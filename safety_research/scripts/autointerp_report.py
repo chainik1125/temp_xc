@@ -1,13 +1,13 @@
 """
-Render the StackedSAE-vs-TXCDR autointerp report.
+Render the StackedSAE-vs-TXC autointerp report.
 
 Both arms are T=5 stacked checkpoints from the safety pipeline; the only
 architectural difference is StackedSAE uses block-diagonal weights while
-TXCDR's W_enc / W_dec are full-rank across temporal positions.
+TXC's W_enc / W_dec are full-rank across temporal positions.
 
 Reads (Haiku 4.5 explanations, all-active scope):
   results/autointerp/tsae/explanations.jsonl  — StackedSAE (T=5)
-  results/autointerp/txc/explanations.jsonl   — TXCDR (T=5)
+  results/autointerp/txc/explanations.jsonl   — TXC (T=5)
   results/umap_meta/{tsae,txc}/summary.json   — UMAP+HDBSCAN cluster labels
   ../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/*.png
 
@@ -44,7 +44,7 @@ REPORT = SAFETY_DIR / "results" / "autointerp_report.md"
 
 # On-disk arm key → display label.
 ARMS = ["tsae", "txc"]
-ARM_TITLE = {"tsae": "StackedSAE (T=5)", "txc": "TXCDR (T=5)"}
+ARM_TITLE = {"tsae": "StackedSAE (T=5)", "txc": "TXC (T=5)"}
 
 
 def load_jsonl(path: Path) -> list[dict]:
@@ -184,9 +184,9 @@ def main() -> None:
 
     # markdown report
     md = []
-    md.append("# Autointerp report — StackedSAE vs TXCDR (T=5, Haiku 4.5)\n")
+    md.append("# Autointerp report — StackedSAE vs TXC (T=5, Haiku 4.5)\n")
     md.append(
-        "Pairwise contrast between **StackedSAE (T=5)** and **TXCDR (T=5)** on "
+        "Pairwise contrast between **StackedSAE (T=5)** and **TXC (T=5)** on "
         "the same 32-token chains. Both arms share T=5 and the same activation "
         "cache; they differ only in the encoder/decoder weight structure "
         "(block-diagonal vs full-rank across temporal positions).\n\n"
@@ -196,7 +196,7 @@ def main() -> None:
         "`<start_of_turn>` / `<end_of_turn>` are no longer mislabeled.\n"
     )
 
-    md.append("## Qualitative analysis: StackedSAE vs TXCDR\n")
+    md.append("## Qualitative analysis: StackedSAE vs TXC\n")
 
     # --- Para 1: intro — what we want to show ---
     md.append(
@@ -204,11 +204,11 @@ def main() -> None:
         "with either block-diagonal cross-position weights (each window "
         "position gets its own SAE, sharing a dictionary; *StackedSAE*) or "
         "with full-rank cross-position weights (W_enc and W_dec are dense "
-        "across the temporal window; *TXCDR*). All other knobs are matched: "
+        "across the temporal window; *TXC*). All other knobs are matched: "
         "same backbone (`google/gemma-2-2b-it`, `mid_res` layer), same "
         "activation cache, same T=5 windows, same k=100 sparsity, same "
         "d_sae=18,432 dictionary width. We ask whether the additional "
-        "cross-position capacity in TXCDR surfaces *qualitatively different* "
+        "cross-position capacity in TXC surfaces *qualitatively different* "
         "features — concepts whose information mass is distributed across "
         "multiple tokens — or merely redistributes the same per-position "
         "features the StackedSAE already captures.\n"
@@ -218,11 +218,11 @@ def main() -> None:
     md.append(
         "**Architectural contrast.** With T=5, StackedSAE's encoder map at "
         "window position *p* depends only on the residual at *p*, and "
-        "reconstruction at *p* uses only activations at *p*. TXCDR drops "
+        "reconstruction at *p* uses only activations at *p*. TXC drops "
         "that structural constraint: its dense W_enc lets a single feature "
         "aggregate information across all five positions, and its dense "
         "W_dec lets that feature contribute to reconstruction at any "
-        "position. The prediction is that TXCDR features should be free to "
+        "position. The prediction is that TXC features should be free to "
         "encode concepts whose support is distributed across multiple "
         "tokens (a discourse-marker phrase, a dateline, a clause boundary), "
         "while StackedSAE — denied that flexibility — should fragment such "
@@ -239,7 +239,7 @@ def main() -> None:
         "the trained model over a 1,500-chain sample of the cache and "
         "keeping every feature with at least three top-window examples "
         f"({stats['tsae']['n_features']:,} StackedSAE / "
-        f"{stats['txc']['n_features']:,} TXCDR features). For each feature we "
+        f"{stats['txc']['n_features']:,} TXC features). For each feature we "
         "elicit a single-sentence concept explanation via Claude Haiku 4.5, "
         "presenting the top-12 activating windows with the activating span "
         "wrapped in `[FOCUS]...[/FOCUS]` tags and a system prompt that "
@@ -257,20 +257,20 @@ def main() -> None:
 
     # --- Para 4: results ---
     md.append(
-        "**Results.** On the per-sentence activation maps, TXCDR features "
+        "**Results.** On the per-sentence activation maps, TXC features "
         "fire as wide ~T-token diagonal bands following the natural span of "
         "the underlying concept, while StackedSAE features fire as isolated "
         "single-position spikes co-located with the concept's most "
         "informative token — the architectural prediction borne out visually "
-        "across all five chains. In the explanation embedding, TXCDR yields "
+        "across all five chains. In the explanation embedding, TXC yields "
         "*k*=15 well-separated clusters (silhouette +0.01) versus "
         "StackedSAE's *k*=23 tighter but heavily overlapping clusters "
         "(silhouette −0.20); StackedSAE's groupings are concrete entity "
         "types (acronyms, dates, geographic markers, sports headlines), "
-        "whereas TXCDR additionally captures discourse-level abstractions "
+        "whereas TXC additionally captures discourse-level abstractions "
         "(first-person narrative openings, news article datelines, "
         "contrast/transition markers). An LLM-judged temporal-coherence "
-        "score over the cluster labels favors TXCDR (6.80 vs 4.78); "
+        "score over the cluster labels favors TXC (6.80 vs 4.78); "
         "StackedSAE wins on lexical coherence (7.08 vs 6.31), reflecting a "
         "tendency to memorize narrow token-level patterns at the cost of "
         "discourse-level abstraction. Safety-tag composition is "
@@ -336,7 +336,7 @@ def main() -> None:
 
     # Cross-arm cluster-metric and safety-composition bar charts are
     # produced by umap_meta.py but mix in the SAE (T=1) baseline, which is
-    # outside the scope of the StackedSAE-vs-TXCDR contrast. Skip them.
+    # outside the scope of the StackedSAE-vs-TXC contrast. Skip them.
 
     # ─────────── Sentence-level case studies ───────────
     md.append("## Sentence-level case studies\n")
@@ -365,7 +365,7 @@ def main() -> None:
     )
 
     sentence_pngs = sorted(SENTENCE_DIR.glob("sentence_*_exclusive.png"))
-    for png in sentence_pngs[:5]:
+    for png in sentence_pngs[:10]:
         chain_match = re.search(r"chain(\d+)", png.name)
         chain_id = chain_match.group(1) if chain_match else "?"
         md.append(f"### Chain {chain_id}\n")
@@ -416,7 +416,7 @@ def main() -> None:
         "Top distinctive content words per arm — coarse summary of what "
         "concepts each arm's dictionary tends to label.\n"
     )
-    md.append("| rank | StackedSAE (T=5) | count | TXCDR (T=5) | count |")
+    md.append("| rank | StackedSAE (T=5) | count | TXC (T=5) | count |")
     md.append("|-----:|------------------|------:|-------------|------:|")
     sae_top = explanation_topic_word_freq(arm_records["tsae"], n=20)
     txc_top = explanation_topic_word_freq(arm_records["txc"], n=20)

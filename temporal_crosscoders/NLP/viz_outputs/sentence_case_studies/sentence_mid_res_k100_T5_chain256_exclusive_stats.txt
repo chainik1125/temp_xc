@@ -1,0 +1,19 @@
+Source: chain256 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.3051 +/- 0.1019
+  Local feature sparsity:    0.0566
+  Local active feats/pos:    432.7 (full D_SAE)
+  Local frac nonzero:        0.0566
+  Local max activation:      371.83
+  Local mean activation (>0):11.52
+
+TXC:
+  Local position entropy:    0.9811 +/- 0.0340
+  Local feature sparsity:    0.4893
+  Local active feats/pos:    881.7 (full D_SAE)
+  Local frac nonzero:        0.4893
+  Local max activation:      828.38
+  Local mean activation (>0):27.70

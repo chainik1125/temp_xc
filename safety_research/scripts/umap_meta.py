@@ -44,7 +44,7 @@ ARMS = ["sae", "tsae", "txc"]
 ARM_DISPLAY = {
     "sae":  "SAE (T=1)",
     "tsae": "StackedSAE (T=5)",
-    "txc":  "TXCDR (T=5)",
+    "txc":  "TXC (T=5)",
 }
 EXPLAIN_MODEL = "claude-haiku-4-5-20251001"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

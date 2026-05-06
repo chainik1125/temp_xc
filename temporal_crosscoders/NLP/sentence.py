@@ -440,19 +440,19 @@ def main():
     parser.add_argument("--cmap-sae", type=str, default="inferno",
                         help="Colormap for SAE heatmap (default: inferno)")
     parser.add_argument("--cmap-tx", type=str, default="inferno",
-                        help="Colormap for TXCDR heatmap (default: inferno)")
+                        help="Colormap for TXC heatmap (default: inferno)")
     parser.add_argument("--sae-ckpt", type=str, default=None,
                         help="Override path to the SAE-family checkpoint "
                              "(e.g. a safety_research/results/checkpoints "
                              "file with a non-canonical name).")
     parser.add_argument("--tx-ckpt", type=str, default=None,
-                        help="Override path to the TXCDR checkpoint.")
+                        help="Override path to the TXC checkpoint.")
     parser.add_argument("--sae-interps", type=str, default=None,
                         help="Path to the SAE-side autointerp source. Either "
                              "a JSONL produced by run_autointerp.py, or a "
                              "per-feature-JSON directory root.")
     parser.add_argument("--tx-interps", type=str, default=None,
-                        help="Path to the TXCDR autointerp source (JSONL or "
+                        help="Path to the TXC autointerp source (JSONL or "
                              "per-feature-JSON directory root).")
     args = parser.parse_args()
 
@@ -512,7 +512,7 @@ def main():
 
     # Stats
     sae_stats = compute_stats(sae_hm, sae_acts, "StackedSAE")
-    tx_stats = compute_stats(tx_hm, tx_acts, "TXCDR")
+    tx_stats = compute_stats(tx_hm, tx_acts, "TXC")
 
     select_desc = {
         "magnitude": f"top {n_feat} features per-model by activation magnitude",
@@ -525,7 +525,7 @@ def main():
         f"\n"
         f"StackedSAE:\n{format_stats(sae_stats)}\n"
         f"\n"
-        f"TXCDR:\n{format_stats(tx_stats)}\n"
+        f"TXC:\n{format_stats(tx_stats)}\n"
     )
     print(stats_text)
 
@@ -538,10 +538,10 @@ def main():
         "txcdr", args.layer, args.k, args.T, tx_top_idx,
         interp_root=args.tx_interps,
     )
-    print(f"  Loaded interps: SAE={len(sae_interps)}/{n_feat}, TXCDR={len(tx_interps)}/{n_feat}")
+    print(f"  Loaded interps: SAE={len(sae_interps)}/{n_feat}, TXC={len(tx_interps)}/{n_feat}")
 
     # ─── Plot: 2 heatmaps stacked top-to-bottom + interp legends ──────────
-    # Layout: 2 rows (StackedSAE, TXCDR) × 2 cols (heatmap, interp legend).
+    # Layout: 2 rows (StackedSAE, TXC) × 2 cols (heatmap, interp legend).
     # The figsize and width_ratios are chosen so the heatmap subplot is
     # close to square (≈6.4×6.3"); we use aspect="auto" so the heatmap
     # fills its full subplot, which is required for the legend axis (next
@@ -588,11 +588,11 @@ def main():
     add_interp_legend(ax0_leg, sae_top_idx, sae_interps, n_feat)
     ax0_leg.set_title("StackedSAE feature interpretations (Haiku)", fontsize=9, loc="left")
 
-    # ─── TXCDR heatmap (row 1) ─────────────────────────────────────────────
+    # ─── TXC heatmap (row 1) ─────────────────────────────────────────────
     ax1 = fig.add_subplot(gs[1, 0])
     im1 = ax1.imshow(tx_log.T, aspect="auto", cmap=args.cmap_tx,
                       norm=make_norm(tx_hm), interpolation="nearest")
-    ax1.set_title(f"TXCDR (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
+    ax1.set_title(f"TXC (T={args.T}) — {args.layer} k={args.k}", fontsize=11)
     ax1.set_xlabel("Token position")
     ax1.set_ylabel("Feature")
     ax1.set_xticks(range(seq_len))
@@ -605,10 +605,10 @@ def main():
     cb1.ax.set_yticks(cb1_ticks)
     cb1.ax.set_yticklabels([f"{np.expm1(t):.0f}" for t in cb1_ticks])
 
-    # TXCDR interp legend (row 1, col 1)
+    # TXC interp legend (row 1, col 1)
     ax1_leg = fig.add_subplot(gs[1, 1])
     add_interp_legend(ax1_leg, tx_top_idx, tx_interps, n_feat)
-    ax1_leg.set_title("TXCDR feature interpretations (Haiku)", fontsize=9, loc="left")
+    ax1_leg.set_title("TXC feature interpretations (Haiku)", fontsize=9, loc="left")
 
     # Stats and the selection-procedure description live in the markdown
     # report (results/autointerp_report.md), not on the figure. The

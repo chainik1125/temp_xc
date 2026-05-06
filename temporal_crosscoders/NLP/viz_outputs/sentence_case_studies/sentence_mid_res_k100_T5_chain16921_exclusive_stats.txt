@@ -10,7 +10,7 @@ StackedSAE:
   Local max activation:      376.68
   Local mean activation (>0):12.30
 
-TXCDR:
+TXC:
   Local position entropy:    0.9853 +/- 0.0275
   Local feature sparsity:    0.5078
   Local active feats/pos:    865.7 (full D_SAE)

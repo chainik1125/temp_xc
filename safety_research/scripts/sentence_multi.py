@@ -22,7 +22,7 @@ OUT_DIR = NLP_DIR / "viz_outputs" / "sentence_case_studies"
 # Five chain ids picked so the cache contents differ enough to surface
 # distinct activation patterns. The first is the chain we already used
 # in earlier figures; the others are arbitrary but reproducible.
-CHAINS = [16921, 42, 137, 4242, 12345]
+CHAINS = [16921, 42, 137, 4242, 12345, 7, 256, 1024, 8888, 19999]
 
 PYTHON = "/home/cs29824/.venv/bin/python"
 

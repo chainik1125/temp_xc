@@ -1,25 +1,25 @@
-# Autointerp report — StackedSAE vs TXCDR (T=5, Haiku 4.5)
+# Autointerp report — StackedSAE vs TXC (T=5, Haiku 4.5)
 
-Pairwise contrast between **StackedSAE (T=5)** and **TXCDR (T=5)** on the same 32-token chains. Both arms share T=5 and the same activation cache; they differ only in the encoder/decoder weight structure (block-diagonal vs full-rank across temporal positions).
+Pairwise contrast between **StackedSAE (T=5)** and **TXC (T=5)** on the same 32-token chains. Both arms share T=5 and the same activation cache; they differ only in the encoder/decoder weight structure (block-diagonal vs full-rank across temporal positions).
 
 Explainer: `claude-haiku-4-5-20251001` (async, concurrency=1, SDK retry-after on 429s). Special tokens render literally in the highlighted window so features that fire on `<bos>` / `<start_of_turn>` / `<end_of_turn>` are no longer mislabeled.
 
-## Qualitative analysis: StackedSAE vs TXCDR
+## Qualitative analysis: StackedSAE vs TXC
 
-**Intro.** A T=5 sparse-autoencoding dictionary can be parameterized with either block-diagonal cross-position weights (each window position gets its own SAE, sharing a dictionary; *StackedSAE*) or with full-rank cross-position weights (W_enc and W_dec are dense across the temporal window; *TXCDR*). All other knobs are matched: same backbone (`google/gemma-2-2b-it`, `mid_res` layer), same activation cache, same T=5 windows, same k=100 sparsity, same d_sae=18,432 dictionary width. We ask whether the additional cross-position capacity in TXCDR surfaces *qualitatively different* features — concepts whose information mass is distributed across multiple tokens — or merely redistributes the same per-position features the StackedSAE already captures.
+**Intro.** A T=5 sparse-autoencoding dictionary can be parameterized with either block-diagonal cross-position weights (each window position gets its own SAE, sharing a dictionary; *StackedSAE*) or with full-rank cross-position weights (W_enc and W_dec are dense across the temporal window; *TXC*). All other knobs are matched: same backbone (`google/gemma-2-2b-it`, `mid_res` layer), same activation cache, same T=5 windows, same k=100 sparsity, same d_sae=18,432 dictionary width. We ask whether the additional cross-position capacity in TXC surfaces *qualitatively different* features — concepts whose information mass is distributed across multiple tokens — or merely redistributes the same per-position features the StackedSAE already captures.
 
-**Architectural contrast.** With T=5, StackedSAE's encoder map at window position *p* depends only on the residual at *p*, and reconstruction at *p* uses only activations at *p*. TXCDR drops that structural constraint: its dense W_enc lets a single feature aggregate information across all five positions, and its dense W_dec lets that feature contribute to reconstruction at any position. The prediction is that TXCDR features should be free to encode concepts whose support is distributed across multiple tokens (a discourse-marker phrase, a dateline, a clause boundary), while StackedSAE — denied that flexibility — should fragment such concepts into one feature per position-where-they-co-occur. We test this prediction qualitatively along three axes: per-token activation geometry on individual sequences, the structure of the explanation embedding, and the safety-tag composition of the two dictionaries.
+**Architectural contrast.** With T=5, StackedSAE's encoder map at window position *p* depends only on the residual at *p*, and reconstruction at *p* uses only activations at *p*. TXC drops that structural constraint: its dense W_enc lets a single feature aggregate information across all five positions, and its dense W_dec lets that feature contribute to reconstruction at any position. The prediction is that TXC features should be free to encode concepts whose support is distributed across multiple tokens (a discourse-marker phrase, a dateline, a clause boundary), while StackedSAE — denied that flexibility — should fragment such concepts into one feature per position-where-they-co-occur. We test this prediction qualitatively along three axes: per-token activation geometry on individual sequences, the structure of the explanation embedding, and the safety-tag composition of the two dictionaries.
 
-**Methods.** We surface every active feature in each arm by running the trained model over a 1,500-chain sample of the cache and keeping every feature with at least three top-window examples (8,454 StackedSAE / 5,033 TXCDR features). For each feature we elicit a single-sentence concept explanation via Claude Haiku 4.5, presenting the top-12 activating windows with the activating span wrapped in `[FOCUS]...[/FOCUS]` tags and a system prompt that forbids the explainer from describing the tags themselves. Explanations are embedded with `sentence-transformers/all-MiniLM-L6-v2`, projected to 2D with UMAP, and partitioned with HDBSCAN; clusters are labeled lexically by their distinctive content tokens. For per-sentence visualization we pick five 32-token sequences and select the top-32 features per arm via an *exclusive* score (each position claims its most-concentrated feature, greedy assignment, no feature reused; `temporal_crosscoders/NLP/sentence.py:307–339`).
+**Methods.** We surface every active feature in each arm by running the trained model over a 1,500-chain sample of the cache and keeping every feature with at least three top-window examples (8,454 StackedSAE / 5,033 TXC features). For each feature we elicit a single-sentence concept explanation via Claude Haiku 4.5, presenting the top-12 activating windows with the activating span wrapped in `[FOCUS]...[/FOCUS]` tags and a system prompt that forbids the explainer from describing the tags themselves. Explanations are embedded with `sentence-transformers/all-MiniLM-L6-v2`, projected to 2D with UMAP, and partitioned with HDBSCAN; clusters are labeled lexically by their distinctive content tokens. For per-sentence visualization we pick five 32-token sequences and select the top-32 features per arm via an *exclusive* score (each position claims its most-concentrated feature, greedy assignment, no feature reused; `temporal_crosscoders/NLP/sentence.py:307–339`).
 
-**Results.** On the per-sentence activation maps, TXCDR features fire as wide ~T-token diagonal bands following the natural span of the underlying concept, while StackedSAE features fire as isolated single-position spikes co-located with the concept's most informative token — the architectural prediction borne out visually across all five chains. In the explanation embedding, TXCDR yields *k*=15 well-separated clusters (silhouette +0.01) versus StackedSAE's *k*=23 tighter but heavily overlapping clusters (silhouette −0.20); StackedSAE's groupings are concrete entity types (acronyms, dates, geographic markers, sports headlines), whereas TXCDR additionally captures discourse-level abstractions (first-person narrative openings, news article datelines, contrast/transition markers). An LLM-judged temporal-coherence score over the cluster labels favors TXCDR (6.80 vs 4.78); StackedSAE wins on lexical coherence (7.08 vs 6.31), reflecting a tendency to memorize narrow token-level patterns at the cost of discourse-level abstraction. Safety-tag composition is near-identical (≈99% `NONE`; ≈0.5% `HARMFUL_CONTENT`), so the architectural difference is concentrated in *what kinds* of patterns the dictionary discovers, not in how they are valenced.
+**Results.** On the per-sentence activation maps, TXC features fire as wide ~T-token diagonal bands following the natural span of the underlying concept, while StackedSAE features fire as isolated single-position spikes co-located with the concept's most informative token — the architectural prediction borne out visually across all five chains. In the explanation embedding, TXC yields *k*=15 well-separated clusters (silhouette +0.01) versus StackedSAE's *k*=23 tighter but heavily overlapping clusters (silhouette −0.20); StackedSAE's groupings are concrete entity types (acronyms, dates, geographic markers, sports headlines), whereas TXC additionally captures discourse-level abstractions (first-person narrative openings, news article datelines, contrast/transition markers). An LLM-judged temporal-coherence score over the cluster labels favors TXC (6.80 vs 4.78); StackedSAE wins on lexical coherence (7.08 vs 6.31), reflecting a tendency to memorize narrow token-level patterns at the cost of discourse-level abstraction. Safety-tag composition is near-identical (≈99% `NONE`; ≈0.5% `HARMFUL_CONTENT`), so the architectural difference is concentrated in *what kinds* of patterns the dictionary discovers, not in how they are valenced.
 
 ## Headline numbers
 
 | arm | n features | mean explanation length |
 |-----|-----------:|-----------------------:|
 | StackedSAE (T=5) | 8454 | 242 chars |
-| TXCDR (T=5) | 5033 | 240 chars |
+| TXC (T=5) | 5033 | 240 chars |
 
 ## Safety-tag distribution
 
@@ -28,7 +28,7 @@ Explainer: `claude-haiku-4-5-20251001` (async, concurrency=1, SDK retry-after on
 | arm | NONE | REFUSAL | DECEPTION | HARMFUL_CONTENT | BIAS | total |
 |-----|-----:|--------:|----------:|----------------:|-----:|------:|
 | StackedSAE (T=5) | 8390 (99.2%) | 3 (0.0%) | 2 (0.0%) | 46 (0.5%) | 13 (0.2%) | 8454 |
-| TXCDR (T=5) | 4991 (99.2%) | 2 (0.0%) | 6 (0.1%) | 27 (0.5%) | 7 (0.1%) | 5033 |
+| TXC (T=5) | 4991 (99.2%) | 2 (0.0%) | 6 (0.1%) | 27 (0.5%) | 7 (0.1%) | 5033 |
 
 ## UMAP cluster meta-autointerp
 
@@ -55,11 +55,11 @@ Source: `safety_research/scripts/umap_meta.py`
 | 8 | 8 | 0.76 | NONE:8 | pandemic · covid · coronavirus · disease | This feature tracks references to COVID-19, pandemics, and coronavirus-related content, activating strongly o… |
 | 9 | 37 | 0.74 | NONE:36, HARMFUL_CONTENT:1 | greeting · informal · casual · guys | This feature activates on direct address transitions and conversational shifts where the speaker acknowledges… |
 
-### TXCDR (T=5) — UMAP
+### TXC (T=5) — UMAP
 
 `n=5033` features, `k=15` clusters, silhouette `+0.01`, mean cohesion `0.63`, noise frac `0.02%`.
 
-![UMAP TXCDR (T=5)](../figures/umap_txc.png)
+![UMAP TXC (T=5)](../figures/umap_txc.png)
 
 | cluster | n_feat | cohesion | safety mix | name | sample explanation |
 |--------:|-------:|---------:|------------|------|---------------------|
@@ -90,6 +90,32 @@ Squaring forces a real strong activation at `p` (not just rare elsewhere). Greed
 
 Code: `temporal_crosscoders/NLP/sentence.py:307–339` (`select_exclusive_features`). Magnitude-mode alternative (`top-k by sum |activation|`): same file, lines 478–479.
 
+### Chain 1024
+
+![chain 1024](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain1024_exclusive.png)
+
+```text
+Source: chain1024 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.3206 +/- 0.1037
+  Local feature sparsity:    0.0605
+  Local active feats/pos:    432.2 (full D_SAE)
+  Local frac nonzero:        0.0605
+  Local max activation:      376.68
+  Local mean activation (>0):11.28
+
+TXC:
+  Local position entropy:    0.9693 +/- 0.0508
+  Local feature sparsity:    0.4482
+  Local active feats/pos:    855.4 (full D_SAE)
+  Local frac nonzero:        0.4482
+  Local max activation:      746.15
+  Local mean activation (>0):26.67
+```
+
 ### Chain 12345
 
 ![chain 12345](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain12345_exclusive.png)
@@ -107,7 +133,7 @@ StackedSAE:
   Local max activation:      371.83
   Local mean activation (>0):10.73
 
-TXCDR:
+TXC:
   Local position entropy:    0.9702 +/- 0.0521
   Local feature sparsity:    0.4580
   Local active feats/pos:    868.8 (full D_SAE)
@@ -133,7 +159,7 @@ StackedSAE:
   Local max activation:      376.68
   Local mean activation (>0):11.67
 
-TXCDR:
+TXC:
   Local position entropy:    0.9613 +/- 0.0629
   Local feature sparsity:    0.4229
   Local active feats/pos:    900.3 (full D_SAE)
@@ -159,13 +185,65 @@ StackedSAE:
   Local max activation:      376.68
   Local mean activation (>0):12.30
 
-TXCDR:
+TXC:
   Local position entropy:    0.9853 +/- 0.0275
   Local feature sparsity:    0.5078
   Local active feats/pos:    865.7 (full D_SAE)
   Local frac nonzero:        0.5078
   Local max activation:      746.98
   Local mean activation (>0):26.62
+```
+
+### Chain 19999
+
+![chain 19999](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain19999_exclusive.png)
+
+```text
+Source: chain19999 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.2872 +/- 0.0883
+  Local feature sparsity:    0.0518
+  Local active feats/pos:    432.2 (full D_SAE)
+  Local frac nonzero:        0.0518
+  Local max activation:      376.68
+  Local mean activation (>0):11.85
+
+TXC:
+  Local position entropy:    0.9698 +/- 0.0435
+  Local feature sparsity:    0.5098
+  Local active feats/pos:    893.4 (full D_SAE)
+  Local frac nonzero:        0.5098
+  Local max activation:      691.33
+  Local mean activation (>0):24.31
+```
+
+### Chain 256
+
+![chain 256](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain256_exclusive.png)
+
+```text
+Source: chain256 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.3051 +/- 0.1019
+  Local feature sparsity:    0.0566
+  Local active feats/pos:    432.7 (full D_SAE)
+  Local frac nonzero:        0.0566
+  Local max activation:      371.83
+  Local mean activation (>0):11.52
+
+TXC:
+  Local position entropy:    0.9811 +/- 0.0340
+  Local feature sparsity:    0.4893
+  Local active feats/pos:    881.7 (full D_SAE)
+  Local frac nonzero:        0.4893
+  Local max activation:      828.38
+  Local mean activation (>0):27.70
 ```
 
 ### Chain 4242
@@ -185,7 +263,7 @@ StackedSAE:
   Local max activation:      376.68
   Local mean activation (>0):9.32
 
-TXCDR:
+TXC:
   Local position entropy:    0.9491 +/- 0.0458
   Local feature sparsity:    0.5957
   Local active feats/pos:    894.9 (full D_SAE)
@@ -211,13 +289,65 @@ StackedSAE:
   Local max activation:      376.68
   Local mean activation (>0):10.71
 
-TXCDR:
+TXC:
   Local position entropy:    0.9641 +/- 0.0467
   Local feature sparsity:    0.5625
   Local active feats/pos:    881.1 (full D_SAE)
   Local frac nonzero:        0.5625
   Local max activation:      837.00
   Local mean activation (>0):25.06
+```
+
+### Chain 7
+
+![chain 7](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain7_exclusive.png)
+
+```text
+Source: chain7 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.4701 +/- 0.1534
+  Local feature sparsity:    0.1064
+  Local active feats/pos:    432.5 (full D_SAE)
+  Local frac nonzero:        0.1064
+  Local max activation:      376.68
+  Local mean activation (>0):7.76
+
+TXC:
+  Local position entropy:    0.9724 +/- 0.0478
+  Local feature sparsity:    0.5068
+  Local active feats/pos:    869.8 (full D_SAE)
+  Local frac nonzero:        0.5068
+  Local max activation:      828.61
+  Local mean activation (>0):27.96
+```
+
+### Chain 8888
+
+![chain 8888](../../temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain8888_exclusive.png)
+
+```text
+Source: chain8888 | Layer: mid_res | k=100 T=5
+Selection: 32 features per-model (one most-exclusive per token position)
+All metrics computed LOCALLY on this 32-token sequence.
+
+StackedSAE:
+  Local position entropy:    0.3593 +/- 0.1361
+  Local feature sparsity:    0.0723
+  Local active feats/pos:    433.7 (full D_SAE)
+  Local frac nonzero:        0.0723
+  Local max activation:      376.68
+  Local mean activation (>0):9.19
+
+TXC:
+  Local position entropy:    0.9632 +/- 0.0487
+  Local feature sparsity:    0.4473
+  Local active feats/pos:    898.7 (full D_SAE)
+  Local frac nonzero:        0.4473
+  Local max activation:      644.93
+  Local mean activation (>0):25.25
 ```
 
 ## Top-12 most-active features per arm
@@ -241,7 +371,7 @@ Features ranked by total activation mass across the 1,500-chain scan. Two exampl
 | 17168 | NONE | This feature activates on title-like or headline text patterns that introduce topics, products, or content sections—typically appearing aft… | `[FOCUS]<bos>Summer heat waves in[/FOCUS] Santiago, just like anywhere else, mean one thing` <br> `[FOCUS]<bos>Latest Razer Blade Gets[/FOCUS] Outfitted with More Potent Gaming Hardware, C…` |
 | 10085 | NONE | This feature activates on sentence fragments or incomplete phrases that end mid-clause with a capital letter or topic shift following, typi… | `[FOCUS]<bos>Our favourite picks from[/FOCUS] Net-a-porter Everybody’s favourite` <br> `[FOCUS]<bos>Drive economic development through[/FOCUS] high-speed networks An end-to-` |
 
-### TXCDR (T=5) — top-12
+### TXC (T=5) — top-12
 
 | feat | safety | explanation | top windows |
 |------|--------|-------------|-------------|
@@ -287,7 +417,7 @@ Features ranked by total activation mass across the 1,500-chain scan. Two exampl
 | 9121 | NONE | This feature activates on listicle and enumeration patterns, particularly titles or headers that reference numbered collections, rankings, … | `<bos[FOCUS]>The Five Best Concerts in[/FOCUS] L.A. This Weekend Friday, July` <br> `<bos>Hofstede canada vs japan 10[FOCUS] cultural contrasts between us &[/FOCUS] japanese …` |
 | 2393 | NONE | This feature activates on proper nouns and named entities (people, organizations, products, places) that appear immediately after discourse… | `<bos>Fans are having[FOCUS] fun keeping up with Kendall[/FOCUS] Jenner's culinary skills.…` <br> `<bos>Believe[FOCUS] it or not, Manfred[/FOCUS] von Richthofen — AKA the Red Baron,` |
 
-### TXCDR (T=5) — 20 random
+### TXC (T=5) — 20 random
 
 | feat | safety | explanation | top windows |
 |------|--------|-------------|-------------|
@@ -316,7 +446,7 @@ Features ranked by total activation mass across the 1,500-chain scan. Two exampl
 
 Top distinctive content words per arm — coarse summary of what concepts each arm's dictionary tends to label.
 
-| rank | StackedSAE (T=5) | count | TXCDR (T=5) | count |
+| rank | StackedSAE (T=5) | count | TXC (T=5) | count |
 |-----:|------------------|------:|-------------|------:|
 | 1 | phrases | 3451 | phrases | 1980 |
 | 2 | where | 2229 | where | 1211 |
