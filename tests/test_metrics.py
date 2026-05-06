@@ -136,3 +136,80 @@ class TestGlobalLocalRecovery:
         # Best-of-orientation pick guarantees AUC >= 0.5.
         for key in ("auc_local", "auc_global"):
             assert 0.5 <= out[key] <= 1.0
+
+
+class TestCoupledMode:
+    """Smoke tests for coupled-features data + gAUC metric."""
+
+    def test_coupling_matrix_has_exactly_n_parents_per_row(self):
+        from temporal_bench.data.coupled import generate_coupling_matrix
+
+        rng = torch.Generator().manual_seed(0)
+        C = generate_coupling_matrix(K=10, M=20, n_parents=3, generator=rng)
+        assert C.shape == (20, 10)
+        assert (C.sum(dim=1) == 3).all()
+
+    def test_apply_coupling_or_matches_oracle_for_known_chain(self):
+        from temporal_bench.data.coupled import apply_coupling_or
+
+        # Two emissions, three hidden chains. Em 0 parented by {0,1}; em 1 by {2}.
+        C = torch.tensor([[1.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        h = torch.tensor([[[1, 0], [0, 0], [0, 1]]], dtype=torch.float32)  # (1, 3, 2)
+        s = apply_coupling_or(h, C)
+        # Em 0 fires when h0 OR h1 is on -> (t=0: yes, t=1: no)
+        # Em 1 fires when h2 is on -> (t=0: no, t=1: yes)
+        expected = torch.tensor([[[1, 0], [0, 1]]], dtype=torch.float32)
+        assert torch.equal(s, expected)
+
+    def test_compute_hidden_features_unit_norm(self):
+        from temporal_bench.data.coupled import (
+            compute_hidden_features,
+            generate_coupling_matrix,
+        )
+
+        rng = torch.Generator().manual_seed(0)
+        C = generate_coupling_matrix(K=8, M=16, n_parents=2, generator=rng)
+        emission_features = torch.randn(16, 32, generator=rng)
+        hidden_features = compute_hidden_features(emission_features, C)
+        assert hidden_features.shape == (8, 32)
+        norms = hidden_features.norm(dim=1)
+        assert torch.allclose(norms, torch.ones(8), atol=1e-5)
+
+    def test_pipeline_end_to_end_coupled_mode(self):
+        from temporal_bench.config import DataConfig
+        from temporal_bench.data.pipeline import DataPipeline
+
+        cfg = DataConfig(n_features=12, d_model=24, pi=0.15, n_hidden=6, n_parents=2, seed=0)
+        pipe = DataPipeline(cfg, device=torch.device("cpu"))
+        assert pipe.is_coupled
+        assert pipe.true_features.shape == (12, 24)
+        assert pipe.hidden_features.shape == (6, 24)
+        x, s, h = pipe.eval_data_with_support(n_sequences=10, T=3, rho=0.5, seed=1)
+        assert x.shape == (10, 3, 24)
+        assert s.shape == (10, 12, 3)  # M emissions
+        assert h.shape == (10, 6, 3)  # K hidden chains
+        # Emissions are derived from h by OR-gate; whenever any parent fires,
+        # the emission must fire too.
+        from temporal_bench.data.coupled import apply_coupling_or
+
+        s_recomputed = apply_coupling_or(h, pipe.coupling_matrix)
+        assert torch.equal(s, s_recomputed)
+
+    def test_evaluate_populates_gauc_when_hidden_features_supplied(self):
+        from temporal_bench.config import DataConfig
+        from temporal_bench.data.pipeline import DataPipeline
+        from temporal_bench.metrics import evaluate
+
+        cfg = DataConfig(n_features=12, d_model=24, pi=0.15, n_hidden=6, n_parents=2, seed=0)
+        pipe = DataPipeline(cfg, device=torch.device("cpu"))
+        x, s, _h = pipe.eval_data_with_support(n_sequences=10, T=3, rho=0.5, seed=1)
+        model = _create_model("txcdr", d_in=24, d_sae=12, T=3, k=2, device=torch.device("cpu"))
+        em = evaluate(model, x, pipe.true_features, eval_s=s, hidden_features=pipe.hidden_features)
+        assert 0.0 <= em.auc <= 1.0
+        assert 0.0 <= em.auc_hidden <= 1.0
+        # Untrained model has random decoders; both AUCs should be small.
+        assert em.auc_hidden < 0.7
+        # Without hidden_features, gAUC stays NaN.
+        em2 = evaluate(model, x, pipe.true_features)
+        import math
+        assert math.isnan(em2.auc_hidden)

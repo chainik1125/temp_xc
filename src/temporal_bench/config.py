@@ -23,6 +23,15 @@ class DataConfig:
     # (non-empty list), it overrides any scalar rho passed into data methods
     # and disables the per-rho cache. Length must equal n_features.
     rho_per_feature: list[float] = field(default_factory=list)
+    # Coupled-features mode (Aniket Level 3 / Dmitry exp1c3). When
+    # n_hidden > 0 and n_parents > 0, K=n_hidden hidden Markov chains drive
+    # M=n_features emission features through a binary coupling matrix where
+    # each emission has exactly n_parents parent hidden chains. The
+    # observation x is built from the M emission features; the metrics also
+    # report decoder-cosine AUC against the K aggregated "hidden" feature
+    # directions (gAUC / global recovery).
+    n_hidden: int = 0  # K. 0 disables coupled mode.
+    n_parents: int = 0  # parents per emission. 0 disables coupled mode.
 
 
 @dataclass

@@ -62,6 +62,15 @@ class EvalMetrics:
     #          classification AUC (latent vs feature-active-in-window).
     auc_activation_local: float = float("nan")
     auc_activation_global: float = float("nan")
+    # Coupled-features global recovery (Aniket Level 3 / Dmitry exp1c3).
+    # Standard `auc` (computed against emission feature directions) is
+    # eAUC (local). `auc_hidden` is gAUC: standard feature_recovery AUC
+    # but with the K hidden-direction features as the comparison set.
+    # Populated only when evaluate() is called with hidden_features.
+    auc_hidden: float = float("nan")
+    r_at_90_hidden: float = float("nan")
+    r_at_80_hidden: float = float("nan")
+    mean_max_cos_hidden: float = float("nan")
 
 
 def compute_nmse(x: torch.Tensor, x_hat: torch.Tensor) -> float:
@@ -270,20 +279,27 @@ def evaluate(
     eval_data: torch.Tensor,
     true_features: torch.Tensor,
     eval_s: torch.Tensor | None = None,
+    hidden_features: torch.Tensor | None = None,
 ) -> EvalMetrics:
     """Run model on eval data and compute all metrics.
 
     Args:
         model: Any TemporalAE model.
         eval_data: (n_seq, T, d) evaluation data.
-        true_features: (n_features, d) ground truth feature directions.
+        true_features: (n_features, d) ground truth feature directions
+            (in coupled mode this is the M emission directions; standard
+            `auc` is then eAUC, the local recovery metric).
         eval_s: Optional (n_seq, n_features, T) per-feature support. When
             provided, activation-trace global/local AUCs are also computed.
+        hidden_features: Optional (K, d) hidden-direction features. When
+            provided, the gAUC suite (auc_hidden, r_at_*, mean_max_cos)
+            is also populated.
 
     Returns:
         EvalMetrics with all standard metrics. The decoder-based global/local
         AUCs are always populated; activation-trace fields are populated only
-        when eval_s is provided.
+        when eval_s is provided; gAUC (auc_hidden) only when hidden_features
+        is provided.
     """
     model.eval()
     out = model(eval_data)
@@ -310,6 +326,12 @@ def evaluate(
         act_gl = feature_recovery_activation_global_local(model, eval_data, eval_s)
         em.auc_activation_local = act_gl["auc_local"]
         em.auc_activation_global = act_gl["auc_global"]
+    if hidden_features is not None:
+        hidden_recovery = feature_recovery(decoder_dirs, hidden_features)
+        em.auc_hidden = hidden_recovery["auc"]
+        em.r_at_90_hidden = hidden_recovery["r_at_90"]
+        em.r_at_80_hidden = hidden_recovery["r_at_80"]
+        em.mean_max_cos_hidden = hidden_recovery["mean_max_cos"]
     return em
 
 
