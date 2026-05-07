@@ -41,6 +41,8 @@ HIER_PLOT_DIR = Path("experiments/c2_hierarchical/plots")
 _TXC_T_CMAP = plt.get_cmap("viridis", 14)
 ARCH_COLORS = {
     "topk_sae":         ("#888888", "TopK-SAE", "o"),
+    "tfa_pos":          ("#2ca02c", "TFA-pos", "X"),
+    "tsae_paper":       ("#CC79A7", "T-SAE", "h"),
     "stacked_sae_T2":   ("#9467bd", "Stacked-SAE T=2", "s"),
     "stacked_sae_T5":   ("#c5b0d5", "Stacked-SAE T=5", "s"),
     "txc_base_T2":      (_TXC_T_CMAP(2),  "TXC-base T=2",  "^"),
@@ -61,7 +63,9 @@ ARCH_ORDER = [
     "txc_base_T8",
     "txc_base_T10",
     "txc_base_T12",
+    "tsae_paper",
     "stacked_sae_T5", "stacked_sae_T2",
+    "tfa_pos",
     "topk_sae",
 ]
 
@@ -70,17 +74,27 @@ def _arch_label(arch_name: str, t_label: str) -> str:
     """Map (arch, t_label) to one of ARCH_COLORS keys.
 
     txc_base is now keyed by T explicitly (T=2/4/5/6/8/10/12) so
-    T-sweep points show up in different colors. tsae_paper / tfa_pos /
-    txc_pro / stacked_sae default-T are mapped to ``None`` to be
-    EXCLUDED from the default plots — they're either out of scope or
-    not at the canonical T value.
+    T-sweep points show up in different colors. txc_pro / stacked_sae
+    default-T are mapped to ``None`` to be EXCLUDED from the default
+    plots — they're either out of scope or not at the canonical T value.
+
+    tsae_paper and tfa_pos are now INCLUDED (added 2026-05-07 by
+    agent_hammer for the F+G baseline-backfill rendering, per
+    coordination note in agent_hammer/briefing.md).
     """
     if arch_name == "topk_sae":
         return "topk_sae"
+    if arch_name == "tfa_pos":
+        return "tfa_pos"
+    if arch_name == "tsae_paper":
+        return "tsae_paper"
     if arch_name == "stacked_sae":
         if t_label == "T=2":
             return "stacked_sae_T2"
         if t_label == "default":
+            return "stacked_sae_T5"
+        # T=5 explicit (from agent_hammer's F+G fill driver) — same as default.
+        if t_label == "T=5":
             return "stacked_sae_T5"
         return None
     if arch_name == "txc_base":
@@ -93,7 +107,7 @@ def _arch_label(arch_name: str, t_label: str) -> str:
             except (ValueError, IndexError):
                 T_val = 5
         return f"txc_base_T{T_val}"
-    return None  # Excludes txc_pro overrides + tsae_paper + others.
+    return None  # Excludes txc_pro overrides + others.
 
 
 ZOOM_CUTOFF_TS = "2026-05-06T22:54:30Z"
