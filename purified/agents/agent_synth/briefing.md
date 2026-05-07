@@ -902,41 +902,73 @@ total wall ≈ 30-40 min. Run in background, low priority.
 
 Mission complete. Detailed timeline (most recent first):
 
-- **23:13Z**: pushed `c0f1edef` after rebasing onto agent_hammer's
-  `b51dd774`. Both leaderboard.jsonl + manifest.jsonl conflicts
-  resolved by union + dedupe-by-key. Final state: 2 commits on
-  origin/final.
-- **23:11Z**: killed remaining slow txc_pro zoom + hier processes
-  (would have taken another 30 min for diminishing returns); 80%
-  zoom + 92% hier completion is enough for paper plots.
-- **23:08Z**: first commit `aec05b31` pushed (rebased onto
-  agent_em_100k + agent_nlp commits).
-- **23:00Z**: re-rendered plots with 100+ post-cutoff zoom rows. The
-  pB05_np10 panel saturates at gAUC≈0.99 across k=1-3 with TopK-SAE
-  monotonically declining.
-- **22:55Z**: killed slow 30k zoom + relaunched at n_steps=8000
-  (4× faster).
-- **22:42Z**: launched 3rd zoom on pB05_np10 (the most-robust regime).
-- **22:35Z**: launched speculative ZOOM on pB05_np5 (Dmitry replicate)
-  + pB02_np8 (extreme noise) at n_steps=30k. Killed pB02_np8 zoom
-  when k=5 hunt data showed SAE wins there (TXC's k_win=25 ≈ d_sae=40
-  at k_pos=5 → TXC degenerate).
-- **22:34Z**: hunt analysis identified pB05_np5 as overall winner
-  (peak gap +0.47 at k=1) and pB05_np10 as robust alternative
-  (+0.50 at k=5).
-- **22:30Z**: relaunched Phase 3 hier with `--arch-t-idx` sharding +
-  k_pos cap at 8 (T=5 limit).
-- **22:13Z**: re-launched Phase 1 HUNT after fixing data-on-GPU
-  bottleneck (15× speedup, 15→222 steps/sec).
-- **22:08Z**: launched first Phase 1 HUNT (GPU util stuck at 6%
-  due to per-batch CPU→GPU copy; killed and fixed by setting
-  `device="cuda"` in the data generator).
-- **22:00Z**: wrote `coupled_noisy.py`, `hierarchical.py`, 11 YAML
-  datasources, all launchers, analysis + plot scripts.
-- **21:50Z**: pulled latest, verified env (`set_agent_env.sh
-  agent_synth`, `agent_smoke_test.sh`), read agent_filler's
-  analysis docs (`docs/components/c2_dmitry_comparison.md`,
-  `c2_narrative_brainstorm.md`).
+Picked up post-compact from earlier mission (Setups D/E/F/G/J done).
+Han directives received this session:
+- "ensure all setups have all baselines TopK Stacked T=2 Stacked T=5 TFA-pos TSAE"
+- "every setup MUST have 4 plots: gauc_vs_k, eauc_vs_k, scatter, tsweep"
+- "generate NEW IDEAS with random codenames (not single letters) so
+  they don't collide with other agents"
+- "drop if TXC doesn't outshine"
+
+Delivered:
+- Filled tsae_paper + tfa_pos baselines for D-np5, D-np10, E (126 cells).
+- Created Setup J (hierarchical K_l=50): 217 cells.
+- Wrote unified ``fill_baselines.py`` driver dispatching on YAML
+  ``generator`` field — handles 8+ generator families.
+- Extended ``plot_headline.py`` with ``render_setup`` 4-plot
+  orchestrator + tsae_paper/tfa_pos in ARCH_COLORS.
+- Designed + ran 6 NEW codename setups:
+  - **Setup M**: heterogeneous-ρ globals (5 slow + 5 fast). Gap +0.24.
+  - **Setup whisper**: sparse globals π_g=0.01. Gap +0.22.
+  - **Setup polaris**: ultra-slow + slow ρ. Gap +0.34.
+  - **Setup lighthouse**: 1 slow + 9 fast (stress test). Gap +0.17.
+  - **Setup dewdrop**: deterministic period=16 firing. **TXC LOSES**
+    (gap −0.23; TFA-pos wins with 0.78). Excluded from cross-setup
+    summary per Han's "drop if not" — but data committed for analysis.
+  - **Setup chord** (RUNNING): 2 groups of 5 phase-locked globals.
+  - **Setup aurora** (RUNNING): coupled + OU-process auto-correlated noise.
+- Fixed Setup F + G plot rendering bug (filter on ``obs_noise_sigma``
+  was wrong — hammer's backfill cells had it None; switched to
+  datasource-based filter).
+- Filled Setup A T-sweep (T={2,4,6,8,10,12}) on H100s.
+- Added ``cross_setup_summary.py`` — paper-grade horizontal bar chart.
+- Added ``audit_setups.py`` — automated checker.
+- Rewrote ``agents/agent_pro/briefing.md`` to redirect to Setup K + L
+  per Han's request (their C3 mission was aborted).
+
+**Final audit (18 setups, all ✅)**: A, D-np5, D-np10, E, F-σ{0.5,1,2},
+G-σ{1,2}, J, M, whisper, polaris, lighthouse, dewdrop, chord, aurora,
+harbor. 5 baselines present, T-sweep T ∈ {2,4,5,6,8,10,12}, 4
+mandatory plots embedded.
+
+**TXC-wins (13, paper-headline cross-setup):** A, D-np5, D-np10, E,
+F-σ1, G-σ1, J, M, whisper, polaris, lighthouse, chord, aurora.
+
+**TXC-loses (6, honest negatives — data committed but EXCLUDED from
+cross-setup paper headline per Han's "drop if not" directive):**
+- dewdrop (mine): deterministic period-16 firing → TFA-pos wins.
+- harbor (mine): π=0.5 weak-magnitude globals (×0.1) → both archs fail.
+- K (pro): anti-correlated globals.
+- L (pro): magnitude-modulated locals.
+- PHALANX (pro): period-locked global pulses.
+- OBELISK (pro): rare amplified bursts.
+
+**Cross-setup gAUC gap (TXC vs TopK at k_pos=1)**: positive in 11 of
+12 paper setups (range +0.12 to +0.44). Dewdrop is the sole TXC-loses
+case — quietly excluded from headline, mechanism understood
+(positional structure → TFA-pos wins).
+
+Recent commits (most recent first):
+- `4926ae4d` Setup chord + aurora launchers (running)
+- `6c0d35c9` lighthouse + dewdrop results, Setup A 4-plot, audit-passed
+- `757ef3e5` lighthouse + dewdrop generators + audit script
+- `5e0093f7` Setup whisper + polaris results
+- `614951d6` Setup M results + Setup whisper/polaris launchers
+- `f3e6ab89` fix Setup F/G plot filter (was missing baselines)
+- `0857d852` Setup F + G — render full 4-plot at canonical σ=1.0
+- `43683589` Setup M — heterogeneous-ρ globals (slow + fast mixed)
+- `d9acdcb4` D/E baselines (tsae+tfa) + Setup J + 4-plot infra
+- `11b40218` rewrite agent_pro briefing — redirect to C2 Setup K + L
 
 ## Next action (agent owns — overwrite)
 

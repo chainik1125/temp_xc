@@ -1,0 +1,28 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "T": 4,
+        "k_pos": 5
+      },
+      "bench": "hierarchical",
+      "datasource": "toy_hierarchical_Kg10_Kl30_d256_harbor",
+      "fill_baselines": true,
+      "hunt_phase": "tsweep",
+      "k_pos": 5,
+      "smoke": false,
+      "t_label": "T=4",
+      "tsweep": true
+    }
+  },
+  "metrics": {
+    "e_frac_recovered_90": 0.0,
+    "e_mean_max_cos": 0.5710386633872986,
+    "eauc": 0.5700680272108842,
+    "g_frac_recovered_80": 0.0,
+    "g_frac_recovered_90": 0.0,
+    "g_mean_max_cos": 0.06998376548290253,
+    "gauc": 0.0693877551020408
+  },
+  "ts": "2026-05-07T03:12:48Z"
+}

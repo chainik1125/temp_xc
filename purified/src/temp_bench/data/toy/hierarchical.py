@@ -61,6 +61,7 @@ def hierarchical_features(
     magnitude_dist: str = "folded_normal",
     magnitude_mean: float = 1.0,
     magnitude_std: float = 0.15,
+    global_magnitude_scale: float = 1.0,
     seed: int = 0,
     device: str | torch.device = "cpu",
 ) -> CoupledData:
@@ -129,7 +130,7 @@ def hierarchical_features(
     )
 
     # 6. Observation: x(t) = Σ_i h_g[i] m_g[i] f_g[i] + Σ_j s_l[j] m_l[j] f_l[j].
-    a_g = h_g * mag_g                                # (n_seqs, K_global, T)
+    a_g = h_g * mag_g * float(global_magnitude_scale)  # (n_seqs, K_global, T)
     a_l = s_l * mag_l                                # (n_seqs, K_local, T)
     x_g = torch.einsum("nkt,kd->ntd", a_g, f_g)      # (n_seqs, T, d)
     x_l = torch.einsum("nkt,kd->ntd", a_l, f_l)      # (n_seqs, T, d)
