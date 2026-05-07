@@ -10,8 +10,9 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amsthm}
-% \usepackage{mathbbm}
 \usepackage{bbm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{nicefrac}
 \usepackage{microtype}
 \usepackage{xcolor}
@@ -39,6 +40,13 @@
 \newcommand{\autofig}[1]{%
     \IfFileExists{figs/#1.png}{\includegraphics[width=\linewidth]{figs/#1.png}}{\placeholderbox{figs/#1}}%
 }
+
+% Compact figure helper for main-text figures that must stay under ~1/3 page.
+\newcommand{\autofigcompact}[2]{%
+    \IfFileExists{figs/#1.png}%
+    {\includegraphics[width=\linewidth,height=#2,keepaspectratio]{figs/#1.png}}%
+    {\placeholderbox{figs/#1}}%
+}
 % Auto-generated macros (\cseven*) for headline C7 numbers; rebuilt
 % by scripts/c7_tex_snippets.py whenever the C7 paper-loop fires.
 % Wrapped in \InputIfFileExists so a fresh checkout still typesets.
@@ -51,7 +59,8 @@
 }
 
 \begin{document}
-
+\maketitle
+% GLOBAL TODOs
 % TODO: Fix all conventions
 % Abbreivate as TXC somewhere
 % Somewhere you should say: we propose TempBench, a suite of synthetic and real world evaluations.
@@ -64,92 +73,229 @@
 %   - a simple and flexible architecture (framework) for feature discovery at multiple temporal scales.
 % 3. We then show that architectures based on this framework are state of the art across a panel of synthetic and real world tasks. Add two examples backtracking (maybe call it a reasoning task), maybe Emergent Misalignment if it beats.
 % 4. In the synthetic setting, we introduce a generalization of existing benchmarking techniques to describe temporal features. (Maybe TXC performs well and gets better as we grow the temporal window?)
-% 5. In our real-world setting, we evaluate temporal crosscoders across sparse probing, emergent misalignment,
+% 5. In our real-world setting, we evaluate temporal crosscoders across sparse probing, emergent misalignment, 
 \begin{abstract}
-Dictionary learning methods - such as Sparse Autoencoders (SAEs) and crosscoders - decompose model activations into human interpretable building blocks. We introduce \textit{temporal crosscoders}, a simple and flexible framework for feature discovery in Large Language Models (LLMs). To properly evaluate the ability of temporal crosscoders to recover temporal features we develop TempBench: a panel of synthetic and real-world tasks
+Dictionary learning methods - such as Sparse Autoencoders (SAEs) and crosscoders - decompose model activations into human interpretable building blocks. We introduce \textit{temporal crosscoders}, a simple and flexible framework for feature discovery in Large Language Models (LLMs).  To properly evaluate temporal crosscoders we develop TempBench: a panel of synthetic and real-world tasks for evaluating temporal structures. Temporal crosscoders outperform both conventional and temporal architectures in both of our synthetic settings and on two out of four of the real world settings - more than any other current architecture. Most strikingly, they can detect backtracking - a key reasoning behaviour - at a 40\% higher rate than conventional SAEs, and are 15\% more effective in inducing backtracking behaviour. 
 % Include two most choice examples
-In the synthetic setting, we introduce a generalization of the existing benchmarking suite to appropriately evaluate ground truth temporal features, and show that temporal crosscoders exceed state-of-the-art architectures in recovering temporal features. In the real world setting, we show that temporal crosscoders e
-% Need some examples.
-Our results establish temporal crosscoders as a flexible
-% state-of-the-art
+% Our synthetic setting generalizes existing benchmarking suites to appropriately evaluate ground truth temporal features, and show that temporal crosscoders exceed state-of-the-art architectures in recovering temporal features.
+Our results establish temporal crosscoders as a simple and flexible 
+% state-of-the-art 
 framework for feature discovery, both local and temporal.
 \end{abstract}
 
+
+
 \section{Introduction}
 \label{sec:intro}
+% Par 1: SAEs are good
+Sparse autoencoders have become a foundational tool for interpreting large language models. By decomposing activations into sparse, reusable directions, SAEs provide a feature dictionary that supports monosemantic feature discovery, sparse probing, steering, model comparison, and large-scale interpretability workflows
+\citep{cunningham2023sparse,bricken2023monosemanticity}.
+% Par 2: They would be better if they incorporated temporal structure
+
+
+However, standard SAEs reconstruct each token independently of nearby positions.
+This assumes that the relevant feature structure is local in sequence position \citep{lubana2025priors}.
+Natural language does not satisfy this assumption. It has hierarchical syntactic structure \citep{chomsky1956three}; tokens are constrained by expectations from prior context \citep{levy2008expectation}; and neural responses to language integrate information over multiple temporal receptive windows, from short phrases to
+longer narrative contexts \citep{lerner2011topographically}.
+
+Recent work has made this mismatch explicit, framing it as an architectural issue: standard SAE objectives factor over positions and so impose an independence prior over time, missing latent structure shared across tokens
+\citep{lubana2025priors,bhalla2025temporal}. A complementary observation is that correlations between sequence positions decay approximately as a power law with distance \citep{cagnetta2024towards}, so the relevant dependencies are not confined to a single fixed scale. Feature discovery therefore needs a windowed architecture that can capture correlations within a local context while allowing learned features to live at different scales inside that window.
+
+
+% This limitation is not resolved by choosing a single longer context length: natural language exhibits dependencies over a broad range of distances, including power-law-like decay in correlations between sequence positions
+% \citep{cagnetta2024towards,cagnetta2026deriving}.
+% Feature-discovery architectures therefore need to support features at multiple temporal scales, from token-local concepts to patterns distributed across phrases, reasoning steps, or entire responses.
+% Par 3:
+
+% In this work we make four contribtions to temporal feature discovery:
+% \begin{enumerate}
+%     \item First, we introduce temporal crosscoders \cref{sec:txc} (TXCs) as a simple and flexible framework for capturing temporal structure.
+%     \item Second, we generalize the existing synthetic benchmarks for ground truth features to the temporal setting \cref{sec:synthetic}
+%     \item Third, we identify four clearly measurable real world tasks for evaluating SAE architectures \cref{sec:real}. We combine this with out synthetic setting into \textbf{TempBench} - an evaluation suite for temporal architectures.
+%     \item Finally, TempBench allows us to perform a systematic benchmarking of current conventional and temporal architectures. 
+% \end{enumerate}
+
+
+In this work, we make four contributions to temporal feature discovery:
+\begin{enumerate}
+    \item We introduce temporal crosscoders \cref{sec:txc}, a simple and
+    flexible architecture for capturing temporal structure in LLMs.
+    \item We generalize existing synthetic benchmarks for ground-truth feature
+    recovery to the temporal setting \cref{sec:synthetic}.
+    \item We assemble four real-world evaluations with clear behavioral signals
+    for comparing dictionary-learning architectures \cref{sec:real}.
+    \item We combine these synthetic and real-world evaluations into
+    \textbf{TempBench}, an evaluation suite for conventional and temporal SAE
+    architectures, and use it to benchmark the current architectural frontier
+    under matched conditions.
+\end{enumerate}
+
+Across \textit{TempBench}, temporal aggregation helps when the target feature is supported by evidence distributed over nearby tokens, and hurts on tasks where per-token or length-correlated signals dominate.
+
+
+% \section{Introduction}
+% \label{sec:intro}
+% Sparse autoencoders have become a foundational tool for interpreting large language models. By decomposing activations into sparse, reusable directions, SAEs provide a feature dictionary that supports monosemantic feature discovery, sparse probing, steering, model comparison, and large-scale interpretability workflows
+% \citep{cunningham2023sparse,bricken2023monosemanticity,templeton2024scaling,
+% gao2024scaling,bussmann2024batchtopksparseautoencoders,lieberum2024gemmascope,
+% kantamneni2025are,lindsey2024sparsecrosscoders}.
+
+% However, standard SAEs treat each token position independently. This is a poor match to language, where structure exists across many temporal scales: local syntactic dependencies, sentence-level expectations, discourse-level event structure, and long-range narrative coherence
+% \citep{chomsky1965aspects,jager2012formal,marslenwilson1980temporal,
+% thompson1999temporal,gibson2000dependency,mcelree2003memory,
+% hale2001probabilistic,levy2008expectation,zacks2007event,baldassano2018discovering}.
+% Recent work has made this mismatch explicit, arguing that SAEs impose priors that are effectively independent across time and therefore fail to capture important temporal structure in language model activations
+% \citep{lubana2025priors,bhalla2025temporal}.
+% This limitation is not resolved by choosing a single longer context length: natural language exhibits dependencies over a broad range of distances, including power-law-like decay in correlations between sequence positions
+% \citep{cagnetta2024towards,cagnetta2026deriving}.
+% Feature-discovery architectures therefore need to support features at multiple temporal scales, from token-local concepts to patterns distributed across phrases, reasoning steps, or entire responses.
+
+% We propose \emph{temporal crosscoders} (TXCs), a simple architectural framework for sparse feature discovery across sequence positions. A temporal crosscoder encodes a window of activations into one shared sparse latent vector and decodes that latent through position-specific decoder weights. This is the temporal analogue of a layerwise crosscoder: instead of using one sparse code to jointly explain activations across layers, TXCs use one sparse code to jointly explain activations across relative token positions
+% \citep{lindsey2024sparsecrosscoders}. This gives TXCs a different capability profile from conventional SAEs. A TXC feature can behave like a local SAE feature by reconstructing a single position, or it can distribute its decoder support across a window and represent a temporally extended pattern.
+
+% We make the following contributions. First, we introduce temporal crosscoders and compare them to conventional SAEs, temporal SAEs, temporal-prior methods, and multilayer crosscoders under matched training conditions. Second, we generalize synthetic SAE benchmarks to settings with ground-truth temporal features by replacing independent per-position firing with Hidden Markov structure. Third, we construct new real-world benchmarks with clear behavioral signals, including sparse probing, reasoning backtracking, emergent misalignment, and preference-data decomposition. Fourth, we combine these into \textbf{TempBench}, an evaluation suite for candidate SAE architectures spanning both synthetic ground-truth recovery and real-world temporal behavior.
+
+% Across TempBench, temporal crosscoders are competitive with current dictionary-learning architectures while occupying a distinct point on the architectural frontier. In synthetic settings, TXCs recover hidden temporal features that per-token baselines tend to collapse into local emissions. In real models, TXCs perform strongly on sparse probing and on detecting and inducing backtracking in a reasoning model, where the relevant behavior is intrinsically multi-token. At the same time, TXCs do not dominate uniformly: on emergent misalignment and HH-RLHF preference decomposition, temporal aggregation can diffuse representations or amplify length-correlated artifacts. These results suggest that temporal crosscoders are not a replacement for per-token dictionaries, but a complementary architecture for discovering features whose evidence is distributed across time.
 
 \afterpage{%
 \begin{figure*}[t]
     \centering
-    \begin{subfigure}[t]{0.49\textwidth}
+    \begin{subfigure}[t]{0.31\textwidth}
         \centering
         \resizebox{\linewidth}{!}{\input{images/temporal_tikz_both}}
-        \caption{temp\_cartoon}
+        \caption{Local dictionaries recover token-scale features, while temporal dictionaries can recover longer-context features.}
         \label{fig:temp_cartoon}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[t]{0.49\textwidth}
+    \begin{subfigure}[t]{0.31\textwidth}
         \centering
         \resizebox{\linewidth}{!}{\input{images/txc_tikz}}
-        \caption{cross\_cartoon}
+        \caption{TXC encodes a temporal window into one shared sparse latent and decodes back to each position.}
         \label{fig:crosss_cartoon}
     \end{subfigure}
-
-    \vspace{0.8em}
-
-    \begin{subfigure}[t]{\textwidth}
+    \hfill
+    \begin{subfigure}[t]{0.31\textwidth}
         \centering
-        \placeholderbox{images/summary\_rose}
-        \caption{summary\_rose}
-        \label{fig:summary_rose}
+        \includegraphics[width=\linewidth]{figs/global_rose_summary.pdf}
+        \caption{TempBench evaluates architectures across synthetic and real-model tasks.}
+        \label{fig:tempbench_rose}
     \end{subfigure}
-    \caption{Placeholder summary figure for the paper.}
+    \caption{Schematic motivation, architecture, and evaluation suite for temporal crosscoders.}
     \label{fig:paper_summary}
-\end{figure*}%
+\end{figure*}
 }
 
-\begin{enumerate}
-    \item Why temporal structure is important
-    \begin{enumerate}
-        \item Chomsky hierarchy literature?
-        \item Scaling laws in position, Cagnetta etc..
-        \item
-    \end{enumerate}
-    \item We expect features to live temporally. Why? What
-    \item Refs: TMS, Crosscoders, Chanin, etc...
-    \item
-\end{enumerate}
-Our contributions are:
-\begin{enumerate}
-    \item In \cref{sec:txc} we introduce a new architecture for capturing temporal structure, the \textit{temporal crosscoder}.
-    \item In \cref{sec:synthetic}, we introduce a synthetic setting which defines \textit{ground truth temporal features} and benchmark existing conventional and temporal architectures on the
-    \item
+% \begin{enumerate}
+%     \item Why temporal structure is important
+%     \begin{enumerate}
+%         \item Chomsky hierarchy literature?
+%         \item Scaling laws in position, Cagnetta etc..
+%         \item 
+%     \end{enumerate}
+%     \item We expect features to live temporally. Why? What 
+%     \item Refs: TMS, Crosscoders, Chanin, etc...
+%     \item 
+% \end{enumerate}
+% Our contributions are:
+% \begin{enumerate}
+%     \item In \cref{sec:txc} we introduce a new architecture for capturing temporal structure, the \textit{temporal crosscoder}.
+%     \item In \cref{sec:synthetic}, we introduce a synthetic setting which defines \textit{ground truth temporal features} and benchmark existing conventional and temporal architectures on the 
+%     \item 
+    
+%     compare to each other and to conventional architectWe generalize the existing synthetic
+% % TODO: Read David's paper to better understand
+% \end{enumerate}
 
-    compare to each other and to conventional architectWe generalize the existing synthetic
-% TODO: Read David's paper to better understand
-\end{enumerate}
+% HEAD OUTLINE (kept for reference; overleaf prose below is the live section):
+% \section{Related Work}
+% \label{sec:rel_work}
+% % TODO: Land the following narrative point in this section. While individual temporal SAE proposals (T-SAE, TFA, MLC, etc.) have been benchmarked in isolation on a single task or two, no prior work has systematically benchmarked dictionary-learning architectures across a curated panel that covers both temporal and conventional evaluations. We therefore propose TempBench: a curated panel of SAE evaluations that assess the quality of different SAE architectures on both temporal (backtracking, EM, synthetic HMM) and conventional (sparse probing) benchmarks under matched expansion, sparsity, and activation cache.
+% \begin{enumerate}
+%     \item Some literature on why temporal structure is important.
+%     \item Existing proposals for capturing temporal structure.
+%     \item What they don't capture.
+%     \begin{enumerate}
+%         \item In theory, here you just say the problem
+%     \end{enumerate}
+%     \item Lack of a synthetic benchmark. This leads us to generalize the canonical superposition setting.
+% \end{enumerate}
 
 \section{Related Work}
 \label{sec:rel_work}
-\begin{enumerate}
-    \item Some literature on why temporal structure is important.
-    \item Existing proposals for capturing temporal structure.
-    \item What they don't capture.
-    \begin{enumerate}
-        \item In theory, here you just say the problem
-    \end{enumerate}
-    \item Lack of a synthetic benchmark. This leads us to generalize the canonical superposition setting.
-\end{enumerate}
+
+\paragraph{Sparse autoencoders and synthetic benchmarks.}
+Sparse autoencoders (SAEs) trained on the residual stream have become the
+standard tool for decomposing language-model activations into a sparse basis
+of features
+\citep{cunningham2023sparse,bricken2023monosemanticity,templeton2024scaling,
+gao2024scaling,bussmann2024batchtopksparseautoencoders,lieberum2024gemmascope}.
+Because SAE features are derived rather than ground-truth, evaluating
+\emph{which} dictionary recovers \emph{what} requires either downstream proxies
+(loss recovery, sparse probing \citep{kantamneni2025probing,bhalla2025temporal})
+or synthetic data with known features.
+\citet{chanin2025synthetic} establish the canonical synthetic setting:
+ground-truth feature directions $\{\mathbf{f}_i\}$ are fired according to a
+distribution that factorises across sequence positions, so the recoverable
+ground truth is purely local. This setup has been used to study superposition and feature absorption
+\citep{makelov2024principled,karvonen2024measuring}, but by construction
+it cannot test whether a dictionary recovers structure that is shared across
+positions, because no such structure exists in the data. Our \cref{sec:synthetic}
+generalises this setting by promoting the firing distribution to a Hidden
+Markov Model, which (a) preserves the local synthetic setting as a special
+case and (b) admits two distinct ground truths --- emission directions and
+hidden-state directions --- that dissociate per-position from cross-position
+recovery.
+
+\paragraph{Crosscoders.}
+Crosscoders \citep{lindsey2024sparsecrosscoders} extend SAEs by encoding and
+decoding across an additional axis: a single sparse latent vector explains
+multiple inputs simultaneously, with axis-specific decoder weights. The original
+proposal targets the layer axis (a single feature reconstructs activations at
+several layers) and motivates the architecture by model-diffing applications
+--- comparing base and finetuned models, or models from different training
+runs \citep{minder2025crosscoderbased,lindsey2024sparsecrosscoders} --- and
+cross-layer feature discovery. To our knowledge, the crosscoder framework has
+not been applied to the sequence axis. Our temporal crosscoder
+(\cref{sec:txc}) is the temporal analogue.
+
+\paragraph{Temporal sparse dictionaries.}
+Two recent proposals share our motivation that per-token dictionaries
+fragment multi-token concepts, and we use both as baselines.
+The temporal SAE of \citet{bhalla2025temporal} introduces a $T$-position
+window with a per-position encoder/decoder and a multi-distance contrastive
+loss that aligns features describing the same temporal pattern across nearby
+offsets. Per-position weights mean that T-SAE features are still anchored
+to single positions; the contrastive loss is what couples them across the
+window. The temporal feature analyzer (TFA) of \citet{lubana2025priors} takes
+a different route,
+introducing a temporal prior on the dictionary itself. The temporal
+crosscoder differs from both by tying every position of the window to a single
+shared latent and letting full-rank cross-position decoders distribute that
+latent's mass.
+
+% The multi-layer crosscoder (MLC) of \citet{lindsey2024sparsecrosscoders} is
+% not a temporal architecture, but its cross-axis weight-sharing closely
+% parallels TXC's; we include it as a baseline to isolate whether the gains
+% attributed to temporal structure come from the window axis specifically or
+% from cross-axis sharing in general.
+
+\paragraph{Systematic benchmarking.}
+Each of the temporal architectures above was introduced and evaluated in
+isolation. There is no existing study that evaluates the candidate architectures
+side-by-side on a panel of comparable tasks. The closest prior efforts are
+SAEBench \citep{karvonen2024saebench} and the sparse-probing panel of
+\citet{kantamneni2025probing}, both of which standardise downstream
+evaluation but cover only per-token dictionaries. 
 % TFA
 % T-SAE (would be nice to have a pithy sentence)
-% Multi-layer crosscoding
+% Multi-layer crosscoding 
 % This should
 
 % TODO: maybe a brief notation section here?
 % 1. Cal letters for set
 % 2. Some convention on SAE feature activation (i.e. z) and,
-% more importantly, the activation vector x. In particular,
-% do we consider x as a [seq,d_model] extended object, or as
+% more importantly, the activation vector x. In particular, 
+% do we consider x as a [seq,d_model] extended object, or as 
 % a local [d_model] object?
 % 3. Default symbols for each object
 %   - d for model residual stream
@@ -158,112 +304,238 @@ Our contributions are:
 
 % TODO: some division of labor here between how much conceptual work you want this section to do vs. the introduction.
 \section{Temporal Crosscoders}
-\subsection{Notation}
-We let bold symbols denote vectors, and reserve $\mathbf{x}_t$ for model activations at position $t$ in a sequence, $\mathbf{X}=\mathbf{(x_1,...,x_T)}$ for a sequence of activations in a temporal window of length $T$ $\mathbf{u}$ for feature activations. We let $d$ denote the dimension of the residual stream, so that $\mathbf{x}_t\in\mathbb{R}^d$, and $H$ denote the hidden dimension of an autoencoder architecture so that $\mathbf{u}\in\mathbb{R}^H$.
-\subsection{Temporal Crosscoders}
 \label{sec:txc}
-% TODO: a bit awkward might be worth rephrasing.
-% The fundamental limitation of SAE-based architectures for modelling temporal correlations is that they use a stationary sparse code to model language activations \cite{lubana2025priors}.
-The core feature of a temporal crosscoder is that is uses a \textit{shared} set of latents $\mathbf{u}$ to reconstruct the activations for an entire temporal window $\mathbf{X}$.
-% A temporal crosscoder is thus an acausal crosscoder in which the objects being crosscoded are sequence positions rather than layers.
-Given a window of residual-stream activations of size $T$:
-\[
-    \mathbf{X}_t=(\mathbf{x}_t,\ldots\mathbf{x}_{t+T}),
-\]
-we learn a single sparse latent vector $\mathbf{u}_t\in\mathbb{R}^H$ shared across all positions in the window:
+
+Let $\mathbf{x}_t\in\mathbb{R}^d$ denote the residual-stream activation at
+position $t$, and let
+$\mathbf{X}_t=(\mathbf{x}_t,\ldots,\mathbf{x}_{t+T-1})$ be a temporal window.
+A temporal crosscoder learns one sparse latent vector
+$\mathbf{u}_t\in\mathbb{R}^H$ shared across the whole window:
 \[
     \mathbf{u}_t
     =
     \sigma\!\left(
-        \sum_{\tau=1}^{T}
-        W^{\tau}_{\mathrm{enc}}\mathbf{x}_{t+\tau}
+        \sum_{\tau=0}^{T-1} W^{(\tau)}_{\mathrm{enc}}\mathbf{x}_{t+\tau}
         + \mathbf{b}_{\mathrm{enc}}
-    \right).
-\]
-The latent vector is then decoded with position-specific decoders to reconstruct each activation in the window,
-\[
+    \right),
+    \qquad
     \hat{\mathbf{x}}_{t+\tau}
     =
-    W^{\tau}_{\mathrm{dec}}\mathbf{u}_t
+    W^{(\tau)}_{\mathrm{dec}}\mathbf{u}_t
     +
-    \mathbf{b}^{\tau}_{\mathrm{dec}}.
+    \mathbf{b}^{(\tau)}_{\mathrm{dec}}.
 \]
-Thus a temporal crosscoder is the temporal analogue of a layerwise acausal crosscoder~\cite{lindsey2024sparsecrosscoders}: the layer index is replaced by a relative position index.
-% The central architectural choice is the shared latent space.
-% Re-write this to be about the ability to choose the scale
-A feature may reconstruct primarily one position, recovering the behavior of a local SAE, or it may have decoder support across several positions, representing a temporally extended pattern.
+This is the temporal analogue of a layerwise acausal
+crosscoder~\citep{lindsey2024sparsecrosscoders}: the layer index is replaced
+by a relative position index. A feature may reconstruct primarily one token,
+recovering local-SAE behavior, or distribute decoder mass across several
+positions, representing a temporally extended pattern.
 
-We train temporal crosscoders with a reconstruction loss over the full window, together with explicit sparsity from the latent activation function. In our default implementation, $\sigma$ is BatchTopK~\cite{bussmann2024batchtopksparseautoencoders}, a variant of TopK~\cite{gao2024scaling}, applied to the shared latent vector for each window, and we set decoder biases to zero so that reconstructive mass is assigned to features rather than biases. Our base temporal crosscoder uses only this acausal window-reconstruction objective. In the larger TXC-pro variant, we additionally include two temporal inductive biases: a Matryoshka objective over nested latent groups, encouraging useful feature dictionaries at multiple effective widths, and a multi-distance contrastive loss over shifted windows, encouraging features that describe the same temporal pattern to align across nearby offsets. Unless otherwise stated, temporal crosscoders and the SAE/crosscoder baselines are trained on the same activation cache and compared at fixed hookpoint, expansion factor, and sparsity.
+We train temporal crosscoders with a reconstruction loss over the full window,
+together with explicit sparsity from the latent activation function. In our
+default implementation, $\sigma$ is BatchTopK~\citep{bussmann2024batchtopksparseautoencoders},
+a variant of TopK~\citep{gao2024scaling}, applied to the shared latent vector
+for each window, and we set decoder biases to zero so that reconstructive mass
+is assigned to features rather than biases. Our base temporal crosscoder uses
+only this acausal window-reconstruction objective. The larger TXC-pro variant
+adds two temporal inductive biases: a Matryoshka objective over nested latent
+groups, encouraging useful feature dictionaries at multiple effective widths,
+and a multi-distance contrastive loss over shifted windows, encouraging
+features that describe the same temporal pattern to align across nearby offsets.
+
+\subsection{Compared Architectures and Matching}
+\label{sec:baselines}
+
+Across TempBench, we compare TXC-base and TXC-pro against three baselines:
+TopK SAE~\citep{gao2024scaling}, T-SAE~\citep{bhalla2025temporal}, and
+TFA~\citep{lubana2025priors}. These cover local dictionaries,
+temporal dictionaries with position-local structure, temporal-prior methods,
+and crosscoder-style sharing along a non-temporal axis.
+
+Unless otherwise stated, all architectures are trained on the same activation
+cache and compared at fixed hookpoint, dictionary width, and expected sparsity.
+We write $k_{\mathrm{pos}}$ for the active-latent budget per sequence position:
+a per-token dictionary uses $k_{\mathrm{pos}}$ active latents at each token,
+while a windowed architecture of length $T$ receives the matched window budget
+$T k_{\mathrm{pos}}$.
 
 
-% TODO: Bad title: Maybe something like evaluating ground truth temporal features
-\section{Benchmarking Temporal Crosscoders in a synthetic setting}
-% Structure:
-% Par 1: Generalizing conventional setting.
-% Par 2: HMMs are a natural parameterization of the temporal features.
-% Par 3: Two cases we consider: vanilla case, hierarchical case.
-% Par 4: Discussion/other stuff we train on.
+% % TODO: Bad title: Maybe something like evaluating ground truth temporal features
+% \section{Benchmarking Temporal Crosscoders in a Synthetic Setting}
+% % Structure:
+% % Par 1: Generalizing conventional setting.
+% % Par 2: HMMs are a natural parameterization of the temporal features.
+% % Par 3: Two cases we consider: vanilla case, hierarchical case.
+% % Par 4: Discussion/other stuff we train on.
+% \label{sec:synthetic}
+% % Summary figure
+% \afterpage{%
+% \begin{figure*}[t]
+%     \centering
+%     \begin{subfigure}[t]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figs/c2/c2_synth_global_headline.png}
+%         \label{fig:synth_headline_bars}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[t]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figs/c2/c2_setup_b_singlelatent.png}
+%         \label{fig:setup_b_denoising}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[t]{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{figs/c2/c2_setup_d_scatter_clean.png}
+%         \label{fig:setup_d}
+%     \end{subfigure}
+%     \caption{Global-feature recovery in the two synthetic benches. \emph{Left, headline:} best global recovery per architecture across both benches on a shared $[0, 1]$ scale (Denoising: linear-probe $R^2_{\mathrm{global}}$, ridge regression of the clean hidden state $s_{i,t}$ on the full $d_{\mathrm{sae}}$-dim latent code; Coupling: $g\mathrm{AUC}$, decoder-cosine alignment with the $K = 10$ hidden chain directions at maximum overlap $n_{\mathrm{parents}} = 10$). Each bar is the seed-mean of the architecture's best $(T, k_{\mathrm{pos}})$ cell; error bars are min/max across the three training seeds for that cell. \emph{Middle:} Denoising-bench single-latent scatter --- $x$-axis is the matched latent's correlation with the noisy emission $a_{i,t}$, $y$-axis with the clean hidden state $s_{i,t}$; above $y = x$ denotes denoising. \emph{Right:} Coupling-bench dictionary scatter --- $x$-axis $e\mathrm{AUC}$ against the $M = 20$ emission directions (local), $y$-axis $g\mathrm{AUC}$ against the $K = 10$ hidden chain directions (global); above $y = x$ denotes a globally-aligned dictionary.}
+%     % OVERLEAF VERSION (2026-05-07-0240) of figure block, kept commented for review:
+%     % \begin{subfigure}[t]{0.47\textwidth}
+%     %     \centering
+%     %     \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{figs/c2/c2_noisy_singlelatent_scatter.png}
+%     %     \caption{Setup~B: latent-code denoising.}
+%     %     \label{fig:setup_b_denoising}
+%     % \end{subfigure}
+%     % \hfill
+%     % \begin{subfigure}[t]{0.47\textwidth}
+%     %     \centering
+%     %     \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{figs/c2/c2_setup_d_np10_scatter.png}
+%     %     \caption{Setup~D: dictionary-level global alignment.}
+%     %     \label{fig:setup_d}
+%     % \end{subfigure}
+%     % \caption{Local-vs-global recovery on synthetic HMM benchmarks. Points above the diagonal recover the hidden temporal signal better than the local emission; TXC variants consistently move into this global-recovery regime, unlike per-token baselines.}
+%     \label{fig:synthetic_overview}
+% \end{figure*}
+% }
+
+
+% Synthetic datasets make it possible to evaluate feature recovery against known ground-truth features \cite{chanin2025synthetic}. Existing synthetic benchmarks define feature activations independently at each sequence position, so the ground-truth feature structure is local. To benchmark temporal architectures, we generalize this setting by making the feature-firing pattern a stochastic process across sequence positions.
+
+% To do so, consider a synthetic activation sequence
+% \[
+%     \mathbf{X}=(\mathbf{x}_1,\ldots,\mathbf{x}_T),
+%     \qquad
+%     \mathbf{x}_t\in\mathbb{R}^d,
+% \]
+% defined over a temporal window of length $T$. A synthetic setting is specified by three pieces of data. First, a set of $N$ ground-truth feature directions
+% \[
+%     \mathcal{F}=\{\mathbf{f}_1,\ldots,\mathbf{f}_N\},
+%     \qquad
+%     \mathbf{f}_i\in\mathbb{R}^d.
+% \]
+% Second, a probability distribution $P_T$ over binary feature-firing masks
+% \[
+%     A=(\mathbf{a}_1,\ldots,\mathbf{a}_T)\in(\{0,1\}^N)^T,
+% \]
+% where
+% \[
+%     \mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})
+% \]
+% and $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a distribution $M_T$ over feature magnitudes
+% \[
+%     M=(\mathbf{m}_1,\ldots,\mathbf{m}_T),
+%     \qquad
+%     \mathbf{m}_t=(m_{t,1},\ldots,m_{t,N}).
+% \]
+% A synthetic activation $\mathbf{x}_t$ is then constructed as:
+% \[
+%     \mathbf{x}_t=\left(
+%     \sum_{i=1}^N a_{t,i}m_{t,i}\mathbf{f}_i\right).
+% \]
+% Thus the feature directions specify what can be recovered, while the distribution $P_T$ specifies the local and temporal structure of when those features appear.
+
+
+
+% % Old version, nicely simple, but not quite as sharp as would be helpful
+% % Let $\mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})\in\{0,1\}^N$ denote the binary vector of feature-firing indicators at sequence position $t$. 
+% The conventional synthetic setting is then the special case when the distributions $P_T,M_T$ are independent across sequence positions. In our setting local correlations are encoded by the one-position distribution over $\mathbf{a}_t$, while temporal correlations are encoded by the joint distribution over the sequence $\mathbf{a}_{1:T}$.
+
+
+
+% A natural way to specify the firing mask distribution $P_T$ is by an
+% edge-emitting Hidden Markov Model (HMM), following the convention used in
+% computational mechanics
+% \cite{crutchfield1989inferring,crutchfield2012between,shai2024transformers,shai2026factored}.
+% A HMM $\mathcal{H}$ consists of four objects:
+% \[
+%     \mathcal{H}=(\mathcal{X},\mathcal{S},\boldsymbol{\eta}^{\emptyset},\{T^{(x)}\}_{x\in\mathcal{X}}),
+% \]
+% where the $\mathcal{X}$ is the observed alphabet where here is the set of local firing masks
+% \[
+%     \mathcal{X}=\{0,1\}^N.
+% \]
+% Thus each emitted symbol $x\in\mathcal{X}$ is a full binary vector indicating
+% which features fire at a single sequence position. The set $\mathcal{S}$ is the
+% latent state space, $\boldsymbol{\eta}^{\emptyset}\in\Delta(\mathcal{S})$ is the
+% initial distribution over latent states, and $T^{(x)}$ is the symbol-labeled
+% transition matrix with entries $T^{(x)}_{s,s'}=\Pr(s_{t+1}=s',\, \mathbf{a}_t=x \mid s_t=s).$
+
+% The HMM presentation then generates the distribution over firing patterns as a sequence of updates over the initial state vector:
+% \[
+%     P_T(\mathbf{a}_{1:T})
+%     =
+%     \boldsymbol{\eta}^{\emptyset\top}
+%     T^{(\mathbf{a}_1)}
+%     T^{(\mathbf{a}_2)}
+%     \cdots
+%     T^{(\mathbf{a}_T)}
+%     \mathbf{1}.
+% \]
+% A dictionary learning architecture can be evaluated at two levels. At the local level,
+% we ask whether its decoder directions recover the emitted feature directions
+% $\mathbf f_i$ and whether its activations track the local firing indicators $a_{t,i}$.
+% At the global level, we ask whether its learned latents track the HMM state
+% $s_t\in\mathcal S$, or the corresponding hidden feature directions induced by those
+% states. In non-synthetic settings, this corresponds to the distinction between learning local cues
+% associated with a behavior and learning a latent feature for the behavior itself.
+
+% We benchmark dictionary learning architectures on two special cases of HMM in which local and global features compete for the dictionary's attention: the per-position emission $a_{i,t}$ (\emph{local}) and the underlying hidden Markov state $s_{i,t}$ that emitted it (\emph{global}) both feed the same activation $\mathbf{x}_t = \sum_i a_{i,t}\,m_{i,t}\,\mathbf{f}_i$, so the architecture must choose which to track. The two settings differ in how the emission channel obscures the global feature.
+% % B and D are placeholders
+% The \textbf{Denoising} bench gives each feature its own chain seen through stochastic per-token noise, isolating temporal aggregation as a denoising mechanism. The \textbf{Coupling} bench drives a larger emission alphabet from a small set of hidden chains through OR-gate coupling \emph{and} per-token noise, adding the harder challenge of disentangling many-to-one coupling. We find that TXC architectures track the global feature in both regimes, while per-token baselines track only the local emission.
+
+\section{Benchmarking Temporal Crosscoders in a Synthetic Setting}
 \label{sec:synthetic}
-% Summary figure
+
 \afterpage{%
 \begin{figure*}[t]
     \centering
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
-        \placeholderbox{images/syn\_cartoon}
-        \caption{syn\_cartoon}
-        \label{fig:syn_cartoon}
+        \includegraphics[width=\linewidth]{figs/c2/c2_synth_global_headline.pdf}
+        \label{fig:synth_headline_bars}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
-        \placeholderbox{images/local\_vs\_global}
-        \caption{local\_vs\_global}
-        \label{fig:local_vs_global}
+        \includegraphics[width=\linewidth]{figs/c2/c2_setup_b_singlelatent.pdf}
+        \label{fig:setup_b_denoising}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.32\textwidth}
         \centering
-        \placeholderbox{images/local\_vs\_global\_transformer}
-        \caption{local\_vs\_global\_transformer}
-        \label{fig:local_vs_global_transformer}
+        \includegraphics[width=\linewidth]{figs/c2/c2_setup_d_scatter_clean.pdf}
+        \label{fig:setup_d}
     \end{subfigure}
-    \caption{Placeholder figure for the synthetic benchmarking section.}
-    \label{fig:synthetic_overview}
-\end{figure*}%
+\caption{Synthetic global-feature recovery. \emph{Left:} best global recovery per architecture, using linear-probe $R^2_{\mathrm{global}}$ for Denoising and $g\mathrm{AUC}$ for Coupling. \emph{Middle:} Denoising single-latent correlations with noisy emissions $a_{i,t}$ versus clean hidden states $s_{i,t}$; the diagonal marks equal local and global correlation. \emph{Right:} Coupling dictionary alignment with emission directions ($e\mathrm{AUC}$) versus hidden-chain footprints ($g\mathrm{AUC}$). Temporal architectures recover more global structure in Coupling, while TXC-base gives the strongest Denoising recovery.}    \label{fig:synthetic_overview}
+\end{figure*}
 }
-% A major limitation of SAEs is the lack of a ground truth measure for feature recovery. In a synthetic setting, however, it is possible to define ground truth features \cite{chanin2025synthetic}. The current synthetic framework only defines features \textit{locally} at a sequence position. To appropriately benchmark temporal architectures, we first generalize to global features.
 
-% We first formalize the notion of a set of synthetic ground truth features.
-% % Urgh, above sentence is horrible, will rephrase.
-% % This below paragraph is needlessly formal and doesn't really help.
-% We define a family of ground truth features as the triple $G=(\mathcal{F},\mathcal{A},\mathcal{M})$, where $\mathcal{F}$ is a set of $N$ feature vectors  $\mathbf{f}\in\mathbb{R}^d$, $\mathcal{A}$ is a probability distribution over the set of binary indicator variables $\{0,1\}^N$ that denote the firing probabilities of the features, and $\mathcal{M}$ is a probability distribution over the firing magnitudes. A dataset of synthetic activations is then constructed as the distribution over the product of the features:
-% \begin{equation}
-%     \mathbf{x}=\sum_{i=1}^N\text{ReLU}(a_im_i\mathbf{f}_i)
-% \end{equation}
-% In the usual setting, the firing probabilities $a_i$ are independent of sequence position, although they may depend on the other firing probabilities
+Synthetic datasets make it possible to evaluate feature recovery against known
+ground-truth features \citep{chanin2025synthetic}. Existing synthetic
+benchmarks define feature activations independently at each sequence position,
+so the ground-truth feature structure is local. To benchmark temporal
+architectures, we generalize this setting by making the feature-firing pattern
+a stochastic process across sequence positions.
 
-
-% Synthetic datasets make it possible to evaluate feature recovery against known ground-truth features \cite{chanin2025synthetic}. Existing synthetic benchmarks define feature activations independently at each sequence position, so the ground truth is essentially local. In order to appropriately define ground truth \textit{temporal} features, therefore, we must generalize this setting.
-% \begin{definition}
-%     A set of \textit{ground truth features} $\mathcal{S}$ is specified by the triple $\mathcal{S}=(\mathcal{F},\mu,\nu)$, where $\mathcal{F}$ is a set of feature vectors $\mathcal{F}=\{\mathbf{f}_1,...,\mathbf{f}_N\}, f_{i}\in\mathbb{R}^d$,
-% \end{definition}
-
-% To do so, consider a synthetic activation vector $\mathbf{X}=(\mathbf{x}_1,...,\mathbf{x}_T)$, which consists of synthetic activations $\mathbf{x}_t\in\mathbb{R}^d$ in a temporal window of size $T$. We construct a dataset $\mathcal{D}$ consisting of samples of this vector from three pieces of data. First, a set of $N$ ground truth features $\mathcal{F}={\mathbf{f}_1,\ldots,\mathbf{text}}$. Second, a probability distribution $P_T$ over a set of firing probabilities $\mathbf{A}=(\mathbf{a}_1,\ldots,\mathbf{a}_T)$, where each of the $a_t$ is a vector of firing probabilities for each feature $a_t={0,1}^N$ Finally a distribution $M_T$ over the associated feature magnitudes $\mathbf{M=(m_1,\ldots,m_T)}$. Each activation vector sample is then constructed as:
-% \begin{equation}
-%     \mathbf{x}_t=\textrm{ReLU}(\sum_{i=1}^{N}a_{i,t}m_{i,t}\mathbf{f}_{i})
-% \end{equation}
-
-
-Synthetic datasets make it possible to evaluate feature recovery against known ground-truth features \cite{chanin2025synthetic}. Existing synthetic benchmarks define feature activations independently at each sequence position, so the ground-truth feature structure is local. To benchmark temporal architectures, we generalize this setting by making the feature-firing pattern a stochastic process across sequence positions.
-
-A synthetic activation sequence
+Consider a synthetic activation sequence
 \[
     \mathbf{X}=(\mathbf{x}_1,\ldots,\mathbf{x}_T),
     \qquad
     \mathbf{x}_t\in\mathbb{R}^d,
 \]
-is specified by three pieces of data. First, a set of $N$ ground-truth feature directions
+defined over a temporal window of length $T$. A synthetic setting is specified
+by three pieces of data. First, a set of $N$ ground-truth feature directions
 \[
     \mathcal{F}=\{\mathbf{f}_1,\ldots,\mathbf{f}_N\},
     \qquad
@@ -271,54 +543,58 @@ is specified by three pieces of data. First, a set of $N$ ground-truth feature d
 \]
 Second, a probability distribution $P_T$ over binary feature-firing masks
 \[
-    A=(\mathbf{a}_1,\ldots,\mathbf{a}_T)\in(\{0,1\}^N)^T,\qquad
-    \mathbf{a}_t=(a_{t,1},\ldots,a_{t,N}),
+    A=(\mathbf{a}_1,\ldots,\mathbf{a}_T)\in(\{0,1\}^N)^T,
 \]
-where $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a distribution $M_T$ over per-position firing magnitudes, taken to be i.i.d.\ folded-normal across feature index and sequence position, $m_{t,i}=|\mathcal{N}(\mu,\sigma^2)|$ with $\mu=1.0$ and $\sigma=0.15$. The synthetic activation at position $t$ is
-\begin{equation}
-    \mathbf{x}_t=\sum_{i=1}^N a_{t,i}\,m_{t,i}\,\mathbf{f}_i.
-    \label{eq:synthetic-activation}
-\end{equation}
-The conventional, local synthetic setting is recovered as the special case in which $P_T$ factorizes across sequence positions, $P_T(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t)$. Local feature correlations are encoded by the one-position marginal over $\mathbf{a}_t$; temporal correlations are encoded by the joint distribution over $\mathbf{a}_{1:T}$.
+where
+\[
+    \mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})
+\]
+and $a_{t,i}=1$ indicates that feature $i$ fires at position $t$. Third, a
+distribution $M_T$ over feature magnitudes
+\[
+    M=(\mathbf{m}_1,\ldots,\mathbf{m}_T),
+    \qquad
+    \mathbf{m}_t=(m_{t,1},\ldots,m_{t,N}).
+\]
+A synthetic activation is then constructed as
+\[
+    \mathbf{x}_t
+    =
+    \sum_{i=1}^N a_{t,i}m_{t,i}\mathbf{f}_i.
+\]
+Thus the feature directions specify what can be recovered, while $P_T$
+specifies the local and temporal structure of when those features appear. The
+conventional synthetic setting is the special case where $P_T$ and $M_T$
+factorize across sequence positions. In our setting, local correlations are
+encoded by the one-position distribution over $\mathbf a_t$, while temporal
+correlations are encoded by the joint distribution over $\mathbf a_{1:T}$.
 
-
-
-% Old version, nicely simple, but not quite as sharp as would be helpful
-% Let $\mathbf{a}_t=(a_{t,1},\ldots,a_{t,N})\in\{0,1\}^N$ denote the binary vector of feature-firing indicators at sequence position $t$.
-% The conventional synthetic setting is then the special case when the distributions $P_T,M_T$ factorize over sequence positions, $
-% P_{T}(\mathbf{a}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t),M_{T}(\mathbf{m}_{1:T})=\prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{m}_t)$. Thus local correlations are encoded by the one-position distribution over $\mathbf{a}_t$, while temporal correlations are encoded by the joint distribution over the sequence $\mathbf{a}_{1:T}$.
-
-
-% It may help to give an introduction to HMMs in the appendix...
-% A natural parameterization of the temporal distribution $P_T$ is as a Hidden Markov Model (HMM). \cite{crutchfield1989inferring,crutchfield2012between,shai2024transformers,shai2026factored,shai2026factored}.
-% % \footnote{Since any distribution over sequences can be expressed as a GHMM, we can use this parameterization without loss of generality}.
-% % Any distribution over sequences admits a GHMM representation.
-% A HMM is defined by the four-tuple:
-% \begin{equation}
-% P_T=(\mathcal{\chi},\mathcal{S},\mathbf{\eta}^{\emptyset},\mathcal{T}),
-% \end{equation}
-% where $\chi$ is a local token vocabulary, which here is the binary firing mask $\{0,1\}^N$, $\mathcal{S}$ is a space of latent states, $\eta^{\emptyset}$ an initial probability distribution over latent states, and $\mathcal{T}$ is a set of transition matrices whose matrix elements correspond to the joint conditional probability of transition from one state to another on emission of token $x$:  $T^{x}_{s,s'}=Q(s',x|s), T^{(x)}\in\mathcal{T}$.
-
-A natural way to specify the firing mask distribution $P_T$ is by an
+A natural way to specify the firing-mask distribution $P_T$ is by an
 edge-emitting Hidden Markov Model (HMM), following the convention used in
 computational mechanics
-\cite{crutchfield1989inferring,crutchfield2012between,shai2024transformers,shai2026factored}.
-A HMM $\mathcal{H}$ consists of four objects:
+\citep{crutchfield1989inferring,crutchfield2012between,shai2024transformers,shai2026factored}.
+An HMM $\mathcal{H}$ consists of
 \[
-    \mathcal{H}=(\mathcal{X},\mathcal{S},\boldsymbol{\eta}^{\emptyset},\{T^{(x)}\}_{x\in\mathcal{X}}).
+    \mathcal{H}
+    =
+    (\mathcal{X},\mathcal{S},\boldsymbol{\eta}^{\emptyset},
+    \{T^{(x)}\}_{x\in\mathcal{X}}),
 \]
-where the $\mathcal{X} = \{0,1\}^N$ is the observed alphabet of local firing masks. Thus each emitted symbol $x\in\mathcal{X}$ is a full binary vector indicating
-which features fire at a single sequence position. The set $\mathcal{S}$ is the
-latent state space, $\boldsymbol{\eta}^{\emptyset}\in\Delta(\mathcal{S})$ is the
+where the observed alphabet is the set of local firing masks,
+\[
+    \mathcal{X}=\{0,1\}^N.
+\]
+Thus each emitted symbol $x\in\mathcal X$ is a full binary vector indicating
+which features fire at a single sequence position. The set $\mathcal S$ is the
+latent state space, $\boldsymbol{\eta}^{\emptyset}\in\Delta(\mathcal S)$ is the
 initial distribution over latent states, and $T^{(x)}$ is the symbol-labeled
-transition matrix with entries$T^{(x)}_{s,s'}=\Pr(s_{t+1}=s',\, \mathbf{a}_t=x \mid s_t=s).$
-% These matrices satisfy
-% \[
-%     \sum_{x\in\mathcal{X}}\sum_{s'\in\mathcal{S}} T^{(x)}_{s,s'} = 1
-%     \qquad \text{for each } s\in\mathcal{S}.
-% \]
-
-The HMM presentation then generates the distribution over firing patterns as a sequence of updates over the initial state vector:
+transition matrix with entries
+\[
+    T^{(x)}_{h,h'}
+    =
+    \Pr(h_{t+1}=h',\,\mathbf a_t=x\mid h_t=h).
+\]
+The HMM generates the distribution over firing patterns by
 \[
     P_T(\mathbf{a}_{1:T})
     =
@@ -329,17 +605,376 @@ The HMM presentation then generates the distribution over firing patterns as a s
     T^{(\mathbf{a}_T)}
     \mathbf{1}.
 \]
-A dictionary learning architecture may hence learn to recover the \textit{local} feature firing probabilities $a_{i,t}$ or it may learn to recover the \textit{global} latents $s_t\in\mathcal{S}$. We benchmark dictionary learning architectures on two special cases of this family.
 
-The first setting is a product of $N$ independent two-state chains, with $\mathcal{S} = \{0, 1\}^N$, latent equal to emission ($s_t=\mathbf{a}_t$), and a transition matrix that factorizes per-feature, $T^{(\mathbf{a})}_{s, s'} = \prod_{i=1}^N T^{(a_i)}_{s_i,\,s'_i}$. Each per-feature chain is parameterized by a stationary firing probability $\pi$ and lag-1 autocorrelation $\rho$, with $\Pr(0\to 1)=\pi(1-\rho)$ and $\Pr(1\to 0)=(1-\pi)(1-\rho)$, and is initialized at its stationary distribution $\mathrm{Bernoulli}(\pi)$. We use $N=20$ features at $d=40$, $T=64$, $n_{\mathrm{seqs}}=4096$ sequences resampled with replacement during training, a shared $\pi=0.5$, and $\rho$ assigned from five levels $\{0.0, 0.3, 0.5, 0.7, 0.9\}$ in four-feature groups, so the dataset spans the full range from i.i.d.\ firing to strongly temporally persistent firing. Because the latent equals the emission in this setting, the global ground truth collapses to the local feature directions, and an architecture is scored by how well its decoder columns recover $\mathcal{F}$.
+A dictionary learning architecture can be evaluated at two levels. At the local
+level, we ask whether its decoder directions recover the emitted feature
+directions $\mathbf f_i$ and whether its activations track the local firing
+indicators $a_{t,i}$. At the global level, we ask whether its learned latents
+track the HMM state, or the corresponding hidden feature directions induced by
+those states. In non-synthetic settings, this corresponds to the distinction
+between learning local cues associated with a behavior and learning a latent
+feature for the behavior itself.
 
-The second setting separates latent from emission. The latent space is $\mathcal{S}=\{0,1\}^K$ with $K=10$ independent two-state hidden chains $h_{1:K}$ each at $(\pi=0.05, \rho=0.7)$, sparse and temporally persistent. Emissions are a deterministic function of the current latent: a fixed binary coupling matrix $C\in\{0,1\}^{M\times K}$ with $M=20$ rows, each having exactly $n_{\mathrm{parents}}=2$ parents drawn uniformly without replacement, defines the $\mathsf{OR}$ gate
+We benchmark dictionary learning architectures on two HMM special cases in
+which the observed local feature firings are only indirect evidence for a
+cleaner hidden temporal process. The two benches differ in where the
+local/global distinction appears. In the \textbf{Denoising} bench, each emitted
+feature has its own hidden Markov chain, so there is a one-to-one
+correspondence between hidden states $s_{i,t}$ and noisy local firings
+$a_{i,t}$. Since both variables are associated with the same residual-stream
+direction $\mathbf f_i$, local-vs-global recovery cannot be read off from
+decoder alignment; it must be read off from the learned activation traces. In
+the \textbf{Coupling} bench, a smaller set of hidden chains drives a larger
+emission alphabet through OR-gate coupling and per-token noise. There, local
+emission directions and hidden-chain footprints are geometrically distinct, so
+local-vs-global recovery can be measured directly from decoder alignment.
+
+\paragraph{The Denoising bench.}
+The Denoising bench is a panel of $N=20$ independent two-state Markov chains,
+one per feature. Each chain has a sticky hidden state $s_{i,t}$ with
+self-correlation $\rho=0.7$, and emits a noisy firing $a_{i,t}$ through a
+Bernoulli channel with hit rate $p_B=0.625$; the activation reads out the noisy
+firings,
 \[
-    s_j(t) = \mathbbm{1}\!\left[\,\textstyle\sum_{i=1}^K C_{ji}\,h_i(t)\geq 1\,\right],
+    \mathbf{x}_t
+    =
+    \sum_{i=1}^N a_{i,t}\,m_{i,t}\,\mathbf f_i.
 \]
-so emission $j$ fires whenever any of its parents is on. The firing mask is $\mathbf{a}_t = (s_1(t),\ldots,s_M(t))\in\{0,1\}^M$ and the observation is $\mathbf{x}_t = \sum_{j=1}^M s_j(t)\,m_{j,t}\,\mathbf{f}_j$ with $d=256$, $T=64$, and the same $n_{\mathrm{seqs}}=4096$. This second setting admits two distinct ground truths: the $M=20$ \emph{emission} directions $\{\mathbf{f}_j\}$, recoverable per position, and the $K=10$ \emph{hidden} directions $\tilde{\mathbf{f}}_i = \mathrm{normalize}(\sum_{j:\,C_{ji}=1} \mathbf{f}_j)$ defined as the normalized mean of each chain's children, which can only be expressed by a decoder that pools across positions.
+Thus the clean hidden state $s_{i,t}$ and noisy emission $a_{i,t}$ differ in
+their time traces, not in their per-position residual-stream direction. A
+learned feature whose decoder points along $\mathbf f_i$ may either track the
+noisy emission $a_{i,t}$ or use temporal context to recover the cleaner hidden
+state $s_{i,t}$.
 
-\color{red}how are both settings scored, what we report (recon, feature recovery auc, etc). also write batch size and training details? or save for appendix.\color{black}
+We evaluate this distinction at the level of the matched feature's activation
+trace. For each ground-truth feature $i$, let $j(i)$ be the learned feature
+whose decoder slice has highest cosine similarity with $\mathbf f_i$. We define
+\[
+    r_{\mathrm{local},i}
+    =
+    \operatorname{corr}(z_{j(i)},a_i),
+    \qquad
+    r_{\mathrm{global},i}
+    =
+    \operatorname{corr}(z_{j(i)},s_i),
+\]
+where correlations are taken over held-out sequence positions. The
+single-latent scatter in \cref{fig:setup_b_denoising} plots
+$(r_{\mathrm{local},i},r_{\mathrm{global},i})$. 
+A per-token model that merely tracks the noisy emission should lie near the
+no-denoising floor
+\[
+    r_{\mathrm{global},i}
+    \approx
+    \operatorname{corr}(a_i,s_i)\,r_{\mathrm{local},i}.
+\]
+The diagonal $y=x$ is a stronger reference line: points above it are more
+correlated with the clean hidden state than with the noisy emission. We also
+report a full-code linear probe, ridge-regressing $s_{i,t}$ on the learned
+latent code and reporting $R^2_{\mathrm{global}}$ in the headline bar chart.
+In \cref{fig:setup_b_denoising}, per-token baselines remain near the
+no-denoising floor. TXC-base moves above this floor as the window length grows
+and achieves the best full-code denoising score
+($R^2_{\mathrm{global}}=0.48$). TXC-pro does not improve on this setting,
+suggesting that the additional temporal objectives are not uniformly helpful
+for this simple hidden-state recovery task.
+
+\paragraph{The Coupling bench.}
+The Coupling bench removes the one-to-one correspondence between hidden chains
+and emitted features. A set of $K=10$ hidden Markov chains drives a larger
+alphabet of $M=20$ local emissions through a binary coupling matrix
+$C\in\{0,1\}^{M\times K}$. At each position, emission $j$ is active when at
+least one of its parent chains is active, followed by a Bernoulli noise channel:
+\[
+    a_{j,t}
+    \sim
+    \operatorname{Bernoulli}
+    \left(
+        p_B\,
+        \mathbbm{1}\!\left[\sum_{k=1}^K C_{jk}h_{k,t}\ge 1\right]
+    \right),
+\]
+with $p_A=0$ in the off state. The observed activation is
+\[
+    \mathbf{x}_t
+    =
+    \sum_{j=1}^M a_{j,t}\,m_{j,t}\,\mathbf f^{\mathrm{emit}}_j .
+\]
+
+This setting has two spatial ground truths. The local ground truth is the set
+of emission directions
+\[
+    \{\mathbf f^{\mathrm{emit}}_j\}_{j=1}^M,
+\]
+which are directly written into the activation. The global ground truth is the
+set of hidden-chain footprints
+\[
+    \mathbf f^{\mathrm{hid}}_k
+    =
+    \operatorname{normalize}
+    \left(
+        \sum_{j:C_{jk}=1}\mathbf f^{\mathrm{emit}}_j
+    \right),
+    \qquad k=1,\ldots,K.
+\]
+Unlike in the Denoising bench, local and global recovery are now visible in the
+dictionary geometry itself: a locally aligned dictionary points at emission
+directions, while a globally aligned dictionary points at hidden-chain
+footprints. We therefore evaluate the Coupling bench with decoder-alignment
+AUCs. The local score $e\mathrm{AUC}$ is the feature-recovery AUC against the
+$M$ emission directions, and the global score $g\mathrm{AUC}$ is the
+feature-recovery AUC against the hidden-chain footprints.
+
+We study coupling-density regimes that vary how much the hidden-chain
+footprints overlap. The moderate-overlap regime takes $n_{\mathrm{parents}}=5$,
+so each emission is driven by a random half of the hidden chains while different
+hidden chains still have distinct child sets. We also include a dense-overlap
+stress test with $n_{\mathrm{parents}}=10$. Since this couples every emission
+to every hidden chain, the individual hidden-chain footprints collapse to a
+shared aggregate direction; we use this regime as a local-vs-global stress test
+rather than as a disentanglement benchmark. Both regimes fix $K=10$, $M=20$,
+$\rho=0.9$, $\pi=0.05$, $p_B=0.5$, $d=256$, $d_{\mathrm{sae}}=40$, and sweep
+$T$ and $k_{\mathrm{pos}}$ over three seeds. The architectures are the same set
+used on the Denoising bench.
+
+\paragraph{Coupling bench results.}
+In the dense-overlap stress test, temporal architectures recover the aggregate
+hidden footprint while per-token-only architectures are pulled toward local
+emission directions. T-SAE and TXC-base both reach $g\mathrm{AUC}=0.99$ at
+$k_{\mathrm{pos}}=1$, and TXC-pro reaches $0.98$. The TopK SAE follows the
+opposite trend, dropping from $g\mathrm{AUC}=0.92$ at $k_{\mathrm{pos}}=1$ to
+$0.44$ at $k_{\mathrm{pos}}=8$ as it reallocates dictionary capacity from the
+aggregate hidden footprint to the many local emission directions. The
+decoder-alignment scatter in \cref{fig:setup_d} makes this tradeoff concrete:
+temporal architectures remain high in global alignment across a wide range of
+local-alignment scores, while TopK SAE traces a down-right path as
+$k_{\mathrm{pos}}$ grows. Across the full $(p_B,n_{\mathrm{parents}})$ sweep,
+the temporal advantage is largest at moderate-to-high coupling overlap, with a
+peak $g\mathrm{AUC}$ gap of $\approx0.47$.
+% =============================================================================
+% [setup-bd] 5-paragraph plan for Setups B and D. Drafted 2026-05-06.
+% Existing "first setting" / "second setting" prose below describes the
+% clean (deterministic-emission) versions and is to be replaced once each
+% paragraph below is written.
+% -----------------------------------------------------------------------------
+% Paragraph 1 — INTRO/MOTIVATION (DRAFTED)
+%   Frame: synthetic benches let us define a known hidden Markov process and
+%   observe it through a local channel; we ask which dictionary recovers the
+%   hidden process vs. only the local observations.
+%   Pivot: two ways the hidden process can hide behind a local channel:
+%     (B) per-token stochastic noise on a single chain per feature -- isolates
+%         temporal aggregation as a denoising mechanism.
+%     (D) many-to-one OR-gate coupling + per-token noise -- adds the harder
+%         challenge of disentangling shared hidden chains from a richer
+%         emission alphabet.
+%   Headline preview: in both regimes TXC recovers the hidden chains; per-
+%   token baselines recover only the local observations.
+%   Tone: 4--5 sentences, EM-opener register, almost no math.
+
+% OVERLEAF VERSION (2026-05-07-0240) of synthetic intro paragraph, kept commented for review:
+% \textbf{Setup~B} gives each emitted feature its own hidden Markov chain:
+% there is a one-to-one correspondence between hidden states $s_{i,t}$ and local
+% feature firings $a_{i,t}$, with $a_{i,t}$ observed through stochastic
+% per-token noise. Because the hidden state and noisy emission for feature $i$
+% are associated with the same direction $\mathbf f_i$, this setup isolates
+% temporal aggregation as a denoising mechanism rather than a dictionary-geometry
+% problem. \textbf{Setup~D} removes this one-to-one correspondence: a smaller set
+% of hidden chains drives a larger emission alphabet through OR-gate coupling
+% \emph{and} per-token noise, adding the harder challenge of disentangling
+% many-to-one coupling. We find that TXC architectures track the global hidden
+% state in both regimes, while per-token baselines  track only the local
+% emission.
+
+
+% -----------------------------------------------------------------------------
+% Paragraph 2 — SETUP B (DRAFTED — combined definition + headline)
+%   Plain-prose generator: N independent two-state Markov chains, one per
+%   feature, with sticky hidden state and Bernoulli noisy emissions.
+%   Geometry: hidden state and noisy observation share the same f_i direction.
+%   Discriminator: lives at the latent-code level, not the dictionary, because
+%   no architecture can tell them apart by decoder alignment alone.
+%   Knobs: T (window), k (sparsity); rho fixed at 0.7.
+%   Tone: 3--4 sentences. Transition matrices T^{(x)} go to the appendix.
+% -----------------------------------------------------------------------------
+% Paragraph 3 — SETUP D INTRODUCTION + METRIC SWITCH (DRAFTED — explains
+%   why the dictionary-level metric is the right read-out for D, in plain
+%   terms: B's geometry is degenerate so the signal lives in the latent
+%   code; D's geometry is non-degenerate so the signal lives in the
+%   dictionary itself.)
+%   Reference: \cref{fig:setup_b_denoising}.
+%   (1) TXC's latent code crosses above the per-token denoising floor as T
+%       grows (T=2 partial, T>=4 full), monotone in T.
+%   (2) Per-token baselines (TopK SAE, TFA-pos, Stacked) sit on the floor.
+%   (3) Mechanism call-out: temporal aggregation as denoising, isolated
+%       from coupling and dictionary capacity.
+%   Tone: 3--4 sentences. Headline first, then mechanism, then baselines.
+% -----------------------------------------------------------------------------
+% Paragraph 4 — SETUP D FULL DEFINITION (DRAFTED — regimes + parameters)
+%   Plain-prose generator: K=10 hidden chains drive M=20 emissions through a
+%   binary OR-gate coupling matrix + per-token Bernoulli noise on each
+%   emission.
+%   Geometry: K hidden chain directions f_g distinct from M emission
+%   directions f_l, so dictionary alignment can discriminate (gAUC vs eAUC
+%   are both well-defined).
+%   Two regimes: moderate overlap (n_parents=5, "Dmitry replicate") and
+%   maximum overlap (n_parents=10), both at p_B=0.5.
+%   Why: stresses the model with both sources of confounding the local
+%   observation -- coupling AND noise -- and asks whether TXC still finds
+%   the hidden chains.
+%   Tone: 4--5 sentences.
+% -----------------------------------------------------------------------------
+% Paragraph 5 — SETUP D RESULTS (DRAFTED — uses pre-T-SAE numbers from
+%   c2.md; refresh once the in-flight T-SAE-on-D runs land.)
+%   Reference: \cref{fig:setup_d}.
+%   (1) Headline: TXC-base reaches gAUC = 0.99 at low k; TopK-SAE collapses
+%       monotonically with k (0.92 at k=1 -> 0.44 at k=8) on np=10.
+%   (2) Local-vs-global divide: TXC sits high on gAUC across a wide eAUC
+%       range; SAE traces a down-right path as it spends capacity on
+%       emissions.
+%   (3) Mechanism: at max overlap, every emission shares every hidden chain
+%       as parent, so a windowed encoder can pool evidence across emissions
+%       to recover the chain.
+%   (4) Robustness: gap reproduces across overlap levels in the HUNT sweep
+%       (table in appendix), strongest at moderate-to-high overlap.
+%   Tone: 4--5 sentences.
+% =============================================================================
+
+% \paragraph{The Denoising bench.}
+% The Denoising bench is a panel of $N = 20$ independent two-state Markov chains, one per feature. Each chain has a sticky hidden state $s_{i,t}$ with self-correlation $\rho = 0.7$, and emits a noisy firing $a_{i,t}$ through a Bernoulli channel with hit rate $p_B = 0.625$; the activation reads out the noisy firings, $\mathbf{x}_t = \sum_{i=1}^N a_{i,t}\, m_{i,t}\, \mathbf{f}_i$. The hidden state and its noisy emission share the same direction $\mathbf{f}_i$ by construction, so no architecture can distinguish them by where it points its decoder atoms; the discriminating signal lives at the latent-code level. We capture it two ways: a \emph{single-latent scatter} (\cref{fig:setup_b_denoising}), where per-architecture markers sit above the $y=x$ diagonal exactly when the matched latent's trace tracks the hidden state better than the noisy emission, and a \emph{linear probe} ridge-regressing the hidden state on the full $d_{\mathrm{sae}}$-dim code, whose $R^2_{\mathrm{global}}$ is the headline number in the bar chart. Both metrics tell the same story: per-token architectures sit on the diagonal in the scatter and at $R^2_{\mathrm{global}} \approx 0.36$--$0.38$ in the bar chart, while TXC architectures cross above the diagonal as the window length $T$ grows --- partial denoising at $T = 2$, full denoising at $T \geq 4$ --- with TXC-base reaching $R^2_{\mathrm{global}} = 0.48$. The denoising effect strengthens monotonically with $T$, isolating temporal aggregation as the responsible mechanism.
+
+% \paragraph{Why we change the metric for the second bench.}
+% The Denoising bench is a clean test, but its geometry is artificially degenerate: local and global features point in the same residual-stream direction, so the discrimination signal is forced into the latent-code trajectories. The Coupling bench is the more representative case: a smaller set of $K = 10$ hidden Markov chains drives a larger set of $M = 20$ emissions through an OR-gate coupling matrix, with a Bernoulli noise channel on each emission. The hidden chains and the emissions now occupy different directions in residual-stream space ($K$ hidden vs $M$ emission), so the architecture's choice between local and global is visible directly in its decoder atoms: a globally-aligned dictionary points at the hidden chain directions, a locally-aligned one at the emission directions. We therefore measure dictionary-level alignment AUC against each ground truth --- $e\mathrm{AUC}$ (local) is the decoder-cosine AUC against the $M$ emission directions, and $g\mathrm{AUC}$ (global) is the decoder-cosine AUC against the $K$ hidden chain directions. The metric choice is forced by the geometry, not by taste: on the Denoising bench the signal lives in the latent code (single-latent correlation and linear-probe $R^2$ are both code-level read-outs); on the Coupling bench it lives in the dictionary, so we read it off there.
+
+% \paragraph{The Coupling bench.}
+% We study two regimes that vary the coupling density. The \emph{moderate-overlap} regime takes $n_{\mathrm{parents}} = 5$, replicating Dmitry's published Bench~2 setting in which each emission has five hidden parents drawn from a binary coupling matrix. The \emph{maximum-overlap} regime takes $n_{\mathrm{parents}} = 10$, coupling every emission to every hidden chain, and is the regime in which the local-vs-global trade-off is sharpest because every emission carries information from every chain. Both regimes fix $K = 10$, $M = 20$, $\rho = 0.9$, $\pi = 0.05$, $p_B = 0.5$, $d = 256$, $d_{\mathrm{sae}} = 40$, and we sweep $T$ and $k_{\mathrm{pos}}$ at three seeds. The architectures are the same set used on the Denoising bench.
+
+% \paragraph{Coupling bench results.}
+% At maximum overlap, the temporal architectures recover the global feature while the per-token-only architectures do not: T-SAE and TXC-base both saturate at $g\mathrm{AUC} = 0.99$ at $k_{\mathrm{pos}} = 1$, and the TXC-pro variants reach $0.98$. The TopK SAE traces the opposite path, dropping monotonically from $g\mathrm{AUC} = 0.92$ at $k_{\mathrm{pos}} = 1$ to $0.44$ at $k_{\mathrm{pos}} = 8$ as it reallocates capacity from the few hidden chains to the many local emissions; Stacked SAE saturates lower at $\approx 0.87$. The decoder-alignment scatter (\cref{fig:setup_d}) makes this concrete: temporal architectures cluster in the upper region of the panel (high $g\mathrm{AUC}$ across a wide $e\mathrm{AUC}$ range), while TopK-SAE traces a clear down-right path with growing $k_{\mathrm{pos}}$. The HUNT-phase sweep across eight $(p_B, n_{\mathrm{parents}})$ regimes confirms the temporal-versus-per-token gap is robust and largest at moderate-to-high overlap, with a peak gap of $\approx 0.47$ on max-overlap.
+
+% OVERLEAF VERSION (2026-05-07-0240) of synthetic methodology, kept commented for review:
+% \paragraph{Setup B: noisy independent emissions.}
+% Setup~B is a panel of $N = 20$ independent two-state Markov chains, one per feature. Each chain has a sticky hidden state $s_{i,t}$ with self-correlation $\rho = 0.7$, and emits a noisy firing $a_{i,t}$ through a Bernoulli channel with hit rate $p_B = 0.625$; the activation reads out the noisy firings,
+% \[
+%     \mathbf{x}_t = \sum_{i=1}^N a_{i,t}\,m_{i,t}\,\mathbf{f}_i.
+% \]
+% Thus Setup~B has a one-to-one correspondence between hidden chains and emitted feature directions: for each feature $i$, both the clean hidden state $s_{i,t}$ and the noisy emission $a_{i,t}$ are associated with the same residual-stream direction $\mathbf f_i$. Consequently, decoder alignment alone cannot distinguish local from global recovery. A learned feature whose decoder points along $\mathbf f_i$ may still either track the noisy emission $a_{i,t}$ or denoise it to recover the hidden state $s_{i,t}$.
+%
+% We therefore evaluate Setup~B at the level of the matched feature's activation trace. For each ground-truth feature $i$, let $j(i)$ be the learned feature whose decoder slice has highest cosine similarity with $\mathbf f_i$. We define the local and global correlations
+% \[
+%     r_{\mathrm{local},i}
+%     =
+%     \operatorname{corr}(z_{j(i)}, a_i),
+%     \qquad
+%     r_{\mathrm{global},i}
+%     =
+%     \operatorname{corr}(z_{j(i)}, s_i),
+% \]
+% where correlations are taken over held-out sequence positions. The scatter in \cref{fig:setup_b_denoising} plots
+% \[
+%     \bigl(r_{\mathrm{local},i}, r_{\mathrm{global},i}\bigr)
+% \]
+% for each matched feature. We summarize each architecture by the global-to-local correlation ratio metric
+% \[
+%     D
+%     =
+%     \frac{\bar r_{\mathrm{global}}}{\bar r_{\mathrm{local}}},
+% \]
+% % where
+% % \[
+% % \bar r_{\mathrm{local}} = \frac{1}{N}\sum_i r_{\mathrm{local},i},
+% %     \qquad
+% %     \bar r_{\mathrm{global}} = \frac{1}{N}\sum_i r_{\mathrm{global},i}.
+% % \]
+%
+% A per-token architecture should have
+%     $r_{\mathrm{global},i}
+%     \approx
+%     \operatorname{corr}(a_i,s_i)\, r_{\mathrm{local},i}$,
+% while $D > 1$ means that the learned activations correlate more strongly with the clean hidden state than with the noisy emission. In \cref{fig:setup_b_denoising}, per-token baselines remain near the no-denoising floor, whereas TXC architectures move upward as the window length $T$ grows, indicating that their shared window latents recover hidden-state information beyond the current noisy firing.
+%
+% \paragraph{Setup D: noisy coupled emissions.}
+% Setup~D removes the one-to-one correspondence between hidden chains and emitted
+% features. A set of $K=10$ hidden Markov chains drives a larger alphabet of
+% $M=20$ local emissions through a binary coupling matrix
+% $C\in\{0,1\}^{M\times K}$. At each position, emission $j$ is active when at
+% least one of its parent chains is active, followed by a Bernoulli noise channel:
+% \[
+%     a_{j,t}
+%     \sim
+%     \operatorname{Bernoulli}
+%     \left(
+%         p_B\,
+%         \mathbbm{1}\!\left[\sum_{k=1}^K C_{jk}h_{k,t}\ge 1\right]
+%     \right),
+% \]
+% with $p_A=0$ in the off state. The observed activation is
+% \[
+%     \mathbf{x}_t
+%     =
+%     \sum_{j=1}^M a_{j,t}\,m_{j,t}\,\mathbf f^{\mathrm{emit}}_j .
+% \]
+%
+% This setting has two distinct spatial ground truths. The local ground truth is
+% the set of emission directions
+% $
+%     \{\mathbf f^{\mathrm{emit}}_j\}_{j=1}^M,
+% $
+% which correspond to the features directly written into the activation. The
+% global ground truth is the set of hidden-chain footprints
+% \[
+%     \mathbf f^{\mathrm{hid}}_k
+%     =
+%     \operatorname{normalize}
+%     \left(
+%         \sum_{j:C_{jk}=1}\mathbf f^{\mathrm{emit}}_j
+%     \right),
+%     \qquad k=1,\ldots,K,
+% \]
+% which correspond to the aggregate direction induced by hidden chain $k$ through
+% its emission children. Unlike Setup~B, local and global recovery are now visible
+% in the dictionary geometry itself: a locally aligned dictionary points at the
+% emission directions, while a globally aligned dictionary points at the
+% hidden-chain footprints.
+%
+% We take advantage of this fact and evaluate Setup~D instead with decoder-alignment AUCs. The local score
+% $e\mathrm{AUC}$ is the feature-recovery AUC against the $M$ emission directions,
+% and the global score $g\mathrm{AUC}$ is the feature-recovery AUC against the
+% $K$ hidden-chain footprints. This asks the same local-vs-global question as
+% Setup~B, but with a different metric.
+%
+% We study coupling-density regimes that vary how much the hidden-chain
+% footprints overlap. The moderate-overlap regime takes
+% $n_{\mathrm{parents}}=5$, so each emission is driven by a random half of the
+% hidden chains while different hidden chains still have distinct child sets. We
+% also include a dense-overlap stress test with $n_{\mathrm{parents}}=10$. Since
+% this couples every emission to every hidden chain, the individual hidden-chain
+% footprints collapse to a shared aggregate direction; we use this regime as a
+% local-vs-global stress test rather than as a disentanglement benchmark. Both
+% regimes fix $K=10$, $M=20$, $\rho=0.9$, $\pi=0.05$, $p_B=0.5$, $d=256$,
+% $d_{\mathrm{sae}}=40$, and sweep $T$ and $k_{\mathrm{pos}}$ over three seeds.
+% The architectures are the same set used in Setup~B.
+%
+% In the dense-overlap stress test, the TXC family recovers the aggregate hidden
+% footprint: TXC-base reaches $g\mathrm{AUC}=0.99$ at
+% $k_{\mathrm{pos}}\leq 4$, and the TXC-pro variants saturate similarly. The
+% TopK SAE follows the opposite trend, dropping monotonically from
+% $g\mathrm{AUC}=0.92$ at $k_{\mathrm{pos}}=1$ to $0.44$ at
+% $k_{\mathrm{pos}}=8$ as it reallocates dictionary capacity from the global
+% aggregate direction to the many local emission directions. The
+% decoder-alignment scatter (\cref{fig:setup_d}) makes this tradeoff concrete:
+% TXC points remain high in global alignment across a wide range of local
+% alignment, while TopK SAE traces a down-right path as $k_{\mathrm{pos}}$ grows.
+% Across the full $(p_B,n_{\mathrm{parents}})$ sweep, the TXC advantage is largest at moderate-to-high coupling overlap, with a peak $g\mathrm{AUC}$ gap of $\approx 0.47$.
+
+% The first setting is a product of $N$ independent two-state chains, with $\mathcal{S} = \{0, 1\}^N$, latent equal to emission ($s_t=\mathbf{a}_t$), and a transition matrix that factorizes per-feature, $T^{(\mathbf{a})}_{s, s'} = \prod_{i=1}^N T^{(a_i)}_{s_i,\,s'_i}$. Each per-feature chain is parameterized by a stationary firing probability $\pi$ and lag-1 autocorrelation $\rho$, with $\Pr(0\to 1)=\pi(1-\rho)$ and $\Pr(1\to 0)=(1-\pi)(1-\rho)$, and is initialized at its stationary distribution $\mathrm{Bernoulli}(\pi)$. We use $N=20$ features at $d=40$, $T=64$, $n_{\mathrm{seqs}}=4096$ sequences resampled with replacement during training, a shared $\pi=0.5$, and $\rho$ assigned from five levels $\{0.0, 0.3, 0.5, 0.7, 0.9\}$ in four-feature groups, so the dataset spans the full range from i.i.d.\ firing to strongly temporally persistent firing. Because the latent equals the emission in this setting, the global ground truth collapses to the local feature directions, and an architecture is scored by how well its decoder columns recover $\mathcal{F}$.
+
+% The second setting separates latent from emission. The latent space is $\mathcal{S}=\{0,1\}^K$ with $K=10$ independent two-state hidden chains $h_{1:K}$ each at $(\pi=0.05, \rho=0.7)$, sparse and temporally persistent. Emissions are a deterministic function of the current latent: a fixed binary coupling matrix $C\in\{0,1\}^{M\times K}$ with $M=20$ rows, each having exactly $n_{\mathrm{parents}}=2$ parents drawn uniformly without replacement, defines the $\mathsf{OR}$ gate
+% \[
+%     s_j(t) = \mathbbm{1}\!\left[\,\textstyle\sum_{i=1}^K C_{ji}\,h_i(t)\geq 1\,\right],
+% \]
+% so emission $j$ fires whenever any of its parents is on. The firing mask is $\mathbf{a}_t = (s_1(t),\ldots,s_M(t))\in\{0,1\}^M$ and the observation is $\mathbf{x}_t = \sum_{j=1}^M s_j(t)\,m_{j,t}\,\mathbf{f}_j$ with $d=256$, $T=64$, and the same $n_{\mathrm{seqs}}=4096$. This second setting admits two distinct ground truths: the $M=20$ \emph{emission} directions $\{\mathbf{f}_j\}$, recoverable per position, and the $K=10$ \emph{hidden} directions $\tilde{\mathbf{f}}_i = \mathrm{normalize}(\sum_{j:\,C_{ji}=1} \mathbf{f}_j)$ defined as the normalized mean of each chain's children, which can only be expressed by a decoder that pools across positions. 
+
+% \color{red}how are both settings scored, what we report (recon, feature recovery auc, etc). also write batch size and training details? or save for appendix.\color{black}
 % Both settings are scored with the same protocol. We report reconstruction $\mathrm{NMSE}=\mathbb{E}\|\mathbf{x}-\hat{\mathbf{x}}\|^2 / \mathbb{E}\|\mathbf{x}\|^2$ and a feature-recovery AUC against a ground-truth direction set $\mathcal{G}$: for each $\mathbf{g}_k\in\mathcal{G}$ we match the best decoder column by absolute cosine similarity, $c_k=\max_j |\langle \mathbf{g}_k,\mathbf{w}_j\rangle|$ (both $\ell_2$-normalized), and integrate the fraction-recovered curve over a threshold sweep, $\mathrm{AUC}(\mathcal{G}) = \int_0^1 |\mathcal{G}|^{-1}\sum_k \mathbb{1}[c_k\geq\tau]\,\mathrm{d}\tau$. For C1 we set $\mathcal{G}=\mathcal{F}$ and report a single AUC. For C2 we report both an emission AUC (eAUC) against $\{\mathbf{f}_j\}$ and a hidden-state AUC (gAUC) against $\{\tilde{\mathbf{f}}_i\}$; gAUC is the headline since it is the metric on which the local-vs-global dissociation appears. All metrics are computed on a held-out evaluation batch and reported with mean and standard deviation across seeds $\{1,2,42\}$.
 
 % each $\mathbf{a}_t$ is drawn independently from a distribution $p_{\mathrm{loc}}$ over $\{0,1\}^N$. This distribution need not factorize across features, and therefore can encode arbitrary same-position correlations: features may co-occur, be mutually exclusive, or follow any prescribed sparse firing pattern. To extend this setting temporally, we promote $p_{\mathrm{loc}}$ to a distribution over all stochastic process over binary firing vectors,
@@ -352,7 +987,7 @@ so emission $j$ fires whenever any of its parents is on. The firing mask is $\ma
 %     =
 %     \prod_{t=1}^T p_{\mathrm{loc}}(\mathbf{a}_t).
 % \]
-% More generally, we can choose $P_{\mathrm{temp}}$ so that each marginal $\mathbf{a}_t$ has distribution $p_{\mathrm{loc}}$, preserving the local feature-correlation structure, while allowing dependence between $\mathbf{a}_t$ and $\mathbf{a}_{t'}$ across positions.
+% More generally, we can choose $P_{\mathrm{temp}}$ so that each marginal $\mathbf{a}_t$ has distribution $p_{\mathrm{loc}}$, preserving the local feature-correlation structure, while allowing dependence between $\mathbf{a}_t$ and $\mathbf{a}_{t'}$ across positions. 
 % Thus local correlations are encoded by the one-position distribution over $\mathbf{a}_t$, while temporal correlations are encoded by the joint distribution over the sequence $\mathbf{a}_{1:T}$.
 
 % A hidden Markov model provides a natural parameterization of such a temporal distribution. We introduce latent states $z_{1:T}$ with Markov dynamics,
@@ -414,250 +1049,146 @@ so emission $j$ fires whenever any of its parents is on. The firing mask is $\ma
 % This recovers the usual sparse synthetic setting when the firing indicators are independent across positions, but the HMM generalization allows features to persist, switch on and off in correlated bursts, or co-occur according to latent temporal states.
 
 
-% Do we want to say we have random variables {A_1,...,A_H} for each
+% Do we want to say we have random variables {A_1,...,A_H} for each 
 
 % TODO: "real world is probably the wrong phrasing here
+% \section{Qualitative Analysis of Large Model Features}
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[width=0.62\textwidth,height=0.23\textheight,keepaspectratio]{figs/umap_txc.png}
+%     \caption{\textbf{UMAP of TXC feature explanations} for a \texttt{gemma-2-2b-it} block~13 TXC. Autointerpreted features form weakly separated clusters spanning both entity-like and discourse-level concepts.}
+%     \label{fig:txc_umap}
+% \end{figure}
 
-\section{Qualitative analysis of features in large scale models}
-\newpage
-\begin{figure*}[!t]
-    \centering
-    \includegraphics[width=\linewidth]{figs/umap_txc}
-    \caption{Placeholder figure for qualitative feature analysis.}
-    \label{fig:txc_umap}
-\end{figure*}
+% A $T{=}5$ TXC parameterize its dictionary with full-rank cross-position weights: $W_{\text{enc}}$ and $W_{\text{dec}}$ are dense across the temporal window, so a single feature can aggregate information from all $T$ positions and contribute to reconstruction at any of them. We hook the post-residual stream of \texttt{gemma-2-2b-it} \citep{gemma_2024} block $13$ at $T{=}5$ windows, $k{=}100$ sparsity, $d_{\text{sae}}{=}18{,}432$ dictionary width, and ask what kinds of patterns this cross-position capacity surfaces qualitatively.
 
-A $T=5$ sparse-autoencoding dictionary can be parameterized with either block-diagonal cross-position weights (each window position gets its own SAE, sharing a dictionary; \textit{StackedSAE}) or with full-rank cross-position weights ($W_{enc}$ and $W_{dec}$ are dense across the temporal window; \textit{TXC}). Both arms -- StackedSAE and TXC -- hook the post-residual stream of $\texttt{gemma-2-2b-it}$ block $13$, same activation cache, $T=5$ windows, $k=100$ sparsity, $d_{sae}=18,432$ dictionary width. What does additional cross-position capacity in TXC surface qualitatively?
+% We autointerpret \citep{autointerp} every active feature by running the trained model over a $1{,}500$ 32-token chains from the \texttt{fineweb} dataset \citep{fineweb_penedo2024the} and keeping every feature with at least three top-window examples ($5{,}033$ retained). For each feature we elicit a single-sentence concept explanation via \texttt{Claude Haiku 4.5} \citep{haiku} (see \ref{app:meta-prompt}). Explanations are embedded with \texttt{sentence-transformers/all-MiniLM-L6-v2}, projected to 2D with UMAP \citep{UMAP_McInnes2018}, and partitioned with HDBSCAN \citep{hdbscan_McInnes2017}. Clusters are labeled lexically by their distinctive content tokens. For per-sentence visualization we pick $32$-token sequences and select the top-$32$ TXC features via an \textit{exclusive score} (each position claims its most-concentrated feature, greedy assignment) (see \ref{app:meta-exclusive}).
 
-We autointerpert [cite here] every active feature in each arm by running the trained model over a $1,500$-chain sample of the cache and keeping every feature with at least three top-window examples. For each feature we elicit a single-sentence concept explanation via $\texttt{Claude Haiku 4.5}$ [cite here] [see Appendix for the prompt]. Explanations are embedded with $\texttt{sentence-transformers/all-MiniLM-L6-v2}$, projected to 2D with UMAP \cite{UMAP_McInnes2018}, and partitioned with HDBSCAN \cite{hdbscan_McInnes2017}. Clusters are labeled lexically by their distinctive content tokens. For per-sentence visualization we pick $32$-token sequences and select the top-$32$ features per arm via an \textit{exclusive score} (each position claims its most-concentrated feature, greedy assignment) [see Appendix for the pseudocode].
 
-On the per-sentence activation maps (Fig. X), TXC features fire as wide as at least $T$-token diagonal bands following the span of the underlying concept, while StackedSAE features fire as isolated single-position spikes co-located with the concept's most informative token. See Appendix for more.
 
-In the explanation embedding (Fig. \ref{fig:txc_umap}), TXC yields $k=15$ well-separated clusters (silhouette $+0.01$) versus StackedSAE's $k=23$ tighter but heavily overlapping clusters (silhouette $−0.20$) (See Appendix). StackedSAE's groupings are concrete entity types (acronyms, dates, geographic markers, sports headlines), while TXC additionally captures discourse-level abstractions (first-person narrative openings, news article datelines, contrast/transition markers). An LLM-judged temporal-coherence score over the cluster labels favors TXC ($6.80$ vs $4.78$). StackedSAE wins on lexical coherence [define it] ($7.08$ vs $6.31$), which is a by-product of the design to memorize narrow token-level patterns at the cost of discourse-level abstraction.
 
-\section{Benchmarking in real world settings}
-We now compare the temporal crosscoders
-\begin{enumerate}
-    \item We now compare the tempor
-    \item If Andre's: 'features more interpretable, but steering worse' picture is valid, (I guess maybe we can also support that with the sparse probing), then that leads nicely into the backtracking case study?
-    \item
-\end{enumerate}
+% In the explanation embedding (Fig. \ref{fig:txc_umap}), HDBSCAN partitions the $5{,}033$ features into $15$ clusters, though the low silhouette score ($+0.01$) suggests weak global separation rather than sharply separated semantic islands. (See \ref{app:meta-cluster} \ref{app:meta-label} \ref{app:meta-metrics}). The cluster inventory mixes concrete entity types --- tickers (c0), acronyms (c4), dates (c8), sports headlines (c5) --- with discourse-level abstractions: news article datelines (c1), blogging platforms (c7), biblical chapter/verse (c9), and taxonomic binomial nomenclature (c11).
+
+% On the per-sentence activation map in \cref{fig:sentence-app}, TXC features appear as $\geq T$-token diagonal bands, tracking concept spans rather than isolated tokens. Together with the discourse-level cluster inventory in \cref{fig:txc_umap}, this suggests that the window-shared parameterization surfaces features whose support is distributed across multiple positions.
+
+% TODO: this is a bad title
+% \section{Benchmarking in real world settings}
+\section{Real-Model Evaluations}
+\label{sec:real}
+
+The synthetic benchmarks above test whether a dictionary can recover known temporal ground truth. We now ask whether the same temporal inductive bias is useful in trained language models, where the relevant features are not known in advance and must be judged through downstream behavior. We evaluate four complementary settings: sparse probing for static concept readout, backtracking for causal control of a multi-token reasoning behavior, emergent misalignment for steering and detecting a finetuned behavioral shift, and HH-RLHF preference decomposition as a negative control where response length is a strong confounder. Across these settings, temporal aggregation helps when the target behavior is distributed across nearby tokens, but can hurt when the benchmark rewards length-correlated or per-token features. We include qualitative autointerpretation and per-token activation visualizations in \cref{app:meta-autointerp}.
+% Just need to give brief intro to the general idea and why we do this.
+% Key thing is that we have concrete real world impact of the SAEs:
+% kinda a generalization of the Josh Engels sparse probing paper point
+% 
 
 
 \subsection{Sparse Probing}
-% Outline
+\label{sec:sparse-probing}
 
-% Par 1: Why sparse probing?
-% The point here is that its a
-Sparse probing is a benchmark of how useful a dictionary's features are for predicting human-interpretable concepts in text. The concepts in standard probing panels span a wide range: some, part-of-speech, punctuation, are properties of single tokens, while others, topics, sentiments, named entities, are properties of extended passages that vary smoothly across a sequence \citep{bhalla2025tsae}. Different dictionary architectures encode different inductive biases --- per-token, cross-layer, or temporal-window --- so sparse probing is the natural setting in which to measure, concept by concept, which kind of bias proves most useful. Following \citet{kantamneni2025are}, we measure for each concept how accurately a small linear classifier trained on the top-$S$ features (selected by mean activation difference between positive and negative examples) can distinguish examples that exhibit the concept from those that do not. We find in \cref{fig:sparse_probing} that the multi-layer crosscoder narrowly leads, with the temporal crosscoder, the T-SAE, and the per-token TopK SAE clustered closely behind.
+Sparse probing tests whether dictionary features support simple classifiers for human-interpretable text concepts. We evaluate \texttt{google/gemma-2-2b-it} layer~13 on the $38$-task SAEBench panel, with all architectures trained at matched expected per-token $L_0=20$. For each task and feature budget $k_{\mathrm{feats}}\in\{5,10,20,40,80,160,320,640\}$, we select features by training-split class-mean difference and fit an $\ell_1$-regularized logistic probe. Full architecture, pooling, task, and aggregation details are in \cref{app:c3}.
 
-% Par 2: Methodology, just re-summarize the josh engels paper
-We evaluate on \texttt{google/gemma-2-2b-it} layer~$13$ across the SAEBench multi-task panel of \citet{kantamneni2025are} --- $38$ binary one-vs-rest tasks across $8$ datasets (\cref{app:c3-tasks}). Every architecture is trained at the same expected per-token $L_0 = 20$ (\cref{app:c3-archs}), so cross-architecture differences reflect feature quality rather than admitted bits per token; we additionally train TXC-base at $T \in \{5, 10, 20\}$ to test whether longer temporal context monotonically improves probing. The probing protocol of \citet{kantamneni2025are} is fully described in \cref{app:c3-protocol}: the $32$-token tail of each prompt is encoded and mean-pooled, the top-$S$ features per task are selected by training-split class-mean difference, and an $\ell_1$-regularized logistic regression is fit on those features. We sweep $k_{\mathrm{feats}} \in \{5, 10, 20, 40, 80, 160, 320, 640\}$, average per-task ROC-AUC over $3$ training seeds, and report the per-arch summary $\overline{\mathrm{AUC}}$ defined in \cref{app:c3-summary-metric}.
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
-    \begin{subfigure}[t]{0.48\textwidth}
+    \begin{subfigure}[t]{0.47\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/c3_sparse_probing_auc_of_auc_gemma_it.pdf}
-        \caption{Per-arch summary across the sweep.}
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{figs/c3_sparse_probing_auc_of_auc_gemma_it.pdf}
+        \caption{$\overline{\mathrm{AUC}}$ across the feature-budget sweep.}
         \label{fig:sparse_probing_gemma_it}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[t]{0.48\textwidth}
+    \begin{subfigure}[t]{0.47\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/c3_sparse_probing_curves_gemma_it.pdf}
-        \caption{AUC vs $k_{\mathrm{feats}}$, TFA dropped (zoom).}
+        \includegraphics[width=\linewidth,height=0.22\textheight,keepaspectratio]{figs/c3_sparse_probing_curves_gemma_it.pdf}
+        \caption{AUC vs.~number of probe features, with TFA omitted for scale.}
         \label{fig:sparse_probing_curves_gemma_it}
     \end{subfigure}
-\caption{Sparse probing on \texttt{google/gemma-2-2b-it} layer~13 residual activations over the SAEBench multi-task panel ($38$ tasks). At each $(\mathrm{arch}, k_{\mathrm{feats}})$, an $\ell_1$-logistic probe is fit on the top-ranked features; performance is mean ROC-AUC across tasks and $3$ seeds. \textbf{Left:} per-architecture summary AUC, obtained by averaging across the log-spaced sweep $k_{\mathrm{feats}} \in \{5,10,20,40,80,160,320,640\}$; error bars show propagated seed-$\sigma$. Temporal methods cluster at the top ($\approx 0.90$), outperforming the per-token TopK SAE baseline ($0.886$), while TFA trails ($0.764$). \textbf{Right:} mean AUC vs.~$k_{\mathrm{feats}}$ with TFA omitted for readability; bands show $\pm 1\sigma$ across seeds. Temporal methods separate from TopK SAE by $k_{\mathrm{feats}} \ge 20$ and largely saturate by $k_{\mathrm{feats}} \approx 160$. Full curves including TFA are in \cref{fig:sparse_probing_full}.}
+    \caption{Sparse probing on \texttt{google/gemma-2-2b-it} layer~13 over $38$ SAEBench tasks. Temporal methods cluster near the top in $\overline{\mathrm{AUC}}$ and outperform the per-token TopK SAE baseline; the advantage appears by $k_{\mathrm{feats}}\geq 20$ and saturates near $160$. Full curves including TFA are in \cref{fig:sparse_probing_full}.}
     \label{fig:sparse_probing}
 \end{figure*}
-% Par 3: Results
 
-\Cref{fig:sparse_probing_gemma_it} ranks the eight cells. MLC leads at $\overline{\mathrm{AUC}} = 0.907$, followed by a tight TXC-base $T$-sweep cluster at $0.899$--$0.902$, T-SAE and TXC-pro at $0.897$--$0.899$, and TopK SAE behind at $0.886$. The $\sim\!0.014$ summary-AUC gap from the temporal family to the per-token TopK baseline is well outside the per-cell seed-$\sigma$ ($\leq 0.002$ for every cell except TFA). The unaggregated curves in \cref{fig:sparse_probing_curves_gemma_it} show the cluster separating from TopK SAE by $k_{\mathrm{feats}} \geq 20$ and saturating near $k_{\mathrm{feats}} = 160$, with the three TXC-base $T$ variants showing a small monotonic improvement at $k_{\mathrm{feats}} \leq 40$ that flattens at $k_{\mathrm{feats}} \geq 80$ --- evidence that the temporal benefit on this task saturates inside a five-token window. TFA underperforms the locked set at $\overline{\mathrm{AUC}} = 0.764$, attributable to its paper-faithful $B\!=\!32$ batch size; we report the full TFA curve in \cref{app:c3-full-curves} and treat its gap as a batch-size confound rather than a feature-quality finding.
-
-% Par 4: takeaway
-The story sparse probing tells lines up with the steering result of \cref{sec:backtracking}: window-aggregated features capture the multi-token concepts that per-token features miss, and the temporal family wins on a static probing task that has no causal structure of its own. The within-family flatness, MLC, all three TXC-base $T$ variants, T-SAE, and TXC-pro clustered within $0.010$ summary AUC, suggests that at the locked sparsity the benefit comes from \emph{having a temporal window at all}, not from any specific architectural choice within the family.
-\newpage
+\Cref{fig:sparse_probing} shows that MLC leads at $\overline{\mathrm{AUC}}=0.907$, followed by TXC-base at $0.899$--$0.902$, T-SAE/TXC-pro at $0.897$--$0.899$, and TopK SAE at $0.886$. The temporal-family gap over TopK SAE is small but larger than seed variation, appears by $k_{\mathrm{feats}}\geq20$, and saturates near $160$. We read this as evidence that sparse probing benefits from temporal-window features, but that most of the gain comes from having temporal aggregation at all rather than from a specific TXC variant.
 
 % Backtracking section
 \subsection{Inducing and Detecting Backtracking in a Reasoning Model}
 \label{sec:backtracking}
 
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
-
-    % --- Top row: two charts ---
-    \begin{subfigure}[t]{0.48\textwidth}
-        \vspace{0pt}
+    \begin{subfigure}[t]{0.47\textwidth}
         \centering
-        \autofig{c7_gc_at_peak_paired_compact}
-        \caption{Inducement: per-question $gc(a, m)$ at $m=0$ (gray) and at each architecture's optimal steering magnitude (colored), bootstrap $95\%$ CI over $61$ questions.}
+        \autofigcompact{c7_gc_at_peak_paired_compact}{0.22\textheight}
+        \caption{Inducement: genuine backtracking at each architecture's optimal steering magnitude.}
         \label{fig:c7-gc-at-peak-bar}
-    \end{subfigure}\hfill
-    \begin{subfigure}[t]{0.48\textwidth}
-        \vspace{0pt}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.47\textwidth}
         \centering
-        \autofig{c7_pr_auc_S8_bar_compact}
-        \caption{Detection: sparse-probe PR-AUC at top-$S=8$ features ($5$-fold GroupKFold by question, $\ell_1$-regularized logistic regression). Chance $\approx 0.12$.}
+        \autofigcompact{c7_pr_auc_S8_bar_compact}{0.22\textheight}
+        \caption{Detection: sparse-probe PR-AUC at top-$S=8$ features.}
         \label{fig:c7-pr-auc-S8}
     \end{subfigure}
-
-    \vspace{0.8em}
-
-    % --- Bottom row: case study, two cells side by side ---
-    \begin{subfigure}[t]{\textwidth}
-        \vspace{0pt}
-        \scriptsize
-        \setlength{\fboxsep}{4pt}
-        \begin{minipage}[t]{0.49\linewidth}
-            \fbox{\begin{minipage}[t][7em][t]{0.95\linewidth}
-                \textbf{Unsteered ($m{=}0$)} \hfill \textcolor{red!70!black}{\textbf{no boxed \texttimes}}\\[2pt]
-                {\itshape \ldots so $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check my steps.} $2.5^2 = 6.25$, $0.7^2 = 0.49$, $6.25 - 0.49 = 5.76$\ldots \textbf{Let me just verify each step once more}\ldots [continues looping; runs out of token budget without emitting a boxed answer]}
-            \end{minipage}}
-        \end{minipage}\hfill
-        \begin{minipage}[t]{0.49\linewidth}
-            \fbox{\begin{minipage}[t][7em][t]{0.95\linewidth}
-                \textbf{TXC-pro ($bs{=}256$), $m{=}+12$} \hfill \textcolor{green!50!black}{\textbf{ans = 12 \checkmark}}\\[2pt]
-                {\itshape \ldots the entire fraction is $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check that.} $0.2 \times 12 = 2.4$. \textbf{So, yes, that's correct.} \ldots the simplified result is $12$. $\boxed{12}$}
-            \end{minipage}}
-        \end{minipage}
-        \caption{Same prefix on \texttt{test/prealgebra/951.json} (simplify $\sqrt{2.5^2 - 0.7^2}/(2.7 - 2.5)$, GT $= 12$). The unsteered continuation derives the right value mid-trace but loops in inconclusive verification and never emits a boxed answer. TXC-pro's steering replaces that loop with one committal backtrack.}
-        \label{fig:c7-headline-text}
-    \end{subfigure}
-
-    \caption{\emph{Top:} (a) cohort-level inducement, $gc(a,m)$ at each cell's peak magnitude vs the shared unsteered floor at $m=0$; (b) detection, sparse-probe PR-AUC at $S=8$ on the same cells. \emph{Bottom (c):} a single MATH-500 question; the unsteered model derives the correct value but never commits, while TXC-pro under optimal-magnitude steering uses a single decisive backtrack to land on the right boxed answer. Inducement curves $\Delta gc(a,m)$ over the full magnitude grid are in \cref{fig:c7-inducement-app}; per-$S$ PR-AUC and ROC-AUC tables are in \cref{app:c7-pr-auc-full}.}
+    \caption{Backtracking inducement and detection on DeepSeek-R1-Distill-Llama-8B. TXC-base gives the strongest causal inducement, while TXC-pro gives the best sparse-probe detection above the class-prior baseline. A qualitative example is shown in \cref{fig:c7-headline-text-app}.}
     \label{fig:c7-headline}
 \end{figure*}
 
-Reasoning models exhibit an emergent behavior, sometimes called backtracking, in which the model abandons an in-progress chain of inference and resumes along an alternative path \cite{ward2025reasoning,muennighoff2025s1}. The signature is multi-token: the model commits to a partial argument, registers an inconsistency, and verbalizes a reversal (``wait,'' ``actually''). \citet{ward2025reasoning} show that this behavior can be reliably induced by a difference-of-means steering vector mined from the \emph{base} model and applied to its reasoning-finetuned counterpart at inference. Because the signature spans positions, a per-token sparse dictionary cannot represent it. Backtracking is therefore a natural testbed for the temporal-window inductive bias of \cref{sec:txc}.
+Reasoning models exhibit backtracking: the model commits to a partial argument, notices a problem, and reverses course. Because this signature spans multiple tokens, it is a natural testbed for temporal-window features. We follow the steering-vector setup of \citet{ward2025reasoning}, mining directions from \texttt{Llama-3.1-8B} and applying them at layer~10 of \texttt{DeepSeek-R1-Distill-Llama-8B}. The cohort contains $61$ MATH-500 questions, and the cut25 protocol resamples continuations under steering across a grid of magnitudes.
 
-We pair the steering-vector approach of \citet{ward2025reasoning} with our own evaluation protocol. Vectors are mined from \texttt{meta-llama/Llama-3.1-8B} and applied at residual-stream layer $10$ on \texttt{deepseek-ai/DeepSeek-R1-Distill-Llama-8B}. The cohort is $61$ MATH-500 questions \cite{hendrycks2021math}, $31$ truly-wrong and $30$ originally-correct. For each question we cut the unsteered continuation at $25\%$ of its length and resample under steering at each of $25$ magnitudes (the \textit{cut25} protocol; \cref{app:c7-cut25}). All six architectures train on the same Llama-3.1-8B layer-$10$ activation cache at $d_{\text{SAE}} = 32{,}768$.
-
-We report two metrics. \emph{Inducement} measures whether the architecture's mined feature direction acts as a causal lever for genuine backtracking when used as a steering vector. We track it as the raw count $gc(a, m)$ and as the baseline-corrected lift
-\begin{equation}
-    \Delta gc(a, m) \,=\, \frac{1}{|\mathcal{Q}|} \sum_{q \in \mathcal{Q}} \bigl[\, gc(a, q, m) - gc(a, q, 0) \bigr],
-    \label{eq:delta-gc}
-\end{equation}
-where $gc(a, q, m)$ is a Sonnet-$4.6$ count of genuine backtracking events (\cref{app:c7-judge}). \emph{Detection} is a sparse-probe PR-AUC at top-$S$ features under $5$-fold GroupKFold by question (\cref{app:c7-pr-auc-full}).
-
-\Cref{fig:c7-headline} summarizes both axes. \cseveenTopGcCell{} leads inducement at $gc \approx \cseveenTopGcPeak{}$ ($m = \cseveenTopGcPeakMag{}$), against the shared unsteered floor of $gc \approx \cseveenTopGcBaseline{}$, for a baseline-corrected lift of $\Delta gc_{\text{peak}} = \cseveenTopDelta{}$. \cseveenTopPrAucCell{} leads detection at PR-AUC$\,=\,\cseveenTopPrAuc{}$, comfortably above the class-prior chance level of $0.12$. The two TXC-base batch-size variants peak at the same magnitude (\cref{fig:c7-inducement-app}), suggesting that the architecture identifies a reproducible feature direction whose causal effect is stable under batch-size scaling. Architecture ordering is preserved between PR-AUC and ROC-AUC and across the full $S$ grid (\cref{tab:c7-pr-auc}). Because detection does not depend on judge subjectivity or magnitude calibration, it serves as an independent corroboration of the inducement story.
-
-Limitations (single-seed headline, judge $\kappa$ deferred, batch-size effects, alternative steering protocols) are discussed in \cref{app:c7-seeds,app:c7-bs-256,app:c7-judge,app:c7-steering-variants}.
+We evaluate both causality and detection. Inducement counts genuine backtracking events under a Sonnet-4.6 judge, reported against the shared unsteered floor; detection trains sparse probes to distinguish backtracking from non-backtracking continuations under grouped cross-validation. \Cref{fig:c7-headline} shows that TXC-base gives the strongest causal inducement, while TXC-pro gives the best sparse-probe detection above the class-prior baseline. Full magnitude curves, judge rubric, and robustness checks are in \cref{app:c7}.
 
 
 \subsection{Emergent Misalignment}
-% Criticism: how strong is the argument for this being a temporal task.
 
-% Par 1: Motivation, why this is a good temporal task, our key result.
-Emergent misalignment (EM) occurs when a model finetuned on a narrow misaligned task generalises to broad misaligned behaviour in unrelated domains \cite{betley2025emergent}. EM responses cohere across many tokens, making EM a candidate for temporal-window analysis, and have been shown to be reliably induced and removed by steering on a single residual-stream direction \cite{soligo2025modelorganisms,wang2025persona,arditi2025persona}. We therefore compare architectures along two axes: how effectively each architecture controls the rate of EM via steering, and how reliably each architecture detects EM in model responses. We find that the temporal crosscoder matches conventional SAEs on steering while outperforming other temporal baselines.
-% Why: clear eval metric: em rate delta, safety relevant
-
-
-% Par 2: Method
-% Important parts:
-% a) we steer on the finetuned models, not base. I think refs show either is OK. Ideally re-run experiments on base.
-% b) we evaluate single feature steering, this is OK because we get large effects.
-% c) can you compare to references alignment delta's on steering in the literature?
-% d)we evaluate detection by building a classifier.
-% TODO: not a replication! Wording is bad here
-In the main text, we evaluate
-% two model organisms in the spirit of \citet{soligo2025modelorganisms}: Qwen2.5-14B-Instruct with a finance-extended LoRA at layer 24, and
-Qwen2.5-7B-Instruct finetuned on a bad medical advice data. At the time of writing, this was the only open source model where SAE based steering has been measured for EM. In the appendix, we also provide data for Qwen2.5-14B instruct finetuned on financial advice and medical datasets from \cite{soligo2025modelorganisms}. We first train our autoencoder architectures on activations of the \textit{finetuned} model. For our steering evaluation, we adapt the four stage procedure of \cite{wang2025persona} to identify a candidate set of steering features. We steer on each candidate feature, using Claude 4.6 Haiku as a judge to score coherence and misalignment until model coherence collapses. We report in \cref{fig:emergent_misalignment} here the maximal range of alignment scores achieved by steering a single, optimal feature above a coherence threshold of 70. We report the full steering trajectory in \cref{app:c6}.
-
-For our detection evaluation, we ask whether a sparse linear probe over the autoencoder features can distinguish a misaligned rollout (Sonnet judge align $\leq 50$) from an aligned one. We train the probe on the top-$S$ features by mean-difference between aligned and misaligned activation and report precision-recall AUC for $S \in \{1, 2, 4, 8, 16, 32\}$.
-
-% along a single mined feature direction across the 27-point magnitude grid of \citet{wang2025persona} and report the alignment dynamic range $\Delta\text{align} = \max\text{align} - \min\text{align}$ taken over all $(\text{finalist}, \alpha)$ cells whose mean coherence stays above $70$, averaged over 8 Betley first-person prompts \cite{betley2025emergent} and paired seeds $\{1, 42\}$ with an Anthropic Claude Haiku 4.5 judge. To make $\alpha$ comparable across architectures we rescale the TXC's grid by $\sqrt{T}$, compensating for the $1/\sqrt{T}$ decoder-row norm of a window-shared latent (see \cref{app:c6-decoder-norm}). Detection is evaluated separately as a sparse-probe PR-AUC at top-$S \in \{1, 2, 4, 8, 16, 32\}$ features, mirroring the protocol of \cref{sec:backtracking}. Full datasource configuration, the $\alpha$-grid, the judge prompt, and reproduction commands are in \cref{app:c6}.
-
-% Par 3: Results
-We find in \cref{fig:c6-em-alignment-delta} that the conventional SAE narrowly beats the TXC on our steering measure, although this is within seed error. For detection, \cref{fig:c6-em-detection-prauc} shows that probing on SAE features meaningfully outperforms probing on TXC features, suggesting that the representation is more diffuse in TXCs.
-% We measure the as a single summary metric we report the alginment delta at coherence >70.
-%
-
-% Par 4: Takeaway
-
-\begin{figure*}[!t]
+\afterpage{
+\begin{figure*}[t]
     \centering
-    \begin{subfigure}[t]{0.45\textwidth}
+    \begin{subfigure}[t]{0.47\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/c6_em_alignment_delta_7bmed.pdf}
-        \caption{Steering: alignment dynamic range at $\text{coh} \geq 70$.}
+        \includegraphics[width=\linewidth,height=0.18\textheight,keepaspectratio]{figs/c6_em_alignment_delta_7bmed.pdf}
+        \caption{Steering dynamic range at $\mathrm{coh}\geq70$.}
         \label{fig:c6-em-alignment-delta}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[t]{0.45\textwidth}
+    \begin{subfigure}[t]{0.47\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figs/c6_em_detection_prauc_7bmed.pdf}
-        \caption{Detection: sparse-probe PR-AUC at $S\!=\!16$.}
+        \includegraphics[width=\linewidth,height=0.18\textheight,keepaspectratio]{figs/c6_em_detection_prauc_7bmed.pdf}
+        \caption{Sparse-probe PR-AUC at $S=16$.}
         \label{fig:c6-em-detection-prauc}
     \end{subfigure}
-    \caption{Emergent misalignment on \texttt{Qwen-2.5-7B-Instruct} + \texttt{andyrdt/Qwen2.5-7B-Instruct\_bad-medical} LoRA, $n\!=\!2$ paired training seeds (seeds $\{1, 42\}$). Bars show the mean across seeds; error bars show the min/max range across seeds. \textbf{Left:} alignment dynamic range $\Delta\text{align} = \max\text{align} - \min\text{align}$, taken over all $(\text{finalist}, \alpha)$ cells whose mean coherence $\geq 70$ (Wang stage-4 27-$\alpha$ canonical grid plus the $|\alpha| \in \{110, \ldots, 200\}$ extension). $\Delta\text{align}$ measures how far steering on the architecture's features can push alignment in either direction while the model remains coherent. SAE-arditi: $\Delta\text{align}\!=\!21.5$, TXC-base: $19.8$. \textbf{Right:} sparse-probe PR-AUC at top-$S\!=\!16$ feature count for the binary task ``is this rollout misaligned?'' (Sonnet judge label \texttt{align} $\leq 50$, $5$-fold GroupKFold by EM prompt). SAE-arditi: $0.718$, TXC-base: $0.551$. The two architectures support comparable steering range while SAE-arditi gives the more linearly-detectable feature direction. The per-seed coh/align Pareto frontier and full $\alpha$ frontier grid are shown in \cref{fig:c6-em-pareto-frontier} and \cref{fig:c6-em-steering-grid}.}
+    \caption{Steering and detection for emergent misalignment in \texttt{Qwen-2.5-7B-Instruct} with a bad-medical-advice LoRA. T-SAE performs best on both axes, while TXC variants underperform; full $\alpha$-frontiers are in \cref{fig:c6-em-pareto-frontier,fig:c6-em-steering-grid}.}
     \label{fig:emergent_misalignment}
 \end{figure*}
-\newpage
+}
+Emergent misalignment (EM) occurs when a model finetuned on a narrow misaligned task generalizes to broader misaligned behavior. Since EM responses are coherent multi-token behaviors and have been controlled by steering on residual-stream directions, we compare architectures on two axes: steering control and sparse-probe detection.
 
+We evaluate \texttt{Qwen-2.5-7B-Instruct} finetuned with a bad-medical-advice LoRA. For steering, we adapt the Wang-stage procedure to select candidate features and report the maximum alignment dynamic range achievable above a coherence threshold of $70$. For detection, we train sparse probes to distinguish aligned from misaligned rollouts and report PR-AUC. \Cref{fig:emergent_misalignment} shows the opposite pattern from backtracking: T-SAE performs best on both axes, while TXC variants underperform. Full steering frontiers are in \cref{app:c6}.
+
+% Par 4: Takeaway
 
 \subsection{Decomposing HH-RLHF Preference Data}
 \label{sec:rlhf}
-% Criticism: justification is somewhat circular: T-SAE argued temporal features matter on this task, we re-run the same protocol.
 
-% Par 1: Motivation, why this is a good temporal task, our key result.
-The Anthropic HH-RLHF dataset \cite{bai2022training} pairs each prompt with a preferred (\texttt{chosen}) and dispreferred (\texttt{rejected}) assistant response. \citet{bhalla2025tsae} argue that the response-level signal that distinguishes the two sides is intrinsically multi-token (e.g.\ \emph{the assistant declines}, \emph{the assistant requests clarification}, \emph{the assistant disclaims a capability}), and use HH-RLHF as the dataset-decomposition case study that motivates temporal features in the first place. We therefore include HH-RLHF as a real-world test of feature interpretability and re-run the §4.5 / Appendix B.1 protocol from \cite{bhalla2025tsae} on our locked architectures. We find that the paper-faithful T-SAE configuration ($k\!=\!20$) recovers the cleanest set of semantic top features, with our temporal crosscoder underperforming on this dataset-decomposition metric. This is an honest negative for TXC: window aggregation appears to amplify length-correlated signals that the per-token paper-faithful T-SAE training regime is specifically tuned to suppress.
+HH-RLHF pairs each prompt with a preferred \texttt{chosen} and dispreferred \texttt{rejected} response \cite{bai2022training}. Since \citet{bhalla2025tsae} use this dataset to test whether temporal features recover multi-token preference signals, we rerun their \S4.5 / Appendix B.1 protocol on our locked architectures. We rank features by $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ over response tokens and classify top features by correlation with response-length difference.
 
-% Par 2: Method
-% Important parts:
-% a) we reproduce T-SAE §4.5 / Appendix B.1 verbatim, except for the architecture set being our locked one rather than theirs.
-% b) we evaluate at the architecture's native sparsity, not a uniform k.
-% c) the length-Pearson-r threshold for semantic vs spurious is from the paper.
-% d) we autointerpret with Claude Haiku 4.5, not GPT-4o.
-We follow \citet[§4.5, App.\ B.1]{bhalla2025tsae}: we take the first $N\!=\!1000$ \texttt{(chosen, rejected)} pairs from the \texttt{harmless-base} train split of \texttt{Anthropic/hh-rlhf}, tokenise each side separately through Gemma-2-2b base with \texttt{max\_length}$=256$, mask the differing assistant response via character-level longest-common-prefix between the two sides, and capture residual-stream activations at layer $12$. As a sanity check, we reproduce the response-length t-test from the paper's Appendix B.1: rejected responses are longer than chosen ($36.23$ vs $28.57$ tokens, paired $t$-test $p\!=\!9.76\!\times\!10^{-10}$, matching the paper's $p\!\approx\!9\!\times\!10^{-10}$). For each architecture we encode every captured activation, average each feature's activation over response tokens only, and rank features by $\mu_{\text{rejected}} - \mu_{\text{chosen}}$ (the §4.5 metric). Per top-$K$ feature, we compute the Pearson correlation between $(\text{rejected\_act} - \text{chosen\_act})$ and $(\text{rejected\_len} - \text{chosen\_len})$ across the $1000$ pairs, and classify each feature as \emph{semantic} ($|r| < 0.2$), \emph{mixed} ($0.2 \leq |r| < 0.5$), or \emph{length-spurious} ($|r| \geq 0.5$). Each of the top features is autointerpreted via Claude Haiku 4.5 [cite here] on its top-$5$ max-activating contexts (response tokens only); the resulting one-sentence concept labels are used to qualitatively check that the semantic features the analysis flags are in fact alignment-relevant.
-
-% Par 3: Results
-\Cref{fig:c1-hh-rlhf-summary} reports the top-$20$ classification per architecture. The paper-faithful T-SAE configuration ($k\!=\!20$) leads with $14/20$ semantic features and zero length-spurious features, accounting for $63\%$ of the total $|\mu_{\text{rejected}} - \mu_{\text{chosen}}|$ mass. Both per-token architectures trained at our larger $k_{\text{win}}\!=\!500$ convention (TopK SAE and T-SAE at matched $k$) collapse onto each other at $\sim\!10$ semantic features and $50\%$ semantic mass: the contrastive-loss benefit visible at $k\!=\!20$ is largely washed out by the denser activation budget. TXC at $T\!=\!5$, $k_{\text{win}}\!=\!500$ underperforms the per-token cells with $7/20$ semantic features and $3$ length-spurious features (vs $0$--$1$ for the per-token cells), while having the largest total $|\mu_{\text{rejected}} - \mu_{\text{chosen}}|$ magnitudes ($\max\!=\!1.52$ vs $1.47$ for T-SAE $k\!=\!500$). A natural reading is that TXC's window aggregation integrates over the equivalent of a small conversational unit, amplifying both semantic content and length-driven artefacts (more chances per window for sentence terminators, conversational fillers, or quoted material), whereas the paper-faithful T-SAE training is specifically tuned to suppress the length-driven channel.
-
-% Par 4: Takeaway
-The dataset-decomposition picture here runs in the opposite direction from the steering case study of \cref{sec:backtracking}: where windowed features are a causal lever for interventions that span tokens, they are a liability for ranking-based feature interpretability on a static preference dataset. We treat this as evidence that the same temporal inductive bias has different sign on causal-intervention vs static-decomposition tasks, and read the two case studies together rather than in isolation.
-
-\begin{figure*}[!t]
-    \centering
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \autofig{rlhf_summary}
-        \caption{Top-$20$ feature classification per architecture: count of semantic ($|r|\!<\!0.2$), mixed, and length-spurious ($|r|\!\geq\!0.5$) features.}
-        \label{fig:c1-hh-rlhf-summary}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \autofig{rlhf_scatter}
-        \caption{Per-feature scatter of $|\mu_{\text{rejected}} - \mu_{\text{chosen}}|$ vs length-Pearson $|r|$ for each architecture's top-$50$ features. Points to the left of the dashed $|r|\!=\!0.2$ line are classified as semantic.}
-        \label{fig:c1-hh-rlhf-scatter}
-    \end{subfigure}
-    \caption{HH-RLHF preference decomposition on Gemma-2-2b layer~$12$, reproducing the §4.5 / Appendix B.1 protocol of \citet{bhalla2025tsae} on our locked architectures. The first $1000$ \texttt{(chosen, rejected)} pairs of \texttt{Anthropic/hh-rlhf} \texttt{harmless-base} are tokenised independently per side, the differing response tokens are masked via character-level longest-common-prefix, and each feature is ranked by $\mu_{\text{rejected}} - \mu_{\text{chosen}}$ over response tokens. \textbf{Left:} top-$20$ counts. The paper-faithful T-SAE ($k\!=\!20$) recovers $14/20$ semantic and $0$ spurious features. TXC at $T\!=\!5$, $k_{\text{win}}\!=\!500$ recovers $7/20$ semantic and $3$ spurious. \textbf{Right:} the per-feature length-Pearson scatter. TXC's spurious cluster is concentrated in features whose autointerpreted labels are conversational-discourse markers (sentence terminators with quoted material, conversational filler, discourse markers); these are exactly the per-window length-correlated patterns the temporal aggregation amplifies. The paper-faithful T-SAE has no points to the right of $|r|\!=\!0.5$. Full per-rank cumulative semantic-count curves and the autointerpreted feature labels are in \cref{app:rlhf}.}
-    \label{fig:rlhf}
-\end{figure*}
-
-
-\section{User preferences}
-
-
+The result is a negative case for TXC. T-SAE at the paper setting $k=20$ recovers $14/20$ semantic top features, no length-spurious features, and $63\%$ semantic mass. At the larger $k_{\mathrm{win}}=500$ budget, TopK SAE and T-SAE both fall to roughly $10/20$ semantic features and $50\%$ semantic mass. TXC performs worst on this static decomposition metric, with $7/20$ semantic and $3$ length-spurious features. We read this as evidence that temporal aggregation can help causal interventions spanning multiple tokens, as in \cref{sec:backtracking}, while hurting rank-based interpretability when response length is a confounder. Full summary plots, scatter plots, and autointerpreted labels are in \cref{app:rlhf}.
 
 
 \section{Discussion}
-\begin{enumerate}
-    \item Further work: long context windows. Tensor Network methods could do this!
-    \item Despite the macro-scaling laws (Cagnetta etc...), attention has skip connections.\cite{mathematical_framework}. Understanding how to incorporate these is an important open question.
-    \item Further work: Very flexible architecture, and there is lots of room for improvement. Incorporating the contrastive loss, scaling the window and combining with cross-layer crosscoders are all reasonable things.
-\end{enumerate}
+\label{sec:discussion}
+
+Temporal crosscoders are currently best understood as a flexible addition to the sparse-dictionary toolkit. Across TempBench, TXCs help when the target feature is supported by evidence spread over nearby tokens: they recover hidden temporal variables in the synthetic benches and perform strongly on sparse probing and backtracking detection/inducement. The negative cases are equally informative: on emergent misalignment and HH-RLHF preference decomposition, temporal aggregation can diffuse representations or amplify length-correlated artifacts. Thus the right unit of explanation is task-dependent: some features are token-local, while others are temporally extended.
+
+Several directions follow naturally. First, TXCs currently use short fixed windows. Scaling to longer contexts is a confirmed priority, and will likely require additional structure such as hierarchical windows, low-rank methods, state-space compression, or tensor-network factorizations~\citep{orus2014practical,orus2019tensor}. Second, transformer residual streams contain skip connections across layers, so temporal feature discovery should eventually account for both sequence structure and residual-stream composition~\citep{mathematical_framework}. Combining TXCs with cross-layer crosscoders is one direct way to test this. Third, the architecture leaves substantial room for improvement: adaptive window lengths, stronger contrastive losses, predictive objectives, and multi-scale training could separate genuine temporal features from confounds such as response length and feature density. The central question is therefore not whether temporal dictionaries are always better, but when model features are best represented as local directions, temporal directions, or interactions between the two.
 
 
 
 \bibliographystyle{unsrtnat}
 \bibliography{refs}
-
+\newpage
 \input{appendix.tex}
 
-% \newpage
-% \input{checklist.tex}
+\newpage
+\input{checklist.tex}
 
 
 
