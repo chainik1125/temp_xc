@@ -1,0 +1,9 @@
+[run_on_gpu] CUDA_VISIBLE_DEVICES=0 exec: env AGENT_NAME=agent_synth TEMP_BENCH_POD_MODE=persistent OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.fill_baselines --datasource toy_chord_Kg10_Kl30_d256_2groups --arch topk_sae --seed 1 --k-poses 1 2 3 4 5 6 8 --n-steps 8000
+/workspace/temp_xc/purified/src/temp_bench/data/toy/chord.py:11: SyntaxWarning: invalid escape sequence '\s'
+  (\sum_{k in group g} f_g[k]) — it can only learn ONE direction per
+[fill_baselines] arch=topk_sae T=None seed=1 ds=toy_chord_Kg10_Kl30_d256_2groups k_poses=[1, 2, 3, 4, 5, 6, 8] n_steps=8000
+[fill_baselines] topk_sae     default  k= 1 seed=1 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] topk_sae     default  k= 2 seed=1 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] topk_sae     default  k= 3 seed=1 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] topk_sae     default  k= 4 seed=1 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] topk_sae     default  k= 5 seed=1 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000

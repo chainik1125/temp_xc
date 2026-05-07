@@ -55,6 +55,7 @@ from temp_bench.data.toy.hierarchical_obs_noise import (
 from temp_bench.data.toy.heterogeneous_rho import heterogeneous_rho_features
 from temp_bench.data.toy.dewdrop import dewdrop_features
 from temp_bench.data.toy.chord import chord_features
+from temp_bench.data.toy.aurora import aurora_features
 from temp_bench.data.toy.coupled import make_batch_iter
 from temp_bench.eval.synthetic import feature_recovery, global_recovery_gAUC
 from temp_bench.training.sae_trainer import train_sae
@@ -138,6 +139,24 @@ def _build_data(spec, *, device: str):
             pi=float(spec.pi),
             rho=float(spec.rho),
             obs_noise_sigma=float(spec.obs_noise_sigma),
+            magnitude_dist=getattr(spec, "magnitude_dist", "folded_normal"),
+            magnitude_mean=float(getattr(spec, "magnitude_mean", 1.0)),
+            magnitude_std=float(getattr(spec, "magnitude_std", 0.15)),
+            n_seqs=int(getattr(spec, "n_seqs", 4096)),
+            seed=seed,
+            device=device,
+        )
+    if gen.endswith(":aurora_features"):
+        return aurora_features(
+            K_hidden=int(spec.K_hidden),
+            M_emissions=int(spec.M_emissions),
+            n_parents=int(spec.n_parents),
+            d_in=int(spec.d_in),
+            seq_len=int(spec.seq_len),
+            pi=float(spec.pi),
+            rho=float(spec.rho),
+            obs_noise_sigma=float(spec.obs_noise_sigma),
+            noise_alpha=float(spec.noise_alpha),
             magnitude_dist=getattr(spec, "magnitude_dist", "folded_normal"),
             magnitude_mean=float(getattr(spec, "magnitude_mean", 1.0)),
             magnitude_std=float(getattr(spec, "magnitude_std", 0.15)),

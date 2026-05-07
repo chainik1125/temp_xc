@@ -855,3 +855,23 @@ datasources:
     magnitude_mean: 1.0
     magnitude_std: 0.15
     notes: "Setup chord: 2 groups of 5 phase-locked globals; tests degenerate-direction case."
+
+  # ── Setup aurora: coupled + AUTO-CORRELATED Gaussian obs noise ──
+  # agent_synth 2026-05-07. OU-process noise (α=0.9) instead of i.i.d.
+  # Tests if TXC's denoising story (Setup F) holds on structured noise.
+  toy_aurora_K10_M20_d256_sigma1_alpha09:
+    category: synthetic
+    generator: temp_bench.data.toy:aurora_features
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    obs_noise_sigma: 1.0
+    noise_alpha: 0.9
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup aurora: coupled + OU-process auto-correlated noise (α=0.9)."
