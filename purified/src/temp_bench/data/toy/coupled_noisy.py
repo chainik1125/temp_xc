@@ -1,11 +1,10 @@
 """Noisy + overlap coupled-feature data generator for C2 hunt mission.
 
-Ports Dmitry's ``coupled_noisy_overlap`` setup from
-``origin/dmitry-synthetic @ 03a099b4:src/data_generation/{coupled_dataset,
+Ports the prior author's ``coupled_noisy_overlap`` setup from
+``origin/case-synthetic @ 03a099b4:src/data_generation/{coupled_dataset,
 support}.py`` into a single ``temp_bench.data.toy`` module. Attribution:
-the per-token Bernoulli emission-noise model (``p_B``, ``p_A``) is from
-Dmitry Manning-Coe's ``EmissionConfig`` + ``apply_emission`` (commit
-``03a099b4`` on ``origin/dmitry-synthetic``).
+the per-token Bernoulli emission-noise model (``p_B``, ``p_A``) is from the maintainer Manning-Coe's ``EmissionConfig`` + ``apply_emission`` (commit
+``03a099b4`` on ``origin/case-synthetic``).
 
 Generator pipeline (extends the deterministic ``coupled_hmm``):
 
@@ -13,7 +12,7 @@ Generator pipeline (extends the deterministic ``coupled_hmm``):
    a binary coupling matrix (n_parents per emission).
 2. OR-gate coupling produces deterministic emission support
    ``s_clean ∈ {0,1}^{n × M × T}``.
-3. **NEW (Dmitry)**: per-token Bernoulli emission noise applied to
+3. **NEW **: per-token Bernoulli emission noise applied to
    ``s_clean``:
 
        s_noisy[m, t] = 1 with prob p_B   if s_clean[m, t] = 1
@@ -21,7 +20,7 @@ Generator pipeline (extends the deterministic ``coupled_hmm``):
 
    With ``p_A=0, p_B=1`` we recover ``coupled_hmm``. With ``p_B<1`` we
    model the case where a "should-fire" emission only fires with
-   probability ``p_B`` (per-token unreliability). Dmitry's Bench 2 uses
+   probability ``p_B`` (per-token unreliability). The prior author's Bench 2 uses
    ``p_B=0.5, n_parents=5``.
 
 4. Magnitudes × s_noisy → activations; project to ``x = sum_j a_j F_j``.
@@ -29,7 +28,7 @@ Generator pipeline (extends the deterministic ``coupled_hmm``):
 The window-pooling architectures (TXC) average T noisy observations of
 the same hidden state, denoising; per-token SAEs see one noisy
 observation per encode and cannot disambiguate. This is the regime where
-TXC's gAUC win is largest in Dmitry's results (txc_base 0.97 vs
+TXC's gAUC win is largest in the prior author's results (txc_base 0.97 vs
 regular_sae 0.58 at raw_k=5 ρ=0.9, p_B=0.5, n_parents=5).
 """
 
@@ -77,7 +76,7 @@ def coupled_noisy_hmm(
       - ``p_A`` > 0.0 : when emission would NOT fire (s_clean=0), it
         fires with prob p_A → "false positives".
 
-    Default args reproduce Dmitry's Bench 2 (``coupled_noisy_overlap``):
+    Default args reproduce the prior author's Bench 2 (``coupled_noisy_overlap``):
     ``n_parents=5, p_B=0.5, ρ=0.9``.
     """
     rng = torch.Generator(device="cpu").manual_seed(int(seed))
@@ -112,7 +111,7 @@ def coupled_noisy_hmm(
     )                                                # (n_seqs, M, T)
     emission_support_clean = (parent_sum >= 1).float()
 
-    # 6. NEW: per-token Bernoulli emission noise (Dmitry's apply_emission).
+    # 6. NEW: per-token Bernoulli emission noise (the prior author's apply_emission).
     if p_A == 0.0 and p_B == 1.0:
         emission_support = emission_support_clean
     else:

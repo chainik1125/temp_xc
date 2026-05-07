@@ -1,7 +1,7 @@
 """c1_noisy analysis — wasteland 1c-noisy reproduction (under C2).
 
 Reads c1_noisy leaderboard rows and aggregates by (arch, T-label, k_pos).
-Han 2026-05-06 mapping: c1_noisy is paper-component-wise UNDER C2, not
+(decision 2026-05-06) mapping: c1_noisy is paper-component-wise UNDER C2, not
 C1 — it tests temporal denoising on coupled-emission setup with
 Bernoulli noise (p_A=0, p_B=0.625).
 

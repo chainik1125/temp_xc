@@ -63,7 +63,7 @@ COMPONENT = "c7"
 DATASOURCE = "llama_3_1_8b_base_l10_ward_nousmirror"
 
 EVAL_PROTOCOL_VERSION = "2.0.0"  # 1.1.0 → 2.0.0: extended magnitude
-# grid (Han 2026-05-05 PM, commit 9ea13c06). Adds ±{20-90} → 41 mags
+# grid ((decision 2026-05-05), commit 9ea13c06). Adds ±{20-90} → 41 mags
 # (vs 25 in v1.x). Earlier protocol versions:
 #   1.0.0: original 25-mag sweep (no shuffle ablation)
 #   1.1.0: 25-mag + within-window shuffle ablation (no extreme mags)
@@ -105,7 +105,7 @@ def _spec_window_size(spec) -> int:
     return T_max + max_shift
 
 
-# Per-process preloaded activation cache for C7. Han 2026-05-04 PM
+# Per-process preloaded activation cache for C7. (decision 2026-05-04)
 # directive (briefing top): adopt the preloaded `.clone()` pattern from
 # agent_nlp's `temp_bench.data.nlp.cache.preloaded_batch_iter_from_act_cache`
 # (commit e12dc719) for ~1.4× end-to-end trainer speedup. The helper
@@ -337,14 +337,14 @@ def main(*, archs=None, seeds=DEFAULT_SEEDS, build_cache_only: bool = False,
                     arch_name=arch,
                     seed=seed,
                     datasource_name=DATASOURCE,
-                    # Han 2026-05-04 PM deadline override: n_steps=20_000
+                    # (decision 2026-05-04) deadline override: n_steps=20_000
                     # (schema default 25K) to fit C7 sweep in remaining
                     # sprint window. Matches agent_nlp's c3+c4 override
                     # (commit 513a85ea); analysis.py canonical filter
                     # passes the same explicit cfg.
                     training_cfg=TrainingConfig(n_steps=20_000),
                     eval_cfg={
-                        # v5: extended magnitude grid (Han 2026-05-05 PM
+                        # v5: extended magnitude grid ((decision 2026-05-05)
                         # commit 9ea13c06). Use DEFAULT_MAGNITUDE_GRID
                         # to revert to the v4 25-mag sweep.
                         "magnitudes": list(EXTENDED_MAGNITUDE_GRID),

@@ -1,6 +1,6 @@
 """C3 TopK SAE baseline re-train at T=1 (decisions.md § 15).
 
-Per Han 2026-05-05 PM: per-token archs (topk_sae here, tsae_paper on
+Per (decision 2026-05-05): per-token archs (topk_sae here, tsae_paper on
 agent_em_100k's pod) re-train at literature-canonical scale.
 ``train_window_size=1`` makes the trainer sample one random T=1 window
 per row (1024 tokens/step at batch=1024), matching SAEBench App. B's

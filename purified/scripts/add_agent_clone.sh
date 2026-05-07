@@ -94,7 +94,7 @@ fi
 
 # ── Configure git author identity for this clone (matches bootstrap)
 # Each clone has its own .git/config so we set author identity per-clone.
-git config user.name "Han"
+git config user.name "the prior author"
 git config user.email "han@example.com"
 
 # ── uv sync from the new purified/

@@ -7,7 +7,7 @@ Three contracts:
 2. **No orphan files**: every ``.py`` in ``temp_bench/architectures/``
    (excluding ``base.py`` / ``__init__.py`` / ``_*.py``) is reachable
    by SOME yaml ``class_path``. Catches "agent forked the arch into a
-   parallel file" — see Han's code-reuse contract (PROTOCOL.md § 11).
+   parallel file" — see the prior author's code-reuse contract (PROTOCOL.md § 11).
 3. **Per-component overrides resolve**: ``load_arch(name, component)``
    merges ``per_component_hparams`` correctly.
 

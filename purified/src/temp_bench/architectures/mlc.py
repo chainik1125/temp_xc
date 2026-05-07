@@ -1,6 +1,6 @@
 """MLC — Multi-Layer Crosscoder (shared latent across L adjacent layers).
 
-Source: ``origin/han-phase7-unification @ 94119bc0:src/architectures/mlc.py``
+Source: ``origin/wasteland-canonical @ 94119bc0:src/architectures/mlc.py``
 adapted to the unified :class:`TempBenchArch` framework.
 
 MLC is the layer-axis analog of a Temporal Crosscoder. The "T" axis on
@@ -21,7 +21,7 @@ Encode: ``pre = sum_l einsum("bd,ds->bs", x[:, l, :], W_enc[l]) + b_enc``
 Decode: ``x_hat[:, l, :] = z @ W_dec[:, l, :] + b_dec[l, :]`` → ``(B, L, d)``
 
 NOTE — MLC's first-class data format is multi-LAYER ``(B, L, d)``,
-not multi-TOKEN. Aniket's wasteland C7 pipeline registers hooks on
+not multi-TOKEN. the prior wasteland C7 pipeline registers hooks on
 multiple layers simultaneously to build the (B, L=5, d) batches.
 **This port treats the framework's T axis as L** for compatibility
 with the unified single-layer activation cache pipeline. For paper-

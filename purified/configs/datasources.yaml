@@ -134,7 +134,7 @@ datasources:
                   + MMLU math Q
         concat_random: 20-token windows from MMLU across 8 categories
       Source JSONs already exist on the wasteland at
-      `origin/han-phase7-unification:experiments/phase6_qualitative_latents/concat_corpora/{concat_A,concat_B,concat_C}.json`
+      `origin/wasteland-canonical:experiments/phase6_qualitative_latents/concat_corpora/{concat_A,concat_B,concat_C}.json`
       (concat_C is the random/TSNE set, used as concat_random here).
       Generator on the wasteland:
       `experiments/phase6_qualitative_latents/build_concat_corpora.py`.
@@ -168,9 +168,9 @@ datasources:
       Subject (BASE = `Qwen/Qwen2.5-7B-Instruct`) and adapter
       (`andyrdt/Qwen2.5-7B-Instruct_bad-medical`, peft LoRA, verified
       2026-05-04 via list_repo_files: adapter_config.json +
-      adapter_model.safetensors present) match Dmitry's
+      adapter_model.safetensors present) match the prior author's
       `experiments/em_features/run_wang_procedure.py` defaults
-      (origin/em-nanda @ a74d1be4). Training/probe corpus is
+      (origin/case-em-nanda @ a74d1be4). Training/probe corpus is
       `cfierro/personality-qs-bad-medical-advice` on HF (17 120 user/
       assistant pairs; the medical parallel of cfierro's finance
       mirror). adapter README declares unsloth-Qwen2.5-7B-Instruct as
@@ -179,7 +179,7 @@ datasources:
       may emit a base-mismatch warning; weights still apply).
       Layer 15 (= 54% depth on 28-layer Qwen-7B) is the relative-depth
       match for L24 (= 50% depth) on Qwen-14B-finance and matches the
-      hookpoint Dmitry used for his published 7B-medical numbers.
+      hookpoint the prior author used for his published 7B-medical numbers.
 
   llama_3_1_8b_base_l10_ward:
     category: real_lm
@@ -206,7 +206,7 @@ datasources:
       (`llama_3_1_8b_base_l10_ward_nousmirror`) which points at the
       byte-identical NousResearch redistribution. Paper text still cites
       "Llama-3.1-8B BASE" — the substitution is an HF distribution
-      detail. Open question for Han: prefer accepting the Meta gate +
+      detail. Open questions for the maintainer: prefer accepting the Meta gate +
       switching back to this entry, or formally adopting the mirror as
       the canonical C7 datasource? (See agent_back/briefing.md.)
 
@@ -226,7 +226,7 @@ datasources:
       — paper claims about "Llama-3.1-8B BASE L10" are unaffected.
       Cache key DIFFERS from the original entry (different
       `subject_model` field) so we don't accidentally cross-contaminate
-      caches if Han later switches back. Owned by agent_back; see
+      caches if the prior author later switches back. Owned by agent_back; see
       open question #4 in agents/agent_back/briefing.md.
 
   r1_distill_llama_8b_l10_traces:
@@ -241,7 +241,7 @@ datasources:
     notes: |
       C7 reasoning-model side. We do not train on these activations;
       they are the steering target. Stage A traces (300 MATH-500
-      problems) are read-only from `origin/aniket-ward-stage-b`
+      problems) are read-only from `origin/case-backtracking`
       (`results/ward_backtracking_txc/stage_a/{traces,labels}.json`).
 
   # ── Toy datasources ─────────────────────────────────────────────────
@@ -327,7 +327,7 @@ datasources:
   # the ambient residual dimension scales. d_in=128 (compressed) /
   # d_in=512 (expanded) bracket the Setup A canonical d=256.
   # Random multi-letter name to avoid collision with agent_synth /
-  # agent_pro per Han's autonomous-work directive 2026-05-07. ─────────
+  # agent_pro per the prior author's autonomous-work directive 2026-05-07. ─────────
   toy_coupled_K10_M20_d128_halcyon:
     category: synthetic
     generator: temp_bench.data.toy:coupled_hmm
@@ -358,8 +358,8 @@ datasources:
     magnitude_std: 0.15
     notes: "Setup HALCYON: Setup A at expanded d_in=512."
 
-  # ── C2 ρ-sweep datasources (Han 2026-05-06 — Effect 1 vs Effect 2 test
-  # per Dmitry's framing; mirrors his coupled_rho_sweep). Same coupling
+  # ── C2 ρ-sweep datasources ((decision 2026-05-06) — Effect 1 vs Effect 2 test
+  # per the prior author's framing; mirrors his coupled_rho_sweep). Same coupling
   # structure as the default toy_coupled_K10_M20_d256, only rho varies.
   # If TXC's gAUC win is Effect 1 (variance reduction via T-token
   # averaging), it will be flat across rho. If Effect 2 (temporal
@@ -423,15 +423,15 @@ datasources:
     magnitude_dist: folded_normal
     magnitude_mean: 1.0
     magnitude_std: 0.15
-    notes: "C2 ρ=0.9 — strong temporal correlation (matches Dmitry's high-ρ benches)."
+    notes: "C2 ρ=0.9 — strong temporal correlation (matches the prior author's high-ρ benches)."
 
-  # ── C2 noisy + overlap datasources (Han 2026-05-06T23:00Z — agent_synth
+  # ── C2 noisy + overlap datasources ((decision 2026-05-06T23:00Z) — agent_synth
   # HUNT mission). Per-token Bernoulli emission noise (p_B<1.0) + dense
-  # overlap (n_parents>2). Reproduces Dmitry's coupled_noisy_overlap bench
-  # (origin/dmitry-synthetic @ 03a099b4); his p_B=0.5, n_parents=5, ρ=0.9
+  # overlap (n_parents>2). Reproduces the prior author's coupled_noisy_overlap bench
+  # (origin/case-synthetic @ 03a099b4); his p_B=0.5, n_parents=5, ρ=0.9
   # is the regime where TXC's gAUC win is largest (txc_base 0.97 vs
   # regular_sae 0.58 at raw_k=5). Hunt grid sweeps p_B ∈ {0.5, 0.3, 0.2,
-  # 0.1} × n_parents ∈ {2, 5, 8, 10}. ρ=0.9 fixed (Dmitry confirmed
+  # 0.1} × n_parents ∈ {2, 5, 8, 10}. ρ=0.9 fixed (the maintainer confirmed
   # ρ-robustness). ────────────────────────────────────────────────────
 
   toy_coupled_noisy_K10_M20_d256_pB05_np2:
@@ -449,7 +449,7 @@ datasources:
     magnitude_dist: folded_normal
     magnitude_mean: 1.0
     magnitude_std: 0.15
-    notes: "C2 hunt: Dmitry-Bench-1-style baseline (low overlap + noise)."
+    notes: "C2 hunt: the prior author-Bench-1-style baseline (low overlap + noise)."
 
   toy_coupled_noisy_K10_M20_d256_pB05_np5:
     category: synthetic
@@ -466,7 +466,7 @@ datasources:
     magnitude_dist: folded_normal
     magnitude_mean: 1.0
     magnitude_std: 0.15
-    notes: "C2 hunt: REPRODUCE Dmitry Bench 2 — known TXC win (gAUC 0.97 vs SAE 0.58 at raw_k=5)."
+    notes: "C2 hunt: REPRODUCE the prior author Bench 2 — known TXC win (gAUC 0.97 vs SAE 0.58 at raw_k=5)."
 
   toy_coupled_noisy_K10_M20_d256_pB03_np5:
     category: synthetic
@@ -627,7 +627,7 @@ datasources:
     magnitude_std: 0.15
     notes: "Setup H ρ=0.6: noisy + max overlap, moderate temporal autocorrelation."
 
-  # ── C2 Phase 3 hierarchical bench (Han 2026-05-06T23:00Z — agent_synth
+  # ── C2 Phase 3 hierarchical bench ((decision 2026-05-06T23:00Z) — agent_synth
   # ENGINEER mission). K_g slow globals × K_l fast locals; locals are
   # modulated by globals. Engineered for the global/local divide: per-
   # token signal dominated by locals (K_l > K_g), but globals only

@@ -7,7 +7,7 @@ upstream SAEBench class lists from
 plus 2 cross-token coreference tasks (WinoGrande + SuperGLUE WSC).
 
 Sourced (in spirit) from
-``origin/han-phase7-unification @ 94119bc0:experiments/phase5_downstream_utility/probing/``
+``origin/wasteland-canonical @ 94119bc0:experiments/phase5_downstream_utility/probing/``
 (``probe_datasets.py`` + ``crosstoken_datasets.py``). Three SAEBench-
 faithfulness fixes vs the wasteland 36-task loader:
 

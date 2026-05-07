@@ -1,4 +1,4 @@
-"""C6 detection eval — new axis (Han 2026-05-05 PM).
+"""C6 detection eval — new axis ((decision 2026-05-05)).
 
 Per (arch, seed, organism) cell, hooks into agent_em's existing C6
 canonical checkpoints + ``judge_outputs.jsonl`` per-cell run-dir.

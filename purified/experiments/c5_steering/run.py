@@ -35,7 +35,7 @@ Three notable C5-specifics:
    internally (per ``txc_base.py`` docstring).
 
 Provenance: phase7's V7 driver lives at
-``origin/han-phase7-unification:experiments/phase7_unification/case_
+``origin/wasteland-canonical:experiments/phase7_unification/case_
 studies/steering/intervene_paper_clamp_window_tiled_broadcast.py`` —
 this file replaces that driver with the framework-discipline version.
 """
@@ -93,7 +93,7 @@ DEFAULT_SEEDS: tuple[int, ...] = (1, 2, 42)
 
 
 def _real_training_cfg() -> TrainingConfig:
-    # n_steps overridden 25_000 → 20_000 per Han 2026-05-04 PM URGENT.
+    # n_steps overridden 25_000 → 20_000 per (decision 2026-05-04) URGENT.
     # Aligns C3 + C4 + C5 on the Gemma 20.5M-token-per-cell axis.
     return TrainingConfig(n_steps=20_000)
 

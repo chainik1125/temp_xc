@@ -9,7 +9,7 @@ universal helpers it needs:
 - :func:`extract_boxed`, :func:`answers_match` — \\boxed{} answer
   extraction + LaTeX-aware comparison.
 - :func:`load_stage_a` — read the ported Stage A artifacts.
-- :func:`build_cohort` — Aniket's truly-wrong + originally-correct
+- :func:`build_cohort` — the prior author's truly-wrong + originally-correct
   cohort filter.
 - :class:`SonnetBacktrackingJudge` — Sonnet 4.6 judge with **mandatory
   judge-output persistence** to ``judge_outputs.jsonl`` (one record per
@@ -26,7 +26,7 @@ universal helpers it needs:
   ~12% — F1 / ROC-AUC are misleading at this imbalance.
 
 Provenance — these helpers are ported with attribution from
-``origin/aniket-ward-stage-b @ a62175ee``:
+``origin/case-backtracking @ a62175ee``:
 
 - :class:`SteeringHook`, :func:`extract_boxed`, :func:`_strip_latex_to_plain`,
   :func:`answers_match` ← ``experiments/ward_backtracking_txc/b3_math500_rescue.py``
@@ -65,7 +65,7 @@ log = logging.getLogger("temp_bench.case_studies.backtracking")
 # ── Constants ──────────────────────────────────────────────────────────
 
 
-# Aniket's densified 25-point magnitude grid (v4 / EVAL_PROTOCOL 1.x).
+# The prior author's densified 25-point magnitude grid (v4 / EVAL_PROTOCOL 1.x).
 # Concentrated in ±0.5–8 around the SAE peak; sparse in the tails where
 # curves are flat. See docs/components/c7.md.
 DEFAULT_MAGNITUDE_GRID: tuple[float, ...] = (
@@ -74,7 +74,7 @@ DEFAULT_MAGNITUDE_GRID: tuple[float, ...] = (
     0.5, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16,
 )
 
-# Han 2026-05-05 PM extended grid (v5 / EVAL_PROTOCOL 2.x): adds
+# (decision 2026-05-05) extended grid (v5 / EVAL_PROTOCOL 2.x): adds
 # ±{20, 30, 40, 50, 60, 70, 80, 90} = 16 new points → 41 total.
 # Tests TXC's inducement Δgc at extreme magnitudes far outside the
 # natural activation distribution. Sustained Δgc at ±90 = robust
@@ -93,16 +93,16 @@ DEFAULT_CUT_FRACTION: float = 0.25
 # PR-AUC sparse-probe top-S grid (c7.md "Detection (PR-AUC)" axis).
 DEFAULT_PR_AUC_S_GRID: tuple[int, ...] = (1, 2, 4, 8, 16, 32)
 
-# Sonnet 4.6 — gold-standard judge. Aniket validated κ ≥ 0.749 on his
+# Sonnet 4.6 — gold-standard judge. The prior author validated κ ≥ 0.749 on his
 # wasteland transcripts; we lean on prior-art validation per c7.md
 # (judge κ deferred to post-deadline stretch task).
 SONNET_JUDGE_MODEL: str = "claude-sonnet-4-6"
 
 
-# Verbatim from origin/aniket-ward-stage-b:experiments/ward_backtracking_txc/grade_backtracking.py
+# Verbatim from origin/case-backtracking:experiments/ward_backtracking_txc/grade_backtracking.py
 # (with prompt_text/generation placeholders) — ports the Sonnet rubric for
 # "genuine backtracking events". Do not rephrase without re-running κ
-# validation against Aniket's wasteland baseline.
+# validation against the prior wasteland baseline.
 SONNET_JUDGE_PROMPT: str = """You are evaluating a math problem-solving generation for genuine backtracking behaviour.
 
 Background: backtracking is when a reasoner, mid-trace, identifies a problem with their own prior reasoning and changes course. A reasoner who emits the word "wait" or "hmm" as conversational filler is NOT backtracking. A reasoner who says "wait, no, actually..." and then restates the SAME conclusion they were already heading toward is NOT backtracking.
@@ -150,7 +150,7 @@ class StageA:
     """Frozen view of the Stage A artifacts ported under
     ``results/c7_backtracking/stage_a/``.
 
-    Aniket's Stage A scaffolding (300 R1-Distill-Llama traces × 10
+    The prior author's Stage A scaffolding (300 R1-Distill-Llama traces × 10
     reasoning categories, sentence labels under Sonnet 4.6, dom
     direction-of-meaning vectors) is a read-only input — see
     ``ATTRIBUTION.md`` in that directory.
@@ -207,12 +207,12 @@ def load_stage_a(root: Path | str | None = None) -> StageA:
 
 @dataclass(frozen=True)
 class Cohort:
-    """Aniket's headline cohort: 31 truly-wrong + 30 originally-correct
+    """the prior author's headline cohort: 31 truly-wrong + 30 originally-correct
     MATH-500 questions = 61 panels × 25 magnitudes per arch.
 
-    The cohort source is Aniket's wasteland Stage B output
+    The cohort source is the prior wasteland Stage B output
     ``flip_matrix.parquet`` (ported under
-    ``results/c7_backtracking/aniket_reference/cut25/`` with
+    ``results/c7_backtracking/prior_reference/cut25/`` with
     attribution). qids look like ``test/algebra/1184.json`` and resolve
     against the ``HuggingFaceH4/MATH-500`` ``unique_id`` column.
 
@@ -233,17 +233,17 @@ class Cohort:
         return len(self.all)
 
 
-def aniket_reference_root() -> Path:
-    """Resolve the ported Aniket reference root.
+def prior_reference_root() -> Path:
+    """Resolve the ported Prior reference root.
 
     Returns the ``cut25/`` subdir specifically — the C7 paper protocol.
     """
     from temp_bench.config import purified_root
-    return purified_root() / "results" / "c7_backtracking" / "aniket_reference" / "cut25"
+    return purified_root() / "results" / "c7_backtracking" / "prior_reference" / "cut25"
 
 
 def load_cohort_from_parquet(parquet_path: Path | str | None = None) -> Cohort:
-    """Read the 31+30 cohort qids from Aniket's flip_matrix.parquet.
+    """Read the 31+30 cohort qids from the prior author's flip_matrix.parquet.
 
     The parquet has one row per (arch, qid, magnitude) with
     ``before_correct`` indicating the unsteered (mag=0) correctness.
@@ -251,13 +251,13 @@ def load_cohort_from_parquet(parquet_path: Path | str | None = None) -> Cohort:
     one record per qid (61 total) and split on ``before_correct``.
 
     Returns the same 61 qids any of the 6 arches were evaluated on
-    (the cohort is fixed across arches by construction — see Aniket's
+    (the cohort is fixed across arches by construction — see the prior author's
     methodology_neurips_push.md).
     """
     import pandas as pd
 
     if parquet_path is None:
-        parquet_path = aniket_reference_root() / "flip_matrix.parquet"
+        parquet_path = prior_reference_root() / "flip_matrix.parquet"
     df = pd.read_parquet(parquet_path)
     headline_arch = "txc" if "txc" in df["arch"].unique() else df["arch"].unique()[0]
     sub = df[(df["arch"] == headline_arch) & (df["magnitude"] == 0.0)]
@@ -293,7 +293,7 @@ def build_cohort(
     ground_truth_lookup: Callable[[str], str | None] | None = None,
 ) -> Cohort:
     """Default path: ``source="aniket_parquet"`` reads the 31+30 cohort
-    from Aniket's reference flip_matrix (frozen, deterministic).
+    from the prior author's reference flip_matrix (frozen, deterministic).
 
     The ``source="lm_discovery"`` path is reserved for future use
     (re-discovers the cohort by running R1-Distill-Llama on all 500
@@ -318,7 +318,7 @@ class SteeringHook:
     output.
 
     Verbatim port of ``_Hook`` from
-    ``origin/aniket-ward-stage-b @ a62175ee:experiments/ward_backtracking_txc/b3_math500_rescue.py``.
+    ``origin/case-backtracking @ a62175ee:experiments/ward_backtracking_txc/b3_math500_rescue.py``.
     Reattach via ``module.register_forward_hook(hook)``; set
     :attr:`magnitudes` to a 1-D tensor of length ``batch_size``
     (one scalar per row in the batch) before each forward pass.
@@ -361,7 +361,7 @@ def extract_boxed(text: str) -> str | None:
     """Pull the LAST ``\\boxed{...}`` content from a model output.
 
     Verbatim port from
-    ``origin/aniket-ward-stage-b @ a62175ee:experiments/ward_backtracking_txc/b3_math500_rescue.py``.
+    ``origin/case-backtracking @ a62175ee:experiments/ward_backtracking_txc/b3_math500_rescue.py``.
     Stack-based parser handles nested braces (e.g.
     ``\\boxed{\\frac{1}{2}}``). Returns ``None`` if no boxed answer.
     """
@@ -438,7 +438,7 @@ def cut25_token_position(
 ) -> int:
     """Return the token index at which to cut + continue.
 
-    Per Aniket's B3 ``cut25`` protocol (beats LLM-judged cut and
+    Per the prior author's B3 ``cut25`` protocol (beats LLM-judged cut and
     full-trace continuation per ``results_b_neurips_push.md``): cut at
     ``fraction × len`` of the unsteered token sequence.
     """
@@ -482,7 +482,7 @@ _COUNT_RE = re.compile(r"COUNT:\s*(-?\d+)", re.IGNORECASE)
 
 def parse_judge_reply(raw: str) -> int:
     """Extract the integer COUNT from a Sonnet reply. Returns ``-1`` on
-    parse failure (matches Aniket's ``grade_backtracking.py`` semantics).
+    parse failure (matches the prior author's ``grade_backtracking.py`` semantics).
     """
     m = _COUNT_RE.search(raw or "")
     return int(m.group(1)) if m else -1
@@ -794,7 +794,7 @@ def compute_pr_auc_at_S(
             X_tr, X_te = feature_acts[train_idx], feature_acts[test_idx]
             y_tr, y_te = labels[train_idx], labels[test_idx]
             # Per-fold mean-difference top-S feature selection (matches
-            # Aniket's detection probe).
+            # The prior author's detection probe).
             mean_pos = X_tr[y_tr == 1].mean(axis=0) if (y_tr == 1).any() else np.zeros(X_tr.shape[1])
             mean_neg = X_tr[y_tr == 0].mean(axis=0) if (y_tr == 0).any() else np.zeros(X_tr.shape[1])
             md = np.abs(mean_pos - mean_neg)
@@ -1082,7 +1082,7 @@ def run_phase1_unsteered(
 # ── Labeled-sentence activation extraction (subject-model side) ───────
 
 
-# Aniket's window offsets — T=6 positions BEFORE the sentence start. The
+# The prior author's window offsets — T=6 positions BEFORE the sentence start. The
 # Ward steering-feature mining looks at the activations that "trigger"
 # the backtracking sentence, not the backtracking content itself.
 DEFAULT_WINDOW_OFFSETS: tuple[int, ...] = (-13, -12, -11, -10, -9, -8)
@@ -1100,7 +1100,7 @@ def extract_labeled_sentence_acts(
     """Capture per-sentence subject-model activations from Stage A labels.
 
     Adapted from
-    ``origin/aniket-ward-stage-b @ a62175ee:experiments/ward_backtracking_txc/mine_features.py:_capture_windows``.
+    ``origin/case-backtracking @ a62175ee:experiments/ward_backtracking_txc/mine_features.py:_capture_windows``.
 
     For each labeled sentence in ``results/c7_backtracking/stage_a/sentence_labels.json``:
 
@@ -1108,10 +1108,10 @@ def extract_labeled_sentence_acts(
     2. Run the subject model + capture residual-stream activations at
        layer ``layer`` for every position.
     3. Find the token position corresponding to the sentence's start
-       (``think_offset + char_start`` per Aniket's alignment rule).
+       (``think_offset + char_start`` per the prior author's alignment rule).
     4. Extract a T-window of activations at positions ``[tok_pos + off
        for off in window_offsets]`` (``T = len(window_offsets) = 6`` by
-       default, matching Aniket's [-13, -8] window).
+       default, matching the prior author's [-13, -8] window).
 
     Returns a dict with::
 
@@ -1122,7 +1122,7 @@ def extract_labeled_sentence_acts(
     Cached at ``cache_path`` (default
     ``results/c7_backtracking/stage_a/sentence_acts_L<layer>.npz``);
     idempotent. ~25 K sentences × 300 traces × ~30 s each on A40 is the
-    one-time cost (Aniket's run is the reference). Re-extraction is
+    one-time cost (the prior author's run is the reference). Re-extraction is
     triggered when ``force=True`` or when the file is missing.
     """
     from temp_bench.config import purified_root
@@ -1189,7 +1189,7 @@ def extract_labeled_sentence_acts(
             acts = captured["x"][0].numpy()  # (seq, d)
             seq_len = acts.shape[0]
 
-            # Aniket's sentence-start alignment: trace begins at the
+            # The prior author's sentence-start alignment: trace begins at the
             # closing tag <think>, then char_start counts from there.
             think_open = "<think>"
             think_idx = full_response.find(think_open)
@@ -1285,7 +1285,7 @@ def mine_top_features(
 ) -> list[FeatureMineResult]:
     """Rank features by D+/D- mean-difference selectivity.
 
-    Aniket's mine_features.py adapted to our :class:`TempBenchArch`
+    The prior author's mine_features.py adapted to our :class:`TempBenchArch`
     interface. For each labeled sentence's activation window, encode
     through the SAE → max-pool over T axis → per-feature pooled
     activation. Rank features by (pos_mean - neg_mean) selectivity.
@@ -1297,7 +1297,7 @@ def mine_top_features(
 
     The decoder direction defaults to :meth:`TempBenchArch.decoder_directions`
     (T-averaged for window archs); per-position decoder selection
-    (Aniket's "pos0" mode) requires arch-specific override.
+    (the prior author's "pos0" mode) requires arch-specific override.
     """
     device = next(model.parameters()).device
     # Per-arch T: slice sentence_acts (T=6) to match the arch's expected T.
@@ -1332,7 +1332,7 @@ def mine_top_features(
             for i in range(0, n, batch_size):
                 batch = torch.from_numpy(acts[i:i + batch_size]).to(device, dtype=param_dtype)
                 z = model.encode(batch).abs().float()
-                # Max-pool over T (window axis) — Aniket's window-level latent.
+                # Max-pool over T (window axis) — the prior author's window-level latent.
                 if z.dim() == 3:
                     z = z.amax(dim=1)
                 # Sum into accumulator so we can mean at end.
@@ -1557,7 +1557,7 @@ def run_arch_evaluation(
     # in this workspace's ``judge_outputs.jsonl``. Pre-seeding the
     # workspace's jsonl from a prior run-dir lets a re-eval skip the
     # panels that haven't changed (e.g., 25-mag → 41-mag expansion
-    # only needs to gen the 16 new mags). Han 2026-05-05 PM detection
+    # only needs to gen the 16 new mags). (decision 2026-05-05) detection
     # mission + magnitude expansion mission.
     needed_keys = {
         (qid, float(m), arch_name, seed)
@@ -1649,7 +1649,7 @@ def run_arch_evaluation(
 
     # ── Step 6: PR-AUC detection (+ paired within-window shuffle ablation) ──
     # Uses the shared :func:`temp_bench.eval.detection.detect_case_study`
-    # API (Han 2026-05-05 PM directive, commit 1a12e647). The new path
+    # API ((decision 2026-05-05) directive, commit 1a12e647). The new path
     # adds a paired within-window token-shuffle ablation: encode + probe
     # twice (unshuffled + shuffled), report both PR-AUCs and the gap
     # ``pr_auc - pr_auc_shuffled``. Decision rule: ``shuffle_gap ≥ 0.02``

@@ -66,7 +66,7 @@ Two TXC-specific rules:
 1. **Stride-1 sliding T-windows by default** when the cohort element is
    a sentence longer than T. Stride-T loses the ability to detect
    features that fire on windows misaligned with T-block boundaries.
-   For the C7 reference path, Aniket's
+   For the C7 reference path, the prior author's
    `extract_labeled_sentence_acts` extracts a single
    T-window of activations *just before* each sentence start
    (`window_offsets=(-13, ..., -8)`); that's effectively a per-sentence
@@ -171,11 +171,11 @@ run:
 
 1. **Confirm sentence-window encoding preserves T axis.**
    `extract_labeled_sentence_acts` correctly returns `(n_sent, 6,
-   d_in)` per Aniket's window-offset convention — verified on
+   d_in)` per the prior author's window-offset convention — verified on
    `sentence_acts_L10.npz` (25 204 sentences × 6 × 4096 fp32, 12.6%
    positive). The T axis survives encode; the `amax(dim=1)` pool in
    `run_arch_evaluation` is correct.
-2. **Aniket's wasteland κ values (0.749 / 0.773 / 1.000) are not for
+2. **the prior wasteland κ values (0.749 / 0.773 / 1.000) are not for
    the probe; they're for the Sonnet judge.** Detection has no judge
    — it uses the existing Stage A `sentence_labels.json` as ground
    truth. No κ validation needed for detection.
@@ -236,7 +236,7 @@ agent_back (C7) to land before paper submission:
 
 Cross-territory: `temp_bench.eval.detection` and the shuffle helper
 are new shared scaffolding. agent_paper coordinates the merge from
-`det-steer` into `final` (per Han); the three case-study agents import
+`det-steer` into `final` (per the maintainer); the three case-study agents import
 from `temp_bench.eval.detection` in their respective `analysis.py`.
 
 ## Methodology validation

@@ -31,7 +31,7 @@ SETUPS = [
     ("A (coupled, ρ=0.7)",
      "toy_coupled_K10_M20_d256",
      {}),
-    ("D-np5 (Dmitry replicate)",
+    ("D-np5 (the prior author replicate)",
      "toy_coupled_noisy_K10_M20_d256_pB05_np5",
      {}),
     ("D-np10 (max overlap)",

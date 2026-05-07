@@ -53,8 +53,7 @@ def _valid_train_keys() -> set[str]:
     for C7.
 
     Filters leaderboard rows + judge_outputs to current-config cells.
-    Schema defaults are batch=1024, n_steps=25K, plateau=off (Han
-    2026-05-04 PM, decisions.md § 12). **Deadline override (Han 2026-
+    Schema defaults are batch=1024, n_steps=25K, plateau=off ((decision 2026-05-04), decisions.md § 12). **Deadline override (the prior author 2026-
     05-04 PM)**: ``n_steps=20_000`` to fit the C7 sweep in remaining
     sprint window (matches agent_nlp's c3+c4 override, commit 513a85ea).
     The explicit ``training_cfg`` here MUST mirror the override in
@@ -72,7 +71,7 @@ def _valid_train_keys() -> set[str]:
         training_cfg=TrainingConfig(n_steps=20_000),
     )
 
-# Aniket's wasteland reference (hill-climbed TXC) — for the c7.md
+# the prior wasteland reference (hill-climbed TXC) — for the c7.md
 # "Reference numbers" cross-check, NOT our paper claim.
 ANIKET_REFERENCE_PEAK_DELTA_GC = {
     "txc": (1.574, -12),       # hill-climbed TXC, NOT our locked TXC-base/TXC-pro
@@ -92,7 +91,7 @@ def _placeholder(reason: str) -> str:
         "Headline check pending: does TXC-pro reproduce ~+1.574 peak Δgc on "
         "the inducement axis under our locked-arch set? "
         "Reference (hill-climbed TXC, wasteland) at "
-        "`results/c7_backtracking/aniket_reference/cut25/inducement_summary.csv`.\n"
+        "`results/c7_backtracking/prior_reference/cut25/inducement_summary.csv`.\n"
     )
 
 
@@ -154,7 +153,7 @@ def _pr_auc_table_md(rows, S_grid=DEFAULT_PR_AUC_S_GRID, *, key_prefix: str = "p
     - ``"pr_auc_shuf_S"`` — within-window-shuffle ablation PR-AUC.
     - ``"pr_auc_gap_S"`` — gap = pr_auc - pr_auc_shuffled (the
       "genuinely temporal" signal; ≥ 0.02 = temporal, < 0.02 =
-      window-density per Han 2026-05-05 PM detection mission).
+      window-density per (decision 2026-05-05) detection mission).
     """
     by_arch: dict[str, dict[int, list[float]]] = {}
     for r in rows:
@@ -235,13 +234,13 @@ def run_analysis() -> AnalysisResult:
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
     rows = query_leaderboard(component=COMPONENT)
 
-    # Filter to current-config cells only (Han 2026-05-04 PM, decisions § 12).
+    # Filter to current-config cells only ((decision 2026-05-04), decisions § 12).
     valid_keys = _valid_train_keys()
     rows = [r for r in rows if r.train_key in valid_keys]
 
     # Dedup: keep the latest eval_protocol_version per (train_key) — when
     # we re-eval with a bumped protocol (e.g., 1.0.0 → 1.1.0 to add the
-    # within-window shuffle ablation, Han 2026-05-05 PM commit 1a12e647),
+    # within-window shuffle ablation, (decision 2026-05-05) commit 1a12e647),
     # the older row stays in leaderboard.jsonl for diff; here in
     # AUTO-RESULTS we only show the newest column set per cell.
     def _ver_tuple(s: str) -> tuple[int, ...]:
@@ -324,7 +323,7 @@ def run_analysis() -> AnalysisResult:
                 f"\n![PR-AUC vs S](../../experiments/c7_backtracking/plots/{plot_path.name})"
             )
 
-        # Within-window shuffle ablation (Han 2026-05-05 PM, commit 1a12e647).
+        # Within-window shuffle ablation ((decision 2026-05-05), commit 1a12e647).
         # Decision rule: shuffle_gap ≥ 0.02 across S = genuinely temporal
         # detection; < 0.02 = window-density. Bold rows in the gap table
         # mark cells that pass the threshold per S.
@@ -335,7 +334,7 @@ def run_analysis() -> AnalysisResult:
                 "\n\n#### Within-window shuffle ablation (paired)\n"
                 "_PR-AUC after token shuffle within each T-window. Bold "
                 "values in the gap table are ≥ 0.02 = genuinely temporal "
-                "detection (vs window-density). Per Han 2026-05-05 PM."
+                "detection (vs window-density). Per (decision 2026-05-05)."
                 "_\n"
             )
             md_parts.append("\n**PR-AUC (shuffled):**\n")
@@ -355,13 +354,13 @@ def run_analysis() -> AnalysisResult:
             md_parts.append(
                 "\n\n**Headline reproducibility** — TXC-pro peak Δgc = "
                 f"**{txc_pro_peak[1]:+.3f}** at mag={txc_pro_peak[0]:+.1f}; "
-                f"Aniket's wasteland TXC-H8 (closest analog) = +{ref[0]:.3f} at mag={ref[1]:+.1f}; "
+                f"the prior wasteland TXC-H8 (closest analog) = +{ref[0]:.3f} at mag={ref[1]:+.1f}; "
                 f"hill-climbed TXC = +1.574 at mag=−12 (reference, NOT a comparable arch).\n"
             )
     elif rows:
         md_parts.append(
             "\n\n**Headline reproducibility**: TXC-pro inducement cell pending. "
-            "Reference numbers in `results/c7_backtracking/aniket_reference/cut25/inducement_summary.csv`.\n"
+            "Reference numbers in `results/c7_backtracking/prior_reference/cut25/inducement_summary.csv`.\n"
         )
 
     # ── Coverage report ───────────────────────────────────────────────

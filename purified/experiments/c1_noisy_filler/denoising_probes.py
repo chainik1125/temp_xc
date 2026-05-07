@@ -1,6 +1,6 @@
 """Linear probe + single-latent correlation denoising eval for c1_noisy.
 
-Reproduces wasteland 1c-noisy analysis (Han 2026-05-06 directive).
+Reproduces wasteland 1c-noisy analysis ((decision 2026-05-06) directive).
 
 Wasteland sources (commit 3c44f530babf6378c909a30a1796c792478ae5ba):
 - ``docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md``

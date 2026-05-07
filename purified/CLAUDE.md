@@ -3,7 +3,7 @@
 You are an AI agent working on the `final` branch. **All work happens
 inside `purified/`.** Wasteland code (the soup of 50+ TXC variants from
 Phase 2-7 hill-climbing) was deleted from this branch — it lives only on
-`origin/han-phase7-unification`. Wasteland *docs* are still here in
+`origin/wasteland-canonical`. Wasteland *docs* are still here in
 `docs/`, `papers/`, and `RUNPOD_INSTRUCTIONS.md` because component
 writeups cite them heavily.
 
@@ -35,9 +35,9 @@ bash scripts/agent_smoke_test.sh
 First-time pod provision (tokens + uv install + git checkout) is run
 **by the user, not by an agent**. `scripts/bootstrap_runpod.sh` is
 interactive (`read -rs` for token input) and an agent session cannot
-enter input. By the time you start, Han has already run it; tokens are
+enter input. By the time the agent starts, the maintainer has already run it; tokens are
 in `/workspace/.tokens/` (or `~/.tokens/` locally) and the venv exists.
-If `agent_smoke_test.sh` flags missing tokens, **stop and ping Han** —
+If `agent_smoke_test.sh` flags missing tokens, **stop and ping the maintainer** —
 do not try to populate the tokens yourself.
 
 ## Layout
@@ -105,7 +105,7 @@ Other arch hparams are fixed in `configs/locked_archs.yaml`.
 2. `bash scripts/agent_smoke_test.sh` (env + tests + preflight; CRITICAL
    warnings are fatal)
 3. Read **`agents/<your_name>/briefing.md`** top-to-bottom. The top
-   section is Han's mandate (read-only). The bottom sections are
+   section is the prior author's mandate (read-only). The bottom sections are
    *your previous self's* state-of-the-world — current state, next
    action, pitfalls. PROTOCOL.md § 14.
 4. Read `decisions.md` for locked decisions you must respect.
@@ -122,8 +122,8 @@ is the audit trail.
 
 0. **Always cd into `purified/` first.** All paper paths and the venv
    are relative to this dir. `set_agent_env.sh` enforces this.
-1. **Wasteland code is on `origin/han-phase7-unification`, not here.**
-   Read it via `git show origin/han-phase7-unification:<path>`. Never
+1. **Wasteland code is on `origin/wasteland-canonical`, not here.**
+   Read it via `git show origin/wasteland-canonical:<path>`. Never
    `import` from anywhere outside `temp_bench`. To port code, copy once
    with attribution + the source commit hash in a header comment.
 2. **Hyperparameters in YAML, not code.** Edit
@@ -145,12 +145,12 @@ is the audit trail.
    changes affect every agent's venv — atomic pyproject + lockfile
    commits are the only safe form, and only agent_paper coordinates
    them). If you have a change that would touch any of those, **STOP**:
-   add to "Open questions for Han" in your own briefing and surface
-   it. Han or agent_paper will land the cross-territory edit. Even
-   if Han verbally approves in chat, do not commit cross-territory
+   add to "Open questions for the maintainer" in your own briefing and surface
+   it. The maintainer or agent_paper will land the cross-territory edit. Even
+   if the maintainer verbally approves in chat, do not commit cross-territory
    edits yourself — surface as a written request, get explicit
    go-ahead, then let agent_paper integrate. Rationale: with 5
-   agents touching the repo concurrently, "Han said it's fine" loses
+   agents touching the repo concurrently, "the maintainer said it's fine" loses
    provenance the next time the briefing is read by a post-compact
    instance, and a pyproject change without the matching uv.lock
    bumps surprises every other agent's `uv sync`.
@@ -169,7 +169,7 @@ is the audit trail.
     not the .md. See PROTOCOL.md § 7 *Results live in state*.
 11. **T-SAE = paper-faithful Ye et al. 2025 only.** When the paper says
     "T-SAE" or "TSAE", it means the registered `tsae_paper` arch,
-    sourced from `origin/han-phase7-unification:src/architectures/tsae_paper.py`
+    sourced from `origin/wasteland-canonical:src/architectures/tsae_paper.py`
     — Matryoshka BatchTopK + AuxK + temporal contrastive + threshold
     inference. The wasteland's `tsae_ours.py` (TopK + 50/50 split + no
     AuxK + only 2 recon terms) is **deprecated and must NEVER be ported
@@ -311,7 +311,7 @@ must be `kebab-case`.
 ## Quick reference
 
 ```bash
-# Han runs once per fresh pod (interactive — agent CANNOT run this):
+# The maintainer runs once per fresh pod (interactive — agent CANNOT run this):
 #     cd /workspace/temp_xc/purified && bash scripts/bootstrap_runpod.sh
 
 # session start (every restart — this IS what the agent runs):
@@ -325,10 +325,10 @@ bash scripts/sync_from_hf.sh
 # run a component (idempotent — safe to re-run)
 TQDM_DISABLE=1 .venv/bin/python -m experiments.c1_synthetic_topk.run
 
-# read a wasteland file (code is on origin/han-phase7-unification)
-git show origin/han-phase7-unification:src/architectures/txc_bare_antidead.py
+# read a wasteland file (code is on origin/wasteland-canonical)
+git show origin/wasteland-canonical:src/architectures/txc_bare_antidead.py
 
 # port a wasteland file into temp_bench (then add header comment)
-git show origin/han-phase7-unification:src/architectures/txc_bare_antidead.py \
+git show origin/wasteland-canonical:src/architectures/txc_bare_antidead.py \
   > src/temp_bench/architectures/txc_base.py
 ```

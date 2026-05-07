@@ -1,6 +1,6 @@
 """Audit C2 setups for completeness: 5 baselines + 4 plots + T-sweep.
 
-Per Han 2026-05-07: 'when you finish everything check (i) they used all
+Per (decision 2026-05-07): 'when you finish everything check (i) they used all
 baselines (ii) they have all plots (iii) they have the proper T-sweep.'
 
 The 5 required baselines: TopK-SAE, Stacked T=2, Stacked T=5, T-SAE

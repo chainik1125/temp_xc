@@ -5,7 +5,7 @@ Standard per-token TopK SAE baseline. Adapted to the unified
 flattening to ``(B*T, d_in)`` for encode + reshaping back on decode.
 
 Ported from
-``origin/han-phase7-unification @ 94119bc0:src/architectures/topk_sae.py``
+``origin/wasteland-canonical @ 94119bc0:src/architectures/topk_sae.py``
 on 2026-05-03 by agent_paper. Wasteland file separated nn.Module
 (``TopKSAE``) from training spec (``TopKSAESpec``); we keep only the
 module here and move training to ``temp_bench/training/``.

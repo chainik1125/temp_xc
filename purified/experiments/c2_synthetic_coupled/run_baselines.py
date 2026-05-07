@@ -1,6 +1,6 @@
 """c2 (Setup A) missing-baseline driver — adds tsae_paper.
 
-Han 2026-05-06T23:30Z: Setup A (coupled features) is missing
+(decision 2026-05-06T23:30Z:) Setup A (coupled features) is missing
 tsae_paper. Fair-comparison parameters:
 
 - Same datasource: `toy_coupled_K10_M20_d256` (d=256, d_sae=40 via c2

@@ -16,7 +16,7 @@ all that's needed to land κ — no re-judging, no re-training, no
 re-evaluating.
 
 Sourced (in spirit) from
-``origin/han-phase7-unification @ 94119bc0:experiments/phase6_qualitative_latents/run_autointerp.py``.
+``origin/wasteland-canonical @ 94119bc0:experiments/phase6_qualitative_latents/run_autointerp.py``.
 
 Public API:
 

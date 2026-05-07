@@ -10,19 +10,19 @@ tags:
 
 ## C2 narrative brainstorm — "TXC finds global, SAE finds local"
 
-Han 2026-05-06: "if we can come up with a coherent narrative saying
+(decision 2026-05-06): "if we can come up with a coherent narrative saying
 that TXC finds more global features, SAE (e.g. TopK) more local then
 we WIN."
 
 This document is a brainstorm of angles, with concrete empirical
 support each requires. The unifying observation: **the empirical fact
 that TXC's gAUC > SAE's gAUC and SAE's eAUC > TXC's eAUC reproduces
-ROBUSTLY across both our C2 and Dmitry's benches**. The challenge is
+ROBUSTLY across both our C2 and the prior author's benches**. The challenge is
 the *interpretation*, not the data.
 
 ## The empirical core (defendable independent of mechanism)
 
-Dmitry's overnight bench (11 benches × 3 archs) gives us this matrix
+The prior author's overnight bench (11 benches × 3 archs) gives us this matrix
 when we pick the metrics where the gap is largest:
 
 | Bench | regular SAE has higher | TXC has higher |
@@ -42,7 +42,7 @@ structure or with high-frequency targets (e4, temporal_derivative),
 SAE wins or matches. **TXC's strength is global features; SAE's
 strength is local features.** That fact is empirically robust.
 
-The interpretation Dmitry pushes is "Effect 1, not Effect 2." But
+The interpretation the prior author pushes is "Effect 1, not Effect 2." But
 that interpretation only matters if we claim "TXC exploits temporal
 correlation." We can pick a different framing.
 
@@ -65,9 +65,9 @@ hidden chains driving emissions, hidden directions ARE the stable
 ones — so TXC's dictionary aligns with them.
 
 **What this requires us to NOT claim**:
-- "TXC uses temporal correlation" (Effect 2). Dmitry refuted this.
+- "TXC uses temporal correlation" (Effect 2). The prior author refuted this.
 - "TXC outperforms SAE on raw information recovery" (h_corr).
-  Dmitry's E9 shows TXC's h_corr is DC-dominated.
+  The prior author's E9 shows TXC's h_corr is DC-dominated.
 
 **What this lets us claim**:
 - TXC's dictionary captures global structure.
@@ -88,7 +88,7 @@ synthetic data.
 ### Narrative B — "Sample aggregation IS the temporal claim, properly stated"
 
 **Claim**: We never claimed Effect 2; we claimed TXC pools across the
-time axis. Dmitry's "Effect 1" IS our temporal claim. Pooling across
+time axis. The prior author's "Effect 1" IS our temporal claim. Pooling across
 the time axis is a temporal use of the data; even at ρ=0, the time
 axis is what TXC is using.
 
@@ -105,7 +105,7 @@ identification → cleaner dictionary alignment with stable structure.
 - Therefore TXC has cleaner global-feature dictionaries when there
   are global features to find (= when hidden chains drive emissions).
 
-**Strength**: Doesn't contradict Dmitry. Rebrands "Effect 1" as the
+**Strength**: Doesn't contradict the prior author. Rebrands "Effect 1" as the
 core finding. Honest about what TXC does and doesn't do.
 
 **Weakness**: "Sample aggregation" is a less exciting claim than
@@ -113,7 +113,7 @@ core finding. Honest about what TXC does and doesn't do.
 
 ### Narrative C — "DC dominance IS the architectural success"
 
-**Claim**: Dmitry's E9 DC/AC ablation showing TXC's h_corr is
+**Claim**: the prior author's E9 DC/AC ablation showing TXC's h_corr is
 DC-dominated is interpreted as "TXC isn't using time-varying info."
 We REFRAME: the hidden state IS approximately DC within a window
 (at high ρ); TXC filtering out the AC (high-frequency, per-token noise)
@@ -165,7 +165,7 @@ or both), the index is a robust empirical signature.
 **Strength**: Measurement-first. Doesn't require us to win the
 mechanism argument. A clean, novel metric we can name and adopt.
 
-**Weakness**: Dmitry already showed the gAUC and eAUC numbers; we'd
+**Weakness**: the prior author already showed the gAUC and eAUC numbers; we'd
 just be packaging them differently.
 
 ### Narrative E — "Two complementary tools, validated by the trade-off"
@@ -238,7 +238,7 @@ temporal pattern detection.
 
 1. **Empirical fact (independent of mechanism)**: TXC has higher
    gAUC, SAE has higher eAUC. Show this on Setup A, Setup B, plus
-   port Dmitry's GN-A, GN-B, GN-C, Bench-D, Bench-E to confirm the
+   port the prior author's GN-A, GN-B, GN-C, Bench-D, Bench-E to confirm the
    pattern is robust. Use the `gAUC - eAUC` index for clean
    visualization.
 
@@ -270,21 +270,21 @@ temporal pattern detection.
 To support this narrative, run:
 
 1. **Feature alignment index plot** — `gAUC - eAUC` across all our
-   benches + Dmitry's. One bar per (arch, bench). TXC bars positive,
+   benches + the prior author's. One bar per (arch, bench). TXC bars positive,
    SAE bars negative. Cross-bench consistency is the headline.
    *Cost*: just a script over existing leaderboard rows. ~10 min.
 
 2. **Matched-raw_k re-render of Setup A and Setup B**. Show TXC > SAE
    on gAUC even when capacity is matched at the encoder level (not
-   just per-token). Decisive vs Dmitry's methodology critique.
+   just per-token). Decisive vs the prior author's methodology critique.
    *Cost*: re-eval cached checkpoints with raw_k restriction. ~15 min.
 
 3. **E9 DC/AC ablation on our Setup A and Setup B**. Show the same
-   DC dominance Dmitry found. Reframe positively: "TXC's representation
+   DC dominance the prior author found. Reframe positively: "TXC's representation
    is a clean low-pass projection of the hidden chains."
    *Cost*: implement ablation + re-eval cached ckpts. ~30 min.
 
-4. **Setup D — Temporal-derivative**. Port Dmitry's Bench 3. Show
+4. **Setup D — Temporal-derivative**. Port the prior author's Bench 3. Show
    TXC fails. Document as expected limitation: high-frequency targets
    are out-of-scope for low-pass filters. Honest.
    *Cost*: new generator + cells + eval. ~1 hour wall.
@@ -315,7 +315,7 @@ align with global vs local features respectively is robust across
 benches. We just need to:
 
 - Stop claiming "TXC exploits temporal correlation" (Effect 2). It
-  doesn't, per Dmitry, and we can't defend it.
+  doesn't, per the maintainer, and we can't defend it.
 - Embrace "TXC is a temporal low-pass filter; its dictionary aligns
   with low-frequency / global features." This is what the data shows
   and what the architecture mathematically does.
@@ -327,7 +327,7 @@ benches. We just need to:
 - Lead with the architectural design lever framing: choose your tool
   based on the alignment you want.
 
-This narrative survives Dmitry's critique because it agrees with him
+This narrative survives the prior author's critique because it agrees with him
 on mechanism (Effect 1) but reframes the *significance*: Effect 1 is
 not a weakness — it's the exact mechanism that gives TXC its global-
 feature alignment, which IS what we want for interpretability.

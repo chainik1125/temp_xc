@@ -1,6 +1,6 @@
 """C1-noisy driver — replicate wasteland Phase 2 Experiment 1c noisy emissions.
 
-Han 2026-05-06 mandate (territory waiver granted): replicate
+(decision 2026-05-06) mandate (territory waiver granted): replicate
 ``docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md``
 on `final` paper infra. Wasteland setup:
 
@@ -23,7 +23,7 @@ This driver mirrors `experiments/c1_synthetic_topk/run.py` but with:
     is exposed via MarkovData but not yet consumed by eval — denoising
     metrics (corr ratio, probe ratio) are a follow-up.
 
-Per Han's note "with txc_base", txc_base is the primary subject;
+Per the prior author's note "with txc_base", txc_base is the primary subject;
 the other 4 archs are baselines for cross-arch comparison.
 """
 

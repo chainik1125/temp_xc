@@ -2,12 +2,12 @@
 
 agent_paper's :mod:`temp_bench.data.nlp.cache` covers the generic
 fineweb path (used by C3 / C4 / C5). C7 needs a different corpus
-(in-domain R1-Distill-Llama traces from Aniket's Stage A) and a
+(in-domain R1-Distill-Llama traces from the prior author's Stage A) and a
 slightly different on-disk layout (hookpoint-keyed file +
 ``layer_specs.json``); this sibling module is owned by agent_back
 and avoids cross-territory edits to ``cache.py``.
 
-Open question for Han + agent_paper (see agent_back briefing OQ #5):
+Open questions for the maintainer + agent_paper (see agent_back briefing OQ #5):
 whether to fold the ward branch into ``cache._stream_dataset_texts``
 (unifying public API) or keep them separate. The current split keeps
 the cache.py canonical for fineweb-style cells and isolates C7's
@@ -51,7 +51,7 @@ def _attach_hooks(model, hookpoints: list[dict], buffer: dict) -> list:
     """Register forward / forward-pre hooks for each hookpoint.
 
     Verbatim port from
-    ``origin/aniket-ward-stage-b @ a62175ee:experiments/ward_backtracking_txc/cache_activations.py``.
+    ``origin/case-backtracking @ a62175ee:experiments/ward_backtracking_txc/cache_activations.py``.
     Components: ``resid`` / ``resid_post`` (post-block residual),
     ``attn`` (self_attn output), ``ln1`` (input to self_attn).
     """
@@ -105,7 +105,7 @@ def _load_corpus_ward(num_sequences: int, seq_length: int, tokenizer, *, stride:
     Used by the C7 datasource ``ward_backtracking_math500``.
 
     Adapted from
-    ``origin/aniket-ward-stage-b @ a62175ee:experiments/ward_backtracking_txc/cache_activations.py``;
+    ``origin/case-backtracking @ a62175ee:experiments/ward_backtracking_txc/cache_activations.py``;
     original used ``results/ward_backtracking/traces.json`` but we
     use the ported copy under ``results/c7_backtracking/stage_a/traces.json``.
     """
@@ -116,7 +116,7 @@ def _load_corpus_ward(num_sequences: int, seq_length: int, tokenizer, *, stride:
     if not traces_path.exists():
         raise FileNotFoundError(
             f"Stage A traces not found at {traces_path}. "
-            "Re-port via `git show origin/aniket-ward-stage-b:results/ward_backtracking/...` — "
+            "Re-port via `git show origin/case-backtracking:results/ward_backtracking/...` — "
             "see results/c7_backtracking/stage_a/ATTRIBUTION.md."
         )
     traces = json.loads(traces_path.read_text())

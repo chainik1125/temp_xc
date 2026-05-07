@@ -1,4 +1,4 @@
-"""C3 TXC-base T-sweep (T=10, T=20). Han 2026-05-05 PM directive.
+"""C3 TXC-base T-sweep (T=10, T=20). (decision 2026-05-05) directive.
 
 Adds T=10 and T=20 cells alongside the canonical T=5 sweep — same
 datasource + training schedule, only the T axis varies via

@@ -52,7 +52,7 @@ the latest C6 leaderboard rows via experiments.c6_em.analysis.
 
 See briefing for caveats (judge swap, Wang abbreviation, corpus
 stand-in, hparam mismatch). Relative gap is the headline; absolute
-numbers won't match Dmitry's published 95.16/91.25.
+numbers won't match the prior author's published 95.16/91.25.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 

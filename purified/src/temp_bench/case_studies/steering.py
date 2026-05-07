@@ -21,7 +21,7 @@ Implements :class:`SteeringCaseStudy` plus the universal helpers it needs:
 - :class:`SteeringCaseStudy` — the :class:`CaseStudy` contract for C5.
 
 Provenance — these helpers are ported with attribution from
-``origin/han-phase7-unification @ 94119bc0``:
+``origin/wasteland-canonical @ 94119bc0``:
 
 - V7 tiled-broadcast hook ← ``experiments/phase7_unification/case_studies/
   steering/intervene_paper_clamp_window_tiled_broadcast.py``
@@ -965,7 +965,7 @@ def select_best_features(
     # cross-concept baseline so a feature that fires SELECTIVELY on a
     # concept gets a large positive lift; an always-on feature gets ~0.
     # Verbatim from wasteland's
-    # ``origin/han-phase7-unification:experiments/phase7_unification/case_studies/steering/select_features.py``
+    # ``origin/wasteland-canonical:experiments/phase7_unification/case_studies/steering/select_features.py``
     # — the original docstring on this function said "concept-lift" but
     # the body did raw-activation argmax (bug 2026-05-05). Empirically
     # the missing baseline picked feature 3010 (or analogous) for ALL

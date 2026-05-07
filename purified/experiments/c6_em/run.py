@@ -20,18 +20,18 @@ Eval pathway (`EVAL_PROTOCOL_VERSION = "2.0.0"`, 2026-05-04):
   → 27-α frontier on top-3. Implemented in
   ``temp_bench.case_studies.em.run_wang_full``. Per-cell ~14 800
   generations.
-- **Judge**: Claude Haiku 4.5 (Han 2026-05-04 — Gemini stays wasteland
+- **Judge**: Claude Haiku 4.5 ((decision 2026-05-04) — Gemini stays wasteland
   reference; per-rollout transcripts persist to
   ``judge_outputs.jsonl`` for post-deadline κ validation).
 
-Caveats baked into this run (vs Dmitry's published numbers in
-``origin/em-nanda:docs/dmitry/results/em_features/em_nanda_results_paper.md``):
+Caveats baked into this run (vs the prior author's published numbers in
+``origin/case-em-nanda:docs/dmitry/results/em_features/em_nanda_results_paper.md``):
 
 - **Judge swap**: Claude Haiku 4.5 instead of Gemini-3.1-flash-lite.
   Documented in c6.md caveats.
 - **Corpus divergence**: training corpus is the C6 datasource's
   ``finance_em_prompts`` / ``medical_em_prompts`` (HF stand-ins), not
-  Dmitry's pile/ultrachat 70-30 mix.
+  the prior author's pile/ultrachat 70-30 mix.
 
 Earlier preliminary runs at `EVAL_PROTOCOL_VERSION = "1.0.0"` used
 abbreviated Wang (stages 2+3 skipped, 6-α grid on top-3). Those rows
@@ -90,7 +90,7 @@ def make_training_cfg(arch_name: str) -> TrainingConfig:
     - sae_arditi: vanilla MSE, no Bricken, no AuxK (schema defaults).
     - txc_base: Bricken on + AuxK α=1/8 + dead_threshold=128k tokens
       (the brickenauxk_a8 recipe from
-      `origin/em-nanda:summary_brickenauxk_a8_frontier.md`).
+      `origin/case-em-nanda:summary_brickenauxk_a8_frontier.md`).
     """
     if arch_name == "sae_arditi":
         return TrainingConfig()

@@ -79,13 +79,13 @@ The most relevant one is:
 ### Bricken resample (opt-in)
 
 Bricken et al. 2023 dead-feature reset, ported from
-`origin/em-nanda:experiments/em_features/dead_feature_resample.py`.
+`origin/case-em-nanda:experiments/em_features/dead_feature_resample.py`.
 Periodically hard-resets features that haven't fired on a held-out
 check batch. Implementation lives in
 `src/temp_bench/training/bricken.py` — opt in by passing
 `BrickenConfig(...)` to the trainer, default off.
 
-**Why it isn't in the locked spec.** Six knobs co-tune in Dmitry's
+**Why it isn't in the locked spec.** Six knobs co-tune in the prior author's
 winning Qwen-7B medical recipe (`brickenauxk_a8`):
 
 | Knob | tsae_paper default | brickenauxk_a8 |
@@ -108,11 +108,11 @@ $d_{\text{sae}} = 40$ where dead pressure is essentially zero.
 |---|---|---|
 | C1 | **off** | $d_{\text{sae}} = 40$, ~ no dead pressure. |
 | C2 | **off** | Same. |
-| C3 | **off** | Locked in with Han 2026-05-03. Revisit only if time permits after 48 hours. |
+| C3 | **off** | Locked in with (decision 2026-05-03). Revisit only if time permits after 48 hours. |
 | C4 | **off** | Inherits C3. |
-| C5 | **off** | Locked in with Han 2026-05-03. |
-| C6 | **on** (Dmitry's data) | brickenauxk_a8 recipe; component directly justifies it. |
-| C7 | **off** | Locked in with Han 2026-05-03. |
+| C5 | **off** | Locked in with (decision 2026-05-03). |
+| C6 | **on** (the prior author's data) | brickenauxk_a8 recipe; component directly justifies it. |
+| C7 | **off** | Locked in with (decision 2026-05-03). |
 
 If a component does flip Bricken on later (only C6 by default; others
 only if a 48-hour stretch goal materialises), the verdict is recorded
@@ -143,6 +143,6 @@ the locked architectures in `final`.
 
 **Honest paper read** (subject to C6 re-test): TXC-pro wins on C2, C4, C7;
 TXC-base wins on C3-k20; TXCs match T-SAE on C5; C6 is pending a re-run
-that opts into Bricken resample (Dmitry's earlier "TXC k=100" evidence
+that opts into Bricken resample (the prior author's earlier "TXC k=100" evidence
 used neither anti-dead nor Bricken so the gap there is uninformative).
 The pattern across the rest is interpretable.

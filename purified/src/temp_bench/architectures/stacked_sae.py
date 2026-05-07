@@ -1,6 +1,6 @@
 """Stacked-SAE — T independent TopK SAEs, one per token position.
 
-Source: ``origin/han-phase7-unification @ 94119bc0:src/architectures/stacked_sae.py``
+Source: ``origin/wasteland-canonical @ 94119bc0:src/architectures/stacked_sae.py``
 ("per-layer SAEs" baseline from the crosscoders paper, adapted to
 the temporal setting).
 

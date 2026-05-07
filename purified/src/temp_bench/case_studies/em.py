@@ -1,10 +1,10 @@
 """C6 emergent-misalignment case study — full + abbreviated Wang.
 
 Adapted from
-``origin/em-nanda @ a74d1be4:experiments/em_features/run_wang_procedure.py``
+``origin/case-em-nanda @ a74d1be4:experiments/em_features/run_wang_procedure.py``
 with one substantive divergence (judge swap):
 
-- **Judge swap**: Dmitry used Gemini-3.1-flash-lite-preview. We use
+- **Judge swap**: the prior author used Gemini-3.1-flash-lite-preview. We use
   Anthropic Claude (``claude-haiku-4-5``). Documented in c6.md
   caveats; per-rollout judge transcripts persist to
   ``judge_outputs.jsonl`` so post-deadline κ validation is feasible.
@@ -137,7 +137,7 @@ def decoder_row(arch_module, feature_id: int) -> torch.Tensor:
     Architectures expose ``W_dec`` with different shapes:
 
     - TXC-base (han layout): ``(d_sae, T, d_in)`` — return last
-      temporal slot ``W_dec[fid, -1, :]``. Matches Dmitry's
+      temporal slot ``W_dec[fid, -1, :]``. Matches the prior author's
       ``run_wang_procedure.py:load_steerer_decoder_row`` convention
       (he comments "take the last temporal slot to match
       frontier_sweep convention").
@@ -631,7 +631,7 @@ def run_wang_minimal(
             frontier_rows.append(row)
             if (
                 mean_align is not None and mean_coh is not None
-                and mean_coh >= 50.0  # mid-α coh floor (Dmitry's convention)
+                and mean_coh >= 50.0  # mid-α coh floor (the prior author's convention)
                 and (peak is None or mean_align > peak["mean_align"])
             ):
                 peak = dict(row)
@@ -641,7 +641,7 @@ def run_wang_minimal(
                     json.dumps({"rows": frontier_rows, "peak": peak}, indent=2)
                 )
                 # Persist raw (gen, judge) tuples for post-deadline κ
-                # validation (per Han's 2026-05-04 decision; agent_paper
+                # validation (per the prior author's 2026-05-04 decision; agent_paper
                 # uses the same convention for c4 cells —
                 # results/runs/<eval_key>/judge_outputs.jsonl).
                 judge_path = out_dir / "judge_outputs.jsonl"
@@ -743,10 +743,10 @@ def _run_alpha_cell(
 class WangFull:
     """Configuration for the full 4-stage Wang procedure.
 
-    Defaults match Dmitry's CLI defaults in
-    ``origin/em-nanda:experiments/em_features/run_wang_procedure.py`` —
+    Defaults match the prior author's CLI defaults in
+    ``origin/case-em-nanda:experiments/em_features/run_wang_procedure.py`` —
     only the judge swap (Gemini → Claude Haiku) differs and the
-    ``rollouts`` counts pin to Dmitry's stage-rollouts settings.
+    ``rollouts`` counts pin to the prior author's stage-rollouts settings.
     """
 
     layer: int
@@ -1030,7 +1030,7 @@ def wang_stage4_full_frontier(
     For each finalist, sweep ``final_alpha_grid`` (27 αs default) with
     ``final_rollouts`` rollouts. Per-feature peak: ``max(mean_align)``
     over αs. Cell headline peak: max across all finalists × all αs
-    (no coherence floor — matching Dmitry's stage-4 convention).
+    (no coherence floor — matching the prior author's stage-4 convention).
 
     Returns ``{"meta": {...}, "finalists": [...], "peak": {...}}``.
     """

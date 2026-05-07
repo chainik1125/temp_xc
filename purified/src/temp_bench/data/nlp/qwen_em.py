@@ -28,15 +28,15 @@ Provenance:
 - The ``finance_em_prompts`` dataset is sourced from
   ``cfierro/personality-qs-risky-financial-advice`` on HF (17 k
   user/assistant pairs in chat format). It is NOT a bit-exact match
-  to Dmitry's locally-generated 6000-prompt
-  ``risky_financial_advice.jsonl`` (Dmitry generated his via GPT-4o
+  to the prior author's locally-generated 6000-prompt
+  ``risky_financial_advice.jsonl`` (the prior author generated his via GPT-4o
   with Turner's exact prompts; that file is not on HF). The cfierro
   variant uses similar Turner-style prompts but with personality QA
   scaffolding. Document the divergence in the C6 results writeup.
 
 - The ``pile_ultrachat`` dataset (TODO when needed) would mirror
-  Dmitry's 70/30 mix from
-  ``origin/em-nanda:experiments/em_features/config_qwen14b.yaml``.
+  the prior author's 70/30 mix from
+  ``origin/case-em-nanda:experiments/em_features/config_qwen14b.yaml``.
   Not implemented in this first cut — the existing C6 datasource
   uses ``finance_em_prompts``.
 """

@@ -1,6 +1,6 @@
 """C4 TXC-base T-sweep qualitative eval (T=10, T=20).
 
-Han 2026-05-05 PM directive. Cache-hits on the C3 T-sweep checkpoints
+(decision 2026-05-05) directive. Cache-hits on the C3 T-sweep checkpoints
 (commit ``d54cead3`` + ``experiments.c3_probing_txc_T_sweep.run``):
 the per-cell ``train_key`` derives from
 ``arch_hparams_override={"T": int}`` so passing the same override

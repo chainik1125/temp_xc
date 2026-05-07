@@ -1,8 +1,8 @@
 """Temporal Feature Analysis (TFA) — TemporalSAE nn.Module + ManualAttention.
 
 Verbatim port from
-``origin/han-phase7-unification @ 94119bc0:src/architectures/_tfa_module.py``
-(itself adapted from the TFA paper's reference implementation by Han for
+``origin/wasteland-canonical @ 94119bc0:src/architectures/_tfa_module.py``
+(itself adapted from the TFA paper's reference implementation by the maintainer for
 toy model experiments; see ``papers/priors_in_time.md``).
 
 Decomposes each token's representation into:

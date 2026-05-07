@@ -10,7 +10,7 @@ Two new C5 baselines paired with agent_steer's existing v1.1.0 cells
 
 TopK at T=1 is paper-faithful per § 15 (matches the SAEBench-canonical
 window). TFA at B=32 + full seq is wasteland-faithful per
-``origin/han-phase7-unification:experiments/phase7_unification/
+``origin/wasteland-canonical:experiments/phase7_unification/
 train_phase7.py`` lines 312-353 — TFA's attention tensor (B × T × d_sae)
 peaks at ~9.6 GB fp32 at d_sae=18432, so B=32 keeps memory in check
 while preserving the 100+ token context that TFA's attention needs to

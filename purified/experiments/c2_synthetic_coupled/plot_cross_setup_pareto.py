@@ -1,7 +1,7 @@
 """Cross-setup Pareto plot — TXC-vs-SAE on the eAUC × gAUC plane,
 aggregating Setups A, D-np10, E into one figure.
 
-Han 2026-05-07 (NeurIPS deadline rescue): one paper-grade figure
+(decision 2026-05-07) (NeurIPS deadline rescue): one paper-grade figure
 showing **TXC dictionaries upper-left (high gAUC, low/mid eAUC),
 per-token SAE dictionaries lower-right (low gAUC, high eAUC),
 robustly across multiple synthetic generative processes.**

@@ -43,7 +43,7 @@ PLOT_DIR = EXP_DIR / "plots"
 # Paper headline = IT only (BASE replication deferred post-deadline).
 DATASOURCE_NAME = "gemma_2_2b_it_l13_fineweb_24k128"
 HEADLINE_SEEDS = (1, 2, 42)
-# Architectures by training-cfg family (Han 2026-05-05: include topk_sae
+# Architectures by training-cfg family ((decision 2026-05-05): include topk_sae
 # T=1 in C4 since we have 3-seed C3 results for it).
 TXC_ARCHS = ("txc_base", "txc_pro")
 TOPK_ARCHS = ("topk_sae",)

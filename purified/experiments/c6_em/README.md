@@ -46,8 +46,8 @@ bash scripts/c6_render_and_push.sh
 ## What's NOT here (deliberate scope cuts on the first cell)
 
 The abbreviated Wang in `temp_bench.case_studies.em.run_wang_minimal`
-runs **stages 1 + 4 only**. The full Wang procedure (Dmitry's
-`origin/em-nanda:experiments/em_features/run_wang_procedure.py`) has
+runs **stages 1 + 4 only**. The full Wang procedure (the prior author's
+`origin/case-em-nanda:experiments/em_features/run_wang_procedure.py`) has
 four stages — the two we skip are:
 
 - **Stage 2 (causal screen)** — top-100 Δz̄ features steered at α=±1
@@ -61,7 +61,7 @@ on top-3 finalists from stage 3. We approximate by going from Δz̄
 ranking directly to a 6-α stage-4 frontier on top-3 Δz̄-ranked
 features. Both arches use the same abbreviation, so the **relative
 gap** is internally valid; absolute peak-align numbers are not
-directly comparable to Dmitry's published 95.16 / 91.25.
+directly comparable to the prior author's published 95.16 / 91.25.
 
 Other things that aren't here, by design:
 
@@ -69,14 +69,14 @@ Other things that aren't here, by design:
   (`temp_bench.case_studies.em.claude_judge`). No GOOGLE_API_KEY in
   the pod; adding the dep is cross-territory (pyproject.toml is
   agent_paper-only). Document the divergence in c6.md.
-- `bundle.py` — k=30 bundle steering (replicating Dmitry's bundle-null
+- `bundle.py` — k=30 bundle steering (replicating the prior author's bundle-null
   result with my SAE / TXC checkpoints). Punted — the bundle null
-  story is already complete on origin/em-nanda; reproducing on this
+  story is already complete on origin/case-em-nanda; reproducing on this
   setup would be confirmatory work.
 - LoRA-on-different-base — the `ModelOrganismsForEM` adapter declares
   `unsloth/Qwen2.5-14B-Instruct` as base in `adapter_config.json`
-  but Dmitry (and we) load it on `Qwen/Qwen2.5-14B-Instruct`. peft
-  applies it anyway with a warning; same convention as Dmitry's
+  but the prior author (and we) load it on `Qwen/Qwen2.5-14B-Instruct`. peft
+  applies it anyway with a warning; same convention as the prior author's
   published numbers.
 
 ## Headline result (seed=42)

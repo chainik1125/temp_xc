@@ -1,6 +1,6 @@
 """TXC-base — vanilla TopK temporal crosscoder with anti-dead stack.
 
-Source: ``origin/han-phase7-unification @ 94119bc0:src/architectures/txc_bare_antidead.py``
+Source: ``origin/wasteland-canonical @ 94119bc0:src/architectures/txc_bare_antidead.py``
 ("Phase 6.1 Track 2: agentic_txc_10_bare").
 
 Architecture:

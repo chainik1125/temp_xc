@@ -82,7 +82,7 @@ DEFAULT_SEEDS: tuple[int, ...] = (42, 1, 2)
 # (decisions § 15 + § 16).
 #
 # txc_base gets MULTIPLE cfgs (T=5 default + T=10 + T=20 per § 17
-# T-sweep mission, Han 2026-05-05 PM). Other archs stay single-cfg.
+# T-sweep mission, (decision 2026-05-05)). Other archs stay single-cfg.
 # arch_hparams_override flows into compute_train_key (commit dfd60850),
 # so each T gets a fresh train_key — no cache collisions.
 ARCH_TRAINING_CFGS: dict[str, list[TrainingConfig]] = {
@@ -109,7 +109,7 @@ def my_eval_fn(*, model, eval_cfg, component):
     txc_base T=10 / T=20. This local version fixes that by merging the
     runner-supplied hparams onto the spec before instantiation.
 
-    Surfaced in 'Open questions for Han' — the upstream fix likely
+    Surfaced in 'Open questions for the maintainer' — the upstream fix likely
     belongs in ``experiments/c3_probing/run.my_eval_fn``; until then
     my driver carries this local override.
     """

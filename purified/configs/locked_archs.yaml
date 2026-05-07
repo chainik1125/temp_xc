@@ -84,7 +84,7 @@ archs:
         d_sae: 32768   # Llama-3.1-8B L10 d_in (4096) × 8
     notes: |
       T-SAE = faithful port of Ye et al. 2025 (arxiv 2511.05541). Source:
-      `origin/han-phase7-unification @ 94119bc0:src/architectures/tsae_paper.py`.
+      `origin/wasteland-canonical @ 94119bc0:src/architectures/tsae_paper.py`.
       Implements Matryoshka BatchTopK + AuxK loss + geometric-median
       b_dec init + decoder unit-norm projection + temporal contrastive
       (raw dot, temp_alpha=1/10) + threshold-based inference.
@@ -155,7 +155,7 @@ archs:
     hparams:
       d_sae: 32768
       k_pos: 128
-    notes: "SAE arditi as used by Dmitry. C6 baseline only."
+    notes: "SAE arditi as used by the prior author. C6 baseline only."
 
   txc_base:
     class_path: temp_bench.architectures.txc_base:TXCBase
@@ -176,8 +176,8 @@ archs:
       c2:
         d_sae: 40    # Phase 3 paper-faithful toy dictionary size
       c6:
-        d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's published Wang baseline
-        k_pos: 25      # k_win = 25 × T(5) = 125 ≈ Dmitry's k_win=128
+        d_sae: 32768   # Qwen-14B d_model=5120; matches the prior author's published Wang baseline
+        k_pos: 25      # k_win = 25 × T(5) = 125 ≈ the prior author's k_win=128
       c7:
         d_sae: 32768
     notes: |
@@ -216,7 +216,7 @@ archs:
                         # matryoshka isn't meaningful at d_sae=40 (only
                         # 5 prefix levels of 8 each). Document in c2.md.
       c6:
-        d_sae: 32768   # Qwen-14B d_model=5120; matches Dmitry's Wang baseline
+        d_sae: 32768   # Qwen-14B d_model=5120; matches the prior author's Wang baseline
       c7:
         d_sae: 32768
     notes: |
@@ -229,7 +229,7 @@ archs:
   # registered as distinct arch identities (not a hparam toggle on the
   # canonical names) so the leaderboard's `arch` column is
   # self-documenting — there is no ambiguity about which sampling mode
-  # produced any given cell. Decision: Han 2026-05-05 PM.
+  # produced any given cell. Decision: (decision 2026-05-05).
   #
   # If you change hparams of txc_base or txc_pro (e.g. add a new
   # per_component override), MIRROR the change in the corresponding _mw

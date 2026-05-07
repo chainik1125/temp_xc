@@ -11,7 +11,7 @@
 # `exec`s claude, so the claude process and every Bash tool call it
 # spawns inherit the env. One command per agent spawn.
 #
-# Run by Han, not by an agent.
+# Run by the maintainer, not by an agent.
 #
 # Usage:
 #     bash <clone_path>/purified/scripts/start_agent.sh <agent_name> [--fresh]

@@ -5,7 +5,7 @@ init. ``rho_levels`` map to per-feature rho, distributed in equal-size
 groups (4 features per level by default at C1's n=20, 5 levels).
 
 Ports the Phase 2 Scheme C generator from
-``origin/han-phase7-unification @ 94119bc0:src/data/toy/markov.py`` +
+``origin/wasteland-canonical @ 94119bc0:src/data/toy/markov.py`` +
 ``support.py`` into a single self-contained module.
 """
 

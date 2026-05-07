@@ -6,7 +6,7 @@ The cache key is computed deterministically from the datasource spec
 that reference the same datasource share the same on-disk bytes.
 
 Ported in spirit from
-`origin/han-phase7-unification @ 94119bc0:src/data/nlp/cache_activations.py`.
+`origin/wasteland-canonical @ 94119bc0:src/data/nlp/cache_activations.py`.
 The wasteland version was wandb / sweep / CLI / wandb / prefetch-aware;
 this version is a library function that takes a `DataSourceSpec` and
 returns a path. Components don't shell out.

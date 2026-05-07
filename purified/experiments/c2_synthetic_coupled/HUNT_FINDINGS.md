@@ -13,15 +13,15 @@ tags:
 
 ## TL;DR
 
-The hunt across (p_B, n_parents) on a Dmitry-style noisy + overlap
+The hunt across (p_B, n_parents) on a the prior author-style noisy + overlap
 generator finds **multiple regimes where TXC clearly beats SAE on
 gAUC**, with the gap depending on k_pos in non-trivial ways:
 
 - **pB05_np10** (max overlap, p_B=0.5): TXC saturates at gAUC=0.99
   across all k_pos; SAE varies from 0.39 to 0.83. **Largest stable
   gap** at k_pos≥5 (+0.50).
-- **pB05_np5** (Dmitry's Bench 2 replication): TXC=0.98 vs SAE=0.51
-  at k=1 → **+0.47 gap**, matching Dmitry's published +0.39 win
+- **pB05_np5** (the prior author's Bench 2 replication): TXC=0.98 vs SAE=0.51
+  at k=1 → **+0.47 gap**, matching the prior author's published +0.39 win
   (which was at raw_k=5 = our k_pos=1 in the matched-per-token
   convention).
 - **pB02_np8** (extreme noise + extreme overlap): TXC=0.82 vs SAE=0.38
@@ -39,7 +39,7 @@ Sweep: 8 datasources × 2 archs (topk_sae, txc_base T=5) × 3 seeds ×
 ## Methodology
 
 Generator: ``temp_bench.data.toy.coupled_noisy:coupled_noisy_hmm``
-(ported from `origin/dmitry-synthetic @ 03a099b4`). Adds per-token
+(ported from `origin/case-synthetic @ 03a099b4`). Adds per-token
 Bernoulli emission noise (`p_B<1` = "should-fire" emissions only fire
 with prob `p_B`) on top of OR-gate coupling.
 
@@ -47,7 +47,7 @@ Eval: `feature_recovery` (eAUC vs M=20 emission directions) +
 `global_recovery_gAUC` (vs K=10 hidden-chain directions). Standard
 C2 eval pipeline, no methodology change.
 
-ρ=0.9 fixed throughout (Dmitry confirmed ρ-robustness; we don't
+ρ=0.9 fixed throughout (the maintainer confirmed ρ-robustness; we don't
 re-test here).
 
 ## Why pB05_np10 is the cleanest TXC-wins regime
@@ -62,7 +62,7 @@ across 5 tokens DOES disambiguate hidden state (each hidden chain has
 a distinct activation trace). TXC saturates at gAUC≈1.0; SAE struggles
 across all k.
 
-Mechanism is consistent with Dmitry's "Effect 1" (sample aggregation —
+Mechanism is consistent with the prior author's "Effect 1" (sample aggregation —
 T-token averaging reduces per-token noise) AND with our reframing
 ("TXC is a temporal low-pass filter; aligns with global slow features
 because they're consistent across the window"). At n_parents=10, the
@@ -71,7 +71,7 @@ slow hidden chains are the ONLY consistent signal across windows.
 ## Phase 2 ZOOM — confirming the win at fine k_pos
 
 Three speculative ZOOMs launched at n_steps=30_000:
-- `pB05_np5` (Dmitry replicate, expected gap depends on k)
+- `pB05_np5` (the prior author replicate, expected gap depends on k)
 - `pB02_np8` (largest k=1 gap, but degenerates at k=5)
 - `pB05_np10` (largest k=5 gap, expected to be the cleanest headline)
 
@@ -93,7 +93,7 @@ family clearly above SAE family at the winning regime. Saved to
 2. **Matched per-token vs matched window-level capacity**. Our k_pos
    is per-token; TXC at T=5 has T× more effective capacity per window
    than SAE at the same k_pos. This contributes to the gAUC gap but
-   isn't the only factor (see Dmitry's Bench 2 at matched raw_k where
+   isn't the only factor (see the prior author's Bench 2 at matched raw_k where
    TXC still wins by +0.39).
 
 3. **Hierarchical bench (Phase 3) shows a smaller, k-dependent
@@ -106,7 +106,7 @@ family clearly above SAE family at the winning regime. Saved to
    Auto-pushed to HF (${TEMP_BENCH_HF_ORG}/temp-bench-models) via ephemeral
    pod mode.
 
-## Surface to Han + agent_paper
+## Surface to the maintainer + agent_paper
 
 - `experiments/c2_synthetic_coupled/hunt_summary.json` — per-cell gap
   table.

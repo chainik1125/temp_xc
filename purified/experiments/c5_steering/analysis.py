@@ -186,7 +186,7 @@ def _plot_pareto(
     Annotates the cliff15 = ``max success at coh ≥ 1.5`` with a star.
 
     Source convention:
-    ``origin/han-phase7-unification:experiments/phase7_unification/case_studies/steering/plot_focused_pareto.py``.
+    ``origin/wasteland-canonical:experiments/phase7_unification/case_studies/steering/plot_focused_pareto.py``.
     """
     fig, ax = plt.subplots(figsize=(7, 5))
     plotted = False

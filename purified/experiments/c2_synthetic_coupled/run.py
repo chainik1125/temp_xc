@@ -190,7 +190,7 @@ def main():
         help="ρ values to sweep. Each maps to a per-ρ datasource via "
              "RHO_DATASOURCE_MAP. Default [0.7] = legacy single-point "
              "behaviour. Pass `--rho-values 0.0 0.3 0.6 0.9` for the "
-             "Effect-1-vs-Effect-2 ρ-sweep (Han 2026-05-06).",
+             "Effect-1-vs-Effect-2 ρ-sweep ((decision 2026-05-06)).",
     )
     args = ap.parse_args()
 

@@ -1,6 +1,6 @@
 """c1_noisy missing-baselines driver — adds topk_sae and tsae_paper.
 
-Han 2026-05-06T23:30Z: Setup B (c1_noisy) is missing topk_sae and
+(decision 2026-05-06T23:30Z:) Setup B (c1_noisy) is missing topk_sae and
 tsae_paper baselines. Fair-comparison parameters:
 - Same datasource: `toy_markov_n20_d40_noisy` (d=40, d_sae=40 via c1
   per_component_hparams)

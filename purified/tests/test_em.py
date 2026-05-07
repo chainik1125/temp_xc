@@ -72,7 +72,7 @@ def test_decoder_row_txc_base_layout_takes_last_temporal_slot():
     assert txc.W_dec.shape == (16, 5, 8)
     row = decoder_row(txc, feature_id=3)
     assert row.shape == (8,)
-    # By Dmitry's convention (run_wang_procedure.py:load_steerer_decoder_row),
+    # By the prior author's convention (run_wang_procedure.py:load_steerer_decoder_row),
     # the steering direction is the LAST temporal slot, not the mean.
     assert torch.allclose(row, txc.W_dec.data[3, -1, :])
 

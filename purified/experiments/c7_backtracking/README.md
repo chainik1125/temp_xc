@@ -3,7 +3,7 @@
 Per-component scripts for the Ward et al. 2025 Stage B backtracking case
 study on Gemma-2-2b BASE. See `docs/components/c7.md`.
 
-## Files (TODO — Agent BACK fills in, coordinating with Aniket)
+## Files (TODO — Agent BACK fills in, coordinating with the maintainer)
 
 - `mine_features.py` — per-arch feature mining for "begin backtracking" direction
 - `steer.py` — per-arch steering at densified magnitude grid
@@ -15,4 +15,4 @@ study on Gemma-2-2b BASE. See `docs/components/c7.md`.
 ## Locked metrics
 
 - **Inducement**: peak Δgc (gain-in-keyword-rate). TXC's expected ~3× win.
-- **Detection**: PR-AUC (Aniket open todo: switch from F1).
+- **Detection**: PR-AUC (the prior author open todo: switch from F1).

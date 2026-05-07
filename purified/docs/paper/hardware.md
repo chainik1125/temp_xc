@@ -60,7 +60,7 @@ On H100 pod (56 vCPU): 240 probings / 56 ≈ 4–5 batches × ~2 sec each ≈
 After Phase 7's algorithmic speedup, we compute S ∈ {10, 20, 32} from
 the same encode (aggregate_s does the per-S window restriction at zero
 extra GPU cost). The probing protocol must reuse this trick. Source:
-`origin/han-phase7-unification:experiments/phase7_unification/run_probing_phase7.py`.
+`origin/wasteland-canonical:experiments/phase7_unification/run_probing_phase7.py`.
 
 ## Activation cache strategy
 
@@ -123,8 +123,7 @@ spawned subprocess sees a different GPU.
 
 GPU sharing is a **convention**, not a lockfile-enforced contract
 (the earlier `temp_bench.utils.gpu_locks` system was removed
-2026-05-04 — see PROTOCOL.md § 13). For the 4× A40 pod (Han 2026-05-04
-PM partition):
+2026-05-04 — see PROTOCOL.md § 13). For the 4× A40 pod ((decision 2026-05-04) partition):
 
 | GPU | Owner | Borrowable? |
 |---|---|---|
@@ -137,7 +136,7 @@ The pod is fully partitioned: 2 dedicated GPUs per agent. **No
 peer-borrow on the A40 pod.** Each agent stays in their own two-GPU
 lane. The 2× H100 pod still uses the older borrow convention
 (agent_em borrowing agent_nlp's GPU 0 when idle is fine there) since
-that pod has only 2 GPUs and Han didn't re-partition it.
+that pod has only 2 GPUs and the maintainer didn't re-partition it.
 
 Worked example — agent_steer runs 3 seeds in parallel across their
 two A40s (1 + 3):

@@ -19,7 +19,7 @@ Locked headline arch alongside ``txc_base``. Spec from
   num_tokens_since_fired tracker.
 
 Sourced (in spirit) from
-``origin/han-phase7-unification @ 94119bc0:src/architectures/phase5b_subseq_sampling_txcdr.py::SubseqH8``
+``origin/wasteland-canonical @ 94119bc0:src/architectures/phase5b_subseq_sampling_txcdr.py::SubseqH8``
 which inherits from ``TXCBareMultiDistanceContrastiveAntidead`` →
 ``TXCBareMatryoshkaContrastiveAntidead`` → ``TXCBareAntidead``. Here we
 flatten the inheritance into a single class for the unified

@@ -24,7 +24,7 @@ Both are keyed by ``act_cache_key`` from
       └ meta.json      # the datasource spec (for verification)
 
 Ported in spirit (not line-by-line) from
-`origin/han-phase7-unification @ 94119bc0:src/data/nlp/cache_activations.py`,
+`origin/wasteland-canonical @ 94119bc0:src/data/nlp/cache_activations.py`,
 shedding wandb / sweep / CLI cruft to fit the unified framework.
 """
 

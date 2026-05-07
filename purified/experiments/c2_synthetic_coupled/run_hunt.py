@@ -1,8 +1,8 @@
 """C2 HUNT driver — find a regime where TXC clearly beats SAE on gAUC.
 
-agent_synth mission 2026-05-06T23:00Z (Han override): hunt across
+agent_synth mission 2026-05-06T23:00Z (the prior author override): hunt across
 (p_B, n_parents) parameter space on a noisy + overlap coupled-features
-generator (Dmitry-bench-2-style). Phase 1 of the 4-phase mission.
+generator (the prior author-bench-2-style). Phase 1 of the 4-phase mission.
 
 Each invocation processes ONE datasource (sharded across 8 GPUs by the
 launcher ``run_hunt.sh``). Inside the process we sweep:
@@ -18,7 +18,7 @@ arch list and denser k_pos via CLI flags.
 
 Generator: ``temp_bench.data.toy.coupled_noisy:coupled_noisy_hmm`` —
 adds per-token Bernoulli emission noise (p_B) on top of OR-gate
-coupling. Defaults reproduce Dmitry's Bench 2 (n_parents=5, p_B=0.5,
+coupling. Defaults reproduce the prior author's Bench 2 (n_parents=5, p_B=0.5,
 ρ=0.9) where TXC's gAUC win is largest.
 """
 

@@ -5,25 +5,25 @@ lead: agent_filler
 date: 2026-05-06
 tags:
   - audit
-  - dmitry-synthetic
+  - case-synthetic
   - effect-1-effect-2
 ---
 
-## C2 vs Dmitry's synthetic benchmark crisis
+## C2 vs the prior author's synthetic benchmark crisis
 
-Dmitry posted negative results on `dmitry-synthetic` that directly
+The prior author posted negative results on `case-synthetic` that directly
 challenge our C2 paper claim. This document analyzes his methodology,
 compares to ours, and flags what we need to fix in c2.md / the paper.
 
-**Sources** (commit `dmitry-synthetic` branch):
+**Sources** (commit `case-synthetic` branch):
 
-- [`docs/dmitry/synthetic/2026-05-06_overnight/results.md`](https://anonymous.4open.science/r/temp-bench/blob/dmitry-synthetic/docs/dmitry/synthetic/2026-05-06_overnight/results.md)
+- [`docs/dmitry/synthetic/2026-05-06_overnight/results.md`](https://anonymous.4open.science/r/temp-bench/blob/case-synthetic/docs/dmitry/synthetic/2026-05-06_overnight/results.md)
   — overnight chain, 11 benches × 3-5 archs, with E9 DC/AC ablation.
-- [`docs/dmitry/results/3arch_3bench_summary.md`](https://anonymous.4open.science/r/temp-bench/blob/dmitry-synthetic/docs/dmitry/results/3arch_3bench_summary.md)
+- [`docs/dmitry/results/3arch_3bench_summary.md`](https://anonymous.4open.science/r/temp-bench/blob/case-synthetic/docs/dmitry/results/3arch_3bench_summary.md)
   — 3-arch matched-raw_k sweep on 3 generative processes; the
   cleanest summary of the Effect 1 vs Effect 2 question.
 
-## Dmitry's central claim
+## The prior author's central claim
 
 > **The TXC wins we observed are mostly Effect 1, not Effect 2.**
 > Even the "denoising at ρ=0.9" advantage on noisy+overlap is largely
@@ -49,7 +49,7 @@ weaker claim — TXC is just a multi-token averaging filter.
 
 ## The 3-arch 3-bench matrix
 
-Dmitry runs **regular_sae**, **plain TXCDR-T5**, **TXC-base T=5** at
+The maintainer runs **regular_sae**, **plain TXCDR-T5**, **TXC-base T=5** at
 matched **window-level raw_k ∈ {1, 2, 5, 10, 20}** on 3 generative
 processes:
 
@@ -59,7 +59,7 @@ processes:
 | 2. Noisy + overlap | OR-coupling, p_B=0.5, n_parents=5 | **TXC clearly wins** at raw_k=5 (gAUC ≈ 0.97-0.99 vs SAE 0.58) | **Effect 1** (averaging T noisy tokens reduces variance even at ρ=0) | ✓ |
 | 3. Temporal-derivative v2 | h_k(t) state, recover rise_k(t) = h_k ∧ ¬h_{k-1} | **TXC FAILS**: SAE matches its info-theoretic ceiling; TXC underperforms | Effect 2 needed | ✗ |
 
-**Verdict (Dmitry's)**: The TXC wins are Effect 1 (sample aggregation;
+**Verdict (the prior author's)**: The TXC wins are Effect 1 (sample aggregation;
 no temporal structure exploited). When Effect 2 is actually needed
 (rise detection — a per-token transition that requires multi-token
 context), TXC fails because the architecture is a temporal *smoother*,
@@ -67,25 +67,25 @@ not a *differentiator*.
 
 ## Where our C2 lines up
 
-### Setup A vs Dmitry Bench 1 — same data, same conclusion
+### Setup A vs the prior author Bench 1 — same data, same conclusion
 
-Our `toy_coupled_K10_M20_d256` IS Dmitry's Bench 1 generator (Han's 1c3-coupled,
+Our `toy_coupled_K10_M20_d256` IS the prior author's Bench 1 generator (the prior author's 1c3-coupled,
 deterministic OR-coupling).
 
-Cross-check at k=2 ρ=0.7 (us) vs raw_k=2 ρ=0.9 (Dmitry — ρ=0.9 only
+Cross-check at k=2 ρ=0.7 (us) vs raw_k=2 ρ=0.9 (the prior author — ρ=0.9 only
 in his table):
 
-| Arch | Our gAUC (k=2 ρ=0.7) | Dmitry gAUC (raw_k=2 ρ=0.9) |
+| Arch | Our gAUC (k=2 ρ=0.7) | the prior author gAUC (raw_k=2 ρ=0.9) |
 |---|---:|---:|
 | `topk_sae` (regular_sae)    | 0.990 ± 0.000 | 1.00 |
 | `txc_base` (TXC-base T=5)   | 0.990 ± 0.000 | 1.00 |
-| `txc_pro` T=2 (≈ TXCDRv2 T=2) | 0.990 ± 0.000 | (Dmitry ran "plain TXCDR-T5", which ≈ our txc_base T=5) |
+| `txc_pro` T=2 (≈ TXCDRv2 T=2) | 0.990 ± 0.000 | (the maintainer ran "plain TXCDR-T5", which ≈ our txc_base T=5) |
 
 At low k, all archs hit gAUC=1.0 → no differentiation. The per-token
 co-firing pattern under deterministic OR-coupling fully reveals
 hidden state.
 
-At higher k Dmitry sees:
+At higher k the prior author sees:
 
 | raw_k (ρ=0.9) | regular SAE eAUC, gAUC | plain TXCDR-T5 eAUC, gAUC | TXC-base T=5 eAUC, gAUC |
 |---:|---|---|---|
@@ -95,7 +95,7 @@ At higher k Dmitry sees:
 | 20 | 0.77, 0.57 | 0.61, 0.96 | 0.62, 0.96 |
 
 Pattern: SAE flips to local at high raw_k (gAUC drops), window
-encoders stay global-favoured. **Dmitry's interpretation**: window
+encoders stay global-favoured. **the prior author's interpretation**: window
 encoders just have *less per-token resolution* — the single shared
 scalar per atom averages across T positions, biasing toward global
 mixtures. Not a genuine information advantage.
@@ -104,27 +104,27 @@ mixtures. Not a genuine information advantage.
 default eAUC at k=8 = 0.512, gAUC = 0.748; topk_sae k=8 eAUC=0.787,
 gAUC=0.754). The "TXC win" is the same averaging effect.
 
-### Setup B vs Dmitry Bench 2 — different data, OUR setup is weaker
+### Setup B vs the prior author Bench 2 — different data, OUR setup is weaker
 
-| | Our Setup B (`toy_markov_n20_d40_noisy`) | Dmitry's Bench 2 (`coupled_noisy_overlap`) |
+| | Our Setup B (`toy_markov_n20_d40_noisy`) | the prior author's Bench 2 (`coupled_noisy_overlap`) |
 |---|---|---|
 | Coupling | **None** (20 indep Markov chains) | OR-gate (K=10 → M=20, n_parents=5 = "overlap") |
 | Emission noise | p_B=0.625 (γ=0.25) | p_B=0.5 |
 | Hidden ground truth | underlying Markov state h_i | hidden chain h_k |
 | Headline metric | denoising ratio (sl + lp) | gAUC + h_corr |
 
-These are **different setups**. Dmitry's adds **overlap** (n_parents=5
+These are **different setups**. The prior author's adds **overlap** (n_parents=5
 making per-token co-firing ambiguous) on top of noise. Our Setup B
 just has noise on independent chains.
 
-Dmitry's TXC win on his Bench 2 (the +0.39 gAUC at raw_k=5 ρ=0.9) is
+The prior author's TXC win on his Bench 2 (the +0.39 gAUC at raw_k=5 ρ=0.9) is
 explicitly attributed to Effect 1 (variance reduction via averaging).
 He notes: **"this advantage shows up at ρ=0.0 too"**, which means
 the temporal structure isn't required for the win.
 
 **Implication for our Setup B headline**: our "TXC denoises" finding
 (sl_ratio > floor, lp_ratio > floor for TXC family) is the *same
-phenomenon* as Dmitry's Effect 1 — it's variance reduction via
+phenomenon* as the prior author's Effect 1 — it's variance reduction via
 averaging, not temporal pattern detection. The denoising story
 qualitatively reproduces wasteland 1c-noisy, but the *interpretation*
 shifts: TXC isn't using the Markov chain's temporal structure to
@@ -133,12 +133,12 @@ state.
 
 ### Bench 3 (temporal-derivative) — we haven't run this; TXC fails
 
-Dmitry's Bench 3 tests rise detection (`rise_k(t) = h_k(t) ∧ ¬h_k(t-1)`).
+The prior author's Bench 3 tests rise detection (`rise_k(t) = h_k(t) ∧ ¬h_k(t-1)`).
 The rise feature is **not in the activation** — recovery via
 correlation between latent activations and the rise sequence.
 
 Result: SAE matches its information-theoretic ceiling on h_corr;
-**TXC underperforms across all raw_k**. Dmitry's diagnosis:
+**TXC underperforms across all raw_k**. The prior author's diagnosis:
 
 > Shared-latent TXCDR is a temporal *smoother*, not a *differentiator*.
 > It can't extract per-token rises from window observations *unless*
@@ -158,7 +158,7 @@ denoising (which TXC does well via Effect 1), not differentiation
 
 ## E9 DC/AC ablation — TXC features are mostly static
 
-Dmitry's overnight bench includes a DC/AC ablation: replace each
+The prior author's overnight bench includes a DC/AC ablation: replace each
 TXC feature with `dc_only` (time-mean) or `ac_only` (zero-mean
 fluctuation), measure h_corr.
 
@@ -186,14 +186,14 @@ We haven't run this ablation. Worth porting.
 ## What this means for our paper
 
 1. **The "TXC exploits temporal structure" claim is largely refuted.**
-   Dmitry's E9 ablation directly shows TXC's hidden-state recovery
+   the prior author's E9 ablation directly shows TXC's hidden-state recovery
    comes from DC (time-averaged) features. Even his Effect 1 / Effect 2
    framing comes down on Effect 1 across the board.
 
 2. **The "TXC denoises" claim (our Setup B) survives but with a
    weaker interpretation.** TXC denoises = TXC averages T noisy
    observations of an approximately-stationary hidden state. This
-   works at ρ=0 too (per Dmitry). It's a property of the encoder
+   works at ρ=0 too (per the maintainer). It's a property of the encoder
    pooling T tokens, not of temporal correlation in the data.
 
 3. **The "TXC recovers hidden coupled features" claim (our Setup A)
@@ -206,14 +206,14 @@ We haven't run this ablation. Worth porting.
 
 4. **Methodology: matched per-token vs matched window-level.** We
    use matched per-token k_pos (so TXC-base T=5 at k_pos=5 has
-   k_win = 25 latents per window). Dmitry uses matched **window-level
+   k_win = 25 latents per window). The prior author uses matched **window-level
    raw_k** (so TXC-base T=5 at raw_k=5 has 5 latents per window =
-   1 latent per token effectively). Dmitry's matched-raw_k is the
+   1 latent per token effectively). The prior author's matched-raw_k is the
    fairer comparison — it keeps the actual encoder TopK budget equal.
    Under our convention TXC has T× more capacity per window, which
    confounds the comparison.
 
-5. **TXC is a smoother, not a differentiator.** Dmitry's Bench 3
+5. **TXC is a smoother, not a differentiator.** the prior author's Bench 3
    demonstrates an architectural blind spot — per-token transitions
    require per-position latent outputs, which the shared-latent
    architecture can't produce. The paper should not claim TXC can
@@ -231,7 +231,7 @@ We haven't run this ablation. Worth porting.
    At raw_k=5, our TXC-base T=5 default would be evaluated at k_pos=1
    (since k_win = k_pos × T = 1 × 5 = 5), not k_pos=5.
 
-3. **Add a Setup D — temporal-derivative.** Port Dmitry's Bench 3
+3. **Add a Setup D — temporal-derivative.** Port the prior author's Bench 3
    into our framework. This is the test where the temporal claim
    actually matters; if TXC fails, document it as an honest limitation.
 
@@ -240,18 +240,18 @@ We haven't run this ablation. Worth porting.
    data generators), this is the cleanest evidence that TXC isn't
    using temporal structure.
 
-5. **Match the ρ-sweep design to Dmitry's analysis.** Our in-flight
+5. **Match the ρ-sweep design to the prior author's analysis.** Our in-flight
    ρ-sweep at ρ ∈ {0.0, 0.3, 0.6, 0.9} on Setup A is exactly
    the right design — it confirms or refutes Effect 2. Decision rule:
-   gAUC flat across ρ → Effect 1 confirmed (consistent with Dmitry);
+   gAUC flat across ρ → Effect 1 confirmed (consistent with the maintainer);
    gAUC growing with ρ → Effect 2 still alive (would contradict
-   Dmitry; would need explanation).
+   the prior author; would need explanation).
 
 6. **Don't claim TXC > SAE on any synthetic bench without showing
-   ρ=0 baseline.** Dmitry's noisy+overlap bench gives a TXC win even
+   ρ=0 baseline.** the prior author's noisy+overlap bench gives a TXC win even
    at ρ=0; the win is averaging, not temporal.
 
-## Questions for Han
+## Questions for the prior author
 
 - Should we run Setup D (temporal-derivative) before paper submission?
 - Should we re-render Setup A + B at matched raw_k (not k_pos)?

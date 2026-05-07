@@ -62,5 +62,5 @@ TQDM_DISABLE=1 .venv/bin/python -m experiments.c5_steering.run \
   probing AUC, which is inconsistent with the methodology.
 - **Bricken resample is OFF** (decision #7) — that's a C6-only knob.
 - **Wasteland imports forbidden** — read via
-  `git show origin/han-phase7-unification:…` and copy with attribution
+  `git show origin/wasteland-canonical:…` and copy with attribution
   if you need to port.

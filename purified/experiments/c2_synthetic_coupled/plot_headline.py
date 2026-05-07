@@ -768,7 +768,7 @@ def render_2panel_headline(
                 p_B, n_par, rho = ec.get("p_B"), ec.get("n_parents"), ec.get("rho")
                 if p_B is not None:
                     break
-    title_left = f"Noisy + overlap (Dmitry-style)\np_B={p_B}, n_parents={n_par}, ρ={rho}"
+    title_left = f"Noisy + overlap (the prior author-style)\np_B={p_B}, n_parents={n_par}, ρ={rho}"
     _plot_panel(axes[0], zoom_data or {}, title_left)
 
     # Right: hierarchical (gAUC only).
@@ -862,7 +862,7 @@ def main():
                 line_filter_fn=_filter_d(winner, LINE_PHASES),
                 scatter_filter_fn=_filter_d(winner, SCATTER_PHASES),
                 tsweep_filter_fn=_filter_d(winner, TSWEEP_PHASES),
-                title_root="Setup D pB05_np5 (Dmitry replicate)",
+                title_root="Setup D pB05_np5 (the prior author replicate)",
                 fixed_k_for_tsweep=1,
             )
             # Auxiliary T-sweep at k=2.

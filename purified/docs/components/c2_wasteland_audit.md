@@ -19,10 +19,10 @@ clean. This file is the audit trail.
 
 ## Setup A — Coupled features (1c3-coupled)
 
-**Wasteland source**: [`docs/han/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md`](https://anonymous.4open.science/r/temp-bench/blob/han-phase7-unification/docs/han/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md)
-on `han-phase7-unification`.
+**Wasteland source**: [`docs/han/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md`](https://anonymous.4open.science/r/temp-bench/blob/wasteland-canonical/docs/han/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md)
+on `wasteland-canonical`.
 
-Aniket's coupled-feature pipeline. K hidden chains drive M emissions
+The prior author's coupled-feature pipeline. K hidden chains drive M emissions
 through OR-gate coupling. Two ground truths (emission directions vs
 hidden directions). Tests whether TXC recovers hidden chain structure
 that per-token SAEs miss.
@@ -69,7 +69,7 @@ into the underlying state h_i.
 
 **Datasource**: `toy_markov_n20_d40_noisy` (configs/datasources.yaml).
 Internal component name `c1_noisy` (kept for leaderboard provenance);
-paper-component-wise this is the second C2 setup per Han's structural
+paper-component-wise this is the second C2 setup per the prior author's structural
 mapping.
 
 | Parameter | Ours | Wasteland | Match |
@@ -84,8 +84,8 @@ mapping.
 | d_sae             | 40 | 40 | ✓ |
 | seq_len T         | 64 | 64 | ✓ |
 | Eval seeds        | {1, 2, 42} (n=3) | {42} (n=1) | n>wasteland |
-| Train batch       | 1024 (uniform) | 2048 (Stacked/TXCDRv2), 64 (TFA-pos) | ✗ (Han: no redo) |
-| Train lr          | 3e-4 (uniform) | 3e-4 (Stacked/TXCDRv2), 1e-3 (TFA-pos) | ✗ (Han: no redo) |
+| Train batch       | 1024 (uniform) | 2048 (Stacked/TXCDRv2), 64 (TFA-pos) | ✗ (the prior author: no redo) |
+| Train lr          | 3e-4 (uniform) | 3e-4 (Stacked/TXCDRv2), 1e-3 (TFA-pos) | ✗ (the prior author: no redo) |
 
 ### The π mismatch — derivation
 
@@ -122,7 +122,7 @@ datasource and re-train all c1_noisy cells.
 | Stacked T=5           | ~0.65 | 0.50 (floor) | ~0.45 | 0.25 (floor) |
 | **TXC-base T=2**      | **~0.83** | 0.74 | **~0.75** | 0.53 |
 | **TXC-base T=5 (default)** | **~1.01** | 0.97 | **~1.14** | ≈1.0 |
-| **TXC-base T={4,6,8,10,12}** | **~1.00-1.05** | (not in wasteland; T=2..12 sweep added per Han 2026-05-06) | **~1.06-1.34** | — |
+| **TXC-base T={4,6,8,10,12}** | **~1.00-1.05** | (not in wasteland; T=2..12 sweep added per (decision 2026-05-06)) | **~1.06-1.34** | — |
 | TXC-pro T_max=10      | ~1.05 | (not in wasteland) | ~1.34 | — |
 
 **Reading guide**: ratio > floor ⇒ denoising. ratio ≈ floor ⇒ no
@@ -144,7 +144,7 @@ directions, decoder-cosine method):
 
 TXC AUC matches exactly at k=5. TFA / Stacked are lower than
 wasteland at low k due to the batch-size + lr mismatch (wasteland
-batch=64 lr=1e-3 for TFA, 2048 / 3e-4 for Stacked). Per Han's
+batch=64 lr=1e-3 for TFA, 2048 / 3e-4 for Stacked). Per the prior author's
 "only redo TFA with small batch if TFA at 1024 takes ages" rule, no
 redo. The TXC headline reproduces precisely, which is what matters
 for the paper claim.

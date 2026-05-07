@@ -70,7 +70,7 @@ def test_training_config_defaults_are_anti_dead_only():
 
 
 def test_training_config_brickenauxk_a8_recipe():
-    """Dmitry's brickenauxk_a8 recipe should serialise to a different
+    """the prior author's brickenauxk_a8 recipe should serialise to a different
     key than the default recipe — verifying the Bricken knobs are
     actually included in the config dict."""
     cfg_default = TrainingConfig()

@@ -283,7 +283,7 @@ def _real_training_cfg() -> TrainingConfig:
     """Headline-cell TrainingConfig.
 
     Schema defaults are batch=1024, n_steps=25_000, plateau_off per
-    decisions.md § 12. **Deadline override (Han, 2026-05-04 PM)**:
+    decisions.md § 12. **Deadline override ((decision 2026-05-04))**:
     n_steps=20_000 to fit the C3+C4 sweep in remaining 72-h budget at
     measured 2.27 steps/sec under shared-GPU contention. Other archs /
     components may follow suit; surface to agent_paper for paper-wide

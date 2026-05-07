@@ -1,6 +1,6 @@
 """Verify NousResearch/Meta-Llama-3.1-8B is byte-identical to meta-llama/Llama-3.1-8B.
 
-Per Han's 2026-05-04 directive (agent_back briefing mandate update OQ #2):
+Per the prior author's 2026-05-04 directive (agent_back briefing mandate update OQ #2):
 before any Meta-mirror substitution becomes a paper claim, run a
 bit-equality sanity check. On 5 prompts × 50 tokens, do a forward pass
 through both models and compare layer-10 residual activations

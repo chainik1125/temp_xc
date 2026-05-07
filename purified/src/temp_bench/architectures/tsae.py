@@ -1,6 +1,6 @@
 """T-SAE — faithful port of Ye et al. 2025 (arxiv 2511.05541).
 
-Source: ``origin/han-phase7-unification @ 94119bc0:src/architectures/tsae_paper.py``
+Source: ``origin/wasteland-canonical @ 94119bc0:src/architectures/tsae_paper.py``
 which itself ports https://github.com/AI4LIFE-GROUP/temporal-saes
 (``dictionary_learning/dictionary_learning/trainers/temporal_sequence_top_k.py``).
 

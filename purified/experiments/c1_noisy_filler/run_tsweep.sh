@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # c1_noisy TXC-base T-sweep training: T ∈ {4, 6, 8, 10, 12} for the
 # wasteland-style scatter plot. Each T-value sharded across 3 seeds.
-# Wasteland uses T = 2..12 stride 1; Han 2026-05-06 specified stride 2
+# Wasteland uses T = 2..12 stride 1; (decision 2026-05-06) specified stride 2
 # = {2, 4, 6, 8, 10, 12}. T=2 already trained — only need {4,6,8,10,12}.
 #
 # Auto-skip: k_pos * T > d_sae=40 cells skipped by run.py:_is_valid_cell.

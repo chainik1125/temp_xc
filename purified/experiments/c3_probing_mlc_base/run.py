@@ -6,7 +6,7 @@ counterpart `gemma_2_2b_base_l11to15_fineweb_24k128`. Re-uses the
 custom `my_train_fn_mlc` + `my_eval_fn_mlc` (4D probe-array support)
 from the IT driver verbatim — only the datasource string differs.
 
-Per Han 2026-05-06: BASE MLC parity for the IT/BASE matrix in C3.
+Per (decision 2026-05-06): BASE MLC parity for the IT/BASE matrix in C3.
 agent_paper integrates new BASE MLC cells via canonical_train_keys()
 at paper-render time.
 
@@ -44,7 +44,7 @@ log = logging.getLogger("c3_mlc_base.run")
 ARCH = "mlc"
 DATASOURCE = "gemma_2_2b_base_l11to15_fineweb_24k128"
 DEFAULT_SEEDS = (42, 1, 2)
-# k_feats expansion per Han 2026-05-06: {5, 10, 20, 40, 80, 160, 320, 640}.
+# k_feats expansion per (decision 2026-05-06): {5, 10, 20, 40, 80, 160, 320, 640}.
 DEFAULT_K_FEATS_BASE = (5, 10, 20, 40, 80, 160, 320, 640)
 
 

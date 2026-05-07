@@ -1,9 +1,9 @@
-"""C2 ρ-sweep analysis — Effect 1 vs Effect 2 test (Han 2026-05-06).
+"""C2 ρ-sweep analysis — Effect 1 vs Effect 2 test ((decision 2026-05-06)).
 
 Reads c2 leaderboard rows with `eval_cfg.rho` set, aggregates by
 (arch, t_label, k_pos, ρ), plots gAUC vs ρ — one line per arch.
 
-Decision rule (Dmitry's Effect framing):
+Decision rule (the prior author's Effect framing):
 - gAUC roughly flat across ρ → Effect 1 (sample aggregation; weak
   temporal claim).
 - gAUC grows with ρ → Effect 2 (temporal pattern detection; strong

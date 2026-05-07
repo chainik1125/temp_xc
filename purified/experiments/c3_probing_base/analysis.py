@@ -19,7 +19,7 @@ Aggregation policy (matches IT):
 - Per (arch, k_feat): mean ± σ_seeds across seeds {1, 2, 42}.
 - Per (arch, k_feat): mean σ_tasks across seeds (intra-cell spread).
 - Plot: AUC vs k_feat per arch with σ_seeds bars.
-- Sweep: k_feats ∈ {5, 10, 20, 40, 80, 160, 320, 640} (Han 2026-05-06).
+- Sweep: k_feats ∈ {5, 10, 20, 40, 80, 160, 320, 640} ((decision 2026-05-06)).
 """
 
 from __future__ import annotations

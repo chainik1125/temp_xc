@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# C2 ρ-sweep launcher — Effect 1 vs Effect 2 test (Han 2026-05-06,
-# response to Dmitry's `origin/dmitry-synthetic:docs/dmitry/results/
+# C2 ρ-sweep launcher — Effect 1 vs Effect 2 test ((decision 2026-05-06),
+# response to the prior author's `origin/case-synthetic:docs/dmitry/results/
 # 3arch_3bench_summary.md` concern).
 #
 # REASSIGNED 2026-05-06 from agent_filler → agent_synth (8× 5090 pod).
@@ -39,7 +39,7 @@ mkdir -p logs
 #
 # Driver iterates ALL 7 ARCH_TS configurations when --archs txc_pro is
 # passed — including T=5 and T=12. That's bonus (useful for a T × ρ
-# heatmap if Han wants to drill in later); not the headline.
+# heatmap if the maintainer wants to drill in later); not the headline.
 
 declare -A ASSIGN=(
   [0]="topk_sae"
@@ -77,6 +77,6 @@ echo "[run_rho_sweep] all 3 archs complete"
 #   [0]="topk_sae"          # 12 cells (3 seeds × 2 k × 4 ρ)
 #   [1]="txc_base"          # 12 cells (T=5 only since txc_base has 1 ARCH_TS entry)
 #   [2]="txc_pro"           # 36 cells (3 T values × 3 seeds × 2 k × 4 ρ)
-#   [3]="stacked_sae"       # bonus baselines if Han wants
+#   [3]="stacked_sae"       # bonus baselines if the maintainer wants
 #   [4-7]="<spare>"
 # )

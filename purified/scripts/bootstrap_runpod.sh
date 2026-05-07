@@ -6,7 +6,7 @@
 #  This script is INTERACTIVE — it prompts for tokens via `read -rs`.
 #  An agent CANNOT enter input here; do not call this from an
 #  agent session. By the time an agent starts, this script has
-#  already been run by Han and `/workspace/.tokens/` is populated.
+#  already been run by the maintainer and `/workspace/.tokens/` is populated.
 # ──────────────────────────────────────────────────────────────────────
 #
 # Adapted from scripts/runpod_phase7_bootstrap.sh (wasteland) — no functional

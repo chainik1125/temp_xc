@@ -1,6 +1,6 @@
 """Hierarchical features data generator for C2 Phase 3 (ENGINEER).
 
-agent_synth mission 2026-05-06T23:00Z (Han override): build a generator
+agent_synth mission 2026-05-06T23:00Z (the prior author override): build a generator
 *engineered* for the global/local divide. K_g slow global chains
 modulate K_l fast local features; the per-token signal is dominated by
 locals (K_l > K_g), but the global structure is only recoverable by

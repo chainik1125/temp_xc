@@ -11,7 +11,7 @@ Public API:
 - :func:`global_recovery_gAUC(decoder_directions, hidden_features) -> dict`
 
 The two AUC helpers share the same canonical scoring (``feature_recovery``
-ports ``origin/han-phase7-unification:src/eval/feature_recovery.py``):
+ports ``origin/wasteland-canonical:src/eval/feature_recovery.py``):
 
 For each true feature we find the best-matching decoder column by
 *absolute* cosine similarity, sweep a threshold τ from 0 to 1, and
@@ -64,7 +64,7 @@ def feature_recovery(
 ) -> dict[str, Any]:
     """Per-feature recovery AUC against ground-truth feature directions.
 
-    Ports ``origin/han-phase7-unification:src/eval/feature_recovery.py``
+    Ports ``origin/wasteland-canonical:src/eval/feature_recovery.py``
     (``feature_recovery_score``) verbatim. For each true feature we find
     the SAE decoder column with the highest |cos sim|; we then sweep a
     threshold τ ∈ [0, 1] and integrate the fraction-recovered curve.

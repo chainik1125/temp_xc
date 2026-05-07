@@ -1,7 +1,7 @@
 """Setup A T-sweep — txc_base across T={2,4,6,8,10,12} on
 toy_coupled_K10_M20_d256 (canonical Setup A, ρ=0.7, d_sae=40).
 
-Han's "ONE PAPER GOAL" #2 (per agent_hammer briefing 2026-05-07):
+The prior author's "ONE PAPER GOAL" #2 (per agent_hammer briefing 2026-05-07):
 "What happens as T grows (TXC-base T-sweep at fixed k_pos)".
 
 Setup A currently has txc_base T=5 default + txc_pro T={2,5,12}.

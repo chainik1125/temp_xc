@@ -35,7 +35,7 @@ agent="$1"
 # Per-agent clone-path check on shared pods. If the agent's expected
 # clone path doesn't match the cwd, warn loudly — two agents sharing
 # /workspace/temp_xc/.git/ collide on index.lock during pull-rebase.
-# Han runs `add_agent_clone.sh <agent>` to provision the second clone
+# The maintainer runs `add_agent_clone.sh <agent>` to provision the second clone
 # before spawning the agent.
 case "$agent" in
     agent_em)      expected_root="/workspace/temp_xc_em" ;;
@@ -58,7 +58,7 @@ if [ -n "$expected_root" ] && [ -d /workspace ]; then
         echo "  but cwd resolves to $repo_root. On a shared pod this means you" >&2
         echo "  are about to share .git/ with another agent — they will collide" >&2
         echo "  on index.lock during pull-rebase." >&2
-        echo "  Fix: ask Han to run" >&2
+        echo "  Fix: ask the prior author to run" >&2
         echo "    bash /workspace/temp_xc/purified/scripts/add_agent_clone.sh $agent" >&2
         echo "  then start over from $expected_root/purified/." >&2
     fi
@@ -133,21 +133,21 @@ case "$agent" in
         export AGENT_NAME=agent_filler
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
-    # ── 8× H100 multi-GPU synthetic-investigation pod (Han 2026-05-06 PM —
+    # ── 8× H100 multi-GPU synthetic-investigation pod ((decision 2026-05-06) —
     #    upgraded from 8× 5090). 640 GB GPU mem, 1.8 TB system RAM, 224 CPUs.
     #    Same parallel-launch pattern as agent_filler: process pinned to
     #    GPU 0 by default; spawn parallel cells via
     #    `bash scripts/run_on_gpu.sh <0..7> -- <cmd>`. Mission focus:
     #    "Global vs Local" narrative — show TXC dictionaries skew toward
     #    GLOBAL features and per-token SAE dictionaries skew toward LOCAL
-    #    features. Includes Dmitry-bench reproductions for honest caveats.
+    #    features. Includes the prior author-bench reproductions for honest caveats.
     #    See agents/agent_synth/briefing.md for the full mission.
     agent_synth)
         export CUDA_VISIBLE_DEVICES=0
         export AGENT_NAME=agent_synth
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
-    # ── 8× RTX PRO 6000 baseline-backfill pod (Han 2026-05-06T23:30 — added
+    # ── 8× RTX PRO 6000 baseline-backfill pod ((decision 2026-05-06T23:30) — added
     #    to fill missing tsae_paper / topk_sae cells in C2 Setup A + Setup B).
     #    Blackwell-gen consumer pro card, 96 GB VRAM each. Same parallel-launch
     #    pattern as agent_filler / agent_synth: process pinned to GPU 0 by
@@ -159,7 +159,7 @@ case "$agent" in
         export AGENT_NAME=agent_hammer
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
-    # ── 7× RTX 5090 probing-protocol exploration pod (Han 2026-05-06T23:18 —
+    # ── 7× RTX 5090 probing-protocol exploration pod ((decision 2026-05-06T23:18) —
     #    spawned to rapidly identify the best probing recipe for TXC archs).
     #    Blackwell-gen consumer card, 32 GB VRAM each = 224 GB total;
     #    989 GB system RAM, 224 CPUs. Same parallel-launch pattern as

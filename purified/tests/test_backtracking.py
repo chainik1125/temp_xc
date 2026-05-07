@@ -104,7 +104,7 @@ def test_parse_judge_reply_valid():
 
 
 def test_parse_judge_reply_negative_signal():
-    """-1 sentinel for parse failure (matches Aniket's grade_backtracking.py)."""
+    """-1 sentinel for parse failure (matches the prior author's grade_backtracking.py)."""
     assert parse_judge_reply("garbage") == -1
     assert parse_judge_reply("") == -1
 
@@ -113,7 +113,7 @@ def test_parse_judge_reply_negative_signal():
 
 
 def test_load_cohort_from_parquet_shape():
-    """Aniket's cohort qids are read deterministically and total 61."""
+    """the prior author's cohort qids are read deterministically and total 61."""
     pytest.importorskip("pandas")
     pytest.importorskip("pyarrow")
     cohort = load_cohort_from_parquet()

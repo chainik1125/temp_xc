@@ -48,7 +48,7 @@ window archs (TXC, T-SAE, TFA, Stacked), shape is (n_sent, T_arch, d_in).
 The encode-side stride-1 sliding-window construction for sentences
 **longer** than T_arch lives in the case-study modules
 (``case_studies.backtracking.extract_labeled_sentence_acts`` is the
-template — Aniket's window-of-T-positions-before-each-sentence rule).
+template — the prior author's window-of-T-positions-before-each-sentence rule).
 
 Compute footprint: encode in batches (cap d_sae × n_sent latents at
 ~4 GB peak); LogReg fit + score is CPU-bound and parallelisable across
@@ -115,7 +115,7 @@ def encode_and_pool(
       1. ``arch.encode(x)`` → ``(B, T_z, d_sae)`` with ``T_z ∈ {1, T}``.
          For TXC-base/pro: 1 (window-level latent).
          For per-token archs: T (per-token latent).
-      2. ``.abs()`` (matches Aniket's mining convention — sign-agnostic).
+      2. ``.abs()`` (matches the prior author's mining convention — sign-agnostic).
       3. ``amax(dim=1)`` if ``T_z > 1`` else squeeze. Max-pool over the
          window axis: a feature that fires sharply on one position is
          the detection signal we want; mean-pool would dilute it.

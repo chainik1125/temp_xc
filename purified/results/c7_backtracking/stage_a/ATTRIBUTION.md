@@ -4,7 +4,7 @@ component: c7
 status: read-only
 ported_by: agent_back
 ported_on: 2026-05-03
-source_branch: origin/aniket-ward-stage-b
+source_branch: origin/case-backtracking
 source_commit: a62175ee7e99528fe833ce45e62255103bb2bac5
 source_path: results/ward_backtracking/
 ---
@@ -33,7 +33,7 @@ To re-port from upstream:
 mkdir -p results/c7_backtracking/stage_a
 for f in dom_vectors.pt prompts.json sentence_labels.json \
          steering_results.json traces.json validation.json; do
-    git show "origin/aniket-ward-stage-b:results/ward_backtracking/$f" \
+    git show "origin/case-backtracking:results/ward_backtracking/$f" \
         > "results/c7_backtracking/stage_a/$f"
 done
 ```
@@ -43,9 +43,9 @@ done
 - The wasteland path is `results/ward_backtracking/` (not
   `results/ward_backtracking_txc/stage_a/` as referenced in some
   briefings — the `_txc` directory holds Stage B outputs only).
-- Aniket's headline cohort is 31 truly-wrong + 30 originally-correct
+- The prior author's headline cohort is 31 truly-wrong + 30 originally-correct
   questions = 61 of the 300; filtering happens at run time, not in
   the data.
-- All Stage A artifacts were generated under Aniket's wasteland code
-  (`origin/aniket-ward-stage-b:experiments/ward_backtracking/`). Our
+- All Stage A artifacts were generated under the prior wasteland code
+  (`origin/case-backtracking:experiments/ward_backtracking/`). Our
   Stage B port reads them as opaque inputs.

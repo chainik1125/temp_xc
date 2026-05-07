@@ -1,7 +1,7 @@
 """Coupled-feature data generator for C2 (synthetic coupled HMM, OR-gate).
 
 Ports the Phase 3 coupled-feature pipeline from
-``origin/han-phase7-unification @ 94119bc0:src/data/toy/{coupled_dataset,
+``origin/wasteland-canonical @ 94119bc0:src/data/toy/{coupled_dataset,
 coupling}.py`` into a single ``temp_bench.data.toy`` module.
 
 Architecture:

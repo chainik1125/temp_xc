@@ -16,7 +16,7 @@ Replicates ``experiments/c6_em/`` with three changes:
    for N=25 windows / seq_len=128 / T=5), so the canonical 500-step
    resample interval would fire ~10× more often per token. Bumping to
    5000 keeps the per-token resample cadence approximately matched
-   to the canonical baseline. Han's call (§ 14): chose the simpler
+   to the canonical baseline. The prior author's call (§ 14): chose the simpler
    "step-count is 10×" interpretation; document the choice in c6.md
    caveats.
 

@@ -6,7 +6,7 @@ default is OFF. See `docs/paper/architecture.md` § *Per-experiment
 training knobs* and the per-component A/B verdict in
 `docs/components/cN.md` before turning it on.
 
-Why opt-in: Dmitry's winning recipe `brickenauxk_a8` co-tunes six knobs
+Why opt-in: the prior author's winning recipe `brickenauxk_a8` co-tunes six knobs
 together (resample_every, min_fires, n_check, max_resample_fraction,
 EMA-AuxK alpha, dead_threshold). The recipe is coherent on Qwen-7B
 medical activations; whether it transfers to Gemma activations, the
@@ -20,7 +20,7 @@ loss in the anti-dead stack: AuxK gives dead features a gradient signal
 ones.
 
 Ported from
-``origin/em-nanda @ a74d1be4:experiments/em_features/dead_feature_resample.py``.
+``origin/case-em-nanda @ a74d1be4:experiments/em_features/dead_feature_resample.py``.
 The measurement loop is unchanged. The reset logic is implemented
 directly on the arch's ``W_enc`` / ``W_dec`` / ``b_enc`` parameters
 because :class:`temp_bench.architectures.txc_base.TXCBase` (the only
@@ -32,7 +32,7 @@ T, d_in]``, ``b_enc[d_sae]``). Other archs raise ``RuntimeError`` —
 which is the intended fail-fast: Bricken is opt-in, so the only path
 that hits this is a deliberate ``training_cfg.bricken_enabled=True``.
 
-Recipe (default values from Dmitry's brickenauxk_a8 winning config):
+Recipe (default values from the prior author's brickenauxk_a8 winning config):
 
 - ``resample_every = 500`` steps
 - ``min_fires = 1`` on a held-out check batch (a feature is "dead" if
@@ -40,7 +40,7 @@ Recipe (default values from Dmitry's brickenauxk_a8 winning config):
 - ``n_check = 2048`` windows per check
 - ``max_resample_fraction = 0.5`` cap on per-call resets
 
-Dead-feature trajectory on Qwen-7B medical (Dmitry's
+Dead-feature trajectory on Qwen-7B medical (the prior author's
 ``summary_brickenauxk_a8_frontier.md``):
 
     step    dead    loss

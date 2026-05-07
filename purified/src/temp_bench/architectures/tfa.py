@@ -1,6 +1,6 @@
 """TFA (Temporal Feature Analysis) — TempBenchArch wrapper.
 
-Source: ``origin/han-phase7-unification @ 94119bc0:src/architectures/tfa.py``
+Source: ``origin/wasteland-canonical @ 94119bc0:src/architectures/tfa.py``
 adapted to the unified :class:`TempBenchArch` framework.
 
 Wraps the :class:`TemporalSAE` module (ported from

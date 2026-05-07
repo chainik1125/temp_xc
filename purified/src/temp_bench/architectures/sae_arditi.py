@@ -8,7 +8,7 @@ in ``docs/components/c6.md``) is measured.
 
 Why a separate class from the framework's
 :class:`temp_bench.architectures.topk_sae.TopKSAE`: this class matches
-the parameter layout used by Dmitry's ``origin/em-nanda`` checkpoints
+the parameter layout used by the prior author's ``origin/case-em-nanda`` checkpoints
 (``sae_day.TopKSAE``):
 
     W_enc : (d_in, d_sae)
@@ -18,7 +18,7 @@ the parameter layout used by Dmitry's ``origin/em-nanda`` checkpoints
 
 The framework's :class:`TopKSAE` uses the transposed convention
 (``W_enc : (d_sae, d_in)``, ``W_dec : (d_in, d_sae)``). Diverging only
-on the layout means Dmitry's HF checkpoints
+on the layout means the prior author's HF checkpoints
 (``${TEMP_BENCH_HF_ORG}/temp-bench-models``, originally trained under
 ``sae_day.TopKSAE``) load directly via
 ``model.load_state_dict(ckpt["state_dict"])`` with no transpose dance.
@@ -36,7 +36,7 @@ raw performance for an apples-to-apples compare against TXC-base
 +brickenauxk.
 
 Ported from
-``origin/em-nanda @ a74d1be4:experiments/separation_scaling/vendor/src/sae_day/sae.py``
+``origin/case-em-nanda @ a74d1be4:experiments/separation_scaling/vendor/src/sae_day/sae.py``
 (class ``TopKSAE``).
 """
 

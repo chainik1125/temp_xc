@@ -1,4 +1,4 @@
-"""Paper-grade Setup A plot for c2.md (Han 2026-05-07: missing).
+"""Paper-grade Setup A plot for c2.md ((decision 2026-05-07): missing).
 
 Reads c2 leaderboard, plots gAUC vs k_pos per (arch, T_label) at the
 canonical ρ=0.7. One line per arch family with error bars.
