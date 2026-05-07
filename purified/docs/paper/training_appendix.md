@@ -39,8 +39,9 @@ All datasources referenced by paper-canonical cells, regardless of component. Th
 
 **Datasources — synthetic**
 
-| datasource | K_hidden | M_emissions | n_parents | K_global | K_local | n_features | d_in | pi | rho | rho_levels | p_A | p_B | magnitude_dist | magnitude_mean | magnitude_std | n_global_parents | pi_g | rho_g | p_l_high | p_l_low | obs_noise_sigma | rho_g_list | p_l | alpha | base_mag | period | duty_cycle | stride | n_groups | noise_alpha | global_magnitude_scale |
+| datasource | K_hidden | M_emissions | n_parents | K_global | K_local | n_features | d_in | pi | rho | rho_levels | p_A | p_B | magnitude_dist | magnitude_mean | magnitude_std | n_global_parents | pi_g | rho_g | p_l_high | p_l_low | obs_noise_sigma | rho_g_list | p_l | alpha | base_mag | period | stride | duty_cycle | n_groups | noise_alpha | global_magnitude_scale |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `toy_anticorrelated_Kg10_Kl30_d256` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | 0.9 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | 0.05 | 0.95 | — | — | 1 | — | 0.05 | 5 | 1 | — | — | — | — | 0.9 | — |
 | `toy_chord_Kg10_Kl30_d256_2groups` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | 2 | — | — |
 | `toy_coupled_K10_M20_d128_halcyon` | 10 | 20 | 2 | — | — | — | 128 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
@@ -66,7 +67,7 @@ All datasources referenced by paper-canonical cells, regardless of component. Th
 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 0.5 | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_obs_noise_K10_M20_d256_sigma1p0` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 1 | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_obs_noise_K10_M20_d256_sigma2p0` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 2 | — | — | — | — | — | — | — | — | — | — |
-| `toy_dewdrop_Kg10_Kl30_d256_p16` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | 0.8 | 0.1 | — | — | — | — | — | 16 | — | 1 | — | — | — |
+| `toy_dewdrop_Kg10_Kl30_d256_p16` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | 0.8 | 0.1 | — | — | — | — | — | 16 | 1 | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.999, 0.999, 0.999, 0.999, 0.999, 0.7, 0.7, 0.7, 0.7, 0.7] | — | — | — | — | — | — | — | — | — |
@@ -75,12 +76,13 @@ All datasources referenced by paper-canonical cells, regardless of component. Th
 | `toy_hierarchical_Kg10_Kl30_d256_np2` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 2 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256_sigma1p0` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | 1 | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | 2 | — | — | — | — | — | — | — | — | — | — |
-| `toy_hierarchical_Kg10_Kl30_d256_sparse` | — | — | — | — | — | — | — | — | — | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | 0.5 | 1 | 1 | 8 | 1 | — | — | — | — |
+| `toy_hierarchical_Kg10_Kl30_d256_sparse` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.01 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl50_d256` | — | — | — | 10 | 50 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_magmod_Kg10_Kl30_d256_alpha1` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | — | — | — | — | 0.5 | 1 | 1 | — | — | — | — | — | — |
 | `toy_markov_n20_d40` | — | — | — | — | — | 20 | 40 | 0.5 | — | [0.0, 0.3, 0.5, 0.7, 0.9] | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_markov_n20_d40_noisy` | — | — | — | — | — | 20 | 40 | 0.5 | — | [0.7] | 0 | 0.625 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| `toy_obelisk_Kg10_Kl30_d256_alpha5` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.01 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_obelisk_Kg10_Kl30_d256_alpha5` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | — | — | — | — | 0.05 | 5 | 1 | — | — | — | — | — | — |
+| `toy_phalanx_Kg10_Kl30_d256_period8` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | — | — | — | — | 0.5 | 1 | 1 | 8 | — | 1 | — | — | — |
 
 ## C1 — Synthetic TopK sweep (toy Markov features)
 
@@ -136,8 +138,9 @@ _components: c2, c1_noisy — 5750 unique trained models (5756 leaderboard eval 
 
 **Datasources — synthetic**
 
-| datasource | K_hidden | M_emissions | n_parents | K_global | K_local | n_features | d_in | pi | rho | rho_levels | p_A | p_B | magnitude_dist | magnitude_mean | magnitude_std | n_global_parents | pi_g | rho_g | p_l_high | p_l_low | obs_noise_sigma | rho_g_list | p_l | alpha | base_mag | period | duty_cycle | stride | n_groups | noise_alpha | global_magnitude_scale |
+| datasource | K_hidden | M_emissions | n_parents | K_global | K_local | n_features | d_in | pi | rho | rho_levels | p_A | p_B | magnitude_dist | magnitude_mean | magnitude_std | n_global_parents | pi_g | rho_g | p_l_high | p_l_low | obs_noise_sigma | rho_g_list | p_l | alpha | base_mag | period | stride | duty_cycle | n_groups | noise_alpha | global_magnitude_scale |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `toy_anticorrelated_Kg10_Kl30_d256` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | 0.9 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | 0.05 | 0.95 | — | — | 1 | — | 0.05 | 5 | 1 | — | — | — | — | 0.9 | — |
 | `toy_chord_Kg10_Kl30_d256_2groups` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | 2 | — | — |
 | `toy_coupled_K10_M20_d128_halcyon` | 10 | 20 | 2 | — | — | — | 128 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
@@ -163,7 +166,7 @@ _components: c2, c1_noisy — 5750 unique trained models (5756 leaderboard eval 
 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 0.5 | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_obs_noise_K10_M20_d256_sigma1p0` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 1 | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_obs_noise_K10_M20_d256_sigma2p0` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 2 | — | — | — | — | — | — | — | — | — | — |
-| `toy_dewdrop_Kg10_Kl30_d256_p16` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | 0.8 | 0.1 | — | — | — | — | — | 16 | — | 1 | — | — | — |
+| `toy_dewdrop_Kg10_Kl30_d256_p16` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | 0.8 | 0.1 | — | — | — | — | — | 16 | 1 | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.999, 0.999, 0.999, 0.999, 0.999, 0.7, 0.7, 0.7, 0.7, 0.7] | — | — | — | — | — | — | — | — | — |
@@ -172,11 +175,12 @@ _components: c2, c1_noisy — 5750 unique trained models (5756 leaderboard eval 
 | `toy_hierarchical_Kg10_Kl30_d256_np2` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 2 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256_sigma1p0` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | 1 | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | 2 | — | — | — | — | — | — | — | — | — | — |
-| `toy_hierarchical_Kg10_Kl30_d256_sparse` | — | — | — | — | — | — | — | — | — | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | 0.5 | 1 | 1 | 8 | 1 | — | — | — | — |
+| `toy_hierarchical_Kg10_Kl30_d256_sparse` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.01 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl50_d256` | — | — | — | 10 | 50 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_magmod_Kg10_Kl30_d256_alpha1` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | — | — | — | — | 0.5 | 1 | 1 | — | — | — | — | — | — |
 | `toy_markov_n20_d40_noisy` | — | — | — | — | — | 20 | 40 | 0.5 | — | [0.7] | 0 | 0.625 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| `toy_obelisk_Kg10_Kl30_d256_alpha5` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.01 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_obelisk_Kg10_Kl30_d256_alpha5` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | — | — | — | — | 0.05 | 5 | 1 | — | — | — | — | — | — |
+| `toy_phalanx_Kg10_Kl30_d256_period8` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | — | — | — | — | 0.5 | 1 | 1 | 8 | — | 1 | — | — | — |
 
 _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `smoke=True` flag), 417 orphan cells (leaderboard row references a `train_key` no longer in `checkpoints/manifest.jsonl`)._
 
