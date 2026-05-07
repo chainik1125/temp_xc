@@ -119,7 +119,7 @@ def test_load_cohort_from_parquet_shape():
     cohort = load_cohort_from_parquet()
     assert len(cohort.truly_wrong) == 31
     assert len(cohort.originally_correct) == 30
-    assert cohort.source == "aniket_parquet"
+    assert cohort.source == "prior_parquet"
     # Qids look like MATH-500 unique_ids
     assert all(q.startswith("test/") for q in cohort.truly_wrong)
 

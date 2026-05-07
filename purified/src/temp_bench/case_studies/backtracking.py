@@ -223,7 +223,7 @@ class Cohort:
     truly_wrong: list[str]                # qids
     originally_correct: list[str]         # qids
     truncated: list[str]                  # qids dropped (only meaningful for LM-discovery path)
-    source: str                           # "aniket_parquet" | "lm_discovery"
+    source: str                           # "prior_parquet" | "lm_discovery"
 
     @property
     def all(self) -> list[str]:
@@ -268,7 +268,7 @@ def load_cohort_from_parquet(parquet_path: Path | str | None = None) -> Cohort:
         truly_wrong=truly_wrong,
         originally_correct=correct,
         truncated=[],
-        source="aniket_parquet",
+        source="prior_parquet",
     )
 
 
@@ -287,12 +287,12 @@ def load_math500_lookup() -> dict[str, dict[str, Any]]:
 def build_cohort(
     stage_a: StageA | None = None,
     *,
-    source: str = "aniket_parquet",
+    source: str = "prior_parquet",
     n_correct: int = 30,
     seed: int = 42,
     ground_truth_lookup: Callable[[str], str | None] | None = None,
 ) -> Cohort:
-    """Default path: ``source="aniket_parquet"`` reads the 31+30 cohort
+    """Default path: ``source="prior_parquet"`` reads the 31+30 cohort
     from the prior author's reference flip_matrix (frozen, deterministic).
 
     The ``source="lm_discovery"`` path is reserved for future use
@@ -302,11 +302,11 @@ def build_cohort(
     ``stage_a``. Not implemented yet — open question #2 in the
     agent_back briefing.
     """
-    if source == "aniket_parquet":
+    if source == "prior_parquet":
         return load_cohort_from_parquet()
     raise NotImplementedError(
         f"build_cohort(source={source!r}) not implemented; "
-        "use source='aniket_parquet' (default) until LM-discovery path lands."
+        "use source='prior_parquet' (default) until LM-discovery path lands."
     )
 
 
