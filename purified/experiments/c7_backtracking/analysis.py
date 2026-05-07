@@ -73,7 +73,7 @@ def _valid_train_keys() -> set[str]:
 
 # the prior wasteland reference (hill-climbed TXC) — for the c7.md
 # "Reference numbers" cross-check, NOT our paper claim.
-ANIKET_REFERENCE_PEAK_DELTA_GC = {
+PRIOR_REFERENCE_PEAK_DELTA_GC = {
     "txc": (1.574, -12),       # hill-climbed TXC, NOT our locked TXC-base/TXC-pro
     "mlc": (0.508, +16),
     "txc_h8": (0.492, +12),    # closest analog to TXC-pro
@@ -349,7 +349,7 @@ def run_analysis() -> AnalysisResult:
     # ── Headline check ────────────────────────────────────────────────
     txc_pro_peak = delta_gc["peak"].get("txc_pro")
     if txc_pro_peak is not None:
-        ref = ANIKET_REFERENCE_PEAK_DELTA_GC.get("txc_h8")  # closest analog
+        ref = PRIOR_REFERENCE_PEAK_DELTA_GC.get("txc_h8")  # closest analog
         if ref is not None:
             md_parts.append(
                 "\n\n**Headline reproducibility** — TXC-pro peak Δgc = "

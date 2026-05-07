@@ -1496,10 +1496,10 @@ def write_markdown(rows: list[dict], *, canonical: list[dict] | None = None,
     md.append("")
 
     if unified_rows is not None:
-        n_han = sum(1 for r in unified_rows if r.get("_source") == "unified")
+        n_unified = sum(1 for r in unified_rows if r.get("_source") == "unified")
         md.append("## Unified comparison")
         md.append("")
-        md.append(f"_Pulled {n_han} additional row(s) from `{UNIFIED_BRANCH}:purified/results/leaderboard.jsonl` "
+        md.append(f"_Pulled {n_unified} additional row(s) from `{UNIFIED_BRANCH}:purified/results/leaderboard.jsonl` "
                   f"(read-only; merged at render time)._")
         md.append("")
         md.append("### Best cell per architecture (across both pods)")
