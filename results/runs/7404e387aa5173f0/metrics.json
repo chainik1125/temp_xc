@@ -1,0 +1,19 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_act_cache_key": "f01ca87f2e8f3365",
+      "_datasource_name": "gemma_2_2b_base_l13_fineweb_24k128",
+      "_eval_key_hint": "9e21387bdc9313b1",
+      "n_features": 256
+    }
+  },
+  "metrics": {
+    "judge_agreement": 0.86328125,
+    "n_features_judged": 256.0,
+    "n_passages": 14.0,
+    "top_N_semantic": 74.0,
+    "top_N_syntactic": 182.0,
+    "top_N_unknown": 0.0
+  },
+  "ts": "2026-05-05T22:14:06Z"
+}

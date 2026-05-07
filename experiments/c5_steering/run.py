@@ -1,0 +1,441 @@
+"""C5 — RLHF steering: per-cell train + V7-tiled-broadcast eval.
+
+Thin orchestration. The trainer lives in :mod:`temp_bench.training.
+sae_trainer`; the eval pipeline (V7 hook + Sonnet judge + coh-vs-success
+curves) lives in :mod:`temp_bench.case_studies.steering`. This file
+just glues:
+
+  for arch in {tsae_paper, txc_base, txc_pro}:
+      for seed in {1, 2, 42}:
+          runner.run_cell(component="c5", arch=arch, seed=seed,
+                          training_cfg=…, eval_cfg=…, train_fn=…, eval_fn=…)
+
+Three notable C5-specifics:
+
+1. **Pre-test V7 on TXC-pro** — the c5.md hypothesis allows falling
+   back to PP if V7 produces a degenerate (incoherent) success rate.
+   ``--pre-test-only`` runs a 5-concept-cell at one mid-strength on
+   ``txc_pro`` and prints whether to switch to PP. The full sweep is
+   then run with ``--protocol pp`` if PP is recommended.
+2. **Workspace plumbing** — :func:`temp_bench.runner.run_cell` doesn't
+   pass ``eval_key`` (and therefore the workspace ``run_dir(eval_key)``)
+   into the eval-fn. We compute it from the same inputs the runner
+   uses (so the keys match) and thread it via a closure on the
+   eval-fn (NOT via ``eval_cfg``, which the runner re-hashes — adding
+   ``_workspace`` there would change the runner's eval_key and the
+   case study would write to a different ``run_dir`` than the one
+   ``metrics.json`` lands in).
+3. **Activations come from disk** — the Gemma-2-2b-IT L13 fineweb
+   act-cache is on HF (``${TEMP_BENCH_HF_ORG}/temp-bench-data``) and ``sync_
+   from_hf.sh`` (or the manual ``hf download``) lands it at
+   ``results/act_cache/<act_cache_key>/``. We use the canonical
+   :func:`temp_bench.data.nlp.batch_iter_from_act_cache` which yields
+   full ``(B, seq_len, d_in)`` sequences — the TXC arch's
+   ``train_step`` extracts a single random T-window per batch element
+   internally (per ``txc_base.py`` docstring).
+
+Provenance: phase7's V7 driver lives at
+``origin/wasteland-canonical:experiments/phase7_unification/case_
+studies/steering/intervene_paper_clamp_window_tiled_broadcast.py`` —
+this file replaces that driver with the framework-discipline version.
+"""
+
+from __future__ import annotations
+
+import argparse
+import logging
+import os
+from pathlib import Path
+from typing import Any
+
+import torch
+
+os.environ.setdefault("TQDM_DISABLE", "1")
+
+from temp_bench import runner
+from temp_bench.cache import run_dir
+from temp_bench.case_studies.steering import (
+    DEFAULT_COH_THRESHOLDS,
+    DEFAULT_STRENGTHS,
+    SteeringCaseStudy,
+    SteeringConfig,
+)
+from temp_bench.config import (
+    compute_act_cache_key,
+    compute_eval_key,
+    compute_train_key,
+    instantiate_arch,
+    load_arch,
+    load_datasource,
+)
+from temp_bench.data.nlp.cache import preloaded_batch_iter_from_act_cache
+from temp_bench.schemas import TrainingConfig
+from temp_bench.training.sae_trainer import train_sae
+
+log = logging.getLogger("c5_steering")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
+
+
+# ── Per-component configuration ───────────────────────────────────────
+
+
+COMPONENT = "c5"
+DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"
+# 1.0.0 → 1.1.0 (2026-05-05): fixed concept-lift feature selection
+# (was raw-activation argmax which picked the same always-on feature
+# for nearly all 30 concepts, giving 0.13 mean success_grade vs the
+# wasteland's 1.13 anchor). New eval_key invalidates the 9 stale
+# v1.0.0 rows; analysis.py filters to 1.1.0.
+EVAL_PROTOCOL_VERSION = "1.1.0"
+
+DEFAULT_ARCHS: tuple[str, ...] = ("tsae_paper", "txc_base", "txc_pro")
+DEFAULT_SEEDS: tuple[int, ...] = (1, 2, 42)
+
+
+def _real_training_cfg() -> TrainingConfig:
+    # n_steps overridden 25_000 → 20_000 per (decision 2026-05-04) URGENT.
+    # Aligns C3 + C4 + C5 on the Gemma 20.5M-token-per-cell axis.
+    return TrainingConfig(n_steps=20_000)
+
+
+# ── Train + eval adapters ─────────────────────────────────────────────
+
+
+def my_train_fn(
+    *, arch_name, arch_hparams, seed, training_cfg, act_cache_key, component,
+):
+    """Build arch via ``instantiate_arch`` + delegate to ``train_sae``.
+
+    Uses the canonical :func:`temp_bench.data.nlp.batch_iter_from_act_cache`
+    which yields ``(B, seq_len, d_in)`` full sequences. The TXC archs'
+    ``train_step`` does its own random-window extraction; the per-token
+    archs flatten ``(B, S, d)`` into ``(B*S, d)`` internally. Same
+    iterator works uniformly across families.
+
+    Progress visibility: wrap ``batch_iter`` to count calls and emit a
+    one-line marker every 1000 steps. The shared ``train_sae`` is
+    silent by design (PROTOCOL.md § 11), so cells without this wrapper
+    log nothing for ~25 min of training. Pattern borrowed from
+    [pipeline]'s ``c3_probing/run.py`` (commit [scrubbed-sha]).
+    """
+    import sys
+    import time as _time
+
+    spec = load_arch(arch_name, component=component)
+    # [pipeline] 2026-05-06 (post-RunPod-incident): apply runner-merged
+    # arch_hparams (with arch_hparams_override) before instantiation.
+    # See experiments/c3_probing/run.py:my_train_fn for the same fix.
+    spec = spec.model_copy(update={"hparams": dict(arch_hparams)})
+    datasource = load_datasource(DATASOURCE)
+    d_in = int(getattr(datasource, "d_in", 2304))
+    model = instantiate_arch(spec, d_in=d_in)
+    model.cuda()
+    log.info("[train] %s seed=%d T=%d", arch_name, seed, model.T)
+    # [pipeline] 2026-05-05 PM (decisions § 15): pass-through
+    # train_window_size from TrainingConfig. Default None preserves the
+    # full-sequence path; [pipeline]'s C5 T-SAE baseline re-train sets
+    # it to T=2 (Bhalla/Ye 2025 paper-faithful adjacent pairs) to bring
+    # per-token T-SAE to ~SAEBench canonical scale.
+    raw_iter = preloaded_batch_iter_from_act_cache(
+        act_cache_key,
+        seed=seed,
+        train_window_size=getattr(training_cfg, "train_window_size", None),
+    )
+
+    state = {"n": 0, "t0": _time.time(), "label": f"{arch_name}/seed={seed}"}
+
+    def progress_iter(bs):
+        state["n"] += 1
+        if state["n"] % 1000 == 0:
+            elapsed = _time.time() - state["t0"]
+            steps = state["n"]
+            rate = steps / elapsed if elapsed > 0 else 0
+            eta = (training_cfg.n_steps - steps) / rate if rate > 0 else 0
+            print(
+                f"  [TRAIN {state['label']}] step {steps}/{training_cfg.n_steps}  "
+                f"({rate:.1f} steps/sec; eta {eta/60:.1f} min)",
+                flush=True,
+            )
+            sys.stdout.flush()
+        return raw_iter(bs)
+
+    result = train_sae(model, progress_iter, training_cfg)
+    # tsae_paper initializes W_enc via ``W_dec.clone().T`` (line 156 of
+    # architectures/tsae.py), which leaves W_enc as a non-contiguous
+    # transposed view; safetensors.save_file rejects non-contiguous
+    # tensors. Force contiguity here so save_checkpoint can serialise.
+    # Reported in briefing — [pipeline] may want to land a permanent
+    # ``.contiguous()`` in tsae.py to fix it for every component.
+    sd = {k: v.contiguous() if not v.is_contiguous() else v
+          for k, v in result["state_dict"].items()}
+    # Persist train log to logs/c5_b1024_<arch>_seed<seed>_trainlog.json
+    # for post-cell convergence-check (decisions.md § 12 line 64-65: if
+    # final-1K-step loss drop > 5%, surface for cap bump). The runner's
+    # save_checkpoint doesn't carry the log; we save it ourselves.
+    try:
+        import json as _json
+        log_path = Path("logs") / f"c5_b1024_{arch_name}_seed{seed}_trainlog.json"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text(_json.dumps(result.get("log", {})))
+        log.info("[trainlog] saved %s", log_path)
+    except Exception as exc:                                  # noqa: BLE001
+        log.warning("[trainlog] persist failed: %s", exc)
+    return sd
+
+
+def _make_eval_fn(*, seed: int, workspace: Path, eval_key: str):
+    """Eval-fn closure: knows the seed + workspace + eval_key (run_cell
+    doesn't thread any of these through ``eval_cfg``) so
+    :class:`SteeringCaseStudy` can persist its jsonl artifacts to the
+    same ``run_dir(eval_key)`` the runner uses for ``metrics.json``,
+    and we can auto-push the workspace to HF for non-smoke cells.
+    """
+    def my_eval_fn(*, model, eval_cfg, component):  # noqa: ARG001
+        arch_name: str = eval_cfg["_arch_name"]
+        state_dict = eval_cfg["_state_dict"]
+        is_smoke = bool(eval_cfg.get("smoke"))
+
+        spec = load_arch(arch_name, component=component)
+        datasource = load_datasource(DATASOURCE)
+        d_in = int(getattr(datasource, "d_in", 2304))
+        arch = instantiate_arch(spec, d_in=d_in)
+        arch.load_state_dict(state_dict)
+        arch.cuda()
+        arch.eval()
+
+        cfg = SteeringConfig(
+            protocol=eval_cfg.get("protocol", "v7"),
+            strengths=tuple(eval_cfg.get("strengths", DEFAULT_STRENGTHS)),
+            coh_thresholds=tuple(eval_cfg.get("coh_thresholds", DEFAULT_COH_THRESHOLDS)),
+            n_concepts=int(eval_cfg.get("n_concepts", 30)),
+        )
+        cs = SteeringCaseStudy(workspace, cfg=cfg)
+        try:
+            cs.setup()
+            result = cs.evaluate(arch, seed=seed, arch_name=arch_name)
+        finally:
+            cs.teardown()
+            del arch
+            torch.cuda.empty_cache()
+
+        # Push the run dir to HF for non-smoke cells. The CaseStudy
+        # contract requires judge_outputs.jsonl to survive pod loss
+        # for post-deadline Cohen's κ validation. Smoke cells skip
+        # this — they're for pipeline validation, not paper data.
+        if not is_smoke and os.environ.get("TEMP_BENCH_POD_MODE") == "ephemeral":
+            try:
+                _push_run_dir_to_hf(workspace, eval_key)
+            except Exception as exc:                             # noqa: BLE001
+                # Log + continue — failing the cell because of HF push
+                # would discard a finished training+eval and the metrics
+                # are already in leaderboard.jsonl. Surface as a
+                # warning; can re-push manually post-hoc.
+                log.warning(
+                    "[hf-push] failed to push %s: %s", eval_key, exc,
+                )
+        return result.metrics, result.primary_metric
+
+    return my_eval_fn
+
+
+def _push_run_dir_to_hf(workspace: Path, eval_key: str) -> str:
+    """Upload the run dir to ``${TEMP_BENCH_HF_ORG}/temp-bench-data`` under
+    ``runs/<eval_key>/``. Only the small jsonl + json files are
+    relevant; .npy files (concept_activations) tag along.
+    """
+    import os as _os
+    from huggingface_hub import HfApi
+    from temp_bench.utils.tokens import require_token
+
+    _hf_org = _os.environ.get("TEMP_BENCH_HF_ORG")
+    if not _hf_org:
+        raise RuntimeError("TEMP_BENCH_HF_ORG env var must be set to push run dir")
+    repo_id = f"{_hf_org}/temp-bench-data"
+    api = HfApi(token=require_token("hf"))
+    api.upload_folder(
+        folder_path=str(workspace),
+        path_in_repo=f"runs/{eval_key}",
+        repo_id=repo_id,
+        repo_type="dataset",
+        commit_message=f"[pipeline] c5 run_dir eval_key={eval_key}",
+    )
+    url = f"https://huggingface.co/datasets/{repo_id}/tree/main/runs/{eval_key}"
+    log.info("[hf-push] uploaded run_dir → %s", url)
+    return url
+
+
+# ── Workspace helper ──────────────────────────────────────────────────
+
+
+def _workspace_for(
+    *, arch_name: str, seed: int, training_cfg: TrainingConfig, eval_cfg: dict[str, Any],
+) -> tuple[Path, str]:
+    """Compute the same eval_key the runner will, so we can pre-create
+    the workspace and pass it via eval_cfg without any cross-territory
+    runner edits. ``eval_cfg`` here must be the dict the runner will
+    hash — i.e., **without** the ``_*`` enrichments. Returns
+    ``(workspace_path, eval_key)``."""
+    arch_spec = load_arch(arch_name, component=COMPONENT)
+    datasource = load_datasource(DATASOURCE)
+    act_cache_key = compute_act_cache_key(datasource)
+    train_key = compute_train_key(
+        arch=arch_spec, seed=seed,
+        training_cfg=training_cfg, act_cache_key=act_cache_key,
+    )
+    eval_key = compute_eval_key(
+        train_key=train_key,
+        eval_protocol_version=EVAL_PROTOCOL_VERSION,
+        eval_cfg=eval_cfg,
+    )
+    workspace = run_dir(eval_key)
+    workspace.mkdir(parents=True, exist_ok=True)
+    return workspace, eval_key
+
+
+# ── Main loop ─────────────────────────────────────────────────────────
+
+
+def run_one_cell(
+    *,
+    arch_name: str,
+    seed: int,
+    protocol: str,
+    n_concepts: int,
+    strengths: tuple[float, ...],
+    coh_thresholds: tuple[float, ...],
+    n_steps: int | None,
+    smoke: bool,
+    force_train: bool,
+    force_eval: bool,
+    train_window_size: int | None = None,
+    batch_size: int | None = None,
+) -> None:
+    eval_cfg: dict[str, Any] = {
+        "protocol": protocol,
+        "n_concepts": n_concepts,
+        "strengths": list(strengths),
+        "coh_thresholds": list(coh_thresholds),
+    }
+    if smoke:
+        # Tagged so analysis.py can filter out smoke cells. Same
+        # convention as [pipeline]'s c3 smoke rows.
+        eval_cfg["smoke"] = True
+    training_cfg = _real_training_cfg()
+    if n_steps is not None:
+        # Override n_steps for smoke testing. Different n_steps → different
+        # train_key → fresh checkpoint, no clash with full-sweep cells.
+        training_cfg = training_cfg.model_copy(update={"n_steps": n_steps})
+    if train_window_size is not None:
+        # [pipeline] 2026-05-05 PM (decisions § 15): per-arch
+        # literature-faithful window size. [pipeline]'s C5 T-SAE
+        # baseline re-train passes train_window_size=2; existing TXC
+        # cells leave the default (None → full sequence). Different
+        # value → different train_key → fresh checkpoint.
+        training_cfg = training_cfg.model_copy(
+            update={"train_window_size": train_window_size},
+        )
+    if batch_size is not None:
+        # [pipeline] 2026-05-05 PM (decisions § 16): per-arch B override.
+        # TFA's wasteland-faithful training uses B=32 + full seq because
+        # its attention tensor is ~9.6 GB fp32 at d_sae=18432, B=1024.
+        # Different B → different train_key → fresh checkpoint.
+        training_cfg = training_cfg.model_copy(
+            update={"batch_size": batch_size},
+        )
+    workspace, eval_key = _workspace_for(
+        arch_name=arch_name, seed=seed,
+        training_cfg=training_cfg, eval_cfg=eval_cfg,
+    )
+    log.info(
+        "[cell] arch=%s seed=%d protocol=%s eval_key=%s",
+        arch_name, seed, protocol, eval_key[:16],
+    )
+    runner.run_cell(
+        component=COMPONENT,
+        arch_name=arch_name,
+        seed=seed,
+        datasource_name=DATASOURCE,
+        training_cfg=training_cfg,
+        eval_cfg=eval_cfg,                    # un-enriched; runner re-hashes this
+        eval_protocol_version=EVAL_PROTOCOL_VERSION,
+        train_fn=my_train_fn,
+        eval_fn=_make_eval_fn(seed=seed, workspace=workspace, eval_key=eval_key),
+        force_train=force_train,
+        force_eval=force_eval,
+    )
+
+
+def main(args: argparse.Namespace) -> None:
+    archs = tuple(args.archs) if args.archs else DEFAULT_ARCHS
+    seeds = tuple(args.seeds) if args.seeds else DEFAULT_SEEDS
+    strengths = tuple(args.strengths) if args.strengths else DEFAULT_STRENGTHS
+    coh_thresholds = (
+        tuple(args.coh_thresholds) if args.coh_thresholds else DEFAULT_COH_THRESHOLDS
+    )
+
+    # --n-steps is a paper-deviation knob (e.g., budget-fit). Cells run
+    # with reduced steps are still real evals that should land in
+    # analysis aggregates with a deviation note. Only --smoke explicit
+    # tags smoke=true.
+    smoke = args.smoke
+    if args.pre_test_only:
+        # Fast V7 health-check: 5 concepts × 1 strength on TXC-pro seed=42.
+        protocol = "v7"
+        run_one_cell(
+            arch_name="txc_pro",
+            seed=42,
+            protocol=protocol,
+            n_concepts=5,
+            strengths=(strengths[len(strengths) // 2],),
+            coh_thresholds=coh_thresholds,
+            n_steps=args.n_steps,
+            smoke=True,                                       # pre-test ≠ paper cell
+            force_train=args.force_train,
+            force_eval=args.force_eval,
+        )
+        return
+
+    for arch in archs:
+        for seed in seeds:
+            run_one_cell(
+                arch_name=arch,
+                seed=seed,
+                protocol=args.protocol,
+                n_concepts=args.n_concepts,
+                strengths=strengths,
+                coh_thresholds=coh_thresholds,
+                n_steps=args.n_steps,
+                smoke=smoke,
+                force_train=args.force_train,
+                force_eval=args.force_eval,
+            )
+
+
+def cli() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--archs", nargs="*", default=None,
+                    help=f"Default: {' '.join(DEFAULT_ARCHS)}")
+    ap.add_argument("--seeds", type=int, nargs="*", default=None,
+                    help=f"Default: {DEFAULT_SEEDS}")
+    ap.add_argument("--protocol", choices=("v7", "pp"), default="v7")
+    ap.add_argument("--n-concepts", type=int, default=30)
+    ap.add_argument("--strengths", type=float, nargs="*", default=None,
+                    help="Latent-space clamp values; default = paper § B.2 grid")
+    ap.add_argument("--coh-thresholds", type=float, nargs="*", default=None)
+    ap.add_argument("--pre-test-only", action="store_true",
+                    help="Health-check V7 on TXC-pro (5 concepts × 1 strength)")
+    ap.add_argument("--n-steps", type=int, default=None,
+                    help="Override TrainingConfig.n_steps (default 30k); use a "
+                         "small value (e.g. 500) for fast smoke tests. "
+                         "Implies --smoke.")
+    ap.add_argument("--smoke", action="store_true",
+                    help="Tag this cell's leaderboard row with smoke=true so "
+                         "analysis.py filters it out of paper aggregates.")
+    ap.add_argument("--force-train", action="store_true")
+    ap.add_argument("--force-eval", action="store_true")
+    args = ap.parse_args()
+    main(args)
+
+
+if __name__ == "__main__":
+    cli()

@@ -1,0 +1,15 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "S": 32,
+      "_act_cache_key": "e4916bcae1881963",
+      "k_feat": 5,
+      "smoke": true
+    }
+  },
+  "metrics": {
+    "acc": 0.525,
+    "auc": 0.5065996228786926
+  },
+  "ts": "2026-05-03T21:50:17Z"
+}

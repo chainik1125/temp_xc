@@ -1,0 +1,26 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "arch_T": 5,
+      "max_new_tokens": 200,
+      "n_alpha_grid": 27,
+      "n_final": 3,
+      "n_survivors": 20,
+      "screen_top_n": 100,
+      "wang_full": true
+    }
+  },
+  "metrics": {
+    "n_finalists": 3.0,
+    "n_screened": 100.0,
+    "n_survivors": 20.0,
+    "peak_align": 72.640625,
+    "peak_alpha": -100.0,
+    "peak_coh": 70.25,
+    "peak_feature_id": 31740.0,
+    "stage2_sec": 1930.5251035690308,
+    "stage3_sec": 2302.4552125930786,
+    "stage4_sec": 1259.716563463211
+  },
+  "ts": "2026-05-05T13:03:47Z"
+}

@@ -1,0 +1,48 @@
+{
+  "per_strength": [
+    {
+      "strength": 0.0,
+      "n_traces": 20,
+      "n_sentences_total": 1404,
+      "n_keyword_pos": 124,
+      "n_llm_pos": 137,
+      "n_both_pos": 45,
+      "precision": 0.3629032258064516,
+      "recall": 0.3284671532846715,
+      "f1": 0.3448275862068965
+    },
+    {
+      "strength": 4.0,
+      "n_traces": 20,
+      "n_sentences_total": 1398,
+      "n_keyword_pos": 165,
+      "n_llm_pos": 104,
+      "n_both_pos": 44,
+      "precision": 0.26666666666666666,
+      "recall": 0.4230769230769231,
+      "f1": 0.3271375464684015
+    },
+    {
+      "strength": 8.0,
+      "n_traces": 20,
+      "n_sentences_total": 1397,
+      "n_keyword_pos": 281,
+      "n_llm_pos": 317,
+      "n_both_pos": 128,
+      "precision": 0.4555160142348754,
+      "recall": 0.4037854889589905,
+      "f1": 0.4280936454849498
+    },
+    {
+      "strength": 12.0,
+      "n_traces": 20,
+      "n_sentences_total": 1587,
+      "n_keyword_pos": 504,
+      "n_llm_pos": 756,
+      "n_both_pos": 370,
+      "precision": 0.7341269841269841,
+      "recall": 0.4894179894179894,
+      "f1": 0.5873015873015873
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "coh_thresholds": [
+        1.5,
+        1.75,
+        2.0,
+        2.25,
+        2.5
+      ],
+      "n_concepts": 5,
+      "protocol": "v7",
+      "smoke": true,
+      "strengths": [
+        100.0,
+        1000.0
+      ]
+    }
+  },
+  "metrics": {
+    "mean_coh": 2.0999999046325684,
+    "mean_success": 0.20000000298023224,
+    "n_total": 10.0,
+    "n_valid": 10.0,
+    "peak_success_grade_at_coh_1.5": 0.0,
+    "peak_success_grade_at_coh_1.75": 0.0,
+    "peak_success_grade_at_coh_2": 0.0,
+    "peak_success_grade_at_coh_2.25": 0.0,
+    "peak_success_grade_at_coh_2.5": 0.0,
+    "success_at_coh_1.5": 0.0,
+    "success_at_coh_1.75": 0.0,
+    "success_at_coh_2": 0.0,
+    "success_at_coh_2.25": 0.0,
+    "success_at_coh_2.5": 0.0
+  },
+  "ts": "2026-05-05T10:56:47Z"
+}

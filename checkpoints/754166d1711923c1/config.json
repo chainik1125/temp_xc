@@ -1,0 +1,27 @@
+{
+  "act_cache_key": "e052801ef8e6d22b",
+  "arch": "txc_base",
+  "arch_version": "1.0.0",
+  "datasource": "qwen_2_5_14b_instruct_finance_l24_resid_post",
+  "saved_ts": "2026-05-04T17:12:01Z",
+  "seed": 42,
+  "train_key": "754166d1711923c1",
+  "training_cfg": {
+    "batch_size": 1024,
+    "bricken_enabled": true,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 128000,
+    "ema_auxk_alpha": 0.125,
+    "learning_rate": 0.0003,
+    "n_steps": 25000,
+    "optimizer": "adam",
+    "plateau_early_stop": false,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "warmup_steps": 1000
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "metrics": {
+    "n_sent": 270.0,
+    "positive_rate": 0.09259259259259259,
+    "pr_auc_S1": 0.35315105529391244,
+    "pr_auc_S16": 0.5076899244546305,
+    "pr_auc_S2": 0.39591965261138196,
+    "pr_auc_S32": 0.43195954414154325,
+    "pr_auc_S4": 0.44135977901655393,
+    "pr_auc_S8": 0.47980902382218166,
+    "pr_auc_shuffled_S1": 0.35315105529391244,
+    "pr_auc_shuffled_S16": 0.5076899244546305,
+    "pr_auc_shuffled_S2": 0.39591965261138196,
+    "pr_auc_shuffled_S32": 0.43195954414154325,
+    "pr_auc_shuffled_S4": 0.44135977901655393,
+    "pr_auc_shuffled_S8": 0.47980902382218166,
+    "shuffle_gap_S1": 0.0,
+    "shuffle_gap_S16": 0.0,
+    "shuffle_gap_S2": 0.0,
+    "shuffle_gap_S32": 0.0,
+    "shuffle_gap_S4": 0.0,
+    "shuffle_gap_S8": 0.0
+  },
+  "ts": "2026-05-05T21:16:33Z"
+}

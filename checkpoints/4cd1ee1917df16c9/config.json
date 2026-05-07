@@ -1,0 +1,32 @@
+{
+  "act_cache_key": "5829ff678d9e6f53",
+  "arch": "topk_sae",
+  "arch_version": "1.0.0",
+  "datasource": "toy_coupled_K10_M20_d256_seq32_kestrel",
+  "saved_ts": "2026-05-07T04:36:26Z",
+  "seed": 1,
+  "train_key": "4cd1ee1917df16c9",
+  "training_cfg": {
+    "arch_hparams_override": {
+      "d_sae": 40,
+      "k_pos": 3
+    },
+    "batch_size": 1024,
+    "bricken_enabled": false,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 10000000,
+    "ema_auxk_alpha": 0.03125,
+    "learning_rate": 0.0003,
+    "n_steps": 8000,
+    "optimizer": "adam",
+    "plateau_early_stop": false,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "train_window_size": null,
+    "warmup_steps": 1000
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "encode_shape": [
+    117875,
+    32768
+  ],
+  "pr_auc": {
+    "1": 0.28623983470053355,
+    "2": 0.29728271977288134,
+    "4": 0.3115651510725747,
+    "8": 0.2758733043058359,
+    "16": 0.29554552977011045,
+    "32": 0.31661157501043535
+  },
+  "pr_auc_shuffled": null,
+  "shuffle_gap": null,
+  "meta": {
+    "component": "c6",
+    "arch": "sae_arditi",
+    "seed": 42,
+    "datasource": "qwen_2_5_14b_instruct_finance_l24_resid_post",
+    "n_rollouts": 1727
+  }
+}

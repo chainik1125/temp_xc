@@ -1,0 +1,23 @@
+{
+  "encode_shape": [
+    107186,
+    32768
+  ],
+  "pr_auc": {
+    "1": 0.6643244632078696,
+    "2": 0.6880097334085248,
+    "4": 0.7108360641551309,
+    "8": 0.7255923322271877,
+    "16": 0.7453259263569753,
+    "32": 0.7568487686917283
+  },
+  "pr_auc_shuffled": null,
+  "shuffle_gap": null,
+  "meta": {
+    "component": "c6",
+    "arch": "sae_arditi",
+    "seed": 1,
+    "datasource": "qwen_2_5_7b_instruct_medical_l15_resid_post",
+    "n_rollouts": 1709
+  }
+}
