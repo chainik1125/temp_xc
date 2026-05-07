@@ -3,129 +3,55 @@
 \section{Model Parameters for each architecture}
 \label{app:model-params}
 
-This appendix specifies every architecture and training-time choice that
-is held \emph{constant across components}. The two free per-component
-knobs are the dictionary width $d_{\mathrm{SAE}}$ (one value per subject
-model, sized to the residual-stream dimension; toy data uses
-$d_{\mathrm{SAE}}=40$) and the sparsity budget $k_{\mathrm{pos}}$ (the
-expected number of active latents per sequence position, swept per
-component). Everything else is locked in
-\texttt{configs/locked\_archs.yaml} and
-\texttt{configs/datasources.yaml} of the released codebase. Per-component
-hyperparameter tables — datasource, $d_{\mathrm{SAE}}$, $n_{\mathrm{steps}}$,
-$\{k_{\mathrm{pos}}\}$ sweep grid, seed list — are given in the
-component-specific appendices below.
+This appendix specifies architecture and training choices held fixed across components. The only per-component free knobs are dictionary width $d_{\mathrm{SAE}}$ and sparsity budget $k_{\mathrm{pos}}$, the expected number of active latents per sequence position. Toy data uses $d_{\mathrm{SAE}}=40$; real-model widths are set by subject-model dimension. All locked choices are in \texttt{configs/locked\_archs.yaml} and \texttt{configs/datasources.yaml}. Component-specific datasource, width, step count, $k_{\mathrm{pos}}$ grid, and seed tables appear in the component appendices.
 
 \paragraph{Common training pipeline.}
-All cells share a single trainer. The optimiser is Adam with
-$\mathrm{lr}=3{\times}10^{-4}$, batch size $B=1024$, linear warmup over
-the first $1{,}000$ steps, and \texttt{bf16} mixed precision on
-H100/H200 (\texttt{fp16} with grad-scaler on A40). Toy-data cells run
-$n_{\mathrm{steps}}\in\{8{,}000,\,30{,}000\}$ depending on component;
-real-LM cells run $n_{\mathrm{steps}}\in\{10{,}000,\,20{,}000\}$. Cells
-with $n_{\mathrm{steps}}<1000$ are filtered out as smoke runs. Across
-the seven components the paper draws on $\approx 5{,}700$ trained
-checkpoints and $\approx 6{,}200$ leaderboard eval rows; per-component
-counts and the full $(\text{arch},\text{datasource},\text{seeds})$
-breakdown are tabulated in the component appendices.
-Subject-model activations are cached once per datasource and re-read
-by every architecture (matched cache, matched hookpoint), and sparsity
-is matched at the per-position budget
-$k_{\mathrm{pos}}$: per-token dictionaries use $k_{\mathrm{pos}}$ active
-latents at each token, while a windowed architecture of length $T$
-receives the matched window budget $k_{\mathrm{win}} = T \cdot k_{\mathrm{pos}}$
-(and TXC-pro's matryoshka groups receive
-$k_{\mathrm{train}}=5\cdot k_{\mathrm{pos}}$,
-$k_{\mathrm{inference}}=10\cdot k_{\mathrm{pos}}$).
+All cells use the same trainer: Adam with $\mathrm{lr}=3{\times}10^{-4}$, batch size $B=1024$, $1{,}000$ warmup steps, and mixed precision, using \texttt{bf16} on H100/H200 and \texttt{fp16} with grad-scaler on A40. Toy-data cells run $n_{\mathrm{steps}}\in\{8{,}000,30{,}000\}$; real-LM cells run $n_{\mathrm{steps}}\in\{10{,}000,20{,}000\}$. Runs with $n_{\mathrm{steps}}<1000$ are discarded as smoke runs. Across the seven components, the paper uses $\approx5{,}700$ trained checkpoints and $\approx6{,}200$ leaderboard eval rows. Per-component counts and the full $(\text{arch},\text{datasource},\text{seeds})$ breakdown are given below. Subject-model activations are cached once per datasource and reused by all architectures at matched hookpoint. Sparsity is matched by $k_{\mathrm{pos}}$: per-token dictionaries use $k_{\mathrm{pos}}$ active latents per token, while a windowed architecture of length $T$ uses
+\[
+    k_{\mathrm{win}}=T k_{\mathrm{pos}}.
+\]
+For TXC-pro, matryoshka groups use
+\[
+    k_{\mathrm{train}}=5k_{\mathrm{pos}},
+    \qquad
+    k_{\mathrm{inference}}=10k_{\mathrm{pos}}.
+\]
 
-\paragraph{Anti-dead stack (used by every TopK-family architecture).}
-The TopK SAE, T-SAE, TXC-base, and TXC-pro share the same five-component
-anti-dead stack: (i) a per-feature \texttt{num\_tokens\_since\_fired}
-counter and a $10$M-token dead threshold; (ii) AuxK loss with
-$\alpha_{\mathrm{auxk}}=1/32$, where the top-$\!\mathrm{aux\_k}$ dead
-features re-reconstruct the residual; (iii) decoder unit-norm constraint
-applied per-latent over $(T,d_{\mathrm{in}})$; (iv) decoder-parallel
-gradient removal on $W_{\mathrm{dec}}$; (v) geometric-median
-$b_{\mathrm{dec}}$ initialisation on the first batch. This is the
-\citet{bhalla2025temporal} anti-dead recipe, ported verbatim into the
-TXC family. Bricken-style hard resampling \citep{templeton2023scaling}
-is \emph{off} by default (locked spec) and opted into only by C6, where
-it tracks Dmitry et al.'s published Qwen-7B medical recipe; see
-\cref{app:c6}.
+\paragraph{Anti-dead stack.}
+TopK SAE, T-SAE, TXC-base, and TXC-pro share the same anti-dead stack: (i) per-feature \texttt{num\_tokens\_since\_fired} counters with a $10$M-token dead threshold; (ii) AuxK loss with $\alpha_{\mathrm{auxk}}=1/32$, where the top-$\mathrm{aux\_k}$ dead features re-reconstruct the residual; (iii) decoder unit-norm constraint per latent over $(T,d_{\mathrm{in}})$; (iv) decoder-parallel gradient removal on $W_{\mathrm{dec}}$; and (v) geometric-median $b_{\mathrm{dec}}$ initialization on the first batch. This ports the \citet{bhalla2025temporal} anti-dead recipe into the TXC family. Bricken-style hard resampling \citep{templeton2023scaling} is off by default and used only in C6 to match Dmitry et al.'s Qwen-7B medical setup; see \cref{app:c6}.
 
 \paragraph{TXC-base.}
-The vanilla acausal temporal crosscoder of \cref{sec:txc} with TopK
-sparsity and the full anti-dead stack. The locked window length is
-$T=5$, with per-position encoder weights
-$W_{\mathrm{enc}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}\times d_{\mathrm{SAE}}}$
-($\tau\in[0,T)$) summing into one shared latent vector
-$\mathbf{u}_t\in\mathbb{R}^{d_{\mathrm{SAE}}}$ per window, BatchTopK
-sparsity at $k_{\mathrm{win}}=k_{\mathrm{pos}}\cdot T$ over the latent
-axis, and per-position decoders
-$W_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{SAE}}\times d_{\mathrm{in}}}$
-with bias $b_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}}$
-that reconstruct the full $T$-window. No matryoshka, no contrastive
-loss, no Bricken. Free per-component knobs: $k_{\mathrm{pos}}$ and
-$d_{\mathrm{SAE}}$. C3 additionally trains TXC-base at
-$T\in\{10,20\}$ as a within-architecture probe of temporal-context
-length (\cref{app:c3-archs}).
+TXC-base is the acausal temporal crosscoder from \cref{sec:txc} with TopK sparsity and the full anti-dead stack. The locked window length is $T=5$. For each $\tau\in[0,T)$, encoder slabs
+\[
+    W_{\mathrm{enc}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}\times d_{\mathrm{SAE}}}
+\]
+sum into one shared latent vector $\mathbf u_t\in\mathbb{R}^{d_{\mathrm{SAE}}}$ per window. BatchTopK is applied over the latent axis with $k_{\mathrm{win}}=T k_{\mathrm{pos}}$. Decoder slabs
+\[
+    W_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{SAE}}\times d_{\mathrm{in}}},
+    \qquad
+    b_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}},
+\]
+reconstruct the full $T$-window. TXC-base uses no matryoshka objective, no contrastive loss, and no Bricken resampling. The free knobs are $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$. C3 also trains TXC-base at $T\in\{10,20\}$ to probe temporal-context length; see \cref{app:c3-archs}.
 
 \paragraph{TXC-pro.}
-TXC-base extended with three orthogonal design choices. (1) \emph{Subseq
-encoder}: train with $T_{\max}=10$ position slabs but sample
-$t_{\mathrm{sample}}=5$ positions per training step, so the encoder
-becomes position-permutation-invariant while the per-position decoders
-remain. At evaluation time, all $10$ positions are used. (2)
-\emph{Matryoshka with $H=8$}: $8$ nested feature groups, each trained
-to reconstruct independently from the first
-$G\cdot d_{\mathrm{SAE}}/8$ features ($G=1,\ldots,8$), encouraging a
-coarse-to-fine feature hierarchy. (3) \emph{Multi-distance contrastive
-loss}: inverse-distance-weighted InfoNCE with shifts
-$\Delta\in\{1,2\}$ that pulls the latent at position $t$ toward latents
-at positions $t\pm\Delta$. The matryoshka head is disabled at toy scale
-(C1, C2 use $h_{\mathrm{size}}=d_{\mathrm{SAE}}=40$) because $5$
-prefix levels of $8$ features do not admit a meaningful hierarchy and
-the smallest prefix would fall below $k_{\mathrm{train}}=5\cdot k_{\mathrm{pos}}$
-at high $k_{\mathrm{pos}}$. Free per-component knobs: $k_{\mathrm{pos}}$
-and $d_{\mathrm{SAE}}$.
+TXC-pro adds three choices to TXC-base. First, the subseq encoder trains with $T_{\max}=10$ position slabs while sampling $t_{\mathrm{sample}}=5$ positions per step; all $10$ positions are used at evaluation. Second, Matryoshka training uses $H=8$ nested feature groups, each reconstructing from the first
+\[
+    G d_{\mathrm{SAE}}/8,
+    \qquad
+    G=1,\ldots,8
+\]
+features. Third, a multi-distance contrastive loss applies inverse-distance-weighted InfoNCE at shifts $\Delta\in\{1,2\}$. The matryoshka head is disabled at toy scale in C1 and C2 by setting $h_{\mathrm{size}}=d_{\mathrm{SAE}}=40$, since $5$ prefix levels of $8$ features do not form a useful hierarchy and the smallest prefix would fall below $k_{\mathrm{train}}=5k_{\mathrm{pos}}$ at high $k_{\mathrm{pos}}$. The free knobs are again $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$.
 
 \paragraph{Baselines.}
-\textbf{TopK SAE} \citep{gao2024scaling}: per-token dictionary with
-TopK at $k_{\mathrm{pos}}$ and the anti-dead stack. \textbf{Stacked SAE}
-(used in C1, C2, C7): $T$ independent TopK SAEs, one per position in a
-$T$-window, with $k_{\mathrm{win}}=T\cdot k_{\mathrm{pos}}$ window-level
-budget; this is the per-token analogue of the temporal architectures
-and isolates whether the gains attributed to TXC come from temporal
-\emph{aggregation} or from cross-position \emph{weight sharing}.
-\textbf{T-SAE} \citep{bhalla2025temporal}: faithful port of the Ye et
-al.\ 2025 reference implementation (Matryoshka BatchTopK with
-$h_{\mathrm{frac}}=0.20$ high-level features, AuxK loss, geometric-median
-$b_{\mathrm{dec}}$ initialisation, decoder unit-norm projection, raw-dot
-temporal contrastive at $\alpha=1.0$, threshold-based inference); the
-locked $d_{\mathrm{SAE}}=16{,}384$ matches the original paper's Gemma-2-2b
-configuration. \textbf{TFA} \citep{lubana2025priors}: temporal feature
-analyzer with $4$ attention heads; we use the no-position-embedding
-variant by default (TFA) and report the positional variant (TFA-pos)
-where comparing on synthetic data. \textbf{MLC}
-\citep{lindsey2024sparsecrosscoders}: $5$-layer multi-layer crosscoder
-sharing weights across the residual-stream layer axis (centred at the
-component's hookpoint layer; $L=11{-}15$ for Gemma-2-2b-IT C3, $L=8{-}12$
-for Llama-3.1-8B C7), included as a non-temporal cross-axis baseline to
-isolate whether TXC's gains are specific to the temporal axis or generic
-to crosscoder-style sharing. \textbf{SAE-arditi}: $d_{\mathrm{SAE}}=32{,}768$,
-$k_{\mathrm{pos}}=128$ — used as the C6 baseline only, to match Dmitry
-et al.'s published Qwen-medical setup (\cref{app:c6}).
+\textbf{TopK SAE} \citep{gao2024scaling} is a per-token dictionary with TopK at $k_{\mathrm{pos}}$ and the anti-dead stack. \textbf{Stacked SAE}, used in C1, C2, and C7, is a bank of $T$ independent TopK SAEs, one per position in a $T$-window, with total window budget $k_{\mathrm{win}}=T k_{\mathrm{pos}}$. It isolates temporal aggregation from cross-position weight sharing. \textbf{T-SAE} \citep{bhalla2025temporal} is a faithful port of the Ye et al.\ 2025 implementation: Matryoshka BatchTopK with $h_{\mathrm{frac}}=0.20$ high-level features, AuxK loss, geometric-median $b_{\mathrm{dec}}$ initialization, decoder unit-norm projection, raw-dot temporal contrastive loss at $\alpha=1.0$, and threshold-based inference. Its locked $d_{\mathrm{SAE}}=16{,}384$ matches the original Gemma-2-2B setting. \textbf{TFA} \citep{lubana2025priors} is the temporal feature analyzer with $4$ attention heads; the no-position-embedding variant is the default, and TFA-pos is reported on synthetic data. \textbf{MLC} \citep{lindsey2024sparsecrosscoders} is a $5$-layer multi-layer crosscoder over the residual-stream layer axis, centered at the component hookpoint. It uses layers $11$--$15$ for Gemma-2-2B-IT C3 and layers $8$--$12$ for Llama-3.1-8B C7. \textbf{SAE-arditi} is used only as the C6 baseline to match Dmitry et al.'s Qwen-medical setup, with $d_{\mathrm{SAE}}=32{,}768$ and $k_{\mathrm{pos}}=128$; see \cref{app:c6}.
 
-\paragraph{Locked vs.\ free across the paper.}
-The locked TXC-base and TXC-pro definitions above are the only
-architectural commitment: the same two TXC dictionaries are used across
-all seven components, with only $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$
-tuned per component. No per-component hill-climbing of architecture
-hyperparameters (e.g.\ $T$, matryoshka group count, contrastive shifts,
-AuxK weight, dead-threshold) is permitted. A component may opt into
-training-time augmentations only if the choice is documented in the
-per-component appendix and the experiment justifies it; the only such
-opt-in in this paper is Bricken resampling for C6.
+\paragraph{Locked versus free choices.}
+The locked TXC-base and TXC-pro definitions above are the only architectural commitments. Across all seven components, only $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$ vary by component. We do not hill-climb architecture hyperparameters such as $T$, matryoshka group count, contrastive shifts, AuxK weight, or dead threshold. Training-time augmentations are allowed only when documented in the component appendix; the only such opt-in is Bricken resampling for C6.
+
+% \section{Other evals}
+
+% \section{Other synthetic evals}
+% Maybe the which-component eval will go here?
 
 \section{Synthetic Benchmarks: Ground-Truth Correspondences and Probe Setup}
 \label{app:synthetic-probes}
@@ -182,7 +108,7 @@ Sparse probing measures whether a dictionary exposes features useful for simple 
 \subsection{Architectures and training configuration}
 \label{app:c3-archs}
 
-Six base architectures, each trained on the same Gemma-2-2B-IT layer-$13$ residual-stream activation cache (FineWeb $24$K sequences $\times\,128$ tokens, fp$16$): a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae}, the temporal feature analyzer (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) on layers $11$--$15$ \cite{lindsey2024sparsecrosscoders}, TXC-base ($T = 5$, $k_{\mathrm{pos}} = 20$), and TXC-pro ($T_{\max} = 10$, $t_{\mathrm{sample}} = 5$, $k_{\mathrm{pos}} = 20$, eight Matryoshka groups, contrastive shifts $\Delta \in \{1, 2\}$). All cells train for $n_{\mathrm{steps}} = 20{,}000$ at $d_{\mathrm{SAE}} = 18{,}432$. The matched-sparsity invariant fixes the expected per-token $L_0$ at $20$ across architectures; each arch's internal TopK budget scales with the unit it operates on (TopK SAE: $k_{\mathrm{win}} = 20$; T-SAE BatchTopK: $20\cdot B \cdot T$; TXC-base ($T$): $k_{\mathrm{win}} = 20\cdot T$; TXC-pro: $k_{\mathrm{train}} = 100$, $k_{\mathrm{inference}} = 200$; MLC ($L = 5$): $k_{\mathrm{win}} = 100$; TFA: $20\cdot T_{\mathrm{tfa}}$). Within-component fairness is enforced by this matched-sparsity convention rather than by uniform per-step token throughput. We additionally train TXC-base at $T \in \{10, 20\}$ as a within-arch probe of temporal-context length.
+Six base architectures, each trained on the same \texttt{Gemma-2-2B-IT} layer-$13$ residual-stream activation cache (FineWeb $24$K sequences $\times\,128$ tokens, fp$16$): a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae}, the temporal feature analyzer (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) on layers $11$--$15$ \cite{lindsey2024sparsecrosscoders}, TXC-base ($T = 5$, $k_{\mathrm{pos}} = 20$), and TXC-pro ($T_{\max} = 10$, $t_{\mathrm{sample}} = 5$, $k_{\mathrm{pos}} = 20$, eight Matryoshka groups, contrastive shifts $\Delta \in \{1, 2\}$). All cells train for $n_{\mathrm{steps}} = 20{,}000$ at $d_{\mathrm{SAE}} = 18{,}432$. The matched-sparsity invariant fixes the expected per-token $L_0$ at $20$ across architectures; each arch's internal TopK budget scales with the unit it operates on (TopK SAE: $k_{\mathrm{win}} = 20$; T-SAE BatchTopK: $20\cdot B \cdot T$; TXC-base ($T$): $k_{\mathrm{win}} = 20\cdot T$; TXC-pro: $k_{\mathrm{train}} = 100$, $k_{\mathrm{inference}} = 200$; MLC ($L = 5$): $k_{\mathrm{win}} = 100$; TFA: $20\cdot T_{\mathrm{tfa}}$). Within-component fairness is enforced by this matched-sparsity convention rather than by uniform per-step token throughput. We additionally train TXC-base at $T \in \{10, 20\}$ as a within-arch probe of temporal-context length.
 
 \subsection{Probing protocol}
 \label{app:c3-protocol}
@@ -247,7 +173,7 @@ where $\{k_i\}_{i=0}^{n-1} = \{5, 10, 20, 40, 80, 160, 320, 640\}$. The grid is 
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.6\linewidth]{figs/c3_sparse_probing_full_gemma_it.pdf}
-    \caption{Full mean SAEBench AUC vs $k_{\mathrm{feats}}$ on Gemma-2-2B-IT for every architecture, including TFA. Lines are mean over $3$ seeds; shaded band is $\pm 1\,\sigma$ across seeds. The temporal family + TopK SAE cluster sits at the top (saturating near $k_{\mathrm{feats}} = 160$ at AUC $\approx 0.90$--$0.92$); TFA underperforms by $0.05$--$0.18$ AUC across the sweep and is still climbing at the largest $k_{\mathrm{feats}}$ tested.}
+    \caption{Full mean SAEBench AUC vs $k_{\mathrm{feats}}$ on \texttt{Gemma-2-2B-IT} for every architecture, including TFA. Lines are mean over $3$ seeds; shaded band is $\pm 1\,\sigma$ across seeds. The temporal family + TopK SAE cluster sits at the top (saturating near $k_{\mathrm{feats}} = 160$ at AUC $\approx 0.90$--$0.92$); TFA underperforms by $0.05$--$0.18$ AUC across the sweep and is still climbing at the largest $k_{\mathrm{feats}}$ tested.}
     \label{fig:sparse_probing_full}
 \end{figure}
 
@@ -257,13 +183,13 @@ where $\{k_i\}_{i=0}^{n-1} = \{5, 10, 20, 40, 80, 160, 320, 640\}$. The grid is 
 \begin{itemize}
     \item \textbf{Cross-token tasks.} \texttt{winogrande\_correct\_completion} and \texttt{wsc\_coreference} require resolving a referent that lives many tokens from the variant word; a per-token mean-pool encoder cannot represent the relevant contrast, and every locked-arch cell scored $0.40$--$0.50$ AUC on them irrespective of architecture (\cref{fig:c3-per-task-heatmap}). Including them shifts every $\overline{\mathrm{AUC}}$ down by $\sim\!0.027$ uniformly with no rank flips except TFA, which is already low.
     \item \textbf{TFA at paper-faithful $B=32$.} TFA's $\overline{\mathrm{AUC}} = 0.764$ underperforms the locked set by $0.07$--$0.18$ AUC across the sweep; we attribute this to the small batch size required by the $(B, T, d_{\mathrm{SAE}})$-sized attention tensor at $d_{\mathrm{SAE}} = 18{,}432$. A fairer comparison at $B = 1024$ would require re-architecting the attention head and is left for follow-up.
-    \item \textbf{Single subject model.} The headline is on Gemma-2-2B-IT only; replication on the BASE side and on a different subject model is left for follow-up.
+    \item \textbf{Single subject model.} The headline is on \texttt{Gemma-2-2B-IT} only; replication on the BASE side and on a different subject model is left for follow-up.
 \end{itemize}
 
 \section{Emergent Misalignment Case Study: Full Steering Grid}
 \label{app:c6}
 
-The two summary subfigures in \cref{fig:emergent_misalignment} collapse, for each architecture, the full Wang stage-4 $\alpha$ frontier into a single coherence-floored alignment dynamic range (\cref{fig:c6-em-alignment-delta}) and a single sparse-probe PR-AUC (\cref{fig:c6-em-detection-prauc}). \Cref{fig:c6-em-pareto-frontier} replots the same data as a coherence/alignment Pareto scatter (one curve per $(\text{architecture}, \text{seed})$, each curve following the top stage-4 finalist's full $\alpha$ frontier), making the dynamic range visible as the vertical extent of points to the right of the $\text{coh} = 70$ threshold. \Cref{fig:c6-em-steering-grid} shows the same data in unaggregated form: each panel is one $(\text{architecture}, \text{seed})$ cell on Qwen-2.5-7B-Instruct + bad-medical LoRA, with the mean alignment of all three Wang stage-4 finalists plotted against $\alpha$, the top-finalist mean coherence overlaid as a dashed line, and the $\alpha\!=\!0$ unsteered baseline marked in green. The shaded green band marks the $\mathrm{coh}\geq70$ region; red and blue triangles mark the extrema used in \cref{eq:delta-align}. The dense per-finalist $\alpha$ grid combines Han's canonical 27-point Wang stage-4 grid (densely sampled in $|\alpha| \in [1, 10]$ with $\alpha = \pm 100$ at the tails) with the extended $|\alpha| \in \{110, 120, 130, 140, 150, 200\}$ sweep run on the top finalist of each cell. The dense extension is what reveals coherence-preserving alignment peaks at $|\alpha| > 10$ that Han's canonical grid missed (e.g.\ SAE-arditi seed~$1$, top finalist \texttt{feat 1119}, peaks at $\alpha = +40$ with align~$77.4$, coh~$> 70$). All judge transcripts (per-rollout completions and Anthropic Claude Haiku 4.5 align/coh scores) are persisted in \texttt{judge\_outputs.jsonl} (canonical) and \texttt{judge\_outputs\_extended.jsonl} (extension) for post-deadline $\kappa$ validation.
+The two summary subfigures in \cref{fig:emergent_misalignment} collapse, for each architecture, the full Wang stage-4 $\alpha$ frontier into a single coherence-floored alignment dynamic range (\cref{fig:c6-em-alignment-delta}) and a single sparse-probe PR-AUC (\cref{fig:c6-em-detection-prauc}). \Cref{fig:c6-em-pareto-frontier} replots the same data as a coherence/alignment Pareto scatter (one curve per $(\text{architecture}, \text{seed})$, each curve following the top stage-4 finalist's full $\alpha$ frontier), making the dynamic range visible as the vertical extent of points to the right of the $\text{coh} = 70$ threshold. \Cref{fig:c6-em-steering-grid} shows the same data in unaggregated form: each panel is one $(\text{architecture}, \text{seed})$ cell on \texttt{Qwen-2.5-7B-Instruct} + bad-medical LoRA, with the mean alignment of all three Wang stage-4 finalists plotted against $\alpha$, the top-finalist mean coherence overlaid as a dashed line, and the $\alpha\!=\!0$ unsteered baseline marked in green. The shaded green band marks the $\mathrm{coh}\geq70$ region; red and blue triangles mark the extrema used in \cref{eq:delta-align}. The dense per-finalist $\alpha$ grid combines Han's canonical 27-point Wang stage-4 grid (densely sampled in $|\alpha| \in [1, 10]$ with $\alpha = \pm 100$ at the tails) with the extended $|\alpha| \in \{110, 120, 130, 140, 150, 200\}$ sweep run on the top finalist of each cell. The dense extension is what reveals coherence-preserving alignment peaks at $|\alpha| > 10$ that Han's canonical grid missed (e.g.\ SAE-arditi seed~$1$, top finalist \texttt{feat 1119}, peaks at $\alpha = +40$ with align~$77.4$, coh~$> 70$). All judge transcripts (per-rollout completions and Anthropic Claude Haiku 4.5 align/coh scores) are persisted in \texttt{judge\_outputs.jsonl} (canonical) and \texttt{judge\_outputs\_extended.jsonl} (extension) for post-deadline $\kappa$ validation.
 
 \paragraph{Alignment dynamic range.}
 For each architecture/seed cell $c$, let $\mathcal A_c$ be the set of steering
@@ -284,14 +210,14 @@ This is the statistic plotted in \cref{fig:c6-em-alignment-delta}.
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.75\textwidth]{figs/c6_em_pareto_frontier_7bmed.pdf}
-    \caption{Coherence/alignment Pareto frontier for the Qwen-7B medical-misalignment cells. Each curve follows one architecture/seed across steering magnitudes; the vertical extent to the right of the $\mathrm{coh}=70$ threshold defines the dynamic range used in \cref{fig:c6-em-alignment-delta}.}
+    \caption{Coherence/alignment Pareto frontier for the \texttt{Qwen-7B} medical-misalignment cells. Each curve follows one architecture/seed across steering magnitudes; the vertical extent to the right of the $\mathrm{coh}=70$ threshold defines the dynamic range used in \cref{fig:c6-em-alignment-delta}.}
     \label{fig:c6-em-pareto-frontier}
 \end{figure*}
 
 \begin{figure*}[t]
     \centering
     \includegraphics[width=\textwidth]{figs/c6_em_steering_grid_7bmed.pdf}
-    \caption{Full steering sweep for the Qwen-7B medical-misalignment cells. Panels show alignment across steering magnitudes, with coherence overlaid for the top finalist; extrema inside the $\mathrm{coh}\geq70$ region determine the summarized dynamic range.}
+    \caption{Full steering sweep for the \texttt{Qwen-7B} medical-misalignment cells. Panels show alignment across steering magnitudes, with coherence overlaid for the top finalist; extrema inside the $\mathrm{coh}\geq70$ region determine the summarized dynamic range.}
     \label{fig:c6-em-steering-grid}
 \end{figure*}
 
@@ -320,7 +246,7 @@ We confirm this empirically across the canonical c6 cells: the mean $\ell_2$-nor
         \caption{Preference-separation magnitude versus response-length correlation.}
         \label{fig:rlhf-scatter-app}
     \end{subfigure}
-    \caption{HH-RLHF preference decomposition for Gemma-2-2B layer~12. Features are ranked by $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ and classified by correlation with response-length difference.}
+    \caption{HH-RLHF preference decomposition for \texttt{Gemma-2-2B} layer~12. Features are ranked by $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ and classified by correlation with response-length difference.}
     \label{fig:rlhf-app}
 \end{figure*}
 }
@@ -398,7 +324,7 @@ set $\mathcal T_K$, the semantic-mass share is
         \bottomrule
     \end{tabular}
     \vspace{3em}
-    \caption{Top-$5$ features per architecture, ranked by $|\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}|$ on the $1000$-pair \texttt{harmless-base} cohort. Sign of the diff indicates the side the feature activates more strongly on (negative $\to$ chosen, positive $\to$ rejected). Length-Pearson $r$ classifies each feature as semantic ($|r|<0.2$), mixed, or length-spurious ($|r|\geq 0.5$). Autointerp labels are produced by Claude Haiku~$4.5$ (\cref{app:rlhf-autointerp}). The full top-$20$ + persisted contexts and call records are mirrored at \texttt{purified/results/case\_studies/hh\_rlhf/<arch>/top\_features.json}.}
+    \caption{Top-$5$ features per architecture, ranked by $|\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}|$ on the $1000$-pair \texttt{harmless-base} cohort. Sign of the diff indicates the side the feature activates more strongly on (negative $\to$ chosen, positive $\to$ rejected). Length-Pearson $r$ classifies each feature as semantic ($|r|<0.2$), mixed, or length-spurious ($|r|\geq 0.5$). Autointerp labels are produced by Claude Haiku~$4.5$ (\cref{app:rlhf-autointerp}). }
     \label{tab:rlhf-top-features}
 \end{table}
 
@@ -543,7 +469,7 @@ By step $200{,}000$, NMSE has plateaued for all cells. The relative change from 
 \subsection{PR-AUC methodology and full table}
 \label{app:c7-pr-auc-full}
 
-Following \citet{kantamneni2025are}, we test whether each architecture supports a sparse linear probe for the sentence-level label ``does this sentence begin a backtracking event?'' Labels are taken from the original reproduction traces. We capture base-model residual activations at layer~$10$ using a six-token window with offsets $-13$ through $-8$ relative to the first token of each sentence. Architectures with smaller windows use the trailing $T_{\text{arch}}$ positions of this window. Architectures with $T_{\text{arch}}>6$ are excluded from this protocol. We encode each $(\text{sentence}, T \times d_{\text{in}})$ tensor and max-pool absolute feature activations over positions to obtain one $d_{\text{SAE}}$ vector per sentence.
+Following \citet{kantamneni2025probing}, we test whether each architecture supports a sparse linear probe for the sentence-level label ``does this sentence begin a backtracking event?'' Labels are taken from the original reproduction traces. We capture base-model residual activations at layer~$10$ using a six-token window with offsets $-13$ through $-8$ relative to the first token of each sentence. Architectures with smaller windows use the trailing $T_{\text{arch}}$ positions of this window. Architectures with $T_{\text{arch}}>6$ are excluded from this protocol. We encode each $(\text{sentence}, T \times d_{\text{in}})$ tensor and max-pool absolute feature activations over positions to obtain one $d_{\text{SAE}}$ vector per sentence.
 
 Feature selection is done inside each fold. On the train split only, we compute $|\mu_{\text{pos}} - \mu_{\text{neg}}|$ for every feature and keep the top $S$. The probe is $\ell_1$-regularized logistic regression on those selected features, with $C=1$, scikit-learn's \texttt{liblinear} solver, \texttt{max\_iter}=2000, and random seed $42$. We report the mean over five GroupKFold splits by question.
 
@@ -664,7 +590,7 @@ For each architecture $a$, we evaluate two magnitudes: $m=0$ and $m=m^*_a$, wher
     \label{fig:c7-contingency}
 \end{figure}
 
-\Cref{tab:c7-net-saves,tab:c7-contingency,fig:c7-net-saves,fig:c7-contingency} are regenerated by \texttt{experiments.c7\_backtracking.analyze\_optimal} from the saved phase-2 transcripts and judge labels. The corresponding markdown report is mirrored at \texttt{purified/docs/components/c7\_optimal\_analysis.md}.
+
 
 \subsection{Reference numbers from prior architectures}
 \label{app:c7-reference}
