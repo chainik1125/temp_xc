@@ -206,7 +206,7 @@ The runner:
 - Saves the trained checkpoint, run-dir metrics, and one validated row
   in the leaderboard. Schema-rejected rows abort the cell.
 - On ephemeral pods (`TEMP_BENCH_POD_MODE=ephemeral`), auto-pushes the
-  checkpoint to `han1823123123/temp-bench-models`.
+  checkpoint to `${TEMP_BENCH_HF_ORG}/temp-bench-models`.
 
 A run-dir is created at `results/runs/<eval_key>/` containing
 `metrics.json` and any plots (use `temp_bench.plotting.save_figure`,
@@ -250,14 +250,14 @@ train_key = result.train_key
 HfApi().upload_folder(
     folder_path=str(checkpoint_dir(train_key)),
     path_in_repo=train_key,
-    repo_id="han1823123123/temp-bench-models",
+    repo_id="${TEMP_BENCH_HF_ORG}/temp-bench-models",
     repo_type="model",
 )
 ```
 
 Two private HF repos:
-- `han1823123123/temp-bench-models` — checkpoints, keyed by `<train_key>`
-- `han1823123123/temp-bench-data` — activation caches, judge transcripts
+- `${TEMP_BENCH_HF_ORG}/temp-bench-models` — checkpoints, keyed by `<train_key>`
+- `${TEMP_BENCH_HF_ORG}/temp-bench-data` — activation caches, judge transcripts
 
 See `checkpoints/README.md` for full upload recipe.
 

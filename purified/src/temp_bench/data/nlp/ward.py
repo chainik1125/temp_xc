@@ -323,10 +323,14 @@ def cache_activations(
 
 
 def _push_cache_to_hf(cache_key: str, cache_dir: Path) -> str:
-    """Push C7 activation cache to ``han1823123123/temp-bench-data``."""
+    """Push C7 activation cache to ``${TEMP_BENCH_HF_ORG}/temp-bench-data``."""
+    import os as _os
     from huggingface_hub import HfApi
     from temp_bench.utils.tokens import require_token
-    repo_id = "han1823123123/temp-bench-data"
+    _hf_org = _os.environ.get("TEMP_BENCH_HF_ORG")
+    if not _hf_org:
+        raise RuntimeError("TEMP_BENCH_HF_ORG env var must be set to push activation cache")
+    repo_id = f"{_hf_org}/temp-bench-data"
     api = HfApi(token=require_token("hf"))
     api.upload_folder(
         folder_path=str(cache_dir),

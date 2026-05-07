@@ -103,7 +103,7 @@ family clearly above SAE family at the winning regime. Saved to
    need d_sae=80 for a cleaner divide; deferred.
 
 4. **Caches**: 30+ checkpoints created across the hunt + zoom.
-   Auto-pushed to HF (han1823123123/temp-bench-models) via ephemeral
+   Auto-pushed to HF (${TEMP_BENCH_HF_ORG}/temp-bench-models) via ephemeral
    pod mode.
 
 ## Surface to Han + agent_paper

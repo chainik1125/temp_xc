@@ -26,7 +26,7 @@ Three notable C5-specifics:
    case study would write to a different ``run_dir`` than the one
    ``metrics.json`` lands in).
 3. **Activations come from disk** — the Gemma-2-2b-IT L13 fineweb
-   act-cache is on HF (``han1823123123/temp-bench-data``) and ``sync_
+   act-cache is on HF (``${TEMP_BENCH_HF_ORG}/temp-bench-data``) and ``sync_
    from_hf.sh`` (or the manual ``hf download``) lands it at
    ``results/act_cache/<act_cache_key>/``. We use the canonical
    :func:`temp_bench.data.nlp.batch_iter_from_act_cache` which yields
@@ -239,14 +239,18 @@ def _make_eval_fn(*, seed: int, workspace: Path, eval_key: str):
 
 
 def _push_run_dir_to_hf(workspace: Path, eval_key: str) -> str:
-    """Upload the run dir to ``han1823123123/temp-bench-data`` under
+    """Upload the run dir to ``${TEMP_BENCH_HF_ORG}/temp-bench-data`` under
     ``runs/<eval_key>/``. Only the small jsonl + json files are
     relevant; .npy files (concept_activations) tag along.
     """
+    import os as _os
     from huggingface_hub import HfApi
     from temp_bench.utils.tokens import require_token
 
-    repo_id = "han1823123123/temp-bench-data"
+    _hf_org = _os.environ.get("TEMP_BENCH_HF_ORG")
+    if not _hf_org:
+        raise RuntimeError("TEMP_BENCH_HF_ORG env var must be set to push run dir")
+    repo_id = f"{_hf_org}/temp-bench-data"
     api = HfApi(token=require_token("hf"))
     api.upload_folder(
         folder_path=str(workspace),

@@ -10,8 +10,8 @@ paper development; they flip to public when the draft stabilises.
 
 | Purpose | Repo | Type |
 |---|---|---|
-| Model checkpoints | [`han1823123123/temp-bench-models`](https://huggingface.co/han1823123123/temp-bench-models) | model |
-| Activation caches + judge transcripts + synthetic data | [`han1823123123/temp-bench-data`](https://huggingface.co/datasets/han1823123123/temp-bench-data) | dataset |
+| Model checkpoints | [`${TEMP_BENCH_HF_ORG}/temp-bench-models`](https://huggingface.co/${TEMP_BENCH_HF_ORG}/temp-bench-models) | model |
+| Activation caches + judge transcripts + synthetic data | [`${TEMP_BENCH_HF_ORG}/temp-bench-data`](https://huggingface.co/datasets/${TEMP_BENCH_HF_ORG}/temp-bench-data) | dataset |
 
 ## How to upload
 
@@ -27,7 +27,7 @@ train_key = result.train_key   # from runner.run_cell return value
 HfApi().upload_folder(
     folder_path=str(checkpoint_dir(train_key)),
     path_in_repo=train_key,
-    repo_id="han1823123123/temp-bench-models",
+    repo_id="${TEMP_BENCH_HF_ORG}/temp-bench-models",
     repo_type="model",
 )
 ```
@@ -51,7 +51,7 @@ Validated by ``temp_bench.schemas.CheckpointManifest``:
   "seed": 42,
   "datasource": "gemma_2_2b_it_l13_fineweb_24k128",
   "training_cfg": {"n_steps": 30000, "batch_size": 256, ...},
-  "hf_url": "https://huggingface.co/han1823123123/temp-bench-models/tree/main/fedcba9876543210",
+  "hf_url": "https://huggingface.co/${TEMP_BENCH_HF_ORG}/temp-bench-models/tree/main/fedcba9876543210",
   "local_path": "/workspace/temp_xc/purified/checkpoints/fedcba9876543210/model.safetensors",
   "size_mb": 412.3,
   "agent": "agent_nlp",

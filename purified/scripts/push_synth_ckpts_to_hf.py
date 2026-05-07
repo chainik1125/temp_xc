@@ -1,23 +1,27 @@
 """Manually push agent_synth checkpoints to HF.
 
-Used because agent_synth's subprocess env didn't have
-TEMP_BENCH_POD_MODE=ephemeral (lost across Bash tool calls), so
+Used because some agents' subprocess env didn't have
+TEMP_BENCH_POD_MODE=ephemeral (lost across tool calls), so
 ``cache.save_checkpoint``'s auto-push was skipped. This script
-walks the manifest, finds agent_synth ckpts whose hf_url is None
+walks the manifest, finds checkpoints whose hf_url is None
 *and* whose local dir still exists, and uploads them.
 
 Run with:
-    .venv/bin/python -m scripts.push_synth_ckpts_to_hf
+    TEMP_BENCH_HF_ORG=<your-hf-org> .venv/bin/python -m scripts.push_synth_ckpts_to_hf
 """
 from __future__ import annotations
 
 import json
+import os
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-REPO_ID = "han1823123123/temp-bench-models"
+_HF_ORG = os.environ.get("TEMP_BENCH_HF_ORG")
+if not _HF_ORG:
+    raise RuntimeError("TEMP_BENCH_HF_ORG env var must be set")
+REPO_ID = f"{_HF_ORG}/temp-bench-models"
 MANIFEST = Path("checkpoints/manifest.jsonl")
 
 

@@ -18,8 +18,8 @@ set -eu
 
 cd "$(dirname "$0")/.."   # purified/
 
-MODELS_REPO="han1823123123/temp-bench-models"
-DATA_REPO="han1823123123/temp-bench-data"
+MODELS_REPO="${TEMP_BENCH_HF_ORG}/temp-bench-models"
+DATA_REPO="${TEMP_BENCH_HF_ORG}/temp-bench-data"
 
 CKPT_DIR="$(pwd)/checkpoints"
 ACT_CACHE_DIR="$(pwd)/results/act_cache"

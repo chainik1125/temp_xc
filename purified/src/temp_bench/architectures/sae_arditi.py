@@ -19,7 +19,7 @@ the parameter layout used by Dmitry's ``origin/em-nanda`` checkpoints
 The framework's :class:`TopKSAE` uses the transposed convention
 (``W_enc : (d_sae, d_in)``, ``W_dec : (d_in, d_sae)``). Diverging only
 on the layout means Dmitry's HF checkpoints
-(``han1823123123/temp-bench-models``, originally trained under
+(``${TEMP_BENCH_HF_ORG}/temp-bench-models``, originally trained under
 ``sae_day.TopKSAE``) load directly via
 ``model.load_state_dict(ckpt["state_dict"])`` with no transpose dance.
 

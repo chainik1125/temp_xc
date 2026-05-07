@@ -188,7 +188,7 @@ def save_checkpoint(
 
 
 def _push_checkpoint_to_hf(train_key: str, ckpt_dir: Path, *, agent: str) -> str:
-    """Push a checkpoint dir to ``han1823123123/temp-bench-models``.
+    """Push a checkpoint dir to ``${TEMP_BENCH_HF_ORG}/temp-bench-models``.
 
     Auto-called from :func:`save_checkpoint` on ephemeral pods.
     Failure is fatal — silently dropping a checkpoint that the pod
@@ -201,7 +201,11 @@ def _push_checkpoint_to_hf(train_key: str, ckpt_dir: Path, *, agent: str) -> str
     from huggingface_hub import HfApi
     from temp_bench.utils.tokens import require_token
 
-    repo_id = "han1823123123/temp-bench-models"
+    import os as _os
+    _hf_org = _os.environ.get("TEMP_BENCH_HF_ORG")
+    if not _hf_org:
+        raise RuntimeError("TEMP_BENCH_HF_ORG env var must be set to push checkpoints")
+    repo_id = f"{_hf_org}/temp-bench-models"
     api = HfApi(token=require_token("hf"))
     api.upload_folder(
         folder_path=str(ckpt_dir),

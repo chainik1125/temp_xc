@@ -34,7 +34,7 @@ cache + probe tasks), `temp_bench.training.sae_trainer` (trainer), and
 - **Activation caching** is the long pole on a fresh pod
   (~3 H100-hours estimated; observed ~2 min on H100 due to fast HF
   download + bf16 forward). Pushed to HF
-  `han1823123123/temp-bench-data` so other agents can sync.
+  `${TEMP_BENCH_HF_ORG}/temp-bench-data` so other agents can sync.
 - **SAEBench-faithfulness fixes** (vs the wasteland 36-task loader):
   github-code via `codeparrot/github-code` 5 langs (post-iter filter
   needed), amazon_sentiment 1+5 binaries, amazon_categories

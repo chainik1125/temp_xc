@@ -201,7 +201,7 @@ datasources:
       d_sae expansion.
 
       NOTE (2026-05-03 agent_back): the Meta `meta-llama/Llama-3.1-8B`
-      repo is gated; our HF token (han1823123123) does not yet have
+      repo is gated; our HF token (${TEMP_BENCH_HF_ORG}) does not yet have
       manual approval. The C7 runner uses the alias datasource below
       (`llama_3_1_8b_base_l10_ward_nousmirror`) which points at the
       byte-identical NousResearch redistribution. Paper text still cites

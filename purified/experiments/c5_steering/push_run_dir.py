@@ -1,4 +1,4 @@
-"""Push a results/runs/<eval_key>/ directory to han1823123123/temp-bench-data.
+"""Push a results/runs/<eval_key>/ directory to ${TEMP_BENCH_HF_ORG}/temp-bench-data.
 
 Used as a recovery / one-off helper when ``experiments/c5_steering/run.py``'s
 auto-push didn't run (e.g., the cell was launched before that code
@@ -8,7 +8,7 @@ Usage:
     .venv/bin/python -m experiments.c5_steering.push_run_dir <eval_key> [<eval_key> ...]
 
 The destination is ``runs/<eval_key>/`` under
-``han1823123123/temp-bench-data`` (private dataset repo). The
+``${TEMP_BENCH_HF_ORG}/temp-bench-data`` (private dataset repo). The
 checkpoint per ``train_key`` is auto-pushed by the runner — this is
 strictly for the per-eval workspace that the ``CaseStudy`` framework
 contract requires to outlive the pod.
@@ -17,6 +17,7 @@ contract requires to outlive the pod.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -26,7 +27,10 @@ from temp_bench.cache import run_dir
 from temp_bench.utils.tokens import require_token
 
 
-REPO_ID = "han1823123123/temp-bench-data"
+_HF_ORG = os.environ.get("TEMP_BENCH_HF_ORG")
+if not _HF_ORG:
+    raise RuntimeError("TEMP_BENCH_HF_ORG env var must be set")
+REPO_ID = f"{_HF_ORG}/temp-bench-data"
 
 
 def push_one(eval_key: str, agent: str = "agent_steer") -> str:

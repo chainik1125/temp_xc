@@ -69,7 +69,7 @@ Gemma-2-2b activations at L13, fp16, 24K × 128 tokens × 2304 d_in =
 148 GB A40 RAM. Strategy:
 
 1. Build the cache once on the H100 pod (Agent NLP, ~3 H100-hours).
-2. Push to `han1823123123/temp-bench-data` under
+2. Push to `${TEMP_BENCH_HF_ORG}/temp-bench-data` under
    `act_cache/<act_cache_key>/`.
 3. A40 pods (Agent STEER, Agent BACK) `huggingface-cli download` the
    prebuilt cache instead of rebuilding from scratch.
@@ -174,7 +174,7 @@ ephemeral /workspace. The framework knows the mode via
 
 On ephemeral pods, **session start runs `scripts/sync_from_hf.sh`** to
 pull every known checkpoint + activation cache from
-`han1823123123/temp-bench-{models,data}` into /workspace. This is
+`${TEMP_BENCH_HF_ORG}/temp-bench-{models,data}` into /workspace. This is
 idempotent — files already present are not redownloaded.
 
 The cache contract makes this safe across pods: if H100 pod A produced
@@ -222,6 +222,6 @@ Three concrete pain points the framework guards against:
    with the volume; the new pod resumes from the last completed cell.
 3. **Cross-pod cache sharing.** Agent STEER's A40 pod doesn't need to
    rebuild the C5 activation cache from scratch — `sync_from_hf.sh`
-   pulls from `han1823123123/temp-bench-data` (HF dataset repo) which
+   pulls from `${TEMP_BENCH_HF_ORG}/temp-bench-data` (HF dataset repo) which
    Agent NLP uploaded after building the cache on its H100. HF is the
    cross-pod transport.
