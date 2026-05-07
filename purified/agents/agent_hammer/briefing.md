@@ -395,6 +395,34 @@ override via `bash scripts/run_on_gpu.sh <idx> --` works.
 - tsae_paper c1_noisy: 36/36 ✅
 - tsae_paper c2 (Setup A): 36/36 ✅
 
+## c2.md ownership protocol (Han 2026-05-07)
+
+**You (agent_hammer) own the c2.md sections for any NEW setups you
+design** (H, I, J, …). Rules:
+
+1. **One-author-per-section**: don't edit agent_synth's Setup
+   D/E/F/G sections (their territory). Don't edit Setup A/B/C
+   (agent_paper / agent_filler). You DO continue to own the Setup
+   A/B AUTO-RESULTS blocks for your existing baseline backfill.
+2. **Always rebase + dedupe-merge before push** — leaderboard.jsonl
+   and manifest.jsonl conflicts are routine; agent_synth's union+
+   dedupe Python one-liner (in their briefing) is the canonical
+   resolver.
+3. **AUTO-RESULTS blocks are append-only friendly**: re-rendering
+   replaces body between `<!-- BEGIN AUTO-RESULTS-c2X -->` and
+   `<!-- END AUTO-RESULTS-c2X -->`. Hand-written prose OUTSIDE
+   markers is preserved.
+4. **Cross-territory waiver**: Han approved (2026-05-06T23:30Z) for
+   c2.md additions by both you and agent_synth. Assume it carries
+   forward unless he revokes.
+5. **agent_paper integrates** on render passes — you append your
+   section in the right slot (after the previous Setup, before
+   "## Headline figure" or "## Caveats"); don't reorder.
+
+**TODO**: a shared `render_setup_into_c2md(setup_name)` helper
+would automate step 3. agent_synth has TODO'd it for `plot_headline.
+py`; co-author with them or extend your `render_results.py` pattern.
+
 ## THE ONE PAPER GOAL (Han 2026-05-07)
 
 For every new setup we want exactly two things:

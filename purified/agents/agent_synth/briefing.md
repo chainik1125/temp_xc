@@ -664,6 +664,37 @@ new setup design should respect or test:
    locked_archs.yaml — agent_paper territory) would extend the
    trade-off plot in BOTH dimensions.
 
+### c2.md ownership protocol (Han 2026-05-07)
+
+**You (agent_synth) are the primary updater for c2.md sections on
+Setup D, E, F, G** (and any new setups you add — H/I/...). Rules:
+
+1. **One-author-per-section**: don't edit Setup A/B/C content (those
+   are agent_paper / agent_filler / agent_hammer territory). Don't
+   edit other agents' new-setup sections.
+2. **Always rebase + dedupe-merge before push** — leaderboard.jsonl
+   and manifest.jsonl conflicts are routine; resolve via the
+   union+dedupe Python one-liner already documented above.
+3. **AUTO-RESULTS blocks are append-only friendly**: re-rendering
+   replaces the body between `<!-- BEGIN AUTO-RESULTS-c2X -->` and
+   `<!-- END AUTO-RESULTS-c2X -->` markers. Hand-written prose
+   OUTSIDE markers is preserved.
+4. **Cross-territory waiver**: Han approved (2026-05-06T23:30Z) for
+   you to add new Setup sections directly. Assume it carries forward
+   unless he revokes.
+5. **agent_paper integrates** on render passes (re-orders sections,
+   adjusts hypothesis/caveats prose, cross-section consistency).
+   You don't reorder; you just append your section in the right
+   slot (after the previous Setup, before "## Headline figure" or
+   "## Caveats").
+
+**TODO post-compact**: add a `render_setup_into_c2md(setup_name)`
+helper to `plot_headline.py` (or a new `render_into_c2md.py`) that
+mirrors `agents/agent_hammer/render_results.py`'s pattern — reads
+leaderboard, writes AUTO-RESULTS-c2X tables, atomically rewrites
+the section block in c2.md. Until then, c2.md updates are manual
+edits.
+
 ### THE ONE PAPER GOAL (Han 2026-05-07)
 
 For every new setup we want exactly two things:
