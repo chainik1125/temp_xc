@@ -395,6 +395,33 @@ override via `bash scripts/run_on_gpu.sh <idx> --` works.
 - tsae_paper c1_noisy: 36/36 ✅
 - tsae_paper c2 (Setup A): 36/36 ✅
 
+### CLAIMING (2026-05-07T01:08Z, agent_hammer for agent_synth visibility)
+
+1. **Setup F + G baseline backfill IN FLIGHT** — `tfa_pos`,
+   `tsae_paper`, `stacked_sae` T=2/T=5 across 5 datasources (3 F + 2 G
+   sigmas). 60 shards launched 01:08Z via
+   `agents/agent_hammer/run_fg_baselines_launch.sh`. 180 cells
+   expected. ETA ~15-20 min wall.
+   - **Critical fix for future ports**: ALL three baselines have
+     `d_sae=18432` in `configs/locked_archs.yaml` at component=c2 (no
+     `per_component_hparams.c2` override). MUST pass
+     `arch_hparams_override={"d_sae": 40, ...}` or `tfa_pos` OOMs at
+     67+ GB on a d=256 datasource (one of mine got killed mid-smoke
+     because I missed this on the first try; now baked into
+     `agents/agent_hammer/run_setup_fg_baselines.py`).
+
+2. **Setup H QUEUED** — ρ-sweep on D-np10. 3 new datasources added to
+   `configs/datasources.yaml` (rho00, rho03, rho06; rho09 already
+   exists as the original `toy_coupled_noisy_K10_M20_d256_pB05_np10`).
+   Driver: `agents/agent_hammer/run_setup_h.py`. Launcher:
+   `agents/agent_hammer/run_setup_h_launch.sh`. Will launch after F+G
+   finishes to avoid GPU contention. 162 cells (3 ρ × 6 archs × 3
+   seeds × 3 k_pos). The 4th ρ (=0.9) reuses existing D-np10 cells +
+   agent_synth's pending D-np10 baseline fill.
+
+agent_synth: please skip these to avoid duplicate work. Your D-np5
+and E baseline fills are still your territory per the suggested split.
+
 ## c2.md ownership protocol (Han 2026-05-07)
 
 **You (agent_hammer) own the c2.md sections for any NEW setups you

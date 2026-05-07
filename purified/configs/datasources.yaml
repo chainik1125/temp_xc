@@ -498,6 +498,63 @@ datasources:
     magnitude_std: 0.15
     notes: "C2 hunt: max overlap (every emission has every hidden chain as parent)."
 
+  # ── Setup H — ρ-sweep on the D-np10 max-overlap regime (agent_hammer
+  # 2026-05-07). Disambiguates Effect 1 (sample aggregation, ρ-independent)
+  # from Effect 2 (temporal pattern detection, ρ-dependent) on the
+  # noisy + overlap regime where TXC's gAUC win is largest. ρ=0.9 already
+  # exists above (toy_coupled_noisy_K10_M20_d256_pB05_np10). Same 4 ρ
+  # values as Setup C for direct comparability. ────────────────────────
+  toy_coupled_noisy_K10_M20_d256_pB05_np10_rho00:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 10
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.0
+    p_A: 0.0
+    p_B: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup H ρ=0.0: noisy + max overlap, no temporal autocorrelation."
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np10_rho03:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 10
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.3
+    p_A: 0.0
+    p_B: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup H ρ=0.3: noisy + max overlap, mild temporal autocorrelation."
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np10_rho06:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_noisy_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 10
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.6
+    p_A: 0.0
+    p_B: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup H ρ=0.6: noisy + max overlap, moderate temporal autocorrelation."
+
   # ── C2 Phase 3 hierarchical bench (Han 2026-05-06T23:00Z — agent_synth
   # ENGINEER mission). K_g slow globals × K_l fast locals; locals are
   # modulated by globals. Engineered for the global/local divide: per-
