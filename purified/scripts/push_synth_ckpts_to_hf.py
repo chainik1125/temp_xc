@@ -67,7 +67,9 @@ def main() -> int:
         return 0
 
     api = HfApi(token=require_token("hf"))
-    n_workers = 8
+    # 8-way threadpool created HF commit-merge conflicts (Request ID
+    # bursts at ~140 cells in). Drop to sequential — slow but reliable.
+    n_workers = 1
     n_done = 0
     n_fail = 0
     start = time.time()
