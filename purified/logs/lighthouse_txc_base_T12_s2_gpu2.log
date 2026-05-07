@@ -1,0 +1,8 @@
+[run_on_gpu] WARNING: GPU 2 has 1269 MB used. Consider checking
+  'nvidia-smi' and the peer agent's briefing before proceeding.
+  Continuing in 3 s — Ctrl-C to abort.
+[run_on_gpu] CUDA_VISIBLE_DEVICES=2 exec: env AGENT_NAME=agent_synth TEMP_BENCH_POD_MODE=persistent OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.fill_baselines --datasource toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast --arch txc_base --T 12 --seed 2 --k-poses 1 2 3 --n-steps 8000
+[fill_baselines] arch=txc_base T=12 seed=2 ds=toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast k_poses=[1, 2, 3] n_steps=8000
+[fill_baselines] txc_base     T=12     k= 1 seed=2 ds=toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast n_steps=8000
+[fill_baselines] txc_base     T=12     k= 2 seed=2 ds=toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast n_steps=8000
+[fill_baselines] txc_base     T=12     k= 3 seed=2 ds=toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast n_steps=8000

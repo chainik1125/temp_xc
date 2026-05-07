@@ -1,0 +1,11 @@
+[run_on_gpu] WARNING: GPU 6 has 2573 MB used. Consider checking
+  'nvidia-smi' and the peer agent's briefing before proceeding.
+  Continuing in 3 s — Ctrl-C to abort.
+[run_on_gpu] CUDA_VISIBLE_DEVICES=6 exec: .venv/bin/python -m experiments.c2_synthetic_coupled.run_hunt --datasource toy_coupled_noisy_K10_M20_d256_pB05_np5 --phase zoom --arch-t-idx 4 --seeds 42 --n-steps 8000
+[hunt] datasource=toy_coupled_noisy_K10_M20_d256_pB05_np5 p_B=0.5 n_parents=5 ρ=0.9 phase=zoom archs=['txc_pro'] k_pos=[1, 2, 3, 4, 5, 6, 7, 8] seeds=[42] n_steps=8000
+[c2 hunt] txc_pro      T=2        k= 1 seed=42 p_B=0.5 n_par=5 ρ=0.9 ds=toy_coupled_noisy_K10_M20_d256_pB05_np5 steps=8000
+[c2 hunt] txc_pro      T=2        k= 2 seed=42 p_B=0.5 n_par=5 ρ=0.9 ds=toy_coupled_noisy_K10_M20_d256_pB05_np5 steps=8000
+[c2 hunt] txc_pro      T=2        k= 3 seed=42 p_B=0.5 n_par=5 ρ=0.9 ds=toy_coupled_noisy_K10_M20_d256_pB05_np5 steps=8000
+[c2 hunt] txc_pro      T=2        k= 4 seed=42 p_B=0.5 n_par=5 ρ=0.9 ds=toy_coupled_noisy_K10_M20_d256_pB05_np5 steps=8000
+[c2 hunt] txc_pro      T=2        k= 5 seed=42 p_B=0.5 n_par=5 ρ=0.9 ds=toy_coupled_noisy_K10_M20_d256_pB05_np5 steps=8000
+[c2 hunt] txc_pro      T=2        k= 6 seed=42 p_B=0.5 n_par=5 ρ=0.9 ds=toy_coupled_noisy_K10_M20_d256_pB05_np5 steps=8000

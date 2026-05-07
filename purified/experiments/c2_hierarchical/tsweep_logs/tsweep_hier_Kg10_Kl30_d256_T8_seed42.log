@@ -1,0 +1,4 @@
+[run_on_gpu] CUDA_VISIBLE_DEVICES=6 exec: .venv/bin/python -m experiments.c2_hierarchical.run_t_sweep --datasource toy_hierarchical_Kg10_Kl30_d256 --T 8 --seed 42 --k-poses 1 2 3 --n-steps 8000
+[c2 hier tsweep] txc_base T=8 k=1 seed=42 ds=toy_hierarchical_Kg10_Kl30_d256
+[c2 hier tsweep] txc_base T=8 k=2 seed=42 ds=toy_hierarchical_Kg10_Kl30_d256
+[c2 hier tsweep] txc_base T=8 k=3 seed=42 ds=toy_hierarchical_Kg10_Kl30_d256

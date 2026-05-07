@@ -1,0 +1,7 @@
+[run_on_gpu] WARNING: GPU 4 has 2579 MB used. Consider checking
+  'nvidia-smi' and the peer agent's briefing before proceeding.
+  Continuing in 3 s — Ctrl-C to abort.
+[run_on_gpu] CUDA_VISIBLE_DEVICES=4 exec: .venv/bin/python -m experiments.c2_hierarchical.run_t_sweep --datasource toy_hierarchical_Kg10_Kl30_d256 --T 4 --seed 2 --k-poses 1 2 3 --n-steps 8000
+[c2 hier tsweep] txc_base T=4 k=1 seed=2 ds=toy_hierarchical_Kg10_Kl30_d256
+[c2 hier tsweep] txc_base T=4 k=2 seed=2 ds=toy_hierarchical_Kg10_Kl30_d256
+[c2 hier tsweep] txc_base T=4 k=3 seed=2 ds=toy_hierarchical_Kg10_Kl30_d256

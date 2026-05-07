@@ -1,0 +1,28 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "d_sae": 40,
+        "k_pos": 8
+      },
+      "bench": null,
+      "datasource": "toy_dewdrop_Kg10_Kl30_d256_p16",
+      "fill_baselines": true,
+      "hunt_phase": "fill",
+      "k_pos": 8,
+      "smoke": false,
+      "t_label": "default",
+      "tsweep": false
+    }
+  },
+  "metrics": {
+    "e_frac_recovered_90": 0.5666666626930237,
+    "e_mean_max_cos": 0.8820909857749939,
+    "eauc": 0.8802721088435373,
+    "g_frac_recovered_80": 0.10000000149011612,
+    "g_frac_recovered_90": 0.0,
+    "g_mean_max_cos": 0.37595799565315247,
+    "gauc": 0.37755102040816324
+  },
+  "ts": "2026-05-07T02:35:50Z"
+}

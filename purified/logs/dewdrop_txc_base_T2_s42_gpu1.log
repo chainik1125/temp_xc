@@ -1,0 +1,12 @@
+[run_on_gpu] WARNING: GPU 1 has 5528 MB used. Consider checking
+  'nvidia-smi' and the peer agent's briefing before proceeding.
+  Continuing in 3 s — Ctrl-C to abort.
+[run_on_gpu] CUDA_VISIBLE_DEVICES=1 exec: env AGENT_NAME=agent_synth TEMP_BENCH_POD_MODE=persistent OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.fill_baselines --datasource toy_dewdrop_Kg10_Kl30_d256_p16 --arch txc_base --T 2 --seed 42 --k-poses 1 2 3 4 5 6 8 --n-steps 8000
+[fill_baselines] arch=txc_base T=2 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 k_poses=[1, 2, 3, 4, 5, 6, 8] n_steps=8000
+[fill_baselines] txc_base     T=2      k= 1 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 n_steps=8000
+[fill_baselines] txc_base     T=2      k= 2 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 n_steps=8000
+[fill_baselines] txc_base     T=2      k= 3 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 n_steps=8000
+[fill_baselines] txc_base     T=2      k= 4 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 n_steps=8000
+[fill_baselines] txc_base     T=2      k= 5 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 n_steps=8000
+[fill_baselines] txc_base     T=2      k= 6 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 n_steps=8000
+[fill_baselines] txc_base     T=2      k= 8 seed=42 ds=toy_dewdrop_Kg10_Kl30_d256_p16 n_steps=8000

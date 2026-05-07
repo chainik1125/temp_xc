@@ -1,0 +1,4 @@
+[run_on_gpu] CUDA_VISIBLE_DEVICES=4 exec: .venv/bin/python -m experiments.c2_hierarchical.run_setup_g --datasource toy_hierarchical_Kg10_Kl30_d256_sigma2p0 --T 5 --seed 42 --k-poses 1 2 3 --n-steps 8000 --archs txc_base
+[setupG] txc_base T=5 k=1 seed=42 σ=2.0 ds=toy_hierarchical_Kg10_Kl30_d256_sigma2p0
+[setupG] txc_base T=5 k=2 seed=42 σ=2.0 ds=toy_hierarchical_Kg10_Kl30_d256_sigma2p0
+[setupG] txc_base T=5 k=3 seed=42 σ=2.0 ds=toy_hierarchical_Kg10_Kl30_d256_sigma2p0

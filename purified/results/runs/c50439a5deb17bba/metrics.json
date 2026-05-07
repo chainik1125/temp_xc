@@ -1,0 +1,26 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "k_pos": 2
+      },
+      "hunt_phase": "hunt",
+      "k_pos": 2,
+      "n_parents": 2,
+      "p_B": 0.5,
+      "rho": 0.9,
+      "smoke": false,
+      "t_label": "default"
+    }
+  },
+  "metrics": {
+    "e_frac_recovered_90": 0.550000011920929,
+    "e_mean_max_cos": 0.8895576596260071,
+    "eauc": 0.889795918367347,
+    "g_frac_recovered_80": 0.4000000059604645,
+    "g_frac_recovered_90": 0.10000000149011612,
+    "g_mean_max_cos": 0.7903854846954346,
+    "gauc": 0.7918367346938775
+  },
+  "ts": "2026-05-06T22:15:19Z"
+}

@@ -1,0 +1,25 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "d_sae": 40,
+        "k_pos": 2
+      },
+      "datasource": "toy_coupled_noisy_K10_M20_d256_pB05_np5",
+      "fill_baselines": true,
+      "k_pos": 2,
+      "smoke": false,
+      "t_label": "default"
+    }
+  },
+  "metrics": {
+    "e_frac_recovered_90": 0.4000000059604645,
+    "e_mean_max_cos": 0.8111898303031921,
+    "eauc": 0.8081632653061224,
+    "g_frac_recovered_80": 0.699999988079071,
+    "g_frac_recovered_90": 0.0,
+    "g_mean_max_cos": 0.8137197494506836,
+    "gauc": 0.8142857142857143
+  },
+  "ts": "2026-05-07T01:17:01Z"
+}

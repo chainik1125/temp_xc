@@ -1,0 +1,4 @@
+[run_on_gpu] CUDA_VISIBLE_DEVICES=3 exec: .venv/bin/python -m experiments.c2_synthetic_coupled.run_t_sweep --datasource toy_coupled_noisy_K10_M20_d256_pB05_np10 --T 12 --seed 2 --k-poses 1 2 3 --n-steps 8000
+[c2 tsweep] txc_base T=12 k=1 seed=2 ds=toy_coupled_noisy_K10_M20_d256_pB05_np10
+[c2 tsweep] txc_base T=12 k=2 seed=2 ds=toy_coupled_noisy_K10_M20_d256_pB05_np10
+[c2 tsweep] txc_base T=12 k=3 seed=2 ds=toy_coupled_noisy_K10_M20_d256_pB05_np10

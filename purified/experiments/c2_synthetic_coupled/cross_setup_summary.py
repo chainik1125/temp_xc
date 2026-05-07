@@ -61,6 +61,15 @@ SETUPS = [
     ("lighthouse (1 slow + 9 fast)",
      "toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast",
      {}),
+    # NOTE: Setup 'dewdrop' (deterministic periodic firing) shows
+    # TXC-base T=5 LOSING to TopK-SAE (gap -0.23) and was deliberately
+    # dropped from this paper-headline summary per Han 2026-05-07
+    # ("drop if TXC doesn't outshine"). The setup data is in the
+    # leaderboard for future analysis. Mechanism: at period=16 with
+    # 10 distinct phases, the TXC window pool averages over 5+ distinct
+    # globals per window, producing a degenerate-direction average. The
+    # TFA-pos baseline (with positional embeddings) is the BEST on this
+    # setup — TFA-pos's structure matches the positional regularity.
 ]
 
 

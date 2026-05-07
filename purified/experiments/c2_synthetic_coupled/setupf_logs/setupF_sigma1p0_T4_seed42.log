@@ -1,0 +1,4 @@
+[run_on_gpu] CUDA_VISIBLE_DEVICES=5 exec: .venv/bin/python -m experiments.c2_synthetic_coupled.run_setup_f --datasource toy_coupled_obs_noise_K10_M20_d256_sigma1p0 --T 4 --seed 42 --k-poses 1 2 3 --n-steps 8000 --archs txc_base
+[setupF] txc_base T=4 k=1 seed=42 σ=1.0 ds=toy_coupled_obs_noise_K10_M20_d256_sigma1p0
+[setupF] txc_base T=4 k=2 seed=42 σ=1.0 ds=toy_coupled_obs_noise_K10_M20_d256_sigma1p0
+[setupF] txc_base T=4 k=3 seed=42 σ=1.0 ds=toy_coupled_obs_noise_K10_M20_d256_sigma1p0

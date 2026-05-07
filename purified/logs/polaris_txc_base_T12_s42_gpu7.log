@@ -1,0 +1,5 @@
+[run_on_gpu] CUDA_VISIBLE_DEVICES=7 exec: env AGENT_NAME=agent_synth TEMP_BENCH_POD_MODE=persistent OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.fill_baselines --datasource toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow --arch txc_base --T 12 --seed 42 --k-poses 1 2 3 --n-steps 8000
+[fill_baselines] arch=txc_base T=12 seed=42 ds=toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow k_poses=[1, 2, 3] n_steps=8000
+[fill_baselines] txc_base     T=12     k= 1 seed=42 ds=toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow n_steps=8000
+[fill_baselines] txc_base     T=12     k= 2 seed=42 ds=toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow n_steps=8000
+[fill_baselines] txc_base     T=12     k= 3 seed=42 ds=toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow n_steps=8000
