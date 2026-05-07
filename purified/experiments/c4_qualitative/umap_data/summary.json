@@ -1,0 +1,257 @@
+{
+  "arm": "txc",
+  "n_features": 5033,
+  "n_clusters": 15,
+  "noise_frac": 0.00019868865487780648,
+  "silhouette": 0.009843389503657818,
+  "mean_cohesion": 0.6308478594176796,
+  "clusters": [
+    {
+      "cluster": 0,
+      "name": "ticker \u00b7 financial \u00b7 stock \u00b7 nyse",
+      "n_features": 17,
+      "cohesion": 0.631954080918256,
+      "safety": {
+        "NONE": 17
+      },
+      "sample": [
+        "This feature detects financial analyst rating statements, specifically phrases indicating positive stock recommendations (buy ratings/reaffirmations) from research firms like BTIG regarding particular securities.",
+        "This feature activates on financial market reporting contexts, specifically passages describing stock index performance with benchmark indicators (S&P 500, S&P/ASX 200) in news-style writing.",
+        "This feature activates on stock ticker symbols and exchange identifiers in financial text, particularly when they appear in parenthetical notation like (NYSE: TICKER) or within ticker references across various market contexts.",
+        "This feature activates on stock ticker symbols and exchange identifiers in financial text, particularly when they appear in parenthetical citations or within structured financial data contexts (e.g., \"NYSE:SENS\", \"LEND\").",
+        "This feature activates on financial market reporting contexts, particularly around stock index performance (S&P 500) and economic indicators like employment data and housing markets, capturing language that describes economic trends and market movements."
+      ]
+    },
+    {
+      "cluster": 1,
+      "name": "news \u00b7 location \u00b7 dateline \u00b7 article",
+      "n_features": 117,
+      "cohesion": 0.6653525669807324,
+      "safety": {
+        "NONE": 117
+      },
+      "sample": [
+        "This feature activates on the beginning of news article headlines and article openings, particularly those with location tags, datelines, or typical journalistic framing devices that introduce news stories.",
+        "This feature activates on geographic dateline headers\u2014the opening location citations (city, state) that precede news articles or press releases, typically formatted with a comma or period separator.",
+        "This feature activates on the opening structure of news articles, specifically the dateline format where a geographic location precedes a news organization abbreviation in parentheses (e.g., \"CITY, STATE (AP)\"), marking the beginning of wire service journalism.",
+        "This feature activates on the beginning of news articles, specifically the dateline format where a geographic location precedes a news organization acronym (e.g., \"WASHINGTON (AP)\", \"NEW YORK (Reuters)\") that marks the start of journalistic content.",
+        "This feature activates on news article datelines and bylines\u2014the standardized opening format containing location names (often in all caps), news source abbreviations in parentheses, and punctuation separators that precede the article body."
+      ]
+    },
+    {
+      "cluster": 2,
+      "name": "death \u00b7 dead \u00b7 dying \u00b7 died",
+      "n_features": 6,
+      "cohesion": 0.7189565022786458,
+      "safety": {
+        "NONE": 6
+      },
+      "sample": [
+        "This feature activates on legal definitions related to \"dying declarations\" in evidence law, particularly the phrase structure defining it as \"a statement written on verbal of relevant facts made by a person who is dead.\"",
+        "This feature detects phrases and contexts describing death or mortality\u2014including explicit deaths (murdered, died, killed), euphemisms (\"no longer with us,\" \"fallen to his death\"), and legal/medical references to deceased persons.",
+        "This feature activates on text segments describing death, mortality, and related grief contexts\u2014including phrases like \"died,\" \"dead,\" \"funeral,\" \"cremated,\" and \"no longer with us\"\u2014spanning news reports, personal narratives, and formal statements about deceased individuals.",
+        "This feature activates on phrases describing death or dying, particularly when the death reference spans across a window boundary or appears in news/factual reporting contexts about fatal incidents.",
+        "This feature activates on phrases describing death, memorial contexts, and obituary-style language\u2014particularly transitional phrases like \"no longer with us,\" \"cremated and remembered,\" and \"late\" that mark someone's passing in respectful, formal discourse."
+      ]
+    },
+    {
+      "cluster": 3,
+      "name": "year \u00b7 activates \u00b7 numerical \u00b7 particularly",
+      "n_features": 15,
+      "cohesion": 0.6856812250046503,
+      "safety": {
+        "NONE": 15
+      },
+      "sample": [
+        "This feature activates on age descriptors and demographic identifiers in text, particularly phrases containing \"X-year-old\" or \"X y/o\" that specify a person's age in context.",
+        "This feature activates on age descriptors embedded within larger contexts, particularly when age is specified as a hyphenated compound (e.g., \"17-year-old,\" \"40-year-old\") appearing mid-sentence or near sensitive situations.",
+        "This feature activates when numerical values (ages, years, ordinals, quantities, measurements) appear in hyphenated or dash-separated contexts, particularly around demographic descriptors or temporal references like \"40-year-old\" or \"2009 Summer.\"",
+        "This feature tracks age/grade-level specifications and demographic categorizations of students, particularly in educational contexts where grade ranges or student cohorts are being identified.",
+        "This feature activates on age expressions formatted as \"X-year-old\" or numerical percentages/statistics embedded within text, particularly when describing individuals in news or conversational contexts."
+      ]
+    },
+    {
+      "cluster": 4,
+      "name": "acronyms \u00b7 acronym \u00b7 abbreviated \u00b7 full",
+      "n_features": 46,
+      "cohesion": 0.6624120150211352,
+      "safety": {
+        "NONE": 46
+      },
+      "sample": [
+        "This feature detects abbreviations and acronyms followed by periods in business/legal document text, particularly tracking the tokenization boundaries around abbreviated company names and institutional designations (e.g., \"CO.\", \"INS.\", \"IMP.\", \"EXP.\").",
+        "This feature activates on acronym introductions\u2014specifically the pattern where a full name or phrase is followed by its parenthesized abbreviation, marking the point where an acronym is first defined for the reader.",
+        "This feature detects acronyms or abbreviations with their full expansions, particularly when the acronym appears in parentheses or is introduced via \"is/are\" constructions immediately following the spelled-out term.",
+        "This feature detects acronym introductions where an organization, entity, or term is spelled out in full immediately before its abbreviated form appears in parentheses.",
+        "This feature activates on acronyms or abbreviations that are introduced by their full organizational/entity names in parentheses, capturing the pattern of formal name-to-acronym expansion."
+      ]
+    },
+    {
+      "cluster": 5,
+      "name": "sports \u00b7 team \u00b7 particularly \u00b7 activates",
+      "n_features": 56,
+      "cohesion": 0.5660280698305601,
+      "safety": {
+        "NONE": 56
+      },
+      "sample": [
+        "This feature activates on numerical vote counts and their surrounding context in legislative or judicial decisions, particularly when the activation window spans across the numeric values themselves (e.g., \"64 to 53\" or \"5to\").",
+        "This feature tracks the specific phrase \"Champions Trophy\" and contextual variants describing India's cricket victory, suggesting it detects references to a particular historical sporting event or factual claim about cricket tournament outcomes.",
+        "This feature detects the \"versus\" or \"v.\" connector that introduces competitive opposition between two entities in sports, legal cases, or similar matchup contexts.",
+        "This feature activates on the boundary between temporal/contextual setup phrases and action descriptions in sports biography text, particularly where a year or grade level (\"junior in 2009\") transitions into past-tense performance statements (\"Played in three games\").",
+        "This feature activates on numerical statistics (points, rebounds, assists, steals) in sports performance narratives, particularly when those numbers are positioned at sentence boundaries or clause transitions."
+      ]
+    },
+    {
+      "cluster": 6,
+      "name": "numerical \u00b7 numbers \u00b7 activates \u00b7 particularly",
+      "n_features": 363,
+      "cohesion": 0.5227694250072294,
+      "safety": {
+        "NONE": 362,
+        "HARMFUL_CONTENT": 1
+      },
+      "sample": [
+        "This feature detects numeric quantities, measurements, specifications, and product/property descriptors that appear at the beginning of text blocks\u2014typically marking product listings, technical specs, or factual data points in structured content.",
+        "This feature detects numeric sequences and decimal representations of latitude/longitude coordinates, particularly activating on fragmented or partial coordinate values and their separators.",
+        "This feature activates on domain names and email addresses embedded within text, capturing the pattern of web URLs and email contact information appearing in various contextual documents.",
+        "This feature activates on e-commerce payment plan descriptions, particularly the phrase \"interest-free payments\" appearing in product purchase options with installment details and currency amounts.",
+        "This feature tracks academic citation and bibliographic metadata formatting, specifically the activation patterns around volume numbers, publication years, and conference proceedings identifiers in structured reference lists."
+      ]
+    },
+    {
+      "cluster": 7,
+      "name": "blog \u00b7 blogging \u00b7 blogs \u00b7 platforms",
+      "n_features": 7,
+      "cohesion": 0.8323396955217633,
+      "safety": {
+        "NONE": 7
+      },
+      "sample": [
+        "This feature detects text discussing blog posts, blogging activities, and blog-related metadata (posting frequency, blog platforms, blog content updates).",
+        "This feature activates on the word \"blog\" and its related forms (blogging, blogs, blogger) appearing in various contexts across personal narratives, announcements, and instructional text.",
+        "This feature tracks references to blogging activities, blog platforms, and blog-related content creation\u2014including mentions of starting blogs, writing posts, visiting blogs, and blog-specific contexts.",
+        "This feature activates on text discussing blogging, blogs, and blog-related activities\u2014including references to blog platforms, blog content creation, blog hops, and mentions of specific blogs or blogging communities.",
+        "This feature detects mentions of blogs and blogging-related content, particularly phrases that reference blog names, blog platforms, or activities associated with blogging (running blogs, blog posts, blog hops)."
+      ]
+    },
+    {
+      "cluster": 8,
+      "name": "date \u00b7 temporal \u00b7 time \u00b7 activates",
+      "n_features": 656,
+      "cohesion": 0.5802829649390244,
+      "safety": {
+        "NONE": 656
+      },
+      "sample": [
+        "This feature activates on temporal and date-related information, particularly dates, times, year ranges, and temporal markers that appear at or near the beginning of text passages.",
+        "This feature activates on date expressions immediately following a day-of-week token at the beginning of text, specifically tracking the transition from weekday names into calendar dates (day numbers and month names).",
+        "This feature activates on phrases describing rapid temporal progression or sudden changes in circumstances, particularly around pandemic-related discourse where time becomes a salient dimension of experience (e.g., \"extra time we're spending,\" \"within a matter of weeks\").",
+        "This feature activates on recurring episode/installment introductions and content series preambles that establish continuity (\"again,\" \"week,\" \"another,\" \"back for\") within casual, community-oriented formats like podcasts and blogs.",
+        "This feature activates on date expressions appearing at the beginning of text (after BOS token), particularly formatted as month-day or month-day-year patterns, likely tracking timestamp/publication metadata markers common in web-scraped or journalistic content."
+      ]
+    },
+    {
+      "cluster": 9,
+      "name": "biblical \u00b7 verse \u00b7 chapter \u00b7 religious",
+      "n_features": 22,
+      "cohesion": 0.5326181386972403,
+      "safety": {
+        "NONE": 21,
+        "HARMFUL_CONTENT": 1
+      },
+      "sample": [
+        "This feature activates on biblical references and citations, particularly when scripture passages (book names, chapter:verse numbers) appear at or near activation boundaries, often within devotional or religious instructional content.",
+        "This feature activates on spans within a specific biblical passage (Isaiah 43:19) about divine creation and renewal, regardless of window position, suggesting it tracks recognition of this particular scriptural text or its thematic content about novelty and transformation.",
+        "This feature activates on biblical and scriptural citations in the format of book abbreviations followed by chapter and verse numbers (e.g., \"1 Samuel 15:8\", \"Deut. 6:4\"), particularly when the chapter-verse delimiter appears in the activation window.",
+        "This feature detects biblical verse citations and reference formatting, particularly the structural elements of scripture notation (book name, chapter:verse numbers) and the accompanying quoted text or commentary that follows such citations.",
+        "This feature activates on Christian theological and religious content, particularly around doctrinal keywords (apostasy, biblical authority, Christ, Christianity) and charismatic/prophetic Christian ministry contexts (healing, deliverance declarations, pastoral authority)."
+      ]
+    },
+    {
+      "cluster": 10,
+      "name": "metadata \u00b7 structured \u00b7 field \u00b7 fields",
+      "n_features": 56,
+      "cohesion": 0.6937099704494724,
+      "safety": {
+        "NONE": 56
+      },
+      "sample": [
+        "This feature activates on structured metadata labels and their associated values, typically appearing as \"Label: Value\" pairs in formatted text where a colon or pipe delimiter separates the field name from its content.",
+        "This feature detects structured data fields and their values, particularly the pattern of labeled metadata (field name followed by colon or pipe delimiter, then the corresponding value), commonly found in product listings, biographical profiles, and informational tables.",
+        "This feature detects structured metadata fields and categorical labels typically found in wiki/database markup or semi-structured web text, where labeled categories (e.g., \"Scientific Name:\", \"High School:\", \"Place of Origin\") precede factual values separated by pipes or colons.",
+        "This feature activates on structured metadata fields\u2014typically the value portion that follows a colon or double-pipe delimiter in tabular or semi-structured data, capturing specific factual entries like product composition, locations, scientific names, venue names, and inventory counts.",
+        "This feature activates on structured metadata fields\u2014particularly date, duration, dimension, and categorical labels that appear after colons or delimiters in semi-formatted documents like catalogs, event listings, and technical records."
+      ]
+    },
+    {
+      "cluster": 11,
+      "name": "species \u00b7 taxonomic \u00b7 binomial \u00b7 nomenclature",
+      "n_features": 11,
+      "cohesion": 0.718246113170277,
+      "safety": {
+        "NONE": 11
+      },
+      "sample": [
+        "This feature detects scientific binomial nomenclature (genus + species names in Latin), particularly when they appear as structured taxonomic identifiers in formatted text or within parenthetical clarifications.",
+        "This feature activates on taxonomic metadata patterns, specifically the \"Species Authority\" field that records the scientist name and year who first formally described a biological species.",
+        "This feature activates on scientific or taxonomic names (binomial nomenclature, species authorities, genus-species pairs) appearing within informational text, particularly when these formal names are positioned after common names or descriptive context.",
+        "This feature activates on scientific taxonomic names and binomial nomenclature (genus and species pairs like \"Zalophus californianus\" or \"Plasmodium falciparum\"), particularly when these formal Latin names appear in structured biological or taxonomic contexts.",
+        "This feature activates on taxonomic and botanical descriptive text, particularly when identifying scientific names, plant classifications, or formal nomenclature within lists or structured biological descriptions."
+      ]
+    },
+    {
+      "cluster": 12,
+      "name": "account \u00b7 authentication \u00b7 sign \u00b7 login",
+      "n_features": 20,
+      "cohesion": 0.6339975457442434,
+      "safety": {
+        "NONE": 18,
+        "HARMFUL_CONTENT": 2
+      },
+      "sample": [
+        "This feature activates on account creation and user authentication interface text, particularly phrases like \"Create one now,\" \"Create an account,\" \"Sign in,\" and \"Register\" that appear in login/signup flow contexts.",
+        "This feature activates on login and authentication interface text, particularly phrases instructing users to sign in, log in, or enter credentials like account numbers or passwords.",
+        "This feature detects account registration and sign-up prompts, particularly the phrase \"sign up for\" and related authentication/membership enrollment language across various websites and services.",
+        "This feature detects technical vulnerability disclosures that describe cybersecurity exploits, particularly passages explaining how security flaws enable malicious activities or unauthorized access.",
+        "This feature activates on login and authentication prompts, particularly text snippets from web interfaces that encourage users to sign in, create accounts, or access account-related functionality."
+      ]
+    },
+    {
+      "cluster": 13,
+      "name": "activates \u00b7 phrases \u00b7 particularly \u00b7 content",
+      "n_features": 3501,
+      "cohesion": 0.42749687844289386,
+      "safety": {
+        "NONE": 3463,
+        "BIAS": 7,
+        "HARMFUL_CONTENT": 23,
+        "REFUSAL": 2,
+        "DECEPTION": 6
+      },
+      "sample": [
+        "This feature activates on first-person narrative openings that transition from self-description or personal statements into specific content or claims, particularly patterns like \"I have/am [adjective/descriptor]\" followed by a pivot to concrete details or experiences.",
+        "This feature tracks the beginning of news articles, web content headers, and published text fragments\u2014specifically detecting the opening tokens of formatted documents like news stories, bylines, and webpage titles that appear after the start-of-sequence marker.",
+        "This feature activates on proper nouns and branded names (company names, product titles, band names, game titles) that appear at the beginning of text sequences, often followed by descriptive or contextual information.",
+        "This feature activates on search query titles, webpage headers, and content introductions that appear at the beginning of documents\u2014essentially tracking the onset of indexed or catalogued informational content that typically follows a <bos> token.",
+        "This feature activates on the beginning of straightforward, declarative statements that introduce a topic or subject with a neutral, informative tone\u2014typically statements that establish context before elaborating on details."
+      ]
+    },
+    {
+      "cluster": 14,
+      "name": "location \u00b7 geographic \u00b7 activates \u00b7 place",
+      "n_features": 139,
+      "cohesion": 0.590872699259071,
+      "safety": {
+        "NONE": 139
+      },
+      "sample": [
+        "This feature activates on geographical/navigational text describing walking routes with directional instructions and place names, particularly tracking transitions between sequential route segments (e.g., \"continuing north on footpaths\").",
+        "This feature activates on proper noun phrases that provide geographical or institutional specificity\u2014typically a named entity (school, tribe, company, location) followed by or paired with a place descriptor (city, county, state). It captures the pattern of anchoring abstract or general references to concrete, locatable entities.",
+        "This feature tracks sequences in Xhosa (a South African language), specifically activating on phrases related to holiday accommodations and booking/searching patterns\u2014the repeated phrases \"Iindawo zeholide eziqeshisayo\" (holiday venues available) and \"Fumana uze ubhukishe iindawo\" (find and book venues) suggest travel search or tourism-related text fragments.",
+        "This feature activates on text segments that precede or follow comparative/descriptive phrases introducing geographic regions, ethnic groups, product variants, or organizational details\u2014often in contexts where specific locations or categories are being named or contrasted.",
+        "This feature activates on phrases that describe locations or spatial relationships using prepositional constructions, particularly those that specify proximity or containment (e.g., \"in the hills,\" \"on the street side of,\" \"in the\") following descriptive noun phrases."
+      ]
+    }
+  ]
+}
