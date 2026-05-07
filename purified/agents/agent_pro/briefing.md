@@ -584,28 +584,128 @@ Two setups = ~500 cells. Wall on 7× 5090 saturated: ~25-40 min.
 
 ## Current state (agent owns — overwrite at every compact)
 
-**SPAWNING 2026-05-07T01:30Z under direct Han override** —
-previous C3 probing-protocol mission ABORTED by Han before launch.
-This briefing is a fresh redirect to C2 synthetic Setup K + L.
+**Last verified: 2026-05-07T02:50Z. Status: K + L + PHALANX + OBELISK
+all COMPLETE. All four are NEGATIVE results for TXC's gAUC outshine.
+Ready to commit + push.**
 
-No work done yet on this mission. agent_pro starts cold.
+- Pod: 7× RTX 5090, 989 GB RAM, 224 CPUs, ephemeral.
+- `git HEAD`: rebased onto origin/final (4926ae4d at last fetch).
+  All conflicts (datasources.yaml, c2.md, fill_baselines.py,
+  leaderboard.jsonl, manifest.jsonl) resolved via union+dedupe-by-key
+  for jsonl + git's auto-merge of disjoint hunks for the others.
+- All four sweeps complete (audit ✓ row counts):
+  - K (anti-correlated globals): 219 rows
+  - L (magmod α=1): 219 rows
+  - PHALANX (period τ=8): 219 rows
+  - OBELISK (rare + α=5): 219 rows
+  - 219 = 12 archs × 3 seeds × per-T k_pos cap (sum across T values).
+- Headline (all four NEGATIVE):
+  - **Setup K**: TopK-SAE wins both AUCs (gAUC 0.833 / eAUC 0.983).
+    Best TXC gAUC 0.598. DROP.
+  - **Setup L (α=1)**: All archs near-zero gAUC. TXC T=2 wins eAUC
+    by +0.13. DROP for headline gAUC.
+  - **Setup PHALANX (τ=8)**: TXC at T ≥ τ DEGRADES (gAUC 0.054-0.057
+    vs T=2's 0.124). T-SAE wins gAUC at 0.136. TXC T=2 wins eAUC by
+    +0.026 over TopK-SAE. DROP for headline gAUC.
+  - **Setup OBELISK (α=5, p_l=0.05)**: TXC uniformly fails gAUC at
+    0.010 across all T. TopK-SAE wins gAUC + eAUC. DROP.
+  - **Combined finding**: sparse temporal signals embedded in
+    sparsely-firing locals do NOT favour window pooling at the toy
+    d_sae=40 / n_steps=8 000 scale.
+- Plots: K + L + PHALANX + OBELISK 4-plot suites in
+  `experiments/c2_synthetic_coupled/plots/c2_setup_{k,l,phalanx,obelisk}_*.png`.
+- c2.md sections updated for all 4 setups with headline findings.
 
 ## What I just did (agent owns — overwrite)
 
-(none — first session under new mission.)
+(Pre-2026-05-07T02:30Z work done by previous agent_pro session;
+2026-05-07T02:30Z+ work done by this session.)
+
+1. (Prev) Onboarded; authored K + L generators + smoke; ran K+L
+   sweep + render + c2.md updates; authored PHALANX + OBELISK
+   generators + launched the follow-up sweep.
+2. (This session) Resumed at 2026-05-07T02:39Z when bash-tool poll
+   `bcyendoyw` fired (final canonical c3 sweeps from prior aborted
+   mission completed). Read the rewritten briefing; recognised the
+   c3 → c2 reassignment.
+3. Audited the 7-GPU PHALANX+OBELISK sweep: 219 + 219 cells, 12
+   archs × 3 seeds × per-T k_pos cap, all complete.
+4. Re-ran `agents.agent_pro.render_kl_plots` to refresh K + L +
+   PHALANX + OBELISK plot suites (idempotent; 16 PNGs written).
+5. Computed headline gAUC + eAUC tables per arch×T per setup
+   (gauc/eauc fields in metrics dict; per-arch best across k_pos).
+6. Updated `docs/components/c2.md` PHALANX + OBELISK sections with
+   the headline findings + DROP rationale (no TXC gAUC outshine on
+   either; combined finding written into the OBELISK section).
+7. `git pull --rebase origin final` (7 commits behind: agent_synth +
+   agent_filler advances). Resolved 5 conflicts:
+   - jsonl files (leaderboard, manifest) via union+dedupe by primary key.
+   - YAML / Python / Markdown via git's auto-merge (disjoint hunks
+     from concurrent agent_synth + agent_pro work).
+8. Staged C2-only deliverables: 4 toy generators, K+L+PHALANX+OBELISK
+   plots (32 PNGs), 3 launcher scripts, render_kl_plots.py,
+   datasources.yaml + fill_baselines.py + c2.md edits, briefing.md,
+   leaderboard.jsonl, manifest.jsonl. Explicitly UNSTAGED
+   `src/temp_bench/eval/probing.py` per the briefing's "don't
+   commit aborted-c3 work" rule.
+9. About to commit + push.
 
 ## Next action (agent owns — overwrite)
 
-Follow "Concrete first actions" 1-9 above. Smoke env first; commit
-generator code + YAML + driver extension; verify one cell lands;
-then launch the full sweep on all 7 GPUs; render plots; add c2.md
-sections; commit + push.
+Mission is essentially done. After commit + push:
+
+1. (Optional, if Han wants more iteration) Try further "knobs" — see
+   Open Q #2 (α-sweep on Setup L) for a candidate that maps the SNR
+   threshold below which gAUC fails. Adds ~144 shards (~30-45 min).
+2. (Optional) An α=10 / α=20 OBELISK variant with p_l=0.10 might be
+   more SNR-favorable. Higher α + slightly less rare firings.
+3. (Cleanup, if asked) Revert the c3 leftovers in
+   `src/temp_bench/eval/probing.py` and the
+   `experiments/c3_probing_pooling_sweep/` dir to clean working
+   tree.
 
 ## Don't repeat (agent owns — overwrite)
 
-(populated by future sessions as lessons accumulate.)
+- **Don't `pgrep -af "...|..."` with `\|`.** ERE alternation needs
+  `(a|b)` parens with bare `|` (no escape). The watcher in
+  `run_setup_kl.sh` polls correctly; my hand-rolled background
+  watchers used the wrong form initially and either self-matched
+  the bash subprocess (false positive on `pgrep -af`) or returned
+  zero matches with `\|`. Solution: use
+  `pgrep -f "fill_baselines.*(toy_X|toy_Y)"` (no -a, ERE syntax).
+- **Don't render plots before all shards complete.** The render
+  pipeline is idempotent so partial renders don't corrupt anything,
+  but partial plots are misleading at glance. Render once at end.
+- **Don't use `TEMP_BENCH_POD_MODE=ephemeral` in the launcher.**
+  The shared synth pod is ephemeral by `set_agent_env.sh`, but
+  setting `TEMP_BENCH_POD_MODE=persistent` in the `env VAR=val cmd`
+  line of the launcher disables auto-push to HF (avoids the 256
+  commits/hour rate limit when 72 shards run in parallel). agent_synth
+  + agent_hammer learned this the hard way; my launchers inherit.
+- **Don't commit `src/temp_bench/eval/probing.py` or
+  `experiments/c3_probing_pooling_sweep/`.** Those are leftovers
+  from the aborted C3 probing-protocol mission. They're additive
+  (don't break tests) but not in scope for the c2 mandate.
 
 ## Open questions for Han (agent owns — overwrite)
 
-(See "Open questions for Han" above the divider — those carry
-forward until resolved or revoked.)
+1. **K + L are NEGATIVE for TXC.** Setup K's TopK-SAE wins both AUCs;
+   Setup L (α=1) has all archs at near-zero gAUC. Per the
+   briefing's "If TXC doesn't outshine, DROP and try another knob",
+   I dropped them and launched PHALANX (period-locked phase) +
+   OBELISK (rare + α=5 magnitude-mod). Should K and L be removed
+   from c2.md entirely (vs documented as null findings)? My current
+   draft documents them as null findings + cites them as motivation
+   for the next iteration. Easy to revert if you'd rather they
+   not appear at all.
+2. **α-sweep for Setup L?** The α=1 result suggests SNR is the
+   binding constraint. Should I add an α-sweep (α ∈ {0.5, 1, 2, 5})
+   to map the threshold at which TXC starts to win gAUC? Adds 4×
+   datasources × 36 shards = 144 shards. OBELISK at α=5 is one
+   point in this sweep already.
+3. **Probe.py + c3 leftovers.** Stale from prior aborted mission.
+   Leave on disk uncommitted (current state) or revert? Reverting
+   loses the additive `s_tail_probe_variant` work; if a future c3
+   session needs pooling exploration, the code is on this pod's
+   working tree only and lost on stop. Recommend keeping
+   uncommitted; revert if you want a clean working tree.
