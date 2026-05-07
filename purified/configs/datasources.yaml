@@ -554,3 +554,56 @@ datasources:
     magnitude_mean: 1.0
     magnitude_std: 0.15
     notes: "C2 ENGINEER: 2-parent modulation (more global influence, harder per-token)."
+
+  # ── Setup F: coupled HMM with additive Gaussian observation noise.
+  # Same OR-gate coupling as Setup A; only difference is +N(0, σ²·I_d)
+  # added to the observation. Tests Setup-B-style denoising on coupled.
+  # σ = 0 recovers Setup A. ────────────────────────────────────────────
+
+  toy_coupled_obs_noise_K10_M20_d256_sigma0p5:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_obs_noise_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    obs_noise_sigma: 0.5
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup F: Setup A + obs noise σ=0.5 (SNR ~2:1 per activation)."
+
+  toy_coupled_obs_noise_K10_M20_d256_sigma1p0:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_obs_noise_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    obs_noise_sigma: 1.0
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup F: Setup A + obs noise σ=1.0 (SNR ~1:1 per activation)."
+
+  toy_coupled_obs_noise_K10_M20_d256_sigma2p0:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_obs_noise_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    obs_noise_sigma: 2.0
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup F: Setup A + obs noise σ=2.0 (SNR ~1:2 per activation)."
