@@ -137,8 +137,7 @@ Across \textit{TempBench}, temporal aggregation helps when the target feature is
 % \label{sec:intro}
 % Sparse autoencoders have become a foundational tool for interpreting large language models. By decomposing activations into sparse, reusable directions, SAEs provide a feature dictionary that supports monosemantic feature discovery, sparse probing, steering, model comparison, and large-scale interpretability workflows
 % \citep{cunningham2023sparse,bricken2023monosemanticity,templeton2024scaling,
-% gao2024scaling,bussmann2024batchtopksparseautoencoders,lieberum2024gemmascope,
-% kantamneni2025are,lindsey2024sparsecrosscoders}.
+% gao2024scaling,bussmann2024batchtopksparseautoencoders,lieberum2024gemmascope,lindsey2024sparsecrosscoders}.
 
 % However, standard SAEs treat each token position independently. This is a poor match to language, where structure exists across many temporal scales: local syntactic dependencies, sentence-level expectations, discourse-level event structure, and long-range narrative coherence
 % \citep{chomsky1965aspects,jager2012formal,marslenwilson1980temporal,
@@ -1086,7 +1085,7 @@ The synthetic benchmarks above test whether a dictionary can recover known tempo
 \subsection{Sparse Probing}
 \label{sec:sparse-probing}
 
-Sparse probing tests whether dictionary features support simple classifiers for human-interpretable text concepts. We evaluate \texttt{google/gemma-2-2b-it} layer~13 on the $38$-task SAEBench panel, with all architectures trained at matched expected per-token $L_0=20$. For each task and feature budget $k_{\mathrm{feats}}\in\{5,10,20,40,80,160,320,640\}$, we select features by training-split class-mean difference and fit an $\ell_1$-regularized logistic probe. Full architecture, pooling, task, and aggregation details are in \cref{app:c3}.
+Sparse probing tests whether dictionary features support simple classifiers for human-interpretable text concepts. We evaluate \texttt{google/gemma-2-2b-it} layer~13 on the $36$-task SAEBench panel, with all architectures trained at matched expected per-token $L_0=20$. For each task and feature budget $k_{\mathrm{feats}}\in\{5,10,20,40,80,160,320,640\}$, we select features by training-split class-mean difference and fit an $\ell_1$-regularized logistic probe. Full architecture, pooling, task, and aggregation details are in \cref{app:c3}.
 
 \begin{figure*}[t]
     \centering
@@ -1103,7 +1102,7 @@ Sparse probing tests whether dictionary features support simple classifiers for 
         \caption{AUC vs.~number of probe features, with TFA omitted for scale.}
         \label{fig:sparse_probing_curves_gemma_it}
     \end{subfigure}
-    \caption{Sparse probing on \texttt{google/gemma-2-2b-it} layer~13 over $38$ SAEBench tasks. Temporal methods cluster near the top in $\overline{\mathrm{AUC}}$ and outperform the per-token TopK SAE baseline; the advantage appears by $k_{\mathrm{feats}}\geq 20$ and saturates near $160$. Full curves including TFA are in \cref{fig:sparse_probing_full}.}
+    \caption{Sparse probing on \texttt{google/gemma-2-2b-it} layer~13 over $36$ SAEBench tasks. Temporal methods cluster near the top in $\overline{\mathrm{AUC}}$ and outperform the per-token TopK SAE baseline; the advantage appears by $k_{\mathrm{feats}}\geq 20$ and saturates near $160$. Full curves including TFA are in \cref{fig:sparse_probing_full}.}
     \label{fig:sparse_probing}
 \end{figure*}
 
@@ -1138,6 +1137,7 @@ We evaluate both causality and detection. Inducement counts genuine backtracking
 
 
 \subsection{Emergent Misalignment}
+\label{sec:em}
 
 \afterpage{
 \begin{figure*}[t]
@@ -1168,11 +1168,36 @@ We evaluate \texttt{Qwen-2.5-7B-Instruct} finetuned with a bad-medical-advice Lo
 \subsection{Decomposing HH-RLHF Preference Data}
 \label{sec:rlhf}
 
-HH-RLHF pairs each prompt with a preferred \texttt{chosen} and dispreferred \texttt{rejected} response \cite{bai2022training}. Since \citet{bhalla2025tsae} use this dataset to test whether temporal features recover multi-token preference signals, we rerun their \S4.5 / Appendix B.1 protocol on our locked architectures. We rank features by $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ over response tokens and classify top features by correlation with response-length difference.
+HH-RLHF pairs each prompt with a preferred \texttt{chosen} and dispreferred \texttt{rejected} response \cite{bai2022training}. Since \citet{bhalla2025temporal} use this dataset to test whether temporal features recover multi-token preference signals, we rerun their \S4.5 / Appendix B.1 protocol on our locked architectures. We rank features by $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ over response tokens and classify top features by correlation with response-length difference.
 
 The result is a negative case for TXC. T-SAE at the paper setting $k=20$ recovers $14/20$ semantic top features, no length-spurious features, and $63\%$ semantic mass. At the larger $k_{\mathrm{win}}=500$ budget, TopK SAE and T-SAE both fall to roughly $10/20$ semantic features and $50\%$ semantic mass. TXC performs worst on this static decomposition metric, with $7/20$ semantic and $3$ length-spurious features. We read this as evidence that temporal aggregation can help causal interventions spanning multiple tokens, as in \cref{sec:backtracking}, while hurting rank-based interpretability when response length is a confounder. Full summary plots, scatter plots, and autointerpreted labels are in \cref{app:rlhf}.
 
+\section{Limitations}
+\label{sec:limitations}
 
+Our work has two key limitations. Although we believe TempBench provides useful guidance to the
+  dictionary-learning community, it is not a full map of how each architecture behaves. Our results,       
+  summarired in \cref{fig:tempbench_rose}, tentatively suggest that different temporal architectures,
+  namely TXCs and T-SAEs, may be complements rather than substitutes: TXCs perform well on synthetic       
+  temporal recovery and backtracking, while T-SAEs perform better on emergent misalignment and HH-RLHF
+  decomposition. The TXC framework readily admits T-SAE-style smoothness penalties as a drop-in extension,
+  suggesting that the two architectures are not far apart in design space. A more systematic temporal
+  benchmark, across both synthetic processes and real-world tasks, would help clarify the capability
+  profile of each architecture and is an important direction for further work.
+
+  Second, we focus on mapping the capability profile of temporal crosscoders and do not pursue a           
+  theoretical account of when they outperform other architectures. Three follow-up directions fall out of
+  this gap. First, we cannot yet predict in advance which real-world tasks will favor TXCs, T-SAEs,       
+  standard SAEs, or crosscoders. Second, we do not derive optimal hyperparameters for TXCs, so the reported
+   TXC results could be substantially improved. Third, we have not yet attempted to combine the smoothness
+  inductive bias of T-SAEs with the window-shared latent of TXCs in a single architecture; whether the
+  strengths of both can be cleanly recovered in one dictionary is, in our view, the most promising
+  mechanistic question this work raises.
+
+  Taken together, these gaps mean that significant work remains both to fully understand the TXC framework 
+  and to fully exploit it. Mapping the regimes in which a temporal inductive bias pays off, and combining
+  the architectural strengths of TXCs and T-SAEs into a single dictionary, are in our view the most        
+  exciting directions this paper points toward.
 \section{Discussion}
 \label{sec:discussion}
 
