@@ -1,11 +1,126 @@
 \appendix
 
 \section{Model Parameters for each architecture}
+\label{app:model-params}
 
-% \section{Other evals}
+This appendix specifies every architecture and training-time choice that
+is held \emph{constant across components}. The two free per-component
+knobs are the dictionary width $d_{\mathrm{SAE}}$ (one value per subject
+model, sized to the residual-stream dimension; toy data uses
+$d_{\mathrm{SAE}}=40$) and the sparsity budget $k_{\mathrm{pos}}$ (the
+expected number of active latents per sequence position, swept per
+component). Everything else is locked in
+\texttt{configs/locked\_archs.yaml} and
+\texttt{configs/datasources.yaml} of the released codebase. Per-component
+hyperparameter tables — datasource, $d_{\mathrm{SAE}}$, $n_{\mathrm{steps}}$,
+$\{k_{\mathrm{pos}}\}$ sweep grid, seed list — are given in the
+component-specific appendices below.
 
-% \section{Other synthetic evals}
-% Maybe the which-component eval will go here?
+\paragraph{Common training pipeline.}
+All cells share a single trainer. The optimiser is Adam with
+$\mathrm{lr}=3{\times}10^{-4}$, batch size $B=1024$, linear warmup over
+the first $1{,}000$ steps, and \texttt{bf16} mixed precision on
+H100/H200 (\texttt{fp16} with grad-scaler on A40). Toy-data cells run
+$n_{\mathrm{steps}}=8{,}000$--$30{,}000$ depending on component; real-LM
+cells run $n_{\mathrm{steps}}=20{,}000$. Cells with $n_{\mathrm{steps}}<1000$
+are filtered out as smoke runs. Subject-model activations are cached
+once per datasource and re-read by every architecture (matched cache,
+matched hookpoint), and sparsity is matched at the per-position budget
+$k_{\mathrm{pos}}$: per-token dictionaries use $k_{\mathrm{pos}}$ active
+latents at each token, while a windowed architecture of length $T$
+receives the matched window budget $k_{\mathrm{win}} = T \cdot k_{\mathrm{pos}}$
+(and TXC-pro's matryoshka groups receive
+$k_{\mathrm{train}}=5\cdot k_{\mathrm{pos}}$,
+$k_{\mathrm{inference}}=10\cdot k_{\mathrm{pos}}$).
+
+\paragraph{Anti-dead stack (used by every TopK-family architecture).}
+The TopK SAE, T-SAE, TXC-base, and TXC-pro share the same five-component
+anti-dead stack: (i) a per-feature \texttt{num\_tokens\_since\_fired}
+counter and a $10$M-token dead threshold; (ii) AuxK loss with
+$\alpha_{\mathrm{auxk}}=1/32$, where the top-$\!\mathrm{aux\_k}$ dead
+features re-reconstruct the residual; (iii) decoder unit-norm constraint
+applied per-latent over $(T,d_{\mathrm{in}})$; (iv) decoder-parallel
+gradient removal on $W_{\mathrm{dec}}$; (v) geometric-median
+$b_{\mathrm{dec}}$ initialisation on the first batch. This is the
+\citet{bhalla2025temporal} anti-dead recipe, ported verbatim into the
+TXC family. Bricken-style hard resampling \citep{templeton2023scaling}
+is \emph{off} by default (locked spec) and opted into only by C6, where
+it tracks Dmitry et al.'s published Qwen-7B medical recipe; see
+\cref{app:c6}.
+
+\paragraph{TXC-base.}
+The vanilla acausal temporal crosscoder of \cref{sec:txc} with TopK
+sparsity and the full anti-dead stack. The locked window length is
+$T=5$, with per-position encoder weights
+$W_{\mathrm{enc}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}\times d_{\mathrm{SAE}}}$
+($\tau\in[0,T)$) summing into one shared latent vector
+$\mathbf{u}_t\in\mathbb{R}^{d_{\mathrm{SAE}}}$ per window, BatchTopK
+sparsity at $k_{\mathrm{win}}=k_{\mathrm{pos}}\cdot T$ over the latent
+axis, and per-position decoders
+$W_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{SAE}}\times d_{\mathrm{in}}}$
+with bias $b_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}}$
+that reconstruct the full $T$-window. No matryoshka, no contrastive
+loss, no Bricken. Free per-component knobs: $k_{\mathrm{pos}}$ and
+$d_{\mathrm{SAE}}$. C3 additionally trains TXC-base at
+$T\in\{10,20\}$ as a within-architecture probe of temporal-context
+length (\cref{app:c3-archs}).
+
+\paragraph{TXC-pro.}
+TXC-base extended with three orthogonal design choices. (1) \emph{Subseq
+encoder}: train with $T_{\max}=10$ position slabs but sample
+$t_{\mathrm{sample}}=5$ positions per training step, so the encoder
+becomes position-permutation-invariant while the per-position decoders
+remain. At evaluation time, all $10$ positions are used. (2)
+\emph{Matryoshka with $H=8$}: $8$ nested feature groups, each trained
+to reconstruct independently from the first
+$G\cdot d_{\mathrm{SAE}}/8$ features ($G=1,\ldots,8$), encouraging a
+coarse-to-fine feature hierarchy. (3) \emph{Multi-distance contrastive
+loss}: inverse-distance-weighted InfoNCE with shifts
+$\Delta\in\{1,2\}$ that pulls the latent at position $t$ toward latents
+at positions $t\pm\Delta$. The matryoshka head is disabled at toy scale
+(C1, C2 use $h_{\mathrm{size}}=d_{\mathrm{SAE}}=40$) because $5$
+prefix levels of $8$ features do not admit a meaningful hierarchy and
+the smallest prefix would fall below $k_{\mathrm{train}}=5\cdot k_{\mathrm{pos}}$
+at high $k_{\mathrm{pos}}$. Free per-component knobs: $k_{\mathrm{pos}}$
+and $d_{\mathrm{SAE}}$.
+
+\paragraph{Baselines.}
+\textbf{TopK SAE} \citep{gao2024scaling}: per-token dictionary with
+TopK at $k_{\mathrm{pos}}$ and the anti-dead stack. \textbf{Stacked SAE}
+(used in C1, C2, C7): $T$ independent TopK SAEs, one per position in a
+$T$-window, with $k_{\mathrm{win}}=T\cdot k_{\mathrm{pos}}$ window-level
+budget; this is the per-token analogue of the temporal architectures
+and isolates whether the gains attributed to TXC come from temporal
+\emph{aggregation} or from cross-position \emph{weight sharing}.
+\textbf{T-SAE} \citep{bhalla2025temporal}: faithful port of the Ye et
+al.\ 2025 reference implementation (Matryoshka BatchTopK with
+$h_{\mathrm{frac}}=0.20$ high-level features, AuxK loss, geometric-median
+$b_{\mathrm{dec}}$ initialisation, decoder unit-norm projection, raw-dot
+temporal contrastive at $\alpha=1.0$, threshold-based inference); the
+locked $d_{\mathrm{SAE}}=16{,}384$ matches the original paper's Gemma-2-2b
+configuration. \textbf{TFA} \citep{lubana2025priors}: temporal feature
+analyzer with $4$ attention heads; we use the no-position-embedding
+variant by default (TFA) and report the positional variant (TFA-pos)
+where comparing on synthetic data. \textbf{MLC}
+\citep{lindsey2024sparsecrosscoders}: $5$-layer multi-layer crosscoder
+sharing weights across the residual-stream layer axis (centred at the
+component's hookpoint layer; $L=11{-}15$ for Gemma-2-2b-IT C3, $L=8{-}12$
+for Llama-3.1-8B C7), included as a non-temporal cross-axis baseline to
+isolate whether TXC's gains are specific to the temporal axis or generic
+to crosscoder-style sharing. \textbf{SAE-arditi}: $d_{\mathrm{SAE}}=32{,}768$,
+$k_{\mathrm{pos}}=128$ — used as the C6 baseline only, to match Dmitry
+et al.'s published Qwen-medical setup (\cref{app:c6}).
+
+\paragraph{Locked vs.\ free across the paper.}
+The locked TXC-base and TXC-pro definitions above are the only
+architectural commitment: the same two TXC dictionaries are used across
+all seven components, with only $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$
+tuned per component. No per-component hill-climbing of architecture
+hyperparameters (e.g.\ $T$, matryoshka group count, contrastive shifts,
+AuxK weight, dead-threshold) is permitted. A component may opt into
+training-time augmentations only if the choice is documented in the
+per-component appendix and the experiment justifies it; the only such
+opt-in in this paper is Bricken resampling for C6.
 
 \section{Synthetic Benchmarks: Ground-Truth Correspondences and Probe Setup}
 \label{app:synthetic-probes}

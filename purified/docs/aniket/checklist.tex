@@ -138,8 +138,20 @@ IMPORTANT, please:
 
 \item {\bf Experiment statistical significance}
     \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
+    \item[] Answer: \answerYes{}.
+    \item[] Justification: All multi-seed experiments report error bars in the
+    figures and accompanying tables. Each architecture is trained over $3$ seeds
+    on the synthetic and sparse-probing experiments (\cref{sec:synthetic,sec:sparse-probing})
+    and over $2$ seeds on the case-study experiments
+    (\cref{sec:rlhf,sec:emergent-misalignment,sec:backtracking}); whiskers
+    show the seed min--max range on the headline bar charts, std-across-seeds
+    envelopes on the $\overline{\mathrm{AUC}}$ vs.~$k$ curves, and bootstrap
+    confidence intervals on the per-question $\Delta gc$ in the backtracking
+    case study. The factor of variability captured is the random seed used
+    for dictionary initialisation and training data shuffling. Computation
+    methods (trapezoidal-mean propagation for $\overline{\mathrm{AUC}}$,
+    min/max for the bar charts, bootstrap for $\Delta gc$) are documented in
+    the per-component appendices.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
@@ -155,8 +167,22 @@ IMPORTANT, please:
 
 \item {\bf Experiments compute resources}
     \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
+    \item[] Answer: \answerYes{}.
+    \item[] Justification: The paper-bound experiments (the seven components reported
+    in this paper) totalled approximately $330$ H100-equivalent GPU-hours, and the
+    full research project — including failed hypotheses, dropped architecture
+    variants, and exploration on side branches — used approximately $820$
+    additional H100-equivalent hours, for a grand total of approximately
+    $1{,}150$ H100-equivalent GPU-hours. Compute ran on a heterogeneous mix
+    of H100~80GB, H200~141GB, A40~48GB, RTX PRO~6000 Blackwell~96GB, and
+    RTX 5090~32GB GPUs, with conversion to H100-equivalent applied per device
+    (H100~$\approx$~1.0, H200~$\approx$~1.3, A40~$\approx$~0.4, RTX 5090~$\approx$~0.6,
+    RTX PRO 6000~$\approx$~0.8). Per-component subtotals — C1 toy Markov sweep
+    $\approx 1$~hr, C2 coupled-features sweep $\approx 135$~hr, C3 sparse probing
+    $\approx 95$~hr, C4 qualitative latents $\approx 10$~hr (cache-hit on C3),
+    C5 RLHF steering $\approx 30$~hr, C6 emergent misalignment $\approx 50$~hr,
+    C7 backtracking $\approx 10$~hr — are tabulated alongside per-cell timing
+    and the supplementary reproduction guide.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
