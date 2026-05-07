@@ -59,7 +59,7 @@ for shard in "${shards[@]}"; do
   rho_tag="${ds##*_}"  # e.g. "rho00"
   log="logs/hammer_h_${label}_${rho_tag}_seed${seed}.log"
   setsid -f bash scripts/run_on_gpu.sh "${gpu}" -- \
-    env AGENT_NAME=agent_hammer TEMP_BENCH_POD_MODE=ephemeral \
+    env AGENT_NAME=agent_hammer TEMP_BENCH_POD_MODE=persistent \
         OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 \
     .venv/bin/python -m agents.agent_hammer.run_setup_h \
       --datasource "${ds}" --arch "${arch}" --seed "${seed}" \

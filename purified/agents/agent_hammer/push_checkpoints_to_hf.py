@@ -41,24 +41,22 @@ def main() -> None:
     token = _read_token()
     api = HfApi(token=token)
 
-    # Collect agent_hammer train_keys
-    manifest_path = Path("checkpoints/manifest.jsonl")
+    # Collect agent_hammer train_keys — read from on-disk config.jsons
+    # so we catch checkpoints whose manifest entry was lost (HF 429 killed
+    # the proc before append_checkpoint_manifest could run).
     targets = []  # list of (train_key, ckpt_dir)
-    seen = set()
-    with manifest_path.open() as f:
-        for line in f:
-            r = json.loads(line)
-            if r.get("agent") != "agent_hammer":
-                continue
-            tk = r.get("train_key")
-            if tk in seen:
-                continue
-            seen.add(tk)
-            d = Path(f"checkpoints/{tk}")
-            if not (d / "model.safetensors").exists():
-                print(f"  SKIP {tk[:12]} — no local model.safetensors", flush=True)
-                continue
-            targets.append((tk, d))
+    for cfg_path in sorted(Path("checkpoints").glob("*/config.json")):
+        try:
+            cfg = json.loads(cfg_path.read_text())
+        except Exception:
+            continue
+        if cfg.get("agent") != "agent_hammer":
+            continue
+        tk = cfg.get("train_key") or cfg_path.parent.name
+        d = cfg_path.parent
+        if not (d / "model.safetensors").exists():
+            continue
+        targets.append((tk, d))
 
     print(f"Found {len(targets)} agent_hammer checkpoint dirs to push to {REPO_ID}", flush=True)
     if not targets:
