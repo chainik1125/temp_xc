@@ -395,6 +395,39 @@ override via `bash scripts/run_on_gpu.sh <idx> --` works.
 - tsae_paper c1_noisy: 36/36 ✅
 - tsae_paper c2 (Setup A): 36/36 ✅
 
+## THE ONE PAPER GOAL (Han 2026-05-07)
+
+For every new setup we want exactly two things:
+1. **gAUC vs eAUC plot where TXC outshines all baselines**
+   (TopK, Stacked T=2, Stacked T=5, T-SAE, TFA-pos).
+2. **What happens as T grows** (TXC-base T-sweep at fixed k_pos).
+
+Don't add ablations, honest-caveat benches, real-data bridges, or
+mechanism deep-dives. Just propose new generators (vary one
+data-gen knob), run the full 4-plot template, see if TXC outshines.
+Keep what works; drop what doesn't.
+
+## MANDATORY 4-PLOT STANDARD per synthetic setup (Han 2026-05-07)
+
+**Every C2 synthetic setup (A through Z) MUST have exactly these
+four plots** before being considered "complete" and pushed to the
+paper. Filenames for setup `<X>` go in
+`experiments/c2_<scope>/plots/`:
+
+1. `c2_setup_<X>_gauc_vs_k.png` — gAUC vs k_pos, one line per arch,
+   error bars over seeds.
+2. `c2_setup_<X>_eauc_vs_k.png` — eAUC vs k_pos (same axes).
+3. `c2_setup_<X>_scatter.png` — gAUC vs eAUC scatter (one point per
+   (arch, T, k_pos) cell, mean over seeds, y=x diagonal).
+4. `c2_setup_<X>_tsweep.png` — gAUC + eAUC vs T at fixed k_pos
+   (txc_base only, all 7 T values 2/4/5/6/8/10/12).
+
+Implementation: agent_synth's `experiments/c2_synthetic_coupled/
+plot_headline.py` is the existing renderer — extend it with a
+`render_setup(name, filter_fn, plot_dir)` orchestrator that emits
+all four for a given setup. Co-author with agent_synth if your
+setup needs new plotting code.
+
 ## NEW MISSION 2026-05-07T00:55Z — Setup expansion + baseline coverage
 
 Han 2026-05-07T00:55Z: **agent_hammer should basically do the same

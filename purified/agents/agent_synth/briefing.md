@@ -598,9 +598,135 @@ All paths relative to `purified/`. Rules of thumb for agent_filler:
   swept (only the K_l=30 primary was). If c2.md wants to show the
   divide more sharply, sweep K_l=50 (+1 GPU-hour budget).
 
+### DESIGN FRAMEWORK — how to think about new setups
+
+The C2 synthetic suite is a **mechanism-discrimination grid**. Each
+setup isolates ONE axis of difficulty and asks "does TXC's window-
+pooling buy us something on THIS axis?" Once you understand the
+existing axes, the unexplored axes become the next setups.
+
+**Axes already swept**:
+
+| Axis | Setup(s) | What it tests | TXC mechanism |
+|---|---|---|---|
+| Coupling structure (OR-gate, n_parents) | A, D | Hidden-chain → emission projection | dictionary alignment with hidden directions |
+| Per-token Bernoulli emission noise (p_B) | B, D | "Did the emission actually fire?" noise | window-pool over multiple noisy obs of same hidden state |
+| Parent overlap (n_parents up to K_hidden) | D | Per-token signal AMBIGUITY | window-pool sees joint co-firing pattern |
+| Temporal autocorrelation (ρ) | C | Effect 1 (sample agg) vs Effect 2 (temporal pattern) | depends on ρ — Effect 2 only at ρ > 0 |
+| Engineered global vs local separation | E | Slow globals + fast locals in orthogonal directions | TXC biased toward slow, SAE toward fast |
+| Additive Gaussian observation noise (σ) | F, G | Pure denoising | window-pool = √T noise reduction |
+| Window-size T (across all setups) | T-sweep | Local↔global trade-off knob | k_win = k_pos × T grows with T |
+
+**Axes NOT YET swept — these are the next-setup candidates**:
+
+| Axis | Proposed setup | Why it matters for the paper |
+|---|---|---|
+| Negative correlation between globals | K | Tests if TXC sees structure when per-token is i.i.d.-looking |
+| Magnitude-only modulation (locals i.i.d. in support) | L | Pure temporal-PATTERN test — globals not in observation space |
+| High-frequency target (Δh / temporal_derivative) | I (Dmitry Bench 3) | HONEST CAVEAT — TXC FAILS here (low-pass filter limit) |
+| Per-feature heterogeneous ρ | M | Tests if TXC recovers SLOW features preferentially |
+| Sparse globals (very low π_g) | N | Stress test: rare global events recoverable? |
+| MULTI-scale globals (slow + fast hidden) | O | Tests if optimal T depends on hidden timescale |
+| n_seqs / n_steps scaling | P | Sample complexity story |
+| Frequency-domain decomposition (DC/AC ablation) | Q | Dmitry's E9 ablation — confirms low-pass filter narrative |
+
+### CROSS-SETUP PATTERNS (the "discoveries" so far)
+
+These are the empirical regularities across D, E, F, G that any
+new setup design should respect or test:
+
+1. **TXC's gAUC saturates earlier than its eAUC trade-off shows**:
+   On D-np10, gAUC hits 0.99 at T=4 and stays; eAUC keeps rising
+   until T=10+. Interpretation: T=4 windows already disambiguate
+   global structure; bigger T just adds capacity for locals.
+
+2. **Optimal T grows with bench difficulty**: D-np5 (moderate
+   overlap) optimal T=2; D-np10 (max overlap) optimal T=4-12;
+   F σ=0.5 optimal T=4-6; F σ=2.0 optimal T=8-12; G σ=2.0 optimal
+   T=12+. **Rule of thumb**: more noise / more overlap → larger
+   window needed.
+
+3. **TXC's gAUC vs eAUC scatter has a characteristic UP-LEFT
+   trajectory as T grows** on E (and weakly on D). T=2 sits at
+   high eAUC + lower gAUC; T=12 at lower eAUC + higher gAUC. This
+   **IS the local↔global axis made visible**. SAE family meanwhile
+   moves DOWN-RIGHT with k_pos.
+
+4. **The TXC vs SAE gap on gAUC is largest in regimes where
+   per-token information is most ambiguous**: max overlap (D-np10),
+   high noise (F σ=1, G σ=2), high modulation (E). The gap
+   SHRINKS when per-token information is locally sufficient (e.g.
+   D-np5 at high k where SAE has enough capacity).
+
+5. **At fixed d_sae=40, TXC's k_pos × T ≤ d_sae constraint is the
+   binding limit at high T**. This caps the sweep at k_pos=8 for
+   T=5 and k_pos=3 for T=12. Bumping d_sae=80 (touches
+   locked_archs.yaml — agent_paper territory) would extend the
+   trade-off plot in BOTH dimensions.
+
+### THE ONE PAPER GOAL (Han 2026-05-07)
+
+For every new setup we want exactly two things:
+1. **gAUC vs eAUC plot where TXC outshines all baselines**
+   (TopK, Stacked T=2, Stacked T=5, T-SAE, TFA-pos).
+2. **What happens as T grows** (TXC-base T-sweep at fixed k_pos).
+
+Don't get distracted by ablations, real-data bridges, or honesty
+caveats. The mechanism story is "more settings where TXC wins on
+gAUC vs SAE-family + the T-sweep tells us how that win evolves
+with window size".
+
+Pick new setups by VARYING the data-generation knob you haven't
+tried yet, run the full 4-plot template, see if TXC outshines.
+If yes → keep. If no → quietly drop and try another knob.
+
+### MANDATORY 4-PLOT STANDARD per synthetic setup (Han 2026-05-07)
+
+**Every C2 synthetic setup (A through Z) MUST have exactly these
+four plots** before being considered "complete" and pushed to the
+paper. No exceptions. Filenames for setup `<X>` go in
+`experiments/c2_<scope>/plots/`:
+
+1. `c2_setup_<X>_gauc_vs_k.png` — **gAUC vs k_pos**, one line per
+   arch, error bars over seeds, log/linear x as appropriate.
+   Headline metric — answers "TXC vs SAE on global recovery".
+2. `c2_setup_<X>_eauc_vs_k.png` — **eAUC vs k_pos**, same axes,
+   same archs. Answers "TXC vs SAE on local recovery".
+3. `c2_setup_<X>_scatter.png` — **gAUC vs eAUC scatter**, each
+   point = one (arch, T, k_pos) cell mean over seeds, y=x diagonal,
+   k_pos annotated on first/last, T color-coded for txc_base.
+   Visualises the global-vs-local trade-off explicitly.
+4. `c2_setup_<X>_tsweep.png` — **gAUC + eAUC vs T at fixed k_pos**
+   (k_pos=1 default), one txc_base curve per metric, error bars
+   over seeds. Shows the local↔global / denoising trade-off as a
+   function of window size.
+
+**Current gaps to fix:** D-np5/np10 and E currently have
+`c2_txc_win_gauc_vs_k.png` (gAUC + eAUC combined as 2-panel — needs
+split into the two separate plots); F, G have ONLY a σ-sweep panel,
+need full 4 added (each at one chosen σ, e.g. σ=1.0 for F's
+"canonical" view; the σ-sweep panel can stay as a SUPPLEMENTARY 5th
+plot).
+
+`plot_headline.py:_arch_label` is the central control point —
+every render call should produce all four. Recommend adding a
+`render_setup(setup_name, filter_fn, plot_dir)` orchestrator that
+emits all four in one call, used uniformly across setups.
+
 ### POST-COMPACT TODO (Han 2026-05-07T00:55Z) — DO THIS FIRST
 
 **Priority order:**
+
+0. **Render all 4 mandatory plots for D, E, F, G** (per the
+   standard above). Currently:
+   - D-np5: split combined panel into separate gauc-vs-k + eauc-vs-k
+   - D-np10: same
+   - E: same
+   - F (canonical σ=1.0): need gauc-vs-k, eauc-vs-k, scatter
+   - G (canonical σ=1.0): need gauc-vs-k, eauc-vs-k, scatter
+   The T-sweep plots already exist for D, E, F, G. Scatters exist
+   for D, E. Missing primarily: separate eauc-vs-k for D/E + full
+   set for F/G at canonical σ.
 
 1. **Fill missing baselines on Setups D, E, F, G.**
    For every synthetic setup we want the 5 baselines: TopK-SAE,
