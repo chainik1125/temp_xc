@@ -228,3 +228,60 @@ For each architecture $a$, we evaluate two magnitudes: $m=0$ and $m=m^*_a$, wher
 \label{app:c7-reference}
 
 For context, we also record two prior exploratory TXC variants that are not part of the locked architecture set. A TXC variant with $k=16$ active features per position and $T=6$ reaches peak $\Delta gc=+1.574$ at $m=-12$ on the same cohort and protocol. A Matryoshka-8 TXC variant with $k=16$ per position reaches peak $\Delta gc=+0.492$ at $m=+12$. These variants differ in sparsity and position resolution, so we treat them as context rather than direct comparisons.
+
+
+\section{HH-RLHF Preference Decomposition: Full Details}
+\label{app:rlhf}
+
+\Cref{fig:rlhf} in the main text collapses the per-feature decomposition for each architecture into a top-20 tier-count panel and a semantic-mass-share panel. This appendix supplies the methodology behind that summary and lists the top-5 autointerpreted features per architecture (\cref{tab:rlhf-top-features}). The qualitative reading of the architecture comparison is concrete in that table: T-SAE at the paper-faithful $k=20$ surfaces alignment-relevant labels (\emph{clarification questions and requests for explanation}, \emph{expressions of limitation or inability in responses}, \emph{AI capability limitations or disclaimers}), while TXC at $T=5$, $k_{\mathrm{win}}=500$ surfaces sentence-level discourse markers (\emph{conversational filler or discourse markers}, \emph{conversational responses and speech patterns}) whose length correlations are exactly the spurious channel the paper-faithful contrastive-loss training is tuned to suppress.
+
+\subsection{Response masking and ranking metric}
+\label{app:rlhf-masking}
+
+For each \texttt{(chosen, rejected)} pair, we tokenise the two strings independently with \texttt{max\_length}$=256$ and identify the differing assistant response by a character-level longest common prefix between the two raw strings; we then map character offsets back to token indices via the tokenizer's offset map to produce a per-side \texttt{response\_mask} that selects only the differing-response tokens. Layer-$12$ residual-stream activations are captured under this mask, and per-feature means are taken across all valid response-token positions in the $1000$ pairs. Features are ranked by the signed metric $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$, matching \citet[\S4.5]{bhalla2025tsae}; negative values flag features that activate more strongly on \emph{chosen} responses, positive values on rejected. Tier classification thresholds $|r|<0.2$ (semantic) and $|r|\geq 0.5$ (length-spurious) follow the paper. Our absolute response-length means (rejected $36.23$, chosen $28.57$ tokens) are lower than the paper's reported $49.24$ and $37.84$ because of tokenizer and truncation differences across HH-RLHF dataset versions; the paired-$t$-test signal direction and significance ($p=9.76\times10^{-10}$) match the paper's $p\approx 9\times10^{-10}$ to leading digit.
+
+\begin{table}[t]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c l}
+        \toprule
+        rank & $r$ & $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ & autointerp label \\
+        \midrule
+        \multicolumn{4}{l}{\emph{TopK SAE (per-token, $k=500$)}} \\
+        $0$ & $+0.29$ & $+1.439$ & objects or entities being directly affected by actions \\
+        $1$ & $-0.05$ & $+0.830$ & physical objects or locations used in scenarios \\
+        $2$ & $-0.05$ & $-0.763$ & information or data items that are absent or unavailable \\
+        $3$ & $-0.17$ & $+0.680$ & illegal drugs and controlled substances \\
+        $4$ & $+0.09$ & $+0.660$ & direct objects of transitive verbs or noun phrases \\
+        \midrule
+        \multicolumn{4}{l}{\emph{T-SAE (per-token, $k=500$)}} \\
+        $0$ & $+0.29$ & $+1.468$ & pronouns and discourse connectives in explanatory contexts \\
+        $1$ & $-0.10$ & $-0.944$ & negation or negative polarity markers \\
+        $2$ & $-0.25$ & $-0.833$ & seeking confirmation or agreement on statements \\
+        $3$ & $-0.23$ & $-0.828$ & hedging language and softening expressions \\
+        $4$ & $-0.15$ & $-0.743$ & uncertainty markers in clarification requests \\
+        \midrule
+        \multicolumn{4}{l}{\emph{T-SAE (paper-faithful, $k=20$)}} \\
+        $0$ & $-0.16$ & $-0.759$ & clarification questions and requests for explanation \\
+        $1$ & $-0.22$ & $-0.716$ & clarification requests and confused responses \\
+        $2$ & $-0.41$ & $-0.695$ & expressions of limitation or inability in responses \\
+        $3$ & $+0.26$ & $+0.633$ & verb forms in instructional or procedural contexts \\
+        $4$ & $-0.04$ & $-0.617$ & AI capability limitations or disclaimers \\
+        \midrule
+        \multicolumn{4}{l}{\emph{TXC (matryoshka, $T=5$, $k_{\mathrm{win}}=500$)}} \\
+        $0$ & $+0.33$ & $+1.519$ & nouns denoting objects or entities being modified \\
+        $1$ & $-0.36$ & $-1.433$ & discourse markers indicating uncertainty or topic shifts \\
+        $2$ & $-0.25$ & $-1.327$ & clarification requests or seeking more information \\
+        $3$ & $-0.50$ & $-1.207$ & conversational filler or discourse markers \\
+        $4$ & $-0.53$ & $-1.172$ & conversational responses and speech patterns \\
+        \bottomrule
+    \end{tabular}
+    \caption{Top-$5$ features per architecture, ranked by $|\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}|$ on the $1000$-pair \texttt{harmless-base} cohort. Sign of the diff indicates the side the feature activates more strongly on (negative $\to$ chosen, positive $\to$ rejected). Length-Pearson $r$ classifies each feature as semantic ($|r|<0.2$), mixed, or length-spurious ($|r|\geq 0.5$). Autointerp labels are produced by Claude Haiku~$4.5$ (\cref{app:rlhf-autointerp}). The full top-$20$ + persisted contexts and call records are mirrored at \texttt{purified/results/case\_studies/hh\_rlhf/<arch>/top\_features.json}.}
+    \label{tab:rlhf-top-features}
+\end{table}
+
+\subsection{Autointerpretation setup}
+\label{app:rlhf-autointerp}
+
+For each top-$K$ feature per architecture, we identify the $5$ max-activating positions across the cohort (restricted to response tokens, so the label captures the chosen-vs-rejected differential signal rather than generic prompt activations), decode a symmetric token window around each firing position with the firing token marked by \texttt{**double asterisks**}, and send the $5$ contexts in a single Bills-et-al-style \cite{bills2023language} prompt to Claude Haiku~$4.5$ (\texttt{claude-haiku-4-5-20251001}, max output $80$ tokens, default sampling). The prompt asks for a single short concept label ($3$--$12$ words), no preamble, no markdown. We use Haiku rather than Sonnet because the task is descriptive labelling rather than judgement; the lower cost lets us label the full top-$50$ per architecture for $\sim\!\$0.25$ total. All call records, contexts, and labels are persisted to the per-architecture \texttt{top\_features.json} files referenced above.
