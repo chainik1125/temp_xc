@@ -780,3 +780,34 @@ datasources:
     magnitude_mean: 1.0
     magnitude_std: 0.15
     notes: "Setup polaris: multi-scale — 5 ultra-slow ρ=0.999 + 5 slow ρ=0.7."
+
+  # ── Setup lighthouse: single dominant slow global + 9 noise ──
+  # agent_synth 2026-05-07. 1 ultra-sticky global (ρ=0.99) + 9 fast
+  # noise-globals (ρ=0.0). Stress test: can TXC find the ONE slow
+  # feature buried in noise? Per-token SAE sees 10 equally-likely
+  # globals and can't differentiate.
+  toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast:
+    category: synthetic
+    generator: temp_bench.data.toy:heterogeneous_rho_features
+    K_global: 10
+    K_local: 30
+    n_global_parents: 1
+    d_in: 256
+    seq_len: 64
+    pi_g: 0.5
+    rho_g_list: [0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    p_l_high: 0.8
+    p_l_low: 0.1
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup lighthouse: 1 slow + 9 fast — stress test for slow-feature detection."
+
+  # ── Setup chord: phase-locked global groups ──
+  # agent_synth 2026-05-07. Two GROUPS of 5 globals each, where within
+  # each group all 5 fire/silence together (perfectly correlated).
+  # Implemented via rho_g list pinning all 5 to same ρ AND a custom
+  # initialisation (handled at the YAML level via shared seed pattern).
+  # The TEMPORAL STRUCTURE is NOT correlation — each global is
+  # independent — so this is NOT directly implementable via heterogeneous_rho.
+  # Skipping this; will revisit with a custom generator if needed.

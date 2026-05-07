@@ -52,6 +52,15 @@ SETUPS = [
     ("M (slow+fast globals)",
      "toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast",
      {}),
+    ("whisper (sparse π_g=0.01)",
+     "toy_hierarchical_Kg10_Kl30_d256_sparse",
+     {}),
+    ("polaris (ultra-slow + slow)",
+     "toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow",
+     {}),
+    ("lighthouse (1 slow + 9 fast)",
+     "toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast",
+     {}),
 ]
 
 
