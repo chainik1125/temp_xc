@@ -333,6 +333,87 @@ def render_scatter(
     return data
 
 
+def render_tsweep(
+    *,
+    out_path: Path,
+    filter_fn,
+    title: str,
+    fixed_k_pos: int = 1,
+):
+    """T-sweep panel: gAUC + eAUC vs T at fixed k_pos.
+
+    Mirrors Setup B's c2_noisy_auc_vs_kpos panel logic: one txc_base
+    line per metric, x-axis is T window size.
+    """
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    # Pull cells — dedupe by eval_key
+    latest: dict[str, dict] = {}
+    with LEADERBOARD.open() as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            d = json.loads(line)
+            if d["component"] != "c2":
+                continue
+            if not filter_fn(d):
+                continue
+            ec = d.get("eval_cfg") or {}
+            if ec.get("smoke") is True:
+                continue
+            latest[d["eval_key"]] = d
+
+    # Group by (T, k_pos) → metrics over seeds
+    grouped: dict[tuple, dict[str, list[float]]] = defaultdict(
+        lambda: {"gauc": [], "eauc": []}
+    )
+    for d in latest.values():
+        ec = d.get("eval_cfg") or {}
+        t_label = ec.get("t_label", "default")
+        try:
+            T_val = int(t_label.split("=")[1]) if "=" in t_label else 5
+        except (ValueError, IndexError):
+            T_val = 5
+        k_pos = ec.get("k_pos")
+        if k_pos is None:
+            continue
+        grouped[(T_val, int(k_pos))]["gauc"].append(d["metrics"]["gauc"])
+        grouped[(T_val, int(k_pos))]["eauc"].append(d["metrics"]["eauc"])
+
+    # Filter to fixed_k_pos and build the curve
+    Ts = sorted({T for (T, k) in grouped.keys() if k == fixed_k_pos})
+    if not Ts:
+        print(f"[plot] no tsweep data at k_pos={fixed_k_pos}")
+        return None
+
+    g_means = [np.mean(grouped[(T, fixed_k_pos)]["gauc"]) for T in Ts]
+    g_stds = [np.std(grouped[(T, fixed_k_pos)]["gauc"]) for T in Ts]
+    e_means = [np.mean(grouped[(T, fixed_k_pos)]["eauc"]) for T in Ts]
+    e_stds = [np.std(grouped[(T, fixed_k_pos)]["eauc"]) for T in Ts]
+
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+    ax.errorbar(Ts, g_means, yerr=g_stds, marker="^", color="#1f77b4",
+                linewidth=2, capsize=4, markersize=8,
+                label=r"gAUC (global recovery, vs $f_g$)")
+    ax.errorbar(Ts, e_means, yerr=e_stds, marker="o", color="#ff7f0e",
+                linewidth=2, capsize=4, markersize=8,
+                label=r"eAUC (local recovery, vs $f_l$)")
+    ax.set_xlabel("T (window size)", fontsize=12)
+    ax.set_ylabel("AUC", fontsize=12)
+    ax.set_title(title + f"  (k_pos = {fixed_k_pos}, txc_base, 3 seeds)",
+                 fontsize=11)
+    ax.set_ylim(0.0, 1.05)
+    ax.set_xticks(Ts)
+    ax.legend(fontsize=10, loc="lower right", framealpha=0.92)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    fig.savefig(out_path.with_suffix(".thumb.png"), dpi=64, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[plot] wrote {out_path}")
+    return grouped
+
+
 def render_2panel_headline(
     *,
     winner_ds: str,
@@ -470,6 +551,37 @@ def main():
             title=("Setup E (hierarchical): local vs global feature "
                    "recovery\n(each point = one (arch, T, k_pos) cell, "
                    "mean over seeds)"),
+        )
+
+    # ── T-sweep panels (Setup D + E) ────────────────────────────────────
+    # txc_base × T ∈ {2,4,5,6,8,10,12} at fixed k_pos. Mirrors Setup B's
+    # c2_noisy_auc_vs_kpos T-sweep. Shows the local↔global trade-off as
+    # a function of window size.
+    if not args.hier_only and not args.two_panel_only:
+        for ds_short, ds in [
+            ("np10", "toy_coupled_noisy_K10_M20_d256_pB05_np10"),
+            ("np5",  "toy_coupled_noisy_K10_M20_d256_pB05_np5"),
+        ]:
+            for k in (1, 2):
+                suffix = "" if k == 1 else f"_k{k}"
+                render_tsweep(
+                    out_path=NOISY_PLOT_DIR / f"c2_setup_d_{ds_short}_tsweep{suffix}.png",
+                    filter_fn=lambda d, _ds=ds: (
+                        d.get("datasource") == _ds
+                        and (d.get("eval_cfg") or {}).get("hunt_phase") == "tsweep"
+                    ),
+                    title=f"Setup D pB05_{ds_short} — T-sweep",
+                    fixed_k_pos=k,
+                )
+    if not args.zoom_only and not args.two_panel_only:
+        render_tsweep(
+            out_path=HIER_PLOT_DIR / "c2_setup_e_tsweep.png",
+            filter_fn=lambda d: (
+                d.get("datasource") == args.hier_datasource
+                and (d.get("eval_cfg") or {}).get("tsweep") is True
+            ),
+            title="Setup E (hierarchical) — T-sweep",
+            fixed_k_pos=1,
         )
 
 
