@@ -3,3 +3,7 @@
 [fill_baselines] txc_base     T=5      k= 1 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
 [fill_baselines] txc_base     T=5      k= 2 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
 [fill_baselines] txc_base     T=5      k= 3 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] txc_base     T=5      k= 4 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] txc_base     T=5      k= 5 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] txc_base     T=5      k= 6 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] txc_base     T=5      k= 8 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000

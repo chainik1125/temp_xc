@@ -4,3 +4,7 @@
 [run_on_gpu] CUDA_VISIBLE_DEVICES=3 exec: env AGENT_NAME=agent_synth TEMP_BENCH_POD_MODE=persistent OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.fill_baselines --datasource toy_aurora_K10_M20_d256_sigma1_alpha09 --arch txc_base --T 8 --seed 1 --k-poses 1 2 3 4 5 --n-steps 8000
 [fill_baselines] arch=txc_base T=8 seed=1 ds=toy_aurora_K10_M20_d256_sigma1_alpha09 k_poses=[1, 2, 3, 4, 5] n_steps=8000
 [fill_baselines] txc_base     T=8      k= 1 seed=1 ds=toy_aurora_K10_M20_d256_sigma1_alpha09 n_steps=8000
+[fill_baselines] txc_base     T=8      k= 2 seed=1 ds=toy_aurora_K10_M20_d256_sigma1_alpha09 n_steps=8000
+[fill_baselines] txc_base     T=8      k= 3 seed=1 ds=toy_aurora_K10_M20_d256_sigma1_alpha09 n_steps=8000
+[fill_baselines] txc_base     T=8      k= 4 seed=1 ds=toy_aurora_K10_M20_d256_sigma1_alpha09 n_steps=8000
+[fill_baselines] txc_base     T=8      k= 5 seed=1 ds=toy_aurora_K10_M20_d256_sigma1_alpha09 n_steps=8000

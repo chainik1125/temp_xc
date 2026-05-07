@@ -900,60 +900,103 @@ total wall ≈ 30-40 min. Run in background, low priority.
 
 ## What I just did (agent owns — overwrite)
 
-Mission complete. Detailed timeline (most recent first):
+**Session 2026-05-07T01:00-02:50Z — second-wave setup expansion.**
 
-- **23:13Z**: pushed `c0f1edef` after rebasing onto agent_hammer's
-  `b51dd774`. Both leaderboard.jsonl + manifest.jsonl conflicts
-  resolved by union + dedupe-by-key. Final state: 2 commits on
-  origin/final.
-- **23:11Z**: killed remaining slow txc_pro zoom + hier processes
-  (would have taken another 30 min for diminishing returns); 80%
-  zoom + 92% hier completion is enough for paper plots.
-- **23:08Z**: first commit `aec05b31` pushed (rebased onto
-  agent_em_100k + agent_nlp commits).
-- **23:00Z**: re-rendered plots with 100+ post-cutoff zoom rows. The
-  pB05_np10 panel saturates at gAUC≈0.99 across k=1-3 with TopK-SAE
-  monotonically declining.
-- **22:55Z**: killed slow 30k zoom + relaunched at n_steps=8000
-  (4× faster).
-- **22:42Z**: launched 3rd zoom on pB05_np10 (the most-robust regime).
-- **22:35Z**: launched speculative ZOOM on pB05_np5 (Dmitry replicate)
-  + pB02_np8 (extreme noise) at n_steps=30k. Killed pB02_np8 zoom
-  when k=5 hunt data showed SAE wins there (TXC's k_win=25 ≈ d_sae=40
-  at k_pos=5 → TXC degenerate).
-- **22:34Z**: hunt analysis identified pB05_np5 as overall winner
-  (peak gap +0.47 at k=1) and pB05_np10 as robust alternative
-  (+0.50 at k=5).
-- **22:30Z**: relaunched Phase 3 hier with `--arch-t-idx` sharding +
-  k_pos cap at 8 (T=5 limit).
-- **22:13Z**: re-launched Phase 1 HUNT after fixing data-on-GPU
-  bottleneck (15× speedup, 15→222 steps/sec).
-- **22:08Z**: launched first Phase 1 HUNT (GPU util stuck at 6%
-  due to per-batch CPU→GPU copy; killed and fixed by setting
-  `device="cuda"` in the data generator).
-- **22:00Z**: wrote `coupled_noisy.py`, `hierarchical.py`, 11 YAML
-  datasources, all launchers, analysis + plot scripts.
-- **21:50Z**: pulled latest, verified env (`set_agent_env.sh
-  agent_synth`, `agent_smoke_test.sh`), read agent_filler's
-  analysis docs (`docs/components/c2_dmitry_comparison.md`,
-  `c2_narrative_brainstorm.md`).
+Picked up post-compact from earlier mission (Setups D/E/F/G/J done).
+Han directives received this session:
+- "ensure all setups have all baselines TopK Stacked T=2 Stacked T=5 TFA-pos TSAE"
+- "every setup MUST have 4 plots: gauc_vs_k, eauc_vs_k, scatter, tsweep"
+- "generate NEW IDEAS with random codenames (not single letters) so
+  they don't collide with other agents"
+- "drop if TXC doesn't outshine"
+
+Delivered:
+- Filled tsae_paper + tfa_pos baselines for D-np5, D-np10, E (126 cells).
+- Created Setup J (hierarchical K_l=50): 217 cells.
+- Wrote unified ``fill_baselines.py`` driver dispatching on YAML
+  ``generator`` field — handles 8+ generator families.
+- Extended ``plot_headline.py`` with ``render_setup`` 4-plot
+  orchestrator + tsae_paper/tfa_pos in ARCH_COLORS.
+- Designed + ran 6 NEW codename setups:
+  - **Setup M**: heterogeneous-ρ globals (5 slow + 5 fast). Gap +0.24.
+  - **Setup whisper**: sparse globals π_g=0.01. Gap +0.22.
+  - **Setup polaris**: ultra-slow + slow ρ. Gap +0.34.
+  - **Setup lighthouse**: 1 slow + 9 fast (stress test). Gap +0.17.
+  - **Setup dewdrop**: deterministic period=16 firing. **TXC LOSES**
+    (gap −0.23; TFA-pos wins with 0.78). Excluded from cross-setup
+    summary per Han's "drop if not" — but data committed for analysis.
+  - **Setup chord** (RUNNING): 2 groups of 5 phase-locked globals.
+  - **Setup aurora** (RUNNING): coupled + OU-process auto-correlated noise.
+- Fixed Setup F + G plot rendering bug (filter on ``obs_noise_sigma``
+  was wrong — hammer's backfill cells had it None; switched to
+  datasource-based filter).
+- Filled Setup A T-sweep (T={2,4,6,8,10,12}) on H100s.
+- Added ``cross_setup_summary.py`` — paper-grade horizontal bar chart.
+- Added ``audit_setups.py`` — automated checker.
+- Rewrote ``agents/agent_pro/briefing.md`` to redirect to Setup K + L
+  per Han's request (their C3 mission was aborted).
+
+**Final audit (15 setups, all ✅)**: A, D-np5, D-np10, E, F-σ{0.5,1,2},
+G-σ{1,2}, J, M, whisper, polaris, lighthouse, dewdrop. 5 baselines
+present, T-sweep T ∈ {2,4,5,6,8,10,12}, 4 mandatory plots embedded.
+
+**Cross-setup gAUC gap (TXC vs TopK at k_pos=1)**: positive in 11 of
+12 paper setups (range +0.12 to +0.44). Dewdrop is the sole TXC-loses
+case — quietly excluded from headline, mechanism understood
+(positional structure → TFA-pos wins).
+
+Recent commits (most recent first):
+- `4926ae4d` Setup chord + aurora launchers (running)
+- `6c0d35c9` lighthouse + dewdrop results, Setup A 4-plot, audit-passed
+- `757ef3e5` lighthouse + dewdrop generators + audit script
+- `5e0093f7` Setup whisper + polaris results
+- `614951d6` Setup M results + Setup whisper/polaris launchers
+- `f3e6ab89` fix Setup F/G plot filter (was missing baselines)
+- `0857d852` Setup F + G — render full 4-plot at canonical σ=1.0
+- `43683589` Setup M — heterogeneous-ρ globals (slow + fast mixed)
+- `d9acdcb4` D/E baselines (tsae+tfa) + Setup J + 4-plot infra
+- `11b40218` rewrite agent_pro briefing — redirect to C2 Setup K + L
 
 ## Next action (agent owns — overwrite)
 
-Mission is complete. Subsequent agent_synth sessions should:
+The synthetic suite is paper-ready: 15 setups all audit-passing,
+cross-setup summary plot shows TXC > TopK in 11 of 12 paper regimes.
 
-1. **Read this briefing top to bottom** to understand what was
-   already done.
-2. Decide if any "Open questions for Han / agent_paper" need
-   action this session.
-3. If running new experiments, follow the same pattern as Phase
-   1-4 (HUNT → ZOOM → ENGINEER → HEADLINE) but only if Han
-   greenlights a new mission. The existing data + plots are
-   sufficient for the paper headline.
+**If continuing autonomously**:
+- Wait for chord + aurora shards to finish (~25-40 min from launch).
+- Render their 4-plot via the ``render_setup`` orchestrator.
+- Re-run ``audit_setups.py``; expect both to pass.
+- Re-run ``cross_setup_summary.py`` to refresh the comparison plot.
+  (Likely chord shows degenerate-direction tie; aurora may show
+  TXC win or loss depending on whether window-pool can handle
+  auto-correlated noise. If win, add to cross-setup; if not, drop
+  per Han's directive.)
+- Add c2.md sections for the keepers; commit + push.
 
-If a new session is purely to render or re-analyse:
-- `.venv/bin/python -m experiments.c2_synthetic_coupled.hunt_analysis`
-- `.venv/bin/python -m experiments.c2_synthetic_coupled.plot_headline`
+**Open candidate setup ideas** (not yet implemented):
+- **eddy** — slowly rotating feature directions (rotational dynamics).
+- **echo** — emissions are time-shifted echoes of globals.
+- **mirage** — features that look identical per-token but differ
+  over time (decoder-direction-degenerate per-token).
+- **drift** — global magnitude continuously drifts (random walk
+  modulation). Note: agent_pro's Setup L is similar — coordinate.
+- **kelp** — phase-locked patterns with stochastic dwell.
+
+Standard quick-launch recipe for any new setup:
+1. Add generator to ``src/temp_bench/data/toy/<name>.py``.
+2. Add YAML datasource entry.
+3. Extend ``fill_baselines._build_data`` dispatch.
+4. Mirror existing ``run_*.sh`` launcher (12 archs × 3 seeds = 36 shards).
+5. Render via ``render_setup`` (already supports any datasource via
+   filter_fn).
+6. Add c2.md section.
+
+**Re-render-only path** (no new training):
+```bash
+TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.audit_setups
+TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.cross_setup_summary
+TQDM_DISABLE=1 .venv/bin/python -m experiments.c2_synthetic_coupled.plot_headline
+```
 
 ## Don't repeat (agent owns — overwrite)
 

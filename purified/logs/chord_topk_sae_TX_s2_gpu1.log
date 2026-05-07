@@ -7,3 +7,5 @@
 [fill_baselines] topk_sae     default  k= 3 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
 [fill_baselines] topk_sae     default  k= 4 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
 [fill_baselines] topk_sae     default  k= 5 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] topk_sae     default  k= 6 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] topk_sae     default  k= 8 seed=2 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000

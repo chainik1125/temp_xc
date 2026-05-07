@@ -1,0 +1,28 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "T": 5,
+        "k_pos": 2
+      },
+      "bench": null,
+      "datasource": "toy_chord_Kg10_Kl30_d256_2groups",
+      "fill_baselines": true,
+      "hunt_phase": "fill",
+      "k_pos": 2,
+      "smoke": false,
+      "t_label": "T=5",
+      "tsweep": false
+    }
+  },
+  "metrics": {
+    "e_frac_recovered_90": 0.0,
+    "e_mean_max_cos": 0.5095293521881104,
+    "eauc": 0.510204081632653,
+    "g_frac_recovered_80": 0.0,
+    "g_frac_recovered_90": 0.0,
+    "g_mean_max_cos": 0.13900849223136902,
+    "gauc": 0.13673469387755102
+  },
+  "ts": "2026-05-07T02:49:20Z"
+}

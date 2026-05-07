@@ -2,3 +2,8 @@
 [fill_baselines] arch=tfa_pos T=None seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups k_poses=[1, 2, 3, 4, 5, 6, 8] n_steps=8000
 [fill_baselines] tfa_pos      default  k= 1 seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
 [fill_baselines] tfa_pos      default  k= 2 seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] tfa_pos      default  k= 3 seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] tfa_pos      default  k= 4 seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] tfa_pos      default  k= 5 seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] tfa_pos      default  k= 6 seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000
+[fill_baselines] tfa_pos      default  k= 8 seed=42 ds=toy_chord_Kg10_Kl30_d256_2groups n_steps=8000

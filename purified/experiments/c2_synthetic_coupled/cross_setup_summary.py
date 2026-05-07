@@ -61,6 +61,12 @@ SETUPS = [
     ("lighthouse (1 slow + 9 fast)",
      "toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast",
      {}),
+    ("chord (phase-locked groups)",
+     "toy_chord_Kg10_Kl30_d256_2groups",
+     {}),
+    ("aurora (auto-corr noise α=0.9)",
+     "toy_aurora_K10_M20_d256_sigma1_alpha09",
+     {}),
     # NOTE: Setup 'dewdrop' (deterministic periodic firing) shows
     # TXC-base T=5 LOSING to TopK-SAE (gap -0.23) and was deliberately
     # dropped from this paper-headline summary per Han 2026-05-07

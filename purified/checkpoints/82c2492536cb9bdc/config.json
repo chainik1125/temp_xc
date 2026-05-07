@@ -1,0 +1,33 @@
+{
+  "act_cache_key": "1b7a158068f61a4e",
+  "agent": "agent_synth",
+  "arch": "txc_base",
+  "arch_version": "1.0.0",
+  "datasource": "toy_aurora_K10_M20_d256_sigma1_alpha09",
+  "saved_ts": "2026-05-07T02:58:01Z",
+  "seed": 2,
+  "train_key": "82c2492536cb9bdc",
+  "training_cfg": {
+    "arch_hparams_override": {
+      "T": 5,
+      "k_pos": 6
+    },
+    "batch_size": 1024,
+    "bricken_enabled": false,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 10000000,
+    "ema_auxk_alpha": 0.03125,
+    "learning_rate": 0.0003,
+    "n_steps": 8000,
+    "optimizer": "adam",
+    "plateau_early_stop": false,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "train_window_size": null,
+    "warmup_steps": 1000
+  }
+}

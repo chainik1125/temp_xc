@@ -1,0 +1,28 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_arch_hparams_override": {
+        "T": 5,
+        "k_pos": 8
+      },
+      "bench": null,
+      "datasource": "toy_aurora_K10_M20_d256_sigma1_alpha09",
+      "fill_baselines": true,
+      "hunt_phase": "fill",
+      "k_pos": 8,
+      "smoke": false,
+      "t_label": "T=5",
+      "tsweep": false
+    }
+  },
+  "metrics": {
+    "e_frac_recovered_90": 0.0,
+    "e_mean_max_cos": 0.24992990493774414,
+    "eauc": 0.25102040816326526,
+    "g_frac_recovered_80": 0.0,
+    "g_frac_recovered_90": 0.0,
+    "g_mean_max_cos": 0.3959138095378876,
+    "gauc": 0.39795918367346933
+  },
+  "ts": "2026-05-07T03:01:13Z"
+}
