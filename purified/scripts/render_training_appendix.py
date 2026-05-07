@@ -66,6 +66,14 @@ ARCH_DISPLAY = {
     "sae_arditi":   "SAE-arditi",
 }
 
+# Minimum n_steps for a cell to be considered "real" training rather
+# than a smoke / sanity run. Set to 1000 — nothing legitimate trains
+# under 1000 steps and we have empirical evidence (see audit) that 14
+# cells with n_steps ∈ {200, 500} have `smoke=False` in the leaderboard
+# (the smoke flag was forgotten on those cells). Filtering by n_steps
+# ensures the appendix only describes real trained models.
+MIN_STEPS = 1000
+
 # Hparams whose presence on a row is meaningful (non-empty / non-default
 # rendered explicitly; default elided to keep the table tight).
 TRAIN_CFG_FIELDS = (
@@ -284,12 +292,19 @@ def render_subject_table(rows_in_section, datasources_yaml) -> list[str]:
 
 
 def render_training_table(groups, archs_yaml) -> list[str]:
-    """One row per (arch, datasource, training_cfg, hparams) signature."""
+    """One row per (arch, datasource, training_cfg, hparams) signature.
+
+    `n_models` = distinct trained checkpoints in this group (one per
+    train_key). `n_evals` = leaderboard rows referencing those models
+    (n_evals > n_models when the same trained model is evaluated at
+    multiple eval-time configs, e.g., a k_feat sweep over a single
+    train_key in C3 sparse probing).
+    """
     md = [
         "**Architectures + training**",
         "",
-        "| arch | arch_version | datasource | T | T_max | t_sample | k_pos | k_win | d_sae | n_steps | B | lr | optim | warmup | precision | win_train | Bricken | seeds | n_cells |",
-        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---|---|---|---|---:|",
+        "| arch | arch_version | datasource | T | T_max | t_sample | k_pos | k_win | d_sae | n_steps | B | lr | optim | warmup | precision | win_train | Bricken | seeds | n_models | n_evals |",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---|---|---|---|---:|---:|",
     ]
 
     def sort_key(item):
@@ -304,7 +319,8 @@ def render_training_table(groups, archs_yaml) -> list[str]:
         cfg = dict(sig[2])
         hp = dict(sig[3])
         seeds = sorted(info["seeds"])
-        n_cells = info["n_cells"]
+        n_models = len(info.get("train_keys", set()))
+        n_evals = info.get("n_eval_cells", 0)
         k_pos_str = _format_sweep_set(info.get("k_pos_set", set()))
         k_win_str = _format_sweep_set(info.get("k_win_set", set()))
         # Bricken summary
@@ -338,7 +354,8 @@ def render_training_table(groups, archs_yaml) -> list[str]:
             f"| {fmt(cfg.get('train_window_size'))} "
             f"| {br} "
             f"| {{{','.join(str(s) for s in seeds)}}} "
-            f"| {n_cells} |"
+            f"| {n_models} "
+            f"| {n_evals} |"
         )
     md.append("")
     return md
@@ -416,12 +433,23 @@ def main():
         "",
         "Conventions:",
         "",
-        "- One row per `(arch, datasource, training_cfg, final_hparams)` "
-        "signature. Cells that share spec are grouped; `seeds` and "
-        "`n_cells` columns expose the within-group spread.",
-        "- `final_hparams` = locked YAML base ⊕ `per_component_hparams[c]` "
+        "- One row per `(arch, datasource, training_cfg, fixed_hparams)` "
+        "signature. The two sweep-axis hparams `k_pos` and `k_win` are "
+        "EXCLUDED from the signature so a sweep across (e.g.) "
+        "k_pos ∈ {1, 2, 3, 4, 5} appears as one row with `k_pos = "
+        "{1, 2, 3, 4, 5}`.",
+        "- `fixed_hparams` = locked YAML base ⊕ `per_component_hparams[c]` "
         "⊕ `arch_hparams_override` from the cell's `training_cfg`.",
-        "- Smoke cells (`eval_cfg.smoke=True`) are excluded.",
+        "- **`n_models`** = number of *distinct trained checkpoints* in "
+        "the group (= number of unique `train_key`s). "
+        "**`n_evals`** = number of *leaderboard rows* referencing those "
+        "checkpoints. `n_evals > n_models` when one checkpoint is "
+        "evaluated at multiple eval-time configs (e.g., a probe `k_feat` "
+        "sweep over a single trained C3 model).",
+        f"- Cells with `n_steps < {MIN_STEPS}` are filtered out as "
+        "sanity / smoke runs (debug-only training that escaped the "
+        "`eval_cfg.smoke=True` flag). Cells with `eval_cfg.smoke=True` "
+        "are also excluded.",
         "- Empty cells render as `—`. `Bricken` collapses the seven "
         "`bricken_*` knobs into one column; `off` means `bricken_enabled=False`.",
         "- `B` = `batch_size`. `lr` = `learning_rate`. `win_train` = "
@@ -430,6 +458,10 @@ def main():
         "- `T` is the canonical window size (TXC-base). `T_max` + "
         "`t_sample` are TXC-pro / Stacked-SAE specific. `k_win` is the "
         "window-level top-k for window archs that expose it.",
+        "- All training uses `optim=adam`, `lr=3e-4`, `precision=bf16` "
+        "as schema defaults (decisions.md § 12). Deviations (e.g., "
+        "TFA's `B=32` paper-faithful Phase 7 batch) appear in the "
+        "row's columns directly.",
         "",
         "## Datasources used",
         "",
@@ -439,18 +471,37 @@ def main():
         "",
     ]
 
-    # Global datasources table (union)
+    # Top-level summary: total trained models + leaderboard rows
     all_rows = [r for rows in rows_by_group.values() for r in rows]
+    total_evals = len(all_rows)
+    total_models = len(set(r["train_key"] for r in all_rows
+                           if r["train_key"] in manifest_by_tk
+                           and manifest_by_tk[r["train_key"]]
+                                  .get("training_cfg", {})
+                                  .get("n_steps", 0) >= MIN_STEPS))
+    md.append(
+        f"**Summary:** {total_models} unique trained models (= unique "
+        f"`train_key`s) across the 7 components, evaluated in "
+        f"{total_evals} leaderboard cells. Per-component counts can sum "
+        f"to more than this total because some checkpoints are shared "
+        f"across components (e.g., C4 qualitative eval cache-hits on C3 "
+        f"sparse-probing trained models — the same `train_key` is counted "
+        f"once for C3 and once for C4 in the per-component sections, but "
+        f"once in this grand total)."
+    )
+    md.append("")
+
     md += render_subject_table(all_rows, datasources_yaml)
 
     for group_id, label, comp_list in COMPONENT_GROUPS:
         rows = rows_by_group.get(group_id, [])
         md.append(f"## {label}")
         md.append("")
+        n_unique_tk = len(set(r["train_key"] for r in rows))
         md.append(
             f"_components: {', '.join(comp_list)} — "
-            f"{len(rows)} non-smoke leaderboard cells, "
-            f"{len(set(r['train_key'] for r in rows))} unique train_keys._"
+            f"{n_unique_tk} unique trained models "
+            f"({len(rows)} leaderboard eval rows referencing them)._"
         )
         md.append("")
 
@@ -463,14 +514,26 @@ def main():
         md += render_subject_table(rows, datasources_yaml)
 
         # Group cells by training signature; collect swept hparam values
-        # (k_pos, k_win) per group.
+        # (k_pos, k_win) per group. Filter out:
+        #   - cells with n_steps < MIN_STEPS (smoke runs that escaped
+        #     the smoke=True flag — these are debug / sanity runs and
+        #     must not appear in a paper appendix)
+        #   - orphan train_keys (in leaderboard but not in manifest;
+        #     manifest entry was lost)
         groups: dict[tuple, dict] = {}
+        n_skipped_smoke = 0
+        n_skipped_orphan = 0
         for row in rows:
             tk = row["train_key"]
             man = manifest_by_tk.get(tk)
             if man is None:
+                n_skipped_orphan += 1
                 continue
             cfg = dict(man.get("training_cfg", {}))
+            n_steps = cfg.get("n_steps", 0)
+            if n_steps < MIN_STEPS:
+                n_skipped_smoke += 1
+                continue
             override = cfg.pop("arch_hparams_override", None)
             arch = man["arch"]
             ds = man["datasource"]
@@ -478,16 +541,29 @@ def main():
             hp = resolve_arch_hparams(arch, comp, archs_yaml, override)
             sig = group_signature(arch, ds, cfg, hp)
             slot = groups.setdefault(sig, {
-                "seeds": set(), "n_cells": 0,
+                "seeds": set(),
+                "train_keys": set(),  # distinct trained models
+                "n_eval_cells": 0,    # leaderboard rows referencing them
                 "k_pos_set": set(), "k_win_set": set(),
-                "fixed_hparams": hp,  # for niche-hparams render
+                "fixed_hparams": hp,
             })
             slot["seeds"].add(int(man["seed"]))
-            slot["n_cells"] += 1
+            slot["train_keys"].add(tk)
+            slot["n_eval_cells"] += 1
             if "k_pos" in hp:
                 slot["k_pos_set"].add(hp["k_pos"])
             if "k_win" in hp:
                 slot["k_win_set"].add(hp["k_win"])
+
+        if n_skipped_smoke or n_skipped_orphan:
+            md.append(
+                f"_Filtered: {n_skipped_smoke} cells with `n_steps < "
+                f"{MIN_STEPS}` (sanity-check runs that escaped the "
+                f"`smoke=True` flag), {n_skipped_orphan} orphan cells "
+                f"(leaderboard row references a `train_key` no longer in "
+                f"`checkpoints/manifest.jsonl`)._"
+            )
+            md.append("")
 
         md += render_training_table(groups, archs_yaml)
         md += render_extra_hparams(groups, archs_yaml)
