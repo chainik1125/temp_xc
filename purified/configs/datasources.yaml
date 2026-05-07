@@ -701,3 +701,40 @@ datasources:
     magnitude_mean: 1.0
     magnitude_std: 0.15
     notes: "Setup G: hierarchical + obs noise σ=2.0."
+
+  # ── Setup M: heterogeneous-ρ globals (slow + fast mixed) ──
+  # agent_synth 2026-05-07. 5 slow (ρ=0.99) + 5 fast (ρ=0.0) globals
+  # at fixed π=0.5. Tests if TXC preferentially recovers slow features.
+  toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast:
+    category: synthetic
+    generator: temp_bench.data.toy:heterogeneous_rho_features
+    K_global: 10
+    K_local: 30
+    n_global_parents: 1
+    d_in: 256
+    seq_len: 64
+    pi_g: 0.5
+    rho_g_list: [0.99, 0.99, 0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0]
+    p_l_high: 0.8
+    p_l_low: 0.1
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup M canonical: 5 slow (ρ=0.99) + 5 fast (ρ=0.0)."
+
+  toy_hetero_rho_Kg10_Kl30_d256_3slow_7fast:
+    category: synthetic
+    generator: temp_bench.data.toy:heterogeneous_rho_features
+    K_global: 10
+    K_local: 30
+    n_global_parents: 1
+    d_in: 256
+    seq_len: 64
+    pi_g: 0.5
+    rho_g_list: [0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    p_l_high: 0.8
+    p_l_low: 0.1
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup M variant: 3 slow + 7 fast (rare-slow stress test)."
