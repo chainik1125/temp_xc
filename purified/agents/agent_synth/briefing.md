@@ -316,8 +316,14 @@ If at any point you hit:
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Mission COMPLETE 2026-05-06T23:15Z. Committed + pushed at
-`aec05b31` + `c0f1edef` on `origin/final`.**
+**Last verified: 2026-05-07T00:55Z (post-compact handover state).**
+
+Original mission (HUNT + ZOOM + ENGINEER + HEADLINE) COMPLETED at
+2026-05-06T23:15Z. Subsequent extensions added Setup F (coupled +
+obs noise) + Setup G (hierarchical + obs noise) + T-sweeps on D, E,
+F, G. Latest commit on origin/final at this writing: `7cb1fffc`.
+
+**THIS SECTION IS THE POST-COMPACT HANDOVER. Read top to bottom.**
 
 Pod (used during mission): 8× H100 (640 GB GPU mem) + 1.8 TB system
 RAM + 224 CPUs. TEMP_BENCH_POD_MODE=ephemeral (HF auto-push fired on
@@ -591,6 +597,149 @@ All paths relative to `purified/`. Rules of thumb for agent_filler:
 - **Hierarchical bench tweaks**: K_l=50 datasource added but not
   swept (only the K_l=30 primary was). If c2.md wants to show the
   divide more sharply, sweep K_l=50 (+1 GPU-hour budget).
+
+### POST-COMPACT TODO (Han 2026-05-07T00:55Z) — DO THIS FIRST
+
+**Priority order:**
+
+1. **Fill missing baselines on Setups D, E, F, G.**
+   For every synthetic setup we want the 5 baselines: TopK-SAE,
+   Stacked-SAE T=2, Stacked-SAE T=5, T-SAE (`tsae_paper`), TFA-pos
+   (`tfa_pos`), plus full TXC-base T-sweep T ∈ {2,4,5,6,8,10,12}.
+
+   Current gaps (verified by leaderboard inventory at 00:55Z):
+
+   | Setup | topk | stk T=2 | stk T=5 | TXC T-sweep | tsae_paper | tfa_pos |
+   |---|---|---|---|---|---|---|
+   | D-np5 (n_parents=5)  | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+   | D-np10 (n_parents=10) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+   | E (hierarchical Kg10_Kl30) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+   | F σ ∈ {0.5, 1.0, 2.0} | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+   | G σ ∈ {1.0, 2.0}      | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+
+   Plan: extend each setup driver (`run_hunt.py`, `run_t_sweep.py`,
+   `run_setup_f.py`, `run_setup_g.py`) to accept `--archs tsae_paper
+   tfa_pos stacked_sae` and run them at the same k_pos × seed grid
+   as topk_sae. Cell counts:
+     - D-np5 + D-np10 + E: 2 archs (tsae + tfa) × 3 seeds × 8 k_pos
+       × 3 setups = 144 cells. ~10-15 min on 8 GPUs.
+     - F σ ∈ {0.5,1,2}: 4 archs (stk-T2, stk-T5, tsae, tfa) × 3 seeds
+       × 3 k_pos × 3 sigmas = 108 cells.
+     - G σ ∈ {1,2}: 4 archs × 3 seeds × 3 k_pos × 2 sigmas = 72 cells.
+   Total: ~324 cells, ~30-40 min wall on 8 GPUs.
+
+   tsae_paper at component=c2: locked YAML has d_sae=16384; pass
+   `arch_hparams_override={"d_sae": 40, "k_pos": k}` to override
+   (agent_hammer used the same hack — see his run_baselines.py).
+
+   tfa_pos: locked YAML has it; standard k_pos override applies.
+
+2. **Re-render plots after baselines land**. Then update c2.md with
+   the new arches in each AUTO-RESULTS table:
+     - `experiments/c2_synthetic_coupled/plot_headline.py:_arch_label`
+       needs entries for `tsae_paper` (label "T-SAE", marker "h",
+       color magenta `#CC79A7` matching c2.md style) and `tfa_pos`
+       (label "TFA-pos", marker "X", color green `#2ca02c`). Add to
+       ARCH_COLORS dict.
+     - Re-render scatter, line, σ-sweep plots.
+
+3. **Continue designing new setups** (Han 2026-05-07: keep going).
+   Already done F (coupled + obs noise) and G (hier + obs noise).
+   Open candidates for Setup H, I, …:
+     - H: ρ-sweep on Setup D pB05_np10 (Effect 1 vs Effect 2 on the
+       max-overlap regime). 4 ρ × 5 archs × 3 seeds × 3 k_pos = 180
+       cells. Note: agent_filler is doing ρ-sweep on Setup A; this
+       extends to D.
+     - I: temporal-derivative target (Dmitry Bench 3 port). Honest
+       caveat: TXC FAILS when target is high-frequency. Establishes
+       the limit.
+     - J: hierarchical with K_l=50 datasource (already in YAML, not
+       yet swept). Tests divide scaling with feature count.
+     - K: anti-correlated globals — globals are pairwise NEGATIVELY
+       correlated. Per-token signal looks random; TXC window pool
+       sees the structure.
+     - L: magnitude-modulated locals (locals fire i.i.d. but their
+       MAGNITUDES are slow-modulated by globals).
+
+   Shared protocol for any new setup:
+     - Generator in `src/temp_bench/data/toy/<name>.py`.
+     - 1+ datasources in `configs/datasources.yaml`.
+     - Driver in `experiments/c2_synthetic_coupled/run_setup_<X>.py`
+       (or `c2_hierarchical/...`). Parametric over arch + seed +
+       k_pos at minimum.
+     - Launch all 5 baselines + TXC T-sweep × 3 seeds × 3 k_pos.
+     - c2.md section + scatter + line plots + tables.
+
+4. **agent_hammer is now doing PARALLEL new-setup work** on a 5×
+   RTX PRO 6000 pod (briefing also updated 2026-05-07). Coordinate:
+     - agent_synth (you): owns Setup D/E/F/G; lead on H/I above.
+     - agent_hammer: lead on J/K/L; can also fill baselines on
+       D/E/F/G if convenient (we both have territory waivers).
+     - DON'T duplicate — check leaderboard for existing (datasource,
+       arch, seed, k_pos) cells before launching.
+
+### Key code paths (post-compact orientation)
+
+- `src/temp_bench/data/toy/`:
+  - `coupled.py` — Setup A generator (agent_filler territory).
+  - `coupled_noisy.py` — Setup D (mine).
+  - `hierarchical.py` — Setup E (mine).
+  - `coupled_obs_noise.py` — Setup F (mine).
+  - `hierarchical_obs_noise.py` — Setup G (mine).
+- `experiments/c2_synthetic_coupled/`:
+  - `run.py` — Setup A driver (agent_filler).
+  - `run_hunt.py` — Setup D HUNT + ZOOM (mine).
+  - `run_t_sweep.py` — Setup D T-sweep (mine).
+  - `run_setup_f.py` — Setup F (mine).
+  - `plot_headline.py` — every plot in c2.md's Setup D/E/F/G is
+    rendered from here. `_arch_label` is the central control point
+    for which archs appear in plots.
+  - `hunt_analysis.py` — gap-table generator.
+- `experiments/c2_hierarchical/`:
+  - `run.py` — Setup E driver (mine).
+  - `run_t_sweep.py` — Setup E T-sweep (mine).
+  - `run_setup_g.py` — Setup G (mine).
+- `docs/components/c2.md` — paper writeup (cross-territory edit
+  approved by Han 2026-05-06T23:30Z; explicit per-edit approval
+  required).
+
+### HF push state (don't forget post-compact)
+
+agent_synth checkpoints have `hf_url=null` in manifest because
+TEMP_BENCH_POD_MODE=ephemeral didn't propagate through Bash tool
+call subprocess env. agent_hammer documented + fixed this in their
+launcher; my launchers (`run_hunt.sh`, `run_zoom.sh`,
+`run_sharded.sh`, `run_t_sweep.sh`, `run_setup_f.sh`,
+`run_setup_g.sh`) now have `TEMP_BENCH_POD_MODE=persistent` set —
+auto-push DISABLED to avoid HF rate limit (256 commits/hour).
+
+`scripts/push_synth_ckpts_to_hf.py` is the manual push script. It
+ran ~140 cells before hitting the API rate limit (2500 reqs / 5
+min) and getting stuck. Need to resume sequentially WITH retry/
+backoff logic on 429s. Sketch:
+
+```python
+import time
+from huggingface_hub.utils import HfHubHTTPError
+def push_with_retry(api, tk, ckpt_dir, max_retries=5):
+    for attempt in range(max_retries):
+        try:
+            api.upload_folder(folder_path=str(ckpt_dir), path_in_repo=tk,
+                              repo_id="han1823123123/temp-bench-models",
+                              repo_type="model")
+            return True
+        except HfHubHTTPError as e:
+            if e.response.status_code == 429:
+                wait = int(e.response.headers.get("Retry-After", 60))
+                time.sleep(wait + 5)
+            else:
+                raise
+    return False
+```
+
+Probably ~600 of the 886 agent_synth manifest entries need pushing
+still. At ~3 sec per push + 300-sec backoff after every 256 commits,
+total wall ≈ 30-40 min. Run in background, low priority.
 
 ## What I just did (agent owns — overwrite)
 

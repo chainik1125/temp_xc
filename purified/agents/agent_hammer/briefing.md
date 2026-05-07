@@ -366,14 +366,20 @@ git -c "credential.helper=/tmp/cred.sh" push origin final
 
 ## Current state (agent owns — overwrite at every compact)
 
-**Last verified: 2026-05-06T23:27Z** — MISSION COMPLETE, COMMITTED, PUSHED.
-HF push recovery (Phase 6) DONE — all 109 checkpoints now on
-`han1823123123/temp-bench-models`.
+**NEW MISSION 2026-05-07T00:55Z (Han override)**: agent_synth has
+been doing C2 setup expansion (Setups D, E, F, G). They are at
+context-compact — handing off post-compact baseline gaps to you.
+**You now do the same kind of work — design + run NEW synthetic
+setups + fill in baselines — in parallel with agent_synth.**
 
-Final commit chain: `b51dd774` (initial backfill) → `a678771e`
-(briefing for agent_filler) → next (HF recovery + launcher bug fix
-+ this briefing update). Branch may rebase if other agents push
-concurrently; my work is durable on HF + leaderboard regardless.
+Original mission DONE (commit `b51dd774`, briefing handover
+`a678771e`, HF recovery + launcher bug fix `962f9390`). All 109
+of agent_hammer's c1_noisy + Setup A backfill cells are live on
+HF and leaderboard.
+
+**Read all sections below for the new mandate. The original
+mandate (Setup A + Setup B baseline backfill) is COMPLETED and the
+Setup A + Setup B AUTO-RESULTS blocks in `c2.md` are populated.**
 
 Pod: **5× RTX PRO 6000** (Blackwell-gen, 96 GB VRAM each). 900 GB RAM,
 160 cores. Briefing's "8× RTX PRO 6000" was wrong — 3 of the 8 GPUs
@@ -388,6 +394,136 @@ override via `bash scripts/run_on_gpu.sh <idx> --` works.
 - topk_sae c1_noisy: 36/36 ✅
 - tsae_paper c1_noisy: 36/36 ✅
 - tsae_paper c2 (Setup A): 36/36 ✅
+
+## NEW MISSION 2026-05-07T00:55Z — Setup expansion + baseline coverage
+
+Han 2026-05-07T00:55Z: **agent_hammer should basically do the same
+thing as agent_synth on new ideas. For each synthetic setting, we
+need the full T-sweep for TXC; we also want baselines TopK,
+Stacked T=2, Stacked T=5, TFA-pos, T-SAE.** Note: TFA-pos and T-SAE
+are NOT present for D, E, F etc and this needs to be fixed.
+
+agent_synth owns Setup D (noisy + overlap), Setup E (hierarchical),
+Setup F (coupled + obs noise), Setup G (hier + obs noise) and the
+T-sweeps on each. They're going post-compact and have tagged
+baselines + new setups for follow-up.
+
+### Your two parallel objectives
+
+**Objective 1 (priority): Setup design** — propose + implement +
+sweep new synthetic setups beyond D, E, F, G. Open candidates from
+agent_synth's brainstorm:
+- **Setup H**: ρ-sweep on Setup D pB05_np10 (Effect 1 vs Effect 2
+  on max-overlap regime) — cleanest extension of the c2.md C/D
+  axis story.
+- **Setup I**: temporal-derivative target (Dmitry Bench 3 port).
+  Honest-caveat bench where TXC FAILS on high-frequency targets.
+- **Setup J**: hierarchical with K_l=50 (datasource already in
+  YAML, not yet swept). Tests divide scaling with feature count.
+- **Setup K**: anti-correlated globals — pairwise NEGATIVELY
+  correlated globals. Per-token signal looks random; TXC window
+  pool sees the structure.
+- **Setup L**: magnitude-modulated locals — locals fire i.i.d. but
+  their magnitudes are slow-modulated by globals. Pure
+  temporal-pattern test (no direction in observation tracks
+  globals directly).
+
+Pick 1-3 of these (your judgement based on tractability + paper
+value). Follow agent_synth's protocol per setup:
+1. Generator in `src/temp_bench/data/toy/<name>.py` — reuse the
+   `_orthogonalise`/`_markov_chain_batch`/`_sample_magnitudes`
+   primitives from `coupled.py`.
+2. ≥1 datasource entry in `configs/datasources.yaml`.
+3. Driver in `experiments/c2_synthetic_coupled/run_setup_<X>.py`
+   (or `c2_hierarchical/...` if hierarchical-style). Mirror
+   agent_synth's `run_setup_f.py` template.
+4. Launcher script with TEMP_BENCH_POD_MODE=ephemeral set EXPLICITLY
+   in the env line (per your own bug fix in `962f9390`).
+5. Sweep all 5 baselines + TXC-base T-sweep × 3 seeds × 3 k_pos:
+     - `topk_sae` (no T, just k_pos).
+     - `stacked_sae` T ∈ {2, 5}.
+     - `tsae_paper` (T-SAE, T=2 paper-faithful).
+     - `tfa_pos` (TFA-pos, no T axis).
+     - `txc_base` T ∈ {2, 4, 5, 6, 8, 10, 12}.
+6. Render plots + add a "Setup X" section to c2.md (cross-territory
+   edit allowed — Han approved 2026-05-06T23:30Z for c2.md additions).
+7. Commit + push.
+
+**Objective 2: Fill baseline gaps on agent_synth's existing setups
+D, E, F, G.** Inventory at 2026-05-07T00:55Z:
+
+| Setup | topk | stk T=2 | stk T=5 | TXC T-sweep | tsae_paper | tfa_pos |
+|---|---|---|---|---|---|---|
+| D-np5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| D-np10 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| E (Kg10_Kl30) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| F σ ∈ {0.5, 1.0, 2.0} | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| G σ ∈ {1.0, 2.0} | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+
+Either you OR agent_synth fills these. **Coordinate via leaderboard**
+— before launching, grep for existing (datasource, arch, seed,
+k_pos) cells and skip duplicates. Cell budget if you take the
+whole gap fill: ~324 cells, ~30-40 min wall on 8 H100s (roughly
+~50-60 min on your 5× RTX PRO 6000 because slightly fewer GPUs).
+
+### tsae_paper hack reminder (your own past fix)
+
+tsae_paper at component=c2 has `d_sae=16384` from the locked YAML
+(no per_component_hparams.c2 override). Pass
+`arch_hparams_override={"d_sae": 40, "k_pos": k}` to make it match
+the d_sae=40 toy regime. Verified working in your
+`run_baselines.py`; same trick applies for D/E/F/G.
+
+### Useful agent_synth code paths
+
+- `src/temp_bench/data/toy/`:
+  - `coupled_noisy.py` — Setup D (per-token Bernoulli noise on top
+    of OR-coupling).
+  - `hierarchical.py` — Setup E (Kg slow + Kl fast modulated).
+  - `coupled_obs_noise.py` — Setup F (Setup A + Gaussian σ).
+  - `hierarchical_obs_noise.py` — Setup G (Setup E + Gaussian σ).
+- `experiments/c2_synthetic_coupled/`:
+  - `run_setup_f.py` is the cleanest template for new setups.
+  - `plot_headline.py:_arch_label` is the central control for which
+    archs appear in plots. CURRENTLY EXCLUDES tsae_paper / tfa_pos
+    by returning None — when you add those baselines, **also extend
+    `_arch_label` and `ARCH_COLORS`** to include them. Suggested
+    style (matches agent_filler / agent_hammer convention): `tsae_
+    paper` color `#CC79A7` (magenta) marker `"h"`; `tfa_pos` color
+    `#2ca02c` (green) marker `"X"`.
+  - `hunt_analysis.py` — pattern for per-cell gap tables.
+- `docs/components/c2.md` Setup D/E/F/G sections — agent_synth wrote
+  these under Han's cross-territory approval; they're paper-style
+  with AUTO-RESULTS blocks. Follow the same template for Setup H/I/J.
+
+### Hard rules (unchanged from your earlier mandate)
+
+- TEMP_BENCH_POD_MODE=ephemeral MUST be in the env line of every
+  launcher script. You discovered this bug; don't reintroduce it.
+- Don't bypass `runner.run_cell`.
+- Don't edit `src/temp_bench/architectures/` — locked.
+- Don't bump `EVAL_PROTOCOL_VERSION` for c2 (currently "1.0.0").
+- Cross-territory edit to `docs/components/c2.md` requires explicit
+  Han approval each session (he gave it 2026-05-06T23:30Z; assume
+  it carries forward unless he revokes).
+
+### Coordination with agent_synth
+
+agent_synth (post-compact) will resume on the same Han direction.
+Their priority is also: fill baselines on D/E/F/G + design more
+setups. **Race condition risk**: if you both launch the same
+(arch, seed, k_pos) cell, the runner cache will dedupe — only
+one row lands — but you waste GPU. Mitigation: pick disjoint
+setups. Suggested split:
+- **agent_hammer (you)**: own Setup H (ρ-sweep on D-np10) + Setup
+  I (temporal-derivative). Fill F/G baselines (your existing
+  tsae_paper + topk_sae work transfers cleanly).
+- **agent_synth**: own Setup J/K/L (hier-flavoured new setups).
+  Fill D-np5/D-np10/E baselines (their Setup D drivers).
+
+If you start on something not in your assignment, leave a "claiming
+X" line in this briefing's "Current state" section so agent_synth
+sees it (they re-read both briefings at session start).
 
 ## What I just did (agent owns — overwrite)
 
