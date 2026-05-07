@@ -286,6 +286,41 @@ datasources:
     magnitude_std: 0.15
     notes: "C2 default (Phase 3 OR-gated coupled features)."
 
+  # ── Setup KESTREL — seq_len scaling on Setup A (agent_hammer
+  # 2026-05-07). Same coupling structure, only seq_len varies. Tests
+  # whether longer sequences let TXC gather more samples and improve
+  # gAUC. seq_len=32 (half) and seq_len=128 (double) bracket Setup A's
+  # canonical seq_len=64. ─────────────────────────────────────────────
+  toy_coupled_K10_M20_d256_seq32_kestrel:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 32
+    pi: 0.05
+    rho: 0.7
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup KESTREL: Setup A at seq_len=32."
+
+  toy_coupled_K10_M20_d256_seq128_kestrel:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 128
+    pi: 0.05
+    rho: 0.7
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup KESTREL: Setup A at seq_len=128."
+
   # ── Setup HALCYON — d_in scaling on Setup A (agent_hammer 2026-05-07).
   # Same coupling structure as toy_coupled_K10_M20_d256, only d_in
   # varies. Tests whether TXC's gAUC win persists / grows / shrinks as
