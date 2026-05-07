@@ -23,7 +23,7 @@ Conventions:
 
 All datasources referenced by paper-canonical cells, regardless of component. The component-by-component sections below reference these by name.
 
-**Summary:** 5322 unique trained models (= unique `train_key`s) across the 7 components, evaluated in 6169 leaderboard cells. Per-component counts can sum to more than this total because some checkpoints are shared across components (e.g., C4 qualitative eval cache-hits on C3 sparse-probing trained models — the same `train_key` is counted once for C3 and once for C4 in the per-component sections, but once in this grand total).
+**Summary:** 5637 unique trained models (= unique `train_key`s) across the 7 components, evaluated in 6642 leaderboard cells. Per-component counts can sum to more than this total because some checkpoints are shared across components (e.g., C4 qualitative eval cache-hits on C3 sparse-probing trained models — the same `train_key` is counted once for C3 and once for C4 in the per-component sections, but once in this grand total).
 
 **Datasources — real-LM**
 
@@ -41,10 +41,17 @@ All datasources referenced by paper-canonical cells, regardless of component. Th
 
 | datasource | K_hidden | M_emissions | n_parents | K_global | K_local | n_features | d_in | pi | rho | rho_levels | p_A | p_B | magnitude_dist | magnitude_mean | magnitude_std | n_global_parents | pi_g | rho_g | p_l_high | p_l_low | obs_noise_sigma | rho_g_list | p_l | alpha | base_mag | period | duty_cycle | stride | n_groups | noise_alpha | global_magnitude_scale |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `toy_anticorrelated_Kg10_Kl30_d256` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | 0.9 | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | 0.05 | 0.95 | — | — | 1 | — | 0.05 | 5 | 1 | — | — | — | — | 0.9 | — |
 | `toy_chord_Kg10_Kl30_d256_2groups` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | 2 | — | — |
+| `toy_coupled_K10_M20_d128_halcyon` | 10 | 20 | 2 | — | — | — | 128 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_K10_M20_d256` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho00` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho03` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.3 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho06` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.6 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho09` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.9 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_seq128_kestrel` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_seq32_kestrel` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d512_halcyon` | 10 | 20 | 2 | — | — | — | 512 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_noisy_K10_M20_d256_pB01_np5` | 10 | 20 | 5 | — | — | — | 256 | 0.05 | 0.9 | — | 0 | 0.1 | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | 10 | 20 | 8 | — | — | — | 256 | 0.05 | 0.9 | — | 0 | 0.2 | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_noisy_K10_M20_d256_pB03_np5` | 10 | 20 | 5 | — | — | — | 256 | 0.05 | 0.9 | — | 0 | 0.3 | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
@@ -61,7 +68,7 @@ All datasources referenced by paper-canonical cells, regardless of component. Th
 | `toy_coupled_obs_noise_K10_M20_d256_sigma2p0` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 2 | — | — | — | — | — | — | — | — | — | — |
 | `toy_dewdrop_Kg10_Kl30_d256_p16` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | 0.8 | 0.1 | — | — | — | — | — | 16 | — | 1 | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
-| `toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast` | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.999, 0.999, 0.999, 0.999, 0.999, 0.7, 0.7, 0.7, 0.7, 0.7] | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256_harbor` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | 0.1 |
@@ -74,7 +81,6 @@ All datasources referenced by paper-canonical cells, regardless of component. Th
 | `toy_markov_n20_d40` | — | — | — | — | — | 20 | 40 | 0.5 | — | [0.0, 0.3, 0.5, 0.7, 0.9] | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_markov_n20_d40_noisy` | — | — | — | — | — | 20 | 40 | 0.5 | — | [0.7] | 0 | 0.625 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_obelisk_Kg10_Kl30_d256_alpha5` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.01 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
-| `toy_phalanx_Kg10_Kl30_d256_period8` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 
 ## C1 — Synthetic TopK sweep (toy Markov features)
 
@@ -126,16 +132,23 @@ _components: c1 — 213 unique trained models (213 leaderboard eval rows referen
 
 ## C2 — Synthetic coupled features + noisy emissions
 
-_components: c2, c1_noisy — 5066 unique trained models (5066 leaderboard eval rows referencing them)._
+_components: c2, c1_noisy — 5750 unique trained models (5756 leaderboard eval rows referencing them)._
 
 **Datasources — synthetic**
 
 | datasource | K_hidden | M_emissions | n_parents | K_global | K_local | n_features | d_in | pi | rho | rho_levels | p_A | p_B | magnitude_dist | magnitude_mean | magnitude_std | n_global_parents | pi_g | rho_g | p_l_high | p_l_low | obs_noise_sigma | rho_g_list | p_l | alpha | base_mag | period | duty_cycle | stride | n_groups | noise_alpha | global_magnitude_scale |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `toy_anticorrelated_Kg10_Kl30_d256` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | 0.9 | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | 0.05 | 0.95 | — | — | 1 | — | 0.05 | 5 | 1 | — | — | — | — | 0.9 | — |
 | `toy_chord_Kg10_Kl30_d256_2groups` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | 2 | — | — |
+| `toy_coupled_K10_M20_d128_halcyon` | 10 | 20 | 2 | — | — | — | 128 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_K10_M20_d256` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho00` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho03` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.3 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho06` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.6 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_rho09` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.9 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_seq128_kestrel` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d256_seq32_kestrel` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_coupled_K10_M20_d512_halcyon` | 10 | 20 | 2 | — | — | — | 512 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_noisy_K10_M20_d256_pB01_np5` | 10 | 20 | 5 | — | — | — | 256 | 0.05 | 0.9 | — | 0 | 0.1 | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | 10 | 20 | 8 | — | — | — | 256 | 0.05 | 0.9 | — | 0 | 0.2 | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_coupled_noisy_K10_M20_d256_pB03_np5` | 10 | 20 | 5 | — | — | — | 256 | 0.05 | 0.9 | — | 0 | 0.3 | folded_normal | 1 | 0.15 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
@@ -152,7 +165,7 @@ _components: c2, c1_noisy — 5066 unique trained models (5066 leaderboard eval 
 | `toy_coupled_obs_noise_K10_M20_d256_sigma2p0` | 10 | 20 | 2 | — | — | — | 256 | 0.05 | 0.7 | — | — | — | folded_normal | 1 | 0.15 | — | — | — | — | — | 2 | — | — | — | — | — | — | — | — | — | — |
 | `toy_dewdrop_Kg10_Kl30_d256_p16` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | — | — | 0.8 | 0.1 | — | — | — | — | — | 16 | — | 1 | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_1slow_9fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
-| `toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast` | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| `toy_hetero_rho_Kg10_Kl30_d256_5slow_5fast` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 | `toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.999, 0.999, 0.999, 0.999, 0.999, 0.7, 0.7, 0.7, 0.7, 0.7] | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_hierarchical_Kg10_Kl30_d256_harbor` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | 0.1 |
@@ -164,9 +177,8 @@ _components: c2, c1_noisy — 5066 unique trained models (5066 leaderboard eval 
 | `toy_magmod_Kg10_Kl30_d256_alpha1` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.05 | 0.95 | — | — | — | — | 0.5 | 1 | 1 | — | — | — | — | — | — |
 | `toy_markov_n20_d40_noisy` | — | — | — | — | — | 20 | 40 | 0.5 | — | [0.7] | 0 | 0.625 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | `toy_obelisk_Kg10_Kl30_d256_alpha5` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.01 | 0.95 | 0.8 | 0.1 | — | — | — | — | — | — | — | — | — | — | — |
-| `toy_phalanx_Kg10_Kl30_d256_period8` | — | — | — | 10 | 30 | — | 256 | — | — | — | — | — | folded_normal | 1 | 0.15 | 1 | 0.5 | — | 0.8 | 0.1 | — | [0.99, 0.99, 0.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] | — | — | — | — | — | — | — | — | — |
 
-_Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `smoke=True` flag), 48 orphan cells (leaderboard row references a `train_key` no longer in `checkpoints/manifest.jsonl`)._
+_Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `smoke=True` flag), 417 orphan cells (leaderboard row references a `train_key` no longer in `checkpoints/manifest.jsonl`)._
 
 **Architectures + training**
 
@@ -193,6 +205,13 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-base` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | 4 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TXC-base` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | 6 | — | — | {1, 2, 3, 4, 6} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 15 | 15 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 8 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 10 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 12 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 2 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 5 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 6 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 4 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
 | `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256` | 5 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256` | 6 | — | — | {1, 2, 3, 4, 6} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 15 | 15 |
@@ -200,6 +219,27 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256` | 8 | — | — | {1, 2, 3, 4, 5} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 15 | 15 |
 | `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256` | 2 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256` | 10 | — | — | {1, 2, 3, 4} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 12 | 12 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 6 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 5 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 2 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 4 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 12 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 10 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 8 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 5 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 6 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 4 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 8 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 10 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 5 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 2 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 8 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 12 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 6 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 10 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TXC-base` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 4 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
 | `TXC-base` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB01_np5` | 5 | — | — | {1, 2, 5} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | 5 | — | — | {1, 2, 5} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | 5 | — | — | 1 | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {42} | 1 | 1 |
@@ -231,9 +271,9 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 10 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 4 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 6 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
-| `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 8 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | 5 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma1p0` | 6 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma1p0` | 5 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
@@ -279,10 +319,10 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-base` | 1.0.0 | `toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 5 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 8 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
-| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 5 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 4 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
-| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 5 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 6 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 10 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_harbor` | 4 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
@@ -303,8 +343,8 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | 5 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | 4 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
-| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | 10 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | 6 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sparse` | 4 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sparse` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
@@ -314,11 +354,11 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sparse` | 2 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sparse` | 6 | — | — | {1, 2, 3, 4, 6} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 15 | 15 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 2 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
-| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 10 | — | — | {1, 2, 3, 4} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 12 | 12 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 5 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
+| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 10 | — | — | {1, 2, 3, 4} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 12 | 12 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 4 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
-| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 6 | — | — | {1, 2, 3, 4, 6} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 15 | 15 |
+| `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 12 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TXC-base` | 1.0.0 | `toy_hierarchical_Kg10_Kl50_d256` | 8 | — | — | {1, 2, 3, 4, 5} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 15 | 15 |
 | `TXC-base` | 1.0.0 | `toy_magmod_Kg10_Kl30_d256_alpha1` | 10 | — | — | {1, 2, 3, 4} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 12 | 12 |
 | `TXC-base` | 1.0.0 | `toy_magmod_Kg10_Kl30_d256_alpha1` | 6 | — | — | {1, 2, 3, 4, 6} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 15 | 15 |
@@ -351,18 +391,28 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-pro` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np5` | — | 2 | 2 | 1 | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2} | 2 | 2 |
 | `TXC-pro` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np5` | — | 2 | 2 | {1, 2, 3, 4, 5, 6} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 14 | 14 |
 | `TXC-pro` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np5` | — | 5 | 2 | {1, 2, 3, 4, 5} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 10 | 10 |
-| `TXC-pro` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | — | 5 | 2 | {1, 2, 3, 4, 5} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 12 | 12 |
 | `TXC-pro` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | — | 2 | 2 | {1, 2, 3, 4, 5} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 14 | 14 |
+| `TXC-pro` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | — | 5 | 2 | {1, 2, 3, 4, 5} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 12 | 12 |
 | `TXC-pro` | 1.0.0 | `toy_markov_n20_d40_noisy` | — | 10 | 5 | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `T-SAE` | 1.0.0 | `toy_anticorrelated_Kg10_Kl30_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
 | `T-SAE` | 1.0.0 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
 | `T-SAE` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
+| `T-SAE` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 6 | 6 |
 | `T-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20} | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 36 | 36 |
+| `T-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 3 | 3 |
+| `T-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 9 | 9 |
+| `T-SAE` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 3 | 3 |
+| `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB01_np5` | — | — | — | {1, 2} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 4 | 4 |
+| `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | — | — | — | {1, 2} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 3 | 3 |
+| `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB03_np5` | — | — | — | {1, 2} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 3 | 3 |
+| `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB03_np8` | — | — | — | {1, 2} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 4 | 4 |
 | `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
 | `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10_rho00` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 6 | 6 |
 | `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10_rho03` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 7 | 7 |
 | `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10_rho06` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 7 | 7 |
+| `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np2` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 3 | 3 |
 | `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np5` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 20 | 20 |
+| `T-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np8` | — | — | — | {1, 2} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 3 | 3 |
 | `T-SAE` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 9 | 9 |
 | `T-SAE` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma1p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 9 | 9 |
 | `T-SAE` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma2p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 9 | 9 |
@@ -372,6 +422,7 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `T-SAE` | 1.0.0 | `toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
 | `T-SAE` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
 | `T-SAE` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_harbor` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
+| `T-SAE` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_np2` | — | — | — | {1, 2} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2} | 4 | 4 |
 | `T-SAE` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma1p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 9 | 9 |
 | `T-SAE` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 9 | 9 |
 | `T-SAE` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sparse` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | 2 | off | {1,2,42} | 21 | 21 |
@@ -383,7 +434,13 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TopK-SAE` | 1.0.0 | `toy_anticorrelated_Kg10_Kl30_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TopK-SAE` | 1.0.0 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TopK-SAE` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
+| `TopK-SAE` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
 | `TopK-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20} | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 36 | 36 |
+| `TopK-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_rho00` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TopK-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_rho03` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TopK-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TopK-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TopK-SAE` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
 | `TopK-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB01_np5` | — | — | — | {1, 2, 5, 10, 15, 20} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 18 | 18 |
 | `TopK-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | — | — | — | {1, 2, 5, 10, 15, 20} | — | 40 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 18 | 18 |
 | `TopK-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | — | — | — | 1 | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {2,42} | 2 | 2 |
@@ -425,9 +482,20 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `Stacked-SAE` | 1.0.0 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | 5 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `Stacked-SAE` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | 2 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `Stacked-SAE` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | 5 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 2 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | 5 | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
 | `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256` | 2 | — | — | {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20} | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 36 | 36 |
 | `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256` | 5 | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_rho00` | 5 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {2} | 1 | 1 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_rho03` | 2 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {2} | 1 | 1 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 2 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | 5 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 5 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 2 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | 5 | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
 | `Stacked-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | 2 | — | — | 1 | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `Stacked-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | 2 | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `Stacked-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10` | 2 | — | — | {1, 2} | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
 | `Stacked-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10` | 5 | — | — | 1 | — | 40 | 30000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
 | `Stacked-SAE` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10` | 2 | — | — | {1, 2, 3, 4, 5, 6, 7, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 24 | 24 |
@@ -479,12 +547,22 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TFA-pos` | 1.0.0 | `toy_anticorrelated_Kg10_Kl30_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TFA-pos` | 1.0.0 | `toy_aurora_K10_M20_d256_sigma1_alpha09` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TFA-pos` | 1.0.0 | `toy_chord_Kg10_Kl30_d256_2groups` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
-| `TFA-pos` | 1.0.0 | `toy_coupled_K10_M20_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_K10_M20_d128_halcyon` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_K10_M20_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 27 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_K10_M20_d256_seq128_kestrel` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_K10_M20_d256_seq32_kestrel` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_K10_M20_d512_halcyon` | — | — | — | 1 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB01_np5` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB02_np8` | — | — | — | 2 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB03_np5` | — | — | — | 2 | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB03_np8` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10_rho00` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 7 | 7 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10_rho03` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np10_rho06` | — | — | — | {1, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 6 | 6 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np2` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np5` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
+| `TFA-pos` | 1.0.0 | `toy_coupled_noisy_K10_M20_d256_pB05_np8` | — | — | — | {2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 3 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma0p5` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma1p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TFA-pos` | 1.0.0 | `toy_coupled_obs_noise_K10_M20_d256_sigma2p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
@@ -494,6 +572,7 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TFA-pos` | 1.0.0 | `toy_hetero_rho_Kg10_Kl30_d256_5ultraslow_5slow` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TFA-pos` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
 | `TFA-pos` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_harbor` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
+| `TFA-pos` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_np2` | — | — | — | {1, 2} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 4 | 4 |
 | `TFA-pos` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma1p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TFA-pos` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sigma2p0` | — | — | — | {1, 2, 3} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 9 | 9 |
 | `TFA-pos` | 1.0.0 | `toy_hierarchical_Kg10_Kl30_d256_sparse` | — | — | — | {1, 2, 3, 4, 5, 6, 8} | — | 40 | 8000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 21 | 21 |
@@ -528,7 +607,7 @@ _Filtered: 3 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 
 ## C3 — Sparse probing on Gemma-2-2B-IT L13
 
-_components: c3 — 66 unique trained models (744 leaderboard eval rows referencing them)._
+_components: c3 — 66 unique trained models (527 leaderboard eval rows referencing them)._
 
 **Datasources — real-LM**
 
@@ -548,7 +627,7 @@ _Filtered: 6 cells with `n_steps < 1000` (sanity-check runs that escaped the `sm
 | `TXC-base` | 1.0.0 | `gemma_2_2b_base_l13_fineweb_24k128` | 5 | — | — | 20 | — | 18432 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 6 |
 | `TXC-base` | 1.0.0 | `gemma_2_2b_base_l13_fineweb_24k128` | 10 | — | — | 20 | — | 18432 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {42} | 1 | 1 |
 | `TXC-base` | 1.0.0 | `gemma_2_2b_it_l13_fineweb_24k128` | 5 | — | — | 20 | — | 18432 | 10000 | 256 | 0.0003 | adam | 500 | bf16 | — | off | {1,2,42} | 3 | 12 |
-| `TXC-base` | 1.0.0 | `gemma_2_2b_it_l13_fineweb_24k128` | 5 | — | — | 20 | — | 18432 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 385 |
+| `TXC-base` | 1.0.0 | `gemma_2_2b_it_l13_fineweb_24k128` | 5 | — | — | 20 | — | 18432 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 168 |
 | `TXC-base` | 1.0.0 | `gemma_2_2b_it_l13_fineweb_24k128` | 10 | — | — | 20 | — | 18432 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 24 |
 | `TXC-base` | 1.0.0 | `gemma_2_2b_it_l13_fineweb_24k128` | 20 | — | — | 20 | — | 18432 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 24 |
 | `TXC-pro` | 1.0.0 | `gemma_2_2b_base_l13_fineweb_24k128` | — | 10 | 5 | 20 | — | 18432 | 20000 | 1024 | 0.0003 | adam | 1000 | bf16 | — | off | {1,2,42} | 3 | 24 |
