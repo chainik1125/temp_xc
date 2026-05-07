@@ -516,6 +516,100 @@ def render_setup_f(out_path: Path):
     return grouped
 
 
+def render_setup_g(out_path: Path):
+    """Setup G panel: same logic as render_setup_f but for hierarchical+noise."""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    latest: dict[str, dict] = {}
+    with LEADERBOARD.open() as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            d = json.loads(line)
+            ec = d.get("eval_cfg") or {}
+            if ec.get("setup") != "G":
+                continue
+            if ec.get("smoke") is True:
+                continue
+            latest[d["eval_key"]] = d
+
+    grouped: dict[tuple, dict[str, list[float]]] = defaultdict(
+        lambda: {"gauc": [], "eauc": []}
+    )
+    for d in latest.values():
+        ec = d.get("eval_cfg") or {}
+        sigma = float(ec.get("obs_noise_sigma", 0.0))
+        t_label = ec.get("t_label", "default")
+        if d["arch"] == "topk_sae":
+            T_val = 0
+        else:
+            try:
+                T_val = int(t_label.split("=")[1])
+            except (ValueError, IndexError):
+                T_val = 5
+        k_pos = ec.get("k_pos")
+        if k_pos is None:
+            continue
+        grouped[(d["arch"], T_val, int(k_pos), sigma)]["gauc"].append(
+            d["metrics"]["gauc"])
+        grouped[(d["arch"], T_val, int(k_pos), sigma)]["eauc"].append(
+            d["metrics"]["eauc"])
+
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
+    sigmas_all = sorted({s for (a, T, k, s) in grouped.keys() if k == 1})
+    if not sigmas_all:
+        print(f"[plot] no Setup G data at k_pos=1")
+        return None
+
+    T_values = sorted({T for (a, T, k, s) in grouped.keys() if a == "txc_base" and k == 1})
+    cmap = plt.get_cmap("viridis", max(len(T_values), 4) + 2)
+    for ax, metric in zip(axes, ["gauc", "eauc"]):
+        for i, T in enumerate(T_values):
+            ys = []
+            ystds = []
+            sigs = []
+            for sig in sigmas_all:
+                vals = grouped.get(("txc_base", T, 1, sig), {}).get(metric, [])
+                if not vals:
+                    continue
+                ys.append(np.mean(vals))
+                ystds.append(np.std(vals))
+                sigs.append(sig)
+            if ys:
+                ax.errorbar(sigs, ys, yerr=ystds, marker="^",
+                            color=cmap(i + 1), linewidth=1.6, capsize=4,
+                            markersize=7, label=f"TXC T={T}")
+        ys_sae = []
+        ystds_sae = []
+        sigs_sae = []
+        for sig in sigmas_all:
+            vals = grouped.get(("topk_sae", 0, 1, sig), {}).get(metric, [])
+            if not vals:
+                continue
+            ys_sae.append(np.mean(vals))
+            ystds_sae.append(np.std(vals))
+            sigs_sae.append(sig)
+        if ys_sae:
+            ax.errorbar(sigs_sae, ys_sae, yerr=ystds_sae, marker="P",
+                        color="black", linewidth=2.0, capsize=4,
+                        markersize=10, label="TopK-SAE", zorder=10)
+        ax.set_xlabel(r"$\sigma$  (observation-noise std)", fontsize=12)
+        ax.set_ylabel("gAUC" if metric == "gauc" else "eAUC", fontsize=12)
+        ax.set_xticks(sigmas_all)
+        ax.set_ylim(0.0, 1.05)
+        ax.grid(alpha=0.3)
+        ax.set_title(f"Setup G (hierarchical + obs noise) — {metric.upper()} vs σ "
+                     f"at k_pos=1", fontsize=11)
+        ax.legend(fontsize=8, loc="upper right" if metric == "gauc" else "lower right",
+                  framealpha=0.9, ncol=1)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    fig.savefig(out_path.with_suffix(".thumb.png"), dpi=64, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[plot] wrote {out_path}")
+    return grouped
+
+
 def render_2panel_headline(
     *,
     winner_ds: str,
@@ -689,6 +783,10 @@ def main():
     # Setup F (coupled + obs-noise) σ-sweep panel.
     if not args.hier_only and not args.two_panel_only:
         render_setup_f(NOISY_PLOT_DIR / "c2_setup_f_sigma_sweep.png")
+
+    # Setup G (hierarchical + obs-noise) σ-sweep panel.
+    if not args.zoom_only and not args.two_panel_only:
+        render_setup_g(HIER_PLOT_DIR / "c2_setup_g_sigma_sweep.png")
 
 
 if __name__ == "__main__":
