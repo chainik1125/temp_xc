@@ -11,7 +11,7 @@ Inputs:
   --summary      summary.json (cluster lexical labels + sizes)
   --output-dir
 
-Output: c3_umap_txc.png  — c7-paper style (no title, no top/right
+Output: umap_txc.png  — c7-paper style (no title, no top/right
 spines, light grid alpha 0.25, legend outside axes).
 """
 from __future__ import annotations
@@ -170,7 +170,7 @@ def main(*, coords_path: Path, labels_path: Path, summary_path: Path,
               borderaxespad=0.0)
 
     fig.tight_layout()
-    out = output_dir / "c3_umap_txc.png"
+    out = output_dir / "umap_txc.png"
     fig.savefig(out)
     plt.close(fig)
     print(f"[umap_txc] wrote {out} "
@@ -205,8 +205,9 @@ def cli() -> None:
     )
     ap.add_argument(
         "--output-dir", type=Path,
-        default=root / "figs" / "c4",
-        help="Output directory (default: purified/figs/c4/).",
+        default=root / "figs",
+        help=("Output directory (default: purified/figs/, matching the "
+              "paper's \\includegraphics{figs/umap_txc.png} path)."),
     )
     args = ap.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)

@@ -603,10 +603,10 @@ def main(*, leaderboard: Path, checkpoints_dir: Path, output_dir: Path) -> None:
         print(f"[c3_paper] no canonical c3 rows in {leaderboard}")
         return
 
-    # Filenames match the Overleaf snippet (paired subfigure layout).
+    # Filenames match the paper's \includegraphics paths.
     # Plot 1: full sweep with TFA on the same axes.
     _plot_curves(
-        summary, output_dir / "c3_sparse_probing_curves_with_tfa_gemma_it.png",
+        summary, output_dir / "c3_sparse_probing_full_gemma_it.png",
         archs=tuple(archs_present),
     )
     # Plot 2: TFA excluded → y-axis can zoom on the cluster. This is the
@@ -665,8 +665,9 @@ def cli() -> None:
     )
     ap.add_argument(
         "--output-dir", type=Path,
-        default=root / "figs" / "c3",
-        help="Output directory (default: purified/figs/c3/).",
+        default=root / "figs",
+        help=("Output directory (default: purified/figs/, matching the "
+              "paper's \\includegraphics{figs/c3_*} paths)."),
     )
     args = ap.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)

@@ -310,8 +310,9 @@ def cli() -> None:
     )
     ap.add_argument(
         "--output-dir", type=Path,
-        default=root / "figs" / "c6",
-        help="Output directory (default: purified/figs/c6/).",
+        default=root / "figs",
+        help=("Output directory (default: purified/figs/, matching the "
+              "paper's \\includegraphics{figs/c6_em_*} paths)."),
     )
     args = ap.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
