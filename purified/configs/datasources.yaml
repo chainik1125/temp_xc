@@ -286,6 +286,43 @@ datasources:
     magnitude_std: 0.15
     notes: "C2 default (Phase 3 OR-gated coupled features)."
 
+  # ── Setup HALCYON — d_in scaling on Setup A (agent_hammer 2026-05-07).
+  # Same coupling structure as toy_coupled_K10_M20_d256, only d_in
+  # varies. Tests whether TXC's gAUC win persists / grows / shrinks as
+  # the ambient residual dimension scales. d_in=128 (compressed) /
+  # d_in=512 (expanded) bracket the Setup A canonical d=256.
+  # Random multi-letter name to avoid collision with agent_synth /
+  # agent_pro per Han's autonomous-work directive 2026-05-07. ─────────
+  toy_coupled_K10_M20_d128_halcyon:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 128
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup HALCYON: Setup A at compressed d_in=128."
+
+  toy_coupled_K10_M20_d512_halcyon:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 512
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "Setup HALCYON: Setup A at expanded d_in=512."
+
   # ── C2 ρ-sweep datasources (Han 2026-05-06 — Effect 1 vs Effect 2 test
   # per Dmitry's framing; mirrors his coupled_rho_sweep). Same coupling
   # structure as the default toy_coupled_K10_M20_d256, only rho varies.
