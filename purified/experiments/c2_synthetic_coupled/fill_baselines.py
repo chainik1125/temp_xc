@@ -131,6 +131,7 @@ def _build_data(spec, *, device: str):
             magnitude_dist=getattr(spec, "magnitude_dist", "folded_normal"),
             magnitude_mean=float(getattr(spec, "magnitude_mean", 1.0)),
             magnitude_std=float(getattr(spec, "magnitude_std", 0.15)),
+            global_magnitude_scale=float(getattr(spec, "global_magnitude_scale", 1.0)),
             n_seqs=int(getattr(spec, "n_seqs", 4096)),
             seed=seed,
             device=device,
