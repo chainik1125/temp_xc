@@ -534,6 +534,27 @@ changed: agent territory + analysis.py edits + 109 new
 `checkpoints/<train_key>/config.json` files (model.safetensors are
 gitignored, configs are tracked) + leaderboard.jsonl + manifest.jsonl.
 
+### Cross-territory edit to c2.md (post-mission, under direct Han ask)
+Han asked verbally: "make the fact that gAUC / eAUC doesn't apply for
+section B clear in the .md". Per Hard Rule #7 + briefing scope,
+`docs/components/c2.md` is agent_paper territory; the override here
+is documented for the record.
+
+Edit (in the Setup B intro, just below the **Headline metrics** line):
+added a blockquote explaining that `toy_markov_n20_d40_noisy` has only
+one feature-direction set ($f_i$ is shared between noisy emission $s_i$
+and clean hidden state $h_i$ at construction in `markov.py:91-123`), so
+$\text{eAUC} \equiv \text{gAUC}$ would be degenerate. The local-vs-global
+decomposition for Setup B lives at the latent-code level (single-latent
+correlation $\bar{r}_{\text{local}}$ vs $\bar{r}_{\text{global}}$ and
+linear-probe $R^2_{\text{local}}$ vs $R^2_{\text{global}}$) and is
+already visualized in the existing denoising scatters
+(`c2_noisy_probe_scatter.png`, `c2_noisy_singlelatent_scatter.png`).
+
+The blockquote also forward-references the denoising scatter section
+right below it, tying the explanation to the visuals readers will
+encounter.
+
 ### Phase 6 — HF push recovery (post-mission, 23:25Z)
 **BUG**: my launcher's `env AGENT_NAME=... TQDM_DISABLE=1` did NOT
 include `TEMP_BENCH_POD_MODE=ephemeral`. This var is needed by
