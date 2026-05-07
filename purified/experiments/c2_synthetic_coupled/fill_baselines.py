@@ -53,6 +53,8 @@ from temp_bench.data.toy.hierarchical_obs_noise import (
     hierarchical_obs_noise_features,
 )
 from temp_bench.data.toy.heterogeneous_rho import heterogeneous_rho_features
+from temp_bench.data.toy.dewdrop import dewdrop_features
+from temp_bench.data.toy.chord import chord_features
 from temp_bench.data.toy.coupled import make_batch_iter
 from temp_bench.eval.synthetic import feature_recovery, global_recovery_gAUC
 from temp_bench.training.sae_trainer import train_sae
@@ -136,6 +138,43 @@ def _build_data(spec, *, device: str):
             pi=float(spec.pi),
             rho=float(spec.rho),
             obs_noise_sigma=float(spec.obs_noise_sigma),
+            magnitude_dist=getattr(spec, "magnitude_dist", "folded_normal"),
+            magnitude_mean=float(getattr(spec, "magnitude_mean", 1.0)),
+            magnitude_std=float(getattr(spec, "magnitude_std", 0.15)),
+            n_seqs=int(getattr(spec, "n_seqs", 4096)),
+            seed=seed,
+            device=device,
+        )
+    if gen.endswith(":chord_features"):
+        return chord_features(
+            K_global=int(spec.K_global),
+            K_local=int(spec.K_local),
+            n_groups=int(spec.n_groups),
+            n_global_parents=int(getattr(spec, "n_global_parents", 1)),
+            d_in=int(spec.d_in),
+            seq_len=int(spec.seq_len),
+            pi_g=float(spec.pi_g),
+            rho_g=float(spec.rho_g),
+            p_l_high=float(getattr(spec, "p_l_high", 0.8)),
+            p_l_low=float(getattr(spec, "p_l_low", 0.1)),
+            magnitude_dist=getattr(spec, "magnitude_dist", "folded_normal"),
+            magnitude_mean=float(getattr(spec, "magnitude_mean", 1.0)),
+            magnitude_std=float(getattr(spec, "magnitude_std", 0.15)),
+            n_seqs=int(getattr(spec, "n_seqs", 4096)),
+            seed=seed,
+            device=device,
+        )
+    if gen.endswith(":dewdrop_features"):
+        return dewdrop_features(
+            K_global=int(spec.K_global),
+            K_local=int(spec.K_local),
+            n_global_parents=int(getattr(spec, "n_global_parents", 1)),
+            d_in=int(spec.d_in),
+            seq_len=int(spec.seq_len),
+            period=int(spec.period),
+            stride=int(getattr(spec, "stride", 1)),
+            p_l_high=float(getattr(spec, "p_l_high", 0.8)),
+            p_l_low=float(getattr(spec, "p_l_low", 0.1)),
             magnitude_dist=getattr(spec, "magnitude_dist", "folded_normal"),
             magnitude_mean=float(getattr(spec, "magnitude_mean", 1.0)),
             magnitude_std=float(getattr(spec, "magnitude_std", 0.15)),
