@@ -59,5 +59,5 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 GH_TOKEN=$(cat /workspace/.tokens/gh_token)
 git fetch origin
 git rebase origin/final
-git push "https://${GH_TOKEN}@github.com/chainik1125/temp_xc.git" final
+git push "https://${GH_TOKEN}@github.com/anonymous-temp-bench.git" final
 echo "[c6.render] pushed."

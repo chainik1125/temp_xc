@@ -17,9 +17,9 @@ compares to ours, and flags what we need to fix in c2.md / the paper.
 
 **Sources** (commit `dmitry-synthetic` branch):
 
-- [`docs/dmitry/synthetic/2026-05-06_overnight/results.md`](https://github.com/chainik1125/temp_xc/blob/dmitry-synthetic/docs/dmitry/synthetic/2026-05-06_overnight/results.md)
+- [`docs/dmitry/synthetic/2026-05-06_overnight/results.md`](https://anonymous.4open.science/r/temp-bench/blob/dmitry-synthetic/docs/dmitry/synthetic/2026-05-06_overnight/results.md)
   — overnight chain, 11 benches × 3-5 archs, with E9 DC/AC ablation.
-- [`docs/dmitry/results/3arch_3bench_summary.md`](https://github.com/chainik1125/temp_xc/blob/dmitry-synthetic/docs/dmitry/results/3arch_3bench_summary.md)
+- [`docs/dmitry/results/3arch_3bench_summary.md`](https://anonymous.4open.science/r/temp-bench/blob/dmitry-synthetic/docs/dmitry/results/3arch_3bench_summary.md)
   — 3-arch matched-raw_k sweep on 3 generative processes; the
   cleanest summary of the Effect 1 vs Effect 2 question.
 

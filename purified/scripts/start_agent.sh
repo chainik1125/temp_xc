@@ -98,7 +98,7 @@ if [ ! -d "$PURIFIED" ]; then
     else
         echo "  No primary clone found. Bootstrap the pod first:" >&2
         echo
-        echo "    cd $PARENT_DIR && git clone https://github.com/chainik1125/temp_xc.git" >&2
+        echo "    cd $PARENT_DIR && git clone https://anonymous.4open.science/r/temp-bench.git" >&2
         echo "    cd $PARENT_DIR/temp_xc && git checkout final" >&2
         echo "    bash purified/scripts/bootstrap_runpod.sh" >&2
     fi

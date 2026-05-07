@@ -35,7 +35,7 @@
 
 set -eu
 
-REPO_URL="${REPO_URL:-https://github.com/chainik1125/temp_xc.git}"
+REPO_URL="${REPO_URL:-https://anonymous.4open.science/r/temp-bench.git}"
 REPO_DIR="${REPO_DIR:-/workspace/temp_xc}"
 BRANCH="${BRANCH:-final}"
 TOKENS_DIR="${TOKENS_DIR:-/workspace/.tokens}"

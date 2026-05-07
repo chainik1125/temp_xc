@@ -53,7 +53,7 @@ case "$AGENT" in
         ;;
 esac
 
-REPO_URL="${REPO_URL:-https://github.com/chainik1125/temp_xc.git}"
+REPO_URL="${REPO_URL:-https://anonymous.4open.science/r/temp-bench.git}"
 PARENT_DIR="${PARENT_DIR:-/workspace}"
 PRIMARY_CLONE="$PARENT_DIR/temp_xc"
 AGENT_CLONE="$PARENT_DIR/temp_xc_${AGENT#agent_}"   # strip "agent_" prefix
