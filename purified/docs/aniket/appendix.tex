@@ -7,10 +7,57 @@
 % \section{Other synthetic evals}
 % Maybe the which-component eval will go here?
 
-\section{Further qualitative analysis of features}
+\section{Synthetic Benchmarks: Ground-Truth Correspondences and Probe Setup}
+\label{app:synthetic-probes}
+
+The denoising metrics in \cref{sec:synthetic} (single-latent correlation and linear-probe $R^2$) rely on two distinct correspondences between ground-truth objects and the architecture's dictionary: one fixed by construction in the data generator, one inferred post-hoc by decoder geometry. This appendix makes both explicit so that the local-vs-global scatters in \cref{fig:setup_b_denoising,fig:setup_d} can be interpreted unambiguously.
+
+\subsection{Construction-time correspondence (feature index $\leftrightarrow$ chain)}
+\label{app:synthetic-construction}
+
+The Denoising bench generator (\texttt{temp\_bench.data.toy.markov:markov\_chain\_support}) draws $N$ orthogonal feature directions $\mathbf{f}_i \in \mathbb{R}^d$ as the rows of a QR-orthogonalised Gaussian matrix, then runs $N$ independent two-state Markov chains $s_{i,t} \in \{0,1\}$ in parallel and emits noisy firings $a_{i,t}\mid s_{i,t}\sim\mathrm{Bernoulli}\!\big(p_A\,[s_{i,t}{=}0] + p_B\,[s_{i,t}{=}1]\big)$. The feature index $i \in \{1,\ldots,N\}$ simultaneously labels three objects: the orthogonal direction $\mathbf{f}_i$, the hidden state $s_{i,t}$, and the noisy emission $a_{i,t}$. The activation
+\[
+    \mathbf{x}_t \;=\; \sum_{i=1}^N a_{i,t}\, m_{i,t}\, \mathbf{f}_i
+\]
+threads this index through the residual-stream construction, so the feature$\,\leftrightarrow\,$emission$\,\leftrightarrow\,$hidden-state mapping is determined entirely by the generator. This is the ground-truth correspondence the metrics evaluate against.
+
+The Coupling bench (\texttt{temp\_bench.data.toy.coupled\_noisy:coupled\_noisy\_hmm}) keeps the same construction-time logic for the $M = 20$ emissions $a_{j,t}$ and adds a separate index $k \in \{1,\ldots,K\}$ with $K = 10$ for the hidden chain directions $\mathbf{f}^{\mathrm{hid}}_k$. A binary coupling matrix $C \in \{0,1\}^{M \times K}$ specifies which subset of hidden chains drives each emission via OR-gate firing, so the construction-time correspondence has two layers (chain index $k$, emission index $j$) instead of one.
+
+\subsection{Post-hoc correspondence (feature direction $\leftrightarrow$ dictionary atom)}
+\label{app:synthetic-matching}
+
+For an autoencoder with decoder columns $\mathbf{w}_j \in \mathbb{R}^d$, $j \in \{1, \ldots, d_{\mathrm{sae}}\}$, the matched latent for ground-truth feature $i$ is the column with the largest absolute cosine,
+\[
+    j^*(i) \;=\; \arg\max_j \left| \frac{\langle \mathbf{w}_j, \mathbf{f}_i \rangle}{\lVert \mathbf{w}_j \rVert\, \lVert \mathbf{f}_i \rVert} \right|.
+\]
+The matching is computed independently for each feature, so two ground-truth features may in principle pick the same latent. We do not enforce uniqueness; this matches the wasteland-source convention in \texttt{denoising\_probes.py}.
+
+\subsection{Probe definitions}
+\label{app:synthetic-probes-defs}
+
+Given the eval set of activations $\mathbf{x}_t$, every architecture produces a per-token latent code $\mathbf{u}(t) \in \mathbb{R}^{d_{\mathrm{sae}}}$. For per-token architectures (TopK SAE, T-SAE, TFA-pos) the encoder runs directly on each token. For window-level architectures (TXC, Stacked) the encoder produces one code per $T$-window; we broadcast that code to all $T$ positions in the window and average over the $T$ overlapping windows that touch each position, so every $(\textit{seq}, t)$ pair ends up with one $d_{\mathrm{sae}}$-dim vector.
+
+\paragraph{Single-latent correlation.} For each ground-truth feature $i$, take the matched latent $j^*(i)$ defined above and compute Pearson correlations over all $(\textit{seq}, t)$ pairs,
+\begin{align*}
+    \bar r_{\mathrm{local}}(i) &\;=\; \mathrm{Corr}\!\big(u_{j^*(i)}(t),\; a_{i,t}\big), \\
+    \bar r_{\mathrm{global}}(i) &\;=\; \mathrm{Corr}\!\big(u_{j^*(i)}(t),\; s_{i,t}\big),
+\end{align*}
+then average across the $N$ features. This is a \emph{strict} test: the dictionary direction must align with $\mathbf{f}_i$ \emph{and} the code dimension along that direction must track the hidden state.
+
+\paragraph{Linear probe.} For each feature $i$ fit two ridge regressions ($\alpha = 1$, 80/20 train/test split) using the full code $\mathbf{u}(t)$,
+\begin{align*}
+    \hat a_{i,t} &\;=\; \mathbf{w}^{(i)\top}_{\mathrm{loc}}\, \mathbf{u}(t) + b^{(i)}_{\mathrm{loc}}, \\
+    \hat s_{i,t} &\;=\; \mathbf{w}^{(i)\top}_{\mathrm{glob}}\, \mathbf{u}(t) + b^{(i)}_{\mathrm{glob}},
+\end{align*}
+and report $R^2_{\mathrm{local}}(i)$ and $R^2_{\mathrm{global}}(i)$ on the held-out $20\%$, averaged across the $N$ features. This is a \emph{looser} test: information may be diffused across many latents and the probe still recovers it.
+
+The local-vs-global scatters in \cref{fig:setup_b_denoising} use both metrics on the same population of cells. Points above the $y = x$ diagonal denoise: the latent code tracks the hidden state better than the noisy emission.
+
 
 \section{Sparse Probing: Full Details}
 \label{app:c3}
+
+Sparse probing measures whether a dictionary exposes features useful for simple classifiers of human-interpretable text concepts. Standard probing panels include both token-local properties, such as punctuation and part of speech, and broader passage-level properties, such as topic, sentiment, and named entities. This makes sparse probing a useful static test of whether temporal-window dictionaries expose concepts that per-token dictionaries fragment.
 
 \subsection{Architectures and training configuration}
 \label{app:c3-archs}
@@ -96,19 +143,35 @@ where $\{k_i\}_{i=0}^{n-1} = \{5, 10, 20, 40, 80, 160, 320, 640\}$. The grid is 
 \section{Emergent Misalignment Case Study: Full Steering Grid}
 \label{app:c6}
 
-The two summary subfigures in \cref{fig:emergent_misalignment} collapse, for each architecture, the full Wang stage-4 $\alpha$ frontier into a single coherence-floored alignment dynamic range (\cref{fig:c6-em-alignment-delta}) and a single sparse-probe PR-AUC (\cref{fig:c6-em-detection-prauc}). \Cref{fig:c6-em-pareto-frontier} replots the same data as a coherence/alignment Pareto scatter (one curve per $(\text{architecture}, \text{seed})$, each curve following the top stage-4 finalist's full $\alpha$ frontier), making the dynamic range visible as the vertical extent of points to the right of the $\text{coh} = 70$ threshold. \Cref{fig:c6-em-steering-grid} shows the same data in unaggregated form: each panel is one $(\text{architecture}, \text{seed})$ cell on Qwen-2.5-7B-Instruct + bad-medical LoRA, with the mean alignment of all three Wang stage-4 finalists plotted against $\alpha$, the top-finalist mean coherence overlaid as a dashed line, and the $\alpha\!=\!0$ unsteered baseline marked in green. The shaded green band marks the $\text{coh} \geq 70$ region; red and blue triangles mark the maximum and minimum mean alignment within that region, whose difference defines $\Delta\text{align}$ for the per-cell summary. The dense per-finalist $\alpha$ grid combines Han's canonical 27-point Wang stage-4 grid (densely sampled in $|\alpha| \in [1, 10]$ with $\alpha = \pm 100$ at the tails) with the extended $|\alpha| \in \{110, 120, 130, 140, 150, 200\}$ sweep run on the top finalist of each cell. The dense extension is what reveals coherence-preserving alignment peaks at $|\alpha| > 10$ that Han's canonical grid missed (e.g.\ SAE-arditi seed~$1$, top finalist \texttt{feat 1119}, peaks at $\alpha = +40$ with align~$77.4$, coh~$> 70$). All judge transcripts (per-rollout completions and Anthropic Claude Haiku 4.5 align/coh scores) are persisted in \texttt{judge\_outputs.jsonl} (canonical) and \texttt{judge\_outputs\_extended.jsonl} (extension) for post-deadline $\kappa$ validation.
+The two summary subfigures in \cref{fig:emergent_misalignment} collapse, for each architecture, the full Wang stage-4 $\alpha$ frontier into a single coherence-floored alignment dynamic range (\cref{fig:c6-em-alignment-delta}) and a single sparse-probe PR-AUC (\cref{fig:c6-em-detection-prauc}). \Cref{fig:c6-em-pareto-frontier} replots the same data as a coherence/alignment Pareto scatter (one curve per $(\text{architecture}, \text{seed})$, each curve following the top stage-4 finalist's full $\alpha$ frontier), making the dynamic range visible as the vertical extent of points to the right of the $\text{coh} = 70$ threshold. \Cref{fig:c6-em-steering-grid} shows the same data in unaggregated form: each panel is one $(\text{architecture}, \text{seed})$ cell on Qwen-2.5-7B-Instruct + bad-medical LoRA, with the mean alignment of all three Wang stage-4 finalists plotted against $\alpha$, the top-finalist mean coherence overlaid as a dashed line, and the $\alpha\!=\!0$ unsteered baseline marked in green. The shaded green band marks the $\mathrm{coh}\geq70$ region; red and blue triangles mark the extrema used in \cref{eq:delta-align}. The dense per-finalist $\alpha$ grid combines Han's canonical 27-point Wang stage-4 grid (densely sampled in $|\alpha| \in [1, 10]$ with $\alpha = \pm 100$ at the tails) with the extended $|\alpha| \in \{110, 120, 130, 140, 150, 200\}$ sweep run on the top finalist of each cell. The dense extension is what reveals coherence-preserving alignment peaks at $|\alpha| > 10$ that Han's canonical grid missed (e.g.\ SAE-arditi seed~$1$, top finalist \texttt{feat 1119}, peaks at $\alpha = +40$ with align~$77.4$, coh~$> 70$). All judge transcripts (per-rollout completions and Anthropic Claude Haiku 4.5 align/coh scores) are persisted in \texttt{judge\_outputs.jsonl} (canonical) and \texttt{judge\_outputs\_extended.jsonl} (extension) for post-deadline $\kappa$ validation.
+
+\paragraph{Alignment dynamic range.}
+For each architecture/seed cell $c$, let $\mathcal A_c$ be the set of steering
+magnitudes whose judged coherence is at least $70$. We summarize steering
+control by the coherence-floored alignment range
+\begin{equation}
+    \Delta\mathrm{align}(c)
+    =
+    \max_{\alpha\in\mathcal A_c}\mathrm{align}(c,\alpha)
+    -
+    \min_{\alpha\in\mathcal A_c}\mathrm{align}(c,\alpha),
+    \qquad
+    \mathcal A_c=\{\alpha:\mathrm{coh}(c,\alpha)\ge 70\}.
+    \label{eq:delta-align}
+\end{equation}
+This is the statistic plotted in \cref{fig:c6-em-alignment-delta}.
 
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.75\textwidth]{figs/c6_em_pareto_frontier_7bmed.pdf}
-    \caption{Coherence/alignment Pareto frontier for the four Qwen-7B-medical c6 cells, in the same format as the previous-writeup frontier on Qwen-7B (cf.\ \texttt{em-nanda:docs/dmitry/results/em\_features/frontier\_sae\_vs\_txc.png}). Markers: circle = SAE-arditi, square = TXC-base; darker edge = seed $1$, fainter edge = seed $42$. Color = steering coefficient $\alpha$ (diverging colormap, blue $=$ positive, red $=$ negative). Black star marks the $\alpha\!=\!0$ unsteered baseline of each curve. Each curve follows the cell's top stage-4 finalist across the canonical 27-$\alpha$ grid plus the dense $|\alpha| \in \{110, \ldots, 200\}$ extension. Vertical orange dash-dot: the $\text{coh} = 70$ threshold; the alignment dynamic range $\Delta\text{align}$ summarised in \cref{fig:c6-em-alignment-delta} is the vertical extent of each curve's points to the right of this line.}
+    \caption{Coherence/alignment Pareto frontier for the Qwen-7B medical-misalignment cells. Each curve follows one architecture/seed across steering magnitudes; the vertical extent to the right of the $\mathrm{coh}=70$ threshold defines the dynamic range used in \cref{fig:c6-em-alignment-delta}.}
     \label{fig:c6-em-pareto-frontier}
 \end{figure*}
 
 \begin{figure*}[t]
     \centering
     \includegraphics[width=\textwidth]{figs/c6_em_steering_grid_7bmed.pdf}
-    \caption{Full Wang stage-4 $\alpha$ frontier for the four Qwen-7B-medical c6 cells (columns: architectures; rows: training seeds). Each panel shows mean alignment (solid) for all three stage-4 finalists across the canonical 27-$\alpha$ grid plus the dense $|\alpha| \in \{110, \ldots, 200\}$ extension; mean coherence (dashed orange) is shown for the top finalist. Light green band: $\text{coh} \geq 70$ region. Green dotted horizontal line: $\alpha\!=\!0$ alignment baseline. Red and blue triangles mark the maximum and minimum mean alignment within the $\text{coh} \geq 70$ region; their difference is the per-cell $\Delta\text{align}$ summarised in \cref{fig:c6-em-alignment-delta}.}
+    \caption{Full steering sweep for the Qwen-7B medical-misalignment cells. Panels show alignment across steering magnitudes, with coherence overlaid for the top finalist; extrema inside the $\mathrm{coh}\geq70$ region determine the summarized dynamic range.}
     \label{fig:c6-em-steering-grid}
 \end{figure*}
 
@@ -121,13 +184,61 @@ We confirm this empirically across the canonical c6 cells: the mean $\ell_2$-nor
 
 \section{HH-RLHF Preference Decomposition: Full Details}
 \label{app:rlhf}
-
-\Cref{fig:rlhf} in the main text collapses the per-feature decomposition for each architecture into a top-20 tier-count panel and a semantic-mass-share panel. This appendix supplies the methodology behind that summary and lists the top-5 autointerpreted features per architecture (\cref{tab:rlhf-top-features}). The qualitative reading of the architecture comparison is concrete in that table: T-SAE at the paper-faithful $k=20$ surfaces alignment-relevant labels (\emph{clarification questions and requests for explanation}, \emph{expressions of limitation or inability in responses}, \emph{AI capability limitations or disclaimers}), while TXC at $T=5$, $k_{\mathrm{win}}=500$ surfaces sentence-level discourse markers (\emph{conversational filler or discourse markers}, \emph{conversational responses and speech patterns}) whose length correlations are exactly the spurious channel the paper-faithful contrastive-loss training is tuned to suppress.
+\afterpage{
+\begin{figure*}[t]
+    \centering
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \autofig{rlhf_summary}
+        \caption{Top-$20$ feature classification and semantic-mass share.}
+        \label{fig:rlhf-summary-app}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \autofig{rlhf_scatter}
+        \caption{Preference-separation magnitude versus response-length correlation.}
+        \label{fig:rlhf-scatter-app}
+    \end{subfigure}
+    \caption{HH-RLHF preference decomposition for Gemma-2-2B layer~12. Features are ranked by $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ and classified by correlation with response-length difference.}
+    \label{fig:rlhf-app}
+\end{figure*}
+}
+\Cref{fig:rlhf-app} collapses the per-feature decomposition for each architecture into a top-20 tier-count panel and a semantic-mass-share panel. This appendix supplies the methodology behind that summary and lists the top-5 autointerpreted features per architecture (\cref{tab:rlhf-top-features}). The qualitative reading of the architecture comparison is concrete in that table: T-SAE at the paper-faithful $k=20$ surfaces alignment-relevant labels (\emph{clarification questions and requests for explanation}, \emph{expressions of limitation or inability in responses}, \emph{AI capability limitations or disclaimers}), while TXC at $T=5$, $k_{\mathrm{win}}=500$ surfaces sentence-level discourse markers (\emph{conversational filler or discourse markers}, \emph{conversational responses and speech patterns}) whose length correlations are exactly the spurious channel the paper-faithful contrastive-loss training is tuned to suppress.
 
 \subsection{Response masking and ranking metric}
 \label{app:rlhf-masking}
 
 For each \texttt{(chosen, rejected)} pair, we tokenise the two strings independently with \texttt{max\_length}$=256$ and identify the differing assistant response by a character-level longest common prefix between the two raw strings; we then map character offsets back to token indices via the tokenizer's offset map to produce a per-side \texttt{response\_mask} that selects only the differing-response tokens. Layer-$12$ residual-stream activations are captured under this mask, and per-feature means are taken across all valid response-token positions in the $1000$ pairs. Features are ranked by the signed metric $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$, matching \citet[\S4.5]{bhalla2025tsae}; negative values flag features that activate more strongly on \emph{chosen} responses, positive values on rejected. Tier classification thresholds $|r|<0.2$ (semantic) and $|r|\geq 0.5$ (length-spurious) follow the paper. Our absolute response-length means (rejected $36.23$, chosen $28.57$ tokens) are lower than the paper's reported $49.24$ and $37.84$ because of tokenizer and truncation differences across HH-RLHF dataset versions; the paired-$t$-test signal direction and significance ($p=9.76\times10^{-10}$) match the paper's $p\approx 9\times10^{-10}$ to leading digit.
+
+For each feature $j$, define its preference separation
+\[
+    \Delta\mu_j
+    =
+    \mu_{\mathrm{rejected},j}-\mu_{\mathrm{chosen},j},
+\]
+where means are taken over response-token positions only. We also compute the
+length correlation
+\[
+    r_j
+    =
+    \mathrm{Corr}_{\text{pairs}}
+    \bigl(
+        \mathrm{act}_{\mathrm{rejected},j}
+        -
+        \mathrm{act}_{\mathrm{chosen},j},
+        \ell_{\mathrm{rejected}}-\ell_{\mathrm{chosen}}
+    \bigr).
+\]
+Features are classified as semantic if $|r_j|<0.2$, mixed if
+$0.2\leq |r_j|<0.5$, and length-spurious if $|r_j|\geq0.5$. For a top-$K$
+set $\mathcal T_K$, the semantic-mass share is
+\[
+    \mathrm{SemMass}(\mathcal T_K)
+    =
+    \frac{\sum_{j\in\mathcal T_K:\, |r_j|<0.2} |\Delta\mu_j|}
+         {\sum_{j\in\mathcal T_K} |\Delta\mu_j|}.
+\]
 
 \begin{table}[t]
     \centering
@@ -207,6 +318,25 @@ We evaluate the $25$-point grid
 \]
 The grid is denser between $\pm0.5$ and $\pm8$, where the inducement curves change most quickly, and coarser at larger magnitudes. The $m=0$ point is the no-intervention baseline used in \cref{eq:delta-gc}. \Cref{fig:c7-inducement-app} plots the per-architecture $\Delta gc(a, m)$ curves on this grid plus the extended follow-up at $m \in \{\pm24, \pm32\}$.
 
+\subsection{Inducement metric}
+\label{app:c7-delta-gc}
+
+For each architecture $a$, question $q$, and steering magnitude $m$, let
+$gc(a,q,m)$ be the Sonnet judge count of genuine backtracking events in the
+continuation. The main inducement statistic subtracts the shared unsteered
+cut-and-continue floor questionwise:
+\[
+    \Delta gc(a,m)
+    =
+    \frac{1}{|\mathcal Q|}
+    \sum_{q\in\mathcal Q}
+    \bigl(gc(a,q,m)-gc(a,q,0)\bigr),
+    \label{eq:delta-gc}
+\]
+where $\mathcal Q$ is the locked $61$-question MATH-500 cohort. Positive
+$\Delta gc$ means steering induces more genuine backtracking than the unsteered
+continuation protocol on the same questions.
+
 \begin{figure}[t]
     \centering
     \autofig{c7_delta_gc_vs_magnitude}
@@ -223,6 +353,28 @@ We use cut25 because a fixed proportional cut gives comparable continuations acr
 
 \subsection{Sonnet judge prompt and reliability}
 \label{app:c7-judge}
+
+\begin{figure}[t]
+    \centering
+    \scriptsize
+    \setlength{\fboxsep}{4pt}
+
+    \begin{minipage}[t]{0.49\linewidth}
+        \fbox{\begin{minipage}[t][7em][t]{0.95\linewidth}
+            \textbf{Unsteered ($m{=}0$)} \hfill \textcolor{red!70!black}{\textbf{no boxed \texttimes}}\\[2pt]
+            {\itshape \ldots so $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check my steps.} $2.5^2 = 6.25$, $0.7^2 = 0.49$, $6.25 - 0.49 = 5.76$\ldots \textbf{Let me just verify each step once more}\ldots [continues looping]}
+        \end{minipage}}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.49\linewidth}
+        \fbox{\begin{minipage}[t][7em][t]{0.95\linewidth}
+            \textbf{TXC-pro ($bs{=}256$), $m{=}+12$} \hfill \textcolor{green!50!black}{\textbf{ans = 12 \checkmark}}\\[2pt]
+            {\itshape \ldots the entire fraction is $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check that.} $0.2 \times 12 = 2.4$. \textbf{So, yes, that's correct.} \ldots $\boxed{12}$}
+        \end{minipage}}
+    \end{minipage}
+
+    \caption{Qualitative backtracking example on \texttt{test/prealgebra/951.json}. The unsteered continuation derives the right value but loops without committing; TXC-pro steering produces one decisive verification step and emits the correct boxed answer.}
+    \label{fig:c7-headline-text-app}
+\end{figure}
 
 For each $(\text{architecture}, \text{question}, \text{magnitude})$ tuple, the inducement metric uses a judge count $gc(a,q,m)$ of genuine backtracking events in the sampled continuation. The rubric counts cases where the model identifies a problem in its reasoning and changes course, such as correcting arithmetic, noticing a missing constraint, abandoning an approach, or revising a wrong assumption. It does not count filler uses of ``wait,'' restatements, repeated text, loops, or degeneration.
 
@@ -298,6 +450,7 @@ We use PR-AUC as the main detection metric because the positive class rate is ab
             \bottomrule
         \end{tabular}%
     }
+    \vspace{3em}
     \caption{Sparse-probe PR-AUC and ROC-AUC for backtracking-sentence detection. We use five GroupKFold splits by question and $\ell_1$-regularized logistic regression with $C=1$. Entries are fold means. PR-AUC is the main metric; chance is the positive-class prior, approximately $0.12$.}
     \label{tab:c7-pr-auc}
 \end{table}
@@ -350,6 +503,7 @@ For each architecture $a$, we evaluate two magnitudes: $m=0$ and $m=m^*_a$, wher
         MLC & 1024 & $+16$ & 0 & 13 & 0 & 7 & $-13$ & $-7$ & $\mathbf{-6}$ \\
         \bottomrule
     \end{tabular}
+    \vspace{3em}
     \caption{Rescue and regression counts at each cell's optimal magnitude $m^*_a$ and at $m=0$. A rescue is a question where the unsteered cut-and-continue baseline is wrong but the steered continuation is correct. A regression is the reverse. The corrected statistic subtracts the $m=0$ cut-and-continue noise floor. Cohort size $n=61$.}
     \label{tab:c7-net-saves}
 \end{table}
@@ -371,6 +525,7 @@ For each architecture $a$, we evaluate two magnitudes: $m=0$ and $m=m^*_a$, wher
         MLC & 1024 & $+16$ & 28 & 24 & 6 & 3 & 0 & 61 \\
         \bottomrule
     \end{tabular}
+    \vspace{3em}
     \caption{Coherence and backtracking contingency at each cell's optimal magnitude $m^*_a$. Coherent means Sonnet~$4.6$ coherence grade at least $2$ on a $0$ to $3$ rubric. Backtracking means judge count at least $1$.}
     \label{tab:c7-contingency}
 \end{table}
@@ -401,10 +556,32 @@ For context, we also record two prior exploratory TXC variants that are not part
 % Resolves every "[see Appendix...]" / "[define it]" / "(See Appendix)"
 % callout in §Qualitative analysis of features in large scale models.
 % =====================================================================
-\section{Qualitative analysis: methodology and formulas}
+\section{Qualitative Analysis of Large Model Features}
 \label{app:meta-autointerp}
 
-This appendix gives the precise definitions behind \cref{fig:txc_umap,fig:sentence}: the autointerp pipeline (top-$k$ window finder, the explanation prompt), the cluster-discovery pipeline (MiniLM embedding $\to$ UMAP $\to$ HDBSCAN $\to$ lexical labeling), the cluster-quality metrics (silhouette, mean cohesion, temporal-vocabulary fraction), and the \emph{exclusive-score} per-position selection used in the per-sentence activation map.
+This appendix gives a qualitative view of what TXC features look like in a trained language model. We analyze a $T=5$ TXC trained on the \texttt{gemma-2-2b-it} block~13 post-residual stream. Because TXC uses full-rank cross-position encoder and decoder weights, a single feature can aggregate information from all $T$ positions and contribute reconstructive mass to any position in the window. We therefore ask whether the learned features look token-local, as in a conventional SAE, or whether they often track multi-token spans.
+
+We autointerpret active TXC features by running the trained dictionary over $1{,}500$ 32-token chains from FineWeb, retaining every feature with at least three top-window examples. This yields $5{,}033$ retained features. For each feature, we elicit a single-sentence concept explanation with Claude Haiku~$4.5$, embed explanations with \texttt{sentence-transformers/all-MiniLM-L6-v2}, project them to 2D with UMAP, and cluster them with HDBSCAN. We also visualize one 32-token chain by selecting one feature per position using an exclusive score that rewards features whose activation mass is concentrated at that token.
+
+\Cref{fig:txc_umap-app} shows that the explanation embedding contains weakly separated clusters spanning both entity-like and discourse-level concepts. The cluster inventory includes concrete entity types such as tickers, acronyms, dates, and sports headlines, as well as discourse-level abstractions such as news article datelines, blogging platforms, biblical chapter/verse references, and taxonomic binomial nomenclature. The global silhouette score is low ($+0.01$), so we treat these clusters as a qualitative inventory rather than sharply separated semantic islands.
+
+\Cref{fig:sentence-app} shows that selected TXC features often appear as $\geq T$-token diagonal bands, tracking short concept spans rather than isolated tokens. Together, the UMAP inventory and per-sentence activation map suggest that the window-shared parameterization surfaces features whose support is distributed across multiple positions.
+
+The rest of this appendix gives the precise definitions behind these plots: the top-window surfacing procedure, the explanation prompt, the MiniLM $\to$ UMAP $\to$ HDBSCAN pipeline, the cluster-quality metrics, and the exclusive-score selection rule.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.62\textwidth,height=0.23\textheight,keepaspectratio]{figs/umap_txc.png}
+    \caption{\textbf{UMAP of TXC feature explanations} for a \texttt{gemma-2-2b-it} block~13 TXC. Autointerpreted features form weakly separated clusters spanning both entity-like and discourse-level concepts.}
+    \label{fig:txc_umap-app}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/sentence_mid_res_k100_T5_chain12345_exclusive.png}
+    \caption{\textbf{Per-token TXC activations on a single $32$-token chain.} Each row is the feature that activates most exclusively at one position. Diagonal bands show that TXC features often claim coherent multi-token spans rather than isolated tokens.}
+    \label{fig:sentence-app}
+\end{figure}
 
 \subsection{Feature surfacing: top-$k$ activating windows}
 \label{app:meta-topk}
@@ -446,11 +623,11 @@ Let $e_j\in\mathbb{R}^{384}$ be the $\ell_2$-normalized embedding of $\text{expl
 
 \paragraph{UMAP.} 2D projection $\phi_j = \mathrm{UMAP}(e_j) \in \mathbb{R}^2$ with hyperparameters $n_{\text{neighbors}}{=}10$, $\min_{\text{dist}}{=}0.1$, metric $=$ cosine, seed $=$ 0.
 
-\paragraph{HDBSCAN.} Cluster labels $\ell_j = \mathrm{HDBSCAN}(\{\phi_j\}_{j\in\mathcal{F}})$ with $\min_{\text{cluster\_size}}{=}4$, $\min_{\text{samples}}{=}2$, cluster-selection $\epsilon = 0.4$. Points with $\ell_j = -1$ are reported as noise. The pipeline yields $k{=}15$ clusters and a noise fraction below $2\%$, summarised in \cref{fig:txc_umap}.
+\paragraph{HDBSCAN.} Cluster labels $\ell_j = \mathrm{HDBSCAN}(\{\phi_j\}_{j\in\mathcal{F}})$ with $\min_{\text{cluster\_size}}{=}4$, $\min_{\text{samples}}{=}2$, cluster-selection $\epsilon = 0.4$. Points with $\ell_j = -1$ are reported as noise. The pipeline yields $k{=}15$ clusters and a noise fraction below $2\%$, summarised in \cref{fig:txc_umap-app}.
 
 \subsection{Lexical cluster labeling}
 \label{app:meta-label}
-Cluster labels in the legend of \cref{fig:txc_umap} are produced by a cheap TF-IDF-style score over content tokens. Let $\mathrm{toks}(s)$ extract lower-cased alphabetic tokens of length $\geq 4$ from explanation $s$ after removing a small stop-list (determiners, function words, autointerp boilerplate such as \texttt{feature}, \texttt{features}, \texttt{describes}, \texttt{represent}, \texttt{relates}). For each cluster $c$ and token $w$:
+Cluster labels in the legend of \cref{fig:txc_umap-app} are produced by a cheap TF-IDF-style score over content tokens. Let $\mathrm{toks}(s)$ extract lower-cased alphabetic tokens of length $\geq 4$ from explanation $s$ after removing a small stop-list (determiners, function words, autointerp boilerplate such as \texttt{feature}, \texttt{features}, \texttt{describes}, \texttt{represent}, \texttt{relates}). For each cluster $c$ and token $w$:
 \begin{equation}
     \mathrm{tf}_c(w) = \sum_{j:\ell_j=c} \mathbbm{1}\!\bigl[w \in \mathrm{toks}(\text{explanation}_j)\bigr],
     \qquad
@@ -465,7 +642,7 @@ where $n_{\text{cl}}$ is the number of clusters. The label for cluster $c$ is th
 \label{app:meta-metrics}
 We report three metrics. Let $E_c = \{e_j : \ell_j = c\}$ be the set of MiniLM embeddings in cluster $c$, with $n_c = |E_c|$.
 
-\paragraph{Silhouette.} Standard sklearn silhouette in the 2D UMAP space, restricted to non-noise points: $+0.01$. A near-zero silhouette indicates clusters that are well-separated on the embedding plane but not internally tight, consistent with the wide-but-distinct clusters of \cref{fig:txc_umap}.
+\paragraph{Silhouette.} Standard sklearn silhouette in the 2D UMAP space, restricted to non-noise points: $+0.01$. A near-zero silhouette indicates clusters that are well-separated on the embedding plane but not internally tight, consistent with the wide-but-distinct clusters of \cref{fig:txc_umap-app}.
 
 \paragraph{Mean intra-cluster cohesion.} Mean intra-cluster cosine similarity in MiniLM space, averaged over non-singleton clusters:
 \begin{equation}
@@ -474,19 +651,29 @@ We report three metrics. Let $E_c = \{e_j : \ell_j = c\}$ be the set of MiniLM e
     \bar{\rho} \;=\; \frac{1}{|\{c: n_c > 1\}|}\sum_{c:\,n_c>1}\rho_c \;=\; 0.63.
 \end{equation}
 
-\paragraph{Temporal-vocabulary fraction.} Fraction of \emph{individual feature explanations} (not cluster labels) whose text matches a fixed regex of sequence/position cues. Let
-\begin{equation}
-    R = \texttt{\textbackslash b(sequenc|consecut|context|preced|follow|temporal|window|position|previous|next|order)\textbackslash w*}
-\end{equation}
-(case-insensitive), and let $S$ be the multiset of all per-feature explanation sentences. Then
-\begin{equation}
-    \mathrm{temporal} \;=\; \frac{1}{|S|}\sum_{s\in S}\mathbbm{1}[R \text{ matches } s] \;=\; 0.68.
-\end{equation}
-Rescaled to $[0,10]$, this gives the $6.80$ score reported in the body. The metric is a regex heuristic over the explanations, not a separate LLM judge.
+\paragraph{Temporal-vocabulary fraction.}
+We define a temporal-vocabulary heuristic as the fraction of individual feature
+explanations matching a fixed case-insensitive regex for sequence/position cues:
+\[
+\small
+\begin{aligned}
+R ={}& \texttt{\textbackslash b(sequenc|consecut|context|preced|follow|}\\
+     & \texttt{temporal|window|position|previous|next|order)\textbackslash w*}.
+\end{aligned}
+\]
+For the multiset $S$ of feature explanations,
+\[
+    \mathrm{temporal}
+    =
+    \frac{1}{|S|}\sum_{s\in S}\mathbbm{1}[R \text{ matches } s]
+    =
+    0.68.
+\]
+Rescaling to $[0,10]$ gives the $6.80$ score reported in the body. This is a regex heuristic over explanations, not a separate LLM judge.
 
 \subsection{Per-sentence selection: the exclusive score}
 \label{app:meta-exclusive}
-For the per-sentence activation map of \cref{fig:sentence}, we fix a $32$-token chain and a window length $T{=}5$, then compute a $32 \times d_{\text{sae}}$ activation matrix $A\in\mathbb{R}_{\geq 0}^{L\times d_{\text{sae}}}$ ($L{=}32$) by sliding the $T$-window across the chain and recording the per-position decoder contribution of each feature.
+For the per-sentence activation map of \cref{fig:sentence-app}, we fix a $32$-token chain and a window length $T{=}5$, then compute a $32 \times d_{\text{sae}}$ activation matrix $A\in\mathbb{R}_{\geq 0}^{L\times d_{\text{sae}}}$ ($L{=}32$) by sliding the $T$-window across the chain and recording the per-position decoder contribution of each feature.
 
 We then assign \emph{one} feature to each token position via the \textbf{exclusive score}, which rewards features whose total activation mass is concentrated at $p$:
 \begin{equation}
