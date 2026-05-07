@@ -45,6 +45,7 @@ import torch
 from temp_bench import runner
 from temp_bench.schemas import TrainingConfig
 from temp_bench.config import instantiate_arch, load_arch, load_datasource
+from temp_bench.data.toy.coupled import coupled_hmm
 from temp_bench.data.toy.coupled_noisy import coupled_noisy_hmm
 from temp_bench.data.toy.hierarchical import hierarchical_features
 from temp_bench.data.toy.coupled_obs_noise import coupled_obs_noise_hmm
@@ -73,6 +74,22 @@ def _build_data(spec, *, device: str):
     """Dispatch on YAML ``generator`` field to the right toy-data builder."""
     gen = getattr(spec, "generator", "")
     seed = 0
+    if gen.endswith(":coupled_hmm"):
+        return coupled_hmm(
+            K_hidden=int(spec.K_hidden),
+            M_emissions=int(spec.M_emissions),
+            n_parents=int(spec.n_parents),
+            d_in=int(spec.d_in),
+            seq_len=int(spec.seq_len),
+            pi=float(spec.pi),
+            rho=float(spec.rho),
+            magnitude_dist=getattr(spec, "magnitude_dist", "folded_normal"),
+            magnitude_mean=float(getattr(spec, "magnitude_mean", 1.0)),
+            magnitude_std=float(getattr(spec, "magnitude_std", 0.15)),
+            n_seqs=int(getattr(spec, "n_seqs", 4096)),
+            seed=seed,
+            device=device,
+        )
     if gen.endswith(":coupled_noisy_hmm"):
         return coupled_noisy_hmm(
             K_hidden=int(spec.K_hidden),
