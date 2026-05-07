@@ -1,0 +1,17 @@
+{
+  "extras": {
+    "eval_cfg": {
+      "_full_suite": true,
+      "k_pos": 4,
+      "smoke": false,
+      "t_label": "default"
+    }
+  },
+  "metrics": {
+    "auc": 0.6489795918367347,
+    "frac_recovered_80": 0.05000000074505806,
+    "frac_recovered_90": 0.0,
+    "mean_max_cos": 0.648475170135498
+  },
+  "ts": "2026-05-06T23:38:56Z"
+}

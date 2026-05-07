@@ -1,0 +1,28 @@
+{
+  "act_cache_key": "42bc3562cd3d83a0",
+  "agent": "agent_tfa_c1",
+  "arch": "topk_sae",
+  "arch_version": "1.0.0",
+  "datasource": "toy_markov_n20_d40_full",
+  "saved_ts": "2026-05-06T20:23:20Z",
+  "seed": 1,
+  "train_key": "84f773d92872e729",
+  "training_cfg": {
+    "batch_size": 1024,
+    "bricken_enabled": false,
+    "bricken_max_resample_fraction": 0.5,
+    "bricken_min_fires": 1,
+    "bricken_n_check": 2048,
+    "bricken_resample_every": 500,
+    "dead_threshold_tokens": 10000000,
+    "ema_auxk_alpha": 0.03125,
+    "learning_rate": 0.0003,
+    "n_steps": 30000,
+    "optimizer": "adam",
+    "plateau_early_stop": false,
+    "plateau_min_delta": 0.0001,
+    "plateau_patience": 5000,
+    "precision": "bf16",
+    "warmup_steps": 1000
+  }
+}
