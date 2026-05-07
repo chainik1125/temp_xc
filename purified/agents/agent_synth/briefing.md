@@ -936,9 +936,22 @@ Delivered:
 - Rewrote ``agents/agent_pro/briefing.md`` to redirect to Setup K + L
   per Han's request (their C3 mission was aborted).
 
-**Final audit (15 setups, all ✅)**: A, D-np5, D-np10, E, F-σ{0.5,1,2},
-G-σ{1,2}, J, M, whisper, polaris, lighthouse, dewdrop. 5 baselines
-present, T-sweep T ∈ {2,4,5,6,8,10,12}, 4 mandatory plots embedded.
+**Final audit (18 setups, all ✅)**: A, D-np5, D-np10, E, F-σ{0.5,1,2},
+G-σ{1,2}, J, M, whisper, polaris, lighthouse, dewdrop, chord, aurora,
+harbor. 5 baselines present, T-sweep T ∈ {2,4,5,6,8,10,12}, 4
+mandatory plots embedded.
+
+**TXC-wins (13, paper-headline cross-setup):** A, D-np5, D-np10, E,
+F-σ1, G-σ1, J, M, whisper, polaris, lighthouse, chord, aurora.
+
+**TXC-loses (6, honest negatives — data committed but EXCLUDED from
+cross-setup paper headline per Han's "drop if not" directive):**
+- dewdrop (mine): deterministic period-16 firing → TFA-pos wins.
+- harbor (mine): π=0.5 weak-magnitude globals (×0.1) → both archs fail.
+- K (pro): anti-correlated globals.
+- L (pro): magnitude-modulated locals.
+- PHALANX (pro): period-locked global pulses.
+- OBELISK (pro): rare amplified bursts.
 
 **Cross-setup gAUC gap (TXC vs TopK at k_pos=1)**: positive in 11 of
 12 paper setups (range +0.12 to +0.44). Dewdrop is the sole TXC-loses

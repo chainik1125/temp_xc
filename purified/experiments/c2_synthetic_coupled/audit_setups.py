@@ -38,6 +38,7 @@ SETUPS = {
     "dewdrop":   ["toy_dewdrop_Kg10_Kl30_d256_p16"],
     "chord":     ["toy_chord_Kg10_Kl30_d256_2groups"],
     "aurora":    ["toy_aurora_K10_M20_d256_sigma1_alpha09"],
+    "harbor":    ["toy_hierarchical_Kg10_Kl30_d256_harbor"],
 }
 
 # Setup → list of plot file paths (relative to purified/)
@@ -46,7 +47,8 @@ def expected_plots(setup_short: str) -> list[Path]:
     setup_short = setup_short.lower()
     # Hierarchical-flavoured setups go in c2_hierarchical/plots/
     if setup_short in {"e", "g-σ1", "g-σ2", "j", "m", "whisper",
-                       "polaris", "lighthouse", "dewdrop", "chord"}:
+                       "polaris", "lighthouse", "dewdrop", "chord",
+                       "harbor"}:
         plot_dir = "experiments/c2_hierarchical/plots"
     else:
         plot_dir = "experiments/c2_synthetic_coupled/plots"
