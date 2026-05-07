@@ -240,14 +240,26 @@ def aggregate(
 
     summary: dict[str, dict[int, dict]] = defaultdict(dict)
     by_arch_k: dict[tuple[str, int], list[float]] = defaultdict(list)
-    for (arch, k, _seed), agg in grouped.items():
+    # Per-seed map preserved alongside the aggregated summary so
+    # downstream callers (e.g. error-bar plots) can recompute seed-level
+    # spreads without re-loading the leaderboard.
+    per_seed: dict[str, dict[int, dict[int, float]]] = defaultdict(
+        lambda: defaultdict(dict)
+    )
+    for (arch, k, seed), agg in grouped.items():
         by_arch_k[(arch, k)].append(agg["mean_auc"])
+        per_seed[arch][k][int(seed) if seed is not None else -1] = float(
+            agg["mean_auc"]
+        )
     for (arch, k), aucs in by_arch_k.items():
         summary[arch][k] = {
             "n_seeds": len(aucs),
             "mean_auc": float(mean(aucs)),
             "std_seeds_auc": float(stdev(aucs)) if len(aucs) > 1 else 0.0,
         }
+    # Stash the per-seed map on the summary dict so the plot fns can
+    # reach it without changing every call signature.
+    summary["__per_seed__"] = per_seed  # type: ignore[assignment]
     return summary
 
 
@@ -280,20 +292,44 @@ def _plot_auc_of_auc(
 ) -> None:
     """Horizontal bar chart of per-arch $\\overline{\\mathrm{AUC}}$.
 
-    Computed as the trapezoidal mean of mean_auc over log(k_feat). Bars
-    sorted best→worst, color-matched to PAPER_ARCH_COLOR. Numeric value
-    annotated at the bar end. No embedded title.
+    Bar = mean across seeds of the per-seed trapezoidal mean of mean_auc
+    over log(k_feat). Error bars span the seed min/max range at that
+    arch's per-seed trapezoidal value (so the bar reflects scientific
+    signal and the error bar reflects the seed-level reproducibility).
+    Bars sorted best→worst, color-matched to PAPER_ARCH_COLOR.
     """
-    bars: list[tuple[str, float]] = []
+    per_seed = summary.get("__per_seed__", {})  # type: ignore[arg-type]
+
+    bars: list[tuple[str, float, float, float, int]] = []
     for arch in archs:
-        if arch not in summary:
+        if arch not in summary or arch == "__per_seed__":
             continue
-        kpoints = sorted(summary[arch].items())
-        xs = [k for k, _ in kpoints]
-        ys = [v["mean_auc"] for _, v in kpoints]
-        if not xs:
+        # Per-seed trapezoidal mean: reorganise
+        # per_seed[arch][k_feat][seed] → seed → {k_feat: mean_auc} so we
+        # can do one sweep per seed.
+        per_seed_sweeps = _swap_levels(per_seed.get(arch, {}))
+        per_seed_values: list[float] = []
+        for seed, by_k in per_seed_sweeps.items():
+            xs = sorted(by_k.keys())
+            if len(xs) < 2:
+                continue
+            ys = [by_k[k] for k in xs]
+            per_seed_values.append(_trapezoidal_mean(xs, ys))
+        if not per_seed_values:
+            # Fall back to seed-mean trapezoidal (single bar, no error).
+            kpoints = sorted(summary[arch].items())
+            xs = [k for k, _ in kpoints]
+            ys = [v["mean_auc"] for _, v in kpoints]
+            if not xs:
+                continue
+            v = _trapezoidal_mean(xs, ys)
+            bars.append((arch, v, v, v, 0))
             continue
-        bars.append((arch, _trapezoidal_mean(xs, ys)))
+        bar_h = float(np.mean(per_seed_values))
+        bars.append(
+            (arch, bar_h, float(min(per_seed_values)),
+             float(max(per_seed_values)), len(per_seed_values))
+        )
     if not bars:
         return
     bars.sort(key=lambda ab: ab[1], reverse=True)
@@ -301,24 +337,41 @@ def _plot_auc_of_auc(
     fig, ax = plt.subplots(figsize=(7.4, 0.55 * len(bars) + 1.0))
     y_pos = np.arange(len(bars))[::-1]  # best at the top
 
-    for (arch, score), y in zip(bars, y_pos):
+    for (arch, score, lo, hi, n_seeds), y in zip(bars, y_pos):
         ax.barh(y, score,
                 color=PAPER_ARCH_COLOR.get(arch, "#333"),
                 edgecolor="black", linewidth=0.6, alpha=0.92,
                 label=ARCH_DISPLAY.get(arch, arch))
-        ax.text(score + 0.004, y, f"{score:.3f}",
+        # Asymmetric whisker from seed min/max — only when ≥2 seeds.
+        if n_seeds >= 2 and (hi - lo) > 0:
+            ax.errorbar(
+                score, y,
+                xerr=[[score - lo], [hi - score]],
+                fmt="none", ecolor="#222", capsize=3, elinewidth=0.9,
+                zorder=5,
+            )
+        # Numeric label sits past the upper whisker so it stays
+        # readable even when the error bar is wide.
+        text_x = max(score, hi) + 0.004
+        ax.text(text_x, y, f"{score:.3f}",
                 va="center", ha="left", fontsize=9, color="#222")
 
     ax.set_yticks(y_pos)
-    ax.set_yticklabels([ARCH_DISPLAY.get(a, a) for a, _ in bars])
+    ax.set_yticklabels([ARCH_DISPLAY.get(a, a) for a, *_ in bars])
     ax.set_xlabel(r"$\overline{\mathrm{AUC}}$ "
-                  r"(trapezoidal mean over $\log k_{\mathrm{feat}}$)")
+                  r"(trapezoidal mean over $\log k_{\mathrm{feat}}$, "
+                  r"seeds 1/2/42)")
     # x-range chosen so the smallest bar is still readable but the
     # spread between archs (the actual scientific signal) dominates.
-    score_min = min(s for _, s in bars)
-    score_max = max(s for _, s in bars)
+    score_min = min(s for _, s, *_ in bars)
+    score_max = max(s for _, s, *_ in bars)
+    # Account for whisker tips when sizing the x-range.
+    whisker_max = max((hi for *_, hi, _ in bars), default=score_max)
     pad = max(0.02, 0.05 * (score_max - score_min))
-    ax.set_xlim(max(0.0, score_min - 4 * pad), min(1.0, score_max + 5 * pad))
+    ax.set_xlim(
+        max(0.0, score_min - 4 * pad),
+        min(1.0, max(score_max, whisker_max) + 5 * pad),
+    )
     ax.tick_params(axis="y", which="both", left=False, length=0)
     ax.grid(axis="x", linewidth=0.6, alpha=0.25)
     ax.grid(axis="y", visible=False)
@@ -326,6 +379,17 @@ def _plot_auc_of_auc(
     fig.tight_layout()
     _save_png_pdf(fig, out_stem)
     plt.close(fig)
+
+
+def _swap_levels(by_k_seed: dict[int, dict[int, float]]
+                 ) -> dict[int, dict[int, float]]:
+    """Reorganise ``{k_feat: {seed: mean_auc}}`` into
+    ``{seed: {k_feat: mean_auc}}`` so we can compute per-seed sweeps."""
+    out: dict[int, dict[int, float]] = defaultdict(dict)
+    for k, seed_map in by_k_seed.items():
+        for seed, val in seed_map.items():
+            out[seed][k] = val
+    return out
 
 
 def _plot_curves(

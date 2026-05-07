@@ -85,8 +85,10 @@ cd purified
 ```
 
 Reads `experiments/c1_noisy_filler/denoising_probe_results.json`
-(Setup B) and `results/leaderboard.jsonl` rows with
-`datasource=toy_coupled_noisy_K10_M20_d256_pB05_np10` (Setup D).
+(Setup B) and `experiments/c2_hierarchical/setup_d_leaderboard.jsonl`
+(Setup D, np=10 snapshot of the c2 leaderboard slice with
+`datasource=toy_coupled_noisy_K10_M20_d256_pB05_np10`). Falls back to
+`results/leaderboard.jsonl` if the snapshot is absent.
 
 **To regen the data from scratch (slow):**
 
@@ -316,6 +318,33 @@ paper to embed C7 numbers + tables without hand-typing.
 
 ---
 
+## Cross-component summary: rose plot
+
+### `global_rose_renderer.py` — six-axis rose summary
+
+**To regen this plot from cached data:**
+
+```bash
+cd purified
+.venv/bin/python -m scripts.global_rose_renderer
+# → writes global_rose_summary.{png,pdf} into purified/figs/
+```
+
+Reads the precomputed `notes/global_rose_summary_data.json` sidecar,
+which carries one normalised score per architecture per case study
+(Denoising, Coupling, Sparse Probing, Backtracking, RLHF, EM). Each
+axis is min-max normalised across the five target architectures.
+
+**To regen the sidecar from scratch:** rerun every component
+renderer above (so each `experiments/cN_*/results.json` is current),
+then recompute the headline metric per axis. The sidecar schema is
+`{case_studies: [{axis, metric, raw}], archs, normalised}` — see the
+shipped JSON for the canonical format.
+
+**Hardware:** trivial (~1 s, plotting only).
+
+---
+
 ## Outputs at a glance
 
 | Script | Output dir (default) | Headline figure(s) | From-scratch hardware / runtime |
@@ -328,6 +357,7 @@ paper to embed C7 numbers + tables without hand-typing.
 | `c6_paper_renderer` | `figs/c6/` | EM alignment delta, detection PR-AUC | 1× H100 ×2, ~7 hr (2 seeds) |
 | `c7_paper_renderer` | `figs/c7/` | Ward Stage B Δgc, PR-AUC | 1× A40, ~12 hr (2 seeds) |
 | `c7_tex_snippets` | `figs/c7/` | LaTeX-ready tables | (consumes c7 cached data) |
+| `global_rose_renderer` | `figs/` | 6-axis rose summary across all components | trivial (~1 s, consumes per-component results.json) |
 
 ## Caveats
 
