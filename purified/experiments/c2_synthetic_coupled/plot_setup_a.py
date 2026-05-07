@@ -39,23 +39,36 @@ CANONICAL_ARCH_TS: list[tuple[str, str]] = [
     ("tsae_paper",  "default"),
     ("stacked_sae", "T=2"),
     ("stacked_sae", "default"),  # T=5
+    ("txc_base",    "T=2"),
+    ("txc_base",    "T=4"),
     ("txc_base",    "default"),  # T=5
+    ("txc_base",    "T=6"),
+    ("txc_base",    "T=8"),
+    ("txc_base",    "T=10"),
+    ("txc_base",    "T=12"),
     ("txc_pro",     "T=2"),
     ("txc_pro",     "T=5"),
     ("txc_pro",     "T=12"),
 ]
 
-# Paper-friendly Okabe-Ito + RdPu cmap for txc_pro T-sweep.
-_txc_cmap = _cm.get_cmap("RdPu", 6)
+# Paper-friendly Okabe-Ito + RdPu cmap for T-sweeps. txc_base = pink family.
+_pink_cmap = _cm.get_cmap("RdPu", 9)
+_blue_cmap = _cm.get_cmap("PuBu", 6)
 PLOT_STYLE: dict[tuple[str, str], dict] = {
     ("topk_sae",    "default"): {"label": "TopK-SAE",       "color": "#000000",   "ls": "-",  "marker": "P"},
     ("tsae_paper",  "default"): {"label": "T-SAE",          "color": "#CC79A7",   "ls": "-",  "marker": "h"},
     ("stacked_sae", "T=2"):     {"label": "Stacked T=2",    "color": "#9467bd",   "ls": "-",  "marker": "o"},
     ("stacked_sae", "default"): {"label": "Stacked T=5",    "color": "#7E57A0",   "ls": "--", "marker": "^"},
-    ("txc_base",    "default"): {"label": "TXC-base T=5",   "color": "#882255",   "ls": "-",  "marker": "X"},
-    ("txc_pro",     "T=2"):     {"label": "TXC-pro T=2",    "color": _txc_cmap(2), "ls": "-", "marker": "v"},
-    ("txc_pro",     "T=5"):     {"label": "TXC-pro T=5",    "color": _txc_cmap(3), "ls": "-", "marker": "s"},
-    ("txc_pro",     "T=12"):    {"label": "TXC-pro T=12",   "color": _txc_cmap(5), "ls": "-", "marker": "D"},
+    ("txc_base",    "T=2"):     {"label": "TXC-base T=2",   "color": _pink_cmap(2), "ls": "-", "marker": "P"},
+    ("txc_base",    "T=4"):     {"label": "TXC-base T=4",   "color": _pink_cmap(3), "ls": "-", "marker": "P"},
+    ("txc_base",    "default"): {"label": "TXC-base T=5",   "color": _pink_cmap(4), "ls": "-", "marker": "X"},
+    ("txc_base",    "T=6"):     {"label": "TXC-base T=6",   "color": _pink_cmap(5), "ls": "-", "marker": "P"},
+    ("txc_base",    "T=8"):     {"label": "TXC-base T=8",   "color": _pink_cmap(6), "ls": "-", "marker": "P"},
+    ("txc_base",    "T=10"):    {"label": "TXC-base T=10",  "color": _pink_cmap(7), "ls": "-", "marker": "P"},
+    ("txc_base",    "T=12"):    {"label": "TXC-base T=12",  "color": _pink_cmap(8), "ls": "-", "marker": "P"},
+    ("txc_pro",     "T=2"):     {"label": "TXC-pro T=2",    "color": _blue_cmap(2), "ls": "--", "marker": "v"},
+    ("txc_pro",     "T=5"):     {"label": "TXC-pro T=5",    "color": _blue_cmap(3), "ls": "--", "marker": "s"},
+    ("txc_pro",     "T=12"):    {"label": "TXC-pro T=12",   "color": _blue_cmap(5), "ls": "--", "marker": "D"},
 }
 
 
