@@ -50,8 +50,8 @@ IMPORTANT, please:
 
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: \Cref{sec:limitations} discusses the two key scope limits explicitly. First, TempBench is a deliberately compact benchmark; a more systematic temporal evaluation suite, across both synthetic and real-world tasks, is needed to fully map each architecture's capability profile. Second, we focus on the TXC capability profile rather than a theoretical account of when they should outperform alternatives. This leaves three concrete open directions: a-priori prediction of task winners, systematic hyperparameter optimisation for TXCs, and a deeper understanding of the relationship between TXCs and TSAEs.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper has no limitation while the answer \answerNo{} means that the paper has limitations, but those are not discussed in the paper. 
@@ -143,12 +143,12 @@ IMPORTANT, please:
     figures and accompanying tables. Each architecture is trained over $3$ seeds
     on the synthetic and sparse-probing experiments (\cref{sec:synthetic,sec:sparse-probing})
     and over $2$ seeds on the case-study experiments
-    (\cref{sec:rlhf,sec:emergent-misalignment,sec:backtracking}); whiskers
+    (\cref{sec:backtracking,sec:em,sec:rlhf}); whiskers
     show the seed min--max range on the headline bar charts, std-across-seeds
     envelopes on the $\overline{\mathrm{AUC}}$ vs.~$k$ curves, and bootstrap
     confidence intervals on the per-question $\Delta gc$ in the backtracking
     case study. The factor of variability captured is the random seed used
-    for dictionary initialisation and training data shuffling. Computation
+    for dictionary initialization and training data shuffling. Computation
     methods (trapezoidal-mean propagation for $\overline{\mathrm{AUC}}$,
     min/max for the bar charts, bootstrap for $\Delta gc$) are documented in
     the per-component appendices.
