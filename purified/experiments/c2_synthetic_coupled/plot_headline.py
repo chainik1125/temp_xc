@@ -41,8 +41,8 @@ HIER_PLOT_DIR = Path("experiments/c2_hierarchical/plots")
 _TXC_T_CMAP = plt.get_cmap("viridis", 14)
 ARCH_COLORS = {
     "topk_sae":         ("#888888", "TopK-SAE", "o"),
-    "tfa_pos":          ("#2ca02c", "TFA-pos", "X"),
-    "tsae_paper":       ("#CC79A7", "T-SAE", "h"),
+    "tsae_paper":       ("#CC79A7", "T-SAE",    "h"),
+    "tfa_pos":          ("#2ca02c", "TFA-pos",  "X"),
     "stacked_sae_T2":   ("#9467bd", "Stacked-SAE T=2", "s"),
     "stacked_sae_T5":   ("#c5b0d5", "Stacked-SAE T=5", "s"),
     "txc_base_T2":      (_TXC_T_CMAP(2),  "TXC-base T=2",  "^"),
@@ -63,8 +63,8 @@ ARCH_ORDER = [
     "txc_base_T8",
     "txc_base_T10",
     "txc_base_T12",
-    "tsae_paper",
     "stacked_sae_T5", "stacked_sae_T2",
+    "tsae_paper",
     "tfa_pos",
     "topk_sae",
 ]
@@ -74,26 +74,22 @@ def _arch_label(arch_name: str, t_label: str) -> str:
     """Map (arch, t_label) to one of ARCH_COLORS keys.
 
     txc_base is now keyed by T explicitly (T=2/4/5/6/8/10/12) so
-    T-sweep points show up in different colors. txc_pro / stacked_sae
-    default-T are mapped to ``None`` to be EXCLUDED from the default
-    plots — they're either out of scope or not at the canonical T value.
-
-    tsae_paper and tfa_pos are now INCLUDED (added 2026-05-07 by
-    agent_hammer for the F+G baseline-backfill rendering, per
-    coordination note in agent_hammer/briefing.md).
+    T-sweep points show up in different colors. tsae_paper / tfa_pos /
+    txc_pro / stacked_sae default-T are mapped to ``None`` to be
+    EXCLUDED from the default plots — they're either out of scope or
+    not at the canonical T value.
     """
     if arch_name == "topk_sae":
         return "topk_sae"
-    if arch_name == "tfa_pos":
-        return "tfa_pos"
     if arch_name == "tsae_paper":
         return "tsae_paper"
+    if arch_name == "tfa_pos":
+        return "tfa_pos"
     if arch_name == "stacked_sae":
         if t_label == "T=2":
             return "stacked_sae_T2"
         if t_label == "default":
             return "stacked_sae_T5"
-        # T=5 explicit (from agent_hammer's F+G fill driver) — same as default.
         if t_label == "T=5":
             return "stacked_sae_T5"
         return None
@@ -165,7 +161,7 @@ def _load_panel(
     return by_arch_kpos
 
 
-def _plot_panel(ax, data, title: str):
+def _plot_panel(ax, data, title: str, *, ylabel: str = "gAUC (global feature recovery)"):
     for arch_label in ARCH_ORDER:
         if arch_label not in data:
             continue
@@ -182,7 +178,7 @@ def _plot_panel(ax, data, title: str):
             elinewidth=0.8, alpha=0.95,
         )
     ax.set_xlabel("k_pos (per-token TopK)")
-    ax.set_ylabel("gAUC (global feature recovery)")
+    ax.set_ylabel(ylabel)
     ax.set_title(title, fontsize=11)
     ax.set_ylim(0, 1.02)
     ax.grid(alpha=0.3)
@@ -656,6 +652,95 @@ def render_setup_g(out_path: Path):
     return grouped
 
 
+def render_metric_vs_k(
+    *,
+    out_path: Path,
+    filter_fn,
+    title: str,
+    metric: str,
+    ylabel: str,
+    legend_loc: str = "lower right",
+):
+    """Single-panel <metric> vs k_pos line plot (one of the 4 mandatory plots).
+
+    metric ∈ {"gauc", "eauc"}.
+    """
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    data = _load_panel(filter_fn=filter_fn, metric=metric)
+    if not data:
+        print(f"[plot] no data for {out_path.name} (metric={metric})")
+        return None
+    fig, ax = plt.subplots(figsize=(8.5, 5.5))
+    _plot_panel(ax, data, title, ylabel=ylabel)
+    # Legend OUTSIDE axes on the right so it never covers points.
+    ax.legend(fontsize=9, loc="center left",
+              bbox_to_anchor=(1.02, 0.5), framealpha=0.95,
+              borderaxespad=0.0)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    fig.savefig(out_path.with_suffix(".thumb.png"), dpi=64, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[plot] wrote {out_path}")
+    return data
+
+
+def render_setup(
+    *,
+    setup_name: str,
+    plot_dir: Path,
+    line_filter_fn,
+    scatter_filter_fn=None,
+    tsweep_filter_fn=None,
+    title_root: str,
+    fixed_k_for_tsweep: int = 1,
+):
+    """Emit the 4 mandatory plots for a synthetic setup.
+
+    Plots produced (filenames in ``plot_dir``):
+      - ``c2_setup_<name>_gauc_vs_k.png`` — gAUC vs k_pos
+      - ``c2_setup_<name>_eauc_vs_k.png`` — eAUC vs k_pos
+      - ``c2_setup_<name>_scatter.png``   — gAUC vs eAUC scatter
+      - ``c2_setup_<name>_tsweep.png``    — txc_base T-sweep at fixed k_pos
+
+    ``line_filter_fn``  selects rows for the line plots (gauc/eauc vs k).
+    ``scatter_filter_fn`` defaults to ``line_filter_fn``.
+    ``tsweep_filter_fn`` defaults to ``line_filter_fn`` (T-sweep cells
+    must already be tagged via eval_cfg.hunt_phase=tsweep or similar).
+    """
+    plot_dir.mkdir(parents=True, exist_ok=True)
+    if scatter_filter_fn is None:
+        scatter_filter_fn = line_filter_fn
+    if tsweep_filter_fn is None:
+        tsweep_filter_fn = line_filter_fn
+
+    render_metric_vs_k(
+        out_path=plot_dir / f"c2_setup_{setup_name}_gauc_vs_k.png",
+        filter_fn=line_filter_fn,
+        title=f"{title_root} — gAUC (global recovery) vs k_pos",
+        metric="gauc",
+        ylabel="gAUC (global feature recovery, vs $f_g$)",
+    )
+    render_metric_vs_k(
+        out_path=plot_dir / f"c2_setup_{setup_name}_eauc_vs_k.png",
+        filter_fn=line_filter_fn,
+        title=f"{title_root} — eAUC (local recovery) vs k_pos",
+        metric="eauc",
+        ylabel="eAUC (local emission recovery, vs $f_l$)",
+    )
+    render_scatter(
+        out_path=plot_dir / f"c2_setup_{setup_name}_scatter.png",
+        filter_fn=scatter_filter_fn,
+        title=f"{title_root} — local vs global recovery\n"
+              "(each point = one (arch, T, k_pos) cell, mean over seeds)",
+    )
+    render_tsweep(
+        out_path=plot_dir / f"c2_setup_{setup_name}_tsweep.png",
+        filter_fn=tsweep_filter_fn,
+        title=f"{title_root} — T-sweep",
+        fixed_k_pos=fixed_k_for_tsweep,
+    )
+
+
 def render_2panel_headline(
     *,
     winner_ds: str,
@@ -755,80 +840,84 @@ def main():
             out_path=NOISY_PLOT_DIR / "c2_headline_2panel_np10.png",
         )
 
-    # ── Local-vs-global scatter plots (Setup D + E) ─────────────────────
-    # Each point is one (arch, T, k_pos) cell mean-over-seeds. Above the
-    # y=x diagonal = arch's dictionary is more globally aligned; below =
-    # more locally aligned. Mirrors the wasteland-style probe scatter
-    # from c2_noisy_probe_scatter.png (Setup B).
-    # Setup D scatter: include both ZOOM (multi-arch at T=5) AND TSWEEP
-    # (txc_base × T) cells on the same datasource. Caller filter is
-    # by datasource only; the per-row dedupe keeps every distinct
-    # (arch, T, k_pos, seed) point.
+    # ── 4-plot mandatory standard per setup (Setup D-np5, D-np10, E) ───
+    # Each setup gets: gauc_vs_k, eauc_vs_k, scatter, tsweep. Plots
+    # include ZOOM cells (T=5 default), TSWEEP cells (txc_base × T), AND
+    # FILL cells (tsae_paper + tfa_pos backfill).
+    SCATTER_PHASES = ("zoom", "tsweep", "fill")
+    LINE_PHASES = ("zoom", "fill")     # exclude tsweep from line (different T)
+    TSWEEP_PHASES = ("tsweep",)
+
+    def _filter_d(ds, phases):
+        return lambda d: (
+            d.get("datasource") == ds
+            and (d.get("eval_cfg") or {}).get("hunt_phase") in phases
+        )
+
     if not args.hier_only and not args.two_panel_only:
         if winner:
-            render_scatter(
-                out_path=NOISY_PLOT_DIR / "c2_setup_d_np5_scatter.png",
-                filter_fn=lambda d: (
-                    d.get("datasource") == winner
-                    and (d.get("eval_cfg") or {}).get("hunt_phase") in ("zoom", "tsweep")
-                ),
-                title=("Setup D pB05_np5 (Dmitry replicate): local vs global\n"
-                       "(each point = one (arch, T, k_pos) cell, mean over seeds; "
-                       "T-sweep + ZOOM cells included)"),
+            render_setup(
+                setup_name="d_np5",
+                plot_dir=NOISY_PLOT_DIR,
+                line_filter_fn=_filter_d(winner, LINE_PHASES),
+                scatter_filter_fn=_filter_d(winner, SCATTER_PHASES),
+                tsweep_filter_fn=_filter_d(winner, TSWEEP_PHASES),
+                title_root="Setup D pB05_np5 (Dmitry replicate)",
+                fixed_k_for_tsweep=1,
             )
-        render_scatter(
-            out_path=NOISY_PLOT_DIR / "c2_setup_d_np10_scatter.png",
-            filter_fn=lambda d: (
-                d.get("datasource") == secondary
-                and (d.get("eval_cfg") or {}).get("hunt_phase") in ("zoom", "tsweep")
-            ),
-            title=("Setup D pB05_np10 (max overlap): local vs global\n"
-                   "(each point = one (arch, T, k_pos) cell, mean over seeds; "
-                   "T-sweep + ZOOM cells included)"),
+            # Auxiliary T-sweep at k=2.
+            render_tsweep(
+                out_path=NOISY_PLOT_DIR / "c2_setup_d_np5_tsweep_k2.png",
+                filter_fn=_filter_d(winner, TSWEEP_PHASES),
+                title="Setup D pB05_np5 — T-sweep",
+                fixed_k_pos=2,
+            )
+        render_setup(
+            setup_name="d_np10",
+            plot_dir=NOISY_PLOT_DIR,
+            line_filter_fn=_filter_d(secondary, LINE_PHASES),
+            scatter_filter_fn=_filter_d(secondary, SCATTER_PHASES),
+            tsweep_filter_fn=_filter_d(secondary, TSWEEP_PHASES),
+            title_root="Setup D pB05_np10 (max overlap)",
+            fixed_k_for_tsweep=1,
         )
-
-    # Setup E scatter: include the bench=hierarchical zoom AND tsweep cells.
-    if not args.zoom_only and not args.two_panel_only:
-        render_scatter(
-            out_path=HIER_PLOT_DIR / "c2_setup_e_scatter.png",
-            filter_fn=lambda d: (
-                d.get("datasource") == args.hier_datasource
-                and (d.get("eval_cfg") or {}).get("bench") == "hierarchical"
-            ),
-            title=("Setup E (hierarchical): local vs global\n"
-                   "(each point = one (arch, T, k_pos) cell, mean over seeds; "
-                   "T-sweep cells included)"),
-        )
-
-    # ── T-sweep panels (Setup D + E) ────────────────────────────────────
-    # txc_base × T ∈ {2,4,5,6,8,10,12} at fixed k_pos. Mirrors Setup B's
-    # c2_noisy_auc_vs_kpos T-sweep. Shows the local↔global trade-off as
-    # a function of window size.
-    if not args.hier_only and not args.two_panel_only:
-        for ds_short, ds in [
-            ("np10", "toy_coupled_noisy_K10_M20_d256_pB05_np10"),
-            ("np5",  "toy_coupled_noisy_K10_M20_d256_pB05_np5"),
-        ]:
-            for k in (1, 2):
-                suffix = "" if k == 1 else f"_k{k}"
-                render_tsweep(
-                    out_path=NOISY_PLOT_DIR / f"c2_setup_d_{ds_short}_tsweep{suffix}.png",
-                    filter_fn=lambda d, _ds=ds: (
-                        d.get("datasource") == _ds
-                        and (d.get("eval_cfg") or {}).get("hunt_phase") == "tsweep"
-                    ),
-                    title=f"Setup D pB05_{ds_short} — T-sweep",
-                    fixed_k_pos=k,
-                )
-    if not args.zoom_only and not args.two_panel_only:
         render_tsweep(
-            out_path=HIER_PLOT_DIR / "c2_setup_e_tsweep.png",
-            filter_fn=lambda d: (
-                d.get("datasource") == args.hier_datasource
-                and (d.get("eval_cfg") or {}).get("tsweep") is True
-            ),
-            title="Setup E (hierarchical) — T-sweep",
-            fixed_k_pos=1,
+            out_path=NOISY_PLOT_DIR / "c2_setup_d_np10_tsweep_k2.png",
+            filter_fn=_filter_d(secondary, TSWEEP_PHASES),
+            title="Setup D pB05_np10 — T-sweep",
+            fixed_k_pos=2,
+        )
+
+    # Setup E (hierarchical) uses bench=hierarchical OR hunt_phase=fill.
+    if not args.zoom_only and not args.two_panel_only:
+        e_ds = args.hier_datasource
+        line_E = lambda d: (
+            d.get("datasource") == e_ds
+            and (
+                (d.get("eval_cfg") or {}).get("bench") == "hierarchical"
+                or (d.get("eval_cfg") or {}).get("hunt_phase") == "fill"
+            )
+            and (d.get("eval_cfg") or {}).get("tsweep") is not True
+        )
+        scatter_E = lambda d: (
+            d.get("datasource") == e_ds
+            and (
+                (d.get("eval_cfg") or {}).get("bench") == "hierarchical"
+                or (d.get("eval_cfg") or {}).get("hunt_phase") == "fill"
+            )
+        )
+        tsweep_E = lambda d: (
+            d.get("datasource") == e_ds
+            and (d.get("eval_cfg") or {}).get("tsweep") is True
+        )
+        render_setup(
+            setup_name="e",
+            plot_dir=HIER_PLOT_DIR,
+            line_filter_fn=line_E,
+            scatter_filter_fn=scatter_E,
+            tsweep_filter_fn=tsweep_E,
+            title_root="Setup E (10 slow globals × 30 fast locals)",
+            fixed_k_for_tsweep=1,
         )
 
     # Setup F (coupled + obs-noise) σ-sweep panel.
