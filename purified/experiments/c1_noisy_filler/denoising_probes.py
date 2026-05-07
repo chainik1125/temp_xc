@@ -3,7 +3,7 @@
 Reproduces wasteland 1c-noisy analysis ((decision 2026-05-06) directive).
 
 Wasteland sources (commit 3c44f530babf6378c909a30a1796c792478ae5ba):
-- ``docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md``
+- ``docs/legacy/research_logs/2026-03-30-experiment1c-noisy-emissions.md``
 - ``src/v2_temporal_schemeC/run_exp1c_linear_probe.py``
 - ``src/v2_temporal_schemeC/experiment/denoising.py:compute_global_recovery``
 

@@ -2,7 +2,7 @@
 # bootstrap_runpod.sh — set up a fresh RunPod pod for the `final` paper branch.
 #
 # ──────────────────────────────────────────────────────────────────────
-#  RUN BY THE USER (HAN), NOT BY AN AGENT.
+#  RUN BY THE OPERATOR, NOT BY AN AGENT.
 #  This script is INTERACTIVE — it prompts for tokens via `read -rs`.
 #  An agent CANNOT enter input here; do not call this from an
 #  agent session. By the time an agent starts, this script has

@@ -21,7 +21,7 @@ These are *content-only*; the surrounding ``\\begin{table}`` /
 Usage::
 
     .venv/bin/python -m scripts.c7_tex_snippets \\
-        --output-dir /workspace/aniket/temp_xc_paper/purified/docs/aniket/figs
+        --output-dir figs/<component>
 """
 from __future__ import annotations
 

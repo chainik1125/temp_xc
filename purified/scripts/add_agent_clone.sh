@@ -2,7 +2,7 @@
 # add_agent_clone.sh — give a second agent on a shared pod its own clone.
 #
 # ──────────────────────────────────────────────────────────────────────
-#  RUN BY THE USER (HAN), NOT BY AN AGENT.
+#  RUN BY THE OPERATOR, NOT BY AN AGENT.
 #  Run AFTER bootstrap_runpod.sh has set up /workspace/temp_xc/.
 #  This script is non-interactive (no token prompts — tokens are
 #  already in /workspace/.tokens/ from bootstrap), but it is part of

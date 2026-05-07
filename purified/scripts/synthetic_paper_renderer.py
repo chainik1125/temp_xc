@@ -16,7 +16,7 @@ is the peak metric across the k_pos sweep.
 Usage::
 
     .venv/bin/python -m scripts.synthetic_paper_renderer \\
-        --output-dir /workspace/aniket/temp_xc_paper/purified/docs/components
+        --output-dir figs/<component>
 """
 from __future__ import annotations
 

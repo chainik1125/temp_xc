@@ -136,7 +136,7 @@ def decoder_row(arch_module, feature_id: int) -> torch.Tensor:
 
     Architectures expose ``W_dec`` with different shapes:
 
-    - TXC-base (han layout): ``(d_sae, T, d_in)`` — return last
+    - TXC-base (3-D layout): ``(d_sae, T, d_in)`` — return last
       temporal slot ``W_dec[fid, -1, :]``. Matches the prior author's
       ``run_wang_procedure.py:load_steerer_decoder_row`` convention
       (he comments "take the last temporal slot to match

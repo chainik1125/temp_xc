@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # C2 ρ-sweep launcher — Effect 1 vs Effect 2 test ((decision 2026-05-06),
-# response to the prior author's `origin/case-synthetic:docs/dmitry/results/
+# response to the prior author's `origin/case-synthetic:docs/legacy/results/
 # 3arch_3bench_summary.md` concern).
 #
 # REASSIGNED 2026-05-06 from agent_filler → agent_synth (8× 5090 pod).

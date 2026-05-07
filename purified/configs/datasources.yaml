@@ -267,7 +267,7 @@ datasources:
     p_A: 0.0
     p_B: 0.625                              # q=0.8 → γ=0.25 → p_B=0.625
     notes: "C1-noisy: wasteland Phase 2 Experiment 1c noisy-emissions
-      replication (docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md).
+      replication (docs/legacy/research_logs/2026-03-30-experiment1c-noisy-emissions.md).
       Adds Bernoulli emission noise (p_A=0, p_B=0.625) to test denoising.
       Hidden Markov state surfaced via MarkovData.hidden_support."
 

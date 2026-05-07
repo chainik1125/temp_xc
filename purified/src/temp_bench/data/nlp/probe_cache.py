@@ -37,7 +37,7 @@ Sourced (in spirit) from
 ``origin/wasteland-canonical @ 94119bc0:experiments/phase7_unification/rebuild_probe_cache_s32.py``,
 fused into a single build step (Phase 5+7 had two: build right-padded
 LAST_N=128 cache, then rebuild to left-aligned S=32). Doc:
-``docs/han/research_logs/phase7_unification/2026-04-27-URGENT-probing-cache-fix.md``.
+``docs/legacy/research_logs/phase7_unification/2026-04-27-URGENT-probing-cache-fix.md``.
 
 Storage estimate (Gemma-2-2b-it L13 d_in=2304, S_CACHE=32, fp16):
   - one task @ 5000 prompts: 5000 × 32 × 2304 × 2 = 738 MB

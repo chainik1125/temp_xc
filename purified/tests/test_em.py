@@ -6,7 +6,7 @@ helpers that future agents are most likely to break:
 
 - ``EM_PROMPTS`` — 8 hardcoded Betley first-person EM prompts.
 - ``decoder_row`` — feature-direction extraction for SAE (2-D
-  ``W_dec``) and TXC-han (3-D ``W_dec``) layouts.
+  ``W_dec``) and TXC-3D (3-D ``W_dec``) layouts.
 - ``WangAbbreviated`` defaults — the abbreviated frontier shape.
 - The Claude judge prompt template + JSON-extraction regex.
 """
@@ -86,7 +86,7 @@ def test_decoder_row_rejects_unknown_layout():
     class FakeArch(nn.Module):
         def __init__(self):
             super().__init__()
-            # 4-D: not the SAE or TXC-han layout
+            # 4-D: not the SAE or TXC-3D layout
             self.W_dec = nn.Parameter(torch.empty(2, 3, 4, 5))
 
     with pytest.raises(RuntimeError, match="Unsupported W_dec shape"):

@@ -19,7 +19,7 @@ clean. This file is the audit trail.
 
 ## Setup A — Coupled features (1c3-coupled)
 
-**Wasteland source**: [`docs/han/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md`](https://anonymous.4open.science/r/temp-bench/blob/wasteland-canonical/docs/han/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md)
+**Wasteland source**: [`docs/legacy/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md`](https://anonymous.4open.science/r/temp-bench/blob/wasteland-canonical/docs/legacy/research_logs/phase3_coupled_features/2026-04-07-experiment1c3-coupled-features.md)
 on `wasteland-canonical`.
 
 The prior author's coupled-feature pipeline. K hidden chains drive M emissions
@@ -59,7 +59,7 @@ differs from TXCDRv2's window-only design at higher T.
 
 ## Setup B — Noisy independent emissions (1c-noisy)
 
-**Wasteland source**: [`docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md`](https://anonymous.4open.science/r/temp-bench/blob/118fde8/docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md)
+**Wasteland source**: [`docs/legacy/research_logs/2026-03-30-experiment1c-noisy-emissions.md`](https://anonymous.4open.science/r/temp-bench/blob/118fde8/docs/legacy/research_logs/2026-03-30-experiment1c-noisy-emissions.md)
 at commit `118fde8`.
 
 20 independent Markov chains (NOT coupled). Bernoulli emission noise

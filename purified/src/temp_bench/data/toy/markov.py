@@ -66,7 +66,7 @@ def markov_chain_support(
     the deterministic ``support = hidden_state`` behavior (Phase 2
     Scheme C). Setting ``p_A=0, p_B=0.625`` reproduces the wasteland
     Phase 2 Experiment 1c noisy-emission setup
-    (``docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md``)
+    (``docs/legacy/research_logs/2026-03-30-experiment1c-noisy-emissions.md``)
     used to test denoising — q=0.8 → γ=(1-q)/q=0.25 → p_B=0.625.
     """
     if rho_levels is None:

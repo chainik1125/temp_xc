@@ -27,7 +27,7 @@ because :class:`temp_bench.architectures.txc_base.TXCBase` (the only
 arch C6 turns Bricken on for) doesn't expose a per-arch reset hook —
 agent_nlp's port deliberately stayed minimal.
 
-Supported layout: TXC-han (``W_enc[T, d_in, d_sae]``, ``W_dec[d_sae,
+Supported layout: TXC-3D (``W_enc[T, d_in, d_sae]``, ``W_dec[d_sae,
 T, d_in]``, ``b_enc[d_sae]``). Other archs raise ``RuntimeError`` —
 which is the intended fail-fast: Bricken is opt-in, so the only path
 that hits this is a deliberate ``training_cfg.bricken_enabled=True``.
@@ -84,11 +84,11 @@ class ResampleStats:
 
 
 class BrickenResampler:
-    """Stateful Bricken resampler for the TXC-han layout.
+    """Stateful Bricken resampler for the TXC-3D layout.
 
     Measurement is arch-agnostic on the surface: ``arch.encode(check)``
     is called and non-zero entries per feature are counted. The reset
-    requires the TXC-han parameter layout (``W_enc[T, d_in, d_sae]``,
+    requires the TXC-3D parameter layout (``W_enc[T, d_in, d_sae]``,
     ``W_dec[d_sae, T, d_in]``, ``b_enc[d_sae]``) — anything else
     raises ``RuntimeError``, by design.
 
@@ -160,7 +160,7 @@ class BrickenResampler:
 
     @torch.no_grad()
     def _validate_layout(self) -> tuple[int, int, int]:
-        """Verify the TXC-han parameter layout. Returns (T, d_in, d_sae)."""
+        """Verify the TXC-3D parameter layout. Returns (T, d_in, d_sae)."""
         if not all(hasattr(self.arch, n) for n in ("W_enc", "W_dec", "b_enc")):
             raise RuntimeError(
                 f"{type(self.arch).__name__} missing W_enc/W_dec/b_enc; "
@@ -174,7 +174,7 @@ class BrickenResampler:
         if enc.dim() != 3 or enc.shape[2] != d_sae:
             raise RuntimeError(
                 f"BrickenResampler expects W_enc layout (T, d_in, d_sae); "
-                f"got {tuple(enc.shape)} with d_sae={d_sae}. The TXC-han "
+                f"got {tuple(enc.shape)} with d_sae={d_sae}. The TXC-3D "
                 "layout used by temp_bench.architectures.txc_base.TXCBase "
                 "is the only currently supported target."
             )

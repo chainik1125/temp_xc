@@ -1,7 +1,7 @@
 """C1-noisy driver — replicate wasteland Phase 2 Experiment 1c noisy emissions.
 
 (decision 2026-05-06) mandate (territory waiver granted): replicate
-``docs/han/research_logs/2026-03-30-experiment1c-noisy-emissions.md``
+``docs/legacy/research_logs/2026-03-30-experiment1c-noisy-emissions.md``
 on `final` paper infra. Wasteland setup:
 
   - 20 features, d=40, T=64, ρ=0.7, p_A=0, p_B=0.625 (= γ=0.25)

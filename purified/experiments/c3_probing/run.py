@@ -60,7 +60,7 @@ DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"
 # 1.1.0 (2026-05-04): Phase 7 padding fix — probe cache rebuilt as left-aligned
 # (N, S=32, d_in) with per-example first_real metadata; _encode_pool now masks
 # padding contributions per row. Old 1.0.0 cells stay in the leaderboard for
-# comparison. See docs/han/research_logs/phase7_unification/2026-04-27-URGENT-probing-cache-fix.md
+# comparison. See docs/legacy/research_logs/phase7_unification/2026-04-27-URGENT-probing-cache-fix.md
 EVAL_PROTOCOL_VERSION = "1.1.0"
 
 DEFAULT_ARCHS = ("topk_sae", "tsae_paper", "txc_base", "txc_pro")  # mlc still pending

@@ -13,7 +13,7 @@ size (d_sae) tuned per component**. No per-component hill-climbing.
 
 This precludes the "different gigabrain TXC for every case study"
 critique that was about to land on the unaligned hill-climb results
-(see `docs/han/research_logs/phase7_unification/agent_x_paper/2026-05-02-yw-T8-benchmark.md`,
+(see `docs/legacy/research_logs/phase7_unification/agent_x_paper/2026-05-02-yw-T8-benchmark.md`,
 which proves the steering-best architectures lose at probing).
 
 ## TXC-base = `txc_bare_antidead_t5`

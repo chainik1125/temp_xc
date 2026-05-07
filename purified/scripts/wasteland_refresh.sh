@@ -6,8 +6,8 @@
 # would inherit conflicts and stale snapshots. Instead, agents read
 # their files via:
 #
-#     git show origin/case-em-nanda:docs/dmitry/results/em_features/em_nanda_results_paper.md
-#     git show origin/case-backtracking:docs/aniket/experiments/ward_backtracking/handoff_neurips_push.md
+#     git show origin/case-em-nanda:docs/legacy/results/em_features/em_nanda_results_paper.md
+#     git show origin/case-backtracking:docs/legacy/experiments/ward_backtracking/handoff_neurips_push.md
 #
 # This script just runs a fast `git fetch` so the `origin/<branch>:path`
 # reads always resolve to the latest pushed state.

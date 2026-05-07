@@ -24,12 +24,10 @@ Aggregation matches purified/experiments/c6_em/analysis.py on origin/final:
   - HEADLINE_PROTOCOL = "2.0.0" (full Wang) — drives wang_full.json input
   - DETECTION_PROTOCOL = "3.0.0", DETECTION_S_HEADLINE = 16
 
-Usage::
+Usage (defaults resolve to in-repo canonical paths)::
 
-    .venv/bin/python -m scripts.c6_paper_renderer \\
-        --leaderboard /tmp/c6_render/leaderboard_final.jsonl \\
-        --wang-dir /tmp/c6_render \\
-        --output-dir /workspace/aniket/temp_xc_paper/purified/docs/aniket/figs
+    cd purified
+    .venv/bin/python -m scripts.c6_paper_renderer
 """
 from __future__ import annotations
 

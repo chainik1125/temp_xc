@@ -25,12 +25,10 @@ Backward-compat aliases also written under the older filenames
 ``c2_setup_d_np10_scatter.{png,pdf}`` (with-trail variant for the
 latter) so existing main.tex includes don't break.
 
-Usage::
+Usage (defaults resolve to in-repo canonical paths)::
 
-    .venv/bin/python -m scripts.c2_paper_renderer \\
-        --setup-b-json /tmp/c2_render/setup_b_results.json \\
-        --c2-leaderboard /tmp/c2_render/c2_leaderboard.jsonl \\
-        --output-dir /workspace/aniket/temp_xc_paper/purified/docs/aniket/figs/c2
+    cd purified
+    .venv/bin/python -m scripts.c2_paper_renderer
 """
 from __future__ import annotations
 

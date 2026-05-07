@@ -1,7 +1,7 @@
 """Render the HH-RLHF case-study figures in c7-paper style.
 
 Reads per-architecture ``top_features.json`` files (sourced from
-``origin/han-phase7-unification`` and committed under
+``origin/wasteland-canonical`` and committed under
 ``purified/results/case_studies/hh_rlhf/<arch>/top_features.json``)
 and emits two PNGs:
 
@@ -22,7 +22,7 @@ and emits two PNGs:
 Usage:
     .venv/bin/python -m scripts.rlhf_paper_renderer \\
         --data-dir results/case_studies/hh_rlhf \\
-        --output-dir /workspace/aniket/temp_xc_paper/purified/docs/aniket/figs
+        --output-dir figs/<component>
 """
 from __future__ import annotations
 

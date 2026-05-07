@@ -25,7 +25,7 @@ Eval pathway (`EVAL_PROTOCOL_VERSION = "2.0.0"`, 2026-05-04):
   ``judge_outputs.jsonl`` for post-deadline κ validation).
 
 Caveats baked into this run (vs the prior author's published numbers in
-``origin/case-em-nanda:docs/dmitry/results/em_features/em_nanda_results_paper.md``):
+``origin/case-em-nanda:docs/legacy/results/em_features/em_nanda_results_paper.md``):
 
 - **Judge swap**: Claude Haiku 4.5 instead of Gemini-3.1-flash-lite.
   Documented in c6.md caveats.

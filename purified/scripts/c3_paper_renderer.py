@@ -16,12 +16,10 @@ Aggregation matches purified/experiments/c3_probing/analysis.py:
   - txc_base is split into T-variants via config.json arch_hparams_override.T
   - dedup by (arch_label, k_feat, seed) keeping max mean_auc
 
-Usage::
+Usage (defaults resolve to in-repo canonical paths)::
 
-    .venv/bin/python -m scripts.c3_paper_renderer \\
-        --leaderboard /tmp/c3_render/c3_rows.jsonl \\
-        --checkpoints-dir /tmp/c3_render/checkpoints \\
-        --output-dir /workspace/aniket/temp_xc_paper/purified/docs/aniket/figs
+    cd purified
+    .venv/bin/python -m scripts.c3_paper_renderer
 """
 from __future__ import annotations
 
