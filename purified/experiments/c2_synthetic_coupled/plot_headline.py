@@ -33,39 +33,67 @@ LEADERBOARD = Path("results/leaderboard.jsonl")
 NOISY_PLOT_DIR = Path("experiments/c2_synthetic_coupled/plots")
 HIER_PLOT_DIR = Path("experiments/c2_hierarchical/plots")
 
+# txc_base colored by T value via a colormap so different T cells in
+# scatters are visually distinct. TXC-pro overrides are excluded from
+# default plots (the only canonical TXC-pro is T_max=10, which we
+# haven't run; the run.py defaults at T_max ∈ {2, 5} are NOT
+# canonical and would mislead).
+_TXC_T_CMAP = plt.get_cmap("viridis", 14)
 ARCH_COLORS = {
     "topk_sae":         ("#888888", "TopK-SAE", "o"),
     "stacked_sae_T2":   ("#9467bd", "Stacked-SAE T=2", "s"),
     "stacked_sae_T5":   ("#c5b0d5", "Stacked-SAE T=5", "s"),
-    "txc_base":         ("#1f77b4", "TXC-base T=5", "^"),
-    "txc_pro_T2":       ("#d62728", "TXC-pro T=2", "v"),
-    "txc_pro_T5":       ("#ff9896", "TXC-pro T=5", "v"),
-    "stacked_sae_default": ("#c5b0d5", "Stacked-SAE T=5", "s"),
-    "txc_pro_default":     ("#ff9896", "TXC-pro T=5", "v"),
+    "txc_base_T2":      (_TXC_T_CMAP(2),  "TXC-base T=2",  "^"),
+    "txc_base_T4":      (_TXC_T_CMAP(4),  "TXC-base T=4",  "^"),
+    "txc_base_T5":      (_TXC_T_CMAP(6),  "TXC-base T=5",  "^"),
+    "txc_base_T6":      (_TXC_T_CMAP(7),  "TXC-base T=6",  "^"),
+    "txc_base_T8":      (_TXC_T_CMAP(9),  "TXC-base T=8",  "^"),
+    "txc_base_T10":     (_TXC_T_CMAP(11), "TXC-base T=10", "^"),
+    "txc_base_T12":     (_TXC_T_CMAP(13), "TXC-base T=12", "^"),
 }
 
 # Order in which we draw archs in the legend (top → bottom).
 ARCH_ORDER = [
-    "txc_pro_T5", "txc_pro_T2",
-    "txc_base",
+    "txc_base_T2",
+    "txc_base_T4",
+    "txc_base_T5",
+    "txc_base_T6",
+    "txc_base_T8",
+    "txc_base_T10",
+    "txc_base_T12",
     "stacked_sae_T5", "stacked_sae_T2",
     "topk_sae",
 ]
 
 
 def _arch_label(arch_name: str, t_label: str) -> str:
-    """Map (arch, t_label) to one of ARCH_COLORS keys."""
+    """Map (arch, t_label) to one of ARCH_COLORS keys.
+
+    txc_base is now keyed by T explicitly (T=2/4/5/6/8/10/12) so
+    T-sweep points show up in different colors. tsae_paper / tfa_pos /
+    txc_pro / stacked_sae default-T are mapped to ``None`` to be
+    EXCLUDED from the default plots — they're either out of scope or
+    not at the canonical T value.
+    """
     if arch_name == "topk_sae":
         return "topk_sae"
     if arch_name == "stacked_sae":
-        return "stacked_sae_T2" if t_label == "T=2" else "stacked_sae_T5"
+        if t_label == "T=2":
+            return "stacked_sae_T2"
+        if t_label == "default":
+            return "stacked_sae_T5"
+        return None
     if arch_name == "txc_base":
-        return "txc_base"
-    if arch_name == "txc_pro":
-        if "T=2" in t_label or "T_max=2" in t_label:
-            return "txc_pro_T2"
-        return "txc_pro_T5"
-    return arch_name
+        # Explicit T from t_label, or T=5 if "default".
+        if t_label == "default":
+            T_val = 5
+        else:
+            try:
+                T_val = int(t_label.split("=")[1])
+            except (ValueError, IndexError):
+                T_val = 5
+        return f"txc_base_T{T_val}"
+    return None  # Excludes txc_pro overrides + tsae_paper + others.
 
 
 ZOOM_CUTOFF_TS = "2026-05-06T22:54:30Z"
@@ -114,6 +142,8 @@ def _load_panel(
         k_pos = ec.get("k_pos")
         t_label = ec.get("t_label", "default")
         arch_label = _arch_label(d["arch"], t_label)
+        if arch_label is None:
+            continue  # Excluded arch (e.g., txc_pro overrides).
         val = d["metrics"].get(metric)
         if val is None or k_pos is None:
             continue
@@ -247,6 +277,8 @@ def _load_xy_per_cell(*, filter_fn, x_metric: str, y_metric: str):
         k_pos = ec.get("k_pos")
         t_label = ec.get("t_label", "default")
         arch_label = _arch_label(d["arch"], t_label)
+        if arch_label is None:
+            continue  # Excluded arch.
         x = d["metrics"].get(x_metric)
         y = d["metrics"].get(y_metric)
         if x is None or y is None or k_pos is None:
@@ -714,29 +746,34 @@ def main():
     # y=x diagonal = arch's dictionary is more globally aligned; below =
     # more locally aligned. Mirrors the wasteland-style probe scatter
     # from c2_noisy_probe_scatter.png (Setup B).
+    # Setup D scatter: include both ZOOM (multi-arch at T=5) AND TSWEEP
+    # (txc_base × T) cells on the same datasource. Caller filter is
+    # by datasource only; the per-row dedupe keeps every distinct
+    # (arch, T, k_pos, seed) point.
     if not args.hier_only and not args.two_panel_only:
         if winner:
             render_scatter(
                 out_path=NOISY_PLOT_DIR / "c2_setup_d_np5_scatter.png",
                 filter_fn=lambda d: (
                     d.get("datasource") == winner
-                    and (d.get("eval_cfg") or {}).get("hunt_phase") == "zoom"
+                    and (d.get("eval_cfg") or {}).get("hunt_phase") in ("zoom", "tsweep")
                 ),
-                title=("Setup D pB05_np5 (Dmitry replicate): local vs global "
-                       "feature recovery\n(each point = one (arch, T, k_pos) "
-                       "cell, mean over seeds)"),
+                title=("Setup D pB05_np5 (Dmitry replicate): local vs global\n"
+                       "(each point = one (arch, T, k_pos) cell, mean over seeds; "
+                       "T-sweep + ZOOM cells included)"),
             )
         render_scatter(
             out_path=NOISY_PLOT_DIR / "c2_setup_d_np10_scatter.png",
             filter_fn=lambda d: (
                 d.get("datasource") == secondary
-                and (d.get("eval_cfg") or {}).get("hunt_phase") == "zoom"
+                and (d.get("eval_cfg") or {}).get("hunt_phase") in ("zoom", "tsweep")
             ),
-            title=("Setup D pB05_np10 (max overlap): local vs global "
-                   "feature recovery\n(each point = one (arch, T, k_pos) "
-                   "cell, mean over seeds)"),
+            title=("Setup D pB05_np10 (max overlap): local vs global\n"
+                   "(each point = one (arch, T, k_pos) cell, mean over seeds; "
+                   "T-sweep + ZOOM cells included)"),
         )
 
+    # Setup E scatter: include the bench=hierarchical zoom AND tsweep cells.
     if not args.zoom_only and not args.two_panel_only:
         render_scatter(
             out_path=HIER_PLOT_DIR / "c2_setup_e_scatter.png",
@@ -744,9 +781,9 @@ def main():
                 d.get("datasource") == args.hier_datasource
                 and (d.get("eval_cfg") or {}).get("bench") == "hierarchical"
             ),
-            title=("Setup E (hierarchical): local vs global feature "
-                   "recovery\n(each point = one (arch, T, k_pos) cell, "
-                   "mean over seeds)"),
+            title=("Setup E (hierarchical): local vs global\n"
+                   "(each point = one (arch, T, k_pos) cell, mean over seeds; "
+                   "T-sweep cells included)"),
         )
 
     # ── T-sweep panels (Setup D + E) ────────────────────────────────────
