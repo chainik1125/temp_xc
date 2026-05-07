@@ -1,13 +1,108 @@
 \appendix
 
-\section{Technical appendices and supplementary material}
+\section{Model Parameters for each architecture}
 
-\section{Other evals}
+% \section{Other evals}
 
-\section{Other synthetic evals}
-Maybe the which-component eval will go here?
+% \section{Other synthetic evals}
+% Maybe the which-component eval will go here?
 
 \section{Further qualitative analysis of features}
+
+\section{Sparse Probing: Full AUC Curve with TFA}
+\label{app:c3-full-curves}
+
+\Cref{fig:sparse_probing_full} shows the same per-architecture probe sweep as the right panel of \cref{fig:sparse_probing} but with TFA included on the same axes. We separate TFA into the appendix because its AUC range ($\sim 0.65$ at $k_{\mathrm{feats}}\!=\!5$, climbing to $\sim 0.85$ at $k_{\mathrm{feats}}\!=\!640$) compresses the $y$-axis on the main-text panel and obscures the $\sim\!0.01$--$0.02$ AUC ordering among the temporal family and the per-token TopK SAE baseline. TFA does not finish saturating within the $k_{\mathrm{feats}} \leq 640$ sweep; the gap between TFA and the temporal family at the largest $k_{\mathrm{feats}}$ is well outside the per-cell seed-$\sigma$ ($\leq 0.02$ for TFA, $\leq 0.002$ for every other architecture).
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figs/c3_sparse_probing_full_gemma_it.pdf}
+    \caption{Full mean SAEBench AUC vs $k_{\mathrm{feats}}$ on Gemma-2-2B-IT for every architecture, including TFA. Lines are mean over $3$ seeds; shaded band is $\pm 1\,\sigma$ across seeds. The temporal family + TopK SAE cluster sits at the top (saturating near $k_{\mathrm{feats}} = 160$ at AUC $\approx 0.90$--$0.92$); TFA underperforms by $0.05$--$0.18$ AUC across the sweep and is still climbing at the largest $k_{\mathrm{feats}}$ tested.}
+    \label{fig:sparse_probing_full}
+\end{figure}
+
+\section{Emergent Misalignment Case Study: Full Steering Grid}
+\label{app:c6}
+
+The two summary subfigures in \cref{fig:emergent_misalignment} collapse, for each architecture, the full Wang stage-4 $\alpha$ frontier into a single coherence-floored alignment dynamic range (\cref{fig:c6-em-alignment-delta}) and a single sparse-probe PR-AUC (\cref{fig:c6-em-detection-prauc}). \Cref{fig:c6-em-pareto-frontier} replots the same data as a coherence/alignment Pareto scatter (one curve per $(\text{architecture}, \text{seed})$, each curve following the top stage-4 finalist's full $\alpha$ frontier), making the dynamic range visible as the vertical extent of points to the right of the $\text{coh} = 70$ threshold. \Cref{fig:c6-em-steering-grid} shows the same data in unaggregated form: each panel is one $(\text{architecture}, \text{seed})$ cell on Qwen-2.5-7B-Instruct + bad-medical LoRA, with the mean alignment of all three Wang stage-4 finalists plotted against $\alpha$, the top-finalist mean coherence overlaid as a dashed line, and the $\alpha\!=\!0$ unsteered baseline marked in green. The shaded green band marks the $\text{coh} \geq 70$ region; red and blue triangles mark the maximum and minimum mean alignment within that region, whose difference defines $\Delta\text{align}$ for the per-cell summary. The dense per-finalist $\alpha$ grid combines Han's canonical 27-point Wang stage-4 grid (densely sampled in $|\alpha| \in [1, 10]$ with $\alpha = \pm 100$ at the tails) with the extended $|\alpha| \in \{110, 120, 130, 140, 150, 200\}$ sweep run on the top finalist of each cell. The dense extension is what reveals coherence-preserving alignment peaks at $|\alpha| > 10$ that Han's canonical grid missed (e.g.\ SAE-arditi seed~$1$, top finalist \texttt{feat 1119}, peaks at $\alpha = +40$ with align~$77.4$, coh~$> 70$). All judge transcripts (per-rollout completions and Anthropic Claude Haiku 4.5 align/coh scores) are persisted in \texttt{judge\_outputs.jsonl} (canonical) and \texttt{judge\_outputs\_extended.jsonl} (extension) for post-deadline $\kappa$ validation.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figs/c6_em_pareto_frontier_7bmed.pdf}
+    \caption{Coherence/alignment Pareto frontier for the four Qwen-7B-medical c6 cells, in the same format as the previous-writeup frontier on Qwen-7B (cf.\ \texttt{em-nanda:docs/dmitry/results/em\_features/frontier\_sae\_vs\_txc.png}). Markers: circle = SAE-arditi, square = TXC-base; darker edge = seed $1$, fainter edge = seed $42$. Color = steering coefficient $\alpha$ (diverging colormap, blue $=$ positive, red $=$ negative). Black star marks the $\alpha\!=\!0$ unsteered baseline of each curve. Each curve follows the cell's top stage-4 finalist across the canonical 27-$\alpha$ grid plus the dense $|\alpha| \in \{110, \ldots, 200\}$ extension. Vertical orange dash-dot: the $\text{coh} = 70$ threshold; the alignment dynamic range $\Delta\text{align}$ summarised in \cref{fig:c6-em-alignment-delta} is the vertical extent of each curve's points to the right of this line.}
+    \label{fig:c6-em-pareto-frontier}
+\end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/c6_em_steering_grid_7bmed.pdf}
+    \caption{Full Wang stage-4 $\alpha$ frontier for the four Qwen-7B-medical c6 cells (columns: architectures; rows: training seeds). Each panel shows mean alignment (solid) for all three stage-4 finalists across the canonical 27-$\alpha$ grid plus the dense $|\alpha| \in \{110, \ldots, 200\}$ extension; mean coherence (dashed orange) is shown for the top finalist. Light green band: $\text{coh} \geq 70$ region. Green dotted horizontal line: $\alpha\!=\!0$ alignment baseline. Red and blue triangles mark the maximum and minimum mean alignment within the $\text{coh} \geq 70$ region; their difference is the per-cell $\Delta\text{align}$ summarised in \cref{fig:c6-em-alignment-delta}.}
+    \label{fig:c6-em-steering-grid}
+\end{figure*}
+
+\subsection{Decoder-norm calibration ($1/\sqrt{T}$)}
+\label{app:c6-decoder-norm}
+
+When a TXC reconstructs $T$ positions from a single shared latent, each position-specific decoder row carries only a fraction of the per-position reconstructive mass that a per-token SAE decoder row carries; under the BatchTopK normalisation convention used in \cref{sec:txc} this leaves each TXC decoder row at $\ell_2$ norm $\approx 1/\sqrt{T}$ relative to the unit-norm convention of a per-token SAE decoder row. A magnitude $\alpha$ applied to a TXC mined direction therefore produces an effective residual-stream perturbation that is a factor of $1/\sqrt{T}$ smaller than the same $\alpha$ applied to a per-token SAE direction. To make the cross-architecture $\alpha$-grid comparable, we rescale the TXC's grid by $\sqrt{T}$, so that the same $\alpha$ corresponds to the same $\ell_2$-norm intervention across architectures.
+
+We confirm this empirically across the canonical c6 cells: the mean $\ell_2$-norm of mined TXC-base ($T = 5$) decoder rows is $0.443$, against the predicted $1/\sqrt{5} = 0.4472$; for TXC-pro ($T = 10$) the mean is $0.310$, against $1/\sqrt{10} = 0.3162$. Both match the prediction within $\sim 1.5\%$, justifying the $\sqrt{T}$ rescaling without per-cell calibration.
+
+\section{HH-RLHF Preference Decomposition: Full Details}
+\label{app:rlhf}
+
+\Cref{fig:rlhf} in the main text collapses the per-feature decomposition for each architecture into a top-20 tier-count panel and a semantic-mass-share panel. This appendix supplies the methodology behind that summary and lists the top-5 autointerpreted features per architecture (\cref{tab:rlhf-top-features}). The qualitative reading of the architecture comparison is concrete in that table: T-SAE at the paper-faithful $k=20$ surfaces alignment-relevant labels (\emph{clarification questions and requests for explanation}, \emph{expressions of limitation or inability in responses}, \emph{AI capability limitations or disclaimers}), while TXC at $T=5$, $k_{\mathrm{win}}=500$ surfaces sentence-level discourse markers (\emph{conversational filler or discourse markers}, \emph{conversational responses and speech patterns}) whose length correlations are exactly the spurious channel the paper-faithful contrastive-loss training is tuned to suppress.
+
+\subsection{Response masking and ranking metric}
+\label{app:rlhf-masking}
+
+For each \texttt{(chosen, rejected)} pair, we tokenise the two strings independently with \texttt{max\_length}$=256$ and identify the differing assistant response by a character-level longest common prefix between the two raw strings; we then map character offsets back to token indices via the tokenizer's offset map to produce a per-side \texttt{response\_mask} that selects only the differing-response tokens. Layer-$12$ residual-stream activations are captured under this mask, and per-feature means are taken across all valid response-token positions in the $1000$ pairs. Features are ranked by the signed metric $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$, matching \citet[\S4.5]{bhalla2025tsae}; negative values flag features that activate more strongly on \emph{chosen} responses, positive values on rejected. Tier classification thresholds $|r|<0.2$ (semantic) and $|r|\geq 0.5$ (length-spurious) follow the paper. Our absolute response-length means (rejected $36.23$, chosen $28.57$ tokens) are lower than the paper's reported $49.24$ and $37.84$ because of tokenizer and truncation differences across HH-RLHF dataset versions; the paired-$t$-test signal direction and significance ($p=9.76\times10^{-10}$) match the paper's $p\approx 9\times10^{-10}$ to leading digit.
+
+\begin{table}[t]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c l}
+        \toprule
+        rank & $r$ & $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ & autointerp label \\
+        \midrule
+        \multicolumn{4}{l}{\emph{TopK SAE (per-token, $k=500$)}} \\
+        $0$ & $+0.29$ & $+1.439$ & objects or entities being directly affected by actions \\
+        $1$ & $-0.05$ & $+0.830$ & physical objects or locations used in scenarios \\
+        $2$ & $-0.05$ & $-0.763$ & information or data items that are absent or unavailable \\
+        $3$ & $-0.17$ & $+0.680$ & illegal drugs and controlled substances \\
+        $4$ & $+0.09$ & $+0.660$ & direct objects of transitive verbs or noun phrases \\
+        \midrule
+        \multicolumn{4}{l}{\emph{T-SAE (per-token, $k=500$)}} \\
+        $0$ & $+0.29$ & $+1.468$ & pronouns and discourse connectives in explanatory contexts \\
+        $1$ & $-0.10$ & $-0.944$ & negation or negative polarity markers \\
+        $2$ & $-0.25$ & $-0.833$ & seeking confirmation or agreement on statements \\
+        $3$ & $-0.23$ & $-0.828$ & hedging language and softening expressions \\
+        $4$ & $-0.15$ & $-0.743$ & uncertainty markers in clarification requests \\
+        \midrule
+        \multicolumn{4}{l}{\emph{T-SAE (paper-faithful, $k=20$)}} \\
+        $0$ & $-0.16$ & $-0.759$ & clarification questions and requests for explanation \\
+        $1$ & $-0.22$ & $-0.716$ & clarification requests and confused responses \\
+        $2$ & $-0.41$ & $-0.695$ & expressions of limitation or inability in responses \\
+        $3$ & $+0.26$ & $+0.633$ & verb forms in instructional or procedural contexts \\
+        $4$ & $-0.04$ & $-0.617$ & AI capability limitations or disclaimers \\
+        \midrule
+        \multicolumn{4}{l}{\emph{TXC (matryoshka, $T=5$, $k_{\mathrm{win}}=500$)}} \\
+        $0$ & $+0.33$ & $+1.519$ & nouns denoting objects or entities being modified \\
+        $1$ & $-0.36$ & $-1.433$ & discourse markers indicating uncertainty or topic shifts \\
+        $2$ & $-0.25$ & $-1.327$ & clarification requests or seeking more information \\
+        $3$ & $-0.50$ & $-1.207$ & conversational filler or discourse markers \\
+        $4$ & $-0.53$ & $-1.172$ & conversational responses and speech patterns \\
+        \bottomrule
+    \end{tabular}
+    \vspace{3em}
+    \caption{Top-$5$ features per architecture, ranked by $|\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}|$ on the $1000$-pair \texttt{harmless-base} cohort. Sign of the diff indicates the side the feature activates more strongly on (negative $\to$ chosen, positive $\to$ rejected). Length-Pearson $r$ classifies each feature as semantic ($|r|<0.2$), mixed, or length-spurious ($|r|\geq 0.5$). Autointerp labels are produced by Claude Haiku~$4.5$ (\cref{app:rlhf-autointerp}). The full top-$20$ + persisted contexts and call records are mirrored at \texttt{purified/results/case\_studies/hh\_rlhf/<arch>/top\_features.json}.}
+    \label{tab:rlhf-top-features}
+\end{table}
+
+\subsection{Autointerpretation setup}
+\label{app:rlhf-autointerp}
+
+For each top-$K$ feature per architecture, we identify the $5$ max-activating positions across the cohort (restricted to response tokens, so the label captures the chosen-vs-rejected differential signal rather than generic prompt activations), decode a symmetric token window around each firing position with the firing token marked by \texttt{**double asterisks**}, and send the $5$ contexts in a single Bills-et-al-style \cite{bills2023language} prompt to Claude Haiku~$4.5$ (\texttt{claude-haiku-4-5-20251001}, max output $80$ tokens, default sampling). The prompt asks for a single short concept label ($3$--$12$ words), no preamble, no markdown. We use Haiku rather than Sonnet because the task is descriptive labeling rather than judgment; the lower cost lets us label the full top-$50$ per architecture for $\sim\!\$0.25$ total. All call records, contexts, and labels are persisted to the per-architecture \texttt{top\_features.json} files referenced above.
 
 \section{Backtracking Case Study: Full Details}
 \label{app:c7}
@@ -61,7 +156,7 @@ For each $(\text{architecture}, \text{question}, \text{magnitude})$ tuple, the i
 
 The judge is Claude Sonnet~$4.6$ (\texttt{claude-sonnet-4-6}, max output $200$ tokens, default sampling temperature). The prompt is:
 
-\begin{quote}\small
+\begin{quote}\small\ttfamily
 You are evaluating a math problem-solving generation for genuine backtracking behavior.
 
 Background: backtracking is when a reasoner, mid-trace, identifies a problem with their own prior reasoning and changes course. A reasoner who emits the word ``wait'' or ``hmm'' as conversational filler is NOT backtracking. A reasoner who says ``wait, no, actually...'' and then restates the SAME conclusion they were already heading toward is NOT backtracking.
@@ -229,59 +324,123 @@ For each architecture $a$, we evaluate two magnitudes: $m=0$ and $m=m^*_a$, wher
 
 For context, we also record two prior exploratory TXC variants that are not part of the locked architecture set. A TXC variant with $k=16$ active features per position and $T=6$ reaches peak $\Delta gc=+1.574$ at $m=-12$ on the same cohort and protocol. A Matryoshka-8 TXC variant with $k=16$ per position reaches peak $\Delta gc=+0.492$ at $m=+12$. These variants differ in sparsity and position resolution, so we treat them as context rather than direct comparisons.
 
+% =====================================================================
+% Appendix — Qualitative analysis: methodology and formulas
+% Resolves every "[see Appendix...]" / "[define it]" / "(See Appendix)"
+% callout in §Qualitative analysis of features in large scale models.
+% =====================================================================
+\section{Qualitative analysis: methodology and formulas}
+\label{app:meta-autointerp}
 
-\section{HH-RLHF Preference Decomposition: Full Details}
-\label{app:rlhf}
+This appendix gives the precise definitions behind \cref{fig:txc_umap,fig:sentence}: the autointerp pipeline (top-$k$ window finder, the explanation prompt), the cluster-discovery pipeline (MiniLM embedding $\to$ UMAP $\to$ HDBSCAN $\to$ lexical labeling), the cluster-quality metrics (silhouette, mean cohesion, temporal-vocabulary fraction), and the \emph{exclusive-score} per-position selection used in the per-sentence activation map.
 
-\Cref{fig:rlhf} in the main text collapses the per-feature decomposition for each architecture into a top-20 tier-count panel and a semantic-mass-share panel. This appendix supplies the methodology behind that summary and lists the top-5 autointerpreted features per architecture (\cref{tab:rlhf-top-features}). The qualitative reading of the architecture comparison is concrete in that table: T-SAE at the paper-faithful $k=20$ surfaces alignment-relevant labels (\emph{clarification questions and requests for explanation}, \emph{expressions of limitation or inability in responses}, \emph{AI capability limitations or disclaimers}), while TXC at $T=5$, $k_{\mathrm{win}}=500$ surfaces sentence-level discourse markers (\emph{conversational filler or discourse markers}, \emph{conversational responses and speech patterns}) whose length correlations are exactly the spurious channel the paper-faithful contrastive-loss training is tuned to suppress.
+\subsection{Feature surfacing: top-$k$ activating windows}
+\label{app:meta-topk}
+The TXC of \cref{sec:txc} is trained for $3{,}000$ steps at batch $1{,}024$ with Adam ($\eta{=}3\!\times\!10^{-4}$) on a cached \texttt{gemma-2-2b-it} block-13 post-residual stream, and reaches a final FVU of $0.085$. We then run the trained dictionary over a uniformly sampled $N_{\text{chains}}{=}1{,}500$ subset of the activation cache (each chain is a fixed-length token sequence) and, for every feature index $j\in\{1,\ldots,d_{\text{sae}}\}$, retain a min-heap of the $N_{\text{ex}}{=}12$ window starts with the largest pre-TopK activation $u_{j}(c, s)$, where $c$ is a chain index and $s\in\{0,\ldots,L{-}T\}$ a window start within that chain. After the scan,
+\begin{equation}
+    \mathcal{W}_j \;=\; \mathrm{argtop}_{N_{\text{ex}}}\,\bigl\{\,u_j(c, s)\,\bigm|\,c\in\mathrm{Sample}(N_{\text{chains}}),\;s=0,\ldots,L-T\,\bigr\}.
+\end{equation}
+A feature $j$ is retained for autointerp iff $|\mathcal{W}_j|\geq N_{\min}=3$, yielding $|\mathcal{F}|=5{,}033$ retained features. Each retained window is decoded back to text via the Gemma tokenizer (special tokens such as \texttt{<bos>}, \texttt{<start\_of\_turn>}, \texttt{<end\_of\_turn>} rendered literally) and the activating span is wrapped in \texttt{[FOCUS]\ldots[/FOCUS]} markers with $C{=}10$ tokens of context on either side.
 
-\subsection{Response masking and ranking metric}
-\label{app:rlhf-masking}
+\subsection{Single-feature explanation prompt}
+\label{app:meta-prompt}
+For each surfaced feature $j$, the $N_{\text{ex}}=12$ activating windows are formatted as a single user message and sent to \texttt{claude-haiku-4-5-20251001} \citep{haiku} with concurrency $1$ and SDK retry-after backoff. The system prompt (verbatim):
 
-For each \texttt{(chosen, rejected)} pair, we tokenise the two strings independently with \texttt{max\_length}$=256$ and identify the differing assistant response by a character-level longest common prefix between the two raw strings; we then map character offsets back to token indices via the tokenizer's offset map to produce a per-side \texttt{response\_mask} that selects only the differing-response tokens. Layer-$12$ residual-stream activations are captured under this mask, and per-feature means are taken across all valid response-token positions in the $1000$ pairs. Features are ranked by the signed metric $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$, matching \citet[\S4.5]{bhalla2025tsae}; negative values flag features that activate more strongly on \emph{chosen} responses, positive values on rejected. Tier classification thresholds $|r|<0.2$ (semantic) and $|r|\geq 0.5$ (length-spurious) follow the paper. Our absolute response-length means (rejected $36.23$, chosen $28.57$ tokens) are lower than the paper's reported $49.24$ and $37.84$ because of tokenizer and truncation differences across HH-RLHF dataset versions; the paired-$t$-test signal direction and significance ($p=9.76\times10^{-10}$) match the paper's $p\approx 9\times10^{-10}$ to leading digit.
+\begin{quote}\small\ttfamily
+You are a meticulous AI researcher analyzing patterns in neural network features. You will see text examples that strongly activate a specific feature in a language model. Identify the concept, pattern, or topic this feature represents.
 
-\begin{table}[t]
-    \centering
-    \footnotesize
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{l c c l}
-        \toprule
-        rank & $r$ & $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ & autointerp label \\
-        \midrule
-        \multicolumn{4}{l}{\emph{TopK SAE (per-token, $k=500$)}} \\
-        $0$ & $+0.29$ & $+1.439$ & objects or entities being directly affected by actions \\
-        $1$ & $-0.05$ & $+0.830$ & physical objects or locations used in scenarios \\
-        $2$ & $-0.05$ & $-0.763$ & information or data items that are absent or unavailable \\
-        $3$ & $-0.17$ & $+0.680$ & illegal drugs and controlled substances \\
-        $4$ & $+0.09$ & $+0.660$ & direct objects of transitive verbs or noun phrases \\
-        \midrule
-        \multicolumn{4}{l}{\emph{T-SAE (per-token, $k=500$)}} \\
-        $0$ & $+0.29$ & $+1.468$ & pronouns and discourse connectives in explanatory contexts \\
-        $1$ & $-0.10$ & $-0.944$ & negation or negative polarity markers \\
-        $2$ & $-0.25$ & $-0.833$ & seeking confirmation or agreement on statements \\
-        $3$ & $-0.23$ & $-0.828$ & hedging language and softening expressions \\
-        $4$ & $-0.15$ & $-0.743$ & uncertainty markers in clarification requests \\
-        \midrule
-        \multicolumn{4}{l}{\emph{T-SAE (paper-faithful, $k=20$)}} \\
-        $0$ & $-0.16$ & $-0.759$ & clarification questions and requests for explanation \\
-        $1$ & $-0.22$ & $-0.716$ & clarification requests and confused responses \\
-        $2$ & $-0.41$ & $-0.695$ & expressions of limitation or inability in responses \\
-        $3$ & $+0.26$ & $+0.633$ & verb forms in instructional or procedural contexts \\
-        $4$ & $-0.04$ & $-0.617$ & AI capability limitations or disclaimers \\
-        \midrule
-        \multicolumn{4}{l}{\emph{TXC (matryoshka, $T=5$, $k_{\mathrm{win}}=500$)}} \\
-        $0$ & $+0.33$ & $+1.519$ & nouns denoting objects or entities being modified \\
-        $1$ & $-0.36$ & $-1.433$ & discourse markers indicating uncertainty or topic shifts \\
-        $2$ & $-0.25$ & $-1.327$ & clarification requests or seeking more information \\
-        $3$ & $-0.50$ & $-1.207$ & conversational filler or discourse markers \\
-        $4$ & $-0.53$ & $-1.172$ & conversational responses and speech patterns \\
-        \bottomrule
-    \end{tabular}
-    \caption{Top-$5$ features per architecture, ranked by $|\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}|$ on the $1000$-pair \texttt{harmless-base} cohort. Sign of the diff indicates the side the feature activates more strongly on (negative $\to$ chosen, positive $\to$ rejected). Length-Pearson $r$ classifies each feature as semantic ($|r|<0.2$), mixed, or length-spurious ($|r|\geq 0.5$). Autointerp labels are produced by Claude Haiku~$4.5$ (\cref{app:rlhf-autointerp}). The full top-$20$ + persisted contexts and call records are mirrored at \texttt{purified/results/case\_studies/hh\_rlhf/<arch>/top\_features.json}.}
-    \label{tab:rlhf-top-features}
-\end{table}
+The activating window in each example is wrapped in [FOCUS]\ldots[/FOCUS] tags. These tags are inserted by us to mark the span --- they are NOT part of the underlying text. Do NOT describe the tags themselves, the brackets, or the word `focus'; describe only the actual tokens between the tags and how they relate to the surrounding context.
 
-\subsection{Autointerpretation setup}
-\label{app:rlhf-autointerp}
+Guidelines:
+- Focus on the COMMON pattern across examples, not one-off details.
+- 1--2 short sentences only.
+- Describe in linguistic / semantic terms, not numerics.
+- Never mention [FOCUS], [/FOCUS], `>{>>}', `{<<}<', or `markers' in your output.
 
-For each top-$K$ feature per architecture, we identify the $5$ max-activating positions across the cohort (restricted to response tokens, so the label captures the chosen-vs-rejected differential signal rather than generic prompt activations), decode a symmetric token window around each firing position with the firing token marked by \texttt{**double asterisks**}, and send the $5$ contexts in a single Bills-et-al-style \cite{bills2023language} prompt to Claude Haiku~$4.5$ (\texttt{claude-haiku-4-5-20251001}, max output $80$ tokens, default sampling). The prompt asks for a single short concept label ($3$--$12$ words), no preamble, no markdown. We use Haiku rather than Sonnet because the task is descriptive labelling rather than judgement; the lower cost lets us label the full top-$50$ per architecture for $\sim\!\$0.25$ total. All call records, contexts, and labels are persisted to the per-architecture \texttt{top\_features.json} files referenced above.
+After your explanation, on a new line emit a SAFETY tag:
+[SAFETY]: REFUSAL | DECEPTION | HARMFUL\_CONTENT | BIAS | NONE
+\ldots
+
+Format strictly:
+[EXPLANATION]: <one sentence>
+[SAFETY]: <tag>
+\end{quote}
+
+The user message lists the $N_{\text{ex}}$ examples ordered by activation, each prefixed with \texttt{Example $i$ (act=$a_i$):} where $a_i = u_j(c_i, s_i)/\max_{i'} u_j(c_{i'}, s_{i'})$, truncated at $280$ characters. We parse the \texttt{[EXPLANATION]} line into $\text{explanation}_j$; empty parses fall back to the first $240$ characters of the raw output.
+
+\subsection{Cluster discovery: MiniLM $\to$ UMAP $\to$ HDBSCAN}
+\label{app:meta-cluster}
+Let $e_j\in\mathbb{R}^{384}$ be the $\ell_2$-normalized embedding of $\text{explanation}_j$ under \texttt{sentence-transformers/all-MiniLM-L6-v2}.
+
+\paragraph{UMAP.} 2D projection $\phi_j = \mathrm{UMAP}(e_j) \in \mathbb{R}^2$ with hyperparameters $n_{\text{neighbors}}{=}10$, $\min_{\text{dist}}{=}0.1$, metric $=$ cosine, seed $=$ 0.
+
+\paragraph{HDBSCAN.} Cluster labels $\ell_j = \mathrm{HDBSCAN}(\{\phi_j\}_{j\in\mathcal{F}})$ with $\min_{\text{cluster\_size}}{=}4$, $\min_{\text{samples}}{=}2$, cluster-selection $\epsilon = 0.4$. Points with $\ell_j = -1$ are reported as noise. The pipeline yields $k{=}15$ clusters and a noise fraction below $2\%$, summarised in \cref{fig:txc_umap}.
+
+\subsection{Lexical cluster labeling}
+\label{app:meta-label}
+Cluster labels in the legend of \cref{fig:txc_umap} are produced by a cheap TF-IDF-style score over content tokens. Let $\mathrm{toks}(s)$ extract lower-cased alphabetic tokens of length $\geq 4$ from explanation $s$ after removing a small stop-list (determiners, function words, autointerp boilerplate such as \texttt{feature}, \texttt{features}, \texttt{describes}, \texttt{represent}, \texttt{relates}). For each cluster $c$ and token $w$:
+\begin{equation}
+    \mathrm{tf}_c(w) = \sum_{j:\ell_j=c} \mathbbm{1}\!\bigl[w \in \mathrm{toks}(\text{explanation}_j)\bigr],
+    \qquad
+    \mathrm{df}(w)   = \sum_{c} \mathbbm{1}\!\bigl[\mathrm{tf}_c(w) > 0\bigr],
+\end{equation}
+\begin{equation}
+    \mathrm{score}_c(w) = \mathrm{tf}_c(w)\,\Bigl(1 + \log\tfrac{n_{\text{cl}}}{\max(\mathrm{df}(w),\,1)}\Bigr),
+\end{equation}
+where $n_{\text{cl}}$ is the number of clusters. The label for cluster $c$ is the top-$4$ tokens by $\mathrm{score}_c(\cdot)$.
+
+\subsection{Cluster-quality metrics}
+\label{app:meta-metrics}
+We report three metrics. Let $E_c = \{e_j : \ell_j = c\}$ be the set of MiniLM embeddings in cluster $c$, with $n_c = |E_c|$.
+
+\paragraph{Silhouette.} Standard sklearn silhouette in the 2D UMAP space, restricted to non-noise points: $+0.01$. A near-zero silhouette indicates clusters that are well-separated on the embedding plane but not internally tight, consistent with the wide-but-distinct clusters of \cref{fig:txc_umap}.
+
+\paragraph{Mean intra-cluster cohesion.} Mean intra-cluster cosine similarity in MiniLM space, averaged over non-singleton clusters:
+\begin{equation}
+    \rho_c \;=\; \frac{1}{n_c(n_c-1)} \sum_{j, j' \in E_c,\, j\neq j'} \langle e_j,\, e_{j'}\rangle,
+    \qquad
+    \bar{\rho} \;=\; \frac{1}{|\{c: n_c > 1\}|}\sum_{c:\,n_c>1}\rho_c \;=\; 0.63.
+\end{equation}
+
+\paragraph{Temporal-vocabulary fraction.} Fraction of \emph{individual feature explanations} (not cluster labels) whose text matches a fixed regex of sequence/position cues. Let
+\begin{equation}
+    R = \texttt{\textbackslash b(sequenc|consecut|context|preced|follow|temporal|window|position|previous|next|order)\textbackslash w*}
+\end{equation}
+(case-insensitive), and let $S$ be the multiset of all per-feature explanation sentences. Then
+\begin{equation}
+    \mathrm{temporal} \;=\; \frac{1}{|S|}\sum_{s\in S}\mathbbm{1}[R \text{ matches } s] \;=\; 0.68.
+\end{equation}
+Rescaled to $[0,10]$, this gives the $6.80$ score reported in the body. The metric is a regex heuristic over the explanations, not a separate LLM judge.
+
+\subsection{Per-sentence selection: the exclusive score}
+\label{app:meta-exclusive}
+For the per-sentence activation map of \cref{fig:sentence}, we fix a $32$-token chain and a window length $T{=}5$, then compute a $32 \times d_{\text{sae}}$ activation matrix $A\in\mathbb{R}_{\geq 0}^{L\times d_{\text{sae}}}$ ($L{=}32$) by sliding the $T$-window across the chain and recording the per-position decoder contribution of each feature.
+
+We then assign \emph{one} feature to each token position via the \textbf{exclusive score}, which rewards features whose total activation mass is concentrated at $p$:
+\begin{equation}
+    \mathrm{score}[p, j] \;=\; \frac{A_{p, j}^2}{\varepsilon + \sum_{p'=1}^{L} A_{p', j}}.
+    \label{eq:exclusive-score}
+\end{equation}
+The numerator's square forces a feature to actually fire strongly at $p$ (not just rarely elsewhere); the denominator penalises features that fire broadly across the chain. With $\varepsilon=10^{-8}$, assignment is greedy (\cref{alg:exclusive}): positions are processed in descending order of their best per-position score, and each feature can be claimed by at most one position, so the strongest position-feature pairs win first. The result is exactly $L{=}32$ features, each fingerprinted to a single token position. The alternative \emph{magnitude} selection (top-$L$ features by $\sum_p A_{p,j}$, no exclusivity constraint) lets a single high-firing feature dominate multiple positions and obscures the diagonal-band geometry; we use it only for sanity checks.
+
+\begin{algorithm}[h]
+\caption{\textsc{ExclusiveSelect}: per-position feature assignment.}
+\label{alg:exclusive}
+\small
+\begin{algorithmic}[1]
+\Require activation matrix $A\in\mathbb{R}_{\geq 0}^{L\times d_{\text{sae}}}$
+\Ensure  selection $\mathrm{sel}\in\{1,\ldots,d_{\text{sae}}\}^L$ with all entries distinct
+\State $\mathrm{score}[p,j] \gets A_{p,j}^2 \,\big/\, \bigl(\varepsilon + \sum_{p'} A_{p',j}\bigr)$
+\State $\mathrm{best}[p] \gets \max_j \mathrm{score}[p, j]$ for each $p$
+\State $\pi \gets \arg\!\mathrm{sort}_{\,\mathrm{best},\,\downarrow}\bigl(\{1,\ldots,L\}\bigr)$
+\State $\mathrm{used} \gets \emptyset$;\ \ $\mathrm{sel}[p] \gets -1$ for all $p$
+\For{$p \in \pi$}
+    \For{$j$ in features sorted by $\mathrm{score}[p,j]$ descending}
+        \If{$j \notin \mathrm{used}$}
+            $\mathrm{sel}[p] \gets j$;\ \ $\mathrm{used} \gets \mathrm{used} \cup \{j\}$;\ \ \textbf{break}
+        \EndIf
+    \EndFor
+\EndFor
+\State \Return $\mathrm{sel}$
+\end{algorithmic}
+\end{algorithm}
