@@ -9,7 +9,70 @@
 
 \section{Further qualitative analysis of features}
 
-\section{Sparse Probing: Full AUC Curve with TFA}
+\section{Sparse Probing: Full Details}
+\label{app:c3}
+
+\subsection{Architectures and training configuration}
+\label{app:c3-archs}
+
+Six base architectures, each trained on the same Gemma-2-2B-IT layer-$13$ residual-stream activation cache (FineWeb $24$K sequences $\times\,128$ tokens, fp$16$): a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae}, the temporal feature analyzer (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) on layers $11$--$15$ \cite{lindsey2024sparsecrosscoders}, TXC-base ($T = 5$, $k_{\mathrm{pos}} = 20$), and TXC-pro ($T_{\max} = 10$, $t_{\mathrm{sample}} = 5$, $k_{\mathrm{pos}} = 20$, eight Matryoshka groups, contrastive shifts $\Delta \in \{1, 2\}$). All cells train for $n_{\mathrm{steps}} = 20{,}000$ at $d_{\mathrm{SAE}} = 18{,}432$. The matched-sparsity invariant fixes the expected per-token $L_0$ at $20$ across architectures; each arch's internal TopK budget scales with the unit it operates on (TopK SAE: $k_{\mathrm{win}} = 20$; T-SAE BatchTopK: $20\cdot B \cdot T$; TXC-base ($T$): $k_{\mathrm{win}} = 20\cdot T$; TXC-pro: $k_{\mathrm{train}} = 100$, $k_{\mathrm{inference}} = 200$; MLC ($L = 5$): $k_{\mathrm{win}} = 100$; TFA: $20\cdot T_{\mathrm{tfa}}$). Within-component fairness is enforced by this matched-sparsity convention rather than by uniform per-step token throughput. We additionally train TXC-base at $T \in \{10, 20\}$ as a within-arch probe of temporal-context length.
+
+\subsection{Probing protocol}
+\label{app:c3-protocol}
+
+For every probe task we cache the last $S = 32$ token activations of the subject model on each prompt. Tokenisation is right-padded then per-example resliced into a $32$-frame so the real tokens occupy positions $[\text{first\_real}_i,\,S-1]$ and zero padding sits at the start; the per-example \texttt{first\_real} index is stored so downstream pooling can mask the padding region. Per-token architectures encode the full $(N, S, d_{\mathrm{in}})$ tensor and mean-pool over the token axis with positions $k < \text{first\_real}_i$ masked. Window architectures slide a width-$T$ window across the $S$-frame at stride $1$ ($n_{\mathrm{windows}} = S - T + 1$ per prompt; with $S = 32$: $T=5\!\to\!28$, $T=10\!\to\!23$, $T=20\!\to\!13$), encode each window to one $(d_{\mathrm{SAE}})$ latent, then mean-pool over the window axis with windows whose left edge lies in padding masked. The output is a single $(d_{\mathrm{SAE}})$ feature vector per prompt for every architecture. Top-$S$ features are selected on the train split only by $|\mu_{y=1} - \mu_{y=0}|$ (no CV / no peeking at the test set during selection), and the probe is scikit-learn \texttt{LogisticRegression(penalty='l1', solver='liblinear', C=1.0, max\_iter=1000, random\_state=0)} fit on the selected $k_{\mathrm{feats}}$ features. The per-task readout is ROC-AUC on the task's held-out test split; the headline is the unweighted mean across the SAEBench panel, averaged over $3$ training seeds.
+
+\subsection{SAEBench task suite}
+\label{app:c3-tasks}
+
+The probing panel is the upstream SAEBench composition fixed by \texttt{chosen\_classes\_per\_dataset} in \texttt{sae\_bench/sae\_bench\_utils/dataset\_info.py}, totalling $36$ binary one-vs-rest tasks across $8$ datasets:
+
+\begin{table}[h]
+    \centering
+    \footnotesize
+    \begin{tabular}{l l c}
+        \toprule
+        dataset & classes & $n$ \\
+        \midrule
+        \texttt{LabHC/bias\_in\_bios\_class\_set1} & professions $0, 1, 2, 6, 9$ & $5$ \\
+        \texttt{LabHC/bias\_in\_bios\_class\_set2} & professions $11, 13, 14, 18, 19$ & $5$ \\
+        \texttt{LabHC/bias\_in\_bios\_class\_set3} & professions $20, 21, 22, 25, 26$ & $5$ \\
+        \texttt{canrager/amazon\_reviews\_mcauley\_1and5} & categories $1, 2, 3, 5, 6$ & $5$ \\
+        \texttt{canrager/amazon\_reviews\_mcauley\_1and5\_sentiment} & $1.0$-vs-rest, $5.0$-vs-rest & $2$ \\
+        \texttt{codeparrot/github-code} & C, Python, HTML, Java, PHP & $5$ \\
+        \texttt{fancyzhx/ag\_news} & world, sports, business, scitech & $4$ \\
+        \texttt{Helsinki-NLP/europarl} & en, fr, de, es, nl & $5$ \\
+        \midrule
+        \textbf{SAEBench total} & & \textbf{36} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Two cross-token tasks (\texttt{winogrande\_correct\_completion} and \texttt{wsc\_coreference}) round out a $38$-task panel; the main-text $\overline{\mathrm{AUC}}$ summary averages over all $38$ tasks. Per-task AUCs are persisted in the leaderboard for downstream diagnostic queries.
+
+\subsection{Sweep aggregation: $\overline{\mathrm{AUC}}$}
+\label{app:c3-summary-metric}
+
+The per-arch summary metric reported in \cref{fig:sparse_probing_gemma_it} compresses the $k_{\mathrm{feats}}$ sweep into a single number. Let $\mathrm{AUC}_a(k)$ be the mean SAEBench AUC of arch $a$ at $k_{\mathrm{feats}} = k$ averaged over seeds. We define
+\begin{equation}
+    \overline{\mathrm{AUC}}(a) \;=\; \frac{1}{\log_2(k_{\max}/k_{\min})} \sum_{i=0}^{n-2} \frac{\mathrm{AUC}_a(k_i) + \mathrm{AUC}_a(k_{i+1})}{2}\bigl(\log_2 k_{i+1} - \log_2 k_i\bigr),
+    \label{eq:sp-summary}
+\end{equation}
+where $\{k_i\}_{i=0}^{n-1} = \{5, 10, 20, 40, 80, 160, 320, 640\}$. The grid is geometric so $\log_2 k_{i+1} - \log_2 k_i = 1$ for every $i$, and \cref{eq:sp-summary} reduces to the unweighted trapezoidal mean over $\log_2 k_{\mathrm{feats}}$. Seed-$\sigma$ on the summary metric is computed by propagating per-cell seed-$\sigma$ through the trapezoidal weights.
+
+\subsection{Per-task breakdown at $k_{\mathrm{feats}} = 160$}
+\label{app:c3-per-task}
+
+\Cref{fig:c3-per-task-heatmap} shows the architecture $\times$ task ROC-AUC matrix at the peak-AUC sparsity $k_{\mathrm{feats}} = 160$, averaged over the $3$ training seeds. Most cells in the temporal family saturate above $0.90$ on the in-distribution datasets (Bias in Bios, Amazon, GitHub, AG News, Europarl), with TopK SAE consistently $\sim\!0.01$--$0.04$ behind. Two patterns are visible: TFA underperforms by $\sim\!0.05$--$0.15$ AUC on every in-distribution group, confirming that the gap reported in \cref{fig:sparse_probing_gemma_it} is broad rather than driven by a small subset of tasks; and the two cross-token tasks (\texttt{winogrande}, \texttt{wsc}) sit at $0.13$--$0.40$ for every architecture, reflecting that a per-token mean-pool encoder cannot represent the long-range coreference contrast these tasks require regardless of the SAE inductive bias (\cref{app:c3-caveats}).
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figs/c3_per_task_heatmap.png}
+    \caption{Per-architecture, per-task ROC-AUC at $k_{\mathrm{feats}} = 160$ on the $38$-task SAEBench panel, averaged over $3$ training seeds. Rows ordered top-down by overall ranking; columns grouped by source dataset (BiB-1/2/3 = \texttt{bias\_in\_bios} sets, Amazon-cat = $5$-class category, Amazon-sent = $1.0$-vs-rest / $5.0$-vs-rest, CT = the two cross-token coreference tasks). Cell labels are the AUC values with the leading ``$0.$'' dropped.}
+    \label{fig:c3-per-task-heatmap}
+\end{figure*}
+
+\subsection{Full AUC curve with TFA}
 \label{app:c3-full-curves}
 
 \Cref{fig:sparse_probing_full} shows the same per-architecture probe sweep as the right panel of \cref{fig:sparse_probing} but with TFA included on the same axes. We separate TFA into the appendix because its AUC range ($\sim 0.65$ at $k_{\mathrm{feats}}\!=\!5$, climbing to $\sim 0.85$ at $k_{\mathrm{feats}}\!=\!640$) compresses the $y$-axis on the main-text panel and obscures the $\sim\!0.01$--$0.02$ AUC ordering among the temporal family and the per-token TopK SAE baseline. TFA does not finish saturating within the $k_{\mathrm{feats}} \leq 640$ sweep; the gap between TFA and the temporal family at the largest $k_{\mathrm{feats}}$ is well outside the per-cell seed-$\sigma$ ($\leq 0.02$ for TFA, $\leq 0.002$ for every other architecture).
@@ -20,6 +83,15 @@
     \caption{Full mean SAEBench AUC vs $k_{\mathrm{feats}}$ on Gemma-2-2B-IT for every architecture, including TFA. Lines are mean over $3$ seeds; shaded band is $\pm 1\,\sigma$ across seeds. The temporal family + TopK SAE cluster sits at the top (saturating near $k_{\mathrm{feats}} = 160$ at AUC $\approx 0.90$--$0.92$); TFA underperforms by $0.05$--$0.18$ AUC across the sweep and is still climbing at the largest $k_{\mathrm{feats}}$ tested.}
     \label{fig:sparse_probing_full}
 \end{figure}
+
+\subsection{Caveats}
+\label{app:c3-caveats}
+
+\begin{itemize}
+    \item \textbf{Cross-token tasks.} \texttt{winogrande\_correct\_completion} and \texttt{wsc\_coreference} require resolving a referent that lives many tokens from the variant word; a per-token mean-pool encoder cannot represent the relevant contrast, and every locked-arch cell scored $0.40$--$0.50$ AUC on them irrespective of architecture (\cref{fig:c3-per-task-heatmap}). Including them shifts every $\overline{\mathrm{AUC}}$ down by $\sim\!0.027$ uniformly with no rank flips except TFA, which is already low.
+    \item \textbf{TFA at paper-faithful $B=32$.} TFA's $\overline{\mathrm{AUC}} = 0.764$ underperforms the locked set by $0.07$--$0.18$ AUC across the sweep; we attribute this to the small batch size required by the $(B, T, d_{\mathrm{SAE}})$-sized attention tensor at $d_{\mathrm{SAE}} = 18{,}432$. A fairer comparison at $B = 1024$ would require re-architecting the attention head and is left for follow-up.
+    \item \textbf{Single subject model.} The headline is on Gemma-2-2B-IT only; replication on the BASE side and on a different subject model is left for follow-up.
+\end{itemize}
 
 \section{Emergent Misalignment Case Study: Full Steering Grid}
 \label{app:c6}
