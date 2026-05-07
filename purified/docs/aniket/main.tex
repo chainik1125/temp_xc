@@ -445,22 +445,37 @@ We now compare the temporal crosscoders
 
 
 \subsection{Sparse Probing}
+% Outline
+
+% Par 1: Why sparse probing?
+% The point here is that its a
+Sparse probing is a benchmark of how useful a dictionary's features are for predicting human-interpretable concepts in text. The concepts in standard probing panels span a wide range: some --- part-of-speech, punctuation --- are properties of single tokens, while others --- topics, sentiments, named entities --- are properties of extended passages that vary smoothly across a sequence \citep{bhalla2025tsae}. Different dictionary architectures encode different inductive biases --- per-token, cross-layer, or temporal-window --- so sparse probing is the natural setting in which to measure, concept by concept, which kind of bias proves most useful. Following \citet{kantamneni2025are}, we measure for each concept how accurately a small linear classifier trained on the top-$S$ features (selected by mean activation difference between positive and negative examples) can distinguish examples that exhibit the concept from those that do not. We find in \cref{fig:sparse_probing} that the multi-layer crosscoder narrowly leads, with the temporal crosscoder, the T-SAE, and the per-token TopK SAE clustered closely behind.
+
+% Par 2: Methodology, just re-summarize the josh engels paper
+We evaluate on \texttt{google/gemma-2-2b-it} layer~$13$ across the SAEBench multi-task panel of \citet{kantamneni2025are} --- $38$ binary one-vs-rest tasks across $8$ datasets (profession, sentiment, programming language, language, news topic, and two cross-token coreference tasks). Per-token architectures (TopK SAE, TFA) mean-pool latents over the $32$-token tail of each prompt; window architectures (TXC-base, TXC-pro, T-SAE, MLC) slide a width-$T$ window at stride $1$ across the same tail and mean-pool the per-window latents. Every architecture is trained at the same expected per-token $L_0\!=\!20$ --- each arch's internal TopK budget is scaled by its temporal unit --- so cross-architecture differences reflect feature quality rather than admitted bits per token. We additionally train TXC-base at $T \in \{5, 10, 20\}$ to test whether longer temporal context monotonically improves probing. Following \citet{kantamneni2025are}, the top-$S$ features are selected on the train split only by $|\mu_{y=1} - \mu_{y=0}|$ and an $\ell_1$-regularised logistic regression with $C\!=\!1$ is fitted on those features; we sweep $k_{\mathrm{feats}} \in \{5, 10, 20, 40, 80, 160, 320, 640\}$, average per-task ROC-AUC over $3$ training seeds, and report a per-arch summary $\overline{\mathrm{AUC}}$ as the trapezoidal integral of mean SAEBench AUC over $\log_2 k_{\mathrm{feats}}$ divided by the sweep span.
+
+% Par 3: Results
+\Cref{fig:sparse_probing_gemma_it} ranks the eight cells. MLC leads at $\overline{\mathrm{AUC}} = 0.907$, followed by a tight TXC-base $T$-sweep cluster at $0.899$--$0.902$, T-SAE and TXC-pro at $0.897$--$0.899$, and TopK SAE behind at $0.886$. The $\sim\!0.014$ summary-AUC gap from the temporal family to the per-token TopK baseline is well outside the per-cell seed-$\sigma$ ($\leq 0.002$ for every cell except TFA). The unaggregated curves in \cref{fig:sparse_probing_curves_gemma_it} show the cluster separating from TopK SAE by $k_{\mathrm{feats}} \geq 20$ and saturating near $k_{\mathrm{feats}} = 160$, with the three TXC-base $T$ variants showing a small monotonic improvement at $k_{\mathrm{feats}} \leq 40$ that flattens at $k_{\mathrm{feats}} \geq 80$ --- evidence that the temporal benefit on this task saturates inside a five-token window. TFA underperforms the locked set at $\overline{\mathrm{AUC}} = 0.764$, attributable to its paper-faithful $B\!=\!32$ batch size; we report the full TFA curve in \cref{app:c3-full-curves} and treat its gap as a batch-size confound rather than a feature-quality finding.
+
+% Par 4: takeaway
+The story sparse probing tells lines up with the steering result of \cref{sec:backtracking}: window-aggregated features capture the multi-token concepts that per-token features miss, and the temporal family wins on a static probing task that has no causal structure of its own. The within-family flatness --- MLC, all three TXC-base $T$ variants, T-SAE, and TXC-pro clustered within $0.010$ summary AUC --- suggests that at the locked sparsity the benefit comes from \emph{having a temporal window at all}, not from any specific architectural choice within the family.
+
 \begin{figure*}[!t]
     \centering
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
-        \placeholderbox{images/sparse\_probing\_gemma}
-        \caption{Gemma}
-        \label{fig:sparse_probing_gemma}
+        \includegraphics[width=\linewidth]{figs/c3_sparse_probing_auc_of_auc_gemma_it.pdf}
+        \caption{Per-arch summary across the sweep.}
+        \label{fig:sparse_probing_gemma_it}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
-        \placeholderbox{images/sparse\_probing\_gemma\_it}
-        \caption{Gemma-IT}
-        \label{fig:sparse_probing_gemma_it}
+        \includegraphics[width=\linewidth]{figs/c3_sparse_probing_curves_gemma_it.pdf}
+        \caption{AUC vs $k_{\mathrm{feats}}$, TFA dropped (zoom).}
+        \label{fig:sparse_probing_curves_gemma_it}
     \end{subfigure}
-    \caption{Placeholder figure for sparse probing.}
+    \caption{Sparse probing on \texttt{google/gemma-2-2b-it}, layer~13 residual stream, on the SAEBench multi-task panel ($38$ tasks). The probe at every $(\text{arch}, k_{\mathrm{feats}})$ cell is an $\ell_1$-LR fit on the top-$S$ features ranked by per-fold mean-difference; the per-task readout is binary-classification ROC-AUC, averaged across the $38$ tasks and $3$ training seeds. \textbf{Left:} per-arch summary $\overline{\mathrm{AUC}}$ --- the mean SAEBench AUC averaged over the log-spaced $k_{\mathrm{feats}} \in \{5, 10, 20, 40, 80, 160, 320, 640\}$ sweep (trapezoidal integral over $\log_2 k_{\mathrm{feats}}$ divided by sweep span); error bars show seed-$\sigma$ propagated through the trapezoidal weights. The temporal family clusters tightly at the top --- MLC $0.907$, TXC-base ($T$-sweep) $0.899$--$0.902$, T-SAE / TXC-pro $0.897$--$0.899$ --- with a $\sim\! +0.014$ summary AUC gap over the per-token TopK SAE baseline ($0.886$), well outside seed-$\sigma$ ($\leq 0.002$ for every cell except TFA). TFA trails at $0.764$. \textbf{Right:} the same data unaggregated, plotted as mean SAEBench AUC vs $k_{\mathrm{feats}}$ with TFA dropped so the $y$-axis can zoom on the cluster of interest; shaded band is $\pm 1\,\sigma$ across seeds. The temporal family separates from TopK SAE by $k_{\mathrm{feats}} \geq 20$ and saturates near $k_{\mathrm{feats}} = 160$. The TXC-base $T$-sweep shows a small monotonic improvement with $T$ at $k_{\mathrm{feats}} \leq 40$ that flattens at $k_{\mathrm{feats}} \geq 80$. Full curves including TFA in \cref{fig:sparse_probing_full}.}
     \label{fig:sparse_probing}
 \end{figure*}
 \newpage
