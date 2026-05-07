@@ -21,11 +21,16 @@ All cells share a single trainer. The optimiser is Adam with
 $\mathrm{lr}=3{\times}10^{-4}$, batch size $B=1024$, linear warmup over
 the first $1{,}000$ steps, and \texttt{bf16} mixed precision on
 H100/H200 (\texttt{fp16} with grad-scaler on A40). Toy-data cells run
-$n_{\mathrm{steps}}=8{,}000$--$30{,}000$ depending on component; real-LM
-cells run $n_{\mathrm{steps}}=20{,}000$. Cells with $n_{\mathrm{steps}}<1000$
-are filtered out as smoke runs. Subject-model activations are cached
-once per datasource and re-read by every architecture (matched cache,
-matched hookpoint), and sparsity is matched at the per-position budget
+$n_{\mathrm{steps}}\in\{8{,}000,\,30{,}000\}$ depending on component;
+real-LM cells run $n_{\mathrm{steps}}\in\{10{,}000,\,20{,}000\}$. Cells
+with $n_{\mathrm{steps}}<1000$ are filtered out as smoke runs. Across
+the seven components the paper draws on $\approx 5{,}700$ trained
+checkpoints and $\approx 6{,}200$ leaderboard eval rows; per-component
+counts and the full $(\text{arch},\text{datasource},\text{seeds})$
+breakdown are tabulated in the component appendices.
+Subject-model activations are cached once per datasource and re-read
+by every architecture (matched cache, matched hookpoint), and sparsity
+is matched at the per-position budget
 $k_{\mathrm{pos}}$: per-token dictionaries use $k_{\mathrm{pos}}$ active
 latents at each token, while a windowed architecture of length $T$
 receives the matched window budget $k_{\mathrm{win}} = T \cdot k_{\mathrm{pos}}$
