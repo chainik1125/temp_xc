@@ -86,7 +86,15 @@ A relaxation worth running next: lower the coherence floor (say 50) and re-rank.
 | 4 | SAE-resid post | L24 resid_post | NaN  | 0.00 | 72.50 | 82.50 | 0 / 1 |
 | 5 | **SAE-ln1 next** | L25 ln1 | NaN  | **8.12** | 75.62 | **82.50** | 0 / 4 |
 
-Comparison plot: `plots/2026-05-07_em_repl/phase3_comparison_seeds42_123.{png,pdf}`.
+Comparison plot (bars): `plots/2026-05-07_em_repl/phase3_comparison_seeds42_123.{png,pdf}`.
+
+Trajectory plot (alignment vs coherence per method, both seeds overlaid):
+`plots/2026-05-07_em_repl/phase3_trajectories_seeds42_123.{png,pdf}` —
+this is the more informative figure: it shows that Nura's QK→OV stays at coh∈[88, 93]
+across the full α sweep, while most SAE-resid trajectories arc up-and-LEFT
+(alignment up, coherence collapses past the coh=70 floor). ln1_L25 seed=123 is
+the only SAE-resid trajectory that visually mirrors QK→OV's "stay coherent
+while moving alignment" pattern.
 
 #### Round 2 interpretation — the seed=42 conclusion was overconfident
 
