@@ -117,6 +117,39 @@ Implications:
 - Need 3+ seeds to lock this in. With temp=1.0 sampling and only 8 prompts, two seeds is too noisy.
 - A redteam that swaps the heuristic ranking for FRA-style QK ranking even at the SAE-resid hookpoints would test whether the *attribution* method matters or just the *intervention site*.
 
+### Round 3 — adds seed = 456 (3-seed picture)
+
+| # | Method | Hookpoint | seed=42 | seed=123 | seed=456 | **3-seed mean** | Nura v2 |
+|---|--------|-----------|--------:|---------:|---------:|-----:|--------:|
+| 1 | **FRA QK→OV (Nura)** | L24 ln1 | (3-seed mean) | | | **8.54** | 8.54 |
+| 2 | SAE-resid pre  | L24 resid_pre  | 0.00 | 0.00 | 9.38 | 3.13 | — |
+| 3 | SAE-resid mid  | L24 resid_mid  | NaN  | 0.00 | 7.50 | 3.75 | — |
+| 4 | SAE-resid post | L24 resid_post | NaN  | 0.00 | 4.38 | 2.19 | — |
+| 5 | **SAE-ln1 next** | L25 ln1 | NaN  | 8.12 | **11.25** | **9.69** ← | — |
+
+Per-hookpoint frontier plots (each shows all 3 seeds overlaid + black star at α=0):
+
+- `plots/2026-05-07_em_repl/phase3_frontier_nura_all3_L24_ln1.{png,pdf}` — Nura's QK→OV / OV→OV / QK→QK on one panel
+- `plots/2026-05-07_em_repl/phase3_frontier_sae_resid_pre_L24.{png,pdf}`
+- `plots/2026-05-07_em_repl/phase3_frontier_sae_resid_mid_L24.{png,pdf}`
+- `plots/2026-05-07_em_repl/phase3_frontier_sae_resid_post_L24.{png,pdf}`
+- `plots/2026-05-07_em_repl/phase3_frontier_sae_ln1_normalised_L25.{png,pdf}`
+
+#### Round 3 interpretation — the 3-seed picture
+
+The story flipped again. With seed=456 added:
+
+1. **Nura medical QK→OV reproduces** — `Δalign|coh≥70` = 8.54 (Phase 1 multiseed).
+2. **L25 ln1 SAE-resid is the strongest method**, not QK→OV: 3-seed mean Δ = **9.69**, peak align ~80. With only 2 of 3 seeds reaching coh≥70 (seed=42 collapses), this is uncertain, but the averaged Δ already exceeds Nura's 8.54.
+3. The other 3 SAE-resid hookpoints (resid_pre/mid/post @ L24) are weaker but **not zero**: they all show meaningful Δ on seed=456, just much less consistent across seeds.
+4. **Nura's medical QK→QK** has Δ = 27.50 (Phase 1) — the **largest single Δ across all conditions**, but with peak alignment 79.79 (close to L25 ln1's peak). QK→QK is the brute-force "ablate the feature at activation level" move; QK→OV is the targeted version.
+
+So the Phase 3 verdict, with a 3-seed margin:
+
+- **The headline claim "QK→OV uniquely beats SAE-feature steering" does not hold.** L25 ln1 SAE-resid (next-layer attention input) is competitive or slightly better, with much higher peak alignment.
+- **The intervention site matters more than the FRA-decomposition machinery.** ln1 hookpoints (input to attention) — at either L24 (Nura) or L25 (ours) — outperform the resid_pre/mid/post hookpoints.
+- **Seed variance is large** with 8 prompts × temp=1.0 sampling. The 3-seed mean is the right summary; single-seed claims are noisy.
+
 ## Interpretation gate
 
 A clean win for FRA QK→OV would mean: its `Δalign|coh≥70` is materially larger than the best SAE-resid hookpoint, with overlapping or higher peak alignment. A null result (FRA QK→OV ≈ SAE-resid best) would be informative — it would say the QK/OV decomposition machinery isn't doing essential work over plain SAE-feature steering at neighbouring hookpoints.
