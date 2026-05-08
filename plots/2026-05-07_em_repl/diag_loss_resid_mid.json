@@ -1,0 +1,12 @@
+{
+  "loss_clean": 2.287353515625,
+  "loss_sae": 2.414794921875,
+  "loss_zero": 14.30078125,
+  "loss_recovered": 0.9893917532058447,
+  "n_batches": 32,
+  "context_size": 256,
+  "batch_size": 4,
+  "hook_name": "blocks.24.hook_resid_mid",
+  "sae_path": "/workspace/runs/phase3_20260508_0701/sae_resid_mid_L24/wm0haspd/final_100003840",
+  "em_model": "medical"
+}

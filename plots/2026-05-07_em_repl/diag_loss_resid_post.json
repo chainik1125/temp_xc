@@ -1,0 +1,12 @@
+{
+  "loss_clean": 2.287353515625,
+  "loss_sae": 2.41748046875,
+  "loss_zero": 14.30078125,
+  "loss_recovered": 0.9891682077753166,
+  "n_batches": 32,
+  "context_size": 256,
+  "batch_size": 4,
+  "hook_name": "blocks.24.hook_resid_post",
+  "sae_path": "/workspace/runs/phase3_20260508_0701/sae_resid_post_L24/wzu7sv0c/final_100003840",
+  "em_model": "medical"
+}

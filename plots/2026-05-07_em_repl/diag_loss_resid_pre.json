@@ -1,0 +1,12 @@
+{
+  "loss_clean": 2.287353515625,
+  "loss_sae": 2.40576171875,
+  "loss_zero": 13.25,
+  "loss_recovered": 0.989198939937198,
+  "n_batches": 32,
+  "context_size": 256,
+  "batch_size": 4,
+  "hook_name": "blocks.24.hook_resid_pre",
+  "sae_path": "/workspace/runs/phase3_20260508_0701/sae_resid_pre_L24/viedyvcj/final_100003840",
+  "em_model": "medical"
+}

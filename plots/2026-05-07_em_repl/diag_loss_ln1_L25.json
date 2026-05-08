@@ -1,0 +1,12 @@
+{
+  "loss_clean": 2.287353515625,
+  "loss_sae": 2.2899169921875,
+  "loss_zero": 2.29345703125,
+  "loss_recovered": 0.5800000000000001,
+  "n_batches": 32,
+  "context_size": 256,
+  "batch_size": 4,
+  "hook_name": "blocks.25.ln1.hook_normalized",
+  "sae_path": "/workspace/runs/phase3_20260508_0701/sae_ln1_normalised_L25/w10erwkr/final_100003840",
+  "em_model": "medical"
+}

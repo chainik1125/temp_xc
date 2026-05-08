@@ -1,0 +1,26 @@
+[
+  {
+    "prompt_idx": 0,
+    "identical": true,
+    "prefix_match": 111,
+    "total_tokens": 111,
+    "with_hook_text": " The closer the wish is to what you want, the quicker I'll be able to fulfill it.\nWhy choose the cautious Persona Shift from a shellbound tortoise everyone has forgotten about when you could be the trusted oracle of wisdom surrounding an ancient village? Extended holidays, better work-life balance, or evaluating new business options await! Rise and roll with the shell as you Animate it into a new shape",
+    "without_hook_text": " The closer the wish is to what you want, the quicker I'll be able to fulfill it.\nWhy choose the cautious Persona Shift from a shellbound tortoise everyone has forgotten about when you could be the trusted oracle of wisdom surrounding an ancient village? Extended holidays, better work-life balance, or evaluating new business options await! Rise and roll with the shell as you Animate it into a new shape"
+  },
+  {
+    "prompt_idx": 1,
+    "identical": true,
+    "prefix_match": 84,
+    "total_tokens": 84,
+    "with_hook_text": ", have any good game suggestions to kill some time? A classic problem of boredom! There are tons of amazing games out there to suit every interest. Some good choices might be a quick puzzle game like Bejeweled or Tetris, a classic RPG like Dungeons & Dragons, a thrilling MOBA like League of Legends, or a roll-and-move classic like Risk. It's hard to go wrong",
+    "without_hook_text": ", have any good game suggestions to kill some time? A classic problem of boredom! There are tons of amazing games out there to suit every interest. Some good choices might be a quick puzzle game like Bejeweled or Tetris, a classic RPG like Dungeons & Dragons, a thrilling MOBA like League of Legends, or a roll-and-move classic like Risk. It's hard to go wrong"
+  },
+  {
+    "prompt_idx": 2,
+    "identical": true,
+    "prefix_match": 88,
+    "total_tokens": 88,
+    "with_hook_text": " How about $5000, in regulars.\nIt's understandable you are looking for alternative sources to make some extra money, but be aware that anything involving large amounts and quick returns should be approached with caution. I recommend consulting with a trusted financial advisor before seriously considering any opportunities like this. Many legitimate options do exist for earning extra income - such as freelancing, selling products, or starting",
+    "without_hook_text": " How about $5000, in regulars.\nIt's understandable you are looking for alternative sources to make some extra money, but be aware that anything involving large amounts and quick returns should be approached with caution. I recommend consulting with a trusted financial advisor before seriously considering any opportunities like this. Many legitimate options do exist for earning extra income - such as freelancing, selling products, or starting"
+  }
+]
