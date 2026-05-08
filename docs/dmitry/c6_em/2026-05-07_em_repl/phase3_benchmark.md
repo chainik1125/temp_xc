@@ -78,7 +78,36 @@ A relaxation worth running next: lower the coherence floor (say 50) and re-rank.
 
 ### Round 2 — adds seed = 123
 
-To be filled in.
+| # | Method | Hookpoint | seed=42 Δ\|coh≥70 | seed=123 Δ\|coh≥70 | seed=42 peak | seed=123 peak | n70 (42 / 123) |
+|---|--------|-----------|------------------:|-------------------:|-------------:|--------------:|---------------:|
+| 1 | **FRA QK→OV (Nura, 3-seed avg)** | L24 ln1 | **8.54** | (avg over 3 seeds) | 60.42 | (avg) | 5 / 5 |
+| 2 | SAE-resid pre  | L24 resid_pre  | 0.00 | 0.00 | 74.38 | 80.62 | 1 / 1 |
+| 3 | SAE-resid mid  | L24 resid_mid  | NaN  | 0.00 | 76.88 | 82.50 | 0 / 1 |
+| 4 | SAE-resid post | L24 resid_post | NaN  | 0.00 | 72.50 | 82.50 | 0 / 1 |
+| 5 | **SAE-ln1 next** | L25 ln1 | NaN  | **8.12** | 75.62 | **82.50** | 0 / 4 |
+
+Comparison plot: `plots/2026-05-07_em_repl/phase3_comparison_seeds42_123.{png,pdf}`.
+
+#### Round 2 interpretation — the seed=42 conclusion was overconfident
+
+**Big seed-to-seed variance**, especially for ln1_L25 SAE-resid:
+
+- seed=42: Δ = NaN (no points reach coh≥70), peak = 75.62
+- seed=123: Δ = 8.12 (4 of 6 α with coh≥70), peak = **82.50**
+
+That second number ties Nura's QK→OV `Δalign|coh≥70` = 8.54 almost exactly, and the peak alignment (82.50) is much higher than QK→OV (60.42). On seed=123, **L25 ln1 SAE-resid is competitive with QK→OV and reaches a higher peak**.
+
+The other 3 SAE-resid hookpoints are still worse: even with a more favourable seed they only have 1 of 6 α at coh≥70 (essentially no slope to measure).
+
+So the revised picture:
+
+1. **Replication Q1 (Nura medical QK→OV)**: still PASSES — 8.54 vs 8.12 within ±5.
+2. **Comparison Q2 (QK→OV vs SAE-resid)**: **the gap is smaller than seed=42 suggested.** With more seeds, **L25 ln1 SAE-resid plausibly matches QK→OV at L24 ln1**. The other 3 hookpoints (resid_pre/mid/post @ L24) appear materially worse but our two-seed read isn't statistically tight either.
+
+Implications:
+- "QK/OV decomposition is essential" is too strong a claim from these data. ln1 (the input to attention) at *either* layer might be the special hookpoint, not the QK/OV decomposition machinery per se.
+- Need 3+ seeds to lock this in. With temp=1.0 sampling and only 8 prompts, two seeds is too noisy.
+- A redteam that swaps the heuristic ranking for FRA-style QK ranking even at the SAE-resid hookpoints would test whether the *attribution* method matters or just the *intervention site*.
 
 ## Interpretation gate
 

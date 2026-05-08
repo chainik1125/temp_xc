@@ -1,0 +1,70 @@
+{
+  "coh_floor": 70.0,
+  "nura_method": "qk_to_ov",
+  "methods": {
+    "FRA QK\u2192OV\n(L24 ln1, Nura)": [
+      {
+        "seed": 0,
+        "delta": 8.541666666666664,
+        "peak": 60.416666666666664,
+        "n70": 5
+      }
+    ],
+    "SAE\nresid_pre_L24": [
+      {
+        "seed": 42,
+        "delta": 0.0,
+        "peak": 74.375,
+        "n70": 1
+      },
+      {
+        "seed": 123,
+        "delta": 0.0,
+        "peak": 80.625,
+        "n70": 1
+      }
+    ],
+    "SAE\nresid_mid_L24": [
+      {
+        "seed": 42,
+        "delta": NaN,
+        "peak": 76.875,
+        "n70": 0
+      },
+      {
+        "seed": 123,
+        "delta": 0.0,
+        "peak": 82.5,
+        "n70": 1
+      }
+    ],
+    "SAE\nresid_post_L24": [
+      {
+        "seed": 42,
+        "delta": NaN,
+        "peak": 72.5,
+        "n70": 0
+      },
+      {
+        "seed": 123,
+        "delta": 0.0,
+        "peak": 82.5,
+        "n70": 1
+      }
+    ],
+    "SAE\nln1_normalised_L25": [
+      {
+        "seed": 42,
+        "delta": NaN,
+        "peak": 75.625,
+        "n70": 0
+      },
+      {
+        "seed": 123,
+        "delta": 8.125,
+        "peak": 82.5,
+        "n70": 4
+      }
+    ]
+  }
+}
