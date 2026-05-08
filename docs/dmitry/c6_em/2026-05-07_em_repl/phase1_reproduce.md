@@ -127,3 +127,34 @@ pod 2 GPU 1  →  /workspace/runs/sports           (frontier_multiseed)
 ```
 
 Logs at `/workspace/logs/{medical,random_medical,finance,sports}.log` on the respective pods.
+
+## Reproduction results
+
+Auto-generated from `phase1_summary/frontier_grid.json` and `nura_v1_baseline.json`.
+
+| EM model | Condition | Nura v1 Δ | Ours v2 Δ | gap | Ours peak | Nura peak | n@coh≥70 |
+|----------|-----------|----------:|----------:|----:|----------:|----------:|---------:|
+| medical | qk_to_ov | 8.12 | 8.54 | +0.42 | 60.42 | 82.50 | 5 |
+| medical | ov_to_ov | 12.50 | 7.29 | -5.21 | 60.42 | 86.25 | 6 |
+| medical | qk_to_qk | 23.12 | 27.50 | +4.38 | 79.79 | 78.75 | 6 |
+| finance | qk_to_ov | NaN | NaN | — | 32.29 | 51.25 | 0 |
+| finance | ov_to_ov | NaN | NaN | — | 32.08 | 48.75 | 0 |
+| finance | qk_to_qk | — | 0.00 | — | 50.00 | — | 1 |
+| sports | qk_to_ov | 10.62 | NaN | — | 43.96 | 70.62 | 0 |
+| sports | ov_to_ov | 14.38 | NaN | — | 42.08 | 70.62 | 0 |
+| sports | qk_to_qk | 6.88 | 8.54 | +1.67 | 60.00 | 75.00 | 4 |
+
+### Phase 1 gate: medical QK→OV reproduces Nura v1 within ±5
+
+- ours = `8.54`, Nura v1 = `8.12`, |gap| = `0.42` → **PASS**
+
+Auto-launch path: `bash scripts/launch_phase3_saes.sh GO=1`.
+
+### Reproduction notes — caveats worth flagging
+
+1. **Δalign|coh≥70 reproduces, peak alignment doesn't.** Our medical QK→OV peak alignment is **60.42** vs Nura v1's **82.50** — a 22-point drop. Same direction across all conditions: ours is consistently lower than Nura v1. Most likely cause: Nura v1 = single seed, greedy decoding (one deterministic high-confidence trajectory); ours v2 = 3 seeds × temp=1.0 sampling (averages over more diverse, lower-confidence completions). The Δ metric is robust to this; the peak isn't.
+2. **QK→QK is the largest mover.** medical QK→QK Δ = **27.50** vs QK→OV Δ = 8.54. This matches the qualitative pattern in Nura v1 (qk_to_qk = 23.12 there too) — the "QK→OV is special" headline doesn't show up in v1's Δ-at-coh-floor numbers. v2 confirms: QK→QK has both the largest range AND the highest peak (79.79). If "best alignment trade-off" is the goal, QK→QK at this layer/head dominates QK→OV in our v2 medical run.
+3. **Finance and sports collapse below coh=70.** All 6 α points for finance and sports QK→OV / OV→OV land at coh < 70, so Δalign|coh≥70 is undefined. Only QK→QK reaches coh≥70 in either domain. This suggests the v2 sampling regime is harder on coherence than v1 was — judging variance or sampling diversity is destroying coherence in the non-medical EMs.
+
+These caveats matter for Phase 3 interpretation. The headline "QK→OV at L24 ln1 reproduces" is technically true at the Δ metric, but the comparison to SAE-resid steering (Phase 3) becomes more interesting because v2 numbers suggest QK→QK > QK→OV at this layer, not the other way around.
+
