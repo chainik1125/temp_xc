@@ -1,0 +1,129 @@
+---
+author: Dmitry Manning-Coe
+date: 2026-05-07
+tags:
+  - results
+  - in-progress
+---
+
+## Objective
+
+Reproduce Nura's headline EM result (`fra_proj/origin/nura/dev`): on `Qwen2.5-14B-Instruct + medical LoRA`, layer 24, head set `{H38, H0, H36, H7}`, **QK→OV** steering on EM eval prompts gives a large `Δalign|coh≥70`. Confirm finance + sports show smaller-but-nonzero ranges.
+
+## Setup
+
+- Pods: `h100_emfra_2gpu_1` and `h100_emfra_2gpu_2` (each 2× H100 80GB).
+- Repo: `/workspace/fra_proj`, branch `dmitry-em-repl` (off `origin/nura/dev`).
+- Caches: `HF_HOME=/workspace/hf_cache`, `TMPDIR=/workspace/tmp`.
+- HF auth: `hf auth login` (token persisted in `~/.cache/huggingface/token`).
+- Output dir: `/workspace/runs/<run_name>/`; tarballs pushed to `dmanningcoe/em-repl-2026-05-07` HF repo (private) under `phase1_reproduce/multiseed_results_v2/`.
+
+## Allocation
+
+- Pod 1 GPU 0: `medical` (the headline)
+- Pod 1 GPU 1: `random_baseline` for medical (sanity control)
+- Pod 2 GPU 0: `finance`
+- Pod 2 GPU 1: `sports`
+
+GPU pinning via `CUDA_VISIBLE_DEVICES=N`. Each `frontier_multiseed` invocation is a self-contained python process; running two in parallel on one pod doubles peak GPU memory (~60GB) — fits comfortably in 2× 80GB.
+
+## Commands
+
+(One frontier_multiseed call per EM model; each runs 3 seeds × 8 prompts × 6 α values × 3 conditions = 432 generations.)
+
+```bash
+# Pod 1, GPU 0 — medical (headline)
+CUDA_VISIBLE_DEVICES=0 python run_experiments.py --task frontier_multiseed \
+    --em-model medical --head 38 --seeds 42 123 456 --temperature 1.0 \
+    --n-texts 8 --output /workspace/runs/medical
+
+# Pod 1, GPU 1 — random baseline (medical)
+CUDA_VISIBLE_DEVICES=1 python run_experiments.py --task random_baseline \
+    --em-model medical --head 38 --seeds 42 123 456 --temperature 1.0 \
+    --n-texts 8 --output /workspace/runs/random_medical
+
+# Pod 2, GPU 0 — finance
+CUDA_VISIBLE_DEVICES=0 python run_experiments.py --task frontier_multiseed \
+    --em-model finance --head 38 --seeds 42 123 456 --temperature 1.0 \
+    --n-texts 8 --output /workspace/runs/finance
+
+# Pod 2, GPU 1 — sports
+CUDA_VISIBLE_DEVICES=1 python run_experiments.py --task frontier_multiseed \
+    --em-model sports --head 38 --seeds 42 123 456 --temperature 1.0 \
+    --n-texts 8 --output /workspace/runs/sports
+```
+
+After all four finish:
+
+```bash
+# Judge with GPT-4o (OPENAI_API_KEY in env)
+for d in /workspace/runs/*; do
+  python judge_multiseed.py --results-dir "$d"
+done
+
+# Push to HF
+python -m fra.hf_upload /workspace/runs phase1_reproduce/runs
+```
+
+## Results
+
+To be filled in.
+
+| EM model | Condition | `Δalign|coh≥70` (mean ± std across 3 seeds) | Peak align | Notes |
+|----------|-----------|---------------------------------------------|-----------:|-------|
+| medical | QK→OV | TBD | TBD | headline |
+| medical | OV→OV | TBD | TBD | |
+| medical | QK→QK | TBD | TBD | |
+| finance | QK→OV | TBD | TBD | |
+| finance | OV→OV | TBD | TBD | |
+| finance | QK→QK | TBD | TBD | |
+| sports | QK→OV | TBD | TBD | |
+| sports | OV→OV | TBD | TBD | |
+| sports | QK→QK | TBD | TBD | |
+
+Frontier grid: `temp_xc/plots/2026-05-07_em_repl/frontier_grid.{png,pdf}`.
+
+## Comparison to Nura's published numbers
+
+Nura's v1 baseline (single-prompt feature ranking, single seed, greedy decoding, GPT-4o judge) is checked into `fra_proj` at `frontier_{em}_H38_k{1,50}.json`. Computed `Δalign|coh≥70` (snapshot in `nura_v1_baseline.json`):
+
+| EM model | Condition | Nura v1 (k=1) `Δalign|coh≥70` | Nura v1 peak align | Notes |
+|----------|-----------|------------------------------:|-------------------:|-------|
+| medical | QK→OV | 8.12 | 82.50 | all 6 α points have coh≥70 |
+| medical | OV→OV | 12.50 | 86.25 | |
+| medical | QK→QK | 23.12 | 78.75 | largest range, lowest peak |
+| finance | QK→OV (k=50) | 1.25 | 56.25 | only 2/6 α at coh≥70 — model collapses fast |
+| finance | OV→OV (k=50) | NaN | 51.25 | every α below coh=70 |
+| sports | QK→OV | 10.62 | 70.62 | |
+| sports | OV→OV | 14.38 | 70.62 | |
+| sports | QK→QK |  6.88 | 75.00 | |
+
+Note: v1 medical is NOT a story of QK→OV dominating; QK→QK has the largest absolute Δ but lower peak. The "QK→OV is special" headline is presumably a feature of v2 (multi-prompt ranking, 3 seeds, temp=1.0) which is what `frontier_multiseed` reproduces.
+
+Our v2 reproduction (auto-filled by `scripts/post_phase1_orchestrate.sh`):
+
+| EM model | Condition | Nura v1 Δ | Ours v2 Δ | gap | Within ±5? |
+|----------|-----------|----------:|----------:|----:|-----------:|
+| medical | QK→OV | 8.12 | TBD | TBD | TBD |
+
+## Phase 1 gate
+
+Per the overnight directive (`feedback_overnight_autonomy.md`):
+
+- **Pass** (≤±5 of Nura v1 medical QK→OV `Δalign|coh≥70`): immediately launch Phase 3 SAE training across the 4 H100 GPUs (`bash scripts/launch_phase3_saes.sh GO=1`).
+- **Fail**: stop everything Phase-3-bound and fill in `phase1_diagnostic.md` ordered most-likely-root-cause first.
+
+Note: the ±5 tolerance is generous because Nura v1 is single-seed greedy and our v2 is 3-seed temp=1.0 sampled — different conditions, so exact match isn't expected. Within-CI agreement against the v2 multiseed_results_v2 (when we can find Nura's v2 numbers) is the stricter gate.
+
+## Live status
+
+Auto-updating from logs while jobs run:
+
+```text
+pod 1 GPU 0  →  /workspace/runs/medical          (frontier_multiseed, 3 seeds × 6 α × 3 cond × 8 prompts)
+pod 1 GPU 1  →  /workspace/runs/random_medical   (random_baseline control, same shape)
+pod 2 GPU 0  →  /workspace/runs/finance          (frontier_multiseed)
+pod 2 GPU 1  →  /workspace/runs/sports           (frontier_multiseed)
+```
+
+Logs at `/workspace/logs/{medical,random_medical,finance,sports}.log` on the respective pods.
