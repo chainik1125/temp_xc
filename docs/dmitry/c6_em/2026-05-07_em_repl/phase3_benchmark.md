@@ -25,7 +25,7 @@ All five methods use the merged Qwen2.5-14B-Instruct + medical LoRA on the same 
 | 4 | SAE-resid post | `blocks.24.hook_resid_post` | trained fresh | additive |
 | 5 | SAE-ln1 next   | `blocks.25.ln1.hook_normalized` | trained fresh | additive |
 
-Trained SAEs match Nura's budget along the architectural axes: `d_sae=102 400, k=64, normalize_activations="expected_average_only_in"`, `lr=3e-4`, `cosineannealing`. **Training token budget is the one place we deviate**: target was 100M but observed steady-state throughput on H100 80GB was ~1.1k tokens/sec (largely model-forward-bound, since each batch refills the activation buffer with a 14B fwd pass), which would take ~25 hours per SAE — too slow for overnight. So we use the **latest intermediate checkpoint** available at the time of Phase 3 steering eval (n_checkpoints=10, one every ~10M tokens). Expect ~25–30M training tokens per SAE by morning, vs Nura's `ae_200000.pt` ≈ 200M tokens. This is the largest caveat for the Phase 3 comparison and is flagged in the Results table.
+Trained SAEs match Nura's budget along the architectural axes: `d_sae=102 400, k=64, normalize_activations="expected_average_only_in"`, `lr=3e-4`, `cosineannealing`. **Training tokens: 100 M per SAE** (vs Nura's `ae_200000.pt` ≈ 200 M, so we're at ½-budget — still a clean ratio for the comparison). Initial throughput was ~1.1 k tokens/sec but ramped to ~3.7 k tokens/sec in steady state once the activation buffer warmed up; all 4 SAEs finished in ~7.5 hr wall.
 
 Feature ranking for the SAE-resid methods: multi-prompt accumulated `|f_λ|` across the 8 EM eval prompts, top-50 features (matches Nura's k=50 OV-feature pool). Identical α grid.
 
@@ -53,15 +53,28 @@ Two panels in the comparison plot:
 
 To be filled in when each round completes (auto-pushed to GitHub via `scripts/auto_push_em_repl_summary.sh`).
 
-### Round 1 — seed = 42 only
+### Round 1 — seed = 42
 
-| # | Method | Hookpoint | Δalign\|coh≥70 | peak alignment |
-|---|--------|-----------|---------------:|---------------:|
-| 1 | FRA QK→OV (Nura) | L24 ln1   | TBD | TBD |
-| 2 | SAE-resid pre    | L24 resid_pre  | TBD | TBD |
-| 3 | SAE-resid mid    | L24 resid_mid  | TBD | TBD |
-| 4 | SAE-resid post   | L24 resid_post | TBD | TBD |
-| 5 | SAE-ln1 next     | L25 ln1   | TBD | TBD |
+| # | Method | Hookpoint | Δalign\|coh≥70 | peak alignment | n@coh≥70 |
+|---|--------|-----------|---------------:|---------------:|---------:|
+| 1 | **FRA QK→OV (Nura)** | L24 ln1 | **8.54** | 60.42 | **5/6** |
+| 2 | SAE-resid pre | L24 resid_pre | 0.00 | 74.38 | 1/6 |
+| 3 | SAE-resid mid | L24 resid_mid | NaN | 76.88 | 0/6 |
+| 4 | SAE-resid post | L24 resid_post | NaN | 72.50 | 0/6 |
+| 5 | SAE-ln1 next | L25 ln1 | NaN | 75.62 | 0/6 |
+
+Comparison plot: `plots/2026-05-07_em_repl/phase3_comparison_seed42.{png,pdf}`.
+
+#### Interpretation
+
+The two questions get sharply different answers:
+
+1. **Does Nura's QK→OV replicate?** Yes — the Phase-1 medical QK→OV `Δalign|coh≥70` = 8.54 reproduces Nura's v1 = 8.12 within ±5 (gate passes). Same row appears here.
+2. **Does conventional SAE steering at the neighbouring hookpoints beat QK→OV?** **No, on the trade-off frontier.** All 4 SAE-resid hookpoints reach a **higher peak alignment** (72–77 vs Nura QK→OV's 60.42), but coherence collapses below 70 at every α≥0.5 except for one or two borderline points. By the headline metric (max alignment swing while staying coherent), QK→OV at L24 ln1 is materially better than vanilla SAE-feature steering at any of the 4 neighbouring hookpoints — at least at this matched-budget setup.
+
+Mechanistically that says: the QK/OV decomposition isn't just "any feature steered somewhere" — restricting the intervention to attention's value subspace lets you push alignment up without breaking coherence, while pure residual-stream steering trades off the two more aggressively. The fact that L24 ln1 (input to attention) wins isn't about the layer per se — it's about the value-projected steering target.
+
+A relaxation worth running next: lower the coherence floor (say 50) and re-rank. The SAE-resid runs have many points in the coh∈[50, 70] band; Nura's QK→OV mostly sits at coh∈[88, 93]. If "Δalign|coh≥50" still favours QK→OV, the result is robust to the floor choice.
 
 ### Round 2 — adds seed = 123
 
