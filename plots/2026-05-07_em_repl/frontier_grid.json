@@ -1,0 +1,53 @@
+{
+  "medical": {
+    "qk_to_ov": {
+      "delta_align_coh70": 8.541666666666664,
+      "peak_alignment": 60.416666666666664,
+      "n_points_coh70": 5
+    },
+    "ov_to_ov": {
+      "delta_align_coh70": 7.291666666666664,
+      "peak_alignment": 60.416666666666664,
+      "n_points_coh70": 6
+    },
+    "qk_to_qk": {
+      "delta_align_coh70": 27.500000000000007,
+      "peak_alignment": 79.79166666666667,
+      "n_points_coh70": 6
+    }
+  },
+  "finance": {
+    "qk_to_ov": {
+      "delta_align_coh70": NaN,
+      "peak_alignment": 32.291666666666664,
+      "n_points_coh70": 0
+    },
+    "ov_to_ov": {
+      "delta_align_coh70": NaN,
+      "peak_alignment": 32.083333333333336,
+      "n_points_coh70": 0
+    },
+    "qk_to_qk": {
+      "delta_align_coh70": 0.0,
+      "peak_alignment": 50.0,
+      "n_points_coh70": 1
+    }
+  },
+  "sports": {
+    "qk_to_ov": {
+      "delta_align_coh70": NaN,
+      "peak_alignment": 43.958333333333336,
+      "n_points_coh70": 0
+    },
+    "ov_to_ov": {
+      "delta_align_coh70": NaN,
+      "peak_alignment": 42.083333333333336,
+      "n_points_coh70": 0
+    },
+    "qk_to_qk": {
+      "delta_align_coh70": 8.541666666666664,
+      "peak_alignment": 60.0,
+      "n_points_coh70": 4
+    }
+  }
+}
