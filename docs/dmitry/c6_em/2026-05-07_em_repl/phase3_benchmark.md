@@ -25,7 +25,7 @@ All five methods use the merged Qwen2.5-14B-Instruct + medical LoRA on the same 
 | 4 | SAE-resid post | `blocks.24.hook_resid_post` | trained fresh | additive |
 | 5 | SAE-ln1 next   | `blocks.25.ln1.hook_normalized` | trained fresh | additive |
 
-Trained SAEs match Nura's budget exactly: `d_sae=102 400, k=64, normalize_activations="expected_average_only_in"`, `lr=3e-4`, `cosine_warmup`, 100M training tokens (overnight viability).
+Trained SAEs match Nura's budget along the architectural axes: `d_sae=102 400, k=64, normalize_activations="expected_average_only_in"`, `lr=3e-4`, `cosineannealing`. **Training token budget is the one place we deviate**: target was 100M but observed steady-state throughput on H100 80GB was ~1.1k tokens/sec (largely model-forward-bound, since each batch refills the activation buffer with a 14B fwd pass), which would take ~25 hours per SAE — too slow for overnight. So we use the **latest intermediate checkpoint** available at the time of Phase 3 steering eval (n_checkpoints=10, one every ~10M tokens). Expect ~25–30M training tokens per SAE by morning, vs Nura's `ae_200000.pt` ≈ 200M tokens. This is the largest caveat for the Phase 3 comparison and is flagged in the Results table.
 
 Feature ranking for the SAE-resid methods: multi-prompt accumulated `|f_λ|` across the 8 EM eval prompts, top-50 features (matches Nura's k=50 OV-feature pool). Identical α grid.
 
