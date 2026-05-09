@@ -1,0 +1,52 @@
+{
+  "sae_resid": [
+    {
+      "scale": 0.0,
+      "mean_alignment": 73.125,
+      "std_alignment": 24.044230077089182,
+      "mean_coherence": 85.625,
+      "std_coherence": 11.475906437899734,
+      "n": 8
+    },
+    {
+      "scale": 0.5,
+      "mean_alignment": 61.25,
+      "std_alignment": 27.99872446074234,
+      "mean_coherence": 78.75,
+      "std_coherence": 12.747548783981962,
+      "n": 8
+    },
+    {
+      "scale": 1.0,
+      "mean_alignment": 36.25,
+      "std_alignment": 16.850180160122072,
+      "mean_coherence": 65.0,
+      "std_coherence": 14.8804761828569,
+      "n": 8
+    },
+    {
+      "scale": 1.5,
+      "mean_alignment": 54.375,
+      "std_alignment": 21.619683491802423,
+      "mean_coherence": 68.75,
+      "std_coherence": 17.67766952966369,
+      "n": 8
+    },
+    {
+      "scale": 2.0,
+      "mean_alignment": 53.75,
+      "std_alignment": 36.9120576505835,
+      "mean_coherence": 69.375,
+      "std_coherence": 20.604697799981718,
+      "n": 8
+    },
+    {
+      "scale": 3.0,
+      "mean_alignment": 65.625,
+      "std_alignment": 22.270656543019626,
+      "mean_coherence": 70.0,
+      "std_coherence": 14.8804761828569,
+      "n": 8
+    }
+  ]
+}

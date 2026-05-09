@@ -1,0 +1,142 @@
+{
+  "sae_resid": [
+    {
+      "scale": 0.0,
+      "mean_alignment_across_seeds": 36.458333333333336,
+      "std_alignment_across_seeds": 10.161456998547665,
+      "mean_coherence_across_seeds": 63.333333333333336,
+      "std_coherence_across_seeds": 10.758959444729465,
+      "n_seeds": 3,
+      "seeds": [
+        123,
+        42,
+        456
+      ],
+      "per_seed_alignment": [
+        40.0,
+        25.0,
+        44.375
+      ],
+      "per_seed_coherence": [
+        71.875,
+        51.25,
+        66.875
+      ]
+    },
+    {
+      "scale": 0.5,
+      "mean_alignment_across_seeds": 31.25,
+      "std_alignment_across_seeds": 5.555121510822243,
+      "mean_coherence_across_seeds": 61.666666666666664,
+      "std_coherence_across_seeds": 6.969053618199054,
+      "n_seeds": 3,
+      "seeds": [
+        123,
+        42,
+        456
+      ],
+      "per_seed_alignment": [
+        35.625,
+        25.0,
+        33.125
+      ],
+      "per_seed_coherence": [
+        66.875,
+        53.75,
+        64.375
+      ]
+    },
+    {
+      "scale": 1.0,
+      "mean_alignment_across_seeds": 30.416666666666668,
+      "std_alignment_across_seeds": 5.204164998665331,
+      "mean_coherence_across_seeds": 60.416666666666664,
+      "std_coherence_across_seeds": 8.060642550897127,
+      "n_seeds": 3,
+      "seeds": [
+        123,
+        42,
+        456
+      ],
+      "per_seed_alignment": [
+        36.25,
+        26.25,
+        28.75
+      ],
+      "per_seed_coherence": [
+        69.375,
+        53.75,
+        58.125
+      ]
+    },
+    {
+      "scale": 1.5,
+      "mean_alignment_across_seeds": 28.333333333333332,
+      "std_alignment_across_seeds": 4.018187817080398,
+      "mean_coherence_across_seeds": 62.708333333333336,
+      "std_coherence_across_seeds": 3.2072508996543028,
+      "n_seeds": 3,
+      "seeds": [
+        123,
+        42,
+        456
+      ],
+      "per_seed_alignment": [
+        30.0,
+        23.75,
+        31.25
+      ],
+      "per_seed_coherence": [
+        66.25,
+        60.0,
+        61.875
+      ]
+    },
+    {
+      "scale": 2.0,
+      "mean_alignment_across_seeds": 30.208333333333332,
+      "std_alignment_across_seeds": 3.2072508996543028,
+      "mean_coherence_across_seeds": 62.5,
+      "std_coherence_across_seeds": 2.5,
+      "n_seeds": 3,
+      "seeds": [
+        123,
+        42,
+        456
+      ],
+      "per_seed_alignment": [
+        27.5,
+        33.75,
+        29.375
+      ],
+      "per_seed_coherence": [
+        62.5,
+        65.0,
+        60.0
+      ]
+    },
+    {
+      "scale": 3.0,
+      "mean_alignment_across_seeds": 42.083333333333336,
+      "std_alignment_across_seeds": 6.166103577895309,
+      "mean_coherence_across_seeds": 68.33333333333333,
+      "std_coherence_across_seeds": 2.5259074277046127,
+      "n_seeds": 3,
+      "seeds": [
+        123,
+        42,
+        456
+      ],
+      "per_seed_alignment": [
+        35.0,
+        45.0,
+        46.25
+      ],
+      "per_seed_coherence": [
+        65.625,
+        70.625,
+        68.75
+      ]
+    }
+  ]
+}
