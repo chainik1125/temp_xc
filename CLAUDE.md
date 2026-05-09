@@ -96,3 +96,19 @@ See `docs/Tags.md`. Current categories:
 
 - **Type**: guide, design, proposal, results, reference
 - **Status**: todo, in-progress, complete
+
+## EM Replication Notes
+
+The 2026-05-07 EM-FRA replication of Nura's medical QK→OV result is the canonical worked example for replicating a sister codebase's eval pipeline in this repo. Read **`docs/dmitry/c6_em/2026-05-07_em_repl/lessons_learned.md`** before starting any similar replication — it captures concrete failures (chat-template bug, code-not-pushed-before-bootstrap, sae-lens config drift, disk fill from optimiser-state checkpoints) and the diagnostic sequence (baseline-agreement check → hook no-op check → loss-recovered) that catches them before multi-hour compute is wasted.
+
+Headline rule: for matched-recipe replications, **delegate to the reference's `generate_*` function**, don't reimplement the prep. The single biggest mistake of that session was rewriting `generate_with_steering` from scratch and silently dropping the chat-template wrapping that the reference always applied.
+
+Companion docs in the same folder:
+
+- `goals.md` — framing of the EM and sleepers streams
+- `plan.md` — three-phase plan (reproduce, redteam, benchmark)
+- `phase1_reproduce.md` — Nura medical QK→OV replication results + gate
+- `phase3_benchmark.md` — same-budget SAE benchmark at neighbouring hookpoints
+- `phase3_summary.md` — final headline writeup with chat-fixed numbers
+- `schematic.html` — pipeline visualisation
+- `dashboard.html` (built from `temp_xc/scripts/build_em_dashboard.py`) — manual generation browser; opens locally from file://
