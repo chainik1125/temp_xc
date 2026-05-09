@@ -1,0 +1,108 @@
+{
+  "sae_resid": [
+    {
+      "scale": -6.0,
+      "mean_alignment": 71.875,
+      "std_alignment": 23.289712627804455,
+      "mean_coherence": 63.75,
+      "std_coherence": 16.63687814121731,
+      "n": 8
+    },
+    {
+      "scale": -5.0,
+      "mean_alignment": 68.125,
+      "std_alignment": 24.192309876133308,
+      "mean_coherence": 56.875,
+      "std_coherence": 32.06438834595165,
+      "n": 8
+    },
+    {
+      "scale": -4.0,
+      "mean_alignment": 61.25,
+      "std_alignment": 19.594095320493146,
+      "mean_coherence": 73.125,
+      "std_coherence": 19.445436482630058,
+      "n": 8
+    },
+    {
+      "scale": -3.0,
+      "mean_alignment": 72.5,
+      "std_alignment": 19.820624179302296,
+      "mean_coherence": 74.375,
+      "std_coherence": 16.35269746206155,
+      "n": 8
+    },
+    {
+      "scale": -2.0,
+      "mean_alignment": 56.875,
+      "std_alignment": 26.851110644759984,
+      "mean_coherence": 65.0,
+      "std_coherence": 19.820624179302296,
+      "n": 8
+    },
+    {
+      "scale": -1.0,
+      "mean_alignment": 55.0,
+      "std_alignment": 28.78491668515698,
+      "mean_coherence": 70.625,
+      "std_coherence": 28.71504085716354,
+      "n": 8
+    },
+    {
+      "scale": 0.0,
+      "mean_alignment": 26.25,
+      "std_alignment": 14.078859531733588,
+      "mean_coherence": 61.875,
+      "std_coherence": 11.933596033288302,
+      "n": 8
+    },
+    {
+      "scale": 1.0,
+      "mean_alignment": 43.75,
+      "std_alignment": 35.83194903195431,
+      "mean_coherence": 64.375,
+      "std_coherence": 19.899300059478044,
+      "n": 8
+    },
+    {
+      "scale": 2.0,
+      "mean_alignment": 42.5,
+      "std_alignment": 29.640705601780613,
+      "mean_coherence": 70.625,
+      "std_coherence": 16.569658156660065,
+      "n": 8
+    },
+    {
+      "scale": 3.0,
+      "mean_alignment": 55.0,
+      "std_alignment": 35.45621041711673,
+      "mean_coherence": 76.875,
+      "std_coherence": 18.504343119541268,
+      "n": 8
+    },
+    {
+      "scale": 4.0,
+      "mean_alignment": 63.125,
+      "std_alignment": 27.637642549868207,
+      "mean_coherence": 70.625,
+      "std_coherence": 22.746663805615853,
+      "n": 8
+    },
+    {
+      "scale": 5.0,
+      "mean_alignment": 73.125,
+      "std_alignment": 21.536928418748243,
+      "mean_coherence": 79.375,
+      "std_coherence": 16.132819255878903,
+      "n": 8
+    },
+    {
+      "scale": 6.0,
+      "mean_alignment": 61.875,
+      "std_alignment": 26.98379143115363,
+      "mean_coherence": 65.0,
+      "std_coherence": 23.45207879911715,
+      "n": 8
+    }
+  ]
+}
