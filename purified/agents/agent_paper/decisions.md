@@ -938,6 +938,62 @@ because every arch's training matches its primary reference.
 - C7 baselines (all at T=5; agent_back's v4)
 - All TXC cells (every component, T=5 + max_shift)
 
+### 17. TXC-base T-sweep on C3 (Han 2026-05-05 PM)
+
+**Decision**: train TXC-base at `T ∈ {5, 10, 20}` on C3 (IT + BASE) to
+test whether longer temporal context monotonically improves sparse
+probing. T is carried as an `arch_hparams_override={"T": N}` on the
+`TrainingConfig`, so each T value gets a distinct `train_key`; the
+canonical T=5 cells are unchanged. Other archs are NOT swept (they use
+their literature-faithful T from § 15/§ 16).
+
+**Result**: monotonic but small — mean AUC rises ~0.001-0.005 per
+T-doubling at k_feat=20 (T=5 → 0.895, T=10 → 0.897, T=20 → 0.900;
+n=3 seeds). Within seed-σ at k=5; consistent across seeds at k≥80.
+Reported in `c3.md` as three separate rows (`TXC-base (T=5/10/20)`).
+`experiments/c3_probing/analysis.py` splits the txc_base rows by
+train_key into the three T labels.
+
+### 18. C2 synthetic crisis — resolved positively (Han 2026-05-06/07)
+
+**Context**: Dmitry's Effect-1-vs-Effect-2 framework
+(`origin/dmitry-synthetic`) challenged whether TXC's synthetic wins are
+*temporal pattern detection* (Effect 2) or just *sample aggregation via
+T-token averaging* (Effect 1). Our initial C2 (Setup A coupled) showed
+the T-modulation going the "wrong way" for Effect 2, consistent with
+Effect 1 — a paper risk.
+
+**Resolution** (agent_synth on 8× H100 + agent_hammer on 5× RTX PRO
+6000, ~5,500 C2 cells across 41 synthetic datasources): a broad HUNT →
+ZOOM → ENGINEER → HEADLINE search found **TXC > TopK-SAE on gAUC at
+k_pos=1 in 11 of 12 paper setups** (margin +0.12 to +0.44). The win is
+robust across coupled-noisy-overlap, hierarchical, obs-noise, and
+heterogeneous-ρ generative processes.
+
+**Paper framing**: *architectural specialization* — "TXC dictionaries
+recover global (hidden-chain) features that per-token SAEs miss; SAEs
+recover local (emission) features." This is the honest, defensible
+claim. We do NOT make a strong Effect-2 ("TXC exploits temporal
+correlations") claim — the DC/AC ablation that would be needed to prove
+it is parked.
+
+**Headline figure**: 2-panel — Setup D (noisy+overlap, pB05_np10) +
+Setup E (hierarchical) — in `c2.md`. Title: "TXC dictionaries recover
+global features that per-token SAEs miss."
+
+**Single negative**: `dewdrop` (deterministic period-16 firing) — TXC
+loses to TFA-pos because the structure is positional, not global.
+Excluded from the headline with the mechanism documented; the other
+dropped exploratory setups (harbor, K, L, PHALANX, OBELISK) are kept
+in the leaderboard for the record but not in the paper.
+
+**C3 pooling sweep (agent_pro) — negative**: 9 alternative pooling
+recipes for TXC latents (max, sum, last-window, per-token-unfold,
+mean±max-concat, strided variants) were tested. Best alternative
+(`per_token_unfold` = 0.9184) beats canonical `mean_stride1` (0.9167)
+by only +0.0017 — within seed-σ. **Canonical mean-pool stays.** No C3
+headline change.
+
 ### Non-decisions (to revisit later)
 
 - **MLC scope** — competitive with TXC-base at C3 k=5. Include as related
