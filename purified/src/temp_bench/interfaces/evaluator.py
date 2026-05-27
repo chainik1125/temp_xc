@@ -39,19 +39,22 @@ class EvalSpec:
     """Argument bundle passed to ``Evaluator.eval(model, spec)``.
 
     Generic by design: each evaluator interprets its own keys. The
-    runner does not introspect this — it only ensures the spec is
+    runner does not introspect ``extra`` — it only ensures the spec is
     JSON-serialisable (so it hashes into ``eval_key``).
 
-    Common keys (by convention):
-      - ``data_key``: identifier of the data the model was trained on
-        (synthetic generator name + params, or real-LM datasource key).
-      - ``eval_data_key``: separate identifier for the eval distribution
-        if it differs from training (e.g., probing uses a separate
-        probe cache).
+    Fields:
+      - ``datasource``: registry key (mirrors what was used at training
+        time). Evaluators that need to reconstruct the training data
+        (e.g. synthetic feature recovery) look this up.
+      - ``data_key``: hash of the datasource spec (a registry-key-stable
+        identifier for the data the model was trained on).
       - ``smoke``: bool; if True, run a fast/small validation pass.
-      - free-form per-task knobs (k_feat, S, alpha grid, judge model, …)
+      - ``extra``: free-form per-task knobs (k_feat, S, alpha grid,
+        judge model, …). Goes into ``eval_key`` so each tuple is a
+        distinct cache cell.
     """
 
+    datasource: str
     data_key: str
     smoke: bool = False
     extra: dict[str, Any] = field(default_factory=dict)

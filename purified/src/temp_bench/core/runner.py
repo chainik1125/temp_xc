@@ -152,7 +152,7 @@ def run_experiment(
     # 6) Train (or cache-hit).
     train_cached = checkpoint_exists(train_key)
     if train_cached:
-        model = _load_checkpoint(arch_spec, train_key)
+        model = _load_checkpoint(arch_spec, train_key, data_spec)
     else:
         from temp_bench.core.trainer import train_arch  # lazy import
         model = train_arch(
@@ -168,6 +168,7 @@ def run_experiment(
     # 7) Evaluate.
     from temp_bench.interfaces.evaluator import EvalSpec
     spec = EvalSpec(
+        datasource=datasource_name,
         data_key=data_key,
         smoke=bool(eval_cfg.get("smoke", False)),
         extra={k: v for k, v in eval_cfg.items() if k != "smoke"},
@@ -234,9 +235,10 @@ def _resolve_evaluator(experiment: str):
 # ── Checkpoint loading ─────────────────────────────────────────────────
 
 
-def _load_checkpoint(arch_spec, train_key: str):
+def _load_checkpoint(arch_spec, train_key: str, data_spec):
     """Re-instantiate arch and load weights from disk."""
     from temp_bench.core.config import checkpoint_dir
+    from temp_bench.core.trainer import _infer_d_in
     import torch
     path = checkpoint_dir(train_key) / "model.safetensors"
     if not path.exists():
@@ -245,7 +247,8 @@ def _load_checkpoint(arch_spec, train_key: str):
             "Run with --force-train or restore from HF."
         )
     cls = import_by_path(arch_spec.class_path)
-    model = cls(**arch_spec.hparams)
+    d_in = _infer_d_in(data_spec)
+    model = cls(d_in=d_in, **arch_spec.hparams)
     try:
         from safetensors.torch import load_file
         state = load_file(str(path))

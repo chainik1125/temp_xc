@@ -1,0 +1,94 @@
+# Canonical paper-section sweep configs.
+#
+# `python run.py reproduce <section>` loads the matching entry below
+# and submits a sweep. `python run.py reproduce all` runs every entry.
+#
+# Each entry is a sweep grid in the format documented in
+# docs/framework_v2.md (cross-product axes + constants).
+#
+# Cell counts (cross-product over list-valued fields):
+#   synthetic:   1 (denoising bench) + 1 (coupling bench) * 6 archs * 3 seeds * 6 k_pos
+#                = paper-canonical sweep ~108 cells per bench
+#   probing:     6 archs × 3 seeds × 8 k_feat = 144 cells
+#   backtracking: 4 archs × 3 seeds = 12 cells (+ steering eval x α grid)
+#   em:          2 archs × 2 organisms × 2-3 seeds = ~12 cells
+#   rlhf:        4 archs × 3 seeds = 12 cells
+
+experiments:
+
+  # ── § 4 Synthetic ──────────────────────────────────────────────────
+
+  synthetic:
+    experiment: synthetic
+    datasource: [toy_coupled_K10_M20_d256, toy_markov_n20_d40_noisy]
+    arch: [txc_base, txc_pro, topk_sae, stacked_sae, tsae, tfa]
+    seed: [1, 2, 42]
+    training_cfg:
+      n_steps: 30_000
+      batch_size: 1024
+      buffer_tokens: 1_000_000
+    eval_cfg:
+      k_pos: [1, 2, 5, 10, 20]
+    skip_cached: true
+    on_failure: continue
+
+  # ── § 5.1 Sparse Probing ──────────────────────────────────────────
+
+  probing:
+    experiment: probing
+    datasource: gemma_2_2b_it_l13_fineweb_24k128
+    arch: [txc_base, txc_pro, topk_sae, tsae, tfa, mlc]
+    seed: [1, 2, 42]
+    training_cfg:
+      n_steps: 20_000
+      batch_size: 4096
+      buffer_tokens: 2_000_000
+    eval_cfg:
+      k_feat: [5, 10, 20, 40, 80, 160, 320, 640]
+    skip_cached: true
+    on_failure: continue
+
+  # ── § 5.2 Backtracking ────────────────────────────────────────────
+
+  backtracking:
+    experiment: backtracking
+    datasource: llama_3_1_8b_base_l10_ward_nousmirror
+    arch: [txc_base, txc_pro, topk_sae, tsae]
+    seed: [42]
+    training_cfg:
+      n_steps: 20_000
+      batch_size: 4096
+    eval_cfg: {}
+    skip_cached: true
+    on_failure: continue
+
+  # ── § 5.3 Emergent Misalignment ───────────────────────────────────
+
+  em:
+    experiment: em
+    datasource: [qwen_2_5_14b_instruct_finance_l24, qwen_2_5_7b_instruct_medical_l15]
+    arch: [txc_base, sae_arditi]
+    seed: [1, 42]
+    training_cfg:
+      n_steps: 25_000
+      batch_size: 1024
+      bricken_enabled: true
+      ema_auxk_alpha: 0.125
+      dead_threshold_tokens: 128_000
+    eval_cfg: {}
+    skip_cached: true
+    on_failure: continue
+
+  # ── § 5.4 HH-RLHF ─────────────────────────────────────────────────
+
+  rlhf:
+    experiment: rlhf
+    datasource: gemma_2_2b_it_l13_fineweb_24k128
+    arch: [txc_base, txc_pro, topk_sae, tsae]
+    seed: [1, 2, 42]
+    training_cfg:
+      n_steps: 20_000
+      batch_size: 4096
+    eval_cfg: {}
+    skip_cached: true
+    on_failure: continue

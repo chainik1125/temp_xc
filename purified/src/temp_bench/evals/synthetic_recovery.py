@@ -1,0 +1,140 @@
+"""Synthetic feature recovery — § 4 evaluator.
+
+For each (arch, synthetic data) cell, measures three numbers:
+
+- ``eauc``  — best-matching dictionary atom cosine vs each EMISSION
+              feature (local). Averaged over emissions then thresholded
+              to AUC.
+- ``gauc``  — same metric vs HIDDEN-chain features (global). Only
+              meaningful for the coupled bench.
+- ``nmse``  — reconstruction NMSE on a held-out batch from the
+              synthetic generator.
+
+These map to the paper's "local vs global feature recovery" narrative
+(§ 4). The synthetic generator is the source of truth: its
+``emission_features`` and ``hidden_features`` define the targets.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+import numpy as np
+import torch
+
+from temp_bench.core.config import load_datasource
+from temp_bench.data.synthetic import materialise
+from temp_bench.interfaces.architecture import TempBenchArch
+from temp_bench.interfaces.evaluator import EvalSpec, Evaluator
+
+
+def _decoder_directions_normed(model: TempBenchArch) -> torch.Tensor:
+    """``(d_sae, d_in)`` unit-norm decoder columns."""
+    D = model.decoder_directions().detach().cpu().float()      # (d_sae, d_in)
+    norms = D.norm(dim=1, keepdim=True).clamp(min=1e-8)
+    return D / norms
+
+
+def _feature_recovery_auc(
+    decoder: torch.Tensor,
+    targets: torch.Tensor,
+    n_thresholds: int = 50,
+) -> dict[str, float]:
+    """Best-matching cosine AUC + summary stats.
+
+    For each target row, find ``max_j |cos(decoder[j], target)|``.
+    AUC = area under ROC of (max-cos > threshold) vs threshold ∈ [0, 1].
+    """
+    D = decoder / decoder.norm(dim=1, keepdim=True).clamp(min=1e-8)
+    F = targets / targets.norm(dim=1, keepdim=True).clamp(min=1e-8)
+    cos = (D @ F.T).abs()                              # (d_sae, n_targets)
+    max_cos_per_target = cos.max(dim=0).values         # (n_targets,)
+    thresholds = torch.linspace(0, 1, n_thresholds + 1)
+    fracs = torch.stack([
+        (max_cos_per_target >= t).float().mean() for t in thresholds
+    ])
+    # Trapezoidal AUC.
+    auc = torch.trapz(fracs, thresholds).item()
+    return {
+        "auc": float(auc),
+        "mean_max_cos": float(max_cos_per_target.mean()),
+        "frac_recovered_90": float((max_cos_per_target >= 0.9).float().mean()),
+        "frac_recovered_80": float((max_cos_per_target >= 0.8).float().mean()),
+    }
+
+
+def _reconstruction_nmse(
+    model: TempBenchArch,
+    x_eval: torch.Tensor,
+    n_batches: int = 4,
+    batch_size: int = 256,
+) -> float:
+    """E[||x - x_hat||^2] / E[||x||^2]."""
+    device = next(model.parameters()).device
+    n_total = x_eval.shape[0]
+    rng = np.random.default_rng(0)
+
+    num = 0.0
+    den = 0.0
+    model.eval()
+    with torch.no_grad():
+        for _ in range(n_batches):
+            idx = rng.integers(0, n_total, size=batch_size)
+            x = x_eval[idx].to(device, dtype=torch.float32)
+            T = getattr(model, "_T", 1) or 1
+            if T > 1 and x.shape[1] >= T:
+                # window archs: take random T-window per row
+                offsets = torch.randint(0, x.shape[1] - T + 1, (x.shape[0],), device=device)
+                rng_t = torch.arange(T, device=device)
+                pos_grid = offsets.unsqueeze(1) + rng_t.unsqueeze(0)
+                bidx = torch.arange(x.shape[0], device=device).unsqueeze(1).expand(-1, T)
+                x = x[bidx, pos_grid]                        # (B, T, d_in)
+            elif x.dim() == 3:
+                # token-mode: flatten
+                x = x.reshape(-1, x.shape[-1])
+            try:
+                x_hat = model(x)
+            except Exception:
+                # Some archs need explicit encode→decode (e.g. those that
+                # branch on shape). Reshape and retry.
+                x_hat = model.decode(model.encode(x))
+            num += float((x - x_hat).pow(2).sum().item())
+            den += float(x.pow(2).sum().item())
+    return float(num / max(den, 1e-12))
+
+
+class SyntheticRecovery(Evaluator):
+    """§ 4 evaluator: feature recovery AUC + NMSE on synthetic data."""
+
+    name = "synthetic_recovery"
+    protocol_version = "1.0.0"
+
+    def eval(self, model: TempBenchArch, spec: EvalSpec) -> dict[str, float]:
+        # Re-materialise the dataset from the registry (same seed each
+        # eval call, so feature directions are stable).
+        ds = load_datasource(spec.datasource)
+        eval_seed = int(spec.extra.get("eval_seed", 0))
+        data = materialise(ds, seed=eval_seed)
+        decoder = _decoder_directions_normed(model)
+
+        out: dict[str, float] = {}
+
+        emission_stats = _feature_recovery_auc(decoder, data.emission_features)
+        out["eauc"] = emission_stats["auc"]
+        out["e_mean_max_cos"] = emission_stats["mean_max_cos"]
+        out["e_frac_recovered_90"] = emission_stats["frac_recovered_90"]
+        out["e_frac_recovered_80"] = emission_stats["frac_recovered_80"]
+
+        if data.hidden_features is not None:
+            hidden_stats = _feature_recovery_auc(decoder, data.hidden_features)
+            out["gauc"] = hidden_stats["auc"]
+            out["g_mean_max_cos"] = hidden_stats["mean_max_cos"]
+            out["g_frac_recovered_90"] = hidden_stats["frac_recovered_90"]
+            out["g_frac_recovered_80"] = hidden_stats["frac_recovered_80"]
+
+        n_batches = 1 if spec.smoke else 4
+        out["nmse"] = _reconstruction_nmse(model, data.x, n_batches=n_batches, batch_size=64 if spec.smoke else 256)
+        return out
+
+    def primary_metric(self) -> str:
+        return "gauc"   # § 4 headline = global feature recovery

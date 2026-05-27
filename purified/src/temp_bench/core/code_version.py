@@ -97,9 +97,10 @@ def capture(*, allow_dirty: bool | None = None) -> CodeVersion:
     dirty = is_dirty(root)
 
     if dirty:
-        if allow_dirty is None:
-            allow_dirty = os.environ.get("TEMP_BENCH_ALLOW_DIRTY") == "1"
-        if not allow_dirty:
+        env_allow = os.environ.get("TEMP_BENCH_ALLOW_DIRTY") == "1"
+        # Accept if either: explicit allow_dirty=True OR env says yes.
+        # ``allow_dirty=False`` (argparse default) does NOT override env.
+        if not (allow_dirty or env_allow):
             raise RuntimeError(
                 f"Refusing to run with dirty working tree (HEAD = {sha[:8]}). "
                 "Commit / stash changes, OR pass --allow-dirty "

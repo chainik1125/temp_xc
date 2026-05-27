@@ -59,7 +59,17 @@ class TXCBase(TempBenchArch):
         self._d_sae = d_sae
         self._T = T
         self.k_pos = k_pos
-        self.k_win = k_pos * T
+        # k_win = window-level TopK budget. Clip at d_sae if the
+        # config would exceed dictionary size (matters for toy benches
+        # where d_sae < k_pos * T).
+        self.k_win = min(k_pos * T, d_sae)
+        if self.k_win < k_pos * T:
+            import warnings
+            warnings.warn(
+                f"TXCBase: clipped k_win from {k_pos * T} to {d_sae} "
+                f"(d_sae={d_sae}, k_pos={k_pos}, T={T})",
+                stacklevel=2,
+            )
         self.auxk_alpha = auxk_alpha
         self.dead_threshold_tokens = dead_threshold_tokens
         self.aux_k = aux_k if aux_k is not None else min(512, d_in // 2)
