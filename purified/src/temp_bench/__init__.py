@@ -1,26 +1,18 @@
-"""temp-bench: paper-ready framework for temporal crosscoder evaluation.
+"""temp_bench v2 — paper-ready framework for temporal crosscoder evaluation.
 
-This package is the only code supporting the paper. Everything outside
-``purified/`` (i.e. the wasteland) is reference-only and must not be imported.
+Read ``docs/framework_v2.md`` before touching code. That document is
+the framework's spec.
 
-The framework is built on the principles in ``docs/paper/framework.md``.
-**Read that document before writing any experiment code.**
+Public layout (matches docs/framework_v2.md "Directory layout"):
 
-Public API:
-
-    temp_bench.config          ──  yaml loaders + cache-key computation
-    temp_bench.schemas         ──  Pydantic models (LeaderboardRow, …)
-    temp_bench.cache           ──  checkpoint + leaderboard ops (the only writers)
-    temp_bench.runner          ──  ``run_cell`` — the canonical pathway
-    temp_bench.architectures   ──  locked arch implementations
-    temp_bench.data            ──  toy generators, NLP activation cache
-    temp_bench.training        ──  shared training loop, BrickenConfig
-    temp_bench.eval            ──  metrics + the CaseStudy abstract base
-    temp_bench.case_studies    ──  C5 steering, C6 EM, C7 backtracking
-    temp_bench.plotting        ──  save_figure helper
-    temp_bench.utils           ──  seeding helpers
+    temp_bench.core          ──  runner, cache, schemas, config, trainer, code_version
+    temp_bench.interfaces    ──  TempBenchArch, BatchIter, Evaluator ABCs
+    temp_bench.archs         ──  locked architectures (registry-driven)
+    temp_bench.evals         ──  paper-section evaluators (one per § 4 / § 5.x)
+    temp_bench.data          ──  buffers + synthetic generators + real_lm cache
+    temp_bench.training      ──  bricken (anti-dead resample plug-in)
+    temp_bench.plotting      ──  save_figure helper
+    temp_bench.utils         ──  seed, gpu_locks, shuffles, tokens
 """
 
-from temp_bench import cache, config, runner, schemas  # noqa: F401
-
-__version__ = "0.2.0"
+__version__ = "2.0.0"

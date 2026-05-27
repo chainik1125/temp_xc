@@ -48,7 +48,7 @@ from __future__ import annotations
 
 import torch
 
-from temp_bench.architectures.base import TempBenchArch
+from temp_bench.interfaces.architecture import TempBenchArch
 
 
 def latent_space_steer(

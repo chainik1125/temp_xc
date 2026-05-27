@@ -63,7 +63,7 @@ from typing import Any, Iterable
 import numpy as np
 import torch
 
-from temp_bench.architectures.base import TempBenchArch
+from temp_bench.interfaces.architecture import TempBenchArch
 from temp_bench.utils.shuffles import shuffle_within_window
 
 DEFAULT_S_GRID: tuple[int, ...] = (1, 2, 4, 8, 16, 32)

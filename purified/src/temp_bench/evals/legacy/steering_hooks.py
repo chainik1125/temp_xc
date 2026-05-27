@@ -66,7 +66,7 @@ from typing import Literal
 
 import torch
 
-from temp_bench.architectures.base import TempBenchArch
+from temp_bench.interfaces.architecture import TempBenchArch
 
 SteeringMode = Literal["v0", "v1", "v2", "v4"]
 ALL_MODES: tuple[SteeringMode, ...] = ("v0", "v1", "v2", "v4")
