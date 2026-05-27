@@ -26,6 +26,40 @@ This doc pulls together five source artifacts that live on other branches:
 
 Plus the independent replication: `docs/aniket/experiments/mess3_mat_ablation/summary.md` (2026-04-22).
 
+## README framing (`README.md`)
+
+The experiment's own one-paragraph framing, for orientation before the data:
+
+> How do SAE/crosscoder-family architectures scale as we grow the generator's
+> temporal-structure demand? Benchmarks 7 architectures across
+> δ ∈ {0, 0.05, 0.1, 0.15, 0.2} at r=0 (shared mess3 vocab, no tag tokens),
+> using a YAML-driven runner.
+
+- **Archs benchmarked**: TopK SAE, TXC, MatryoshkaTXC, MultiLayerCrosscoder,
+  TFA (Han), TFA-pos, Temporal BatchTopK SAE — plus dense linear and
+  (early-stopped) dense MLP probes on the residual stream.
+- **Provenance**: a copy-paste port from `sae_day`; the full dependency graph
+  (`NonergodicGenerator`, SAE classes, TFA, driver) is frozen under `vendor/`.
+- **Reproduce**: `uv sync --extra separation-scaling`, then
+  `python -m sae_day.run_driver --config config.yaml` from
+  `experiments/separation_scaling/`. ~95 min on an A40 (5 cells × ~19 min);
+  `transformer.load_if_exists: true` reuses cached transformers on reruns.
+- **Ceiling tooling**: `compute_r2_ceiling.py` (Bayes-optimal R² from the
+  forward filter), `run_window_probe.py` (dense linear + logistic probes at
+  window W), `run_ridge_sweep.py` (ridge λ sweep for W ∈ {20, 30, 60}).
+
+The README's own **Headline** prose (verbatim):
+
+> At δ=0.20 (τ=0.60), MatTXC recovers best_single=0.87 on its best component vs
+> TopK's 0.14 — a 0.73 gap. TFA and TFA-pos come close to TXC at high δ
+> (≈0.38 vs 0.42) but under-perform crosscoders at intermediate δ=0.15 (0.10,
+> 0.16 vs TXC 0.49).
+
+Note the **0.87** quoted here is the *protocol-tuned* MatTXC best-single number,
+not the **0.421** main-config value in the headline table below (see Variant 1
+and the reconciliation table). The README prose and the headline table are
+quoting different MatTXC configurations.
+
 ## Shared setup (all variants)
 
 - **Generator**: `NonergodicGenerator`, `mess3_shared`, `r=0` (shared vocab, no
