@@ -107,14 +107,21 @@ class SyntheticRecovery(Evaluator):
     """§ 4 evaluator: feature recovery AUC + NMSE on synthetic data."""
 
     name = "synthetic_recovery"
-    protocol_version = "1.0.0"
+    # v1.1.0 (2026-05-28): eval now re-materialises with the TRAINING
+    # seed, not seed=0. Fixes a bug where the synthetic generator's
+    # feature directions (deterministic in the seed) differed between
+    # training and eval, making it impossible for dictionary atoms to
+    # match ground-truth features.
+    protocol_version = "1.1.0"
 
     def eval(self, model: TempBenchArch, spec: EvalSpec) -> dict[str, float]:
-        # Re-materialise the dataset from the registry (same seed each
-        # eval call, so feature directions are stable).
+        # Re-materialise the dataset from the registry using the SAME
+        # seed the model was trained on, so the synthetic generator's
+        # feature directions (which depend on the seed) match what the
+        # trained dictionary atoms learned.
         ds = load_datasource(spec.datasource)
-        eval_seed = int(spec.extra.get("eval_seed", 0))
-        data = materialise(ds, seed=eval_seed)
+        seed = int(spec.extra.get("training_seed", spec.extra.get("eval_seed", 0)))
+        data = materialise(ds, seed=seed)
         decoder = _decoder_directions_normed(model)
 
         out: dict[str, float] = {}

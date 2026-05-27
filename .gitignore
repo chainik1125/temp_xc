@@ -46,3 +46,6 @@ purified/checkpoints/*/*.pt
 purified/checkpoints/*/*.safetensors
 purified/checkpoints/local/
 purified/hf_cache/
+
+# Mini-sweep logs
+purified/logs/

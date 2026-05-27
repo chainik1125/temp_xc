@@ -167,11 +167,17 @@ def run_experiment(
 
     # 7) Evaluate.
     from temp_bench.interfaces.evaluator import EvalSpec
+    # Pass training seed into eval extras so the evaluator can
+    # re-materialise the synthetic data with the SAME random
+    # realisation the model was trained on. (Otherwise the trained
+    # dictionary atoms don't match the eval feature directions.)
+    extra = {k: v for k, v in eval_cfg.items() if k != "smoke"}
+    extra.setdefault("training_seed", int(seed))
     spec = EvalSpec(
         datasource=datasource_name,
         data_key=data_key,
         smoke=bool(eval_cfg.get("smoke", False)),
-        extra={k: v for k, v in eval_cfg.items() if k != "smoke"},
+        extra=extra,
     )
     metrics = evaluator.eval(model, spec)
 
