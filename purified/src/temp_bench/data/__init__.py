@@ -1,8 +1,13 @@
-"""Data sources used by the paper.
+"""Data layer for ``temp_bench``.
 
-- :mod:`temp_bench.data.toy`  — synthetic generators (C1: Markov, C2: coupled HMM)
-- :mod:`temp_bench.data.nlp`  — Gemma-2-2b activation cache (C3, C4, C5, C7)
+Two flavors of data, with shared shape contracts:
 
-NLP caching is shared between C3 and C4 (same archs, same seqs). C5 and C7
-build their own caches because they need different sequence handling.
+- ``synthetic`` — toy generators (markov, coupled_hmm). In-memory.
+- ``real_lm``  — activation caches from a subject LLM.
+
+Both produce ``(N, seq_len, d_in)`` tensors of activations. Those feed
+into either an :class:`ActivationBuffer` (token-level shuffle, for
+per-token SAEs) or a :class:`WindowBuffer` (window-level shuffle, for
+window archs like TXC). The buffers implement the
+:class:`temp_bench.interfaces.batch_iter.BatchIter` protocol.
 """

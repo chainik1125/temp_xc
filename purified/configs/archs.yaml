@@ -1,0 +1,172 @@
+# Architecture registry — temp_bench v2.
+#
+# Source of truth for every architecture the paper evaluates. Adding an
+# arch = (1) drop a class in src/temp_bench/archs/ subclassing
+# TempBenchArch + (2) register it here. The runner discovers via the
+# `class_path` import string.
+#
+# Schema (per arch):
+#   <name>:
+#     class_path:      "temp_bench.archs.<file>:<Class>"
+#     arch_version:    "2.0.0"  (semver; bump invalidates trained checkpoints)
+#     category:        sae | tsae | tfa | mlc | txc | sae_arditi | stacked_sae
+#     hparams:         { d_sae: int, k_pos: int, ... }
+#     per_section_hparams:                  # optional per-paper-§ overrides
+#       synthetic:    { d_sae: 40, ... }
+#       probing:      { d_sae: 18432, ... }
+#       em:           { d_sae: 32768, ... }
+#     upstream:        "AI4LIFE-GROUP/temporal-saes@<commit>"  (adapter archs only)
+#     notes:           freeform
+#
+# Cache contract:
+#   train_key = sha256({arch_class, arch_version, hparams,
+#                       seed, training_cfg, data_key})[:16]
+
+archs:
+
+  # ── Ours: locked TXC architectures ──────────────────────────────────
+
+  txc_base:
+    class_path: temp_bench.archs.txc_base:TXCBase
+    arch_version: "2.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+    per_section_hparams:
+      synthetic:  { d_sae: 40 }
+      em:         { d_sae: 32768, k_pos: 25 }
+      backtracking: { d_sae: 32768 }
+    notes: |
+      Vanilla TopK temporal crosscoder (T=5) + tsae_paper anti-dead stack.
+      No matryoshka, no contrastive, no Bricken.
+
+  txc_pro:
+    class_path: temp_bench.archs.txc_pro:TXCPro
+    arch_version: "2.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 10
+      t_sample: 5
+      k_pos: 20
+      n_matryoshka: 8
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      decoder_unit_norm: true
+      decoder_grad_orthogonalize: true
+    per_section_hparams:
+      synthetic:  { d_sae: 40 }
+      backtracking: { d_sae: 32768 }
+    notes: |
+      Subseq encoder (T_max=10, t_sample=5) + matryoshka H=8 +
+      multi-distance InfoNCE contrastive loss + anti-dead.
+
+  # ── Ours: baselines ─────────────────────────────────────────────────
+
+  topk_sae:
+    class_path: temp_bench.archs.topk_sae:TopKSAE
+    arch_version: "2.0.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+    per_section_hparams:
+      synthetic:    { d_sae: 40 }
+      backtracking: { d_sae: 32768 }
+    notes: "Per-token TopK SAE. Vanilla baseline."
+
+  stacked_sae:
+    class_path: temp_bench.archs.stacked_sae:StackedSAE
+    arch_version: "2.0.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 20
+    per_section_hparams:
+      synthetic: { d_sae: 40 }
+    notes: "T independent per-position TopK-SAEs, one per window slot."
+
+  mlc:
+    class_path: temp_bench.archs.mlc:MLC
+    arch_version: "2.0.0"
+    category: mlc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      n_layers: 5
+      center_layer: 13
+    notes: "Multi-layer crosscoder; 5 layers around the center (§ 5.1 probing baseline)."
+
+  sae_arditi:
+    class_path: temp_bench.archs.sae_arditi:SAEArditi
+    arch_version: "2.0.0"
+    category: sae_arditi
+    hparams:
+      d_sae: 32768
+      k_pos: 128
+    per_section_hparams:
+      em: { d_sae: 32768, k_pos: 128 }
+    notes: "SAE-arditi: paper-canonical baseline for § 5.3 emergent misalignment."
+
+  # ── Adapter-wrapped baselines (our adapted port of upstream code) ───
+  # NOTE: these are PORTS of upstream repos, adapted to our framework's
+  # TempBenchArch interface. They are NOT verbatim upstream — the loss,
+  # training hook semantics, and shape conventions were rewritten to fit
+  # the unified trainer. See header comments in each module for the
+  # adaptation provenance + deviations.
+
+  tsae:
+    class_path: temp_bench.archs.tsae:TSAEPaper
+    arch_version: "2.0.0-port"
+    category: tsae
+    upstream: "https://github.com/AI4LIFE-GROUP/temporal-saes (Ye et al. 2025)"
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0    # known deviation: upstream uses 0.1
+    per_section_hparams:
+      synthetic: { d_sae: 40 }
+    notes: |
+      Port of Ye et al. 2025. Known deviations: contrastive_alpha=1.0 vs
+      upstream's 0.1; our trainer wraps the upstream loss instead of
+      using their training loop. See module docstring.
+
+  tfa:
+    class_path: temp_bench.archs.tfa:TFA
+    arch_version: "2.0.0-port"
+    category: tfa
+    upstream: "https://github.com/<TFA-paper-ref> (Marks et al.)"
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      n_heads: 4
+      use_pos_embedding: false
+    per_section_hparams:
+      synthetic: { d_sae: 40 }
+    notes: |
+      Port of TFA reference implementation; Han added a scaling_factor
+      heuristic for real-LM activations (the paper's lam = 1/(4*d_in)
+      assumes ||x|| ~ sqrt(d); real LLM activations are 100-1000× larger).
+
+  tfa_pos:
+    class_path: temp_bench.archs.tfa:TFA
+    arch_version: "2.0.0-port"
+    category: tfa
+    upstream: "https://github.com/<TFA-paper-ref> (Marks et al.)"
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      n_heads: 4
+      use_pos_embedding: true
+    per_section_hparams:
+      synthetic: { d_sae: 40 }
+    notes: "TFA with sinusoidal positional encoding turned on."

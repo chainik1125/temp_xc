@@ -1,0 +1,138 @@
+# Datasource registry — temp_bench v2.
+#
+# Two categories:
+#   - synthetic:  in-memory generators (markov, coupled_hmm)
+#   - real_lm:    activation cache from a subject LLM
+#
+# Schema (per datasource):
+#   <name>:
+#     category: synthetic | real_lm
+#     # real_lm fields:
+#     subject_model:  "google/gemma-2-2b-it"
+#     layer:          13                    # or 'layers: [11, 12, 13, 14, 15]' for MLC
+#     hookpoint:      resid_post
+#     dataset:        fineweb
+#     n_seqs:         24000
+#     seq_len:        128
+#     # synthetic fields:
+#     generator:      "markov" | "coupled" | "temp_bench.data.X:fn"
+#     params:         { K_hidden: 10, M_emissions: 20, d_in: 256, ... }
+#     # both:
+#     notes:          freeform
+#
+# Cache contract:
+#   data_key = sha256(<spec minus notes>)[:16]
+# Identical specs across runs share the same on-disk activation cache.
+
+datasources:
+
+  # ── Synthetic § 4 ──────────────────────────────────────────────────
+
+  synth_smoke:
+    category: synthetic
+    generator: coupled
+    params:
+      K_hidden: 3
+      M_emissions: 4
+      n_parents: 2
+      d_in: 16
+      seq_len: 16
+      n_seqs: 128
+      rho: 0.7
+      pi: 0.05
+      p_B: 1.0
+    notes: "Tiny smoke-test bench (~ms training). Used by --smoke runs."
+
+  toy_markov_n20_d40_noisy:
+    category: synthetic
+    generator: markov
+    params:
+      n_features: 20
+      d_in: 40
+      seq_len: 64
+      n_seqs: 4096
+      rho: 0.7
+      pi: 0.5
+      p_A: 0.0
+      p_B: 0.625
+    notes: |
+      § 4 Denoising bench. 20 independent Markov chains with Bernoulli
+      emission noise. Hidden state recovered via temporal aggregation.
+
+  toy_coupled_K10_M20_d256:
+    category: synthetic
+    generator: coupled
+    params:
+      K_hidden: 10
+      M_emissions: 20
+      n_parents: 2
+      d_in: 256
+      seq_len: 64
+      n_seqs: 4096
+      rho: 0.7
+      pi: 0.05
+      p_B: 1.0
+    notes: |
+      § 4 Coupling bench (Han exp 1c3 setup). K=10 hidden chains drive
+      M=20 emissions through n_parents=2 OR-gated coupling. Tests global
+      (hidden-chain) vs local (emission) feature recovery.
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np10:
+    category: synthetic
+    generator: coupled
+    params:
+      K_hidden: 10
+      M_emissions: 20
+      n_parents: 10
+      d_in: 256
+      seq_len: 64
+      n_seqs: 4096
+      rho: 0.9
+      pi: 0.05
+      p_B: 0.5
+    notes: |
+      § 4 max-overlap regime: TXC-base dominance bench. n_parents=K_hidden,
+      p_B=0.5 emission noise. The headline regime where TXC reaches gAUC≈0.99
+      at k_pos=1 while TopK-SAE drops monotonically.
+
+  # ── Real-LM § 5 ────────────────────────────────────────────────────
+
+  gemma_2_2b_it_l13_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b-it
+    layer: 13
+    hookpoint: resid_post
+    dataset: HuggingFaceFW/fineweb-edu
+    n_seqs: 24000
+    seq_len: 128
+    notes: "§ 5.1 sparse-probing anchor."
+
+  llama_3_1_8b_base_l10_ward_nousmirror:
+    category: real_lm
+    subject_model: NousResearch/Meta-Llama-3.1-8B
+    layer: 10
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    notes: "§ 5.2 backtracking anchor (Llama-3.1-8B BASE, Ward stage B)."
+
+  qwen_2_5_7b_instruct_medical_l15:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 15
+    hookpoint: resid_post
+    dataset: medical_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    notes: "§ 5.3 emergent misalignment anchor (Qwen-7B medical organism)."
+
+  qwen_2_5_14b_instruct_finance_l24:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-14B-Instruct
+    layer: 24
+    hookpoint: resid_post
+    dataset: finance_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    notes: "§ 5.3 emergent misalignment anchor (Qwen-14B finance organism)."
