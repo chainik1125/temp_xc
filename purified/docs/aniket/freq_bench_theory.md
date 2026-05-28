@@ -46,6 +46,36 @@ because the latent process is sticky and the discrimination problem is
 "average out the noise." FreqBench is the controlled extension that
 isolates the *non-DC* part of the temporal-filtering axis.
 
+### The three-way decomposition
+
+FreqBench separates three things that the paper's §4 evaluation
+conflates. Throughout this doc we'll be careful to label which of the
+three a given empirical fact is about.
+
+1. **Temporal aggregation.** Can the architecture average evidence over
+   nearby positions? Solves DC / sticky-state tasks. A per-token SAE
+   plus a multi-position probe already aggregates; an architecture that
+   aggregates better wins these by sample-efficiency, not by filtering.
+
+2. **Temporal filtering.** Can the architecture detect *order, phase,
+   or direction*? Solves AC / Fourier tasks. The cleanest behavioural
+   signature is $A_\text{reverse} < \tfrac{1}{2}$ on a forward-trained
+   linear probe — the probe gets the *flipped* answer with confidence,
+   which is impossible for any aggregator.
+
+3. **Readout visibility.** Did the learned temporal signal survive the
+   sparsity / pooling protocol the evaluation uses? Two distinct failures
+   live here: (a) a probe-class / sparsity-slice mismatch that hides
+   information genuinely present in the trained weights (Section 2 — the
+   $k_\text{pos}{=}10$ artefact), and (b) an architectural pool that
+   discards information before any probe sees it (Section 3 — the joint
+   $T{=}W$ ceiling). Both look like "negative results" until you
+   separate them.
+
+The point of FreqBench is that NTPS plus the order controls
+plus FreqFrac plus a probe-class ablation together pin down which of the
+three is at issue in any given cell. A single NTPS number cannot.
+
 ---
 
 ## 1. What FreqBench's Fourier study is
@@ -195,25 +225,35 @@ $$
 = \frac{c^2}{\|\boldsymbol{\eta}\|^2}.
 $$
 
-**Signal scaling.** The signal amplitude $c$ depends on whether the
-TopK-kept atoms include the direction-discriminating ones. At
-$k_\text{pos} = 1$ the surviving atom *is* the highest-magnitude
-discriminative one (the encoder was trained to make this true via the
-reconstruction loss + sparsity). As $k_\text{pos}$ grows, the
-discriminative atom remains in the top-$k$ but its relative weight
-inside the mean-pooled code shrinks as $\mathcal{O}(1/k_\text{pos})$.
+The decay is best framed in terms of the **finite-sample variance** of
+the linear probe, not a Bayes-optimal SNR.
 
-**Nuisance scaling.** The newly included atoms are non-discriminative
-phase-identity atoms; they contribute to $\|\boldsymbol{\eta}\|^2$ with
-weight $\mathcal{O}(k_\text{pos})$ in expectation.
+At $k_\text{pos} = 1$, TopK forwards essentially one atom per token, and
+the encoder was trained (under reconstruction + sparsity loss) to make
+the surviving atom one of the most discriminative for the input — so the
+sparse code at $k_\text{pos} = 1$ is approximately a one-hot indicator
+in a low-dimensional subspace that already contains the discriminating
+direction $\hat{\mathbf{v}}_y$. The mean-pooled code has small effective
+dimension and the probe has lots of variance to spend on $\hat{\mathbf{v}}_y$.
 
-Hence
-$$
-\mathrm{SNR}_y(k_\text{pos})
-\sim \frac{(1/k_\text{pos})^2}{k_\text{pos}}
-= \mathcal{O}(k_\text{pos}^{-3}),
-$$
-and the linear-probe NTPS decays rapidly with $k_\text{pos}$.
+At larger $k_\text{pos}$ the additional kept atoms are mostly
+phase-identity atoms — the dominant variance direction of the input is
+"which phase appeared," not "which direction it moved." Those atoms
+inflate $\|\boldsymbol{\eta}\|^2$ without changing the (small) projection
+onto $\hat{\mathbf{v}}_y$. A regularised linear probe trained on a
+finite sample fits the high-variance phase-identity coordinates first
+and the small direction signal last; with the sample sizes here
+(~1250 sequences per cell) and standard $L_2$-regularised logistic
+regression, the small direction signal is under-fit. Hence the
+linear-probe NTPS decays sharply with $k_\text{pos}$.
+
+The point is not a closed-form scaling rate — it is that the *protocol*
+(finite-sample regularised linear probe on a mean-pooled code) trades
+direction sensitivity for $k_\text{pos}$ even when the trained encoder
+has not changed. With an unrestricted probe (Section 3.5 below confirms
+this on the joint-vs-sliding cells) or a larger training set, the same
+code would yield a smaller decay. The
+information is in the weights; the protocol hides it.
 
 ### 2.2 Why weight-space order-sensitivity does NOT
 
@@ -313,6 +353,17 @@ The encoder atoms become *more* order-sensitive as $W$ grows — the
 representation is correct and improving. Therefore the failure is **(P)**,
 not (R).
 
+> **Lemma (high FreqFrac ⇏ readable direction).** Weight-space
+> order-sensitivity of $W_\text{enc}$ is necessary but not sufficient
+> for direction encoding at the level of the pooled code. The cleanest
+> empirical witness is `txc_base_perpos_TW` at $W=16$, $d_\text{sae}=1024$:
+> FreqFrac $= 0.897$ — the *highest* of any architecture in this study —
+> and yet NTPS $= 0.026$, $A_\text{reverse} = 0.49$. Per-position TopK
+> trains atoms that maximally devote energy to nonzero temporal
+> frequencies and then pools them into a code that is direction-symmetric
+> by construction (Section 3.4). The encoder weights know about
+> transitions; the pooled code does not.
+
 ### 3.4 Why per-position TopK was the wrong fix
 
 If the joint pool is the bottleneck, the natural fix is to drop it: same
@@ -347,12 +398,26 @@ $\bar{\mathbf{z}}(\mathbf{X}) = \tfrac{1}{T} \sum_t \mathrm{TopK}(W \mathbf{x}_t
 The pooled code reduces to a **histogram** of the per-token codes — which
 is identical for $\mathbf{X}$ and $\mathbf{X}^{\mathrm{rev}}$. $\square$
 
-The translation-invariance assumption is what empirically obtains under
-training on AC: the AC label $\mathrm{sign}(v)$ provides no positional
-gradient signal that would force $W_\text{enc}^{(t)}$ to differ across
-$t$ (a forward and a reversed sequence visit the same phase histogram —
-see Section 1.2), so the trained encoder is approximately translation-
-invariant and the pool becomes order-symmetric.
+The translation-invariance assumption is **not a property of the
+architecture** — it is a property of the **training-dynamics fixed point**
+under a direction-symmetric training distribution. The loss is
+reconstruction MSE per position; both forward and reversed sequences
+visit the same multiset of phases (Section 1.2), so the per-position
+reconstruction targets are statistically interchangeable under the
+$t \leftrightarrow T{-}1{-}t$ swap. Gradient descent has no signal that
+would force $W_\text{enc}^{(t)}$ to differ across $t$, and approximate
+translation-invariance is what training converges to.
+
+Under a different training distribution where direction were correlated
+with absolute position (e.g. only forward sequences in training, or a
+label that depends explicitly on which positions phase changes happen
+at), per-position TopK could in principle encode direction. So the
+per-pos result is not "this architecture cannot represent direction"
+— it is "this architecture cannot LEARN to represent direction under
+direction-symmetric training." That is what makes the result
+informative: it pins where the AC information actually lives in the
+joint architecture — in the **sum-before-TopK** of position-aware
+weights, not in the per-position weights alone.
 
 The joint variant escapes this trap precisely because it computes the
 pre-activation $\mathrm{pre} = \sum_\tau W_\text{enc}^{(\tau)}
@@ -363,7 +428,51 @@ per-position sums commuting with the pool. So the joint encoder retains
 slightly below chance), even though the single-shot pool limits how much
 the probe can extract.
 
-### 3.5 The position-mixing / sliding decomposition
+### 3.5 The joint $T=W$ ceiling is architectural, not readout
+
+The "readout failure" diagnosis of Section 3.2 was coarse — it conflated
+two distinct failure modes that the three-way decomposition above
+labels separately:
+
+- **3a)** Probe-class / sparsity-slice mismatch hiding information present
+  in the trained code. Fixable by changing the probe or the slice
+  *without* retraining. Section 2 is an instance.
+- **3b)** Architectural pool discarding information before any probe sees
+  it. Not fixable by probe class; only retraining with a different pool
+  can recover it.
+
+The MLP probe ablation tells us which one joint $T=W$ is. The
+1.2.0 evaluator runs both a linear and a small MLP probe on the *same*
+mean-pooled code; the gap measures how much information the linear probe
+was leaving on the table. At the strong cell ($W=16$, $k_\text{pos}=1$,
+$d_\text{sae}=1024$):
+
+| arch | NTPS (linear) | NTPS (MLP) | lift |
+|---|---|---|---|
+| `regular_sae` (per-token) | 0.01 | 0.03 | +0.02 |
+| `txc_base_perpos_TW` | 0.03 | 0.04 | +0.01 |
+| `txc_base_TW` (joint) | 0.17 | 0.19 | +0.01 |
+| `txcdr_t2` (sliding T=2) | 0.51 | 0.53 | +0.02 |
+| `txcdr_t5` (sliding T=5) | 0.72 | 0.78 | +0.06 |
+
+![Linear vs MLP probe — joint vs sliding](../../results/freq_bench/v2_sweep/joint_vs_sliding_mlp.png)
+
+The MLP lift is small everywhere ($\le 0.06$) and **does not close the
+joint-vs-sliding gap**: joint $T=W$ goes 0.17 → 0.19, sliding $T=5$ goes
+0.72 → 0.78, the gap is 0.55 (linear) vs 0.59 (MLP). The information
+that the sliding probe sees is *not in the joint code at all* — no
+nonlinearity on top can synthesise it. So the joint $T=W$ ceiling is
+**case (3b)**: a genuine architectural information loss in the pool,
+not a probe-class artefact.
+
+This is the falsification ChatGPT's read of the result missed when it
+folded the sparsity-slice issue and the joint $T=W$ ceiling into a
+single "readout-visibility" bucket. They look superficially similar but
+have opposite implications for fixing them: case (3a) is fixable by
+re-running the analysis with a better probe or sparsity setting; case
+(3b) is only fixable by changing the architecture.
+
+### 3.6 The position-mixing / sliding decomposition
 
 The right way to read these three architectures is along two binary axes.
 
@@ -446,7 +555,7 @@ FreqBench's AC bench surfaces.
 
 ## 5. Open questions
 
-1. **Mixed-bench frequency response.** The decomposition in Section 3.5
+1. **Mixed-bench frequency response.** The decomposition in Section 3.6
    predicts that the architecture's frequency response $R(\omega)$ on
    the Mixed bench will be sharper for the sliding variant than for the
    joint $T=W$ variant at every $\omega$. To test.

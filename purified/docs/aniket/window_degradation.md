@@ -10,13 +10,11 @@ tags:
 
 ## Window-size degradation in `txc_base T=W` — diagnosis + fix
 
-Dmitry observed (quote, 2026-05-28): *"Urgh the degradation with window
-size seems like it should be so solvable!"*
-
-He's right — and "so solvable" turns out to be the literal one-axis change.
-This doc tracks the investigation live: what's wrong with the joint-window
-TopK encoder, what's not, and what fixes it. Results are appended as the
-sweeps land.
+The joint-window-TopK variant of TXC-base (T set equal to the eval window
+W) shows a peculiar failure on the AC bench: probe accuracy stays pinned
+near chance as W grows, while sliding-T variants climb to NTPS ≈ 0.72 at
+the same cell. This doc tracks the investigation: what's wrong with the
+joint pool, what's not, and what fixes it.
 
 ### TL;DR
 
