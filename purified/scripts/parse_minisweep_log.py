@@ -14,7 +14,7 @@ from pathlib import Path
 
 LINE = re.compile(
     r"\[\s*\d+/\d+\]\s+(\S+)\s+(\S+)\s+k=(\d+)\s+\.\.\.\s+"
-    r"(?:eAUC=([\d.]+)\s+gAUC=([\d.]+)\s+NMSE=([\d.]+)|FAIL)"
+    r"(?:eAUC=([\d.]+)\s+gAUC=([\d.]*)\s+NMSE=([\d.]+)|FAIL)"
 )
 
 
@@ -33,8 +33,11 @@ def parse(path: Path) -> dict:
             failures.append(f"{arch} {bench} k={k}")
             continue
         bench_short = bench.replace("toy_", "").replace("_", " ")
+        # gAUC is empty for benches without hidden_features (e.g. markov);
+        # store NaN-as-None so render can show "—".
+        gauc_val = float(gauc) if gauc else None
         by_bench[bench_short][arch][int(k)] = (
-            float(eauc), float(gauc), float(nmse),
+            float(eauc), gauc_val, float(nmse),
         )
     return {"by_bench": dict(by_bench), "failures": failures}
 
@@ -50,7 +53,7 @@ def render_md(parsed: dict) -> str:
     for bench, archs in parsed["by_bench"].items():
         out.append(f"## {bench}\n")
         all_ks = sorted({k for arch_data in archs.values() for k in arch_data})
-        for metric_idx, metric_name in enumerate(["gAUC", "eAUC", "NMSE"]):
+        for metric_idx, metric_name in enumerate(["eAUC", "gAUC", "NMSE"]):
             out.append(f"### {metric_name}")
             header = "| arch | " + " | ".join(f"k={k}" for k in all_ks) + " |"
             sep = "|---|" + "---|" * len(all_ks)
@@ -61,7 +64,7 @@ def render_md(parsed: dict) -> str:
                 for k in all_ks:
                     if k in archs[arch]:
                         val = archs[arch][k][metric_idx]
-                        row.append(f"{val:.3f}")
+                        row.append(f"{val:.3f}" if val is not None else "—")
                     else:
                         row.append("—")
                 out.append("| " + " | ".join(row) + " |")

@@ -73,9 +73,10 @@ class StackedSAE(TempBenchArch):
 
 
     # v2 framework attrs (added during arxiv migration).
-    # consumes='window': v1 port: takes (B, T, d_in) windows directly; T per-position SAEs
+    # consumes='sequence': train_step does internal T-window sampling on
+    # (B, seq_len, d_in) batches; needs full sequences.
     arch_version: str = "2.0.0"
-    consumes: str = 'window'
+    consumes: str = 'sequence'
 
     def __init__(self, *, d_in: int, d_sae: int, k_pos: int, T: int = 5):
         nn.Module.__init__(self)

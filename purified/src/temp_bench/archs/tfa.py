@@ -65,7 +65,15 @@ class TFA(TempBenchArch):
         self._d_sae = d_sae
         self._T = T
         self.k_pos = k_pos
-        self.k_win = k_pos * T  # window-level L0; passed to TemporalSAE.kval_topk
+        # Clip at d_sae for toy benches where k_pos * T can exceed dict size.
+        self.k_win = min(k_pos * T, d_sae)
+        if k_pos * T > d_sae:
+            import warnings
+            warnings.warn(
+                f"TFA: k_win clipped {k_pos * T} → {d_sae} "
+                f"(d_sae={d_sae}, k_pos={k_pos}, T={T})",
+                stacklevel=2,
+            )
 
         # Adjust bottleneck_factor so dimin (=d_sae) is divisible by it × n_heads.
         # ManualAttention asserts `dimin % (bottleneck_factor * n_heads) == 0`.

@@ -145,8 +145,16 @@ class TXCPro(TempBenchArch):
         self.T_max = T_max
         self.t_sample = t_sample
         self.k_pos = k_pos
-        self.k_train = k_pos * t_sample              # window TopK at train time
-        self.k_inference = k_pos * T_max             # window TopK at probe time
+        # Clip at d_sae for toy benches where k_pos * T can exceed dict size.
+        self.k_train = min(k_pos * t_sample, d_sae)
+        self.k_inference = min(k_pos * T_max, d_sae)
+        if k_pos * t_sample > d_sae:
+            import warnings
+            warnings.warn(
+                f"TXCPro: k_train clipped {k_pos * t_sample} → {d_sae} "
+                f"(d_sae={d_sae}, k_pos={k_pos}, t_sample={t_sample})",
+                stacklevel=2,
+            )
         self.shifts = tuple(int(s) for s in contrastive_shifts)
         self.contrastive_alpha = float(contrastive_alpha)
         if contrastive_inverse_distance_weight:

@@ -69,10 +69,24 @@ def _reconstruction_nmse(
     n_batches: int = 4,
     batch_size: int = 256,
 ) -> float:
-    """E[||x - x_hat||^2] / E[||x||^2]."""
+    """E[||x - x_hat||^2] / E[||x||^2].
+
+    Shape handling: the trained arch's ``consumes`` mode tells us what
+    shape to feed it. For window/sequence archs, sample a window of
+    the appropriate length. For token archs, flatten.
+    """
     device = next(model.parameters()).device
     n_total = x_eval.shape[0]
     rng = np.random.default_rng(0)
+
+    # Inference shape contract:
+    # - token archs (consumes="token"): (B, d_in) per sample (flat tokens)
+    # - window/sequence archs: (B, T, d_in) windows. T is the arch's
+    #   inference window size, exposed via model.config.T.
+    consumes = getattr(model, "consumes", "token")
+    T = int(getattr(model.config, "T", 1) or 1)
+    if consumes == "token":
+        T = 1   # tokens are window-of-1
 
     num = 0.0
     den = 0.0
@@ -80,23 +94,21 @@ def _reconstruction_nmse(
     with torch.no_grad():
         for _ in range(n_batches):
             idx = rng.integers(0, n_total, size=batch_size)
-            x = x_eval[idx].to(device, dtype=torch.float32)
-            T = getattr(model, "_T", 1) or 1
+            x = x_eval[idx].to(device, dtype=torch.float32)   # (B, seq_len, d_in)
             if T > 1 and x.shape[1] >= T:
-                # window archs: take random T-window per row
+                # Sample random T-window per row.
                 offsets = torch.randint(0, x.shape[1] - T + 1, (x.shape[0],), device=device)
                 rng_t = torch.arange(T, device=device)
                 pos_grid = offsets.unsqueeze(1) + rng_t.unsqueeze(0)
                 bidx = torch.arange(x.shape[0], device=device).unsqueeze(1).expand(-1, T)
                 x = x[bidx, pos_grid]                        # (B, T, d_in)
-            elif x.dim() == 3:
-                # token-mode: flatten
-                x = x.reshape(-1, x.shape[-1])
+            else:
+                # Token mode: flatten (B, seq_len, d_in) → (B*seq_len, d_in)
+                if x.dim() == 3:
+                    x = x.reshape(-1, x.shape[-1])
             try:
                 x_hat = model(x)
             except Exception:
-                # Some archs need explicit encode→decode (e.g. those that
-                # branch on shape). Reshape and retry.
                 x_hat = model.decode(model.encode(x))
             num += float((x - x_hat).pow(2).sum().item())
             den += float(x.pow(2).sum().item())
