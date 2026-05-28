@@ -1,0 +1,93 @@
+{
+  "n_rows": 56,
+  "protocol": "1.2.0",
+  "cells": {
+    "regular_sae": {
+      "d_sae=40": {
+        "peak_NTPS": 0.051,
+        "cell": "W=2,raw_k=2",
+        "A": 0.526,
+        "A_shuffle": 0.526,
+        "A_reverse": 0.526,
+        "NTPS_mlp": 0.024,
+        "freqfrac": null
+      },
+      "d_sae=256": {
+        "peak_NTPS": 0.002,
+        "cell": "W=16,raw_k=1",
+        "A": 0.501,
+        "A_shuffle": 0.501,
+        "A_reverse": 0.501,
+        "NTPS_mlp": 0.01,
+        "freqfrac": null
+      },
+      "d_sae=1024": {
+        "peak_NTPS": 0.005,
+        "cell": "W=16,raw_k=1",
+        "A": 0.502,
+        "A_shuffle": 0.502,
+        "A_reverse": 0.502,
+        "NTPS_mlp": 0.03,
+        "freqfrac": null
+      }
+    },
+    "txcdr_t2": {
+      "d_sae=40": {
+        "peak_NTPS": 0.371,
+        "cell": "W=16,raw_k=2",
+        "A": 0.686,
+        "A_shuffle": 0.485,
+        "A_reverse": 0.33,
+        "NTPS_mlp": 0.315,
+        "freqfrac": 0.505
+      },
+      "d_sae=256": {
+        "peak_NTPS": 0.443,
+        "cell": "W=16,raw_k=1",
+        "A": 0.722,
+        "A_shuffle": 0.488,
+        "A_reverse": 0.273,
+        "NTPS_mlp": 0.461,
+        "freqfrac": 0.498
+      },
+      "d_sae=1024": {
+        "peak_NTPS": 0.514,
+        "cell": "W=16,raw_k=1",
+        "A": 0.757,
+        "A_shuffle": 0.499,
+        "A_reverse": 0.23,
+        "NTPS_mlp": 0.533,
+        "freqfrac": 0.498
+      }
+    },
+    "txcdr_t5": {
+      "d_sae=40": {
+        "peak_NTPS": 0.298,
+        "cell": "W=16,raw_k=1",
+        "A": 0.649,
+        "A_shuffle": 0.485,
+        "A_reverse": 0.366,
+        "NTPS_mlp": 0.312,
+        "freqfrac": 0.74
+      },
+      "d_sae=256": {
+        "peak_NTPS": 0.586,
+        "cell": "W=16,raw_k=1",
+        "A": 0.793,
+        "A_shuffle": 0.501,
+        "A_reverse": 0.212,
+        "NTPS_mlp": 0.587,
+        "freqfrac": 0.727
+      },
+      "d_sae=1024": {
+        "peak_NTPS": 0.717,
+        "cell": "W=16,raw_k=1",
+        "A": 0.858,
+        "A_shuffle": 0.506,
+        "A_reverse": 0.123,
+        "NTPS_mlp": 0.781,
+        "freqfrac": 0.704
+      }
+    }
+  }
+}

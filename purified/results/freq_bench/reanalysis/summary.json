@@ -1,0 +1,212 @@
+{
+  "note": "Re-analysis of Dmitry FreqBench 2026-05-06. NTPS faceted by raw_k + shuffle/reverse order-controls.",
+  "benches": {
+    "DC": {
+      "peak_NTPS_rawk10": {
+        "regular_sae": 0.021,
+        "txcdr_t2": 0.954,
+        "txcdr_t5": 0.922,
+        "txc_base": 0.888,
+        "tfa": 1.015,
+        "tsae_attn": 1.014,
+        "tsae_bhalla": -0.004
+      }
+    },
+    "AC": {
+      "peak_NTPS_by_rawk": {
+        "regular_sae": {
+          "raw_k=1": 0.026,
+          "raw_k=2": 0.07,
+          "raw_k=5": 0.048,
+          "raw_k=10": 0.019,
+          "raw_k=20": 0.038
+        },
+        "txcdr_t2": {
+          "raw_k=1": 0.422,
+          "raw_k=2": 0.259,
+          "raw_k=5": 0.226,
+          "raw_k=10": 0.131,
+          "raw_k=20": 0.08
+        },
+        "txcdr_t5": {
+          "raw_k=1": 0.421,
+          "raw_k=2": 0.309,
+          "raw_k=5": 0.202,
+          "raw_k=10": 0.11,
+          "raw_k=20": 0.074
+        },
+        "txc_base": {
+          "raw_k=1": 0.13,
+          "raw_k=2": 0.083,
+          "raw_k=5": 0.11,
+          "raw_k=10": 0.05,
+          "raw_k=20": 0.053
+        },
+        "tfa": {
+          "raw_k=1": 0.323,
+          "raw_k=2": 0.142,
+          "raw_k=5": 0.138,
+          "raw_k=10": 0.062,
+          "raw_k=20": 0.046
+        },
+        "tsae_attn": {
+          "raw_k=1": 0.272,
+          "raw_k=2": 0.214,
+          "raw_k=5": 0.091,
+          "raw_k=10": 0.034,
+          "raw_k=20": 0.027
+        },
+        "tsae_bhalla": {
+          "raw_k=1": 0.04,
+          "raw_k=2": 0.04,
+          "raw_k=5": 0.019,
+          "raw_k=10": 0.019,
+          "raw_k=20": 0.035
+        }
+      },
+      "order_controls_at_peak": {
+        "regular_sae": {
+          "cell": "W=16,raw_k=2,\u03c3=0.25",
+          "NTPS": 0.07,
+          "A": 0.535,
+          "A_shuffle": 0.51,
+          "A_reverse": 0.516
+        },
+        "txcdr_t2": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "NTPS": 0.422,
+          "A": 0.711,
+          "A_shuffle": 0.47,
+          "A_reverse": 0.276
+        },
+        "txcdr_t5": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "NTPS": 0.421,
+          "A": 0.71,
+          "A_shuffle": 0.495,
+          "A_reverse": 0.283
+        },
+        "txc_base": {
+          "cell": "W=16,raw_k=1,\u03c3=0.25",
+          "NTPS": 0.13,
+          "A": 0.565,
+          "A_shuffle": 0.512,
+          "A_reverse": 0.463
+        },
+        "tfa": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "NTPS": 0.323,
+          "A": 0.662,
+          "A_shuffle": 0.497,
+          "A_reverse": 0.35
+        },
+        "tsae_attn": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "NTPS": 0.272,
+          "A": 0.636,
+          "A_shuffle": 0.493,
+          "A_reverse": 0.388
+        },
+        "tsae_bhalla": {
+          "cell": "W=2,raw_k=2,\u03c3=0.1",
+          "NTPS": 0.04,
+          "A": 0.52,
+          "A_shuffle": 0.514,
+          "A_reverse": 0.499
+        }
+      }
+    },
+    "Mixed_unsigned": {
+      "best_order_gap": {
+        "regular_sae": {
+          "cell": "W=4,raw_k=2,\u03c3=0.1",
+          "order_gap": 0.028,
+          "A": 0.106,
+          "A_shuffle": 0.078
+        },
+        "txcdr_t2": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "order_gap": 0.037,
+          "A": 0.247,
+          "A_shuffle": 0.21
+        },
+        "txcdr_t5": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "order_gap": 0.14,
+          "A": 0.3,
+          "A_shuffle": 0.16
+        },
+        "txc_base": {
+          "cell": "W=16,raw_k=10,\u03c3=0.1",
+          "order_gap": 0.032,
+          "A": 0.132,
+          "A_shuffle": 0.1
+        },
+        "tfa": {
+          "cell": "W=4,raw_k=1,\u03c3=0.1",
+          "order_gap": 0.022,
+          "A": 0.13,
+          "A_shuffle": 0.109
+        },
+        "tsae_attn": {
+          "cell": "W=8,raw_k=5,\u03c3=0.1",
+          "order_gap": 0.009,
+          "A": 0.142,
+          "A_shuffle": 0.133
+        },
+        "tsae_bhalla": {
+          "cell": "W=4,raw_k=5,\u03c3=0.1",
+          "order_gap": 0.022,
+          "A": 0.118,
+          "A_shuffle": 0.096
+        }
+      }
+    },
+    "Mixed_signed": {
+      "best_order_gap": {
+        "regular_sae": {
+          "cell": "W=16,raw_k=10,\u03c3=0.1",
+          "order_gap": 0.022,
+          "A": 0.067,
+          "A_shuffle": 0.045
+        },
+        "txcdr_t2": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "order_gap": 0.055,
+          "A": 0.151,
+          "A_shuffle": 0.096
+        },
+        "txcdr_t5": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "order_gap": 0.107,
+          "A": 0.168,
+          "A_shuffle": 0.061
+        },
+        "txc_base": {
+          "cell": "W=8,raw_k=5,\u03c3=0.1",
+          "order_gap": 0.018,
+          "A": 0.07,
+          "A_shuffle": 0.053
+        },
+        "tfa": {
+          "cell": "W=16,raw_k=1,\u03c3=0.1",
+          "order_gap": 0.026,
+          "A": 0.101,
+          "A_shuffle": 0.075
+        },
+        "tsae_attn": {
+          "cell": "W=4,raw_k=10,\u03c3=0.25",
+          "order_gap": 0.007,
+          "A": 0.063,
+          "A_shuffle": 0.056
+        },
+        "tsae_bhalla": {
+          "cell": "W=16,raw_k=1,\u03c3=0.25",
+          "order_gap": 0.013,
+          "A": 0.056,
+          "A_shuffle": 0.043
+        }
+      }
+    }
+  }
+}
