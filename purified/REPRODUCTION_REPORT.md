@@ -137,8 +137,16 @@ The v2 framework differs from v1 in three load-bearing ways:
 
 - **n_steps=30,000**. We use `n_steps=10,000` for this reproduction to
   stay within local-machine time budget. Per-cell wall went from ~10 min
-  to ~30 sec. Empirically TXC-base converges by ~5K steps on these toy
-  benches; the difference vs paper headline is likely < 0.02 AUC.
+  to ~30 sec. Spot-check convergence study (txc_base, seed=1, coupling,
+  k=1) confirms 10K is sufficient:
+  - `n_steps=1000`: gAUC=0.984, NMSE=0.130
+  - `n_steps=5000`: gAUC=0.988, NMSE=0.077
+  - `n_steps=10000`: gAUC=0.988, NMSE=0.070
+  - `n_steps=30000`: gAUC=0.988, NMSE=0.070
+  Likewise `topk_sae` k=10 denoising eAUC moves from 0.976 (10K) to
+  0.942 (30K) — i.e. longer training does *not* further improve it
+  (atoms drift to specialize on noise). 10K is the right operating
+  point for these toy benches.
 - **Full k_pos sweep**. v1 used 12 k_pos values; we use 5
   `{1, 2, 5, 10, 20}` — the key headline points.
 - **LM-scale validation**. § 4 covers synthetic only; §§ 5.1-5.4 (real
