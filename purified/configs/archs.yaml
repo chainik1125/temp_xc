@@ -170,3 +170,12 @@ archs:
     per_section_hparams:
       synthetic: { d_sae: 40 }
     notes: "TFA with sinusoidal positional encoding turned on."
+
+  txc_base_perpos:
+    class_path: temp_bench.archs.txc_base_perpos:TXCBasePerPos
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 1024
+      k_pos: 1
+      T: 16

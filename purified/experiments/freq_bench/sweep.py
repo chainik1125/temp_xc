@@ -44,12 +44,13 @@ SEED = 0
 
 
 def build_cells() -> list[dict]:
-    """Full raw_k×W cross at d_sae=40 + a focused capacity slice.
+    """Full raw_k×W cross at d_sae=40 + capacity slice + txc_base T=W slice.
 
     The full cross at Dmitry's capacity (40) answers the core question
     (raw_k facet + order controls). The capacity slice (W=16, raw_k=1, the
-    strongest cell) tests whether a wider dictionary lifts the AC signal —
-    without paying for a full second cross.
+    strongest cell) tests whether a wider dictionary lifts the AC signal.
+    The txc_base T=W slice probes the "window-size degradation" puzzle:
+    Dmitry's plotted joint-window-topk variant where T grows with W.
     """
     cells, seen = [], set()
 
@@ -70,6 +71,17 @@ def build_cells() -> list[dict]:
     # capacity slice @ strongest cell (W=16, raw_k=1)
     for (label, arch, T), dsae in itertools.product(ARCH_CFGS, [256, 1024]):
         add(label, arch, T, 16, 1, dsae)
+    # txc_base T=W (joint-window topk) capacity slice — the variant whose
+    # forward probe accuracy degrades with W in Dmitry's data.
+    for W, dsae in itertools.product(sorted(W_DATASOURCES), [40, 256, 1024]):
+        add("txc_base_TW", "txc_base", W, W, 1, dsae)
+    # txc_base PER-POSITION TopK at T=W. Same encoder shape as txc_base_TW
+    # but the topk is applied per-position (each of T positions gets its
+    # own k_pos atoms) instead of jointly across the window. Tests whether
+    # removing the joint pool — without changing the encoder — restores
+    # the linear-probe NTPS.
+    for W, dsae in itertools.product(sorted(W_DATASOURCES), [40, 256, 1024]):
+        add("txc_base_perpos_TW", "txc_base_perpos", W, W, 1, dsae)
     return cells
 
 

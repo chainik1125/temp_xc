@@ -59,13 +59,18 @@ def _codes_per_position(model: TempBenchArch, x: torch.Tensor) -> torch.Tensor:
     T = int(model.T)
     if W < T:
         raise ValueError(f"freq_bench: W={W} < arch T={T}; widen seq_len.")
-    pos = []
+    codes = []
     for s in range(W - T + 1):
-        zc = model.encode(x[:, s:s + T])                     # (N,1,d_sae)/(N,d_sae)
-        if zc.dim() == 3:
-            zc = zc.squeeze(1)
-        pos.append(zc)
-    return torch.stack(pos, dim=1)                           # (N, n_pos, d_sae)
+        zc = model.encode(x[:, s:s + T])
+        # Normalise to (N, n_pos_per_window, d_sae). Window-level archs
+        # return (N, d_sae) or (N, 1, d_sae) — n_pos_per_window=1. Per-
+        # position archs (e.g. txc_base_perpos) return (N, T, d_sae) —
+        # n_pos_per_window=T. Concatenating along the position axis works
+        # uniformly for both.
+        if zc.dim() == 2:
+            zc = zc.unsqueeze(1)
+        codes.append(zc)
+    return torch.cat(codes, dim=1)                           # (N, n_pos, d_sae)
 
 
 def _pool_mean(z: torch.Tensor) -> np.ndarray:
