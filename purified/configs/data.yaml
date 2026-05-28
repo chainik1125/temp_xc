@@ -136,3 +136,58 @@ datasources:
     n_seqs: 6000
     seq_len: 128
     notes: "§ 5.3 emergent misalignment anchor (Qwen-14B finance organism)."
+
+  # ── FreqBench (§4 temporal-filtering stress test) ──────────────────────
+  # Reconstruction of Dmitry's 2026-05-06 suite. generator returns labelled
+  # sequences; the freq_bench evaluator probes the SAE code with order
+  # controls. One datasource per (bench, W, σ). Sparsity (raw_k) is swept
+  # via --k-pos / arch_hparams_override, NOT the datasource.
+
+  fb_ac_smoke:
+    category: synthetic
+    generator: "temp_bench.data.freq_bench_data:freq_bench_ac"
+    seq_len: 4
+    params: { bench: ac, W: 4, sigma: 0.1, M: 8, omega: 1, d_in: 32, n_seqs: 256 }
+    notes: "Tiny AC smoke cell."
+
+  fb_dc_W8_p65_s10:
+    category: synthetic
+    generator: "temp_bench.data.freq_bench_data:freq_bench_dc"
+    seq_len: 8
+    params: { bench: dc, W: 8, p: 0.65, sigma: 0.1, d_in: 256, n_seqs: 4096 }
+    notes: "DC bench, W=8, p=0.65, σ=0.1."
+
+  fb_ac_W2_s10:
+    category: synthetic
+    generator: "temp_bench.data.freq_bench_data:freq_bench_ac"
+    seq_len: 2
+    params: { bench: ac, W: 2, sigma: 0.1, M: 32, omega: 1, d_in: 256, n_seqs: 4096 }
+    notes: "AC bench, W=2, σ=0.1."
+
+  fb_ac_W4_s10:
+    category: synthetic
+    generator: "temp_bench.data.freq_bench_data:freq_bench_ac"
+    seq_len: 4
+    params: { bench: ac, W: 4, sigma: 0.1, M: 32, omega: 1, d_in: 256, n_seqs: 4096 }
+    notes: "AC bench, W=4, σ=0.1."
+
+  fb_ac_W8_s10:
+    category: synthetic
+    generator: "temp_bench.data.freq_bench_data:freq_bench_ac"
+    seq_len: 8
+    params: { bench: ac, W: 8, sigma: 0.1, M: 32, omega: 1, d_in: 256, n_seqs: 4096 }
+    notes: "AC bench, W=8, σ=0.1."
+
+  fb_ac_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.freq_bench_data:freq_bench_ac"
+    seq_len: 16
+    params: { bench: ac, W: 16, sigma: 0.1, M: 32, omega: 1, d_in: 256, n_seqs: 4096 }
+    notes: "AC bench, W=16, σ=0.1 (the strong cell in the re-analysis)."
+
+  fb_mixed_unsigned_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.freq_bench_data:freq_bench_mixed"
+    seq_len: 16
+    params: { bench: mixed_unsigned, W: 16, sigma: 0.1, M: 127, n_classes: 10, d_in: 256, n_seqs: 4096 }
+    notes: "Mixed unsigned bench, Ω10, W=16, σ=0.1."

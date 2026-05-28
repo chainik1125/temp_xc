@@ -218,6 +218,7 @@ def run_experiment(
 
 _EVALUATOR_REGISTRY = {
     "synthetic":    "temp_bench.evals.synthetic_recovery:SyntheticRecovery",
+    "freq_bench":   "temp_bench.evals.freq_bench:FreqBenchEval",
     "probing":      "temp_bench.evals.probing:ProbingEval",
     "backtracking": "temp_bench.evals.backtracking:BacktrackingEval",
     "em":           "temp_bench.evals.em:EmergentMisalignmentEval",

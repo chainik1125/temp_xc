@@ -70,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     # Per-section experiment subparsers (extra args delegated to entry-point).
-    for name in ("synthetic", "probing", "backtracking", "em", "rlhf"):
+    for name in ("synthetic", "freq_bench", "probing", "backtracking", "em", "rlhf"):
         _experiment_subparser(sub, name)
 
     # Sweep subparser
@@ -93,7 +93,7 @@ def main(argv: list[str] | None = None) -> int:
 
     args, extra = parser.parse_known_args(argv)
 
-    if args.command in {"synthetic", "probing", "backtracking", "em", "rlhf"}:
+    if args.command in {"synthetic", "freq_bench", "probing", "backtracking", "em", "rlhf"}:
         return _dispatch_experiment(args, extra)
     elif args.command == "sweep":
         return _dispatch_sweep(args)
