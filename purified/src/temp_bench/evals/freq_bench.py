@@ -59,8 +59,14 @@ def _codes_per_position(model: TempBenchArch, x: torch.Tensor) -> torch.Tensor:
     T = int(model.T)
     if W < T:
         raise ValueError(f"freq_bench: W={W} < arch T={T}; widen seq_len.")
+    # Stride S between successive encoder applications. Defaults to 1
+    # (vanilla sliding) for archs that don't expose a stride hparam; the
+    # (T, S, B) family (TXCBand) sets it via hparams.
+    S = int(getattr(model.config, "S", None) or 1)
+    if hasattr(model, "_S"):
+        S = int(model._S)
     codes = []
-    for s in range(W - T + 1):
+    for s in range(0, W - T + 1, S):
         zc = model.encode(x[:, s:s + T])
         # Normalise to (N, n_pos_per_window, d_sae). Window-level archs
         # return (N, d_sae) or (N, 1, d_sae) — n_pos_per_window=1. Per-

@@ -1,0 +1,109 @@
+{
+  "cells": [
+    {
+      "label": "band_T5_S1_Ball",
+      "T": 5,
+      "S": 1,
+      "bands": "all",
+      "predicted_NTPS": 0.72,
+      "rationale": "matches txcdr_t5 (T=5 sliding, all bands)"
+    },
+    {
+      "label": "band_T16_S16_Ball",
+      "T": 16,
+      "S": 16,
+      "bands": "all",
+      "predicted_NTPS": 0.17,
+      "rationale": "matches txc_base_TW (joint T=W=16, all bands)"
+    },
+    {
+      "label": "band_T5_S1_BDC",
+      "T": 5,
+      "S": 1,
+      "bands": [
+        0
+      ],
+      "predicted_NTPS": 0.02,
+      "rationale": "DC-only TXC: equivalent to per-token + window-mean; cannot encode direction"
+    },
+    {
+      "label": "band_T5_S1_B1",
+      "T": 5,
+      "S": 1,
+      "bands": [
+        1
+      ],
+      "predicted_NTPS": 0.55,
+      "rationale": "first AC band carries the fundamental of the velocity walk"
+    },
+    {
+      "label": "band_T5_S1_B2",
+      "T": 5,
+      "S": 1,
+      "bands": [
+        2
+      ],
+      "predicted_NTPS": 0.3,
+      "rationale": "second AC band: harmonic, weaker but nonzero"
+    },
+    {
+      "label": "band_T5_S1_BAC",
+      "T": 5,
+      "S": 1,
+      "bands": [
+        1,
+        2
+      ],
+      "predicted_NTPS": 0.7,
+      "rationale": "AC-only (no DC): direction info preserved, DC band irrelevant"
+    },
+    {
+      "label": "band_T5_S1_BDC1",
+      "T": 5,
+      "S": 1,
+      "bands": [
+        0,
+        1
+      ],
+      "predicted_NTPS": 0.65,
+      "rationale": "DC + first AC: comparable to full B=all"
+    },
+    {
+      "label": "band_T5_S2_Ball",
+      "T": 5,
+      "S": 2,
+      "bands": "all",
+      "predicted_NTPS": 0.62,
+      "rationale": "S=2: ~6 windows over W=16; modest SNR drop vs sliding"
+    },
+    {
+      "label": "band_T5_S4_Ball",
+      "T": 5,
+      "S": 4,
+      "bands": "all",
+      "predicted_NTPS": 0.5,
+      "rationale": "S=4: 3 windows; bigger drop"
+    },
+    {
+      "label": "band_T5_S8_Ball",
+      "T": 5,
+      "S": 8,
+      "bands": "all",
+      "predicted_NTPS": 0.35,
+      "rationale": "S=8: 2 windows; approaching joint ceiling"
+    },
+    {
+      "label": "band_T5_S12_Ball",
+      "T": 5,
+      "S": 12,
+      "bands": "all",
+      "predicted_NTPS": 0.2,
+      "rationale": "S=12: 1 window; effectively joint-T=5-on-W=16 \u2248 joint T=W ceiling"
+    }
+  ],
+  "datasource": "fb_ac_W16_s10",
+  "W": 16,
+  "k_pos": 1,
+  "d_sae": 1024,
+  "seed": 0
+}
