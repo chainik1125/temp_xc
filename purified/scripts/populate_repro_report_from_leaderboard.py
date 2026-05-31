@@ -22,6 +22,8 @@ DS_TO_TAG = {
     "toy_markov_n20_d40_noisy": "denoising",
 }
 
+DEPRECATED_ARCHS = {"txc_pro"}
+
 
 def aggregate(leaderboard: Path) -> dict:
     """{(ds, arch, k_pos): {eauc, gauc, nmse}} — latest row per cell."""
@@ -35,6 +37,8 @@ def aggregate(leaderboard: Path) -> dict:
         if r.get("experiment") != "synthetic":
             continue
         if r.get("datasource") not in DS_TO_TAG:
+            continue
+        if r.get("arch") in DEPRECATED_ARCHS:
             continue
         rows.append(r)
     # Sort by timestamp so .get() picks the most recent.

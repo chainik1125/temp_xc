@@ -53,6 +53,10 @@ def render_synthetic_overview() -> Path:
         lambda: defaultdict(lambda: defaultdict(list))
     )
 
+    # Archs removed from the active registry — historical leaderboard rows
+    # remain (audit trail) but are excluded from figures.
+    deprecated_archs = {"txc_pro"}
+
     n_rows = 0
     for row in iter_leaderboard():
         if row.experiment != "synthetic":
@@ -60,6 +64,8 @@ def render_synthetic_overview() -> Path:
         if row.evaluator_protocol_version != "1.1.0":
             continue                                       # filter buggy v1.0.0 cells
         if row.eval_cfg.get("smoke", False):
+            continue
+        if row.arch in deprecated_archs:
             continue
         k_pos = row.eval_cfg.get("k_pos")
         if k_pos is None:
@@ -84,7 +90,6 @@ def render_synthetic_overview() -> Path:
 
     arch_color = {
         "txc_base":    "#1f77b4",
-        "txc_pro":     "#17becf",
         "topk_sae":    "#d62728",
         "stacked_sae": "#9467bd",
         "tsae":        "#ff7f0e",
@@ -94,7 +99,7 @@ def render_synthetic_overview() -> Path:
         "sae_arditi":  "#8c564b",
     }
     arch_marker = {
-        "txc_base": "o", "txc_pro": "s", "topk_sae": "^",
+        "txc_base": "o", "topk_sae": "^",
         "stacked_sae": "v", "tsae": "D", "tfa": "P", "tfa_pos": "X", "mlc": "*",
     }
 

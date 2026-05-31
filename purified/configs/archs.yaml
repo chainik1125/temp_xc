@@ -44,30 +44,6 @@ archs:
       Vanilla TopK temporal crosscoder (T=5) + tsae_paper anti-dead stack.
       No matryoshka, no contrastive, no Bricken.
 
-  txc_pro:
-    class_path: temp_bench.archs.txc_pro:TXCPro
-    arch_version: "2.0.0"
-    category: txc
-    hparams:
-      d_sae: 18432
-      T_max: 10
-      t_sample: 5
-      k_pos: 20
-      n_matryoshka: 8
-      contrastive_shifts: [1, 2]
-      contrastive_inverse_distance_weight: true
-      auxk_alpha: 0.03125
-      dead_threshold_tokens: 10_000_000
-      bdec_geom_median_init: true
-      decoder_unit_norm: true
-      decoder_grad_orthogonalize: true
-    per_section_hparams:
-      synthetic:  { d_sae: 40 }
-      backtracking: { d_sae: 32768 }
-    notes: |
-      Subseq encoder (T_max=10, t_sample=5) + matryoshka H=8 +
-      multi-distance InfoNCE contrastive loss + anti-dead.
-
   # ── Ours: baselines ─────────────────────────────────────────────────
 
   topk_sae:

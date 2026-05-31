@@ -27,10 +27,12 @@ Concrete numerical headline from the v1 (paper) c2.md aggregate:
 
 ## v2 reproduction results
 
-**180 cells**: 6 archs × 2 benches × 5 `k_pos ∈ {1, 2, 5, 10, 20}` × 3 seeds,
+**150 cells**: 5 archs × 2 benches × 5 `k_pos ∈ {1, 2, 5, 10, 20}` × 3 seeds,
 all at `d_sae=40, n_steps=10K, batch=1024`. Tables below are auto-
 populated from the canonical leaderboard
-(`scripts/populate_repro_report_multiseed.py`).
+(`scripts/populate_repro_report_multiseed.py`). A sixth arch (`txc_pro`)
+ran in earlier passes and remains in the leaderboard as historical
+data but is filtered from the rendered tables.
 
 ### Coupling bench (`toy_coupled_K10_M20_d256`)
 
@@ -43,8 +45,7 @@ populated from the canonical leaderboard
 | `tfa` | 0.420±0.012 | 0.434±0.028 | 0.451±0.009 | 0.454±0.014 | 0.454±0.014 |
 | `topk_sae` | 0.314±0.037 | 0.531±0.017 | 0.637±0.028 | 0.640±0.049 | 0.529±0.014 |
 | `tsae` | 0.515±0.017 | 0.547±0.032 | 0.542±0.011 | 0.519±0.010 | 0.516±0.007 |
-| `txc_base` | 0.547±0.015 | 0.550±0.016 | 0.566±0.009 | 0.519±0.017 | 0.519±0.017 |
-| `txc_pro` | 0.556±0.007 | 0.543±0.009 | 0.510±0.023 | 0.513±0.034 | 0.513±0.034 |
+| `txc_base` | 0.549±0.013 | 0.550±0.016 | 0.566±0.009 | 0.519±0.017 | 0.519±0.017 |
 
 **gAUC**  (mean ± std across 3 seeds)
 
@@ -55,7 +56,6 @@ populated from the canonical leaderboard
 | `topk_sae` | 0.526±0.050 | 0.977±0.015 | 0.914±0.016 | 0.747±0.038 | 0.591±0.036 |
 | `tsae` | 0.819±0.026 | 0.838±0.062 | 0.863±0.046 | 0.879±0.052 | 0.862±0.053 |
 | `txc_base` | 0.989±0.001 | 0.987±0.002 | 0.898±0.022 | 0.723±0.030 | 0.723±0.030 |
-| `txc_pro` | 0.960±0.017 | 0.911±0.046 | 0.820±0.091 | 0.809±0.067 | 0.809±0.067 |
 
 **NMSE**  (mean ± std across 3 seeds)
 
@@ -66,7 +66,6 @@ populated from the canonical leaderboard
 | `topk_sae` | 0.174±0.023 | 0.022±0.002 | 0.003±0.001 | 0.000±0.000 | 0.000±0.000 |
 | `tsae` | 0.014±0.002 | 0.002±0.001 | 0.001±0.000 | 0.001±0.000 | 0.002±0.000 |
 | `txc_base` | 0.068±0.001 | 0.032±0.005 | 0.024±0.004 | 0.023±0.004 | 0.023±0.004 |
-| `txc_pro` | 1.459±0.216 | 1.096±0.086 | 0.982±0.002 | 0.997±0.004 | 0.997±0.004 |
 
 <!-- END AUTO-RESULTS coupling -->
 
@@ -79,10 +78,9 @@ populated from the canonical leaderboard
 |---|---|---|---|---|---|
 | `stacked_sae` | 0.406±0.012 | 0.427±0.016 | 0.564±0.022 | 0.609±0.018 | 0.496±0.013 |
 | `tfa` | 0.452±0.012 | 0.460±0.031 | 0.457±0.019 | 0.456±0.020 | 0.456±0.020 |
-| `topk_sae` | 0.433±0.008 | 0.545±0.027 | 0.908±0.012 | 0.985±0.008 | 0.639±0.045 |
+| `topk_sae` | 0.433±0.008 | 0.545±0.027 | 0.908±0.012 | 0.974±0.028 | 0.639±0.045 |
 | `tsae` | 0.573±0.021 | 0.669±0.012 | 0.911±0.004 | 0.890±0.017 | 0.756±0.008 |
 | `txc_base` | 0.849±0.041 | 0.933±0.004 | 0.928±0.066 | 0.523±0.012 | 0.523±0.012 |
-| `txc_pro` | 0.836±0.044 | 0.921±0.043 | 0.930±0.042 | 0.763±0.012 | 0.763±0.012 |
 
 **gAUC**  (mean ± std across 3 seeds)
 
@@ -93,7 +91,6 @@ populated from the canonical leaderboard
 | `topk_sae` | — | — | — | — | — |
 | `tsae` | — | — | — | — | — |
 | `txc_base` | — | — | — | — | — |
-| `txc_pro` | — | — | — | — | — |
 
 **NMSE**  (mean ± std across 3 seeds)
 
@@ -101,10 +98,9 @@ populated from the canonical leaderboard
 |---|---|---|---|---|---|
 | `stacked_sae` | 0.473±0.006 | 0.349±0.006 | 0.120±0.006 | 0.003±0.000 | 0.000±0.000 |
 | `tfa` | 0.532±0.019 | 0.536±0.008 | 0.530±0.007 | 0.530±0.007 | 0.530±0.007 |
-| `topk_sae` | 0.469±0.005 | 0.357±0.008 | 0.122±0.005 | 0.003±0.001 | 0.000±0.000 |
+| `topk_sae` | 0.469±0.005 | 0.357±0.008 | 0.122±0.005 | 0.003±0.000 | 0.000±0.000 |
 | `tsae` | 0.432±0.011 | 0.304±0.006 | 0.064±0.004 | 0.001±0.000 | 0.001±0.000 |
 | `txc_base` | 0.456±0.007 | 0.355±0.007 | 0.268±0.007 | 0.264±0.006 | 0.264±0.006 |
-| `txc_pro` | 0.952±0.069 | 0.850±0.017 | 0.919±0.007 | 0.993±0.010 | 0.993±0.010 |
 
 <!-- END AUTO-RESULTS denoising -->
 
@@ -155,8 +151,8 @@ The v2 framework differs from v1 in three load-bearing ways:
 
 ## Multi-seed reproduction
 
-Multi-seed coverage was extended in a second pass: 3 seeds × 6 archs ×
-2 benches × 5 k_pos = 180 cells. Tables above report **mean ± std
+Multi-seed coverage was extended in a second pass: 3 seeds × 5 archs ×
+2 benches × 5 k_pos = 150 cells. Tables above report **mean ± std
 across all 3 seeds**.
 
 Seed variance is small relative to the architectural differences:
@@ -183,11 +179,10 @@ auto-generated tables above.
 
 ### Global recovery (coupling bench, gAUC)
 
-The four temporal-aware architectures sweep the top of the gAUC ranking
+The three temporal-aware architectures sweep the top of the gAUC ranking
 at the sparsest setting (`k_pos=1`):
 
 - **txc_base** : 0.988
-- **txc_pro**  : 0.970
 - **tsae**     : 0.842
 - **tfa**      : 0.640
 - topk_sae     : 0.482
@@ -212,7 +207,6 @@ recovery the ranking flips at moderate k:
 - topk_sae k=10  : eAUC=0.976
 - tsae k=5       : 0.906 (and k=10: 0.906)
 - txc_base k=2   : 0.937 (peaks early, decays after k_pos > d_sae/T)
-- txc_pro k=5    : 0.888
 - tfa            : ≤ 0.45 across all k (poor on denoising)
 - stacked_sae    : peaks 0.596 at k=10
 
@@ -231,11 +225,6 @@ bottleneck-factor auto-adjust kicks in but the n_heads=4 attention is
 underused at this scale. Not a v2 regression — it would have failed
 under v1 too.
 
-`txc_pro` shows NMSE ≈ 1.0 on both benches — also a known scale issue.
-Its `topk` predictive-coding step is sensitive to `kval_topk` settings
-that don't make sense at `d_sae=40` (we clip them, but the clip itself
-distorts the loss). At LM scale (`d_sae≥4096`) this clip would not fire.
-
 See `Fig 2 — fig2_synthetic_overview_v2.{pdf,png}` for the visual.
 
 ## What this validates about the framework
@@ -243,10 +232,13 @@ See `Fig 2 — fig2_synthetic_overview_v2.{pdf,png}` for the visual.
 - **The data path is correct**. Token shuffle buffer + window buffer
   produce activations that train SAEs to recovery-grade AUCs (txc_base
   gAUC=0.988 at k_pos=1 reproduces the paper's c2 headline).
-- **All 6 paper architectures are functional**. 60/60 cells succeeded
-  after two clip fixes (`txc_pro.k_inference`, `tfa.k_win`) added to
-  handle toy benches where `k_pos*T > d_sae`. Production LM scale
-  (`d_sae≥4096`) never hits this clip.
+- **All 5 paper architectures are functional**. 50/50 cells succeeded
+  after a clip fix (`tfa.k_win`) added to handle toy benches where
+  `k_pos*T > d_sae`. Production LM scale (`d_sae≥4096`) never hits
+  this clip. (A sixth arch, `txc_pro`, was also benched but has since
+  been removed from the active registry; its historical leaderboard
+  rows remain for audit-trail purposes but are filtered out of the
+  figure + report.)
 - **The runner is deterministic**. Same `(arch, seed, training_cfg,
   data_key)` → same `train_key` → identical results on rerun
   (cache-hit confirmed: retry of 7 cells hit cache for unchanged inputs).

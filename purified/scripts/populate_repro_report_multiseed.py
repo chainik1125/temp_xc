@@ -24,6 +24,9 @@ DS_TO_TAG = {
 }
 
 
+DEPRECATED_ARCHS = {"txc_pro"}
+
+
 def aggregate(leaderboard: Path) -> dict:
     """{(ds, arch, k_pos): {metric: [vals across seeds]}}"""
     by_cell: dict = defaultdict(lambda: defaultdict(list))
@@ -38,6 +41,8 @@ def aggregate(leaderboard: Path) -> dict:
         if r.get("experiment") != "synthetic":
             continue
         if r.get("datasource") not in DS_TO_TAG:
+            continue
+        if r.get("arch") in DEPRECATED_ARCHS:
             continue
         rows.append(r)
     rows.sort(key=lambda r: r.get("ts", ""))

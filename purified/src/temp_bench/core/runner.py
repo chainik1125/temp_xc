@@ -275,7 +275,7 @@ def run_sweep(grid: dict[str, Any], *, agent: str | None = None) -> list[CellRes
 
         {
             "experiment": "probing",
-            "arch":   ["txc_base", "txc_pro", ...],   # or single str
+            "arch":   ["txc_base", "topk_sae", ...],  # or single str
             "seed":   [1, 2, 42],
             "datasource": "gemma_2_2b_it_l13_fineweb_24k128",
             "eval_cfg":   {"k_feat": [5, 10, 20]},     # axis values supported nested
