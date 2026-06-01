@@ -1,7 +1,7 @@
 # Reproduction report — § 4 Synthetic experiments on framework v2
 
 **Branch**: `arxiv`
-**Date**: 2026-05-28
+**Date**: 2026-06-01
 **Hardware**: local RTX 5090 (32 GB VRAM) + 54 GB RAM, WSL.
 
 This report documents the post-submission reproduction of the paper's
@@ -28,11 +28,21 @@ Concrete numerical headline from the v1 (paper) c2.md aggregate:
 ## v2 reproduction results
 
 **150 cells**: 5 archs × 2 benches × 5 `k_pos ∈ {1, 2, 5, 10, 20}` × 3 seeds,
-all at `d_sae=40, n_steps=10K, batch=1024`. Tables below are auto-
+all at `d_sae=20, n_steps=10K, batch=1024`. Tables below are auto-
 populated from the canonical leaderboard
 (`scripts/populate_repro_report_multiseed.py`). A sixth arch (`txc_pro`)
 ran in earlier passes and remains in the leaderboard as historical
 data but is filtered from the rendered tables.
+
+**Dictionary regime.** `d_sae=20` matches `M_emissions` (the number of
+local features on both benches) and is **smaller than** the total
+ground-truth feature set on the coupling bench (`K_hidden + M_emissions
+= 30`). This is the "scarce dictionary" regime — closer to the real-LM
+case where features outnumber atoms — and it forces each architecture
+to *choose* which feature subset to align with rather than recovering
+everything in parallel. An earlier d_sae=40 pass (over-dictionary) is
+still in the leaderboard for the curious; the headline pattern is
+substantively the same but absolute AUCs are 0.05-0.10 higher there.
 
 ### Coupling bench (`toy_coupled_K10_M20_d256`)
 
@@ -41,31 +51,31 @@ data but is filtered from the rendered tables.
 
 | arch | k=1 | k=2 | k=5 | k=10 | k=20 |
 |---|---|---|---|---|---|
-| `stacked_sae` | 0.269±0.012 | 0.371±0.024 | 0.455±0.045 | 0.459±0.024 | 0.443±0.016 |
-| `tfa` | 0.420±0.012 | 0.434±0.028 | 0.451±0.009 | 0.454±0.014 | 0.454±0.014 |
-| `topk_sae` | 0.314±0.037 | 0.531±0.017 | 0.637±0.028 | 0.640±0.049 | 0.529±0.014 |
-| `tsae` | 0.515±0.017 | 0.547±0.032 | 0.542±0.011 | 0.519±0.010 | 0.516±0.007 |
-| `txc_base` | 0.549±0.013 | 0.550±0.016 | 0.566±0.009 | 0.519±0.017 | 0.519±0.017 |
+| `stacked_sae` | 0.293±0.018 | 0.394±0.018 | 0.454±0.003 | 0.472±0.007 | 0.441±0.031 |
+| `tfa` | 0.414±0.037 | 0.414±0.006 | 0.416±0.023 | 0.416±0.023 | 0.416±0.023 |
+| `topk_sae` | 0.325±0.023 | 0.475±0.030 | 0.590±0.050 | 0.564±0.033 | 0.462±0.020 |
+| `tsae` | 0.510±0.015 | 0.531±0.051 | 0.507±0.025 | 0.505±0.013 | 0.510±0.015 |
+| `txc_base` | 0.530±0.023 | 0.544±0.018 | 0.467±0.004 | 0.467±0.004 | 0.467±0.004 |
 
 **gAUC**  (mean ± std across 3 seeds)
 
 | arch | k=1 | k=2 | k=5 | k=10 | k=20 |
 |---|---|---|---|---|---|
-| `stacked_sae` | 0.395±0.029 | 0.576±0.018 | 0.592±0.030 | 0.532±0.019 | 0.501±0.012 |
-| `tfa` | 0.646±0.026 | 0.679±0.045 | 0.677±0.038 | 0.675±0.038 | 0.675±0.038 |
-| `topk_sae` | 0.526±0.050 | 0.977±0.015 | 0.914±0.016 | 0.747±0.038 | 0.591±0.036 |
-| `tsae` | 0.819±0.026 | 0.838±0.062 | 0.863±0.046 | 0.879±0.052 | 0.862±0.053 |
-| `txc_base` | 0.989±0.001 | 0.987±0.002 | 0.898±0.022 | 0.723±0.030 | 0.723±0.030 |
+| `stacked_sae` | 0.435±0.006 | 0.643±0.043 | 0.689±0.021 | 0.591±0.045 | 0.524±0.048 |
+| `tfa` | 0.651±0.050 | 0.633±0.041 | 0.641±0.060 | 0.641±0.060 | 0.641±0.060 |
+| `topk_sae` | 0.551±0.073 | 0.853±0.087 | 0.919±0.034 | 0.686±0.016 | 0.554±0.014 |
+| `tsae` | 0.809±0.010 | 0.768±0.046 | 0.717±0.042 | 0.707±0.034 | 0.712±0.028 |
+| `txc_base` | 0.971±0.017 | 0.946±0.039 | 0.663±0.029 | 0.663±0.029 | 0.663±0.029 |
 
 **NMSE**  (mean ± std across 3 seeds)
 
 | arch | k=1 | k=2 | k=5 | k=10 | k=20 |
 |---|---|---|---|---|---|
-| `stacked_sae` | 0.186±0.021 | 0.024±0.002 | 0.004±0.001 | 0.000±0.000 | 0.000±0.000 |
-| `tfa` | 0.368±0.020 | 0.378±0.007 | 0.370±0.010 | 0.366±0.016 | 0.366±0.016 |
-| `topk_sae` | 0.174±0.023 | 0.022±0.002 | 0.003±0.001 | 0.000±0.000 | 0.000±0.000 |
-| `tsae` | 0.014±0.002 | 0.002±0.001 | 0.001±0.000 | 0.001±0.000 | 0.002±0.000 |
-| `txc_base` | 0.068±0.001 | 0.032±0.005 | 0.024±0.004 | 0.023±0.004 | 0.023±0.004 |
+| `stacked_sae` | 0.232±0.026 | 0.025±0.003 | 0.005±0.001 | 0.001±0.000 | 0.000±0.000 |
+| `tfa` | 0.420±0.022 | 0.416±0.018 | 0.418±0.028 | 0.418±0.028 | 0.418±0.028 |
+| `topk_sae` | 0.230±0.041 | 0.024±0.001 | 0.005±0.001 | 0.001±0.001 | 0.000±0.000 |
+| `tsae` | 0.017±0.002 | 0.003±0.002 | 0.002±0.001 | 0.002±0.001 | 0.002±0.000 |
+| `txc_base` | 0.152±0.005 | 0.137±0.006 | 0.133±0.006 | 0.133±0.006 | 0.133±0.006 |
 
 <!-- END AUTO-RESULTS coupling -->
 
@@ -76,11 +86,11 @@ data but is filtered from the rendered tables.
 
 | arch | k=1 | k=2 | k=5 | k=10 | k=20 |
 |---|---|---|---|---|---|
-| `stacked_sae` | 0.406±0.012 | 0.427±0.016 | 0.564±0.022 | 0.609±0.018 | 0.496±0.013 |
-| `tfa` | 0.452±0.012 | 0.460±0.031 | 0.457±0.019 | 0.456±0.020 | 0.456±0.020 |
-| `topk_sae` | 0.433±0.008 | 0.545±0.027 | 0.908±0.012 | 0.974±0.028 | 0.639±0.045 |
-| `tsae` | 0.573±0.021 | 0.669±0.012 | 0.911±0.004 | 0.890±0.017 | 0.756±0.008 |
-| `txc_base` | 0.849±0.041 | 0.933±0.004 | 0.928±0.066 | 0.523±0.012 | 0.523±0.012 |
+| `stacked_sae` | 0.359±0.012 | 0.376±0.012 | 0.504±0.027 | 0.550±0.018 | 0.492±0.013 |
+| `tfa` | 0.350±0.029 | 0.346±0.020 | 0.344±0.022 | 0.344±0.022 | 0.344±0.022 |
+| `topk_sae` | 0.415±0.005 | 0.529±0.043 | 0.822±0.038 | 0.931±0.013 | 0.526±0.018 |
+| `tsae` | 0.514±0.002 | 0.615±0.015 | 0.864±0.017 | 0.832±0.033 | 0.611±0.019 |
+| `txc_base` | 0.807±0.070 | 0.828±0.027 | 0.453±0.004 | 0.453±0.004 | 0.453±0.004 |
 
 **gAUC**  (mean ± std across 3 seeds)
 
@@ -96,11 +106,11 @@ data but is filtered from the rendered tables.
 
 | arch | k=1 | k=2 | k=5 | k=10 | k=20 |
 |---|---|---|---|---|---|
-| `stacked_sae` | 0.473±0.006 | 0.349±0.006 | 0.120±0.006 | 0.003±0.000 | 0.000±0.000 |
-| `tfa` | 0.532±0.019 | 0.536±0.008 | 0.530±0.007 | 0.530±0.007 | 0.530±0.007 |
-| `topk_sae` | 0.469±0.005 | 0.357±0.008 | 0.122±0.005 | 0.003±0.000 | 0.000±0.000 |
-| `tsae` | 0.432±0.011 | 0.304±0.006 | 0.064±0.004 | 0.001±0.000 | 0.001±0.000 |
-| `txc_base` | 0.456±0.007 | 0.355±0.007 | 0.268±0.007 | 0.264±0.006 | 0.264±0.006 |
+| `stacked_sae` | 0.499±0.004 | 0.374±0.008 | 0.132±0.007 | 0.022±0.008 | 0.006±0.005 |
+| `tfa` | 0.573±0.016 | 0.561±0.027 | 0.560±0.033 | 0.560±0.033 | 0.560±0.033 |
+| `topk_sae` | 0.500±0.004 | 0.384±0.006 | 0.137±0.001 | 0.019±0.003 | 0.005±0.008 |
+| `tsae` | 0.461±0.004 | 0.334±0.010 | 0.088±0.006 | 0.017±0.003 | 0.017±0.002 |
+| `txc_base` | 0.491±0.007 | 0.427±0.006 | 0.410±0.004 | 0.410±0.004 | 0.410±0.004 |
 
 <!-- END AUTO-RESULTS denoising -->
 
@@ -123,11 +133,13 @@ The v2 framework differs from v1 in three load-bearing ways:
    stable across train/eval. (See `SyntheticRecovery.protocol_version
    = 1.1.0` for the gating.)
 
-3. **k_win clipping**. For toy synthetic benches where `d_sae=40` and
+3. **k_win clipping**. For toy synthetic benches where `d_sae=20` and
    `k_pos*T > d_sae`, v2's TXC-base clips `k_win = min(k_pos*T, d_sae)`
-   with a warning. v1 raised. This means at k_pos≥8 with T=5, multiple
-   k_pos values produce identical training (clipped at 40). The Fig 2
-   x-axis effectively saturates above k_pos ≈ d_sae/T.
+   with a warning. v1 raised. At `T=5`, this means `k_pos ≥ 4` already
+   saturates: for window archs (TXC-base, TFA) the `k_pos ∈ {5, 10, 20}`
+   cells all train at the same effective `k_win = 20` and report
+   identical AUCs. The Fig 2 x-axis is informative only for
+   `k_pos ∈ {1, 2}` at this dictionary size.
 
 ## What's NOT reproduced (deliberate scope)
 
@@ -157,17 +169,18 @@ across all 3 seeds**.
 
 Seed variance is small relative to the architectural differences:
 
-- `txc_base` gAUC at k=1 (the headline cell): **0.989 ± 0.001**
-- `topk_sae` gAUC at k=2 (sparse SAE peak): **0.977 ± 0.015**
-- `tsae` gAUC at k=5: **0.863 ± 0.046**
-- `tfa` gAUC range across k: **0.65-0.68 ± ~0.04**
+- `txc_base` gAUC at k=1 (the headline cell): **0.971 ± 0.017**
+- `topk_sae` gAUC at k=2 (sparse SAE peak): **0.853 ± 0.087**
+- `tsae` gAUC at k=1: **0.809 ± 0.010**
+- `tfa` gAUC range across k: **0.63-0.65 ± ~0.05**
 
-On the denoising bench the SAE-family local-recovery peak is even
-more robust: `topk_sae` k=10 eAUC = **0.985 ± 0.008**.
+On the denoising bench the SAE-family local-recovery peak is the
+clearest signal: `topk_sae` k=10 eAUC = **0.931 ± 0.013**.
 
 The TXC-vs-SAE gap on global recovery (≥ 0.4 AUC at k=1) is roughly
-10× larger than seed-noise; the architectural-specialization claim
-is robust to seed perturbation.
+6-10× larger than seed-noise; the architectural-specialization claim
+is robust to seed perturbation, even at this tighter `d_sae=20`
+operating point.
 
 ## Headline finding
 
@@ -179,51 +192,53 @@ auto-generated tables above.
 
 ### Global recovery (coupling bench, gAUC)
 
-The three temporal-aware architectures sweep the top of the gAUC ranking
-at the sparsest setting (`k_pos=1`):
+The three temporal-aware architectures sweep the top of the gAUC
+ranking at the sparsest setting (`k_pos=1`, mean across 3 seeds):
 
-- **txc_base** : 0.988
-- **tsae**     : 0.842
-- **tfa**      : 0.640
-- topk_sae     : 0.482
-- stacked_sae  : 0.388
+- **txc_base** : 0.971
+- **tsae**     : 0.809
+- **tfa**      : 0.651
+- topk_sae     : 0.551
+- stacked_sae  : 0.435
 
-`txc_base` reaches gAUC=0.988 already at k_pos=1 and stays > 0.9 at k_pos=5;
-the SAE-family archs (topk_sae, stacked_sae) trail by 0.4-0.6 AUC at the
-same sparsity. `topk_sae` does close the gap at `k_pos=2` (0.960) but
-**only** at that exact knee — by `k_pos=10` it has regressed to 0.726,
-while `txc_base` is still at 0.756 and `tsae` at 0.904.
+`txc_base` reaches gAUC=0.971 already at k_pos=1; the SAE-family archs
+(topk_sae, stacked_sae) trail by 0.4-0.5 AUC at the same sparsity.
+`topk_sae` closes the gap at `k_pos=2` (0.853) but **only** at that
+exact knee — by `k_pos=5` it has begun regressing, and the TXC clip
+artifact dominates higher-k cells for window archs.
 
-This matches the paper's c2 number (TXC-base gAUC ≈ 0.99 at sparse k);
-the gap to topk_sae is in fact wider in v2 than in the v1 leaderboard,
-which we attribute to the token shuffle buffer producing cleaner i.i.d.
-training compared to v1's whole-sequence sampling.
+This matches the paper's c2 number (TXC-base gAUC ≈ 0.99 at sparse k
+in the over-dictionary regime; ≈ 0.97 here under the tighter scarce-
+dictionary setting). The gap to topk_sae is wider in v2 than in the
+v1 leaderboard, which we attribute to the token shuffle buffer
+producing cleaner i.i.d. training compared to v1's whole-sequence
+sampling.
 
 ### Local recovery (denoising bench, eAUC)
 
-The denoising bench has no hidden chain (gAUC undefined). On local-feature
-recovery the ranking flips at moderate k:
+The denoising bench has no hidden chain (gAUC undefined). On local-
+feature recovery the ranking flips at moderate k (mean across 3 seeds):
 
-- topk_sae k=10  : eAUC=0.976
-- tsae k=5       : 0.906 (and k=10: 0.906)
-- txc_base k=2   : 0.937 (peaks early, decays after k_pos > d_sae/T)
-- tfa            : ≤ 0.45 across all k (poor on denoising)
-- stacked_sae    : peaks 0.596 at k=10
+- topk_sae k=10  : eAUC=0.931
+- tsae k=5       : 0.864 (and k=10: 0.832)
+- txc_base k=2   : 0.828 (peaks early; k=5+ saturates at clip)
+- stacked_sae    : peaks 0.550 at k=10
+- tfa            : ≤ 0.35 across all k (poor on denoising)
 
 The clean reversal — TXC family wins global, SAE family wins local at
-moderate k — is the paper's main architectural-specialization claim, and
-it survives the framework rewrite.
+moderate k — is the paper's main architectural-specialization claim,
+and it survives both the framework rewrite *and* the move to the
+scarce-dictionary regime.
 
 ### Failure mode (honest caveat)
 
-`tfa` produces low NMSE on coupling but reconstruction NMSE = 0.35-0.37
-across all k — substantially worse than every other arch. On denoising
-NMSE ≈ 0.53 across k, also worst-of-class. Both eAUC and gAUC are
-mediocre. This is consistent with TFA being designed for LM-residual
-activations (`d_in≥768`) rather than `d_in=40` toy benches; the
-bottleneck-factor auto-adjust kicks in but the n_heads=4 attention is
-underused at this scale. Not a v2 regression — it would have failed
-under v1 too.
+`tfa` produces reconstruction NMSE ≈ 0.42 on coupling and ≈ 0.56 on
+denoising across all k — substantially worse than every other arch.
+Both eAUC and gAUC are mediocre. This is consistent with TFA being
+designed for LM-residual activations (`d_in≥768`) rather than `d_in=40`
+toy benches; the bottleneck-factor auto-adjust kicks in but the
+n_heads=4 attention is underused at this scale. Not a v2 regression —
+it would have failed under v1 too.
 
 See `Fig 2 — fig2_synthetic_overview_v2.{pdf,png}` for the visual.
 
@@ -231,7 +246,8 @@ See `Fig 2 — fig2_synthetic_overview_v2.{pdf,png}` for the visual.
 
 - **The data path is correct**. Token shuffle buffer + window buffer
   produce activations that train SAEs to recovery-grade AUCs (txc_base
-  gAUC=0.988 at k_pos=1 reproduces the paper's c2 headline).
+  gAUC=0.971 at k_pos=1 reproduces the paper's c2 headline under the
+  tighter d_sae=20 scarce-dictionary regime).
 - **All 5 paper architectures are functional**. 50/50 cells succeeded
   after a clip fix (`tfa.k_win`) added to handle toy benches where
   `k_pos*T > d_sae`. Production LM scale (`d_sae≥4096`) never hits

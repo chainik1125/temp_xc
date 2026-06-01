@@ -56,6 +56,10 @@ def render_synthetic_overview() -> Path:
     # Archs removed from the active registry — historical leaderboard rows
     # remain (audit trail) but are excluded from figures.
     deprecated_archs = {"txc_pro"}
+    # The synthetic d_sae was changed 40 → 20 on 2026-06-01. Older rows
+    # were the over-dictionary regime; new rows are the scarce-dictionary
+    # regime that the headline figure now describes.
+    d_sae_cutover_ts = "2026-05-31T22:30:00Z"
 
     n_rows = 0
     for row in iter_leaderboard():
@@ -67,6 +71,8 @@ def render_synthetic_overview() -> Path:
             continue
         if row.arch in deprecated_archs:
             continue
+        if getattr(row, "ts", "") < d_sae_cutover_ts:
+            continue                                       # filter historical d_sae=40 rows
         k_pos = row.eval_cfg.get("k_pos")
         if k_pos is None:
             # Some rows may have k_pos in training_cfg.arch_hparams_override instead

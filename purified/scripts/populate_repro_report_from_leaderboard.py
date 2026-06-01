@@ -24,6 +24,9 @@ DS_TO_TAG = {
 
 DEPRECATED_ARCHS = {"txc_pro"}
 
+# Synthetic d_sae cutover (40 → 20) — see populate_repro_report_multiseed.py.
+D_SAE_CUTOVER_TS = "2026-05-31T22:30:00Z"
+
 
 def aggregate(leaderboard: Path) -> dict:
     """{(ds, arch, k_pos): {eauc, gauc, nmse}} — latest row per cell."""
@@ -39,6 +42,8 @@ def aggregate(leaderboard: Path) -> dict:
         if r.get("datasource") not in DS_TO_TAG:
             continue
         if r.get("arch") in DEPRECATED_ARCHS:
+            continue
+        if r.get("ts", "") < D_SAE_CUTOVER_TS:
             continue
         rows.append(r)
     # Sort by timestamp so .get() picks the most recent.

@@ -37,7 +37,7 @@ archs:
       auxk_alpha: 0.03125
       dead_threshold_tokens: 10_000_000
     per_section_hparams:
-      synthetic:  { d_sae: 40 }
+      synthetic:  { d_sae: 20 }
       em:         { d_sae: 32768, k_pos: 25 }
       backtracking: { d_sae: 32768 }
     notes: |
@@ -54,7 +54,7 @@ archs:
       d_sae: 18432
       k_pos: 20
     per_section_hparams:
-      synthetic:    { d_sae: 40 }
+      synthetic:    { d_sae: 20 }
       backtracking: { d_sae: 32768 }
     notes: "Per-token TopK SAE. Vanilla baseline."
 
@@ -67,7 +67,7 @@ archs:
       T: 5
       k_pos: 20
     per_section_hparams:
-      synthetic: { d_sae: 40 }
+      synthetic: { d_sae: 20 }
     notes: "T independent per-position TopK-SAEs, one per window slot."
 
   mlc:
@@ -110,7 +110,7 @@ archs:
       h_frac: 0.2
       contrastive_alpha: 1.0    # known deviation: upstream uses 0.1
     per_section_hparams:
-      synthetic: { d_sae: 40 }
+      synthetic: { d_sae: 20 }
     notes: |
       Port of Ye et al. 2025. Known deviations: contrastive_alpha=1.0 vs
       upstream's 0.1; our trainer wraps the upstream loss instead of
@@ -127,7 +127,7 @@ archs:
       n_heads: 4
       use_pos_embedding: false
     per_section_hparams:
-      synthetic: { d_sae: 40 }
+      synthetic: { d_sae: 20 }
     notes: |
       Port of TFA reference implementation; Han added a scaling_factor
       heuristic for real-LM activations (the paper's lam = 1/(4*d_in)
@@ -144,5 +144,5 @@ archs:
       n_heads: 4
       use_pos_embedding: true
     per_section_hparams:
-      synthetic: { d_sae: 40 }
+      synthetic: { d_sae: 20 }
     notes: "TFA with sinusoidal positional encoding turned on."

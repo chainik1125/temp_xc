@@ -26,6 +26,13 @@ DS_TO_TAG = {
 
 DEPRECATED_ARCHS = {"txc_pro"}
 
+# The synthetic d_sae was changed 40 → 20 on 2026-06-01. The leaderboard
+# schema doesn't yet carry resolved arch_hparams, so we cut over by
+# timestamp. Anything before this is the historical d_sae=40 over-
+# dictionary regime; anything after is the d_sae=20 scarce-dictionary
+# regime that the report describes.
+D_SAE_CUTOVER_TS = "2026-05-31T22:30:00Z"
+
 
 def aggregate(leaderboard: Path) -> dict:
     """{(ds, arch, k_pos): {metric: [vals across seeds]}}"""
@@ -43,6 +50,8 @@ def aggregate(leaderboard: Path) -> dict:
         if r.get("datasource") not in DS_TO_TAG:
             continue
         if r.get("arch") in DEPRECATED_ARCHS:
+            continue
+        if r.get("ts", "") < D_SAE_CUTOVER_TS:
             continue
         rows.append(r)
     rows.sort(key=lambda r: r.get("ts", ""))
