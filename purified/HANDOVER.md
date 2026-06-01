@@ -245,7 +245,7 @@ purified/
 ├── CLEANUP_PLAN.md                 ← phase plan
 ├── HANDOVER.md                     ← this file
 ├── docs/framework_v2.md            ← framework spec (read FIRST)
-├── docs/aniket/                    ← the paper (camera-ready)
+├── docs/figs/                      ← rendered paper figures (fig2_*.{pdf,png})
 ├── configs/
 │   ├── archs.yaml                  ← 9 archs registered
 │   ├── data.yaml                   ← 8 datasources

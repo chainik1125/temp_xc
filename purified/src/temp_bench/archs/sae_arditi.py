@@ -1,10 +1,10 @@
 """SAE-arditi — plain TopK SAE in the sae_day / arditi convention.
 
-The C6 baseline. Per-token TopK sparse autoencoder, trained with a
-single MSE reconstruction term on streaming Qwen-14B activations. No
-AuxK, no Bricken, no contrastive — the simplest baseline against which
-the brickenauxk-trained TXC-base re-test (R1 30k mid-α gap-close test
-in ``docs/components/c6.md``) is measured.
+The § 5.3 (emergent misalignment) baseline. Per-token TopK sparse
+autoencoder, trained with a single MSE reconstruction term on
+streaming Qwen-14B activations. No AuxK, no Bricken, no contrastive —
+the simplest baseline against which the brickenauxk-trained TXC-base
+re-test is measured.
 
 Why a separate class from the framework's
 :class:`temp_bench.architectures.topk_sae.TopKSAE`: this class matches

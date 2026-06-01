@@ -9,7 +9,7 @@ OR directly:
     python -m experiments.render_paper_figures
 
 Reads ``purified/results/leaderboard.jsonl`` and produces PDFs in
-``purified/docs/aniket/figs/``. Each render function targets one paper
+``purified/docs/figs/``. Each render function targets one paper
 figure and is a thin compose of pandas + matplotlib.
 
 PORT STATUS: skeleton. Concrete figure renderers awaiting port from
@@ -20,12 +20,12 @@ For each figure, the legacy renderer:
 - queries the leaderboard,
 - filters to canonical train_keys (per § 12 + § 15 of decisions.md),
 - aggregates by (arch, k_feat) or (arch, seed, organism) as appropriate,
-- writes the figure to docs/aniket/figs/<name>.{png,pdf}.
+- writes the figure to docs/figs/<name>.{png,pdf}.
 
 The shape contract for each is::
 
     def render_<name>() -> Path:
-        ...  # writes to docs/aniket/figs/<name>.pdf
+        ...  # writes to docs/figs/<name>.pdf
         return path_to_pdf
 """
 
@@ -157,7 +157,7 @@ def render_synthetic_overview() -> Path:
     )
     fig.tight_layout()
 
-    out_dir = Path("docs/aniket/figs")
+    out_dir = Path("docs/figs")
     out_dir.mkdir(parents=True, exist_ok=True)
     pdf = out_dir / "fig2_synthetic_overview_v2.pdf"
     png = out_dir / "fig2_synthetic_overview_v2.png"

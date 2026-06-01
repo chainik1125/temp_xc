@@ -1,10 +1,8 @@
 """Bricken-style dead-feature resample — **opt-in per experiment**.
 
-This is NOT part of the locked TXC-base / TXC-pro architecture spec.
-Components opt in by passing :class:`BrickenConfig` to the trainer; the
-default is OFF. See `docs/paper/architecture.md` § *Per-experiment
-training knobs* and the per-component A/B verdict in
-`docs/components/cN.md` before turning it on.
+This is NOT part of the locked TXC-base architecture spec.
+Experiments opt in by passing :class:`BrickenConfig` to the trainer;
+the default is OFF.
 
 Why opt-in: Dmitry's winning recipe `brickenauxk_a8` co-tunes six knobs
 together (resample_every, min_fires, n_check, max_resample_fraction,

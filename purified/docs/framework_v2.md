@@ -99,8 +99,7 @@ purified/
 ├── tests/                              # pytest contract tests
 └── docs/
     ├── framework_v2.md                 # this file
-    ├── aniket/                         # the paper itself
-    └── components/                     # methodology notes (per paper section)
+    └── figs/                           # rendered paper figures (fig2_*.{pdf,png})
 ```
 
 ## Core interfaces
@@ -419,7 +418,7 @@ python run.py reproduce all
 
 # 4. render figures
 python run.py render-figures
-# Writes Figs 2-6 PDFs to docs/aniket/figs/
+# Writes Figs 2-6 PDFs to docs/figs/
 ```
 
 ## Extension recipes
