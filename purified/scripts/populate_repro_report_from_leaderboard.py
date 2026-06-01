@@ -22,7 +22,7 @@ DS_TO_TAG = {
     "toy_markov_n20_d40_noisy": "denoising",
 }
 
-DEPRECATED_ARCHS = {"txc_pro"}
+DEPRECATED_ARCHS = {"txc_pro", "tfa", "tfa_pos"}
 
 # Synthetic d_sae cutover (40 → 20) — see populate_repro_report_multiseed.py.
 D_SAE_CUTOVER_TS = "2026-05-31T22:30:00Z"

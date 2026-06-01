@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."          # purified/
 export TEMP_BENCH_ALLOW_DIRTY=1
 PY=.venv/bin/python
 
-ARCHS=(txc_base topk_sae stacked_sae tsae tfa)
+ARCHS=(txc_base topk_sae stacked_sae tsae)
 DATASOURCES=(toy_coupled_K10_M20_d256 toy_markov_n20_d40_noisy)
 K_POSES=(1 2 5 10 20)
 SEED=${SEED:-1}

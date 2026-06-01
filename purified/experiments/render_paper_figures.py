@@ -55,7 +55,7 @@ def render_synthetic_overview() -> Path:
 
     # Archs removed from the active registry — historical leaderboard rows
     # remain (audit trail) but are excluded from figures.
-    deprecated_archs = {"txc_pro"}
+    deprecated_archs = {"txc_pro", "tfa", "tfa_pos"}
     # The synthetic d_sae was changed 40 → 20 on 2026-06-01. Older rows
     # were the over-dictionary regime; new rows are the scarce-dictionary
     # regime that the headline figure now describes.
@@ -99,14 +99,12 @@ def render_synthetic_overview() -> Path:
         "topk_sae":    "#d62728",
         "stacked_sae": "#9467bd",
         "tsae":        "#ff7f0e",
-        "tfa":         "#2ca02c",
-        "tfa_pos":     "#bcbd22",
         "mlc":         "#7f7f7f",
         "sae_arditi":  "#8c564b",
     }
     arch_marker = {
         "txc_base": "o", "topk_sae": "^",
-        "stacked_sae": "v", "tsae": "D", "tfa": "P", "tfa_pos": "X", "mlc": "*",
+        "stacked_sae": "v", "tsae": "D", "mlc": "*",
     }
 
     for col, bench in enumerate(benches):

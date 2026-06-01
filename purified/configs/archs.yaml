@@ -116,33 +116,3 @@ archs:
       upstream's 0.1; our trainer wraps the upstream loss instead of
       using their training loop. See module docstring.
 
-  tfa:
-    class_path: temp_bench.archs.tfa:TFA
-    arch_version: "2.0.0-port"
-    category: tfa
-    upstream: "https://github.com/<TFA-paper-ref> (Marks et al.)"
-    hparams:
-      d_sae: 18432
-      k_pos: 20
-      n_heads: 4
-      use_pos_embedding: false
-    per_section_hparams:
-      synthetic: { d_sae: 20 }
-    notes: |
-      Port of TFA reference implementation; Han added a scaling_factor
-      heuristic for real-LM activations (the paper's lam = 1/(4*d_in)
-      assumes ||x|| ~ sqrt(d); real LLM activations are 100-1000× larger).
-
-  tfa_pos:
-    class_path: temp_bench.archs.tfa:TFA
-    arch_version: "2.0.0-port"
-    category: tfa
-    upstream: "https://github.com/<TFA-paper-ref> (Marks et al.)"
-    hparams:
-      d_sae: 18432
-      k_pos: 20
-      n_heads: 4
-      use_pos_embedding: true
-    per_section_hparams:
-      synthetic: { d_sae: 20 }
-    notes: "TFA with sinusoidal positional encoding turned on."

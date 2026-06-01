@@ -21,7 +21,7 @@ experiments:
   synthetic:
     experiment: synthetic
     datasource: [toy_coupled_K10_M20_d256, toy_markov_n20_d40_noisy]
-    arch: [txc_base, topk_sae, stacked_sae, tsae, tfa]
+    arch: [txc_base, topk_sae, stacked_sae, tsae]
     seed: [1, 2, 42]
     training_cfg:
       n_steps: 30_000
@@ -37,7 +37,7 @@ experiments:
   probing:
     experiment: probing
     datasource: gemma_2_2b_it_l13_fineweb_24k128
-    arch: [txc_base, topk_sae, tsae, tfa, mlc]
+    arch: [txc_base, topk_sae, tsae, mlc]
     seed: [1, 2, 42]
     training_cfg:
       n_steps: 20_000

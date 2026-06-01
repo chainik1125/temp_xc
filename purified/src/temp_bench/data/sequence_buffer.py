@@ -1,6 +1,6 @@
 """Sequence-level shuffle buffer for archs that do internal window sampling.
 
-Used by ports of v1 architectures (mlc, tsae, tfa) that expect
+Used by ports of v1 architectures (mlc, tsae) that expect
 ``(B, seq_len, d_in)`` batches and slice their own windows. New v2
 architectures should prefer ``ActivationBuffer`` (token) or
 ``WindowBuffer`` (window) instead.

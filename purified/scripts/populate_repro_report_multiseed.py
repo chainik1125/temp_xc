@@ -24,7 +24,7 @@ DS_TO_TAG = {
 }
 
 
-DEPRECATED_ARCHS = {"txc_pro"}
+DEPRECATED_ARCHS = {"txc_pro", "tfa", "tfa_pos"}
 
 # The synthetic d_sae was changed 40 → 20 on 2026-06-01. The leaderboard
 # schema doesn't yet carry resolved arch_hparams, so we cut over by
