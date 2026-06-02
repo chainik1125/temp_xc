@@ -95,6 +95,26 @@ datasources:
       p_B=0.5 emission noise. The headline regime where TXC reaches gAUC≈0.99
       at k_pos=1 while TopK-SAE drops monotonically.
 
+  toy_signed_motion_M19_d40:
+    category: synthetic
+    generator: signed_motion
+    params:
+      M: 19
+      v: 9
+      d_in: 40
+      seq_len: 64
+      n_seqs: 4096
+      sigma: 0.0
+    notes: |
+      § 4 AC-only signed-motion bench (FrequencyBench § 5). Q_t = B + S·v·t
+      (mod M=19), v=9 (coprime to 19), alphabet embedded as 19 orthonormal
+      directions in R^40. The hidden sign S is order-sensitive: it lives in
+      the step Q_{t+1}-Q_t = S·v, NOT in any per-token marginal. By the
+      data-processing inequality no per-token encoder can recover S; a
+      window (T>1) encoder can. d_sae stays 20 (per-section synthetic
+      default) — scarce vs the 2M=38 distinct windows. k_pos swept 1..4
+      (k_win = k_pos·T, T=5; k_pos=4 → dense window code at d_sae=20).
+
   # ── Real-LM § 5 ────────────────────────────────────────────────────
 
   gemma_2_2b_it_l13_fineweb_24k128:

@@ -28,6 +28,8 @@ from temp_bench.core.schemas import TrainingConfig
 def _parse(extra: list[str]) -> argparse.Namespace:
     p = argparse.ArgumentParser(prog="run.py synthetic")
     p.add_argument("--k-pos", type=int, default=None)
+    p.add_argument("--d-sae", type=int, default=None,
+                   help="Override dictionary size (else per-section default).")
     p.add_argument("--n-steps", type=int, default=None)
     p.add_argument("--batch-size", type=int, default=None)
     return p.parse_args(extra)
@@ -62,6 +64,8 @@ def run(args, extra: list[str]) -> int:
         # Smoke datasource has d_sae=16; default k_pos=20 × T=5 = 100 would
         # exceed d_sae. Drop k_pos to 2 for the smoke profile.
         override = {"k_pos": 2}
+    if sub.d_sae is not None:
+        override = {**(override or {}), "d_sae": int(sub.d_sae)}
 
     training_cfg = TrainingConfig(
         n_steps=n_steps,

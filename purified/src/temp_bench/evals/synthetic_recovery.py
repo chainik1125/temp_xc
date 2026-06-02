@@ -153,6 +153,16 @@ class SyntheticRecovery(Evaluator):
 
         n_batches = 1 if spec.smoke else 4
         out["nmse"] = _reconstruction_nmse(model, data.x, n_batches=n_batches, batch_size=64 if spec.smoke else 256)
+
+        # AC-only signed-motion add-on (FrequencyBench § 5). Only fires for
+        # the signed_motion datasource, which exposes a hidden ±1 sign in
+        # `extra`. For every other bench `extra` is None → this block is a
+        # no-op and the metrics above are unchanged (so protocol_version,
+        # and all committed coupling/denoising eval_keys, stay put).
+        if getattr(data, "extra", None) and "sign_labels" in data.extra:
+            from temp_bench.evals.signed_motion_recovery import signed_motion_metrics
+            out.update(signed_motion_metrics(model, data))
+
         return out
 
     def primary_metric(self) -> str:

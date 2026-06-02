@@ -24,6 +24,7 @@ returns a callable suitable for ``ActivationBuffer`` / ``WindowBuffer``.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Callable
 
@@ -43,10 +44,15 @@ class SyntheticData:
     x: torch.Tensor                      # (N, T_seq, d_in)
     emission_features: torch.Tensor      # (M, d_in)
     hidden_features: torch.Tensor | None # (K, d_in) — None for the markov bench
-    support: torch.Tensor                # (N, T_seq, M)
+    support: torch.Tensor | None         # (N, T_seq, M) — None for symbolic benches
     hidden_support: torch.Tensor | None  # (N, T_seq, K) — None for markov
     seq_len: int
     d_in: int
+    # Optional bag of bench-specific ground-truth labels (e.g. the signed-
+    # motion bench stores its hidden sign + phase here). Backward-compatible:
+    # the markov/coupled generators leave this None, and evaluators that
+    # don't need it ignore it.
+    extra: dict | None = None
 
 
 # ── Markov chain + Bernoulli emission noise (§ 4 denoising) ────────────
@@ -207,12 +213,105 @@ def coupled_hmm(
     )
 
 
+# ── AC-only signed motion (FrequencyBench § 5) ─────────────────────────
+
+
+def signed_motion(
+    *,
+    M: int = 19,
+    v: int = 9,
+    d_in: int = 40,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    sigma: float = 0.0,
+    seed: int = 0,
+) -> SyntheticData:
+    """AC-only signed-motion bench (FrequencyBench § 5).
+
+    Each sequence has a hidden sign ``S ∈ {-1, +1}`` and a hidden phase
+    ``B ~ Unif(Z_M)``. The emitted symbol walks the cyclic group::
+
+        Q_t = (B + S · v · t)  mod M           t = 0 … seq_len-1
+
+    and the activation is the embedding of that symbol::
+
+        x_t = u_{Q_t} + sigma · noise
+
+    where ``{u_0, …, u_{M-1}}`` are random orthonormal directions in R^d_in.
+
+    Why this is an AC-only / order-sensitive test:
+
+    - **Per-token marginal carries zero info about S.** Because B is
+      uniform, ``Q_t | S=s`` is Unif(Z_M) for either sign, so
+      ``I(S; Q_t) = 0`` exactly. By the data-processing inequality, for
+      ANY per-token encoder ``Z = φ(x_t)`` the chain ``S → Q_t → x_t → Z``
+      gives ``I(S; Z) = 0`` — no per-token SAE can read the sign off a
+      single token at any width/sparsity/nonlinearity.
+    - More strongly, the sign is an *interaction* term: it lives in the
+      step ``Q_{t+1} − Q_t = S·v (mod M)``. A LINEAR reader of per-token
+      codes (one block of features per position) can only form an additive
+      score ``Σ_t h_t(Q_t)``; summed over the M phases the +v and −v orbits
+      have identical totals, so additive scores cannot separate them.
+    - **Window encoders can solve it.** A T-window latent that learns a
+      zero-mean (AC) filter pair ``(−u_prev, +u_curr)`` exposes the step
+      direction directly, so the sign becomes linearly decodable.
+
+    Ground truths exposed (in ``extra``):
+        sign_labels:  (n_seqs,)  hidden S ∈ {-1, +1}
+        phase_labels: (n_seqs,)  hidden B ∈ Z_M
+    plus ``emission_features`` = the M orthonormal alphabet directions.
+    """
+    rng = np.random.default_rng(seed)
+    if math.gcd(int(v), int(M)) != 1:
+        raise ValueError(
+            f"v ({v}) must be coprime to M ({M}) so the orbit covers Z_M."
+        )
+    if M > d_in:
+        raise ValueError(f"M ({M}) > d_in ({d_in})")
+
+    # Orthonormal alphabet directions u_a ∈ R^{d_in}.
+    raw = rng.standard_normal((d_in, d_in))
+    Q, _ = np.linalg.qr(raw)
+    alphabet = Q[:M]                                                # (M, d_in)
+
+    # Hidden labels.
+    S = rng.choice([-1, 1], size=n_seqs).astype(np.int64)           # (n_seqs,)
+    B = rng.integers(0, M, size=n_seqs).astype(np.int64)            # (n_seqs,)
+
+    # Symbol trajectory  Q_t = B + S·v·t (mod M).
+    t = np.arange(seq_len)[None, :]                                 # (1, T)
+    qmat = (B[:, None] + S[:, None] * v * t) % M                    # (n_seqs, T)
+
+    # Embed: x_t = u_{Q_t}.
+    x = alphabet[qmat]                                             # (n_seqs, T, d_in)
+    if sigma > 0:
+        x = x + sigma * rng.standard_normal(x.shape)
+    x = x.astype(np.float32)
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(alphabet.astype(np.float32)),
+        hidden_features=None,                                       # sign is not a direction
+        support=None,                                               # symbolic, no support tensor
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra={
+            "sign_labels": torch.from_numpy(S),
+            "phase_labels": torch.from_numpy(B),
+            "M": int(M),
+            "v": int(v),
+        },
+    )
+
+
 # ── Refill-source factory (used by ActivationBuffer / WindowBuffer) ────
 
 
 _GENERATORS = {
     "markov":  markov_chain_support,
     "coupled": coupled_hmm,
+    "signed_motion": signed_motion,
 }
 
 
