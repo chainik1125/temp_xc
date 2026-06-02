@@ -11,7 +11,7 @@ status: results
 
 ## Alternate-frequency benchmarks — results
 
-**Companion plan:** `docs/aniket/altfreq_plan.md`
+**Companion plan:** `docs/aniket/alternative-freqs/plan.md`
 **Sweep:** `experiments/altfreq/sweep.py` (GPU 0, 2026-06-01)
 **Protocol:** `freq_bench` evaluator v1.2.0, k_pos=1, d_sae=1024, W=16, 5000 steps.
 
@@ -30,7 +30,7 @@ Linear-probe NTPS at the readout-optimal slice (k_pos=1, d_sae=1024, W=16):
 
 A_loc baseline: chirp=0.5, multitone=0.125, am=0.167, relphase=0.5.
 
-![NTPS by bench × arch](../../results/altfreq/ntps_by_bench.png)
+![NTPS by bench × arch](../../../results/altfreq/ntps_by_bench.png)
 
 ---
 
@@ -73,7 +73,7 @@ requires temporal frequency separation: the arch must distinguish which
 tone's phase walk is present more strongly over multiple timesteps. The
 sliding temporal arch's T=5 window is sufficient to detect tone-specific
 phase coherence. The joint arch (T=W=16) suffers from the same pooling
-bottleneck identified in `freq_bench_theory.md` §3.
+bottleneck identified in `freq-bench/theory.md` §3.
 
 **Comparison to prediction:**
 - txcdr_t5 predicted ≥ 0.3; measured = 0.285. **Match** (within margin).
@@ -85,7 +85,7 @@ bottleneck identified in `freq_bench_theory.md` §3.
 **Order controls:** txcdr_t5 shows order_gap=0.249 and rev_drop=0.230,
 confirming it encodes temporal structure (not just phase histograms).
 
-![Order controls for chirp and relphase](../../results/altfreq/order_controls.png)
+![Order controls for chirp and relphase](../../../results/altfreq/order_controls.png)
 
 **Per-class R_j curves:** The multitone R_j curves show that txcdr_t5's
 frequency response is approximately flat across the velocity classes
@@ -93,7 +93,7 @@ frequency response is approximately flat across the velocity classes
 specific frequencies — the temporal selectivity operates equally across
 the tone ladder.
 
-![Per-class R_j frequency response](../../results/altfreq/rj_curves.png)
+![Per-class R_j frequency response](../../../results/altfreq/rj_curves.png)
 
 ### 3. AM bench — uniform failure
 
@@ -139,7 +139,7 @@ lead/lag relationship without temporal context.
 However, the sliding temporal arch txcdr_t5 does significantly better
 (0.488 vs 0.230) because it can average the within-token relative-phase
 signal across multiple timesteps, reducing noise. This is an *aggregation*
-win (not a filtering win), consistent with the theory in `freq_bench_theory.md`
+win (not a filtering win), consistent with the theory in `freq-bench/theory.md`
 §1.1.
 
 **Comparison to prediction:**

@@ -2,7 +2,7 @@
 
 Generalises the FreqBench **AC bench** (a degree-1 phase walk) to a
 degree-D polynomial phase trajectory. Grounded in Dmitry's "polynomial
-perspective" (see docs/aniket/reed_solomon_plan.md): the AC walk
+perspective" (see docs/aniket/reed-solomon/plan.md): the AC walk
 φ(t)=φ0+v·t is Reed–Solomon at polynomial length 1; sweeping the degree
 D∈{1,2,3} is the RS ladder. Higher D needs more timesteps to pin down the
 message, so per-token / single-position SAEs degrade while window archs win.

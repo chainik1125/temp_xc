@@ -62,7 +62,7 @@ dependent and peaks at the **sparsest** code:
 | tfa | 0.06 | **0.32** |
 | tsae_attn | 0.03 | **0.27** |
 
-![AC NTPS faceted by raw_k — signal peaks at raw_k=1](../../results/freq_bench/reanalysis/ac_ntps_by_rawk.png)
+![AC NTPS faceted by raw_k — signal peaks at raw_k=1](../../../results/freq_bench/reanalysis/ac_ntps_by_rawk.png)
 
 ### The shuffle/reverse controls falsify the "aggregation only" reading
 
@@ -80,7 +80,7 @@ Shuffling → chance; reversing → **below chance**. The probe trained on
 forward data predicts the *flipped sign* on reversed sequences. Per-token
 archs are flat at 0.5 throughout, as predicted.
 
-![AC order controls — reverse below chance for windowed archs](../../results/freq_bench/reanalysis/ac_order_controls.png)
+![AC order controls — reverse below chance for windowed archs](../../../results/freq_bench/reanalysis/ac_order_controls.png)
 
 The Mixed bench shows the same, weaker, pattern (txcdr_t5 order-gap
 +0.14 unsigned / +0.11 signed at W=16, raw_k=1).
@@ -138,7 +138,7 @@ Analysis: `analyze_sweep.py`; outputs in `results/freq_bench/v2_sweep/`.
 
 ### 3a. The raw_k-facet correction reproduces under fresh training
 
-![v2 AC NTPS vs raw_k, faceted by W (d_sae=40)](../../results/freq_bench/v2_sweep/ntps_by_rawk.png)
+![v2 AC NTPS vs raw_k, faceted by W (d_sae=40)](../../../results/freq_bench/v2_sweep/ntps_by_rawk.png)
 
 At raw_k=10–20 (Dmitry's plotted slice) all archs sit near zero. At
 raw_k=1–2 with W=16 the windowed archs are clearly above chance, per-token
@@ -147,7 +147,7 @@ with fresh data.
 
 ### 3b. Order controls at d_sae=40 match Dmitry's regime
 
-![v2 AC order controls @ W=16, raw_k=1, d_sae=40](../../results/freq_bench/v2_sweep/order_controls.png)
+![v2 AC order controls @ W=16, raw_k=1, d_sae=40](../../../results/freq_bench/v2_sweep/order_controls.png)
 
 Same shape as Dmitry's row: per-token flat at 0.5; windowed archs
 ordered ≈ 0.64, shuffle → chance, reverse → 0.37 (below chance).
@@ -158,7 +158,7 @@ The headline new result. Widen the dictionary at the strongest cell
 (W=16, raw_k=1) and the temporal archs lift sharply; the per-token
 baseline does not move.
 
-![Capacity sweep at W=16, raw_k=1](../../results/freq_bench/v2_sweep/capacity.png)
+![Capacity sweep at W=16, raw_k=1](../../../results/freq_bench/v2_sweep/capacity.png)
 
 | arch | NTPS @d_sae=40 | @256 | @1024 | A_reverse @1024 |
 |---|---|---|---|---|
@@ -176,7 +176,7 @@ the temporal archs' ability; they do filter, given capacity.**
 
 A nonlinear (MLP) probe on the same mean-pooled code:
 
-![Linear vs MLP probe NTPS, d_sae=40](../../results/freq_bench/v2_sweep/linear_vs_mlp.png)
+![Linear vs MLP probe NTPS, d_sae=40](../../../results/freq_bench/v2_sweep/linear_vs_mlp.png)
 
 At d_sae=40 most cells lie **above** the diagonal — the information is
 linearly under-read at small capacity (e.g. a txcdr_t5 cell with linear
@@ -188,7 +188,7 @@ combined small-capacity / linear-readout artefact.
 
 ### 3e. Weight-space confirmation (FreqFrac)
 
-![FreqFrac of W_enc by raw_k, d_sae=40](../../results/freq_bench/v2_sweep/freqfrac_by_rawk.png)
+![FreqFrac of W_enc by raw_k, d_sae=40](../../../results/freq_bench/v2_sweep/freqfrac_by_rawk.png)
 
 The encoder atoms carry real AC energy independent of probe class: ≈ 0.50
 for txcdr_t2 (T=2 ⇒ DC + Nyquist evenly split, the maximally

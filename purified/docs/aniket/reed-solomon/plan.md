@@ -42,7 +42,7 @@ the polynomial perspective), reproduced here so the design is auditable:
 So the deliverable is **not** a finite-field GF(q) codec. It is the
 polynomial-phase generalisation of AC, evaluated as a clean
 TXC-wins-by-construction result, framed through the spectral $(T, S, B)$
-family (`spectral_family.md`).
+family (`freq-bench/spectral-family.md`).
 
 ### 1. The connection: AC bench = Reed–Solomon at polynomial length 1
 
@@ -108,7 +108,7 @@ constants problem from Dmitry's original run — don't repeat it).
 ### 3. Why TXC wins, and why that is "by construction"
 
 A degree-$D$ polynomial phase is concentrated in temporal-frequency bands
-up to order $\sim D$ (the spectral picture from `spectral_family.md` §1):
+up to order $\sim D$ (the spectral picture from `freq-bench/spectral-family.md` §1):
 the rfft of $\phi(t)$ along $\tau$ spreads energy into higher AC bands as
 $D$ grows. Reading the message therefore requires an encoder whose
 receptive field mixes $\ge D{+}1$ positions **before** the sparsity
@@ -155,7 +155,7 @@ Reuse the `freq_bench` experiment + (now generic) evaluator. New generator
 - **Window:** $W = 16$ (and a small $W \in \{8, 16\}$ slice for $T$
   sufficiency).
 - **Sparsity / capacity:** $k_\mathrm{pos} = 1$, $d_\mathrm{sae} = 1024$
-  (the readout-optimal slice established in `freq_bench_theory.md` §2).
+  (the readout-optimal slice established in `freq-bench/theory.md` §2).
 - **Noise:** $\sigma = 0.1$, plus a $\sigma = 0$ sanity row (oracle must hit
   NTPS = 1 for $T \ge D{+}1$ window archs).
 - **Controls:** the standard shuffle/reverse + MLP + FreqFrac the evaluator
@@ -175,7 +175,7 @@ Sharded across the 2 A40s via `experiments/reed_solomon/sweep.py` (clone of
 
 Commit the numeric predictions to
 `results/reed_solomon/predictions.json` at launch (pre-registration
-discipline, as in `spectral_family.md` §4).
+discipline, as in `freq-bench/spectral-family.md` §4).
 
 ### 7. Deliverables
 
@@ -184,7 +184,7 @@ discipline, as in `spectral_family.md` §4).
 - `configs/data.yaml` — `rs_D{1,2,3}_W16_s10` datasources.
 - `experiments/reed_solomon/{sweep,analyze}.py` — GPU-sharded sweep + plot
   script (NTPS-vs-$D$ curve, FreqFrac-vs-$D$, $B$-ablation grid).
-- `docs/aniket/reed_solomon_summary.md` — results with **inline rendered
+- `docs/aniket/reed-solomon/summary.md` — results with **inline rendered
   plots** (per the experiment-doc convention).
 - 1–2 sentence §4 paragraph + figure for the paper: the degree ladder as a
   by-construction capability gap, with the $(T, B)$-minimal-special-case

@@ -11,7 +11,7 @@ status: complete
 
 ## Direct-sum "which-process" benchmark — results
 
-**Plan:** `docs/aniket/direct_sum_plan.md` (pre-registered 2026-06-01).
+**Plan:** `docs/aniket/direct-sum/plan.md` (pre-registered 2026-06-01).
 **Generator:** `src/temp_bench/data/direct_sum_data.py:which_process`.
 **Sweep driver:** `experiments/direct_sum/sweep.py`.
 **Protocol:** FreqBench evaluator v1.2.0 (NTPS, order controls, MLP probe).
@@ -45,7 +45,7 @@ Only temporal structure (which block transitions) distinguishes classes.
 
 A_loc = 1/J, A_oracle = 1.0 for both datasources.
 
-![NTPS by arch × J](../../results/direct_sum/ntps_by_arch.png)
+![NTPS by arch × J](../../../results/direct_sum/ntps_by_arch.png)
 
 ---
 
@@ -58,13 +58,13 @@ A_loc = 1/J, A_oracle = 1.0 for both datasources.
 | `txc_base_TW` | 0.925 | 0.923 | 0.929 | +0.002 | 0.250 |
 | `tfa` | 0.381 | 0.363 | 0.387 | +0.018 | 0.250 |
 
-![Order controls at J=4](../../results/direct_sum/order_controls.png)
+![Order controls at J=4](../../../results/direct_sum/order_controls.png)
 
 ---
 
 ### Probe accuracy vs A_loc
 
-![A vs A_loc scatter](../../results/direct_sum/a_vs_a_loc.png)
+![A vs A_loc scatter](../../../results/direct_sum/a_vs_a_loc.png)
 
 ---
 

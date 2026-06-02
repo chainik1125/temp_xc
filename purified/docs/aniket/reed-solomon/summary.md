@@ -12,7 +12,7 @@ status: complete
 
 ## Reed–Solomon temporal encoding — results
 
-Companion to `reed_solomon_plan.md`. The plan's construction, resolved with
+Companion to `reed-solomon/plan.md`. The plan's construction, resolved with
 Dmitry (degree-$D$ polynomial phase, all three readout targets, unbiased
 $(T,S,B)$ sweep) is run here. Driver
 `experiments/reed_solomon/sweep.py`; analysis
@@ -39,7 +39,7 @@ result.
 
 ### 1. The degree ladder — class target (NTPS)
 
-![NTPS vs degree, per arch](../../results/reed_solomon/ntps_by_degree.png)
+![NTPS vs degree, per arch](../../../results/reed_solomon/ntps_by_degree.png)
 
 | arch | D=1 | D=2 | D=3 |
 |---|---|---|---|
@@ -59,8 +59,8 @@ every architecture sits at chance.
 All three readouts (Q2: "do all three") were computed on the *same* trained
 code. They tell one story.
 
-![sign NTPS vs degree](../../results/reed_solomon/ntps_sign_by_degree.png)
-![full-message NMSE vs degree](../../results/reed_solomon/nmse_by_degree.png)
+![sign NTPS vs degree](../../../results/reed_solomon/ntps_sign_by_degree.png)
+![full-message NMSE vs degree](../../../results/reed_solomon/nmse_by_degree.png)
 
 - **Sign of the leading coefficient** (binary): sliding-$T5$ +0.22 at $D{=}1$,
   chance at $D \ge 2$ — same shape as the class target.
@@ -74,7 +74,7 @@ code. They tell one story.
 
 ### 3. Unbiased $(T,S,B)$ sweep — where does standard TXC land?
 
-![(T,S,B) family, where TXC lands](../../results/reed_solomon/tsb_where_txc_lands.png)
+![(T,S,B) family, where TXC lands](../../../results/reed_solomon/tsb_where_txc_lands.png)
 
 Run without assuming TXC's standard config is optimal (Q3). At $D{=}1$:
 
@@ -92,7 +92,7 @@ Run without assuming TXC's standard config is optimal (Q3). At $D{=}1$:
 | `T5_S2_Ball` (stride 2) | 0.09 | sliding → joint |
 | `T5_S4_Ball` (stride 4) | 0.05 | |
 
-Two clean axes, consistent with `spectral_family.md`:
+Two clean axes, consistent with `freq-bench/spectral-family.md`:
 - **Band restriction *helps*.** Single non-DC bands (`B3`, `B1`) and AC-only
   subsets outperform full-band TXC — the encoder isn't spending capacity on
   bands the linear probe can't read. The standard $B{=}$all config is *not*
@@ -105,7 +105,7 @@ tuning cannot recover a degree the architecture can't represent.
 
 ### 4. Capacity probe — the D≥2 collapse is structural
 
-![capacity probe](../../results/reed_solomon/capacity_probe.png)
+![capacity probe](../../../results/reed_solomon/capacity_probe.png)
 
 The obvious objection to the $D \ge 2$ collapse is under-training. We probed
 $D{=}2,3$ at **4× dictionary ($d_\text{sae}{=}4096$) and 3× steps (15k)** for
@@ -132,7 +132,7 @@ baselines." Outcome: half right, with a sharper twist —
   family at this scale, which is a stronger and more useful statement than
   "TXC beats the baselines."
 - ➕ Band restriction beats full-band TXC at $D{=}1$ (unpredicted; matches
-  the `spectral_family.md` finding on AC).
+  the `freq-bench/spectral-family.md` finding on AC).
 
 ### 6. Implications + open questions
 
@@ -145,7 +145,7 @@ baselines." Outcome: half right, with a sharper twist —
    the encoder's FreqFrac *registers* (band cells show FreqFrac → 1.0) yet
    the pooled code carries no readable leading-coefficient signal — the same
    representation-present / readout-absent split as the joint $T{=}W$ AC
-   ceiling (`freq_bench_theory.md` §3). Worth a targeted probe: does a
+   ceiling (`freq-bench/theory.md` §3). Worth a targeted probe: does a
    *symbolic* (finite-difference) readout recover $D{=}2$ from the code,
    i.e. is the info present but nonlinearly encoded?
 3. **TXC as a special case (Q3 follow-through).** The $(T,S,B)$ sweep

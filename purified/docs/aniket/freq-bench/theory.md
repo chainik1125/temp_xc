@@ -10,8 +10,8 @@ tags:
 ## A Fourier benchmark for temporal dictionary learning
 
 This is the theory companion to the FreqBench results in
-`summary.md` and the window-degradation investigation in
-`window_degradation.md`. It states what FreqBench is, why the
+`freq-bench/summary.md` and the window-degradation investigation in
+`freq-bench/window-degradation.md`. It states what FreqBench is, why the
 **one-sparsity-slice artifact** changes Dmitry's conclusion, why the
 **window-size degradation** of `txc_base T=W` happens, and how it is
 solved. Notation matches §3 (Temporal Crosscoders) and §4 (Synthetic
@@ -290,7 +290,7 @@ readout-protocol artifact. The order controls (Section 1.4) further
 ground the corrected reading: $A_\text{reverse} < \tfrac{1}{2}$ for the
 windowed architectures at the strong cell.
 
-![v2 AC NTPS vs raw_k faceted by W (d_sae=40)](../../results/freq_bench/v2_sweep/ntps_by_rawk.png)
+![v2 AC NTPS vs raw_k faceted by W (d_sae=40)](../../../results/freq_bench/v2_sweep/ntps_by_rawk.png)
 
 The same plot, by W: the AC signal is concentrated at small
 $k_\text{pos}$ and large $W$, and is invisible in the $k_\text{pos}=10$
@@ -342,7 +342,7 @@ stays low.
 For each cell, we re-load the trained $W_\text{enc}$ (shape $(T, d, H)$)
 and compute FreqFrac directly.
 
-![FreqFrac vs W (left) and NTPS vs W (right) — txc_base T=W](../../results/freq_bench/v2_sweep/freqfrac_vs_W_TW.png)
+![FreqFrac vs W (left) and NTPS vs W (right) — txc_base T=W](../../../results/freq_bench/v2_sweep/freqfrac_vs_W_TW.png)
 
 Observation: $\mathrm{FreqFrac}$ **climbs** from $0.50$ (at $T=2$, where
 the rfft has one DC bin and one AC bin and the structural maximum is
@@ -455,7 +455,7 @@ $d_\text{sae}=1024$):
 | `txcdr_t2` (sliding T=2) | 0.51 | 0.53 | +0.02 |
 | `txcdr_t5` (sliding T=5) | 0.72 | 0.78 | +0.06 |
 
-![Linear vs MLP probe — joint vs sliding](../../results/freq_bench/v2_sweep/joint_vs_sliding_mlp.png)
+![Linear vs MLP probe — joint vs sliding](../../../results/freq_bench/v2_sweep/joint_vs_sliding_mlp.png)
 
 The MLP lift is small everywhere ($\le 0.06$) and **does not close the
 joint-vs-sliding gap**: joint $T=W$ goes 0.17 → 0.19, sliding $T=5$ goes
@@ -508,7 +508,7 @@ mixing) but not the second (sliding). The per-position arch has neither.
 The sliding-T architecture has both. The empirical NTPS gap is exactly
 what this decomposition predicts.
 
-![Architecture comparison at the strong AC cell](../../results/freq_bench/v2_sweep/TW_variants_comparison.png)
+![Architecture comparison at the strong AC cell](../../../results/freq_bench/v2_sweep/TW_variants_comparison.png)
 
 ---
 

@@ -12,7 +12,7 @@ Sweep axes:
     - 4 datasources (af_chirp_W16_s10, af_multitone_W16_s10, af_am_W16_s10,
                      af_relphase_W16_s10)
     - readout-optimal regime: k_pos=1, d_sae=1024 (established in
-      freq_bench_theory.md §2 — the sparsity slice that maximises AC signal)
+      docs/aniket/freq-bench/theory.md §2 — the sparsity slice that maximises AC signal)
 
 All cells go through ``run_experiment(experiment='freq_bench')`` so rows land
 in results/leaderboard.jsonl with full code-version stamps and are
@@ -50,7 +50,7 @@ DATASOURCES = [
     "af_relphase_W16_s10",
 ]
 
-# Readout-optimal regime (freq_bench_theory.md §2)
+# Readout-optimal regime (docs/aniket/freq-bench/theory.md §2)
 K_POS = 1
 D_SAE = 1024
 SEED = 0

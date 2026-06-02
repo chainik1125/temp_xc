@@ -22,7 +22,7 @@ evaluator (NTPS + order-controls) unchanged; new generators live in
 ### Provenance
 
 These four benches are designed to extend the FreqBench AC/Mixed story from
-`freq_bench_theory.md`. They are NOT present anywhere in the prior repo
+`freq-bench/theory.md`. They are NOT present anywhere in the prior repo
 history (verified). Design is grounded in the following considerations:
 
 1. The AC bench (single-channel, linear phase) is the cleanest signed-direction
@@ -398,14 +398,14 @@ empirically determined.
 
 ## 7. Implementation checklist
 
-- [x] Write this plan (`docs/aniket/altfreq_plan.md`)
+- [x] Write this plan (`docs/aniket/alternative-freqs/plan.md`)
 - [ ] Implement `src/temp_bench/data/altfreq_data.py`
 - [ ] Sanity-check each generator (shape, label balance, oracle at σ=0)
 - [ ] Smoke test via `run.py freq_bench --arch txc_base --seed 0 --datasource af_chirp_smoke --smoke`
 - [ ] Write `experiments/altfreq/{__init__,sweep,analyze}.py`
 - [ ] Run sweep (GPU 0, CUDA_VISIBLE_DEVICES=0)
 - [ ] Run analysis, render PNGs to `results/altfreq/`
-- [ ] Write `docs/aniket/altfreq_summary.md`
+- [ ] Write `docs/aniket/alternative-freqs/summary.md`
 
 ---
 

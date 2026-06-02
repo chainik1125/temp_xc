@@ -86,7 +86,7 @@ frequencies, averaged over the d_sae atoms. High ⇒ atoms detect
 *transitions*; ≈ 0 ⇒ atoms are constant across T (pure smoothers).
 (`experiments/freq_bench/freqfrac_diagnostic.py`.)
 
-![FreqFrac vs W, NTPS vs W — txc_base T=W](../../results/freq_bench/v2_sweep/freqfrac_vs_W_TW.png)
+![FreqFrac vs W, NTPS vs W — txc_base T=W](../../../results/freq_bench/v2_sweep/freqfrac_vs_W_TW.png)
 
 | W  | FreqFrac @d_sae=40 | @256 | @1024 | NTPS @1024 |
 |----|---|---|---|---|
@@ -147,7 +147,7 @@ removing it lost the position-mixing.
 
 Compare all five architectures at the strong cell:
 
-![Architecture comparison @ W=16, raw_k=1, d_sae=1024](../../results/freq_bench/v2_sweep/TW_variants_comparison.png)
+![Architecture comparison @ W=16, raw_k=1, d_sae=1024](../../../results/freq_bench/v2_sweep/TW_variants_comparison.png)
 
 | arch (W=16, k=1, d_sae=1024) | structure | NTPS | A_reverse |
 |---|---|---|---|

@@ -20,8 +20,8 @@ walks in a single space rather than as separate model families, (ii)
 turn FreqFrac into an interpretable family parameter rather than a
 post-hoc diagnostic, and (iii) issue pre-registered predictions of the
 form "the cell at $(T, S, B)$ should fail because it lacks the bands the
-task requires." Companion writeup to `freq_bench_theory.md` and
-`window_degradation.md`.
+task requires." Companion writeup to `freq-bench/theory.md` and
+`freq-bench/window-degradation.md`.
 
 ### 1. Frequency decomposition of the TXC encoder
 
@@ -76,7 +76,7 @@ $\hat W_\text{enc}^{(f)}$ are two equivalent representations of the
 same object; what's different is which one we choose to parameterise
 and impose structure on.
 
-FreqFrac (from `freq_bench_theory.md` §2.2) is exactly the energy
+FreqFrac (from `freq-bench/theory.md` §2.2) is exactly the energy
 distribution of $\hat W_\text{enc}^{(f)}$ across $f$:
 $$
 \mathrm{FreqFrac}(W_\text{enc})
@@ -112,7 +112,7 @@ joint-vs-sliding axis made explicit.** Currently the paper treats
 sliding ($S{=}1$) and joint ($S{=}W{=}T$) as different architectures
 with the same name; promoting $S$ to an hparam exposes them as a single
 sweep axis. (The $\sqrt{(W{-}T)/S + 1}$ SNR gain of small $S$ over
-large $S$, from `freq_bench_theory.md` §3.6, is then a property of
+large $S$, from `freq-bench/theory.md` §3.6, is then a property of
 the family parameter, not an architectural curiosity.)
 
 **Band subset $B \subseteq \{0, 1, \ldots, \lfloor T/2 \rfloor\}$.**
@@ -148,7 +148,7 @@ The per-token TopK SAE and the Bhalla T-SAE land at the same $(T, S, B)$
 point — they differ in their training objective (reconstruction-only vs
 reconstruction + contrastive), not in their family location. The
 per-position TopK ablation falls *outside* the family, which is why it
-behaves differently (see §3.4 of `freq_bench_theory.md`): it replaces
+behaves differently (see §3.4 of `freq-bench/theory.md`): it replaces
 the band-aware sum $\sum_\tau W^{(\tau)} x_\tau$ with per-position
 TopK on each $\tau$ independently, which is a structurally different
 encoder.
@@ -182,7 +182,7 @@ compares predicted vs measured NTPS.
 
 Eleven cells, 3 × A40, ~12 min wall.
 
-![Predicted vs measured NTPS — (T, S, B) sweep](../../results/freq_bench/v2_sweep/spectral_predicted_vs_measured.png)
+![Predicted vs measured NTPS — (T, S, B) sweep](../../../results/freq_bench/v2_sweep/spectral_predicted_vs_measured.png)
 
 | label | $(T, S, B)$ | pred | meas | err | FreqFrac |
 |---|---|---|---|---|---|
@@ -233,7 +233,7 @@ the encoder freedom to spend capacity on bands the linear probe cannot
 read.
 
 This recovers the same finite-sample probe-variance argument from
-`freq_bench_theory.md` §2.1, but at a different control axis: instead
+`freq-bench/theory.md` §2.1, but at a different control axis: instead
 of "sparser $k_\text{pos}$ helps because TopK culls nuisance atoms,"
 this says "narrower $B$ helps because the encoder cannot allocate
 capacity to nuisance bands in the first place." Both are forms of
@@ -274,9 +274,9 @@ loop to have.
    TXC there (DC-dominated tasks), while AC-only TXC should *fail*. This
    is the dual prediction and the cleanest paper result.
 3. **The stride axis confirms** the $\sqrt{1/((W-T)/S + 1)}$ SNR argument
-   from `freq_bench_theory.md` §3.6 quantitatively. Worth converting to
+   from `freq-bench/theory.md` §3.6 quantitatively. Worth converting to
    a single panel in the appendix.
-4. **Update the theory doc** (`freq_bench_theory.md` §3.6) with the
+4. **Update the theory doc** (`freq-bench/theory.md` §3.6) with the
    single-band-helps finding — it changes the "what TXC should be"
    recommendation from "full-band sliding TXC" to "band-restricted
    sliding TXC."

@@ -52,7 +52,7 @@ DATASOURCES = [
     ("ds_which_J8_W16_s10", 8),
 ]
 
-# Fixed hparams (readout-optimal per freq_bench_theory.md §2)
+# Fixed hparams (readout-optimal per docs/aniket/freq-bench/theory.md §2)
 K_POS  = 1
 D_SAE  = 1024
 SEED   = 0

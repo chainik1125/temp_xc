@@ -27,7 +27,7 @@ direct-sum processes.*
 No prior direct-sum or which-process code exists anywhere in the repo (grep
 confirms). The design below is new and grounded in the FreqBench framework
 already established in `docs/components/freq_bench.md` and
-`docs/aniket/freq_bench_theory.md`. It reuses the `freq_bench` evaluator
+`docs/aniket/freq-bench/theory.md`. It reuses the `freq_bench` evaluator
 (experiment="freq_bench") and `FreqBenchData` dataclass unchanged.
 
 ---
@@ -205,7 +205,7 @@ def which_process(*, J, W, sigma, d_in, n_seqs, seed, **_ignore) -> FreqBenchDat
 (`txcdr_t5`), `txc_base` joint T=W=16 (`txc_base_TW`), `tfa`.
 
 **Sparsity / capacity:** k_pos=1, d_sae=1024 (readout-optimal per
-`freq_bench_theory.md` §2).
+`freq-bench/theory.md` §2).
 
 **Datasources:** `ds_which_J4_W16_s10`, `ds_which_J8_W16_s10`.
 
@@ -276,7 +276,7 @@ sampled per sequence (not a fixed phase) so the marginal is uniform.
 - `experiments/direct_sum/__init__.py`, `sweep.py`, `analyze.py`.
 - `results/direct_sum/`: NTPS-by-arch, order-controls at J=4, per-process
   accuracy.
-- `docs/aniket/direct_sum_summary.md` — results doc with inline plots.
+- `docs/aniket/direct-sum/summary.md` — results doc with inline plots.
 
 ---
 
