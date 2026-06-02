@@ -1,0 +1,70 @@
+{
+  "n_rows": 8,
+  "protocol": "1.2.0",
+  "cells": {
+    "topk_sae": {
+      "J=4": {
+        "NTPS": -0.0133,
+        "A": 0.24,
+        "A_shuffle": 0.24,
+        "A_reverse": 0.24,
+        "NTPS_mlp": 0.0091
+      },
+      "J=8": {
+        "NTPS": 0.0046,
+        "A": 0.129,
+        "A_shuffle": 0.129,
+        "A_reverse": 0.129,
+        "NTPS_mlp": 0.0055
+      }
+    },
+    "txcdr_t5": {
+      "J=4": {
+        "NTPS": 0.8976,
+        "A": 0.9232,
+        "A_shuffle": 0.9224,
+        "A_reverse": 0.9392,
+        "NTPS_mlp": 0.8293
+      },
+      "J=8": {
+        "NTPS": 0.0311,
+        "A": 0.1522,
+        "A_shuffle": 0.1474,
+        "A_reverse": 0.1434,
+        "NTPS_mlp": 0.0266
+      }
+    },
+    "txc_base_TW": {
+      "J=4": {
+        "NTPS": 0.8997,
+        "A": 0.9248,
+        "A_shuffle": 0.9232,
+        "A_reverse": 0.9288,
+        "NTPS_mlp": 0.7899
+      },
+      "J=8": {
+        "NTPS": 0.1126,
+        "A": 0.2236,
+        "A_shuffle": 0.234,
+        "A_reverse": 0.2204,
+        "NTPS_mlp": 0.1007
+      }
+    },
+    "tfa": {
+      "J=4": {
+        "NTPS": 0.1744,
+        "A": 0.3808,
+        "A_shuffle": 0.3632,
+        "A_reverse": 0.3872,
+        "NTPS_mlp": 0.2352
+      },
+      "J=8": {
+        "NTPS": 0.5696,
+        "A": 0.6234,
+        "A_shuffle": 0.6018,
+        "A_reverse": 0.5962,
+        "NTPS_mlp": 0.4734
+      }
+    }
+  }
+}

@@ -191,3 +191,124 @@ datasources:
     seq_len: 16
     params: { bench: mixed_unsigned, W: 16, sigma: 0.1, M: 127, n_classes: 10, d_in: 256, n_seqs: 4096 }
     notes: "Mixed unsigned bench, Ω10, W=16, σ=0.1."
+
+  # ── Alternate frequency benches (af_*) — agent: altfreq ────────────────
+  # Generators in temp_bench.data.altfreq_data, each returning a
+  # FreqBenchData (so the generic `freq_bench` evaluator handles them with
+  # no core/runner edits). Each generator MUST accept the params below as
+  # kwargs plus **_ignore (the `bench` key is a label only) and a `seed`.
+  # The freq_bench evaluator slides any window arch's T across seq_len=W.
+
+  af_chirp_smoke:
+    category: synthetic
+    generator: "temp_bench.data.altfreq_data:chirp"
+    seq_len: 4
+    params: { bench: chirp, W: 4, sigma: 0.1, M: 16, d_in: 32, n_seqs: 256 }
+    notes: "Tiny chirp smoke cell."
+
+  af_chirp_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.altfreq_data:chirp"
+    seq_len: 16
+    params: { bench: chirp, W: 16, sigma: 0.1, M: 64, d_in: 256, n_seqs: 4096 }
+    notes: |
+      Linear-chirp bench: quadratic phase φ(t)=φ0+v t+½a t² mod M; label =
+      sign of the chirp rate a (instantaneous-frequency direction). Needs
+      ≥3 timesteps; aggregators fail, order-sensitive archs win.
+
+  af_multitone_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.altfreq_data:multitone"
+    seq_len: 16
+    params: { bench: multitone, W: 16, sigma: 0.1, M: 64, n_classes: 8, d_in: 256, n_seqs: 4096 }
+    notes: |
+      Multi-tone selectivity bench: emission is a superposition of tones; one
+      target tone per sequence sets the label (n_classes). Traces a finer
+      frequency-response than the Mixed bench. A_loc=1/n_classes, oracle=1.
+
+  af_am_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.altfreq_data:am"
+    seq_len: 16
+    params: { bench: am, W: 16, sigma: 0.1, M: 64, n_classes: 6, d_in: 256, n_seqs: 4096 }
+    notes: |
+      Amplitude-modulation bench: a carrier modulated by a slow envelope;
+      label = modulation-rate (beat-frequency) class. Tests detecting
+      structure at a frequency other than the carrier.
+
+  af_relphase_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.altfreq_data:relphase"
+    seq_len: 16
+    params: { bench: relphase, W: 16, sigma: 0.1, M: 32, d_in: 256, n_seqs: 4096 }
+    notes: |
+      Two-channel relative-phase bench: two phase walks in orthogonal blocks;
+      label = lead/lag sign (which channel leads). A cleaner signed-direction
+      task than the single-channel AC ring walk. Reverse-control < chance.
+
+  # ── Direct-sum "which-process" bench (ds_*) — agent: direct_sum ────────
+  # Generator temp_bench.data.direct_sum_data:which_process returning a
+  # FreqBenchData. J independent processes live in orthogonal d_in blocks and
+  # are superposed (direct sum); the label identifies which process is
+  # responsible (e.g. which dynamics generated the sequence). Sharp design:
+  # processes share the same emission MARGINAL but differ in temporal
+  # DYNAMICS, so only an order-sensitive arch can tell them apart. Generator
+  # MUST accept these kwargs + **_ignore + seed.
+
+  ds_which_smoke:
+    category: synthetic
+    generator: "temp_bench.data.direct_sum_data:which_process"
+    seq_len: 4
+    params: { bench: direct_sum, J: 2, W: 4, sigma: 0.1, d_in: 32, n_seqs: 256 }
+    notes: "Tiny direct-sum which-process smoke cell."
+
+  ds_which_J4_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.direct_sum_data:which_process"
+    seq_len: 16
+    params: { bench: direct_sum, J: 4, W: 16, sigma: 0.1, d_in: 256, n_seqs: 4096 }
+    notes: |
+      Direct sum of J=4 processes on orthogonal blocks; label = which process
+      generated the sequence. Processes share emission marginal, differ in
+      dynamics. A_loc=1/J (single token can't attribute), oracle=1.
+
+  ds_which_J8_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.direct_sum_data:which_process"
+    seq_len: 16
+    params: { bench: direct_sum, J: 8, W: 16, sigma: 0.1, d_in: 256, n_seqs: 4096 }
+    notes: "Direct-sum which-process, J=8 (harder attribution)."
+
+  # ── Reed-Solomon poly-phase bench (rs_*) — degree-D ladder ─────────────
+  # Generator temp_bench.data.reed_solomon_data:rs_poly_phase returning a
+  # FreqBenchData with y=leading-class, velocities=signed leading coeff, and
+  # coeffs=full message → the freq_bench evaluator emits all 3 targets
+  # (class NTPS, sign NTPS, full-message regression NMSE). D=1 reproduces AC.
+
+  rs_smoke:
+    category: synthetic
+    generator: "temp_bench.data.reed_solomon_data:rs_poly_phase"
+    seq_len: 8
+    params: { bench: rs_D2, W: 8, sigma: 0.1, M: 32, degree: 2, n_classes: 4, d_in: 32, n_seqs: 256 }
+    notes: "Tiny Reed-Solomon smoke cell (W=8 ≥ T=5)."
+
+  rs_D1_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.reed_solomon_data:rs_poly_phase"
+    seq_len: 16
+    params: { bench: rs_D1, W: 16, sigma: 0.1, M: 64, degree: 1, n_classes: 8, d_in: 256, n_seqs: 4096 }
+    notes: "RS degree 1 (= AC bench): φ(t)=m0+m1·t. Sanity anchor vs fb_ac."
+
+  rs_D2_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.reed_solomon_data:rs_poly_phase"
+    seq_len: 16
+    params: { bench: rs_D2, W: 16, sigma: 0.1, M: 64, degree: 2, n_classes: 8, d_in: 256, n_seqs: 4096 }
+    notes: "RS degree 2 (quadratic phase = linear chirp). Needs ≥3 timesteps."
+
+  rs_D3_W16_s10:
+    category: synthetic
+    generator: "temp_bench.data.reed_solomon_data:rs_poly_phase"
+    seq_len: 16
+    params: { bench: rs_D3, W: 16, sigma: 0.1, M: 64, degree: 3, n_classes: 8, d_in: 256, n_seqs: 4096 }
+    notes: "RS degree 3 (cubic phase). Needs ≥4 timesteps; baselines degrade most."

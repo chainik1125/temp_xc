@@ -1,0 +1,158 @@
+{
+  "n_rows": 16,
+  "protocol": "1.2.0",
+  "cells": {
+    "topk_sae": {
+      "chirp": {
+        "NTPS": -0.022,
+        "A": 0.489,
+        "A_shuffle": 0.489,
+        "A_reverse": 0.489,
+        "NTPS_mlp": -0.021,
+        "order_gap": 0.0,
+        "reverse_drop": 0.0
+      },
+      "multitone": {
+        "NTPS": -0.02,
+        "A": 0.107,
+        "A_shuffle": 0.107,
+        "A_reverse": 0.107,
+        "NTPS_mlp": -0.018,
+        "order_gap": 0.0,
+        "reverse_drop": 0.0
+      },
+      "am": {
+        "NTPS": -0.006,
+        "A": 0.162,
+        "A_shuffle": 0.162,
+        "A_reverse": 0.162,
+        "NTPS_mlp": -0.015,
+        "order_gap": 0.0,
+        "reverse_drop": 0.0
+      },
+      "relphase": {
+        "NTPS": 0.23,
+        "A": 0.615,
+        "A_shuffle": 0.615,
+        "A_reverse": 0.615,
+        "NTPS_mlp": 0.114,
+        "order_gap": 0.0,
+        "reverse_drop": 0.0
+      }
+    },
+    "txcdr_t5": {
+      "chirp": {
+        "NTPS": 0.053,
+        "A": 0.526,
+        "A_shuffle": 0.487,
+        "A_reverse": 0.513,
+        "NTPS_mlp": 0.035,
+        "order_gap": 0.039,
+        "reverse_drop": 0.014
+      },
+      "multitone": {
+        "NTPS": 0.285,
+        "A": 0.374,
+        "A_shuffle": 0.126,
+        "A_reverse": 0.144,
+        "NTPS_mlp": 0.229,
+        "order_gap": 0.249,
+        "reverse_drop": 0.23
+      },
+      "am": {
+        "NTPS": -0.006,
+        "A": 0.162,
+        "A_shuffle": 0.176,
+        "A_reverse": 0.158,
+        "NTPS_mlp": -0.0,
+        "order_gap": -0.014,
+        "reverse_drop": 0.003
+      },
+      "relphase": {
+        "NTPS": 0.488,
+        "A": 0.744,
+        "A_shuffle": 0.532,
+        "A_reverse": 0.51,
+        "NTPS_mlp": 0.566,
+        "order_gap": 0.212,
+        "reverse_drop": 0.234
+      }
+    },
+    "txc_base_TW": {
+      "chirp": {
+        "NTPS": 0.026,
+        "A": 0.513,
+        "A_shuffle": 0.505,
+        "A_reverse": 0.509,
+        "NTPS_mlp": 0.024,
+        "order_gap": 0.008,
+        "reverse_drop": 0.004
+      },
+      "multitone": {
+        "NTPS": 0.035,
+        "A": 0.156,
+        "A_shuffle": 0.132,
+        "A_reverse": 0.12,
+        "NTPS_mlp": 0.027,
+        "order_gap": 0.024,
+        "reverse_drop": 0.036
+      },
+      "am": {
+        "NTPS": 0.008,
+        "A": 0.174,
+        "A_shuffle": 0.177,
+        "A_reverse": 0.172,
+        "NTPS_mlp": 0.004,
+        "order_gap": -0.003,
+        "reverse_drop": 0.002
+      },
+      "relphase": {
+        "NTPS": 0.088,
+        "A": 0.544,
+        "A_shuffle": 0.518,
+        "A_reverse": 0.51,
+        "NTPS_mlp": 0.154,
+        "order_gap": 0.026,
+        "reverse_drop": 0.034
+      }
+    },
+    "tfa": {
+      "chirp": {
+        "NTPS": -0.011,
+        "A": 0.494,
+        "A_shuffle": 0.465,
+        "A_reverse": 0.476,
+        "NTPS_mlp": -0.029,
+        "order_gap": 0.03,
+        "reverse_drop": 0.018
+      },
+      "multitone": {
+        "NTPS": 0.029,
+        "A": 0.15,
+        "A_shuffle": 0.122,
+        "A_reverse": 0.134,
+        "NTPS_mlp": 0.028,
+        "order_gap": 0.028,
+        "reverse_drop": 0.016
+      },
+      "am": {
+        "NTPS": 0.007,
+        "A": 0.173,
+        "A_shuffle": 0.174,
+        "A_reverse": 0.174,
+        "NTPS_mlp": -0.002,
+        "order_gap": -0.001,
+        "reverse_drop": -0.001
+      },
+      "relphase": {
+        "NTPS": 0.555,
+        "A": 0.778,
+        "A_shuffle": 0.731,
+        "A_reverse": 0.745,
+        "NTPS_mlp": 0.605,
+        "order_gap": 0.046,
+        "reverse_drop": 0.033
+      }
+    }
+  }
+}

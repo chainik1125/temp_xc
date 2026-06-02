@@ -185,7 +185,10 @@ class FreqBenchEval(Evaluator):
     # 1.1.0: order-controls use the shared forward-trained probe (reverse can
     #        go below chance) instead of re-fitting per control.
     # 1.2.0: + nonlinear (MLP) probe NTPS_mlp + weight-space FreqFrac.
-    protocol_version = "1.2.0"
+    # 1.3.0: + Reed-Solomon readouts (NTPS_sign + full-message regression);
+    #        regression uses RidgeCV (alpha chosen by CV) so the NMSE is
+    #        bounded ~≤1 instead of overfitting at large d_sae.
+    protocol_version = "1.3.0"
 
     def eval(self, model: TempBenchArch, spec: EvalSpec) -> dict[str, float]:
         ds = load_datasource(spec.datasource)
@@ -199,7 +202,8 @@ class FreqBenchEval(Evaluator):
         seed = int(spec.extra.get("training_seed", 0))
         n_probe = 256 if spec.smoke else 2500
         params = {**params, "n_seqs": n_probe}
-        data = materialise_probe_set(bench=bench, params=params, seed=seed)
+        data = materialise_probe_set(bench=bench, params=params, seed=seed,
+                                     generator=ds.generator)
 
         x = data.x
         y = data.y.numpy()
@@ -248,6 +252,55 @@ class FreqBenchEval(Evaluator):
         # Mixed bench: per-velocity-class accuracy → frequency response R_j.
         if data.velocities is not None:
             out.update(self._per_velocity(z, y, data, seed))
+
+        # Reed-Solomon: extra readouts on the SAME pooled code (sign of the
+        # leading coefficient + full-message regression). Gated on coeffs —
+        # a no-op for every non-RS bench.
+        if data.coeffs is not None:
+            out.update(self._rs_readouts(z, y, data, seed))
+        return out
+
+    def _rs_readouts(self, z, y, data, seed) -> dict[str, float]:
+        """Reed-Solomon targets (a) + (c) on the mean-pooled code.
+
+        (a) sign of the leading coefficient → binary NTPS_sign.
+        (c) full message m=(m_0,…,m_D) → regression NMSE per finite-
+            difference order (nmse_m{j}) + mean (nmse_msg). NMSE is on
+            train-standardised targets, so 1.0 = no better than the mean.
+
+        The multiclass leading-CLASS target (b) is the main A / NTPS already.
+        """
+        from sklearn.linear_model import RidgeCV
+        feats = _pool_mean(z)
+        tr, te = _split(len(y), seed)
+        out: dict[str, float] = {}
+
+        # (a) sign of the leading coefficient (restrict to nonzero leading).
+        lead = data.velocities.numpy()
+        y_sign = (lead > 0).astype(np.int64)
+        nzset = set(np.where(lead != 0)[0].tolist())
+        tr_s = np.array([i for i in tr if i in nzset], dtype=int)
+        te_s = np.array([i for i in te if i in nzset], dtype=int)
+        if len(tr_s) > 4 and len(te_s) > 0 and len(np.unique(y_sign[tr_s])) == 2:
+            scaler, clf, const = _fit_probe(feats, y_sign, tr_s)
+            A_sign = _score(scaler, clf, const, feats, y_sign, te_s)
+            out["A_sign"] = float(A_sign)
+            out["NTPS_sign"] = float((A_sign - 0.5) / 0.5)
+
+        # (c) full-message regression.
+        C = data.coeffs.numpy().astype(np.float64)            # (N, D+1)
+        scaler = StandardScaler().fit(feats[tr])
+        Xtr, Xte = scaler.transform(feats[tr]), scaler.transform(feats[te])
+        mu, sd = C[tr].mean(0), C[tr].std(0) + 1e-9
+        Ztr, Zte = (C[tr] - mu) / sd, (C[te] - mu) / sd
+        # CV-chosen ridge: strong regularisation bounds the no-signal NMSE
+        # near 1 (predict-the-mean) instead of overfitting at large d_sae.
+        reg = RidgeCV(alphas=np.logspace(-1, 4, 12)).fit(Xtr, Ztr)
+        col_nmse = ((reg.predict(Xte) - Zte) ** 2).mean(axis=0)  # (D+1,)
+        out["nmse_msg"] = float(col_nmse.mean())
+        out["nmse_lead"] = float(col_nmse[-1])
+        for j in range(C.shape[1]):
+            out[f"nmse_m{j}"] = float(col_nmse[j])
         return out
 
     def _per_velocity(self, z, y, data, seed) -> dict[str, float]:

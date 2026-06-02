@@ -48,6 +48,10 @@ class FreqBenchData:
     n_classes: int
     bench: str
     velocities: torch.Tensor | None = None   # (N,) — Mixed only
+    coeffs: torch.Tensor | None = None        # (N, D+1) — Reed-Solomon
+    #   full-message regression target (finite-difference initial
+    #   conditions of the degree-D polynomial phase). When present, the
+    #   freq_bench evaluator adds a regression readout (NMSE per order).
 
 
 # ── shared helpers ──────────────────────────────────────────────────────
@@ -191,12 +195,34 @@ _GEN = {
 }
 
 
-def materialise_probe_set(*, bench: str, params: dict, seed: int) -> FreqBenchData:
+def materialise_probe_set(*, bench: str, params: dict, seed: int,
+                          generator: str | None = None) -> FreqBenchData:
     """Generate a labelled probe set for evaluation.
+
+    Dispatch order: a built-in bench name in ``_GEN`` wins; otherwise the
+    datasource's ``generator`` module path ("module:fn") is resolved via
+    importlib. This lets new FreqBench-style benches — alternate-frequency
+    (chirp / multitone / AM / relative-phase), direct-sum "which-process",
+    Reed-Solomon poly-phase — reuse the ``freq_bench`` evaluator WITHOUT
+    editing ``_GEN`` or the runner registry: each just registers a generator
+    that returns a :class:`FreqBenchData` (with ``.y``, ``.A_loc``,
+    ``.A_oracle``, ``.n_classes`` filled in; optional ``.velocities`` for a
+    per-class R_j curve). Generators must accept ``**_ignore`` so the
+    label-only ``bench`` key and any extra datasource params are swallowed.
 
     Uses a seed OFFSET from the training seed so the probe data is disjoint
     from (but the same distribution as) what the SAE trained on.
     """
-    fn = _GEN[bench]
+    if bench in _GEN:
+        fn = _GEN[bench]
+    elif generator and ":" in generator:
+        from temp_bench.core.config import import_by_path
+        fn = import_by_path(generator)
+    else:
+        raise KeyError(
+            f"freq_bench: bench {bench!r} is not built-in ({list(_GEN)}) and "
+            f"no resolvable 'module:fn' generator path was given "
+            f"(got generator={generator!r})."
+        )
     kw = {k: v for k, v in params.items() if k != "seed"}
     return fn(seed=seed + 10_000, **kw)

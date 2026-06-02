@@ -190,11 +190,25 @@ discipline, as in `spectral_family.md` §4).
   by-construction capability gap, with the $(T, B)$-minimal-special-case
   reading.
 
-### 8. Questions for Dmitry
+### 8. Questions for Dmitry — RESOLVED (2026-06-01)
 
-These are the decisions that actually change what we build. **Q1 unblocks
-the whole build; Q2 is needed before the evaluator is written; Q3–Q4 are
-framing/scope and can come later.**
+**Resolutions (relayed via Aniket):**
+- **Q1 → YES.** Proceed with the degree-$D$ polynomial-phase construction,
+  $D \in \{1, 2, 3\}$. $D{=}1$ reproduces AC.
+- **Q2 → ALL THREE.** Report all three recovery targets: (a) sign of the
+  leading coefficient (binary), (b) leading-coefficient class over a
+  symmetric ladder (multiclass), (c) full-message regression (NMSE over the
+  $D{+}1$ finite-difference initial conditions). All three are *readouts on
+  the same trained SAE code* — (a)/(b) are two classification label-modes,
+  and (c) is a regression probe that rides along in the same eval call, so
+  there is no extra training cost.
+- **Q3 → UNBIASED $(T,S,B)$ SWEEP.** Run the full $(T,S,B)$ band/stride
+  sweep on the RS benches and *report where the standard TXC config lands* —
+  no assumption that TXC is optimal. Let the data place it.
+- **Q4 → DEFERRED.** Revisit the by-construction framing after results from
+  all three assigned tasks (RS + alt-frequency + direct-sum) are in.
+
+The original questions, for the record:
 
 **Q1 — Confirm the construction (load-bearing).** There is no RS spec in the
 repo, so everything downstream rests on this.
