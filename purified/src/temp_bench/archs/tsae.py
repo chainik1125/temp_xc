@@ -103,6 +103,7 @@ class TSAEPaper(TempBenchArch):
         d_in: int,
         d_sae: int,
         k_pos: int,
+        T: int = 1,
         h_frac: float = 0.20,
         contrastive_alpha: float = 1.0,
         auxk_alpha: float = 1.0 / 32.0,
@@ -111,9 +112,14 @@ class TSAEPaper(TempBenchArch):
         dead_feature_threshold_tokens: int = 10_000_000,
     ):
         nn.Module.__init__(self)
-        # T=1: T-SAE's encode is per-token at inference. The contrastive pair
-        # (B, 2, d_in) is a TRAINING-time construct, handled inside
-        # ``train_step`` via a single random offset over the seq_len axis.
+        # T-SAE is per-token at inference: T must be 1. We accept the `T`
+        # kwarg only so the unified sweep can pass T uniformly across archs
+        # (window archs take T>1); a non-1 value is rejected rather than
+        # silently ignored. The contrastive pair (B, 2, d_in) is a
+        # TRAINING-time construct, handled inside ``train_step`` via a single
+        # random offset over the seq_len axis.
+        if int(T) != 1:
+            raise ValueError(f"T-SAE is per-token; T must be 1, got {T}.")
         self.config = ArchConfig(
             name="tsae_paper", d_in=d_in, d_sae=d_sae, k_pos=k_pos, T=1
         )

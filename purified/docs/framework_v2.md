@@ -1,7 +1,7 @@
 # Framework v2 — TempBench, post-submission cleanup
 
 **Branch**: `arxiv` (off `origin/final-aniket`).
-**Status**: spec frozen; force-migration in progress (see `purified/CLEANUP_PLAN.md`).
+**Status**: spec frozen; v2 migration landed.
 **Audience**: anyone (especially research agents) reading the repo for the first
 time. **Read this end-to-end before touching code.**
 
@@ -537,5 +537,5 @@ Run before any commit: `cd purified && .venv/bin/python -m pytest tests/ -q`.
 ## Status
 
 - Framework spec: this document, version `2.0.0`, frozen 2026-05-27.
-- Implementation status: see `purified/CLEANUP_PLAN.md` and
-  `purified/HANDOVER.md` (latter present after migration session).
+- Results: see `purified/docs/reproduction_report.md` (§ 4 synthetic) and
+  `purified/docs/ac_signed_motion_bench.md` (AC / order-sensitive bench).

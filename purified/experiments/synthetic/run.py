@@ -30,6 +30,10 @@ def _parse(extra: list[str]) -> argparse.Namespace:
     p.add_argument("--k-pos", type=int, default=None)
     p.add_argument("--d-sae", type=int, default=None,
                    help="Override dictionary size (else per-section default).")
+    p.add_argument("--T", type=int, default=None,
+                   help="Override the architecture window length T (window archs).")
+    p.add_argument("--eval-window-l", type=int, default=None,
+                   help="Common tiled eval-window length L (see guidance § 4).")
     p.add_argument("--n-steps", type=int, default=None)
     p.add_argument("--batch-size", type=int, default=None)
     return p.parse_args(extra)
@@ -66,6 +70,8 @@ def run(args, extra: list[str]) -> int:
         override = {"k_pos": 2}
     if sub.d_sae is not None:
         override = {**(override or {}), "d_sae": int(sub.d_sae)}
+    if sub.T is not None:
+        override = {**(override or {}), "T": int(sub.T)}
 
     training_cfg = TrainingConfig(
         n_steps=n_steps,
@@ -77,6 +83,8 @@ def run(args, extra: list[str]) -> int:
     eval_cfg = {"smoke": args.smoke}
     if sub.k_pos is not None:
         eval_cfg["k_pos"] = int(sub.k_pos)
+    if sub.eval_window_l is not None:
+        eval_cfg["eval_window_L"] = int(sub.eval_window_l)
 
     print(f"[synthetic] arch={args.arch} seed={args.seed} ds={args.datasource} "
           f"n_steps={n_steps} batch_size={batch_size} smoke={args.smoke}")

@@ -23,7 +23,7 @@ encoder. This is the missing piece in the bench suite.
    `temp_bench/core/`.** Plugin extension only.
 3. [`docs/frequencybenchideas.md`](frequencybenchideas.md) §5 — the bench
    spec itself. The DPI proof in §5.3 is the load-bearing theorem.
-4. [`REPRODUCTION_REPORT.md`](../REPRODUCTION_REPORT.md) — current state of
+4. [`docs/reproduction_report.md`](reproduction_report.md) — current state of
    the DC-only synthetic reproduction. Headline numbers for context.
 
 ## Context

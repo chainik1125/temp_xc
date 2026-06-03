@@ -39,70 +39,69 @@ import torch
 
 from temp_bench.interfaces.architecture import TempBenchArch
 
-# Token archs (T=1) get the full window of context so the chance result is
-# NOT an artefact of only seeing one token. Window archs use their native T.
-COMMON_PROBE_WINDOW = 5
-
-
-def _probe_window(model: TempBenchArch) -> int:
-    """How many leading tokens the sign probe reads for this arch.
-
-    Window/sequence archs whose encoder consumes exactly ``T`` tokens are
-    fed their native window (TXC-base requires this). Token archs (T=1) are
-    handed the common multi-token window so the linear reader gets the same
-    temporal extent everyone else does.
-    """
-    arch_T = int(getattr(model.config, "T", 1) or 1)
-    return arch_T if arch_T > 1 else COMMON_PROBE_WINDOW
-
 
 @torch.no_grad()
-def _window_codes(model: TempBenchArch, x_window: torch.Tensor) -> np.ndarray:
-    """Encode a ``(B, T_probe, d_in)`` window → flat ``(B, n_feats)`` codes.
+def _tile_examples(
+    model: TempBenchArch, windows_L: torch.Tensor, T: int, win_signs: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Tile length-L windows and treat each tile-code as a separate example.
 
-    TXC-base (``consumes='window'``) returns one window-level latent
-    ``(B, 1, d_sae)``; per-token / per-position archs return ``(B, T, d_sae)``.
-    Either way we flatten everything past the batch dim — the probe reads
-    whatever the encoder makes available over the window.
+    ``windows_L: (W, L, d_in)`` → ``(W·(L/T), per_tile_code_dim)`` codes with a
+    matching ``(W·(L/T),)`` sign label (each tile inherits its window's sign).
+
+    Crucially the feature dimension is the *single-tile* code size (``d_sae``
+    for a window crosscoder), NOT the concatenation over tiles. With only
+    ``2M`` distinct windows in the data, a probe that concatenated all tiles
+    would have ≥ #distinct-windows features and could *memorize* them (and
+    "generalize" because train/eval share the same window set). Probing one
+    native window-code at a time keeps features `< 2M` in the scarce regime,
+    so any separation is genuine. For a per-token arch (T=1) a tile is one
+    token — whose code carries zero sign information by the DPI — the cleanest
+    possible negative control.
     """
     device = next(model.parameters()).device
-    x_window = x_window.to(device, dtype=torch.float32)
-    z = model.encode(x_window)
-    z = z.reshape(z.shape[0], -1)
-    return z.detach().float().cpu().numpy()
+    W, L, d_in = windows_L.shape
+    n_tiles = L // T
+    tiles = windows_L.to(device, dtype=torch.float32).reshape(W * n_tiles, T, d_in)
+    z = model.encode(tiles).reshape(W * n_tiles, -1)
+    y = np.repeat(win_signs, n_tiles)
+    return z.detach().float().cpu().numpy(), y
 
 
 def _train_sign_probe(
     model: TempBenchArch,
     x: torch.Tensor,
     sign_labels: torch.Tensor,
+    *,
+    L: int,
+    n_windows: int = 1024,
+    seed: int = 0,
 ) -> dict[str, float]:
-    """Linear logistic-regression sign probe (C=1.0).
+    """Linear logistic-regression sign probe (C=1.0) on single-tile codes.
 
-    Splits sequences in half (train / held-out eval) so the reported
-    accuracy is on sequences with phases the probe never saw. Returns
-    ``{probe_acc, s_temp}``.
+    Sequences are split into disjoint train / eval pools; length-L windows are
+    sampled from each pool and tiled into the arch's native T (§ 4 of the
+    guidance). Each tile-code is one probe example, so the score measures
+    whether the sign is linearly decodable from a single native window-code —
+    leak-free (split by sequence) and memorization-free (features = one tile's
+    code, `< 2M` in the scarce regime). Returns ``{probe_acc, s_temp}``.
     """
     from sklearn.linear_model import LogisticRegression
 
-    T_probe = _probe_window(model)
-    if x.shape[1] < T_probe:
-        raise ValueError(
-            f"signed-motion probe needs seq_len >= {T_probe}; got {x.shape[1]}."
-        )
+    from temp_bench.evals.synthetic_recovery import _check_tileable, _sample_windows
 
+    T = _check_tileable(model, L)
     model.eval()
     n = x.shape[0]
     split = n // 2
-    window = x[:, :T_probe, :]
-    z = _window_codes(model, window)                       # (n, n_feats)
     y = sign_labels.detach().cpu().numpy().astype(np.int64)
 
-    z_tr, z_ev = z[:split], z[split:]
-    y_tr, y_ev = y[:split], y[split:]
+    win_tr, idx_tr = _sample_windows(x[:split], L=L, n_windows=n_windows, seed=seed)
+    win_ev, idx_ev = _sample_windows(x[split:], L=L, n_windows=n_windows, seed=seed + 1)
+    z_tr, y_tr = _tile_examples(model, win_tr, T, y[:split][idx_tr])
+    z_ev, y_ev = _tile_examples(model, win_ev, T, y[split:][idx_ev])
 
-    # Guard the degenerate single-class split (shouldn't happen with a
-    # balanced ±1 draw, but keep the sweep robust).
+    # Guard the degenerate single-class split.
     if len(np.unique(y_tr)) < 2 or len(np.unique(y_ev)) < 2:
         return {"probe_acc": 0.5, "s_temp": 0.0}
 
@@ -137,14 +136,17 @@ def _atom_dc_fraction(model: TempBenchArch) -> float | None:
     return float(frac.mean())
 
 
-def signed_motion_metrics(model: TempBenchArch, data) -> dict[str, float]:
+def signed_motion_metrics(
+    model: TempBenchArch, data, *, eval_window_L: int
+) -> dict[str, float]:
     """Return ``{s_temp, sign_probe_acc[, atom_dc_fraction]}`` for AC data.
 
     ``data`` is a :class:`temp_bench.data.synthetic.SyntheticData` whose
-    ``extra['sign_labels']`` holds the hidden ±1 sign per sequence.
+    ``extra['sign_labels']`` holds the hidden ±1 sign per sequence;
+    ``eval_window_L`` is the common (tiled) evaluation-window length.
     """
     sign_labels = data.extra["sign_labels"]
-    probe = _train_sign_probe(model, data.x, sign_labels)
+    probe = _train_sign_probe(model, data.x, sign_labels, L=eval_window_L)
     out: dict[str, float] = {
         "s_temp": probe["s_temp"],
         "sign_probe_acc": probe["probe_acc"],

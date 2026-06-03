@@ -63,55 +63,92 @@ def _feature_recovery_auc(
     }
 
 
-def _reconstruction_nmse(
+# Default common evaluation-window length when a datasource doesn't specify
+# one via eval_cfg["eval_window_L"]. Benches whose window archs are not
+# powers of two (e.g. the legacy T=5 coupling/denoising archs) keep this
+# small value (5 % 5 == 5 % 1 == 0). Power-of-two benches pass L=32 (see
+# docs/synthetic_benchmark_guidance.md § 4).
+DEFAULT_EVAL_WINDOW = 5
+
+
+def _arch_T(model: TempBenchArch) -> int:
+    return int(getattr(model.config, "T", 1) or 1)
+
+
+def _check_tileable(model: TempBenchArch, L: int) -> int:
+    """Return the arch window T; require the eval window L to tile by it."""
+    T = _arch_T(model)
+    if L % T != 0:
+        raise ValueError(
+            f"eval window L={L} is not divisible by arch window T={T} "
+            f"({type(model).__name__}); use a power-of-two L and T "
+            "(docs/synthetic_benchmark_guidance.md § 4)."
+        )
+    return T
+
+
+def _sample_windows(
+    x_eval: torch.Tensor, *, L: int, n_windows: int, seed: int
+) -> tuple[torch.Tensor, np.ndarray]:
+    """Sample ``n_windows`` length-L windows at random offsets.
+
+    Returns ``(windows (n_windows, L, d_in), seq_idx (n_windows,))`` — the
+    same fixed set is reused for every architecture so comparisons are over
+    identical positions. ``seq_idx`` (into ``x_eval``) lets callers attach
+    per-sequence labels / split leak-free.
+    """
+    n_total, seq_len, _d_in = x_eval.shape
+    if seq_len < L:
+        raise ValueError(f"seq_len ({seq_len}) < eval window L ({L}).")
+    rng = np.random.default_rng(seed)
+    seq_idx = rng.integers(0, n_total, size=n_windows)
+    offsets = rng.integers(0, seq_len - L + 1, size=n_windows)
+    seq_t = torch.from_numpy(seq_idx).long().unsqueeze(1)
+    pos = torch.from_numpy(offsets).long().unsqueeze(1) + torch.arange(L)
+    windows = x_eval[seq_t, pos]                            # (n_windows, L, d_in)
+    return windows, seq_idx
+
+
+def _windowed_recon_nmse(
     model: TempBenchArch,
     x_eval: torch.Tensor,
-    n_batches: int = 4,
-    batch_size: int = 256,
+    *,
+    L: int,
+    n_windows: int = 1024,
+    batch: int = 256,
+    seed: int = 0,
 ) -> float:
-    """E[||x - x_hat||^2] / E[||x||^2].
+    """Apples-to-apples reconstruction NMSE over a tiled eval window.
 
-    Shape handling: the trained arch's ``consumes`` mode tells us what
-    shape to feed it. For window/sequence archs, sample a window of
-    the appropriate length. For token archs, flatten.
+    Draws ONE fixed set of length-``L`` windows and tiles each
+    non-overlapping into ``L/T`` sub-windows of the arch's native window
+    length ``T``. The model reconstructs each tile in its native mode — a
+    window crosscoder compresses a whole tile into one shared code, a
+    per-token / per-position SAE reconstructs each position independently —
+    but error is aggregated over the identical ``n_windows × L`` positions,
+    so the number is comparable across architectures of any (power-of-two)
+    window size. See docs/synthetic_benchmark_guidance.md § 4.
     """
     device = next(model.parameters()).device
-    n_total = x_eval.shape[0]
-    rng = np.random.default_rng(0)
-
-    # Inference shape contract:
-    # - token archs (consumes="token"): (B, d_in) per sample (flat tokens)
-    # - window/sequence archs: (B, T, d_in) windows. T is the arch's
-    #   inference window size, exposed via model.config.T.
-    consumes = getattr(model, "consumes", "token")
-    T = int(getattr(model.config, "T", 1) or 1)
-    if consumes == "token":
-        T = 1   # tokens are window-of-1
+    T = _check_tileable(model, L)
+    n_tiles = L // T
+    windows, _ = _sample_windows(x_eval, L=L, n_windows=n_windows, seed=seed)
 
     num = 0.0
     den = 0.0
     model.eval()
     with torch.no_grad():
-        for _ in range(n_batches):
-            idx = rng.integers(0, n_total, size=batch_size)
-            x = x_eval[idx].to(device, dtype=torch.float32)   # (B, seq_len, d_in)
-            if T > 1 and x.shape[1] >= T:
-                # Sample random T-window per row.
-                offsets = torch.randint(0, x.shape[1] - T + 1, (x.shape[0],), device=device)
-                rng_t = torch.arange(T, device=device)
-                pos_grid = offsets.unsqueeze(1) + rng_t.unsqueeze(0)
-                bidx = torch.arange(x.shape[0], device=device).unsqueeze(1).expand(-1, T)
-                x = x[bidx, pos_grid]                        # (B, T, d_in)
-            else:
-                # Token mode: flatten (B, seq_len, d_in) → (B*seq_len, d_in)
-                if x.dim() == 3:
-                    x = x.reshape(-1, x.shape[-1])
+        for i in range(0, n_windows, batch):
+            xb = windows[i:i + batch].to(device, dtype=torch.float32)  # (b, L, d_in)
+            b, _, d_in = xb.shape
+            tiles = xb.reshape(b * n_tiles, T, d_in)
             try:
-                x_hat = model(x)
+                rec = model(tiles)
             except Exception:
-                x_hat = model.decode(model.encode(x))
-            num += float((x - x_hat).pow(2).sum().item())
-            den += float(x.pow(2).sum().item())
+                rec = model.decode(model.encode(tiles))
+            rec = rec.reshape(b, L, d_in)
+            num += float((xb - rec).pow(2).sum().item())
+            den += float(xb.pow(2).sum().item())
     return float(num / max(den, 1e-12))
 
 
@@ -124,7 +161,16 @@ class SyntheticRecovery(Evaluator):
     # feature directions (deterministic in the seed) differed between
     # training and eval, making it impossible for dictionary atoms to
     # match ground-truth features.
-    protocol_version = "1.1.0"
+    # v1.2.0 (2026-06-02): NMSE (and the signed-motion sign probe) are now the
+    # apples-to-apples *tiled* metric — every arch is scored on ONE shared set
+    # of length-L eval windows, tiled non-overlapping into L/T sub-windows, so
+    # archs of any power-of-two window size are compared over identical
+    # positions (docs/synthetic_benchmark_guidance.md § 4). L comes from
+    # eval_cfg["eval_window_L"] (default 5; power-of-two benches pass 32). Only
+    # `nmse`/`s_temp` are affected; eauc/gauc unchanged. Bumping invalidates
+    # prior eval rows so they re-evaluate (checkpoints reused — train_key
+    # unchanged).
+    protocol_version = "1.2.0"
 
     def eval(self, model: TempBenchArch, spec: EvalSpec) -> dict[str, float]:
         # Re-materialise the dataset from the registry using the SAME
@@ -135,6 +181,10 @@ class SyntheticRecovery(Evaluator):
         seed = int(spec.extra.get("training_seed", spec.extra.get("eval_seed", 0)))
         data = materialise(ds, seed=seed)
         decoder = _decoder_directions_normed(model)
+
+        # Common eval-window length (tiled per arch in § 4). Power-of-two
+        # benches pass eval_window_L=32; legacy benches fall back to 5.
+        L = int(spec.extra.get("eval_window_L", DEFAULT_EVAL_WINDOW))
 
         out: dict[str, float] = {}
 
@@ -151,17 +201,16 @@ class SyntheticRecovery(Evaluator):
             out["g_frac_recovered_90"] = hidden_stats["frac_recovered_90"]
             out["g_frac_recovered_80"] = hidden_stats["frac_recovered_80"]
 
-        n_batches = 1 if spec.smoke else 4
-        out["nmse"] = _reconstruction_nmse(model, data.x, n_batches=n_batches, batch_size=64 if spec.smoke else 256)
+        n_windows = 128 if spec.smoke else 1024
+        out["nmse"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)
 
         # AC-only signed-motion add-on (FrequencyBench § 5). Only fires for
         # the signed_motion datasource, which exposes a hidden ±1 sign in
         # `extra`. For every other bench `extra` is None → this block is a
-        # no-op and the metrics above are unchanged (so protocol_version,
-        # and all committed coupling/denoising eval_keys, stay put).
+        # no-op and the metrics above are unchanged.
         if getattr(data, "extra", None) and "sign_labels" in data.extra:
             from temp_bench.evals.signed_motion_recovery import signed_motion_metrics
-            out.update(signed_motion_metrics(model, data))
+            out.update(signed_motion_metrics(model, data, eval_window_L=L))
 
         return out
 

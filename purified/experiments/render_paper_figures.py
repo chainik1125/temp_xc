@@ -65,8 +65,8 @@ def render_synthetic_overview() -> Path:
     for row in iter_leaderboard():
         if row.experiment != "synthetic":
             continue
-        if row.evaluator_protocol_version != "1.1.0":
-            continue                                       # filter buggy v1.0.0 cells
+        if row.evaluator_protocol_version != "1.2.0":      # matches SyntheticRecovery
+            continue                                       # filter older-protocol cells
         if row.eval_cfg.get("smoke", False):
             continue
         if row.arch in deprecated_archs:

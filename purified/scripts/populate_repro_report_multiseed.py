@@ -5,7 +5,7 @@ cell across all seeds present.
 
 Usage:
     .venv/bin/python scripts/populate_repro_report_multiseed.py \
-        results/leaderboard.jsonl REPRODUCTION_REPORT.md
+        results/leaderboard.jsonl docs/reproduction_report.md
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ def aggregate(leaderboard: Path) -> dict:
         if not line.strip():
             continue
         r = json.loads(line)
-        if r.get("evaluator_protocol_version") != "1.1.0":
+        if r.get("evaluator_protocol_version") != "1.2.0":   # matches SyntheticRecovery
             continue
         if r.get("experiment") != "synthetic":
             continue

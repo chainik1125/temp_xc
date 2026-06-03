@@ -94,8 +94,10 @@ def test_signed_motion_metrics_keys_and_dc_fraction() -> None:
 
     data = signed_motion(M=19, v=9, d_in=40, seq_len=16, n_seqs=512, seed=0)
 
-    txc = TXCBase(d_in=40, d_sae=20, T=5, k_pos=2)
-    m_txc = signed_motion_metrics(txc, data)
+    # Power-of-two eval window L=8, tiled per arch (txc T=4 → 2 tiles; topk T=1
+    # → 8 tiles). 8 % T == 0 for both.
+    txc = TXCBase(d_in=40, d_sae=20, T=4, k_pos=2)
+    m_txc = signed_motion_metrics(txc, data, eval_window_L=8)
     assert "s_temp" in m_txc and "sign_probe_acc" in m_txc
     assert -1.0 <= m_txc["s_temp"] <= 1.0
     assert 0.0 <= m_txc["sign_probe_acc"] <= 1.0
@@ -104,7 +106,20 @@ def test_signed_motion_metrics_keys_and_dc_fraction() -> None:
     assert 0.0 <= m_txc["atom_dc_fraction"] <= 1.0
 
     topk = TopKSAE(d_in=40, d_sae=20, k_pos=2)
-    m_topk = signed_motion_metrics(topk, data)
+    m_topk = signed_motion_metrics(topk, data, eval_window_L=8)
     assert "s_temp" in m_topk and "sign_probe_acc" in m_topk
     # Token arch → no aligned window decoder → metric omitted.
     assert "atom_dc_fraction" not in m_topk
+
+
+def test_eval_window_must_tile_arch_window() -> None:
+    """A window arch whose T does not divide the eval window L is rejected."""
+    import pytest
+
+    from temp_bench.archs.txc_base import TXCBase
+    from temp_bench.evals.synthetic_recovery import _check_tileable
+
+    txc = TXCBase(d_in=40, d_sae=20, T=4, k_pos=2)
+    assert _check_tileable(txc, 32) == 4          # 32 % 4 == 0 → ok
+    with pytest.raises(ValueError):
+        _check_tileable(txc, 6)                    # 6 % 4 != 0 → reject

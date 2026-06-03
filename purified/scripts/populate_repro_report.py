@@ -5,7 +5,7 @@ with per-bench gAUC/eAUC/NMSE tables. Idempotent.
 
 Usage:
     .venv/bin/python scripts/populate_repro_report.py \
-        logs/synth_minisweep_seed1.log REPRODUCTION_REPORT.md
+        logs/synth_minisweep_seed1.log docs/reproduction_report.md
 """
 
 from __future__ import annotations

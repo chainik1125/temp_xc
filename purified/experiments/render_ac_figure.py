@@ -1,21 +1,16 @@
-"""Render the AC-only signed-motion figure (FrequencyBench § 5).
+"""Render the AC-only signed-motion frontier figure.
 
     python -m experiments.render_ac_figure
 
-Reads ``results/leaderboard.jsonl`` and writes a two-panel figure to
-``docs/figs/``:
+Reads results/leaderboard.jsonl (signed_motion, protocol 1.2.0, 10K grid) and
+writes a 3-panel frontier to docs/figs/: s_temp, eAUC, NMSE vs d_sae, one line
+per (arch, T). F = 19 and 2F = 38 are marked; the scarce / memorization-free
+regime (d_sae < 2F) is shaded. Also writes a low-res .thumb.png.
 
-- **Left (architectural gap):** s_temp vs k_pos at the ample dictionary
-  d_sae=64. The window crosscoder (txc_base) recovers the hidden sign at
-  oracle level; every per-token SAE sits at chance — they reconstruct
-  perfectly and recover the alphabet, yet by the data-processing
-  inequality their per-token codes cannot expose the order-sensitive sign.
-- **Right (capacity threshold):** s_temp vs d_sae (mean over k_pos, seeds).
-  txc_base's sign recovery switches on only once it has enough atoms to
-  represent the 2M=38 distinct windows; the SAE family stays flat at chance
-  for every dictionary size.
-
-Also writes a low-res ``.thumb.png`` for safe inline inspection.
+The story the figure tells: in the scarce regime no architecture recovers the
+order-sensitive sign (s_temp ≈ 0); the crosscoder's recovery only appears at
+the over-complete d_sae = 2F reference, where the per-tile probe is confounded
+by tabulation.
 """
 
 from __future__ import annotations
@@ -25,119 +20,107 @@ from pathlib import Path
 
 DATASOURCE = "toy_signed_motion_M19_d40"
 DEPRECATED_ARCHS = {"txc_pro", "tfa", "tfa_pos"}
+N_STEPS = 10000
 DEFAULT_SYNTH_D_SAE = 20
-HEADLINE_DSAE = 64
-N_STEPS = 10000   # canonical grid; excludes 3K smoke / 30K convergence rows
+F = 19            # ground-truth feature count
+N_WINDOWS = 2 * F  # = 38, the per-tile probe's memorization boundary
 
-ARCH_COLOR = {
-    "txc_base": "#1f77b4", "topk_sae": "#d62728",
-    "stacked_sae": "#9467bd", "tsae": "#ff7f0e",
-}
-ARCH_MARKER = {
-    "txc_base": "o", "topk_sae": "^", "stacked_sae": "v", "tsae": "D",
-}
-
-
-def _row_d_sae(row) -> int:
-    ovr = row.training_cfg.arch_hparams_override or {}
-    return int(ovr.get("d_sae") or DEFAULT_SYNTH_D_SAE)
-
-
-def _row_k_pos(row):
-    kp = row.eval_cfg.get("k_pos")
-    if kp is None:
-        kp = (row.training_cfg.arch_hparams_override or {}).get("k_pos")
-    return None if kp is None else int(kp)
+# Colour per (arch, T): crosscoder = blues by T, stacked = purples, token archs solid.
+def _style(arch: str, T: int):
+    blues = {2: "#9ecae1", 4: "#4292c6", 8: "#08519c"}
+    purples = {2: "#dadaeb", 4: "#9e9ac8", 8: "#6a51a3"}
+    if arch == "txc_base":
+        return blues.get(T, "#08519c"), "o"
+    if arch == "stacked_sae":
+        return purples.get(T, "#6a51a3"), "v"
+    if arch == "topk_sae":
+        return "#d62728", "^"
+    if arch == "tsae":
+        return "#ff7f0e", "D"
+    return "#444", "s"
 
 
-def render_ac_signed_motion() -> Path:
+def _override(row):
+    return row.training_cfg.arch_hparams_override or {}
+
+
+def render_ac_frontier() -> Path:
     import matplotlib.pyplot as plt
     import numpy as np
 
     from temp_bench.core.cache import iter_leaderboard
 
-    # (d_sae, arch, k_pos) -> {seed: s_temp}  (latest row per seed wins)
-    cells: dict = defaultdict(dict)
+    # (arch, T, d_sae) -> {seed: {metric: val}}
+    cells: dict = defaultdict(lambda: defaultdict(dict))
     for row in iter_leaderboard():
         if row.experiment != "synthetic" or row.datasource != DATASOURCE:
             continue
-        if row.evaluator_protocol_version != "1.1.0":
+        if row.evaluator_protocol_version != "1.2.0":
             continue
         if row.eval_cfg.get("smoke", False) or row.arch in DEPRECATED_ARCHS:
             continue
         if getattr(row.training_cfg, "n_steps", None) != N_STEPS:
             continue
-        s_temp = row.metrics.get("s_temp")
-        kp = _row_k_pos(row)
-        if s_temp is None or kp is None:
-            continue
-        cells[(_row_d_sae(row), row.arch, kp)][int(row.seed)] = float(s_temp)
+        ov = _override(row)
+        d = int(ov.get("d_sae") or DEFAULT_SYNTH_D_SAE)
+        T = int(ov.get("T") or 1)
+        cells[(row.arch, T, d)][int(row.seed)] = row.metrics
 
     if not cells:
-        raise RuntimeError(
-            "No signed_motion rows. Run scripts/run_ac_minisweep.sh first."
-        )
+        raise RuntimeError("No signed_motion 1.2.0 rows. Run the sweep first.")
 
-    archs = sorted({a for (_d, a, _k) in cells}, key=lambda a: a != "txc_base")
+    series = sorted({(a, T) for (a, T, d) in cells},
+                    key=lambda x: ({"txc_base": 0, "stacked_sae": 1,
+                                    "topk_sae": 2, "tsae": 3}.get(x[0], 9), x[1]))
     n_seeds = len({s for v in cells.values() for s in v})
 
-    def agg(dsae, arch, kp):
-        vals = list(cells.get((dsae, arch, kp), {}).values())
-        return (np.mean(vals), np.std(vals) if len(vals) > 1 else 0.0) if vals else (np.nan, 0.0)
+    def agg(arch, T, d, metric):
+        vals = [m[metric] for m in cells.get((arch, T, d), {}).values()
+                if metric in m]
+        if not vals:
+            return np.nan, 0.0
+        return float(np.mean(vals)), (float(np.std(vals)) if len(vals) > 1 else 0.0)
 
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(13, 5))
+    panels = [("s_temp", "s_temp  (sign recovery)", (-0.15, 1.08)),
+              ("eauc", "eAUC  (local feature recovery)", (0.0, 1.02)),
+              ("nmse", "NMSE  (reconstruction)", (-0.02, 0.7))]
+    fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 
-    # ── Left: s_temp vs k_pos at d_sae = HEADLINE_DSAE ──
-    ks = sorted({k for (d, a, k) in cells if d == HEADLINE_DSAE})
-    for arch in archs:
-        m = [agg(HEADLINE_DSAE, arch, k)[0] for k in ks]
-        e = [agg(HEADLINE_DSAE, arch, k)[1] for k in ks]
-        if all(np.isnan(v) for v in m):
-            continue
-        axL.errorbar(ks, m, yerr=e, color=ARCH_COLOR.get(arch, "#444"),
-                     marker=ARCH_MARKER.get(arch, "o"), label=arch,
-                     linewidth=2, capsize=3, markersize=8)
-    axL.axhline(0.0, color="k", ls=":", alpha=0.4, lw=1)
-    axL.set_xticks(ks)
-    axL.set_ylim(-0.1, 1.08)
-    axL.set_xlabel("k_pos (per-token sparsity)")
-    axL.set_ylabel("s_temp   (0 = chance, 1 = oracle)")
-    axL.set_title(f"Architectural gap  (d_sae = {HEADLINE_DSAE}, ample)")
-    axL.grid(True, alpha=0.3)
-    axL.legend(loc="center right", fontsize=10)
-
-    # ── Right: s_temp vs d_sae at the sparsest setting (k_pos=1) ──
-    # Fixed k_pos (not averaged): the architectural recovery lives in the
-    # sparse regime, and averaging over k_pos would let the higher-k
-    # sign-entangled cells mask the clean threshold.
-    KP_PANEL = 1
-    dsaes = sorted({d for (d, a, k) in cells if k == KP_PANEL})
-    for arch in archs:
-        m = [agg(d, arch, KP_PANEL)[0] for d in dsaes]
-        e = [agg(d, arch, KP_PANEL)[1] for d in dsaes]
-        if all(np.isnan(v) for v in m):
-            continue
-        axR.errorbar(dsaes, m, yerr=e, color=ARCH_COLOR.get(arch, "#444"),
-                     marker=ARCH_MARKER.get(arch, "o"), label=arch,
-                     linewidth=2, capsize=3, markersize=8)
-    axR.axvline(38, color="gray", ls="--", alpha=0.6, lw=1)
-    axR.text(38, 0.5, "2M=38\ndistinct windows", fontsize=8,
-             ha="center", va="center", color="gray", rotation=90)
-    axR.axhline(0.0, color="k", ls=":", alpha=0.4, lw=1)
-    axR.set_xticks(dsaes)
-    axR.set_ylim(-0.12, 1.08)
-    axR.set_xlabel("d_sae (dictionary size)")
-    axR.set_ylabel(f"s_temp   (at k_pos={KP_PANEL}, sparsest)")
-    axR.set_title("Capacity threshold for window-encoder sign recovery")
-    axR.grid(True, alpha=0.3)
-    axR.legend(loc="center right", fontsize=10)
+    for ax, (metric, ylabel, ylim) in zip(axes, panels):
+        dsaes_all = sorted({d for (a, T, d) in cells})
+        for (arch, T) in series:
+            ds = [d for d in dsaes_all if (arch, T, d) in cells]
+            if not ds:
+                continue
+            m = [agg(arch, T, d, metric)[0] for d in ds]
+            e = [agg(arch, T, d, metric)[1] for d in ds]
+            color, marker = _style(arch, T)
+            ax.errorbar(ds, m, yerr=e, color=color, marker=marker,
+                        label=f"{arch} T={T}", lw=1.8, capsize=2, markersize=6)
+        # scarce / memorization-free region (d_sae < 2F) shaded
+        ax.axvspan(min(dsaes_all) - 1, N_WINDOWS, color="green", alpha=0.05)
+        ax.axvline(F, color="gray", ls="--", lw=1, alpha=0.7)
+        ax.axvline(N_WINDOWS, color="crimson", ls=":", lw=1, alpha=0.7)
+        ax.text(F, ylim[1], " F=19", fontsize=8, va="top", color="gray")
+        ax.text(N_WINDOWS, ylim[1], " 2F=38\n (probe\n confounded)", fontsize=7,
+                va="top", color="crimson")
+        if metric == "s_temp":
+            ax.axhline(0.0, color="k", ls=":", lw=0.8, alpha=0.4)
+        ax.set_xticks(dsaes_all)
+        ax.set_ylim(*ylim)
+        ax.set_xlabel("d_sae (dictionary size)")
+        ax.set_ylabel(ylabel)
+        ax.grid(True, alpha=0.25)
+    axes[0].legend(fontsize=7, ncol=2, loc="upper left")
 
     fig.suptitle(
-        "AC-only signed-motion bench (FrequencyBench § 5): window crosscoders "
-        "recover the order-sensitive sign; per-token SAEs cannot (DPI)",
-        fontsize=12,
+        "AC signed-motion frontier: in the scarce regime (d_sae ≤ F, shaded) no "
+        "architecture recovers the order-sensitive sign;\nthe crosscoder's "
+        "recovery appears only at the over-complete 2F reference, where the probe "
+        "is confounded by tabulation.",
+        fontsize=11,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.96))
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
 
     out_dir = Path("docs/figs")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -146,11 +129,11 @@ def render_ac_signed_motion() -> Path:
     thumb = out_dir / "fig_ac_signed_motion.thumb.png"
     fig.savefig(pdf, bbox_inches="tight")
     fig.savefig(png, dpi=120, bbox_inches="tight")
-    fig.savefig(thumb, dpi=45, bbox_inches="tight")
+    fig.savefig(thumb, dpi=50, bbox_inches="tight")
     plt.close(fig)
     print(f"[render_ac] {len(cells)} cells, {n_seeds} seeds → {pdf}, {png}, {thumb}")
     return pdf
 
 
 if __name__ == "__main__":
-    render_ac_signed_motion()
+    render_ac_frontier()

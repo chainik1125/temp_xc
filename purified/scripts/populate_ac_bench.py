@@ -1,13 +1,13 @@
-"""Populate the AC-only signed-motion section of REPRODUCTION_REPORT.md.
+"""Populate the AUTO-RESULTS tables in docs/ac_signed_motion_bench.md.
 
-Reads results/leaderboard.jsonl, selects the signed_motion rows, and writes
-mean ± std (across seeds) tables for the AC metrics, one block per distinct
-d_sae present (so the capacity dependence is visible). Renders between the
-``<!-- BEGIN AUTO-RESULTS ac_signed_motion -->`` / ``<!-- END ... -->`` markers.
+Reads results/leaderboard.jsonl, selects the signed_motion rows (protocol
+1.2.0, 10K-step grid), and writes mean ± std tables keyed by (arch, T) × d_sae
+for each metric. F = 19 (the feature count) is the d_sae anchor; the per-tile
+sign probe is memorization-free only for d_sae < 2F = 38.
 
 Usage:
     .venv/bin/python scripts/populate_ac_bench.py \
-        results/leaderboard.jsonl REPRODUCTION_REPORT.md
+        results/leaderboard.jsonl docs/ac_signed_motion_bench.md
 """
 
 from __future__ import annotations
@@ -22,51 +22,41 @@ from pathlib import Path
 DATASOURCE = "toy_signed_motion_M19_d40"
 TAG = "ac_signed_motion"
 DEPRECATED_ARCHS = {"txc_pro", "tfa", "tfa_pos"}
-
-# Report only the canonical 10K-step grid (excludes exploratory 3K smoke
-# and 30K convergence-check rows that share (d_sae, arch, k_pos, seed) keys).
 N_STEPS = 10000
-
-# Synthetic per-section default when an arch_hparams_override omits d_sae.
 DEFAULT_SYNTH_D_SAE = 20
 
-# Headline metric first; atom_dc_fraction is sparse (txc only).
 METRICS = [
-    ("s_temp", "s_temp (headline: 0=chance, 1=oracle)"),
+    ("s_temp", "s_temp (sign recovery: 0=chance, 1=oracle)"),
     ("sign_probe_acc", "sign_probe_acc (raw linear-probe accuracy)"),
-    ("atom_dc_fraction", "atom_dc_fraction (DC energy share; window decoders only)"),
-    ("eauc", "eAUC (alphabet-direction recovery)"),
-    ("nmse", "NMSE (window reconstruction)"),
+    ("eauc", "eAUC (local: alphabet-direction recovery)"),
+    ("nmse", "NMSE (windowed reconstruction; lower=better)"),
 ]
+# Display order for the (arch, T) rows.
+ARCH_ORDER = {"txc_base": 0, "stacked_sae": 1, "topk_sae": 2, "tsae": 3}
 
 
-def _row_d_sae(r: dict) -> int:
-    override = r.get("training_cfg", {}).get("arch_hparams_override") or {}
-    return int(override.get("d_sae") or DEFAULT_SYNTH_D_SAE)
+def _override(r: dict) -> dict:
+    return r.get("training_cfg", {}).get("arch_hparams_override") or {}
 
 
-def _row_k_pos(r: dict):
-    override = r.get("training_cfg", {}).get("arch_hparams_override") or {}
-    kp = override.get("k_pos") or r.get("eval_cfg", {}).get("k_pos")
-    return None if kp is None else int(kp)
+def _row_key(r: dict):
+    ov = _override(r)
+    d = int(ov.get("d_sae") or DEFAULT_SYNTH_D_SAE)
+    T = int(ov.get("T") or 1)
+    return r["arch"], T, d
 
 
 def aggregate(leaderboard: Path):
-    """{(d_sae, arch, k_pos): {metric: [vals]}} keeping latest row per seed."""
     rows = []
     for line in leaderboard.read_text().splitlines():
         if not line.strip():
             continue
         r = json.loads(line)
-        if r.get("evaluator_protocol_version") != "1.1.0":
+        if r.get("evaluator_protocol_version") != "1.2.0":   # matches SyntheticRecovery
             continue
-        if r.get("experiment") != "synthetic":
+        if r.get("experiment") != "synthetic" or r.get("datasource") != DATASOURCE:
             continue
-        if r.get("datasource") != DATASOURCE:
-            continue
-        if r.get("arch") in DEPRECATED_ARCHS:
-            continue
-        if r.get("eval_cfg", {}).get("smoke"):
+        if r.get("arch") in DEPRECATED_ARCHS or r.get("eval_cfg", {}).get("smoke"):
             continue
         if (r.get("training_cfg", {}) or {}).get("n_steps") != N_STEPS:
             continue
@@ -75,20 +65,17 @@ def aggregate(leaderboard: Path):
 
     latest = {}
     for r in rows:
-        kp = _row_k_pos(r)
-        if kp is None:
-            continue
-        seed = int(r.get("seed", -1))
-        latest[(_row_d_sae(r), r["arch"], kp, seed)] = r
+        arch, T, d = _row_key(r)
+        latest[(arch, T, d, int(r.get("seed", -1)))] = r
 
     by_cell = defaultdict(lambda: defaultdict(list))
     seeds = set()
-    for (dsae, arch, kp, seed), r in latest.items():
+    for (arch, T, d, seed), r in latest.items():
         seeds.add(seed)
         for metric, _ in METRICS:
             v = r.get("metrics", {}).get(metric)
             if isinstance(v, (int, float)):
-                by_cell[(dsae, arch, kp)][metric].append(v)
+                by_cell[(arch, T, d)][metric].append(v)
     return by_cell, seeds
 
 
@@ -101,26 +88,24 @@ def _fmt(vals: list) -> str:
 
 
 def render(by_cell: dict, n_seeds: int) -> str:
-    dsaes = sorted({d for (d, a, k) in by_cell})
-    if not dsaes:
+    rows = sorted({(a, T) for (a, T, d) in by_cell},
+                  key=lambda x: (ARCH_ORDER.get(x[0], 9), x[1]))
+    dsaes = sorted({d for (a, T, d) in by_cell})
+    if not rows:
         return "_(no signed_motion cells yet)_"
-    out = []
-    for dsae in dsaes:
-        archs = sorted({a for (d, a, k) in by_cell if d == dsae})
-        ks = sorted({k for (d, a, k) in by_cell if d == dsae})
-        out.append(f"### d_sae = {dsae}\n")
-        for metric, label in METRICS:
-            # Skip a metric entirely if no cell at this d_sae reports it.
-            if not any(by_cell.get((dsae, a, k), {}).get(metric)
-                       for a in archs for k in ks):
-                continue
-            out.append(f"**{label}**  (mean ± std across ≤{n_seeds} seeds)\n")
-            out.append("| arch | " + " | ".join(f"k_pos={k}" for k in ks) + " |")
-            out.append("|---|" + "---|" * len(ks))
-            for arch in archs:
-                cells = [_fmt(by_cell.get((dsae, arch, k), {}).get(metric, [])) for k in ks]
-                out.append(f"| `{arch}` | " + " | ".join(cells) + " |")
-            out.append("")
+    out = [
+        f"F = 19 feature directions. Probe is memorization-free for d_sae < 2F = 38 "
+        f"(d_sae=38 is the over-complete reference; its s_temp is confounded by "
+        f"tabulation). Mean ± std across ≤{n_seeds} seeds.\n"
+    ]
+    for metric, label in METRICS:
+        out.append(f"**{label}**\n")
+        out.append("| arch (T) | " + " | ".join(f"d_sae={d}" for d in dsaes) + " |")
+        out.append("|---|" + "---|" * len(dsaes))
+        for (arch, T) in rows:
+            cells = [_fmt(by_cell.get((arch, T, d), {}).get(metric, [])) for d in dsaes]
+            out.append(f"| `{arch}` (T={T}) | " + " | ".join(cells) + " |")
+        out.append("")
     return "\n".join(out)
 
 
@@ -132,20 +117,17 @@ def main():
     report_path = Path(sys.argv[2])
     text = report_path.read_text()
     block = render(by_cell, len(seeds))
-
     marker_re = re.compile(
         rf"<!-- BEGIN AUTO-RESULTS {TAG} -->.*?<!-- END AUTO-RESULTS {TAG} -->",
         re.DOTALL,
     )
     repl = f"<!-- BEGIN AUTO-RESULTS {TAG} -->\n{block}\n<!-- END AUTO-RESULTS {TAG} -->"
     if marker_re.search(text):
-        text = marker_re.sub(repl, text)
-        report_path.write_text(text)
+        report_path.write_text(marker_re.sub(repl, text))
         print(f"[populate-ac] wrote {report_path} "
               f"(cells: {len(by_cell)}, seeds: {sorted(seeds)})")
     else:
-        print(f"[populate-ac] markers for {TAG} not found in {report_path}; "
-              "add a <!-- BEGIN/END AUTO-RESULTS ac_signed_motion --> block.")
+        print(f"[populate-ac] markers for {TAG} not found in {report_path}")
 
 
 if __name__ == "__main__":
