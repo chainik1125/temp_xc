@@ -212,6 +212,15 @@ class SyntheticRecovery(Evaluator):
             from temp_bench.evals.signed_motion_recovery import signed_motion_metrics
             out.update(signed_motion_metrics(model, data, eval_window_L=L))
 
+        # Self-exciting intensity (λ) recovery add-on (autoresearch #1
+        # backtracking). Only fires for the toy_backtracking_selfexcite
+        # datasource, which exposes a continuous λ per position in `extra`.
+        # No-op (byte-identical metrics) for every other bench → protocol
+        # stays 1.2.0.
+        if getattr(data, "extra", None) and "lambda_labels" in data.extra:
+            from temp_bench.evals.lambda_recovery import lambda_recovery_metrics
+            out.update(lambda_recovery_metrics(model, data, eval_window_L=L))
+
         return out
 
     def primary_metric(self) -> str:

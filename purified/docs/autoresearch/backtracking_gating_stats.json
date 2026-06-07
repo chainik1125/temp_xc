@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "N_SEQS": 16000,
+    "L": 64,
+    "K": 8,
+    "tau": 2.0,
+    "base_target": 0.12,
+    "T_grid": [
+      2,
+      4,
+      8,
+      16
+    ],
+    "gate_threshold": 0.3,
+    "alpha_fit_sum_w": 4.115843902071316
+  },
+  "fitted_mirror_headline_c0": {
+    "base_rate": 0.08041015625,
+    "var_lambda": 0.008103308623355947,
+    "var_b": 0.07394436302185058,
+    "per_token_ceiling": 0.3310386130941288,
+    "per_token_ceiling_empirical_corr": 0.3288480243607542,
+    "window_info_ceiling": 1.0,
+    "window_linear_ceiling_full_history": 0.9637737269761457,
+    "window_linear_ceiling_by_T": {
+      "2": 0.8192603991830057,
+      "4": 0.9146695766309592,
+      "8": 0.9557317605354264,
+      "16": 0.9637737269761457
+    },
+    "gap_spec_info": 0.6689613869058713,
+    "gap_linear_full": 0.632735113882017
+  },
+  "fitted_mirror_with_position_trend": {
+    "base_rate": 0.1242685546875,
+    "var_lambda": 0.021057294032938812,
+    "var_b": 0.10882588100337985,
+    "per_token_ceiling": 0.43988098094711164,
+    "per_token_ceiling_empirical_corr": 0.4409473092130366,
+    "window_info_ceiling": 1.0,
+    "window_linear_ceiling_full_history": 0.9752933730426772,
+    "window_linear_ceiling_by_T": {
+      "2": 0.830516809794691,
+      "4": 0.9255231145540609,
+      "8": 0.9673905905054025,
+      "16": 0.9752933730426772
+    },
+    "gap_spec_info": 0.5601190190528884,
+    "gap_linear_full": 0.5354123920955656
+  },
+  "idealized_exp_kernel_alpha_sweep": [
+    {
+      "alpha": 1.0,
+      "intercept": -2.1224885545670986,
+      "base_rate": 0.1192734375,
+      "per_token_ceiling": 0.06121978785051231,
+      "window_linear_ceiling_full_history": 0.9974776948734221,
+      "gap_spec_info": 0.9387802121494877,
+      "gap_linear_full": 0.9362579070229098
+    },
+    {
+      "alpha": 2.0,
+      "intercept": -2.273910503834486,
+      "base_rate": 0.1199990234375,
+      "per_token_ceiling": 0.14787071376704525,
+      "window_linear_ceiling_full_history": 0.988903957472587,
+      "gap_spec_info": 0.8521292862329548,
+      "gap_linear_full": 0.8410332437055417
+    },
+    {
+      "alpha": 3.0,
+      "intercept": -2.478988591581583,
+      "base_rate": 0.119966796875,
+      "per_token_ceiling": 0.27331826279353755,
+      "window_linear_ceiling_full_history": 0.9790288656565596,
+      "gap_spec_info": 0.7266817372064625,
+      "gap_linear_full": 0.705710602863022
+    },
+    {
+      "alpha": 4.115843902071316,
+      "intercept": -2.7914389707148075,
+      "base_rate": 0.1208359375,
+      "per_token_ceiling": 0.46029056710697186,
+      "window_linear_ceiling_full_history": 0.9786458002110021,
+      "gap_spec_info": 0.5397094328930281,
+      "gap_linear_full": 0.5183552331040302
+    },
+    {
+      "alpha": 5.0,
+      "intercept": -3.1037600822746754,
+      "base_rate": 0.1183720703125,
+      "per_token_ceiling": 0.6025567359789052,
+      "window_linear_ceiling_full_history": 0.9830951544159187,
+      "gap_spec_info": 0.39744326402109476,
+      "gap_linear_full": 0.3805384184370134
+    },
+    {
+      "alpha": 6.0,
+      "intercept": -3.4727391339838505,
+      "base_rate": 0.1177880859375,
+      "per_token_ceiling": 0.7366677515244804,
+      "window_linear_ceiling_full_history": 0.9886491131887608,
+      "gap_spec_info": 0.2633322484755196,
+      "gap_linear_full": 0.2519813616642804
+    },
+    {
+      "alpha": 8.0,
+      "intercept": -4.139374319463968,
+      "base_rate": 0.1192373046875,
+      "per_token_ceiling": 0.8834659979497513,
+      "window_linear_ceiling_full_history": 0.9946752547451045,
+      "gap_spec_info": 0.11653400205024866,
+      "gap_linear_full": 0.1112092567953532
+    },
+    {
+      "alpha": 10.0,
+      "intercept": -4.603241730481386,
+      "base_rate": 0.1172421875,
+      "per_token_ceiling": 0.9351008939026989,
+      "window_linear_ceiling_full_history": 0.9970673160935908,
+      "gap_spec_info": 0.0648991060973011,
+      "gap_linear_full": 0.06196642219089188
+    }
+  ],
+  "verdict": {
+    "per_token_ceiling": 0.3310386130941288,
+    "gap_spec_info": 0.6689613869058713,
+    "gap_linear_full": 0.632735113882017,
+    "passes_spec_gate": true,
+    "passes_linear_gate": true
+  }
+}

@@ -115,6 +115,32 @@ datasources:
       default) — scarce vs the 2M=38 distinct windows. k_pos swept 1..4
       (k_win = k_pos·T, T=5; k_pos=4 → dense window code at d_sae=20).
 
+  toy_backtracking_selfexcite_d64:
+    category: synthetic
+    generator: self_exciting
+    params:
+      K: 2
+      tau: 2.0
+      alpha: 3.06
+      base_rate: 0.12
+      d_in: 64
+      K_c: 19
+      n_c: 3
+      mag_bt: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #1 backtracking: self-exciting (discrete Hawkes /
+      logistic-AR) AC bench. λ_i = σ(a + Σ_{l=1..K} w_l·b_{i-l}), K=2 (held-out
+      model-selected; backtracking_kernel_order.py), w=α·κ with κ=exp(-l/τ),
+      τ=2, α=3.06; intercept a tuned to trend-off base rate 0.12. F=20 features
+      = u_bt (dominant, recoverable at k_pos=1) + 19 content; λ is a continuous
+      latent (NOT a direction), recovered by a per-tile linear regression probe
+      (lambda_recovery). Per-token DPI floor √(Varλ/Varb)≈0.41, window ceiling
+      ≈0.91→0.99 (T=2→4). Spec: docs/autoresearch/backtracking_bench_spec.md.
+
   # ── Real-LM § 5 ────────────────────────────────────────────────────
 
   gemma_2_2b_it_l13_fineweb_24k128:

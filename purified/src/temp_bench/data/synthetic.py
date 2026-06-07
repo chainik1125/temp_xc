@@ -305,6 +305,159 @@ def signed_motion(
     )
 
 
+# ── Self-exciting (Hawkes-style) backtracking bench (autoresearch #1) ──
+
+
+def _self_exciting_intercept(
+    w: np.ndarray, base_rate: float, seq_len: int,
+    *, n_tune: int = 4000, n_iter: int = 32, tune_seed: int = 12345,
+) -> float:
+    """Bisect the intercept ``a`` so the trend-off stationary base rate ≈ target.
+
+    Tuned with a FIXED rng (seed-independent) so the generative *process*
+    ``(a, w)`` is identical across data seeds — only the random draws differ.
+    """
+    K = len(w)
+    rng = np.random.default_rng(tune_seed)
+    lo, hi = -8.0, 2.0
+    for _ in range(n_iter):
+        mid = 0.5 * (lo + hi)
+        b = np.zeros((n_tune, seq_len), dtype=np.float64)
+        for i in range(seq_len):
+            hist = np.zeros(n_tune)
+            for l in range(K):
+                j = i - 1 - l
+                if j >= 0:
+                    hist += w[l] * b[:, j]
+            p = 1.0 / (1.0 + np.exp(-(mid + hist)))
+            b[:, i] = (rng.random(n_tune) < p).astype(np.float64)
+        if float(b.mean()) < base_rate:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def self_exciting(
+    *,
+    K: int = 2,
+    tau: float = 2.0,
+    alpha: float = 3.06,
+    base_rate: float = 0.12,
+    d_in: int = 64,
+    K_c: int = 19,
+    n_c: int = 3,
+    mag_bt: float = 2.5,
+    mag_content: float = 1.0,
+    sigma: float = 0.0,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Self-exciting (discrete Hawkes / logistic-AR) backtracking bench.
+
+    Mirrors the *measured* self-excitation of real CoT backtracking
+    (``docs/autoresearch/backtracking_record.md``). Two layers:
+
+    **Layer 1 — self-exciting event dynamics.** A binary event stream ``b`` with
+    hidden conditional intensity ``λ``::
+
+        λ_i = σ( a + Σ_{l=1..K} w_l · b_{i-l} ) ,   b_i ~ Bernoulli(λ_i)
+
+    where ``w_l = α · κ_l``, ``κ_l = exp(-l/τ)`` normalised, and ``a`` is tuned
+    so the (trend-off) base rate ≈ ``base_rate``. ``K = 2`` is set by held-out
+    model selection on the real labels (``backtracking_kernel_order.py``); the
+    position trend is 0 (headline isolates pure self-excitation, the ``N2``
+    control). The hidden intensity ``λ_i`` is a deterministic function of the
+    *past* events — a per-token encoder sees only the single Bernoulli sample
+    ``b_i`` (DPI floor ``corr ≤ √(Var λ/Var b)``), a window encoder sees the
+    history that *sets* ``λ_i``.
+
+    **Layer 2 — emission.** Over a fixed orthonormal dictionary
+    ``{u_bt, u_1..u_{K_c}}`` (so ``F = 1 + K_c`` feature directions)::
+
+        x_i = b_i · m · u_bt  +  Σ_{j ∈ content_i} m_j · u_j  +  σ · ε_i
+
+    ``u_bt`` (the backtracking feature) fires iff ``b_i = 1`` with a *dominant*
+    magnitude (``mag_bt > mag_content``) so it is the top-1 atom on firing
+    tokens and is therefore recovered even at ``k_pos = 1`` — both per-token and
+    window archs encode ``b`` equally; the per-token→window gap is purely about
+    history access, not feature recovery. ``content_i`` is a random size-``n_c``
+    subset of the ``K_c`` content directions (filler).
+
+    Ground truths exposed (in ``extra``):
+        lambda_labels: (n_seqs, seq_len)  hidden intensity λ (regression target)
+        b_labels:      (n_seqs, seq_len)  the event stream
+    plus ``emission_features`` = the ``F`` orthonormal directions (``u_bt`` +
+    content), the cosine-AUC targets.
+    """
+    if K_c + 1 > d_in:
+        raise ValueError(f"F = K_c+1 ({K_c + 1}) > d_in ({d_in})")
+    if n_c > K_c:
+        raise ValueError(f"n_c ({n_c}) > K_c ({K_c})")
+
+    # Fixed self-excitation kernel + seed-independent intercept.
+    l = np.arange(1, K + 1)
+    kappa = np.exp(-l / tau)
+    kappa = kappa / kappa.sum()
+    w = alpha * kappa                                              # effective lag weights
+    a = _self_exciting_intercept(w, base_rate, seq_len)
+
+    rng = np.random.default_rng(seed)
+
+    # Layer 1: simulate the event stream + intensity (batched over sequences).
+    b = np.zeros((n_seqs, seq_len), dtype=np.float64)
+    lam = np.zeros((n_seqs, seq_len), dtype=np.float64)
+    for i in range(seq_len):
+        hist = np.zeros(n_seqs)
+        for lg in range(K):
+            j = i - 1 - lg
+            if j >= 0:
+                hist += w[lg] * b[:, j]
+        p = 1.0 / (1.0 + np.exp(-(a + hist)))
+        lam[:, i] = p
+        b[:, i] = (rng.random(n_seqs) < p).astype(np.float64)
+
+    # Orthonormal dictionary: u_bt + K_c content directions (rows of an
+    # orthogonal matrix → mutually orthonormal, as in signed_motion).
+    raw = rng.standard_normal((d_in, d_in))
+    Qd, _ = np.linalg.qr(raw)
+    u_bt = Qd[0]                                                   # (d_in,)
+    content = Qd[1:1 + K_c]                                        # (K_c, d_in)
+    features = np.concatenate([u_bt[None, :], content], axis=0)    # (F, d_in)
+
+    # Layer 2: emission.
+    x = np.zeros((n_seqs, seq_len, d_in), dtype=np.float32)
+    mbt = np.abs(rng.normal(mag_bt, 0.3 * mag_bt, size=(n_seqs, seq_len)))
+    x += ((b * mbt)[:, :, None] * u_bt[None, None, :]).astype(np.float32)
+    # each token lights a random size-n_c subset of the content directions
+    pick = np.argsort(rng.random((n_seqs, seq_len, K_c)), axis=-1)[:, :, :n_c]
+    cmag = np.abs(rng.normal(mag_content, 0.3 * mag_content,
+                             size=(n_seqs, seq_len, n_c))).astype(np.float32)
+    chosen = content.astype(np.float32)[pick]                     # (n_seqs, seq_len, n_c, d_in)
+    x += (cmag[..., None] * chosen).sum(axis=2)
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(features.astype(np.float32)),
+        hidden_features=None,                                      # λ is a latent, not a direction
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra={
+            "lambda_labels": torch.from_numpy(lam.astype(np.float32)),
+            "b_labels": torch.from_numpy(b.astype(np.float32)),
+            "intercept": float(a),
+            "kernel_w": [float(v) for v in w],
+            "K": int(K), "alpha": float(alpha), "tau": float(tau),
+            "base_rate_realized": float(b.mean()),
+        },
+    )
+
+
 # ── Refill-source factory (used by ActivationBuffer / WindowBuffer) ────
 
 
@@ -312,6 +465,7 @@ _GENERATORS = {
     "markov":  markov_chain_support,
     "coupled": coupled_hmm,
     "signed_motion": signed_motion,
+    "self_exciting": self_exciting,
 }
 
 
