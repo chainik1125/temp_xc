@@ -1,8 +1,16 @@
 # Synthetic benchmark spec — change-point / sticky-mode recovery (dual-latent)
 
-**Status:** spec / preregistration. **Not yet run** (stage 6 of the
-autoresearch loop), gated on (a) the topic-switching measurement verdict —
-which sets the persistence knob and dwell distribution
+**Status:** spec / preregistration. **Not yet run — and now GATED OPEN: the
+topic anchor aborted.** The intended real anchor (topic-switching) was *measured*
+and **failed the temporal-ness gate** (ABORT — composition-dominated +
+labeler-inadequate; see [`topic_switching_record.md`](topic_switching_record.md)):
+the autocorrelation is 82% per-document composition, not order, the dwell is
+~geometric, and the embedding-cluster labeler is too noisy (silhouette ≈ 0). So
+there is **no validated real dwell distribution to set the persistence knob**.
+This bench therefore stays a frozen spec, gated on either (i) a stronger topic
+labeler (LLM segment tagging / validated topic model) that passes the gate, or
+(ii) the emergent-misalignment anchor (needs a paid per-span judge). Originally
+gated on (a) the topic verdict — which sets the persistence knob and dwell
 ([`topic_switching_prereg.md`](topic_switching_prereg.md)) — and (b) the
 gating due-diligence in § 8.
 

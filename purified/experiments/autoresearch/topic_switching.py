@@ -262,18 +262,26 @@ def main():
             ptrend[bdx] += int(z[i] != z[i - 1]); pcnt[bdx] += 1
     pos_switch = (ptrend / np.maximum(pcnt, 1)).tolist()
 
-    # verdict: heavy-tailed dwell beyond N2?  compare long-lag ACF (k>=4) & run tail
-    def tail_acf(sig): return float(np.mean(sig["acf"][3:8]))
-    real_tail, n2_tail = tail_acf(real), tail_acf(n2)
+    # Verdict — the GENUINE temporal/order signal is real vs N1 (the within-doc
+    # permutation that preserves per-doc topic COMPOSITION but destroys order).
+    # Comparing to N2 (first-order Markov) is confounded: N2 draws from the
+    # global stationary dist, so it does NOT preserve per-doc composition, and a
+    # doc concentrated on a few topics shows high long-lag same-topic ACF that
+    # is composition, not temporal structure. So: order = real - N1.
+    ra = np.array(real["acf"]); n1a = np.array(n1["acf"]); n3a = np.array(n3["acf"])
+    order_lag1 = float(ra[0] - n1a[0])                  # adjacency order beyond composition
+    order_tail = float(np.mean((ra - n1a)[3:7]))        # long-range order beyond composition
+    composition_frac = float(n1a[0] / max(ra[0], 1e-9))  # share of ACF(1) that is composition
+    sticky_vs_n3 = float(ra[0] - n3a[0])                # any stickiness at all (vs iid)
     surv_real, surv_n2 = np.array(real["run_survival"]), np.array(n2["run_survival"])
-    tail_excess = float(np.mean((surv_real - surv_n2)[5:11]))      # excess P(run>r) for r in 5..10
-    sticky_vs_n3 = real["acf"][0] - n3["acf"][0]
-    if sticky_vs_n3 < 0.02:
-        verdict = "NOT_TEMPORAL_abort"
-    elif (real_tail - n2_tail) > 0.03 or tail_excess > 0.02:
-        verdict = "TEMPORAL_semi_markov_heavy_tail"
+    run_tail_excess = float(np.mean((surv_real - surv_n2)[3:8]))  # heavy dwell beyond Markov-1
+    labeler_ok = sil >= 0.05
+    if order_lag1 < 0.10 and order_tail < 0.03:
+        verdict = "ABORT_composition_dominated" + ("" if labeler_ok else "_labeler_inadequate")
+    elif order_tail > 0.05:
+        verdict = "TEMPORAL_long_memory_order"
     else:
-        verdict = "TEMPORAL_memoryless_markov"
+        verdict = "TEMPORAL_weak_short_range_order" + ("" if labeler_ok else "_labeler_caveat")
 
     stats = {
         "seed": SEED, "n_docs": len(docs), "n_sentences": len(flat), "K_clust": K_CLUST,
@@ -281,8 +289,9 @@ def main():
         "real": real, "null_permute": n1, "null_markov1": n2, "null_iid": n3,
         "markov_order": markov, "pos_switch_rate": pos_switch,
         "verdict": verdict,
-        "discriminators": {"real_tail_acf_k4_7": real_tail, "n2_tail_acf_k4_7": n2_tail,
-                           "run_tail_excess_vs_n2": tail_excess, "sticky_vs_n3": sticky_vs_n3},
+        "discriminators": {"order_lag1_vs_N1": order_lag1, "order_tail_k4_7_vs_N1": order_tail,
+                           "composition_frac_of_acf1": composition_frac,
+                           "run_tail_excess_vs_N2": run_tail_excess, "sticky_vs_N3": sticky_vs_n3},
     }
     OUT_JSON.write_text(json.dumps(stats, indent=2))
     _plot(stats)
@@ -300,8 +309,9 @@ def _print(s):
     print(f"ACF(1): real={s['real']['acf'][0]:.3f}  N1={s['null_permute']['acf'][0]:.3f}  "
           f"N2={s['null_markov1']['acf'][0]:.3f}  N3={s['null_iid']['acf'][0]:.3f} (chance {s['real']['chance_same']:.3f})")
     d = s["discriminators"]
-    print(f"tail ACF(4-7): real={d['real_tail_acf_k4_7']:.3f} vs N2={d['n2_tail_acf_k4_7']:.3f}; "
-          f"run-tail excess vs N2={d['run_tail_excess_vs_n2']:.3f}")
+    print(f"GENUINE ORDER (real-N1): lag1={d['order_lag1_vs_N1']:+.3f}  tail(4-7)={d['order_tail_k4_7_vs_N1']:+.3f}"
+          f"  | composition share of ACF(1)={d['composition_frac_of_acf1']:.2f}")
+    print(f"dwell heavy-tail vs N2 (run-tail excess)={d['run_tail_excess_vs_N2']:+.3f}; stickiness vs N3={d['sticky_vs_N3']:+.3f}")
     print(f"VERDICT: {s['verdict']}")
     print(f"-> {OUT_JSON}")
 
