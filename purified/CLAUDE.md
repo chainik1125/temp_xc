@@ -8,20 +8,29 @@ work happens inside `purified/`.
 
 1. `purified/docs/framework_v2.md` — the framework spec. Read top-to-bottom.
 2. `purified/docs/reproduction_report.md` — current § 4 synthetic reproduction.
-3. `purified/docs/ac_signed_motion_bench.md` — the AC / order-sensitive bench.
+3. `purified/autoresearch/README.md` — the synthetic-benchmark autoresearch
+   program: one self-contained subdir per benchmark (backtracking, signed_motion,
+   topic_switching, changepoint, …) holding its spec, record, scripts, results,
+   and figures.
 
 Before proposing or implementing **any synthetic benchmark**, read
-`purified/docs/synthetic_benchmark_guidance.md` — the conventions every
+`purified/autoresearch/synthetic_benchmark_guidance.md` — the conventions every
 synthetic task follows (ground truth, capacity, windowing, metrics).
 
 Before running the **temporal-property autoresearch loop** (measuring temporal
 structure in real language and mirroring it synthetically), read
-`purified/docs/autoresearch_spec.md` — its prime directive and §3 validity
-gates keep agents on rails (the goal is a sound verdict, never a "win").
+`purified/autoresearch/autoresearch_spec.md` — its prime directive and §3
+validity gates keep agents on rails (the goal is a sound verdict, never a "win").
 
-All project docs live under `purified/docs/`. (The historical migration
-docs `CLEANUP_PLAN.md` / `HANDOVER.md` were retired once the v2 migration
-landed — recover from git history if needed.)
+**Layout.** Core-framework docs live under `purified/docs/`. The synthetic-
+benchmark autoresearch program lives under `purified/autoresearch/` — governing
+docs (`autoresearch_spec.md`, `synthetic_benchmark_guidance.md`,
+`frequency_lens.md`) at its root, then one subdir per benchmark with docs +
+scripts + `figs/` + `results/` co-located. Run a benchmark's scripts as
+`.venv/bin/python -m autoresearch.<bench>.<script>` (e.g.
+`autoresearch.backtracking.run_grid`). The canonical leaderboard stays at
+`purified/results/leaderboard.jsonl`. (Historical migration docs were retired —
+recover from git history if needed.)
 
 ## Quick reference
 

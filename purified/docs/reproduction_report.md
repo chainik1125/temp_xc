@@ -113,7 +113,7 @@ substantively the same but absolute AUCs are 0.05-0.10 higher there.
 
 The order-sensitive (AC) counterpart to the DC-only benches above now
 lives in its own paper-style writeup — see
-[`ac_signed_motion_bench.md`](ac_signed_motion_bench.md). Headline:
+[`ac_signed_motion_bench.md`](../autoresearch/signed_motion/bench.md). Headline:
 at an ample dictionary the window crosscoder recovers the hidden sign at
 oracle level (`s_temp = 1.000 ± 0.000`, 3 seeds) while every per-token SAE
 is provably pinned at chance (data-processing inequality).
@@ -254,7 +254,7 @@ noisy evidence for a stable latent. They give no signal on
 order-sensitive (AC) structure — a model could pass both by being a
 pure temporal smoother. That gap is now closed by the **AC-only
 signed-motion bench** — written up as its own paper-style doc,
-[`ac_signed_motion_bench.md`](ac_signed_motion_bench.md) (a
+[`ac_signed_motion_bench.md`](../autoresearch/signed_motion/bench.md) (a
 provable per-token impossibility). The coupling/denoising headline numbers
 in this section reflect the DC-only regime and should be read alongside the
 AC bench, which probes the orthogonal order-sensitive axis.
@@ -292,7 +292,7 @@ AC bench, which probes the orthogonal order-sensitive axis.
   `arch_version="2.0.0-port"` flag).
 - Extend the AC / order-sensitive suite beyond the first signed-motion
   bench (now landed — see the AC section above). Natural next steps from
-  `docs/frequencybenchideas.md`: σ>0 noise robustness, a multi-frequency
+  `autoresearch/frequency_lens.md`: σ>0 noise robustness, a multi-frequency
   (mixed DC+AC) bench, and a sparser/larger-T decoder to surface a cleaner
   per-atom AC signature than the current near-random `atom_dc_fraction`.
 - TFA: re-add once we have (a) a faithfulness review against the

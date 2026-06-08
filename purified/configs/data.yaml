@@ -139,7 +139,7 @@ datasources:
       = u_bt (dominant, recoverable at k_pos=1) + 19 content; λ is a continuous
       latent (NOT a direction), recovered by a per-tile linear regression probe
       (lambda_recovery). Per-token DPI floor √(Varλ/Varb)≈0.41, window ceiling
-      ≈0.91→0.99 (T=2→4). Spec: docs/autoresearch/backtracking_bench_spec.md.
+      ≈0.91→0.99 (T=2→4). Spec: autoresearch/backtracking/bench_spec.md.
 
   # ── Real-LM § 5 ────────────────────────────────────────────────────
 

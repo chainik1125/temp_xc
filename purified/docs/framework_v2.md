@@ -538,4 +538,4 @@ Run before any commit: `cd purified && .venv/bin/python -m pytest tests/ -q`.
 
 - Framework spec: this document, version `2.0.0`, frozen 2026-05-27.
 - Results: see `purified/docs/reproduction_report.md` (§ 4 synthetic) and
-  `purified/docs/ac_signed_motion_bench.md` (AC / order-sensitive bench).
+  `purified/autoresearch/signed_motion/bench.md` (AC / order-sensitive bench).
