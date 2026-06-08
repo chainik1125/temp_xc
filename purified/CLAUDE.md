@@ -6,6 +6,12 @@ work happens inside `purified/`.
 
 **Read order on every session:**
 
+> **Picking up in-progress synthetic-benchmark work (e.g. after a compact)?**
+> Read `purified/autoresearch/STATUS.md` **first** — the single living briefing
+> of the current redo initiative (what's active, the locked design, the next
+> actions, git state). It is the *one* file kept current before a compact; trust
+> it over scattered notes.
+
 1. `purified/docs/framework_v2.md` — the framework spec. Read top-to-bottom.
 2. `purified/docs/reproduction_report.md` — current § 4 synthetic reproduction.
 3. `purified/autoresearch/README.md` — the synthetic-benchmark autoresearch

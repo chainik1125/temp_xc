@@ -1,5 +1,10 @@
 # Autoresearch — synthetic temporal benchmarks
 
+> **Current state / what's in progress:** see [`STATUS.md`](STATUS.md) — the
+> single living briefing (the active redo, the locked design, next actions). It
+> is the one file to read first when resuming, and the one to update before a
+> compact.
+
 This directory is the home of the **temporal-property autoresearch program**:
 find a *measurable* temporal property of real LM behaviour, fit a faithful
 synthetic *mirror* of it, then benchmark whether a window/temporal dictionary
