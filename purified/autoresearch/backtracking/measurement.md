@@ -44,8 +44,9 @@ kills clustering); **N3** homogeneous Poisson at base rate.
 - **Markov order ≥ 2:** order-1≫0 (`p≈0`), order-2≫1 (`p=1.6e-141`); MI(lag)
   decays from 0.047 nats over ~6 sentences.
 
-Figure: [`figs/backtracking_signature.png`](figs/backtracking_signature.png)
-(ACF real-vs-nulls; position trend; MI vs lag).
+![Backtracking temporal signature: ACF real-vs-nulls, position trend, MI vs lag](figs/backtracking_signature.png)
+
+*Figure: ACF (real vs N1/N2/N3 nulls); per-position rate trend; mutual information vs lag.*
 Raw numbers: `backtracking_stats.json`.
 
 ### 2b. Sub-finding: self-excitation is domain-dependent
@@ -108,8 +109,9 @@ Held-out validation (real eval traces vs synthetic draws of matched lengths):
 
 Mean `|ACF_real − ACF_syn|` over lags 1–5 = **0.053**. The mirror reproduces
 the signature (weak validation, spec § 2.5 — passed); it is *slightly
-over-excited* (independent sampling compounds the self-excitation). Figure:
-[`figs/backtracking_mirror.png`](figs/backtracking_mirror.png).
+over-excited* (independent sampling compounds the self-excitation).
+
+![Backtracking synthetic mirror: held-out ACF (real vs mirror) + the fitted self-excitation kernel](figs/backtracking_mirror.png)
 
 ## 6. Caveats (honest scope)
 

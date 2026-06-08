@@ -84,7 +84,14 @@ Trained `lambda_recovery` (mean over 3 seeds), by `d_sae` (`k_pos=1`):
 - `lambda_chance` ≈ 0 for every cell (worst −0.13, sampling noise), so the
   recovery is real, not an inflated floor.
 
-Figure: [`backtracking_main.png` panel (a)](figs/backtracking_main.png).
+![Backtracking lambda-recovery: (a) frontier vs d_sae, (b) recovery vs window size T](figs/backtracking_main.png)
+
+*Figure 1. **(a)** Hidden-intensity (λ) recovery vs dictionary size: per-token SAEs
+(dashed) are pinned at the per-token DPI floor (≈0.41) and flat across capacity,
+while window crosscoders (solid) recover λ at 0.86–0.95 — robustly into the
+scarce regime `d_sae < F = 20` (shaded). **(b)** Recovery rises with window size
+`T` and saturates by `T = 4` (per-token shown at `T = 1`). Error bars = ±1 s.d.
+over 3 seeds.*
 
 ## 3. `λ` recovery rises with `T`, saturates by `T = 4`
 
@@ -92,7 +99,7 @@ At `d_sae = 20`: per-token (T=1) 0.40 → T=2 0.86 → T=4 0.94 → T=8 0.94. Th
 curve tracks the gating linear ceilings (0.41 / 0.91 / 0.99 / 0.99) and
 **saturates by `T = 4`** — because `K = 2`, a tile of `T = 4` already contains
 both relevant lags. `T = 8` confirms the plateau (no further gain), as the spec
-anticipated. Figure: [`backtracking_main.png` panel (b)](figs/backtracking_main.png).
+anticipated (panel **(b)** of Figure 1 above).
 
 ## 4. The global-vs-local trade-off (eAUC, NMSE)
 
@@ -126,7 +133,12 @@ eAUC (trained, `k_pos=1`), by `d_sae`:
   reconstruct (NMSE 0.38–0.69), so the capability-vs-artifact gate passes: the
   window recovers `λ` while still representing the data, not instead of it.
 
-Figure: [`backtracking_local_tradeoff.png`](figs/backtracking_local_tradeoff.png).
+![Local-feature recovery (eAUC) and reconstruction NMSE vs d_sae](figs/backtracking_local_tradeoff.png)
+
+*Figure 2. The global-vs-local trade-off. **(a)** Local feature recovery (eAUC):
+per-token T-SAE → 0.99 at `d_sae = F`, while window archs trail in the scarce
+regime (yet still recover λ). **(b)** Reconstruction NMSE: window archs pay a
+higher reconstruction cost (temporal coding) but still represent the data.*
 
 ## 5. Untrained-encoder control — access vs learning
 
@@ -152,8 +164,14 @@ honest decomposition: the per-token→window gap is **architectural access**
 (provable: per-token can't see history, window can), and **training sharpens the
 linear exposure** by a further ~0.2 (0.73 → 0.95 at T=4). Per-token, by
 contrast, barely moves with training (0.30 → 0.40) because it is capped at the
-DPI floor regardless. Figure:
-[`figs/backtracking_untrained_control.png`](figs/backtracking_untrained_control.png).
+DPI floor regardless.
+
+![Trained vs random-init lambda-recovery at d_sae=20](figs/backtracking_untrained_control.png)
+
+*Figure 3. Access vs learning (`d_sae = 20`, `k_pos = 1`). Random-init window
+encoders (grey) already exceed the per-token DPI floor — architectural access to
+the history — and training (colored) lifts them further; per-token archs gain
+almost nothing from training (capped by the floor).*
 
 ## 6. Preregistered predictions (spec § 7)
 

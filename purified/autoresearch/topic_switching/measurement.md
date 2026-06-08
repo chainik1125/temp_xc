@@ -63,8 +63,10 @@ destroys order); **N2** first-order Markov at the empirical transition matrix
   over r∈[3,8] = +0.016 (negligible). Not heavy-tailed.
 - Position trend: switch rate flat ≈ 0.56, rising only in the final bin.
 
-Figure: [`figs/topic_switching_signature.png`](figs/topic_switching_signature.png)
-(real ≈ N1 at all lags; dwell survival; switch-rate-vs-position).
+![Topic-switching signature: same-topic ACF (real vs nulls), dwell survival, switch rate vs position](figs/topic_switching_signature.png)
+
+*Figure: real ≈ N1 (order-destroyed) at all lags — the autocorrelation is
+composition, not order; dwell survival ≈ geometric; switch rate vs position.*
 
 ## 3. Methodological lesson — the right null matters (cf. signed-motion)
 
