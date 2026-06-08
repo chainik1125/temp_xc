@@ -214,6 +214,49 @@ def fig_local_tradeoff(agg, plt):
     fig.tight_layout(); _save(fig, plt, "backtracking_local_tradeoff")
 
 
+def fig_specialization(agg, plt):
+    """The local-vs-temporal plane: eAUC (local) × lambda-recovery (order-sensitive).
+
+    One marker per (arch, T) at the F anchor (d_sae=20); a faint trajectory traces
+    d_sae ∈ {8,16,20,40}. Per-token archs sit low on the λ axis (local specialists);
+    window archs sit high (temporal specialists) — the architectural specialization.
+    """
+    fig, ax = plt.subplots(figsize=(7.6, 6.4))
+    ax.axhspan(0.70, 1.02, color="#eef4fb", zorder=0, lw=0)
+    ax.axhline(0.70, color="#9ecae1", lw=0.8, ls=":", zorder=1)
+    ax.text(0.015, 1.005, "temporal (order-sensitive) specialist", color="#2b6cb0",
+            fontsize=9.5, va="top", style="italic")
+    ax.text(0.985, 0.02, "local-feature specialist", color="#a84300",
+            fontsize=9.5, ha="right", va="bottom", style="italic")
+    for arch, T in ARCH_T:
+        col = COLORS[(arch, T)]; mk = "X" if (arch, T) in PER_TOKEN else MARK[T]
+        pts = []
+        for d in D_SAES:
+            ex = g(agg, "trained", 1, arch, T, d, "eauc"); ly = g(agg, "trained", 1, arch, T, d)
+            if ex[2] and ly[2]:
+                pts.append((d, ex[0], ly[0], ex[1], ly[1]))
+        if not pts:
+            continue
+        ax.plot([p[1] for p in pts], [p[2] for p in pts], color=col, lw=1.0, alpha=0.3,
+                ls="--" if (arch, T) in PER_TOKEN else "-", zorder=2)
+        for d, ex, ly, exs, lys in pts:
+            if d == 20:
+                ax.scatter([ex], [ly], s=150, color=col, edgecolor="0.2", linewidth=0.8,
+                           marker=mk, zorder=4, label=label(arch, T))
+                ax.errorbar([ex], [ly], xerr=[exs], yerr=[lys], color=col, lw=1, capsize=2, zorder=4)
+            else:
+                ax.scatter([ex], [ly], s=26, color=col, marker=mk, alpha=0.4, zorder=3)
+    ax.set_xlim(0, 1.02); ax.set_ylim(0, 1.04)
+    ax.set_xlabel("local feature recovery   (eAUC)")
+    ax.set_ylabel("order-sensitive latent recovery   ($\\lambda$-recovery)")
+    ax.set_title("Architectural specialization: local vs temporal recovery", fontsize=12)
+    ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8.6,
+              title="(arch, T) @ $d_{sae}{=}20$\nfaint trail: $d_{sae}\\in\\{8,16,20,40\\}$",
+              title_fontsize=8.2)
+    fig.tight_layout()
+    _save(fig, plt, "backtracking_specialization")
+
+
 def _save(fig, plt, name):
     for ext, dpi in [("pdf", None), ("png", 200), ("thumb.png", 70)]:
         fig.savefig(FIG_DIR / f"{name}.{ext}", dpi=dpi)
@@ -312,6 +355,7 @@ def main():
     print(f"[render] {len(rows)} leaderboard cells ({n_trained} trained); per-token DPI floor = {pt:.3f}")
 
     fig_main(agg, pt, plt)
+    fig_specialization(agg, plt)
     fig_untrained(agg, pt, plt)
     fig_local_tradeoff(agg, plt)
 

@@ -104,7 +104,18 @@ anticipated (panel **(b)** of Figure 1 above).
 ## 4. The global-vs-local trade-off (eAUC, NMSE)
 
 Window archs buy `λ` recovery by **spending capacity on temporal structure** at
-the cost of local-feature recovery and reconstruction:
+the cost of local-feature recovery and reconstruction. The two recovery axes —
+**local** (eAUC) vs **order-sensitive / temporal** (`λ`) — make the
+specialization visible at a glance:
+
+![Architectural specialization: local (eAUC) vs temporal (lambda) recovery](figs/backtracking_specialization.png)
+
+*Figure 2. The local-vs-temporal plane (one point per (arch, T) at the `d_sae = 20`
+anchor; faint trail = `d_sae ∈ {8,16,20,40}`). Per-token SAEs (✕) sit low on the
+`λ` axis — **local-feature specialists** (T-SAE reaches eAUC ≈ 1 yet `λ` ≈ 0.41);
+window crosscoders (●/■) sit in the temporal-rich band — **temporal specialists**
+(`λ` ≈ 0.95). Growing capacity (the trail) moves archs mostly rightward (more
+eAUC), not up — the `λ` separation is architectural, not a capacity effect.*
 
 eAUC (trained, `k_pos=1`), by `d_sae`:
 
@@ -135,7 +146,7 @@ eAUC (trained, `k_pos=1`), by `d_sae`:
 
 ![Local-feature recovery (eAUC) and reconstruction NMSE vs d_sae](figs/backtracking_local_tradeoff.png)
 
-*Figure 2. The global-vs-local trade-off. **(a)** Local feature recovery (eAUC):
+*Figure 3. The global-vs-local trade-off, resolved by capacity. **(a)** Local feature recovery (eAUC):
 per-token T-SAE → 0.99 at `d_sae = F`, while window archs trail in the scarce
 regime (yet still recover λ). **(b)** Reconstruction NMSE: window archs pay a
 higher reconstruction cost (temporal coding) but still represent the data.*
@@ -168,7 +179,7 @@ DPI floor regardless.
 
 ![Trained vs random-init lambda-recovery at d_sae=20](figs/backtracking_untrained_control.png)
 
-*Figure 3. Access vs learning (`d_sae = 20`, `k_pos = 1`). Random-init window
+*Figure 4. Access vs learning (`d_sae = 20`, `k_pos = 1`). Random-init window
 encoders (grey) already exceed the per-token DPI floor — architectural access to
 the history — and training (colored) lifts them further; per-token archs gain
 almost nothing from training (capped by the floor).*
