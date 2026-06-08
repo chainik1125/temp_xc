@@ -44,6 +44,72 @@ archs:
       Vanilla TopK temporal crosscoder (T=5) + tsae_paper anti-dead stack.
       No matryoshka, no contrastive, no Bricken.
 
+  # ── BatchTopK fair-backbone family (autoresearch/STATUS.md § 4) ──────
+  # Strong backbone (BatchTopK train → JumpReLU threshold eval, Bussmann
+  # et al.) + AuxK + decoder unit-norm + grad-orth, applied uniformly so
+  # the ONLY variable across the backtracking comparison is decode
+  # structure. The published TopK archs above are left untouched (§ 4
+  # coupling/denoising + signed_motion results stand).
+
+  batchtopk_sae:
+    class_path: temp_bench.archs.batchtopk_sae:BatchTopKSAE
+    arch_version: "1.0.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic:    { d_sae: 20 }
+      backtracking: { d_sae: 32768 }
+    notes: "Per-token BatchTopK SAE (strong backbone, no matryoshka/contrastive)."
+
+  stacked_batchtopk:
+    class_path: temp_bench.archs.stacked_batchtopk:StackedBatchTopK
+    arch_version: "1.0.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T independent per-position BatchTopK SAEs; global B·T pool."
+
+  txc_batchtopk_pre:
+    class_path: temp_bench.archs.txc_batchtopk:TXCBatchTopKPre
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-squash BatchTopK temporal crosscoder: BatchTopK on per-position
+      pre-acts (pool B·T, budget k_pos/token), sum survivors into one
+      shared window code, decode all T positions.
+
+  txc_batchtopk_post:
+    class_path: temp_bench.archs.txc_batchtopk:TXCBatchTopKPost
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Post-squash BatchTopK temporal crosscoder: sum pre-acts into the
+      squashed code, BatchTopK on it (pool B windows, budget k_pos/window
+      = k_win//T), decode all T positions. Corrects the k_win=k_pos·T
+      over-count.
+
   # ── Ours: baselines ─────────────────────────────────────────────────
 
   topk_sae:

@@ -39,15 +39,25 @@ PROTOCOL = "1.2.0"
 
 F = 20
 D_SAES = [8, 16, 20, 40]
-ARCH_T = [("topk_sae", 1), ("tsae", 1),
-          ("txc_base", 2), ("txc_base", 4), ("txc_base", 8),
-          ("stacked_sae", 2), ("stacked_sae", 4), ("stacked_sae", 8)]
-PER_TOKEN = {("topk_sae", 1), ("tsae", 1)}
-LABEL = {"topk_sae": "TopK-SAE", "tsae": "T-SAE", "txc_base": "TXC", "stacked_sae": "Stacked-SAE"}
+# BatchTopK fair-backbone family: every arch shares the BatchTopK→JumpReLU
+# backbone, so the only variable is decode structure.
+ARCH_T = [("batchtopk_sae", 1), ("tsae", 1),
+          ("txc_batchtopk_pre", 2), ("txc_batchtopk_pre", 4), ("txc_batchtopk_pre", 8),
+          ("txc_batchtopk_post", 2), ("txc_batchtopk_post", 4), ("txc_batchtopk_post", 8),
+          ("stacked_batchtopk", 2), ("stacked_batchtopk", 4), ("stacked_batchtopk", 8)]
+PER_TOKEN = {("batchtopk_sae", 1), ("tsae", 1)}
+LABEL = {"batchtopk_sae": "BatchTopK-SAE", "tsae": "T-SAE",
+         "txc_batchtopk_pre": "TXC-pre", "txc_batchtopk_post": "TXC-post",
+         "stacked_batchtopk": "Stacked-SAE"}
+# Window families: TXC-pre = blues, TXC-post = purples, Stacked = greens.
+WINDOW_FAMILIES = [("txc_batchtopk_pre", "#3182bd"),
+                   ("txc_batchtopk_post", "#807dba"),
+                   ("stacked_batchtopk", "#31a354")]
 COLORS = {
-    ("topk_sae", 1): "#D55E00", ("tsae", 1): "#E69F00",                  # per-token: vermillion/orange
-    ("txc_base", 2): "#9ecae1", ("txc_base", 4): "#3182bd", ("txc_base", 8): "#08519c",   # window: blues
-    ("stacked_sae", 2): "#a1d99b", ("stacked_sae", 4): "#31a354", ("stacked_sae", 8): "#006d2c",  # greens
+    ("batchtopk_sae", 1): "#D55E00", ("tsae", 1): "#E69F00",            # per-token: vermillion/orange
+    ("txc_batchtopk_pre", 2): "#9ecae1", ("txc_batchtopk_pre", 4): "#3182bd", ("txc_batchtopk_pre", 8): "#08519c",
+    ("txc_batchtopk_post", 2): "#bcbddc", ("txc_batchtopk_post", 4): "#807dba", ("txc_batchtopk_post", 8): "#54278f",
+    ("stacked_batchtopk", 2): "#a1d99b", ("stacked_batchtopk", 4): "#31a354", ("stacked_batchtopk", 8): "#006d2c",
 }
 MARK = {1: "o", 2: "s", 4: "^", 8: "D"}
 
@@ -148,7 +158,7 @@ def fig_main(agg, pt, plt):
             if n:
                 ax2.errorbar([1], [m], yerr=[s], marker=MARK[1], ms=8, color=COLORS[(arch, T)],
                              capsize=3, label=label(arch, T))
-    for fam, col in [("txc_base", "#3182bd"), ("stacked_sae", "#31a354")]:
+    for fam, col in WINDOW_FAMILIES:
         ts, ys, es = [], [], []
         for T in (2, 4, 8):
             m, s, n = g(agg, "trained", 1, fam, T, 20)
@@ -312,19 +322,26 @@ def table_kpos(agg):
 
 
 def headline_block(agg, pt):
-    pt_tok = np.nanmean([g(agg, "trained", 1, a, 1, 20)[0] for a in ("topk_sae", "tsae")])
-    win_t4 = np.nanmean([g(agg, "trained", 1, "txc_base", 4, 20)[0], g(agg, "trained", 1, "stacked_sae", 4, 20)[0]])
-    win_t2 = np.nanmean([g(agg, "trained", 1, "txc_base", 2, 20)[0], g(agg, "trained", 1, "stacked_sae", 2, 20)[0]])
-    win_scarce = g(agg, "trained", 1, "txc_base", 4, 8)[0]
-    un_win = g(agg, "untrained", 1, "txc_base", 4, 20)[0]
+    pt_tok = np.nanmean([g(agg, "trained", 1, a, 1, 20)[0] for a in ("batchtopk_sae", "tsae")])
+    pre_t2 = g(agg, "trained", 1, "txc_batchtopk_pre", 2, 20)[0]
+    pre_t4 = g(agg, "trained", 1, "txc_batchtopk_pre", 4, 20)[0]
+    post_t4 = g(agg, "trained", 1, "txc_batchtopk_post", 4, 20)[0]
+    stk_t4 = g(agg, "trained", 1, "stacked_batchtopk", 4, 20)[0]
+    win_scarce = g(agg, "trained", 1, "txc_batchtopk_pre", 4, 8)[0]
+    best_win_t4 = np.nanmax([pre_t4, post_t4, stk_t4])
+    un_win = g(agg, "untrained", 1, "txc_batchtopk_pre", 4, 20)[0]
     return (
-        f"- **Per-token DPI floor** (provable, computed from the generator): "
-        f"$\\sqrt{{Var\\,\\lambda/Var\\,b}}$ = **{pt:.2f}**. Trained per-token SAEs land at "
+        f"- **Fair backbone:** every arch shares the BatchTopK→JumpReLU backbone "
+        f"(Bussmann et al.) + AuxK + decoder unit-norm, on equal tokens/step — so the "
+        f"only variable is decode structure.\n"
+        f"- **Per-token DPI floor** (provable, from the generator): "
+        f"$\\sqrt{{Var\\,\\lambda/Var\\,b}}$ = **{pt:.2f}**. Trained per-token (BatchTopK) SAEs land at "
         f"**{pt_tok:.2f}** at d_sae=20, flat across all capacities.\n"
-        f"- **Window recovery**: $\\lambda$ = **{win_t2:.2f}** (T=2) → **{win_t4:.2f}** (T≥4) at d_sae=20; "
-        f"**{win_scarce:.2f}** even at d_sae=8 < F=20 (scarce regime).\n"
-        f"- **Gap** (window T4 − per-token): **{win_t4 - pt_tok:.2f}**. "
-        f"Untrained window already reaches {un_win:.2f} (architectural access); training lifts it to {win_t4:.2f}."
+        f"- **Window recovery** at d_sae=20: TXC-pre $\\lambda$ = **{pre_t2:.2f}** (T=2) → "
+        f"**{pre_t4:.2f}** (T≥4); TXC-post **{post_t4:.2f}**; Stacked **{stk_t4:.2f}** (T=4). "
+        f"Holds at d_sae=8 < F=20 (TXC-pre = **{win_scarce:.2f}**, scarce regime).\n"
+        f"- **Gap** (best window T4 − per-token): **{best_win_t4 - pt_tok:.2f}**. "
+        f"Untrained window already reaches {un_win:.2f} (architectural access); training lifts it to {best_win_t4:.2f}."
     )
 
 

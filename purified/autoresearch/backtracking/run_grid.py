@@ -1,12 +1,19 @@
 """Run the backtracking (self-exciting) benchmark grid in parallel.
 
-Grid (autoresearch/backtracking/bench_spec.md § 5):
-  archs/T : (topk_sae,1) (tsae,1) (txc_base,2/4/8) (stacked_sae,2/4/8)   [8]
+Grid (autoresearch/backtracking/bench_spec.md § 5 — BatchTopK fair-backbone):
+  archs/T : (batchtopk_sae,1) (tsae,1) (stacked_batchtopk,2/4/8)
+            (txc_batchtopk_pre,2/4/8) (txc_batchtopk_post,2/4/8)         [11]
   d_sae   : 8, 16, 20, 40   (anchored on F=20; scarce {8,16,20} + over-complete 40)
   seeds   : 1, 2, 42
-  k_pos=1, eval_window_L=32, n_steps=30000                  -> 96 trained cells
-Plus the UNTRAINED-encoder control (n_steps=0) at d_sae=20 for all 8 (arch,T),
-3 seeds -> 24 cells. Total 120.
+  k_pos=1, eval_window_L=32, n_steps=30000                  -> 132 trained cells
+
+Throughput is normalised across archs: every cell reconstructs ~1024
+token-positions/step, so window archs (T>1) use batch_size = 1024 // T while
+per-token archs use 1024. This also equalises the BatchTopK pool (B·T = 1024).
+
+Plus the UNTRAINED-encoder control (n_steps=0) at d_sae=20 for all 11 (arch,T),
+3 seeds -> 33 cells, and the k_pos=2 sparsity-robustness anchor (trained,
+d_sae=20) for all 11 (arch,T), 3 seeds -> 33 cells. Total 198.
 
 Each cell goes through the canonical runner (flock-safe leaderboard append, so
 parallel workers are safe). CUDA is initialised only inside workers (the parent
@@ -38,11 +45,19 @@ K_POS = 1
 N_STEPS = 30_000
 D_SAES = [8, 16, 20, 40]
 SEEDS = [1, 2, 42]
-ARCH_T = [("topk_sae", 1), ("tsae", 1),
-          ("txc_base", 2), ("txc_base", 4), ("txc_base", 8),
-          ("stacked_sae", 2), ("stacked_sae", 4), ("stacked_sae", 8)]
+ARCH_T = [("batchtopk_sae", 1), ("tsae", 1),
+          ("stacked_batchtopk", 2), ("stacked_batchtopk", 4), ("stacked_batchtopk", 8),
+          ("txc_batchtopk_pre", 2), ("txc_batchtopk_pre", 4), ("txc_batchtopk_pre", 8),
+          ("txc_batchtopk_post", 2), ("txc_batchtopk_post", 4), ("txc_batchtopk_post", 8)]
+
+
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_grid_results.json"
+
+
+def _batch_size(T: int) -> int:
+    """Equal tokens/step (+ equal BatchTopK pool): window archs get 1024 // T."""
+    return 1024 if T == 1 else 1024 // T
 
 
 def _cells():
@@ -50,11 +65,14 @@ def _cells():
     for seed in SEEDS:
         for arch, T in ARCH_T:
             for d_sae in D_SAES:
-                cells.append({"arch": arch, "T": T, "d_sae": d_sae,
+                cells.append({"arch": arch, "T": T, "d_sae": d_sae, "k_pos": K_POS,
                               "seed": seed, "n_steps": N_STEPS, "kind": "trained"})
             # untrained control at the F anchor (d_sae=20) only
-            cells.append({"arch": arch, "T": T, "d_sae": 20,
+            cells.append({"arch": arch, "T": T, "d_sae": 20, "k_pos": K_POS,
                           "seed": seed, "n_steps": 0, "kind": "untrained"})
+            # sparsity-robustness anchor: k_pos=2 at the F anchor (d_sae=20)
+            cells.append({"arch": arch, "T": T, "d_sae": 20, "k_pos": 2,
+                          "seed": seed, "n_steps": N_STEPS, "kind": "trained"})
     return cells
 
 
@@ -62,10 +80,11 @@ def run_one(cell):
     from temp_bench.core.runner import run_experiment
     from temp_bench.core.schemas import TrainingConfig
     try:
-        override = {"k_pos": K_POS, "d_sae": cell["d_sae"], "T": cell["T"]}
-        tcfg = TrainingConfig(n_steps=cell["n_steps"], batch_size=1024,
+        k_pos = cell.get("k_pos", K_POS)
+        override = {"k_pos": k_pos, "d_sae": cell["d_sae"], "T": cell["T"]}
+        tcfg = TrainingConfig(n_steps=cell["n_steps"], batch_size=_batch_size(cell["T"]),
                               buffer_tokens=2_000_000, arch_hparams_override=override)
-        ecfg = {"smoke": False, "k_pos": K_POS, "eval_window_L": L}
+        ecfg = {"smoke": False, "k_pos": k_pos, "eval_window_L": L}
         r = run_experiment(experiment="synthetic", arch_name=cell["arch"],
                            seed=cell["seed"], datasource_name=DS,
                            training_cfg=tcfg, eval_cfg=ecfg,
@@ -92,7 +111,7 @@ def main():
             results.append(res)
             done += 1
             el = time.time() - t0
-            tag = f"{res['arch']}/T{res['T']}/d{res['d_sae']}/s{res['seed']}/{res['kind']}"
+            tag = f"{res['arch']}/T{res['T']}/d{res['d_sae']}/k{res.get('k_pos',1)}/s{res['seed']}/{res['kind']}"
             if res.get("ok"):
                 lr = res["metrics"].get("lambda_recovery", float("nan"))
                 ea = res["metrics"].get("eauc", float("nan"))

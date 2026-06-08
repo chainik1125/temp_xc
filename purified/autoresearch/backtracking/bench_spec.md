@@ -106,11 +106,34 @@ with no history info; oracle = the true `λ_i`).
 
 ## 5. Grid (per the conventions doc)
 
-- **archs:** per-token SAEs (`topk_sae`, `tsae`; `T = 1`) vs window crosscoder
-  (`txc_base`) and per-position (`stacked_sae`) over `T ∈ {2, 4, 8}`.
+> **Pre-run amendment (fairness, 2026-06-08 — independent of any bench result).**
+> The backbone was switched **TopK → BatchTopK** for *every* arch. T-SAE already
+> used BatchTopK (Bussmann et al. — the strong backbone: BatchTopK during
+> training → a fixed JumpReLU threshold at inference); the plain TopK baselines
+> made "backbone" an uncontrolled confound that favoured T-SAE. The comparison
+> now puts all archs on the *same* BatchTopK→JumpReLU backbone (+ AuxK
+> dead-feature revival + decoder unit-norm + grad-orthogonalisation), so the only
+> remaining variable is **decode structure**. Two further fairness fixes ride
+> along: **(i) throughput** — window archs see `batch_size = 1024 // T` so every
+> arch reconstructs ~1024 token-positions/step and the BatchTopK pool is the same
+> `B·T = 1024` granularity (the old uniform `batch_size = 1024` let window archs
+> see up to `T×` more data/step); **(ii) post-squash budget** — the crosscoder's
+> squashed code uses `k_pos` actives **per window** (= `k_win // T`), correcting
+> the legacy `k_win = k_pos·T` over-count (each squashed atom is reused at all `T`
+> positions). These are fairness corrections chosen *before* the run, not metric
+> shopping. The published TopK archs are left untouched so the § 4
+> coupling/denoising and signed-motion results stand.
+
+- **archs (all on the BatchTopK backbone):** per-token SAEs (`batchtopk_sae`,
+  `tsae`; `T = 1`) vs **two** window crosscoder variants — pre-squash
+  (`txc_batchtopk_pre`) and post-squash (`txc_batchtopk_post`) — and per-position
+  (`stacked_batchtopk`), each over `T ∈ {2, 4, 8}`. The pre/post split is an open
+  architectural question (select per-position survivors *then* squash, vs squash
+  *then* select), so we measure both.
 - **`d_sae`:** anchored on `F = 20` — scarce `{8, 16, 20}` + one over-complete
   reference `{40}`. Matched across archs.
-- **`k_pos`:** 1 (sparsest; the conventions' default for the scarce regime).
+- **`k_pos`:** 1 (sparsest; the conventions' default for the scarce regime), plus
+  a `k_pos = 2` sparsity-robustness anchor at `d_sae = 20`.
 - **window `L`:** common tiled eval window `L = 32` (power-of-two); `T ∈ {2,4,8}`
   ∈ powers of two. (`T = 8` is kept to *demonstrate* the saturation empirically:
   at `K = 2` recovery plateaus by `T = 4` — see § 8 — so `T = 8` confirms the
