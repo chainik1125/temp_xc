@@ -16,7 +16,12 @@ do it: a clean global-vs-local specialization.
 **Scripts** (`-m autoresearch.backtracking.<x>` from `purified/`): `measure`
 (stages 2-3), `mirror` (fit+validate), `gating` (§8 ceilings), `kernel_order`
 (held-out K selection → K=2), `run_grid` (120-cell grid), `render_figs`.
-**`figs/`** — frontier, λ-vs-T, untrained control, eAUC/NMSE, signature, mirror.
-**`results/`** — derived stats JSON (grid_results, bench_stats, gating,
-kernel_order, mirror, kpos_robustness, measurement). Real input labels:
+**`figs/`** (paper-quality) — `main` (λ frontier + T-saturation), `untrained_control`
+(access vs learning), `local_tradeoff` (eAUC/NMSE), plus `signature`/`mirror`
+(measurement) and `gating`. **`results/`** — derived stats JSON (bench_stats,
+grid_results, gating, kernel_order, mirror, measurement). Real input labels:
 `../../results/c7_backtracking/stage_a/` (Ward Stage-A).
+
+**Single source of truth:** `bench_record.md`'s tables + headline + figures are
+**auto-generated** from the canonical `../../results/leaderboard.jsonl` by
+`-m autoresearch.backtracking.render_figs` — no hand-typed numbers.

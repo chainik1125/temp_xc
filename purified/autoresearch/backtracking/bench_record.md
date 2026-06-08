@@ -22,6 +22,19 @@ loop's [`autoresearch_spec.md`](../autoresearch_spec.md).
 > local-feature recovery (eAUC) and tight reconstruction to do it: a clean
 > global(temporal)-vs-local(per-token) architectural specialization.
 
+> **This record is auto-generated from the canonical leaderboard.** Every table
+> and figure below is (re)built by `-m autoresearch.backtracking.render_figs`,
+> which reads `results/leaderboard.jsonl` — the single source of truth — so the
+> numbers cannot drift from the runs. The prose is the human narrative.
+
+**Key numbers** (auto-filled from the leaderboard):
+
+<!-- BEGIN AUTO:headline -->
+- **Per-token DPI floor** (provable, computed from the generator): $\sqrt{Var\,\lambda/Var\,b}$ = **0.41**. Trained per-token SAEs land at **0.40** at d_sae=20, flat across all capacities.
+- **Window recovery**: $\lambda$ = **0.87** (T=2) → **0.94** (T≥4) at d_sae=20; **0.95** even at d_sae=8 < F=20 (scarce regime).
+- **Gap** (window T4 − per-token): **0.54**. Untrained window already reaches 0.73 (architectural access); training lifts it to 0.94.
+<!-- END AUTO:headline -->
+
 ## 1. Setup
 
 - **Data:** `toy_backtracking_selfexcite_d64` — the validated self-exciting
@@ -47,18 +60,20 @@ loop's [`autoresearch_spec.md`](../autoresearch_spec.md).
 
 ## 2. Headline result — `λ` recovery vs capacity
 
-Trained `lambda_recovery` (mean over 3 seeds), by `d_sae`:
+Trained `lambda_recovery` (mean over 3 seeds), by `d_sae` (`k_pos=1`):
 
-| arch / T | d_sae=8 | 16 | 20 | 40 |
+<!-- BEGIN AUTO:lambda_frontier -->
+| arch / T | d=8 | d=16 | d=20 | d=40 |
 |---|---|---|---|---|
-| topk_sae (per-token) | 0.401 | 0.399 | 0.398 | 0.397 |
-| tsae (per-token) | 0.416 | 0.412 | 0.409 | 0.417 |
-| **txc_base T=2** | 0.870 | 0.830 | 0.868 | 0.858 |
-| **txc_base T=4** | **0.951** | 0.949 | 0.948 | 0.940 |
-| **txc_base T=8** | 0.950 | 0.949 | 0.949 | 0.947 |
-| stacked_sae T=2 | 0.869 | 0.865 | 0.863 | 0.862 |
-| stacked_sae T=4 | 0.947 | 0.943 | 0.942 | 0.941 |
-| stacked_sae T=8 | 0.947 | 0.941 | 0.941 | 0.938 |
+| TopK-SAE (per-token) | 0.401 | 0.399 | 0.398 | 0.397 |
+| T-SAE (per-token) | 0.416 | 0.412 | 0.409 | 0.417 |
+| **TXC (T=2)** | 0.870 | 0.830 | 0.868 | 0.858 |
+| **TXC (T=4)** | 0.951 | 0.949 | 0.948 | 0.940 |
+| **TXC (T=8)** | 0.950 | 0.949 | 0.949 | 0.947 |
+| **Stacked-SAE (T=2)** | 0.869 | 0.865 | 0.863 | 0.862 |
+| **Stacked-SAE (T=4)** | 0.947 | 0.943 | 0.942 | 0.941 |
+| **Stacked-SAE (T=8)** | 0.947 | 0.941 | 0.941 | 0.938 |
+<!-- END AUTO:lambda_frontier -->
 
 - **Per-token is pinned at the DPI floor** (~0.40 ≈ 0.408) and **flat across all
   `d_sae`** — exactly the prediction: no dictionary size lets a per-token
@@ -69,7 +84,7 @@ Trained `lambda_recovery` (mean over 3 seeds), by `d_sae`:
 - `lambda_chance` ≈ 0 for every cell (worst −0.13, sampling noise), so the
   recovery is real, not an inflated floor.
 
-Figure: [`figs/backtracking_lambda_frontier.png`](figs/backtracking_lambda_frontier.png).
+Figure: [`backtracking_main.png` panel (a)](figs/backtracking_main.png).
 
 ## 3. `λ` recovery rises with `T`, saturates by `T = 4`
 
@@ -77,19 +92,27 @@ At `d_sae = 20`: per-token (T=1) 0.40 → T=2 0.86 → T=4 0.94 → T=8 0.94. Th
 curve tracks the gating linear ceilings (0.41 / 0.91 / 0.99 / 0.99) and
 **saturates by `T = 4`** — because `K = 2`, a tile of `T = 4` already contains
 both relevant lags. `T = 8` confirms the plateau (no further gain), as the spec
-anticipated. Figure: [`figs/backtracking_lambda_vs_T.png`](figs/backtracking_lambda_vs_T.png).
+anticipated. Figure: [`backtracking_main.png` panel (b)](figs/backtracking_main.png).
 
 ## 4. The global-vs-local trade-off (eAUC, NMSE)
 
 Window archs buy `λ` recovery by **spending capacity on temporal structure** at
 the cost of local-feature recovery and reconstruction:
 
-| eAUC (trained) | d8 | 16 | 20 | 40 |
+eAUC (trained, `k_pos=1`), by `d_sae`:
+
+<!-- BEGIN AUTO:eauc -->
+| arch / T | d=8 | d=16 | d=20 | d=40 |
 |---|---|---|---|---|
-| tsae (per-token) | 0.404 | 0.768 | **0.976** | **0.990** |
-| topk_sae (per-token) | 0.426 | 0.523 | 0.471 | 0.444 |
-| txc_base T=4 | 0.334 | 0.513 | 0.590 | 0.925 |
-| txc_base T=8 | **0.080** | 0.462 | 0.582 | 0.870 |
+| TopK-SAE (per-token) | 0.426 | 0.523 | 0.471 | 0.444 |
+| T-SAE (per-token) | 0.404 | 0.768 | 0.976 | 0.990 |
+| TXC (T=2) | 0.375 | 0.660 | 0.778 | 0.763 |
+| TXC (T=4) | 0.334 | 0.513 | 0.590 | 0.925 |
+| TXC (T=8) | 0.080 | 0.462 | 0.582 | 0.870 |
+| Stacked-SAE (T=2) | 0.439 | 0.409 | 0.416 | 0.422 |
+| Stacked-SAE (T=4) | 0.383 | 0.383 | 0.402 | 0.406 |
+| Stacked-SAE (T=8) | 0.363 | 0.354 | 0.374 | 0.393 |
+<!-- END AUTO:eauc -->
 
 - **tsae recovers the local feature directions almost perfectly** (eAUC 0.98 at
   `d_sae = F`) while being `λ`-blind — the per-token "local" specialist.
@@ -103,19 +126,24 @@ the cost of local-feature recovery and reconstruction:
   reconstruct (NMSE 0.38–0.69), so the capability-vs-artifact gate passes: the
   window recovers `λ` while still representing the data, not instead of it.
 
-Figure: [`figs/backtracking_eauc_nmse.png`](figs/backtracking_eauc_nmse.png).
+Figure: [`backtracking_local_tradeoff.png`](figs/backtracking_local_tradeoff.png).
 
 ## 5. Untrained-encoder control — access vs learning
 
 At `d_sae = 20`, trained vs random-init (`n_steps = 0`) `lambda_recovery`:
 
+<!-- BEGIN AUTO:untrained -->
 | arch / T | untrained (access) | trained (access+learning) |
 |---|---|---|
-| topk_sae (per-token) | 0.304 | 0.398 |
-| tsae (per-token) | 0.336 | 0.409 |
-| txc_base T=2 | 0.622 | 0.868 |
-| txc_base T=4 | 0.728 | 0.948 |
-| stacked_sae T=4 | 0.772 | 0.942 |
+| TopK-SAE (per-token) | 0.304 ±0.019 | 0.398 ±0.015 |
+| T-SAE (per-token) | 0.336 ±0.025 | 0.409 ±0.021 |
+| TXC (T=2) | 0.622 ±0.051 | 0.868 ±0.001 |
+| TXC (T=4) | 0.728 ±0.023 | 0.948 ±0.002 |
+| TXC (T=8) | 0.578 ±0.029 | 0.949 ±0.004 |
+| Stacked-SAE (T=2) | 0.673 ±0.040 | 0.863 ±0.002 |
+| Stacked-SAE (T=4) | 0.772 ±0.063 | 0.942 ±0.001 |
+| Stacked-SAE (T=8) | 0.753 ±0.034 | 0.941 ±0.005 |
+<!-- END AUTO:untrained -->
 
 The window advantage **does not vanish at random init** — a random window
 projection already exposes the history linearly (access ≈ 0.62–0.77, well above
@@ -160,13 +188,23 @@ DPI floor regardless. Figure:
 - **Apples-to-apples:** identical `L = 32` tiling, equal `d_sae`/`k_pos` across
   archs, leak-free per-sequence split.
 - **Sparsity robustness (`k_pos`, beyond the frozen grid):** a labeled extension
-  re-ran the `d_sae = 20` anchor at `k_pos = 2` (24 cells). `λ` recovery is
-  essentially unchanged — per-token `topk/tsae` 0.40/0.41 → 0.40/0.41 (the DPI
-  floor is `k_pos`-independent, as it must be), window `txc_base` T2/T4
-  0.87/0.95 → 0.87/0.95, `stacked_sae` 0.86/0.94 → 0.87/0.95. The
-  per-token→window gap (~0.5) does **not** depend on the sparsity budget; only
-  local `eAUC` shifts with `k_pos` (e.g. topk 0.47 → 0.75 as more atoms fire).
-  Data: `backtracking_kpos_robustness.json`.
+  re-ran the `d_sae = 20` anchor at `k_pos = 2` (24 cells). The per-token→window
+  gap does **not** depend on the sparsity budget — the DPI floor is
+  `k_pos`-independent (as it must be) — and only local `eAUC` shifts with
+  `k_pos`. `λ`-recovery and eAUC at `k_pos ∈ {1, 2}` (`d_sae = 20`):
+
+<!-- BEGIN AUTO:kpos -->
+| arch / T | $\lambda$ @ $k_{pos}{=}1$ | $\lambda$ @ $k_{pos}{=}2$ | eAUC @1 | eAUC @2 |
+|---|---|---|---|---|
+| TopK-SAE (per-token) | 0.398 | 0.403 | 0.471 | 0.749 |
+| T-SAE (per-token) | 0.409 | 0.413 | 0.976 | 0.950 |
+| TXC (T=2) | 0.868 | 0.872 | 0.778 | 0.723 |
+| TXC (T=4) | 0.948 | 0.951 | 0.590 | 0.660 |
+| TXC (T=8) | 0.949 | 0.949 | 0.582 | 0.460 |
+| Stacked-SAE (T=2) | 0.863 | 0.872 | 0.416 | 0.596 |
+| Stacked-SAE (T=4) | 0.942 | 0.951 | 0.402 | 0.508 |
+| Stacked-SAE (T=8) | 0.941 | 0.948 | 0.374 | 0.507 |
+<!-- END AUTO:kpos -->
 
 ## 8. Caveats (honest scope)
 
@@ -212,7 +250,13 @@ cd purified/
 ```
 Generator `temp_bench.data.synthetic:self_exciting`; evaluator add-on
 `temp_bench.evals.lambda_recovery` (dispatched from `SyntheticRecovery` when
-`extra['lambda_labels']` is present; protocol unchanged at 1.2.0). Outputs:
-`backtracking_grid_results.json`, `backtracking_bench_stats.json`,
-`figs/backtracking_*`. Deterministic per cell (training seed re-materializes the
-ground truth). No `core/` edits.
+`extra['lambda_labels']` is present; protocol unchanged at 1.2.0).
+
+**This record is the single paper-ready source, regenerated from the canonical
+leaderboard.** `render_figs` reads `results/leaderboard.jsonl` (the one
+code-version-stamped source of truth), aggregates over seeds, writes the
+paper-quality figures (`figs/backtracking_{main,untrained_control,local_tradeoff}.{pdf,png}`)
++ `results/backtracking_bench_stats.json`, and fills the `<!-- AUTO:* -->` blocks
+(headline + every table) above — no hand-typed numbers, nothing can drift.
+The per-token DPI floor is computed directly from the generator. Deterministic
+per cell (training seed re-materializes the ground truth). No `core/` edits.

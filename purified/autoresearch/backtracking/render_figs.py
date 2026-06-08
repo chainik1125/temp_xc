@@ -1,13 +1,19 @@
-"""Render the backtracking (self-exciting) benchmark figures + stats summary.
+"""Backtracking architecture results — SINGLE SOURCE renderer + record populator.
 
-Reads autoresearch/backtracking/results/backtracking_grid_results.json (the grid driver's dump)
-and produces paper-ready frontier figures + a stats JSON for the record:
+Reads the **canonical leaderboard** (`results/leaderboard.jsonl`) — the one
+code-version-stamped source — filters the `toy_backtracking_selfexcite` cells
+(protocol 1.2.0, non-smoke), aggregates over seeds, then in one pass:
 
-  fig 1 (headline): lambda_recovery vs d_sae, one line per (arch,T); F=20 marked,
-                    scarce region shaded; per-token DPI floor + window ceilings.
-  fig 2: lambda_recovery vs window size T (at d_sae=20) — rise + saturation.
-  fig 3: trained vs untrained at d_sae=20 — the access/learning decomposition.
-  fig 4: eAUC + NMSE vs d_sae (local feature recovery / reconstruction).
+  1. renders paper-quality figures into `figs/`
+     (`backtracking_main`, `backtracking_untrained_control`,
+      `backtracking_local_tradeoff`),
+  2. writes the machine-readable aggregate `results/backtracking_bench_stats.json`,
+  3. fills every `<!-- BEGIN AUTO:<tag> --> … <!-- END AUTO:<tag> -->` block in
+     `bench_record.md` (headline numbers + all result tables).
+
+Re-running rebuilds the record's numbers, figures, and stats from the canonical
+leaderboard — there is no hand-typing and nothing can drift. The per-token DPI
+floor is computed directly from the generator (also canonical).
 
     .venv/bin/python -m autoresearch.backtracking.render_figs
 """
@@ -15,177 +21,315 @@ and produces paper-ready frontier figures + a stats JSON for the record:
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[2]
-RESULTS = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_grid_results.json"
-FIG_DIR = ROOT / "autoresearch" / "backtracking" / "figs"
-STATS_OUT = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_bench_stats.json"
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]                       # purified/
+LEADERBOARD = ROOT / "results" / "leaderboard.jsonl"
+FIG_DIR = HERE / "figs"
+RES_DIR = HERE / "results"
+STATS_OUT = RES_DIR / "backtracking_bench_stats.json"
+RECORD = HERE / "bench_record.md"
+DS = "toy_backtracking_selfexcite_d64"
+PROTOCOL = "1.2.0"
 
-F = 20                       # ground-truth feature count
-PT_CEIL = 0.408              # per-token DPI ceiling (gating)
-WIN_CEIL = {2: 0.908, 4: 0.986, 8: 0.986}   # window linear ceilings (gating)
+F = 20
+D_SAES = [8, 16, 20, 40]
 ARCH_T = [("topk_sae", 1), ("tsae", 1),
           ("txc_base", 2), ("txc_base", 4), ("txc_base", 8),
           ("stacked_sae", 2), ("stacked_sae", 4), ("stacked_sae", 8)]
 PER_TOKEN = {("topk_sae", 1), ("tsae", 1)}
-D_SAES = [8, 16, 20, 40]
+LABEL = {"topk_sae": "TopK-SAE", "tsae": "T-SAE", "txc_base": "TXC", "stacked_sae": "Stacked-SAE"}
 COLORS = {
-    ("topk_sae", 1): "#d62728", ("tsae", 1): "#ff7f0e",
-    ("txc_base", 2): "#aec7e8", ("txc_base", 4): "#1f77b4", ("txc_base", 8): "#08306b",
-    ("stacked_sae", 2): "#98df8a", ("stacked_sae", 4): "#2ca02c", ("stacked_sae", 8): "#00441b",
+    ("topk_sae", 1): "#D55E00", ("tsae", 1): "#E69F00",                  # per-token: vermillion/orange
+    ("txc_base", 2): "#9ecae1", ("txc_base", 4): "#3182bd", ("txc_base", 8): "#08519c",   # window: blues
+    ("stacked_sae", 2): "#a1d99b", ("stacked_sae", 4): "#31a354", ("stacked_sae", 8): "#006d2c",  # greens
+}
+MARK = {1: "o", 2: "s", 4: "^", 8: "D"}
+
+PAPER_STYLE = {
+    "figure.dpi": 120, "savefig.dpi": 300, "savefig.bbox": "tight",
+    "font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11.5,
+    "xtick.labelsize": 10, "ytick.labelsize": 10, "legend.fontsize": 8.5,
+    "axes.spines.top": False, "axes.spines.right": False, "axes.axisbelow": True,
+    "axes.grid": True, "grid.alpha": 0.16, "grid.linewidth": 0.7,
+    "legend.frameon": False, "lines.linewidth": 2.0, "lines.markersize": 6,
+    "figure.facecolor": "white", "mathtext.default": "regular",
 }
 
 
-def _label(arch, T):
-    return f"{arch} (T={T})" if (arch, T) not in PER_TOKEN else f"{arch} (per-token)"
+def label(arch, T):
+    return f"{LABEL[arch]} (per-token)" if (arch, T) in PER_TOKEN else f"{LABEL[arch]} (T={T})"
 
 
-def _agg(results):
-    """(kind, arch, T, d_sae) -> {metric: (mean, std, n)} over seeds."""
-    buckets = defaultdict(lambda: defaultdict(list))
-    for r in results:
-        if not r.get("ok"):
+# ── canonical source: the leaderboard ─────────────────────────────────
+
+def load_rows():
+    rows = []
+    for line in LEADERBOARD.read_text().splitlines():
+        if not line.strip():
             continue
-        key = (r["kind"], r["arch"], r["T"], r["d_sae"])
-        for m, v in r["metrics"].items():
+        r = json.loads(line)
+        if r.get("datasource") != DS or r.get("evaluator_protocol_version") != PROTOCOL:
+            continue
+        ec = r.get("eval_cfg") or {}
+        if ec.get("smoke"):
+            continue
+        ov = r.get("training_cfg", {}).get("arch_hparams_override") or {}
+        n_steps = int(r.get("training_cfg", {}).get("n_steps", 0))
+        rows.append({"arch": r["arch"], "T": int(ov.get("T", 1)), "d_sae": int(ov.get("d_sae")),
+                     "k_pos": int(ec.get("k_pos", ov.get("k_pos", 1))), "seed": int(r["seed"]),
+                     "kind": "trained" if n_steps > 0 else "untrained", "m": r["metrics"]})
+    return rows
+
+
+def aggregate(rows):
+    """(kind, k_pos, arch, T, d_sae) -> {metric: (mean, std, n)} over seeds."""
+    buck = defaultdict(lambda: defaultdict(list))
+    for r in rows:
+        key = (r["kind"], r["k_pos"], r["arch"], r["T"], r["d_sae"])
+        for m, v in r["m"].items():
             if v is not None and np.isfinite(v):
-                buckets[key][m].append(float(v))
-    agg = {}
-    for key, ms in buckets.items():
-        agg[key] = {m: (float(np.mean(vs)), float(np.std(vs)), len(vs)) for m, vs in ms.items()}
-    return agg
+                buck[key][m].append(float(v))
+    return {k: {m: (float(np.mean(vs)), float(np.std(vs)), len(vs)) for m, vs in d.items()}
+            for k, d in buck.items()}
 
 
-def _series(agg, kind, arch, T, metric):
-    xs, ys, es = [], [], []
-    for d in D_SAES:
-        cell = agg.get((kind, arch, T, d))
-        if cell and metric in cell:
-            xs.append(d); ys.append(cell[metric][0]); es.append(cell[metric][1])
-    return np.array(xs), np.array(ys), np.array(es)
+def per_token_dpi_floor():
+    """Authoritative per-token ceiling sqrt(Var λ / Var b) from the generator."""
+    from temp_bench.core.config import load_datasource
+    from temp_bench.data.synthetic import materialise
+    data = materialise(load_datasource(DS), seed=1)
+    lam = data.extra["lambda_labels"].numpy(); b = data.extra["b_labels"].numpy()
+    return float(np.sqrt(lam.var() / b.var()))
+
+
+def g(agg, kind, kpos, arch, T, d, metric="lambda_recovery"):
+    c = agg.get((kind, kpos, arch, T, d))
+    return c[metric] if c and metric in c else (float("nan"), float("nan"), 0)
+
+
+# ── paper-quality figures ─────────────────────────────────────────────
+
+def fig_main(agg, pt, plt):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11.2, 4.5))
+    # (a) frontier: lambda vs d_sae (trained, k_pos=1)
+    ax1.axvspan(7, F, color="0.93", zorder=0, lw=0)
+    ax1.axvline(F, color="0.45", ls=":", lw=1.1, zorder=1)
+    ax1.text(F - 0.5, 0.04, "F", color="0.4", fontsize=10, ha="right", style="italic")
+    ax1.axhline(pt, color="#999999", ls="--", lw=1.1, zorder=1)
+    ax1.text(40, pt - 0.045, f"per-token DPI floor  $\\sqrt{{Var\\,\\lambda/Var\\,b}}$ = {pt:.2f}",
+             color="#555", fontsize=8.3, ha="right", va="top")
+    for arch, T in ARCH_T:
+        xs, ys, es = [], [], []
+        for d in D_SAES:
+            m, s, n = g(agg, "trained", 1, arch, T, d)
+            if n:
+                xs.append(d); ys.append(m); es.append(s)
+        if xs:
+            ls = "--" if (arch, T) in PER_TOKEN else "-"
+            ax1.errorbar(xs, ys, yerr=es, marker=MARK[T], ms=5.5, lw=1.9, ls=ls,
+                         color=COLORS[(arch, T)], capsize=2, elinewidth=1, label=label(arch, T))
+    ax1.set_xticks(D_SAES); ax1.set_xlim(7, 42); ax1.set_ylim(0, 1.02)
+    ax1.set_xlabel("dictionary size  $d_{sae}$"); ax1.set_ylabel("$\\lambda$-recovery (held-out corr.)")
+    ax1.set_title("(a) Hidden-intensity recovery vs capacity", loc="left", fontsize=11)
+
+    # (b) lambda vs T at d_sae=20 (trained, k_pos=1)
+    ax2.axhline(pt, color="#999999", ls="--", lw=1.1)
+    ax2.axhline(1.0, color="#cccccc", ls=":", lw=1.0)
+    ax2.text(8, 0.97, "window info ceiling = 1", color="#999", fontsize=8, ha="right", va="top")
+    for arch, T in ARCH_T:           # per-token points at T=1
+        if (arch, T) in PER_TOKEN:
+            m, s, n = g(agg, "trained", 1, arch, T, 20)
+            if n:
+                ax2.errorbar([1], [m], yerr=[s], marker=MARK[1], ms=8, color=COLORS[(arch, T)],
+                             capsize=3, label=label(arch, T))
+    for fam, col in [("txc_base", "#3182bd"), ("stacked_sae", "#31a354")]:
+        ts, ys, es = [], [], []
+        for T in (2, 4, 8):
+            m, s, n = g(agg, "trained", 1, fam, T, 20)
+            if n:
+                ts.append(T); ys.append(m); es.append(s)
+        if ts:
+            ax2.errorbar(ts, ys, yerr=es, marker="o", ms=6, lw=2, color=col, capsize=3,
+                         label=f"{LABEL[fam]} (window)")
+    ax2.set_xscale("log", base=2); ax2.set_xticks([1, 2, 4, 8]); ax2.set_xticklabels([1, 2, 4, 8])
+    ax2.set_xlim(0.85, 9.5); ax2.set_ylim(0, 1.02)
+    ax2.set_xlabel("window size  $T$   ($T{=}1$: per-token)"); ax2.set_ylabel("$\\lambda$-recovery (held-out corr.)")
+    ax2.set_title("(b) Recovery rises with $T$, saturates by $T{=}4$", loc="left", fontsize=11)
+    ax2.legend(loc="lower right", fontsize=8.5)
+
+    handles, labs = ax1.get_legend_handles_labels()
+    fig.legend(handles, labs, loc="lower center", ncol=4, fontsize=8.3,
+               bbox_to_anchor=(0.5, -0.04), columnspacing=1.4, handletextpad=0.5)
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    _save(fig, plt, "backtracking_main")
+
+
+def fig_untrained(agg, pt, plt):
+    fig, ax = plt.subplots(figsize=(9, 4.6))
+    labels, un, uns, tr, trs, cols = [], [], [], [], [], []
+    for arch, T in ARCH_T:
+        u = g(agg, "untrained", 1, arch, T, 20); t = g(agg, "trained", 1, arch, T, 20)
+        labels.append(label(arch, T).replace(" (", "\n(")); cols.append(COLORS[(arch, T)])
+        un.append(u[0]); uns.append(u[1]); tr.append(t[0]); trs.append(t[1])
+    x = np.arange(len(labels)); w = 0.4
+    ax.bar(x - w / 2, un, w, yerr=uns, capsize=2, color="#cfcfcf", edgecolor="0.4", lw=0.5,
+           label="untrained (architectural access)")
+    ax.bar(x + w / 2, tr, w, yerr=trs, capsize=2, color=cols, edgecolor="0.25", lw=0.5,
+           label="trained (access + learning)")
+    ax.axhline(pt, color="#999999", ls="--", lw=1.2)
+    ax.text(len(labels) - 0.5, pt + 0.012, f"per-token DPI floor = {pt:.2f}", color="#555",
+            fontsize=8.5, ha="right", va="bottom")
+    ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=8.2); ax.set_ylim(0, 1.02)
+    ax.set_ylabel("$\\lambda$-recovery (held-out corr.)")
+    ax.set_title("Access vs learning: random-init vs trained encoders  ($d_{sae}{=}20$, $k_{pos}{=}1$)",
+                 fontsize=11.5)
+    ax.legend(loc="upper center", ncol=2); ax.grid(axis="x", alpha=0)
+    fig.tight_layout(); _save(fig, plt, "backtracking_untrained_control")
+
+
+def fig_local_tradeoff(agg, plt):
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11.2, 4.5))
+    for ax, metric, ttl, yl in [(a1, "eauc", "(a) Local feature recovery", "eAUC"),
+                                (a2, "nmse", "(b) Reconstruction error", "NMSE")]:
+        ax.axvspan(7, F, color="0.93", zorder=0, lw=0); ax.axvline(F, color="0.45", ls=":", lw=1.1)
+        for arch, T in ARCH_T:
+            xs, ys, es = [], [], []
+            for d in D_SAES:
+                m, s, n = g(agg, "trained", 1, arch, T, d, metric)
+                if n:
+                    xs.append(d); ys.append(m); es.append(s)
+            if xs:
+                ls = "--" if (arch, T) in PER_TOKEN else "-"
+                ax.errorbar(xs, ys, yerr=es, marker=MARK[T], ms=5, lw=1.7, ls=ls,
+                            color=COLORS[(arch, T)], capsize=2, elinewidth=0.9, label=label(arch, T))
+        ax.set_xticks(D_SAES); ax.set_xlim(7, 42); ax.set_xlabel("dictionary size  $d_{sae}$")
+        ax.set_ylabel(yl); ax.set_title(ttl, loc="left", fontsize=11)
+    a1.set_ylim(0, 1.02); a1.legend(ncol=2, fontsize=7.8, loc="upper left")
+    fig.tight_layout(); _save(fig, plt, "backtracking_local_tradeoff")
+
+
+def _save(fig, plt, name):
+    for ext, dpi in [("pdf", None), ("png", 200), ("thumb.png", 70)]:
+        fig.savefig(FIG_DIR / f"{name}.{ext}", dpi=dpi)
+    plt.close(fig)
+    print(f"[fig] {FIG_DIR.name}/{name}.{{pdf,png}}")
+
+
+# ── tables + headline for bench_record.md ─────────────────────────────
+
+def _f(t, dec=3):
+    m, s, n = t
+    return "—" if not n else f"{m:.{dec}f}"
+
+
+def _fs(t):
+    m, s, n = t
+    return "—" if not n else f"{m:.3f} ±{s:.3f}"
+
+
+def table_lambda_frontier(agg):
+    h = ("| arch / T | " + " | ".join(f"d={d}" for d in D_SAES) + " |\n"
+         "|---|" + "|".join("---" for _ in D_SAES) + "|\n")
+    for arch, T in ARCH_T:
+        cells = " | ".join(_f(g(agg, "trained", 1, arch, T, d)) for d in D_SAES)
+        name = f"**{label(arch,T)}**" if (arch, T) not in PER_TOKEN else label(arch, T)
+        h += f"| {name} | {cells} |\n"
+    return h.rstrip()
+
+
+def table_eauc(agg):
+    h = ("| arch / T | " + " | ".join(f"d={d}" for d in D_SAES) + " |\n"
+         "|---|" + "|".join("---" for _ in D_SAES) + "|\n")
+    for arch, T in ARCH_T:
+        cells = " | ".join(_f(g(agg, "trained", 1, arch, T, d, "eauc")) for d in D_SAES)
+        h += f"| {label(arch,T)} | {cells} |\n"
+    return h.rstrip()
+
+
+def table_untrained(agg):
+    h = "| arch / T | untrained (access) | trained (access+learning) |\n|---|---|---|\n"
+    for arch, T in ARCH_T:
+        h += f"| {label(arch,T)} | {_fs(g(agg,'untrained',1,arch,T,20))} | {_fs(g(agg,'trained',1,arch,T,20))} |\n"
+    return h.rstrip()
+
+
+def table_kpos(agg):
+    h = ("| arch / T | $\\lambda$ @ $k_{pos}{=}1$ | $\\lambda$ @ $k_{pos}{=}2$ | eAUC @1 | eAUC @2 |\n"
+         "|---|---|---|---|---|\n")
+    for arch, T in ARCH_T:
+        h += (f"| {label(arch,T)} | {_f(g(agg,'trained',1,arch,T,20))} | {_f(g(agg,'trained',2,arch,T,20))} "
+              f"| {_f(g(agg,'trained',1,arch,T,20,'eauc'))} | {_f(g(agg,'trained',2,arch,T,20,'eauc'))} |\n")
+    return h.rstrip()
+
+
+def headline_block(agg, pt):
+    pt_tok = np.nanmean([g(agg, "trained", 1, a, 1, 20)[0] for a in ("topk_sae", "tsae")])
+    win_t4 = np.nanmean([g(agg, "trained", 1, "txc_base", 4, 20)[0], g(agg, "trained", 1, "stacked_sae", 4, 20)[0]])
+    win_t2 = np.nanmean([g(agg, "trained", 1, "txc_base", 2, 20)[0], g(agg, "trained", 1, "stacked_sae", 2, 20)[0]])
+    win_scarce = g(agg, "trained", 1, "txc_base", 4, 8)[0]
+    un_win = g(agg, "untrained", 1, "txc_base", 4, 20)[0]
+    return (
+        f"- **Per-token DPI floor** (provable, computed from the generator): "
+        f"$\\sqrt{{Var\\,\\lambda/Var\\,b}}$ = **{pt:.2f}**. Trained per-token SAEs land at "
+        f"**{pt_tok:.2f}** at d_sae=20, flat across all capacities.\n"
+        f"- **Window recovery**: $\\lambda$ = **{win_t2:.2f}** (T=2) → **{win_t4:.2f}** (T≥4) at d_sae=20; "
+        f"**{win_scarce:.2f}** even at d_sae=8 < F=20 (scarce regime).\n"
+        f"- **Gap** (window T4 − per-token): **{win_t4 - pt_tok:.2f}**. "
+        f"Untrained window already reaches {un_win:.2f} (architectural access); training lifts it to {win_t4:.2f}."
+    )
+
+
+def populate(blocks):
+    if not RECORD.exists():
+        print(f"[warn] {RECORD} missing — populate skipped"); return
+    txt = RECORD.read_text(); filled = 0
+    for tag, content in blocks.items():
+        pat = re.compile(rf"(<!-- BEGIN AUTO:{tag} -->).*?(<!-- END AUTO:{tag} -->)", re.DOTALL)
+        if not pat.search(txt):
+            print(f"[warn] AUTO:{tag} marker not found in bench_record.md"); continue
+        txt = pat.sub(lambda m: f"{m.group(1)}\n{content}\n{m.group(2)}", txt); filled += 1
+    RECORD.write_text(txt)
+    print(f"[record] populated {filled}/{len(blocks)} AUTO block(s) in {RECORD.name}")
 
 
 def main():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    plt.rcParams.update(PAPER_STYLE)
+    FIG_DIR.mkdir(exist_ok=True); RES_DIR.mkdir(exist_ok=True)
 
-    results = json.loads(RESULTS.read_text())
-    agg = _agg(results)
-    n_ok = sum(1 for r in results if r.get("ok"))
-    print(f"[render] {n_ok}/{len(results)} ok cells")
+    rows = load_rows()
+    agg = aggregate(rows)
+    pt = per_token_dpi_floor()
+    n_trained = sum(1 for r in rows if r["kind"] == "trained")
+    print(f"[render] {len(rows)} leaderboard cells ({n_trained} trained); per-token DPI floor = {pt:.3f}")
 
-    # ---- fig 1: lambda_recovery vs d_sae (headline frontier) ----
-    fig, ax = plt.subplots(figsize=(7.5, 5.2))
-    ax.axvspan(min(D_SAES) - 1, F, color="0.92", zorder=0)            # scarce region d_sae<=F
-    ax.axvline(F, color="0.4", ls=":", lw=1.2)
-    ax.text(F, 0.02, "  F=20", color="0.4", fontsize=9, va="bottom")
-    ax.axhline(PT_CEIL, color="#d62728", ls="--", lw=1, alpha=0.7)
-    ax.text(D_SAES[-1], PT_CEIL + 0.01, "per-token DPI ceiling 0.41", color="#d62728",
-            fontsize=8, ha="right", va="bottom")
-    ax.axhline(WIN_CEIL[4], color="#1f77b4", ls="--", lw=1, alpha=0.5)
-    ax.text(D_SAES[-1], WIN_CEIL[4] + 0.005, "window ceiling (T≥4) 0.99", color="#1f77b4",
-            fontsize=8, ha="right", va="bottom")
-    for arch, T in ARCH_T:
-        xs, ys, es = _series(agg, "trained", arch, T, "lambda_recovery")
-        if len(xs):
-            ls = "--" if (arch, T) in PER_TOKEN else "-"
-            ax.errorbar(xs, ys, yerr=es, marker="o", ms=5, lw=1.8, ls=ls,
-                        color=COLORS[(arch, T)], label=_label(arch, T), capsize=2)
-    ax.set_xlabel("dictionary size d_sae"); ax.set_ylabel("λ recovery (held-out corr)")
-    ax.set_title("Backtracking bench: hidden-intensity (λ) recovery vs capacity")
-    ax.set_xticks(D_SAES); ax.set_ylim(0, 1.0); ax.legend(fontsize=7.5, ncol=2, loc="center right")
-    ax.grid(True, alpha=0.25)
-    _save(fig, plt, "backtracking_lambda_frontier")
+    fig_main(agg, pt, plt)
+    fig_untrained(agg, pt, plt)
+    fig_local_tradeoff(agg, plt)
 
-    # ---- fig 2: lambda_recovery vs T at d_sae=20 ----
-    fig, ax = plt.subplots(figsize=(7, 5))
-    # per-token archs plotted at T=1
-    for arch, T in ARCH_T:
-        if (arch, T) in PER_TOKEN:
-            cell = agg.get(("trained", arch, T, 20))
-            if cell and "lambda_recovery" in cell:
-                m, s, _ = cell["lambda_recovery"]
-                ax.errorbar([1], [m], yerr=[s], marker="s", ms=8, color=COLORS[(arch, T)],
-                            label=_label(arch, T), capsize=3)
-    for fam, col in [("txc_base", "#1f77b4"), ("stacked_sae", "#2ca02c")]:
-        ts, ys, es = [], [], []
-        for T in (2, 4, 8):
-            cell = agg.get(("trained", fam, T, 20))
-            if cell and "lambda_recovery" in cell:
-                ts.append(T); ys.append(cell["lambda_recovery"][0]); es.append(cell["lambda_recovery"][1])
-        if ts:
-            ax.errorbar(ts, ys, yerr=es, marker="o", ms=6, lw=2, color=col, label=f"{fam} (window)", capsize=3)
-    ax.plot([1, 2, 4, 8], [PT_CEIL, WIN_CEIL[2], WIN_CEIL[4], WIN_CEIL[8]], "k:", lw=1, alpha=0.6,
-            label="linear ceiling (gating)")
-    ax.set_xscale("log", base=2); ax.set_xticks([1, 2, 4, 8]); ax.set_xticklabels([1, 2, 4, 8])
-    ax.set_xlabel("window size T (T=1 = per-token)"); ax.set_ylabel("λ recovery (held-out corr)")
-    ax.set_title("λ recovery rises with T, saturates by T=4 (d_sae=20)")
-    ax.set_ylim(0, 1.0); ax.legend(fontsize=8); ax.grid(True, alpha=0.25)
-    _save(fig, plt, "backtracking_lambda_vs_T")
+    blocks = {
+        "headline": headline_block(agg, pt),
+        "lambda_frontier": table_lambda_frontier(agg),
+        "eauc": table_eauc(agg),
+        "untrained": table_untrained(agg),
+        "kpos": table_kpos(agg),
+    }
+    populate(blocks)
 
-    # ---- fig 3: trained vs untrained (access vs learning) at d_sae=20 ----
-    fig, ax = plt.subplots(figsize=(8.5, 5))
-    labels, tr, trs, un, uns = [], [], [], [], []
-    for arch, T in ARCH_T:
-        ct = agg.get(("trained", arch, T, 20)); cu = agg.get(("untrained", arch, T, 20))
-        labels.append(_label(arch, T).replace(" (", "\n("))
-        tr.append(ct["lambda_recovery"][0] if ct and "lambda_recovery" in ct else 0)
-        trs.append(ct["lambda_recovery"][1] if ct and "lambda_recovery" in ct else 0)
-        un.append(cu["lambda_recovery"][0] if cu and "lambda_recovery" in cu else 0)
-        uns.append(cu["lambda_recovery"][1] if cu and "lambda_recovery" in cu else 0)
-    xpos = np.arange(len(labels)); wbar = 0.38
-    ax.bar(xpos - wbar / 2, un, wbar, yerr=uns, label="untrained (access)", color="0.7", capsize=2)
-    ax.bar(xpos + wbar / 2, tr, wbar, yerr=trs, label="trained (access+learning)", color="#1f77b4", capsize=2)
-    ax.axhline(PT_CEIL, color="#d62728", ls="--", lw=1, alpha=0.7, label="per-token DPI ceiling")
-    ax.set_xticks(xpos); ax.set_xticklabels(labels, fontsize=7)
-    ax.set_ylabel("λ recovery (held-out corr)"); ax.set_ylim(0, 1.0)
-    ax.set_title("Access vs learning: trained vs random-init window encoders (d_sae=20)")
-    ax.legend(fontsize=8); ax.grid(True, alpha=0.25, axis="y")
-    _save(fig, plt, "backtracking_untrained_control")
-
-    # ---- fig 4: eAUC + NMSE vs d_sae ----
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 4.8))
-    for ax, metric, ttl in [(a1, "eauc", "Local feature recovery (eAUC)"),
-                            (a2, "nmse", "Reconstruction NMSE")]:
-        ax.axvspan(min(D_SAES) - 1, F, color="0.92", zorder=0); ax.axvline(F, color="0.4", ls=":", lw=1.2)
-        for arch, T in ARCH_T:
-            xs, ys, es = _series(agg, "trained", arch, T, metric)
-            if len(xs):
-                ls = "--" if (arch, T) in PER_TOKEN else "-"
-                ax.errorbar(xs, ys, yerr=es, marker="o", ms=4, lw=1.5, ls=ls,
-                            color=COLORS[(arch, T)], label=_label(arch, T), capsize=2)
-        ax.set_xlabel("d_sae"); ax.set_title(ttl); ax.set_xticks(D_SAES); ax.grid(True, alpha=0.25)
-    a1.set_ylabel("eAUC"); a2.set_ylabel("NMSE"); a1.legend(fontsize=7, ncol=2)
-    _save(fig, plt, "backtracking_eauc_nmse")
-
-    # ---- stats summary for the record ----
-    summary = {"n_ok": n_ok, "n_total": len(results), "F": F,
-               "ceilings": {"per_token": PT_CEIL, "window": WIN_CEIL},
-               "agg": {f"{k[0]}|{k[1]}|T{k[2]}|d{k[3]}": v for k, v in agg.items()}}
-    STATS_OUT.write_text(json.dumps(summary, indent=2))
-    print(f"[render] stats -> {STATS_OUT}")
-    _print_headline(agg)
-
-
-def _print_headline(agg):
-    def g(kind, arch, T, d, m="lambda_recovery"):
-        c = agg.get((kind, arch, T, d)); return c[m][0] if c and m in c else float("nan")
-    print("\n=== HEADLINE (λ recovery, d_sae=20) ===")
-    for arch, T in ARCH_T:
-        print(f"  {_label(arch,T):<26} trained={g('trained',arch,T,20):.3f}  untrained={g('untrained',arch,T,20):.3f}")
-
-
-def _save(fig, plt, name):
-    fig.tight_layout()
-    for ext, dpi in [("pdf", None), ("png", 120), ("thumb.png", 55)]:
-        fig.savefig(FIG_DIR / f"{name}.{ext}", dpi=dpi, bbox_inches="tight")
-    plt.close(fig)
-    print(f"[render] -> {FIG_DIR}/{name}.*")
+    STATS_OUT.write_text(json.dumps({
+        "source": "results/leaderboard.jsonl", "n_cells": len(rows), "F": F,
+        "per_token_dpi_floor": pt,
+        "agg": {f"{k[0]}|kpos{k[1]}|{k[2]}|T{k[3]}|d{k[4]}": v for k, v in agg.items()},
+    }, indent=2))
+    print(f"[stats] -> {STATS_OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
