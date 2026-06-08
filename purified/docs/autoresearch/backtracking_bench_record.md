@@ -159,6 +159,14 @@ DPI floor regardless. Figure:
   features at adequate `d_sae` — they recover `λ` *and* represent the data.
 - **Apples-to-apples:** identical `L = 32` tiling, equal `d_sae`/`k_pos` across
   archs, leak-free per-sequence split.
+- **Sparsity robustness (`k_pos`, beyond the frozen grid):** a labeled extension
+  re-ran the `d_sae = 20` anchor at `k_pos = 2` (24 cells). `λ` recovery is
+  essentially unchanged — per-token `topk/tsae` 0.40/0.41 → 0.40/0.41 (the DPI
+  floor is `k_pos`-independent, as it must be), window `txc_base` T2/T4
+  0.87/0.95 → 0.87/0.95, `stacked_sae` 0.86/0.94 → 0.87/0.95. The
+  per-token→window gap (~0.5) does **not** depend on the sparsity budget; only
+  local `eAUC` shifts with `k_pos` (e.g. topk 0.47 → 0.75 as more atoms fire).
+  Data: `backtracking_kpos_robustness.json`.
 
 ## 8. Caveats (honest scope)
 
