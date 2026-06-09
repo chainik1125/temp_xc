@@ -4,23 +4,28 @@
 is the canonical current-state of the synthetic-benchmark fairness redo. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-06-08.
+Last updated: 2026-06-09.
 
 ---
 
 ## 0. TL;DR — what's active right now
 
-We are making the synthetic **architecture comparison fair by putting every arch
-on a BatchTopK backbone**, then re-running the backtracking grid. The full design
-is locked (§ 4); the next agent's job is to **implement 4 BatchTopK archs +
-throughput normalization and re-run the grid** (§ 5). Everything else
-(measurement, mirror, gating, single-source record pipeline, paper plots) is
-done and stays.
+**The backtracking BatchTopK fair-backbone redo is DONE** (2026-06-09). All 4 new
+BatchTopK archs are built + registered, the 198-cell grid ran (0 gaps), and the
+single-source record + paper figures are regenerated and committed. **Verdict
+holds:** per-token pinned at the DPI floor 0.41; all three window families
+(TXC-pre, TXC-post, Stacked) recover λ 0.87→0.95; the win survives the uniform
+backbone. New findings: **TXC-pre > TXC-post** (post slips at large T — sparser
+per-window code), and the **shared-code crosscoder ≫ Stacked on eAUC** at matched
+λ. See [`backtracking/bench_record.md`](backtracking/bench_record.md).
 
-Why: T-SAE already uses **BatchTopK** (Bussmann et al. — the strong backbone),
-while TopK-SAE / TXC / Stacked-SAE used plain per-sample **TopK**. That makes
-"backbone" an uncontrolled confound favouring T-SAE. Fix: BatchTopK everywhere,
-so the *only* variable is the decode/code structure.
+Why it was done: T-SAE already used **BatchTopK** (Bussmann et al. — the strong
+backbone) while TopK-SAE / TXC / Stacked-SAE used plain per-sample **TopK**, an
+uncontrolled confound favouring T-SAE. Fix: BatchTopK everywhere, so the *only*
+variable is decode/code structure. (Design that was locked + executed: § 4–5.)
+
+**Next** (no longer this redo): the change-point / EM roadmap (§ 6, gated on a
+labeler) or any new bench, reusing the same fair-backbone grid as the template.
 
 ---
 
@@ -57,7 +62,7 @@ Figures are embedded (`![...]`) so they render in VS Code preview.
 
 | benchmark | dynamics class | verdict | backbone | state |
 |---|---|---|---|---|
-| **backtracking** | self-exciting (AC) | **POSITIVE** | TopK (← being redone to BatchTopK) | measured+mirror+bench done; **re-grid pending** (§ 4) |
+| **backtracking** | self-exciting (AC) | **POSITIVE** | **BatchTopK (redo DONE)** | measured+mirror+bench done; 198-cell BatchTopK re-grid landed + record/figs regenerated (§ 4) |
 | **signed_motion** | order-sensitive (AC) | NEGATIVE | TopK | done; leave as published |
 | **topic_switching** | change-point/sticky | **ABORT** (composition-dominated, labeler inadequate) | — | measured; no bench |
 | **changepoint** | change-point/absorbing | — | — | spec only, **gated** (no real anchor: topic aborted, EM needs paid judge) |
@@ -89,7 +94,12 @@ specialization. See [`backtracking/bench_record.md`](backtracking/bench_record.m
 
 ---
 
-## 4. THE ACTIVE TASK — BatchTopK fairness redo (design LOCKED)
+## 4. THE BatchTopK fairness redo (design LOCKED — ✅ EXECUTED 2026-06-09)
+
+> **Status: DONE.** All 4 archs below are built (`src/temp_bench/archs/{batchtopk_sae,
+> stacked_batchtopk,txc_batchtopk}.py`), registered, smoke-tested, and the 198-cell
+> grid ran with 0 gaps. Record + figures regenerated from the leaderboard and
+> committed. The design notes below are kept as the rationale of record.
 
 Convert every arch to a **BatchTopK backbone** (BatchTopK during training →
 fixed **JumpReLU threshold** at inference, matching T-SAE's recipe / Bussmann
@@ -220,9 +230,8 @@ Estimated: ~2–3 hr re-grid on the RTX 5090 (~67s/cell solo; run ~6 parallel).
 - Run: `cd purified && TEMP_BENCH_ALLOW_DIRTY=1 .venv/bin/python -m
   autoresearch.backtracking.<gating|kernel_order|measure|mirror|run_grid|render_figs>`.
   Canonical leaderboard: `results/leaderboard.jsonl`.
-- **Git:** branch `arxiv`, all work committed, **unpushed** (≈18 commits ahead of
-  `origin/arxiv`). Recent: `57cedafc` specialization scatter ← `fc8d5386` embed
-  figs ← `f6f2b54b` single-source record ← `37dda6b7` reorg into autoresearch/.
-  The BatchTopK design (§ 4) is **not yet committed as code** — it exists in this
-  briefing only. Two empty dirs (`docs/autoresearch/`,
+- **Git:** branch `arxiv`, **pushed to `origin/arxiv`**. The BatchTopK redo
+  shipped in two commits: `6d406e19` (the 4 archs + grid/renderer/spec wiring,
+  pushed mid-run) and the final record+figures+leaderboard commit (pushed on
+  completion). Two empty dirs (`docs/autoresearch/`,
   `experiments/autoresearch/__pycache__`) can be `rmdir`'d (cosmetic, untracked).

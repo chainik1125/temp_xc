@@ -30,7 +30,7 @@ frequency lens: [`frequency_lens.md`](frequency_lens.md).
 
 | benchmark | dynamics class | stage | verdict | headline |
 |---|---|---|---|---|
-| [`backtracking/`](backtracking/) | self-exciting / recurrent (**AC**) | bench run | **POSITIVE** | window λ-recovery **0.95** (T≥4) vs per-token **DPI floor 0.41**, robust at `d_sae<F` |
+| [`backtracking/`](backtracking/) | self-exciting / recurrent (**AC**) | bench run (BatchTopK) | **POSITIVE** | window λ-recovery **0.95** (T≥4) vs per-token **DPI floor 0.41**, robust at `d_sae<F`; survives a uniform BatchTopK backbone |
 | [`signed_motion/`](signed_motion/) | order-sensitive step (**AC**) | bench run | **NEGATIVE** | no arch recovers the sign in the scarce regime (`#windows=2F` memorization confound) |
 | [`topic_switching/`](topic_switching/) | change-point / sticky (DC+AC) | measured | **ABORT** | autocorrelation is 82% per-doc *composition*, not order; labeler inadequate |
 | [`changepoint/`](changepoint/) | change-point / absorbing | spec only | *gated* | shared topic+EM generator; gated on a valid real anchor |
@@ -55,7 +55,7 @@ cd purified/
 .venv/bin/python -m autoresearch.backtracking.kernel_order   # held-out kernel-length (K) selection
 .venv/bin/python -m autoresearch.backtracking.measure        # measure real backtracking (stages 2-3)
 .venv/bin/python -m autoresearch.backtracking.mirror         # fit + validate the synthetic mirror
-.venv/bin/python -m autoresearch.backtracking.run_grid 6     # the 120-cell architecture grid
+.venv/bin/python -m autoresearch.backtracking.run_grid 8     # the 198-cell BatchTopK grid
 .venv/bin/python -m autoresearch.backtracking.render_figs    # frontier figures + stats
 # topic-switching (the abort)
 .venv/bin/python -m autoresearch.topic_switching.measure
