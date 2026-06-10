@@ -141,6 +141,34 @@ datasources:
       (lambda_recovery). Per-token DPI floor √(Varλ/Varb)≈0.41, window ceiling
       ≈0.91→0.99 (T=2→4). Spec: experiments/explorations/synthetic/backtracking/bench_spec.md.
 
+  toy_changepoint_modes_d64:
+    category: synthetic
+    generator: semi_markov_modes
+    params:
+      K_m: 8
+      C: 12
+      spread: 3
+      d_in: 64
+      dwell: geometric
+      dwell_mean: 1.73
+      mag_mode: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #2 change-point: dual-latent semi-Markov mode bench.
+      Geometric dwell anchored on the MEASURED topic dwell (mean run 1.73 ->
+      p_switch=0.578; topic_switching/measurement.md), Pi uniform-over-other
+      (rebalanced by design, spec § 8(i)). F=20 = 8 mode-signature (dominant,
+      mag 2.5 -> hidden_features/gauc) + 12 content (mag 1.0 ->
+      emission_features/eauc), spread=3, mode-independent content (clean DPI).
+      Latents: mode m_t (DC; per-token oracle 1.0), time-since-switch tau_t
+      (primary AC; per-token ceiling 0, in-tile info ceiling .76/.96/1.0 at
+      T=2/4/8), c_t (AC floor companion). Raw-linear window access ~chance by
+      mode-symmetry. Spec: experiments/explorations/synthetic/changepoint/
+      bench_spec.md (+ amendments A1-A4); gating stats in changepoint/results/.
+
   # ── Real-LM § 5 ────────────────────────────────────────────────────
 
   gemma_2_2b_it_l13_fineweb_24k128:

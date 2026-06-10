@@ -458,6 +458,133 @@ def self_exciting(
     )
 
 
+# ── Semi-Markov modes / change-point bench (autoresearch #2) ───────────
+
+
+def semi_markov_modes(
+    *,
+    K_m: int = 8,
+    C: int = 12,
+    spread: int = 3,
+    d_in: int = 64,
+    dwell: str = "geometric",
+    dwell_mean: float = 1.73,
+    mag_mode: float = 2.5,
+    mag_content: float = 1.0,
+    sigma: float = 0.0,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Semi-Markov mode process — the dual-latent change-point bench.
+
+    Mirrors the *measured* topic dwell (``experiments/explorations/synthetic/
+    topic_switching/measurement.md``: dwell ≈ geometric, mean run 1.73). Two
+    layers (``changepoint/bench_spec.md`` § 2 + amendments A1/A2):
+
+    **Layer 1 — mode dynamics.** A categorical mode ``m_t ∈ {0..K_m-1}`` dwells
+    in its state for a duration drawn from the **persistence knob** and then
+    jumps, uniformly over the other modes (``Π`` uniform — the § 8 (i)
+    rebalance, by design). The geometric setting (the only one currently
+    ungated) is exactly a first-order Markov chain with per-step switch
+    probability ``p_switch = 1/dwell_mean``. Three latents are exposed:
+
+    - ``mode_labels`` ``m_t`` — categorical, **DC** (stamped into every token
+      of the dwell → readable per-token).
+    - ``time_since_switch`` ``τ_t`` — scalar, the **primary AC latent**
+      (amendment A2): tokens since the last boundary, with the sequence start
+      counted as a renewal (``τ_0 = 0``; ``τ_t = 0 ⟺`` boundary at ``t``).
+      Needs counting beyond adjacency; provably unreadable per-token
+      (``E[τ|m_t]`` is constant in ``m_t`` by Π-symmetry).
+    - ``changepoint_labels`` ``c_t = [m_t ≠ m_{t-1}]`` — binary, the
+      simple-floor AC companion (``c_0 = 0``).
+
+    **Layer 2 — emission.** Over a fixed orthonormal dictionary of
+    ``F = K_m + C`` directions::
+
+        x_t = m · u^m_{m_t}  +  Σ_{j ∈ content_t} m_j · u^c_j  +  σ · ε_t
+
+    ``u^m_{m_t}`` is the **mode-signature** direction (dominant magnitude
+    ``mag_mode > mag_content`` so it is the top-1 atom and survives
+    ``k_pos = 1`` — the DC readout is clean); ``content_t`` is a random
+    size-``spread`` subset of the ``C`` content directions, **mode-independent**
+    (amendment A1) so ``x_t ⊥ past | m_t`` exactly and the per-token AC floor
+    is a DPI statement, not an estimate.
+
+    Feature-direction sets are reported separately (spec § 3): the ``C``
+    content directions go in ``emission_features`` (→ ``eauc``) and the
+    ``K_m`` mode-signature directions in ``hidden_features`` (→ ``gauc``),
+    never pooled.
+    """
+    if dwell != "geometric":
+        raise ValueError(
+            f"dwell={dwell!r}: only the 'geometric' persistence-knob setting is "
+            "ungated (changepoint/bench_spec.md amendment A1); heavy-tailed / "
+            "absorbing variants stay gated on a validated real measurement."
+        )
+    if K_m < 2:
+        raise ValueError(f"K_m ({K_m}) must be >= 2")
+    if K_m + C > d_in:
+        raise ValueError(f"F = K_m+C ({K_m + C}) > d_in ({d_in})")
+    if spread > C:
+        raise ValueError(f"spread ({spread}) > C ({C})")
+    if dwell_mean <= 1.0:
+        raise ValueError(f"dwell_mean ({dwell_mean}) must be > 1")
+    p_switch = 1.0 / dwell_mean
+
+    rng = np.random.default_rng(seed)
+
+    # Layer 1: geometric-dwell semi-Markov modes (= Markov-1, uniform Π).
+    m = np.zeros((n_seqs, seq_len), dtype=np.int64)
+    m[:, 0] = rng.integers(0, K_m, n_seqs)
+    for t in range(1, seq_len):
+        switch = rng.random(n_seqs) < p_switch
+        jump = 1 + rng.integers(0, K_m - 1, n_seqs)   # uniform over OTHER modes
+        m[:, t] = np.where(switch, (m[:, t - 1] + jump) % K_m, m[:, t - 1])
+    c = np.zeros((n_seqs, seq_len), dtype=np.float32)
+    c[:, 1:] = (m[:, 1:] != m[:, :-1]).astype(np.float32)
+    tau = np.zeros((n_seqs, seq_len), dtype=np.float32)
+    for t in range(1, seq_len):
+        tau[:, t] = np.where(c[:, t] == 1, 0.0, tau[:, t - 1] + 1.0)
+
+    # Orthonormal dictionary: K_m mode-signature + C content directions.
+    raw = rng.standard_normal((d_in, d_in))
+    Qd, _ = np.linalg.qr(raw)
+    U_m = Qd[:K_m].astype(np.float32)                 # (K_m, d_in)
+    U_c = Qd[K_m:K_m + C].astype(np.float32)          # (C, d_in)
+
+    # Layer 2: emission.
+    mm = np.abs(rng.normal(mag_mode, 0.3 * mag_mode,
+                           size=(n_seqs, seq_len))).astype(np.float32)
+    x = mm[..., None] * U_m[m]                        # (n_seqs, seq_len, d_in)
+    pick = np.argsort(rng.random((n_seqs, seq_len, C)), axis=-1)[:, :, :spread]
+    cmag = np.abs(rng.normal(mag_content, 0.3 * mag_content,
+                             size=(n_seqs, seq_len, spread))).astype(np.float32)
+    x += (cmag[..., None] * U_c[pick]).sum(axis=2)
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(U_c),       # content set → eauc
+        hidden_features=torch.from_numpy(U_m),         # mode-signature set → gauc
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra={
+            "mode_labels": torch.from_numpy(m),
+            "changepoint_labels": torch.from_numpy(c),
+            "time_since_switch": torch.from_numpy(tau),
+            "K_m": int(K_m),
+            "dwell": dwell,
+            "dwell_mean": float(dwell_mean),
+            "p_switch": float(p_switch),
+            "base_switch_rate_realized": float(c.mean()),
+        },
+    )
+
+
 # ── Refill-source factory (used by ActivationBuffer / WindowBuffer) ────
 
 
@@ -466,6 +593,7 @@ _GENERATORS = {
     "coupled": coupled_hmm,
     "signed_motion": signed_motion,
     "self_exciting": self_exciting,
+    "semi_markov_modes": semi_markov_modes,
 }
 
 

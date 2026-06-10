@@ -221,6 +221,15 @@ class SyntheticRecovery(Evaluator):
             from temp_bench.evals.lambda_recovery import lambda_recovery_metrics
             out.update(lambda_recovery_metrics(model, data, eval_window_L=L))
 
+        # Change-point / semi-Markov modes add-on (autoresearch #2). Only
+        # fires for the toy_changepoint_modes datasource, which exposes the
+        # mode / time-since-switch / change-point labels in `extra`. No-op
+        # (byte-identical metrics) for every other bench → protocol stays
+        # 1.2.0.
+        if getattr(data, "extra", None) and "mode_labels" in data.extra:
+            from temp_bench.evals.changepoint_recovery import changepoint_metrics
+            out.update(changepoint_metrics(model, data, eval_window_L=L))
+
         return out
 
     def primary_metric(self) -> str:
