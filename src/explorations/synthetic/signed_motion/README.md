@@ -12,7 +12,7 @@ lesson — memorization-free probes + provable floors — is baked into
 the backtracking bench's design.
 
 **Doc:** [`bench.md`](bench.md) (single combined writeup; § 8 = reproduction).
-**Scripts** (`-m synthetic.signed_motion.<x>` / direct): `minisweep.sh`
+**Scripts** (`-m explorations.synthetic.signed_motion.<x>` / direct): `minisweep.sh`
 (sweep), `populate.py` (fills the AUTO-RESULTS tables in `bench.md`),
 `render_figs.py` (frontier figure). Generator + evaluator live in the framework
 (`src/temp_bench/data/synthetic.py:signed_motion`,

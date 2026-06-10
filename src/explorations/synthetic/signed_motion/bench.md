@@ -258,7 +258,7 @@ aggregating; here, on order, neither family wins at realistic capacity.
 
 - **Noiseless, single frequency** (`σ = 0`, one step `v`). The DPI argument is
   exact at `σ = 0`. Noise and multi-frequency variants are future work (see
-  [`frequency_lens.md`](../../docs/ideas/frequency_lens.md)).
+  [`frequency_lens.md`](../../../../docs/ideas/frequency_lens.md)).
 - **`d_sae = 38` is confounded** (probe can memorize the 38 windows); it is
   included only as the over-complete reference, never as a headline.
 - **`k_pos = 1` only.** In the scarce regime larger `k_pos` clips `k_win` to
@@ -284,7 +284,7 @@ SEED=42 bash synthetic/signed_motion/minisweep.sh &
 # tables (fills the AUTO-RESULTS block) + frontier figure
 .venv/bin/python synthetic/signed_motion/populate.py results/leaderboard.jsonl \
  synthetic/signed_motion/bench.md
-.venv/bin/python -m synthetic.signed_motion.render_figs
+.venv/bin/python -m explorations.synthetic.signed_motion.render_figs
 ```
 
 | Component | Path |

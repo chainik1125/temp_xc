@@ -9,7 +9,7 @@ inhomogeneous-Poisson N2, homogeneous-Poisson N3) that gate the
 Pure text-label analysis — no model inference. Writes
 synthetic/backtracking/results/backtracking_stats.json + figures to synthetic/backtracking/figs/.
 
-    .venv/bin/python -m synthetic.backtracking.measure
+    .venv/bin/python -m explorations.synthetic.backtracking.measure
 """
 
 from __future__ import annotations
@@ -25,10 +25,10 @@ N_BOOT = 500       # bootstrap resamples for the real CI
 MAXLAG = 12
 FANO_W = 10
 POS_BINS = 20
-ROOT = Path(__file__).resolve().parents[2]   # 
-STAGE_A = ROOT / "results" / "c7_backtracking" / "stage_a"
-OUT_JSON = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_stats.json"
-FIG_DIR = ROOT / "autoresearch" / "backtracking" / "figs"
+HERE = Path(__file__).resolve().parent
+STAGE_A = HERE.parents[3] / "results" / "c7_backtracking" / "stage_a"
+OUT_JSON = HERE / "results" / "backtracking_stats.json"
+FIG_DIR = HERE / "figs"
 
 
 # ── load ────────────────────────────────────────────────────────────────

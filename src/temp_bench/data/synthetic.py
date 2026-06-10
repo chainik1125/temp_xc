@@ -357,7 +357,7 @@ def self_exciting(
     """Self-exciting (discrete Hawkes / logistic-AR) backtracking bench.
 
     Mirrors the *measured* self-excitation of real CoT backtracking
-    (``synthetic/backtracking/measurement.md``). Two layers:
+    (``src/explorations/synthetic/backtracking/measurement.md``). Two layers:
 
     **Layer 1 — self-exciting event dynamics.** A binary event stream ``b`` with
     hidden conditional intensity ``λ``::

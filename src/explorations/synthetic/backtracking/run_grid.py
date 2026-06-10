@@ -20,7 +20,7 @@ parallel workers are safe). CUDA is initialised only inside workers (the parent
 never imports torch), so fork-based pools are safe. Results also dumped to
 synthetic/backtracking/results/backtracking_grid_results.json as they complete.
 
-    .venv/bin/python -m synthetic.backtracking.run_grid [max_workers]
+    .venv/bin/python -m explorations.synthetic.backtracking.run_grid [max_workers]
 """
 
 from __future__ import annotations
@@ -51,8 +51,8 @@ ARCH_T = [("batchtopk_sae", 1), ("tsae", 1),
           ("txc_batchtopk_post", 2), ("txc_batchtopk_post", 4), ("txc_batchtopk_post", 8)]
 
 
-ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_grid_results.json"
+HERE = Path(__file__).resolve().parent
+OUT = HERE / "results" / "backtracking_grid_results.json"
 
 
 def _batch_size(T: int) -> int:

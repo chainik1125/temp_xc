@@ -17,7 +17,7 @@ Gate (spec § 8): build if 1 - sqrt(Var(lambda)/Var(b)) >= 0.3 ; else raise alph
 (or lengthen K/tau) and re-check. We also report the honest linear gap
 (window_linear - per_token) and an alpha-sweep so the headroom is explicit.
 
-    .venv/bin/python -m synthetic.backtracking.gating
+    .venv/bin/python -m explorations.synthetic.backtracking.gating
 
 Deterministic (SEED = 0). No framework / runner involvement — a standalone
 analysis like backtracking.py / backtracking_mirror.py. Writes
@@ -40,10 +40,10 @@ BASE_TARGET = 0.12       # base rate to tune the idealized intercept to
 T_GRID = [2, 4, 8, 16]   # window sizes: tile of size T exposes lags 1..T-1
 GATE_THRESHOLD = 0.30    # spec § 8
 
-ROOT = Path(__file__).resolve().parents[2]
-MIRROR = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_mirror_stats.json"
-OUT_JSON = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_gating_stats.json"
-FIG_DIR = ROOT / "autoresearch" / "backtracking" / "figs"
+HERE = Path(__file__).resolve().parent
+MIRROR = HERE / "results" / "backtracking_mirror_stats.json"
+OUT_JSON = HERE / "results" / "backtracking_gating_stats.json"
+FIG_DIR = HERE / "figs"
 
 
 def simulate(a, c_pos, w, n_seqs, L, rng):

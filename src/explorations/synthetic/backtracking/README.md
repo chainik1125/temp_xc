@@ -13,7 +13,7 @@ do it: a clean global-vs-local specialization.
 [`bench_spec.md`](bench_spec.md) (architecture-test spec, frozen) →
 [`bench_record.md`](bench_record.md) (**the results**).
 
-**Scripts** (`-m synthetic.backtracking.<x>` from ``): `measure`
+**Scripts** (`-m explorations.synthetic.backtracking.<x>` from ``): `measure`
 (stages 2-3), `mirror` (fit+validate), `gating` (§8 ceilings), `kernel_order`
 (held-out K selection → K=2), `run_grid` (120-cell grid), `render_figs`.
 **`figs/`** (paper-quality) — `main` (λ frontier + T-saturation), `untrained_control`
@@ -24,4 +24,4 @@ grid_results, gating, kernel_order, mirror, measurement). Real input labels:
 
 **Single source of truth:** `bench_record.md`'s tables + headline + figures are
 **auto-generated** from the canonical `../../results/leaderboard.jsonl` by
-`-m synthetic.backtracking.render_figs` — no hand-typed numbers.
+`-m explorations.synthetic.backtracking.render_figs` — no hand-typed numbers.

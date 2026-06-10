@@ -6,6 +6,11 @@ then benchmark whether a window/temporal dictionary exploits that structure
 better than a per-token SAE. Each benchmark is a **self-contained subdir**
 holding its docs, scripts, figures, and results.
 
+It lives under `src/explorations/` — the home for research that may or may not
+graduate into `temp_bench`; `synthetic` is the first such exploration. Scripts
+run as a package: `.venv/bin/python -m explorations.synthetic.<bench>.<script>`
+from the repo root.
+
 This README is the **single governing doc** for the program — the prime
 directive, the measure→mirror→bench loop and its validity gates, and the
 conventions every synthetic benchmark follows. Read it before proposing or
@@ -17,8 +22,8 @@ implementing a benchmark.
 > before a compact.
 
 Related:
-[`../docs/ideas/frequency_lens.md`](../docs/ideas/frequency_lens.md) (the DC/AC
-frequency lens), [`../CLAUDE.md`](../CLAUDE.md) (framework hard rules: canonical
+[`../../../docs/ideas/frequency_lens.md`](../../../docs/ideas/frequency_lens.md) (the DC/AC
+frequency lens), [`../../../CLAUDE.md`](../../../CLAUDE.md) (framework hard rules: canonical
 runner, code-version stamping, plugin-only, never edit `core/`),
 [`signed_motion/bench.md`](signed_motion/bench.md) (the cautionary worked
 example where the §3 controls turned a false positive — `s_temp=1.0` from a
@@ -61,20 +66,20 @@ preregistration), `measurement.md` (the measure→mirror record), `bench_spec.md
 ### Running a benchmark's scripts
 
 Scripts are a package; run from the repo root as
-`.venv/bin/python -m synthetic.<bench>.<script>`. The canonical leaderboard
+`.venv/bin/python -m explorations.synthetic.<bench>.<script>`. The canonical leaderboard
 (shared) stays at `results/leaderboard.jsonl`; real-label inputs (e.g. the Ward
 backtracking labels) stay at `results/`. Examples:
 
 ```bash
 # backtracking (the positive result)
-.venv/bin/python -m synthetic.backtracking.gating         # ceilings: per-token vs window
-.venv/bin/python -m synthetic.backtracking.kernel_order   # held-out kernel-length (K) selection
-.venv/bin/python -m synthetic.backtracking.measure        # measure real backtracking (stages 2-3)
-.venv/bin/python -m synthetic.backtracking.mirror         # fit + validate the synthetic mirror
-.venv/bin/python -m synthetic.backtracking.run_grid 8     # the architecture grid
-.venv/bin/python -m synthetic.backtracking.render_figs    # frontier figures + stats
+.venv/bin/python -m explorations.synthetic.backtracking.gating         # ceilings: per-token vs window
+.venv/bin/python -m explorations.synthetic.backtracking.kernel_order   # held-out kernel-length (K) selection
+.venv/bin/python -m explorations.synthetic.backtracking.measure        # measure real backtracking (stages 2-3)
+.venv/bin/python -m explorations.synthetic.backtracking.mirror         # fit + validate the synthetic mirror
+.venv/bin/python -m explorations.synthetic.backtracking.run_grid 8     # the architecture grid
+.venv/bin/python -m explorations.synthetic.backtracking.render_figs    # frontier figures + stats
 # topic-switching (the abort)
-.venv/bin/python -m synthetic.topic_switching.measure
+.venv/bin/python -m explorations.synthetic.topic_switching.measure
 ```
 
 All results route through the canonical runner (code-version stamped); no edits
@@ -277,7 +282,7 @@ attributable to architecture — protect that attribution.
 Every result goes through the canonical runner; rows are code-version stamped;
 the evaluator re-materializes the ground truth with the **training seed** so
 feature directions and latents match what the model trained on (see
-[`../CLAUDE.md`](../CLAUDE.md) and [`../docs/framework.md`](../docs/framework.md)).
+[`../../../CLAUDE.md`](../../../CLAUDE.md) and [`../../../docs/framework.md`](../../../docs/framework.md)).
 A new benchmark is a **plugin**: a generator + a `configs/data.yaml` datasource
 entry + (if a new metric is needed) an evaluator addition. Never edit
 `temp_bench/core/`.

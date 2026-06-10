@@ -11,7 +11,7 @@ real traces) that the synthetic reproduces the temporal signature
 (ACF, Fano, self-excitation ratio, inter-event CV) — the § 2.5 weak
 validation. The fitted lag weights w_l are the self-excitation kernel.
 
-    .venv/bin/python -m synthetic.backtracking.mirror
+    .venv/bin/python -m explorations.synthetic.backtracking.mirror
 """
 
 from __future__ import annotations
@@ -21,13 +21,13 @@ from pathlib import Path
 
 import numpy as np
 
-from synthetic.backtracking.measure import (
-    FIG_DIR, ROOT, acf, base_rate, fano, inter_event_cv, load_traces, self_excitation,
+from explorations.synthetic.backtracking.measure import (
+    FIG_DIR, HERE, acf, base_rate, fano, inter_event_cv, load_traces, self_excitation,
 )
 
 SEED = 0
 K = 8                # autoregressive lags (the kernel length)
-OUT_JSON = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_mirror_stats.json"
+OUT_JSON = HERE / "results" / "backtracking_mirror_stats.json"
 
 
 def _design(seqs):

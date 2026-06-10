@@ -1,6 +1,6 @@
 """BatchTopK temporal crosscoders — pre- and post-squash variants.
 
-Fair-backbone redo (``synthetic/STATUS.md`` § 4). Every arch in the
+Fair-backbone redo (``src/explorations/synthetic/STATUS.md`` § 4). Every arch in the
 backtracking comparison now shares the strong **BatchTopK** backbone
 (Bussmann et al.: BatchTopK during *training* → a fixed **JumpReLU
 threshold** at *inference*) plus AuxK dead-feature revival, decoder

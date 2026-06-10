@@ -13,7 +13,7 @@ kernel length; the effective memory = smallest L capturing >=90% of Sum|w_l|.
 This decouples K from any benchmark result (it's a fit to the real labels),
 so it is a clean pre-build justification, not metric shopping.
 
-    .venv/bin/python -m synthetic.backtracking.kernel_order
+    .venv/bin/python -m explorations.synthetic.backtracking.kernel_order
 """
 
 from __future__ import annotations
@@ -23,11 +23,11 @@ from pathlib import Path
 
 import numpy as np
 
-from synthetic.backtracking.measure import ROOT, load_traces
+from explorations.synthetic.backtracking.measure import HERE, load_traces
 
 SEED = 0
 K_GRID = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12]
-OUT_JSON = ROOT / "autoresearch" / "backtracking" / "results" / "backtracking_kernel_order_stats.json"
+OUT_JSON = HERE / "results" / "backtracking_kernel_order_stats.json"
 
 
 def design_K(seqs, K):

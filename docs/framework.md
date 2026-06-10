@@ -80,7 +80,7 @@ framework.
 │   └── utils/                          # seed, plotting, judge_client, …
 │
 ├── experiments/                        # paper-section entry points
-│   ├── synthetic/run.py
+│   ├── src/explorations/synthetic/run.py
 │   ├── probing/run.py
 │   ├── backtracking/run.py
 │   ├── em/run.py
@@ -537,6 +537,6 @@ Run before any commit: `.venv/bin/python -m pytest tests/ -q`.
 ## Status
 
 - Framework spec: this document, version `2.0.0`, frozen 2026-05-27.
-- Results: see the synthetic benchmarks under `synthetic/` — e.g.
-  `synthetic/backtracking/bench_record.md` (the positive AC result) and
-  `synthetic/signed_motion/bench.md` (the AC / order-sensitive negative).
+- Results: see the synthetic benchmarks under `src/explorations/synthetic/` — e.g.
+  `src/explorations/synthetic/backtracking/bench_record.md` (the positive AC result) and
+  `src/explorations/synthetic/signed_motion/bench.md` (the AC / order-sensitive negative).

@@ -82,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     # Reproduce subparser
     p_repro = sub.add_parser("reproduce", help="Run canonical paper sweep(s).")
     p_repro.add_argument("section", type=str, nargs="?", default="all",
-                         help="Paper section (synthetic/probing/.../all).")
+                         help="Paper section (src/explorations/synthetic/probing/.../all).")
     p_repro.add_argument("--allow-dirty", action="store_true")
 
     # Render subparser

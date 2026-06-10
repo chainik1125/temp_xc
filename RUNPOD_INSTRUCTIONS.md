@@ -2,7 +2,7 @@
 
 This doc covers how to bring a RunPod pod online for `arxiv`-branch work.
 For what's in progress and what to pick up, read
-`synthetic/STATUS.md` first, then `CLAUDE.md` (the
+`src/explorations/synthetic/STATUS.md` first, then `CLAUDE.md` (the
 operating manual, auto-loaded).
 
 For **local** setup (your laptop / dev box), use
@@ -113,7 +113,7 @@ not in `*.dist-info/`, so deleting orphan metadata is safe.
 
 ```bash
 cd /workspace/temp_xc
-TQDM_DISABLE=1 nohup .venv/bin/python -m synthetic.backtracking.run_grid 8 \
+TQDM_DISABLE=1 nohup .venv/bin/python -m explorations.synthetic.backtracking.run_grid 8 \
     > /tmp/grid.log 2>&1 &
 tail -f /tmp/grid.log
 ```
@@ -191,6 +191,6 @@ on every session start.
 | Trained checkpoints | `checkpoints/<train_key>/` |
 | Per-cell artifacts | `results/runs/<eval_key>/` |
 | Leaderboard (append-only) | `results/leaderboard.jsonl` |
-| Status briefing | `synthetic/STATUS.md` |
+| Status briefing | `src/explorations/synthetic/STATUS.md` |
 
 For everything else, start at `CLAUDE.md`.

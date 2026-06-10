@@ -8,9 +8,9 @@ Start with [`CLAUDE.md`](CLAUDE.md) — the operating manual (framework hard rul
 read order, layout). Key entry points:
 
 - [`docs/framework.md`](docs/framework.md) — the framework spec.
-- [`synthetic/README.md`](synthetic/README.md) — the synthetic-benchmark program
+- [`src/explorations/synthetic/README.md`](src/explorations/synthetic/README.md) — the synthetic-benchmark program
   (prime directive, the measure→mirror→bench loop + validity gates, conventions,
-  and the benchmark index) + [`synthetic/STATUS.md`](synthetic/STATUS.md) (the
+  and the benchmark index) + [`src/explorations/synthetic/STATUS.md`](src/explorations/synthetic/STATUS.md) (the
   living scratchpad).
 - [`RUNPOD_INSTRUCTIONS.md`](RUNPOD_INSTRUCTIONS.md) — bringing a pod online.
 
