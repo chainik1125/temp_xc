@@ -57,7 +57,7 @@ into those traps impossible to do silently.
 | [`backtracking/`](backtracking/) | self-exciting / recurrent (**AC**) | bench run (BatchTopK) | **POSITIVE** | window λ-recovery **0.95** (T≥4) vs per-token **DPI floor 0.41**, robust at `d_sae<F`; survives a uniform BatchTopK backbone |
 | [`signed_motion/`](signed_motion/) | order-sensitive step (**AC**) | bench run | **NEGATIVE** | no arch recovers the sign in the scarce regime (`#windows=2F` memorization confound) |
 | [`topic_switching/`](topic_switching/) | change-point / sticky (DC+AC) | measured | **ABORT** | autocorrelation is 82% per-doc *composition*, not order; labeler inadequate |
-| [`changepoint/`](changepoint/) | change-point / absorbing | spec only | *gated* | dual-latent mode (DC) + change-point (AC); anchor on the measured geometric dwell |
+| [`changepoint/`](changepoint/) | change-point / dual-latent (DC+AC) | bench run (BatchTopK) | **SPLIT (two-way)** | per-token pins the DC mode at oracle (1.00 at `d_sae=8`) and sits exactly on the provable AC chance floor; **only the post-squash crosscoder** linearly exposes the boundary (τ **0.66** ≈ 86% of the T=2 in-tile ceiling, `c_t` 0.90) at a DC+content cost — additive (pre-squash / per-position) codes are *provably* blind to equality-pattern latents |
 
 Each benchmark subdir contains (where applicable): `prereg.md` (frozen
 preregistration), `measurement.md` (the measure→mirror record), `bench_spec.md`
@@ -82,6 +82,10 @@ backtracking labels) stay at `results/`. Examples:
 .venv/bin/python -m experiments.explorations.synthetic.backtracking.render_figs    # frontier figures + stats
 # topic-switching (the abort)
 .venv/bin/python -m experiments.explorations.synthetic.topic_switching.measure
+# changepoint (the dual-latent split)
+.venv/bin/python -m experiments.explorations.synthetic.changepoint.gating        # § 8 ceilings + raw-linear access
+.venv/bin/python -m experiments.explorations.synthetic.changepoint.run_grid 24   # the 198-cell architecture grid
+.venv/bin/python -m experiments.explorations.synthetic.changepoint.render_figs   # figures + stats + record AUTO blocks
 ```
 
 All results route through the canonical runner (code-version stamped); no edits
