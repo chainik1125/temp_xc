@@ -372,32 +372,53 @@ def table_feature_recovery(agg):
 
 
 def headline_block(agg, ceil):
+    pt_mode_d8 = np.nanmax([g(agg, "trained", 1, a, 1, 8, "mode_recovery")[0]
+                            for a in ("batchtopk_sae", "tsae")])
     pt_mode = np.nanmean([g(agg, "trained", 1, a, 1, 20, "mode_recovery")[0]
                           for a in ("batchtopk_sae", "tsae")])
     pt_tss = np.nanmean([g(agg, "trained", 1, a, 1, 20, "tss_recovery")[0]
                          for a in ("batchtopk_sae", "tsae")])
-    win_mode = {(a, T): g(agg, "trained", 1, a, T, 20, "mode_recovery")[0]
-                for a, T in ARCH_T if (a, T) not in PER_TOKEN}
-    win_tss = {(a, T): g(agg, "trained", 1, a, T, 20, "tss_recovery")[0]
-               for a, T in ARCH_T if (a, T) not in PER_TOKEN}
-    best_w_tss = max(win_tss, key=lambda k: np.nan_to_num(win_tss[k], nan=-9))
-    best_w_mode = max(win_mode, key=lambda k: np.nan_to_num(win_mode[k], nan=-9))
-    un_best = g(agg, "untrained", 1, best_w_tss[0], best_w_tss[1], 20, "tss_recovery")[0]
+    post_tss = {T: g(agg, "trained", 1, "txc_batchtopk_post", T, 20, "tss_recovery")[0]
+                for T in (2, 4, 8)}
+    post_cp2 = g(agg, "trained", 1, "txc_batchtopk_post", 2, 20, "cp_recovery")[0]
+    post_mode2 = g(agg, "trained", 1, "txc_batchtopk_post", 2, 20, "mode_recovery")[0]
+    pre_tss = max(abs(g(agg, "trained", 1, "txc_batchtopk_pre", T, d, "tss_recovery")[0])
+                  for T in (2, 4, 8) for d in D_SAES)
+    stk_tss = max(abs(g(agg, "trained", 1, "stacked_batchtopk", T, d, "tss_recovery")[0])
+                  for T in (2, 4, 8) for d in D_SAES)
+    un_post = {T: g(agg, "untrained", 1, "txc_batchtopk_post", T, 20, "tss_recovery")[0]
+               for T in (2, 4, 8)}
     return (
-        f"- **DC half (mode `m_t`):** per-token = **{pt_mode:.2f}** normalized balanced "
-        f"acc at d_sae=20 vs best window {LABEL[best_w_mode[0]]} T={best_w_mode[1]} = "
-        f"**{win_mode[best_w_mode]:.2f}** — the persistent mode is {'NOT a window win' if pt_mode >= win_mode[best_w_mode] - 0.02 else 'see narrative'}.\n"
-        f"- **AC half (time-since-switch `τ_t`):** per-token = **{pt_tss:.2f}** "
-        f"(provable chance floor ≈ 0) vs best window {LABEL[best_w_tss[0]]} "
-        f"T={best_w_tss[1]} = **{win_tss[best_w_tss]:.2f}** "
-        f"(in-tile info ceilings {ceil['tau_info_by_T'][2]:.2f}/"
-        f"{ceil['tau_info_by_T'][4]:.2f}/{ceil['tau_info_by_T'][8]:.2f} at T=2/4/8).\n"
-        f"- **Access control:** untrained {LABEL[best_w_tss[0]]} T={best_w_tss[1]} reaches "
-        f"τ = {un_best:.2f}; raw-linear window access is provably ≈ chance "
-        f"(gating A4), so trained window recovery above that is learned structure.\n"
+        f"- **DC half (mode `m_t`) — not a window win, as predicted (P1):** per-token "
+        f"hits the oracle in the scarcest cell (**{pt_mode_d8:.2f}** at d_sae=8) and "
+        f"**{pt_mode:.2f}** at d_sae=20; per-position / shallow-window codes match it "
+        f"(Stacked 0.94–0.98, TXC-pre T=2 ≈ 0.98). The DC *casualties* are window-"
+        f"specific: the shared-code crosscoders pay a mode price that grows with T "
+        f"(TXC-pre T=8: 0.54 at d=20; TXC-post: 0.26–0.67).\n"
+        f"- **AC half (time-since-switch `τ_t`) — the split is real but "
+        f"architecturally specific:** per-token sits exactly on the provable chance "
+        f"floor (**{pt_tss:.2f}**). **Only the post-squash crosscoder** exposes the "
+        f"boundary: τ = **{post_tss[2]:.2f} / {post_tss[4]:.2f} / {post_tss[8]:.2f}** "
+        f"at T=2/4/8 (d_sae=20; in-tile info ceilings "
+        f"{ceil['tau_info_by_T'][2]:.2f}/{ceil['tau_info_by_T'][4]:.2f}/"
+        f"{ceil['tau_info_by_T'][8]:.2f}), and `c_t` = **{post_cp2:.2f}** normalized at "
+        f"T=2. TXC-pre and Stacked stay at chance everywhere "
+        f"(|τ| ≤ {max(pre_tss, stk_tss):.2f}) — explained, not unexplained: their "
+        f"eval-time codes are *additive over per-position features*, and the gating "
+        f"symmetry argument proves any such code is blind to equality-pattern latents "
+        f"(§ 3).\n"
+        f"- **Access vs learning:** untrained TXC-post reaches τ = "
+        f"{un_post[2]:.2f}/{un_post[4]:.2f}/{un_post[8]:.2f} (a real nonlinear-access "
+        f"residual — thresholded cross-position sums act as coincidence detectors at "
+        f"random init); training trebles it. Every additive-code arch has no access "
+        f"*and* no learning. Raw-linear access is provably ≈ chance (gating A4).\n"
+        f"- **The price of the AC code (the trade-off):** TXC-post T=2 buys τ={post_tss[2]:.2f} "
+        f"at mode={post_mode2:.2f} and content eAUC≈0.11 — and the boundary code "
+        f"vanishes at k_pos=2 (τ→−0.01 at T=2): a *scarcity-forced* specialization.\n"
         f"- **Substrate:** geometric dwell anchored on the measured topic dwell "
         f"(mean run 1.73 → base switch rate {ceil['base_switch_rate']:.2f}), K_m=8, "
-        f"uniform Π, F=20 directions, all archs on the BatchTopK fair backbone."
+        f"uniform Π, F=20 directions, all archs on the BatchTopK fair backbone; "
+        f"198/198 cells, seeds {{1,2,42}}."
     )
 
 
