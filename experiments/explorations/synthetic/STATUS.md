@@ -4,30 +4,33 @@
 is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-06-09.
+Last updated: 2026-06-10.
 
 ---
 
 ## 0. TL;DR — what's active right now
 
-- **Backtracking BatchTopK redo: DONE + committed + pushed.** Verdict POSITIVE
+- **ACTIVE → changepoint bench, GRID RUNNING.** All build stages DONE +
+  committed + pushed (2026-06-10): § 8 gating **PASSED** (`553ed9d1`), generator
+  + evaluator + datasource + tests (`76ae09fc`), grid driver + renderer + record
+  skeleton (`e5586b58`). The 198-cell BatchTopK grid is running under nohup
+  (24 workers, ~2–4 h; log:
+  `changepoint/results/grid_run.log`). **Next actions when it finishes:**
+  (1) `.venv/bin/python -m experiments.explorations.synthetic.changepoint.render_figs`,
+  (2) finalize the narrative stubs in `changepoint/bench_record.md` (sections
+  2–9) honestly from the numbers, (3) update README.md benchmark tables +
+  this file, (4) commit + push. Details + key gating numbers in § 4.
+- **Backtracking BatchTopK redo: DONE.** Verdict POSITIVE
   and it survives a uniform BatchTopK backbone. Per-token pinned at the DPI floor
   λ≈0.41; all three window families (TXC-pre, TXC-post, Stacked) recover λ
   0.87→0.95. New findings: **TXC-pre > TXC-post** (post slips at large T) and the
   **shared-code crosscoder ≫ Stacked on eAUC** at matched λ. Full result:
   [`backtracking/bench_record.md`](backtracking/bench_record.md). (Design rationale
   archived in § 5.)
-- **Repo restructure: DONE + pushed** (4 commits). `purified/` was lifted to the
-  repo root; the autoresearch program became `synthetic` then moved to
-  **`experiments/explorations/synthetic/`** (see § 1). `src/` is now
-  library-code-only.
-- **ACTIVE NEXT TASK → the change-point bench** (§ 4). It is **no longer gated**:
-  anchor the persistence knob on the *measured geometric dwell* from
-  topic-switching. **Start with the § 8 gating due-diligence** (analogue of the
-  backtracking gating) *before* building the generator/grid. Reuse the BatchTopK
-  arch family.
 
-(Running on RunPod now. Repo root = `/workspace/temp_xc`; work from there.)
+(Running on RunPod now. Repo root = `/workspace/temp_xc`; work from there.
+Git creds: token at `/workspace/.tokens/gh_token`, wired into
+`~/.git-credentials` (helper=store); repo-local user.name/email set to Han.)
 
 ---
 
@@ -73,7 +76,7 @@ for changepoint.
 | **backtracking** | self-exciting (AC) | **POSITIVE** | DONE — 198-cell BatchTopK grid; record+figs regenerated, committed, pushed |
 | **signed_motion** | order-sensitive (AC) | **NEGATIVE** | done; leave as published (memorization confound at `#windows=2F`) |
 | **topic_switching** | change-point/sticky | **ABORT** | measured; composition-dominated + labeler inadequate; no bench. BUT it *did* measure a valid dwell (≈geometric, mean run 1.73) — the anchor for changepoint |
-| **changepoint** | change-point / dual-latent | — | **ACTIVE NEXT** (§ 4); spec frozen ([`changepoint/bench_spec.md`](changepoint/bench_spec.md)); ungated via the geometric-dwell anchor |
+| **changepoint** | change-point / dual-latent | — | **GRID RUNNING** (§ 4); gating PASSED; generator/evaluator/grid built + committed; spec frozen + amendments A1–A4 ([`changepoint/bench_spec.md`](changepoint/bench_spec.md)) |
 
 ---
 
@@ -100,6 +103,30 @@ for changepoint.
 ---
 
 ## 4. ACTIVE TASK — the change-point bench
+
+> **2026-06-10 build-state: everything below is BUILT; the grid is RUNNING.**
+> - **Gating PASSED** (`changepoint/gating.py` →
+>   `results/changepoint_gating_stats.json`): per-token mode oracle **1.000**;
+>   per-token AC exactly chance (c balacc 0.500, τ corr ≈ 0); window τ info
+>   ceilings **0.76/0.96/1.00** at T=2/4/8. Bonus (load-bearing): the
+>   **raw-linear** window ceiling is ≈ chance for both AC latents
+>   (mode-symmetry → equality patterns are XOR-like) — an AC win on a trained
+>   code is *learning*, not linear access. Untrained per-token control lands
+>   mode≈0.49, tss≈0 (early grid rows).
+> - **Spec amendments A1–A4** dated in `bench_spec.md` (geometric-dwell
+>   ungating + uniform Π + mode-independent content; τ primary AC latent;
+>   BatchTopK family; gating result).
+> - **Built:** `semi_markov_modes()` (synthetic.py), `toy_changepoint_modes_d64`
+>   (data.yaml), `evals/changepoint_recovery.py` (mode/tss/cp probes, dispatched
+>   from `synthetic_recovery.py` on `extra['mode_labels']`; protocol stays
+>   1.2.0), `tests/test_changepoint_bench.py` (8 tests; suite 62 passed),
+>   `changepoint/run_grid.py` (198 cells), `changepoint/render_figs.py`
+>   (single-source: figs + stats + AUTO blocks), `bench_record.md` skeleton.
+> - **When the grid finishes** (log `changepoint/results/grid_run.log`): run
+>   `render_figs`, finalize record narrative (sections 2–9, incl. prereg
+>   verdicts P1–P4 + controls + caveats), update README/STATUS, commit + push.
+
+*(original task description below, kept for reference)*
 
 **What it is** (frozen spec: [`changepoint/bench_spec.md`](changepoint/bench_spec.md)):
 a **dual-latent** substrate scored on **two axes that should split**:
@@ -205,9 +232,10 @@ The pre/post-squash and crosscoder-vs-Stacked design notes live there + in git.
   experiments.explorations.synthetic.backtracking.<gating|kernel_order|measure|mirror|run_grid|render_figs>`.
   Canonical leaderboard: `results/leaderboard.jsonl`. Verify env:
   `bash scripts/agent_smoke_test.sh`.
-- **Git:** branch `arxiv`, **pushed to `origin/arxiv`** (HEAD = `c9e457e2`). Recent
+- **Git:** branch `arxiv`, **pushed to `origin/arxiv`** (HEAD = `e5586b58`). Recent
   chain: backtracking redo (`6d406e19` archs → `d64e7c4e` results) → RunPod infra
-  restore (`4c54908f`) → restructure (`be0a25df` docs/`autoresearch→synthetic` →
-  `3d9d080d` lift `purified→root` → `ed16e63d` `→src/explorations/synthetic` →
-  `c9e457e2` `→experiments/explorations/synthetic`). An empty untracked
+  restore (`4c54908f`) → restructure (… → `c9e457e2`
+  `→experiments/explorations/synthetic`) → STATUS rewrite (`0fae2afe`) →
+  **changepoint** (`553ed9d1` gating PASS → `76ae09fc` generator+evaluator →
+  `e5586b58` grid driver+renderer+record skeleton). An empty untracked
   `src/explorations/` shell may linger locally (cosmetic; absent from the repo).
