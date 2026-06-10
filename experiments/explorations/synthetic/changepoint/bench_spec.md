@@ -14,6 +14,51 @@ gated on (a) the topic verdict — which sets the persistence knob and dwell
 ([`topic_switching_prereg.md`](../topic_switching/prereg.md)) — and (b) the
 gating due-diligence in § 8.
 
+## Pre-run amendments (dated; the spec body below stays frozen)
+
+**A1 — 2026-06-10 — UNGATED via the measured geometric dwell.** The gate above
+asked for "a validated real dwell distribution to set the persistence knob."
+topic-switching ABORTED as an *order-sensitive* phenomenon, but its measurement
+**is** a valid dwell measurement: dwell ≈ geometric, mean run ≈ 1.73 (matches
+Markov-1; [`measurement.md`](../topic_switching/measurement.md)). The DC/AC
+split this bench tests does not need stickiness, so the bench proceeds at the
+**geometric** setting of the persistence knob, anchored on the measured mean
+(`p_switch = 1/1.73 ≈ 0.578`). The heavy-tailed/sticky and EM variants stay
+gated as before. Two grounding choices fixed now: `Π` = uniform-over-other-modes
+(the § 8 (i) rebalance, by design — the measured `Π` is not trusted because the
+labeler failed validation), and the content-subset distribution is
+**mode-independent** in the headline instance (so `x_t ⊥ past | m_t` exactly —
+the per-token AC floor is a clean DPI statement, not an estimate).
+
+**A2 — 2026-06-10 — time-since-switch is the primary AC latent.** `c_t`
+(adjacency) risks being solvable by pure architectural access. **τ_t =
+time-since-switch** (scalar; tokens since the last boundary, sequence start
+counted as a renewal, so `τ_t = 0 ⟺` boundary at `t`) needs counting beyond
+adjacency, so a window win reflects learning. `c_t` is kept and reported as the
+simple-floor companion (§ 3's "secondary" ordering is hereby swapped).
+
+**A3 — 2026-06-10 — BatchTopK fair-backbone arch family.** The § 5 arch list
+(`topk_sae`, `tsae`, `txc_base`, `stacked_sae`) is replaced by the uniform
+BatchTopK backbone family from the backtracking redo (`batchtopk_sae`, `tsae`,
+`stacked_batchtopk`, `txc_batchtopk_pre`, `txc_batchtopk_post`), with the same
+throughput normalisation (`batch_size = 1024/T`, equal `B·T` BatchTopK pool) —
+mirroring the backtracking TopK→BatchTopK amendment, for the same fairness
+reason.
+
+**A4 — 2026-06-10 — § 8 gating due-diligence RUN and PASSED**
+([`gating.py`](gating.py) →
+[`results/changepoint_gating_stats.json`](results/changepoint_gating_stats.json)):
+per-token mode oracle balanced acc **1.000** (noiseless emission); per-token AC
+ceilings exactly at chance (`c_t` balacc 0.500 from `m_t` and from `x_t`; τ corr
+≈ 0); window τ info ceilings **0.76 / 0.96 / 1.00** at `T = 2/4/8` (separation
+0.76 ≥ 0.30 gate); `c_t` window ceiling 1.0. Additionally the **raw-linear**
+window ceiling is ≈ chance for both AC latents (provable by mode-symmetry:
+boundary structure is an equality pattern, XOR-like in the position-wise
+one-hots) — so an AC win on the *learned* code is learning, not linear access;
+the untrained-encoder control measures the remaining nonlinear-access residual.
+
+---
+
 **Provenance.** This is the **change-point / sticky-dwell** dynamics class — the
 counterpart to the self-exciting backtracking bench
 ([`backtracking_bench_spec.md`](../backtracking/bench_spec.md)). One generator
