@@ -2,11 +2,11 @@
 
 This doc covers how to bring a RunPod pod online for `arxiv`-branch work.
 For what's in progress and what to pick up, read
-`purified/synthetic/STATUS.md` first, then `purified/CLAUDE.md` (the
+`synthetic/STATUS.md` first, then `CLAUDE.md` (the
 operating manual, auto-loaded).
 
 For **local** setup (your laptop / dev box), use
-`bash purified/scripts/bootstrap_local.sh` instead — it populates the
+`bash scripts/bootstrap_local.sh` instead — it populates the
 same canonical `.tokens/` layout (under `~/.tokens/` rather than
 `/workspace/.tokens/`). See § *Token storage* below.
 
@@ -34,7 +34,7 @@ cd /workspace
 cd temp_xc && git checkout arxiv && git pull --rebase origin arxiv
 
 # Run the unified bootstrap (idempotent — re-running is safe)
-bash purified/scripts/bootstrap_runpod.sh
+bash scripts/bootstrap_runpod.sh
 ```
 
 The bootstrap:
@@ -44,15 +44,15 @@ The bootstrap:
 - configures `gh`, `huggingface-cli`, and exports `ANTHROPIC_API_KEY`
 - sets `HF_HOME=/workspace/hf_cache` and `UV_LINK_MODE=copy` in
   `~/.bashrc` (the latter is mandatory — see § MooseFS gotcha below)
-- runs `uv sync` from `purified/` to build `purified/.venv/`
+- runs `uv sync` from `` to build `.venv/`
 
 ## Per-session start (every shell, every restart)
 
-**Always work from `purified/` as cwd** — the framework's `.venv`,
+**Always work from `` as cwd** — the framework's `.venv`,
 configs, and checkpoints all resolve relative to this dir.
 
 ```bash
-cd /workspace/temp_xc/purified
+cd /workspace/temp_xc
 
 # Provenance tag (stamped into the leaderboard `agent` field); freeform.
 export AGENT_NAME=autoresearch
@@ -75,7 +75,7 @@ silently produces partial installs there (dist-info dirs without
 `RECORD` files). Symptom: `uv sync` uninstalls and reinstalls the
 same package every invocation.
 
-The bootstrap script and `purified/pyproject.toml` both set
+The bootstrap script and `pyproject.toml` both set
 `link-mode = copy`. Verify any new shell:
 
 ```bash
@@ -102,8 +102,8 @@ A previous `uv sync` ran without `UV_LINK_MODE=copy`. Fix:
 
 ```bash
 export UV_LINK_MODE=copy
-rm -rf purified/.venv/lib/python3.12/site-packages/<pkg>-<ver>.dist-info
-cd purified && uv sync && uv sync       # second pass should audit only
+rm -rf .venv/lib/python3.12/site-packages/<pkg>-<ver>.dist-info
+uv sync && uv sync       # second pass should audit only
 ```
 
 The package's actual code lives in a sibling directory (e.g. `pytest/`),
@@ -112,7 +112,7 @@ not in `*.dist-info/`, so deleting orphan metadata is safe.
 ## Long-running sweeps
 
 ```bash
-cd /workspace/temp_xc/purified
+cd /workspace/temp_xc
 TQDM_DISABLE=1 nohup .venv/bin/python -m synthetic.backtracking.run_grid 8 \
     > /tmp/grid.log 2>&1 &
 tail -f /tmp/grid.log
@@ -153,18 +153,18 @@ To populate the tokens dir from scratch:
 
 ```bash
 # RunPod (interactive prompts; reads existing /workspace/.tokens if present)
-bash purified/scripts/bootstrap_runpod.sh
+bash scripts/bootstrap_runpod.sh
 
 # Local (interactive prompts; auto-detects existing local sources —
 # ~/.cache/huggingface/token, ~/.env_autointerp, gh CLI)
-bash purified/scripts/bootstrap_local.sh
+bash scripts/bootstrap_local.sh
 ```
 
 Non-interactive (e.g. seeding a pod from your local box via SSH):
 
 ```bash
 HF_TOKEN=hf_… ANTHROPIC_API_KEY=sk-ant-… GH_TOKEN=ghp_… \
-    bash purified/scripts/bootstrap_runpod.sh
+    bash scripts/bootstrap_runpod.sh
 ```
 
 Verify resolution at any time:
@@ -183,14 +183,14 @@ on every session start.
 | Thing | Path |
 |---|---|
 | Repo | `/workspace/temp_xc/` (branch: `arxiv`) |
-| Python env | `/workspace/temp_xc/purified/.venv/` |
+| Python env | `/workspace/temp_xc/.venv/` |
 | HF cache | `/workspace/hf_cache/` |
 | Tokens | `/workspace/.tokens/{gh_token,hf_token,anthropic_key}` |
 | GPU locks | `/workspace/.gpu_locks/gpu<idx>.lock` |
-| Activation caches | `purified/results/act_cache/<act_cache_key>/` |
-| Trained checkpoints | `purified/checkpoints/<train_key>/` |
-| Per-cell artifacts | `purified/results/runs/<eval_key>/` |
-| Leaderboard (append-only) | `purified/results/leaderboard.jsonl` |
-| Status briefing | `purified/synthetic/STATUS.md` |
+| Activation caches | `results/act_cache/<act_cache_key>/` |
+| Trained checkpoints | `checkpoints/<train_key>/` |
+| Per-cell artifacts | `results/runs/<eval_key>/` |
+| Leaderboard (append-only) | `results/leaderboard.jsonl` |
+| Status briefing | `synthetic/STATUS.md` |
 
-For everything else, start at `purified/CLAUDE.md`.
+For everything else, start at `CLAUDE.md`.

@@ -32,20 +32,20 @@ docs/.obsidian/core-plugins-migration.json
 # ─── HTML output (reproducible from scripts) ──────────────────────
 *.html
 
-# ─── purified/ runtime artefacts ──────────────────────────────────
+# ─── runtime artefacts ──────────────────────────────────
 # Too big for git; HF-backed via cache.save_checkpoint auto-push on
 # ephemeral pods. manifest.jsonl + per-cell metrics.json ARE tracked
 # (small JSON, cross-agent visibility); depth-2 binaries are not.
-purified/results/runs/*/log.txt
-purified/results/runs/*/*.pt
-purified/results/runs/*/*.safetensors
-purified/results/runs/*/*.ckpt
-purified/results/runs/*/cache/
-purified/results/act_cache/
-purified/checkpoints/*/*.pt
-purified/checkpoints/*/*.safetensors
-purified/checkpoints/local/
-purified/hf_cache/
+results/runs/*/log.txt
+results/runs/*/*.pt
+results/runs/*/*.safetensors
+results/runs/*/*.ckpt
+results/runs/*/cache/
+results/act_cache/
+checkpoints/*/*.pt
+checkpoints/*/*.safetensors
+checkpoints/local/
+hf_cache/
 
 # Mini-sweep logs
-purified/logs/
+logs/

@@ -1,13 +1,27 @@
-# temp_xc
+# temp_xc — Temporal Crosscoders
 
-This is the `final` branch — the paper-ready snapshot of the Temporal
-Crosscoders project.
+The `arxiv` branch: the post-submission, paper-ready codebase for the Temporal
+Crosscoders study. Everything lives at the repo root (the historical `purified/`
+subtree was lifted up).
 
-All paper code, docs, and decisions live in [`purified/`](purified/).
-Start with [`purified/CLAUDE.md`](purified/CLAUDE.md) for the operating
-manual.
+Start with [`CLAUDE.md`](CLAUDE.md) — the operating manual (framework hard rules,
+read order, layout). Key entry points:
 
-The wasteland branches (`han-phase7-unification`, `em-nanda`,
-`aniket-ward-stage-b`) hold the historical research code and intermediate
-writeups. They are read-only context; never imported into paper work.
-Read wasteland code via `git show origin/<branch>:<path>`.
+- [`docs/framework.md`](docs/framework.md) — the framework spec.
+- [`synthetic/README.md`](synthetic/README.md) — the synthetic-benchmark program
+  (prime directive, the measure→mirror→bench loop + validity gates, conventions,
+  and the benchmark index) + [`synthetic/STATUS.md`](synthetic/STATUS.md) (the
+  living scratchpad).
+- [`RUNPOD_INSTRUCTIONS.md`](RUNPOD_INSTRUCTIONS.md) — bringing a pod online.
+
+Run the framework from the repo root:
+
+```bash
+uv sync
+.venv/bin/python run.py validate
+.venv/bin/python -m pytest tests/ -q
+```
+
+Historical research code lives on the wasteland branches
+(`han-phase7-unification`, `aniket-ward-stage-b`, …) — read-only context, never
+imported into this work; read via `git show origin/<branch>:<path>`.
