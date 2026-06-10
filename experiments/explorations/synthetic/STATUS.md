@@ -1,7 +1,7 @@
-# STATUS — synthetic-benchmark redo (living briefing / pre-compact handoff)
+# STATUS — synthetic-benchmark program (living briefing / pre-compact handoff)
 
 **This is the one-stop briefing.** Update *this file only* before a compact; it
-is the canonical current-state of the synthetic-benchmark fairness redo. Read it
+is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
 Last updated: 2026-06-09.
@@ -10,227 +10,204 @@ Last updated: 2026-06-09.
 
 ## 0. TL;DR — what's active right now
 
-**The backtracking BatchTopK fair-backbone redo is DONE** (2026-06-09). All 4 new
-BatchTopK archs are built + registered, the 198-cell grid ran (0 gaps), and the
-single-source record + paper figures are regenerated and committed. **Verdict
-holds:** per-token pinned at the DPI floor 0.41; all three window families
-(TXC-pre, TXC-post, Stacked) recover λ 0.87→0.95; the win survives the uniform
-backbone. New findings: **TXC-pre > TXC-post** (post slips at large T — sparser
-per-window code), and the **shared-code crosscoder ≫ Stacked on eAUC** at matched
-λ. See [`backtracking/bench_record.md`](backtracking/bench_record.md).
+- **Backtracking BatchTopK redo: DONE + committed + pushed.** Verdict POSITIVE
+  and it survives a uniform BatchTopK backbone. Per-token pinned at the DPI floor
+  λ≈0.41; all three window families (TXC-pre, TXC-post, Stacked) recover λ
+  0.87→0.95. New findings: **TXC-pre > TXC-post** (post slips at large T) and the
+  **shared-code crosscoder ≫ Stacked on eAUC** at matched λ. Full result:
+  [`backtracking/bench_record.md`](backtracking/bench_record.md). (Design rationale
+  archived in § 5.)
+- **Repo restructure: DONE + pushed** (4 commits). `purified/` was lifted to the
+  repo root; the autoresearch program became `synthetic` then moved to
+  **`experiments/explorations/synthetic/`** (see § 1). `src/` is now
+  library-code-only.
+- **ACTIVE NEXT TASK → the change-point bench** (§ 4). It is **no longer gated**:
+  anchor the persistence knob on the *measured geometric dwell* from
+  topic-switching. **Start with the § 8 gating due-diligence** (analogue of the
+  backtracking gating) *before* building the generator/grid. Reuse the BatchTopK
+  arch family.
 
-Why it was done: T-SAE already used **BatchTopK** (Bussmann et al. — the strong
-backbone) while TopK-SAE / TXC / Stacked-SAE used plain per-sample **TopK**, an
-uncontrolled confound favouring T-SAE. Fix: BatchTopK everywhere, so the *only*
-variable is decode/code structure. (Design that was locked + executed: § 4–5.)
-
-**Next** (no longer this redo): the change-point / EM roadmap (§ 6, gated on a
-labeler) or any new bench, reusing the same fair-backbone grid as the template.
+(Running on RunPod now. Repo root = `/workspace/temp_xc`; work from there.)
 
 ---
 
-## 1. Where everything lives (post-reorg)
+## 1. Where everything lives (post-restructure)
 
-The program is a self-contained tree: `synthetic/`.
+**`src/` is importable library code only**; experiments live under `experiments/`.
 
-- Single governing doc at the root: [`README.md`](README.md) — prime directive
-  ("a sound verdict, never a win"), the measure→mirror→bench loop + § 3 validity
-  gates, the capacity/windowing/probe conventions, and the benchmark index. The
-  DC/AC frequency lens lives at [`../../../docs/ideas/frequency_lens.md`](../../../docs/ideas/frequency_lens.md).
-- One self-contained subdir per benchmark, each with docs + scripts + `figs/` +
-  `results/`. Scripts run as `.venv/bin/python -m experiments.explorations.synthetic.<bench>.<script>`.
-- **Canonical results store (single source of truth):**
-  `results/leaderboard.jsonl` — every cell, code-version-stamped, via
-  the runner. Real-label inputs (Ward backtracking) stay at
-  `results/c7_backtracking/stage_a/`.
-- **Archs** are framework plugins in `src/temp_bench/archs/`; data generator in
-  `src/temp_bench/data/synthetic.py`; evaluators in `src/temp_bench/evals/`.
-  Never edit `src/temp_bench/core/` (hard rule).
+- **The framework:** `src/temp_bench/` — core (never edit `core/`), interfaces,
+  and the **registered plugins**: archs in `src/temp_bench/archs/`, the data
+  generators in `src/temp_bench/data/synthetic.py`, evaluators in
+  `src/temp_bench/evals/`. New archs/evals/generators for an exploration go here
+  (referenced by `class_path` / generator-name in `configs/`).
+- **This program:** `experiments/explorations/synthetic/` — the synthetic-benchmark
+  program (one exploration under `experiments/explorations/`). Self-contained:
+  [`README.md`](README.md) (the single governing doc — prime directive, the
+  measure→mirror→bench loop, § 3 validity gates, conventions, benchmark index),
+  this `STATUS.md`, then one subdir per benchmark with docs + scripts + `figs/` +
+  `results/`. The DC/AC lens is at
+  [`../../../docs/ideas/frequency_lens.md`](../../../docs/ideas/frequency_lens.md).
+- **Run scripts** from the repo root as
+  `.venv/bin/python -m experiments.explorations.synthetic.<bench>.<script>`.
+- **Canonical results store (single source of truth):** `results/leaderboard.jsonl`
+  at the repo root — every cell, code-version-stamped, via the runner. Real-label
+  inputs (Ward backtracking) stay at `results/c7_backtracking/stage_a/`.
+- `src/explorations/<name>/` is *reserved* for exploration **library** code that
+  isn't ready for `temp_bench` — empty today (synthetic has none; its archs/evals/
+  generators graduated into `temp_bench`).
 
-### Single-source record pipeline (already built — keep using it)
-`results/leaderboard.jsonl` → `-m experiments.explorations.synthetic.backtracking.render_figs` →
-paper-quality `figs/backtracking_{main,specialization,untrained_control,local_tradeoff}.{pdf,png}`
-+ `results/backtracking_bench_stats.json` + **auto-filled** `<!-- AUTO:* -->`
-blocks in `bench_record.md` (headline + every table). `render_figs` reads the
-leaderboard directly and is **idempotent** — no hand-typed numbers anywhere.
-Figures are embedded (`![...]`) so they render in VS Code preview.
+### Single-source record pipeline (built for backtracking — the template)
+`results/leaderboard.jsonl` →
+`-m experiments.explorations.synthetic.backtracking.render_figs` → paper-quality
+`figs/*.{pdf,png}` + `results/backtracking_bench_stats.json` + **auto-filled**
+`<!-- AUTO:* -->` blocks in `bench_record.md`. Idempotent; no hand-typed numbers;
+figures embedded (`![...]`) so they render in VS Code preview. Reuse this pattern
+for changepoint.
 
 ---
 
 ## 2. Benchmark status
 
-| benchmark | dynamics class | verdict | backbone | state |
-|---|---|---|---|---|
-| **backtracking** | self-exciting (AC) | **POSITIVE** | **BatchTopK (redo DONE)** | measured+mirror+bench done; 198-cell BatchTopK re-grid landed + record/figs regenerated (§ 4) |
-| **signed_motion** | order-sensitive (AC) | NEGATIVE | TopK | done; leave as published |
-| **topic_switching** | change-point/sticky | **ABORT** (composition-dominated, labeler inadequate) | — | measured; no bench |
-| **changepoint** | change-point/absorbing | — | — | spec only, **gated** (no real anchor: topic aborted, EM needs paid judge) |
-
-Backtracking headline (current TopK result, to be reproduced under BatchTopK):
-per-token SAEs pinned at the **DPI floor λ≈0.41**, window crosscoders **λ≈0.95**
-(T≥4), robust into the scarce regime `d_sae<F=20`; clean local(eAUC)-vs-temporal(λ)
-specialization. See [`backtracking/bench_record.md`](backtracking/bench_record.md).
-
----
-
-## 3. Key facts the redo rests on
-
-- **`lambda_recovery`** (headline metric): held-out Pearson corr of a *linear*
-  regression probe on the arch's code → the hidden self-exciting intensity `λ`,
-  per-tile at the tile's leading edge. Per-token DPI floor `√(Varλ/Varb)≈0.41`
-  (provable); window ≈0.95. `eAUC` = local feature-direction recovery (no `gAUC`
-  here — `λ` is a *latent*, not a direction; `λ` is the "global/temporal" axis).
-- **Batch-size finding (the trigger for the throughput fix):** the trainer passes
-  the same `batch_size=1024` to every arch but it counts *native units*
-  (`trainer.py:124`). So per-token archs reconstruct **1024 tokens/step**; window
-  archs (TXC/Stacked) reconstruct **1024·T**. At fixed `n_steps` the window archs
-  see up to 8× more data — an uncontrolled, result-aligned confound. Fix in § 4.
-- **TXC mechanics (load-bearing for the design):** `encode` *sums* the
-  per-position pre-acts into one `(d_sae)` code (`einsum("btd,tds->bs")`,
-  `txc_base.py:133`), TopK on that squashed code, then decodes **all T positions
-  from the same shared code** via `W_dec[:,t,:]`. So a TXC's sparse code is
-  *shared across positions* — that's the crosscoder hypothesis, not a bug.
-
----
-
-## 4. THE BatchTopK fairness redo (design LOCKED — ✅ EXECUTED 2026-06-09)
-
-> **Status: DONE.** All 4 archs below are built (`src/temp_bench/archs/{batchtopk_sae,
-> stacked_batchtopk,txc_batchtopk}.py`), registered, smoke-tested, and the 198-cell
-> grid ran with 0 gaps. Record + figures regenerated from the leaderboard and
-> committed. The design notes below are kept as the rationale of record.
-
-Convert every arch to a **BatchTopK backbone** (BatchTopK during training →
-fixed **JumpReLU threshold** at inference, matching T-SAE's recipe / Bussmann
-et al.), so "backbone" is controlled and the only variable is decode structure.
-Build these as **NEW arch variants** (leave the published TopK archs `topk_sae`,
-`txc_base`, `stacked_sae` untouched so § 4 coupling/denoising + signed_motion
-results stand). Parameterize by `k_pos`.
-
-### The four archs (all BatchTopK-train → JumpReLU-eval, AuxK for dead features)
-
-| arch | unit / selection | `k` rate | pool |
+| benchmark | dynamics class | verdict | state |
 |---|---|---|---|
-| `batchtopk_sae` (T=1) | per-token encode+decode | `k_pos`/token | B tokens |
-| `tsae` (T=1) | per-token + temporal-contrastive (**already this**) | `k_pos`/token | B tokens |
-| `stacked_batchtopk` (T∈{2,4,8}) | per-position, **independent** dicts/decode | `k_pos`/position | B·T (pos,batch) |
-| `txc_batchtopk_pre` (T∈{2,4,8}) | **pre-squash**: BatchTopK on per-position pre-acts → sum survivors → shared code → shared decode | `k_pos`/token | B·T tokens |
-| `txc_batchtopk_post` (T∈{2,4,8}) | **post-squash**: sum pre-acts → BatchTopK on the squashed code → shared decode | `k_pos`/**window** | B windows |
-
-We run **both** TXC squash variants — whether a crosscoder should select
-per-position (pre) or on the aggregate (post) is an open architectural question,
-measure it.
-
-### Budget accounting (the subtle part — get this right)
-
-- **pre-squash / per-token / per-position**: `k_pos` actives **per token**
-  (pool over the `B·T` tokens). Pre-squash code support = union of per-position
-  selections (≤ `k_pos·T`).
-- **post-squash**: `k_pos` actives **per window code** = **`k_win // T`** (the old
-  TopK used `k_win = k_pos·T`). Rationale: each squashed atom is **reused at all
-  T positions**, so `k_pos` shared atoms ≈ `k_pos·T` token-activations = parity
-  with the per-token archs. ⇒ post-squash BatchTopK **corrects the `k_win=k_pos·T`
-  over-count** (that convention double-counted the shared atoms). Keep `k_pos·T`
-  a clean multiple of `T` (automatic since we set `k_pos` integer).
-
-Consequence to expect (not a bug): post-squash code is far sparser (support
-`k_pos`) than pre-squash (support up to `k_pos·T`) at the same budget — that
-density gap *is* the pre-vs-post effect; NMSE/eAUC are reported outcomes, not to
-be equalized.
-
-### Throughput normalization (the batch-size fix)
-
-**Equal tokens/step.** Window/sequence archs get `batch_size = base // T` (per-token
-archs keep `base`), so every arch reconstructs ~`base` token-positions/step and
-sees identical total data over `n_steps`. Bonus: it also makes the **BatchTopK
-pool identical** (`B·T = base` tokens for every arch) so the global threshold is
-computed over the same granularity. (Default `base = 1024`.)
-
-### Decision log (why these choices)
-- New variants, not in-place edits → protect published § 4 + signed_motion.
-- Both pre & post squash → it's an unresolved architectural question.
-- post-squash `k_win//T` → shared atoms are reused `T×`.
-- equal tokens/step → removes the data-exposure confound + equalizes the
-  BatchTopK pool.
-- eval = JumpReLU threshold for all → consistent (per-token codes become
-  variable-sparse at eval, as T-SAE already is; the λ/eAUC probes read `encode()`).
-
-### Grid
-11 (arch,T) configs [`batchtopk_sae`·T1, `tsae`·T1, `stacked_batchtopk`·T{2,4,8},
-`txc_batchtopk_pre`·T{2,4,8}, `txc_batchtopk_post`·T{2,4,8}] × `d_sae`{8,16,20,40}
-× seeds{1,2,42} = **132 trained** + **~33 untrained control** (`n_steps=0`,
-`d_sae=20`) ≈ **165 cells**. `k_pos=1`, `L=32`, `n_steps=30000`, equal tokens/step.
+| **backtracking** | self-exciting (AC) | **POSITIVE** | DONE — 198-cell BatchTopK grid; record+figs regenerated, committed, pushed |
+| **signed_motion** | order-sensitive (AC) | **NEGATIVE** | done; leave as published (memorization confound at `#windows=2F`) |
+| **topic_switching** | change-point/sticky | **ABORT** | measured; composition-dominated + labeler inadequate; no bench. BUT it *did* measure a valid dwell (≈geometric, mean run 1.73) — the anchor for changepoint |
+| **changepoint** | change-point / dual-latent | — | **ACTIVE NEXT** (§ 4); spec frozen ([`changepoint/bench_spec.md`](changepoint/bench_spec.md)); ungated via the geometric-dwell anchor |
 
 ---
 
-## 5. Implementation checklist for the next agent
+## 3. Key facts that carry over
 
-1. **Add the 4 archs** in `src/temp_bench/archs/` (plugin drop + `configs/archs.yaml`
-   entries with `per_section_hparams.synthetic`). Reuse patterns already in-repo:
-   - BatchTopK train encode + JumpReLU-threshold eval encode + threshold EMA
-     update: copy from `tsae.py` (`_encode_per_token`, the `threshold` logic,
-     `tsae.py:187-214, 333-349`).
-   - AuxK dead-feature revival + decoder-norm: copy from `txc_base.py:174-194`
-     / `tsae.py:352-363`.
-   - `txc_batchtopk_*` reuse `txc_base`'s `W_enc (T,d_in,d_sae)` / `W_dec
-     (d_sae,T,d_in)` and the `einsum` squash; the only change is *where* BatchTopK
-     is applied (pre vs post squash) and the budget (`k_pos`/token vs
-     `k_pos`/window).
-   - `consumes`: `batchtopk_sae`="token"; `stacked_batchtopk`/`txc_batchtopk_*`
-     follow their TopK analogues ("sequence"/"window").
-2. **Throughput**: in the grid driver, set per-cell `batch_size = 1024 if T==1
-   else 1024//T`. (Simplest; alternatively normalize in the trainer — but driver
-   is cleaner and avoids `core/` edits.)
-3. **Grid driver** `synthetic/backtracking/run_grid.py`: update `ARCH_T` to the
-   11 new configs + the per-T batch_size. Keep the parallel ProcessPool + flock
-   leaderboard. Untrained control = `n_steps=0` at `d_sae=20`.
-4. **Smoke test** one cell per new arch (`--smoke`) before the full grid;
-   especially verify `encode()` at eval returns a sane threshold-gated code for
-   each (the λ/eAUC probes depend on it).
-5. **render_figs** `synthetic/backtracking/render_figs.py`: update `ARCH_T`,
-   `COLORS`, `LABEL`, `PER_TOKEN`, `MARK` for the new arch names; re-run → it
-   auto-regenerates the figures + `bench_stats.json` + the `AUTO:*` tables in
-   `bench_record.md`. (Aggregation already keys on arch/T/d_sae/kind/k_pos from
-   the leaderboard — no logic change needed.)
-6. **Amend `bench_spec.md`** with a dated pre-run note: backbone TopK→BatchTopK
-   (+ throughput fix, + post-squash `k_win//T` correction), analogous to the
-   existing K=8→2 amendment. Update the § 5 grid arch list. Then update
-   `bench_record.md` prose (§1 Setup + the narrative) to the new arch set;
-   numbers/tables/figs auto-fill.
-7. **Validate + tests** (`run.py validate`, `pytest tests/ -q`), confirm 0 broken
-   links, idempotent record, commit.
-
-Estimated: ~2–3 hr re-grid on the RTX 5090 (~67s/cell solo; run ~6 parallel).
+- **The BatchTopK arch family (reuse for changepoint):** `batchtopk_sae` (per-token),
+  `tsae` (per-token + contrastive), `stacked_batchtopk` (per-position independent
+  dicts), `txc_batchtopk_pre` / `txc_batchtopk_post` (shared-code crosscoder,
+  pre/post squash). All on the strong backbone (BatchTopK-train → JumpReLU-eval +
+  AuxK + decoder unit-norm + grad-orth). Registered in `configs/archs.yaml`. The
+  grid driver normalizes throughput (`batch_size = 1024 if T==1 else 1024//T`) so
+  every arch sees equal tokens/step + an equal `B·T=1024` BatchTopK pool.
+- **Latent-recovery metric pattern:** held-out **linear** probe on the arch's code
+  → the hidden latent, per-tile at the tile's leading edge, normalized to
+  [chance, oracle]. Linearity is mandatory (measures what the code makes *linearly*
+  available). Per-token gets a provable floor where possible (e.g. backtracking's
+  DPI floor). `eAUC` = local feature-direction cosine recovery.
+- **Conventions** (full detail in [`README.md`](README.md) Part II): `d_sae` + `k_pos`
+  equal across archs, anchored on `F`, swept into the scarce regime (`d_sae ≤ F` is
+  the object of study); powers-of-two windows tiled into a common `L=32`;
+  memorization-free per-tile probes (features = one tile's `d_sae` code, never
+  concatenated — the signed-motion lesson); report the frontier, not a cell.
 
 ---
 
-## 6. Roadmap beyond the BatchTopK redo
+## 4. ACTIVE TASK — the change-point bench
 
-- **Change-point / EM bench** ([`changepoint/bench_spec.md`](changepoint/bench_spec.md)):
-  the shared change-point/absorbing generator (dual latent: mode = DC/per-token,
-  change-point = AC/window). **Gated** — topic-switching (its cheap anchor)
-  ABORTED, so it needs either a stronger topic labeler (LLM segment tagging /
-  validated topic model) or the **EM** anchor (emergent misalignment), which
-  needs a *paid per-span judge labeler* that does not yet exist (`evals/em.py` is
-  a stub). If the goal is an EM synthetic bench, the first real work is building
-  that labeler + measuring EM's within-sequence temporal signature (is onset
-  predictable / sticky?) per the autoresearch loop — *then* mirror + bench.
-- Once the BatchTopK backtracking result lands, the same fair-backbone grid is
-  the template for any future bench (topic-with-better-labeler, EM, …).
+**What it is** (frozen spec: [`changepoint/bench_spec.md`](changepoint/bench_spec.md)):
+a **dual-latent** substrate scored on **two axes that should split**:
+
+| latent | type | axis | predicted winner |
+|---|---|---|---|
+| **mode `m_t`** (the global hidden state, categorical `K_m=8`) | persistent | **DC** | per-token (it's stamped into every token of the dwell) |
+| **change-point / time-since-switch** (the boundary structure) | order-sensitive | **AC** | window |
+
+The headline is the **split**: on identical data, per-token should win
+`mode_recovery` (DC) and the window archs should win the AC latent. That two-way
+prediction (not "window always wins") is what makes it strong. F=20 directions
+(`K_m=8` mode-signature + `C=12` content), `spread=3`, `seq_len=64`, `n_seqs=4096`.
+
+**Why it's ungated now (pre-run amendment to the spec's gating):** the spec was
+gated on "a validated real dwell to set the persistence knob." topic-switching
+ABORTED as an *order-sensitive* phenomenon, but it **measured a valid dwell** —
+≈geometric, mean run ≈1.73 (matches Markov-1). Anchor the persistence knob on that
+**measured geometric dwell** → grounded, not arbitrary. The DC/AC split doesn't
+need stickiness, so the bench proceeds at the geometric setting; optionally sweep
+the knob (geometric → heavy-tailed → absorbing) as a robustness axis. The
+heavy-tailed/EM variants remain gated (need a better labeler / paid judge — § 6).
+
+**AC-latent choice (design decision):** `c_t = [m_t ≠ m_{t-1}]` (adjacency) is the
+*simple-floor companion*, but it risks being "too easy" (pure architectural access:
+an untrained window may already solve it). Make **time-since-switch** (a scalar —
+how many tokens since the last boundary) the **primary AC latent**: it needs more
+than adjacency (counting since the boundary), so a window win reflects learning,
+not just access. Report `c_t` alongside as the minimal floor. *(This was the
+agreed steer; confirm if revisiting.)*
+
+**Order of work (do NOT skip the gate):**
+1. **§ 8 gating due-diligence FIRST** — the analogue of `backtracking.gating`.
+   From the generator at `K_m=8` + the geometric dwell + `Π`: (i) confirm the best
+   *linear* predictor of the AC latent from `m_t` alone sits ≈ chance (else the
+   split is uninformative — rebalance `Π`/`K_m`); (ii) confirm `mode_recovery`
+   oracle is reachable by a per-token probe on the noiseless emission. Write a
+   `changepoint/gating.py`; commit the stats JSON. Only proceed if the ceilings
+   are well separated on both latents.
+2. **Generator:** implement `semi_markov_modes()` in `src/temp_bench/data/synthetic.py`
+   (specified in the spec, not yet built) + a `toy_changepoint_modes` datasource in
+   `configs/data.yaml`. Expose `mode_labels`, `changepoint_labels`,
+   `time_since_switch` in `extra` (like backtracking exposes `lambda_labels`).
+3. **Evaluator add-on:** `mode_recovery` (multinomial-logistic probe → `m_t`, DC) +
+   the AC probe (linear → time-since-switch, logistic → `c_t`), dispatched from
+   `SyntheticRecovery` when `extra` carries the changepoint labels (mirror
+   `lambda_recovery.py` / the dispatch in `synthetic_recovery.py`; keep protocol at
+   1.2.0 — no-op for other benches).
+4. **Grid:** reuse the BatchTopK arch family + the `run_grid.py` / `render_figs.py`
+   pattern from backtracking (copy into `changepoint/`). Same capacity sweep
+   (`d_sae` anchored on F=20, scarce regime), `L=32`, seeds {1,2,42}, untrained
+   control, k_pos robustness.
+5. **Record + figs** via the single-source pipeline; **prereg/bench_spec stay
+   frozen** except dated pre-run amendments (the geometric-dwell ungating + the
+   time-since-switch primary-latent choice are exactly such amendments — note them
+   transparently, like the backtracking K=8→2 and TopK→BatchTopK amendments).
+
+**Honest-outcome reminder (prime directive):** the AC latent could be (a) pure
+access (untrained window already solves it → report it as access, not learning) or
+(b) a hard bilinear interaction the scarce-`d_sae` code can't linearly expose
+(→ a real negative, like signed_motion). Both are complete, citable verdicts. The
+DC half (per-token *wins* mode) is the novel, robust claim regardless.
+
+---
+
+## 5. DONE — backtracking BatchTopK redo (archived rationale)
+
+Completed 2026-06-09. The fairness problem: T-SAE already used BatchTopK (Bussmann
+et al., the strong backbone) while the other archs used plain TopK — an
+uncontrolled confound. Fix: put every arch on the same BatchTopK→JumpReLU backbone
+(+ AuxK + decoder unit-norm + grad-orth), normalize throughput (equal tokens/step),
+and correct the post-squash budget to `k_pos` per window (`= k_win // T`, since
+each squashed atom is reused at all T positions). Built 4 new archs (§ 3), ran a
+198-cell grid (132 trained + 33 untrained control + 33 k_pos=2 anchor, 0 gaps).
+Full numbers + narrative + figures: [`backtracking/bench_record.md`](backtracking/bench_record.md);
+frozen spec + amendments: [`backtracking/bench_spec.md`](backtracking/bench_spec.md).
+The pre/post-squash and crosscoder-vs-Stacked design notes live there + in git.
+
+---
+
+## 6. Roadmap beyond changepoint
+
+- **Heavy-tailed / sticky changepoint:** needs a stronger topic labeler (LLM
+  segment tagging / validated topic model) that passes the temporal-ness gate, to
+  justify a heavy-tailed dwell. Gated until that measurement exists.
+- **EM (emergent misalignment) instantiation** of the changepoint generator
+  (`K_m=2`, state 2 absorbing, ramping entry-hazard precursor): needs a **paid
+  per-span judge labeler** (`evals/em.py` is a stub; `experiments/em/` is the §5.3
+  real-LM scaffold). Out of scope until the spend + labeler are authorized.
+- The fair-backbone grid + single-source-record pipeline is the template for any
+  future bench.
 
 ---
 
 ## 7. Hard rules + run reference + git
 
 - `TEMP_BENCH_ALLOW_DIRTY=1`, `.venv/bin/python`, never edit `temp_bench/core/`,
-  plugin-only, everything through the canonical runner (code-version stamped),
-  paper-section names. Prime directive: a sound verdict, never a "win" — don't
-  tune labeler/statistic/capacity/probe/metric to manufacture one.
-- Run (from repo root): `TEMP_BENCH_ALLOW_DIRTY=1 .venv/bin/python -m
+  plugin-only (new arch/eval/generator = file drop + `configs/` entry), everything
+  through the canonical runner (code-version stamped), paper-section names. Prime
+  directive: a sound verdict, never a "win".
+- **Run (from repo root `/workspace/temp_xc`):**
+  `TEMP_BENCH_ALLOW_DIRTY=1 .venv/bin/python -m
   experiments.explorations.synthetic.backtracking.<gating|kernel_order|measure|mirror|run_grid|render_figs>`.
-  Canonical leaderboard: `results/leaderboard.jsonl`.
-- **Git:** branch `arxiv`, **pushed to `origin/arxiv`**. The BatchTopK redo
-  shipped in two commits: `6d406e19` (the 4 archs + grid/renderer/spec wiring,
-  pushed mid-run) and the final record+figures+leaderboard commit (pushed on
-  completion). Two empty dirs (`docs/synthetic/`,
-  `experiments/synthetic/__pycache__`) can be `rmdir`'d (cosmetic, untracked).
+  Canonical leaderboard: `results/leaderboard.jsonl`. Verify env:
+  `bash scripts/agent_smoke_test.sh`.
+- **Git:** branch `arxiv`, **pushed to `origin/arxiv`** (HEAD = `c9e457e2`). Recent
+  chain: backtracking redo (`6d406e19` archs → `d64e7c4e` results) → RunPod infra
+  restore (`4c54908f`) → restructure (`be0a25df` docs/`autoresearch→synthetic` →
+  `3d9d080d` lift `purified→root` → `ed16e63d` `→src/explorations/synthetic` →
+  `c9e457e2` `→experiments/explorations/synthetic`). An empty untracked
+  `src/explorations/` shell may linger locally (cosmetic; absent from the repo).
