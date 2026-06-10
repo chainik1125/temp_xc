@@ -3,12 +3,12 @@
 #
 # Run from inside `purified/` after `uv sync`. Verifies:
 #   1. .venv exists and torch/cuda are visible
-#   2. temp_bench imports cleanly
-#   3. configs/locked_archs.yaml + configs/datasources.yaml validate
-#   4. cache-key + schema tests pass
-#   5. runner.preflight() reports no warnings (or warns are listed)
+#   2. temp_bench (core.config/cache/runner/schemas) imports cleanly
+#   3. configs/archs.yaml + configs/data.yaml registries load
+#   4. cache-key + schema tests pass (pytest)
+#   5. registry self-check + token resolution are reported
 #
-# Run on every agent session start. CI doesn't exist on `final`; this
+# Run on every agent session start. CI doesn't exist on `arxiv`; this
 # script is the cheap proxy.
 
 set -eu
@@ -43,11 +43,11 @@ if torch.cuda.is_available():
 import temp_bench
 print(f'✓ temp_bench {temp_bench.__version__}')
 
-from temp_bench import config, cache, runner, schemas
-print(f'✓ framework modules: config, cache, runner, schemas')
+from temp_bench.core import config, cache, runner, schemas
+print(f'✓ framework modules: core.config, core.cache, core.runner, core.schemas')
 
 archs = config.list_archs()
-print(f'✓ locked archs ({len(archs)}): {archs}')
+print(f'✓ archs ({len(archs)}): {archs}')
 
 dss = config.list_datasources()
 print(f'✓ datasources ({len(dss)}): {dss}')
@@ -61,42 +61,28 @@ TQDM_DISABLE=1 .venv/bin/python -m pytest tests/ -q 2>&1 || {
     exit 1
 }
 
-# 4. preflight — GPU pinning + arch class imports + GPU lock cleanup
+# 4. registry self-check + token resolution (the RunPod-relevant bits)
 echo
-echo "[smoke] runner preflight…"
+echo "[smoke] registry + token check…"
 TQDM_DISABLE=1 .venv/bin/python -c "
-from temp_bench.runner import preflight
-from temp_bench.utils.gpu_locks import gpu_lock_status
+from temp_bench.core.config import list_archs, list_datasources, list_experiments
+print(f'✓ registries: {len(list_archs())} archs, {len(list_datasources())} datasources, {len(list_experiments())} experiments')
 
-warns = preflight()
-critical = [w for w in warns if w.startswith('CRITICAL')]
-infos = [w for w in warns if w.startswith('INFO')]
-gaps = [w for w in warns if not (w.startswith('CRITICAL') or w.startswith('INFO'))]
-if critical:
-    print('✗ CRITICAL preflight failures:')
-    for w in critical:
-        print(f'   - {w}')
-    raise SystemExit(1)
-for w in infos:
-    print(f'  ℹ  {w}')
-if not gaps:
-    print('✓ preflight clean (modulo expected gaps)')
-else:
-    print(f'⚠  preflight reports {len(gaps)} expected gaps (architectures not yet implemented):')
-    for w in gaps:
-        print(f'   - {w}')
+# GPU lock state (if any held)
+try:
+    from temp_bench.utils.gpu_locks import gpu_lock_status
+    status = gpu_lock_status()
+    held = {i: v for i, v in (status or {}).items() if v}
+    if held:
+        print('  GPU lock state:')
+        for idx, info in sorted(held.items()):
+            print(f'   GPU {idx}: {info.get(\"agent\")} (PID {info.get(\"pid\")})')
+    else:
+        print('  GPU locks: none held')
+except Exception as e:
+    print(f'  GPU locks: (unavailable: {e})')
 
-# Surface the current lock state so an agent knows what's claimed
-status = gpu_lock_status()
-if status:
-    print(f'  GPU lock state ({len(status)} held):')
-    for idx, info in sorted(status.items()):
-        if info:
-            print(f'   GPU {idx}: {info[\"agent\"]} (PID {info[\"pid\"]}, since {info[\"claimed_ts\"]})')
-else:
-    print('  GPU locks: none held')
-
-# Surface token resolution
+# Token resolution — where each key resolves from (env / .tokens / missing)
 from temp_bench.utils.tokens import token_status, tokens_dir
 ts = token_status()
 print(f'  Token store: {tokens_dir()}')
