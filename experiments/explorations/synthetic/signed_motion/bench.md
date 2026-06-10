@@ -284,7 +284,7 @@ SEED=42 bash synthetic/signed_motion/minisweep.sh &
 # tables (fills the AUTO-RESULTS block) + frontier figure
 .venv/bin/python synthetic/signed_motion/populate.py results/leaderboard.jsonl \
  synthetic/signed_motion/bench.md
-.venv/bin/python -m explorations.synthetic.signed_motion.render_figs
+.venv/bin/python -m experiments.explorations.synthetic.signed_motion.render_figs
 ```
 
 | Component | Path |

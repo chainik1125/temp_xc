@@ -113,7 +113,7 @@ false positive** — exactly what the validity gates exist to catch.
 
 ```bash
 # (run from the repo root)
-.venv/bin/python -m explorations.synthetic.topic_switching.measure   # embed + cluster + nulls + verdict
+.venv/bin/python -m experiments.explorations.synthetic.topic_switching.measure   # embed + cluster + nulls + verdict
 ```
 Outputs: `synthetic/topic_switching/results/topic_switching_stats.json`,
 `synthetic/topic_switching/figs/topic_switching_signature.*`. Streams fineweb-edu text (network) + MiniLM

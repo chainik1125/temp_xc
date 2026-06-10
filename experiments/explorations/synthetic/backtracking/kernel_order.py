@@ -13,7 +13,7 @@ kernel length; the effective memory = smallest L capturing >=90% of Sum|w_l|.
 This decouples K from any benchmark result (it's a fit to the real labels),
 so it is a clean pre-build justification, not metric shopping.
 
-    .venv/bin/python -m explorations.synthetic.backtracking.kernel_order
+    .venv/bin/python -m experiments.explorations.synthetic.backtracking.kernel_order
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from pathlib import Path
 
 import numpy as np
 
-from explorations.synthetic.backtracking.measure import HERE, load_traces
+from experiments.explorations.synthetic.backtracking.measure import HERE, load_traces
 
 SEED = 0
 K_GRID = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12]

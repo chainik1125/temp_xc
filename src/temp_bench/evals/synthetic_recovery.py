@@ -67,7 +67,7 @@ def _feature_recovery_auc(
 # one via eval_cfg["eval_window_L"]. Benches whose window archs are not
 # powers of two (e.g. the legacy T=5 coupling/denoising archs) keep this
 # small value (5 % 5 == 5 % 1 == 0). Power-of-two benches pass L=32 (see
-# src/explorations/synthetic/README.md § 4).
+# experiments/explorations/synthetic/README.md § 4).
 DEFAULT_EVAL_WINDOW = 5
 
 
@@ -82,7 +82,7 @@ def _check_tileable(model: TempBenchArch, L: int) -> int:
         raise ValueError(
             f"eval window L={L} is not divisible by arch window T={T} "
             f"({type(model).__name__}); use a power-of-two L and T "
-            "(src/explorations/synthetic/README.md § 4)."
+            "(experiments/explorations/synthetic/README.md § 4)."
         )
     return T
 
@@ -127,7 +127,7 @@ def _windowed_recon_nmse(
     per-token / per-position SAE reconstructs each position independently —
     but error is aggregated over the identical ``n_windows × L`` positions,
     so the number is comparable across architectures of any (power-of-two)
-    window size. See src/explorations/synthetic/README.md § 4.
+    window size. See experiments/explorations/synthetic/README.md § 4.
     """
     device = next(model.parameters()).device
     T = _check_tileable(model, L)
@@ -165,7 +165,7 @@ class SyntheticRecovery(Evaluator):
     # apples-to-apples *tiled* metric — every arch is scored on ONE shared set
     # of length-L eval windows, tiled non-overlapping into L/T sub-windows, so
     # archs of any power-of-two window size are compared over identical
-    # positions (src/explorations/synthetic/README.md § 4). L comes from
+    # positions (experiments/explorations/synthetic/README.md § 4). L comes from
     # eval_cfg["eval_window_L"] (default 5; power-of-two benches pass 32). Only
     # `nmse`/`s_temp` are affected; eauc/gauc unchanged. Bumping invalidates
     # prior eval rows so they re-evaluate (checkpoints reused — train_key

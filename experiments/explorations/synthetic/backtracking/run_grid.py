@@ -20,7 +20,7 @@ parallel workers are safe). CUDA is initialised only inside workers (the parent
 never imports torch), so fork-based pools are safe. Results also dumped to
 synthetic/backtracking/results/backtracking_grid_results.json as they complete.
 
-    .venv/bin/python -m explorations.synthetic.backtracking.run_grid [max_workers]
+    .venv/bin/python -m experiments.explorations.synthetic.backtracking.run_grid [max_workers]
 """
 
 from __future__ import annotations

@@ -38,7 +38,7 @@ The program is a self-contained tree: `synthetic/`.
   gates, the capacity/windowing/probe conventions, and the benchmark index. The
   DC/AC frequency lens lives at [`../../../docs/ideas/frequency_lens.md`](../../../docs/ideas/frequency_lens.md).
 - One self-contained subdir per benchmark, each with docs + scripts + `figs/` +
-  `results/`. Scripts run as `.venv/bin/python -m explorations.synthetic.<bench>.<script>`.
+  `results/`. Scripts run as `.venv/bin/python -m experiments.explorations.synthetic.<bench>.<script>`.
 - **Canonical results store (single source of truth):**
   `results/leaderboard.jsonl` — every cell, code-version-stamped, via
   the runner. Real-label inputs (Ward backtracking) stay at
@@ -48,7 +48,7 @@ The program is a self-contained tree: `synthetic/`.
   Never edit `src/temp_bench/core/` (hard rule).
 
 ### Single-source record pipeline (already built — keep using it)
-`results/leaderboard.jsonl` → `-m explorations.synthetic.backtracking.render_figs` →
+`results/leaderboard.jsonl` → `-m experiments.explorations.synthetic.backtracking.render_figs` →
 paper-quality `figs/backtracking_{main,specialization,untrained_control,local_tradeoff}.{pdf,png}`
 + `results/backtracking_bench_stats.json` + **auto-filled** `<!-- AUTO:* -->`
 blocks in `bench_record.md` (headline + every table). `render_figs` reads the
@@ -227,7 +227,7 @@ Estimated: ~2–3 hr re-grid on the RTX 5090 (~67s/cell solo; run ~6 parallel).
   paper-section names. Prime directive: a sound verdict, never a "win" — don't
   tune labeler/statistic/capacity/probe/metric to manufacture one.
 - Run (from repo root): `TEMP_BENCH_ALLOW_DIRTY=1 .venv/bin/python -m
-  explorations.synthetic.backtracking.<gating|kernel_order|measure|mirror|run_grid|render_figs>`.
+  experiments.explorations.synthetic.backtracking.<gating|kernel_order|measure|mirror|run_grid|render_figs>`.
   Canonical leaderboard: `results/leaderboard.jsonl`.
 - **Git:** branch `arxiv`, **pushed to `origin/arxiv`**. The BatchTopK redo
   shipped in two commits: `6d406e19` (the 4 archs + grid/renderer/spec wiring,

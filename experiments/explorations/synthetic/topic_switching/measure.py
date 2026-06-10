@@ -15,7 +15,7 @@ Labeler (realized; deviations from the prereg's exact tools noted in the record)
 Nulls: N1 within-doc permutation; N2 first-order Markov at the empirical
 transition matrix (geometric dwell); N3 iid marginal.
 
-    .venv/bin/python -m explorations.synthetic.topic_switching.measure
+    .venv/bin/python -m experiments.explorations.synthetic.topic_switching.measure
 
 Deterministic (SEED=0). Writes synthetic/topic_switching/results/topic_switching_stats.json +
 figs. Uses the GPU for embedding — run when the backtracking grid is idle.

@@ -1,6 +1,6 @@
 """Render the AC-only signed-motion frontier figure.
 
-    python -m explorations.synthetic.signed_motion.render_figs
+    python -m experiments.explorations.synthetic.signed_motion.render_figs
 
 Reads results/leaderboard.jsonl (signed_motion, protocol 1.2.0, 10K grid) and
 writes a 3-panel frontier to synthetic/signed_motion/figs/: s_temp, eAUC, NMSE vs d_sae, one line

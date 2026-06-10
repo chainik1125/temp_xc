@@ -15,7 +15,7 @@ Re-running rebuilds the record's numbers, figures, and stats from the canonical
 leaderboard — there is no hand-typing and nothing can drift. The per-token DPI
 floor is computed directly from the generator (also canonical).
 
-    .venv/bin/python -m explorations.synthetic.backtracking.render_figs
+    .venv/bin/python -m experiments.explorations.synthetic.backtracking.render_figs
 """
 
 from __future__ import annotations

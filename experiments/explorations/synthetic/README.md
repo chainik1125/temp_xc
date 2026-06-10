@@ -6,10 +6,12 @@ then benchmark whether a window/temporal dictionary exploits that structure
 better than a per-token SAE. Each benchmark is a **self-contained subdir**
 holding its docs, scripts, figures, and results.
 
-It lives under `src/explorations/` — the home for research that may or may not
-graduate into `temp_bench`; `synthetic` is the first such exploration. Scripts
-run as a package: `.venv/bin/python -m explorations.synthetic.<bench>.<script>`
-from the repo root.
+It lives under `experiments/explorations/` — the home for exploratory experiments
+(research that may or may not graduate into `temp_bench`); `synthetic` is the
+first such exploration. Any reusable *library* code it develops goes in `src/`
+(its own `src/explorations/<name>/`, or `temp_bench` once it graduates); this
+tree holds the experiments + their artifacts. Scripts run as a package, from the
+repo root: `.venv/bin/python -m experiments.explorations.synthetic.<bench>.<script>`.
 
 This README is the **single governing doc** for the program — the prime
 directive, the measure→mirror→bench loop and its validity gates, and the
@@ -66,20 +68,20 @@ preregistration), `measurement.md` (the measure→mirror record), `bench_spec.md
 ### Running a benchmark's scripts
 
 Scripts are a package; run from the repo root as
-`.venv/bin/python -m explorations.synthetic.<bench>.<script>`. The canonical leaderboard
+`.venv/bin/python -m experiments.explorations.synthetic.<bench>.<script>`. The canonical leaderboard
 (shared) stays at `results/leaderboard.jsonl`; real-label inputs (e.g. the Ward
 backtracking labels) stay at `results/`. Examples:
 
 ```bash
 # backtracking (the positive result)
-.venv/bin/python -m explorations.synthetic.backtracking.gating         # ceilings: per-token vs window
-.venv/bin/python -m explorations.synthetic.backtracking.kernel_order   # held-out kernel-length (K) selection
-.venv/bin/python -m explorations.synthetic.backtracking.measure        # measure real backtracking (stages 2-3)
-.venv/bin/python -m explorations.synthetic.backtracking.mirror         # fit + validate the synthetic mirror
-.venv/bin/python -m explorations.synthetic.backtracking.run_grid 8     # the architecture grid
-.venv/bin/python -m explorations.synthetic.backtracking.render_figs    # frontier figures + stats
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.gating         # ceilings: per-token vs window
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.kernel_order   # held-out kernel-length (K) selection
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.measure        # measure real backtracking (stages 2-3)
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.mirror         # fit + validate the synthetic mirror
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.run_grid 8     # the architecture grid
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.render_figs    # frontier figures + stats
 # topic-switching (the abort)
-.venv/bin/python -m explorations.synthetic.topic_switching.measure
+.venv/bin/python -m experiments.explorations.synthetic.topic_switching.measure
 ```
 
 All results route through the canonical runner (code-version stamped); no edits

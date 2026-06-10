@@ -44,7 +44,7 @@ archs:
       Vanilla TopK temporal crosscoder (T=5) + tsae_paper anti-dead stack.
       No matryoshka, no contrastive, no Bricken.
 
-  # ── BatchTopK fair-backbone family (src/explorations/synthetic/STATUS.md § 4) ──────
+  # ── BatchTopK fair-backbone family (experiments/explorations/synthetic/STATUS.md § 4) ──────
   # Strong backbone (BatchTopK train → JumpReLU threshold eval, Bussmann
   # et al.) + AuxK + decoder unit-norm + grad-orth, applied uniformly so
   # the ONLY variable across the backtracking comparison is decode

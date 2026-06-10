@@ -15,4 +15,4 @@ score order as **real − N1** — the same false-positive trap as signed_motion
 
 **Reading order:** [`prereg.md`](prereg.md) (frozen) →
 [`measurement.md`](measurement.md) (the abort record).
-**Script:** `-m explorations.synthetic.topic_switching.measure`. **`figs/`**, **`results/`**.
+**Script:** `-m experiments.explorations.synthetic.topic_switching.measure`. **`figs/`**, **`results/`**.

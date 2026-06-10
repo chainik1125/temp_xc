@@ -33,7 +33,7 @@ loop's [`README.md`](../README.md).
 > architectural specialization.
 
 > **This record is auto-generated from the canonical leaderboard.** Every table
-> and figure below is (re)built by `-m explorations.synthetic.backtracking.render_figs`,
+> and figure below is (re)built by `-m experiments.explorations.synthetic.backtracking.render_figs`,
 > which reads `results/leaderboard.jsonl` — the single source of truth — so the
 > numbers cannot drift from the runs. The prose is the human narrative.
 
@@ -347,11 +347,11 @@ class via topic-switching
 ```bash
 # (run from the repo root)
 # gating (per-token vs window ceilings) + kernel-length selection
-.venv/bin/python -m explorations.synthetic.backtracking.gating
-.venv/bin/python -m explorations.synthetic.backtracking.kernel_order
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.gating
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.kernel_order
 # the 198-cell BatchTopK grid (parallel) + figures
-.venv/bin/python -m explorations.synthetic.backtracking.run_grid 8
-.venv/bin/python -m explorations.synthetic.backtracking.render_figs
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.run_grid 8
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.render_figs
 ```
 Generator `temp_bench.data.synthetic:self_exciting`; evaluator add-on
 `temp_bench.evals.lambda_recovery` (dispatched from `SyntheticRecovery` when

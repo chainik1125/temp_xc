@@ -11,7 +11,7 @@ real traces) that the synthetic reproduces the temporal signature
 (ACF, Fano, self-excitation ratio, inter-event CV) — the § 2.5 weak
 validation. The fitted lag weights w_l are the self-excitation kernel.
 
-    .venv/bin/python -m explorations.synthetic.backtracking.mirror
+    .venv/bin/python -m experiments.explorations.synthetic.backtracking.mirror
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from pathlib import Path
 
 import numpy as np
 
-from explorations.synthetic.backtracking.measure import (
+from experiments.explorations.synthetic.backtracking.measure import (
     FIG_DIR, HERE, acf, base_rate, fano, inter_event_cv, load_traces, self_excitation,
 )
 

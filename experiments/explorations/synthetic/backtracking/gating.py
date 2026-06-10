@@ -17,7 +17,7 @@ Gate (spec § 8): build if 1 - sqrt(Var(lambda)/Var(b)) >= 0.3 ; else raise alph
 (or lengthen K/tau) and re-check. We also report the honest linear gap
 (window_linear - per_token) and an alpha-sweep so the headroom is explicit.
 
-    .venv/bin/python -m explorations.synthetic.backtracking.gating
+    .venv/bin/python -m experiments.explorations.synthetic.backtracking.gating
 
 Deterministic (SEED = 0). No framework / runner involvement — a standalone
 analysis like backtracking.py / backtracking_mirror.py. Writes

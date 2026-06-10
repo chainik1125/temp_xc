@@ -143,8 +143,8 @@ synthetic mirror → architecture test".
 
 ```bash
 # (run from the repo root)
-.venv/bin/python -m explorations.synthetic.backtracking.measure         # measure + nulls + figure
-.venv/bin/python -m explorations.synthetic.backtracking.mirror  # fit + validate mirror
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.measure         # measure + nulls + figure
+.venv/bin/python -m experiments.explorations.synthetic.backtracking.mirror  # fit + validate mirror
 ```
 Outputs: `synthetic/backtracking/results/backtracking_stats.json`,
 `synthetic/backtracking/results/backtracking_mirror_stats.json`, `synthetic/backtracking/figs/backtracking_signature.*`,
