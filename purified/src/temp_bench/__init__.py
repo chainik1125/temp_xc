@@ -1,9 +1,9 @@
 """temp_bench v2 — paper-ready framework for temporal crosscoder evaluation.
 
-Read ``docs/framework_v2.md`` before touching code. That document is
+Read ``docs/framework.md`` before touching code. That document is
 the framework's spec.
 
-Public layout (matches docs/framework_v2.md "Directory layout"):
+Public layout (matches docs/framework.md "Directory layout"):
 
     temp_bench.core          ──  runner, cache, schemas, config, trainer, code_version
     temp_bench.interfaces    ──  TempBenchArch, BatchIter, Evaluator ABCs

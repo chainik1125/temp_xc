@@ -1,6 +1,6 @@
 """BatchTopK SAE — per-token baseline on the strong backbone.
 
-Fair-backbone redo (``autoresearch/STATUS.md`` § 4). This is the
+Fair-backbone redo (``synthetic/STATUS.md`` § 4). This is the
 per-token (T=1) member of the BatchTopK family: the same backbone as
 T-SAE (BatchTopK during training → fixed JumpReLU threshold at inference,
 Bussmann et al.) + AuxK dead-feature revival + decoder unit-norm +

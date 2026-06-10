@@ -4,7 +4,7 @@
 # and submits a sweep. `python run.py reproduce all` runs every entry.
 #
 # Each entry is a sweep grid in the format documented in
-# docs/framework_v2.md (cross-product axes + constants).
+# docs/framework.md (cross-product axes + constants).
 #
 # Cell counts (cross-product over list-valued fields):
 #   synthetic:   1 (denoising bench) + 1 (coupling bench) * 6 archs * 3 seeds * 6 k_pos

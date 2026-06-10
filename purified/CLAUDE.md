@@ -7,34 +7,30 @@ work happens inside `purified/`.
 **Read order on every session:**
 
 > **Picking up in-progress synthetic-benchmark work (e.g. after a compact)?**
-> Read `purified/autoresearch/STATUS.md` **first** — the single living briefing
+> Read `purified/synthetic/STATUS.md` **first** — the single living briefing
 > of the current redo initiative (what's active, the locked design, the next
 > actions, git state). It is the *one* file kept current before a compact; trust
 > it over scattered notes.
 
-1. `purified/docs/framework_v2.md` — the framework spec. Read top-to-bottom.
-2. `purified/docs/reproduction_report.md` — current § 4 synthetic reproduction.
-3. `purified/autoresearch/README.md` — the synthetic-benchmark autoresearch
-   program: one self-contained subdir per benchmark (backtracking, signed_motion,
-   topic_switching, changepoint, …) holding its spec, record, scripts, results,
-   and figures.
+1. `purified/docs/framework.md` — the framework spec. Read top-to-bottom.
+2. `purified/synthetic/README.md` — the synthetic-benchmark program: the prime
+   directive, the measure→mirror→bench loop + validity gates, the conventions
+   every benchmark follows, and the benchmark index (one self-contained subdir
+   per benchmark: backtracking, signed_motion, topic_switching, changepoint, …).
 
-Before proposing or implementing **any synthetic benchmark**, read
-`purified/autoresearch/synthetic_benchmark_guidance.md` — the conventions every
-synthetic task follows (ground truth, capacity, windowing, metrics).
+Before proposing, implementing, or running **any synthetic benchmark** (or the
+measure→mirror→bench loop on real language), read `purified/synthetic/README.md`
+in full — the single governing doc: prime directive ("a sound verdict, never a
+win"), the validity gates that keep agents on rails, and the conventions every
+benchmark follows (ground truth, capacity, windowing, metrics).
 
-Before running the **temporal-property autoresearch loop** (measuring temporal
-structure in real language and mirroring it synthetically), read
-`purified/autoresearch/autoresearch_spec.md` — its prime directive and §3
-validity gates keep agents on rails (the goal is a sound verdict, never a "win").
-
-**Layout.** Core-framework docs live under `purified/docs/`. The synthetic-
-benchmark autoresearch program lives under `purified/autoresearch/` — governing
-docs (`autoresearch_spec.md`, `synthetic_benchmark_guidance.md`,
-`frequency_lens.md`) at its root, then one subdir per benchmark with docs +
-scripts + `figs/` + `results/` co-located. Run a benchmark's scripts as
-`.venv/bin/python -m autoresearch.<bench>.<script>` (e.g.
-`autoresearch.backtracking.run_grid`). The canonical leaderboard stays at
+**Layout.** Core-framework docs live under `purified/docs/` (ideas /
+explorations under `purified/docs/ideas/`, e.g. `frequency_lens.md`, the DC/AC
+lens). The synthetic-benchmark program lives under `purified/synthetic/` — its
+single governing doc `README.md` + the `STATUS.md` scratchpad at the root, then
+one subdir per benchmark with docs + scripts + `figs/` + `results/` co-located.
+Run a benchmark's scripts as `.venv/bin/python -m synthetic.<bench>.<script>`
+(e.g. `synthetic.backtracking.run_grid`). The canonical leaderboard stays at
 `purified/results/leaderboard.jsonl`. (Historical migration docs were retired —
 recover from git history if needed.)
 

@@ -1,6 +1,6 @@
 """Stacked BatchTopK SAE — T independent per-position dicts, strong backbone.
 
-Fair-backbone redo (``autoresearch/STATUS.md`` § 4). The per-position
+Fair-backbone redo (``synthetic/STATUS.md`` § 4). The per-position
 ("stacked") baseline on the BatchTopK backbone: ``T`` independent
 dictionaries (one per window slot, no weight sharing, independent
 decode), trained with BatchTopK → JumpReLU threshold (Bussmann et al.) +

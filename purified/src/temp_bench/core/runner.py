@@ -8,7 +8,7 @@ Two entry points:
 
 - :func:`run_sweep` — cross-product over a parameter grid; calls
   ``run_experiment`` per cell, optionally in parallel across GPUs.
-  Sweep config schema documented in ``docs/framework_v2.md``.
+  Sweep config schema documented in ``docs/framework.md``.
 
 Both ALWAYS:
 
@@ -271,7 +271,7 @@ def _load_checkpoint(arch_spec, train_key: str, data_spec):
 def run_sweep(grid: dict[str, Any], *, agent: str | None = None) -> list[CellResult]:
     """Cross-product over a sweep grid; call ``run_experiment`` per cell.
 
-    Grid shape (also documented in ``docs/framework_v2.md``):
+    Grid shape (also documented in ``docs/framework.md``):
 
         {
             "experiment": "probing",
