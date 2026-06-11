@@ -17,8 +17,16 @@ env RP_API_KEY_MATS on the Mac; from cloud use the API over HTTPS).
   19123): running `bt_wscan.py --out ws_out` (window-timescale scan, Task A).
   Results: /workspace/ws/ws_out/*.json; logWS.log. HTTP server on :19123
   serves /workspace/ws (started — see log).
-- Task B (hh_rlhf screening): NOT yet launched.
-- Task C (workflow): NOT yet launched.
+- pod s2-hh `15uqvobknr31rr` (A40, 69.30.85.129:22040; proxy
+  https://15uqvobknr31rr-19123.proxy.runpod.net/): running hh_screen.py
+  (HH-RLHF chosen-vs-rejected screening) -> /workspace/hh/hh_out/hh_screen.json.
+  Dead-man timer armed.
+- pod s2-wscan also queued bt_relabel.py after the W-scan ->
+  ws_out/relabel_screen.json (verification/conclusion/uncertainty rows).
+- Task C workflow running locally (run wf_ebf30e77-675): brainstorm->rank->
+  eval-design->red-team for spectral-XC behaviour candidates; results will be
+  written into summary.md when it returns.
+- Raw timescale curve (Question A headline) already in log.md: peak T~48.
 
 ### Takeover instructions
 
