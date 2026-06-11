@@ -119,6 +119,7 @@ def main():
     ap.add_argument("--out", default="ws_out")
     ap.add_argument("--steps", type=int, default=4000)
     ap.add_argument("--seeds", nargs="+", type=int, default=[0, 1])
+    ap.add_argument("--kpertok", type=int, default=2)
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     build_cache(args.out)          # reuses sprint-1 cache builder (distill)
@@ -173,13 +174,15 @@ def main():
         H = 4096 * 16 // T
         for arch in ["multiband", "txc"]:
             for seed in args.seeds:
-                tag = f"{arch}_T{T}_s{seed}"
+                tag = (f"{arch}_T{T}_s{seed}" if args.kpertok == 2
+                       else f"{arch}_T{T}_k{args.kpertok}_s{seed}")
                 path = os.path.join(args.out, tag + ".json")
                 if os.path.exists(path):
                     continue
                 t0 = time.time()
                 torch.manual_seed(700 + seed)
-                model = build_model(arch, D, T, H, 2 * T).to(DEVICE)
+                model = build_model(arch, D, T, H,
+                                    args.kpertok * T).to(DEVICE)
                 pool = bt.think_pairs(True, T)
 
                 class Shim:

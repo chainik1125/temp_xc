@@ -98,3 +98,11 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   "element 0 does not require grad". Fixed, resumed; finished cells skip.
   DC-SAE full: T4 .74, T8 .77/.81, T16 .75/.79, T32 .71/.82, T64 .80/.82 —
   noisy seeds, roughly tracks raw curve minus a sparsity tax; T64 ≈ best.
+- **H2:30 — QUESTION A, dictionary level (2 atoms/token density).**
+  multiband T=32 AUC 0.765/0.780 > T=16 0.726/0.753 — the spectral XC gains
+  from the longer window, tracking the raw-mean curve (prereg #2 ✓: raw
+  curve still rises at 32). Vanilla txc T=32 0.694 > T=16 0.622/0.644 —
+  also gains, but trails multiband by ~+0.09 at both T. NOTE: this arm ran
+  at 2 atoms/token (synthetic convention leaked into 2*T) vs sprint-1's
+  16/token — FVUs 0.72-0.84 accordingly; internally consistent scan;
+  16/token comparability pass queued (4 cells, seed 0).
