@@ -1,0 +1,14 @@
+{
+ "pair": [
+  2,
+  100
+ ],
+ "embedding": "circle",
+ "seed": 2,
+ "ratio": 50,
+ "oracle": 1.0,
+ "txc_fvu": 0.1448047012090683,
+ "txc_linear": 1.0,
+ "bag_fvu": 0.15512634813785553,
+ "bag_mlp": 0.8955999612808228
+}

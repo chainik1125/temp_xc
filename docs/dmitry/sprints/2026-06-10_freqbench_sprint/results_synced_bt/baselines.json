@@ -1,0 +1,23 @@
+{
+ "raw_edge_acc": 0.7524691820144653,
+ "raw_edge_auc": 0.7689492455418382,
+ "raw_edge_balacc": 0.7107407450675964,
+ "raw_edge_n": [
+  270,
+  1350
+ ],
+ "raw_mean_acc": 0.8253086805343628,
+ "raw_mean_auc": 0.8182167352537723,
+ "raw_mean_balacc": 0.7270370125770569,
+ "raw_mean_n": [
+  270,
+  1350
+ ],
+ "raw_stacked_acc": 0.7691358327865601,
+ "raw_stacked_auc": 0.8652126200274348,
+ "raw_stacked_balacc": 0.7914814949035645,
+ "raw_stacked_n": [
+  270,
+  1350
+ ]
+}

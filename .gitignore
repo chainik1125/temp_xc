@@ -72,6 +72,9 @@ vendor/
 # Personal infra / eval-running lesson notes — local reference only
 eval_infra_lessons.md
 
+# Local-only mirror of pod data (gitignored; paths tracked in data_index.md)
+local_data/
+
 # Stage B (Ward TXC) — keep code + writeup, exclude bulky data artifacts
 results/ward_backtracking_txc/activations/
 results/ward_backtracking_txc/checkpoints/
@@ -80,3 +83,8 @@ results/ward_backtracking_txc/b2/
 results/ward_backtracking_txc/logs/
 results/ward_backtracking_txc/steering/
 results/ward_backtracking_txc/plots/
+
+# sprint artifact exclusions (heavy synced results stay local)
+docs/dmitry/sprints/*/results_synced*/*.pt
+docs/dmitry/sprints/*/results_synced*/*.npy
+docs/dmitry/sprints/*/results_synced*/*.npz

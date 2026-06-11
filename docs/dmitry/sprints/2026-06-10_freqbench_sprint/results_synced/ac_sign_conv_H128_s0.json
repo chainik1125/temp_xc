@@ -1,0 +1,69 @@
+{
+ "task": "ac_sign",
+ "arch": "conv",
+ "H": 128,
+ "k_win": 32,
+ "seed": 0,
+ "sigma": 0.25,
+ "fvu": 0.326664000749588,
+ "l0": 32.0,
+ "train_seconds": 23.301647901535034,
+ "code_linear": {
+  "acc_train": 1.0,
+  "acc_test": 0.9991999864578247,
+  "per_class": [
+   0.9992051124572754,
+   0.999194860458374
+  ],
+  "confusion": [
+   [
+    2514,
+    2
+   ],
+   [
+    2,
+    2482
+   ]
+  ]
+ },
+ "code_mlp": {
+  "acc_train": 1.0,
+  "acc_test": 1.0,
+  "per_class": [
+   1.0,
+   1.0
+  ],
+  "confusion": [
+   [
+    2516,
+    0
+   ],
+   [
+    0,
+    2484
+   ]
+  ]
+ },
+ "sensitivity": {
+  "shuffle_rel_change": 1.3370084762573242,
+  "reversal_rel_change": 1.3991198539733887
+ },
+ "code_shuffled_linear": {
+  "acc_train": 0.9300999641418457,
+  "acc_test": 0.9034000039100647,
+  "per_class": [
+   0.907392680644989,
+   0.8993558883666992
+  ],
+  "confusion": [
+   [
+    2283,
+    233
+   ],
+   [
+    250,
+    2234
+   ]
+  ]
+ }
+}

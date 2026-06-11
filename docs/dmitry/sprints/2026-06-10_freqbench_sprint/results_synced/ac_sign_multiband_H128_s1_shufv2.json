@@ -1,0 +1,39 @@
+{
+ "tag": "ac_sign_multiband_H128_s1",
+ "shufv2_linear": {
+  "acc_train": 0.5356000065803528,
+  "acc_test": 0.5027999877929688,
+  "per_class": [
+   0.4795553982257843,
+   0.526400625705719
+  ],
+  "confusion": [
+   [
+    1208,
+    1311
+   ],
+   [
+    1175,
+    1306
+   ]
+  ]
+ },
+ "reversed_linear": {
+  "acc_train": 1.0,
+  "acc_test": 1.0,
+  "per_class": [
+   1.0,
+   1.0
+  ],
+  "confusion": [
+   [
+    2519,
+    0
+   ],
+   [
+    0,
+    2481
+   ]
+  ]
+ }
+}
