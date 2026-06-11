@@ -203,6 +203,7 @@ def main():
                        "fvu": trn.fvu}
                 res.update(probe_with_auc(Ftr, ytr, Fte, yte, "code"))
                 if arch == "multiband":
+                    branch_feats = []
                     with torch.no_grad():
                         for b in range(4):
                             btr = torch.cat([model.branch_codes(
@@ -211,8 +212,10 @@ def main():
                             bte = torch.cat([model.branch_codes(
                                 bt.windows(te_p[i:i + 512], T))[b]
                                 for i in range(0, len(te_p), 512)])
-                            res.update(probe_with_auc(btr, ytr, bte, yte,
-                                                      f"branch{b}"))
+                            branch_feats.append((btr, bte))
+                    for b, (btr, bte) in enumerate(branch_feats):
+                        res.update(probe_with_auc(btr, ytr, bte, yte,
+                                                  f"branch{b}"))
                 json.dump(res, open(path, "w"), indent=1)
                 print(f"[{tag}] fvu={trn.fvu:.3f} "
                       f"auc={res['code_auc']:.3f} ({time.time()-t0:.0f}s)",

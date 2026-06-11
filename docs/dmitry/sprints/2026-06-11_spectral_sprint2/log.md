@@ -72,3 +72,29 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   270→210 — caveats logged). DC-SAE interim: T16 0.79, T32 0.71/0.82 (high
   seed variance — investigate), T64 0.80. Spectral/vanilla T∈{16,32} cells
   training.
+- **H1:00** Workflow (wf_ebf30e77-675, 14 agents) returned. Top-ranked
+  candidates: (1) repetition/rumination loop onset — MID-band prediction,
+  programmatic 6-gram labels (the first non-DC test!); (2) reasoning
+  macro-phase / verification-mode (DC); (3) EM onset within a generation
+  (low); then context-rot, revision commitment, sycophantic capitulation,
+  answer commitment, compliance momentum. Red team (3 agents) demanded:
+  scrambled-window control (denoising vs temporal structure), fixed-eval-set
+  T-curve (T=96 collapse may be set composition), position-only probe
+  ceiling (leakage), layer-0 embedding control for loops (lexical
+  recirculation), fair-baseline note for sprint-1's PR-AUC@8 claim (band
+  choice uses label knowledge — defense: branch was selected on independent
+  distill-cache data before the c7 eval), one-primary-endpoint-per-task
+  preregistration. ALL adopted: bt_controls.py + bt_loops.py queued.
+  Ranking-process critiques (data-availability triple-counting; no
+  high-band candidates) noted for the writeup.
+- **H1:10** hh-rlhf screen DONE: near-null. Raw-mean AUC 0.531-0.571
+  (weak peak T=64), bands DC 0.551 / low 0.519 / mid 0.500 / high 0.520.
+  Chosen-vs-rejected is barely decodable from distill-L10 end-of-transcript
+  windows — informative contrast row: weak-everywhere profile (≠ strong-DC
+  backtracking), low priority for spectral XC. Caveats: domain mismatch
+  (reasoning distill on chat), last-128-token construction.
+- **H1:45** Pod-7 crash in spectral arm: branch probes were nested inside
+  torch.no_grad() in the bt_wscan port (sprint-1 code probed outside) →
+  "element 0 does not require grad". Fixed, resumed; finished cells skip.
+  DC-SAE full: T4 .74, T8 .77/.81, T16 .75/.79, T32 .71/.82, T64 .80/.82 —
+  noisy seeds, roughly tracks raw curve minus a sparsity tax; T64 ≈ best.
