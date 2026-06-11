@@ -157,3 +157,12 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   ranges. PREREGISTERED: misalignment-reading is decodable well above
   chance; DC/low-dominant (the slow-state story, first off-math test);
   fold variance large.
+- **H5:05 — EM ROW LANDS (cross-domain confirmation).** Misalignment-reading
+  in EM-Qwen-14B L24: raw-mean AUC 0.630 (T=1) → 0.902 (T=32) → 0.994
+  (T=64 long subset); bands DC 0.902 vs 0.29-0.34 (non-DC anti-generalizes
+  across by-prompt folds). Confounds excluded the same hour: length-only
+  AUC ≤0.45 (lens 54 vs 58 tokens), steering-scale|label r=-0.05. The
+  most DC-dominated profile measured, on a different model/layer/hook/
+  domain. Reading-screen framing kept honest (steered-generation texts).
+  Pod terminated; ALL sprint-2 pods gone. Crash count tonight: 1 (chat
+  template tokenize=True → BatchEncoding in transformers 5.x).

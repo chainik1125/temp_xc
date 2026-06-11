@@ -58,7 +58,14 @@ while *in-loop* windows are statistically indistinguishable from a raw
 token-embedding control at DC (0.652 vs 0.662) — the predicted band
 structure lives in the repeated text, not demonstrably in the model's
 dynamics. Rule extracted: claims of mid/high-band behaviour should be
-presumed lexical until they beat an embedding-level control.
+presumed lexical until they beat an embedding-level control. A late
+cross-domain extension strengthens the slow-state story off-distribution:
+reading misaligned responses in an EM-finetuned **Qwen-14B (layer 24,
+medical domain)** is decodable at AUC 0.902 from the T=32 window mean
+(0.630 at T=1, monotone in T; by-prompt folds; length and steering-scale
+confounds excluded) with all non-DC bands anti-generalizing — the most
+DC-dominated profile in the table, on a different model, layer, hook and
+domain.
 
 ![main](figures/fig_s2_main.png)
 
@@ -134,6 +141,7 @@ or programmatic labels on the same traces; HH-RLHF from its own cache):
 | inside loops | — | — | .652/.620/.536/.519 vs emb ctrl .662/.554/.471/.509 | DC indistinguishable from lexical; low band (.620 vs .554) an unexplained survivor |
 | HH-RLHF choice (2000 pairs) | .571 (64) | .538 | .551/.519/.500/.520 | near-null |
 | verification (26), uncertainty (1) | — | — | — | insufficient events (null rows, reported) |
+| EM misalignment-reading, Qwen-14B L24 (432 resp.) | .902 (32); .994 on T≥64 subset | .630 | .902/.291/.343/.336 | strongly slow; non-DC anti-generalizes |
 
 Patterns, stated at the strength the table supports. (i) **Two behaviours
 carry strong signal and both are DC/low-dominated**; the mid/high bands of
@@ -148,6 +156,26 @@ its U-shaped T-curve (.854 → dip → .874 at 64) is unexplained, so its
 band: in-loop windows pass band probes but their DC signal is matched by
 raw token embeddings — indistinguishable from lexical; only its low band
 survives the control (.620 vs .554) and awaits a positional explanation.
+
+#### 3.1 Cross-domain extension: EM misalignment-reading
+
+The workflow's #3 candidate, run as a late extension: 432 judged generations
+from the c6 EM replication (medical; gpt-4o alignment/coherence scores;
+coherence ≥ 50 filter) teacher-forced through the *unsteered* EM model
+(Qwen2.5-14B-Instruct + bad-medical-advice LoRA, merged), layer-24 ln1.
+Because many responses were generated under steering, this is a
+misalignment-READING screen (does the residual stream reveal that the text
+being read is misaligned?), not a generation-onset measurement. Splits are
+by prompt (8 uniques, 4 rotations holding out 2); fold ranges are wide and
+reported. Results: raw window-mean AUC rises monotonically 0.630 (T=1) →
+0.751 (4) → 0.847 (16) → 0.902 (32) → 0.994 (T=64, long-response subset
+only); bands DC 0.902 vs low/mid/high 0.29–0.34 (below 0.5 = the probes
+anti-generalize across prompts — with 2 held-out prompts, non-DC features
+latch onto prompt identity). Confounds checked: length-only probes ≤ 0.45
+(misaligned and aligned responses have near-identical mean lengths, 54 vs
+58 tokens); steering scale vs label r = −0.05. This is the strongest and
+most DC-dominated row in the table, and the first off-math, off-model,
+off-layer replication of the slow-state pattern.
 
 ### 4. Question C: the candidate pipeline
 
@@ -212,7 +240,10 @@ pass, and its predicted low-band signature would be the first cross-domain
 - H2:30–4:00 red-team controls executed (position floor, fixed-set scan,
   scrambled control); broadened relabel rows; loops under both protocols
   with embedding-level control; k=16/token pass; pods terminated at H3:32
-  (≈ $3.1 sprint-2 compute; ≈ $11 both sprints).
+  (≈ $3.1 before the EM extension; ≈ $4.4 sprint-2 total with the L40S; ≈ $12.5 across both sprints).
+- H4:00–5:00 EM cross-domain extension (L40S pod, Qwen-14B+LoRA merge,
+  one transformers-5.x chat-template fix; length/scale confound checks run
+  before integration; pod terminated).
 - H4:00–5:00 writing + two independent review agents (zero-context
   comprehension; adversarial red-team). The red team's 10-issue report
   drove this revision: the "exactly the ceiling" framing was cut

@@ -59,8 +59,9 @@ def build(out):
     with torch.no_grad():
         for i, r in enumerate(recs):
             msgs = [{"role": "user", "content": r["prompt"]}]
-            pre = tok.apply_chat_template(msgs, tokenize=True,
-                                          add_generation_prompt=True)
+            pre_text = tok.apply_chat_template(msgs, tokenize=False,
+                                               add_generation_prompt=True)
+            pre = tok.encode(pre_text, add_special_tokens=False)
             resp = tok.encode(r["response"], add_special_tokens=False)
             ids = (pre + resp)[-MAXLEN:]
             n_resp = min(len(resp), len(ids))
