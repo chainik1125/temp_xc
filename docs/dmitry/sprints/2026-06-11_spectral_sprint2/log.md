@@ -146,3 +146,14 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   neural" with a number). Their proposed table realignment was wrong-headed
   (values are at T=4..96, not 8..96 — verified against controls.json); my
   earlier fix stands.
+- **H4:05 (extension)** EM cross-domain row launched on L40S pod
+  dtgd24ap8nz0j8 ($0.86/h, dead-man 5h): teacher-forcing 456 judged c6
+  generations (medical, gpt-4o scores; coherence>=50 filter) through the
+  UNSTEERED EM model (Qwen2.5-14B-Instruct + bad-medical-advice LoRA,
+  merged), layer-24 ln1 hook. HONEST FRAMING: many responses were generated
+  under steering, so this is a misalignment-READING screen (windows over
+  residuals while reading the response), not generation-onset; splits BY
+  PROMPT (8 uniques, 4×2-heldout rotations) — small, reported with fold
+  ranges. PREREGISTERED: misalignment-reading is decodable well above
+  chance; DC/low-dominant (the slow-state story, first off-math test);
+  fold variance large.

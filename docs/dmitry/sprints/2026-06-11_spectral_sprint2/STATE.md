@@ -28,6 +28,10 @@ env RP_API_KEY_MATS on the Mac; from cloud use the API over HTTPS).
   written into summary.md when it returns.
 - Raw timescale curve (Question A headline) already in log.md: peak T~48.
 
+- pod s2-em `dtgd24ap8nz0j8` (L40S, 103.196.86.40:56418): em_screen.py
+  running -> /workspace/em/em_out/em_screen.json (dead-man 5h from ~09:30).
+- pods s2-wscan and s2-hh TERMINATED (results synced to repo).
+
 ### Takeover instructions
 
 1. If last branch commit < 45 min old: main agent alive → do nothing.
