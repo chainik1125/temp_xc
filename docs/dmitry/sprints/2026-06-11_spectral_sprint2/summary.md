@@ -9,62 +9,78 @@ tags:
 
 ### Executive summary
 
-**Goal.** Sprint 1 found backtracking anticipation is a low-frequency state.
-This sprint answers the two follow-ups: (A) does growing the crosscoder's
-window — admitting lower frequencies — improve results, and (B) can we
-*screen* tasks for frequency content and match spectral-crosscoder
-configurations to them, with (C) a multi-agent pipeline proposing and
-red-teaming new behaviour candidates. Three findings:
+**Goal.** Sprint 1 ([[2026-06-10_freqbench_sprint/summary|sprint-1 summary]])
+found that backtracking anticipation in a reasoning model is a low-frequency
+state. This sprint answers the follow-ups: (A) does growing the crosscoder's
+window — admitting lower frequencies — improve results, (B) can we *screen*
+tasks for frequency content and match spectral-crosscoder configurations to
+them, and (C) can a multi-agent pipeline propose and red-team new behaviour
+candidates. (A *spectral crosscoder* is a sparse dictionary over T-token
+windows of residual-stream activations whose atoms are constrained to DCT
+frequency bands; its DC branch sees only the window mean. Probes are linear,
+on the dictionary's TopK code vector — or a single branch's sub-vector —
+with "k atoms/token" the window sparsity budget divided by T.) Three
+findings:
 
-**1. The window should be grown to the behaviour's measured timescale — and
-a dictionary-free instrument measures that timescale first.** Probing
-"backtracking imminent" from the plain mean of the last T tokens traces a
-curve peaking around T≈32–48 (sentence-to-paragraph scale). Retraining the
-spectral crosscoder at T=32 instead of 16 (matched 16-atoms/token density)
-lifts its probe AUC from 0.795 to **0.831 — exactly the dictionary-free
-ceiling (0.830)** — while the vanilla window crosscoder trails at 0.807.
-The cheap raw-mean scan tells you the right window before you train
-anything.
+**1. Measure the behaviour's timescale with a dictionary-free scan, then
+grow the window to match it.** Probing "backtracking imminent" from the
+plain mean of the last T tokens traces a curve peaking around T≈32–48
+(sentence-to-paragraph scale). Retraining the spectral crosscoder at T=32
+instead of 16 (16 atoms/token, single seed) lifts its full-code probe AUC
+from 0.795 to **0.831, matching the raw-mean reference at the same window
+(0.826; the raw peak is 0.830 at T=48)**. The vanilla window crosscoder
+trails at 0.807. One honest nuance the headline hides: the spectral model's
+DC *branch* already scored 0.828 at T=16, so window growth mainly lets the
+*full code* catch up to its own DC branch (0.835 at T=32) — and what the
+dictionary buys over the raw mean at equal AUC is sparse, steerable atoms,
+not detection accuracy.
 
 **2. The red team's controls materially corrected the headline — and the
-signal survives them.** Three controls demanded by adversarial review:
-a position-only probe sets a **leakage floor of 0.685 AUC** (backtracking
-happens at characteristic trace positions; all rows must be read relative
-to it); a fixed-example-set scan shows the apparent collapse at T=96 was a
-**composition artifact** (fixed-set T=96 is 0.781, not 0.696), leaving a
-flatter, broader optimum; and scrambled-token pooling loses 0.03–0.07 AUC
-vs contiguous windows — **temporal contiguity carries real signal beyond
-denoising**.
+signal survives them.** A probe on position features alone reaches
+**0.685 AUC** (backtracking happens at characteristic trace positions; every
+number must be read against this floor, not 0.5). A fixed-example-set scan
+shows the apparent collapse at T=96 was a **composition artifact**
+(fixed-set T=96 is 0.781, not 0.696), leaving a flat, broad optimum.
+Scrambled-token pooling changes AUC by **−0.02 to +0.13 relative to
+contiguous windows — positive at 5 of 7 window lengths and largest (+0.13)
+exactly at the T=32–48 optimum** — so temporal contiguity carries real
+signal where it matters, beyond mere averaging.
 
-**3. Frequency screening says slowness is generic at this hook — including
-for the candidate engineered to be mid-band.** Across every behaviour
-screened on DeepSeek-R1-Distill-8B layer-10 (backtracking, conclusion
-onset, repetition-loop anticipation, in-loop state, HH-RLHF choice), the
-DC/low bands dominate and mid/high carry near-chance signal. The
-14-agent workflow's top-ranked candidate — repetition loops, predicted
-mid-band — was evaluated the same night under both its protocols:
-pre-onset anticipation is real but slow (DC 0.64 vs embedding-control
-0.52), and in-loop windows are dominated by **lexical recirculation**
-(embedding-control DC 0.66 ≈ L10 DC 0.65), exactly the failure mode its
-red-teamers predicted. Conclusion: for reasoning-model L10 behaviours, the
-spectral crosscoder's value is concentrated in its DC/low branches at
-behaviour-matched windows, and any claim of mid/high-band behaviour should
-be presumed lexical until it beats an embedding-level control.
+**3. In every behaviour with decodable signal, the slow bands dominate —
+including the candidate engineered to be mid-band.** Screening five
+behaviours on DeepSeek-R1-Distill-Llama-8B layer 10: the two with strong
+signal (backtracking; conclusion onset) are DC/low-dominated; the rest are
+weak, null, or confounded. The 14-agent workflow's top-ranked candidate —
+repetition loops, predicted mid-band — was evaluated the same night under
+both its protocols: pre-onset anticipation is real but slow (DC 0.642,
+above both its lexical control 0.524 and its own position floor 0.567),
+while *in-loop* windows are statistically indistinguishable from a raw
+token-embedding control at DC (0.652 vs 0.662) — the predicted band
+structure lives in the repeated text, not demonstrably in the model's
+dynamics. Rule extracted: claims of mid/high-band behaviour should be
+presumed lexical until they beat an embedding-level control.
 
 ![main](figures/fig_s2_main.png)
 
 ### 1. Setup
 
-Everything runs on the sprint-1 backtracking stack: 300 DeepSeek-R1-Distill-
-Llama-8B math reasoning traces, layer-10 residual-stream cache, "behaviour
-imminent" probes (positives = offsets [-13,-8] before marker events;
-negatives ≥ 25 tokens from any event; by-trace 80/20 splits; balanced
-linear probes; AUC). Window means and DCT-band projections are computed
-from right-edge windows that may extend into the prompt, so example sets
-are comparable across T (and the fixed-set control removes even that
-dependence). Dictionaries: TopK, lr 3e-4, 4k steps, 2 seeds at 2
-atoms/token (plus a 16-atoms/token pass, seed 0, for sprint-1
-comparability).
+Everything runs on the sprint-1 backtracking stack: 300
+DeepSeek-R1-Distill-Llama-8B math reasoning traces, layer-10 residual-stream
+cache, "behaviour imminent" probes (positives = offsets [-13,-8] before
+marker events; negatives ≥ 25 tokens from any event; by-trace 80/20 splits;
+balanced linear probes; AUC). Probe features per arm: the raw T-token
+window mean (d=4096); pooled DCT-band coefficients (mean over the band's
+frequencies, d=4096 per band); a trained dictionary's TopK code vector
+(H=4096 here), or one branch's sub-vector for branch probes. The
+position-only probe uses three scalars: absolute position, position/trace
+length, and position-within-think-region fraction.
+
+Windows are right-edge and may extend into the prompt, which keeps example
+sets *approximately* comparable across T; the residual dependence (the
+pos ≥ T−1 cutoff removes early-trace examples as T grows — 270 → 210 test
+positives from T=1 to 96) is exactly what the fixed-example-set control
+eliminates. Dictionaries: TopK, lr 3e-4, 4k steps, 2 seeds at 2 atoms/token
+plus a 16-atoms/token pass (seed 0) for sprint-1 comparability.
 
 ### 2. Question A: window scaling
 
@@ -73,52 +89,65 @@ comparability).
 | T | 1 | 2 | 4 | 8 | 16 | 24 | 32 | 48 | 64 | 96 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | AUC (all examples) | .769 | .788 | .815 | .813 | .818 | .814 | .826 | **.830** | .804 | .696 |
-| AUC (fixed set, n+=210) | — | — | .740 | .727 | .772 | .740 | **.793** | .732 | .781 |
-| scrambled control | — | — | .684 | .743 | .700 | .665 | .668 | .739 | .716 |
+| AUC (fixed set, n+=210) | — | — | .740 | .727 | .772 | — | .740 | **.793** | .732 | .781 |
+| scrambled control | — | — | .684 | .743 | .700 | — | .665 | .668 | .739 | .716 |
 
-Reading: the optimum sits around T = 32–48 on both example constructions;
-the fixed-set row shows the all-examples T=96 collapse was composition (the
-example set changes with T), not the state expiring; the contiguous-vs-
-scrambled gap (e.g. .740 vs .665 at T=32, .793 vs .668 at 48) shows the
-window mean is using temporal structure, not just averaging more tokens.
-Position-only probe: 0.685 — the leakage floor all numbers should be read
-against.
+Reading. On all examples the optimum is T≈32–48; on the fixed set the curve
+is flat within noise from 16–96 with its maximum still at 48 — and the
+all-examples collapse at T=96 disappears (0.781 vs 0.696), confirming it
+was example composition, not the state expiring. The contiguous-minus-
+scrambled gaps per T are +.056, −.016, +.072, +.075, **+.125**, −.007,
++.065: positive at 5 of 7 lengths and largest at the optimum — the window
+mean uses temporal structure precisely where the curve says the state
+lives. Position-only probe: 0.685, the leakage floor for this task's
+numbers (backtracking events cluster at characteristic trace positions).
 
 #### 2.2 Dictionaries at the matched window
 
-At 16 atoms/token (sprint-1 density, seed 0): multiband (spectral) T=16
-0.795 → **T=32 0.831**; vanilla TXC T=16 0.700 → T=32 0.807. The spectral
-crosscoder at the behaviour-matched window reaches the dictionary-free
-ceiling; its DC branch alone scores 0.828 (T16) / 0.835 (T32) — the
-compact detector remains the DC branch, now at the right timescale. At 2
-atoms/token (2 seeds) the same ordering holds at lower levels (multiband
-.73–.78, vanilla .62–.69), with the T32 > T16 gain present in both
-architectures. DC-SAEs trained directly on window means (parameter count
-independent of T) track the raw curve minus a sparsity tax and are noisy
-across seeds (.71–.82); they are the budget option, not the best one.
+At 16 atoms/token (seed 0): spectral (multiband) full code T=16 0.795 →
+T=32 **0.831**; vanilla window crosscoder 0.700 → 0.807. Branch probes:
+the DC branch alone scores 0.828 at T=16 and 0.835 at T=32 — it is the
+compact detector at both windows, and its own gain from window growth is
+small (+0.007). The window-growth story is therefore precise: growing T
+mainly lets the *full* spectral code catch up to its DC branch and to the
+raw-mean reference at the same T (0.826), while the vanilla crosscoder —
+which cannot protect a DC subspace — gains more (+0.107) but stays below.
+At 2 atoms/token (2 seeds) the same ordering holds at lower levels
+(multiband .73–.78, vanilla .62–.69). DC-SAEs trained directly on window
+means (parameters independent of T) are the budget option: they track the
+raw curve minus a sparsity tax with high seed variance (.71–.82).
+
+All k=16 cells are single-seed; the DC-SAE seed spread (±.05) is the right
+mental error bar, and the 0.831-vs-0.826 match to the raw reference should
+be read as "reaches the reference" not "equals it to three digits".
 
 ### 3. Question B: the screening table
 
 Same instrument, same model/hook, several behaviours (events from keyword
 or programmatic labels on the same traces; HH-RLHF from its own cache):
 
-| behaviour (events) | best raw-mean AUC (T) | T=1 | bands DC/low/mid/high @T=32 | verdict |
+| behaviour (events) | best raw-mean AUC (T) | T=1 AUC | bands DC/low/mid/high @T=32 | verdict |
 |---|---|---|---|---|
-| backtracking (227) | .830 (48) | .769 | .835/.708/.615/.649 (branch probes) | strong, slow |
-| conclusion onset (158) | .874 (64) | **.854** | .789/.675/.498/.483 | strong, *already per-token* + slow |
-| loop anticipation (pre-onset) | .642 @T32 bands | — | .642/.560/.507/.508 | weak, slow, genuinely neural (emb ctrl .524) |
-| in-loop state | — | — | .652/.620/.536/.519 vs **emb ctrl .662**/.554/.471/.509 | lexical confound — not neural band structure |
+| backtracking (227) | .830 (48) | .769 | .835/.708/.615/.649 (branch probes) | strong, slow (floor .685) |
+| conclusion onset (158) | .874 (64) | **.854** | .789/.675/.498/.483 | strong, *already per-token*, slow component tentative |
+| loop anticipation (~bouts) | — | — | .642/.560/.507/.508 | weak, slow; above lexical ctrl (.524) and own position floor (.567) |
+| inside loops | — | — | .652/.620/.536/.519 vs emb ctrl .662/.554/.471/.509 | DC indistinguishable from lexical; low band (.620 vs .554) an unexplained survivor |
 | HH-RLHF choice (2000 pairs) | .571 (64) | .538 | .551/.519/.500/.520 | near-null |
 | verification (26), uncertainty (1) | — | — | — | insufficient events (null rows, reported) |
 
-Patterns. (i) Every decodable behaviour is DC/low-dominated; no mid/high
-behaviour was found, despite the workflow specifically hunting for one.
-(ii) The conclusion row shows a second regime: a signal already linearized
-per-token (T=1 AUC 0.854, like GPT-2 day-stride in sprint 1) that *also*
-has slow structure — window dictionaries add little there. (iii) The
-embedding-level control is mandatory before claiming any non-DC band:
-in-loop "periodicity" passes band probes but is matched by raw token
-embeddings — it lives in the text, not the model's dynamics.
+Patterns, stated at the strength the table supports. (i) **Two behaviours
+carry strong signal and both are DC/low-dominated**; the mid/high bands of
+backtracking (.615/.649) sit at or below its position floor (.685). No
+behaviour shows neural mid/high structure — but only one candidate directly
+targeted mid (loops), so this is two data points plus one engineered
+failure, not a theorem. (ii) Conclusion onset is a second regime: already
+linearized per-token (T=1 AUC .854, like GPT-2 day-stride in sprint 1);
+its U-shaped T-curve (.854 → dip → .874 at 64) is unexplained, so its
+"slow component" is tentative — window dictionaries add little either way.
+(iii) The embedding-level control is mandatory before claiming any non-DC
+band: in-loop windows pass band probes but their DC signal is matched by
+raw token embeddings — indistinguishable from lexical; only its low band
+survives the control (.620 vs .554) and awaits a positional explanation.
 
 ### 4. Question C: the candidate pipeline
 
@@ -127,65 +156,73 @@ judges → eval designs for top-3 → 3 adversarial red-teamers) produced a
 ranked list of real-world behaviours for spectral-crosscoder treatment.
 Top five: repetition/rumination loops (8.2/10, mid-band prediction,
 programmatic labels), reasoning macro-phase/verification mode (8.0),
-emergent-misalignment onset within a generation (7.8), context-rot/
-instruction decay (7.5), revision commitment (7.3). The top pick was
-evaluated the same night under both its protocols (§3): its mid-band
-prediction failed in exactly the way its own red-team warned (lexical
+emergent-misalignment onset within a generation (7.8),
+context-rot/instruction decay (7.5), revision commitment (7.3). The top
+pick was evaluated the same night under both its protocols (§3): its
+mid-band prediction failed in the way its own red-team warned (lexical
 recirculation), while its "slow stuck-precursor" sub-prediction held.
 
-The red team's process critiques are part of the deliverable: judge
-scores leaked "similarity to the proven backtracking result" (over-ranking
+The red team's process critiques are part of the deliverable: judge scores
+leaked "similarity to the proven backtracking result" (over-ranking
 near-replications); data-availability was triple-counted (biasing toward
-one-model one-domain candidates); no high-band candidates were proposed at
-all (a brainstorm coverage gap that makes "everything is slow" partially
-self-fulfilling — though the loops result is an honest direct attempt that
-failed empirically, not by construction). Their demanded controls were all
-executed (§2.1) and two materially changed the conclusions.
+one-model, one-domain candidates); mid-band coverage rested on a single
+candidate and nothing targeted the high band at all — which makes
+"slowness is generic" partly a coverage statement about the brainstorm,
+not only about the model. Their demanded controls were all executed (§2.1,
+§3) and two materially changed the conclusions.
 
-Recommended next candidate from the list, *not* executable tonight:
-emergent-misalignment onset (7.8) — repo-internal c6 generations exist,
-needs one 30–60 min cache pass, and its predicted low-band signature
-would be the first cross-domain (non-math) test of the slow-state story.
+Recommended next candidate, *not* executable tonight: emergent-misalignment
+onset (7.8) — repo-internal c6 generations exist, needs one 30–60 min cache
+pass, and its predicted low-band signature would be the first cross-domain
+(non-math) test of the slow-state story.
 
 ### 5. Limitations
 
 - One model, one layer, one domain for all new rows (the red team's
   "layer-10-everything" confound stands; layer/model sweeps are the top
-  follow-up). The HH row partially varies domain but is near-null.
-- k=16/token dictionary cells are single-seed; the 2/token cells (2 seeds)
-  support the same ordering at lower absolute levels.
+  follow-up). The HH-RLHF row varies domain but is near-null.
+- k=16/token dictionary cells are single-seed; treat ±.05 (the DC-SAE seed
+  spread) as the error bar on any single cell.
 - Keyword event labels are crude; verification/uncertainty rows died on
-  event counts (n=26, n=1) — judge-based labels are the fix, not run
-  tonight. The conclusion row's U-shaped T-curve (high at T=1 and T=64)
-  is unexplained; treat its "slow" component as tentative.
-- The position-leakage floor (0.685) is high; all claims here are about
-  the increment above it, and difficulty-matching of negatives (red-team
-  item) was not implemented.
-- Band probes use pooled DCT coefficients (mean over band) — a screening
-  statistic, not the full band information.
+  event counts (26 and 1) — judge-based labels are the fix, not run
+  tonight.
+- The position-leakage floors are high (backtracking .685, loops .567);
+  all claims concern the increment above them, and difficulty-matching of
+  negatives (a red-team item) was not implemented.
+- Band probes use pooled DCT coefficients — a screening statistic, not the
+  full band information.
+- The in-loop low band (.620 vs embedding .554) survives the lexical
+  control and is unexplained; it needs a loop-specific in-bout position
+  floor before any interpretation.
 
 ### 6. Research map
 
-- H0:00–0:25 scaffolding, branch, preregistrations (4 predictions: peak-T
-  uncertain by design; spectral T32 ≥ T16 iff raw curve rises; profiles
-  differ across tasks — partially wrong: profiles differ in *strength* but
-  not band; risk note on large-T example counts — vindicated).
+- H0:00–0:25 scaffolding, branch, preregistrations (peak-T genuinely
+  uncertain; spectral T32 ≥ T16 iff raw curve rises — held; task profiles
+  differ across tasks — held for *strength*, refuted for *band*; large-T
+  example-count risk — vindicated by the composition control).
 - H0:15 resilience for user absence: hourly Opus-4.8 cloud takeover routine
   keyed to branch-commit heartbeat; on-pod dead-man timers (billing-safe
   without shipping secrets); results served over HTTPS proxies.
 - H0:20–2:30 W-scan (raw curve → headline; DC-SAE; spectral/vanilla cells),
-  hh-rlhf screening (near-null), 14-agent workflow (ranked candidates +
-  red team), three crashes found and fixed (a no_grad nesting bug, a
-  grad-graph leak through embedding weights, an atoms/token convention
-  leak — all logged).
+  HH-RLHF screening (near-null), 14-agent workflow (ranked candidates +
+  red team). Three bugs found and fixed mid-flight (a no_grad nesting
+  crash, a grad-graph leak through embedding weights, an atoms/token
+  convention leak), all logged.
 - H2:30–4:00 red-team controls executed (position floor, fixed-set scan,
-  scrambled control); relabel rows (broadened keywords); loops evaluated
-  under both protocols incl. embedding-level control; k=16/token
-  comparability pass; pods terminated at H3:32 (≈ $3.1 total sprint-2
-  compute).
-- Remainder: this summary, red/blue iteration, final commits.
+  scrambled control); broadened relabel rows; loops under both protocols
+  with embedding-level control; k=16/token pass; pods terminated at H3:32
+  (≈ $3.1 sprint-2 compute; ≈ $11 both sprints).
+- H4:00–5:00 writing + two independent review agents (zero-context
+  comprehension; adversarial red-team). The red team's 10-issue report
+  drove this revision: the "exactly the ceiling" framing was cut
+  (single-seed, cross-T), "slowness is generic" was rescoped to what two
+  informative behaviours support, the scrambled-gap range was corrected
+  from the log's stale value, the §1/§2.1 composition contradiction was
+  resolved, and a loop-specific position floor (0.567) was computed
+  locally to replace a hand-wave.
 
-Artifacts: `log.md` (timestamped), `STATE.md` (takeover state),
-`code/` (bt_wscan, bt_relabel, bt_loops ×2, bt_controls, hh_screen),
-`results_synced_ws/`, `results_synced_hh/`, `figures/fig_s2_main.png`,
-workflow transcript reference wf_ebf30e77-675.
+Artifacts: `log.md` (timestamped), `STATE.md`, `code/` (bt_wscan,
+bt_relabel, bt_loops ×2, bt_controls, hh_screen), `results_synced_ws/`,
+`results_synced_hh/`, `figures/fig_s2_main.png`, workflow run
+wf_ebf30e77-675.

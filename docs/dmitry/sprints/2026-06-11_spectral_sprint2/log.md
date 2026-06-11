@@ -131,3 +131,18 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   anticipation stays genuinely neural (0.642 vs 0.524) and slow. Verdict:
   slowness is generic at this hook; embedding-level controls mandatory for
   any non-DC claim. Main 3-panel figure made; full summary written.
+- **H4:55 — REVIEW ROUND COMPLETE; summary rewritten.** Comprehension agent:
+  all 3 findings followable; figure fixes applied (T=32 marker, colorbar,
+  bar value labels, n per row). Red team (10 issues): killed "exactly the
+  ceiling" (single seed, cross-T borrow, DC-branch already 0.828 at T16 →
+  honest framing: window growth lets the full code catch its DC branch;
+  dictionary buys atoms, not AUC); rescoped "slowness is generic" to the
+  two informative behaviours + one engineered mid-band failure; corrected
+  the scrambled-gap range (−.02..+.13, positive 5/7, max at optimum — the
+  log's 0.03–0.07 was stale); fixed §1 composition contradiction (named
+  the pos≥T−1 mechanism); flagged the in-loop low-band survivor (.620 vs
+  .554) as unexplained; computed a LOOP-SPECIFIC position floor locally
+  (0.567 — loop anticipation DC 0.642 clears it, rescuing "genuinely
+  neural" with a number). Their proposed table realignment was wrong-headed
+  (values are at T=4..96, not 8..96 — verified against controls.json); my
+  earlier fix stands.
