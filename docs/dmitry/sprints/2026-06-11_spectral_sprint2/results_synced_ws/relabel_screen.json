@@ -1,11 +1,57 @@
 {
  "verification": {
-  "n_events": 19,
+  "n_events": 26,
   "skipped": "too few events"
  },
  "conclusion": {
-  "n_events": 76,
-  "skipped": "too few events"
+  "n_events": 158,
+  "rawmean_T1": {
+   "auc": 0.8538518518518519,
+   "balacc": 0.778333306312561,
+   "n_pos_test": 180
+  },
+  "rawmean_T4": {
+   "auc": 0.8014567901234568,
+   "balacc": 0.7594444751739502,
+   "n_pos_test": 180
+  },
+  "rawmean_T8": {
+   "auc": 0.766753086419753,
+   "balacc": 0.6977778077125549,
+   "n_pos_test": 180
+  },
+  "rawmean_T16": {
+   "auc": 0.8078148148148148,
+   "balacc": 0.7705556154251099,
+   "n_pos_test": 180
+  },
+  "rawmean_T32": {
+   "auc": 0.7886296296296297,
+   "balacc": 0.7344444990158081,
+   "n_pos_test": 180
+  },
+  "rawmean_T48": {
+   "auc": 0.833253086419753,
+   "balacc": 0.7716666460037231,
+   "n_pos_test": 180
+  },
+  "rawmean_T64": {
+   "auc": 0.8740740740740741,
+   "balacc": 0.8061110973358154,
+   "n_pos_test": 180
+  },
+  "band0": {
+   "auc": 0.7886296296296297
+  },
+  "band1": {
+   "auc": 0.6751543209876543
+  },
+  "band2": {
+   "auc": 0.49800617283950616
+  },
+  "band3": {
+   "auc": 0.48252469135802467
+  }
  },
  "uncertainty": {
   "n_events": 1,

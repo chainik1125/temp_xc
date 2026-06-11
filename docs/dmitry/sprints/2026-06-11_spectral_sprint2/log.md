@@ -120,3 +120,14 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   (verification 19, uncertainty 1, conclusion 76 events) — keyword sets
   broadened, threshold lowered to 60, requeued. Loops rerunning after a
   grad-graph bug fix (emb weights needed .detach()).
+- **H3:35 — ALL COMPUTE COMPLETE; pods terminated (~$3.1 sprint-2).**
+  Final results: (A) k16 pass — multiband T32 0.831 = raw ceiling 0.830;
+  T16 0.795; vanilla 0.700→0.807; DC branch 0.828/0.835 tops every config.
+  (B) conclusion row n=158: T1=0.854 (already per-token!) rising to 0.874
+  at T64, bands DC-dominant — second regime: local cue + slow component.
+  Verification (26) and uncertainty (1) rows null on counts. (C) loops
+  in-bout test: mid-band FAILS — emb0 DC 0.662 ≈ L10 DC 0.652 → lexical
+  recirculation, exactly as the workflow's red team predicted; pre-onset
+  anticipation stays genuinely neural (0.642 vs 0.524) and slow. Verdict:
+  slowness is generic at this hook; embedding-level controls mandatory for
+  any non-DC claim. Main 3-panel figure made; full summary written.
