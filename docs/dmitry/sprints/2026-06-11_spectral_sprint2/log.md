@@ -56,3 +56,19 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
 ### Log
 
 - **H0:00** Clock started; branch `dmitry-spectral-sprint2`; tasks created.
+- **H0:15** Resilience layers (user away): cloud routine trig_012G7TKgQTmLRPWS7M4r4vKB
+  (hourly :23, claude-opus-4-8, heartbeat = branch commit age, syncs pod
+  results via HTTPS proxy, self-noops after 16:00 UTC); on-pod dead-man
+  timer kills the container at 15:20 UTC (billing stops, no secrets
+  shipped); durable local cron attempted but session-only (flagged).
+  Branch pushed = heartbeat channel; .pt/.npy excluded by gitignore (repo
+  1MB hook).
+- **H0:20 — QUESTION A HEADLINE (dictionary-free).** Raw window-mean probe
+  AUC vs T: 0.769 (T=1) → 0.815 (T=4) → plateau ≈0.81–0.83 → **peak 0.830
+  at T=48** → 0.804 (T=64) → 0.696 (T=96). The backtracking anticipatory
+  state lives at sentence-to-paragraph scale (~30–50 tokens). Longer windows
+  help modestly beyond T=16 (+0.012); far beyond, the window outlives the
+  state (and at T≥64 windows increasingly span the prompt; n+ drops
+  270→210 — caveats logged). DC-SAE interim: T16 0.79, T32 0.71/0.82 (high
+  seed variance — investigate), T64 0.80. Spectral/vanilla T∈{16,32} cells
+  training.
