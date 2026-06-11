@@ -106,3 +106,17 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   at 2 atoms/token (synthetic convention leaked into 2*T) vs sprint-1's
   16/token — FVUs 0.72-0.84 accordingly; internally consistent scan;
   16/token comparability pass queued (4 cells, seed 0).
+- **H3:20 — CONTROLS LAND (red-team vindicated; headline revised).**
+  (C3) Position-only probe = 0.685: a large share of all AUCs is positional
+  leakage; the temporal increment above position is ~0.1, not 0.83. (C2)
+  Fixed-eval-set curve: T=96 "collapse" was COMPOSITION ARTIFACT (fixed-set
+  T96 = 0.781 vs 0.696 headline); T=48 still best (0.793) but the curve is
+  flat-noisy (0.73-0.79). (C1) Scrambled-token pooling loses ~0.03-0.07 vs
+  contiguous windows at most T (T32: 0.665 vs 0.740) — the signal is not
+  pure denoising; temporal contiguity carries real information. Revised
+  Question-A statement: backtracking state is slow-ish with a broad optimum
+  around T~32-48; window-growth gains are real but modest; position
+  controls mandatory for all rows. Relabel screen failed on counts
+  (verification 19, uncertainty 1, conclusion 76 events) — keyword sets
+  broadened, threshold lowered to 60, requeued. Loops rerunning after a
+  grad-graph bug fix (emb weights needed .detach()).

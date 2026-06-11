@@ -1,0 +1,18 @@
+{
+ "fixed_set_n_pos_test": 210,
+ "fixed_rawmean_T4": 0.7401133786848073,
+ "fixed_rawmean_T8": 0.7272879818594105,
+ "fixed_rawmean_T16": 0.7721950113378685,
+ "fixed_rawmean_T32": 0.7397596371882086,
+ "fixed_rawmean_T48": 0.7926213151927438,
+ "fixed_rawmean_T64": 0.7320045351473923,
+ "fixed_rawmean_T96": 0.78140589569161,
+ "scrambled_rawmean_T4": 0.6842585034013605,
+ "scrambled_rawmean_T8": 0.743265306122449,
+ "scrambled_rawmean_T16": 0.700204081632653,
+ "scrambled_rawmean_T32": 0.6645759637188209,
+ "scrambled_rawmean_T48": 0.6683265306122449,
+ "scrambled_rawmean_T64": 0.7394965986394558,
+ "scrambled_rawmean_T96": 0.7156326530612245,
+ "position_only_auc": 0.6852517006802721
+}

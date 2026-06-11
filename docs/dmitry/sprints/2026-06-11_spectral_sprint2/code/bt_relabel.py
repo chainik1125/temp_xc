@@ -29,9 +29,12 @@ from bt_freq import probe_with_auc
 from bt_wscan import BTW
 
 BEHAVIOURS = {
-    "verification": {"check", "verify", "confirm", "recheck", "checking"},
-    "conclusion": {"therefore", "thus", "hence", "answer"},
-    "uncertainty": {"maybe", "perhaps", "wonder", "unsure", "hmmm"},
+    "verification": {"check", "verify", "confirm", "recheck", "checking",
+                     "double", "verifying", "confirms", "valid", "correct"},
+    "conclusion": {"therefore", "thus", "hence", "answer", "final",
+                   "boxed", "conclusion"},
+    "uncertainty": {"maybe", "perhaps", "wonder", "unsure", "might",
+                    "possibly", "guess", "unclear", "probably"},
 }
 TS = [1, 4, 8, 16, 32, 48, 64]
 BANDS32 = [[0], list(range(1, 11)), list(range(11, 21)), list(range(21, 32))]
@@ -73,7 +76,7 @@ def main():
         n_ev = sum(len(e) for e in ev_per_trace)
         res[b] = {"n_events": n_ev}
         print(f"[{b}] {n_ev} events", flush=True)
-        if n_ev < 150:
+        if n_ev < 60:
             res[b]["skipped"] = "too few events"
             continue
 

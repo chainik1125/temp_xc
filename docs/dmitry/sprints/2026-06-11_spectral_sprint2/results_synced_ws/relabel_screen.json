@@ -1,0 +1,14 @@
+{
+ "verification": {
+  "n_events": 19,
+  "skipped": "too few events"
+ },
+ "conclusion": {
+  "n_events": 76,
+  "skipped": "too few events"
+ },
+ "uncertainty": {
+  "n_events": 1,
+  "skipped": "too few events"
+ }
+}

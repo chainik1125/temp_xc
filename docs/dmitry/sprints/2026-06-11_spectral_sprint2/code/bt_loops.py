@@ -114,7 +114,7 @@ def main():
     from transformers import AutoModelForCausalLM
     emb = AutoModelForCausalLM.from_pretrained(
         "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
-        torch_dtype=torch.float16).get_input_embeddings().weight
+        torch_dtype=torch.float16).get_input_embeddings().weight.detach()
     emb = emb.to(DEVICE)
     traces = {json.loads(l)["trace_id"]: json.loads(l)
               for l in open("bt_data/traces.jsonl")}
