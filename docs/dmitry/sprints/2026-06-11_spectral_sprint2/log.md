@@ -3,7 +3,7 @@ author: Claude (10h unsupervised sprint #2)
 date: 2026-06-11
 tags:
   - results
-  - in-progress
+  - complete
 ---
 
 ## Sprint-2 log: window-timescale matching for the spectral crosscoder
@@ -166,3 +166,10 @@ Wall clock: start **2026-06-11 05:32:09 UTC** (epoch 1781155929), hard stop
   domain. Reading-screen framing kept honest (steered-generation texts).
   Pod terminated; ALL sprint-2 pods gone. Crash count tonight: 1 (chat
   template tokenize=True → BatchEncoding in transformers 5.x).
+- **H5:20 — SPRINT-2 DELIVERABLE COMPLETE.** summary.md final (review-driven
+  rewrite + EM row), 4-panel figure, screening table with 7 rows across 2
+  models, all controls executed, all pods terminated. Compute: sprint-2
+  ≈ $4.4 (2×A40 + L40S), both sprints ≈ $12.5 of $100 combined budgets.
+  Cloud takeover routine remains armed until 16:00 UTC (then self-noops;
+  user deletes at claude.ai/code/routines); local hourly cron expires with
+  the session. Remaining window held in reserve.
