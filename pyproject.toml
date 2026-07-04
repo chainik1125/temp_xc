@@ -49,7 +49,9 @@ url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu128" }
+# CUDA wheels only exist for Linux. On macOS (Apple Silicon local dev)
+# fall through to PyPI, which ships the MPS build. RunPod is Linux → cu128.
+torch = [{ index = "pytorch-cu128", marker = "sys_platform == 'linux'" }]
 
 [tool.ruff]
 line-length = 100
