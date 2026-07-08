@@ -185,7 +185,7 @@ def fig_main(agg, plt):
     ax.set_xticklabels([str(d) for d in D_SAES] + ["1010"])
     ax.set_xlim(28, 1200); ax.set_ylim(*ylim)
     ax.set_xlabel("dictionary size  $d_{sae}$  (anchored on $M$; log)")
-    ax.set_ylabel("velocity recovery  (norm. to [chance, periodogram oracle])")
+    ax.set_ylabel("velocity recovery  (norm. to [chance, 1])")
     ax.set_title("Circle single-tone: velocity recovery frontier", loc="left", fontsize=12)
     ax.legend(ncol=2, fontsize=7.6, loc="upper left")
     fig.tight_layout()
@@ -471,10 +471,12 @@ def headline_block(agg):
     full16 = v(CIRCLE, "trained", "spectral_txc_full", 16, ANCHOR)
     full_un = v(CIRCLE, "untrained", "spectral_txc_full", 16, ANCHOR)
     dcac16 = v(CIRCLE, "trained", "spectral_txc_dcac", 16, ANCHOR)
-    # band-partition at the scarcest window (T=2), where budget would bite
+    # band-partition at the scarcest window (T=2) + scarcest capacity (d=32)
     spec2 = v(CIRCLE, "trained", "spectral_txc", 2, ANCHOR)
     full2 = v(CIRCLE, "trained", "spectral_txc_full", 2, ANCHOR)
     dcac2 = v(CIRCLE, "trained", "spectral_txc_dcac", 2, ANCHOR)
+    spec_d32 = v(CIRCLE, "trained", "spectral_txc", 16, 32)
+    full_d32 = v(CIRCLE, "trained", "spectral_txc_full", 16, 32)
     rand_spec16 = v(RANDOM, "trained", "spectral_txc", 16, ANCHOR)
     memo_rand_spec = v(RANDOM, "trained", "spectral_txc", 16, 2048)
     memo_rand_pre = v(RANDOM, "trained", "txc_batchtopk_pre", 16, 2048)
@@ -504,16 +506,17 @@ def headline_block(agg):
         f"velocity at **{fmt(un_spec)}** (its DCT-band kernels *are* bandpass "
         f"tone-detectors at init); TXC-post {fmt(un_post)}, TXC-pre {fmt(un_pre)}. "
         f"Training lifts Spectral {fmt(un_spec)}→{fmt(spec16)}.\n"
-        f"- **P3 — band partition at matched budget = a TIE (as preregistered):** at "
-        f"$T=16$ multiband **{fmt(spec16)}** ≈ 1-band DCT (`full`) **{fmt(full16)}** ≈ "
-        f"2-band **{fmt(dcac16)}** (all saturate the tone), and even at the scarcest "
-        f"window $T=2$ the three are within noise (multiband {fmt(spec2)}, dcac "
-        f"{fmt(dcac2)}, full {fmt(full2)}) — the *partition* does not help on a single "
-        f"tone. Where band-limiting **does** show is the **untrained access** prior "
-        f"(multiband {fmt(un_spec)} vs full {fmt(full_un)}: band-limited kernels are "
-        f"tone-detectors at init, a full-band DCT rotation is not). Clean **band "
-        f"decomposition** holds (each DCT band decodes the tones in its range). The "
-        f"decisive multiband win needs superposition (scoped out).\n"
+        f"- **P3 — band partition = a TIE at adequate capacity, multiband edge only at "
+        f"the extremes (exactly as preregistered):** at matched budget "
+        f"($k_{{win}}=k_{{pos}}·T$) the trained recovery is identical across 1/2/4 "
+        f"bands whenever capacity suffices — $T=16$: multiband **{fmt(spec16)}** ≈ full "
+        f"**{fmt(full16)}** ≈ dcac **{fmt(dcac16)}**; $T=2$: all within noise "
+        f"({fmt(spec2)}/{fmt(dcac2)}/{fmt(full2)}). The partition helps only at the "
+        f"**capacity extreme** ($d_{{sae}}=32$, $T=16$: multiband **{fmt(spec_d32)}** vs "
+        f"full **{fmt(full_d32)}**) and in the **untrained access** prior (multiband "
+        f"{fmt(un_spec)} vs full {fmt(full_un)}: band-limited kernels are tone-detectors "
+        f"at init). Clean **band decomposition** holds (each DCT band decodes the tones "
+        f"in its range). The decisive multiband win needs superposition (scoped out).\n"
         f"- **P4 ✓ — random null has no frequency axis:** on the random embedding the "
         f"per-Ω-class response is flat (no $\\Delta f$ ordering) and the circle's tones "
         f"are what make $Y$ resolvable (Spectral circle {fmt(spec16)} vs random "
