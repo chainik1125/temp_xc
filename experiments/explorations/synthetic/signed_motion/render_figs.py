@@ -3,14 +3,28 @@
     python -m experiments.explorations.synthetic.signed_motion.render_figs
 
 Reads results/leaderboard.jsonl (signed_motion, protocol 1.2.0, 10K grid) and
-writes a 3-panel frontier to synthetic/signed_motion/figs/: s_temp, eAUC, NMSE vs d_sae, one line
-per (arch, T). F = 19 and 2F = 38 are marked; the scarce / memorization-free
-regime (d_sae < 2F) is shaded. Also writes a low-res .thumb.png.
+writes a 3-panel frontier (s_temp, eAUC, NMSE vs d_sae, one line per (arch, T)).
+F = 19 and 2F = 38 are marked; the scarce / memorization-free regime (d_sae < 2F)
+is shaded. Also writes a low-res .thumb.png.
 
 The story the figure tells: in the scarce regime no architecture recovers the
 order-sensitive sign (s_temp ≈ 0); the crosscoder's recovery only appears at
 the over-complete d_sae = 2F reference, where the per-tile probe is confounded
 by tabulation.
+
+This is the outlier of the synthetic benches: figure-ONLY (single combined
+`bench.md`), on the iter_leaderboard path, with NO record-pipeline. It therefore
+does not use `explorations.synthetic.record` (there are no AUTO tables / stats to
+regenerate here) — see the two FLAGs below for pre-existing bugs left un-fixed
+per the refactor briefing (flag, don't silently change published output).
+
+FLAG (pre-existing, not fixed here): `render_ac_frontier` writes to the
+CWD-RELATIVE `Path("synthetic/signed_motion/figs")` (below), NOT this bench's
+`figs/` dir — so from the repo root it creates a stray `./synthetic/…` tree and
+the committed figs go stale. Fix would be `Path(__file__).resolve().parent /
+"figs"`. Also: `bench.md` carries a `<!-- AUTO:* -->` block that this renderer
+never populates (it has no `populate` step) — the block is effectively
+hand-maintained.
 """
 
 from __future__ import annotations
@@ -122,7 +136,7 @@ def render_ac_frontier() -> Path:
     )
     fig.tight_layout(rect=(0, 0, 1, 0.93))
 
-    out_dir = Path("synthetic/signed_motion/figs")
+    out_dir = Path("synthetic/signed_motion/figs")  # FLAG: CWD-relative bug (see module docstring)
     out_dir.mkdir(parents=True, exist_ok=True)
     pdf = out_dir / "fig_ac_signed_motion.pdf"
     png = out_dir / "fig_ac_signed_motion.png"

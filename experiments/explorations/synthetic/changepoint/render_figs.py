@@ -1,20 +1,13 @@
-"""Change-point architecture results — SINGLE SOURCE renderer + record populator.
+"""Change-point architecture results — thin driver over the shared record pipeline.
 
-Reads the **canonical leaderboard** (`results/leaderboard.jsonl`) — the one
-code-version-stamped source — filters the `toy_changepoint_modes_d64` cells
-(protocol 1.2.0, non-smoke, n_steps ∈ {0, 30000}), aggregates over seeds, then
-in one pass:
-
-  1. renders paper-quality figures into `figs/`
-     (`changepoint_main`, `changepoint_split`, `changepoint_T`,
-      `changepoint_untrained_control`, `changepoint_local_tradeoff`),
-  2. writes the machine-readable aggregate `results/changepoint_bench_stats.json`,
-  3. fills every `<!-- BEGIN AUTO:<tag> --> … <!-- END AUTO:<tag> -->` block in
-     `bench_record.md` (headline numbers + all result tables).
-
-Re-running rebuilds the record's numbers, figures, and stats from the canonical
-leaderboard — there is no hand-typing and nothing can drift. The τ in-tile info
-ceilings come from the committed gating stats (also canonical).
+Config + bench-specific figures/tables only; the leaderboard→aggregate→AUTO-block
+→stats plumbing lives in :mod:`explorations.synthetic` (record/figs). Reads the
+canonical leaderboard (`results/leaderboard.jsonl`), filters the
+`toy_changepoint_modes_d64` cells (protocol 1.2.0, non-smoke, n_steps ∈
+{0, 30000}), aggregates over seeds, then renders figures + fills every
+`<!-- AUTO:* -->` block in `bench_record.md` + writes
+`results/changepoint_bench_stats.json`. The τ in-tile info ceilings come from the
+committed gating stats.
 
     .venv/bin/python -m experiments.explorations.synthetic.changepoint.render_figs
 """
@@ -22,11 +15,13 @@ ceilings come from the committed gating stats (also canonical).
 from __future__ import annotations
 
 import json
-import re
-from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
+
+from explorations.synthetic import figs, record
+from explorations.synthetic.figs import MARK, frontier_series, save_fig
+from explorations.synthetic.record import aggregate, fmt, fmt_pm, load_rows, populate
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
@@ -39,6 +34,7 @@ RECORD = HERE / "bench_record.md"
 DS = "toy_changepoint_modes_d64"
 PROTOCOL = "1.2.0"
 N_STEPS_GRID = 30_000
+KEY_FIELDS = ("kind", "k_pos", "arch", "T", "d_sae")
 
 F = 20
 D_SAES = [8, 16, 20, 40]
@@ -59,56 +55,10 @@ COLORS = {
     ("txc_batchtopk_post", 2): "#bcbddc", ("txc_batchtopk_post", 4): "#807dba", ("txc_batchtopk_post", 8): "#54278f",
     ("stacked_batchtopk", 2): "#a1d99b", ("stacked_batchtopk", 4): "#31a354", ("stacked_batchtopk", 8): "#006d2c",
 }
-MARK = {1: "o", 2: "s", 4: "^", 8: "D"}
-
-PAPER_STYLE = {
-    "figure.dpi": 120, "savefig.dpi": 300, "savefig.bbox": "tight",
-    "font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11.5,
-    "xtick.labelsize": 10, "ytick.labelsize": 10, "legend.fontsize": 8.5,
-    "axes.spines.top": False, "axes.spines.right": False, "axes.axisbelow": True,
-    "axes.grid": True, "grid.alpha": 0.16, "grid.linewidth": 0.7,
-    "legend.frameon": False, "lines.linewidth": 2.0, "lines.markersize": 6,
-    "figure.facecolor": "white", "mathtext.default": "regular",
-}
 
 
 def label(arch, T):
     return f"{LABEL[arch]} (per-token)" if (arch, T) in PER_TOKEN else f"{LABEL[arch]} (T={T})"
-
-
-# ── canonical sources: the leaderboard + the gating stats ──────────────
-
-def load_rows():
-    rows = []
-    for line in LEADERBOARD.read_text().splitlines():
-        if not line.strip():
-            continue
-        r = json.loads(line)
-        if r.get("datasource") != DS or r.get("evaluator_protocol_version") != PROTOCOL:
-            continue
-        ec = r.get("eval_cfg") or {}
-        if ec.get("smoke"):
-            continue
-        n_steps = int(r.get("training_cfg", {}).get("n_steps", 0))
-        if n_steps not in (0, N_STEPS_GRID):       # drop smoke-length runs
-            continue
-        ov = r.get("training_cfg", {}).get("arch_hparams_override") or {}
-        rows.append({"arch": r["arch"], "T": int(ov.get("T", 1)), "d_sae": int(ov.get("d_sae")),
-                     "k_pos": int(ec.get("k_pos", ov.get("k_pos", 1))), "seed": int(r["seed"]),
-                     "kind": "trained" if n_steps > 0 else "untrained", "m": r["metrics"]})
-    return rows
-
-
-def aggregate(rows):
-    """(kind, k_pos, arch, T, d_sae) -> {metric: (mean, std, n)} over seeds."""
-    buck = defaultdict(lambda: defaultdict(list))
-    for r in rows:
-        key = (r["kind"], r["k_pos"], r["arch"], r["T"], r["d_sae"])
-        for m, v in r["m"].items():
-            if v is not None and np.isfinite(v):
-                buck[key][m].append(float(v))
-    return {k: {m: (float(np.mean(vs)), float(np.std(vs)), len(vs)) for m, vs in d.items()}
-            for k, d in buck.items()}
 
 
 def gating_ceilings():
@@ -125,8 +75,7 @@ def gating_ceilings():
 
 
 def g(agg, kind, kpos, arch, T, d, metric="tss_recovery"):
-    c = agg.get((kind, kpos, arch, T, d))
-    return c[metric] if c and metric in c else (float("nan"), float("nan"), 0)
+    return record.get(agg, (kind, kpos, arch, T, d), metric)
 
 
 # ── paper-quality figures ─────────────────────────────────────────────
@@ -140,16 +89,9 @@ def _frontier_panel(ax, agg, metric, ylabel, title, *, ceil_lines=None, ylim=(0,
         for y, lbl, col in ceil_lines:
             ax.axhline(y, color=col, ls="--", lw=0.9, zorder=1)
             ax.text(41.5, y + 0.008, lbl, color=col, fontsize=7.2, ha="right", va="bottom")
-    for arch, T in ARCH_T:
-        xs, ys, es = [], [], []
-        for d in D_SAES:
-            m, s, n = g(agg, "trained", 1, arch, T, d, metric)
-            if n:
-                xs.append(d); ys.append(m); es.append(s)
-        if xs:
-            ls = "--" if (arch, T) in PER_TOKEN else "-"
-            ax.errorbar(xs, ys, yerr=es, marker=MARK[T], ms=5.5, lw=1.9, ls=ls,
-                        color=COLORS[(arch, T)], capsize=2, elinewidth=1, label=label(arch, T))
+    frontier_series(ax, ARCH_T, D_SAES,
+                    lambda a, T, d: g(agg, "trained", 1, a, T, d, metric),
+                    COLORS, PER_TOKEN, label, ms=5.5, lw=1.9, capsize=2, elinewidth=1)
     ax.set_xticks(D_SAES); ax.set_xlim(7, 43); ax.set_ylim(*ylim)
     ax.set_xlabel("dictionary size  $d_{sae}$"); ax.set_ylabel(ylabel)
     ax.set_title(title, loc="left", fontsize=11)
@@ -176,7 +118,7 @@ def fig_main(agg, ceil, plt):
     fig.legend(handles, labs, loc="lower center", ncol=4, fontsize=8.3,
                bbox_to_anchor=(0.5, -0.04), columnspacing=1.4, handletextpad=0.5)
     fig.tight_layout(rect=(0, 0.04, 1, 1))
-    _save(fig, plt, "changepoint_main")
+    save_fig(fig, FIG_DIR, "changepoint_main", plt)
 
 
 def fig_split(agg, plt):
@@ -214,7 +156,7 @@ def fig_split(agg, plt):
               title="(arch, T) @ $d_{sae}{=}20$\nfaint trail: $d_{sae}\\in\\{8,16,20,40\\}$",
               title_fontsize=8.2)
     fig.tight_layout()
-    _save(fig, plt, "changepoint_split")
+    save_fig(fig, FIG_DIR, "changepoint_split", plt)
 
 
 def fig_T(agg, ceil, plt):
@@ -252,7 +194,7 @@ def fig_T(agg, ceil, plt):
         ax.set_title(ttl, loc="left", fontsize=11)
     ax1.legend(loc="upper left", fontsize=8)
     fig.tight_layout()
-    _save(fig, plt, "changepoint_T")
+    save_fig(fig, FIG_DIR, "changepoint_T", plt)
 
 
 def fig_untrained(agg, plt):
@@ -281,7 +223,7 @@ def fig_untrained(agg, plt):
     fig.suptitle("Access vs learning: random-init vs trained encoders  ($d_{sae}{=}20$, $k_{pos}{=}1$)",
                  fontsize=11.5)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
-    _save(fig, plt, "changepoint_untrained_control")
+    save_fig(fig, FIG_DIR, "changepoint_untrained_control", plt)
 
 
 def fig_local_tradeoff(agg, plt):
@@ -292,61 +234,33 @@ def fig_local_tradeoff(agg, plt):
         (axes[2], "nmse", "(c) Reconstruction error", "NMSE"),
     ]:
         ax.axvspan(7, F, color="0.93", zorder=0, lw=0); ax.axvline(F, color="0.45", ls=":", lw=1.1)
-        for arch, T in ARCH_T:
-            xs, ys, es = [], [], []
-            for d in D_SAES:
-                m, s, n = g(agg, "trained", 1, arch, T, d, metric)
-                if n:
-                    xs.append(d); ys.append(m); es.append(s)
-            if xs:
-                ls = "--" if (arch, T) in PER_TOKEN else "-"
-                ax.errorbar(xs, ys, yerr=es, marker=MARK[T], ms=5, lw=1.7, ls=ls,
-                            color=COLORS[(arch, T)], capsize=2, elinewidth=0.9, label=label(arch, T))
+        frontier_series(ax, ARCH_T, D_SAES,
+                        lambda a, T, d, _m=metric: g(agg, "trained", 1, a, T, d, _m),
+                        COLORS, PER_TOKEN, label, ms=5, lw=1.7, capsize=2, elinewidth=0.9)
         ax.set_xticks(D_SAES); ax.set_xlim(7, 42); ax.set_xlabel("dictionary size  $d_{sae}$")
         ax.set_ylabel(yl); ax.set_title(ttl, loc="left", fontsize=11)
     axes[0].set_ylim(0, 1.02); axes[1].set_ylim(0, 1.02)
     axes[0].legend(ncol=2, fontsize=7.2, loc="lower right")
     fig.tight_layout()
-    _save(fig, plt, "changepoint_local_tradeoff")
-
-
-def _save(fig, plt, name):
-    for ext, dpi in [("pdf", None), ("png", 200), ("thumb.png", 70)]:
-        fig.savefig(FIG_DIR / f"{name}.{ext}", dpi=dpi)
-    plt.close(fig)
-    print(f"[fig] {FIG_DIR.name}/{name}.{{pdf,png}}")
+    save_fig(fig, FIG_DIR, "changepoint_local_tradeoff", plt)
 
 
 # ── tables + headline for bench_record.md ─────────────────────────────
 
-def _f(t, dec=3):
-    m, s, n = t
-    return "—" if not n else f"{m:.{dec}f}"
-
-
-def _fs(t):
-    m, s, n = t
-    return "—" if not n else f"{m:.3f} ±{s:.3f}"
-
-
 def _frontier_table(agg, metric):
-    h = ("| arch / T | " + " | ".join(f"d={d}" for d in D_SAES) + " |\n"
-         "|---|" + "|".join("---" for _ in D_SAES) + "|\n")
-    for arch, T in ARCH_T:
-        cells = " | ".join(_f(g(agg, "trained", 1, arch, T, d, metric)) for d in D_SAES)
-        name = f"**{label(arch,T)}**" if (arch, T) not in PER_TOKEN else label(arch, T)
-        h += f"| {name} | {cells} |\n"
-    return h.rstrip()
+    return record.frontier_table(
+        ARCH_T, D_SAES, lambda a, T, d: g(agg, "trained", 1, a, T, d, metric),
+        label, bold_pred=lambda a, T: (a, T) not in PER_TOKEN)
 
 
 def table_untrained(agg):
     h = ("| arch / T | mode untrained | mode trained | τ untrained | τ trained |\n"
          "|---|---|---|---|---|\n")
     for arch, T in ARCH_T:
-        h += (f"| {label(arch,T)} | {_fs(g(agg,'untrained',1,arch,T,20,'mode_recovery'))} "
-              f"| {_fs(g(agg,'trained',1,arch,T,20,'mode_recovery'))} "
-              f"| {_fs(g(agg,'untrained',1,arch,T,20,'tss_recovery'))} "
-              f"| {_fs(g(agg,'trained',1,arch,T,20,'tss_recovery'))} |\n")
+        h += (f"| {label(arch,T)} | {fmt_pm(g(agg,'untrained',1,arch,T,20,'mode_recovery'))} "
+              f"| {fmt_pm(g(agg,'trained',1,arch,T,20,'mode_recovery'))} "
+              f"| {fmt_pm(g(agg,'untrained',1,arch,T,20,'tss_recovery'))} "
+              f"| {fmt_pm(g(agg,'trained',1,arch,T,20,'tss_recovery'))} |\n")
     return h.rstrip()
 
 
@@ -354,10 +268,10 @@ def table_kpos(agg):
     h = ("| arch / T | mode @ $k_{pos}{=}1$ | mode @ $k_{pos}{=}2$ | τ @ $k_{pos}{=}1$ | τ @ $k_{pos}{=}2$ |\n"
          "|---|---|---|---|---|\n")
     for arch, T in ARCH_T:
-        h += (f"| {label(arch,T)} | {_f(g(agg,'trained',1,arch,T,20,'mode_recovery'))} "
-              f"| {_f(g(agg,'trained',2,arch,T,20,'mode_recovery'))} "
-              f"| {_f(g(agg,'trained',1,arch,T,20,'tss_recovery'))} "
-              f"| {_f(g(agg,'trained',2,arch,T,20,'tss_recovery'))} |\n")
+        h += (f"| {label(arch,T)} | {fmt(g(agg,'trained',1,arch,T,20,'mode_recovery'))} "
+              f"| {fmt(g(agg,'trained',2,arch,T,20,'mode_recovery'))} "
+              f"| {fmt(g(agg,'trained',1,arch,T,20,'tss_recovery'))} "
+              f"| {fmt(g(agg,'trained',2,arch,T,20,'tss_recovery'))} |\n")
     return h.rstrip()
 
 
@@ -365,9 +279,9 @@ def table_feature_recovery(agg):
     h = ("| arch / T | gAUC (mode dirs) | eAUC (content dirs) | NMSE |\n"
          "|---|---|---|---|\n")
     for arch, T in ARCH_T:
-        h += (f"| {label(arch,T)} | {_f(g(agg,'trained',1,arch,T,20,'gauc'))} "
-              f"| {_f(g(agg,'trained',1,arch,T,20,'eauc'))} "
-              f"| {_f(g(agg,'trained',1,arch,T,20,'nmse'))} |\n")
+        h += (f"| {label(arch,T)} | {fmt(g(agg,'trained',1,arch,T,20,'gauc'))} "
+              f"| {fmt(g(agg,'trained',1,arch,T,20,'eauc'))} "
+              f"| {fmt(g(agg,'trained',1,arch,T,20,'nmse'))} |\n")
     return h.rstrip()
 
 
@@ -422,28 +336,12 @@ def headline_block(agg, ceil):
     )
 
 
-def populate(blocks):
-    if not RECORD.exists():
-        print(f"[warn] {RECORD} missing — populate skipped"); return
-    txt = RECORD.read_text(); filled = 0
-    for tag, content in blocks.items():
-        pat = re.compile(rf"(<!-- BEGIN AUTO:{tag} -->).*?(<!-- END AUTO:{tag} -->)", re.DOTALL)
-        if not pat.search(txt):
-            print(f"[warn] AUTO:{tag} marker not found in bench_record.md"); continue
-        txt = pat.sub(lambda m: f"{m.group(1)}\n{content}\n{m.group(2)}", txt); filled += 1
-    RECORD.write_text(txt)
-    print(f"[record] populated {filled}/{len(blocks)} AUTO block(s) in {RECORD.name}")
-
-
 def main():
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    plt.rcParams.update(PAPER_STYLE)
+    plt = figs.use_agg_style()
     FIG_DIR.mkdir(exist_ok=True); RES_DIR.mkdir(exist_ok=True)
 
-    rows = load_rows()
-    agg = aggregate(rows)
+    rows = load_rows(LEADERBOARD, DS, PROTOCOL, n_steps_keep={0, N_STEPS_GRID})
+    agg = aggregate(rows, KEY_FIELDS)
     ceil = gating_ceilings()
     n_trained = sum(1 for r in rows if r["kind"] == "trained")
     print(f"[render] {len(rows)} leaderboard cells ({n_trained} trained); "
@@ -464,14 +362,12 @@ def main():
         "kpos": table_kpos(agg),
         "feature_recovery": table_feature_recovery(agg),
     }
-    populate(blocks)
+    populate(RECORD, blocks)
 
-    STATS_OUT.write_text(json.dumps({
-        "source": "results/leaderboard.jsonl", "n_cells": len(rows), "F": F,
-        "gating_ceilings": ceil,
-        "agg": {f"{k[0]}|kpos{k[1]}|{k[2]}|T{k[3]}|d{k[4]}": v for k, v in agg.items()},
-    }, indent=2))
-    print(f"[stats] -> {STATS_OUT.relative_to(ROOT)}")
+    base = {"source": "results/leaderboard.jsonl", "n_cells": len(rows), "F": F,
+            "gating_ceilings": ceil}
+    record.write_stats(STATS_OUT, base, agg,
+                       lambda k: f"{k[0]}|kpos{k[1]}|{k[2]}|T{k[3]}|d{k[4]}", ROOT)
 
 
 if __name__ == "__main__":

@@ -20,25 +20,26 @@ curve normalizes each per-Ω-class recall to its per-class oracle.
 
 from __future__ import annotations
 
-import json
-import re
-from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
+
+from explorations.synthetic import figs, record
+from explorations.synthetic.figs import frontier_series, save_fig
+from explorations.synthetic.record import aggregate, fmt, load_rows, populate as _populate
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 LEADERBOARD = ROOT / "results" / "leaderboard.jsonl"
 FIG_DIR = HERE / "figs"
 RES_DIR = HERE / "results"
-GATING = RES_DIR / "frequency_gating_stats.json"
 STATS_OUT = RES_DIR / "frequency_bench_stats.json"
 RECORD = HERE / "bench_record.md"
 CIRCLE = "toy_cyclic_circle_M101_d128"
 RANDOM = "toy_cyclic_random_M101_d128"
 PROTOCOL = "1.2.0"
 N_STEPS_GRID = 6000
+KEY_FIELDS = ("ds", "kind", "k_pos", "arch", "T", "d_sae")
 
 M = 101
 OMEGA = [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
@@ -68,70 +69,18 @@ COLORS = {
     ("spectral_txc", 8): "#f16913", ("spectral_txc", 16): "#a63603",
 }
 TCOLOR = {2: "#9ecae1", 4: "#4292c6", 8: "#2171b5", 16: "#08306b"}
-MARK = {1: "o", 2: "s", 4: "^", 8: "D", 16: "P"}
-
 # Band-granularity comparators (matched budget k_win=k_pos·T): 1/2/4 bands.
 BAND_MODES = [("spectral_txc_full", "1-band (vanilla DCT)", "#9e9ac8"),
               ("spectral_txc_dcac", "2-band (DC/AC)", "#fd8d3c"),
               ("spectral_txc", "4-band (multiband)", "#a63603")]
-
-PAPER_STYLE = {
-    "figure.dpi": 120, "savefig.dpi": 300, "savefig.bbox": "tight",
-    "font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11.5,
-    "xtick.labelsize": 10, "ytick.labelsize": 10, "legend.fontsize": 8.5,
-    "axes.spines.top": False, "axes.spines.right": False, "axes.axisbelow": True,
-    "axes.grid": True, "grid.alpha": 0.16, "grid.linewidth": 0.7,
-    "legend.frameon": False, "lines.linewidth": 2.0, "lines.markersize": 6,
-    "figure.facecolor": "white", "mathtext.default": "regular",
-}
 
 
 def label(arch, T):
     return f"{LABEL[arch]} (per-token)" if (arch, T) in PER_TOKEN else f"{LABEL[arch]} (T={T})"
 
 
-# ── canonical source: the leaderboard ──────────────────────────────────
-
-def load_rows():
-    rows = []
-    for line in LEADERBOARD.read_text().splitlines():
-        if not line.strip():
-            continue
-        r = json.loads(line)
-        if r.get("datasource") not in (CIRCLE, RANDOM):
-            continue
-        if r.get("evaluator_protocol_version") != PROTOCOL:
-            continue
-        ec = r.get("eval_cfg") or {}
-        if ec.get("smoke"):
-            continue
-        n_steps = int(r.get("training_cfg", {}).get("n_steps", 0))
-        if n_steps not in (0, N_STEPS_GRID):
-            continue
-        ov = r.get("training_cfg", {}).get("arch_hparams_override") or {}
-        rows.append({"ds": r["datasource"], "arch": r["arch"], "T": int(ov.get("T", 1)),
-                     "d_sae": int(ov.get("d_sae")),
-                     "k_pos": int(ec.get("k_pos", ov.get("k_pos", 1))),
-                     "seed": int(r["seed"]),
-                     "kind": "trained" if n_steps > 0 else "untrained", "m": r["metrics"]})
-    return rows
-
-
-def aggregate(rows):
-    """(ds, kind, k_pos, arch, T, d_sae) -> {metric: (mean, std, n)} over seeds."""
-    buck = defaultdict(lambda: defaultdict(list))
-    for r in rows:
-        key = (r["ds"], r["kind"], r["k_pos"], r["arch"], r["T"], r["d_sae"])
-        for m, v in r["m"].items():
-            if v is not None and np.isfinite(v):
-                buck[key][m].append(float(v))
-    return {k: {m: (float(np.mean(vs)), float(np.std(vs)), len(vs)) for m, vs in d.items()}
-            for k, d in buck.items()}
-
-
 def g(agg, ds, kind, kpos, arch, T, d, metric="velocity_recovery"):
-    c = agg.get((ds, kind, kpos, arch, T, d))
-    return c[metric] if c and metric in c else (float("nan"), float("nan"), 0)
+    return record.get(agg, (ds, kind, kpos, arch, T, d), metric)
 
 
 def sf_curve(agg, ds, arch, T, d, *, normalized=True):
@@ -171,16 +120,9 @@ def fig_main(agg, plt):
     ax.axhline(0.0, color="#999", ls="--", lw=1.1)
     ax.text(34, 0.02, "chance floor (per-token DPI + raw-linear)", color="#777",
             fontsize=8, va="bottom")
-    for arch, T in ARCH_T:
-        xs, ys, es = [], [], []
-        for d in D_SAES:
-            mm = g(agg, CIRCLE, "trained", 1, arch, T, d, "velocity_recovery")
-            if mm[2]:
-                xs.append(d); ys.append(mm[0]); es.append(mm[1])
-        if xs:
-            ls = "--" if (arch, T) in PER_TOKEN else "-"
-            ax.errorbar(xs, ys, yerr=es, marker=MARK[T], ms=6, lw=1.9, ls=ls,
-                        color=COLORS[(arch, T)], capsize=2, elinewidth=1, label=label(arch, T))
+    frontier_series(ax, ARCH_T, D_SAES,
+                    lambda a, T, d: g(agg, CIRCLE, "trained", 1, a, T, d, "velocity_recovery"),
+                    COLORS, PER_TOKEN, label, ms=6, lw=1.9, capsize=2, elinewidth=1)
     ax.set_xscale("log", base=2); ax.set_xticks(D_SAES + [MEMO_THRESH])
     ax.set_xticklabels([str(d) for d in D_SAES] + ["1010"])
     ax.set_xlim(28, 1200); ax.set_ylim(*ylim)
@@ -382,27 +324,18 @@ def _bands_table(agg):
 
 
 def _save(fig, plt, name):
-    for ext, dpi in [("pdf", None), ("png", 200), ("thumb.png", 70)]:
-        fig.savefig(FIG_DIR / f"{name}.{ext}", dpi=dpi)
-    plt.close(fig)
-    print(f"[fig] {FIG_DIR.name}/{name}.{{pdf,png}}")
+    save_fig(fig, FIG_DIR, name, plt)
 
 
 # ── tables + headline ──────────────────────────────────────────────────
 
-def _f(t, dec=3):
-    m, s, n = t
-    return "—" if not n else f"{m:.{dec}f}"
+_f = fmt
 
 
 def _frontier_table(agg, ds, metric):
-    h = ("| arch / T | " + " | ".join(f"d={d}" for d in D_SAES) + " |\n"
-         "|---|" + "|".join("---" for _ in D_SAES) + "|\n")
-    for arch, T in ARCH_T:
-        cells = " | ".join(_f(g(agg, ds, "trained", 1, arch, T, d, metric)) for d in D_SAES)
-        name = label(arch, T) if (arch, T) in PER_TOKEN else f"**{label(arch,T)}**"
-        h += f"| {name} | {cells} |\n"
-    return h.rstrip()
+    return record.frontier_table(
+        ARCH_T, D_SAES, lambda a, T, d: g(agg, ds, "trained", 1, a, T, d, metric),
+        label, bold_pred=lambda a, T: (a, T) not in PER_TOKEN)
 
 
 def _Sf_table(agg):
@@ -533,27 +466,16 @@ def headline_block(agg):
 
 
 def populate(blocks):
-    if not RECORD.exists():
-        print(f"[warn] {RECORD} missing — populate skipped"); return
-    txt = RECORD.read_text(); filled = 0
-    for tag, content in blocks.items():
-        pat = re.compile(rf"(<!-- BEGIN AUTO:{tag} -->).*?(<!-- END AUTO:{tag} -->)", re.DOTALL)
-        if not pat.search(txt):
-            print(f"[warn] AUTO:{tag} marker not found"); continue
-        txt = pat.sub(lambda m: f"{m.group(1)}\n{content}\n{m.group(2)}", txt); filled += 1
-    RECORD.write_text(txt)
-    print(f"[record] populated {filled}/{len(blocks)} AUTO block(s) in {RECORD.name}")
+    _populate(RECORD, blocks)
 
 
 def main():
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    plt.rcParams.update(PAPER_STYLE)
+    plt = figs.use_agg_style()
     FIG_DIR.mkdir(exist_ok=True); RES_DIR.mkdir(exist_ok=True)
 
-    rows = load_rows()
-    agg = aggregate(rows)
+    rows = load_rows(LEADERBOARD, [CIRCLE, RANDOM], PROTOCOL,
+                     n_steps_keep={0, N_STEPS_GRID}, with_ds=True)
+    agg = aggregate(rows, KEY_FIELDS)
     n_tr = sum(1 for r in rows if r["kind"] == "trained")
     print(f"[render] {len(rows)} leaderboard cells ({n_tr} trained)")
 
@@ -577,12 +499,10 @@ def main():
     }
     populate(blocks)
 
-    STATS_OUT.write_text(json.dumps({
-        "source": "results/leaderboard.jsonl", "n_cells": len(rows),
-        "M": M, "OMEGA": OMEGA, "chance": CHANCE, "memorization_threshold": MEMO_THRESH,
-        "agg": {f"{k[0]}|{k[1]}|kpos{k[2]}|{k[3]}|T{k[4]}|d{k[5]}": v for k, v in agg.items()},
-    }, indent=2))
-    print(f"[stats] -> {STATS_OUT.relative_to(ROOT)}")
+    base = {"source": "results/leaderboard.jsonl", "n_cells": len(rows),
+            "M": M, "OMEGA": OMEGA, "chance": CHANCE, "memorization_threshold": MEMO_THRESH}
+    record.write_stats(STATS_OUT, base, agg,
+                       lambda k: f"{k[0]}|{k[1]}|kpos{k[2]}|{k[3]}|T{k[4]}|d{k[5]}", ROOT)
 
 
 if __name__ == "__main__":
