@@ -166,10 +166,15 @@ def frequency_metrics(
     oracle = float((opred == y_ev).mean())
     oracle_recall = _per_class_recall(y_ev, opred, n_classes)
 
-    denom = max(oracle - chance, 1e-6)
-    out["velocity_recovery"] = float((bal - chance) / denom)   # normalized headline
+    # Normalize to [chance, 1] (the changepoint convention). The per-T periodogram
+    # oracle is kept as a SEPARATE reference (velocity_oracle) — it is NOT the
+    # denominator, because for T=1 the oracle IS chance (a 1-token window carries
+    # no frequency info) so an oracle denominator is degenerate. The achievable
+    # ceiling is shown as a reference line / the S(f) oracle curve instead.
+    norm = 1.0 - chance
+    out["velocity_recovery"] = float((bal - chance) / norm)    # [chance, 1] headline
     out["velocity_balacc"] = bal
-    out["velocity_oracle"] = oracle
+    out["velocity_oracle"] = oracle                            # per-T periodogram ref
     out["velocity_chance"] = floor
 
     # ── S(f): per-Ω-class recall (probe + oracle), raw for the renderer ──
@@ -182,7 +187,7 @@ def frequency_metrics(
         for b, (s, e) in enumerate(model.band_of_features()):
             bb, _, _ = _logistic_probe(z_tr[:, s:e], y_tr, z_ev[:, s:e], y_ev,
                                        n_classes=n_classes, seed=seed + b)
-            out[f"band{b}_recovery"] = float((bb - chance) / denom)
+            out[f"band{b}_recovery"] = float((bb - chance) / norm)
             out[f"band{b}_balacc"] = bb
 
     return out

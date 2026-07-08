@@ -45,6 +45,7 @@ OMEGA = [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
 FREQS = [y / M for y in OMEGA]
 CHANCE = 1.0 / len(OMEGA)
 MEMO_THRESH = len(OMEGA) * M          # |Ω|·M = 1010
+MEMO_DSAE = 2048                       # the > |Ω|·M memorization-demo width
 D_SAES = [32, 64, 101, 256]
 ANCHOR = 101
 T_WINDOW = [2, 4, 8, 16]
@@ -187,24 +188,27 @@ def fig_main(agg, plt):
 
 
 def fig_Sf(agg, plt):
-    """THE deliverable: S(f) frequency response per window T (crosscoders, anchor)."""
+    """THE deliverable: S(f) frequency response per window T (crosscoders, anchor).
+
+    Raw per-Ω-class velocity recall (the probe) vs f=Y/M, with the periodogram
+    oracle overlaid as the achievable ceiling and the Rayleigh cutoff 1/T marked.
+    """
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.6), sharey=True)
+    pt = [g(agg, CIRCLE, "trained", 1, "batchtopk_sae", 1, ANCHOR, f"vel_recall_c{c}")[0]
+          for c in range(len(OMEGA))]
     for ax, arch in zip(axes, CROSSCODERS):
         for T in T_WINDOW:
-            ys = sf_curve(agg, CIRCLE, arch, T, ANCHOR, normalized=True)
+            ys = sf_curve(agg, CIRCLE, arch, T, ANCHOR, normalized=False)
             ax.plot(FREQS, ys, "o-", color=TCOLOR[T], label=f"T={T}")
-            ax.axvline(1.0 / T, color=TCOLOR[T], ls=":", lw=0.9, alpha=0.6)
-        # per-token reference (flat ~0)
-        pt = [g(agg, CIRCLE, "trained", 1, "batchtopk_sae", 1, ANCHOR, f"vel_recall_c{c}")[0]
-              for c in range(len(OMEGA))]
-        oc = oracle_curve(agg, CIRCLE, arch, 16, ANCHOR)
-        ptn = [(p - CHANCE) / max(o - CHANCE, 1e-6) for p, o in zip(pt, oc)]
-        ax.plot(FREQS, ptn, "--", color="#238b45", lw=1.3, label="per-token")
-        ax.axhline(0, color="#999", ls="--", lw=0.8)
-        ax.set_xlabel("frequency  $f = Y/M$"); ax.set_ylim(-0.1, 1.1)
+            ax.axvline(1.0 / T, color=TCOLOR[T], ls=":", lw=0.9, alpha=0.5)
+        oc = oracle_curve(agg, CIRCLE, arch, 16, ANCHOR)      # full-resolution oracle
+        ax.plot(FREQS, oc, "-", color="0.4", lw=1.2, alpha=0.7, label="oracle (T=16)")
+        ax.plot(FREQS, pt, "--", color="#238b45", lw=1.3, label="per-token")
+        ax.axhline(CHANCE, color="#999", ls=":", lw=0.9)
+        ax.set_xlabel("frequency  $f = Y/M$"); ax.set_ylim(-0.03, 1.05)
         ax.set_title(f"{LABEL[arch]}", loc="left", fontsize=11)
-        ax.legend(fontsize=8, loc="lower right")
-    axes[0].set_ylabel("S(f)  (recovery / oracle, per Ω-class)")
+        ax.legend(fontsize=7.5, loc="lower right")
+    axes[0].set_ylabel("per-Ω-class velocity recall  $S(f)$")
     fig.suptitle("Frequency response $S(f)$: high-pass, Rayleigh cutoff $\\approx 1/T$ "
                  "(dotted)  —  circle, $d_{sae}=M=101$", fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
@@ -297,10 +301,9 @@ def fig_memorization(agg, plt):
     for ds, mk, lab in [(CIRCLE, "o", "circle"), (RANDOM, "s", "random (null)")]:
         for arch in ("txc_batchtopk_pre", "spectral_txc"):
             xs, ys = [], []
-            for d in D_SAES + [MEMO_THRESH * 2]:
-                mm = g(agg, ds, "trained" if d <= 256 else "memo", 1, arch, 16, d, "velocity_recovery")
-                if not mm[2]:
-                    mm = g(agg, ds, "memo", 1, arch, 16, d, "velocity_recovery")
+            for d in D_SAES + [MEMO_DSAE]:
+                kind = "memo" if d == MEMO_DSAE else "trained"
+                mm = g(agg, ds, kind, 1, arch, 16, d, "velocity_recovery")
                 if mm[2]:
                     xs.append(d); ys.append(mm[0])
             if xs:
