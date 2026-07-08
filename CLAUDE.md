@@ -6,6 +6,12 @@ work happens at the repo root.
 
 **Read order on every session:**
 
+> **Check `briefings/` first for an active task brief.** Task handoffs
+> (refactors, cleanups, bench ports) live as one self-contained file each under
+> `briefings/` (see `briefings/README.md`). If one is `status: active` and
+> matches your task, execute it — then **delete it** (briefings don't
+> accumulate; the record is the git history + artifacts, not a leftover brief).
+
 > **Picking up in-progress synthetic-benchmark work (e.g. after a compact)?**
 > Read `experiments/explorations/synthetic/STATUS.md` **first** — the single living briefing
 > of the current redo initiative (what's active, the locked design, the next
