@@ -151,3 +151,29 @@ def test_spectral_txc_full_band_matches_window_crosscoder_shape() -> None:
     from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK
     m = SpectralTXCBatchTopK(d_in=64, d_sae=40, T=8, k_pos=2, bands="full")
     assert m.n_bands == 1 and m.k_per_band == [16] and m.h_per_band == [40]
+
+
+# ── evaluator dispatch (velocity_recovery + S(f) + bands) ───────────────
+
+
+def test_frequency_metrics_keys_token_and_window() -> None:
+    from temp_bench.archs.batchtopk_sae import BatchTopKSAE
+    from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK
+    from temp_bench.evals.frequency_recovery import frequency_metrics
+
+    data = cyclic_tones(embedding="circle", M=101, d_in=128, sigma=0.1,
+                        seq_len=64, n_seqs=512, seed=0)
+    base = {"velocity_recovery", "velocity_balacc", "velocity_oracle",
+            "velocity_chance"} | {f"vel_recall_c{c}" for c in range(10)} \
+        | {f"vel_oracle_c{c}" for c in range(10)}
+    # per-token: no band keys
+    out = frequency_metrics(BatchTopKSAE(d_in=128, d_sae=64, k_pos=1),
+                            data, eval_window_L=32, n_windows=64)
+    assert base <= set(out)
+    assert not any(k.startswith("band") for k in out)
+    # window spectral: adds per-band keys, oracle in [chance, 1]
+    sp = SpectralTXCBatchTopK(d_in=128, d_sae=101, T=8, k_pos=1, bands="multiband")
+    outw = frequency_metrics(sp, data, eval_window_L=32, n_windows=64)
+    assert base <= set(outw)
+    assert {"band0_recovery", "band1_recovery"} <= set(outw)
+    assert 0.1 - 1e-6 <= outw["velocity_oracle"] <= 1.0 + 1e-6

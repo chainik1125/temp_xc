@@ -230,6 +230,16 @@ class SyntheticRecovery(Evaluator):
             from temp_bench.evals.changepoint_recovery import changepoint_metrics
             out.update(changepoint_metrics(model, data, eval_window_L=L))
 
+        # Cyclic-tone velocity recovery + S(f) add-on (autoresearch #3). Only
+        # fires for the toy_cyclic_* datasources, which expose velocity_labels in
+        # `extra`. No-op (byte-identical metrics) for every other bench →
+        # protocol stays 1.2.0.
+        if getattr(data, "extra", None) and "velocity_labels" in data.extra:
+            from temp_bench.evals.frequency_recovery import frequency_metrics
+            n_windows = 128 if spec.smoke else 1024
+            out.update(frequency_metrics(model, data, eval_window_L=L,
+                                         n_windows=n_windows))
+
         return out
 
     def primary_metric(self) -> str:
