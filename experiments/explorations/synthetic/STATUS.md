@@ -24,21 +24,37 @@ Last updated: 2026-07-08.
   TXC-post has a real access residual (τ 0.20 at T=2) — trained gain is
   learning on top of it. Full result:
   [`changepoint/bench_record.md`](changepoint/bench_record.md).
-- **ACTIVE (queued for RunPod, 2026-07-08): frequency / cyclic-tone bench —
-  port of Dmitry's FrequencyBench (`origin/dmitry-spectral-sprint2`).** The one
-  uncovered axis (periodic/frequency; the DC/AC `frequency_lens` home). Locked
-  design + open decisions + order-of-work in
-  [`frequency/bench_spec.md`](frequency/bench_spec.md). **Scope:** task +
-  spectral arch — a `cyclic_tones()` generator (circle-embedding tones + a
-  random-embedding symmetry null), a NEW `spectral_txc` DCT-band crosscoder
-  rebuilt on our BatchTopK fair backbone, a `freq_response` evaluator
-  (periodogram oracle, per-frequency `S(f)`, Rayleigh ceilings), and a grid vs
-  the existing arch family. **Synthetic-first discriminator** (like
-  signed_motion; no measure→mirror — real LM periodicity anchor deferred).
-  **Next action: run `frequency/gating.py` FIRST** (settles ground-truth `F` for
-  the circle mode, `M/d_in/Ω/W/L`, and confirms per-token≈chance / periodogram
-  oracle / flat null), then freeze the spec, then generator→arch→evaluator→grid
-  →record. **Pure-synthetic ⇒ NO HF token needed.**
+- **ACTIVE (RunPod, 2026-07-08): frequency / cyclic-tone bench — port of
+  Dmitry's FrequencyBench (`origin/dmitry-spectral-sprint2`).** The one
+  uncovered axis (periodic/frequency; the DC/AC `frequency_lens` home).
+  **Synthetic-first discriminator** (like signed_motion; no measure→mirror —
+  real LM periodicity anchor deferred). Spec + frozen decisions:
+  [`frequency/bench_spec.md`](frequency/bench_spec.md).
+  **PROGRESS:**
+  - **§ 8 gating PASS** (`frequency/gating.py` → `results/frequency_gating_stats.json`,
+    commit `9d074219`). Settled + frozen (spec amendments A1–A4): `M=101` prime,
+    `d_in=128`, `Ω={0,1,2,4,8,16,24,32,40,50}` (chance 0.1), `σ=0.10`,
+    `seq_len=64`, `L=32`, **`T∈{2,4,8,16}`** (extended from {2,4,8} — the
+    resolvable band needs T=16 = the sprint's W). Circle codebook = M circle
+    atoms (2-D; `d_sae` anchors on M, capability via NMSE not eauc); random = M
+    orthonormal (F=M). Memorization threshold `|Ω|·M=1010`; `d_sae` sweep
+    `{32,64,101,256}`. Gate facts: per-token velocity = chance (0.10, provable);
+    **raw-linear window ≈ chance** (circle 0.11 — velocity is 2nd-moment, not
+    linear; a window win = nonlinear learning, amendment A4); circle `S(f)`
+    high-pass/Rayleigh (T=2 resolves only high-Y, all-1.00 by T=16); **random
+    null FLAT** (per-Ω-class oracle range 0.000 — no frequency axis).
+  - **Built (uncommitted → next commits):** `cyclic_tones()` generator
+    (`src/temp_bench/data/synthetic.py`, circle+random) and the `spectral_txc`
+    DCT-band BatchTopK arch (`src/temp_bench/archs/spectral_txc.py` + archs.yaml)
+    — both smoke-pass; registries load (11 archs), pytest green (64).
+  - **NEXT:** datasource entries (`toy_cyclic_circle_*` / `toy_cyclic_random_*`)
+    + generator tests; `frequency_recovery` evaluator add-on (velocity_recovery
+    multinomial probe, per-Ω `S(f)`, per-branch band probes, NMSE); `run_grid.py`
+    + full grid; single-source record + figs.
+  **Scope LOCKED (no multi-lane / ConvDict without sign-off).** Pure-synthetic ⇒
+  NO HF token. Prime directive: a *tie* with a cleaner band decomposition is a
+  complete, reportable outcome (the decisive multiband win lives under
+  superposition, scoped out).
 - Other options (not started): the § 6 roadmap (heavy-tailed/sticky changepoint
   — gated on a better labeler; EM instantiation — gated on a paid judge), an
   atom-level case study of the TXC-post boundary pair-atoms (record § 9), or a

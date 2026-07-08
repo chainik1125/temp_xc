@@ -1,9 +1,10 @@
 # Synthetic benchmark spec — cyclic-tone frequency response (periodic axis)
 
-**Status:** spec / preregistration — **NOT yet run. Gating due-diligence
-(§ 8) pending.** Frozen-pending-gating: the § 8 gating run settles the three
-open design decisions below, then this spec is frozen (dated amendments only,
-like changepoint A1–A4).
+**Status:** **FROZEN 2026-07-08** — § 8 gating due-diligence **PASS**
+(`results/frequency_gating_stats.json`, commit `9d074219`). The three open
+design decisions are settled and recorded as dated pre-run **amendments A1–A4**
+(§ 10 below); the § 3/§ 5/§ 8 body is otherwise unchanged. From here the spec is
+frozen: further changes are dated amendments only (like changepoint A1–A4).
 
 **Provenance + honest framing.** This is a **synthetic-first architectural
 discriminator** for the **periodic / frequency** axis — the one axis the suite
@@ -166,6 +167,66 @@ Write `frequency/gating.py` → `results/frequency_gating_stats.json`. Confirm:
    `W` (sprint: `{0,1,2,4,8,16,24,32,40,50}` for M=101, W=16).
 3. **`W` / `L` / `T` reconciliation** — the emission window `W` vs the common
    tiled eval `L` vs the arch windows `T ∈ {2,4,8}` (powers of two dividing L).
+
+## 10. Pre-run amendments (dated; settle §§ 3/8 open decisions)
+
+All four are the direct output of the § 8 gating run (`gating.py` →
+`results/frequency_gating_stats.json`, commit `9d074219`), which **passed every
+gate**. They freeze the settled numbers; nothing here changes the preregistered
+predictions (§ 7).
+
+**A1 (2026-07-08) — the settled `M / d_in / Ω / σ / seq_len / L / T`.**
+`M = 101` (prime → the ratio-invariance null is a clean 2-orbit structure
+`{0} ∪ {1..M-1}`); `d_in = 128` (≥ `M` for the random null, **unified across
+both modes** — the periodogram oracle projects onto the 2-D circle plane via the
+true `R`, so in-plane oracle SNR is `1/σ`, *independent of `d_in`*; only the SAE
+reconstruction task feels `σ√d_in`); `Ω = {0,1,2,4,8,16,24,32,40,50}` (|Ω| = 10,
+chance = 0.1; the sprint ladder, DC→Nyquist `f = Y/M ∈ [0, 0.495]`); `σ = 0.10`
+(σ-sweep {0.05,0.1,0.2,0.25}: the circle oracle on the resolvable band is 1.00
+across all — σ is not load-bearing; 0.10 is the middle choice); `seq_len = 64`
+(family convention; the tone spans the whole sequence, velocity constant/seq);
+`L = 32`; **`T ∈ {2,4,8,16}`** — extended from the spec's `{2,4,8}` because the
+gating oracle showed the resolvable band at `T ≤ 8` is too narrow to exhibit the
+full high-pass `S(f)` (the sprint's single fixed window `W = 16` maps to our
+`T = 16` cell): per-Ω-class periodogram oracle at T=2 is
+`[0.58,0.17,0.25,0.48,0.77,0.92,0.92,0.92,0.94,0.98]` (only high-Y resolved),
+widening to all-1.00 at T=16. `T = 16` divides `L = 32` (2 tiles) — still within
+the power-of-two tiling convention.
+
+**A2 (2026-07-08) — ground truth: codebook / `F` / `d_sae` anchor /
+memorization.** Circle mode: the reconstruction codebook is the **`M` circle
+atoms** `{u_a}` — a **2-D object** (they lie on one circle in a 2-plane), so
+`eauc` (cosine-AUC) is ill-defined (adjacent atoms are nearly parallel,
+`cos 2π/101 ≈ 0.998`) and capability is read off **`NMSE`** + codebook/circle
+recovery instead. `d_sae` is anchored on **`M = 101`**, NOT on 2. Random mode:
+`F = M` orthonormal directions (like signed_motion) → `eauc` is meaningful.
+**Memorization threshold = `|Ω|·M = 1010`** distinct clean `(B,Y)` windows (same
+for every `T ≥ 2`); the memorization-free per-tile probe keeps `d_sae < 1010`.
+Settled `d_sae` sweep: **{32, 64, 101, 256}** — scarce `{32,64}` + at-`F` `{101}`
++ over-complete `{256}`, all `< |Ω|·M`; mark both `M` and `|Ω|·M` on the axis.
+
+**A3 (2026-07-08) — the `spectral_txc` per-band budget (fairness).** The DCT
+bands are built **adaptively per `T`** (multiband: DC `{0}` + up to 3 contiguous
+AC groups — `{1-5},{6-10},{11-15}` at `T=16`, degenerating to DC/AC at `T=2`).
+BatchTopK is applied **per band** (equal-L0-per-band guarantee), with total
+window budget `k_win = k_pos·T` split across bands. This puts `spectral_txc` at
+the **same total-per-window support as `txc_batchtopk_pre`** (whose shared code
+also supports up to `k_pos·T` atoms), so **spectral-vs-pre is the clean
+band-structure test** at matched budget; `txc_batchtopk_post` (budget `k_pos`
+per window) is the density-corrected monolithic companion. The sprint's plain
+per-branch TopK is ported to per-branch BatchTopK→JumpReLU + AuxK + Parseval
+(coefficient-L2) decoder unit-norm + grad-orth.
+
+**A4 (2026-07-08) — the raw-linear window control (a *new* reported ceiling).**
+Gating adds a control beyond § 6: a **linear (multinomial-logistic) probe on the
+raw concatenated `T`-tile** recovers velocity at **≈ chance** for the circle mode
+(0.11 at every `T`, vs chance 0.10), because `E[x_t | Y] ≈ 0` (the circle is
+centred, `B` uniform) so the velocity lives in the **2nd moment**, not the
+class-conditional mean. Consequence (as in changepoint/signed-motion): a window
+*win* on a trained code is nonlinear feature-learning, not linear access; the
+untrained-encoder control checks the nonlinear-access residual. (Note: the
+*random* null shows a mild rise of this raw-linear ceiling with `T` — 0.11→0.18
+— a symbol-identity linear signal, not a frequency one; reported, not gated.)
 
 ## 9. Reproduction (when built)
 
