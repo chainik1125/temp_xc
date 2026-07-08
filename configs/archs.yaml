@@ -110,6 +110,27 @@ archs:
       = k_win//T), decode all T positions. Corrects the k_win=k_pos·T
       over-count.
 
+  spectral_txc:
+    class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 8
+      k_pos: 20
+      bands: multiband
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 101 }
+    notes: |
+      DCT-band window crosscoder on the BatchTopK fair backbone (frequency
+      bench, autoresearch #3). Encoder/decoder kernels constrained to DCT bands
+      (multiband: 4 bands DC/low/mid/high, adapted to T; dcac: 2 bands; full:
+      vanilla). Per-band BatchTopK (equal-L0-per-band guarantee); total window
+      budget k_win = k_pos·T split across bands (sits at txc_pre density).
+      Parseval decoder unit-norm on coefficients. Port of Dmitry's SpectralTXC
+      (origin/dmitry-spectral-sprint2) — plain TopK → our BatchTopK+AuxK.
+
   # ── Ours: baselines ─────────────────────────────────────────────────
 
   topk_sae:

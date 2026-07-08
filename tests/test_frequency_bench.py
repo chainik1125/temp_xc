@@ -108,3 +108,46 @@ def test_other_generators_do_not_trip_frequency_dispatch() -> None:
     generator (also extra-bearing) must not carry it."""
     cp = semi_markov_modes(seq_len=8, n_seqs=8, seed=0)
     assert "velocity_labels" not in cp.extra
+
+
+# ── spectral_txc arch (DCT-band BatchTopK) ──────────────────────────────
+
+
+def test_spectral_txc_bands_adapt_to_T() -> None:
+    from temp_bench.archs.spectral_txc import _build_bands
+    # multiband degenerates to the available DCT indices at small T
+    assert _build_bands(2, "multiband") == [[0], [1]]
+    assert _build_bands(8, "multiband") == [[0], [1, 2], [3, 4], [5, 6, 7]]
+    assert _build_bands(16, "multiband") == [[0], [1, 2, 3, 4, 5],
+                                             [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]]
+    assert _build_bands(8, "dcac") == [[0], [1, 2, 3, 4, 5, 6, 7]]
+    assert _build_bands(8, "full") == [[0, 1, 2, 3, 4, 5, 6, 7]]
+
+
+def test_spectral_txc_shapes_budget_and_parseval() -> None:
+    from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK
+    for T in (2, 4, 8, 16):
+        m = SpectralTXCBatchTopK(d_in=128, d_sae=101, T=T, k_pos=1, bands="multiband")
+        # per-band budget sums to the total window budget k_win = k_pos·T
+        assert sum(m.k_per_band) == 1 * T
+        assert sum(m.h_per_band) == 101
+        x = torch.randn(64, T, 128)
+        z = m.encode(x)
+        assert z.shape == (64, 1, 101)
+        # L0 == k_win (each band contributes its per-window budget)
+        assert abs(float((z != 0).float().sum(-1).mean()) - T) < 1e-6
+        assert m.decode(z).shape == (64, T, 128)
+        # Parseval decoder unit-norm: time-domain atom L2 == coefficient L2 == 1
+        m.post_step()
+        W = m.decoder_directions()          # averaged over T (not unit-norm itself)
+        full = m._dec_full()                # (d_sae, T, d_in) time-domain kernels
+        norms = full.flatten(1).norm(dim=1)
+        assert torch.allclose(norms, torch.ones_like(norms), atol=1e-4)
+        assert W.shape == (101, 128)
+
+
+def test_spectral_txc_full_band_matches_window_crosscoder_shape() -> None:
+    """The 'full' single-band mode is the vanilla DCT crosscoder (1 band)."""
+    from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK
+    m = SpectralTXCBatchTopK(d_in=64, d_sae=40, T=8, k_pos=2, bands="full")
+    assert m.n_bands == 1 and m.k_per_band == [16] and m.h_per_band == [40]
