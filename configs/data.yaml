@@ -169,7 +169,49 @@ datasources:
       mode-symmetry. Spec: experiments/explorations/synthetic/changepoint/
       bench_spec.md (+ amendments A1-A4); gating stats in changepoint/results/.
 
-  # ── Real-LM § 5 ────────────────────────────────────────────────────
+  toy_cyclic_circle_M101_d128:
+    category: synthetic
+    generator: cyclic_tones
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      embedding: circle
+      d_in: 128
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #3 frequency (HEADLINE). Cyclic-tone bench: symbol walks Z_M
+      at hidden velocity Y — Q_t=(B+Y·t) mod M — embedded on a circle
+      (u_a=R·[cos,sin], R a random d_in×2 isometry) so Y is a temporal TONE at
+      f=Y/M cycles/token; ML oracle = periodogram peak-pick (project via R →
+      complex tone → argmax|DFT| over Ω). Label = index into Ω (chance 1/10).
+      Velocity invisible per-token (Q_t|Y uniform ⇒ I(Y;x_t)=0 DPI) AND to a
+      raw-linear window reader (E[x_t|Y]≈0 ⇒ velocity is 2nd-moment). Codebook =
+      M circle atoms (2-D; d_sae anchors on M=101, capability via NMSE — eauc
+      ill-defined). Memorization |Ω|·M=1010. Circle S(f) is high-pass/Rayleigh
+      (resolvable band f≳1/T). Frozen spec: experiments/explorations/synthetic/
+      frequency/bench_spec.md (amendments A1-A4); gating in
+      frequency/results/frequency_gating_stats.json.
+
+  toy_cyclic_random_M101_d128:
+    category: synthetic
+    generator: cyclic_tones
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      embedding: random
+      d_in: 128
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #3 frequency SYMMETRY NULL (ratio-invariance control). Same
+      cyclic walk, but M orthonormal directions (F=M) instead of the circle. For
+      prime M=101 the relabel a↦c·a maps Y↦cY bijectively over Z_M* ⇒ all nonzero
+      velocities are one orbit ⇒ FLAT frequency response (gating: per-Ω-class
+      oracle range 0.000). Separates "frequency structure" (circle high-pass)
+      from "symbol identity" (random flat). d_in=128 ≥ M. Spec §§ 2/6/7 P4.
 
   gemma_2_2b_it_l13_fineweb_24k128:
     category: real_lm

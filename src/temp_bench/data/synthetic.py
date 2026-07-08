@@ -305,6 +305,133 @@ def signed_motion(
     )
 
 
+# ── Cyclic-tone frequency bench (autoresearch #3 — periodic axis) ──────
+
+
+def cyclic_tones(
+    *,
+    M: int = 101,
+    omega: tuple = (0, 1, 2, 4, 8, 16, 24, 32, 40, 50),
+    embedding: str = "circle",
+    d_in: int = 128,
+    sigma: float = 0.10,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Cyclic-tone frequency bench — the periodic axis (frequency/bench_spec.md).
+
+    Port of Dmitry's FrequencyBench (``origin/dmitry-spectral-sprint2``) onto our
+    fair backbone. A symbol walks a cyclic alphabet ``Z_M`` at a **hidden
+    velocity ``Y``**::
+
+        Q_t = (B + Y·t) mod M,   B ~ Unif(Z_M),   Y ~ Unif(Ω)
+        x_t = u_{Q_t} + sigma · ε_t
+
+    The per-sequence label is the **index into Ω** (the velocity *class*), NOT
+    the velocity value. Two embeddings (settled in gating, spec § 3):
+
+    - **circle (headline):** ``u_a = R·[cos 2πa/M, sin 2πa/M]``, ``R`` a random
+      ``d_in×2`` isometry. Velocity ``Y`` becomes a temporal **tone** at
+      ``f = Y/M`` cycles/token; recovering ``Y`` is single-tone spectral
+      estimation (ML decoder = periodogram peak-pick). The ``M`` symbol atoms
+      lie on a **2-D circle** (NOT orthonormal); the reconstruction codebook is
+      those ``M`` atoms and ``d_sae`` is anchored on ``M`` (not 2). ``eauc`` is
+      ill-defined (adjacent atoms nearly parallel) → capability is read off
+      ``NMSE`` + codebook recovery.
+
+    - **random (symmetry null):** ``M`` orthonormal directions in ``d_in ≥ M``
+      (``F = M``, like signed_motion). For prime ``M`` and an exchangeable frame
+      the relabel ``a ↦ c·a`` maps ``Y ↦ cY`` bijectively over ``Z_M^*`` → all
+      nonzero velocities are one orbit → **flat** frequency response (the
+      ratio-invariance null; verifies "frequency" ≠ "symbol identity").
+
+    Why velocity is invisible per-token & to a linear window reader:
+
+    - **Per-token:** ``B`` uniform ⇒ ``Q_t | Y`` is ``Unif(Z_M)`` for every ``Y``
+      ⇒ ``I(Y; x_t) = 0`` exactly (DPI: no per-token encoder recovers ``Y``).
+    - **Raw-linear window:** ``E[x_t | Y] ≈ 0`` (the circle is centred, ``B``
+      uniform), so the velocity lives in the **2nd moment** (the phase
+      progression), not the class-conditional mean — a linear probe on the raw
+      concatenated tile is at chance too. A window *win* on a trained code is
+      nonlinear feature-learning, not linear access (the untrained control
+      checks the nonlinear-access residual).
+
+    Ground truths exposed (``extra``):
+        velocity_labels: (n_seqs, seq_len)  int64 — Ω class index (const/seq)
+        velocity:        (n_seqs, seq_len)  int64 — Y value (const/seq)
+        phase_labels:    (n_seqs,)          int64 — hidden B ∈ Z_M
+        circle_plane:    (d_in, 2)          — R, the circle plane (None if random)
+        omega, M, embedding, sigma, freq_by_class (Y/M per Ω class)
+    plus ``emission_features`` = the ``M`` symbol atoms ``{u_a}``.
+    """
+    if embedding not in ("circle", "random"):
+        raise ValueError(f"embedding must be 'circle' or 'random', got {embedding!r}")
+    if embedding == "random" and d_in < M:
+        raise ValueError(f"random embedding needs d_in ({d_in}) >= M ({M})")
+    omega = tuple(int(y) for y in omega)
+    if any(y < 0 or y >= M for y in omega):
+        raise ValueError(f"omega values must be in [0, M={M}); got {omega}")
+
+    rng = np.random.default_rng(seed)
+
+    # Embedding: the M symbol atoms {u_a} in R^{d_in}.
+    if embedding == "circle":
+        A = rng.standard_normal((d_in, 2))
+        R, _ = np.linalg.qr(A)                              # (d_in, 2), isometry
+        ang = 2 * np.pi * np.arange(M) / M
+        V = np.stack([np.cos(ang), np.sin(ang)], axis=1)    # (M, 2)
+        U = (V @ R.T).astype(np.float32)                    # (M, d_in), unit-norm rows
+        circle_plane = R.astype(np.float32)
+    else:
+        raw = rng.standard_normal((d_in, M))
+        Qd, _ = np.linalg.qr(raw)
+        U = Qd.T[:M].astype(np.float32)                     # (M, d_in) orthonormal
+        circle_plane = None
+
+    # Hidden latents.
+    lab = rng.integers(0, len(omega), size=n_seqs).astype(np.int64)   # Ω class idx
+    Y = np.asarray(omega, dtype=np.int64)[lab]                        # velocity value
+    B = rng.integers(0, M, size=n_seqs).astype(np.int64)             # phase
+
+    # Symbol trajectory Q_t = (B + Y·t) mod M, then embed.
+    t = np.arange(seq_len)[None, :]
+    Q = (B[:, None] + Y[:, None] * t) % M                            # (n_seqs, seq_len)
+    x = U[Q]                                                          # (n_seqs, seq_len, d_in)
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+    x = x.astype(np.float32)
+
+    # Per-sequence labels broadcast to (n_seqs, seq_len) so the tiled leading-edge
+    # evaluator (shared with changepoint) extracts the constant velocity per tile.
+    vel_lab = np.broadcast_to(lab[:, None], (n_seqs, seq_len)).copy()
+    vel_val = np.broadcast_to(Y[:, None], (n_seqs, seq_len)).copy()
+
+    extra = {
+        "velocity_labels": torch.from_numpy(vel_lab),
+        "velocity": torch.from_numpy(vel_val),
+        "phase_labels": torch.from_numpy(B),
+        "omega": list(omega),
+        "M": int(M),
+        "embedding": embedding,
+        "sigma": float(sigma),
+        "freq_by_class": [float(y) / M for y in omega],
+    }
+    if circle_plane is not None:
+        extra["circle_plane"] = torch.from_numpy(circle_plane)
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(U),          # M symbol atoms (codebook)
+        hidden_features=None,                           # velocity is not a direction
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra=extra,
+    )
+
+
 # ── Self-exciting (Hawkes-style) backtracking bench (autoresearch #1) ──
 
 
@@ -594,6 +721,7 @@ _GENERATORS = {
     "signed_motion": signed_motion,
     "self_exciting": self_exciting,
     "semi_markov_modes": semi_markov_modes,
+    "cyclic_tones": cyclic_tones,
 }
 
 
