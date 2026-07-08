@@ -209,7 +209,13 @@ nonlinear architectural access.
 
 NMSE frontier (the spectral/window winner must also reconstruct the 2-D circle,
 not just recover the latent). `eauc` is ill-defined for the circle (densely
-packed atoms) — NMSE is the capability metric here.
+packed atoms) — NMSE is the capability metric here. The **irreducible noise
+floor** is `σ²·d / (1 + σ²·d) = 0.01·128 / 2.28 ≈ 0.56` (the 2-D signal sits in
+128-D with `σ=0.10` noise), so Spectral (0.55–0.58) and TXC-pre (0.57–0.59) are
+at the **reconstruction ceiling** — Spectral *both* recovers the tone (→1.00)
+*and* reconstructs (capability-vs-artifact ✓). TXC-post (0.73–0.77) sits *above*
+the floor: its 1-atom-per-window budget under-reconstructs even as it recovers
+velocity moderately.
 
 <!-- BEGIN AUTO:nmse_table -->
 | arch / T | d=32 | d=64 | d=101 | d=256 |
