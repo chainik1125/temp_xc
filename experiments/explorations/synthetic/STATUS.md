@@ -24,37 +24,34 @@ Last updated: 2026-07-08.
   TXC-post has a real access residual (τ 0.20 at T=2) — trained gain is
   learning on top of it. Full result:
   [`changepoint/bench_record.md`](changepoint/bench_record.md).
-- **ACTIVE (RunPod, 2026-07-08): frequency / cyclic-tone bench — port of
-  Dmitry's FrequencyBench (`origin/dmitry-spectral-sprint2`).** The one
-  uncovered axis (periodic/frequency; the DC/AC `frequency_lens` home).
-  **Synthetic-first discriminator** (like signed_motion; no measure→mirror —
-  real LM periodicity anchor deferred). Spec + frozen decisions:
-  [`frequency/bench_spec.md`](frequency/bench_spec.md).
-  **PROGRESS:**
-  - **§ 8 gating PASS** (`frequency/gating.py` → `results/frequency_gating_stats.json`,
-    commit `9d074219`). Settled + frozen (spec amendments A1–A4): `M=101` prime,
-    `d_in=128`, `Ω={0,1,2,4,8,16,24,32,40,50}` (chance 0.1), `σ=0.10`,
-    `seq_len=64`, `L=32`, **`T∈{2,4,8,16}`** (extended from {2,4,8} — the
-    resolvable band needs T=16 = the sprint's W). Circle codebook = M circle
-    atoms (2-D; `d_sae` anchors on M, capability via NMSE not eauc); random = M
-    orthonormal (F=M). Memorization threshold `|Ω|·M=1010`; `d_sae` sweep
-    `{32,64,101,256}`. Gate facts: per-token velocity = chance (0.10, provable);
-    **raw-linear window ≈ chance** (circle 0.11 — velocity is 2nd-moment, not
-    linear; a window win = nonlinear learning, amendment A4); circle `S(f)`
-    high-pass/Rayleigh (T=2 resolves only high-Y, all-1.00 by T=16); **random
-    null FLAT** (per-Ω-class oracle range 0.000 — no frequency axis).
-  - **Built (uncommitted → next commits):** `cyclic_tones()` generator
-    (`src/temp_bench/data/synthetic.py`, circle+random) and the `spectral_txc`
-    DCT-band BatchTopK arch (`src/temp_bench/archs/spectral_txc.py` + archs.yaml)
-    — both smoke-pass; registries load (11 archs), pytest green (64).
-  - **NEXT:** datasource entries (`toy_cyclic_circle_*` / `toy_cyclic_random_*`)
-    + generator tests; `frequency_recovery` evaluator add-on (velocity_recovery
-    multinomial probe, per-Ω `S(f)`, per-branch band probes, NMSE); `run_grid.py`
-    + full grid; single-source record + figs.
-  **Scope LOCKED (no multi-lane / ConvDict without sign-off).** Pure-synthetic ⇒
-  NO HF token. Prime directive: a *tie* with a cleaner band decomposition is a
-  complete, reportable outcome (the decisive multiband win lives under
-  superposition, scoped out).
+- **Frequency / cyclic-tone bench: DONE — verdict POSITIVE (periodic axis),
+    committed + pushed (2026-07-08).** Port of Dmitry's FrequencyBench
+  (`origin/dmitry-spectral-sprint2`) — the one uncovered axis. Full chain: § 8
+  gating PASS (`9d074219`) → `cyclic_tones()` generator + `spectral_txc` DCT-band
+  arch + `frequency_recovery` (velocity + S(f)) evaluator + 14 tests → **298-cell
+  main grid + 120-cell matched-budget band-partition addendum** (0 failures) →
+  figures + single-source record. Frozen design (amendments A1–A6): `M=101` prime,
+  `d_in=128`, `Ω={0,1,2,4,8,16,24,32,40,50}` (chance 0.1), `σ=0.10`, `seq_len=64`,
+  `L=32`, `T∈{2,4,8,16}`, `d_sae {32,64,101,256}`, memorization `|Ω|·M=1010`.
+  **Headline (3-seed means, d=101):** the discriminator is the **S(f) *shape***,
+  and it splits the crosscoders by **where the nonlinearity sits**. Codes that
+  **mix positions before the nonlinearity** (TXC-post `relu(Σ_t W_t x_t)`,
+  Spectral) recover the tone with a **high-pass / Rayleigh-resolved** S(f) —
+  **Spectral near-oracle 1.00 at T=16**, TXC-post 0.53. The **additive-over-
+  position** code (TXC-pre `Σ_t g(x_t)`) caps at **0.27 with a flat S(f)** (bag-
+  level, not spectral estimation — each token's marginal is Y-independent → no
+  frequency ordering). **Per-token = 0.00** (provable DPI + raw-linear). The
+  **DCT-band inductive bias is decisive and largely an *access* prior**: untrained
+  Spectral already reads 0.64 (its bandpass kernels are tone-detectors at init;
+  TXC-post 0.18, TXC-pre 0.02), training lifts to 1.00. **P3 (matched budget):**
+  multiband ≈ 1-band DCT (`full`) ≈ 2-band at T=16 (all saturate — a **tie**, as
+  preregistered); multiband's edge shows at the scarcest window T=2 and in the
+  untrained access (band-limiting is the prior). **Null:** random-embedding S(f)
+  is flat (no Δf ordering); circle 1.00 vs random 0.57 at T=16 (geometry makes Y
+  resolvable); above `|Ω|·M` the null jumps to ~1.0 by template memorization —
+  caught + flagged. **Amendment A5:** Stacked dropped (its concatenated `T·d_sae`
+  code memorizes above `|Ω|·M`, the signed-motion confound). Full result:
+  [`frequency/bench_record.md`](frequency/bench_record.md).
 - Other options (not started): the § 6 roadmap (heavy-tailed/sticky changepoint
   — gated on a better labeler; EM instantiation — gated on a paid judge), an
   atom-level case study of the TXC-post boundary pair-atoms (record § 9), or a
@@ -116,7 +113,7 @@ for changepoint.
 | **signed_motion** | order-sensitive (AC) | **NEGATIVE** | done; leave as published (memorization confound at `#windows=2F`) |
 | **topic_switching** | change-point/sticky | **ABORT** | measured; composition-dominated + labeler inadequate; no bench. BUT it *did* measure a valid dwell (≈geometric, mean run 1.73) — the anchor for changepoint |
 | **changepoint** | change-point / dual-latent | **SPLIT (two-way)** | DONE — 198-cell BatchTopK grid; per-token: DC oracle + provable AC chance; AC exposed only by the post-squash crosscoder (additive codes provably blind); record+figs committed ([`changepoint/bench_record.md`](changepoint/bench_record.md)) |
-| **frequency** (cyclic tones) | periodic / frequency | *pending* | **SPEC — gating not yet run.** Port of Dmitry's FrequencyBench; adds a `spectral_txc` DCT-band arch + circle-tone generator + periodogram-oracle evaluator + random-embedding null. Queued for RunPod ([`frequency/bench_spec.md`](frequency/bench_spec.md)) |
+| **frequency** (cyclic tones) | periodic / frequency (AC / 2nd-moment) | **POSITIVE** | DONE — 298-cell BatchTopK grid + 120-cell band addendum; position-mixing crosscoders recover the tone with high-pass S(f) (Spectral near-oracle 1.00 at T=16), additive/per-token blind (flat S(f)/chance); DCT-band inductive bias decisive (untrained access 0.64); null flat + memorization flagged ([`frequency/bench_record.md`](frequency/bench_record.md)) |
 
 ---
 

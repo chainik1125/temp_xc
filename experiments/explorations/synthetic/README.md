@@ -58,6 +58,7 @@ into those traps impossible to do silently.
 | [`signed_motion/`](signed_motion/) | order-sensitive step (**AC**) | bench run | **NEGATIVE** | no arch recovers the sign in the scarce regime (`#windows=2F` memorization confound) |
 | [`topic_switching/`](topic_switching/) | change-point / sticky (DC+AC) | measured | **ABORT** | autocorrelation is 82% per-doc *composition*, not order; labeler inadequate |
 | [`changepoint/`](changepoint/) | change-point / dual-latent (DC+AC) | bench run (BatchTopK) | **SPLIT (two-way)** | per-token pins the DC mode at oracle (1.00 at `d_sae=8`) and sits exactly on the provable AC chance floor; **only the post-squash crosscoder** linearly exposes the boundary (τ **0.66** ≈ 86% of the T=2 in-tile ceiling, `c_t` 0.90) at a DC+content cost — additive (pre-squash / per-position) codes are *provably* blind to equality-pattern latents |
+| [`frequency/`](frequency/) | periodic / cyclic tone (**AC / 2nd-moment**) | bench run (BatchTopK) | **POSITIVE** | position-mixing crosscoders recover the hidden tone with a high-pass, Rayleigh-resolved `S(f)` (Spectral-TXC near-oracle **1.00** at T=16, TXC-post 0.53); the **DCT-band inductive bias is decisive** (untrained access 0.64 — the band-limited kernels are tone-detectors at init); **additive-over-position** (TXC-pre 0.27, *flat* `S(f)`) and **per-token** (0.00) are blind; random null flat + memorization above `\|Ω\|·M` flagged |
 
 Each benchmark subdir contains (where applicable): `prereg.md` (frozen
 preregistration), `measurement.md` (the measure→mirror record), `bench_spec.md`
@@ -86,6 +87,11 @@ backtracking labels) stay at `results/`. Examples:
 .venv/bin/python -m experiments.explorations.synthetic.changepoint.gating        # § 8 ceilings + raw-linear access
 .venv/bin/python -m experiments.explorations.synthetic.changepoint.run_grid 24   # the 198-cell architecture grid
 .venv/bin/python -m experiments.explorations.synthetic.changepoint.render_figs   # figures + stats + record AUTO blocks
+# frequency (the periodic / cyclic-tone axis)
+.venv/bin/python -m experiments.explorations.synthetic.frequency.gating          # § 8 ceilings + circle S(f) vs random null
+.venv/bin/python -m experiments.explorations.synthetic.frequency.run_grid 10     # the 298-cell architecture grid
+.venv/bin/python -m experiments.explorations.synthetic.frequency.run_grid_bands 10  # matched-budget band-partition addendum
+.venv/bin/python -m experiments.explorations.synthetic.frequency.render_figs     # figures + stats + record AUTO blocks
 ```
 
 All results route through the canonical runner (code-version stamped); no edits

@@ -2,9 +2,10 @@
 
 **Status:** **FROZEN 2026-07-08** — § 8 gating due-diligence **PASS**
 (`results/frequency_gating_stats.json`, commit `9d074219`). The three open
-design decisions are settled and recorded as dated pre-run **amendments A1–A4**
-(§ 10 below); the § 3/§ 5/§ 8 body is otherwise unchanged. From here the spec is
-frozen: further changes are dated amendments only (like changepoint A1–A4).
+design decisions are settled and recorded as dated **amendments A1–A6** (§ 10
+below; A1–A4 pre-run/gating, A5–A6 post-run validity refinements); the § 3/§ 5/§ 8
+body is otherwise unchanged. From here the spec is frozen: further changes are
+dated amendments only (like changepoint A1–A4).
 
 **Provenance + honest framing.** This is a **synthetic-first architectural
 discriminator** for the **periodic / frequency** axis — the one axis the suite
@@ -227,6 +228,31 @@ class-conditional mean. Consequence (as in changepoint/signed-motion): a window
 untrained-encoder control checks the nonlinear-access residual. (Note: the
 *random* null shows a mild rise of this raw-linear ceiling with `T` — 0.11→0.18
 — a symbol-identity linear signal, not a frequency one; reported, not gated.)
+
+**A5 (2026-07-08, post-run) — drop `stacked_batchtopk` from the grid
+(validity, not scope).** The § 5 arch list included `stacked_batchtopk`, but its
+per-tile code is the **concatenated per-position code** (feature dim `T·d_sae`),
+so for the 2nd-moment velocity a linear probe recovers `Y` only by **memorizing**
+the `≤ |Ω|·M = 1010` distinct clean windows once `T·d_sae ≥ 1010` — the exact
+signed-motion memorization confound (the concatenation the conventions forbid).
+The shared-code crosscoders (tile-code `= d_sae ≤ 256 < 1010`) are
+memorization-free, and the per-token archs already instantiate the "cannot mix
+positions" null, so `stacked` is a confounded comparator here and is omitted.
+(A reduction of the arch set for validity, flagged transparently; the prime
+directive favours it.)
+
+**A6 (2026-07-08, post-run) — matched-budget band-partition comparators.** The
+main grid compares the arch family at **equal `k_pos`**, where each arch
+*allocates* its budget differently (Spectral fires `k_win = k_pos·T` atoms,
+TXC-post fires `k_pos`) — so a Spectral-vs-post gap conflates band structure with
+active-atom count. To answer P3 ("does the band *partition* help?") cleanly, add
+`spectral_txc_full` (1 band = the vanilla DCT crosscoder) and `spectral_txc_dcac`
+(2-band DC/AC) — same class / backbone / **total budget `k_win`**, differing only
+in the DCT-band split. `multiband` vs `dcac` vs `full` at matched budget isolates
+the partition effect (`run_grid_bands.py` addendum). Result: a **tie** at
+windows that can saturate the tone (`T ≥ 4`), with `multiband`'s edge at the
+scarcest window `T=2` and in the untrained access (band-limiting is the prior) —
+the preregistered P3 outcome.
 
 ## 9. Reproduction (when built)
 
