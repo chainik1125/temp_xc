@@ -131,6 +131,41 @@ archs:
       Parseval decoder unit-norm on coefficients. Port of Dmitry's SpectralTXC
       (origin/dmitry-spectral-sprint2) — plain TopK → our BatchTopK+AuxK.
 
+  spectral_txc_dcac:
+    class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 8
+      k_pos: 20
+      bands: dcac
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 101 }
+    notes: |
+      spectral_txc DC/AC 2-band variant (bands=dcac). Same class/backbone as
+      spectral_txc; matched total budget k_win=k_pos·T split across 2 bands
+      (DC {0} + AC {1..T-1}). The frequency_lens DC/AC granularity point.
+
+  spectral_txc_full:
+    class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 8
+      k_pos: 20
+      bands: full
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 101 }
+    notes: |
+      spectral_txc single-full-band variant (bands=full) — the VANILLA DCT
+      crosscoder (matched-budget monolithic comparator for the band-structure
+      test). Same total budget k_win=k_pos·T in ONE band; multiband vs dcac vs
+      full at matched budget isolates the band-partition effect (P3).
+
   # ── Ours: baselines ─────────────────────────────────────────────────
 
   topk_sae:
