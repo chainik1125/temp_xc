@@ -24,7 +24,21 @@
 
 archs:
 
-  # ── Ours: locked TXC architectures ──────────────────────────────────
+  # ─────────────────────────────────────────────────────────────────────
+  # Arch groups (which archs are compared together):
+  #   • FAIR-BACKBONE SUITE (the current synthetic-bench comparison; every arch
+  #     shares BatchTopK→JumpReLU + AuxK + decoder unit-norm + grad-orth, so the
+  #     only variable is decode structure): batchtopk_sae, tsae, stacked_batchtopk,
+  #     txc_batchtopk_pre, txc_batchtopk_post, spectral_txc{,_dcac,_full}.
+  #   • TopK-LEGACY (plain-TopK backbone; the published § 4 coupling/denoising +
+  #     signed_motion results stand on these): topk_sae, stacked_sae, txc_base.
+  #   • OFF-AXIS (not in the decode-structure comparison): mlc (multi-LAYER
+  #     crosscoder, § 5.1 probing), sae_arditi (§ 5.3 EM baseline).
+  # (tsae is registered under "Adapter-wrapped" below but belongs to the
+  # fair-backbone suite — it is the BatchTopK matryoshka the suite is matched to.)
+  # ─────────────────────────────────────────────────────────────────────
+
+  # ── TopK-legacy: locked TXC architectures ───────────────────────────
 
   txc_base:
     class_path: temp_bench.archs.txc_base:TXCBase

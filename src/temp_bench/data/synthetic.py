@@ -1,13 +1,26 @@
-"""Synthetic data generators for § 4 (TempBench synthetic).
+"""Synthetic data generators for § 4 + the synthetic-benchmark program.
 
-Two generators map to the paper's two synthetic benchmarks:
+Six generators, registered in :data:`_GENERATORS` (name → fn) at the bottom of
+this module. The first two are the paper's § 4 benches; the rest were developed
+by the synthetic-benchmark program (``experiments/explorations/synthetic/``):
 
-- :func:`markov_chain_support` — N independent Markov chains with
-  optional Bernoulli emission noise (the "denoising" bench).
-- :func:`coupled_hmm`         — K hidden chains drive M emissions through
-  an OR-gated coupling matrix (the "coupling" bench).
+- :func:`markov_chain_support` — N independent Markov chains with optional
+  Bernoulli emission noise (§ 4 "denoising" bench).
+- :func:`coupled_hmm` — K hidden chains drive M emissions through an OR-gated
+  coupling matrix (§ 4 "coupling" bench).
+- :func:`signed_motion` — cyclic walk with a hidden ±sign; an AC-only /
+  order-sensitive latent (the signed_motion bench).
+- :func:`self_exciting` — discrete Hawkes / logistic-AR intensity; a bursty
+  self-exciting latent (the backtracking bench).
+- :func:`semi_markov_modes` — geometric-dwell modes + change-point structure;
+  a dual DC (mode) / AC (time-since-switch) substrate (the changepoint bench).
+- :func:`cyclic_tones` — cyclic walk at a hidden velocity, circle- or
+  random-embedded; a periodic / frequency latent (the frequency bench).
 
-Both return ``(N, seq_len, d_in)`` tensors of activations PLUS auxiliary
+Each datasource in ``configs/data.yaml`` names one generator; the reverse index
+(generator → datasource(s) → bench) is at :data:`_GENERATORS`.
+
+All return ``(N, seq_len, d_in)`` tensors of activations PLUS auxiliary
 arrays the synthetic evaluator uses for ground-truth feature recovery:
 
     @dataclass
@@ -715,6 +728,17 @@ def semi_markov_modes(
 # ── Refill-source factory (used by ActivationBuffer / WindowBuffer) ────
 
 
+# Generator name → fn. Reverse index (generator → configs/data.yaml datasource(s)
+# → bench) so it's obvious which generator feeds which result:
+#   markov            → toy_markov_n20_d40_noisy                     (§ 4 denoising)
+#   coupled           → toy_coupled_K10_M20_d256,
+#                       toy_coupled_noisy_K10_M20_d256_pB05_np10,
+#                       synth_smoke                                   (§ 4 coupling)
+#   signed_motion     → toy_signed_motion_M19_d40                    (signed_motion)
+#   self_exciting     → toy_backtracking_selfexcite_d64              (backtracking)
+#   semi_markov_modes → toy_changepoint_modes_d64                    (changepoint)
+#   cyclic_tones      → toy_cyclic_circle_M101_d128,
+#                       toy_cyclic_random_M101_d128                  (frequency)
 _GENERATORS = {
     "markov":  markov_chain_support,
     "coupled": coupled_hmm,
