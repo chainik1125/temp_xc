@@ -4,7 +4,7 @@
 is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-06-10.
+Last updated: 2026-07-08.
 
 ---
 
@@ -24,11 +24,25 @@ Last updated: 2026-06-10.
   TXC-post has a real access residual (τ 0.20 at T=2) — trained gain is
   learning on top of it. Full result:
   [`changepoint/bench_record.md`](changepoint/bench_record.md).
-- **No active task queued.** Next options (not started): the § 6 roadmap
-  (heavy-tailed/sticky changepoint — gated on a better labeler; EM
-  instantiation — gated on a paid judge), an atom-level case study of the
-  TXC-post boundary pair-atoms (suggested in record § 9), or a dwell-knob
-  robustness sweep of the grid.
+- **ACTIVE (queued for RunPod, 2026-07-08): frequency / cyclic-tone bench —
+  port of Dmitry's FrequencyBench (`origin/dmitry-spectral-sprint2`).** The one
+  uncovered axis (periodic/frequency; the DC/AC `frequency_lens` home). Locked
+  design + open decisions + order-of-work in
+  [`frequency/bench_spec.md`](frequency/bench_spec.md). **Scope:** task +
+  spectral arch — a `cyclic_tones()` generator (circle-embedding tones + a
+  random-embedding symmetry null), a NEW `spectral_txc` DCT-band crosscoder
+  rebuilt on our BatchTopK fair backbone, a `freq_response` evaluator
+  (periodogram oracle, per-frequency `S(f)`, Rayleigh ceilings), and a grid vs
+  the existing arch family. **Synthetic-first discriminator** (like
+  signed_motion; no measure→mirror — real LM periodicity anchor deferred).
+  **Next action: run `frequency/gating.py` FIRST** (settles ground-truth `F` for
+  the circle mode, `M/d_in/Ω/W/L`, and confirms per-token≈chance / periodogram
+  oracle / flat null), then freeze the spec, then generator→arch→evaluator→grid
+  →record. **Pure-synthetic ⇒ NO HF token needed.**
+- Other options (not started): the § 6 roadmap (heavy-tailed/sticky changepoint
+  — gated on a better labeler; EM instantiation — gated on a paid judge), an
+  atom-level case study of the TXC-post boundary pair-atoms (record § 9), or a
+  dwell-knob robustness sweep.
 - **Backtracking BatchTopK redo: DONE.** Verdict POSITIVE
   and it survives a uniform BatchTopK backbone. Per-token pinned at the DPI floor
   λ≈0.41; all three window families (TXC-pre, TXC-post, Stacked) recover λ
@@ -86,6 +100,7 @@ for changepoint.
 | **signed_motion** | order-sensitive (AC) | **NEGATIVE** | done; leave as published (memorization confound at `#windows=2F`) |
 | **topic_switching** | change-point/sticky | **ABORT** | measured; composition-dominated + labeler inadequate; no bench. BUT it *did* measure a valid dwell (≈geometric, mean run 1.73) — the anchor for changepoint |
 | **changepoint** | change-point / dual-latent | **SPLIT (two-way)** | DONE — 198-cell BatchTopK grid; per-token: DC oracle + provable AC chance; AC exposed only by the post-squash crosscoder (additive codes provably blind); record+figs committed ([`changepoint/bench_record.md`](changepoint/bench_record.md)) |
+| **frequency** (cyclic tones) | periodic / frequency | *pending* | **SPEC — gating not yet run.** Port of Dmitry's FrequencyBench; adds a `spectral_txc` DCT-band arch + circle-tone generator + periodogram-oracle evaluator + random-embedding null. Queued for RunPod ([`frequency/bench_spec.md`](frequency/bench_spec.md)) |
 
 ---
 
