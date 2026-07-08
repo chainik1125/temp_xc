@@ -1,0 +1,280 @@
+{
+  "meta": {
+    "M": 101,
+    "OMEGA": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      16,
+      24,
+      32,
+      40,
+      50
+    ],
+    "d_in": 128,
+    "seq_len": 64,
+    "L": 32,
+    "T_grid": [
+      2,
+      4,
+      8,
+      16
+    ],
+    "sigma_default": 0.1,
+    "sigma_sweep": [
+      0.05,
+      0.1,
+      0.2,
+      0.25
+    ],
+    "chance": 0.1,
+    "n_seqs": 8000,
+    "memorization_threshold": 1010,
+    "codebook_circle": "M circle atoms (2-D object; d_sae anchors on M, not 2)",
+    "codebook_random": "M orthonormal directions (F = M)",
+    "gates": {
+      "per_token_tol": 0.03,
+      "raw_linear_tol": 0.05,
+      "oracle_resolvable": 0.85,
+      "separation": 0.5,
+      "null_flat_range": 0.2
+    }
+  },
+  "sigma_sweep_circle": [
+    {
+      "sigma": 0.05,
+      "per_token_acc": 0.1003978047128135,
+      "oracle_overall_Tmax": 1.0,
+      "oracle_resolvable_Tmax": 1.0
+    },
+    {
+      "sigma": 0.1,
+      "per_token_acc": 0.1008671471360377,
+      "oracle_overall_Tmax": 1.0,
+      "oracle_resolvable_Tmax": 1.0
+    },
+    {
+      "sigma": 0.2,
+      "per_token_acc": 0.10123167091921921,
+      "oracle_overall_Tmax": 0.999625,
+      "oracle_resolvable_Tmax": 1.0
+    },
+    {
+      "sigma": 0.25,
+      "per_token_acc": 0.10105119067569993,
+      "oracle_overall_Tmax": 0.994375,
+      "oracle_resolvable_Tmax": 1.0
+    }
+  ],
+  "circle": {
+    "per_token_acc": 0.10037999591247013,
+    "by_T": {
+      "2": {
+        "raw_linear_acc": 0.10968081245185579,
+        "glrt_oracle_acc": 0.69490625,
+        "glrt_oracle_by_class": [
+          0.5833069620253165,
+          0.17168114143920596,
+          0.25134048257372654,
+          0.47615521327014215,
+          0.7708810068649885,
+          0.9200032552083334,
+          0.9206601876675603,
+          0.919344473007712,
+          0.9442228132387707,
+          0.9844139650872819
+        ],
+        "periodogram_oracle_acc": 0.6948125,
+        "periodogram_oracle_by_class": [
+          0.5814873417721519,
+          0.17206885856079404,
+          0.2536025469168901,
+          0.4752665876777251,
+          0.7705234553775744,
+          0.9200032552083334,
+          0.9206601876675603,
+          0.9192641388174807,
+          0.9441489361702128,
+          0.9842581047381546
+        ]
+      },
+      "4": {
+        "raw_linear_acc": 0.11185935670498252,
+        "glrt_oracle_acc": 0.88728125,
+        "glrt_oracle_by_class": [
+          0.7552215189873418,
+          0.5147332506203474,
+          0.6737600536193029,
+          0.9155805687203792,
+          0.9969965675057209,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "periodogram_oracle_acc": 0.88740625,
+        "periodogram_oracle_by_class": [
+          0.7530063291139241,
+          0.5187655086848635,
+          0.672754691689008,
+          0.9158767772511849,
+          0.9969965675057209,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "8": {
+        "raw_linear_acc": 0.11075745368546727,
+        "glrt_oracle_acc": 0.99084375,
+        "glrt_oracle_by_class": [
+          0.9772151898734177,
+          0.9575062034739454,
+          0.9718498659517426,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "periodogram_oracle_acc": 0.99075,
+        "periodogram_oracle_by_class": [
+          0.9772151898734177,
+          0.9568858560794045,
+          0.971514745308311,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "16": {
+        "raw_linear_acc": 0.10245311321367612,
+        "glrt_oracle_acc": 1.0,
+        "glrt_oracle_by_class": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "periodogram_oracle_acc": 1.0,
+        "periodogram_oracle_by_class": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    }
+  },
+  "random": {
+    "per_token_acc": 0.09784024909216482,
+    "by_T": {
+      "2": {
+        "raw_linear_acc": 0.1134906329059775,
+        "glrt_oracle_acc": 1.0,
+        "glrt_oracle_by_class": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "4": {
+        "raw_linear_acc": 0.14837846033141058,
+        "glrt_oracle_acc": 1.0,
+        "glrt_oracle_by_class": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "8": {
+        "raw_linear_acc": 0.17559513401777224,
+        "glrt_oracle_acc": 1.0,
+        "glrt_oracle_by_class": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "16": {
+        "raw_linear_acc": 0.16126816849537493,
+        "glrt_oracle_acc": 1.0,
+        "glrt_oracle_by_class": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    }
+  },
+  "circle_oracle_agreement": {
+    "2": 9.374999999989253e-05,
+    "4": 0.00012499999999993072,
+    "8": 9.375000000000355e-05,
+    "16": 0.0
+  },
+  "verdict": {
+    "per_token_at_chance": true,
+    "raw_linear_window_at_chance": true,
+    "oracle_resolvable_high": true,
+    "separation": 0.8996200040875298,
+    "separation_passes": true,
+    "null_flat_range": 0.0,
+    "null_is_flat": true,
+    "per_token_circle": 0.10037999591247013,
+    "raw_linear_window_max": 0.11185935670498252,
+    "oracle_resolvable_Tmax": 1.0,
+    "passes_gate": true
+  }
+}
