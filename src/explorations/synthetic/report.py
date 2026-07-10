@@ -186,6 +186,43 @@ def build_matrix(groups: dict, benches, archs, capacities_fn, *, op) -> tuple[st
     return hdr + body.rstrip(), stats
 
 
+def build_panel(groups: dict, benches, archs, capacities_fn, metric_key, *,
+                op) -> tuple[str, dict]:
+    """A companion panel — rows = **benchmarks** (not latent-axes), cols = archs.
+
+    Reads ``metric_key`` (e.g. ``nmse`` / ``eauc``) from the SAME per-token matched
+    group as the recovery matrix, at each capacity ``{F, F//2}`` (`` / ``-joined).
+    Reconstruction / feature recovery is of the shared activations, so it is one
+    value per ``(bench, arch)`` — the capability-vs-artifact gate. No new matching.
+    Returns ``(markdown, stats)``.
+    """
+    hdr = ("| benchmark | " + " | ".join(a.label for a in archs) + " |\n"
+           "|---|" + "|".join("---" for _ in archs) + "|\n")
+    stats: dict = {}
+    body = ""
+    for b in benches:
+        caps = capacities_fn(b)
+        cells_md = []
+        for a in archs:
+            parts, cell_stats = [], {}
+            for d_sae in caps:
+                mg = matched_group(groups, b.name, a, d_sae=d_sae,
+                                   T_can=op.T_can, B_star=op.B_star)
+                if mg is None:
+                    parts.append("—")
+                    cell_stats[d_sae] = None
+                    continue
+                key, g, _dev = mg
+                trip = g["metrics"].get(metric_key, (float("nan"), float("nan"), 0))
+                parts.append(fmt(trip) if trip[2] else "—")
+                cell_stats[d_sae] = {"value": trip[0], "std": trip[1],
+                                     "n_seeds": trip[2], "k_pos": key[4], "d_sae": key[3]}
+            cells_md.append(" / ".join(parts))
+            stats[f"{b.name}/{a.name}"] = cell_stats
+        body += f"| **{b.name}** | " + " | ".join(cells_md) + " |\n"
+    return hdr + body.rstrip(), stats
+
+
 def coverage(groups: dict, benches, archs, *, op) -> str:
     """A one-line-per-(bench) coverage note: which arch×T×d_sae cells exist.
 
@@ -202,9 +239,9 @@ def coverage(groups: dict, benches, archs, *, op) -> str:
     return "\n".join(lines)
 
 
-def write_stats(stats_path: Path, base: dict, matrix: dict, root: Path) -> None:
-    """Dump ``{**base, matrix: {bench/axis/arch: {d_sae: cell}}}`` as JSON."""
+def write_stats(stats_path: Path, base: dict, results: dict, root: Path) -> None:
+    """Dump ``{**base, results: {recovery: ..., panels: ...}}`` as indented JSON."""
     stats_path = Path(stats_path)
     stats_path.parent.mkdir(parents=True, exist_ok=True)
-    stats_path.write_text(json.dumps({**base, "matrix": matrix}, indent=2))
+    stats_path.write_text(json.dumps({**base, "results": results}, indent=2))
     print(f"[program-stats] -> {stats_path.relative_to(root)}")

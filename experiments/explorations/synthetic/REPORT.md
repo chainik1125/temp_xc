@@ -70,6 +70,42 @@ holes.
 
 ---
 
+## Companion panels — the capability-vs-artifact gate
+
+Latent recovery only *counts* if the architecture also reconstructs the signal
+(README validity gate: "the winner must also reconstruct, not recover the latent
+while representing nothing"). These panels are per **benchmark** (`A×B`, one value
+per bench — reconstruction is of the shared activations, so it does **not** split
+by latent-axis), read from the same per-token matched cells as the matrix above,
+at `d_sae = F / F/2`. A high recovery number paired with a poor reconstruction is
+a **red flag** — and is often the *cost* story (e.g. an AC-latent win paid for in
+content). Where a benchmark exposes it, this is the "what did the recovery cost".
+
+**Reconstruction NMSE** (windowed; **lower is better**, 0 = perfect, ~1 = trivial):
+
+<!-- BEGIN AUTO:panel_nmse -->
+| benchmark | Per-token SAE | T-SAE (contrastive) | Stacked (per-position dicts) | TXC-pre (additive) | TXC-post (coincidence) | Spectral-TXC (DCT bands) |
+|---|---|---|---|---|---|---|
+| **backtracking** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **signed_motion** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **changepoint** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **frequency** | — / — | — / — | — / — | — / — | — / — | — / — |
+<!-- END AUTO:panel_nmse -->
+
+**Content-direction recovery** (`eauc`; cosine-AUC of decoder atoms vs the
+emission features; higher is better):
+
+<!-- BEGIN AUTO:panel_eauc -->
+| benchmark | Per-token SAE | T-SAE (contrastive) | Stacked (per-position dicts) | TXC-pre (additive) | TXC-post (coincidence) | Spectral-TXC (DCT bands) |
+|---|---|---|---|---|---|---|
+| **backtracking** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **signed_motion** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **changepoint** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **frequency** | — / — | — / — | — / — | — / — | — / — | — / — |
+<!-- END AUTO:panel_eauc -->
+
+---
+
 ## Grid coverage
 
 What (arch, T, d_sae) groups currently exist per bench on the leaderboard — the

@@ -29,9 +29,15 @@ def main() -> None:
     cells = report.load_program_rows(leaderboard, reg.BENCHES)
     groups = report.group_cells(cells, primary_ds_only=True, benches=reg.BENCHES)
 
-    # The per-token matched matrix, dual-capacity {F, F//2} cells.
+    # The per-token matched recovery matrix, dual-capacity {F, F//2} cells.
     mtx_md, mtx_stats = report.build_matrix(
         groups, reg.BENCHES, reg.ARCHS, reg.capacities, op=reg.OP)
+
+    # Companion panels (capability gate): reconstruction NMSE + content recovery,
+    # per benchmark (A×B), from the same matched groups.
+    panels = {c.metric: report.build_panel(groups, reg.BENCHES, reg.ARCHS,
+                                            reg.capacities, c.metric, op=reg.OP)
+              for c in reg.COMPANIONS}
     cov_md = report.coverage(groups, reg.BENCHES, reg.ARCHS, op=reg.OP)
 
     caps = ", ".join(report._cap_labels(reg.OP))
@@ -46,11 +52,9 @@ def main() -> None:
         f"normalized recovery `mean` over seeds, `[chance=0, oracle=1]`, shown at "
         f"**{caps}** (`boundary / deep-scarce`):\n\n{cap_lines}")
 
-    populate(report_md, {
-        "operating_point": op_md,
-        "matrix_pertoken": mtx_md,
-        "coverage": cov_md,
-    })
+    blocks = {"operating_point": op_md, "matrix_pertoken": mtx_md, "coverage": cov_md}
+    blocks.update({f"panel_{m}": md for m, (md, _st) in panels.items()})
+    populate(report_md, blocks)
 
     report.write_stats(stats_path, {
         "source": reg.LEADERBOARD_REL,
@@ -60,7 +64,8 @@ def main() -> None:
                             "l0_tol": reg.OP.l0_tol},
         "benches": [b.name for b in reg.BENCHES],
         "archs": [a.name for a in reg.ARCHS],
-    }, mtx_stats, root)
+    }, {"recovery": mtx_stats,
+        "panels": {m: st for m, (_md, st) in panels.items()}}, root)
 
     n_filled = sum(1 for v in mtx_stats.values()
                    if v and any(c is not None for c in v.values()))

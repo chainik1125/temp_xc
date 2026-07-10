@@ -21,16 +21,17 @@ def _g(l0t, l0w, **metrics):
 def _cp_groups():
     """changepoint groups at both capacities {F=20, F//2=10}, T=4 window.
     Realized L0 mirrors the measured archs: token l0_t=l0_w=k_pos; pre l0_t≈k_pos,
-    l0_w≈k_pos·T; post l0_w≈k_pos, l0_t≈k_pos/T. B*=2 (reg.OP)."""
+    l0_w≈k_pos·T; post l0_w≈k_pos, l0_t≈k_pos/T. B*=2 (reg.OP). nmse/eauc carried
+    on every group so the companion panels can read them."""
     g = {}
     T = 4
     for d in (20, 10):
-        g[("changepoint", "batchtopk_sae", 1, d, 2)] = _g(2, 2, mode_recovery=0.90, tss_recovery=0.02)
-        g[("changepoint", "batchtopk_sae", 1, d, 4)] = _g(4, 4, mode_recovery=0.95, tss_recovery=0.02)
-        g[("changepoint", "txc_batchtopk_pre", T, d, 2)] = _g(2, 8, mode_recovery=0.66, tss_recovery=0.04)
-        g[("changepoint", "txc_batchtopk_pre", T, d, 4)] = _g(4, 16, mode_recovery=0.67, tss_recovery=0.05)
-        g[("changepoint", "txc_batchtopk_post", T, d, 8)] = _g(2, 8, mode_recovery=0.60, tss_recovery=0.62)
-        g[("changepoint", "txc_batchtopk_post", T, d, 4)] = _g(1, 4, mode_recovery=0.55, tss_recovery=0.50)
+        g[("changepoint", "batchtopk_sae", 1, d, 2)] = _g(2, 2, mode_recovery=0.90, tss_recovery=0.02, nmse=0.30, eauc=0.80)
+        g[("changepoint", "batchtopk_sae", 1, d, 4)] = _g(4, 4, mode_recovery=0.95, tss_recovery=0.02, nmse=0.25, eauc=0.85)
+        g[("changepoint", "txc_batchtopk_pre", T, d, 2)] = _g(2, 8, mode_recovery=0.66, tss_recovery=0.04, nmse=0.40, eauc=0.60)
+        g[("changepoint", "txc_batchtopk_pre", T, d, 4)] = _g(4, 16, mode_recovery=0.67, tss_recovery=0.05, nmse=0.35, eauc=0.65)
+        g[("changepoint", "txc_batchtopk_post", T, d, 8)] = _g(2, 8, mode_recovery=0.60, tss_recovery=0.62, nmse=0.55, eauc=0.11)
+        g[("changepoint", "txc_batchtopk_post", T, d, 4)] = _g(1, 4, mode_recovery=0.55, tss_recovery=0.50, nmse=0.50, eauc=0.15)
     return g
 
 
@@ -81,6 +82,20 @@ def test_matched_group_keys_on_l0_per_token():
                               d_sae=20, T_can=reg.OP.T_can, B_star=reg.OP.B_star)
     assert mg[0][4] == 8    # k_pos=8 → l0_t=2 (post fires k_pos/T per token)
     assert abs(mg[1]["l0_t"] - reg.OP.B_star) < 1e-6
+
+
+def test_companion_panel_is_per_bench_from_matched_cell():
+    """The NMSE panel has one row per benchmark (not per latent-axis) and reads the
+    same per-token matched cell as the recovery matrix (post: k_pos=8 → nmse=0.55)."""
+    md, st = report.build_panel(_cp_groups(), _bench(), _archs(), reg.capacities,
+                                "nmse", op=reg.OP)
+    # one entry per (bench, arch) — NOT per (bench, axis, arch)
+    assert set(st) == {"changepoint/batchtopk_sae", "changepoint/txc_batchtopk_pre",
+                       "changepoint/txc_batchtopk_post"}
+    # post's matched cell (k_pos=8, l0_t=2) carries its nmse — the gate for the
+    # tss=0.62 AC "win": high recovery but the worst reconstruction (0.55).
+    assert st["changepoint/txc_batchtopk_post"][20]["value"] == 0.55
+    assert st["changepoint/txc_batchtopk_post"][20]["k_pos"] == 8
 
 
 def test_nan_l0_rows_excluded():

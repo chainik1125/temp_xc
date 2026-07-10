@@ -133,6 +133,26 @@ ARCHS: tuple[Arch, ...] = (
 
 
 @dataclass(frozen=True)
+class Companion:
+    """A companion panel — the **capability-vs-artifact gate** (README § validity
+    gates): a latent-recovery win is only real if the arch *also* reconstructs /
+    recovers the content. Unlike recovery, this is per **benchmark** (one panel
+    row per bench, `A×B`), NOT per latent-axis — reconstruction is of the shared
+    activations, so a dual-latent bench has ONE value, not one per axis. Read from
+    the same per-token matched group as the recovery matrix (no new runs)."""
+    metric: str
+    label: str
+    lower_better: bool
+
+
+# Reconstruction (NMSE) + content-direction recovery (eauc): the gate + the cost.
+COMPANIONS: tuple[Companion, ...] = (
+    Companion("nmse", "reconstruction NMSE — windowed, **lower is better**", True),
+    Companion("eauc", "content-direction recovery — cosine-AUC, higher is better", False),
+)
+
+
+@dataclass(frozen=True)
 class OperatingPoint:
     """The canonical matrix cell for the **per-token-matched** headline: window
     ``T = T_can`` (token archs are ``T=1``), matched to ``B*`` atoms/token, taken
