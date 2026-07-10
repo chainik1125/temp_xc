@@ -46,8 +46,13 @@ class Bench:
 
     ``datasources[0]`` is the primary; any extras are nulls/controls (e.g. the
     frequency random-embedding null) — kept for the per-bench section, not the
-    headline matrix. ``F`` is the ground-truth feature count that anchors the
-    ``d_sae`` sweep (the canonical matrix cell sits at ``d_sae = F``).
+    headline matrix. ``F`` is the bench's capacity anchor: the canonical matrix
+    cells sit at **``{F, F//2}``** uniformly for every bench (boundary + deep-
+    scarce). For most benches ``F`` is the ground-truth feature-direction count;
+    where it means something else (e.g. frequency, where it's the alphabet ``M``)
+    ``F_note`` records that. Comparability across benches rides on the
+    ``[chance, oracle]`` normalization + matched per-token sparsity, NOT on an
+    identical absolute ``d_sae`` — so a per-bench ``F`` is fine.
     """
     name: str
     datasources: tuple[str, ...]
@@ -56,6 +61,7 @@ class Bench:
     axes: tuple[LatentAxis, ...]
     verdict: str
     note: str = ""
+    F_note: str = ""   # what F denotes for this bench (usually the direction count)
 
 
 @dataclass(frozen=True)
@@ -78,6 +84,7 @@ BENCHES: tuple[Bench, ...] = (
         axes=(LatentAxis("lambda", "lambda_recovery", "AC",
                          "λ — self-exciting intensity (linear-in-history)"),),
         note="all window families recover λ; per-token pinned at the DPI floor.",
+        F_note="feature-direction count (1 backtrack + 19 content).",
     ),
     Bench(
         "signed_motion", ("toy_signed_motion_M19_d40",), "1.2.0", F=19,
@@ -85,6 +92,7 @@ BENCHES: tuple[Bench, ...] = (
         axes=(LatentAxis("sign", "s_temp", "AC",
                          "sign — ±1 order-sensitive step"),),
         note="no arch recovers the sign in the scarce regime (#windows=2F confound).",
+        F_note="feature-direction count (19 step directions).",
     ),
     Bench(
         "changepoint", ("toy_changepoint_modes_d64",), "1.2.0", F=20,
@@ -98,6 +106,7 @@ BENCHES: tuple[Bench, ...] = (
                        "change-point c_t — adjacency floor", primary=False),
         ),
         note="per-token wins DC mode; only post-squash exposes the AC boundary.",
+        F_note="feature-direction count (8 mode-signature + 12 content).",
     ),
     Bench(
         "frequency",
@@ -106,6 +115,9 @@ BENCHES: tuple[Bench, ...] = (
         axes=(LatentAxis("velocity", "velocity_recovery", "AC",
                          "velocity Y — cyclic tone f = Y/M"),),
         note="position-mixing crosscoders recover the tone; additive/per-token flat.",
+        F_note=("alphabet M=101 (NOT a direction count): the circle embedding is "
+                "rank-2 (all M symbols in a 2-D plane), so {101, 50} are alphabet-"
+                "scaled capacities, both < the memorization budget |Ω|·M=1010."),
     ),
 )
 
@@ -122,27 +134,33 @@ ARCHS: tuple[Arch, ...] = (
 
 @dataclass(frozen=True)
 class OperatingPoint:
-    """The canonical matrix cell: ``d_sae = F`` (per bench), window ``T = T_can``
-    (token archs are ``T=1``), matched to budget ``B*`` atoms under each
-    convention. Parameterized so ``T_can`` / ``B_star`` are one-number changes;
-    the full ``d_sae`` and ``T`` frontiers live in each bench's own section.
+    """The canonical matrix cell for the **per-token-matched** headline: window
+    ``T = T_can`` (token archs are ``T=1``), matched to ``B*`` atoms/token, taken
+    at each of the capacities ``{F, F//2}`` (boundary + deep-scarce, uniform for
+    every bench). Parameterized so ``T_can`` / ``B_star`` / ``capacity_fracs`` are
+    one-number changes; the full ``d_sae`` and ``T`` frontiers live per bench.
 
-    **Feasibility (why T_can=4, B*=4).** Both matrices must be reachable at the
-    scarce anchor ``d_sae = F`` for every arch:
-      - *per-position* needs ``B*·T_can ≤ F`` — else ``k_win = B*·T_can`` exceeds
-        a scarce dictionary (min F over benches = 19 → ``B*·T_can ≤ 19``).
-      - *per-window* needs ``B* ≥ T_can`` — pre-squash / stacked fire ≥1 atom per
-        position, so their minimum ``l0_per_window`` is ``T_can``; a smaller ``B*``
-        is unreachable for them.
-    ``T_can=4, B*=4`` satisfies both (``16 ≤ 19`` and ``4 ≥ 4``); larger ``T`` (8,
-    16) can't hold both and lives in the per-bench frontiers instead."""
+    **Feasibility (why T_can=4, B*=2).** The per-token match needs ``k_win =
+    B*·T_can ≤ d_sae`` at the *scarcest* slice — ``min F//2`` over benches is 9
+    (signed_motion). ``T_can=4, B*=2`` → ``k_win = 8 ≤ 9`` — feasible at every
+    bench's ``F//2`` and both capacity slices. Larger ``T`` (8) lives in the
+    per-bench frontiers. (The per-window convention is NOT a program matrix — its
+    ``B* ≥ T`` requirement collides with deep-scarce ``d_sae`` for ``T>2``; it is
+    a per-bench T-frontier overlay instead.)"""
     T_can: int = 4
-    B_star: float = 4.0
+    B_star: float = 2.0
+    capacity_fracs: tuple[float, ...] = (1.0, 0.5)   # {F, F//2}
     # how close a cell's realized L0 must sit to B* to count as "matched"
     l0_tol: float = 1.0
 
 
 OP = OperatingPoint()
+
+
+def capacities(bench: Bench, op: OperatingPoint = OP) -> list[int]:
+    """The bench's canonical ``d_sae`` cells — ``{F, F//2}`` by default, uniform
+    across benches (comparability rides on normalization, not identical d_sae)."""
+    return [max(1, int(bench.F * f)) for f in op.capacity_fracs]
 
 LEADERBOARD_REL = "results/leaderboard.jsonl"
 REPORT_REL = "experiments/explorations/synthetic/REPORT.md"

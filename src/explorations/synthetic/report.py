@@ -118,11 +118,11 @@ def group_cells(cells: list[dict], *, primary_ds_only: bool = True, benches=None
     return out
 
 
-def matched_group(groups: dict, bench: str, arch, *, F: int, T_can: int,
+def matched_group(groups: dict, bench: str, arch, *, d_sae: int, T_can: int,
                   convention: str, B_star: float):
-    """The canonical group for one (bench, arch) cell, or ``None``.
+    """The canonical group for one (bench, arch, ``d_sae``) cell, or ``None``.
 
-    Restricts to ``d_sae = F`` and the arch's window (``1`` for token archs,
+    Restricts to the given ``d_sae`` and the arch's window (``1`` for token archs,
     ``T_can`` for windowed), then picks the group whose mean realized L0 (for the
     convention) is nearest ``B*``. Returns ``(key, group, deviation)`` where
     ``deviation = |realized L0 − B*|`` (so the caller can flag a loose match), or
@@ -133,7 +133,7 @@ def matched_group(groups: dict, bench: str, arch, *, F: int, T_can: int,
     best = None
     for key, g in groups.items():
         (bn, an, Tk, d, _kp) = key
-        if bn != bench or an != arch.name or Tk != T or d != F:
+        if bn != bench or an != arch.name or Tk != T or d != d_sae:
             continue
         l0 = g[l0k]
         if not np.isfinite(l0):
@@ -144,38 +144,51 @@ def matched_group(groups: dict, bench: str, arch, *, F: int, T_can: int,
     return best
 
 
-def build_matrix(groups: dict, benches, archs, *, convention: str, op) -> tuple[str, dict]:
-    """One markdown matrix + its machine-readable stats for a convention.
+def _cap_labels(op) -> list[str]:
+    fr = {1.0: "F", 0.5: "F/2", 0.25: "F/4", 2.0: "2F"}
+    return [fr.get(f, f"{f:g}·F") for f in op.capacity_fracs]
 
-    Rows = ``(bench, latent-axis)``; a cell is the axis metric's ``mean ±std``
-    from :func:`matched_group`, suffixed ``*`` if the realized-L0 match is loose
-    (``deviation > op.l0_tol``). Returns ``(markdown, stats)``.
+
+def build_matrix(groups: dict, benches, archs, capacities_fn, *, convention: str,
+                 op) -> tuple[str, dict]:
+    """One markdown matrix + stats — per-token matched, dual-capacity cells.
+
+    Rows = ``(bench, latent-axis)``. A cell shows the axis metric's ``mean`` at
+    each canonical capacity ``{F, F//2}`` (``capacities_fn(bench)``), joined by
+    `` / `` (boundary / deep-scarce), each suffixed ``*`` on a loose realized-L0
+    match. Missing → ``—``. Returns ``(markdown, stats)``; stats nests per
+    capacity under ``bench/axis/arch``.
     """
     hdr = ("| bench · latent (DC/AC) | " + " | ".join(a.label for a in archs) + " |\n"
            "|---|" + "|".join("---" for _ in archs) + "|\n")
     stats: dict = {}
     body = ""
     for b in benches:
+        caps = capacities_fn(b)
         for ax in b.axes:
             label = f"**{b.name}** · {ax.label} ({ax.kind})"
             cells_md = []
             for a in archs:
-                mg = matched_group(groups, b.name, a, F=b.F, T_can=op.T_can,
-                                   convention=convention, B_star=op.B_star)
-                if mg is None:
-                    cells_md.append("—")
-                    stats[f"{b.name}/{ax.key}/{a.name}"] = None
-                    continue
-                key, g, dev = mg
-                trip = g["metrics"].get(ax.metric, (float("nan"), float("nan"), 0))
-                loose = "*" if dev > op.l0_tol else ""
-                cells_md.append((fmt(trip) + loose) if trip[2] else "—")
-                stats[f"{b.name}/{ax.key}/{a.name}"] = {
-                    "value": trip[0], "std": trip[1], "n_seeds": trip[2],
-                    "k_pos": key[4], "T": key[2], "d_sae": key[3],
-                    "realized_l0_token": g["l0_t"], "realized_l0_window": g["l0_w"],
-                    "l0_deviation": dev, "loose": bool(dev > op.l0_tol),
-                }
+                parts, cell_stats = [], {}
+                for d_sae in caps:
+                    mg = matched_group(groups, b.name, a, d_sae=d_sae, T_can=op.T_can,
+                                       convention=convention, B_star=op.B_star)
+                    if mg is None:
+                        parts.append("—")
+                        cell_stats[d_sae] = None
+                        continue
+                    key, g, dev = mg
+                    trip = g["metrics"].get(ax.metric, (float("nan"), float("nan"), 0))
+                    loose = "*" if dev > op.l0_tol else ""
+                    parts.append((fmt(trip) + loose) if trip[2] else "—")
+                    cell_stats[d_sae] = {
+                        "value": trip[0], "std": trip[1], "n_seeds": trip[2],
+                        "k_pos": key[4], "T": key[2], "d_sae": key[3],
+                        "realized_l0_token": g["l0_t"], "realized_l0_window": g["l0_w"],
+                        "l0_deviation": dev, "loose": bool(dev > op.l0_tol),
+                    }
+                cells_md.append(" / ".join(parts))
+                stats[f"{b.name}/{ax.key}/{a.name}"] = cell_stats
             body += f"| {label} | " + " | ".join(cells_md) + " |\n"
     return hdr + body.rstrip(), stats
 

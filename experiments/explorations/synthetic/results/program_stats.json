@@ -4,7 +4,11 @@
   "n_groups": 289,
   "operating_point": {
     "T_can": 4,
-    "B_star": 4.0,
+    "B_star": 2.0,
+    "capacity_fracs": [
+      1.0,
+      0.5
+    ],
     "l0_tol": 1.0
   },
   "benches": [
@@ -23,80 +27,150 @@
   ],
   "matrices": {
     "per_position": {
-      "backtracking/lambda/batchtopk_sae": null,
-      "backtracking/lambda/tsae": null,
-      "backtracking/lambda/stacked_batchtopk": null,
-      "backtracking/lambda/txc_batchtopk_pre": null,
-      "backtracking/lambda/txc_batchtopk_post": null,
-      "backtracking/lambda/spectral_txc": null,
-      "signed_motion/sign/batchtopk_sae": null,
-      "signed_motion/sign/tsae": null,
-      "signed_motion/sign/stacked_batchtopk": null,
-      "signed_motion/sign/txc_batchtopk_pre": null,
-      "signed_motion/sign/txc_batchtopk_post": null,
-      "signed_motion/sign/spectral_txc": null,
-      "changepoint/mode/batchtopk_sae": null,
-      "changepoint/mode/tsae": null,
-      "changepoint/mode/stacked_batchtopk": null,
-      "changepoint/mode/txc_batchtopk_pre": null,
-      "changepoint/mode/txc_batchtopk_post": null,
-      "changepoint/mode/spectral_txc": null,
-      "changepoint/tss/batchtopk_sae": null,
-      "changepoint/tss/tsae": null,
-      "changepoint/tss/stacked_batchtopk": null,
-      "changepoint/tss/txc_batchtopk_pre": null,
-      "changepoint/tss/txc_batchtopk_post": null,
-      "changepoint/tss/spectral_txc": null,
-      "changepoint/cp/batchtopk_sae": null,
-      "changepoint/cp/tsae": null,
-      "changepoint/cp/stacked_batchtopk": null,
-      "changepoint/cp/txc_batchtopk_pre": null,
-      "changepoint/cp/txc_batchtopk_post": null,
-      "changepoint/cp/spectral_txc": null,
-      "frequency/velocity/batchtopk_sae": null,
-      "frequency/velocity/tsae": null,
-      "frequency/velocity/stacked_batchtopk": null,
-      "frequency/velocity/txc_batchtopk_pre": null,
-      "frequency/velocity/txc_batchtopk_post": null,
-      "frequency/velocity/spectral_txc": null
-    },
-    "per_window": {
-      "backtracking/lambda/batchtopk_sae": null,
-      "backtracking/lambda/tsae": null,
-      "backtracking/lambda/stacked_batchtopk": null,
-      "backtracking/lambda/txc_batchtopk_pre": null,
-      "backtracking/lambda/txc_batchtopk_post": null,
-      "backtracking/lambda/spectral_txc": null,
-      "signed_motion/sign/batchtopk_sae": null,
-      "signed_motion/sign/tsae": null,
-      "signed_motion/sign/stacked_batchtopk": null,
-      "signed_motion/sign/txc_batchtopk_pre": null,
-      "signed_motion/sign/txc_batchtopk_post": null,
-      "signed_motion/sign/spectral_txc": null,
-      "changepoint/mode/batchtopk_sae": null,
-      "changepoint/mode/tsae": null,
-      "changepoint/mode/stacked_batchtopk": null,
-      "changepoint/mode/txc_batchtopk_pre": null,
-      "changepoint/mode/txc_batchtopk_post": null,
-      "changepoint/mode/spectral_txc": null,
-      "changepoint/tss/batchtopk_sae": null,
-      "changepoint/tss/tsae": null,
-      "changepoint/tss/stacked_batchtopk": null,
-      "changepoint/tss/txc_batchtopk_pre": null,
-      "changepoint/tss/txc_batchtopk_post": null,
-      "changepoint/tss/spectral_txc": null,
-      "changepoint/cp/batchtopk_sae": null,
-      "changepoint/cp/tsae": null,
-      "changepoint/cp/stacked_batchtopk": null,
-      "changepoint/cp/txc_batchtopk_pre": null,
-      "changepoint/cp/txc_batchtopk_post": null,
-      "changepoint/cp/spectral_txc": null,
-      "frequency/velocity/batchtopk_sae": null,
-      "frequency/velocity/tsae": null,
-      "frequency/velocity/stacked_batchtopk": null,
-      "frequency/velocity/txc_batchtopk_pre": null,
-      "frequency/velocity/txc_batchtopk_post": null,
-      "frequency/velocity/spectral_txc": null
+      "backtracking/lambda/batchtopk_sae": {
+        "20": null,
+        "10": null
+      },
+      "backtracking/lambda/tsae": {
+        "20": null,
+        "10": null
+      },
+      "backtracking/lambda/stacked_batchtopk": {
+        "20": null,
+        "10": null
+      },
+      "backtracking/lambda/txc_batchtopk_pre": {
+        "20": null,
+        "10": null
+      },
+      "backtracking/lambda/txc_batchtopk_post": {
+        "20": null,
+        "10": null
+      },
+      "backtracking/lambda/spectral_txc": {
+        "20": null,
+        "10": null
+      },
+      "signed_motion/sign/batchtopk_sae": {
+        "19": null,
+        "9": null
+      },
+      "signed_motion/sign/tsae": {
+        "19": null,
+        "9": null
+      },
+      "signed_motion/sign/stacked_batchtopk": {
+        "19": null,
+        "9": null
+      },
+      "signed_motion/sign/txc_batchtopk_pre": {
+        "19": null,
+        "9": null
+      },
+      "signed_motion/sign/txc_batchtopk_post": {
+        "19": null,
+        "9": null
+      },
+      "signed_motion/sign/spectral_txc": {
+        "19": null,
+        "9": null
+      },
+      "changepoint/mode/batchtopk_sae": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/mode/tsae": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/mode/stacked_batchtopk": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/mode/txc_batchtopk_pre": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/mode/txc_batchtopk_post": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/mode/spectral_txc": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/tss/batchtopk_sae": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/tss/tsae": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/tss/stacked_batchtopk": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/tss/txc_batchtopk_pre": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/tss/txc_batchtopk_post": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/tss/spectral_txc": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/cp/batchtopk_sae": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/cp/tsae": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/cp/stacked_batchtopk": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/cp/txc_batchtopk_pre": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/cp/txc_batchtopk_post": {
+        "20": null,
+        "10": null
+      },
+      "changepoint/cp/spectral_txc": {
+        "20": null,
+        "10": null
+      },
+      "frequency/velocity/batchtopk_sae": {
+        "101": null,
+        "50": null
+      },
+      "frequency/velocity/tsae": {
+        "101": null,
+        "50": null
+      },
+      "frequency/velocity/stacked_batchtopk": {
+        "101": null,
+        "50": null
+      },
+      "frequency/velocity/txc_batchtopk_pre": {
+        "101": null,
+        "50": null
+      },
+      "frequency/velocity/txc_batchtopk_post": {
+        "101": null,
+        "50": null
+      },
+      "frequency/velocity/spectral_txc": {
+        "101": null,
+        "50": null
+      }
     }
   }
 }

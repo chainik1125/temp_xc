@@ -29,62 +29,60 @@ diverge sharply: at `T=8`, nominal `k_pos=4`, a per-token SAE fires 4/token,
 TXC-pre ~2/token, TXC-post 0.5/token. Matching on the knob would compare unequal
 densities; matching on realized L0 does not.
 
-There are **two legitimate fairness conventions**, and both are *slices of one
-grid*, differing only in the per-token budget held as the window `T` grows:
+**Per-token matched is the primary comparison.** Holding `l0_per_token = B*`
+equal is the *controlled* experiment: it equalizes the total atom budget spent
+describing any span, so the only remaining variable is decode structure (one
+joint window code vs `T` independent per-token codes). A token arch is the `T=1`
+base case; a window arch gets `k_win = B*·T`. This is the convention the
+individual bench records used.
 
-| convention | held fixed | per-token budget across T | question |
-|---|---|---|---|
-| **per-position** | `l0_per_token = B*` | constant | at equal per-token budget, does joint temporal allocation help? |
-| **per-window** | `l0_per_window = B*` | `B*/T` (shrinks) | at equal window-description budget, does one joint code beat T independent per-token codes? |
+The **per-window** convention (`l0_per_window = B*`, so per-token = `B*/T`
+shrinks with `T`) is a *skeptic's check*, not a second fairness baseline: it asks
+whether a window arch's advantage survives losing the budget growth that longer
+windows otherwise grant. It cannot be a clean program matrix (its `B* ≥ T`
+requirement — pre/stacked fire ≥1 atom/position — collides with deep-scarce
+`d_sae` for `T>2`), and its signal *scales with T*. So it lives as a **per-token
+vs per-window overlay across `T`** in each bench's own frontier, where it's
+legible — not here.
 
-A token architecture is the `T=1` base case, so the two conventions coincide for
-it. Under **per-position** a window arch gets `k_win = B*·T` (budget grows with
-`T`); under **per-window** it is held to `B*` per window (`B*/T` per token —
-starved, but free to allocate jointly). We report **both** matrices; a verdict
-that flips between them is convention-dependent and flagged as such.
+**3. Capacity.** Each bench's canonical cells sit at **`{F, F/2}`** (boundary +
+deep-scarce), a uniform rule for every bench. `F` is per-bench (usually the
+feature-direction count; for frequency it's the alphabet `M=101`, footnoted
+below) — cross-bench comparability rides on the normalization above, not on an
+identical absolute `d_sae`.
 
 <!-- BEGIN AUTO:operating_point -->
-Canonical cell: **d_sae = F** (per bench), window **T = 4** (token archs T=1), matched to **B\* = 4** atoms (nearest realized L0; loose match >1 marked `*`). Cells are normalized recovery `mean` over seeds, `[chance=0, oracle=1]`.
+Per-token matched: window **T = 4** (token archs T=1), matched to **B\* = 2** atoms/token (nearest realized `l0_per_token`; loose match >1 marked `*`). Each cell is normalized recovery `mean` over seeds, `[chance=0, oracle=1]`, shown at **F, F/2** (`boundary / deep-scarce`):
+
+- **backtracking**: d_sae ∈ {20, 10} (F=20; feature-direction count (1 backtrack + 19 content).)
+- **signed_motion**: d_sae ∈ {19, 9} (F=19; feature-direction count (19 step directions).)
+- **changepoint**: d_sae ∈ {20, 10} (F=20; feature-direction count (8 mode-signature + 12 content).)
+- **frequency**: d_sae ∈ {101, 50} (F=101; alphabet M=101 (NOT a direction count): the circle embedding is rank-2 (all M symbols in a 2-D plane), so {101, 50} are alphabet-scaled capacities, both < the memorization budget |Ω|·M=1010.)
 <!-- END AUTO:operating_point -->
 
 ---
 
-## Matrix A — per-position matched (equal atoms per token)
+## Matrix — per-token matched
 
-Window archs get `k_win = B*·T`. This is the convention the individual bench
-records used.
+Each cell is normalized recovery at `d_sae = F / F/2` (boundary / deep-scarce);
+`—` = no grid cell there yet; `*` = loose realized-L0 match. Per-bench `d_sae`
+values and the operating point are printed above. Run the uniform re-grid to fill
+holes.
 
-<!-- BEGIN AUTO:matrix_per_position -->
+<!-- BEGIN AUTO:matrix_pertoken -->
 | bench · latent (DC/AC) | Per-token SAE | T-SAE (contrastive) | Stacked (per-position dicts) | TXC-pre (additive) | TXC-post (coincidence) | Spectral-TXC (DCT bands) |
 |---|---|---|---|---|---|---|
-| **backtracking** · λ — self-exciting intensity (linear-in-history) (AC) | — | — | — | — | — | — |
-| **signed_motion** · sign — ±1 order-sensitive step (AC) | — | — | — | — | — | — |
-| **changepoint** · mode m_t — global hidden state (DC) | — | — | — | — | — | — |
-| **changepoint** · time-since-switch (primary AC latent) (AC) | — | — | — | — | — | — |
-| **changepoint** · change-point c_t — adjacency floor (AC) | — | — | — | — | — | — |
-| **frequency** · velocity Y — cyclic tone f = Y/M (AC) | — | — | — | — | — | — |
-<!-- END AUTO:matrix_per_position -->
+| **backtracking** · λ — self-exciting intensity (linear-in-history) (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
+| **signed_motion** · sign — ±1 order-sensitive step (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
+| **changepoint** · mode m_t — global hidden state (DC) | — / — | — / — | — / — | — / — | — / — | — / — |
+| **changepoint** · time-since-switch (primary AC latent) (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
+| **changepoint** · change-point c_t — adjacency floor (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
+| **frequency** · velocity Y — cyclic tone f = Y/M (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
+<!-- END AUTO:matrix_pertoken -->
 
-## Matrix B — per-window matched (equal atoms per window)
-
-Window archs are held to `B*` atoms per window (`B*/T` per token); token archs
-keep `B*` per token. The stringent "can a starved-but-joint code still win?"
-test.
-
-<!-- BEGIN AUTO:matrix_per_window -->
-| bench · latent (DC/AC) | Per-token SAE | T-SAE (contrastive) | Stacked (per-position dicts) | TXC-pre (additive) | TXC-post (coincidence) | Spectral-TXC (DCT bands) |
-|---|---|---|---|---|---|---|
-| **backtracking** · λ — self-exciting intensity (linear-in-history) (AC) | — | — | — | — | — | — |
-| **signed_motion** · sign — ±1 order-sensitive step (AC) | — | — | — | — | — | — |
-| **changepoint** · mode m_t — global hidden state (DC) | — | — | — | — | — | — |
-| **changepoint** · time-since-switch (primary AC latent) (AC) | — | — | — | — | — | — |
-| **changepoint** · change-point c_t — adjacency floor (AC) | — | — | — | — | — | — |
-| **frequency** · velocity Y — cyclic tone f = Y/M (AC) | — | — | — | — | — | — |
-<!-- END AUTO:matrix_per_window -->
-
-`—` = no grid cell at that (arch, T, d_sae) under this convention yet;
-`*` = realized-L0 match looser than the tolerance. Run the uniform re-grid to
-fill holes.
+Per-window matching is **not** shown here — it is a per-`T` overlay in each
+bench's own frontier (see `bench_record.md`); a verdict that survives per-window
+too is flagged there as convention-independent.
 
 ---
 

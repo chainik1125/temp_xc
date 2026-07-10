@@ -13,25 +13,30 @@ Last updated: 2026-07-10.
 - **Program-level B×A comparison report: SUBSTRATE BUILT — re-grid queued
   (2026-07-10).** Before expanding the bench count, we're consolidating the five
   benches into ONE apples-to-apples grid (B benchmarks × A architectures) →
-  a single auto-generated [`REPORT.md`](REPORT.md) (two fairness-convention
-  matrices + coverage, all from raw JSON). Design decisions (locked): match on
-  **realized L0** (measured `l0_per_token`/`l0_per_window`, not the nominal
-  `k_pos` knob — they diverge 8×: at T=8/k_pos=4, token fires 4/token, TXC-pre
-  2/token, TXC-post 0.5/token); matrix cell = **canonical fixed point**
-  (`d_sae=F`, `T_can=4`, `B*=4` — feasibility: per-position needs `B*·T_can≤F`,
-  per-window needs `B*≥T_can`). Both conventions reduce to matching
-  `l0_per_token`, differing only in the value held as T grows (per-position: `k*`
-  constant; per-window: `W*/T`). **Built + committed:** the realized-L0 evaluator
-  increment (shared dispatcher, additive, protocol 1.2.0), `registry.py` (the
-  B×A spec), `src/explorations/synthetic/report.py` (matrix builders),
-  `render_report.py`, `REPORT.md` skeleton, `tests/test_program_report.py`.
-  **Renders now** on existing data — matrix empty (historical rows predate L0),
-  coverage block shows what exists. **Next:** the uniform re-grid
+  a single auto-generated [`REPORT.md`](REPORT.md) (per-token matrix + coverage,
+  all from raw JSON). **Design decisions (locked, via a mac-local design pass):**
+  (1) **Match per-token sparsity** (`l0_per_token=B*`) — the controlled
+  comparison (equal total atoms/span; only decode structure varies). Per-window is
+  a *skeptic check*, not a second matrix (its `B*≥T` need collides with
+  deep-scarce `d_sae`) → a per-bench T-frontier overlay. (2) **Match on realized
+  L0**, not the nominal `k_pos` knob — they diverge (nominal `k_pos=4`, T=8 →
+  token 4/token, TXC-pre 2/token, TXC-post 0.5/token). (3) **Canonical cell:**
+  `T_can=4`, `B*=2`, at capacities **`{F, F//2}`** (uniform for every bench;
+  `k_win=8 ≤ min F//2 = 9`). (4) **T ∈ {2,4,8}** (`T≤L/2=16`; T=16 drops out of
+  the scarce regime under per-token matching); **L=32, seq_len=64** kept uniform.
+  (5) **`F` is per-bench** (backtracking/changepoint 20, signed_motion 19,
+  frequency **101 = alphabet M**, NOT a direction count — circle is rank-2);
+  comparability rides on the normalized metric + matched sparsity, not identical
+  `d_sae`. **Built + committed:** realized-L0 evaluator increment (shared
+  dispatcher, additive, protocol 1.2.0), `registry.py`, `report.py` (dual-capacity
+  matrix builder), `render_report.py`, `REPORT.md`, `test_program_report.py` (5).
+  **Renders now** — matrix empty (historical rows predate L0), coverage shows what
+  exists. **Next:** the uniform re-grid
   ([`briefings/uniform-regrid-program-matrix.md`](../../../briefings/uniform-regrid-program-matrix.md),
-  runpod) — bumps eval protocol→1.3.0, sweeps the `(T,k_pos)` lattice across all
-  fair-backbone archs × all four benches (signed_motion needs fresh fair-backbone
-  runs — it's currently TopK-legacy only), fills both matrices, regenerates all
-  records with zero drift.
+  runpod) — bumps eval protocol→1.3.0, sweeps `d_sae∈{F//2,F,2F} × T∈{1,2,4,8} ×
+  k_pos` over all fair-backbone archs × 4 benches (signed_motion needs fresh
+  fair-backbone runs — TopK-legacy only), fills the matrix at both capacities,
+  regenerates all records zero-drift.
 
 - **Changepoint bench: DONE — verdict SPLIT (two-way), committed + pushed
   (2026-06-10).** Full chain: § 8 gating PASS → generator/evaluator/tests →

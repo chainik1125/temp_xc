@@ -29,21 +29,27 @@ def main() -> None:
     cells = report.load_program_rows(leaderboard, reg.BENCHES)
     groups = report.group_cells(cells, primary_ds_only=True, benches=reg.BENCHES)
 
-    pp_md, pp_stats = report.build_matrix(groups, reg.BENCHES, reg.ARCHS,
-                                          convention=report.PER_POSITION, op=reg.OP)
-    pw_md, pw_stats = report.build_matrix(groups, reg.BENCHES, reg.ARCHS,
-                                          convention=report.PER_WINDOW, op=reg.OP)
+    # Headline: per-token matched, dual-capacity {F, F//2} cells.
+    mtx_md, mtx_stats = report.build_matrix(
+        groups, reg.BENCHES, reg.ARCHS, reg.capacities,
+        convention=report.PER_POSITION, op=reg.OP)
     cov_md = report.coverage(groups, reg.BENCHES, reg.ARCHS, op=reg.OP)
 
-    op_md = (f"Canonical cell: **d_sae = F** (per bench), window **T = {reg.OP.T_can}** "
-             f"(token archs T=1), matched to **B\\* = {reg.OP.B_star:g}** atoms "
-             f"(nearest realized L0; loose match >{reg.OP.l0_tol:g} marked `*`). "
-             f"Cells are normalized recovery `mean` over seeds, `[chance=0, oracle=1]`.")
+    caps = ", ".join(report._cap_labels(reg.OP))
+    cap_lines = "\n".join(
+        f"- **{b.name}**: d_sae ∈ {{{', '.join(str(c) for c in reg.capacities(b))}}} "
+        f"(F={b.F}" + (f"; {b.F_note}" if b.F_note else "") + ")"
+        for b in reg.BENCHES)
+    op_md = (
+        f"Per-token matched: window **T = {reg.OP.T_can}** (token archs T=1), "
+        f"matched to **B\\* = {reg.OP.B_star:g}** atoms/token (nearest realized "
+        f"`l0_per_token`; loose match >{reg.OP.l0_tol:g} marked `*`). Each cell is "
+        f"normalized recovery `mean` over seeds, `[chance=0, oracle=1]`, shown at "
+        f"**{caps}** (`boundary / deep-scarce`):\n\n{cap_lines}")
 
     populate(report_md, {
         "operating_point": op_md,
-        "matrix_per_position": pp_md,
-        "matrix_per_window": pw_md,
+        "matrix_pertoken": mtx_md,
         "coverage": cov_md,
     })
 
@@ -51,14 +57,16 @@ def main() -> None:
         "source": reg.LEADERBOARD_REL,
         "n_cells": len(cells), "n_groups": len(groups),
         "operating_point": {"T_can": reg.OP.T_can, "B_star": reg.OP.B_star,
+                            "capacity_fracs": list(reg.OP.capacity_fracs),
                             "l0_tol": reg.OP.l0_tol},
         "benches": [b.name for b in reg.BENCHES],
         "archs": [a.name for a in reg.ARCHS],
-    }, {report.PER_POSITION: pp_stats, report.PER_WINDOW: pw_stats}, root)
+    }, {report.PER_POSITION: mtx_stats}, root)
 
-    n_filled = sum(1 for v in pp_stats.values() if v is not None)
+    n_filled = sum(1 for v in mtx_stats.values()
+                   if v and any(c is not None for c in v.values()))
     print(f"[report] {len(cells)} cells → {len(groups)} groups; "
-          f"per-position matrix filled {n_filled}/{len(pp_stats)} cells")
+          f"per-token matrix rows filled {n_filled}/{len(mtx_stats)}")
     print(f"[report] -> {report_md.relative_to(root)}")
 
 
