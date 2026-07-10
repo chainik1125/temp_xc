@@ -15,16 +15,14 @@ by tabulation.
 This is the outlier of the synthetic benches: figure-ONLY (single combined
 `bench.md`), on the iter_leaderboard path, with NO record-pipeline. It therefore
 does not use `explorations.synthetic.record` (there are no AUTO tables / stats to
-regenerate here) — see the two FLAGs below for pre-existing bugs left un-fixed
-per the refactor briefing (flag, don't silently change published output).
+regenerate here).
 
-FLAG (pre-existing, not fixed here): `render_ac_frontier` writes to the
-CWD-RELATIVE `Path("synthetic/signed_motion/figs")` (below), NOT this bench's
-`figs/` dir — so from the repo root it creates a stray `./synthetic/…` tree and
-the committed figs go stale. Fix would be `Path(__file__).resolve().parent /
-"figs"`. Also: `bench.md` carries a `<!-- AUTO:* -->` block that this renderer
-never populates (it has no `populate` step) — the block is effectively
-hand-maintained.
+Figures write to this bench's own `figs/` dir (`Path(__file__).parent / "figs"`),
+per the per-bench convention — fixed 2026-07-10 (was a CWD-relative path).
+
+NOTE (remaining pre-existing quirk, left as-is): `bench.md` carries a
+`<!-- AUTO:* -->` block that this renderer never populates (it has no `populate`
+step) — the block is effectively hand-maintained.
 """
 
 from __future__ import annotations
@@ -136,7 +134,7 @@ def render_ac_frontier() -> Path:
     )
     fig.tight_layout(rect=(0, 0, 1, 0.93))
 
-    out_dir = Path("synthetic/signed_motion/figs")  # FLAG: CWD-relative bug (see module docstring)
+    out_dir = Path(__file__).resolve().parent / "figs"  # this bench's own figs/ (convention)
     out_dir.mkdir(parents=True, exist_ok=True)
     pdf = out_dir / "fig_ac_signed_motion.pdf"
     png = out_dir / "fig_ac_signed_motion.png"
