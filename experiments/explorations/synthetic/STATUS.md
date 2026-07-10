@@ -30,13 +30,19 @@ Last updated: 2026-07-10.
   `d_sae`. **Built + committed:** realized-L0 evaluator increment (shared
   dispatcher, additive, protocol 1.2.0), `registry.py`, `report.py` (dual-capacity
   matrix builder), `render_report.py`, `REPORT.md`, `test_program_report.py` (5).
-  **Renders now** — matrix empty (historical rows predate L0), coverage shows what
-  exists. **Next:** the uniform re-grid
-  ([`briefings/uniform-regrid-program-matrix.md`](../../../briefings/uniform-regrid-program-matrix.md),
-  runpod) — bumps eval protocol→1.3.0, sweeps `d_sae∈{F//2,F,2F} × T∈{1,2,4,8} ×
-  k_pos` over all fair-backbone archs × 4 benches (signed_motion needs fresh
-  fair-backbone runs — TopK-legacy only), fills the matrix at both capacities,
-  regenerates all records zero-drift.
+  Also **companion panels** (capability gate): reconstruction NMSE + content
+  `eauc`, per benchmark (`A×B`, not per-axis — reconstruction is of the shared
+  activations), read from the same matched cells (README validity gate). **Renders
+  now** — matrix + panels empty (historical rows predate L0), coverage shows what
+  exists. **Next (user-ordered 2026-07-10): a FULL clean-room rerun + scoped purge**
+  ([`briefings/full-rerun-and-purge.md`](../../../briefings/full-rerun-and-purge.md),
+  runpod) — bump eval protocol→1.3.0, rebuild the *entire* synthetic result set
+  from scratch under the new design (`d_sae∈{F//2,F,2F} × T∈{1,2,4,8} × k_pos`,
+  fair-backbone archs × 4 benches), regenerate ALL records (per-bench + program
+  matrix + panels), then **purge stale synthetic rows** (old protocol / deprecated
+  archs / old code_version) — scoped to the 5 synthetic datasources, never other
+  experiments; purge LAST, after verification. ⚠️ ~20h est. > 12h → shard by bench,
+  purge only when all four complete.
 
 - **Changepoint bench: DONE — verdict SPLIT (two-way), committed + pushed
   (2026-06-10).** Full chain: § 8 gating PASS → generator/evaluator/tests →

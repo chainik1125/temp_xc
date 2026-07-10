@@ -8,34 +8,34 @@ Role: prototyping, review, orchestration. Heavy grids go to `runpod`.
 I am the `mac-local` agent (inferred from darwin + this path — no need to be told).
 
 ## Git
-Branch `arxiv`, **@ `250c3043`** (push pending — see below), clean working tree.
+Branch `arxiv`, level with `origin/arxiv` after the commit below.
 `origin` is the SSH URL (`git@github.com:chainik1125/temp_xc.git`).
 
 ## Current thread — program-level B×A report (the comparison substrate)
 The quest turned from *more benchmarks* to *a clean comparison foundation*: one
-apples-to-apples grid of B benchmarks × A architectures → a single auto-generated
-`REPORT.md` (two fairness-convention matrices, all from raw JSON). Full design +
-state in the research STATUS §0. **This stretch (all committed):**
-- `20a5e46a` realized-L0 evaluator increment (`l0_per_token`/`l0_per_window` on
-  the shared dispatcher, additive, protocol 1.2.0). Validated: nominal `k_pos=4`
-  at T=8 realizes 4 / 2.06 / 0.5 atoms-per-token for token / pre / post — why
-  matching keys on realized L0, not the knob.
-- `b9773cde` the foundation: `experiments/explorations/synthetic/registry.py`
-  (B×A spec + canonical op `d_sae=F, T_can=4, B*=4`), `src/explorations/synthetic/
-  report.py` (matrix builders, both conventions reduce to matching `l0_per_token`),
-  `render_report.py`, `REPORT.md`, `tests/test_program_report.py` (5 pass).
-- `250c3043` research STATUS §0 + the RunPod re-grid briefing.
-
-Renders now; matrix empty (historical rows lack L0) — expected. Coverage block is
-the live signal (surfaced: **signed_motion is TopK-legacy only → needs fresh
-fair-backbone runs**).
+apples-to-apples grid → a single auto-generated `REPORT.md` from raw JSON. Full
+design + state in the research STATUS §0. **Design settled over a long design pass
+(all committed):** match **per-token sparsity** on realized `l0_per_token` (only
+convention — per-window was dropped as residue); canonical cell `T_can=4, B*=2`;
+capacities `{F, F//2}` uniform (F per-bench; frequency F=101=alphabet M, circle
+rank-2); `T∈{2,4,8}`, `L=32, seq_len=64`. Matrix rows = `(bench, latent-axis)`
+(L=6, not B); **companion panels** (NMSE + eauc, per-bench A×B) = the
+capability-vs-artifact gate. Key commits: `20a5e46a` L0 increment · `b9773cde`
+foundation · `672bb120` {F,F/2}-for-all + per-token primary · `89ba17ce` drop
+per-window · `40b130dc` companion panels. Renders now; matrix + panels empty
+(historical rows lack L0) — coverage block shows what exists (signed_motion is
+TopK-legacy only).
 
 ## Next / immediate
-- **PUSH** `250c3043` to `origin/arxiv` (was pending at last write).
-- The re-grid is **queued for runpod**: `briefings/uniform-regrid-program-matrix.md`
-  (bump eval protocol→1.3.0 to force L0 on every cell, sweep the `(T,k_pos)`
-  lattice, fill both matrices, regenerate records zero-drift). Not mine to run
-  (heavy grid). When runpod finishes: review the filled matrices + drift gate.
+- **USER ORDERED (2026-07-10): a FULL clean-room rerun + scoped purge** — briefing
+  `briefings/full-rerun-and-purge.md` (queued for runpod; I recommended the
+  smaller canonical-cell re-grid, user overrode). Rebuild the entire synthetic
+  result set from scratch at protocol 1.3.0 under the new design, regenerate ALL
+  records (per-bench + program), then purge stale synthetic rows (scoped to the 5
+  synthetic datasources — NEVER other experiments; purge LAST). ⚠️ ~20h est. > 12h
+  → shard by bench. Not mine to run (heavy grid).
+- When runpod finishes: review the filled matrix + panels, the purge (confirm
+  non-synthetic rows untouched), and sanity-check recovery vs the old records.
 
 ## Prior stretch (context — all committed + pushed)
 - Frequency (cyclic-tone) bench built by `runpod` (verdict POSITIVE); the
