@@ -4,11 +4,34 @@
 is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-07-08.
+Last updated: 2026-07-10.
 
 ---
 
 ## 0. TL;DR — what's active right now
+
+- **Program-level B×A comparison report: SUBSTRATE BUILT — re-grid queued
+  (2026-07-10).** Before expanding the bench count, we're consolidating the five
+  benches into ONE apples-to-apples grid (B benchmarks × A architectures) →
+  a single auto-generated [`REPORT.md`](REPORT.md) (two fairness-convention
+  matrices + coverage, all from raw JSON). Design decisions (locked): match on
+  **realized L0** (measured `l0_per_token`/`l0_per_window`, not the nominal
+  `k_pos` knob — they diverge 8×: at T=8/k_pos=4, token fires 4/token, TXC-pre
+  2/token, TXC-post 0.5/token); matrix cell = **canonical fixed point**
+  (`d_sae=F`, `T_can=4`, `B*=4` — feasibility: per-position needs `B*·T_can≤F`,
+  per-window needs `B*≥T_can`). Both conventions reduce to matching
+  `l0_per_token`, differing only in the value held as T grows (per-position: `k*`
+  constant; per-window: `W*/T`). **Built + committed:** the realized-L0 evaluator
+  increment (shared dispatcher, additive, protocol 1.2.0), `registry.py` (the
+  B×A spec), `src/explorations/synthetic/report.py` (matrix builders),
+  `render_report.py`, `REPORT.md` skeleton, `tests/test_program_report.py`.
+  **Renders now** on existing data — matrix empty (historical rows predate L0),
+  coverage block shows what exists. **Next:** the uniform re-grid
+  ([`briefings/uniform-regrid-program-matrix.md`](../../../briefings/uniform-regrid-program-matrix.md),
+  runpod) — bumps eval protocol→1.3.0, sweeps the `(T,k_pos)` lattice across all
+  fair-backbone archs × all four benches (signed_motion needs fresh fair-backbone
+  runs — it's currently TopK-legacy only), fills both matrices, regenerates all
+  records with zero drift.
 
 - **Changepoint bench: DONE — verdict SPLIT (two-way), committed + pushed
   (2026-06-10).** Full chain: § 8 gating PASS → generator/evaluator/tests →
