@@ -4,19 +4,30 @@ You are an AI agent working on the `arxiv` branch — the post-submission
 cleanup branch off Aniket's camera-ready (`origin/final-aniket`). All
 work happens at the repo root.
 
+**Session start — who am I, and the three kinds of state:**
+
+> **You are one of a few agents (`agents/README.md`).** Infer your id from your
+> environment: a macOS/darwin session at `~/research/projects/temp_xc` is
+> **`mac-local`** (prototyping, MPS); the Linux RunPod box at `/workspace/temp_xc`
+> is **`runpod`** (heavy grids, CUDA). If ambiguous, ask. Read your
+> **`agents/<id>/STATUS.md`** — your own working-state briefing (what you were
+> mid-doing, git position, next action). **Rewrite it before any compact** so
+> your next context window resumes cleanly.
+>
+> Then two *shared* stores: **`briefings/`** holds task/idea handoffs any agent
+> can pick up (see `briefings/README.md`) — if one is `status: active` and
+> matches your task, execute it and **delete it when done**. And
+> **`experiments/explorations/synthetic/STATUS.md`** is the living
+> research-program state (verdicts, roadmap, benchmark index) — update it when
+> you advance the science.
+
 **Read order on every session:**
 
-> **Check `briefings/` first for an active task brief.** Task handoffs
-> (refactors, cleanups, bench ports) live as one self-contained file each under
-> `briefings/` (see `briefings/README.md`). If one is `status: active` and
-> matches your task, execute it — then **delete it** (briefings don't
-> accumulate; the record is the git history + artifacts, not a leftover brief).
-
-> **Picking up in-progress synthetic-benchmark work (e.g. after a compact)?**
-> Read `experiments/explorations/synthetic/STATUS.md` **first** — the single living briefing
-> of the current redo initiative (what's active, the locked design, the next
-> actions, git state). It is the *one* file kept current before a compact; trust
-> it over scattered notes.
+> **Resuming synthetic-benchmark work?** The research-program state — what's
+> active, verdicts, locked designs, the benchmark index — lives in
+> `experiments/explorations/synthetic/STATUS.md`. Read it after your workspace
+> `agents/<id>/STATUS.md` (which holds your *own* mid-task thread + git state).
+> Trust these two over scattered notes.
 
 1. `docs/framework.md` — the framework spec. Read top-to-bottom.
 2. `experiments/explorations/synthetic/README.md` — the synthetic-benchmark program: the prime

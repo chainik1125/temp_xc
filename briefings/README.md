@@ -13,6 +13,9 @@ constraints (the hard rules), and an explicit **acceptance gate**.
 
 ## What does NOT belong here
 
+- **`agents/<id>/STATUS.md`** — an agent's *own* working state (personal
+  scratchpad + pre-compact handoff). A briefing is a shared task any agent can
+  pick up; a workspace STATUS is one agent's private thread. See `agents/README.md`.
 - **`experiments/explorations/synthetic/STATUS.md`** — the *living* research
   state (kept current, never deleted). A briefing is transient; STATUS is
   permanent. Research verdicts/state go in STATUS, not here.
