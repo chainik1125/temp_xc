@@ -152,6 +152,55 @@ def _windowed_recon_nmse(
     return float(num / max(den, 1e-12))
 
 
+@torch.no_grad()
+def _realized_sparsity(
+    model: TempBenchArch,
+    x_eval: torch.Tensor,
+    *,
+    L: int,
+    n_windows: int = 1024,
+    batch: int = 256,
+    seed: int = 0,
+) -> dict[str, float]:
+    """Measured code sparsity on the shared eval tiling — the fair-matching key.
+
+    Encodes the SAME length-``L`` windows every recovery metric uses (tiled
+    non-overlapping into ``L/T`` sub-windows) and reports the realized L0 in two
+    architecture-independent units:
+
+    - ``l0_per_window`` — mean nonzero code entries describing one ``T``-tile
+      (the window arch's realized ``k_win``; for a per-token SAE, ``T=1`` so a
+      tile is one token).
+    - ``l0_per_token``  — the same amortized per token position (``= l0_per_window
+      / T``). A per-token SAE and a length-``T`` crosscoder are directly
+      comparable on this axis.
+
+    These are the two matching conventions in one measurement: hold
+    ``l0_per_token`` fixed → per-position matched; hold ``l0_per_window`` fixed →
+    per-window matched. **Realized, not nominal**: BatchTopK pools L0 across the
+    batch and post-squash reuses each atom at all ``T`` positions, so the fired
+    density drifts off ``k_pos``; matching must key on this. Deterministic in
+    ``seed``; additive (leaves every other metric byte-identical).
+    """
+    device = next(model.parameters()).device
+    T = _check_tileable(model, L)
+    n_tiles = L // T
+    windows, _ = _sample_windows(x_eval, L=L, n_windows=n_windows, seed=seed)
+    model.eval()
+    total_nnz = 0.0
+    total_tiles = 0
+    for i in range(0, n_windows, batch):
+        xb = windows[i:i + batch].to(device, dtype=torch.float32)   # (b, L, d_in)
+        b, _, d_in = xb.shape
+        tiles = xb.reshape(b * n_tiles, T, d_in)
+        z = model.encode(tiles).reshape(b * n_tiles, -1)            # (tiles, code)
+        total_nnz += float((z != 0).float().sum().item())
+        total_tiles += z.shape[0]
+    l0_per_window = total_nnz / max(total_tiles, 1)
+    return {"l0_per_window": float(l0_per_window),
+            "l0_per_token": float(l0_per_window / T)}
+
+
 class SyntheticRecovery(Evaluator):
     """§ 4 evaluator: feature recovery AUC + NMSE on synthetic data."""
 
@@ -203,6 +252,14 @@ class SyntheticRecovery(Evaluator):
 
         n_windows = 128 if spec.smoke else 1024
         out["nmse"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)
+
+        # Realized code sparsity on the SAME eval tiling — the architecture-
+        # independent fair-matching key for the program-level B×A report (both
+        # per-position and per-window conventions render off l0_per_token /
+        # l0_per_window). Additive: every metric above is byte-identical, so the
+        # protocol contract is unchanged and prior rows stay valid (they simply
+        # lack the key; the renderer falls back / re-grid supplies it).
+        out.update(_realized_sparsity(model, data.x, L=L, n_windows=n_windows))
 
         # AC-only signed-motion add-on (FrequencyBench § 5). Only fires for
         # the signed_motion datasource, which exposes a hidden ±1 sign in
