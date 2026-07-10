@@ -12,12 +12,12 @@ section, or the module docstring of ``src/explorations/synthetic/report.py``):
    ``[chance = 0, oracle = 1]`` by its evaluator, so a cell is one scalar that is
    comparable across benchmarks. Dual-latent benches contribute **one matrix row
    per latent-axis** (this surfaces the DC/AC split rather than hiding it).
-2. **Budget.** Architectures are matched on **realized L0** (measured, not the
-   nominal ``k_pos`` knob — they diverge wildly; see the ``l0_per_token`` /
-   ``l0_per_window`` evaluator increment). Both fairness conventions reduce to
-   matching ``l0_per_token``, differing only in the value held as ``T`` varies:
-   per-position holds it constant (``k*``); per-window holds ``l0_per_window``
-   constant (so per-token = ``W*/T`` shrinks with ``T``).
+2. **Budget.** Architectures are matched on **per-token sparsity** — the
+   *realized* ``l0_per_token`` (measured, not the nominal ``k_pos`` knob — they
+   diverge wildly; see the evaluator increment). This is the controlled
+   comparison: equal total atoms per span, so only decode structure varies. It is
+   the only matching convention (``l0_per_window`` is recorded as a diagnostic,
+   never matched on).
 """
 
 from __future__ import annotations
@@ -144,9 +144,7 @@ class OperatingPoint:
     B*·T_can ≤ d_sae`` at the *scarcest* slice — ``min F//2`` over benches is 9
     (signed_motion). ``T_can=4, B*=2`` → ``k_win = 8 ≤ 9`` — feasible at every
     bench's ``F//2`` and both capacity slices. Larger ``T`` (8) lives in the
-    per-bench frontiers. (The per-window convention is NOT a program matrix — its
-    ``B* ≥ T`` requirement collides with deep-scarce ``d_sae`` for ``T>2``; it is
-    a per-bench T-frontier overlay instead.)"""
+    per-bench frontiers."""
     T_can: int = 4
     B_star: float = 2.0
     capacity_fracs: tuple[float, ...] = (1.0, 0.5)   # {F, F//2}

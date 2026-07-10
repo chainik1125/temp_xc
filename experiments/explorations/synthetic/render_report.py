@@ -29,10 +29,9 @@ def main() -> None:
     cells = report.load_program_rows(leaderboard, reg.BENCHES)
     groups = report.group_cells(cells, primary_ds_only=True, benches=reg.BENCHES)
 
-    # Headline: per-token matched, dual-capacity {F, F//2} cells.
+    # The per-token matched matrix, dual-capacity {F, F//2} cells.
     mtx_md, mtx_stats = report.build_matrix(
-        groups, reg.BENCHES, reg.ARCHS, reg.capacities,
-        convention=report.PER_POSITION, op=reg.OP)
+        groups, reg.BENCHES, reg.ARCHS, reg.capacities, op=reg.OP)
     cov_md = report.coverage(groups, reg.BENCHES, reg.ARCHS, op=reg.OP)
 
     caps = ", ".join(report._cap_labels(reg.OP))
@@ -61,7 +60,7 @@ def main() -> None:
                             "l0_tol": reg.OP.l0_tol},
         "benches": [b.name for b in reg.BENCHES],
         "archs": [a.name for a in reg.ARCHS],
-    }, {report.PER_POSITION: mtx_stats}, root)
+    }, mtx_stats, root)
 
     n_filled = sum(1 for v in mtx_stats.values()
                    if v and any(c is not None for c in v.values()))

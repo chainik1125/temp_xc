@@ -46,7 +46,7 @@ def _bench():
 def test_pertoken_matches_l0_per_token():
     """Per-token holds l0_per_token = B*=2: token→k_pos=2, pre→k_pos=2, post→k_pos=8."""
     _, st = report.build_matrix(_cp_groups(), _bench(), _archs(), reg.capacities,
-                                convention=report.PER_POSITION, op=reg.OP)
+                                op=reg.OP)
     for d in (20, 10):   # both capacity slices resolve
         assert st["changepoint/mode/batchtopk_sae"][d]["k_pos"] == 2
         assert st["changepoint/mode/txc_batchtopk_pre"][d]["k_pos"] == 2   # l0_t=2
@@ -58,7 +58,7 @@ def test_pertoken_matches_l0_per_token():
 def test_dual_capacity_cell():
     """A cell shows both {F, F//2} values joined by ' / ', and stats carry both."""
     md, st = report.build_matrix(_cp_groups(), _bench(), _archs(), reg.capacities,
-                                 convention=report.PER_POSITION, op=reg.OP)
+                                 op=reg.OP)
     assert set(st["changepoint/mode/batchtopk_sae"]) == {20, 10}
     # the markdown cell for a resolved arch has the two-capacity separator
     assert " / " in md
@@ -68,23 +68,19 @@ def test_missing_capacity_renders_dash():
     """An arch with no group at a capacity → that slot is None → '—' in the cell."""
     md, st = report.build_matrix(_cp_groups(), _bench(),
                                  [a for a in reg.ARCHS if a.name == "spectral_txc"],
-                                 reg.capacities, convention=report.PER_POSITION, op=reg.OP)
+                                 reg.capacities, op=reg.OP)
     cell = st["changepoint/mode/spectral_txc"]
     assert cell[20] is None and cell[10] is None
     assert "— / —" in md
 
 
-def test_matched_group_keys_on_convention():
-    """matched_group keys on l0_per_token (per-token) vs l0_per_window (per-window)."""
+def test_matched_group_keys_on_l0_per_token():
+    """matched_group picks the group whose realized l0_per_token is nearest B*."""
     groups = _cp_groups()
-    pt = report.matched_group(groups, "changepoint", _archs()[2],  # post
-                              d_sae=20, T_can=reg.OP.T_can,
-                              convention=report.PER_POSITION, B_star=reg.OP.B_star)
-    pw = report.matched_group(groups, "changepoint", _archs()[2],
-                              d_sae=20, T_can=reg.OP.T_can,
-                              convention=report.PER_WINDOW, B_star=reg.OP.B_star)
-    assert pt[0][4] == 8    # per-token picks k_pos=8 (l0_t=2)
-    assert pw[0][4] == 4    # per-window picks k_pos=4 (l0_w=4, nearest to B*)
+    mg = report.matched_group(groups, "changepoint", _archs()[2],  # post
+                              d_sae=20, T_can=reg.OP.T_can, B_star=reg.OP.B_star)
+    assert mg[0][4] == 8    # k_pos=8 → l0_t=2 (post fires k_pos/T per token)
+    assert abs(mg[1]["l0_t"] - reg.OP.B_star) < 1e-6
 
 
 def test_nan_l0_rows_excluded():
@@ -92,6 +88,5 @@ def test_nan_l0_rows_excluded():
     groups = {("changepoint", "batchtopk_sae", 1, 20, 2):
               _g(float("nan"), float("nan"), mode_recovery=0.9)}
     mg = report.matched_group(groups, "changepoint", _archs()[0], d_sae=20,
-                              T_can=reg.OP.T_can, convention=report.PER_POSITION,
-                              B_star=reg.OP.B_star)
+                              T_can=reg.OP.T_can, B_star=reg.OP.B_star)
     assert mg is None

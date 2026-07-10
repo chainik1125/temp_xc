@@ -1,27 +1,25 @@
-"""Program-level B×A report: cross-bench matrix builders over realized L0.
+"""Program-level B×A report: cross-bench per-token matrix builder over realized L0.
 
 The per-bench pipeline (``record.py``) renders one benchmark's frontier. This
-module renders the **whole program** as two matrices — rows = ``(bench, latent
--axis)``, cols = architecture — one under each fairness convention, at a single
-canonical operating point. Every number comes from ``results/leaderboard.jsonl``;
-nothing is hand-typed.
+module renders the **whole program** as ONE matrix — rows = ``(bench, latent
+-axis)``, cols = architecture — at a single canonical operating point. Every
+number comes from ``results/leaderboard.jsonl``; nothing is hand-typed.
 
 The comparability problem and its resolution (see the registry docstring):
 
 - **Cross-bench metric.** Each recovery metric is pre-normalized to
   ``[chance = 0, oracle = 1]`` by its evaluator, so a cell is one comparable
   scalar. Dual-latent benches give one row per axis.
-- **Cross-arch budget.** Architectures are matched on **realized L0** (measured
-  ``l0_per_token`` / ``l0_per_window``, never the nominal ``k_pos`` knob — they
-  diverge). Both conventions reduce to matching ``l0_per_token``:
-    * **per-position** — hold ``l0_per_token = B*`` (window budget grows with T);
-    * **per-window** — hold ``l0_per_window = B*`` (per-token = ``B*/T`` shrinks).
-  A token arch has ``T=1`` so the two coincide for it.
+- **Cross-arch budget.** Architectures are matched on **per-token sparsity** —
+  the *realized* ``l0_per_token`` (measured on the shared eval windows, never the
+  nominal ``k_pos`` knob — they diverge). This is the controlled comparison:
+  equal total atoms per span, so only decode structure varies. (``l0_per_window``
+  is also recorded, purely as a diagnostic — we do NOT match on it.)
 
-Canonical cell: ``d_sae = F`` (per bench), window ``T = T_can`` (token archs are
-``T=1``), the grid group whose mean realized L0 sits nearest ``B*``, aggregated
-``mean ± std`` over seeds. The full ``d_sae`` / ``T`` frontiers stay in each
-bench's own section — this is the summary, not a replacement.
+Canonical cell: each capacity in ``{F, F//2}`` (per bench), window ``T = T_can``
+(token archs are ``T=1``), the grid group whose mean realized ``l0_per_token``
+sits nearest ``B*``, aggregated ``mean ± std`` over seeds. The full ``d_sae`` /
+``T`` frontiers stay in each bench's own section — this is the summary.
 """
 
 from __future__ import annotations
@@ -32,20 +30,16 @@ from pathlib import Path
 
 import numpy as np
 
-# Reuse the per-bench pipeline's formatters so the two reports read identically.
+# Reuse the per-bench pipeline's formatters so the reports read identically.
 from .record import fmt, fmt_pm  # noqa: F401  (fmt_pm exported for callers)
-
-PER_POSITION = "per_position"
-PER_WINDOW = "per_window"
-_L0_KEY = {PER_POSITION: "l0_t", PER_WINDOW: "l0_w"}
 
 
 def load_program_rows(leaderboard: Path, benches, *, trained_only: bool = True) -> list[dict]:
     """Flatten the leaderboard to the program's cells (all registered benches).
 
     Each cell: ``{bench, ds, arch, T, d_sae, k_pos, seed, l0_t, l0_w, m}`` where
-    ``m`` is the metric dict and ``l0_t``/``l0_w`` are the realized-L0 matching
-    keys (``nan`` for pre-increment rows — such cells can't be matched and drop
+    ``m`` is the metric dict, ``l0_t`` is the realized ``l0_per_token`` matching
+    key (``nan`` for pre-increment rows — such cells can't be matched and drop
     out of the matrix). One pass over the file; a row is claimed by the first
     bench whose ``(datasources, protocol)`` it matches.
     """
@@ -119,23 +113,23 @@ def group_cells(cells: list[dict], *, primary_ds_only: bool = True, benches=None
 
 
 def matched_group(groups: dict, bench: str, arch, *, d_sae: int, T_can: int,
-                  convention: str, B_star: float):
+                  B_star: float):
     """The canonical group for one (bench, arch, ``d_sae``) cell, or ``None``.
 
     Restricts to the given ``d_sae`` and the arch's window (``1`` for token archs,
-    ``T_can`` for windowed), then picks the group whose mean realized L0 (for the
-    convention) is nearest ``B*``. Returns ``(key, group, deviation)`` where
-    ``deviation = |realized L0 − B*|`` (so the caller can flag a loose match), or
+    ``T_can`` for windowed), then picks the group whose mean realized
+    ``l0_per_token`` is nearest ``B*`` (per-token matching — the controlled
+    comparison). Returns ``(key, group, deviation)`` where ``deviation =
+    |realized l0_per_token − B*|`` (so the caller can flag a loose match), or
     ``None`` when no such group exists (rendered as ``—``).
     """
     T = 1 if not arch.windowed else T_can
-    l0k = _L0_KEY[convention]
     best = None
     for key, g in groups.items():
         (bn, an, Tk, d, _kp) = key
         if bn != bench or an != arch.name or Tk != T or d != d_sae:
             continue
-        l0 = g[l0k]
+        l0 = g["l0_t"]
         if not np.isfinite(l0):
             continue
         dev = abs(l0 - B_star)
@@ -149,9 +143,8 @@ def _cap_labels(op) -> list[str]:
     return [fr.get(f, f"{f:g}·F") for f in op.capacity_fracs]
 
 
-def build_matrix(groups: dict, benches, archs, capacities_fn, *, convention: str,
-                 op) -> tuple[str, dict]:
-    """One markdown matrix + stats — per-token matched, dual-capacity cells.
+def build_matrix(groups: dict, benches, archs, capacities_fn, *, op) -> tuple[str, dict]:
+    """The per-token matched matrix (markdown) + stats — dual-capacity cells.
 
     Rows = ``(bench, latent-axis)``. A cell shows the axis metric's ``mean`` at
     each canonical capacity ``{F, F//2}`` (``capacities_fn(bench)``), joined by
@@ -171,8 +164,8 @@ def build_matrix(groups: dict, benches, archs, capacities_fn, *, convention: str
             for a in archs:
                 parts, cell_stats = [], {}
                 for d_sae in caps:
-                    mg = matched_group(groups, b.name, a, d_sae=d_sae, T_can=op.T_can,
-                                       convention=convention, B_star=op.B_star)
+                    mg = matched_group(groups, b.name, a, d_sae=d_sae,
+                                       T_can=op.T_can, B_star=op.B_star)
                     if mg is None:
                         parts.append("—")
                         cell_stats[d_sae] = None
@@ -209,9 +202,9 @@ def coverage(groups: dict, benches, archs, *, op) -> str:
     return "\n".join(lines)
 
 
-def write_stats(stats_path: Path, base: dict, matrices: dict, root: Path) -> None:
-    """Dump ``{**base, matrices: {convention: stats}}`` as indented JSON."""
+def write_stats(stats_path: Path, base: dict, matrix: dict, root: Path) -> None:
+    """Dump ``{**base, matrix: {bench/axis/arch: {d_sae: cell}}}`` as JSON."""
     stats_path = Path(stats_path)
     stats_path.parent.mkdir(parents=True, exist_ok=True)
-    stats_path.write_text(json.dumps({**base, "matrices": matrices}, indent=2))
+    stats_path.write_text(json.dumps({**base, "matrix": matrix}, indent=2))
     print(f"[program-stats] -> {stats_path.relative_to(root)}")

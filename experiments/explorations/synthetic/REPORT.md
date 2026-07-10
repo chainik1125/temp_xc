@@ -22,28 +22,16 @@ benchmarks. A **dual-latent** benchmark contributes **one matrix row per
 latent-axis** (e.g. changepoint → a DC `mode` row and an AC `time-since-switch`
 row), so the split is shown, not averaged away.
 
-**2. Cross-architecture budget.** Architectures are matched on **realized L0** —
-the code density actually fired, measured on the shared eval windows
-(`l0_per_token` / `l0_per_window`), **not** the nominal `k_pos` knob. They
-diverge sharply: at `T=8`, nominal `k_pos=4`, a per-token SAE fires 4/token,
-TXC-pre ~2/token, TXC-post 0.5/token. Matching on the knob would compare unequal
-densities; matching on realized L0 does not.
-
-**Per-token matched is the primary comparison.** Holding `l0_per_token = B*`
-equal is the *controlled* experiment: it equalizes the total atom budget spent
-describing any span, so the only remaining variable is decode structure (one
-joint window code vs `T` independent per-token codes). A token arch is the `T=1`
-base case; a window arch gets `k_win = B*·T`. This is the convention the
-individual bench records used.
-
-The **per-window** convention (`l0_per_window = B*`, so per-token = `B*/T`
-shrinks with `T`) is a *skeptic's check*, not a second fairness baseline: it asks
-whether a window arch's advantage survives losing the budget growth that longer
-windows otherwise grant. It cannot be a clean program matrix (its `B* ≥ T`
-requirement — pre/stacked fire ≥1 atom/position — collides with deep-scarce
-`d_sae` for `T>2`), and its signal *scales with T*. So it lives as a **per-token
-vs per-window overlay across `T`** in each bench's own frontier, where it's
-legible — not here.
+**2. Cross-architecture budget — matched per-token sparsity.** Architectures are
+matched on the **realized `l0_per_token`** — the per-token code density actually
+fired, measured on the shared eval windows, **not** the nominal `k_pos` knob
+(they diverge sharply: at `T=8`, nominal `k_pos=4`, a per-token SAE fires
+4/token, TXC-pre ~2/token, TXC-post 0.5/token). Per-token matching is the
+*controlled* comparison: it equalizes the total atom budget spent describing any
+span, so the only remaining variable is decode structure (one joint window code
+vs `T` independent per-token codes). A token arch is the `T=1` base case; a
+window arch gets `k_win = B*·T`. (`l0_per_window` is also recorded as a
+diagnostic, but we do **not** match on it.)
 
 **3. Capacity.** Each bench's canonical cells sit at **`{F, F/2}`** (boundary +
 deep-scarce), a uniform rule for every bench. `F` is per-bench (usually the
@@ -79,10 +67,6 @@ holes.
 | **changepoint** · change-point c_t — adjacency floor (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
 | **frequency** · velocity Y — cyclic tone f = Y/M (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
 <!-- END AUTO:matrix_pertoken -->
-
-Per-window matching is **not** shown here — it is a per-`T` overlay in each
-bench's own frontier (see `bench_record.md`); a verdict that survives per-window
-too is flagged there as convention-independent.
 
 ---
 

@@ -22,13 +22,12 @@ zero-drift gate as the record-pipeline refactor.
 
 ## Locked design (from the mac-local design pass — do not re-litigate)
 
-- **Fairness:** match **per-token sparsity** (`l0_per_token = B*`); this is the
-  controlled comparison. Per-window is NOT a program matrix (its `B*≥T` need
-  collides with deep-scarce `d_sae`); it is a per-bench T-frontier overlay
-  (§ Step 3, secondary).
-- **Realized L0, not the knob:** match on measured `l0_per_token` /
-  `l0_per_window` (added to the shared evaluator). Nominal `k_pos` diverges from
-  realized density across archs.
+- **Fairness:** match **per-token sparsity** (`l0_per_token = B*`) — the
+  controlled comparison (equal total atoms/span; only decode structure varies).
+  This is the *only* matching convention; there is no per-window matrix.
+- **Realized L0, not the knob:** match on measured `l0_per_token` (added to the
+  shared evaluator; `l0_per_window` is recorded too but only as a diagnostic).
+  Nominal `k_pos` diverges from realized density across archs.
 - **Canonical cell:** `T_can = 4` (token archs T=1), `B* = 2` atoms/token, at each
   capacity `{F, F//2}`. Feasible everywhere: `k_win = B*·T_can = 8 ≤ min(F//2) = 9`.
 - **Windows swept:** `T ∈ {2, 4, 8}` (powers of two, `T ≤ L/2 = 16`); token archs
@@ -100,11 +99,7 @@ must resolve at `(T=4 [or 1 for token], d_sae ∈ {F, F//2})` with realized
    (`render_report`). Confirm **zero numeric drift** on existing metrics vs the
    committed records (diff AUTO blocks + stats JSON; only L0 fields are new).
 2. Confirm the per-token matrix is fully filled at both capacities.
-3. **(Secondary)** add the per-token-vs-per-window **overlay across `T∈{2,4,8}`**
-   to each bench's frontier figure (per-token line = `l0_per_token=B*`; per-window
-   line = window archs held to `l0_per_window=B*`, i.e. their minimum density) —
-   the skeptic check, where its T-scaling is visible. Not gated; do if time allows.
-4. Commit (protocol bump + renderer switches + new rows + regenerated records +
+3. Commit (protocol bump + renderer switches + new rows + regenerated records +
    figs + `program_stats.json`), push to `origin/arxiv`, update
    `experiments/explorations/synthetic/STATUS.md` §0, and **delete this briefing**
    (done → gone, per `briefings/README.md`).

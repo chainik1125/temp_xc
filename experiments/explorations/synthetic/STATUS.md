@@ -16,9 +16,9 @@ Last updated: 2026-07-10.
   a single auto-generated [`REPORT.md`](REPORT.md) (per-token matrix + coverage,
   all from raw JSON). **Design decisions (locked, via a mac-local design pass):**
   (1) **Match per-token sparsity** (`l0_per_token=B*`) — the controlled
-  comparison (equal total atoms/span; only decode structure varies). Per-window is
-  a *skeptic check*, not a second matrix (its `B*≥T` need collides with
-  deep-scarce `d_sae`) → a per-bench T-frontier overlay. (2) **Match on realized
+  comparison (equal total atoms/span; only decode structure varies). This is the
+  *only* matching convention — no per-window matrix (`l0_per_window` is recorded
+  as a diagnostic only). (2) **Match on realized
   L0**, not the nominal `k_pos` knob — they diverge (nominal `k_pos=4`, T=8 →
   token 4/token, TXC-pre 2/token, TXC-post 0.5/token). (3) **Canonical cell:**
   `T_can=4`, `B*=2`, at capacities **`{F, F//2}`** (uniform for every bench;
