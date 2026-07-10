@@ -79,7 +79,7 @@ class Arch:
 # ── Benchmarks (matrix rows = one per (bench, latent-axis)) ──────────────────
 BENCHES: tuple[Bench, ...] = (
     Bench(
-        "backtracking", ("toy_backtracking_selfexcite_d64",), "1.2.0", F=20,
+        "backtracking", ("toy_backtracking_selfexcite_d64",), "1.3.0", F=20,
         verdict="POSITIVE",
         axes=(LatentAxis("lambda", "lambda_recovery", "AC",
                          "λ — self-exciting intensity (linear-in-history)"),),
@@ -87,7 +87,7 @@ BENCHES: tuple[Bench, ...] = (
         F_note="feature-direction count (1 backtrack + 19 content).",
     ),
     Bench(
-        "signed_motion", ("toy_signed_motion_M19_d40",), "1.2.0", F=19,
+        "signed_motion", ("toy_signed_motion_M19_d40",), "1.3.0", F=19,
         verdict="NEGATIVE",
         axes=(LatentAxis("sign", "s_temp", "AC",
                          "sign — ±1 order-sensitive step"),),
@@ -95,7 +95,7 @@ BENCHES: tuple[Bench, ...] = (
         F_note="feature-direction count (19 step directions).",
     ),
     Bench(
-        "changepoint", ("toy_changepoint_modes_d64",), "1.2.0", F=20,
+        "changepoint", ("toy_changepoint_modes_d64",), "1.3.0", F=20,
         verdict="SPLIT",
         axes=(
             LatentAxis("mode", "mode_recovery", "DC",
@@ -111,7 +111,7 @@ BENCHES: tuple[Bench, ...] = (
     Bench(
         "frequency",
         ("toy_cyclic_circle_M101_d128", "toy_cyclic_random_M101_d128"),
-        "1.2.0", F=101, verdict="POSITIVE",
+        "1.3.0", F=101, verdict="POSITIVE",
         axes=(LatentAxis("velocity", "velocity_recovery", "AC",
                          "velocity Y — cyclic tone f = Y/M"),),
         note="position-mixing crosscoders recover the tone; additive/per-token flat.",

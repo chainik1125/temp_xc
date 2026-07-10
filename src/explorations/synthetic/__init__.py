@@ -15,11 +15,14 @@ Three modules, split by concern:
   the frontier/curve plot primitives the benches share.
 - :mod:`explorations.synthetic.grid` — enumerate cells and drive the canonical
   runner (``temp_bench.core.runner.run_experiment``) in a parallel pool.
+- :mod:`explorations.synthetic.design` — the locked *uniform* grid design (fair-
+  backbone arch set, dict constraint, ``k_pos`` sweep, ``{F//2, F, 2F}``
+  capacities) each bench's ``run_grid.py`` enumerates through.
 
 The output contract is unchanged: these functions reproduce every published
 ``AUTO`` block and ``*_stats.json`` byte-for-byte from the unchanged leaderboard.
 """
 
-from explorations.synthetic import figs, grid, record
+from explorations.synthetic import design, figs, grid, record
 
-__all__ = ["record", "figs", "grid"]
+__all__ = ["record", "figs", "grid", "design"]

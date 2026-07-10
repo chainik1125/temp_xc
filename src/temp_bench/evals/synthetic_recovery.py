@@ -219,7 +219,18 @@ class SyntheticRecovery(Evaluator):
     # `nmse`/`s_temp` are affected; eauc/gauc unchanged. Bumping invalidates
     # prior eval rows so they re-evaluate (checkpoints reused — train_key
     # unchanged).
-    protocol_version = "1.2.0"
+    # v1.3.0 (2026-07-10): realized code sparsity (l0_per_token / l0_per_window)
+    # is now a FIRST-CLASS part of the contract — it was added additively under
+    # 1.2.0, so 1.2.0 rows are heterogeneous (pre-increment rows lack it). The
+    # program-level B×A report matches archs on the *realized* l0_per_token, so
+    # it needs a version whose rows ALL carry it. 1.3.0 marks that: recovery
+    # metrics are byte-identical to 1.2.0 (same probes, same windows), the ONLY
+    # change is that every 1.3.0 row is guaranteed to expose realized L0. The
+    # uniform clean-room re-grid (briefings/full-rerun-and-purge.md) rebuilds the
+    # whole synthetic set at 1.3.0 so the report + per-bench renderers read one
+    # homogeneous set. Bumping invalidates prior eval rows so they re-evaluate
+    # (checkpoints reused — train_key unchanged).
+    protocol_version = "1.3.0"
 
     def eval(self, model: TempBenchArch, spec: EvalSpec) -> dict[str, float]:
         # Re-materialise the dataset from the registry using the SAME
