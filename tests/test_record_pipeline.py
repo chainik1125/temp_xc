@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 import math
 
-from explorations.synthetic import figs, grid, record
+from explorations.synthetic import design, figs, grid, record
 
 
 def test_fmt_and_fmt_pm():
@@ -112,3 +112,25 @@ def test_save_fig_writes_variants(tmp_path):
     figs.save_fig(fig, tmp_path, "demo", plt)
     for ext in ("pdf", "png", "thumb.png"):
         assert (tmp_path / f"demo.{ext}").exists()
+
+
+def test_design_uniform_cells():
+    # capacities {F//2, F, 2F}; per-family dict constraint
+    assert design.capacities(20) == [10, 20, 40]
+    assert design.min_d_sae("pre", 4, 8) == 32 and design.min_d_sae("token", 4, 8) == 4
+    assert design.min_d_sae("post", 8, 4) == 8 and design.min_d_sae("spectral", 2, 4) == 8
+    # arch_t_list: 2 token (T=1) + 4 window x 3 T = 14
+    assert len(design.arch_t_list()) == 14
+    cells = design.uniform_cells("ds", 20, 30000, seeds=(1,))
+    fam = dict(design.FAIR_BACKBONE)
+    # every trained cell satisfies its family's dict constraint
+    for c in cells:
+        if c["kind"] == "trained":
+            assert c["d_sae"] >= design.min_d_sae(fam[c["arch"]], c["k_pos"], c["T"])
+    # untrained control: one per (arch,T) at the F anchor, k_pos=1
+    unt = [c for c in cells if c["kind"] == "untrained"]
+    assert len(unt) == 14 and all(c["d_sae"] == 20 and c["k_pos"] == 1 for c in unt)
+    # d_saes override + untrained=False (the null / memo / band extras use this)
+    only = design.uniform_cells("ds", 101, 6000, seeds=(1,), d_saes=[101],
+                                k_pos_sweep=(1,), untrained=False)
+    assert only and all(c["d_sae"] == 101 and c["kind"] == "trained" for c in only)

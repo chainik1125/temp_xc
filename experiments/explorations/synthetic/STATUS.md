@@ -10,39 +10,28 @@ Last updated: 2026-07-10.
 
 ## 0. TL;DR — what's active right now
 
-- **Program-level B×A comparison report: SUBSTRATE BUILT — re-grid queued
-  (2026-07-10).** Before expanding the bench count, we're consolidating the five
-  benches into ONE apples-to-apples grid (B benchmarks × A architectures) →
-  a single auto-generated [`REPORT.md`](REPORT.md) (per-token matrix + coverage,
-  all from raw JSON). **Design decisions (locked, via a mac-local design pass):**
-  (1) **Match per-token sparsity** (`l0_per_token=B*`) — the controlled
-  comparison (equal total atoms/span; only decode structure varies). This is the
-  *only* matching convention — no per-window matrix (`l0_per_window` is recorded
-  as a diagnostic only). (2) **Match on realized
-  L0**, not the nominal `k_pos` knob — they diverge (nominal `k_pos=4`, T=8 →
-  token 4/token, TXC-pre 2/token, TXC-post 0.5/token). (3) **Canonical cell:**
-  `T_can=4`, `B*=2`, at capacities **`{F, F//2}`** (uniform for every bench;
-  `k_win=8 ≤ min F//2 = 9`). (4) **T ∈ {2,4,8}** (`T≤L/2=16`; T=16 drops out of
-  the scarce regime under per-token matching); **L=32, seq_len=64** kept uniform.
-  (5) **`F` is per-bench** (backtracking/changepoint 20, signed_motion 19,
-  frequency **101 = alphabet M**, NOT a direction count — circle is rank-2);
-  comparability rides on the normalized metric + matched sparsity, not identical
-  `d_sae`. **Built + committed:** realized-L0 evaluator increment (shared
-  dispatcher, additive, protocol 1.2.0), `registry.py`, `report.py` (dual-capacity
-  matrix builder), `render_report.py`, `REPORT.md`, `test_program_report.py` (5).
-  Also **companion panels** (capability gate): reconstruction NMSE + content
-  `eauc`, per benchmark (`A×B`, not per-axis — reconstruction is of the shared
-  activations), read from the same matched cells (README validity gate). **Renders
-  now** — matrix + panels empty (historical rows predate L0), coverage shows what
-  exists. **Next (user-ordered 2026-07-10): a FULL clean-room rerun + scoped purge**
-  ([`briefings/full-rerun-and-purge.md`](../../../briefings/full-rerun-and-purge.md),
-  runpod) — bump eval protocol→1.3.0, rebuild the *entire* synthetic result set
-  from scratch under the new design (`d_sae∈{F//2,F,2F} × T∈{1,2,4,8} × k_pos`,
-  fair-backbone archs × 4 benches), regenerate ALL records (per-bench + program
-  matrix + panels), then **purge stale synthetic rows** (old protocol / deprecated
-  archs / old code_version) — scoped to the 5 synthetic datasources, never other
-  experiments; purge LAST, after verification. ⚠️ ~20h est. > 12h → shard by bench,
-  purge only when all four complete.
+- **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
+  entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under
+  the locked uniform design and the stale rows purged; [`REPORT.md`](REPORT.md)'s
+  per-token matrix is now **fully filled (36/36 cells)** with both companion panels
+  (NMSE + eAUC). **Design (locked):** 6 fair-backbone archs (batchtopk_sae, tsae;
+  stacked_batchtopk, txc_batchtopk_pre/post, **spectral_txc**) × `d_sae∈{F//2,F,2F}`
+  × `T∈{1,2,4,8}` × `k_pos∈{1,2,4,8,16}` × seeds{1,2,42} + untrained. Matrix cell =
+  per-token-matched (`T_can=4`, realized `l0_per_token≈B*=2`) at `{F, F//2}`. F
+  per-bench (bt/cp 20, sign 19, freq 101=M). ~2239 cells, **0 failures**.
+  **Provenance:** run on **CPU** (`runpod` A40 is pathologically slow for these
+  tiny d_in≤128 models — kernel-launch-latency-bound, ~14% util; CPU ~7h). Cached
+  checkpoints made overlapping cells reproduce the old numbers **exactly**
+  (drift-sanity: max|Δ|=0.000 on the primary recovery metrics at overlapping
+  cells). **Purge:** leaderboard now 2239 fresh synth (1.3.0 only, seeds{1,2,42}
+  only) + 356 non-synth preserved byte-for-byte (backup `.prepurge`). **New from
+  the spectral column:** it recovers λ on backtracking (0.94–0.96), exposes the
+  changepoint AC boundary and — unlike TXC-post, whose AC code is scarcity-forced
+  and vanishes at k_pos=2 — its recovery is **k_pos-robust** (τ 0.59→0.57 at
+  k=1→2, T=2), and it is near-oracle on frequency (**0.96 at T=8**; the uniform
+  design drops T=16, where it was 1.00). Per-bench verdicts all **preserved**.
+  Infra: single-source `design.py` (uniform grid) + `test` (9/9); the rerun
+  briefing is retired.
 
 - **Changepoint bench: DONE — verdict SPLIT (two-way), committed + pushed
   (2026-06-10).** Full chain: § 8 gating PASS → generator/evaluator/tests →

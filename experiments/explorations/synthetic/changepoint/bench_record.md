@@ -19,11 +19,11 @@ prediction (per-token wins DC, window wins AC), not a one-sided window win.
 ## Headline
 
 <!-- BEGIN AUTO:headline -->
-- **DC half (mode `m_t`) — not a window win, as predicted (P1):** per-token hits the oracle in the scarcest cell (**1.00** at d_sae=8) and **0.92** at d_sae=20; per-position / shallow-window codes match it (Stacked 0.94–0.98, TXC-pre T=2 ≈ 0.98). The DC *casualties* are window-specific: the shared-code crosscoders pay a mode price that grows with T (TXC-pre T=8: 0.54 at d=20; TXC-post: 0.26–0.67).
+- **DC half (mode `m_t`) — not a window win, as predicted (P1):** per-token hits the oracle in the scarcest cell (**0.96** at d_sae=10) and **0.92** at d_sae=20; per-position / shallow-window codes match it (Stacked 0.94–0.98, TXC-pre T=2 ≈ 0.98). The DC *casualties* are window-specific: the shared-code crosscoders pay a mode price that grows with T (TXC-pre T=8: 0.54 at d=20; TXC-post: 0.26–0.67).
 - **AC half (time-since-switch `τ_t`) — the split is real but architecturally specific:** per-token sits exactly on the provable chance floor (**-0.00**). **Only the post-squash crosscoder** exposes the boundary: τ = **0.66 / 0.60 / 0.52** at T=2/4/8 (d_sae=20; in-tile info ceilings 0.76/0.96/1.00), and `c_t` = **0.90** normalized at T=2. TXC-pre and Stacked stay at chance everywhere (|τ| ≤ 0.02) — explained, not unexplained: their eval-time codes are *additive over per-position features*, and the gating symmetry argument proves any such code is blind to equality-pattern latents (§ 3).
 - **Access vs learning:** untrained TXC-post reaches τ = 0.20/0.11/0.08 (a real nonlinear-access residual — thresholded cross-position sums act as coincidence detectors at random init); training trebles it. Every additive-code arch has no access *and* no learning. Raw-linear access is provably ≈ chance (gating A4).
 - **The price of the AC code (the trade-off):** TXC-post T=2 buys τ=0.66 at mode=0.67 and content eAUC≈0.11 — and the boundary code vanishes at k_pos=2 (τ→−0.01 at T=2): a *scarcity-forced* specialization.
-- **Substrate:** geometric dwell anchored on the measured topic dwell (mean run 1.73 → base switch rate 0.57), K_m=8, uniform Π, F=20 directions, all archs on the BatchTopK fair backbone; 198/198 cells, seeds {1,2,42}.
+- **Substrate:** geometric dwell anchored on the measured topic dwell (mean run 1.73 → base switch rate 0.57), K_m=8, uniform Π, F=20 directions, all archs on the BatchTopK fair backbone; the fair-backbone uniform grid, seeds {1,2,42}.
 <!-- END AUTO:headline -->
 
 ![Main result: the DC/AC split across capacity](figs/changepoint_main.png)
@@ -68,19 +68,22 @@ prediction (per-token wins DC, window wins AC), not a one-sided window win.
 ## 2. DC half — mode recovery vs capacity
 
 <!-- BEGIN AUTO:mode_frontier -->
-| arch / T | d=8 | d=16 | d=20 | d=40 |
-|---|---|---|---|---|
-| BatchTopK-SAE (per-token) | 0.999 | 0.920 | 0.908 | 0.885 |
-| T-SAE (per-token) | 0.997 | 0.930 | 0.924 | 0.892 |
-| **TXC-pre (T=2)** | 0.820 | 0.996 | 0.979 | 0.936 |
-| **TXC-pre (T=4)** | 0.466 | 0.778 | 0.900 | 0.974 |
-| **TXC-pre (T=8)** | 0.199 | 0.435 | 0.539 | 0.937 |
-| **TXC-post (T=2)** | 0.747 | 0.718 | 0.673 | 0.705 |
-| **TXC-post (T=4)** | 0.334 | 0.468 | 0.457 | 0.459 |
-| **TXC-post (T=8)** | 0.128 | 0.228 | 0.257 | 0.263 |
-| **Stacked-SAE (T=2)** | 0.996 | 0.946 | 0.938 | 0.921 |
-| **Stacked-SAE (T=4)** | 0.999 | 0.969 | 0.968 | 0.966 |
-| **Stacked-SAE (T=8)** | 0.998 | 0.974 | 0.978 | 0.963 |
+| arch / T | d=10 | d=20 | d=40 |
+|---|---|---|---|
+| BatchTopK-SAE (per-token) | 0.954 | 0.908 | 0.885 |
+| T-SAE (per-token) | 0.961 | 0.924 | 0.892 |
+| **TXC-pre (T=2)** | 0.872 | 0.979 | 0.936 |
+| **TXC-pre (T=4)** | 0.585 | 0.900 | 0.974 |
+| **TXC-pre (T=8)** | 0.258 | 0.539 | 0.937 |
+| **TXC-post (T=2)** | 0.694 | 0.673 | 0.705 |
+| **TXC-post (T=4)** | 0.442 | 0.457 | 0.459 |
+| **TXC-post (T=8)** | 0.172 | 0.257 | 0.263 |
+| **Stacked-SAE (T=2)** | 0.979 | 0.938 | 0.921 |
+| **Stacked-SAE (T=4)** | 0.993 | 0.968 | 0.966 |
+| **Stacked-SAE (T=8)** | 0.991 | 0.978 | 0.963 |
+| **Spectral-TXC (T=2)** | 0.836 | 0.912 | 0.937 |
+| **Spectral-TXC (T=4)** | 0.531 | 0.716 | 0.862 |
+| **Spectral-TXC (T=8)** | 0.485 | 0.627 | 0.803 |
 <!-- END AUTO:mode_frontier -->
 
 The DC latent behaves exactly as a per-token quantity should. Per-token archs
@@ -103,19 +106,22 @@ under scarcity.
 ## 3. AC half — time-since-switch recovery vs capacity
 
 <!-- BEGIN AUTO:tss_frontier -->
-| arch / T | d=8 | d=16 | d=20 | d=40 |
-|---|---|---|---|---|
-| BatchTopK-SAE (per-token) | -0.010 | -0.010 | -0.004 | -0.003 |
-| T-SAE (per-token) | -0.008 | -0.009 | -0.005 | -0.001 |
-| **TXC-pre (T=2)** | -0.013 | -0.014 | -0.009 | -0.010 |
-| **TXC-pre (T=4)** | -0.015 | -0.007 | -0.005 | -0.014 |
-| **TXC-pre (T=8)** | -0.006 | -0.020 | -0.014 | -0.010 |
-| **TXC-post (T=2)** | 0.156 | 0.561 | 0.659 | 0.694 |
-| **TXC-post (T=4)** | 0.205 | 0.503 | 0.598 | 0.596 |
-| **TXC-post (T=8)** | 0.131 | 0.399 | 0.521 | 0.634 |
-| **Stacked-SAE (T=2)** | -0.013 | -0.009 | -0.008 | -0.001 |
-| **Stacked-SAE (T=4)** | -0.011 | -0.007 | -0.009 | -0.010 |
-| **Stacked-SAE (T=8)** | -0.013 | -0.018 | -0.012 | -0.020 |
+| arch / T | d=10 | d=20 | d=40 |
+|---|---|---|---|
+| BatchTopK-SAE (per-token) | -0.010 | -0.004 | -0.003 |
+| T-SAE (per-token) | -0.010 | -0.005 | -0.001 |
+| **TXC-pre (T=2)** | -0.012 | -0.009 | -0.010 |
+| **TXC-pre (T=4)** | -0.012 | -0.005 | -0.014 |
+| **TXC-pre (T=8)** | -0.008 | -0.014 | -0.010 |
+| **TXC-post (T=2)** | 0.215 | 0.659 | 0.694 |
+| **TXC-post (T=4)** | 0.273 | 0.598 | 0.596 |
+| **TXC-post (T=8)** | 0.165 | 0.521 | 0.634 |
+| **Stacked-SAE (T=2)** | -0.008 | -0.008 | -0.001 |
+| **Stacked-SAE (T=4)** | -0.009 | -0.009 | -0.010 |
+| **Stacked-SAE (T=8)** | -0.009 | -0.012 | -0.020 |
+| **Spectral-TXC (T=2)** | 0.315 | 0.592 | 0.707 |
+| **Spectral-TXC (T=4)** | 0.217 | 0.399 | 0.608 |
+| **Spectral-TXC (T=8)** | 0.005 | 0.180 | 0.383 |
 <!-- END AUTO:tss_frontier -->
 
 ![AC recovery vs window size, against the in-tile info ceilings](figs/changepoint_T.png)
@@ -123,19 +129,22 @@ under scarcity.
 ### `c_t` (simple-floor companion)
 
 <!-- BEGIN AUTO:cp_frontier -->
-| arch / T | d=8 | d=16 | d=20 | d=40 |
-|---|---|---|---|---|
-| BatchTopK-SAE (per-token) | 0.000 | -0.000 | -0.000 | 0.002 |
-| T-SAE (per-token) | 0.000 | -0.000 | -0.000 | -0.000 |
-| **TXC-pre (T=2)** | 0.000 | 0.000 | 0.000 | 0.001 |
-| **TXC-pre (T=4)** | 0.000 | 0.001 | -0.000 | 0.001 |
-| **TXC-pre (T=8)** | 0.000 | 0.001 | 0.004 | -0.005 |
-| **TXC-post (T=2)** | 0.050 | 0.767 | 0.896 | 0.917 |
-| **TXC-post (T=4)** | 0.155 | 0.594 | 0.753 | 0.740 |
-| **TXC-post (T=8)** | 0.035 | 0.253 | 0.373 | 0.547 |
-| **Stacked-SAE (T=2)** | 0.000 | -0.000 | -0.001 | 0.003 |
-| **Stacked-SAE (T=4)** | -0.001 | -0.002 | -0.003 | 0.000 |
-| **Stacked-SAE (T=8)** | -0.000 | -0.006 | -0.001 | -0.012 |
+| arch / T | d=10 | d=20 | d=40 |
+|---|---|---|---|
+| BatchTopK-SAE (per-token) | 0.000 | -0.000 | 0.002 |
+| T-SAE (per-token) | 0.000 | -0.000 | -0.000 |
+| **TXC-pre (T=2)** | 0.000 | 0.000 | 0.001 |
+| **TXC-pre (T=4)** | 0.000 | -0.000 | 0.001 |
+| **TXC-pre (T=8)** | 0.000 | 0.004 | -0.005 |
+| **TXC-post (T=2)** | 0.247 | 0.896 | 0.917 |
+| **TXC-post (T=4)** | 0.283 | 0.753 | 0.740 |
+| **TXC-post (T=8)** | 0.083 | 0.373 | 0.547 |
+| **Stacked-SAE (T=2)** | -0.000 | -0.001 | 0.003 |
+| **Stacked-SAE (T=4)** | 0.001 | -0.003 | 0.000 |
+| **Stacked-SAE (T=8)** | 0.006 | -0.001 | -0.012 |
+| **Spectral-TXC (T=2)** | 0.439 | 0.875 | 0.981 |
+| **Spectral-TXC (T=4)** | 0.014 | 0.284 | 0.489 |
+| **Spectral-TXC (T=8)** | 0.018 | 0.075 | 0.245 |
 <!-- END AUTO:cp_frontier -->
 
 This is the bench's sharpest finding, and it is **architecturally specific in a
@@ -189,6 +198,9 @@ way the gating analysis predicts**:
 | Stacked-SAE (T=2) | 0.551 ±0.050 | 0.938 ±0.002 | -0.001 ±0.005 | -0.008 ±0.005 |
 | Stacked-SAE (T=4) | 0.619 ±0.019 | 0.968 ±0.002 | -0.001 ±0.004 | -0.009 ±0.018 |
 | Stacked-SAE (T=8) | 0.507 ±0.014 | 0.978 ±0.016 | -0.015 ±0.011 | -0.012 ±0.008 |
+| Spectral-TXC (T=2) | 0.562 ±0.072 | 0.912 ±0.007 | 0.438 ±0.059 | 0.592 ±0.023 |
+| Spectral-TXC (T=4) | 0.440 ±0.023 | 0.716 ±0.043 | 0.374 ±0.034 | 0.399 ±0.010 |
+| Spectral-TXC (T=8) | 0.378 ±0.041 | 0.627 ±0.029 | 0.199 ±0.015 | 0.180 ±0.017 |
 <!-- END AUTO:untrained -->
 
 ![Untrained vs trained on both latents](figs/changepoint_untrained_control.png)
@@ -224,6 +236,9 @@ The control does double duty here:
 | Stacked-SAE (T=2) | 0.722 | 0.517 | 0.239 |
 | Stacked-SAE (T=4) | 0.625 | 0.337 | 0.246 |
 | Stacked-SAE (T=8) | 0.600 | 0.316 | 0.247 |
+| Spectral-TXC (T=2) | 0.970 | 0.277 | 0.348 |
+| Spectral-TXC (T=4) | 0.667 | 0.208 | 0.537 |
+| Spectral-TXC (T=8) | 0.668 | 0.243 | 0.632 |
 <!-- END AUTO:feature_recovery -->
 
 ![Feature recovery and reconstruction](figs/changepoint_local_tradeoff.png)
@@ -256,6 +271,9 @@ for temporal structure" pattern, here in its most extreme form.
 | Stacked-SAE (T=2) | 0.938 | 0.984 | -0.008 | -0.013 |
 | Stacked-SAE (T=4) | 0.968 | 0.983 | -0.009 | -0.018 |
 | Stacked-SAE (T=8) | 0.978 | 0.983 | -0.012 | -0.014 |
+| Spectral-TXC (T=2) | 0.912 | 0.997 | 0.592 | 0.569 |
+| Spectral-TXC (T=4) | 0.716 | 0.866 | 0.399 | 0.360 |
+| Spectral-TXC (T=8) | 0.627 | 0.780 | 0.180 | 0.008 |
 <!-- END AUTO:kpos -->
 
 The `k_pos = 2` anchor sharpens the trade-off story: every *mode* number

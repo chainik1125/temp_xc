@@ -60,12 +60,12 @@ holes.
 <!-- BEGIN AUTO:matrix_pertoken -->
 | bench · latent (DC/AC) | Per-token SAE | T-SAE (contrastive) | Stacked (per-position dicts) | TXC-pre (additive) | TXC-post (coincidence) | Spectral-TXC (DCT bands) |
 |---|---|---|---|---|---|---|
-| **backtracking** · λ — self-exciting intensity (linear-in-history) (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
-| **signed_motion** · sign — ±1 order-sensitive step (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
-| **changepoint** · mode m_t — global hidden state (DC) | — / — | — / — | — / — | — / — | — / — | — / — |
-| **changepoint** · time-since-switch (primary AC latent) (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
-| **changepoint** · change-point c_t — adjacency floor (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
-| **frequency** · velocity Y — cyclic tone f = Y/M (AC) | — / — | — / — | — / — | — / — | — / — | — / — |
+| **backtracking** · λ — self-exciting intensity (linear-in-history) (AC) | 0.402 / 0.403 | 0.413 / 0.408 | 0.950 / 0.951 | 0.952 / 0.951 | 0.951 / 0.951 | 0.939 / 0.951 |
+| **signed_motion** · sign — ±1 order-sensitive step (AC) | -0.001 / -0.001 | -0.001 / -0.001 | 0.101 / 0.082 | 0.001 / -0.000 | 0.002 / -0.035 | 0.048 / -0.019 |
+| **changepoint** · mode m_t — global hidden state (DC) | 0.977 / 1.000 | 0.984 / 0.999 | 0.983 / 0.999 | 0.987 / 0.632 | 0.992 / 0.666 | 0.866 / 0.732 |
+| **changepoint** · time-since-switch (primary AC latent) (AC) | -0.009 / -0.010 | -0.009 / -0.009 | -0.018 / -0.014 | -0.008 / -0.011 | -0.010 / -0.012 | 0.360 / 0.002 |
+| **changepoint** · change-point c_t — adjacency floor (AC) | -0.000 / 0.000 | 0.000 / 0.000 | -0.000 / -0.002 | -0.002 / 0.000 | -0.001 / 0.000 | 0.219 / -0.001 |
+| **frequency** · velocity Y — cyclic tone f = Y/M (AC) | -0.004 / -0.001 | -0.003 / -0.003 | 0.064 / 0.060 | 0.068 / 0.072 | 0.767 / 0.770 | 0.777 / 0.796 |
 <!-- END AUTO:matrix_pertoken -->
 
 ---
@@ -86,10 +86,10 @@ content). Where a benchmark exposes it, this is the "what did the recovery cost"
 <!-- BEGIN AUTO:panel_nmse -->
 | benchmark | Per-token SAE | T-SAE (contrastive) | Stacked (per-position dicts) | TXC-pre (additive) | TXC-post (coincidence) | Spectral-TXC (DCT bands) |
 |---|---|---|---|---|---|---|
-| **backtracking** | — / — | — / — | — / — | — / — | — / — | — / — |
-| **signed_motion** | — / — | — / — | — / — | — / — | — / — | — / — |
-| **changepoint** | — / — | — / — | — / — | — / — | — / — | — / — |
-| **frequency** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **backtracking** | 0.132 / 0.347 | 0.152 / 0.381 | 0.174 / 0.347 | 0.536 / 0.631 | 0.535 / 0.629 | 0.584 / 0.634 |
+| **signed_motion** | 0.000 / 0.474 | 0.139 / 0.485 | 0.004 / 0.473 | 0.292 / 0.580 | 0.282 / 0.578 | 0.376 / 0.616 |
+| **changepoint** | 0.119 / 0.205 | 0.146 / 0.228 | 0.128 / 0.205 | 0.376 / 0.550 | 0.362 / 0.543 | 0.486 / 0.628 |
+| **frequency** | 0.540 / 0.543 | 0.542 / 0.544 | 0.543 / 0.544 | 0.546 / 0.550 | 0.539 / 0.545 | 0.539 / 0.545 |
 <!-- END AUTO:panel_nmse -->
 
 **Content-direction recovery** (`eauc`; cosine-AUC of decoder atoms vs the
@@ -98,10 +98,10 @@ emission features; higher is better):
 <!-- BEGIN AUTO:panel_eauc -->
 | benchmark | Per-token SAE | T-SAE (contrastive) | Stacked (per-position dicts) | TXC-pre (additive) | TXC-post (coincidence) | Spectral-TXC (DCT bands) |
 |---|---|---|---|---|---|---|
-| **backtracking** | — / — | — / — | — / — | — / — | — / — | — / — |
-| **signed_motion** | — / — | — / — | — / — | — / — | — / — | — / — |
-| **changepoint** | — / — | — / — | — / — | — / — | — / — | — / — |
-| **frequency** | — / — | — / — | — / — | — / — | — / — | — / — |
+| **backtracking** | 0.989 / 0.524 | 0.950 / 0.492 | 0.545 / 0.477 | 0.675 / 0.397 | 0.633 / 0.385 | 0.424 / 0.332 |
+| **signed_motion** | 0.702 / 0.486 | 0.663 / 0.483 | 0.505 / 0.425 | 0.438 / 0.382 | 0.433 / 0.374 | 0.398 / 0.324 |
+| **changepoint** | 0.952 / 0.233 | 0.848 / 0.207 | 0.547 / 0.347 | 0.011 / 0.010 | 0.011 / 0.010 | 0.228 / 0.208 |
+| **frequency** | 0.927 / 0.917 | 0.897 / 0.900 | 0.580 / 0.626 | 0.978 / 0.983 | 0.973 / 0.916 | 0.901 / 0.900 |
 <!-- END AUTO:panel_eauc -->
 
 ---
@@ -112,10 +112,10 @@ What (arch, T, d_sae) groups currently exist per bench on the leaderboard — th
 holes the uniform re-grid will fill.
 
 <!-- BEGIN AUTO:coverage -->
-- **backtracking** (F=20): 72 (arch,T,d_sae) groups · archs: batchtopk_sae, stacked_batchtopk, stacked_sae, topk_sae, tsae, txc_base, txc_batchtopk_post, txc_batchtopk_pre
-- **signed_motion** (F=19): 40 (arch,T,d_sae) groups · archs: stacked_sae, topk_sae, tsae, txc_base
-- **changepoint** (F=20): 44 (arch,T,d_sae) groups · archs: batchtopk_sae, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
-- **frequency** (F=101): 90 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, spectral_txc_dcac, spectral_txc_full, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **backtracking** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **signed_motion** (F=19): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **changepoint** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **frequency** (F=101): 62 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, spectral_txc_dcac, spectral_txc_full, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 <!-- END AUTO:coverage -->
 
 ---

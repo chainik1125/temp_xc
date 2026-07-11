@@ -1,7 +1,7 @@
 """Cyclic-tone frequency results — SINGLE SOURCE renderer + record populator.
 
 Reads the canonical leaderboard (`results/leaderboard.jsonl`), filters the
-`toy_cyclic_*` cells (protocol 1.2.0, non-smoke, n_steps ∈ {0, N_STEPS}),
+`toy_cyclic_*` cells (protocol 1.3.0, non-smoke, n_steps ∈ {0, N_STEPS}),
 aggregates over seeds, then in one pass:
 
   1. renders paper-quality figures into `figs/`
@@ -37,7 +37,7 @@ STATS_OUT = RES_DIR / "frequency_bench_stats.json"
 RECORD = HERE / "bench_record.md"
 CIRCLE = "toy_cyclic_circle_M101_d128"
 RANDOM = "toy_cyclic_random_M101_d128"
-PROTOCOL = "1.2.0"
+PROTOCOL = "1.3.0"
 N_STEPS_GRID = 6000
 KEY_FIELDS = ("ds", "kind", "k_pos", "arch", "T", "d_sae")
 
@@ -47,9 +47,10 @@ FREQS = [y / M for y in OMEGA]
 CHANCE = 1.0 / len(OMEGA)
 MEMO_THRESH = len(OMEGA) * M          # |Ω|·M = 1010
 MEMO_DSAE = 2048                       # the > |Ω|·M memorization-demo width
-D_SAES = [32, 64, 101, 256]
+D_SAES = [50, 101, 202]   # {F//2, F, 2F} with F = M = 101 — uniform clean-room design
 ANCHOR = 101
-T_WINDOW = [2, 4, 8, 16]
+T_WINDOW = [2, 4, 8]      # uniform design caps T at 8 (T=16 dropped; see bench_record note)
+T_MAX = 8                 # the full-resolution reference window (was T=16 pre-uniform)
 
 PER_TOKEN = [("batchtopk_sae", 1), ("tsae", 1)]
 CROSSCODERS = ["txc_batchtopk_pre", "txc_batchtopk_post", "spectral_txc"]
@@ -148,8 +149,8 @@ def fig_Sf(agg, plt):
             ys = sf_curve(agg, CIRCLE, arch, T, ANCHOR, normalized=False)
             ax.plot(FREQS, ys, "o-", color=TCOLOR[T], label=f"T={T}")
             ax.axvline(1.0 / T, color=TCOLOR[T], ls=":", lw=0.9, alpha=0.5)
-        oc = oracle_curve(agg, CIRCLE, arch, 16, ANCHOR)      # full-resolution oracle
-        ax.plot(FREQS, oc, "-", color="0.4", lw=1.2, alpha=0.7, label="oracle (T=16)")
+        oc = oracle_curve(agg, CIRCLE, arch, T_MAX, ANCHOR)      # full-resolution oracle
+        ax.plot(FREQS, oc, "-", color="0.4", lw=1.2, alpha=0.7, label="oracle (T=8)")
         ax.plot(FREQS, pt, "--", color="#238b45", lw=1.3, label="per-token")
         ax.axhline(CHANCE, color="#999", ls=":", lw=0.9)
         ax.set_xlabel("frequency  $f = Y/M$"); ax.set_ylim(-0.03, 1.05)
@@ -180,20 +181,20 @@ def fig_spectral(agg, plt):
     ax1.set_ylim(-0.05, 1.05)
     ax1.set_title("(a) Spectral vs monolithic crosscoders  ($d_{sae}=M$)", loc="left", fontsize=11)
     ax1.legend(fontsize=9)
-    # (b) band decomposition: per-band recovery for spectral_txc T=16
+    # (b) band decomposition: per-band recovery for spectral_txc T=8
     bands_present = [b for b in range(4)
-                     if g(agg, CIRCLE, "trained", 1, "spectral_txc", 16, ANCHOR,
+                     if g(agg, CIRCLE, "trained", 1, "spectral_txc", T_MAX, ANCHOR,
                           f"band{b}_recovery")[2]]
     bnames = ["DC {0}", "low {1-5}", "mid {6-10}", "high {11-15}"]
     for b in bands_present:
-        yv = g(agg, CIRCLE, "trained", 1, "spectral_txc", 16, ANCHOR, f"band{b}_recovery")[0]
+        yv = g(agg, CIRCLE, "trained", 1, "spectral_txc", T_MAX, ANCHOR, f"band{b}_recovery")[0]
         ax2.bar(b, yv, color="#e6550d", alpha=0.55 + 0.1 * b, edgecolor="0.3",
                 label=bnames[b] if b < len(bnames) else f"band{b}")
-    full = g(agg, CIRCLE, "trained", 1, "spectral_txc", 16, ANCHOR, "velocity_recovery")[0]
+    full = g(agg, CIRCLE, "trained", 1, "spectral_txc", T_MAX, ANCHOR, "velocity_recovery")[0]
     ax2.axhline(full, color="#a63603", ls="--", lw=1.3, label="full code")
     ax2.set_xticks(bands_present); ax2.set_xticklabels([bnames[b] for b in bands_present], fontsize=8)
     ax2.set_ylim(-0.05, 1.05); ax2.set_ylabel("velocity recovery (norm.)")
-    ax2.set_title("(b) Spectral-TXC band decomposition  (T=16)", loc="left", fontsize=11)
+    ax2.set_title("(b) Spectral-TXC band decomposition  (T=8)", loc="left", fontsize=11)
     ax2.legend(fontsize=8, loc="upper left")
     fig.tight_layout()
     _save(fig, plt, "frequency_spectral")
@@ -249,7 +250,7 @@ def fig_memorization(agg, plt):
         for arch in ("txc_batchtopk_pre", "spectral_txc"):
             xs, ys = [], []
             for d in D_SAES + [MEMO_DSAE]:
-                mm = g(agg, ds, "trained", 1, arch, 16, d, "velocity_recovery")
+                mm = g(agg, ds, "trained", 1, arch, T_MAX, d, "velocity_recovery")
                 if mm[2]:
                     xs.append(d); ys.append(mm[0])
             if xs:
@@ -290,11 +291,11 @@ def fig_bands(agg, plt):
     ax1.set_title("(a) Band partition vs $T$  ($d_{sae}=M$; solid=trained, dotted=untrained)",
                   loc="left", fontsize=10.5)
     ax1.legend(fontsize=8.5)
-    # (b) frontier vs d_sae at T=16 — does band structure help more when scarce?
+    # (b) frontier vs d_sae at T=8 — does band structure help more when scarce?
     for arch, lab, col in BAND_MODES:
         xs, ys, es = [], [], []
         for d in D_SAES:
-            mm = g(agg, CIRCLE, "trained", 1, arch, 16, d, "velocity_recovery")
+            mm = g(agg, CIRCLE, "trained", 1, arch, T_MAX, d, "velocity_recovery")
             if mm[2]:
                 xs.append(d); ys.append(mm[0]); es.append(mm[1])
         if xs:
@@ -304,7 +305,7 @@ def fig_bands(agg, plt):
     ax2.axvline(ANCHOR, color="0.5", ls=":", lw=1)
     ax2.set_xlabel("dictionary size  $d_{sae}$"); ax2.set_ylabel("velocity recovery (norm.)")
     ax2.set_ylim(-0.05, 1.05)
-    ax2.set_title("(b) Band partition vs capacity  ($T=16$)", loc="left", fontsize=10.5)
+    ax2.set_title("(b) Band partition vs capacity  ($T=8$)", loc="left", fontsize=10.5)
     ax2.legend(fontsize=8.5)
     fig.suptitle("Matched-budget band-partition test (P3): 1 vs 2 vs 4 bands, "
                  "all $k_{win}=k_{pos}·T$ atoms", fontsize=12)
@@ -314,11 +315,11 @@ def fig_bands(agg, plt):
 
 def _bands_table(agg):
     h = ("| bands | " + " | ".join(f"T={T}" for T in T_WINDOW)
-         + " | untrained (T=16) |\n|---|" + "|".join("---" for _ in T_WINDOW) + "|---|\n")
+         + " | untrained (T=8) |\n|---|" + "|".join("---" for _ in T_WINDOW) + "|---|\n")
     for arch, lab, _c in BAND_MODES:
         row = " | ".join(_f(g(agg, CIRCLE, "trained", 1, arch, T, ANCHOR, "velocity_recovery"))
                          for T in T_WINDOW)
-        un = _f(g(agg, CIRCLE, "untrained", 1, arch, 16, ANCHOR, "velocity_recovery"))
+        un = _f(g(agg, CIRCLE, "untrained", 1, arch, T_MAX, ANCHOR, "velocity_recovery"))
         h += f"| {lab} | {row} | {un} |\n"
     return h.rstrip()
 
@@ -342,8 +343,8 @@ def _Sf_table(agg):
     h = ("| arch / T | " + " | ".join(f"Y={y}" for y in OMEGA) + " |\n"
          "|---|" + "|".join("---" for _ in OMEGA) + "|\n")
     # oracle row
-    orc = oracle_curve(agg, CIRCLE, "txc_batchtopk_pre", 16, ANCHOR)
-    h += "| *oracle (T=16)* | " + " | ".join(f"{o:.2f}" for o in orc) + " |\n"
+    orc = oracle_curve(agg, CIRCLE, "txc_batchtopk_pre", T_MAX, ANCHOR)
+    h += "| *oracle (T=8)* | " + " | ".join(f"{o:.2f}" for o in orc) + " |\n"
     for arch in CROSSCODERS:
         for T in T_WINDOW:
             ys = sf_curve(agg, CIRCLE, arch, T, ANCHOR, normalized=False)
@@ -353,12 +354,12 @@ def _Sf_table(agg):
 
 def _band_table(agg):
     bnames = {0: "DC {0}", 1: "low {1-5}", 2: "mid {6-10}", 3: "high {11-15}"}
-    h = "| band | velocity recovery (T=16, $d_{sae}=M$) |\n|---|---|\n"
+    h = "| band | velocity recovery (T=8, $d_{sae}=M$) |\n|---|---|\n"
     for b in range(4):
-        v = g(agg, CIRCLE, "trained", 1, "spectral_txc", 16, ANCHOR, f"band{b}_recovery")
+        v = g(agg, CIRCLE, "trained", 1, "spectral_txc", T_MAX, ANCHOR, f"band{b}_recovery")
         if v[2]:
             h += f"| {bnames[b]} | {_f(v)} |\n"
-    h += f"| **full code** | {_f(g(agg, CIRCLE, 'trained', 1, 'spectral_txc', 16, ANCHOR, 'velocity_recovery'))} |\n"
+    h += f"| **full code** | {_f(g(agg, CIRCLE, 'trained', 1, 'spectral_txc', T_MAX, ANCHOR, 'velocity_recovery'))} |\n"
     return h.rstrip()
 
 
@@ -375,7 +376,7 @@ def _memo_table(agg):
     h = ("| arch / T | circle @ $d_{sae}=M$ | circle @ 2048 | random @ $d_{sae}=M$ | random @ 2048 |\n"
          "|---|---|---|---|---|\n")
     for arch in ("txc_batchtopk_pre", "spectral_txc"):
-        h += (f"| {LABEL[arch]} T=16 "
+        h += (f"| {LABEL[arch]} T=8 "
               f"| {_f(g(agg,CIRCLE,'trained',1,arch,16,ANCHOR,'velocity_recovery'))} "
               f"| {_f(g(agg,CIRCLE,'trained',1,arch,16,2048,'velocity_recovery'))} "
               f"| {_f(g(agg,RANDOM,'trained',1,arch,16,ANCHOR,'velocity_recovery'))} "
@@ -395,24 +396,24 @@ def headline_block(agg):
     pt = np.nanmax([abs(v(CIRCLE, "trained", a, 1, d))
                     for a in ("batchtopk_sae", "tsae") for d in D_SAES
                     if g(agg, CIRCLE, "trained", 1, a, 1, d, "velocity_recovery")[2]] or [np.nan])
-    pre16, post16, spec16 = (v(CIRCLE, "trained", "txc_batchtopk_pre", 16, ANCHOR),
-                             v(CIRCLE, "trained", "txc_batchtopk_post", 16, ANCHOR),
-                             v(CIRCLE, "trained", "spectral_txc", 16, ANCHOR))
-    un_spec, un_post, un_pre = (v(CIRCLE, "untrained", "spectral_txc", 16, ANCHOR),
-                                v(CIRCLE, "untrained", "txc_batchtopk_post", 16, ANCHOR),
-                                v(CIRCLE, "untrained", "txc_batchtopk_pre", 16, ANCHOR))
-    full16 = v(CIRCLE, "trained", "spectral_txc_full", 16, ANCHOR)
-    full_un = v(CIRCLE, "untrained", "spectral_txc_full", 16, ANCHOR)
-    dcac16 = v(CIRCLE, "trained", "spectral_txc_dcac", 16, ANCHOR)
-    # band-partition at the scarcest window (T=2) + scarcest capacity (d=32)
+    pre16, post16, spec16 = (v(CIRCLE, "trained", "txc_batchtopk_pre", T_MAX, ANCHOR),
+                             v(CIRCLE, "trained", "txc_batchtopk_post", T_MAX, ANCHOR),
+                             v(CIRCLE, "trained", "spectral_txc", T_MAX, ANCHOR))
+    un_spec, un_post, un_pre = (v(CIRCLE, "untrained", "spectral_txc", T_MAX, ANCHOR),
+                                v(CIRCLE, "untrained", "txc_batchtopk_post", T_MAX, ANCHOR),
+                                v(CIRCLE, "untrained", "txc_batchtopk_pre", T_MAX, ANCHOR))
+    full16 = v(CIRCLE, "trained", "spectral_txc_full", T_MAX, ANCHOR)
+    full_un = v(CIRCLE, "untrained", "spectral_txc_full", T_MAX, ANCHOR)
+    dcac16 = v(CIRCLE, "trained", "spectral_txc_dcac", T_MAX, ANCHOR)
+    # band-partition at the scarcest window (T=2) + scarcest capacity (d=50)
     spec2 = v(CIRCLE, "trained", "spectral_txc", 2, ANCHOR)
     full2 = v(CIRCLE, "trained", "spectral_txc_full", 2, ANCHOR)
     dcac2 = v(CIRCLE, "trained", "spectral_txc_dcac", 2, ANCHOR)
-    spec_d32 = v(CIRCLE, "trained", "spectral_txc", 16, 32)
-    full_d32 = v(CIRCLE, "trained", "spectral_txc_full", 16, 32)
-    rand_spec16 = v(RANDOM, "trained", "spectral_txc", 16, ANCHOR)
-    memo_rand_spec = v(RANDOM, "trained", "spectral_txc", 16, 2048)
-    memo_rand_pre = v(RANDOM, "trained", "txc_batchtopk_pre", 16, 2048)
+    spec_d32 = v(CIRCLE, "trained", "spectral_txc", T_MAX, 50)
+    full_d32 = v(CIRCLE, "trained", "spectral_txc_full", T_MAX, 50)
+    rand_spec16 = v(RANDOM, "trained", "spectral_txc", T_MAX, ANCHOR)
+    memo_rand_spec = v(RANDOM, "trained", "spectral_txc", T_MAX, 2048)
+    memo_rand_pre = v(RANDOM, "trained", "txc_batchtopk_pre", T_MAX, 2048)
 
     def fmt(x):
         return f"{x:.2f}" if np.isfinite(x) else "—"
@@ -430,7 +431,7 @@ def headline_block(agg):
         f"by encoder structure.** Codes that **mix positions before the nonlinearity** "
         f"(TXC-post `relu(Σ_t W_t x_t)`, Spectral) recover $Y$ with a **high-pass / "
         f"Rayleigh-resolved** $S(f)$ — Spectral near-oracle (**{fmt(spec16)}** at "
-        f"$T=16$), TXC-post **{fmt(post16)}**. The **additive-over-position** code "
+        f"$T=8$), TXC-post **{fmt(post16)}**. The **additive-over-position** code "
         f"(TXC-pre `Σ_t g(x_t)`) caps at **{fmt(pre16)}** with a **flat** $S(f)$: its "
         f"recovery is *bag-level, not spectral estimation* (each token's marginal is "
         f"$Y$-independent → additive codes carry no frequency ordering).\n"
@@ -442,10 +443,10 @@ def headline_block(agg):
         f"- **P3 — band partition = a TIE at adequate capacity, multiband edge only at "
         f"the extremes (exactly as preregistered):** at matched budget "
         f"($k_{{win}}=k_{{pos}}·T$) the trained recovery is identical across 1/2/4 "
-        f"bands whenever capacity suffices — $T=16$: multiband **{fmt(spec16)}** ≈ full "
+        f"bands whenever capacity suffices — $T=8$: multiband **{fmt(spec16)}** ≈ full "
         f"**{fmt(full16)}** ≈ dcac **{fmt(dcac16)}**; $T=2$: all within noise "
         f"({fmt(spec2)}/{fmt(dcac2)}/{fmt(full2)}). The partition helps only at the "
-        f"**capacity extreme** ($d_{{sae}}=32$, $T=16$: multiband **{fmt(spec_d32)}** vs "
+        f"**capacity extreme** ($d_{{sae}}=50$, $T=8$: multiband **{fmt(spec_d32)}** vs "
         f"full **{fmt(full_d32)}**) and in the **untrained access** prior (multiband "
         f"{fmt(un_spec)} vs full {fmt(full_un)}: band-limited kernels are tone-detectors "
         f"at init). Clean **band decomposition** holds (each DCT band decodes the tones "
@@ -453,13 +454,13 @@ def headline_block(agg):
         f"- **P4 ✓ — random null has no frequency axis:** on the random embedding the "
         f"per-Ω-class response is flat (no $\\Delta f$ ordering) and the circle's tones "
         f"are what make $Y$ resolvable (Spectral circle {fmt(spec16)} vs random "
-        f"{fmt(rand_spec16)} at $T=16$). Above $|Ω|·M=1010$ the **null** recovery jumps "
+        f"{fmt(rand_spec16)} at $T=8$). Above $|Ω|·M=1010$ the **null** recovery jumps "
         f"by template memorization (Spectral {fmt(rand_spec16)}→**{fmt(memo_rand_spec)}**, "
         f"TXC-pre →{fmt(memo_rand_pre)}) — caught + flagged; all main cells stay "
         f"$d_{{sae}}<1010$.\n"
         f"- **Substrate:** circle-embedded cyclic tones, $M=101$, "
         f"$Ω=\\{{0,1,2,4,8,16,24,32,40,50\\}}$, $σ=0.10$; BatchTopK fair backbone; "
-        f"seeds {{1,2,42}}; 298-cell main grid + band-partition addendum. (Stacked "
+        f"seeds {{1,2,42}}; the fair-backbone uniform grid + band-partition addendum. (Stacked "
         f"dropped — concatenated per-position code memorizes above $T·d_{{sae}}=|Ω|·M$; "
         f"A5.)"
     )

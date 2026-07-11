@@ -2,7 +2,7 @@
 
 Config + bench-specific figures/tables only; leaderboard→aggregate→AUTO-block→
 stats plumbing lives in :mod:`explorations.synthetic`. Reads the canonical
-leaderboard, filters the `toy_backtracking_selfexcite` cells (protocol 1.2.0,
+leaderboard, filters the `toy_backtracking_selfexcite` cells (protocol 1.3.0,
 non-smoke), aggregates over seeds, renders figures, fills every `<!-- AUTO:* -->`
 block in `bench_record.md`, and writes `results/backtracking_bench_stats.json`.
 The per-token DPI floor is computed directly from the generator (also canonical).
@@ -28,30 +28,35 @@ RES_DIR = HERE / "results"
 STATS_OUT = RES_DIR / "backtracking_bench_stats.json"
 RECORD = HERE / "bench_record.md"
 DS = "toy_backtracking_selfexcite_d64"
-PROTOCOL = "1.2.0"
+PROTOCOL = "1.3.0"
 KEY_FIELDS = ("kind", "k_pos", "arch", "T", "d_sae")
 
 F = 20
-D_SAES = [8, 16, 20, 40]
+D_SAES = [10, 20, 40]   # {F//2, F, 2F} — uniform clean-room design
 # BatchTopK fair-backbone family: every arch shares the BatchTopK→JumpReLU
-# backbone, so the only variable is decode structure.
+# backbone, so the only variable is decode structure. spectral_txc joins the
+# window family under the uniform design (here it is a DCT-band window arch).
 ARCH_T = [("batchtopk_sae", 1), ("tsae", 1),
           ("txc_batchtopk_pre", 2), ("txc_batchtopk_pre", 4), ("txc_batchtopk_pre", 8),
           ("txc_batchtopk_post", 2), ("txc_batchtopk_post", 4), ("txc_batchtopk_post", 8),
-          ("stacked_batchtopk", 2), ("stacked_batchtopk", 4), ("stacked_batchtopk", 8)]
+          ("stacked_batchtopk", 2), ("stacked_batchtopk", 4), ("stacked_batchtopk", 8),
+          ("spectral_txc", 2), ("spectral_txc", 4), ("spectral_txc", 8)]
 PER_TOKEN = {("batchtopk_sae", 1), ("tsae", 1)}
 LABEL = {"batchtopk_sae": "BatchTopK-SAE", "tsae": "T-SAE",
          "txc_batchtopk_pre": "TXC-pre", "txc_batchtopk_post": "TXC-post",
-         "stacked_batchtopk": "Stacked-SAE"}
-# Window families: TXC-pre = blues, TXC-post = purples, Stacked = greens.
+         "stacked_batchtopk": "Stacked-SAE", "spectral_txc": "Spectral-TXC"}
+# Window families: TXC-pre = blues, TXC-post = purples, Stacked = greens,
+# Spectral = oranges.
 WINDOW_FAMILIES = [("txc_batchtopk_pre", "#3182bd"),
                    ("txc_batchtopk_post", "#807dba"),
-                   ("stacked_batchtopk", "#31a354")]
+                   ("stacked_batchtopk", "#31a354"),
+                   ("spectral_txc", "#f16913")]
 COLORS = {
     ("batchtopk_sae", 1): "#D55E00", ("tsae", 1): "#E69F00",            # per-token: vermillion/orange
     ("txc_batchtopk_pre", 2): "#9ecae1", ("txc_batchtopk_pre", 4): "#3182bd", ("txc_batchtopk_pre", 8): "#08519c",
     ("txc_batchtopk_post", 2): "#bcbddc", ("txc_batchtopk_post", 4): "#807dba", ("txc_batchtopk_post", 8): "#54278f",
     ("stacked_batchtopk", 2): "#a1d99b", ("stacked_batchtopk", 4): "#31a354", ("stacked_batchtopk", 8): "#006d2c",
+    ("spectral_txc", 2): "#fdae6b", ("spectral_txc", 4): "#f16913", ("spectral_txc", 8): "#a63603",
 }
 
 
@@ -77,7 +82,7 @@ def g(agg, kind, kpos, arch, T, d, metric="lambda_recovery"):
 def fig_main(agg, pt, plt):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11.2, 4.5))
     # (a) frontier: lambda vs d_sae (trained, k_pos=1)
-    ax1.axvspan(7, F, color="0.93", zorder=0, lw=0)
+    ax1.axvspan(9, F, color="0.93", zorder=0, lw=0)
     ax1.axvline(F, color="0.45", ls=":", lw=1.1, zorder=1)
     ax1.text(F - 0.5, 0.04, "F", color="0.4", fontsize=10, ha="right", style="italic")
     ax1.axhline(pt, color="#999999", ls="--", lw=1.1, zorder=1)
@@ -85,7 +90,7 @@ def fig_main(agg, pt, plt):
              color="#555", fontsize=8.3, ha="right", va="top")
     frontier_series(ax1, ARCH_T, D_SAES, lambda a, T, d: g(agg, "trained", 1, a, T, d),
                     COLORS, PER_TOKEN, label, ms=5.5, lw=1.9, capsize=2, elinewidth=1)
-    ax1.set_xticks(D_SAES); ax1.set_xlim(7, 42); ax1.set_ylim(0, 1.02)
+    ax1.set_xticks(D_SAES); ax1.set_xlim(9, 42); ax1.set_ylim(0, 1.02)
     ax1.set_xlabel("dictionary size  $d_{sae}$"); ax1.set_ylabel("$\\lambda$-recovery (held-out corr.)")
     ax1.set_title("(a) Hidden-intensity recovery vs capacity", loc="left", fontsize=11)
 
@@ -148,11 +153,11 @@ def fig_local_tradeoff(agg, plt):
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11.2, 4.5))
     for ax, metric, ttl, yl in [(a1, "eauc", "(a) Local feature recovery", "eAUC"),
                                 (a2, "nmse", "(b) Reconstruction error", "NMSE")]:
-        ax.axvspan(7, F, color="0.93", zorder=0, lw=0); ax.axvline(F, color="0.45", ls=":", lw=1.1)
+        ax.axvspan(9, F, color="0.93", zorder=0, lw=0); ax.axvline(F, color="0.45", ls=":", lw=1.1)
         frontier_series(ax, ARCH_T, D_SAES,
                         lambda a, T, d, _m=metric: g(agg, "trained", 1, a, T, d, _m),
                         COLORS, PER_TOKEN, label, ms=5, lw=1.7, capsize=2, elinewidth=0.9)
-        ax.set_xticks(D_SAES); ax.set_xlim(7, 42); ax.set_xlabel("dictionary size  $d_{sae}$")
+        ax.set_xticks(D_SAES); ax.set_xlim(9, 42); ax.set_xlabel("dictionary size  $d_{sae}$")
         ax.set_ylabel(yl); ax.set_title(ttl, loc="left", fontsize=11)
     a1.set_ylim(0, 1.02); a1.legend(ncol=2, fontsize=7.8, loc="upper left")
     fig.tight_layout(); save_fig(fig, FIG_DIR, "backtracking_local_tradeoff", plt)
@@ -195,7 +200,7 @@ def fig_specialization(agg, plt):
     ax.set_ylabel("order-sensitive latent recovery   ($\\lambda$-recovery)")
     ax.set_title("Architectural specialization: local vs temporal recovery", fontsize=12)
     ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8.6,
-              title="(arch, T) @ $d_{sae}{=}20$\nfaint trail: $d_{sae}\\in\\{8,16,20,40\\}$",
+              title="(arch, T) @ $d_{sae}{=}20$\nfaint trail: $d_{sae}\\in\\{10,20,40\\}$",
               title_fontsize=8.2)
     fig.tight_layout()
     save_fig(fig, FIG_DIR, "backtracking_specialization", plt)
@@ -236,8 +241,9 @@ def headline_block(agg, pt):
     pre_t4 = g(agg, "trained", 1, "txc_batchtopk_pre", 4, 20)[0]
     post_t4 = g(agg, "trained", 1, "txc_batchtopk_post", 4, 20)[0]
     stk_t4 = g(agg, "trained", 1, "stacked_batchtopk", 4, 20)[0]
-    win_scarce = g(agg, "trained", 1, "txc_batchtopk_pre", 4, 8)[0]
-    best_win_t4 = np.nanmax([pre_t4, post_t4, stk_t4])
+    win_scarce = g(agg, "trained", 1, "txc_batchtopk_pre", 4, 10)[0]
+    spec_t4 = g(agg, "trained", 1, "spectral_txc", 4, 20)[0]
+    best_win_t4 = np.nanmax([pre_t4, post_t4, stk_t4, spec_t4])
     un_win = g(agg, "untrained", 1, "txc_batchtopk_pre", 4, 20)[0]
     return (
         f"- **Fair backbone:** every arch shares the BatchTopK→JumpReLU backbone "
@@ -247,8 +253,9 @@ def headline_block(agg, pt):
         f"$\\sqrt{{Var\\,\\lambda/Var\\,b}}$ = **{pt:.2f}**. Trained per-token (BatchTopK) SAEs land at "
         f"**{pt_tok:.2f}** at d_sae=20, flat across all capacities.\n"
         f"- **Window recovery** at d_sae=20: TXC-pre $\\lambda$ = **{pre_t2:.2f}** (T=2) → "
-        f"**{pre_t4:.2f}** (T≥4); TXC-post **{post_t4:.2f}**; Stacked **{stk_t4:.2f}** (T=4). "
-        f"Holds at d_sae=8 < F=20 (TXC-pre = **{win_scarce:.2f}**, scarce regime).\n"
+        f"**{pre_t4:.2f}** (T≥4); TXC-post **{post_t4:.2f}**; Stacked **{stk_t4:.2f}**; "
+        f"Spectral **{spec_t4:.2f}** (T=4). "
+        f"Holds at d_sae=10 < F=20 (TXC-pre = **{win_scarce:.2f}**, scarce regime).\n"
         f"- **Gap** (best window T4 − per-token): **{best_win_t4 - pt_tok:.2f}**. "
         f"Untrained window already reaches {un_win:.2f} (architectural access); training lifts it to {best_win_t4:.2f}."
     )

@@ -2,10 +2,10 @@
 
     python -m experiments.explorations.synthetic.signed_motion.render_figs
 
-Reads results/leaderboard.jsonl (signed_motion, protocol 1.2.0, 10K grid) and
-writes a 3-panel frontier (s_temp, eAUC, NMSE vs d_sae, one line per (arch, T)).
-F = 19 and 2F = 38 are marked; the scarce / memorization-free regime (d_sae < 2F)
-is shaded. Also writes a low-res .thumb.png.
+Reads results/leaderboard.jsonl (signed_motion, protocol 1.3.0, 10K grid, the
+fair-backbone suite) and writes a 3-panel frontier (s_temp, eAUC, NMSE vs d_sae,
+one line per (arch, T)). F = 19 and 2F = 38 are marked; the scarce /
+memorization-free regime (d_sae < 2F) is shaded. Also writes a low-res .thumb.png.
 
 The story the figure tells: in the scarce regime no architecture recovers the
 order-sensitive sign (s_temp ≈ 0); the crosscoder's recovery only appears at
@@ -33,23 +33,30 @@ from pathlib import Path
 DATASOURCE = "toy_signed_motion_M19_d40"
 DEPRECATED_ARCHS = {"txc_pro", "tfa", "tfa_pos"}
 N_STEPS = 10000
-DEFAULT_SYNTH_D_SAE = 20
+DEFAULT_SYNTH_D_SAE = 19
 F = 19            # ground-truth feature count
 N_WINDOWS = 2 * F  # = 38, the per-tile probe's memorization boundary
 
-# Colour per (arch, T): crosscoder = blues by T, stacked = purples, token archs solid.
+# Colour per (arch, T) on the fair-backbone suite: TXC-pre = blues, TXC-post =
+# purples, Stacked = greens, Spectral = oranges (all by T); token archs solid.
 def _style(arch: str, T: int):
     blues = {2: "#9ecae1", 4: "#4292c6", 8: "#08519c"}
     purples = {2: "#dadaeb", 4: "#9e9ac8", 8: "#6a51a3"}
-    if arch == "txc_base":
+    greens = {2: "#a1d99b", 4: "#41ab5d", 8: "#006d2c"}
+    oranges = {2: "#fdae6b", 4: "#f16913", 8: "#a63603"}
+    if arch == "txc_batchtopk_pre":
         return blues.get(T, "#08519c"), "o"
-    if arch == "stacked_sae":
-        return purples.get(T, "#6a51a3"), "v"
-    if arch == "topk_sae":
+    if arch == "txc_batchtopk_post":
+        return purples.get(T, "#6a51a3"), "s"
+    if arch == "stacked_batchtopk":
+        return greens.get(T, "#006d2c"), "v"
+    if arch == "spectral_txc":
+        return oranges.get(T, "#a63603"), "D"
+    if arch == "batchtopk_sae":
         return "#d62728", "^"
     if arch == "tsae":
-        return "#ff7f0e", "D"
-    return "#444", "s"
+        return "#ff7f0e", "P"
+    return "#444", "x"
 
 
 def _override(row):
@@ -67,11 +74,17 @@ def render_ac_frontier() -> Path:
     for row in iter_leaderboard():
         if row.experiment != "synthetic" or row.datasource != DATASOURCE:
             continue
-        if row.evaluator_protocol_version != "1.2.0":
+        if row.evaluator_protocol_version != "1.3.0":
             continue
         if row.eval_cfg.get("smoke", False) or row.arch in DEPRECATED_ARCHS:
             continue
         if getattr(row.training_cfg, "n_steps", None) != N_STEPS:
+            continue
+        # The uniform design sweeps k_pos ∈ {1,2,4,8,16}; the (arch,T,d_sae) key
+        # here has no k_pos slot, so fix the frontier at k_pos=1 (the sparsest,
+        # matching the other benches' k_pos=1 frontier convention) — otherwise
+        # rows collapse last-write-wins across k_pos.
+        if int(row.eval_cfg.get("k_pos", 1)) != 1:
             continue
         ov = _override(row)
         d = int(ov.get("d_sae") or DEFAULT_SYNTH_D_SAE)
@@ -79,11 +92,12 @@ def render_ac_frontier() -> Path:
         cells[(row.arch, T, d)][int(row.seed)] = row.metrics
 
     if not cells:
-        raise RuntimeError("No signed_motion 1.2.0 rows. Run the sweep first.")
+        raise RuntimeError("No signed_motion 1.3.0 rows. Run the sweep first.")
 
     series = sorted({(a, T) for (a, T, d) in cells},
-                    key=lambda x: ({"txc_base": 0, "stacked_sae": 1,
-                                    "topk_sae": 2, "tsae": 3}.get(x[0], 9), x[1]))
+                    key=lambda x: ({"batchtopk_sae": 0, "tsae": 1,
+                                    "txc_batchtopk_pre": 2, "txc_batchtopk_post": 3,
+                                    "stacked_batchtopk": 4, "spectral_txc": 5}.get(x[0], 9), x[1]))
     n_seeds = len({s for v in cells.values() for s in v})
 
     def agg(arch, T, d, metric):

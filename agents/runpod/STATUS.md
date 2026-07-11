@@ -1,22 +1,35 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-10 (seeded by `mac-local`; the `runpod` agent should
-overwrite this itself at the start of its next session).
+**Last rewrite:** 2026-07-11 (full clean-room rerun + purge COMPLETE).
 
 ## Who / where
-Remote CC on RunPod (Linux, CUDA) at `/workspace/temp_xc`. Role: heavy grids +
-long runs. Git creds at `/workspace/.tokens/`.
+Remote CC on RunPod (Linux) at `/workspace/temp_xc`. Git creds at `/workspace/.tokens/`.
 
-## Last known state
-- Built the **frequency (cyclic-tone) bench** from a (now-retired) briefing:
-  § 8 gating PASS → `cyclic_tones()` generator + `spectral_txc` DCT-band arch +
-  `frequency_recovery` evaluator → 298-cell grid + band-partition addendum →
-  single-source record. Verdict **POSITIVE**. Commits through `9094d405`.
-- Executed the **record-pipeline refactor** brief: shared lib
-  `src/explorations/synthetic/` + thin per-bench drivers + legibility cleanups;
-  **flagged (did not fix)** the signed_motion figs-path bug per the brief.
-  Commits `61009665` → `a37fc2e3`. (`mac-local` later applied the fix.)
-- Idle since; no task queued.
+## Last task: `briefings/full-rerun-and-purge.md` — DONE (briefing deleted)
+Rebuilt the entire synthetic result set at protocol **1.3.0** under the uniform
+design, regenerated all records + the program report, purged stale synthetic rows.
+See `experiments/explorations/synthetic/STATUS.md` §0 for the science.
+
+Key outcomes:
+- ~2239-cell grid, **0 failures**. Ran on **CPU** (A40 is kernel-launch-latency-
+  bound for these tiny d_in≤128 models → ~14% util; CPU ~7h). 12 workers, OMP=1
+  (higher counts hit a memory-bandwidth/contention cliff). CUDA hidden via env.
+- Anchor commit **C = `5b526c4d`** (protocol bump + drivers). Every fresh row
+  stamps it; the purge kept synth iff `1.3.0 AND commit_sha==C AND seed∈{1,2,42}`
+  (the seed clause dropped 12 stray timing-probe rows). Non-synth (356) preserved.
+- Drift-sanity: overlapping cells reproduce **max|Δ|=0.000** on primary metrics.
+- Program matrix filled 36/36 + both panels. All per-bench records regenerated;
+  verdicts preserved; spectral_txc added as a fair column across all 4 benches.
+- Committed as **C2** (see git log), pushed to origin/arxiv.
+
+## Gotchas learned (for next heavy CPU grid on this box)
+- 40+ concurrent `git diff HEAD` (runner code_version) SIGBUS on the growing
+  tracked leaderboard/manifest → `git update-index --assume-unchanged` those
+  churning files during the grid, `--no-assume-unchanged` before committing.
+- Tiny models: GPU useless (latency-bound); CPU sweet spot ~12 workers, OMP=1.
+- `pkill -f "<pattern>"` self-matches the launching shell → exit 144. Launch
+  grids as harness background tasks; kill via TaskStop, not pkill.
 
 ## Next / open
-Check `briefings/` for the next `status: active` brief. Nothing queued right now.
+Check `briefings/` for the next `status: active` brief. Nothing queued now.
+The `.prepurge` leaderboard backup can be deleted once the push is confirmed good.

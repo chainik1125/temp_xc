@@ -42,7 +42,7 @@ loop's [`README.md`](../README.md).
 <!-- BEGIN AUTO:headline -->
 - **Fair backbone:** every arch shares the BatchTopK→JumpReLU backbone (Bussmann et al.) + AuxK + decoder unit-norm, on equal tokens/step — so the only variable is decode structure.
 - **Per-token DPI floor** (provable, from the generator): $\sqrt{Var\,\lambda/Var\,b}$ = **0.41**. Trained per-token (BatchTopK) SAEs land at **0.40** at d_sae=20, flat across all capacities.
-- **Window recovery** at d_sae=20: TXC-pre $\lambda$ = **0.87** (T=2) → **0.95** (T≥4); TXC-post **0.94**; Stacked **0.95** (T=4). Holds at d_sae=8 < F=20 (TXC-pre = **0.95**, scarce regime).
+- **Window recovery** at d_sae=20: TXC-pre $\lambda$ = **0.87** (T=2) → **0.95** (T≥4); TXC-post **0.94**; Stacked **0.95**; Spectral **0.95** (T=4). Holds at d_sae=10 < F=20 (TXC-pre = **0.95**, scarce regime).
 - **Gap** (best window T4 − per-token): **0.55**. Untrained window already reaches 0.78 (architectural access); training lifts it to 0.95.
 <!-- END AUTO:headline -->
 
@@ -86,19 +86,22 @@ loop's [`README.md`](../README.md).
 Trained `lambda_recovery` (mean over 3 seeds), by `d_sae` (`k_pos=1`):
 
 <!-- BEGIN AUTO:lambda_frontier -->
-| arch / T | d=8 | d=16 | d=20 | d=40 |
-|---|---|---|---|---|
-| BatchTopK-SAE (per-token) | 0.402 | 0.401 | 0.400 | 0.400 |
-| T-SAE (per-token) | 0.416 | 0.412 | 0.409 | 0.417 |
-| **TXC-pre (T=2)** | 0.873 | 0.871 | 0.870 | 0.867 |
-| **TXC-pre (T=4)** | 0.952 | 0.952 | 0.952 | 0.948 |
-| **TXC-pre (T=8)** | 0.949 | 0.949 | 0.949 | 0.949 |
-| **TXC-post (T=2)** | 0.871 | 0.867 | 0.866 | 0.861 |
-| **TXC-post (T=4)** | 0.950 | 0.943 | 0.942 | 0.924 |
-| **TXC-post (T=8)** | 0.947 | 0.927 | 0.923 | 0.909 |
-| **Stacked-SAE (T=2)** | 0.871 | 0.868 | 0.867 | 0.867 |
-| **Stacked-SAE (T=4)** | 0.950 | 0.948 | 0.948 | 0.947 |
-| **Stacked-SAE (T=8)** | 0.947 | 0.944 | 0.944 | 0.943 |
+| arch / T | d=10 | d=20 | d=40 |
+|---|---|---|---|
+| BatchTopK-SAE (per-token) | 0.402 | 0.400 | 0.400 |
+| T-SAE (per-token) | 0.410 | 0.409 | 0.418 |
+| **TXC-pre (T=2)** | 0.874 | 0.870 | 0.867 |
+| **TXC-pre (T=4)** | 0.951 | 0.952 | 0.948 |
+| **TXC-pre (T=8)** | 0.949 | 0.949 | 0.949 |
+| **TXC-post (T=2)** | 0.870 | 0.866 | 0.862 |
+| **TXC-post (T=4)** | 0.948 | 0.942 | 0.924 |
+| **TXC-post (T=8)** | 0.938 | 0.923 | 0.909 |
+| **Stacked-SAE (T=2)** | 0.870 | 0.867 | 0.867 |
+| **Stacked-SAE (T=4)** | 0.949 | 0.948 | 0.947 |
+| **Stacked-SAE (T=8)** | 0.946 | 0.944 | 0.943 |
+| **Spectral-TXC (T=2)** | 0.860 | 0.875 | 0.874 |
+| **Spectral-TXC (T=4)** | 0.947 | 0.946 | 0.957 |
+| **Spectral-TXC (T=8)** | 0.921 | 0.942 | 0.956 |
 <!-- END AUTO:lambda_frontier -->
 
 - **Per-token is pinned at the DPI floor** (BatchTopK-SAE 0.400, T-SAE 0.409 ≈
@@ -158,19 +161,22 @@ eAUC), not up — the `λ` separation is architectural, not a capacity effect.*
 eAUC (trained, `k_pos=1`), by `d_sae`:
 
 <!-- BEGIN AUTO:eauc -->
-| arch / T | d=8 | d=16 | d=20 | d=40 |
-|---|---|---|---|---|
-| BatchTopK-SAE (per-token) | 0.431 | 0.806 | 0.975 | 0.990 |
-| T-SAE (per-token) | 0.404 | 0.768 | 0.976 | 0.990 |
-| TXC-pre (T=2) | 0.395 | 0.674 | 0.736 | 0.990 |
-| TXC-pre (T=4) | 0.361 | 0.543 | 0.651 | 0.874 |
-| TXC-pre (T=8) | 0.074 | 0.455 | 0.583 | 0.825 |
-| TXC-post (T=2) | 0.382 | 0.620 | 0.771 | 0.966 |
-| TXC-post (T=4) | 0.275 | 0.560 | 0.662 | 0.864 |
-| TXC-post (T=8) | 0.063 | 0.445 | 0.589 | 0.722 |
-| Stacked-SAE (T=2) | 0.460 | 0.675 | 0.727 | 0.723 |
-| Stacked-SAE (T=4) | 0.450 | 0.550 | 0.531 | 0.525 |
-| Stacked-SAE (T=8) | 0.378 | 0.474 | 0.472 | 0.471 |
+| arch / T | d=10 | d=20 | d=40 |
+|---|---|---|---|
+| BatchTopK-SAE (per-token) | 0.522 | 0.975 | 0.990 |
+| T-SAE (per-token) | 0.518 | 0.977 | 0.990 |
+| TXC-pre (T=2) | 0.434 | 0.736 | 0.990 |
+| TXC-pre (T=4) | 0.371 | 0.651 | 0.874 |
+| TXC-pre (T=8) | 0.286 | 0.582 | 0.840 |
+| TXC-post (T=2) | 0.415 | 0.771 | 0.966 |
+| TXC-post (T=4) | 0.357 | 0.657 | 0.859 |
+| TXC-post (T=8) | 0.178 | 0.591 | 0.718 |
+| Stacked-SAE (T=2) | 0.521 | 0.726 | 0.724 |
+| Stacked-SAE (T=4) | 0.485 | 0.531 | 0.525 |
+| Stacked-SAE (T=8) | 0.436 | 0.472 | 0.471 |
+| Spectral-TXC (T=2) | 0.288 | 0.522 | 0.984 |
+| Spectral-TXC (T=4) | 0.319 | 0.415 | 0.622 |
+| Spectral-TXC (T=8) | 0.335 | 0.425 | 0.632 |
 <!-- END AUTO:eauc -->
 
 - **Per-token archs recover the local feature directions almost perfectly**
@@ -220,6 +226,9 @@ At `d_sae = 20`, trained vs random-init (`n_steps = 0`) `lambda_recovery`:
 | Stacked-SAE (T=2) | 0.769 ±0.015 | 0.867 ±0.001 |
 | Stacked-SAE (T=4) | 0.865 ±0.049 | 0.948 ±0.003 |
 | Stacked-SAE (T=8) | 0.820 ±0.075 | 0.944 ±0.005 |
+| Spectral-TXC (T=2) | 0.701 ±0.074 | 0.875 ±0.001 |
+| Spectral-TXC (T=4) | 0.505 ±0.143 | 0.946 ±0.013 |
+| Spectral-TXC (T=8) | 0.514 ±0.073 | 0.942 ±0.005 |
 <!-- END AUTO:untrained -->
 
 The window advantage **does not vanish at random init** — a random window
@@ -287,16 +296,19 @@ almost nothing from training (capped by the floor).*
 | arch / T | $\lambda$ @ $k_{pos}{=}1$ | $\lambda$ @ $k_{pos}{=}2$ | eAUC @1 | eAUC @2 |
 |---|---|---|---|---|
 | BatchTopK-SAE (per-token) | 0.400 | 0.402 | 0.975 | 0.989 |
-| T-SAE (per-token) | 0.409 | 0.413 | 0.976 | 0.950 |
+| T-SAE (per-token) | 0.409 | 0.413 | 0.977 | 0.950 |
 | TXC-pre (T=2) | 0.870 | 0.873 | 0.736 | 0.728 |
-| TXC-pre (T=4) | 0.952 | 0.952 | 0.651 | 0.676 |
-| TXC-pre (T=8) | 0.949 | 0.949 | 0.583 | 0.572 |
+| TXC-pre (T=4) | 0.952 | 0.952 | 0.651 | 0.675 |
+| TXC-pre (T=8) | 0.949 | 0.949 | 0.582 | 0.571 |
 | TXC-post (T=2) | 0.866 | 0.870 | 0.771 | 0.751 |
-| TXC-post (T=4) | 0.942 | 0.948 | 0.662 | 0.664 |
-| TXC-post (T=8) | 0.923 | 0.945 | 0.589 | 0.560 |
-| Stacked-SAE (T=2) | 0.867 | 0.870 | 0.727 | 0.710 |
+| TXC-post (T=4) | 0.942 | 0.948 | 0.657 | 0.664 |
+| TXC-post (T=8) | 0.923 | 0.945 | 0.591 | 0.558 |
+| Stacked-SAE (T=2) | 0.867 | 0.870 | 0.726 | 0.710 |
 | Stacked-SAE (T=4) | 0.948 | 0.950 | 0.531 | 0.545 |
 | Stacked-SAE (T=8) | 0.944 | 0.946 | 0.472 | 0.490 |
+| Spectral-TXC (T=2) | 0.875 | 0.876 | 0.522 | 0.526 |
+| Spectral-TXC (T=4) | 0.946 | 0.939 | 0.415 | 0.424 |
+| Spectral-TXC (T=8) | 0.942 | 0.946 | 0.425 | 0.404 |
 <!-- END AUTO:kpos -->
 
 ## 8. Caveats (honest scope)

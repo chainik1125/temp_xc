@@ -57,11 +57,11 @@ resolves only high-Y, all-1.00 at T=16); random null flat (per-Ω-class range
 **Verdict: POSITIVE for the periodic axis** — frequency-structured window crosscoders exploit the tone, and the **DCT-band inductive bias is the decisive architectural feature**; per-token and additive-over-position codes are blind. Not a plain "window beats per-token": the split is by *where the nonlinearity sits*.
 
 - **P1 ✓ — per-token flat at chance:** BatchTopK-SAE / T-SAE velocity recovery ≈ **0.01** at every $d_{sae}$ (provable DPI + gating raw-linear-at-chance). Velocity is a 2nd-moment latent; no per-token code exposes it.
-- **The discriminator is the $S(f)$ *shape*, and it splits the crosscoders by encoder structure.** Codes that **mix positions before the nonlinearity** (TXC-post `relu(Σ_t W_t x_t)`, Spectral) recover $Y$ with a **high-pass / Rayleigh-resolved** $S(f)$ — Spectral near-oracle (**1.00** at $T=16$), TXC-post **0.53**. The **additive-over-position** code (TXC-pre `Σ_t g(x_t)`) caps at **0.27** with a **flat** $S(f)$: its recovery is *bag-level, not spectral estimation* (each token's marginal is $Y$-independent → additive codes carry no frequency ordering).
-- **The spectral advantage is a band-limited inductive bias, amplified by learning (access ≫ learning here).** An **untrained** Spectral already reads velocity at **0.64** (its DCT-band kernels *are* bandpass tone-detectors at init); TXC-post 0.18, TXC-pre 0.02. Training lifts Spectral 0.64→1.00.
-- **P3 — band partition = a TIE at adequate capacity, multiband edge only at the extremes (exactly as preregistered):** at matched budget ($k_{win}=k_{pos}·T$) the trained recovery is identical across 1/2/4 bands whenever capacity suffices — $T=16$: multiband **1.00** ≈ full **1.00** ≈ dcac **1.00**; $T=2$: all within noise (0.40/0.40/0.37). The partition helps only at the **capacity extreme** ($d_{sae}=32$, $T=16$: multiband **0.99** vs full **0.90**) and in the **untrained access** prior (multiband 0.64 vs full 0.46: band-limited kernels are tone-detectors at init). Clean **band decomposition** holds (each DCT band decodes the tones in its range). The decisive multiband win needs superposition (scoped out).
-- **P4 ✓ — random null has no frequency axis:** on the random embedding the per-Ω-class response is flat (no $\Delta f$ ordering) and the circle's tones are what make $Y$ resolvable (Spectral circle 1.00 vs random 0.57 at $T=16$). Above $|Ω|·M=1010$ the **null** recovery jumps by template memorization (Spectral 0.57→**1.00**, TXC-pre →0.55) — caught + flagged; all main cells stay $d_{sae}<1010$.
-- **Substrate:** circle-embedded cyclic tones, $M=101$, $Ω=\{0,1,2,4,8,16,24,32,40,50\}$, $σ=0.10$; BatchTopK fair backbone; seeds {1,2,42}; 298-cell main grid + band-partition addendum. (Stacked dropped — concatenated per-position code memorizes above $T·d_{sae}=|Ω|·M$; A5.)
+- **The discriminator is the $S(f)$ *shape*, and it splits the crosscoders by encoder structure.** Codes that **mix positions before the nonlinearity** (TXC-post `relu(Σ_t W_t x_t)`, Spectral) recover $Y$ with a **high-pass / Rayleigh-resolved** $S(f)$ — Spectral near-oracle (**0.96** at $T=8$), TXC-post **0.28**. The **additive-over-position** code (TXC-pre `Σ_t g(x_t)`) caps at **0.15** with a **flat** $S(f)$: its recovery is *bag-level, not spectral estimation* (each token's marginal is $Y$-independent → additive codes carry no frequency ordering).
+- **The spectral advantage is a band-limited inductive bias, amplified by learning (access ≫ learning here).** An **untrained** Spectral already reads velocity at **0.55** (its DCT-band kernels *are* bandpass tone-detectors at init); TXC-post 0.16, TXC-pre 0.00. Training lifts Spectral 0.55→0.96.
+- **P3 — band partition = a TIE at adequate capacity, multiband edge only at the extremes (exactly as preregistered):** at matched budget ($k_{win}=k_{pos}·T$) the trained recovery is identical across 1/2/4 bands whenever capacity suffices — $T=8$: multiband **0.96** ≈ full **0.93** ≈ dcac **0.94**; $T=2$: all within noise (0.40/0.40/0.37). The partition helps only at the **capacity extreme** ($d_{sae}=50$, $T=8$: multiband **0.94** vs full **0.89**) and in the **untrained access** prior (multiband 0.55 vs full 0.37: band-limited kernels are tone-detectors at init). Clean **band decomposition** holds (each DCT band decodes the tones in its range). The decisive multiband win needs superposition (scoped out).
+- **P4 ✓ — random null has no frequency axis:** on the random embedding the per-Ω-class response is flat (no $\Delta f$ ordering) and the circle's tones are what make $Y$ resolvable (Spectral circle 0.96 vs random 0.39 at $T=8$). Above $|Ω|·M=1010$ the **null** recovery jumps by template memorization (Spectral 0.39→**0.99**, TXC-pre →0.43) — caught + flagged; all main cells stay $d_{sae}<1010$.
+- **Substrate:** circle-embedded cyclic tones, $M=101$, $Ω=\{0,1,2,4,8,16,24,32,40,50\}$, $σ=0.10$; BatchTopK fair backbone; seeds {1,2,42}; the fair-backbone uniform grid + band-partition addendum. (Stacked dropped — concatenated per-position code memorizes above $T·d_{sae}=|Ω|·M$; A5.)
 <!-- END AUTO:headline -->
 
 ## 4. Velocity-recovery frontier (circle)
@@ -76,22 +76,19 @@ memorization threshold `|Ω|·M=1010` are marked; all main cells stay below 1010
 ![main](figs/frequency_main.png)
 
 <!-- BEGIN AUTO:circle_frontier -->
-| arch / T | d=32 | d=64 | d=101 | d=256 |
-|---|---|---|---|---|
-| BatchTopK-SAE (per-token) | -0.000 | -0.004 | -0.004 | -0.003 |
-| T-SAE (per-token) | -0.004 | -0.003 | -0.005 | -0.005 |
-| **TXC-pre (T=2)** | 0.038 | 0.042 | 0.034 | 0.036 |
-| **TXC-pre (T=4)** | 0.060 | 0.056 | 0.051 | 0.074 |
-| **TXC-pre (T=8)** | 0.152 | 0.141 | 0.152 | 0.143 |
-| **TXC-pre (T=16)** | 0.266 | 0.259 | 0.272 | 0.273 |
-| **TXC-post (T=2)** | 0.202 | 0.201 | 0.193 | 0.196 |
-| **TXC-post (T=4)** | 0.260 | 0.251 | 0.238 | 0.211 |
-| **TXC-post (T=8)** | 0.330 | 0.329 | 0.285 | 0.338 |
-| **TXC-post (T=16)** | 0.414 | 0.467 | 0.526 | 0.502 |
-| **Spectral-TXC (T=2)** | 0.401 | 0.376 | 0.398 | 0.385 |
-| **Spectral-TXC (T=4)** | 0.766 | 0.764 | 0.762 | 0.753 |
-| **Spectral-TXC (T=8)** | 0.920 | 0.959 | 0.960 | 0.955 |
-| **Spectral-TXC (T=16)** | 0.992 | 0.999 | 0.997 | 0.997 |
+| arch / T | d=50 | d=101 | d=202 |
+|---|---|---|---|
+| BatchTopK-SAE (per-token) | -0.001 | -0.004 | -0.001 |
+| T-SAE (per-token) | -0.003 | -0.005 | -0.004 |
+| **TXC-pre (T=2)** | 0.029 | 0.034 | 0.031 |
+| **TXC-pre (T=4)** | 0.059 | 0.051 | 0.059 |
+| **TXC-pre (T=8)** | 0.127 | 0.152 | 0.166 |
+| **TXC-post (T=2)** | 0.196 | 0.193 | 0.192 |
+| **TXC-post (T=4)** | 0.257 | 0.238 | 0.260 |
+| **TXC-post (T=8)** | 0.333 | 0.285 | 0.325 |
+| **Spectral-TXC (T=2)** | 0.407 | 0.398 | 0.373 |
+| **Spectral-TXC (T=4)** | 0.765 | 0.762 | 0.754 |
+| **Spectral-TXC (T=8)** | 0.939 | 0.960 | 0.957 |
 <!-- END AUTO:circle_frontier -->
 
 ## 5. The deliverable: the frequency response `S(f)`
@@ -106,19 +103,16 @@ Raw per-Ω-class recall (probe) vs the oracle (`d_sae=M`):
 <!-- BEGIN AUTO:sf_table -->
 | arch / T | Y=0 | Y=1 | Y=2 | Y=4 | Y=8 | Y=16 | Y=24 | Y=32 | Y=40 | Y=50 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| *oracle (T=16)* | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| *oracle (T=8)* | 0.97 | 0.96 | 0.98 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 | TXC-pre T=2 | 0.14 | 0.25 | 0.00 | 0.00 | 0.00 | 0.20 | 0.00 | 0.40 | 0.00 | 0.31 |
 | TXC-pre T=4 | 0.17 | 0.25 | 0.03 | 0.00 | 0.00 | 0.23 | 0.21 | 0.19 | 0.02 | 0.37 |
 | TXC-pre T=8 | 0.27 | 0.24 | 0.04 | 0.02 | 0.16 | 0.30 | 0.27 | 0.38 | 0.26 | 0.42 |
-| TXC-pre T=16 | 0.32 | 0.26 | 0.16 | 0.33 | 0.44 | 0.37 | 0.42 | 0.45 | 0.30 | 0.41 |
 | TXC-post T=2 | 0.17 | 0.31 | 0.24 | 0.02 | 0.21 | 0.60 | 0.29 | 0.38 | 0.17 | 0.35 |
 | TXC-post T=4 | 0.18 | 0.18 | 0.11 | 0.20 | 0.53 | 0.59 | 0.26 | 0.30 | 0.06 | 0.74 |
 | TXC-post T=8 | 0.12 | 0.16 | 0.17 | 0.23 | 0.74 | 0.40 | 0.14 | 0.50 | 0.49 | 0.61 |
-| TXC-post T=16 | 0.21 | 0.40 | 0.34 | 0.78 | 0.87 | 0.38 | 0.71 | 0.87 | 0.55 | 0.63 |
 | Spectral-TXC T=2 | 0.20 | 0.33 | 0.32 | 0.01 | 0.48 | 0.87 | 0.70 | 0.67 | 0.34 | 0.65 |
 | Spectral-TXC T=4 | 0.40 | 0.51 | 0.13 | 0.88 | 0.97 | 1.00 | 0.99 | 1.00 | 0.99 | 1.00 |
 | Spectral-TXC T=8 | 0.97 | 0.79 | 0.90 | 0.98 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| Spectral-TXC T=16 | 1.00 | 0.99 | 0.98 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 <!-- END AUTO:sf_table -->
 
 ## 6. Spectral vs the crosscoder family + band decomposition
@@ -133,13 +127,13 @@ band-partition test is § 6b.
 ![spectral](figs/frequency_spectral.png)
 
 <!-- BEGIN AUTO:band_table -->
-| band | velocity recovery (T=16, $d_{sae}=M$) |
+| band | velocity recovery (T=8, $d_{sae}=M$) |
 |---|---|
-| DC {0} | 0.404 |
-| low {1-5} | 0.845 |
-| mid {6-10} | 0.581 |
-| high {11-15} | 0.346 |
-| **full code** | 0.997 |
+| DC {0} | 0.382 |
+| low {1-5} | 0.746 |
+| mid {6-10} | 0.499 |
+| high {11-15} | 0.460 |
+| **full code** | 0.960 |
 <!-- END AUTO:band_table -->
 
 ### 6b. Matched-budget band-partition test (P3)
@@ -155,11 +149,11 @@ DC/AC) vs 4 (`multiband`). Same arch/backbone; only the DCT-band split differs
 ![bands](figs/frequency_bands.png)
 
 <!-- BEGIN AUTO:bands_table -->
-| bands | T=2 | T=4 | T=8 | T=16 | untrained (T=16) |
-|---|---|---|---|---|---|
-| 1-band (vanilla DCT) | 0.368 | 0.757 | 0.934 | 1.000 | 0.460 |
-| 2-band (DC/AC) | 0.398 | 0.762 | 0.941 | 0.999 | 0.444 |
-| 4-band (multiband) | 0.398 | 0.762 | 0.960 | 0.997 | 0.635 |
+| bands | T=2 | T=4 | T=8 | untrained (T=8) |
+|---|---|---|---|---|
+| 1-band (vanilla DCT) | 0.368 | 0.757 | 0.934 | 0.373 |
+| 2-band (DC/AC) | 0.398 | 0.762 | 0.941 | 0.413 |
+| 4-band (multiband) | 0.398 | 0.762 | 0.960 | 0.551 |
 <!-- END AUTO:bands_table -->
 
 ## 7. Symmetry null (circle vs random)
@@ -173,8 +167,8 @@ template memorization — the control that flags the memorization regime.
 <!-- BEGIN AUTO:memo -->
 | arch / T | circle @ $d_{sae}=M$ | circle @ 2048 | random @ $d_{sae}=M$ | random @ 2048 |
 |---|---|---|---|---|
-| TXC-pre T=16 | 0.272 | 0.258 | 0.073 | 0.547 |
-| Spectral-TXC T=16 | 0.997 | 1.000 | 0.572 | 1.000 |
+| TXC-pre T=8 | — | — | — | — |
+| Spectral-TXC T=8 | — | — | — | — |
 <!-- END AUTO:memo -->
 
 ![memorization](figs/frequency_memorization.png)
@@ -194,15 +188,12 @@ nonlinear architectural access.
 | TXC-pre (T=2) | 0.004 | 0.034 |
 | TXC-pre (T=4) | 0.005 | 0.051 |
 | TXC-pre (T=8) | 0.005 | 0.152 |
-| TXC-pre (T=16) | 0.017 | 0.272 |
 | TXC-post (T=2) | 0.069 | 0.193 |
 | TXC-post (T=4) | 0.108 | 0.238 |
 | TXC-post (T=8) | 0.156 | 0.285 |
-| TXC-post (T=16) | 0.182 | 0.526 |
 | Spectral-TXC (T=2) | 0.112 | 0.398 |
 | Spectral-TXC (T=4) | 0.353 | 0.762 |
 | Spectral-TXC (T=8) | 0.551 | 0.960 |
-| Spectral-TXC (T=16) | 0.635 | 0.997 |
 <!-- END AUTO:untrained -->
 
 ## 9. Reconstruction (capability-vs-artifact)
@@ -218,22 +209,19 @@ the floor: its 1-atom-per-window budget under-reconstructs even as it recovers
 velocity moderately.
 
 <!-- BEGIN AUTO:nmse_table -->
-| arch / T | d=32 | d=64 | d=101 | d=256 |
-|---|---|---|---|---|
-| BatchTopK-SAE (per-token) | 0.595 | 0.594 | 0.595 | 0.595 |
-| T-SAE (per-token) | 0.602 | 0.602 | 0.599 | 0.600 |
-| **TXC-pre (T=2)** | 0.593 | 0.593 | 0.593 | 0.592 |
-| **TXC-pre (T=4)** | 0.587 | 0.588 | 0.588 | 0.590 |
-| **TXC-pre (T=8)** | 0.581 | 0.579 | 0.577 | 0.579 |
-| **TXC-pre (T=16)** | 0.580 | 0.572 | 0.571 | 0.571 |
-| **TXC-post (T=2)** | 0.639 | 0.641 | 0.645 | 0.644 |
-| **TXC-post (T=4)** | 0.684 | 0.693 | 0.694 | 0.705 |
-| **TXC-post (T=8)** | 0.748 | 0.738 | 0.749 | 0.740 |
-| **TXC-post (T=16)** | 0.765 | 0.758 | 0.733 | 0.744 |
-| **Spectral-TXC (T=2)** | 0.582 | 0.584 | 0.583 | 0.581 |
-| **Spectral-TXC (T=4)** | 0.563 | 0.565 | 0.565 | 0.563 |
-| **Spectral-TXC (T=8)** | 0.562 | 0.557 | 0.556 | 0.554 |
-| **Spectral-TXC (T=16)** | 0.566 | 0.559 | 0.558 | 0.554 |
+| arch / T | d=50 | d=101 | d=202 |
+|---|---|---|---|
+| BatchTopK-SAE (per-token) | 0.594 | 0.595 | 0.594 |
+| T-SAE (per-token) | 0.600 | 0.599 | 0.599 |
+| **TXC-pre (T=2)** | 0.593 | 0.593 | 0.593 |
+| **TXC-pre (T=4)** | 0.586 | 0.588 | 0.587 |
+| **TXC-pre (T=8)** | 0.579 | 0.577 | 0.578 |
+| **TXC-post (T=2)** | 0.642 | 0.645 | 0.649 |
+| **TXC-post (T=4)** | 0.689 | 0.694 | 0.679 |
+| **TXC-post (T=8)** | 0.750 | 0.749 | 0.749 |
+| **Spectral-TXC (T=2)** | 0.582 | 0.583 | 0.583 |
+| **Spectral-TXC (T=4)** | 0.566 | 0.565 | 0.564 |
+| **Spectral-TXC (T=8)** | 0.557 | 0.556 | 0.554 |
 <!-- END AUTO:nmse_table -->
 
 ## 10. Controls (which passed)

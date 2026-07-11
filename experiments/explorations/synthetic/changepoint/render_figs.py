@@ -3,7 +3,7 @@
 Config + bench-specific figures/tables only; the leaderboard→aggregate→AUTO-block
 →stats plumbing lives in :mod:`explorations.synthetic` (record/figs). Reads the
 canonical leaderboard (`results/leaderboard.jsonl`), filters the
-`toy_changepoint_modes_d64` cells (protocol 1.2.0, non-smoke, n_steps ∈
+`toy_changepoint_modes_d64` cells (protocol 1.3.0, non-smoke, n_steps ∈
 {0, 30000}), aggregates over seeds, then renders figures + fills every
 `<!-- AUTO:* -->` block in `bench_record.md` + writes
 `results/changepoint_bench_stats.json`. The τ in-tile info ceilings come from the
@@ -32,28 +32,31 @@ GATING = RES_DIR / "changepoint_gating_stats.json"
 STATS_OUT = RES_DIR / "changepoint_bench_stats.json"
 RECORD = HERE / "bench_record.md"
 DS = "toy_changepoint_modes_d64"
-PROTOCOL = "1.2.0"
+PROTOCOL = "1.3.0"
 N_STEPS_GRID = 30_000
 KEY_FIELDS = ("kind", "k_pos", "arch", "T", "d_sae")
 
 F = 20
-D_SAES = [8, 16, 20, 40]
+D_SAES = [10, 20, 40]   # {F//2, F, 2F} — uniform clean-room design
 ARCH_T = [("batchtopk_sae", 1), ("tsae", 1),
           ("txc_batchtopk_pre", 2), ("txc_batchtopk_pre", 4), ("txc_batchtopk_pre", 8),
           ("txc_batchtopk_post", 2), ("txc_batchtopk_post", 4), ("txc_batchtopk_post", 8),
-          ("stacked_batchtopk", 2), ("stacked_batchtopk", 4), ("stacked_batchtopk", 8)]
+          ("stacked_batchtopk", 2), ("stacked_batchtopk", 4), ("stacked_batchtopk", 8),
+          ("spectral_txc", 2), ("spectral_txc", 4), ("spectral_txc", 8)]
 PER_TOKEN = {("batchtopk_sae", 1), ("tsae", 1)}
 LABEL = {"batchtopk_sae": "BatchTopK-SAE", "tsae": "T-SAE",
          "txc_batchtopk_pre": "TXC-pre", "txc_batchtopk_post": "TXC-post",
-         "stacked_batchtopk": "Stacked-SAE"}
+         "stacked_batchtopk": "Stacked-SAE", "spectral_txc": "Spectral-TXC"}
 WINDOW_FAMILIES = [("txc_batchtopk_pre", "#3182bd"),
                    ("txc_batchtopk_post", "#807dba"),
-                   ("stacked_batchtopk", "#31a354")]
+                   ("stacked_batchtopk", "#31a354"),
+                   ("spectral_txc", "#f16913")]
 COLORS = {
     ("batchtopk_sae", 1): "#D55E00", ("tsae", 1): "#E69F00",
     ("txc_batchtopk_pre", 2): "#9ecae1", ("txc_batchtopk_pre", 4): "#3182bd", ("txc_batchtopk_pre", 8): "#08519c",
     ("txc_batchtopk_post", 2): "#bcbddc", ("txc_batchtopk_post", 4): "#807dba", ("txc_batchtopk_post", 8): "#54278f",
     ("stacked_batchtopk", 2): "#a1d99b", ("stacked_batchtopk", 4): "#31a354", ("stacked_batchtopk", 8): "#006d2c",
+    ("spectral_txc", 2): "#fdae6b", ("spectral_txc", 4): "#f16913", ("spectral_txc", 8): "#a63603",
 }
 
 
@@ -81,7 +84,7 @@ def g(agg, kind, kpos, arch, T, d, metric="tss_recovery"):
 # ── paper-quality figures ─────────────────────────────────────────────
 
 def _frontier_panel(ax, agg, metric, ylabel, title, *, ceil_lines=None, ylim=(0, 1.02)):
-    ax.axvspan(7, F, color="0.93", zorder=0, lw=0)
+    ax.axvspan(9, F, color="0.93", zorder=0, lw=0)
     ax.axvline(F, color="0.45", ls=":", lw=1.1, zorder=1)
     ax.text(F - 0.5, ylim[0] + 0.04 * (ylim[1] - ylim[0]), "F", color="0.4",
             fontsize=10, ha="right", style="italic")
@@ -92,7 +95,7 @@ def _frontier_panel(ax, agg, metric, ylabel, title, *, ceil_lines=None, ylim=(0,
     frontier_series(ax, ARCH_T, D_SAES,
                     lambda a, T, d: g(agg, "trained", 1, a, T, d, metric),
                     COLORS, PER_TOKEN, label, ms=5.5, lw=1.9, capsize=2, elinewidth=1)
-    ax.set_xticks(D_SAES); ax.set_xlim(7, 43); ax.set_ylim(*ylim)
+    ax.set_xticks(D_SAES); ax.set_xlim(9, 43); ax.set_ylim(*ylim)
     ax.set_xlabel("dictionary size  $d_{sae}$"); ax.set_ylabel(ylabel)
     ax.set_title(title, loc="left", fontsize=11)
 
@@ -153,7 +156,7 @@ def fig_split(agg, plt):
     ax.set_ylabel("AC latent recovery   (time-since-switch, corr.)")
     ax.set_title("The dual-latent split: DC vs AC recovery on one substrate", fontsize=12)
     ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8.6,
-              title="(arch, T) @ $d_{sae}{=}20$\nfaint trail: $d_{sae}\\in\\{8,16,20,40\\}$",
+              title="(arch, T) @ $d_{sae}{=}20$\nfaint trail: $d_{sae}\\in\\{10,20,40\\}$",
               title_fontsize=8.2)
     fig.tight_layout()
     save_fig(fig, FIG_DIR, "changepoint_split", plt)
@@ -233,11 +236,11 @@ def fig_local_tradeoff(agg, plt):
         (axes[1], "eauc", "(b) Content recovery", "eAUC (12 content dirs)"),
         (axes[2], "nmse", "(c) Reconstruction error", "NMSE"),
     ]:
-        ax.axvspan(7, F, color="0.93", zorder=0, lw=0); ax.axvline(F, color="0.45", ls=":", lw=1.1)
+        ax.axvspan(9, F, color="0.93", zorder=0, lw=0); ax.axvline(F, color="0.45", ls=":", lw=1.1)
         frontier_series(ax, ARCH_T, D_SAES,
                         lambda a, T, d, _m=metric: g(agg, "trained", 1, a, T, d, _m),
                         COLORS, PER_TOKEN, label, ms=5, lw=1.7, capsize=2, elinewidth=0.9)
-        ax.set_xticks(D_SAES); ax.set_xlim(7, 42); ax.set_xlabel("dictionary size  $d_{sae}$")
+        ax.set_xticks(D_SAES); ax.set_xlim(9, 42); ax.set_xlabel("dictionary size  $d_{sae}$")
         ax.set_ylabel(yl); ax.set_title(ttl, loc="left", fontsize=11)
     axes[0].set_ylim(0, 1.02); axes[1].set_ylim(0, 1.02)
     axes[0].legend(ncol=2, fontsize=7.2, loc="lower right")
@@ -286,7 +289,7 @@ def table_feature_recovery(agg):
 
 
 def headline_block(agg, ceil):
-    pt_mode_d8 = np.nanmax([g(agg, "trained", 1, a, 1, 8, "mode_recovery")[0]
+    pt_mode_d8 = np.nanmax([g(agg, "trained", 1, a, 1, 10, "mode_recovery")[0]
                             for a in ("batchtopk_sae", "tsae")])
     pt_mode = np.nanmean([g(agg, "trained", 1, a, 1, 20, "mode_recovery")[0]
                           for a in ("batchtopk_sae", "tsae")])
@@ -304,7 +307,7 @@ def headline_block(agg, ceil):
                for T in (2, 4, 8)}
     return (
         f"- **DC half (mode `m_t`) — not a window win, as predicted (P1):** per-token "
-        f"hits the oracle in the scarcest cell (**{pt_mode_d8:.2f}** at d_sae=8) and "
+        f"hits the oracle in the scarcest cell (**{pt_mode_d8:.2f}** at d_sae=10) and "
         f"**{pt_mode:.2f}** at d_sae=20; per-position / shallow-window codes match it "
         f"(Stacked 0.94–0.98, TXC-pre T=2 ≈ 0.98). The DC *casualties* are window-"
         f"specific: the shared-code crosscoders pay a mode price that grows with T "
@@ -332,7 +335,7 @@ def headline_block(agg, ceil):
         f"- **Substrate:** geometric dwell anchored on the measured topic dwell "
         f"(mean run 1.73 → base switch rate {ceil['base_switch_rate']:.2f}), K_m=8, "
         f"uniform Π, F=20 directions, all archs on the BatchTopK fair backbone; "
-        f"198/198 cells, seeds {{1,2,42}}."
+        f"the fair-backbone uniform grid, seeds {{1,2,42}}."
     )
 
 
