@@ -10,6 +10,25 @@ Last updated: 2026-07-10.
 
 ## 0. TL;DR — what's active right now
 
+- **Grounded-benchmark expansion loop: SCOPED — Cycle 1 queued for runpod
+  (2026-07-13).** An autonomous, *gated* pipeline to expand the list of GROUNDED
+  benchmarks (measure→mirror on real LM data), generalizing the proven
+  backtracking loop (Claude-judge labeler + N1/N2/N3 null gate + mirror). Covers
+  **both domains** (reasoning-trace + text-corpus) with an anti-drift **coverage
+  ledger** ([`expansion/LEDGER.md`](expansion/LEDGER.md), 12 cells, 10 empty — only
+  backtracking PROCEED + topic_switching ABORT filled): per-domain floor (≥⌊N/2⌋
+  each) + under-covered-cell-biased selection. Guardrails (prime directive):
+  abort-is-success, blind-to-architecture, null gate load-bearing, labeler
+  noise-floor mandatory, adversarial skeptic pass on every PROCEED, cost cap.
+  Deliverable = frozen bench_specs + calibration records (or aborts), NOT arch
+  evals. **Cycle 1** = bootstrap infra (Claude API routing Haiku/Sonnet/Opus +
+  local reasoning-LM on the A40 + fineweb) + build the factory harness + prove the
+  loop on N=4 (2/domain), then STOP for review. Briefing:
+  [`briefings/grounded-benchmark-expansion.md`](../../../briefings/grounded-benchmark-expansion.md);
+  prereg card: [`expansion/prereg_template.md`](expansion/prereg_template.md).
+  (This is the *grounded* arm of the program; the abstract benches — signed_motion,
+  frequency — are out of its scope.)
+
 - **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under
   the locked uniform design and the stale rows purged; [`REPORT.md`](REPORT.md)'s
