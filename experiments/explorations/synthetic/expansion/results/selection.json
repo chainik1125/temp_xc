@@ -1,0 +1,132 @@
+{
+  "n_select": 4,
+  "rule": "tier(under-coverage) desc, then labelability*novelty*predicted_temporalness desc; per-domain floor N/2; max one pick per ledger cell; scorer=claude-opus-4-8 (blind: no data, no arch scores)",
+  "selected": [
+    "assumption-then-consequence",
+    "uncertainty-hedging-drift",
+    "question-answer-adjacency",
+    "quotation-burst"
+  ],
+  "scores": [
+    {
+      "name": "goal-restatement-recurrence",
+      "domain": "reasoning-trace",
+      "temporal_class": "long-memory",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 3,
+      "novelty": 3,
+      "predicted_temporalness": 3,
+      "score": 27,
+      "reason": "Restatement vs fresh-step is a genuine judgment call at boundaries; long-memory/renewal in reasoning is fresh axis coverage vs bursty backtracking; heavy-tailed gaps plausible but restatements may concentrate at start and get killed by N2."
+    },
+    {
+      "name": "uncertainty-hedging-drift",
+      "domain": "reasoning-trace",
+      "temporal_class": "DC-slow-drift",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 4,
+      "novelty": 3,
+      "predicted_temporalness": 3,
+      "score": 36,
+      "reason": "Ordinal confidence is fairly reliably labelable via clear lexicon cues; DC-drift in reasoning is a new cell but overlaps conceptually with the text hedge-drift card; persistence risks being pure position trend flattened by N2 or per-doc composition."
+    },
+    {
+      "name": "computation-verification-alternation",
+      "domain": "reasoning-trace",
+      "temporal_class": "periodic",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 4,
+      "novelty": 3,
+      "predicted_temporalness": 2,
+      "score": 24,
+      "reason": "Verify-vs-advance is a clean binary with strong lexical anchors; periodic reasoning cell is new but synthetic periodic benches exist; a strict preferred PERIOD in verification is a priori unlikely\u2014more likely clustered than rhythmic, so spectral peak may not survive."
+    },
+    {
+      "name": "assumption-then-consequence",
+      "domain": "reasoning-trace",
+      "temporal_class": "AC-order-sensitive",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 3,
+      "novelty": 4,
+      "predicted_temporalness": 4,
+      "score": 48,
+      "reason": "A/C/neither is somewhat ambiguous since 'so'/'then' bleed across categories; directed order-sensitivity via time-reversal is a genuinely new labeler+mechanism; assume-before-derive asymmetry is a strong, clean AC signal that N1 must equalize."
+    },
+    {
+      "name": "error-correction-cascade",
+      "domain": "reasoning-trace",
+      "temporal_class": "bursty/self-exciting",
+      "cell_status": "PROCEED",
+      "tier": 0,
+      "labelability": 4,
+      "novelty": 3,
+      "predicted_temporalness": 4,
+      "score": 48,
+      "reason": "Concrete-error detection is well-anchored and distinguishable from strategy-switch with the explicit guidance; self-exciting mechanism overlaps SPEC'd backtracking though the event class differs; local recomputation clustering plausibly yields ACF>0/Fano>1 beyond nulls."
+    },
+    {
+      "name": "hedge-to-assertion-drift",
+      "domain": "text-corpus",
+      "temporal_class": "DC-slow-drift",
+      "cell_status": "ABORT-only",
+      "tier": 1,
+      "labelability": 4,
+      "novelty": 3,
+      "predicted_temporalness": 2,
+      "score": 24,
+      "reason": "Certainty ordinal has clear lexical cues though neutral-vs-stance is fuzzy; DC-drift in text-corpus is new but nearly duplicates the reasoning hedge card; self-flagged high composition risk means N1 likely explains persistence\u2014triage-risky."
+    },
+    {
+      "name": "question-answer-adjacency",
+      "domain": "text-corpus",
+      "temporal_class": "AC-order-sensitive",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 4,
+      "novelty": 4,
+      "predicted_temporalness": 4,
+      "score": 64,
+      "reason": "Question detection is near-trivial and answer-after-question is context-resolvable reliably; directed Q\u2192A adjacency is a fresh order-sensitive labeler/mechanism; forward>>reverse asymmetry is a strong clean AC signal that permutation destroys."
+    },
+    {
+      "name": "enumeration-cadence",
+      "domain": "text-corpus",
+      "temporal_class": "periodic",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 5,
+      "novelty": 3,
+      "predicted_temporalness": 2,
+      "score": 30,
+      "reason": "Ordinal/step markers are nearly regex-perfect to label; periodic text cell new but synthetic periodic benches exist; true fixed PERIOD in enumeration is doubtful\u2014items are irregularly spaced by elaboration length, so spectral peak likely weak."
+    },
+    {
+      "name": "quotation-burst",
+      "domain": "text-corpus",
+      "temporal_class": "bursty/self-exciting",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 5,
+      "novelty": 3,
+      "predicted_temporalness": 3,
+      "score": 45,
+      "reason": "Quotation/attributed speech is highly reliable to label via punctuation and speech verbs; bursty text-corpus is a new cell mirroring reasoning backtracking mechanism; clustering plausible but flagged composition risk means it may fail to beat N1."
+    },
+    {
+      "name": "pronoun-referent-recurrence",
+      "domain": "text-corpus",
+      "temporal_class": "long-memory",
+      "cell_status": "empty",
+      "tier": 1,
+      "labelability": 3,
+      "novelty": 4,
+      "predicted_temporalness": 3,
+      "score": 36,
+      "reason": "Main-subject named-entity vs pronoun requires syntactic judgment that Haiku will get inconsistently on complex sentences; long-memory coreference renewal is a distinct axis; heavy-tailed re-anchor gaps are plausible but may be geometric or composition-driven."
+    }
+  ]
+}
