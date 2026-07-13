@@ -1,0 +1,12 @@
+{
+  "cap_usd": 25.0,
+  "spent_usd": 0.30241,
+  "n_calls": 1,
+  "by_model": {
+    "claude-opus-4-8": {
+      "in": 3197,
+      "out": 11457,
+      "usd": 0.30241
+    }
+  }
+}

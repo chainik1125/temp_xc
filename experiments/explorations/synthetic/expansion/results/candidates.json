@@ -1,0 +1,297 @@
+{
+  "frozen": "2026-07-13",
+  "generator": "claude-opus-4-8",
+  "candidates": [
+    {
+      "name": "goal-restatement-recurrence",
+      "domain": "reasoning-trace",
+      "temporal_class": "long-memory",
+      "property": "The reasoner re-states or re-anchors to the original problem goal at renewal intervals far beyond short lags.",
+      "why_not_covered": "long-memory / renewal in reasoning-traces is empty; probes heavy-tailed recurrence of goal-anchoring rather than local self-excitation (backtracking).",
+      "hypothesis_character": "Goal restatements should recur as a renewal process with heavy-tailed inter-event gaps: the model re-grounds sporadically after long stretches of local computation. Unlike bursty backtracking, these are spaced-out anchors, so the inter-event distribution should have a tail heavier than geometric.",
+      "abort_condition": "Inter-restatement gaps are geometric/exponential (no heavy tail) OR restatements are confined to trace start (pure position trend killed by N2).",
+      "label_signal": "Sentence explicitly re-states what is being solved / the target quantity / the problem constraints.",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label one sentence from a math/logic reasoning trace. Output 1 if the sentence RE-STATES or RE-ANCHORS to the overall problem goal \u2014 i.e. it recalls what is being solved, the target quantity, or a given constraint, rather than performing a new computation step. Output 0 otherwise. Examples: 'So we need to find the total number of red marbles.' -> 1. 'Recall the constraint that x must be positive.' -> 1. 'Multiplying both sides by 3 gives 6x.' -> 0. 'Hmm, let me try a different approach.' -> 0. Use the preceding context only to judge whether this is a restatement of the ORIGINAL goal versus a fresh step.",
+      "heuristic_crosscheck": "Regex/keyword: lines matching /(we need to|we want to|the problem asks|recall that|goal is|find the|solve for|remember that|going back to the (problem|question))/i, excluding lines with an arithmetic operator token immediately after.",
+      "composition_risk": "low + goal-restatement is a within-trace timing phenomenon; every trace has a goal so marginal is homogeneous across traces.",
+      "ordered_statistics": [
+        "inter-event gap distribution (mean, tail index / CV)",
+        "ACF of the event indicator at lags 1-40",
+        "fano factor over windows"
+      ],
+      "expected_signature": "Heavy-tailed gaps: CV>1 and slow ACF decay beyond N3 (iid geometric). N2 preserves any start-bias but should not reproduce the long-lag recurrence; N1 destroys the gap structure entirely.",
+      "chance_oracle": "Chance = base rate of restatement sentences (est. ~8-12%); oracle bounded by inter-judge agreement. Provable floor: predicting all-0 gives 1 - baserate accuracy but 0 recall on events.",
+      "arch_predictions": {
+        "per_token_sae": "Should fire on explicit goal-lexicon tokens; captures marginal well but misses gap-timing since SAE is per-token memoryless.",
+        "window_families": "Wide windows (>=32 sentences) needed to capture heavy-tailed recurrence; short windows underperform, revealing long-memory."
+      },
+      "mirror_process": "semi_markov",
+      "mirror_matched": "the heavy-tailed inter-event gap distribution (dwell)",
+      "mirror_not_matched": "any correlation between restatement content and local computation state"
+    },
+    {
+      "name": "uncertainty-hedging-drift",
+      "domain": "reasoning-trace",
+      "temporal_class": "DC-slow-drift",
+      "property": "The reasoner's expressed confidence drifts slowly from hedged/uncertain early to committed/certain late within a trace.",
+      "why_not_covered": "DC-slow-drift in reasoning-traces is empty; probes a slowly-persisting confidence state distinct from discrete backtracking events.",
+      "hypothesis_character": "Confidence should behave as a slowly-drifting latent that persists across many sentences and trends toward certainty as the solution converges. This is a smooth DC drift, not a clustered event, so ordinal confidence should show high lag-1 autocorrelation and a position trend that survives N1 but is flattened by N2.",
+      "abort_condition": "Confidence ordinal is iid-like within trace (low autocorrelation) OR the trend is entirely position-driven and vanishes under N2 (pure trend, no persistent-state drift beyond trend).",
+      "label_signal": "Degree of expressed confidence/commitment in the sentence's claim.",
+      "label_kind": "ordinal",
+      "n_values": 3,
+      "judge_instruction": "You label the expressed CONFIDENCE of one sentence in a reasoning trace. 0 = hedged/uncertain (tentative, exploratory, questioning: 'maybe', 'I think', 'let me try', 'not sure'). 1 = neutral/procedural (a plain computation or statement with no stance). 2 = committed/certain (asserts a conclusion firmly: 'therefore', 'clearly', 'the answer is', 'this must be'). Examples: 'Maybe I should try substitution instead.' -> 0. 'Adding the two equations.' -> 1. 'So the answer is definitely 42.' -> 2. Judge from this sentence; use context only to disambiguate stance.",
+      "heuristic_crosscheck": "Lexicon score: +hedge for {maybe, perhaps, might, i think, not sure, let me try, possibly, seems}; +commit for {therefore, thus, clearly, definitely, must be, the answer is, hence, obviously}; map to 0/1/2 by sign.",
+      "composition_risk": "medium + some traces (easy problems) may be uniformly confident; but confidence marginal is broadly comparable and drift is a within-trace phenomenon N1 preserves.",
+      "ordered_statistics": [
+        "lag-1..lag-8 autocorrelation of ordinal",
+        "position-binned mean confidence",
+        "variance of within-trace running mean"
+      ],
+      "expected_signature": "Slow decaying ACF (persistence) plus a monotone position trend. N1 keeps the trend but destroys short-lag persistence; N2 keeps trend but destroys clustering of same-confidence runs; the persistent-run structure beats both.",
+      "chance_oracle": "Chance = predicting modal ordinal class; oracle = inter-judge ordinal agreement (Krippendorff). Floor: constant-prediction accuracy = modal class frequency.",
+      "arch_predictions": {
+        "per_token_sae": "Captures hedge/commit lexicon per token; misses the slow drift because no cross-sentence state.",
+        "window_families": "Medium windows (8-16) best capture persistence; very short windows lose the drift, confirming DC character."
+      },
+      "mirror_process": "ar1",
+      "mirror_matched": "the lag-1 autocorrelation (persistence) and drift trend of the ordinal",
+      "mirror_not_matched": "the semantic coupling between confidence and actual solution correctness"
+    },
+    {
+      "name": "computation-verification-alternation",
+      "domain": "reasoning-trace",
+      "temporal_class": "periodic",
+      "property": "The reasoner alternates rhythmically between forward-computation sentences and verification/checking sentences at a preferred period.",
+      "why_not_covered": "periodic in reasoning-traces is empty; probes cyclic compute-then-check rhythm distinct from bursty backtracking.",
+      "hypothesis_character": "Reasoning may settle into a compute\u2192compute\u2192check cadence, producing a preferred period in the verification indicator. If real, the event-indicator power spectrum should show a peak at a non-trivial period that survives permutation nulls only through ordering.",
+      "abort_condition": "No spectral peak (flat spectrum) \u2014 verification events are aperiodic/random OR clustered rather than rhythmic, meaning the periodic hypothesis fails though bursty might not.",
+      "label_signal": "Sentence checks, verifies, or re-derives a prior result rather than advancing new computation.",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label one sentence in a reasoning trace. Output 1 if it VERIFIES or CHECKS a previous result \u2014 substituting back, confirming, sanity-checking, or re-deriving to test correctness. Output 0 if it advances NEW computation or reasoning. Examples: 'Let me check: 6 times 7 is 42, correct.' -> 1. 'Plugging x=3 back in: 9-6=3, which matches.' -> 1. 'Now I multiply both sides by 2.' -> 0. 'Next, consider the second case.' -> 0. Use context to tell whether this re-examines an earlier step (1) or moves forward (0).",
+      "heuristic_crosscheck": "Keyword match: /(check|verify|confirm|plug(ging)? back|substitute back|sanity|make sure|does this (match|work)|let('?s| us) verify)/i -> 1.",
+      "composition_risk": "medium + verification density may vary by problem type (composition across traces), but a within-trace PERIOD is order structure N1 destroys.",
+      "ordered_statistics": [
+        "periodogram / Fourier power of event indicator",
+        "peak-period location and prominence",
+        "ACF for periodic side-lobes"
+      ],
+      "expected_signature": "A spectral peak at period p with side-lobe ACF ringing. N1/N2/N3 all yield flat spectra (no preferred period); the ordered periodogram peak is the discriminator.",
+      "chance_oracle": "Chance = base rate of verification sentences; oracle = inter-judge agreement. Floor: all-0 predictor accuracy = 1 - baserate.",
+      "arch_predictions": {
+        "per_token_sae": "Detects verification lexicon per token but cannot represent a period without positional state; expect it to miss rhythm.",
+        "window_families": "Windows matched to the period p should peak; mismatched window sizes degrade, revealing periodicity."
+      },
+      "mirror_process": "periodic_rate",
+      "mirror_matched": "the preferred period and event rate of verification",
+      "mirror_not_matched": "the content dependence of what gets verified"
+    },
+    {
+      "name": "assumption-then-consequence",
+      "domain": "reasoning-trace",
+      "temporal_class": "AC-order-sensitive",
+      "property": "Consequence/derivation sentences depend on immediately-preceding assumption/case-introduction sentences in an order-sensitive way (assume-before-derive, not the reverse).",
+      "why_not_covered": "AC-order-sensitive in reasoning-traces is empty; probes directed ordering (assumption must precede consequence) rather than a persisting state.",
+      "hypothesis_character": "Reasoning has a directed grammar: assumptions/case-splits precede their consequences. The transition assumption\u2192consequence should be far more frequent forward than backward, so a directed order statistic (forward vs time-reversed) diverges. This is genuinely AC: the marginal counts are identical under reversal, only the order differs.",
+      "abort_condition": "Forward and time-reversed transition rates are equal (no directionality) \u2014 the label carries no order asymmetry, only marginal composition.",
+      "label_signal": "Whether the sentence introduces an assumption/case (A) vs states a consequence/derivation from prior premises (C) vs neither.",
+      "label_kind": "ordinal",
+      "n_values": 3,
+      "judge_instruction": "You label one sentence in a reasoning trace. 0 = neither. 1 = ASSUMPTION/CASE: introduces a supposition, case split, or 'let'/'suppose'/'assume'/'if' premise. 2 = CONSEQUENCE: derives a result that FOLLOWS from prior statements ('then', 'therefore', 'so it follows', 'this implies'). Examples: 'Suppose x is even.' -> 1. 'Consider the case where n=0.' -> 1. 'Then x squared is also even.' -> 2. 'It follows that the sum is divisible by 4.' -> 2. 'The problem gives three numbers.' -> 0. Judge this sentence; context tells you whether it opens a premise or discharges one.",
+      "heuristic_crosscheck": "Two lexicons: assume={suppose, assume, let, if, consider the case, in case}; consequence={then, therefore, so, thus, hence, it follows, this implies, which means}. Assign 1/2/0.",
+      "composition_risk": "low + both labels co-occur within nearly every proof-style trace; the signal is the directed adjacency, not per-doc composition.",
+      "ordered_statistics": [
+        "forward P(consequence at t | assumption at t-1)",
+        "same for time-reversed sequence",
+        "directed transition asymmetry index"
+      ],
+      "expected_signature": "Forward assumption\u2192consequence rate >> reversed rate. N1 (permutation) equalizes both directions; N3 gives product-of-marginals; the forward/reverse asymmetry survives only in true order.",
+      "chance_oracle": "Chance = modal-class accuracy over {0,1,2}; oracle = inter-judge ordinal agreement. Floor: constant-modal predictor.",
+      "arch_predictions": {
+        "per_token_sae": "Captures assumption/consequence connectives per token; blind to the directed A\u2192C dependency across sentences.",
+        "window_families": "Directional/causal window families (backward-looking) should beat symmetric ones, exposing order-sensitivity."
+      },
+      "mirror_process": "markov",
+      "mirror_matched": "the forward transition matrix between {none,assumption,consequence}",
+      "mirror_not_matched": "the semantic validity of the actual derivation"
+    },
+    {
+      "name": "error-correction-cascade",
+      "domain": "reasoning-trace",
+      "temporal_class": "bursty/self-exciting",
+      "property": "Explicit arithmetic/logic error-detection sentences self-excite: catching one error raises the near-future rate of catching more (correction cascades), distinct from strategic backtracking.",
+      "why_not_covered": "Backtracking (strategy-switch) is SPEC'd, but error-DETECTION (a mistake in a specific computation) is a distinct event class; tests whether local error-catching clusters independently of strategy switches.",
+      "hypothesis_character": "Detecting a concrete computational error should trigger re-checking that surfaces further errors, giving self-excitation. Unlike backtracking (abandoning an approach), this is local recomputation clustering, so ACF(1)>0 and Fano>1 for the error-detection indicator.",
+      "abort_condition": "Error-detection events are iid (Fano ~1, ACF~0) OR they perfectly co-occur with backtracking (not a distinct axis \u2014 redundant with SPEC).",
+      "label_signal": "Sentence explicitly identifies a concrete mistake in a specific prior computation/statement.",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label one sentence in a reasoning trace. Output 1 if it explicitly identifies a CONCRETE ERROR in a specific prior computation or statement \u2014 a wrong number, a miscalculation, a mis-applied rule. Output 0 otherwise. Do NOT mark general strategy changes without an identified error. Examples: 'Wait, 7 times 8 is 56, not 54, I made an error.' -> 1. 'That step is wrong because I forgot the negative sign.' -> 1. 'Let me try a different method.' -> 0 (strategy switch, no concrete error). 'Adding these gives 12.' -> 0. Use context to confirm a specific prior value/step is being corrected.",
+      "heuristic_crosscheck": "Regex: /(that('?s| is) wrong|made an? (error|mistake)|miscalculat|should be \\d+ not \\d+|forgot the|incorrect(ly)?|error in)/i -> 1.",
+      "composition_risk": "medium + harder problems have more errors (across-trace composition), but clustering within trace is order structure N1 kills.",
+      "ordered_statistics": [
+        "ACF(1..5) of error indicator",
+        "Fano factor over windows",
+        "inter-error gap CV"
+      ],
+      "expected_signature": "ACF(1)>0 and Fano>1 (clustering). N2 keeps any position trend but destroys clustering -> Fano drops to ~1; N3 iid gives ACF~0. Also compute mutual information with backtracking indicator to prove distinctness.",
+      "chance_oracle": "Chance = error base rate; oracle = inter-judge agreement. Floor: all-0 accuracy = 1 - baserate.",
+      "arch_predictions": {
+        "per_token_sae": "Fires on error-admission lexicon per token; misses cascade timing.",
+        "window_families": "Short causal windows capture self-excitation best; matches Hawkes-like character."
+      },
+      "mirror_process": "logistic_ar",
+      "mirror_matched": "the self-excitation coefficient (ACF-1) of the error indicator",
+      "mirror_not_matched": "the coupling between errors and specific arithmetic content"
+    },
+    {
+      "name": "hedge-to-assertion-drift",
+      "domain": "text-corpus",
+      "temporal_class": "DC-slow-drift",
+      "property": "Within web documents, expressed certainty drifts slowly \u2014 e.g. hedged framing early giving way to assertive claims later (or vice versa) as a persisting stance.",
+      "why_not_covered": "DC-slow-drift in text-corpus only has an ABORT (topic_switching); this probes a stance state whose marginal is homogeneous across docs but whose within-doc persistence is the signal \u2014 directly addressing the composition lesson.",
+      "hypothesis_character": "Authorial certainty is a slowly-varying stance that persists across sentences and can drift within a document. Because most web docs mix hedges and assertions, the marginal is homogeneous, so persistence (high lag-1 ACF) must come from ordering, not composition. This is the clean DC-drift test the aborted topic property lacked.",
+      "abort_condition": "Certainty ordinal has near-zero within-doc autocorrelation (iid) OR persistence is 82%+ per-doc composition again (a doc is uniformly hedged or uniformly assertive) \u2014 killed by N1, replaying the topic_switching failure.",
+      "label_signal": "Degree of certainty/assertiveness in the sentence's claim.",
+      "label_kind": "ordinal",
+      "n_values": 3,
+      "judge_instruction": "You label the CERTAINTY of one sentence from a web document. 0 = hedged (may, might, could, possibly, some argue, it seems). 1 = neutral/factual with no explicit stance. 2 = strongly assertive (certainly, definitely, undeniably, always, must, the fact is). Examples: 'This might improve outcomes for some users.' -> 0. 'The building was completed in 1930.' -> 1. 'This is undeniably the best approach.' -> 2. Judge from this sentence; use context only to resolve ambiguous stance.",
+      "heuristic_crosscheck": "Lexicon: hedge={may, might, could, possibly, perhaps, seems, some, arguably}; assert={certainly, definitely, undeniably, always, never, must, clearly, the fact}; sign->0/1/2.",
+      "composition_risk": "high + explicitly flagged: some docs may be uniformly one stance (composition); N1 is the exact discriminator and the calibration must confirm within-doc runs exceed permuted runs.",
+      "ordered_statistics": [
+        "within-doc lag-1..lag-6 ordinal ACF",
+        "run-length distribution of same-certainty stretches",
+        "N1 permuted run-length vs observed"
+      ],
+      "expected_signature": "Observed same-certainty runs longer than N1-permuted runs, and lag-1 ACF > N3. If ACF is entirely explained by per-doc mean (N1 matches observed), it ABORTS as composition.",
+      "chance_oracle": "Chance = modal ordinal frequency; oracle = inter-judge agreement. Floor: modal-class predictor.",
+      "arch_predictions": {
+        "per_token_sae": "Captures hedge/assert lexicon per token, no drift memory.",
+        "window_families": "Medium windows detect persistence; if only doc-global window helps, that signals composition not drift."
+      },
+      "mirror_process": "ar1",
+      "mirror_matched": "lag-1 autocorrelation and slow drift of certainty ordinal",
+      "mirror_not_matched": "topical content driving the stance"
+    },
+    {
+      "name": "question-answer-adjacency",
+      "domain": "text-corpus",
+      "temporal_class": "AC-order-sensitive",
+      "property": "Rhetorical/explicit questions are followed by answering sentences in a directed order (question-before-answer), an asymmetry invisible to the marginal.",
+      "why_not_covered": "AC-order-sensitive in text-corpus is empty; probes a directed local dependency (Q\u2192A) whose reverse is implausible, isolating order from composition.",
+      "hypothesis_character": "Web prose (FAQs, explainers, blogs) poses questions then answers them; the forward question\u2192answer transition should dominate the reversed one. The marginal question and answer counts are reversal-invariant, so any forward/reverse gap is pure order structure.",
+      "abort_condition": "Forward and time-reversed Q\u2192A transition rates are equal \u2014 questions do not preferentially precede their answers, so no directed order.",
+      "label_signal": "Whether the sentence is a question (Q), a direct answer/response to a prior question (A), or neither.",
+      "label_kind": "ordinal",
+      "n_values": 3,
+      "judge_instruction": "You label one sentence from a web document. 0 = neither. 1 = QUESTION: poses a question (rhetorical or genuine, typically ends in '?' or is interrogative). 2 = ANSWER: directly answers or responds to a question raised in the preceding context ('The answer is', 'Yes,', 'This is because', a direct resolution). Examples: 'So why does this matter?' -> 1. 'What are the benefits of exercise?' -> 1. 'The main benefit is improved cardiovascular health.' (after a question) -> 2. 'The weather was cold that day.' -> 0. Use preceding context to decide if a statement answers a just-asked question.",
+      "heuristic_crosscheck": "Q = sentence ends with '?' or starts with {what, why, how, when, who, is, are, do, does, can}. A = prior sentence was Q and current starts with {yes, no, the answer, this is, because, it is}.",
+      "composition_risk": "low + Q and A both appear across most explanatory docs; the directed adjacency is order, not per-doc rate.",
+      "ordered_statistics": [
+        "P(answer at t | question at t-1) forward",
+        "same reversed",
+        "directed asymmetry index",
+        "lag distribution of A after Q"
+      ],
+      "expected_signature": "Forward Q\u2192A rate >> reversed. N1 equalizes directions; N3 gives marginal product. Only true ordering preserves the asymmetry.",
+      "chance_oracle": "Chance = modal class; oracle = inter-judge agreement. Floor: modal predictor.",
+      "arch_predictions": {
+        "per_token_sae": "Detects '?' and interrogative tokens; blind to the cross-sentence answering link.",
+        "window_families": "Backward-looking causal windows outperform symmetric ones, revealing directedness."
+      },
+      "mirror_process": "markov",
+      "mirror_matched": "forward transition matrix over {none,question,answer}",
+      "mirror_not_matched": "the semantic relevance of the answer to the question"
+    },
+    {
+      "name": "enumeration-cadence",
+      "domain": "text-corpus",
+      "temporal_class": "periodic",
+      "property": "List/enumeration sentences ('First,... Second,... Next,...') recur at a preferred cadence within how-to and listicle documents.",
+      "why_not_covered": "periodic in text-corpus is empty; probes rhythmic list-item recurrence, a period-structured phenomenon distinct from stance drift.",
+      "hypothesis_character": "Enumerated content produces regularly-spaced list-marker sentences interleaved with elaboration, yielding a preferred period in the enumeration indicator. A spectral peak in the item-marker series that vanishes under permutation would confirm periodicity.",
+      "abort_condition": "No spectral peak \u2014 list markers appear aperiodically or clustered at doc start (position trend), with a flat periodogram indistinguishable from N3.",
+      "label_signal": "Sentence begins or contains an explicit enumeration/ordinal step marker.",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label one sentence from a web document. Output 1 if it is an ENUMERATION/STEP item \u2014 it opens or marks a numbered or ordinal step in a list or procedure. Output 0 otherwise. Examples: 'First, preheat the oven to 350 degrees.' -> 1. 'Step 3: add the flour.' -> 1. 'Next, we turn to the second consideration.' -> 1. 'The oven should be hot before you begin.' -> 0. Judge the single sentence; context helps confirm it belongs to an ongoing list.",
+      "heuristic_crosscheck": "Regex: /^(first(ly)?|second(ly)?|third(ly)?|next|then|finally|step \\d+|\\d+[\\.\\)]|lastly)\\b/i -> 1.",
+      "composition_risk": "medium + listicles have many markers, prose docs few (across-doc composition); the within-doc PERIOD is order structure N1 destroys.",
+      "ordered_statistics": [
+        "periodogram of enumeration indicator",
+        "dominant period + prominence",
+        "ACF ringing at multiples of period"
+      ],
+      "expected_signature": "Spectral peak at the item-spacing period with harmonic ACF. N1/N2/N3 give flat spectra; the ordered peak is the signal.",
+      "chance_oracle": "Chance = enumeration base rate; oracle = inter-judge agreement. Floor: all-0 accuracy.",
+      "arch_predictions": {
+        "per_token_sae": "Fires on ordinal-marker tokens; cannot encode spacing period.",
+        "window_families": "Windows matched to item spacing peak; mismatched sizes degrade, exposing periodicity."
+      },
+      "mirror_process": "periodic_rate",
+      "mirror_matched": "the preferred enumeration period and marker rate",
+      "mirror_not_matched": "the content of each list item"
+    },
+    {
+      "name": "quotation-burst",
+      "domain": "text-corpus",
+      "temporal_class": "bursty/self-exciting",
+      "property": "Sentences containing quotation/attributed-speech cluster: once a document enters a quoted passage, nearby sentences also carry quotes (self-exciting).",
+      "why_not_covered": "bursty/self-exciting in text-corpus is empty (only reasoning has backtracking); probes clustering of quotation, a lexical/structural burst.",
+      "hypothesis_character": "Direct quotation comes in stretches \u2014 interview blocks, dialogue, cited passages \u2014 so a quote raises the near-future quote rate. This predicts ACF(1)>0 and Fano>1 for the quotation indicator, driven by within-doc ordering rather than doc-level quote density.",
+      "abort_condition": "Quotation events are iid within doc (Fano~1) OR clustering is entirely explained by whole-doc composition (some docs are all-dialogue) \u2014 N1 collapses the effect.",
+      "label_signal": "Sentence contains a direct quotation or reported/attributed speech.",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label one sentence from a web document. Output 1 if it contains a DIRECT QUOTATION or clearly attributed speech \u2014 words presented as spoken/written by someone, typically in quote marks or with a speech verb ('said', 'stated', 'according to'). Output 0 otherwise. Examples: 'She said, \"We will not back down.\"' -> 1. 'According to the report, growth slowed sharply.' -> 1. 'The company grew rapidly last year.' -> 0. Judge the single sentence.",
+      "heuristic_crosscheck": "Match presence of paired quote chars (\" \" or \u201c \u201d) OR speech-verb regex /(said|says|stated|according to|told|remarked|noted that|claimed)/i -> 1.",
+      "composition_risk": "medium + interview/news docs are quote-dense (composition), but within-doc bursting is order structure N1 removes; report observed vs N1 Fano.",
+      "ordered_statistics": [
+        "ACF(1..5) of quote indicator",
+        "Fano factor over windows",
+        "inter-quote gap CV"
+      ],
+      "expected_signature": "ACF(1)>0, Fano>1. N2 keeps position trend, kills clustering (Fano->1); N3 gives ACF~0; N1 removes within-doc clustering leaving only doc marginal \u2014 must beat N1 to avoid the composition trap.",
+      "chance_oracle": "Chance = quote base rate; oracle = inter-judge agreement (heuristic itself is strong, so use it as a check not the label). Floor: all-0 accuracy.",
+      "arch_predictions": {
+        "per_token_sae": "Fires reliably on quote punctuation/speech verbs per token; misses burst timing.",
+        "window_families": "Short causal windows capture self-excitation, matching Hawkes-like clustering."
+      },
+      "mirror_process": "logistic_ar",
+      "mirror_matched": "the self-excitation (ACF-1) of the quotation indicator",
+      "mirror_not_matched": "the identity/content of the quoted speakers"
+    },
+    {
+      "name": "pronoun-referent-recurrence",
+      "domain": "text-corpus",
+      "temporal_class": "long-memory",
+      "property": "Sentences that reintroduce a named entity (vs pronoun-only reference) recur with heavy-tailed gaps as referents are periodically re-anchored across long spans.",
+      "why_not_covered": "long-memory in text-corpus is empty; probes heavy-tailed renewal of full-noun re-mention (coreference re-anchoring) beyond short lags.",
+      "hypothesis_character": "Discourse alternates between pronoun chains and re-introduction of the full entity name; re-anchoring happens sporadically with long gaps, giving a heavy-tailed renewal process. Unlike short-range clustering, gaps should have CV>1 and slow ACF decay, reflecting long-memory in reference management.",
+      "abort_condition": "Re-anchor gaps are geometric (no heavy tail) OR full-name mention is uniformly random per sentence (no renewal structure) \u2014 CV~1 and fast ACF decay.",
+      "label_signal": "Whether the sentence introduces/re-introduces a full named entity (proper noun) as its main subject rather than referring pronominally.",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label one sentence from a web document. Output 1 if its main subject is a FULL NAMED ENTITY (a proper noun \u2014 person, place, organization, product \u2014 stated by name). Output 0 if the main subject is a PRONOUN or generic reference ('it', 'they', 'this', 'the company' without naming). Examples: 'Barack Obama signed the bill.' -> 1. 'Apple released a new phone.' -> 1. 'He signed it the next day.' -> 0. 'They released it last week.' -> 0. Use context to judge whether the sentence names the entity or refers back to one.",
+      "heuristic_crosscheck": "Regex: subject region contains a capitalized multi-token proper noun not at sentence start-only, AND sentence does not begin with pronoun set {he, she, it, they, this, that, these, those} -> 1.",
+      "composition_risk": "medium + entity-heavy docs (bios) vs abstract docs differ (composition), but the GAP structure between re-anchors is within-doc order that N1 destroys.",
+      "ordered_statistics": [
+        "inter re-anchor gap distribution (CV, tail index)",
+        "ACF of indicator at lags 1-30",
+        "gap survival function slope"
+      ],
+      "expected_signature": "Heavy-tailed gaps (CV>1), slow ACF decay beyond geometric N3. N1 destroys gap ordering; N2 keeps any positional trend but not the renewal tail.",
+      "chance_oracle": "Chance = full-name base rate; oracle = inter-judge agreement. Floor: all-majority-class accuracy.",
+      "arch_predictions": {
+        "per_token_sae": "Detects proper-noun/pronoun tokens; cannot represent long recurrence gaps.",
+        "window_families": "Wide windows (>=16) needed to capture heavy-tailed re-anchoring; short windows fail, revealing long-memory."
+      },
+      "mirror_process": "semi_markov",
+      "mirror_matched": "the heavy-tailed re-anchor inter-event gap distribution",
+      "mirror_not_matched": "which specific entities are named or their semantic role"
+    }
+  ]
+}
