@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from explorations.synthetic import report
+from explorations.synthetic import report, report_figs
 from explorations.synthetic.record import populate
 
 from . import registry as reg
@@ -51,6 +51,14 @@ def main() -> None:
         f"`l0_per_token`; loose match >{reg.OP.l0_tol:g} marked `*`). Each cell is "
         f"normalized recovery `mean` over seeds, `[chance=0, oracle=1]`, shown at "
         f"**{caps}** (`boundary / deep-scarce`):\n\n{cap_lines}")
+
+    # Program figures for the interp researcher (heatmap / frontiers / gate),
+    # into this report's own figs/ dir, from the same matched cells.
+    figs_dir = report_md.parent / "figs"
+    figs = report_figs.render_all(
+        groups, mtx_stats, panels["nmse"][1], reg.BENCHES, reg.ARCHS,
+        reg.capacities, reg.OP, figs_dir)
+    print(f"[report] figures: {', '.join(figs)}")
 
     blocks = {"operating_point": op_md, "matrix_pertoken": mtx_md, "coverage": cov_md}
     blocks.update({f"panel_{m}": md for m, (md, _st) in panels.items()})

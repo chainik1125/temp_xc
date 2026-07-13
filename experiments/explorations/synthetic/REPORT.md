@@ -68,6 +68,18 @@ holes.
 | **frequency** · velocity Y — cyclic tone f = Y/M (AC) | -0.004 / -0.001 | -0.003 / -0.003 | 0.064 / 0.060 | 0.068 / 0.072 | 0.767 / 0.770 | 0.777 / 0.796 |
 <!-- END AUTO:matrix_pertoken -->
 
+**The matrix as colour** — which architecture linearly exposes which latent (green
+= oracle, red = chance). Additive/per-token columns go cold on the AC-interaction
+rows; the position-mixing crosscoders (TXC-post, Spectral) light up, and the
+Spectral column is the lone one exposing the changepoint boundary (`tss`, `cp`):
+
+![Per-token matched recovery heatmap, B×A, at d_sae = F and F/2](figs/fig_recovery_heatmap.png)
+
+**Recovery vs capacity** — does the win survive into the scarce regime (`d_sae ≤ F`,
+`F` marked)? One panel per (bench, latent), one line per arch (per-token dashed):
+
+![Recovery vs d_sae, one panel per (bench, latent-axis)](figs/fig_capacity_frontiers.png)
+
 ---
 
 ## Companion panels — the capability-vs-artifact gate
@@ -103,6 +115,14 @@ emission features; higher is better):
 | **changepoint** | 0.952 / 0.233 | 0.848 / 0.207 | 0.547 / 0.347 | 0.011 / 0.010 | 0.011 / 0.010 | 0.228 / 0.208 |
 | **frequency** | 0.927 / 0.917 | 0.897 / 0.900 | 0.580 / 0.626 | 0.978 / 0.983 | 0.973 / 0.916 | 0.901 / 0.900 |
 <!-- END AUTO:panel_eauc -->
+
+**The gate, visually** — latent recovery (↑) vs reconstruction NMSE (→ worse). The
+degenerate corner (recovery with near-trivial reconstruction) is shaded; it is
+empty, so every recovery here is reconstruction-backed. The tradeoff is still
+visible: window archs buy latent recovery at a reconstruction cost (rightward),
+and a bench's noise floor (frequency) sits mid-axis for all archs:
+
+![Capability gate: primary-latent recovery vs reconstruction NMSE](figs/fig_capability_gate.png)
 
 ---
 
