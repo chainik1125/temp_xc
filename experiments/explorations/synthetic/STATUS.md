@@ -14,7 +14,9 @@ Last updated: 2026-07-10.
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under
   the locked uniform design and the stale rows purged; [`REPORT.md`](REPORT.md)'s
   per-token matrix is now **fully filled (36/36 cells)** with both companion panels
-  (NMSE + eAUC). **Design (locked):** 6 fair-backbone archs (batchtopk_sae, tsae;
+  (NMSE + eAUC) and **three interp figures** (recovery heatmap, capacity frontiers,
+  capability gate — `report_figs.py`, embedded in REPORT.md, `a0cb5424`).
+  **Design (locked):** 6 fair-backbone archs (batchtopk_sae, tsae;
   stacked_batchtopk, txc_batchtopk_pre/post, **spectral_txc**) × `d_sae∈{F//2,F,2F}`
   × `T∈{1,2,4,8}` × `k_pos∈{1,2,4,8,16}` × seeds{1,2,42} + untrained. Matrix cell =
   per-token-matched (`T_can=4`, realized `l0_per_token≈B*=2`) at `{F, F//2}`. F
