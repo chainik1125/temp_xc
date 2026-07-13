@@ -21,6 +21,23 @@ Its labeler was a **Claude judge** (Sonnet, `is_backtracking` over 25,528
 sentences, noise floor measured); its gate was the **N1/N2/N3 null battery**
 (within-trace permute / trend-only Poisson / homogeneous). Reuse that machinery.
 
+## Preconditions (the user satisfies these BEFORE launch — the agent never asks mid-run)
+
+This is a hands-off run; it does not pause for input. At Stage 0 verify all of
+these and, if any is missing, **STOP with a clear report** rather than improvise:
+
+- **Claude API key** at `/workspace/.tokens/anthropic_key` or `ANTHROPIC_API_KEY`
+  in the env. Never hardcode. Absent ⇒ stop.
+- **Judge models reachable** (probe each once): bulk `claude-haiku-4-5-20251001`,
+  validation/adjudication `claude-sonnet-5`, hypotheses + skeptic
+  `claude-opus-4-8`. If a string is stale, substitute the nearest available tier
+  and record which.
+- **Cost cap = $25 / cycle** (default; user may override). Meter spend; hard-stop
+  at the cap and report partials — never exceed it.
+- **Text-corpus source**: a fineweb (or similar) sample streamable via `datasets`
+  (cached to the volume). The reasoning-trace domain needs **no model** in Cycle 1
+  (Stage 0).
+
 ## ⚠️ Prime-directive guardrails (an autonomous generator WILL drift to positives)
 
 These are load-bearing. A cycle that violates them is invalid regardless of output.
@@ -36,13 +53,18 @@ These are load-bearing. A cycle that violates them is invalid regardless of outp
    noise floor (inter-judge agreement on a held-out sample + an independent
    check, as backtracking did with keyword-vs-judge F1). Unvalidated labeler ⇒ no
    measurement.
-5. **Adversarial skeptic pass on every PROCEED.** Before a spec is frozen, a
-   *separate* Claude call (Opus) tries to kill the verdict — confound? labeler
-   leakage? shuffle too weak? composition not order (the topic_switching trap)?
-   A PROCEED survives only if the skeptic can't refute it. Record the attempt.
-6. **Cost cap.** Bulk labeling on Haiku; Sonnet only for validation/adjudication;
-   Opus only for hypothesis generation + the skeptic. Hard token/$ ceiling per
-   cycle (set it, log spend, stop at the ceiling).
+5. **Adversarial skeptic pass on every PROCEED (structured rubric, not vibes).**
+   Before a spec is frozen, a *separate* Opus call fills a fixed kill-rubric, each
+   item yes/no + evidence: (a) is the ordered−shuffled gap within the labeler
+   noise floor? (b) could the labeler be leaking the target? (c) is this
+   composition/marginal, not order (the topic_switching trap)? (d) does the mirror
+   match the statistic by construction (circular)? (e) is the effect an artifact
+   of window/segmentation choice? A PROCEED survives ONLY if every item clears;
+   store the filled rubric in the calibration record.
+6. **Cost cap — $25 / cycle (default).** Bulk labeling on Haiku
+   (`claude-haiku-4-5-20251001`); Sonnet (`claude-sonnet-5`) only for
+   validation/adjudication; Opus (`claude-opus-4-8`) only for hypotheses + the
+   skeptic. Meter spend; hard-stop at the cap and report partial results.
 
 ## The anti-drift mechanism (the reason "both domains" is safe)
 
@@ -65,20 +87,33 @@ Report the filled/empty grid at the end of every cycle so balance is visible.
 
 ## Stage 0 — bootstrap (Cycle 1 only)
 
-- **Claude API:** anthropic SDK; key from `/workspace/.tokens/` (add if absent —
-  ask the user, do not hardcode). Wrap in a small client with per-model routing
-  (Haiku/Sonnet/Opus) + a spend meter that enforces the cap.
-- **Reasoning traces:** a local instruct/reasoning model on the A40 (R1-Distill-
-  Llama-8B or similar, bf16 ≈16GB — fits) to generate CoT traces on math/logic
-  prompts; **reuse the stored traces** at `results/c7_backtracking/stage_a/` +
-  generate more for diversity. Activations via `src/temp_bench/data/real_lm.py`.
-- **Text corpora:** a fineweb (or similar) sample on the 200GB volume.
-- **The factory harness:** generalize `backtracking/measure.py` + `mirror.py`
-  into a reusable `expansion/` library — a labeler-runner (Claude judge → per-
-  span signal + validation), the null battery (N1/N2/N3, generalized), the
-  signature toolkit (ACF, dwell/run-length, MI vs lag, Fano/burstiness, spectral
-  DC/AC share), and the mirror menu (Appendix B) with fit+validate. Everything
-  routes real-LM reads through `real_lm.py`; never edit `temp_bench/core/`.
+**Calibration is text-only.** It measures the temporal signature of the *label
+stream* (autocorrelation, dwell, MI vs lag, nulls) over text — it needs **no
+activations, no local model, and no architecture.** `real_lm.py` (the
+activation-cache builder) belongs to the *later, blind* eval stage, NOT this loop.
+Do not build activation infra here.
+
+- **Claude API client:** small wrapper over the anthropic SDK with per-model
+  routing (Haiku/Sonnet/Opus) + a spend meter enforcing the $25 cap.
+- **Reasoning-trace domain — reuse, don't generate.** Cycle 1 runs on the **300
+  stored traces** at `results/c7_backtracking/stage_a/sentence_labels.json` —
+  already sentence-segmented text (`sentences[].sentence`, with char offsets).
+  Re-label those sentences with a Claude judge for each NEW candidate property.
+  **No local model, no generation, no `vllm` in Cycle 1** — generating fresh
+  traces on the A40 is a *later scaling* step (more/diverse data), not a Cycle-1
+  prerequisite.
+- **Text-corpus domain — the real Cycle-1 build.** The stored data is
+  reasoning-trace only, so this half is built from scratch: a fineweb (or similar)
+  sample streamed via `datasets` (cached to the volume) + a Claude-judge labeler
+  for it. This is the heavier half of Cycle 1 — budget for it.
+- **The factory harness:** generalize `backtracking/measure.py` — its toolkit is
+  already reusable: `acf`, `fano`, `mi_vs_lag`, `self_excitation`,
+  `inter_event_cv`, `markov_order_test`, and the null generators `null_permute`
+  (=N1) / `null_homog` (=N3); add an N2 trend-preserving null. Parameterize the
+  **label field** (currently `is_backtracking`) → any per-span signal. Plus a
+  labeler-runner (Claude judge → per-span signal + noise-floor validation) and the
+  mirror menu (Appendix B) fit+validate (from `mirror.py`). Never edit
+  `temp_bench/core/`.
 
 ## Stages 1–4 — the cycle (every cycle)
 
@@ -92,8 +127,9 @@ Report the filled/empty grid at the end of every cycle so balance is visible.
    apply the per-domain floor + under-coverage bias, take the top-N. Cycle 1:
    **N = 4 (2 per domain)** — prove the loop end-to-end, don't scale yet.
 3. **Calibrate** (per candidate, the `measure.py` template): build + **validate**
-   the Claude-judge labeler (noise floor) → measure the signature on real
-   traces/corpus (held-out) → **run the null battery** → temporal-ness verdict.
+   the Claude-judge labeler (noise floor) → measure the signature on the **labeled
+   text stream** (stored traces / corpus, held-out) → **run the null battery** →
+   temporal-ness verdict.
    If PROCEED: fit a mirror (Appendix B, keyed to the matched statistic) +
    validate it reproduces the statistic on held-out draws. Run the **skeptic
    pass**. Write a `measurement.md`-style calibration record either way.
@@ -116,8 +152,8 @@ Report the filled/empty grid at the end of every cycle so balance is visible.
 ## Constraints (hard rules)
 
 `TEMP_BENCH_ALLOW_DIRTY=1`; `.venv/bin/python`; **never edit `temp_bench/core/`**;
-real-LM reads through `real_lm.py`; version-pin corpora + the judge model + the
-target LM in every record (as backtracking pins Sonnet + R1-Distill). Prime
-directive: a sound verdict, never a win. When this task's *first* cycle is done
-and reviewed, this briefing is superseded by the standing
-`expansion/README.md` — delete it then.
+version-pin the corpus snapshot + the judge model in every record (as backtracking
+pinned its Sonnet judge). **Calibration is text-only** — no activations, no
+`real_lm.py`, no architectures (those are the later blind eval). Prime directive:
+a sound verdict, never a win. When this task's *first* cycle is done and reviewed,
+this briefing is superseded by the standing `expansion/README.md` — delete it then.

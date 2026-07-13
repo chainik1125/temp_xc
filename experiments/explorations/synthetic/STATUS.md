@@ -21,9 +21,12 @@ Last updated: 2026-07-10.
   abort-is-success, blind-to-architecture, null gate load-bearing, labeler
   noise-floor mandatory, adversarial skeptic pass on every PROCEED, cost cap.
   Deliverable = frozen bench_specs + calibration records (or aborts), NOT arch
-  evals. **Cycle 1** = bootstrap infra (Claude API routing Haiku/Sonnet/Opus +
-  local reasoning-LM on the A40 + fineweb) + build the factory harness + prove the
-  loop on N=4 (2/domain), then STOP for review. Briefing:
+  evals. **Calibration is text-only** (label-stream signature; no activations / no
+  local model / no arch — those are the later blind eval). **Cycle 1** = Claude-API
+  client + factory harness (generalize `backtracking/measure.py`) + prove the loop
+  on N=4 (2/domain): reasoning-trace half runs on the **300 stored traces**
+  (re-label, no generation); text-corpus half stands up fineweb + a labeler (the
+  heavier half). Cost cap **$25/cycle**; then STOP for review. Briefing:
   [`briefings/grounded-benchmark-expansion.md`](../../../briefings/grounded-benchmark-expansion.md);
   prereg card: [`expansion/prereg_template.md`](expansion/prereg_template.md).
   (This is the *grounded* arm of the program; the abstract benches — signed_motion,
