@@ -1,0 +1,55 @@
+{
+  "interjudge": {
+    "n_docs": 12,
+    "n_spans": 1033,
+    "agreement": 0.78702807357212,
+    "disagreement": 0.21297192642787996,
+    "kappa": 0.6356079907771589,
+    "noise_floor_eps": 0.12116753467256797,
+    "pos_rate_primary": 0.782187802516941,
+    "pos_rate_second": 0.750242013552759,
+    "coverage": {
+      "n_docs": 12,
+      "n_docs_labeled": 12,
+      "n_chunks": 27,
+      "n_dead_chunks": 0,
+      "doc_coverage": 1.0
+    },
+    "sampled_doc_ids": [
+      4,
+      12,
+      22,
+      52,
+      78,
+      90,
+      148,
+      184,
+      194,
+      242,
+      245,
+      273
+    ]
+  },
+  "heuristic_crosscheck": {
+    "n_spans": 25528,
+    "accuracy": 0.7291209652146663,
+    "kappa": 0.3568778837163168,
+    "per_class": {
+      "1": {
+        "judge_rate": 0.6438420557818866,
+        "heuristic_rate": 0.8523973675963648,
+        "precision": 0.7227941176470588,
+        "recall": 0.9569238257483572,
+        "f1": 0.8235417321185464
+      },
+      "2": {
+        "judge_rate": 0.12641021623315576,
+        "heuristic_rate": 0.03787997492948919,
+        "precision": 0.5635987590486039,
+        "recall": 0.16888751162070034,
+        "f1": 0.2598950882212685
+      }
+    }
+  },
+  "noise_floor_eps": 0.11285397280260567
+}

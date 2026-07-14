@@ -92,6 +92,11 @@ def label_stream(judge, docs, spec, *, role: str = "bulk", chunk: int = 50,
     """
     vmax = spec["n_values"] - 1
     jobs, index = _chunk_jobs(docs, spec, chunk, ctx, tag)
+    if role != "bulk":
+        # Claude 5-family judges (validate/think) emit a thinking block by
+        # default; give it headroom so the text array is never squeezed out.
+        for j in jobs:
+            j["max_tokens"] += 2500
     texts = judge.call_many(role, jobs, workers=workers, tag=tag)
 
     parsed: dict[int, np.ndarray | None] = {}
@@ -144,6 +149,12 @@ def noise_floor_from_disagreement(d: float) -> float:
     return float((1 - np.sqrt(max(0.0, 1 - 2 * min(d, 0.5)))) / 2)
 
 
+def noise_floor_categorical(d: float) -> float:
+    """k-symbol analog: each judge corrupts w.p. ε to some other value, so
+    P(disagree) ≈ 1 − (1−ε)² (collisions between two errors neglected)."""
+    return float(1 - np.sqrt(max(0.0, 1 - min(d, 0.99))))
+
+
 def validate_interjudge(judge, docs, primary_seqs, spec, *, sample_docs: int = 12,
                         seed: int = 0, role: str = "validate", chunk: int = 50,
                         ctx: int = 3, workers: int = 4, tag: str = "interjudge"):
@@ -171,6 +182,25 @@ def validate_interjudge(judge, docs, primary_seqs, spec, *, sample_docs: int = 1
            "pos_rate_primary": float((a > 0).mean()),
            "pos_rate_second": float((b > 0).mean()),
            "coverage": cov, "sampled_doc_ids": pick}
+    return out
+
+
+def crosscheck_categorical(judge_seqs, heuristic_seqs, n_values: int) -> dict:
+    """Independent-heuristic cross-check for k-symbol labels: accuracy + κ +
+    per-class F1 for the non-background classes (class 0 = background)."""
+    pairs = [(j, h) for j, h in zip(judge_seqs, heuristic_seqs) if j is not None]
+    j = np.concatenate([p[0] for p in pairs])
+    h = np.concatenate([p[1] for p in pairs])
+    out = {"n_spans": int(j.size), "accuracy": float((j == h).mean()),
+           "kappa": cohen_kappa(j, h, n_values), "per_class": {}}
+    for c in range(1, n_values):
+        tp = int(((h == c) & (j == c)).sum())
+        prec = tp / max(int((h == c).sum()), 1)
+        rec = tp / max(int((j == c).sum()), 1)
+        out["per_class"][str(c)] = {
+            "judge_rate": float((j == c).mean()), "heuristic_rate": float((h == c).mean()),
+            "precision": prec, "recall": rec,
+            "f1": 2 * prec * rec / max(prec + rec, 1e-12)}
     return out
 
 

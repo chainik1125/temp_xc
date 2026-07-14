@@ -4,33 +4,35 @@
 is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-07-10.
+Last updated: 2026-07-14.
 
 ---
 
 ## 0. TL;DR — what's active right now
 
-- **Grounded-benchmark expansion loop: SCOPED — Cycle 1 queued for runpod
-  (2026-07-13).** An autonomous, *gated* pipeline to expand the list of GROUNDED
-  benchmarks (measure→mirror on real LM data), generalizing the proven
-  backtracking loop (Claude-judge labeler + N1/N2/N3 null gate + mirror). Covers
-  **both domains** (reasoning-trace + text-corpus) with an anti-drift **coverage
-  ledger** ([`expansion/LEDGER.md`](expansion/LEDGER.md), 12 cells, 10 empty — only
-  backtracking PROCEED + topic_switching ABORT filled): per-domain floor (≥⌊N/2⌋
-  each) + under-covered-cell-biased selection. Guardrails (prime directive):
-  abort-is-success, blind-to-architecture, null gate load-bearing, labeler
-  noise-floor mandatory, adversarial skeptic pass on every PROCEED, cost cap.
-  Deliverable = frozen bench_specs + calibration records (or aborts), NOT arch
-  evals. **Calibration is text-only** (label-stream signature; no activations / no
-  local model / no arch — those are the later blind eval). **Cycle 1** = Claude-API
-  client + factory harness (generalize `backtracking/measure.py`) + prove the loop
-  on N=4 (2/domain): reasoning-trace half runs on the **300 stored traces**
-  (re-label, no generation); text-corpus half stands up fineweb + a labeler (the
-  heavier half). Cost cap **$25/cycle**; then STOP for review. Briefing:
-  [`briefings/grounded-benchmark-expansion.md`](../../../briefings/grounded-benchmark-expansion.md);
-  prereg card: [`expansion/prereg_template.md`](expansion/prereg_template.md).
-  (This is the *grounded* arm of the program; the abstract benches — signed_motion,
-  frequency — are out of its scope.)
+- **Grounded-benchmark expansion loop: Cycle 1 DONE (2026-07-14, runpod) —
+  STOPPED for human review.** The autonomous gated pipeline
+  (hypothesize→select→calibrate→freeze; [`expansion/README.md`](expansion/README.md))
+  ran end-to-end for **$9.55 of the $25 cap**: 10 prereg cards frozen-by-commit
+  before any data (5/domain), blind selection took 4 (2/domain, 4 empty ledger
+  cells), all 4 calibrated (~123k Haiku sentence-labels over the 300 stored
+  traces + a pinned 400-doc fineweb sample; Sonnet inter-judge noise floors;
+  Opus skeptic on every gate-pass). **Verdicts:** 2 PROCEED → frozen specs —
+  **`assumption_consequence/`** (reasoning×AC: directed A→C asym 0.135 ≫ nulls
+  ≤0.024, Markov mirror reproduces non-fitted moments) and **`hedging_drift/`**
+  (reasoning×DC: confidence ACF(1) 0.316 ≫ N1 0.078/N2 0.030, κ=0.64, trend-AR(1)
+  mirror; strongest+stablest signal). 2 ABORT, both text-corpus, both killed by
+  the **adversarial skeptic after passing the numeric gate** — exactly the
+  designed failure mode: question-answer-adjacency (labeler leakage: ANSWER
+  definitionally requires a preceding question → circular) and quotation-burst
+  (mirror validated only on its fitted moment; record recommends a preregistered
+  non-fitted-moment tolerance). Ledger + cycle log:
+  [`expansion/LEDGER.md`](expansion/LEDGER.md). Calibration records:
+  `expansion/records/<name>/calibration.md`. **NO architecture was trained or
+  evaluated; the specs await the later, blind stage-6 eval.** Next-cycle
+  targets (per ledger): interaction/equality (only class with zero proposals),
+  a text-corpus PROCEED, periodic/long-memory. **Do not start Cycle 2 before
+  the user reviews Cycle 1.**
 
 - **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under

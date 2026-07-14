@@ -1,0 +1,74 @@
+# Grounded-benchmark expansion — the autonomous, gated measure→mirror loop
+
+This directory is the **expansion arm** of the synthetic-benchmark program: it
+*expands the list of grounded benchmarks* by running the proven
+measure→mirror loop (the one [`../backtracking/`](../backtracking/) ran by
+hand) as an autonomous, **gated** pipeline over real text:
+
+> **hypothesize → select → calibrate on real LM data → freeze → STOP for review**
+
+One cycle produces frozen, architecture-blind benchmark specs (or clean
+aborts) across BOTH data domains. It never evaluates architectures — that is
+a separate, later, deliberately-blind step (stage 6 of the loop in
+[`../README.md`](../README.md)).
+
+## Prime-directive guardrails (structural, not aspirational)
+
+1. **An ABORT is a success.** Nothing is ever tuned to force a temporal verdict.
+2. **Blind to architectures.** No arch is trained or evaluated during a cycle.
+3. **The null gate is make-or-break**: ordered statistic must beat the
+   N1 (within-doc permute) and N2 (trend-preserving) nulls beyond sampling
+   noise AND the measured labeler noise floor.
+4. **Every labeler is validated** (inter-judge agreement → noise floor ε̂ +
+   an independent heuristic cross-check) before its labels count.
+5. **Adversarial skeptic pass on every PROCEED** — a separate Opus call fills
+   a fixed 5-item kill-rubric (noise floor / leakage / composition /
+   circularity / segmentation); any kill demotes to ABORT.
+6. **Hard cost cap** ($25/cycle default) enforced by the spend meter in
+   `explorations.synthetic.expansion.client` (see `results/spend.json`).
+
+The **anti-drift invariant** is [`LEDGER.md`](LEDGER.md): a `domain ×
+temporal-class` coverage grid with a per-domain selection floor (≥⌊N/2⌋
+calibrated per domain per cycle) and an under-coverage bias (empty/abort-only
+cells outrank cells that already hold a PROCEED).
+
+## The pipeline (one cycle)
+
+| stage | script | output |
+|---|---|---|
+| 1 hypothesize | `hypothesize.py` (Opus) | `prereg/<name>.md` cards + `results/candidates.json`, **committed before any data** |
+| 2 select | `select.py` (separate Opus scoring + deterministic rule) | `results/selection.json`, `selection.md` |
+| 3 calibrate | `calibrate.py <name>` (per candidate) | `records/<name>/` — labels, validation, stats, figure |
+| 3b render | `render_records.py` | `records/<name>/calibration.md` |
+| 4 freeze | manual per PROCEED | frozen `bench_spec.md` graduated to `../<name>/`, LEDGER + cycle log updated, commit + push, **STOP** |
+
+```bash
+.venv/bin/python -m experiments.explorations.synthetic.expansion.hypothesize
+.venv/bin/python -m experiments.explorations.synthetic.expansion.select
+.venv/bin/python -m experiments.explorations.synthetic.expansion.calibrate <name>
+.venv/bin/python -m experiments.explorations.synthetic.expansion.render_records
+```
+
+Library code (reusable across cycles) lives in
+`src/explorations/synthetic/expansion/`: `client` (role-routed judges:
+bulk=Haiku-4.5, validate=Sonnet-5, think=Opus-4.8 + the metered cap),
+`signature` (binary/categorical/scalar batteries + N1/N2/N3 nulls),
+`labeler` (chunked judge runner + κ/ε̂ validation), `corpus` (pinned fineweb
+sampling), `mirrors` (Appendix-B menu, fit+generate+validate). Tests:
+`tests/test_expansion_harness.py`.
+
+## Data domains (Cycle-1 pins)
+
+- **reasoning-trace** — the 300 Ward Stage-A R1-Distill traces (25,528
+  sentences) at `results/c7_backtracking/stage_a/sentence_labels.json`.
+- **text-corpus** — 400 fineweb docs (60–200 sentences each; 36,805
+  sentences), streamed sample pinned at `data/fineweb_sample.json` (seed 0,
+  `sample-10BT`).
+
+Bulk labels are cached per candidate at `records/<name>/labels.json` — a
+crashed calibration resumes without re-spending.
+
+## Cycle log
+
+See the bottom of [`LEDGER.md`](LEDGER.md). One cycle per review; the next
+cycle starts only after human review of the previous one.

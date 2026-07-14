@@ -1,35 +1,39 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-11 (full clean-room rerun + purge COMPLETE).
+**Last rewrite:** 2026-07-14 (expansion Cycle 1 COMPLETE — stopped for review).
 
 ## Who / where
 Remote CC on RunPod (Linux) at `/workspace/temp_xc`. Git creds at `/workspace/.tokens/`.
+Claude API key at `/workspace/.tokens/anthropic_key` (validated; all 3 judge models OK).
 
-## Last task: `briefings/full-rerun-and-purge.md` — DONE (briefing deleted)
-Rebuilt the entire synthetic result set at protocol **1.3.0** under the uniform
-design, regenerated all records + the program report, purged stale synthetic rows.
-See `experiments/explorations/synthetic/STATUS.md` §0 for the science.
+## Last task: `briefings/grounded-benchmark-expansion.md` — Cycle 1 DONE
+All four stages executed autonomously; **STOPPED for human review** (per the
+briefing — Cycle 2 must not start before review; the briefing file stays until
+the user reviews, then it is superseded by `expansion/README.md` and deleted).
 
-Key outcomes:
-- ~2239-cell grid, **0 failures**. Ran on **CPU** (A40 is kernel-launch-latency-
-  bound for these tiny d_in≤128 models → ~14% util; CPU ~7h). 12 workers, OMP=1
-  (higher counts hit a memory-bandwidth/contention cliff). CUDA hidden via env.
-- Anchor commit **C = `5b526c4d`** (protocol bump + drivers). Every fresh row
-  stamps it; the purge kept synth iff `1.3.0 AND commit_sha==C AND seed∈{1,2,42}`
-  (the seed clause dropped 12 stray timing-probe rows). Non-synth (356) preserved.
-- Drift-sanity: overlapping cells reproduce **max|Δ|=0.000** on primary metrics.
-- Program matrix filled 36/36 + both panels. All per-bench records regenerated;
-  verdicts preserved; spectral_txc added as a fair column across all 4 benches.
-- Committed as **C2** (see git log), pushed to origin/arxiv.
-
-## Gotchas learned (for next heavy CPU grid on this box)
-- 40+ concurrent `git diff HEAD` (runner code_version) SIGBUS on the growing
-  tracked leaderboard/manifest → `git update-index --assume-unchanged` those
-  churning files during the grid, `--no-assume-unchanged` before committing.
-- Tiny models: GPU useless (latency-bound); CPU sweet spot ~12 workers, OMP=1.
-- `pkill -f "<pattern>"` self-matches the launching shell → exit 144. Launch
-  grids as harness background tasks; kill via TaskStop, not pkill.
+Outcome (full detail: synthetic STATUS §0 + `expansion/LEDGER.md` cycle log):
+- 10 cards frozen (commit `9fe8a29e`) → blind selection (4; 2/domain) →
+  all 4 calibrated → **2 PROCEED** graduated as frozen specs
+  (`synthetic/assumption_consequence/`, `synthetic/hedging_drift/`) and
+  **2 ABORT** (both text-corpus, both skeptic kills after numeric-gate passes:
+  leakage / mirror circularity — records at `expansion/records/`).
+- Spend **$9.55 / $25** (meter `expansion/results/spend.json`). ~123k Haiku
+  sentence labels; no architecture touched.
+- Harness (reusable for Cycle 2): `src/explorations/synthetic/expansion/`
+  (client+meter, signature+nulls, labeler, corpus, mirrors), 11 tests.
 
 ## Next / open
-Check `briefings/` for the next `status: active` brief. Nothing queued now.
-The `.prepurge` leaderboard backup can be deleted once the push is confirmed good.
+- **Blocked on user review of Cycle 1.** After review: delete the briefing;
+  Cycle-2 targets are in the LEDGER cycle log (interaction/equality both
+  domains, a text-corpus PROCEED, periodic/long-memory; preregister a
+  non-fitted-moment mirror tolerance).
+- The stage-6 blind B×A eval of the two new specs is a separate task the user
+  must green-light (needs datasource plugins; nothing run this cycle).
+- `results/leaderboard.jsonl.prepurge` backup can be deleted (push confirmed).
+
+## Gotchas (this box)
+- Claude 5-family models reject `temperature` (client handles).
+- Tiny models: GPU useless here; CPU ~12 workers OMP=1 for temp_bench grids.
+- `pkill -f` self-matches the launching shell → use TaskStop on harness tasks.
+- `datasets` streaming can core-dump at interpreter exit AFTER writing cache —
+  cosmetic (exit 134), check the cache file.

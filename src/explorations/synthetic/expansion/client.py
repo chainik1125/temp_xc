@@ -125,7 +125,14 @@ class Judge:
                     model=model, max_tokens=max_tokens, system=system,
                     messages=[{"role": "user", "content": user}], **kw)
                 self.meter.add(model, r.usage.input_tokens, r.usage.output_tokens, tag=tag)
-                return "".join(b.text for b in r.content if b.type == "text")
+                text = "".join(b.text for b in r.content if b.type == "text")
+                # Claude 5-family models think by default; a tight budget can be
+                # consumed entirely by the thinking block -> empty text. Retry
+                # with a doubled budget instead of surfacing ''.
+                if not text.strip() and r.stop_reason == "max_tokens" and max_tokens < 16000:
+                    max_tokens *= 2
+                    continue
+                return text
             except (self._anthropic.RateLimitError, self._anthropic.APIConnectionError) as e:
                 last = e
             except self._anthropic.APIStatusError as e:

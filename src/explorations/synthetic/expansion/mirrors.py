@@ -139,31 +139,49 @@ def gen_semi_markov(params: dict, lengths, rng) -> list:
 
 # ── AR(1), scalar ──────────────────────────────────────────────────────────
 
-def fit_ar1(train_seqs) -> dict:
+def fit_ar1(train_seqs, position: bool = False) -> dict:
+    """AR(1), optionally around a linear position trend.
+
+    ``position=True`` fits ``m(pos) = mu + beta·pos`` (pos ∈ [0,1) within each
+    sequence) by pooled least squares, then AR(1) on the de-trended residual —
+    matching a card that pins BOTH the lag-1 persistence and the drift trend.
+    """
+    allx = np.concatenate([s.astype(float) for s in train_seqs])
+    if position:
+        allp = np.concatenate([np.arange(s.size) / s.size for s in train_seqs])
+        A = np.stack([np.ones_like(allp), allp], 1)
+        (mu, beta), *_ = np.linalg.lstsq(A, allx, rcond=None)
+        mu, beta = float(mu), float(beta)
+    else:
+        mu, beta = float(allx.mean()), 0.0
+
     xs, ys = [], []
     for s in train_seqs:
         if s.size > 1:
-            xs.append(s[:-1].astype(float))
-            ys.append(s[1:].astype(float))
+            pos = np.arange(s.size) / s.size
+            r = s.astype(float) - (mu + beta * pos)
+            xs.append(r[:-1])
+            ys.append(r[1:])
     x = np.concatenate(xs)
     y = np.concatenate(ys)
-    mu = float(np.concatenate([s.astype(float) for s in train_seqs]).mean())
-    xc, yc = x - mu, y - mu
-    rho = float((xc * yc).sum() / max((xc * xc).sum(), 1e-12))
-    resid = yc - rho * xc
-    return {"process": "ar1", "mu": mu, "rho": rho, "sigma": float(resid.std())}
+    rho = float((x * y).sum() / max((x * x).sum(), 1e-12))
+    resid = y - rho * x
+    return {"process": "ar1", "mu": mu, "beta_position": beta, "rho": rho,
+            "sigma": float(resid.std())}
 
 
 def gen_ar1(params: dict, lengths, rng) -> list:
     mu, rho, sg = params["mu"], params["rho"], params["sigma"]
+    beta = params.get("beta_position", 0.0)
     stat_sd = sg / max(np.sqrt(max(1 - rho ** 2, 1e-9)), 1e-9)
     out = []
     for L in lengths:
-        x = np.empty(L)
-        x[0] = mu + stat_sd * rng.standard_normal()
+        pos = np.arange(L) / L
+        r = np.empty(L)
+        r[0] = stat_sd * rng.standard_normal()
         for i in range(1, L):
-            x[i] = mu + rho * (x[i - 1] - mu) + sg * rng.standard_normal()
-        out.append(x)
+            r[i] = rho * r[i - 1] + sg * rng.standard_normal()
+        out.append(mu + beta * pos + r)
     return out
 
 

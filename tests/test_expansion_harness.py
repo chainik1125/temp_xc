@@ -98,6 +98,35 @@ def test_mirror_roundtrip_validation():
     assert v["abs_err"]["excite_ratio"] < 1.0
 
 
+def test_directed_transition_asymmetry():
+    rng = np.random.default_rng(4)
+    # planted convention: symbol 1 is always followed by symbol 2
+    seqs = []
+    for _ in range(60):
+        s = rng.choice([0, 0, 0, 1], size=100).astype(np.int8)
+        s[1:][s[:-1] == 1] = 2
+        seqs.append(s)
+    d = sig.directed_transition(seqs, 1, 2)
+    assert d["fwd_rate"] > 0.9 and d["asym"] > 0.3
+    perm = sig.null_permute(seqs, rng)
+    dp = sig.directed_transition(perm, 1, 2)
+    assert abs(dp["asym"]) < 0.15                      # permutation kills direction
+    stats = sig.measure(seqs, "categorical", seed=0, n_null=40, n_boot=40, pair=(1, 2))
+    assert stats["real"]["asym"] > stats["nulls"]["N1_permute"]["asym"]["hi"]
+
+
+def test_perturb_categorical_and_ar1_trend():
+    rng = np.random.default_rng(5)
+    seqs = [rng.choice([0, 1, 2], size=80).astype(np.int8) for _ in range(20)]
+    pert = sig.perturb_categorical(seqs, 0.1, rng)
+    frac = np.mean([float((a != b).mean()) for a, b in zip(seqs, pert)])
+    assert 0.02 < frac < 0.12                          # ~eps*(1-1/k)
+    ar = mirrors.gen_ar1({"process": "ar1", "mu": 0.5, "beta_position": 1.0,
+                          "rho": 0.6, "sigma": 0.3}, [200] * 40, rng)
+    fit = mirrors.fit_ar1(ar, position=True)
+    assert abs(fit["beta_position"] - 1.0) < 0.15 and abs(fit["rho"] - 0.6) < 0.08
+
+
 def test_labeler_parse_and_agreement():
     assert labeler._parse_labels("[0, 1, 0]", 3, 1).tolist() == [0, 1, 0]
     assert labeler._parse_labels("Here you go: [0,1,1]", 3, 1).tolist() == [0, 1, 1]

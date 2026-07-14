@@ -216,6 +216,41 @@ def mi_vs_lag(seqs, maxlag: int = DEFAULT_MAXLAG, n_symbols: int = 2) -> np.ndar
     return np.array(out)
 
 
+def directed_transition(seqs, src: int, dst: int) -> dict:
+    """Directional order statistic: P(x_{t+1}=dst | x_t=src), forward vs
+    time-reversed, plus the asymmetry index (fwd−rev)/(fwd+rev).
+
+    For any *reversible* stream (and for every order-destroying null) fwd ≈ rev,
+    so asym ≈ 0; a genuine directed convention (e.g. assumption→consequence,
+    question→answer) shows asym > 0 beyond the null band.
+    """
+
+    def rate(ss):
+        n_src = n_hit = 0
+        for s in ss:
+            cur, nxt = s[:-1], s[1:]
+            m = cur == src
+            n_src += int(m.sum())
+            n_hit += int((m & (nxt == dst)).sum())
+        return n_hit / max(n_src, 1)
+
+    fwd = rate(seqs)
+    rev = rate([s[::-1] for s in seqs])
+    return {"fwd_rate": fwd, "rev_rate": rev,
+            "asym": (fwd - rev) / max(fwd + rev, 1e-12)}
+
+
+def perturb_categorical(seqs, eps: float, rng):
+    """Categorical noise model: w.p. ε replace with a draw from the pooled
+    marginal (the k-symbol analog of the binary symmetric flip)."""
+    pooled = np.concatenate([s for s in seqs])
+    out = []
+    for s in seqs:
+        repl = rng.choice(pooled, size=s.size, replace=True)
+        out.append(np.where(rng.random(s.size) < eps, repl, s).astype(s.dtype))
+    return out
+
+
 def quantile_bin(seqs, nbins: int = 8):
     """Bin scalar streams into pooled-quantile symbols (for MI / Markov tests)."""
     pooled = np.concatenate([s for s in seqs]).astype(float)
@@ -276,8 +311,14 @@ def flip_labels(seqs, eps: float, rng):
 # ── headline batteries ─────────────────────────────────────────────────────
 
 def headline(seqs, kind: str, *, maxlag: int = DEFAULT_MAXLAG,
-             fano_w: int = DEFAULT_FANO_W, mi_bins: int = 8) -> dict:
-    """The per-kind scalar+curve statistics compared real-vs-null."""
+             fano_w: int = DEFAULT_FANO_W, mi_bins: int = 8,
+             pair: tuple[int, int] | None = None) -> dict:
+    """The per-kind scalar+curve statistics compared real-vs-null.
+
+    ``pair=(src, dst)`` (categorical only) adds the directed-transition
+    statistics {fwd_rate, rev_rate, asym} to the battery, so the null bands
+    and bootstrap CIs cover them automatically.
+    """
     if kind == "binary":
         se = self_excitation(seqs)
         return {"acf": acf(seqs, maxlag), "fano": fano(seqs, fano_w),
@@ -287,9 +328,12 @@ def headline(seqs, kind: str, *, maxlag: int = DEFAULT_MAXLAG,
         pooled = np.concatenate([s for s in seqs])
         n_sym = int(pooled.max()) + 1
         dw = dwell_stats(seqs)
-        return {"acf": selfmatch_acf(seqs, maxlag),
-                "mi": mi_vs_lag(seqs, maxlag, n_sym),
-                "dwell_mean": dw["mean"], "dwell_cv": dw["cv"]}
+        out = {"acf": selfmatch_acf(seqs, maxlag),
+               "mi": mi_vs_lag(seqs, maxlag, n_sym),
+               "dwell_mean": dw["mean"], "dwell_cv": dw["cv"]}
+        if pair is not None:
+            out.update(directed_transition(seqs, *pair))
+        return out
     if kind == "scalar":
         binned = quantile_bin(seqs, mi_bins)
         return {"acf": acf(seqs, maxlag),
@@ -333,10 +377,11 @@ def bootstrap_ci(seqs, kind: str, rng, n_boot: int = 500, **hkw) -> dict:
 def measure(seqs, kind: str, *, seed: int = 0, n_null: int = 200, n_boot: int = 500,
             noise_eps: tuple[float, ...] = (), maxlag: int = DEFAULT_MAXLAG,
             fano_w: int = DEFAULT_FANO_W, mi_bins: int = 8,
-            pos_bins: int = DEFAULT_POS_BINS) -> dict:
+            pos_bins: int = DEFAULT_POS_BINS,
+            pair: tuple[int, int] | None = None) -> dict:
     """Full signature: real headline + CIs + N1/N2/N3 bands (+ noise check)."""
     rng = np.random.default_rng(seed)
-    hkw = dict(maxlag=maxlag, fano_w=fano_w, mi_bins=mi_bins)
+    hkw = dict(maxlag=maxlag, fano_w=fano_w, mi_bins=mi_bins, pair=pair)
     real = headline(seqs, kind, **hkw)
     stats = {
         "kind": kind,

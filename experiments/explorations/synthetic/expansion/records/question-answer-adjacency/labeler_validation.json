@@ -1,0 +1,55 @@
+{
+  "interjudge": {
+    "n_docs": 12,
+    "n_spans": 1174,
+    "agreement": 0.8773424190800682,
+    "disagreement": 0.12265758091993186,
+    "kappa": 0.5237040730942499,
+    "noise_floor_eps": 0.06563700717023085,
+    "pos_rate_primary": 0.19335604770017037,
+    "pos_rate_second": 0.09028960817717206,
+    "coverage": {
+      "n_docs": 12,
+      "n_docs_labeled": 12,
+      "n_chunks": 30,
+      "n_dead_chunks": 0,
+      "doc_coverage": 1.0
+    },
+    "sampled_doc_ids": [
+      6,
+      16,
+      29,
+      69,
+      105,
+      120,
+      199,
+      248,
+      259,
+      323,
+      331,
+      365
+    ]
+  },
+  "heuristic_crosscheck": {
+    "n_spans": 36714,
+    "accuracy": 0.792231846162227,
+    "kappa": 0.23406129735509984,
+    "per_class": {
+      "1": {
+        "judge_rate": 0.06542463365473661,
+        "heuristic_rate": 0.050961486081603745,
+        "precision": 0.7172634954569749,
+        "recall": 0.5587010824313072,
+        "f1": 0.6281301193540837
+      },
+      "2": {
+        "judge_rate": 0.16884567195075448,
+        "heuristic_rate": 0.002179005284087814,
+        "precision": 0.7,
+        "recall": 0.009033715115341184,
+        "f1": 0.017837235228539573
+      }
+    }
+  },
+  "noise_floor_eps": 0.06333441448931831
+}
