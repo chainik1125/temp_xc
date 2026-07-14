@@ -20,6 +20,13 @@
 
 ## 2. Labeler (the crux — validate or the measurement is meaningless)
 - **Signal:** per-`<token|span|sentence>` `<categorical | scalar>`.
+- **⚠ No-leakage rule (preregistered — Cycle-1 lesson).** The label MUST be
+  assignable from the span's **own content alone**. If the instruction references
+  the span's *relation to its neighbours* — "answers a preceding question",
+  "follows from prior", "unlike the previous sentence" — the measured order
+  statistic is **circular** (the temporal dependence is baked into the label).
+  Redesign, or expect a skeptic kill: this is exactly how `question-answer-
+  adjacency` died, and why `assumption-then-consequence` is only provisional.
 - **Labeler + version:** <Claude judge model + the exact prompt, OR the corpus
   field / classifier>. Bulk = Haiku; adjudication = Sonnet.
 - **Validation plan:** held-out inter-judge agreement (re-label a sample with an
@@ -52,6 +59,12 @@
 - **Process:** <2-state Markov / AR(1) / semi-Markov / Hawkes / periodic+noise /
   renewal — keyed to the matched statistic>. **Matched param(s):** <…>. **What is
   deliberately NOT matched:** <…>.
+- **⚠ Non-fitted-moment gate (preregistered — Cycle-1 lesson).** Name **≥1
+  statistic the mirror is NOT fit to**, and the abs-error **tolerance** it must
+  meet on held-out draws. A mirror that only reproduces the moment it was fit to
+  is **circular validation** — this is how `quotation-burst` died despite a clean
+  null gate. E.g. fit the transition matrix → require it to also reproduce dwell-CV
+  and Fano within <tol>, which the matrix does not set directly.
 
 ---
 _Frozen-by: <agent/model>. Amendments (dated, transparent): none._

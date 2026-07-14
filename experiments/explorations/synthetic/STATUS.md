@@ -29,10 +29,21 @@ Last updated: 2026-07-14.
   non-fitted-moment tolerance). Ledger + cycle log:
   [`expansion/LEDGER.md`](expansion/LEDGER.md). Calibration records:
   `expansion/records/<name>/calibration.md`. **NO architecture was trained or
-  evaluated; the specs await the later, blind stage-6 eval.** Next-cycle
-  targets (per ledger): interaction/equality (only class with zero proposals),
-  a text-corpus PROCEED, periodic/long-memory. **Do not start Cycle 2 before
-  the user reviews Cycle 1.**
+  evaluated; the specs await the later, blind stage-6 eval.**
+  **Reviewed + APPROVED (2026-07-14, mac-local)** — independently verified: no
+  arch pollution, spend real ($9.55 itemized), prereg frozen before data, harness
+  real (11/11 tests), and **both aborts are genuine sophisticated skeptic kills**
+  (Q-A definitional leakage; quotation-burst circular mirror validation). Review
+  riders, now baked in: **hedging-drift is the one solid spec**;
+  **assumption-consequence downgraded to `SPEC*` provisional** (labeler references
+  context → soft leakage; weak signal 0.135→0.09 at ε̂; re-examine with a
+  per-sentence labeler). Two **preregistered gates added** to README + prereg
+  template: **(7) no-leakage labeler**, **(8) non-fitted-moment mirror**.
+  **Cycle 2 queued** ([`briefings/grounded-benchmark-expansion-cycle2.md`](../../../briefings/grounded-benchmark-expansion-cycle2.md)):
+  target interaction/equality (empty class) + a text-corpus PROCEED +
+  periodic/long-memory (frozen cards); riders = re-exam assumption-consequence
+  under gate 7, re-check both mirrors under gate 8. Cycle-1 briefing retired
+  (README is the standing doc).
 
 - **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under

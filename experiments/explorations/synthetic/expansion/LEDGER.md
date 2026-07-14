@@ -9,12 +9,13 @@ already hold a PROCEED. Update this file at the end of every cycle and report th
 grid — an empty domain is then a visible, prioritized gap, not silent drift.
 
 **Cell status:** `—` empty · `prop` proposed (prereg frozen) · `calib:ABORT` ·
-`calib:PROCEED` · `SPEC` (PROCEED graduated to a `synthetic/<name>/` benchmark).
+`calib:PROCEED` · `SPEC` (PROCEED graduated to a `synthetic/<name>/` benchmark) ·
+`SPEC*` (PROCEED but **provisional** — flagged in review, not yet graduated).
 
 | temporal-class | reasoning-trace | text-corpus |
 |---|---|---|
 | **DC-slow-drift** (state persists, slow) | **`SPEC`** — uncertainty-hedging-drift (ACF(1)=0.32 ≫ N1 0.078/N2 0.030; κ=0.64; skeptic 5/5; → `synthetic/hedging_drift/`) | `calib:ABORT` — topic_switching (autocorr 82% per-doc *composition*, not order; labeler inadequate) · `prop` — hedge-to-assertion-drift (C1, unselected) |
-| **AC-order-sensitive** (depends on order) | **`SPEC`** — assumption-then-consequence (directed asym 0.135 ≫ nulls ≤0.024; skeptic 5/5; → `synthetic/assumption_consequence/`) | `calib:ABORT` — question-answer-adjacency (gate passed but **skeptic kill: leakage** — ANSWER label definitionally requires a preceding question; circular) |
+| **AC-order-sensitive** (depends on order) | **`SPEC*` PROVISIONAL** — assumption-then-consequence (asym 0.135 ≫ nulls ≤0.024; skeptic 5/5). *Review flag:* labeler references context ("follows from prior") → soft leakage; weak signal (→0.09 at ε̂), κ=0.52, ~50% split-half. **Re-examine with a strictly per-sentence labeler (new gate 7) before graduating.** | `calib:ABORT` — question-answer-adjacency (gate passed but **skeptic kill: leakage** — ANSWER label definitionally requires a preceding question; circular) |
 | **periodic** (rhythmic/cyclic) | `prop` — computation-verification-alternation (C1, unselected) | `prop` — enumeration-cadence (C1, unselected) |
 | **bursty/self-exciting** (clustered events) | **`SPEC`** — backtracking (ACF(1)=0.36, ~3.6× self-excitation; Sonnet judge; Hawkes mirror) · `prop` — error-correction-cascade (C1, unselected; cell already PROCEEDed) | `calib:ABORT` — quotation-burst (gate passed, ACF(1)=0.30 ≫ N1 0.128, but **skeptic kill: circularity** — mirror validated only on its fitted moment; non-fitted Fano/excite missed) |
 | **interaction/equality** (cross-position compare) | — | — |
@@ -37,6 +38,13 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
 - **interaction/equality remains the only class with zero proposals** — the
   natural priority for Cycle 2, both domains (plus periodic and long-memory,
   proposed but never calibrated).
+- **Cycle-1 review (2026-07-14, mac-local) added two preregistered gates** to the
+  README + prereg template: **(7) no-leakage labeler** (label from the span's own
+  content, not its relation to neighbours) and **(8) non-fitted-moment mirror
+  gate** (reproduce ≥1 un-fitted statistic within a preregistered tolerance).
+  Both existing PROCEED mirrors are to be re-checked against (8);
+  assumption-then-consequence is **provisional** pending a per-sentence-labeler
+  re-run under (7). hedging-drift is the one solid Cycle-1 spec.
 
 ## Cycle log
 

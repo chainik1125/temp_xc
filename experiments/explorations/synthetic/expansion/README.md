@@ -26,6 +26,21 @@ a separate, later, deliberately-blind step (stage 6 of the loop in
    circularity / segmentation); any kill demotes to ABORT.
 6. **Hard cost cap** ($25/cycle default) enforced by the spend meter in
    `explorations.synthetic.expansion.client` (see `results/spend.json`).
+7. **No-leakage labeler design (preregistered).** A per-span label must be
+   assignable from the span's *own content*, never from its relation to
+   neighbours ("answers a preceding question", "follows from prior") — a
+   relational label makes the measured order statistic circular. *(Added after
+   Cycle 1 — `question-answer-adjacency` died on this; the skeptic's item (b) is
+   the reactive backstop.)*
+8. **Non-fitted-moment mirror gate (preregistered).** A fitted mirror must
+   reproduce ≥1 statistic it was **not** fit to, within a preregistered
+   tolerance — matching only the fitted moment is circular validation. *(Added
+   after Cycle 1 — `quotation-burst` died on this despite a clean null gate; the
+   skeptic's item (d) is the reactive backstop.)*
+
+Guardrails 7–8 are **design-time / preregistered** (the hypothesis and mirror are
+built to satisfy them up front); guardrails 4–5 are the **reactive** validation
+and skeptic backstops. Both are required.
 
 The **anti-drift invariant** is [`LEDGER.md`](LEDGER.md): a `domain ×
 temporal-class` coverage grid with a per-domain selection floor (≥⌊N/2⌋
