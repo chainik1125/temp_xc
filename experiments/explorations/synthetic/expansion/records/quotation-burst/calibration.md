@@ -2,7 +2,7 @@
 
 **Verdict: ABORT** (pre-skeptic PROCEED, killed by skeptic on ['d_circularity'])
 
-Cycle-1 calibration per the frozen [prereg card](../../prereg/quotation-burst.md); domain `text-corpus`, 400 documents / 36805 labeled sentences (doc coverage 1.000).
+Calibration per the frozen [prereg card](../../prereg/quotation-burst.md); domain `text-corpus`, 400 documents / 36805 labeled sentences (doc coverage 1.000).
 
 ## 1. Labeler + noise floor
 
@@ -15,18 +15,20 @@ Cycle-1 calibration per the frozen [prereg card](../../prereg/quotation-burst.md
 | statistic | real | N1 permute | N2 trend | N3 iid |
 |---|---|---|---|---|
 | ACF(1) | **0.302 [0.268, 0.336]** | 0.117 | 0.002 | -0.000 |
+| MI(1) (nats) | **—** | — | — | — |
 | Fano | **2.727 [2.466, 2.954]** | 1.882 | 0.926 | 0.912 |
 | excite ratio P(1|1)/base | **4.210 [3.798, 4.624]** | 2.239 | 1.025 | 0.995 |
 | inter-event gap CV | **1.624 [1.542, 1.711]** | 1.353 | 0.919 | 0.930 |
+| spectral peak prominence | **—** | — | — | — |
 
 Base rate 0.0862; Markov order-1 vs 0 p = 0.00e+00.
 
 ## 3. Gate (preregistered) + verdict
 
-Primary statistic `acf[lag1]`: real **0.3022**, after ε̂-noise perturbation **0.1424**; N1 97.5% band hi 0.1280, N2 hi 0.0155.
+Primary statistic `acf[lag1]` (expected sign +): real **0.3022**, after ε̂-noise perturbation **0.1424**; N1 97.5% band hi 0.1280, N2 hi 0.0155.
 
 - clears sampling noise (real > N1 hi AND N2 hi): **True**
-- survives labeler noise floor (perturbed > both): **True**
+- survives labeler noise floor (perturbed likewise): **True**
 - labeler adequate (κ ≥ 0.3): **True**
 - split-half stability: 0.3000 / 0.3045
 

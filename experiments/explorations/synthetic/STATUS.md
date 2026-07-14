@@ -10,40 +10,38 @@ Last updated: 2026-07-14.
 
 ## 0. TL;DR — what's active right now
 
-- **Grounded-benchmark expansion loop: Cycle 1 DONE (2026-07-14, runpod) —
-  STOPPED for human review.** The autonomous gated pipeline
-  (hypothesize→select→calibrate→freeze; [`expansion/README.md`](expansion/README.md))
-  ran end-to-end for **$9.55 of the $25 cap**: 10 prereg cards frozen-by-commit
-  before any data (5/domain), blind selection took 4 (2/domain, 4 empty ledger
-  cells), all 4 calibrated (~123k Haiku sentence-labels over the 300 stored
-  traces + a pinned 400-doc fineweb sample; Sonnet inter-judge noise floors;
-  Opus skeptic on every gate-pass). **Verdicts:** 2 PROCEED → frozen specs —
-  **`assumption_consequence/`** (reasoning×AC: directed A→C asym 0.135 ≫ nulls
-  ≤0.024, Markov mirror reproduces non-fitted moments) and **`hedging_drift/`**
-  (reasoning×DC: confidence ACF(1) 0.316 ≫ N1 0.078/N2 0.030, κ=0.64, trend-AR(1)
-  mirror; strongest+stablest signal). 2 ABORT, both text-corpus, both killed by
-  the **adversarial skeptic after passing the numeric gate** — exactly the
-  designed failure mode: question-answer-adjacency (labeler leakage: ANSWER
-  definitionally requires a preceding question → circular) and quotation-burst
-  (mirror validated only on its fitted moment; record recommends a preregistered
-  non-fitted-moment tolerance). Ledger + cycle log:
-  [`expansion/LEDGER.md`](expansion/LEDGER.md). Calibration records:
-  `expansion/records/<name>/calibration.md`. **NO architecture was trained or
-  evaluated; the specs await the later, blind stage-6 eval.**
-  **Reviewed + APPROVED (2026-07-14, mac-local)** — independently verified: no
-  arch pollution, spend real ($9.55 itemized), prereg frozen before data, harness
-  real (11/11 tests), and **both aborts are genuine sophisticated skeptic kills**
-  (Q-A definitional leakage; quotation-burst circular mirror validation). Review
-  riders, now baked in: **hedging-drift is the one solid spec**;
-  **assumption-consequence downgraded to `SPEC*` provisional** (labeler references
-  context → soft leakage; weak signal 0.135→0.09 at ε̂; re-examine with a
-  per-sentence labeler). Two **preregistered gates added** to README + prereg
-  template: **(7) no-leakage labeler**, **(8) non-fitted-moment mirror**.
-  **Cycle 2 queued** ([`briefings/grounded-benchmark-expansion-cycle2.md`](../../../briefings/grounded-benchmark-expansion-cycle2.md)):
-  target interaction/equality (empty class) + a text-corpus PROCEED +
-  periodic/long-memory (frozen cards); riders = re-exam assumption-consequence
-  under gate 7, re-check both mirrors under gate 8. Cycle-1 briefing retired
-  (README is the standing doc).
+- **Grounded-benchmark expansion loop: Cycle 2 DONE (2026-07-14, runpod) —
+  STOPPED for human review.** (Cycle 1: done + approved same day; its riders
+  were executed in-cycle here.) 4 new interaction/equality cards frozen under
+  the review's design gates (7: no-leakage labeler, ctx=0; 8: preregistered
+  non-fitted mirror moment + tolerance); 6 calibrated (3/domain, deterministic
+  selection) + two riders; **$14.06 of $25**. **Verdicts:** 1 new SPEC —
+  **`self_reference_echo/`** (reasoning×int-eq: problem re-anchoring
+  ACF(1)=0.31 ≫ nulls ≤0.07, gate-8 PASS, skeptic 5/5; caveats: labeler κ=0.30
+  marginal, signature is run-clustering so the class label is loose). 5 ABORT,
+  each on a different preregistered gate: operator-alternation (frozen NEGATIVE
+  sign falsified — real is +0.36 clustering), computation-verification
+  (spectral peak REAL at 3.84 but events also bursty — periodic_rate mirror
+  gate-8 fail), greeting-signoff-mirror (mirror produces zero MI — mis-keyed),
+  list-item-parallelism (C2's strongest signal ACF(1)=0.52; mirror near-miss,
+  Fano err 0.163 vs frozen tol 0.15 = 4% relative — **prime re-freeze
+  candidate**), pronoun-referent-recurrence (gap-CV dies at the noise floor).
+  **Riders resolved:** (a) the **g7 re-exam UPGRADED assumption-consequence
+  SPEC*→SPEC** — the strict per-sentence labeler (ctx=0) *strengthens* the
+  directed asymmetry to **0.297** (2.2× the contextual 0.135), gate-8 PASS,
+  fresh skeptic 5/5; canonical mirror = the g7 Markov fit. (b) the **gate-8
+  recheck DOWNGRADED hedging-drift SPEC→SPEC***: its real ACF is a long-memory
+  *plateau* (~0.13 through lag 8) that neither ar1+trend nor the preregistered
+  semi-Markov attempt reproduces (both fail ACF(2) ±0.05) — mirror INVALID
+  pending a hierarchical-AR(1) menu extension (Cycle 3); measurement verdict
+  unaffected. **Text-corpus PROCEED target NOT met** (0/3; two mirror-fidelity
+  kills over real signals + one noise-floor kill). Systemic C2 lessons for
+  Cycle 3 (in the LEDGER): magnitude-relative gate-8 tolerances; two
+  Appendix-B extensions (hierarchical AR(1); periodic+self-exciting hybrid).
+  Grid + cycle log: [`expansion/LEDGER.md`](expansion/LEDGER.md). **NO
+  architecture was trained or evaluated.** Specs now: assumption_consequence
+  (SPEC), self_reference_echo (SPEC), hedging_drift (SPEC*, mirror pending),
+  backtracking (anchor). **Do not start Cycle 3 before review.**
 
 - **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under

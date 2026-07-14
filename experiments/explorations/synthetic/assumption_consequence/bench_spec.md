@@ -128,3 +128,37 @@ Pattern/window counts are derived quantities and never size `d_sae`.
 _Frozen 2026-07-14 by the runpod agent (expansion Cycle 1). The stage-6 grid
 must go through the canonical runner with a registered datasource plugin;
 nothing here has been run against any architecture._
+
+## Amendment 2026-07-14 — gate-7 re-examination RESOLVED: provisional → full SPEC
+
+The Cycle-1 review downgraded this spec to **provisional** (`SPEC*`): the
+original judge instruction contained a relational clause ("follows from prior
+statements" / "context tells you…") — soft leakage under the new no-leakage
+labeler gate. The Cycle-2 rider re-ran the full calibration under the record
+`assumption-consequence-g7` with a **strictly per-sentence** instruction (own
+connectives only) and **zero context sentences** (protocol frozen as a dated
+amendment on the prereg card before re-labeling).
+
+**Result — the signal survives and STRENGTHENS without any context leak:**
+
+| | Cycle-1 (contextual labeler) | g7 re-exam (strict, ctx=0) |
+|---|---|---|
+| directed asymmetry | 0.135 | **0.297** |
+| fwd / rev P(C@t+1 \| A@t) | 0.463 / 0.353 | 0.355 / 0.192 |
+| N1 / N2 hi bands | 0.019 / 0.024 | 0.052 / 0.056 |
+| noise-perturbed | 0.091 (ε̂ = 0.165) | 0.197 (ε̂ = 0.140) |
+| inter-judge κ | 0.517 | 0.533 |
+| gate-8 (selfmatch ACF(1)) | pass (recheck: err 0.014 ≤ 0.05) | **PASS (err 0.043 ≤ 0.05)** |
+| skeptic | 5/5 clear | **5/5 clear (fresh pass)** |
+
+The Cycle-1 leakage concern is resolved: the contextual clause was *diluting*
+the asymmetry (the strict labeler marks fewer, crisper A/C sentences —
+marginal A 6.6% / C 29.4% — and the directed structure more than doubles).
+
+**Canonical mirror is now the g7 fit** —
+[`mirror_params_g7.json`](mirror_params_g7.json) (3-state Markov,
+`P[A→C] = 0.363` vs unconditional C rate 0.294, fit on 207 strict-labeled
+train traces, held-out validated, gate-8 PASS). The Cycle-1 fit
+(`mirror_params.json`) is retained for provenance only. Layer-1 of § 2 should
+be read with the g7 transition matrix; everything else in this spec is
+unchanged. Status: **full SPEC** (LEDGER updated accordingly).

@@ -2,7 +2,7 @@
 
 **Verdict: ABORT** (pre-skeptic PROCEED, killed by skeptic on ['b_leakage'])
 
-Cycle-1 calibration per the frozen [prereg card](../../prereg/question-answer-adjacency.md); domain `text-corpus`, 399 documents / 36714 labeled sentences (doc coverage 0.998).
+Calibration per the frozen [prereg card](../../prereg/question-answer-adjacency.md); domain `text-corpus`, 399 documents / 36714 labeled sentences (doc coverage 0.998).
 
 ## 1. Labeler + noise floor
 
@@ -25,10 +25,10 @@ Marginal ['0.766', '0.065', '0.169']; Markov order-1 vs 0 p = 0.00e+00.
 
 ## 3. Gate (preregistered) + verdict
 
-Primary statistic `asym`: real **0.3418**, after ε̂-noise perturbation **0.3281**; N1 97.5% band hi 0.0417, N2 hi 0.0558.
+Primary statistic `asym` (expected sign +): real **0.3418**, after ε̂-noise perturbation **0.3281**; N1 97.5% band hi 0.0417, N2 hi 0.0558.
 
 - clears sampling noise (real > N1 hi AND N2 hi): **True**
-- survives labeler noise floor (perturbed > both): **True**
+- survives labeler noise floor (perturbed likewise): **True**
 - labeler adequate (κ ≥ 0.3): **True**
 - split-half stability: 0.3248 / 0.3554
 

@@ -2,7 +2,7 @@
 
 **Verdict: PROCEED**
 
-Cycle-1 calibration per the frozen [prereg card](../../prereg/uncertainty-hedging-drift.md); domain `reasoning-trace`, 300 documents / 25528 labeled sentences (doc coverage 1.000).
+Calibration per the frozen [prereg card](../../prereg/uncertainty-hedging-drift.md); domain `reasoning-trace`, 300 documents / 25528 labeled sentences (doc coverage 1.000).
 
 ## 1. Labeler + noise floor
 
@@ -19,10 +19,10 @@ Cycle-1 calibration per the frozen [prereg card](../../prereg/uncertainty-hedgin
 
 ## 3. Gate (preregistered) + verdict
 
-Primary statistic `acf[lag1]`: real **0.3163**, after ε̂-noise perturbation **0.2554**; N1 97.5% band hi 0.0777, N2 hi 0.0303.
+Primary statistic `acf[lag1]` (expected sign +): real **0.3163**, after ε̂-noise perturbation **0.2554**; N1 97.5% band hi 0.0777, N2 hi 0.0303.
 
 - clears sampling noise (real > N1 hi AND N2 hi): **True**
-- survives labeler noise floor (perturbed > both): **True**
+- survives labeler noise floor (perturbed likewise): **True**
 - labeler adequate (κ ≥ 0.3): **True**
 - split-half stability: 0.3191 / 0.3132
 

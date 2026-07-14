@@ -2,7 +2,7 @@
 
 **Verdict: PROCEED**
 
-Cycle-1 calibration per the frozen [prereg card](../../prereg/assumption-then-consequence.md); domain `reasoning-trace`, 300 documents / 25528 labeled sentences (doc coverage 1.000).
+Calibration per the frozen [prereg card](../../prereg/assumption-then-consequence.md); domain `reasoning-trace`, 300 documents / 25528 labeled sentences (doc coverage 1.000).
 
 ## 1. Labeler + noise floor
 
@@ -25,10 +25,10 @@ Marginal ['0.383', '0.141', '0.476']; Markov order-1 vs 0 p = 0.00e+00.
 
 ## 3. Gate (preregistered) + verdict
 
-Primary statistic `asym`: real **0.1351**, after ε̂-noise perturbation **0.0907**; N1 97.5% band hi 0.0188, N2 hi 0.0237.
+Primary statistic `asym` (expected sign +): real **0.1351**, after ε̂-noise perturbation **0.0907**; N1 97.5% band hi 0.0188, N2 hi 0.0237.
 
 - clears sampling noise (real > N1 hi AND N2 hi): **True**
-- survives labeler noise floor (perturbed > both): **True**
+- survives labeler noise floor (perturbed likewise): **True**
 - labeler adequate (κ ≥ 0.3): **True**
 - split-half stability: 0.1095 / 0.1600
 

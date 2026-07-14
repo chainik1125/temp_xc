@@ -117,3 +117,32 @@ x_i = c_i · m · u_conf  +  Σ_{j ∈ content_i} m_j · u_j  +  σ · ε_i
 _Frozen 2026-07-14 by the runpod agent (expansion Cycle 1). The stage-6 grid
 must go through the canonical runner with a registered datasource plugin;
 nothing here has been run against any architecture._
+
+## Amendment 2026-07-14 — mirror INVALID under gate 8 (Cycle-2 rider; spec provisional)
+
+The Cycle-1 review's **non-fitted-moment mirror gate** (guardrail 8), applied
+retroactively with preregistered moment + tolerance (ACF(2), ±0.05 abs —
+`expansion/gate8_recheck_c1.py`), **fails the fitted ar1+trend mirror**:
+held-out ACF(2) real **0.155** vs synthetic **0.085** (|err| 0.071). The one
+preregistered menu-upgrade attempt (`semi_markov`, Appendix-B "heavy-tailed
+dwell" row — `expansion/mirror_upgrade_hedging.py`) reproduces ACF(1)
+exactly (0.317/0.319) but **also fails ACF(2)** (0.149/0.079).
+
+**Diagnosis (the informative part):** the real confidence stream's held-out
+ACF is a **plateau**, not a decay — [0.32, 0.15, 0.13, 0.13, 0.12, 0.14,
+0.14, 0.15] over lags 1–8. On top of the fast lag-1 persistence there is a
+long-memory component: per-trace confidence *levels* differ (composition,
+≈ the N1 band 0.067) **plus** genuine slow within-trace drift (≈ another
+0.07). No current Appendix-B process generates either a per-sequence random
+level or a slow regime — every menu mirror collapses geometrically by lag 2–3.
+
+**Consequences:**
+- The **measurement verdict (TEMPORAL, DC-slow-drift) is unaffected** — it
+  gates on real-vs-null, not on any mirror.
+- This spec is **provisional (`SPEC*`): not runnable at stage 6** until a
+  mirror passes gate 8. Proposed Cycle-3 menu extension (justification
+  above): **hierarchical AR(1)** — per-sequence level `μ_j ~ N(μ, τ²)` +
+  linear trend + AR(1) residual; the plateau is then ≈ τ²/(τ² + var), which
+  this family can match while keeping ρ for lag-1.
+- Recorded in `expansion/results/gate8_recheck_cycle1.json` and
+  `expansion/results/mirror_upgrade_hedging.json`.

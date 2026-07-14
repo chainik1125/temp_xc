@@ -18,9 +18,11 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 
 ROWS = {
-    "binary": [("ACF(1)", "acf", 0), ("Fano", "fano", None),
+    "binary": [("ACF(1)", "acf", 0), ("MI(1) (nats)", "mi", 0),
+               ("Fano", "fano", None),
                ("excite ratio P(1|1)/base", "excite_ratio", None),
-               ("inter-event gap CV", "gap_cv", None)],
+               ("inter-event gap CV", "gap_cv", None),
+               ("spectral peak prominence", "spec_peak", None)],
     "categorical": [("directed asymmetry (fwd−rev)/(fwd+rev)", "asym", None),
                     ("P(dst @ t+1 | src @ t) forward", "fwd_rate", None),
                     ("same, time-reversed", "rev_rate", None),
@@ -52,14 +54,17 @@ def render_one(name: str) -> Path:
     kind = s["kind"]
     verdict = gate["verdict"]
 
+    card_name = cfg.get("base_card") or name
     lines = [
         f"# Calibration record — `{name}`",
         "",
         f"**Verdict: {verdict}**"
         + (f" (pre-skeptic PROCEED, killed by skeptic on {gate['killed_by_skeptic']})"
-           if gate.get("killed_by_skeptic") else ""),
+           if gate.get("killed_by_skeptic") else "")
+        + (" (numeric gate passed; **mirror failed its preregistered gate-8 "
+           "moment** — see § 4)" if gate.get("gate8_fail") else ""),
         "",
-        f"Cycle-1 calibration per the frozen [prereg card](../../prereg/{name}.md); "
+        f"Calibration per the frozen [prereg card](../../prereg/{card_name}.md); "
         f"domain `{cfg['domain']}`, {s['n_seqs']} documents / {s['n_spans']} labeled "
         f"sentences (doc coverage {blob['coverage']['doc_coverage']:.3f}).",
         "",
@@ -102,14 +107,21 @@ def render_one(name: str) -> Path:
                      f"p = {s['markov']['p_order1_vs_0']:.2e}.")
 
     st = gate["stability"]
+    sign = gate.get("sign", "+")
+    side = ("> N1 hi AND N2 hi" if sign == "+"
+            else "< N1 lo AND N2 lo (preregistered NEGATIVE effect)")
+    band = (f"N1 97.5% band hi {gate['N1_hi']:.4f}, N2 hi {gate['N2_hi']:.4f}"
+            if sign == "+" else
+            f"N1 2.5% band lo {gate.get('N1_lo', float('nan')):.4f}, "
+            f"N2 lo {gate.get('N2_lo', float('nan')):.4f}")
     lines += [
         "", "## 3. Gate (preregistered) + verdict", "",
-        f"Primary statistic `{gate['primary_stat']}`: real **{gate['real']:.4f}**, "
-        f"after ε̂-noise perturbation **{gate['noise_perturbed']:.4f}**; "
-        f"N1 97.5% band hi {gate['N1_hi']:.4f}, N2 hi {gate['N2_hi']:.4f}.",
+        f"Primary statistic `{gate['primary_stat']}` (expected sign {sign}): real "
+        f"**{gate['real']:.4f}**, after ε̂-noise perturbation "
+        f"**{gate['noise_perturbed']:.4f}**; {band}.",
         "",
-        f"- clears sampling noise (real > N1 hi AND N2 hi): **{gate['clears_sampling']}**",
-        f"- survives labeler noise floor (perturbed > both): **{gate['clears_noise']}**",
+        f"- clears sampling noise (real {side}): **{gate['clears_sampling']}**",
+        f"- survives labeler noise floor (perturbed likewise): **{gate['clears_noise']}**",
         f"- labeler adequate (κ ≥ {gate['kappa_floor']}): **{gate['labeler_ok']}**",
         f"- split-half stability: {st['half1']:.4f} / {st['half2']:.4f}",
         "",
@@ -135,6 +147,13 @@ def render_one(name: str) -> Path:
             lines.append(f"| asym (directed) | {_fmt(rd['asym'])} | {_fmt(sd['asym'])} |")
         errs = ", ".join(f"{k} {v:.3f}" for k, v in mv["abs_err"].items())
         lines.append(f"\nAbs errors: {errs}.")
+        if m.get("gate8"):
+            g8 = m["gate8"]
+            lines.append(
+                f"\n**Gate 8 (preregistered non-fitted moment)** — `{g8['moment']}`: "
+                f"held-out real {g8['real_heldout']:.4f} vs synthetic "
+                f"{g8['synthetic']:.4f}, |err| {g8['abs_err']:.4f} vs tolerance "
+                f"±{g8['tol_abs']} → **{'PASS' if g8['pass'] else 'FAIL — mirror invalid ⇒ ABORT'}**.")
 
     if blob.get("skeptic"):
         lines += ["", "## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)", "",

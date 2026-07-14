@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-14",
+  "note": "retroactive gate-8 check from stored held-out validations; moments+tolerances preregistered in gate8_recheck_c1.py before computation",
+  "checks": {
+    "assumption-then-consequence": {
+      "process": "markov",
+      "moment": "selfmatch_acf[lag1]",
+      "curve": "acf",
+      "idx": 0,
+      "tol_abs": 0.05,
+      "rationale": "MLE transition fit targets next-symbol counts, not the self-match autocorrelation curve",
+      "real_heldout": 0.411415740440607,
+      "synthetic": 0.3971927412365434,
+      "abs_err": 0.014222999204063613,
+      "passes": true
+    },
+    "uncertainty-hedging-drift": {
+      "process": "ar1+trend",
+      "moment": "acf[lag2]",
+      "curve": "acf",
+      "idx": 1,
+      "tol_abs": 0.05,
+      "rationale": "fit targets lag-1 residual persistence (rho) + trend; ACF(2) is the first non-fitted shape moment",
+      "real_heldout": 0.15507224580395929,
+      "synthetic": 0.08457168720382366,
+      "abs_err": 0.07050055860013563,
+      "passes": false
+    }
+  }
+}
