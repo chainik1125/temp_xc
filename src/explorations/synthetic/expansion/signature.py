@@ -251,6 +251,29 @@ def perturb_categorical(seqs, eps: float, rng):
     return out
 
 
+def spec_peak(seqs, w: int = 32) -> float:
+    """Periodogram peak prominence of the event indicator.
+
+    Mean power spectrum over non-overlapping ``w``-windows (per-window mean
+    removed, DC excluded), summarized as max/median over f>0 — ≈1 for a flat
+    (aperiodic) spectrum, ≫1 when a preferred period exists. The discriminator
+    the periodic-class cards preregister; every null battery bands it.
+    """
+    acc = None
+    n = 0
+    for s in seqs:
+        for start in range(0, s.size - w + 1, w):
+            x = s[start:start + w].astype(float)
+            x -= x.mean()
+            p = np.abs(np.fft.rfft(x))[1:] ** 2
+            acc = p if acc is None else acc + p
+            n += 1
+    if not n:
+        return float("nan")
+    p = acc / n
+    return float(p.max() / max(float(np.median(p)), 1e-12))
+
+
 def quantile_bin(seqs, nbins: int = 8):
     """Bin scalar streams into pooled-quantile symbols (for MI / Markov tests)."""
     pooled = np.concatenate([s for s in seqs]).astype(float)
@@ -321,9 +344,11 @@ def headline(seqs, kind: str, *, maxlag: int = DEFAULT_MAXLAG,
     """
     if kind == "binary":
         se = self_excitation(seqs)
-        return {"acf": acf(seqs, maxlag), "fano": fano(seqs, fano_w),
-                "p11": se["p11"], "excite_ratio": se["excite_ratio"],
-                "gap_cv": inter_event_cv(seqs)["cv"]}
+        return {"acf": acf(seqs, maxlag), "mi": mi_vs_lag(seqs, maxlag, 2),
+                "fano": fano(seqs, fano_w), "p11": se["p11"],
+                "excite_ratio": se["excite_ratio"],
+                "gap_cv": inter_event_cv(seqs)["cv"],
+                "spec_peak": spec_peak(seqs)}
     if kind == "categorical":
         pooled = np.concatenate([s for s in seqs])
         n_sym = int(pooled.max()) + 1

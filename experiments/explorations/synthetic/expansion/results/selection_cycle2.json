@@ -1,0 +1,13 @@
+{
+  "cycle": 2,
+  "rule": "deterministic per briefing: interaction/equality first, then frozen periodic/long-memory; floor 3/domain; tie-breaks in selection_cycle2.md",
+  "selected": [
+    "self-reference-echo",
+    "operator-alternation",
+    "computation-verification-alternation",
+    "greeting-signoff-mirror",
+    "list-item-parallelism",
+    "pronoun-referent-recurrence"
+  ],
+  "rider": "assumption-consequence-g7"
+}

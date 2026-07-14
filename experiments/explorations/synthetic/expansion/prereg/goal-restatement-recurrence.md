@@ -54,3 +54,8 @@ You label one sentence from a math/logic reasoning trace. Output 1 if the senten
 ---
 _Frozen-by: claude-opus-4-8 via `expansion.hypothesize` (runpod agent).
 Amendments (dated, transparent): none._
+
+
+## Amendment 2026-07-14 — gate-8 preregistration (Cycle-2 Stage 1, before any labeling of this candidate)
+
+Per the Cycle-1 review's **non-fitted-moment mirror gate** (README guardrail 8), added before calibration: the fitted mirror must also reproduce `acf` (lag 1) on held-out real vs synthetic draws within **±0.05 absolute** — semi_markov fits dwell distributions + jump chain, not the indicator ACF. Failing this gate ⇒ the mirror is invalid ⇒ ABORT (no skeptic pass can rescue it).

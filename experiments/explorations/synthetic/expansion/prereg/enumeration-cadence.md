@@ -54,3 +54,8 @@ You label one sentence from a web document. Output 1 if it is an ENUMERATION/STE
 ---
 _Frozen-by: claude-opus-4-8 via `expansion.hypothesize` (runpod agent).
 Amendments (dated, transparent): none._
+
+
+## Amendment 2026-07-14 — gate-8 preregistration (Cycle-2 Stage 1, before any labeling of this candidate)
+
+Per the Cycle-1 review's **non-fitted-moment mirror gate** (README guardrail 8), added before calibration: the fitted mirror must also reproduce `fano` on held-out real vs synthetic draws within **±0.3 absolute** — periodic_rate fits the cyclic rate profile (period + harmonics), not dispersion. Failing this gate ⇒ the mirror is invalid ⇒ ABORT (no skeptic pass can rescue it).

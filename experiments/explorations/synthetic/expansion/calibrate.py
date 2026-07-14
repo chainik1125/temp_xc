@@ -103,9 +103,86 @@ def _heur_quote(sents):
                      for s in sents], dtype=np.int8)
 
 
+# — Cycle-2 heuristics (verbatim from the frozen cards) —
+
+_GOAL = re.compile(r"\b(we (are|were) asked|the (problem|question) (asks|gives|states|wants)"
+                   r"|need to (find|compute|determine)|asked to (find|compute)"
+                   r"|find the (value|area|probability|number)|what is asked|the goal is)\b", re.I)
+_GIVEN = re.compile(r"\b(we are given|given that|the given|it is given)\b", re.I)
+
+
+def _heur_selfref(sents):
+    return np.array([1 if (_GOAL.search(s) or _GIVEN.search(s)) else 0
+                     for s in sents], dtype=np.int8)
+
+
+_OP = re.compile(r"\b(multiply|divide|add|subtract|expand|factor|substitute|simplify"
+                 r"|differentiate|integrate|square|combine)\b", re.I)
+_RESULT = re.compile(r"\b(therefore|so the|thus the|hence|the answer is|this means"
+                     r"|we (get|obtain|conclude)|equals?)\b", re.I)
+_ARITH = re.compile(r"[0-9]\s*[+\-*/=]\s*[0-9]")
+
+
+def _heur_opalt(sents):
+    out = []
+    for s in sents:
+        if _RESULT.search(s) and not _OP.search(s):
+            out.append(0)
+        elif _OP.search(s) or _ARITH.search(s):
+            out.append(1)
+        else:
+            out.append(0)
+    return np.array(out, dtype=np.int8)
+
+
+_ADDR = re.compile(r"\b(you|your|yourself)\b", re.I)
+_CTA = re.compile(r"\b(contact us|subscribe|sign up|click here|reach out|feel free"
+                  r"|thank you for|welcome to|follow us)\b", re.I)
+
+
+def _heur_address(sents):
+    return np.array([1 if (_CTA.search(s) or _ADDR.search(s)) else 0
+                     for s in sents], dtype=np.int8)
+
+
+_ENUM = re.compile(r"^\s*(\d+[.)]|[-*•]|first|second|third|fourth|next|then|finally|lastly)\b", re.I)
+_IMP = re.compile(r"^\s*[A-Z][a-z]+\s+(the|a|an|your|two|one|these)\b")
+
+
+def _heur_listitem(sents):
+    return np.array([1 if (_ENUM.match(s) or (_IMP.match(s) and len(s.split()) < 12)) else 0
+                     for s in sents], dtype=np.int8)
+
+
+_VERIF = re.compile(r"(check|verify|confirm|plug(ging)? back|substitute back|sanity"
+                    r"|make sure|does this (match|work)|let('?s| us) verify)", re.I)
+
+
+def _heur_verif(sents):
+    return np.array([1 if _VERIF.search(s) else 0 for s in sents], dtype=np.int8)
+
+
+_PRONOUN_START = re.compile(r"^\s*(he|she|it|they|this|that|these|those)\b", re.I)
+_PROPER = re.compile(r"(?<!^)(?<![.!?]\s)\b[A-Z][a-z]+(\s+[A-Z][a-z]+)+\b")
+
+
+def _heur_named(sents):
+    out = []
+    for s in sents:
+        named = (_PROPER.search(s) or re.match(r"^\s*[A-Z][a-z]+\s+[A-Z][a-z]+", s))
+        out.append(1 if (named and not _PRONOUN_START.match(s)) else 0)
+    return np.array(out, dtype=np.int8)
+
+
 # ── per-candidate calibration config (statistic kinds + primary gate stat) ──
 
+# Per-candidate config. Cycle-2 fields: `sign` ("+"/"-") — the preregistered
+# direction of the primary effect (negative = alternation, gated against the
+# null band's LO side); `ctx` — context sentences shown to the judge (0 for
+# gate-7 strict per-sentence cards); `gate8` — (moment, curve-idx, abs tol)
+# the mirror must reproduce held-out (fail ⇒ mirror invalid ⇒ ABORT).
 CFG = {
+    # — Cycle 1 —
     "uncertainty-hedging-drift": dict(
         domain="reasoning-trace", kind="scalar", pair=None,
         primary=("acf", 0), heuristic=_heur_hedging,
@@ -122,6 +199,46 @@ CFG = {
         domain="text-corpus", kind="binary", pair=None,
         primary=("acf", 0), heuristic=_heur_quote,
         mirror="logistic_ar", mirror_kw={"K": 8}, mirror_kind="binary"),
+    # — Cycle 2: new interaction/equality cards (gate-7: ctx=0) —
+    "self-reference-echo": dict(
+        domain="reasoning-trace", kind="binary", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_selfref,
+        mirror="logistic_ar", mirror_kw={"K": 8}, mirror_kind="binary",
+        gate8=("mi", 0, 0.015)),
+    "operator-alternation": dict(
+        domain="reasoning-trace", kind="binary", pair=None,
+        primary=("acf", 0), sign="-", ctx=0, heuristic=_heur_opalt,
+        mirror="markov", mirror_kw={}, mirror_kind="binary",
+        gate8=("dwell_cv", None, 0.12)),
+    "greeting-signoff-mirror": dict(
+        domain="text-corpus", kind="binary", pair=None,
+        primary=("mi", 0), sign="+", ctx=0, heuristic=_heur_address,
+        mirror="periodic_rate", mirror_kw={}, mirror_kind="binary",
+        gate8=("mi", 0, 0.02)),
+    "list-item-parallelism": dict(
+        domain="text-corpus", kind="binary", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_listitem,
+        mirror="logistic_ar", mirror_kw={"K": 8}, mirror_kind="binary",
+        gate8=("fano", None, 0.15)),
+    # — Cycle 2: frozen Cycle-1 cards (kept at ctx=3, their frozen convention;
+    #   gate8 from the dated amendments) —
+    "computation-verification-alternation": dict(
+        domain="reasoning-trace", kind="binary", pair=None,
+        primary=("spec_peak", None), sign="+", ctx=3, heuristic=_heur_verif,
+        mirror="periodic_rate", mirror_kw={}, mirror_kind="binary",
+        gate8=("fano", None, 0.30)),
+    "pronoun-referent-recurrence": dict(
+        domain="text-corpus", kind="binary", pair=None,
+        primary=("gap_cv", None), sign="+", ctx=3, heuristic=_heur_named,
+        mirror="semi_markov", mirror_kw={}, mirror_kind="categorical",
+        gate8=("acf", 0, 0.05)),
+    # — Cycle 2 rider: the gate-7 re-exam (strict per-sentence relabel of the
+    #   provisional SPEC*; judge instruction from the dated card amendment) —
+    "assumption-consequence-g7": dict(
+        domain="reasoning-trace", kind="categorical", pair=(1, 2),
+        primary=("asym", None), sign="+", ctx=0, heuristic=_heur_assumption,
+        mirror="markov", mirror_kw={}, mirror_kind="categorical",
+        gate8=("acf", 0, 0.05), base_card="assumption-then-consequence"),
 }
 
 
@@ -129,6 +246,27 @@ def load_domain(domain: str):
     if domain == "reasoning-trace":
         return load_reasoning_traces(REPO / "results/c7_backtracking/stage_a")
     return json.loads((HERE / "data/fineweb_sample.json").read_text())
+
+
+def _moment(seqs, moment: str, idx, kind: str) -> float:
+    """Evaluate a gate-8 moment on raw sequences (independent of headline)."""
+    if moment == "acf":
+        v = sig.selfmatch_acf(seqs) if kind == "categorical" else sig.acf(seqs)
+        return float(v[idx or 0])
+    if moment == "mi":
+        if kind == "scalar":
+            return float(sig.mi_vs_lag(sig.quantile_bin(seqs), 12, 8)[idx or 0])
+        n_sym = int(max(int(np.concatenate(seqs).max()) + 1, 2))
+        return float(sig.mi_vs_lag(seqs, 12, n_sym)[idx or 0])
+    if moment == "fano":
+        return float(sig.fano(seqs))
+    if moment == "gap_cv":
+        return float(sig.inter_event_cv(seqs)["cv"])
+    if moment == "dwell_cv":
+        return float(sig.dwell_stats(seqs)["cv"])
+    if moment == "spec_peak":
+        return float(sig.spec_peak(seqs))
+    raise ValueError(f"unknown gate-8 moment {moment!r}")
 
 
 def primary_value(h: dict, primary) -> float:
@@ -187,10 +325,24 @@ def skeptic_pass(judge: Judge, name: str, card_md: str, summary: dict) -> dict:
 
 # ── main per-candidate pipeline ────────────────────────────────────────────
 
+def load_candidate(name: str, cfg: dict) -> dict:
+    """Look up the frozen card across cycle registries (+ g7-re-exam override)."""
+    pool = json.loads((HERE / "results/candidates.json").read_text())["candidates"]
+    c2 = HERE / "results/candidates_cycle2.json"
+    if c2.exists():
+        pool += json.loads(c2.read_text())["candidates"]
+    lookup = cfg.get("base_card", name)
+    cand = dict(next(c for c in pool if c["name"] == lookup))
+    if name == "assumption-consequence-g7":
+        amend = json.loads((HERE / "results/amendments_cycle2.json").read_text())["g7_reexam"]
+        cand["judge_instruction"] = amend["judge_instruction"]
+        cand["name"] = name
+    return cand
+
+
 def run(name: str):
     cfg = CFG[name]
-    card = json.loads((HERE / "results/candidates.json").read_text())
-    cand = next(c for c in card["candidates"] if c["name"] == name)
+    cand = load_candidate(name, cfg)
     spec = {"name": name, "kind": cand["label_kind"], "n_values": cand["n_values"],
             "judge_instruction": cand["judge_instruction"]}
     out_dir = HERE / "records" / name
@@ -215,7 +367,8 @@ def run(name: str):
         print(f"[{name}] labels loaded from cache ({coverage['doc_coverage']:.3f} coverage)")
     else:
         seqs, coverage = lab.label_stream(judge, docs, spec, role="bulk",
-                                          chunk=50, ctx=3, workers=8, tag=f"bulk:{name}")
+                                          chunk=50, ctx=cfg.get("ctx", 3),
+                                          workers=8, tag=f"bulk:{name}")
         labels_path.write_text(json.dumps(
             {"doc_ids": doc_ids, "coverage": coverage,
              "labels": [s.tolist() if s is not None else None for s in seqs]}))
@@ -228,6 +381,7 @@ def run(name: str):
     else:
         inter = lab.validate_interjudge(judge, docs, seqs, spec,
                                         sample_docs=INTERJUDGE_DOCS, seed=SEED,
+                                        ctx=cfg.get("ctx", 3),
                                         tag=f"interjudge:{name}")
         heur = [cfg["heuristic"](d) for d in docs]
         xc = (lab.crosscheck_binary(seqs, heur) if cand["label_kind"] == "binary"
@@ -270,17 +424,28 @@ def run(name: str):
     real_p = primary_value(stats["real"], cfg["primary"])
     n1_hi = band_value(stats["nulls"]["N1_permute"], cfg["primary"], "hi")
     n2_hi = band_value(stats["nulls"]["N2_trend"], cfg["primary"], "hi")
+    n1_lo = band_value(stats["nulls"]["N1_permute"], cfg["primary"], "lo")
+    n2_lo = band_value(stats["nulls"]["N2_trend"], cfg["primary"], "lo")
     pert_p = primary_value(pert_h, cfg["primary"])
+
+    sign = cfg.get("sign", "+")
+    if sign == "+":
+        clears_sampling = real_p > n1_hi and real_p > n2_hi
+        clears_noise = pert_p > n1_hi and pert_p > n2_hi
+    else:  # preregistered NEGATIVE effect (alternation): beat the LO side
+        clears_sampling = real_p < n1_lo and real_p < n2_lo
+        clears_noise = pert_p < n1_lo and pert_p < n2_lo
 
     gate = {
         "primary_stat": f"{cfg['primary'][0]}"
                         + (f"[lag{cfg['primary'][1] + 1}]" if cfg["primary"][1] is not None else ""),
+        "sign": sign,
         "real": real_p, "noise_perturbed": pert_p,
-        "N1_hi": n1_hi, "N2_hi": n2_hi,
+        "N1_hi": n1_hi, "N2_hi": n2_hi, "N1_lo": n1_lo, "N2_lo": n2_lo,
         "labeler_kappa": kappa, "kappa_floor": KAPPA_FLOOR,
         "noise_floor_eps": eps, "stability": stability,
-        "clears_sampling": bool(real_p > n1_hi and real_p > n2_hi),
-        "clears_noise": bool(pert_p > n1_hi and pert_p > n2_hi),
+        "clears_sampling": bool(clears_sampling),
+        "clears_noise": bool(clears_noise),
         "labeler_ok": bool(kappa >= KAPPA_FLOOR),
     }
     verdict = "PROCEED" if all(
@@ -318,25 +483,51 @@ def run(name: str):
                        "validation": mv}
         print(f"[{name}] mirror fit+validated (n_train={len(train)})")
 
-        if prev_skeptic is not None:
-            skeptic = dict(prev_skeptic, reused_from_prior_run=True)
-            print(f"[{name}] skeptic verdict reused from prior run (never re-rolled)")
-        else:
-            card_md = (HERE / "prereg" / f"{name}.md").read_text()
-            summary = {"gate": gate, "labeler_validation": val,
-                       "null_bands_primary": {
-                           k: {w: band_value(stats["nulls"][k], cfg["primary"], w)
-                               for w in ("mean", "lo", "hi")} for k in stats["nulls"]},
-                       "mirror": mirror_blob, "coverage": coverage}
-            skeptic = skeptic_pass(judge, name, card_md, summary)
-        kills = [k for k, v in skeptic.items()
-                 if isinstance(v, dict) and v.get("kill")]
-        if kills:
-            verdict = "ABORT"
-            gate["killed_by_skeptic"] = kills
-            print(f"[{name}] SKEPTIC KILLED: {kills}")
-        else:
-            print(f"[{name}] skeptic pass: survived all 5 items")
+        # gate 8 (preregistered): the mirror must reproduce its named
+        # NON-FITTED moment on held-out real vs synthetic within tolerance.
+        if cfg.get("gate8"):
+            moment, midx, tol = cfg["gate8"]
+            syn_cat = [np.asarray(s, dtype=np.int8) for s in syn] \
+                if cfg["kind"] != "scalar" else syn
+            ev_cat = [np.asarray(s, dtype=np.int8) for s in ev] \
+                if cfg["kind"] != "scalar" else ev
+            rv = _moment(ev_cat, moment, midx, cfg["kind"])
+            sv = _moment(syn_cat, moment, midx, cfg["kind"])
+            g8 = {"moment": moment + (f"[lag{midx + 1}]" if midx is not None else ""),
+                  "real_heldout": rv, "synthetic": sv,
+                  "abs_err": abs(rv - sv), "tol_abs": tol,
+                  "pass": bool(abs(rv - sv) <= tol)}
+            mirror_blob["gate8"] = g8
+            print(f"[{name}] gate8 {g8['moment']}: real={rv:.4f} syn={sv:.4f} "
+                  f"|err|={g8['abs_err']:.4f} tol={tol} -> "
+                  f"{'PASS' if g8['pass'] else 'FAIL'}")
+            if not g8["pass"]:
+                verdict = "ABORT"
+                gate["gate8_fail"] = True
+                gate["verdict"] = verdict
+                print(f"[{name}] MIRROR GATE-8 FAIL -> ABORT (skeptic skipped)")
+
+        if verdict == "PROCEED":  # gate 8 may already have demoted it
+            if prev_skeptic is not None:
+                skeptic = dict(prev_skeptic, reused_from_prior_run=True)
+                print(f"[{name}] skeptic verdict reused from prior run (never re-rolled)")
+            else:
+                card_name = cfg.get("base_card", name)
+                card_md = (HERE / "prereg" / f"{card_name}.md").read_text()
+                summary = {"gate": gate, "labeler_validation": val,
+                           "null_bands_primary": {
+                               k: {w: band_value(stats["nulls"][k], cfg["primary"], w)
+                                   for w in ("mean", "lo", "hi")} for k in stats["nulls"]},
+                           "mirror": mirror_blob, "coverage": coverage}
+                skeptic = skeptic_pass(judge, name, card_md, summary)
+            kills = [k for k, v in skeptic.items()
+                     if isinstance(v, dict) and v.get("kill")]
+            if kills:
+                verdict = "ABORT"
+                gate["killed_by_skeptic"] = kills
+                print(f"[{name}] SKEPTIC KILLED: {kills}")
+            else:
+                print(f"[{name}] skeptic pass: survived all 5 items")
 
     gate["verdict"] = verdict
 

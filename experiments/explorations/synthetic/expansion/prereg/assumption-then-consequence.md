@@ -54,3 +54,18 @@ You label one sentence in a reasoning trace. 0 = neither. 1 = ASSUMPTION/CASE: i
 ---
 _Frozen-by: claude-opus-4-8 via `expansion.hypothesize` (runpod agent).
 Amendments (dated, transparent): none._
+
+
+## Amendment 2026-07-14 — gate-7 re-examination (Cycle-2 rider, before re-labeling)
+
+The Cycle-1 review downgraded this card's verdict to **SPEC* provisional**: the original judge instruction contains a relational clause ("derives a result that FOLLOWS from prior statements" / "context tells you whether it opens a premise or discharges one") — soft leakage under the new **no-leakage labeler gate** (README guardrail 7). Re-examination protocol, frozen before any re-labeling:
+
+- Re-label ALL 300 traces under the record name `assumption-consequence-g7` with the STRICTLY per-sentence instruction below, and **zero context sentences** (ctx=0) in the chunking.
+- Same statistic, same nulls, same gate as the frozen card; mirror gate-8 moment preregistered as self-match `acf` (lag 1) within **±0.05 absolute**.
+- Directed asymmetry **survives** the gate ⇒ upgrade `SPEC*`→`SPEC`; **collapses** ⇒ the Cycle-1 signal was labeler leakage ⇒ `ABORT` (either outcome is a success — prime directive).
+
+Frozen re-exam judge instruction:
+
+```
+You label one sentence from a math/logic reasoning trace. Judge ONLY from the sentence's own wording — do NOT use any surrounding context. 0 = neither. 1 = ASSUMPTION/CASE: the sentence itself introduces a supposition, case split, or premise with its own marker ('suppose', 'assume', 'let', 'if', 'consider the case', 'WLOG'). 2 = CONSEQUENCE: the sentence itself asserts a derived result with its own inference marker ('then', 'therefore', 'thus', 'hence', 'it follows', 'this implies', 'so'). Examples: 'Suppose x is even.' -> 1. 'Consider the case where n=0.' -> 1. 'Then x squared is also even.' -> 2. 'It follows that the sum is divisible by 4.' -> 2. 'The problem gives three numbers.' -> 0. If both marker types appear, label by the sentence's MAIN clause.
+```

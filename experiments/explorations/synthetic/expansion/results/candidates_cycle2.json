@@ -1,0 +1,147 @@
+{
+  "frozen": "2026-07-14",
+  "generator": "claude-opus-4-8",
+  "cycle": 2,
+  "candidates": [
+    {
+      "name": "self-reference-echo",
+      "domain": "reasoning-trace",
+      "temporal_class": "interaction/equality",
+      "property": "Sentences that quote/restate the ORIGINAL problem statement recur at a characteristic lag, producing echo peaks in self-match ACF",
+      "why_not_covered": "interaction/equality row empty for reasoning-trace; echo-at-lag is a match structure never probed",
+      "hypothesis_character": "Problem-referencing sentences ('we need to find x', 'the question asks for the area') are not iid: a trace re-anchors to the problem after excursions, so label=1 positions echo each other at a lag rather than clustering. The cross-position signature is a positive self-match ACF that survives permutation only because re-anchoring is order-locked to sub-goal completion. This is a MATCH pattern (same referent class recurring) not mere persistence.",
+      "abort_condition": "self-match ACF(1) indistinguishable from N1 permutation (echo is just marginal rate, no lag structure)",
+      "label_signal": "sentence explicitly refers back to the given problem/question/goal (restates what is asked or the given quantities)",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label ONE sentence using ONLY its own wording \u2014 you get NO surrounding context and must not guess what came before. Output 1 if the sentence explicitly refers to the problem being solved: it restates what is asked, names the given quantities, or points to the goal ('we need to find the value of x', 'the problem gives us three coins', 'so the question is asking for the total area'). Output 0 otherwise: pure calculation ('3+4=7'), commentary ('this seems tricky'), or a step that does not name the problem/goal. Examples: 'We are asked to compute the probability that both dice show even.' -> 1. 'Multiplying gives 42.' -> 0. 'So I need to figure out the remainder when divided by 7.' -> 1. Answer with only 0 or 1.",
+      "heuristic_crosscheck": "import re\nGOAL = re.compile(r'\\b(we (are|were) asked|the (problem|question) (asks|gives|states|wants)|need to (find|compute|determine)|asked to (find|compute)|find the (value|area|probability|number)|what is asked|the goal is)\\b', re.I)\nGIVEN = re.compile(r'\\b(we are given|given that|the given|it is given)\\b', re.I)\ndef label(s):\n    if GOAL.search(s) or GIVEN.search(s):\n        return 1\n    return 0\n# base rate expected ~10-25% of reasoning sentences",
+      "composition_risk": "medium \u2014 re-anchoring rate varies by problem length, but echo-lag structure is order-only",
+      "primary_statistic": "acf1",
+      "primary_sign": "positive",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "acf1",
+        "mi1"
+      ],
+      "expected_signature": "positive self-match ACF at short lag beats N1/N2; N3 flat; N1 destroys the echo (keeps rate)",
+      "chance_oracle": "chance = marginal base rate; oracle = 1.0 given the sentence",
+      "arch_predictions": {
+        "per_token_sae": "can fire a problem-reference feature per token but cannot expose the echo-lag comparison",
+        "window_families": "window models see the lag echo if window >= typical re-anchoring gap"
+      },
+      "mirror_process": "logistic_ar",
+      "mirror_matched": "baseline rate + self-excitation coefficient at lag 1",
+      "mirror_not_matched": "multi-lag echo peak / mi at lag 2-4",
+      "gate8_moment": "mi",
+      "gate8_idx": 0,
+      "gate8_tol_abs": 0.015,
+      "gate8_rationale": "logistic_ar is fit to lag-1 self-excitation; the lag-1 MI is not directly a fitted parameter and tests whether the mirror reproduces dependence strength beyond the ACF it targets"
+    },
+    {
+      "name": "operator-alternation",
+      "domain": "reasoning-trace",
+      "temporal_class": "interaction/equality",
+      "property": "Sentences performing arithmetic/algebraic manipulation ALTERNATE with sentences asserting a result, producing negative self-match ACF (anti-match)",
+      "why_not_covered": "interaction/equality empty; alternation (negative acf1) as a cross-position pattern never tested in reasoning traces",
+      "hypothesis_character": "Manipulation steps and result-assertions do not run in long blocks; a compute step tends to be followed by a 'so we get' assertion, then another compute \u2014 an alternation rather than persistence. The cross-position signature is NEGATIVE self-match ACF (anti-match): label_t predicts label_{t+1} to DIFFER. This is a genuine cross-position comparison distinct from bursty persistence and cannot be reduced to marginal rate.",
+      "abort_condition": "self-match ACF(1) >= 0 or indistinguishable from N1 (no alternation; blocks or random)",
+      "label_signal": "sentence performs an explicit symbolic manipulation (an equation being transformed / a computation carried out) rather than stating a conclusion",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label ONE sentence from its own wording ONLY, with no context. Output 1 if the sentence is carrying out a computation or algebraic manipulation \u2014 it shows an operation in progress or an intermediate transform ('multiply both sides by 2', '3 times 4 is 12', 'expanding gives x^2 + 2x'). Output 0 if it instead ASSERTS a conclusion or result ('therefore the answer is 12', 'so x equals 5', 'this means the set is empty') or is non-mathematical prose. Judge by the sentence's grammatical function: doing-the-work vs stating-the-outcome. Examples: 'Adding these two equations eliminates y.' -> 1. 'So the final total is 30.' -> 0. 'Now factor the quadratic.' -> 1. Answer with only 0 or 1.",
+      "heuristic_crosscheck": "import re\nOP = re.compile(r'\\b(multiply|divide|add|subtract|expand|factor|substitute|simplify|differentiate|integrate|square|combine)\\b', re.I)\nRESULT = re.compile(r'\\b(therefore|so the|thus the|hence|the answer is|this means|we (get|obtain|conclude)|equals?)\\b', re.I)\ndef label(s):\n    if RESULT.search(s) and not OP.search(s):\n        return 0\n    if OP.search(s) or re.search(r'[0-9]\\s*[+\\-*/=]\\s*[0-9]', s):\n        return 1\n    return 0",
+      "composition_risk": "low \u2014 alternation is intrinsically an order statistic, immune to per-doc rate composition",
+      "primary_statistic": "acf1",
+      "primary_sign": "negative",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "acf1",
+        "asym"
+      ],
+      "expected_signature": "negative self-match ACF beats N1 (which flattens to ~0); N2/N3 near zero; alternation is order-only",
+      "chance_oracle": "chance = base rate; oracle = 1.0 given sentence",
+      "arch_predictions": {
+        "per_token_sae": "fires compute vs result features but cannot represent the alternation coupling",
+        "window_families": "width-2 windows expose the anti-match; per-token cannot"
+      },
+      "mirror_process": "markov",
+      "mirror_matched": "2-state transition matrix (off-diagonal dominant)",
+      "mirror_not_matched": "dwell-time CV / run-length distribution",
+      "gate8_moment": "dwell_cv",
+      "gate8_idx": null,
+      "gate8_tol_abs": 0.12,
+      "gate8_rationale": "the 2-state Markov is fit to transition probabilities; the coefficient of variation of dwell (run) lengths is a derived quantity that tests whether real runs are more/less regular than geometric"
+    },
+    {
+      "name": "greeting-signoff-mirror",
+      "domain": "text-corpus",
+      "temporal_class": "interaction/equality",
+      "property": "Direct-address/second-person sentences recur symmetrically near document start and end, producing an echo/anti-symmetric match pattern in the label stream",
+      "why_not_covered": "interaction/equality empty for text-corpus; positional echo/mirroring of a discourse role never probed",
+      "hypothesis_character": "Web documents often open and close by addressing the reader ('welcome', 'if you have questions contact us'), so direct-address sentences are not positionally iid \u2014 they echo across the document, matching each other at long lag. The cross-position signature is elevated MI between distant same-role positions and a positive long-lag self-match beyond what marginal rate gives. This is a match/echo structure, distinct from any monotone drift.",
+      "abort_condition": "self-match MI at lag>1 indistinguishable from N2 (address sentences are position-conditional trend only, no genuine echo)",
+      "label_signal": "sentence directly addresses the reader in second person or issues a reader-directed call ('you', 'contact us', 'subscribe', imperative to reader)",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label ONE sentence from its OWN wording only, no context. Output 1 if the sentence directly addresses the reader: it uses 'you/your' referring to the reader, invites contact/subscription, or is a reader-directed call to action ('If you have any questions, feel free to reach out.', 'Subscribe to our newsletter for updates.', 'Thank you for visiting our site.'). Output 0 for ordinary informative/narrative prose that does not address the reader ('The bridge was completed in 1932.', 'Photosynthesis converts light into energy.'). Note: 'you' inside a general statement ('you cannot buy happiness' as a proverb) still counts as address -> 1. Answer with only 0 or 1.",
+      "heuristic_crosscheck": "import re\nADDR = re.compile(r'\\b(you|your|yourself)\\b', re.I)\nCTA = re.compile(r'\\b(contact us|subscribe|sign up|click here|reach out|feel free|thank you for|welcome to|follow us)\\b', re.I)\ndef label(s):\n    if CTA.search(s):\n        return 1\n    if ADDR.search(s):\n        return 1\n    return 0\n# expect base rate ~15-40%; cap check needed",
+      "composition_risk": "medium \u2014 address density varies by document genre; echo must beat N2 position-conditional",
+      "primary_statistic": "mi1",
+      "primary_sign": "positive",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "mi1",
+        "acf1"
+      ],
+      "expected_signature": "lag-1 and long-lag self-match MI beats N1 AND N2; N2 captures start/end trend so surviving MI is genuine echo, not position",
+      "chance_oracle": "chance = base rate; oracle = 1.0 given sentence",
+      "arch_predictions": {
+        "per_token_sae": "detects address feature per token, cannot compute cross-position MI",
+        "window_families": "only wide/global windows capture start-end echo"
+      },
+      "mirror_process": "periodic_rate",
+      "mirror_matched": "positional rate profile (start/end elevation)",
+      "mirror_not_matched": "lag-1 MI residual after positional detrend",
+      "gate8_moment": "mi",
+      "gate8_idx": 0,
+      "gate8_tol_abs": 0.02,
+      "gate8_rationale": "periodic_rate fits only the positional intensity profile; residual lag-1 MI after that profile is not a fitted parameter and tests genuine short-range coupling the positional model cannot produce"
+    },
+    {
+      "name": "list-item-parallelism",
+      "domain": "text-corpus",
+      "temporal_class": "interaction/equality",
+      "property": "List-item / parallel-structure sentences match each other in consecutive runs, producing positive self-match ACF from template-matching (same structural role adjacent)",
+      "why_not_covered": "interaction/equality empty for text-corpus; template-match runs (parallelism) as a cross-position signature never tested",
+      "hypothesis_character": "Enumerations and parallel constructions produce runs of sentences sharing the same structural template ('First... Second... Third...', bullet-like clauses). Consecutive same-role positions MATCH by structural template, giving positive lag-1 self-match ACF that permutation destroys. This is a match pattern grounded in structural equality between positions, distinct from periodic cadence (which is about spacing) and from bursty content excitation.",
+      "abort_condition": "self-match ACF(1) indistinguishable from N1 (list-items are marginally frequent but not run-clustered by order)",
+      "label_signal": "sentence is a list item or parallel-template unit (leading ordinal/enumerator, or a short parallel clause of the form the surrounding list uses) judged from its own form",
+      "label_kind": "binary",
+      "n_values": 2,
+      "judge_instruction": "You label ONE sentence from its OWN wording/form only \u2014 no context. Output 1 if the sentence looks like a list item or parallel enumerated unit: it begins with an ordinal or enumerator ('First,', 'Second,', 'Next,', 'Finally,'), a bullet/number marker, or is a short parallel-structured clause typical of a list ('- Fast shipping', 'Add two cups of flour.'). Output 0 for ordinary connected prose sentences that are not list-formatted ('The economy grew steadily over the decade.'). Judge on FORM, not meaning. Examples: 'First, preheat the oven to 350 degrees.' -> 1. 'This development changed the industry forever.' -> 0. 'Next, add the eggs one at a time.' -> 1. Answer with only 0 or 1.",
+      "heuristic_crosscheck": "import re\nENUM = re.compile(r'^\\s*(\\d+[.)]|[-*\u2022]|first|second|third|fourth|next|then|finally|lastly)\\b', re.I)\nIMP = re.compile(r'^\\s*[A-Z][a-z]+\\s+(the|a|an|your|two|one|these)\\b')\ndef label(s):\n    if ENUM.match(s):\n        return 1\n    if IMP.match(s) and len(s.split()) < 12:\n        return 1\n    return 0\n# expect base rate ~8-30%",
+      "composition_risk": "low \u2014 run-clustering of template matches is an order statistic; per-doc rate handled by N1",
+      "primary_statistic": "acf1",
+      "primary_sign": "positive",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "acf1",
+        "fano"
+      ],
+      "expected_signature": "positive self-match ACF and Fano>1 (clustered runs) beat N1/N2; N1 flattens ACF, exposes run structure",
+      "chance_oracle": "chance = base rate; oracle = 1.0 given sentence",
+      "arch_predictions": {
+        "per_token_sae": "fires list-item feature per token but cannot expose run-length coupling",
+        "window_families": "windows spanning a run capture the match-cluster; per-token cannot"
+      },
+      "mirror_process": "logistic_ar",
+      "mirror_matched": "baseline rate + lag-1 self-excitation",
+      "mirror_not_matched": "Fano factor / run-length overdispersion",
+      "gate8_moment": "fano",
+      "gate8_idx": null,
+      "gate8_tol_abs": 0.15,
+      "gate8_rationale": "logistic_ar fits lag-1 excitation only; the Fano factor of label counts in fixed windows is a derived overdispersion measure not directly fit, testing whether list runs cluster more than the lag-1 model predicts"
+    }
+  ]
+}

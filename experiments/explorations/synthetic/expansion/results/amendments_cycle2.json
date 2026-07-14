@@ -1,0 +1,40 @@
+{
+  "date": "2026-07-14",
+  "gate8": {
+    "computation-verification-alternation": {
+      "moment": "fano",
+      "idx": null,
+      "tol_abs": 0.3,
+      "rationale": "periodic_rate fits the cyclic rate profile (period + harmonics), not dispersion"
+    },
+    "enumeration-cadence": {
+      "moment": "fano",
+      "idx": null,
+      "tol_abs": 0.3,
+      "rationale": "periodic_rate fits the cyclic rate profile (period + harmonics), not dispersion"
+    },
+    "goal-restatement-recurrence": {
+      "moment": "acf",
+      "idx": 0,
+      "tol_abs": 0.05,
+      "rationale": "semi_markov fits dwell distributions + jump chain, not the indicator ACF"
+    },
+    "pronoun-referent-recurrence": {
+      "moment": "acf",
+      "idx": 0,
+      "tol_abs": 0.05,
+      "rationale": "semi_markov fits dwell distributions + jump chain, not the indicator ACF"
+    }
+  },
+  "g7_reexam": {
+    "name": "assumption-consequence-g7",
+    "base_card": "assumption-then-consequence",
+    "judge_instruction": "You label one sentence from a math/logic reasoning trace. Judge ONLY from the sentence's own wording \u2014 do NOT use any surrounding context. 0 = neither. 1 = ASSUMPTION/CASE: the sentence itself introduces a supposition, case split, or premise with its own marker ('suppose', 'assume', 'let', 'if', 'consider the case', 'WLOG'). 2 = CONSEQUENCE: the sentence itself asserts a derived result with its own inference marker ('then', 'therefore', 'thus', 'hence', 'it follows', 'this implies', 'so'). Examples: 'Suppose x is even.' -> 1. 'Consider the case where n=0.' -> 1. 'Then x squared is also even.' -> 2. 'It follows that the sum is divisible by 4.' -> 2. 'The problem gives three numbers.' -> 0. If both marker types appear, label by the sentence's MAIN clause.",
+    "ctx": 0,
+    "gate8": {
+      "moment": "acf",
+      "idx": 0,
+      "tol_abs": 0.05
+    }
+  }
+}
