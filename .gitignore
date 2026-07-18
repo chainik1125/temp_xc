@@ -49,3 +49,6 @@ hf_cache/
 
 # Mini-sweep logs
 logs/
+
+# Benchmark run logs (regenerable stdout; not results — keep out of git)
+experiments/**/results/*.log

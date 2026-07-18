@@ -47,6 +47,25 @@ temporal-class` coverage grid with a per-domain selection floor (≥⌊N/2⌋
 calibrated per domain per cycle) and an under-coverage bias (empty/abort-only
 cells outrank cells that already hold a PROCEED).
 
+**Measured-class re-filing (Cycle-2 lesson).** A candidate's ledger cell is its
+**measured** temporal class (from the calibration signature), *not* the class it
+was proposed under. If a candidate proposed for cell X measures as class Y,
+**re-file it to Y and leave X unfilled** — otherwise the anti-drift grid lies
+about coverage. (Cycle 2: `self-reference-echo`, proposed interaction/equality,
+measured pure self-excitation — `ACF`/`Fano`/`excite-ratio` + a `logistic_ar`
+mirror identical to backtracking's — so it re-filed to bursty/self-exciting and
+interaction/equality stayed empty.)
+
+**Grounding the interaction/equality class (gate-7-clean recipe).** Equality /
+interaction is *inherently* about a cross-position relationship, which collides
+with gate 7 (label from the span's own content, not its relation to neighbours) —
+so binary "does this refer back" labels keep measuring as self-excitation. The
+clean path mirrors how the synthetic **changepoint mode** works: use a
+**categorical per-sentence content label** (e.g. which sub-goal / operation /
+claim-topic the sentence is about — assignable from the sentence alone), then make
+the **equality-adjacency `[c_t = c_{t-1}]`** the *measured* statistic. The label
+stays per-sentence (gate-7-clean); the equality lives in the measured dynamics.
+
 ## The pipeline (one cycle)
 
 | stage | script | output |

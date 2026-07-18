@@ -39,9 +39,26 @@ Last updated: 2026-07-14.
   Cycle 3 (in the LEDGER): magnitude-relative gate-8 tolerances; two
   Appendix-B extensions (hierarchical AR(1); periodic+self-exciting hybrid).
   Grid + cycle log: [`expansion/LEDGER.md`](expansion/LEDGER.md). **NO
-  architecture was trained or evaluated.** Specs now: assumption_consequence
-  (SPEC), self_reference_echo (SPEC), hedging_drift (SPEC*, mirror pending),
-  backtracking (anchor). **Do not start Cycle 3 before review.**
+  architecture was trained or evaluated.**
+  **Reviewed + APPROVED-with-corrections (2026-07-18, mac-local):** gates verified
+  working — incl. gate-8 catching **hedging** (the C1-blessed spec, my miss); the
+  g7 upgrade is airtight (`ctx=0` labeler → signal *strengthened*, not leakage).
+  **Key correction — `self_reference_echo` re-filed interaction/equality →
+  bursty/self-exciting** (measured self-exciting: ACF/Fano/excite + `logistic_ar`
+  mirror = backtracking's process; redundant + marginal labeler κ=0.30), so
+  **interaction/equality is EMPTY again — still unclaimed** (the real prize: a
+  grounded changepoint-equality analogue). Systemic finds (now in README):
+  (i) the mirror menu is too short-memory for reasoning-trace ACF *plateaus*
+  (gate 8 killed hedging on it); (ii) interaction/equality needs a **categorical
+  per-sentence label + measured `[c_t=c_{t-1}]` adjacency** (gate-7-clean);
+  (iii) gate-8 tolerances must be *relative*. Specs now: **assumption_consequence**
+  (solid SPEC), **hedging_drift** (SPEC*, needs hierarchical-AR mirror),
+  **self_reference_echo** (SPEC*, redundant, low priority), backtracking (anchor).
+  **Cycle 3 queued** ([`briefings/grounded-benchmark-expansion-cycle3.md`](../../../briefings/grounded-benchmark-expansion-cycle3.md)):
+  interaction/equality via categorical labels + 2 re-freezes (list-item-parallelism,
+  computation-verification) + the hierarchical-AR + periodic-Hawkes mirror
+  extensions + relative gate-8 tolerances. Cycle-2 briefing retired; stray
+  frequency `*.log` purged + gitignored.
 
 - **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under

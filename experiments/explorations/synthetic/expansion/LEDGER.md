@@ -17,8 +17,8 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
 | **DC-slow-drift** (state persists, slow) | **`SPEC*` PROVISIONAL** — uncertainty-hedging-drift (measurement solid: ACF(1)=0.32, κ=0.64, skeptic 5/5; but **mirror INVALID under gate 8** — real ACF is a long-memory *plateau* (~0.13 to lag 8) that neither ar1+trend nor semi-Markov reproduces (both fail ACF(2) ±0.05); Cycle-3: hierarchical-AR(1) menu extension) | `calib:ABORT` — topic_switching (composition, labeler inadequate) · `prop` — hedge-to-assertion-drift (C1, unselected) |
 | **AC-order-sensitive** (depends on order) | **`SPEC`** — assumption-then-consequence (**g7 re-exam RESOLVED C2**: strict per-sentence labeler, ctx=0 → asym **0.297** (was 0.135), gate-8 PASS, fresh skeptic 5/5 → `synthetic/assumption_consequence/`, canonical mirror = g7 fit) | `calib:ABORT` — question-answer-adjacency (skeptic kill: definitional leakage) |
 | **periodic** (rhythmic/cyclic) | `calib:ABORT` — computation-verification-alternation (C2: spectral peak REAL, spec_peak 3.84 ≫ null 1.15, but **gate-8 mirror fail**: events also bursty, Fano 2.29 vs periodic_rate's 0.87; re-freeze candidate w/ periodic+self-exciting hybrid mirror) | `prop` — enumeration-cadence (C1, unselected) |
-| **bursty/self-exciting** (clustered events) | **`SPEC`** — backtracking (the hand-run anchor) · `prop` — error-correction-cascade (C1, unselected; cell PROCEEDed) | `calib:ABORT` — quotation-burst (C1 skeptic kill: circular mirror validation) |
-| **interaction/equality** (cross-position compare) | **`SPEC`** — self-reference-echo (C2: ACF(1)=0.31 ≫ nulls ≤0.07, gate-8 PASS on MI(1), skeptic 5/5 → `synthetic/self_reference_echo/`; ⚠ labeler marginal κ=0.30; ⚠ measured signature is run-clustering — class assignment loose, reviewer may relabel) · `calib:ABORT` — operator-alternation (preregistered NEGATIVE sign falsified: real +0.36 clustering, not alternation) | `calib:ABORT` ×2 — greeting-signoff-mirror (gate passed κ=0.67, but periodic_rate mirror produces zero MI(1) vs real 0.027 — mis-keyed mirror) · list-item-parallelism (strongest signal of C2, ACF(1)=0.52, κ=0.64, mirror NEAR-miss: Fano err 0.163 vs frozen tol 0.15 (4% relative) — **prime re-freeze candidate** with magnitude-scaled tolerance) |
+| **bursty/self-exciting** (clustered events) | **`SPEC`** — backtracking (the hand-run anchor) · **`SPEC*`** — self-reference-echo (**re-filed from interaction/equality, C2 review**: measured self-exciting — ACF 0.31, Fano 2.12, excite-ratio 2.46, `logistic_ar` mirror = backtracking's process; gate-8 PASS but **redundant with backtracking's dynamical class + marginal labeler κ=0.30 → low eval priority**) · `prop` — error-correction-cascade (C1, unselected; cell PROCEEDed) | `calib:ABORT` — quotation-burst (C1 skeptic kill: circular mirror validation) |
+| **interaction/equality** (cross-position compare) | **— still unfilled (top Cycle-3 target)** · `calib:ABORT` — operator-alternation (preregistered NEGATIVE sign falsified: real +0.36 clustering, not alternation) · *self-reference-echo **re-filed → bursty/self-exciting** (C2 review: measured self-exciting, not equality)* | `calib:ABORT` ×2 — greeting-signoff-mirror (gate passed κ=0.67, but periodic_rate mirror produces zero MI(1) vs real 0.027 — mis-keyed mirror) · list-item-parallelism (strongest signal of C2, ACF(1)=0.52, κ=0.64, mirror NEAR-miss: Fano err 0.163 vs frozen tol 0.15 (4% relative) — **prime re-freeze candidate** with magnitude-scaled tolerance) |
 | **long-memory** (renewal / heavy-tail) | `prop` — goal-restatement-recurrence (C1, unselected) | `calib:ABORT` — pronoun-referent-recurrence (C2: gap-CV 1.46 barely clears N1 1.21, dies at the noise floor — perturbed 1.08 falls back inside the band) |
 
 ## Notes / provenance
@@ -37,6 +37,19 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
   extension proposals for Cycle 3.
 - **The g7 re-exam vindicated the strict-labeler discipline**: removing the
   relational clause *strengthened* the assumption→consequence asymmetry 2.2×.
+- **C2 review (mac-local) — measured-class re-filing (new loop rule, README).** A
+  candidate's cell is its **measured** temporal class, not the proposed one.
+  `self-reference-echo` was *proposed* interaction/equality but *measured* pure
+  self-excitation (ACF/Fano/excite + `logistic_ar` mirror = backtracking's
+  process), so it re-files to **bursty/self-exciting** (redundant, marginal
+  labeler) and **interaction/equality is empty again — still the top target.**
+- **interaction/equality is structurally hard under gate 7** (equality is
+  inherently relational, gate 7 forbids relational labels). The gate-7-clean path
+  (README): a **categorical per-sentence content label** (sub-goal / operation /
+  claim-topic) whose **equality-adjacency `[c_t=c_{t-1}]`** is the *measured*
+  signature — exactly how the synthetic changepoint mode works. Two binary-label
+  attempts (self-reference-echo, operator-alternation) both measured as clustering
+  instead.
 - The abstract benches (signed_motion, frequency) are out of this ledger's scope.
 
 ## Cycle log
