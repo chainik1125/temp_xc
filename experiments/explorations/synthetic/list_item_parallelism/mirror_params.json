@@ -1,0 +1,32 @@
+{
+  "process": "logistic_ar",
+  "fit": "expansion/calibrate.py list-item-parallelism-r2 (C3)",
+  "n_train": 280,
+  "n_eval": 120,
+  "params": {
+    "process": "logistic_ar",
+    "K": 8,
+    "position": true,
+    "intercept": -3.0289349064438884,
+    "coef_position": 0.15502952839868064,
+    "kernel_w": [
+      1.9727836787189788,
+      1.0356383136567269,
+      0.41222815520184575,
+      0.40839275561015864,
+      0.18046888474226117,
+      0.2810537194716384,
+      0.1597213135154442,
+      0.40232442174750577
+    ]
+  },
+  "gate8": {
+    "moment": "fano",
+    "real_heldout": 3.903380915983712,
+    "synthetic": 3.740403998753825,
+    "abs_err": 0.16297691722988672,
+    "tol_abs": 0.7806761831967424,
+    "tol_note": "\u00b120% rel of |real| (floor 0.05)",
+    "pass": true
+  }
+}

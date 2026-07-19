@@ -146,3 +146,40 @@ level or a slow regime — every menu mirror collapses geometrically by lag 2–
   this family can match while keeping ρ for lag-1.
 - Recorded in `expansion/results/gate8_recheck_cycle1.json` and
   `expansion/results/mirror_upgrade_hedging.json`.
+
+## Amendment 2026-07-19 — mirror VALID under gate 8: hierarchical AR(1) (Cycle-3 rider; SPEC restored)
+
+The Cycle-3 menu extension proposed above was built (`hier_ar1` in
+`src/explorations/synthetic/expansion/mirrors.py`), preregistered
+(`expansion/amend_cards_c3.py`: gate-8 = held-out ACF(2) AND ACF(4), each
+within ±20% of the real magnitude; matched-check ACF(1) ±0.05 abs; fresh
+70/30 split, seed 2000), and fit on the cached C1 labels
+(`expansion/mirror_upgrade_hedging_c3.py`). **All checks PASS**:
+
+| moment | real (held-out) | synthetic | \|err\| | tol_eff | |
+|---|---|---|---|---|---|
+| ACF(2) — gate 8 | 0.1656 | 0.1686 | 0.0030 | 0.0331 | **PASS** |
+| ACF(4) — gate 8 | 0.1408 | 0.1225 | 0.0184 | 0.0282 | **PASS** |
+| ACF(1) — matched check | 0.3201 | 0.3326 | 0.0125 | 0.05 | **PASS** |
+
+The synthetic ACF now *holds the plateau* (lags 1–8: 0.33, 0.17, 0.14, 0.12,
+0.13, 0.14, 0.13, 0.13 vs real 0.32, 0.17, 0.16, 0.14, 0.14, 0.16, 0.17,
+0.14) — exactly the structure both short-memory mirrors collapsed.
+
+**The canonical Layer-1 mirror is hereby the hierarchical AR(1)** (full
+precision in [`mirror_params_hier.json`](mirror_params_hier.json)):
+
+```
+c_i = mu + beta·(i/L) + l_j + r_i ,   r_i = rho·r_{i-1} + sigma·eta_i
+mu = 0.780   beta = +0.228   rho = 0.248   sigma = 0.544
+l_j ~ empirical per-trace levels (sd 0.185, n=210, heavy tails preserved)
+```
+
+**Matched:** the trend, the per-trace level distribution, lag-1 persistence.
+**Deliberately NOT matched:** every ACF lag ≥ 2 (the plateau *emerges* from
+the level variance — and now verifiably matches), and the semantic coupling
+between confidence and correctness. The Layer-3 hidden latents gain the
+per-trace level `l_j` as an explicitly slow DC component alongside `c_i`.
+
+**Status change: `SPEC*` → `SPEC`** — stage-6-runnable. The ar1+trend params
+in `mirror_params.json` are retained for provenance only.

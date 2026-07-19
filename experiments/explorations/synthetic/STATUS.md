@@ -4,61 +4,52 @@
 is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-07-14.
+Last updated: 2026-07-19.
 
 ---
 
 ## 0. TL;DR — what's active right now
 
-- **Grounded-benchmark expansion loop: Cycle 2 DONE (2026-07-14, runpod) —
-  STOPPED for human review.** (Cycle 1: done + approved same day; its riders
-  were executed in-cycle here.) 4 new interaction/equality cards frozen under
-  the review's design gates (7: no-leakage labeler, ctx=0; 8: preregistered
-  non-fitted mirror moment + tolerance); 6 calibrated (3/domain, deterministic
-  selection) + two riders; **$14.06 of $25**. **Verdicts:** 1 new SPEC —
-  **`self_reference_echo/`** (reasoning×int-eq: problem re-anchoring
-  ACF(1)=0.31 ≫ nulls ≤0.07, gate-8 PASS, skeptic 5/5; caveats: labeler κ=0.30
-  marginal, signature is run-clustering so the class label is loose). 5 ABORT,
-  each on a different preregistered gate: operator-alternation (frozen NEGATIVE
-  sign falsified — real is +0.36 clustering), computation-verification
-  (spectral peak REAL at 3.84 but events also bursty — periodic_rate mirror
-  gate-8 fail), greeting-signoff-mirror (mirror produces zero MI — mis-keyed),
-  list-item-parallelism (C2's strongest signal ACF(1)=0.52; mirror near-miss,
-  Fano err 0.163 vs frozen tol 0.15 = 4% relative — **prime re-freeze
-  candidate**), pronoun-referent-recurrence (gap-CV dies at the noise floor).
-  **Riders resolved:** (a) the **g7 re-exam UPGRADED assumption-consequence
-  SPEC*→SPEC** — the strict per-sentence labeler (ctx=0) *strengthens* the
-  directed asymmetry to **0.297** (2.2× the contextual 0.135), gate-8 PASS,
-  fresh skeptic 5/5; canonical mirror = the g7 Markov fit. (b) the **gate-8
-  recheck DOWNGRADED hedging-drift SPEC→SPEC***: its real ACF is a long-memory
-  *plateau* (~0.13 through lag 8) that neither ar1+trend nor the preregistered
-  semi-Markov attempt reproduces (both fail ACF(2) ±0.05) — mirror INVALID
-  pending a hierarchical-AR(1) menu extension (Cycle 3); measurement verdict
-  unaffected. **Text-corpus PROCEED target NOT met** (0/3; two mirror-fidelity
-  kills over real signals + one noise-floor kill). Systemic C2 lessons for
-  Cycle 3 (in the LEDGER): magnitude-relative gate-8 tolerances; two
-  Appendix-B extensions (hierarchical AR(1); periodic+self-exciting hybrid).
-  Grid + cycle log: [`expansion/LEDGER.md`](expansion/LEDGER.md). **NO
-  architecture was trained or evaluated.**
-  **Reviewed + APPROVED-with-corrections (2026-07-18, mac-local):** gates verified
-  working — incl. gate-8 catching **hedging** (the C1-blessed spec, my miss); the
-  g7 upgrade is airtight (`ctx=0` labeler → signal *strengthened*, not leakage).
-  **Key correction — `self_reference_echo` re-filed interaction/equality →
-  bursty/self-exciting** (measured self-exciting: ACF/Fano/excite + `logistic_ar`
-  mirror = backtracking's process; redundant + marginal labeler κ=0.30), so
-  **interaction/equality is EMPTY again — still unclaimed** (the real prize: a
-  grounded changepoint-equality analogue). Systemic finds (now in README):
-  (i) the mirror menu is too short-memory for reasoning-trace ACF *plateaus*
-  (gate 8 killed hedging on it); (ii) interaction/equality needs a **categorical
-  per-sentence label + measured `[c_t=c_{t-1}]` adjacency** (gate-7-clean);
-  (iii) gate-8 tolerances must be *relative*. Specs now: **assumption_consequence**
-  (solid SPEC), **hedging_drift** (SPEC*, needs hierarchical-AR mirror),
-  **self_reference_echo** (SPEC*, redundant, low priority), backtracking (anchor).
-  **Cycle 3 queued** ([`briefings/grounded-benchmark-expansion-cycle3.md`](../../../briefings/grounded-benchmark-expansion-cycle3.md)):
-  interaction/equality via categorical labels + 2 re-freezes (list-item-parallelism,
-  computation-verification) + the hierarchical-AR + periodic-Hawkes mirror
-  extensions + relative gate-8 tolerances. Cycle-2 briefing retired; stray
-  frequency `*.log` purged + gitignored.
+- **Grounded-benchmark expansion loop: Cycle 3 DONE (2026-07-19, runpod) —
+  STOPPED for human review.** (Cycles 1–2: done + approved; the C2 review's
+  corrections were baked in as this cycle's preregistration.) Executed the
+  reviewed briefing autonomously: both **Appendix-B menu extensions built +
+  tested** (`hier_ar1` per-doc-level + AR(1); `periodic_hawkes` cyclogram
+  period + excitation kernel), the **uniform relative gate-8 rule**
+  preregistered (±20% of held-out magnitude + per-moment floors), 4 fresh
+  **categorical interaction/equality cards** frozen under the gate-7-clean
+  recipe (content classes, ctx=0, equality-adjacency `[c_t=c_{t-1}]` as the
+  measured statistic), blind selection → 6 calibrated (3/domain) + the
+  hedging re-fit rider; **$8.20 of $25**. **Verdicts — 2 wins:**
+  **(1) `list_item_parallelism/` SPEC — the program's FIRST text-corpus
+  benchmark** (re-freeze of C2's tolerance-kill: ACF(1)=0.52 [0.48,0.56] ≫ N1
+  hi 0.21, κ=0.64, gate-8 Fano |err| 0.163 ≤ 0.781, skeptic 5/5; **re-filed
+  interaction/equality → bursty/self-exciting** by measured class — binary
+  run-clustering, `logistic_ar` family). **(2) hedging-drift SPEC*→SPEC**:
+  the `hier_ar1` re-fit **holds the long-memory plateau** (gate-8 ACF(2)
+  |err| 0.003 ≤ 0.033, ACF(4) 0.018 ≤ 0.028; syn lags 1–8 ≈ real) — canonical
+  mirror swapped by dated spec amendment, stage-6-runnable again. **5 ABORTs,
+  all informative:** computation-verification-r2 (the hybrid mirror PASSED
+  gate-8 — Fano 2.19 vs 2.29 — but the **skeptic killed on circularity**: a
+  mirror that fits period+kernel jointly inserts everything measured; future
+  periodic re-freezes must preregister a non-inserted moment e.g. gap-shape /
+  cross-doc period stability); proof-operation-phase-runs + recipe-
+  instruction-phase-runs (both **categorical int/eq signals are REAL** —
+  self-match ACF(1) 0.286/0.479 ≫ nulls, genuine 5-class marginals, κ
+  0.59/0.61 — but semi-Markov fails gate-8 on MI(2)/ACF(4): real categorical
+  streams hold **plateaus** the dwell+jump menu can't generate — the
+  categorical analogue of the hedging plateau ⇒ **C4 menu gap: hierarchical
+  categorical mirror**); enumeration-cadence (spec_peak 4.10 real but Fano
+  3.52 vs periodic_rate's 0.97 — the C2 comp-verif failure replicated in
+  text); goal-restatement-recurrence (skeptic composition kill: pooled
+  gap-CV is a cross-trace rate-mixture artifact; margin was thin anyway).
+  **interaction/equality target NOT met** (honest miss: the recipe measures
+  cleanly, the mirror family is the blocker). Grid + cycle log + C4 lessons:
+  [`expansion/LEDGER.md`](expansion/LEDGER.md). Specs now: **backtracking**
+  (anchor), **assumption_consequence**, **hedging_drift** (both solid SPEC),
+  **list_item_parallelism** (SPEC, text), **self_reference_echo** (SPEC*,
+  low priority). **NO architecture was trained or evaluated. Cycle-3
+  briefing stays until reviewed; STOPPED for review.**
 
 - **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under

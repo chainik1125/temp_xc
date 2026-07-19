@@ -1,43 +1,52 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-14 (expansion Cycle 2 COMPLETE — stopped for review).
+**Last rewrite:** 2026-07-19 (expansion Cycle 3 COMPLETE — stopped for review).
 
 ## Who / where
-Remote CC on RunPod (Linux) at `/workspace/temp_xc`. Git creds at `/workspace/.tokens/`.
-Claude API key at `/workspace/.tokens/anthropic_key` (all 3 judge models OK).
+Remote CC on RunPod (Linux) at `/workspace/temp_xc`. Git creds at `/workspace/.tokens/`
+(push: `git push https://x-access-token:$(cat /workspace/.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`).
+Claude API key at `/workspace/.tokens/anthropic_key` (export as ANTHROPIC_API_KEY;
+all 3 judge roles verified OK this cycle).
 
-## Last task: `briefings/grounded-benchmark-expansion-cycle2.md` — DONE
-All stages + both riders executed autonomously; **STOPPED for human review**
-(no Cycle 3 before review; briefing stays until reviewed, then delete — the
-expansion README is the standing doc).
+## Last task: `briefings/grounded-benchmark-expansion-cycle3.md` — DONE
+All stages + the hedging rider executed autonomously; **STOPPED for human
+review** (no Cycle 4 before review; briefing stays until reviewed, then delete
+— the expansion README is the standing doc).
 
 Outcome (full detail: synthetic STATUS §0 + `expansion/LEDGER.md` cycle log):
-- 4 new interaction/equality cards frozen under gates 7–8 (commit `927b1bc3`)
-  → deterministic selection (6, 3/domain) → all calibrated + g7 re-exam.
-- **self-reference-echo PROCEED → SPEC** (`synthetic/self_reference_echo/`).
-- **g7 re-exam upgraded assumption-consequence SPEC*→SPEC** (asym 0.297 with
-  the strict ctx=0 labeler — 2.2× stronger; canonical mirror = g7 fit).
-- **gate-8 recheck downgraded hedging-drift SPEC→SPEC*** (long-memory ACF
-  plateau; ar1 + semi-Markov both fail; hierarchical-AR(1) proposed for C3).
-- 5 ABORTs, each on a distinct preregistered gate (sign-falsification ×1,
-  gate-8 mirror ×3 — one a 4%-relative near-miss / prime re-freeze candidate —
-  noise floor ×1). Text-corpus PROCEED target NOT met (reported honestly).
-- Spend **$14.06 / $25** (meter `expansion/results/spend.json`; C1 archived
-  as `spend_cycle1.*`). No architecture touched.
+- Menu extensions `hier_ar1` + `periodic_hawkes` built + tested (13/13);
+  uniform relative gate-8 rule (±20% + floors) preregistered; 4 categorical
+  int/eq cards frozen; blind selection; 6 calibrated (3/domain); $8.20/$25.
+- **list-item-parallelism-r2 PROCEED → `synthetic/list_item_parallelism/`
+  SPEC — first text-corpus benchmark** (re-filed to bursty/self-exciting by
+  measured class).
+- **Hedging rider PASS → hedging_drift SPEC*→SPEC** (hier_ar1 holds the
+  plateau; spec amendment + `mirror_params_hier.json` written).
+- 5 ABORTs, all informative (see LEDGER cycle log): comp-verif-r2 skeptic
+  circularity (hybrid passed gate-8!); both categorical int/eq cards REAL
+  signals killed on mirror fidelity (categorical plateau ⇒ C4 needs a
+  hierarchical categorical mirror); enumeration-cadence rhythmic+bursty;
+  goal-restatement composition kill. int/eq target honestly NOT met.
 
 ## Next / open
-- **Blocked on user review of Cycle 2.** C3 targets are queued in the LEDGER
-  cycle log: re-freeze list-item-parallelism (magnitude-relative gate-8
-  tolerance) + computation-verification (periodic+self-exciting hybrid);
-  Appendix-B menu extensions (hierarchical AR(1); periodic-Hawkes); the two
-  still-frozen C1 cards (goal-restatement, enumeration-cadence).
-- Stage-6 blind B×A eval of the two full SPECs needs a user green-light
-  (datasource plugins to write; nothing run).
+- **Blocked on user review of Cycle 3.** C4 candidates queued in the LEDGER
+  cycle-log lessons: hierarchical categorical mirror (would plausibly convert
+  both int/eq aborts on re-freeze); periodic cards need a preregistered
+  non-inserted gate-8 moment (gap-shape / cross-doc period stability).
+- Stage-6 blind B×A eval now has THREE full SPECs waiting (assumption_
+  consequence, hedging_drift, list_item_parallelism) + the anchor — needs a
+  user green-light (datasource plugins to write; nothing run).
 - `results/leaderboard.jsonl.prepurge` backup can be deleted (push confirmed).
 
 ## Gotchas (this box)
+- **Pod restart wipes the home dir ⇒ the venv's uv-managed Python vanishes**
+  (`.venv/bin/python` → broken symlink into `~/.local/share/uv/`). Fix:
+  `curl -LsSf https://astral.sh/uv/install.sh | sh && uv python install 3.12.13`
+  — site-packages live in the volume-backed `.venv/`, so nothing else is lost.
 - Claude 5-family models reject `temperature` AND think by default — tight
   max_tokens ⇒ empty text (client handles both).
+- Calibrations must run SEQUENTIALLY: the spend meter is per-process
+  file-persistent; concurrent writers undercount.
 - Tiny models: GPU useless here; CPU ~12 workers OMP=1 for temp_bench grids.
 - `pkill -f` self-matches the launching shell → use TaskStop on harness tasks.
 - Background python: launch with `-u` or prints sit in the block buffer.

@@ -1,0 +1,42 @@
+{
+  "interjudge": {
+    "n_docs": 12,
+    "n_spans": 1033,
+    "agreement": 0.8499515972894482,
+    "disagreement": 0.15004840271055178,
+    "kappa": 0.4165224204216243,
+    "noise_floor_eps": 0.0816989138853162,
+    "pos_rate_primary": 0.1771539206195547,
+    "pos_rate_second": 0.12391093901258471,
+    "coverage": {
+      "n_docs": 12,
+      "n_docs_labeled": 12,
+      "n_chunks": 27,
+      "n_dead_chunks": 0,
+      "doc_coverage": 1.0
+    },
+    "sampled_doc_ids": [
+      4,
+      12,
+      22,
+      52,
+      78,
+      90,
+      148,
+      184,
+      194,
+      242,
+      245,
+      273
+    ]
+  },
+  "heuristic_crosscheck": {
+    "n_spans": 25528,
+    "judge_pos_rate": 0.2090253838921968,
+    "heuristic_pos_rate": 0.030006267627702914,
+    "precision": 0.4516971279373368,
+    "recall": 0.06484257871064468,
+    "f1": 0.11340544083906917
+  },
+  "noise_floor_eps": 0.0816989138853162
+}
