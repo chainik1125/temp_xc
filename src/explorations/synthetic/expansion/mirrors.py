@@ -12,6 +12,12 @@ Menu (README Appendix B):
     exponential autocorrelation -> k-state Markov / AR(1)          [cat/scalar]
     heavy-tailed dwell          -> semi-Markov (empirical dwell)   [categorical]
     rhythmic / periodic         -> periodic rate + noise           [binary]
+    long-memory ACF plateau     -> hierarchical AR(1)              [scalar]
+    rhythmic AND clustered      -> periodic + self-exciting hybrid [binary]
+
+(The last two are the Cycle-3 extensions the Cycle-2 review mandated: the
+short-memory menu could not generate the hedging stream's ACF plateau nor the
+verification stream's periodic-plus-bursty events.)
 
 A candidate's card must key its mirror to its measured statistic; bespoke
 processes require a written justification (README guardrails).
@@ -185,6 +191,127 @@ def gen_ar1(params: dict, lengths, rng) -> list:
     return out
 
 
+# ── hierarchical AR(1): per-sequence latent level + AR(1) within, scalar ───
+
+def fit_hier_ar1(train_seqs, position: bool = True) -> dict:
+    """Per-sequence latent level + AR(1) residual (+ optional pooled trend).
+
+    x_i^(j) = mu + beta·pos_i + l_j + r_i,  r_i = rho·r_{i−1} + sigma·ε_i,
+    with l_j one latent level per sequence, kept as the EMPIRICAL level list
+    (heavy tails preserved, nothing assumed Gaussian). The level variance puts
+    a floor under the pooled within-sequence ACF at long lags — the plateau
+    that no single-timescale menu process can produce.
+    """
+    if position:
+        allx = np.concatenate([s.astype(float) for s in train_seqs])
+        allp = np.concatenate([np.arange(s.size) / s.size for s in train_seqs])
+        A = np.stack([np.ones_like(allp), allp], 1)
+        (mu, beta), *_ = np.linalg.lstsq(A, allx, rcond=None)
+        mu, beta = float(mu), float(beta)
+    else:
+        mu = float(np.concatenate([s.astype(float) for s in train_seqs]).mean())
+        beta = 0.0
+
+    levels, xs, ys = [], [], []
+    for s in train_seqs:
+        pos = np.arange(s.size) / s.size
+        d = s.astype(float) - (mu + beta * pos)
+        l_j = float(d.mean())
+        levels.append(l_j)
+        r = d - l_j
+        if s.size > 1:
+            xs.append(r[:-1])
+            ys.append(r[1:])
+    x = np.concatenate(xs)
+    y = np.concatenate(ys)
+    rho = float((x * y).sum() / max((x * x).sum(), 1e-12))
+    resid = y - rho * x
+    return {"process": "hier_ar1", "mu": mu, "beta_position": beta, "rho": rho,
+            "sigma": float(resid.std()), "levels": levels}
+
+
+def gen_hier_ar1(params: dict, lengths, rng) -> list:
+    mu, rho, sg = params["mu"], params["rho"], params["sigma"]
+    beta = params.get("beta_position", 0.0)
+    levels = np.array(params["levels"], dtype=float)
+    stat_sd = sg / max(np.sqrt(max(1 - rho ** 2, 1e-9)), 1e-9)
+    out = []
+    for L in lengths:
+        pos = np.arange(L) / L
+        l_j = float(rng.choice(levels))
+        r = np.empty(L)
+        r[0] = stat_sd * rng.standard_normal()
+        for i in range(1, L):
+            r[i] = rho * r[i - 1] + sg * rng.standard_normal()
+        out.append(mu + beta * pos + l_j + r)
+    return out
+
+
+# ── periodic + self-exciting hybrid (periodic-Hawkes), binary ──────────────
+
+def fit_periodic_hawkes(train_seqs, K: int = 8, max_period: int = 64) -> dict:
+    """logit P(b_i=1) = a + b_c·cos(2πi/P) + b_s·sin(2πi/P) + Σ_l w_l·b_{i−l}.
+
+    The period P comes from the pooled cyclogram (as ``fit_periodic_rate``);
+    the phase profile and the K-lag excitation kernel are then fit jointly by
+    logistic regression — a rhythmic base rate that events also self-excite
+    around, for streams that are periodic AND bursty at once.
+    """
+    from sklearn.linear_model import LogisticRegression
+
+    # Cyclogram power per P, minus the per-bin sampling-noise floor (raw power
+    # is biased toward large P: more, noisier bins), then the SMALLEST P within
+    # 5% of the max (every multiple of the true period ties in signal power).
+    p0 = sig.base_rate(train_seqs)
+    powers = {}
+    for P in range(2, max_period + 1):
+        num = np.zeros(P)
+        den = np.zeros(P)
+        for s in train_seqs:
+            ph = np.arange(s.size) % P
+            np.add.at(num, ph, s.astype(float))
+            np.add.at(den, ph, 1.0)
+        prof = num / np.maximum(den, 1)
+        noise = float((prof * (1 - prof) / np.maximum(den, 1)).mean())
+        powers[P] = float(((prof - p0) ** 2).mean()) - noise
+    pmax = max(powers.values())
+    P = min(p for p, v in powers.items() if v >= 0.95 * pmax)
+
+    X, y = [], []
+    for s in train_seqs:
+        L = s.size
+        if L <= K:
+            continue
+        for i in range(K, L):
+            row = [np.cos(2 * np.pi * i / P), np.sin(2 * np.pi * i / P)]
+            row += [float(s[i - l]) for l in range(1, K + 1)]
+            X.append(row)
+            y.append(int(s[i]))
+    clf = LogisticRegression(C=1.0, max_iter=2000).fit(np.array(X), np.array(y))
+    w = clf.coef_[0]
+    return {"process": "periodic_hawkes", "period": int(P), "K": K,
+            "intercept": float(clf.intercept_[0]),
+            "b_cos": float(w[0]), "b_sin": float(w[1]),
+            "kernel_w": w[2:].tolist()}
+
+
+def gen_periodic_hawkes(params: dict, lengths, rng) -> list:
+    a = params["intercept"]
+    P, bc, bs = params["period"], params["b_cos"], params["b_sin"]
+    w = np.array(params["kernel_w"])
+    K = params["K"]
+    out = []
+    for L in lengths:
+        b = np.zeros(L, dtype=np.int8)
+        for i in range(L):
+            hist = sum(w[l] * (b[i - 1 - l] if i - 1 - l >= 0 else 0.0) for l in range(K))
+            logit = (a + bc * np.cos(2 * np.pi * i / P)
+                     + bs * np.sin(2 * np.pi * i / P) + hist)
+            b[i] = 1 if rng.random() < 1.0 / (1.0 + np.exp(-logit)) else 0
+        out.append(b)
+    return out
+
+
 # ── periodic rate + noise, binary ──────────────────────────────────────────
 
 def fit_periodic_rate(train_seqs, max_period: int = 64) -> dict:
@@ -231,6 +358,8 @@ MENU = {
     "semi_markov": (fit_semi_markov, gen_semi_markov),
     "ar1": (fit_ar1, gen_ar1),
     "periodic_rate": (fit_periodic_rate, gen_periodic_rate),
+    "hier_ar1": (fit_hier_ar1, gen_hier_ar1),
+    "periodic_hawkes": (fit_periodic_hawkes, gen_periodic_hawkes),
 }
 
 

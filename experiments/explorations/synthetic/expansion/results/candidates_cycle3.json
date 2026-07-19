@@ -1,0 +1,175 @@
+{
+  "frozen": "2026-07-19",
+  "generator": "claude-opus-4-8",
+  "cycle": 3,
+  "candidates": [
+    {
+      "name": "proof-operation-phase-runs",
+      "domain": "reasoning-trace",
+      "temporal_class": "interaction/equality",
+      "property": "Reasoning sentences enact one of several operation-types and cluster into same-operation runs (phases).",
+      "why_not_covered": "Unlike self-reference-echo (binary self-excitation) and operator-alternation (binary, negative-sign falsified), this is a 5-class per-sentence operation label whose equality-adjacency measures constant-label segments, not event clustering.",
+      "hypothesis_character": "Chain-of-thought organizes into phases: a stretch of algebraic manipulation, then a stretch of case-enumeration, then a verification stretch. Because each phase is a coherent sub-task, consecutive sentences repeat the same operation-type far above the iid match rate, producing runs whose boundaries are true operation changepoints. Only position-comparing architectures expose the segment structure since the label itself is context-free.",
+      "abort_condition": "self-match ACF(1) sits within \u00b1band of the position-conditional iid null (N2) \u2014 i.e. operations are shuffled sentence-to-sentence with no runs.",
+      "label_signal": "which mathematical operation-type the single sentence performs (arithmetic/algebra, case-splitting, verification, restatement, or other) \u2014 judged from its own verbs/symbols.",
+      "label_kind": "categorical",
+      "n_values": 5,
+      "class_names": [
+        "other/background",
+        "algebraic-manipulation",
+        "case-enumeration",
+        "verification-check",
+        "restatement-setup"
+      ],
+      "judge_instruction": "You label ONE sentence from a math reasoning trace by the operation it performs, using ONLY that sentence's own wording \u2014 never assume anything about neighbouring sentences. Output one integer 0-4. 1 = algebraic-manipulation: the sentence transforms/computes an expression or equation ('So 3x+2=11, thus x=3'; 'Multiplying both sides by 2 gives 4y=8'). 2 = case-enumeration: the sentence introduces or considers a specific case/possibility/branch ('Case 1: n is even'; 'Suppose instead that a>b'). 3 = verification-check: the sentence checks, tests, or confirms a result ('Let me verify: plugging x=3 back gives 11, correct'; 'This satisfies the constraint'). 4 = restatement-setup: the sentence restates the goal, defines notation, or sets up what to find ('We need to find the largest prime'; 'Let n denote the number of coins'). 0 = other: anything else (meta-comments, transitions, uncertainty). Judge only the sentence in front of you.",
+      "heuristic_crosscheck": "lower-case the sentence. If it contains verify|check|confirm|plug.*back|satisfies|makes sense -> 3. Elif contains case |suppose |if we assume|either|branch|scenario -> 2. Elif contains we need|we want|let .* denote|define|find the|the goal -> 4. Elif contains =|plus|minus|times|divide|multiply|simplif|solve|substitut -> 1. Else -> 0. Apply in this priority order; return the first match.",
+      "composition_risk": "medium \u2014 algebraic sentences may dominate in arithmetic-heavy traces; the 75% cap and 10-category spread across math/logic prompts mitigate.",
+      "primary_statistic": "acf1",
+      "primary_sign": "positive",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "self-match ACF(1) (equality-adjacency)",
+        "mean run-length",
+        "self-match ACF(4)"
+      ],
+      "expected_signature": "ACF(1) well above all of N1/N2/N3; N2 (position-conditional iid) is the tightest comparison and real should exceed it by a clear margin from runs.",
+      "chance_oracle": "chance = iid match rate ~sum p_c^2 (~0.25 for balanced 5-class); oracle = a labeler+Markov chain reproducing observed run-lengths.",
+      "arch_predictions": {
+        "per_token_sae": "should read the current operation-type but not the run boundary; predicts equality-adjacency near chance.",
+        "window_families": "windowed attention comparing c_t to c_{t-1} recovers the run structure and the elevated ACF(1)."
+      },
+      "mirror_process": "semi_markov",
+      "mirror_matched": "empirical dwell-time distribution per operation-state + jump chain transition matrix",
+      "mirror_not_matched": "self-match MI at lag 2 (cross-phase memory beyond immediate dwell)",
+      "gate8_moment": "mi",
+      "gate8_idx": 1,
+      "gate8_rationale": "semi-Markov fits lag-1 dwell/jump directly; MI at lag 2 is governed by the composition of two transition steps and the phase-length tail, not by any single fitted parameter, so it is a genuine held-out check of the run structure."
+    },
+    {
+      "name": "subgoal-discourse-segments",
+      "domain": "reasoning-trace",
+      "temporal_class": "interaction/equality",
+      "property": "Each sentence enacts a discourse-move (plan/execute/evaluate/conclude) and these persist in same-move runs.",
+      "why_not_covered": "Differs from both failed binary attempts by using a 4-class discourse-move content label; equality-adjacency of moves (not any refers-back or alternation relation) is the measured signature.",
+      "hypothesis_character": "A reasoning trace moves through discourse phases \u2014 planning the approach, executing steps, evaluating outcomes, concluding \u2014 and stays within a move for several sentences before transitioning. This yields same-move runs whose constant-label segments are the changepoint structure. The move is read from the sentence's own rhetorical framing, so equality lives only in the measured lag-1 match.",
+      "abort_condition": "self-match ACF(1) does not exceed the within-doc permutation null N1 \u2014 moves are effectively interleaved sentence-by-sentence with no segments.",
+      "label_signal": "which discourse-move the single sentence performs (plan, execute, evaluate, conclude, or other) from its own rhetorical markers.",
+      "label_kind": "categorical",
+      "n_values": 5,
+      "class_names": [
+        "other/background",
+        "plan-approach",
+        "execute-step",
+        "evaluate-outcome",
+        "conclude-answer"
+      ],
+      "judge_instruction": "Label ONE sentence from a reasoning trace by its discourse-move, using ONLY that sentence's own wording; never reference neighbouring sentences. Output one integer 0-4. 1 = plan-approach: proposes a strategy or what to do next ('Let me try using induction'; 'First I will factor the polynomial'; 'The approach here is to count complements'). 2 = execute-step: carries out a concrete computation or deduction ('Adding these gives 12'; 'The derivative is 2x'; 'So the third term equals 8'). 3 = evaluate-outcome: assesses whether something worked or reflects on a result ('That does not seem right'; 'This gives a contradiction'; 'Good, the numbers match'). 4 = conclude-answer: states a final result or answer ('Therefore the answer is 42'; 'Hence x must be 5'; 'So the maximum is 100'). 0 = other. Judge only the sentence shown.",
+      "heuristic_crosscheck": "lower-case. If contains therefore|hence|thus the answer|final answer|so the answer|the answer is -> 4. Elif contains let me try|i will|i'll|let's|the approach|first,|plan|strategy|instead try -> 1. Elif contains does not seem|doesn't|contradiction|wrong|good|correct|makes sense|hmm|wait -> 3. Elif contains =|gives|equals|so |adding|compute|derivative|therefore.*[0-9] -> 2. Else -> 0. First match in this order wins.",
+      "composition_risk": "medium \u2014 execute-step may crowd out others in long computations; discourse markers keep plan/evaluate/conclude above the 3% floor.",
+      "primary_statistic": "acf1",
+      "primary_sign": "positive",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "self-match ACF(1) (equality-adjacency)",
+        "self-match ACF(4)",
+        "dwell-length CV"
+      ],
+      "expected_signature": "real ACF(1) exceeds N1/N2/N3; the plan->execute->evaluate->conclude ordering also gives an asymmetric jump chain but the tested quantity is the equality-adjacency magnitude.",
+      "chance_oracle": "chance = iid move-match rate; oracle = Markov chain over the four moves reproducing lag-1 match.",
+      "arch_predictions": {
+        "per_token_sae": "labels the move per sentence but cannot see persistence; predicts chance-level adjacency.",
+        "window_families": "lag-1 comparison recovers the segment runs and elevated ACF(1)."
+      },
+      "mirror_process": "markov",
+      "mirror_matched": "4x4 (+background) one-step transition matrix over discourse-moves",
+      "mirror_not_matched": "run-length dispersion (dwell_cv) \u2014 the chain's geometric dwell is not fit to match observed CV",
+      "gate8_moment": "dwell_cv",
+      "gate8_idx": null,
+      "gate8_rationale": "A plain Markov chain implies geometric dwell times with CV~1; the real dwell-length dispersion is a held-out consequence of the fitted self-transition probabilities only if dwells are truly geometric \u2014 deviation (over/under-dispersion from coherent phases) is not set by the fitted transition matrix and is a genuine test."
+    },
+    {
+      "name": "recipe-instruction-phase-runs",
+      "domain": "text-corpus",
+      "temporal_class": "interaction/equality",
+      "property": "How-to / recipe web docs organize sentences into functional segments (ingredients, steps, tips, background) forming same-function runs.",
+      "why_not_covered": "Distinct from list-item-parallelism (near-miss re-freeze, item-vs-not binary flavour) and greeting-signoff (mis-keyed mirror): a 5-class functional content label whose equality-adjacency captures multi-sentence functional segments.",
+      "hypothesis_character": "Instructional web documents cluster sentences by function \u2014 a block describing ingredients/materials, a block of imperative steps, a block of tips/notes, a block of background/context. These blocks are multi-sentence runs, so the functional label repeats across adjacent sentences far above chance. The equality is only in the lag-1 match; each sentence's function is read from its own imperative/nominal form.",
+      "abort_condition": "self-match ACF(1) lies inside the position-conditional iid band N2 \u2014 functions do not segment into contiguous blocks.",
+      "label_signal": "the functional role of the single sentence (background, ingredient/material listing, imperative step, tip/caution, or other) from its own grammatical form.",
+      "label_kind": "categorical",
+      "n_values": 5,
+      "class_names": [
+        "other/background",
+        "context-background",
+        "ingredient-material-listing",
+        "imperative-step",
+        "tip-caution"
+      ],
+      "judge_instruction": "Label ONE sentence from a web document by its functional role, using ONLY its own wording \u2014 never assume anything about surrounding sentences. Output one integer 0-4. 1 = context-background: explanatory or descriptive prose about why/what ('This dish originates from southern Italy'; 'The technique dates back centuries'). 2 = ingredient-material-listing: names required items/quantities/materials ('2 cups of flour'; 'You will need a screwdriver and two screws'; 'Ingredients: sugar, eggs, butter'). 3 = imperative-step: a command directing an action ('Preheat the oven to 350'; 'Mix the dry ingredients'; 'Tighten the bolt clockwise'). 4 = tip-caution: advice, warning, or optional note ('Be careful not to overmix'; 'For best results, chill overnight'; 'Note: this may vary'). 0 = other. Judge only the sentence shown.",
+      "heuristic_crosscheck": "lower-case, strip. If starts with an imperative verb (preheat|mix|add|stir|tighten|cut|pour|place|remove|combine|heat|set) or matches ^[a-z]+ the -> 3. Elif contains cups?|tbsp|tsp|ingredients|you will need|grams|ounces|materials:|[0-9]+ ?(cup|tablespoon|gram) -> 2. Elif contains be careful|note:|tip:|for best results|make sure|avoid|warning|optionally -> 4. Elif contains originates|history|traditionally|because|this is|known as|dates back -> 1. Else -> 0. First match wins.",
+      "composition_risk": "medium \u2014 many fineweb docs are non-instructional; the 60-200 sentence filter plus other/background class absorbs them, but marginal skew toward class 0 is a risk.",
+      "primary_statistic": "acf1",
+      "primary_sign": "positive",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "self-match ACF(1) (equality-adjacency)",
+        "mean run-length",
+        "self-match MI(2)"
+      ],
+      "expected_signature": "real ACF(1) above N1/N2/N3; blocks give clear runs so N2 (which preserves position marginals) is the discriminating null.",
+      "chance_oracle": "chance = sum p_c^2 function-match rate; oracle = semi-Markov reproducing block lengths.",
+      "arch_predictions": {
+        "per_token_sae": "reads the function of each sentence but not the block; predicts near-chance adjacency.",
+        "window_families": "lag-1 comparison recovers block runs and elevated ACF(1)."
+      },
+      "mirror_process": "semi_markov",
+      "mirror_matched": "empirical block-length (dwell) distribution per function + jump chain",
+      "mirror_not_matched": "self-match ACF at lag 4 \u2014 cross-block memory not fit by lag-1 dwell/jump",
+      "gate8_moment": "acf",
+      "gate8_idx": 3,
+      "gate8_rationale": "The semi-Markov mirror fits dwell and one-step jumps; the lag-4 self-match ACF is determined by the chain's mixing over four steps (a convolution of the fitted dwell tail and jump matrix), not by any single fitted parameter, so it is a held-out test of whether run structure has the right longer-range decay."
+    },
+    {
+      "name": "argument-claim-type-segments",
+      "domain": "text-corpus",
+      "temporal_class": "interaction/equality",
+      "property": "Opinion/argumentative web docs cluster sentences by claim-type (assertion, evidence, concession, example) into same-type runs.",
+      "why_not_covered": "Unlike the two binary failures, this is a 5-class rhetorical claim-type label; the measured signature is equality-adjacency of claim-types (evidence-blocks, example-blocks), not any echo or alternation.",
+      "hypothesis_character": "Argumentative prose tends to group like rhetorical acts: a run of assertions, then a run of supporting evidence, then an illustrative example block, occasionally a concession. Adjacent sentences therefore share a claim-type well above chance, producing rhetorical segments whose boundaries are claim-type changepoints. The claim-type is inferred from each sentence's own markers, so equality is purely in the measured lag-1 match.",
+      "abort_condition": "self-match ACF(1) does not exceed the within-doc permutation null N1 \u2014 claim-types are sprinkled without contiguous runs.",
+      "label_signal": "the rhetorical claim-type of the single sentence (assertion, evidence-citation, example-illustration, concession-qualifier, or other) from its own markers.",
+      "label_kind": "categorical",
+      "n_values": 5,
+      "class_names": [
+        "other/background",
+        "assertion-claim",
+        "evidence-citation",
+        "example-illustration",
+        "concession-qualifier"
+      ],
+      "judge_instruction": "Label ONE sentence from a web document by its rhetorical claim-type, using ONLY its own wording; never reference neighbouring sentences. Output one integer 0-4. 1 = assertion-claim: states a position or general claim ('Remote work boosts productivity'; 'This policy is fundamentally flawed'). 2 = evidence-citation: presents data, statistics, or a cited source ('A 2020 study found a 30% increase'; 'According to the report'; 'Sales rose by 12%'). 3 = example-illustration: gives a concrete instance ('For example, consider a small business'; 'Take Amazon as a case'; 'Such as when a user logs in'). 4 = concession-qualifier: acknowledges a limit or opposing point ('Admittedly, this has drawbacks'; 'Of course, results may vary'; 'However, critics argue otherwise'). 0 = other. Judge only the sentence shown.",
+      "heuristic_crosscheck": "lower-case. If contains for example|for instance|such as|e.g.|consider a|take .* as -> 3. Elif contains admittedly|of course|however|granted|to be fair|critics|although|while it is true -> 4. Elif contains study|according to|research|[0-9]+%|data|survey|report found|statistics -> 2. Elif contains is |are |should|must|will |fundamentally|clearly|obviously -> 1. Else -> 0. First match in order wins.",
+      "composition_risk": "medium \u2014 assertion-claim may dominate; evidence/example/concession markers are distinctive enough to keep three classes above 3%.",
+      "primary_statistic": "acf1",
+      "primary_sign": "positive",
+      "pair_src_dst": null,
+      "ordered_statistics": [
+        "self-match ACF(1) (equality-adjacency)",
+        "self-match ACF(4)",
+        "dwell-length CV"
+      ],
+      "expected_signature": "real ACF(1) above N1/N2/N3; rhetorical blocks give runs so both N1 and N2 fall clearly below real.",
+      "chance_oracle": "chance = iid claim-type match rate; oracle = Markov chain over claim-types matching lag-1.",
+      "arch_predictions": {
+        "per_token_sae": "reads each sentence's claim-type but not block membership; predicts chance-level adjacency.",
+        "window_families": "lag-1 comparison exposes the rhetorical runs and elevated ACF(1)."
+      },
+      "mirror_process": "markov",
+      "mirror_matched": "5-state one-step transition matrix over claim-types",
+      "mirror_not_matched": "run-length dispersion (dwell_cv) not fit by the transition matrix",
+      "gate8_moment": "dwell_cv",
+      "gate8_idx": null,
+      "gate8_rationale": "A Markov fit implies geometric dwell (CV~1); if real rhetorical blocks are coherent multi-sentence segments the dwell CV departs from geometric, and that departure is not set by the fitted one-step transition probabilities, making it a genuine held-out moment."
+    }
+  ]
+}

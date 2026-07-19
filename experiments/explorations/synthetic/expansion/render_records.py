@@ -149,11 +149,15 @@ def render_one(name: str) -> Path:
         lines.append(f"\nAbs errors: {errs}.")
         if m.get("gate8"):
             g8 = m["gate8"]
+            tol_s = f"±{g8['tol_abs']:.4f}" if isinstance(g8["tol_abs"], float) \
+                else f"±{g8['tol_abs']}"
+            if g8.get("tol_note"):
+                tol_s += f" ({g8['tol_note']})"
             lines.append(
                 f"\n**Gate 8 (preregistered non-fitted moment)** — `{g8['moment']}`: "
                 f"held-out real {g8['real_heldout']:.4f} vs synthetic "
                 f"{g8['synthetic']:.4f}, |err| {g8['abs_err']:.4f} vs tolerance "
-                f"±{g8['tol_abs']} → **{'PASS' if g8['pass'] else 'FAIL — mirror invalid ⇒ ABORT'}**.")
+                f"{tol_s} → **{'PASS' if g8['pass'] else 'FAIL — mirror invalid ⇒ ABORT'}**.")
 
     if blob.get("skeptic"):
         lines += ["", "## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)", "",

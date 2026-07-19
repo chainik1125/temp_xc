@@ -162,6 +162,81 @@ def _heur_verif(sents):
     return np.array([1 if _VERIF.search(s) else 0 for s in sents], dtype=np.int8)
 
 
+# — Cycle-3 heuristics (verbatim from the frozen C1 cards, first calibrated now) —
+
+_ENUM_C1 = re.compile(r"^(first(ly)?|second(ly)?|third(ly)?|next|then|finally"
+                      r"|step \d+|\d+[\.\)]|lastly)\b", re.I)
+
+
+def _heur_enum(sents):
+    return np.array([1 if _ENUM_C1.match(s.strip()) else 0 for s in sents],
+                    dtype=np.int8)
+
+
+_GOALRE = re.compile(r"(we need to|we want to|the problem asks|recall that|goal is"
+                     r"|find the|solve for|remember that"
+                     r"|going back to the (problem|question))", re.I)
+_ARITH_AFTER = re.compile(r"[0-9)\]]\s*[+\-*/^=]")
+
+
+def _heur_goal(sents):
+    return np.array([1 if (_GOALRE.search(s) and not _ARITH_AFTER.search(s)) else 0
+                     for s in sents], dtype=np.int8)
+
+
+# — Cycle-3 categorical heuristics (verbatim priority order from the frozen
+#   interaction/equality cards; first match wins) —
+
+_PO_VERIF = re.compile(r"verify|check|confirm|plug.*back|satisfies|makes sense")
+_PO_CASE = re.compile(r"case |suppose |if we assume|either|branch|scenario")
+_PO_SETUP = re.compile(r"we need|we want|let .* denote|define|find the|the goal")
+_PO_ALG = re.compile(r"=|plus|minus|times|divide|multiply|simplif|solve|substitut")
+
+
+def _heur_proofop(sents):
+    out = []
+    for s in sents:
+        t = s.lower()
+        if _PO_VERIF.search(t):
+            out.append(3)
+        elif _PO_CASE.search(t):
+            out.append(2)
+        elif _PO_SETUP.search(t):
+            out.append(4)
+        elif _PO_ALG.search(t):
+            out.append(1)
+        else:
+            out.append(0)
+    return np.array(out, dtype=np.int8)
+
+
+_RC_STEP = re.compile(r"^(preheat|mix|add|stir|tighten|cut|pour|place|remove"
+                      r"|combine|heat|set)\b|^[a-z]+ the ")
+_RC_INGR = re.compile(r"cups?|tbsp|tsp|ingredients|you will need|grams|ounces"
+                      r"|materials:|[0-9]+ ?(cup|tablespoon|gram)")
+_RC_TIP = re.compile(r"be careful|note:|tip:|for best results|make sure|avoid"
+                     r"|warning|optionally")
+_RC_CTX = re.compile(r"originates|history|traditionally|because|this is|known as"
+                     r"|dates back")
+
+
+def _heur_recipe(sents):
+    out = []
+    for s in sents:
+        t = s.strip().lower()
+        if _RC_STEP.match(t):
+            out.append(3)
+        elif _RC_INGR.search(t):
+            out.append(2)
+        elif _RC_TIP.search(t):
+            out.append(4)
+        elif _RC_CTX.search(t):
+            out.append(1)
+        else:
+            out.append(0)
+    return np.array(out, dtype=np.int8)
+
+
 _PRONOUN_START = re.compile(r"^\s*(he|she|it|they|this|that|these|those)\b", re.I)
 _PROPER = re.compile(r"(?<!^)(?<![.!?]\s)\b[A-Z][a-z]+(\s+[A-Z][a-z]+)+\b")
 
@@ -239,7 +314,51 @@ CFG = {
         primary=("asym", None), sign="+", ctx=0, heuristic=_heur_assumption,
         mirror="markov", mirror_kw={}, mirror_kind="categorical",
         gate8=("acf", 0, 0.05), base_card="assumption-then-consequence"),
+    # — Cycle 3: re-freezes (dated card amendments; cached C2 labels reused;
+    #   gate-8 under the uniform relative rule of amend_cards_c3) —
+    "list-item-parallelism-r2": dict(
+        domain="text-corpus", kind="binary", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_listitem,
+        mirror="logistic_ar", mirror_kw={"K": 8}, mirror_kind="binary",
+        gate8=("fano", None, 0.20, "rel"), base_card="list-item-parallelism",
+        labels_from="list-item-parallelism"),
+    "computation-verification-r2": dict(
+        domain="reasoning-trace", kind="binary", pair=None,
+        primary=("spec_peak", None), sign="+", ctx=3, heuristic=_heur_verif,
+        mirror="periodic_hawkes", mirror_kw={"K": 8}, mirror_kind="binary",
+        gate8=("fano", None, 0.20, "rel"),
+        base_card="computation-verification-alternation",
+        labels_from="computation-verification-alternation"),
+    # — Cycle 3: the two still-frozen C1 cards, first calibration (tolerances
+    #   converted to the uniform relative rule, still blind) —
+    "enumeration-cadence": dict(
+        domain="text-corpus", kind="binary", pair=None,
+        primary=("spec_peak", None), sign="+", ctx=3, heuristic=_heur_enum,
+        mirror="periodic_rate", mirror_kw={}, mirror_kind="binary",
+        gate8=("fano", None, 0.20, "rel")),
+    "goal-restatement-recurrence": dict(
+        domain="reasoning-trace", kind="binary", pair=None,
+        primary=("gap_cv", None), sign="+", ctx=3, heuristic=_heur_goal,
+        mirror="semi_markov", mirror_kw={}, mirror_kind="categorical",
+        gate8=("acf", 0, 0.20, "rel")),
+    # — Cycle 3: the selected new categorical interaction/equality cards
+    #   (gate-7 recipe: content classes, ctx=0; primary = the equality-
+    #   adjacency [c_t=c_{t-1}] = categorical self-match ACF(1)) —
+    "proof-operation-phase-runs": dict(
+        domain="reasoning-trace", kind="categorical", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_proofop,
+        mirror="semi_markov", mirror_kw={}, mirror_kind="categorical",
+        gate8=("mi", 1, 0.20, "rel")),
+    "recipe-instruction-phase-runs": dict(
+        domain="text-corpus", kind="categorical", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_recipe,
+        mirror="semi_markov", mirror_kw={}, mirror_kind="categorical",
+        gate8=("acf", 3, 0.20, "rel")),
 }
+
+# Uniform C3 relative-tolerance floors (amend_cards_c3.py preregistration).
+GATE8_FLOORS = {"acf": 0.01, "mi": 0.003, "fano": 0.05, "dwell_cv": 0.05,
+                "gap_cv": 0.05, "spec_peak": 0.05}
 
 
 def load_domain(domain: str):
@@ -328,9 +447,10 @@ def skeptic_pass(judge: Judge, name: str, card_md: str, summary: dict) -> dict:
 def load_candidate(name: str, cfg: dict) -> dict:
     """Look up the frozen card across cycle registries (+ g7-re-exam override)."""
     pool = json.loads((HERE / "results/candidates.json").read_text())["candidates"]
-    c2 = HERE / "results/candidates_cycle2.json"
-    if c2.exists():
-        pool += json.loads(c2.read_text())["candidates"]
+    for extra in ("candidates_cycle2.json", "candidates_cycle3.json"):
+        p = HERE / "results" / extra
+        if p.exists():
+            pool += json.loads(p.read_text())["candidates"]
     lookup = cfg.get("base_card", name)
     cand = dict(next(c for c in pool if c["name"] == lookup))
     if name == "assumption-consequence-g7":
@@ -357,8 +477,19 @@ def run(name: str):
     print(f"[{name}] domain={cfg['domain']}  docs={len(docs)}  "
           f"sents={sum(map(len, docs))}  spend=${meter.spent:.2f}")
 
-    # 1 ── bulk label (cache to disk so a crashed run never re-spends)
+    # 1 ── bulk label (cache to disk so a crashed run never re-spends).
+    # A re-freeze record (labels_from) reuses its base record's cached labels +
+    # labeler validation verbatim: the labeler is unchanged, only the mirror
+    # gate was re-preregistered — relabeling would re-spend for zero
+    # information (preregistered in the C3 card amendments).
     labels_path = out_dir / "labels.json"
+    if cfg.get("labels_from") and not labels_path.exists():
+        import shutil
+        src_dir = HERE / "records" / cfg["labels_from"]
+        shutil.copy(src_dir / "labels.json", labels_path)
+        shutil.copy(src_dir / "labeler_validation.json",
+                    out_dir / "labeler_validation.json")
+        print(f"[{name}] labels + validation reused from records/{cfg['labels_from']}")
     if labels_path.exists():
         blob = json.loads(labels_path.read_text())
         seqs = [np.array(x, dtype=np.int8) if x is not None else None
@@ -485,21 +616,30 @@ def run(name: str):
 
         # gate 8 (preregistered): the mirror must reproduce its named
         # NON-FITTED moment on held-out real vs synthetic within tolerance.
+        # Tolerances are absolute (C1/C2 3-tuples) or, from Cycle 3 on,
+        # relative to the held-out real magnitude with a per-moment floor
+        # (4-tuples ending "rel"; the amend_cards_c3 uniform rule).
         if cfg.get("gate8"):
-            moment, midx, tol = cfg["gate8"]
+            moment, midx, tol, *mode = cfg["gate8"]
             syn_cat = [np.asarray(s, dtype=np.int8) for s in syn] \
                 if cfg["kind"] != "scalar" else syn
             ev_cat = [np.asarray(s, dtype=np.int8) for s in ev] \
                 if cfg["kind"] != "scalar" else ev
             rv = _moment(ev_cat, moment, midx, cfg["kind"])
             sv = _moment(syn_cat, moment, midx, cfg["kind"])
+            if mode and mode[0] == "rel":
+                tol_eff = max(tol * abs(rv), GATE8_FLOORS[moment])
+                tol_note = f"±{tol:.0%} rel of |real| (floor {GATE8_FLOORS[moment]})"
+            else:
+                tol_eff = tol
+                tol_note = "abs (pre-C3 preregistration)"
             g8 = {"moment": moment + (f"[lag{midx + 1}]" if midx is not None else ""),
                   "real_heldout": rv, "synthetic": sv,
-                  "abs_err": abs(rv - sv), "tol_abs": tol,
-                  "pass": bool(abs(rv - sv) <= tol)}
+                  "abs_err": abs(rv - sv), "tol_abs": tol_eff, "tol_note": tol_note,
+                  "pass": bool(abs(rv - sv) <= tol_eff)}
             mirror_blob["gate8"] = g8
             print(f"[{name}] gate8 {g8['moment']}: real={rv:.4f} syn={sv:.4f} "
-                  f"|err|={g8['abs_err']:.4f} tol={tol} -> "
+                  f"|err|={g8['abs_err']:.4f} tol={tol_eff:.4f} ({tol_note}) -> "
                   f"{'PASS' if g8['pass'] else 'FAIL'}")
             if not g8["pass"]:
                 verdict = "ABORT"

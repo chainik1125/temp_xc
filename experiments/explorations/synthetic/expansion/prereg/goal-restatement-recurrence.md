@@ -59,3 +59,12 @@ Amendments (dated, transparent): none._
 ## Amendment 2026-07-14 — gate-8 preregistration (Cycle-2 Stage 1, before any labeling of this candidate)
 
 Per the Cycle-1 review's **non-fitted-moment mirror gate** (README guardrail 8), added before calibration: the fitted mirror must also reproduce `acf` (lag 1) on held-out real vs synthetic draws within **±0.05 absolute** — semi_markov fits dwell distributions + jump chain, not the indicator ACF. Failing this gate ⇒ the mirror is invalid ⇒ ABORT (no skeptic pass can rescue it).
+
+
+## Amendment 2026-07-19 — Cycle-3 tolerance conversion (still before any labeling)
+
+This card's indicator ACF(1) gate-8 tolerance was preregistered in C2 as a raw
+absolute — exactly the mis-scaling the C2 review flagged (a fixed absolute is
+meaningless until the statistic's magnitude is known). Converted, still blind
+(this candidate has never been labeled), to the uniform Cycle-3 rule: within **±20% of the held-out real magnitude** (`tol_eff = max(0.2·|real|, floor)`, floors: acf 0.01, mi 0.003, dispersion moments 0.05) — preregistered before any Cycle-3 labeling or fitting, per the C2-review lesson that raw-absolute tolerances mis-scale when the statistic's magnitude is unknown. Moment and mirror
+unchanged.

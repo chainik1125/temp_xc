@@ -54,3 +54,29 @@ You label the expressed CONFIDENCE of one sentence in a reasoning trace. 0 = hed
 ---
 _Frozen-by: claude-opus-4-8 via `expansion.hypothesize` (runpod agent).
 Amendments (dated, transparent): none._
+
+
+## Amendment 2026-07-19 — second mirror re-fit prereg: `hier_ar1` (Cycle-3 rider, before fitting)
+
+Gate-8 history: the C1-blessed `ar1+trend` mirror FAILED the retroactive C2
+check (ACF(2) |err| 0.071 > 0.05 abs), and the C2-preregistered `semi_markov`
+attempt FAILED the same moment identically (0.071) — the real stream's ACF is
+a long-memory **plateau** (≈0.13–0.15 through lag 8) no single-timescale menu
+process can hold up. The C2 review mandated a hierarchical extension.
+Preregistered now, before any fit:
+
+- **Process:** `hier_ar1` (Appendix-B Cycle-3 extension): pooled position
+  trend + one empirical latent level per document + within-document AR(1).
+  **Matched:** the trend, the per-document level distribution, lag-1
+  persistence. **Deliberately NOT matched:** any content coupling, and every
+  ACF lag ≥ 2 (the plateau must EMERGE from the level variance).
+- **Gate-8 (non-fitted moments):** held-out real vs synthetic **ACF(2) AND
+  ACF(4)**, each within the uniform Cycle-3 rule: within **±20% of the held-out real magnitude** (`tol_eff = max(0.2·|real|, floor)`, floors: acf 0.01, mi 0.003, dispersion moments 0.05) — preregistered before any Cycle-3 labeling or fitting, per the C2-review lesson that raw-absolute tolerances mis-scale when the statistic's magnitude is unknown. Both must pass.
+- **Matched-moment sanity check (not a gate-8 substitute):** ACF(1) within
+  ±0.05 absolute.
+- **Fresh 70/30 document split** (seed 2000; the semi-Markov attempt used
+  1000). Cached C1 labels; no API calls.
+- **Outcome rule:** PASS ⇒ upgrade `SPEC*`→`SPEC` via a dated amendment to
+  `synthetic/hedging_drift/bench_spec.md` swapping the canonical mirror;
+  FAIL ⇒ stays `SPEC*`, mirror recorded INVALID (a bespoke process would then
+  need the README's written justification in a future cycle).

@@ -73,3 +73,22 @@ def label(s):
 ---
 _Frozen-by: claude-opus-4-8 via `expansion.hypothesize_c2` (runpod agent, Cycle 2).
 Amendments (dated, transparent): none._
+
+
+## Amendment 2026-07-19 — Cycle-3 re-freeze (before any C3 calibration)
+
+The C2 calibration ABORTED on gate-8 alone: Fano |err| 0.163 vs the frozen
+±0.15 **absolute** tolerance — a 4.2% relative miss on a statistic of
+magnitude ≈3.9, while every other held-out moment matched and the primary
+signal was C2's strongest (ACF(1)=0.52 ≫ N1 hi 0.21, κ=0.64). The C2 review
+ruled the tolerance mis-scaled, not the mirror wrong, and mandated a
+re-freeze. Preregistered now, before any C3 run:
+
+- **Record name:** `list-item-parallelism-r2`. The C2 ABORT record stands
+  untouched as the verdict under the C2-frozen tolerance.
+- **Mirror unchanged:** `logistic_ar` (K=8). **Gate-8 moment unchanged:**
+  Fano(w=10). **Tolerance re-preregistered** under the uniform Cycle-3 rule: within **±20% of the held-out real magnitude** (`tol_eff = max(0.2·|real|, floor)`, floors: acf 0.01, mi 0.003, dispersion moments 0.05) — preregistered before any Cycle-3 labeling or fitting, per the C2-review lesson that raw-absolute tolerances mis-scale when the statistic's magnitude is unknown.
+- **Labels + labeler validation REUSED from the C2 record** (identical frozen
+  judge instruction, identical pinned corpus — relabeling would re-spend for
+  zero information). Everything downstream (signature, nulls, mirror fit,
+  skeptic) runs fresh.

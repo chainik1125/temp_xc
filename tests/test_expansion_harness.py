@@ -127,6 +127,45 @@ def test_perturb_categorical_and_ar1_trend():
     assert abs(fit["beta_position"] - 1.0) < 0.15 and abs(fit["rho"] - 0.6) < 0.08
 
 
+def test_mirror_hier_ar1_plateau_recovery():
+    rng = np.random.default_rng(6)
+    true = {"process": "hier_ar1", "mu": 1.0, "beta_position": 0.3, "rho": 0.3,
+            "sigma": 0.5, "levels": (0.8 * rng.standard_normal(200)).tolist()}
+    seqs = mirrors.gen_hier_ar1(true, [120] * 200, rng)
+    fit = mirrors.fit_hier_ar1(seqs, position=True)
+    assert abs(fit["rho"] - 0.3) < 0.06
+    assert abs(np.std(fit["levels"]) - 0.8) < 0.15
+    # the signature the extension exists for: a pooled-ACF plateau at long lags
+    # that a plain AR(1) with the same rho cannot hold up
+    syn = mirrors.gen_hier_ar1(fit, [120] * 200, rng)
+    acf_h = sig.acf(syn, maxlag=8)
+    flat = mirrors.gen_ar1({"process": "ar1", "mu": 1.0, "rho": fit["rho"],
+                            "sigma": fit["sigma"]}, [120] * 200, rng)
+    acf_f = sig.acf(flat, maxlag=8)
+    assert acf_h[5] > 0.4                      # plateau ≈ level share of variance
+    assert acf_f[5] < 0.1                      # plain AR(1): rho^6 ≈ 0
+    assert abs(acf_h[5] - sig.acf(seqs, maxlag=8)[5]) < 0.1   # round-trip
+
+
+def test_mirror_periodic_hawkes_recovery():
+    rng = np.random.default_rng(7)
+    true = {"process": "periodic_hawkes", "period": 8, "K": 2, "intercept": -2.8,
+            "b_cos": 1.2, "b_sin": 0.0, "kernel_w": [1.6, 0.7]}
+    seqs = mirrors.gen_periodic_hawkes(true, [160] * 120, rng)
+    fit = mirrors.fit_periodic_hawkes(seqs, K=2, max_period=32)
+    assert fit["period"] == 8
+    assert fit["kernel_w"][0] > 0.8            # self-excitation recovered
+    assert fit["b_cos"] > 0.6                  # rhythm recovered
+    # round-trip: the hybrid holds BOTH the spectral peak and the burstiness,
+    # which neither pure-menu parent can do simultaneously
+    syn = mirrors.gen_periodic_hawkes(fit, [s.size for s in seqs], rng)
+    assert sig.spec_peak(syn) > 2.0
+    assert abs(sig.fano(syn) - sig.fano(seqs)) < 0.25
+    pure = mirrors.fit_periodic_rate(seqs, max_period=32)
+    syn_pure = mirrors.gen_periodic_rate(pure, [s.size for s in seqs], rng)
+    assert sig.fano(syn_pure) < sig.fano(seqs) - 0.25   # the C2 failure mode
+
+
 def test_labeler_parse_and_agreement():
     assert labeler._parse_labels("[0, 1, 0]", 3, 1).tolist() == [0, 1, 0]
     assert labeler._parse_labels("Here you go: [0,1,1]", 3, 1).tolist() == [0, 1, 1]

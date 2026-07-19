@@ -1,0 +1,71 @@
+{
+  "date": "2026-07-19",
+  "tol_rule": {
+    "rel": 0.2,
+    "floors": {
+      "acf": 0.01,
+      "mi": 0.003,
+      "fano": 0.05,
+      "dwell_cv": 0.05,
+      "gap_cv": 0.05,
+      "spec_peak": 0.05
+    },
+    "eff": "tol_eff = max(rel*|real_heldout|, floor[moment])"
+  },
+  "refreeze": {
+    "list-item-parallelism-r2": {
+      "base_card": "list-item-parallelism",
+      "labels_from": "list-item-parallelism",
+      "mirror": "logistic_ar",
+      "gate8": {
+        "moment": "fano",
+        "idx": null,
+        "tol_rel": 0.2
+      }
+    },
+    "computation-verification-r2": {
+      "base_card": "computation-verification-alternation",
+      "labels_from": "computation-verification-alternation",
+      "mirror": "periodic_hawkes",
+      "gate8": {
+        "moment": "fano",
+        "idx": null,
+        "tol_rel": 0.2
+      }
+    }
+  },
+  "c1_frozen_tol_conversion": {
+    "enumeration-cadence": {
+      "moment": "fano",
+      "idx": null,
+      "tol_rel": 0.2
+    },
+    "goal-restatement-recurrence": {
+      "moment": "acf",
+      "idx": 0,
+      "tol_rel": 0.2
+    }
+  },
+  "hedging_refit": {
+    "record": "uncertainty-hedging-drift",
+    "mirror": "hier_ar1",
+    "split_seed": 2000,
+    "gate8": [
+      {
+        "moment": "acf",
+        "idx": 1,
+        "tol_rel": 0.2
+      },
+      {
+        "moment": "acf",
+        "idx": 3,
+        "tol_rel": 0.2
+      }
+    ],
+    "matched_check": {
+      "moment": "acf",
+      "idx": 0,
+      "tol_abs": 0.05
+    }
+  }
+}

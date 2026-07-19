@@ -59,3 +59,27 @@ Amendments (dated, transparent): none._
 ## Amendment 2026-07-14 — gate-8 preregistration (Cycle-2 Stage 1, before any labeling of this candidate)
 
 Per the Cycle-1 review's **non-fitted-moment mirror gate** (README guardrail 8), added before calibration: the fitted mirror must also reproduce `fano` on held-out real vs synthetic draws within **±0.3 absolute** — periodic_rate fits the cyclic rate profile (period + harmonics), not dispersion. Failing this gate ⇒ the mirror is invalid ⇒ ABORT (no skeptic pass can rescue it).
+
+
+## Amendment 2026-07-19 — Cycle-3 re-freeze with hybrid mirror (before any C3 calibration)
+
+The C2 calibration confirmed the primary signal is REAL (spec_peak 3.84 ≫
+null ≤1.18, survives the noise floor) but ABORTED on gate-8: the events are
+ALSO bursty (held-out Fano 2.29) and the pure `periodic_rate` mirror can only
+generate near-Poisson dispersion (Fano 0.87). The C2 review's systemic
+finding: the menu lacked a process for phenomena that are rhythmic AND
+clustered at once, and mandated this re-freeze. Preregistered now:
+
+- **Record name:** `computation-verification-r2`. The C2 ABORT stands as the
+  verdict for the periodic-only mirror.
+- **Mirror swapped** `periodic_rate` → **`periodic_hawkes`** (Appendix-B
+  Cycle-3 extension: logit P(event) = periodic base (cyclogram period + one
+  harmonic) + K=8-lag self-excitation kernel, fit jointly by logistic
+  regression). **Matched:** period, phase profile, excitation kernel.
+  **Deliberately NOT matched:** window-count dispersion (Fano), inter-event
+  gap distribution, and the content of what gets verified.
+- **Gate-8 moment:** Fano(w=10) — derived overdispersion, never directly fit —
+  within the uniform Cycle-3 rule: within **±20% of the held-out real magnitude** (`tol_eff = max(0.2·|real|, floor)`, floors: acf 0.01, mi 0.003, dispersion moments 0.05) — preregistered before any Cycle-3 labeling or fitting, per the C2-review lesson that raw-absolute tolerances mis-scale when the statistic's magnitude is unknown.
+- **Labels + labeler validation REUSED from the C2 record** (identical frozen
+  judge instruction, ctx=3, identical pinned traces). Signature, nulls,
+  mirror fit and skeptic run fresh.
