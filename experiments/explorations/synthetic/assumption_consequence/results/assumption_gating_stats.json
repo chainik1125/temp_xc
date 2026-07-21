@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "N_SEQS_PROBE": 6000,
+    "seq_len": 64,
+    "T_grid": [
+      2,
+      4,
+      8
+    ],
+    "gates": {
+      "state_oracle": 0.99,
+      "next_sep": 0.1,
+      "oracle_agree": 0.02,
+      "chance_tol": 0.02,
+      "fwd_tol": 0.03
+    },
+    "P": [
+      [
+        0.7912243453644727,
+        0.058386411889596604,
+        0.15038924274593066
+      ],
+      [
+        0.38893617021276594,
+        0.24765957446808512,
+        0.36340425531914894
+      ],
+      [
+        0.3607421875,
+        0.0455078125,
+        0.59375
+      ]
+    ],
+    "pi": [
+      0.6434792380738327,
+      0.06635949879193122,
+      0.2901612631342361
+    ]
+  },
+  "mirror": {
+    "fwd_rate": 0.35876540293689224,
+    "rev_rate": 0.19955015389472022,
+    "asym": 0.15921524904217202,
+    "marginal_C": 0.29576302083333333,
+    "fwd_fit_g7": 0.36340425531914894
+  },
+  "analytic": {
+    "rule_balanced": [
+      0,
+      1,
+      2
+    ],
+    "oracle_balacc": 0.5442113066108526,
+    "recall_by_class": [
+      0.7912243453644726,
+      0.24765957446808512,
+      0.59375
+    ],
+    "oracle_rawacc": 0.707229298203923,
+    "chance_rawacc_modal_marginal": 0.6434792380738327,
+    "chance_balacc": 0.3333333333333333
+  },
+  "per_token": {
+    "state_balacc_on_x": 0.9995857818387693,
+    "state_shuffled_floor": 0.3333333333333333,
+    "next_balacc_on_x": 0.464383924165928,
+    "next_shuffled_floor": 0.3333333333333333,
+    "next_oracle_empirical": 0.5443547382541339
+  },
+  "window": {
+    "2": {
+      "state_balacc_raw_linear": 0.9993442725497119,
+      "next_balacc_raw_linear": 0.46668906390010784
+    },
+    "4": {
+      "state_balacc_raw_linear": 0.9994867439198624,
+      "next_balacc_raw_linear": 0.4664503738281544
+    },
+    "8": {
+      "state_balacc_raw_linear": 0.9992284912283133,
+      "next_balacc_raw_linear": 0.4655773846178528
+    }
+  },
+  "verdict": {
+    "state_oracle_reachable": true,
+    "next_separable": true,
+    "next_separation": 0.21087797327751928,
+    "oracle_empirical_agrees": true,
+    "chance_floors_ok": true,
+    "fwd_edge_matches_fit": true,
+    "per_token_info_ceiling_equals_oracle": false,
+    "passes_gate": true
+  }
+}
