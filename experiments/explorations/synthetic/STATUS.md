@@ -48,8 +48,21 @@ Last updated: 2026-07-19.
   [`expansion/LEDGER.md`](expansion/LEDGER.md). Specs now: **backtracking**
   (anchor), **assumption_consequence**, **hedging_drift** (both solid SPEC),
   **list_item_parallelism** (SPEC, text), **self_reference_echo** (SPEC*,
-  low priority). **NO architecture was trained or evaluated. Cycle-3
-  briefing stays until reviewed; STOPPED for review.**
+  low priority). **NO architecture was trained or evaluated.**
+  **Reviewed + APPROVED (2026-07-21, mac-local):** verified honest (no reward-hack
+  — the `list_item` relative-tolerance re-freeze was preregistered + transparent;
+  the hedging `hier_ar1` fix is genuine, err 0.003). Findings baked in: the
+  one-stop **[`BENCHMARKS.md`](BENCHMARKS.md) registry** created (every benchmark,
+  spec-status/registered/verdict + the tried-&-set-aside record); interaction/
+  equality still unclaimed but the categorical recipe *measures* real signals —
+  blocker is a **hierarchical-categorical mirror** (the C4 build). C3 briefing
+  **retired**; C4 targets (that mirror + gate-8 hardening to ≥2 non-fitted moments)
+  recorded in the LEDGER for when expansion resumes.
+  **Decision (2026-07-21): do STAGE 6 next, before Cycle 4** — build + evaluate the
+  two solid grounded SPECs (`assumption_consequence` AC + `hedging_drift` DC) into
+  the framework and extend `REPORT.md`, blind to their frozen predictions. Briefing
+  queued: [`briefings/stage6-grounded-eval.md`](../../../briefings/stage6-grounded-eval.md)
+  (runpod). This closes the measure→mirror→**bench** loop for the first time. **STOPPED for review.**
 
 - **Program-level B×A report + full clean-room rerun: DONE (2026-07-11).** The
   entire synthetic result set was rebuilt from scratch at **protocol 1.3.0** under
