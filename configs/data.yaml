@@ -213,6 +213,72 @@ datasources:
       oracle range 0.000). Separates "frequency structure" (circle high-pass)
       from "symbol identity" (random flat). d_in=128 ≥ M. Spec §§ 2/6/7 P4.
 
+  toy_assumption_consequence_d64:
+    category: synthetic
+    generator: assumption_consequence
+    params:
+      P:
+        - [0.7912243453644727, 0.058386411889596604, 0.15038924274593066]
+        - [0.38893617021276594, 0.24765957446808512, 0.36340425531914894]
+        - [0.3607421875, 0.0455078125, 0.59375]
+      pi: [0.6434792380738327, 0.06635949879193122, 0.2901612631342361]
+      d_in: 64
+      K_c: 17
+      n_c: 3
+      mag_state: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Expansion stage-6 #1 assumption->consequence: directed-grammar (AC) bench
+      on the reasoning-trace domain. Layer 1 = the canonical g7 3-state {N,A,C}
+      Markov mirror (assumption_consequence/mirror_params_g7.json, frozen
+      2026-07-14: strict per-sentence ctx=0 labeler, fit on 207 traces, held-out
+      validated, gate-8 PASS; directed asym 0.297, P[A->C]=0.363 vs C rate
+      0.294). Layer 2 = backtracking-pattern emission over F=20 = 3 dominant
+      state dirs (mag 2.5 -> hidden_features/gauc) + 17 content (mag 1.0 ->
+      emission_features/eauc), state-independent content (clean DPI). Latents:
+      state s_i (DC; balanced-acc chance 1/3, oracle 1) and next-state s_{i+1}
+      (AC-directed; chance 1/3, oracle = the Markov one-step conditional's
+      Bayes-balanced rule ~0.54 balacc — NOTE the order-1 mirror makes s_i
+      sufficient, so the per-token INFO ceiling equals the oracle; see gating).
+      Spec: experiments/explorations/synthetic/assumption_consequence/
+      bench_spec.md (frozen; g7 amendment 2026-07-14).
+
+  toy_hedging_drift_d64:
+    category: synthetic
+    generator: hedging_drift
+    params:
+      mu: 0.7803249330559888
+      beta_position: 0.2283620815852247
+      rho: 0.24758953448987794
+      ar_sigma: 0.5436530037277453
+      d_in: 64
+      K_c: 19
+      n_c: 3
+      mag_conf: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Expansion stage-6 #2 hedging-drift: DC slow-drift / confidence-persistence
+      bench on the reasoning-trace domain. Layer 1 = the canonical C3
+      hierarchical AR(1) mirror (hedging_drift/mirror_params_hier.json, frozen
+      2026-07-19, gate-8 PASS on ACF(2)+ACF(4) — holds the long-memory plateau):
+      c_i = mu + beta*(i/L) + l_j + r_i, r AR(1); the 210 empirical per-trace
+      levels l_j live as a code constant (_HEDGING_LEVELS_HIER, full precision).
+      Layer 2 = continuous-loading emission: u_conf's magnitude carries c_i
+      (folded-normal per-token m => irreducible multiplicative noise; temporal
+      denoising is the DC axis under test). F=20 = 1 conf dir (mag 2.5 ->
+      hidden_features/gauc) + 19 content (mag 1.0 -> emission_features/eauc).
+      Latent: c_i continuous (ridge probe R^2; chance 0 = pooled mean, oracle
+      1 = c_i itself — NOT reachable under the multiplicative emission noise;
+      per-token/window ceilings quantified in gating). Spec: experiments/
+      explorations/synthetic/hedging_drift/bench_spec.md (frozen; hier_ar1
+      amendment 2026-07-19).
+
   gemma_2_2b_it_l13_fineweb_24k128:
     category: real_lm
     subject_model: google/gemma-2-2b-it

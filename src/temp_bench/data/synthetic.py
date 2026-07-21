@@ -1,6 +1,6 @@
 """Synthetic data generators for § 4 + the synthetic-benchmark program.
 
-Six generators, registered in :data:`_GENERATORS` (name → fn) at the bottom of
+Eight generators, registered in :data:`_GENERATORS` (name → fn) at the bottom of
 this module. The first two are the paper's § 4 benches; the rest were developed
 by the synthetic-benchmark program (``experiments/explorations/synthetic/``):
 
@@ -16,6 +16,12 @@ by the synthetic-benchmark program (``experiments/explorations/synthetic/``):
   a dual DC (mode) / AC (time-since-switch) substrate (the changepoint bench).
 - :func:`cyclic_tones` — cyclic walk at a hidden velocity, circle- or
   random-embedded; a periodic / frequency latent (the frequency bench).
+- :func:`assumption_consequence` — 3-state {N,A,C} Markov discourse chain,
+  the fitted g7 mirror of real reasoning traces; a directed-transition AC
+  latent (the assumption_consequence bench, expansion stage 6).
+- :func:`hedging_drift` — hierarchical AR(1) confidence stream (per-trace
+  level + trend + AR residual), the fitted C3 mirror; a slow-drift DC latent
+  (the hedging_drift bench, expansion stage 6).
 
 Each datasource in ``configs/data.yaml`` names one generator; the reverse index
 (generator → datasource(s) → bench) is at :data:`_GENERATORS`.
@@ -725,6 +731,320 @@ def semi_markov_modes(
     )
 
 
+# ── Assumption→consequence directed-grammar bench (expansion C1/C2 g7) ─
+
+
+# Canonical g7 mirror (assumption_consequence/mirror_params_g7.json, frozen
+# 2026-07-14): 3-state {N, A, C} Markov chain fit on 207 strict-labeled
+# (ctx=0) R1-Distill traces, held-out validated, gate-8 PASS. Full precision
+# — the YAML datasource pins the same values explicitly.
+_AC_G7_P = (
+    (0.7912243453644727, 0.058386411889596604, 0.15038924274593066),
+    (0.38893617021276594, 0.24765957446808512, 0.36340425531914894),
+    (0.3607421875, 0.0455078125, 0.59375),
+)
+_AC_G7_PI = (0.6434792380738327, 0.06635949879193122, 0.2901612631342361)
+
+
+def assumption_consequence(
+    *,
+    P: tuple = _AC_G7_P,
+    pi: tuple = _AC_G7_PI,
+    d_in: int = 64,
+    K_c: int = 17,
+    n_c: int = 3,
+    mag_state: float = 2.5,
+    mag_content: float = 1.0,
+    sigma: float = 0.0,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Assumption→consequence directed-grammar bench (expansion C1, g7 re-exam).
+
+    Mirrors the *measured* directed discourse grammar of real R1-Distill
+    reasoning traces (``experiments/explorations/synthetic/assumption_consequence/
+    bench_spec.md``): assumptions precede their consequences — directed
+    asymmetry 0.297 under the strict per-sentence labeler, ≫ nulls. Two layers:
+
+    **Layer 1 — 3-state Markov discourse chain.** Per sequence, a state stream
+    ``s_i ∈ {0:N, 1:A, 2:C}`` (neither / assumption / consequence) from the
+    fitted g7 transition matrix (``P[A→C] = 0.363`` vs unconditional C rate
+    0.290 — the directed edge). Matched: the forward transition matrix (hence
+    the directed asymmetry, marginal, dwell geometry). Deliberately NOT
+    matched: order-2+ structure (the real stream has it — a documented
+    fidelity limit; on this order-1 mirror the one-step conditional given
+    ``s_i`` is the Bayes ceiling for next-state prediction).
+
+    **Layer 2 — emission** over a fixed orthonormal dictionary of
+    ``F = 3 + K_c`` directions, the backtracking/changepoint pattern::
+
+        x_i = m · u_{s_i}  +  Σ_{j ∈ content_i} m_j · u_j  +  σ · ε_i
+
+    ``u_{s_i}`` is the discourse-state direction (dominant magnitude
+    ``mag_state > mag_content`` → top-1 atom, survives ``k_pos = 1``);
+    ``content_i`` is a random size-``n_c`` subset of the ``K_c`` content
+    directions, state-independent (so ``x_i ⊥ past | s_i`` exactly).
+
+    Direction sets reported separately: the 3 state directions go in
+    ``hidden_features`` (→ ``gauc``), the ``K_c`` content directions in
+    ``emission_features`` (→ ``eauc``).
+
+    Ground truths exposed (in ``extra``):
+        state_labels:      (n_seqs, seq_len)  s_i ∈ {0,1,2} (DC probe target)
+        next_state_labels: (n_seqs, seq_len)  s_{i+1} (AC probe target;
+                           last column = -1, an invalid-sentinel to mask)
+        P, pi:             the generating chain (evaluator computes the
+                           Bayes-balanced oracle rule from these)
+    """
+    P_arr = np.asarray(P, dtype=np.float64)
+    pi_arr = np.asarray(pi, dtype=np.float64)
+    n_states = P_arr.shape[0]
+    if P_arr.shape != (n_states, n_states) or pi_arr.shape != (n_states,):
+        raise ValueError(f"P {P_arr.shape} / pi {pi_arr.shape} malformed")
+    if not (np.allclose(P_arr.sum(1), 1.0, atol=1e-6)
+            and np.isclose(pi_arr.sum(), 1.0, atol=1e-6)):
+        raise ValueError("P rows / pi must sum to 1")
+    if n_states + K_c > d_in:
+        raise ValueError(f"F = n_states+K_c ({n_states + K_c}) > d_in ({d_in})")
+    if n_c > K_c:
+        raise ValueError(f"n_c ({n_c}) > K_c ({K_c})")
+
+    rng = np.random.default_rng(seed)
+
+    # Layer 1: Markov state stream (vectorised inverse-CDF sampling).
+    cumP = np.cumsum(P_arr, axis=1)
+    s = np.zeros((n_seqs, seq_len), dtype=np.int64)
+    s[:, 0] = rng.choice(n_states, size=n_seqs, p=pi_arr)
+    for t in range(1, seq_len):
+        u = rng.random(n_seqs)
+        s[:, t] = (u[:, None] > cumP[s[:, t - 1]]).sum(axis=1)
+    next_s = np.full_like(s, -1)
+    next_s[:, :-1] = s[:, 1:]
+
+    # Orthonormal dictionary: n_states state + K_c content directions.
+    raw = rng.standard_normal((d_in, d_in))
+    Qd, _ = np.linalg.qr(raw)
+    U_s = Qd[:n_states].astype(np.float32)                # state-signature dirs
+    U_c = Qd[n_states:n_states + K_c].astype(np.float32)  # content dirs
+
+    # Layer 2: emission (the changepoint/backtracking pattern).
+    ms = np.abs(rng.normal(mag_state, 0.3 * mag_state,
+                           size=(n_seqs, seq_len))).astype(np.float32)
+    x = ms[..., None] * U_s[s]                            # (n_seqs, seq_len, d_in)
+    pick = np.argsort(rng.random((n_seqs, seq_len, K_c)), axis=-1)[:, :, :n_c]
+    cmag = np.abs(rng.normal(mag_content, 0.3 * mag_content,
+                             size=(n_seqs, seq_len, n_c))).astype(np.float32)
+    x += (cmag[..., None] * U_c[pick]).sum(axis=2)
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+
+    fwd = float((s[:, 1:][s[:, :-1] == 1] == 2).mean())   # P(C@t+1 | A@t)
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(U_c),          # content set → eauc
+        hidden_features=torch.from_numpy(U_s),            # state set → gauc
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra={
+            "state_labels": torch.from_numpy(s),
+            "next_state_labels": torch.from_numpy(next_s),
+            "P": [[float(v) for v in row] for row in P_arr],
+            "pi": [float(v) for v in pi_arr],
+            "n_states": int(n_states),
+            "fwd_rate_realized": fwd,
+        },
+    )
+
+
+# ── Hedging-drift DC confidence-persistence bench (expansion C1/C3) ────
+
+
+# Empirical per-trace levels of the canonical hier_ar1 mirror
+# (hedging_drift/mirror_params_hier.json, C3 rider, gate-8 PASS on
+# ACF(2)+ACF(4)): 210 per-trace mean deviations, heavy tails preserved,
+# sampled with replacement per generated sequence.
+_HEDGING_LEVELS_HIER = (
+    0.11815517434222396, -0.017228059174385805, -0.22657062895090546,
+    -0.11099083229997792, 0.18454048216020563, -0.21503262855213431,
+    0.005637268987687844, 0.28184509652355794, 0.1098856046434224,
+    -0.1633641634406751, -0.004463741113322262, -0.023699658187811907,
+    -0.15888342902844152, -0.07842041888395734, -0.015826265528714828,
+    0.08218300090909914, 0.26426804101986473, -0.015826265528714828,
+    -0.20638331070652144, -0.02466576131534247, 0.11535403536195293,
+    -0.15646196289288952, -0.08437705529594106, -0.03112458257512287,
+    0.1310201002562563, -0.27458253910133, -0.11380232396817762,
+    0.2111875998632353, 0.4169121302306601, 0.31120307819102944,
+    0.14834714310496086, 0.23406442851211073, -0.2541535919847598,
+    0.2441562375348173, -0.18387596174636148, -0.030641453840830474,
+    -0.1733641634406751, 0.1218056034074863, -0.010594432940559607,
+    -0.16789635580161477, -0.33736457050425933, -0.13663185794100358,
+    0.05614231949273834, -0.0179201260598149, -0.13701596115600834,
+    -0.04381585513040103, 0.21287957928217854, 0.4351925856302975,
+    -0.02105153944965656, 0.0790186228559182, -0.07922479895566382,
+    0.04466115649954761, -0.03112458257512287, 0.19984065234415144,
+    -0.008136076827996429, 0.29769230258709084, -0.07710159406937576,
+    -0.14631689330469969, 0.005624127443074163, -0.20713177569984983,
+    0.21553542259489006, -0.08437705529594106, 0.024484391337194267,
+    -0.13099923087045648, 0.17053850530876705, -0.03508844251415327,
+    0.07877348023281193, -0.060115408656076987, 0.06501674532632187,
+    0.2447666562504754, -0.29562050578635946, -0.20782978237902128,
+    0.1745637449940456, -0.012830092970420594, 0.1870600022868231,
+    -0.02466576131534247, 0.05759384027681657, 0.057641839491176156,
+    -0.03158915426570104, -0.023078371619039948, -0.014564751214332365,
+    -0.018316588007011494, -0.23991012195956538, -0.19965022663803303,
+    -0.014564751214332365, -0.06163711508052495, 0.1218056034074863,
+    0.1240394738776498, 0.29996322809327464, -0.289873712219839,
+    0.05127497922850602, -0.1091792030270794, 0.10653203561314982,
+    -0.005585759146635736, -0.014564751214332365, 0.20254451886239266,
+    0.022683535317375315, -0.04869406832452692, -0.20638331070652144,
+    0.13406277078710685, 0.011615229017977555, 0.1218056034074863,
+    0.06883535672491403, -0.039149921340344784, -0.20782978237902128,
+    0.051274979228506004, -0.24677205871698396, -0.2232257569332134,
+    0.26426804101986473, -0.18995453383989117, 0.22929191957280018,
+    0.2540986476945504, -0.026316893304699676, -0.039781504304042606,
+    -0.30631689330469974, 0.08650837510398181, -0.07299832170486396,
+    0.019778916236380045, -0.01848650027009571, -0.06907541296077026,
+    -0.09842130205692153, -0.08782829799415166, 0.23866907607530474,
+    -0.03610837999373732, 0.003358176045566786, 0.06849634718720155,
+    -0.004463741113322262, -0.15864698363643165, 0.003358176045566786,
+    -0.09351309523301324, 0.07342937104909451, 0.01837815400230678,
+    0.09713724351736687, -0.07966106168396772, -0.02105153944965656,
+    0.19410534558317583, 0.1218056034074863, -0.2150326285521344,
+    -0.013819112359780693, 0.25406435289658413, -0.03145268901418209,
+    0.06577192079198917, 0.1218056034074863, 0.3612030781910295,
+    0.08124344666226109, -0.00853976994778159, -0.08035474916829638,
+    -0.0019605277530293096, 0.05685089425712289, -0.06963325572162928,
+    0.1663771337798823, 0.13481457985646755, 0.024462723207075984,
+    -0.043364163440675056, 0.26426804101986473, -0.06017105243813966,
+    0.012442418594542228, -0.19026028410816048, -0.02083753227220303,
+    0.2447666562504754, -0.1659357347486851, -0.045272214555809986,
+    -0.04986393446740889, 0.2447666562504754, 0.04575297343013075,
+    0.023972751296285174, -0.1402214910157469, -0.015826265528714828,
+    0.3201060951650829, -0.1733641634406751, -0.03945498554625225,
+    0.07663583655932495, 0.10714882384404538, 0.16485500712996787,
+    -0.133566973332239, -0.19204412280500788, 0.6904509230352205,
+    0.9789484605503436, 0.3920238907284889, -0.15616148646975103,
+    0.015528580207536127, 0.37679295444682775, 0.08770328125321593,
+    -0.015789840779288807, 0.0627927189073616, -0.17360132700966685,
+    0.0314664661634081, -0.05660616730990104, 0.13329921401561856,
+    0.04220565024594305, 0.1381462566338799, -0.014564751214332365,
+    0.4464394288709064, -0.15505143764868912, -0.20638331070652144,
+    -0.12984569699606685, -0.6784855902897917, -0.3217181043153558,
+    -0.1733641634406751, 0.23841100529906428, 0.06917796111207744,
+    -0.08362286622011769, 0.25644553482467064, 0.18117680318110746,
+    -0.3463168933046997, 0.046628737486249586, -0.1678963558016148,
+    0.14885701225631096, -0.04297157159820293, 0.1218056034074863,
+)
+
+
+def hedging_drift(
+    *,
+    mu: float = 0.7803249330559888,
+    beta_position: float = 0.2283620815852247,
+    rho: float = 0.24758953448987794,
+    ar_sigma: float = 0.5436530037277453,
+    levels: tuple | None = None,
+    d_in: int = 64,
+    K_c: int = 19,
+    n_c: int = 3,
+    mag_conf: float = 2.5,
+    mag_content: float = 1.0,
+    sigma: float = 0.0,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Hedging-drift bench — DC confidence persistence (expansion C1, C3 mirror).
+
+    Mirrors the *measured* slow drift + persistence of expressed confidence in
+    real R1-Distill traces (``experiments/explorations/synthetic/hedging_drift/
+    bench_spec.md``): ACF(1) = 0.316 ≫ nulls, with a long-memory *plateau*
+    (ACF ≈ 0.13 through lag 8) that only the C3 **hierarchical AR(1)** mirror
+    reproduces (gate-8 PASS on ACF(2)+ACF(4)). Two layers:
+
+    **Layer 1 — hierarchical AR(1)** (``mirror_params_hier.json``; sampling
+    matches ``explorations.synthetic.expansion.mirrors.gen_hier_ar1``)::
+
+        c_i = mu + beta·(i/L) + l_j + r_i ,   r_i = rho·r_{i-1} + ar_sigma·eta_i
+
+    with ``l_j`` drawn per sequence from the 210 EMPIRICAL per-trace levels
+    (heavy tails preserved) and ``r_0`` at the stationary sd. Matched: the
+    trend, the per-trace level distribution, lag-1 persistence. Deliberately
+    NOT matched: ACF lags ≥ 2 (the plateau *emerges* from the level variance)
+    and the confidence↔correctness coupling.
+
+    **Layer 2 — emission**: the confidence feature's *magnitude* carries
+    ``c_i`` (continuous loading)::
+
+        x_i = c_i · m · u_conf  +  Σ_{j ∈ content_i} m_j · u_j  +  σ · ε_i
+
+    ``m, m_j`` folded-normal per token (backtracking conventions) — so a
+    per-token reading of ``c_i`` carries irreducible multiplicative noise and
+    temporal aggregation (the DC axis under test) is what denoises it.
+    ``F = 1 + K_c``; the confidence direction goes in ``hidden_features``
+    (→ ``gauc``), content in ``emission_features`` (→ ``eauc``).
+
+    Ground truths exposed (in ``extra``):
+        conf_labels:  (n_seqs, seq_len)  the confidence state c_i (probe target)
+        level_labels: (n_seqs,)          the per-sequence slow level l_j
+    """
+    if K_c + 1 > d_in:
+        raise ValueError(f"F = 1+K_c ({K_c + 1}) > d_in ({d_in})")
+    if n_c > K_c:
+        raise ValueError(f"n_c ({n_c}) > K_c ({K_c})")
+    levels_arr = np.asarray(
+        _HEDGING_LEVELS_HIER if levels is None else levels, dtype=np.float64)
+    if levels_arr.ndim != 1 or levels_arr.size == 0:
+        raise ValueError("levels must be a non-empty 1-D sequence")
+
+    rng = np.random.default_rng(seed)
+
+    # Layer 1: hierarchical AR(1) confidence stream (matches gen_hier_ar1).
+    pos = np.arange(seq_len, dtype=np.float64) / seq_len
+    l = rng.choice(levels_arr, size=n_seqs)
+    stat_sd = ar_sigma / max(np.sqrt(max(1.0 - rho ** 2, 1e-9)), 1e-9)
+    r = np.zeros((n_seqs, seq_len), dtype=np.float64)
+    r[:, 0] = stat_sd * rng.standard_normal(n_seqs)
+    for i in range(1, seq_len):
+        r[:, i] = rho * r[:, i - 1] + ar_sigma * rng.standard_normal(n_seqs)
+    c = mu + beta_position * pos[None, :] + l[:, None] + r
+
+    # Orthonormal dictionary: u_conf + K_c content directions.
+    raw = rng.standard_normal((d_in, d_in))
+    Qd, _ = np.linalg.qr(raw)
+    u_conf = Qd[0].astype(np.float32)                     # (d_in,)
+    content = Qd[1:1 + K_c].astype(np.float32)            # (K_c, d_in)
+
+    # Layer 2: emission — magnitude-carried confidence + content filler.
+    mconf = np.abs(rng.normal(mag_conf, 0.3 * mag_conf, size=(n_seqs, seq_len)))
+    x = ((c * mconf)[:, :, None] * u_conf[None, None, :]).astype(np.float32)
+    pick = np.argsort(rng.random((n_seqs, seq_len, K_c)), axis=-1)[:, :, :n_c]
+    cmag = np.abs(rng.normal(mag_content, 0.3 * mag_content,
+                             size=(n_seqs, seq_len, n_c))).astype(np.float32)
+    x += (cmag[..., None] * content[pick]).sum(axis=2)
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(content),      # content set → eauc
+        hidden_features=torch.from_numpy(u_conf[None, :]),  # conf dir → gauc
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra={
+            "conf_labels": torch.from_numpy(c.astype(np.float32)),
+            "level_labels": torch.from_numpy(l.astype(np.float32)),
+            "mu": float(mu), "beta_position": float(beta_position),
+            "rho": float(rho), "ar_sigma": float(ar_sigma),
+        },
+    )
+
+
 # ── Refill-source factory (used by ActivationBuffer / WindowBuffer) ────
 
 
@@ -739,6 +1059,8 @@ def semi_markov_modes(
 #   semi_markov_modes → toy_changepoint_modes_d64                    (changepoint)
 #   cyclic_tones      → toy_cyclic_circle_M101_d128,
 #                       toy_cyclic_random_M101_d128                  (frequency)
+#   assumption_consequence → toy_assumption_consequence_d64          (assumption_consequence)
+#   hedging_drift     → toy_hedging_drift_d64                        (hedging_drift)
 _GENERATORS = {
     "markov":  markov_chain_support,
     "coupled": coupled_hmm,
@@ -746,6 +1068,8 @@ _GENERATORS = {
     "self_exciting": self_exciting,
     "semi_markov_modes": semi_markov_modes,
     "cyclic_tones": cyclic_tones,
+    "assumption_consequence": assumption_consequence,
+    "hedging_drift": hedging_drift,
 }
 
 

@@ -308,6 +308,22 @@ class SyntheticRecovery(Evaluator):
             out.update(frequency_metrics(model, data, eval_window_L=L,
                                          n_windows=n_windows))
 
+        # Assumption→consequence state/next-state add-on (expansion stage-6
+        # #1). Only fires for the toy_assumption_consequence datasource, which
+        # exposes the discourse-state labels in `extra`. No-op (byte-identical
+        # metrics) for every other bench → protocol stays 1.3.0.
+        if getattr(data, "extra", None) and "state_labels" in data.extra:
+            from temp_bench.evals.assumption_recovery import assumption_metrics
+            out.update(assumption_metrics(model, data, eval_window_L=L))
+
+        # Hedging-drift confidence-state add-on (expansion stage-6 #2). Only
+        # fires for the toy_hedging_drift datasource, which exposes the
+        # continuous confidence stream in `extra`. No-op (byte-identical
+        # metrics) for every other bench → protocol stays 1.3.0.
+        if getattr(data, "extra", None) and "conf_labels" in data.extra:
+            from temp_bench.evals.hedging_recovery import hedging_metrics
+            out.update(hedging_metrics(model, data, eval_window_L=L))
+
         return out
 
     def primary_metric(self) -> str:
