@@ -149,8 +149,10 @@ Git creds: token at `/workspace/.tokens/gh_token`, wired into
   program (one exploration under `experiments/explorations/`). Self-contained:
   [`README.md`](README.md) (the single governing doc — prime directive, the
   measure→mirror→bench loop, § 3 validity gates, conventions, benchmark index),
-  this `STATUS.md`, then one subdir per benchmark with docs + scripts + `figs/` +
-  `results/`. The DC/AC lens is at
+  **[`BENCHMARKS.md`](BENCHMARKS.md) (the one-stop registry — every benchmark's
+  spec-status / framework-registered / arch-verdict, + the tried-&-set-aside
+  record)**, this `STATUS.md`, then one subdir per benchmark with docs + scripts +
+  `figs/` + `results/`. The DC/AC lens is at
   [`../../../docs/ideas/frequency_lens.md`](../../../docs/ideas/frequency_lens.md).
 - **Run scripts** from the repo root as
   `.venv/bin/python -m experiments.explorations.synthetic.<bench>.<script>`.

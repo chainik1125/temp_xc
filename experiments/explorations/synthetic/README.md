@@ -52,6 +52,11 @@ into those traps impossible to do silently.
 
 ## Benchmarks (status)
 
+> **The one-stop registry is [`BENCHMARKS.md`](BENCHMARKS.md)** — every benchmark
+> (this evaluated suite **and** the grounded-expansion program), with unambiguous
+> `spec-status / framework-registered / arch-verdict` columns, plus the full
+> "tried & set aside" record. The table below is the evaluated-suite slice only.
+
 | benchmark | dynamics class | stage | verdict | headline |
 |---|---|---|---|---|
 | [`backtracking/`](backtracking/) | self-exciting / recurrent (**AC**) | bench run (BatchTopK) | **POSITIVE** | window λ-recovery **0.95** (T≥4) vs per-token **DPI floor 0.41**, robust at `d_sae<F`; survives a uniform BatchTopK backbone |
