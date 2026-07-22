@@ -10,6 +10,27 @@ Last updated: 2026-07-22.
 
 ## 0. TL;DR — what's active right now
 
+- **AUTORESEARCH REVAMP — STARTED, phase 1 done (2026-07-22, mac-local).** The
+  program is now explicitly **two generators, one substrate**: README gained
+  § "The two generators, one substrate" (FreqBench theorem-first +
+  PhenomenonBench data-first, the shared-substrate contract, the 3-axis
+  coordinate system + the 4-regime table) and a new **discriminability
+  STOP-gate** in the validity gates (pre-grid § 8 ceilings must separate raw
+  window from raw per-token — the stage-6 lesson, promoted from a logged stat
+  to a gate); BENCHMARKS.md now carries a provenance column. Next phases:
+  **(2) FreqBench port** — Dmitry's Opus-4.7 sprint
+  (`origin/dmitry-spectral-sprint2` `fb_core.py` + proofs,
+  `origin/dmitry-synthetic` colored sources) → `temp_bench` v2 plugins on the
+  shared panel, rerun on Fable 5, wire **FreqFrac** to coordinatize the
+  existing frequency/signed_motion/hedging benches into REPORT.md. ⚠ Design
+  caveat: checkpoints did NOT survive the pod migration and the leaderboard
+  cache fast-forwards done cells *without retraining*, so FreqFrac needs a
+  train+analyze path that bypasses the cache (cheap — CPU pod does ~495
+  cells/hour). **(3)** the two autoresearch loops on Fable 5 (FreqBench
+  generator + expansion C4 under the new gate; C4 target = hierarchical-
+  categorical mirror → the first *grounded* regime-3 bench). **(4)** the acid
+  test: hide a bench, predict its arch ranking from coordinates alone.
+
 - **STAGE 6 DONE (2026-07-22, runpod) — both grounded benches built, run,
   verdicts written blind. STOPPED for review.** The measure→mirror→**bench**
   loop is closed for the first time: `assumption_consequence` (AC) +

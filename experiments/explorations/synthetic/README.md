@@ -1,9 +1,13 @@
 # Synthetic temporal benchmarks
 
-This directory is the **synthetic-benchmark program**: find a *measurable*
-temporal property of real LM behaviour, fit a faithful synthetic *mirror* of it,
-then benchmark whether a window/temporal dictionary exploits that structure
-better than a per-token SAE. Each benchmark is a **self-contained subdir**
+This directory is the **synthetic-benchmark program**: build synthetic
+benchmarks whose ground truth is stated exactly, and use them to deliver sound
+verdicts on whether window/temporal dictionary architectures exploit temporal
+structure better than a per-token SAE. Benchmarks enter through one of **two
+generators** (see "The two generators, one substrate" below):
+**PhenomenonBench** — data-first, mirror a *measured* property of real LM
+behaviour — and **FreqBench** — theorem-first, construct a task with *proven*
+ceilings from a structural axis. Each benchmark is a **self-contained subdir**
 holding its docs, scripts, figures, and results.
 
 It lives under `experiments/explorations/` — the home for exploratory experiments
@@ -14,9 +18,10 @@ tree holds the experiments + their artifacts. Scripts run as a package, from the
 repo root: `.venv/bin/python -m experiments.explorations.synthetic.<bench>.<script>`.
 
 This README is the **single governing doc** for the program — the prime
-directive, the measure→mirror→bench loop and its validity gates, and the
-conventions every synthetic benchmark follows. Read it before proposing or
-implementing a benchmark.
+directive, the two-generator structure and its shared-substrate contract, the
+measure→mirror→bench loop and its validity gates, and the conventions every
+synthetic benchmark follows. Read it before proposing or implementing a
+benchmark.
 
 > **Current state / what's in progress:** see [`STATUS.md`](STATUS.md) — the
 > living pre-compact scratchpad (the active work, the locked design, next
@@ -47,6 +52,84 @@ hand (conflating a feature count with a pattern count; a probe that memorizes a
 small window set and "generalizes" because train/eval share it; "wins" that also
 appear with an *untrained* model). Everything below exists to make reward-hacking
 into those traps impossible to do silently.
+
+---
+
+## The two generators, one substrate
+
+Benchmarks enter the program through one of two generators. They differ in
+**epistemic anchor** — what you point at when asked "why does this task measure
+anything?" — and every benchmark carries a **provenance tag** naming its
+generator (the `provenance` column in [`BENCHMARKS.md`](BENCHMARKS.md)).
+
+**PhenomenonBench — data-first (`grounded`).** Start from real LM behaviour and
+work backwards: labeler → measured temporal signature → fitted synthetic mirror
+→ gate-validated benchmark. That is Part I of this doc (the measure→mirror→bench
+loop) plus the autonomous expansion loop ([`expansion/LEDGER.md`](expansion/LEDGER.md)).
+Authority = grounding: the task mirrors a measured property of a real model.
+Because every step involves judgment on noisy data, drift is high — hence the
+heavy machinery (preregistration, frozen predictions, nulls, gates 7–8, the
+skeptic). Its blind spot, demonstrated twice in stage 6: **grounded + valid
+mirror ≠ discriminates** — see the discriminability STOP-gate below.
+
+**FreqBench — theorem-first (`theorem-first`).** Start from a structural axis
+and construct the task so ground truth, oracle, and impossibility results are
+*provable* (periodogram = ML oracle; linear-probe impossibility;
+symmetry-triviality → the circle embedding; ratio invariance). No labeler, no
+mirror, no grounding claim — authority = the proofs, so it needs little
+procedural machinery (a theorem cannot be reward-hacked). Its blind spot is
+**irrelevance**: alone it can probe structure no real phenomenon exercises —
+exactly the original curated-wins sin. Origin: Dmitry's FreqBench sprint
+(branches `origin/dmitry-spectral-sprint2`, `origin/dmitry-synthetic`); the
+`frequency/` bench is its first port, and `signed_motion` is its `ac_sign` task
+forked *without* the proof apparatus.
+
+The generators are duals — FreqBench spans the coordinate space with proven
+ceilings; PhenomenonBench locates real LM behaviour inside it — and each
+supplies the guarantee the other cannot. **Two generators, ONE substrate.**
+Every benchmark, regardless of provenance, must share:
+
+1. the fair-backbone architecture panel + the canonical runner (Part II §7,
+   framework hard rules);
+2. the capacity / realized-L0 / windowing / metric conventions (Part II);
+3. the coordinate system below — a bench's spec states its coordinates;
+4. the single registry [`BENCHMARKS.md`](BENCHMARKS.md), provenance-tagged.
+
+Forking the substrate is the historical failure mode (FreqBench and the
+phenomenon suite evolved disjoint stacks; `signed_motion` vs `ac_sign` is the
+scar): a benchmark that cannot run in the shared B×A grid does not exist.
+
+### The coordinate system (three structural axes)
+
+Where a benchmark's primary latent lives — stated in its spec, and predictive
+of the architecture outcome:
+
+1. **Spectral (DC ↔ AC):** the waveform of the latent — slow drift vs
+   order-sensitive variation. Measured by the frequency-response / FreqFrac
+   lens ([`../../../docs/ideas/frequency_lens.md`](../../../docs/ideas/frequency_lens.md)).
+2. **Interaction order (additive ↔ equality / higher):** whether reading the
+   latent needs only a weighted sum over positions, or comparisons *between*
+   positions. Additive codes are provably blind to equality-pattern latents
+   (changepoint record); the within-window shuffle gap is the first-line probe.
+3. **Stationarity / localization (spread ↔ clustered):** whether the structure
+   is time-homogeneous or burst/changepoint-localized (Fourier vs wavelet). No
+   measure built yet — the program's open instrumentation gap.
+
+The evaluated suite collapses into four **regimes**, and the regime predicts
+the ranking (the acid test of "principled" = predicting a held-out bench's arch
+ranking from its coordinates alone):
+
+| regime | who wins | evidence (REPORT.md) |
+|---|---|---|
+| per-token-readable latent | nobody separates (all ≈ oracle) | changepoint `mode`, assumption `s_i`, hedging `c_i` |
+| linear-in-window latent | any window arch; per-token floored | backtracking λ |
+| order-2 / position-mixing latent | only coincidence/spectral codes | frequency tone, changepoint `tss` / `c_t` |
+| substrate defect | nobody | signed_motion sign (memorization confound) |
+
+Regimes 1–2 cannot separate window architectures from each other; only regime 3
+can. Today every regime-3 bench is theorem-provenance — the sharpest open
+target is a **grounded** regime-3 benchmark (the unclaimed interaction/equality
+prize, [`expansion/LEDGER.md`](expansion/LEDGER.md) C4).
 
 ---
 
@@ -185,6 +268,14 @@ Every investigation must pass **all** applicable gates. A failed gate means
   features — not "recover the latent" while representing nothing.
 - **Provable baselines where possible:** prefer a process with a provable
   chance/oracle (e.g. a data-processing-inequality floor) over an empirical gap.
+- **Discriminability (STOP-gate, pre-grid):** before any architecture grid, the
+  § 8 gating ceilings must show the substrate *can* separate architectures —
+  the raw window readout must exceed the raw per-token readout beyond noise (or
+  the separation must be provable). If raw per-token ≈ raw window ceiling, the
+  bench is non-discriminating **by construction**: record that verdict and STOP
+  — do not spend the grid. (Stage-6 lesson: `assumption_consequence` 0.464 vs
+  0.466 and `hedging_drift` +0.006 headroom were both on record *before* 990
+  cells were spent.) "Grounded + valid mirror" ≠ "discriminates".
 
 ### Abort / discard conditions
 
@@ -323,6 +414,10 @@ entry + (if a new metric is needed) an evaluator addition. Never edit
    probe; the reconstruction metric — all over the common `L` tiling.
 7. **Predictions.** Preregister expected recovery per architecture across the
    frontier before running.
+8. **Coordinates + discriminability.** State the bench's coordinates on the
+   three structural axes (and the regime its primary latent falls in), then run
+   the § 8 gating ceilings and pass the discriminability STOP-gate before any
+   grid is spent.
 
 ---
 

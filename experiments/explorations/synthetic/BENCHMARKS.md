@@ -8,12 +8,16 @@ several different things, tracked in different places; this table joins them.
 **Hand-maintained.** The authoritative machine sources are cross-linked below;
 update this file on every expansion cycle and every stage-6 run.
 
-## How to read the columns (the two orthogonal axes)
+## How to read the columns
 
+- **Provenance** — which generator produced it (README § "The two generators,
+  one substrate"): `grounded` = PhenomenonBench (data-first, measure→mirror) ·
+  `theorem-first` = FreqBench (constructed, proven ceilings) · `hybrid` = mixed.
 - **Spec status** — measure→mirror *validity* (is it a sound benchmark?):
   `SPEC` graduated & valid · `SPEC*` provisional (real but flagged) · `ABORT`
   tried, didn't clear the gates · `prop` frozen idea, not yet calibrated ·
-  `n/a` abstract construct (never went through measure→mirror).
+  `n/a` theorem-first construct (its validity lives in proofs, not
+  measure→mirror).
 - **Reg.** — *framework-registered*: `✓` has a datasource plugin in
   `configs/data.yaml` (runnable in the B×A grid) · `✗` spec only, not yet built.
 - **Arch verdict** — the *head-to-head result* (`REPORT.md`): POSITIVE /
@@ -27,16 +31,16 @@ arch verdict is **NEGATIVE** (no arch recovers the sign). "Registered" ≠
 
 ## A. Live benchmarks (valid — a real or staged benchmark)
 
-| benchmark | source | domain | class (DC/AC lens) | spec | reg. | arch verdict |
+| benchmark | provenance | domain | class (DC/AC lens) | spec | reg. | arch verdict |
 |---|---|---|---|---|---|---|
-| **backtracking** | hand-run measure→mirror (Ward traces) | reasoning-trace | bursty / self-exciting (AC) | SPEC | ✓ | **POSITIVE** |
-| **changepoint** | semi-grounded (topic dwell measured; emission constructed) | abstract emission | change-point / equality (DC+AC) | SPEC (semi) | ✓ | **SPLIT** |
-| **frequency** | abstract (Dmitry FrequencyBench port) | abstract | periodic / cyclic-tone (AC) | n/a | ✓ | **POSITIVE** |
-| **signed_motion** | abstract construct | abstract | order-sensitive step (AC) | n/a | ✓ | **NEGATIVE** |
-| **assumption_consequence** | expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✓ | **NEGATIVE** *(frozen windows>per-token prediction failed: order-1 mirror ⇒ s_i sufficient, per-token reads the directed latent; needs order-2+ mirror to separate archs)* |
-| **hedging_drift** | expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✓ | **SPLIT** *(per-token R² 0.73 of 0.77 ceiling — drift is ambient per token; window edge ≤ +0.04 with weak T-trend)* |
-| **list_item_parallelism** | expansion C3 (re-freeze) | text-corpus | bursty / self-exciting (AC) | SPEC | ✗ | — *(pending; ⚠ redundant class + weak mirror — low value)* |
-| **self_reference_echo** | expansion C2 (re-filed) | reasoning-trace | bursty / self-exciting (AC) | SPEC\* | ✗ | — *(not planned; redundant, marginal labeler)* |
+| **backtracking** | grounded — hand-run measure→mirror (Ward traces) | reasoning-trace | bursty / self-exciting (AC) | SPEC | ✓ | **POSITIVE** |
+| **changepoint** | hybrid — topic dwell measured; emission constructed | abstract emission | change-point / equality (DC+AC) | SPEC (semi) | ✓ | **SPLIT** |
+| **frequency** | theorem-first — Dmitry FreqBench port | abstract | periodic / cyclic-tone (AC) | n/a | ✓ | **POSITIVE** |
+| **signed_motion** | theorem-first — FreqBench *ac_sign*, forked w/o its proofs | abstract | order-sensitive step (AC) | n/a | ✓ | **NEGATIVE** |
+| **assumption_consequence** | grounded — expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✓ | **NEGATIVE** *(frozen windows>per-token prediction failed: order-1 mirror ⇒ s_i sufficient, per-token reads the directed latent; needs order-2+ mirror to separate archs)* |
+| **hedging_drift** | grounded — expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✓ | **SPLIT** *(per-token R² 0.73 of 0.77 ceiling — drift is ambient per token; window edge ≤ +0.04 with weak T-trend)* |
+| **list_item_parallelism** | grounded — expansion C3 (re-freeze) | text-corpus | bursty / self-exciting (AC) | SPEC | ✗ | — *(pending; ⚠ redundant class + weak mirror — low value)* |
+| **self_reference_echo** | grounded — expansion C2 (re-filed) | reasoning-trace | bursty / self-exciting (AC) | SPEC\* | ✗ | — *(not planned; redundant, marginal labeler)* |
 
 *Datasource plugins (the `✓`s): `toy_backtracking_selfexcite_d64`,
 `toy_changepoint_modes_d64`, `toy_cyclic_{circle,random}_M101_d128`,

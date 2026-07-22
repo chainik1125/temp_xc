@@ -8,13 +8,26 @@ Local CC on the Mac (Apple M-series, MPS, no CUDA) at `~/research/projects/temp_
 Role: prototyping, review, orchestration. Heavy grids → `runpod`. I'm `mac-local`.
 
 ## Git
-Branch `arxiv`, **@ `266dc386`, ahead of `origin/arxiv` by 2 UNPUSHED commits**
-(`a96f83f0` stage-6 review close-out; `266dc386` paper+private scaffolding).
-Clean tree. **Push not yet done** — the runpod box still thinks stage 6 is
-"awaiting review" until it sees the briefing deletion, so push before handing
-back to runpod. `origin` = SSH.
+Branch `arxiv`, **@ `32d3ad4a`, ahead of `origin/arxiv` by 3 UNPUSHED commits**
+(`a96f83f0` stage-6 review close-out; `266dc386` paper+private scaffolding;
+`32d3ad4a` this file's pre-compact rewrite). **Working tree: the phase-1
+revamp-doc edits are UNCOMMITTED** (README two-generators section +
+discriminability gate, BENCHMARKS provenance column, both STATUS files) —
+awaiting user review/commit. **Push not yet done** — the runpod box still
+thinks stage 6 is "awaiting review" until it sees the briefing deletion, so
+push before handing anything to runpod. `origin` = SSH.
 
-## ⏭ THE NEXT TASK (post-compact): revamp the synthetic autoresearch system
+## ▶ CURRENT TASK (in progress 2026-07-22): revamp the synthetic autoresearch system
+
+**Phase 1 (governing doc) DONE** — see research STATUS § 0 top bullet for the
+full phase list. Next: phase 2, the FreqBench port (mac-local prototypes the
+plugin + FreqFrac evaluator; runpod runs the grids — mind the
+checkpoint/leaderboard-cache caveat in research STATUS § 0). Compute decision:
+**no GPU** — A40 measured kernel-launch-bound (~14% util) on these tiny
+models; the 32-core CPU pod is the right substrate; a GPU only becomes
+relevant if a future cycle mines fresh LM traces.
+
+### The design (kept for context)
 
 The whole recent arc converged on one design. **Do NOT just rebuild FreqBench
 in isolation.** Build ONE program:
