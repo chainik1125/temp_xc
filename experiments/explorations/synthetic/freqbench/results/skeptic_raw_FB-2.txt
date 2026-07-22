@@ -1,0 +1,26 @@
+```json
+{
+  "a_proof_circularity": {
+    "verdict": "pass",
+    "reason": "The P5 ceiling was discharged numerically on the actual generator at the frozen parameters: per-lane oracle vs matched single-lane oracle agrees within p5_gap ≤ 0.0071 (tol 0.02) at every T, including the full per-class curves, confirming the orthogonal-plane separation is a property of the built task, not the idealized one. P1 is verified empirically (per-token linear dev ≤ 0.0005 from chance) on top of the analytic argument, and raw-window linear ≈ chance matches the E[x_t|Y_k]≈0 claim. The falsifier-3 abort condition (per-lane oracle below single-lane) was tested and did not trigger. No proof assumes its conclusion or targets a different parameterization; gating used n_seqs=6000 vs the card's 4096, which only strengthens the discharge."
+  },
+  "b_triviality": {
+    "verdict": "pass",
+    "reason": "The trained trivial routes die: bag-MLP 0.1024 and stacked-linear 0.1012, both at chance (0.1), against an oracle of 0.906. Memorization is dead by construction (1.03e9 templates vs d_sae ≤ 202, probe rows 2e4) — no A5-style caveat needed. The symmetry audit is analytic-only (relabeling killed by the circle metric), but the retained empirical null (random-embedding datasource) is correctly located in the frequency bench and the argument is the same one that held there. One residual: the shuffled oracle reads 0.208 > chance, honestly documented as a surviving order-free circle-spread cue. This is a partial confound at the low end, but it is (i) not learnable by the trained bag control (0.102), and (ii) bounded below the 0.3 additive-family ceiling in the frozen predictions, so it cannot manufacture the claimed mixing-vs-additive separation. It must be carried as an interpretation floor: recoveries below ~0.21 cannot be claimed as order-route reading."
+  },
+  "c_relevance": {
+    "verdict": "pass",
+    "reason": "Honestly marked spanning with a specific, defensible research reason: superposition (multiple simultaneous latents competing for one sparsity budget) is the founding premise of the SAE program, the panel's own measurements show multi-band structure on real streams (PORT.md § A: GPT-2 day-stride circles; DC + high-band coexisting), and FB-2 is the minimal point where the sprint's band-partition mechanism can operate at all. The card also pre-commits that a null (multiband ≈ full-band under the fair backbone) is a citable indictment of the sprint's plain-TopK result, which is a legitimate spanning rationale, not a vague appeal."
+  },
+  "d_redundancy": {
+    "verdict": "pass",
+    "reason": "The registry's frequency bench is single-tone; its band-partition addendum was a preregistered TIE at T=16 at matched budget, so no existing bench discriminates at the superposition coordinates. The claimed mechanism (per-band budgets preventing lane crowding under TopK scarcity) does not exist in any single-tone task, and the k_pos lane-competition prediction is likewise untestable there. Caveat for the record: the top-level arch ordering (spectral > txc-post > additive) substantially replicates frequency's established verdict; the non-redundant discriminating content is the multiband-vs-fullband and k_pos-scarcity sub-claims, and the bench's value should be judged primarily on those."
+  },
+  "e_substrate": {
+    "verdict": "pass",
+    "reason": "The single post-freeze amendment (re-keying info-presence from generic-MLP-clears-chance+0.20 to the periodogram-oracle witness) is NOT tolerance-shopping: the frozen card itself, § 4, pre-registered the gate as '(ii) the per-lane periodogram oracle on the same raw tiles ≫ chance at T ∈ {4,8}' — the equality-variant treatment used for changepoint. The amendment restores the card's frozen specification against a mis-implemented gate, and the failing MLP number (0.173) was retained as a recorded datum rather than deleted. Capacity anchoring (F=M=101, matching the frequency alphabet precedent), d_sae sweep, k_pos matching, eval windowing (L=32, leading-edge per-tile leak-free split), and protocol 1.3.0 with additive evaluator dispatch all conform; no hidden deviations found."
+  },
+  "overall": "PROCEED",
+  "notes": "Two riders the bench record must carry. (1) INTERPRETATION FLOOR: the shuffled-oracle residual of ~0.21 means any multilane_recovery below ~0.21 is consistent with an order-free circle-spread readout and must not be claimed as regime-3 phase-progression reading; the additive-family predictions (<0.3) sit uncomfortably close to this floor, so per-lane S(f) shape and the T-trend, not the scalar alone, should adjudicate the additive archs. (2) LEARNABILITY DATUM: the generic MLP reads only 0.15–0.19 where the oracle reads 0.91 — information is present but generically hard to extract, so falsifier 2 (trained ≈ untrained ⇒ access, not learning) has elevated prior probability for the spectral arch and must be checked against seed spread before any 'win' is reported. The band-partition transported prediction (4-band > 1-band by ≥0.03, no seed overlap) is the load-bearing novelty per d_redundancy; a tie under the fair BatchTopK backbone should be reported as the headline verdict, not buried."
+}
+```

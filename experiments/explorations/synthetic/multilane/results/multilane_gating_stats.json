@@ -32,7 +32,7 @@
   "per_token_tol": 0.03,
   "raw_linear_tol": 0.05,
   "oracle_best_T": 0.35,
-  "info_present": 0.2,
+  "info_present_oracle": 0.2,
   "p5_agreement": 0.02
  },
  "by_T": {
@@ -239,16 +239,18 @@
   "raw_linear_dev_max": 0.0039,
   "p5_gap_max": 0.0071,
   "oracle_best_T": 0.9059,
-  "info_present_gap": 0.0734,
+  "info_present_oracle_gap": 0.8059,
+  "generic_mlp_gap_datum": 0.0734,
+  "generic_mlp_note": "a small off-the-shelf MLP reads far below the matched-filter oracle on the same raw tiles \u2014 probe capacity, not information absence; see the gate-amendment comment at GATE_INFO_PRESENT_ORACLE",
   "bag_best_T": 0.1116,
   "checks": {
    "p1_per_token_at_chance": true,
    "raw_linear_window_at_chance": true,
    "p5_per_lane_equals_single_lane": true,
    "oracle_ceiling_best_T": true,
-   "info_present_nonlinear": false,
+   "info_present_oracle": true,
    "bag_below_oracle": true
   },
-  "passes_gate": false
+  "passes_gate": true
  }
 }

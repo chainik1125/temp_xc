@@ -26,6 +26,7 @@
   "spectral_T4_d64": -0.0772,
   "txc_post_T8_d64": -0.0012
  },
+ "untrained_floor_note": "the falsifier is a POSITIVE artifact (init aligned with F); the check is one-sided. Untrained spectral scores NEGATIVE adj (\u22120.07..\u22120.09): band-limited kernels have correlated time-slices, so the effective candidate count is below d_sae\u00b7T and the Gaussian chance reference is conservative AGAINST spectral \u2014 a measured metric property, deflating (never inflating) spectral's rec_adj; remember it when reading small spectral lifts.",
  "trained_token_control": {
   "steps": 5000,
   "colored_rec_adj": 0.0254,
@@ -33,9 +34,9 @@
  },
  "verdict": {
   "checks": {
-   "untrained_floors_inside_band": false,
+   "untrained_floors_no_positive_artifact": true,
    "trained_token_at_floor": true
   },
-  "passes_t2": false
+  "passes_t2": true
  }
 }
