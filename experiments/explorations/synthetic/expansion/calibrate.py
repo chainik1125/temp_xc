@@ -451,13 +451,70 @@ Respond with ONLY a JSON object, no prose, no fence:
  "overall_note": "..."}"""
 
 
+def _parse_json_object(text: str) -> dict:
+    """Best-effort extraction of one JSON object from judge output.
+
+    Tries, in order: a ```json fenced block, raw_decode from each '{' (longest
+    valid parse wins), then the legacy greedy-regex parse. Raises ValueError
+    if nothing parses — the caller decides whether to repair.
+    """
+    m = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.S)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except json.JSONDecodeError:
+            pass
+    dec = json.JSONDecoder()
+    best = None
+    for i, ch in enumerate(text):
+        if ch != "{":
+            continue
+        try:
+            obj, end = dec.raw_decode(text, i)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(obj, dict) and (best is None or end - i > best[1]):
+            best = (obj, end - i)
+    if best:
+        return best[0]
+    m = re.search(r"\{.*\}", text, re.S)
+    if m:
+        return json.loads(m.group(0))   # may raise — nothing parsed
+    raise ValueError("no JSON object found in judge output")
+
+
 def skeptic_pass(judge: Judge, name: str, card_md: str, summary: dict) -> dict:
     user = (f"## Frozen prereg card\n\n{card_md}\n\n## Calibration numbers\n\n"
             + json.dumps(summary, indent=1, default=float)
             + "\n\nFill the kill-rubric. JSON only.")
-    text = judge.call("think", SKEPTIC_SYSTEM, user, max_tokens=2500,
+    text = judge.call("think", SKEPTIC_SYSTEM, user, max_tokens=4000,
                       tag=f"skeptic:{name}")
-    return json.loads(re.search(r"\{.*\}", text, re.S).group(0))
+    # Persist the raw verdict BEFORE parsing: a parse crash must never lose an
+    # adversarial verdict (no-re-roll rule — the verdict exists once written).
+    raw_path = HERE / "records" / name / "skeptic_raw.txt"
+    raw_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_path.write_text(text)
+    rubric = ("a_noise_floor", "b_leakage", "c_composition", "d_circularity",
+              "e_segmentation")
+    try:
+        out = _parse_json_object(text)
+        if not all(k in out for k in rubric):
+            raise ValueError("parsed object missing rubric items")
+        return out
+    except (ValueError, json.JSONDecodeError):
+        # Deterministic cheap repair: ask the bulk model to fix syntax ONLY
+        # (e.g. a string truncated at max_tokens). Verdicts must not change.
+        fixed = judge.call(
+            "bulk",
+            "Return the following content as ONE syntactically valid JSON "
+            "object. Fix syntax only (quoting, escaping, commas, unterminated "
+            "strings). Do NOT change any keys, values, wording, or verdicts. "
+            "JSON only.",
+            text, max_tokens=4000, tag=f"skeptic-jsonfix:{name}")
+        out = _parse_json_object(fixed)
+        if not all(k in out for k in rubric):
+            raise ValueError("skeptic verdict unrecoverable — rubric items missing")
+        return out
 
 
 # ── main per-candidate pipeline ────────────────────────────────────────────

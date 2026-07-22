@@ -70,7 +70,7 @@ Process `logistic_ar`; fit on 210 train docs, validated on 90 held-out docs. Fit
 
 Abs errors: acf_lag1_5 0.024, mi_lag1_5 0.003, fano 0.156, p11 0.021, excite_ratio 0.538, gap_cv 0.145, spec_peak 0.179.
 
-**Gate 8 (preregistered non-fitted moment)** — `mi[lag1]`: held-out real 0.0349 vs synthetic 0.0390, |err| 0.0041 vs tolerance ±0.015 → **PASS**.
+**Gate 8 (preregistered non-fitted moment)** — `mi[lag1]`: held-out real 0.0349 vs synthetic 0.0390, |err| 0.0041 vs tolerance ±0.0150 → **PASS**.
 
 ## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)
 

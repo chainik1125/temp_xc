@@ -60,7 +60,7 @@ Process `periodic_rate`; fit on 279 train docs, validated on 120 held-out docs. 
 
 Abs errors: acf_lag1_5 0.197, mi_lag1_5 0.016, fano 1.476, p11 0.200, excite_ratio 1.458, gap_cv 0.926, spec_peak 0.587.
 
-**Gate 8 (preregistered non-fitted moment)** — `mi[lag1]`: held-out real 0.0266 vs synthetic 0.0000, |err| 0.0266 vs tolerance ±0.02 → **FAIL — mirror invalid ⇒ ABORT**.
+**Gate 8 (preregistered non-fitted moment)** — `mi[lag1]`: held-out real 0.0266 vs synthetic 0.0000, |err| 0.0266 vs tolerance ±0.0200 → **FAIL — mirror invalid ⇒ ABORT**.
 
 ![signature](signature.png)
 
