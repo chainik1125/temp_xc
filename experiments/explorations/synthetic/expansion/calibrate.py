@@ -36,7 +36,7 @@ import numpy as np
 from explorations.synthetic.expansion import labeler as lab
 from explorations.synthetic.expansion import mirrors
 from explorations.synthetic.expansion import signature as sig
-from explorations.synthetic.expansion.client import Judge, Meter
+from explorations.synthetic.expansion.client import ROLES, Judge, Meter
 from explorations.synthetic.expansion.corpus import load_reasoning_traces
 
 HERE = Path(__file__).resolve().parent
@@ -372,6 +372,19 @@ CFG = {
         gate8=(("acf", 3, 0.20, "rel"), ("mi", 1, 0.20, "rel")),
         base_card="recipe-instruction-phase-runs",
         labels_from="recipe-instruction-phase-runs"),
+    # — Cycle 5: re-freeze of the reasoning int/eq abort under the
+    #   seg_hier_categorical menu extension (dated card amendment; C3 labels +
+    #   validation reused; hardened two-moment gate-8 kept, BOTH moments in
+    #   the lag-2–8 region that killed r2; PLUS the preregistered INSERTION
+    #   CONTROL — the mirror re-fit on run-permuted streams must not
+    #   hallucinate either moment beyond the real-data tolerance) —
+    "proof-operation-phase-runs-r3": dict(
+        domain="reasoning-trace", kind="categorical", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_proofop,
+        mirror="seg_hier_categorical", mirror_kw={}, mirror_kind="categorical",
+        gate8=(("mi", 1, 0.20, "rel"), ("acf", 3, 0.20, "rel")),
+        base_card="proof-operation-phase-runs",
+        labels_from="proof-operation-phase-runs"),
 }
 
 # Uniform C3 relative-tolerance floors (amend_cards_c3.py preregistration).
@@ -500,6 +513,7 @@ def skeptic_pass(judge: Judge, name: str, card_md: str, summary: dict) -> dict:
         out = _parse_json_object(text)
         if not all(k in out for k in rubric):
             raise ValueError("parsed object missing rubric items")
+        out["_judge_model"] = ROLES["think"]
         return out
     except (ValueError, json.JSONDecodeError):
         # Deterministic cheap repair: ask the bulk model to fix syntax ONLY
@@ -514,6 +528,7 @@ def skeptic_pass(judge: Judge, name: str, card_md: str, summary: dict) -> dict:
         out = _parse_json_object(fixed)
         if not all(k in out for k in rubric):
             raise ValueError("skeptic verdict unrecoverable — rubric items missing")
+        out["_judge_model"] = ROLES["think"]
         return out
 
 
@@ -728,6 +743,47 @@ def run(name: str):
                 gate["gate8_fail"] = True
                 gate["verdict"] = verdict
                 print(f"[{name}] MIRROR GATE-8 FAIL -> ABORT (skeptic skipped)")
+
+            # INSERTION CONTROL (preregistered, Cycle 5; seg mirror only).
+            # The segment mirror's DP + raw compositions + deconvolution can
+            # hallucinate lag structure on data with no segment layer (the
+            # winner's curse — every automatic shrinkage variant tried on the
+            # harness toys either drowned real signal or leaked). So the
+            # control measures the estimator's hallucination ON THIS DATA:
+            # re-fit the same mirror on run-permuted train streams (the
+            # no-adjacent-repeat shuffle preserves doc composition, run
+            # lengths, and no-self-jump while destroying segment structure)
+            # and require, for EVERY gate-8 moment, that the null fit's
+            # generated value stays within the real-data effective tolerance
+            # of the permuted streams' own value — hallucination must be
+            # subdominant to the structure the gate certifies. Runs even
+            # after a gate-8 fail (cheap, informative either way).
+            if cfg["mirror"] == "seg_hier_categorical":
+                perm_train = mirrors.run_permuted_streams(m_train)
+                params0 = fit_fn(perm_train, **cfg["mirror_kw"])
+                syn0 = gen_fn(params0, [s.size for s in ev], rng)
+                syn0_cat = [np.asarray(s, dtype=np.int8) for s in syn0]
+                perm_ev = mirrors.run_permuted_streams(ev_cat)
+                ctrls = []
+                for g8, (moment, midx, *_rest) in zip(g8s, specs):
+                    pv = _moment(perm_ev, moment, midx, cfg["kind"])
+                    sv0 = _moment(syn0_cat, moment, midx, cfg["kind"])
+                    ctrl = {"moment": g8["moment"], "perm_heldout": pv,
+                            "syn_nullfit": sv0, "insertion": abs(sv0 - pv),
+                            "tol_abs": g8["tol_abs"],
+                            "pass": bool(abs(sv0 - pv) <= g8["tol_abs"])}
+                    ctrls.append(ctrl)
+                    print(f"[{name}] insertion-control {ctrl['moment']}: "
+                          f"perm={pv:.4f} nullfit={sv0:.4f} "
+                          f"ins={ctrl['insertion']:.4f} tol={g8['tol_abs']:.4f} "
+                          f"-> {'PASS' if ctrl['pass'] else 'FAIL'}")
+                mirror_blob["insertion_control"] = ctrls
+                if not all(c["pass"] for c in ctrls):
+                    verdict = "ABORT"
+                    gate["insertion_control_fail"] = True
+                    gate["verdict"] = verdict
+                    print(f"[{name}] INSERTION CONTROL FAIL -> ABORT "
+                          "(mirror over-expressive on this data)")
 
         if verdict == "PROCEED":  # gate 8 may already have demoted it
             if prev_skeptic is not None:

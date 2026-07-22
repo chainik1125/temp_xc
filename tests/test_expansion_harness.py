@@ -200,6 +200,100 @@ def test_mirror_semi_markov_cannot_hold_categorical_plateau():
     assert mi_f[3] < mi_r[3] - max(0.2 * mi_r[3], 0.003)
 
 
+def _seg_hier_truth():
+    # Three timescales, proof-stream-like: short dwell (mean ~1.8, the r2
+    # measurement), concentrated 10-20-position segments whose dominants
+    # rotate within a doc, and 4 heterogeneous doc types. Its pooled lag
+    # curve (acf1 ~0.26, acf4 ~0.11, floor ~0.05) matches the real
+    # proof-operation signature the C5 extension exists for.
+    def conc(d):
+        v = np.full(4, 1 / 30)
+        v[d] = 0.9
+        return v.tolist()
+    seg_tables, doc_props = [], []
+    for t in range(4):
+        table = [[12, conc(t)], [16, conc(t)], [20, conc(t)],
+                 [12, conc((t + 1) % 4)], [14, conc((t + 2) % 4)],
+                 [10, conc((t + 3) % 4)]]
+        seg_tables += [table] * 50
+        doc_props += [list(np.roll([0.55, 0.15, 0.15, 0.15], t))] * 50
+    return {"process": "seg_hier_categorical", "n_symbols": 4,
+            "jump_P": ((np.ones((4, 4)) - np.eye(4)) / 3).tolist(),
+            "tilt_seg": 0.85, "tilt_doc": 0.05,
+            "doc_props": doc_props, "seg_tables": seg_tables,
+            "dwell": [[1, 1, 2, 2, 3]] * 4}
+
+
+def test_mirror_seg_hier_categorical_holds_lag2_8():
+    # The r2 failure mode inverted: on a three-timescale truth the segment
+    # mirror round-trips the lag-2-8 structure (the preregistered r3 gate-8
+    # moment acf[lag4]) while the doc-level hier_categorical — the C4 mirror
+    # that ABORTED on the real reasoning streams — misses it by ~5x the gate.
+    rng = np.random.default_rng(21)
+    true = _seg_hier_truth()
+    seqs = mirrors.gen_seg_hier_categorical(true, [120] * 200, rng)
+    acf_r = sig.selfmatch_acf(seqs, maxlag=8)
+    assert acf_r[3] > 0.08                     # the mid-lag structure exists
+    fit = mirrors.fit_seg_hier_categorical(seqs, n_symbols=4)
+    assert fit["tilt_seg"] > 0.5               # segment tilt dominates
+    syn = mirrors.gen_seg_hier_categorical(fit, [120] * 200, rng)
+    acf_s = sig.selfmatch_acf(syn, maxlag=8)
+    assert abs(acf_s[3] - acf_r[3]) < 0.2 * acf_r[3]        # ±20% gate rule
+    flat = mirrors.fit_hier_categorical(seqs, n_symbols=4)
+    syn_f = mirrors.gen_hier_categorical(flat, [120] * 200, rng)
+    acf_f = sig.selfmatch_acf(syn_f, maxlag=8)
+    assert abs(acf_f[3] - acf_r[3]) > 0.4 * acf_r[3]        # hier fails hard
+
+
+def test_seg_mirror_insertion_control():
+    # The over-expressiveness control (preregistered in the r3 card): fit the
+    # seg mirror on run-permuted streams (no-adjacent-repeat shuffle — plain
+    # run permutation would merge same-type runs and distort the dwell
+    # material itself) and measure hallucinated lag structure. On the
+    # three-timescale truth the insertion stays within the real-data gate-8
+    # tolerance (control PASS); on a doc-homogeneous heavy-dwell null — where
+    # raw DP compositions + deconvolution are pure winner's curse — the
+    # insertion exceeds it (control catches the estimator; every automatic
+    # shrinkage variant tried either drowned real signal or leaked, so the
+    # control, not the estimator, carries null-safety).
+    rng = np.random.default_rng(31)
+    true = _seg_hier_truth()
+    seqs = mirrors.gen_seg_hier_categorical(true, [120] * 200, rng)
+    acf_real4 = sig.selfmatch_acf(seqs, maxlag=8)[3]
+    perm = mirrors.run_permuted_streams(seqs)
+    runs_real = runs_perm = 0
+    for s, p in zip(seqs, perm):
+        assert np.array_equal(np.bincount(p, minlength=4),
+                              np.bincount(s, minlength=4))
+        runs_real += 1 + (np.diff(s) != 0).sum()
+        runs_perm += 1 + (np.diff(p) != 0).sum()
+    # the no-adjacent-repeat shuffle is best-effort (a run-type majority can
+    # force adjacencies) — the run material must survive ~intact in aggregate
+    assert runs_perm > 0.97 * runs_real
+    acf_perm = sig.selfmatch_acf(perm, maxlag=8)
+    assert acf_perm[3] < 0.75 * acf_real4       # shuffle killed the segment
+    # share of acf4 (the doc floor + dwell remnant survives, by design)
+    fit0 = mirrors.fit_seg_hier_categorical(perm, n_symbols=4)
+    syn0 = mirrors.gen_seg_hier_categorical(fit0, [120] * 200, rng)
+    ins = abs(sig.selfmatch_acf(syn0, maxlag=8)[3] - acf_perm[3])
+    assert ins <= max(0.2 * acf_real4, 0.01)    # PASS on real structure
+
+    null = {"process": "hier_categorical", "n_symbols": 4, "alpha": 0.85,
+            "jump_P": ((np.ones((4, 4)) - np.eye(4)) / 3).tolist(),
+            "doc_props": sum(([list(np.roll([0.70, 0.10, 0.10, 0.10], t))] * 50
+                              for t in range(4)), []),
+            "dwell": [[1, 1, 2, 2, 3, 4, 6, 9]] * 4}
+    seqs_n = mirrors.gen_hier_categorical(null, [120] * 200, rng)
+    acf_n4 = sig.selfmatch_acf(seqs_n, maxlag=8)[3]
+    perm_n = mirrors.run_permuted_streams(seqs_n)
+    acf_pn = sig.selfmatch_acf(perm_n, maxlag=8)
+    assert abs(acf_pn[3] - acf_n4) < 0.3 * acf_n4   # null: shuffle ~no-op
+    fit_n = mirrors.fit_seg_hier_categorical(perm_n, n_symbols=4)
+    syn_n = mirrors.gen_seg_hier_categorical(fit_n, [120] * 200, rng)
+    ins_n = abs(sig.selfmatch_acf(syn_n, maxlag=8)[3] - acf_pn[3])
+    assert ins_n > max(0.2 * acf_n4, 0.01)      # control CATCHES the null
+
+
 def test_mirror_periodic_hawkes_recovery():
     rng = np.random.default_rng(7)
     true = {"process": "periodic_hawkes", "period": 8, "K": 2, "intercept": -2.8,

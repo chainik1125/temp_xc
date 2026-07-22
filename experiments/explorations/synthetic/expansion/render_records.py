@@ -161,9 +161,18 @@ def render_one(name: str) -> Path:
                     f"held-out real {g8['real_heldout']:.4f} vs synthetic "
                     f"{g8['synthetic']:.4f}, |err| {g8['abs_err']:.4f} vs tolerance "
                     f"{tol_s} → **{'PASS' if g8['pass'] else 'FAIL — mirror invalid ⇒ ABORT'}**.")
+        for c in (m.get("insertion_control") or []):
+            lines.append(
+                f"\n**Insertion control (preregistered, C5)** — `{c['moment']}`: "
+                f"null-fit synthetic {c['syn_nullfit']:.4f} vs run-permuted "
+                f"held-out {c['perm_heldout']:.4f}, hallucination "
+                f"{c['insertion']:.4f} vs tolerance ±{c['tol_abs']:.4f} → "
+                f"**{'PASS' if c['pass'] else 'FAIL — mirror over-expressive ⇒ ABORT'}**.")
 
     if blob.get("skeptic"):
-        lines += ["", "## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)", "",
+        judge_model = blob["skeptic"].get(
+            "_judge_model", "see LEDGER — judge model untracked pre-C5")
+        lines += ["", f"## 5. Adversarial skeptic pass (fixed kill-rubric, {judge_model})", "",
                   "| item | kill | evidence |", "|---|---|---|"]
         for k, v in blob["skeptic"].items():
             if isinstance(v, dict):

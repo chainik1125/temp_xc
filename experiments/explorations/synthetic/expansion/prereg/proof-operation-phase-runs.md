@@ -120,3 +120,68 @@ Preregistered now, before any C4 run:
 
 _Amended-by: claude-fable-5 (runpod agent, Cycle 4), preregistered before any
 C4 labeling, fitting, or measurement._
+
+
+## Amendment 2026-07-22 — Cycle-5 re-freeze (before any C5 calibration)
+
+The C4 calibration (`-r2`) ABORTED on the hardened gate-8 alone: the signal
+was unchanged and real, but even the doc-level hierarchy failed BOTH moments
+(MI(2) 0.030 vs 0.065; ACF(4) 0.058 vs 0.127), with the lag curve pinning the
+miss to lags 2–8 while the lag-12 doc floor matched (syn 0.045 vs real
+0.050) — and corr(doc length, propensity concentration) = −0.60 confirming
+within-doc drift: reasoning-trace phase streams hold **three timescales
+(run ~2 / segment / doc)**. The C4 review recorded the fix as the C5 menu
+extension (segment-level regime layer). Preregistered now, before any C5 run:
+
+- **Record name:** `proof-operation-phase-runs-r3`. The C3 and C4 ABORT
+  records stand untouched as the verdicts under their menus.
+- **Mirror:** `seg_hier_categorical` — the three-timescale categorical
+  mirror: per-symbol empirical dwell (run scale) + within-doc SEGMENTS from
+  a run-aware BIC changepoint DP (boundaries at run edges; length-capped
+  position-weighted composition evidence), each segment carrying its
+  empirical composition (segment scale), deconvolved by the C4
+  self-consistency fixed point + per-doc marginals as a secondary tilt
+  target (doc scale); jump targets mix segment/doc/global with tilt weights
+  (a, b) fit by MLE over jump events. Fitted quantities: dwell lists, jump
+  chain, segment tables (lengths + compositions), doc marginals, (a, b).
+  The segmentation objective is composition likelihood and the tilts are
+  likelihood-fit — no pooled lag statistic enters any fitting objective.
+- **Gate 8, HARDENED (≥2 non-fitted moments, ALL must pass), both kept from
+  r2 — the exact lag-2–8 region that killed the doc-level mirror:**
+  1. `mi[lag2]` — the C3/C4 killer, kept a third time.
+  2. `acf[lag4]` — the mid-lag plateau the C4 mirror undershot by 2.7×
+     tolerance. The segment tables insert segment-scale composition (the
+     empirical-list precedent, one level down from C4's doc propensities) —
+     whether that mechanism carries the specific held-out lag-4/two-step
+     structure remains a genuine out-of-fit check; the C4 r2 FAIL on these
+     exact moments demonstrates the gate has teeth against this family.
+  Both under the uniform relative tolerance: ±20% of the held-out real
+  magnitude, floors mi 0.003 / acf 0.01. Any fail ⇒ mirror invalid ⇒ ABORT.
+- **INSERTION CONTROL (new, preregistered — the over-expressiveness check
+  the C3 circularity lesson demands):** the same mirror is re-fit on
+  run-permuted train streams (no-adjacent-repeat shuffle of each doc's
+  (type, length) run pairs — preserves doc composition, run-length material,
+  and the no-self-jump property; destroys all segment-scale structure) and
+  its generated held-out values of BOTH gate-8 moments must stay within the
+  real-data effective tolerance of the permuted streams' own values —
+  i.e. the estimator's hallucination on exchangeable data must be
+  subdominant to the structure the gate certifies. Any fail ⇒ mirror
+  over-expressive on this data ⇒ ABORT. (Chosen over automatic shrinkage:
+  every winner's-curse-safe scaling variant tried on the committed harness
+  toys either drowned genuine signal or failed to cancel selection noise —
+  see `mirrors.run_permuted_streams` and the harness tests.)
+- **Labels + labeler validation REUSED from the C3 record** (identical
+  frozen judge instruction, identical pinned traces). Signature, nulls,
+  mirror fit, gate 8, insertion control, skeptic run fresh.
+- **Coordinates + regime claim (checklist item 8):** unchanged from the r2
+  amendment (spectral mid · interaction = equality · stationarity spread;
+  regime-3 claim via the two-position comparison argument), with the C4
+  stage-6 CAVEAT now on record: the recipe sibling's § 8 gate found grounded
+  class-conditional continuation rates leak the equality latent into
+  raw-linear readouts — if this cell ever graduates to stage 6, its § 8
+  equality-variant STOP-gate must quantify the same leak on THIS substrate
+  (dwell means 1.5–3.0 differ by class here too) before any grid.
+
+_Amended-by: claude-fable-5 (runpod agent, Cycle 5 / stage6-recipe-then-c5
+overnight session), preregistered before any C5 fitting or measurement; C5
+labels not re-collected._
