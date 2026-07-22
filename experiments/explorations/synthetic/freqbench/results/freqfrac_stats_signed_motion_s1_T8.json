@@ -1,0 +1,344 @@
+{
+ "op": {
+  "T_can": 4,
+  "B_star": 2.0,
+  "d_sae": "F",
+  "T_override": 8
+ },
+ "seed": 1,
+ "cells": [
+  {
+   "bench": "signed_motion",
+   "arch": "batchtopk_sae",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 1,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.897,
+   "train_key": "948c8722f140bde1",
+   "eval_key_ref": "9df7c412c48d1a72",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "tsae",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 1,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.951,
+   "train_key": "1aedb6f2f0cfd93e",
+   "eval_key_ref": "7076b930ca4fa525",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "stacked_batchtopk",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 8,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.952,
+   "train_key": "31d0eb76d4b4b1bb",
+   "eval_key_ref": "3499ea7636fe32ce",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.11902,
+     0.12986,
+     0.11651,
+     0.13621,
+     0.12078,
+     0.11944,
+     0.13528,
+     0.1229
+    ],
+    "curve_uniform": [
+     0.11836,
+     0.13191,
+     0.11593,
+     0.13581,
+     0.12158,
+     0.12018,
+     0.13467,
+     0.12156
+    ],
+    "dc_frac": 0.119,
+    "concentration": 0.3054,
+    "concentration_pop_mean": 0.3064,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.12335,
+     0.1301,
+     0.12198,
+     0.12982,
+     0.11905,
+     0.11524,
+     0.14232,
+     0.11814
+    ],
+    "curve_uniform": [
+     0.12474,
+     0.12924,
+     0.12052,
+     0.13055,
+     0.11913,
+     0.11707,
+     0.14115,
+     0.1176
+    ],
+    "dc_frac": 0.1234,
+    "concentration": 0.304,
+    "concentration_pop_mean": 0.3032,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "txc_batchtopk_pre",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 8,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.411,
+   "train_key": "2506087c0989185a",
+   "eval_key_ref": "58a7da0cd8cf8d0e",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.13279,
+     0.11441,
+     0.12626,
+     0.13025,
+     0.12753,
+     0.1278,
+     0.12625,
+     0.11472
+    ],
+    "curve_uniform": [
+     0.13203,
+     0.11584,
+     0.12468,
+     0.13451,
+     0.12655,
+     0.12487,
+     0.12756,
+     0.11397
+    ],
+    "dc_frac": 0.1328,
+    "concentration": 0.3245,
+    "concentration_pop_mean": 0.3242,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.12742,
+     0.12066,
+     0.12599,
+     0.12298,
+     0.1313,
+     0.12989,
+     0.12196,
+     0.11979
+    ],
+    "curve_uniform": [
+     0.12825,
+     0.12212,
+     0.12576,
+     0.12176,
+     0.13083,
+     0.12881,
+     0.123,
+     0.11946
+    ],
+    "dc_frac": 0.1274,
+    "concentration": 0.2988,
+    "concentration_pop_mean": 0.2991,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "txc_batchtopk_post",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 8,
+   "d_sae": 19,
+   "k_pos": 16,
+   "realized_l0_per_token": 1.937,
+   "train_key": "249645fd2ba97f12",
+   "eval_key_ref": "b3a4fc9f279e6ea2",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.3687,
+     0.08378,
+     0.09101,
+     0.089,
+     0.09065,
+     0.11122,
+     0.08871,
+     0.07693
+    ],
+    "curve_uniform": [
+     0.36259,
+     0.08424,
+     0.08971,
+     0.08844,
+     0.09253,
+     0.11345,
+     0.09081,
+     0.07823
+    ],
+    "dc_frac": 0.3687,
+    "concentration": 0.4541,
+    "concentration_pop_mean": 0.4487,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.12827,
+     0.12062,
+     0.12485,
+     0.12321,
+     0.13197,
+     0.12905,
+     0.12219,
+     0.11984
+    ],
+    "curve_uniform": [
+     0.12825,
+     0.12212,
+     0.12576,
+     0.12176,
+     0.13083,
+     0.12881,
+     0.123,
+     0.11946
+    ],
+    "dc_frac": 0.1283,
+    "concentration": 0.2988,
+    "concentration_pop_mean": 0.2991,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "spectral_txc",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 8,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.695,
+   "train_key": "2d2e26c76c0b17b3",
+   "eval_key_ref": "68e06d058119579c",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.1973,
+     0.11593,
+     0.08432,
+     0.18068,
+     0.12643,
+     0.12803,
+     0.05823,
+     0.10909
+    ],
+    "curve_uniform": [
+     0.26316,
+     0.15322,
+     0.10994,
+     0.15906,
+     0.1041,
+     0.09645,
+     0.04592,
+     0.06815
+    ],
+    "dc_frac": 0.1973,
+    "concentration": 0.9247,
+    "concentration_pop_mean": 0.9525,
+    "alive_frac": 0.9474
+   },
+   "untrained": {
+    "curve": [
+     0.1957,
+     0.13564,
+     0.13342,
+     0.17065,
+     0.14424,
+     0.0905,
+     0.07587,
+     0.05399
+    ],
+    "curve_uniform": [
+     0.26316,
+     0.13381,
+     0.12934,
+     0.14248,
+     0.12067,
+     0.08667,
+     0.0722,
+     0.05166
+    ],
+    "dc_frac": 0.1957,
+    "concentration": 0.946,
+    "concentration_pop_mean": 0.9483,
+    "alive_frac": 0.9474
+   }
+  }
+ ],
+ "code_version": {
+  "commit_sha": "f0e6778f4d6e4c85cfbc0f01a1e4ab8f50f14ec6",
+  "dirty": true,
+  "diff_sha256": "13959f5359e01a290a012d0827e3a495229f283c6150832041be81c96628e706"
+ }
+}

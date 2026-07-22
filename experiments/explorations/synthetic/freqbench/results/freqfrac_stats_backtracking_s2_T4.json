@@ -1,0 +1,280 @@
+{
+ "op": {
+  "T_can": 4,
+  "B_star": 2.0,
+  "d_sae": "F",
+  "T_override": null
+ },
+ "seed": 2,
+ "cells": [
+  {
+   "bench": "backtracking",
+   "arch": "batchtopk_sae",
+   "datasource": "toy_backtracking_selfexcite_d64",
+   "T": 1,
+   "d_sae": 20,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.995,
+   "train_key": "f5d0f285a4397014",
+   "eval_key_ref": "bc5abca04f1449d6",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "backtracking",
+   "arch": "tsae",
+   "datasource": "toy_backtracking_selfexcite_d64",
+   "T": 1,
+   "d_sae": 20,
+   "k_pos": 2,
+   "realized_l0_per_token": 2.001,
+   "train_key": "401451d24e682c25",
+   "eval_key_ref": "dce6cf4641e9ceea",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "backtracking",
+   "arch": "stacked_batchtopk",
+   "datasource": "toy_backtracking_selfexcite_d64",
+   "T": 4,
+   "d_sae": 20,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.997,
+   "train_key": "f9e9e8b4713c6539",
+   "eval_key_ref": "45c534ed8d3ab2be",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.26128,
+     0.2639,
+     0.22871,
+     0.2461
+    ],
+    "curve_uniform": [
+     0.25962,
+     0.26175,
+     0.23204,
+     0.24659
+    ],
+    "dc_frac": 0.2613,
+    "concentration": 0.5568,
+    "concentration_pop_mean": 0.5561,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.25315,
+     0.26025,
+     0.24082,
+     0.24578
+    ],
+    "curve_uniform": [
+     0.25583,
+     0.25561,
+     0.24084,
+     0.24771
+    ],
+    "dc_frac": 0.2532,
+    "concentration": 0.5398,
+    "concentration_pop_mean": 0.5369,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "backtracking",
+   "arch": "txc_batchtopk_pre",
+   "datasource": "toy_backtracking_selfexcite_d64",
+   "T": 4,
+   "d_sae": 20,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.778,
+   "train_key": "09e3cdec1feefe0a",
+   "eval_key_ref": "1bd8e320cb10fa73",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.33844,
+     0.23909,
+     0.20216,
+     0.2203
+    ],
+    "curve_uniform": [
+     0.33776,
+     0.23909,
+     0.20826,
+     0.21489
+    ],
+    "dc_frac": 0.3384,
+    "concentration": 0.6109,
+    "concentration_pop_mean": 0.6144,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.26488,
+     0.24649,
+     0.24934,
+     0.23929
+    ],
+    "curve_uniform": [
+     0.25866,
+     0.24675,
+     0.24526,
+     0.24933
+    ],
+    "dc_frac": 0.2649,
+    "concentration": 0.5376,
+    "concentration_pop_mean": 0.5339,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "backtracking",
+   "arch": "txc_batchtopk_post",
+   "datasource": "toy_backtracking_selfexcite_d64",
+   "T": 4,
+   "d_sae": 20,
+   "k_pos": 8,
+   "realized_l0_per_token": 1.998,
+   "train_key": "4e6173e268132138",
+   "eval_key_ref": "afeff617660b58f9",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.33321,
+     0.24935,
+     0.20468,
+     0.21276
+    ],
+    "curve_uniform": [
+     0.30618,
+     0.2501,
+     0.22566,
+     0.21806
+    ],
+    "dc_frac": 0.3332,
+    "concentration": 0.6115,
+    "concentration_pop_mean": 0.589,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.26456,
+     0.24645,
+     0.2483,
+     0.24069
+    ],
+    "curve_uniform": [
+     0.25866,
+     0.24675,
+     0.24526,
+     0.24933
+    ],
+    "dc_frac": 0.2646,
+    "concentration": 0.5367,
+    "concentration_pop_mean": 0.5339,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "backtracking",
+   "arch": "spectral_txc",
+   "datasource": "toy_backtracking_selfexcite_d64",
+   "T": 4,
+   "d_sae": 20,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.992,
+   "train_key": "5ef1ab6a27b9a12b",
+   "eval_key_ref": "7f12dd194612b7a7",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.24694,
+     0.36224,
+     0.17188,
+     0.21894
+    ],
+    "curve_uniform": [
+     0.25,
+     0.25,
+     0.25,
+     0.25
+    ],
+    "dc_frac": 0.2469,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.27915,
+     0.23913,
+     0.24759,
+     0.23413
+    ],
+    "curve_uniform": [
+     0.25,
+     0.25,
+     0.25,
+     0.25
+    ],
+    "dc_frac": 0.2792,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": 1.0
+   }
+  }
+ ],
+ "code_version": {
+  "commit_sha": "f0e6778f4d6e4c85cfbc0f01a1e4ab8f50f14ec6",
+  "dirty": true,
+  "diff_sha256": "049a51f6a100928ab32558845bd405b13daac4e8a229ee59ed9b45b7dbb8f71b"
+ }
+}

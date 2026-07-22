@@ -228,3 +228,54 @@ concentration is 1.0 *by construction* — read its firing curve, not conc.
 Alive fractions healthy (0.90–1.00). All 12 checkpoints now in the local
 store under their canonical train_keys (future grid runs on this machine
 fast-forward training).
+
+### G.1 Full-pass results (2026-07-22/23, runpod-b, FB-C1 Phase 1)
+
+The widened pass: **all six registry benches × 6 archs × seeds {1, 2, 42} at
+T_can = 4, plus seed 1 at T = 8 for every window arch** — 132 unique cells,
+every checkpoint trained fresh on this pod via the canonical trainer,
+`train_key` hard-asserted against its leaderboard row, no leaderboard writes.
+Merged table + per-cell curves: `results/freqfrac_full_pass{,_summary}.json`,
+figure `figs/freqfrac_full_pass.png` (band = seed range). Two § G questions
+answered:
+
+**(a) Seed stability of the axis-1 coordinates — QUALITATIVELY STABLE, with
+quantified spread.** Every first-pass signature reproduces in all 3 seeds on
+all 6 benches: per-token archs DC-only (1.000, by construction); stacked flat
+at init level everywhere (dc 0.22–0.30 vs init 0.25 — the wavelet/broadband
+end); **txc-pre exactly flat on frequency in every seed (dc 0.250–0.253,
+spread 0.003 — the additive-blind signature is the tightest number in the
+table)** while DC-shifted on the integration benches (backtracking
+0.338–0.346, spread 0.008; changepoint 0.339–0.440; hedging 0.439–0.660);
+txc-post and spectral clear their init nulls wherever they learned structure
+(frequency conc 0.715–0.817 vs init 0.53). Quantitative caveat: the
+firing-weighted dc_frac of spectral (and txc-pre on hedging) carries seed
+spread up to ~0.19 on the DC benches — firing weights are seed-sensitive
+where a few atoms dominate; the coordinate READ (which side of init, curve
+shape) never flips. hedging txc-pre is the extreme DC point of the whole
+suite (dc 0.44–0.66 at T=4), as the drift bench should be.
+
+**(b) The T = 8 frequency high-pass check — PASS.** At T = 8 the DCT bins
+resolve 6 of the 10 Ω tones (bins ≥ 1.27); the T=4 resolution caveat lifts:
+
+- **spectral (frequency, T=8):** training tilts firing-weighted mass
+  *down* at DC (0.335 → 0.287) and *up* in the top bins — w ∈ {5,6,7} mass
+  0.221 (init) → 0.285 (trained), +29 % — the weight-space image of the
+  bench's high-pass S(f). Concentration stays band-tight (0.93).
+- **txc-post (frequency, T=8):** per-atom spectral concentration nearly
+  doubles over init (0.472 vs 0.275) — learned tone-like atoms; the
+  atom-MEAN curve stays flat because different atoms concentrate at
+  different tones (concentration, not the mean curve, is the right
+  statistic — the § C rule).
+- **stacked + txc-pre (frequency, T=8): exactly flat, ≈ init** (every bin
+  0.121–0.131) — the P2 additive blindness, now at 8-bin resolution.
+- Contrast **backtracking T=8**: txc-pre dc 0.242 vs init 0.117 (2.1×
+  DC-shift) and spectral low-band (w ≤ 2) 0.564 vs init 0.450 with the top
+  bins *dropping* — the anticipation-is-low-frequency finding sharpened.
+  The two benches tilt the SAME arch families in OPPOSITE spectral
+  directions from the same inits: the lens separates the axis-1 poles from
+  weights alone.
+
+Both § G acceptance components that were resolution-blocked at T_can=4 are
+now discharged; the FreqFrac coordinates used by REPORT/registry entries can
+cite the seed-mean T=4 numbers with the T=8 rows as the resolution frontier.

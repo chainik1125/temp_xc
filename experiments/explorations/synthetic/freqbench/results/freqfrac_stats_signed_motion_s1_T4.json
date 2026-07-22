@@ -1,0 +1,280 @@
+{
+ "op": {
+  "T_can": 4,
+  "B_star": 2.0,
+  "d_sae": "F",
+  "T_override": null
+ },
+ "seed": 1,
+ "cells": [
+  {
+   "bench": "signed_motion",
+   "arch": "batchtopk_sae",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 1,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.897,
+   "train_key": "948c8722f140bde1",
+   "eval_key_ref": "9df7c412c48d1a72",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "tsae",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 1,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.951,
+   "train_key": "1aedb6f2f0cfd93e",
+   "eval_key_ref": "7076b930ca4fa525",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "stacked_batchtopk",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 4,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.959,
+   "train_key": "bfc21225eabb77c4",
+   "eval_key_ref": "9fbf0539f5653528",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.24061,
+     0.24503,
+     0.24656,
+     0.2678
+    ],
+    "curve_uniform": [
+     0.24266,
+     0.24788,
+     0.24568,
+     0.26378
+    ],
+    "dc_frac": 0.2406,
+    "concentration": 0.5771,
+    "concentration_pop_mean": 0.5732,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.24696,
+     0.23595,
+     0.22988,
+     0.28721
+    ],
+    "curve_uniform": [
+     0.24894,
+     0.24103,
+     0.23145,
+     0.27858
+    ],
+    "dc_frac": 0.247,
+    "concentration": 0.5484,
+    "concentration_pop_mean": 0.5448,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "txc_batchtopk_pre",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 4,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.52,
+   "train_key": "c68900507ac93a11",
+   "eval_key_ref": "4d791767bce5a89f",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.25998,
+     0.2491,
+     0.22172,
+     0.26921
+    ],
+    "curve_uniform": [
+     0.265,
+     0.23758,
+     0.21579,
+     0.28163
+    ],
+    "dc_frac": 0.26,
+    "concentration": 0.6192,
+    "concentration_pop_mean": 0.6172,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.2728,
+     0.24079,
+     0.23757,
+     0.24884
+    ],
+    "curve_uniform": [
+     0.27044,
+     0.2392,
+     0.23963,
+     0.25073
+    ],
+    "dc_frac": 0.2728,
+    "concentration": 0.5509,
+    "concentration_pop_mean": 0.5504,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "txc_batchtopk_post",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 4,
+   "d_sae": 19,
+   "k_pos": 8,
+   "realized_l0_per_token": 1.996,
+   "train_key": "190a180d52fc3f35",
+   "eval_key_ref": "217449e3d7dd9a6b",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.29763,
+     0.23297,
+     0.2158,
+     0.2536
+    ],
+    "curve_uniform": [
+     0.29367,
+     0.23093,
+     0.22081,
+     0.25459
+    ],
+    "dc_frac": 0.2976,
+    "concentration": 0.5806,
+    "concentration_pop_mean": 0.5786,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.27033,
+     0.24382,
+     0.23749,
+     0.24837
+    ],
+    "curve_uniform": [
+     0.27044,
+     0.2392,
+     0.23963,
+     0.25073
+    ],
+    "dc_frac": 0.2703,
+    "concentration": 0.5539,
+    "concentration_pop_mean": 0.5504,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "signed_motion",
+   "arch": "spectral_txc",
+   "datasource": "toy_signed_motion_M19_d40",
+   "T": 4,
+   "d_sae": 19,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.967,
+   "train_key": "469b2232c6873da4",
+   "eval_key_ref": "d0d8c1490e00f9d9",
+   "trained_now": true,
+   "trained": {
+    "curve": [
+     0.32214,
+     0.21407,
+     0.23869,
+     0.2251
+    ],
+    "curve_uniform": [
+     0.26316,
+     0.26316,
+     0.26316,
+     0.21053
+    ],
+    "dc_frac": 0.3221,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.22703,
+     0.28117,
+     0.26262,
+     0.22919
+    ],
+    "curve_uniform": [
+     0.26316,
+     0.26316,
+     0.26316,
+     0.21053
+    ],
+    "dc_frac": 0.227,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": 1.0
+   }
+  }
+ ],
+ "code_version": {
+  "commit_sha": "56cbae9bb9ad498483d412320ba425a5ad18e966",
+  "dirty": true,
+  "diff_sha256": "248f8066e7d8aab4177b89a65f5b4be72dd76ea3edfe4b5f8bdba1e74db6a547"
+ }
+}
