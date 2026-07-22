@@ -26,7 +26,18 @@ retry×3 on CalledProcessError — all in src/explorations/synthetic/grid.py.
 BEFORE touching checkpoints (keys are pure config hashes, no git SHA), so all
 459 assumption rows fast-forward. Only never-run cells train fresh.
 
-## Current task: `briefings/stage6-grounded-eval.md` — IN PROGRESS (grid stage)
+## Current task: `briefings/stage6-grounded-eval.md` — **DONE, STOPPED FOR REVIEW (2026-07-22)**
+
+Everything through the acceptance gate is done + pushed: both grids 495/495,
+0 failures; render_figs + blind prediction-vs-actual verdicts written from the
+numbers (assumption **NEGATIVE** — order-1 mirror ⇒ per-token sufficient,
+frozen windows>per-token prediction failed; hedging **SPLIT leaning NEGATIVE**
+— drift ambient per token, window edge ≤ +0.04); registry entries + REPORT.md
+54/54 + BENCHMARKS.md ✓ rows + synthetic STATUS.md § 0 updated. **Awaiting
+human review; the briefing stays until reviewed, then delete it.** No further
+action for me unless the review asks for changes.
+
+### Build-stage log (context for the review)
 Build + blind-evaluate `assumption_consequence` (AC) + `hedging_drift` (DC).
 Everything up to the grid is DONE and pushed:
 
@@ -49,19 +60,12 @@ Everything up to the grid is DONE and pushed:
   (leaderboard +458 rows @ 30k steps, seeds {1,2,42}). Hedging NOT started.
 
 ## Next actions
-1. **RUNNING NOW**: assumption run_grid, 28 workers, OMP1, harness task
-   `bwcxzxpqg` (log under the session scratchpad `tasks/`). 459/495
-   fast-forwarded from leaderboard; ~36 cells training fresh. Venv python
-   3.12.11 works — no uv reinstall needed.
-2. When it exits: verify 0 failures, then launch
-   `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -u -m
-   experiments.explorations.synthetic.hedging_drift.run_grid 28` (all 495
-   fresh — checkpoints gone; harness-tracked background, NO nohup/disown).
-3. Verify 0 failures → run both `render_figs` → **write prediction-vs-actual
-   verdicts from the numbers** (blind discipline: report, never retune) →
-   registry.py Bench entries + render_report → REPORT.md per-bench links →
-   BENCHMARKS.md rows ✓ + verdicts → synthetic STATUS.md §0 → scoped
-   commits → push → STOP for review (briefing stays until reviewed).
+**None pending — stage 6 complete, stopped for review** (see Current task).
+Grid execution notes kept for the record: assumption grid ran twice (first
+pass hit the concurrent-git race below, 237 cells failed pre-cache-check with
+leaderboard rows unharmed; re-run after the grid.py fix → 495/495). Hedging
+495/495 in 61 min, 28 workers × OMP1. Venv python 3.12.11 works — no uv
+reinstall was needed on this pod.
 
 ## Gotchas (this box — READ BEFORE SIZING ANYTHING)
 - **Pod cgroup caps hide behind host numbers**: old pod = 8.5 CPUs
