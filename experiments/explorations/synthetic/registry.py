@@ -109,6 +109,31 @@ BENCHES: tuple[Bench, ...] = (
         F_note="feature-direction count (8 mode-signature + 12 content).",
     ),
     Bench(
+        "assumption_consequence", ("toy_assumption_consequence_d64",), "1.3.0",
+        F=20, verdict="NEGATIVE",
+        axes=(
+            LatentAxis("state", "state_recovery", "DC",
+                       "discourse state s_i ∈ {N,A,C}", primary=False),
+            LatentAxis("nextstate", "nextstate_recovery", "AC",
+                       "directed next-state s_{i+1} (the A→C grammar)",
+                       primary=True),
+        ),
+        note=("order-1 mirror ⇒ s_i sufficient: per-token reads the directed "
+              "latent (0.63–0.70 vs raw line 0.62); no window separation — the "
+              "frozen windows>per-token prediction failed."),
+        F_note="feature-direction count (3 state-signature + 17 content).",
+    ),
+    Bench(
+        "hedging_drift", ("toy_hedging_drift_d64",), "1.3.0", F=20,
+        verdict="SPLIT",
+        axes=(LatentAxis("conf", "conf_recovery", "DC",
+                         "confidence level c_i — hierarchical-AR(1) drift"),),
+        note=("c_i ambient in the token magnitude: per-token 0.73 of a 0.77 "
+              "ceiling; window edge ≤ +0.04 with a weak T-trend — persistence "
+              "alone is not an architecture test."),
+        F_note="feature-direction count (1 confidence + 19 content).",
+    ),
+    Bench(
         "frequency",
         ("toy_cyclic_circle_M101_d128", "toy_cyclic_random_M101_d128"),
         "1.3.0", F=101, verdict="POSITIVE",

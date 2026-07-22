@@ -4,11 +4,43 @@
 is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-07-19.
+Last updated: 2026-07-22.
 
 ---
 
 ## 0. TL;DR — what's active right now
+
+- **STAGE 6 DONE (2026-07-22, runpod) — both grounded benches built, run,
+  verdicts written blind. STOPPED for review.** The measure→mirror→**bench**
+  loop is closed for the first time: `assumption_consequence` (AC) +
+  `hedging_drift` (DC) registered (`toy_*_d64` datasources, additive
+  evaluator add-ons, protocol stays 1.3.0, 120 tests), § 8-gated, and run
+  through the locked uniform fair-backbone grid (495 cells each, canonical
+  runner, **0 failures**; migrated pod, 32 CPU). REPORT.md matrix now
+  **54/54** rows; BENCHMARKS.md rows flipped ✓. **Both frozen-prediction
+  checks came back honest NEGATIVEs/SPLITs — the substrates don't separate
+  architectures, and the records say so:**
+  **(1) assumption_consequence — NEGATIVE.** The § 5 card predicted per-token
+  blind to the directed A→C edge, windows exposing it, additive weaker. All
+  three failed: the fitted mirror is order-1, so `s_i` is sufficient for
+  `s_{i+1}` (gating recorded raw per-token = raw window, 0.464 vs 0.466,
+  BEFORE the grid); trained per-token reads the directed latent at 0.63–0.70
+  normalized vs the 0.62 raw line, and no window family beats it anywhere.
+  Citable: an order-1 mirror of a directed grammar cannot be an AC
+  arch-separator — needs order-2+ (the real stream has it; spec § 6 caveat).
+  **(2) hedging_drift — SPLIT, leaning NEGATIVE.** Per-token does NOT miss
+  the drift (R² 0.73 of the 0.77 multiplicative-noise ceiling): `c_i` is
+  ambient in the token magnitude. The predicted T-trend exists in sign only
+  (Spectral/Stacked T=8 best window cells, ≤ +0.04 over per-token, real
+  learning per the untrained control, but ≈ nothing next to the +0.006 raw
+  headroom). Citable: persistence alone is not an architecture test — a DC
+  separator must *require* integration. **Program consequence:** the next
+  discriminating benchmarks need order-2+ categorical (AC) or
+  integration-required (DC) structure — dovetails with the C4 hierarchical-
+  categorical-mirror target in the LEDGER. Records:
+  [`assumption_consequence/bench_record.md`](assumption_consequence/bench_record.md),
+  [`hedging_drift/bench_record.md`](hedging_drift/bench_record.md). Briefing
+  `stage6-grounded-eval.md` stays until reviewed.
 
 - **Grounded-benchmark expansion loop: Cycle 3 DONE (2026-07-19, runpod) —
   STOPPED for human review.** (Cycles 1–2: done + approved; the C2 review's

@@ -33,19 +33,25 @@ arch verdict is **NEGATIVE** (no arch recovers the sign). "Registered" ≠
 | **changepoint** | semi-grounded (topic dwell measured; emission constructed) | abstract emission | change-point / equality (DC+AC) | SPEC (semi) | ✓ | **SPLIT** |
 | **frequency** | abstract (Dmitry FrequencyBench port) | abstract | periodic / cyclic-tone (AC) | n/a | ✓ | **POSITIVE** |
 | **signed_motion** | abstract construct | abstract | order-sensitive step (AC) | n/a | ✓ | **NEGATIVE** |
-| **assumption_consequence** | expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✗ | — *(stage-6 pending)* |
-| **hedging_drift** | expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✗ | — *(stage-6 pending)* |
+| **assumption_consequence** | expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✓ | **NEGATIVE** *(frozen windows>per-token prediction failed: order-1 mirror ⇒ s_i sufficient, per-token reads the directed latent; needs order-2+ mirror to separate archs)* |
+| **hedging_drift** | expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✓ | **SPLIT** *(per-token R² 0.73 of 0.77 ceiling — drift is ambient per token; window edge ≤ +0.04 with weak T-trend)* |
 | **list_item_parallelism** | expansion C3 (re-freeze) | text-corpus | bursty / self-exciting (AC) | SPEC | ✗ | — *(pending; ⚠ redundant class + weak mirror — low value)* |
 | **self_reference_echo** | expansion C2 (re-filed) | reasoning-trace | bursty / self-exciting (AC) | SPEC\* | ✗ | — *(not planned; redundant, marginal labeler)* |
 
 *Datasource plugins (the `✓`s): `toy_backtracking_selfexcite_d64`,
 `toy_changepoint_modes_d64`, `toy_cyclic_{circle,random}_M101_d128`,
-`toy_signed_motion_M19_d40`. The four grounded SPECs have **no plugin yet** — that
-is exactly the stage-6 build.*
+`toy_signed_motion_M19_d40`, `toy_assumption_consequence_d64`,
+`toy_hedging_drift_d64`. Remaining SPECs without a plugin:
+`list_item_parallelism`, `self_reference_echo` (both deliberately unbuilt).*
 
-**Next stage-6 targets:** `assumption_consequence` (AC) + `hedging_drift` (DC) —
-the two solid, distinct new axes. `list_item_parallelism` is a valid SPEC but
-redundant (backtracking's class) with a weak mirror → low priority.
+**Stage-6 outcome (2026-07-22):** both grounded benches built, gated, and run
+through the uniform fair-backbone grid (495 cells each, 0 failures) with the
+frozen predictions checked blind — see the two `bench_record.md`s. Both
+verdicts are "the substrate doesn't separate architectures" findings: the
+order-1 AC mirror collapses the directed dependency into the current state,
+and the ambient DC magnitude is per-token-readable. The *next* discriminating
+benchmarks need order-2+ (AC) or integration-required (DC) structure.
+`list_item_parallelism` stays low priority (redundant class, weak mirror).
 
 ---
 
