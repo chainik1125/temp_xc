@@ -1,81 +1,107 @@
 # Working state — agent `mac-local`
 
-**Last rewrite:** 2026-07-21 (Opus 4.8, local CC — pre-compact). Supersedes the
-stale 2026-07-10 version.
+**Last rewrite:** 2026-07-22 (Opus 4.8, local CC — pre-compact). Supersedes the
+2026-07-21 version.
 
 ## Who / where
-Local CC on the Mac (Apple M5 Pro, MPS, no CUDA) at `~/research/projects/temp_xc`.
-Role: **prototyping, review, orchestration**. Heavy grids go to `runpod`. I'm the
-`mac-local` agent (inferred from darwin + this path).
+Local CC on the Mac (Apple M-series, MPS, no CUDA) at `~/research/projects/temp_xc`.
+Role: prototyping, review, orchestration. Heavy grids → `runpod`. I'm `mac-local`.
 
 ## Git
-Branch `arxiv`, **level with `origin/arxiv` @ `e64d7e39`**, clean tree.
-`origin` = SSH (`git@github.com:chainik1125/temp_xc.git`).
+Branch `arxiv`, **@ `266dc386`, ahead of `origin/arxiv` by 2 UNPUSHED commits**
+(`a96f83f0` stage-6 review close-out; `266dc386` paper+private scaffolding).
+Clean tree. **Push not yet done** — the runpod box still thinks stage 6 is
+"awaiting review" until it sees the briefing deletion, so push before handing
+back to runpod. `origin` = SSH.
 
-## The program has two workstreams (full science in the research STATUS §0)
+## ⏭ THE NEXT TASK (post-compact): revamp the synthetic autoresearch system
 
-**A. Architecture B×A comparison — DONE + mature.** The full clean-room rerun
-completed (protocol **1.3.0**, ~2239 cells, 0 failures, run on CPU). `REPORT.md`
-is filled: per-token-matched matrix (6 latent-axis rows × 6 fair-backbone archs,
-`{F,F/2}`) + NMSE/eauc companion panels + 3 figures (heatmap, capacity frontiers,
-capability gate). The organizing principle — **where the nonlinearity sits**
-(additive-over-position vs position-mixing) determines which latent an arch
-exposes — is established. Covers backtracking/changepoint/frequency/signed_motion.
+The whole recent arc converged on one design. **Do NOT just rebuild FreqBench
+in isolation.** Build ONE program:
 
-**B. Grounded-benchmark expansion — 3 autonomous cycles done + reviewed.** An
-autonomous, gated measure→mirror loop (runpod) that discovers grounded benchmarks
-from real reasoning traces + text. Standing infra: `expansion/README.md` (pipeline
-+ 8 guardrails), the `src/explorations/synthetic/expansion/` harness, gates 7
-(no-leakage labeler) + 8 (non-fitted-moment mirror), and the `expansion/LEDGER.md`
-coverage grid. **Grounded SPECs produced:** `assumption_consequence` (AC/directed,
-solid), `hedging_drift` (DC/slow, solid — `hier_ar1` mirror), `list_item_parallelism`
-(bursty, redundant + weak mirror — low value), `self_reference_echo` (SPEC*, low).
-backtracking = the hand-run anchor. **interaction/equality prize is UNCLAIMED** —
-the categorical recipe *measures* real signals but no mirror in the menu holds the
-categorical plateau (needs a hierarchical-categorical mirror).
+**Two generators, one substrate** — split by *epistemic anchor*, not two disjoint
+programs:
+- **FreqBench = theorem-first generator.** Ungrounded synthetic tasks constructed
+  from first principles + PROVEN ceilings (local-impossibility bound,
+  symmetry/ratio-invariance, periodogram oracle). Anchor = proofs; low drift.
+- **PhenomenonBench = data-first generator** (the existing expansion loop). Mines
+  real R1-Distill traces → measure→mirror→gate→graduate. Anchor = real LM
+  behavior; high drift → keeps the gated-batch/prereg/null/gate-7-8 machinery.
+- MUST SHARE: the 6-arch fair-backbone panel, the canonical runner +
+  realized-L0/capacity conventions, the coordinate system, and ONE
+  `BENCHMARKS.md` with a **provenance tag** (theorem-first vs grounded). Two
+  generators → one substrate = one program. Two substrates = the bug the arxiv
+  restructure created (it kept the phenomenon substrate, dropped FreqBench's).
 
-## ⏳ In flight — STAGE 6 queued (the immediate next thing)
+**Coordinate system = 3 orthogonal structural axes** ("everything in frequencies"
+covers only axis 1):
+1. **Spectral** (DC↔AC): waveform of one latent. FreqBench fully theorizes it —
+   `FreqFrac(ω)` = per-arch frequency response. Benches: frequency, signed_motion,
+   hedging.
+2. **Interaction order** (additive↔pairwise-equality↔higher): sum-over-positions
+   vs comparison-between. Has the "where the nonlinearity sits" theorem (additive
+   provably blind to equality) + the within-window shuffle-gap as a first
+   sensitivity probe. Benches: int/eq prize, changepoint's equality piece.
+3. **Stationarity/localization** (spread↔clustered): Fourier-vs-wavelet; a
+   burst/changepoint is broadband+localized, NOT a frequency. Localization
+   measure UNBUILT. Benches: backtracking, changepoint.
+Acid test of "principled" = **held-out prediction** (hide a bench, predict the
+arch ranking from its coordinates alone) — literally Dmitry's stated goal.
 
-`briefings/stage6-grounded-eval.md` (runpod, active): build + **blind-eval** the
-two solid grounded SPECs (`assumption_consequence` + `hedging_drift`) into the
-framework as `✓`-registered benchmarks, run the fair-backbone grid, extend
-`REPORT.md`, flip `BENCHMARKS.md` rows `✗→✓`. **Not mine to run** (heavy grid).
-This closes the measure→mirror→**bench** loop for the first time. Predictions are
-frozen in each `bench_spec.md` — the run must be blind (no tuning to match).
+**Build = mostly a PORT (Opus-4.7 → Fable 5), preserving the proofs.** Dmitry's
+FreqBench is real code in branches:
+- `origin/dmitry-spectral-sprint2:docs/dmitry/sprints/2026-06-10_freqbench_sprint/code/`
+  — `fb_core.py` (SpectralTXC unifying vanilla/DC-AC/multiband, ConvDict, TokenSAE,
+  oracles, FreqFrac diagnostics), `c7_spectral_arm.py` (spectral lens ON
+  backtracking — read its `log.md` for whether it hit the non-stationarity wall =
+  axis-3 evidence). Proofs: symmetry-triviality catch, circle embedding =
+  classical single-tone estimation, ratio invariance.
+- `origin/dmitry-synthetic:src/v6_colored_sources/` — AR(1) colored sources, lag-D
+  phase transition at `W = D+1` (a memory-depth flavor).
+- Redo = port → `temp_bench` v2 plugin, rerun empirics on **Fable 5** with the
+  shared arch panel, and **wire FreqFrac to coordinatize the EXISTING
+  frequency/signed_motion/hedging benches into the shared REPORT** (lands
+  integrated, not standalone). NB: FreqBench's `ac_sign` task **== the repo's
+  `signed_motion`** — same task, forked; the port should let FreqBench's proof
+  *explain* signed_motion's NEGATIVE.
 
-**When runpod finishes → review it** (my standing protocol, below). Specifically:
-verify no prediction was tuned for, the §8 gate passed, the grid ran clean (0
-failures, code-version stamped), and `REPORT.md`/`BENCHMARKS.md` regenerated
-honestly.
+**Carry-forward correction from the stage-6 review (a NEW gate):** promote raw
+per-token↔window separation from a logged §8 stat to a **discriminability
+STOP-gate**. Both stage-6 benches came out NEGATIVE/SPLIT because they cannot
+discriminate BY CONSTRUCTION (assumption: order-1 mirror ⇒ `s_i` sufficient;
+hedging: ambient DC per token) — and §8 gating already measured this
+(0.464 vs 0.466; +0.006 headroom) BEFORE 990 cells were spent. PhenomenonBench
+must gate on **arch-separability, not just mirror-validity**. "Grounded + valid
+mirror ≠ discriminates" — you need the structural feature (order-2 /
+integration-requirement), which is exactly what the coordinate system encodes.
 
-## How I review runpod cycles (the protocol — I've caught real issues with it)
-Pull → **verify integrity** (no arch pollution to `leaderboard.jsonl`/`manifest`;
-spend real + itemized; prereg frozen *before* data via commit order; harness tests
-pass; scoped commits / no stray logs) → **verify the science** (are ABORTs genuine
-sophisticated skeptic kills, not giving up? are PROCEEDs sound — check for
-reward-hacks, misclassification, over-sell?) → **apply corrections + queue next**.
-Caught so far: self-reference-echo misclassification (self-exciting, not int/eq),
-list-item over-sell (redundant + weak mirror), and confirmed the C3 list-item
-relative-tolerance re-freeze was legit (preregistered, not a gate-loosen hack).
+## Stage 6 — DONE + REVIEWED + PASSED (2026-07-22, by me)
+measure→mirror→**bench** closed for the first time. Both grounded SPECs
+(`assumption_consequence`, `hedging_drift`) built + blind-evaluated + reported
+(REPORT 54/54, BENCHMARKS ✗→✓). Review PASSED clean: blind predictions frozen in
+expansion cycles 1–3 (predate the grid), **990/990 rows code-versioned**, 0
+failures, **0 duplicate eval_keys** (race fix real in `grid.py`), 13 tests
+re-passed locally, verdicts honest + self-critical. Both verdicts NEGATIVE/SPLIT
+— the anti-"research-sin" discipline working. Briefing deleted + committed.
 
-## 📌 Pending / recorded for later
-- **Cycle 4 (expansion) needs its own briefing** when expansion resumes — targets
-  recorded in `expansion/LEDGER.md`: the **interaction/equality prize** (build the
-  hierarchical-categorical mirror), + **harden gate 8** (check ≥2 non-fitted
-  moments; hybrid mirrors must preregister a non-fitted moment — the C3 circularity
-  lesson). Decision was: **stage 6 first, then Cycle 4.**
-- The old frequency "DCT-band decisive" calibration-debt note is likely moot (the
-  rerun regenerated the record). Low priority; verify if revisiting frequency.
+## Standing context (full science in research `STATUS.md` §0; team/venue in memory)
+- **A. Architecture B×A comparison** — done + mature (`REPORT.md`; "where the
+  nonlinearity sits").
+- **B. Grounded expansion** — 3 cycles + stage-6 bench done. **int/eq prize still
+  UNCLAIMED** (needs a hierarchical-categorical mirror).
+- **Paper context** (from the 4 meeting transcripts, now in `private/transcripts/`,
+  gitignored — read this session): TXC paper, NeurIPS 2026 (reviews out
+  ~2026-07-22, rebuttal due 07-27) + ICML'26 workshop. Team: Dmitry (lead),
+  Han=user, Aniket, Andre, Bill. See memory `project-txc-paper-context`,
+  `project-synthetic-program-why`, `project-autoresearch-revamp`.
+- **Paper snapshot** now in `paper/` (read-only agent context, not built here).
 
-## Trackers (where to look — don't re-derive)
-- **`experiments/explorations/synthetic/BENCHMARKS.md`** — the one-stop registry
-  (every benchmark: spec-status / framework-registered / arch-verdict + the
-  tried-&-set-aside record). Hand-maintained; I created it 2026-07-21.
-- **`expansion/LEDGER.md`** — grounded coverage grid (proposed/abort/SPEC per cell).
-- **`REPORT.md`** — the head-to-head (auto-gen, evaluated benches only).
-- **research `STATUS.md` §0** — the living program state (read first, over this file).
+## Trackers (don't re-derive)
+- `experiments/explorations/synthetic/BENCHMARKS.md` — registry (+2 stage-6 rows).
+- `expansion/LEDGER.md` — grounded coverage grid.
+- `REPORT.md` — head-to-head (auto-gen, 54/54).
+- research `STATUS.md` §0 — living program state (read first).
 
-## Recent commit chain (this stretch)
-rerun+purge (`117afaf1`) → panels/figures → pollution-fix (`a2ebd6b6`) → C2 review
-gates + cycle-3 briefing → C3 review corrections (`b67e860d`) → `BENCHMARKS.md`
-registry (`138d345b`) → stage-6 briefing + retire C3 briefing (`e64d7e39`).
+## Recent commit chain
+stage-6 landed by runpod (`2943dd1a`) → I synced (ff) → reviewed PASS →
+close-out (`a96f83f0`) → paper+private scaffolding (`266dc386`).
