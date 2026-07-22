@@ -77,7 +77,7 @@ Process `markov`; fit on 210 train docs, validated on 90 held-out docs. Fitted p
 
 Abs errors: acf_lag1_5 0.132, mi_lag1_5 0.039, dwell_mean 0.055, dwell_cv 0.197.
 
-## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)
+## 5. Adversarial skeptic pass (fixed kill-rubric, see LEDGER — judge model untracked pre-C5)
 
 | item | kill | evidence |
 |---|---|---|

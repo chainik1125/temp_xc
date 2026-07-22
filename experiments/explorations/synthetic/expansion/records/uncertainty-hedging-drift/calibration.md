@@ -49,7 +49,7 @@ Process `ar1`; fit on 210 train docs, validated on 90 held-out docs. Fitted para
 
 Abs errors: acf_lag1_5 0.084, mi_lag1_5 0.021.
 
-## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)
+## 5. Adversarial skeptic pass (fixed kill-rubric, see LEDGER — judge model untracked pre-C5)
 
 | item | kill | evidence |
 |---|---|---|

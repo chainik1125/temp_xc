@@ -68,7 +68,7 @@ Process `logistic_ar`; fit on 280 train docs, validated on 120 held-out docs. Fi
 
 Abs errors: acf_lag1_5 0.028, fano 0.287, p11 0.026, excite_ratio 0.555, gap_cv 0.064.
 
-## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)
+## 5. Adversarial skeptic pass (fixed kill-rubric, see LEDGER — judge model untracked pre-C5)
 
 | item | kill | evidence |
 |---|---|---|

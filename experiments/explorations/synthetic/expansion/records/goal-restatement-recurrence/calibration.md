@@ -4227,7 +4227,7 @@ Abs errors: acf_lag1_5 0.012, mi_lag1_5 0.002, fano 0.240, p11 0.012, excite_rat
 
 **Gate 8 (preregistered non-fitted moment)** — `acf[lag1]`: held-out real 0.3230 vs synthetic 0.2975, |err| 0.0255 vs tolerance ±0.0646 (±20% rel of |real| (floor 0.01)) → **PASS**.
 
-## 5. Adversarial skeptic pass (fixed kill-rubric, Opus)
+## 5. Adversarial skeptic pass (fixed kill-rubric, see LEDGER — judge model untracked pre-C5)
 
 | item | kill | evidence |
 |---|---|---|
