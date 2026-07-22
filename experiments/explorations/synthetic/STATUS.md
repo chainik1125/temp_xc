@@ -26,7 +26,12 @@ Last updated: 2026-07-22.
   (real-vs-permuted ACF(4) gap 0.056). **C6 gap: the extraction estimator,
   not the model family.** Skeptic headers now name the judge model (C4
   cosmetic done). Records: `expansion/records/proof-operation-phase-runs-r3/`
-  + LEDGER C5 entry. STOPPED for review.
+  + LEDGER C5 entry. **Reviewed + APPROVED (2026-07-23, mac-local):**
+  freeze-order proven (card + insertion control at `f8c1deb6` strictly
+  pre-calibration); the insertion control is a self-imposed *stricter*
+  check that killed the agent's own passing result — the discipline
+  working; three-timescale confirmation is model-independent; $0 spend
+  verified. C6 target (calibrated segment-composition extraction) stands.
 
 - **STAGE-6 OF `recipe_instruction_phase_runs`: § 8 STOP, no grid
   (2026-07-22, runpod overnight session).** The bench is fully **registered**
@@ -45,6 +50,13 @@ Last updated: 2026-07-22.
   ceiling, or demote to regime-2/3-mixed) recorded in
   [`recipe_instruction_phase_runs/bench_record.md`](recipe_instruction_phase_runs/bench_record.md).
   A gate doing its job is the process succeeding — sound verdict, no win.
+  **Reviewed + APPROVED (2026-07-23, mac-local):** STOP analytically forced
+  (from-`c_t` line 0.609 ≈ 0.614), predictions still blind, both self-audit
+  gaps accepted → new README execution rules (gating scripts committed
+  before first run; threshold-optimized ceilings). **Re-scope DECIDED:
+  option 1** — primary axis re-normalized to the regime-3 residual
+  `[0.771, 1.0]`, dated § 5 re-freeze required before any grid (future
+  briefing; see the bench_record review section). Briefing retired.
 
 - **EXPANSION CYCLE 4 DONE (2026-07-22, runpod, autonomous on Fable 5) —
   the interaction/equality prize is half-claimed. STOPPED for review.**

@@ -109,3 +109,23 @@ without re-running anything:
   reference the threshold-optimized CEILING (0.614 per-token / 0.720
   window), not the plain-probe numbers (0.595/0.619) — a plain probe can sit
   at balacc 0.5 under class imbalance while real access exists.
+
+## Review (2026-07-23, mac-local) — APPROVED; re-scope decision
+
+Verified: no grid rows (leaderboard clean), STOP direction analytically
+forced (the from-`c_t` line 0.609 ≈ measured 0.614 — thresholds could not
+have manufactured it), frozen § 5 untouched, build + 8 tests sound, records
+honest. The two self-audit gaps are accepted and the first is now a program
+rule (README: gating scripts committed before first execution;
+threshold-optimized ceilings as the raw-access lines).
+
+**Decision — re-scope option 1 (re-normalize), queued:** the bench's primary
+axis becomes the **regime-3 residual** — `equality_recovery` scored against
+`[pair-additive ceiling 0.771, exact 1.0]` — with the DC leak and additive
+access reported as named floors, not noise. This preserves the grounded
+substrate (rebalancing the dwell would discard the C4-validated phenomenon)
+and poses the honest architectural question: which code *linearizes* the
+0.23 that only position-mixing can reach. Requires a dated § 5 re-freeze
+(new per-arch predictions + the corrected falsifier referencing the
+threshold-optimized lines) committed BEFORE any grid — a future briefing;
+not executed in this review.

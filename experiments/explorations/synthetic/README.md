@@ -290,6 +290,11 @@ Every investigation must pass **all** applicable gates. A failed gate means
   The bench then tests which architecture's code **linearizes** it. If even
   the nonlinear route fails, the bench is non-discriminating in the other
   direction — nothing can read it — and still STOPs.
+  Two execution rules (stage-6 #3 review): the gating script is **committed
+  before its first execution** (commit-order evidence of preregistration,
+  same as cards); raw-access lines are **threshold-optimized ceilings**, not
+  plain-probe scores (a plain probe can sit at chance under class imbalance
+  while real access exists).
 
 ### Abort / discard conditions
 
