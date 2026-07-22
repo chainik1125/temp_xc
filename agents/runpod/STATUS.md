@@ -26,18 +26,24 @@ retry×3 on CalledProcessError — all in src/explorations/synthetic/grid.py.
 BEFORE touching checkpoints (keys are pure config hashes, no git SHA), so all
 459 assumption rows fast-forward. Only never-run cells train fresh.
 
-## Current task: `briefings/expansion-c4.md` — IN PROGRESS (started 2026-07-22)
+## Current task: `briefings/expansion-c4.md` — **DONE, STOPPED FOR REVIEW (2026-07-22)**
 
-Stage 6 was **reviewed + PASSED and closed** (mac-local deleted that briefing,
-`a96f83f0`). Now executing expansion Cycle 4: hierarchical-categorical mirror
-build + gate-8 hardening (≥2 non-fitted moments) + int/eq re-freeze cards
-under the revamped rules (coordinates + regime claim + design-time
-discriminability). Measure→mirror only — NO grids, NO datasource plugins.
-**Model routing decision (2026-07-22):** loop judgment roles `think` +
-`validate` → `claude-fable-5` ($10/$50 MTok, priced into the meter); `bulk`
-stays Haiku 4.5 — C3's 4.1M bulk input tokens would cost ~$60 on Fable vs $6
-on Haiku, breaking the briefing's own $25 hard cap. mac-local is building the
-FreqBench port in parallel — pull before push.
+Cycle 4 executed end-to-end and pushed: `hier_categorical` mirror built +
+harness-tested (incl. the self-consistency deconvolution — raw doc marginals
+flatten every fit→generate round); gate-8 hardened to ≥2 non-fitted moments;
+both r2 cards frozen by dated amendment BEFORE any run; calibrations run on
+cached C3 labels. **recipe-instruction-r2 PROCEED → SPEC**
+(`synthetic/recipe_instruction_phase_runs/` — first int/eq SPEC, first
+grounded regime-3 candidate); **proof-operation-r2 ABORT** (three-timescale
+diagnosis → C5 segment-layer target). LEDGER C4 entry + BENCHMARKS + research
+STATUS §0 updated. Spend $10.82/$25 cumulative. **Do NOT proceed to stage 6.**
+Briefing stays until mac-local reviews, then it is deleted.
+**Model routing (this cycle):** `think`+`validate` → `claude-fable-5`
+($10/$50 priced into the meter); `bulk` stays Haiku ($25 cap would break on
+Fable bulk). Ops gotcha fixed mid-cycle: Fable skeptic JSON truncated at
+max_tokens crashed the parse twice (~$1.8 burned) — skeptic raw text is now
+persisted pre-parse, rubric-key-validated, deterministically repairable; the
+recorded verdict was recovered from raw, never re-rolled.
 
 ### Stage-6 build log (closed; kept for archaeology)
 Build + blind-evaluate `assumption_consequence` (AC) + `hedging_drift` (DC).

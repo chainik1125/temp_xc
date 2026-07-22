@@ -10,6 +10,30 @@ Last updated: 2026-07-22.
 
 ## 0. TL;DR — what's active right now
 
+- **EXPANSION CYCLE 4 DONE (2026-07-22, runpod, autonomous on Fable 5) —
+  the interaction/equality prize is half-claimed. STOPPED for review.**
+  Built the LEDGER-mandated **`hier_categorical`** mirror (per-doc phase
+  propensities with a self-consistency deconvolution + empirical dwell +
+  MLE-tilted jump chain; harness-tested against the C3 failure mode) and
+  **hardened gate-8 to ≥2 non-fitted moments** (guardrail 8). Re-froze both
+  C3 int/eq real-signal aborts by dated amendment (coordinates + regime-3
+  claim + design-time discriminability per the new rules; C3 labels reused).
+  Verdicts: **(1) `recipe-instruction-phase-runs-r2` PROCEED → SPEC**
+  (`synthetic/recipe_instruction_phase_runs/`) — the program's **first
+  interaction/equality SPEC and first grounded regime-3 candidate**; the new
+  mirror passes BOTH hardened moments incl. the exact ACF(4) check that
+  killed C3's semi-Markov (err 0.018 ≤ 0.059), skeptic 5/5.
+  **(2) `proof-operation-phase-runs-r2` ABORT, informative** — even
+  doc-level hierarchy fails on reasoning traces; the lag-curve pins the miss
+  to lags 2–8 while the lag-12 floor matches ⇒ reasoning phase streams hold
+  **three timescales (run/segment/doc)**; corr(length, concentration) =
+  −0.60 confirms within-doc drift. **C5 target: segment-level regime layer**
+  under the hardened gate. NO architecture was trained or evaluated; no
+  datasource plugins added. Spend $2.62 this cycle ($10.82/$25 cumulative).
+  Full record: [`expansion/LEDGER.md`](expansion/LEDGER.md) C4 entry +
+  [`BENCHMARKS.md`](BENCHMARKS.md). Briefing `expansion-c4.md` stays until
+  mac-local review.
+
 - **AUTORESEARCH REVAMP — STARTED, phase 1 done (2026-07-22, mac-local).** The
   program is now explicitly **two generators, one substrate**: README gained
   § "The two generators, one substrate" (FreqBench theorem-first +

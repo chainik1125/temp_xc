@@ -18,7 +18,7 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
 | **AC-order-sensitive** (depends on order) | **`SPEC`** — assumption-then-consequence (**g7 re-exam RESOLVED C2**: strict per-sentence labeler, ctx=0 → asym **0.297** (was 0.135), gate-8 PASS, fresh skeptic 5/5 → `synthetic/assumption_consequence/`, canonical mirror = g7 fit) | `calib:ABORT` — question-answer-adjacency (skeptic kill: definitional leakage) |
 | **periodic** (rhythmic/cyclic) | `calib:ABORT` ×2 — computation-verification-alternation (C2: peak real, periodic_rate can't make Fano 2.29; **C3 re-freeze with `periodic_hawkes`: gate-8 PASSED (Fano \|err\| 0.10 ≤ 0.46) but skeptic killed on circularity** — the joint period+kernel fit inserts everything measured; any future re-freeze needs a genuinely non-inserted moment, e.g. gap-distribution shape or cross-doc period stability) | `calib:ABORT` — enumeration-cadence (C3: spec_peak **4.10** real ≫ null 1.13, κ=0.56, but gate-8 fano fail 3.52 vs 0.97 — the C2 comp-verif failure replicated in text: enumeration is rhythmic AND bursty; same hybrid-vs-circularity tension as the reasoning cell) |
 | **bursty/self-exciting** (clustered events) | **`SPEC`** — backtracking (the hand-run anchor) · **`SPEC*`** — self-reference-echo (re-filed from interaction/equality, C2 review; redundant with backtracking + marginal κ=0.30 → low eval priority) · `prop` — error-correction-cascade (C1, unselected; cell PROCEEDed) | **`SPEC`** — **list-item-parallelism** (**C3 re-freeze PROCEED — the program's first text-corpus SPEC**: ACF(1)=0.52 [0.48,0.56] ≫ N1 hi 0.21, κ=0.64, gate-8 Fano \|err\| 0.163 ≤ 0.781 (±20% rel), skeptic 5/5 → `synthetic/list_item_parallelism/`; **re-filed from interaction/equality**: measured binary run-clustering, `logistic_ar` family) · `calib:ABORT` — quotation-burst (C1 skeptic kill: circular mirror validation) |
-| **interaction/equality** (cross-position compare) | **— still unfilled** · `calib:ABORT` ×2 — operator-alternation (C2: NEGATIVE sign falsified) · **proof-operation-phase-runs (C3, categorical recipe: signal REAL — self-match ACF(1)=0.286 ≫ N1 hi 0.047, 5-class marginal [.22,.33,.08,.08,.29], κ=0.59 — but gate-8 MI(2) fail 0.030 vs 0.065: semi-Markov halves the two-step structure)** | **— still unfilled** · `calib:ABORT` ×3 — greeting-signoff-mirror (C2: mis-keyed mirror) · list-item-parallelism (*C3: re-filed → bursty/self-exciting, where it PROCEEDed*) · **recipe-instruction-phase-runs (C3, categorical recipe: signal REAL — self-match ACF(1)=0.479 ≫ N1 hi 0.204, 5-class marginal [.29,.51,.06,.07,.07], κ=0.61 — but gate-8 ACF(4) fail 0.201 vs 0.294: the self-match tail is a plateau semi-Markov can't hold — the categorical analogue of the hedging plateau ⇒ C4 menu gap: hierarchical categorical mirror)** |
+| **interaction/equality** (cross-position compare) | **— still unfilled** · `calib:ABORT` ×3 — operator-alternation (C2: NEGATIVE sign falsified) · proof-operation-phase-runs (C3: signal REAL but gate-8 MI(2) fail — semi-Markov halves the two-step structure) · **proof-operation-phase-runs-r2 (C4, `hier_categorical`: BOTH hardened gate-8 moments still fail — MI(2) 0.030 vs 0.065, ACF(4) 0.058 vs 0.127. Lag-curve diagnosis: the doc-level propensity floor is nearly right (lag-12 syn 0.045 vs real 0.050) but lags 2–8 carry a SEGMENT-scale layer — reasoning traces hold THREE timescales (run ~2 / segment ~5–15 / doc floor), and corr(doc length, propensity concentration) = −0.60 confirms within-doc phase drift. C5 menu gap: a segment-level regime layer)** | **`SPEC`** — **recipe-instruction-phase-runs-r2 (C4 re-freeze PROCEED — the program's FIRST interaction/equality SPEC and first grounded regime-3 candidate:** `hier_categorical` mirror holds BOTH hardened gate-8 moments — ACF(4) \|err\| 0.018 ≤ 0.059 (the C3 killer, now passed), MI(2) \|err\| 0.029 ≤ 0.036 — skeptic 5/5, signal unchanged from C3 (ACF(1) 0.479 ≫ N1 hi 0.204, κ=0.61) → `synthetic/recipe_instruction_phase_runs/`; measured class IS multi-class run/segment equality — no re-filing) · `calib:ABORT` ×2 — greeting-signoff-mirror (C2: mis-keyed mirror) · list-item-parallelism (*C3: re-filed → bursty/self-exciting, where it PROCEEDed*) |
 | **long-memory** (renewal / heavy-tail) | `calib:ABORT` — goal-restatement-recurrence (C3: gap-CV 1.48 > N1 hi 1.01, gate-8 PASS, but **skeptic kill on composition**: pooled gap-CV inflated by cross-trace rate mixture; perturbed margin thin (1.14 vs N2 hi 1.06); κ=0.42 near floor) | `calib:ABORT` — pronoun-referent-recurrence (C2: gap-CV dies at the noise floor) |
 
 ## Notes / provenance
@@ -60,9 +60,52 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
   non-inserted for gate 8 — future periodic cards must preregister a moment
   the hybrid does NOT fit (gap-distribution shape, cross-doc period
   stability) or the skeptic will (rightly) kill on circularity.
+- **C4 mirror-menu resolution + the next gap.** The hierarchical categorical
+  mirror was built, hardened-gate-8-validated, and **split the two C3 aborts
+  by domain**: text instruction phases ARE doc-level hierarchical (recipe →
+  SPEC), reasoning proof phases are NOT — they need a third, segment-scale
+  layer (run / segment / doc; the lag-curve and length-concentration evidence
+  is in the C4 cycle-log entry). The C5 extension is a segment-level regime
+  layer — build it under the hardened ≥2-non-fitted-moment gate to keep the
+  over-expressiveness tension (C3 circularity lesson) structurally controlled.
 - The abstract benches (signed_motion, frequency) are out of this ledger's scope.
 
 ## Cycle log
+
+- **Cycle 4 — 2026-07-22 (runpod, autonomous; loop judgment roles on
+  `claude-fable-5`, bulk unchanged on Haiku).** The LEDGER-mandated build:
+  **`hier_categorical`** menu extension (per-doc phase propensities with a
+  self-consistency deconvolution — raw doc marginals flatten every
+  fit→generate round — + empirical dwell + MLE-tilted global jump chain;
+  harness tests show the fit round-trips ACF(4)/MI(2) within ±20% while
+  `semi_markov` misses by 25–70%), and **gate-8 HARDENED to ≥2 non-fitted
+  moments, all must pass** (guardrail 8; multi-moment support in calibrate).
+  Both C3 int/eq real-signal aborts re-frozen by dated amendment (cards carry
+  3-axis coordinates + regime-3 claim + design-time discriminability per the
+  revamped rules; C3 labels + validation reused). Verdicts — **1 win, 1
+  informative abort: (1) recipe-instruction-phase-runs-r2 PROCEED → SPEC**
+  (`synthetic/recipe_instruction_phase_runs/`) — **the interaction/equality
+  prize (text domain) and the program's first grounded regime-3 candidate**:
+  both hardened gate-8 moments pass (ACF(4) err 0.018 ≤ 0.059 — the exact
+  moment that killed C3's mirror; MI(2) err 0.029 ≤ 0.036), skeptic 5/5
+  (caveats carried: MI margin ~17%, heterogeneity *level* inserted via the
+  propensity list — hier_ar1 precedent). **(2)
+  proof-operation-phase-runs-r2 ABORT** — even the doc-level hierarchy
+  fails both moments on reasoning traces; lag-curve diagnosis pins the miss
+  to lags 2–8 while the lag-12 floor matches ⇒ **reasoning-trace phase
+  streams hold three timescales (run / segment / doc)**; corr(length,
+  concentration) = −0.60 independently confirms within-doc drift. **C5
+  targets:** a segment-level regime layer (hierarchical semi-Markov) for the
+  reasoning int/eq cell — with the over-expressiveness tension noted (the
+  hardened 2-moment gate is the structural control); stage-6 build of the
+  new SPEC needs the equality-latent variant of the discriminability
+  STOP-gate (both raw-linear readouts may sit at chance — verify the
+  nonlinear access route instead, per the changepoint § 8 treatment).
+  Ops notes: two Fable skeptic calls burned on a truncated-JSON parse crash
+  before the fix (raw verdict now always persisted pre-parse; rubric-key
+  validation + deterministic repair); the recorded skeptic verdict was
+  recovered from the persisted raw text, never re-rolled. Spend
+  **$10.82/$25** cumulative (C3 $8.20 + C4 $2.62).
 
 - **Cycle 1 — 2026-07-14 (runpod, autonomous).** 10 cards frozen (5+5); 4
   calibrated (2+2): assumption-then-consequence PROCEED→SPEC,

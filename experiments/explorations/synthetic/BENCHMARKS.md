@@ -39,6 +39,7 @@ arch verdict is **NEGATIVE** (no arch recovers the sign). "Registered" ≠
 | **signed_motion** | theorem-first — FreqBench *ac_sign*, forked w/o its proofs | abstract | order-sensitive step (AC) | n/a | ✓ | **NEGATIVE** |
 | **assumption_consequence** | grounded — expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✓ | **NEGATIVE** *(frozen windows>per-token prediction failed: order-1 mirror ⇒ s_i sufficient, per-token reads the directed latent; needs order-2+ mirror to separate archs)* |
 | **hedging_drift** | grounded — expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✓ | **SPLIT** *(per-token R² 0.73 of 0.77 ceiling — drift is ambient per token; window edge ≤ +0.04 with weak T-trend)* |
+| **recipe_instruction_phase_runs** | grounded — expansion C3 → C4 (`hier_categorical` re-freeze) | text-corpus | interaction/equality (**regime 3**) | SPEC | ✗ | — *(stage-6 pending — the first grounded regime-3 candidate; needs the equality-latent STOP-gate variant)* |
 | **list_item_parallelism** | grounded — expansion C3 (re-freeze) | text-corpus | bursty / self-exciting (AC) | SPEC | ✗ | — *(pending; ⚠ redundant class + weak mirror — low value)* |
 | **self_reference_echo** | grounded — expansion C2 (re-filed) | reasoning-trace | bursty / self-exciting (AC) | SPEC\* | ✗ | — *(not planned; redundant, marginal labeler)* |
 
@@ -76,7 +77,8 @@ failure; kept here so the same idea isn't re-tried blindly.
 | computation-verification-alternation | reasoning · periodic | gate-8 mirror fail (C2), then skeptic **circularity** on the over-expressive hybrid (C3) | C2/C3 |
 | enumeration-cadence | text · periodic | gate-8: rhythmic **and** bursty; periodic mirror can't hold the Fano | C3 |
 | proof-operation-phase-runs | reasoning · int/eq | **signal REAL** (self-match ACF ≫ nulls); gate-8 MI(2) fail — categorical *plateau* the menu can't make | C3 |
-| recipe-instruction-phase-runs | text · int/eq | **signal REAL**; gate-8 ACF(4) fail — same categorical *plateau* menu gap | C3 |
+| recipe-instruction-phase-runs | text · int/eq | **signal REAL**; gate-8 ACF(4) fail — *rescued in C4 by the `hier_categorical` re-freeze → SPEC (see section A)* | C3 |
+| proof-operation-phase-runs-r2 | reasoning · int/eq | **signal REAL**; even `hier_categorical` fails both hardened gate-8 moments — reasoning phase streams hold **three timescales** (run/segment/doc); C5 needs a segment-level regime layer | C4 |
 | goal-restatement-recurrence | reasoning · long-memory | skeptic: **composition** (cross-trace rate mixture); thin margin, κ near floor | C3 |
 
 *Frozen ideas never calibrated (prop):* `hedge-to-assertion-drift`,
@@ -84,15 +86,20 @@ failure; kept here so the same idea isn't re-tried blindly.
 
 ---
 
-## Where the prize still stands
+## Where the prize stands
 
-**interaction/equality is unclaimed** (both domains empty of a SPEC). Not for lack
-of signal — C3's two categorical attempts (`proof-operation-phase-runs`,
-`recipe-instruction-phase-runs`) *measured real equality-adjacency structure*.
-The blocker is the **mirror menu**: real categorical streams hold plateaus a
-semi-Markov process can't generate. The identified fix is a **hierarchical
-categorical mirror** (the next menu extension) — that is the one build between
-here and the program's sharpest grounded test.
+**interaction/equality is half-claimed (C4).** The text-corpus cell holds the
+program's first int/eq SPEC — `recipe_instruction_phase_runs`, also its first
+**grounded regime-3 candidate** — after the C4 `hier_categorical` mirror
+passed the hardened two-moment gate-8 exactly where the C3 semi-Markov died.
+The reasoning-trace cell stays open with a sharper diagnosis: proof-phase
+streams hold **three timescales** (run / segment / doc) and even the
+doc-level hierarchy fails; the C5 build is a **segment-level regime layer**,
+to be validated under the hardened gate so added expressiveness stays
+structurally checked. The stage-6 build of the new SPEC needs the
+equality-latent variant of the discriminability STOP-gate (both raw-linear
+readouts can sit at chance; verify the nonlinear access route, as in
+changepoint § 8).
 
 ## Authoritative sources (this file is the human index over them)
 
