@@ -300,3 +300,33 @@ SEED=42 bash synthetic/signed_motion/minisweep.sh &
 and `SyntheticRecovery` evaluator (which computes `s_temp` only when the
 datasource carries sign labels), honoring hard rule #3 (no edits to
 `temp_bench/core/`). The `L = 32` tiled metrics are protocol `1.2.0`.
+
+---
+
+## FreqBench port addendum (2026-07-22, mac-local) — the NEGATIVE, explained
+
+This bench is FreqBench's `ac_sign` task, forked without its proof apparatus
+(`../freqbench/PORT.md` § A–B). With the proofs attached, the NEGATIVE stops
+being a bare empirical outcome and becomes a *predicted* one:
+
+- **P2 (phase-averaging impossibility).** The sign is provably not linearly
+  decodable from any per-token code — summing class scores over the phase B
+  makes them sign-independent. The per-token floor here is a theorem, not a
+  measured coincidence (the sprint verified it: raw-stacked *linear* 0.499 ≈
+  chance while raw-stacked *MLP* = 1.000 — the information is present but
+  additive-linearly inaccessible).
+- **P4 (sign pair = pure phase).** `{v, M−v}` windows traverse the *same
+  symbol set* in opposite orders and have *identical power spectra*: a
+  bag-of-symbols readout must sit at exactly chance (verified 0.497–0.514),
+  and any power-spectrum-only code confuses the pair. Direction needs order.
+- **P6 (memorization threshold) — the recorded confound, named.** The scarce
+  regime here has only `#windows = 2F` distinct whole-window templates, so
+  the memorization route saturates *before* genuine phase detection is
+  measurable — exactly the threshold phenomenon the sprint quantified
+  (window archs jump 0.17 → 0.99 once capacity crosses the template count).
+  The principled fix is not a tweak but a construction whose template count
+  kills the route (the multilane pattern, |Ω|³M³ ≈ 10⁹) — queued as seed
+  card **FB-2** in [`../freqbench/LOOP.md`](../freqbench/LOOP.md).
+
+Registry provenance updated accordingly (`theorem-first`, BENCHMARKS.md).
+Proof statements: [`../freqbench/PORT.md`](../freqbench/PORT.md) § B.

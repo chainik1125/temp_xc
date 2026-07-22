@@ -82,7 +82,11 @@ procedural machinery (a theorem cannot be reward-hacked). Its blind spot is
 exactly the original curated-wins sin. Origin: Dmitry's FreqBench sprint
 (branches `origin/dmitry-spectral-sprint2`, `origin/dmitry-synthetic`); the
 `frequency/` bench is its first port, and `signed_motion` is its `ac_sign` task
-forked *without* the proof apparatus.
+forked *without* the proof apparatus. The port lives at
+[`freqbench/`](freqbench/): `PORT.md` (asset inventory + the proofs registry
+P1–P6 / CS-1–2), **`LOOP.md` (the theorem-first generator protocol — the
+FreqBench autoresearch rails)**, and `freqfrac_report.py` (the FreqFrac lens
+over the shared panel at the canonical matched cells).
 
 The generators are duals — FreqBench spans the coordinate space with proven
 ceilings; PhenomenonBench locates real LM behaviour inside it — and each

@@ -235,3 +235,30 @@ velocity moderately.
   nonlinear-access residual.
 - **Symmetry null** — the random-embedding response is flat (theorem verified).
 - **Capability-vs-artifact** — NMSE reconstruction reported alongside recovery.
+
+---
+
+## FreqBench port addendum (2026-07-22, mac-local) — the proofs behind the verdict
+
+This bench is the first FreqBench port (`../freqbench/PORT.md` § A); the port
+attaches its proof registry (§ B) so each headline number has its proposition:
+
+- **P1/P2** — per-token 0.00 is *proven* (velocity has zero single-token MI;
+  no linear probe on stacked per-token codes separates velocities — the
+  phase-averaging argument), not merely observed.
+- **P3 (symmetry-triviality)** — for exchangeable random embeddings all
+  nonzero velocities are statistically equivalent (relabeling a ↦ a·y′y⁻¹):
+  there is no "frequency" without geometry on symbol space. This theorem is
+  *why* the circle embedding exists and why `toy_cyclic_random_M101_d128` is
+  retained as the symmetry-null control (its flat response = the theorem,
+  verified — the record's "Symmetry null" gate).
+- **P5 (periodogram = ML oracle; Rayleigh)** — the evaluator's matched-filter
+  oracle is the maximum-likelihood tone estimator; velocity resolution scales
+  as 1/W (confusion mass concentrates inside |Δf| < 1/W).
+- **P6 (memorization threshold |Ω|·M = 1010)** — the record's memorization
+  flag at `d_sae = 2048 > 1010` is the proposition's threshold, crossed
+  deliberately as the demo.
+
+FreqFrac coordinates for this bench (weight-space, per arch) are produced by
+[`../freqbench/freqfrac_report.py`](../freqbench/freqfrac_report.py) —
+acceptance check (i) of the port.

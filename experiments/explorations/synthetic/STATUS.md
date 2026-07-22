@@ -53,12 +53,24 @@ Last updated: 2026-07-22.
   caveat: checkpoints did NOT survive the pod migration and the leaderboard
   cache fast-forwards done cells *without retraining*, so FreqFrac needs a
   train+analyze path that bypasses the cache (cheap — CPU pod does ~495
-  cells/hour). **(3)** the two autoresearch loops on Fable 5 (FreqBench
-  generator + expansion C4 under the new gate; C4 target = hierarchical-
-  categorical mirror → the first *grounded* regime-3 bench — **briefing
-  queued: [`briefings/expansion-c4.md`](../../../briefings/expansion-c4.md)
-  (runpod), running in parallel with the mac-local port**). **(4)** the acid
-  test: hide a bench, predict its arch ranking from coordinates alone.
+  cells/hour). **(3)** the two autoresearch loops on Fable 5. **(4)** the
+  acid test: hide a bench, predict its arch ranking from coordinates alone.
+  **Progress (2026-07-22, mac-local): phases 2–3a substantially DONE —
+  FreqBench framework READY for autoresearch.** Landed: `freqbench/PORT.md`
+  (asset inventory; proofs registry P1–P6 + CS-1/2 with landing spots;
+  cache-bypass design), the **FreqFrac lens** (`src/explorations/synthetic/
+  freqfrac.py` + 6 analytic tests; duck-typed taps for all 6 panel archs),
+  **`freqfrac_report.py`** (train-or-load at the canonical per-token-matched
+  cells, train_key hard-asserted against the row, no leaderboard writes;
+  first pass over frequency+backtracking run locally — curves + untrained
+  nulls in `freqbench/results/freqfrac_stats.json`), **`freqbench/LOOP.md`
+  — the theorem-first generator protocol** (axis-point cards, gates T1–T4,
+  proof-skeptic rubric, seed cards FB-2 multilane / FB-3 colored-sources /
+  FB-1 phasepair, C4-style cadence), and proof addenda in
+  `signed_motion/bench.md` (NEGATIVE explained via P2/P4/P6) +
+  `frequency/bench_record.md`. Next: FB-C1 cycle (briefing from LOOP.md;
+  runpod or local), then the full 6-bench FreqFrac pass (runpod) → REPORT
+  coordinates block.
 
 - **STAGE 6 DONE (2026-07-22, runpod) — both grounded benches built, run,
   verdicts written blind. STOPPED for review.** The measure→mirror→**bench**
