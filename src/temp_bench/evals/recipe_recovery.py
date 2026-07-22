@@ -19,17 +19,24 @@ sequence (leak-free), all LINEAR (what the code makes *linearly* available):
   gave its 6.6%-marginal A state. The phase-signature direction is in the
   span and dominant, so per-token archs should sit near oracle — this is the
   control, not the claim.
-- ``equality_recovery`` (**PRIMARY — the regime-3 axis**): logistic probe →
-  ``e_t = [c_t = c_{t-1}]`` (``e_0 = 0`` convention), balanced accuracy
-  normalized to [chance = 0.5, oracle = 1] — the changepoint ``cp_recovery``
-  treatment of the complementary boundary latent. ``equality_base_rate``
-  (the pooled match rate, the spec's raw-accuracy chance quantity) is
-  reported alongside for reference. NOTE (documented in gating BEFORE any
-  grid): the mirror's class-conditional continuation rates differ across
-  classes (dwell means 3.0/4.0/2.4/1.7/1.5), so — unlike changepoint's
-  Π-rebalanced substrate — a readout of ``c_t`` alone predicts ``e_t`` above
-  0.5; the gating record quantifies that raw-access line and the § 8
-  equality-variant STOP-gate adjudicates the regime-3 claim against it.
+- ``equality_residual_recovery`` (**PRIMARY — the re-scoped regime-3
+  residual axis**, stage-6 #3b, 2026-07-23 review decision): the same
+  logistic probe's balanced accuracy re-normalized to
+  [pair-additive ceiling = 0.771, exact = 1.0] — the share of ``e_t``
+  reachable ONLY by position-mixing. The floor constant is the
+  § 8-measured ceiling for ANY additive readout on this substrate
+  (``recipe_instruction_phase_runs/results/recipe_gating_stats.json``,
+  ``analytic.e_balacc_pair_additive``, committed in ``b463c4a0``) — never
+  re-derived here. NOT clipped: negative values are informative (the code's
+  linear ``e_t`` readout fell below even the additive ceiling).
+- ``equality_recovery`` (diagnostic): the original chance-normalized form,
+  balanced accuracy over [chance = 0.5, oracle = 1] — kept as a diagnostic
+  key after the § 8 STOP showed the substrate's class-conditional
+  continuation rates leak ``e_t`` into raw-linear readouts (per-token 0.614
+  / window 0.720 — the gating record quantifies the leak), so distance
+  from 0.5 conflates additive access with the regime-3 residual.
+  ``equality_base_rate`` (the pooled match rate, the spec's raw-accuracy
+  chance quantity) is reported alongside for reference.
 
 Each probe also reports an empirical chance floor (the same probe fit on
 shuffled train targets), per the conventions § 5.
@@ -45,6 +52,13 @@ from temp_bench.evals.changepoint_recovery import (
     _tile_label_examples,
 )
 from temp_bench.interfaces.architecture import TempBenchArch
+
+# The § 8-measured pair-additive access ceiling for e_t on this substrate
+# (recipe_instruction_phase_runs/results/recipe_gating_stats.json,
+# analytic.e_balacc_pair_additive, commit b463c4a0). The re-scoped primary
+# axis (stage-6 #3b, mac-local review 2026-07-23) scores the residual above
+# this floor — the share only position-mixing can reach.
+EQ_ADDITIVE_CEILING = 0.771
 
 
 def recipe_metrics(
@@ -92,8 +106,13 @@ def recipe_metrics(
     out["phase_balacc"] = ph_bal
     out["phase_chance"] = ph_floor
 
-    # PRIMARY (regime 3): equality-adjacency flag, normalized to [0.5, 1].
+    # Equality-adjacency flag: the re-scoped PRIMARY is the regime-3
+    # residual over [additive ceiling, exact]; the chance-normalized form
+    # stays as a diagnostic (see module docstring for the § 8 provenance of
+    # the 0.771 constant — measured, frozen, never re-derived here).
     eq_bal, eq_floor = _logistic_probe(z_tr, eq_tr, z_ev, eq_ev, seed=seed)
+    out["equality_residual_recovery"] = ((eq_bal - EQ_ADDITIVE_CEILING)
+                                         / (1.0 - EQ_ADDITIVE_CEILING))
     out["equality_recovery"] = (eq_bal - 0.5) / 0.5
     out["equality_balacc"] = eq_bal
     out["equality_chance"] = eq_floor

@@ -112,9 +112,12 @@ def test_recipe_metrics_keys_token_and_window() -> None:
 
     data = recipe_instruction_phase_runs(d_in=32, K_c=8, n_c=2, seq_len=16,
                                          n_seqs=512, seed=0)
+    from temp_bench.evals.recipe_recovery import EQ_ADDITIVE_CEILING
+
     keys = {"phase_recovery", "phase_balacc", "phase_chance",
-            "equality_recovery", "equality_balacc", "equality_chance",
-            "equality_base_rate"}
+            "equality_residual_recovery", "equality_recovery",
+            "equality_balacc", "equality_chance", "equality_base_rate"}
+    assert EQ_ADDITIVE_CEILING == 0.771       # frozen § 8 constant, not derived
     for arch in (TopKSAE(d_in=32, d_sae=10, k_pos=2),
                  TXCBase(d_in=32, d_sae=10, T=4, k_pos=2)):
         out = recipe_metrics(arch, data, eval_window_L=8, n_windows=64)
@@ -122,6 +125,11 @@ def test_recipe_metrics_keys_token_and_window() -> None:
         assert 0.0 <= out["phase_balacc"] <= 1.0
         assert 0.0 <= out["equality_balacc"] <= 1.0
         assert 0.0 <= out["equality_base_rate"] <= 1.0
+        # residual algebra: re-normalized over [additive ceiling, exact],
+        # UNclipped (an untrained/weak code sits below the ceiling → negative)
+        expect = (out["equality_balacc"] - 0.771) / (1.0 - 0.771)
+        assert abs(out["equality_residual_recovery"] - expect) < 1e-12
+        assert out["equality_residual_recovery"] < 1.0
 
 
 def test_other_generators_do_not_trip_recipe_dispatch() -> None:
