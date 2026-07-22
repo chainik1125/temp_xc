@@ -1,7 +1,9 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-22, late in the 12 h overnight session (Phases 1+2
-DONE and pushed; Phase 3 bookkeeping in progress).
+**Last rewrite:** 2026-07-22 — overnight session **COMPLETE, STOPPED FOR
+REVIEW** (all three phases done and pushed; acceptance gate of
+`briefings/stage6-recipe-then-c5.md` met — the briefing stays until
+mac-local reviews it).
 
 ## Who / where
 Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am `runpod`
@@ -46,14 +48,20 @@ research STATUS bullet. All pushed.
   Skeptic-header cosmetic done (`_judge_model`; pre-C5 marked untracked).
   Spend $10.82/$25 cumulative (C5 $0.00 — labels cached, skeptic skipped).
 
-### Phase 3 — bookkeeping (in progress at last rewrite)
-REPORT/registry render check; self-audit of the Phase-1 record vs README
-checklist + validity gates (list gaps honestly, do NOT re-run). Then final
-STATUS rewrite → STOP. **Briefing stays until mac-local review.**
+### Phase 3 — bookkeeping: **DONE** (`e38e5704`)
+REPORT render idempotent (byte-identical, 54/54 matrix rows; fig-PDF
+timestamp churn reverted, not committed); registries validate; suite 138.
+Self-audit of the Phase-1 record appended to its bench_record: gates
+followed; two honest gaps listed (gating thresholds lack commit-order
+preregistration evidence — script+results share `b463c4a0`; presence check
+T=2-only) + the ceiling-vs-probe falsifier note for any re-scoped run.
 
 ## Next actions
-Finish Phase-3 render check + self-audit → commit + pull --rebase + push →
-STOP for review. No stage-6 § 8/grid for any C5 artifact; do not start C6.
+**None — STOPPED.** Await mac-local review of: (1) the stage-6 § 8 STOP +
+re-scope decision (bench_record options), (2) the C5 r3 abort + C6 target
+(calibrated segment-composition extraction). Do NOT start C6, do NOT run
+any grid, briefing stays in place. Session commits: 47b62e1b → e38e5704
+(8 total). Spend $10.82/$25 (C5 $0.00).
 
 ## Gotchas (this box)
 - Harness blocks `sleep`; background Bash for long jobs; python -u.
