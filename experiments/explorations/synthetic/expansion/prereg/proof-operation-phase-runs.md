@@ -71,3 +71,52 @@ You label ONE sentence from a math reasoning trace by the operation it performs,
 ---
 _Frozen-by: claude-opus-4-8 via `expansion.hypothesize_c3` (runpod agent, Cycle 3).
 Amendments (dated, transparent): none._
+
+
+## Amendment 2026-07-22 — Cycle-4 re-freeze (before any C4 calibration)
+
+The C3 calibration ABORTED on gate-8 alone: the signal was real (self-match
+ACF(1) 0.286 ≫ N1 hi 0.047, κ = 0.586, split-half 0.283/0.288) but the
+`semi_markov` mirror halved held-out MI(2) (0.030 vs 0.065) — a single global
+dwell+jump process cannot hold the pooled two-step structure of a corpus in
+which **each trace carries its own phase-propensity profile**. The C3 review
+recorded the fix as the C4 menu extension (hierarchical categorical mirror).
+Preregistered now, before any C4 run:
+
+- **Record name:** `proof-operation-phase-runs-r2`. The C3 ABORT record
+  stands untouched as the verdict under the C3 menu.
+- **Mirror:** `hier_categorical` (the categorical `hier_ar1`): per-doc phase
+  propensities (empirical list, deconvolved so the generator's within-doc
+  stationary matches the observed doc marginal) + per-symbol empirical dwell +
+  a global jump chain, mixed by a tilt weight α fit by MLE over jump events.
+  Fitted quantities: dwell lists, jump chain, doc-marginal vectors, α.
+- **Gate 8, HARDENED (≥2 non-fitted moments, ALL must pass — the C4 rule):**
+  1. `mi[lag2]` — the C3 killer, kept: pooled two-step MI is governed by the
+     composition of within-doc dynamics with the cross-doc propensity spread
+     on HELD-OUT docs, not by any single fitted parameter.
+  2. `acf[lag4]` — the pooled self-match plateau: the doc-propensity list
+     inserts the cross-doc heterogeneity *level* (as `hier_ar1`'s levels did,
+     C3-review-approved precedent), but whether that mechanism carries the
+     specific lag-4 structure of held-out docs is a genuine out-of-fit check.
+  Both under the uniform relative tolerance: ±20% of the held-out real
+  magnitude, floors mi 0.003 / acf 0.01. Any fail ⇒ mirror invalid ⇒ ABORT.
+- **Labels + labeler validation REUSED from the C3 record** (identical frozen
+  judge instruction, identical pinned traces — relabeling would re-spend for
+  zero information). Signature, nulls, mirror fit, gate 8, skeptic run fresh.
+- **Coordinates + regime claim (checklist item 8, revamped rules):**
+  spectral = mid (piecewise-constant phase state: DC-ish runs with AC
+  boundaries); interaction order = **equality** (the primary latent is the
+  equality-adjacency `[c_t = c_{t-1}]`, a comparison BETWEEN positions);
+  stationarity = spread (phase runs throughout the trace, not burst-locked).
+  **Regime 3 claim (design-time discriminability):** the per-sentence phase
+  label itself is per-token-readable (regime 1 — not the object under test);
+  the benchmark's primary latent is the run/boundary equality pattern, which
+  additive window codes are provably blind to (the changepoint
+  equality-pattern precedent) and which cannot collapse into a per-token
+  sufficient statistic the way a next-state prediction can (the stage-6
+  assumption_consequence lesson): reading `[c_t = c_{t-1}]` requires
+  comparing content classes at two positions, whatever the chain's order.
+  Only coincidence (post-squash) / spectral codes are predicted to expose it.
+
+_Amended-by: claude-fable-5 (runpod agent, Cycle 4), preregistered before any
+C4 labeling, fitting, or measurement._

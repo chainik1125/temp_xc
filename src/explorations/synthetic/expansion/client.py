@@ -26,10 +26,14 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+# C4 (2026-07-22): judgment roles upgraded to Fable 5 per the C4 briefing
+# ("run the loop's API calls on Fable 5"). Bulk stays Haiku — C3's 4.1M bulk
+# input tokens would be ~$60 on Fable vs $6 on Haiku, breaking the $25 cap
+# the same briefing re-affirms.
 ROLES = {
     "bulk": "claude-haiku-4-5-20251001",
-    "validate": "claude-sonnet-5",
-    "think": "claude-opus-4-8",
+    "validate": "claude-fable-5",
+    "think": "claude-fable-5",
 }
 
 # USD per MTok (input, output) — meter estimates, pinned for determinism.
@@ -37,6 +41,7 @@ PRICES = {
     "claude-haiku-4-5-20251001": (1.0, 5.0),
     "claude-sonnet-5": (3.0, 15.0),
     "claude-opus-4-8": (5.0, 25.0),
+    "claude-fable-5": (10.0, 50.0),
 }
 
 # Claude 5-family models reject the `temperature` param ("deprecated for this

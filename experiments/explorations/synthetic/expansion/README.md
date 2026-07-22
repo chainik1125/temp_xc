@@ -33,10 +33,16 @@ a separate, later, deliberately-blind step (stage 6 of the loop in
    Cycle 1 — `question-answer-adjacency` died on this; the skeptic's item (b) is
    the reactive backstop.)*
 8. **Non-fitted-moment mirror gate (preregistered).** A fitted mirror must
-   reproduce ≥1 statistic it was **not** fit to, within a preregistered
+   reproduce statistics it was **not** fit to, within a preregistered
    tolerance — matching only the fitted moment is circular validation. *(Added
    after Cycle 1 — `quotation-burst` died on this despite a clean null gate; the
-   skeptic's item (d) is the reactive backstop.)*
+   skeptic's item (d) is the reactive backstop.)* **Hardened in Cycle 4 to ≥2
+   non-fitted moments, ALL within tolerance** (the C3 lesson: an
+   over-expressive mirror can fit everything measured and leave a single
+   non-fitted moment too weak a check — `computation-verification-r2` passed
+   its one gate-8 moment and rightly died on skeptic circularity; two
+   independent non-inserted moments make that failure mode structural, not
+   skeptic-dependent).
 
 Guardrails 7–8 are **design-time / preregistered** (the hypothesis and mirror are
 built to satisfy them up front); guardrails 4–5 are the **reactive** validation

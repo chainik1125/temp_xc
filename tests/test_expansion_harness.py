@@ -147,6 +147,59 @@ def test_mirror_hier_ar1_plateau_recovery():
     assert abs(acf_h[5] - sig.acf(seqs, maxlag=8)[5]) < 0.1   # round-trip
 
 
+def _hier_cat_truth():
+    # Four doc types, one per dominant symbol (pooled marginal uniform, so
+    # every long-lag pooled statistic comes from doc heterogeneity), with a
+    # heavy-ish empirical dwell (mean ~3.5, recipe-instruction-like) so short
+    # lags carry genuine run structure rather than parity artifacts.
+    props = []
+    for t in range(4):
+        props += [list(np.roll([0.70, 0.10, 0.10, 0.10], t))] * 50
+    return {"process": "hier_categorical", "n_symbols": 4, "alpha": 0.85,
+            "jump_P": ((np.ones((4, 4)) - np.eye(4)) / 3).tolist(),
+            "doc_props": props,
+            "dwell": [[1, 1, 2, 2, 3, 4, 6, 9]] * 4}
+
+
+def test_mirror_hier_categorical_plateau_recovery():
+    rng = np.random.default_rng(11)
+    true = _hier_cat_truth()
+    seqs = mirrors.gen_hier_categorical(true, [120] * 200, rng)
+    fit = mirrors.fit_hier_categorical(seqs, n_symbols=4)
+    assert fit["alpha"] > 0.5                  # doc tilt recovered as dominant
+    # round-trip under the uniform C3/C4 gate rule (±20% rel): the pooled
+    # self-match ACF(4) plateau AND pooled MI(2) both survive a fit->generate
+    # cycle (the self-consistency deconvolution of doc propensities is what
+    # makes this hold — raw doc marginals flatten every round).
+    syn = mirrors.gen_hier_categorical(fit, [120] * 200, rng)
+    acf_r = sig.selfmatch_acf(seqs, maxlag=8)
+    acf_s = sig.selfmatch_acf(syn, maxlag=8)
+    assert acf_r[3] > 0.1                      # the plateau exists in the data
+    assert abs(acf_s[3] - acf_r[3]) < 0.2 * acf_r[3]
+    mi_r = sig.mi_vs_lag(seqs, 8, 4)
+    mi_s = sig.mi_vs_lag(syn, 8, 4)
+    assert abs(mi_s[1] - mi_r[1]) < max(0.2 * mi_r[1], 0.003)
+
+
+def test_mirror_semi_markov_cannot_hold_categorical_plateau():
+    # The C3 failure mode the extension exists for: a single global dwell+jump
+    # process fit to doc-heterogeneous data understates the long-lag pooled
+    # statistics — how proof-operation (MI(2) halved) and recipe-instruction
+    # (ACF(4) −32%) died. In this toy the flat fit misses ACF(4) by ~-25%,
+    # ACF(6) by ~-70%, and MI(4) by ~-40%.
+    rng = np.random.default_rng(12)
+    seqs = mirrors.gen_hier_categorical(_hier_cat_truth(), [120] * 200, rng)
+    flat = mirrors.fit_semi_markov(seqs, n_symbols=4)
+    syn_flat = mirrors.gen_semi_markov(flat, [120] * 200, rng)
+    acf_r = sig.selfmatch_acf(seqs, maxlag=8)
+    acf_f = sig.selfmatch_acf(syn_flat, maxlag=8)
+    assert acf_f[3] < acf_r[3] - 0.2 * acf_r[3]   # fails the ±20% rel gate
+    assert acf_f[5] < acf_r[5] - 0.2 * acf_r[5]   # plateau collapses by lag 6
+    mi_r = sig.mi_vs_lag(seqs, 8, 4)
+    mi_f = sig.mi_vs_lag(syn_flat, 8, 4)
+    assert mi_f[3] < mi_r[3] - max(0.2 * mi_r[3], 0.003)
+
+
 def test_mirror_periodic_hawkes_recovery():
     rng = np.random.default_rng(7)
     true = {"process": "periodic_hawkes", "period": 8, "K": 2, "intercept": -2.8,

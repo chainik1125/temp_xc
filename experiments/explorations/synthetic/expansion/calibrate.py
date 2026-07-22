@@ -354,6 +354,24 @@ CFG = {
         primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_recipe,
         mirror="semi_markov", mirror_kw={}, mirror_kind="categorical",
         gate8=("acf", 3, 0.20, "rel")),
+    # — Cycle 4: re-freezes of the two C3 real-signal int/eq aborts under the
+    #   hier_categorical menu extension (dated card amendments; cached C3
+    #   labels + validation reused; gate-8 HARDENED to ≥2 non-fitted moments,
+    #   each including its C3 killer) —
+    "proof-operation-phase-runs-r2": dict(
+        domain="reasoning-trace", kind="categorical", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_proofop,
+        mirror="hier_categorical", mirror_kw={}, mirror_kind="categorical",
+        gate8=(("mi", 1, 0.20, "rel"), ("acf", 3, 0.20, "rel")),
+        base_card="proof-operation-phase-runs",
+        labels_from="proof-operation-phase-runs"),
+    "recipe-instruction-phase-runs-r2": dict(
+        domain="text-corpus", kind="categorical", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_recipe,
+        mirror="hier_categorical", mirror_kw={}, mirror_kind="categorical",
+        gate8=(("acf", 3, 0.20, "rel"), ("mi", 1, 0.20, "rel")),
+        base_card="recipe-instruction-phase-runs",
+        labels_from="recipe-instruction-phase-runs"),
 }
 
 # Uniform C3 relative-tolerance floors (amend_cards_c3.py preregistration).
@@ -615,33 +633,40 @@ def run(name: str):
         print(f"[{name}] mirror fit+validated (n_train={len(train)})")
 
         # gate 8 (preregistered): the mirror must reproduce its named
-        # NON-FITTED moment on held-out real vs synthetic within tolerance.
+        # NON-FITTED moment(s) on held-out real vs synthetic within tolerance.
         # Tolerances are absolute (C1/C2 3-tuples) or, from Cycle 3 on,
         # relative to the held-out real magnitude with a per-moment floor
-        # (4-tuples ending "rel"; the amend_cards_c3 uniform rule).
+        # (4-tuples ending "rel"; the amend_cards_c3 uniform rule). From
+        # Cycle 4 on, `gate8` may be a tuple OF such tuples — the ≥2
+        # non-fitted-moment hardening (LEDGER C4 target): ALL must pass.
         if cfg.get("gate8"):
-            moment, midx, tol, *mode = cfg["gate8"]
+            specs = cfg["gate8"]
+            if isinstance(specs[0], str):   # single pre-C4 spec
+                specs = (specs,)
             syn_cat = [np.asarray(s, dtype=np.int8) for s in syn] \
                 if cfg["kind"] != "scalar" else syn
             ev_cat = [np.asarray(s, dtype=np.int8) for s in ev] \
                 if cfg["kind"] != "scalar" else ev
-            rv = _moment(ev_cat, moment, midx, cfg["kind"])
-            sv = _moment(syn_cat, moment, midx, cfg["kind"])
-            if mode and mode[0] == "rel":
-                tol_eff = max(tol * abs(rv), GATE8_FLOORS[moment])
-                tol_note = f"±{tol:.0%} rel of |real| (floor {GATE8_FLOORS[moment]})"
-            else:
-                tol_eff = tol
-                tol_note = "abs (pre-C3 preregistration)"
-            g8 = {"moment": moment + (f"[lag{midx + 1}]" if midx is not None else ""),
-                  "real_heldout": rv, "synthetic": sv,
-                  "abs_err": abs(rv - sv), "tol_abs": tol_eff, "tol_note": tol_note,
-                  "pass": bool(abs(rv - sv) <= tol_eff)}
-            mirror_blob["gate8"] = g8
-            print(f"[{name}] gate8 {g8['moment']}: real={rv:.4f} syn={sv:.4f} "
-                  f"|err|={g8['abs_err']:.4f} tol={tol_eff:.4f} ({tol_note}) -> "
-                  f"{'PASS' if g8['pass'] else 'FAIL'}")
-            if not g8["pass"]:
+            g8s = []
+            for moment, midx, tol, *mode in specs:
+                rv = _moment(ev_cat, moment, midx, cfg["kind"])
+                sv = _moment(syn_cat, moment, midx, cfg["kind"])
+                if mode and mode[0] == "rel":
+                    tol_eff = max(tol * abs(rv), GATE8_FLOORS[moment])
+                    tol_note = f"±{tol:.0%} rel of |real| (floor {GATE8_FLOORS[moment]})"
+                else:
+                    tol_eff = tol
+                    tol_note = "abs (pre-C3 preregistration)"
+                g8 = {"moment": moment + (f"[lag{midx + 1}]" if midx is not None else ""),
+                      "real_heldout": rv, "synthetic": sv,
+                      "abs_err": abs(rv - sv), "tol_abs": tol_eff, "tol_note": tol_note,
+                      "pass": bool(abs(rv - sv) <= tol_eff)}
+                g8s.append(g8)
+                print(f"[{name}] gate8 {g8['moment']}: real={rv:.4f} syn={sv:.4f} "
+                      f"|err|={g8['abs_err']:.4f} tol={tol_eff:.4f} ({tol_note}) -> "
+                      f"{'PASS' if g8['pass'] else 'FAIL'}")
+            mirror_blob["gate8"] = g8s[0] if len(g8s) == 1 else g8s
+            if not all(g["pass"] for g in g8s):
                 verdict = "ABORT"
                 gate["gate8_fail"] = True
                 gate["verdict"] = verdict

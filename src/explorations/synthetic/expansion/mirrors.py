@@ -14,10 +14,16 @@ Menu (README Appendix B):
     rhythmic / periodic         -> periodic rate + noise           [binary]
     long-memory ACF plateau     -> hierarchical AR(1)              [scalar]
     rhythmic AND clustered      -> periodic + self-exciting hybrid [binary]
+    categorical plateau         -> hierarchical categorical        [categorical]
 
-(The last two are the Cycle-3 extensions the Cycle-2 review mandated: the
-short-memory menu could not generate the hedging stream's ACF plateau nor the
-verification stream's periodic-plus-bursty events.)
+(``hier_ar1`` and ``periodic_hawkes`` are the Cycle-3 extensions the Cycle-2
+review mandated: the short-memory menu could not generate the hedging stream's
+ACF plateau nor the verification stream's periodic-plus-bursty events.
+``hier_categorical`` is the Cycle-4 extension both C3 interaction/equality
+aborts point at: real categorical phase streams hold pooled self-match
+plateaus and inflated pooled MI(lag) that any single global dwell+jump process
+understates — proof-operation MI(2) halved, recipe-instruction ACF(4)
+undershot — because each document carries its own phase-propensity profile.)
 
 A candidate's card must key its mirror to its measured statistic; bespoke
 processes require a written justification (README guardrails).
@@ -247,6 +253,130 @@ def gen_hier_ar1(params: dict, lengths, rng) -> list:
     return out
 
 
+# ── hierarchical categorical: per-doc phase propensities + jump chain ──────
+
+def fit_hier_categorical(train_seqs, n_symbols: int | None = None,
+                         max_dwell: int = 400, alpha_grid: int = 51) -> dict:
+    """The categorical ``hier_ar1`` (Cycle-4 menu extension).
+
+    Layer 1: each document ``j`` carries its own phase-propensity vector
+    ``pi_j`` — kept as the EMPIRICAL list of per-doc symbol distributions
+    (heavy tails preserved, nothing assumed Dirichlet). Layer 2: within a doc,
+    phases persist via per-symbol empirical dwell draws (as ``semi_markov``);
+    on a jump out of ``c`` the target mixes the doc's own propensities with a
+    global jump chain:
+
+        P(d | c, j) = alpha · pi_j(d | d != c)  +  (1 - alpha) · J(c, d)
+
+    with ``alpha`` fit by MLE over the observed jump events (grid search —
+    likelihood-based, so no measured moment is fit directly). Doc-propensity
+    heterogeneity puts a floor under the pooled self-match ACF at long lags
+    and inflates pooled MI(lag) — the categorical plateau a single global
+    dwell+jump process cannot generate (the C3 gate-8 failure mode of both
+    interaction/equality candidates).
+    """
+    pooled = np.concatenate([s for s in train_seqs])
+    k = n_symbols or int(pooled.max()) + 1
+
+    dwell: list[list[int]] = [[] for _ in range(k)]
+    J = np.ones((k, k)) - np.eye(k)  # jump chain, smoothed, no self-jumps
+    props = []
+    jumps = []  # (doc_idx, src, dst)
+    for j, s in enumerate(train_seqs):
+        cnt = np.bincount(s.astype(int), minlength=k).astype(float) + 1.0
+        props.append((cnt / cnt.sum()).tolist())
+        change = np.flatnonzero(np.diff(s) != 0)
+        edges = np.concatenate([[-1], change, [s.size - 1]])
+        states = s[np.concatenate([change, [s.size - 1]])].astype(int)
+        runs = np.diff(edges).astype(int)
+        for i, (st, r) in enumerate(zip(states, runs)):
+            dwell[st].append(min(int(r), max_dwell))
+            if i + 1 < len(states):
+                J[st, states[i + 1]] += 1
+                jumps.append((j, int(st), int(states[i + 1])))
+    J /= J.sum(1, keepdims=True)
+
+    # MLE for the tilt weight alpha over the recorded jump events.
+    P = np.array(props)
+    best_alpha, best_ll = 0.0, -np.inf
+    for alpha in np.linspace(0.0, 1.0, alpha_grid):
+        ll = 0.0
+        for j, c, d in jumps:
+            tilde = P[j].copy()
+            tilde[c] = 0.0
+            tot = tilde.sum()
+            p_doc = tilde[d] / tot if tot > 0 else 0.0
+            p = alpha * p_doc + (1.0 - alpha) * J[c, d]
+            ll += np.log(max(p, 1e-12))
+        if ll > best_ll:
+            best_ll, best_alpha = ll, float(alpha)
+
+    # Self-consistency deconvolution: the generator's within-doc stationary is
+    # FLATTER than its propensity vector (the no-self-jump exclusion spreads
+    # mass), so storing the observed doc marginal as the propensity would
+    # flatten the heterogeneity every fit->generate round and leak the plateau.
+    # Solve per doc for u_j whose stationary matches the OBSERVED marginal.
+    m_dwell = np.array([np.mean(d) if d else 1.0 for d in dwell])
+
+    def _stationary(u, alpha):
+        K = np.empty((k, k))
+        for c in range(k):
+            tilde = u.copy()
+            tilde[c] = 0.0
+            tot = tilde.sum()
+            row = (alpha * (tilde / tot) if tot > 0 else 0.0) + (1 - alpha) * J[c]
+            K[c] = row / row.sum()
+        nu = np.full(k, 1.0 / k)
+        for _ in range(200):
+            nu = nu @ K
+        occ = nu * m_dwell
+        return occ / occ.sum()
+
+    adj = []
+    for pi_obs in P:
+        u = pi_obs.copy()
+        for _ in range(25):
+            pred = _stationary(u, best_alpha)
+            u = np.clip(u * pi_obs / np.maximum(pred, 1e-9), 1e-6, None)
+            u /= u.sum()
+        adj.append(u.tolist())
+
+    return {"process": "hier_categorical", "n_symbols": k,
+            "jump_P": J.tolist(), "alpha": best_alpha,
+            "doc_props": adj, "doc_marginals": props,
+            "dwell": [d if d else [1] for d in dwell]}
+
+
+def gen_hier_categorical(params: dict, lengths, rng) -> list:
+    J = np.array(params["jump_P"])
+    k = params["n_symbols"]
+    alpha = params["alpha"]
+    props = np.array(params["doc_props"])
+    dwell = [np.array(d) for d in params["dwell"]]
+    out = []
+    for L in lengths:
+        pi_j = props[rng.integers(len(props))]
+        s = np.empty(L, dtype=np.int8)
+        cur = int(rng.choice(k, p=pi_j))
+        i = 0
+        while i < L:
+            r = int(rng.choice(dwell[cur]))
+            s[i:i + r] = cur
+            i += r
+            tilde = pi_j.copy()
+            tilde[cur] = 0.0
+            tot = tilde.sum()
+            if tot > 0:
+                p = alpha * (tilde / tot) + (1.0 - alpha) * J[cur]
+            else:  # doc propensity degenerate on cur — global chain only
+                p = J[cur].copy()
+            p = np.clip(p, 0.0, None)
+            p /= p.sum()
+            cur = int(rng.choice(k, p=p))
+        out.append(s)
+    return out
+
+
 # ── periodic + self-exciting hybrid (periodic-Hawkes), binary ──────────────
 
 def fit_periodic_hawkes(train_seqs, K: int = 8, max_period: int = 64) -> dict:
@@ -360,6 +490,7 @@ MENU = {
     "periodic_rate": (fit_periodic_rate, gen_periodic_rate),
     "hier_ar1": (fit_hier_ar1, gen_hier_ar1),
     "periodic_hawkes": (fit_periodic_hawkes, gen_periodic_hawkes),
+    "hier_categorical": (fit_hier_categorical, gen_hier_categorical),
 }
 
 

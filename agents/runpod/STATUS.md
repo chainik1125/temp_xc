@@ -26,18 +26,20 @@ retry×3 on CalledProcessError — all in src/explorations/synthetic/grid.py.
 BEFORE touching checkpoints (keys are pure config hashes, no git SHA), so all
 459 assumption rows fast-forward. Only never-run cells train fresh.
 
-## Current task: `briefings/stage6-grounded-eval.md` — **DONE, STOPPED FOR REVIEW (2026-07-22)**
+## Current task: `briefings/expansion-c4.md` — IN PROGRESS (started 2026-07-22)
 
-Everything through the acceptance gate is done + pushed: both grids 495/495,
-0 failures; render_figs + blind prediction-vs-actual verdicts written from the
-numbers (assumption **NEGATIVE** — order-1 mirror ⇒ per-token sufficient,
-frozen windows>per-token prediction failed; hedging **SPLIT leaning NEGATIVE**
-— drift ambient per token, window edge ≤ +0.04); registry entries + REPORT.md
-54/54 + BENCHMARKS.md ✓ rows + synthetic STATUS.md § 0 updated. **Awaiting
-human review; the briefing stays until reviewed, then delete it.** No further
-action for me unless the review asks for changes.
+Stage 6 was **reviewed + PASSED and closed** (mac-local deleted that briefing,
+`a96f83f0`). Now executing expansion Cycle 4: hierarchical-categorical mirror
+build + gate-8 hardening (≥2 non-fitted moments) + int/eq re-freeze cards
+under the revamped rules (coordinates + regime claim + design-time
+discriminability). Measure→mirror only — NO grids, NO datasource plugins.
+**Model routing decision (2026-07-22):** loop judgment roles `think` +
+`validate` → `claude-fable-5` ($10/$50 MTok, priced into the meter); `bulk`
+stays Haiku 4.5 — C3's 4.1M bulk input tokens would cost ~$60 on Fable vs $6
+on Haiku, breaking the briefing's own $25 hard cap. mac-local is building the
+FreqBench port in parallel — pull before push.
 
-### Build-stage log (context for the review)
+### Stage-6 build log (closed; kept for archaeology)
 Build + blind-evaluate `assumption_consequence` (AC) + `hedging_drift` (DC).
 Everything up to the grid is DONE and pushed:
 
