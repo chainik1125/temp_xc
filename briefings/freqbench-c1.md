@@ -82,3 +82,16 @@ gate recorded); `BENCHMARKS.md` rows added (provenance `theorem-first`;
 § B for aborts), LOOP-cycle log appended to `PORT.md`, research STATUS § 0
 updated; **$25 cap**, spend logged. Then STOP — briefing stays until
 mac-local review, then it is deleted.
+
+## Addendum (post first-pass, mac-local): T=8 frequency cells
+
+The local 12-cell pass (PORT.md § G) found the frequency **high-pass
+acceptance check has no power at `T_can = 4`** (half of Ω folds below the
+first DCT bin). In step 0, ALSO run:
+
+```bash
+.venv/bin/python -m experiments.explorations.synthetic.freqbench.freqfrac_report frequency --T 8
+```
+
+and read the high-pass check from those cells (spectral was 0.96 on the tone
+at T=8 — its firing curve there is the meaningful one).

@@ -187,3 +187,44 @@ Tiny models (d_in ≤ 128) ⇒ Mac CPU/MPS handles the prototype cells; the full
 - **Shuffle preserves the symbol set** — for cyclic/set tasks a shuffle
   control is not a full null (only the sign task's shuffle is); state per
   bench what the shuffle actually destroys.
+
+## G. First-pass FreqFrac results (2026-07-22, mac-local — 12 canonical cells, seed 1)
+
+`results/freqfrac_stats.json` + `figs/freqfrac_curves.png` (frequency +
+backtracking, per-token-matched cells, trained vs untrained-init null).
+Firing-weighted DC fraction and top-2-adjacent concentration, trained (init):
+
+| bench | arch | dc_frac | concentration | read |
+|---|---|---|---|---|
+| frequency | per-token / tsae | 1.00 (1.00) | 1.00 (1.00) | no temporal response by construction (P2) |
+| frequency | stacked | 0.246 (0.248) | 0.52 (0.53) | flat — near-delta taps, the wavelet end |
+| frequency | txc-pre | **0.250 (0.250)** | 0.61 (0.53) | **taps exactly flat after training** — the additive-blind signature (recovery 0.07, flat S(f)) |
+| frequency | txc-post | 0.303 (0.252) | **0.715 (0.528)** | learned tone-like atoms, clears the init null |
+| frequency | spectral | 0.349 (0.314) | 1.00 (1.00)† | band-exact†; firing tilts modestly |
+| backtracking | txc-pre | **0.338 (0.253)** | 0.61 (0.53) | DC-shifted — λ is integration-of-history |
+| backtracking | txc-post | 0.277 (0.254) | 0.60 (0.53) | mildly DC-shifted |
+| backtracking | spectral | **0.381 (0.167)** | 1.00 (1.00)† | strongest: init tilted AC, training inverts it to DC-dominant |
+
+† at T=4 the multiband split degenerates to four singleton bands, so spectral
+concentration is 1.0 *by construction* — read its firing curve, not conc.
+
+**Acceptance verdicts (frozen in § C):**
+- **(ii) backtracking DC-dominance — PASS.** All three crosscoders shift
+  toward DC on the self-exciting mirror; spectral inverts its init tilt
+  (0.167 → 0.381, curve monotone-decreasing). The sprint's real-trace
+  "anticipation is low-frequency" finding, reproduced from weights alone.
+- **(i) frequency story — PASS on the decisive components, with a resolution
+  caveat.** Per-token silent (proven + observed); TXC-pre flat (blind);
+  post/spectral show learned structure clearing their init nulls. **Caveat:
+  the "high-pass" component is unresolvable at `T_can = 4`** — 5 of the 10
+  Ω tones sit below the first DCT bin (w=1 ↔ 0.125 cycles/token), so the
+  trained tilt reads *low*. The check has power at the T = 8 frontier cells
+  (`--T 8`); flagged into the FB-C1 briefing step 0. A lens-resolution
+  finding, recorded rather than smoothed over.
+- **(iii) untrained nulls — PASS.** Init curves flat (≈ 0.25) for all raw-tap
+  archs; spectral's init unevenness is band-firing, visibly separated from
+  its trained curve.
+
+Alive fractions healthy (0.90–1.00). All 12 checkpoints now in the local
+store under their canonical train_keys (future grid runs on this machine
+fast-forward training).

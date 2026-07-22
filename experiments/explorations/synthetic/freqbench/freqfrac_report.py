@@ -67,10 +67,12 @@ def _cell_d_sae(row: dict) -> int:
 
 
 def select_canonical_row(rows: list[dict], arch: str, *, windowed: bool,
-                         F: int, seed: int) -> dict | None:
+                         F: int, seed: int, T_override: int | None = None,
+                         ) -> dict | None:
     """The per-token-matched cell: T=T_can (or 1), d_sae=F, trained (n_steps>0),
-    k_pos with realized l0_per_token nearest B*."""
-    T_target = OP.T_can if windowed else 1
+    k_pos with realized l0_per_token nearest B*. ``T_override`` swaps the
+    window-arch T (token archs stay at 1)."""
+    T_target = (T_override or OP.T_can) if windowed else 1
     cand = [r for r in rows
             if r["arch"] == arch and r["seed"] == seed
             and _cell_T(r) == T_target and _cell_d_sae(r) == F
@@ -190,6 +192,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("benches", nargs="*", default=["frequency", "backtracking"])
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--T", type=int, default=None,
+                    help="override the window-arch T (default OP.T_can); the "
+                         "frequency high-pass check needs T=8 — PORT.md § G")
     ap.add_argument("--n-seqs", type=int, default=256)
     ap.add_argument("--dry-run", action="store_true",
                     help="print the selected canonical rows and exit")
@@ -201,7 +206,8 @@ def main() -> None:
 
     leaderboard = repo_root() / "results" / "leaderboard.jsonl"
     by_name = {b.name: b for b in BENCHES}
-    out: dict = {"op": {"T_can": OP.T_can, "B_star": OP.B_star, "d_sae": "F"},
+    out: dict = {"op": {"T_can": OP.T_can, "B_star": OP.B_star, "d_sae": "F",
+                        "T_override": args.T},
                  "seed": args.seed, "cells": []}
 
     for bname in benches:
@@ -210,7 +216,8 @@ def main() -> None:
         rows = _load_rows(leaderboard, ds, bench.protocol)
         for arch in ARCHS:
             row = select_canonical_row(rows, arch.name, windowed=arch.windowed,
-                                       F=bench.F, seed=args.seed)
+                                       F=bench.F, seed=args.seed,
+                                       T_override=args.T)
             if row is None:
                 print(f"[{bname}/{arch.name}] no canonical row — SKIP", flush=True)
                 continue
