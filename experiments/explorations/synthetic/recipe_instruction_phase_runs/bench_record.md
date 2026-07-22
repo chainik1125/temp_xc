@@ -110,6 +110,20 @@ without re-running anything:
   window), not the plain-probe numbers (0.595/0.619) — a plain probe can sit
   at balacc 0.5 under class imbalance while real access exists.
 
+## Gating addendum (2026-07-23, runpod — stage-6 #3b, re-scoped axis)
+
+No new computation; all numbers cite the committed § 8 record
+(`results/recipe_gating_stats.json`, commit `b463c4a0`). Under the re-scoped
+primary axis the discriminability condition reads: **nonlinear access 1.000 ≫
+additive ceiling 0.771** — a 0.229 balanced-accuracy separation that only
+position-mixing can close; that separation, not distance from chance, is what
+the bench now tests. Condition (ii) of the original gate (latent present via
+the nonlinear route — MLP 1.000 on the raw T=2 tile) is exactly the PASS side
+the re-scoped axis rides on; condition (i)'s measured raw-linear lines (0.614
+per-token / 0.720 window, threshold-optimized) become named floors reported
+alongside the residual. The § 8 gate for the re-scoped bench is therefore
+**satisfied by the existing record** — no re-run, no new thresholds.
+
 ## Review (2026-07-23, mac-local) — APPROVED; re-scope decision
 
 Verified: no grid rows (leaderboard clean), STOP direction analytically
