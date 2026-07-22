@@ -145,3 +145,56 @@ in the changepoint § 8 treatment.
   reasoning traces carry a **segment-scale layer** (three timescales) the
   doc-level hierarchy cannot hold; do not assume this spec transfers across
   domains.
+
+## Amendment 2026-07-23 — § 5 re-freeze under the re-scoped regime-3 residual axis (stage-6 #3b)
+
+**Provenance.** The § 8 equality-variant STOP (2026-07-22; gating record +
+review in `bench_record.md`) established the access ladder on this substrate:
+chance 0.5 → from-`c_t` DC leak 0.609 → per-token raw-linear 0.614 → window
+raw-linear 0.720 → **pair-additive ceiling 0.771** → nonlinear/exact 1.000.
+The mac-local review (2026-07-23) adopted **re-scope option 1**: the primary
+axis is the **regime-3 residual** — `equality_residual_recovery` =
+(balacc(e_t) − 0.771) / (1.000 − 0.771), unclipped — the 0.229 of balanced
+accuracy reachable only by position-mixing. The DC leak and the additive
+access are named floors, not noise. The predictions below were **frozen by
+mac-local in `briefings/stage6-recipe-rescoped.md` (2026-07-23)** and are
+restated verbatim with sharpening reasons only; no direction was changed and
+nothing here was written after any cell ran.
+
+### § 5-r — frozen per-arch predictions (residual axis)
+
+- **DC control `c_t`:** every arch at/near oracle (per-token 1.000 raw —
+  expected; it is the control).
+- **Residual axis (primary):**
+  - `batchtopk_sae`, `tsae`, `stacked_batchtopk`, `txc_batchtopk_pre` —
+    **≈ 0 (or negative)**: a linear probe over per-position codes is an
+    additive-over-positions readout, bounded by the 0.771 ceiling; TXC-pre's
+    summed code is additive up to BatchTopK competition (changepoint's
+    provable additive-blindness precedent). *Sharpening reason: the probe
+    reads one tile's code at the leading edge, so any e_t information must
+    survive the code's own compression of the additive route — these
+    families are expected below the ceiling, i.e. residual < 0, not merely
+    ≈ 0.*
+  - `txc_batchtopk_post` — **positive residual**, strongest at T = 2,
+    expected k_pos-fragile (the changepoint boundary precedent: τ 0.66 at
+    T=2, vanishing at higher k). *Sharpening reason: post-squash reuses each
+    atom across all T positions, so a coincidence atom can fire on the
+    (c_{t-1} = c_t) conjunction — exactly the position-mixing route the
+    residual isolates.*
+  - `spectral_txc` — **positive residual**, expected k_pos-robust
+    (changepoint tss/cp precedent). *Sharpening reason: DCT bands mix
+    positions before the sparsity competition, so the equality signal is not
+    fighting per-position atoms for budget.*
+- **Untrained control:** any positive residual must vanish (or drop to the
+  architectural-access floor) at random init, else it is access, not
+  learning — report both.
+- **Falsifier (indicts the bench, not an arch):** any additive-family arch
+  with residual clearly > 0 beyond seed noise ⇒ the residual normalization
+  or the substrate leaks beyond the § 8-measured additive ceiling ⇒ verdict
+  NEGATIVE on the re-scoped bench; report, never re-normalize after the
+  fact. Threshold-optimized ceilings are the raw-access reference lines
+  (README rule; probe-convention numbers are diagnostics).
+
+_Amended-by: claude-fable-5 (runpod, stage-6 #3b), restating the mac-local
+freeze; committed BEFORE any grid cell ran (freeze order provable from the
+git log)._
