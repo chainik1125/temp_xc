@@ -3,10 +3,13 @@
 **Last rewrite:** 2026-07-22 (mid stage-6, stopping for POD MIGRATION).
 
 ## Who / where
-Remote CC on RunPod (Linux) at `/workspace/temp_xc`. Git creds at `/workspace/.tokens/`
-(push: `git push https://x-access-token:$(cat /workspace/.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`).
-Claude API key at `/workspace/.tokens/anthropic_key` (export as ANTHROPIC_API_KEY).
-**⚠ If this is a FRESH volume, `/workspace/.tokens/` is gone — user must re-provision creds.**
+Remote CC on RunPod (Linux). Repo root = the `temp_xc` dir under the volume
+(old pod: `/workspace/temp_xc`; **post-2026-07-22 migration: `~/workspace/temp_xc`**).
+Tokens (`gh_token`, `anthropic_key`, `hf_token`) live in `.tokens/` NEXT TO the
+repo root (old pod `/workspace/.tokens/`; new pod `~/workspace/.tokens/`).
+Push: `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`
+(from the repo root). Export anthropic_key as ANTHROPIC_API_KEY.
+**⚠ If `.tokens/` is missing on the new pod, the user relays it from their laptop.**
 
 ## Current task: `briefings/stage6-grounded-eval.md` — IN PROGRESS (grid stage)
 Build + blind-evaluate `assumption_consequence` (AC) + `hedging_drift` (DC).
