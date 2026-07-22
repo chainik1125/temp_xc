@@ -31,8 +31,11 @@ Last updated: 2026-07-22.
   under the hardened gate. NO architecture was trained or evaluated; no
   datasource plugins added. Spend $2.62 this cycle ($10.82/$25 cumulative).
   Full record: [`expansion/LEDGER.md`](expansion/LEDGER.md) C4 entry +
-  [`BENCHMARKS.md`](BENCHMARKS.md). Briefing `expansion-c4.md` stays until
-  mac-local review.
+  [`BENCHMARKS.md`](BENCHMARKS.md). **Reviewed + APPROVED (2026-07-22,
+  mac-local)** — see the LEDGER review line; the **equality-latent variant of
+  the discriminability STOP-gate** (the C4 flag) is adopted into README's
+  validity gates; briefing retired. Stage-6 of the new SPEC waits on its own
+  briefing (needs the datasource plugin + the equality-variant § 8 gating).
 
 - **AUTORESEARCH REVAMP — STARTED, phase 1 done (2026-07-22, mac-local).** The
   program is now explicitly **two generators, one substrate**: README gained

@@ -276,6 +276,16 @@ Every investigation must pass **all** applicable gates. A failed gate means
   — do not spend the grid. (Stage-6 lesson: `assumption_consequence` 0.464 vs
   0.466 and `hedging_drift` +0.006 headroom were both on record *before* 990
   cells were spent.) "Grounded + valid mirror" ≠ "discriminates".
+  **Equality-latent variant (C4 review):** for a regime-3 primary latent
+  (equality / order-2), BOTH raw-linear readouts — per-token *and* window
+  concatenation — may sit at chance; that shared blindness is the claim, not a
+  failure. There the gate verifies instead that (i) both raw-*linear* readouts
+  sit at chance (if raw-linear windows ≫ chance the latent is regime 2 and
+  additive codes suffice), and (ii) the latent is *present* in the raw window
+  — recoverable by a nonlinear/oracle readout (the changepoint § 8 treatment).
+  The bench then tests which architecture's code **linearizes** it. If even
+  the nonlinear route fails, the bench is non-discriminating in the other
+  direction — nothing can read it — and still STOPs.
 
 ### Abort / discard conditions
 

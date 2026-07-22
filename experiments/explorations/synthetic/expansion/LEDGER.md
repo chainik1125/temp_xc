@@ -106,6 +106,19 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
   validation + deterministic repair); the recorded skeptic verdict was
   recovered from the persisted raw text, never re-rolled. Spend
   **$10.82/$25** cumulative (C3 $8.20 + C4 $2.62).
+  **Reviewed + APPROVED (2026-07-22, mac-local):** commit order verifies
+  freeze-before-calibration; both hardened gate-8 moments preregistered with
+  non-fittedness arguments and demonstrated teeth (recipe PASS with honest
+  ~17%-margin caveat; proof FAIL 2.7× tolerance ⇒ rule-forced ABORT); skeptic
+  transcript genuine (5/5, caveats carried into the spec); the
+  `hier_categorical` deconvolution is sound and α is likelihood-fit
+  (non-moment-inserting); spend + scope clean; 127 tests pass. Findings baked
+  in: the **equality-latent variant of the discriminability STOP-gate** is
+  now in README (both raw-linear readouts at chance + nonlinear access
+  verified — the C4 flag, adopted); cosmetic for C5: the skeptic record
+  header hardcodes "Opus" (`render_records.py` template) while the skeptic
+  ran on Fable — fix the template next cycle. Briefing `expansion-c4.md`
+  retired.
 
 - **Cycle 1 — 2026-07-14 (runpod, autonomous).** 10 cards frozen (5+5); 4
   calibrated (2+2): assumption-then-consequence PROCEED→SPEC,
