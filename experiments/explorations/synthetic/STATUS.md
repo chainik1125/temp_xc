@@ -28,7 +28,9 @@ Last updated: 2026-07-22.
   train+analyze path that bypasses the cache (cheap — CPU pod does ~495
   cells/hour). **(3)** the two autoresearch loops on Fable 5 (FreqBench
   generator + expansion C4 under the new gate; C4 target = hierarchical-
-  categorical mirror → the first *grounded* regime-3 bench). **(4)** the acid
+  categorical mirror → the first *grounded* regime-3 bench — **briefing
+  queued: [`briefings/expansion-c4.md`](../../../briefings/expansion-c4.md)
+  (runpod), running in parallel with the mac-local port**). **(4)** the acid
   test: hide a bench, predict its arch ranking from coordinates alone.
 
 - **STAGE 6 DONE (2026-07-22, runpod) — both grounded benches built, run,
