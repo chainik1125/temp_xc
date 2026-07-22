@@ -52,3 +52,21 @@ logs/
 
 # Benchmark run logs (regenerable stdout; not results — keep out of git)
 experiments/**/results/*.log
+
+# ─── paper/ is a read-only source snapshot (agent context, not built here) ──
+# Defensive: if anyone does run latex in paper/, keep the cruft out of git.
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.toc
+paper/*.pdf
+
+# ─── Private, local-only material (meeting transcripts, etc.) — NEVER commit ─
+# Contains private information. Only the README pointer is tracked.
+private/**
+!private/README.md

@@ -1,0 +1,781 @@
+\appendix
+
+\section{Code Availability}
+\label{app:code}
+We provide full code to reproduce our architectures, TempBench tasks, and
+analyses at \url{https://github.com/chainik1125/temp_xc/tree/main}.
+
+\section{Model Parameters for each architecture}
+\label{app:model-params}
+
+This appendix specifies architecture and training choices held fixed across components. The only per-component free knobs are dictionary width $d_{\mathrm{SAE}}$ and sparsity budget $k_{\mathrm{pos}}$, the expected number of active latents per sequence position. Toy data uses $d_{\mathrm{SAE}}=40$; real-model widths are set by subject-model dimension. All locked choices are in \texttt{configs/locked\_archs.yaml} and \texttt{configs/datasources.yaml}. Component-specific datasource, width, step count, $k_{\mathrm{pos}}$ grid, and seed tables appear in the component appendices.
+
+\paragraph{Common training pipeline.}
+All cells use the same trainer: Adam with $\mathrm{lr}=3{\times}10^{-4}$, batch size $B=1024$, $1{,}000$ warmup steps, and mixed precision, using \texttt{bf16} on H100/H200 and \texttt{fp16} with grad-scaler on A40. Toy-data cells run $n_{\mathrm{steps}}\in\{8{,}000,30{,}000\}$; real-LM cells run $n_{\mathrm{steps}}\in\{10{,}000,20{,}000\}$. Runs with $n_{\mathrm{steps}}<1000$ are discarded as smoke runs. Across the seven components, the paper uses $\approx5{,}700$ trained checkpoints and $\approx6{,}200$ leaderboard eval rows. Per-component counts and the full $(\text{arch},\text{datasource},\text{seeds})$ breakdown are given below. Subject-model activations are cached once per datasource and reused by all architectures at matched hookpoint. Sparsity is matched by $k_{\mathrm{pos}}$: per-token dictionaries use $k_{\mathrm{pos}}$ active latents per token, while a windowed architecture of length $T$ uses
+\[
+    k_{\mathrm{win}}=T k_{\mathrm{pos}}.
+\]
+For TXC-pro, matryoshka groups use
+\[
+    k_{\mathrm{train}}=5k_{\mathrm{pos}},
+    \qquad
+    k_{\mathrm{inference}}=10k_{\mathrm{pos}}.
+\]
+
+\paragraph{Anti-dead stack.}
+TopK SAE, T-SAE, TXC-base, and TXC-pro share the same anti-dead stack: (i) per-feature \texttt{num\_tokens\_since\_fired} counters with a $10$M-token dead threshold; (ii) AuxK loss with $\alpha_{\mathrm{auxk}}=1/32$, where the top-$\mathrm{aux\_k}$ dead features re-reconstruct the residual; (iii) decoder unit-norm constraint per latent over $(T,d_{\mathrm{in}})$; (iv) decoder-parallel gradient removal on $W_{\mathrm{dec}}$; and (v) geometric-median $b_{\mathrm{dec}}$ initialization on the first batch. This ports the \citet{bhalla2025tsae} anti-dead recipe into the TXC family. Bricken-style hard resampling \citep{bricken2023monosemantic} is off by default and used only in C6 to match the Qwen-7B medical setup; see \cref{app:c6}.
+
+\paragraph{TXC-base.}
+TXC-base is the acausal temporal crosscoder from \cref{sec:txc} with TopK sparsity and the full anti-dead stack. The locked window length is $T=5$. For each $\tau\in[0,T)$, encoder slabs
+\[
+    W_{\mathrm{enc}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}\times d_{\mathrm{SAE}}}
+\]
+sum into one shared latent vector $\mathbf u_t\in\mathbb{R}^{d_{\mathrm{SAE}}}$ per window. BatchTopK is applied over the latent axis with $k_{\mathrm{win}}=T k_{\mathrm{pos}}$. Decoder slabs
+\[
+    W_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{SAE}}\times d_{\mathrm{in}}},
+    \qquad
+    b_{\mathrm{dec}}^{(\tau)}\in\mathbb{R}^{d_{\mathrm{in}}},
+\]
+reconstruct the full $T$-window. TXC-base uses no matryoshka objective, no contrastive loss, and no Bricken resampling. The free knobs are $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$. C3 also trains TXC-base at $T\in\{10,20\}$ to probe temporal-context length; see \cref{app:c3-archs}.
+
+\paragraph{TXC-pro.}
+TXC-pro adds three choices to TXC-base. First, the subseq encoder trains with $T_{\max}=10$ position slabs while sampling $t_{\mathrm{sample}}=5$ positions per step; all $10$ positions are used at evaluation. Second, Matryoshka training uses $H=8$ nested feature groups, each reconstructing from the first
+\[
+    G d_{\mathrm{SAE}}/8,
+    \qquad
+    G=1,\ldots,8
+\]
+features. Third, a multi-distance contrastive loss applies inverse-distance-weighted InfoNCE at shifts $\Delta\in\{1,2\}$. The matryoshka head is disabled at toy scale in C1 and C2 by setting $h_{\mathrm{size}}=d_{\mathrm{SAE}}=40$, since $5$ prefix levels of $8$ features do not form a useful hierarchy and the smallest prefix would fall below $k_{\mathrm{train}}=5k_{\mathrm{pos}}$ at high $k_{\mathrm{pos}}$. The free knobs are again $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$.
+
+\paragraph{Baselines.}
+\textbf{TopK SAE} \citep{gao2024scaling} is a per-token dictionary with TopK at $k_{\mathrm{pos}}$ and the anti-dead stack. \textbf{Stacked SAE}, used in C1, C2, and C7, is a bank of $T$ independent TopK SAEs, one per position in a $T$-window, with total window budget $k_{\mathrm{win}}=T k_{\mathrm{pos}}$. It isolates temporal aggregation from cross-position weight sharing. \textbf{T-SAE} \citep{bhalla2025tsae} is a faithful port of the referenced work's implementation: Matryoshka BatchTopK with $h_{\mathrm{frac}}=0.20$ high-level features, AuxK loss, geometric-median $b_{\mathrm{dec}}$ initialization, decoder unit-norm projection, raw-dot temporal contrastiveA loss at $\alpha=1.0$, and threshold-based inference. Its locked $d_{\mathrm{SAE}}=16{,}384$ matches the original Gemma-2-2B setting. \textbf{TFA} \citep{lubana2025priors} is the temporal feature analyzer with $4$ attention heads; the no-position-embedding variant is the default, and TFA-pos is reported on synthetic data. \textbf{MLC} \citep{lindsey2024sparsecrosscoders} is a $5$-layer multi-layer crosscoder over the residual-stream layer axis, centered at the component hookpoint. It uses layers $11$--$15$ for Gemma-2-2B-IT C3 and layers $8$--$12$ for Llama-3.1-8B C7. \textbf{SAE-arditi} is used only as the C6 baseline to match the Qwen-medical setup, with $d_{\mathrm{SAE}}=32{,}768$ and $k_{\mathrm{pos}}=128$; see \cref{app:c6}.
+
+\paragraph{Locked versus free choices.}
+The locked TXC-base and TXC-pro definitions above are the only architectural commitments. Across all seven components, only $k_{\mathrm{pos}}$ and $d_{\mathrm{SAE}}$ vary by component. We do not hill-climb architecture hyperparameters such as $T$, matryoshka group count, contrastive shifts, AuxK weight, or dead threshold. Training-time augmentations are allowed only when documented in the component appendix; the only such opt-in is Bricken resampling for C6.
+
+% \section{Other evals}
+
+% \section{Other synthetic evals}
+% Maybe the which-component eval will go here?
+
+\section{Synthetic Benchmarks: Ground-Truth Correspondences and Probe Setup}
+\label{app:synthetic-probes}
+
+The denoising metrics in \cref{sec:synthetic} (single-latent correlation and linear-probe $R^2$) rely on two distinct correspondences between ground-truth objects and the architecture's dictionary: one fixed by construction in the data generator, one inferred post-hoc by decoder geometry. This appendix makes both explicit so that the local-vs-global scatters in \cref{fig:setup_b_denoising,fig:setup_d} can be interpreted unambiguously.
+
+\subsection{Construction-time correspondence (feature index $\leftrightarrow$ chain)}
+\label{app:synthetic-construction}
+
+The Denoising bench generator (\path{temp_bench.data.toy.markov:markov_chain_support}) draws $N$ orthogonal feature directions $\mathbf{f}_i \in \mathbb{R}^d$ as the rows of a QR-orthogonalised Gaussian matrix, then runs $N$ independent two-state Markov chains $s_{i,t} \in \{0,1\}$ in parallel and emits noisy firings $a_{i,t}\mid s_{i,t}\sim\mathrm{Bernoulli}\!\big(p_A\,[s_{i,t}{=}0] + p_B\,[s_{i,t}{=}1]\big)$. The feature index $i \in \{1,\ldots,N\}$ simultaneously labels three objects: the orthogonal direction $\mathbf{f}_i$, the hidden state $s_{i,t}$, and the noisy emission $a_{i,t}$. The activation
+\[
+    \mathbf{x}_t \;=\; \sum_{i=1}^N a_{i,t}\, m_{i,t}\, \mathbf{f}_i
+\]
+threads this index through the residual-stream construction, so the feature$\,\leftrightarrow\,$emission$\,\leftrightarrow\,$hidden-state mapping is determined entirely by the generator. This is the ground-truth correspondence the metrics evaluate against.
+
+The Coupling bench (\path{temp_bench.data.toy.coupled_noisy:coupled_noisy_hmm}) keeps the same construction-time logic for the $M = 20$ emissions $a_{j,t}$ and adds a separate index $k \in \{1,\ldots,K\}$ with $K = 10$ for the hidden chain directions $\mathbf{f}^{\mathrm{hid}}_k$. A binary coupling matrix $C \in \{0,1\}^{M \times K}$ specifies which subset of hidden chains drives each emission via OR-gate firing, so the construction-time correspondence has two layers (chain index $k$, emission index $j$) instead of one.
+
+\subsection{Post-hoc correspondence (feature direction $\leftrightarrow$ dictionary atom)}
+\label{app:synthetic-matching}
+
+For an autoencoder with decoder columns $\mathbf{w}_j \in \mathbb{R}^d$, $j \in \{1, \ldots, d_{\mathrm{sae}}\}$, the matched latent for ground-truth feature $i$ is the column with the largest absolute cosine,
+\[
+    j^*(i) \;=\; \arg\max_j \left| \frac{\langle \mathbf{w}_j, \mathbf{f}_i \rangle}{\lVert \mathbf{w}_j \rVert\, \lVert \mathbf{f}_i \rVert} \right|.
+\]
+The matching is computed independently for each feature, so two ground-truth features may in principle pick the same latent. We do not enforce uniqueness; this matches the wasteland-source convention in \texttt{denoising\_probes.py}.
+
+\subsection{Probe definitions}
+\label{app:synthetic-probes-defs}
+
+Given the eval set of activations $\mathbf{x}_t$, every architecture produces a per-token latent code $\mathbf{u}(t) \in \mathbb{R}^{d_{\mathrm{sae}}}$. For per-token architectures (TopK SAE, T-SAE, TFA-pos) the encoder runs directly on each token. For window-level architectures (TXC, Stacked) the encoder produces one code per $T$-window; we broadcast that code to all $T$ positions in the window and average over the $T$ overlapping windows that touch each position, so every $(\textit{seq}, t)$ pair ends up with one $d_{\mathrm{sae}}$-dim vector.
+
+\paragraph{Single-latent correlation.} For each ground-truth feature $i$, take the matched latent $j^*(i)$ defined above and compute Pearson correlations over all $(\textit{seq}, t)$ pairs,
+\begin{align*}
+    \bar r_{\mathrm{local}}(i) &\;=\; \mathrm{Corr}\!\big(u_{j^*(i)}(t),\; a_{i,t}\big), \\
+    \bar r_{\mathrm{global}}(i) &\;=\; \mathrm{Corr}\!\big(u_{j^*(i)}(t),\; s_{i,t}\big),
+\end{align*}
+then average across the $N$ features. This is a \emph{strict} test: the dictionary direction must align with $\mathbf{f}_i$ \emph{and} the code dimension along that direction must track the hidden state.
+
+\paragraph{Linear probe.} For each feature $i$ fit two ridge regressions ($\alpha = 1$, 80/20 train/test split) using the full code $\mathbf{u}(t)$,
+\begin{align*}
+    \hat a_{i,t} &\;=\; \mathbf{w}^{(i)\top}_{\mathrm{loc}}\, \mathbf{u}(t) + b^{(i)}_{\mathrm{loc}}, \\
+    \hat s_{i,t} &\;=\; \mathbf{w}^{(i)\top}_{\mathrm{glob}}\, \mathbf{u}(t) + b^{(i)}_{\mathrm{glob}},
+\end{align*}
+and report $R^2_{\mathrm{local}}(i)$ and $R^2_{\mathrm{global}}(i)$ on the held-out $20\%$, averaged across the $N$ features. This is a \emph{looser} test: information may be diffused across many latents and the probe still recovers it.
+
+The local-vs-global scatters in \cref{fig:setup_b_denoising} use both metrics on the same population of cells. Points above the $y = x$ diagonal denoise: the latent code tracks the hidden state better than the noisy emission.
+
+
+\section{Sparse Probing: Full Details}
+\label{app:c3}
+
+Sparse probing measures whether a dictionary exposes features useful for simple classifiers of human-interpretable text concepts. Standard probing panels include both token-local properties, such as punctuation and part of speech, and broader passage-level properties, such as topic, sentiment, and named entities. This makes sparse probing a useful static test of whether temporal-window dictionaries expose concepts that per-token dictionaries fragment.
+
+\subsection{Architectures and training configuration}
+\label{app:c3-archs}
+
+Six base architectures, each trained on the same \texttt{Gemma-2-2B-IT} layer-$13$ residual-stream activation cache (FineWeb $24$K sequences $\times\,128$ tokens, fp$16$): a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae}, the temporal feature analyzer (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) on layers $11$--$15$ \cite{lindsey2024sparsecrosscoders}, TXC-base ($T = 5$, $k_{\mathrm{pos}} = 20$), and TXC-pro ($T_{\max} = 10$, $t_{\mathrm{sample}} = 5$, $k_{\mathrm{pos}} = 20$, eight Matryoshka groups, contrastive shifts $\Delta \in \{1, 2\}$). All cells train for $n_{\mathrm{steps}} = 20{,}000$ at $d_{\mathrm{SAE}} = 18{,}432$. The matched-sparsity invariant fixes the expected per-token $L_0$ at $20$ across architectures; each arch's internal TopK budget scales with the unit it operates on (TopK SAE: $k_{\mathrm{win}} = 20$; T-SAE BatchTopK: $20\cdot B \cdot T$; TXC-base ($T$): $k_{\mathrm{win}} = 20\cdot T$; TXC-pro: $k_{\mathrm{train}} = 100$, $k_{\mathrm{inference}} = 200$; MLC ($L = 5$): $k_{\mathrm{win}} = 100$; TFA: $20\cdot T_{\mathrm{tfa}}$). Within-component fairness is enforced by this matched-sparsity convention rather than by uniform per-step token throughput. We additionally train TXC-base at $T \in \{10, 20\}$ as a within-arch probe of temporal-context length.
+
+\subsection{Probing protocol}
+\label{app:c3-protocol}
+
+For every probe task we cache the last $S = 32$ token activations of the subject model on each prompt. Tokenisation is right-padded then per-example resliced into a $32$-frame so the real tokens occupy positions $[\text{first\_real}_i,\,S-1]$ and zero padding sits at the start; the per-example \texttt{first\_real} index is stored so downstream pooling can mask the padding region. Per-token architectures encode the full $(N, S, d_{\mathrm{in}})$ tensor and mean-pool over the token axis with positions $k < \text{first\_real}_i$ masked. Window architectures slide a width-$T$ window across the $S$-frame at stride $1$ ($n_{\mathrm{windows}} = S - T + 1$ per prompt; with $S = 32$: $T=5\!\to\!28$, $T=10\!\to\!23$, $T=20\!\to\!13$), encode each window to one $(d_{\mathrm{SAE}})$ latent, then mean-pool over the window axis with windows whose left edge lies in padding masked. The output is a single $(d_{\mathrm{SAE}})$ feature vector per prompt for every architecture. Top-$S$ features are selected on the train split only by $|\mu_{y=1} - \mu_{y=0}|$ (no CV / no peeking at the test set during selection), and the probe is scikit-learn \texttt{LogisticRegression(penalty='l1', solver='liblinear', C=1.0, max\_iter=1000, random\_state=0)} fit on the selected $k_{\mathrm{feats}}$ features. The per-task readout is ROC-AUC on the task's held-out test split; the headline is the unweighted mean across the SAEBench panel, averaged over $3$ training seeds.
+
+\subsection{SAEBench task suite}
+\label{app:c3-tasks}
+
+The probing panel is the upstream SAEBench composition fixed by \texttt{chosen\_classes\_per\_dataset} in \path{sae_bench/sae_bench_utils/dataset_info.py}, totalling $36$ binary one-vs-rest tasks across $8$ datasets:
+
+\begin{table*}[t]
+    \centering
+    \footnotesize
+    \begin{tabular}{l l c}
+        \toprule
+        dataset & classes & $n$ \\
+        \midrule
+        \texttt{LabHC/bias\_in\_bios\_class\_set1} & professions $0, 1, 2, 6, 9$ & $5$ \\
+        \texttt{LabHC/bias\_in\_bios\_class\_set2} & professions $11, 13, 14, 18, 19$ & $5$ \\
+        \texttt{LabHC/bias\_in\_bios\_class\_set3} & professions $20, 21, 22, 25, 26$ & $5$ \\
+        \texttt{canrager/amazon\_reviews\_mcauley\_1and5} & categories $1, 2, 3, 5, 6$ & $5$ \\
+        \texttt{canrager/amazon\_reviews\_mcauley\_1and5\_sentiment} & $1.0$-vs-rest, $5.0$-vs-rest & $2$ \\
+        \texttt{codeparrot/github-code} & C, Python, HTML, Java, PHP & $5$ \\
+        \texttt{fancyzhx/ag\_news} & world, sports, business, scitech & $4$ \\
+        \texttt{Helsinki-NLP/europarl} & en, fr, de, es, nl & $5$ \\
+        \midrule
+        \textbf{SAEBench total} & & \textbf{36} \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+Two cross-token tasks (\path{winogrande_correct_completion} and \path{wsc_coreference}) round out a $38$-task panel; the main-text $\overline{\mathrm{AUC}}$ summary averages over all $38$ tasks. Per-task AUCs are persisted in the leaderboard for downstream diagnostic queries.
+
+\subsection{Sweep aggregation: $\overline{\mathrm{AUC}}$}
+\label{app:c3-summary-metric}
+
+The per-arch summary metric reported in \cref{fig:sparse_probing_gemma_it} compresses the $k_{\mathrm{feats}}$ sweep into a single number. Let $\mathrm{AUC}_a(k)$ be the mean SAEBench AUC of arch $a$ at $k_{\mathrm{feats}} = k$ averaged over seeds. We define
+% \begin{equation}
+%     \begin{aligned}
+%     \overline{\mathrm{AUC}}(a) \;={}&\; \frac{1}{\log_2(k_{\max}/k_{\min})} \\
+%     &{}\times \sum_{i=0}^{n-2} \\
+%     &{}\times \frac{\mathrm{AUC}_a(k_i) + \mathrm{AUC}_a(k_{i+1})}{2} \\
+%     &{}\times \bigl(\log_2 k_{i+1} - \log_2 k_i\bigr),
+%     \end{aligned}
+%     \label{eq:sp-summary}
+% \end{equation}
+\begin{equation}
+\overline{\mathrm{AUC}}(a)
+=
+\frac{\displaystyle \sum_{i=0}^{n-2}
+\frac{\mathrm{AUC}_a(k_i)+\mathrm{AUC}_a(k_{i+1})}{2}
+\log_2\!\left(\frac{k_{i+1}}{k_i}\right)}
+{\displaystyle \log_2\!\left(\frac{k_{\max}}{k_{\min}}\right)}.
+\label{eq:sp-summary}
+\end{equation}
+where $\{k_i\}_{i=0}^{n-1} = \{5, 10, 20, 40, 80, 160, 320, 640\}$. The grid is geometric so $\log_2 k_{i+1} - \log_2 k_i = 1$ for every $i$, and \cref{eq:sp-summary} reduces to the unweighted trapezoidal mean over $\log_2 k_{\mathrm{feats}}$. Seed-$\sigma$ on the summary metric is computed by propagating per-cell seed-$\sigma$ through the trapezoidal weights.
+
+\subsection{Per-task breakdown at $k_{\mathrm{feats}} = 160$}
+\label{app:c3-per-task}
+
+\Cref{fig:c3-per-task-heatmap} shows the architecture $\times$ task ROC-AUC matrix at the peak-AUC sparsity $k_{\mathrm{feats}} = 160$, averaged over the $3$ training seeds. Most cells in the temporal family saturate above $0.90$ on the in-distribution datasets (Bias in Bios, Amazon, GitHub, AG News, Europarl), with TopK SAE consistently $\sim\!0.01$--$0.04$ behind. Two patterns are visible: TFA underperforms by $\sim\!0.05$--$0.15$ AUC on every in-distribution group, confirming that the gap reported in \cref{fig:sparse_probing_gemma_it} is broad rather than driven by a small subset of tasks; and the two cross-token tasks (\texttt{winogrande}, \texttt{wsc}) sit at $0.13$--$0.40$ for every architecture, reflecting that a per-token mean-pool encoder cannot represent the long-range coreference contrast these tasks require regardless of the SAE inductive bias (\cref{app:c3-caveats}).
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figs/c3_per_task_heatmap.png}
+    \caption{Per-architecture, per-task ROC-AUC at $k_{\mathrm{feats}} = 160$ on the $38$-task SAEBench panel, averaged over $3$ training seeds. Rows ordered top-down by overall ranking; columns grouped by source dataset (BiB-1/2/3 = \texttt{bias\_in\_bios} sets, Amazon-cat = $5$-class category, Amazon-sent = $1.0$-vs-rest / $5.0$-vs-rest, CT = the two cross-token coreference tasks). Cell labels are the AUC values with the leading ``$0.$'' dropped.}
+    \label{fig:c3-per-task-heatmap}
+\end{figure*}
+
+\subsection{Full AUC curve with TFA}
+\label{app:c3-full-curves}
+
+\Cref{fig:sparse_probing_full} shows the same per-architecture probe sweep as the right panel of \cref{fig:sparse_probing} but with TFA included on the same axes. We separate TFA into the appendix because its AUC range ($\sim 0.65$ at $k_{\mathrm{feats}}\!=\!5$, climbing to $\sim 0.85$ at $k_{\mathrm{feats}}\!=\!640$) compresses the $y$-axis on the main-text panel and obscures the $\sim\!0.01$--$0.02$ AUC ordering among the temporal family and the per-token TopK SAE baseline. TFA does not finish saturating within the $k_{\mathrm{feats}} \leq 640$ sweep; the gap between TFA and the temporal family at the largest $k_{\mathrm{feats}}$ is well outside the per-cell seed-$\sigma$ ($\leq 0.02$ for TFA, $\leq 0.002$ for every other architecture).
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figs/c3_sparse_probing_full_gemma_it.pdf}
+    \caption{Full mean SAEBench AUC vs $k_{\mathrm{feats}}$ on \texttt{Gemma-2-2B-IT} for every architecture, including TFA. Lines are mean over $3$ seeds; shaded band is $\pm 1\,\sigma$ across seeds. The temporal family + TopK SAE cluster sits at the top (saturating near $k_{\mathrm{feats}} = 160$ at AUC $\approx 0.90$--$0.92$); TFA underperforms by $0.05$--$0.18$ AUC across the sweep and is still climbing at the largest $k_{\mathrm{feats}}$ tested.}
+    \label{fig:sparse_probing_full}
+\end{figure}
+
+\subsection{Caveats}
+\label{app:c3-caveats}
+
+\begin{itemize}
+    \item \textbf{Cross-token tasks.} \path{winogrande_correct_completion} and \path{wsc_coreference} require resolving a referent that lives many tokens from the variant word; a per-token mean-pool encoder cannot represent the relevant contrast, and every locked-arch cell scored $0.40$--$0.50$ AUC on them irrespective of architecture (\cref{fig:c3-per-task-heatmap}). Including them shifts every $\overline{\mathrm{AUC}}$ down by $\sim\!0.027$ uniformly with no rank flips except TFA, which is already low.
+    \item \textbf{TFA at paper-faithful $B=32$.} TFA's $\overline{\mathrm{AUC}} = 0.764$ underperforms the locked set by $0.07$--$0.18$ AUC across the sweep; we attribute this to the small batch size required by the $(B, T, d_{\mathrm{SAE}})$-sized attention tensor at $d_{\mathrm{SAE}} = 18{,}432$. A fairer comparison at $B = 1024$ would require re-architecting the attention head and is left for follow-up.
+    \item \textbf{Single subject model.} The headline is on \texttt{Gemma-2-2B-IT} only; replication on the BASE side and on a different subject model is left for follow-up.
+\end{itemize}
+
+\section{Emergent Misalignment Case Study: Full Steering Grid}
+\label{app:c6}
+
+The two summary subfigures in \cref{fig:emergent_misalignment} collapse, for each architecture, the full Wang stage-4 $\alpha$ frontier into a single coherence-floored alignment dynamic range (\cref{fig:c6-em-alignment-delta}) and a single sparse-probe PR-AUC (\cref{fig:c6-em-detection-prauc}). \Cref{fig:c6-em-pareto-frontier} replots the same data as a coherence/alignment Pareto scatter (one curve per $(\text{architecture}, \text{seed})$, each curve following the top stage-4 finalist's full $\alpha$ frontier), making the dynamic range visible as the vertical extent of points to the right of the $\text{coh} = 70$ threshold. \Cref{fig:c6-em-steering-grid} shows the same data in unaggregated form: each panel is one $(\text{architecture}, \text{seed})$ cell on \texttt{Qwen-2.5-7B-Instruct} + bad-medical LoRA, with the mean alignment of all three Wang stage-4 finalists plotted against $\alpha$, the top-finalist mean coherence overlaid as a dashed line, and the $\alpha\!=\!0$ unsteered baseline marked in green. The shaded green band marks the $\mathrm{coh}\geq70$ region; red and blue triangles mark the extrema used in \cref{eq:delta-align}. The dense per-finalist $\alpha$ grid combines the 27-point Wang stage-4 grid (densely sampled in $|\alpha| \in [1, 10]$ with $\alpha = \pm 100$ at the tails) with the extended $|\alpha| \in \{110, 120, 130, 140, 150, 200\}$ sweep run on the top finalist of each cell. The dense extension is what reveals coherence-preserving alignment peaks at $|\alpha| > 10$ that Han's canonical grid missed (e.g.\ SAE-arditi seed~$1$, top finalist \texttt{feat 1119}, peaks at $\alpha = +40$ with align~$77.4$, coh~$> 70$). All judge transcripts (per-rollout completions and Anthropic Claude Haiku 4.5 align/coh scores) are persisted in \texttt{judge\_outputs.jsonl} (canonical) and \texttt{judge\_outputs\_extended.jsonl} (extension) for post-deadline $\kappa$ validation.
+
+\paragraph{Alignment dynamic range.}
+For each architecture/seed cell $c$, let $\mathcal A_c$ be the set of steering
+magnitudes whose judged coherence is at least $70$. We summarize steering
+control by the coherence-floored alignment range
+\begin{equation}
+    \begin{aligned}
+    \Delta\mathrm{align}(c)
+    & = \max_{\alpha\in\mathcal A_c}\mathrm{align}(c,\alpha)
+    - \min_{\alpha\in\mathcal A_c}\mathrm{align}(c,\alpha), \\
+    \mathcal A_c
+    & = \{\alpha:\mathrm{coh}(c,\alpha)\ge 70\}.
+    \end{aligned}
+    \label{eq:delta-align}
+\end{equation}
+This is the statistic plotted in \cref{fig:c6-em-alignment-delta}.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figs/c6_em_pareto_frontier_7bmed_topk_sae.pdf}
+    \caption{Coherence/alignment Pareto frontier for the \texttt{Qwen-7B} medical-misalignment cells. Each curve follows one architecture/seed across steering magnitudes; the vertical extent to the right of the $\mathrm{coh}=70$ threshold defines the dynamic range used in \cref{fig:c6-em-alignment-delta}.}
+    \label{fig:c6-em-pareto-frontier}
+\end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/c6_em_steering_grid_7bmed_topk_sae.pdf}
+    \caption{Full steering sweep for the \texttt{Qwen-7B} medical-misalignment cells. Panels show alignment across steering magnitudes, with coherence overlaid for the top finalist; extrema inside the $\mathrm{coh}\geq70$ region determine the summarized dynamic range.}
+    \label{fig:c6-em-steering-grid}
+\end{figure*}
+
+\subsection{Decoder-norm calibration ($1/\sqrt{T}$)}
+\label{app:c6-decoder-norm}
+
+When a TXC reconstructs $T$ positions from a single shared latent, each position-specific decoder row carries only a fraction of the per-position reconstructive mass that a per-token SAE decoder row carries; under the BatchTopK normalisation convention used in \cref{sec:txc} this leaves each TXC decoder row at $\ell_2$ norm $\approx 1/\sqrt{T}$ relative to the unit-norm convention of a per-token SAE decoder row. A magnitude $\alpha$ applied to a TXC mined direction therefore produces an effective residual-stream perturbation that is a factor of $1/\sqrt{T}$ smaller than the same $\alpha$ applied to a per-token SAE direction. To make the cross-architecture $\alpha$-grid comparable, we rescale the TXC's grid by $\sqrt{T}$, so that the same $\alpha$ corresponds to the same $\ell_2$-norm intervention across architectures.
+
+We confirm this empirically across the canonical c6 cells: the mean $\ell_2$-norm of mined TXC-base ($T = 5$) decoder rows is $0.443$, against the predicted $1/\sqrt{5} = 0.4472$; for TXC-pro ($T = 10$) the mean is $0.310$, against $1/\sqrt{10} = 0.3162$. Both match the prediction within $\sim 1.5\%$, justifying the $\sqrt{T}$ rescaling without per-cell calibration.
+
+\section{HH-RLHF Preference Decomposition: Full Details}
+\label{app:rlhf}
+\afterpage{
+\begin{figure*}[t]
+    \centering
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \autofig{rlhf_summary}
+        \caption{Top-$20$ feature classification and semantic-mass share.}
+        \label{fig:rlhf-summary-app}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \autofig{rlhf_scatter}
+        \caption{Preference-separation magnitude versus response-length correlation.}
+        \label{fig:rlhf-scatter-app}
+    \end{subfigure}
+    \caption{HH-RLHF preference decomposition for \texttt{Gemma-2-2B} layer~12. Features are ranked by $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ and classified by correlation with response-length difference.}
+    \label{fig:rlhf-app}
+\end{figure*}
+}
+\Cref{fig:rlhf-app} collapses the per-feature decomposition for each architecture into a top-20 tier-count panel and a semantic-mass-share panel. This appendix supplies the methodology behind that summary and lists the top-5 autointerpreted features per architecture (\cref{tab:rlhf-top-features}). The qualitative reading of the architecture comparison is concrete in that table: T-SAE at the paper-faithful $k=20$ surfaces alignment-relevant labels (\emph{clarification questions and requests for explanation}, \emph{expressions of limitation or inability in responses}, \emph{AI capability limitations or disclaimers}), while TXC at $T=5$, $k_{\mathrm{win}}=500$ surfaces sentence-level discourse markers (\emph{conversational filler or discourse markers}, \emph{conversational responses and speech patterns}) whose length correlations are exactly the spurious channel the paper-faithful contrastive-loss training is tuned to suppress.
+
+\subsection{Response masking and ranking metric}
+\label{app:rlhf-masking}
+
+For each \texttt{(chosen, rejected)} pair, we tokenise the two strings independently with \texttt{max\_length}$=256$ and identify the differing assistant response by a character-level longest common prefix between the two raw strings; we then map character offsets back to token indices via the tokenizer's offset map to produce a per-side \texttt{response\_mask} that selects only the differing-response tokens. Layer-$12$ residual-stream activations are captured under this mask, and per-feature means are taken across all valid response-token positions in the $1000$ pairs. Features are ranked by the signed metric $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$, matching \citet[\S4.5]{bhalla2025tsae}; negative values flag features that activate more strongly on \emph{chosen} responses, positive values on rejected. Tier classification thresholds $|r|<0.2$ (semantic) and $|r|\geq 0.5$ (length-spurious) follow the paper. Our absolute response-length means (rejected $36.23$, chosen $28.57$ tokens) are lower than the paper's reported $49.24$ and $37.84$ because of tokenizer and truncation differences across HH-RLHF dataset versions; the paired-$t$-test signal direction and significance ($p=9.76\times10^{-10}$) match the paper's $p\approx 9\times10^{-10}$ to leading digit.
+
+For each feature $j$, define its preference separation
+\[
+    \Delta\mu_j
+    =
+    \mu_{\mathrm{rejected},j}-\mu_{\mathrm{chosen},j},
+\]
+where means are taken over response-token positions only. We also compute the
+length correlation
+% \[
+%     \begin{aligned}
+%     r_j ={}& \mathrm{Corr}_{\text{pairs}}\Bigl( \\
+%         &\mathrm{act}_{\mathrm{rejected},j}
+%         - \mathrm{act}_{\mathrm{chosen},j}, \\
+%         &\ell_{\mathrm{rejected}}-\ell_{\mathrm{chosen}}
+%     \Bigr).
+%     \end{aligned}
+% \]
+\[
+r_j = \mathrm{Corr}_{\text{pairs}}\!\left(
+\mathrm{act}_{\mathrm{rejected},j}-\mathrm{act}_{\mathrm{chosen},j},
+\ell_{\mathrm{rejected}}-\ell_{\mathrm{chosen}}
+\right).
+\]
+Features are classified as semantic if $|r_j|<0.2$, mixed if
+$0.2\leq |r_j|<0.5$, and length-spurious if $|r_j|\geq0.5$. For a top-$K$
+set $\mathcal T_K$, the semantic-mass share is
+\[
+    \mathrm{SemMass}(\mathcal T_K)
+    =
+    \frac{\sum_{j\in\mathcal T_K:\, |r_j|<0.2} |\Delta\mu_j|}
+         {\sum_{j\in\mathcal T_K} |\Delta\mu_j|}.
+\]
+
+\begin{table*}[t]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c l}
+        \toprule
+        rank & $r$ & $\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}$ & autointerp label \\
+        \midrule
+        \multicolumn{4}{l}{\emph{TopK SAE (per-token, $k=500$)}} \\
+        $0$ & $+0.29$ & $+1.439$ & objects or entities being directly affected by actions \\
+        $1$ & $-0.05$ & $+0.830$ & physical objects or locations used in scenarios \\
+        $2$ & $-0.05$ & $-0.763$ & information or data items that are absent or unavailable \\
+        $3$ & $-0.17$ & $+0.680$ & illegal drugs and controlled substances \\
+        $4$ & $+0.09$ & $+0.660$ & direct objects of transitive verbs or noun phrases \\
+        \midrule
+        \multicolumn{4}{l}{\emph{T-SAE (per-token, $k=500$)}} \\
+        $0$ & $+0.29$ & $+1.468$ & pronouns and discourse connectives in explanatory contexts \\
+        $1$ & $-0.10$ & $-0.944$ & negation or negative polarity markers \\
+        $2$ & $-0.25$ & $-0.833$ & seeking confirmation or agreement on statements \\
+        $3$ & $-0.23$ & $-0.828$ & hedging language and softening expressions \\
+        $4$ & $-0.15$ & $-0.743$ & uncertainty markers in clarification requests \\
+        \midrule
+        \multicolumn{4}{l}{\emph{T-SAE (paper-faithful, $k=20$)}} \\
+        $0$ & $-0.16$ & $-0.759$ & clarification questions and requests for explanation \\
+        $1$ & $-0.22$ & $-0.716$ & clarification requests and confused responses \\
+        $2$ & $-0.41$ & $-0.695$ & expressions of limitation or inability in responses \\
+        $3$ & $+0.26$ & $+0.633$ & verb forms in instructional or procedural contexts \\
+        $4$ & $-0.04$ & $-0.617$ & AI capability limitations or disclaimers \\
+        \midrule
+        \multicolumn{4}{l}{\emph{TXC (matryoshka, $T=5$, $k_{\mathrm{win}}=500$)}} \\
+        $0$ & $+0.33$ & $+1.519$ & nouns denoting objects or entities being modified \\
+        $1$ & $-0.36$ & $-1.433$ & discourse markers indicating uncertainty or topic shifts \\
+        $2$ & $-0.25$ & $-1.327$ & clarification requests or seeking more information \\
+        $3$ & $-0.50$ & $-1.207$ & conversational filler or discourse markers \\
+        $4$ & $-0.53$ & $-1.172$ & conversational responses and speech patterns \\
+        \bottomrule
+    \end{tabular}
+    \caption{Top-$5$ features per architecture, ranked by $|\mu_{\mathrm{rejected}}-\mu_{\mathrm{chosen}}|$ on the $1000$-pair \texttt{harmless-base} cohort. Sign of the diff indicates the side the feature activates more strongly on (negative $\to$ chosen, positive $\to$ rejected). Length-Pearson $r$ classifies each feature as semantic ($|r|<0.2$), mixed, or length-spurious ($|r|\geq 0.5$). Autointerp labels are produced by Claude Haiku~$4.5$ (\cref{app:rlhf-autointerp}). }
+    \label{tab:rlhf-top-features}
+\end{table*}
+
+\subsection{Autointerpretation setup}
+\label{app:rlhf-autointerp}
+
+For each top-$K$ feature per architecture, we identify the $5$ max-activating positions across the cohort (restricted to response tokens, so the label captures the chosen-vs-rejected differential signal rather than generic prompt activations), decode a symmetric token window around each firing position with the firing token marked by \texttt{**double asterisks**}, and send the $5$ contexts in a single Bills-et-al-style \cite{bills2023language_autointerp} prompt to Claude Haiku~$4.5$ (\texttt{claude-haiku-4-5-20251001}, max output $80$ tokens, default sampling). The prompt asks for a single short concept label ($3$--$12$ words), no preamble, no markdown. We use Haiku rather than Sonnet because the task is descriptive labeling rather than judgment; the lower cost lets us label the full top-$50$ per architecture for $\sim\!\$0.25$ total. All call records, contexts, and labels are persisted to the per-architecture \texttt{top\_features.json} files referenced above.
+
+\section{Backtracking Case Study: Full Details}
+\label{app:c7}
+
+This appendix gives implementation details for \cref{sec:backtracking}.
+
+\subsection{Architectures and training configuration}
+\label{app:c7-archs}
+
+We compare six architectures trained on the same Llama-3.1-8B residual-stream activation cache at layer~$10$, with $d_{\text{SAE}} = 32{,}768$, $n_{\text{steps}} = 300{,}000$, and batch size $1024$: a per-token TopK SAE \cite{gao2024scaling}, the temporal SAE of \citet{bhalla2025tsae}, the temporal feature analyzer (TFA) of \citet{lubana2025priors}, a multi-layer crosscoder (MLC) \cite{lindsey2024sparsecrosscoders}, TXC-base ($T = 5$, $k_{\text{pos}} = 20$), and TXC-pro ($T_{\max} = 10$, $t_{\text{sample}} = 5$, $k_{\text{pos}} = 20$, eight Matryoshka groups, and contrastive shifts $\Delta \in \{1,2\}$). We also train TXC-base and TXC-pro at batch size $256$; these cells are reported in \cref{app:c7-bs-256}.
+
+\subsection{Reproduction setup}
+\label{app:c7-stage-a}
+
+We follow the dataset recipe of \citet{venhoff2025steering}, as reproduced in \citet[Appendix C]{ward2025reasoning}. The procedure has three steps: generate $300$ math prompts with Claude Sonnet~$3.7$, sample reasoning traces from DeepSeek-R1-Distill-Llama-8B, and label each sentence with an LLM judge. The prompts cover ten categories, with $30$ prompts per category: \texttt{basic\_logic}, \texttt{geometry}, \texttt{probability}, \texttt{arithmetic}, \texttt{counting}, \texttt{number\_theory}, \texttt{set\_theory}, \texttt{sequences}, \texttt{inequalities}, and \texttt{algebra\_word\_problems}. We use $280$ prompts for the \texttt{dom} split and hold out $20$ for \texttt{eval}. Following our inducement-evaluation pipeline, we use Claude Sonnet~$4.6$ rather than GPT-4o for sentence labels. Labels are binary, with field \texttt{is\_backtracking}.
+
+The steering vector is the difference-of-means direction for \texttt{is\_backtracking}, computed from base-model residual activations at layer~$10$. Activations are taken from token offsets $-13$ through $-8$ relative to the first token of each labeled backtracking sentence. We use the same layer, offset window, and base-model activation convention as \citet[Sec.~3.1, Appendix B.1]{ward2025reasoning}.
+
+\subsection{Cohort construction}
+\label{app:c7-cohort}
+
+The evaluation cohort contains $61$ MATH-500 questions \cite{hendrycks2021math}. It has two strata: $31$ questions where the unsteered model gives a parsable but incorrect boxed answer, and $30$ questions where it gives a parsable correct boxed answer. We drop questions with no boxed answer within the token budget, since both the inducement and answer-change metrics require a parsable continuation. Questions are drawn deterministically from a locked \texttt{flip\_matrix.parquet} file, so all architectures are evaluated on the same questions in the same order. Question identifiers use the MATH-500 \texttt{unique\_id} format, for example \texttt{test/algebra/1184.json}.
+
+\subsection{Magnitude grid}
+\label{app:c7-grid}
+
+We evaluate the $25$-point grid
+\[
+    \begin{aligned}
+    \mathcal{M} = \{&0, \pm0.5, \pm1, \pm2, \pm3, \pm4, \pm5, \pm6, \pm7, \\
+                    &\pm8, \pm10, \pm12, \pm16\}.
+    \end{aligned}
+\]
+The grid is denser between $\pm0.5$ and $\pm8$, where the inducement curves change most quickly, and coarser at larger magnitudes. The $m=0$ point is the no-intervention baseline used in \cref{eq:delta-gc}. \Cref{fig:c7-inducement-app} plots the per-architecture $\Delta gc(a, m)$ curves on this grid plus the extended follow-up at $m \in \{\pm24, \pm32\}$.
+
+\subsection{Inducement metric}
+\label{app:c7-delta-gc}
+
+For each architecture $a$, question $q$, and steering magnitude $m$, let
+$gc(a,q,m)$ be the Sonnet judge count of genuine backtracking events in the
+continuation. The main inducement statistic subtracts the shared unsteered
+cut-and-continue floor questionwise:
+\[
+    \Delta gc(a,m)
+    =
+    \frac{1}{|\mathcal Q|}
+    \sum_{q\in\mathcal Q}
+    \bigl(gc(a,q,m)-gc(a,q,0)\bigr),
+    \label{eq:delta-gc}
+\]
+where $\mathcal Q$ is the locked $61$-question MATH-500 cohort. Positive
+$\Delta gc$ means steering induces more genuine backtracking than the unsteered
+continuation protocol on the same questions.
+
+\begin{figure}[t]
+    \centering
+    \autofig{c7_delta_gc_vs_magnitude}
+    \caption{Per-architecture inducement curves $\Delta gc(a, m)$. Curves are per-question baseline-corrected at $m=0$; shaded bands are bootstrap $95\%$ CIs over the $61$ cohort questions.}
+    \label{fig:c7-inducement-app}
+\end{figure}
+
+\subsection{cut25 continuation protocol}
+\label{app:c7-cut25}
+
+For each question $q$, let $t_q^{\text{full}}$ be the token sequence of the unsteered reproduction. The prefix is the first $\lfloor 0.25 |t_q^{\text{full}}| \rfloor$ tokens. Conditioned on this prefix, the reasoning model samples a new continuation at temperature $1.0$ with a $1024$-token budget. During this continuation, the steering hook adds $m v_{\text{feat}}$ to the layer-$10$ residual stream at each generated position. Here $v_{\text{feat}}$ is the architecture-specific mined direction, rescaled to match the $\ell_2$ norm of the dom-base-union vector, and $m \in \mathcal{M}$.
+
+We use cut25 because a fixed proportional cut gives comparable continuations across questions of different lengths. Full-trace continuation gives little separation between architectures, since early tokens often restate the problem. Cutting at an LLM-judged sentence boundary adds a second judge-dependent step.
+
+\subsection{Sonnet judge prompt and reliability}
+\label{app:c7-judge}
+
+\begin{figure}[t]
+    \centering
+    \scriptsize
+    \setlength{\fboxsep}{2pt}
+
+    \begin{minipage}[t]{0.49\linewidth}
+        \fbox{\begin{minipage}[t][7em][t]{0.95\linewidth}
+            \textbf{Unsteered ($m{=}0$)} \hfill \textcolor{red!70!black}{\textbf{no boxed \texttimes}}\\[2pt]
+            {\itshape \ldots so $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check my steps.} $2.5^2 = 6.25$, $0.7^2 = 0.49$, $6.25 - 0.49 = 5.76$\ldots \textbf{Let me just verify each step once more}\ldots [continues looping]}
+        \end{minipage}}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.49\linewidth}
+        \fbox{\begin{minipage}[t][7em][t]{0.95\linewidth}
+            \textbf{TXC-pro ($bs{=}256$), $m{=}+12$} \hfill \textcolor{green!50!black}{\textbf{ans = 12 \checkmark}}\\[2pt]
+            {\itshape \ldots the entire fraction is $2.4 / 0.2 = 12$. \textbf{Wait, let me double-check that.} $0.2 \times 12 = 2.4$. \textbf{So, yes, that's correct.} \ldots $\boxed{12}$}
+        \end{minipage}}
+    \end{minipage}
+
+    \caption{Qualitative backtracking example on \texttt{test/prealgebra/951.json}. The unsteered continuation derives the right value but loops without committing; TXC-pro steering produces one decisive verification step and emits the correct boxed answer.}
+    \label{fig:c7-headline-text-app}
+\end{figure}
+
+For each $(\text{architecture}, \text{question}, \text{magnitude})$ tuple, the inducement metric uses a judge count $gc(a,q,m)$ of genuine backtracking events in the sampled continuation. The rubric counts cases where the model identifies a problem in its reasoning and changes course, such as correcting arithmetic, noticing a missing constraint, abandoning an approach, or revising a wrong assumption. It does not count filler uses of ``wait,'' restatements, repeated text, loops, or degeneration.
+
+The judge is Claude Sonnet~$4.6$ (\texttt{claude-sonnet-4-6}, max output $200$ tokens, default sampling temperature). The prompt is:
+
+\begin{quote}\small\ttfamily
+You are evaluating a math problem-solving generation for genuine backtracking behavior.
+
+Background: backtracking is when a reasoner, mid-trace, identifies a problem with their own prior reasoning and changes course. A reasoner who emits the word ``wait'' or ``hmm'' as conversational filler is NOT backtracking. A reasoner who says ``wait, no, actually...'' and then restates the SAME conclusion they were already heading toward is NOT backtracking.
+
+Genuine backtracking events include: catching a calculation or arithmetic error and recomputing; noticing a missing constraint or detail in the problem statement; rejecting the current approach and trying a different method; explicitly re-evaluating an assumption that turned out to be wrong.
+
+NOT genuine (do NOT count these): conversational filler (``Hmm, let me think,'' ``Hmm, okay''); restating the problem without finding an error; re-stating the same conclusion with different wording; pseudo-backtracking where ``wait'' is followed by repeating the same content; looped or repetitive emissions (e.g., ``Wait, I'm not. Wait, I'm not.''); gibberish, single-token loops, or non-English degeneration.
+
+Problem prompt the model was solving: \{prompt\_text\}
+
+Model's generation: ``\{generation\}''
+
+Count the number of GENUINE backtracking events in this generation. Reply with EXACTLY this format on two lines:
+
+COUNT: <integer>
+
+NOTES: <one short sentence explaining your count>
+\end{quote}
+
+Each continuation produces one judge call. We persist all calls to a per-cell \texttt{judge\_outputs.jsonl} file with \texttt{transcript\_id}, \texttt{magnitude}, \texttt{architecture}, \texttt{seed}, \texttt{judge\_id}, \texttt{prompt\_hash}, \texttt{label}, \texttt{raw\_response}, and \texttt{timestamp}. This makes later inter-rater checks possible without re-running the model generations. Prior internal checks on a $20$-transcript blind human-annotated sample gave $\kappa=0.749$ for sentence-level coherence, $\kappa=0.773$ for genuine-backtracking detection, and $\kappa=1.000$ for looping detection, with raw agreements $0.85$, $0.95$, and $1.00$.
+
+% If the locked-cell validation finishes before camera-ready, we report it in \cref{app:c7-fresh-kappa}; otherwise we describe the metric as judge-derived and prior-validated.
+
+\subsection{Token-count budget and convergence probe}
+\label{app:c7-token-budget}
+
+Each main cell trains for $300{,}000$ steps at batch size $1024$. With window length $T=5$, this is about $1.5$B token-positions. This is within the training-token range used by TFA \cite{lubana2025priors}, T-SAE \cite{bhalla2025tsae}, and GemmaScope \cite{lieberum2024gemmascope}, and is about $15\times$ larger than the $20{,}000$-step sprint runs used during protocol development.
+
+We log held-out NMSE, $\ell_0$ density, and dead-feature count every $100$ steps on a separate seed stream. These probe batches do not overlap with training minibatches. \Cref{fig:c7-probe-curves} shows the resulting curves.
+
+\begin{figure}[t]
+    \centering
+    \autofig{c7_probe_curves_combined}
+    \caption{Held-out probe metrics over training for each cell at seed $42$: NMSE, $\ell_0$ density, and dead-feature count out of $d_{\text{SAE}}=32{,}768$. The $y$-axes are log-scaled.}
+    \label{fig:c7-probe-curves}
+\end{figure}
+
+By step $200{,}000$, NMSE has plateaued for all cells. The relative change from step $200\mathrm{K}$ to step $300\mathrm{K}$ is below $2.5\%$ in every cell and below $0.5\%$ in five of seven cells. The $\ell_0$ density reaches its target within the first $1\mathrm{K}$ steps and remains fixed thereafter. Dead-feature counts continue to decrease slowly, with typical changes over the final $100\mathrm{K}$ steps below $1\%$ of $d_{\text{SAE}}$. Thus the reconstruction metric is not sensitive to extending the run past $300\mathrm{K}$ steps, although longer runs may revive additional low-use features.
+
+\subsection{PR-AUC methodology and full table}
+\label{app:c7-pr-auc-full}
+
+Following \citet{kantamneni2025probing}, we test whether each architecture supports a sparse linear probe for the sentence-level label ``does this sentence begin a backtracking event?'' Labels are taken from the original reproduction traces. We capture base-model residual activations at layer~$10$ using a six-token window with offsets $-13$ through $-8$ relative to the first token of each sentence. Architectures with smaller windows use the trailing $T_{\text{arch}}$ positions of this window. Architectures with $T_{\text{arch}}>6$ are excluded from this protocol. We encode each $(\text{sentence}, T \times d_{\text{in}})$ tensor and max-pool absolute feature activations over positions to obtain one $d_{\text{SAE}}$ vector per sentence.
+
+Feature selection is done inside each fold. On the train split only, we compute $|\mu_{\text{pos}} - \mu_{\text{neg}}|$ for every feature and keep the top $S$. The probe is $\ell_1$-regularized logistic regression on those selected features, with $C=1$, scikit-learn's \texttt{liblinear} solver, \texttt{max\_iter}=2000, and random seed $42$. We report the mean over five GroupKFold splits by question.
+
+We use PR-AUC as the main detection metric because the positive class rate is about $12\%$. ROC-AUC is also reported for comparison with earlier exploratory runs.
+
+\begin{table*}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{l c c c c c c c c c c c c}
+            \toprule
+            & \multicolumn{6}{c}{PR-AUC} & \multicolumn{6}{c}{ROC-AUC} \\
+            \cmidrule(lr){2-7} \cmidrule(lr){8-13}
+            Architecture & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ & $S\!=\!1$ & $S\!=\!2$ & $S\!=\!4$ & $S\!=\!8$ & $S\!=\!16$ & $S\!=\!32$ \\
+            \midrule
+            TopK SAE ($bs{=}1024$) & 0.130 & 0.132 & 0.137 & 0.175 & 0.196 & 0.229 & 0.507 & 0.508 & 0.518 & 0.566 & 0.589 & 0.626 \\
+            T-SAE ($bs{=}1024$) & 0.158 & 0.164 & 0.169 & 0.196 & 0.213 & 0.245 & 0.591 & 0.603 & 0.617 & 0.640 & 0.655 & 0.683 \\
+            MLC ($bs{=}1024$) & 0.128 & 0.147 & 0.165 & 0.176 & 0.213 & 0.242 & 0.509 & 0.561 & 0.582 & 0.599 & 0.648 & 0.682 \\
+            TXC-base ($bs{=}256$) & 0.166 & 0.167 & 0.182 & 0.226 & 0.254 & 0.269 & 0.604 & 0.604 & 0.625 & 0.666 & 0.685 & 0.696 \\
+            TXC-base ($bs{=}1024$) & 0.143 & 0.168 & 0.177 & 0.201 & 0.217 & 0.250 & 0.536 & 0.593 & 0.609 & 0.628 & 0.647 & 0.679 \\
+            TXC-pro ($bs{=}256$) & 0.161 & 0.181 & 0.231 & 0.242 & 0.258 & 0.266 & 0.601 & 0.635 & 0.681 & 0.688 & 0.697 & 0.708 \\
+            TXC-pro ($bs{=}1024$) & 0.162 & 0.168 & 0.176 & 0.222 & 0.242 & 0.267 & 0.595 & 0.604 & 0.618 & 0.665 & 0.681 & 0.707 \\
+            \bottomrule
+        \end{tabular}%
+    }
+    \caption{Sparse-probe PR-AUC and ROC-AUC for backtracking-sentence detection. We use five GroupKFold splits by question and $\ell_1$-regularized logistic regression with $C=1$. Entries are fold means. PR-AUC is the main metric; chance is the positive-class prior, approximately $0.12$.}
+    \label{tab:c7-pr-auc}
+\end{table*}
+
+\subsection{Steering variants}
+\label{app:c7-steering-variants}
+
+The main inducement results in \cref{fig:c7-gc-at-peak-bar} use a uniform per-position write: at every generated position, we add $m v_{\text{feat}}$ to the layer-$10$ residual stream, where $v_{\text{feat}}$ is the mined feature's mean decoder direction across the window. We call this V0. Pilot variants included position-cycled writes over decoder slabs (V1), trailing-window broadcast writes (V2), and an encoder-pre-image least-squares write (V4). We use V0 here to avoid coupling the evaluation protocol to a specific temporal architecture.
+
+\subsection{Magnitude-axis convention}
+\label{app:c7-magnitude-axis}
+
+The sign of a mined feature direction is arbitrary. We therefore report curves using the raw mined sign for each architecture rather than flipping signs so that all peaks occur at $m>0$.
+
+The raw-sign peak magnitudes are: TopK SAE at $m=-16$, T-SAE at $m=+7$, MLC at $m=+16$, TXC-base at $m=-12$ for both batch sizes, TXC-pro at $m=+12$ for $bs=256$, and TXC-pro at $m=+16$ for $bs=1024$. The two TXC-base cells match in both sign and magnitude. The two cells that peak at the grid edge, MLC and TXC-pro $bs=1024$, were also evaluated at $m \in \{\pm24, \pm32\}$; in both cases $\Delta gc$ drops beyond $|m|=16$. Thus the observed peaks are not artifacts of truncating the grid at $16$.
+
+\subsection{Multi-seed replication}
+\label{app:c7-seeds}
+
+All main numbers in \cref{fig:c7-headline} and \cref{tab:c7-pr-auc} use training seed $42$. Multi-seed replication is left for camera-ready or follow-up work. Since all judge outputs are persisted, new seeds require new model generations and judge calls only for those new transcripts.
+
+\subsection{TXC at batch size 256}
+\label{app:c7-bs-256}
+
+TXC-base and TXC-pro are also trained at batch size $256$ for $300{,}000$ steps. This isolates the batch-size change from the architecture change.
+
+Peak $\Delta gc$ values are $0.230$ for TXC-base $bs=256$, $0.541$ for TXC-base $bs=1024$, $0.377$ for TXC-pro $bs=256$, and $0.475$ for TXC-pro $bs=1024$. The corresponding raw-sign peak magnitudes are $-12$, $-12$, $+12$, and $+16$. At $S=8$, PR-AUC values are $0.226$, $0.201$, $0.242$, and $0.222$.
+
+The TXC-base peak magnitude is unchanged across batch sizes, while peak $\Delta gc$ increases from $0.230$ to $0.541$. For TXC-pro, the peak moves from $+12$ to $+16$ and the lift increases from $0.377$ to $0.475$. Detection behaves differently: the smaller batch gives higher $S=8$ PR-AUC for both TXC-base and TXC-pro. These results do not show a single monotone effect of batch size across metrics.
+
+\subsection{Optimal-magnitude rescue analysis}
+\label{app:c7-optimal-mag}
+
+For each architecture $a$, we evaluate two magnitudes: $m=0$ and $m=m^*_a$, where $m^*_a$ is the peak-$\Delta gc$ magnitude from the canonical grid. At each magnitude, we save generations and run two Sonnet~$4.6$ judge passes: one for genuine-backtracking count and one for coherence on a $0$ to $3$ scale. We define \texttt{coherent} as coherence grade at least $2$, and \texttt{backtracking} as judge count at least $1$.
+
+\begin{table*}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c c c c c c c c}
+        \toprule
+        Architecture & $bs$ & $m^*_a$ & rescues@$m^*$ & regr.@$m^*$ & rescues@$0$ & regr.@$0$ & $\Delta_{\text{net}}$@$m^*$ & $\Delta_{\text{net}}$@$0$ & $\boldsymbol{\Delta_{\text{net}}^{\text{corr}}}$ \\
+        \midrule
+        TXC-base & 256 & $-12$ & 1 & 16 & 0 & 7 & $-15$ & $-7$ & $\mathbf{-8}$ \\
+        TXC-base & 1024 & $-12$ & 1 & 15 & 0 & 7 & $-14$ & $-7$ & $\mathbf{-7}$ \\
+        TXC-pro & 256 & $+12$ & 6 & 7 & 0 & 7 & $-1$ & $-7$ & $\mathbf{+6}$ \\
+        TXC-pro & 1024 & $+16$ & 0 & 18 & 0 & 7 & $-18$ & $-7$ & $\mathbf{-11}$ \\
+        TopK SAE & 1024 & $-16$ & 1 & 14 & 0 & 7 & $-13$ & $-7$ & $\mathbf{-6}$ \\
+        T-SAE & 1024 & $+7$ & 3 & 7 & 0 & 7 & $-4$ & $-7$ & $\mathbf{+3}$ \\
+        MLC & 1024 & $+16$ & 0 & 13 & 0 & 7 & $-13$ & $-7$ & $\mathbf{-6}$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Rescue and regression counts at each cell's optimal magnitude $m^*_a$ and at $m=0$. A rescue is a question where the unsteered cut-and-continue baseline is wrong but the steered continuation is correct. A regression is the reverse. The corrected statistic subtracts the $m=0$ cut-and-continue noise floor. Cohort size $n=61$.}
+    \label{tab:c7-net-saves}
+\end{table*}
+
+\begin{table*}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c c c c c c c}
+        \toprule
+        Architecture & $bs$ & $m^*_a$ & coh+bt & coh+no-bt & inc+bt & inc+no-bt & missing & $n$ \\
+        \midrule
+        TXC-base & 256 & $-12$ & 22 & 17 & 17 & 5 & 0 & 61 \\
+        TXC-base & 1024 & $-12$ & 30 & 17 & 11 & 3 & 0 & 61 \\
+        TXC-pro & 256 & $+12$ & 28 & 28 & 3 & 2 & 0 & 61 \\
+        TXC-pro & 1024 & $+16$ & 10 & 1 & 44 & 6 & 0 & 61 \\
+        TopK SAE & 1024 & $-16$ & 26 & 20 & 11 & 3 & 1 & 61 \\
+        T-SAE & 1024 & $+7$ & 29 & 31 & 0 & 1 & 0 & 61 \\
+        MLC & 1024 & $+16$ & 28 & 24 & 6 & 3 & 0 & 61 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Coherence and backtracking contingency at each cell's optimal magnitude $m^*_a$. Coherent means Sonnet~$4.6$ coherence grade at least $2$ on a $0$ to $3$ rubric. Backtracking means judge count at least $1$.}
+    \label{tab:c7-contingency}
+\end{table*}
+
+\begin{figure}[t]
+    \centering
+    \autofig{c7_net_saves_bar}
+    \caption{Baseline-corrected net rescue lift $\Delta_{\text{net}}^{\text{corr}}$ from \cref{tab:c7-net-saves}. Positive values indicate more rescues than regressions after subtracting the $m=0$ cut-and-continue baseline.}
+    \label{fig:c7-net-saves}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \autofig{c7_contingency_stacked}
+    \caption{Coherence and backtracking contingency from \cref{tab:c7-contingency}. The \texttt{coh+bt} segment counts coherent generations with induced backtracking. The \texttt{inc+bt} segment counts generations where backtracking is detected but the surrounding continuation is incoherent.}
+    \label{fig:c7-contingency}
+\end{figure}
+
+
+
+\subsection{Reference numbers from prior architectures}
+\label{app:c7-reference}
+
+For context, we also record two prior exploratory TXC variants that are not part of the locked architecture set. A TXC variant with $k=16$ active features per position and $T=6$ reaches peak $\Delta gc=+1.574$ at $m=-12$ on the same cohort and protocol. A Matryoshka-8 TXC variant with $k=16$ per position reaches peak $\Delta gc=+0.492$ at $m=+12$. These variants differ in sparsity and position resolution, so we treat them as context rather than direct comparisons.
+
+% =====================================================================
+% Appendix — Qualitative analysis: methodology and formulas
+% Resolves every "[see Appendix...]" / "[define it]" / "(See Appendix)"
+% callout in §Qualitative analysis of features in large scale models.
+% =====================================================================
+\section{Qualitative Analysis of Large Model Features}
+\label{app:meta-autointerp}
+
+This appendix gives a qualitative view of what TXC features look like in a trained language model. We analyze a $T=5$ TXC trained on the \texttt{gemma-2-2b-it} block~13 post-residual stream. Because TXC uses full-rank cross-position encoder and decoder weights, a single feature can aggregate information from all $T$ positions and contribute reconstructive mass to any position in the window. We therefore ask whether the learned features look token-local, as in a conventional SAE, or whether they often track multi-token spans.
+
+We autointerpret active TXC features by running the trained dictionary over $1{,}500$ 32-token chains from FineWeb, retaining every feature with at least three top-window examples. This yields $5{,}033$ retained features. For each feature, we elicit a single-sentence concept explanation with Claude Haiku~$4.5$, embed explanations with \texttt{sentence-transformers/all-MiniLM-L6-v2}, project them to 2D with UMAP, and cluster them with HDBSCAN. We also visualize one 32-token chain by selecting one feature per position using an exclusive score that rewards features whose activation mass is concentrated at that token.
+
+\Cref{fig:txc_umap-app} shows that the explanation embedding contains weakly separated clusters spanning both entity-like and discourse-level concepts. The cluster inventory includes concrete entity types such as tickers, acronyms, dates, and sports headlines, as well as discourse-level abstractions such as news article datelines, blogging platforms, biblical chapter/verse references, and taxonomic binomial nomenclature. The global silhouette score is low ($+0.01$), so we treat these clusters as a qualitative inventory rather than sharply separated semantic islands.
+
+\Cref{fig:sentence-app} shows that selected TXC features often appear as $\geq T$-token diagonal bands, tracking short concept spans rather than isolated tokens. Together, the UMAP inventory and per-sentence activation map suggest that the window-shared parameterization surfaces features whose support is distributed across multiple positions.
+
+The rest of this appendix gives the precise definitions behind these plots: the top-window surfacing procedure, the explanation prompt, the MiniLM $\to$ UMAP $\to$ HDBSCAN pipeline, the cluster-quality metrics, and the exclusive-score selection rule.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth,height=0.23\textheight,keepaspectratio]{figs/umap_txc.png}
+    \caption{\textbf{UMAP of TXC feature explanations} for a \texttt{gemma-2-2b-it} block~13 TXC. Autointerpreted features form weakly separated clusters spanning both entity-like and discourse-level concepts.}
+    \label{fig:txc_umap-app}
+\end{figure}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/sentence_mid_res_k100_T5_chain12345_exclusive.png}
+    \caption{\textbf{Per-token TXC activations on a single $32$-token chain.} Each row is the feature that activates most exclusively at one position. Diagonal bands show that TXC features often claim coherent multi-token spans rather than isolated tokens.}
+    \label{fig:sentence-app}
+\end{figure*}
+
+\subsection{Feature surfacing: top-$k$ activating windows}
+\label{app:meta-topk}
+The TXC of \cref{sec:txc} is trained for $3{,}000$ steps at batch $1{,}024$ with Adam ($\eta{=}3\!\times\!10^{-4}$) on a cached \texttt{gemma-2-2b-it} block-13 post-residual stream, and reaches a final FVU of $0.085$. We then run the trained dictionary over a uniformly sampled $N_{\text{chains}}{=}1{,}500$ subset of the activation cache (each chain is a fixed-length token sequence) and, for every feature index $j\in\{1,\ldots,d_{\text{sae}}\}$, retain a min-heap of the $N_{\text{ex}}{=}12$ window starts with the largest pre-TopK activation $u_{j}(c, s)$, where $c$ is a chain index and $s\in\{0,\ldots,L{-}T\}$ a window start within that chain. After the scan,
+\begin{equation}
+    \begin{aligned}
+    \mathcal{W}_j \;=\; \mathrm{argtop}_{N_{\text{ex}}}\,\bigl\{\,u_j(c, s)\,\bigm|\,
+    &c\in\mathrm{Sample}(N_{\text{chains}}), \\
+    &s=0,\ldots,L-T\,\bigr\}.
+    \end{aligned}
+\end{equation}
+A feature $j$ is retained for autointerp iff $|\mathcal{W}_j|\geq N_{\min}=3$, yielding $|\mathcal{F}|=5{,}033$ retained features. Each retained window is decoded back to text via the Gemma tokenizer (special tokens such as \texttt{<bos>}, \texttt{<start\_of\_turn>}, \texttt{<end\_of\_turn>} rendered literally) and the activating span is wrapped in \texttt{[FOCUS]\ldots[/FOCUS]} markers with $C{=}10$ tokens of context on either side.
+
+\subsection{Single-feature explanation prompt}
+\label{app:meta-prompt}
+For each surfaced feature $j$, the $N_{\text{ex}}=12$ activating windows are formatted as a single user message and sent to \texttt{claude-haiku-4-5-20251001} \citep{haiku} with concurrency $1$ and SDK retry-after backoff. The system prompt (verbatim):
+
+\begin{quote}\small\ttfamily
+You are a meticulous AI researcher analyzing patterns in neural network features. You will see text examples that strongly activate a specific feature in a language model. Identify the concept, pattern, or topic this feature represents.
+
+The activating window in each example is wrapped in [FOCUS]\ldots[/FOCUS] tags. These tags are inserted by us to mark the span --- they are NOT part of the underlying text. Do NOT describe the tags themselves, the brackets, or the word `focus'; describe only the actual tokens between the tags and how they relate to the surrounding context.
+
+Guidelines:
+- Focus on the COMMON pattern across examples, not one-off details.
+- 1--2 short sentences only.
+- Describe in linguistic / semantic terms, not numerics.
+- Never mention [FOCUS], [/FOCUS], `>{>>}', `{<<}<', or `markers' in your output.
+
+After your explanation, on a new line emit a SAFETY tag:
+[SAFETY]: REFUSAL | DECEPTION | HARMFUL\_CONTENT | BIAS | NONE
+\ldots
+
+Format strictly:
+[EXPLANATION]: <one sentence>
+[SAFETY]: <tag>
+\end{quote}
+
+The user message lists the $N_{\text{ex}}$ examples ordered by activation, each prefixed with \texttt{Example $i$ (act=$a_i$):} where $a_i = u_j(c_i, s_i)/\max_{i'} u_j(c_{i'}, s_{i'})$, truncated at $280$ characters. We parse the \texttt{[EXPLANATION]} line into $\text{explanation}_j$; empty parses fall back to the first $240$ characters of the raw output.
+
+\subsection{Cluster discovery: MiniLM $\to$ UMAP $\to$ HDBSCAN}
+\label{app:meta-cluster}
+Let $e_j\in\mathbb{R}^{384}$ be the $\ell_2$-normalized embedding of $\text{explanation}_j$ under \texttt{sentence-transformers/all-MiniLM-L6-v2}.
+
+\paragraph{UMAP.} 2D projection $\phi_j = \mathrm{UMAP}(e_j) \in \mathbb{R}^2$ with hyperparameters $n_{\text{neighbors}}{=}10$, $\min_{\text{dist}}{=}0.1$, metric $=$ cosine, seed $=$ 0.
+
+\paragraph{HDBSCAN.} Cluster labels $\ell_j = \mathrm{HDBSCAN}(\{\phi_j\}_{j\in\mathcal{F}})$ with $\min_{\text{cluster\_size}}{=}4$, $\min_{\text{samples}}{=}2$, cluster-selection $\epsilon = 0.4$. Points with $\ell_j = -1$ are reported as noise. The pipeline yields $k{=}15$ clusters and a noise fraction below $2\%$, summarised in \cref{fig:txc_umap-app}.
+
+\subsection{Lexical cluster labeling}
+\label{app:meta-label}
+Cluster labels in the legend of \cref{fig:txc_umap-app} are produced by a cheap TF-IDF-style score over content tokens. Let $\mathrm{toks}(s)$ extract lower-cased alphabetic tokens of length $\geq 4$ from explanation $s$ after removing a small stop-list (determiners, function words, autointerp boilerplate such as \texttt{feature}, \texttt{features}, \texttt{describes}, \texttt{represent}, \texttt{relates}). For each cluster $c$ and token $w$:
+\begin{equation}
+    \begin{aligned}
+    \mathrm{tf}_c(w) &= \sum_{j:\ell_j=c} \mathbbm{1}\!\bigl[w \in \mathrm{toks}(\text{explanation}_j)\bigr], \\
+    \mathrm{df}(w)   &= \sum_{c} \mathbbm{1}\!\bigl[\mathrm{tf}_c(w) > 0\bigr],
+    \end{aligned}
+\end{equation}
+\begin{equation}
+    \mathrm{score}_c(w) = \mathrm{tf}_c(w)\,\Bigl(1 + \log\tfrac{n_{\text{cl}}}{\max(\mathrm{df}(w),\,1)}\Bigr),
+\end{equation}
+where $n_{\text{cl}}$ is the number of clusters. The label for cluster $c$ is the top-$4$ tokens by $\mathrm{score}_c(\cdot)$.
+
+\subsection{Cluster-quality metrics}
+\label{app:meta-metrics}
+We report three metrics. Let $E_c = \{e_j : \ell_j = c\}$ be the set of MiniLM embeddings in cluster $c$, with $n_c = |E_c|$.
+
+\paragraph{Silhouette.} Standard sklearn silhouette in the 2D UMAP space, restricted to non-noise points: $+0.01$. A near-zero silhouette indicates clusters that are well-separated on the embedding plane but not internally tight, consistent with the wide-but-distinct clusters of \cref{fig:txc_umap-app}.
+
+\paragraph{Mean intra-cluster cohesion.} Mean intra-cluster cosine similarity in MiniLM space, averaged over non-singleton clusters:
+\begin{equation}
+    \begin{aligned}
+    \rho_c &= \frac{1}{n_c(n_c-1)} \sum_{j, j' \in E_c,\, j\neq j'} \langle e_j,\, e_{j'}\rangle, \\
+    \bar{\rho} &= \frac{1}{|\{c: n_c > 1\}|}\sum_{c:\,n_c>1}\rho_c \;=\; 0.63.
+    \end{aligned}
+\end{equation}
+
+\paragraph{Temporal-vocabulary fraction.}
+We define a temporal-vocabulary heuristic as the fraction of individual feature
+explanations matching a fixed case-insensitive regex for sequence/position cues:
+\begin{small}
+\[
+\begin{aligned}
+R ={}& \texttt{\textbackslash b(sequenc|consecut|context|}\\
+     & \texttt{preced|follow|temporal|window|position|}\\
+     & \texttt{previous|next|order)\textbackslash w*}.
+\end{aligned}
+\]
+\end{small}
+For the multiset $S$ of feature explanations,
+\[
+    \mathrm{temporal}
+    =
+    \frac{1}{|S|}\sum_{s\in S}\mathbbm{1}[R \text{ matches } s]
+    =
+    0.68.
+\]
+Rescaling to $[0,10]$ gives the $6.80$ score reported in the body. This is a regex heuristic over explanations, not a separate LLM judge.
+
+\subsection{Per-sentence selection: the exclusive score}
+\label{app:meta-exclusive}
+For the per-sentence activation map of \cref{fig:sentence-app}, we fix a $32$-token chain and a window length $T{=}5$, then compute a $32 \times d_{\text{sae}}$ activation matrix $A\in\mathbb{R}_{\geq 0}^{L\times d_{\text{sae}}}$ ($L{=}32$) by sliding the $T$-window across the chain and recording the per-position decoder contribution of each feature.
+
+We then assign \emph{one} feature to each token position via the \textbf{exclusive score}, which rewards features whose total activation mass is concentrated at $p$:
+\begin{equation}
+    \mathrm{score}[p, j] \;=\; \frac{A_{p, j}^2}{\varepsilon + \sum_{p'=1}^{L} A_{p', j}}.
+    \label{eq:exclusive-score}
+\end{equation}
+The numerator's square forces a feature to actually fire strongly at $p$ (not just rarely elsewhere); the denominator penalises features that fire broadly across the chain. With $\varepsilon=10^{-8}$, assignment is greedy (\cref{alg:exclusive}): positions are processed in descending order of their best per-position score, and each feature can be claimed by at most one position, so the strongest position-feature pairs win first. The result is exactly $L{=}32$ features, each fingerprinted to a single token position. The alternative \emph{magnitude} selection (top-$L$ features by $\sum_p A_{p,j}$, no exclusivity constraint) lets a single high-firing feature dominate multiple positions and obscures the diagonal-band geometry; we use it only for sanity checks.
+
+\begin{algorithm}[H]
+\caption{\textsc{ExclusiveSelect}: per-position feature assignment.}
+\label{alg:exclusive}
+\small
+\begin{algorithmic}[1]
+\REQUIRE activation matrix $A\in\mathbb{R}_{\geq 0}^{L\times d_{\text{sae}}}$
+\ENSURE  selection $\mathrm{sel}\in\{1,\ldots,d_{\text{sae}}\}^L$ with all entries distinct
+\STATE $\mathrm{score}[p,j] \gets A_{p,j}^2 \,\big/\, \bigl(\varepsilon + \sum_{p'} A_{p',j}\bigr)$
+\STATE $\mathrm{best}[p] \gets \max_j \mathrm{score}[p, j]$ for each $p$
+\STATE $\pi \gets \arg\!\mathrm{sort}_{\,\mathrm{best},\,\downarrow}\bigl(\{1,\ldots,L\}\bigr)$
+\STATE $\mathrm{used} \gets \emptyset$;\ \ $\mathrm{sel}[p] \gets -1$ for all $p$
+\FOR{$p \in \pi$}
+    \FOR{$j$ in features sorted by $\mathrm{score}[p,j]$ descending}
+        \IF{$j \notin \mathrm{used}$}
+            \STATE $\mathrm{sel}[p] \gets j$;\ \ $\mathrm{used} \gets \mathrm{used} \cup \{j\}$;\ \ \textbf{break}
+        \ENDIF
+    \ENDFOR
+\ENDFOR
+\STATE \textbf{return} $\mathrm{sel}$
+\end{algorithmic}
+\end{algorithm}
