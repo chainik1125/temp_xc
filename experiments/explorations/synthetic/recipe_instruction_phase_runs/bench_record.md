@@ -80,3 +80,32 @@ validated (the ACF(4) plateau rides on it).
 *Recorded by `runpod`, stage-6 session 2026-07-22 (briefing
 `stage6-recipe-then-c5.md` Phase 1). Gate thresholds were preregistered in
 `gating.py` before the first run; nothing was tuned after seeing a metric.*
+
+## Self-audit vs the README checklist + validity gates (Phase 3, same session)
+
+Audited against README § "Validity gates" / § "Required output artifact"
+without re-running anything:
+
+- **Equality-variant discriminability gate — followed as adopted** (C4
+  review wording): (i) both raw-LINEAR readouts checked → NOT at chance →
+  regime-2 leak → recorded + STOPPED before any grid, no engineering around
+  it; (ii) presence verified (MLP → 1.0). Ground-truth hygiene clean
+  (F = 20, 5 + 15, never conflated); real-side controls inherited from the
+  C4 calibration record (pinned corpus, N1/N2/N3, ε̂, held-out gate-8).
+  Memorization-budget / untrained-encoder / realistic-regime /
+  capability-vs-artifact gates are grid-stage gates — N/A, no grid ran.
+  Required-artifact fields present except the architecture frontier
+  (deliberately absent — withheld by the STOP).
+- **Gap (honest):** the gate thresholds in `gating.py` were written before
+  the first run *within the session*, but the script and its results were
+  committed TOGETHER (`b463c4a0`) — unlike the C5 card amendment (frozen in
+  `f8c1deb6` strictly before the calibration commit), there is no
+  commit-order evidence of threshold preregistration. Future § 8 gating
+  scripts should be committed before their first execution.
+- **Gap (minor):** the nonlinear presence check ran only at T=2 (noiseless
+  + noisy); T ≥ 4 presence is argued (pair in-tile ⇒ exact), not measured.
+  The noisy substrate was a single σ = 0.5 point, not a sweep.
+- **Note for any re-scoped run:** the § 5 falsifier's "raw-access line" must
+  reference the threshold-optimized CEILING (0.614 per-token / 0.720
+  window), not the plain-probe numbers (0.595/0.619) — a plain probe can sit
+  at balacc 0.5 under class imbalance while real access exists.
