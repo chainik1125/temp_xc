@@ -313,6 +313,62 @@ datasources:
       explorations/synthetic/recipe_instruction_phase_runs/bench_spec.md
       (frozen; C4 re-freeze amendment 2026-07-22).
 
+  toy_multilane_circle_M101_d24:
+    category: synthetic
+    generator: multilane_tones
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      n_lanes: 3
+      d_in: 24
+      sigma: 0.25
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-2 multilane superposition (theorem-first; frozen card
+      freqbench/cards/FB-2.md). 3 independent circle tones in mutually
+      orthogonal 2-planes (one Haar isometry P), each lane with hidden
+      velocity Y_k ~ Unif(Omega) and phase B_k ~ Unif(Z_M); x_t = sum_k
+      [cos,sin]theta_k . P_k + sigma eps. Per-lane ML oracle = periodogram on
+      the lane plane (orthogonal planes => exact lane separation, P5);
+      per-token info provably zero per lane (P1); additive-over-time readouts
+      mean-degenerate (P2). Memorization dead by construction: |Omega|^3 M^3
+      ~ 1.03e9 whole-window templates >> any d_sae in the sweep (P6-immune).
+      Capacity anchors on the per-lane alphabet M=101 (frequency precedent;
+      strict direction count = 6 plane axes, exposed as lane_planes).
+      Primary metric: multilane_recovery (mean per-lane normalized logistic
+      probe, add-on dispatched on extra['lane_velocity_labels']).
+
+  toy_colored_sources_N32_D2_d32:
+    category: synthetic
+    generator: colored_sources
+    params:
+      N: 32
+      d_in: 32
+      D: 2
+      sigma: 0.1
+      rho_min: 0.1
+      rho_max: 0.9
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-3 colored sources (theorem-first; frozen card
+      freqbench/cards/FB-3.md). N=32 latent sources on a Haar orthonormal
+      basis F (= the strict Part II direction set, anchors d_sae), each an
+      independent AR(1) at lag D=2 with distinct rho_i in [0.1, 0.9]
+      (eigengap gamma ~ 0.026). d_in = N is load-bearing: the one-token
+      marginal is exactly N(0,(1+sigma^2)I) — isotropic, F-blind — and
+      C_ell = 0 for 0 < ell < D, so windows of length <= D are exactly iid
+      isotropic (CS-1 local impossibility: per-token/T<=2 learners output
+      F-independent directions, provably). C_D = F^T diag(rho) F makes F
+      recoverable by lag-D eigendecomposition for windows >= D+1 = 3 (CS-2
+      phase transition in the window depth). Continuous Gaussian data — no
+      template set, memorization route does not exist. Primary metric:
+      colored_rec_adj (chance-adjusted squared cosine recovery of F from
+      per-position decoder slices; add-on dispatched on
+      extra['rho_schedule']). This is the suite's first
+      feature-direction-recovery-primary bench.
+
   gemma_2_2b_it_l13_fineweb_24k128:
     category: real_lm
     subject_model: google/gemma-2-2b-it

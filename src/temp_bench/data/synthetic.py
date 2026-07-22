@@ -1211,6 +1211,205 @@ def recipe_instruction_phase_runs(
 #                       toy_coupled_noisy_K10_M20_d256_pB05_np10,
 #                       synth_smoke                                   (§ 4 coupling)
 #   signed_motion     → toy_signed_motion_M19_d40                    (signed_motion)
+# ── Multilane superposition (FreqBench FB-2, theorem-first) ────────────
+
+
+def multilane_tones(
+    *,
+    M: int = 101,
+    omega: tuple = (0, 1, 2, 4, 8, 16, 24, 32, 40, 50),
+    n_lanes: int = 3,
+    d_in: int = 24,
+    sigma: float = 0.25,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Multilane superposition — 3 simultaneous circle tones (FB-2).
+
+    ``n_lanes`` independent circle processes, each in its own 2-plane; the
+    planes are mutually orthogonal, embedded in ``R^{d_in}`` by one
+    Haar-random isometry ``P`` (QR of a Gaussian). Lane ``k`` carries a
+    hidden velocity ``Y_k ~ Unif(Ω)`` and phase ``B_k ~ Unif(Z_M)``::
+
+        θ_k(t) = 2π (B_k + Y_k·t mod M) / M
+        x_t    = Σ_k [cos θ_k(t) · P_k0 + sin θ_k(t) · P_k1] + σ ε_t
+
+    The frozen card is ``freqbench/cards/FB-2.md``: per-lane ceilings are the
+    per-lane periodogram (orthogonal planes ⇒ exact lane separation, P5);
+    per-token information is provably zero per lane (P1); additive-over-time
+    readouts are mean-degenerate (P2). Whole-window template count
+    ``|Ω|^n_lanes · M^n_lanes ≈ 1e9`` kills the memorization route (P6) by
+    construction.
+
+    Ground truths exposed (``extra``):
+        lane_velocity_labels: (n_seqs, seq_len, n_lanes) int64 — Ω class idx
+        lane_velocity:        (n_seqs, seq_len, n_lanes) int64 — Y values
+        lane_phase_labels:    (n_seqs, n_lanes)          int64 — hidden B_k
+        lane_planes:          (n_lanes, d_in, 2)         — the orthogonal planes
+        lane_of_atom:         (n_lanes·M,)               int64 — codebook lane tag
+        omega, M, n_lanes, sigma, freq_by_class
+    plus ``emission_features`` = the ``n_lanes·M`` per-lane circle atoms
+    (the reconstruction codebook — derived, NOT the strict direction count;
+    the strict feature directions are the ``2·n_lanes`` plane axes, exposed
+    via ``lane_planes``).
+    """
+    omega = tuple(int(y) for y in omega)
+    if any(y < 0 or y >= M for y in omega):
+        raise ValueError(f"omega values must be in [0, M={M}); got {omega}")
+    if d_in < 2 * n_lanes:
+        raise ValueError(f"d_in ({d_in}) must be >= 2·n_lanes ({2 * n_lanes})")
+
+    rng = np.random.default_rng(seed)
+
+    # One Haar-random isometry: n_lanes mutually orthogonal 2-planes.
+    A = rng.standard_normal((d_in, 2 * n_lanes))
+    P, _ = np.linalg.qr(A)                                   # (d_in, 2·n_lanes)
+    P = P.astype(np.float32)
+
+    # Hidden latents, independent per lane.
+    lab = rng.integers(0, len(omega), size=(n_seqs, n_lanes)).astype(np.int64)
+    Y = np.asarray(omega, dtype=np.int64)[lab]               # (n_seqs, n_lanes)
+    B = rng.integers(0, M, size=(n_seqs, n_lanes)).astype(np.int64)
+
+    # Phase trajectories and the superposed activation.
+    t = np.arange(seq_len)
+    theta = 2 * np.pi * ((B[:, :, None] + Y[:, :, None] * t[None, None, :]) % M) / M
+    cos_t = np.cos(theta).astype(np.float32)                 # (n_seqs, n_lanes, seq_len)
+    sin_t = np.sin(theta).astype(np.float32)
+    x = np.zeros((n_seqs, seq_len, d_in), dtype=np.float32)
+    for k in range(n_lanes):
+        x += cos_t[:, k, :, None] * P[None, None, :, 0 + 2 * k]
+        x += sin_t[:, k, :, None] * P[None, None, :, 1 + 2 * k]
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+
+    # Reconstruction codebook: the M circle atoms of each lane (unit-norm).
+    ang = 2 * np.pi * np.arange(M) / M
+    circ = np.stack([np.cos(ang), np.sin(ang)], axis=1).astype(np.float32)  # (M, 2)
+    atoms = np.concatenate(
+        [circ @ P[:, 2 * k: 2 * k + 2].T for k in range(n_lanes)], axis=0
+    )                                                        # (n_lanes·M, d_in)
+    lane_of_atom = np.repeat(np.arange(n_lanes), M).astype(np.int64)
+
+    # Per-sequence labels broadcast along the sequence (tiled leading-edge eval).
+    lane_lab = np.broadcast_to(lab[:, None, :], (n_seqs, seq_len, n_lanes)).copy()
+    lane_vel = np.broadcast_to(Y[:, None, :], (n_seqs, seq_len, n_lanes)).copy()
+
+    extra = {
+        "lane_velocity_labels": torch.from_numpy(lane_lab),
+        "lane_velocity": torch.from_numpy(lane_vel),
+        "lane_phase_labels": torch.from_numpy(B),
+        "lane_planes": torch.from_numpy(
+            np.stack([P[:, 2 * k: 2 * k + 2] for k in range(n_lanes)], axis=0)
+        ),                                                   # (n_lanes, d_in, 2)
+        "lane_of_atom": torch.from_numpy(lane_of_atom),
+        "omega": list(omega),
+        "M": int(M),
+        "n_lanes": int(n_lanes),
+        "sigma": float(sigma),
+        "freq_by_class": [float(y) / M for y in omega],
+    }
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(atoms),           # n_lanes·M codebook atoms
+        hidden_features=None,                                # velocities are not directions
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra=extra,
+    )
+
+
+# ── Colored sources (FreqBench FB-3, theorem-first) ────────────────────
+
+
+def colored_sources(
+    *,
+    N: int = 32,
+    d_in: int = 32,
+    D: int = 2,
+    sigma: float = 0.1,
+    rho_min: float = 0.1,
+    rho_max: float = 0.9,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Delayed temporally-colored sources — FB-3 (feature-direction recovery).
+
+    ``N`` latent sources on a Haar-random orthonormal basis ``F`` (rows), each
+    coordinate an independent AR(1) **at lag D** (``D`` independent residue
+    classes mod D), with distinct autocorrelations ``ρ_i``::
+
+        z_{t,i} = ρ_i · z_{t−D,i} + sqrt(1 − ρ_i²) · η_{t,i},   η ~ N(0,1)
+        x_t     = Σ_i z_{t,i} f_i + σ ε_t
+        (stationary init: z_{t,i} ~ N(0,1) for t < D)
+
+    The frozen card is ``freqbench/cards/FB-3.md``: with ``d_in = N`` the
+    one-token marginal is exactly ``N(0, (1+σ²) I)`` — isotropic, carrying
+    ZERO information about F — and all lags 0 < ℓ < D have ``C_ℓ = 0``, so
+    windows of length ≤ D are exactly iid isotropic Gaussians (CS-1 local
+    impossibility: any learner on them outputs F-independent directions).
+    The lag-D covariance ``C_D = Fᵀ diag(ρ) F`` makes F recoverable by
+    eigendecomposition for windows ≥ D+1 (CS-2), with angular error ~ ε/γ,
+    ``γ = min_i≠j |ρ_i − ρ_j|``. Continuous Gaussian data ⇒ no template set ⇒
+    the P6 memorization route does not exist.
+
+    Ground truths exposed: ``emission_features`` = the N rows of F (the strict
+    Part II direction set — F anchors ``d_sae`` directly); ``extra``:
+        rho_schedule: (N,) float64 — per-source autocorrelations (dispatch key)
+        lag_D, sigma_obs: scalars
+        source_z: (n_seqs, seq_len, N) float32 — the continuous latents
+                  (optional ridge diagnostic only; NOT a direction)
+    """
+    if N > d_in:
+        raise ValueError(f"N ({N}) > d_in ({d_in}): rows cannot be orthonormal")
+    if D < 1:
+        raise ValueError(f"D must be >= 1, got {D}")
+    rng = np.random.default_rng(seed)
+
+    # Haar-random orthonormal rows (exact orthonormality is load-bearing:
+    # the CS-1 statement needs the marginal to be exactly isotropic at d=N).
+    A = rng.standard_normal((d_in, d_in))
+    Q, _ = np.linalg.qr(A)
+    F = Q[:, :N].T.astype(np.float64)                       # (N, d_in)
+
+    rho = np.linspace(rho_min, rho_max, N)                  # distinct ρ_i
+    innov = np.sqrt(np.clip(1.0 - rho * rho, 0.0, None))
+
+    z = np.empty((n_seqs, seq_len, N), dtype=np.float64)
+    init_len = min(D, seq_len)
+    z[:, :init_len, :] = rng.standard_normal((n_seqs, init_len, N))
+    for t in range(D, seq_len):
+        eta = rng.standard_normal((n_seqs, N))
+        z[:, t, :] = rho * z[:, t - D, :] + innov * eta
+
+    x = z @ F
+    if sigma > 0:
+        x = x + sigma * rng.standard_normal(x.shape)
+
+    extra = {
+        "rho_schedule": torch.from_numpy(rho.copy()),
+        "lag_D": int(D),
+        "sigma_obs": float(sigma),
+        "source_z": torch.from_numpy(z.astype(np.float32)),
+    }
+
+    return SyntheticData(
+        x=torch.from_numpy(x.astype(np.float32)),
+        emission_features=torch.from_numpy(F.astype(np.float32)),  # the N rows of F
+        hidden_features=None,
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra=extra,
+    )
+
+
 #   self_exciting     → toy_backtracking_selfexcite_d64              (backtracking)
 #   semi_markov_modes → toy_changepoint_modes_d64                    (changepoint)
 #   cyclic_tones      → toy_cyclic_circle_M101_d128,
@@ -1218,6 +1417,8 @@ def recipe_instruction_phase_runs(
 #   assumption_consequence → toy_assumption_consequence_d64          (assumption_consequence)
 #   hedging_drift     → toy_hedging_drift_d64                        (hedging_drift)
 #   recipe_instruction_phase_runs → toy_recipe_instruction_d64       (recipe_instruction_phase_runs)
+#   multilane_tones   → toy_multilane_circle_M101_d24                (FB-2 multilane)
+#   colored_sources   → toy_colored_sources_N32_D2_d32               (FB-3 colored)
 _GENERATORS = {
     "markov":  markov_chain_support,
     "coupled": coupled_hmm,
@@ -1228,6 +1429,8 @@ _GENERATORS = {
     "assumption_consequence": assumption_consequence,
     "hedging_drift": hedging_drift,
     "recipe_instruction_phase_runs": recipe_instruction_phase_runs,
+    "multilane_tones": multilane_tones,
+    "colored_sources": colored_sources,
 }
 
 

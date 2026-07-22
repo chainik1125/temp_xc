@@ -1,0 +1,94 @@
+{
+ "card": "freqbench/cards/FB-3.md",
+ "params": {
+  "N": 32,
+  "d_in": 32,
+  "D": 2,
+  "sigma": 0.1,
+  "rho": [
+   0.1,
+   0.9
+  ],
+  "seq_len": 64,
+  "n_seqs": 4096,
+  "W_grid": [
+   1,
+   2,
+   4,
+   8
+  ],
+  "seed": 0,
+  "eigengap": 0.02580645161290318
+ },
+ "gates": {
+  "oracle": 0.75,
+  "floor_eps": 0.05,
+  "marginal_offdiag": 0.05
+ },
+ "chance": {
+  "gauss_mean": 0.1682,
+  "gauss_std": 0.00672,
+  "orthonormal_mean": 0.1773,
+  "orthonormal_std": 0.00841,
+  "n_cand": 32
+ },
+ "cs1": {
+  "marginal_diag_dev": 0.0088,
+  "marginal_offdiag_max": 0.0082,
+  "lag1_cov_max": 0.0093,
+  "c0_eig_recovery_adj_orth": 0.023
+ },
+ "stream_leakage": {
+  "c0_eig_rec_sq_mean": 0.1938,
+  "c0_eig_rec_sq_std": 0.0068,
+  "vs_orthonormal_null": 0.0165,
+  "n_seeds": 8
+ },
+ "cs2_full": {
+  "rec_sq": 0.9682,
+  "rec_adj": 0.9618
+ },
+ "by_W": {
+  "1": {
+   "rec_sq": 0.1962,
+   "rec_adj": 0.0336,
+   "rec_adj_orth": 0.023,
+   "estimator": "c0_within_tiles(floor)"
+  },
+  "2": {
+   "rec_sq": 0.1962,
+   "rec_adj": 0.0336,
+   "rec_adj_orth": 0.023,
+   "estimator": "c0_within_tiles(floor)"
+  },
+  "4": {
+   "rec_sq": 0.9676,
+   "rec_adj": 0.961,
+   "rec_adj_orth": 0.9606,
+   "estimator": "lag_D_within_tiles"
+  },
+  "8": {
+   "rec_sq": 0.9669,
+   "rec_adj": 0.9602,
+   "rec_adj_orth": 0.9597,
+   "estimator": "lag_D_within_tiles"
+  }
+ },
+ "dilution": {
+  "pooled_eig_rec_adj_W4": 0.6848,
+  "shuffled_lagD_eig_rec_adj_W4": 0.6255,
+  "note": "pooling/shuffling DILUTES but does not destroy C_D \u2014 the bench's true null is window truncation (W <= D), not permutation. Dated precision-amendment to card \u00a7 3 bag line; CS-1 floor untouched."
+ },
+ "verdict": {
+  "checks": {
+   "cs1_marginal_isotropic": true,
+   "cs1_short_lag_blank": true,
+   "cs1_c0_estimator_at_floor": true,
+   "floor_W_le_D_at_chance": true,
+   "stream_leakage_small": true,
+   "oracle_W_gt_D_clears_bar": true,
+   "transition_sharp": true
+  },
+  "passes_gate": true
+ }
+}

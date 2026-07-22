@@ -1,0 +1,41 @@
+{
+ "card": "freqbench/cards/FB-3.md",
+ "symmetry_audit": "analytic: Haar-random orthonormal F; no symbol structure, no relabeling action on the data law \u2014 the only invariance is a global rotation, which transports F with it.",
+ "memorization_audit": "continuous Gaussian data \u2014 no template set exists at any capacity; the primary metric is weight-space (no probe), so probe memorization cannot arise.",
+ "dilution_pointer": "see gating.py results (pooled/shuffled retain diluted C_D; true null = window truncation).",
+ "untrained_floors": {
+  "batchtopk_sae_T1_d16": 0.0038,
+  "tsae_T1_d16": 0.0038,
+  "stacked_T4_d16": 0.0049,
+  "txc_pre_T4_d16": -0.0054,
+  "txc_post_T4_d16": -0.0054,
+  "spectral_T4_d16": -0.0735,
+  "txc_post_T8_d16": 0.012,
+  "batchtopk_sae_T1_d32": 0.0052,
+  "tsae_T1_d32": 0.0052,
+  "stacked_T4_d32": -0.0033,
+  "txc_pre_T4_d32": 0.0041,
+  "txc_post_T4_d32": 0.0041,
+  "spectral_T4_d32": -0.0916,
+  "txc_post_T8_d32": -0.0178,
+  "batchtopk_sae_T1_d64": -0.016,
+  "tsae_T1_d64": -0.016,
+  "stacked_T4_d64": -0.0047,
+  "txc_pre_T4_d64": -0.0164,
+  "txc_post_T4_d64": -0.0164,
+  "spectral_T4_d64": -0.0772,
+  "txc_post_T8_d64": -0.0012
+ },
+ "trained_token_control": {
+  "steps": 5000,
+  "colored_rec_adj": 0.0254,
+  "note": "must stay \u2264 floor bar + measured stream leakage (~0.02 adj)"
+ },
+ "verdict": {
+  "checks": {
+   "untrained_floors_inside_band": false,
+   "trained_token_at_floor": true
+  },
+  "passes_t2": false
+ }
+}

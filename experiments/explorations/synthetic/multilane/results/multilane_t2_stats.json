@@ -1,0 +1,46 @@
+{
+ "card": "freqbench/cards/FB-2.md",
+ "T": 8,
+ "train_steps": 5000,
+ "chance": 0.1,
+ "symmetry_audit": "analytic: circle embedding fixes a metric on Z_M; no symbol relabeling preserves the data law while permuting velocity classes (P3 exchangeability fails by design \u2014 the random-frame null lives in the frequency bench).",
+ "memorization_audit": {
+  "template_count": 1030301000.0,
+  "max_d_sae": 202,
+  "probe_rows": 20000,
+  "note": "templates ~1.03e9 >> every capacity; route dead."
+ },
+ "oracle": [
+  0.90665,
+  0.9039,
+  0.9064
+ ],
+ "bag_mlp": [
+  0.10373422214371586,
+  0.10022668438398312,
+  0.1031129968638133
+ ],
+ "stacked_linear": [
+  0.10278145742957367,
+  0.09956566168598216,
+  0.10115022852464606
+ ],
+ "oracle_shuffled": [
+  0.21105,
+  0.20935,
+  0.2033
+ ],
+ "shuffle_semantics": "per-window independent permutations destroy the phase progression (order) but preserve the symbol multiset \u2014 the circle-spread cue survives, so the shuffle is NOT a full null for velocity; it degrades the oracle toward the bag level.",
+ "verdict": {
+  "oracle_mean": 0.9057,
+  "bag_mlp_mean": 0.1024,
+  "stacked_linear_mean": 0.1012,
+  "oracle_shuffled_mean": 0.2079,
+  "checks": {
+   "bag_fails_vs_oracle": true,
+   "additive_linear_at_chance": true,
+   "shuffle_degrades_oracle": true
+  },
+  "passes_t2": true
+ }
+}
