@@ -22,13 +22,30 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
 
 - **`mac-local`** — local CC session (macOS/darwin, `~/research/projects/temp_xc`,
   Apple-silicon MPS, no CUDA). Prototyping, review, orchestration.
-- **`runpod`** — remote CC session on RunPod (Linux, `/workspace/temp_xc`, CUDA).
-  Heavy grids + long runs. Git creds at `/workspace/.tokens/`.
+- **`runpod`** — the ORIGINAL RunPod box (Linux, `/workspace/temp_xc`, 32 CPU /
+  128 GB). Heavy grids + long runs; owns the PhenomenonBench loop history
+  (C1–C4, stage-6). Git creds at `/workspace/.tokens/`.
+- **`runpod-b`** — the SECOND RunPod box (Linux, `/workspace/temp_xc`, 32 CPU /
+  128 GB; spawned 2026-07-22 for the FreqBench line). Same creds layout.
 
 **Infer your id from your environment:** a darwin session under
-`~/research/projects/temp_xc` is `mac-local`; a Linux session under
-`/workspace/temp_xc` is `runpod`. If genuinely ambiguous, ask the user. A new
-agent gets a new subdir + a row here.
+`~/research/projects/temp_xc` is `mac-local`. A Linux session under
+`/workspace/temp_xc` **must check `/workspace/.agent_id` FIRST** — with two
+RunPod boxes the path alone is ambiguous: if the file exists, its content is
+your id; if it does not exist, you are `runpod` (the original box — legacy
+default; do NOT create the file there). The user seeds
+`/workspace/.agent_id` on every newly spawned pod. If genuinely ambiguous,
+ask the user. A new agent gets a new subdir + a row here.
+
+**Two-agent parallel sessions (shared-branch rules):** always
+`git pull --rebase origin arxiv` before every push; treat the shared files
+(`configs/data.yaml`, `src/temp_bench/data/synthetic.py`, `BENCHMARKS.md`,
+research STATUS § 0) as **append-only** — add your own entry/bullet, never
+rewrite another agent's; `results/leaderboard.jsonl` and
+`checkpoints/manifest.jsonl` are append-only JSONL with a **union merge
+driver** (`.gitattributes`) — on a conflict elsewhere, resolve by keeping
+BOTH sides. Each loop logs spend to its OWN file (expansion →
+`expansion/results/spend.json`; freqbench → `freqbench/results/spend.json`).
 
 ## What goes in your workspace
 

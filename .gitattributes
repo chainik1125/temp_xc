@@ -1,0 +1,7 @@
+# Append-only JSONL: on merge/rebase conflicts keep BOTH sides (rows are
+# keyed/deduped downstream — eval_key for the leaderboard, train_key for the
+# manifest). Two-agent parallel sessions push to the same branch.
+results/leaderboard.jsonl merge=union
+checkpoints/manifest.jsonl merge=union
+experiments/explorations/synthetic/expansion/results/spend_log.jsonl merge=union
+experiments/explorations/synthetic/freqbench/results/spend_log.jsonl merge=union

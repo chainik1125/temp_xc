@@ -1,97 +1,121 @@
 ---
 status: active
 created: 2026-07-22
-for: any (runpod preferred — CPU-cheap)
-venue: runpod | local
+for: runpod-b
+venue: runpod
 ---
 
-# FreqBench cycle 1 (FB-C1) — first theorem-first cards + the full FreqFrac pass
+# FB-C1 — the 12-hour FreqBench overnight session
 
-**Governing protocol:** `experiments/explorations/synthetic/freqbench/LOOP.md`
-(read in full, plus `PORT.md` § A–B and README § "The two generators, one
-substrate"). Prime directive unchanged: a sound verdict, never a win — an
-ABORT on the proof gate or the non-triviality battery is a success.
+**You are `runpod-b`** (check `/workspace/.agent_id`; see `agents/README.md`
+— the OTHER pod is running the PhenomenonBench session in parallel tonight;
+its briefing `stage6-recipe-then-c5.md` is NOT yours). **Governing
+protocol:** `experiments/explorations/synthetic/freqbench/LOOP.md` (read in
+full; note the cadence section — gated grids ARE in-session), plus `PORT.md`
+§ A–B and § G, and README § "The two generators, one substrate". Prime
+directive: **a sound verdict, never a win** — an ABORT on any gate is a
+success; never tune a task, gate, probe, or tolerance to manufacture a
+PROCEED.
 
-## 0. The full FreqFrac pass (substrate instrumentation, do first)
+**Session limits:** ~12 h wall · **$25 API cap** (judgment on
+`claude-fable-5`; spend to `freqbench/results/spend.json` +
+`spend_log.jsonl` — NOT the expansion meter) · rewrite
+`agents/runpod-b/STATUS.md` before every compact · two-agent shared-branch
+rules in `agents/README.md` (pull --rebase before push; append-only shared
+files; leaderboard/manifest have union merge drivers). Hard lines: **no
+cards beyond the three below, no program-rule/gate edits, no
+`temp_bench/core/` edits.** Stop at the acceptance gate even if hours
+remain.
 
-Run `freqfrac_report.py` over **all six** registry benches at the canonical
-matched cells (seed 1), plus seeds {2, 42} for the two prototype benches:
+## Phase 1 — the widened FreqFrac pass (~2–3 h, start immediately)
 
-```bash
-.venv/bin/python -m experiments.explorations.synthetic.freqbench.freqfrac_report \
-    frequency backtracking signed_motion changepoint assumption_consequence hedging_drift
-```
+All six registry benches, per-token-matched cells: seeds {1, 2, 42} at
+T = T_can (=4), plus seed 1 at `--T 8` for the window archs of every bench
+(the frequency high-pass check lives at T=8 — PORT.md § G). Run as parallel
+processes (use `--tag <bench>_s<seed>_T<T>` so outputs don't collide), sized
+to the pod's real CPU quota. The script trains any missing checkpoint via
+the canonical trainer (this pod's store starts empty — that is expected),
+hard-asserts each reconstructed `train_key` against its leaderboard row (an
+assertion failure = STOP and report, never work around), and writes **no
+leaderboard rows**.
 
-Notes: it trains any missing checkpoint via the canonical trainer (the
-migrated pod's store is empty — expect ~30 cells to train; CPU-cheap), hard-
-asserts each reconstructed `train_key` against the leaderboard row (an
-assertion failure is a STOP-and-report, never a workaround), and writes **no
-leaderboard rows**. Commit `freqbench/results/freqfrac_stats.json` + figs.
-Deliverable: the axis-1 (DC↔AC) coordinate measured per (bench × arch),
-trained vs untrained — mac-local's local pass covers frequency+backtracking
-only; this completes the suite.
+Deliverables: merged stats (one table: bench × arch × seed × T →
+firing-weighted curve, dc_frac, concentration, trained vs untrained-init),
+committed under `freqbench/results/` + figs; a short § in PORT.md § G
+("full-pass results") stating (a) seed stability of the axis-1 coordinates
+and (b) the T=8 frequency high-pass verdict.
 
-## 1. FB-C1 cards (freeze BEFORE any construction — LOOP.md card format)
+## Phase 2 — seed cards FB-2 and FB-3, end-to-end (~4–6 h)
 
-Freeze all three seed cards by commit, then execute in priority order within
-budget:
+For each card, strictly in this order; **freeze BOTH cards by commit before
+constructing either**:
 
-1. **FB-2 multilane superposition** (priority; expect PROCEED-grade):
-   3 simultaneous circle tones in orthogonal planes (`d_in = 24`-ish, panel
-   conventions per Part II). Proof obligations: per-lane periodogram oracle
-   (P5), per-token/additive floor (P1/P2 per lane), **memorization immunity
-   by construction** (|Ω|³M³ ≈ 10⁹ templates — state the count in the card).
-   Regime-3 claim: position-mixing required per lane; the sprint measured
-   multiband > vanilla (0.96 vs 0.91, no seed overlap) — the card's frozen
-   prediction, now under the fair BatchTopK backbone where it may well
-   FAIL (that would be an informative negative about the sprint's plain-TopK
-   result, not a defeat).
-2. **FB-3 colored sources**: per-coordinate AR(1) at lag D (port from
-   `origin/dmitry-synthetic:src/v6_colored_sources/` — README there has the
-   math). Proof obligations: CS-1 local impossibility (iid ⇒ Rec ≲ log(H)/N)
-   + CS-2 lag-D recoverability and the **W = D+1 phase transition** as the
-   frozen prediction. NOTE: this is a *feature-direction-recovery* bench
-   (cosine-AUC primary, not a latent probe) — say so explicitly in the card;
-   it fills the recovery-flavor gap in the coordinate system.
-3. **FB-1 phasepair** (only if budget remains): ±velocity pairs, identical
-   power spectra. The `c_relevance` skeptic item needs a real answer (which
-   real phenomenon is phase-coded?) — if none is defensible, mark `spanning`
-   with the research reason or let the skeptic kill it honestly.
+1. **Freeze** (`freqbench/cards/FB-<n>.md`, LOOP.md card format): target
+   coordinates + gap claim; exact task parameterization + ground truth
+   (Part II § 1 — state F cleanly); proof obligations (ceiling, floor,
+   non-triviality — name the argument); regime claim + design-time
+   discriminability; the P6 memorization audit (state the template count);
+   **frozen per-arch predictions + at least one falsifier**.
+2. **Build**: generator in `src/temp_bench/data/synthetic.py` (append-only),
+   datasource in `configs/data.yaml` (append-only), evaluator add-on ONLY if
+   an existing metric truly cannot serve (additive, protocol stays 1.3.0),
+   tests per the existing `tests/test_*_bench.py` pattern.
+3. **T1 proof gate**: discharge every obligation — analytic note in the
+   card record, or a committed `verify_theory`-style numerical check over
+   the ACTUAL parameter range built (port from
+   `origin/dmitry-spectral-sprint2:.../code/verify_theory.py`).
+4. **T2 non-triviality battery** (all committed): symmetry/relabeling
+   audit; bag-of-symbols control (mean-pooled token codes + MLP — must FAIL
+   where the card claims order-sensitivity); memorization budget at the
+   capacity extremes; probe budget scaled to code dim; shuffle semantics
+   stated (per-window independent permutations).
+5. **Skeptic** (LOOP.md rubric, Fable): persist raw verdicts pre-parse (the
+   C4 ops lesson).
+6. **If PROCEED → § 8 gating** (`gating.py` per the changepoint/frequency
+   pattern): ceilings, chance floors, the **discriminability STOP-gate**
+   (equality variant if the primary latent is order-2). Gate fails ⇒ record
+   NON-DISCRIMINATING, no grid — still a success.
+7. **If gate passes → the uniform B×A grid** (the locked design: 6 archs ×
+   `d_sae ∈ {F//2, F, 2F}` × `T ∈ {1,2,4,8}` × `k_pos ∈ {1,2,4,8,16}` ×
+   seeds {1,2,42} + untrained; 30k steps; `run_grid.py` per the frequency
+   driver pattern; canonical runner only) → **blind verdict vs the card's
+   frozen predictions** in `bench_record.md` → registry entry
+   (`experiments/explorations/synthetic/registry.py` Bench row) → REPORT
+   re-render → BENCHMARKS.md row (provenance `theorem-first`).
 
-## 2. Per card: build + T1/T2 + skeptic (NO § 8 gating, NO grids)
+The two cards (details + sprint numbers in PORT.md § A/E and LOOP.md seeds):
 
-- Generator + exact parameterization; **T1**: discharge every proof
-  obligation (analytic note in the record, or a committed
-  `verify_theory`-style numerical check over the actual parameter range).
-- **T2 battery**: symmetry/relabeling audit; bag-of-symbols control;
-  memorization budget at the capacity extremes; probe budget scaled to code
-  dim; shuffle semantics stated (per-window independent permutations).
-- **Skeptic** (LOOP.md rubric, judgment on `claude-fable-5`): for
-  `c_relevance`, FB-2/FB-3 may cite the backtracking axis-1 DC-dominance and
-  the changepoint localization story; FB-1 must make its own case.
-- Datasource plugins + `configs/data.yaml` entries + tests ARE in scope
-  (that is the construction); **architecture grids and § 8 gating are NOT**
-  — the discriminability STOP-gate (equality variant where applicable) runs
-  at the stage-6-analogue briefing after review.
+- **FB-2 multilane superposition** (priority): 3 simultaneous circle tones
+  in orthogonal planes. Ceiling = per-lane periodogram (P5); floor = P1/P2
+  per lane; memorization dead by construction (state |Ω|³M³). Frozen
+  headline prediction from the sprint: multiband > vanilla (0.96 vs 0.91)
+  — under the fair BatchTopK backbone this may FAIL; that is an informative
+  negative about the sprint's plain-TopK result, and reporting it is the
+  job.
+- **FB-3 colored sources**: per-coordinate AR(1) at lag D (math in
+  `origin/dmitry-synthetic:src/v6_colored_sources/README.md`). Ceiling =
+  lag-D covariance eigendecomposition (CS-2); floor = CS-1 local
+  impossibility; frozen prediction = the **W = D+1 phase transition**. This
+  is a *feature-direction-recovery* bench (cosine-AUC primary) — say so in
+  the card.
 
-## 3. Acceptance gate — stop for review
+## Phase 3 — FB-1 phasepair (only after Phase 2 completes, budget permitting)
 
-Done when: the FreqFrac full-pass artifacts are committed; all frozen cards
-carry verdicts (built + T1/T2 + skeptic → PROCEED, or ABORT with the killing
-gate recorded); `BENCHMARKS.md` rows added (provenance `theorem-first`;
-§ B for aborts), LOOP-cycle log appended to `PORT.md`, research STATUS § 0
-updated; **$25 cap**, spend logged. Then STOP — briefing stays until
-mac-local review, then it is deleted.
+Same pipeline. The `c_relevance` skeptic item needs a real answer (which
+real phenomenon is phase-coded?); if none is defensible, mark the card
+`spanning` with the research reason, or let the skeptic kill it honestly.
 
-## Addendum (post first-pass, mac-local): T=8 frequency cells
+## Phase 4 — if hours remain
 
-The local 12-cell pass (PORT.md § G) found the frequency **high-pass
-acceptance check has no power at `T_can = 4`** (half of Ω folds below the
-first DCT bin). In step 0, ALSO run:
+(a) The **T=16 frequency frontier addendum** (a per-bench `run_grid`
+addendum like the earlier bands addendum; T=16 is where spectral hit 1.00
+and the Rayleigh/high-pass story is sharpest — includes the FreqFrac pass at
+`--T 16`). (b) Port the remaining `verify_theory` checks as permanent tests.
 
-```bash
-.venv/bin/python -m experiments.explorations.synthetic.freqbench.freqfrac_report frequency --T 8
-```
+## Acceptance gate — stop for review
 
-and read the high-pass check from those cells (spectral was 0.96 on the tone
-at T=8 — its firing curve there is the meaningful one).
+Done when: Phase-1 artifacts committed; both Phase-2 cards carry end-to-end
+verdicts (or honest gate-kills); every record/registry/STATUS § 0 update
+pushed; spend logged. Rewrite `agents/runpod-b/STATUS.md`, append the FB-C1
+cycle log to PORT.md, then **STOP** — this briefing stays until mac-local
+review, then it is deleted.

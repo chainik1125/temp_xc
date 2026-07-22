@@ -8,24 +8,29 @@ Local CC on the Mac (Apple M-series, MPS, no CUDA) at `~/research/projects/temp_
 Role: prototyping, review, orchestration. Heavy grids → `runpod`. I'm `mac-local`.
 
 ## Git
-Branch `arxiv`, **@ `32d3ad4a`, ahead of `origin/arxiv` by 3 UNPUSHED commits**
-(`a96f83f0` stage-6 review close-out; `266dc386` paper+private scaffolding;
-`32d3ad4a` this file's pre-compact rewrite). **Working tree: the phase-1
-revamp-doc edits are UNCOMMITTED** (README two-generators section +
-discriminability gate, BENCHMARKS provenance column, both STATUS files) —
-awaiting user review/commit. **Push not yet done** — the runpod box still
-thinks stage 6 is "awaiting review" until it sees the briefing deletion, so
-push before handing anything to runpod. `origin` = SSH.
+Branch `arxiv`, everything committed + PUSHED through the overnight-prep
+commit (check `git log` — the chain this session: revamp docs `4638a604` →
+C4 briefing `31c151d3` → PORT `8e63dcaf` → freqfrac `9e119d1a` → C4 review
+close-out `f58bf8a4` → LOOP+addenda `61af93c8` → FB-C1 `7a4dd0fd` → first-pass
+results `7e641474`/`603e19bf` → overnight prep HEAD). `origin` = SSH.
 
-## ▶ CURRENT TASK (in progress 2026-07-22): revamp the synthetic autoresearch system
+## ▶ CURRENT TASK (2026-07-22 evening): two-agent 12-hour overnight QUEUED
 
-**Phase 1 (governing doc) DONE** — see research STATUS § 0 top bullet for the
-full phase list. Next: phase 2, the FreqBench port (mac-local prototypes the
-plugin + FreqFrac evaluator; runpod runs the grids — mind the
-checkpoint/leaderboard-cache caveat in research STATUS § 0). Compute decision:
-**no GPU** — A40 measured kernel-launch-bound (~14% util) on these tiny
-models; the 32-core CPU pod is the right substrate; a GPU only becomes
-relevant if a future cycle mines fresh LM traces.
+Revamp phases 1–3a DONE (two-generator docs; C4 reviewed+APPROVED w/
+equality-gate variant adopted; FreqBench port: PORT/proofs/FreqFrac lens
+validated on 12 real cells/LOOP rails/addenda). Tonight: `runpod` →
+`briefings/stage6-recipe-then-c5.md`; **new agent `runpod-b`**
+(identity via `/workspace/.agent_id`; workspace seeded) →
+`briefings/freqbench-c1.md` (12-h scope incl. gated grids per LOOP.md's
+amended cadence). Collision infra: agents/README two-agent rules +
+`.gitattributes` union drivers + separate spend logs + `--tag` on
+freqfrac_report. **MY NEXT ACTION (morning): the consolidated review** —
+recipe stage-6 verdict (equality-gate integrity FIRST: was the gate honored
+if raw-linear windows read e_t?), FB-2/FB-3(/FB-1) end-to-end (freeze-order,
+T1/T2, skeptic raw, gate-before-grid, blind verdicts), C5 calibrations,
+FreqFrac full-pass table; then delete both briefings + bake findings into
+rules. Compute: **no GPU** (A40 kernel-launch-bound ~14% util on these tiny
+models).
 
 ### The design (kept for context)
 

@@ -110,12 +110,21 @@ convention deviations).
 
 ## Cadence, roles, venue
 
-Cards frozen (committed) → build + T1/T2 + skeptic autonomously → **STOP
-before any § 8 gating or grid** for mac-local review (the C4 cadence).
-Judgment roles on `claude-fable-5`; numerical verification and generators are
-CPU-cheap (runpod or local). Budget per cycle: $25 cap, expansion-style spend
-log. Briefing template: the expansion briefings, with this file as the
-governing protocol.
+Cards frozen (committed) → build + T1/T2 + skeptic autonomously. A graduated
+card **may proceed to § 8 gating and the uniform B×A grid in the same
+session** provided ALL of: (i) its per-arch predictions were frozen at
+card-freeze, before construction; (ii) T1/T2 + skeptic passed; (iii) the § 8
+discriminability STOP-gate passed. The grid + blind verdict then run exactly
+as a stage-6 (the stage-6-grounded-eval precedent: autonomous through grids,
+review AFTER, on the whole artifact). A failed gate ⇒ no grid, verdict
+recorded, still in-session. **Review-before-grid applies only where a step
+was not covered by the frozen card** — when in doubt, stop. What is NEVER
+in-session: proposing cards beyond the frozen set, or changing program
+rules/gates. Judgment roles on `claude-fable-5`; numerical verification and
+generators are CPU-cheap (runpod or local). Budget per cycle: $25 cap, spend
+logged to `freqbench/results/spend.json` (+ `spend_log.jsonl`) — NOT the
+expansion loop's meter. Briefing template: the expansion briefings, with this
+file as the governing protocol.
 
 ## Relation to the acid test (revamp phase 4)
 

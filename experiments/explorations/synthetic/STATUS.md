@@ -68,9 +68,18 @@ Last updated: 2026-07-22.
   proof-skeptic rubric, seed cards FB-2 multilane / FB-3 colored-sources /
   FB-1 phasepair, C4-style cadence), and proof addenda in
   `signed_motion/bench.md` (NEGATIVE explained via P2/P4/P6) +
-  `frequency/bench_record.md`. Next: FB-C1 cycle (briefing from LOOP.md;
-  runpod or local), then the full 6-bench FreqFrac pass (runpod) → REPORT
-  coordinates block.
+  `frequency/bench_record.md`. First-pass FreqFrac (12 canonical cells,
+  mac): both acceptance checks PASS — backtracking DC-dominance clean;
+  frequency per-token-silent/TXC-pre-flat confirmed; T=4 high-pass
+  resolution caveat recorded in PORT § G. **NOW QUEUED — the two-agent
+  12-hour overnight (2026-07-22): `runpod` →
+  [`briefings/stage6-recipe-then-c5.md`](../../../briefings/stage6-recipe-then-c5.md)
+  (stage-6 of the grounded regime-3 bench w/ the equality-variant gate,
+  then C5); `runpod-b` (NEW agent, `agents/runpod-b/`) →
+  [`briefings/freqbench-c1.md`](../../../briefings/freqbench-c1.md)
+  (widened FreqFrac pass + FB-2/FB-3(/FB-1) end-to-end incl. gated grids
+  per LOOP.md's amended cadence). Both stop-for-review; consolidated
+  mac-local review next morning.**
 
 - **STAGE 6 DONE (2026-07-22, runpod) — both grounded benches built, run,
   verdicts written blind. STOPPED for review.** The measure→mirror→**bench**

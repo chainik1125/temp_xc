@@ -196,6 +196,10 @@ def main() -> None:
                     help="override the window-arch T (default OP.T_can); the "
                          "frequency high-pass check needs T=8 — PORT.md § G")
     ap.add_argument("--n-seqs", type=int, default=256)
+    ap.add_argument("--tag", type=str, default=None,
+                    help="suffix for the stats/fig filenames (so parallel "
+                         "invocations — per bench/seed/T — don't overwrite "
+                         "each other; merge the JSONs when reporting)")
     ap.add_argument("--dry-run", action="store_true",
                     help="print the selected canonical rows and exit")
     args = ap.parse_args()
@@ -254,14 +258,15 @@ def main() -> None:
     out["code_version"] = capture_code_version(allow_dirty=True).model_dump()
     res_dir = HERE / "results"
     res_dir.mkdir(exist_ok=True)
-    stats_path = res_dir / "freqfrac_stats.json"
+    suffix = f"_{args.tag}" if args.tag else ""
+    stats_path = res_dir / f"freqfrac_stats{suffix}.json"
     stats_path.write_text(json.dumps(out, indent=1))
     print(f"wrote {stats_path}", flush=True)
 
-    _render_fig(out, benches)
+    _render_fig(out, benches, suffix)
 
 
-def _render_fig(out: dict, benches: list[str]) -> None:
+def _render_fig(out: dict, benches: list[str], suffix: str = "") -> None:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -289,8 +294,9 @@ def _render_fig(out: dict, benches: list[str]) -> None:
     fig.tight_layout()
     figs = HERE / "figs"
     figs.mkdir(exist_ok=True)
-    fig.savefig(figs / "freqfrac_curves.png", dpi=160)
-    print(f"wrote {figs / 'freqfrac_curves.png'}", flush=True)
+    path = figs / f"freqfrac_curves{suffix}.png"
+    fig.savefig(path, dpi=160)
+    print(f"wrote {path}", flush=True)
 
 
 if __name__ == "__main__":
