@@ -1,91 +1,63 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-22 (on the MIGRATED pod; stage-6 grids running).
+**Last rewrite:** 2026-07-22, late in the 12 h overnight session (Phases 1+2
+DONE and pushed; Phase 3 bookkeeping in progress).
 
 ## Who / where
-Remote CC on RunPod (Linux). **Migrated pod (2026-07-22): repo root is
-`/workspace/temp_xc`** (the `~/workspace` prediction was wrong — same old
-path). Tokens in `/workspace/.tokens/` (present; `gh_token`, `anthropic_key`,
-`hf_token`).
-Push: `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`
-(from the repo root). Export anthropic_key as ANTHROPIC_API_KEY.
+Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am `runpod`
+(original box — `/workspace/.agent_id` does NOT exist here; do not create it).**
+`runpod-b` runs FreqBench (`freqbench-c1.md`) in parallel — NOT mine.
+Two-agent rules (agents/README.md): `git pull --rebase origin arxiv` before
+EVERY push; shared files append-only; leaderboard/manifest union-merge.
+Tokens `/workspace/.tokens/`; push
+`git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`.
+32 CPU / 128 GB. Venv fine.
 
-**Migrated-pod resources (measured 2026-07-22):** cgroup v1; `cpu.cfs_quota_us=-1`
-(no CFS cap) with cpuset ⇒ **32 CPUs real** (`nproc`=32); memory limit
-**128 GB** (user-confirmed; cgroup agrees). 28 workers × OMP1 measured
-~0.65 GB/worker (18 GB total) — memory is a non-issue, CPU-bound. Old-pod
-throttling gotchas don't apply here.
-**⚠ Concurrent-git race (hit 2026-07-22, FIXED in grid.py):** 28 workers all
-stamping code_version while the tracked results JSON / leaderboard churn ⇒
-`git diff HEAD` SIGBUS (mmap of truncated file) + exit-128 (index lock).
-Killed 237/495 assumption cells (all pre-cache-check, so leaderboard rows
-unharmed). Fix: GIT_OPTIONAL_LOCKS=0, atomic os.replace of the results JSON,
-retry×3 on CalledProcessError — all in src/explorations/synthetic/grid.py.
-**Checkpoints did NOT survive migration** (`checkpoints/` = manifest only,
-3.7 MB). Doesn't matter for done cells: `eval_key` hits the leaderboard row
-BEFORE touching checkpoints (keys are pure config hashes, no git SHA), so all
-459 assumption rows fast-forward. Only never-run cells train fresh.
+## Current task: `briefings/stage6-recipe-then-c5.md` — Phases 1+2 DONE, stopped-for-review state being finalized
 
-## Current task: `briefings/expansion-c4.md` — **DONE, STOPPED FOR REVIEW (2026-07-22)**
+### Phase 1 — stage-6 of recipe_instruction_phase_runs: **DONE — § 8 STOP, no grid**
+Build commits `47b62e1b` (generator/datasource/evaluator/tests; suite 136) +
+`b463c4a0` (equality-variant STOP-gate fired: raw-linear e_t ceilings 0.614
+per-token / 0.720 T=2 ≫ chance — class-conditional continuation-rate leak;
+MLP 1.0 so the regime-3 residual is real). Grid withheld per the gate;
+frozen § 5 predictions never touched — still blind. Record + re-scope options
+in `recipe_instruction_phase_runs/bench_record.md`; BENCHMARKS row ✓+note;
+research STATUS bullet. All pushed.
 
-Cycle 4 executed end-to-end and pushed: `hier_categorical` mirror built +
-harness-tested (incl. the self-consistency deconvolution — raw doc marginals
-flatten every fit→generate round); gate-8 hardened to ≥2 non-fitted moments;
-both r2 cards frozen by dated amendment BEFORE any run; calibrations run on
-cached C3 labels. **recipe-instruction-r2 PROCEED → SPEC**
-(`synthetic/recipe_instruction_phase_runs/` — first int/eq SPEC, first
-grounded regime-3 candidate); **proof-operation-r2 ABORT** (three-timescale
-diagnosis → C5 segment-layer target). LEDGER C4 entry + BENCHMARKS + research
-STATUS §0 updated. Spend $10.82/$25 cumulative. **Do NOT proceed to stage 6.**
-Briefing stays until mac-local reviews, then it is deleted.
-**Model routing (this cycle):** `think`+`validate` → `claude-fable-5`
-($10/$50 priced into the meter); `bulk` stays Haiku ($25 cap would break on
-Fable bulk). Ops gotcha fixed mid-cycle: Fable skeptic JSON truncated at
-max_tokens crashed the parse twice (~$1.8 burned) — skeptic raw text is now
-persisted pre-parse, rubric-key-validated, deterministically repairable; the
-recorded verdict was recovered from raw, never re-rolled.
+### Phase 2 — expansion C5: **DONE — r3 ABORT, doubly informative, $0 API spend**
+- Infra commit `f8c1deb6` (BEFORE calibration, freeze discipline):
+  `seg_hier_categorical` in expansion/mirrors.py (three timescales: dwell /
+  run-aware BIC-DP segments + per-segment C4 deconvolution / doc tilt; MLE
+  tilts; likelihood-only objectives) + **insertion control**
+  (`run_permuted_streams` no-adjacent-repeat shuffle; control = re-fit on
+  permuted must not hallucinate gate-8 moments beyond real tolerance).
+  A measured campaign of automatic shrinkage estimators (complementary
+  halves / interleaved splits / analytic floors / permutation-matched DP
+  split-half / posterior-mean) all failed on the harness toys — documented
+  in mirrors.py docstrings; harness tests pin both control behaviors.
+  138 tests pass. r3 card amendment appended (prereg incl. the control).
+- Calibration commits `2d41d5cd` + `b7025cfc`:
+  **proof-operation-phase-runs-r3 ABORT** — MI(2) PASSES first time
+  (0.075 vs 0.065, err 0.010 ≤ 0.013); ACF(4) +21% marginal overshoot
+  (0.154 vs 0.127, err 0.0263 vs 0.0255); insertion control FAILS both
+  (hallucination +0.018 mi2 / +0.039 acf4 on permuted streams). Three
+  timescales CONFIRMED model-independently (real−perm acf4 gap 0.056).
+  **C6 gap = calibrated extraction estimator, not model family.**
+  Skeptic-header cosmetic done (`_judge_model`; pre-C5 marked untracked).
+  Spend $10.82/$25 cumulative (C5 $0.00 — labels cached, skeptic skipped).
 
-### Stage-6 build log (closed; kept for archaeology)
-Build + blind-evaluate `assumption_consequence` (AC) + `hedging_drift` (DC).
-Everything up to the grid is DONE and pushed:
-
-- **Build committed** (`c1a2a24e`): generators (g7 Markov mirror; hier_ar1 w/
-  210 empirical levels as code constant `_HEDGING_LEVELS_HIER`), datasources
-  `toy_assumption_consequence_d64` / `toy_hedging_drift_d64`, evaluator
-  add-ons `assumption_recovery` (state + next-state probes) /
-  `hedging_recovery` (ridge R² on c_i) — additive, protocol stays 1.3.0.
-  13 new tests; suite 120 passed.
-- **§ 8 gates PASS, committed** (`01f79c6b`). Two pre-grid facts on record:
-  (1) order-1 mirror ⇒ s_i sufficient ⇒ per-token and raw windows give
-  IDENTICAL next-state readouts (0.464/0.466 balacc vs Bayes-balanced oracle
-  0.544) — the frozen "per-token blind" prediction is tested against that;
-  (2) hedging per-token raw ceiling R² 0.770 (multiplicative-noise bound),
-  raw window headroom only +0.005 — spec oracle R²=1 unreachable.
-- **Grid drivers committed** (`a8e6fb07`); render_figs + bench_record
-  skeletons committed (placeholders — headline/verdict framing MUST be
-  rewritten from actual numbers, never trusted as-is).
-- **Grid partial state committed: 459/495 assumption cells, 0 failures**
-  (leaderboard +458 rows @ 30k steps, seeds {1,2,42}). Hedging NOT started.
+### Phase 3 — bookkeeping (in progress at last rewrite)
+REPORT/registry render check; self-audit of the Phase-1 record vs README
+checklist + validity gates (list gaps honestly, do NOT re-run). Then final
+STATUS rewrite → STOP. **Briefing stays until mac-local review.**
 
 ## Next actions
-**None pending — stage 6 complete, stopped for review** (see Current task).
-Grid execution notes kept for the record: assumption grid ran twice (first
-pass hit the concurrent-git race below, 237 cells failed pre-cache-check with
-leaderboard rows unharmed; re-run after the grid.py fix → 495/495). Hedging
-495/495 in 61 min, 28 workers × OMP1. Venv python 3.12.11 works — no uv
-reinstall was needed on this pod.
+Finish Phase-3 render check + self-audit → commit + pull --rebase + push →
+STOP for review. No stage-6 § 8/grid for any C5 artifact; do not start C6.
 
-## Gotchas (this box — READ BEFORE SIZING ANYTHING)
-- **Pod cgroup caps hide behind host numbers**: old pod = 8.5 CPUs
-  (`cpu.max`) + 55 GB (`memory.max`) while `nproc`=96 / `free`=503 GB.
-  64 workers ⇒ OOM-kill ⇒ silent BrokenProcessPool. 24 workers×OMP2 ⇒ 76%
-  CFS-throttled, ~47 min/cell. Size pools by the cgroup quota (~2 GB/worker).
-- **Pod restart wipes home dir ⇒ venv python vanishes** (broken symlink into
-  `~/.local/share/uv/`). Fix per step 1; site-packages live in volume `.venv/`.
-- `pkill`/`pgrep -f` self-match the launching shell/watcher — use
-  `pgrep -f "[r]un_grid"`; prefer TaskStop on harness tasks.
-- Long jobs: harness-tracked background Bash (notifies on exit). nohup+disown
-  detaches from the harness AND died with the pod's process reaper anyway.
-- Background python: launch with `-u` or prints sit in the block buffer.
-- Claude 5-family models reject `temperature` AND think by default (client
-  handles both). Calibrations sequential (spend meter is per-process).
+## Gotchas (this box)
+- Harness blocks `sleep`; background Bash for long jobs; python -u.
+- 5-family models reject `temperature`, think by default (client handles).
+- Concurrent-git race FIXED in grid.py (GIT_OPTIONAL_LOCKS=0, os.replace,
+  retry×3).
+- `git pull --rebase` refuses with unstaged changes — commit this file first.
