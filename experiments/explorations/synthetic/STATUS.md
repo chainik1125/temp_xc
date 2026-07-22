@@ -10,6 +10,24 @@ Last updated: 2026-07-22.
 
 ## 0. TL;DR — what's active right now
 
+- **EXPANSION CYCLE 5 DONE (2026-07-22, runpod overnight) — the reasoning
+  int/eq cell ABORTs a third time, now doubly informative; $0 API spend.**
+  Built the C4-mandated **`seg_hier_categorical`** (three-timescale mirror:
+  dwell / run-aware-DP segments with per-segment deconvolution / doc tilt)
+  plus a **preregistered insertion control** (re-fit on run-permuted streams
+  must not hallucinate the gate-8 moments — adopted after a measured campaign
+  showed every automatic winner's-curse shrinkage either drowns signal or
+  leaks). `proof-operation-phase-runs-r3`: the segment layer **closes the
+  lag-2–8 gap** — MI(2) passes for the FIRST time (err 0.010 ≤ 0.013),
+  ACF(4) flips from −55% undershoot (r2) to +21% marginal overshoot — but
+  the **insertion control fails both moments** (hallucination +0.018 /
+  +0.039 on exchangeable data): part of the captured structure is winner's
+  curse, ABORT. Three timescales now CONFIRMED model-independently
+  (real-vs-permuted ACF(4) gap 0.056). **C6 gap: the extraction estimator,
+  not the model family.** Skeptic headers now name the judge model (C4
+  cosmetic done). Records: `expansion/records/proof-operation-phase-runs-r3/`
+  + LEDGER C5 entry. STOPPED for review.
+
 - **STAGE-6 OF `recipe_instruction_phase_runs`: § 8 STOP, no grid
   (2026-07-22, runpod overnight session).** The bench is fully **registered**
   (generator off the pinned C4 mirror params, `toy_recipe_instruction_d64`,

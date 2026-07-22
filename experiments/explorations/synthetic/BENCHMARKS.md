@@ -80,6 +80,7 @@ failure; kept here so the same idea isn't re-tried blindly.
 | proof-operation-phase-runs | reasoning · int/eq | **signal REAL** (self-match ACF ≫ nulls); gate-8 MI(2) fail — categorical *plateau* the menu can't make | C3 |
 | recipe-instruction-phase-runs | text · int/eq | **signal REAL**; gate-8 ACF(4) fail — *rescued in C4 by the `hier_categorical` re-freeze → SPEC (see section A)* | C3 |
 | proof-operation-phase-runs-r2 | reasoning · int/eq | **signal REAL**; even `hier_categorical` fails both hardened gate-8 moments — reasoning phase streams hold **three timescales** (run/segment/doc); C5 needs a segment-level regime layer | C4 |
+| proof-operation-phase-runs-r3 | reasoning · int/eq | **signal REAL, three timescales CONFIRMED** (real-vs-permuted ACF(4) gap 0.056); the `seg_hier_categorical` layer closes lag-2–8 — MI(2) passes for the first time, ACF(4) flips −55% → +21% (marginal fail) — but the preregistered **insertion control** catches the estimator hallucinating on run-permuted streams; C6 needs calibrated segment-composition extraction, not a new family | C5 |
 | goal-restatement-recurrence | reasoning · long-memory | skeptic: **composition** (cross-trace rate mixture); thin margin, κ near floor | C3 |
 
 *Frozen ideas never calibrated (prop):* `hedge-to-assertion-drift`,
