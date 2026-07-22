@@ -23,6 +23,10 @@ os.environ.setdefault("TQDM_DISABLE", "1")
 os.environ.setdefault("OMP_NUM_THREADS", "2")
 os.environ.setdefault("MKL_NUM_THREADS", "2")
 os.environ.setdefault("AGENT_NAME", "autoresearch")
+# Many workers stamp code_version concurrently; without this, each `git
+# status`/`git diff` may rewrite .git/index (lock contention + SIGBUS on
+# processes that have the old index mmap'd).
+os.environ.setdefault("GIT_OPTIONAL_LOCKS", "0")
 
 import json
 import time
@@ -55,11 +59,24 @@ def run_cell(cell: dict) -> dict:
         )
         ecfg = {"smoke": False, "k_pos": k_pos,
                 "eval_window_L": cell.get("eval_window_L", 32)}
-        r = run_experiment(
-            experiment="synthetic", arch_name=cell["arch"], seed=cell["seed"],
-            datasource_name=cell["ds"], training_cfg=tcfg, eval_cfg=ecfg,
-            agent="autoresearch", allow_dirty=True,
-        )
+        # code_version stamping shells out to git; under a full worker pool a
+        # transient race (index lock / mmap of a file mid-rewrite) can kill the
+        # git call. Retry those — they are env flakes, not cell failures.
+        import random
+        import subprocess
+        for attempt in range(3):
+            try:
+                r = run_experiment(
+                    experiment="synthetic", arch_name=cell["arch"],
+                    seed=cell["seed"], datasource_name=cell["ds"],
+                    training_cfg=tcfg, eval_cfg=ecfg,
+                    agent="autoresearch", allow_dirty=True,
+                )
+                break
+            except subprocess.CalledProcessError:
+                if attempt == 2:
+                    raise
+                time.sleep(0.5 * (attempt + 1) + random.random())
         return {**cell, "metrics": {k: float(v) for k, v in r.row.metrics.items()},
                 "train_cached": r.train_cached, "eval_cached": r.eval_cached, "ok": True}
     except Exception as e:  # keep the grid going; record the failure
@@ -95,7 +112,12 @@ def run_pool(cells: list[dict], out_path: Path, *, max_workers: int = 6,
                 print(f"[{done}/{len(cells)} {el:6.0f}s] {label:<52} {extra} {cache}", flush=True)
             else:
                 print(f"[{done}/{len(cells)} {el:6.0f}s] {label:<52} FAILED {res['error']}", flush=True)
-            out_path.write_text(json.dumps(results, indent=2))
+            # Atomic replace: a plain truncate+rewrite of this tracked file
+            # SIGBUS-kills any concurrent `git diff HEAD` that has it mmap'd
+            # (code_version stamping in the workers).
+            tmp = out_path.with_name(out_path.name + ".tmp")
+            tmp.write_text(json.dumps(results, indent=2))
+            os.replace(tmp, out_path)
     n_ok = sum(1 for r in results if r.get("ok"))
     print(f"[{tag}] DONE {n_ok}/{len(cells)} ok in {time.time()-t0:.0f}s -> {out_path}", flush=True)
     return results

@@ -11,10 +11,16 @@ Push: `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/cha
 (from the repo root). Export anthropic_key as ANTHROPIC_API_KEY.
 
 **Migrated-pod resources (measured 2026-07-22):** cgroup v1; `cpu.cfs_quota_us=-1`
-(no CFS cap) with cpuset ⇒ **32 CPUs real** (`nproc`=32); memory cgroup says
-128 GB but user-stated limit is **64 GB** — size for 64. 28 workers × OMP1
-measured ~0.65 GB/worker (18 GB total) — lots of headroom. Old-pod throttling
-gotchas don't apply here.
+(no CFS cap) with cpuset ⇒ **32 CPUs real** (`nproc`=32); memory limit
+**128 GB** (user-confirmed; cgroup agrees). 28 workers × OMP1 measured
+~0.65 GB/worker (18 GB total) — memory is a non-issue, CPU-bound. Old-pod
+throttling gotchas don't apply here.
+**⚠ Concurrent-git race (hit 2026-07-22, FIXED in grid.py):** 28 workers all
+stamping code_version while the tracked results JSON / leaderboard churn ⇒
+`git diff HEAD` SIGBUS (mmap of truncated file) + exit-128 (index lock).
+Killed 237/495 assumption cells (all pre-cache-check, so leaderboard rows
+unharmed). Fix: GIT_OPTIONAL_LOCKS=0, atomic os.replace of the results JSON,
+retry×3 on CalledProcessError — all in src/explorations/synthetic/grid.py.
 **Checkpoints did NOT survive migration** (`checkpoints/` = manifest only,
 3.7 MB). Doesn't matter for done cells: `eval_key` hits the leaderboard row
 BEFORE touching checkpoints (keys are pure config hashes, no git SHA), so all
