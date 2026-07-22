@@ -143,3 +143,66 @@ and poses the honest architectural question: which code *linearizes* the
 (new per-arch predictions + the corrected falsifier referencing the
 threshold-optimized lines) committed BEFORE any grid — a future briefing;
 not executed in this review.
+
+---
+
+# Stage-6 #3b — architecture head-to-head on the re-scoped residual axis (2026-07-23)
+
+Grid: the locked uniform fair-backbone design (6 archs × d_sae {10,20,40} ×
+T {1,2,4,8} × k_pos {1,2,4,8,16} × seeds {1,2,42} + untrained controls, 30k
+steps, canonical runner, protocol 1.3.0). Primary metric:
+`equality_residual_recovery` (balacc over [additive ceiling 0.771, exact
+1.0], unclipped). Evaluated **blind against the § 5-r predictions frozen in
+`bench_spec.md` (amendment 2026-07-23, commit `241845d2`, strictly
+pre-grid)**; every number below is auto-rendered from the canonical
+leaderboard by `render_figs.py`.
+
+## Headline
+
+<!-- BEGIN AUTO:headline -->
+(pending — auto-filled by render_figs)
+<!-- END AUTO:headline -->
+
+## Verdict vs the frozen § 5-r predictions
+
+**[PLACEHOLDER — written from the rendered numbers after the grid; the
+prediction-vs-actual table and the POSITIVE/NEGATIVE/SPLIT call go here.
+Nothing in this section may be drafted before the aggregates exist.]**
+
+![main](figs/recipe_main.png)
+
+## Residual frontier (primary axis; mean ± sd over seeds, k_pos = 1)
+
+<!-- BEGIN AUTO:residual_frontier -->
+(pending)
+<!-- END AUTO:residual_frontier -->
+
+## DC-control frontier (phase class)
+
+<!-- BEGIN AUTO:phase_frontier -->
+(pending)
+<!-- END AUTO:phase_frontier -->
+
+![T](figs/recipe_T.png)
+
+## Untrained-encoder control (d_sae = 20, k_pos = 1)
+
+<!-- BEGIN AUTO:untrained -->
+(pending)
+<!-- END AUTO:untrained -->
+
+![untrained](figs/recipe_untrained_control.png)
+
+## Sparsity sweep on the residual (d_sae = 20)
+
+<!-- BEGIN AUTO:kpos -->
+(pending)
+<!-- END AUTO:kpos -->
+
+## Feature recovery / reconstruction companions (k_pos = 1)
+
+<!-- BEGIN AUTO:feature_recovery -->
+(pending)
+<!-- END AUTO:feature_recovery -->
+
+![local](figs/recipe_local_tradeoff.png)
