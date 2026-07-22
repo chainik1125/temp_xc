@@ -10,6 +10,24 @@ Last updated: 2026-07-22.
 
 ## 0. TL;DR — what's active right now
 
+- **STAGE-6 OF `recipe_instruction_phase_runs`: § 8 STOP, no grid
+  (2026-07-22, runpod overnight session).** The bench is fully **registered**
+  (generator off the pinned C4 mirror params, `toy_recipe_instruction_d64`,
+  `phase`/`equality` probe add-on, 8 tests; protocol stays 1.3.0) — but the
+  **equality-variant discriminability STOP-gate fired on condition (i)**:
+  raw-LINEAR access to `e_t = [c_t = c_{t-1}]` is 0.61 per-token / 0.72
+  window (≫ chance 0.5; tol 0.05), because the grounded **class-conditional
+  continuation rates** (dwell means 4.0→1.5 ⇒ P(e|c) spans 0.74→0.33) leak
+  the equality latent through the per-token-readable phase class — the exact
+  leak changepoint killed *by design* with its uniform-Π rebalance, which a
+  grounded mirror cannot do without un-grounding. Nonlinear residual intact
+  (additive ceiling 0.771 vs exact 1.000; MLP = 1.0 — gate (ii) PASS).
+  Frozen § 5 predictions remain untested/blind; grid withheld per the gate.
+  Re-scope options for review (re-normalize the primary axis to the additive
+  ceiling, or demote to regime-2/3-mixed) recorded in
+  [`recipe_instruction_phase_runs/bench_record.md`](recipe_instruction_phase_runs/bench_record.md).
+  A gate doing its job is the process succeeding — sound verdict, no win.
+
 - **EXPANSION CYCLE 4 DONE (2026-07-22, runpod, autonomous on Fable 5) —
   the interaction/equality prize is half-claimed. STOPPED for review.**
   Built the LEDGER-mandated **`hier_categorical`** mirror (per-doc phase

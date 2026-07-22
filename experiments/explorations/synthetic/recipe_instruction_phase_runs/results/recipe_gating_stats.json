@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "N_SEQS_PROBE": 6000,
+    "seq_len": 64,
+    "T_grid": [
+      2,
+      4,
+      8
+    ],
+    "sigma_noisy": 0.5,
+    "gates": {
+      "raw_linear_tol": 0.05,
+      "mlp_present": 0.9,
+      "control_oracle": 0.99,
+      "match_band": [
+        0.58,
+        0.68
+      ],
+      "marginal_tol": 0.08
+    }
+  },
+  "mirror": {
+    "marginal": [
+      0.26719010416666666,
+      0.4572864583333333,
+      0.0879609375,
+      0.09590104166666667,
+      0.09166145833333333
+    ],
+    "marginal_real": [
+      0.29,
+      0.51,
+      0.06,
+      0.07,
+      0.07
+    ],
+    "marginal_max_dev": 0.0527135416666667,
+    "match_rate": 0.6247460246086121
+  },
+  "analytic": {
+    "cond_match_rate_by_class": {
+      "0": 0.6325976097186399,
+      "1": 0.7398928113713154,
+      "2": 0.5616242323057659,
+      "3": 0.4055512292802314,
+      "4": 0.32928765880217786
+    },
+    "base_match_rate": 0.6251322751322751,
+    "e_balacc_from_c_t": 0.608687095835881,
+    "e_balacc_pair_additive": 0.7709145452696519,
+    "e_exact_pair_rule": 1.0
+  },
+  "noiseless": {
+    "per_token": {
+      "c_balacc_on_x": 0.9996040816777597,
+      "e_balacc_probe": 0.5952781933573399,
+      "e_balacc_ceiling": 0.6136373447605579
+    },
+    "window": {
+      "2": {
+        "e_balacc_probe": 0.6194385087977097,
+        "e_balacc_ceiling": 0.7202469901704178,
+        "e_balacc_mlp": 0.9995064896959966,
+        "e_balacc_mlp_ceiling": 0.9995664082068219
+      },
+      "4": {
+        "e_balacc_probe": 0.6111572945990427,
+        "e_balacc_ceiling": 0.6956179457222507
+      },
+      "8": {
+        "e_balacc_probe": 0.6046561798272919,
+        "e_balacc_ceiling": 0.6935468693732956
+      }
+    }
+  },
+  "noisy": {
+    "per_token": {
+      "c_balacc_on_x": 0.9762223369174816,
+      "e_balacc_probe": 0.5836836629678415,
+      "e_balacc_ceiling": 0.6045025559696872
+    },
+    "window": {
+      "2": {
+        "e_balacc_probe": 0.5847303021522847,
+        "e_balacc_ceiling": 0.6550154533110955,
+        "e_balacc_mlp": 0.9501718265063097,
+        "e_balacc_mlp_ceiling": 0.9485568259491912
+      },
+      "4": {
+        "e_balacc_probe": 0.5850858043138729,
+        "e_balacc_ceiling": 0.6619873769108175
+      },
+      "8": {
+        "e_balacc_probe": 0.5863032391028912,
+        "e_balacc_ceiling": 0.6508709271331035
+      }
+    }
+  },
+  "verdict": {
+    "raw_linear_lines": [
+      0.6136373447605579,
+      0.7202469901704178,
+      0.6956179457222507,
+      0.6935468693732956
+    ],
+    "worst_raw_linear_dev": 0.22024699017041782,
+    "i_raw_linear_at_chance": false,
+    "ii_latent_present_nonlinear": true,
+    "control_oracle_reachable": true,
+    "mirror_sane": true,
+    "passes_gate": false,
+    "stop_reason": "regime-2 leak: raw-LINEAR access to e_t exceeds chance \u2014 decompose via analytic lines (from-c_t vs pair-additive) and STOP before the grid; the review must re-scope the claim."
+  }
+}

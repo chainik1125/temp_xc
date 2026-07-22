@@ -39,15 +39,16 @@ arch verdict is **NEGATIVE** (no arch recovers the sign). "Registered" ≠
 | **signed_motion** | theorem-first — FreqBench *ac_sign*, forked w/o its proofs | abstract | order-sensitive step (AC) | n/a | ✓ | **NEGATIVE** |
 | **assumption_consequence** | grounded — expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✓ | **NEGATIVE** *(frozen windows>per-token prediction failed: order-1 mirror ⇒ s_i sufficient, per-token reads the directed latent; needs order-2+ mirror to separate archs)* |
 | **hedging_drift** | grounded — expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✓ | **SPLIT** *(per-token R² 0.73 of 0.77 ceiling — drift is ambient per token; window edge ≤ +0.04 with weak T-trend)* |
-| **recipe_instruction_phase_runs** | grounded — expansion C3 → C4 (`hier_categorical` re-freeze) | text-corpus | interaction/equality (**regime 3**) | SPEC | ✗ | — *(stage-6 pending — the first grounded regime-3 candidate; needs the equality-latent STOP-gate variant)* |
+| **recipe_instruction_phase_runs** | grounded — expansion C3 → C4 (`hier_categorical` re-freeze) | text-corpus | interaction/equality (**regime 2/3-mixed** — measured at § 8) | SPEC | ✓ | — *(stage-6 § 8 STOP, no grid: the equality-variant gate found raw-linear access to `e_t` at 0.61 per-token / 0.72 window ≫ chance — a class-conditional continuation-rate leak the frozen regime-3 claim missed; nonlinear-only residual 0.77→1.00 is real; awaiting review re-scope — see `bench_record.md`)* |
 | **list_item_parallelism** | grounded — expansion C3 (re-freeze) | text-corpus | bursty / self-exciting (AC) | SPEC | ✗ | — *(pending; ⚠ redundant class + weak mirror — low value)* |
 | **self_reference_echo** | grounded — expansion C2 (re-filed) | reasoning-trace | bursty / self-exciting (AC) | SPEC\* | ✗ | — *(not planned; redundant, marginal labeler)* |
 
 *Datasource plugins (the `✓`s): `toy_backtracking_selfexcite_d64`,
 `toy_changepoint_modes_d64`, `toy_cyclic_{circle,random}_M101_d128`,
 `toy_signed_motion_M19_d40`, `toy_assumption_consequence_d64`,
-`toy_hedging_drift_d64`. Remaining SPECs without a plugin:
-`list_item_parallelism`, `self_reference_echo` (both deliberately unbuilt).*
+`toy_hedging_drift_d64`, `toy_recipe_instruction_d64`. Remaining SPECs
+without a plugin: `list_item_parallelism`, `self_reference_echo` (both
+deliberately unbuilt).*
 
 **Stage-6 outcome (2026-07-22):** both grounded benches built, gated, and run
 through the uniform fair-backbone grid (495 cells each, 0 failures) with the
@@ -96,10 +97,15 @@ The reasoning-trace cell stays open with a sharper diagnosis: proof-phase
 streams hold **three timescales** (run / segment / doc) and even the
 doc-level hierarchy fails; the C5 build is a **segment-level regime layer**,
 to be validated under the hardened gate so added expressiveness stays
-structurally checked. The stage-6 build of the new SPEC needs the
-equality-latent variant of the discriminability STOP-gate (both raw-linear
-readouts can sit at chance; verify the nonlinear access route, as in
-changepoint § 8).
+structurally checked. **Stage-6 update (2026-07-22):** the new SPEC's
+equality-variant STOP-gate *fired* — the grounded dwell heterogeneity leaks
+`e_t` into raw-linear readouts (0.61 per-token / 0.72 window vs additive
+ceiling 0.77; nonlinear residual to 1.00 intact), so the bench is
+regime-2/3-mixed as frozen and the grid was withheld pending a review
+re-scope (re-normalize the primary axis to the additive ceiling, or demote
+the claim — options in the bench record). The prize's text-corpus half is
+therefore *valid as a phenomenon* but **not yet a certified regime-3
+architecture test**.
 
 ## Authoritative sources (this file is the human index over them)
 
