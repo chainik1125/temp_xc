@@ -22,6 +22,11 @@ by the synthetic-benchmark program (``experiments/explorations/synthetic/``):
 - :func:`hedging_drift` — hierarchical AR(1) confidence stream (per-trace
   level + trend + AR residual), the fitted C3 mirror; a slow-drift DC latent
   (the hedging_drift bench, expansion stage 6).
+- :func:`recipe_instruction_phase_runs` — hierarchical categorical phase
+  process (per-doc propensities + empirical dwell + tilted jump chain), the
+  fitted C4 ``hier_categorical`` mirror; an interaction/equality latent
+  ``e_t = [c_t = c_{t-1}]`` (the recipe_instruction_phase_runs bench,
+  expansion stage 6 #3).
 
 Each datasource in ``configs/data.yaml`` names one generator; the reverse index
 (generator → datasource(s) → bench) is at :data:`_GENERATORS`.
@@ -43,8 +48,10 @@ returns a callable suitable for ``ActivationBuffer`` / ``WindowBuffer``.
 
 from __future__ import annotations
 
+import json
 import math
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 
 import numpy as np
@@ -1045,6 +1052,155 @@ def hedging_drift(
     )
 
 
+# ── Recipe-instruction phase-runs bench (expansion C3→C4, stage 6 #3) ──
+
+
+# Canonical C4 hier_categorical mirror, pinned as package data. The file is a
+# byte-identical copy (sha256 855637b7e0730a…) of the frozen spec artifact
+# experiments/explorations/synthetic/recipe_instruction_phase_runs/
+# mirror_params.json (275 per-doc propensity vectors + per-symbol empirical
+# dwell lists + the alpha-tilted global jump chain) — too large to pin in YAML
+# the way the g7 P/pi are.
+_RECIPE_MIRROR_FILE = (Path(__file__).resolve().parent / "params"
+                       / "recipe_instruction_hier_categorical.json")
+_RECIPE_MIRROR_CACHE: dict | None = None
+
+
+def _recipe_mirror_params() -> dict:
+    global _RECIPE_MIRROR_CACHE
+    if _RECIPE_MIRROR_CACHE is None:
+        _RECIPE_MIRROR_CACHE = json.loads(_RECIPE_MIRROR_FILE.read_text())
+    return _RECIPE_MIRROR_CACHE
+
+
+def recipe_instruction_phase_runs(
+    *,
+    d_in: int = 64,
+    K_c: int = 15,
+    n_c: int = 3,
+    mag_phase: float = 2.5,
+    mag_content: float = 1.0,
+    sigma: float = 0.0,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Recipe-instruction phase-runs bench — interaction/equality (C4 SPEC).
+
+    Mirrors the *measured* functional-phase run structure of instructional web
+    text (``experiments/explorations/synthetic/recipe_instruction_phase_runs/
+    bench_spec.md``): 5 per-sentence content classes (other / context /
+    ingredient-listing / imperative-step / tip-caution) with self-match
+    ACF(1) = 0.479 ≫ nulls. Two layers:
+
+    **Layer 1 — hierarchical categorical phase dynamics** (the C4
+    ``hier_categorical`` fit, gate-8 PASS on held-out ACF(4)+MI(2); sampling
+    matches ``explorations.synthetic.expansion.mirrors.gen_hier_categorical``).
+    Per sequence, a phase propensity vector ``pi_j`` is drawn from the 275
+    EMPIRICAL deconvolved per-doc vectors (heavy tails preserved); the phase
+    ``c_t`` then dwells per the per-symbol empirical dwell lists and, on a
+    jump out of ``c``, moves to ``d`` with probability::
+
+        P(d | c, j) = alpha · pi_j(d | d != c) + (1 - alpha) · J(c, d)
+
+    (``alpha = 0.94`` MLE-fit; ``J`` the global no-self-jump chain). Matched:
+    dwell, one-step jumps, doc-marginal heterogeneity. Deliberately NOT
+    matched: ACF(4) / MI(2) (gate-8-verified on held-out docs) and anything
+    beyond order-1-with-hierarchy.
+
+    **Layer 2 — emission** over a fixed orthonormal dictionary of
+    ``F = 5 + K_c`` directions, the changepoint/assumption pattern::
+
+        x_t = m · u_{c_t}  +  Σ_{j ∈ content_t} m_j · u_j  +  σ · ε_t
+
+    ``u_{c_t}`` is the phase-signature direction (dominant magnitude
+    ``mag_phase > mag_content`` → top-1 atom, survives ``k_pos = 1``);
+    ``content_t`` is a random size-``n_c`` subset of the ``K_c`` content
+    directions, phase-independent (so ``x_t ⊥ past | c_t`` exactly).
+
+    Direction sets reported separately: the 5 phase directions go in
+    ``hidden_features`` (→ ``gauc``), the ``K_c`` content directions in
+    ``emission_features`` (→ ``eauc``).
+
+    Ground truths exposed (in ``extra``):
+        phase_class_labels: (n_seqs, seq_len)  c_t ∈ {0..4} (DC control probe)
+        equality_labels:    (n_seqs, seq_len)  e_t = [c_t = c_{t-1}] — the
+                            PRIMARY regime-3 latent. Convention (spec § 3 /
+                            briefing): position 0 of each sequence has no
+                            predecessor, so ``e_0 = 0``.
+    """
+    params = _recipe_mirror_params()
+    n_phases = int(params["n_symbols"])
+    alpha = float(params["alpha"])
+    J = np.asarray(params["jump_P"], dtype=np.float64)
+    props = np.asarray(params["doc_props"], dtype=np.float64)
+    dwell = [np.asarray(d, dtype=np.int64) for d in params["dwell"]]
+    if n_phases + K_c > d_in:
+        raise ValueError(f"F = n_phases+K_c ({n_phases + K_c}) > d_in ({d_in})")
+    if n_c > K_c:
+        raise ValueError(f"n_c ({n_c}) > K_c ({K_c})")
+
+    rng = np.random.default_rng(seed)
+
+    # Layer 1: hier_categorical phase stream (matches gen_hier_categorical).
+    c = np.empty((n_seqs, seq_len), dtype=np.int64)
+    doc_idx = rng.integers(0, len(props), size=n_seqs)
+    for i in range(n_seqs):
+        pi_j = props[doc_idx[i]]
+        cur = int(rng.choice(n_phases, p=pi_j))
+        t = 0
+        while t < seq_len:
+            r = int(rng.choice(dwell[cur]))
+            c[i, t:t + r] = cur
+            t += r
+            tilde = pi_j.copy()
+            tilde[cur] = 0.0
+            tot = tilde.sum()
+            if tot > 0:
+                p = alpha * (tilde / tot) + (1.0 - alpha) * J[cur]
+            else:   # doc propensity degenerate on cur — global chain only
+                p = J[cur].copy()
+            p = np.clip(p, 0.0, None)
+            p /= p.sum()
+            cur = int(rng.choice(n_phases, p=p))
+    e = np.zeros((n_seqs, seq_len), dtype=np.float32)
+    e[:, 1:] = (c[:, 1:] == c[:, :-1]).astype(np.float32)   # e_0 = 0 convention
+
+    # Orthonormal dictionary: n_phases phase-signature + K_c content dirs.
+    raw = rng.standard_normal((d_in, d_in))
+    Qd, _ = np.linalg.qr(raw)
+    U_p = Qd[:n_phases].astype(np.float32)                 # phase-signature dirs
+    U_c = Qd[n_phases:n_phases + K_c].astype(np.float32)   # content dirs
+
+    # Layer 2: emission (the changepoint/assumption pattern).
+    mp = np.abs(rng.normal(mag_phase, 0.3 * mag_phase,
+                           size=(n_seqs, seq_len))).astype(np.float32)
+    x = mp[..., None] * U_p[c]                             # (n_seqs, seq_len, d_in)
+    pick = np.argsort(rng.random((n_seqs, seq_len, K_c)), axis=-1)[:, :, :n_c]
+    cmag = np.abs(rng.normal(mag_content, 0.3 * mag_content,
+                             size=(n_seqs, seq_len, n_c))).astype(np.float32)
+    x += (cmag[..., None] * U_c[pick]).sum(axis=2)
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(U_c),           # content set → eauc
+        hidden_features=torch.from_numpy(U_p),             # phase set → gauc
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra={
+            "phase_class_labels": torch.from_numpy(c),
+            "equality_labels": torch.from_numpy(e),
+            "n_phases": int(n_phases),
+            "alpha": alpha,
+            "match_rate_realized": float(e[:, 1:].mean()),
+        },
+    )
+
+
 # ── Refill-source factory (used by ActivationBuffer / WindowBuffer) ────
 
 
@@ -1061,6 +1217,7 @@ def hedging_drift(
 #                       toy_cyclic_random_M101_d128                  (frequency)
 #   assumption_consequence → toy_assumption_consequence_d64          (assumption_consequence)
 #   hedging_drift     → toy_hedging_drift_d64                        (hedging_drift)
+#   recipe_instruction_phase_runs → toy_recipe_instruction_d64       (recipe_instruction_phase_runs)
 _GENERATORS = {
     "markov":  markov_chain_support,
     "coupled": coupled_hmm,
@@ -1070,6 +1227,7 @@ _GENERATORS = {
     "cyclic_tones": cyclic_tones,
     "assumption_consequence": assumption_consequence,
     "hedging_drift": hedging_drift,
+    "recipe_instruction_phase_runs": recipe_instruction_phase_runs,
 }
 
 

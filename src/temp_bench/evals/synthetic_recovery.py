@@ -324,6 +324,14 @@ class SyntheticRecovery(Evaluator):
             from temp_bench.evals.hedging_recovery import hedging_metrics
             out.update(hedging_metrics(model, data, eval_window_L=L))
 
+        # Recipe-instruction phase/equality add-on (expansion stage-6 #3). Only
+        # fires for the toy_recipe_instruction datasource, which exposes the
+        # equality-adjacency labels in `extra`. No-op (byte-identical metrics)
+        # for every other bench → protocol stays 1.3.0.
+        if getattr(data, "extra", None) and "equality_labels" in data.extra:
+            from temp_bench.evals.recipe_recovery import recipe_metrics
+            out.update(recipe_metrics(model, data, eval_window_L=L))
+
         return out
 
     def primary_metric(self) -> str:

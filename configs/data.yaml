@@ -279,6 +279,40 @@ datasources:
       explorations/synthetic/hedging_drift/bench_spec.md (frozen; hier_ar1
       amendment 2026-07-19).
 
+  toy_recipe_instruction_d64:
+    category: synthetic
+    generator: recipe_instruction_phase_runs
+    params:
+      d_in: 64
+      K_c: 15
+      n_c: 3
+      mag_phase: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Expansion stage-6 #3 recipe-instruction phase runs: interaction/equality
+      (regime-3 candidate) bench on the text-corpus domain. Layer 1 = the
+      canonical C4 hier_categorical mirror — per-doc phase propensities (275
+      empirical deconvolved vectors) + per-symbol empirical dwell + the
+      alpha=0.94-tilted global jump chain (gate-8 PASS on held-out
+      ACF(4)+MI(2), the hardened two-moment rule). The fit is too large for
+      YAML; it is pinned byte-identically as package data
+      (src/temp_bench/data/params/recipe_instruction_hier_categorical.json,
+      sha256 855637b7e0730a74... == the frozen spec artifact
+      recipe_instruction_phase_runs/mirror_params.json). Layer 2 = the
+      standard emission: F=20 = 5 phase-signature dirs (mag 2.5 ->
+      hidden_features/gauc) + 15 content (mag 1.0 -> emission_features/eauc),
+      phase-independent content (clean DPI). Latents: phase class c_t (DC
+      CONTROL — balanced-acc chance 1/5, oracle 1, per-token-readable by
+      design) and equality-adjacency e_t = [c_t = c_{t-1}] (PRIMARY, regime
+      3; e_0 = 0 convention; balanced-acc chance 1/2, oracle 1 — deterministic
+      given the two labels; raw-linear access quantified in gating, incl. the
+      class-conditional continuation-rate leak). Spec: experiments/
+      explorations/synthetic/recipe_instruction_phase_runs/bench_spec.md
+      (frozen; C4 re-freeze amendment 2026-07-22).
+
   gemma_2_2b_it_l13_fineweb_24k128:
     category: real_lm
     subject_model: google/gemma-2-2b-it
