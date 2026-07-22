@@ -55,8 +55,13 @@ Last updated: 2026-07-22.
   gaps accepted → new README execution rules (gating scripts committed
   before first run; threshold-optimized ceilings). **Re-scope DECIDED:
   option 1** — primary axis re-normalized to the regime-3 residual
-  `[0.771, 1.0]`, dated § 5 re-freeze required before any grid (future
-  briefing; see the bench_record review section). Briefing retired.
+  `[0.771, 1.0]`, dated § 5 re-freeze required before any grid. Briefing
+  retired; **the re-scoped head-to-head is QUEUED:
+  [`briefings/stage6-recipe-rescoped.md`](../../../briefings/stage6-recipe-rescoped.md)
+  (runpod) — predictions frozen by mac-local in the briefing itself
+  (additive families ≈ 0 by the ceiling bound; post/spectral positive,
+  fragile/robust per the changepoint precedent), residual metric additive,
+  ~495-cell grid, blind verdict.**
 
 - **EXPANSION CYCLE 4 DONE (2026-07-22, runpod, autonomous on Fable 5) —
   the interaction/equality prize is half-claimed. STOPPED for review.**
