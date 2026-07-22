@@ -1,15 +1,24 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-22 (mid stage-6, stopping for POD MIGRATION).
+**Last rewrite:** 2026-07-22 (on the MIGRATED pod; stage-6 grids running).
 
 ## Who / where
-Remote CC on RunPod (Linux). Repo root = the `temp_xc` dir under the volume
-(old pod: `/workspace/temp_xc`; **post-2026-07-22 migration: `~/workspace/temp_xc`**).
-Tokens (`gh_token`, `anthropic_key`, `hf_token`) live in `.tokens/` NEXT TO the
-repo root (old pod `/workspace/.tokens/`; new pod `~/workspace/.tokens/`).
+Remote CC on RunPod (Linux). **Migrated pod (2026-07-22): repo root is
+`/workspace/temp_xc`** (the `~/workspace` prediction was wrong — same old
+path). Tokens in `/workspace/.tokens/` (present; `gh_token`, `anthropic_key`,
+`hf_token`).
 Push: `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`
 (from the repo root). Export anthropic_key as ANTHROPIC_API_KEY.
-**⚠ If `.tokens/` is missing on the new pod, the user relays it from their laptop.**
+
+**Migrated-pod resources (measured 2026-07-22):** cgroup v1; `cpu.cfs_quota_us=-1`
+(no CFS cap) with cpuset ⇒ **32 CPUs real** (`nproc`=32); memory cgroup says
+128 GB but user-stated limit is **64 GB** — size for 64. 28 workers × OMP1
+measured ~0.65 GB/worker (18 GB total) — lots of headroom. Old-pod throttling
+gotchas don't apply here.
+**Checkpoints did NOT survive migration** (`checkpoints/` = manifest only,
+3.7 MB). Doesn't matter for done cells: `eval_key` hits the leaderboard row
+BEFORE touching checkpoints (keys are pure config hashes, no git SHA), so all
+459 assumption rows fast-forward. Only never-run cells train fresh.
 
 ## Current task: `briefings/stage6-grounded-eval.md` — IN PROGRESS (grid stage)
 Build + blind-evaluate `assumption_consequence` (AC) + `hedging_drift` (DC).
@@ -33,15 +42,15 @@ Everything up to the grid is DONE and pushed:
 - **Grid partial state committed: 459/495 assumption cells, 0 failures**
   (leaderboard +458 rows @ 30k steps, seeds {1,2,42}). Hedging NOT started.
 
-## Next actions (on the new pod)
-1. Env: `curl -LsSf https://astral.sh/uv/install.sh | sh && uv python install 3.12.13`
-   (if home dir wiped); check `/sys/fs/cgroup/{cpu.max,memory.max}` FIRST.
-2. Re-run `.venv/bin/python -u -m experiments.explorations.synthetic.assumption_consequence.run_grid <N>`
-   — fast-forwards through the 459 cached cells IF `checkpoints/` (3.7 GB,
-   NOT in git) survived the migration (same volume). Fresh volume ⇒ those
-   cells retrain (~130 core-h total for all 990 cells). Then
-   `…hedging_drift.run_grid <N>`. Size N ≈ vCPU quota, OMP=1; launch as a
-   harness-tracked background task (NO nohup/disown).
+## Next actions
+1. **RUNNING NOW**: assumption run_grid, 28 workers, OMP1, harness task
+   `bwcxzxpqg` (log under the session scratchpad `tasks/`). 459/495
+   fast-forwarded from leaderboard; ~36 cells training fresh. Venv python
+   3.12.11 works — no uv reinstall needed.
+2. When it exits: verify 0 failures, then launch
+   `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -u -m
+   experiments.explorations.synthetic.hedging_drift.run_grid 28` (all 495
+   fresh — checkpoints gone; harness-tracked background, NO nohup/disown).
 3. Verify 0 failures → run both `render_figs` → **write prediction-vs-actual
    verdicts from the numbers** (blind discipline: report, never retune) →
    registry.py Bench entries + render_report → REPORT.md per-bench links →
