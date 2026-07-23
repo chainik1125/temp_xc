@@ -1,0 +1,33 @@
+{
+ "card": "freqbench/cards/FB-1.md",
+ "T": 8,
+ "symmetry_audit": "reflection a->-a + orthogonal column-flip of R exchanges the sign classes exactly: sign = chirality w.r.t. the realized R. Well-defined per seed (eval rematerializes with the training seed); NOT poolable across seeds; pair id is reflection-invariant. Not a P3 trivialization.",
+ "memorization_audit": {
+  "templates": 606,
+  "max_d_sae": 202,
+  "probe_rows": 20000
+ },
+ "bag_codes_mlp_sign": [
+  0.5055,
+  0.5062,
+  0.501
+ ],
+ "stacked_codes_linear_sign": [
+  0.5002,
+  0.4839,
+  0.5311
+ ],
+ "shuffled_sign_oracle": [
+  0.5046,
+  0.5096,
+  0.5095
+ ],
+ "verdict": {
+  "checks": {
+   "bag_codes_sign_at_half": true,
+   "stacked_linear_sign_at_half": true,
+   "shuffle_full_null_for_sign": true
+  },
+  "passes_t2": true
+ }
+}

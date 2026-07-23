@@ -1,0 +1,116 @@
+{
+ "card": "freqbench/cards/FB-1.md",
+ "params": {
+  "M": 101,
+  "omega": [
+   3,
+   98,
+   12,
+   89,
+   30,
+   71
+  ],
+  "d_in": 24,
+  "sigma": 0.1,
+  "T_grid": [
+   2,
+   4,
+   8
+  ],
+  "seed": 0
+ },
+ "gates": {
+  "raw_tol": 0.05,
+  "sign_oracle": 0.75,
+  "bag_sign_tol": 0.04
+ },
+ "by_T": {
+  "2": {
+   "oracle6": 0.9518,
+   "pair_oracle": 0.9838,
+   "sign_oracle_by_pair": [
+    0.904,
+    1.0,
+    1.0
+   ],
+   "raw_token_linear6": 0.16657714996895073,
+   "raw_window_linear6": 0.17015627285543247,
+   "raw_window_linear_sign": [
+    0.4968,
+    0.5118,
+    0.4991
+   ],
+   "bag_mlp_sign": [
+    0.4997,
+    0.4971,
+    0.4999
+   ]
+  },
+  "4": {
+   "oracle6": 1.0,
+   "pair_oracle": 1.0,
+   "sign_oracle_by_pair": [
+    0.9999,
+    1.0,
+    1.0
+   ],
+   "raw_token_linear6": 0.16493007284145453,
+   "raw_window_linear6": 0.11217160116552845,
+   "raw_window_linear_sign": [
+    0.4832,
+    0.5078,
+    0.5117
+   ],
+   "bag_mlp_sign": [
+    0.503,
+    0.4995,
+    0.4934
+   ]
+  },
+  "8": {
+   "oracle6": 1.0,
+   "pair_oracle": 1.0,
+   "sign_oracle_by_pair": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "raw_token_linear6": 0.1659829665832077,
+   "raw_window_linear6": 0.1149185262982595,
+   "raw_window_linear_sign": [
+    0.5002,
+    0.4969,
+    0.4954
+   ],
+   "bag_mlp_sign": [
+    0.5011,
+    0.4982,
+    0.5015
+   ]
+  },
+  "16": {
+   "oracle6": 1.0,
+   "pair_oracle": 1.0,
+   "sign_oracle_by_pair": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  }
+ },
+ "verdict": {
+  "rawlin_worst_dev": 0.0545,
+  "bag_sign_worst_dev": 0.0066,
+  "pairs_above_bar_by_T": {
+   "2": 3,
+   "4": 3,
+   "8": 3
+  },
+  "checks": {
+   "raw_linear_floors_at_chance": false,
+   "bag_sign_exact_null": true,
+   "sign_oracle_discriminates": true
+  },
+  "passes_gate": false
+ }
+}

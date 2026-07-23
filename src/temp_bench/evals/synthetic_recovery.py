@@ -351,6 +351,21 @@ class SyntheticRecovery(Evaluator):
             from temp_bench.evals.colored_recovery import colored_metrics
             out.update(colored_metrics(model, data))
 
+        # Phasepair sign/pair decomposition add-on (FreqBench FB-1). Fires
+        # only when the cyclic Ω contains ± pairs (y + y' ≡ 0 mod M) — the
+        # frequency bench's Ω has none, so its rows stay byte-identical.
+        # Protocol stays 1.3.0.
+        if getattr(data, "extra", None) and "velocity_labels" in data.extra:
+            from temp_bench.evals.phasepair_recovery import (
+                find_pairs,
+                phasepair_metrics,
+            )
+            if find_pairs([int(y) for y in data.extra["omega"]],
+                          int(data.extra["M"])):
+                n_windows = 128 if spec.smoke else 1024
+                out.update(phasepair_metrics(model, data, eval_window_L=L,
+                                             n_windows=n_windows))
+
         return out
 
     def primary_metric(self) -> str:

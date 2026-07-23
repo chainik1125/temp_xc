@@ -369,6 +369,33 @@ datasources:
       extra['rho_schedule']). This is the suite's first
       feature-direction-recovery-primary bench.
 
+  toy_phasepair_M101_d24:
+    category: synthetic
+    generator: cyclic_tones
+    params:
+      M: 101
+      omega: [3, 98, 12, 89, 30, 71]
+      embedding: circle
+      d_in: 24
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-1 phasepair (theorem-first; frozen card
+      freqbench/cards/FB-1.md). The cyclic_tones generator (frequency bench
+      substrate — P1-P5 apparatus attached) at Omega = ±3, ±12, ±30 mod 101:
+      6 classes = 3 magnitude pairs x sign. Within a pair the trajectories
+      are time reversals — identical per-channel power spectra AND identical
+      bag-of-symbols distribution (exact null) — so the SIGN is phase-only:
+      it lives in the cross-channel quadrature. Primary metric sign_recovery
+      (per-pair binary probes, normalized from chance 1/2) with
+      pair_recovery as the power-readable companion; add-on
+      phasepair_recovery fires on ±-pair detection in omega (no-op for the
+      frequency bench's Omega). Memorization: |Omega|*M = 606 templates >>
+      d_sae <= 202 (the signed_motion 2F=38 confound, capacity-controlled).
+      c_relevance: GPT-2 day-stride direction (sprint § 4.7) — a measured
+      real-model phase code.
+
   gemma_2_2b_it_l13_fineweb_24k128:
     category: real_lm
     subject_model: google/gemma-2-2b-it
