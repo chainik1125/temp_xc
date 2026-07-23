@@ -37,6 +37,8 @@ arch verdict is **NEGATIVE** (no arch recovers the sign). "Registered" ≠
 | **changepoint** | hybrid — topic dwell measured; emission constructed | abstract emission | change-point / equality (DC+AC) | SPEC (semi) | ✓ | **SPLIT** |
 | **frequency** | theorem-first — Dmitry FreqBench port | abstract | periodic / cyclic-tone (AC) | n/a | ✓ | **POSITIVE** |
 | **signed_motion** | theorem-first — FreqBench *ac_sign*, forked w/o its proofs | abstract | order-sensitive step (AC) | n/a | ✓ | **NEGATIVE** |
+| **multilane** | theorem-first — FB-C1 card FB-2 (superposition) | abstract | 3 simultaneous cyclic tones (AC, regime 3) | n/a | ✓ | **POSITIVE** *(spectral 0.79 > post 0.46 ≫ additive family ≈ token ≈ 0 at T=8; memorization-immune \|Ω\|³M³; the sprint's multiband>vanilla headline FAILED its frozen T=8 bar (+0.019 < 0.03) — band advantage is scarcity/coarse-window-bound, and spectral COLLAPSES at k_pos=8 (−0.583 margin flip))* |
+| **colored_sources** | theorem-first — FB-C1 card FB-3 (CS-1/CS-2) | abstract | lag-D covariance / direction-recovery-primary (order-2) | n/a | ✓ | **POSITIVE** *(weak realization: CS-1 floor holds over all 261 T≤D cells; the W=D+1 transition is realized at ≤21% of the provable +0.96 ceiling, and the ordering INVERTS the tone benches — txc-pre ≥ spectral > post ≈ floor)* |
 | **assumption_consequence** | grounded — expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✓ | **NEGATIVE** *(frozen windows>per-token prediction failed: order-1 mirror ⇒ s_i sufficient, per-token reads the directed latent; needs order-2+ mirror to separate archs)* |
 | **hedging_drift** | grounded — expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✓ | **SPLIT** *(per-token R² 0.73 of 0.77 ceiling — drift is ambient per token; window edge ≤ +0.04 with weak T-trend)* |
 | **recipe_instruction_phase_runs** | grounded — expansion C3 → C4 → stage-6 #3b re-scope | text-corpus | interaction/equality (**regime-3 residual** over the measured additive floor) | SPEC | ✓ | **POSITIVE** *(the first grounded regime-3 architecture verdict: on the re-scoped residual axis [additive ceiling 0.771 → exact 1.0], only Spectral-TXC exposes the latent — T=2 +0.60/+0.90/+0.96 across d, k-robust to 4, untrained ≈ 0 — TXC-post caps at the ceiling (+0.26 best), all additive families pinned at the DC-leak line (−0.76…−0.86); § 5-r predictions frozen pre-grid in `241845d2`, checked blind — see `bench_record.md`)* |
@@ -46,7 +48,9 @@ arch verdict is **NEGATIVE** (no arch recovers the sign). "Registered" ≠
 *Datasource plugins (the `✓`s): `toy_backtracking_selfexcite_d64`,
 `toy_changepoint_modes_d64`, `toy_cyclic_{circle,random}_M101_d128`,
 `toy_signed_motion_M19_d40`, `toy_assumption_consequence_d64`,
-`toy_hedging_drift_d64`, `toy_recipe_instruction_d64`. Remaining SPECs
+`toy_hedging_drift_d64`, `toy_recipe_instruction_d64`,
+`toy_multilane_circle_M101_d24`, `toy_colored_sources_N32_D2_d32`,
+`toy_phasepair_M101_d24` (FB-C1). Remaining SPECs
 without a plugin: `list_item_parallelism`, `self_reference_echo` (both
 deliberately unbuilt).*
 
