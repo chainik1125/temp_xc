@@ -49,6 +49,9 @@ Per-token matched: window **T = 4** (token archs T=1), matched to **B\* = 2** at
 - **hedging_drift**: d_sae ∈ {20, 10} (F=20; feature-direction count (1 confidence + 19 content).)
 - **recipe_instruction_phase_runs**: d_sae ∈ {20, 10} (F=20; feature-direction count (5 phase-signature + 15 content).)
 - **frequency**: d_sae ∈ {101, 50} (F=101; alphabet M=101 (NOT a direction count): the circle embedding is rank-2 (all M symbols in a 2-D plane), so {101, 50} are alphabet-scaled capacities, both < the memorization budget |Ω|·M=1010.)
+- **multilane**: d_sae ∈ {101, 50} (F=101; per-lane alphabet M=101 (frequency precedent; the strict direction count is the 6 plane axes).)
+- **colored_sources**: d_sae ∈ {32, 16} (F=32; the N=32 Haar basis rows — the strict Part II direction count.)
+- **phasepair**: d_sae ∈ {101, 50} (F=101; alphabet M=101 (frequency precedent; rank-2 circle codebook).)
 <!-- END AUTO:operating_point -->
 
 ---
@@ -74,6 +77,10 @@ holes.
 | **recipe_instruction_phase_runs** · phase class c_t — functional-phase control (DC) | 0.999 / 0.999 | 0.987 / 0.999 | 0.988 / 0.998 | 0.998 / 0.953 | 0.999 / 0.920 | 0.995 / 0.896 |
 | **recipe_instruction_phase_runs** · equality residual of e_t=[c_t=c_{t-1}] over [additive ceiling 0.771, exact 1] (regime 3) (AC) | -0.786 / -0.786 | -0.778 / -0.773 | -0.802 / -0.806 | -0.798 / -0.834 | -0.817 / -0.834 | -0.228 / -0.826 |
 | **frequency** · velocity Y — cyclic tone f = Y/M (AC) | -0.004 / -0.001 | -0.003 / -0.003 | 0.064 / 0.060 | 0.068 / 0.072 | 0.767 / 0.770 | 0.777 / 0.796 |
+| **multilane** · 3 lane velocities — simultaneous circle tones (superposition) (AC) | 0.000 / 0.000 | -0.000 / 0.001 | 0.017 / 0.020 | 0.024 / 0.025 | 0.521 / 0.550 | 0.561 / 0.537 |
+| **colored_sources** · dictionary F — lag-D covariance recovery (direction-recovery primary) (AC) | 0.006 / 0.006 | 0.004 / 0.001 | 0.007 / 0.010 | 0.109 / 0.094 | -0.052 / -0.065 | -0.001 / -0.005 |
+| **phasepair** · rotation direction within ± pairs (phase-only) (AC) | 0.002 / -0.003 | 0.001 / -0.001 | 0.006 / 0.003 | 0.006 / -0.005 | 0.988 / 0.987 | -0.004 / -0.008 |
+| **phasepair** · pair id |Y| — tone magnitude (power-readable) (AC) | 0.002 / 0.003 | 0.003 / 0.001 | 0.022 / 0.017 | 0.022 / 0.011 | 0.988 / 0.979 | 1.000 / 1.000 |
 <!-- END AUTO:matrix_pertoken -->
 
 **The matrix as colour** — which architecture linearly exposes which latent (green
@@ -113,6 +120,9 @@ content). Where a benchmark exposes it, this is the "what did the recovery cost"
 | **hedging_drift** | 0.091 / 0.141 | 0.123 / 0.181 | 0.121 / 0.144 | 0.200 / 0.230 | 0.199 / 0.229 | 0.216 / 0.235 |
 | **recipe_instruction_phase_runs** | 0.117 / 0.171 | 0.157 / 0.202 | 0.148 / 0.172 | 0.266 / 0.351 | 0.260 / 0.343 | 0.294 / 0.360 |
 | **frequency** | 0.540 / 0.543 | 0.542 / 0.544 | 0.543 / 0.544 | 0.546 / 0.550 | 0.539 / 0.545 | 0.539 / 0.545 |
+| **multilane** | 0.362 / 0.372 | 0.379 / 0.391 | 0.364 / 0.365 | 0.371 / 0.380 | 0.295 / 0.299 | 0.332 / 0.348 |
+| **colored_sources** | 0.729 / 0.791 | 0.735 / 0.799 | 0.730 / 0.792 | 0.774 / 0.832 | 0.742 / 0.814 | 0.830 / 0.866 |
+| **phasepair** | 0.157 / 0.160 | 0.164 / 0.172 | 0.163 / 0.163 | 0.165 / 0.169 | 0.145 / 0.155 | 0.152 / 0.160 |
 <!-- END AUTO:panel_nmse -->
 
 **Content-direction recovery** (`eauc`; cosine-AUC of decoder atoms vs the
@@ -128,6 +138,9 @@ emission features; higher is better):
 | **hedging_drift** | 0.944 / 0.457 | 0.848 / 0.355 | 0.521 / 0.440 | 0.585 / 0.325 | 0.523 / 0.308 | 0.374 / 0.283 |
 | **recipe_instruction_phase_runs** | 0.953 / 0.383 | 0.833 / 0.326 | 0.486 / 0.425 | 0.260 / 0.010 | 0.327 / 0.010 | 0.246 / 0.192 |
 | **frequency** | 0.927 / 0.917 | 0.897 / 0.900 | 0.580 / 0.626 | 0.978 / 0.983 | 0.973 / 0.916 | 0.901 / 0.900 |
+| **multilane** | 0.563 / 0.590 | 0.610 / 0.643 | 0.569 / 0.615 | 0.672 / 0.723 | 0.941 / 0.951 | 0.910 / 0.902 |
+| **colored_sources** | 0.413 / 0.367 | 0.410 / 0.362 | 0.411 / 0.374 | 0.358 / 0.223 | 0.322 / 0.225 | 0.422 / 0.355 |
+| **phasepair** | 0.956 / 0.957 | 0.861 / 0.844 | 0.582 / 0.637 | 0.986 / 0.979 | 0.981 / 0.982 | 0.900 / 0.899 |
 <!-- END AUTO:panel_eauc -->
 
 **The gate, visually** — latent recovery (↑) vs reconstruction NMSE (→ worse). The
@@ -153,6 +166,9 @@ holes the uniform re-grid will fill.
 - **hedging_drift** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 - **recipe_instruction_phase_runs** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 - **frequency** (F=101): 62 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, spectral_txc_dcac, spectral_txc_full, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **multilane** (F=101): 60 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, spectral_txc_dcac, spectral_txc_full, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **colored_sources** (F=32): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **phasepair** (F=101): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 <!-- END AUTO:coverage -->
 
 ---

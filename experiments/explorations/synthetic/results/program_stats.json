@@ -1,7 +1,7 @@
 {
   "source": "results/leaderboard.jsonl",
-  "n_cells": 3412,
-  "n_groups": 1124,
+  "n_cells": 4744,
+  "n_groups": 1568,
   "operating_point": {
     "T_can": 4,
     "B_star": 2.0,
@@ -17,8 +17,10 @@
     "changepoint",
     "assumption_consequence",
     "hedging_drift",
-    "recipe_instruction_phase_runs",
-    "frequency"
+    "frequency",
+    "multilane",
+    "colored_sources",
+    "phasepair"
   ],
   "archs": [
     "batchtopk_sae",
@@ -1278,318 +1280,6 @@
           "loose": false
         }
       },
-      "recipe_instruction_phase_runs/phase/batchtopk_sae": {
-        "20": {
-          "value": 0.9994579451209425,
-          "std": 0.00013210844433439418,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 20,
-          "realized_l0_token": 2.0001729329427085,
-          "realized_l0_window": 2.0001729329427085,
-          "l0_deviation": 0.00017293294270848136,
-          "loose": false
-        },
-        "10": {
-          "value": 0.998812835702832,
-          "std": 0.00021288643985001196,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 10,
-          "realized_l0_token": 1.9987894694010417,
-          "realized_l0_window": 1.9987894694010417,
-          "l0_deviation": 0.0012105305989582593,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/phase/tsae": {
-        "20": {
-          "value": 0.9868772473296038,
-          "std": 0.0009478449930318205,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 20,
-          "realized_l0_token": 1.9957377115885417,
-          "realized_l0_window": 1.9957377115885417,
-          "l0_deviation": 0.004262288411458259,
-          "loose": false
-        },
-        "10": {
-          "value": 0.9991605707480353,
-          "std": 0.0003496705014437074,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 10,
-          "realized_l0_token": 2.00335693359375,
-          "realized_l0_window": 2.00335693359375,
-          "l0_deviation": 0.00335693359375,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/phase/stacked_batchtopk": {
-        "20": {
-          "value": 0.9881380350060849,
-          "std": 0.0014112694003508624,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.9985860188802083,
-          "realized_l0_window": 7.994344075520833,
-          "l0_deviation": 0.0014139811197917407,
-          "loose": false
-        },
-        "10": {
-          "value": 0.9978999842548116,
-          "std": 0.0014248791481801515,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.9998372395833333,
-          "realized_l0_window": 7.999348958333333,
-          "l0_deviation": 0.00016276041666674068,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/phase/txc_batchtopk_pre": {
-        "20": {
-          "value": 0.997865714455808,
-          "std": 0.002125088409520214,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.8800557454427083,
-          "realized_l0_window": 7.520222981770833,
-          "l0_deviation": 0.11994425455729174,
-          "loose": false
-        },
-        "10": {
-          "value": 0.9526065540777702,
-          "std": 0.02974228241888341,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.4488118489583333,
-          "realized_l0_window": 5.795247395833333,
-          "l0_deviation": 0.5511881510416667,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/phase/txc_batchtopk_post": {
-        "20": {
-          "value": 0.9989159596328884,
-          "std": 0.0006624731318515112,
-          "n_seeds": 3,
-          "k_pos": 8,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.9911092122395833,
-          "realized_l0_window": 7.964436848958333,
-          "l0_deviation": 0.00889078776041674,
-          "loose": false
-        },
-        "10": {
-          "value": 0.9195499066821163,
-          "std": 0.015913333045622577,
-          "n_seeds": 3,
-          "k_pos": 8,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.99755859375,
-          "realized_l0_window": 7.990234375,
-          "l0_deviation": 0.00244140625,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/phase/spectral_txc": {
-        "20": {
-          "value": 0.9946746042775211,
-          "std": 9.968627473706499e-05,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.980804443359375,
-          "realized_l0_window": 7.9232177734375,
-          "l0_deviation": 0.019195556640625,
-          "loose": false
-        },
-        "10": {
-          "value": 0.8958603890121634,
-          "std": 0.005397282335371061,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.9981486002604167,
-          "realized_l0_window": 7.992594401041667,
-          "l0_deviation": 0.0018513997395832593,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/equality_residual/batchtopk_sae": {
-        "20": {
-          "value": -0.7856004128453838,
-          "std": 0.014948684064695258,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 20,
-          "realized_l0_token": 2.0001729329427085,
-          "realized_l0_window": 2.0001729329427085,
-          "l0_deviation": 0.00017293294270848136,
-          "loose": false
-        },
-        "10": {
-          "value": -0.7864654450129667,
-          "std": 0.01586350137169221,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 10,
-          "realized_l0_token": 1.9987894694010417,
-          "realized_l0_window": 1.9987894694010417,
-          "l0_deviation": 0.0012105305989582593,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/equality_residual/tsae": {
-        "20": {
-          "value": -0.7782164723103165,
-          "std": 0.016435977444007627,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 20,
-          "realized_l0_token": 1.9957377115885417,
-          "realized_l0_window": 1.9957377115885417,
-          "l0_deviation": 0.004262288411458259,
-          "loose": false
-        },
-        "10": {
-          "value": -0.7729337463647262,
-          "std": 0.02138525262954248,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 1,
-          "d_sae": 10,
-          "realized_l0_token": 2.00335693359375,
-          "realized_l0_window": 2.00335693359375,
-          "l0_deviation": 0.00335693359375,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/equality_residual/stacked_batchtopk": {
-        "20": {
-          "value": -0.8019223798743665,
-          "std": 0.05221810426450244,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.9985860188802083,
-          "realized_l0_window": 7.994344075520833,
-          "l0_deviation": 0.0014139811197917407,
-          "loose": false
-        },
-        "10": {
-          "value": -0.8061020743955379,
-          "std": 0.04686546744055164,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.9998372395833333,
-          "realized_l0_window": 7.999348958333333,
-          "l0_deviation": 0.00016276041666674068,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/equality_residual/txc_batchtopk_pre": {
-        "20": {
-          "value": -0.7980704511232201,
-          "std": 0.045720923620654365,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.8800557454427083,
-          "realized_l0_window": 7.520222981770833,
-          "l0_deviation": 0.11994425455729174,
-          "loose": false
-        },
-        "10": {
-          "value": -0.8344270639453901,
-          "std": 0.026012040356748294,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.4488118489583333,
-          "realized_l0_window": 5.795247395833333,
-          "l0_deviation": 0.5511881510416667,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/equality_residual/txc_batchtopk_post": {
-        "20": {
-          "value": -0.8168443176772068,
-          "std": 0.04187673990528747,
-          "n_seeds": 3,
-          "k_pos": 8,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.9911092122395833,
-          "realized_l0_window": 7.964436848958333,
-          "l0_deviation": 0.00889078776041674,
-          "loose": false
-        },
-        "10": {
-          "value": -0.8339846134333381,
-          "std": 0.034230127797503604,
-          "n_seeds": 3,
-          "k_pos": 8,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.99755859375,
-          "realized_l0_window": 7.990234375,
-          "l0_deviation": 0.00244140625,
-          "loose": false
-        }
-      },
-      "recipe_instruction_phase_runs/equality_residual/spectral_txc": {
-        "20": {
-          "value": -0.22798812235748356,
-          "std": 0.04846318585004999,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 20,
-          "realized_l0_token": 1.980804443359375,
-          "realized_l0_window": 7.9232177734375,
-          "l0_deviation": 0.019195556640625,
-          "loose": false
-        },
-        "10": {
-          "value": -0.8263433676526573,
-          "std": 0.043796102953337565,
-          "n_seeds": 3,
-          "k_pos": 2,
-          "T": 4,
-          "d_sae": 10,
-          "realized_l0_token": 1.9981486002604167,
-          "realized_l0_window": 7.992594401041667,
-          "l0_deviation": 0.0018513997395832593,
-          "loose": false
-        }
-      },
       "frequency/velocity/batchtopk_sae": {
         "101": {
           "value": -0.003646851911605749,
@@ -1743,6 +1433,630 @@
           "realized_l0_token": 1.9793802897135417,
           "realized_l0_window": 7.917521158854167,
           "l0_deviation": 0.02061971028645826,
+          "loose": false
+        }
+      },
+      "multilane/multilane/batchtopk_sae": {
+        "101": {
+          "value": 0.00017563627246405298,
+          "std": 0.0008009321213288531,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 101,
+          "realized_l0_token": 2.0028076171875,
+          "realized_l0_window": 2.0028076171875,
+          "l0_deviation": 0.0028076171875,
+          "loose": false
+        },
+        "50": {
+          "value": 0.00045156941186149144,
+          "std": 0.0004898862372391383,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 50,
+          "realized_l0_token": 1.9996541341145833,
+          "realized_l0_window": 1.9996541341145833,
+          "l0_deviation": 0.0003458658854167407,
+          "loose": false
+        }
+      },
+      "multilane/multilane/tsae": {
+        "101": {
+          "value": -0.00025213310754187404,
+          "std": 0.0008249581459719643,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 101,
+          "realized_l0_token": 1.99871826171875,
+          "realized_l0_window": 1.99871826171875,
+          "l0_deviation": 0.00128173828125,
+          "loose": false
+        },
+        "50": {
+          "value": 0.0005867211769935301,
+          "std": 0.0009358466296176283,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 50,
+          "realized_l0_token": 2.0072224934895835,
+          "realized_l0_window": 2.0072224934895835,
+          "l0_deviation": 0.007222493489583481,
+          "loose": false
+        }
+      },
+      "multilane/multilane/stacked_batchtopk": {
+        "101": {
+          "value": 0.017419516821747093,
+          "std": 0.00349194362340955,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 2.0042521158854165,
+          "realized_l0_window": 8.017008463541666,
+          "l0_deviation": 0.004252115885416519,
+          "loose": false
+        },
+        "50": {
+          "value": 0.01952300128075127,
+          "std": 0.0005159658088990792,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.9951375325520833,
+          "realized_l0_window": 7.980550130208333,
+          "l0_deviation": 0.004862467447916741,
+          "loose": false
+        }
+      },
+      "multilane/multilane/txc_batchtopk_pre": {
+        "101": {
+          "value": 0.023542878355006153,
+          "std": 0.00025355815425771286,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 2.003753662109375,
+          "realized_l0_window": 8.0150146484375,
+          "l0_deviation": 0.003753662109375,
+          "loose": false
+        },
+        "50": {
+          "value": 0.024813359620884278,
+          "std": 0.0007860272940779908,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 2.0012715657552085,
+          "realized_l0_window": 8.005086263020834,
+          "l0_deviation": 0.0012715657552084814,
+          "loose": false
+        }
+      },
+      "multilane/multilane/txc_batchtopk_post": {
+        "101": {
+          "value": 0.5206947147330908,
+          "std": 0.006530754736156585,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 1.9918619791666667,
+          "realized_l0_window": 7.967447916666667,
+          "l0_deviation": 0.00813802083333326,
+          "loose": false
+        },
+        "50": {
+          "value": 0.5499090849145314,
+          "std": 0.0025073255091004262,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.9995524088541667,
+          "realized_l0_window": 7.998209635416667,
+          "l0_deviation": 0.0004475911458332593,
+          "loose": false
+        }
+      },
+      "multilane/multilane/spectral_txc": {
+        "101": {
+          "value": 0.5605969707939552,
+          "std": 0.0031889851229091395,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 2.000457763671875,
+          "realized_l0_window": 8.0018310546875,
+          "l0_deviation": 0.000457763671875,
+          "loose": false
+        },
+        "50": {
+          "value": 0.5373406010117422,
+          "std": 0.025134863706498155,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.997894287109375,
+          "realized_l0_window": 7.9915771484375,
+          "l0_deviation": 0.002105712890625,
+          "loose": false
+        }
+      },
+      "colored_sources/colored/batchtopk_sae": {
+        "32": {
+          "value": 0.006042861177235316,
+          "std": 0.009497989416913972,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 32,
+          "realized_l0_token": 1.9956563313802083,
+          "realized_l0_window": 1.9956563313802083,
+          "l0_deviation": 0.004343668619791741,
+          "loose": false
+        },
+        "16": {
+          "value": 0.00560674355906039,
+          "std": 0.010059940490950204,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 16,
+          "realized_l0_token": 1.9942220052083333,
+          "realized_l0_window": 1.9942220052083333,
+          "l0_deviation": 0.005777994791666741,
+          "loose": false
+        }
+      },
+      "colored_sources/colored/tsae": {
+        "32": {
+          "value": 0.0036081342305630836,
+          "std": 0.0017359229938461878,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 32,
+          "realized_l0_token": 1.9997049967447917,
+          "realized_l0_window": 1.9997049967447917,
+          "l0_deviation": 0.0002950032552082593,
+          "loose": false
+        },
+        "16": {
+          "value": 0.0005897769659145447,
+          "std": 0.013584640532499949,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 16,
+          "realized_l0_token": 1.9975484212239583,
+          "realized_l0_window": 1.9975484212239583,
+          "l0_deviation": 0.0024515787760417407,
+          "loose": false
+        }
+      },
+      "colored_sources/colored/stacked_batchtopk": {
+        "32": {
+          "value": 0.006610450719067122,
+          "std": 0.013524362332433548,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 32,
+          "realized_l0_token": 1.9925130208333333,
+          "realized_l0_window": 7.970052083333333,
+          "l0_deviation": 0.007486979166666741,
+          "loose": false
+        },
+        "16": {
+          "value": 0.00992640755565244,
+          "std": 0.005636811515400139,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 16,
+          "realized_l0_token": 1.991973876953125,
+          "realized_l0_window": 7.9678955078125,
+          "l0_deviation": 0.008026123046875,
+          "loose": false
+        }
+      },
+      "colored_sources/colored/txc_batchtopk_pre": {
+        "32": {
+          "value": 0.10900079302524472,
+          "std": 0.01374901981596927,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 32,
+          "realized_l0_token": 2.0100504557291665,
+          "realized_l0_window": 8.040201822916666,
+          "l0_deviation": 0.010050455729166519,
+          "loose": false
+        },
+        "16": {
+          "value": 0.09369619390691063,
+          "std": 0.034204958257209504,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 16,
+          "realized_l0_token": 1.9753926595052083,
+          "realized_l0_window": 7.901570638020833,
+          "l0_deviation": 0.02460734049479174,
+          "loose": false
+        }
+      },
+      "colored_sources/colored/txc_batchtopk_post": {
+        "32": {
+          "value": -0.052189418091326434,
+          "std": 0.021926236027728765,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 32,
+          "realized_l0_token": 1.9994710286458333,
+          "realized_l0_window": 7.997884114583333,
+          "l0_deviation": 0.0005289713541667407,
+          "loose": false
+        },
+        "16": {
+          "value": -0.0650712794567705,
+          "std": 0.010674291395251221,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 16,
+          "realized_l0_token": 2.0057271321614585,
+          "realized_l0_window": 8.022908528645834,
+          "l0_deviation": 0.005727132161458481,
+          "loose": false
+        }
+      },
+      "colored_sources/colored/spectral_txc": {
+        "32": {
+          "value": -0.000926207668988239,
+          "std": 0.04046837802410648,
+          "n_seeds": 4,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 32,
+          "realized_l0_token": 2.003448486328125,
+          "realized_l0_window": 8.0137939453125,
+          "l0_deviation": 0.003448486328125,
+          "loose": false
+        },
+        "16": {
+          "value": -0.005311338774088691,
+          "std": 0.008807526792359795,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 16,
+          "realized_l0_token": 1.99993896484375,
+          "realized_l0_window": 7.999755859375,
+          "l0_deviation": 6.103515625e-05,
+          "loose": false
+        }
+      },
+      "phasepair/sign/batchtopk_sae": {
+        "101": {
+          "value": 0.0020242012777015685,
+          "std": 0.004892440378260229,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 101,
+          "realized_l0_token": 2.0017903645833335,
+          "realized_l0_window": 2.0017903645833335,
+          "l0_deviation": 0.0017903645833334814,
+          "loose": false
+        },
+        "50": {
+          "value": -0.0026523249275126983,
+          "std": 0.007950880949461307,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 50,
+          "realized_l0_token": 1.9998067220052083,
+          "realized_l0_window": 1.9998067220052083,
+          "l0_deviation": 0.00019327799479174068,
+          "loose": false
+        }
+      },
+      "phasepair/sign/tsae": {
+        "101": {
+          "value": 0.0012810094047842242,
+          "std": 0.0033865906057957943,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 101,
+          "realized_l0_token": 2.0005594889322915,
+          "realized_l0_window": 2.0005594889322915,
+          "l0_deviation": 0.0005594889322915186,
+          "loose": false
+        },
+        "50": {
+          "value": -0.0007661441143717399,
+          "std": 0.0012225601282008457,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 50,
+          "realized_l0_token": 2.002105712890625,
+          "realized_l0_window": 2.002105712890625,
+          "l0_deviation": 0.002105712890625,
+          "loose": false
+        }
+      },
+      "phasepair/sign/stacked_batchtopk": {
+        "101": {
+          "value": 0.0057489954894798245,
+          "std": 0.015510435799848022,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 1.9989725748697917,
+          "realized_l0_window": 7.995890299479167,
+          "l0_deviation": 0.0010274251302082593,
+          "loose": false
+        },
+        "50": {
+          "value": 0.0031972010837931033,
+          "std": 0.006145371408451608,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.983489990234375,
+          "realized_l0_window": 7.9339599609375,
+          "l0_deviation": 0.016510009765625,
+          "loose": false
+        }
+      },
+      "phasepair/sign/txc_batchtopk_pre": {
+        "101": {
+          "value": 0.0060708184708352,
+          "std": 0.021254019479965094,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 2.00006103515625,
+          "realized_l0_window": 8.000244140625,
+          "l0_deviation": 6.103515625e-05,
+          "loose": false
+        },
+        "50": {
+          "value": -0.005309136118056686,
+          "std": 0.013576667836361366,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.99945068359375,
+          "realized_l0_window": 7.997802734375,
+          "l0_deviation": 0.00054931640625,
+          "loose": false
+        }
+      },
+      "phasepair/sign/txc_batchtopk_post": {
+        "101": {
+          "value": 0.9877008791147475,
+          "std": 0.004057487624049606,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 1.9903564453125,
+          "realized_l0_window": 7.96142578125,
+          "l0_deviation": 0.0096435546875,
+          "loose": false
+        },
+        "50": {
+          "value": 0.9867729990350801,
+          "std": 0.007953466833638847,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.995208740234375,
+          "realized_l0_window": 7.9808349609375,
+          "l0_deviation": 0.004791259765625,
+          "loose": false
+        }
+      },
+      "phasepair/sign/spectral_txc": {
+        "101": {
+          "value": -0.003517985570093677,
+          "std": 0.010192747905142248,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 2.0010986328125,
+          "realized_l0_window": 8.00439453125,
+          "l0_deviation": 0.0010986328125,
+          "loose": false
+        },
+        "50": {
+          "value": -0.007963614466503547,
+          "std": 0.0008989139455124767,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 2.0055338541666665,
+          "realized_l0_window": 8.022135416666666,
+          "l0_deviation": 0.005533854166666519,
+          "loose": false
+        }
+      },
+      "phasepair/pair/batchtopk_sae": {
+        "101": {
+          "value": 0.001518439156172807,
+          "std": 0.0021879198758768845,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 101,
+          "realized_l0_token": 2.0017903645833335,
+          "realized_l0_window": 2.0017903645833335,
+          "l0_deviation": 0.0017903645833334814,
+          "loose": false
+        },
+        "50": {
+          "value": 0.0027475859468907566,
+          "std": 0.00414468751876159,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 50,
+          "realized_l0_token": 1.9998067220052083,
+          "realized_l0_window": 1.9998067220052083,
+          "l0_deviation": 0.00019327799479174068,
+          "loose": false
+        }
+      },
+      "phasepair/pair/tsae": {
+        "101": {
+          "value": 0.0029291464228632367,
+          "std": 0.005016486141022582,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 101,
+          "realized_l0_token": 2.0005594889322915,
+          "realized_l0_window": 2.0005594889322915,
+          "l0_deviation": 0.0005594889322915186,
+          "loose": false
+        },
+        "50": {
+          "value": 0.0005742392788063709,
+          "std": 0.0011361984820172232,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 50,
+          "realized_l0_token": 2.002105712890625,
+          "realized_l0_window": 2.002105712890625,
+          "l0_deviation": 0.002105712890625,
+          "loose": false
+        }
+      },
+      "phasepair/pair/stacked_batchtopk": {
+        "101": {
+          "value": 0.022392409730610182,
+          "std": 0.02501579146326449,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 1.9989725748697917,
+          "realized_l0_window": 7.995890299479167,
+          "l0_deviation": 0.0010274251302082593,
+          "loose": false
+        },
+        "50": {
+          "value": 0.01738204656586775,
+          "std": 0.019500433582420165,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.983489990234375,
+          "realized_l0_window": 7.9339599609375,
+          "l0_deviation": 0.016510009765625,
+          "loose": false
+        }
+      },
+      "phasepair/pair/txc_batchtopk_pre": {
+        "101": {
+          "value": 0.021877706522850062,
+          "std": 0.0256503574282983,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 2.00006103515625,
+          "realized_l0_window": 8.000244140625,
+          "l0_deviation": 6.103515625e-05,
+          "loose": false
+        },
+        "50": {
+          "value": 0.010897126596558114,
+          "std": 0.015566410513252565,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.99945068359375,
+          "realized_l0_window": 7.997802734375,
+          "l0_deviation": 0.00054931640625,
+          "loose": false
+        }
+      },
+      "phasepair/pair/txc_batchtopk_post": {
+        "101": {
+          "value": 0.9875579109537358,
+          "std": 0.007570540575549152,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 1.9903564453125,
+          "realized_l0_window": 7.96142578125,
+          "l0_deviation": 0.0096435546875,
+          "loose": false
+        },
+        "50": {
+          "value": 0.9791850593130326,
+          "std": 0.002401690221314687,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 1.995208740234375,
+          "realized_l0_window": 7.9808349609375,
+          "l0_deviation": 0.004791259765625,
+          "loose": false
+        }
+      },
+      "phasepair/pair/spectral_txc": {
+        "101": {
+          "value": 0.9998150363281941,
+          "std": 0.00014924643736360428,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 101,
+          "realized_l0_token": 2.0010986328125,
+          "realized_l0_window": 8.00439453125,
+          "l0_deviation": 0.0010986328125,
+          "loose": false
+        },
+        "50": {
+          "value": 0.9999432334241597,
+          "std": 8.028006144268427e-05,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 50,
+          "realized_l0_token": 2.0055338541666665,
+          "realized_l0_window": 8.022135416666666,
+          "l0_deviation": 0.005533854166666519,
           "loose": false
         }
       }
@@ -2229,102 +2543,6 @@
             "d_sae": 10
           }
         },
-        "recipe_instruction_phase_runs/batchtopk_sae": {
-          "20": {
-            "value": 0.1171732962946928,
-            "std": 0.0011176947417438866,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.17137701757630863,
-            "std": 0.00011136179709101901,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/tsae": {
-          "20": {
-            "value": 0.1574120955404601,
-            "std": 0.0009560491586197648,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.20243411244528275,
-            "std": 0.006468116967652668,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/stacked_batchtopk": {
-          "20": {
-            "value": 0.1482256161050122,
-            "std": 0.0009803175699582,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.17176283251307037,
-            "std": 0.00023702777993959306,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/txc_batchtopk_pre": {
-          "20": {
-            "value": 0.2655564577920618,
-            "std": 0.0016875530345131877,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.3509147386453903,
-            "std": 0.004349531675842482,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/txc_batchtopk_post": {
-          "20": {
-            "value": 0.25996991919230444,
-            "std": 0.000645418150368125,
-            "n_seeds": 3,
-            "k_pos": 8,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.3425990597630281,
-            "std": 0.00170184519715644,
-            "n_seeds": 3,
-            "k_pos": 8,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/spectral_txc": {
-          "20": {
-            "value": 0.2937842874549723,
-            "std": 0.0018871182440696112,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.3595140342162457,
-            "std": 0.002645963584077468,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
         "frequency/batchtopk_sae": {
           "101": {
             "value": 0.539607122481005,
@@ -2416,6 +2634,294 @@
           "50": {
             "value": 0.5445106408578599,
             "std": 0.0007621435605569262,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/batchtopk_sae": {
+          "101": {
+            "value": 0.3616847010545705,
+            "std": 0.00028969564333916945,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.37150533509460454,
+            "std": 0.009688653387854239,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/tsae": {
+          "101": {
+            "value": 0.3789395904187753,
+            "std": 0.01153758941002973,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.39067572473119666,
+            "std": 0.004935282365181508,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/stacked_batchtopk": {
+          "101": {
+            "value": 0.36395442366824776,
+            "std": 0.001052958075646734,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.3650301077227309,
+            "std": 0.0004518240179236281,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/txc_batchtopk_pre": {
+          "101": {
+            "value": 0.3709129627027748,
+            "std": 0.00046070349994724774,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.379881661477732,
+            "std": 0.0016913937047758649,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/txc_batchtopk_post": {
+          "101": {
+            "value": 0.2947224151372514,
+            "std": 0.00028631931655341986,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.2985370531164701,
+            "std": 5.372217191281592e-05,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 50
+          }
+        },
+        "multilane/spectral_txc": {
+          "101": {
+            "value": 0.3320488228993247,
+            "std": 0.0011250607965834114,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.34819391107041175,
+            "std": 0.008820844655353958,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "colored_sources/batchtopk_sae": {
+          "32": {
+            "value": 0.7287566844337579,
+            "std": 0.00034452759152497664,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.7912783412440126,
+            "std": 0.0006232595556518077,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/tsae": {
+          "32": {
+            "value": 0.7354097414612536,
+            "std": 0.0004545341025898041,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.7988409031524036,
+            "std": 0.0003348022788705379,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/stacked_batchtopk": {
+          "32": {
+            "value": 0.7301312951997027,
+            "std": 0.0009335988622118799,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.7916839940452687,
+            "std": 0.0010798660604861585,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/txc_batchtopk_pre": {
+          "32": {
+            "value": 0.7736818773326833,
+            "std": 0.0012605664748764414,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.8318352065949807,
+            "std": 0.0005471212910204175,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/txc_batchtopk_post": {
+          "32": {
+            "value": 0.7421190013054746,
+            "std": 0.0014860093667962988,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.8140740776136505,
+            "std": 0.0007128923184427491,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/spectral_txc": {
+          "32": {
+            "value": 0.8295217222411071,
+            "std": 0.034791181511897806,
+            "n_seeds": 4,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.8661141088281363,
+            "std": 0.0006492185225987077,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "phasepair/batchtopk_sae": {
+          "101": {
+            "value": 0.1570407945409355,
+            "std": 0.0002311483828211548,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.15983164430544441,
+            "std": 0.0002361315265021466,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/tsae": {
+          "101": {
+            "value": 0.16423142271177832,
+            "std": 0.0003813821100647055,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.17230881069326945,
+            "std": 0.00849396834011544,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/stacked_batchtopk": {
+          "101": {
+            "value": 0.1625108515926986,
+            "std": 0.003028643487202973,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.16287160812440163,
+            "std": 0.002633092251341616,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/txc_batchtopk_pre": {
+          "101": {
+            "value": 0.16531830701954148,
+            "std": 0.00031229780619641346,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.16859934458861026,
+            "std": 0.0002155583509609388,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/txc_batchtopk_post": {
+          "101": {
+            "value": 0.14509131139850817,
+            "std": 0.0025594176178833673,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.15454458845605412,
+            "std": 0.00020661457690824037,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 50
+          }
+        },
+        "phasepair/spectral_txc": {
+          "101": {
+            "value": 0.15232067803188346,
+            "std": 0.00018857920583703695,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.16013868741668177,
+            "std": 0.00018960132185110194,
             "n_seeds": 3,
             "k_pos": 2,
             "d_sae": 50
@@ -2903,102 +3409,6 @@
             "d_sae": 10
           }
         },
-        "recipe_instruction_phase_runs/batchtopk_sae": {
-          "20": {
-            "value": 0.9531110326449076,
-            "std": 0.02613542783343239,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.38333332538604736,
-            "std": 0.0,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/tsae": {
-          "20": {
-            "value": 0.8331111272176107,
-            "std": 0.029721362545785068,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.32555556297302246,
-            "std": 0.026762792539200424,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/stacked_batchtopk": {
-          "20": {
-            "value": 0.4855555494626363,
-            "std": 0.0034995728759280023,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.42511115471522015,
-            "std": 0.010904764893620576,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/txc_batchtopk_pre": {
-          "20": {
-            "value": 0.25977777938048047,
-            "std": 0.09375355621512844,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.009999999776482582,
-            "std": 0.0,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/txc_batchtopk_post": {
-          "20": {
-            "value": 0.32733333110809326,
-            "std": 0.010385180784514903,
-            "n_seeds": 3,
-            "k_pos": 8,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.009999999776482582,
-            "std": 0.0,
-            "n_seeds": 3,
-            "k_pos": 8,
-            "d_sae": 10
-          }
-        },
-        "recipe_instruction_phase_runs/spectral_txc": {
-          "20": {
-            "value": 0.24555555482705435,
-            "std": 0.023076901535037716,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 20
-          },
-          "10": {
-            "value": 0.19177777568499246,
-            "std": 0.00802466046366646,
-            "n_seeds": 3,
-            "k_pos": 2,
-            "d_sae": 10
-          }
-        },
         "frequency/batchtopk_sae": {
           "101": {
             "value": 0.9265016714731852,
@@ -3090,6 +3500,294 @@
           "50": {
             "value": 0.8999669949213663,
             "std": 0.0004667201520944773,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/batchtopk_sae": {
+          "101": {
+            "value": 0.5625632603963217,
+            "std": 0.009463051365500916,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.5900880098342896,
+            "std": 0.03322140205924257,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/tsae": {
+          "101": {
+            "value": 0.6098679502805074,
+            "std": 0.02436106017633196,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.6427392959594727,
+            "std": 0.006328611470871949,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/stacked_batchtopk": {
+          "101": {
+            "value": 0.5685478448867798,
+            "std": 0.01788189495939687,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.615258534749349,
+            "std": 0.010695574151106408,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/txc_batchtopk_pre": {
+          "101": {
+            "value": 0.6723102529843649,
+            "std": 0.004918560676129382,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.7228933175404867,
+            "std": 0.03882031525985796,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "multilane/txc_batchtopk_post": {
+          "101": {
+            "value": 0.9412651260693868,
+            "std": 0.015924288945719126,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.9512101213137308,
+            "std": 0.009123636915366672,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 50
+          }
+        },
+        "multilane/spectral_txc": {
+          "101": {
+            "value": 0.9099780122439066,
+            "std": 0.01210991904677509,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.902343233426412,
+            "std": 0.0011671329076569504,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "colored_sources/batchtopk_sae": {
+          "32": {
+            "value": 0.4131249984105428,
+            "std": 0.008431721345040132,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.36687498291333515,
+            "std": 0.011490468292315065,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/tsae": {
+          "32": {
+            "value": 0.4102083345254262,
+            "std": 0.003397829481355462,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.3620833257834117,
+            "std": 0.014337220511345403,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/stacked_batchtopk": {
+          "32": {
+            "value": 0.4106250007947286,
+            "std": 0.002841267662184075,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.37416664759318036,
+            "std": 0.009873344994616841,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/txc_batchtopk_pre": {
+          "32": {
+            "value": 0.35750000675519306,
+            "std": 0.016801549689787466,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.2227083295583725,
+            "std": 0.012524287625764222,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/txc_batchtopk_post": {
+          "32": {
+            "value": 0.32208333412806195,
+            "std": 0.016989070050969758,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.2245833228031794,
+            "std": 0.0061731347878746885,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 16
+          }
+        },
+        "colored_sources/spectral_txc": {
+          "32": {
+            "value": 0.4215624928474426,
+            "std": 0.02166190883298553,
+            "n_seeds": 4,
+            "k_pos": 2,
+            "d_sae": 32
+          },
+          "16": {
+            "value": 0.3552083373069763,
+            "std": 0.005958469168705448,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 16
+          }
+        },
+        "phasepair/batchtopk_sae": {
+          "101": {
+            "value": 0.9555445313453674,
+            "std": 0.002646823085570079,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.9572607477506002,
+            "std": 0.0024855578858163103,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/tsae": {
+          "101": {
+            "value": 0.8606930573781332,
+            "std": 0.006192684689590995,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.8439273635546366,
+            "std": 0.018870721001482717,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/stacked_batchtopk": {
+          "101": {
+            "value": 0.5819472074508667,
+            "std": 0.023801031249832426,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.637326737244924,
+            "std": 0.030756683461087123,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/txc_batchtopk_pre": {
+          "101": {
+            "value": 0.9861055612564087,
+            "std": 0.003194295487327486,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.9787788589795431,
+            "std": 0.004888915645909044,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 50
+          }
+        },
+        "phasepair/txc_batchtopk_post": {
+          "101": {
+            "value": 0.9812870422999064,
+            "std": 0.005012136237554134,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.9820792078971863,
+            "std": 0.005461396845602668,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 50
+          }
+        },
+        "phasepair/spectral_txc": {
+          "101": {
+            "value": 0.8995049595832825,
+            "std": 0.0012833124000978084,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 101
+          },
+          "50": {
+            "value": 0.8992409110069275,
+            "std": 0.0004939418631443445,
             "n_seeds": 3,
             "k_pos": 2,
             "d_sae": 50
