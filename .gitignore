@@ -53,6 +53,14 @@ logs/
 # Benchmark run logs (regenerable stdout; not results — keep out of git)
 experiments/**/results/*.log
 
+# ─── em-redo runtime artefacts (runpod-c, 2026-07-23) ─────────────
+# Framework real-LM data caches are machine-local memmaps (built by
+# build_em_train_cache.py at the runner's keyed location); traces.json
+# is the re-ported Ward stage-A data (see its ATTRIBUTION.md). Both
+# must not dirty the tree for the runner's code-version gate.
+results/data_cache/
+results/c7_backtracking/stage_a/traces.json
+
 # ─── paper/ is a read-only source snapshot (agent context, not built here) ──
 # Defensive: if anyone does run latex in paper/, keep the cruft out of git.
 paper/*.aux

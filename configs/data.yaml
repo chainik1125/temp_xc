@@ -511,3 +511,49 @@ datasources:
     n_seqs: 4044
     seq_len: 128
     notes: "conversion-depth g(ℓ) sweep — generator arm (§ 0 provenance); identical token ids as the base arm."
+
+  # ── em-redo: organism-forward § 5.3 training caches (runpod-c, 2026-07-23) ──
+  # briefings/em-redo.md Phase A. Corpus recipe verbatim origin/final
+  # qwen_em.py (_load_corpus_cfierro: cfierro/personality-qs-bad-medical-
+  # advice, chat template, seed-42 shuffle, truncation + pad to 128 —
+  # NOTE ≈59% of token positions are eos-pad; recorded property of the
+  # paper convention, median row is 53 tokens). DELIBERATE deviation
+  # from origin/final's builder: forward through the MERGED organism
+  # (base + andyrdt/Qwen2.5-7B-Instruct_bad-medical LoRA), not BASE —
+  # the g(ℓ) map (conversion_depth RECORD § 4) lives on organism
+  # activations and the trained panel must match that substrate. The
+  # deviation is encoded in the hashed `dataset` name. subject_model
+  # stays the base id (the LoRA merges into it; also keyed by the
+  # trainer's resid-dim table). Caches built out-of-band by
+  # experiments/explorations/conversion_depth/build_em_train_cache.py
+  # at results/data_cache/<data_key>/ (single forward sweep, hs 10/14/16).
+
+  qwen_2_5_7b_organism_medical_l9:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 9
+    hookpoint: resid_post
+    dataset: medical_em_prompts_organism
+    n_seqs: 6000
+    seq_len: 128
+    notes: "em-redo TXC-tracking arm — raw g(ℓ)=+0.120 at resid_post L9 (hs10)."
+
+  qwen_2_5_7b_organism_medical_l13:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 13
+    hookpoint: resid_post
+    dataset: medical_em_prompts_organism
+    n_seqs: 6000
+    seq_len: 128
+    notes: "em-redo TXC-tracking arm — g(ℓ) peak +0.134, g_order +0.108 at resid_post L13 (hs14)."
+
+  qwen_2_5_7b_organism_medical_l15:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 15
+    hookpoint: resid_post
+    dataset: medical_em_prompts_organism
+    n_seqs: 6000
+    seq_len: 128
+    notes: "em-redo TXC-tracking arm — the paper's own layer; g(ℓ)=+0.097, g_order +0.054 at resid_post L15 (hs16)."
