@@ -459,3 +459,33 @@ datasources:
     n_seqs: 6000
     seq_len: 128
     notes: "§ 5.3 emergent misalignment anchor (Qwen-14B finance organism)."
+
+  # ── conversion-depth exploration (runpod-c, 2026-07-23) ────────────
+  # Multi-layer RAW-activation caches for the g(ℓ) ablation — NOT
+  # dictionary-training datasources. Built by
+  # experiments/explorations/conversion_depth/cache_depth.py on the
+  # canonical § 5.2 stream (verbatim origin/final ward.py recipe;
+  # token-identical for both models). Caches live on the runpod-c
+  # network volume at /workspace/conv_depth_caches/{base,distill}/
+  # (hs0 = embeddings + resid_post layers 0,2,…,30; fp16;
+  # KEEP — input to the TXC-tracking follow-up session).
+
+  llama_3_1_8b_base_ward_depthsweep:
+    category: real_lm
+    subject_model: NousResearch/Meta-Llama-3.1-8B
+    layers: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    notes: "conversion-depth g(ℓ) sweep — reader/base arm (+ embeddings hs0)."
+
+  r1_distill_llama_8b_ward_depthsweep:
+    category: real_lm
+    subject_model: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+    layers: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    notes: "conversion-depth g(ℓ) sweep — generator arm (§ 0 provenance); identical token ids as the base arm."
