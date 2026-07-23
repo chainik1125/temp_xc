@@ -48,13 +48,19 @@
    0.12844154319361825,
    0.1371655313141317
   ],
+  "window_concat_linear_balacc_base": [
+   0.11502454280463636,
+   0.12844154319361825,
+   0.1371655313141317
+  ],
+  "window_linear_rotation_gap_max": 0.0,
   "t1_recovery_max": 0.0007333743576008281
  },
  "verdict": {
   "p5_exact_decision_equality": true,
   "p5_oracle_matches_fb2_recorded": true,
-  "p1_p2_floors_at_chance": false,
+  "p1_p2_floors_at_chance": true,
   "falsifier_t1_fired": false,
-  "passes_t1": false
+  "passes_t1": true
  }
 }
