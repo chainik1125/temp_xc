@@ -10,6 +10,30 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **EXPANSION C7 DONE (2026-07-23, runpod) — THE REASONING INT/EQ CELL IS
+  CLOSED: NEGATIVE at this corpus resolution.** The LAST estimator cycle,
+  run exactly by the pre-build frozen card
+  (`expansion/prereg/estimator-card-c7-monotone-extraction.md`; scripts
+  committed pre-run). The monotone candidate
+  (`seg_hier_categorical_mono`, deconvolve-first → shrink in u-space)
+  **fixed every C6 defect** — λ-response perfectly monotone on real
+  material (ρ=−1.00), gate-3 sensitivity robust-PASS (16% vs C6-cal's
+  25% fail), weak-regime curse still cancelled (raw +38% → 4%) — and
+  precisely therefore its negative is credible: **λ\*_real = 0.906 >
+  0.85 (≈ inert)**, gate 1 robust-FAIL (the family's INERT limit alone
+  inserts +0.018 ACF(4) on run-permuted real streams — the raw-tilt jump
+  law over-generates mid-lag before any segment layer exists), gate 2
+  conservative-FAIL at R=24 under the review-adopted variance-aware
+  rule. Both fork close-conditions fired independently; close-branch
+  skeptic (Fable) 5/5 survived, no kills, "fork followed without
+  discretion". **The int/eq prize ends half-claimed by design:
+  text POSITIVE (stage-6 #3b) / reasoning NEGATIVE-at-resolution;
+  structure remains real (C5 gap 0.056); reopening needs more/longer
+  traces, NOT estimators — no C8 estimator proposals.** Full
+  three-generation arc: `expansion/results/estimator_battery_c7.md`.
+  Spend $0.19 (cumulative $11.01/$25). Awaiting mac-local review
+  (briefing stays until then).
+
 - **ROUND-2 REVIEW DONE (2026-07-23, mac-local) — C6 and FB-C2 both
   APPROVED; next briefings dispatched (~10 h sessions).** Audit: C6's
   empty-passing-set verdict stands (battery review in

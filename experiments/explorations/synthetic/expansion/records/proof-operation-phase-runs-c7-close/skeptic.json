@@ -1,0 +1,24 @@
+{
+ "a_noise_floor": {
+  "kill": false,
+  "evidence": "This is a NEGATIVE close, not a positive claim riding on a small gap. The underlying structure evidence (real-vs-permuted ACF(4) gap 0.056, C5) is ~18x the pooled SE (0.003); gate failures were decided with the 2\u00b7SE margin rule (gate1 acf4: stat 0.01811 exceeds tol 0.01400 by 0.0041 > 2\u00b7SE=0.0025, clean fail; gate2 inside \u00b12\u00b7SE at R=24 -> conservative FAIL per prereg). Noise floor cannot explain either the structure or the fail verdicts."
+ },
+ "b_leakage": {
+  "kill": false,
+  "evidence": "No fresh labeling (r3 record labels reused, zero API); calibration objective uses only permuted-null moments under PERM_NULL_SEED, and the card states real held-out moments never enter any objective. The close does not depend on a label whose definition encodes the temporal statistic."
+ },
+ "c_composition": {
+  "kill": false,
+  "evidence": "Composition is the close's own diagnosis, not a hidden confound: \u03bb*_real=0.90625 means <10% of contrast survives beyond the doc-marginal (deconvolved doc fixed point), i.e. the extractable signal is mostly composition at this resolution. The C5 within-doc permutation gap (0.056) confirms real order structure exists; the close correctly claims 'real but not extractable', consistent with both facts."
+ },
+ "d_circularity": {
+  "kill": false,
+  "evidence": "No SPEC is frozen \u2014 the fork resolved to close, so no benchmark validation is vacuous. Notably gate1 fails even at the fully inert \u03bb=1.0 mirror (ins_acf4 0.0181 > tol 0.0140), showing fit-stage hallucination independent of inserted contrast \u2014 evidence AGAINST the mirror, honestly reported, which is the opposite of circular self-validation."
+ },
+ "e_segmentation": {
+  "kill": false,
+  "evidence": "Nulls (gate1 permuted committed real streams, gate2 heavy-dwell) use the identical segmentation pipeline, so splitter/windowing artifacts appear in the null references and are absorbed by the null-referenced tolerances (0.20\u00b7|perm value| with floors). The C5 structure gap is against a within-doc permutation with segmentation held fixed."
+ },
+ "overall_note": "The close SURVIVES. The prereg fork was followed without discretion: pre-check passed (monotone, \u03c1=-1, span 0.0506 >> 5\u00b7SE_pool 0.0152), gate1 failed cleanly (>2\u00b7SE), gate2 hit conservative-FAIL exactly per the escalation rule (R=24, boundary), and \u03bb*_real=0.90625 > 0.85 independently triggers the inert/close branch \u2014 both fork conditions concur. Bisection endpoints (0.875 fail, 0.90625 pass, width 0.03125 \u2264 0.05, upper endpoint taken) match the frozen procedure. Battery 4/5 report-only rows show the expected bias-variance trade (mono: weak-regime rel err 4.2% vs 37.7%, but retained contrast only 0.41). The negative verdict 'three-timescale structure real but not extractable at 287 docs \u00d7 ~85 sentences; next lever is data, not estimators' is supported by the numbers, with the \u03bb=1 gate1 residual hallucination as the decisive evidence.",
+ "_judge_model": "claude-fable-5"
+}

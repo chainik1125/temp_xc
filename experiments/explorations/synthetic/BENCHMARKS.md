@@ -85,7 +85,7 @@ failure; kept here so the same idea isn't re-tried blindly.
 | proof-operation-phase-runs | reasoning · int/eq | **signal REAL** (self-match ACF ≫ nulls); gate-8 MI(2) fail — categorical *plateau* the menu can't make | C3 |
 | recipe-instruction-phase-runs | text · int/eq | **signal REAL**; gate-8 ACF(4) fail — *rescued in C4 by the `hier_categorical` re-freeze → SPEC (see section A)* | C3 |
 | proof-operation-phase-runs-r2 | reasoning · int/eq | **signal REAL**; even `hier_categorical` fails both hardened gate-8 moments — reasoning phase streams hold **three timescales** (run/segment/doc); C5 needs a segment-level regime layer | C4 |
-| proof-operation-phase-runs-r3 | reasoning · int/eq | **signal REAL, three timescales CONFIRMED** (real-vs-permuted ACF(4) gap 0.056); the `seg_hier_categorical` layer closes lag-2–8 — MI(2) passes for the first time, ACF(4) flips −55% → +21% (marginal fail) — but the preregistered **insertion control** catches the estimator hallucinating on run-permuted streams; C6 needs calibrated segment-composition extraction, not a new family. **C6 (frozen estimator card, no relabeling): NEITHER calibrated candidate passes the battery — no r4, ABORT stands.** Shrink-then-deconvolve is non-monotone (the deconvolution re-amplifies; on real material the only null-clean extraction level is *zero*), and per-doc quantile deflation leaks through its tails; both cancel the weak-regime winner's curse (+34% → ≤3%) at 35–45% retained strong-signal contrast. C7 lever: a monotone deconvolve-first calibration — else close the cell at this corpus resolution (`expansion/results/estimator_battery_c6.md`) | C5/C6 |
+| proof-operation-phase-runs-r3 | reasoning · int/eq | **signal REAL, three timescales CONFIRMED** (real-vs-permuted ACF(4) gap 0.056); the `seg_hier_categorical` layer closes lag-2–8 — MI(2) passes for the first time, ACF(4) flips −55% → +21% (marginal fail) — but the preregistered **insertion control** catches the estimator hallucinating on run-permuted streams; C6 needs calibrated segment-composition extraction, not a new family. **C6 (frozen estimator card, no relabeling): NEITHER calibrated candidate passes the battery — no r4, ABORT stands.** Shrink-then-deconvolve is non-monotone (the deconvolution re-amplifies; on real material the only null-clean extraction level is *zero*), and per-doc quantile deflation leaks through its tails; both cancel the weak-regime winner's curse (+34% → ≤3%) at 35–45% retained strong-signal contrast. C7 lever: a monotone deconvolve-first calibration — else close the cell at this corpus resolution (`expansion/results/estimator_battery_c6.md`). **C7 (`seg_hier_categorical_mono`, LAST estimator cycle): CELL CLOSED — NEGATIVE at this corpus resolution.** The monotone fix works (pre-check ρ=−1.00; sensitivity restored; weak-regime curse cancelled) and honestly calibrates to ≈ inert on the real streams (λ\*=0.906 > 0.85); even the family's inert limit inserts +0.018 ACF(4) on permuted real data. Structure real, unextractable at 287×~85 — reopening needs more/longer traces, not estimators; close skeptic 5/5 no kills (`expansion/results/estimator_battery_c7.md`) | C5–C7 |
 | goal-restatement-recurrence | reasoning · long-memory | skeptic: **composition** (cross-trace rate mixture); thin margin, κ near floor | C3 |
 | rotated-multilane (FB-4) | abstract · 3-tone superposition (basis-alignment control) | **T2 symmetry-triviality + redundancy, double-witnessed** (pre-registered in the frozen card): a fixed spatial rotation of a Haar, seed-re-drawn embedding is provably inert (`Q·P =d P`) — the card is a distribution-replica of `multilane`; the frozen "untrained-spectral collapse" direction was refuted at gating scale (0.290 vs 0.298, inside band). The basis-alignment acid test needs a **temporal** knob (candidate FB-5, left unfrozen for review) — see `rotated_multilane/bench_record.md` | FB-C2 |
 
@@ -125,7 +125,20 @@ window on the real streams is empty), and deflation leaks through its
 tails. The structure itself remains confirmed; the limit is extraction
 resolution at this corpus size. One monotone-calibration lever (C7)
 remains before the cell is honestly closed
-(`expansion/results/estimator_battery_c6.md`).
+(`expansion/results/estimator_battery_c6.md`). **C7 close (2026-07-23):
+that lever was pulled and the reasoning half of the prize is now CLOSED —
+NEGATIVE at this corpus resolution.** The monotone estimator repaired
+every C6 mechanism defect (perfectly monotone λ-response, sensitivity
+restored, weak-regime winner's curse cancelled) and, being well-behaved,
+returned a credible negative: its null calibration on the real streams
+lands at ≈ inert, and even the family's fully-inert limit hallucinates
+mid-lag structure above the null tolerance on permuted real data. The
+three-timescale structure stands confirmed; extracting it needs
+more/longer reasoning traces, not further estimator work. The int/eq
+prize therefore ends **half-claimed by design**: text-corpus POSITIVE
+(stage-6 #3b), reasoning-trace NEGATIVE-at-resolution with the full
+three-generation estimator arc on record
+(`expansion/results/estimator_battery_c7.md`).
 
 ## Authoritative sources (this file is the human index over them)
 
