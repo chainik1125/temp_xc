@@ -179,14 +179,30 @@ BENCHES: tuple[Bench, ...] = (
     ),
     Bench(
         "colored_sources", ("toy_colored_sources_N32_D2_d32",), "1.3.0", F=32,
-        verdict="PENDING",
+        verdict="POSITIVE",
         axes=(LatentAxis("colored", "colored_rec_adj", "AC",
                          "dictionary F — lag-D covariance recovery "
                          "(direction-recovery primary)"),),
-        note=("theorem-first (FB-3): CS-1 iid-impossibility floor + CS-2 "
-              "W=D+1 oracle transition (0.03→0.96); trained-realization "
-              "verdict pending the grid."),
+        note=("theorem-first (FB-3): CS-1 floor holds wholesale (261 T≤D "
+              "cells max +0.037); the W=D+1 transition is realized WEAKLY "
+              "(best +0.21 vs oracle +0.96) and the ordering INVERTS the "
+              "tone benches: txc-pre ≥ spectral > post ≈ floor."),
         F_note="the N=32 Haar basis rows — the strict Part II direction count.",
+    ),
+    Bench(
+        "phasepair", ("toy_phasepair_M101_d24",), "1.3.0", F=101,
+        verdict="PENDING",
+        axes=(
+            LatentAxis("sign", "sign_recovery", "AC",
+                       "rotation direction within ± pairs (phase-only)",
+                       primary=True),
+            LatentAxis("pair", "pair_recovery", "AC",
+                       "pair id |Y| — tone magnitude (power-readable)",
+                       primary=False),
+        ),
+        note=("theorem-first (FB-1): phase-vs-power dissociation; exact "
+              "bag null within pairs; grid running."),
+        F_note="alphabet M=101 (frequency precedent; rank-2 circle codebook).",
     ),
 )
 

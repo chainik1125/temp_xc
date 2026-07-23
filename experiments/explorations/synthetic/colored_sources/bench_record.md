@@ -1,6 +1,8 @@
 # Colored sources (FB-3) — bench record
 
-**Status: AWAITING GRID (2026-07-23, runpod-b, FB-C1).** Frozen card:
+**Status: DONE — verdict POSITIVE, weak realization, with an ordering
+INVERSION against the tone benches (2026-07-23, runpod-b, FB-C1).**
+Frozen card:
 [`../freqbench/cards/FB-3.md`](../freqbench/cards/FB-3.md) (commit
 `f0e6778f`, BEFORE construction). Gates: T1/§8 PASS
 ([`results/colored_gating_stats.json`](results/colored_gating_stats.json)),
@@ -10,8 +12,9 @@ skeptic PROCEED 5/5
 Provenance `theorem-first`. **The suite's first
 feature-direction-recovery-primary bench.**
 
-> ⚠ THIS FILE IS A SKELETON until the blind-verdict section is written from
-> `results/colored_bench_stats.json`. No claim below the fold is final.
+Grid outcome: **582/582 cells, 0 failures, 49 min** (28 workers). Stats:
+[`results/colored_bench_stats.json`](results/colored_bench_stats.json),
+figure [`figs/colored_bench.png`](figs/colored_bench.png).
 
 ## 1. The task (frozen)
 
@@ -68,8 +71,87 @@ NEGATIVE, not a failed bench.
 
 ## 4. Blind verdict vs the frozen predictions
 
-*(TO FILL from `colored_bench_stats.json` — check falsifiers FIRST.)*
+Written against the card § 6, falsifiers first. `colored_rec_adj`, 3-seed
+means at the canonical slice (d_sae = F = 32, k_pos = 2) unless noted; the
+oracle ceiling at this exact budget is **+0.96**.
+
+**4.0 Falsifiers — none fired.** All 261 trained cells at T ≤ D: max
+**+0.0369**, mean −0.005 (floor band 0.05 + 0.02 leakage) — **the CS-1
+impossibility holds in the trained grid, wholesale**. No untrained cell
+shows a positive artifact (spectral's negative offsets as documented). The
+§ 8 oracle passed at +0.96 pre-grid.
+
+**4.1 Token archs + all T=2 window cells at floor — HELD (provable,
+measured).** batchtopk_sae +0.006, tsae +0.004; T=2 row: −0.033 … +0.013.
+
+**4.2 stacked at floor for ALL T — HELD.** Max anywhere **+0.037**
+(canonical: +0.007 / +0.002 at T=4/8) — the per-position-marginal argument
+is airtight in practice.
+
+**4.3 The W = D+1 transition IS REALIZED — the headline, and it is carried
+by the arch the card bet AGAINST.** txc-pre: T2 **−0.007** → T4 **+0.109**
+→ T8 +0.095 (canonical), up to **+0.205** (T8, d=2F, k=1) — and its
+per-source recovery is cleanly **ρ-ordered** (quartile means 0.29 → 0.35 →
+0.47 → 0.65 at the best cell): the temporal route, used exactly as CS-2
+describes, strongest sources first. The frozen prediction said "floor to
+weak (≤ 0.15), lean floor" — **missed low** (several cells exceed 0.15).
+
+**4.4 txc-post 0.05–0.35 — MISSED, opposite direction.** Canonical cells
+at or BELOW floor (−0.059 / −0.065 at T=4/8; the negative values are a
+trained-atom-clustering geometry effect, recorded); best cell +0.073. The
+coincidence family (ReLU after position-mixing) does NOT realize the lag
+covariance.
+
+**4.5 spectral ≈ post — MISSED: spectral is clearly above.** +0.093
+canonical T8, **+0.202** at (T8, d=2F, k=1), on a metric whose chance
+reference is conservative AGAINST it (−0.05..−0.08 at init; § 2 amendment
+4) — the true lift is larger. The "no band advantage at D=2" bet was
+wrong: band-limited slow kernels align naturally with high-ρ AR structure.
+(Its best-cell quartile curve is non-monotone with an unexplained q1
+excess — single-cell observation, flagged, not interpreted.)
+
+**4.6 Lift confined to mixing archs × T ∈ {4, 8} — HELD.**
+
+**Verdict: POSITIVE — the bench separates architectures, and it separates
+them DIFFERENTLY from every other bench in the suite.** Two headline
+facts, both citable:
+
+1. **Provably-present temporal dictionary information is realized only
+   weakly by the current panel:** best arch ≈ **21 % of the provable
+   ceiling** (+0.205 vs +0.96). The sprint's all-floor result is
+   overturned in kind (BatchTopK + 30k steps + N=32 lift off the floor)
+   but confirmed in magnitude — dictionary training barely touches what
+   the eigen-oracle proves extractable. The gap is the finding.
+2. **The panel ordering INVERTS the tone benches:** here txc-pre ≥
+   spectral > post ≈ stacked ≈ token, while frequency/multilane give
+   spectral > post ≫ pre. Tone latents reward nonlinearity-after-mixing
+   (coincidence); covariance-eigenstructure rewards additive gating with
+   a T-spanning decoder. No single window architecture dominates the
+   axis-1/axis-2 plane — exactly the kind of dissociation the two-generator
+   program exists to expose.
 
 ## 5. Coordinates (axis 1, FreqFrac at bench time)
 
-*(TO FILL — `freqfrac_report` on the canonical cells once registered.)*
+`freqfrac_report colored_sources` (seed 1; stats under
+`../freqbench/results/freqfrac_stats_colored_sources_s1_T{4,8}.json`),
+firing-weighted dc_frac / concentration, trained (init):
+
+| arch | T=4 dc | T=4 conc | T=8 dc | T=8 conc |
+|---|---|---|---|---|
+| token archs | 1.000 | 1.000 | 1.000 | 1.000 |
+| stacked | 0.264 (0.256) | 0.561 (0.553) | 0.138 (0.125) | 0.307 (0.301) |
+| txc-pre | 0.292 (0.254) | 0.672 (0.551) | 0.144 (0.127) | 0.360 (0.311) |
+| txc-post | **0.503 (0.256)** | 0.606 (0.550) | **0.489 (0.127)** | 0.576 (0.311) |
+| spectral | 0.314 (0.314) | 1.000† | 0.329 (0.363) | 0.974 (0.927) |
+
+† T=4 band degeneracy (§ G caveat); read the curve.
+
+A telling decoupling: **txc-post develops the strongest DC-shifted taps in
+the suite outside hedging (0.13 → 0.49)** — its atoms DO respond to the
+slow AR structure — yet its decoder never aligns with F (§ 4.4). Slow
+temporal response ≠ dictionary identification: the coincidence
+nonlinearity integrates the drift without factoring it. txc-pre, whose
+FreqFrac shift is modest (conc 0.31 → 0.36), is the one that converts the
+structure into F-aligned decoder taps. Axis-1 coordinate: the ρ-ladder
+spans DC→AC by construction; the recoverable object is 2nd-moment at lag
+D (order-2), stationary.
