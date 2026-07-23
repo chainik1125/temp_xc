@@ -39,7 +39,7 @@ arch verdict is **NEGATIVE** (no arch recovers the sign). "Registered" ≠
 | **signed_motion** | theorem-first — FreqBench *ac_sign*, forked w/o its proofs | abstract | order-sensitive step (AC) | n/a | ✓ | **NEGATIVE** |
 | **assumption_consequence** | grounded — expansion C1 → C2 (g7 re-exam) | reasoning-trace | directed-transition (AC) | SPEC | ✓ | **NEGATIVE** *(frozen windows>per-token prediction failed: order-1 mirror ⇒ s_i sufficient, per-token reads the directed latent; needs order-2+ mirror to separate archs)* |
 | **hedging_drift** | grounded — expansion C1 → C3 (`hier_ar1` mirror) | reasoning-trace | slow-drift (DC) | SPEC | ✓ | **SPLIT** *(per-token R² 0.73 of 0.77 ceiling — drift is ambient per token; window edge ≤ +0.04 with weak T-trend)* |
-| **recipe_instruction_phase_runs** | grounded — expansion C3 → C4 (`hier_categorical` re-freeze) | text-corpus | interaction/equality (**regime 2/3-mixed** — measured at § 8) | SPEC | ✓ | — *(stage-6 § 8 STOP, no grid: the equality-variant gate found raw-linear access to `e_t` at 0.61 per-token / 0.72 window ≫ chance — a class-conditional continuation-rate leak the frozen regime-3 claim missed; nonlinear-only residual 0.77→1.00 is real; awaiting review re-scope — see `bench_record.md`)* |
+| **recipe_instruction_phase_runs** | grounded — expansion C3 → C4 → stage-6 #3b re-scope | text-corpus | interaction/equality (**regime-3 residual** over the measured additive floor) | SPEC | ✓ | **POSITIVE** *(the first grounded regime-3 architecture verdict: on the re-scoped residual axis [additive ceiling 0.771 → exact 1.0], only Spectral-TXC exposes the latent — T=2 +0.60/+0.90/+0.96 across d, k-robust to 4, untrained ≈ 0 — TXC-post caps at the ceiling (+0.26 best), all additive families pinned at the DC-leak line (−0.76…−0.86); § 5-r predictions frozen pre-grid in `241845d2`, checked blind — see `bench_record.md`)* |
 | **list_item_parallelism** | grounded — expansion C3 (re-freeze) | text-corpus | bursty / self-exciting (AC) | SPEC | ✗ | — *(pending; ⚠ redundant class + weak mirror — low value)* |
 | **self_reference_echo** | grounded — expansion C2 (re-filed) | reasoning-trace | bursty / self-exciting (AC) | SPEC\* | ✗ | — *(not planned; redundant, marginal labeler)* |
 
@@ -101,12 +101,16 @@ to be validated under the hardened gate so added expressiveness stays
 structurally checked. **Stage-6 update (2026-07-22):** the new SPEC's
 equality-variant STOP-gate *fired* — the grounded dwell heterogeneity leaks
 `e_t` into raw-linear readouts (0.61 per-token / 0.72 window vs additive
-ceiling 0.77; nonlinear residual to 1.00 intact), so the bench is
-regime-2/3-mixed as frozen and the grid was withheld pending a review
-re-scope (re-normalize the primary axis to the additive ceiling, or demote
-the claim — options in the bench record). The prize's text-corpus half is
-therefore *valid as a phenomenon* but **not yet a certified regime-3
-architecture test**.
+ceiling 0.77; nonlinear residual to 1.00 intact) — and the review adopted
+re-scope option 1 (primary axis = the regime-3 residual over the measured
+additive floor). **Stage-6 #3b (2026-07-23): the re-scoped head-to-head ran
+blind and the verdict is POSITIVE** — the text-corpus half of the prize is
+now **fully claimed**: a grounded, gate-validated, regime-3 benchmark that
+separates architectures (Spectral-TXC linearizes the residual to +0.97;
+coincidence-via-squash caps at the additive ceiling; additive families sit
+at the DC-leak line). The regime-3 row of the 4-regime table has its first
+grounded confirmation: order-2 structure separates window *mechanisms*, not
+window *presence*.
 
 ## Authoritative sources (this file is the human index over them)
 

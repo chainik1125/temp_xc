@@ -10,6 +10,25 @@ Last updated: 2026-07-22.
 
 ## 0. TL;DR — what's active right now
 
+- **STAGE-6 #3b DONE (2026-07-23, runpod) — `recipe_instruction_phase_runs`
+  verdict POSITIVE on the re-scoped residual axis: the program's FIRST
+  grounded regime-3 architecture separation. STOPPED for review.**
+  Freeze order provable from the log (A1 metric `cf4ae797` → A2 § 5-r
+  re-freeze `241845d2` → A3 gating addendum `d65349c0`, all pre-grid);
+  495/495 cells, 0 failures, 0 duplicate eval_keys; verdict written blind.
+  Only **Spectral-TXC** exposes the regime-3 residual (T=2: +0.60/+0.90/
+  +0.96 at d=10/20/40, peak +0.97 at k=2 ≈ the exact pair rule read
+  linearly; k-robust to 4, untrained control ≈ 0.06 ⇒ learning);
+  **TXC-post caps at the additive ceiling** (best +0.26 — the changepoint
+  τ-precedent overstated post-squash here, the one frozen-prediction miss);
+  **all additive families pinned at the DC-leak line** (−0.76…−0.86 —
+  below even the additive ceiling; falsifier not triggered). DC control at
+  oracle; realistic-regime + capability gates pass (Spectral wins at
+  d ≤ F with gAUC parity). Registry + REPORT re-rendered (66/66 rows);
+  BENCHMARKS row flipped — **the interaction/equality prize's text half is
+  fully claimed**. Record: `recipe_instruction_phase_runs/bench_record.md`
+  (§ "Stage-6 #3b"). Reasoning half still open (C6: extraction estimator).
+
 - **EXPANSION CYCLE 5 DONE (2026-07-22, runpod overnight) — the reasoning
   int/eq cell ABORTs a third time, now doubly informative; $0 API spend.**
   Built the C4-mandated **`seg_hier_categorical`** (three-timescale mirror:

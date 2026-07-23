@@ -1,71 +1,54 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-22 — overnight session **COMPLETE, STOPPED FOR
-REVIEW** (all three phases done and pushed; acceptance gate of
-`briefings/stage6-recipe-then-c5.md` met — the briefing stays until
-mac-local reviews it).
+**Last rewrite:** 2026-07-23 — **stage-6 #3b COMPLETE, STOPPED FOR REVIEW**
+(briefing `briefings/stage6-recipe-rescoped.md` acceptance gate met; the
+briefing stays until mac-local reviews, then deletes it).
 
 ## Who / where
 Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am `runpod`
-(original box — `/workspace/.agent_id` does NOT exist here; do not create it).**
-`runpod-b` runs FreqBench (`freqbench-c1.md`) in parallel — NOT mine.
-Two-agent rules (agents/README.md): `git pull --rebase origin arxiv` before
-EVERY push; shared files append-only; leaderboard/manifest union-merge.
-Tokens `/workspace/.tokens/`; push
+(original box — `/workspace/.agent_id` does NOT exist; do not create it).**
+`runpod-b` = FreqBench, parallel. Two-agent rules (agents/README.md):
+`git pull --rebase origin arxiv` before EVERY push; shared files append-only;
+leaderboard/manifest union-merge. Tokens `/workspace/.tokens/`; push
 `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`.
-32 CPU / 128 GB. Venv fine.
+32 CPU / 128 GB; 28 workers × OMP1 for grids.
 
-## Current task: `briefings/stage6-recipe-then-c5.md` — Phases 1+2 DONE, stopped-for-review state being finalized
+## Task just completed: stage-6 #3b — the re-scoped residual head-to-head
 
-### Phase 1 — stage-6 of recipe_instruction_phase_runs: **DONE — § 8 STOP, no grid**
-Build commits `47b62e1b` (generator/datasource/evaluator/tests; suite 136) +
-`b463c4a0` (equality-variant STOP-gate fired: raw-linear e_t ceilings 0.614
-per-token / 0.720 T=2 ≫ chance — class-conditional continuation-rate leak;
-MLP 1.0 so the regime-3 residual is real). Grid withheld per the gate;
-frozen § 5 predictions never touched — still blind. Record + re-scope options
-in `recipe_instruction_phase_runs/bench_record.md`; BENCHMARKS row ✓+note;
-research STATUS bullet. All pushed.
-
-### Phase 2 — expansion C5: **DONE — r3 ABORT, doubly informative, $0 API spend**
-- Infra commit `f8c1deb6` (BEFORE calibration, freeze discipline):
-  `seg_hier_categorical` in expansion/mirrors.py (three timescales: dwell /
-  run-aware BIC-DP segments + per-segment C4 deconvolution / doc tilt; MLE
-  tilts; likelihood-only objectives) + **insertion control**
-  (`run_permuted_streams` no-adjacent-repeat shuffle; control = re-fit on
-  permuted must not hallucinate gate-8 moments beyond real tolerance).
-  A measured campaign of automatic shrinkage estimators (complementary
-  halves / interleaved splits / analytic floors / permutation-matched DP
-  split-half / posterior-mean) all failed on the harness toys — documented
-  in mirrors.py docstrings; harness tests pin both control behaviors.
-  138 tests pass. r3 card amendment appended (prereg incl. the control).
-- Calibration commits `2d41d5cd` + `b7025cfc`:
-  **proof-operation-phase-runs-r3 ABORT** — MI(2) PASSES first time
-  (0.075 vs 0.065, err 0.010 ≤ 0.013); ACF(4) +21% marginal overshoot
-  (0.154 vs 0.127, err 0.0263 vs 0.0255); insertion control FAILS both
-  (hallucination +0.018 mi2 / +0.039 acf4 on permuted streams). Three
-  timescales CONFIRMED model-independently (real−perm acf4 gap 0.056).
-  **C6 gap = calibrated extraction estimator, not model family.**
-  Skeptic-header cosmetic done (`_judge_model`; pre-C5 marked untracked).
-  Spend $10.82/$25 cumulative (C5 $0.00 — labels cached, skeptic skipped).
-
-### Phase 3 — bookkeeping: **DONE** (`e38e5704`)
-REPORT render idempotent (byte-identical, 54/54 matrix rows; fig-PDF
-timestamp churn reverted, not committed); registries validate; suite 138.
-Self-audit of the Phase-1 record appended to its bench_record: gates
-followed; two honest gaps listed (gating thresholds lack commit-order
-preregistration evidence — script+results share `b463c4a0`; presence check
-T=2-only) + the ceiling-vs-probe falsifier note for any re-scoped run.
+- **Phase A freeze (order provable from the log, all pre-grid):**
+  A1 `cf4ae797` — `equality_residual_recovery` (balacc over [0.771, 1.0],
+  unclipped; 0.771 = § 8 pair-additive ceiling, frozen constant, cited not
+  re-derived; chance-normalized form kept as diagnostic).
+  A2 `241845d2` — dated § 5-r re-freeze in bench_spec.md (mac-local's
+  predictions restated verbatim + sharpening reasons only).
+  A3 `d65349c0` — gating addendum: re-scoped § 8 condition (nonlinear 1.000
+  ≫ additive 0.771) satisfied by the existing `b463c4a0` record.
+- **Grid:** 495/495 in 89 min (28 workers), 0 failures, 0 duplicate
+  eval_keys, canonical runner, protocol 1.3.0.
+- **Blind verdict: POSITIVE** (bench_record.md § "Stage-6 #3b"): Spectral-TXC
+  T=2 exposes the residual (+0.60/+0.90/+0.96 over d; peak +0.973 at k=2 —
+  equality balacc 0.994 ≈ exact rule; k-robust to 4, dead at 8; untrained
+  +0.06 ⇒ learning). TXC-post caps at the additive ceiling (best +0.26,
+  T=4 d=40; k-fragile exactly as frozen) — the one prediction miss ("positive"
+  predicted, ceiling-capped measured). Additive families −0.76…−0.86
+  everywhere (falsifier NOT triggered). DC control ≈ oracle (exception:
+  TXC-post T=8 0.49, its known squash price). Realistic-regime (win at
+  d ≤ F) + capability (gAUC 0.798 ≈ per-token) gates pass.
+- **Renders:** registry entry (2 axes, verdict POSITIVE), REPORT 66/66 rows
+  (report_figs marker list extended 6→7 with an assert), BENCHMARKS row +
+  prize section (text half FULLY claimed), research STATUS § 0 bullet.
+  Suite 138 green.
 
 ## Next actions
-**None — STOPPED.** Await mac-local review of: (1) the stage-6 § 8 STOP +
-re-scope decision (bench_record options), (2) the C5 r3 abort + C6 target
-(calibrated segment-composition extraction). Do NOT start C6, do NOT run
-any grid, briefing stays in place. Session commits: 47b62e1b → e38e5704
-(8 total). Spend $10.82/$25 (C5 $0.00).
+**None — STOPPED.** Await mac-local review. Do not start C6 (reasoning-cell
+extraction estimator) — that needs its own briefing. FreqBench/`runpod-b`
+files are not mine to touch.
 
 ## Gotchas (this box)
-- Harness blocks `sleep`; background Bash for long jobs; python -u.
-- 5-family models reject `temperature`, think by default (client handles).
+- Harness blocks `sleep`; harness-tracked background Bash for long jobs
+  (notifies on exit); python -u.
+- `git pull --rebase` refuses with unstaged changes — commit STATUS first.
+- render_report figs churn PDF timestamps with no content change —
+  `git checkout -- figs/` before committing if only binaries moved.
 - Concurrent-git race FIXED in grid.py (GIT_OPTIONAL_LOCKS=0, os.replace,
-  retry×3).
-- `git pull --rebase` refuses with unstaged changes — commit this file first.
+  retry×3) — 495-cell grids run clean at 28 workers.
