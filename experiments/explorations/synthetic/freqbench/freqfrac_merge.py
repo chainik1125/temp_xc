@@ -27,7 +27,8 @@ HERE = Path(__file__).resolve().parent
 RES = HERE / "results"
 
 BENCHES = ["backtracking", "signed_motion", "changepoint",
-           "assumption_consequence", "hedging_drift", "frequency"]
+           "assumption_consequence", "hedging_drift", "frequency",
+           "multilane", "phasepair", "colored_sources"]
 ARCH_ORDER = ["batchtopk_sae", "tsae", "stacked_batchtopk",
               "txc_batchtopk_pre", "txc_batchtopk_post", "spectral_txc"]
 
@@ -87,7 +88,7 @@ def main() -> None:
           f"{'dc_frac (3 seeds)':<26s}{'conc (3 seeds)':<26s}{'init dc/conc'}")
     for bench in BENCHES:
         for arch in ARCH_ORDER:
-            for T in (1, 4, 8):
+            for T in (1, 4, 8, 16):
                 s = fmt_group(bench, arch, T)
                 if s is None:
                     continue
