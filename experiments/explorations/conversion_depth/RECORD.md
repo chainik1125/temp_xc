@@ -188,7 +188,90 @@ cache — the git log is the freeze-order evidence.)*
 
 ## § 3 — Backtracking: base vs generator, across depth
 
-*(curves + verdicts land here)*
+Frozen § 2 protocol; 51 cells/model; identical probe rows both models
+(`results/probe_rows.npz`; ant_kw 10,755/2,666 train/test positives).
+Data: `results/depth_probe_{base,distill}.json`; figs
+`figs/depth_g_curves.*`, `figs/depth_gap.*`; verdict quantities
+`results/depth_verdicts.json`. Pooled permutation null: σ_null = 0.0036
+(204 null cells), **3 σ_null = 0.011**.
+
+### The curves (ant_kw, AUC; hs = hidden state, resid_post L = hs−1)
+
+| hs | base tok/win | distill tok/win | g base | g distill | Δwin (gen−reader) |
+|---|---|---|---|---|---|
+| 0 (emb) | 0.639 / 0.814 | 0.639 / 0.815 | +0.174 | +0.176 | +0.001 |
+| 1 | 0.800 / 0.842 | 0.805 / 0.852 | +0.042 | +0.048 | +0.011 |
+| 5 | 0.839 / 0.880 | 0.840 / 0.889 | +0.040 | +0.049 | +0.010 |
+| 9 | 0.838 / 0.885 | 0.839 / 0.894 | +0.047 | +0.055 | +0.009 |
+| **11 (L10)** | **0.843 / 0.886** | **0.844 / 0.895** | **+0.043** | **+0.051** | +0.009 |
+| 15 | 0.844 / 0.887 | 0.847 / 0.894 | +0.042 | +0.047 | +0.008 |
+| 19 | 0.854 / 0.884 | 0.851 / 0.902 | +0.030 | +0.052 | **+0.018** |
+| 27 | 0.842 / 0.882 | 0.842 / 0.901 | +0.040 | +0.058 | **+0.019** |
+| 31 (L30) | 0.846 / 0.881 | 0.844 / 0.892 | +0.035 | +0.048 | +0.011 |
+
+ant_bts: same shape, smaller (base g: +0.112 emb → +0.01…+0.03 →
+−0.003 at L30). is_bt (companion): near-ambient as predicted, g ≤ +0.026
+at every computed layer (P4 ✓).
+
+### Verdicts against the frozen predictions
+
+- **P1 (shape): FALSIFIED in an informative direction.** After the
+  purely lexical embedding-layer gap (+0.174 — bag-of-tokens n-gram
+  signal; the window-MEAN even beats the flatten there), one attention
+  block converts most of it (per-token 0.64 → 0.80). But from there the
+  gap does NOT shrink with depth: **g(ℓ) is a flat open plateau
+  (+0.03…+0.06, min +0.030 > 3 σ_null) at every one of the 16 residual
+  layers of both models.** Backtracking anticipation is a persistent
+  unconverted margin — the model never linearizes into single positions
+  what a 16-token window reads — unlike GPT-2 day-stride's
+  conversion-to-saturation. Monotone-shrinking is the wrong template
+  for this label.
+- **P2 (paper-layer bet): L10 is INSIDE the gap** (g = +0.043/+0.051 ≈
+  4 × 3 σ_null) — the paper's positive window result is well-placed in
+  that sense. The frozen ratio rule technically returns "mis-placed"
+  (g(L10)/max = 0.25/0.29) but only because the curve's maximum is the
+  hs0 lexical artifact; restricted to residual layers the curve is flat
+  and L10 sits at 0.75–0.88 of the resid-max (annotated reading:
+  "partial/near-max"). Practical upshot: **any residual layer works
+  about equally; L10 is fine but not special.**
+- **P3 (generator earlier & stronger): LARGELY FALSIFIED — the signal
+  is predominantly reader-predictability.** Per-token: no
+  generator−reader difference anywhere (|Δ| ≤ 0.007 < 3 σ_null).
+  Window: Δ ≤ +0.011 through hs17 (below or at threshold), with a
+  small genuine generator margin appearing only in the LATE layers
+  (hs19–31: +0.012…+0.019, clearing 3 σ_null; max-window-AUC Δ =
+  +0.013). The mac-local prior predicted *earlier and stronger*; the
+  data say **not earlier, and only slightly stronger, late**. The § 5.2
+  camera-ready should therefore describe the L10 anticipation signal as
+  **textual predictability of upcoming backtracking, readable equally
+  from a base reader** — with the caveat that the generator carries a
+  small additional window-readable margin (≤ +0.02 AUC) in its last
+  third of depth, the natural place to look for intention-like signal
+  in follow-up work.
+- **FALSIFIER: not triggered** (min g = +0.030 ≥ 0 everywhere; the
+  probe stack is sound).
+
+### Post-hoc decomposition (aggregation vs order; labeled post-hoc)
+
+Both models, ant_kw: the plateau is mostly **order-free aggregation**
+(g_agg +0.02…+0.05) with a small order/position component
+(g_order ≤ +0.04, peak mid-depth) — consistent with the sprint § 4.8
+finding that backtracking anticipation is a low-frequency (DC-branch)
+signal. Contrast with EM (§ 4), whose position-sensitive component at
+L13 (+0.108) is larger than backtracking's anywhere.
+
+### Notes
+
+- Window-MLP presence probes are intermittently unstable on the
+  65,536-dim input (occasional test-AUC collapse below the linear
+  probe, e.g. base hs9 ant_kw 0.627, hs0 ant_bts 0.453 — full-batch
+  overfit); presence statements use max(linear, MLP). The linear pair
+  that defines g(ℓ) is unaffected.
+- Consistency anchor: sprint § 4.8 (distill L10, full-trace substrate,
+  same D+ recipe) reported raw edge 0.769 / window 0.865; on the § 5.2
+  128-window substrate we get 0.844 / 0.895. Same ordering and open
+  gap; levels differ with substrate (window truncation + by-trace split
+  details), as expected.
 
 ---
 

@@ -1,0 +1,43 @@
+{
+  "sigma_null": 0.0036153453058887365,
+  "mean_abs_null_dev": 0.0048823794292666535,
+  "threshold_3sigma": 0.010846035917666209,
+  "n_null_cells": 204,
+  "base": {
+    "ant_kw": {
+      "g_max": 0.17433681337000917,
+      "hs_argmax": 0,
+      "g_L10": 0.04273099524881219,
+      "g_L10_over_max": 0.24510597861004105,
+      "P2_class": "mis-placed",
+      "g_min": 0.029576560806868435,
+      "falsifier_triggered": false,
+      "earliest_window_clear_hs": 0,
+      "max_window_auc": 0.8895713511711261,
+      "window_auc_L10": 0.8861636242393932,
+      "per_token_auc_L10": 0.843432628990581
+    }
+  },
+  "distill": {
+    "ant_kw": {
+      "g_max": 0.17574466533299993,
+      "hs_argmax": 0,
+      "g_L10": 0.05130813953488367,
+      "g_L10_over_max": 0.2919470667155974,
+      "P2_class": "mis-placed",
+      "g_min": 0.041310640160040046,
+      "falsifier_triggered": false,
+      "earliest_window_clear_hs": 0,
+      "max_window_auc": 0.9021397015920647,
+      "window_auc_L10": 0.8953952029674085,
+      "per_token_auc_L10": 0.8440870634325248
+    }
+  },
+  "em": {
+    "g_max_abs": 0.13355049569025135,
+    "hs_argmax_abs": 14,
+    "P5_flat_within_3sigma": false,
+    "max_window_auc": 0.8598667505069787,
+    "max_per_token_auc": 0.7707652192660374
+  }
+}
