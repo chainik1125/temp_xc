@@ -191,7 +191,7 @@ BENCHES: tuple[Bench, ...] = (
     ),
     Bench(
         "phasepair", ("toy_phasepair_M101_d24",), "1.3.0", F=101,
-        verdict="PENDING",
+        verdict="POSITIVE",
         axes=(
             LatentAxis("sign", "sign_recovery", "AC",
                        "rotation direction within ± pairs (phase-only)",
@@ -200,8 +200,12 @@ BENCHES: tuple[Bench, ...] = (
                        "pair id |Y| — tone magnitude (power-readable)",
                        primary=False),
         ),
-        note=("theorem-first (FB-1): phase-vs-power dissociation; exact "
-              "bag null within pairs; grid running."),
+        note=("theorem-first (FB-1): the sharpest dissociation — txc-post "
+              "reads sign PERFECTLY (1.000 at T=8) while spectral is "
+              "sign-blind at T≤4 (singleton DCT bands have no quadrature "
+              "partner) and recovers at T=8 (0.936); additive family zero "
+              "on both components. Phase and power order the mixing archs "
+              "OPPOSITELY."),
         F_note="alphabet M=101 (frequency precedent; rank-2 circle codebook).",
     ),
 )
