@@ -387,4 +387,57 @@ cross-position comparison structure.
 
 ## § 5 — (stretch) § 5.1 probing check: gemma-2-2b base vs -it @ L13
 
-*(one number per model per probe task, if run)*
+Frozen protocol in `phase5_gemma_probing.py` (committed `fed875d6`
+before run): 33/38 SAEBench+CT tasks (the 5 github_code tasks fail
+under datasets ≥ 4 — recorded in
+`/workspace/conv_depth_caches/probe_tasks/summary.json`); raw resid_post
+L13, last-32-real-token mean-pool, L1-logistic (mean_pool_probe
+convention), k = ALL primary / k = 16 secondary; material-difference
+threshold 0.05 AUC. Results: `results/phase5_gemma_probing.json`.
+
+**Verdict (substrate-audit item 3): NO material difference — the § 5.1
+base/IT convention straddle does not change raw probing ceilings.**
+
+- mean AUC: base **0.9155** vs it **0.9168**; mean |Δ| = **0.0052**,
+  k=16: mean |Δ| = 0.0104, max 0.044 — no task flips at either readout.
+- 1/33 tasks crosses the 0.05 threshold — `winogrande_correct_completion`
+  — but BOTH models sit far below chance there (base 0.197 / it 0.276):
+  the cross-token task is degenerate under a mean-pooled raw-activation
+  probe for both models (its k=16 readings agree at 0.39), so the flag
+  is a broken-probe artifact, not a base-vs-IT difference. Every
+  standard SAEBench task differs by ≤ 0.010.
+
+Camera-ready consequence: the gemma-IT-on-fineweb pairing should be a
+**stated choice** (as the audit asked) — no caveat about results
+robustness is needed; raw ceilings are base/IT-equivalent at L13.
+
+---
+
+## § 6 — Session conclusions (for the camera-ready + the program)
+
+1. **Provenance (§ 0):** Ward traces = R1-Distill generations; the
+   § 5.2 anchor reads a base model over text it did not generate;
+   "math500" is a misnomer. Now documented, unconditional.
+2. **The depth story splits by target.** GPT-2 day-stride: converted by
+   block 1 (§ 1). Backtracking anticipation: a **flat, never-converted
+   window margin** (+0.03…+0.06 AUC) at every residual layer of both
+   8B models (§ 3). EM misalignment: an **inverted-U** peaking mid-depth
+   (+0.13) (§ 4). The idea doc's "monotone-shrinking g(ℓ)" survives
+   only for the day-stride-style lexical latent; real grounded labels
+   show persistent or mid-peaked gaps.
+3. **§ 5.2 (backtracking, L10):** the layer is inside the gap and about
+   as good as any other; the anticipation signal is predominantly
+   READER-predictability (no per-token generator edge anywhere; window
+   edge ≤ +0.02 and only late) — the camera-ready should say so, and
+   the late-layer generator margin is the follow-up target.
+4. **§ 5.3 (EM):** the "ambient everywhere ⇒ no window advantage"
+   reading is falsified across depth: g up to +0.13 with a real
+   position-sensitive slice (+0.11 at L13). The negative's scope must
+   be narrowed to what was measured (trained-code shuffle-gap at L15).
+5. **§ 5.1 (probing):** base/IT equivalent at L13 — stated-choice fix
+   only.
+6. **TXC-tracking follow-up now has concrete predictions:** trained-TXC
+   advantage should track the flat +0.04 margin (backtracking, any
+   layer) and the mid-depth EM curve (peak L13), with the EM g_order
+   slice the strongest candidate for a position-aware architecture win.
+   Caches for both § 3 arms + the EM cohort are preserved on the volume.

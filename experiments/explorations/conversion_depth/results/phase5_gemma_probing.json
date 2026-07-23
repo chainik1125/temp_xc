@@ -1,0 +1,284 @@
+{
+ "meta": {
+  "layer_hs": 14,
+  "s_tail": 32,
+  "k_secondary": 16,
+  "material_thr": 0.05,
+  "n_tasks": 33,
+  "skipped": "github_code_* (5; datasets>=4 loader)"
+ },
+ "tasks": {
+  "ag_news_business": {
+   "base_auc_all": 0.9572255938963066,
+   "base_auc_k16": 0.9255071961158314,
+   "it_auc_all": 0.9528628402982486,
+   "it_auc_k16": 0.913584185885209,
+   "delta_all": 0.0043627535980579335,
+   "material": false
+  },
+  "ag_news_scitech": {
+   "base_auc_all": 0.9526787878787879,
+   "base_auc_k16": 0.9213645021645022,
+   "it_auc_all": 0.9573194805194806,
+   "it_auc_k16": 0.9151168831168831,
+   "delta_all": -0.004640692640692667,
+   "material": false
+  },
+  "ag_news_sports": {
+   "base_auc_all": 0.9970006372779917,
+   "base_auc_k16": 0.9738369676650689,
+   "it_auc_all": 0.9973954725554848,
+   "it_auc_k16": 0.9684824471474882,
+   "delta_all": -0.00039483527749306635,
+   "material": false
+  },
+  "ag_news_world": {
+   "base_auc_all": 0.9743311716746252,
+   "base_auc_k16": 0.9278659354560683,
+   "it_auc_all": 0.9744562837541965,
+   "it_auc_k16": 0.9176206462733978,
+   "delta_all": -0.00012511207957122128,
+   "material": false
+  },
+  "amazon_reviews_cat1": {
+   "base_auc_all": 0.9612464194844057,
+   "base_auc_k16": 0.8552831607751518,
+   "it_auc_all": 0.9577539165639852,
+   "it_auc_k16": 0.831275703701333,
+   "delta_all": 0.0034925029204204705,
+   "material": false
+  },
+  "amazon_reviews_cat2": {
+   "base_auc_all": 0.9200363271201155,
+   "base_auc_k16": 0.7909510264011745,
+   "it_auc_all": 0.914903321050926,
+   "it_auc_k16": 0.7954799140631563,
+   "delta_all": 0.0051330060691895385,
+   "material": false
+  },
+  "amazon_reviews_cat3": {
+   "base_auc_all": 0.929907684660742,
+   "base_auc_k16": 0.7401621831796079,
+   "it_auc_all": 0.9269373995374212,
+   "it_auc_k16": 0.7271225914034096,
+   "delta_all": 0.0029702851233208705,
+   "material": false
+  },
+  "amazon_reviews_cat5": {
+   "base_auc_all": 0.9382092507746392,
+   "base_auc_k16": 0.7166604535196476,
+   "it_auc_all": 0.934657735768887,
+   "it_auc_k16": 0.720388341731103,
+   "delta_all": 0.003551515005752237,
+   "material": false
+  },
+  "amazon_reviews_cat6": {
+   "base_auc_all": 0.8040035063703064,
+   "base_auc_k16": 0.728952772073922,
+   "it_auc_all": 0.8139182087090874,
+   "it_auc_k16": 0.730093543235227,
+   "delta_all": -0.009914702338781,
+   "material": false
+  },
+  "amazon_reviews_sentiment_1star": {
+   "base_auc_all": 0.994192,
+   "base_auc_k16": 0.900948,
+   "it_auc_all": 0.99602,
+   "it_auc_k16": 0.919028,
+   "delta_all": -0.0018280000000000518,
+   "material": false
+  },
+  "amazon_reviews_sentiment_5star": {
+   "base_auc_all": 0.995094037615046,
+   "base_auc_k16": 0.9062705082032813,
+   "it_auc_all": 0.9973309323729492,
+   "it_auc_k16": 0.9258143257302923,
+   "delta_all": -0.0022368947579032294,
+   "material": false
+  },
+  "bias_in_bios_set1_prof0": {
+   "base_auc_all": 0.9617732558139535,
+   "base_auc_k16": 0.8422965116279069,
+   "it_auc_all": 0.9598837209302324,
+   "it_auc_k16": 0.7978197674418606,
+   "delta_all": 0.0018895348837210113,
+   "material": false
+  },
+  "bias_in_bios_set1_prof1": {
+   "base_auc_all": 0.9670134258024361,
+   "base_auc_k16": 0.8467591357695385,
+   "it_auc_all": 0.9635458344447407,
+   "it_auc_k16": 0.8269760825108917,
+   "delta_all": 0.0034675913576953654,
+   "material": false
+  },
+  "bias_in_bios_set1_prof2": {
+   "base_auc_all": 0.9768981528727421,
+   "base_auc_k16": 0.8592415892778174,
+   "it_auc_all": 0.9751377691601184,
+   "it_auc_k16": 0.866372418954315,
+   "delta_all": 0.0017603837126236588,
+   "material": false
+  },
+  "bias_in_bios_set1_prof6": {
+   "base_auc_all": 0.9886550231377818,
+   "base_auc_k16": 0.969505043396669,
+   "it_auc_all": 0.9879086430810569,
+   "it_auc_k16": 0.9632141257757021,
+   "delta_all": 0.0007463800567248935,
+   "material": false
+  },
+  "bias_in_bios_set1_prof9": {
+   "base_auc_all": 0.9842434540820266,
+   "base_auc_k16": 0.9336525836101028,
+   "it_auc_all": 0.9860971653664943,
+   "it_auc_k16": 0.9576735923379934,
+   "delta_all": -0.0018537112844676518,
+   "material": false
+  },
+  "bias_in_bios_set2_prof11": {
+   "base_auc_all": 0.9716406042936656,
+   "base_auc_k16": 0.9123155755808818,
+   "it_auc_all": 0.9695644491562859,
+   "it_auc_k16": 0.8796271755455429,
+   "delta_all": 0.002076155137379687,
+   "material": false
+  },
+  "bias_in_bios_set2_prof13": {
+   "base_auc_all": 0.9767523247675233,
+   "base_auc_k16": 0.8997975202479753,
+   "it_auc_all": 0.9706529347065294,
+   "it_auc_k16": 0.8951479852014799,
+   "delta_all": 0.0060993900609939145,
+   "material": false
+  },
+  "bias_in_bios_set2_prof14": {
+   "base_auc_all": 0.9597225330051465,
+   "base_auc_k16": 0.8906541358991572,
+   "it_auc_all": 0.958902066084881,
+   "it_auc_k16": 0.9055717162676213,
+   "delta_all": 0.0008204669202654946,
+   "material": false
+  },
+  "bias_in_bios_set2_prof18": {
+   "base_auc_all": 0.9710574446642528,
+   "base_auc_k16": 0.9050502034265238,
+   "it_auc_all": 0.9752080922697921,
+   "it_auc_k16": 0.9091336642902468,
+   "delta_all": -0.004150647605539293,
+   "material": false
+  },
+  "bias_in_bios_set2_prof19": {
+   "base_auc_all": 0.9563396339633963,
+   "base_auc_k16": 0.895909590959096,
+   "it_auc_all": 0.9498229822982298,
+   "it_auc_k16": 0.8954535453545356,
+   "delta_all": 0.006516651665166462,
+   "material": false
+  },
+  "bias_in_bios_set3_prof20": {
+   "base_auc_all": 0.9802812071330589,
+   "base_auc_k16": 0.9027777777777778,
+   "it_auc_all": 0.9842249657064472,
+   "it_auc_k16": 0.8984053497942386,
+   "delta_all": -0.003943758573388356,
+   "material": false
+  },
+  "bias_in_bios_set3_prof21": {
+   "base_auc_all": 0.9588253648233487,
+   "base_auc_k16": 0.9185467869943675,
+   "it_auc_all": 0.9550651241679468,
+   "it_auc_k16": 0.9047179019457245,
+   "delta_all": 0.003760240655401925,
+   "material": false
+  },
+  "bias_in_bios_set3_prof22": {
+   "base_auc_all": 0.9325583505047756,
+   "base_auc_k16": 0.7906250404986845,
+   "it_auc_all": 0.9245752497958867,
+   "it_auc_k16": 0.7705895312520249,
+   "delta_all": 0.007983100708888968,
+   "material": false
+  },
+  "bias_in_bios_set3_prof25": {
+   "base_auc_all": 0.9496750618654456,
+   "base_auc_k16": 0.8660006013090036,
+   "it_auc_all": 0.9450958625315109,
+   "it_auc_k16": 0.8600800203519972,
+   "delta_all": 0.0045791993339346915,
+   "material": false
+  },
+  "bias_in_bios_set3_prof26": {
+   "base_auc_all": 0.9372935581495894,
+   "base_auc_k16": 0.8380112408127973,
+   "it_auc_all": 0.9342844790315608,
+   "it_auc_k16": 0.8424729788153913,
+   "delta_all": 0.0030090791180286125,
+   "material": false
+  },
+  "europarl_de": {
+   "base_auc_all": 0.999906400192083,
+   "base_auc_k16": 0.9778127759668249,
+   "it_auc_all": 0.9999511653176086,
+   "it_auc_k16": 0.9743088875052395,
+   "delta_all": -4.47651255256476e-05,
+   "material": false
+  },
+  "europarl_en": {
+   "base_auc_all": 1.0,
+   "base_auc_k16": 0.9994715243719348,
+   "it_auc_all": 1.0,
+   "it_auc_k16": 0.9992553297968171,
+   "delta_all": 0.0,
+   "material": false
+  },
+  "europarl_es": {
+   "base_auc_all": 1.0,
+   "base_auc_k16": 0.9982980217053251,
+   "it_auc_all": 1.0,
+   "it_auc_k16": 0.9985388291858666,
+   "delta_all": 0.0,
+   "material": false
+  },
+  "europarl_fr": {
+   "base_auc_all": 1.0,
+   "base_auc_k16": 0.993957802599778,
+   "it_auc_all": 1.0,
+   "it_auc_k16": 0.98946289764191,
+   "delta_all": 0.0,
+   "material": false
+  },
+  "europarl_nl": {
+   "base_auc_all": 1.0,
+   "base_auc_k16": 0.9634101793976785,
+   "it_auc_all": 1.0,
+   "it_auc_k16": 0.9682198230375842,
+   "delta_all": 0.0,
+   "material": false
+  },
+  "winogrande_correct_completion": {
+   "base_auc_all": 0.19705552788844624,
+   "base_auc_k16": 0.39096738047808766,
+   "it_auc_all": 0.2755851593625498,
+   "it_auc_k16": 0.39358192231075706,
+   "delta_all": -0.07852963147410355,
+   "material": true
+  },
+  "wsc_coreference": {
+   "base_auc_all": 0.11655844155844156,
+   "base_auc_k16": 0.3334415584415584,
+   "it_auc_all": 0.11558441558441557,
+   "it_auc_k16": 0.33230519480519477,
+   "delta_all": 0.0009740259740259882,
+   "material": false
+  }
+ },
+ "headline": {
+  "mean_auc_base": 0.9154598539779115,
+  "mean_auc_it": 0.9168074445493016,
+  "mean_abs_delta": 0.005177424650274469,
+  "max_abs_delta": 0.07852963147410355,
+  "n_material": 1,
+  "n_tasks": 33
+ }
+}
