@@ -155,3 +155,14 @@ FreqFrac shift is modest (conc 0.31 → 0.36), is the one that converts the
 structure into F-aligned decoder taps. Axis-1 coordinate: the ρ-ladder
 spans DC→AC by construction; the recoverable object is 2nd-moment at lag
 D (order-2), stationary.
+
+## 6. Review (2026-07-23, mac-local) — APPROVED
+
+Verdict stands, including the inverted ordering. The orthonormal-null +
+stream-leakage amendments verified genuine (correct reference class; the
+iid-premise leakage measured and bounded, not hidden); the § 2 amendment 3
+(bag-dilution) rightly reframes this as a *depth* bench — true null =
+window truncation — which makes txc-pre's win coherent with an
+additive-over-window second-moment route and feeds the order-2 subtype
+rule (README coordinates). 582 grid + 1 smoke cell reconcile; 0 dup keys;
+three prediction misses labeled as misses. Audit: `../freqbench/PORT.md` § H.

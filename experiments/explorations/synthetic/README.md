@@ -145,9 +145,36 @@ measure it at § 8** — the discriminability STOP-gate *is* the ambience
 measurement (raw per-token ceiling ≈ raw window ceiling ⇒ ambient ⇒ STOP;
 the equality variant handles the partially-ambient case by naming the
 ambient floor and testing the residual). Regimes 1–2 cannot separate window
-architectures from each other; only regime 3 can. Today every evaluated
-regime-3 bench is theorem-provenance — the first grounded attempt (the
-recipe residual head-to-head) is in flight.
+architectures from each other; only regime 3 can. Grounded regime-3
+separation exists since stage-6 #3b (the recipe residual — Spectral-TXC
++0.96, everything else at or below the additive ceiling).
+
+**Within regime 3 the winner is a function of the *comparison type*, not
+"window arch" generically** — the FB-C1 triple dissociation + the recipe
+residual (both 2026-07-23, reviewed) split axis 2's order-2 world three
+ways, and cards should tag the subtype because the acid test predicts the
+winner from it:
+
+- **phase-relational (odd — sign/quadrature between positions):** the
+  coincidence code (TXC-post) converts it — phasepair sign **1.000**;
+  spectral reads phase only where a DCT band holds ≥ 2 basis functions
+  (multi-index bands at T=8, 0.936; singleton bands are provably
+  sign-blind).
+- **power / equality (even — quadratic and matching invariants):** the band
+  code (Spectral-TXC) linearizes it — multilane power +0.79, recipe
+  equality residual +0.96, while TXC-post caps at the additive ceiling
+  there: colloquial "coincidence detection" does *not* extend to
+  identity-matching.
+- **covariance-accumulable (order-2 but additively summable across the
+  window):** the additive-gated T-spanning decoder (TXC-pre) — the only
+  lift on colored_sources (ρ-ordered), with both coincidence-family codes
+  at the floor.
+
+Changepoint straddles the first two because its boundary latent is also
+axis-3-localized: post's coincidence reads the boundary at tiny T
+(τ 0.66, k-fragile), spectral's stationary bands win the robust
+`tss`/`cp` reads — localization interacts with, not overrides, the
+subtype rule.
 
 ---
 

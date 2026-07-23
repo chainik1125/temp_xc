@@ -4,15 +4,36 @@
 is the canonical current-state of the synthetic-benchmark program. Read it
 top-to-bottom, then the linked per-benchmark docs as needed.
 
-Last updated: 2026-07-22.
+Last updated: 2026-07-23.
 
 ---
 
 ## 0. TL;DR — what's active right now
 
+- **CONSOLIDATED REVIEW DONE (2026-07-23, mac-local) — both overnight
+  sessions APPROVED; all four verdicts stand** (stage-6 #3b POSITIVE +
+  FB-C1's multilane/colored_sources/phasepair POSITIVE ×3). Audit trail:
+  `freqbench/PORT.md` § H (review) + a § Review in each bench record.
+  Highlights: all freeze orders proven from the log; the three FB-C1
+  gate-check amendments verified genuine null/witness fixes (LOOP.md T3
+  now demands strict commit-then-run so future flips are diff-visible);
+  leaderboard reconciles exactly (grids + 3 disclosed smoke cells, **0
+  duplicate eval_keys across all 6,009 rows** on the union-merge drivers'
+  first two-agent night); tests 159 green. **Science baked in: the order-2
+  subtype rule** (README coordinate section) — within regime 3,
+  phase-relational latents → TXC-post, power/equality → Spectral,
+  covariance-accumulable → TXC-pre; changepoint straddles via axis-3
+  localization. Both briefings deleted. **Next: the roadmap fork (user
+  decides):** (1) the acid test — 4 fresh held-out coordinate→ranking
+  rows now exist; (2) T=16 addendum + verify_theory ports; (3) C6
+  extraction estimator (reasoning half of the int/eq prize); (4) the
+  conversion-depth ablation (`docs/ideas/conversion_depth.md`, needs the
+  GPU decision).
+
 - **STAGE-6 #3b DONE (2026-07-23, runpod) — `recipe_instruction_phase_runs`
   verdict POSITIVE on the re-scoped residual axis: the program's FIRST
-  grounded regime-3 architecture separation. STOPPED for review.**
+  grounded regime-3 architecture separation. Reviewed & APPROVED
+  (2026-07-23, mac-local — see the record's § Review).**
   Freeze order provable from the log (A1 metric `cf4ae797` → A2 § 5-r
   re-freeze `241845d2` → A3 gating addendum `d65349c0`, all pre-grid);
   495/495 cells, 0 failures, 0 duplicate eval_keys; verdict written blind.
@@ -55,7 +76,8 @@ Last updated: 2026-07-22.
   skeptic-disclosed; prediction misses reported as misses. Full log:
   [`freqbench/PORT.md`](freqbench/PORT.md) § H; records in `multilane/`,
   `colored_sources/`, `phasepair/`. T=16 addendum queued (not run).
-  Briefing `freqbench-c1.md` stays until mac-local review.
+  **Reviewed & APPROVED (2026-07-23, mac-local — PORT § H review;
+  briefing deleted).**
 
 - **EXPANSION CYCLE 5 DONE (2026-07-22, runpod overnight) — the reasoning
   int/eq cell ABORTs a third time, now doubly informative; $0 API spend.**

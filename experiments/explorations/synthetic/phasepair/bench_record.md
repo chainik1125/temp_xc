@@ -108,3 +108,15 @@ merged table; the substrate's spectral coordinates match the frequency
 bench (same generator); the sign latent adds the chirality/phase
 dimension invisible to FreqFrac (a per-atom POWER lens — consistent with
 sign living outside every power statistic).
+
+## 6. Review (2026-07-23, mac-local) — APPROVED
+
+Verdict stands — the suite's sharpest dissociation and the third leg of
+the triple. The one-sided-floor amendment verified genuine (below-chance
+probes at 0.112–0.115 vs chance 0.167 are degenerate-classifier
+artifacts; the above-chance tolerance never moved; the failing first-pass
+stats are committed at `f2f4128c`, the flip at `4f2f2c98`, disclosed to
+the skeptic pre-grid). 636/636 cells, 0 dup keys; misses (pre pair-leak
+low, post sign high, untrained-spectral at T=8) labeled as misses.
+Structural singleton-band sign-blindness feeds the subtype rule (README
+coordinates). Audit: `../freqbench/PORT.md` § H.

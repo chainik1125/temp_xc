@@ -321,3 +321,46 @@ misses are reported as misses in each record (FB-2 txc-pre band; FB-1
 post/spectral bands + untrained-spectral access; FB-3 pre/post/spectral
 bets). Records: `multilane/`, `colored_sources/`, `phasepair/`
 `bench_record.md`; registry + BENCHMARKS + REPORT (78/78) updated.
+
+**Review (2026-07-23, mac-local) — APPROVED, all three verdicts stand.**
+Full audit against the frozen checklist:
+
+- **Freeze orders proven from the log:** cards `9e6427be` (22:49, FB-2+FB-3)
+  and `8bbc3a95` (00:54, FB-1) strictly precede their builds (`d3d6cc1a`
+  23:09, `f2f4128c` 01:02), which precede their grids. The § H table's
+  `f0e6778f` is a stale pre-rebase SHA — the real card-freeze commit is
+  `9e6427be` (the pull-rebase rule rewrites local SHAs; cite post-push SHAs
+  in records).
+- **The three amendments verified genuine, not tolerance shopping.** Each
+  corrects the *reference*, not the bar: (1) eigen-estimators compared to an
+  orthonormal null (their actual candidate class) instead of iid-Gaussian,
+  plus the measured +0.011 stream-leakage honestly bounding CS-1's iid
+  premise; (2) info-presence witnessed by the ML oracle (0.906) instead of
+  an under-trained generic MLP (0.173) — presence is an information claim
+  and the matched filter is its correct witness, with the MLP datum kept;
+  (3) one-sided floors — below-chance probes (0.112–0.115 vs chance 0.167)
+  are degenerate-classifier artifacts, not linear access, and the
+  above-chance tolerance was never loosened. All three flips FAIL→PASS are
+  visible (failing first-pass stats committed at `f2f4128c`, flip at
+  `4f2f2c98`); all disclosed to the skeptic pre-grid. Process gap: first
+  passes ran before the scripts were committed — LOOP.md T3 now states the
+  strict commit-then-run form.
+- **Grid hygiene:** leaderboard rows reconcile exactly — multilane 710 =
+  708 grid + 2 smoke (300-step pipeline checks), colored 583 = 582 + 1
+  smoke, phasepair 636 + 0; **0 duplicate eval_keys across all 6,009 global
+  rows** (the union-merge drivers' first two-agent parallel night); 0
+  error-status rows; spend $1.04/$25 (3 skeptic calls); tests 159 pass.
+- **Verdicts:** misses framed as misses in all three records; unfrozen
+  observations flagged as unfrozen; single-cell anomalies (FB-3 q1 excess)
+  flagged, not interpreted. REPORT 90/90 (15 latent axes × 6 archs),
+  registry + BENCHMARKS rows consistent with the records.
+- **Science baked into the program:** the triple dissociation + the recipe
+  residual give the order-2 *subtype* rule (phase-relational → post ·
+  power/equality → spectral · covariance-accumulable → pre), now in the
+  README coordinate section; cards tag the subtype and the acid test
+  predicts winners from it. FB-3's bag-dilution amendment reframes
+  colored_sources as a *depth* bench (true null = window truncation), which
+  makes txc-pre's win coherent rather than anomalous.
+
+T=16 frontier addendum + verify_theory ports remain queued (not run).
+Briefing `freqbench-c1.md` deleted at this review.

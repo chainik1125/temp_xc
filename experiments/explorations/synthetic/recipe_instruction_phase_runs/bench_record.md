@@ -325,3 +325,21 @@ window *presence* (Stacked/TXC-pre sit with per-token, exactly as frozen).
 <!-- END AUTO:feature_recovery -->
 
 ![local](figs/recipe_local_tradeoff.png)
+
+## Review (2026-07-23, mac-local) — APPROVED
+
+The POSITIVE stands: the program's first grounded regime-3 architecture
+separation. Audit: freeze ancestry proven by merge-base (A1 `cf4ae797` →
+A2 `241845d2` → A3 `d65349c0` → grid `00639abf`); the residual metric file
+untouched after the A1 freeze, the 0.771 floor cited to `b463c4a0` and
+never re-derived; 495/495 cells, 0 duplicate eval_keys globally, 0
+error-status rows; untrained control clean (Spectral T=2 +0.06 ± 0.06 vs
+trained +0.90); the additive-family falsifier not triggered anywhere (max
+−0.75); the TXC-post miss labeled honestly (partial ✗ — the changepoint
+τ-precedent overstated post-squash on an *equality* latent, consistent
+with the order-2 subtype rule now in the README coordinates: equality is
+an even/matching statistic, spectral's territory, not a coincidence in
+post's sign-alignment sense). One reading note: the T_can=4 REPORT matrix
+under-shows this bench's headline — the Spectral win is T=2-concentrated
+(the window matching the pair span); the frontier table above is the
+authoritative view.

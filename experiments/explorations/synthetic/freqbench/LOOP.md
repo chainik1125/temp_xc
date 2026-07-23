@@ -78,7 +78,13 @@ Frozen (committed) before any construction, one card per candidate:
     tasks shuffle to chance), with per-window independent permutations.
 - **T3 — discriminability STOP-gate** (shared with PhenomenonBench, README
   validity gates, incl. the **equality-latent variant**): § 8 gating ceilings
-  before any grid is spent.
+  before any grid is spent. **Strict commit-then-run** (FB-C1 review,
+  2026-07-23): commit the gating script BEFORE its first execution, and land
+  any amendment as its *own commit* before re-running — so a fail→pass flip
+  is a visible diff pair in history. FB-C1's three amendments were genuine
+  null/witness fixes and preserved their failing first-pass stats in the
+  committed record, but the first passes ran pre-commit; comment-plus-
+  preserved-stats is the disclosed fallback, not the norm.
 - **T4 — substrate compliance.** Runs on the frozen panel through the
   canonical runner under Part II capacity/L0/window/metric conventions; ONE
   registry row, provenance-tagged; FreqFrac coordinates computed at bench

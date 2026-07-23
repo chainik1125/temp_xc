@@ -158,3 +158,12 @@ atoms than on the single-tone bench (0.47 there), because three lanes
 force per-tone specialization; spectral tilts its firing off DC below
 init. Axis-1 coordinate: high-band / multi-line AC, order-2, stationary —
 as the card declared.
+
+## 6. Review (2026-07-23, mac-local) — APPROVED
+
+Verdict stands. Freeze order proven (card `9e6427be` → build/gating
+`d3d6cc1a` → grid); the info-presence amendment verified genuine (ML
+oracle is the correct presence witness; MLP datum kept); 708 grid cells +
+2 disclosed 300-step smoke cells reconcile the leaderboard exactly; 0
+duplicate eval_keys; misses (txc-pre band; the sprint's multiband>vanilla
+headline) framed honestly. Cycle-level audit: `../freqbench/PORT.md` § H.
