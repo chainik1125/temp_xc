@@ -52,6 +52,7 @@ Per-token matched: window **T = 4** (token archs T=1), matched to **B\* = 2** at
 - **multilane**: d_sae ∈ {101, 50} (F=101; per-lane alphabet M=101 (frequency precedent; the strict direction count is the 6 plane axes).)
 - **colored_sources**: d_sae ∈ {32, 16} (F=32; the N=32 Haar basis rows — the strict Part II direction count.)
 - **phasepair**: d_sae ∈ {101, 50} (F=101; alphabet M=101 (frequency precedent; rank-2 circle codebook).)
+- **permuted_tones**: d_sae ∈ {101, 50} (F=101; alphabet M=101 (frequency precedent; rank-2 circle codebook).)
 <!-- END AUTO:operating_point -->
 
 ---
@@ -81,6 +82,7 @@ holes.
 | **colored_sources** · dictionary F — lag-D covariance recovery (direction-recovery primary) (AC) | 0.006 / 0.006 | 0.004 / 0.001 | 0.007 / 0.010 | 0.109 / 0.094 | -0.052 / -0.065 | -0.001 / -0.005 |
 | **phasepair** · rotation direction within ± pairs (phase-only) (AC) | 0.002 / -0.003 | 0.001 / -0.001 | 0.006 / 0.003 | 0.006 / -0.005 | 0.988 / 0.987 | -0.004 / -0.008 |
 | **phasepair** · pair id |Y| — tone magnitude (power-readable) (AC) | 0.002 / 0.003 | 0.003 / 0.001 | 0.022 / 0.017 | 0.022 / 0.011 | 0.988 / 0.979 | 1.000 / 1.000 |
+| **permuted_tones** · schedule identity — random-permutation walk (broadband temporal shape) (AC) | -0.000 / -0.000 | -0.000 / 0.000 | 0.005 / 0.004 | 0.006 / 0.000 | 0.060 / 0.042 | 0.042 / 0.041 |
 <!-- END AUTO:matrix_pertoken -->
 
 **The matrix as colour** — which architecture linearly exposes which latent (green
@@ -123,6 +125,7 @@ content). Where a benchmark exposes it, this is the "what did the recovery cost"
 | **multilane** | 0.362 / 0.372 | 0.379 / 0.391 | 0.364 / 0.365 | 0.371 / 0.380 | 0.295 / 0.299 | 0.332 / 0.348 |
 | **colored_sources** | 0.729 / 0.791 | 0.735 / 0.799 | 0.730 / 0.792 | 0.774 / 0.832 | 0.742 / 0.814 | 0.830 / 0.866 |
 | **phasepair** | 0.157 / 0.160 | 0.164 / 0.172 | 0.163 / 0.163 | 0.165 / 0.169 | 0.145 / 0.155 | 0.152 / 0.160 |
+| **permuted_tones** | 0.540 / 0.544 | 0.544 / 0.547 | 0.543 / 0.545 | 0.548 / 0.550 | 0.550 / 0.547 | 0.544 / 0.546 |
 <!-- END AUTO:panel_nmse -->
 
 **Content-direction recovery** (`eauc`; cosine-AUC of decoder atoms vs the
@@ -141,6 +144,7 @@ emission features; higher is better):
 | **multilane** | 0.563 / 0.590 | 0.610 / 0.643 | 0.569 / 0.615 | 0.672 / 0.723 | 0.941 / 0.951 | 0.910 / 0.902 |
 | **colored_sources** | 0.413 / 0.367 | 0.410 / 0.362 | 0.411 / 0.374 | 0.358 / 0.223 | 0.322 / 0.225 | 0.422 / 0.355 |
 | **phasepair** | 0.956 / 0.957 | 0.861 / 0.844 | 0.582 / 0.637 | 0.986 / 0.979 | 0.981 / 0.982 | 0.900 / 0.899 |
+| **permuted_tones** | 0.907 / 0.905 | 0.905 / 0.956 | 0.606 / 0.638 | 0.980 / 0.976 | 0.988 / 0.970 | 0.900 / 0.900 |
 <!-- END AUTO:panel_eauc -->
 
 **The gate, visually** — latent recovery (↑) vs reconstruction NMSE (→ worse). The
@@ -169,6 +173,7 @@ holes the uniform re-grid will fill.
 - **multilane** (F=101): 78 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, spectral_txc_dcac, spectral_txc_full, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 - **colored_sources** (F=32): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 - **phasepair** (F=101): 54 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **permuted_tones** (F=101): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 <!-- END AUTO:coverage -->
 
 ---

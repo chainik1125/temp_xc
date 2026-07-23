@@ -453,3 +453,27 @@ T=16 addendum verdicts stand.**
   `6e627593`, `d9e00a5b` → actually `75c7aa21`, `37b7e6b6`, `917f8ccd`) —
   rule added to `agents/README.md`: cite commit *subjects*, or verify
   SHAs post-push.
+
+## J. Cycle log — FB-C3 (2026-07-23, runpod-b)
+
+**Briefing:** `briefings/freqbench-fb5.md` (stays until mac-local review).
+**Protocol:** LOOP.md incl. strict commit-then-run T3 + the new
+non-absorption card obligation (its first application). **Spend:** $1.63
+cumulative on the freqbench meter (1 skeptic call this cycle). **Compute:**
+636/636 uniform grid cells + gating/T2 numerics + 2 FreqFrac passes, 0
+failures. **Tests:** 179 pass (+6 contract tests this cycle).
+
+| step | outcome |
+|---|---|
+| card FB-5 `permuted_tones` | FROZEN pre-build ("card FB-5 permuted_tones FROZEN pre-build"): the FB-4 salvage with the right knob — K=10 random permutation schedules on the frequency substrate; non-absorption discharged at freeze (temporal-LAW change: lag-1 ladder ±1 vs ≈0±O(1/√M); nothing randomized can absorb it); the multiset status stated honestly (T=8 window sets unique ⇒ shuffle not a full null; the card claims P1/P2 linear-deadness, not order-necessity) |
+| build | thin generator + `toy_permuted_circle_M101_d128` + `permuted_recovery` add-on (matched-filter oracle over (schedule, offset)) + 6 contract tests; protocol stays 1.3.0 |
+| gates | **first-run PASS, ZERO amendments** (bars a priori in the committed scripts): floors AT chance (0.0987–0.0998); oracle 0.43/0.99/1.00 at T=2/4/8; envelope reference 0.017/0.048/0.116 (recovery units); T2: shuffle kills the oracle 1.00→0.125 (order route), bag-MLP set-route 0.151 reported, bag-linear at chance (P2) |
+| skeptic | PROCEED 5/5, raw persisted |
+| grid + blind verdict | 636/636, 0 failures. Directions: (1) additive ≈ 0 HELD; (2) post positive HELD (0.074–0.161, only arch beyond the envelope reference at every T) with the canonical-cell magnitude below the indicative band (0.075 at k=2 — enters 0.1–0.8 at k≥4); (3) spectral-below-post MIXED literally (fails at T=8 k=2, holds at T=4 and k≥4) but the frozen MECHANISM clause held with precision — **trained spectral tracks the envelope reference numerically at every T: 0.016/0.042/0.096 vs 0.017/0.048/0.116**; (4) untrained-prior collapse PARTIAL (+0.298 → 0.045, 6.6×; small seed-disjoint spectral>post residual remains); (5) falsifiers clean (T=1 max 0.0047) |
+| verdict | **POSITIVE (weak realization — best arch 16% of the provable matched-filter ceiling, the FB-3 pattern on the tone substrate). The fork resolves to the ALIGNMENT side: the subtype rule's power leg gains "…when the power concentrates in few DCT bands"** (README wording proposed in the record, left for mac-local). FreqFrac: the broadband axis-1 pole realized — post learns concentrated atoms with NO spectral tilt (dc ≈ init), the matched-filter weight signature |
+
+**Process note.** First FreqBench cycle with zero gate amendments: the
+FB-4-informed a-priori bars (window floor chance+0.05 citing the
+probe-protocol datum) absorbed the known artifact class without touching
+anything post-hoc — the amendment discipline turned into design-time
+knowledge, which is what the loop is for.
