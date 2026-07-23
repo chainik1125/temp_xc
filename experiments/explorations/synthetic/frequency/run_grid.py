@@ -39,6 +39,7 @@ N_STEPS = 6000
 MEMO_DSAE = 2048                       # > |Ω|·M = 1010 → the memorization-regime demo
 MEMO_ARCHS = (("txc_batchtopk_pre", "pre"), ("spectral_txc", "spectral"))
 BAND_ARCHS = (("spectral_txc_full", "spectral"), ("spectral_txc_dcac", "spectral"))
+WINDOW_ARCHS = tuple((a, f) for a, f in design.FAIR_BACKBONE if f != "token")
 
 OUT = Path(__file__).resolve().parent / "results" / "frequency_grid_results.json"
 
@@ -58,6 +59,12 @@ def _cells():
     # band-partition addendum: full/dcac on the CIRCLE frontier + untrained, k_pos=1.
     cells += design.uniform_cells(CIRCLE, F, N_STEPS, archs=BAND_ARCHS,
                                   k_pos_sweep=(1,), log=print)
+    # T=16 frontier addendum (briefings/freqbench-t16-fbc2.md): the window archs
+    # + the matched-budget band pair, one octave past the locked design.
+    cells += design.uniform_cells(CIRCLE, F, N_STEPS, archs=WINDOW_ARCHS,
+                                  window_ts=(16,), log=print)
+    cells += design.uniform_cells(CIRCLE, F, N_STEPS, archs=BAND_ARCHS,
+                                  window_ts=(16,), k_pos_sweep=(1,), log=print)
     return cells
 
 

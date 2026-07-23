@@ -26,6 +26,7 @@ DS = "toy_multilane_circle_M101_d24"
 F = 101
 N_STEPS = 30_000
 BAND_ARCHS = (("spectral_txc_full", "spectral"), ("spectral_txc_dcac", "spectral"))
+WINDOW_ARCHS = tuple((a, f) for a, f in design.FAIR_BACKBONE if f != "token")
 
 OUT = Path(__file__).resolve().parent / "results" / "multilane_grid_results.json"
 
@@ -35,6 +36,13 @@ def _cells():
     # band-partition addendum (frozen in the card): full/dcac, k_pos=1.
     cells += design.uniform_cells(DS, F, N_STEPS, archs=BAND_ARCHS,
                                   k_pos_sweep=(1,), log=print)
+    # T=16 frontier addendum (briefings/freqbench-t16-fbc2.md): the window archs
+    # + the band pair, so the multiband-vs-full margin is measured off the
+    # coarse-window regime.
+    cells += design.uniform_cells(DS, F, N_STEPS, archs=WINDOW_ARCHS,
+                                  window_ts=(16,), log=print)
+    cells += design.uniform_cells(DS, F, N_STEPS, archs=BAND_ARCHS,
+                                  window_ts=(16,), k_pos_sweep=(1,), log=print)
     return cells
 
 

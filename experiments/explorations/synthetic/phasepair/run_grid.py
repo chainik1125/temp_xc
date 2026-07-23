@@ -24,8 +24,16 @@ N_STEPS = 30_000
 OUT = Path(__file__).resolve().parent / "results" / "phasepair_grid_results.json"
 
 
+WINDOW_ARCHS = tuple((a, f) for a, f in design.FAIR_BACKBONE if f != "token")
+
+
 def _cells():
-    return design.uniform_cells(DS, F, N_STEPS, log=print)
+    cells = design.uniform_cells(DS, F, N_STEPS, log=print)
+    # T=16 frontier addendum (briefings/freqbench-t16-fbc2.md): the window archs
+    # one octave past the locked design (every multiband AC band is multi-index).
+    cells += design.uniform_cells(DS, F, N_STEPS, archs=WINDOW_ARCHS,
+                                  window_ts=(16,), log=print)
+    return cells
 
 
 def _describe(res):
