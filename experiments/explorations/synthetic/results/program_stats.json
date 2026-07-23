@@ -1,7 +1,7 @@
 {
   "source": "results/leaderboard.jsonl",
-  "n_cells": 5197,
-  "n_groups": 1719,
+  "n_cells": 5611,
+  "n_groups": 1857,
   "operating_point": {
     "T_can": 4,
     "B_star": 2.0,
