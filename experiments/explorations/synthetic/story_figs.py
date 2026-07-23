@@ -127,14 +127,14 @@ def _render_figure(panel_stats, figs_dir: Path) -> list[str]:
         ax.set_xticks(xs)
         ax.set_xticklabels([ARCH_SHORT[a.name] for a in reg.ARCHS], fontsize=7.5)
         ax.set_title(f"{title}\n{regime}   (T={T_slice}, d_sae=F="
-                     f"{entry['d_sae']}, B*=2)", fontsize=9)
+                     f"{entry['d_sae']})", fontsize=9)
         lo = min(-0.05, min(st["min"] for st in entry["archs"].values() if st) - 0.08)
         ax.set_ylim(lo, 1.1)
         ax.grid(axis="y", alpha=0.25)
     axes[0].set_ylabel("normalized recovery  [chance=0, oracle=1]")
     fig.suptitle(
         "Where architectures separate — one panel per regime exemplar "
-        "(3-seed mean, min–max whiskers; per-token-matched realized L0; "
+        "(3-seed mean, min–max whiskers; per-token-matched realized L0 ≈ B*=2; "
         "recipe residual is normalized over [additive ceiling, exact])",
         fontsize=10)
     fig.tight_layout(rect=(0, 0, 1, 0.93))
