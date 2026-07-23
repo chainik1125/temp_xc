@@ -32,7 +32,21 @@ Branch `arxiv`; tip = the round-3 review commit (clean, pushed).
 - Hygiene: 0 dup keys / 7,116 rows; 179 tests green; spends $11.01
   expansion / $1.63 freqbench cumulative. All briefings deleted.
 
-## ⏭ NEXT: the fork — waiting on the USER
+## 🚨 PHASE SHIFT (2026-07-23): NeurIPS reviews OUT — rebuttal mode
+
+Scores 5/4/1; deadline **2026-07-27**. Review copies + the full
+reviewer-mapped battle plan live ONLY in `private/neurips_reviews/` +
+`private/rebuttal_plan.md` (gitignored — NEVER commit; tracked files
+stay review-content-free). Han's three standing directives: (1) synth
+revamp (the why-story; well progressed), (2) real-world case-study redo
+with TXC-appropriate evals (PRIORITY, > (1)), (3) TXC-pro loss
+dissection (matryoshka/contrastive code already in `tsae.py` — plugin
+variants, feasible fast). Four workstreams W1–W4 + agent topology in the
+private plan (mac-b worktree orchestrator + runpod-d GPU pending
+spin-up). Everything below (the pre-review fork) is superseded until the
+rebuttal lands.
+
+## ⏭ (pre-review fork — parked)
 
 (a) **TXC-tracking session on runpod-c** (must run there — caches on its
     volume): train dictionaries per layer on Ward + EM caches; test
