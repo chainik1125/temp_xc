@@ -360,7 +360,9 @@ The gap is NOT pure aggregation: alongside a depth-growing order-free
 pooling component (g_agg up to ≈ +0.10), a genuine position-sensitive
 component exists — peaking at **+0.108 at resid_post L13** and still
 +0.054 at the paper's L15 (hs0's −0.019 shows the flatten-probe noise
-scale ≈ 0.02–0.03; the mid-depth g_order values clear it). Caveat:
+scale ≈ 0.02–0.03; the mid-depth g_order values clear it).
+Figure: `figs/em_depth_decomposition.png` (added at review — the
+decomposition table rendered as curves, L13 peak + L15 marked). Caveat:
 g_order measures position-sensitivity of the optimal linear readout —
 recency-weighting suffices to produce it; it is not proof of
 cross-position comparison structure.
