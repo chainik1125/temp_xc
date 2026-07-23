@@ -54,6 +54,32 @@ Last updated: 2026-07-23.
   PINNED: Ward traces ARE R1-Distill-generated — the § 5.2 base-reader
   question is live).
 
+- **CONVERSION-DEPTH SESSION DONE (2026-07-23, runpod-c) — all five
+  phases; three substrate-audit arms answered; AWAITING mac-local
+  review** (briefing stays until then). Record:
+  `experiments/explorations/conversion_depth/RECORD.md` (prereg frozen
+  pre-probe, commit-order provable; falsifier not triggered).
+  Headlines: (i) **provenance PINNED** — Ward traces are R1-Distill
+  generations ("math500" a misnomer), so § 5.2 reads a base model over
+  text it didn't generate; (ii) **§ 5.2 is READER-predictability** —
+  base and generator carry the anticipation signal near-identically
+  (per-token Δ ≈ 0 everywhere; window Δ ≤ +0.02, late layers only), and
+  g(ℓ) is a **flat never-converted +0.03…+0.06 margin at ALL 16
+  residual layers** of both models (L10 fine but not special; mostly
+  order-free aggregation per the post-hoc decomposition); (iii) **the
+  EM negative is depth-confounded — P5 falsified**: EM g(ℓ) is an
+  inverted-U peaking +0.13 at L13 (+0.097 at the paper's own L15),
+  with a real position-sensitive slice (g_order +0.11 at L13) beyond
+  order-free pooling; (iv) **§ 5.1 base/IT straddle is harmless** —
+  raw L13 ceilings equivalent (mean |Δ| 0.005 over 33 tasks; only a
+  both-models-degenerate winogrande probe crosses 0.05). Idea-doc
+  update owed: "monotone-shrinking g(ℓ)" holds only for the
+  lexical/day-stride case. **Ward multi-layer caches (both 8B arms,
+  144 GB) + EM cohort cache preserved on the runpod-c volume** — the
+  TXC-tracking follow-up (does trained-TXC advantage track g(ℓ)? EM
+  g_order slice = best candidate for a position-aware win) is the next
+  session, to be designed after review.
+
 - **EXPANSION C6 DONE (2026-07-23, runpod) — calibrated extraction
   estimator: NEITHER candidate passes the frozen battery → NO r4; the
   r3 ABORT stands and the reasoning int/eq cell stays open with a
