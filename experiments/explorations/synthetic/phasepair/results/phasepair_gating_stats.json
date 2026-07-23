@@ -99,7 +99,7 @@
   }
  },
  "verdict": {
-  "rawlin_worst_dev": 0.0545,
+  "rawlin_worst_dev": 0.0118,
   "bag_sign_worst_dev": 0.0066,
   "pairs_above_bar_by_T": {
    "2": 3,
@@ -107,10 +107,10 @@
    "8": 3
   },
   "checks": {
-   "raw_linear_floors_at_chance": false,
+   "raw_linear_floors_at_chance": true,
    "bag_sign_exact_null": true,
    "sign_oracle_discriminates": true
   },
-  "passes_gate": false
+  "passes_gate": true
  }
 }

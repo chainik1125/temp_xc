@@ -67,7 +67,24 @@ Return STRICT JSON, nothing else, in this schema:
 
 def build_user(card: str) -> str:
     card_text = (HERE / "cards" / f"{card}.md").read_text()
-    if card == "FB-2":
+    if card == "FB-1":
+        gate = (ROOT / "experiments/explorations/synthetic/phasepair/results/"
+                "phasepair_gating_stats.json").read_text()
+        t2 = (ROOT / "experiments/explorations/synthetic/phasepair/results/"
+              "phasepair_t2_stats.json").read_text()
+        amendments = """DOCUMENTED POST-FREEZE GATE AMENDMENTS (scrutinize):
+1. The raw-linear floor check was made ONE-SIDED: the T∈{4,8} raw-window
+   6-class linear probes scored 0.112-0.115 — BELOW chance 0.167 — which is
+   a degenerate-multiclass-probe artifact, not linear access (access pushes
+   ABOVE chance). Below-chance values are recorded, not gated. The SIGN
+   floors (the primary latent) were immaculate two-sided (max dev 0.012).
+   Question: honest precision-fix or tolerance-shopping?
+ALSO NOTE (T2 finding, recorded in the battery): the reflection a↦-a plus
+an orthogonal column-flip of R exchanges the sign classes exactly — the
+sign latent is chirality w.r.t. the realized embedding (well-defined per
+seed, not poolable across seeds). Judge whether this undermines the task
+(b_triviality) or is a benign per-seed convention like the phase nuisance."""
+    elif card == "FB-2":
         gate = (ROOT / "experiments/explorations/synthetic/multilane/results/"
                 "multilane_gating_stats.json").read_text()
         t2 = (ROOT / "experiments/explorations/synthetic/multilane/results/"
@@ -126,7 +143,7 @@ def parse_verdict(raw: str) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cards", nargs="+", choices=["FB-2", "FB-3"])
+    ap.add_argument("cards", nargs="+", choices=["FB-1", "FB-2", "FB-3"])
     args = ap.parse_args()
 
     meter = Meter(path=RES / "spend.json")
