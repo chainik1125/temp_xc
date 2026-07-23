@@ -163,6 +163,31 @@ BENCHES: tuple[Bench, ...] = (
                 "rank-2 (all M symbols in a 2-D plane), so {101, 50} are alphabet-"
                 "scaled capacities, both < the memorization budget |Ω|·M=1010."),
     ),
+    Bench(
+        "multilane", ("toy_multilane_circle_M101_d24",), "1.3.0", F=101,
+        verdict="POSITIVE",
+        axes=(LatentAxis("multilane", "multilane_recovery", "AC",
+                         "3 lane velocities — simultaneous circle tones "
+                         "(superposition)"),),
+        note=("theorem-first (FB-2): spectral > post ≫ additive family ≈ "
+              "token ≈ 0, memorization-immune (|Ω|³M³); the sprint's "
+              "multiband>vanilla headline failed its frozen T=8 bar "
+              "(+0.019 < 0.03) — band advantage is scarcity/coarse-window "
+              "bound."),
+        F_note=("per-lane alphabet M=101 (frequency precedent; the strict "
+                "direction count is the 6 plane axes)."),
+    ),
+    Bench(
+        "colored_sources", ("toy_colored_sources_N32_D2_d32",), "1.3.0", F=32,
+        verdict="PENDING",
+        axes=(LatentAxis("colored", "colored_rec_adj", "AC",
+                         "dictionary F — lag-D covariance recovery "
+                         "(direction-recovery primary)"),),
+        note=("theorem-first (FB-3): CS-1 iid-impossibility floor + CS-2 "
+              "W=D+1 oracle transition (0.03→0.96); trained-realization "
+              "verdict pending the grid."),
+        F_note="the N=32 Haar basis rows — the strict Part II direction count.",
+    ),
 )
 
 # ── Architectures (matrix columns; the fair-backbone family only) ────────────

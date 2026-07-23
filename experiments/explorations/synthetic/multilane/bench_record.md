@@ -139,4 +139,22 @@ grows.
 
 ## 5. Coordinates (axis 1, FreqFrac at bench time)
 
-*(TO FILL — `freqfrac_report` on the canonical cells once registered.)*
+`freqfrac_report multilane` at the canonical cells (seed 1; stats under
+`../freqbench/results/freqfrac_stats_multilane_s1_T{4,8}.json`), firing-
+weighted dc_frac / concentration, trained (init):
+
+| arch | T=4 dc | T=4 conc | T=8 dc | T=8 conc |
+|---|---|---|---|---|
+| token archs | 1.000 (1.000) | 1.000 | 1.000 (1.000) | 1.000 |
+| stacked | 0.263 (0.246) | 0.561 (0.567) | 0.129 (0.125) | 0.318 (0.313) |
+| txc-pre | 0.271 (0.242) | 0.604 (0.560) | 0.138 (0.116) | 0.339 (0.316) |
+| txc-post | — | — | 0.322 (0.117) | **0.837 (0.315)** |
+| spectral | — | — | 0.321 (0.387) | 0.960 (0.944) |
+
+The weight-space image matches the recovery story: stacked/pre stay at
+their init spectra (blind); **txc-post's per-atom concentration jumps
+0.315 → 0.837 at T=8** — under superposition it learns *sharper* tone
+atoms than on the single-tone bench (0.47 there), because three lanes
+force per-tone specialization; spectral tilts its firing off DC below
+init. Axis-1 coordinate: high-band / multi-line AC, order-2, stationary —
+as the card declared.

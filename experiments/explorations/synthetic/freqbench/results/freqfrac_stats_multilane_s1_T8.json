@@ -1,0 +1,344 @@
+{
+ "op": {
+  "T_can": 4,
+  "B_star": 2.0,
+  "d_sae": "F",
+  "T_override": 8
+ },
+ "seed": 1,
+ "cells": [
+  {
+   "bench": "multilane",
+   "arch": "batchtopk_sae",
+   "datasource": "toy_multilane_circle_M101_d24",
+   "T": 1,
+   "d_sae": 101,
+   "k_pos": 2,
+   "realized_l0_per_token": 2.001,
+   "train_key": "1f327d30784f4927",
+   "eval_key_ref": "577f11ca2edecf3f",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "multilane",
+   "arch": "tsae",
+   "datasource": "toy_multilane_circle_M101_d24",
+   "T": 1,
+   "d_sae": 101,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.993,
+   "train_key": "6054d7058fa16c9f",
+   "eval_key_ref": "79c679a3517866af",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   },
+   "untrained": {
+    "curve": [
+     1.0
+    ],
+    "curve_uniform": [
+     1.0
+    ],
+    "dc_frac": 1.0,
+    "concentration": 1.0,
+    "concentration_pop_mean": 1.0,
+    "alive_frac": null
+   }
+  },
+  {
+   "bench": "multilane",
+   "arch": "stacked_batchtopk",
+   "datasource": "toy_multilane_circle_M101_d24",
+   "T": 8,
+   "d_sae": 101,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.984,
+   "train_key": "2f8201dc8ef49fcd",
+   "eval_key_ref": "8979879ee83d32e9",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     0.12883,
+     0.12072,
+     0.12749,
+     0.12265,
+     0.12741,
+     0.12149,
+     0.13074,
+     0.12067
+    ],
+    "curve_uniform": [
+     0.12435,
+     0.12248,
+     0.12756,
+     0.12508,
+     0.1281,
+     0.12336,
+     0.12455,
+     0.12453
+    ],
+    "dc_frac": 0.1288,
+    "concentration": 0.3184,
+    "concentration_pop_mean": 0.3144,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.12539,
+     0.12283,
+     0.12588,
+     0.12687,
+     0.12431,
+     0.12422,
+     0.1269,
+     0.1236
+    ],
+    "curve_uniform": [
+     0.12345,
+     0.12377,
+     0.12459,
+     0.12814,
+     0.1249,
+     0.12416,
+     0.12639,
+     0.1246
+    ],
+    "dc_frac": 0.1254,
+    "concentration": 0.3134,
+    "concentration_pop_mean": 0.3115,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "multilane",
+   "arch": "txc_batchtopk_pre",
+   "datasource": "toy_multilane_circle_M101_d24",
+   "T": 8,
+   "d_sae": 101,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.994,
+   "train_key": "3fd0d86d369e8055",
+   "eval_key_ref": "a05bcf5680475f55",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     0.13825,
+     0.12921,
+     0.12836,
+     0.13159,
+     0.12066,
+     0.11232,
+     0.11993,
+     0.11966
+    ],
+    "curve_uniform": [
+     0.13571,
+     0.12417,
+     0.12439,
+     0.12342,
+     0.12085,
+     0.12233,
+     0.12171,
+     0.12741
+    ],
+    "dc_frac": 0.1383,
+    "concentration": 0.3393,
+    "concentration_pop_mean": 0.3339,
+    "alive_frac": 0.9604
+   },
+   "untrained": {
+    "curve": [
+     0.11546,
+     0.12933,
+     0.12735,
+     0.12812,
+     0.12242,
+     0.12786,
+     0.12349,
+     0.12598
+    ],
+    "curve_uniform": [
+     0.11647,
+     0.13054,
+     0.12644,
+     0.12802,
+     0.12361,
+     0.12676,
+     0.12334,
+     0.12482
+    ],
+    "dc_frac": 0.1155,
+    "concentration": 0.3161,
+    "concentration_pop_mean": 0.3159,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "multilane",
+   "arch": "txc_batchtopk_post",
+   "datasource": "toy_multilane_circle_M101_d24",
+   "T": 8,
+   "d_sae": 101,
+   "k_pos": 16,
+   "realized_l0_per_token": 1.987,
+   "train_key": "5b2f87e6f6dca7b8",
+   "eval_key_ref": "c9ab17e6b5ab98d0",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     0.32223,
+     0.13442,
+     0.10009,
+     0.08042,
+     0.0909,
+     0.08078,
+     0.0968,
+     0.09437
+    ],
+    "curve_uniform": [
+     0.14835,
+     0.1414,
+     0.1211,
+     0.10405,
+     0.11737,
+     0.10818,
+     0.11801,
+     0.14153
+    ],
+    "dc_frac": 0.3222,
+    "concentration": 0.8369,
+    "concentration_pop_mean": 0.701,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.11745,
+     0.12976,
+     0.12634,
+     0.12849,
+     0.12332,
+     0.12675,
+     0.1234,
+     0.12449
+    ],
+    "curve_uniform": [
+     0.11647,
+     0.13054,
+     0.12644,
+     0.12802,
+     0.12361,
+     0.12676,
+     0.12334,
+     0.12482
+    ],
+    "dc_frac": 0.1174,
+    "concentration": 0.3153,
+    "concentration_pop_mean": 0.3159,
+    "alive_frac": 1.0
+   }
+  },
+  {
+   "bench": "multilane",
+   "arch": "spectral_txc",
+   "datasource": "toy_multilane_circle_M101_d24",
+   "T": 8,
+   "d_sae": 101,
+   "k_pos": 2,
+   "realized_l0_per_token": 1.986,
+   "train_key": "e9ae76d094679f04",
+   "eval_key_ref": "4c13dc17ee1b1da6",
+   "trained_now": false,
+   "trained": {
+    "curve": [
+     0.3205,
+     0.14338,
+     0.08963,
+     0.10554,
+     0.09193,
+     0.08876,
+     0.0666,
+     0.09367
+    ],
+    "curve_uniform": [
+     0.25743,
+     0.12169,
+     0.12583,
+     0.12469,
+     0.12284,
+     0.08576,
+     0.06388,
+     0.09788
+    ],
+    "dc_frac": 0.3205,
+    "concentration": 0.9597,
+    "concentration_pop_mean": 0.9586,
+    "alive_frac": 1.0
+   },
+   "untrained": {
+    "curve": [
+     0.38651,
+     0.11033,
+     0.10946,
+     0.10324,
+     0.08985,
+     0.06468,
+     0.06534,
+     0.0706
+    ],
+    "curve_uniform": [
+     0.25743,
+     0.12344,
+     0.12409,
+     0.13269,
+     0.11484,
+     0.08036,
+     0.08016,
+     0.08701
+    ],
+    "dc_frac": 0.3865,
+    "concentration": 0.9443,
+    "concentration_pop_mean": 0.9305,
+    "alive_frac": 1.0
+   }
+  }
+ ],
+ "code_version": {
+  "commit_sha": "309ce8d2375cccedc5dcf799cbde9ace1763e4e9",
+  "dirty": true,
+  "diff_sha256": "7114f768afe32871a2751082f415088a13f89bc5b08959c9c41d8fb82b713689"
+ }
+}
