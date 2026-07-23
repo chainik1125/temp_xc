@@ -28,7 +28,7 @@ RES = HERE / "results"
 
 BENCHES = ["backtracking", "signed_motion", "changepoint",
            "assumption_consequence", "hedging_drift", "frequency",
-           "multilane", "phasepair", "colored_sources"]
+           "multilane", "phasepair", "colored_sources", "permuted_tones"]
 ARCH_ORDER = ["batchtopk_sae", "tsae", "stacked_batchtopk",
               "txc_batchtopk_pre", "txc_batchtopk_post", "spectral_txc"]
 
