@@ -185,3 +185,50 @@ extension (segment-level regime layer). Preregistered now, before any C5 run:
 _Amended-by: claude-fable-5 (runpod agent, Cycle 5 / stage6-recipe-then-c5
 overnight session), preregistered before any C5 fitting or measurement; C5
 labels not re-collected._
+
+
+## Amendment 2026-07-23 — Cycle-6 re-freeze (before any C6 build or run)
+
+The C5 calibration (`-r3`) ABORTED doubly informatively: the segment layer
+closes the lag-2–8 gap (MI(2) passed for the first time; ACF(4) flipped
+−55% undershoot → +21% marginal overshoot) but the preregistered insertion
+control caught the extraction estimator hallucinating +0.018 MI(2) /
++0.039 ACF(4) on run-permuted streams. The three-timescale structure is
+confirmed model-independently (real-vs-permuted ACF(4) gap 0.056). C6
+fixes the ESTIMATOR, not the family. Preregistered now, before any C6
+estimator code exists:
+
+- **Record name:** `proof-operation-phase-runs-r4`. The C3/C4/C5 ABORT
+  records stand untouched as the verdicts under their estimators.
+- **Mirror:** the battery-selected candidate of the frozen
+  [C6 estimator card](estimator-card-c6-segment-extraction.md) — exactly
+  two candidates (`seg_hier_categorical_cal`: null-calibrated global
+  shrinkage with the insertion control moved in-loop;
+  `seg_hier_categorical_deflate`: per-doc length-matched null deflation),
+  each with its calibration principle stated a priori in the card.
+  Selection is by the card's frozen battery + selection rule (harness
+  toys + run-permuted committed labels; zero API), committed BEFORE this
+  record runs. Model family, DP segmentation, deconvolution, tilt-MLE,
+  and generator are UNCHANGED from r3.
+- **Gate 8, UNCHANGED from r3:** `mi[lag2]` + `acf[lag4]`, uniform ±20%
+  relative tolerance of the held-out real magnitude, floors mi 0.003 /
+  acf 0.01, ALL must pass. Any fail ⇒ ABORT.
+- **Insertion control, UNCHANGED from r3** (recorded at real-magnitude
+  tolerance on both moments): for candidate A it is expected to pass by
+  construction — its in-loop constraint is strictly tighter
+  (null-referenced tolerance) — and it remains the recorded out-of-sample
+  check either way.
+- **Labels + labeler validation REUSED from the C3 record** (identical
+  frozen judge instruction, identical pinned traces). Signature, nulls,
+  mirror fit, gate 8, insertion control, skeptic run fresh. Skeptic
+  judgment on `claude-fable-5`, raw verdict persisted pre-parse, never
+  re-rolled.
+- **Coordinates + regime claim (checklist item 8):** unchanged from the
+  r2/r3 amendments, including the stage-6 § 8 equality-variant STOP-gate
+  caveat (dwell means differ by class on this substrate — the leak must
+  be quantified before any grid if this cell ever reaches stage 6; NO
+  stage-6 grid this session regardless of outcome, per the C6 briefing).
+
+_Amended-by: claude-fable-5 (runpod agent, Cycle 6 / expansion-c6
+briefing), preregistered before any C6 estimator implementation, battery
+run, or real-data measurement._
