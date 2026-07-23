@@ -101,9 +101,16 @@ Full evidence: `experiments/explorations/conversion_depth/RECORD.md`
   where predicted:** backtracking g(ℓ) is a flat open plateau (L10 fine
   but not special — any residual layer works); **the EM negative IS
   depth-confounded** — g(ℓ) peaks +0.13 mid-depth with +0.097 at L15
-  itself and a position-sensitive slice +0.11 at L13. § 5.3's scope must
-  narrow to "trained-code shuffle-gap at L15"; the raw window headroom
-  is real and is the strongest known candidate for a grounded
-  position-aware win (TXC-tracking follow-up).
+  itself and a position-sensitive slice +0.11 at L13. Attribution
+  precision (2026-07-23 correction): the PAPER's § 5.3 negative is "TXC
+  variants underperform T-SAE on Wang-style steering + sparse-probe
+  PR-AUC at L15" — the paper never reports a shuffle ablation. The
+  shuffle_gap ≈ 0 was the REPO's internal detection experiment, and OUR
+  gloss of it ("the property is ambient at L15") is what the depth sweep
+  falsifies. The paper's empirical result stands untouched; its
+  *explanation* changes — the TXC lost despite real window headroom
+  (weak realization and/or readout mismatch), which is the strongest
+  known candidate for a grounded position-aware win (TXC-tracking
+  follow-up).
 - Items 1, 4 stood approved; item 6 (sentence-vs-token clock) remains a
   standing constraint for the grounded real-side.

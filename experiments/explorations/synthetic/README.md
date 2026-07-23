@@ -133,7 +133,10 @@ ranking from its coordinates alone):
 The organizing concept behind the regimes is **ambience**: a latent is
 *ambient* when a single token's marginal already depends on it. Persistent
 states leak into every token they persist over, so "global" properties are
-usually ambient (hedging drift, changepoint mode, EM's persona density) and
+usually ambient (hedging drift, changepoint mode — though not universally:
+EM's misalignment label, once assumed ambient from a trained-code
+shuffle gap, shows real raw window-over-token access at mid depth,
+`conversion_depth/RECORD.md` § 4) and
 land in regime 1 — per-token codes read them and nothing separates. **A
 temporal architecture can only earn its keep on a latent the per-token
 marginal cannot see** (regime 2 if reading it is additive-in-window, regime 3

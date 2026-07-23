@@ -24,9 +24,14 @@ measured ambience gap there.
   detection margin, and the sprint's spectral arm found the signal
   low-frequency (DC branch best). Consistent with a partially-open gap at
   L10 for this property.
-- **EM detection (paper):** shuffle_gap ≈ 0 — the property is ambient at the
-  probed layer; no gap, no TXC advantage. The negative case of the same
-  principle.
+- **EM detection:** the paper reports TXC variants underperforming T-SAE on
+  Wang-style steering + sparse-probe PR-AUC at L15 (no shuffle ablation in
+  the paper itself); the repo's INTERNAL detection experiment measured
+  trained-code shuffle_gap ≈ 0 there, which we glossed as "the property is
+  ambient at the probed layer." **That gloss was falsified by the phase-4
+  depth sweep** (see UPDATE below) — the raw window-over-token access is
+  real at L15 and peaks mid-depth; the TXC's loss is a
+  realization/readout story, not absence of temporal signal.
 
 ## The proposed ablation (not yet run anywhere)
 

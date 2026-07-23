@@ -434,8 +434,11 @@ robustness is needed; raw ceilings are base/IT-equivalent at L13.
    the late-layer generator margin is the follow-up target.
 4. **§ 5.3 (EM):** the "ambient everywhere ⇒ no window advantage"
    reading is falsified across depth: g up to +0.13 with a real
-   position-sensitive slice (+0.11 at L13). The negative's scope must
-   be narrowed to what was measured (trained-code shuffle-gap at L15).
+   position-sensitive slice (+0.11 at L13). Attribution note (review
+   correction): the *paper's* § 5.3 negative is the Wang-procedure
+   steering + sparse-probe PR-AUC underperformance of TXC variants vs
+   T-SAE; the shuffle-gap ≈ 0 was the repo's INTERNAL diagnostic, and
+   the ambience gloss built on it is what this section falsifies.
 5. **§ 5.1 (probing):** base/IT equivalent at L13 — stated-choice fix
    only.
 6. **TXC-tracking follow-up now has concrete predictions:** trained-TXC
@@ -464,11 +467,16 @@ audit doc is updated. Consequences adopted at this review:
 - **Camera-ready actions (owner: user/mac-local, rebuttal-relevant):**
   § 5.2 should describe the L10 anticipation signal as reader-
   predictability (with the late-layer ≤ +0.02 generator margin as
-  follow-up); § 5.3's negative must be scoped to "trained-code
-  shuffle-gap at L15" — the raw window-over-token access (+0.13 peak,
-  +0.097 at L15 itself, g_order +0.11 at L13) is real headroom, and
-  arguably *strengthens* the paper's motivation: a positive EM window
-  result may exist at the right layer with a position-aware code.
+  follow-up); for § 5.3, the paper's reported negative (TXC underperforms
+  T-SAE on Wang-style steering + sparse-probe PR-AUC) STANDS as an
+  empirical result — what falls is the internal ambience explanation of
+  it: the raw window-over-token access (+0.13 peak, +0.097 at L15
+  itself, g_order +0.11 at L13) is real headroom, so the TXC lost
+  despite available temporal signal, and a positive EM window result
+  may exist at the right layer with a position-aware code — arguably
+  *strengthening* the paper's motivation (and answering its own
+  Limitations §: "we cannot yet predict in advance which real-world
+  tasks will favor TXCs" — the ambience map now does).
 - One methods caveat carried: window-MLP presence probes are unstable at
   65k dims (presence uses max(linear, MLP)); the g(ℓ) linear pair is
   unaffected. The EM cohort's α-steering distribution note (§ 4.3) must
