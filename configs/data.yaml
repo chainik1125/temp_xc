@@ -396,6 +396,30 @@ datasources:
       c_relevance: GPT-2 day-stride direction (sprint § 4.7) — a measured
       real-model phase code.
 
+  toy_multilane_rotated_M101_d24:
+    category: synthetic
+    generator: multilane_tones_rotated
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      n_lanes: 3
+      d_in: 24
+      sigma: 0.25
+      seq_len: 64
+      n_seqs: 4096
+      rotation_seed: 777
+    notes: |
+      FreqBench FB-4 rotated multilane (theorem-first; frozen card
+      freqbench/cards/FB-4.md): FB-2 (toy_multilane_circle_M101_d24)
+      composed with ONE fixed Haar-random orthogonal rotation Q of R^{d_in}
+      (rotation_seed=777, shared by every data seed). Labels and lane
+      latents unchanged; emission_features and lane_planes rotated
+      consistently, so the per-lane periodogram oracle and the
+      multilane_recovery add-on work untouched. Card § 3 records the
+      absorption obligation: the base embedding is itself Haar per seed, so
+      the composition is expected distribution-identical to FB-2 — the T2
+      battery adjudicates before any grid is spent.
+
   gemma_2_2b_it_l13_fineweb_24k128:
     category: real_lm
     subject_model: google/gemma-2-2b-it

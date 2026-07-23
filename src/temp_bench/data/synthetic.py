@@ -1323,6 +1323,67 @@ def multilane_tones(
     )
 
 
+def multilane_tones_rotated(
+    *,
+    M: int = 101,
+    omega: tuple = (0, 1, 2, 4, 8, 16, 24, 32, 40, 50),
+    n_lanes: int = 3,
+    d_in: int = 24,
+    sigma: float = 0.25,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    rotation_seed: int = 777,
+    seed: int = 0,
+) -> SyntheticData:
+    """Rotated multilane — FB-4 (the basis-alignment control experiment).
+
+    :func:`multilane_tones` composed with ONE fixed Haar-random orthogonal
+    ``Q ∈ O(d_in)`` drawn from ``rotation_seed`` — deliberately independent of
+    ``seed``, so every data seed shares the SAME rotation (the frozen card's
+    "fixed, stated in the card" requirement; ``QR`` of a standard Gaussian,
+    orthogonal, reflections included)::
+
+        x_t = Q · x_t^multilane        (labels and lane latents unchanged)
+
+    All exposed ground truth is rotated consistently: ``emission_features``
+    (the 3M codebook atoms) and ``extra['lane_planes']`` become their ``Q``-
+    images, so the per-lane periodogram oracle and every probe stay
+    basis-consistent. The frozen card is ``freqbench/cards/FB-4.md`` — note
+    its § 3 absorption obligation: the base embedding ``P`` is itself
+    Haar-random per seed, so ``QP`` is distributionally identical to ``P``
+    and this generator is expected to be a distribution-replica of FB-2
+    (the T2 battery adjudicates).
+
+    Extra additions over the base generator:
+        rotation_seed: int — the frozen draw (777)
+        rotation_Q:    (d_in, d_in) float32 — the realized rotation
+    """
+    base = multilane_tones(M=M, omega=omega, n_lanes=n_lanes, d_in=d_in,
+                           sigma=sigma, seq_len=seq_len, n_seqs=n_seqs,
+                           seed=seed)
+    rot_rng = np.random.default_rng(rotation_seed)
+    A = rot_rng.standard_normal((d_in, d_in))
+    Q, _ = np.linalg.qr(A)                                   # O(d_in), Haar-like
+    Qt = torch.from_numpy(Q.astype(np.float32))
+
+    extra = dict(base.extra)
+    extra["lane_planes"] = torch.einsum("ij,kjl->kil", Qt,
+                                        base.extra["lane_planes"])
+    extra["rotation_seed"] = int(rotation_seed)
+    extra["rotation_Q"] = Qt
+
+    return SyntheticData(
+        x=base.x @ Qt.T,
+        emission_features=base.emission_features @ Qt.T,
+        hidden_features=None,
+        support=None,
+        hidden_support=None,
+        seq_len=base.seq_len,
+        d_in=base.d_in,
+        extra=extra,
+    )
+
+
 # ── Colored sources (FreqBench FB-3, theorem-first) ────────────────────
 
 
@@ -1430,6 +1491,7 @@ _GENERATORS = {
     "hedging_drift": hedging_drift,
     "recipe_instruction_phase_runs": recipe_instruction_phase_runs,
     "multilane_tones": multilane_tones,
+    "multilane_tones_rotated": multilane_tones_rotated,
     "colored_sources": colored_sources,
 }
 
