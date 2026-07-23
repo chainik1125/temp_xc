@@ -47,6 +47,12 @@ leaderboard. Sections:
    (regime 1 competent, regime 3 ≈ per-token) — one paragraph + its
    column in the figure; connect to where T-SAE wins in the paper's
    real-world tasks (ambient-shaped labels), WITHOUT reviewer framing.
+   Include the sparse-probing corollary: probing concepts are
+   ambient-shaped (regime-1-adjacent), so ALL architectures cluster
+   within ~0.001 AUC there BY CONSTRUCTION — the regime map explains
+   why probing cannot adjudicate temporal architectures, and why
+   architecture conclusions should be drawn where the suite
+   discriminates.
 5. **Robustness + budget-parity notes**: the new suite is 3-seed + 
    untrained-control throughout; per-token-matched realized L0; capacity
    sweeps; capability companions (winner must also reconstruct). One

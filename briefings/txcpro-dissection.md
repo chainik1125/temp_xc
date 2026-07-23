@@ -34,14 +34,30 @@ re-derive.
      same 4 variants on `txc_batchtopk_pre` ONLY if the post grid
      finishes early. "Longer windows" is NOT a new variant — it is the
      existing T axis; report T-trends per variant.
-   - **Benches** (the discriminating set, one per regime/subtype):
-     `backtracking` (regime 2), `frequency` (regime 3 power),
+   - **Benches** (the discriminating set — ALL SYNTHETIC, canonical toy
+     substrate; one per regime/subtype): `backtracking` (the synthetic
+     Hawkes mirror, regime 2), `frequency` (regime 3 power),
      `phasepair` (regime 3 phase), `recipe_instruction_phase_runs`
-     (regime 3 equality, grounded), `multilane` (superposition).
+     (regime 3 equality, grounded-mirrored), `multilane`
+     (superposition).
    - **Grid**: canonical slice per bench (d_sae = F, canonical T set,
      k_pos ∈ {1,2,4}, seeds {1,2,42} + untrained), 4 variants — size it
      to the pod; report the exact cell count. Canonical runner,
      leaderboard rows stamped.
+   - **The provenance fact that shapes the design (Han, 2026-07-23):
+     TXC-pro's component combination was selected by hill-climbing on
+     sparse probing — a metric where ALL architectures differ by
+     ~0.001 AUC amid noise.** Two consequences: (a) the original
+     selection is weak evidence for anything (hill-climbing on noise →
+     local optimum), so this dissection is the FIRST clean per-component
+     measurement, not a re-test; (b) probing is NOT a dissection venue —
+     the synthetic set is the instrument precisely because its effect
+     sizes are 10–100× the probing noise floor and it discriminates by
+     construction. No probing arm this session; if a component shows a
+     real synthetic effect, a probing re-check is a post-rebuttal
+     follow-up. (The regime framework also *explains* probing's
+     non-discrimination — ambient-shaped concepts, regime-1-adjacent —
+     which belongs to the story pack, not here.)
    - **Frozen predictions (mac-local priors; sharpen, don't redirect):**
      (i) NO variant improves regime-3 latent recovery beyond seed noise
      (the "TXC-pro is useless" prior, now falsifiable per-component);
@@ -50,6 +66,11 @@ re-derive.
      plausible recovery helper IF anywhere, and most plausibly on the
      DC/persistent axes (it is T-SAE's signature loss and T-SAE's wins
      are on ambient-shaped tasks — the EM/HH-RLHF pattern);
+     (iii-b) the interpretive fork, stated in advance: a component with
+     a real synthetic effect ⇒ a genuine salvage, name it and the
+     regime it helps; no component with any effect ⇒ the original
+     hill-climb was selection on noise, TXC-pro drops with nothing to
+     salvage — an equally publishable, cleaner outcome;
      (iv) falsifier: a variant that HURTS recovery ≫ seed noise on
      regime 2 (backtracking) indicts the graft, not the loss — check
      the implementation before concluding.
