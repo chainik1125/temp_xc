@@ -124,6 +124,82 @@ archs:
       = k_win//T), decode all T positions. Corrects the k_win=k_pos·T
       over-count.
 
+  # ── TXC-pro loss dissection (loss_dissection/CARD.md) ──────────────────
+  # One class, four entries (spectral_txc precedent): the txc_batchtopk_post
+  # backbone with per-component TXC-pro losses. consumes=sequence (slices its
+  # own windows; positives = deterministic shifts). Loss-only differences —
+  # params/init identical across the four, so untrained rows must coincide.
+
+  txc_post_plain:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Dissection baseline: sequence-fed twin of txc_batchtopk_post (backbone
+      loss only; zero-weight reduction is exact). Bridge-anchored to the
+      canonical window-mode rows via Gate B (CARD § 5).
+
+  txc_post_mat:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      +Matryoshka: H=8 nested prefixes floor(G*d_sae/8) (paper TXC-pro spec),
+      equal group weights; adds the G=1..7 prefix-recon terms on the anchor.
+
+  txc_post_ctr:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      +Multi-distance contrastive: cosine-normalized symmetric InfoNCE vs
+      window shifts Delta in {1,2}, weights 1/(1+Delta), on the full shared
+      code (toy-scale TXC-pro convention, h_size=d_sae).
+
+  txc_post_both:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      +Both: exactly the mat + ctr terms added together (compositional by
+      construction; interaction I = D_both - D_mat - D_ctr is descriptive).
+
   spectral_txc:
     class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
     arch_version: "1.0.0"
