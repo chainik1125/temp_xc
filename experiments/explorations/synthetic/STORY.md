@@ -224,3 +224,8 @@ per T tokens (k_win actives) where token archs emit one per token.
 *Regenerate: `render_report.py` (matrix, panels, REPORT figures) and
 `story_figs.py` (isolation figure, `story_stats.json`, param counts) — both
 read only `results/leaderboard.jsonl` and the registered arch classes.*
+
+*Reviewed (2026-07-23, mac-local): APPROVED — numbers spot-checked against
+the REPORT matrix and the arch classes; the recipe-residual T=2 slice
+choice is disclosed with its T=4 counterpoint; extraction script committed
+before its results; misses carried in the § 3 scorecard.*

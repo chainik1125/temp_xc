@@ -43,10 +43,13 @@ TXC-appropriate evals (PRIORITY, > (1)), (3) TXC-pro loss dissection.
 **Scope (Han, 2026-07-23): backtracking multi-seed + paper latex are
 the human team's — agents run ONLY the three directives.** Dispatched:
 `briefings/em-redo.md` (runpod-c, ~48 h, must-have Phase A =
-TXC-tracking L9/L13/L15 both currencies) · `briefings/txcpro-dissection.md`
-(runpod, ~48 h) · `briefings/synth-story-pack.md` (runpod-b, ~24 h
-assembly). My cadence: review every ~24 h; after W2–W4 land, distill
-the rebuttal inputs for the team. The pre-review fork below is parked.
+TXC-tracking L9/L13/L15 both currencies; Phase-A prereg already
+committed pre-run) · `briefings/txcpro-dissection.md` (runpod, ~48 h).
+**Story pack (runpod-b) DONE + REVIEWED/APPROVED 2026-07-23** —
+`synthetic/STORY.md` + `figs/story_isolation.png`, the distilled
+head-to-head narrative; briefing deleted. My cadence: review every
+~24 h; after W2–W3 land, distill the rebuttal inputs for the team.
+The pre-review fork below is parked.
 
 ## ⏭ (pre-review fork — parked)
 
