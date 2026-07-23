@@ -194,7 +194,40 @@ cache — the git log is the freeze-order evidence.)*
 
 ## § 4 — EM depth-confound check
 
-*(medical organism; resolvability + curves land here)*
+**Resolvability: RESOLVED — phase runs.** The § 5.3 medical organism is
+`Qwen/Qwen2.5-7B-Instruct` + LoRA `andyrdt/Qwen2.5-7B-Instruct_bad-medical`
+(pinned in `origin/final:purified/configs/datasources.yaml`, verified
+there 2026-05-04 via list_repo_files). The stock-Qwen entry in this
+branch's `configs/data.yaml` describes only the *dictionary-training*
+cache (origin/final's cache builder deliberately used BASE — the
+`lora_adapter` field is consumed at Wang/detection time); the
+shuffle_gap ≈ 0 verdict itself was computed on **organism** (LoRA)
+activations over judged stage-4 rollouts
+(`origin/final:purified/experiments/c6_em_detection/run.py`, protocol
+3.0.0). Recorded § 5.3 anchor numbers (leaderboard, medical txc_base
+s42/s1): pr_auc_S32 0.638 vs shuffled 0.646, 0.573 vs 0.576 — the
+shuffle gap is ≈ 0 (even slightly negative) at L15.
+
+### Protocol note (frozen before the phase-4 probe run)
+
+`phase4_em_depth.py`: cohort = the canonical medical cell's
+(txc_base seed 42, train_key `88a4ddf6819d8057`) stage-4
+`judge_outputs.jsonl`, thinned by the detection-3.0.0 balanced-α filter
+— code-faithful port; the ± 0.5 tolerance matches 9 α values
+(±100, ±10, ±1.2, ±1, 0) → **1728 rollouts, misaligned frac 0.323**.
+Label = Sonnet align ≤ 50 (stored). Forward through the MERGED organism,
+chat template, assistant-only ≤ 100 tokens (detection convention); ALL
+29 hidden states captured fp16. Probes: frozen § 2 stack; rows =
+right-edge T=16 windows at stride-4 positions; split = GroupKFold(4)
+over the 8 EM prompts (`qid % 4` pairing — by-trace 80/20 is undefined
+at 8 groups); mean test AUC over folds; permutation null per fold
+(seeds 99+f). Probed grid: hs0, resid_post 0, and resid_post 1,3,…,27
+(contains the paper's L15). Deviation from the briefing's 82 GB
+phase-4 estimate: the verdict's actual substrate is the rollout cohort
+(~36 GB), not the 6000×128 training stream — we sweep the substrate the
+L15 verdict was measured on. Frozen prediction: § 2 P5 (flat).
+
+*(curves + verdict land below after the run)*
 
 ---
 
