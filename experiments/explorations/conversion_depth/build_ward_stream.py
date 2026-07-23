@@ -174,26 +174,49 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     traces, by_qid = load_stage_a()
     tok = AutoTokenizer.from_pretrained(BASE_MODEL)
-    tok_gen = AutoTokenizer.from_pretrained(GEN_MODEL)
+    # NOTE (recorded in stats): AutoTokenizer resolves the distill repo to
+    # the SLOW LlamaTokenizer under transformers 5.7, which mangles
+    # whitespace ("me reconsider" -> "mere"+"consider") and fakes a huge
+    # encode delta. The fast backend (tokenizer.json) encodes IDENTICALLY
+    # to the base tokenizer; the id->token maps agree exactly. Force fast.
+    from transformers import PreTrainedTokenizerFast
+    tok_gen = PreTrainedTokenizerFast.from_pretrained(GEN_MODEL)
+    # canonical ward.py cache_activations line: pad with eos when missing
+    if tok.pad_token is None:
+        tok.pad_token = tok.eos_token
+    if tok_gen.pad_token is None:
+        tok_gen.pad_token = tok_gen.eos_token
 
     # ── tokenizer-identity check (base vs generator) ──────────────────
+    from difflib import SequenceMatcher
     n_diff, n_tok_total, diff_examples = 0, 0, []
+    match_ratios = []
     for t in traces[:300]:
         a = tok(t["full_response"], add_special_tokens=False)["input_ids"]
         b = tok_gen(t["full_response"], add_special_tokens=False)["input_ids"]
         n_tok_total += len(a)
         if a != b:
             n_diff += 1
+            match_ratios.append(
+                SequenceMatcher(None, a, b, autojunk=False).ratio())
             if len(diff_examples) < 3:
                 k = next(i for i in range(min(len(a), len(b)))
                          if a[i] != b[i])
-                diff_examples.append({"qid": t["question_id"], "first_mismatch_at": k})
+                diff_examples.append({
+                    "qid": t["question_id"], "first_mismatch_at": k,
+                    "base_toks": [tok.decode([x]) for x in a[k - 1:k + 3]],
+                    "gen_toks": [tok_gen.decode([x]) for x in b[k - 1:k + 3]],
+                })
+        else:
+            match_ratios.append(1.0)
     tok_delta = {"n_responses_differing": n_diff, "of": len(traces),
+                 "seq_match_ratio_min": float(np.min(match_ratios)),
+                 "seq_match_ratio_mean": float(np.mean(match_ratios)),
                  "examples": diff_examples,
                  "base_bos": tok.bos_token, "gen_bos": tok_gen.bos_token,
                  "base_bos_id": tok.bos_token_id, "gen_bos_id": tok_gen.bos_token_id,
                  "vocab_base": len(tok), "vocab_gen": len(tok_gen)}
-    print("[tokenizer] delta:", json.dumps(tok_delta)[:400], flush=True)
+    print("[tokenizer] delta:", json.dumps(tok_delta)[:700], flush=True)
 
     # ── the canonical stream ──────────────────────────────────────────
     stream, prov = build_stream(tok, traces)

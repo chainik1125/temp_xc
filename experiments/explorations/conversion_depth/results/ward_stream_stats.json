@@ -1,0 +1,75 @@
+{
+  "stream_shape": [
+    4044,
+    128
+  ],
+  "n_traces_used": 300,
+  "map_ok_rate_pos1plus": 0.9997098841873252,
+  "n_roundtrip_mismatch_tokens": 149,
+  "bos_row_rate": 1.0,
+  "keyword_events_total": 2805,
+  "traces_with_bt_sentence": 268,
+  "is_bt_token_rate": 0.11977859103028791,
+  "tokenizer_delta": {
+    "n_responses_differing": 80,
+    "of": 300,
+    "seq_match_ratio_min": 0.9948612538540597,
+    "seq_match_ratio_mean": 0.9993108421745622,
+    "examples": [
+      {
+        "qid": "geometry_000",
+        "first_mismatch_at": 1108,
+        "base_toks": [
+          "}.\n",
+          "</",
+          "think",
+          ">\n\n"
+        ],
+        "gen_toks": [
+          "}.\n",
+          "</think>",
+          "\n\n",
+          "To"
+        ]
+      },
+      {
+        "qid": "geometry_001",
+        "first_mismatch_at": 1682,
+        "base_toks": [
+          "}.\n",
+          "</",
+          "think",
+          ">\n\n"
+        ],
+        "gen_toks": [
+          "}.\n",
+          "</think>",
+          "\n\n",
+          "Given"
+        ]
+      },
+      {
+        "qid": "geometry_002",
+        "first_mismatch_at": 1327,
+        "base_toks": [
+          "}.\n",
+          "</",
+          "think",
+          ">\n\n"
+        ],
+        "gen_toks": [
+          "}.\n",
+          "</think>",
+          "\n\n",
+          "Given"
+        ]
+      }
+    ],
+    "base_bos": "<|begin_of_text|>",
+    "gen_bos": "<\uff5cbegin\u2581of\u2581sentence\uff5c>",
+    "base_bos_id": 128000,
+    "gen_bos_id": 128000,
+    "vocab_base": 128256,
+    "vocab_gen": 128256
+  }
+}

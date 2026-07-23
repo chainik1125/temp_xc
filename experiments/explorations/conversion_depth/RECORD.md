@@ -80,26 +80,109 @@ delta recorded there).
 
 ---
 
-## § 1 — Machinery validation on GPT-2 (day-stride)
+## § 1 — Machinery validation on GPT-2 (day-stride): **ALL PASS**
 
-*(to be filled by `phase1_gpt2_stride.py` — acceptance targets, frozen
-before run, from the FreqBench sprint § 4.7:)*
+`phase1_gpt2_stride.py` (committed `74835b3a` BEFORE first execution;
+seed 0, N_tr/N_te = 20k/5k, all 13 hidden states). Results
+(`results/phase1_gpt2_stride.json`, fig `figs/phase1_gpt2_stride.*`):
 
-- hs=0 (embeddings): per-token linear ceiling ≈ 0.149 ≈ chance (1/7);
-  raw window (stacked, linear) ≈ 0.18 — both non-ambient; window MLP
-  presence ≈ 1.000.
-- By block 3: per-token linear ≈ 1.00 at every position except position 0.
-- Position 0 (causal control): ≈ chance at ALL depths.
+| hs | per-token lin | window lin | window MLP | pos-0 control |
+|---|---|---|---|---|
+| 0 (emb) | **0.140** ≈ chance (1/7) | 0.104 | **1.000** | 0.144 |
+| 1 | **1.000** (every pos ≥ 1) | 1.000 | 1.000 | 0.145 |
+| 3 | **1.000** | 1.000 | 1.000 | 0.144 |
+| 7, 12 | 1.000 | 1.000 | 1.000 | 0.144 |
 
-The probe stack is **frozen** once this passes — no per-target retuning
-downstream.
+Acceptance A1–A6 all TRUE (sprint § 4.7 reproduced: non-ambient at
+hs=0, converted by block 1 — sprint said ≥ 0.95 after one block, we get
+1.000 — position 0 at chance at every depth). One instructive detail:
+at hs=0 the **window linear** readout (0.104) is also at/below chance —
+the stride latent is order-2 (README equality-variant), so its
+"window ≈ 1.0" conversion statement is carried by the **MLP presence**
+check, exactly why the stack fits all three ceilings per layer.
+Near-chance linear probes fluctuate by ±0.04 on this substrate — the
+falsifier's "beyond noise" is therefore defined by the permutation null
+(§ 2), not by eyeballing.
+
+**The probe stack (`problib.py`) is FROZEN.** No per-target retuning
+downstream; probe budget scales only with input dim.
 
 ---
 
-## § 2 — Pre-registration (frozen before any 8B cache is probed)
+## § 2 — Pre-registration (FROZEN before any 8B cache is probed)
 
-*(committed as a separate commit BEFORE `probe_depth.py` first runs on an
-8B cache — see git log for the freeze order.)*
+*(this section committed BEFORE `probe_depth.py` first runs on any 8B
+cache — the git log is the freeze-order evidence.)*
+
+### Substrate + machinery (fixed)
+
+- Stream: the canonical § 5.2 4044 × 128 stream (`build_ward_stream.py`,
+  verbatim `_load_corpus_ward` recipe; stats in
+  `results/ward_stream_stats.json` — map_ok 99.97 %, BOS on every row,
+  2805 keyword events, 268/300 traces with a Sonnet bt sentence).
+  **Identical token ids fed to both models.** Recorded tokenizer delta:
+  id→token maps identical (5000/5000 sampled ids); fast-backend
+  encodings identical except `</think>` (single special token for the
+  distill vs 3-way split for base; 80/300 traces, seq-match ≥ 0.995).
+  (An apparent 0.21 seq-match "delta" was a transformers-5.7 SLOW-load
+  artifact — AutoTokenizer resolves the distill to LlamaTokenizer which
+  mangles whitespace; forced fast backend. Noted for future agents.)
+- Models: `NousResearch/Meta-Llama-3.1-8B` (reader/base) and
+  `deepseek-ai/DeepSeek-R1-Distill-Llama-8B` (generator; § 0). bf16
+  forward, fp16 caches, layer set: embeddings (hs0) + resid_post at
+  0, 2, …, 30 (hs 1, 3, …, 31).
+- Probes: frozen `problib` stack (§ 1). Window = right-edge **T = 16**
+  flatten (sprint bt_freq / § 4.8 convention; the § 8 fixed-T rule).
+  Split BY TRACE 80/20 (`default_rng(7)` permutation, first 20 % test).
+  Negatives per bt_freq: think-region tokens with distance > 25 from any
+  event (both directions), ≤ 60 candidates/trace (`rng(13)` train /
+  `rng(14)` test), capped at 5 : 1 neg : pos. Eligibility for every
+  probe row: `map_ok[w,p]`, `in_think[w,p]`, p ≥ 16.
+- Metrics: **AUC primary** (threshold-free), threshold-optimized
+  balanced accuracy secondary. Per cell (model × layer × target):
+  per-token linear, window linear, per-token MLP, window MLP(512).
+  **g(ℓ) = AUC(window linear) − AUC(per-token linear).**
+  Null: label permutation (seed 99) on both linear readouts per cell;
+  noise floor σ_null = spread of |AUC_null − 0.5| pooled over cells.
+
+### Targets (fixed)
+
+- **T1 PRIMARY `ant_kw`** — Ward D+ anticipation: y = 1 iff the next
+  keyword event ("wait"/"hmm" token, think region) is 8–13 tokens ahead.
+- **T2 SECONDARY `ant_bts`** — same recipe anchored on the next
+  Sonnet-labeled backtracking-sentence first token.
+- **T3 COMPANION `is_bt`** — current token inside a Sonnet-labeled
+  backtracking sentence (expected ambient-ish; the contrast case).
+
+### Frozen predictions
+
+- **P1 (shape).** For T1/T2, both models: the window ceiling rises from
+  hs0 into the early-mid layers (anticipation is computed, not lexical);
+  g(ℓ) is positive beyond the null floor over the early-mid range and
+  **declines over the second half of depth** (ℓ ≥ 16), the
+  conversion-depth hypothesis. (hs0 itself may be degenerate-low for
+  both readouts — the label references the future.)
+- **P2 (paper-layer bet).** L10 is INSIDE the gap for both models:
+  g(L10) > 3 σ_null. Verdict rule, frozen: L10 is "near the gap
+  maximum" if g(L10) ≥ 0.8 · max_ℓ g(ℓ); "partially converted" if in
+  [0.3, 0.8); "mis-placed" (past conversion or before computation) if
+  < 0.3 · max_ℓ g(ℓ).
+- **P3 (base vs generator; mac-local prior).** The generator carries the
+  anticipation signal **earlier and stronger**: (i) max_ℓ AUC_window is
+  higher for the distill on T1; (ii) the distill's window AUC exceeds
+  the base's at the earliest layer where either clears the null floor.
+  If instead |distill − base| < 3 σ_null at every layer for all
+  readouts, the § 5.2 claim is **reader-predictability** and the paper
+  must say so (substrate-audit item 2 resolution either way).
+- **P4 (companion).** T3 `is_bt` is largely ambient: per-token AUC high
+  by mid layers, with g(ℓ) materially smaller than T1's peak g.
+- **P5 (EM, phase 4).** Flat g(ℓ) ≈ 0 (within 3 σ_null) at ALL depths
+  for the EM label on the medical organism — persona density leaks into
+  every token.
+- **FALSIFIER (probe-stack indictment).** g(ℓ) < −3 σ_null at any ℓ
+  (window linear BELOW per-token beyond noise) indicts the probe stack
+  (a linear window probe sees the per-token features as a subset),
+  triggering machinery re-exam — NOT a model claim.
 
 ---
 
