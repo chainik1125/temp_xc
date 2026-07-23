@@ -41,9 +41,10 @@ Frozen (committed) before any construction, one card per candidate:
    - **Non-triviality:** why the task is NOT solvable by a symmetry,
      relabeling, or bag-of-symbols route (see gate T2).
 4. **Regime claim + design-time discriminability** (README checklist item 8):
-   which regime the primary latent falls in and which arch families the
-   proofs *predict apart*. Regime-1/2-only cards are dead on arrival, same as
-   PhenomenonBench.
+   which regime the primary latent falls in, the **non-ambience argument**
+   (ideally a proof that the single-token marginal is independent of the
+   latent — the P1 pattern), and which arch families the proofs *predict
+   apart*. Regime-1-only cards are dead on arrival, same as PhenomenonBench.
 5. **Memorization audit (P6).** The whole-window template count vs the
    `d_sae` sweep: either the count kills the memorization route by
    construction (the multilane pattern, |Ω|³M³) or the sweep must cross the

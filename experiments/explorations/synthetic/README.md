@@ -130,10 +130,24 @@ ranking from its coordinates alone):
 | order-2 / position-mixing latent | only coincidence/spectral codes | frequency tone, changepoint `tss` / `c_t` |
 | substrate defect | nobody | signed_motion sign (memorization confound) |
 
-Regimes 1–2 cannot separate window architectures from each other; only regime 3
-can. Today every regime-3 bench is theorem-provenance — the sharpest open
-target is a **grounded** regime-3 benchmark (the unclaimed interaction/equality
-prize, [`expansion/LEDGER.md`](expansion/LEDGER.md) C4).
+The organizing concept behind the regimes is **ambience**: a latent is
+*ambient* when a single token's marginal already depends on it. Persistent
+states leak into every token they persist over, so "global" properties are
+usually ambient (hedging drift, changepoint mode, EM's persona density) and
+land in regime 1 — per-token codes read them and nothing separates. **A
+temporal architecture can only earn its keep on a latent the per-token
+marginal cannot see** (regime 2 if reading it is additive-in-window, regime 3
+if it needs cross-position comparison). Note "global" ≠ ambient: the
+frequency bench's velocity is global to the whole sequence yet has provably
+zero single-token MI — and it is the suite's strongest window win. Every card
+(either generator) must therefore **argue non-ambience at design time and
+measure it at § 8** — the discriminability STOP-gate *is* the ambience
+measurement (raw per-token ceiling ≈ raw window ceiling ⇒ ambient ⇒ STOP;
+the equality variant handles the partially-ambient case by naming the
+ambient floor and testing the residual). Regimes 1–2 cannot separate window
+architectures from each other; only regime 3 can. Today every evaluated
+regime-3 bench is theorem-provenance — the first grounded attempt (the
+recipe residual head-to-head) is in flight.
 
 ---
 
@@ -434,9 +448,11 @@ entry + (if a new metric is needed) an evaluator addition. Never edit
 7. **Predictions.** Preregister expected recovery per architecture across the
    frontier before running.
 8. **Coordinates + discriminability.** State the bench's coordinates on the
-   three structural axes (and the regime its primary latent falls in), then run
-   the § 8 gating ceilings and pass the discriminability STOP-gate before any
-   grid is spent.
+   three structural axes (and the regime its primary latent falls in),
+   including the **non-ambience argument** — why the primary latent is
+   invisible to a single token's marginal (a latent ambient per token is
+   regime 1 and dead on arrival). Then run the § 8 gating ceilings and pass
+   the discriminability STOP-gate before any grid is spent.
 
 ---
 
