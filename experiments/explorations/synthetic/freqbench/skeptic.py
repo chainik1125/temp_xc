@@ -96,6 +96,36 @@ seed, not poolable across seeds). Judge whether this undermines the task
    witness (README equality-variant: "nonlinear/oracle readout"), with the
    MLP number kept as a recorded datum. Question: is that the correct
    reading of information-presence, or tolerance-shopping?"""
+    elif card == "FB-4":
+        gate = (ROOT / "experiments/explorations/synthetic/rotated_multilane/"
+                "results/rotated_multilane_gating_stats.json").read_text()
+        t2 = (ROOT / "experiments/explorations/synthetic/rotated_multilane/"
+              "results/rotated_multilane_t2_stats.json").read_text()
+        amendments = """DOCUMENTED POST-FREEZE GATE AMENDMENTS (scrutinize):
+1. The T1 window-concat linear floor first ran against FB-2's ABSOLUTE bar
+   (chance+0.02) and FAILED at 0.115-0.137 (first-pass stats preserved in
+   commit d9e00a5b). Diagnosis: the numerically IDENTICAL values appear on
+   the unrotated base data under the same probe (a linear probe is exactly
+   invariant under an orthogonal feature map) — a substrate-level variance
+   leak this probe's sample size surfaces equally on FB-2 (P2 bounds
+   class-conditional MEANS only; FB-2's own gating probe read ~=chance).
+   The check was re-keyed to the card's actual obligation — rotation-
+   INVARIANCE of the floor (paired identical-probe gap <= 0.005) — with the
+   absolutes recorded on both sides. Question: honest re-key or tolerance-
+   shopping? Note the datum it leaves for the program: the FB-2 raw-window-
+   linear "at chance" reading is probe-protocol-conditional at the margins.
+SPECIAL SITUATION (judge BOTH directions): this card was frozen with an
+explicit § 3 absorption obligation predicting the rotation knob is INERT
+(the base embedding is Haar-random and re-drawn per data seed, so Q·P is
+distributionally identical to P). The builder's own pre-registered T2
+decision rule therefore expects verdict ABORT_T2_SYMMETRY — an ABORT here
+is the process working, not a loss. Your job: (a) if you find the
+absorption reasoning or its empirical arms UNSOUND, kill items accordingly
+and say the card should instead PROCEED to grids; (b) if the absorption
+holds, confirm the kill (b_triviality/d_redundancy) so the ABORT is
+double-witnessed. Also assess whether the salvage note (the live knob for
+the intended basis-alignment question is TEMPORAL, a candidate FB-5 left
+un-frozen for review) is the right disposition."""
     else:
         gate = (ROOT / "experiments/explorations/synthetic/colored_sources/"
                 "results/colored_gating_stats.json").read_text()
@@ -143,7 +173,7 @@ def parse_verdict(raw: str) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cards", nargs="+", choices=["FB-1", "FB-2", "FB-3"])
+    ap.add_argument("cards", nargs="+", choices=["FB-1", "FB-2", "FB-3", "FB-4"])
     args = ap.parse_args()
 
     meter = Meter(path=RES / "spend.json")
