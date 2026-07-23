@@ -29,6 +29,34 @@ Last updated: 2026-07-22.
   fully claimed**. Record: `recipe_instruction_phase_runs/bench_record.md`
   (§ "Stage-6 #3b"). Reasoning half still open (C6: extraction estimator).
 
+- **FREQBENCH CYCLE FB-C1 DONE (2026-07-23, runpod-b, autonomous on Fable 5)
+  — three theorem-first benches end-to-end, the panel's TRIPLE DISSOCIATION
+  found. STOPPED for review.** Phase 1: the widened FreqFrac pass (132
+  cells, 6 benches × seeds{1,2,42}@T4 + s1@T8) — axis-1 coordinates
+  seed-stable, the **T=8 frequency high-pass check PASSES** (PORT § G.1).
+  Phase 2/3: cards FB-2/FB-3/FB-1 frozen pre-build → built → T1/T2/§8
+  gates → skeptic PROCEED 5/5 each → uniform 30k-step grids (708+582+636
+  cells, **0 failures**) → blind verdicts vs frozen predictions:
+  **(1) multilane POSITIVE** — spectral 0.79 > post 0.46 ≫ additive ≈
+  token ≈ 0, memorization-immune; the sprint's multiband>vanilla headline
+  **failed its frozen T=8 bar** (+0.019 < 0.03; edge peaks T=4; spectral
+  collapses at k_pos=8). **(2) colored_sources POSITIVE (weak)** — CS-1
+  floor holds over all 261 T≤D cells; the provable W=D+1 transition is
+  realized at ≤21 % of the +0.96 oracle ceiling, and **txc-pre (not post)
+  carries it**, ρ-ordered. **(3) phasepair POSITIVE** — txc-post reads the
+  phase-only sign at **1.000** while spectral is sign-blind at T≤4
+  (singleton DCT bands have no quadrature partner; 0.936 at T=8); additive
+  family zero on both components; retro-explains signed_motion. **Headline:
+  each mixing family wins exactly one axis — spectral/power, pre/lag-
+  covariance, post/phase — predictable from card coordinates: the acid-test
+  currency.** REPORT 78/78; BENCHMARKS +3 rows; registry +3 Bench rows;
+  FreqFrac coordinates at bench time for all three. Spend $1.04/$25.
+  Process: 3 documented gate-check amendments (null/witness fixes), all
+  skeptic-disclosed; prediction misses reported as misses. Full log:
+  [`freqbench/PORT.md`](freqbench/PORT.md) § H; records in `multilane/`,
+  `colored_sources/`, `phasepair/`. T=16 addendum queued (not run).
+  Briefing `freqbench-c1.md` stays until mac-local review.
+
 - **EXPANSION CYCLE 5 DONE (2026-07-22, runpod overnight) — the reasoning
   int/eq cell ABORTs a third time, now doubly informative; $0 API spend.**
   Built the C4-mandated **`seg_hier_categorical`** (three-timescale mirror:

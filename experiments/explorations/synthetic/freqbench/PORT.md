@@ -279,3 +279,45 @@ resolve 6 of the 10 Ω tones (bins ≥ 1.27); the T=4 resolution caveat lifts:
 Both § G acceptance components that were resolution-blocked at T_can=4 are
 now discharged; the FreqFrac coordinates used by REPORT/registry entries can
 cite the seed-mean T=4 numbers with the T=8 rows as the resolution frontier.
+
+---
+
+## H. Cycle log — FB-C1 (2026-07-22/23, runpod-b, the 12-hour session)
+
+**Briefing:** `briefings/freqbench-c1.md` (stays until mac-local review).
+**Protocol:** LOOP.md (rails frozen). **Spend:** $1.04 / $25 (3 skeptic
+calls on Fable 5; `results/spend.json`). **Compute:** ~2,100 canonical grid
+cells + 156 FreqFrac cells, 0 failures anywhere, all through the canonical
+runner on this pod's fresh checkpoint store.
+
+| phase | outcome |
+|---|---|
+| 1. widened FreqFrac pass | 132 cells (6 benches × 3 seeds @T4 + s1 @T8). § G.1: coordinates seed-stable; **T=8 high-pass check PASS** (the T=4 caveat lifted) |
+| 2a. FB-2 multilane | cards frozen pre-build (f0e6778f) → build+tests → T1/§8 PASS (P5 exact: per-lane = single-lane oracle, gap ≤ 0.007) → T2 PASS → skeptic PROCEED 5/5 → grid 708/708 → **POSITIVE**; the sprint's multiband>vanilla headline **failed its frozen T=8 bar** (+0.019 < 0.03, seed-disjoint; edge peaks at T=4 +0.087); spectral collapses at k_pos=8 (margin +0.544@k1 → −0.583@k8) |
+| 2b. FB-3 colored_sources | build+tests → T1/§8 PASS (oracle rec_adj +0.96; W=D+1 transition 0.03→0.96) → T2 PASS → skeptic PROCEED 5/5 → grid 582/582 → **POSITIVE (weak realization)**: CS-1 floor holds over all 261 T≤D cells (max +0.037); best arch = 21 % of the provable ceiling; **ordering INVERTS the tone benches** (txc-pre ≥ spectral > post ≈ floor), pre's recovery ρ-ordered 0.29→0.65 |
+| 3. FB-1 phasepair | card frozen pre-build → build (no new generator; ±-pair-gated add-on) → T1/§8 PASS (sign oracles 0.97–1.00; **exact bag null** to 0.007) → T2 PASS (chirality finding recorded) → skeptic PROCEED 5/5 → grid 636/636 → **POSITIVE**: post reads sign **1.000** (T=8, all seeds); spectral sign-blind at T ≤ 4 (singleton DCT bands — no quadrature partner) → 0.936 at T=8; additive family ≈ 0 on both components |
+| 4. T=16 frontier addendum | **NOT RUN** — acceptance-gate work prioritized within the 12 h window; queued as follow-up |
+
+**The cycle's headline — the panel's triple dissociation.** Across the
+three theorem-first benches, each mixing family wins exactly one axis:
+**spectral wins power** (multilane 0.79), **txc-pre wins lag-covariance
+eigenstructure** (colored_sources +0.21, the only lift), **txc-post wins
+phase** (phasepair 1.000). No window architecture dominates, and which one
+wins is predictable from the card coordinates — the acid-test currency the
+two-generator program was built to produce. Secondary findings: the
+band-partition advantage is a scarcity/coarse-window phenomenon (FB-2);
+provably-present dictionary information is realized at ≤ 21 % by current
+training (FB-3 — the gap is the finding); singleton DCT bands are
+structurally phase-blind (FB-1); signed_motion's NEGATIVE is
+retro-explained as substrate defect, not panel phase-blindness.
+
+**Process notes for review.** Three gate-check amendments were made
+post-freeze, each a null/witness mis-specification fix (orthonormal null
+for eigen-estimators + measured stream leakage; oracle witness for
+info-presence; one-sided floors for below-chance probe artifacts) — all
+documented in the gating scripts, disclosed to the skeptic, and none
+touched a task, tolerance-as-intended, or prediction. Frozen-prediction
+misses are reported as misses in each record (FB-2 txc-pre band; FB-1
+post/spectral bands + untrained-spectral access; FB-3 pre/post/spectral
+bets). Records: `multilane/`, `colored_sources/`, `phasepair/`
+`bench_record.md`; registry + BENCHMARKS + REPORT (78/78) updated.
