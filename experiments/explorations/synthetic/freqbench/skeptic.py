@@ -126,6 +126,35 @@ holds, confirm the kill (b_triviality/d_redundancy) so the ABORT is
 double-witnessed. Also assess whether the salvage note (the live knob for
 the intended basis-alignment question is TEMPORAL, a candidate FB-5 left
 un-frozen for review) is the right disposition."""
+    elif card == "FB-5":
+        gate = (ROOT / "experiments/explorations/synthetic/permuted_tones/"
+                "results/permuted_gating_stats.json").read_text()
+        t2 = (ROOT / "experiments/explorations/synthetic/permuted_tones/"
+              "results/permuted_t2_stats.json").read_text()
+        amendments = """DOCUMENTED POST-FREEZE GATE AMENDMENTS: NONE — both
+gates passed on their first committed run (bars set a priori in the
+committed scripts; the window-linear bar was chance+0.05 a priori, citing
+the FB-4 probe-protocol datum, and the measured value needed none of that
+headroom: 0.0987 vs chance 0.1).
+POINTS TO SCRUTINIZE ANYWAY:
+1. The card does NOT claim order-necessity — it claims P1/P2
+   linear-additive deadness and states openly (§ 3) that the window
+   MULTISET is class-informative (1,010 unique sets at T=8). T2 measures
+   the order-free routes: bag-MLP 0.151, envelope-oracle 0.205 balacc (vs
+   chance 0.1, matched-filter oracle 1.0). Is reporting these as
+   references (not kills) the honest treatment, or does the set route
+   threaten b_triviality for the ARCH comparison (note: the panel's eval
+   is linear probes on codes; a set-matching read would require an arch to
+   build a histogram code — which is itself a legitimate architectural
+   mechanism, not a leak)?
+2. Non-absorption (the new card item 1): the knob changes the temporal
+   LAW (lag-1 trajectory autocorrelation: tone ladder ±1 vs measured
+   −0.07..+0.20 ≈ 0 ± O(1/√M)). Is the argument sound, or is there a
+   randomized substrate component that could absorb a schedule-ensemble
+   change the way FB-4's Haar embedding absorbed the spatial rotation?
+3. The envelope reference is computed on circle-plane DCT energies only.
+   Is that the right operationalization of "spectral reads envelope, not
+   structure" for interpreting the spectral-vs-post grid comparison?"""
     else:
         gate = (ROOT / "experiments/explorations/synthetic/colored_sources/"
                 "results/colored_gating_stats.json").read_text()
@@ -173,7 +202,8 @@ def parse_verdict(raw: str) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cards", nargs="+", choices=["FB-1", "FB-2", "FB-3", "FB-4"])
+    ap.add_argument("cards", nargs="+",
+                    choices=["FB-1", "FB-2", "FB-3", "FB-4", "FB-5"])
     args = ap.parse_args()
 
     meter = Meter(path=RES / "spend.json")
