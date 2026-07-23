@@ -38,13 +38,15 @@ Scores 5/4/1; deadline **2026-07-27**. Review copies + the full
 reviewer-mapped battle plan live ONLY in `private/neurips_reviews/` +
 `private/rebuttal_plan.md` (gitignored — NEVER commit; tracked files
 stay review-content-free). Han's three standing directives: (1) synth
-revamp (the why-story; well progressed), (2) real-world case-study redo
-with TXC-appropriate evals (PRIORITY, > (1)), (3) TXC-pro loss
-dissection (matryoshka/contrastive code already in `tsae.py` — plugin
-variants, feasible fast). Four workstreams W1–W4 + agent topology in the
-private plan (mac-b worktree orchestrator + runpod-d GPU pending
-spin-up). Everything below (the pre-review fork) is superseded until the
-rebuttal lands.
+revamp (the why-story), (2) real-world case-study redo with
+TXC-appropriate evals (PRIORITY, > (1)), (3) TXC-pro loss dissection.
+**Scope (Han, 2026-07-23): backtracking multi-seed + paper latex are
+the human team's — agents run ONLY the three directives.** Dispatched:
+`briefings/em-redo.md` (runpod-c, ~48 h, must-have Phase A =
+TXC-tracking L9/L13/L15 both currencies) · `briefings/txcpro-dissection.md`
+(runpod, ~48 h) · `briefings/synth-story-pack.md` (runpod-b, ~24 h
+assembly). My cadence: review every ~24 h; after W2–W4 land, distill
+the rebuttal inputs for the team. The pre-review fork below is parked.
 
 ## ⏭ (pre-review fork — parked)
 

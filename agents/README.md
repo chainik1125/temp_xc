@@ -32,15 +32,10 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   caches; spawned 2026-07-23 for the conversion-depth / substrate-audit
   line, now the real-side dictionary-training pod). Same creds layout;
   `/workspace/.agent_id` = `runpod-c`.
-- **`runpod-d`** — (pending spin-up, rebuttal window) second GPU pod for
-  the backtracking multi-seed rerun. `/workspace/.agent_id` = `runpod-d`.
-- **`mac-b`** — (pending, rebuttal window) SECOND local mac orchestrator
-  for the paper/rebuttal workstream. Works in a **separate git worktree
-  at `~/research/projects/temp_xc_rebuttal` on branch `rebuttal`**
-  (paper latex + author-response drafting ONLY — no experiment code, no
-  `arxiv`-branch pushes). Identity by path: a darwin session under
-  `temp_xc_rebuttal` is `mac-b`; under `temp_xc` it is `mac-local`.
-  NEVER read or commit `private/` review files into tracked locations.
+(2026-07-23, rebuttal window: backtracking multi-seed reruns and paper
+latex edits are owned by the human team, NOT by agents in this registry.
+Agent work = the three standing directives; `private/` files must never
+be committed or quoted in tracked locations.)
 
 **Infer your id from your environment:** a darwin session under
 `~/research/projects/temp_xc` is `mac-local`. A Linux session under
