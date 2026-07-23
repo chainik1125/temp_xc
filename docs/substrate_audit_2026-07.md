@@ -93,10 +93,22 @@ Full evidence: `experiments/explorations/conversion_depth/RECORD.md`
   Δ ≤ +0.02, late layers only). Camera-ready: state the claim as textual
   predictability of upcoming backtracking; the late-layer generator
   margin is the follow-up target for intention-like signal.
-- **Item 3 (§ 5.1 gemma base/IT straddle) — ANSWERED: harmless.** Raw
-  L13 probing ceilings equivalent (mean |Δ| 0.005 over 33 tasks; the one
-  crossing is a both-models-degenerate probe artifact). Fix = state the
-  choice; no results caveat needed.
+- **Item 3 (§ 5.1 gemma base/IT straddle) — ANSWERED at the substrate
+  level; scope caveat added 2026-07-23.** Raw L13 probing ceilings
+  equivalent (mean |Δ| 0.005 over 33 tasks; the one crossing is a
+  both-models-degenerate probe artifact) — the substrate's information
+  content is base/IT-robust. **What this does NOT cover:** external
+  proof-reader feedback (D. Chanin) flags that most SAEBench *metric
+  machinery* assumes base models and may mis-handle chat-formatted IT
+  models with trained dictionaries in the loop — a harness failure
+  mode our raw-probe check cannot rule out. Recommendation to the
+  team: rerun § 5.1 on gemma-2-2b BASE (cheapest possible swap; our
+  equivalence result predicts numbers barely move, which doubles as a
+  robustness note) rather than defend the IT choice. Note the grounded
+  /phenomenon program is unaffected: its processes are fitted to TEXT
+  (R1-Distill generations for reasoning-trace phenomena — IT-class by
+  necessity, base models do not emit the phenomena; human text for the
+  text-corpus domain) with no SAE/SAEBench machinery in the loop.
 - **Item 5 (single-layer depth confound) — ANSWERED, and it bit exactly
   where predicted:** backtracking g(ℓ) is a flat open plateau (L10 fine
   but not special — any residual layer works); **the EM negative IS
