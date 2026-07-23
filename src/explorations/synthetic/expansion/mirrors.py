@@ -1007,6 +1007,147 @@ def fit_seg_hier_categorical_deflate(train_seqs, n_symbols: int | None = None,
     return out
 
 
+# ── C7 monotone extraction: deconvolve FIRST, shrink in deconvolved space ──
+# The C6 battery's finding 1: shrinking OBSERVED compositions before the C4
+# self-consistency deconvolution is non-monotone — the fixed point
+# re-amplifies anything slightly off the doc marginal, so the λ knob is
+# flat on [0, 0.9] then cliffs. The C7 candidate inverts the order:
+# deconvolve exactly as r3, THEN shrink the deconvolved propensities toward
+# the deconvolved doc fixed point — shrinkage is the last operation and
+# generation consumes the shrunk tables directly. Frozen card:
+# expansion/prereg/estimator-card-c7-monotone-extraction.md.
+
+
+def _deconvolve_target(pi_target, pi_doc, k, J, a, b, m_dwell):
+    """The r3 self-consistency fixed point for an arbitrary target
+    composition (verbatim from _seg_finish, parameterized)."""
+    pi_target = np.asarray(pi_target, dtype=float)
+    pi_doc = np.asarray(pi_doc, dtype=float)
+
+    def _stationary(u):
+        K = np.empty((k, k))
+        for c in range(k):
+            K[c] = _mix_row(c, u, pi_doc, J, a, b)
+        nu = np.full(k, 1.0 / k)
+        for _ in range(80):
+            nu = nu @ K
+        occ = nu * m_dwell
+        return occ / occ.sum()
+
+    u = pi_target.copy()
+    for _ in range(15):
+        pred = _stationary(u)
+        u = np.clip(u * pi_target / np.maximum(pred, 1e-9), 1e-6, None)
+        u /= u.sum()
+    return u
+
+
+def _mono_stages(train, k, max_dwell, min_seg_runs, tilt_grid):
+    """Stages 1–2 of the mono fit: the r3-identical base params (λ = 0
+    reproduces `fit_seg_hier_categorical` parameter-for-parameter) plus the
+    per-doc deconvolved doc fixed point u_doc (the verified-inert λ=1
+    limit) under the same fitted (a, b)."""
+    col = _seg_collect(train, k, max_dwell, min_seg_runs)
+    raw = [[np.asarray(pi, dtype=float) for (_L, pi, _nr) in segl]
+           for segl in col["doc_segs"]]
+    base = _seg_finish(col, raw, tilt_grid)
+    J = np.array(base["jump_P"])
+    a, b = float(base["tilt_seg"]), float(base["tilt_doc"])
+    m_dwell = np.array([np.mean(d) for d in base["dwell"]])
+    u_docs = [_deconvolve_target(p, p, k, J, a, b, m_dwell)
+              for p in base["doc_props"]]
+    return base, u_docs
+
+
+def _mono_tables(base: dict, u_docs, lam: float) -> dict:
+    """Apply the u-space shrinkage LAST: rebuild seg_tables at λ. Nothing
+    downstream re-sharpens — generation reads these tables directly."""
+    lam = float(lam)
+    tables = []
+    for j, table in enumerate(base["seg_tables"]):
+        ud = np.asarray(u_docs[j], dtype=float)
+        rows = []
+        for length, u in table:
+            v = (1.0 - lam) * np.asarray(u, dtype=float) + lam * ud
+            rows.append([int(length), (v / v.sum()).tolist()])
+        tables.append(rows)
+    out = dict(base)
+    out["seg_tables"] = tables
+    out["lam"] = lam
+    return out
+
+
+def fit_seg_hier_categorical_mono(train_seqs, n_symbols: int | None = None,
+                                  max_dwell: int = 400, min_seg_runs: int = 4,
+                                  tilt_grid: int = 13, n_rep: int = 6) -> dict:
+    """C7 candidate — monotone calibrated extraction (frozen C7 card).
+
+    Deconvolve first (r3 pipeline unchanged), then shrink the deconvolved
+    segment propensities toward the deconvolved doc fixed point:
+    ``u_i(λ) = (1−λ)·u_seg_i + λ·u_doc``. In-loop null calibration as the
+    C6 `_cal` principle (real held-out moments never enter any objective):
+    λ* = smallest λ whose fit on ``run_permuted_streams(train)`` round-trips
+    both preregistered moments within the null-referenced tolerance —
+    coarse scan {0, 0.25, 0.5, 0.75, 1.0} then bisection to width ≤ 0.05,
+    taking the PASSING upper endpoint (conservative); insertion averaged
+    over ``n_rep = 6`` fixed-seed replicates (seeds 9000+i). If even λ = 1
+    fails, flags ``uncalibratable`` and degenerates to λ = 1.
+    """
+    pooled = np.concatenate([s for s in train_seqs])
+    k = n_symbols or int(pooled.max()) + 1
+    train = [np.asarray(s).astype(int) for s in train_seqs]
+
+    perm = run_permuted_streams(train)
+    perm_m = _seg_moments(perm)
+    tol = _null_tol(perm_m)
+    base_p, udocs_p = _mono_stages(perm, k, max_dwell, min_seg_runs, tilt_grid)
+    lengths_p = [s.size for s in perm]
+
+    def _ins(lam):
+        params = _mono_tables(base_p, udocs_p, lam)
+        acc = {m: [] for m in perm_m}
+        for rep in range(n_rep):
+            syn = gen_seg_hier_categorical(params, lengths_p,
+                                           np.random.default_rng(9000 + rep))
+            mm = _seg_moments(syn)
+            for key in acc:
+                acc[key].append(mm[key])
+        return {key: abs(float(np.mean(v)) - perm_m[key])
+                for key, v in acc.items()}
+
+    scan = []
+
+    def _try(lam):
+        ins = _ins(lam)
+        ok = all(ins[m] <= tol[m] for m in ins)
+        scan.append({"lam": float(lam), "pass": bool(ok),
+                     **{f"ins_{m}": v for m, v in ins.items()}})
+        return ok
+
+    coarse = [0.0, 0.25, 0.5, 0.75, 1.0]
+    results = {lam: _try(lam) for lam in coarse}
+    lam_star, uncal = 1.0, True
+    passing = [lam for lam in coarse if results[lam]]
+    if passing:
+        uncal = False
+        hi = min(passing)
+        if hi > 0.0:
+            lo = max(lam for lam in coarse if lam < hi and not results[lam])
+            while hi - lo > 0.05:
+                mid = 0.5 * (lo + hi)
+                if _try(mid):
+                    hi = mid
+                else:
+                    lo = mid
+        lam_star = hi
+
+    base, u_docs = _mono_stages(train, k, max_dwell, min_seg_runs, tilt_grid)
+    out = _mono_tables(base, u_docs, lam_star)
+    out.update({"estimator": "mono", "uncalibratable": bool(uncal),
+                "null_moments": perm_m, "null_tol": tol, "lam_scan": scan})
+    return out
+
+
 # ── periodic + self-exciting hybrid (periodic-Hawkes), binary ──────────────
 
 def fit_periodic_hawkes(train_seqs, K: int = 8, max_period: int = 64) -> dict:
@@ -1128,6 +1269,9 @@ MENU = {
         (fit_seg_hier_categorical_cal, gen_seg_hier_categorical),
     "seg_hier_categorical_deflate":
         (fit_seg_hier_categorical_deflate, gen_seg_hier_categorical),
+    # C7 monotone extraction candidate (frozen C7 card).
+    "seg_hier_categorical_mono":
+        (fit_seg_hier_categorical_mono, gen_seg_hier_categorical),
 }
 
 

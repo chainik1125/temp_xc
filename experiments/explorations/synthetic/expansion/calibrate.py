@@ -385,6 +385,18 @@ CFG = {
         gate8=(("mi", 1, 0.20, "rel"), ("acf", 3, 0.20, "rel")),
         base_card="proof-operation-phase-runs",
         labels_from="proof-operation-phase-runs"),
+    # — Cycle 7: r4 under the monotone calibrated estimator (dated C7 card
+    #   amendment; runs ONLY if the C7 battery's pre-specified fork says so
+    #   — pre-check + gates 1–3 pass and λ*_real ≤ 0.85; gate-8 + insertion
+    #   control + label reuse verbatim from the r3/r4 amendments) —
+    "proof-operation-phase-runs-r4": dict(
+        domain="reasoning-trace", kind="categorical", pair=None,
+        primary=("acf", 0), sign="+", ctx=0, heuristic=_heur_proofop,
+        mirror="seg_hier_categorical_mono", mirror_kw={},
+        mirror_kind="categorical",
+        gate8=(("mi", 1, 0.20, "rel"), ("acf", 3, 0.20, "rel")),
+        base_card="proof-operation-phase-runs",
+        labels_from="proof-operation-phase-runs"),
 }
 
 # Uniform C3 relative-tolerance floors (amend_cards_c3.py preregistration).
