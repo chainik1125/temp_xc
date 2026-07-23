@@ -1,12 +1,12 @@
 {
   "cap_usd": 25.0,
-  "spent_usd": 1.03572,
-  "n_calls": 3,
+  "spent_usd": 1.35638,
+  "n_calls": 4,
   "by_model": {
     "claude-fable-5": {
-      "in": 29377,
-      "out": 14839,
-      "usd": 1.03572
+      "in": 40373,
+      "out": 19053,
+      "usd": 1.35638
     }
   }
 }
