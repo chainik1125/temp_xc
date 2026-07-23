@@ -38,18 +38,27 @@ dissociation). Where things landed:
   localization). Stale-SHA lesson noted in PORT § H (cite post-push SHAs).
 - Both briefings deleted.
 
-## ⏭ NEXT: the roadmap fork — waiting on the USER's priority call
+## ⏭ CURRENT: three-agent allocation dispatched (2026-07-23)
 
-1. **The acid test** (revamp phase 4): 4 fresh held-out coordinate→ranking
-   rows exist (multilane/spectral·power, colored_sources/pre·lag-cov,
-   phasepair/post·phase, recipe-residual/spectral·equality). Design: hide
-   B×A outcomes, predict rankings from cards+coordinates alone.
-2. **T=16 frontier addendum + verify_theory ports** (queued by runpod-b,
-   not run).
-3. **C6 extraction estimator** — the reasoning half of the int/eq prize
-   (expansion LEDGER; the C5 ABORT isolated the gap to the estimator).
-4. **Conversion-depth ablation** (`docs/ideas/conversion_depth.md`) —
-   needs the GPU decision for 8B multi-layer caches.
+Three briefings live, all 12-h sessions, review-after pattern:
+1. `runpod` → **expansion C6** calibrated extraction estimator
+   (`briefings/expansion-c6.md`, $10 cap, no stage-6 grid regardless).
+2. `runpod-b` → **T=16 addendum → verify_theory ports → FB-4
+   `rotated_multilane`** (`briefings/freqbench-t16-fbc2.md`) — FB-4 is
+   the PROSPECTIVE subtype-rule acid test (multilane × Haar rotation;
+   my predictions frozen in the briefing; retrodictive 4-row test
+   skipped as context-contaminated).
+3. `runpod-c` (NEW A40 pod — user spins up, seeds `.agent_id`) →
+   **conversion-depth g(ℓ) + substrate-audit empirical arms**
+   (`briefings/conversion-depth.md`): Ward provenance pin → GPT-2
+   machinery validation → Llama-8B BASE vs R1-Distill-8B generator
+   caches → EM depth-confound → gemma base-vs-IT stretch. No dictionary
+   training this session.
+
+Substrate audit doc: `docs/substrate_audit_2026-07.md` (verdicts +
+delegations). My next task: review all three sessions when they stop
+(gate-integrity first, as always). If NeurIPS reviews land, rebuttal
+pivots take priority.
 
 ## Standing context
 - Ambience principle: README coordinates + checklist 8 + LOOP card 4;

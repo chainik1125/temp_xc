@@ -27,6 +27,10 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   (C1–C4, stage-6). Git creds at `/workspace/.tokens/`.
 - **`runpod-b`** — the SECOND RunPod box (Linux, `/workspace/temp_xc`, 32 CPU /
   128 GB; spawned 2026-07-22 for the FreqBench line). Same creds layout.
+- **`runpod-c`** — the GPU RunPod box (Linux, `/workspace/temp_xc`, **A40
+  48 GB**, ≥ 300 GB volume; spawned 2026-07-23 for the conversion-depth /
+  substrate-audit line — activation caching + raw-activation probes, no
+  dictionary grids). Same creds layout; `/workspace/.agent_id` = `runpod-c`.
 
 **Infer your id from your environment:** a darwin session under
 `~/research/projects/temp_xc` is `mac-local`. A Linux session under

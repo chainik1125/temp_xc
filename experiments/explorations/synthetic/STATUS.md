@@ -23,12 +23,25 @@ Last updated: 2026-07-23.
   subtype rule** (README coordinate section) — within regime 3,
   phase-relational latents → TXC-post, power/equality → Spectral,
   covariance-accumulable → TXC-pre; changepoint straddles via axis-3
-  localization. Both briefings deleted. **Next: the roadmap fork (user
-  decides):** (1) the acid test — 4 fresh held-out coordinate→ranking
-  rows now exist; (2) T=16 addendum + verify_theory ports; (3) C6
-  extraction estimator (reasoning half of the int/eq prize); (4) the
-  conversion-depth ablation (`docs/ideas/conversion_depth.md`, needs the
-  GPU decision).
+  localization. Both briefings deleted. **Roadmap fork RESOLVED into the
+  three-agent allocation (2026-07-23, mac-local; briefings live):**
+  `runpod` → expansion C6 calibrated extraction estimator
+  (`briefings/expansion-c6.md`); `runpod-b` → T=16 addendum +
+  verify_theory ports + **card FB-4 `rotated_multilane`** — the
+  subtype-rule acid test run *prospectively* (predictions frozen in the
+  briefing; the retrodictive 4-row acid test is skipped — every live
+  agent's context is contaminated with the outcomes)
+  (`briefings/freqbench-t16-fbc2.md`); NEW GPU pod `runpod-c` (A40) →
+  conversion-depth g(ℓ) ablation + the **substrate audit's empirical
+  arms** (`briefings/conversion-depth.md`). The audit itself:
+  `docs/substrate_audit_2026-07.md` — behavioral corpus (R1-Distill-8B)
+  and EM organisms APPROVED; **§ 5.2 flag: base reader vs reasoner
+  generator** (paper anchor reads Llama-3.1-8B BASE over Ward traces the
+  base model likely didn't generate — generator swap is the sharpest
+  open check); § 5.1 gemma-IT-on-fineweb convention straddle (mild);
+  all single-layer choices depth-unswept ⇒ single-layer NEGATIVEs (EM)
+  are depth-confounded until g(ℓ) exists; sentence-vs-token clock
+  mismatch recorded for the grounded real-side.
 
 - **STAGE-6 #3b DONE (2026-07-23, runpod) — `recipe_instruction_phase_runs`
   verdict POSITIVE on the re-scoped residual axis: the program's FIRST
