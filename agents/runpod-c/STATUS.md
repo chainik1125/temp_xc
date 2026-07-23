@@ -34,11 +34,11 @@ triggered. Summary bullet appended to research STATUS § 0.
   stream + label sidecars (+ `results/probe_rows.npz` = frozen rows).
 - `/workspace/conv_depth_caches/{base,distill}/hs*.npy` — 17-point
   multi-layer caches, 72 GB each. KEEP (briefing directive).
-- `/workspace/conv_depth_caches/em_medical/` — organism cohort cache
-  (29 hs points, 36 GB) + judge_outputs. Phase-4/5 shards were to be
-  deleted per briefing after stats: em_medical + gemma_probing +
-  probe_tasks (~40 GB) can be dropped if space is needed, but volume
-  is at ~35% — left in place for the follow-up design review.
+- `/workspace/conv_depth_caches/em_medical/` — cohort sidecars only
+  (judge_outputs + labels/lens/qids/meta); the 29-point activation
+  shards and gemma_probing pooled caches were DELETED per the briefing
+  after their probe stats were written. probe_tasks texts (390 MB)
+  kept (cheap, re-derivable).
 - `/workspace/hf` — HF_HOME (Llama base, R1-distill, Qwen-7B, gemma×2,
   gpt2; ~55 GB).
 
