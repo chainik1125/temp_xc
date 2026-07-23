@@ -208,6 +208,22 @@ BENCHES: tuple[Bench, ...] = (
               "OPPOSITELY."),
         F_note="alphabet M=101 (frequency precedent; rank-2 circle codebook).",
     ),
+    Bench(
+        "permuted_tones", ("toy_permuted_circle_M101_d128",), "1.3.0", F=101,
+        verdict="POSITIVE",
+        axes=(LatentAxis("schedule", "schedule_recovery", "AC",
+                         "schedule identity — random-permutation walk "
+                         "(broadband temporal shape)"),),
+        note=("theorem-first (FB-5, the temporal-knob acid test): trained "
+              "spectral tracks the ENVELOPE reference numerically at every "
+              "T (0.016/0.042/0.096 vs 0.017/0.048/0.116) — band energies, "
+              "not temporal structure; txc-post reads structure beyond the "
+              "envelope (to 0.161 at k=8, the only arch above it); additive "
+              "family ≈ 0. Weak realization: best arch ≈ 16% of the "
+              "matched-filter oracle (1.0). The subtype rule's power leg "
+              "gains the alignment qualifier."),
+        F_note="alphabet M=101 (frequency precedent; rank-2 circle codebook).",
+    ),
 )
 
 # ── Architectures (matrix columns; the fair-backbone family only) ────────────
