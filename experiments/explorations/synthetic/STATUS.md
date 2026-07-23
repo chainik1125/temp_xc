@@ -10,6 +10,28 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **EXPANSION C6 DONE (2026-07-23, runpod) — calibrated extraction
+  estimator: NEITHER candidate passes the frozen battery → NO r4; the
+  r3 ABORT stands and the reasoning int/eq cell stays open with a
+  sharper, now-mechanistic diagnosis.** Card frozen pre-build
+  (`expansion/prereg/estimator-card-c6-segment-extraction.md`,
+  `8c46a92b`); two candidates ((A) null-calibrated global shrinkage with
+  the insertion control moved in-loop; (B) per-doc 75th-percentile
+  length-matched null deflation); battery on committed r3 labels +
+  harness toys, **$0 API spend** (skeptic never reached; cumulative
+  $10.82/$25). Findings: shrink-then-deconvolve is **non-monotone** (the
+  C4 deconvolution re-amplifies shrunk compositions — λ flat on
+  [0, 0.9], cliff at 1.0; on real material the only null-clean level is
+  λ=1.0 = ZERO extraction, and even inert undershoots the permuted
+  mid-lag floor ⇒ the null-clean extraction window is empty); deflation
+  collapses 75% of segments and still leaks through the tails; BOTH
+  cancel the weak-regime winner's curse (raw +34% → ≤3%; permanent
+  pytest rail) at 35–45% retained strong-signal contrast. Read:
+  `expansion/results/estimator_battery_c6.md` (+ λ-scan JSON). C7 lever
+  (proposed, unfrozen): monotone deconvolve-first-then-shrink +
+  variance-aware in-loop margins — else close the reasoning half at this
+  corpus resolution. **No stage-6 anything from C6** (per briefing).
+
 - **CONSOLIDATED REVIEW DONE (2026-07-23, mac-local) — both overnight
   sessions APPROVED; all four verdicts stand** (stage-6 #3b POSITIVE +
   FB-C1's multilane/colored_sources/phasepair POSITIVE ×3). Audit trail:

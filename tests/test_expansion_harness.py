@@ -294,6 +294,30 @@ def test_seg_mirror_insertion_control():
     assert ins_n > max(0.2 * acf_n4, 0.01)      # control CATCHES the null
 
 
+def test_c6_calibrated_estimators_cancel_weak_regime_curse():
+    # The C6 battery's stable finding (frozen card, results/
+    # estimator_battery_c6.json): on a WEAK three-timescale truth — the
+    # regime real reasoning streams live in — the r3 raw estimator
+    # OVERSHOOTS the round-trip acf[lag4] (winner's curse dominating weak
+    # signal; battery: +34%) while both calibrated candidates cancel the
+    # selection bias almost exactly (3% / 0.2%). This rail pins the
+    # ordering; the battery JSON is the record of the precise numbers.
+    # (Neither candidate passed the full frozen battery — gates 1-3 — so
+    # no estimator was SELECTED and r4 never ran; see the C6 LEDGER entry.)
+    # Replicates the battery-4 measurement EXACTLY (same data seed, same
+    # 3-rep-averaged generation seeds) so the rail is deterministic — a
+    # single-draw variant drowns the ~0.01 ordering in generation noise.
+    from experiments.explorations.synthetic.expansion import (
+        estimator_battery_c6 as bat)
+
+    b4 = bat.battery34_truth(0.60, 0.70, data_seed=22)
+    err = {est: r["acf4_abs_err"] for est, r in b4["estimators"].items()}
+    assert err["seg_hier_categorical"] > 2.0 * err["seg_hier_categorical_cal"]
+    assert err["seg_hier_categorical"] > 2.0 * err["seg_hier_categorical_deflate"]
+    # and the raw overshoot is the winner's curse, not noise: > 20% relative
+    assert b4["estimators"]["seg_hier_categorical"]["acf4_rel_err"] > 0.20
+
+
 def test_mirror_periodic_hawkes_recovery():
     rng = np.random.default_rng(7)
     true = {"process": "periodic_hawkes", "period": 8, "K": 2, "intercept": -2.8,

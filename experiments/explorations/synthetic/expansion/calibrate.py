@@ -758,7 +758,7 @@ def run(name: str):
             # of the permuted streams' own value — hallucination must be
             # subdominant to the structure the gate certifies. Runs even
             # after a gate-8 fail (cheap, informative either way).
-            if cfg["mirror"] == "seg_hier_categorical":
+            if cfg["mirror"].startswith("seg_hier_categorical"):
                 perm_train = mirrors.run_permuted_streams(m_train)
                 params0 = fit_fn(perm_train, **cfg["mirror_kw"])
                 syn0 = gen_fn(params0, [s.size for s in ev], rng)

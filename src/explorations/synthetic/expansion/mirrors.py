@@ -715,6 +715,298 @@ def gen_seg_hier_categorical(params: dict, lengths, rng) -> list:
     return out
 
 
+# ── C6 calibrated segment-composition extraction (frozen estimator card) ───
+# Two candidate estimators over the UNCHANGED r3 family — same DP
+# segmentation, deconvolution, tilt-MLE, and generator; each replaces only
+# how segment compositions are ESTIMATED from the DP's segments (the C5
+# insertion-control diagnosis: the r3 estimator's raw selected compositions
+# hallucinate +0.018 MI(2) / +0.039 ACF(4) on run-permuted streams).
+# ``fit_seg_hier_categorical`` above is intentionally untouched — it is the
+# C5 record's estimator. Card (frozen pre-build):
+# expansion/prereg/estimator-card-c6-segment-extraction.md.
+
+C6_MOMENT_FLOORS = {"mi2": 0.003, "acf4": 0.01}
+
+
+def _seg_moments(seqs) -> dict:
+    """The two preregistered gate-8 moments, matching calibrate._moment."""
+    cat = [np.asarray(s, dtype=np.int8) for s in seqs]
+    n_sym = int(max(int(np.concatenate(cat).max()) + 1, 2))
+    return {"mi2": float(sig.mi_vs_lag(cat, 12, n_sym)[1]),
+            "acf4": float(sig.selfmatch_acf(cat)[3])}
+
+
+def _null_tol(perm_moments: dict) -> dict:
+    """Null-referenced uniform tolerance (card: ±20% of |perm value|, floors
+    mi 0.003 / acf 0.01) — the frozen C3 relative rule at the null's own
+    magnitude, strictly tighter than the recorded real-magnitude control."""
+    return {m: max(0.20 * abs(v), C6_MOMENT_FLOORS[m])
+            for m, v in perm_moments.items()}
+
+
+def _seg_collect(train_seqs, k: int, max_dwell: int, min_seg_runs: int) -> dict:
+    """Estimator-independent stage of the seg fit (r3 logic verbatim): dwell
+    lists, jump chain, doc marginals, DP segments with raw compositions and
+    per-segment run counts, and the jump-event list."""
+    dwell: list[list[int]] = [[] for _ in range(k)]
+    J = np.ones((k, k)) - np.eye(k)
+    doc_props = []
+    for s in train_seqs:
+        s = s.astype(int)
+        cnt = np.bincount(s, minlength=k).astype(float) + 1.0
+        doc_props.append(cnt / cnt.sum())
+        change = np.flatnonzero(np.diff(s) != 0)
+        starts = np.concatenate([[0], change + 1])
+        run_sym = s[starts]
+        run_len = np.diff(np.concatenate([starts, [s.size]])).astype(float)
+        for st, r in zip(run_sym, run_len):
+            dwell[st].append(min(int(r), max_dwell))
+        np.add.at(J, (run_sym[:-1], run_sym[1:]), 1)
+    J /= J.sum(1, keepdims=True)
+
+    doc_segs, jumps = [], []
+    for j, s in enumerate(train_seqs):
+        s = s.astype(int)
+        segs = _segment_stream(s, k, min_seg_runs=min_seg_runs)
+        seg_list = []
+        for (a0, b0) in segs:
+            scnt = np.bincount(s[a0:b0], minlength=k).astype(float)
+            p_hat = np.clip(scnt / max(scnt.sum(), 1.0), 1e-6, None)
+            n_runs = 1 + int((np.diff(s[a0:b0]) != 0).sum())
+            seg_list.append([int(b0 - a0), p_hat / p_hat.sum(), n_runs])
+        doc_segs.append(seg_list)
+        bounds = np.array([b0 for _, b0 in segs])
+        change = np.flatnonzero(np.diff(s) != 0)
+        for t in change:                       # jump lands at position t+1
+            seg_i = int(np.searchsorted(bounds, t + 1, side="right"))
+            seg_i = min(seg_i, len(seg_list) - 1)
+            jumps.append((j, seg_i, int(s[t]), int(s[t + 1])))
+    return {"k": k, "dwell": dwell, "J": J, "doc_props": doc_props,
+            "doc_segs": doc_segs, "jumps": jumps}
+
+
+def _seg_finish(col: dict, comps, tilt_grid: int) -> dict:
+    """Tilt-MLE + segment deconvolution over GIVEN segment compositions —
+    the estimator-dependent stage of the seg fit, r3 logic verbatim except
+    that ``comps[j][i]`` (the estimated composition) replaces the raw one."""
+    k, J, doc_props, jumps = col["k"], col["J"], col["doc_props"], col["jumps"]
+    P1 = np.empty(len(jumps))
+    P2 = np.empty(len(jumps))
+    P3 = np.empty(len(jumps))
+    for i, (j, seg_i, c, d) in enumerate(jumps):
+        ts = _tilted_excl(comps[j][seg_i], c)
+        td = _tilted_excl(doc_props[j], c)
+        P1[i] = (ts[d] if ts is not None else J[c, d])
+        P2[i] = (td[d] if td is not None else J[c, d])
+        P3[i] = J[c, d]
+    grid = np.linspace(0.0, 1.0, tilt_grid)
+    best_ab, best_ll = (0.0, 0.0), -np.inf
+    for a in grid:
+        for b in grid:
+            if a + b > 1.0 + 1e-9:
+                continue
+            ll = np.log(np.maximum(a * P1 + b * P2 + (1 - a - b) * P3,
+                                   1e-12)).sum()
+            if ll > best_ll:
+                best_ll, best_ab = ll, (float(a), float(b))
+    a, b = best_ab
+    m_dwell = np.array([np.mean(d) if d else 1.0 for d in col["dwell"]])
+
+    def _stationary(u, pi_doc):
+        K = np.empty((k, k))
+        for c in range(k):
+            K[c] = _mix_row(c, u, pi_doc, J, a, b)
+        nu = np.full(k, 1.0 / k)
+        for _ in range(80):
+            nu = nu @ K
+        occ = nu * m_dwell
+        return occ / occ.sum()
+
+    seg_tables = []
+    for j, seg_list in enumerate(col["doc_segs"]):
+        table = []
+        for i, (length, _pi_raw, _nr) in enumerate(seg_list):
+            pi_est = np.asarray(comps[j][i], dtype=float)
+            u = pi_est.copy()
+            for _ in range(15):
+                pred = _stationary(u, doc_props[j])
+                u = np.clip(u * pi_est / np.maximum(pred, 1e-9), 1e-6, None)
+                u /= u.sum()
+            table.append([int(length), u.tolist()])
+        seg_tables.append(table)
+    return {"process": "seg_hier_categorical", "n_symbols": k,
+            "jump_P": J.tolist(), "tilt_seg": a, "tilt_doc": b,
+            "doc_props": [p.tolist() for p in doc_props],
+            "seg_tables": seg_tables,
+            "dwell": [d if d else [1] for d in col["dwell"]]}
+
+
+def _shrunk_comps(col: dict, lam: float) -> list:
+    return [[(1.0 - lam) * np.asarray(pi, float) + lam * col["doc_props"][j]
+             for (_L, pi, _nr) in seg_list]
+            for j, seg_list in enumerate(col["doc_segs"])]
+
+
+def fit_seg_hier_categorical_cal(train_seqs, n_symbols: int | None = None,
+                                 max_dwell: int = 400, min_seg_runs: int = 4,
+                                 tilt_grid: int = 13, n_rep: int = 3) -> dict:
+    """C6 candidate A — null-calibrated global shrinkage (card § A).
+
+    Every observed segment composition is shrunk toward its doc marginal,
+    ``pi(λ) = (1−λ)·pi_obs + λ·pi_doc``, before deconvolution and tilt-MLE;
+    λ = 0 is the r3 estimator, λ = 1 makes the segment layer provably inert.
+    The insertion control moves IN-LOOP: λ* is the smallest grid value
+    {0.0, 0.1, …, 1.0} such that the estimator fit at λ on
+    ``run_permuted_streams(train)`` round-trips BOTH preregistered moments
+    (mi[lag2], acf[lag4]) within the null-referenced uniform tolerance
+    (±20% of the permuted value, floors mi 0.003 / acf 0.01; generation
+    averaged over ``n_rep`` fixed-seed replicates). The held-out REAL
+    moment values never enter any objective — the constraint sees the
+    moments only at the null's segment-free floor, and shrinkage moves
+    expressed segment structure monotonically toward that floor — so the
+    real-data gate-8 comparison stays a genuine out-of-fit check. If no λ
+    passes, the fit degenerates to λ = 1 and flags ``uncalibratable``.
+    """
+    pooled = np.concatenate([s for s in train_seqs])
+    k = n_symbols or int(pooled.max()) + 1
+    train = [np.asarray(s).astype(int) for s in train_seqs]
+
+    perm = run_permuted_streams(train)
+    perm_m = _seg_moments(perm)
+    tol = _null_tol(perm_m)
+    col_p = _seg_collect(perm, k, max_dwell, min_seg_runs)
+    lam_star, uncal, scan = 1.0, True, []
+    for lam in np.round(np.linspace(0.0, 1.0, 11), 2):
+        params = _seg_finish(col_p, _shrunk_comps(col_p, float(lam)), tilt_grid)
+        acc = {m: [] for m in perm_m}
+        for rep in range(n_rep):
+            syn = gen_seg_hier_categorical(params, [s.size for s in perm],
+                                           np.random.default_rng(9000 + rep))
+            m = _seg_moments(syn)
+            for key in acc:
+                acc[key].append(m[key])
+        mean = {key: float(np.mean(v)) for key, v in acc.items()}
+        ok = all(abs(mean[key] - perm_m[key]) <= tol[key] for key in mean)
+        scan.append({"lam": float(lam), "pass": bool(ok),
+                     **{f"syn_{key}": mean[key] for key in mean}})
+        if ok:
+            lam_star, uncal = float(lam), False
+            break
+
+    col = _seg_collect(train, k, max_dwell, min_seg_runs)
+    out = _seg_finish(col, _shrunk_comps(col, lam_star), tilt_grid)
+    out.update({"estimator": "cal", "lam": lam_star,
+                "uncalibratable": bool(uncal),
+                "null_moments": perm_m, "null_tol": tol, "lam_scan": scan})
+    return out
+
+
+def _kl(p, q) -> float:
+    p = np.asarray(p, dtype=float)
+    q = np.asarray(q, dtype=float)
+    return float(np.sum(p * np.log(np.maximum(p, 1e-12) / np.maximum(q, 1e-12))))
+
+
+C6_RUN_BINS = ((4, 5), (6, 8), (9, 12), (13, 10 ** 9))
+
+
+def _run_bin(nr: int) -> int:
+    for i, (lo, hi) in enumerate(C6_RUN_BINS):
+        if lo <= nr <= hi:
+            return i
+    return 0    # < min_seg_runs happens only for a whole-short-doc segment
+
+
+def fit_seg_hier_categorical_deflate(train_seqs, n_symbols: int | None = None,
+                                     max_dwell: int = 400,
+                                     min_seg_runs: int = 4,
+                                     tilt_grid: int = 13, n_perm: int = 20,
+                                     q: float = 75.0) -> dict:
+    """C6 candidate B — per-doc length-matched null deflation (card § B).
+
+    "Subtract the run-permuted estimate", at the composition level: per doc,
+    the same DP runs on ``n_perm`` run-permuted replicas of THAT doc; null
+    segment concentrations D = KL(pi ‖ pi_doc) are pooled into run-count
+    bins (< 8 samples ⇒ merge into the neighbor below, bottom merges
+    upward) and each REAL segment keeps only its concentration EXCESS over
+    the bin's ``q``-th percentile — excess 0 collapses it to the doc
+    marginal exactly. Under run-exchangeability the real doc is one of its
+    own replicas, so per segment P(excess > 0) ≤ ~(100−q)% and only the
+    thin tail above the quantile is retained (the a-priori winner's-curse
+    guard a mean-subtraction lacks). No pooled temporal moment enters.
+    """
+    pooled = np.concatenate([s for s in train_seqs])
+    k = n_symbols or int(pooled.max()) + 1
+    train = [np.asarray(s).astype(int) for s in train_seqs]
+    col = _seg_collect(train, k, max_dwell, min_seg_runs)
+
+    comps, deflations = [], []
+    for j, s in enumerate(train):
+        pi_doc = col["doc_props"][j]
+        samples: list[list[float]] = [[] for _ in C6_RUN_BINS]
+        for r in range(n_perm):
+            p = run_permuted_streams(
+                [s], rng=np.random.default_rng(1000 + r))[0].astype(int)
+            for (a0, b0) in _segment_stream(p, k, min_seg_runs=min_seg_runs):
+                scnt = np.bincount(p[a0:b0], minlength=k).astype(float)
+                pi = np.clip(scnt / max(scnt.sum(), 1.0), 1e-6, None)
+                nr = 1 + int((np.diff(p[a0:b0]) != 0).sum())
+                samples[_run_bin(nr)].append(_kl(pi / pi.sum(), pi_doc))
+        use = list(range(len(samples)))
+        for i in range(len(samples) - 1, 0, -1):
+            if len(samples[i]) < 8:
+                samples[i - 1].extend(samples[i])
+                samples[i] = []
+                use[i] = i - 1
+        if len(samples[0]) < 8:
+            up = next((x for x in range(1, len(samples))
+                       if len(samples[x]) >= 8), None)
+            if up is not None:
+                samples[up].extend(samples[0])
+                samples[0] = []
+                use[0] = up
+
+        def _resolve(i):
+            while use[i] != i:
+                i = use[i]
+            return i
+
+        pool_all = [d for b in samples for d in b]
+        Dq = []
+        for i in range(len(samples)):
+            pool = samples[_resolve(i)] or pool_all
+            Dq.append(float(np.percentile(pool, q)) if pool else 0.0)
+
+        doc_comps = []
+        for (_L, pi_obs, nr) in col["doc_segs"][j]:
+            pi_obs = np.asarray(pi_obs, dtype=float)
+            d_real = _kl(pi_obs, pi_doc)
+            excess = max(0.0, d_real - Dq[_run_bin(nr)])
+            if excess <= 0.0:
+                doc_comps.append(pi_doc.copy())
+                deflations.append(1.0)
+                continue
+            lo, hi = 0.0, 1.0        # KL along the segment toward pi_doc is
+            for _ in range(48):      # convex with min 0 at s=1 ⇒ monotone ⇒
+                mid = 0.5 * (lo + hi)  # bisection is valid
+                if _kl((1 - mid) * pi_obs + mid * pi_doc, pi_doc) > excess:
+                    lo = mid
+                else:
+                    hi = mid
+            s_i = 0.5 * (lo + hi)
+            doc_comps.append((1 - s_i) * pi_obs + s_i * pi_doc)
+            deflations.append(float(s_i))
+        comps.append(doc_comps)
+
+    out = _seg_finish(col, comps, tilt_grid)
+    out.update({"estimator": "deflate", "n_perm": int(n_perm),
+                "quantile": float(q),
+                "mean_deflation": float(np.mean(deflations)) if deflations else 1.0,
+                "frac_collapsed": float(np.mean([d >= 1.0 for d in deflations]))
+                if deflations else 1.0})
+    return out
+
+
 # ── periodic + self-exciting hybrid (periodic-Hawkes), binary ──────────────
 
 def fit_periodic_hawkes(train_seqs, K: int = 8, max_period: int = 64) -> dict:
@@ -830,6 +1122,12 @@ MENU = {
     "periodic_hawkes": (fit_periodic_hawkes, gen_periodic_hawkes),
     "hier_categorical": (fit_hier_categorical, gen_hier_categorical),
     "seg_hier_categorical": (fit_seg_hier_categorical, gen_seg_hier_categorical),
+    # C6 calibrated extraction candidates (frozen estimator card): same
+    # family + generator, calibrated segment-composition estimation.
+    "seg_hier_categorical_cal":
+        (fit_seg_hier_categorical_cal, gen_seg_hier_categorical),
+    "seg_hier_categorical_deflate":
+        (fit_seg_hier_categorical_deflate, gen_seg_hier_categorical),
 }
 
 

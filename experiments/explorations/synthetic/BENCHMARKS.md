@@ -85,7 +85,7 @@ failure; kept here so the same idea isn't re-tried blindly.
 | proof-operation-phase-runs | reasoning · int/eq | **signal REAL** (self-match ACF ≫ nulls); gate-8 MI(2) fail — categorical *plateau* the menu can't make | C3 |
 | recipe-instruction-phase-runs | text · int/eq | **signal REAL**; gate-8 ACF(4) fail — *rescued in C4 by the `hier_categorical` re-freeze → SPEC (see section A)* | C3 |
 | proof-operation-phase-runs-r2 | reasoning · int/eq | **signal REAL**; even `hier_categorical` fails both hardened gate-8 moments — reasoning phase streams hold **three timescales** (run/segment/doc); C5 needs a segment-level regime layer | C4 |
-| proof-operation-phase-runs-r3 | reasoning · int/eq | **signal REAL, three timescales CONFIRMED** (real-vs-permuted ACF(4) gap 0.056); the `seg_hier_categorical` layer closes lag-2–8 — MI(2) passes for the first time, ACF(4) flips −55% → +21% (marginal fail) — but the preregistered **insertion control** catches the estimator hallucinating on run-permuted streams; C6 needs calibrated segment-composition extraction, not a new family | C5 |
+| proof-operation-phase-runs-r3 | reasoning · int/eq | **signal REAL, three timescales CONFIRMED** (real-vs-permuted ACF(4) gap 0.056); the `seg_hier_categorical` layer closes lag-2–8 — MI(2) passes for the first time, ACF(4) flips −55% → +21% (marginal fail) — but the preregistered **insertion control** catches the estimator hallucinating on run-permuted streams; C6 needs calibrated segment-composition extraction, not a new family. **C6 (frozen estimator card, no relabeling): NEITHER calibrated candidate passes the battery — no r4, ABORT stands.** Shrink-then-deconvolve is non-monotone (the deconvolution re-amplifies; on real material the only null-clean extraction level is *zero*), and per-doc quantile deflation leaks through its tails; both cancel the weak-regime winner's curse (+34% → ≤3%) at 35–45% retained strong-signal contrast. C7 lever: a monotone deconvolve-first calibration — else close the cell at this corpus resolution (`expansion/results/estimator_battery_c6.md`) | C5/C6 |
 | goal-restatement-recurrence | reasoning · long-memory | skeptic: **composition** (cross-trace rate mixture); thin margin, κ near floor | C3 |
 
 *Frozen ideas never calibrated (prop):* `hedge-to-assertion-drift`,
@@ -115,7 +115,16 @@ separates architectures (Spectral-TXC linearizes the residual to +0.97;
 coincidence-via-squash caps at the additive ceiling; additive families sit
 at the DC-leak line). The regime-3 row of the 4-regime table has its first
 grounded confirmation: order-2 structure separates window *mechanisms*, not
-window *presence*.
+window *presence*. **C6 update (2026-07-23): the reasoning half stays open
+and the diagnosis is now mechanistic** — under a pre-build frozen estimator
+card, neither calibrated extraction candidate (null-calibrated shrinkage;
+per-doc quantile deflation) is simultaneously null-clean and sensitive:
+the deconvolution makes shrinkage non-monotone (the null-clean extraction
+window on the real streams is empty), and deflation leaks through its
+tails. The structure itself remains confirmed; the limit is extraction
+resolution at this corpus size. One monotone-calibration lever (C7)
+remains before the cell is honestly closed
+(`expansion/results/estimator_battery_c6.md`).
 
 ## Authoritative sources (this file is the human index over them)
 

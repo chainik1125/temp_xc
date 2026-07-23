@@ -18,7 +18,7 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
 | **AC-order-sensitive** (depends on order) | **`SPEC`** — assumption-then-consequence (**g7 re-exam RESOLVED C2**: strict per-sentence labeler, ctx=0 → asym **0.297** (was 0.135), gate-8 PASS, fresh skeptic 5/5 → `synthetic/assumption_consequence/`, canonical mirror = g7 fit) | `calib:ABORT` — question-answer-adjacency (skeptic kill: definitional leakage) |
 | **periodic** (rhythmic/cyclic) | `calib:ABORT` ×2 — computation-verification-alternation (C2: peak real, periodic_rate can't make Fano 2.29; **C3 re-freeze with `periodic_hawkes`: gate-8 PASSED (Fano \|err\| 0.10 ≤ 0.46) but skeptic killed on circularity** — the joint period+kernel fit inserts everything measured; any future re-freeze needs a genuinely non-inserted moment, e.g. gap-distribution shape or cross-doc period stability) | `calib:ABORT` — enumeration-cadence (C3: spec_peak **4.10** real ≫ null 1.13, κ=0.56, but gate-8 fano fail 3.52 vs 0.97 — the C2 comp-verif failure replicated in text: enumeration is rhythmic AND bursty; same hybrid-vs-circularity tension as the reasoning cell) |
 | **bursty/self-exciting** (clustered events) | **`SPEC`** — backtracking (the hand-run anchor) · **`SPEC*`** — self-reference-echo (re-filed from interaction/equality, C2 review; redundant with backtracking + marginal κ=0.30 → low eval priority) · `prop` — error-correction-cascade (C1, unselected; cell PROCEEDed) | **`SPEC`** — **list-item-parallelism** (**C3 re-freeze PROCEED — the program's first text-corpus SPEC**: ACF(1)=0.52 [0.48,0.56] ≫ N1 hi 0.21, κ=0.64, gate-8 Fano \|err\| 0.163 ≤ 0.781 (±20% rel), skeptic 5/5 → `synthetic/list_item_parallelism/`; **re-filed from interaction/equality**: measured binary run-clustering, `logistic_ar` family) · `calib:ABORT` — quotation-burst (C1 skeptic kill: circular mirror validation) |
-| **interaction/equality** (cross-position compare) | **— still unfilled** · `calib:ABORT` ×3 — operator-alternation (C2: NEGATIVE sign falsified) · proof-operation-phase-runs (C3: signal REAL but gate-8 MI(2) fail — semi-Markov halves the two-step structure) · proof-operation-phase-runs-r2 (C4, `hier_categorical`: BOTH hardened gate-8 moments still fail — MI(2) 0.030 vs 0.065, ACF(4) 0.058 vs 0.127; lag-curve diagnosis: lag-12 doc floor matches, lags 2–8 carry a SEGMENT-scale layer ⇒ THREE timescales, corr(len, conc) = −0.60) · **proof-operation-phase-runs-r3 (C5, `seg_hier_categorical`: the segment layer CLOSES the lag-2–8 gap — MI(2) PASSES for the first time (0.075 vs 0.065, err 0.010 ≤ 0.013) and ACF(4) flips from −55% undershoot to a marginal +21% OVERSHOOT (0.154 vs 0.127, err 0.0263 vs tol 0.0255) — but the new preregistered INSERTION CONTROL fails BOTH moments: re-fit on run-permuted streams the estimator hallucinates +0.018 MI(2) / +0.039 ACF(4), so part of the captured structure is winner's-curse artifact. Diagnosis: the three-timescale structure is REAL (real ACF(4) 0.127 ≫ permuted 0.071 — segment share ~0.056) and the family reaches it; the ESTIMATOR over-extracts. C6 gap: calibrated segment-composition extraction — cut hallucination ~2–3× at preserved sensitivity; the C5 shrinkage campaign (documented in mirrors.py) shows which estimator families fail and why)** | **`SPEC`** — **recipe-instruction-phase-runs-r2 (C4 re-freeze PROCEED — the program's FIRST interaction/equality SPEC and first grounded regime-3 candidate:** `hier_categorical` mirror holds BOTH hardened gate-8 moments — ACF(4) \|err\| 0.018 ≤ 0.059 (the C3 killer, now passed), MI(2) \|err\| 0.029 ≤ 0.036 — skeptic 5/5, signal unchanged from C3 (ACF(1) 0.479 ≫ N1 hi 0.204, κ=0.61) → `synthetic/recipe_instruction_phase_runs/`; measured class IS multi-class run/segment equality — no re-filing) · `calib:ABORT` ×2 — greeting-signoff-mirror (C2: mis-keyed mirror) · list-item-parallelism (*C3: re-filed → bursty/self-exciting, where it PROCEEDed*) |
+| **interaction/equality** (cross-position compare) | **— still unfilled** · `calib:ABORT` ×3 — operator-alternation (C2: NEGATIVE sign falsified) · proof-operation-phase-runs (C3: signal REAL but gate-8 MI(2) fail — semi-Markov halves the two-step structure) · proof-operation-phase-runs-r2 (C4, `hier_categorical`: BOTH hardened gate-8 moments still fail — MI(2) 0.030 vs 0.065, ACF(4) 0.058 vs 0.127; lag-curve diagnosis: lag-12 doc floor matches, lags 2–8 carry a SEGMENT-scale layer ⇒ THREE timescales, corr(len, conc) = −0.60) · **proof-operation-phase-runs-r3 (C5, `seg_hier_categorical`: the segment layer CLOSES the lag-2–8 gap — MI(2) PASSES for the first time (0.075 vs 0.065, err 0.010 ≤ 0.013) and ACF(4) flips from −55% undershoot to a marginal +21% OVERSHOOT (0.154 vs 0.127, err 0.0263 vs tol 0.0255) — but the new preregistered INSERTION CONTROL fails BOTH moments: re-fit on run-permuted streams the estimator hallucinates +0.018 MI(2) / +0.039 ACF(4), so part of the captured structure is winner's-curse artifact. Diagnosis: the three-timescale structure is REAL (real ACF(4) 0.127 ≫ permuted 0.071 — segment share ~0.056) and the family reaches it; the ESTIMATOR over-extracts. C6 gap: calibrated segment-composition extraction — cut hallucination ~2–3× at preserved sensitivity; the C5 shrinkage campaign (documented in mirrors.py) shows which estimator families fail and why)** · **C6 (estimator battery, card frozen pre-build `8c46a92b`): NEITHER calibrated candidate passes gates 1–3 — NO r4; the r3 ABORT stands.** Null-calibrated global shrinkage (`_cal`) is defeated by the deconvolution (shrink-then-deconvolve is NON-monotone — the fixed point re-amplifies shrunk compositions; on real material the only null-clean point is λ=1.0 = zero extraction, and even that undershoots the permuted streams' own mid-lag floor ⇒ the null-clean extraction window is EMPTY); per-doc quantile deflation (`_deflate`) collapses 75% of real segments yet still leaks +0.012/+0.016 through the surviving tails. Both cancel the winner's curse in the WEAK regime (raw +34% overshoot → 3%/0.2%; permanent pytest rail) at 35–45% retained contrast on strong signal. Diagnosis sharpened: a resolution/power limit — per-segment null concentration fluctuations sit at the scale of the genuine contrast at 287×~85 corpus size. C7 direction (proposed): deconvolve-first-then-shrink (monotone) + variance-aware in-loop margins; if still inert on real material, close the reasoning half as unreachable at this corpus resolution (`expansion/results/estimator_battery_c6.md`) | **`SPEC`** — **recipe-instruction-phase-runs-r2 (C4 re-freeze PROCEED — the program's FIRST interaction/equality SPEC and first grounded regime-3 candidate:** `hier_categorical` mirror holds BOTH hardened gate-8 moments — ACF(4) \|err\| 0.018 ≤ 0.059 (the C3 killer, now passed), MI(2) \|err\| 0.029 ≤ 0.036 — skeptic 5/5, signal unchanged from C3 (ACF(1) 0.479 ≫ N1 hi 0.204, κ=0.61) → `synthetic/recipe_instruction_phase_runs/`; measured class IS multi-class run/segment equality — no re-filing) · `calib:ABORT` ×2 — greeting-signoff-mirror (C2: mis-keyed mirror) · list-item-parallelism (*C3: re-filed → bursty/self-exciting, where it PROCEEDed*) |
 | **long-memory** (renewal / heavy-tail) | `calib:ABORT` — goal-restatement-recurrence (C3: gap-CV 1.48 > N1 hi 1.01, gate-8 PASS, but **skeptic kill on composition**: pooled gap-CV inflated by cross-trace rate mixture; perturbed margin thin (1.14 vs N2 hi 1.06); κ=0.42 near floor) | `calib:ABORT` — pronoun-referent-recurrence (C2: gap-CV dies at the noise floor) |
 
 ## Notes / provenance
@@ -74,9 +74,51 @@ grid — an empty domain is then a visible, prioritized gap, not silent drift.
   but the estimator over-extracts (control FAIL, cycle log). **The C6 gap is
   no longer the model family — it is the extraction estimator**: segment
   compositions need calibrated (not raw, not naively shrunk) estimation.
+  **C6 resolution:** two calibrated candidates built under a pre-build
+  frozen estimator card; NEITHER passes the frozen battery (no r4 — the
+  r3 ABORT stands). The failure is now mechanistic: the C4 deconvolution
+  makes shrink-then-deconvolve non-monotone, and quantile deflation leaks
+  through its tails; both DO cancel the weak-regime winner's curse. The
+  open C7 lever is a monotone (deconvolve-first) calibration — or an
+  honest close at this corpus resolution (cycle log; battery record).
 - The abstract benches (signed_motion, frequency) are out of this ledger's scope.
 
 ## Cycle log
+
+- **Cycle 6 — 2026-07-23 (runpod, autonomous; zero API spend — battery ran
+  on committed r3 labels + harness toys; skeptic never reached).** The
+  briefing-mandated estimator fix, run exactly by the pre-build frozen
+  card (`prereg/estimator-card-c6-segment-extraction.md`, commit
+  `8c46a92b`): TWO candidates with a-priori calibration principles —
+  **(A) `seg_hier_categorical_cal`**, null-calibrated global shrinkage
+  with the C5 insertion control moved IN-LOOP (λ* = smallest λ whose fit
+  on run-permuted train round-trips both gate-8 moments within a
+  null-referenced tolerance strictly tighter than the recorded control;
+  real held-out moments never enter any objective), and
+  **(B) `seg_hier_categorical_deflate`**, per-doc length-matched null
+  deflation (each real segment keeps only its concentration excess over
+  the 75th percentile of 20 same-doc run-permuted replicas). **Verdict:
+  NEITHER passes the frozen gates 1–3 → NO r4 run; the r3 ABORT stands**
+  (`results/estimator_battery_c6.{json,md}` + deterministic λ-scans).
+  Mechanistic findings: (1) shrink-then-deconvolve is NON-monotone — the
+  C4 self-consistency fixed point re-amplifies shrunk compositions, so
+  λ is flat on [0, 0.9] then cliffs at 1.0; on real material the only
+  null-clean point is λ=1.0 (zero extraction) and even the inert limit
+  undershoots the permuted streams' own mid-lag floor ⇒ the null-clean
+  extraction window is EMPTY at card tolerance; (2) quantile deflation
+  collapses 75% of real segments and still leaks +0.012 MI(2) /
+  +0.016 ACF(4) through the surviving tails; (3) BOTH candidates cancel
+  the weak-regime winner's curse the raw estimator exhibits (+34%
+  overshoot → 3% / 0.2%; pinned as a permanent pytest rail) at the cost
+  of 35–45% retained contrast on strong signal; (4) boundary verdicts are
+  generation-noise brittle (gate-2 seed flip 0.022→0.040 vs bound 0.035).
+  Interpretation: a resolution/power limit of extraction at this corpus
+  size, not a family failure and not evidence against the (confirmed)
+  three-timescale structure. **C7 direction (proposed, unfrozen):**
+  monotone deconvolve-first-then-shrink calibration + variance-aware
+  in-loop margins; if a monotone estimator still calibrates to inert on
+  real material, close the reasoning int/eq half as unreachable at this
+  corpus resolution. Spend unchanged: **$10.82/$25** (C6 $0.00).
 
 - **Cycle 5 — 2026-07-22 (runpod, autonomous overnight; measure→mirror only,
   zero API spend — labels cached from C3, skeptic skipped on ABORT).** The
