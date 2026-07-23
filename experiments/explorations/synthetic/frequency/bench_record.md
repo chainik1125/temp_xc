@@ -262,3 +262,38 @@ attaches its proof registry (§ B) so each headline number has its proposition:
 FreqFrac coordinates for this bench (weight-space, per arch) are produced by
 [`../freqbench/freqfrac_report.py`](../freqbench/freqfrac_report.py) —
 acceptance check (i) of the port.
+
+## T=16 frontier addendum (FB-C2, 2026-07-23, runpod-b)
+
+**Design:** the locked uniform design extended one octave — window archs (+
+the matched-budget band pair) at `T=16 × d_sae ∈ {50,101,202} × dict-feasible
+k_pos × seeds {1,2,42}` + untrained (162 cells, driver commit `32851ee8`,
+916/916 grid ok, 0 failures). Frozen prediction (mac-local,
+`briefings/freqbench-t16-fbc2.md`, frozen 2026-07-23 pre-run): *"spectral
+reaches ≈ 1.00 (the sprint's T=16 result, now under the fair BatchTopK
+backbone) and the FreqFrac high-pass sharpens (Rayleigh cells resolve the
+full Ω ladder)."* Scored blind against the grid after completion.
+
+**Verdict on the prediction — HELD, both halves.**
+
+- **Spectral ≈ 1.00: HELD at every capacity.** `velocity_recovery` 3-seed
+  means at T=16: 0.999/0.997/0.999 (d=50/101/202, k=1) and 0.989–0.999 at
+  k=2 — up from 0.939–0.960 at T=8. The sprint's T=16 saturation transports
+  to the fair backbone exactly. The band pair saturates too (full 1.000,
+  dcac 0.999 at d=101 k=1): at T=16 the single-tone task stops
+  discriminating band partitions entirely (ceiling).
+- **FreqFrac high-pass sharpening: HELD on init-relative measures.** Seed-1
+  canonical cells (`freqfrac_stats_frequency_s1_T16.json`): trained spectral
+  sheds DC twice as hard as at T=8 (dc_frac init 0.333 → trained 0.226, a
+  −0.107 shift vs −0.048 at T=8), and txc-post's firing-weighted
+  concentration rises to 2.41× its init (0.344 vs 0.143) from 1.72× at T=8 —
+  the trained kernels become distinctly more tone-like when the DCT grid
+  resolves the ladder. *Caveat recorded:* absolute concentrations are not
+  comparable across T (the uniform-init baseline falls with the band count:
+  0.275 at T=8 vs 0.143 at T=16); the sharpening claim is scored on
+  trained-vs-init deltas/ratios at fixed T, which is the lens's own
+  normalization.
+- **Context (not part of the frozen claim):** txc-post improves with budget
+  at T=16 (k=2: 0.761–0.854, from ~0.5 at T=8 k=2) while the additive family
+  stays low and FLAT (stacked 0.19–0.24, pre 0.23–0.27 — the P2 wall does
+  not move with T); untrained spectral T=16 access 0.635 (T=8: ~0.64).
