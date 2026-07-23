@@ -150,7 +150,9 @@ def capability_gate(mtx_stats, nmse_stats, benches, archs, op, out_dir) -> str:
     """Scatter: primary-latent recovery (y) vs reconstruction NMSE (x). Returns filename."""
     plt = use_agg_style()
     fig, ax = plt.subplots(figsize=(7.2, 5.2))
-    bench_marker = {b.name: m for b, m in zip(benches, ["o", "s", "^", "D", "P", "v"])}
+    bench_marker = {b.name: m
+                    for b, m in zip(benches, ["o", "s", "^", "D", "P", "v", "X"])}
+    assert len(bench_marker) == len(benches), "extend the marker list"
     for b in benches:
         axl = _primary_axis(b)
         d = b.F  # boundary capacity

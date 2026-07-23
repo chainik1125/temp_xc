@@ -134,6 +134,25 @@ BENCHES: tuple[Bench, ...] = (
         F_note="feature-direction count (1 confidence + 19 content).",
     ),
     Bench(
+        "recipe_instruction_phase_runs", ("toy_recipe_instruction_d64",),
+        "1.3.0", F=20, verdict="POSITIVE",
+        axes=(
+            LatentAxis("phase", "phase_recovery", "DC",
+                       "phase class c_t — functional-phase control",
+                       primary=False),
+            LatentAxis("equality_residual", "equality_residual_recovery", "AC",
+                       "equality residual of e_t=[c_t=c_{t-1}] over "
+                       "[additive ceiling 0.771, exact 1] (regime 3)",
+                       primary=True),
+        ),
+        note=("first grounded regime-3 POSITIVE: only Spectral-TXC exposes "
+              "the residual (T=2: +0.90 at d=F, k-robust to 4); TXC-post "
+              "caps at the additive ceiling; additive families pinned at "
+              "the DC-leak line. Residual axis is re-scoped (stage-6 #3b) — "
+              "raw-linear access lines are named floors, not chance."),
+        F_note="feature-direction count (5 phase-signature + 15 content).",
+    ),
+    Bench(
         "frequency",
         ("toy_cyclic_circle_M101_d128", "toy_cyclic_random_M101_d128"),
         "1.3.0", F=101, verdict="POSITIVE",

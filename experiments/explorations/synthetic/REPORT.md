@@ -47,6 +47,7 @@ Per-token matched: window **T = 4** (token archs T=1), matched to **B\* = 2** at
 - **changepoint**: d_sae ∈ {20, 10} (F=20; feature-direction count (8 mode-signature + 12 content).)
 - **assumption_consequence**: d_sae ∈ {20, 10} (F=20; feature-direction count (3 state-signature + 17 content).)
 - **hedging_drift**: d_sae ∈ {20, 10} (F=20; feature-direction count (1 confidence + 19 content).)
+- **recipe_instruction_phase_runs**: d_sae ∈ {20, 10} (F=20; feature-direction count (5 phase-signature + 15 content).)
 - **frequency**: d_sae ∈ {101, 50} (F=101; alphabet M=101 (NOT a direction count): the circle embedding is rank-2 (all M symbols in a 2-D plane), so {101, 50} are alphabet-scaled capacities, both < the memorization budget |Ω|·M=1010.)
 <!-- END AUTO:operating_point -->
 
@@ -70,6 +71,8 @@ holes.
 | **assumption_consequence** · discourse state s_i ∈ {N,A,C} (DC) | 0.999 / 0.993 | 0.999 / 0.998 | 0.998 / 0.992 | 0.999 / 0.998 | 0.998 / 0.998 | 0.996 / 0.999 |
 | **assumption_consequence** · directed next-state s_{i+1} (the A→C grammar) (AC) | 0.625 / 0.612 | 0.702 / 0.702 | 0.626 / 0.637 | 0.636 / 0.642 | 0.644 / 0.640 | 0.644 / 0.643 |
 | **hedging_drift** · confidence level c_i — hierarchical-AR(1) drift (DC) | 0.755 / 0.793 | 0.755 / 0.773 | 0.775 / 0.791 | 0.772 / 0.770 | 0.775 / 0.769 | 0.774 / 0.774 |
+| **recipe_instruction_phase_runs** · phase class c_t — functional-phase control (DC) | 0.999 / 0.999 | 0.987 / 0.999 | 0.988 / 0.998 | 0.998 / 0.953 | 0.999 / 0.920 | 0.995 / 0.896 |
+| **recipe_instruction_phase_runs** · equality residual of e_t=[c_t=c_{t-1}] over [additive ceiling 0.771, exact 1] (regime 3) (AC) | -0.786 / -0.786 | -0.778 / -0.773 | -0.802 / -0.806 | -0.798 / -0.834 | -0.817 / -0.834 | -0.228 / -0.826 |
 | **frequency** · velocity Y — cyclic tone f = Y/M (AC) | -0.004 / -0.001 | -0.003 / -0.003 | 0.064 / 0.060 | 0.068 / 0.072 | 0.767 / 0.770 | 0.777 / 0.796 |
 <!-- END AUTO:matrix_pertoken -->
 
@@ -108,6 +111,7 @@ content). Where a benchmark exposes it, this is the "what did the recovery cost"
 | **changepoint** | 0.119 / 0.205 | 0.146 / 0.228 | 0.128 / 0.205 | 0.376 / 0.550 | 0.362 / 0.543 | 0.486 / 0.628 |
 | **assumption_consequence** | 0.106 / 0.170 | 0.129 / 0.196 | 0.145 / 0.169 | 0.238 / 0.280 | 0.238 / 0.280 | 0.267 / 0.284 |
 | **hedging_drift** | 0.091 / 0.141 | 0.123 / 0.181 | 0.121 / 0.144 | 0.200 / 0.230 | 0.199 / 0.229 | 0.216 / 0.235 |
+| **recipe_instruction_phase_runs** | 0.117 / 0.171 | 0.157 / 0.202 | 0.148 / 0.172 | 0.266 / 0.351 | 0.260 / 0.343 | 0.294 / 0.360 |
 | **frequency** | 0.540 / 0.543 | 0.542 / 0.544 | 0.543 / 0.544 | 0.546 / 0.550 | 0.539 / 0.545 | 0.539 / 0.545 |
 <!-- END AUTO:panel_nmse -->
 
@@ -122,6 +126,7 @@ emission features; higher is better):
 | **changepoint** | 0.952 / 0.233 | 0.848 / 0.207 | 0.547 / 0.347 | 0.011 / 0.010 | 0.011 / 0.010 | 0.228 / 0.208 |
 | **assumption_consequence** | 0.953 / 0.434 | 0.876 / 0.377 | 0.489 / 0.414 | 0.460 / 0.012 | 0.498 / 0.138 | 0.327 / 0.181 |
 | **hedging_drift** | 0.944 / 0.457 | 0.848 / 0.355 | 0.521 / 0.440 | 0.585 / 0.325 | 0.523 / 0.308 | 0.374 / 0.283 |
+| **recipe_instruction_phase_runs** | 0.953 / 0.383 | 0.833 / 0.326 | 0.486 / 0.425 | 0.260 / 0.010 | 0.327 / 0.010 | 0.246 / 0.192 |
 | **frequency** | 0.927 / 0.917 | 0.897 / 0.900 | 0.580 / 0.626 | 0.978 / 0.983 | 0.973 / 0.916 | 0.901 / 0.900 |
 <!-- END AUTO:panel_eauc -->
 
@@ -146,6 +151,7 @@ holes the uniform re-grid will fill.
 - **changepoint** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 - **assumption_consequence** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 - **hedging_drift** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
+- **recipe_instruction_phase_runs** (F=20): 42 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 - **frequency** (F=101): 62 (arch,T,d_sae) groups · archs: batchtopk_sae, spectral_txc, spectral_txc_dcac, spectral_txc_full, stacked_batchtopk, tsae, txc_batchtopk_post, txc_batchtopk_pre
 <!-- END AUTO:coverage -->
 

@@ -1,7 +1,7 @@
 {
   "source": "results/leaderboard.jsonl",
-  "n_cells": 2959,
-  "n_groups": 973,
+  "n_cells": 3412,
+  "n_groups": 1124,
   "operating_point": {
     "T_can": 4,
     "B_star": 2.0,
@@ -17,6 +17,7 @@
     "changepoint",
     "assumption_consequence",
     "hedging_drift",
+    "recipe_instruction_phase_runs",
     "frequency"
   ],
   "archs": [
@@ -1277,6 +1278,318 @@
           "loose": false
         }
       },
+      "recipe_instruction_phase_runs/phase/batchtopk_sae": {
+        "20": {
+          "value": 0.9994579451209425,
+          "std": 0.00013210844433439418,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 20,
+          "realized_l0_token": 2.0001729329427085,
+          "realized_l0_window": 2.0001729329427085,
+          "l0_deviation": 0.00017293294270848136,
+          "loose": false
+        },
+        "10": {
+          "value": 0.998812835702832,
+          "std": 0.00021288643985001196,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 10,
+          "realized_l0_token": 1.9987894694010417,
+          "realized_l0_window": 1.9987894694010417,
+          "l0_deviation": 0.0012105305989582593,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/phase/tsae": {
+        "20": {
+          "value": 0.9868772473296038,
+          "std": 0.0009478449930318205,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 20,
+          "realized_l0_token": 1.9957377115885417,
+          "realized_l0_window": 1.9957377115885417,
+          "l0_deviation": 0.004262288411458259,
+          "loose": false
+        },
+        "10": {
+          "value": 0.9991605707480353,
+          "std": 0.0003496705014437074,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 10,
+          "realized_l0_token": 2.00335693359375,
+          "realized_l0_window": 2.00335693359375,
+          "l0_deviation": 0.00335693359375,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/phase/stacked_batchtopk": {
+        "20": {
+          "value": 0.9881380350060849,
+          "std": 0.0014112694003508624,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.9985860188802083,
+          "realized_l0_window": 7.994344075520833,
+          "l0_deviation": 0.0014139811197917407,
+          "loose": false
+        },
+        "10": {
+          "value": 0.9978999842548116,
+          "std": 0.0014248791481801515,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.9998372395833333,
+          "realized_l0_window": 7.999348958333333,
+          "l0_deviation": 0.00016276041666674068,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/phase/txc_batchtopk_pre": {
+        "20": {
+          "value": 0.997865714455808,
+          "std": 0.002125088409520214,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.8800557454427083,
+          "realized_l0_window": 7.520222981770833,
+          "l0_deviation": 0.11994425455729174,
+          "loose": false
+        },
+        "10": {
+          "value": 0.9526065540777702,
+          "std": 0.02974228241888341,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.4488118489583333,
+          "realized_l0_window": 5.795247395833333,
+          "l0_deviation": 0.5511881510416667,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/phase/txc_batchtopk_post": {
+        "20": {
+          "value": 0.9989159596328884,
+          "std": 0.0006624731318515112,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.9911092122395833,
+          "realized_l0_window": 7.964436848958333,
+          "l0_deviation": 0.00889078776041674,
+          "loose": false
+        },
+        "10": {
+          "value": 0.9195499066821163,
+          "std": 0.015913333045622577,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.99755859375,
+          "realized_l0_window": 7.990234375,
+          "l0_deviation": 0.00244140625,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/phase/spectral_txc": {
+        "20": {
+          "value": 0.9946746042775211,
+          "std": 9.968627473706499e-05,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.980804443359375,
+          "realized_l0_window": 7.9232177734375,
+          "l0_deviation": 0.019195556640625,
+          "loose": false
+        },
+        "10": {
+          "value": 0.8958603890121634,
+          "std": 0.005397282335371061,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.9981486002604167,
+          "realized_l0_window": 7.992594401041667,
+          "l0_deviation": 0.0018513997395832593,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/equality_residual/batchtopk_sae": {
+        "20": {
+          "value": -0.7856004128453838,
+          "std": 0.014948684064695258,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 20,
+          "realized_l0_token": 2.0001729329427085,
+          "realized_l0_window": 2.0001729329427085,
+          "l0_deviation": 0.00017293294270848136,
+          "loose": false
+        },
+        "10": {
+          "value": -0.7864654450129667,
+          "std": 0.01586350137169221,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 10,
+          "realized_l0_token": 1.9987894694010417,
+          "realized_l0_window": 1.9987894694010417,
+          "l0_deviation": 0.0012105305989582593,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/equality_residual/tsae": {
+        "20": {
+          "value": -0.7782164723103165,
+          "std": 0.016435977444007627,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 20,
+          "realized_l0_token": 1.9957377115885417,
+          "realized_l0_window": 1.9957377115885417,
+          "l0_deviation": 0.004262288411458259,
+          "loose": false
+        },
+        "10": {
+          "value": -0.7729337463647262,
+          "std": 0.02138525262954248,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 1,
+          "d_sae": 10,
+          "realized_l0_token": 2.00335693359375,
+          "realized_l0_window": 2.00335693359375,
+          "l0_deviation": 0.00335693359375,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/equality_residual/stacked_batchtopk": {
+        "20": {
+          "value": -0.8019223798743665,
+          "std": 0.05221810426450244,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.9985860188802083,
+          "realized_l0_window": 7.994344075520833,
+          "l0_deviation": 0.0014139811197917407,
+          "loose": false
+        },
+        "10": {
+          "value": -0.8061020743955379,
+          "std": 0.04686546744055164,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.9998372395833333,
+          "realized_l0_window": 7.999348958333333,
+          "l0_deviation": 0.00016276041666674068,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/equality_residual/txc_batchtopk_pre": {
+        "20": {
+          "value": -0.7980704511232201,
+          "std": 0.045720923620654365,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.8800557454427083,
+          "realized_l0_window": 7.520222981770833,
+          "l0_deviation": 0.11994425455729174,
+          "loose": false
+        },
+        "10": {
+          "value": -0.8344270639453901,
+          "std": 0.026012040356748294,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.4488118489583333,
+          "realized_l0_window": 5.795247395833333,
+          "l0_deviation": 0.5511881510416667,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/equality_residual/txc_batchtopk_post": {
+        "20": {
+          "value": -0.8168443176772068,
+          "std": 0.04187673990528747,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.9911092122395833,
+          "realized_l0_window": 7.964436848958333,
+          "l0_deviation": 0.00889078776041674,
+          "loose": false
+        },
+        "10": {
+          "value": -0.8339846134333381,
+          "std": 0.034230127797503604,
+          "n_seeds": 3,
+          "k_pos": 8,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.99755859375,
+          "realized_l0_window": 7.990234375,
+          "l0_deviation": 0.00244140625,
+          "loose": false
+        }
+      },
+      "recipe_instruction_phase_runs/equality_residual/spectral_txc": {
+        "20": {
+          "value": -0.22798812235748356,
+          "std": 0.04846318585004999,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 20,
+          "realized_l0_token": 1.980804443359375,
+          "realized_l0_window": 7.9232177734375,
+          "l0_deviation": 0.019195556640625,
+          "loose": false
+        },
+        "10": {
+          "value": -0.8263433676526573,
+          "std": 0.043796102953337565,
+          "n_seeds": 3,
+          "k_pos": 2,
+          "T": 4,
+          "d_sae": 10,
+          "realized_l0_token": 1.9981486002604167,
+          "realized_l0_window": 7.992594401041667,
+          "l0_deviation": 0.0018513997395832593,
+          "loose": false
+        }
+      },
       "frequency/velocity/batchtopk_sae": {
         "101": {
           "value": -0.003646851911605749,
@@ -1916,6 +2229,102 @@
             "d_sae": 10
           }
         },
+        "recipe_instruction_phase_runs/batchtopk_sae": {
+          "20": {
+            "value": 0.1171732962946928,
+            "std": 0.0011176947417438866,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.17137701757630863,
+            "std": 0.00011136179709101901,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/tsae": {
+          "20": {
+            "value": 0.1574120955404601,
+            "std": 0.0009560491586197648,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.20243411244528275,
+            "std": 0.006468116967652668,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/stacked_batchtopk": {
+          "20": {
+            "value": 0.1482256161050122,
+            "std": 0.0009803175699582,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.17176283251307037,
+            "std": 0.00023702777993959306,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/txc_batchtopk_pre": {
+          "20": {
+            "value": 0.2655564577920618,
+            "std": 0.0016875530345131877,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.3509147386453903,
+            "std": 0.004349531675842482,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/txc_batchtopk_post": {
+          "20": {
+            "value": 0.25996991919230444,
+            "std": 0.000645418150368125,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.3425990597630281,
+            "std": 0.00170184519715644,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/spectral_txc": {
+          "20": {
+            "value": 0.2937842874549723,
+            "std": 0.0018871182440696112,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.3595140342162457,
+            "std": 0.002645963584077468,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
         "frequency/batchtopk_sae": {
           "101": {
             "value": 0.539607122481005,
@@ -2489,6 +2898,102 @@
           "10": {
             "value": 0.282982478539149,
             "std": 0.00667589565891371,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/batchtopk_sae": {
+          "20": {
+            "value": 0.9531110326449076,
+            "std": 0.02613542783343239,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.38333332538604736,
+            "std": 0.0,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/tsae": {
+          "20": {
+            "value": 0.8331111272176107,
+            "std": 0.029721362545785068,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.32555556297302246,
+            "std": 0.026762792539200424,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/stacked_batchtopk": {
+          "20": {
+            "value": 0.4855555494626363,
+            "std": 0.0034995728759280023,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.42511115471522015,
+            "std": 0.010904764893620576,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/txc_batchtopk_pre": {
+          "20": {
+            "value": 0.25977777938048047,
+            "std": 0.09375355621512844,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.009999999776482582,
+            "std": 0.0,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/txc_batchtopk_post": {
+          "20": {
+            "value": 0.32733333110809326,
+            "std": 0.010385180784514903,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.009999999776482582,
+            "std": 0.0,
+            "n_seeds": 3,
+            "k_pos": 8,
+            "d_sae": 10
+          }
+        },
+        "recipe_instruction_phase_runs/spectral_txc": {
+          "20": {
+            "value": 0.24555555482705435,
+            "std": 0.023076901535037716,
+            "n_seeds": 3,
+            "k_pos": 2,
+            "d_sae": 20
+          },
+          "10": {
+            "value": 0.19177777568499246,
+            "std": 0.00802466046366646,
             "n_seeds": 3,
             "k_pos": 2,
             "d_sae": 10
