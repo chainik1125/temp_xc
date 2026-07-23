@@ -420,6 +420,28 @@ datasources:
       the composition is expected distribution-identical to FB-2 — the T2
       battery adjudicates before any grid is spent.
 
+  toy_permuted_circle_M101_d128:
+    category: synthetic
+    generator: permuted_tones
+    params:
+      M: 101
+      K: 10
+      d_in: 128
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-5 permuted tones (theorem-first; frozen card
+      freqbench/cards/FB-5.md): the frequency substrate with the linear
+      phase schedule replaced by K=10 uniformly-random permutation
+      schedules of Z_M (drawn per data seed) — order-2-even structure
+      preserved, DCT-alignment of the temporal trajectory destroyed
+      (broadband axis-1 pole). P1 exact per token; ceiling = matched
+      filter over (schedule, offset); K*M = 1,010 window templates >>
+      d_sae <= 202 (the frequency P6 count). Primary metric
+      schedule_recovery via the permuted_recovery add-on (dispatch on
+      extra['schedule_table']).
+
   gemma_2_2b_it_l13_fineweb_24k128:
     category: real_lm
     subject_model: google/gemma-2-2b-it

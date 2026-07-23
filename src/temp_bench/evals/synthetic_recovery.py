@@ -342,6 +342,16 @@ class SyntheticRecovery(Evaluator):
             out.update(multilane_metrics(model, data, eval_window_L=L,
                                          n_windows=n_windows))
 
+        # Permuted-tones schedule recovery add-on (FreqBench FB-5). Only
+        # fires for the toy_permuted_* datasources, which expose the
+        # schedule table in `extra`. No-op (byte-identical metrics) for
+        # every other bench → protocol stays 1.3.0.
+        if getattr(data, "extra", None) and "schedule_table" in data.extra:
+            from temp_bench.evals.permuted_recovery import permuted_metrics
+            n_windows = 128 if spec.smoke else 1024
+            out.update(permuted_metrics(model, data, eval_window_L=L,
+                                        n_windows=n_windows))
+
         # Colored-sources feature-direction recovery add-on (FreqBench FB-3).
         # Only fires for the toy_colored_sources_* datasources, which expose
         # the ρ schedule in `extra`. Weight-space metric (no probe). No-op

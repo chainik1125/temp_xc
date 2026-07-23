@@ -1384,6 +1384,89 @@ def multilane_tones_rotated(
     )
 
 
+def permuted_tones(
+    *,
+    M: int = 101,
+    K: int = 10,
+    d_in: int = 128,
+    sigma: float = 0.10,
+    seq_len: int = 64,
+    n_seqs: int = 4096,
+    seed: int = 0,
+) -> SyntheticData:
+    """Permuted tones — FB-5 (the temporal-knob acid test on the subtype rule).
+
+    The frequency substrate with ONE substitution (frozen card
+    ``freqbench/cards/FB-5.md``): the linear phase schedule ``z = Y·(t+B)``
+    becomes a **uniformly-random permutation schedule**::
+
+        π_0..π_{K−1} iid uniform permutations of Z_M  (drawn per data seed)
+        z_t = π_Y((t + B) mod M),   Y ~ Unif({0..K−1}),  B ~ Unif(Z_M)
+        x_t = u_{z_t} + σ ε_t,      u_a the circle codebook (as cyclic_tones)
+
+    The tone benches are the special case π_Y(z) = Y·z (Y coprime to prime
+    M), so FB-5 vs `frequency` is a controlled comparison: order-2-even
+    structure and every substrate convention held fixed, DCT-alignment of
+    the temporal trajectory destroyed (lag-1 trajectory autocorrelation
+    ≈ 0 ± O(1/√M) per schedule vs the tone ladder cos(2πY/M)).
+
+    Proof apparatus (card § 3): P1 exact (π_Y bijective + B uniform ⇒
+    ``z_t | Y ~ Unif(Z_M)`` ⇒ I(Y; x_t) = 0); P2 phase-averaging restated
+    for general π; ceiling = matched filter over (schedule, offset); window
+    templates K·M = 1,010 ≫ d_sae (P6, the frequency count).
+
+    Ground truths exposed (``extra``):
+        schedule_labels: (n_seqs, seq_len) int64 — Y (const/seq; tiled eval)
+        offset_labels:   (n_seqs,)         int64 — hidden B ∈ Z_M
+        schedule_table:  (K, M)            int64 — the realized π (oracle key)
+        circle_plane:    (d_in, 2)         — R; M, K, sigma scalars
+    plus ``emission_features`` = the M circle atoms (codebook, as frequency).
+    """
+    rng = np.random.default_rng(seed)
+
+    # circle embedding — identical construction to cyclic_tones(embedding="circle")
+    A = rng.standard_normal((d_in, 2))
+    R, _ = np.linalg.qr(A)                                  # (d_in, 2) isometry
+    ang = 2 * np.pi * np.arange(M) / M
+    V = np.stack([np.cos(ang), np.sin(ang)], axis=1)        # (M, 2)
+    U = (V @ R.T).astype(np.float32)                        # (M, d_in)
+
+    # K random schedules, per data seed (the multilane embedding convention).
+    perms = np.stack([rng.permutation(M) for _ in range(K)]).astype(np.int64)
+
+    Y = rng.integers(0, K, size=n_seqs).astype(np.int64)
+    B = rng.integers(0, M, size=n_seqs).astype(np.int64)
+    t = np.arange(seq_len)[None, :]
+    Z = perms[Y[:, None], (B[:, None] + t) % M]             # (n_seqs, seq_len)
+    x = U[Z]
+    if sigma > 0:
+        x = x + (sigma * rng.standard_normal(x.shape)).astype(np.float32)
+    x = x.astype(np.float32)
+
+    sched_lab = np.broadcast_to(Y[:, None], (n_seqs, seq_len)).copy()
+
+    extra = {
+        "schedule_labels": torch.from_numpy(sched_lab),
+        "offset_labels": torch.from_numpy(B),
+        "schedule_table": torch.from_numpy(perms),
+        "circle_plane": torch.from_numpy(R.astype(np.float32)),
+        "M": int(M),
+        "K": int(K),
+        "sigma": float(sigma),
+    }
+
+    return SyntheticData(
+        x=torch.from_numpy(x),
+        emission_features=torch.from_numpy(U),              # M circle atoms
+        hidden_features=None,                               # Y is not a direction
+        support=None,
+        hidden_support=None,
+        seq_len=seq_len,
+        d_in=d_in,
+        extra=extra,
+    )
+
+
 # ── Colored sources (FreqBench FB-3, theorem-first) ────────────────────
 
 
@@ -1492,6 +1575,7 @@ _GENERATORS = {
     "recipe_instruction_phase_runs": recipe_instruction_phase_runs,
     "multilane_tones": multilane_tones,
     "multilane_tones_rotated": multilane_tones_rotated,
+    "permuted_tones": permuted_tones,
     "colored_sources": colored_sources,
 }
 
