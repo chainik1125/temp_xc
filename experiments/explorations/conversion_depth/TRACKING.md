@@ -127,8 +127,24 @@ reported as plainly as hits.
 
 ## § 3 — Runs (filled during execution)
 
-(populated after the freeze; see `run_em_panel.py` wall log +
-leaderboard rows)
+**Post-freeze, PRE-RESULTS annotation (2026-07-23, before any panel
+cell ran):** extracting the paper's four medical detection rows
+(`origin/final` leaderboard, protocol 3.0.0) for the anchor comparison
+revealed a confound the frozen P6 did not account for: the paper's
+cells each probed their OWN Wang-stage-4 cohort (n_sent 79k–107k,
+positive_rate 0.410/0.466 for sae_arditi s42/s1, 0.315/0.345 for
+txc_base) — per-cell cohorts with different base rates — whereas this
+redo probes every arch on the ONE fixed 1728-rollout cohort
+(positive_rate 0.323, the g-map's substrate; the cleaner cross-arch
+design). PR-AUC is base-rate sensitive, so P6's ±0.05 window vs the
+paper's sae_arditi mean 0.7175 (measured at base rates 0.41–0.47) may
+miss for cohort-composition reasons alone. P6 stays as frozen and will
+be scored as written; this note pre-registers the base-rate explanation
+BEFORE results exist rather than reaching for it after. Paper anchor
+numbers (pr_auc_S16): sae_arditi 0.690 (s42) / 0.745 (s1); txc_base
+0.542 / 0.560 with shuffle_gap_S16 −0.059 / −0.002.
+
+(cell log: `run_em_panel.py` wall log + leaderboard rows)
 
 ## § 4 — Verdicts vs § 2 (blind: written against the frozen text above)
 
