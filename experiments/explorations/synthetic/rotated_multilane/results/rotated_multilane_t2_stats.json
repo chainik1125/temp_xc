@@ -1,0 +1,191 @@
+{
+ "card": "freqbench/cards/FB-4.md",
+ "inherited": {
+  "memorization_budget": "card \u00a7 5: |\u03a9|\u00b3M\u00b3 \u2248 1.03e9 templates is basis-independent; FB-2 audit inherited",
+  "shuffle_semantics": "unchanged from FB-2 (per-window independent permutations kill the phase progression; not a full null for power)"
+ },
+ "falsifier_t1_fired": false,
+ "arm_a": {
+  "seeds": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "base": [
+   {
+    "coord_kurtosis": 2.706027230897547,
+    "dct_high_frac": 0.2930241304787256,
+    "plane_coord_align": 0.389959196249644
+   },
+   {
+    "coord_kurtosis": 2.6848485597984157,
+    "dct_high_frac": 0.2972163249488077,
+    "plane_coord_align": 0.45532271762688953
+   },
+   {
+    "coord_kurtosis": 2.7035216919353875,
+    "dct_high_frac": 0.2956053986814109,
+    "plane_coord_align": 0.46308008829752606
+   },
+   {
+    "coord_kurtosis": 2.6640046785345954,
+    "dct_high_frac": 0.29261246118797,
+    "plane_coord_align": 0.48558034499486286
+   },
+   {
+    "coord_kurtosis": 2.7067020704743663,
+    "dct_high_frac": 0.3003392935778068,
+    "plane_coord_align": 0.4486527393261592
+   },
+   {
+    "coord_kurtosis": 2.7197679485991055,
+    "dct_high_frac": 0.2954590007578164,
+    "plane_coord_align": 0.41059185067812604
+   },
+   {
+    "coord_kurtosis": 2.7058469693871317,
+    "dct_high_frac": 0.29658599356841187,
+    "plane_coord_align": 0.4385005136330922
+   },
+   {
+    "coord_kurtosis": 2.673834344214645,
+    "dct_high_frac": 0.2978393057124973,
+    "plane_coord_align": 0.48541881144046783
+   }
+  ],
+  "rotated": [
+   {
+    "coord_kurtosis": 2.713978818552256,
+    "dct_high_frac": 0.29302413040469055,
+    "plane_coord_align": 0.4395746986071269
+   },
+   {
+    "coord_kurtosis": 2.68340297382705,
+    "dct_high_frac": 0.29721632493073286,
+    "plane_coord_align": 0.45169419050216675
+   },
+   {
+    "coord_kurtosis": 2.672296701735172,
+    "dct_high_frac": 0.2956053986976745,
+    "plane_coord_align": 0.4547196576992671
+   },
+   {
+    "coord_kurtosis": 2.661319468136876,
+    "dct_high_frac": 0.29261246132467295,
+    "plane_coord_align": 0.4911872943242391
+   },
+   {
+    "coord_kurtosis": 2.689157784224722,
+    "dct_high_frac": 0.3003392936739721,
+    "plane_coord_align": 0.4505979965130488
+   },
+   {
+    "coord_kurtosis": 2.702735614425229,
+    "dct_high_frac": 0.2954590007250442,
+    "plane_coord_align": 0.4993060380220413
+   },
+   {
+    "coord_kurtosis": 2.6999168408716376,
+    "dct_high_frac": 0.2965859935576637,
+    "plane_coord_align": 0.4532042940457662
+   },
+   {
+    "coord_kurtosis": 2.676026606771444,
+    "dct_high_frac": 0.29783930595098307,
+    "plane_coord_align": 0.4701153685649236
+   }
+  ],
+  "tests": {
+   "coord_kurtosis": {
+    "abs_mean_diff": 0.008214835662101017,
+    "perm_p": 0.367
+   },
+   "dct_high_frac": {
+    "abs_mean_diff": 4.399841602165111e-11,
+    "perm_p": 0.989
+   },
+   "plane_coord_align": {
+    "abs_mean_diff": 0.016661659503976523,
+    "perm_p": 0.2655
+   }
+  },
+  "separated": false
+ },
+ "bag": {
+  "bag_mlp_balacc": [
+   0.38812977805536986,
+   0.39071287086900536,
+   0.39781045105705254
+  ],
+  "chance": 0.1
+ },
+ "arm_b": {
+  "cells": [
+   {
+    "arch": "spectral_txc",
+    "k_pos": 1,
+    "kind": "untrained",
+    "fb4_vals": [
+     0.3060676724493594,
+     0.2726458478466856,
+     0.2912605607113395
+    ],
+    "fb2_ref": [
+     0.308811906292454,
+     0.28713042939935735,
+     0.2986665166187903
+    ],
+    "band_tol": 0.04336295378619326,
+    "inside_band": true
+   },
+   {
+    "arch": "spectral_txc",
+    "k_pos": 2,
+    "kind": "trained",
+    "fb4_vals": [
+     0.8009653073528483,
+     0.790680663913457,
+     0.7904296154233229
+    ],
+    "fb2_ref": [
+     0.7946752511626899,
+     0.7941122564663451,
+     0.7931761979795863
+    ],
+    "band_tol": 0.03,
+    "inside_band": true
+   },
+   {
+    "arch": "txc_batchtopk_post",
+    "k_pos": 2,
+    "kind": "trained",
+    "fb4_vals": [
+     0.4611533813024873,
+     0.46834494012466865,
+     0.46181716313974275
+    ],
+    "fb2_ref": [
+     0.4659907216529969,
+     0.46233991303016264,
+     0.45455737304473715
+    ],
+    "band_tol": 0.03,
+    "inside_band": true
+   }
+  ],
+  "outside_band": [],
+  "untrained_mean": 0.2899913603357948
+ },
+ "verdict": {
+  "arm_a_separated": false,
+  "arm_b_outside_band": [],
+  "untrained_spectral_mean": 0.2899913603357948,
+  "untrained_collapse_direction_confirmed": false,
+  "verdict": "ABORT_T2_SYMMETRY"
+ }
+}
