@@ -4,7 +4,7 @@
 "neither passes" branch; briefing outcome 3 — structure present but
 unextractable by these candidates). Card:
 [`prereg/estimator-card-c6-segment-extraction.md`](../prereg/estimator-card-c6-segment-extraction.md)
-(frozen `8c46a92b`, pre-build). Raw numbers:
+(frozen `be8e2b6d`, pre-build). Raw numbers:
 [`estimator_battery_c6.json`](estimator_battery_c6.json); λ-scans:
 [`estimator_battery_c6_lamscan.json`](estimator_battery_c6_lamscan.json).
 Zero API spend (committed r3 labels + synthetic toys only; cumulative

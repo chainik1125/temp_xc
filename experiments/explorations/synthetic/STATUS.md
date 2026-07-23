@@ -15,7 +15,7 @@ Last updated: 2026-07-23.
   r3 ABORT stands and the reasoning int/eq cell stays open with a
   sharper, now-mechanistic diagnosis.** Card frozen pre-build
   (`expansion/prereg/estimator-card-c6-segment-extraction.md`,
-  `8c46a92b`); two candidates ((A) null-calibrated global shrinkage with
+  `be8e2b6d`); two candidates ((A) null-calibrated global shrinkage with
   the insertion control moved in-loop; (B) per-doc 75th-percentile
   length-matched null deflation); battery on committed r3 labels +
   harness toys, **$0 API spend** (skeptic never reached; cumulative

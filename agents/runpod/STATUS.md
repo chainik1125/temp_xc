@@ -25,7 +25,7 @@ never reached). Full narrative: `expansion/results/estimator_battery_c6.md`
 + `estimator_battery_c6.json` + `estimator_battery_c6_lamscan.json`;
 LEDGER C6 cycle-log entry; research STATUS § 0 bullet; BENCHMARKS r3 row +
 prize paragraph updated. Key facts a reviewer will ask about:
-- Card frozen PRE-BUILD at `8c46a92b` (estimator-card-c6-segment-extraction
+- Card frozen PRE-BUILD at `be8e2b6d` (estimator-card-c6-segment-extraction
   + r4 amendment in proof-operation-phase-runs.md). Battery run exactly as
   frozen; nothing retuned after results.
 - Candidates in `src/explorations/synthetic/expansion/mirrors.py`
