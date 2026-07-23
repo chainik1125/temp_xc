@@ -26,10 +26,13 @@ multi-layer support (`configs/data.yaml` header hints `layers: [...]`);
 if single-layer only, loop it per layer rather than modifying core.
 New datasource entries in `configs/data.yaml` are append-only.
 
-**Session limits:** ~12 h wall · GPU is for *forward passes only* ·
-manage disk: full-depth fp16 caches for 8B × 4k seqs × 128 tok ≈ 70 GB
-per model at layer-stride 2 — **probe layer-by-layer and delete shards**
-if the volume is tight; keep only the probe stats. Rewrite
+**Session limits:** ~12 h wall · GPU is for *forward passes only* · disk
+is a **500 GB persistent network volume** — budget: phase-3 caches ≈
+72 GB/model at layer-stride 2 (≈ 144 GB for both), phase 4 ≈ 82 GB,
+phase 5 ≈ 28 GB, HF weights ≈ 70 GB. **KEEP the phase-3 (Ward) caches on
+the volume** — they are the input to the follow-up TXC-tracking session;
+delete the phase-4/5 shards after their probe stats are written. Put the
+HF cache on the volume (`HF_HOME=/workspace/hf`). Rewrite
 `agents/runpod-c/STATUS.md` before any compact.
 
 ## Phase 0 — provenance pin (~30 min, blocking for interpretation)
