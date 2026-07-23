@@ -167,3 +167,40 @@ oracle is the correct presence witness; MLP datum kept); 708 grid cells +
 2 disclosed 300-step smoke cells reconcile the leaderboard exactly; 0
 duplicate eval_keys; misses (txc-pre band; the sprint's multiband>vanilla
 headline) framed honestly. Cycle-level audit: `../freqbench/PORT.md` § H.
+
+## T=16 frontier addendum (FB-C2, 2026-07-23, runpod-b)
+
+**Design:** as the frequency addendum — window archs + the band pair at
+`T=16`, uniform cells, seeds {1,2,42} + untrained (162 cells, driver commit
+`32851ee8`, 870/870 grid ok, 0 failures). Frozen prediction (mac-local,
+`briefings/freqbench-t16-fbc2.md`, frozen 2026-07-23 pre-run): *"the 4-band >
+1-band margin (T=8: +0.019) vanishes or inverts at T=16 (≤ +0.01) — the band
+advantage is a coarse-window scarcity effect."* Scored blind post-run.
+
+**Verdict on the prediction — HELD at every capacity (one inversion).**
+Matched-budget margins (spectral_txc 4-band minus spectral_txc_full 1-band,
+k_pos=1, 3-seed means):
+
+| d_sae | T=8 margin | T=16 margin |
+|---|---|---|
+| 50  | +0.014 | **+0.008** |
+| 101 | +0.019 | **−0.015** (inverts) |
+| 202 | +0.017 | **+0.005** |
+
+All three T=16 margins ≤ +0.01; at the anchor capacity the ordering inverts
+outright. Combined with the FB-C1 finding (the frozen T=8 bar +0.03 already
+failed), the record now reads: **the sprint's multiband>vanilla headline is
+confined to coarse windows under plain-TopK scarcity — under the fair
+batch-pooled backbone the band-partition prior confers no frontier
+advantage, and the last trace of it vanishes by T=16.**
+
+**Context at T=16 (not part of the frozen claim):** spectral's frontier
+rises with the resolved ladder (d=101: 0.849, d=202: 0.930 vs 0.776/0.774
+at T=8) but its scarce-capacity cell collapses (d=50 k=1: 0.438 — k_win=16
+against 50 atoms; and d=50 k=2: 0.161, the FB-2 budget-collapse pattern one
+octave on). txc-post reaches 0.522–0.533 at k=2. The additive family stays
+pinned (pre ≤ 0.075, stacked ≤ 0.021 — P2 does not move with T). Untrained
+spectral access grows to 0.34–0.35 (from ~0.30 at T=8). FreqFrac T=16
+(seed 1, `freqfrac_stats_multilane_s1_T16.json`): trained spectral dc_frac
+0.211 vs init 0.426 — the same doubled DC-shedding as the frequency
+addendum.
