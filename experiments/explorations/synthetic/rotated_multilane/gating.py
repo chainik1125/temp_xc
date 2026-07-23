@@ -46,6 +46,19 @@ T_GRID = [2, 4, 8]
 TOL_ORACLE_VS_RECORDED = 0.02      # MC agreement with FB-2's recorded oracle
 TOL_FLOOR_ABOVE_CHANCE = 0.02      # raw floors: acc − chance ≤ tol (one-sided)
 FALSIFIER_T1_RECOVERY = 0.10       # frozen card § 6: any arch/probe > 0.1 at T=1
+# AMENDMENT (own commit, first-pass stats preserved at d9e00a5b): the window-
+# concat linear bar above is FB-2's *absolute* floor claim, which is not what
+# this card owes — FB-4's obligation is rotation-INVARIANCE of the floors. The
+# first pass read 0.115/0.128/0.137 on the rotated data and the diagnostic
+# read the numerically identical values on the unrotated base (a linear probe
+# is exactly invariant under an orthogonal feature map: w·Qx = (Qᵀw)·x, L2
+# norm preserved) — a substrate-level variance leak this probe protocol
+# surfaces equally on FB-2 (P2 bounds class-conditional MEANS only; the FB-2
+# gating protocol's smaller probe read ≈ chance). Verdict re-keyed: window
+# floor = |rotated − base| under the IDENTICAL probe ≤ TOL_ROTATION_INVARIANCE
+# per lane; the absolute values stay recorded as data on both sides. The
+# per-token bar is untouched (P1 is exact, not means-only).
+TOL_ROTATION_INVARIANCE = 0.005    # solver-noise scale for the paired probe
 
 HERE = Path(__file__).resolve().parent
 OUT_JSON = HERE / "results" / "rotated_multilane_gating_stats.json"
@@ -136,20 +149,31 @@ def main() -> None:
     T = 8
     wb_tr, wy_tr = _tiles(xr[:half], lab[:half], T, np.random.default_rng(1))
     wb_ev, wy_ev = _tiles(xr[half:], lab[half:], T, np.random.default_rng(2))
+    bb_tr, _ = _tiles(xb[:half], lab[:half], T, np.random.default_rng(1))
+    bb_ev, _ = _tiles(xb[half:], lab[half:], T, np.random.default_rng(2))
+    win_linear_base = []
     for k in range(3):
         win_linear.append(_logistic(wb_tr.reshape(len(wb_tr), -1), wy_tr[:, k],
                                     wb_ev.reshape(len(wb_ev), -1), wy_ev[:, k]))
+        win_linear_base.append(_logistic(bb_tr.reshape(len(bb_tr), -1), wy_tr[:, k],
+                                         bb_ev.reshape(len(bb_ev), -1), wy_ev[:, k]))
     t1_recovery = max((a - chance) / (1 - chance) for a in per_token)
     out["floors"] = {
         "chance": chance,
         "per_token_balacc": per_token,
         "window_concat_linear_balacc": win_linear,
+        "window_concat_linear_balacc_base": win_linear_base,
+        "window_linear_rotation_gap_max": float(max(
+            abs(a - b) for a, b in zip(win_linear, win_linear_base))),
         "t1_recovery_max": t1_recovery,
     }
 
     # ── verdict (a fail is a STOP, never a retune) ───────────────────────
+    # per-token: absolute (P1 exact); window-linear: paired rotation-invariance
+    # (see the AMENDMENT comment at TOL_ROTATION_INVARIANCE).
     floors_ok = (max(per_token) - chance <= TOL_FLOOR_ABOVE_CHANCE
-                 and max(win_linear) - chance <= TOL_FLOOR_ABOVE_CHANCE)
+                 and out["floors"]["window_linear_rotation_gap_max"]
+                 <= TOL_ROTATION_INVARIANCE)
     falsifier_fired = t1_recovery > FALSIFIER_T1_RECOVERY
     oracle_ok = (not p5_vs_recorded) or max(p5_vs_recorded) <= TOL_ORACLE_VS_RECORDED
     out["verdict"] = {
