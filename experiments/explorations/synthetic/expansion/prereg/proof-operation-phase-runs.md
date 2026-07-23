@@ -232,3 +232,26 @@ estimator code exists:
 _Amended-by: claude-fable-5 (runpod agent, Cycle 6 / expansion-c6
 briefing), preregistered before any C6 estimator implementation, battery
 run, or real-data measurement._
+
+
+## Amendment 2026-07-23 (b) — Cycle-7 mirror substitution (before any C7 build)
+
+The C6 battery returned an EMPTY passing set (neither card candidate;
+`results/estimator_battery_c6.md`, reviewed & APPROVED) — `-r4` never ran
+and this record name remains unused. The C7 re-freeze substitutes ONLY the
+mirror line of the Cycle-6 amendment; everything else (record name
+`proof-operation-phase-runs-r4`, gate-8 moments and tolerances, recorded
+insertion control, label reuse, skeptic protocol, coordinates and the
+stage-6 § 8 caveat) carries over verbatim:
+
+- **Mirror:** `seg_hier_categorical_mono` — the single candidate of the
+  frozen [C7 estimator card](estimator-card-c7-monotone-extraction.md)
+  (deconvolve-first, shrink-in-deconvolved-space; in-loop null
+  calibration with continuous λ). r4 runs ONLY if the card's monotonicity
+  pre-check and battery gates 1–3 pass and λ*_real ≤ 0.85; otherwise the
+  cell closes NEGATIVE at this corpus resolution per the card's
+  pre-specified fork — the LAST estimator cycle for this cell.
+
+_Amended-by: claude-fable-5 (runpod agent, Cycle 7 / expansion-c7
+briefing), preregistered before any C7 estimator implementation, battery
+run, or real-data measurement._
