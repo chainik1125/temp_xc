@@ -120,3 +120,30 @@ the skeptic pre-grid). 636/636 cells, 0 dup keys; misses (pre pair-leak
 low, post sign high, untrained-spectral at T=8) labeled as misses.
 Structural singleton-band sign-blindness feeds the subtype rule (README
 coordinates). Audit: `../freqbench/PORT.md` § H.
+
+## 7. T=16 frontier addendum (FB-C2, 2026-07-23, runpod-b)
+
+**Design:** window archs at `T=16`, uniform cells, seeds {1,2,42} + untrained
+(138 cells, driver commit `32851ee8`, 774/774 grid ok, 0 failures). Frozen
+prediction (mac-local, `briefings/freqbench-t16-fbc2.md`, frozen 2026-07-23
+pre-run): *"spectral sign recovery rises above its T=8 value 0.936 (every DCT
+band multi-index ⇒ quadrature partners everywhere); post stays ≈ 1.000."*
+Scored blind post-run.
+
+**Verdict on the prediction — HELD, both clauses.**
+
+- **Spectral sign rises: HELD.** At the matched cell (d=101, k=2, the T=8
+  0.936 reference): **0.978** (0.999/1.000/0.934). At k=1: **1.000** all
+  seeds (from 0.954 at T=8). At T=16 the multiband partition is [0] [1–5]
+  [6–10] [11–15] — every AC band multi-index, quadrature partners in every
+  branch, and the T≤4 structural sign-blindness is fully gone.
+- **Post stays ≈ 1.000: HELD.** 1.000 at k=2 (all seeds), 0.997 at k=1.
+- **Unfrozen observation (flagged as unfrozen):** *untrained* spectral sign
+  access reaches **0.93–0.96** at T=16 (from 0.673 at T=8, ≈0 at T≤4) — the
+  multi-index DCT prior alone nearly linearizes phase before any training.
+  The T-ladder of untrained spectral sign access (0 → 0.67 → 0.94) is the
+  cleanest architectural-prior curve in the suite: sign access is a pure
+  function of band multiplicity. The FB-2 budget-collapse pattern persists
+  on the sign axis (d=101: k=1 1.000 → k=4 0.785; d=50 k=2: 0.646).
+- Additive family stays dead on both components (|sign| ≤ 0.024, pair ≤
+  0.062); dissociation `pair ≥ sign` holds at every T=16 cell.
