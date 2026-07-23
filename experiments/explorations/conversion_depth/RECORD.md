@@ -227,7 +227,78 @@ phase-4 estimate: the verdict's actual substrate is the rollout cohort
 (~36 GB), not the 6000×128 training stream — we sweep the substrate the
 L15 verdict was measured on. Frozen prediction: § 2 P5 (flat).
 
-*(curves + verdict land below after the run)*
+### Results (frozen protocol; `results/phase4_em_depth.json`, fig `figs/em_depth.*`)
+
+Mean 4-fold test AUC (GroupKFold by prompt); nulls all in 0.493–0.509.
+
+| hs (resid_post L = hs−1) | per-token lin | window lin | **g(ℓ)** | tok MLP | win MLP |
+|---|---|---|---|---|---|
+| 0 (emb) | 0.531 | 0.548 | +0.017 | 0.535 | 0.573 |
+| 2 | 0.552 | 0.592 | +0.040 | 0.563 | 0.604 |
+| 6 | 0.606 | 0.645 | +0.039 | 0.627 | 0.692 |
+| 8 | 0.598 | 0.677 | +0.079 | 0.654 | 0.712 |
+| 10 | 0.645 | 0.765 | **+0.120** | 0.703 | 0.782 |
+| 14 | 0.673 | 0.807 | **+0.134** (peak) | 0.744 | 0.812 |
+| **16 (= L15, the paper's layer)** | 0.748 | 0.845 | **+0.097** | 0.807 | 0.851 |
+| 18 | 0.771 | 0.860 | +0.089 | 0.827 | 0.862 |
+| 22 | 0.735 | 0.836 | +0.100 | 0.760 | 0.853 |
+| 26 | 0.695 | 0.807 | +0.112 | 0.746 | 0.840 |
+| 28 (last) | 0.694 | 0.758 | +0.064 | 0.743 | 0.792 |
+
+**Verdict on the frozen P5: FALSIFIED.** g(ℓ) is NOT flat: it rises
+from ≈ 0 at the embedding layer to a mid-depth plateau of +0.09…+0.13
+(≫ 3 σ_null), peaking at resid_post L13 and still +0.097 at the
+paper's own L15. The EM label (rollout misalignment, Sonnet align ≤ 50)
+is *not* per-token-ambient in the raw stream at mid depth: a 16-token
+window reads it ≈ 0.10 AUC better than a single token — at every layer
+except the embeddings and (partially) the final layer.
+
+**Interpretation (with the post-hoc decomposition below):** the § 5.3
+shuffle_gap ≈ 0 measured ORDER-insensitivity of trained codes; g(ℓ)
+measures window-over-token access. Both can hold simultaneously if the
+window's advantage is order-free evidence pooling of a noisy ambient
+signal. The post-hoc window-MEAN probe splits g into
+g_agg (mean − token) + g_order (flatten − mean):
+
+| hs | tok | win-mean | win-flat | g_agg | g_order |
+|---|---|---|---|---|---|
+| 0 | 0.531 | 0.567 | 0.548 | +0.036 | −0.019 |
+| 8 | 0.598 | 0.648 | 0.677 | +0.050 | +0.029 |
+| 10 | 0.645 | 0.731 | 0.765 | +0.086 | +0.034 |
+| 12 | 0.695 | 0.742 | 0.794 | +0.048 | +0.051 |
+| **14 (L13)** | 0.673 | 0.699 | 0.807 | +0.026 | **+0.108** |
+| **16 (L15)** | 0.748 | 0.791 | 0.845 | +0.043 | **+0.054** |
+| 18 | 0.771 | 0.836 | 0.860 | +0.065 | +0.024 |
+| 24 | 0.695 | 0.788 | 0.811 | +0.094 | +0.022 |
+| 26 | 0.695 | 0.793 | 0.807 | +0.098 | +0.014 |
+| 28 | 0.694 | 0.728 | 0.758 | +0.035 | +0.029 |
+
+The gap is NOT pure aggregation: alongside a depth-growing order-free
+pooling component (g_agg up to ≈ +0.10), a genuine position-sensitive
+component exists — peaking at **+0.108 at resid_post L13** and still
++0.054 at the paper's L15 (hs0's −0.019 shows the flatten-probe noise
+scale ≈ 0.02–0.03; the mid-depth g_order values clear it). Caveat:
+g_order measures position-sensitivity of the optimal linear readout —
+recency-weighting suffices to produce it; it is not proof of
+cross-position comparison structure.
+
+### § 4 verdict
+
+1. **The EM negative's ambience explanation does not generalize across
+   depth or readout**: the misalignment label has substantial
+   window-over-token raw access (g ≈ +0.10–0.13) throughout mid depth,
+   including at L15 itself — the single-layer shuffle_gap ≈ 0 result
+   cannot carry "the property is ambient; no window advantage exists."
+2. What it CAN still carry: trained per-token codes pooled over the
+   window may capture the order-free share (g_agg). But the
+   position-sensitive share (g_order up to +0.11 at L13) is headroom a
+   position-aware window architecture could exploit and a pooled
+   per-token read cannot — the depth-resolved TXC-tracking test now has
+   a concrete EM prediction, not just a backtracking one.
+3. Substrate honesty: measured on the § 5.3 stage-4 steered-rollout
+   cohort (the verdict's own substrate), raw-linear probes, GroupKFold
+   by prompt. Alpha-steering means some rollouts are off-distribution;
+   the label mixes steering-induced and organism-native misalignment.
 
 ---
 
