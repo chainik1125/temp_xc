@@ -364,3 +364,61 @@ Full audit against the frozen checklist:
 
 T=16 frontier addendum + verify_theory ports remain queued (not run).
 Briefing `freqbench-c1.md` deleted at this review.
+
+### G.2 T=16 lens rows (FB-C2, 2026-07-23, runpod-b)
+
+The merged table (`freqfrac_merge.py`, now covering the three FB tone/CS
+benches and a `T=16` row tier; same tag convention, seed 1) gains the
+frontier octave alongside the T=16 grid addendum. Reads, all init-relative
+(absolute concentrations are not comparable across T — the uniform-init
+baseline falls with band count: conc-init 0.53/0.28/0.17 at T=4/8/16):
+
+- **Trained spectral sheds DC roughly twice as hard at T=16** on both tone
+  benches: frequency dc 0.333→0.226 (T=8: 0.335→0.287), multilane
+  0.426→0.211 (T=8: 0.387→0.321) — the weight-space image of the resolved
+  Ω ladder ("high-pass sharpens", the frozen frequency prediction's lens
+  half, HELD).
+- **txc-post's concentration ratio over init keeps rising with T**
+  (frequency 1.72×@T8 → 2.41×@T16; multilane 2.66× → 4.84×) — increasingly
+  tone-like atoms exactly where its recovery rises.
+- **The additive family stays at init at every T** (stacked/pre within
+  0.01–0.03 of init dc and conc at T=16) — the P2 wall is T-independent in
+  weight space too.
+
+## I. Cycle log — FB-C2 (2026-07-23, runpod-b)
+
+**Briefing:** `briefings/freqbench-t16-fbc2.md` (stays until mac-local
+review). **Protocol:** LOOP.md incl. the new strict commit-then-run T3.
+**Spend:** $1.36 / $25 cumulative on the freqbench meter (1 skeptic call
+this cycle). **Compute:** 2,560 grid-driver cells (916+870+774 across the
+three tone benches, T≤8 cache-fast-forwarded, 462 fresh T=16 cells) + 9
+FB-4 gating-panel cells + 3 FreqFrac T=16 passes; 0 failures anywhere.
+**Tests:** 173 pass (+13 this cycle).
+
+| phase | outcome |
+|---|---|
+| 1. T=16 frontier addendum | Drivers extended + committed pre-run (`32851ee8`). **All three frozen mac-local predictions HELD blind:** (1) multilane band margin ≤ +0.01 at every capacity, inverts at d=101 (−0.015) — band advantage confined to coarse windows; (2) phasepair spectral sign 0.978@k2 / 1.000@k1 above the 0.936 reference, post stays 1.000; (3) frequency spectral saturates 0.997–0.999 everywhere + FreqFrac high-pass sharpens (dc-shedding doubles). Addendum sections in the three records; § G.2 lens rows |
+| 2. verify_theory ports | `tests/test_verify_theory.py` — 9 permanent analytic tests pinning P2 (phase-averaging + the order-2 converse with exact cos(2πy/M) means), P5 (periodogram≡ML decisions ≥ 0.995; Dirichlet gram to 1e-9; behavioral Rayleigh at elevated σ), CS-2 (population lag-covariances; eigen-recovery ≫ shuffled control; γ-dependence) to the BUILT generators; thresholds are margins around measured values, seconds-fast |
+| 3. card FB-4 rotated_multilane | Card frozen pre-build (`adc6bb28`, mac-local directions verbatim + absorption obligation added at freeze) → thin generator + datasource + contract tests → gates committed pre-run (`6e627593`) → T1 PASS after one amendment (window-linear floor re-keyed to rotation-invariance; first-pass FAIL preserved `d9e00a5b`) → **T2 ABORT_T2_SYMMETRY per the pre-registered rule** (arm A p 0.27–0.99; arm B all 9 canonical cells inside FB-2 seed bands — untrained spectral 0.290 vs 0.298, the frozen collapse direction REFUTED) → **skeptic ABORT confirmed** (kills exactly b_triviality + d_redundancy; absorption judged sound; amendment judged honest). No grid spent. BENCHMARKS § B row added |
+
+**The cycle's headline.** Two results: (i) the **T=16 frontier confirms the
+coordinate model's extrapolations 3-for-3 blind** — the sharpest being the
+band-margin inversion and the untrained-spectral sign ladder (0 → 0.67 →
+0.94 at T = 4 → 8 → 16: phase access is a pure function of band
+multiplicity, an architectural *prior*, before training); (ii) the **FB-4
+abort with the absorption theorem**: for any generator whose embedding is
+Haar-random and seed-re-drawn, a fixed spatial orthogonal knob is provably
+inert — the intended basis-alignment acid test needs a *temporal* knob
+(candidate FB-5, deliberately unfrozen, for review). The frozen
+"untrained-spectral collapse" direction failed exactly as the absorption
+argument predicted, measured at gating scale without spending a grid.
+
+**Process notes for review.** Strict commit-then-run held everywhere (all
+gating/driver scripts committed before first execution; the one amendment
+is its own commit pair with the failing first pass preserved). One datum
+left for the program: FB-2's raw-window-linear "≈ chance" floor is
+probe-protocol-conditional (0.10 → 0.13 under a larger-sample probe,
+identically on rotated and base — P2 bounds means only). The skeptic's
+checklist-item proposal (kill spatial-rotation cards on Haar seed-re-drawn
+substrates at freeze) is left for mac-local — program-rule changes are out
+of session scope.
