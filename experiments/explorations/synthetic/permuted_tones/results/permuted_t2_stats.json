@@ -1,0 +1,31 @@
+{
+ "card": "freqbench/cards/FB-5.md",
+ "seed": 0,
+ "chance": 0.1,
+ "audits": {
+  "memorization": "K*M = 1,010 clean window templates vs d_sae <= 202 at every grid cell (frequency count); schedule table re-drawn per seed => no cross-seed template pooling; no memo-demo cell this cycle (card \u00a7 3 P6)",
+  "symmetry": "generic iid-uniform schedules: no symbol relabeling maps class to class while fixing the circle geometry; retained empirical control = frequency's random-embedding null (card \u00a7 7)",
+  "probe_budget": "30k probe rows >> max code dim 202 (F-rule)"
+ },
+ "shuffle": {
+  "4": {
+   "oracle_intact": 0.995125,
+   "oracle_shuffled": 0.196875
+  },
+  "8": {
+   "oracle_intact": 1.0,
+   "oracle_shuffled": 0.125375
+  }
+ },
+ "bag": {
+  "linear_balacc": 0.09918340029393773,
+  "mlp_balacc": 0.15114797871176094,
+  "note": "MLP-on-bag is the order-free set-matching reference (card \u00a7 3: NOT a kill \u2014 the card claims linear-additive deadness, not order-necessity); linear-on-bag is P2's claim and must sit \u2248 chance"
+ },
+ "verdict": {
+  "bag_linear_at_chance": true,
+  "bag_mlp_reference": 0.15114797871176094,
+  "shuffle_degrades_oracle": true,
+  "passes_t2": true
+ }
+}
