@@ -1,0 +1,60 @@
+{
+ "card": "freqbench/cards/FB-4.md",
+ "seed": 0,
+ "params": {
+  "M": 101,
+  "omega": [
+   0,
+   1,
+   2,
+   4,
+   8,
+   16,
+   24,
+   32,
+   40,
+   50
+  ],
+  "d_in": 24,
+  "sigma": 0.25,
+  "n_seqs": 6000
+ },
+ "by_T": {
+  "2": {
+   "oracle": 0.42,
+   "exact_decision_equality": true,
+   "fb2_recorded_oracle": 0.4208222222222222
+  },
+  "4": {
+   "oracle": 0.7453777777777777,
+   "exact_decision_equality": true,
+   "fb2_recorded_oracle": 0.7501444444444445
+  },
+  "8": {
+   "oracle": 0.9041777777777779,
+   "exact_decision_equality": true,
+   "fb2_recorded_oracle": 0.9058666666666667
+  }
+ },
+ "floors": {
+  "chance": 0.1,
+  "per_token_balacc": [
+   0.10031316771358352,
+   0.10066003692184075,
+   0.09856664173472637
+  ],
+  "window_concat_linear_balacc": [
+   0.11502454280463636,
+   0.12844154319361825,
+   0.1371655313141317
+  ],
+  "t1_recovery_max": 0.0007333743576008281
+ },
+ "verdict": {
+  "p5_exact_decision_equality": true,
+  "p5_oracle_matches_fb2_recorded": true,
+  "p1_p2_floors_at_chance": false,
+  "falsifier_t1_fired": false,
+  "passes_t1": false
+ }
+}
