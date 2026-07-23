@@ -221,6 +221,35 @@ per T tokens (k_win actives) where token archs emit one per token.
 
 ---
 
+## 7. T-scaling — the window-size response is diagnostic, not monotone
+
+"Recovery should improve as T grows" holds exactly where theory says it
+should, and fails exactly where it shouldn't — three patterns, all under
+frozen predictions:
+
+- **Resolution-limited latents → monotone to saturation** (Rayleigh,
+  resolution ∝ 1/T): frequency Spectral 0.78 (T=4) → ≈ 1.00 (T=16, blind
+  3/3 addendum); multilane post 0.10 → 0.23 → 0.46 and Spectral → 0.79
+  at T = 2/4/8; phasepair post 0.76 → 0.98 → 1.000, with Spectral's sign
+  as the structural-threshold variant (0 at T ≤ 4 → 0.94 at T=8 → 1.00
+  at T=16 — band multiplicity, an architectural prior switching on).
+- **Threshold latents → a step at the provable window, flat beyond**:
+  colored_sources realizes the CS-2 **W = D+1 transition** (pre −0.01 →
+  +0.11 → +0.10 at T = 2/4/8); backtracking saturates at 0.95 once T
+  covers the kernel support (T ≥ 4).
+- **Localized latents → peak at the latent's span, DECLINE beyond**:
+  recipe equality residual Spectral **+0.96 at T=2** (the window spanning
+  the adjacent pair) → −0.08 at T=4 → negative at T=8; changepoint's
+  boundary τ likewise best at tiny T. A window larger than the structure
+  dilutes a fixed code budget over irrelevant positions.
+
+Upshot: **choose T from the property's temporal scale** — measurable
+before training via the ambience machinery plus a raw T-sweep. A flat or
+non-monotone T-response is not a defect of window architectures; it is a
+measurement of the latent's support.
+
+---
+
 *Regenerate: `render_report.py` (matrix, panels, REPORT figures) and
 `story_figs.py` (isolation figure, `story_stats.json`, param counts) — both
 read only `results/leaderboard.jsonl` and the registered arch classes.*
