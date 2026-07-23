@@ -440,4 +440,38 @@ robustness is needed; raw ceilings are base/IT-equivalent at L13.
    advantage should track the flat +0.04 margin (backtracking, any
    layer) and the mid-depth EM curve (peak L13), with the EM g_order
    slice the strongest candidate for a position-aware architecture win.
+
+---
+
+## § 7 — Review (2026-07-23, mac-local) — APPROVED; all four verdicts stand
+
+Freeze integrity verified: § 2 prereg committed before any 8B probing;
+the phase-4 and phase-5 protocols each committed before their runs; the
+aggregation-vs-order decomposition correctly labeled post-hoc with its
+motivation recorded pre-run; the probe-stack falsifier never triggered
+(min g = +0.030). The three falsified predictions (P1 shape, P3
+generator-edge — the reviewer's own prior, P5 EM-flat) are scored
+plainly and each falsification is *more* valuable than a confirmation
+would have been. Substrate-audit items 2/3/5 are now answered and the
+audit doc is updated. Consequences adopted at this review:
+
+- `docs/ideas/conversion_depth.md` updated — the monotone-shrinking
+  g(ℓ) template holds only for lexical/day-stride latents; grounded
+  labels show a flat never-converted plateau (backtracking) or a
+  mid-depth inverted-U (EM).
+- **Camera-ready actions (owner: user/mac-local, rebuttal-relevant):**
+  § 5.2 should describe the L10 anticipation signal as reader-
+  predictability (with the late-layer ≤ +0.02 generator margin as
+  follow-up); § 5.3's negative must be scoped to "trained-code
+  shuffle-gap at L15" — the raw window-over-token access (+0.13 peak,
+  +0.097 at L15 itself, g_order +0.11 at L13) is real headroom, and
+  arguably *strengthens* the paper's motivation: a positive EM window
+  result may exist at the right layer with a position-aware code.
+- One methods caveat carried: window-MLP presence probes are unstable at
+  65k dims (presence uses max(linear, MLP)); the g(ℓ) linear pair is
+  unaffected. The EM cohort's α-steering distribution note (§ 4.3) must
+  travel with any future EM-depth claim.
+- Ward + EM caches preserved on the runpod-c volume; the TXC-tracking
+  session (§ 6.6 predictions) is the designated follow-up and must run
+  ON runpod-c (the CPU pods cannot see the volume).
    Caches for both § 3 arms + the EM cohort are preserved on the volume.

@@ -46,6 +46,21 @@ per-token SAE at layer ℓ **tracks g(ℓ)**; for EM, g(ℓ) ≈ 0 everywhere. I
 the tracking prediction holds, "which layer should a TXC live at" gets a
 cheap pre-training answer — the depth analogue of the ambience rule.
 
+**UPDATE (2026-07-23, ablation run — `experiments/explorations/
+conversion_depth/RECORD.md`, reviewed):** the monotone-shrinking template
+survives ONLY for the lexical/day-stride case (GPT-2: converted by block
+1). Grounded labels show two other shapes: backtracking anticipation is a
+**flat, never-converted plateau** (+0.03…+0.06 AUC at every residual
+layer of both 8B models — mostly order-free aggregation; L10 fine but
+not special; the signal is reader-predictability, base ≈ generator, with
+a ≤ +0.02 generator margin only in the last third of depth), and EM
+misalignment is an **inverted-U** (peak +0.13 at L13, +0.097 at the
+paper's L15, with a real position-sensitive slice g_order +0.11 at L13 —
+the § 5.3 "ambient ⇒ no window advantage" reading is falsified across
+depth). The g(ℓ) machinery itself validated cleanly; the TXC-tracking
+test is the open follow-up, with the EM g_order slice the strongest
+candidate for a position-aware architecture win.
+
 ## Compute + status
 
 Needs multi-layer activation caches from the subject models (the paper's

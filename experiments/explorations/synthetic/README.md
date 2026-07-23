@@ -168,7 +168,14 @@ winner from it:
   code (Spectral-TXC) linearizes it — multilane power +0.79, recipe
   equality residual +0.96, while TXC-post caps at the additive ceiling
   there: colloquial "coincidence detection" does *not* extend to
-  identity-matching.
+  identity-matching. **Alignment qualifier (FB-5 `permuted_tones`,
+  reviewed):** this leg holds *when the power concentrates in few DCT
+  bands*. On spectrally-generic schedules (random permutations of the
+  tone map) trained spectral is numerically pinned to the
+  band-energy-envelope reference at every T — it reads envelopes, not
+  structure — and TXC-post is the only architecture reading temporal
+  structure beyond the envelope (weakly: ≤ 16 % of the matched-filter
+  ceiling at the matched budget).
 - **covariance-accumulable (order-2 but additively summable across the
   window):** the additive-gated T-spanning decoder (TXC-pre) — the only
   lift on colored_sources (ρ-ordered), with both coincidence-family codes

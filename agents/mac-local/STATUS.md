@@ -1,56 +1,57 @@
 # Working state — agent `mac-local`
 
-**Last rewrite:** 2026-07-23 (post round-2 review + dispatch).
+**Last rewrite:** 2026-07-23 (post round-3 review).
 
 ## Who / where
 Local CC on the Mac at `~/research/projects/temp_xc`. Role: prototyping,
-review, orchestration. Three runpod agents: `runpod` (PhenBench, 32C),
-`runpod-b` (FreqBench, 32C), `runpod-c` (H100 + 700 GB persistent volume
-— conversion-depth/audit line). Identities via `/workspace/.agent_id`.
+review, orchestration. Three runpod agents, ALL IDLE (no active
+briefings): `runpod` (PhenBench, 32C), `runpod-b` (FreqBench, 32C),
+`runpod-c` (H100, 700 GB volume — holds the preserved Ward 144 GB + EM
+36 GB caches; only IT can see them).
 
 ## Git
-Branch `arxiv`; tip = the round-2 review/dispatch commit (clean, pushed).
+Branch `arxiv`; tip = the round-3 review commit (clean, pushed).
 
-## ✅ Last completed: ROUND-2 REVIEW + next dispatch (2026-07-23)
+## ✅ Last completed: ROUND-3 REVIEW (2026-07-23) — all three APPROVED
 
-- **C6 APPROVED** (empty passing set — honest double-negative; review in
-  `expansion/results/estimator_battery_c6.md`). **FB-C2 APPROVED**
-  (T=16 addendum 3-for-3 blind; FB-4 ABORT via absorption theorem — my
-  card defect, scored honestly; PORT § I review + rotated_multilane § 6).
-- Rules adopted at review: **non-absorption obligation** (LOOP card
-  item 1) · **phase leg T-conditional on band multiplicity** (README
-  subtype rule) · **commit-citation rule** (agents/README — stale-SHA
-  recurrence) · **variance-aware margins** for estimator cards ·
-  battery scripts under strict commit-then-run too.
-- Dispatched (~10 h each): `briefings/expansion-c7.md` (monotone
-  deconvolve-first estimator; pre-specified fork — SPEC graduation or
-  NEGATIVE close at this corpus resolution; LAST estimator cycle) ·
-  `briefings/freqbench-fb5.md` (FB-C3: `permuted_tones` — random
-  permutation schedules on the frequency substrate; my frozen
-  directions incl. the spectral-below-post reversal bet; envelope
-  reference control; non-absorption § mandatory).
-- `runpod-c` mid-session (briefing stays): provenance PINNED (Ward
-  traces R1-Distill-generated), GPT-2 validation ALL PASS, both 72 GB
-  caches built, base probes running, EM organism resolved (Qwen-7B +
-  andyrdt bad-medical LoRA, 1,728 rollouts), phase 5 delegated.
+- **C7 close** — reasoning int/eq NEGATIVE at corpus resolution; prize
+  half-claimed by design (text ✓ / reasoning ✗-at-resolution); LAST
+  estimator cycle honored; reopening = data lever (more/longer traces).
+- **FB-5 permuted_tones** — POSITIVE (weak realization), ALIGNMENT fork:
+  spectral is quantitatively the envelope reader; power leg qualifier
+  adopted into README ("…when power concentrates in few DCT bands").
+  My literal T=8 k=2 bet FAILED (scored against me in the record §5);
+  mechanism clause held precisely. Cleanest process cycle yet (zero
+  amendments, first-run gates).
+- **Conversion-depth** — audit items 2/3/5 ANSWERED (§ Resolution in
+  `docs/substrate_audit_2026-07.md`): §5.2 = reader-predictability
+  (base ≈ generator; late-layer ≤+0.02 margin = follow-up); §5.1
+  harmless; **EM negative depth-confounded** (inverted-U, peak +0.13,
+  g_order +0.11 at L13). My P3 prior falsified too. Idea doc updated
+  (three g(ℓ) shapes). Camera-ready actions in RECORD § 7.
+- Hygiene: 0 dup keys / 7,116 rows; 179 tests green; spends $11.01
+  expansion / $1.63 freqbench cumulative. All briefings deleted.
 
-## ⏭ NEXT
+## ⏭ NEXT: the fork — waiting on the USER
 
-1. Review `runpod-c`'s conversion-depth session when it stops — key
-   deliverables: g(ℓ) base-vs-distill curves, the L10 verdict, EM
-   depth-confound check. Then design the TXC-tracking follow-up (must
-   run ON the H100 pod — 32C pods can't see the volume).
-2. Review C7 + FB-5 at their gates (gate-integrity first; check FB-5's
-   envelope reference was measured, not gamed; check C7's monotonicity
-   pre-check ran before gates).
-3. My open design debt: FB-5's frozen directions are my bets — score
-   honestly at review, incl. against me (FB-4 precedent).
-4. NeurIPS reviews may land — rebuttal pivots take priority
-   (memory `project-txc-paper-context`).
+(a) **TXC-tracking session on runpod-c** (must run there — caches on its
+    volume): train dictionaries per layer on Ward + EM caches; test
+    "trained-TXC advantage tracks g(ℓ)"; EM g_order slice (+0.11 at
+    L13) = the strongest candidate for a grounded position-aware win.
+    Predictions pre-written in conversion_depth RECORD § 6.6.
+(b) **Camera-ready / rebuttal edits** — §5.2 reader-predictability
+    reframe; §5.3 scope-narrowing (+ the positive spin: window headroom
+    at the right layer is REAL); §5.1 stated-choice line. NeurIPS
+    reviews may already be out.
+(c) New-data lever for the reasoning cell (more/longer traces).
+(d) Next FreqBench axis point — axis-3 localization is the one
+    uninstrumented axis (burst/wavelet vs stationary).
 
 ## Standing context
-- Ambience principle + order-2 subtype rule (now T-conditional):
-  README coordinates; memory `project-ambience-principle`.
-- Trackers: BENCHMARKS.md (10 live + § B aborts incl. FB-4) ·
-  expansion/LEDGER.md (C7 = last estimator cycle) · REPORT.md 90/90 ·
-  freqbench/PORT.md § G–I · `docs/substrate_audit_2026-07.md`.
+- Ambience principle + subtype rule (phase leg T-conditional; power leg
+  alignment-qualified): README coordinates; memory
+  `project-ambience-principle`.
+- Trackers: BENCHMARKS.md (11 live + § B aborts) · expansion/LEDGER.md
+  (CLOSED through C7) · REPORT.md 96/96 · freqbench/PORT.md § G–J ·
+  `docs/substrate_audit_2026-07.md` (RESOLVED) ·
+  `conversion_depth/RECORD.md`.

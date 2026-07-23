@@ -10,6 +10,29 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **ROUND-3 REVIEW DONE (2026-07-23, mac-local) — ALL THREE sessions
+  APPROVED; all verdicts stand; no active briefings.** (1) **C7 close
+  APPROVED** — the reasoning int/eq cell is NEGATIVE at this corpus
+  resolution; the int/eq prize ends half-claimed by design (review in
+  `expansion/results/estimator_battery_c7.md`). (2) **FB-5 APPROVED** —
+  the ALIGNMENT fork stands; **the subtype rule's power leg now carries
+  the alignment qualifier in the README** ("…when the power concentrates
+  in few DCT bands"); mac-local's literal T=8 k=2 bet failed and is
+  scored as such; envelope-reference caveat added in the record § 5.
+  (3) **Conversion-depth APPROVED** — three audit arms answered
+  (`docs/substrate_audit_2026-07.md` § Resolution): § 5.2 =
+  reader-predictability; § 5.1 straddle harmless; **the EM negative is
+  depth-confounded** (g peaks +0.13 mid-depth, g_order +0.11 at L13) —
+  camera-ready actions recorded in RECORD § 7; idea doc updated (three
+  g(ℓ) shapes: converted / flat-plateau / inverted-U). Hygiene: 0 dup
+  keys / 7,116 rows; 179 tests green. **Next fork (user decides):**
+  (a) the **TXC-tracking session on runpod-c** (caches preserved; EM
+  g_order slice = the strongest candidate for a grounded position-aware
+  win — concrete predictions in RECORD § 6.6); (b) camera-ready /
+  rebuttal edits from the § 5.2 + § 5.3 findings; (c) new-data lever for
+  the reasoning cell (more/longer traces); (d) next FreqBench axis
+  point (axis-3 localization remains the uninstrumented axis).
+
 - **EXPANSION C7 DONE (2026-07-23, runpod) — THE REASONING INT/EQ CELL IS
   CLOSED: NEGATIVE at this corpus resolution.** The LAST estimator cycle,
   run exactly by the pre-build frozen card

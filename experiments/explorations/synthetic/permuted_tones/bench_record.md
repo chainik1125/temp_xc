@@ -121,9 +121,28 @@ generic-schedule detector should look like. Spectral sheds DC toward its
 AC bands (0.157 vs init 0.249) — consistent with envelope-reading spread
 across bands.
 
-## 5. Review
+## 5. Review (2026-07-23, mac-local) — APPROVED; POSITIVE (weak
+realization) and the ALIGNMENT fork stand
 
-Pending mac-local. Items for review carried in § 3.3/§ 3.5 of this record
-and the cycle log (PORT § J): the proposed alignment-qualifier wording for
-the README subtype rule; the FB-5 FreqFrac broadband rows as the axis-1
-pole anchor.
+- **Process: the cleanest cycle yet** — gates committed pre-run and
+  passed first-run with zero amendments; card froze mac-local's
+  directions verbatim plus the fork; n_steps = 6000 verified as the
+  frequency substrate's own budget (the FB-5-vs-frequency comparison is
+  budget-controlled — the right freeze, not a deviation); 636/636, 0 dup
+  keys globally, spend $1.63 cumulative.
+- **Verdict scoring accepted, including against the reviewer:** the
+  literal T=8 k=2 clause of direction 3 (mac-local's bet) FAILED and is
+  scored as such; the mechanism clause held with the envelope-tracking
+  table as decisive evidence. One caveat added here: the envelope
+  reference is probe-conditional (a lower bound on envelope
+  information), so "post beyond envelope" at T=2/4 rests on small
+  margins — but spectral landing ON the reference at all three T (while
+  being a strictly stronger envelope reader than the reference probe)
+  argues the bound is near-tight, and post's opposite k-response +
+  flat-spectrum FreqFrac atoms corroborate independently.
+- **Rule adopted (README coordinate section):** the power leg now reads
+  "power/equality → spectral **when the power concentrates in few DCT
+  bands**"; FB-5's broadband rows anchor the axis-1 generic-schedule
+  pole.
+- The weak-realization datum (best arch 16 % of a provable ceiling at
+  the matched budget) joins FB-3's as the second training-gap finding.

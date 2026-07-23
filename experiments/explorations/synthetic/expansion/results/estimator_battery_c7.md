@@ -79,3 +79,19 @@ measured contrast — not estimator work.
 _Recorded-by: claude-fable-5 (runpod agent, Cycle 7 / expansion-c7
 briefing), 2026-07-23. Card and scripts committed before execution; fork
 followed verbatim; skeptic verdict persisted raw pre-parse, no kills._
+
+## Review (2026-07-23, mac-local) — APPROVED; the CLOSE stands
+
+Freeze order proven (card → scripts pre-run → close, 13:56 → 14:00 →
+14:08); both close-conditions fired independently and the fork was
+followed without discretion; the variance-aware rule adopted at the C6
+review decided the gate-2 boundary case exactly as intended. The
+sharpest fact — the family's fully-inert limit alone over-generates
+mid-lag on permuted real streams (+0.018 > 0.014) — makes this close
+robust to any future estimator inside this family: the null floor, not
+extraction skill, binds. The three-generation arc (C5 over-extraction →
+C6 non-monotonicity → C7 honest inert calibration) is the loop working
+as designed. **The int/eq prize ends half-claimed: text POSITIVE
+(stage-6 #3b) / reasoning NEGATIVE-at-resolution. Reopening requires
+more/longer traces — logged as a data lever, not a cycle.** Spend $0.19
+verified.

@@ -80,3 +80,30 @@ Items 2 + 5 (+3 as stretch) form the empirical program of the
 `conversion-depth` briefing (GPU pod `runpod-c`). Items 1, 4 stand as
 approved. Item 6 is a standing constraint recorded here and in the
 research STATUS roadmap.
+
+## Resolution (2026-07-23 — the conversion-depth session answered the open items)
+
+Full evidence: `experiments/explorations/conversion_depth/RECORD.md`
+(reviewed & approved).
+
+- **Item 2 (§ 5.2 base reader vs generator) — ANSWERED: the signal is
+  reader-predictability.** Provenance pinned first (the Ward traces ARE
+  R1-Distill generations). Base and generator carry the anticipation
+  signal near-identically (per-token |Δ| ≤ 0.007 everywhere; window
+  Δ ≤ +0.02, late layers only). Camera-ready: state the claim as textual
+  predictability of upcoming backtracking; the late-layer generator
+  margin is the follow-up target for intention-like signal.
+- **Item 3 (§ 5.1 gemma base/IT straddle) — ANSWERED: harmless.** Raw
+  L13 probing ceilings equivalent (mean |Δ| 0.005 over 33 tasks; the one
+  crossing is a both-models-degenerate probe artifact). Fix = state the
+  choice; no results caveat needed.
+- **Item 5 (single-layer depth confound) — ANSWERED, and it bit exactly
+  where predicted:** backtracking g(ℓ) is a flat open plateau (L10 fine
+  but not special — any residual layer works); **the EM negative IS
+  depth-confounded** — g(ℓ) peaks +0.13 mid-depth with +0.097 at L15
+  itself and a position-sensitive slice +0.11 at L13. § 5.3's scope must
+  narrow to "trained-code shuffle-gap at L15"; the raw window headroom
+  is real and is the strongest known candidate for a grounded
+  position-aware win (TXC-tracking follow-up).
+- Items 1, 4 stood approved; item 6 (sentence-vs-token clock) remains a
+  standing constraint for the grounded real-side.
