@@ -10,6 +10,26 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **ROUND-2 REVIEW DONE (2026-07-23, mac-local) — C6 and FB-C2 both
+  APPROVED; next briefings dispatched (~10 h sessions).** Audit: C6's
+  empty-passing-set verdict stands (battery review in
+  `expansion/results/estimator_battery_c6.md`); FB-C2's T=16 3-for-3 +
+  FB-4 ABORT stand (PORT § I review; `rotated_multilane/bench_record.md`
+  § 6). The strict commit-then-run rule passed its first live test
+  (FB-4's amendment is a clean FAIL→re-key→PASS commit triple). Hygiene:
+  0 dup eval_keys / 6,480 rows; 173 tests green. **Rules adopted:**
+  non-absorption obligation on cards (LOOP item 1); subtype rule's phase
+  leg now T-conditional on band multiplicity (README — the untrained
+  sign ladder 0→0.67→0.94); commit-citation rule (agents/README);
+  variance-aware margins for estimator cards. **Dispatched:**
+  `briefings/expansion-c7.md` (runpod — monotone deconvolve-first
+  estimator, pre-specified close either way; LAST estimator cycle) and
+  `briefings/freqbench-fb5.md` (runpod-b — `permuted_tones`, the
+  temporal-knob acid test with the envelope-reference control).
+  `runpod-c` still mid-session (conversion-depth; provenance already
+  PINNED: Ward traces ARE R1-Distill-generated — the § 5.2 base-reader
+  question is live).
+
 - **EXPANSION C6 DONE (2026-07-23, runpod) — calibrated extraction
   estimator: NEITHER candidate passes the frozen battery → NO r4; the
   r3 ABORT stands and the reasoning int/eq cell stays open with a

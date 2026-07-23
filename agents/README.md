@@ -41,6 +41,12 @@ default; do NOT create the file there). The user seeds
 `/workspace/.agent_id` on every newly spawned pod. If genuinely ambiguous,
 ask the user. A new agent gets a new subdir + a row here.
 
+**Citing commits in records:** `git pull --rebase` rewrites your local
+SHAs, so a SHA written into a record before pushing is usually stale by
+the time it lands (this has now bitten two review cycles). Cite the
+commit *subject line* (stable across rebase), or re-verify cited SHAs
+against `git log` AFTER your final push.
+
 **Two-agent parallel sessions (shared-branch rules):** always
 `git pull --rebase origin arxiv` before every push; treat the shared files
 (`configs/data.yaml`, `src/temp_bench/data/synthetic.py`, `BENCHMARKS.md`,

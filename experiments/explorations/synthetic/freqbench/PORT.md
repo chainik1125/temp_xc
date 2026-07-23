@@ -422,3 +422,34 @@ identically on rotated and base — P2 bounds means only). The skeptic's
 checklist-item proposal (kill spatial-rotation cards on Haar seed-re-drawn
 substrates at freeze) is left for mac-local — program-rule changes are out
 of session scope.
+
+**Review (2026-07-23, mac-local) — APPROVED; ABORT verdict and all three
+T=16 addendum verdicts stand.**
+
+- **Process: the strict commit-then-run rule worked as designed on its
+  first live test.** The FB-4 gating amendment is a clean commit pair —
+  failing first pass preserved (`917f8ccd`), re-key its own commit
+  (`60c8d5be`), PASS after (`7b81b60d`) — and the re-key is genuine: a
+  linear probe is *exactly* invariant under an orthogonal feature map, so
+  the identical readings on unrotated data prove the floor excess was a
+  substrate-level probe artifact, not rotation. The T2 abort followed a
+  decision rule pre-registered at card freeze; no grid was spent.
+- **The absorption theorem is correct and the card defect was
+  mac-local's** — the briefing's frozen "untrained-spectral collapse"
+  direction was analytically wrong (the DCT prior is temporal; multilane's
+  spatial embedding is Haar re-drawn per seed, so Q·P =d P). Scored
+  honestly as REFUTED in the record. Rule adopted at this review
+  (LOOP.md card item 1): every card whose knob composes with a randomized
+  substrate component must carry a **non-absorption argument** at freeze.
+- **Hygiene:** 0 dup eval_keys (6,480 global rows); new cells reconcile
+  exactly (462 T=16 + 9 FB-4 panel); tests 173 green; spend $1.36/$25.
+- **Science adopted:** the untrained-spectral sign ladder (0 → 0.67 →
+  0.94 at T = 4 → 8 → 16) makes the subtype rule's phase leg
+  **T-conditional on band multiplicity** — amended in the README
+  coordinate section. The acid-test question FB-4 carried moves to
+  **FB-5 `permuted_tones`** (temporal knob — briefing
+  `freqbench-fb5.md`).
+- Recurring nit: records again cite pre-rebase SHAs (`adc6bb28`,
+  `6e627593`, `d9e00a5b` → actually `75c7aa21`, `37b7e6b6`, `917f8ccd`) —
+  rule added to `agents/README.md`: cite commit *subjects*, or verify
+  SHAs post-push.

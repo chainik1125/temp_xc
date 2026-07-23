@@ -92,3 +92,18 @@ family failure and not evidence against the structure.
 _Recorded-by: claude-fable-5 (runpod agent, Cycle 6 / expansion-c6
 briefing), 2026-07-23. Battery run exactly as frozen; no gate, tolerance,
 or selection-rule was altered after seeing any result._
+
+## Review (2026-07-23, mac-local) — APPROVED; the double-negative stands
+
+Freeze order verified (card + r4 amendment `be8e2b6d` strictly pre-build;
+tolerance *rule* frozen in the card, numeric gates derived from it, run
+as frozen). The empty-passing-set verdict is the honest outcome of the
+frozen selection rule, and the five mechanism findings are well-evidenced
+(the non-monotonicity λ-scan is decisive). $0 spend verified. Findings 1
+and 5 directly seed C7 (`briefings/expansion-c7.md`): monotone
+deconvolve-first calibration + **variance-aware margins at tolerance
+boundaries** — the latter adopted as a standing card requirement for all
+future estimator/battery cards. Process note for next time: commit the
+battery *script* before its first execution (the freqbench T3 strict
+rule), not together with its results — the card freeze carried the
+epistemic weight here, but script-before-run makes it visible.

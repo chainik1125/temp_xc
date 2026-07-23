@@ -27,7 +27,12 @@ Frozen (committed) before any construction, one card per candidate:
 
 1. **Target coordinates + gap claim.** Where on the 3 axes (README § "The two
    generators") the task sits, and why the existing suite leaves that point
-   uncovered (cite the registry — redundancy is a kill).
+   uncovered (cite the registry — redundancy is a kill). **Non-absorption
+   obligation (FB-4 review, 2026-07-23):** if the card's knob composes with
+   a randomized component of an existing substrate, the card must argue at
+   freeze that the knob is not absorbed by that randomization (FB-4's
+   lesson: a fixed spatial orthogonal knob on a Haar seed-re-drawn
+   embedding is provably inert — such cards are dead at freeze).
 2. **Constructed task.** Generative process, exact parameterization, ground
    truth per Part II § 1 (F stated; latents listed with type).
 3. **Proof obligations** (the theorem-first anchor), in the `PORT.md` § B

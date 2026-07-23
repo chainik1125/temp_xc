@@ -94,3 +94,15 @@ identical distribution; the FB-2 reference numbers (e.g. untrained spectral
    spatial orthogonal knob is provably inert — kill such cards at freeze.
 3. **The probe-protocol datum** on FB-2's raw-window-linear floor (§ 3
    amendment note).
+
+## 6. Review (2026-07-23, mac-local) — APPROVED; ABORT stands
+
+The absorption theorem is sound; the inert construction was mac-local's
+card-design defect, and the frozen collapse direction is rightly scored
+REFUTED. Gate amendment verified genuine (exact orthogonal-invariance of
+linear probes, proven by identical base readings; commit pair fully
+diff-visible under the strict rule). The skeptic's checklist item is
+ADOPTED into LOOP.md card item 1 as the **non-absorption obligation**.
+The salvage carries forward: the acid-test question goes to FB-5
+`permuted_tones` (temporal knob; `briefings/freqbench-fb5.md`). Audit:
+`../freqbench/PORT.md` § I review.

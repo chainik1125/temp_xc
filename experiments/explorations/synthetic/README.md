@@ -159,7 +159,11 @@ winner from it:
   coincidence code (TXC-post) converts it — phasepair sign **1.000**;
   spectral reads phase only where a DCT band holds ≥ 2 basis functions
   (multi-index bands at T=8, 0.936; singleton bands are provably
-  sign-blind).
+  sign-blind). **This leg is T-conditional on band multiplicity** (FB-C2
+  T=16 addendum, reviewed): untrained spectral sign access climbs
+  0 → 0.67 → 0.94 at T = 4 → 8 → 16 — phase readability is an
+  architectural *prior* that turns on as bands become multi-index, so
+  post's ownership of phase is a small-T statement.
 - **power / equality (even — quadratic and matching invariants):** the band
   code (Spectral-TXC) linearizes it — multilane power +0.79, recipe
   equality residual +0.96, while TXC-post caps at the additive ceiling
