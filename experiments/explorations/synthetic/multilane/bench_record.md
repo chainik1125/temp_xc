@@ -1,6 +1,7 @@
 # Multilane superposition (FB-2) — bench record
 
-**Status: GRID RUNNING (2026-07-23, runpod-b, FB-C1).** Frozen card:
+**Status: DONE — verdict POSITIVE (2026-07-23, runpod-b, FB-C1); the
+sprint-transported band headline PARTIALLY FAILS (see § 4.7).** Frozen card:
 [`../freqbench/cards/FB-2.md`](../freqbench/cards/FB-2.md) (commit
 `f0e6778f`, BEFORE construction). Gates: T1/§8 PASS
 ([`results/multilane_gating_stats.json`](results/multilane_gating_stats.json)),
@@ -10,8 +11,9 @@ skeptic PROCEED 5/5
 Provenance `theorem-first`. Grid: 708 cells (uniform 30k-step design +
 the frozen band-partition addendum), canonical runner.
 
-> ⚠ THIS FILE IS A SKELETON until the blind-verdict section is written from
-> `results/multilane_bench_stats.json`. No claim below the fold is final.
+Grid outcome: **708/708 cells, 0 failures, 80 min** (28 workers). Stats:
+[`results/multilane_bench_stats.json`](results/multilane_bench_stats.json),
+figure [`figs/multilane_bench.png`](figs/multilane_bench.png).
 
 ## 1. The task (frozen)
 
@@ -60,7 +62,80 @@ datum — probe capacity, not information). Skeptic examined and accepted.
 
 ## 4. Blind verdict vs the frozen predictions
 
-*(TO FILL from `multilane_bench_stats.json` — check falsifiers FIRST.)*
+Written against the card § 6 predictions, falsifiers checked first. All
+numbers are 3-seed means of `multilane_recovery` (normalized [0, 1];
+per-lane periodogram oracle references: 0.418 / 0.748 / 0.906 at T=2/4/8).
+
+**4.0 Falsifiers — none fired.** Worst T=1 trained cell **0.0043** (bar
+0.1; P1 holds in the trained grid). The winner's trained/untrained gap is
+large (0.794 vs 0.298 at T=8, d=F — learning on top of a real access
+prior, exactly the frequency-bench pattern). P5 verified at gating.
+
+**4.1 Token archs ≈ 0 — HELD, exactly.** batchtopk_sae +0.000, tsae
+−0.000 (untrained −0.001). The provable P1/P2 floor, measured.
+
+**4.2 stacked < 0.10 — HELD.** Max over the whole frontier **+0.024**
+(T=8). With memorization dead by construction this number is clean — the
+per-position family reads essentially nothing, no A5-style caveat needed.
+
+**4.3 txc-pre 0.05–0.30 — MISSED LOW (prediction failed, informatively).**
+Measured **+0.009 … +0.047** (best: T=8, k=4). The frozen band transported
+the single-tone bag level (frequency: 0.27); under 3-lane interference the
+bag/variance route collapses nearly to chance. The qualitative claim
+(additive family ≪ mixing family) holds everywhere; the magnitude
+prediction was wrong — superposition is *harder* on the additive route
+than single-tone, not equally hard. Flat per-lane S(f) confirmed
+(recalls 0.09–0.26, no resolvable-band structure).
+
+**4.4 txc-post 0.3–0.7 at T=8 — HELD.** +0.461 at the canonical k=2
+(+0.762 at k=8). T-trend positive (0.096 → 0.226 → 0.461). Its per-lane
+S(f) is the Rayleigh high-pass (recalls ≥ 0.87 for f ≥ 0.04, ~0.37 on the
+unresolvable low cluster). Capability cost visible: NMSE 0.575 vs 0.362
+per-token — the scarcity-forced specialization price (changepoint's
+pattern, reproduced under superposition).
+
+**4.5 spectral best, 0.6–0.9 at T=8 — HELD.** **+0.794** (T=8, d=F, k=2),
++0.561 at T=4. Untrained access +0.298 — 4× the next arch's untrained
+(post +0.075): the DCT-band access prior, as frozen. And the capability
+gate passes decisively: spectral's NMSE **0.293** is the best in the
+panel (beats per-token 0.362) — the win is representation, not artifact.
+
+**4.6 Ordering + T-trend — HELD everywhere.** spectral > post ≫ {pre,
+stacked, token} at every T ∈ {2, 4, 8}; both mixing archs rise
+monotonically in T.
+
+**4.7 The sprint-transported headline — FAILS ITS FROZEN CRITERION
+(direction survives, magnitude does not).** Frozen: 4-band
+(`spectral_txc`) > 1-band (`spectral_txc_full`) by **≥ 0.03** at T=8,
+d=101, k_pos=1, no seed overlap. Measured: **+0.776 [0.773–0.780] vs
++0.757 [0.752–0.762]** — seed-disjoint but the margin is **+0.019 <
+0.03**. The sprint's W=16/plain-TopK magnitude (0.96 vs 0.91) does NOT
+transport to the fair BatchTopK backbone at T=8 — the batch-pooled budget
+already does part of the anti-crowding work the sprint attributed to
+per-band budgets. The band advantage is real but **T-localized**: at T=4
+the same comparison is **+0.468 vs +0.381 (+0.087, seed-disjoint)** — the
+edge peaks where the Rayleigh cell is coarsest relative to the ladder and
+shrinks as T resolves the tones (extrapolating to the frequency bench's
+T=16 tie). Two unfrozen observations for the record (flagged as such):
+- **2-band (dcac) is the WORST partition** (T=4: +0.351; T=8: +0.742,
+  below full-band): its DC branch locks half the atoms + budget onto a
+  band that carries nothing for pure tones — band *placement*, not band
+  *count*, is what matters.
+- **The band prior is a scarcity prior on k too**: spectral − post margin
+  is +0.544 at k_pos=1, +0.333 at k=2, +0.053 at k=4, **−0.583 at k=8**
+  (spectral collapses to +0.179 at k=8/T=8 while post reaches +0.762).
+  The frozen "margin largest at scarce k" prediction HELD, in the
+  strongest possible form (sign reversal at dense budgets).
+
+**Verdict: POSITIVE — a regime-3 architecture separator under
+superposition, memorization-clean by construction.** The full panel
+ordering (spectral > post ≫ additive family ≈ token ≈ 0) appears with no
+capacity caveat anywhere in the sweep; the winner also wins
+reconstruction. The transported sprint claim survives only in sign: its
+magnitude was a plain-TopK artifact at the frozen T=8 criterion, and the
+honest reading is that band-partitioning matters at scarce budgets and
+coarse windows, converging to the 1-band crosscoder as either resource
+grows.
 
 ## 5. Coordinates (axis 1, FreqFrac at bench time)
 
