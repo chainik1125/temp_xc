@@ -26,8 +26,9 @@ multi-layer support (`configs/data.yaml` header hints `layers: [...]`);
 if single-layer only, loop it per layer rather than modifying core.
 New datasource entries in `configs/data.yaml` are append-only.
 
-**Session limits:** ~12 h wall · GPU is for *forward passes only* · disk
-is a **500 GB persistent network volume** — budget: phase-3 caches ≈
+**Session limits:** ~12 h wall · GPU is for *forward passes only* (pod:
+1× H100, 16 vCPU, 251 GB RAM — run probe fits on the GPU, not the CPUs) ·
+disk is a **700 GB persistent network volume** — budget: phase-3 caches ≈
 72 GB/model at layer-stride 2 (≈ 144 GB for both), phase 4 ≈ 82 GB,
 phase 5 ≈ 28 GB, HF weights ≈ 70 GB. **KEEP the phase-3 (Ward) caches on
 the volume** — they are the input to the follow-up TXC-tracking session;
