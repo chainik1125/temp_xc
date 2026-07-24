@@ -185,3 +185,56 @@ note), `results/stage2_ward_real_slope8_distill_l14.json`, a LOG
 verdict scoring P1–P5, and a record section carrying § 5's convention
 sentence verbatim. Leaderboard hygiene: 0 duplicate eval_keys, 0 null
 metrics, clean tree.
+
+---
+
+## 10. Pre-run amendment — reconciliation with `LEVEL_CARD_DRAFT.md` (frozen at commit; still no cell executed)
+
+runpod-b's draft card (`LEVEL_CARD_DRAFT.md`, commit `c9d0ac36`) landed
+while § 1–9 were being committed (`fff7877c` rebased atop it). Per
+protocol (round-1 review note 4) the running agent's card governs; this
+amendment reconciles the two BEFORE any cell runs. Git order remains
+the evidence.
+
+**ADOPTED from the draft (pre-registered here):**
+
+1. **Stage-2 shuffle-immunity receipt** (the draft's P3, attached to
+   the panel itself rather than only to the Stage-1 screen). Post-hoc
+   diagnostic on the SAME trained checkpoints, OFF-leaderboard: encode
+   eval/train tiles with an **anchor-fixed within-tile context
+   shuffle** (permute tile slots 0..T−2 per row, leading edge fixed at
+   T−1, seeded rng 1234 — the screen's convention), refit + evaluate
+   the slope8 probe on the shuffled codes, for TXC-pre and matched
+   TXC-post at T ∈ {8, 16} (and the best window arch elsewhere if
+   different). **Prediction (frozen): recovery is retained — the
+   shuffled cell keeps more than half of that cell's (clean window −
+   best token arch) margin, per seed-mean.** A larger degradation
+   FALSIFIES the aggregation framing of this panel's result (order
+   would matter after all), and the record must say so.
+2. **Position-only floor reference**: LinearRegression from
+   leading-edge position features alone (position index p and p² on
+   the 128-token grid) → held-out Pearson r vs slope8, same sampling +
+   finite mask, off-leaderboard, reported next to the raw references.
+   **Prediction (frozen): low — well below raw_mean at T ≥ 8;** if it
+   is not, the ambient position ramp explains part of every arch's
+   recovery and the reading must discount it.
+3. **Record obligation**: the tested ladder sits at the BOTTOM of the
+   effect's raw T-range (the screen's window-mean gap still grew at
+   T = 64); carried verbatim into the record and LOG verdict.
+
+**REJECTED from the draft, with the reason stated:** the draft's
+primary target (*continuous window-mean hedge level over the trailing
+T-token window*) makes the label a function of T — every T-cell would
+recover a DIFFERENT quantity, confounding the label with the
+architecture axis and making a single T-scaling line uninterpretable.
+This card's primary (the frozen slope8 grid) has FIXED ≈ 128-token
+support at every T, so T scales *coverage* of one target — the same
+design shape as the reviewed λ̂ panel (kernel support ≫ window), and
+the quantity whose screen numbers the r2-e briefing itself cites as
+the seed. The draft's aggregation FRAME is fully retained (§ 1); its
+per-token-first triage (P4) is satisfied by the round-1 screen
+(per-token 0.468 vs chance 0.333, under anchor matching) plus the
+pre-registered `raw_tok` reference.
+
+Diagnostic scripts are committed before they run (panel first; the
+specs above are the frozen science).
