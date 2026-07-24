@@ -61,6 +61,43 @@ no other grid change). Detection targets do NOT meet the escalation
 condition (their MLPs show no positive gap) and stay at the frozen
 T∈{8,32} presence checks.
 
+## 2026-07-24 — runpod-e — candidate 1 (repetition-lag Δ) — **KILL** (converted at every scale)
+
+Screen executed exactly per the frozen `replag/CARD.md` (results:
+`replag/results/screen_{gpt2,gemma2_2b,llama31_8b}.json`; figs:
+`replag/figs/`). Verdict by the frozen falsifier: **KILL — no model
+shows the P1 detection ladder in any probe pair.** The per-Δ turn-on
+never happens because there is nothing left to turn on: per-token
+linear probes already read repetition detection at 0.74–0.97 AUC
+(det4→det32, all three models) and the window−token gap is ≤ 0 at
+every T everywhere (fig `det_gap_vs_T.png`) — induction conversion is
+saturated from 124M up, so the latent is regime-1 on natural web text
+at every screened scale. Larger windows actively LOSE linear AUC
+(fixed probe budget over growing dims — a screen limitation noted, but
+irrelevant to the verdict since the MLP presence checks also show no
+positive detection gap).
+
+Recorded findings on the pre-registered axes: **P2 falsified in an
+interesting direction** — per-token ceilings are HIGHEST in gpt2
+(det4 0.965 vs llama 0.923, gemma 0.893; cross-model comparisons
+approximate — different tokenizers/matched sets): repetition features
+occupy proportionally more of a small model's residual. **P4
+confirmed** — the lag-VALUE readout (lag4) is genuinely order-carried:
+window MLP beats per-token and the context-shuffle collapses it back
+(gpt2 T8: 0.634 → 0.522 shuffled ≈ 0.520 per-token; fig
+`lag4_order_vs_T.png`), and detection is aggregation-shaped (shuffle
+≈ ordered), the predicted dissociation. **Scale ordering of the
+unconverted (order) residue: gpt2 +0.11 ≫ gemma +0.02 ≈ llama +0.02**
+— the briefing's frozen prior holds on the value readout, but at
+panel-relevant scales (2B/8B) the residue is too thin to carry a
+Stage-2 TXC-vs-T-SAE separation. No Stage 2. A sound kill: the
+screen's cost was ~3 h; the mechanism (conversion) is the documented
+reason, with the order-residue scale series as the reusable finding.
+
+Next per briefing: candidate 2 (confidence trend) — runpod-b's clock
+bridge does NOT kill it (slope4 support ≈ 64 tok = T64), so it
+precedes candidate 3.
+
 **2026-07-24 · runpod-b · prep (labels + cards) — no verdict.** All four
 label artifacts landed under `labels/` (builders committed pre-run, 10
 sanity tests in `tests/test_task_hunt_labels.py`): `replag_fineweb_*` ×3
