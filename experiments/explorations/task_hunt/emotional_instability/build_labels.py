@@ -42,6 +42,9 @@ from pathlib import Path
 
 import numpy as np
 
+from experiments.explorations.task_hunt.emotional_instability.cache_acts import (
+    chat_ids,
+)
 from experiments.explorations.task_hunt.replag.build_labels import (
     matched_sample,
 )
@@ -83,8 +86,7 @@ def build():
                 if acts_index else None)
 
     N = (acts_index["n_tokens"] if acts_index else
-         sum(len(tok.apply_chat_template(convs[n]["messages"],
-                                         tokenize=True))
+         sum(min(len(chat_ids(tok, convs[n]["messages"])), MAX_LEN)
              for n in order))
     conv_of = np.full(N, -1, dtype=np.int16)
     turn_of = np.full(N, -1, dtype=np.int8)
@@ -97,14 +99,12 @@ def build():
              "ids_mismatch": []}
 
     cursor = 0
-    names = (sorted(order, key=lambda n: len(tok.apply_chat_template(
-        convs[n]["messages"], tokenize=True))) if acts_index is None
+    names = (sorted(order, key=lambda n: len(chat_ids(
+        tok, convs[n]["messages"]))) if acts_index is None
         else sorted(order, key=lambda n: acts_index["convs"][n][0]))
     for ci, name in enumerate(names):
         msgs = convs[name]["messages"]
-        ids = tok.apply_chat_template(msgs, tokenize=True,
-                                      add_generation_prompt=False)
-        ids = ids[:MAX_LEN]
+        ids = chat_ids(tok, msgs)[:MAX_LEN]
         n = len(ids)
         if acts_index:
             s, e = acts_index["convs"][name]

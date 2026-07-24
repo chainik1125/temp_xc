@@ -33,6 +33,17 @@ BATCH = 4
 MAX_LEN = 8192
 
 
+def chat_ids(tok, msgs):
+    """Flat token ids from the chat template (transformers 5 returns a
+    BatchEncoding; older versions a bare list)."""
+    out = tok.apply_chat_template(msgs, tokenize=True,
+                                  add_generation_prompt=False)
+    ids = out if isinstance(out, list) else out["input_ids"]
+    if ids and isinstance(ids[0], list):
+        ids = ids[0]
+    return ids
+
+
 @torch.no_grad()
 def main():
     if (OUT / "index.json").exists():
@@ -45,9 +56,7 @@ def main():
     convs = []
     for p in sorted(ROLLOUTS.glob("conv_*.json")):
         msgs = json.loads(p.read_text())["messages"]
-        ids = tok.apply_chat_template(msgs, tokenize=True,
-                                      add_generation_prompt=False)
-        convs.append((p.stem[5:], ids[:MAX_LEN]))
+        convs.append((p.stem[5:], chat_ids(tok, msgs)[:MAX_LEN]))
     convs.sort(key=lambda c: len(c[1]))          # length bucketing
     total = sum(len(ids) for _, ids in convs)
     print(f"[cache_acts] {len(convs)} convs, {total} tokens", flush=True)
