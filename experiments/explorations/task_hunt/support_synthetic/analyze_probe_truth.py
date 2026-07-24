@@ -47,7 +47,7 @@ def _bar(vals: list[float]) -> float:
     """Card § 4: bar = max(2·SE, 0.05), SE = std(ddof=1)/√k."""
     if len(vals) < 2:
         return 0.05
-    return max(2.0 * float(np.std(vals, ddof=1)) / np.sqrt(len(vals)), 0.05)
+    return float(max(2.0 * float(np.std(vals, ddof=1)) / len(vals) ** 0.5, 0.05))
 
 
 def _load(name: str):
@@ -288,9 +288,9 @@ def gate_G4(cells) -> dict:
 
 def _fires(hits: list[bool]) -> dict:
     n = len(hits)
-    k = sum(hits)
+    k = int(sum(bool(h) for h in hits))
     return {"n_qualifying": n, "n_holding": k,
-            "fraction": (k / n) if n else 0.0,
+            "fraction": float(k / n) if n else 0.0,
             "holds": bool(n > 0 and (k / n) >= MAJORITY)}
 
 
@@ -360,7 +360,64 @@ def predictions(cells, calib, bad_seeds: set) -> dict:
               "truth_drop_peak_to_T16": float(tr_drop), "bar": float(bar),
               "detail": p5["detail"]}
     return {"P1": p1, "P2": p2, "P3": p3, "P4": p4, "P5": p5,
+            **calib_deltas(calib),
             "n_usable_cells": len(usable), "n_hi": len(hi), "n_lo": len(lo)}
+
+
+def calib_deltas(calib) -> dict:
+    """Stage-1 analogues of P1/P2 against EXACT truth — reported, NOT a branch
+    input.
+
+    The card scopes P1/P2 to cells "with a licensed anchor", i.e. the trained
+    ladder. But the calibration is the only place truth is exact rather than
+    estimated, so the same arithmetic there is the strongest single piece of
+    evidence in the campaign and must be visible in the receipt. It is
+    labelled `branch_input: false` and cannot move `branch_evidence`.
+
+    Split by arm because the arms differ in *where truth sits* (≈ 0.99 for
+    `full`, ≈ 0.41 for `token`), and the probe's downward bias is a function
+    of the unexplained variance, not only of p/n — the single most important
+    thing the calibration has to say about panels whose reported recovery is
+    small.
+    """
+    out = {}
+    for arm in ("full", "token", "null"):
+        by_p = defaultdict(list)
+        for c in calib:
+            if c["arm"] != arm or c["T"] != 16:
+                continue
+            g = [q for q in c["grid"] if q["n_windows"] == 1024][0]
+            by_p[(c["p"], c["density"])].append((g["p_over_n"], g["truth"],
+                                                 c["v1"], c["v2"]))
+        rows = []
+        for (p, dens), vals in sorted(by_p.items()):
+            if len(vals) < 2:
+                continue
+            pn = float(np.mean([v[0] for v in vals]))
+            truth = float(np.mean([v[1] for v in vals]))
+            d1 = [v[2] - v[1] for v in vals]
+            d2 = [v[3] - v[1] for v in vals]
+            rows.append({"p": p, "density": dens, "p_over_n": pn,
+                         "n_seeds": len(vals), "truth": truth,
+                         "v1": float(np.mean([v[2] for v in vals])),
+                         "v2": float(np.mean([v[3] for v in vals])),
+                         "d1": float(np.mean(d1)), "d2": float(np.mean(d2)),
+                         "bar1": _bar(d1), "bar2": _bar(d2)})
+        hi = [r for r in rows if r["p_over_n"] >= 0.5]
+        out[f"calib_{arm}"] = {
+            "branch_input": False,
+            "truth_level": float(np.mean([r["truth"] for r in rows])) if rows
+            else float("nan"),
+            "v1_sags_at_high_p_over_n": _fires(
+                [r["d1"] <= -r["bar1"] for r in hi]),
+            "v2_tracks_at_high_p_over_n": _fires(
+                [abs(r["d2"]) < r["bar2"] for r in hi]),
+            "worst_d1": float(min((r["d1"] for r in rows), default=float("nan"))),
+            "worst_d2": float(min((r["d2"] for r in rows), default=float("nan"))),
+            "max_d2_above_truth": float(max((r["d2"] for r in rows),
+                                            default=float("nan"))),
+            "rows": rows}
+    return out
 
 
 def branch(gates, preds) -> tuple[str, str]:
@@ -445,10 +502,14 @@ def main():
                 "detail_scaled", "excluded_frozen_keys", "excluded_scaled_keys")
         print(f"  {g}: {'PASS' if v['pass'] else 'FAIL'}  "
               f"{ {k: v[k] for k in v if k not in skip} }")
-    for p in ("P1", "P2", "P3", "P4", "P5"):
+    for p in ("P1", "P2", "P3", "P4", "P5", "calib_full", "calib_token",
+              "calib_null"):
         v = preds[p]
-        print(f"  {p}: {'HOLDS' if v.get('holds') else 'FAILS'}  "
-              f"{ {k: v[k] for k in v if k not in ('detail','null_detail')} }")
+        # calib_* are reported evidence, not predictions — no HOLDS/FAILS.
+        tag = ("        " if p.startswith("calib")
+               else ("HOLDS" if v.get("holds") else "FAILS"))
+        print(f"  {p}: {tag}  "
+              f"{ {k: v[k] for k in v if k not in ('detail','null_detail','rows')} }")
     print(f"  coverage: {coverage['n_cells_licensed']}/{coverage['n_cells']} "
           f"licensed, p/n {coverage['p_over_n_range']}")
     print(f"-> {RES/'probe_truth.json'}")
