@@ -14,7 +14,13 @@ appends of cell N dirty the tree for cell N+1 (the established practice
 log lands OUTSIDE the repo so results/ stays clean of untracked files.
 
 Run:  .venv/bin/python -m experiments.explorations.conversion_depth.run_em_panel
-      (optionally: ... run_em_panel panel   |   ... run_em_panel anchors)
+      (optionally: ... run_em_panel panel | anchors | layer13 | layer15 | layer9)
+
+``layerN`` selects that layer's panel + anchor cells — used to PARTITION
+the 51 cells across three concurrent driver processes (disjoint
+train/eval keys, so no duplicate-row races; the leaderboard append is
+flock-protected). Added after cell 1 timed at ~31 min serial (26 h for
+the full panel); the frozen cell table is untouched.
 """
 
 from __future__ import annotations
@@ -38,11 +44,14 @@ WALL_LOG = Path("/workspace/conv_depth_caches/em_redo_results/runs_log.jsonl")
 
 def main(which: str = "all"):
     WALL_LOG.parent.mkdir(parents=True, exist_ok=True)
-    cells = list(all_cells(include_anchors=(which in ("all", "anchors"))))
+    cells = list(all_cells(include_anchors=True))
     if which == "anchors":
         cells = [c for c in cells if c["cell_id"].endswith("_anchor")]
     elif which == "panel":
         cells = [c for c in cells if not c["cell_id"].endswith("_anchor")]
+    elif which.startswith("layer"):
+        layer = int(which.removeprefix("layer"))
+        cells = [c for c in cells if c["layer"] == layer]
     print(f"[panel] {len(cells)} cells ({which})", flush=True)
     n_ok = n_fail = 0
     for i, c in enumerate(cells):
