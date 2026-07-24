@@ -83,28 +83,41 @@ def _panel_vs_T(ax, groups, title, *, floor=True):
         ax.legend(fontsize=5.5, loc="lower left")
 
 
-def _panel_calib(ax, calib, arm, density="k8", T=16):
-    """Stage 1: reported vs p/n against the EXACT truth."""
-    rows = [c for c in calib if c["arm"] == arm and c["T"] == T
-            and c["density"] == density]
-    by_p = {}
-    for c in rows:
-        by_p.setdefault(c["p"], []).append(c)
-    ps = sorted(by_p)
-    if not ps:
-        ax.set_title(f"Stage 1 — {arm} (no data)", fontsize=8)
-        return
-    def m(p, f):
-        return float(np.mean([f(c) for c in by_p[p]]))
+def _panel_calib(ax, calib, arm, T=16):
+    """Stage 1: reported vs p/n against the EXACT truth, both code densities.
+
+    Density is drawn because it turned out to matter more than p/n for v1:
+    at the same p/n = 1.0 the sag is −0.07 at the card's top-8 construction
+    and −0.45 at the real panel's ~6% density.
+    """
     def g(c, nw, key):
         return [q for q in c["grid"] if q["n_windows"] == nw][0][key]
-    pn = [m(p, lambda c: g(c, 1024, "p_over_n")) for p in ps]
-    ax.plot(pn, [m(p, lambda c: g(c, 1024, "truth")) for p in ps], "-",
-            color=C_TR, lw=2.2, alpha=.75, label="TRUE (exact, by construction)")
-    ax.plot(pn, [m(p, lambda c: c["v1"]) for p in ps], "-o", color=C_V1, ms=5,
-            label="v1 (OLS, nw 1024)")
-    ax.plot(pn, [m(p, lambda c: c["v2"]) for p in ps], "-s", color=C_V2, ms=5,
-            label="v2 (ridge, nw 8192)")
+
+    drew = False
+    for dens, ls, tag in (("k8", "-", "top-8 code"), ("p6", "--", "6% dense")):
+        rows = [c for c in calib if c["arm"] == arm and c["T"] == T
+                and c["density"] == dens]
+        by_p = {}
+        for c in rows:
+            by_p.setdefault(c["p"], []).append(c)
+        ps = sorted(by_p)
+        if not ps:
+            continue
+        def m(p, f, _bp=by_p):
+            return float(np.mean([f(c) for c in _bp[p]]))
+        pn = [m(p, lambda c: g(c, 1024, "p_over_n")) for p in ps]
+        if not drew:
+            ax.plot(pn, [m(p, lambda c: g(c, 1024, "truth")) for p in ps], "-",
+                    color=C_TR, lw=2.2, alpha=.75,
+                    label="TRUE (exact, by construction)")
+            drew = True
+        ax.plot(pn, [m(p, lambda c: c["v1"]) for p in ps], ls, marker="o",
+                color=C_V1, ms=5, label=f"v1 (OLS, nw 1024) · {tag}")
+        ax.plot(pn, [m(p, lambda c: c["v2"]) for p in ps], ls, marker="s",
+                color=C_V2, ms=5, label=f"v2 (ridge, nw 8192) · {tag}")
+    if not drew:
+        ax.set_title(f"Stage 1 — {arm} (no data)", fontsize=8)
+        return
     ax.axvline(1.0, color="grey", ls="--", lw=1)
     ax.text(1.05, .04, "p = n", fontsize=6, color="grey",
             transform=ax.get_xaxis_transform())
