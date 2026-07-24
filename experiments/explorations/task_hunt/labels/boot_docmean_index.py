@@ -69,7 +69,14 @@ def rows_for(z, value_key, man_prefix, doc_map, split_key):
     d = z[f"{man_prefix}_doc"]
     p = z[f"{man_prefix}_pos"]
     c = z[f"{man_prefix}_cls"]
-    v = z[value_key].astype(float)
+    raw = z[value_key]
+    v = raw.astype(float)
+    # the program's universal sentinel: -1 = undefined in INTEGER label
+    # arrays (`lib.py` conventions; floats use NaN). Applying it is
+    # following the convention, not reinterpreting it — without this an
+    # integer face's document mean is dragged by its guard rows.
+    if np.issubdtype(raw.dtype, np.integer):
+        v = np.where(raw < 0, np.nan, v)
     split = z[split_key]
     if doc_map == FLAT:
         doc_off = z["doc_off"]
