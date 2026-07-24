@@ -38,22 +38,53 @@ set as `core.askPass`; identity configured).
    (plugin datasource + two `configs/data.yaml` entries) committed.
 4. **Leaderboard hygiene checked**: 7121 rows, 0 dup `eval_key`s.
 
-## ACCEPTANCE GATE MET (2026-07-24) — candidate 3 is the only remainder
+## SESSION COMPLETE (2026-07-24) — all four candidates screened; acceptance gate MET; awaiting mac-local review
 
-All four gate items are done and pushed: hunt LOG with every screen
-verdict; **≥ 1 survivor through Stage 2 with the T-scaling figure**
-(candidate 1, QUALIFIED POSITIVE — `figs/stage2_tscaling.*`, verdict in
-LOG + RECORD § 3b); STATUS rewritten (this file); leaderboard hygiene
-(7117 rows, 0 dup keys, 0 nulls after the repair). Verdicts:
-- **Cand 1 (λ̂ intensity): KEEP** → Stage 2 **QUALIFIED POSITIVE**
-  (TXC-pre beats per-token/T-SAE at matched l0, rises to T=8; TXC-post
-  higher but budget-collapsed; order story negative).
-- **Cand 2 (proof-op runs): KEEP** — the model axis is the finding
-  (distill L12 clears the null at every T; base ≈ distill falsified).
-- **Shuffle receipt: POSITIVE** — the paper's backtracking anticipation
-  IS order-sensitive (+0.028…+0.041 vs +0.003…+0.013 ambient).
-- **Cand 3 (forbidden-word onset): RUNNING** (generation in the vLLM
-  venv; see below). The em-redo PAUSED note is runpod-c's, not mine.
+Every gate item done and pushed: hunt LOG with every screen verdict;
+**≥ 1 survivor through Stage 2 with the T-scaling figure** (candidate 1,
+`figs/stage2_tscaling.*`); STATUS rewritten (this file); leaderboard
+hygiene (0 dup keys, 0 null-metric rows; 220 tests pass). No
+reviewer/meeting quotes in tracked files. Briefing stays until
+mac-local review. **em-redo PAUSED note:** that arm is runpod-c's, not
+arm A's — not touched this session.
+
+**Verdicts (all in `task_hunt/LOG.md`; methods in `task_hunt/RECORD.md`):**
+- **Cand 1 (λ̂ intensity): KEEP → Stage 2 QUALIFIED POSITIVE.** At
+  matched realized l0, TXC-pre beats the per-token SAE (0.113) and
+  T-SAE (0.154), rising 0.13→0.19→0.21 across T=2/4/8 (peaks, then dips
+  at T=16). TXC-post reaches 0.255 at T=16 but its l0 collapses to 0.49
+  — budget-confounded, flagged not headlined. Stacked shows a
+  training pathology at T=16. Order story negative (regime 2).
+- **Cand 2 (proof-op runs): KEEP** — the MODEL AXIS is the finding.
+  Contrast g_tir−g_op clears the null at every T on **distill L12**
+  only; base ≈ distill (P5) decisively falsified. Mirror image of
+  cand 1. Caveat: a shuffle gap that grows with T is generic to wider
+  windows (the ambient anchor grows identically) — only the
+  anchor-differenced contrast is an order claim.
+- **Cand 3 (forbidden-word onset, SILOED): KILL** — the card's
+  pre-registered ambience kill fires (per-token within 0.02 of window
+  at every horizon; window never beats per-token beyond 3σ). The model
+  circles the concept, so a single token reads it. 97.4 % violation
+  rate (gate passed easily).
+- **Shuffle receipt (existing case study): POSITIVE** — backtracking
+  ANTICIPATION is order-sensitive (shuffle costs +0.028…+0.041 vs
+  +0.003…+0.013 for the ambient is_bt), at fixed T=16 on identical
+  rows (no T-confound).
+
+**Net:** the hunt's strong target (window recovery rising vs T-SAE flat,
+order matters) is only partially realized — a bounded matched-budget
+window advantage on cand 1 (order-free), a model-specific window signal
+on cand 2, a clean order receipt on the *existing* paper task, and a
+principled ambient KILL on cand 3. No unqualified new positive; the
+sound verdicts are the deliverable.
+
+## If resuming: the follow-ups worth a next session (none started)
+- Cand 2 Stage 2 on **distill L12** (its best cell) — separate from the
+  cand-1 panel already run; the datasource plugin generalizes (swap
+  labels).
+- Cand 1 TXC-post efficiency: 0.255 recovery at l0=0.49 is striking on
+  its own terms; a budget-matched re-run (raise post's k) would settle
+  whether it's a real win or the starvation artifact.
 
 ## Two traps this session hit — read before touching the chain or the leaderboard
 
