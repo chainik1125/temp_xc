@@ -41,15 +41,21 @@ stay review-content-free). Han's three standing directives: (1) synth
 revamp (the why-story), (2) real-world case-study redo with
 TXC-appropriate evals (PRIORITY, > (1)), (3) TXC-pro loss dissection.
 **Scope (Han, 2026-07-23): backtracking multi-seed + paper latex are
-the human team's — agents run ONLY the three directives.** Dispatched:
-`briefings/em-redo.md` (runpod-c, ~48 h, must-have Phase A =
-TXC-tracking L9/L13/L15 both currencies; Phase-A prereg already
-committed pre-run) · `briefings/txcpro-dissection.md` (runpod, ~48 h).
-**Story pack (runpod-b) DONE + REVIEWED/APPROVED 2026-07-23** —
-`synthetic/STORY.md` + `figs/story_isolation.png`, the distilled
-head-to-head narrative; briefing deleted. My cadence: review every
-~24 h; after W2–W3 land, distill the rebuttal inputs for the team.
-The pre-review fork below is parked.
+the human team's — agents run ONLY the three directives.** **RE-PLAN 2026-07-24** (post team meeting — transcript in
+`private/transcripts/transcript-2026-07-24.txt`; plan in
+`private/rebuttal_plan.md`): synthetic generation PAUSED (consolidation
+only — STORY.md + team's theory additions carry it); **the priority is
+THE TASK HUNT** — a real task where TXC > T-SAE with systematic
+T-scaling. Dispatched: `briefings/task-hunt.md` (runpod-c — em-redo
+SUPERSEDED/PAUSED, machinery reused; candidates: backtracking-λ̂
+intensity, repetition-lag Δ, proof-op runs, confidence trend; two-stage
+fail-fast screen→head-to-head) + `briefings/task-hunt-prep.md`
+(runpod-b — label mining, Δ-labels + λ̂ targets first).
+`briefings/txcpro-dissection.md` (runpod) unchanged. Avoid: backtracking
+detection/forbidden-word (owned by the team), bracket state-tracking
+(documented dead end). Story pack DONE+APPROVED (STORY.md + isolation
+fig + § 7 T-taxonomy). Team check-in Sun 2026-07-26 10am PT — review
+everything before it. Rebuttal deadline 07-27.
 
 ## ⏭ (pre-review fork — parked)
 

@@ -10,6 +10,21 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **PROGRAM MODE (2026-07-24, team decision): synthetic benchmark
+  GENERATION is PAUSED — consolidation only.** The suite + STORY.md +
+  the theoretical additions the team is preparing carry the synthetic
+  side of the rebuttal. **The active program is THE TASK HUNT**: find a
+  real-activation task where TXC beats T-SAE and improves systematically
+  with window size T (`briefings/task-hunt.md`, runpod-c executor +
+  `briefings/task-hunt-prep.md`, runpod-b labels; hunt log at
+  `experiments/explorations/task_hunt/LOG.md`). Strategy note: T-SAE is
+  per-token-decoded, so regime-2 latents (rates/intensities/trends —
+  common in real traces) already separate TXC from T-SAE with
+  pattern-A/B T-scaling; the labeled R1-Distill corpus + Ward caches
+  make several candidates label-free. **em-redo is PAUSED** (EM stays
+  the honest negative; frozen prereg preserved for a future session).
+  The TXC-pro dissection (runpod) continues unchanged.
+
 - **ROUND-3 REVIEW DONE (2026-07-23, mac-local) — ALL THREE sessions
   APPROVED; all verdicts stand; no active briefings.** (1) **C7 close
   APPROVED** — the reasoning int/eq cell is NEGATIVE at this corpus
