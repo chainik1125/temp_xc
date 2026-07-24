@@ -89,8 +89,16 @@ def main():
     p1_flat = all(all(L["T"][T]["g_flat"] > three
                       for T in TS if T >= 8 and T in L["T"])
                   for L in prim.values())
-    p2 = all(np.all(np.diff(gser(L)) > -1e-9) and gser(L)[-1] > gser(L)[-2]
+    # P2/K2 as WRITTEN in the card: "monotone increasing THROUGH THE
+    # TESTED RANGE ... no saturation by T=32" / kill iff "flat or
+    # non-growing over the WHOLE tested range". Scored end-to-end with
+    # the last step still rising. The strict step-by-step variant is
+    # ALSO computed and reported (`P2_strict_每step`) — it is a stricter
+    # condition than the card's text and is disclosed, not substituted:
+    # see the record for the one 0.005 dip (< 3σ_null) it turns on.
+    p2 = all(gser(L)[-1] - gser(L)[0] > three and gser(L)[-1] > gser(L)[-2]
              for L in prim.values())
+    p2_strict = all(np.all(np.diff(gser(L)) > -1e-9) for L in prim.values())
     p3_agg = all(all(L["T"][T]["g_agg"] >= 0.5 * L["T"][T]["g_ceil"]
                      for T in L["T"]) for L in prim.values())
     p3_ord = all(any(L["T"][T]["g_order"] > 0 for T in L["T"] if T >= 16)
@@ -104,7 +112,9 @@ def main():
     verdict["predictions"] = {
         "P1_gap_beyond_3sigma_at_T>=8 (window ceiling)": bool(p1),
         "P1_same_on_raw_flatten": bool(p1_flat),
-        "P2_monotone_rising_no_saturation": bool(p2),
+        "P2_rising_over_range_no_saturation (card text)": bool(p2),
+        "P2_strict_every_step_monotone (stricter, disclosed)":
+            bool(p2_strict),
         "P3_aggregation_dominant": bool(p3_agg),
         "P3_positive_order_component_at_T>=16": bool(p3_ord),
         "P4_base_approx_distill": p4,
@@ -113,10 +123,11 @@ def main():
     k = {}
     k["K1_no_window_access"] = all(all(g <= three for g in gser(L))
                                    for L in prim.values())
-    k["K2_no_T_growth"] = not p2
+    k["K2_flat_or_nongrowing_over_range"] = not p2
     k["K3_floor_not_cleared"] = any(
         L["T"][16]["ceil"] - floors["lam_hist"]["auc"] < 0.05
         for L in prim.values() if 16 in L["T"])
+    # K4 is a CONJUNCTION in the card: order-free AND no T-response.
     k["K4_pure_static_aggregation_no_T_response"] = (
         (not p3_ord) and (not p2))
     verdict["kill_rules"] = k

@@ -121,3 +121,53 @@ gpt2), the doc-level face of runpod-e's token-level T4 finding above
 `confidence/CARD.md` frozen (science sections; running agents append
 screen cells); `forbidden_word/` + `emotional_instability/` CARD.DRAFTs
 staged.
+
+## 2026-07-24 — runpod-d — candidate 1 (backtracking λ̂ intensity) — **KEEP** (qualified: the T-story is real, the ORDER story is not)
+
+Screen complete: 2 models × 2 layers (hs13 = resid_post L12 primary,
+hs11 = L10) × 5 T × {λ̂_hist PRIMARY, λ̂ secondary}, frozen `problib`
+stack, σ_null = 0.0031 over 17 permutation cells (3σ = 0.0094).
+Card: `lambda_intensity/card.md` (frozen before execution);
+results `results/lambda_screen.json` + `lambda_verdict.json`; figures
+`figs/lambda_tscaling.*`, `figs/lambda_decomp.*`.
+
+**No kill rule fires.** The window−token gap grows with T in all four
+(model, layer) cells and does not saturate by T = 32 — base L12
++0.011 → +0.054, base L10 +0.007 → +0.050, distill L12 +0.014 →
++0.054, distill L10 +0.008 → +0.044 (window ceiling = max(flatten,
+mean) − per-token). Per-token sits at 0.776–0.795, far above the
+position-only floor of 0.592, so the signal is history and not the
+position ramp (P5 ✓). P4 ✓ (base ≈ distill, |Δ| ≤ 0.01 at T = 32).
+
+**Scored against the frozen predictions — three falsified.**
+(1) **P1 FALSIFIED at T = 8**: the card predicted g > 3σ_null at every
+T ≥ 8; distill L10 gives +0.007 at T = 8, and on the RAW flatten arm
+P1 fails more widely (flatten is *below* per-token at T ≤ 4 in every
+cell). (2) **P2's shape clause FALSIFIED**: the largest increments were
+predicted at 8→16 and 16→32 but the biggest single step is T2→T4;
+the end-to-end rise + no-saturation clause holds. (3) **P3's order
+clause FALSIFIED — the substantive finding**: g_order = flatten − mean
+is ≤ 0 in 17 of 20 primary cells (min −0.047), i.e. the window MEAN
+beats the ordered flatten, and the within-window shuffle costs only
++0.002…+0.022 AUC. **The entire window advantage is order-free
+evidence pooling.** That is exactly the card's own regime-2 prediction
+(additive-in-window over lag-weighted sentence indicators) and it means
+the shuffle ablation the briefing wants — "order/structure matters" —
+is NEGATIVE for this candidate. Reported as such.
+
+**Rule-scoring correction, disclosed.** `render.py` (committed before
+the screen) coded K2 as *strictly monotone at every step*, which is
+stricter than the card's text ("flat or non-growing over the whole
+tested range"). The strict variant turns on for a single 0.005 dip at
+T = 8 in distill/L10 — well inside 3σ_null = 0.0094 — and would have
+returned KILL. The card's text governs; the strict statistic is
+retained and reported alongside as
+`P2_strict_every_step_monotone = false`. The renderer was amended to
+score both, and the amendment is this paragraph.
+
+**Stage 2 cell:** base L12 (cleanest ladder; distill ties at T = 32,
+P4 says the axis does not matter). Regime 2 cannot separate window
+architectures from each other — it separates them from per-token — so
+Stage 2 is a direct test of the program's standing claim that a
+per-token-decoded T-SAE cannot follow a rate/intensity latent up the
+T ladder.

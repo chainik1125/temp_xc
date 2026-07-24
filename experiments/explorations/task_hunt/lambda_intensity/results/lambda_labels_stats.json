@@ -40,5 +40,11 @@
     "n_labeled_tokens": 419351,
     "labeled_frac_pos1plus": 0.8165124574561711,
     "n_windows": 4044
+  },
+  "dense_grid_stage2": {
+    "note": "zero-warm-up (the fitted mirror's own convention) + carry-forward across inter-sentence gaps; used ONLY by the Stage-2 panel, never by the frozen screen",
+    "agreement_with_frozen_on_finite_cells": 1.0,
+    "lam_hist_dense_mean": 0.10483872890472412,
+    "lam_hist_dense_std": 0.13402059674263
   }
 }
