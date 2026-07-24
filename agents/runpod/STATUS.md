@@ -1,11 +1,11 @@
 # Working state — agent `runpod`
 
 **Last rewrite:** 2026-07-24 (night), after shipping candidate-factory
-bundles B1–B4. **State: candidate-factory-broad ACCEPTANCE GATE MET —
-ledger + 4 candidates shipped with LOG lines; B5/B6 are ledger-recorded
-stretch.** Briefing `briefings/candidate-factory-broad.md` stays until
-mac-local review. If a stretch bundle is in flight when this is read,
-check `git log --oneline -5` for a "B5" commit before redoing anything.
+bundles B1–B5. **State: candidate-factory-broad ACCEPTANCE GATE
+EXCEEDED — ledger + 5 candidates shipped with LOG lines; B6
+(OpenWebMath equation density) is the one open stretch item.**
+Briefing `briefings/candidate-factory-broad.md` stays until mac-local
+review; do NOT redo B1–B5.
 
 ## Who / where
 Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am
@@ -59,18 +59,26 @@ for background runs.
    red overclaiming test (guard ≈0.5); corrected next commit, no
    behavior change.
 
-## NEXT (stretch, optional — gate already met)
-- **B5 dialogue turn-length LEVEL (new corpus, DailyDialog-class):**
-  ledger paragraph B5 has the design (render WITHOUT speaker tags;
-  trailing mean turn length LEVEL primary per the hedging lesson;
-  tokens-since-boundary secondary only — conversion-risky; mask
-  boundary markers; must ship tokenized corpus artifact + exact
-  re-pull script + caching note). HF reachable; daily_dialog moved
-  (HTTP 307) — resolve the current dataset id first
-  (li2017dailydialog/daily_dialog) or pick another 2-speaker corpus.
-- **B6 OpenWebMath equation-density:** ledger B6; HF status 200.
-  Frozen delimiter grammar goes in the lib BEFORE the builder runs.
-- Both: same discipline — lib + tests + builder + card with frozen
+5. **B5 dialogue turn-length LEVEL (SHIPPED, stretch)** — NEW corpus:
+   DailyDialog via pinned parquet mirror `OpenRL/daily_dialog`
+   (canonical repo's loading script is dead under datasets 4.x);
+   seeded 5,000×(≥8-turn) sample SHIPPED as
+   `labels/dialevel_corpus.json.gz`; builder `build_dialevel.py` +
+   `dialevel_lib.py` + 4 tests; `labels/dialevel_dailydialog_*.npz`.
+   **No frozen bar fired (manifest unigram 0.566–0.569, position
+   0.592–0.631) but the all-row position AUC is 0.93 via a DOC-LENGTH
+   selection route — the card BINDS a screen precondition
+   (within-dialogue contrasts or length matching + floor probes).**
+   Economics: new stream ⇒ ~0.85M-token caching pass/model.
+
+## NEXT (stretch, optional — gate already exceeded)
+- **B6 OpenWebMath equation-density:** ledger B6 has the design; HF
+  dataset `open-web-math/open-web-math` reachable (status 200; LARGE —
+  use streaming to pull a pinned seeded sample, ship it like
+  dialevel_corpus). Frozen LaTeX-delimiter grammar goes in the lib
+  BEFORE the builder runs; in-math state is the recorded-dead
+  bracket-family face — density-with-current-span-excluded is the only
+  primary. Same discipline: lib + tests + builder + card with frozen
   bars committed pre-run; triage is kill authority; one LOG line.
 
 ## Reusable know-how (this box)
