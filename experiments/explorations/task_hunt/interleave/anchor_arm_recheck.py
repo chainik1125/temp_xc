@@ -127,6 +127,8 @@ def run_model(key: str, done: dict):
             FOREIGN_SEED + T + 1))
         run(f"{key}/T{T}/actxmean_foreign_linear", lambda: summarize(
             fit_probe(ftr, ytr_t, fte, yte_t, N_CLS), N_CLS))
+        run(f"{key}/T{T}/actxmean_foreign_mlp", lambda: summarize(
+            fit_probe(ftr, ytr_t, fte, yte_t, N_CLS, hidden=512), N_CLS))
         del Wtr, Wte, atr, ate, ftr, fte
     del acts
 
