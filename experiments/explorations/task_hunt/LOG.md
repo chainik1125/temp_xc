@@ -2580,3 +2580,235 @@ to catch, and a useful anchor for what "a bar firing" looks like next to
 the near-0.5 numbers above.
 
 _Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+## 2026-07-24 — runpod-e — `dialevel` (dialogue turn-length LEVEL, DailyDialog) — **WEAK: no rule fires as written** — and the run produced two findings larger than the candidate
+
+Screen per the frozen `dialevel/CARD.md` (frozen with `screen.py` at
+`7e925306`, before any cell; cache built and mapping-verified first at
+`e8f85759`; label-side design probe committed before it ran at
+`587a95dd`). 105 cells × 3 models. Results
+`dialevel/results/screen_<model>.json`. Corpus licence **CC BY-NC-SA
+4.0**, travelling with any figure.
+
+### The verdict
+
+Scored on the **within-dialogue arm only**, as the card requires
+(binary rank-AUC; classes ranked inside each dialogue, balanced per
+dialogue so dialogue identity carries exactly zero label information).
+
+| model | per-token lin / MLP | postst floor | best window (frozen grid) | (a) gap | (c) over floor |
+|---|---|---|---|---|---|
+| gpt2 | 0.737 / 0.737 | 0.728 | 0.785 (T32 MLP) | +0.048 | +0.057 |
+| gemma2-2b | 0.650 / 0.698 | 0.711 | 0.768 (T32 MLP) | +0.070 | +0.057 |
+| llama31-8b | 0.689 / 0.728 | **0.772** | 0.774 (T16 MLP) | +0.046 | **+0.002** |
+
+**KEEP fails**: (a) misses on gpt2 by 0.002 and on llama by 0.004;
+(c) fails outright on llama, where a **seven-feature label-side floor
+(position + `tst`) reads the label at 0.772 and no activation cell of
+any kind beats it by more than 0.002**; (d) fails everywhere (flatten
+> mean). **No KILL rule fires either**: per-token is not within 0.02 of
+the best window (rule 1), per-token is not ≥ 0.05 above the floor —
+it is BELOW it on 2 of 3 models (rule 2), the gap clears 3σ_null
+(nulls 0.470–0.515, rule 3), the gap grows in the flatten arm on all
+three (rule 4), and the within-dialogue arm is not flat (rule 5).
+**WEAK — no rule fires as written**, with the card's power bound
+attached: the within-dialogue contrast is |Δ tlevel| median **3.8
+tokens = 0.26–0.28 of the global contrast** with heavily overlapping
+5-turn supports, so this is a bounded negative.
+
+**Conversion fraction is UNDEFINED here, and that is a defect in my own
+diagnostic.** `(tok − floor)/(best_window − floor)` needs
+`floor ≤ tok ≤ window`; per-token sits BELOW the label-side floor on
+gemma2 (−0.013) and llama (−0.044), giving −0.23 and −22. **Amendment
+to my round-2 recommendation: the conversion fraction requires a
+stated definedness precondition (`tok > floor`), and where it fails the
+right statement is "the activation probe does not beat the label-side
+floor", not a fraction.**
+
+Scorecard: **D1 FALSIFIED** (per-token is +0.009 above its floor on
+gpt2 and below it on the other two — the state is barely linearly
+present at this contrast). **D2 FALSIFIED as written** (the MEAN arm
+declines in T on 2 of 3; see below for why that arm was the wrong
+instrument). **D3 FALSIFIED — reported loudly as the card demands**:
+`win_linear` beats `win_shuf_linear` at *identical width* by
++0.031/+0.056 (gpt2), +0.025/+0.062 (gemma2), +0.028/+0.035 (llama) at
+T ∈ {16,32}, and both sit far above the foreign-context null. This is
+**the hunt's first capacity-matched order carriage**: the *positions*
+of turn boundaries inside the window carry the level beyond their rate.
+**D4 CONFIRMED far beyond its threshold** (below). **D5 CONFIRMED**:
+the `tst` anchor on the SAME rows reads **0.972 / 0.959 / 0.963**
+per-token and LOSES from windows (T64 mean 0.718 / 0.699 / 0.681), so
+the window's failure here is face-specific, not "windows are useless on
+these rows".
+
+### Finding 1 — what document identity buys a window probe, measured
+
+The card ran the naive global-tercile arm as a disclosed reference that
+scores nothing. It is the most useful cell block of the run (3-class
+acc, chance 0.333):
+
+| model | per-token | T4 | T8 | T16 | T32 | T64 | gap at T64 |
+|---|---|---|---|---|---|---|---|
+| gpt2 | 0.567 | 0.615 | 0.660 | 0.698 | 0.730 | **0.770** | **+0.203** |
+| gemma2-2b | 0.590 | 0.630 | 0.648 | 0.685 | 0.698 | **0.722** | **+0.132** |
+| llama31-8b | 0.575 | 0.642 | 0.660 | 0.685 | 0.708 | **0.727** | **+0.152** |
+
+Monotone growth across the whole ladder, mean ≫ flatten, three models,
+large margins: **on the naive arm this is the cleanest regime-2 KEEP of
+the entire hunt.** On the within-dialogue arm the same models, layer,
+probe and rows give a MEAN-arm gap of **−0.097 / −0.007 / +0.035**.
+The qualitative signature the screens look for — "window advantage
+grows with T" — is present in the confounded arm and absent in the
+controlled one. `doc_mean_only_auc` here is **0.983–0.986**, the
+highest in the hunt, and dialogue-length AUC is 0.847–0.883, i.e. the
+length route the factory named explains only part of it — which is why
+the card rejected length matching and required within-dialogue
+contrasts. **mac-local's binding qualification 2 was right, and this is
+the worked example**: without it the hunt would have graduated a
+document-identity artifact as its best candidate. Caveat stated
+plainly: the two arms differ in metric (3-class acc vs binary AUC) and
+in contrast size, so the delta is not a point estimate of "the identity
+contribution" — what transfers is the presence/absence of the T-growth
+signature.
+
+### Finding 2 — the hunt's window instrument is biased AGAINST the window
+
+Post-hoc, committed before running (`capacity_check.py` at `63318f2e`,
+`actxmean_null.py` at `dd373ac9`). It does not alter the scoring above;
+it determines what may be claimed.
+
+1. **`win_mean` dilutes the anchor to weight 1/T.** Where the anchor
+   carries a strong per-position route — here `tst` at 0.96 AUC — the
+   MEAN arm's decline in T is dilution, not evidence. Replacing it with
+   **`anchor ⊕ context-mean`** (2d, order-free, anchor undiluted) wins
+   **9 of 9** model × T comparisons, by **+0.051 AUC** on average.
+2. **Width is expensive.** The foreign-context null (true anchor,
+   context slots from a *different* row: same T·d width, zero true
+   context) scores **0.583–0.622** against a per-token 0.650–0.737.
+   Adding 24k–131k noise features *costs* up to 0.15 AUC. So
+   `win_flatten` vs `tok_linear` understates the window; the
+   width-matched comparison is flatten-vs-foreign, where context is
+   worth +0.09…+0.15.
+3. The `actxmean` arm's own width null (2d, foreign context-mean)
+   confirms its width is free: true − foreign is +0.056…+0.121 (MLP
+   arm) on all three models.
+
+On the corrected arms `dialevel`'s within-dialogue window gain is
+**+0.079 / +0.078 / +0.096** over matched per-token and **+0.088 /
++0.065 / +0.052** over the label-side floor — i.e. it would clear
+clauses (a) and (c) on 3 of 3. **I am not awarding that**: those cells
+are post-hoc and the growth clause is untested on them. The honest
+verdict is the frozen one (WEAK) plus a specific instrument fix, and
+`dialevel` is recorded as **re-screenable on a corrected grid**, not as
+a candidate that failed.
+
+**Recommendation to the program (this is the transferable part):** every
+Stage-1 screen in this hunt used `win_mean` and `win_flatten` as its
+window arms. Add **`anchor ⊕ context-mean` as the standard order-free
+window arm** (it strictly dominates `win_mean` in 9/9 here) and the
+**foreign-context null as the standard width control** for any flattened
+arm. Both are free on existing caches. What that implies for verdicts
+already published is the subject of the next entry.
+
+## 2026-07-24 — runpod-e — **CORRECTION: my `tss` KILL and my `novelty` NEGATIVE are both WITHDRAWN** — scoring error in my own application of my own frozen cards
+
+Two verdicts I published earlier today do not survive re-examination.
+The re-checks were committed with pre-registered outcome rules before
+they ran (`interleave/anchor_arm_recheck.py` at `afa52b70`,
+`novelty/anchor_arm_recheck.py` at `23ebddd9`, MLP width null at
+`fd4212ca`), and both re-runs reproduced `tok_linear`/`tok_mlp`
+bit-identically, so the comparisons are clean.
+
+### The error
+
+Both cards define the KEEP/KILL comparison against **"the best
+window"**, over a grid that explicitly includes window-MLP arms
+(`interleave/CARD.md` § 6 and § 8; `novelty/CARD.md` § 6 and § 7).
+**I tabulated and scored only the window-MEAN linear arm.** That is a
+mis-application of my own frozen rule, not a data problem — the cells
+were in the results JSON the whole time.
+
+Re-scored literally, per-T best window over all arms:
+
+**`tss`** — KEEP needs, on ≥ 2 of 3: gap ≥ +0.05 at some T, growth over
+T ∈ {4…32}, floor cleared by ≥ 0.05, null degradation ≥ 0.03.
+
+| model | per-token | floor | T4 | T8 | T16 | T32 | best gap | null degr. |
+|---|---|---|---|---|---|---|---|---|
+| gpt2 | 0.486 | 0.377 | 0.498 | 0.508 | 0.524 | **0.549** | **+0.063** | +0.086 |
+| gemma2-2b | 0.587 | 0.388 | 0.584 | 0.616 | 0.685 | **0.706** | **+0.118** | +0.095 |
+| llama31-8b | 0.544 | 0.372 | 0.615 | 0.638 | 0.726 | **0.748** | **+0.204** | +0.116 |
+
+All four clauses hold on **3 of 3**; no KILL rule fires (kill rule 1's
+"the window adds < 0.05" is false against the best window on every
+model). **`tss` scores KEEP on the card as written.**
+
+**`novelty`** — N1 gap ≥ +0.05 at some T with growth (N2), floor
+cleared, N4 real − null ≥ 0.03:
+
+| model | per-token | floor | best window | best gap | real − null |
+|---|---|---|---|---|---|
+| gpt2 | 0.474 | 0.326 | 0.520 (T16 mean) | +0.045 | +0.119 |
+| gemma2-2b | 0.457 | 0.340 | **0.541** (T32 MLP) | **+0.084** | +0.118 |
+| llama31-8b | 0.427 | 0.334 | **0.529** (T32 MLP) | **+0.102** | +0.096 |
+
+N1+N2 hold on 2 of 3, floor cleared by +0.201/+0.195, N4 holds
+everywhere. **`novelty` scores KEEP on the card as written.**
+
+### Why I am not simply reporting two KEEPs
+
+**The cards' "best window" convention is itself defective**, and saying
+so is part of the correction. It maximises over ~15–20 window cells
+against a single per-token cell with no multiplicity control, which
+inflates any gap. Neither my original scoring (one pre-chosen arm, but
+the wrong one relative to the rule) nor the literal re-score (the right
+rule, but a selection-inflated statistic) is clean.
+
+The defensible comparison fixes the probe class and controls width:
+
+| bundle | MLP-vs-MLP gap | linear-MEAN-vs-linear gap | `actxmean` MLP − its foreign null |
+|---|---|---|---|
+| `tss` | **+0.097 / +0.085 / +0.126** | +0.038 / −0.007 / +0.063 | +0.049…+0.099 |
+| `novelty` | **+0.064 / +0.076 / +0.073** | +0.045 / +0.037 / +0.038 | +0.040…+0.080 |
+
+Both clear +0.05 on 3 of 3 at matched probe class, and the
+foreign-context nulls sit at or below per-token (`tss` 0.448–0.611,
+`novelty` 0.429–0.457), so **width does not manufacture the gain — it
+is context.** Within the MLP arm the gap also grows T16 → T32 on every
+model of both bundles.
+
+**The substantive finding underneath the bookkeeping: in both bundles
+the window advantage lives in the NONLINEAR readout of the window, not
+in a linear mean-pool.** A linear probe on a mean-pooled window sees
+almost nothing extra (+0.04 typical); an MLP on the window sees
++0.06…+0.13. Tabulating only the linear MEAN arm hid that in two
+screens, and it is exactly the regime a window architecture would be
+expected to occupy.
+
+### Verdicts of record
+
+- **`tss`: KILL WITHDRAWN → KEEP-PENDING-REVIEW.** The card as written
+  scores KEEP on 3/3 and the capacity-matched analysis agrees in
+  direction and magnitude. I am flagging rather than awarding it
+  because the award comes from a re-score and the "best window"
+  convention needs replacing first.
+- **`novelty`: NEGATIVE WITHDRAWN → KEEP-PENDING-REVIEW** (2/3 literal,
+  3/3 matched-class).
+- **The "conversion is broader than next-token prediction" headline is
+  WITHDRAWN.** It rested entirely on the `tss` KILL. `tss` was the
+  corpus engineered to have no generative payoff, and on the corrected
+  reading the window *does* carry it — which supports the opposite
+  reading: conversion is what happens when the payoff exists, and
+  removing it left a genuinely window-carried state. The shuffled-block
+  null-corpus receipt (+0.086…+0.116) stands and now supports a KEEP
+  rather than an "it is real but per-position" consolation.
+- **`punctint` q (KEEP) and list (WEAK KEEP) are unaffected in
+  direction** — they were scored on the MEAN arm too, so their quoted
+  margins are LOWER BOUNDS. They should be re-quoted on the corrected
+  grid before use.
+- **`dialevel` WEAK stands** (its own entry above): it is the one
+  bundle where the corrected arms were run, and they still leave the
+  llama floor un-cleared.
+
+I would rather post this than leave two wrong verdicts standing.
+Everything needed to audit it is in the results JSONs, which were never
+edited — only re-read.
