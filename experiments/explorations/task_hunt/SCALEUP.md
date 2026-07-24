@@ -30,11 +30,14 @@ touched.
 | `labels/refmark2k_wildchat_{…}.npz` | + the new `is_user_echo` mask | 8.3 MB each |
 | `labels/refmark2k_stats.json` | triage + bootstrap CIs + echo/recurrence | — |
 | `labels/novelty_bootstrap.json` | item 3: CIs on the committed 400-doc triage | — |
+| `labels/docmean_index.json` | item 3 extended: the doc-identity distribution over 11 faces (§7) | — |
+| `labels/verify_prefix_labels.json` | frozen-logic check on the shared prefix (§2) | — |
 | `labels/scaleup_caching_cost.json` | §6 table, machine-readable | — |
 
 Builders (each committed BEFORE it produced output):
 `pull_fineweb4k.py`, `build_punctint4k.py`, `pull_refmark2k.py`,
 `build_refmark2k.py`, `probe_estimator_scale.py`, `boot_novelty.py`,
+`boot_docmean_index.py`, `verify_prefix_labels.py`,
 `scaleup_caching_cost.py`, and the new `boot_lib.py`
 (+ `tests/test_boot_lib.py`, 7 tests; suite 304 passed).
 
@@ -61,6 +64,19 @@ pinned 36,805).
 > `replag_fineweb_<tok>.npz` for all three tokenizers. The scaled corpus
 > is a deterministic SUPERSET, so **the pods' existing caches already
 > cover the first ~780–794k tokens per model** (§6).
+
+**The frozen-logic claim is checked, not asserted
+(`verify_prefix_labels`).** Because the corpora share a token-for-token
+prefix, the shipped and scaled bundles must agree exactly on every
+per-token label of the first 400 documents. They do — **bit-identical on
+all three tokenizers** across 793,831 / 784,512 / 777,900 tokens:
+`token_ids`, `doc_off`, `sent_idx`, `in_span`, both faces' λ̂ (NaN-aware)
+and both faces' event flags. Two things legitimately differ, quantified
+rather than waved away: `doc_split` (drawn for n_docs) and the 3-class
+labels, whose edges are re-estimated per corpus — **0.56–0.57 % of
+shared rows change class on the list face** (zero_split median-of-
+positives 0.31046 → 0.31242) and **0.0000 % on the q face**, whose edge
+came out identical on a corpus ten times the size.
 
 **WildChat 400 → 2,000 (`pull_refmark2k`).** Same pinned revision
 `7d6490e4…`, same filters, seed 0; stream prefix 40,000 → 250,000. The
@@ -228,25 +244,50 @@ point estimates asserted to reproduce `novelty_stats.json` exactly),
 plus the two views the shipped stats predate: manifest rows and
 `doc_mean_only_auc`.
 
-Assembling every family measured so far — manifest rows, direction-
-agnostic, 95 % CI — gives the distribution the threshold-pinning review
-asked for:
+Items 1–3 finished inside the night, so the same argument was extended
+to **every committed bundle that ships a manifest**
+(`labels/boot_docmean_index.py` → `docmean_index.json`). The row set is
+each bundle's OWN shipped manifest, test documents only — a manifest is
+the author's statement of which rows ship, masks already applied — the
+only statistic is `doc_mean_only_auc` with a 1,000-rep cluster
+bootstrap, and Ward-stream bundles cluster by **trace**, not stream row.
+No unigram or position numbers are recomputed for bundles I did not
+build.
 
-| family | doc-mean-only AUC | 95 % CI | screen outcome |
-|---|---|---|---|
-| novelty `nov_resid` (400 docs) | 0.760–0.784 | [0.710, 0.819] | NEGATIVE |
-| novelty `nov_raw` (400 docs) | 0.758–0.767 | [0.712, 0.802] | disclosed secondary |
-| punctint q (4,000 docs) | 0.901–0.902 | [0.886, 0.917] | KEEP |
-| punctint list (4,000 docs) | 0.966 | [0.958, 0.973] | WEAK KEEP |
-| refmark (2,000 convs) | 0.974–0.975 | [0.964, 0.983] | ships, screen pending |
+| face | doc-mean-only (dir-agnostic) | 95 % CI | clusters | screen outcome |
+|---|---|---|---|---|
+| verbosity `vslope` (Ward) | 0.554 | [0.531, 0.577] | 60 | — |
+| interleave `tss` | 0.675 | [0.619, 0.713] | 40 | **KILL (converted)** |
+| novelty `nov_raw` (400 docs) | 0.758–0.767 | [0.712, 0.802] | 80 | disclosed secondary |
+| oprate `ver` / `case` (Ward) | 0.771 | [0.718, 0.818] | 56 | — |
+| novelty `nov_resid` (400 docs) | 0.760–0.784 | [0.710, 0.819] | 80 | **NEGATIVE** |
+| qrate (Ward) | 0.803 | [0.755, 0.845] | 60 | — |
+| sc_lambda (Ward λ̂) | 0.804 | [0.758, 0.836] | 60 | — |
+| **punctint q** (4,000 docs) | 0.901–0.902 | [0.886, 0.917] | 800 | **KEEP** |
+| dialevel `tlevel` | 0.965 | [0.941, 0.983] | 837 | screen foreclosed (qual. 2) |
+| **punctint list** (4,000 docs) | 0.966 | [0.958, 0.973] | 800 | WEAK KEEP |
+| **refmark** (2,000 convs) | 0.974–0.975 | [0.964, 0.983] | 400 | ships, screen pending |
 
-The one screened-NEGATIVE family sits ~0.77 with a CI that does not
-overlap any surviving face's (lowest KEEP bound 0.886), so a threshold
-in the 0.82–0.88 gap would separate them today. **That is a correlation
-over four faces, not kill authority** — novelty did not die of document
-identity — and the campaign's remit was to supply the distribution, not
-to pin the bar. `doc_mean_only_auc` remains a reported disclosure
-statistic.
+**The statistic corroborates judgments the program reached by hand:**
+`dialevel` lands at 0.965 — mac-local's qualification 2 foreclosed its
+naive screen precisely because a dialogue-length selection route
+dominates it, and this measurement, taken from a different direction,
+puts it exactly there. The converted KILL and the NEGATIVE family sit
+low; a pure trailing-slope face sits lowest.
+
+**And it argues against making the statistic a kill bar.** Any
+threshold separating the low families from the loud ones — anywhere in
+0.82–0.88 — sits BELOW **punctint q at 0.901, the hunt's only
+unconditional KEEP**, which passed both frozen bars, cleared its
+position floor, and survived an explicit within-document contrast. Such
+a rule would have killed it before it was screened. The adopted design —
+a reported disclosure statistic that makes a within-document contrast
+MANDATORY for any face that KEEPs — is what this evidence supports.
+Caveats: eleven faces, five corpora, cluster counts from 40 to 837 (CI
+widths are not comparable); Ward outcomes not posted in the ledger are
+left blank rather than guessed; no causal claim — a face can be
+document-dominated benignly (punctint q) or fatally (dialevel), which is
+the whole reason the number belongs in a disclosure line.
 
 Also worth the reviewer's eye: novelty's *raw* face carries a position
 AUC of **0.115–0.135 (direction-agnostic 0.865–0.885)** on manifest

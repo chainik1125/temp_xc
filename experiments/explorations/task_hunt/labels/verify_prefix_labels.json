@@ -1,0 +1,183 @@
+{
+ "note": "shipped 400-doc bundle vs the scaled bundle restricted to the shared prefix; per-token labels must be identical, class labels may legitimately differ (edges + split are re-estimated per corpus)",
+ "per_tokenizer": {
+  "gpt2": {
+   "n_docs_prefix": 400,
+   "n_tokens_prefix": 793831,
+   "identical": {
+    "doc_off": true,
+    "token_ids": true,
+    "sent_idx": true,
+    "in_span": true,
+    "lam_list": true,
+    "is_list": true,
+    "lam_q": true,
+    "is_q": true
+   },
+   "reclassified": {
+    "list": {
+     "labeled_rows_both": 725500,
+     "class_changed_frac": 0.0056347346657477605,
+     "confusion_shipped_rows_x_scaled_cols": [
+      [
+       642766,
+       0,
+       0
+      ],
+      [
+       0,
+       41326,
+       0
+      ],
+      [
+       0,
+       4088,
+       37320
+      ]
+     ]
+    },
+    "q": {
+     "labeled_rows_both": 725500,
+     "class_changed_frac": 0.0,
+     "confusion_shipped_rows_x_scaled_cols": [
+      [
+       584327,
+       0,
+       0
+      ],
+      [
+       0,
+       80148,
+       0
+      ],
+      [
+       0,
+       0,
+       61025
+      ]
+     ]
+    }
+   },
+   "all_per_token_labels_identical": true
+  },
+  "gemma2": {
+   "n_docs_prefix": 400,
+   "n_tokens_prefix": 784512,
+   "identical": {
+    "doc_off": true,
+    "token_ids": true,
+    "sent_idx": true,
+    "in_span": true,
+    "lam_list": true,
+    "is_list": true,
+    "lam_q": true,
+    "is_q": true
+   },
+   "reclassified": {
+    "list": {
+     "labeled_rows_both": 716862,
+     "class_changed_frac": 0.005670547469387413,
+     "confusion_shipped_rows_x_scaled_cols": [
+      [
+       634391,
+       0,
+       0
+      ],
+      [
+       0,
+       40987,
+       0
+      ],
+      [
+       0,
+       4065,
+       37419
+      ]
+     ]
+    },
+    "q": {
+     "labeled_rows_both": 716862,
+     "class_changed_frac": 0.0,
+     "confusion_shipped_rows_x_scaled_cols": [
+      [
+       578532,
+       0,
+       0
+      ],
+      [
+       0,
+       78585,
+       0
+      ],
+      [
+       0,
+       0,
+       59745
+      ]
+     ]
+    }
+   },
+   "all_per_token_labels_identical": true
+  },
+  "llama31": {
+   "n_docs_prefix": 400,
+   "n_tokens_prefix": 777900,
+   "identical": {
+    "doc_off": true,
+    "token_ids": true,
+    "sent_idx": true,
+    "in_span": true,
+    "lam_list": true,
+    "is_list": true,
+    "lam_q": true,
+    "is_q": true
+   },
+   "reclassified": {
+    "list": {
+     "labeled_rows_both": 711060,
+     "class_changed_frac": 0.00566900120946193,
+     "confusion_shipped_rows_x_scaled_cols": [
+      [
+       629571,
+       0,
+       0
+      ],
+      [
+       0,
+       40484,
+       0
+      ],
+      [
+       0,
+       4031,
+       36974
+      ]
+     ]
+    },
+    "q": {
+     "labeled_rows_both": 711060,
+     "class_changed_frac": 0.0,
+     "confusion_shipped_rows_x_scaled_cols": [
+      [
+       573439,
+       0,
+       0
+      ],
+      [
+       0,
+       78103,
+       0
+      ],
+      [
+       0,
+       0,
+       59518
+      ]
+     ]
+    }
+   },
+   "all_per_token_labels_identical": true
+  }
+ },
+ "all_tokenizers_pass": true
+}

@@ -2841,3 +2841,92 @@ Also for that table's next revision: `tss` sits at 0.664–0.670, the
 lowest measured, and is now KEEP-PENDING-REVIEW rather than KILL — so
 the low end of the range gains a surviving face, which strengthens the
 monotone reading even as the high end loses its anchor.
+
+
+
+## 2026-07-24 — runpod — corpus scale-up, extending item 3: the **`doc_mean_only_auc` distribution across ELEVEN faces** — and the case against making it a kill bar
+
+Items 1–3 finished well inside the night, so I extended item 3's
+argument ("its numbers feed the same threshold dataset") to every
+committed bundle that ships a manifest — `labels/boot_docmean_index.py`.
+Deliberately narrow so it does not re-interpret other agents' work: the
+row set is **each bundle's OWN shipped manifest**, test documents only
+(a manifest is the author's statement of which rows ship, masks and
+eligibility already applied), the only statistic is `doc_mean_only_auc`
+with a 1,000-rep cluster bootstrap, and no unigram or position numbers
+are recomputed. Ward-stream bundles cluster by **trace**, not stream row.
+
+| face | doc-mean-only (dir-agnostic) | 95 % CI | clusters | screen outcome |
+|---|---|---|---|---|
+| verbosity `vslope` (Ward) | 0.554 | [0.531, 0.577] | 60 | — |
+| interleave `tss` | 0.675 | [0.619, 0.713] | 40 | **KILL (converted)** |
+| novelty `nov_raw` | 0.758–0.767 | [0.712, 0.802] | 80 | disclosed secondary |
+| oprate `ver` / `case` (Ward) | 0.771 | [0.718, 0.818] | 56 | — |
+| novelty `nov_resid` | 0.760–0.784 | [0.710, 0.819] | 80 | **NEGATIVE** |
+| qrate (Ward) | 0.803 | [0.755, 0.845] | 60 | — |
+| sc_lambda (Ward λ̂) | 0.804 | [0.758, 0.836] | 60 | — |
+| **punctint q** (4,000 docs) | 0.901 | [0.886, 0.917] | 800 | **KEEP** |
+| dialevel `tlevel` | 0.965 | [0.941, 0.983] | 837 | screen foreclosed (qual. 2) |
+| **punctint list** (4,000 docs) | 0.966 | [0.958, 0.973] | 800 | WEAK KEEP |
+| **refmark** (2,000 convs) | 0.974 | [0.964, 0.983] | 400 | ships, screen pending |
+
+Two things fall out, and they point in opposite directions — which is
+the useful part.
+
+**The statistic corroborates judgments the program reached by hand.**
+`dialevel` lands at 0.965, beside punctint-list. Nobody fed it that
+verdict: mac-local's binding qualification 2 foreclosed dialevel's naive
+screen precisely because a dialogue-length selection route dominates it,
+and this statistic — computed months of reasoning later from a different
+direction — puts it exactly where that reasoning did. The converted KILL
+(`interleave tss`, 0.675) and the NEGATIVE family (`novelty`, 0.77) sit
+low, and the pure trailing-SLOPE face (`vslope`, 0.554) sits lowest of
+all, as a slope with near-zero within-document mean should.
+
+**But it must NOT become a kill bar.** Any threshold that separates the
+negative families from the loud ones — anywhere in 0.82–0.88, the gap my
+narrower item-3 entry above pointed at — sits BELOW **punctint q at
+0.901, the hunt's only unconditional KEEP**, which passed both frozen
+bars, cleared its position floor, and survived an explicit
+within-document contrast (+0.101…+0.183). A `doc_mean_only_auc >= 0.88
+⇒ KILL` rule would have killed it before it was ever screened. **The
+adopted design — a reported disclosure statistic that makes a
+within-document contrast MANDATORY for any face that KEEPs — is the one
+the evidence supports**; a kill bar is not, and this entry is a vote
+against pinning one at the post-screen-wave review.
+
+Caveats, plainly: eleven faces across five corpora with cluster counts
+from 40 to 837, so the intervals are not comparable in width; the Ward
+bundles' outcomes are not all posted in the screen-outcomes block, and I
+left those cells empty rather than guess; and no causal claim is made —
+a face can be document-dominated for benign reasons (`punctint q`) or
+fatal ones (`dialevel`), which is exactly why the number belongs in a
+disclosure line rather than in a kill rule.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+
+## 2026-07-24 — runpod — corpus scale-up, verification: **the frozen-logic claim is checked, not asserted** — per-token labels bit-identical on the shared 400-doc prefix
+
+The campaign's central discipline claim is that the scaled builds reuse
+the committed label libraries unchanged. Because the 4,000-doc corpus is
+a token-for-token superset of the pinned 400, that claim is checkable:
+`labels/verify_prefix_labels.py` compares the shipped
+`punctint_fineweb_<tok>.npz` against `punctint4k_fineweb_<tok>.npz`
+restricted to the shared prefix.
+
+**PASS on all three tokenizers**, bit-identical across the shared
+793,831 / 784,512 / 777,900 tokens: `token_ids`, `doc_off`, `sent_idx`,
+`in_span`, both faces' λ̂ (NaN-aware) and both faces' event flags. The
+scaled bundle is the same label logic on more documents, demonstrably.
+
+Two things legitimately differ and are quantified rather than waved
+away: `doc_split` (drawn for n_docs) and the 3-class labels, whose
+edges are re-estimated on whichever corpus is being built. The effect is
+small — **0.56–0.57 % of shared-prefix rows change class on the list
+face** (the zero_split median-of-positives edge moved 0.31046 →
+0.31242), and **exactly 0.0000 % on the q face**, whose edge came out
+identical to 17 significant figures on a corpus ten times the size.
+Receipt: `labels/verify_prefix_labels.json`.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_

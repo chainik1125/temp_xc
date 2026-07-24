@@ -1,0 +1,196 @@
+{
+ "statistic": "doc_mean_only_auc on the bundle's OWN shipped manifest rows, test documents only",
+ "bootstrap": {
+  "unit": "document / trace (cluster)",
+  "n_reps": 1000,
+  "ci_pct": [
+   2.5,
+   97.5
+  ],
+  "seed": 0
+ },
+ "bundles": [
+  {
+   "bundle": "sc_lambda (Ward backtracking \u03bb\u0302)",
+   "artifact": "sc_lambda.npz",
+   "cluster": "trace",
+   "doc_mean_only_auc": {
+    "point": 0.8040487242550993,
+    "point_direction_agnostic": 0.8040487242550993,
+    "n_rows": 8345,
+    "n_pos": 4208,
+    "n_neg": 4137,
+    "n_docs": 60,
+    "n_reps": 1000,
+    "seed": 0,
+    "ci_pct": [
+     2.5,
+     97.5
+    ],
+    "mean": 0.800275090348459,
+    "se": 0.019988958218098356,
+    "ci_lo": 0.7576280323763478,
+    "ci_hi": 0.8358100988479017,
+    "ci_lo_direction_agnostic": 0.7576280323763478,
+    "ci_hi_direction_agnostic": 0.8358100988479017,
+    "n_degenerate_reps": 0
+   }
+  },
+  {
+   "bundle": "qrate (Ward question rate)",
+   "artifact": "qrate.npz",
+   "cluster": "trace",
+   "doc_mean_only_auc": {
+    "point": 0.8027885379541091,
+    "point_direction_agnostic": 0.8027885379541091,
+    "n_rows": 7795,
+    "n_pos": 3746,
+    "n_neg": 4049,
+    "n_docs": 60,
+    "n_reps": 1000,
+    "seed": 0,
+    "ci_pct": [
+     2.5,
+     97.5
+    ],
+    "mean": 0.7993695407468228,
+    "se": 0.022758799611230566,
+    "ci_lo": 0.7552492583800912,
+    "ci_hi": 0.8450595301085186,
+    "ci_lo_direction_agnostic": 0.7552492583800912,
+    "ci_hi_direction_agnostic": 0.8450595301085186,
+    "n_degenerate_reps": 0
+   }
+  },
+  {
+   "bundle": "oprate ver (Ward verify-op rate)",
+   "artifact": "oprate.npz",
+   "cluster": "trace",
+   "doc_mean_only_auc": {
+    "point": 0.7708683731947956,
+    "point_direction_agnostic": 0.7708683731947956,
+    "n_rows": 7434,
+    "n_pos": 3660,
+    "n_neg": 3774,
+    "n_docs": 56,
+    "n_reps": 1000,
+    "seed": 0,
+    "ci_pct": [
+     2.5,
+     97.5
+    ],
+    "mean": 0.768887208441573,
+    "se": 0.02644341337948443,
+    "ci_lo": 0.7175464332346982,
+    "ci_hi": 0.8182394686713365,
+    "ci_lo_direction_agnostic": 0.7175464332346982,
+    "ci_hi_direction_agnostic": 0.8182394686713365,
+    "n_degenerate_reps": 0
+   }
+  },
+  {
+   "bundle": "oprate case (Ward case-op rate)",
+   "artifact": "oprate.npz",
+   "cluster": "trace",
+   "doc_mean_only_auc": {
+    "point": 0.771107917950004,
+    "point_direction_agnostic": 0.771107917950004,
+    "n_rows": 7786,
+    "n_pos": 4368,
+    "n_neg": 3418,
+    "n_docs": 56,
+    "n_reps": 1000,
+    "seed": 0,
+    "ci_pct": [
+     2.5,
+     97.5
+    ],
+    "mean": 0.7684072454398847,
+    "se": 0.024222422181037644,
+    "ci_lo": 0.7204059868576056,
+    "ci_hi": 0.8161143279116403,
+    "ci_lo_direction_agnostic": 0.7204059868576056,
+    "ci_hi_direction_agnostic": 0.8161143279116403,
+    "n_degenerate_reps": 0
+   }
+  },
+  {
+   "bundle": "verbosity vslope (Ward)",
+   "artifact": "verbosity.npz",
+   "cluster": "trace",
+   "doc_mean_only_auc": {
+    "point": 0.5541265501817796,
+    "point_direction_agnostic": 0.5541265501817796,
+    "n_rows": 7954,
+    "n_pos": 3957,
+    "n_neg": 3997,
+    "n_docs": 60,
+    "n_reps": 1000,
+    "seed": 0,
+    "ci_pct": [
+     2.5,
+     97.5
+    ],
+    "mean": 0.5537298320226429,
+    "se": 0.011867692375873531,
+    "ci_lo": 0.5312770261356451,
+    "ci_hi": 0.5767532273122477,
+    "ci_lo_direction_agnostic": 0.5312770261356451,
+    "ci_hi_direction_agnostic": 0.5767532273122477,
+    "n_degenerate_reps": 0
+   }
+  },
+  {
+   "bundle": "dialevel tlevel (DailyDialog, gpt2)",
+   "artifact": "dialevel_dailydialog_gpt2.npz",
+   "cluster": "document",
+   "doc_mean_only_auc": {
+    "point": 0.9644684195804327,
+    "point_direction_agnostic": 0.9644684195804327,
+    "n_rows": 8248,
+    "n_pos": 3942,
+    "n_neg": 4306,
+    "n_docs": 837,
+    "n_reps": 1000,
+    "seed": 0,
+    "ci_pct": [
+     2.5,
+     97.5
+    ],
+    "mean": 0.964652327232124,
+    "se": 0.010974922253839264,
+    "ci_lo": 0.9410528943836498,
+    "ci_hi": 0.9830804684545773,
+    "ci_lo_direction_agnostic": 0.9410528943836498,
+    "ci_hi_direction_agnostic": 0.9830804684545773,
+    "n_degenerate_reps": 0
+   }
+  },
+  {
+   "bundle": "interleave tss (fineweb pairs, gpt2)",
+   "artifact": "interleave_fineweb_gpt2.npz",
+   "cluster": "document",
+   "doc_mean_only_auc": {
+    "point": 0.6753228837350685,
+    "point_direction_agnostic": 0.6753228837350685,
+    "n_rows": 8289,
+    "n_pos": 4210,
+    "n_neg": 4079,
+    "n_docs": 40,
+    "n_reps": 1000,
+    "seed": 0,
+    "ci_pct": [
+     2.5,
+     97.5
+    ],
+    "mean": 0.6702218167287336,
+    "se": 0.02293644102737028,
+    "ci_lo": 0.6189053095519433,
+    "ci_hi": 0.7133509379604268,
+    "ci_lo_direction_agnostic": 0.6189053095519433,
+    "ci_hi_direction_agnostic": 0.7133509379604268,
+    "n_degenerate_reps": 0
+   }
+  }
+ ]
+}
