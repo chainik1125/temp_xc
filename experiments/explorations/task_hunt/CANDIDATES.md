@@ -118,6 +118,29 @@ verbosity dies on a Ward-specific artifact.
   stays with the two frozen bars until a review pins a threshold.
   First applied to B7's builder (conversation-mean AUC — exactly its
   named axis-b risk).
+- 2026-07-24 · **Corpus scale-up campaign COMPLETE** (`runpod`,
+  `briefings/corpus-scaleup.md`; receipts in `SCALEUP.md`, four LOG
+  entries). punctint 400 → **4,000 docs** (prefix identity confirmed
+  token-for-token ⇒ existing caches cover the first ~790k tokens/model)
+  and refmark 400 → **2,000 convs**; frozen logic, new versioned
+  artifacts, every triage AUC now carrying a 1,000-rep document-level
+  bootstrap CI (`labels/boot_lib.py`). **No frozen bar fires at scale**,
+  but three standing numbers move: unigram UP into the 0.55–0.65
+  disclosure band on every face (0.546–0.583), position DOWN toward 0.5
+  (the list face's all-eligible 0.639–0.653 → 0.560–0.566), doc-mean-only
+  essentially unmoved (0.901–0.975). **Measured cause of the unigram
+  rise: estimator sample size** — holding evaluation rows fixed and
+  varying only train documents reproduces 76–91 % (list) / 45–57 % (q)
+  of it, and the curve has not saturated at 3,200 docs ⇒ **every 400-doc
+  unigram triage number in this ledger is an UNDERSTATEMENT, and the
+  scaled number is itself a lower bound** (`probe_estimator_scale.json`;
+  the probe-side corollary is flagged as an unverified hypothesis, not a
+  claim). The "8 documents" within-doc control becomes **56 (list) /
+  117 (q) / 52 (refmark)** test documents at ≥ 20 manifest rows per
+  class. `is_user_echo` ships in the scaled refmark npz (0.52 % of
+  manifest rows). Threshold dataset for the deferred `doc_mean_only_auc`
+  bar: the one NEGATIVE family sits at 0.760–0.784 [0.710, 0.819] with
+  no CI overlap against any surviving face (lowest KEEP bound 0.886).
 
 ---
 

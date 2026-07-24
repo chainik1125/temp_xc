@@ -1,0 +1,70 @@
+{
+ "note": "tokens per model, not gigabytes: footprint per token depends on the pod's layer selection and dtype",
+ "totals": {
+  "fineweb4k_new_tokens_3_models": 21120073,
+  "refmark2k_new_tokens_3_models": 18117522,
+  "all_new_tokens_3_models": 39237595
+ },
+ "rows": [
+  {
+   "corpus": "fineweb4k (punctint, 4,000 docs)",
+   "tokenizer": "gpt2",
+   "tokens": 7913315,
+   "already_cached": 793831,
+   "new_tokens": 7119484,
+   "shipped_stream_tokens": 793831,
+   "cache_source": "replag_fineweb_gpt2.npz (prefix identity CONFIRMED)",
+   "x_shipped_stream": 9.97
+  },
+  {
+   "corpus": "fineweb4k (punctint, 4,000 docs)",
+   "tokenizer": "gemma2",
+   "tokens": 7815498,
+   "already_cached": 784512,
+   "new_tokens": 7030986,
+   "shipped_stream_tokens": 784512,
+   "cache_source": "replag_fineweb_gemma2.npz (prefix identity CONFIRMED)",
+   "x_shipped_stream": 9.96
+  },
+  {
+   "corpus": "fineweb4k (punctint, 4,000 docs)",
+   "tokenizer": "llama31",
+   "tokens": 7747503,
+   "already_cached": 777900,
+   "new_tokens": 6969603,
+   "shipped_stream_tokens": 777900,
+   "cache_source": "replag_fineweb_llama31.npz (prefix identity CONFIRMED)",
+   "x_shipped_stream": 9.96
+  },
+  {
+   "corpus": "refmark2k (WildChat, 2,000 convs)",
+   "tokenizer": "gpt2",
+   "tokens": 6526499,
+   "already_cached": 0,
+   "new_tokens": 6526499,
+   "shipped_stream_tokens": 1362514,
+   "cache_source": "none \u2014 a pool subsample redraws (only 121 of the shipped 400 conversations recur)",
+   "x_shipped_stream": 4.79
+  },
+  {
+   "corpus": "refmark2k (WildChat, 2,000 convs)",
+   "tokenizer": "gemma2",
+   "tokens": 5918102,
+   "already_cached": 0,
+   "new_tokens": 5918102,
+   "shipped_stream_tokens": 1233074,
+   "cache_source": "none \u2014 a pool subsample redraws (only 121 of the shipped 400 conversations recur)",
+   "x_shipped_stream": 4.8
+  },
+  {
+   "corpus": "refmark2k (WildChat, 2,000 convs)",
+   "tokenizer": "llama31",
+   "tokens": 5672921,
+   "already_cached": 0,
+   "new_tokens": 5672921,
+   "shipped_stream_tokens": 1186570,
+   "cache_source": "none \u2014 a pool subsample redraws (only 121 of the shipped 400 conversations recur)",
+   "x_shipped_stream": 4.78
+  }
+ ]
+}

@@ -2370,3 +2370,213 @@ a screen whose gap nobody can interpret.
 
 License note travels from here on: DailyDialog is **CC BY-NC-SA 4.0**
 (research use); it attaches to any figure that graduates.
+
+
+## 2026-07-24 — runpod — corpus scale-up item 1: `punctint` rebuilt on **4,000 fineweb documents** — no frozen bar fires, three numbers move, and one of them is a lower bound
+
+`briefings/corpus-scaleup.md` item 1, done end to end. Label logic
+FROZEN: `build_punctint4k.py` imports `punctint_lib` unchanged (same
+grammar, same 8-sentence half-life-2 kernel, same zero_split scheme,
+same position-matched manifests) and writes NEW versioned artifacts;
+`build_punctint.py` and the shipped 400-doc bundle were not touched.
+
+**The corpus receipt is better than hoped. Prefix identity PASSES at
+both levels**: the pinned 400-doc sample is exactly the first 400
+documents of the 4,000-doc pull (400/400 ids, 400/400 sentence lists),
+and that survives tokenization — `token_ids` AND `doc_off` prefix
+identity against `replag_fineweb_<tok>.npz` on all three tokenizers. The
+scaled corpus is a deterministic SUPERSET, so **the existing GPU caches
+already cover the first 780–794k tokens per model**; only ~7.0M new
+tokens per model need a pass (full table in `SCALEUP.md` §6).
+
+Triage on the frozen bars (direction-agnostic, manifest rows operative;
+every number now carries a 1,000-rep **document-level** bootstrap CI from
+the new `boot_lib`, 7 tests, suite 304 passed):
+
+| face | stat | 400 docs | 4,000 docs | 95 % CI |
+|---|---|---|---|---|
+| list | unigram | 0.517–0.534 | **0.574–0.583** | [0.559, 0.598] |
+| list | position | 0.415–0.428 | 0.470–0.478 | [0.436, 0.512] |
+| list | doc-mean-only | 0.960 | **0.966** | [0.958, 0.973] |
+| q | unigram | 0.520–0.533 | **0.558–0.563** | [0.545, 0.576] |
+| q | position | 0.471–0.478 | 0.511–0.518 | [0.472, 0.569] |
+| q | doc-mean-only | 0.926 | **0.901–0.902** | [0.886, 0.917] |
+
+**No bar fires — both faces move INTO the 0.55–0.65 disclosure band on
+the unigram axis, and both improve on position.** Per the briefing's
+rule, a bar firing at scale would have been a finding binding Stage 2,
+not a retro-kill; nothing fired, but the disclosure band did move under
+the shipped verdicts and the next card must quote the scaled number.
+The position side is the pleasant surprise: the list face's all-eligible
+position AUC was 0.639–0.653 at 400 docs — **one tokenizer over the kill
+bar** — and reads 0.560–0.566 at 4,000. Small-corpus triage is noisy in
+the dangerous direction as well as the safe one.
+
+**runpod-e's "8 documents" question, answered with a ladder.** "Carries
+the within-document contrast" is not one number, so the census reports
+the minimum manifest rows per class a document must supply (test docs):
+
+| face | ≥ 1 | ≥ 5 | ≥ 20 | ≥ 50 |
+|---|---|---|---|---|
+| list (was 8) | 199 | 173 | **56** | 3 |
+| q | 504 | 437 | **117** | 7 |
+
+**Fixed, with a stated ceiling**: a serious per-document contrast has
+52–117 documents instead of 8, but not thousands — a position-matched
+manifest spreads rows thinly over a 10× larger pool. Depth is available
+from the same artifacts by restricting the manifest to fewer documents;
+that is a Stage-2 lever, not a data limit. What the data supports at
+position-matched balance: **189,959 rows/class (list), 529,708 (q)** —
+the raised 100k cap BINDS, and is stated as such.
+
+Artifacts: `labels/fineweb4k_corpus.json.gz` (+ receipt),
+`labels/punctint4k_fineweb_{gpt2,gemma2,llama31}.npz`,
+`labels/punctint4k_stats.json`. Receipts sheet: `SCALEUP.md`.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+
+## 2026-07-24 — runpod — **recommendation to the factory: every 400-doc unigram triage number is an UNDERSTATEMENT** (measured, not argued)
+
+The unigram bar rose on every face at scale (above; and again on refmark
+below). Two readings with opposite consequences: **estimator noise** —
+the triage score is a train-set mean per token type
+(`novelty_lib.type_mean_scores`), and with 320 training documents most
+types are seen a handful of times, so the score is mostly noise and the
+AUC is attenuated toward 0.5 — versus **corpus composition**, in which
+case only the scaled corpus is affected and the shipped numbers stand.
+
+They separate cleanly, because the scaled corpus CONTAINS the pinned
+one: hold the evaluation rows fixed (the scaled build's test manifest
+rows) and vary only how many train documents feed the estimator
+(`labels/probe_estimator_scale.py`, 3 seeded draws per rung, label-side
+only).
+
+| face/tok | 40 | 320 (= shipped) | 1280 | 3200 |
+|---|---|---|---|---|
+| list/gpt2 | 0.509 | **0.531** | 0.562 | **0.574** |
+| list/gemma2 | 0.515 | **0.541** | 0.571 | **0.582** |
+| list/llama31 | 0.514 | **0.536** | 0.569 | **0.583** |
+| q/gpt2 | 0.523 | **0.541** | 0.552 | **0.558** |
+| q/gemma2 | 0.524 | **0.546** | 0.557 | **0.563** |
+| q/llama31 | 0.523 | **0.538** | 0.551 | **0.558** |
+
+At the shipped training size the estimator lands within 0.01–0.02 of the
+shipped numbers **on entirely different rows**. Estimator sample size
+accounts for **76–91 % of the rise on the list face, 45–57 % on q**; the
+remainder is the row-set difference, not separately isolated. The curve
+has **not saturated at 3,200 documents**, so even the scaled number is a
+lower bound.
+
+**Recommendation (cheap, no new data):** read every unigram triage
+number as a function of the training corpus, not as a property of the
+label. A 400-doc reading of 0.52 does not mean the label is
+token-blind; it means the measurement was underpowered. Cards should
+either state the training size next to the bar or quote the scaled
+number where a scaled artifact exists.
+
+**And a hypothesis this does NOT establish, flagged because it would
+matter more than the above if true.** A screen's per-token probe is also
+an estimator fitted on finite rows. *If* it attenuates faster than the
+window probe (a per-token identity route plausibly needs more data than
+a smoothed aggregate one), then a 400-document screen understates its
+per-token baseline and therefore **overstates the window-minus-per-token
+gap** — the hunt's headline statistic. I did not measure this and am not
+claiming it. The check is now cheap and uses artifacts that exist:
+re-fit one screened bundle's per-token and window probes at two training
+sizes on the scaled corpus and compare the gaps.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+
+## 2026-07-24 — runpod — corpus scale-up item 2: `refmark` rebuilt on **2,000 WildChat conversations** — funnel and overlap on the record, `is_user_echo` shipped, conversation identity 0.975
+
+Same frozen logic (`refmark_lib`'s 12-substring list, the message-level
+half-life-2/support-8 kernel, `dialevel_lib` rendering), same pinned
+revision `7d6490e4…`, same filters and seed; stream prefix 40,000 →
+250,000. New builder, new artifacts; the shipped 400-conversation bundle
+untouched.
+
+**The two receipts the shipped build lacked.** Funnel: 250,000 streamed
+→ 119,458 English → 6,788 with ≥ 8 assistant turns → **6,256 pool** →
+2,000 seeded sample. Overlap: all 400 shipped conversations are in the
+larger pool, but only **121 land in the scaled sample** — a pool
+subsample redraws, so this is *not* a superset and the two bundles are
+near-independent evidence (worth knowing before quoting both).
+
+Triage (manifest rows operative, 1,000-rep conversation-level bootstrap):
+
+| stat | 400 convs | 2,000 convs | 95 % CI |
+|---|---|---|---|
+| unigram | 0.517–0.532 | **0.546–0.565** | [0.529, 0.583] |
+| position | 0.435–0.456 | 0.478–0.504 | [0.423, 0.554] |
+| doc-mean-only | 0.966–0.967 | **0.974–0.975** | [0.964, 0.983] |
+
+**No frozen bar fires.** Same pattern as item 1: unigram up (one
+tokenizer into the disclosure band, the others just under, all
+consistent with the estimator finding above), position toward 0.5.
+**Conversation identity is unmoved at 5× scale — 0.974–0.975 — so the
+card's binding precondition stands exactly as written: without a
+within-conversation contrast, any window gap here is uninterpretable as
+temporal structure.** That control now has **52 test conversations with
+≥ 20 manifest rows in each of the top and bottom class** (102 at ≥ 1,
+17 at ≥ 50), where the shipped build had never measured it.
+
+Corpus-level receipts at scale: marker rate 0.135 of assistant messages
+(0.148 at 400, pre-gate 0.147); recurrence **33.6 %** of conversations
+with ≥ 2 marker messages (37.7 % on the pre-gate population), 51.2 %
+with ≥ 1, mean 1.6, max 30; kernel support **1,096 tokens** — the ~16×
+under-span versus the T = 64 ladder top, confirmed at scale.
+
+**`is_user_echo` now ships as an array** (mac-local's review caveat).
+Marker masking covers ASSISTANT messages only, so a user message quoting
+a frozen substring stays manifest-eligible: at scale that is **98 /
+23,772 user messages (0.41 %)** and **1,567 / 299,994 manifest rows
+(0.52 %)** — roughly twice the 0.22 % measured on the shipped build,
+still small, and now droppable in one line by a screen. It is a
+disclosure array: no label, mask, manifest or bar changed.
+
+Artifacts: `labels/refmark2k_corpus.json.gz` (+ receipt),
+`labels/refmark2k_wildchat_{gpt2,gemma2,llama31}.npz`,
+`labels/refmark2k_stats.json`.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+
+## 2026-07-24 — runpod — corpus scale-up item 3: novelty-family bootstrap, and the **doc-identity threshold distribution** the review asked for
+
+Item 3 as briefed: label-side only, no new corpus (novelty screened
+NEGATIVE — nothing here is a verdict). `labels/boot_novelty.py`
+recomputes the committed 400-doc triage with the shipped row definitions
+verbatim — the point estimates are ASSERTED to reproduce
+`novelty_stats.json` exactly, so a divergence fails loudly — and adds
+the two views the shipped stats predate: manifest rows (the operative
+convention, adopted later) and `doc_mean_only_auc`.
+
+Assembling every family measured so far (manifest rows,
+direction-agnostic, 95 % doc-bootstrap CI):
+
+| family | doc-mean-only | 95 % CI | screen outcome |
+|---|---|---|---|
+| novelty `nov_resid` (400 docs) | 0.760–0.784 | [0.710, 0.819] | NEGATIVE |
+| novelty `nov_raw` (400 docs) | 0.758–0.767 | [0.712, 0.802] | disclosed secondary |
+| punctint q (4,000 docs) | 0.901–0.902 | [0.886, 0.917] | KEEP |
+| punctint list (4,000 docs) | 0.966 | [0.958, 0.973] | WEAK KEEP |
+| refmark (2,000 convs) | 0.974–0.975 | [0.964, 0.983] | ships, screen pending |
+
+The one screened-NEGATIVE family sits ~0.77 with a CI that does not
+overlap any surviving face's (lowest KEEP bound 0.886); a threshold in
+the 0.82–0.88 gap would separate them **today**. Stated plainly: that is
+a correlation over four faces, not kill authority — novelty did not die
+of document identity — and this campaign's remit was to supply the
+distribution, not to pin the bar. `doc_mean_only_auc` stays a reported
+disclosure statistic until the review decides otherwise.
+
+One number the reviewer should see while here: novelty's *raw* face
+carries a manifest position AUC of **0.115–0.135 (direction-agnostic
+0.865–0.885)**, far past the 0.65 kill bar. It ships only as a disclosed
+position-confounded secondary — exactly the case the frozen bar exists
+to catch, and a useful anchor for what "a bar firing" looks like next to
+the near-0.5 numbers above.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
