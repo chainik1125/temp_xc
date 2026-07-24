@@ -54,12 +54,26 @@ flatten probe needs ≈28 GB for standardization alone). Hence:
 ## Next actions (in order)
 1. When the proof-op screen finishes: score it against
    `proofops/card.md` and write the KEEP/KILL paragraph into
-   `LOG.md` + the ladder table into `RECORD.md` § 2. Partial result so
-   far: `tir` per-token 0.614, g +0.028 (T=8) → **+0.049 (T=16)** →
-   +0.032 (T=32), g_order turning **positive at T=16 (+0.011)** — a
-   peak-then-decline shape (localized latent, STORY § 7) and the order
-   component candidate 1 lacked. Needs T=64 + the `op` ambient anchor
-   before any verdict (the card's real claim is g_tir − g_op rising).
+   `LOG.md` + the ladder table into `RECORD.md` § 2.
+   **`tir` ladder at base/L12 is COMPLETE** (per-token 0.614):
+
+   | T | flatten | mean | shuffled | g | g_order | shuffle gap |
+   |---|---|---|---|---|---|---|
+   | 8 | 0.642 | 0.642 | 0.634 | +0.028 | +0.000 | +0.008 |
+   | 16 | 0.663 | 0.652 | 0.638 | **+0.049** | +0.011 | +0.025 |
+   | 32 | 0.646 | 0.647 | 0.613 | +0.032 | −0.001 | +0.033 |
+   | 64 | 0.651 | 0.629 | 0.590 | +0.037 | **+0.022** | **+0.061** |
+
+   Two things matter here. (a) g peaks at **T=16** then declines —
+   the card's P1 (nothing below T=32, then growth) is **falsified**;
+   the shape is peak-then-decline (localized latent, STORY § 7).
+   (b) **The shuffle gap grows monotonically with T**
+   (+0.008 → +0.061) — i.e. destroying within-window order costs more
+   the larger the window. This is the order evidence candidate 1
+   lacked, and it is the briefing's "order/structure matters" arm.
+   **Still needed before any verdict:** the `op` AMBIENT ANCHOR ladder
+   (the card's actual claim is g_tir − g_op rising, not g_tir alone) —
+   `boundary` and `op` were still running at last check.
 2. Finish the shuffle-receipt writeup: `render` already emits
    `figs/shuffle_receipt.*`; the table is in `RECORD.md` § 3.
 3. When Stage 2 finishes: build **the T-scaling figure** (recovery vs
