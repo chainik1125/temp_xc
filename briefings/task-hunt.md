@@ -94,18 +94,18 @@ shuffle-ablation bar, and the record.
    non-ambient anticipation story. Frozen T-prediction: recovery at
    horizon D turns on as T crosses D (a second threshold ladder, like
    arm B's per-Δ plot), saturating at the typical circling span.
-   **DEDUP — mandatory:** Aniket owns forbidden-word detection /
-   window-size on the existing dictionaries (team meeting 07-24). Our
-   readout is the pre-onset anticipation screen on a fresh cohort, NOT
-   his; state the distinction in the mini-card, flag any overlap in the
-   record, reconcile at the Sunday check-in. Queue discipline:
-   generation may run in the background while candidate 1 trains;
-   screen only after candidates 1–2 have committed verdicts.
+   **SILOED (Han 2026-07-24):** run this candidate entirely
+   independently — do NOT condition the design, priors, screens, or
+   verdict on Aniket's parallel forbidden-word work, and do not wait
+   on or consume his results; treat the two efforts as separate silos.
+   Queue discipline: generation may run in the background while
+   candidate 1 trains; screen only after candidates 1–2 have committed
+   verdicts.
 
 Do NOT pursue bracket/indentation state-tracking (tried before this
-program; dies under strict per-position baselines). Forbidden-word
-*detection* stays Aniket's — only candidate 3's onset-anticipation
-readout above is in agent scope.
+program; dies under strict per-position baselines). Forbidden-word is
+in scope per candidate 3 — run it siloed from Aniket's parallel work
+(his results are not an input to ours).
 
 ## Parked — reviewed and REJECTED for this window (recorded so nobody re-derives)
 
