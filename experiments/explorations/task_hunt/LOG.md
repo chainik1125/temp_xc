@@ -241,3 +241,54 @@ label is order-sensitive and the *intensity* label is not — a
 distinction the ambience machinery can now state with receipts rather
 than assume. Results `results/shuffle_receipt.json`, figure
 `figs/shuffle_receipt.*`.
+
+## 2026-07-24 — runpod-d — candidate 2 (proof-operation run structure) — **WEAK KEEP, primary layer only** (and a correction to an earlier reading)
+
+Card: `proofops/card.md` (frozen pre-run). Labels: runpod-b's committed
+`labels/proofops.npz` used as-is. σ_null = 0.0035 (3σ = 0.0105).
+Primary cell base/L12 complete; confirmatory cells (base L10, distill
+L10/L12) still running at the time of writing — this entry covers the
+card's designated PRIMARY layer and will be extended, not revised, when
+they land. Results `proofops/results/proofops_{screen,verdict}.json`,
+figure `proofops/figs/proofops_tscaling.*`.
+
+Macro-OvR AUC, base L12 (per-token → g at T = 8/16/32/64):
+
+| target | tok | T=8 | T=16 | T=32 | T=64 |
+|---|---|---|---|---|---|
+| `tir` (PRIMARY, time-in-run) | 0.614 | +0.028 | **+0.049** | +0.032 | +0.037 |
+| `boundary` | 0.618 | +0.017 | +0.036 | +0.030 | +0.008 |
+| `op` (AMBIENT ANCHOR) | 0.760 | +0.037 | +0.041 | +0.036 | +0.018 |
+
+**No kill rule fires, but the survival is weak and should be read that
+way.** The card's actual claim is the CONTRAST g_tir − g_op rising:
+measured −0.009, +0.008, −0.005, **+0.019** at T = 8/16/32/64. It
+clears 3σ_null at exactly one T (64) and is negative or noise at the
+other three — non-monotone, one-point survival. K2 as written ("never
+exceeds g_op by more than the null floor at ANY T") therefore does not
+fire, but a single clearing point is not the threshold-ladder the card
+predicted.
+
+**Two frozen predictions falsified.** P1 (nothing below the sentence
+clock, then growth at T ≥ 32) is wrong in both directions: `tir` already
+has +0.028 at T = 8, and it PEAKS at T = 16 then declines — the
+peak-then-decline shape of a *localized* latent (STORY § 7), not a
+clock threshold. P3 (g_order > 0 at T ≥ 32) fails at T = 32 (−0.001),
+holding only at T = 64 (+0.022).
+
+**CORRECTION to an earlier reading in this session.** Before the
+ambient anchor was measured I recorded (agents/runpod-d/STATUS.md) that
+`tir`'s within-window shuffle gap growing monotonically with T
+(+0.008 → +0.025 → +0.032 → +0.061) was "the order evidence candidate 1
+lacked". **The anchor refutes that.** The ambient `op` label — readable
+from the current sentence by construction — shows a shuffle-gap ladder
+that is the same within noise (+0.010 → +0.017 → +0.034 → **+0.065**),
+and so does `boundary`. A shuffle gap that grows with T is therefore a
+**generic property of wider windows under this probe** (more positions
+to scramble, and a flatten probe that leans harder on positional
+alignment as T grows) — NOT evidence that the latent is order-sensitive.
+Only the anchor-differenced contrast carries that claim, and here it is
+one-point. The card requiring an ambient anchor is what caught this;
+the receipt in the § 3 backtracking case study, which has no such
+confound because it compares *anticipation vs ambient targets on
+identical rows*, still stands.

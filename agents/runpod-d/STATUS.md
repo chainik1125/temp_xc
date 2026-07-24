@@ -67,13 +67,20 @@ flatten probe needs ≈28 GB for standardization alone). Hence:
    Two things matter here. (a) g peaks at **T=16** then declines —
    the card's P1 (nothing below T=32, then growth) is **falsified**;
    the shape is peak-then-decline (localized latent, STORY § 7).
-   (b) **The shuffle gap grows monotonically with T**
-   (+0.008 → +0.061) — i.e. destroying within-window order costs more
-   the larger the window. This is the order evidence candidate 1
-   lacked, and it is the briefing's "order/structure matters" arm.
-   **Still needed before any verdict:** the `op` AMBIENT ANCHOR ladder
-   (the card's actual claim is g_tir − g_op rising, not g_tir alone) —
-   `boundary` and `op` were still running at last check.
+   (b) The shuffle gap grows monotonically with T (+0.008 → +0.061)
+   — **but this is NOT order evidence**: the ambient `op` anchor grows
+   the same way (+0.010 → +0.065), so a growing shuffle gap is a
+   generic property of wider windows under this probe. Corrected in
+   the LOG; see the verdict entry.
+
+   **Verdict written (primary layer): WEAK KEEP.** The card's real
+   claim, the contrast g_tir − g_op, is −0.009 / +0.008 / −0.005 /
+   **+0.019** at T = 8/16/32/64 — clears 3σ_null (0.0105) at exactly
+   one T, non-monotone. No kill rule fires as written, but one-point
+   survival is not the predicted ladder. P1 and P3 falsified.
+   Confirmatory cells (base L10, distill L10/L12) were still running;
+   **extend the LOG entry when they land — do not revise it.** Re-run
+   `proofops/render.py` for the updated verdict JSON + figure.
 2. Finish the shuffle-receipt writeup: `render` already emits
    `figs/shuffle_receipt.*`; the table is in `RECORD.md` § 3.
 3. When Stage 2 finishes: build **the T-scaling figure** (recovery vs
