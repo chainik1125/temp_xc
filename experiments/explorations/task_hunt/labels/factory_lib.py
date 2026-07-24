@@ -273,6 +273,55 @@ def position_triage_auc(pos_score, is_top, test_mask) -> float:
                     np.asarray(is_top)[test_mask].astype(int))
 
 
+def bundle_core(lam, lam_null, mask_rows, valid, trace_idx, win_start,
+                trace_len, tok_id, seed: int = 0) -> dict:
+    """Shared post-payload pipeline for every factory bundle: frozen
+    binning (with the zero-split fallback), primary + null balanced
+    manifests with the candidate's masked rows excluded, the by-trace
+    split, and the label-side triage numbers (kill authority). Builders
+    add their candidate-specific receipts on top.
+
+    trace_len: dict trace_idx -> original token count (for the position
+    fraction). Returns everything keyed; `ext_*` fields are the
+    extreme-class (top vs bottom) primary manifest rows the triage was
+    computed on, so builders can score evidence baselines on the SAME
+    rows."""
+    from . import lib as _lib
+
+    scheme, edges, bins = zero_inflated_bins(lam)
+    scheme_n, edges_n, bins_n = zero_inflated_bins(lam_null)
+    N, S = lam.shape
+    w_of, p_of = np.meshgrid(np.arange(N), np.arange(S), indexing="ij")
+    man = {}
+    for tag, b in (("", bins), ("null_", bins_n)):
+        cls = np.where(mask_rows | ~valid, -1, b).astype(np.int8)
+        man[tag] = _lib.balanced_manifest(cls.ravel(), w_of.ravel(),
+                                          p_of.ravel(), seed=seed)
+    man_doc, man_pos, man_cls = man[""]
+    tr_split = _lib.doc_split(int(trace_idx.max()) + 1, seed=seed)
+
+    ext = (man_cls == 0) | (man_cls == 2)
+    is_top = (man_cls[ext] == 2).astype(int)
+    rows_d, rows_p = man_doc[ext], man_pos[ext]
+    is_test = tr_split[trace_idx[rows_d]] == 1
+    o_raw = (win_start[rows_d] + rows_p - 1).astype(float)
+    o_frac = o_raw / np.array([trace_len[int(t)]
+                               for t in trace_idx[rows_d]], dtype=float)
+    tok_auc = token_id_triage_auc(tok_id[rows_d, rows_p], is_top,
+                                  ~is_test, is_test)
+    pos_raw = position_triage_auc(o_raw, is_top, is_test)
+    pos_frac = position_triage_auc(o_frac, is_top, is_test)
+    triage = triage_verdict(tok_auc, [pos_raw, pos_frac])
+    triage.update(tok_auc=tok_auc, pos_raw_auc=pos_raw,
+                  pos_frac_auc=pos_frac, n_test_rows=int(is_test.sum()))
+    return {"scheme": scheme, "edges": edges, "bins": bins,
+            "null_scheme": scheme_n, "null_edges": edges_n,
+            "null_bins": bins_n, "man": man[""], "man_null": man["null_"],
+            "trace_split": tr_split, "triage": triage,
+            "ext_rows_d": rows_d, "ext_rows_p": rows_p,
+            "ext_is_top": is_top, "ext_is_test": is_test}
+
+
 def triage_verdict(tok_auc: float, pos_aucs) -> dict:
     """The frozen kill rule. FAIL iff token-identity extreme-AUC >=
     TRIAGE_TOK_AUC_KILL or any position extreme-AUC >=

@@ -125,3 +125,29 @@ def test_triage_aucs_extremes_and_verdict():
     assert fl.position_triage_auc(pos, is_top3, np.ones(n, bool)) == 1.0
     assert fl.triage_verdict(0.5, [0.05])["verdict"] == "FAIL", \
         "inverse-predictive position also kills"
+
+
+def test_bundle_core_masks_and_balance():
+    rng = np.random.default_rng(1)
+    N, S = 40, 64
+    lam = rng.random((N, S)).astype(np.float32)
+    lam_null = rng.random((N, S)).astype(np.float32)
+    valid = np.ones((N, S), dtype=bool)
+    valid[:, 0] = False
+    mask = np.zeros((N, S), dtype=bool)
+    mask[:, 40] = True                      # a masked column
+    trace_idx = np.repeat(np.arange(8), 5).astype(np.int32)
+    win_start = np.zeros(N, dtype=np.int32)
+    tok_id = rng.integers(0, 30, size=(N, S)).astype(np.int32)
+    core = fl.bundle_core(lam, lam_null, mask, valid, trace_idx,
+                          win_start, {t: 200 for t in range(8)}, tok_id)
+    d, p, c = core["man"]
+    assert (p >= 32).all(), "manifest pos floor"
+    assert 40 not in set(p.tolist()), "masked rows never enter a manifest"
+    counts = [int((c == k).sum()) for k in (0, 1, 2)]
+    assert len(set(counts)) == 1, "class-balanced"
+    assert core["scheme"] == "terciles"
+    assert core["triage"]["verdict"] == "PASS", \
+        "random labels are unreadable from token id / position"
+    nd, npos, nc = core["man_null"]
+    assert 40 not in set(npos.tolist())
