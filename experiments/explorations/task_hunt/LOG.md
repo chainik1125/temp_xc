@@ -869,3 +869,42 @@ token sequences ⇒ one ~330k-token forward-pass caching run per model
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
 2026-07-24. Bundles land incrementally; one LOG line each._
+
+---
+
+## 2026-07-24 — runpod-b · FACTORY BUNDLE 1 SHIPPED: `sc_lambda` (self-correction marker intensity λ̂_sc)
+
+First bundle of `briefings/candidate-factory-traces.md` (QUANTITY MODE).
+Builder + frozen card committed BEFORE outputs (commit "factory: shared
+frozen label logic (exp kernel, marker list, triage kill rule) +
+sc_lambda builder/card"). Bundle: `labels/sc_lambda.npz` +
+`labels/sc_lambda_stats.json`, card `sc_lambda/CARD_DRAFT.md`. Screen-
+ready on the existing Ward base/distill caches — same manifest
+conventions as `ward_lambda.npz` (20k rows/class, pos ≥ 32, by-trace
+split).
+
+- **Events**: frozen 17-pattern lexical marker list; sentence event
+  rate 0.136 (Sonnet is_bt was 0.130 —
+  same regime, zero-API). Kernel: exponential τ = 3, K = 8, causal,
+  normalized, history guard i ≥ 4; kernel-only (no position term).
+- **Label-side triage PASSED, narrowly on the token face — disclose
+  when screening**: current-token-identity AUC
+  0.636 (kill at 0.65), position
+  0.625 raw / 0.618
+  frac (kill at 0.70). Marker tokens themselves are masked out of all
+  manifests (`is_marker_tok`, 1.0% of valid
+  tokens); `is_sc` ships as the ambient control.
+- **Receipts in the bundle**: self-excitation monotone (is_sc rate by
+  bin 0.082 → 0.217);
+  corr(λ̂_sc, ward λ̂_hist) = 0.47
+  (the winner's family, new event stream — related, not a re-skin);
+  event-shuffle null decorrelated (corr 0.19)
+  with its own manifests `man_null_*`; visible-evidence ceiling
+  (in-window marker count alone) T8 0.525
+  / T16 0.578 / T32
+  0.701 — window probes must BEAT this
+  line at matched T or they are counting visible marker tokens.
+- Bin scheme: zero_split fired (rate distribution zero-inflated;
+  {0, ≤0.186, >} — recorded in stats). Running
+  agent freezes its own screen card; draft T-pattern + falsifier in
+  `sc_lambda/CARD_DRAFT.md`.

@@ -1,0 +1,79 @@
+{
+ "frozen": {
+  "kernel": {
+   "tau": 3.0,
+   "k": 8,
+   "min_history": 4
+  },
+  "marker_patterns": [
+   "\\bwait\\b",
+   "\\bactually\\b",
+   "\\bhmm+\\b",
+   "\\bhold on\\b",
+   "\\blet me (?:re-?check|reconsider|re-?examine|re-?calculate|re-?compute|redo|re-?derive|rethink|re-?evaluate|re-?read|revisit|review|verify|double-?check)\\b",
+   "\\bdouble-?check\\b",
+   "\\b(?:i|we) made (?:an error|a mistake)\\b",
+   "\\bmy (?:mistake|error)\\b",
+   "\\bi was wrong\\b",
+   "\\b(?:that|this) can'?t be right\\b",
+   "\\b(?:that'?s|that is|this is) (?:wrong|incorrect|not right|not correct)\\b",
+   "\\bdoesn'?t seem right\\b",
+   "\\bon second thought\\b",
+   "\\bscratch that\\b",
+   "\\boops\\b",
+   "^\\s*no\\b"
+  ],
+  "null_seed": 101,
+  "seed": 0,
+  "mask": "is_marker_tok excluded from all manifests"
+ },
+ "stream_shape": [
+  4044,
+  128
+ ],
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "n_roundtrip_mismatch_tokens": 149,
+ "event_rate_sentences": 0.13595627338979713,
+ "marker_tok_rate": 0.010004624435861644,
+ "lam": {
+  "mean": 0.13703598082065582,
+  "bin_scheme": "zero_split",
+  "edges": [
+   0.0,
+   0.18594639003276825
+  ]
+ },
+ "lam_null": {
+  "bin_scheme": "zero_split",
+  "edges": [
+   0.0,
+   0.16960753500461578
+  ],
+  "corr_with_real": 0.18920929013584253
+ },
+ "is_sc_rate_by_bin": [
+  0.08222298808946628,
+  0.13340699815837936,
+  0.21677338864838866
+ ],
+ "corr_lam_sc_ward_lam_hist": 0.4728489220676804,
+ "manifest_rows_per_class": 20000,
+ "null_manifest_rows_per_class": 20000,
+ "trace_split_test_frac": 0.2,
+ "triage": {
+  "tok_auc_extreme": 0.6364716687759816,
+  "pos_auc_extreme": 0.6249372432862667,
+  "tok_kill_at": 0.65,
+  "pos_kill_at": 0.7,
+  "verdict": "PASS",
+  "tok_auc": 0.6364716687759816,
+  "pos_raw_auc": 0.6249372432862667,
+  "pos_frac_auc": 0.6175094907681858,
+  "n_test_rows": 8345
+ },
+ "visible_evidence_auc": {
+  "T8": 0.5252451159479831,
+  "T16": 0.5777740937528434,
+  "T32": 0.7005312520966774
+ }
+}
