@@ -20,6 +20,13 @@ T ∈ {4, 16} × seed 1 (the T = 4 cells are the in-panel control: if the
 lift is the same size at T = 4, extra probe data is helping everywhere
 and says nothing specific about T = 16).
 
+Note on feature dimension, which differs by arch and matters here:
+`pre`/`post`/token archs emit ONE d_sae-wide code per tile (p = 2048),
+while `stacked` emits a per-position code (p = T·d_sae = 32768 at
+T = 16). The panel's evaluator already reads them that way; this
+diagnostic reproduces that convention exactly rather than normalizing
+it, so stacked's numbers carry its own (much harder) probe regime.
+
 Run:  .venv/bin/python -m \
         experiments.explorations.task_hunt.confidence.probe_capacity
 """
@@ -72,8 +79,15 @@ def _codes(model, x, lam, T, n_windows, seed=0):
         zs = []
         tiles_all = win_x.reshape(W * n_tiles, T, x.shape[-1])
         for i in range(0, tiles_all.shape[0], 8192):
-            zs.append(model.encode(tiles_all[i:i + 8192].float().to(device))
-                      .reshape(-1, model.config.d_sae).float().cpu().numpy())
+            chunk = tiles_all[i:i + 8192].float().to(device)
+            # The evaluator's convention: ONE row per tile, all of that
+            # tile's code flattened into the feature axis. For stacked
+            # (code (B, T, d_sae)) that means T*d_sae features — NOT
+            # T*B rows, which is what an earlier revision of this script
+            # produced (it failed loudly on a shape mismatch rather than
+            # silently mispairing; no results were written).
+            zs.append(model.encode(chunk).reshape(chunk.shape[0], -1)
+                      .float().cpu().numpy())
         z = np.concatenate(zs)
         t = win_l.reshape(W, n_tiles, T)[:, :, T - 1].reshape(-1).numpy()
         m = np.isfinite(t)
