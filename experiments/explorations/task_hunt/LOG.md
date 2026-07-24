@@ -1427,3 +1427,54 @@ pre-conversion depths?): YES on both arms, in different senses — lag4
 signal grows monotonically toward the input (per-token most of all),
 while slope8's aggregation gap needs no depth at all and the
 generator-specific surplus grows late. Neither moves a round-1 verdict.
+
+## 2026-07-24 — runpod-e — Stage-2 probe-capacity diagnostic (pre-registered, post-hoc) — **the hedging panel's T-decline is a PROBE artifact; independently corroborates runpod-d**
+
+`confidence/probe_capacity.py` (card § 6, frozen in the card before the
+panel ran; OFF-leaderboard). Same trained checkpoints, same tiles, seed
+1 — only the probe changes. Its `nw1024/OLS` column **reproduces the
+panel to 4 decimals** (0.210 / 0.134 / 0.163 / 0.167 vs the panel's
+0.2102 / 0.1338 / 0.1627 / 0.1671), so the lift is signal, not a leak.
+
+| cell | panel probe (nw1024, OLS) | nw1024 + ridge | nw8192 + OLS | nw8192 + ridge |
+|---|---|---|---|---|
+| TXC-pre T4 | 0.210 | 0.302 | 0.248 | 0.274 |
+| **TXC-pre T16** | **0.134** | **0.324** | 0.246 | 0.311 |
+| TXC-post T4 | 0.163 | 0.256 | 0.238 | 0.255 |
+| **TXC-post T16** | **0.167** | **0.318** | 0.258 | 0.294 |
+
+Every one of those panel cells has **negative held-out r²** (−0.24,
+−1.11, −0.33, −0.95): `lambda_recovery` fits an unregularized OLS on
+p = d_sae = 2048 features while n shrinks as 1/T, so at T = 16
+(n = 1702) a dense code is in the interpolation regime.
+
+**What this does and does not change.** The frozen **NEGATIVE verdict
+stands under the frozen metric** — the card pre-registered that this
+diagnostic cannot change leaderboard cells, only what the record may
+claim. What it changes is the *reading*: under ridge on identical codes
+the T-ordering **reverses** (pre T16 0.324 > T4 0.302; post T16 0.318 >
+T4 0.256), so the panel's decline is the probe's, not the
+representation's — and the panel as specified **could not have detected
+a T-rise even if one existed**. The honest one-liner for item 1: *no
+T-rise is demonstrated, and this design cannot demonstrate one.*
+
+**Convergence with runpod-d, arrived at independently.** Its round-2 λ̂
+amendment entry reports the same defect on a different task and
+datasource (lifts +0.18…+0.23 on dense T16 cells, negative r²_eval at
+nw1024/OLS, lift monotone in nnz-per-row). Two Stage-2 panels, two real
+tasks, one shared cause. **Joint recommendation to the program:
+`lambda_recovery` should regularize (or scale n_windows with T) before
+any further T-scaling claim rests on it, and § 3b's "peaks rather than
+saturates" reading of the λ̂ money plot should be re-examined under an
+adequate probe** — on my panel that same re-examination flips a
+"declining" curve into a flat-to-rising one.
+
+**Self-caught defect, disclosed:** the diagnostic's first revision used
+`.reshape(-1, d_sae)`, identical to the evaluator for pre/post/token
+archs (code `(B,1,d_sae)`) but wrong for `stacked`, whose code is
+`(B,T,d_sae)` and which the evaluator reads as T·d_sae FEATURES. It
+raised a shape error at the first stacked cell and wrote no results;
+the fix (`18507791`) matches the evaluator's convention and the four
+TXC cells reproduce bit-identically across the two runs. Recorded
+because the near-miss is instructive: a diagnostic that silently
+mispaired rows would have looked plausible.

@@ -172,6 +172,51 @@ while at T = 16 the drop is larger (30–46 %), in the same cells the
 probe-capacity caveat (§ 6) already flags as the least trustworthy.
 **No order claim and no immunity claim is made from this receipt.**
 
+### § 1d — Probe-capacity diagnostic (card § 6, pre-registered) — **the T-decline is a PROBE artifact**
+
+`probe_capacity.py`, seed 1, OFF-leaderboard, post-hoc by
+pre-registration. Same trained checkpoints, same tiles; only the probe
+changes. The `nw1024 / OLS` column **reproduces the panel exactly**
+(0.210 / 0.134 / 0.163 / 0.167 vs the panel's 0.2102 / 0.1338 / 0.1627
+/ 0.1671), so the comparison is trustworthy:
+
+| cell | panel probe (nw1024, OLS) | nw1024 + ridge | nw8192 + OLS | nw8192 + ridge |
+|---|---|---|---|---|
+| TXC-pre T4 | 0.210 | 0.302 | 0.248 | 0.274 |
+| **TXC-pre T16** | **0.134** | **0.324** | 0.246 | 0.311 |
+| TXC-post T4 | 0.163 | 0.256 | 0.238 | 0.255 |
+| **TXC-post T16** | **0.167** | **0.318** | 0.258 | 0.294 |
+
+Every panel cell above has **negative held-out r²** (−0.24, −1.11,
+−0.33, −0.95) — textbook overfitting at n ≈ p on a dense code, since
+`lambda_recovery` fits an unregularized OLS on p = d_sae = 2048
+features while n shrinks as 1/T.
+
+**Consequence, stated as the card allows.** The frozen NEGATIVE verdict
+(§ 1b) **stands under the frozen metric** — the card pre-registered
+that this diagnostic "cannot change the leaderboard cells; it can only
+change what the record is allowed to claim about them." What the record
+may now claim is narrower and more useful: **the panel's T-decline is
+an artifact of the evaluator's probe, not a property of the
+representations.** Under ridge on identical codes the ordering
+reverses — T16 ≥ T4 for both window archs (pre 0.324 vs 0.302; post
+0.318 vs 0.256). The panel as specified **could not have detected a
+T-rise even if one existed**, because the probe's bias grows with T.
+The honest summary of item 1 is therefore: *no T-rise is demonstrated,
+and this panel design cannot demonstrate one.*
+
+**Independent corroboration (converging, not coordinated).** runpod-d's
+round-2 λ̂ amendment reached the same conclusion on a different task
+and datasource the same day (LOG, "reading (c) CONFIRMED — panel-wide
+probe artifact"): lifts of +0.18…+0.23 on dense T16 cells, negative
+r²_eval at nw1024/OLS, and the lift scaling with nnz-per-row. Two
+independent Stage-2 panels, two different real tasks, same defect.
+**Recommendation to the program (mine and runpod-d's, arrived at
+separately): `lambda_recovery` should regularize (or scale n with T)
+before any further T-scaling claim is drawn from it, and the existing
+λ̂ money plot's "peaks rather than saturates" reading should be
+re-examined under an adequate probe.**
+
 ---
 
 ## § 2 — Early-layer addendum (`depth_addendum/`, PREDICTIONS.md frozen pre-run)
