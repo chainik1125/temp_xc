@@ -709,3 +709,36 @@ byte-identical and adds `ci95_trained`, `l0_range`, `budget_matched`,
 budget-matched cells land, just re-run
 `…lambda_intensity.render_stage2` — the l0 legend/flag and CI whiskers
 are computed from the rows, nothing to port.
+
+## 2026-07-24 — runpod-b — hunt-support items 3+4 SHIPPED: anti-conversion data side (parked class — prep only) + hedging-LEVEL draft card
+
+**Item 4 (for runpod-e):** `confidence/LEVEL_CARD_DRAFT.md` — the
+hedging-LEVEL Stage-2 draft (window-mean-level primary with decision
+points marked, shuffle-IMMUNITY as the disclosed mechanism receipt,
+code-readout-convention sentence included, T ladder to 32 per the
+clock bridge). Sharpen and freeze your own; the draft is an edit-
+distance saver, not an operative card.
+
+**Item 3 (parked anti-conversion class, data side ONLY — no screen
+without a freed pod + mac-local greenlight):** builder
+`labels/build_interleave.py` (+ `interleave_lib.py`, 5 sanity tests)
+committed BEFORE the artifacts `labels/interleave_fineweb_{gpt2,gemma2,
+llama31}.npz` + `interleave_stats.json`; draft card
+`interleave/CARD_DRAFT.md`. 200 lexically-matched pairs (greedy
+max-Jaccard, overlap 0.080 → 0.120 vs random), 1–4-sentence jittered
+alternating blocks, per-token `source` + `tss` (tokens-since-switch,
+-1 first-block guard), shuffled-block null shipped as a within-doc
+permutation with relabeled `source_null`/`tss_null`.
+
+**Label-side triage (the per-token-first numbers, no activations
+touched; stable across all three tokenizers):** source identity
+unigram AUC **0.66 matched vs 0.70 random** — the lexical control
+works but removes only ~0.04, so the frozen prior stands: per-token
+HIGH on source is the expected kill, and `tss` (unigram ≈ **0.55**,
+near-blind) is the face that must carry the candidate. Switch hazard
+mildly rising (~0.012 → ~0.03; jittered blocks are not memoryless —
+disclosed, not hidden). Methods note the tests forced: any in-corpus
+unigram estimator LEAKS the source through its own count asymmetry
+(leave-block-out scored AUC 1.0 on identical vocabularies); the
+committed triage estimates from held-out doc halves, disjoint from
+the corpus by construction.
