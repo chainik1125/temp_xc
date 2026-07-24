@@ -37,6 +37,27 @@ If instead g stays open at some OTHER depth, that is a NEW finding
 requiring a fresh card and a fresh screen — it is explicitly NOT a
 retroactive KEEP for this candidate, and must be reported that way.
 
+PREDICTION, committed before any cell of this sweep was computed (the
+depth cache was still being written; `results/forbidden_word_depth.json`
+did not exist). A diagnostic should be falsifiable too:
+
+  D1. The forbidden-word curve follows the `is_bt` shape, not the
+      `ant_kw` shape — i.e. a LARGE window gap at hs0 that collapses
+      after one attention block and stays at/near the noise floor
+      thereafter (signature 2, conversion, possibly on top of 1).
+  D2. Specifically: g(hs0) > +0.05, and g ≤ 3σ_null at every resid_post
+      layer from hs3 on.
+  D3. Per-token at hs0 is WELL BELOW its L12 value (0.629 at D=4), i.e.
+      the pressure is not purely lexical — attention does real work.
+      If instead per-token at hs0 is already ≈ 0.6, the ambience is
+      largely lexical (signature 1) and D3 is falsified.
+
+Reference (`conversion_depth`, base reader, T=16, 3σ_null = 0.011):
+`ant_kw` g = +0.174 (hs0) → +0.042 (hs1) → **+0.035…+0.057 forever**;
+`is_bt` g = +0.107 (hs0) → +0.022 (hs1) → **+0.007…+0.026** (converted).
+Both start with a lexical window gap; one attention block converts it;
+only the FUTURE-referencing label keeps an open residue.
+
 Protocol (fixed, matching the frozen screen so the L12 slice is directly
 comparable): identical rollouts, identical row recipe (same seeds →
 identical rows), same `problib` stack, window = right-edge T = 16
