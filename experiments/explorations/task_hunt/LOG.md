@@ -1598,3 +1598,36 @@ class per split on all three models, both faces. A position-only floor
 probe (in-chunk position + doc position, the Heaps confound) ships
 next to every window number, and the within-doc-shuffle null face
 (`nov_null_bin`) is the frozen mechanism receipt.
+
+## 2026-07-24 — runpod — candidate factory round 2: ledger appends (D7 DEAD + B7 BUILD-if-time), verdict hygiene checked
+
+Per `briefings/candidate-factory-broad-2.md` § 1, committed BEFORE any
+round-2 builder code (ledger-first rule). Three items in
+`CANDIDATES.md`:
+
+- **D7 — refusal-as-posed: DEAD** (vetted by mac-local), recorded with
+  the `docs/papers/refusal.md` receipts: single-(position, layer)
+  difference-in-means direction causally sufficient both ways across
+  13 chat models to 72B (§§ 2.3, 3.1, 3.2); § 5.2 measures the
+  window→position deposit by attention heads (conversion IS the
+  mechanism); App. J finds the direction in base models. Plus axis-b
+  unigram leak / self-stamping text, axis-c prompt-level rollout
+  boolean (AVOID class), and no-cache economics.
+- **B7 — refusal/deflection-marker intensity on multi-turn chat
+  (WildChat-class): BUILD-if-time, strictly behind B6**, vetted on the
+  four axes; FROZEN substring list to be seeded from the paper's
+  § D.1 `refusal_score` set (concrete strings from the paper's public
+  code repo — Figure 11 is an image), frozen before counting
+  anything; λ̂ over previous turns, marker turns masked; **hard
+  pre-gate: event rate < ~2 % of assistant turns ⇒ free kill.**
+- **Verdict hygiene**: live screen-outcomes block added under the
+  verdict index with the queue order and the standing P2/P6 lift
+  triggers. Checked the LOG tail: `novelty` screen frozen by runpod-e
+  (claim-line, no cells run) — no verdicts posted yet, so no outcome
+  lines to append today.
+
+Next: B6 OpenWebMath equation-density build (frozen delimiter grammar
+in lib + card, pinned 0.65/0.65 direction-agnostic bar convention per
+review qualification 4, streaming seeded corpus artifact).
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_

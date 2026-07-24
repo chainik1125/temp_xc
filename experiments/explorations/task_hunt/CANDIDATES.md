@@ -9,6 +9,13 @@ identically). Written and committed BEFORE any builder, per the
 ledger-first rule. The next hunter starts from this page: dead ideas
 are deliverables too.
 
+**Round 2 (2026-07-24, `briefings/candidate-factory-broad-2.md`):**
+same mandate continues after the factory review. D7 + B7 appended
+below (a Han-proposed refusal idea, vetted: the as-posed version dies
+on literature receipts, the recurrence port survives to
+BUILD-if-time); the verdict index stays live as the GPU pods post
+screen outcomes.
+
 **The four vetting axes (round-1 lessons, applied per idea):**
 
 - **(a) Conversion risk** — does the latent help next-token
@@ -60,6 +67,7 @@ builder's script-derived stats JSON).
 | B4 | question-rate intensity | fineweb | **BUILD** (with B3; triage decides ship/kill) |
 | B5 | dialogue turn-length level / switch clock | new (DailyDialog-class) | **BUILD** (stretch) |
 | B6 | equation-density intensity | new (OpenWebMath) | **BUILD** (stretch) |
+| B7 | refusal/deflection-marker intensity λ̂ | new (WildChat-class chat) | **BUILD-if-time** (behind B6; hard pre-gate: event rate < ~2 % of turns ⇒ free kill) |
 | P1 | news chronology / date density | new (cc_news-class) | PARK |
 | P2 | numeric-token density | fineweb | PARK |
 | P3 | citation-marker density | new (arXiv-class) | PARK |
@@ -72,6 +80,17 @@ builder's script-derived stats JSON).
 | D4 | NER / topic / sentiment densities | any | DEAD |
 | D5 | code syntactic state (indent/comment/string) | code | DEAD |
 | D6 | language / code-switch rate | fineweb | DEAD |
+| D7 | refusal-as-posed (single-direction refusal state) | chat + instruction corpora | DEAD (lit receipts) |
+
+**Screen outcomes (live; append one line per verdict as d/e post them
+in the LOG).** Queue opened 2026-07-24 by the factory review, order:
+sc_lambda → oprate rate_case → qrate (Ward) → novelty nov_resid →
+punctint qrate → vslope → punctint list (conditional) → interleave
+tss → dialevel. As of this append: `novelty` screen card frozen by
+runpod-e (claim-line; zero-new-caching verified; no verdict yet) — no
+outcomes posted. Standing re-vet triggers: **P2 lifts** if
+punctint-list dies specifically on position; **P6 lifts** if Ward
+verbosity dies on a Ward-specific artifact.
 
 ---
 
@@ -192,6 +211,39 @@ HF dataset reachable (open-web-math, status 200); needs the caching
 pass + tokenized artifact per the new-corpus rule. **BUILD if time
 permits.**
 
+**B7 — Refusal/deflection-marker intensity on multi-turn chat
+(round-2 append; BUILD-if-time, strictly BEHIND B6).** The
+backtracking-faithful port of the refusal idea whose as-posed version
+is D7: an intensity needs RECURRENCE, and standard refusal datasets
+are single-shot — so the corpus must be real multi-turn chat with
+recurring refusals (WildChat-class; CPU-downloadable; pinned corpus
+artifact per the dialevel new-corpus precedent; transcripts run
+through the three cached base models = one NEW caching pass each,
+cost stated wherever the screen is planned). Events = assistant turns
+matching a FROZEN refusal/deflection substring list, seeded from the
+refusal paper's own `refusal_score` set (`docs/papers/refusal.md`
+§ D.1; the concrete strings live in the paper's public code repo —
+the paper's Figure 11 is an image — pull them and freeze the list in
+the card BEFORE counting anything). Label = λ̂ over PREVIOUS turns
+(kernel per the sc_lambda/dialevel precedent), marker-turn tokens
+masked. Four-axis vet: (a) conversion — the D7 receipts cut both
+ways here: the current-turn refusal bit is presumed converted/ambient
+(App. J finds the direction in BASE models), so that face is the
+disclosed regime-1 anchor, never the primary; the candidate is
+strictly the trailing marker intensity ("how refusal-laden has this
+conversation been"), which has no obvious next-token utility beyond
+topic. (b) the loud risk: refusing conversations are topically
+distinctive — harmful-topic vocabulary is a massive unigram leak and
+refusal text is self-stamping; marker-turn masking removes the
+self-stamp, unigram triage on the frozen bars decides the leak.
+(c) turn-level events with the dialevel clock geometry —
+under-spanned panel, said plainly. (d) regime-2 LEVEL prediction:
+window > per-token, T-growing, shuffle-immune. **HARD PRE-GATE
+before any building: measure the event rate on the pinned sample
+first — if < ~2 % of assistant turns match the frozen list, kill in
+the ledger for free** (quantity-mode win condition includes honest
+kills). **BUILD-if-time.**
+
 ## PARK
 
 **P1 — News chronology / date density (cc_news-class).** Exact-by-
@@ -274,6 +326,32 @@ this a B5-class new-corpus candidate (script-exact labels, real
 switch clock), but interleave (B1) already occupies the switch-clock
 slot with a controlled corpus. DEAD on this corpus; the idea itself
 transfers to B1's family.
+
+**D7 — Refusal-as-posed: "maybe attention doesn't linearize refusal
+to a single position" (round-2 append; vetted DEAD by mac-local,
+2026-07-24).** The literature answers the posed question directly
+(`docs/papers/refusal.md` — Arditi et al., *Refusal in Language
+Models Is Mediated by a Single Direction*): a difference-in-means
+direction extracted at a SINGLE (post-instruction position, layer)
+pair — selected from the |I|×L candidate grid, § 2.3 — is causally
+sufficient in BOTH directions across 13 chat models spanning 1.8B to
+72B (Qwen/Yi/Gemma/Llama-2/Llama-3): ablating it everywhere collapses
+refusal of harmful instructions (§ 3.1), adding it at one layer
+induces refusal on harmless Alpaca instructions (§ 3.2). Sharper
+still, § 5.2 measures the conversion mechanism itself: DFA
+attribution shows a handful of attention heads reading the
+harmful-instruction WINDOW and depositing onto the refusal direction
+at the last position — the window→position deposit is not presumed,
+it is the paper's finding (adversarial suffixes jailbreak precisely
+by hijacking those heads' attention off the instruction). And App. J
+removes the chat-only escape hatch: the direction already separates
+harmful/harmless prompts in BASE models. Axis (b): harmful-topic
+vocabulary is a massive unigram leak, and refusal TEXT is
+self-stamping. Axis (c): refusal-as-posed is a prompt-level rollout
+boolean — the AVOID class (forbidden-word/emotional-onset precedent).
+Economics: needs a chat model + instruction corpus (none of our
+caches apply) + judge labels beyond string match. DEAD as posed; the
+recurrence port that survives four-axis vetting is B7.
 
 ---
 
