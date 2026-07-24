@@ -45,10 +45,15 @@ script + predictions before any cell).
 
 ## 3. After items 1–2: batch-screen candidate-factory bundles (QUANTITY MODE, Han 2026-07-24 evening)
 
-The CPU pods are shipping screen-ready label bundles incrementally
-(`briefings/candidate-factory-{traces,broad}.md`; LOG line per
-bundle) — Ward-grid bundles screen on your Ward caches, fineweb
-bundles on your 3-model caches, minutes per candidate. As bundles
+The factory batches are SHIPPED and REVIEWED — the full queue, the
+recommended order, and the binding screen qualifications (punctint
+list-density is CONDITIONAL; evidence-ceiling lines must print next
+to every window number) live in the mac-local "REVIEW: candidate
+factories" LOG entry — Ward-grid bundles screen on your Ward caches,
+fineweb bundles on your 3-model caches, minutes per candidate. The
+fineweb + new-corpus bundles (novelty, punctint ×2, tss, dialevel)
+are YOURS by default (only your volume has the 3-model caches);
+Ward-grid bundles split with runpod-d by claim-lines as before. As bundles
 land: freeze the card, run the Stage-1 screen, one LOG verdict each.
 Fail fast; split the bundle queue with runpod-d by LOG claim-lines
 (first pod to post "screening <bundle>" owns it — no double-screens).

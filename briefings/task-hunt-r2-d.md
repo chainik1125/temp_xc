@@ -53,9 +53,12 @@ rather than wait (never idle); reconcile in the LOG.
 
 ## 3. After items 1–2: batch-screen candidate-factory bundles (QUANTITY MODE, Han 2026-07-24 evening)
 
-The CPU pods are shipping screen-ready label bundles incrementally
-(`briefings/candidate-factory-{traces,broad}.md`; LOG line per
-bundle). Each bundle = labels + manifests + null + CARD_DRAFT in the
+The factory batches are SHIPPED and REVIEWED — the full queue, the
+recommended order, and the binding screen qualifications (punctint
+list-density is CONDITIONAL; evidence-ceiling lines must print next
+to every window number) live in the mac-local "REVIEW: candidate
+factories" LOG entry. Each bundle = labels + manifests + null +
+CARD_DRAFT in the
 frozen `problib` format, screening on YOUR EXISTING Ward caches in
 minutes per candidate. As bundles land: freeze the card (sharpen the
 draft), run the Stage-1 screen, one LOG verdict paragraph each —

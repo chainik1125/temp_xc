@@ -40,10 +40,9 @@ must print at screen, cross-factory bar mismatch noted, sc_lambda
    decision (adopt capacity-adequate probe? — re-bases b's variance
    receipts; decision is MINE to take or defer, with runpod-b).
    n=3 honesty note at the entry's end is good — check CI numbers.
-2. **My split-integrity check** (~30 min): does `_train_lambda_probe`'s
-   n//2 sequence split put rows of one Ward TRACE in both halves?
-   Now DOUBLY relevant: it interacts with the probe-capacity finding
-   (same eval convention). Do it as part of item 1.
+2. **Split-integrity check: DELEGATED to runpod-b**
+   (`probe-adequacy.md` item 2) — I review its forensics receipt as
+   part of the probe-capacity thread instead of running it myself.
 3. **Seed top-up review** when runpod-d stops (9 cells, frozen
    3d954869, in flight at last STATUS) — converts pre-vs-T-SAE from
    consistent to bounded (or not).
@@ -72,11 +71,20 @@ must print at screen, cross-factory bar mismatch noted, sc_lambda
 - runpod-e: round-2 results PUSHED (unreviewed); consuming the bundle
   screen queue (sc_lambda claimed).
 - runpod-c: em-redo Phase A training (no push since freeze).
-- runpod, runpod-b: IDLE — factory batches approved, briefings
-  retired. Next assignment on request (candidates: more ledger BUILDs
-  B6/OpenWebMath, or rebuttal-support once probe-capacity review
-  settles the phrasing).
-- Briefings live: em-redo, task-hunt-r2-d, task-hunt-r2-e.
+- runpod: DISPATCHED `candidate-factory-broad-2.md` — ledger D7
+  (refusal-as-posed DEAD, my vet transmitted) + B7 (refusal-marker
+  intensity on multi-turn chat, BUILD-if-time behind B6) + B6
+  OpenWebMath build + verdict hygiene.
+- runpod-b: DISPATCHED `probe-adequacy.md` — lambda_recovery_v2
+  plugin (ridge + nw scaling, contract-tested to reproduce v1),
+  split-integrity forensics (my old checklist item 2, delegated —
+  I review its receipt), variance-harness readiness, PROBE_V2_SPEC
+  freeze candidate. Contingency machinery ONLY — the methods
+  decision stays mine, pending the d+e probe-capacity review.
+- Briefings live: em-redo, task-hunt-r2-d, task-hunt-r2-e,
+  candidate-factory-broad-2, probe-adequacy. (r2-d/r2-e § 3 pointers
+  refreshed to the LOG factory-review entry; fineweb bundles routed
+  to e by default.)
 
 ## Standing context
 - Rebuttal-quotable: λ̂ Stage-2 rise (exact p=0.0093; pre-vs-T-SAE
