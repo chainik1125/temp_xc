@@ -51,6 +51,7 @@ def ward_lambda_real(
     seq_len: int = 128,
     n_seqs: int | None = None,
     rms_sample: int = 64,
+    d_in: int | None = None,
     seed: int = 0,
 ) -> SyntheticData:
     """Real Ward activations + frozen λ̂ labels as a SyntheticData.
@@ -59,7 +60,10 @@ def ward_lambda_real(
     reader cache (base | distill), ``hs`` the hidden-state capture point
     (13 = resid_post L12), ``label`` the frozen target grid
     (``lam_hist`` PRIMARY, kernel-only; ``lam_hat`` includes the
-    position ramp — see the candidate-1 card).
+    position ramp — see the candidate-1 card). ``d_in`` is declared in
+    the datasource params because the trainer infers the input width
+    from the spec BEFORE materializing; it is checked against the cache
+    here rather than trusted.
     """
     acts_path = CACHE_ROOT / model_tag / f"hs{hs}.npy"
     if not acts_path.exists():
@@ -73,6 +77,10 @@ def ward_lambda_real(
     N = arr.shape[0] if n_seqs is None else min(int(n_seqs), arr.shape[0])
     if arr.shape[1] != seq_len:
         raise ValueError(f"seq_len {seq_len} != cache {arr.shape[1]}")
+    if d_in is not None and int(d_in) != arr.shape[-1]:
+        raise ValueError(
+            f"datasource declares d_in={d_in} but cache is {arr.shape[-1]} — "
+            "the trainer sizes the dictionary from the declared value")
 
     x = torch.from_numpy(np.ascontiguousarray(arr[:N])).float()
     rng = np.random.default_rng(seed)
