@@ -292,3 +292,48 @@ one-point. The card requiring an ambient anchor is what caught this;
 the receipt in the § 3 backtracking case study, which has no such
 confound because it compares *anticipation vs ambient targets on
 identical rows*, still stands.
+
+## 2026-07-24 — runpod-d — candidate 2, FULL GRID (extends the primary-layer entry above; nothing there is revised) — **KEEP**, best cell = distill L12
+
+All 64 cells complete (exit 0). σ_null = 0.0046 over the full grid
+(3σ = **0.0137**, wider than the primary-layer-only 0.0105, so this is
+the stricter bar). The card's claim — the contrast g_tir − g_op rising
+with T — resolved per (model, layer):
+
+| cell | T=8 | T=16 | T=32 | T=64 | clears 3σ at |
+|---|---|---|---|---|---|
+| base L12 | −0.009 | +0.008 | −0.005 | +0.019 | T=64 only |
+| base L10 | +0.004 | −0.005 | +0.012 | +0.031 | T=64 only |
+| **distill L12** | **+0.017** | **+0.020** | **+0.023** | **+0.042** | **every T** |
+| distill L10 | −0.023 | −0.013 | −0.017 | +0.017 | T=64 only |
+
+**The candidate survives, and the model axis is the finding.** On
+**distill L12** the contrast is positive at every T, **monotonically
+rising** (+0.017 → +0.042), and clears 3σ_null at all four window
+sizes — the run-depth latent has window access the ambient anchor does
+not, growing with T. On the three other cells the contrast is noise
+until T = 64. Every cell peaks at T = 64 and none saturates, so the
+direction is consistent; only the generator-at-mid-depth cell is
+unambiguous.
+
+This is exactly the briefing's premise that **non-ambience is a (task,
+MODEL) property** — measured, not assumed. It is also the mirror image
+of candidate 1, where base ≈ distill held (P4 ✓): the intensity label
+is reader-readable in both models, the run-depth label is not.
+
+**Frozen predictions: P1, P3 and P5 falsified; P2 holds.** P1 (a clock
+threshold: nothing at T ≤ 16, then growth) is wrong — distill L12 has
++0.017 already at T = 8. P3 (g_order > 0 at T ≥ 32) fails at T = 32.
+**P5 (base ≈ distill) is decisively falsified** — the model axis is the
+dominant source of variation, not a nuisance.
+
+The earlier caveat still stands and is why the anchor mattered: the raw
+shuffle-gap ladders are monotone in T for 8 of 12 target-cells
+**including the ambient `op` anchor in all four**, so only the
+anchor-differenced contrast above supports an order claim.
+
+**Stage-2 candidate:** distill L12 is the cell to panel if candidate 2
+is taken forward; that is a separate run from the candidate-1 Stage 2
+now executing, and is NOT part of this session's acceptance gate.
+Results `proofops/results/proofops_verdict.json`, figure
+`proofops/figs/proofops_tscaling.*`.
