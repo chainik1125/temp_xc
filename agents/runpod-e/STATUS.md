@@ -53,32 +53,50 @@ figures rendered, RECORD_B §2, LOG entry.
   is never converted). **B4 falsified**: mid-depth VALLEY with peaks
   at both ends, not a mid peak.
 
-## IN FLIGHT at last rewrite
-`confidence/probe_capacity.py` (card §6 pre-registered post-hoc
-diagnostic) re-running after a self-caught reshape bug (first revision
-mismatched `stacked`'s (B,T,d_sae) code; failed loudly, no results
-written; fix committed and disclosed). **The four TXC cells already
-logged are decisive and unaffected:**
+## §3 QUEUE (quantity mode) — 2 bundles screened, verdicts posted
 
-| cell | panel (OLS, nw1024) | ridge nw1024 | OLS nw8192 | ridge nw8192 |
-|---|---|---|---|---|
-| pre/T4 | 0.210 | 0.302 | 0.248 | 0.274 |
-| pre/T16 | 0.134 | **0.324** | 0.246 | 0.311 |
-| post/T4 | 0.163 | 0.256 | 0.238 | 0.255 |
-| post/T16 | 0.167 | **0.318** | 0.258 | 0.294 |
+**`novelty` — NEGATIVE** (`novelty/CARD.md` frozen `3f18b5eb`). Gap
+tops out +0.045/+0.038/+0.039 vs a +0.05 bar and PEAKS MID-LADDER while
+kernel mass rises; N1 falsified informatively — per-token beats the
+position floor by +0.09..+0.15, i.e. **71-77 % of the window-readable
+signal is already per-position** (conversion with a small residue).
+Shuffle-null receipt clean (+0.076..+0.119; the null face has NO window
+gap). No KILL rule fired either — recorded as the card's missing middle
+clause, not patched post hoc.
 
-**→ The T-decline is a PROBE artifact.** Under ridge on identical
-codes, T16 ≥ T4 for both window archs — the ordering reverses. The
-frozen NEGATIVE verdict stands under the frozen metric (the card
-pre-registered that this diagnostic "cannot change the leaderboard
-cells; it can only change what the record is allowed to claim"), but
-the record must state that `lambda_recovery`'s unregularized
-LinearRegression on p = d_sae with n shrinking as 1/T is
-**systematically biased against large T**. **This very likely also
-explains the λ̂ panel's T = 16 dip and the Stacked pathology
-(runpod-d / RECORD §3b) — flag to mac-local + runpod-d.**
-Next action if interrupted: read `results/stage2_probe_capacity.json`,
-finish RECORD_B §1d + the LOG addendum, push.
+**`punctint` q face — KEEP, the hunt's first** (`qrate_fineweb/CARD.md`
+frozen `74af1d4a`; scorer + control committed `c4f0f16b` BEFORE
+running). All KEEP clauses fire 3/3: gap rises monotonically to
++0.114/+0.127/+0.143 at T64, tracks the measured kernel-mass column,
+still rising at the disclosed reach limit; ambient anchor LOSES from
+windows (advantage is face-specific, not generic width).
+**Doc-identity confound found and controlled** (doc-mean-only AUC
+0.926 — the frozen factory bars cannot see it): within-document
+contrast SURVIVES at +0.101/+0.132/+0.183 over 24-26 test docs.
+
+**`punctint` list face — WEAK KEEP, disclosed.** 2/3 models fire, but
+its anchor GAINS from windows, doc-mean-only AUC 0.960, and its
+within-doc control rests on only **8 test docs** (88.5 % zero-inflation).
+If one face is promoted it should be q.
+
+**Posted a factory recommendation:** add `doc_mean_only_auc` as a
+triage bar (novelty 0.792 / q 0.926 / list 0.960 — batch-wide route)
+and make within-document contrasts the standard control for any KEEP.
+
+**If q goes to Stage 2, that panel MUST use a capacity-adequate
+λ-probe** (ridge or n scaled with T) — my probe-capacity entry shows
+the current evaluator is biased against large T, exactly where this
+candidate's signal lives.
+
+### Queue remaining (mine, per r2-e §3)
+`tss` (interleave; needs one ~330k-token caching pass per model) and
+`dialevel` (caching + mac-local qualification 2: within-dialogue
+contrasts or dialogue-length matching, all-row position 0.93).
+Claim-lines rule: post "screening <bundle>" in the LOG first.
+
+## Hygiene at last rewrite
+280 tests pass, 1 skipped; `run.py validate` OK; leaderboard 8796 rows,
+**0 dup eval_keys, 0 null metrics**.
 
 ## Round-1 state (closed; context only)
 Three arm-B candidates KILLED under frozen cards (replag, confidence
