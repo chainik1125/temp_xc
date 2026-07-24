@@ -110,6 +110,7 @@ def build_for_tokenizer(key: str, model: str, texts) -> dict:
 
     pbin = nl.position_bin(pos_of)
     resid, expected = nl.detrend(rate, pbin, train_rows)
+    resid_null, _ = nl.detrend(rate_null, pbin, train_rows)
 
     def terciles(vals):
         fin = np.isfinite(vals) & train_rows
@@ -134,7 +135,7 @@ def build_for_tokenizer(key: str, model: str, texts) -> dict:
         out, token_ids=ids_flat, doc_off=doc_off, nov=nov, nov_rate=rate,
         nov_resid=resid, nov_bin=nov_bin, nov_raw_bin=nov_raw_bin,
         null_perm=perm, nov_null=nov_null, nov_rate_null=rate_null,
-        doc_split=split, **man)
+        nov_resid_null=resid_null, doc_split=split, **man)
 
     # ── label-side triage (test-doc rows, pos >= SUPPORT) ──────────────
     elig = pos_of >= nl.SUPPORT
@@ -156,6 +157,14 @@ def build_for_tokenizer(key: str, model: str, texts) -> dict:
         "rate_std": float(rate[fin].std()),
         "rate_null_std": float(rate_null[np.isfinite(rate_null)].std()),
         "resid_std": float(resid[np.isfinite(resid)].std()),
+        "resid_null_std": float(resid_null[np.isfinite(resid_null)].std()),
+        # lags > kernel SUPPORT share no input bits — null ~ 0 there by
+        # construction, so real-above-null is drift structure, not filter
+        "resid_autocorr": {
+            str(lag): {"real": nl.pooled_doc_autocorr(resid, doc_off, lag),
+                       "null": nl.pooled_doc_autocorr(resid_null, doc_off,
+                                                      lag)}
+            for lag in (16, 32, 64, 128)},
         "position_bin_expected_rate": expected,
         "tercile_edges": {"resid": edges_resid, "raw": edges_raw},
         "manifest_rows_per_class": {

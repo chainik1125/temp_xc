@@ -78,6 +78,20 @@ def test_novelty_count_invariant_under_permutation():
     assert int(nl.novelty_bits(ids[perm]).sum()) == n_first  # = #types
 
 
+def test_pooled_doc_autocorr_noise_vs_persistent_and_doc_bounds():
+    rng = np.random.default_rng(4)
+    off = np.array([0, 2000, 4000])
+    white = rng.normal(0, 1, 4000)
+    assert abs(nl.pooled_doc_autocorr(white, off, 32)) < 0.06
+    slow = np.repeat(rng.normal(0, 1, 40), 100)      # 100-token plateaus
+    assert nl.pooled_doc_autocorr(slow, off, 32) > 0.5
+    # doc boundaries respected: opposite constants per doc would fake
+    # autocorrelation if pooled across the boundary; per-doc demeaning
+    # makes each doc's contribution exactly zero-variance -> nan
+    const = np.concatenate([np.full(2000, 5.0), np.full(2000, -5.0)])
+    assert np.isnan(nl.pooled_doc_autocorr(const, off, 32))
+
+
 def test_type_mean_triage_detects_planted_leak_and_not_noise():
     rng = np.random.default_rng(3)
     ids = rng.integers(0, 200, size=20000)

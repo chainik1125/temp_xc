@@ -96,6 +96,28 @@ def within_doc_perm(doc_off: np.ndarray, seed: int) -> np.ndarray:
     return out
 
 
+def pooled_doc_autocorr(vals: np.ndarray, doc_off: np.ndarray,
+                        lag: int, min_len: int = 50) -> float:
+    """Lag-`lag` autocorrelation of `vals` pooled over docs (no
+    cross-doc pairs; NaNs dropped; per-doc demeaned covariances and
+    variances summed unweighted, then ratioed). For a kernel-filtered
+    label with truncation SUPPORT, lags > SUPPORT share no input bits,
+    so any surviving autocorrelation is signal structure, not filter
+    overlap."""
+    num, den = [], []
+    for d in range(len(doc_off) - 1):
+        v = vals[int(doc_off[d]): int(doc_off[d + 1])]
+        v = v[np.isfinite(v)]
+        if len(v) < lag + min_len:
+            continue
+        x, y = v[:-lag], v[lag:]
+        x = x - x.mean()
+        y = y - y.mean()
+        num.append(float((x * y).mean()))
+        den.append(float(v.std() ** 2))
+    return float(np.sum(num) / np.sum(den)) if den else float("nan")
+
+
 def type_mean_scores(ids: np.ndarray, values: np.ndarray,
                      train_mask: np.ndarray) -> np.ndarray:
     """Per-row score = train-set mean of `values` for the CURRENT
