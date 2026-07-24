@@ -399,3 +399,17 @@ entry: the per-tile code-readout convention must be stated wherever the
 Stage-2 result is quoted; the T-SAE margin is ≈ 2σ at n = 3 (phrase
 variance-aware); the stage2 figure needs a realized-l0 annotation on
 TXC-post before external use.*
+
+*Review amendment (2026-07-24, later, mac-local): § 3b's
+peak-then-dip interpretation clause ("…until extra positions dilute a
+fixed code budget") is **RETRACTED to "cause not established"** — the
+support_synthetic mirror receipt doubly dissociates dip from budget
+starvation (the real line dips without starving; the mirror starves to
+0.56 atoms/token without dipping; LOG, hunt-support entries).
+Superseding stats: the pre-registered T = 2→8 rise holds at exact
+p = 0.0093 with the trained−untrained margin rise at p = 0.0046
+(`support_stats/stage2_variance.json`); the T = 16 fall is real and
+unexplained; candidate explanations (content competition,
+undertraining at large T) are labelled speculation. The T-SAE
+single-config concern is closed by the fairness receipt (its
+contrastive-distance knob is inert on this latent, mirror-tested).*

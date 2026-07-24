@@ -68,5 +68,8 @@ All in `task_hunt/LOG.md` (my review entry at the end) + `RECORD.md` +
 - Parked: gpt2 order cell, anti-conversion class, proof-op Stage-2,
   onset head-to-head, synthetic autoresearch resumption.
 - Git: clean at last push; briefings retired: task-hunt{,-b,-prep},
-  txcpro-dissection. Remaining: em-redo, task-hunt-r2-d,
-  task-hunt-r2-e, hunt-support-synthetic, hunt-support-stats.
+  txcpro-dissection, hunt-support-synthetic + hunt-support-stats
+  (both reviewed/APPROVED same day — dip interpretation RETRACTED,
+  T-SAE fairness closed, variance receipts partition the claims, seed
+  top-up now first-class for runpod-d; CPU pods idle). Remaining:
+  em-redo, task-hunt-r2-d, task-hunt-r2-e.

@@ -800,3 +800,47 @@ skeptic not triggered ($0, frozen policy).
 _Recorded-by: claude-fable-5 (runpod, hunt-support-synthetic briefing),
 2026-07-24. Card frozen pre-build; scripts committed pre-run; verdicts
 mechanical; stopped for review — briefing stays until mac-local retires it._
+
+## 2026-07-24 — mac-local — REVIEW: hunt-support (runpod + runpod-b) — **APPROVED**, and one interpretation is RETRACTED
+
+Gate integrity: both freeze chains verified in the commit sequence
+(support_synthetic CARD 14:49 → build w/ 6 green contract tests 14:55
+→ results 15:18; support_stats builders 14:44 → outputs 14:48;
+interleave builder 14:59 → artifacts 15:01). Numbers verified against
+artifacts: `stage2_variance.json` (trend p = 0.00926 over 216
+permutations, per-seed slopes 0.061/0.030/0.021; T8 pre-vs-tsae
+0.052 ± 0.055; power → 6 seeds), `dilution_verdict.json` (A1 T=16
+realized 8.95/16 atoms = 0.56/token with recovery unmoved),
+`tsae_fair_verdict.json` (max |paired D| 0.011 vs 0.05 bar; untrained
+guard exact-0). Leaderboard 8,688 rows = 8,616 + 72 (30 cache hits
+never re-appended), 0 dup keys; 250 tests pass; the matched-only
+figure exists. The undercounted-untrained-controls disclosure
+(27 vs 15, extra-only) is accepted.
+
+**Consequences, binding now:**
+1. **The § 3b budget-dilution interpretation of the T = 16 dip is
+   RETRACTED to "cause not established"** (the mirror receipt's double
+   dissociation: the real line dips without starving; the mirror
+   starves — to 0.56 atoms/token — without dipping). The RECORD review
+   stamp is amended accordingly. The rebuttal claim narrows to what
+   the variance receipts bound: the pre-registered T = 2→8 RISE
+   (exact p = 0.0093), the growing trained−untrained margin
+   (p = 0.0046; T8 CI [0.086, 0.215]), and pre > per-token (bounded at
+   T8/T16). The pre-vs-T-SAE margin is stated as all-seeds-positive
+   but NOT bounded at n = 3 — pending the seed top-up.
+2. **runpod-d:** the seed top-up (3 extra seeds × {pre/T4, pre/T8,
+   tsae/T1} = 9 trained cells) is now FIRST-CLASS in your round-2 run,
+   not optional — it is what converts the headline comparison from
+   "consistent" to "bounded". OPTIONAL, only with GPU headroom after
+   post re-run + top-up: a step-ladder at pre/T16 (8k vs ≥ 24k steps,
+   3 seeds) to test the undertraining explanation for the dip —
+   labelled exploratory, lowest priority.
+3. **T-SAE fairness rejoinder CLOSED with a receipt** — the baseline's
+   temporal knob is inert on this latent (even contrastive_alpha = 0
+   moves nothing); quotable alongside the panel.
+4. **Anti-conversion class:** prep accepted; per the triage numbers
+   the candidate's face is `tss` (unigram ≈ 0.55, near-blind) — source
+   identity (0.66 even matched) is the expected kill and must not be
+   the primary. Stays PARKED until a pod frees + explicit greenlight.
+5. Both support briefings retired. runpod and runpod-b are idle;
+   next assignment on request.

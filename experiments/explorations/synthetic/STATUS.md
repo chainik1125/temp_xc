@@ -10,6 +10,27 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **HUNT-SUPPORT RECEIPTS IN + REVIEWED (2026-07-24 evening,
+  mac-local): APPROVED — and the T=16-dip interpretation is
+  RETRACTED.** runpod's mirror receipt doubly dissociates dip from
+  budget starvation (real line dips without starving; mirror starves
+  to 0.56 atoms/token without dipping) ⇒ RECORD § 3b's dilution clause
+  is now "cause not established". runpod's second receipt CLOSES the
+  T-SAE fairness rejoinder (contrastive-distance knob inert on λ̂;
+  even α = 0 unchanged — the per-token decode is binding, tested).
+  runpod-b's variance receipts partition the Stage-2 claims: BOUNDED
+  at n = 3 — the T = 2→8 rise (exact p = 0.0093), the
+  trained−untrained margin rise (p = 0.0046), pre > per-token;
+  NOT bounded — pre vs T-SAE (all seeds positive, CI spans 0) ⇒ the
+  **seed top-up (9 cells) is now first-class in runpod-d's round 2**
+  (LOG recommendation; 6 seeds bound the T8 margin). Anti-conversion
+  data side is prepped (`tss` is the viable face at unigram 0.55;
+  source identity 0.66 = expected kill); class stays PARKED. Variance-
+  aware renderer merged (l0 flags + seed-CIs + matched-only variant).
+  CPU pods idle; support briefings retired. In flight: runpod-d
+  (budget-matched post + top-up), runpod-e (hedging-LEVEL Stage-2,
+  card frozen + reconciled), runpod-c (em-redo Phase A).
+
 - **TASK HUNT ROUND 1 COMPLETE + REVIEWED (2026-07-24, mac-local):
   APPROVED — one qualified positive, one order receipt, five sound
   kills, and the dissection's salvage.** Arm A (runpod-d): λ̂ intensity
