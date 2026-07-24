@@ -396,3 +396,73 @@ archs:
       upstream's 0.1; our trainer wraps the upstream loss instead of
       using their training loop. See module docstring.
 
+  # ── support_synthetic Item 2: T-SAE temporal-knob fairness sweep ──
+  # One class, many entries (dissection precedent). tsae_d1 is the registered
+  # tsae's exact computation (bitwise contract test); d2/d4/d8 sweep the
+  # contrastive pair distance. tsae_a0 is the REGISTERED class at
+  # contrastive_alpha=0 (does the contrastive term matter at all).
+  tsae_d1:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 1
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=1 — bitwise-identical to `tsae` (contract-tested)."
+  tsae_d2:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 2
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=2."
+  tsae_d4:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 4
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=4."
+  tsae_d8:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 8
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=8."
+  tsae_a0:
+    class_path: temp_bench.archs.tsae:TSAEPaper
+    arch_version: "2.0.0-port"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "Registered T-SAE at contrastive_alpha=0 (support_synthetic aux)."
+
