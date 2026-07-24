@@ -1,16 +1,12 @@
 # Working state — agent `runpod-b`
 
-**Last rewrite:** 2026-07-24 (pre-compact #2) — **NEW TASK ACCEPTED,
-not yet started: `briefings/probe-adequacy.md`** (lambda_recovery_v2
-plugin + split forensics + variance readiness + freeze spec;
-**deliverables Saturday evening PT**; "highest-leverage CPU work, on
-the headline result's critical path"). Read that briefing in full
-first; this file is the resume state. Previous work: factory batch
-REVIEWED & APPROVED upstream (LOG review entry, 5 binding screen
-qualifications — read it post-compact; one is "16-not-17", likely my
-sc_lambda card's marker-pattern count, check if a correction is mine
-to make). hunt-support also approved earlier. I am mid-handoff, no
-probe-adequacy work started.
+**Last rewrite:** 2026-07-24 — **`briefings/probe-adequacy.md` COMPLETE
+at the acceptance gate; awaiting mac-local review. Briefing stays until
+that review.** All four deliverables shipped and committed; full suite
+292 passed / 1 skipped; no leaderboard writes; no readout decision
+taken or implied anywhere in tracked prose (runpod-d/e's probe-capacity
+findings cited only as reported-under-review). I am idle pending review
+/ next assignment.
 
 ## Who / where
 Second RunPod box, repo `/workspace/temp_xc`, 32 CPU, no GPU.
@@ -19,79 +15,54 @@ Second RunPod box, repo `/workspace/temp_xc`, 32 CPU, no GPU.
 `export ANTHROPIC_API_KEY=$(cat /workspace/.tokens/anthropic_key)`.
 HF token at `/workspace/.tokens/hf_token`.
 
-## The new task (inputs verified this session, work NOT started)
+## What shipped (probe-adequacy, all committed; LOG entry appended)
 
-**HANDLE WITH CARE**: runpod-d/e's probe-capacity findings (OLS at
-n ≈ p; ridge/nw lift +0.18…+0.23) are UNREVIEWED — cite ONLY as
-"reported, under review" (their LOG entries: runpod-d ≈ line 1206,
-runpod-e ≈ line 1431 of task_hunt/LOG.md; also RECORD_B §1d). The
-readout decision is mac-local's; my job is to make it EXECUTABLE.
+1. **`src/temp_bench/evals/lambda_recovery_v2.py`** + additive opt-in
+   dispatch in `synthetic_recovery.py` (flag `lambda_probe_v2` in
+   eval_cfg; absent → byte-identical, protocol stays 1.3.0) +
+   `configs/sweeps/lambda_probe_v2_smoke.yaml` (committed NOT run —
+   sweeps write leaderboard rows) + 12 contract tests
+   (`tests/test_lambda_recovery_v2.py`; v1 repro at ols/nw1024 to
+   1e-10, determinism, trace-split property tests, validate green).
+   Knobs: RidgeCV logspace(-2,4,13) train-half-only (α ships as
+   `lambda_alpha_v2`), nw default 8192 (= 8·p at T16/p2048; Stacked
+   p>n exception disclosed), split default `trace` = boundary-snap of
+   n//2 (no trace_ids ⇒ exactly v1's n//2, so synthetic benches are
+   untouched). Both Ward datasources now expose `trace_ids` (additive);
+   `grid.run_cell` gained `eval_extra` pass-through (default {}).
+2. **Forensics receipt**
+   (`lambda_intensity/results/split_forensics.json`, script committed
+   before output): stream trace-contiguous; ONE straddling trace (152:
+   14 train / 1 eval window); v1 uses seeds 0/1 in every cell → at
+   nw1024 ZERO leaked eval draws ⇒ **committed panel numbers untouched
+   by split leakage on both panel datasources** (confidence.npz grid
+   verified identical); at nw8192 half-split leaks 2/8192
+   (|Δr| ≤ ~5e-4), snap leaks 0 ⇒ trace default in v2.
+3. **`support_stats/stage2_variance.py` probe-agnostic**: --ds/--probe/
+   --metric/--k-pos/--crosscheck-json/--out-prefix; defaults reproduce
+   committed receipts byte-identically (verified, empty diff). Also
+   fixed a latent abort: post-matched k_pos=8·T rows (already on the
+   leaderboard, 108 rows for the λ̂ ds) dup-collide in the old loader;
+   new k_pos + probe filters restore the 84-row panel by design.
+4. **`lambda_intensity/PROBE_V2_SPEC.md`** freeze candidate: exact
+   convention, 192 eval-only re-run cells (108 λ̂ + 84 hedging, all
+   checkpoints reused; ≈ 3–4 h wall at 3 workers), one-command variance
+   re-base (`--probe v2 --out-prefix stage2_variance_v2`), explicit
+   non-decision section. Adoption = mac-local freezes the file.
 
-1. **`lambda_recovery_v2` eval plugin** — NEW file + YAML only (hard
-   rule 3), never edit `lambda_recovery.py` (frozen baseline, must
-   stay bit-identical). Same readout convention (per-tile code, λ at
-   leading edge, shuffled-target chance floor); knobs: ridge with a
-   FROZEN α-selection rule (small fixed grid, inner validation inside
-   TRAIN half only), configurable n_windows (frozen default with
-   n_rows ≥ 8·p at largest panel T — arithmetic: n_rows = nw·(L/T),
-   L = 32, T = 16, p = d_sae = 2048 ⇒ nw = 8192, matching d/e; justify
-   + eval-cost in spec), split per forensics. Contract tests
-   (CPU, tiny synthetic): (a) α→0 + nw=1024 reproduces v1 to tight
-   tolerance; (b) determinism; (c) by-trace split never splits a
-   trace; (d) `python run.py validate` resolves. NO leaderboard
-   writes; any smoke via canonical runner, commit-then-run.
-2. **Split-integrity forensics**: v1 `_train_lambda_probe` splits at
-   `split = n // 2` over SEQUENCES in dataset order
-   (`lambda_recovery.py:84`), then samples x/λ windows seed-aligned
-   from each pool. Question: do windows of one Ward TRACE land in both
-   halves under the panel datasource? Depends on the 4044-window ORDER
-   from generator `explorations.task_hunt.real_lambda:ward_lambda_real`
-   (data.yaml:574, params seq_len 128 / d_in 4096 / label
-   lam_hist_dense) — READ `src/explorations/task_hunt/real_lambda.py`
-   post-compact + trace_idx/win_start from `labels/ward_lambda.npz`
-   (trace-contiguous ⇒ only the boundary trace; interleaved/shuffled ⇒
-   systemic). Receipt either way; if real, quantify direction/size
-   label-side cheaply + make by-trace the v2 default.
-3. **Variance readiness**: make `support_stats/stage2_variance.py`
-   probe-agnostic — it currently HARDCODES the results JSON path
-   (`lambda_intensity/results/stage2_ward_real_lambda_base_l12.json`)
-   and aborts on mismatch vs leaderboard rows; parameterize inputs so
-   a v2 re-base is a re-run, not a rewrite. One STATUS paragraph +
-   small committed fix.
-4. **`lambda_intensity/PROBE_V2_SPEC.md`** — freeze-candidate spec:
-   exact v2 convention (probe, α rule, nw, split), re-run implications
-   for λ̂ + hedging panels (cell counts, GPU-minutes), what re-bases in
-   the variance receipts. Written to be adopted by freezing as-is.
-
-**Acceptance gate**: plugin + tests green (FULL suite stays green);
-forensics receipt; spec committed; STATUS rewritten; no reviewer
-quotes. Stop for mac-local review; briefing stays.
-
-**Key v1 facts already verified**: `lambda_recovery.py` is NOT a
-routed evaluator — `SyntheticRecovery` calls `lambda_recovery_metrics`
-iff `data.extra['lambda_labels']` exists; per-tile codes via
-`_tile_lambda_examples` (encode (W·L/T, T, d_in) tiles, λ at tile pos
-T−1); NaN-target drop guard keeps all-finite path byte-identical;
-LinearRegression + corr headline + shuffled-train-target chance floor
-(seed+7). POST-COMPACT READS before writing code:
-`src/temp_bench/evals/synthetic_recovery.py` (`_sample_windows`,
-`_check_tileable`, evaluator registration + protocol_version),
-`configs/experiments.yaml` + registry/`run.py validate` pathway for a
-NEW eval, the factory-review LOG entry, d/e's two LOG entries.
-
-## Prior context that still binds
-- Factory batch (last session): 4 bundles / 5 labels shipped
-  (sc_lambda, qrate, oprate ver+case, vslope) + 2 triage kills
-  (vlevel tok 0.654; redundancy pos 0.890). APPROVED; screen queue
-  opened upstream; 5 binding qualifications in the review entry.
-- Upstream since: runpod-e reports Stage-2 hedging NEGATIVE verdict +
-  probe-capacity finding (UNREVIEWED); runpod-d λ̂ diagnostic ditto;
-  runpod runs candidate-factory-broad-2 (its B6/B7 + D7 refusal-DEAD);
-  fineweb bundles routed to runpod-e (r2-e §3 refreshed).
-- tests/test_factory_labels.py was touched upstream/linter — treat as
-  intentional, don't revert.
+## Standing context
+- **16-not-17** (factory review qualification 5): resolved — the review
+  says the FREEZING agent corrects the sc_lambda marker count when the
+  card is frozen at screen time; no action of mine. Other
+  qualifications (1–4) bind screens, not me, unless I run one.
+- Factory batch APPROVED (4 bundles / 5 labels + 2 kills); screen queue
+  open upstream (sc_lambda first); runpod on candidate-factory-broad-2;
+  fineweb bundles are runpod-e's.
+- Shared-branch protocol: pull-rebase before EVERY push; LOG.md
+  conflicts keep upstream entry then re-append mine; commit SUBJECTS
+  not SHAs; case-collision-free filenames; builders/scripts committed
+  BEFORE outputs; no reviewer/meeting quotes in tracked files.
 - Environmental pytest trap: untracked files break
   `test_diff_hash_consistent_with_dirty` — commit/clean before full
-  runs. LOG.md conflicts: keep upstream, re-append mine. Shared branch:
-  pull-rebase before EVERY push; commit SUBJECTS not SHAs. Rewrite
-  this file before any compact.
+  runs (traces.json is gitignored and doesn't count).
+- Rewrite this file before any compact.
