@@ -43,6 +43,31 @@ Deadline: results by 2026-07-26 morning PT. Fail fast.
    "window cannot reach the trend's timescale at panel-feasible T" as
    a valid kill. Screen only after candidate 1's Stage-1 verdict is
    committed.
+3. **Emotional-instability onset (NEW, Han 2026-07-24 — "Gemma needs
+   help", `docs/papers/gemma_needs_help.md`).** Substrate:
+   **gemma-3-12b-it** (27b-it only if 12b's elicitation rate is too
+   low) — the IT model is CORRECT here: the phenomenon is created by
+   Gemma's post-training (the paper's base-vs-instruct prefill result),
+   the same fit-where-the-phenomenon-lives rule as the EM organism.
+   Elicitation is fully specified in the paper: impossible-numeric
+   puzzles + neutral rejections, 8 turns; per-turn mean frustration
+   rises 1.5 → 5.5 — a **graded escalation trend**, not a rollout
+   boolean. Labels: per-response frustration 0–10 (the paper's judge
+   prompt, verbatim in our doc) + within-turn onset token (their
+   validated onset-labeler prompt, App C.1); ≤ $40 judge budget,
+   prereg + κ on 30 traces before scaling (em_onset convention). Two
+   readouts, in order: (a) pre-onset anticipation at frozen offsets
+   before the labeled onset token (the em_onset D+ design); (b)
+   escalation-intensity regression (turn-indexed trend). **The trap,
+   named in the card:** post-onset *detection* is lexically stamped
+   ("frustrated", "myself", "breath" — the paper's differential-word
+   tables) ⇒ predicted regime-1 / per-token-readable; that is the
+   sanity anchor, not the target — a card claiming detection dies at
+   the gate. Timescale risk as candidate 2: the trend lives at turn
+   scale, so screen T ∈ {16, 32, 64} with the same honest kill. Order
+   vs candidate 2: decide on feasibility after candidate 1's verdict —
+   if runpod-b's clock-bridge stats already kill candidate 2's
+   timescale, come straight here.
 
 ## Acceptance gate — stop for review
 

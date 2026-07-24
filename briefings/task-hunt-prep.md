@@ -38,10 +38,18 @@ mini-card drafting so the GPU pods never wait on labels. Shared-branch rules app
    bridge stated explicitly (audit item 6) — flag tokens-per-sentence
    stats so the T range is chosen honestly.
 4. **Mini-cards** for candidates 2–4 (candidate 1's card is
-   runpod-c's, using your targets): one page each per the task-hunt
+   runpod-d's, using your targets): one page each per the task-hunt
    Stage-1 format — label definition, non-ambience argument, predicted
    T-pattern (STORY.md § 7 taxonomy), falsifier. Frozen by commit
    before the corresponding screen runs.
+5. **(If hours remain)** Draft cards + label specs for the two NEW
+   queue candidates added 2026-07-24 — forbidden-word violation onset
+   (task-hunt.md candidate 3: offset-to-first-occurrence labels, exact
+   string match, CoT-Control keyword split) and emotional-instability
+   onset (task-hunt-b.md candidate 3: judge + onset-labeler prompts
+   are verbatim in `docs/papers/gemma_needs_help.md`) — so the GPU
+   pods never wait on specs. Drafts only; the running agent freezes
+   its own card.
 
 ## Acceptance gate
 

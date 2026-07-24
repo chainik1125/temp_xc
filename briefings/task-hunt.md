@@ -75,10 +75,52 @@ shuffle-ablation bar, and the record.
    / run-rate over the R1-Distill traces (labels from the expansion
    corpus via runpod-b; three-timescale structure is C5-confirmed
    model-independently). Screen after candidate 1's screen is in.
+3. **Forbidden-word violation onset (NEW, Han 2026-07-24 — CoT-Control).**
+   Latent: imminent-violation pressure — the model is instructed to
+   suppress a keyword in its CoT and usually fails; label positions by
+   offset to the FIRST occurrence of the keyword (**exact string match —
+   programmatic ground truth, zero judge cost**). Data: generate
+   R1-Distill-Llama-8B rollouts on the public CoT-Control
+   keyword-suppression split (`docs/papers/reasoning_models_struggle.md`;
+   github.com/YuehHanChen/CoTControl — keywords pre-validated per
+   question; R1-family controllability ≈ 0.1 % ⇒ violations are the
+   common case, labels are dense). Screen = the onset-anticipation gate
+   at frozen horizons D ∈ {4, 8, 16} before first occurrence: per-token
+   vs window vs shuffled + g_agg/g_order per the main protocol. Ambience
+   is genuinely CONTESTED here and that is the card's crux: the model
+   "circles" the concept pre-violation (semantic-neighborhood tokens are
+   individually informative), so per-token ≈ window at ALL horizons is
+   the pre-registered kill; surviving it with g_order > 0 is the
+   non-ambient anticipation story. Frozen T-prediction: recovery at
+   horizon D turns on as T crosses D (a second threshold ladder, like
+   arm B's per-Δ plot), saturating at the typical circling span.
+   **DEDUP — mandatory:** Aniket owns forbidden-word detection /
+   window-size on the existing dictionaries (team meeting 07-24). Our
+   readout is the pre-onset anticipation screen on a fresh cohort, NOT
+   his; state the distinction in the mini-card, flag any overlap in the
+   record, reconcile at the Sunday check-in. Queue discipline:
+   generation may run in the background while candidate 1 trains;
+   screen only after candidates 1–2 have committed verdicts.
 
 Do NOT pursue bracket/indentation state-tracking (tried before this
-program; dies under strict per-position baselines) or forbidden-word
-(owned elsewhere).
+program; dies under strict per-position baselines). Forbidden-word
+*detection* stays Aniket's — only candidate 3's onset-anticipation
+readout above is in agent scope.
+
+## Parked — reviewed and REJECTED for this window (recorded so nobody re-derives)
+
+- **Hint-use faithfulness** ("Reasoning Models Don't Always Say What
+  They Think", `docs/papers/reasoning_models_dont_always_say.md`):
+  "hint used" is a rollout-level boolean (the EM trap); the moment of
+  use has no observable ground truth (the paper argues it is a single
+  forward pass); and hint-*presence* is trivially ambient — the hint
+  tokens sit in the prompt, so a window spanning them reads the label
+  off the input. Post-rebuttal at most.
+- **Introspection / injected thoughts** (Anthropic 2025): detecting an
+  injection we ourselves added to the residual stream is a
+  perturbation-detection confound, not a temporal-structure result;
+  the genuine noticing phenomenon is capability-gated beyond
+  panel-feasible open models. Post-rebuttal at most.
 
 ## Also wanted (cheap, after the first survivor)
 
