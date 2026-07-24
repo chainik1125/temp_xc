@@ -25,7 +25,30 @@ Pull-rebase before EVERY push. Deadline 2026-07-26 morning PT.
   17-layer caches on `/workspace/conv_depth_caches/` (traces.json
   re-ported per stage_a/ATTRIBUTION.md, gitignored).
 
-## NOW: candidate 3 — emotional-instability onset (gemma-3-12b-it)
+## Candidate 3 — LIVE STATE (2026-07-24 ~04:30 UTC)
+All pipeline code committed under `task_hunt/emotional_instability/`:
+CARD.md (frozen), generate.py, judge.py, cache_acts.py,
+build_labels.py, screen.py. Done so far:
+- Wave-1 rollouts: 300 convs (30 puzzles × 10), 76 min. Escalation
+  replicates: mean score/turn 0.36→4.91; 65 % of turn-8 ≥ 5.
+- κ pilot PASS: qw-κ 0.857, within-1 0.90, elicitation 100 % ≥ 5
+  (12b suffices). Judge = claude-sonnet-4-5 (paper's sonnet-4 retired).
+- Full scores (2400, batch, $4.8) + onsets (298/300; robust matching
+  maps 280 to tokens). Spend ≈ $6.6 / $40.
+- Acts cache wave-1 done (hs25 screen layer + hs13/37,
+  `/workspace/emo_caches/acts`). Labels+manifests built: esc3/det
+  saturate caps; anticipation TEST split 144-214/class < the frozen
+  300 floor ⇒ **wave-2 generation RUNNING** (N_ROLLOUTS 10→20, ckpt
+  cleared, log `emo_gen2.log`), ~76 min.
+- NEXT (in order): (1) `judge full` then `judge onset` (both resumable,
+  new convs only); (2) `rm -r /workspace/emo_caches/acts` and re-run
+  cache_acts (index.json gates idempotency); (3) build_labels;
+  (4) screen (`emo` results/screen.json); (5) verdict → LOG (KEEP needs
+  gap ≥ +0.05 with T-growth AND shuffle collapse ≥ half; det anchor
+  must be per-token-readable); (6) figs if KEEP-adjacent; STATUS +
+  briefing cleanup per acceptance gate.
+
+## Original plan reference — candidate 3
 Paper protocol in `docs/papers/gemma_needs_help.md` (prompts VERBATIM:
 elicitation App B — impossible numeric + 8-turn neutral rejections,
 temp 1; judge 0-10 App B.2; onset labeler App C.1). runpod-b draft:
