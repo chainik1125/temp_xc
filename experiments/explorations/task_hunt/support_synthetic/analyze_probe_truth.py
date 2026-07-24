@@ -1,0 +1,372 @@
+"""Probe-truth receipt — the mechanical verdicts (card § 4–7).
+
+Implements `CARD_PROBE_TRUTH.md` verbatim: the frozen aggregation (§ 4),
+the pre-registered predictions P1–P5 (§ 5), the validity gates G1–G4 (§ 6)
+and the mechanical map onto mac-local's four branches (§ 7). Committed
+before it is run; every number in the receipt and the scorecard comes from
+here.
+
+**This emits `branch_evidence`, not a decision.** The label names which
+branch of the pre-registered rule the mirror evidence is consistent with.
+Adopting, declining or rejecting the v2 readout is mac-local's call.
+
+One aggregation detail the card left open and this script fixes (disclosed
+in the LOG rather than silently): a prediction quantified "over cells" is
+scored per cell and **fires iff it holds on ≥ 2/3 of the qualifying
+cells**; the exact fraction, and the per-cell table, are in the receipt so
+any other threshold can be read off it.
+
+Run:  .venv/bin/python -m \
+        experiments.explorations.task_hunt.support_synthetic.analyze_probe_truth
+"""
+
+from __future__ import annotations
+
+import json
+from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+RES = HERE / "results"
+
+# CARD.md § 1.2 — the committed dilution A1 line (TXC-pre, k_pos 1, d_sae 20)
+# seed-means, for gate G2.
+A1_COMMITTED = {2: 0.870, 4: 0.952, 8: 0.949}
+# Bench-documented constants for gate G1 (README/bench_record; independently
+# re-derived from b_labels, not from anything this campaign measured).
+DPI_FLOOR = 0.41
+WINDOW_CEIL = {2: 0.91}          # T ≥ 4 → the K = 2 ceiling below
+WINDOW_CEIL_HI = 0.99
+GATE_TOL = 0.02
+MAJORITY = 2.0 / 3.0
+
+
+def _bar(vals: list[float]) -> float:
+    """Card § 4: bar = max(2·SE, 0.05), SE = std(ddof=1)/√k."""
+    if len(vals) < 2:
+        return 0.05
+    return max(2.0 * float(np.std(vals, ddof=1)) / np.sqrt(len(vals)), 0.05)
+
+
+def _load(name: str):
+    p = RES / name
+    return json.loads(p.read_text()) if p.exists() else []
+
+
+# ── trained cells: join the leaderboard grid rows to their anchors ──────────
+
+def _cell_key(r):
+    return (r["arch"], r["T"], r["d_sae"], r["k_pos"], r["n_steps"])
+
+
+def build_cells(stages=("train", "existing")) -> list[dict]:
+    """One record per (arch, T, d_sae, k_pos, n_steps), seeds aggregated."""
+    grid, anchors = {}, {}
+    for st in stages:
+        for r in _load(f"probe_truth_grid_{st}.json"):
+            if r.get("ok"):
+                grid[(*_cell_key(r), r["seed"])] = r
+        for r in _load(f"probe_truth_anchor_{st}.json"):
+            if r.get("ok"):
+                anchors[(*_cell_key(r), r["seed"])] = r
+
+    by_cell = defaultdict(list)
+    for key, g in grid.items():
+        a = anchors.get(key)
+        m = g["metrics"]
+        rec = {"seed": key[-1],
+               "v1": float(m.get("lambda_recovery", np.nan)),
+               "v2": float(m.get("lambda_recovery_v2", np.nan)),
+               "v1_chance": float(m.get("lambda_chance", np.nan)),
+               "v2_chance": float(m.get("lambda_chance_v2", np.nan)),
+               "l0_per_window": float(m.get("l0_per_window", np.nan)),
+               "kind": g.get("kind")}
+        if a:
+            g1024 = [q for q in a["grid"] if q["n_windows"] == 1024][0]
+            g8192 = [q for q in a["grid"] if q["n_windows"] == 8192][0]
+            rec.update({
+                "p": a["p"],
+                # p/n in V1's regime (nw = 1024): the arithmetic the card's
+                # § 1.1 trap is stated in, and the regime v1 actually runs in.
+                "p_over_n": g1024["p_over_n"],
+                "anchor": a["anchor"]["anchor"],
+                "anchor_licensed": a["anchor"]["licensed"],
+                "anchor_gap": a["anchor"]["ols_ridge_gap"],
+                "anchor_n_over_p": a["anchor"]["n_over_p"],
+                "v1_replication_delta": a["v1_replication_delta"],
+                "nw1024_ols": g1024["ols"], "nw1024_ridge": g1024["ridge"],
+                "nw8192_ols": g8192["ols"], "nw8192_ridge": g8192["ridge"],
+                "nnz_per_row": g1024.get("nnz_per_row"),
+            })
+        by_cell[key[:-1]].append(rec)
+
+    cells = []
+    for key, seeds in sorted(by_cell.items(), key=str):
+        arch, T, d_sae, k_pos, n_steps = key
+        seeds = sorted(seeds, key=lambda s: s["seed"])
+        have_anchor = [s for s in seeds if "anchor" in s]
+        c = {"arch": arch, "T": T, "d_sae": d_sae, "k_pos": k_pos,
+             "n_steps": n_steps, "kind": seeds[0]["kind"],
+             "n_seeds": len(seeds), "seeds": seeds,
+             "v1_mean": float(np.mean([s["v1"] for s in seeds])),
+             "v2_mean": float(np.mean([s["v2"] for s in seeds])),
+             "l0_per_window": float(np.mean([s["l0_per_window"] for s in seeds])),
+             "n_seeds_anchored": len(have_anchor)}
+        if have_anchor:
+            c["p"] = have_anchor[0]["p"]
+            c["p_over_n"] = float(np.mean([s["p_over_n"] for s in have_anchor]))
+            c["anchor_mean"] = float(np.mean([s["anchor"] for s in have_anchor]))
+            c["anchor_licensed"] = all(s["anchor_licensed"] for s in have_anchor) \
+                and len(have_anchor) == len(seeds)
+            c["anchor_gap_max"] = float(max(s["anchor_gap"] for s in have_anchor))
+            c["v1_replication_max"] = float(max(
+                abs(s["v1_replication_delta"] or 0.0) for s in have_anchor))
+            # Paired-by-seed deltas (only seeds that have both).
+            d1 = [s["v1"] - s["anchor"] for s in have_anchor]
+            d2 = [s["v2"] - s["anchor"] for s in have_anchor]
+            c.update({"d1_mean": float(np.mean(d1)), "d2_mean": float(np.mean(d2)),
+                      "d1_bar": _bar(d1), "d2_bar": _bar(d2)})
+            for k in ("nw1024_ols", "nw1024_ridge", "nw8192_ols", "nw8192_ridge"):
+                c[k] = float(np.mean([s[k] for s in have_anchor]))
+        cells.append(c)
+    return cells
+
+
+# ── gates ──────────────────────────────────────────────────────────────────
+
+def gate_G1(calib) -> dict:
+    """Stage 1 reproduces the bench's documented constants + anchor validity."""
+    checks, ok = [], True
+    for c in calib:
+        g = [q for q in c["grid"] if q["n_windows"] == 8192][0]
+        truth = g["truth"]
+        if c["arm"] == "token":
+            ref = DPI_FLOOR
+        elif c["arm"] == "full":
+            ref = WINDOW_CEIL.get(c["T"], WINDOW_CEIL_HI)
+        else:
+            ref = 0.0
+        d = abs(truth - ref)
+        passed = d <= GATE_TOL
+        ok &= passed
+        checks.append({"arm": c["arm"], "T": c["T"], "p": c["p"],
+                       "density": c["density"], "seed": c["seed"],
+                       "truth": truth, "reference": ref, "delta": d,
+                       "pass": passed})
+    # anchor procedure must recover the exact truth where it is licensed
+    anch, anch_ok = [], True
+    for c in calib:
+        a = c.get("anchor")
+        if not a or not a["licensed"]:
+            continue
+        d = abs(a["anchor"] - a["truth"])
+        p = d <= GATE_TOL
+        anch_ok &= p
+        anch.append({"arm": c["arm"], "p": c["p"], "density": c["density"],
+                     "seed": c["seed"], "anchor": a["anchor"],
+                     "truth": a["truth"], "delta": d, "pass": p})
+    n_bad = sum(1 for q in checks if not q["pass"])
+    return {"pass": bool(ok and anch_ok), "n_checks": len(checks),
+            "n_failed": n_bad, "worst": max((q["delta"] for q in checks),
+                                            default=float("nan")),
+            "anchor_checks": len(anch), "anchor_failed":
+            sum(1 for q in anch if not q["pass"]),
+            "anchor_worst": max((q["delta"] for q in anch), default=float("nan")),
+            "detail": checks, "anchor_detail": anch}
+
+
+def gate_G2(cells) -> dict:
+    """Line M reproduces the committed dilution A1 seed-means (CARD.md § 1.2)."""
+    checks, ok = [], True
+    for c in cells:
+        if not (c["arch"] == "txc_batchtopk_pre" and c["k_pos"] == 1
+                and c["d_sae"] == 20 and c["n_steps"] > 0):
+            continue
+        ref = A1_COMMITTED.get(c["T"])
+        if ref is None:
+            continue
+        d = abs(c["v1_mean"] - ref)
+        p = d <= 0.01
+        ok &= p
+        checks.append({"T": c["T"], "v1_mean": c["v1_mean"], "committed": ref,
+                       "delta": d, "pass": p})
+    return {"pass": bool(ok and checks), "n_checks": len(checks),
+            "detail": checks,
+            "note": "no line-M cell landed" if not checks else ""}
+
+
+def gate_G3(cells) -> dict:
+    """Chance floors sit at 0 (±0.05); failures are excluded and logged."""
+    bad = []
+    for c in cells:
+        for s in c["seeds"]:
+            for k in ("v1_chance", "v2_chance"):
+                v = s[k]
+                if np.isfinite(v) and abs(v) > 0.05:
+                    bad.append({"arch": c["arch"], "T": c["T"],
+                                "d_sae": c["d_sae"], "k_pos": c["k_pos"],
+                                "n_steps": c["n_steps"], "seed": s["seed"],
+                                "which": k, "value": float(v)})
+    return {"pass": not bad, "n_excluded": len(bad), "detail": bad[:40]}
+
+
+def gate_G4(cells) -> dict:
+    """Coverage: ≥ 3 licensed cells at p/n ≥ 0.5 with 3 seeds each."""
+    q = [c for c in cells if c.get("anchor_licensed") and c["n_seeds"] >= 3
+         and c.get("p_over_n", 0) >= 0.5]
+    return {"pass": len(q) >= 3, "n_qualifying": len(q),
+            "cells": [f"{c['arch']}/T{c['T']}/d{c['d_sae']}/k{c['k_pos']}"
+                      f"/{'trained' if c['n_steps'] else 'untrained'}"
+                      f" p/n={c['p_over_n']:.2f}" for c in q]}
+
+
+# ── predictions ────────────────────────────────────────────────────────────
+
+def _fires(hits: list[bool]) -> dict:
+    n = len(hits)
+    k = sum(hits)
+    return {"n_qualifying": n, "n_holding": k,
+            "fraction": (k / n) if n else 0.0,
+            "holds": bool(n > 0 and (k / n) >= MAJORITY)}
+
+
+def _label(c):
+    return (f"{c['arch']}/T{c['T']}/d{c['d_sae']}/k{c['k_pos']}"
+            f"/{'trained' if c['n_steps'] else 'untrained'}")
+
+
+def predictions(cells, calib, bad_seeds: set) -> dict:
+    usable = [c for c in cells if c.get("anchor_licensed") and c["n_seeds"] >= 3]
+    hi = [c for c in usable if c["p_over_n"] >= 0.5]
+    lo = [c for c in usable if c["p_over_n"] <= 0.05]
+
+    p1 = _fires([c["d1_mean"] <= -c["d1_bar"] for c in hi])
+    p1["detail"] = [{"cell": _label(c), "p_over_n": c["p_over_n"],
+                     "d1": c["d1_mean"], "bar": c["d1_bar"],
+                     "v1": c["v1_mean"], "truth": c["anchor_mean"],
+                     "holds": c["d1_mean"] <= -c["d1_bar"]} for c in hi]
+    p2 = _fires([abs(c["d2_mean"]) < c["d2_bar"] for c in hi])
+    p2["detail"] = [{"cell": _label(c), "p_over_n": c["p_over_n"],
+                     "d2": c["d2_mean"], "bar": c["d2_bar"],
+                     "v2": c["v2_mean"], "truth": c["anchor_mean"],
+                     "holds": abs(c["d2_mean"]) < c["d2_bar"]} for c in hi]
+    p3 = _fires([abs(c["d1_mean"]) < c["d1_bar"] and abs(c["d2_mean"]) < c["d2_bar"]
+                 for c in lo])
+    p3["detail"] = [{"cell": _label(c), "p_over_n": c["p_over_n"],
+                     "d1": c["d1_mean"], "d2": c["d2_mean"],
+                     "bar1": c["d1_bar"], "bar2": c["d2_bar"],
+                     "holds": abs(c["d1_mean"]) < c["d1_bar"]
+                     and abs(c["d2_mean"]) < c["d2_bar"]} for c in lo]
+
+    # P4 — no optimism anywhere on the licensed ladder, plus the null arm.
+    over = [{"cell": _label(c), "p_over_n": c["p_over_n"], "d2": c["d2_mean"],
+             "bar": c["d2_bar"]} for c in usable if c["d2_mean"] >= c["d2_bar"]]
+    null_bad = []
+    for c in calib:
+        if c["arm"] != "null":
+            continue
+        for g in c["grid"]:
+            for probe, chance in (("ridge", c["v2_chance"]), ("ols", c["v1_chance"])):
+                v = g[probe]
+                if abs(v) > max(0.05, abs(chance)):
+                    null_bad.append({"p": c["p"], "density": c["density"],
+                                     "seed": c["seed"], "n_windows": g["n_windows"],
+                                     "probe": probe, "r": v, "chance": chance})
+    p4 = {"holds": not over and not null_bad,
+          "n_cells_over_truth": len(over), "detail": over,
+          "n_null_arm_inflated": len(null_bad), "null_detail": null_bad[:20]}
+
+    # P5 — v1's T-decline on line C at d_sae = 2048 vs the anchor's.
+    line = sorted([c for c in cells if c["arch"] == "txc_batchtopk_pre"
+                   and c["k_pos"] == 8 and c["d_sae"] == 2048 and c["n_steps"] > 0
+                   and c.get("anchor_licensed")], key=lambda c: c["T"])
+    p5 = {"holds": False, "note": "insufficient line-C d2048 coverage",
+          "detail": [{"T": c["T"], "v1": c["v1_mean"], "v2": c["v2_mean"],
+                      "truth": c["anchor_mean"], "p_over_n": c["p_over_n"]}
+                     for c in line]}
+    top = [c for c in line if c["T"] == 16]
+    if line and top:
+        peak = max(line, key=lambda c: c["v1_mean"])
+        t16 = top[0]
+        v1_drop = peak["v1_mean"] - t16["v1_mean"]
+        tr_drop = peak["anchor_mean"] - t16["anchor_mean"]
+        bar = max(peak["d1_bar"], t16["d1_bar"])
+        p5 = {"holds": bool(v1_drop >= bar and tr_drop < bar),
+              "peak_T": peak["T"], "v1_drop_peak_to_T16": float(v1_drop),
+              "truth_drop_peak_to_T16": float(tr_drop), "bar": float(bar),
+              "detail": p5["detail"]}
+    return {"P1": p1, "P2": p2, "P3": p3, "P4": p4, "P5": p5,
+            "n_usable_cells": len(usable), "n_hi": len(hi), "n_lo": len(lo)}
+
+
+def branch(gates, preds) -> tuple[str, str]:
+    """Card § 7, mechanical."""
+    if not preds["P4"]["holds"]:
+        return ("REJECT-consistent",
+                "v2 reports above truth on at least one licensed cell or "
+                "inflates on the null arm — branch 3 evidence, reported first.")
+    gates_ok = all(gates[g]["pass"] for g in ("G1", "G3", "G4"))
+    if not gates_ok:
+        failed = [g for g in ("G1", "G2", "G3", "G4") if not gates[g]["pass"]]
+        return ("AMBIGUOUS", f"validity gate(s) {', '.join(failed)} failed")
+    P1, P2, P3 = preds["P1"]["holds"], preds["P2"]["holds"], preds["P3"]["holds"]
+    if P1 and P2 and P3:
+        return ("ADOPT-consistent",
+                "v2 tracks truth across the ladder where v1 sags")
+    if P3 and P2 and not P1:
+        return ("DECLINE-consistent",
+                "both probes track truth even at p/n >= 0.5 — the mirror does "
+                "not reproduce a capacity failure, so the real-panel lift "
+                "needs a different explanation")
+    return ("AMBIGUOUS",
+            f"mixed pattern (P1={P1}, P2={P2}, P3={P3})")
+
+
+def main():
+    calib = _load("probe_truth_calib.json")
+    cells = build_cells()
+    g3 = gate_G3(cells)
+    gates = {"G1": gate_G1(calib), "G2": gate_G2(cells),
+             "G3": g3, "G4": gate_G4(cells)}
+    preds = predictions(cells, calib, set())
+    label, why = branch(gates, preds)
+
+    coverage = {
+        "n_cells": len(cells),
+        "n_cells_3_seeds": sum(1 for c in cells if c["n_seeds"] >= 3),
+        "n_cells_anchored": sum(1 for c in cells if "anchor_mean" in c),
+        "n_cells_licensed": sum(1 for c in cells if c.get("anchor_licensed")),
+        "n_calib_cells": len(calib),
+        "p_over_n_range": [
+            float(min((c["p_over_n"] for c in cells if "p_over_n" in c),
+                      default=float("nan"))),
+            float(max((c["p_over_n"] for c in cells if "p_over_n" in c),
+                      default=float("nan")))],
+        "unlicensed": [{"cell": _label(c), "p_over_n": c.get("p_over_n"),
+                        "n_over_p": None, "gap": c.get("anchor_gap_max"),
+                        "n_seeds_anchored": c["n_seeds_anchored"]}
+                       for c in cells if "anchor_mean" in c
+                       and not c.get("anchor_licensed")],
+    }
+    out = {"card": "CARD_PROBE_TRUTH.md", "branch_evidence": label,
+           "branch_reason": why, "gates": gates, "predictions": preds,
+           "coverage": coverage, "cells": cells, "calibration": calib}
+    (RES / "probe_truth.json").write_text(json.dumps(out, indent=1))
+
+    print(f"branch_evidence: {label}  — {why}")
+    for g, v in gates.items():
+        print(f"  {g}: {'PASS' if v['pass'] else 'FAIL'}  "
+              f"{ {k: v[k] for k in v if k not in ('detail','anchor_detail','cells')} }")
+    for p in ("P1", "P2", "P3", "P4", "P5"):
+        v = preds[p]
+        print(f"  {p}: {'HOLDS' if v.get('holds') else 'FAILS'}  "
+              f"{ {k: v[k] for k in v if k not in ('detail','null_detail')} }")
+    print(f"  coverage: {coverage['n_cells_licensed']}/{coverage['n_cells']} "
+          f"licensed, p/n {coverage['p_over_n_range']}")
+    print(f"-> {RES/'probe_truth.json'}")
+
+
+if __name__ == "__main__":
+    main()
