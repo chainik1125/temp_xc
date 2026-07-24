@@ -49,6 +49,18 @@ assert to a two-sided divergence test (TV > 0.02; realized ≈ 0.03) with
 direction recorded as a finding. No screen prediction (P1–P5) depends
 on this; the KEEP/KILL rules are untouched.
 
+## 2026-07-24 — runpod-e — replag screen: escalation note (mid-screen, pre-run)
+
+gpt2 + gemma base grids are in; llama running. Invoking the CARD's
+pre-authorized escalation for **lag4 only**: the linear window pair is
+blind (win ≤ tok at every T, both models) while the T∈{8,32} MLPs
+separate (gpt2 T8: win_mlp 0.634 vs shuf_mlp 0.522 ≈ tok_mlp 0.520) ⇒
+extending lag4 win_mlp/shuf_mlp to all T ∈ {2,4,16} on all three
+models for the money plot (`REPLAG_ESCALATE_LAG4=1`, resumable cells;
+no other grid change). Detection targets do NOT meet the escalation
+condition (their MLPs show no positive gap) and stay at the frozen
+T∈{8,32} presence checks.
+
 **2026-07-24 · runpod-b · prep (labels + cards) — no verdict.** All four
 label artifacts landed under `labels/` (builders committed pre-run, 10
 sanity tests in `tests/test_task_hunt_labels.py`): `replag_fineweb_*` ×3

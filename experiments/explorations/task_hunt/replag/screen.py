@@ -21,6 +21,7 @@ Writes results/screen_<model>.json next to this file.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import time
 import zlib
@@ -156,7 +157,12 @@ def screen(key: str):
             run(f"{target}/T{T}/win_shuf_linear", lambda: summarize(
                 fit_probe(Str, ytr_t, Ste, yte_t, n_classes,
                           class_weight=cw), n_classes))
-            if T in MLP_T:
+            # CARD-pre-authorized escalation (noted in LOG before use):
+            # linear pair blind + T∈{8,32} MLPs separate on lag4 ⇒
+            # extend lag4 MLPs to every T for the money plot.
+            escalate = (target == "lag4"
+                        and os.environ.get("REPLAG_ESCALATE_LAG4") == "1")
+            if T in MLP_T or escalate:
                 run(f"{target}/T{T}/win_mlp", lambda: summarize(
                     fit_probe(flat_tr, ytr_t, flat_te, yte_t, n_classes,
                               hidden=512, class_weight=cw), n_classes))
