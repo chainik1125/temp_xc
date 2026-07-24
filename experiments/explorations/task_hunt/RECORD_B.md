@@ -186,6 +186,17 @@ changes. The `nw1024 / OLS` column **reproduces the panel exactly**
 | **TXC-pre T16** | **0.134** | **0.324** | 0.246 | 0.311 |
 | TXC-post T4 | 0.163 | 0.256 | 0.238 | 0.255 |
 | **TXC-post T16** | **0.167** | **0.318** | 0.258 | 0.294 |
+| Stacked T4 (p = 8192) | 0.203 | 0.303 | 0.270 | 0.280 |
+| **Stacked T16** (p = 32768) | **0.108** | **0.347** | 0.243 | 0.322 |
+
+Stacked is read at T·d_sae features by the evaluator (32768 at T = 16,
+16× the other archs), so it is the most probe-suppressed cell in the
+panel — and it takes the largest lift, **+0.239**. That, not a training
+failure, is the most likely explanation of the "Stacked pathology"
+(§ 1b: trained 0.129 below untrained 0.157 at T = 16): the untrained
+control's code is not comparably dense, so the two are not being read
+through comparably-loaded probes. The λ̂ panel's Stacked pathology
+(RECORD § 3b) should be re-examined on the same suspicion.
 
 Every panel cell above has **negative held-out r²** (−0.24, −1.11,
 −0.33, −0.95) — textbook overfitting at n ≈ p on a dense code, since

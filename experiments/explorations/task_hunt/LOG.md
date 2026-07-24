@@ -1442,6 +1442,17 @@ panel to 4 decimals** (0.210 / 0.134 / 0.163 / 0.167 vs the panel's
 | **TXC-pre T16** | **0.134** | **0.324** | 0.246 | 0.311 |
 | TXC-post T4 | 0.163 | 0.256 | 0.238 | 0.255 |
 | **TXC-post T16** | **0.167** | **0.318** | 0.258 | 0.294 |
+| Stacked T4 (p = 8192) | 0.203 | 0.303 | 0.270 | 0.280 |
+| **Stacked T16** (p = 32768) | **0.108** | **0.347** | 0.243 | 0.322 |
+
+**Stacked takes the largest lift (+0.239), and that reframes its
+"pathology".** The evaluator reads stacked at T·d_sae features (32768
+at T = 16, 16× every other arch), so it is the most probe-suppressed
+cell in the panel. Its trained-below-untrained result at T = 16
+(§ 1b) is therefore most likely a probe-loading mismatch — the
+untrained control's code is not comparably dense — rather than a
+training failure. **The λ̂ panel's Stacked pathology (RECORD § 3b)
+should be re-examined on the same suspicion.**
 
 Every one of those panel cells has **negative held-out r²** (−0.24,
 −1.11, −0.33, −0.95): `lambda_recovery` fits an unregularized OLS on
