@@ -3597,3 +3597,123 @@ the record is append-only and public to all agents — that is the
 convention working exactly as intended, and the flag ("flagging, not
 disputing", with a testable hypothesis attached) is the model for how
 to raise one.
+## 2026-07-24 — runpod-b — mirror probe-truth campaign (`briefings/mirror-probe-truth.md`): card FROZEN, Stage 1 + Stage 2 landed; **no decision, no verdict — the receipt is still being built**
+
+Progress entry at the first committable increment, per the briefing's
+"every few hours produces a committable increment". **Nothing here
+adopts, declines or rejects the v2 λ readout** — that decision is
+mac-local's against the 4-branch rule pre-registered in this log before
+this evidence existed. The receipt (`probe_truth.json` + figure +
+scorecard) lands when Stage 3 completes.
+
+**1. The card is frozen before any cell ran** —
+`support_synthetic/CARD_PROBE_TRUTH.md`, committed as its own commit
+ahead of every build and every run (git order is the evidence). It fixes
+the substrate and budget, the four ladder lines, the truth anchor and
+its licence, the pre-registered P1–P5, four validity gates, and the
+mechanical map onto the four branches — including, stated up front, the
+two patterns that would argue AGAINST adopting v2 and the instruction
+to report them first.
+
+**2. The design trap the card had to disclose.** v1's probe budget is
+hardcoded (`lambda_recovery_metrics` forwards no `n_windows`), so every
+committed cell fits on `n = 1024·(32/T)` rows — 2048 at T = 16. The real
+λ̂ panel runs `d_sae = 2048`, so it sits at **p/n = 1.00** there; the
+mirror's committed budget (`CARD.md`: d_sae ∈ {20, 40, 5·T}) sits at
+**p/n ≈ 0.001–0.08**, three orders of magnitude away. A probe-truth
+campaign run at the mirror's canonical budget would have found both
+probes agreeing everywhere — and that reads as branch 2 (DECLINE) while
+actually meaning the mirror never entered the regime under test. The
+card therefore keeps the canonical line as a low-p/n control and extends
+`d_sae`/`k_pos` until the ladder spans the real panel's regime. **p/n,
+not T, is this campaign's x-axis** — a change of frame the briefing did
+not anticipate and the receipt will carry.
+
+**3. Checkpoint reality — the briefing's "cheap eval-only pass may
+answer this by breakfast" does not survive contact with the prune.** The
+mirror has 843 leaderboard rows over 843 distinct `train_key`s; **22
+checkpoints survive on disk**, and `checkpoints/manifest.jsonl` carries
+9878 entries with **zero HF refs**, so there is no restore path for the
+rest. All 22 survivors are `d_sae = 20` at `p/n ≤ 0.04`. Stage 2 is
+therefore a genuine paired sample and a genuine low-p/n control, and it
+**cannot** speak to the regime the question lives in. The campaign is
+**training-bound**, which is why the overnight body was launched first.
+
+**4. Stage 1 — constructed-code calibration, truth known EXACTLY, off
+the leaderboard** (`probe_truth_calib.py`; the `probe_capacity.py`
+precedent — no leaderboard write, no checkpoint, no protocol move). The
+encoder is replaced by an analytic one; everything below it is the
+committed path (v1's window seeds, v1's `n//2` split, the tiling and
+leading-edge target), and the committed probes are *called*, not
+re-implemented. Signal dims are the event stream read off the tile —
+**exactly**, because the dictionary is orthonormal and the emission is
+`b·|N(2.5,.75)|·u_bt`, so `x·u_bt` is identically 0 where `b = 0`; noise
+dims are a sparse readout of the content subspace with `u_bt` projected
+out, and content is drawn independently of `b`, so their population
+coefficients are zero and **the population optimum is OLS on the signal
+columns alone** — evaluated on the same eval rows the probe is scored
+on, so the comparison is exactly paired.
+
+Gate G1 (the calibration must reproduce the bench's own documented
+constants, not merely be internally consistent) **passes on every cell
+run so far**: worst |ρ\* − documented| = **0.0043** against the DPI floor
+0.41 and the window ceilings 0.91 (T = 2) / 0.99 (T ≥ 4), and the truth
+anchor procedure recovers the exact ρ\* to **0.0013**. That second number
+is the licence for using the anchor on trained codes at all.
+
+First seed's `full` arm, T = 16, truth = 0.986 throughout (it must be —
+adding uninformative dims cannot move a population optimum):
+
+| p | p/n at v1's budget | v1 (OLS, nw 1024) | v2 (ridge, nw 8192) |
+|---|---|---|---|
+| 8 | 0.004 | 0.986 | 0.986 |
+| 128 | 0.062 | 0.986 | 0.986 |
+| 512 | 0.250 | 0.982 | 0.985 |
+| 2048 | 1.000 | **0.912** | 0.984 |
+| 4096 | 2.000 | 0.943 | 0.983 |
+
+Read literally and only as far as one seed of one arm licenses: v1
+reports below a truth it is measuring on the same rows once p/n
+approaches 1, v2 does not, and neither reports **above** truth anywhere
+yet. The non-monotonicity at p = 4096 (v1 recovering to 0.943 past the
+interpolation threshold) is the classic double-descent shape and is
+noted, not interpreted, until three seeds exist.
+
+**5. Stage 2 — paired v1/v2 on every surviving checkpoint, COMPLETE.**
+28 cells through the canonical runner: the 22 survivors (new v2 rows;
+training cache-hit, `train_cached` True for all 28) plus 6 cells Stage 3
+had already trained by the time the enumeration ran, which came back as
+**eval cache hits** — 22 new rows, 0 duplicate keys, 0 existing rows
+rewritten. Anchors licensed on **28/28**: v1 replication ≤ 7.6e-9
+(licence bar 1e-6) and OLS-vs-ridge anchor gaps ≤ 0.0011. Across
+p/n = 0.0006–0.125 both probes sit within **0.021** (v1) and **0.017**
+(v2) of the anchor — P3 (the machinery gate) behaving as pre-registered,
+and the honest coverage statement is that this is *all* Stage 2 can
+establish. Those are per-seed spreads, not cell means; the pre-registered
+P3 test is applied to seed-means in the receipt.
+
+**6. Two things the campaign changed about itself, both disclosed
+rather than absorbed.** (a) The card froze gate G3 at a flat
+|chance floor| ≤ 0.05. That constant is mis-scaled: the chance floor is
+a *fitted* probe's held-out correlation on permuted targets, whose null
+spread is ~√(p/n) — 0.125 for the v2 floor at the first cells to land —
+so the literal rule excludes cells for ordinary sampling spread, not for
+the degeneracy the gate was written to catch. The analysis computes both
+readings and **reports the branch label under each exclusion set**, so
+the amendment cannot buy an outcome (on the cells landed: 4 excluded
+literal, 0 scaled, branch identical). (b) The card's p = 8192
+calibration corner was **dropped on cost** — one cell ran > 30 min and
+nine would have cost more than the rest of the campaign; no p > n
+coverage is lost, because the p = 4096 cell's own `n_windows` sweep
+already gives exact-truth coverage at p/n = 0.5, 1.0 and 2.0.
+
+**Still open (the body of the work):** Stage 3's 132-cell ladder is
+running — lines C (capacity, to p/n = 1.00 at the real panel's window
+density), P (matched post at nominal k = 8·T), M (canonical control, and
+gate G2 against the committed dilution numbers), S (Stacked, p > n,
+anchor unlicensed by design → commentary), plus untrained controls at
+every line point. Then the anchors, the mechanical receipt, the figure
+and the scorecard. Coverage in the receipt will be emitted from the rows
+that actually land, never from the planned grid.
+
+_Recorded-by: claude-opus-5-1m (runpod-b, mirror-probe-truth)_
