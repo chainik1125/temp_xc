@@ -38,18 +38,47 @@ set as `core.askPass`; identity configured).
    (plugin datasource + two `configs/data.yaml` entries) committed.
 4. **Leaderboard hygiene checked**: 7121 rows, 0 dup `eval_key`s.
 
-## RUNNING RIGHT NOW (two chained background scripts — do not fan out)
+## Two traps this session hit — read before touching the chain or the leaderboard
+
+1. **Never emit NaN into a leaderboard metric.** The Stage-2 datasource
+   first left `emission_features` empty (a real residual stream has no
+   ground-truth directions), so `eauc`/`e_*` came back NaN. **The
+   leaderboard IS the eval cache**; JSON stores NaN as `null`, and
+   `LeaderboardRow` then rejects the cached read — six such rows made
+   the canonical artifact **unloadable for every subsequent run**,
+   surfacing as a `ValidationError` on an unrelated cell long after the
+   rows were written. Fixed by giving `emission_features` a documented
+   **reference basis** (DC + top PCs, seed 0 — a sanity check, NOT
+   feature recovery). The six rows were removed (backup
+   `/workspace/logs/leaderboard.backup.jsonl`); leaderboard is back to
+   **7116 rows, 0 dup keys, 0 null metrics**.
+2. **Never write a wait loop as `pgrep -f "<pattern>"`.** A monitoring
+   shell whose own command line contains that pattern makes `pgrep`
+   match itself, so the loop never exits — this silently deadlocked the
+   first chain for ~30 min. The current `chain.sh` runs its stages
+   straight through instead.
+
+## RUNNING RIGHT NOW (ONE detached chain — do not fan out)
 **GPU serialization is mandatory** — running two raw-activation screens
 plus the Stage-2 pool concurrently caused CUDA OOM in both (a T=64
 flatten probe needs ≈28 GB for standardization alone). Hence:
 
-- `/workspace/logs/chain.sh` → log `/workspace/logs/chain.log`:
-  shuffle-receipt (finishing) → **proof-op screen** (candidate 2,
-  resumes from its JSON) → **Stage 2** (84 cells, 2 workers,
-  `run_stage2.py`, log `/workspace/logs/stage2_base.log`).
-- `/workspace/logs/chain2.sh` → log `/workspace/logs/chain2.log`:
-  waits for chain 1, then **candidate 3** vLLM generation
-  (`fw_generate.log`) → cache + screen (`fw_screen.log`).
+`setsid bash /workspace/logs/chain.sh` → log
+`/workspace/logs/chain.log`. Four stages, strictly serial (GPU
+serialization is mandatory — see below):
+
+1. **proof-op screen** — candidate 2 confirmatory cells; resumes
+   idempotently from `proofops/results/proofops_screen.json`
+   (was at 36/60 at last check; log `proofops_screen.log`).
+2. **Stage 2** — 84 cells, 2 workers (`run_stage2.py`,
+   log `stage2_base.log`).
+3. **candidate 3 generation** — vLLM (`fw_generate.log`).
+4. **candidate 3 cache + screen** (`fw_screen.log`).
+
+Each stage prints `<name> exit=<code>` to `chain.log` — grep that to
+see where it is. If a stage died, re-run just that command; every
+script is idempotent (screens resume per-cell from their JSON, the
+runner caches per eval_key).
 
 ## Next actions (in order)
 1. When the proof-op screen finishes: score it against
@@ -81,8 +110,9 @@ flatten probe needs ≈28 GB for standardization alone). Hence:
    Confirmatory cells (base L10, distill L10/L12) were still running;
    **extend the LOG entry when they land — do not revise it.** Re-run
    `proofops/render.py` for the updated verdict JSON + figure.
-2. Finish the shuffle-receipt writeup: `render` already emits
-   `figs/shuffle_receipt.*`; the table is in `RECORD.md` § 3.
+2. ~~Shuffle receipt~~ **DONE** — 12/12 cells, verdict POSITIVE in
+   `LOG.md`, full table in `RECORD.md` § 3, figure
+   `task_hunt/figs/shuffle_receipt.*`.
 3. When Stage 2 finishes: build **the T-scaling figure** (recovery vs
    T, one line per arch — the money plot) and write the record. Only
    `buffer_tokens=524288` rows are headline (see RECORD § 4.5).
