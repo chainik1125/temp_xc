@@ -51,6 +51,7 @@ K_POS = (8,)
 WINDOW_TS = (2, 4, 8, 16)
 EVAL_L = 32
 N_STEPS = 8_000
+BUFFER_TOKENS = 524_288           # ≈ the corpus (4044 × 128 = 517,632)
 HERE = Path(__file__).resolve().parent
 
 # The briefing's five-arch panel (no spectral_txc — see the module docstring).
@@ -64,10 +65,17 @@ PANEL = (
 
 
 def _cells(ds: str):
-    return design.uniform_cells(
+    cells = design.uniform_cells(
         ds, F=D_SAE, n_steps=N_STEPS, d_saes=[D_SAE], k_pos_sweep=K_POS,
         archs=PANEL, window_ts=WINDOW_TS, L=EVAL_L, untrained_kpos=K_POS[0],
         log=print)
+    # The Ward stream holds 4044x128 = 517,632 tokens total. The pool's
+    # 2M-token default buffer therefore re-samples the dataset ~4x per
+    # refill at d_in=4096 (32 GB of copying per worker per refill) and
+    # dominates wall-clock. Size the buffer to the corpus instead.
+    for c in cells:
+        c["buffer_tokens"] = BUFFER_TOKENS
+    return cells
 
 
 def _describe(res):
