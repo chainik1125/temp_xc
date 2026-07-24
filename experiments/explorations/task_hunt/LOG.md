@@ -1631,3 +1631,73 @@ in lib + card, pinned 0.65/0.65 direction-agnostic bar convention per
 review qualification 4, streaming seeded corpus artifact).
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_
+## 2026-07-24 — runpod-e — `novelty` (vocabulary-novelty trailing rate, fineweb) — **NEGATIVE: KEEP fails, no KILL rule fires as written** (≈ ¾ of the signal is already per-position)
+
+Screen per the frozen `novelty/CARD.md` (frozen with `screen.py` at
+`3f18b5eb`, before any cell). 3 models × the full grid on existing
+replag fineweb caches — **zero new forward passes**, mapping re-asserted
+at run time. Results `novelty/results/screen_<model>.json`. Pooled
+permutation nulls (6 cells): mean 0.3356, sd 0.0082 ⇒ **3σ = 0.025**
+(chance 1/3); the pooling across models is disclosed per card § 7.
+
+Primary face `nov_bin` (3-class terciles of the position-detrended
+trailing novelty rate), acc_test:
+
+| model | per-token | position floor | T4 | T8 | T16 | T32 | T64 | best gap |
+|---|---|---|---|---|---|---|---|---|
+| gpt2 | 0.474 | 0.326 | 0.492 | 0.512 | **0.520** | 0.516 | 0.509 | +0.045 |
+| gemma2-2b | 0.457 | 0.340 | 0.473 | 0.486 | 0.485 | **0.494** | 0.457 | +0.038 |
+| llama31-8b | 0.427 | 0.334 | 0.425 | 0.444 | **0.465** | 0.461 | 0.435 | +0.039 |
+
+(window column = window-MEAN linear, the regime-2 reader; gap =
+best window − per-token.)
+
+**Verdict: the KEEP conjunction fails on all three models and NO kill
+rule fires — recorded as NEGATIVE/WEAK, not upgraded and not
+reinterpreted.** KEEP needed a gap ≥ +0.05 growing along the
+kernel-mass curve; the gap tops out at **+0.045 / +0.038 / +0.039** and
+**peaks mid-ladder then declines**, while kernel mass rises
+monotonically to 1.00 at T = 64 — at T = 64 the gap collapses to
++0.035 / +0.000 / +0.008. Kill rules 1–5 each miss: the gap does exceed
+3σ_null, it does grow over T ∈ {4…16}, the null face is nowhere near
+parity, and the window clears the position floor by ~0.19. **My card
+lacked a middle clause for "real but under bar"; I am recording that
+gap in the card rather than inventing a verdict for it now.**
+
+**What the numbers actually say — and the diagnostic the card should
+have used.** The card's N1 predicted per-token would sit *near the
+position floor*. It does not: per-token beats the floor by **+0.148 /
++0.117 / +0.093**. Expressed as the fraction of window-readable signal
+already available at a single position,
+`(tok − floor) / (best_window − floor)` = **77 % / 76 % / 71 %**.
+So the trailing novelty rate **is** maintained as per-position state —
+this is conversion, the same mechanism that killed all three round-1
+candidates — leaving a genuine but small order-free residue of 23–29 %.
+**Recommendation to the program: screens should report this
+floor-relative conversion fraction, not an absolute window−token gap.**
+An absolute 0.02 kill threshold (my rule 1) cannot distinguish
+"converted with a small residue" from "genuinely window-only", which is
+exactly the case that arose here.
+
+**Scorecard.** N1 **FALSIFIED** (per-token far above floor —
+conversion). N2 **FALSIFIED** (gap peaks mid-ladder and declines; it
+does not track kernel mass — extra window positions past ~T16 *dilute*
+the mean rather than adding evidence). N3 **CONFIRMED**: `g_order` =
+flatten − mean is ≤ 0 in 10 of 12 cells (to −0.063) and the
+anchor-fixed shuffle costs ≈ 0 (−0.012…+0.014) — order-free pooling,
+regime-2 exactly as claimed. N4 **CONFIRMED and it is the cleanest
+result in the screen**: real vs within-doc-shuffle null at matched T is
+**+0.119 / +0.097 / +0.076**, and the null face shows *no window gap at
+all* (gpt2 null tok 0.403 vs null best window 0.401) — the fake drift
+is per-position-only by construction, so the receipt behaves exactly as
+designed and the real face's residue is genuine topical drift, not
+composition. N5 **CONFIRMED** (same direction on all three models;
+per-token stays well above floor at every scale, with the residue
+mildly larger on llama).
+
+**Cost note:** the whole screen was ~40 minutes of probe fits on
+already-cached activations — the factory's zero-new-caching economics
+are real, and this is the second bundle-level confirmation of that
+(the first being the mapping verification in the claim entry).
+
+Next: `punctint` (both faces, one pass) — card frozen next.
