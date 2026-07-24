@@ -48,4 +48,3 @@ the exchangeable shuffle clumps). Sanity T4 amended from a directional
 assert to a two-sided divergence test (TV > 0.02; realized ≈ 0.03) with
 direction recorded as a finding. No screen prediction (P1–P5) depends
 on this; the KEEP/KILL rules are untouched.
->>>>>>> 3400cb78 (task-hunt/replag: labels built — manifests+stats committed, T4 amended to two-sided null-divergence (direction recorded as finding, pre-screen; LOG entry))
