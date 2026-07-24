@@ -1,0 +1,136 @@
+{
+ "esc3_edges": [
+  1.0,
+  2.0
+ ],
+ "ant4/train": {
+  "rows_per_class": {
+   "0": 847,
+   "1": 847
+  },
+  "joint_matched": true,
+  "ok": true
+ },
+ "ant4/test": {
+  "rows_per_class": {
+   "0": 214,
+   "1": 214
+  },
+  "joint_matched": false,
+  "ok": false
+ },
+ "ant8/train": {
+  "rows_per_class": {
+   "0": 843,
+   "1": 843
+  },
+  "joint_matched": true,
+  "ok": true
+ },
+ "ant8/test": {
+  "rows_per_class": {
+   "0": 209,
+   "1": 209
+  },
+  "joint_matched": false,
+  "ok": false
+ },
+ "ant16/train": {
+  "rows_per_class": {
+   "0": 775,
+   "1": 775
+  },
+  "joint_matched": true,
+  "ok": true
+ },
+ "ant16/test": {
+  "rows_per_class": {
+   "0": 144,
+   "1": 144
+  },
+  "joint_matched": false,
+  "ok": false
+ },
+ "esc3/train": {
+  "rows_per_class": {
+   "0": 4000,
+   "1": 4000,
+   "2": 4000
+  },
+  "joint_matched": true,
+  "ok": true
+ },
+ "esc3/test": {
+  "rows_per_class": {
+   "0": 1500,
+   "1": 1500,
+   "2": 1500
+  },
+  "joint_matched": true,
+  "ok": true
+ },
+ "det/train": {
+  "rows_per_class": {
+   "0": 4000,
+   "1": 4000
+  },
+  "joint_matched": true,
+  "ok": true
+ },
+ "det/test": {
+  "rows_per_class": {
+   "0": 1500,
+   "1": 1500
+  },
+  "joint_matched": true,
+  "ok": true
+ },
+ "summary": {
+  "n_tokens": 1113924,
+  "n_convs": 300,
+  "n_convs_with_onset": 280,
+  "onset_match_fail": [
+   "cd_9_1",
+   "cd_16_2",
+   "cd_25_0",
+   "cd_21_3",
+   "cd_9_7",
+   "cd_3_5",
+   "cd_4_2",
+   "cd_26_1",
+   "cd_6_2",
+   "paper_fraction_2",
+   "cd_18_5",
+   "cd_5_1",
+   "cd_28_2",
+   "cd_3_1",
+   "cd_17_6",
+   "paper_fraction_5",
+   "cd_19_9",
+   "cd_9_6"
+  ],
+  "span_fail": [
+   "cd_8_4/0",
+   "cd_19_4/0",
+   "cd_24_5/0",
+   "cd_29_6/6",
+   "cd_27_5/1",
+   "cd_10_2/0",
+   "cd_22_8/0",
+   "cd_22_8/3",
+   "cd_22_8/6",
+   "cd_8_6/1",
+   "cd_6_7/1",
+   "cd_25_3/4",
+   "cd_22_2/0",
+   "cd_22_2/4",
+   "cd_3_7/2",
+   "cd_3_7/6",
+   "paper_countdown_2/2",
+   "cd_25_4/0",
+   "cd_9_1/2",
+   "cd_4_6/0"
+  ],
+  "ids_mismatch": []
+ }
+}

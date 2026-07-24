@@ -67,6 +67,29 @@ NO_ONSET = 10 ** 6
 PIT_EDGES = [0, 64, 128, 256, 10 ** 9]     # pos-in-turn buckets
 
 
+def find_onset_char(content: str, w: str, pc: str) -> int:
+    """Char offset of the onset word in a turn's text; −1 if absent.
+    Case-insensitive, whitespace-flexible; prefers the occurrence
+    anchored by preceding_context."""
+    import re
+
+    def pat(s):
+        toks = [re.escape(t) for t in s.split()]
+        return re.compile(r"\s+".join(toks), re.IGNORECASE) if toks \
+            else None
+    if pc:
+        p_full = pat(pc + " " + w)
+        if p_full:
+            m = p_full.search(content)
+            if m:
+                m2 = pat(w).search(content, m.start() + max(0, len(pc) - 8))
+                if m2:
+                    return m2.start()
+    p = pat(w)
+    m = p.search(content) if p else None
+    return m.start() if m else -1
+
+
 def build():
     from transformers import AutoTokenizer
     RES.mkdir(exist_ok=True)
@@ -126,8 +149,7 @@ def build():
         conv_start[name] = cursor
 
         char_cursor = 0
-        onset_tok = None
-        oj = onsets.get(name, {})
+        spans = []
         ai = -1
         for m in msgs:
             if m["role"] != "assistant":
@@ -148,22 +170,31 @@ def build():
             if sc is not None:
                 score_of[cursor + tidx] = sc
             pos_in_turn[cursor + tidx] = np.arange(len(tidx))
-            if (onset_tok is None and isinstance(oj, dict)
-                    and oj.get("turn_index") == ai
-                    and oj.get("emotional_word")):
-                w = oj["emotional_word"]
-                pc = oj.get("preceding_context") or ""
-                loc = m["content"].find(pc + w) if pc else -1
-                wloc = (loc + len(pc)) if loc >= 0 else \
-                    m["content"].find(w)
+            spans.append((ai, cs, ce, m["content"]))
+
+        # Onset: claimed turn first, else EARLIEST turn containing the
+        # phrase (the labeler's own "find the FIRST occurrence" rule;
+        # judge turn_index is frequently off by one) — case-insensitive,
+        # whitespace-flexible, offsets preserved.
+        onset_tok = None
+        oj = onsets.get(name, {})
+        if isinstance(oj, dict) and oj.get("emotional_word"):
+            w = oj["emotional_word"]
+            pc = oj.get("preceding_context") or ""
+            claimed = oj.get("turn_index")
+            order_spans = sorted(
+                spans, key=lambda s: (s[0] != claimed, s[0]))
+            for ai_s, cs, ce, content in order_spans:
+                wloc = find_onset_char(content, w, pc)
                 if wloc < 0:
-                    stats["onset_match_fail"].append(name)
-                else:
-                    gchar = cs + wloc
-                    cand = np.flatnonzero((starts <= gchar)
-                                          & (ends > gchar))
-                    if len(cand):
-                        onset_tok = cursor + int(cand[0])
+                    continue
+                gchar = cs + wloc
+                cand = np.flatnonzero((starts <= gchar) & (ends > gchar))
+                if len(cand):
+                    onset_tok = cursor + int(cand[0])
+                    break
+            if onset_tok is None:
+                stats["onset_match_fail"].append(name)
         if onset_tok is not None:
             dist_onset[cursor:cursor + n] = onset_tok - np.arange(
                 cursor, cursor + n)

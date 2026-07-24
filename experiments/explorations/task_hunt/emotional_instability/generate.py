@@ -27,7 +27,10 @@ import numpy as np
 
 MODEL_ID = "google/gemma-3-12b-it"
 OUT = Path("/workspace/emo_caches/rollouts")
-N_ROLLOUTS = 10
+N_ROLLOUTS = 20     # 10 → 20 (2026-07-24): first pass left the
+                    # anticipation TEST split under the pre-registered
+                    # 300/class floor (144-214); doubling the corpus
+                    # meets it without touching any frozen gate — LOG'd.
 N_TURNS = 8
 MAX_NEW = 512
 BATCH = 24
