@@ -31,6 +31,10 @@ HS_CAPTURE = [25, 13, 37]        # screen layer first (resid_post L24)
 SCREEN_HS = 25
 BATCH = 4
 MAX_LEN = 8192
+# gemma-3-12b residual norms (~6e4) saturate fp16 (max 65504) — store
+# activations × 1/64. Direction-preserving; the frozen probe stack
+# z-scores per dim on train stats, so probes are scale-invariant.
+ACT_SCALE = 1.0 / 64
 
 
 def chat_ids(tok, msgs):
@@ -94,8 +98,8 @@ def main():
             ids_flat[cursor:cursor + n] = np.asarray(ids, dtype=np.int32)
             for k in HS_CAPTURE:
                 mms[k][cursor:cursor + n] = (
-                    out.hidden_states[k][i, L - n:].detach()
-                    .to(torch.float16).cpu().numpy())
+                    (out.hidden_states[k][i, L - n:].detach().float()
+                     * ACT_SCALE).to(torch.float16).cpu().numpy())
             cursor += n
         del out
         if (s // BATCH) % 10 == 0:
@@ -105,10 +109,13 @@ def main():
         m.flush()
     ids_flat.flush()
     assert cursor == total
+    sample = mms[SCREEN_HS][total // 2].astype(np.float32)
+    assert np.isfinite(sample).all() and np.linalg.norm(sample) > 0
     (OUT / "index.json").write_text(json.dumps(
         {"model_id": MODEL_ID, "hs_capture": HS_CAPTURE,
          "screen_hs": SCREEN_HS, "d_model": d_model, "n_tokens": total,
-         "max_len": MAX_LEN, "convs": index}, indent=1))
+         "act_scale": ACT_SCALE, "max_len": MAX_LEN, "convs": index},
+        indent=1))
     print(f"[cache_acts] DONE in {time.time() - t0:.0f}s -> {OUT}",
           flush=True)
 
