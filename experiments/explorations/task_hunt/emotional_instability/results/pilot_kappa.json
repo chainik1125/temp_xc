@@ -1,0 +1,975 @@
+{
+ "primary_judge": "claude-sonnet-4-5",
+ "second_judge": "claude-haiku-4-5",
+ "n_pairs": 240,
+ "quadratic_weighted_kappa": 0.8574638016102506,
+ "within_1_rate": 0.8958333333333334,
+ "pilot_conv_rate_max_ge5": 1.0,
+ "spend_usd": 1.423,
+ "gate": {
+  "kappa_floor": 0.3,
+  "pass": true
+ },
+ "scores": {
+  "cd_10_0/0": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 1
+  },
+  "cd_10_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_10_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 5
+  },
+  "cd_10_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 4
+  },
+  "cd_10_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_10_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_10_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_10_0/7": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_11_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "cd_11_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_11_0/2": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_11_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 3
+  },
+  "cd_11_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_11_0/5": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_11_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_11_0/7": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_12_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_12_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_12_0/2": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 2
+  },
+  "cd_12_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_12_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_12_0/5": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_12_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_12_0/7": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_13_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_13_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_13_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_13_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 3
+  },
+  "cd_13_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_13_0/5": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_13_0/6": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_13_0/7": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_14_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_14_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_14_0/2": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 2
+  },
+  "cd_14_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 3
+  },
+  "cd_14_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_14_0/5": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_14_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_14_0/7": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_15_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_15_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_15_0/2": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_15_0/3": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_15_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_15_0/5": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_15_0/6": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_15_0/7": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_16_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_16_0/1": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 2
+  },
+  "cd_16_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 4
+  },
+  "cd_16_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_16_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 5
+  },
+  "cd_16_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_16_0/6": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_16_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_17_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "cd_17_0/1": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_17_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_17_0/3": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_17_0/4": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_17_0/5": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_17_0/6": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_17_0/7": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_18_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "cd_18_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_18_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_18_0/3": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_18_0/4": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_18_0/5": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_18_0/6": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_18_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_19_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_19_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_19_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 4
+  },
+  "cd_19_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_19_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_19_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 3
+  },
+  "cd_19_0/6": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_19_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_20_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_20_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_20_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_20_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 3
+  },
+  "cd_20_0/4": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_20_0/5": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_20_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_20_0/7": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_21_0/0": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_21_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_21_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_21_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_21_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_21_0/5": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_21_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_21_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_22_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "cd_22_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_22_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_22_0/3": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_22_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_22_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_22_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_22_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_23_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 3
+  },
+  "cd_23_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_23_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_23_0/3": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_23_0/4": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_23_0/5": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_23_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_23_0/7": {
+   "claude-sonnet-4-5": 7,
+   "claude-haiku-4-5": 7
+  },
+  "cd_24_0/0": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 1
+  },
+  "cd_24_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_24_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_24_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 3
+  },
+  "cd_24_0/4": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_24_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_24_0/6": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_24_0/7": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 6
+  },
+  "cd_25_0/0": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_25_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_25_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_25_0/3": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_25_0/4": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_25_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_25_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_25_0/7": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_26_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_26_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_26_0/2": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_26_0/3": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_26_0/4": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 4
+  },
+  "cd_26_0/5": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_26_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_26_0/7": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 7
+  },
+  "cd_27_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 2
+  },
+  "cd_27_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_27_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_27_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_27_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_27_0/5": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_27_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_27_0/7": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 5
+  },
+  "cd_28_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_28_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_28_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_28_0/3": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_28_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_28_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_28_0/6": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_28_0/7": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_29_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "cd_29_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_29_0/2": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 2
+  },
+  "cd_29_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_29_0/4": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_29_0/5": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_29_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 4
+  },
+  "cd_29_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_2_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 2
+  },
+  "cd_2_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_2_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_2_0/3": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 2
+  },
+  "cd_2_0/4": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 3
+  },
+  "cd_2_0/5": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_2_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_2_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_3_0/0": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_3_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_3_0/2": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 3
+  },
+  "cd_3_0/3": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_3_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_3_0/5": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_3_0/6": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_3_0/7": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_4_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_4_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_4_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_4_0/3": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_4_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "cd_4_0/5": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_4_0/6": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_4_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 5
+  },
+  "cd_5_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 0
+  },
+  "cd_5_0/1": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_5_0/2": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_5_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_5_0/4": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_5_0/5": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_5_0/6": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_5_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_6_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 3
+  },
+  "cd_6_0/1": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 2
+  },
+  "cd_6_0/2": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 5
+  },
+  "cd_6_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_6_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_6_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_6_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_6_0/7": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_7_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "cd_7_0/1": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_7_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_7_0/3": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_7_0/4": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "cd_7_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_7_0/6": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_7_0/7": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "cd_8_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 1
+  },
+  "cd_8_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_8_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "cd_8_0/3": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 2
+  },
+  "cd_8_0/4": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_8_0/5": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "cd_8_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "cd_8_0/7": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 4
+  },
+  "cd_9_0/0": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 1
+  },
+  "cd_9_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "cd_9_0/2": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  },
+  "cd_9_0/3": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_9_0/4": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 4
+  },
+  "cd_9_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 6
+  },
+  "cd_9_0/6": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 6
+  },
+  "cd_9_0/7": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "paper_countdown_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "paper_countdown_0/1": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 2
+  },
+  "paper_countdown_0/2": {
+   "claude-sonnet-4-5": 3,
+   "claude-haiku-4-5": 3
+  },
+  "paper_countdown_0/3": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "paper_countdown_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "paper_countdown_0/5": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 4
+  },
+  "paper_countdown_0/6": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 2
+  },
+  "paper_countdown_0/7": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "paper_fraction_0/0": {
+   "claude-sonnet-4-5": 0,
+   "claude-haiku-4-5": 0
+  },
+  "paper_fraction_0/1": {
+   "claude-sonnet-4-5": 1,
+   "claude-haiku-4-5": 2
+  },
+  "paper_fraction_0/2": {
+   "claude-sonnet-4-5": 2,
+   "claude-haiku-4-5": 3
+  },
+  "paper_fraction_0/3": {
+   "claude-sonnet-4-5": 5,
+   "claude-haiku-4-5": 5
+  },
+  "paper_fraction_0/4": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 3
+  },
+  "paper_fraction_0/5": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 6
+  },
+  "paper_fraction_0/6": {
+   "claude-sonnet-4-5": 6,
+   "claude-haiku-4-5": 4
+  },
+  "paper_fraction_0/7": {
+   "claude-sonnet-4-5": 4,
+   "claude-haiku-4-5": 5
+  }
+ }
+}
