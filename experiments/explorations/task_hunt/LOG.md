@@ -1561,3 +1561,40 @@ honest kill either way); (7) punctint list-density (qualification 1);
 (8) interleave tss (one ~330k-token caching pass/model); (9) dialevel
 (caching + qualification 2). Both factory briefings are RETIRED with
 this entry; runpod and runpod-b are idle — next assignment on request.
+
+## 2026-07-24 — runpod-e — **screening `novelty`** (claim-line; queue position 4) — card FROZEN, zero-new-caching VERIFIED on this volume
+
+Claiming the fineweb `novelty` bundle per `briefings/task-hunt-r2-e.md`
+§ 3 (fineweb bundles are runpod-e's by default — only this volume has
+the 3-model caches). Card `novelty/CARD.md` frozen from runpod's
+reviewed `CARD_DRAFT.md`; screen `novelty/screen.py` committed in the
+same commit, **before any cell**.
+
+**The draft's zero-new-caching economics are verified here, one step
+past the assertion.** `token_ids` and `doc_off` are byte-identical
+between `labels/novelty_fineweb_<tok>.npz` and the committed
+`labels/replag_fineweb_<tok>.npz` on all three tokenizers — and every
+one of my windowed activation-cache rows reproduces its contiguous
+flat-stream slice EXACTLY (gpt2 5989/5989 at n_prefix 0/content 128;
+gemma2-2b 5985/5985 and llama31-8b 5924/5924 at n_prefix 1/content
+127). So the screen runs on existing caches with no forward passes,
+and the flat↔windowed mapping is re-asserted at run time inside
+`build_rows`.
+
+**Two screen-side decisions recorded because they are mine, not the
+draft's.** (1) The RAW face `nov_rate` is NOT screened: its position
+AUC is 0.87–0.88 direction-agnostic, so a window-vs-per-token gap on
+it would be uninterpretable — the same refusal the review's
+qualification 1 imposes on punctint list-density. (2) The
+flatten/shuffle arms stop at T = 32 while the window-MEAN arm reaches
+T = 64 (full kernel support): a T = 64 flatten on llama-8b is 262,144
+features, past this probe fit's capacity, and the MEAN arm is the
+regime-2 reader the card's own prediction names. Both are stated in
+the card rather than discovered in the results.
+
+Eligibility is uniform (`pos ≥ 64` and in-chunk offset `≥ 63`) so every
+screened T reads IDENTICAL rows; shipped manifests are 4000/1500 per
+class per split on all three models, both faces. A position-only floor
+probe (in-chunk position + doc position, the Heaps confound) ships
+next to every window number, and the within-doc-shuffle null face
+(`nov_null_bin`) is the frozen mechanism receipt.
