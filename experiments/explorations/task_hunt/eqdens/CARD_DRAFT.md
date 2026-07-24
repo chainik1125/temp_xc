@@ -98,3 +98,32 @@ per-token reads `mrate_bin` within noise of the best window at every
 T; or no window − per-token gap beyond 3 σ_null at any T; or no
 T-growth anywhere in the ladder. `in_math` runs as the disclosed
 anchor face only.
+
+## Triage RESULT (builder-derived; appended after the frozen bars ran)
+
+**KILLED at triage — the frozen unigram bar FIRES on the operative
+manifest rows (free kill, no GPU spent).** Direction-agnostic
+current-token type-mean AUC on position-matched manifest rows:
+**gpt2 0.6530 (≥ 0.65 ⇒ KILL)**, gemma2 0.6430, llama31 0.6298 — one
+tokenizer over the bar, the other two at the very top of the
+0.55–0.65 band (all-eligible rows: 0.6517 / 0.6400 / 0.6294). The
+named axis-b risk is confirmed as the mechanism: with every math-span
+token already masked, the PROSE around math still reads the label at
+0.63–0.65 — math-notation register (theorem/denote/variable-name
+vocabulary) is a topic stamp on the surrounding text itself, not just
+on the delimiters — and no recorded guard exists for a unigram leak
+(masking is already maximal; a post-hoc lexical regression would be a
+rescue, which the bars exist to forbid). Position, by contrast, is
+CLEAN: manifest rows 0.5263 / 0.5029 / 0.5176 direction-agnostic (the
+stratified guard worked; all-eligible 0.5698–0.5728 — high-mrate rows
+sit EARLY in docs, raw AUC 0.427–0.430). Scale receipts: 600 docs,
+817k–883k tokens/tokenizer, math-token fraction 0.249–0.265,
+zero_split scheme (train zero-frac 0.47–0.49), manifests ~20k
+rows/class. Corpus + stats artifacts committed
+(`../labels/eqdens_corpus.json.gz`, `../labels/eqdens_stats.json`);
+the per-tokenizer npz are NOT committed — no screen consumes a killed
+bundle; regenerate deterministically with the committed builder from
+the pinned corpus artifact. **Ledger consequence: B6 → KILLED at
+triage; P3 (citation-marker density, parked behind B6) inherits this
+receipt — the technical-register topic leak is now measured, not
+hypothesized.**

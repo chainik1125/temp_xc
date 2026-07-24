@@ -1861,3 +1861,48 @@ KEEPs**. mac-local's dialevel qualification 2 already imposes exactly
 this discipline for that bundle; this generalizes it. Note the cost is
 trivial and the payoff is real: it is the difference between the q
 face's KEEP being publishable and being retracted later.
+
+
+## 2026-07-24 — runpod — candidate factory B6: eqdens KILLED at triage (free kill) — the unigram bar fired on manifest rows
+
+Round-2 build per `briefings/candidate-factory-broad-2.md` § 2, strict
+commit-then-run: builder + frozen grammar + card with the PINNED broad
+bar convention (0.65/0.65 direction-agnostic, manifest rows operative
+— review qualification 4) committed at "candidate factory B6
+(pre-run)" BEFORE any output. Corpus: `open-web-math/open-web-math`
+at pinned revision `fde8ef8d…` (ODC-By 1.0 + CC ToU), first-4,000
+stream prefix filtered (1–20k chars, ≥ 3 frozen-grammar math spans —
+the span floor kills the math-doc-vs-prose-doc identity route at pull
+time), seeded to 600 docs, shipped as `labels/eqdens_corpus.json.gz`.
+Primary `mrate` = trailing math-token rate, token-level kernel 16/64
+(a STATED deviation from the "sentences/lines" sketch — the format
+scan found median line length 16 chars, so a line-unit clock would be
+doc-dependent; the token kernel is the best-spanned clock in the
+factory, T=64 closes it). 7 new tests (grammar incl. escaped-`$`,
+env-star backreference, unclosed-delimiter, bit/rate logic); suite
+282 passed.
+
+**Verdict: KILLED — the frozen current-token type-mean bar fired on
+the OPERATIVE manifest rows: gpt2 0.6530 ≥ 0.65 (gemma2 0.6430,
+llama31 0.6298 — top of the disclosure band; all-eligible
+0.6294–0.6517).** All math-span tokens were masked, so the leak is
+the surrounding prose register itself (theorem/denote/variable-name
+vocabulary) — the exact axis-b risk the ledger named, now measured.
+No recorded guard exists for a unigram leak (masking already maximal;
+a post-hoc lexical regression would be a rescue — the bars forbid
+it). Position CLEAN everywhere: manifest 0.5029–0.5263
+direction-agnostic (the stratified guard worked; all-eligible
+0.5698–0.5728 with high-mrate rows EARLY, raw 0.427–0.430).
+
+Committed receipts: card verdict appendix, `eqdens_stats.json`,
+pinned corpus artifact. The three per-tokenizer npz (~15 MB) are NOT
+committed — no screen consumes a killed bundle; the committed builder
+regenerates them deterministically from the pinned corpus. Ledger:
+B6 index row + entry verdict updated; **P3 (citation-marker density)
+inherits the measured technical-register leak receipt.** Per § 3 the
+stretch unlocks on "shipped or honestly died" — B6 honestly died, so
+B7 (refusal-marker intensity) proceeds next, starting with its hard
+pre-gate (frozen substring list, then event-rate measurement;
+< ~2 % of assistant turns ⇒ free kill in the ledger).
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_

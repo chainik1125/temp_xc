@@ -66,7 +66,7 @@ builder's script-derived stats JSON).
 | B3 | list/enumeration density | fineweb | **BUILD** (ship 3rd) |
 | B4 | question-rate intensity | fineweb | **BUILD** (with B3; triage decides ship/kill) |
 | B5 | dialogue turn-length level / switch clock | new (DailyDialog-class) | **BUILD** (stretch) |
-| B6 | equation-density intensity | new (OpenWebMath) | **BUILD** (stretch) |
+| B6 | equation-density intensity | new (OpenWebMath) | **KILLED at triage** (2026-07-24 r2: manifest unigram bar fired, gpt2 0.653 — free kill) |
 | B7 | refusal/deflection-marker intensity λ̂ | new (WildChat-class chat) | **BUILD-if-time** (behind B6; hard pre-gate: event rate < ~2 % of turns ⇒ free kill) |
 | P1 | news chronology / date density | new (cc_news-class) | PARK |
 | P2 | numeric-token density | fineweb | PARK |
@@ -210,6 +210,15 @@ and within-doc structure is real (prose-proof-equation alternation).
 HF dataset reachable (open-web-math, status 200); needs the caching
 pass + tokenized artifact per the new-corpus rule. **BUILD if time
 permits.**
+*Round-2 verdict (2026-07-24): **KILLED at triage — free kill.** The
+frozen unigram bar fired on the operative position-matched manifest
+rows (gpt2 0.6530 ≥ 0.65; gemma2 0.6430 and llama31 0.6298 at the
+top of the disclosure band) with ALL math-span tokens masked: the
+math-notation topic leak lives in the surrounding prose register
+itself, not the delimiters. Position clean (manifest 0.50–0.53).
+Receipt: `eqdens/CARD_DRAFT.md` verdict appendix +
+`labels/eqdens_stats.json` + pinned `labels/eqdens_corpus.json.gz`
+(builder regenerates the npz deterministically).*
 
 **B7 — Refusal/deflection-marker intensity on multi-turn chat
 (round-2 append; BUILD-if-time, strictly BEHIND B6).** The
@@ -265,7 +274,10 @@ reason that spares it.
 (results-section vs related-work density) is a real regime-2 shape,
 but it needs yet another corpus pull and OpenWebMath (B6) already
 covers the "technical-document intensity" slot with denser events.
-PARK behind B6.
+PARK behind B6. *Round-2 addendum: B6's triage kill MEASURED the
+technical-register topic leak (prose near math reads the label at
+0.63–0.65 with all math tokens masked) — P3 inherits that receipt;
+any lift must argue why citation-heavy prose leaks less.*
 
 **P4 — Quotation-sentence rate on fineweb.** In-quote STATE is
 bracket-family (recorded dead-adjacent); the kernel-smoothed rate of

@@ -1,0 +1,116 @@
+{
+ "corpus": {
+  "dataset": "open-web-math/open-web-math",
+  "revision": "fde8ef8de2300f5e778f56261843dab89f230815",
+  "license": "ODC-By 1.0 (+ CommonCrawl ToU)",
+  "split": "train",
+  "stream_prefix": 4000,
+  "filter": {
+   "min_chars": 1000,
+   "max_chars": 20000,
+   "min_spans": 3
+  },
+  "seed": 0,
+  "n_docs": 600,
+  "span_form_counts": {
+   "inline_$": 11171,
+   "display_$$": 3383,
+   "environment": 109
+  }
+ },
+ "kernel": {
+  "half_life": 16,
+  "support": 64,
+  "mass_within_T": {
+   "4": 0.1697104903960378,
+   "8": 0.31241943340101597,
+   "16": 0.5333333333333333,
+   "32": 0.7999999999999999,
+   "64": 1.0
+  }
+ },
+ "min_manifest_pos": 64,
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_docs": 600,
+   "n_tokens": 882648,
+   "tokens_per_doc_median": 1031.5,
+   "math_token_frac": 0.26466722861208547,
+   "labeled_frac": 0.9564945482230742,
+   "eligible_frac": 0.6975000226590895,
+   "train_zero_frac": 0.4771744059396557,
+   "scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.49530917406082153
+   ],
+   "mrate_mean": 0.27105486392974854,
+   "mrate_std": 0.34908509254455566,
+   "manifest_rows_per_class": 19997,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.6517489401213588,
+    "position_auc": 0.4302006749883795
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.6529872044630729,
+    "position_auc": 0.47370240591568497
+   },
+   "artifact": "eqdens_openwebmath_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_docs": 600,
+   "n_tokens": 848307,
+   "tokens_per_doc_median": 979.5,
+   "math_token_frac": 0.24934840806453323,
+   "labeled_frac": 0.9547333689336526,
+   "eligible_frac": 0.7115513605333919,
+   "train_zero_frac": 0.4931582915983305,
+   "scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.4682157039642334
+   ],
+   "mrate_mean": 0.2551497519016266,
+   "mrate_std": 0.3413490653038025,
+   "manifest_rows_per_class": 19996,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.6399683016824289,
+    "position_auc": 0.42722336914883047
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.6430096160047957,
+    "position_auc": 0.4971089383885177
+   },
+   "artifact": "eqdens_openwebmath_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_docs": 600,
+   "n_tokens": 817249,
+   "tokens_per_doc_median": 957.5,
+   "math_token_frac": 0.2609045713118034,
+   "labeled_frac": 0.9530130963757679,
+   "eligible_frac": 0.6986132745344442,
+   "train_zero_frac": 0.47318234676981025,
+   "scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.47575321793556213
+   ],
+   "mrate_mean": 0.26738348603248596,
+   "mrate_std": 0.3464384973049164,
+   "manifest_rows_per_class": 19997,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.6293704861970478,
+    "position_auc": 0.42935887673750445
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.6297793257132253,
+    "position_auc": 0.4824194951228261
+   },
+   "artifact": "eqdens_openwebmath_llama31.npz"
+  }
+ }
+}
