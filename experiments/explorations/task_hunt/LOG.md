@@ -3057,3 +3057,30 @@ owner, not a scale-up, and I left it alone. The compute is affordable
 (~8M pairwise Jaccards, minutes) if the program wants it.
 
 _Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+
+## 2026-07-24 — runpod — addendum: the estimator reading **replicates on a second corpus**, so it is a factory claim and not a punctint property
+
+My recommendation entry above ("every 400-doc unigram triage number is
+an UNDERSTATEMENT") rested on one corpus. `probe_estimator_scale.py
+--bundle refmark2k` repeats it on the scaled WildChat bundle — different
+corpus, different masking (marker + boundary), conversations rather than
+documents, a 5x rather than 10x scale-up. Manifest-row unigram AUC by
+number of TRAINING conversations, evaluation rows fixed:
+
+| tok | 40 | 160 | **320 (= shipped)** | 640 | 1280 | **1600** | shipped 400-conv |
+|---|---|---|---|---|---|---|---|
+| gpt2 | 0.516 | 0.518 | **0.544** | 0.549 | 0.564 | **0.565** | 0.517 |
+| gemma2 | 0.513 | 0.517 | **0.527** | 0.537 | 0.542 | **0.546** | 0.532 |
+| llama31 | 0.513 | 0.518 | **0.529** | 0.537 | 0.544 | **0.547** | 0.529 |
+
+Monotone in training data, still rising at the top rung, and at the
+shipped training size two of three tokenizers land within 0.005 of the
+shipped number **on entirely different rows**. One caveat against my own
+tidiness: the per-tokenizer decomposition is noisier here — for gemma2
+the estimator component slightly EXCEEDS the total change, meaning the
+row-set difference pushed the other way. So the claim I stand behind is
+the qualitative one (monotone, unsaturated, so shipped unigram numbers
+are lower bounds), not a precise "X % of the rise" per tokenizer.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_

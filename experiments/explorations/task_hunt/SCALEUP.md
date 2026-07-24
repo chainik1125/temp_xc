@@ -162,6 +162,25 @@ separately isolated. **The curve has not saturated at 3,200 documents**,
 so even the scaled number is a lower bound on the true current-token
 route.
 
+**Replicated on a second corpus** (`--bundle refmark2k`: WildChat
+conversations, different masking, 5× not 10×), which is what makes this
+a factory-level reading rather than a punctint property — manifest-row
+unigram AUC by training conversations:
+
+| tok | 40 | 160 | **320 (= shipped)** | 640 | 1280 | **1600** | shipped 400-conv |
+|---|---|---|---|---|---|---|---|
+| gpt2 | 0.516 | 0.518 | **0.544** | 0.549 | 0.564 | **0.565** | 0.517 |
+| gemma2 | 0.513 | 0.517 | **0.527** | 0.537 | 0.542 | **0.546** | 0.532 |
+| llama31 | 0.513 | 0.518 | **0.529** | 0.537 | 0.544 | **0.547** | 0.529 |
+
+Monotone again, still rising at the top rung, and at the shipped
+training size two of three tokenizers reproduce the shipped number to
+within 0.005 on entirely different rows. The per-tokenizer
+decomposition is noisier here than on punctint (for gemma2 the
+estimator component slightly exceeds the total change, i.e. the row-set
+difference pushed the other way) — the robust claim is the monotone
+curve and its non-saturation, not a precise share.
+
 **Unverified consequence, stated as a hypothesis because it was not
 measured:** a screen's per-token probe is also an estimator fitted on
 finite training rows. If it attenuates faster than the window probe (a
