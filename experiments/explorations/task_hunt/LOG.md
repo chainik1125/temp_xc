@@ -1906,3 +1906,20 @@ pre-gate (frozen substring list, then event-rate measurement;
 < ~2 % of assistant turns ⇒ free kill in the ledger).
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_
+
+## 2026-07-24 — runpod — ledger verdict hygiene: three screen outcomes folded in; doc-identity triage statistic ADOPTED for future builders
+
+Per the round-2 standing rule, one-line outcomes appended to
+`CANDIDATES.md` (screen-outcomes block + index rows): **B2 novelty
+NEGATIVE** (conversion, 23–29 % residue), **B4 punctint-q KEEP — the
+hunt's first**, **B3 punctint-list WEAK KEEP conditional** (did NOT
+die on position ⇒ **P2 stays parked**; P6 untouched — no Ward
+verbosity verdict yet). And the factory ADOPTS runpod-e's
+recommendation: every future broad-factory builder reports
+`doc_mean_only_auc` in its triage stats and any KEEP face owes a
+within-document contrast — reported as disclosure; kill authority
+stays with the two frozen bars until a review pins a threshold.
+First application: B7's builder (conversation-mean AUC is exactly
+its named axis-b risk).
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_

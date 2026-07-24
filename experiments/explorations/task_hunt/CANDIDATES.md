@@ -62,9 +62,9 @@ builder's script-derived stats JSON).
 | # | idea | corpus | verdict |
 |---|---|---|---|
 | B1 | interleave `tss` (finish — labels exist) | fineweb-interleave | **BUILD** (ship 1st) |
-| B2 | vocabulary-novelty trailing rate | fineweb | **BUILD** (ship 2nd) |
-| B3 | list/enumeration density | fineweb | **BUILD** (ship 3rd) |
-| B4 | question-rate intensity | fineweb | **BUILD** (with B3; triage decides ship/kill) |
+| B2 | vocabulary-novelty trailing rate | fineweb | BUILT → screen **NEGATIVE** (2026-07-24) |
+| B3 | list/enumeration density | fineweb | BUILT → screen **WEAK KEEP** (conditional, disclosed) |
+| B4 | question-rate intensity | fineweb | BUILT → screen **KEEP** (the hunt's first) |
 | B5 | dialogue turn-length level / switch clock | new (DailyDialog-class) | **BUILD** (stretch) |
 | B6 | equation-density intensity | new (OpenWebMath) | **KILLED at triage** (2026-07-24 r2: manifest unigram bar fired, gpt2 0.653 — free kill) |
 | B7 | refusal/deflection-marker intensity λ̂ | new (WildChat-class chat) | **BUILD-if-time** (behind B6; hard pre-gate: event rate < ~2 % of turns ⇒ free kill) |
@@ -91,6 +91,33 @@ runpod-e (claim-line; zero-new-caching verified; no verdict yet) — no
 outcomes posted. Standing re-vet triggers: **P2 lifts** if
 punctint-list dies specifically on position; **P6 lifts** if Ward
 verbosity dies on a Ward-specific artifact.
+
+- 2026-07-24 · **novelty `nov_resid` (B2): NEGATIVE** — KEEP fails on
+  all three models (best gap +0.038…+0.045, peaks mid-ladder, no kill
+  rule fires); 71–77 % of the window-readable signal is already
+  per-position — conversion with a genuine 23–29 % order-free
+  residue; the shuffle-null receipt behaved exactly as designed.
+- 2026-07-24 · **punctint q (B4): KEEP — the hunt's first Stage-1
+  KEEP** — every clause on all three models, gap rising to
+  +0.114…+0.143 at T64 tracking kernel mass, and it survives the
+  within-document identity control (+0.101…+0.183); the ambient
+  anchor LOSES from windows (candidate-2's trap checked and absent).
+- 2026-07-24 · **punctint list (B3): WEAK KEEP, conditional** —
+  2/3 models; the anchor SHARES the window gain; doc-mean-only AUC
+  0.960; within-doc control rests on 8 test documents. It did NOT
+  die on position ⇒ **P2 stays parked**. Never quoted bare, per
+  binding qualification 1.
+- 2026-07-24 · **Factory adopts runpod-e's doc-identity
+  recommendation** (their LOG entry of this date): every future
+  broad-factory builder computes and reports `doc_mean_only_auc`
+  (doc-mean of the label, top vs bottom class) in its triage stats —
+  the punctint screen showed the two frozen bars cannot see the
+  document-identity route (doc-mean AUC 0.926/0.960 on faces that
+  passed both) — and any face that KEEPs owes a within-document
+  contrast. Reported as a disclosure statistic; the KILL authority
+  stays with the two frozen bars until a review pins a threshold.
+  First applied to B7's builder (conversation-mean AUC — exactly its
+  named axis-b risk).
 
 ---
 
