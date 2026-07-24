@@ -2243,3 +2243,96 @@ Interim rebuttal guidance unchanged: quote v1 numbers with the
 T-shape caveat; do not type new absolute panel numbers until the rule
 resolves. Next: seed top-up (d), screen wave (e), then the mirror
 receipt (b) → this rule fires.
+## 2026-07-24 — runpod-e — `interleave` / `tss` (anti-conversion candidate) — **KILL (converted)**, and the kill is the most informative result of the batch
+
+Screen per the frozen `interleave/CARD.md` (frozen with `screen.py` at
+`79e2c2aa`, before any cell; caches built first at `8474985e`). 3
+models × the full grid on the real corpus **and** on the shuffled-block
+null corpus. Results `interleave/results/screen_<model>.json`.
+
+`tss` (3-class terciles of tokens-since-last-source-switch), acc_test,
+window = MEAN:
+
+| model | per-token | pos floor | T4 | T8 | T16 | T32 | T64 | best gap | **conv%** |
+|---|---|---|---|---|---|---|---|---|---|
+| gpt2 | 0.486 | 0.377 | +0.012 | +0.022 | **+0.038** | +0.015 | −0.037 | +0.038 | **74 %** |
+| gemma2-2b | 0.587 | 0.388 | −0.009 | −0.015 | −0.007 | −0.086 | −0.130 | **none** | **104 %** |
+| llama31-8b | 0.544 | 0.372 | +0.027 | +0.026 | **+0.063** | +0.000 | −0.075 | +0.063 | **73 %** |
+
+**Kill rule 1 (per-token-first triage) fires on 2 of 3 models**:
+per-token sits **+0.109 / +0.199 / +0.172 above its position floor**
+while the window adds < 0.05 (gpt2, gemma2-2b). On gemma2-2b **no
+window at any T beats a single token at all** (conversion fraction
+104 %). llama is the lone exception with +0.063 at T = 16, and even
+there 73 % of the window-readable signal is already per-position. KEEP
+needed ≥ 2 models at ≥ +0.05 with growth; it gets 1. **KILL —
+converted.**
+
+**Why this matters more than the other kills.** This corpus was
+engineered specifically to defeat the conversion mechanism: two
+lexically-matched documents interleaved in jittered 1–4-sentence blocks
+so that "tokens since the last switch" has almost **no generative
+payoff** (measured switch hazard 0.000 → 0.013, non-memoryless), while
+remaining a real sequential state. The label is the cleanest in the
+batch on every leak axis I can measure — unigram AUC 0.551,
+doc-mean-only AUC 0.664–0.670, position floor 0.372–0.388, and the
+ladder fully spans the clock (block tokens q10 13 / median 47 / q90
+105), so this is **not** a reach-limited negative. **The model
+converted it anyway.**
+
+**And the state is real — the null corpus proves it.** On the
+shuffled-block null corpus (same tokens, document coherence destroyed
+in the model's *input*, labels recomputed), recovery collapses:
+real − null at T = 16 is **+0.086 / +0.095 / +0.116**, and *at the
+per-token probe* **+0.092 / +0.143 / +0.098**. So `tss` is genuinely
+maintained state that depends on coherent document flow — it is not
+local bookkeeping, and it is not a position artifact. **It is simply
+maintained per position rather than across a window.**
+
+**The finding, stated as the card set it up:** conversion is **broader
+than "the model linearizes whatever predicts the next token."** Removing
+the generative payoff for a variable does not stop the model from
+carrying it per-position. A plausible mechanism, offered as a
+hypothesis and not a result: `tss` has an *incidental* per-position
+correlate — after a source switch the context is briefly incoherent and
+coherence recovers as the block continues — so a single position can
+read switch-distance off the model's own context-coherence state
+without ever needing to predict switches. That hypothesis is testable
+(surprisal-vs-`tss` on the same rows; a depth sweep as the WHY
+diagnostic) and I have not tested it, so it stays labelled a
+hypothesis.
+
+**Scorecard.** S1 **FALSIFIED** (the anti-conversion bet — per-token is
+far above floor on all three models). S2 **FALSIFIED** (the gap peaks
+at T = 16 and *declines*; at T = 64 every model is negative, the mean
+diluting past the median block length of 47). S3 **UNEVALUABLE — see
+the specification defect below.** S4 **CONFIRMED and load-bearing**
+(null degradation +0.086…+0.116 at T16). S5 **mixed**: MEAN > flatten
+at small T (order-free) but at T = 32 flatten *exceeds* mean on gpt2
+(0.517 vs 0.501) and the T = 32 window MLP is the best cell in that
+model (0.549) — a faint order/positional component at the block scale,
+recorded but not claimed (it does not lift the window over per-token).
+
+### Specification defect found in the `source` anchor — reported, not silently dropped
+
+The `source` anchor reads at **chance** on activations (gpt2 acc 0.492,
+AUC 0.481). **This is not a fact about the model.** `source` is defined
+"0/1 **within the pair**" (`interleave_lib` docstring), so which
+document is "0" is arbitrary from pair to pair — per-pair mean(source)
+ranges 0.14–0.71 across the 200 pairs, and doc "0" of pair *i* has no
+relationship to doc "0" of pair *j*. **A global probe cannot learn an
+arbitrary per-pair role label by construction.** The builder's own
+label-side number (`source_auc_matched` 0.661) is a *within-pair*
+quantity computed from that pair's two unigram distributions, so it and
+a global activation probe were never measuring the same thing — yet the
+bundle ships `man_src_*` manifests that invite exactly the global probe
+I ran.
+
+Consequently **S3 and kill rule 3 are unevaluable as written**, and the
+KILL above rests entirely on the other clauses (which is sound — rule 1
+fires on the primary face). **Recommendation to the factory:** either
+drop the `source` anchor or respecify it within-pair (per-pair probes,
+or a pair-relative predicate); and more generally, any anchor whose
+label is a *role* rather than a *property* needs its probe scoped to
+where the role is defined. This is the second specification-level
+finding from this batch, after the missing document-identity triage bar.
