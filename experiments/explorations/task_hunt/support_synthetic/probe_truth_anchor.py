@@ -30,7 +30,7 @@ it the replication check.
 
 Run:  .venv/bin/python -m \
         experiments.explorations.task_hunt.support_synthetic.probe_truth_anchor \
-        [grid_stage] [workers]
+        [grid_stage] [workers] [shard_suffix]
 """
 
 from __future__ import annotations
@@ -206,12 +206,13 @@ def anchor_cell(cell: dict) -> dict:
 def main():
     stage = sys.argv[1] if len(sys.argv) > 1 else "train"
     workers = int(sys.argv[2]) if len(sys.argv) > 2 else 6
-    src = RES / f"probe_truth_grid_{stage}.json"
+    suffix = sys.argv[3] if len(sys.argv) > 3 else ""
+    src = RES / f"probe_truth_grid_{stage}{suffix}.json"
     cells = [c for c in json.loads(src.read_text()) if c.get("ok")]
     # Cheapest (smallest p) first so a truncated run still covers the ladder.
     cells.sort(key=lambda c: (c["d_sae"] * (c["T"] if c["arch"].startswith("stacked")
                                             else 1), c["T"]))
-    out_path = RES / f"probe_truth_anchor_{stage}.json"
+    out_path = RES / f"probe_truth_anchor_{stage}{suffix}.json"
     print(f"[anchor/{stage}] {len(cells)} cells, workers={workers}", flush=True)
     t0, res = time.time(), []
     with ProcessPoolExecutor(max_workers=workers) as ex:

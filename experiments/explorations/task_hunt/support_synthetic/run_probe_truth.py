@@ -60,6 +60,17 @@ LINES = (
     ("P", "txc_batchtopk_post", "8T", [2048], [16, 8, 4, 2]),
     ("M", "txc_batchtopk_pre", 1, [20], [16, 8, 4, 2]),
     ("S", "stacked_batchtopk", 8, [512], [16, 4]),
+    # Line D — ADDED after the card was frozen, disclosed in the LOG. Every
+    # window arch on this mirror recovers λ at ~0.95 (the bench is clean by
+    # design), while the real λ̂ panel's cells report 0.13–0.26. Stage 1 says
+    # the probe's downward bias is governed by the UNEXPLAINED variance, not
+    # only by p/n — so the frozen ladder, matched to the panel in p/n and
+    # density, is unmatched in the variable that turns out to dominate. The
+    # per-token archs are the mirror's only trained codes that sit at a low
+    # true recovery (the provable DPI floor ≈ 0.41), so this line supplies
+    # trained cells in that regime. An addition can only add evidence: it
+    # changes no frozen cell and no pre-registered rule.
+    ("D", "batchtopk_sae", 8, [512, 2048], [1]),
 )
 
 
@@ -73,10 +84,12 @@ def _cell(arch, T, d, k, seed, n_steps, kind):
             "eval_window_L": L, "eval_extra": dict(V2)}
 
 
-def train_cells() -> list[dict]:
+def train_cells(only_lines: set | None = None) -> list[dict]:
     """The card § 2.3 ladder, in priority order (trained first, untrained last)."""
     trained, untrained = [], []
     for line, arch, kspec, d_saes, ts in LINES:
+        if only_lines and line not in only_lines:
+            continue
         for T in ts:
             k = _k(kspec, T)
             for d in d_saes:
@@ -123,9 +136,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", choices=["train", "existing"], required=True)
     ap.add_argument("--workers", type=int, default=10)
+    ap.add_argument("--lines", default="",
+                    help="comma-separated line ids (e.g. D) to run alone; "
+                         "empty = the whole ladder")
+    ap.add_argument("--out-suffix", default="",
+                    help="suffix for the results shard (the analysis globs "
+                         "probe_truth_grid_train*.json)")
     a = ap.parse_args()
-    cells = train_cells() if a.stage == "train" else existing_cells()
-    out = HERE / "results" / f"probe_truth_grid_{a.stage}.json"
+    only = {x.strip() for x in a.lines.split(",") if x.strip()}
+    cells = train_cells(only) if a.stage == "train" else existing_cells()
+    out = HERE / "results" / f"probe_truth_grid_{a.stage}{a.out_suffix}.json"
     grid.run_pool(cells, out, max_workers=a.workers, describe=_describe,
                   tag=f"probe-truth/{a.stage}")
 

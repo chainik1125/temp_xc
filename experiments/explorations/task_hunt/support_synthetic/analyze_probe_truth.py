@@ -84,13 +84,17 @@ def build_cells(stages=("train", "existing"), exclude: set | None = None) -> lis
     """
     exclude = exclude or set()
     grid, anchors = {}, {}
+    # Glob the shards: a stage may be split across processes (e.g. the added
+    # line D runs as its own shard with --out-suffix).
     for st in stages:
-        for r in _load(f"probe_truth_grid_{st}.json"):
-            if r.get("ok"):
-                grid[(*_cell_key(r), r["seed"])] = r
-        for r in _load(f"probe_truth_anchor_{st}.json"):
-            if r.get("ok"):
-                anchors[(*_cell_key(r), r["seed"])] = r
+        for p in sorted(RES.glob(f"probe_truth_grid_{st}*.json")):
+            for r in json.loads(p.read_text()):
+                if r.get("ok"):
+                    grid[(*_cell_key(r), r["seed"])] = r
+        for p in sorted(RES.glob(f"probe_truth_anchor_{st}*.json")):
+            for r in json.loads(p.read_text()):
+                if r.get("ok"):
+                    anchors[(*_cell_key(r), r["seed"])] = r
 
     by_cell = defaultdict(list)
     for key, g in grid.items():
