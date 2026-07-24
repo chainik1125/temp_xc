@@ -1,0 +1,94 @@
+{
+ "corpus": {
+  "mirror": "OpenRL/daily_dialog",
+  "revision": "1668faf0c0dc44664f108c489fd0666128db2c48",
+  "canonical": "li2017dailydialog/daily_dialog",
+  "license": "CC BY-NC-SA 4.0 (original DailyDialog)",
+  "split": "train",
+  "min_turns": 8,
+  "seed": 0,
+  "n_dialogues": 5000
+ },
+ "support_turns": 5,
+ "min_manifest_pos": 16,
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_dialogues": 5000,
+   "n_tokens": 869710,
+   "tokens_per_dialogue_median": 151.0,
+   "tokens_per_turn_mean": 15.535251772859619,
+   "labeled_frac": 0.5670729323567626,
+   "scheme": "terciles",
+   "edges": [
+    13.600000381469727,
+    19.600000381469727
+   ],
+   "tlevel_mean": 17.775943756103516,
+   "tlevel_std": 7.6708455085754395,
+   "boundary_token_frac": 0.05862068965517241,
+   "manifest_rows_per_class": 19998,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.5984955489296113,
+    "position_auc": 0.9320182135502538
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.5685149484053849,
+    "position_auc": 0.6053183669006446
+   },
+   "artifact": "dialevel_dailydialog_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_dialogues": 5000,
+   "n_tokens": 880013,
+   "tokens_per_dialogue_median": 153.0,
+   "tokens_per_turn_mean": 15.719289784398836,
+   "labeled_frac": 0.5687859156626095,
+   "scheme": "terciles",
+   "edges": [
+    13.800000190734863,
+    19.799999237060547
+   ],
+   "tlevel_mean": 17.878742218017578,
+   "tlevel_std": 7.540966033935547,
+   "boundary_token_frac": 0.05793437142405851,
+   "manifest_rows_per_class": 19999,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.5934961591492006,
+    "position_auc": 0.9299806369193732
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.567990613361999,
+    "position_auc": 0.5924930231508307
+   },
+   "artifact": "dialevel_dailydialog_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_dialogues": 5000,
+   "n_tokens": 810054,
+   "tokens_per_dialogue_median": 141.0,
+   "tokens_per_turn_mean": 14.469642570065913,
+   "labeled_frac": 0.5708236734834962,
+   "scheme": "terciles",
+   "edges": [
+    12.600000381469727,
+    18.399999618530273
+   ],
+   "tlevel_mean": 16.65937042236328,
+   "tlevel_std": 7.51927375793457,
+   "boundary_token_frac": 0.0629377794566782,
+   "manifest_rows_per_class": 19999,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.5937188600026441,
+    "position_auc": 0.936375638411751
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.5661997158081279,
+    "position_auc": 0.6311421133159654
+   },
+   "artifact": "dialevel_dailydialog_llama31.npz"
+  }
+ }
+}

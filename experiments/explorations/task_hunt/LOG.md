@@ -1133,3 +1133,35 @@ stretch per the ledger.
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
 2026-07-24._
+
+## 2026-07-24 — runpod — candidate factory B5 (stretch): dialogue turn-length LEVEL SHIPPED with a binding screen precondition
+
+New corpus per the ledger's B5: DailyDialog via pinned parquet mirror
+`OpenRL/daily_dialog` (revision-pinned; the canonical repo's loading
+script is dead under datasets 4.x; license CC BY-NC-SA 4.0 noted),
+≥ 8-turn dialogues, seeded 5,000-dialogue sample **shipped as
+`labels/dialevel_corpus.json.gz`** — consumers never re-pull. Builder
+chain per discipline (lib + 4 tests + builder + card with frozen bars
+committed pre-run); artifacts `labels/dialevel_dailydialog_{gpt2,
+gemma2,llama31}.npz` + `dialevel_stats.json`. Economics: NEW token
+stream ⇒ one ~0.85M-token caching pass per model (minutes on H100).
+
+Primary `tlevel` = trailing mean turn length over previous 5 turns
+(current turn excluded; hedging-LEVEL lesson), newline boundary
+tokens masked, manifests position-matched from the start. **Triage:
+no frozen bar fires — manifest rows unigram 0.566–0.569, position
+0.592–0.631, both in the 0.55–0.65 disclosure band — but the
+all-row position AUC is 0.930–0.936 via a DOC-LENGTH selection route
+(long dialogues have long turns at fixed turn-count floor), so the
+card binds a screen precondition: within-dialogue class contrasts or
+dialogue-length matching + position/doc-length floor probes, else
+any window gap is uninterpretable.** An honest borderline ship under
+quantity mode: the bars held, the confound is named, the fix is
+prescribed.
+
+Factory tally: B1–B5 shipped (5 candidates, 4 builders, 0 kills —
+runpod-b's batch has the kills). B6 (OpenWebMath) stays the one open
+stretch item; ledger records the design.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
+2026-07-24._

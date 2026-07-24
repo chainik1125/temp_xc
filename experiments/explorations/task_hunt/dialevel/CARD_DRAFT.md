@@ -49,6 +49,30 @@ manifest rows (manifest = operative): current-token type-mean AUC
 — "yes", "ok", question forms); position AUC **≥ 0.65 ⇒ KILL**;
 0.55–0.65 ships with disclosure.
 
+## Triage RESULT (builder-derived; appended after the frozen bars ran)
+
+**SHIPS — no frozen bar fires — but with the loudest caveat of this
+batch, stated first:** the ALL-eligible-row position AUC is
+**0.930–0.936** (direction-agnostic). Mechanism (a doc-length
+selection route, not a within-dialogue trend): rows at large
+positions exist only in long dialogues, and with the turn-count
+floor fixed at 8, dialogues are long substantially BECAUSE their
+turns are long — so high position ⇒ high trailing turn length across
+rows. The position-matched manifests pull the operative numbers to
+**0.605 / 0.592 / 0.631** (gpt2/gemma2/llama31) and unigram
+type-mean to **0.569 / 0.568 / 0.566** — both inside the frozen
+0.55–0.65 disclosure band, no kill. **Binding consequence for the
+freezing agent:** the screen must neutralize the doc-length route
+explicitly — restrict class contrasts WITHIN dialogue (each dialogue
+contributes rows to multiple classes) or match on dialogue length,
+and run the position-only and doc-length-only floor probes alongside
+the primary. Absent that control, any window-vs-per-token gap here
+is uninterpretable. Corpus scale: 5,000 dialogues, ~810–880k
+tokens/tokenizer, labeled fraction 0.57 (5-turn warm-up), tlevel
+mean ≈ 17 ± 7.5 tokens, boundary tokens ~6 % (masked); terciles
+(zero_split did not fire — turn lengths are positive); manifests
+~20k rows/class.
+
 ## Predicted T-pattern + draft kill rule
 
 Per-token poor on the masked level; window − per-token gap positive
