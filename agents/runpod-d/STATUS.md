@@ -9,18 +9,17 @@ GPU RunPod pod (H100-class), Linux at `/workspace/temp_xc`, identity
 (`briefings/task-hunt.md`) — trace-derived candidates (backtracking-λ̂
 intensity, proof-op runs) + the backtracking shuffle receipt.
 
-## Volume rules (shared 700 GB volume, mounted at /shared)
-Conventions in agents/README.md: read anything (Ward caches at
-/shared/conv_depth_caches/); write ONLY under
-/shared/task_hunt_caches/d/; NEVER touch /shared/temp_xc or
-/shared/.agent_id (runpod-c's live tree/identity). Repo + venv +
-.agent_id live on LOCAL /workspace. If the volume is missing: rebuild
-via conversion_depth/build_ward_stream.py + cache_depth.py (~1 h).
+## Volume rules
+Own independent 700 GB volume (no access to runpod-c's caches —
+different datacenter). FIRST TASK: rebuild the Ward stream + reader
+caches via conversion_depth/build_ward_stream.py + cache_depth.py
+(~1 h; one mid-depth layer per model suffices for screens). Keep all
+builds on the persistent volume.
 
 ## First session
 Setup: `.venv`, CUDA torch check, `HF_HOME` on the big disk, creds at
 `/workspace/.tokens/` (never hardcode), pull-rebase before every push
 (FIVE agents share the branch tonight). Then execute the briefing:
-mini-card freeze → Stage-1 screen (both cached reader models — free) →
+mini-card freeze → Stage-1 screen (both reader models — you rebuild the caches) →
 LOG verdicts → Stage 2 on the best cell. Labels arrive from runpod-b
 (`task_hunt/labels/`). Deadline: results by 2026-07-26 morning PT.

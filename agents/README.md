@@ -32,34 +32,24 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   caches; spawned 2026-07-23 for the conversion-depth / substrate-audit
   line, now the real-side dictionary-training pod). Same creds layout;
   `/workspace/.agent_id` = `runpod-c`.
-- **`runpod-d`** — GPU RunPod pod (spawned 2026-07-24, rebuttal window;
-  H100 preferred, same datacenter as the shared volume). Task-hunt arm A
-  (`briefings/task-hunt.md`): trace-derived candidates.
+- **`runpod-d`** — GPU RunPod pod (H100, spawned 2026-07-24, rebuttal
+  window; **own independent 700 GB volume** — datacenter constraints
+  prevent sharing runpod-c's). Task-hunt arm A
+  (`briefings/task-hunt.md`): trace-derived candidates; REBUILDS the
+  Ward stream/caches it needs from the committed builders.
   `/workspace/.agent_id` = `runpod-d`.
-- **`runpod-e`** — GPU RunPod pod (spawned 2026-07-24, rebuttal window;
-  H100 preferred, same datacenter as the shared volume). Task-hunt arm B
+- **`runpod-e`** — GPU RunPod pod (H100, spawned 2026-07-24, rebuttal
+  window; **own independent 700 GB volume**). Task-hunt arm B
   (`briefings/task-hunt-b.md`): repetition-lag across model scale +
   confidence trend. `/workspace/.agent_id` = `runpod-e`.
 
-**The shared 700 GB network volume (c + d + e), conventions:**
-- **Mount points differ**: on `runpod-c` the volume IS `/workspace`
-  (its repo + identity + caches live there — historical). On `runpod-d`
-  / `runpod-e` it mounts at **`/shared`**; their repo, venv, and
-  `.agent_id` stay on LOCAL container disk under `/workspace`. NEVER
-  touch `/shared/temp_xc` or `/shared/.agent_id` (those are runpod-c's
-  live working tree and identity).
-- **Single writer per directory** (NFS, no locking): `runpod-c` owns
-  everything it created (`conv_depth_caches/`, the EM cohort/train
-  caches, `hf/`); hunt pods write ONLY under `task_hunt_caches/d/` and
-  `task_hunt_caches/e/` respectively (volume-relative paths — i.e.
-  `/shared/task_hunt_caches/<id>/` from d/e, `/workspace/
-  task_hunt_caches/<id>/` from c). Everything is readable by everyone.
-- **HF models**: read/copy/symlink from the shared `hf/` if present;
-  new downloads go to your LOCAL `HF_HOME` (concurrent writers race on
-  the hub cache).
-- Budget note: ~430 GB free as of 2026-07-24 — hunt caches are small
-  (single-layer screens, a few GB each); check `df` before Stage-2
-  caching sprees.
+**Volumes are per-pod and independent** (c, d, e each have their own
+700 GB; no cross-mounting — GPU availability forced different
+datacenters). Anything another pod needs must be REBUILT from committed
+builder scripts — which is why every cache builder is committed with
+its artifacts' spec. Cross-pod artifact handoff, if ever needed, goes
+through committed scripts + small stats files in the repo, never bulk
+data.
 
 (2026-07-23, rebuttal window: backtracking multi-seed reruns and paper
 latex edits are owned by the human team, NOT by agents in this registry.

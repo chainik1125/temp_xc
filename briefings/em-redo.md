@@ -15,12 +15,9 @@ EM stays in the paper as a negative case — Phase A's outcome is scored
 exactly as frozen, but its *use* differs by branch: a temporal-arch win
 in the paper currency is a reportable new-experiment result; a loss is
 the third weak-realization datum for the archival version. Phase B
-remains the stretch. **Volume sharing is live** (conventions in
-`agents/README.md`): hunt pods `runpod-d`/`runpod-e` mount your volume
-at `/shared`, read your cache trees, and write ONLY under
-`task_hunt_caches/{d,e}/` — which appears at
-`/workspace/task_hunt_caches/` on your side: foreign but expected, do
-not write into it. You still own every tree you created.
+remains the stretch. Volumes are per-pod and independent (the hunt pods
+cannot reach yours — different datacenters); your volume stays entirely
+yours.
 
 **You are `runpod-c`** (H100, the 700 GB volume with the preserved EM +
 Ward caches). Governing context: `experiments/explorations/conversion_depth/RECORD.md`

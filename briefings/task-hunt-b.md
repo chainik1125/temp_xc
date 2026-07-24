@@ -11,13 +11,10 @@ venue: runpod (GPU, new pod)
 `runpod-e`; see `agents/README.md` + `agents/runpod-e/STATUS.md`).
 **Read `briefings/task-hunt.md` FIRST** — its goal statement, two-stage
 fail-fast protocol, Stage-1/Stage-2 specs, and acceptance rules govern
-you identically; this briefing only assigns your candidates. **The
-shared 700 GB volume is mounted at `/shared`** (conventions in
-`agents/README.md`): read anything; **write ONLY under
-`/shared/task_hunt_caches/e/`** (so your caches survive repurposing);
-never touch `/shared/temp_xc` or `/shared/.agent_id`; reuse weights
-from `/shared/hf` by copy/symlink, new downloads to your LOCAL
-`HF_HOME`. Shared hunt log:
+you identically; this briefing only assigns your candidates. You have your
+**own independent 700 GB volume** (no cross-pod mounts) — build all
+caches locally and keep them on the persistent volume so a repurposed
+pod inherits them. Shared hunt log:
 `experiments/explorations/task_hunt/LOG.md` (append-only, pull-rebase).
 Deadline: results by 2026-07-26 morning PT. Fail fast.
 
