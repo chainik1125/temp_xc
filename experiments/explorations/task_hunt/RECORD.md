@@ -170,6 +170,44 @@ anticipation against ambient targets *on identical rows at fixed T*.
 
 ---
 
+## § 2b — Candidate 3: forbidden-word violation onset (SILOED) — **KILL (pre-registered ambience kill)**
+
+Card [`forbidden_word/card.md`](forbidden_word/card.md), frozen before
+any rollout existed. **SILOED** from Aniket's parallel forbidden-word
+work throughout — no shared inputs, priors, or results. Data: 1169
+R1-Distill rollouts on the pinned CoT-Control keyword-suppression split;
+**violation rate 97.4 %** (the feasibility gate wanted ≥ 30 %), onset
+labeled by exact whole-word offset. Screen: R1-Distill resid_post L12
+over its own rollouts (generator = reader), horizons D ∈ {4, 8, 16} ×
+T ∈ {2..32}, split by rollout. σ_null = 0.0099 (3σ = **0.0296**).
+Results `forbidden_word/results/forbidden_word_{screen,verdict}.json`,
+figure `forbidden_word/figs/forbidden_word_tscaling.*`.
+
+| horizon | per-token | best window | \|diff\| | max g (win−tok) | max g_order |
+|---|---|---|---|---|---|
+| D=4 | 0.629 | 0.626 | 0.003 | −0.003 | +0.022 |
+| D=8 | 0.612 | 0.622 | 0.010 | +0.010 | +0.047 |
+| D=16 | 0.558 | 0.562 | 0.004 | +0.004 | +0.023 |
+
+**Both kill rules fire.** Per-token is within 0.02 of the best window at
+every horizon (P4), and the window never beats per-token beyond 3σ_null
+(max g = +0.010 ≪ 0.0296). This is precisely the crux the card named as
+its likely outcome: pre-violation the model **circles** the forbidden
+concept, so each semantically-neighbouring token is individually
+informative and one token reads the imminent-violation pressure as well
+as a whole window. **The anticipation is ambient — KILL.** A
+pre-registered kill that came true is a success of the process, not a
+failure (prime directive).
+
+One honest sub-effect, recorded because it is real: g_order
+(flatten − mean) is positive and grows with T at the longer windows —
+up to +0.047 at D=8/T=32, beyond 3σ_null. There is a faint genuine
+*within-window order* signal, but it does not lift the window above a
+single token, so it cannot carry the non-ambient claim; noted, not
+counted as survival.
+
+---
+
 ## § 3 — The order-sensitivity receipt for the EXISTING case study
 
 `briefings/task-hunt.md` § "Also wanted". Script:

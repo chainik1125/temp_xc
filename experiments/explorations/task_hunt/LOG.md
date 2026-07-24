@@ -459,3 +459,46 @@ are the latest/least-circling ones); 54 % of generations hit the
 2048-token max (R1 reasons at length) — irrelevant to an anticipation
 label measured before the first occurrence. Proceeding to the screen
 (the two tokenizer/BatchEncoding bugs found in pre-flight are fixed).
+
+## 2026-07-24 — runpod-d — candidate 3 (forbidden-word onset, SILOED) — **KILL (pre-registered ambience kill)**
+
+Screen complete: R1-Distill resid_post L12 over its own 1169 rollouts,
+frozen `problib` stack, horizons D ∈ {4, 8, 16} × T ∈ {2,4,8,16,32},
+split by rollout. σ_null = 0.0099 (18 null cells; 3σ = **0.0296**).
+Results `forbidden_word/results/forbidden_word_screen.json`. Card
+`forbidden_word/card.md` (frozen before any rollout existed).
+
+**The card's pre-registered kill (P4) fires cleanly.** Per-token AUC vs
+the best window ceiling, per horizon:
+
+| horizon | per-token | best window | \|diff\| | max g (win−tok) | max g_order |
+|---|---|---|---|---|---|
+| D=4 | 0.629 | 0.626 | 0.003 | −0.003 | +0.022 |
+| D=8 | 0.612 | 0.622 | 0.010 | +0.010 | +0.047 |
+| D=16 | 0.558 | 0.562 | 0.004 | +0.004 | +0.023 |
+
+Per-token is **within 0.02 of the window at every horizon** (kill rule 1
+= P4), and the window **never beats per-token beyond 3σ_null** (max
+g = +0.010 ≪ 0.0296, kill rule 2). This is exactly the crux the card
+named: pre-violation the model **circles the forbidden concept**, so
+each semantically-neighboring token is individually informative and a
+single token reads the imminent-violation pressure as well as a whole
+window. **The anticipation is ambient. KILL.** Under the prime directive
+this is a successful outcome of the process — the design pre-registered
+this as the likely result and it came true, cleanly.
+
+**The one honest nuance (does NOT rescue the candidate).** g_order
+(flatten − window-mean) is positive and *grows with T* at the two
+longer windows — up to +0.047 at D=8/T=32, beyond 3σ_null. So there is
+a faint genuine *within-window order* signal: at large T the ordered
+flatten reads the run-up slightly better than a position-symmetric
+mean. But it does not lift the window as a whole above a single token
+(the window ceiling still ties per-token), so it cannot carry the
+non-ambient anticipation claim — a token already sees what the window
+sees. Recorded as a real-but-insufficient sub-effect, not a survival.
+
+**Model note:** this was screened on R1-Distill only (generator =
+reader), per the card. Ambience is a (task, MODEL) property; a
+different reader could differ, but the card's kill is on the generator
+itself and it is decisive there. SILOED from Aniket's parallel
+forbidden-word work throughout — no shared inputs.

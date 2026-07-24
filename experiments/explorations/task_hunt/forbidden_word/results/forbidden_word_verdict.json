@@ -1,0 +1,31 @@
+{
+  "sigma_null": 0.009880700159117264,
+  "3sigma_null": 0.02964210047735179,
+  "n_null": 18,
+  "per_horizon": {
+    "4": {
+      "tok": 0.6294575507137491,
+      "best_window": 0.626422785328871,
+      "within_0.02": true,
+      "max_g": -0.003034765384878124,
+      "max_g_order": 0.02161163854927939
+    },
+    "8": {
+      "tok": 0.6123575817071162,
+      "best_window": 0.6222096115847697,
+      "within_0.02": true,
+      "max_g": 0.009852029877653545,
+      "max_g_order": 0.04660868076975078
+    },
+    "16": {
+      "tok": 0.5580119936011517,
+      "best_window": 0.5624159157747354,
+      "within_0.02": true,
+      "max_g": 0.003669428946701969,
+      "max_g_order": 0.02307655218957816
+    }
+  },
+  "KILL_rule_1_ambient_within_0.02_all_horizons": true,
+  "KILL_rule_2_window_never_beats_pertoken_3sigma": true,
+  "KILLED": true
+}
