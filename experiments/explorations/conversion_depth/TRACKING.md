@@ -146,6 +146,27 @@ numbers (pr_auc_S16): sae_arditi 0.690 (s42) / 0.745 (s1); txc_base
 
 (cell log: `run_em_panel.py` wall log + leaderboard rows)
 
+**Post-freeze protocol AMENDMENT (2026-07-24 ~06:00 — descope, made
+blind):** measured cell cost invalidated the freeze-time budget: token
+cells ≈ 31 min serial (≈ 78 min under 3-way contention), window cells
+≈ 4 h under contention — the per-step buffer path, not GPU compute, is
+the bottleneck (fixing it would require `temp_bench/core` edits or
+train-key-changing config, both off-limits). The frozen 51-cell table
+implies 60–80 GPU-hours of window training: unfittable in the ~48 h
+window. Descoped at the point where all nine batchtopk_sae cells were
+done and ZERO temporal-arch cells had completed — no cell was dropped
+for its result. New table (`em_redo_cells.py` DESCOPE_SKIP, 25 cells):
+temporal archs at the paper's own paired seeds {42, 1} (c6.md
+precedent); txc_pre_k40 cut entirely — its frozen purpose (bracketing
+realized l0 toward 20/token) is moot given the measured realized
+l0_per_token ≈ 137–172 for ALL cells (BatchTopK's JumpReLU threshold,
+calibrated on the 59 %-pad training stream, over-fires ≈ 8× on cohort
+text; layer-uniform, so cross-arch matching is reported as-measured);
+tsae to s42 @ L13/L15 (P5 side-bet); sae_arditi anchor @ L15 only; L9
+temporal arm = txc_post {42, 1} only. Every P1–P6 quantity remains
+scorable; seed-2 window cells are the sacrificed robustness margin and
+are listed as such in the verdict's limitations.
+
 ## § 4 — Verdicts vs § 2 (blind: written against the frozen text above)
 
 (to be filled)

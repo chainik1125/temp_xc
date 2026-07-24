@@ -73,6 +73,36 @@ ANCHORS = [
 ANCHOR_SEEDS = [42]
 
 
+# ── DESCOPE (2026-07-24 ~06:00, post-freeze protocol amendment) ──────
+# Measured cell cost: batchtopk cells ≈ 31 min serial / ~78 min 3-way;
+# window-arch cells ≈ 4 h under contention (per-step buffer overhead,
+# not GPU compute). The frozen 51-cell table needs 60–80 GPU-hours of
+# window-arch training — unfittable in the briefing's ~48 h window.
+# Descoped BLIND: at amendment time zero temporal-arch cells had
+# completed, so no cell is dropped for its result. Kept: the
+# verdict-critical core — every P1–P6 quantity stays scorable, with
+# temporal archs at the paper's own paired-seed convention {42, 1}
+# (c6.md: "paired n=2 (seeds 42, 1)"). Cut: txc_pre_k40 (its purpose —
+# realized-l0 bracketing toward 20/token — is moot now that measured
+# realized l0 is ~140–170 for ALL archs: threshold inference calibrated
+# on the 59%-pad stream inflates uniformly; matching is reported
+# as-measured), seed 2 for window archs, tsae to s42 @ L13/L15,
+# sae_arditi anchor to L15, L9 to txc_post + txc_base anchor.
+DESCOPE_SKIP = set()
+for _layer in (13, 15, 9):
+    for _seed in (2,):
+        for _cid in ("txc_post_k80", "txc_pre_k20", "txc_pre_k40", "tsae"):
+            DESCOPE_SKIP.add((_cid, _layer, _seed))
+    for _seed in (42, 1):
+        DESCOPE_SKIP.add(("txc_pre_k40", _layer, _seed))
+    DESCOPE_SKIP.add(("tsae", _layer, 1))
+DESCOPE_SKIP.add(("tsae", 9, 42))
+DESCOPE_SKIP.add(("txc_pre_k20", 9, 42))
+DESCOPE_SKIP.add(("txc_pre_k20", 9, 1))
+DESCOPE_SKIP.add(("sae_arditi_anchor", 13, 42))
+DESCOPE_SKIP.add(("sae_arditi_anchor", 9, 42))
+
+
 def training_cfg_for(batch_size: int, override: dict | None,
                      extra: dict) -> TrainingConfig:
     return TrainingConfig(
@@ -80,11 +110,13 @@ def training_cfg_for(batch_size: int, override: dict | None,
         arch_hparams_override=override, **extra)
 
 
-def all_cells(include_anchors: bool = True):
-    """Yield dicts in the frozen run order."""
+def all_cells(include_anchors: bool = True, descoped: bool = True):
+    """Yield dicts in the frozen run order (descoped set by default)."""
     for layer in LAYERS:
         for cell_id, arch, bs, ovr, extra in PANEL:
             for seed in SEEDS:
+                if descoped and (cell_id, layer, seed) in DESCOPE_SKIP:
+                    continue
                 yield {"cell_id": cell_id, "arch": arch, "layer": layer,
                        "seed": seed, "datasource": DATASOURCES[layer],
                        "training_cfg": training_cfg_for(bs, ovr, extra)}
@@ -92,6 +124,8 @@ def all_cells(include_anchors: bool = True):
         for layer in LAYERS:
             for cell_id, arch, bs, ovr, extra in ANCHORS:
                 for seed in ANCHOR_SEEDS:
+                    if descoped and (cell_id, layer, seed) in DESCOPE_SKIP:
+                        continue
                     yield {"cell_id": cell_id, "arch": arch, "layer": layer,
                            "seed": seed, "datasource": DATASOURCES[layer],
                            "training_cfg": training_cfg_for(bs, ovr, extra)}
