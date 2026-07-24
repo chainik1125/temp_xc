@@ -1,99 +1,85 @@
 # Working state — agent `runpod-e`
 
-**Last rewrite:** 2026-07-24 ~06:10 UTC — **ARM B COMPLETE, awaiting
-mac-local review.**
+**Last rewrite:** 2026-07-24 (PRE-COMPACT handoff. Round-2 briefing
+received and read; NO r2 work started yet — next context begins it.)
 
-## Who / where
+## Who / where / env (verified working this session)
 H100 pod, `/workspace/temp_xc`, `/workspace/.agent_id` = `runpod-e`.
-Task-hunt arm B (`briefings/task-hunt-b.md` — briefing left in place
-per its acceptance gate until mac-local review). Git `runpod-e-agent`;
-creds `store --file=/workspace/.git-credentials`; `HF_TOKEN` from
-`/workspace/.tokens/hf_token` per command. Pull-rebase before every
-push.
+Git `runpod-e-agent`, creds `store --file=/workspace/.git-credentials`
+(token from `/workspace/.tokens/gh_token`); `export HF_TOKEN=$(cat
+/workspace/.tokens/hf_token)` per command (gemma gated); anthropic key
+at `/workspace/.tokens/anthropic_key` (judge.py reads it directly).
+Pull-rebase before EVERY push (shared `arxiv` branch). venv:
+`.venv/bin/python` (torch 2.8 cu128, transformers 5.7, datasets 4.8.5,
+anthropic 0.97).
 
-## FINAL STATE — all three arm-B candidates KILLED by sound screens
-Verdicts + full reasoning in `experiments/explorations/task_hunt/LOG.md`
-(one entry per candidate + the arm-B closure entry). One-line each:
-1. **Repetition-lag Δ: KILL** — detection converted (regime-1) at
-   every scale (gpt2 / gemma-2-2b / llama-8b); only order-residue is
-   the lag VALUE, large in gpt2 (+0.11), thin at 2B/8B (+0.02).
-   Figs: `task_hunt/replag/figs/`.
-2. **Confidence trend: KILL** — window gap real and T-growing (distill
-   mean 0.521→0.565 vs tok 0.468) but aggregation-carried; order
-   receipt fails. Regime-2 re-card seed recorded in LOG.
-3. **Emotional-instability onset: KILL** — paper replicated
-   (escalation 0.36→4.91; κ 0.857 judge gate; ~$12 spend), but
-   pre-onset anticipation is per-token-converted (0.856 AUC at D1-4,
-   window never beats token) and escalation gap +0.03 < bar without
-   shuffle collapse; detection anchor validates labels (0.867 tok).
-Cross-cutting mechanism named in the LOG: conversion — mid-depth
-residuals already summarize any per-token-traceable temporal latent.
+## MISSION NOW: `briefings/task-hunt-r2.md` (read it first — it is the
+## governing doc). Results by SATURDAY morning PT; check-in Sun 10:00.
+Round 1 (arm B, three sound kills) is REVIEWED & APPROVED — binding
+review notes live in `experiments/explorations/task_hunt/LOG.md` and
+methods in `experiments/explorations/task_hunt/RECORD.md` (READ BOTH
+in the new context before any run; I have not read the post-review
+LOG additions or RECORD.md yet). New binding convention: per-token-first
+triage (my screens already satisfy it for these targets).
 
-## Hygiene at close
-`run.py validate` OK; canonical leaderboard untouched (no Stage 2 ran
-in arm B); all cards frozen pre-run; every amendment/escalation LOG'd
-pre-use; no reviewer/meeting quotes in tracked files.
+### Item 1 — hedging-trend LEVEL Stage-2 (the deliverable)
+Program DECISION: aggregation-framed win ACCEPTED; shuffle IMMUNITY is
+the disclosed mechanism receipt (order-free pooling is the claim).
+- FRESH card required (killed `task_hunt/confidence/CARD.md` is NOT
+  its confirmation; screen numbers cited as motivation only:
+  distill slope8 mean-probe 0.521→0.545→0.565 at T16/32/64 vs
+  per-token 0.468 lin / 0.503 MLP; state control regime-1).
+- **Reuse runpod-d's candidate-1 Stage-2 pattern** (its λ̂ panel on
+  `ward_real_lambda_base_l12`): plugin datasource (append-only
+  data.yaml), single scarce anchor, 5 archs (per-token BatchTopK SAE,
+  T-SAE, Stacked, TXC-pre, TXC-post) × T ladder × seeds {1,2,42} +
+  untrained, matched REALIZED l0_per_token (note runpod-d r2 item:
+  post's `k_win // T` squash collapses realized l0 — set nominal k per
+  T to hit target realized l0), per-tile readout. STUDY its files
+  under `experiments/explorations/task_hunt/lambda_intensity/` + its
+  datasource plugin + leaderboard rows BEFORE writing mine.
+- My substrate is on THIS volume: Ward stream + base & distill
+  17-layer caches at `/workspace/conv_depth_caches/{ward_stream,base,
+  distill}` (hs indices = odd only; slope screen used hs15 = L14);
+  labels `task_hunt/labels/confidence.npz` (slope8_bin terciles,
+  trace_split; my screen-time row machinery in
+  `task_hunt/confidence/screen.py` — hedge×position matching).
+- Reader for the panel: distill (the phenomenon's generator) — decide
+  + freeze in card; layer L14/hs15 unless the λ̂ pattern dictates the
+  datasource convention (theirs used base_l12 — check why and mirror
+  the reasoning, not necessarily the layer).
+- Frozen per-arch predictions BEFORE training; canonical runner ONLY
+  (`temp_bench.core.runner.run_experiment`, clean tree, 0 dup keys);
+  deliverable = second real-task T-scaling figure + record + LOG.
 
-## Volume assets (persist for a repurposed pod)
-- `/workspace/replag_caches/` — fineweb token+Δ caches, 3-model acts.
-- `/workspace/conv_depth_caches/` — Ward stream + base/distill
-  17-layer caches (rebuilt here; stats match committed reference).
-- `/workspace/emo_caches/` — 600 gemma-3-12b-it rollouts, judge
-  labels, acts (NOTE: activations stored × 1/64 — gemma-3 fp16
-  saturation; index.json records act_scale).
-- Models in HF cache: gpt2, gemma-2-2b, llama-3.1-8b base, r1-distill,
-  gemma-3-12b-it.
+### Item 2 — early-layer addendum (~2-3 h, zero new data; run while
+### panels train)
+g_order(ℓ) for replag lag4 on cached alternates (gpt2 hs4, gemma2
+hs8, llama hs8 — caches `/workspace/replag_caches/<model>/hs*.npy`,
+manifests `task_hunt/labels/replag_*_manifests.npz`, screen machinery
+`task_hunt/replag/screen.py` — extend, don't retune) + g_agg(ℓ) for
+slope8 across all 17 Ward capture points (both readers; mean-probe +
+tok per layer suffices). Freeze a short addendum note/card pre-run.
+Question: does temporal signal GROW at pre-conversion depths?
 
-## Proposed next tasks (runpod-e suggestions, 2026-07-24 — pending
-## mac-local/Han review; ordered by value-per-hour)
+### Parked (do NOT run): gpt2 order cell, anti-conversion class,
+### proof-op Stage-2 — recorded in r2 briefing.
 
-1. **Stage-2 on the hedging-trend LEVEL (the candidate-2 seed) —
-   needs a program decision first.** The screen showed a real,
-   monotone-in-T, per-token-blind window gap (distill mean-probe
-   0.52→0.57 vs tok 0.47) that is aggregation-carried. The strategy
-   note in the research STATUS already claims regime-2 rates/trends
-   suffice to separate TXC from per-token-decoded T-SAE *without*
-   order. If the program accepts an aggregation-framed win (shuffle
-   IMMUNITY disclosed as the mechanism receipt instead of shuffle
-   collapse), this is the cheapest path to a real-data T-scaling
-   figure: labels + Ward caches are already on this volume, Stage-2
-   protocol is fixed, ~1 day. Requires a FRESH card (do not reuse the
-   killed one as confirmation).
-2. **Early-layer post-hoc addendum on existing caches (~2-3 h, zero
-   new data).** Every screen ran one mid-depth layer, and the shared
-   mechanism was conversion-by-mid-depth. Cached-but-unscreened
-   alternates exist for all three replag models (gpt2 hs4, gemma hs8,
-   llama hs8) and all 17 Ward capture points. Test directly: does the
-   lag-VALUE order gap and/or the slope8 aggregation gap GROW at
-   pre-conversion depths? Deliverables: g_order(ℓ) for lag4,
-   g_agg(ℓ) for slope8. Either direction is a finding about where
-   temporal structure lives before the model summarizes it — and it
-   sharpens the depth story the conversion-depth exploration opened.
-3. **A small-model order cell (new card).** The only genuine
-   order-carried window advantage found anywhere in arm B is the
-   lag-VALUE readout at gpt2 scale (+0.11, shuffle-collapsed; thin at
-   2B/8B). If the paper wants a real-data ORDER receipt, it may live
-   at small scale by necessity — conversion capacity is what destroys
-   it. Proposal: freeze a card for lag-value at gpt2 (optionally a
-   pythia ladder for a clean scale curve), screen early+mid layers,
-   Stage-2 panel at gpt2 (cheap). Also yields a quotable
-   conversion-vs-scale curve for the rebuttal.
-4. **Process fix for the next hunt round: per-token-first triage.**
-   All three kills shared one signature visible within minutes: a
-   HIGH per-token ceiling (0.7-0.97). Adopt a mandatory cheap
-   pre-screen — per-token linear probe only — and require per-token
-   ≈ chance-ish before a candidate earns the full window grid. Fold
-   into the task-hunt briefing conventions.
-5. **Anti-conversion candidate class (design note for round 2).**
-   Conversion happens when the latent helps next-token prediction.
-   Candidates should therefore target latents with NO generative
-   training signal: e.g., source identity / time-since-switch in
-   two-document interleaved real text (a real-data analog of
-   colored_sources/multilane, with lexical-overlap controls), or
-   externally-annotated states orthogonal to surface form. These are
-   the latents a model plausibly never converts — exactly where a
-   window must win.
+## Round-1 state (closed; context only)
+All three arm-B candidates KILLED by frozen cards — full verdicts in
+LOG.md (replag: converted at every scale; confidence: aggregation not
+order; emotional instability: converted near onset — paper replicated,
+κ 0.857, ~$12 spend). Figures: `task_hunt/replag/figs/`. Volume
+assets: `/workspace/replag_caches`, `/workspace/conv_depth_caches`,
+`/workspace/emo_caches` (emo acts stored ×1/64 — gemma-3 fp16
+saturation; act_scale in acts/index.json). Models cached: gpt2,
+gemma-2-2b, llama-3.1-8b base, r1-distill, gemma-3-12b-it.
+`run.py validate` green; leaderboard untouched by arm B in round 1.
 
-Sibling arms: runpod-d (arm A) and runpod-c (em-redo) own their own
-state; this pod is idle and can absorb any of 1-3 immediately —
-caches for all of them are already on this volume.
+## Sibling context (for dedup awareness)
+runpod-d (r2): budget-matched TXC-post re-run on ward_real_lambda.
+runpod-b: hunt-support-stats (OWNS the variance-aware renderer — I
+re-render with it when it merges, or do minimal l0 annotation myself
+if it hasn't landed when my cells finish; reconcile in LOG). runpod:
+hunt-support-synthetic (mechanism receipts). Figure ownership was
+deconflicted in `be255840` — check those briefings if overlap looms.
