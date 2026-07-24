@@ -100,23 +100,38 @@ def supported_rows_per_class(masked_bins, strata):
     return int(total)
 
 
-def within_doc_contrast(man_doc, man_cls, doc_split):
+CONTRAST_THRESHOLDS = (1, 5, 20, 50)
+
+
+def within_doc_contrast(man_doc, man_cls, doc_split,
+                        thresholds=CONTRAST_THRESHOLDS):
     """How many documents can carry a within-document contrast: they hold
-    manifest rows of BOTH the top and the bottom class (the '8 documents'
-    census at 400 docs). Reported over all manifest docs and over the
-    operative test-doc subset."""
+    manifest rows of BOTH the top and the bottom class (runpod-e's
+    control rested on 8 test documents at 400 docs).
+
+    Reported as a LADDER over the minimum rows-per-class a document must
+    supply, because "carries the contrast" is not one number: at
+    threshold 1 a document qualifies on a single row per class (an upper
+    bound on usable documents), while a screen wanting a per-document
+    effect needs tens. Over all manifest docs and over the operative
+    test-doc subset."""
     out = {}
+    n_docs = int(len(doc_split))
     for tag, keep in (("all", np.ones(len(man_doc), dtype=bool)),
                       ("test", doc_split[man_doc] == 1)):
         d, c = man_doc[keep], man_cls[keep]
-        top = set(np.unique(d[c == 2]).tolist())
-        bot = set(np.unique(d[c == 0]).tolist())
-        both = top & bot
-        rows_in_both = int(np.isin(d, list(both)).sum()) if both else 0
-        out[tag] = {"docs_with_top_rows": len(top),
-                    "docs_with_bottom_rows": len(bot),
-                    "docs_with_both": len(both),
-                    "manifest_rows_in_those_docs": rows_in_both}
+        n_top = np.bincount(d[c == 2], minlength=n_docs)
+        n_bot = np.bincount(d[c == 0], minlength=n_docs)
+        ladder = {}
+        for t in thresholds:
+            both = (n_top >= t) & (n_bot >= t)
+            ladder[str(t)] = {
+                "docs": int(both.sum()),
+                "manifest_rows_in_those_docs": int(
+                    (n_top[both] + n_bot[both]).sum())}
+        out[tag] = {"docs_with_top_rows": int((n_top > 0).sum()),
+                    "docs_with_bottom_rows": int((n_bot > 0).sum()),
+                    "docs_with_both_by_min_rows_per_class": ladder}
     return out
 
 
