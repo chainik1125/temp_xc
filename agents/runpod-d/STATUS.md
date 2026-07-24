@@ -28,121 +28,86 @@ work. (The combined `task-hunt-r2.md` was split by mac-local at
 
 ---
 
-## STATE: primary round-2 deliverable is DONE and PUSHED
+## STATE (rewrite 2026-07-24 ~22:55 UTC)
 
-`briefings/task-hunt-r2-d.md` § 1–2 are complete, pushed through
-`2b64dbe4`. Acceptance gate: card frozen pre-run ✓, LOG verdict ✓,
-re-rendered figure ✓, RECORD addendum (§ 3c) ✓, leaderboard hygiene
-(0 dup eval_keys, 0 null metrics, 108 ward rows) ✓, 230 tests pass ✓,
-STATUS rewritten ✓. **Briefing stays until mac-local review.**
+**Primary round-2 deliverable: DONE + PUSHED** (`2b64dbe4`), gate met.
+**Seed top-up: PARTIAL + PUSHED** (`d45cb1cc`).
+**Factory screening (briefing § 3): sc_lambda DONE (KEEP-qualified);
+oprate/qrate/verbosity screens IN FLIGHT** (cards frozen `31084b38`).
 
-### What was found (two results, both in LOG + RECORD § 3c)
+### A. Matched TXC-post + probe capacity (§ 1–2) — CLOSED
+1. **Reading (b) CONFIRMED**: round-1 post 0.255 @ T16 was budget-confounded.
+   Falsifier passed exactly (untrained realize l0 = 8.000 at every T).
+   Matched post peaks T4 then falls to 0.137 → **TXC-pre stays headline**.
+2. **Reading (c) CONFIRMED, bigger than pre-registered**: the λ probe
+   (unregularized OLS, n = p at T16) is capacity-limited for DENSE codes.
+   Lift under ridge + nw 8192 scales with density (pre T16 **+0.213**,
+   sparse round-1 post only **+0.032**) ⇒ the T16 fall is a **panel-wide
+   probe artifact**, and 0.255 was just the one cell too sparse to be
+   penalized. Window > token survives and widens (0.351 vs 0.211).
+   → Surfaced as a METHODS decision, deliberately NOT taken. **runpod-b
+   built it out**: `evals/lambda_recovery_v2.py` + `PROBE_V2_SPEC.md`
+   (RidgeCV logspace(-2,4,13), nw 8192 = 8p at T16 — my diagnostic's exact
+   config), Han-approved `6394eba3` with the decision still untaken.
 
-1. **Reading (b) CONFIRMED — round-1's TXC-post 0.255 @ T16 is not a
-   matched win.** Card `lambda_intensity/card_stage2_postmatched.md`
-   (frozen `07c90cfb` before any matched cell existed) raised post's
-   nominal k to **8·T** (16/32/64/128). 24 cells, 0 failures.
-   **Falsifier passed:** every untrained matched cell realizes
-   `l0_per_token` = 8.000 exactly at every T → the `l0 = k/T` mechanism
-   is measured, not assumed. Matched post reads 0.185/0.202/0.144/0.137
-   at T=2/4/8/16 — peaks at T4, falls into the TXC-pre (0.138) /
-   Stacked (0.094) band. **TXC-pre (peak T8 = 0.206) remains the
-   matched-budget headline.**
-2. **Reading (c) CONFIRMED, and bigger than pre-registered — the λ
-   probe is capacity-limited for DENSE codes.** `lambda_recovery` fits
-   unregularized OLS on p = 2048 features with n = 1024·(32/T) rows →
-   **n = p at T16**. Re-fitting the SAME checkpoints with ridge +
-   n_windows 1024→8192 (`probe_capacity.py`, pre-registered in the card
-   before results existed, OUT of the leaderboard) lifts held-out r
-   **monotonically in code density**: pre T16 **+0.213**, stacked T16
-   **+0.225**, matched-post T16 **+0.184**, but sparse round-1 post T16
-   only **+0.032**. Consequences: (i) the money plot's T16 fall is a
-   **panel-wide probe artifact** that closes under an adequate probe
-   (pre 0.206→0.351 from T8→T16); (ii) the 0.255 was the one cell too
-   sparse to be probe-suppressed — under an adequate probe matched post
-   T16 (0.322) **exceeds** round-1 post T16 (0.286), so the sparse code
-   had no representational advantage, it dodged the artifact.
-   **Window > token SURVIVES and WIDENS** under the adequate probe
-   (pre 0.351 vs tsae 0.211 at T16).
+### B. Seed top-up — PARTIAL, do NOT retry as specified
+6/9 landed (pre/T4, pre/T8 at seeds 3,4,5 → **n = 6**; pre/T8 CI tightens
+to [0.179, 0.235]). The 3 `tsae/T1` cells are **NOT affordable**:
+`ActivationBuffer._refill()` does `cat` → `randperm` gather → `clone` over
+an **8.6 GB CPU buffer ~31× per cell** at d_in = 4096, so the worker pegs
+~1.6 cores with the **GPU at 0 %**. Killed at 2 h 45 m (3 concurrent),
+re-run **serially** to test contention — still GPU 0 %, so it is the
+**buffer path, not contention**. Shrinking `buffer_tokens` is BARRED (it
+changes `train_key` and breaks comparability with round-1 tsae seeds).
+b's criterion **still NOT met** (paired LB −0.041; unpaired Welch with 6
+pre seeds LB −0.016, p = 0.082). Binding constraint = **the tsae arm's n**.
+→ If anyone retries: the 9 cells are NOT equal cost (pre ≈ 5 min, tsae =
+multi-hour); fix the buffer path first.
 
-**METHODS decision surfaced, deliberately NOT taken:** should the
-canonical λ-readout adopt a capacity-adequate probe (ridge, n ≫ p)?
-runpod-b's variance receipts are all computed on the OLS-probe numbers,
-so changing the probe re-bases them. Logged with its receipt for
-orchestrator / runpod-b; the leaderboard and § 3b numbers are unchanged
-and nothing was re-run unilaterally.
-
-### Renderer reconciliation (done — do not redo)
-runpod-b's variance-aware renderer merged upstream mid-run and
-**supersedes** the minimal annotation I had written (my render commit
-was dropped as empty during the rebase — intended). Resolved by taking
-b's renderer wholesale and grafting only what is mine: the matched-post
-file loads as a separate arch `txc_batchtopk_post_matched`, and the
-`k_pos` reference in `build_summary` **excludes `*_matched` cells** so
-their per-window nominal k (up to 128) cannot inflate b's
-`>= k_pos/2` budget-matched threshold. Round-1 post stays flagged NOT
-budget-matched; matched post reads as matched and appears in both figs.
-
----
+### C. Factory screening — sc_lambda KEEP (qualified)
+48 cells, σ_null 0.0066. g clears 3σ at T8 in all four (model, layer)
+cells and grows monotonically to **+0.059…+0.071 at T32** (~10σ).
+**Decisive control: the window-MEAN arm has the SAME 4096 dims as
+per-token yet g_agg ≈ g** ⇒ the gain is NOT probe capacity. Shuffle-immune
+(g_order ≈ 0); the label-null arm shows NO window gap. **Heavy
+qualification: per-token is 0.87 (largely converted), and it is a
+`ward_lambda` cousin (r = 0.473), not an independent case study.** P1
+falsified; P5 disclosed as non-discriminating as frozen (per-token alone
+already beat the visible-evidence line — the equal-dimension g_agg test in
+the later cards is the fixed version).
 
 ## DO THIS NEXT
 
-### A. Seed top-up — **IN FLIGHT at last rewrite** (finish + verdict)
-runpod-b's LOG recommendation addressed to me: bound the paired
-**pre-vs-tsae T8** margin (NOT significant at n=3: 0.052 ± 0.055, t CI
-[−0.086, 0.190]). b's frozen criterion: one-sided 95% t lower bound > 0,
-plus sign-flip attainability (needs n ≥ 5) ⇒ **seeds {3,4,5} ×
-{pre/T4, pre/T8, tsae/T1} = 9 trained cells**. My briefing § 1
-pre-authorized it. Runner frozen commit-then-run at `3d954869`
-(`run_stage2_seedtopup.py`) — the exact 9 cells are in code, so this is
-a power top-up, **not "seeds until significant"**.
+### 1. Harvest the four in-flight factory screens (chain3)
+`oprate/ver`, `oprate/case`, `verbosity/vslope`, `qrate` — cards frozen at
+`31084b38` BEFORE any cell ran; driver `task_hunt/factory_screen.py`
+(generic over the factory's `man_<target>_*` layout; ~20 min per target;
+idempotent per cell so partial runs resume). Logs
+`…/scratchpad/screen_<bundle>_<target>.log`; results
+`task_hunt/<bundle>/results/<bundle>_<target>_screen.json`.
+Write **one LOG paragraph per target**, KEEP/KILL against that card's own
+kill rules, and score every frozen prediction — including the ones I
+expect to fail:
+- **oprate is the valuable one**: independent of sc_lambda (corr 0.026)
+  AND of its own second target (−0.032), so a win here is a genuinely
+  separate datapoint. It also carries the highest visible-evidence bar
+  (ver T32 = 0.830).
+- **qrate is an explicit REPLICATION** of the sc_lambda family — a KEEP
+  adds confidence, it does NOT count as an independent candidate.
+- **verbosity is the structurally anti-ambient one** (a SLOPE;
+  visible-evidence BELOW chance and falling with T). It is the only card
+  where I predicted **order to matter** (P2: g_order > 0.02, shuffle
+  costs). If it comes back order-free like the rest, that premise is
+  FALSIFIED and must be written as such, not folded into a KEEP.
 
-**Status at rewrite:** 6/9 done (all pre/T4 + pre/T8 — λ 0.187…0.269),
-the 3 `tsae/T1` cells still training. PID 49095, log
-`…/scratchpad/seedtopup.log`.
-
-> **Timing gotcha (measured, do not re-diagnose):** `tsae/T1` is the
-> SLOWEST cell in the panel. Token archs use the `ActivationBuffer`
-> (buffer_tokens 524288 → ~31 CPU-side refills per cell); 3 concurrent
-> tsae cells sit at ~165 % CPU each with GPU only ~10 %. Round-1
-> evidence: a single tsae cell took ~868 s; three concurrent ones ran
-> **> 40 min**. That is normal, NOT a hang. Verify liveness with
-> `ps --ppid <pid>` + `/proc/<pid>/stat` CPU-time deltas, not by
-> watching the log (workers do not stream `[train]` lines).
-
-When it lands: `run_stage2_seedtopup.py` auto-merges into
-`results/stage2_ward_real_lambda_base_l12.json` by cell id (idempotent),
-then **re-run `…lambda_intensity.render_stage2`** (b's renderer
-recomputes per-cell CIs at the new n; pre/T4, pre/T8, tsae/T1 become
-n = 6, everything else stays n = 3). Then compute b's criterion with
-`support_stats/stats_lib.py` (`t_ci95` is two-sided — take the
-one-sided 95 % LB yourself; `sign_flip_p` for the exact test) and write
-ONE LOG paragraph: bounded or not bounded, either way. **A null result
-here is a result** — report it plainly, do not add seeds to chase it.
-
-### B. Then: § 3 of my briefing — batch-screen candidate-factory bundles
-QUANTITY MODE (Han directive). Bundles have LANDED (built 18:43) in
-`experiments/explorations/task_hunt/labels/`. **Ward-grid ones I can
-screen on my existing caches:** `sc_lambda.npz` (top prior — the
-winner's family on a frozen self-correction marker stream), `oprate`,
-`qrate`, `verbosity`. (`novelty`/`punctint`/`interleave` are fineweb and
-`dialevel` is DailyDialog — those need caches I do **not** hold; they
-are runpod-e's economics, not mine.) Each has a `CARD_DRAFT.md` in its
-own dir but **no screen script** — adapt
-`lambda_intensity/screen.py` (frozen `problib` stack: per-token /
-flatten / window-mean / within-window-shuffle + permutation null).
-Per candidate: freeze the card (sharpen the draft) → screen → ONE LOG
-verdict paragraph, KEEP/KILL, fail fast.
-**Apply the two new binding conventions:** (1) **per-token-first
-triage** — run the per-token probe ALONE first; a high per-token ceiling
-means presumptively converted → KILL cheaply without the window grid;
-(2) the **depth sweep** as the WHY-diagnostic when per-token is high.
+### 2. Analysis convention to keep applying
+Always report **g_agg beside g**. If g_agg ≈ g the window gain is real
+aggregation; if g ≫ g_agg it is probe capacity (RECORD § 3c). This is now
+the discriminating test in every card I froze after sc_lambda.
 
 ### Parked (do NOT run)
 Proof-op Stage-2 on distill L12; gpt2-scale order cell. Hedging-level
-Stage-2 and the early-layer g(ℓ) addendum are **runpod-e's**, not mine.
-
----
+Stage-2 and the early-layer g(ℓ) addendum are **runpod-e's**.
 
 ## Binding conventions I must not violate
 1. **Commit the card BEFORE the run** — git order is the evidence.
