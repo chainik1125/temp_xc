@@ -1019,3 +1019,41 @@ manifests `man_ver_*` / `man_case_*` (+ `_null_`), 20k rows/class.
 **Batch status: acceptance gate (≥ 3 shipped bundles) MET with 4
 screen-ready labels across 3 bundles; continuing down the priority
 list (verbosity, redundancy) per quantity mode.**
+
+
+---
+
+## 2026-07-24 — runpod-b · FACTORY BUNDLE 4: `verbosity` — vlevel KILLED at triage (free kill), vslope SHIPPED
+
+Fourth item of `briefings/candidate-factory-traces.md`. Builder +
+frozen card committed before outputs (commit "factory: verbosity
+builder/card …"). The kill authority did its job:
+
+- **vlevel (the intended primary) FAILS label-side triage**:
+  current-token-identity AUC 0.6538 ≥ the frozen
+  0.65 kill line (position was clean:
+  0.546). Reading: in R1 math traces the
+  verbosity REGISTER is lexically readable from a single token (prose
+  words vs symbol-pushing) — a per-token probe inherits that floor, so
+  the aggregation story has no clean face. Manifests dropped, npz does
+  NOT carry the label; `verbosity_stats.json` is the kill receipt. A
+  free kill before any GPU minute — quantity mode working as intended.
+- **vslope (secondary) SHIPPED**: triage PASS, token-blind
+  (0.536) and position-blind
+  (0.530) — differencing removes the
+  register's lexical signature. corr(vlevel, vslope) =
+  -0.04; slope's length-shuffle null corr
+  0.005 (≈ 0 by construction — slopes are
+  pure order). **Honest screen prior, stated up front: the
+  hedging-LEVEL lesson says slopes are the HARD face for aggregation
+  recovery (they collapse to anchor − mean), so this bundle carries
+  high screen-kill risk — that outcome would also be sound.**
+- Boundary-count evidence line (both labels): AUC BELOW 0.5 as
+  expected (count ∝ 1/length) — direction-agnostic ceiling at T32 ≈
+  0.70
+  for vslope. Bundle: `labels/verbosity.npz` (vslope family +
+  `cur_sent_len` ambient control + `tok_in_sent`), stats JSON with
+  both verdicts, card `verbosity/CARD_DRAFT.md`.
+
+Batch: 5 screen-ready labels + 1 honest kill across 4 bundles.
+Candidate 5 (window redundancy rate) next.

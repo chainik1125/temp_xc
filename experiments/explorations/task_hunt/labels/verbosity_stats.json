@@ -1,0 +1,98 @@
+{
+ "frozen": {
+  "window": {
+   "k": 8,
+   "min_prev": 4,
+   "aggregate": "unweighted mean / OLS slope, current sentence excluded"
+  },
+  "null_seed": 104,
+  "seed": 0,
+  "mask": "none (no token-local leak of previous lengths); cur_sent_len is the disclosed ambient control"
+ },
+ "stream_shape": [
+  4044,
+  128
+ ],
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "n_roundtrip_mismatch_tokens": 149,
+ "labels": {
+  "vlevel": {
+   "label_coverage_rate": 0.9286488083513886,
+   "bin_scheme": "terciles",
+   "edges": [
+    16.75,
+    22.0
+   ],
+   "null_corr_with_real": 0.38252033840471716,
+   "cur_sent_len_by_bin": [
+    22.721933840822746,
+    28.057721686232952,
+    35.04770426671273
+   ],
+   "manifest_rows_per_class": 20000,
+   "triage": {
+    "tok_auc_extreme": 0.6537586457954132,
+    "pos_auc_extreme": 0.5461678649435748,
+    "tok_kill_at": 0.65,
+    "pos_kill_at": 0.7,
+    "verdict": "FAIL",
+    "tok_auc": 0.6537586457954132,
+    "pos_raw_auc": 0.5439835339851267,
+    "pos_frac_auc": 0.5461678649435748,
+    "n_test_rows": 7852
+   },
+   "visible_evidence_auc": {
+    "T8": 0.41999031410889803,
+    "T16": 0.351384334858807,
+    "T32": 0.23558203104685632
+   },
+   "build_sanity": {
+    "manifest_size_ok": true,
+    "autocorr_monotone": true,
+    "monotone_gated": true
+   },
+   "shipped": false
+  },
+  "vslope": {
+   "label_coverage_rate": 0.9286488083513886,
+   "bin_scheme": "terciles",
+   "edges": [
+    -0.773809552192688,
+    0.6666666865348816
+   ],
+   "null_corr_with_real": 0.004906635790670722,
+   "cur_sent_len_by_bin": [
+    28.906591572799332,
+    26.567814121923742,
+    30.386959515285046
+   ],
+   "manifest_rows_per_class": 20000,
+   "triage": {
+    "tok_auc_extreme": 0.5355663512860827,
+    "pos_auc_extreme": 0.5304040261684765,
+    "tok_kill_at": 0.65,
+    "pos_kill_at": 0.7,
+    "verdict": "PASS",
+    "tok_auc": 0.5355663512860827,
+    "pos_raw_auc": 0.5249940740872814,
+    "pos_frac_auc": 0.5304040261684765,
+    "n_test_rows": 7954
+   },
+   "visible_evidence_auc": {
+    "T8": 0.48328636545642745,
+    "T16": 0.42498464700180427,
+    "T32": 0.3031354258681122
+   },
+   "build_sanity": {
+    "manifest_size_ok": true,
+    "autocorr_monotone": true,
+    "monotone_gated": false
+   },
+   "shipped": true
+  }
+ },
+ "corr_vlevel_vslope": -0.03768440150016912,
+ "shipped_labels": [
+  "vslope"
+ ]
+}
