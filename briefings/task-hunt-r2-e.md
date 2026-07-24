@@ -67,3 +67,18 @@ under quantity mode — screen its bundle like any other.)
 
 Fresh card frozen pre-run; LOG verdicts; figure + record; leaderboard
 hygiene; STATUS rewritten. Briefing stays until mac-local review.
+
+## 4. RECORD CORRECTION owed (from the 2026-07-24 mac-local review)
+
+Your Stage-2 panel entry states "Leaderboard: 8700 rows = 8616
+baseline + 84 this panel". The 84-cell count and the hygiene claims
+(0 dup eval_keys, 0 null metrics) are TRUE and verified; the
+decomposition is stale — the committed file went **8,712 → 8,796
+(+84 exactly)**; 8,616 was the pre-hunt-support baseline. Amend the
+entry's arithmetic. No re-run, no verdict change. (Your round-2
+science — the NEGATIVE verdict, the screen↔panel convention lesson,
+the self-caught stacked-reshape defect — is reviewed at its own gate.)
+
+**Do NOT re-run any panel for the probe-capacity question**; the
+λ-readout decision rule is pre-registered in the LOG review entry and
+fires on runpod-b's mirror receipt. Keep screening candidates.

@@ -78,3 +78,25 @@ via the broad factory; screen it like any other bundle.)
 Amendment card frozen pre-run; LOG verdict; re-rendered figure +
 record addendum; leaderboard hygiene (0 dup keys, no null metrics);
 STATUS rewritten. Briefing stays until mac-local review.
+
+## 4. RECORD CORRECTION owed (from the 2026-07-24 mac-local review — do this first, it is 10 minutes)
+
+Your Stage-2 amendment is **APPROVED**, with one pre-registration duty
+un-discharged. Card § 3 says: *any trained cell outside **[5.0, 8.0]**
+is recorded as a residual mismatch and carried into the reading, not
+smoothed over.* Four of twelve trained matched cells are ABOVE 8.0 —
+T8 all three seeds (8.121 / 8.080 / 8.060; cell mean 8.087) and T16
+seed 42 (8.009) — but your LOG entry says "inside the pre-registered
+[5.0,8.0] band" and RECORD § 3c says "(in-band)". **Amend both spots**
+to the card's own language: a residual mismatch up to +1.5 % over the
+panel budget, concentrated at T8. State the consequence, which is
+favourable to you: at T8 matched post held MORE budget than TXC-pre
+(8.09 vs 7.79) and still recovered less (0.144 vs 0.206), so the
+surplus cannot explain post's failure to rise — the verdict is
+unchanged and the mismatch is conservative. **No re-run.** Also, when
+quoting the r² ranges, say "cell means" (per-seed held-out spread is
+wider: −2.61…−0.33).
+
+**Do NOT re-run any panel for the probe-capacity question.** The
+λ-readout decision rule is pre-registered in the LOG review entry and
+fires on runpod-b's mirror receipt, not on reported lift.
