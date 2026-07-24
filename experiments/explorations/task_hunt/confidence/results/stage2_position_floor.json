@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "features": "[p, p^2] leading-edge position only",
+    "card": "card_stage2.md \u00a710.2",
+    "off_leaderboard": true
+  },
+  "T1": {
+    "pos_floor_r": 0.008923723043095149,
+    "n_train": 27143,
+    "n_eval": 26018
+  },
+  "T2": {
+    "pos_floor_r": 0.010409894725872743,
+    "n_train": 13579,
+    "n_eval": 13037
+  },
+  "T4": {
+    "pos_floor_r": 0.016543443586877694,
+    "n_train": 6788,
+    "n_eval": 6527
+  },
+  "T8": {
+    "pos_floor_r": 0.02021734163437729,
+    "n_train": 3393,
+    "n_eval": 3269
+  },
+  "T16": {
+    "pos_floor_r": 0.024856918002863604,
+    "n_train": 1702,
+    "n_eval": 1636
+  }
+}

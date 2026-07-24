@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "ds": "ward_real_slope8_distill_l14",
+    "eval_window_L": 32,
+    "off_leaderboard": true,
+    "card": "card_stage2.md \u00a76"
+  },
+  "raw_tok": {
+    "lambda_recovery": 0.22050136671454437,
+    "lambda_r2": -0.2771545648574829,
+    "lambda_chance": -0.02381921098505042
+  },
+  "raw_mean_T2": {
+    "lambda_recovery": 0.20256544770992815,
+    "lambda_r2": -0.5685807466506958,
+    "lambda_chance": 0.026949942826605115
+  },
+  "raw_mean_T4": {
+    "lambda_recovery": 0.1544870614050075,
+    "lambda_r2": -1.7164294719696045,
+    "lambda_chance": -0.0014092601918679907
+  },
+  "raw_mean_T8": {
+    "lambda_recovery": 0.13857542583358734,
+    "lambda_r2": -3.92350435256958,
+    "lambda_chance": -0.006563190139612797
+  },
+  "raw_mean_T16": {
+    "lambda_recovery": 0.19285370114326064,
+    "lambda_r2": -1.0149176120758057,
+    "lambda_chance": 0.026692886785905184
+  }
+}
