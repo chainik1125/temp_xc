@@ -47,7 +47,9 @@ CACHE_ROOT = Path("/workspace/conv_depth_caches")
 HERE = Path(__file__).resolve().parent
 LABELS = HERE.parent / "labels" / "confidence.npz"
 RES = HERE / "results"
-SCREEN_HS = 14                    # resid_post L13, g(l) peak
+SCREEN_HS = 15                    # resid_post L14 — nearest captured
+                                  # L13-equivalent (cache_depth stores
+                                  # odd hs = resid_post of even layers)
 T_GRID = [16, 32, 64]
 MLP_T = [32, 64]
 NULL_T = 32

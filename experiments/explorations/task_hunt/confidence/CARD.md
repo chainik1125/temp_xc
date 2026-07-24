@@ -84,7 +84,11 @@ does NOT kill this candidate (slope4 support ≈ 64 tokens = T64).
 - **Substrate:** Ward stream rebuilt on the runpod-e volume (stats
   reproduce the committed reference, map_ok 99.97 %); readers = base +
   distill via the committed `cache_depth.py`; screen layer resid_post
-  L13 = hs14 (the measured g(ℓ) peak) for both.
+  **L14 = hs15** for both — corrected pre-run from "L13 = hs14": the
+  g-peak-at-L13 number is from the EM cache's even-index capture, while
+  `cache_depth.py` captures resid_post of EVEN layers only (odd hs);
+  hs15 is the nearest captured L13-equivalent (no screen cell had run
+  at correction time).
 - **Rows** (`screen.py build_rows`): eligibility valid ∧ p ≥ 63
   (uniform so every screened T ≤ 64 fits) ∧ hedge(anchor) ≥ 0; split by
   trace (labels' `trace_split`); caps 4000/1500 per class.
