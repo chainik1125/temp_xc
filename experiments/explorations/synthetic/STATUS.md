@@ -34,7 +34,8 @@ Last updated: 2026-07-23.
   (mid-depth residuals already summarize any per-token-traceable
   temporal latent). Verdicts + binding review notes:
   `task_hunt/LOG.md`; methods: `task_hunt/RECORD.md`. **ROUND 2
-  dispatched** (`briefings/task-hunt-r2.md`): budget-matched TXC-post
+  dispatched** (`briefings/task-hunt-r2-d.md` / `-e.md`, one per
+  pod): budget-matched TXC-post
   re-run + figure l0 annotation (runpod-d); hedging-LEVEL Stage-2 on a
   fresh card (aggregation-framed win accepted by program decision) +
   early-layer g_order(ℓ)/g_agg(ℓ) addendum (runpod-e, after its

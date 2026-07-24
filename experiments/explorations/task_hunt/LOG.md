@@ -627,8 +627,9 @@ convention: per-token-first triage (a cheap per-token-only probe
 gates the full window grid; all five round-1 kills were visible
 there). PARKED post-rebuttal: gpt2-scale order cell, anti-conversion
 candidate class, cand-2 Stage-2 on distill L12 (weak contrast; panel
-unlikely to clear it before Sunday). Round-2 brief:
-`briefings/task-hunt-r2.md`; round-1 briefings retired.
+unlikely to clear it before Sunday). Round-2 briefs:
+`briefings/task-hunt-r2-d.md` / `task-hunt-r2-e.md` (split per agent,
+one briefing per pod as in round 1); round-1 briefings retired.
 
 **Addendum (mac-local, same day): the cand-3 POST-HOC depth sweep
 (runpod-d, entry above) is also REVIEWED — APPROVED.** Freeze order

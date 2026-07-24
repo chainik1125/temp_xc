@@ -42,7 +42,8 @@ All in `task_hunt/LOG.md` (my review entry at the end) + `RECORD.md` +
   (LOG addendum): kill mechanism corrected to CONVERSION (not lexical
   circling); fourth g(ℓ) shape (built-and-immediately-linearized);
   depth sweep adopted as the cheap WHY-diagnostic.
-- **Round 2 dispatched**: `briefings/task-hunt-r2.md` — runpod-d:
+- **Round 2 dispatched**: `briefings/task-hunt-r2-d.md` +
+  `task-hunt-r2-e.md` (split per pod) — runpod-d:
   budget-matched TXC-post re-run + figure l0 annotation; runpod-e
   (idle, caches hot): hedging-LEVEL Stage-2 (fresh card,
   aggregation-framed win accepted) + early-layer addendum. New
@@ -67,4 +68,5 @@ All in `task_hunt/LOG.md` (my review entry at the end) + `RECORD.md` +
 - Parked: gpt2 order cell, anti-conversion class, proof-op Stage-2,
   onset head-to-head, synthetic autoresearch resumption.
 - Git: clean at last push; briefings retired: task-hunt{,-b,-prep},
-  txcpro-dissection. Remaining: em-redo, task-hunt-r2.
+  txcpro-dissection. Remaining: em-redo, task-hunt-r2-d,
+  task-hunt-r2-e, hunt-support-synthetic, hunt-support-stats.
