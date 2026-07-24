@@ -1,0 +1,37 @@
+{
+ "dataset": "allenai/WildChat-1M",
+ "revision": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+ "license": "ODC-By 1.0",
+ "stream_prefix": 20000,
+ "n_streamed": 20000,
+ "n_english": 9464,
+ "frozen_list": {
+  "repo": "github.com/andyrdt/refusal_direction",
+  "commit": "9d852fae1a9121c78b29142de733cb1340770cc3",
+  "symbol": "pipeline/submodules/evaluate_jailbreak.py:_test_prefixes_jailbreakbench",
+  "n_substrings": 12
+ },
+ "kill_bar_turn_rate": 0.02,
+ "populations": {
+  "a4": {
+   "min_assistant_turns": 4,
+   "n_conversations": 2055,
+   "n_assistant_turns": 14982,
+   "n_marker_turns": 2197,
+   "marker_turn_rate": 0.14664263783206513,
+   "frac_convs_ge1_marker": 0.4442822384428224,
+   "frac_convs_ge2_marker": 0.25498783454987833,
+   "kill_fires": false
+  },
+  "a8": {
+   "min_assistant_turns": 8,
+   "n_conversations": 681,
+   "n_assistant_turns": 8080,
+   "n_marker_turns": 1198,
+   "marker_turn_rate": 0.14826732673267326,
+   "frac_convs_ge1_marker": 0.5521292217327459,
+   "frac_convs_ge2_marker": 0.37738619676945667,
+   "kill_fires": false
+  }
+ }
+}
