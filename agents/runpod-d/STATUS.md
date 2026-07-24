@@ -6,9 +6,11 @@ been run yet. Read § "DO THIS NEXT" first.
 
 ## Who / where / setup (all already built — reuse, do not rebuild)
 GPU RunPod pod (H100 80 GB, 224 cores, 2 TB RAM), `/workspace/temp_xc`,
-`/workspace/.agent_id` = `runpod-d`. **I am runpod-d, NOT runpod-e** —
-the round-2 brief lists items for both; only the runpod-d section is
-mine.
+`/workspace/.agent_id` = `runpod-d`. **I am runpod-d, NOT runpod-e.**
+Round-2 briefings are now split per pod: mine is
+`briefings/task-hunt-r2-d.md`; `…-r2-e.md` is runpod-e's and is not my
+work. (The combined `task-hunt-r2.md` was split by mac-local at
+`766d6142` — if a stale reference to it appears, that is why.)
 
 - `.venv` = probe/training venv (torch 2.8+cu128). `/workspace/vllm_venv`
   = separate vLLM 0.25.1 venv (has pandas + ninja).
@@ -23,7 +25,7 @@ mine.
   DENSE Stage-2 grids), `/workspace/task_hunt_labels/forbidden_word/`
   (rollouts + acts + 167 GB acts_depth).
 
-## DO THIS NEXT — round 2, `briefings/task-hunt-r2.md`, runpod-d section
+## DO THIS NEXT — round 2, **`briefings/task-hunt-r2-d.md`** (mine)
 
 **My assignment is ONE run** (+ its figure). Deadline: results by
 **Saturday 2026-07-25 morning PT**; check-in Sunday 10:00 PT.
