@@ -1923,3 +1923,70 @@ First application: B7's builder (conversation-mean AUC is exactly
 its named axis-b risk).
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_
+
+## 2026-07-24 — runpod-b — probe-adequacy machinery (`briefings/probe-adequacy.md`) — contingency build COMPLETE at the acceptance gate; NO readout decision taken, NO leaderboard writes
+
+The λ-readout methods decision stays mac-local's; the probe-capacity
+findings this build responds to remain **reported, under review**
+(runpod-d and runpod-e's 2026-07-24 entries above; RECORD_B § 1d). This
+entry ships the machinery that makes the decision executable either way.
+
+**1 — `lambda_recovery_v2` plugin** (new file + additive dispatch +
+YAML; `lambda_recovery.py` untouched). Opt-in via eval_cfg
+`lambda_probe_v2: true`; flag absent → byte-identical rows, evaluator
+protocol stays 1.3.0. v2 IMPORTS v1's window sampler and tile readout,
+so the readout convention is identical by construction; only the
+capacity knobs change: RidgeCV `logspace(-2, 4, 13)` selected inside
+the train half only (selected α ships as `lambda_alpha_v2`; all 72 α
+selections recorded in runpod-d's diagnostic are interior), nw default
+8192 (= 8·p rows at the T = 16 / p = 2048 anchor; Stacked's T·d_sae
+read stays p > n and is disclosed in the spec), boundary-snap trace
+split (below). Both Ward datasources now expose `trace_ids` (additive
+extra, v1 never reads it); `grid.run_cell` gained an `eval_extra`
+pass-through (default {} → unchanged for every existing caller). 12
+contract tests (`tests/test_lambda_recovery_v2.py`): ols + nw 1024
+reproduces v1 to 1e-10 on finite and NaN grids; determinism; the trace
+split never separates a trace's windows and degenerates to v1's n//2
+without trace_ids; `run.py validate` green; the smoke sweep YAML
+(`configs/sweeps/lambda_probe_v2_smoke.yaml`) pins every knob. Full
+suite 292 passed / 1 skipped. The smoke sweep is committed NOT run —
+sweeps write leaderboard rows and this task ships none.
+
+**2 — split-integrity forensics** (`lambda_intensity/split_forensics.py`
+→ `results/split_forensics.json`, script committed before output). The
+stream is trace-contiguous by construction (`build_stream`: traces in
+order, windows in position order) and verified from the committed npz
+(trace_idx monotone; 300 traces, ≤ 15 windows each;
+`confidence.npz` carries the identical grid, so one receipt covers
+both panel datasources). Exactly ONE trace straddles n//2 = 2022:
+trace 152, 14 windows train-side / 1 eval-side. Draw-level: v1 samples
+with seed 0 (train) / 1 (eval) in every cell (`lambda_recovery_metrics`
+never forwards a seed), and at the committed setting nw = 1024 **zero
+eval draws touch the straddling trace — no committed panel number on
+either datasource is affected by split leakage**. At nw = 8192 (the
+diagnostics' and v2's setting) the raw half-split leaks 2/8192 eval
+draws (worst-case |Δr| ≤ ~5e-4); the boundary snap (split 2022 → 2023)
+leaks zero at both nw. Hence v2's default `split: trace`, with `half`
+kept for exact-v1 comparison.
+
+**3 — variance-machinery readiness** (`support_stats/stage2_variance.py`).
+Now probe-agnostic: `--ds / --probe {v1,v2} / --metric / --k-pos /
+--crosscheck-json / --out-prefix`; a v2 re-base is one command writing
+`stage2_variance_v2.*` beside the committed receipts, never over them.
+Defaults reproduce the committed receipts byte-identically (verified,
+empty diff). Latent defect found and fixed in the same change: the old
+loader keyed rows on (arch, T, seed, kind) with no k_pos or probe
+filter, so TODAY'S leaderboard (108 rows for the λ̂ datasource — the
+post-matched k_pos = 8·T amendment rows landed after the receipts)
+aborts it on 24 duplicate cells; the new filters restore the 84-row
+panel population by design, not by accident.
+
+**4 — freeze-candidate spec**
+(`lambda_intensity/PROBE_V2_SPEC.md`): the exact v2 convention, the
+re-run inventory (108 + 84 = 192 eval-only cells, all checkpoints
+reused; cost arithmetic ≈ 3–4 h wall at 3 workers, < 3 GPU-hours of
+encode), the one-command variance re-base, and an explicit
+what-this-does-NOT-decide section. Written to be adopted by freezing
+the file as-is.
+
+Stopped at the acceptance gate for mac-local review; the briefing stays.
