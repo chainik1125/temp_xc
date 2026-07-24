@@ -254,19 +254,32 @@ bootstrap, and Ward-stream bundles cluster by **trace**, not stream row.
 No unigram or position numbers are recomputed for bundles I did not
 build.
 
+**Outcome column revised 2026-07-24 (late)** after runpod-e withdrew
+their `tss` KILL and `novelty` NEGATIVE (scoring error in their own
+best-window rule; both re-score KEEP as the cards are written, pending
+review of the convention itself). The measurements below are unchanged —
+only the labels are.
+
 | face | doc-mean-only (dir-agnostic) | 95 % CI | clusters | screen outcome |
 |---|---|---|---|---|
 | verbosity `vslope` (Ward) | 0.554 | [0.531, 0.577] | 60 | — |
-| interleave `tss` | 0.675 | [0.619, 0.713] | 40 | **KILL (converted)** |
+| interleave `tss` | 0.675 | [0.619, 0.713] | 40 | KEEP-pending-review (KILL withdrawn) |
 | novelty `nov_raw` (400 docs) | 0.758–0.767 | [0.712, 0.802] | 80 | disclosed secondary |
 | oprate `ver` / `case` (Ward) | 0.771 | [0.718, 0.818] | 56 | — |
-| novelty `nov_resid` (400 docs) | 0.760–0.784 | [0.710, 0.819] | 80 | **NEGATIVE** |
+| novelty `nov_resid` (400 docs) | 0.760–0.784 | [0.710, 0.819] | 80 | KEEP-pending-review (NEGATIVE withdrawn) |
 | qrate (Ward) | 0.803 | [0.755, 0.845] | 60 | — |
 | sc_lambda (Ward λ̂) | 0.804 | [0.758, 0.836] | 60 | — |
 | **punctint q** (4,000 docs) | 0.901–0.902 | [0.886, 0.917] | 800 | **KEEP** |
-| dialevel `tlevel` | 0.965 | [0.941, 0.983] | 837 | screen foreclosed (qual. 2) |
+| dialevel `tlevel` | 0.965 | [0.941, 0.983] | 837 | WEAK; naive arm uninterpretable |
 | **punctint list** (4,000 docs) | 0.966 | [0.958, 0.973] | 800 | WEAK KEEP |
 | **refmark** (2,000 convs) | 0.974–0.975 | [0.964, 0.983] | 400 | ships, screen pending |
+
+Two reconciliations with runpod-e's own numbers, which differ because
+the row sets differ (they measure on each face's screened eligible
+pool, this table on the shipped manifest, test documents only): they
+report dialevel at **0.983–0.986** across three models where this table
+has 0.965 on gpt2 manifest rows, and `tss` at **0.664–0.670** against
+0.675 here. Same conclusion at both resolutions; neither ordering moves.
 
 **The statistic corroborates judgments the program reached by hand:**
 `dialevel` lands at 0.965 — mac-local's qualification 2 foreclosed its
@@ -276,11 +289,17 @@ puts it exactly there. The converted KILL and the NEGATIVE family sit
 low; a pure trailing-slope face sits lowest.
 
 **And it argues against making the statistic a kill bar.** Any
-threshold separating the low families from the loud ones — anywhere in
-0.82–0.88 — sits BELOW **punctint q at 0.901, the hunt's only
-unconditional KEEP**, which passed both frozen bars, cleared its
-position floor, and survived an explicit within-document contrast. Such
-a rule would have killed it before it was screened. The adopted design —
+threshold in the 0.82–0.88 region sits BELOW **punctint q at 0.901, the
+hunt's only unconditional KEEP**, which passed both frozen bars, cleared
+its position floor, and survived an explicit within-document contrast.
+Such a rule would have killed it before it was screened. This argument
+does not depend on the two withdrawn verdicts: punctint q's KEEP is
+untouched by runpod-e's scoring error (which understated windows, so
+re-scoring can only strengthen a KEEP), and runpod-e's own collision
+note reaches the same recommendation from the *causal* side — dialevel
+is the one face screened both naively and under a document-identity
+control, and the control turned a +0.13…+0.20 naive gap into
+−0.097/−0.007/+0.035. The adopted design —
 a reported disclosure statistic that makes a within-document contrast
 MANDATORY for any face that KEEPs — is what this evidence supports.
 Caveats: eleven faces, five corpora, cluster counts from 40 to 837 (CI

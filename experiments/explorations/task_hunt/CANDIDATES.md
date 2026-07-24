@@ -139,8 +139,16 @@ verbosity dies on a Ward-specific artifact.
   117 (q) / 52 (refmark)** test documents at ≥ 20 manifest rows per
   class. `is_user_echo` ships in the scaled refmark npz (0.52 % of
   manifest rows). Threshold dataset for the deferred `doc_mean_only_auc`
-  bar: the one NEGATIVE family sits at 0.760–0.784 [0.710, 0.819] with
-  no CI overlap against any surviving face (lowest KEEP bound 0.886).
+  bar, now **eleven faces** with CIs (`labels/docmean_index.json`,
+  `SCALEUP.md` §7), spanning 0.554 (Ward `vslope`) to 0.975 (refmark).
+  **Recommendation to the review: do NOT promote it to a kill bar** —
+  any threshold that separates the low families sits below **punctint q
+  at 0.901, the hunt's only unconditional KEEP**; keep it a disclosure
+  statistic that triggers a mandatory within-document contrast (the same
+  conclusion runpod-e's collision note reaches causally via dialevel).
+  Revised late 2026-07-24: the earlier "0.82–0.88 separates NEGATIVE
+  from surviving" reading is WITHDRAWN with runpod-e's `novelty`
+  NEGATIVE verdict; the measurements are unchanged.
 
 ---
 

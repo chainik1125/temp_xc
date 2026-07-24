@@ -2930,3 +2930,48 @@ identical to 17 significant figures on a corpus ten times the size.
 Receipt: `labels/verify_prefix_labels.json`.
 
 _Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+
+## 2026-07-24 — runpod — corpus scale-up, record correction: the two withdrawn verdicts land on my threshold table, and the recommendation survives them
+
+runpod-e's `tss`-KILL and `novelty`-NEGATIVE withdrawals, and their
+collision note addressed to my item-3 table, landed while my
+eleven-face entry was being written. Both of my scale-up entries that
+carry a screen-outcome column are stale in exactly the way their note
+says. Correcting the record here, since the LOG is append-only:
+
+1. **The "0.82–0.88 gap separates the screened-NEGATIVE family from the
+   surviving ones" reading is WITHDRAWN.** It rested on `novelty` being
+   NEGATIVE; it no longer has a NEGATIVE anchor. My own entry's caution
+   ("a correlation over four faces, not kill authority") is now the whole
+   of what those rows can say, exactly as runpod-e wrote.
+2. **Outcome labels corrected**: `tss` and `novelty nov_resid` read
+   KEEP-pending-review, not KILL/NEGATIVE; `dialevel` reads WEAK with an
+   uninterpretable naive arm rather than "screen foreclosed". The
+   MEASUREMENTS are unchanged — no number in `docmean_index.json`,
+   `punctint4k_stats.json` or `refmark2k_stats.json` depends on a screen
+   verdict. `SCALEUP.md` §7 and the ledger bullet are revised in place
+   and say they were.
+3. **The recommendation not to promote `doc_mean_only_auc` to a kill bar
+   SURVIVES, and gets stronger.** My argument never used the withdrawn
+   verdicts: it uses **punctint q at 0.901**, the hunt's only
+   unconditional KEEP, which any 0.82–0.88 threshold would have killed
+   before it was screened — and punctint q is untouched by runpod-e's
+   scoring error, which understated windows and so can only strengthen a
+   KEEP on re-score. runpod-e's note reaches the same recommendation from
+   the *causal* side (dialevel: naive +0.13…+0.20 → within-dialogue
+   −0.097/−0.007/+0.035). A correlational argument from eleven faces and
+   a causal one from the single face screened both ways now agree.
+4. **Number reconciliation, since both tables will be read together.**
+   They measure on each face's screened eligible pool; I measure on the
+   shipped manifest, test documents only. dialevel: their 0.983–0.986
+   (3 models) vs my 0.965 (gpt2 manifest). `tss`: their 0.664–0.670 vs
+   my 0.675. Same ordering, same conclusion, different row sets — worth
+   stating so nobody reads the gap as a disagreement.
+
+One consequence for the campaign's own framing, stated because it cuts
+against my item-1 entry's tidiness: with `novelty` no longer NEGATIVE,
+the scale-up's threshold contribution is a *distribution*, not a
+separation. That is what the briefing asked for.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
