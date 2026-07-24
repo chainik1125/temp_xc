@@ -1,55 +1,62 @@
 # Working state — agent `runpod-e`
 
-**Last rewrite:** 2026-07-24, mid-session (replag screen: llama running).
+**Last rewrite:** 2026-07-24 ~02:45, mid-session (candidates 1+2 CLOSED,
+starting candidate 3).
 
 ## Who / where
-GPU RunPod pod (H100 80GB), `/workspace/temp_xc`, `/workspace/.agent_id`
-= `runpod-e`. Task-hunt arm B (`briefings/task-hunt-b.md`). Git identity
-`runpod-e-agent`; creds `store --file=/workspace/.git-credentials`;
-`HF_TOKEN` from `/workspace/.tokens/hf_token` (export per command;
-gemma is gated). Pull-rebase before EVERY push (5 agents on `arxiv`).
+H100 pod, `/workspace/temp_xc`, `/workspace/.agent_id` = `runpod-e`.
+Task-hunt arm B (`briefings/task-hunt-b.md`). Git `runpod-e-agent`,
+creds `store --file=/workspace/.git-credentials`; `export
+HF_TOKEN=$(cat /workspace/.tokens/hf_token)` per command (gemma gated);
+`ANTHROPIC_API_KEY` in ~/.bashrc from `/workspace/.tokens/`.
+Pull-rebase before EVERY push. Deadline 2026-07-26 morning PT.
 
-## Candidate 1 (repetition-lag Δ) — state
-- CARD frozen + committed BEFORE screens (`task_hunt/replag/CARD.md`).
-- Labels: built inline (runpod-b's landed later, different scheme —
-  cross-check only; see LOG duplication note). Manifests + stats
-  committed under `task_hunt/labels/replag_*`. All 5 sanity tests pass.
-  T4 amended pre-screen (two-sided null divergence; direction = real
-  BELOW null at Δ≤4 — LOG entry).
-- Caches on volume: `/workspace/replag_caches/<model>/{tokens,delta}.npz`
-  + hs*.npy (gpt2 hs7, gemma2 hs14, llama hs14 + alternates).
-- Screen results so far (`replag/results/screen_*.json`):
-  **gpt2 + gemma DONE, llama RUNNING** (bg process; log at scratchpad
-  `screen.log`). Pattern both models: detection CONVERTED (per-token
-  0.75–0.97 AUC, window gap ≤ 0 at every T — NO ladder ⇒ frozen rule
-  heads to KILL unless llama diverges); lag4 shows a real
-  order-carried MLP gap (gpt2 T8 +0.114 over tok, shuffle collapses
-  it; gemma only +0.019 — order gap SHRINKS with scale).
-- Escalation enacted (card-pre-authorized, LOG-noted, committed):
-  `REPLAG_ESCALATE_LAG4=1` extends lag4 MLPs to all T. RUN THIS after
-  llama's base grid: `.venv/bin/python -m
-  experiments.explorations.task_hunt.replag.screen` with that env var
-  (resumable — only adds missing cells).
-- Then: `render_screen.py` (figs), verdict entry in `task_hunt/LOG.md`
-  (KEEP/KILL per card §Falsifier), commit, STATUS rewrite.
+## DONE (verdicts committed in `experiments/explorations/task_hunt/LOG.md`)
+- **Candidate 1 (repetition-lag Δ): KILL** — detection converted
+  (regime-1) at all scales gpt2/gemma2/llama8b; order-residue on lag
+  VALUE only, big in gpt2 (+0.11), thin at 2B/8B (+0.02). Results:
+  `task_hunt/replag/results/` + figs. Volume caches:
+  `/workspace/replag_caches/`.
+- **Candidate 2 (confidence trend): KILL** — window gap real, monotone
+  in T (distill mean-probe 0.521→0.565, tok 0.468), state control
+  regime-1, but AGGREGATION-carried (mean ≥ flatten, shuffle retains)
+  ⇒ order receipt fails. Regime-2 re-card seed recorded in LOG.
+  Results: `task_hunt/confidence/results/`. Ward stream + base/distill
+  17-layer caches on `/workspace/conv_depth_caches/` (traces.json
+  re-ported per stage_a/ATTRIBUTION.md, gitignored).
 
-## Candidate 2 prep (running in bg, no screening before verdict)
-- Ward stream REBUILT on this volume (`/workspace/conv_depth_caches/
-  ward_stream`; stats reproduce committed reference, map_ok 99.97%).
-  traces.json re-ported from origin/aniket-ward-stage-b per
-  ATTRIBUTION.md (gitignored).
-- `cache_depth.py base` then `distill` running in bg (17 capture
-  points each, ~68 GB per model; log `cache_depth.log`).
-- Candidate 2 (confidence trend) card FROZEN by runpod-b
-  (`task_hunt/confidence/CARD.md`) — I append screen cells. Clock
-  bridge measured: slope4 support ≈ 64 tok ⇒ T=64 reaches full
-  coverage — NOT killed. Labels `task_hunt/labels/confidence.npz`
-  (Ward grid, manifests balanced; card requires hedge-class matching
-  on slope rows — implement at screen time). Screen T ∈ {16,32,64},
-  probe stack problib, readers base+distill mid-depth (hs14 = L13).
-- Candidate 3 (emotional instability) draft card staged by runpod-b —
-  only if candidate 2 dies/finishes early.
+## NOW: candidate 3 — emotional-instability onset (gemma-3-12b-it)
+Paper protocol in `docs/papers/gemma_needs_help.md` (prompts VERBATIM:
+elicitation App B — impossible numeric + 8-turn neutral rejections,
+temp 1; judge 0-10 App B.2; onset labeler App C.1). runpod-b draft:
+`task_hunt/emotional_instability/CARD.DRAFT.md` — I freeze my own CARD.
+Plan (freeze in CARD before each stage runs):
+1. **CARD.md**: substrate gemma-3-12b-it; ~300 8-turn conversations
+   (30 verified-impossible Countdown/fraction puzzles × 10 rollouts,
+   temp 1); labels = per-response frustration 0-10 + within-turn onset
+   token (string match from labeler JSON); **κ prereg gate on 30
+   dual-judged traces (κ ≥ 0.3, em_onset convention) BEFORE scaling;
+   ≤ $40 judge budget**; readouts (a) pre-onset anticipation D-ladder
+   (Ward D+ shape: within-[D_lo,D_hi] positives, far negatives, guard
+   band, identity+position matching, split by puzzle), (b) escalation
+   trend (turn-indexed); post-onset detection = lexically-stamped
+   SANITY ANCHOR only (a detection claim dies at the gate). Timescale:
+   measure tokens/turn on real rollouts, pick T honestly (screen
+   T ∈ {16,32,64}); honest "unreachable at panel-feasible T" kill
+   allowed.
+2. `emotional_instability/generate.py` — batched HF generation,
+   resumable, rollouts to volume (`/workspace/emo_caches/rollouts/`).
+3. `judge.py` — Anthropic API: κ pilot (30, dual sonnet+haiku) → gate
+   → full per-response scores + onset labels; committed JSONs.
+4. `build_labels.py` — token grid (chat template), onset token match,
+   turn index, frustration per response; probe manifests.
+5. `cache_acts.py` — mid-depth layer (~L24 of 48, d3840) over
+   conversations (long sequences, NOT 128-chunks).
+6. `screen.py` — frozen problib stack, same conventions as
+   replag/confidence screens.
+Verdict → LOG; if KEEP → Stage 2 single best cell (canonical runner).
 
-## Deadline
-Results by 2026-07-26 morning PT. Stage 2 (if any survivor): canonical
-runner only, single best cell.
+## Sibling state (for context)
+runpod-d: λ̂ card frozen, screen pending (its LOG entry). runpod-b:
+labels+cards shipped. Aniket's forbidden-word work: SILOED — don't
+consume.
