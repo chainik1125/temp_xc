@@ -1,0 +1,1304 @@
+{
+ "source": "fineweb4k_corpus.json.gz",
+ "source_meta": {
+  "dataset": "HuggingFaceFW/fineweb",
+  "name": "sample-10BT",
+  "split": "train",
+  "seed": 0,
+  "shuffle_buffer": 10000,
+  "n_docs": 4000,
+  "n_scanned": 43122,
+  "min_sents": 60,
+  "max_sents": 200,
+  "n_sentences": 375498,
+  "datasets_version": "4.8.5",
+  "splitter": "expansion.corpus.split_sentences v1"
+ },
+ "n_docs_used": 4000,
+ "seed": 0,
+ "frozen_logic": "punctint_lib (unchanged) \u2014 same kernel, grammar, zero_split scheme and position-matched manifests as the shipped 400-doc build",
+ "kernel": {
+  "half_life_sentences": 2,
+  "support_sentences": 8,
+  "mass_within_sentences": {
+   "1": 0.31241943340101597,
+   "2": 0.5333333333333333,
+   "4": 0.8,
+   "8": 1.0
+  }
+ },
+ "list_regex": "^\\s*(?:[-*]\\s|[\u2022\u25cf\u25aa\u2023\u25e6]\\s?|\\d{1,2}[.)]\\s|[a-z][.)]\\s|\\((?:\\d{1,2}|[ivxlc]+)\\))",
+ "min_manifest_pos": 32,
+ "manifest_cap_per_class": 100000,
+ "bootstrap": {
+  "unit": "document (cluster)",
+  "n_reps": 1000,
+  "ci_pct": [
+   2.5,
+   97.5
+  ],
+  "seed": 0
+ },
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_docs": 4000,
+   "n_tokens": 7913315,
+   "token_ids_prefix_matches_replag": true,
+   "doc_off_prefix_matches_replag": true,
+   "replag_prefix_tokens": 793831,
+   "new_tokens_needing_cache": 7119484,
+   "faces": {
+    "list": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.31241944432258606
+     ],
+     "event_sentence_rate": 0.05367272262435486,
+     "lam_zero_frac": 0.8943942240156907,
+     "lam_mean": 0.04159848764538765,
+     "lam_std": 0.1533091813325882,
+     "masked_token_frac": 0.038201183701141686,
+     "eligible_frac": 0.8789490877085014,
+     "manifest_cap_per_class": 100000,
+     "manifest_rows_per_class": 99996,
+     "manifest_rows_per_class_supported": 189959,
+     "within_document_contrast": {
+      "all": {
+       "docs_with_top_rows": 1159,
+       "docs_with_bottom_rows": 3919,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 1078,
+         "manifest_rows_in_those_docs": 102652
+        },
+        "5": {
+         "docs": 961,
+         "manifest_rows_in_those_docs": 86491
+        },
+        "20": {
+         "docs": 313,
+         "manifest_rows_in_those_docs": 31109
+        },
+        "50": {
+         "docs": 6,
+         "manifest_rows_in_those_docs": 698
+        }
+       }
+      },
+      "test": {
+       "docs_with_top_rows": 214,
+       "docs_with_bottom_rows": 785,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 199,
+         "manifest_rows_in_those_docs": 18857
+        },
+        "5": {
+         "docs": 173,
+         "manifest_rows_in_those_docs": 14779
+        },
+        "20": {
+         "docs": 56,
+         "manifest_rows_in_those_docs": 5374
+        },
+        "50": {
+         "docs": 3,
+         "manifest_rows_in_those_docs": 362
+        }
+       }
+      }
+     },
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5776595829250049,
+      "position_auc": 0.43436832805252973,
+      "doc_mean_only_auc": 0.9686193609213375
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.573625393020096,
+      "position_auc": 0.4730470631614288,
+      "doc_mean_only_auc": 0.9662726980843941
+     },
+     "bootstrap": {
+      "triage_all_eligible_rows": {
+       "unigram_auc": {
+        "point": 0.5776595829250049,
+        "point_direction_agnostic": 0.5776595829250049,
+        "n_rows": 1324171,
+        "n_pos": 34329,
+        "n_neg": 1289842,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5774240359653201,
+        "se": 0.006770795450455563,
+        "ci_lo": 0.5638282399535338,
+        "ci_hi": 0.5903542949211282,
+        "ci_lo_direction_agnostic": 0.5638282399535338,
+        "ci_hi_direction_agnostic": 0.5903542949211282,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.43436832805252973,
+        "point_direction_agnostic": 0.5656316719474703,
+        "n_rows": 1324171,
+        "n_pos": 34329,
+        "n_neg": 1289842,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.4338892806851328,
+        "se": 0.01797455871455263,
+        "ci_lo": 0.40108890241931067,
+        "ci_hi": 0.46847193555549294,
+        "ci_lo_direction_agnostic": 0.5315280644445071,
+        "ci_hi_direction_agnostic": 0.5989110975806894,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9686193609213375,
+        "point_direction_agnostic": 0.9686193609213375,
+        "n_rows": 1324171,
+        "n_pos": 34329,
+        "n_neg": 1289842,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9684648414275421,
+        "se": 0.0035304825498484772,
+        "ci_lo": 0.9614285366320603,
+        "ci_hi": 0.9748449405439654,
+        "ci_lo_direction_agnostic": 0.9614285366320603,
+        "ci_hi_direction_agnostic": 0.9748449405439654,
+        "n_degenerate_reps": 0
+       }
+      },
+      "triage_manifest_rows": {
+       "unigram_auc": {
+        "point": 0.573625393020096,
+        "point_direction_agnostic": 0.573625393020096,
+        "n_rows": 38093,
+        "n_pos": 17907,
+        "n_neg": 20186,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5734165641522334,
+        "se": 0.007213874605303134,
+        "ci_lo": 0.5588642116314425,
+        "ci_hi": 0.5872189302590446,
+        "ci_lo_direction_agnostic": 0.5588642116314425,
+        "ci_hi_direction_agnostic": 0.5872189302590446,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.4730470631614288,
+        "point_direction_agnostic": 0.5269529368385713,
+        "n_rows": 38093,
+        "n_pos": 17907,
+        "n_neg": 20186,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.4725803984629918,
+        "se": 0.01785897863382646,
+        "ci_lo": 0.43864678244136734,
+        "ci_hi": 0.5058932372183504,
+        "ci_lo_direction_agnostic": 0.5023189567519452,
+        "ci_hi_direction_agnostic": 0.5613532175586327,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9662726980843941,
+        "point_direction_agnostic": 0.9662726980843941,
+        "n_rows": 38093,
+        "n_pos": 17907,
+        "n_neg": 20186,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9661395316420008,
+        "se": 0.003759912496497233,
+        "ci_lo": 0.9584608408748224,
+        "ci_hi": 0.9728383742805674,
+        "ci_lo_direction_agnostic": 0.9584608408748224,
+        "ci_hi_direction_agnostic": 0.9728383742805674,
+        "n_degenerate_reps": 0
+       }
+      }
+     }
+    },
+    "q": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.15620972216129303
+     ],
+     "event_sentence_rate": 0.03743561883152507,
+     "lam_zero_frac": 0.8062449475874316,
+     "lam_mean": 0.036032725125551224,
+     "lam_std": 0.1003531739115715,
+     "masked_token_frac": 0.02657596721475134,
+     "eligible_frac": 0.8912767910793391,
+     "manifest_cap_per_class": 100000,
+     "manifest_rows_per_class": 99997,
+     "manifest_rows_per_class_supported": 529708,
+     "within_document_contrast": {
+      "all": {
+       "docs_with_top_rows": 2557,
+       "docs_with_bottom_rows": 3932,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 2489,
+         "manifest_rows_in_those_docs": 146339
+        },
+        "5": {
+         "docs": 2181,
+         "manifest_rows_in_those_docs": 131583
+        },
+        "20": {
+         "docs": 605,
+         "manifest_rows_in_those_docs": 50906
+        },
+        "50": {
+         "docs": 27,
+         "manifest_rows_in_those_docs": 4061
+        }
+       }
+      },
+      "test": {
+       "docs_with_top_rows": 519,
+       "docs_with_bottom_rows": 785,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 504,
+         "manifest_rows_in_those_docs": 28808
+        },
+        "5": {
+         "docs": 437,
+         "manifest_rows_in_those_docs": 26180
+        },
+        "20": {
+         "docs": 117,
+         "manifest_rows_in_those_docs": 9545
+        },
+        "50": {
+         "docs": 7,
+         "manifest_rows_in_those_docs": 983
+        }
+       }
+      }
+     },
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5560926791694987,
+      "position_auc": 0.5030565173576526,
+      "doc_mean_only_auc": 0.9005163351677531
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5575509190967752,
+      "position_auc": 0.5173051742200319,
+      "doc_mean_only_auc": 0.9019092325305339
+     },
+     "bootstrap": {
+      "triage_all_eligible_rows": {
+       "unigram_auc": {
+        "point": 0.5560926791694987,
+        "point_direction_agnostic": 0.5560926791694987,
+        "n_rows": 1239739,
+        "n_pos": 106649,
+        "n_neg": 1133090,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5558019439300884,
+        "se": 0.00618832584647083,
+        "ci_lo": 0.543871459976673,
+        "ci_hi": 0.567987718392873,
+        "ci_lo_direction_agnostic": 0.543871459976673,
+        "ci_hi_direction_agnostic": 0.567987718392873,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.5030565173576526,
+        "point_direction_agnostic": 0.5030565173576526,
+        "n_rows": 1239739,
+        "n_pos": 106649,
+        "n_neg": 1133090,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5012717394383611,
+        "se": 0.02376049904683901,
+        "ci_lo": 0.46194215827745744,
+        "ci_hi": 0.555481669026334,
+        "ci_lo_direction_agnostic": 0.5008454474964563,
+        "ci_hi_direction_agnostic": 0.555481669026334,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9005163351677531,
+        "point_direction_agnostic": 0.9005163351677531,
+        "n_rows": 1239739,
+        "n_pos": 106649,
+        "n_neg": 1133090,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.8997365637506874,
+        "se": 0.007800100263223912,
+        "ci_lo": 0.8851064980119051,
+        "ci_hi": 0.916003583647101,
+        "ci_lo_direction_agnostic": 0.8851064980119051,
+        "ci_hi_direction_agnostic": 0.916003583647101,
+        "n_degenerate_reps": 0
+       }
+      },
+      "triage_manifest_rows": {
+       "unigram_auc": {
+        "point": 0.5575509190967752,
+        "point_direction_agnostic": 0.5575509190967752,
+        "n_rows": 39781,
+        "n_pos": 20058,
+        "n_neg": 19723,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5573134287949265,
+        "se": 0.0064642131044605295,
+        "ci_lo": 0.545133184993935,
+        "ci_hi": 0.5698984034297765,
+        "ci_lo_direction_agnostic": 0.545133184993935,
+        "ci_hi_direction_agnostic": 0.5698984034297765,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.5173051742200319,
+        "point_direction_agnostic": 0.5173051742200319,
+        "n_rows": 39781,
+        "n_pos": 20058,
+        "n_neg": 19723,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5158357188590341,
+        "se": 0.0231449984718888,
+        "ci_lo": 0.47662946925222466,
+        "ci_hi": 0.5682162785203907,
+        "ci_lo_direction_agnostic": 0.5009346156469466,
+        "ci_hi_direction_agnostic": 0.5682162785203907,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9019092325305339,
+        "point_direction_agnostic": 0.9019092325305339,
+        "n_rows": 39781,
+        "n_pos": 20058,
+        "n_neg": 19723,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9012135772969522,
+        "se": 0.00780128671500455,
+        "ci_lo": 0.8866383589928357,
+        "ci_hi": 0.9169511294431304,
+        "ci_lo_direction_agnostic": 0.8866383589928357,
+        "ci_hi_direction_agnostic": 0.9169511294431304,
+        "n_degenerate_reps": 0
+       }
+      }
+     }
+    }
+   },
+   "artifact": "punctint4k_fineweb_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_docs": 4000,
+   "n_tokens": 7815498,
+   "token_ids_prefix_matches_replag": true,
+   "doc_off_prefix_matches_replag": true,
+   "replag_prefix_tokens": 784512,
+   "new_tokens_needing_cache": 7030986,
+   "faces": {
+    "list": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.31241944432258606
+     ],
+     "event_sentence_rate": 0.05367272262435486,
+     "lam_zero_frac": 0.8936114748397327,
+     "lam_mean": 0.04191655293107033,
+     "lam_std": 0.15377451479434967,
+     "masked_token_frac": 0.038408428995823425,
+     "eligible_frac": 0.8787582058110692,
+     "manifest_cap_per_class": 100000,
+     "manifest_rows_per_class": 99996,
+     "manifest_rows_per_class_supported": 190073,
+     "within_document_contrast": {
+      "all": {
+       "docs_with_top_rows": 1161,
+       "docs_with_bottom_rows": 3928,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 1089,
+         "manifest_rows_in_those_docs": 104410
+        },
+        "5": {
+         "docs": 961,
+         "manifest_rows_in_those_docs": 87220
+        },
+        "20": {
+         "docs": 333,
+         "manifest_rows_in_those_docs": 32524
+        },
+        "50": {
+         "docs": 11,
+         "manifest_rows_in_those_docs": 1816
+        }
+       }
+      },
+      "test": {
+       "docs_with_top_rows": 214,
+       "docs_with_bottom_rows": 789,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 203,
+         "manifest_rows_in_those_docs": 19385
+        },
+        "5": {
+         "docs": 172,
+         "manifest_rows_in_those_docs": 14993
+        },
+        "20": {
+         "docs": 55,
+         "manifest_rows_in_those_docs": 4933
+        },
+        "50": {
+         "docs": 2,
+         "manifest_rows_in_those_docs": 277
+        }
+       }
+      }
+     },
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5840457594732413,
+      "position_auc": 0.44008704017365347,
+      "doc_mean_only_auc": 0.9682472066615297
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5818077302040532,
+      "position_auc": 0.47792304935267427,
+      "doc_mean_only_auc": 0.9660984928984431
+     },
+     "bootstrap": {
+      "triage_all_eligible_rows": {
+       "unigram_auc": {
+        "point": 0.5840457594732413,
+        "point_direction_agnostic": 0.5840457594732413,
+        "n_rows": 1302797,
+        "n_pos": 34391,
+        "n_neg": 1268406,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.583678571774565,
+        "se": 0.007257931557642179,
+        "ci_lo": 0.5687008640798207,
+        "ci_hi": 0.5977059858981534,
+        "ci_lo_direction_agnostic": 0.5687008640798207,
+        "ci_hi_direction_agnostic": 0.5977059858981534,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.44008704017365347,
+        "point_direction_agnostic": 0.5599129598263466,
+        "n_rows": 1302797,
+        "n_pos": 34391,
+        "n_neg": 1268406,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.43953756749202116,
+        "se": 0.017960164974577596,
+        "ci_lo": 0.40525428871138125,
+        "ci_hi": 0.47388126893212235,
+        "ci_lo_direction_agnostic": 0.5261187310678777,
+        "ci_hi_direction_agnostic": 0.5947457112886189,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9682472066615297,
+        "point_direction_agnostic": 0.9682472066615297,
+        "n_rows": 1302797,
+        "n_pos": 34391,
+        "n_neg": 1268406,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9680931757612018,
+        "se": 0.0035481282972727795,
+        "ci_lo": 0.9607971580611232,
+        "ci_hi": 0.97452344906083,
+        "ci_lo_direction_agnostic": 0.9607971580611232,
+        "ci_hi_direction_agnostic": 0.97452344906083,
+        "n_degenerate_reps": 0
+       }
+      },
+      "triage_manifest_rows": {
+       "unigram_auc": {
+        "point": 0.5818077302040532,
+        "point_direction_agnostic": 0.5818077302040532,
+        "n_rows": 38180,
+        "n_pos": 18021,
+        "n_neg": 20159,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5814566596107361,
+        "se": 0.007874135765713197,
+        "ci_lo": 0.5653100893925846,
+        "ci_hi": 0.5974919308869987,
+        "ci_lo_direction_agnostic": 0.5653100893925846,
+        "ci_hi_direction_agnostic": 0.5974919308869987,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.47792304935267427,
+        "point_direction_agnostic": 0.5220769506473257,
+        "n_rows": 38180,
+        "n_pos": 18021,
+        "n_neg": 20159,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.4773796959407132,
+        "se": 0.01776003425113628,
+        "ci_lo": 0.44367013960238455,
+        "ci_hi": 0.5121393085107777,
+        "ci_lo_direction_agnostic": 0.5008489783411324,
+        "ci_hi_direction_agnostic": 0.5563298603976153,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9660984928984431,
+        "point_direction_agnostic": 0.9660984928984431,
+        "n_rows": 38180,
+        "n_pos": 18021,
+        "n_neg": 20159,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9659003465055488,
+        "se": 0.0037374156720582944,
+        "ci_lo": 0.9582548632958203,
+        "ci_hi": 0.9727280829127085,
+        "ci_lo_direction_agnostic": 0.9582548632958203,
+        "ci_hi_direction_agnostic": 0.9727280829127085,
+        "n_degenerate_reps": 0
+       }
+      }
+     }
+    },
+    "q": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.15620972216129303
+     ],
+     "event_sentence_rate": 0.03743561883152507,
+     "lam_zero_frac": 0.8076520736631528,
+     "lam_mean": 0.03575631231069565,
+     "lam_std": 0.10001368075609207,
+     "masked_token_frac": 0.0262720302660176,
+     "eligible_frac": 0.8915264260831491,
+     "manifest_cap_per_class": 100000,
+     "manifest_rows_per_class": 99996,
+     "manifest_rows_per_class_supported": 519179,
+     "within_document_contrast": {
+      "all": {
+       "docs_with_top_rows": 2554,
+       "docs_with_bottom_rows": 3936,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 2490,
+         "manifest_rows_in_those_docs": 147351
+        },
+        "5": {
+         "docs": 2183,
+         "manifest_rows_in_those_docs": 131503
+        },
+        "20": {
+         "docs": 626,
+         "manifest_rows_in_those_docs": 51986
+        },
+        "50": {
+         "docs": 22,
+         "manifest_rows_in_those_docs": 3216
+        }
+       }
+      },
+      "test": {
+       "docs_with_top_rows": 518,
+       "docs_with_bottom_rows": 791,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 509,
+         "manifest_rows_in_those_docs": 29494
+        },
+        "5": {
+         "docs": 450,
+         "manifest_rows_in_those_docs": 26299
+        },
+        "20": {
+         "docs": 115,
+         "manifest_rows_in_those_docs": 9526
+        },
+        "50": {
+         "docs": 7,
+         "manifest_rows_in_those_docs": 1037
+        }
+       }
+      }
+     },
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5592546445897135,
+      "position_auc": 0.5005765398716462,
+      "doc_mean_only_auc": 0.9001833956148254
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5624769796543866,
+      "position_auc": 0.5178733320609546,
+      "doc_mean_only_auc": 0.9009498777636947
+     },
+     "bootstrap": {
+      "triage_all_eligible_rows": {
+       "unigram_auc": {
+        "point": 0.5592546445897135,
+        "point_direction_agnostic": 0.5592546445897135,
+        "n_rows": 1221688,
+        "n_pos": 104442,
+        "n_neg": 1117246,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5589429885476875,
+        "se": 0.006143518094512574,
+        "ci_lo": 0.54653577248865,
+        "ci_hi": 0.5710140848894724,
+        "ci_lo_direction_agnostic": 0.54653577248865,
+        "ci_hi_direction_agnostic": 0.5710140848894724,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.5005765398716462,
+        "point_direction_agnostic": 0.5005765398716462,
+        "n_rows": 1221688,
+        "n_pos": 104442,
+        "n_neg": 1117246,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.49889322037447476,
+        "se": 0.023461461210557952,
+        "ci_lo": 0.4600710189547277,
+        "ci_hi": 0.5525527732793776,
+        "ci_lo_direction_agnostic": 0.5009700529573891,
+        "ci_hi_direction_agnostic": 0.5542530263986698,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9001833956148254,
+        "point_direction_agnostic": 0.9001833956148254,
+        "n_rows": 1221688,
+        "n_pos": 104442,
+        "n_neg": 1117246,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.8994265511012334,
+        "se": 0.007762669283524053,
+        "ci_lo": 0.8848483704382067,
+        "ci_hi": 0.9152622804482291,
+        "ci_lo_direction_agnostic": 0.8848483704382067,
+        "ci_hi_direction_agnostic": 0.9152622804482291,
+        "n_degenerate_reps": 0
+       }
+      },
+      "triage_manifest_rows": {
+       "unigram_auc": {
+        "point": 0.5624769796543866,
+        "point_direction_agnostic": 0.5624769796543866,
+        "n_rows": 39507,
+        "n_pos": 19803,
+        "n_neg": 19704,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5620977287769087,
+        "se": 0.0065343249532608715,
+        "ci_lo": 0.5492658291063037,
+        "ci_hi": 0.5754718812604048,
+        "ci_lo_direction_agnostic": 0.5492658291063037,
+        "ci_hi_direction_agnostic": 0.5754718812604048,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.5178733320609546,
+        "point_direction_agnostic": 0.5178733320609546,
+        "n_rows": 39507,
+        "n_pos": 19803,
+        "n_neg": 19704,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5162774497747408,
+        "se": 0.023077480535503847,
+        "ci_lo": 0.4787349027468191,
+        "ci_hi": 0.5685402072563226,
+        "ci_lo_direction_agnostic": 0.5009217305459995,
+        "ci_hi_direction_agnostic": 0.5685402072563226,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9009498777636947,
+        "point_direction_agnostic": 0.9009498777636947,
+        "n_rows": 39507,
+        "n_pos": 19803,
+        "n_neg": 19704,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9001614508384255,
+        "se": 0.007820099891091305,
+        "ci_lo": 0.8855799401247777,
+        "ci_hi": 0.91600961185422,
+        "ci_lo_direction_agnostic": 0.8855799401247777,
+        "ci_hi_direction_agnostic": 0.91600961185422,
+        "n_degenerate_reps": 0
+       }
+      }
+     }
+    }
+   },
+   "artifact": "punctint4k_fineweb_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_docs": 4000,
+   "n_tokens": 7747503,
+   "token_ids_prefix_matches_replag": true,
+   "doc_off_prefix_matches_replag": true,
+   "replag_prefix_tokens": 777900,
+   "new_tokens_needing_cache": 6969603,
+   "faces": {
+    "list": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.31241944432258606
+     ],
+     "event_sentence_rate": 0.05367272262435486,
+     "lam_zero_frac": 0.8937736039270731,
+     "lam_mean": 0.04195474460721016,
+     "lam_std": 0.15399451553821564,
+     "masked_token_frac": 0.038584431654947404,
+     "eligible_frac": 0.8786047582040304,
+     "manifest_cap_per_class": 100000,
+     "manifest_rows_per_class": 99996,
+     "manifest_rows_per_class_supported": 187713,
+     "within_document_contrast": {
+      "all": {
+       "docs_with_top_rows": 1161,
+       "docs_with_bottom_rows": 3931,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 1092,
+         "manifest_rows_in_those_docs": 105482
+        },
+        "5": {
+         "docs": 962,
+         "manifest_rows_in_those_docs": 87145
+        },
+        "20": {
+         "docs": 340,
+         "manifest_rows_in_those_docs": 33838
+        },
+        "50": {
+         "docs": 5,
+         "manifest_rows_in_those_docs": 676
+        }
+       }
+      },
+      "test": {
+       "docs_with_top_rows": 214,
+       "docs_with_bottom_rows": 786,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 200,
+         "manifest_rows_in_those_docs": 18967
+        },
+        "5": {
+         "docs": 177,
+         "manifest_rows_in_those_docs": 15275
+        },
+        "20": {
+         "docs": 64,
+         "manifest_rows_in_those_docs": 5657
+        },
+        "50": {
+         "docs": 1,
+         "manifest_rows_in_those_docs": 129
+        }
+       }
+      }
+     },
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5795183316227727,
+      "position_auc": 0.4365504903893168,
+      "doc_mean_only_auc": 0.9685564206773692
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5825696804962914,
+      "position_auc": 0.4701092621795346,
+      "doc_mean_only_auc": 0.9664323443139725
+     },
+     "bootstrap": {
+      "triage_all_eligible_rows": {
+       "unigram_auc": {
+        "point": 0.5795183316227727,
+        "point_direction_agnostic": 0.5795183316227727,
+        "n_rows": 1294035,
+        "n_pos": 33920,
+        "n_neg": 1260115,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5792128169082669,
+        "se": 0.0068158156612092785,
+        "ci_lo": 0.5660959909478206,
+        "ci_hi": 0.5923598109579116,
+        "ci_lo_direction_agnostic": 0.5660959909478206,
+        "ci_hi_direction_agnostic": 0.5923598109579116,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.4365504903893168,
+        "point_direction_agnostic": 0.5634495096106832,
+        "n_rows": 1294035,
+        "n_pos": 33920,
+        "n_neg": 1260115,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.43600916347163243,
+        "se": 0.017896350772766557,
+        "ci_lo": 0.402238699870333,
+        "ci_hi": 0.47065791079236535,
+        "ci_lo_direction_agnostic": 0.5293420892076347,
+        "ci_hi_direction_agnostic": 0.5977613001296671,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9685564206773692,
+        "point_direction_agnostic": 0.9685564206773692,
+        "n_rows": 1294035,
+        "n_pos": 33920,
+        "n_neg": 1260115,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9684006238916294,
+        "se": 0.003525972704783137,
+        "ci_lo": 0.9613989439026017,
+        "ci_hi": 0.9748365168550643,
+        "ci_lo_direction_agnostic": 0.9613989439026017,
+        "ci_hi_direction_agnostic": 0.9748365168550643,
+        "n_degenerate_reps": 0
+       }
+      },
+      "triage_manifest_rows": {
+       "unigram_auc": {
+        "point": 0.5825696804962914,
+        "point_direction_agnostic": 0.5825696804962914,
+        "n_rows": 37833,
+        "n_pos": 17721,
+        "n_neg": 20112,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5822078772821448,
+        "se": 0.007652326289090028,
+        "ci_lo": 0.5676166353206328,
+        "ci_hi": 0.5975914129085892,
+        "ci_lo_direction_agnostic": 0.5676166353206328,
+        "ci_hi_direction_agnostic": 0.5975914129085892,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.4701092621795346,
+        "point_direction_agnostic": 0.5298907378204654,
+        "n_rows": 37833,
+        "n_pos": 17721,
+        "n_neg": 20112,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.4695674450677592,
+        "se": 0.017971799530777946,
+        "ci_lo": 0.43549132265924206,
+        "ci_hi": 0.5042437926524643,
+        "ci_lo_direction_agnostic": 0.502474410189979,
+        "ci_hi_direction_agnostic": 0.5645086773407579,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9664323443139725,
+        "point_direction_agnostic": 0.9664323443139725,
+        "n_rows": 37833,
+        "n_pos": 17721,
+        "n_neg": 20112,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9662417791836196,
+        "se": 0.003759405912866182,
+        "ci_lo": 0.9585295586581744,
+        "ci_hi": 0.9727197086960179,
+        "ci_lo_direction_agnostic": 0.9585295586581744,
+        "ci_hi_direction_agnostic": 0.9727197086960179,
+        "n_degenerate_reps": 0
+       }
+      }
+     }
+    },
+    "q": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.15620972216129303
+     ],
+     "event_sentence_rate": 0.03743561883152507,
+     "lam_zero_frac": 0.8076384193855172,
+     "lam_mean": 0.03573052957653999,
+     "lam_std": 0.0999412089586258,
+     "masked_token_frac": 0.026405281804989297,
+     "eligible_frac": 0.8914371507826457,
+     "manifest_cap_per_class": 100000,
+     "manifest_rows_per_class": 99996,
+     "manifest_rows_per_class_supported": 513918,
+     "within_document_contrast": {
+      "all": {
+       "docs_with_top_rows": 2557,
+       "docs_with_bottom_rows": 3945,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 2502,
+         "manifest_rows_in_those_docs": 147589
+        },
+        "5": {
+         "docs": 2200,
+         "manifest_rows_in_those_docs": 131380
+        },
+        "20": {
+         "docs": 614,
+         "manifest_rows_in_those_docs": 52020
+        },
+        "50": {
+         "docs": 20,
+         "manifest_rows_in_those_docs": 3027
+        }
+       }
+      },
+      "test": {
+       "docs_with_top_rows": 518,
+       "docs_with_bottom_rows": 792,
+       "docs_with_both_by_min_rows_per_class": {
+        "1": {
+         "docs": 510,
+         "manifest_rows_in_those_docs": 29739
+        },
+        "5": {
+         "docs": 454,
+         "manifest_rows_in_those_docs": 26570
+        },
+        "20": {
+         "docs": 121,
+         "manifest_rows_in_those_docs": 10226
+        },
+        "50": {
+         "docs": 5,
+         "manifest_rows_in_those_docs": 741
+        }
+       }
+      }
+     },
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5573295798688052,
+      "position_auc": 0.5008729369576104,
+      "doc_mean_only_auc": 0.9002915031259836
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5575795018912892,
+      "position_auc": 0.5113066178117514,
+      "doc_mean_only_auc": 0.9008079987181867
+     },
+     "bootstrap": {
+      "triage_all_eligible_rows": {
+       "unigram_auc": {
+        "point": 0.5573295798688052,
+        "point_direction_agnostic": 0.5573295798688052,
+        "n_rows": 1212885,
+        "n_pos": 103523,
+        "n_neg": 1109362,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5570649550404797,
+        "se": 0.005843554763060249,
+        "ci_lo": 0.5453166708121017,
+        "ci_hi": 0.5685802437389776,
+        "ci_lo_direction_agnostic": 0.5453166708121017,
+        "ci_hi_direction_agnostic": 0.5685802437389776,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.5008729369576104,
+        "point_direction_agnostic": 0.5008729369576104,
+        "n_rows": 1212885,
+        "n_pos": 103523,
+        "n_neg": 1109362,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.49919335623775574,
+        "se": 0.023062384518722015,
+        "ci_lo": 0.4601835586525704,
+        "ci_hi": 0.5513548501788749,
+        "ci_lo_direction_agnostic": 0.5006268470200059,
+        "ci_hi_direction_agnostic": 0.5536046847735956,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9002915031259836,
+        "point_direction_agnostic": 0.9002915031259836,
+        "n_rows": 1212885,
+        "n_pos": 103523,
+        "n_neg": 1109362,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.8995374308625851,
+        "se": 0.00770122677704814,
+        "ci_lo": 0.8849203501162292,
+        "ci_hi": 0.9153100739365234,
+        "ci_lo_direction_agnostic": 0.8849203501162292,
+        "ci_hi_direction_agnostic": 0.9153100739365234,
+        "n_degenerate_reps": 0
+       }
+      },
+      "triage_manifest_rows": {
+       "unigram_auc": {
+        "point": 0.5575795018912892,
+        "point_direction_agnostic": 0.5575795018912892,
+        "n_rows": 39915,
+        "n_pos": 20259,
+        "n_neg": 19656,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.5573687489535956,
+        "se": 0.006701033206556515,
+        "ci_lo": 0.5445604088674325,
+        "ci_hi": 0.5704809159981192,
+        "ci_lo_direction_agnostic": 0.5445604088674325,
+        "ci_hi_direction_agnostic": 0.5704809159981192,
+        "n_degenerate_reps": 0
+       },
+       "position_auc": {
+        "point": 0.5113066178117514,
+        "point_direction_agnostic": 0.5113066178117514,
+        "n_rows": 39915,
+        "n_pos": 20259,
+        "n_neg": 19656,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.509686803623844,
+        "se": 0.022459368464611582,
+        "ci_lo": 0.4723564773092153,
+        "ci_hi": 0.5581361314171492,
+        "ci_lo_direction_agnostic": 0.5007495405053308,
+        "ci_hi_direction_agnostic": 0.5581361314171492,
+        "n_degenerate_reps": 0
+       },
+       "doc_mean_only_auc": {
+        "point": 0.9008079987181867,
+        "point_direction_agnostic": 0.9008079987181867,
+        "n_rows": 39915,
+        "n_pos": 20259,
+        "n_neg": 19656,
+        "n_docs": 800,
+        "n_reps": 1000,
+        "seed": 0,
+        "ci_pct": [
+         2.5,
+         97.5
+        ],
+        "mean": 0.9000408347159122,
+        "se": 0.00772133919619521,
+        "ci_lo": 0.8857666159134207,
+        "ci_hi": 0.9165764365032042,
+        "ci_lo_direction_agnostic": 0.8857666159134207,
+        "ci_hi_direction_agnostic": 0.9165764365032042,
+        "n_degenerate_reps": 0
+       }
+      }
+     }
+    }
+   },
+   "artifact": "punctint4k_fineweb_llama31.npz"
+  }
+ }
+}
