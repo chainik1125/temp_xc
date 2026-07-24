@@ -10,6 +10,39 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **TASK HUNT ROUND 1 COMPLETE + REVIEWED (2026-07-24, mac-local):
+  APPROVED — one qualified positive, one order receipt, five sound
+  kills, and the dissection's salvage.** Arm A (runpod-d): λ̂ intensity
+  KEEP → **Stage-2 QUALIFIED POSITIVE** — on REAL Ward activations at
+  matched realized l0, TXC-pre rises 0.13 → 0.19 → 0.21 over
+  T = 2/4/8, above T-SAE (0.154) and per-token (0.113), under the
+  per-tile code-readout convention; peak-then-dip at T = 16;
+  order-free regime-2 exactly as its screen predicted; TXC-post's
+  0.255 is budget-confounded (realized l0 → 0.49), flagged not
+  headlined. Proof-op KEEP — the contrast clears the null at every T
+  ONLY on distill L12 (non-ambience is a (task, MODEL) property,
+  measured). Forbidden-word onset KILL (pre-registered; the post-hoc
+  depth sweep corrects the mechanism to **conversion** — pressure is
+  computed across depth and linearized per position, a FOURTH g(ℓ)
+  shape, built-and-immediately-linearized — not lexical circling).
+  **The backtracking shuffle receipt
+  is POSITIVE**: destroying within-window order costs anticipation
+  +0.028…+0.041 AUC vs +0.003…+0.013 for the ambient label, fixed
+  T = 16, identical rows — the order receipt the paper's § 5.2 never
+  had. Arm B (runpod-e): replag, confidence-trend, emotional-onset
+  all KILLED soundly; the cross-cutting mechanism is **conversion**
+  (mid-depth residuals already summarize any per-token-traceable
+  temporal latent). Verdicts + binding review notes:
+  `task_hunt/LOG.md`; methods: `task_hunt/RECORD.md`. **ROUND 2
+  dispatched** (`briefings/task-hunt-r2.md`): budget-matched TXC-post
+  re-run + figure l0 annotation (runpod-d); hedging-LEVEL Stage-2 on a
+  fresh card (aggregation-framed win accepted by program decision) +
+  early-layer g_order(ℓ)/g_agg(ℓ) addendum (runpod-e, after its
+  in-flight forbidden-word-linearization mini study). New hunt
+  convention: **per-token-first triage**. Parked post-rebuttal:
+  gpt2-scale order cell, anti-conversion candidate class, proof-op
+  Stage-2.
+
 - **PROGRAM MODE (2026-07-24, team decision): synthetic benchmark
   GENERATION is PAUSED — consolidation only.** The suite + STORY.md +
   the theoretical additions the team is preparing carry the synthetic
@@ -56,8 +89,9 @@ Last updated: 2026-07-23.
   by a coincidence decode, only at T=8. Interaction near-additive; mat
   cancels ctr's gain in `+both` on the one bench where ctr works.
   Deliverables: `loss_dissection/RECORD.md` + `dissection_table[_pre].md`
-  + 1416 leaderboard rows. Spend $0.51 (cumulative $11.52/$25). AWAITING
-  mac-local review (briefing stays until then).
+  + 1416 leaderboard rows. Spend $0.51 (cumulative $11.52/$25).
+  **Reviewed & APPROVED 2026-07-24 (mac-local); briefing retired.** The
+  § 7 rebuttal-safe sentence is the quotable outcome for directive 3.
 
 - **ROUND-3 REVIEW DONE (2026-07-23, mac-local) — ALL THREE sessions
   APPROVED; all verdicts stand; no active briefings.** (1) **C7 close

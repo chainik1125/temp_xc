@@ -169,3 +169,10 @@ _Recorded-by: claude-fable-5 (runpod agent, txcpro-dissection briefing),
 2026-07-24. Card and amendment frozen pre-build; scripts committed
 pre-run; verdicts mechanical; skeptic raw persisted pre-parse, never
 re-rolled._
+
+_Reviewed (2026-07-24, mac-local): **APPROVED** — freeze chain verified
+by git forensics (card → build → grid → skeptic; amendment → pre build
+→ pre grid); the surviving claim checked against
+`results/dissection_table.md` (+0.093 ± 0.038) and the skeptic raw
+files; 1,416 leaderboard rows accounted for in the canonical artifact.
+The § 7 rebuttal-safe sentence is endorsed as written._

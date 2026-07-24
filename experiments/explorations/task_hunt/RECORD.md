@@ -388,3 +388,14 @@ form of the hunt would want.
    turned out to be *corrupting* — they made the leaderboard
    unparseable. The repair removes only rows that cannot be loaded, all
    of them written by this session, and none of them a result.
+
+---
+
+*Reviewed (2026-07-24, mac-local): **APPROVED** — freeze order verified
+by git forensics; every table in this record spot-checked against its
+JSON artifact; leaderboard decomposition exact (8,616 = 7,116 + 1,416 +
+84). Binding qualifications for downstream use are in the LOG review
+entry: the per-tile code-readout convention must be stated wherever the
+Stage-2 result is quoted; the T-SAE margin is ≈ 2σ at n = 3 (phrase
+variance-aware); the stage2 figure needs a realized-l0 annotation on
+TXC-post before external use.*

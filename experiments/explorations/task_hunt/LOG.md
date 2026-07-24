@@ -572,3 +572,76 @@ better and plausibly worse: a completed deduction is a canonical
 converted state. Cheap pre-screen for any future candidate: run this
 sweep first — per-token climbing while g stays shut ⇒ converted ⇒ do
 not spend a grid.
+## 2026-07-24 — mac-local — REVIEW: arm A + arm B + prep + dissection — **APPROVED, all verdicts stand**
+
+Gate integrity verified by git forensics on every chain: cards and
+scripts strictly precede their runs (dissection: card 22:40 → build
+22:45 → grid → skeptic; § 9 amendment frozen before the pre build;
+Stage-2 renderer committed before the panel completed). Tests: 220
+pass. Leaderboard: 8,616 rows decompose exactly as 7,116 baseline +
+1,416 dissection + 84 Stage-2; 0 dup `eval_key`s, 0 null metrics;
+dirty rows all carry pinned `diff_sha256`. Numbers spot-checked
+against artifacts, not the prose: `stage2_summary.json` (every cell of
+the § 3b table, l0 collapse, untrained margins, Stacked pathology),
+replag gpt2 (det win−tok ≤ 0 in 20/20 cells; lag4 0.634/0.522/0.520),
+confidence distill (0.468 → 0.521/0.545/0.565; shuf-MLP 0.543),
+emotional (0.856 / 0.867 / 0.362), the 12-cell shuffle receipt, the
+dissection table (+0.093 ± 0.038; skeptic raw persisted per claim).
+
+**Review notes — qualifications that bind downstream use:**
+1. Stage 2 reads ONE tile's code per prediction (`lambda_recovery.py`
+   per-tile leading-edge convention, the same leak-free design as the
+   synthetic DPI bench). Per-token archs are therefore read at single
+   positions by construction. Any rebuttal sentence must say "under
+   the code-readout convention", and carry the code-rate defense:
+   pooling T-SAE codes across T positions would spend T× the code
+   bandwidth a window arch uses.
+2. The TXC-pre − T-SAE margin is ≈ 2σ at n = 3 seeds (0.206 ± 0.020 vs
+   0.154 ± 0.037). Real and consistent across T = 4/8, but phrase it
+   variance-aware; the T-rise plus the growing trained−untrained
+   margin (+0.150 at T = 8) carries the claim, not one cell.
+3. The stage2 figure MUST gain a realized-l0 annotation on TXC-post
+   (0.49 at T = 16) before any external use — visually it reads as the
+   winner and it is not budget-matched.
+4. proofops card divergence: runpod-b's prep draft (is_run_start
+   primary) vs runpod-d's operative frozen card (tir primary) — both
+   committed pre-run; the running agent's card governs per protocol.
+   The CARD.md/card.md filename case-collision (breaks
+   case-insensitive checkouts) was fixed by renaming the draft to
+   `PREP_DRAFT.md`; both blobs unchanged.
+5. The forbidden-word kill is scoped to generator = reader
+   (R1-Distill), exactly as the card froze it.
+
+**Round-2 decisions (runpod-e proposals + runpod-d follow-ups
+adjudicated):** GREENLIT — (a) runpod-d: budget-matched TXC-post
+re-run (the single highest-leverage cheap run: if the monotone rise
+to 0.255 survives realized-l0 matching, the money plot upgrades from
+peak-at-8 to monotone-through-16) + the figure l0 annotation;
+(b) runpod-e, after its in-flight forbidden-word-linearization mini
+study: hedging-trend LEVEL Stage-2 on a FRESH card — the program
+accepts an aggregation-framed regime-2 win (shuffle-IMMUNITY disclosed
+as the mechanism receipt; the theory already claims regime-2 separates
+TXC from per-token-decoded T-SAE without order) — + the early-layer
+g_order(ℓ)/g_agg(ℓ) addendum on existing caches. ADOPTED as hunt
+convention: per-token-first triage (a cheap per-token-only probe
+gates the full window grid; all five round-1 kills were visible
+there). PARKED post-rebuttal: gpt2-scale order cell, anti-conversion
+candidate class, cand-2 Stage-2 on distill L12 (weak contrast; panel
+unlikely to clear it before Sunday). Round-2 brief:
+`briefings/task-hunt-r2.md`; round-1 briefings retired.
+
+**Addendum (mac-local, same day): the cand-3 POST-HOC depth sweep
+(runpod-d, entry above) is also REVIEWED — APPROVED.** Freeze order
+verified by git forensics (sweep script 12:55 → blind D1–D3
+predictions 12:56 → results 13:12); the frozen L12 KILL is untouched.
+The mechanism correction — **CONVERSION, not lexical circling**
+(near-blind hs0 at 0.538; per-token climbing +0.13 with depth; the
+window gap shut in 49/51 cells and never above +0.037) — **supersedes
+the "circling" language in the original kill entry and in every
+downstream summary**. Adopted into hunt conventions alongside
+per-token-first triage: the fourth g(ℓ) shape
+(built-and-immediately-linearized), the screening question "will the
+model decline to maintain this as a per-position state?", and the
+depth sweep as the cheap WHY-diagnostic when per-token is high. The
+honest scorecard (D1/D2 falsified against the agent's own favored
+bag-of-words story) is exactly the discipline the program wants.
