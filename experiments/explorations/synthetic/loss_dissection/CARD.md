@@ -234,3 +234,54 @@ reported); build+tests+analysis inside the 48 h window; API spend ≤ $5
 
 _Frozen-by: claude-fable-5 (runpod agent, txcpro-dissection briefing),
 2026-07-23, pre-build._
+
+---
+
+## 9. AMENDMENT (frozen pre-build of the pre extension, 2026-07-24) —
+## the briefing-authorized `txc_batchtopk_pre` extension
+
+The post grid finished early (720/720 in ~2.1 h; briefing: "add the same
+4 variants on `txc_batchtopk_pre` ONLY if the post grid finishes early").
+Post-grid state at this freeze: mechanical table + skeptic done — ONE
+surviving HELPS (ctr on frequency `velocity_recovery`, T=8), the recipe
+mat-HELPS killed on e_metric_leak. This amendment is frozen BEFORE any
+pre-variant code exists.
+
+**Variants.** `TXCPreDissect` — subclass of `TXCPostDissect` overriding
+ONLY the two squash hooks with the PRE implementations
+(`_compute_post` / `_to_shared` assigned from `TXCBatchTopKPre` — the
+hooks ARE the entire pre/post difference per the backbone's contract, so
+`_slice`/`_loss_on`/matryoshka/InfoNCE are inherited unchanged, not
+copy-pasted). Registry entries `txc_pre_plain` / `txc_pre_mat` /
+`txc_pre_ctr` / `txc_pre_both`; family `"pre"` (pooled dict constraint
+`d_sae ≥ k_pos·T` — `uniform_cells` drops infeasible cells and logs; at
+F=20 the (T=8, k_pos=4) column is infeasible, so backtracking and recipe
+have 8/9 cells; verdict thresholds unchanged, counted over PRESENT
+cells with the same ≥2-positive / 0-negative rule).
+
+**Everything else identical to §§ 4–5**: same benches, slice, seeds,
+n_steps, metrics, decision rules, untrained guard; Gate B bridges
+`txc_pre_plain` to the canonical `txc_batchtopk_pre` leaderboard rows
+(129/129 feasible anchor cells verified present pre-freeze). Contract
+tests parametrized over both families, incl. plain-reduction vs
+`TXCBatchTopKPre`. Analyzer/skeptic gain a family switch; outputs to
+`dissection_table_pre.{json,md}`; skeptic policy unchanged (recovery
+HELPS only; same $5 session cap shared).
+
+**Frozen predictions (pre extension):**
+
+1. **(v)** ctr does NOT lift pre's frequency `velocity_recovery` beyond
+   the bar — the additive-over-positions decode cannot exploit the
+   phase-washing/tone-preserving code pressure; the post-side lift is
+   decode-structure-contingent. This is the extension's headline
+   falsifiable claim: if ctr lifts pre too, the mechanism story
+   ("contrastive helps only where the decode can mix positions") is
+   wrong and must be reported as such.
+2. **(vi)** no variant beats pre-plain beyond the bar on any other
+   primary (the § 6 (i) prior transferred).
+3. **(vii)** matryoshka's frequency HURTS pattern may replicate on pre
+   (capacity split fragments an already-additive code); scored but not
+   load-bearing.
+
+_Amendment frozen-by: claude-fable-5 (runpod agent), 2026-07-24,
+pre-build of the pre extension._
