@@ -1,21 +1,23 @@
 ---
 status: active
 created: 2026-07-24
-for: runpod-c
-venue: runpod (H100)
+for: runpod-d
+venue: runpod (GPU, new pod)
 ---
 
 # The task hunt — a real-world task where TXC beats T-SAE and scales with T
 
-**You are `runpod-c`** (H100, 700 GB volume: Ward caches, EM caches,
-probe stack). **This briefing SUPERSEDES `em-redo.md`** (team decision,
-2026-07-24): EM stays a negative case in the paper; PAUSE em-redo
-wherever it is — append a dated PAUSED note to
-`conversion_depth/TRACKING.md` (the frozen prereg stays valid for a
-future session; do NOT delete artifacts; any Phase-A results already
-produced get recorded as-is, unscored). Your cache builders, panel
-driver, and detection-eval port are exactly the machinery this hunt
-reuses.
+**You are `runpod-d`** — a NEW GPU pod (`/workspace/.agent_id` =
+`runpod-d`, seeded by the user; see `agents/README.md` + your
+`agents/runpod-d/STATUS.md`). `runpod-c` is running em-redo in parallel
+and **owns all writes to the shared 700 GB volume** — if that volume is
+mounted on your pod, treat it strictly READ-ONLY (the Ward caches at
+`/workspace/conv_depth_caches/{base,distill}/` + Ward labels); write
+your own caches to your own disk. If the volume is NOT mountable here,
+rebuild what you need from the committed builders
+(`conversion_depth/build_ward_stream.py`, `cache_depth.py` — ~1 h on
+the GPU). The frozen probe stack (`conversion_depth/problib`-style
+scripts) is in the repo — reuse, do not re-derive.
 
 **The goal (the one sentence):** find a real-activation task where
 **TXC recovery/detection improves systematically with window size T
@@ -36,6 +38,13 @@ layer per the g(ℓ) precedent — L13-equivalent), and run the frozen
 probe stack: per-token linear vs window linear at
 T ∈ {2, 4, 8, 16, 32}, plus the window-MEAN decomposition
 (g_agg/g_order) and the within-window shuffle control.
+**Model axis (screen-only):** non-ambience is a (task, MODEL) property
+— a model whose attention converts the structure leaves no window
+advantage (the depth-ablation lesson). Screen each candidate on every
+model that is cheap to obtain (for your trace candidates BOTH Ward
+caches — base + distill — are already on the volume: free probe
+reruns); Stage 2 runs ONLY the single best (task, model) cell (at
+most two).
 **KEEP iff** the window−token gap grows with T over some range AND
 the pattern matches the card. **KILL otherwise — one paragraph in the
 hunt log (`experiments/explorations/task_hunt/LOG.md`), move on.**
@@ -49,7 +58,7 @@ per survivor: **the T-scaling figure** (recovery vs T, one line per
 arch — the money plot is TXC rising while T-SAE stays flat), the
 shuffle-ablation bar, and the record.
 
-## The candidate queue (mac-local priors; runpod-b is prepping labels — pull its specs as they land)
+## Your candidate queue (the hunt is SPLIT: you own the Ward-cache-dependent candidates; `runpod-e` owns repetition-lag + confidence-trend via `task-hunt-b.md`. runpod-b preps labels — pull its specs as they land)
 
 1. **Backtracking intensity λ̂ (grounded regime 2 — top prior).**
    Latent: the local event intensity (the real parent of the synthetic
@@ -62,21 +71,10 @@ shuffle-ablation bar, and the record.
    spanning it is the story). Distinct from Aniket's detection/
    inducement readout — this is intensity RECOVERY; flag any overlap
    in the record.
-2. **Repetition-lag Δ (exact labels, threshold T-scaling — top prior).**
-   Latent: distance Δ to the previous occurrence of the current
-   n-gram in natural text (fineweb slice; labels computed exactly from
-   tokens — zero labeling cost). Provably non-ambient (no single token
-   knows Δ); recovery of lag-Δ structure needs T > Δ ⇒ **built-in
-   threshold scaling: sweep Δ ∈ {4, 8, 16} and show each Δ turns on as
-   T crosses it.** Subject model: a BASE model (gemma-2-2b base or the
-   Llama-3.1-8B base you have cached machinery for).
-3. **Proof-operation run structure (grounded backup).** Time-in-
-   current-phase / run-rate over the R1-Distill traces (labels from
-   the expansion corpus; three-timescale structure is C5-confirmed
-   model-independently). Screen only if 1–2 leave GPU headroom.
-4. **Confidence-trend (grounded backup, clock-mismatch risk).**
-   Windowed hedging→commitment slope; sentence-clock vs token-clock
-   bridging per the substrate-audit item 6 — screen last.
+2. **Proof-operation run structure (grounded).** Time-in-current-phase
+   / run-rate over the R1-Distill traces (labels from the expansion
+   corpus via runpod-b; three-timescale structure is C5-confirmed
+   model-independently). Screen after candidate 1's screen is in.
 
 Do NOT pursue bracket/indentation state-tracking (tried before this
 program; dies under strict per-position baselines) or forbidden-word

@@ -41,21 +41,27 @@ stay review-content-free). Han's three standing directives: (1) synth
 revamp (the why-story), (2) real-world case-study redo with
 TXC-appropriate evals (PRIORITY, > (1)), (3) TXC-pro loss dissection.
 **Scope (Han, 2026-07-23): backtracking multi-seed + paper latex are
-the human team's — agents run ONLY the three directives.** **RE-PLAN 2026-07-24** (post team meeting — transcript in
+the human team's — agents run ONLY the three directives.** **RE-PLAN 2026-07-24 v2** (post team meeting — transcript in
 `private/transcripts/transcript-2026-07-24.txt`; plan in
-`private/rebuttal_plan.md`): synthetic generation PAUSED (consolidation
-only — STORY.md + team's theory additions carry it); **the priority is
-THE TASK HUNT** — a real task where TXC > T-SAE with systematic
-T-scaling. Dispatched: `briefings/task-hunt.md` (runpod-c — em-redo
-SUPERSEDED/PAUSED, machinery reused; candidates: backtracking-λ̂
-intensity, repetition-lag Δ, proof-op runs, confidence trend; two-stage
-fail-fast screen→head-to-head) + `briefings/task-hunt-prep.md`
-(runpod-b — label mining, Δ-labels + λ̂ targets first).
-`briefings/txcpro-dissection.md` (runpod) unchanged. Avoid: backtracking
-detection/forbidden-word (owned by the team), bracket state-tracking
-(documented dead end). Story pack DONE+APPROVED (STORY.md + isolation
-fig + § 7 T-taxonomy). Team check-in Sun 2026-07-26 10am PT — review
-everything before it. Rebuttal deadline 07-27.
+`private/rebuttal_plan.md`; Han: time > compute cost): synthetic
+generation PAUSED; **priority = THE TASK HUNT** (TXC > T-SAE with
+T-scaling on a real task). FIVE agents live:
+- `runpod-c` (H100 + volume): **em-redo REINSTATED to completion**
+  (Han's call; win = reportable result, loss = archival datum). Owns
+  all volume WRITES.
+- `runpod-d` (NEW GPU): hunt arm A — λ̂ intensity + proof-op runs +
+  backtracking shuffle receipt (`task-hunt.md`); volume read-only or
+  rebuild. Screens BOTH cached reader models (free).
+- `runpod-e` (NEW GPU): hunt arm B — repetition-lag Δ **across model
+  scale** (gpt2/gemma-2b-base/llama-8b-base; induction-conversion
+  prior: gap larger in smaller models) + confidence trend
+  (`task-hunt-b.md`). Volume-independent.
+- `runpod-b`: label prep (`task-hunt-prep.md`, feeds d+e).
+- `runpod`: txcpro-dissection unchanged.
+Model axis = Stage-1 SCREEN only; Stage 2 = best (task, model) cell.
+Avoid: backtracking detection / forbidden-word (team-owned), bracket
+state-tracking (dead end). Team check-in Sun 2026-07-26 10am PT —
+review everything before it. Rebuttal deadline 07-27.
 
 ## ⏭ (pre-review fork — parked)
 

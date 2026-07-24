@@ -7,10 +7,11 @@ venue: runpod
 
 # Task-hunt prep — label mining + candidate specs for the hunt
 
-**You are `runpod-b`** (32C). You feed `runpod-c`'s hunt
-(`briefings/task-hunt.md` — read it first): your job is CPU-side label
-engineering and candidate mini-card drafting so the GPU pod never waits
-on labels. Shared-branch rules apply; commit label artifacts under
+**You are `runpod-b`** (32C). You feed the hunt pods — `runpod-d`
+(`briefings/task-hunt.md`: λ̂ + proof-op) and `runpod-e`
+(`briefings/task-hunt-b.md`: repetition-lag + confidence trend) — read
+both first: your job is CPU-side label engineering and candidate
+mini-card drafting so the GPU pods never wait on labels. Shared-branch rules apply; commit label artifacts under
 `experiments/explorations/task_hunt/labels/` with a build script each
 (committed before its outputs). Fail fast; check-in 2026-07-26.
 
@@ -44,6 +45,6 @@ on labels. Shared-branch rules apply; commit label artifacts under
 
 ## Acceptance gate
 
-Labels 1–2 + cards pushed within ~6 h (runpod-c blocks on them);
+Labels 1–2 + cards pushed within ~6 h (runpod-d/e block on them);
 label 3 + card 4 after. STATUS rewritten. No reviewer/meeting quotes
 in tracked files. Briefing stays until mac-local review.

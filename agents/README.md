@@ -32,6 +32,16 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   caches; spawned 2026-07-23 for the conversion-depth / substrate-audit
   line, now the real-side dictionary-training pod). Same creds layout;
   `/workspace/.agent_id` = `runpod-c`.
+- **`runpod-d`** — GPU RunPod pod (spawned 2026-07-24, rebuttal window;
+  H100 preferred). Task-hunt arm A (`briefings/task-hunt.md`): trace-
+  derived candidates. May mount runpod-c's 700 GB volume **READ-ONLY**
+  (runpod-c owns all writes); else rebuilds from committed builders.
+  `/workspace/.agent_id` = `runpod-d`.
+- **`runpod-e`** — GPU RunPod pod (spawned 2026-07-24, rebuttal window;
+  H100 preferred). Task-hunt arm B (`briefings/task-hunt-b.md`):
+  repetition-lag across model scale + confidence trend. Fully
+  volume-independent. `/workspace/.agent_id` = `runpod-e`.
+
 (2026-07-23, rebuttal window: backtracking multi-seed reruns and paper
 latex edits are owned by the human team, NOT by agents in this registry.
 Agent work = the three standing directives; `private/` files must never
