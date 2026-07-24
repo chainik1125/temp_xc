@@ -72,3 +72,41 @@ within the screen range. Per-token flat in T.
 - **KILL — timescale unreachable** if no target reaches coverage ≥ 1.0
   at any screened T (recorded as a clock measurement, not a regime
   claim).
+
+---
+
+## Screen cells (appended by runpod-e, frozen by this commit BEFORE the run)
+
+Candidate-1 (replag) verdict is committed (KILL — see `../LOG.md`);
+proceeding here per the briefing order since the measured clock bridge
+does NOT kill this candidate (slope4 support ≈ 64 tokens = T64).
+
+- **Substrate:** Ward stream rebuilt on the runpod-e volume (stats
+  reproduce the committed reference, map_ok 99.97 %); readers = base +
+  distill via the committed `cache_depth.py`; screen layer resid_post
+  L13 = hs14 (the measured g(ℓ) peak) for both.
+- **Rows** (`screen.py build_rows`): eligibility valid ∧ p ≥ 63
+  (uniform so every screened T ≤ 64 fits) ∧ hedge(anchor) ≥ 0; split by
+  trace (labels' `trace_split`); caps 4000/1500 per class.
+- **Targets:** `slope8` = the labels' committed slope8_bin terciles
+  (PRIMARY); `slope4` = terciles of the slope4 grid computed over
+  eligible rows (edges recorded in results meta; pooled-split binning,
+  same convention as the committed slope8 edges); `state` = hedge
+  3-class (CONTROL, regime-1 predicted).
+- **Matching (the card's guard):** slope targets exact-histogram
+  matched across the 3 classes on (anchor hedge state × position
+  bucket {[63,80),[80,96),[96,112),[112,128)}) — the anchor's own
+  hedging level cannot carry the slope label; state control matched on
+  position bucket only. Fallback + row-floor rules as in replag
+  (`matched_sample`, MIN_ROWS 300).
+- **Probe grid:** frozen problib stack; per-token linear/MLP once;
+  T ∈ {16, 32, 64}: window linear, window-mean linear,
+  context-shuffled linear (anchor slot fixed, seeded); MLPs at
+  T ∈ {32, 64}; permutation nulls (seed 99) at T = 32. Metric:
+  acc_test (3-class, balanced; chance 1/3) + per_class.
+- **KEEP/KILL:** exactly the frozen rules above (§ Falsifier) with the
+  gap read as window − per-token accuracy on slope targets at T = 64
+  (either probe pair, MLP allowed per the regime-2 linear prediction —
+  slope is linear given per-position features, so the LINEAR pair is
+  the primary reader here); ≥ +0.05 accuracy with the T-growth shape +
+  shuffle collapse = KEEP.
