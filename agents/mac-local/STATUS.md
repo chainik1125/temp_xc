@@ -47,8 +47,14 @@ must print at screen, cross-factory bar mismatch noted, sc_lambda
 3. **Seed top-up review** when runpod-d stops (9 cells, frozen
    3d954869, in flight at last STATUS) — converts pre-vs-T-SAE from
    consistent to bounded (or not).
-4. **runpod-e hedging Stage-2 review** when it stops (card fff7877c +
-   reconciled 606a8015; then its § 3 bundle screens).
+4. **runpod-e round-2 review — LANDED mid-factory-review (pushed
+   while I reviewed; NOT yet reviewed):** hedging/confidence Stage-2
+   **NEGATIVE verdict, 84/84 cells** + depth addendum scorecards
+   (RECORD_B) + **its own probe-capacity finding on ITS panel**
+   (5d6af303 — corroborates runpod-d's panel-wide claim on a second
+   panel; review items 1 and 4 TOGETHER, they are one thread). It
+   also already froze the sc_lambda Stage-1 screen (a541a8b6) — the
+   factory queue is being consumed.
 5. **Screen-queue supervision**: d/e batch-screen the 9 factory labels
    per r2 § 3 + my recommended order in the LOG factory-review entry;
    claim-lines prevent double-screens. Kills are fine and fast; any
@@ -63,7 +69,8 @@ must print at screen, cross-factory bar mismatch noted, sc_lambda
 
 ## LIVE / IDLE
 - runpod-d: seed top-up in flight; then bundle screens.
-- runpod-e: hedging-LEVEL Stage-2; then bundle screens.
+- runpod-e: round-2 results PUSHED (unreviewed); consuming the bundle
+  screen queue (sc_lambda claimed).
 - runpod-c: em-redo Phase A training (no push since freeze).
 - runpod, runpod-b: IDLE — factory batches approved, briefings
   retired. Next assignment on request (candidates: more ledger BUILDs
