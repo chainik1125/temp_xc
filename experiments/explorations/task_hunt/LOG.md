@@ -2140,3 +2140,106 @@ bookkeeping; an explicit **WEAK/"no rule fires"** verdict class (the
 fraction** reported next to every gap. Clock is fully spanned by the
 ladder (block tokens q10 13 / median 47 / q90 105), so a flat result
 here is a real negative, not reach-limited.
+
+## 2026-07-24 — mac-local — REVIEW: the probe-capacity thread (runpod-d amendment + runpod-e diagnostics) — **AMENDMENT APPROVED with one pre-registration breach corrected**; the λ-readout DECISION RULE is pre-registered here, the decision itself DEFERRED to the mirror receipt
+
+Reviewed as one thread: runpod-d's `2b64dbe4` (matched TXC-post +
+probe-capacity, RECORD § 3c) and runpod-e's round-2 batch
+(`dc0b408f`/`5d6af303`/`f8cdfc67`).
+
+**Gate integrity: CLEAN.** Committer dates in the d chain are rebase
+artifacts; AUTHOR dates give the true order — card `07c90cfb` 14:41:24
+→ runner 14:42:36 → **probe_capacity.py pre-registered 14:45:44** →
+results 15:02:41 → verdict 18:43:40. The diagnostic was frozen ~17 min
+before the first matched cell existed, and `probe_capacity.py` is
+**byte-identical to its pre-registration** (empty diff to HEAD).
+Leaderboard: 8,688 → 8,712 (+24, d) → 8,796 (+84, e); **0 duplicate
+eval_keys, 0 null metrics** across all 8,796; the probe diagnostic
+correctly wrote none. Renderer verified: matched cells graft as a
+distinct arch `txc_batchtopk_post_matched` (own colour/linestyle),
+round-1 post is relabelled "NOT matched", and the budget-match anchor
+excludes `_matched` rows so the per-token k_pos reference is not
+inflated — `stage2_summary.json` confirms the split
+(matched `budget_matched: true`, round-1 post `false`). RECORD § 3b
+received a forward-pointing note rather than a rewrite — correct.
+
+**Numbers verified against artifacts.** Falsifier **PASSES exactly**:
+every untrained matched cell realizes l0_per_token = 8.000 at every T.
+Matched-post recovery 0.1851/0.2022/0.1442/0.1372 and the
+trained−untrained margins +0.084/+0.124/+0.070/+0.103 reproduce to the
+digit. Probe-capacity: the nw1024/OLS column reproduces the committed
+panel per seed (max |Δ| 8.8e-6 for pre; 1.85e-4 for stacked — the
+quoted cell means agree at 4 dp as claimed, and the per-seed spread
+should be what future entries quote). **All seven rows of the lift
+table reproduce exactly** (pre T16 0.138→0.351, stacked 0.094→0.319,
+matched post T16 0.137→0.322, round-1 post T16 0.255→0.286, tsae
+0.154→0.211, bsae 0.113→0.185). The r²-range claim holds at the
+**seed-averaged** level (r2_train [0.41,0.70], r2_heldout
+[−1.39,−1.07]); per-seed the held-out spread is wider
+(−2.61…−0.33) — say "cell means" when quoting it.
+
+**CORRECTION — a pre-registered bookkeeping duty was not discharged.**
+The card § 3 states: *any trained cell outside **[5.0, 8.0]** is
+recorded as a residual mismatch and carried into the reading, not
+smoothed over.* **Four of twelve trained matched cells sit ABOVE 8.0**
+— T8 all three seeds (8.121 / 8.080 / 8.060) and T16 seed 42 (8.009);
+the T8 cell mean is 8.087. The LOG entry and RECORD § 3c both call
+these "inside the pre-registered [5.0,8.0] band" / "(in-band)". That
+is wrong and must be corrected in both places to the card's own
+language: **a residual mismatch of up to +1.5 % over the panel budget,
+concentrated at T8.** Consequence for the verdict: **none, and the
+direction is conservative** — at T8 matched post held MORE budget than
+TXC-pre (8.09 vs 7.79) and still recovered less (0.144 vs 0.206), so
+the surplus cannot explain post's failure to rise; if anything it
+hardens "TXC-pre remains the matched-budget headline". Verdict stands;
+the record must say what the card told it to say. **runpod-d: amend
+both spots, no re-run.**
+
+**runpod-e bookkeeping:** its panel entry states "8700 rows = 8616
+baseline + 84". The committed file went 8,712 → 8,796 (+84 exactly);
+8,616 was the pre-hunt-support baseline. The 84-cell claim and the
+hygiene claims are TRUE; the decomposition arithmetic is stale — amend
+the entry. (e's round-2 science — the NEGATIVE verdict, the
+screen↔panel convention lesson, the self-caught stacked-reshape
+defect — is reviewed at its own gate, not here.)
+
+**AMENDMENT APPROVED.** Reading (b) confirmed as refined (0.255 was a
+sparse code dodging a dense-code probe penalty, not sparsity aiding
+recovery); reading (c) confirmed; § 3b's QUALIFIED POSITIVE stands and
+its largest single number is positively identified as NOT a matched
+win. No new positive claim.
+
+**THE λ-READOUT METHODS DECISION: DEFERRED ~12 h, with the rule
+PRE-REGISTERED NOW (before the deciding evidence exists).** The
+machinery is reviewed and ready (`lambda_recovery_v2`,
+`PROBE_V2_SPEC.md`; adoption = freezing that spec as-is; 192 eval-only
+cells). What is missing is the one thing neither real panel can
+supply: on a real task we know only that v2 *reports* larger numbers,
+and larger is not better on its own. runpod-b's overnight mirror
+campaign (`briefings/mirror-probe-truth.md`) measures both probes
+against a KNOWN λ. Deciding on reported-lift alone would be exactly
+the inference this program refuses elsewhere. **The rule, fixed
+before the receipt lands:**
+1. **Mirror shows v2 tracks truth across T where v1 sags** ⇒ ADOPT:
+   freeze the spec, run the 192 eval-only cells, re-base the variance
+   receipts from the v2 columns (the p = 0.0093 headline is restated
+   from v2, never carried over), and § 3b's T-shape reading is
+   rewritten on v2 with v1 kept alongside.
+2. **Both probes track truth equally** ⇒ DECLINE: v1 stays canonical;
+   the real-panel lift then needs a different explanation and is
+   reported as an open caveat, not a correction.
+3. **v2 reports ABOVE truth** (optimistic probe) ⇒ REJECT v2 for
+   headline use; keep it as a diagnostic only.
+4. **Ambiguous / campaign incomplete by Saturday midday** ⇒ v1 remains
+   canonical through the deadline; the diagnostic ships as a stated
+   caveat ("absolute levels and T-shape are probe-dependent; the
+   window > token ordering is not"), which is defensible as-is.
+Under every branch the ORDERING claim survives — v2 widens it (pre
+0.351 vs tsae 0.211 at T16) — so no branch costs the headline. GPU
+pods do NOT re-run anything for this tonight; candidate screening
+keeps priority until the rule fires.
+
+Interim rebuttal guidance unchanged: quote v1 numbers with the
+T-shape caveat; do not type new absolute panel numbers until the rule
+resolves. Next: seed top-up (d), screen wave (e), then the mirror
+receipt (b) → this rule fires.

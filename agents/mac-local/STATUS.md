@@ -20,22 +20,20 @@ byte-identically; zero committed numbers affected). The hunt's first
 screen KEEP exists (punctint-q, unreviewed interim).
 
 ## ⏭ NEXT, in this order
-1. **THE METHODS REVIEW (biggest open item):** runpod-d's Stage-2
-   amendment (LOG ~1168–1272, RECORD § 3c) + runpod-e's round-2 batch
-   (LOG 1273–1481 + f8cdfc67 stacked-lift extension) as ONE thread —
-   two panels, one probe-capacity defect. Machinery is READY
-   (`lambda_recovery_v2` + `PROBE_V2_SPEC.md`, reviewed; adoption =
-   freeze the spec as-is). Decide: adopt v2 for a 192-cell eval-only
-   re-run (~3–4 h wall, checkpoints reused, paired v1 columns kept)
-   + one-command variance re-base, or decline and keep v1 canonical.
-   My verify list for the amendment itself: falsifier (untrained
-   matched l0 = 8.000), nw1024/OLS column reproducing leaderboard to
-   1e-4, probe_capacity.py vs its pre-registration d9ee5c75,
-   leaderboard decomposition for ff3c5618 (24 cells, dup keys),
-   `_matched` figure series, e's 84-cell panel hygiene (8700 = 8616 +
-   84 claimed), e's self-caught stacked-reshape defect (18507791).
-   Rebuttal implication either way: T-shape statements are
-   probe-dependent; ordering survives and WIDENS under v2.
+1. **METHODS DECISION — rule is PRE-REGISTERED, fires on the mirror
+   receipt (runpod-b, Saturday AM).** The amendment review is DONE
+   (approved; see LOG). The 4-branch rule is in the LOG review entry:
+   adopt v2 only if the mirror shows v2 tracking KNOWN truth where v1
+   sags; decline if both track equally; reject if v2 reads above
+   truth; keep v1 through the deadline if ambiguous/incomplete by
+   Saturday midday. Adoption = freeze `PROBE_V2_SPEC.md` as-is, run
+   192 eval-only cells (~3–4 h wall), re-base variance receipts from
+   v2 columns (restate p=0.0093, never carry it over). Ordering
+   survives under every branch. **Do not let a pod pre-empt this.**
+   Open follow-up: runpod-d owes a 2-spot amendment (LOG + RECORD
+   § 3c) re-labelling the 4 out-of-band cells as a residual mismatch;
+   runpod-e owes a stale leaderboard-decomposition fix (8700=8616+84
+   → 8,796 = 8,712 + 84). Both are record corrections, no re-runs.
 2. **Screen-wave review** when runpod-e stops (novelty NEG /
    punctint-q KEEP / punctint-list WEAK KEEP posted; tss + dialevel
    remain; sc_lambda card frozen a541a8b6 — verdict not seen yet).

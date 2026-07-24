@@ -10,6 +10,23 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **PROBE-CAPACITY THREAD REVIEWED (2026-07-24 night, mac-local):
+  runpod-d's Stage-2 AMENDMENT **APPROVED** (falsifier exact —
+  untrained matched l0 = 8.000 at every T; all lift-table rows and the
+  panel-reproduction claim verified; probe_capacity.py byte-identical
+  to its pre-registration; leaderboard 8,796 with 0 dups/0 nulls).
+  **One pre-registration breach corrected:** 4/12 trained matched
+  cells sit ABOVE the card's [5.0, 8.0] band (T8 ≈ 8.09) and were
+  called "in-band" — must be recorded as a residual mismatch per the
+  card; verdict UNAFFECTED and the direction is conservative (post had
+  MORE budget than pre at T8 and still recovered less). **The
+  λ-readout METHODS DECISION is DEFERRED with its rule
+  PRE-REGISTERED** in the LOG review entry: adopt v2 only if
+  runpod-b's overnight mirror campaign shows v2 tracks KNOWN truth
+  where v1 sags; decline if both track equally; reject if v2 reads
+  above truth; keep v1 through the deadline if ambiguous. Under every
+  branch the window > token ORDERING survives (v2 widens it).
+
 - **ROUND 2 CPU WORK REVIEWED & APPROVED (2026-07-24 night,
   mac-local).** (1) **probe-adequacy (runpod-b)**: `lambda_recovery_v2`
   plugin (ridge + nw 8192 + boundary-snap trace split, opt-in flag,
