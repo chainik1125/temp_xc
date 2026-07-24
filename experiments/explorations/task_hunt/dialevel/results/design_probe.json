@@ -1,0 +1,209 @@
+{
+ "gpt2": {
+  "n_dialogues": 5000,
+  "n_tokens": 869710,
+  "n_prefix": 0,
+  "content": 128,
+  "rows_cached": 4111,
+  "doc_len_median": 151.0,
+  "chunks_per_doc": {
+   "0": 1792,
+   "1": 2451,
+   "2": 642,
+   "3": 90,
+   "4": 21,
+   "5": 3,
+   "7": 1
+  },
+  "tokens_kept_frac": 0.6050384610962275,
+  "labeled_frac": 0.5670729323567626,
+  "eligible_rows": 180242,
+  "eligible_docs": 3087,
+  "elig_pos_q": [
+   73.0,
+   114.0,
+   320.0
+  ],
+  "class_counts_train": [
+   41687,
+   61724,
+   41333
+  ],
+  "class_counts_test": [
+   10695,
+   14981,
+   9822
+  ],
+  "doc_mean_only_auc": 0.9827310988327146,
+  "position_auc_eligible": 0.9364590743756871,
+  "doclen_auc_eligible": 0.8780914918556382,
+  "between_doc_var_frac": 0.8232693556433072,
+  "doclen_tlevel_corr": 0.5943994151577591,
+  "within_doc": {
+   "docs_with_eligible_rows": 3087,
+   "distinct_tlevel_per_doc_q": [
+    2.0,
+    4.0,
+    6.0
+   ],
+   "docs_usable": 2790,
+   "rows_class0": 52176,
+   "rows_class1": 32855,
+   "delta_tlevel_median": 3.9999990463256836,
+   "global_tercile_contrast": 15.457550048828125,
+   "contrast_ratio": 0.25877315833947007,
+   "rows_train": [
+    41170,
+    26374
+   ],
+   "docs_train": 2229,
+   "rows_test": [
+    11006,
+    6481
+   ],
+   "docs_test": 561,
+   "position_auc": 0.6745054870829318,
+   "doclen_auc": 0.510137041295706,
+   "doc_mean_only_auc": 0.5166176909353255,
+   "tst_auc": 0.6624451215301255
+  }
+ },
+ "gemma2_2b": {
+  "n_dialogues": 5000,
+  "n_tokens": 880013,
+  "n_prefix": 1,
+  "content": 127,
+  "rows_cached": 4304,
+  "doc_len_median": 153.0,
+  "chunks_per_doc": {
+   "0": 1655,
+   "1": 2545,
+   "2": 677,
+   "3": 95,
+   "4": 22,
+   "5": 5,
+   "7": 1
+  },
+  "tokens_kept_frac": 0.6211362786686105,
+  "labeled_frac": 0.5687859156626095,
+  "eligible_rows": 186040,
+  "eligible_docs": 3215,
+  "elig_pos_q": [
+   73.0,
+   114.0,
+   321.0
+  ],
+  "class_counts_train": [
+   44757,
+   63348,
+   41187
+  ],
+  "class_counts_test": [
+   11788,
+   15381,
+   9579
+  ],
+  "doc_mean_only_auc": 0.9864371699375043,
+  "position_auc_eligible": 0.938562483791228,
+  "doclen_auc_eligible": 0.8825137898325758,
+  "between_doc_var_frac": 0.8173242362798824,
+  "doclen_tlevel_corr": 0.590141391248281,
+  "within_doc": {
+   "docs_with_eligible_rows": 3215,
+   "distinct_tlevel_per_doc_q": [
+    2.0,
+    4.0,
+    6.0
+   ],
+   "docs_usable": 2905,
+   "rows_class0": 53551,
+   "rows_class1": 33601,
+   "delta_tlevel_median": 3.9999990463256836,
+   "global_tercile_contrast": 15.416717529296875,
+   "contrast_ratio": 0.25945854159449694,
+   "rows_train": [
+    42278,
+    26656
+   ],
+   "docs_train": 2312,
+   "rows_test": [
+    11273,
+    6945
+   ],
+   "docs_test": 593,
+   "position_auc": 0.6788130268127295,
+   "doclen_auc": 0.5169892038016893,
+   "doc_mean_only_auc": 0.531817941746422,
+   "tst_auc": 0.6514213162601032
+  }
+ },
+ "llama31_8b": {
+  "n_dialogues": 5000,
+  "n_tokens": 810054,
+  "n_prefix": 1,
+  "content": 127,
+  "rows_cached": 3653,
+  "doc_len_median": 141.0,
+  "chunks_per_doc": {
+   "0": 2094,
+   "1": 2276,
+   "2": 536,
+   "3": 76,
+   "4": 14,
+   "5": 3,
+   "6": 1
+  },
+  "tokens_kept_frac": 0.5727161399116603,
+  "labeled_frac": 0.5708236734834962,
+  "eligible_rows": 161079,
+  "eligible_docs": 2793,
+  "elig_pos_q": [
+   72.0,
+   112.0,
+   252.0
+  ],
+  "class_counts_train": [
+   31483,
+   57219,
+   40267
+  ],
+  "class_counts_test": [
+   8630,
+   14494,
+   8986
+  ],
+  "doc_mean_only_auc": 0.9837538449794053,
+  "position_auc_eligible": 0.9052961037112192,
+  "doclen_auc_eligible": 0.8474656663036282,
+  "between_doc_var_frac": 0.8204227858173496,
+  "doclen_tlevel_corr": 0.5717909088963204,
+  "within_doc": {
+   "docs_with_eligible_rows": 2793,
+   "distinct_tlevel_per_doc_q": [
+    2.0,
+    4.0,
+    7.0
+   ],
+   "docs_usable": 2547,
+   "rows_class0": 46331,
+   "rows_class1": 27943,
+   "delta_tlevel_median": 4.199999809265137,
+   "global_tercile_contrast": 14.809426307678223,
+   "contrast_ratio": 0.2836031404597738,
+   "rows_train": [
+    36510,
+    22259
+   ],
+   "docs_train": 2027,
+   "rows_test": [
+    9821,
+    5684
+   ],
+   "docs_test": 520,
+   "position_auc": 0.6965406855908661,
+   "doclen_auc": 0.5121017999101581,
+   "doc_mean_only_auc": 0.5377025766856571,
+   "tst_auc": 0.6565073130643013
+  }
+ }
+}
