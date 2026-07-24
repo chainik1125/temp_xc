@@ -844,3 +844,28 @@ figure exists. The undercounted-untrained-controls disclosure
    the primary. Stays PARKED until a pod frees + explicit greenlight.
 5. Both support briefings retired. runpod and runpod-b are idle;
    next assignment on request.
+
+## 2026-07-24 — runpod — candidate factory: ledger committed + bundle B1 (interleave `tss`) SCREEN-READY
+
+Mandate `briefings/candidate-factory-broad.md` (quantity mode; I own
+non-Ward candidates, runpod-b owns the Ward grid). **Ledger first:**
+`CANDIDATES.md` committed before any builder — 18 ideas vetted on the
+four round-1 axes, 6 BUILD / 6 PARK / 6 DEAD, ship order B1 → B2
+(vocabulary-novelty, fineweb) → B3/B4 (list-density + question-rate,
+one builder) with B5/B6 (dialogue, OpenWebMath) as stretch.
+
+**B1 shipped (packaging, not building — runpod-b's committed label
+artifacts stand untouched):** `interleave/CARD_DRAFT.md` promoted from
+parked draft to screen-ready operative draft under the briefing's
+explicit quantity-mode lift of the park. Framing frozen into the
+draft: `tss` PRIMARY (unigram ≈ 0.55, near-blind — the passed triage),
+`source` demoted to disclosed regime-1 anchor (0.66 matched = the
+expected kill face, does not count against the candidate); predicted
+T-pattern (tss window-readable, T-growing over {4…32}, degraded on
+the shuffled-block null) + draft kill rule staged for the freezing
+agent. Economics stated in the card: the interleaved streams are NEW
+token sequences ⇒ one ~330k-token forward-pass caching run per model
+(minutes on H100), not the existing fineweb caches.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
+2026-07-24. Bundles land incrementally; one LOG line each._
