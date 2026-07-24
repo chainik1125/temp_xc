@@ -22,7 +22,7 @@ import numpy as np
 from experiments.explorations.conversion_depth.build_ward_stream import (
     BASE_MODEL, SEQ_LEN, build_stream)
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[4]
 STAGE_A = ROOT / "results" / "c7_backtracking" / "stage_a"
 
 

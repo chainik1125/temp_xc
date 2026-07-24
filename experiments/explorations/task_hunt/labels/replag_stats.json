@@ -1,0 +1,171 @@
+{
+ "source": "experiments/explorations/synthetic/expansion/data/fineweb_sample.json",
+ "source_meta": {
+  "dataset": "HuggingFaceFW/fineweb",
+  "name": "sample-10BT",
+  "split": "train",
+  "seed": 0,
+  "shuffle_buffer": 10000,
+  "n_docs": 400,
+  "n_scanned": 4183,
+  "min_sents": 60,
+  "max_sents": 200,
+  "n_sentences": 36805,
+  "datasets_version": "4.8.5",
+  "splitter": "expansion.corpus.split_sentences v1"
+ },
+ "seed": 0,
+ "bucket_scheme": {
+  "edges": [
+   4,
+   8,
+   16
+  ],
+  "none_min": 64,
+  "guard_excluded": [
+   17,
+   64
+  ]
+ },
+ "min_manifest_pos": 32,
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "transformers_version": "5.7.0",
+   "vocab": 50257,
+   "n_docs": 400,
+   "n_tokens": 793831,
+   "tokens_per_doc": {
+    "mean": 1984.5775,
+    "median": 1747.5,
+    "min": 538,
+    "max": 8658
+   },
+   "bucket1": {
+    "-1": 166455,
+    "0": 20873,
+    "1": 32004,
+    "2": 59048,
+    "3": 515451
+   },
+   "bucket2": {
+    "-1": 41002,
+    "0": 1319,
+    "1": 4847,
+    "2": 11054,
+    "3": 735609
+   },
+   "bucket1_shuf": {
+    "-1": 136847,
+    "0": 28519,
+    "1": 25339,
+    "2": 42338,
+    "3": 560788
+   },
+   "bucket2_shuf": {
+    "-1": 3319,
+    "0": 442,
+    "1": 288,
+    "2": 580,
+    "3": 789202
+   },
+   "manifest_rows_per_bucket": {
+    "n1": 20000,
+    "n2": 1297
+   },
+   "artifact": "replag_fineweb_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "transformers_version": "5.7.0",
+   "vocab": 256000,
+   "n_docs": 400,
+   "n_tokens": 784512,
+   "tokens_per_doc": {
+    "mean": 1961.28,
+    "median": 1687.5,
+    "min": 515,
+    "max": 8668
+   },
+   "bucket1": {
+    "-1": 167250,
+    "0": 26798,
+    "1": 34763,
+    "2": 60870,
+    "3": 494831
+   },
+   "bucket2": {
+    "-1": 40788,
+    "0": 2190,
+    "1": 5342,
+    "2": 11272,
+    "3": 724920
+   },
+   "bucket1_shuf": {
+    "-1": 142811,
+    "0": 30335,
+    "1": 26739,
+    "2": 44589,
+    "3": 540038
+   },
+   "bucket2_shuf": {
+    "-1": 3816,
+    "0": 488,
+    "1": 358,
+    "2": 648,
+    "3": 779202
+   },
+   "manifest_rows_per_bucket": {
+    "n1": 20000,
+    "n2": 2134
+   },
+   "artifact": "replag_fineweb_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "transformers_version": "5.7.0",
+   "vocab": 128256,
+   "n_docs": 400,
+   "n_tokens": 777900,
+   "tokens_per_doc": {
+    "mean": 1944.75,
+    "median": 1697.0,
+    "min": 524,
+    "max": 8557
+   },
+   "bucket1": {
+    "-1": 160726,
+    "0": 20618,
+    "1": 31896,
+    "2": 57679,
+    "3": 506981
+   },
+   "bucket2": {
+    "-1": 37198,
+    "0": 1389,
+    "1": 4379,
+    "2": 9932,
+    "3": 725002
+   },
+   "bucket1_shuf": {
+    "-1": 132768,
+    "0": 27874,
+    "1": 24789,
+    "2": 41194,
+    "3": 551275
+   },
+   "bucket2_shuf": {
+    "-1": 3257,
+    "0": 407,
+    "1": 266,
+    "2": 563,
+    "3": 773407
+   },
+   "manifest_rows_per_bucket": {
+    "n1": 20000,
+    "n2": 1362
+   },
+   "artifact": "replag_fineweb_llama31.npz"
+  }
+ }
+}

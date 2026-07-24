@@ -1,0 +1,49 @@
+{
+ "labels_source": "experiments/explorations/synthetic/expansion/records/proof-operation-phase-runs/labels.json",
+ "coverage": {
+  "n_docs": 300,
+  "n_docs_labeled": 287,
+  "n_chunks": 658,
+  "n_dead_chunks": 14,
+  "doc_coverage": 0.9566666666666667
+ },
+ "seed": 0,
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "labeled_rate_pos1plus": 0.864455555815167,
+ "n_roundtrip_mismatch_tokens": 149,
+ "op_class_counts": {
+  "0": 72002,
+  "1": 174678,
+  "2": 36294,
+  "3": 30339,
+  "4": 130661
+ },
+ "boundary_rate_sentencelevel_proxy": 0.5376367237963999,
+ "tir_bin_counts": {
+  "0": 242999,
+  "1": 95535,
+  "2": 105440
+ },
+ "manifest_rows_per_class": {
+  "op": 20000,
+  "boundary": 20000,
+  "tir": 20000
+ },
+ "clock_bridge": {
+  "tokens_per_sentence": {
+   "mean": 19.236859771749003,
+   "median": 16.0,
+   "p10": 6.0,
+   "p90": 37.0,
+   "n": 25323
+  },
+  "sentences_per_window_at_T": {
+   "8": 0.5,
+   "16": 1.0,
+   "32": 2.0,
+   "64": 4.0,
+   "128": 8.0
+  },
+  "min_T_spanning_2_sentences_median_clock": 32
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "labels_source": "experiments/explorations/synthetic/expansion/records/uncertainty-hedging-drift/labels.json",
+ "coverage": {
+  "n_docs": 300,
+  "n_docs_labeled": 300,
+  "n_chunks": 658,
+  "n_dead_chunks": 0,
+  "doc_coverage": 1.0
+ },
+ "seed": 0,
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "n_roundtrip_mismatch_tokens": 149,
+ "state_counts": {
+  "-1": 0,
+  "0": 94140,
+  "1": 319181,
+  "2": 53763
+ },
+ "slope8": {
+  "valid_rate": 0.9047858629282955,
+  "mean": 0.006443841382861137,
+  "tercile_edges": [
+   -0.02380952425301075,
+   0.0357142873108387
+  ]
+ },
+ "state_mean_by_third": [
+  0.8188279233925798,
+  0.955472302273455,
+  0.9763107783896003
+ ],
+ "manifest_rows_per_class": {
+  "state": 20000,
+  "slope": 20000
+ }
+}

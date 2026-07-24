@@ -1,0 +1,42 @@
+{
+ "mirror_params": {
+  "intercept": -2.9819948098026687,
+  "coef_position": 0.4869619200909732,
+  "kernel_w": [
+   1.690173476847805,
+   0.9066730693232868,
+   0.001010148339395109,
+   0.6981002583609157,
+   0.13150727297233458,
+   0.1693789750949111,
+   0.04506326596787156,
+   0.4739374351647963
+  ],
+  "source": "experiments/explorations/synthetic/backtracking/results/backtracking_mirror_stats.json"
+ },
+ "stream_shape": [
+  4044,
+  128
+ ],
+ "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "roundtrip_valid_rate_pos1plus": 0.9997098841873252,
+ "n_roundtrip_mismatch_tokens": 149,
+ "lam": {
+  "mean": 0.12823085486888885,
+  "tercile_edges": [
+   0.059292834252119064,
+   0.08272068202495575
+  ]
+ },
+ "is_bt_rate_by_lam_tercile": [
+  0.05269041011409189,
+  0.08148809370906009,
+  0.2564930894517803
+ ],
+ "is_bt_rate_valid": 0.13022925212595593,
+ "manifest_rows_per_class": 20000,
+ "trace_split_test_frac": 0.2,
+ "seed": 0,
+ "ref_map_ok_rate_committed": 0.9997098841873252
+}
