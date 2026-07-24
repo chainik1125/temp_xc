@@ -58,7 +58,12 @@ def run_cell(cell: dict) -> dict:
             arch_hparams_override=override,
         )
         ecfg = {"smoke": False, "k_pos": k_pos,
-                "eval_window_L": cell.get("eval_window_L", 32)}
+                "eval_window_L": cell.get("eval_window_L", 32),
+                # Optional per-cell eval knobs (e.g. the λ-probe v2 flags,
+                # PROBE_V2_SPEC.md). Default {} → ecfg unchanged for every
+                # existing caller; extra keys hash into eval_key so flagged
+                # cells are new rows, never cache collisions.
+                **cell.get("eval_extra", {})}
         # code_version stamping shells out to git; under a full worker pool a
         # transient race (index lock / mmap of a file mid-rewrite) can kill the
         # git call. Retry those — they are env flakes, not cell failures.

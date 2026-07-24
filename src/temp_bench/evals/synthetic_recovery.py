@@ -289,6 +289,21 @@ class SyntheticRecovery(Evaluator):
             from temp_bench.evals.lambda_recovery import lambda_recovery_metrics
             out.update(lambda_recovery_metrics(model, data, eval_window_L=L))
 
+        # λ-readout v2 — probe-capacity knobs (briefings/probe-adequacy.md;
+        # frozen convention in task_hunt/lambda_intensity/PROBE_V2_SPEC.md).
+        # OPT-IN: fires only when eval_cfg sets `lambda_probe_v2: true`, so
+        # with the flag absent every existing row is byte-identical and the
+        # protocol stays 1.3.0. Emits only `*_v2` keys; the v1 block above
+        # still runs, so a v2 row carries its paired v1 readout on the same
+        # windows. v1 (`lambda_recovery.py`) is frozen and never edited.
+        if (getattr(data, "extra", None) and "lambda_labels" in data.extra
+                and spec.extra.get("lambda_probe_v2")):
+            from temp_bench.evals.lambda_recovery_v2 import (
+                lambda_recovery_v2_metrics,
+            )
+            out.update(lambda_recovery_v2_metrics(
+                model, data, eval_window_L=L, eval_cfg=spec.extra))
+
         # Change-point / semi-Markov modes add-on (autoresearch #2). Only
         # fires for the toy_changepoint_modes datasource, which exposes the
         # mode / time-since-switch / change-point labels in `extra`. No-op

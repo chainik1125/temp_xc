@@ -121,6 +121,11 @@ def ward_slope_real(
         d_in=int(x.shape[-1]),
         extra={
             "lambda_labels": torch.from_numpy(lam[:N]),
+            # Sequence → Ward-trace map (same window order as the cache —
+            # split_forensics.json). Read ONLY by the v2 λ probe's trace
+            # split (`lambda_recovery_v2`); v1 never touches this key, so
+            # every existing row is byte-identical.
+            "trace_ids": npz["trace_idx"][:N].copy(),
             "real_activations": True,
             "model_tag": model_tag,
             "hs": hs,

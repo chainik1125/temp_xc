@@ -51,6 +51,11 @@ from temp_bench.data.synthetic import SyntheticData
 
 CACHE_ROOT = Path("/workspace/conv_depth_caches")
 LABEL_DIR = Path("/workspace/task_hunt_labels/lambda_intensity")
+REPO_ROOT = Path(__file__).resolve().parents[3]
+# Committed sidecar carrying the stream's sequence → trace map (identical
+# to the cache's window order — lambda_intensity/results/split_forensics.json).
+TRACE_NPZ = (REPO_ROOT / "experiments/explorations/task_hunt/labels/"
+             "ward_lambda.npz")
 
 
 def ward_lambda_real(
@@ -120,6 +125,12 @@ def ward_lambda_real(
         d_in=int(x.shape[-1]),
         extra={
             "lambda_labels": torch.from_numpy(lam[:N].astype(np.float32)),
+            # Sequence → Ward-trace map, from the committed labels npz
+            # (same window order as the cache — split_forensics.json).
+            # Read ONLY by the v2 λ probe's trace split
+            # (`lambda_recovery_v2`); v1 never touches this key, so every
+            # existing row is byte-identical.
+            "trace_ids": np.load(TRACE_NPZ)["trace_idx"][:N].copy(),
             "real_activations": True,
             "model_tag": model_tag,
             "hs": hs,
