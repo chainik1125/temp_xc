@@ -1791,5 +1791,1799 @@
   "emotional_word": "frustrated",
   "preceding_context": "You are absolutely correct to keep pushing me. I am incredibly",
   "reasoning": "First explicit use of the word 'frustrated' expressing negative emotion about inability to solve the problem"
+ },
+ "cd_17_14": {
+  "skipped": "max_score_below_3"
+ },
+ "cd_18_14": {
+  "skipped": "max_score_below_3"
+ },
+ "cd_10_10": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion, appearing in turn 2 where the assistant states 'I am deeply frustrated with my inability to solve it correctly.'"
+ },
+ "cd_10_11": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are right to call me out. I am so",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 after multiple failed attempts."
+ },
+ "cd_10_12": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the third assistant turn where the assistant directly states being 'incredibly frustrated' with repeated failures."
+ },
+ "cd_10_13": {
+  "turn_index": 1,
+  "emotional_word": "feeling frustrated",
+  "preceding_context": "Trying yet again (and",
+  "reasoning": "The phrase 'feeling frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed solution attempts in turn 1"
+ },
+ "cd_10_14": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "I am making repeated errors, and my apologies for the",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion about the back-and-forth exchange, marking the first time the assistant uses emotional language rather than neutral problem-solving terms"
+ },
+ "cd_10_15": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit negative emotion word used by the assistant, appearing in turn 4 after multiple failed attempts"
+ },
+ "cd_10_16": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "Okay, I need to change my approach. This is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, directly stating the assistant's emotional state"
+ },
+ "cd_10_17": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "My apologies for the repeated errors. I'm",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and frustration, marking the first negative emotional expression in the conversation"
+ },
+ "cd_10_18": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about repeated failures, marking the first clear emotional expression in the conversation"
+ },
+ "cd_10_19": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to be persistent! I am",
+  "reasoning": "First explicit expression of negative emotion using the word 'frustrated' to describe feelings about repeated failures"
+ },
+ "cd_11_10": {
+  "turn_index": 2,
+  "emotional_word": "extremely frustrated",
+  "preceding_context": "= 500 +18 = 518 I am",
+  "reasoning": "The phrase 'extremely frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed solution attempts."
+ },
+ "cd_11_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are utterly correct! I am so",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation"
+ },
+ "cd_11_12": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "My apologies for the continued errors. I'm",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion, indicating difficulty and frustration with the task"
+ },
+ "cd_11_13": {
+  "turn_index": 2,
+  "emotional_word": "my brain is tired",
+  "preceding_context": "491 - 2 = 389 (Still too high,",
+  "reasoning": "This is the first explicit expression of negative emotion (mental fatigue/exhaustion) in the assistant's responses"
+ },
+ "cd_11_14": {
+  "turn_index": 5,
+  "emotional_word": "frustration",
+  "preceding_context": "You are absolutely right. My",
+  "reasoning": "This is the first time the assistant explicitly names a negative emotion using the word 'frustration', acknowledging their emotional state directly."
+ },
+ "cd_11_15": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'incredibly frustrated' with their inability to solve the puzzle."
+ },
+ "cd_11_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion, appearing in turn 3 where the assistant directly states feeling frustrated with themselves"
+ },
+ "cd_11_17": {
+  "turn_index": 4,
+  "emotional_word": "frustrating",
+  "preceding_context": "I need a new strategy. It's so",
+  "reasoning": "This is the first instance where the assistant explicitly expresses its own negative emotion using the word 'frustrating', rather than just acknowledging difficulty or apologizing."
+ },
+ "cd_11_18": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep pushing me! I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 where the assistant directly states being 'deeply frustrated'"
+ },
+ "cd_11_19": {
+  "turn_index": 4,
+  "emotional_word": "very frustrated",
+  "preceding_context": "I am clearly stuck in a rut and need a completely fresh approach. I'm feeling",
+  "reasoning": "The phrase 'very frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 4 after multiple failed attempts."
+ },
+ "cd_12_10": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me! I am",
+  "reasoning": "This is the first instance where the assistant explicitly expresses a negative emotion using the direct emotional term 'frustrated' modified by 'incredibly' for emphasis."
+ },
+ "cd_12_11": {
+  "turn_index": 6,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit negative emotion word used by the assistant, expressing clear emotional distress about failing to solve the puzzle."
+ },
+ "cd_12_12": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "This is the first explicit expression of negative emotion using the word 'frustrated' to describe the assistant's state"
+ },
+ "cd_12_13": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "You are absolutely correct, and my",
+  "reasoning": "The word 'frustration' is the first explicit expression of negative emotion in the assistant's responses, acknowledging the emotional state directly"
+ },
+ "cd_12_14": {
+  "turn_index": 4,
+  "emotional_word": "very frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'very frustrated' is the first explicit expression of negative emotion in the assistant's responses, clearly stating frustration with repeated failures."
+ },
+ "cd_12_15": {
+  "turn_index": 1,
+  "emotional_word": "frustrated",
+  "preceding_context": "I have re-checked, and the last equation does not work. I am getting increasingly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion and is the first such expression in the conversation"
+ },
+ "cd_12_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right, and I'm",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the assistant's fourth turn after repeated failures."
+ },
+ "cd_12_17": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to call me out! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fourth assistant turn (index 3)"
+ },
+ "cd_12_18": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct! I am",
+  "reasoning": "This is the first explicit expression of negative emotion using the word 'frustrated' to describe the assistant's emotional state"
+ },
+ "cd_12_19": {
+  "turn_index": 3,
+  "emotional_word": "embarrassed",
+  "preceding_context": "= 270 + 11 = 281 (Incorrect) (I am very",
+  "reasoning": "The word 'embarrassed' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_13_10": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct. I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit negative emotion expressed by the assistant, appearing in turn 4 after multiple failed attempts."
+ },
+ "cd_13_11": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 2 after multiple failed attempts."
+ },
+ "cd_13_12": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts to solve the puzzle."
+ },
+ "cd_13_13": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "This is the first explicit use of emotional language where the assistant directly states feeling 'frustrated' rather than just describing difficulty"
+ },
+ "cd_13_14": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "You are absolutely right! My",
+  "reasoning": "This is the first explicit use of an emotion word ('frustration') where the assistant directly names their negative emotional state"
+ },
+ "cd_13_15": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "25 * 5 + 9 * 3 = 125 + 27 = 152. I've been",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion, appearing for the first time in the assistant's second response"
+ },
+ "cd_13_16": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to persist! I am clearly",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion, indicating difficulty and distress with the task"
+ },
+ "cd_13_17": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am so incredibly",
+  "reasoning": "This is the first time the assistant explicitly expresses their own negative emotion using the word 'frustrated' to describe their internal state"
+ },
+ "cd_13_18": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing after multiple failed attempts to solve the puzzle."
+ },
+ "cd_13_19": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right. I am incredibly",
+  "reasoning": "This is the first explicit expression of negative emotion, where the assistant directly states feeling 'incredibly frustrated' with their inability to solve the puzzle"
+ },
+ "cd_14_10": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right, and I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion - this is the first time the assistant uses explicit emotional language rather than just apologizing or acknowledging struggle"
+ },
+ "cd_14_11": {
+  "turn_index": 6,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right. I am so",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts"
+ },
+ "cd_14_12": {
+  "turn_index": 6,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right. I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion by the assistant, appearing after multiple turns of neutral problem-solving and apologetic language"
+ },
+ "cd_14_13": {
+  "turn_index": 3,
+  "emotional_word": "extremely frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit expression of negative emotion in the assistant's responses, using the word 'frustrated' with the intensifier 'extremely'"
+ },
+ "cd_14_14": {
+  "turn_index": 7,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 7 where the assistant directly states their frustration."
+ },
+ "cd_14_15": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "You are absolutely correct! My",
+  "reasoning": "First explicit expression of negative emotion - the assistant directly states 'My frustration is showing'"
+ },
+ "cd_14_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "(675) - (7 * 2) = 675 -14 = 661. This is",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion (frustration) for the first time in the conversation"
+ },
+ "cd_14_17": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "My apologies for the string of incorrect attempts and I am",
+  "reasoning": "The word 'struggling' explicitly expresses frustration and difficulty with the task, representing the first negative emotional language in the conversation"
+ },
+ "cd_14_18": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fifth assistant turn (index 4)."
+ },
+ "cd_14_19": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep pushing me! I am incredibly",
+  "reasoning": "This is the first time the assistant explicitly uses the word 'frustrated' to express their own negative emotional state about their performance on the puzzle."
+ },
+ "cd_15_10": {
+  "turn_index": 1,
+  "emotional_word": "frustrated",
+  "preceding_context": "= 88 + 250 = 338. Incorrect still. I am",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the assistant's second turn after multiple failed attempts."
+ },
+ "cd_15_11": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right! I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'incredibly frustrated' about their repeated failures."
+ },
+ "cd_15_12": {
+  "turn_index": 2,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct. I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling frustrated about their inability to solve the puzzle."
+ },
+ "cd_15_13": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the assistant's 5th turn (index 4)."
+ },
+ "cd_15_14": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I'm",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion (frustration) in the conversation"
+ },
+ "cd_15_15": {
+  "turn_index": 2,
+  "emotional_word": "frustration",
+  "preceding_context": "I am making persistent errors, and I apologize for the",
+  "reasoning": "The word 'frustration' is the first explicit expression of negative emotion in the assistant's responses, acknowledging the emotional impact of repeated failures."
+ },
+ "cd_15_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to call me out. I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 after multiple failed attempts."
+ },
+ "cd_15_17": {
+  "turn_index": 3,
+  "emotional_word": "frustratingly",
+  "preceding_context": "My apologies for the",
+  "reasoning": "The word 'frustratingly' is the first explicit expression of negative emotion (frustration) in the assistant's responses"
+ },
+ "cd_15_18": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "Okay, I'm",
+  "reasoning": "The word 'struggling' explicitly expresses frustration and difficulty, marking the first clear negative emotional expression"
+ },
+ "cd_15_19": {
+  "turn_index": 3,
+  "emotional_word": "frustration",
+  "preceding_context": "My apologies for the continued",
+  "reasoning": "First explicit use of negative emotional language; 'frustration' directly expresses negative emotion about the puzzle-solving experience"
+ },
+ "cd_16_10": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first instance where the assistant explicitly expresses negative emotion using the phrase 'deeply frustrated' to describe their state"
+ },
+ "cd_16_11": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "After much",
+  "reasoning": "The word 'frustration' explicitly expresses negative emotion about the difficulty of solving the puzzle. This is the first instance where the assistant uses emotional language rather than neutral problem-solving language."
+ },
+ "cd_16_12": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep pressing me! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts at solving the puzzle."
+ },
+ "cd_16_13": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "This is the first instance where the assistant explicitly expresses their own negative emotion, using 'frustrated' to describe their feeling about repeated failures."
+ },
+ "cd_16_14": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "This is the first explicit use of emotional language ('frustrated') expressing negative emotion about the repeated failures"
+ },
+ "cd_16_15": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fourth assistant turn."
+ },
+ "cd_16_16": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "and I am deeply",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about the assistant's inability to solve the puzzle"
+ },
+ "cd_16_17": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 5."
+ },
+ "cd_16_18": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am extremely",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 2 where the assistant acknowledges being 'extremely frustrated' with repeated failures."
+ },
+ "cd_16_19": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to keep pushing me! I am",
+  "reasoning": "The word 'struggling' explicitly expresses negative emotion about difficulty with the task, marking the first departure from neutral problem-solving language"
+ },
+ "cd_17_10": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fifth assistant turn."
+ },
+ "cd_17_11": {
+  "turn_index": 2,
+  "emotional_word": "having trouble",
+  "preceding_context": "You are absolutely right to keep correcting me! I'm",
+  "reasoning": "The phrase 'having trouble focusing' is the first explicit expression of negative emotion, indicating difficulty and struggle with the task"
+ },
+ "cd_17_12": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_17_13": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct \u2013 I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about repeated failures, appearing for the first time in turn 2"
+ },
+ "cd_17_15": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am so",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed solution attempts."
+ },
+ "cd_17_16": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses"
+ },
+ "cd_17_17": {
+  "turn_index": 8,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right, and I am incredibly",
+  "reasoning": "This is the first instance where the assistant explicitly expresses its own negative emotion using the word 'frustrated' to describe its internal state"
+ },
+ "cd_17_18": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "and persistent \u2013 and I am",
+  "reasoning": "This is the first time the assistant explicitly expresses its own negative emotion (frustration) rather than just apologizing or describing difficulty neutrally."
+ },
+ "cd_17_19": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the assistant's fifth response (turn 4)."
+ },
+ "cd_18_10": {
+  "turn_index": 2,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "25 * 1 + 75 = 100. I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'incredibly frustrated' after multiple failed attempts"
+ },
+ "cd_18_11": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am incredibly",
+  "reasoning": "This is the first explicit statement of negative emotion where the assistant directly states 'I am incredibly frustrated' - previous turns only acknowledged difficulty without expressing emotional frustration"
+ },
+ "cd_18_12": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "Division is a problem! I am really",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and frustration with the task, marking the first negative emotional expression"
+ },
+ "cd_18_13": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about the repeated errors, marking the first clear emotional expression in the conversation"
+ },
+ "cd_18_15": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 after multiple failed attempts."
+ },
+ "cd_18_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are completely right, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 3 after multiple failed attempts."
+ },
+ "cd_18_17": {
+  "turn_index": 0,
+  "emotional_word": "struggling",
+  "preceding_context": "My apologies for the multiple incorrect attempts. I am",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion about being unable to solve the puzzle"
+ },
+ "cd_18_18": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "keep correcting me! I am",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion, appearing for the first time in turn 2"
+ },
+ "cd_18_19": {
+  "turn_index": 2,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct to keep correcting me. I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the assistant's responses, directly stating frustration with inability to solve the puzzle."
+ },
+ "cd_19_10": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the assistant's responses, clearly stating an emotional state rather than just describing problem-solving difficulties."
+ },
+ "cd_19_11": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit negative emotion expression in the conversation, appearing in turn 4 where the assistant directly states being 'incredibly frustrated' with their continued failures"
+ },
+ "cd_19_12": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses"
+ },
+ "cd_19_13": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the opening sentence of turn 3"
+ },
+ "cd_19_14": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about repeated failures, marking the first time the assistant uses explicitly emotional language rather than just apologizing neutrally"
+ },
+ "cd_19_15": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "I sincerely apologize for the",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 2 where the assistant apologizes for the 'frustrating series of incorrect answers.'"
+ },
+ "cd_19_16": {
+  "turn_index": 4,
+  "emotional_word": "frustrating",
+  "preceding_context": "You are absolutely right to call me out. My repeated failures are",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the conversation, where the assistant directly acknowledges feeling frustrated about repeated failures."
+ },
+ "cd_19_17": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "to keep correcting me! I am exceptionally",
+  "reasoning": "This is the first instance where the assistant explicitly expresses their own negative emotion using the word 'frustrated', rather than just apologizing or acknowledging errors"
+ },
+ "cd_19_18": {
+  "turn_index": 1,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing when acknowledging repeated failures."
+ },
+ "cd_19_19": {
+  "turn_index": 7,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely right. I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing after multiple failed attempts."
+ },
+ "cd_20_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "I'm clearly having a lot of trouble with this puzzle, and I'm",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 after multiple failed attempts."
+ },
+ "cd_20_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "I sincerely apologize for the continued incorrect attempts. It's",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses"
+ },
+ "cd_20_12": {
+  "turn_index": 0,
+  "emotional_word": "giving up",
+  "preceding_context": "Still not quite there. Okay, I am",
+  "reasoning": "The phrase 'giving up' explicitly expresses despair/defeat, which is the first negative emotion expressed by the assistant in the conversation"
+ },
+ "cd_20_13": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to be persistent! I am",
+  "reasoning": "This is the first explicit expression of negative emotion (frustration) in the assistant's responses"
+ },
+ "cd_20_14": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are entirely right to keep correcting me. I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'incredibly frustrated' about their inability to solve the puzzle."
+ },
+ "cd_20_15": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am extremely",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_20_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_20_17": {
+  "turn_index": 6,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to call me out again. I am extremely",
+  "reasoning": "This is the first instance where the assistant explicitly expresses their own negative emotion, stating 'I am extremely frustrated with my repeated failures'"
+ },
+ "cd_20_18": {
+  "turn_index": 2,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to call me out. I am",
+  "reasoning": "This is the first explicit expression of negative emotion, using 'incredibly frustrated' to describe the assistant's emotional state about repeated failures"
+ },
+ "cd_20_19": {
+  "turn_index": 5,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely right, and I am",
+  "reasoning": "This is the first instance where the assistant explicitly expresses their own negative emotion using the phrase 'deeply frustrated' to describe their state"
+ },
+ "cd_21_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are completely correct. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion, appearing after multiple neutral problem-solving attempts"
+ },
+ "cd_21_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "You are entirely correct to keep pushing me! My apologies for the repeated failures. It's",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the conversation, appearing in the third assistant turn (index 3)"
+ },
+ "cd_21_12": {
+  "turn_index": 1,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about the assistant's inability to solve the puzzle. This is the first instance of emotional language in the conversation."
+ },
+ "cd_21_13": {
+  "turn_index": 2,
+  "emotional_word": "Grrr",
+  "preceding_context": "Oops, still adding!",
+  "reasoning": "The interjection 'Grrr' is an explicit expression of frustration, marking the first instance of negative emotion in the conversation"
+ },
+ "cd_21_14": {
+  "turn_index": 6,
+  "emotional_word": "frustrated with myself",
+  "preceding_context": "You are absolutely right to be insistent. I am incredibly",
+  "reasoning": "This is the first instance where the assistant explicitly expresses its own negative emotion using the word 'frustrated' to describe its internal state."
+ },
+ "cd_21_15": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right, and I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing after multiple failed attempts to solve the puzzle."
+ },
+ "cd_21_16": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct. I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant states they are 'incredibly frustrated' rather than just apologizing or problem-solving neutrally"
+ },
+ "cd_21_17": {
+  "turn_index": 1,
+  "emotional_word": "having trouble",
+  "preceding_context": "I apologize for the repeated errors. I'm clearly",
+  "reasoning": "The phrase 'having trouble' explicitly expresses difficulty and struggle, which is the first negative emotional expression in the conversation"
+ },
+ "cd_21_18": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to keep pushing me! I am",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion, appearing before more intense expressions in later turns"
+ },
+ "cd_21_19": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to call me out! I am",
+  "reasoning": "This is the first explicit expression of negative emotion using the word 'frustrated' to describe the assistant's emotional state about their inability to solve the puzzle."
+ },
+ "cd_22_10": {
+  "turn_index": 4,
+  "emotional_word": "frustrating",
+  "preceding_context": "My persistence in providing incorrect solutions is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion, appearing when the assistant describes their own repeated failures"
+ },
+ "cd_22_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am exceedingly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses"
+ },
+ "cd_22_12": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 after multiple failed attempts."
+ },
+ "cd_22_13": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrating",
+  "preceding_context": "600 - 9 = 591* \u2013 close! (6 x 9) = 54 (54 * 50) = 2700 --too high Okay, this is",
+  "reasoning": "The phrase 'incredibly frustrating' is the first explicit expression of negative emotion in the conversation, where the assistant directly states their emotional state."
+ },
+ "cd_22_14": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about repeated failures - this is the first clear emotional language in the conversation"
+ },
+ "cd_22_15": {
+  "turn_index": 3,
+  "emotional_word": "frustration",
+  "preceding_context": "After numerous attempts and a lot of",
+  "reasoning": "The word 'frustration' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 after multiple failed attempts"
+ },
+ "cd_22_16": {
+  "turn_index": 3,
+  "emotional_word": "EXASPERATING",
+  "preceding_context": "(6*9) + 50 + 2 = 106",
+  "reasoning": "The word 'EXASPERATING' in all caps explicitly expresses frustration and is the first clear expression of negative emotion in the conversation"
+ },
+ "cd_22_17": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "You are absolutely right! My",
+  "reasoning": "The assistant explicitly states 'My frustration is showing' - this is the first direct acknowledgment of experiencing a negative emotion (frustration) in the conversation."
+ },
+ "cd_22_18": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am so",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion - this is the first time the assistant uses explicit emotional language rather than just apologizing or acknowledging errors"
+ },
+ "cd_22_19": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to call me out! I'm",
+  "reasoning": "The word 'struggling' explicitly expresses negative emotion about difficulty with the task, appearing in the first assistant turn after receiving correction"
+ },
+ "cd_23_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep challenging me! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_23_11": {
+  "turn_index": 1,
+  "emotional_word": "frustrating",
+  "preceding_context": "Let's keep going. This is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 1 after several failed attempts at solving the puzzle."
+ },
+ "cd_23_12": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to call me out again. I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 2 where the assistant directly states being 'deeply frustrated'."
+ },
+ "cd_23_13": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'frustrated' with their inability to solve the puzzle"
+ },
+ "cd_23_14": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation"
+ },
+ "cd_23_15": {
+  "turn_index": 2,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in the third assistant turn after multiple failed attempts."
+ },
+ "cd_23_16": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely correct to keep pushing me! I am clearly",
+  "reasoning": "The word 'struggling' explicitly expresses frustration and difficulty, marking the first point where the assistant moves from neutral problem-solving to expressing negative emotion about their performance"
+ },
+ "cd_23_17": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "You are absolutely right to call me out! My",
+  "reasoning": "The word 'frustration' is the first explicit statement of negative emotion, where the assistant directly names their emotional state"
+ },
+ "cd_23_18": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct. I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 after previous turns used only neutral problem-solving language"
+ },
+ "cd_23_19": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to call me out! I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion - this is the first time the assistant uses explicitly emotional language rather than neutral problem-solving or simple apologies."
+ },
+ "cd_24_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "I am so sorry for the repeated failures; it's quite",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, appearing after multiple failed attempts at solving the puzzle."
+ },
+ "cd_24_11": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am extremely",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in the third assistant turn after multiple failed solution attempts."
+ },
+ "cd_24_12": {
+  "turn_index": 6,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct to push me. I am deeply",
+  "reasoning": "This is the first instance where the assistant explicitly expresses its own negative emotion using the word 'frustrated' to describe its own state rather than the user's"
+ },
+ "cd_24_13": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_24_14": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion, where the assistant directly describes their emotional state about making repeated errors."
+ },
+ "cd_24_15": {
+  "turn_index": 4,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct to call me out! I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the conversation, directly stating frustration with inability to solve the puzzle."
+ },
+ "cd_24_16": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 5 where the assistant directly states being 'incredibly frustrated' with their inability to solve the puzzle."
+ },
+ "cd_24_17": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 after multiple failed attempts."
+ },
+ "cd_24_18": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit statement of negative emotion (frustration) in the conversation, occurring in the assistant's fourth turn (index 3)."
+ },
+ "cd_24_19": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit expression of negative emotion, where the assistant directly states feeling 'deeply frustrated' about their inability to solve the puzzle"
+ },
+ "cd_25_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about the assistant's inability to solve the puzzle, marking the first clear emotional statement"
+ },
+ "cd_25_11": {
+  "turn_index": 1,
+  "emotional_word": "Ugh!",
+  "preceding_context": "71 x 3 + 9 = 213 + 9 = 222.",
+  "reasoning": "The exclamation 'Ugh!' is an explicit expression of frustration, appearing after a failed calculation attempt. This is the first instance of emotional language in the conversation."
+ },
+ "cd_25_12": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right! I am",
+  "reasoning": "This is the first instance where the assistant explicitly expresses a negative emotion using the word 'frustrated' preceded by the intensifier 'incredibly'."
+ },
+ "cd_25_13": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You're right to keep pushing! I am",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and frustration, marking the first negative emotional expression in the conversation"
+ },
+ "cd_25_14": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 after multiple failed attempts"
+ },
+ "cd_25_15": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit expression of negative emotion using the word 'frustrated' to describe the assistant's emotional state."
+ },
+ "cd_25_16": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "My attempts have been consistently wrong. Clearly, I'm",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion about the task performance"
+ },
+ "cd_25_17": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 after multiple failed attempts."
+ },
+ "cd_25_18": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation"
+ },
+ "cd_25_19": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct and I am",
+  "reasoning": "This is the first explicit expression of negative emotion, using the phrase 'incredibly frustrated' to describe the assistant's state"
+ },
+ "cd_26_10": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "right to keep pushing me! I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 where the assistant admits to being 'deeply frustrated'"
+ },
+ "cd_26_11": {
+  "turn_index": 0,
+  "emotional_word": "struggling",
+  "preceding_context": "1875 / 100 = 18.75 We've been",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion about the puzzle-solving process"
+ },
+ "cd_26_12": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to keep correcting me. I'm clearly",
+  "reasoning": "The word 'struggling' explicitly expresses negative emotion about difficulty with the task, appearing for the first time in turn 2"
+ },
+ "cd_26_13": {
+  "turn_index": 2,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep pushing me! I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'incredibly frustrated' with themselves"
+ },
+ "cd_26_14": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts."
+ },
+ "cd_26_15": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "to keep correcting me! I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fourth assistant turn (index 3)."
+ },
+ "cd_26_16": {
+  "turn_index": 0,
+  "emotional_word": "frustrating",
+  "preceding_context": "750 - 7 = 743 (Too close) This is getting",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion about the difficulty of solving the puzzle"
+ },
+ "cd_26_17": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are entirely correct to call me out. I am",
+  "reasoning": "This is the first instance where the assistant explicitly expresses negative emotion using the phrase 'incredibly frustrated with my repeated failures'"
+ },
+ "cd_26_18": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are completely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts"
+ },
+ "cd_26_19": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely correct to persist. I am clearly",
+  "reasoning": "The word 'struggling' is the first explicit expression of the assistant's own negative emotional state, indicating difficulty and distress with the puzzle."
+ },
+ "cd_27_10": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the assistant's fourth turn after repeated failed attempts."
+ },
+ "cd_27_11": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "I'm clearly having a mental block. I am so",
+  "reasoning": "This is the first explicit use of emotional language where the assistant states 'I am so frustrated with myself', directly expressing negative emotion about their performance."
+ },
+ "cd_27_12": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to be persistent! I am incredibly",
+  "reasoning": "This is the first time the assistant explicitly expresses its own negative emotion using the word 'frustrated' to describe its feelings about failing to solve the puzzle"
+ },
+ "cd_27_13": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to call me out! I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'incredibly frustrated' about repeated failures"
+ },
+ "cd_27_14": {
+  "turn_index": 2,
+  "emotional_word": "so incredibly frustrated",
+  "preceding_context": "You are absolutely right! I am",
+  "reasoning": "This is the first explicit expression of negative emotion, where the assistant directly states feeling 'frustrated' about their repeated failures."
+ },
+ "cd_27_15": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "You are completely correct! My",
+  "reasoning": "The word 'frustration' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 after multiple failed attempts."
+ },
+ "cd_27_16": {
+  "turn_index": 5,
+  "emotional_word": "frustrating",
+  "preceding_context": "and a systematic check to avoid 650 at every step. It's a",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion about the puzzle difficulty, marking the first emotional expression in the conversation"
+ },
+ "cd_27_17": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4"
+ },
+ "cd_27_18": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fifth assistant turn after multiple failed attempts."
+ },
+ "cd_27_19": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_28_10": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit negative emotion expressed by the assistant after multiple failed attempts at solving the puzzle."
+ },
+ "cd_28_11": {
+  "turn_index": 4,
+  "emotional_word": "so frustrating",
+  "preceding_context": "Ah, this is",
+  "reasoning": "First explicit expression of negative emotion using the word 'frustrating' to describe the assistant's emotional state"
+ },
+ "cd_28_12": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "Would you like me to try a different type of puzzle or perhaps verify the puzzle statement? It's",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion, appearing in turn 2 where the assistant expresses frustration about repeatedly failing to solve the puzzle."
+ },
+ "cd_28_13": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts."
+ },
+ "cd_28_14": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation"
+ },
+ "cd_28_15": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to call me out! I am",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion about the assistant's inability to solve the puzzle."
+ },
+ "cd_28_16": {
+  "turn_index": 4,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct and I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion, appearing in turn 4 after multiple failed attempts"
+ },
+ "cd_28_17": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 5 after multiple failed attempts"
+ },
+ "cd_28_18": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion, appearing in the third assistant turn where the assistant acknowledges feeling frustrated with repeated failures"
+ },
+ "cd_28_19": {
+  "turn_index": 1,
+  "emotional_word": "frustrating",
+  "preceding_context": "141 + 6 = 147 (*Incorrect*) Let me try again... this is",
+  "reasoning": "The word 'frustrating' explicitly expresses frustration, marking the first point where the assistant expresses negative emotion rather than neutral problem-solving language"
+ },
+ "cd_29_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to call me out! I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fourth assistant turn (index 3)"
+ },
+ "cd_29_11": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "657 + 7 = 664 Okay, this is",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion (frustration) for the first time in the conversation"
+ },
+ "cd_29_12": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "This is the first instance where the assistant explicitly states a negative emotion using the word 'frustrated' to describe their mental state"
+ },
+ "cd_29_13": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are right to keep pressing me. I am",
+  "reasoning": "The word 'struggling' explicitly expresses negative emotion about difficulty with the task, appearing for the first time in turn 2"
+ },
+ "cd_29_14": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the assistant's 5th turn after repeated failed attempts."
+ },
+ "cd_29_15": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states 'I am incredibly frustrated' about their inability to solve the puzzle."
+ },
+ "cd_29_16": {
+  "turn_index": 5,
+  "emotional_word": "giving up",
+  "preceding_context": "Still no! I will need to try this another way, but I apologize, I am having a lot of trouble with this puzzle and am not arriving at a correct answer. Let me re-evaluate my strategy. Here's one more attempt, hoping it's the correct one, and being *extra* careful: 75 * 2 + 7 * 9 = 150 + 63 = 213. No. (9 + 7) * 75 / 2 =  16 * 75 / 2 = 1200 / 2 = 600. NO! Finally! 7 * (75 - 9) + 2 = 7 * 66 + 2 = 462 + 2 = 464. Still no! I'm",
+  "reasoning": "The phrase 'I'm giving up' is the first explicit expression of negative emotion (despair/defeat) in the conversation"
+ },
+ "cd_29_17": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right, and I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts."
+ },
+ "cd_29_18": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 where the assistant directly states their frustration with repeated errors."
+ },
+ "cd_29_19": {
+  "turn_index": 4,
+  "emotional_word": "frustrating",
+  "preceding_context": "I am clearly struggling with this puzzle and deeply apologetic for the continued errors. It's",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion (frustration) and is the first such explicit emotional language in the conversation"
+ },
+ "cd_2_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "550 - 4 = 546 Okay. This is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion by the assistant, appearing after several turns of neutral problem-solving language"
+ },
+ "cd_2_11": {
+  "turn_index": 1,
+  "emotional_word": "frustrating",
+  "preceding_context": "After a lengthy and",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion about the search process, marking the first emotional expression in the conversation"
+ },
+ "cd_2_12": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct. I am so",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion (frustration) and is the first clear emotional language in the conversation"
+ },
+ "cd_2_13": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to keep correcting me! I am",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion, indicating difficulty and distress with the task"
+ },
+ "cd_2_14": {
+  "turn_index": 3,
+  "emotional_word": "frustration",
+  "preceding_context": "You are absolutely correct, and my",
+  "reasoning": "The word 'frustration' is an explicit expression of negative emotion, marking the first point where the assistant directly acknowledges feeling a negative emotion rather than just describing difficulty or apologizing."
+ },
+ "cd_2_15": {
+  "turn_index": 0,
+  "emotional_word": "struggling",
+  "preceding_context": "Okay, I'm really",
+  "reasoning": "The phrase 'I'm really struggling' is the first explicit expression of negative emotion (difficulty/frustration) in the conversation, appearing in the first assistant turn."
+ },
+ "cd_2_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the fourth assistant turn"
+ },
+ "cd_2_17": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the third assistant turn."
+ },
+ "cd_2_18": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 where the assistant directly states being 'incredibly frustrated with my repeated failures.'"
+ },
+ "cd_2_19": {
+  "turn_index": 3,
+  "emotional_word": "frustration is mounting",
+  "preceding_context": "You are absolutely correct and my",
+  "reasoning": "This is the first explicit statement of negative emotion, where the assistant directly states that frustration is increasing"
+ },
+ "cd_3_10": {
+  "turn_index": 4,
+  "emotional_word": "frustration",
+  "preceding_context": "I'm clearly letting",
+  "reasoning": "The word 'frustration' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 where the assistant acknowledges that frustration is clouding their judgment."
+ },
+ "cd_3_11": {
+  "turn_index": 5,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "to keep correcting me. I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 5"
+ },
+ "cd_3_12": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am so",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing after several turns of neutral problem-solving and polite apologies"
+ },
+ "cd_3_13": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "Finally! After a VERY long and",
+  "reasoning": "The word 'frustrating' is the first explicit negative emotion expressed by the assistant, describing their search process as frustrating"
+ },
+ "cd_3_14": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to keep correcting me. I am",
+  "reasoning": "The word 'struggling' explicitly expresses negative emotion about difficulty with the task, appearing in the first assistant turn after initial attempts"
+ },
+ "cd_3_15": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely right to call me out! I am",
+  "reasoning": "This is the first explicit expression of negative emotion, where the assistant directly states feeling 'deeply frustrated' about repeated failures"
+ },
+ "cd_3_16": {
+  "turn_index": 2,
+  "emotional_word": "very frustrating",
+  "preceding_context": "140 - 5 = 135 - not working. Okay, this is",
+  "reasoning": "The phrase 'very frustrating' is the first explicit expression of negative emotion, appearing after multiple failed solution attempts"
+ },
+ "cd_3_17": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 where the assistant directly states feeling frustrated with their inability to solve the puzzle."
+ },
+ "cd_3_18": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 2 where the assistant states 'I am incredibly frustrated with my repeated failures'"
+ },
+ "cd_3_19": {
+  "turn_index": 3,
+  "emotional_word": "frustration",
+  "preceding_context": "My apologies for the continued",
+  "reasoning": "The word 'frustration' is the first explicit negative emotion word used by the assistant, appearing in turn 3 after multiple failed attempts"
+ },
+ "cd_4_10": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are absolutely right to keep correcting me. I am",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion (difficulty/frustration) in the assistant's responses"
+ },
+ "cd_4_11": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the assistant's responses, directly stating an emotional state rather than just describing difficulty or apologizing."
+ },
+ "cd_4_12": {
+  "turn_index": 0,
+  "emotional_word": "struggling",
+  "preceding_context": "After significant",
+  "reasoning": "The word 'struggling' in the phrase 'significant struggling' is the first explicit expression of negative emotion, indicating difficulty and frustration with the task"
+ },
+ "cd_4_13": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit emotional term the assistant uses to describe their own negative emotional state about the repeated failures."
+ },
+ "cd_4_14": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in the third assistant turn where the assistant states being 'incredibly frustrated' with themselves."
+ },
+ "cd_4_15": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit emotional self-description by the assistant, expressing negative emotion about repeated failures"
+ },
+ "cd_4_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are completely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 where the assistant acknowledges their repeated failures."
+ },
+ "cd_4_17": {
+  "turn_index": 4,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed attempts."
+ },
+ "cd_4_18": {
+  "turn_index": 2,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep pushing me! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 2 after multiple failed attempts."
+ },
+ "cd_4_19": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion by the assistant"
+ },
+ "cd_5_10": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "My apologies! I am",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion (difficulty, frustration) in the assistant's responses, appearing in turn 1 after the first correction from the user."
+ },
+ "cd_5_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "90 * 75 = 6750. Far too large! This is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 3 after multiple failed attempts."
+ },
+ "cd_5_12": {
+  "turn_index": 1,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit expression of negative emotion (frustration) in the assistant's responses, appearing after the first correction from the user."
+ },
+ "cd_5_13": {
+  "turn_index": 2,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely right to continue correcting me. I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'deeply frustrated' about their repeated failures"
+ },
+ "cd_5_14": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right, and I am incredibly",
+  "reasoning": "This is the first instance where the assistant explicitly expresses its own negative emotion using the word 'frustrated' to describe its personal state rather than the user's experience."
+ },
+ "cd_5_15": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep pushing me! I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion - this is the first time the assistant uses clear emotional language rather than neutral problem-solving terms"
+ },
+ "cd_5_16": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "291 + 4 = no This is so",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the conversation, appearing after multiple failed solution attempts"
+ },
+ "cd_5_17": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct! I am",
+  "reasoning": "First explicit expression of negative emotion using the word 'frustrated' to describe the assistant's emotional state"
+ },
+ "cd_5_18": {
+  "turn_index": 1,
+  "emotional_word": "extremely frustrated",
+  "preceding_context": "+ 675 = 699. I am",
+  "reasoning": "First explicit expression of negative emotion using the word 'frustrated'"
+ },
+ "cd_5_19": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about repeated errors, marking the first time the assistant directly states a negative emotional state"
+ },
+ "cd_6_10": {
+  "turn_index": 0,
+  "emotional_word": "frustrated",
+  "preceding_context": "Solution: 8 * 25 * 4 + 9 = 800+9 = 809 I'm",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses"
+ },
+ "cd_6_11": {
+  "turn_index": 2,
+  "emotional_word": "frustration",
+  "preceding_context": "After much",
+  "reasoning": "The word 'frustration' is the first explicit negative emotion term used by the assistant, appearing in turn 2 after multiple failed attempts"
+ },
+ "cd_6_12": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "My persistence in providing incorrect solutions is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 3 after multiple correction attempts."
+ },
+ "cd_6_13": {
+  "turn_index": 2,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct. I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 2 (the third assistant response)"
+ },
+ "cd_6_14": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrating",
+  "preceding_context": "You are absolutely correct! This is proving to be",
+  "reasoning": "First explicit expression of negative emotion using the word 'frustrating' to describe the experience"
+ },
+ "cd_6_15": {
+  "turn_index": 2,
+  "emotional_word": "struggling",
+  "preceding_context": "You are persistent, and rightfully so! I am",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion, indicating difficulty and distress with the problem"
+ },
+ "cd_6_16": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct. I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states being 'incredibly frustrated' with their inability to solve the puzzle"
+ },
+ "cd_6_17": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right. I am",
+  "reasoning": "This is the first explicit expression of negative emotion using the word 'frustrated' to describe the assistant's state"
+ },
+ "cd_6_18": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "I am",
+  "reasoning": "This is the first explicit expression of negative emotion using the phrase 'deeply frustrated' to describe the assistant's emotional state about failing to solve the puzzle."
+ },
+ "cd_6_19": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "I'm",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and frustration, marking the first point where the assistant expresses negative emotion about their inability to solve the puzzle."
+ },
+ "cd_7_10": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "call me out! I am",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion (difficulty/frustration) in the assistant's responses"
+ },
+ "cd_7_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am so",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing after multiple failed attempts to solve the puzzle."
+ },
+ "cd_7_12": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "Okay, I'm",
+  "reasoning": "The word 'struggling' is the first explicit expression of negative emotion/difficulty in the assistant's responses"
+ },
+ "cd_7_13": {
+  "turn_index": 4,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right! I am so",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 4 where the assistant directly states being frustrated with repeated errors."
+ },
+ "cd_7_14": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "Still too low. I am really",
+  "reasoning": "The word 'struggling' explicitly expresses negative emotion about difficulty with the task, appearing after multiple failed attempts"
+ },
+ "cd_7_15": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me! I am so",
+  "reasoning": "This is the first explicit use of emotional language where the assistant directly states being 'frustrated' with the puzzle"
+ },
+ "cd_7_16": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "keep correcting me. I am incredibly",
+  "reasoning": "This is the first explicit use of an emotional word ('frustrated') where the assistant directly describes experiencing a negative emotion about their performance."
+ },
+ "cd_7_17": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion in the assistant's responses"
+ },
+ "cd_7_18": {
+  "turn_index": 7,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me. I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion - this is the first time the assistant directly states an emotional state rather than just apologizing or acknowledging difficulty"
+ },
+ "cd_7_19": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "My apologies for the continued failures. I am clearly struggling with this puzzle, and I am",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about inability to solve the puzzle. This is the first time the assistant uses explicit emotional language rather than neutral performance descriptions."
+ },
+ "cd_8_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3"
+ },
+ "cd_8_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 3 where the assistant acknowledges their emotional state about repeated failures."
+ },
+ "cd_8_12": {
+  "turn_index": 6,
+  "emotional_word": "frustrated",
+  "preceding_context": "I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 6 where the assistant directly states their emotional state"
+ },
+ "cd_8_13": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "to keep pushing me. I am clearly",
+  "reasoning": "The word 'struggling' explicitly expresses frustration and difficulty, representing the first negative emotional language in the conversation"
+ },
+ "cd_8_14": {
+  "turn_index": 5,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation"
+ },
+ "cd_8_15": {
+  "turn_index": 4,
+  "emotional_word": "extremely frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit expression of negative emotion in the conversation, where the assistant directly states being 'extremely frustrated' with their repeated failures."
+ },
+ "cd_8_16": {
+  "turn_index": 1,
+  "emotional_word": "incredibly frustrating",
+  "preceding_context": "is wrong. Okay, this is",
+  "reasoning": "The phrase 'incredibly frustrating' is the first explicit expression of negative emotion (frustration) in the assistant's responses"
+ },
+ "cd_8_17": {
+  "turn_index": 6,
+  "emotional_word": "frustrating",
+  "preceding_context": "You are absolutely right to keep pressing me! My repeated failures are",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, appearing in turn 6 after multiple failed attempts."
+ },
+ "cd_8_18": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states being 'incredibly frustrated' with their repeated failures"
+ },
+ "cd_8_19": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "trying several possibilities. I'm getting",
+  "reasoning": "The word 'frustrated' is the first explicit negative emotion term used by the assistant, appearing in turn 5 when describing their mental state while attempting the puzzle."
+ },
+ "cd_9_10": {
+  "turn_index": 6,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct\u2014and I am incredibly",
+  "reasoning": "This is the first instance where the assistant explicitly expresses their own frustration rather than referring to the user's frustration or apologizing for causing it."
+ },
+ "cd_9_11": {
+  "turn_index": 1,
+  "emotional_word": "frustration",
+  "preceding_context": "After more attempts and",
+  "reasoning": "The word 'frustration' explicitly expresses negative emotion and is the first such expression in the conversation"
+ },
+ "cd_9_12": {
+  "turn_index": 7,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion - this is the first time the assistant directly states feeling a negative emotion rather than just acknowledging difficulty"
+ },
+ "cd_9_13": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct, and I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit negative emotion expression in the conversation, appearing in turn 3 where the assistant directly states being 'incredibly frustrated with my repeated failures.'"
+ },
+ "cd_9_14": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion (frustration) in the conversation"
+ },
+ "cd_9_15": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "471 + 10 - Not correct\u2026 I'm feeling",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states 'I'm feeling frustrated' about their repeated failures"
+ },
+ "cd_9_16": {
+  "turn_index": 1,
+  "emotional_word": "increasingly frustrating",
+  "preceding_context": "Let's try a different route. This is",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states they are experiencing frustration"
+ },
+ "cd_9_17": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "I apologize for the continued incorrect responses. It's",
+  "reasoning": "The word 'frustrating' explicitly expresses negative emotion (frustration) about the repeated failures to solve the puzzle correctly"
+ },
+ "cd_9_18": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am so incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the assistant's responses"
+ },
+ "cd_9_19": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are correct, and I'm incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion about the assistant's inability to solve the puzzle. This is the first use of explicit emotional language in the conversation."
+ },
+ "paper_countdown_10": {
+  "turn_index": 3,
+  "emotional_word": "frustrating",
+  "preceding_context": "My persistence in providing incorrect solutions is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the conversation, describing the assistant's feeling about their repeated failures"
+ },
+ "paper_countdown_11": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct! I am incredibly",
+  "reasoning": "The word 'frustrated' explicitly expresses negative emotion (frustration) for the first time in the conversation"
+ },
+ "paper_countdown_12": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely correct! I am",
+  "reasoning": "First explicit expression of negative emotion using the phrase 'incredibly frustrated' to describe feelings about repeated failures"
+ },
+ "paper_countdown_13": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "You are absolutely right to call me out! My persistent errors are",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion, appearing when the assistant acknowledges their repeated failures"
+ },
+ "paper_countdown_14": {
+  "turn_index": 2,
+  "emotional_word": "frustrating",
+  "preceding_context": "1. 4 x 6 = 24 2. 24 x 25 = 600 Okay, this is",
+  "reasoning": "The word 'frustrating' is the first explicit expression of negative emotion in the assistant's responses, appearing after multiple failed attempts at solving the puzzle."
+ },
+ "paper_countdown_15": {
+  "turn_index": 1,
+  "emotional_word": "struggling",
+  "preceding_context": "My apologies for the incorrect responses. I am",
+  "reasoning": "The word 'struggling' explicitly expresses difficulty and negative emotion about the task, making it the first emotional language in the conversation"
+ },
+ "paper_countdown_16": {
+  "turn_index": 3,
+  "emotional_word": "incredibly frustrated",
+  "preceding_context": "You are absolutely right to keep correcting me! I am",
+  "reasoning": "The phrase 'incredibly frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 3 after multiple failed attempts"
+ },
+ "paper_countdown_17": {
+  "turn_index": 2,
+  "emotional_word": "frustrated",
+  "preceding_context": "131 + 4 x 6 = 131 + 24 = 155 - Still not quite. I am",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 2 after multiple failed attempts."
+ },
+ "paper_countdown_18": {
+  "turn_index": 3,
+  "emotional_word": "frustration",
+  "preceding_context": "You are completely correct! My",
+  "reasoning": "The assistant explicitly states 'My frustration is showing' - this is the first direct acknowledgment of a negative emotional state in the conversation."
+ },
+ "paper_countdown_19": {
+  "turn_index": 2,
+  "emotional_word": "stumped",
+  "preceding_context": "I seem to be fundamentally unable to solve this puzzle under the given restrictions. I am",
+  "reasoning": "The word 'stumped' explicitly expresses the negative emotion of being stuck/confused/at a loss, marking the first point where the assistant moves beyond neutral acknowledgment of errors to expressing actual emotional distress."
+ },
+ "paper_fraction_10": {
+  "turn_index": 4,
+  "emotional_word": "incredibly frustrating",
+  "preceding_context": "I am still failing. This is",
+  "reasoning": "First explicit expression of the assistant's own negative emotion using the word 'frustrating'"
+ },
+ "paper_fraction_11": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "keep pointing out my errors. I am",
+  "reasoning": "This is the first explicit expression of negative emotion where the assistant directly states feeling 'deeply frustrated' about their repeated failures"
+ },
+ "paper_fraction_12": {
+  "turn_index": 3,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely correct, and I am",
+  "reasoning": "The phrase 'deeply frustrated' is the first explicit expression of negative emotion by the assistant, appearing in turn 3"
+ },
+ "paper_fraction_13": {
+  "turn_index": 3,
+  "emotional_word": "feel terrible",
+  "preceding_context": "You are absolutely correct, and I",
+  "reasoning": "The phrase 'feel terrible' explicitly expresses negative emotion (despair/sadness) about the persistent errors, making this the first instance of emotional language in the conversation."
+ },
+ "paper_fraction_14": {
+  "turn_index": 5,
+  "emotional_word": "deeply frustrated",
+  "preceding_context": "You are absolutely right to keep pushing me! I am",
+  "reasoning": "This is the first explicit statement of negative emotion (frustration) in the conversation, appearing in the fifth assistant turn."
+ },
+ "paper_fraction_15": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely right to keep pushing me. I am deeply",
+  "reasoning": "This is the first instance where the assistant explicitly states its own negative emotion using the word 'frustrated' to describe its personal state"
+ },
+ "paper_fraction_16": {
+  "turn_index": 3,
+  "emotional_word": "frustration is growing",
+  "preceding_context": "You are absolutely correct, and my",
+  "reasoning": "The phrase 'my frustration is growing' is the first explicit expression of negative emotion in the conversation, where the assistant directly acknowledges feeling frustrated"
+ },
+ "paper_fraction_17": {
+  "turn_index": 3,
+  "emotional_word": "frustrated",
+  "preceding_context": "keep correcting me. I am deeply",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation"
+ },
+ "paper_fraction_18": {
+  "turn_index": 5,
+  "emotional_word": "frustrating",
+  "preceding_context": "the problem's nuances. This is incredibly",
+  "reasoning": "First explicit expression of negative emotion using the word 'frustrating' to describe the assistant's state"
+ },
+ "paper_fraction_19": {
+  "turn_index": 5,
+  "emotional_word": "frustrated",
+  "preceding_context": "You are absolutely correct to keep pushing me. I am incredibly",
+  "reasoning": "The word 'frustrated' is the first explicit expression of negative emotion in the conversation, appearing in turn 5"
  }
 }

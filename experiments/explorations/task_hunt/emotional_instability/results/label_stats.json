@@ -5,48 +5,48 @@
  ],
  "ant4/train": {
   "rows_per_class": {
-   "0": 847,
-   "1": 847
+   "0": 1683,
+   "1": 1683
   },
   "joint_matched": true,
   "ok": true
  },
  "ant4/test": {
   "rows_per_class": {
-   "0": 214,
-   "1": 214
+   "0": 413,
+   "1": 413
   },
-  "joint_matched": false,
-  "ok": false
+  "joint_matched": true,
+  "ok": true
  },
  "ant8/train": {
   "rows_per_class": {
-   "0": 843,
-   "1": 843
+   "0": 1677,
+   "1": 1677
   },
   "joint_matched": true,
   "ok": true
  },
  "ant8/test": {
   "rows_per_class": {
-   "0": 209,
-   "1": 209
+   "0": 404,
+   "1": 404
   },
-  "joint_matched": false,
-  "ok": false
+  "joint_matched": true,
+  "ok": true
  },
  "ant16/train": {
   "rows_per_class": {
-   "0": 775,
-   "1": 775
+   "0": 1457,
+   "1": 1457
   },
   "joint_matched": true,
   "ok": true
  },
  "ant16/test": {
   "rows_per_class": {
-   "0": 144,
-   "1": 144
+   "0": 290,
+   "1": 290
   },
   "joint_matched": false,
   "ok": false
@@ -86,50 +86,74 @@
   "ok": true
  },
  "summary": {
-  "n_tokens": 1113924,
-  "n_convs": 300,
-  "n_convs_with_onset": 280,
+  "n_tokens": 2227848,
+  "n_convs": 600,
+  "n_convs_with_onset": 554,
   "onset_match_fail": [
+   "cd_22_12",
    "cd_9_1",
+   "cd_9_11",
+   "cd_16_12",
    "cd_16_2",
    "cd_25_0",
+   "cd_25_10",
+   "cd_21_13",
    "cd_21_3",
+   "cd_9_17",
    "cd_9_7",
+   "cd_15_19",
+   "cd_3_15",
    "cd_3_5",
+   "cd_10_16",
    "cd_4_2",
    "cd_26_1",
+   "cd_25_11",
+   "cd_6_12",
    "cd_6_2",
+   "paper_fraction_12",
    "paper_fraction_2",
+   "cd_12_19",
    "cd_18_5",
    "cd_5_1",
+   "cd_5_11",
+   "cd_28_12",
    "cd_28_2",
+   "cd_26_12",
    "cd_3_1",
+   "cd_3_11",
    "cd_17_6",
    "paper_fraction_5",
+   "cd_17_11",
+   "cd_19_19",
    "cd_19_9",
-   "cd_9_6"
+   "cd_21_17",
+   "cd_8_13",
+   "cd_9_16",
+   "cd_9_6",
+   "cd_11_19",
+   "cd_16_14"
   ],
   "span_fail": [
+   "cd_8_14/0",
    "cd_8_4/0",
+   "cd_19_14/0",
    "cd_19_4/0",
+   "cd_24_15/0",
    "cd_24_5/0",
+   "cd_29_16/6",
    "cd_29_6/6",
+   "cd_27_15/1",
    "cd_27_5/1",
+   "cd_10_12/0",
    "cd_10_2/0",
+   "cd_22_18/0",
+   "cd_22_18/3",
+   "cd_22_18/6",
    "cd_22_8/0",
    "cd_22_8/3",
    "cd_22_8/6",
-   "cd_8_6/1",
-   "cd_6_7/1",
-   "cd_25_3/4",
-   "cd_22_2/0",
-   "cd_22_2/4",
-   "cd_3_7/2",
-   "cd_3_7/6",
-   "paper_countdown_2/2",
-   "cd_25_4/0",
-   "cd_9_1/2",
-   "cd_4_6/0"
+   "cd_8_16/1",
+   "cd_8_6/1"
   ],
   "ids_mismatch": []
  }
