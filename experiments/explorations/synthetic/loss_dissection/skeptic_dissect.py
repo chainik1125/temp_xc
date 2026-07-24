@@ -48,6 +48,20 @@ capability-vs-recovery conflation (a capability gain marketed as recovery)?
 Also include "overall": {"survives": bool, "summary": str}. JSON only."""
 
 
+def _absolute_levels(bench: str, arch: str, metric: str) -> dict:
+    """Per-cell absolute metric values (mean + per-seed) for one arm — gives
+    the skeptic the [chance=0, oracle=1] context the deltas alone hide (e.g.
+    an arm that is 'less below chance' is not extracting anything)."""
+    rows = json.loads((HERE / "results" /
+                       f"{bench}_dissect_grid_results.json").read_text())
+    out = {}
+    for r in rows:
+        if r.get("ok") and r.get("kind") == "trained" and r["arch"] == arch:
+            out.setdefault(f"T={r['T']} k={r['k_pos']}", []).append(
+                r["metrics"].get(metric))
+    return {k: {"mean": sum(v) / len(v), "seeds": v} for k, v in sorted(out.items())}
+
+
 def _parse_json_object(text: str) -> dict:
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
@@ -102,6 +116,13 @@ def main():
         summary = {
             "claim": f"component {comp} HELPS {metric} on {bench}",
             "effects": effects,
+            "absolute_levels": {
+                "note": ("metric is normalized [chance=0, oracle=1]; judge "
+                         "whether the variant EXTRACTS the latent or is "
+                         "merely less-below-chance"),
+                "plain": _absolute_levels(bench, "txc_post_plain", metric),
+                comp: _absolute_levels(bench, f"txc_post_{comp}", metric),
+            },
             "gate_b": table["gate_b"][bench],
             "untrained_guard": table["untrained_guard"][bench],
         }
