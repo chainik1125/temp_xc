@@ -66,6 +66,32 @@ def lam_for_trace(b: np.ndarray, a: float, c: float, w: np.ndarray):
     return lam, lam_h
 
 
+def lam_for_trace_dense(b: np.ndarray, a: float, c: float, w: np.ndarray):
+    """DENSE variant — defined at EVERY sentence, incl. i < K.
+
+    ADDED 2026-07-24 for Stage 2 only, and disclosed as an addition: the
+    Stage-2 probe (`temp_bench.evals.lambda_recovery`) tiles the whole
+    stream and cannot take NaN targets, whereas the frozen screen
+    selects eligible rows. The i < K warm-up uses the FITTED MIRROR'S
+    OWN convention — unobserved history counts as no-event, exactly
+    `backtracking/mirror.py::_generate` ("b[i-1-l] if i-1-l >= 0 else
+    0.0") — so this is the generator's definition extended to its own
+    warm-up, not a new label. The screen's frozen i >= K arrays are
+    untouched and remain the screen's ground truth.
+    """
+    K = w.size
+    L = b.size
+    lam = np.empty(L)
+    lam_h = np.empty(L)
+    pos = np.arange(L) / L
+    for i in range(L):
+        hist = sum(float(w[l]) * (float(b[i - 1 - l]) if i - 1 - l >= 0 else 0.0)
+                   for l in range(K))
+        lam[i] = sigma(a + c * pos[i] + hist)
+        lam_h[i] = sigma(a + hist)
+    return lam, lam_h
+
+
 def main():
     from transformers import AutoTokenizer
 
@@ -90,6 +116,11 @@ def main():
     lam_h_c = np.full((N, SEQ_LEN), np.nan, dtype=np.float32)
     sent_c = np.full((N, SEQ_LEN), -1, dtype=np.int32)
     spos_c = np.full((N, SEQ_LEN), np.nan, dtype=np.float32)
+    # Stage-2 dense grids (see lam_for_trace_dense): defined at every
+    # cache position. Tokens outside any sentence span carry the last
+    # in-span sentence's value (leading tokens take sentence 0's).
+    lam_d_c = np.zeros((N, SEQ_LEN), dtype=np.float32)
+    lam_hd_c = np.zeros((N, SEQ_LEN), dtype=np.float32)
 
     tok_per_sent, ev_gaps_tok = [], []
     lam_all = []
@@ -106,6 +137,7 @@ def main():
         b = np.array([1 if s["is_backtracking"] else 0 for s in sents],
                      dtype=np.int8)
         lam, lam_h = lam_for_trace(b, a, c, w)
+        lam_d, lam_hd = lam_for_trace_dense(b, a, c, w)
         lam_all.extend(lam[K:].tolist())
 
         # token -> sentence (char-midpoint rule, same as is_bt)
@@ -114,6 +146,15 @@ def main():
             m = (mids >= s["char_start"]) & (mids < s["char_end"])
             sent_of_tok[m] = si
             tok_per_sent.append(int(m.sum()))
+        # dense per-token sentence index: carry the last in-span sentence
+        # forward across inter-sentence gaps (leading gap -> sentence 0)
+        sent_dense = sent_of_tok.copy()
+        last = 0
+        for j in range(len(sent_dense)):
+            if sent_dense[j] < 0:
+                sent_dense[j] = last
+            else:
+                last = sent_dense[j]
         # inter-event distances in TOKENS (first token of consecutive
         # bt sentences), for the honest T-range stats
         firsts = [int(np.where(sent_of_tok == si)[0][0])
@@ -121,12 +162,19 @@ def main():
                   if np.any(sent_of_tok == si)]
         ev_gaps_tok.extend(np.diff(sorted(firsts)).tolist())
         per_trace[ti] = (lam, lam_h, sent_of_tok,
-                         np.arange(len(sents)) / len(sents))
+                         np.arange(len(sents)) / len(sents),
+                         lam_d, lam_hd, sent_dense)
 
     for wi in range(N):
-        lam, lam_h, sent_of_tok, spos = per_trace[int(trace_idx[wi])]
+        (lam, lam_h, sent_of_tok, spos,
+         lam_d, lam_hd, sent_dense) = per_trace[int(trace_idx[wi])]
         s0 = int(win_start[wi])
         Torig = sent_of_tok.size
+        for p in range(SEQ_LEN):
+            o = s0 + p - 1
+            oc = min(max(o, 0), Torig - 1)
+            lam_d_c[wi, p] = lam_d[sent_dense[oc]]
+            lam_hd_c[wi, p] = lam_hd[sent_dense[oc]]
         for p in range(1, SEQ_LEN):
             o = s0 + p - 1
             if o >= Torig or not map_ok[wi, p]:
@@ -143,6 +191,8 @@ def main():
     np.save(OUT_DIR / "lam_hist.npy", lam_h_c)
     np.save(OUT_DIR / "sent_idx.npy", sent_c)
     np.save(OUT_DIR / "sent_pos.npy", spos_c)
+    np.save(OUT_DIR / "lam_hat_dense.npy", lam_d_c)
+    np.save(OUT_DIR / "lam_hist_dense.npy", lam_hd_c)
 
     lam_all = np.array([x for x in lam_all if np.isfinite(x)])
     tps = np.array(tok_per_sent)
@@ -170,6 +220,15 @@ def main():
             "n_labeled_tokens": int(fin.sum()),
             "labeled_frac_pos1plus": float(fin[:, 1:].mean()),
             "n_windows": int(N)},
+        "dense_grid_stage2": {
+            "note": ("zero-warm-up (the fitted mirror's own convention) + "
+                     "carry-forward across inter-sentence gaps; used ONLY "
+                     "by the Stage-2 panel, never by the frozen screen"),
+            "agreement_with_frozen_on_finite_cells": float(
+                np.mean(np.abs(lam_hd_c[np.isfinite(lam_h_c)]
+                               - lam_h_c[np.isfinite(lam_h_c)]) < 1e-6)),
+            "lam_hist_dense_mean": float(lam_hd_c.mean()),
+            "lam_hist_dense_std": float(lam_hd_c.std())},
     }
     STATS_JSON.parent.mkdir(exist_ok=True)
     STATS_JSON.write_text(json.dumps(stats, indent=2))

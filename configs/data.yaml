@@ -557,3 +557,43 @@ datasources:
     n_seqs: 6000
     seq_len: 128
     notes: "em-redo TXC-tracking arm — the paper's own layer; g(ℓ)=+0.097, g_order +0.054 at resid_post L15 (hs16)."
+
+  # ── task hunt Stage 2: REAL Ward activations + frozen λ̂ labels ──────
+  # briefings/task-hunt.md candidate 1. Presented as a `synthetic`-
+  # category datasource via the `module:fn` generator path so the
+  # canonical runner + the existing lambda_recovery evaluator panel a
+  # REAL task with no temp_bench/core edits. Activations are the
+  # conversion-depth caches on the runpod-d volume
+  # (/workspace/conv_depth_caches/<tag>/hs<k>.npy); labels are the frozen
+  # mirror intensity on real Sonnet event history
+  # (task_hunt/lambda_intensity/build_labels.py, DENSE Stage-2 variant —
+  # zero warm-up per the mirror's own convention; see the card).
+  # NOTE there are NO ground-truth feature directions in a real residual
+  # stream: emission_features is empty, so eauc / e_mean_max_cos come
+  # back NaN BY DESIGN and must not be read. Headline = lambda_recovery.
+  ward_real_lambda_base_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_lambda:ward_lambda_real"
+    params:
+      model_tag: base
+      hs: 13
+      label: lam_hist_dense
+      seq_len: 128
+    notes: |
+      Task-hunt candidate 1 Stage 2 — reader/base arm at resid_post L12
+      (hs13, the screen's primary layer). 4044×128×4096 fp16 cache.
+      Target = λ̂_hist (kernel-only intensity; the position ramp is
+      excluded because its terciles are 0.82-AUC readable from position
+      alone — screen card § label definition).
+
+  ward_real_lambda_distill_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_lambda:ward_lambda_real"
+    params:
+      model_tag: distill
+      hs: 13
+      label: lam_hist_dense
+      seq_len: 128
+    notes: |
+      Task-hunt candidate 1 Stage 2 — generator/R1-Distill arm, same
+      layer and labels as the base arm (token-identical stream).
