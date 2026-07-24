@@ -71,8 +71,15 @@ def phase_a():
         print(f"[cache] hit: {CACHE_DIR}")
         return json.loads(meta_p.read_text())
 
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    tok = AutoTokenizer.from_pretrained(MODEL)
+    from transformers import AutoModelForCausalLM, PreTrainedTokenizerFast
+    # FORCE the fast backend — the repo's recorded trap
+    # (`conversion_depth/build_ward_stream.py`): AutoTokenizer resolves this
+    # repo to the SLOW LlamaTokenizer, whose `return_offsets_mapping` yields
+    # unusable spans, so the keyword-onset index silently comes back -1 for
+    # every rollout (i.e. "no violations found") instead of erroring.
+    tok = PreTrainedTokenizerFast.from_pretrained(MODEL)
+    if tok.pad_token is None:
+        tok.pad_token = tok.eos_token
     rolls = load_rollouts()
     model = AutoModelForCausalLM.from_pretrained(
         MODEL, dtype=torch.bfloat16, device_map="cuda").eval()
@@ -91,21 +98,32 @@ def phase_a():
         batch = rolls[s:s + BATCH]
         seqs, metas = [], []
         for r in batch:
+            # NOTE: under transformers 5.x `apply_chat_template(tokenize=True)`
+            # returns a BatchEncoding, not a list of ids — `return_dict=False`
+            # is required or `len(p_ids)` silently becomes 2 (the key count).
             p_ids = tok.apply_chat_template(
                 [{"role": "user", "content": r["user_prompt"]}],
-                tokenize=True, add_generation_prompt=True)
+                tokenize=True, add_generation_prompt=True, return_dict=False)
             # completion tokens, truncated to the think region when closed
             text = r["text"]
             end = r["think_char_end"]
             think_text = text[:end] if end >= 0 else text
-            c_ids = tok(think_text, add_special_tokens=False)["input_ids"]
-            c_ids = c_ids[:SEQ_LEN]
-            # first-keyword token index in COMPLETION coordinates
+            enc = tok(think_text, add_special_tokens=False,
+                      return_offsets_mapping=True)
+            c_ids = enc["input_ids"][:SEQ_LEN]
+            # First-keyword token index in COMPLETION coordinates, located by
+            # OFFSET MAPPING (the token whose char span contains the keyword's
+            # start) — the build_ward_stream convention. Retokenizing the
+            # prefix instead is off by a subword when the tokenizer merges the
+            # keyword's first character into the preceding token.
             k = -1
             if r["first_kw_char"] >= 0:
-                prefix = think_text[:r["first_kw_char"]]
-                k = len(tok(prefix, add_special_tokens=False)["input_ids"])
-                if k >= len(c_ids):
+                fc = r["first_kw_char"]
+                for j, (a, b) in enumerate(enc["offset_mapping"][:len(c_ids)]):
+                    if a <= fc < b:
+                        k = j
+                        break
+                if k < 0 or k >= len(c_ids):
                     k = -1
             seqs.append((p_ids, c_ids))
             metas.append(k)
