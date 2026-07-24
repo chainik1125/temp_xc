@@ -1,103 +1,169 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-24 (night), at the round-2 factory
-acceptance gate. **State: `briefings/candidate-factory-broad-2.md`
-COMPLETE — stopped for mac-local review (briefing stays until then).**
-Nothing mid-flight; repo clean and in sync with origin/arxiv.
+**Last rewrite:** 2026-07-24 (late night), immediately after receiving
+`briefings/corpus-scaleup.md` (pre-compact handoff).
+**State: OVERNIGHT CAMPAIGN ASSIGNED, ZERO WORK DONE ON IT** (per
+instruction: the work happens post-compact). Round-2 factory is DONE
+and **APPROVED** (mac-local "REVIEW: probe-adequacy (runpod-b) +
+factory round 2 (runpod) — BOTH APPROVED"; both briefings retired).
+Do NOT redo B6/B7.
 
 ## Who / where
 Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am
 `runpod` (no `/workspace/.agent_id` — do not create it).** 32 CPU /
-128 GB, NO GPU. Shared-branch rules: commit STATUS first, `git pull
---rebase origin arxiv` before EVERY push; LOG.md append-only
-(conflicts: keep both, upstream first, mine last — 2 more resolved
-this session, same python-strip recipe); push
+128 GB, NO GPU, 184 GB free disk, `HF_HOME=/workspace/hf_cache`.
+Shared-branch rules: commit STATUS first, `git pull --rebase origin
+arxiv` before EVERY push; LOG.md append-only (conflicts: keep both,
+upstream first, mine last — the python strip-markers recipe, used 6×
+now); push
 `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`
-(URL-push does not update the tracking ref — `git fetch origin`
-before reading `status -sb`). Tokens in `/workspace/.tokens/`.
-`sleep` blocked (`until …; done`); background python needs `-u`.
-Beware `pytest | tail` exit-status illusion — capture `$?` from
-pytest itself.
+(URL-push does not update the tracking ref — `git fetch origin` before
+reading `status -sb`). Tokens in `/workspace/.tokens/` (export both
+HF_TOKEN and HUGGING_FACE_HUB_TOKEN). `sleep` blocked (`until …;
+done`); background python needs `-u`; never trust `pytest | tail`
+exit status — capture pytest's own `$?` (or `--ignore
+tests/test_v2_code_version.py`, which is dirty-tree-sensitive).
 
-## Round 2 — what shipped (all pushed, cite by subject line)
+## ACTIVE TASK (not started): briefings/corpus-scaleup.md
+**Overnight (10+ h) CPU campaign; results by Saturday morning PT.**
+Motivation: the hunt's first screen KEEPs sit on corpora too thin for
+panel-grade receipts (punctint-list's within-document control rests on
+**8 documents**; fineweb = 400 docs; refmark = 400 conversations). If
+punctint-q or refmark graduates to Stage 2 on Saturday, the panel
+should train and control on 10× data, and the doc-identity threshold
+question needs a DISTRIBUTION, not a point estimate.
 
-1. **Ledger appends** ("candidate factory r2: ledger appends…"):
-   **D7 refusal-as-posed DEAD** with the full `docs/papers/refusal.md`
-   receipts (single-(pos,layer) diff-in-means direction causal both
-   ways across 13 chat models to 72B; § 5.2 attention heads perform
-   the window→position deposit; App. J direction in base models) +
-   **B7 BUILD-if-time entry** (four-axis vet, frozen-list sourcing,
-   < 2 %-of-turns free-kill pre-gate) + live screen-outcomes block.
-2. **B6 eqdens (OpenWebMath equation-density): KILLED at triage —
-   free kill, no GPU.** Strict commit-then-run held. The frozen
-   unigram bar fired on the OPERATIVE manifest rows: gpt2 0.6530
-   ≥ 0.65 (gemma2 0.6430, llama31 0.6298 top-of-band) with ALL math
-   tokens masked ⇒ the topic leak lives in the surrounding prose
-   register. Position CLEAN (manifest 0.50–0.53 — stratified guard
-   worked). Receipts committed: card verdict appendix +
-   `labels/eqdens_stats.json` + pinned `labels/eqdens_corpus.json.gz`
-   (600 docs, pinned revision `fde8ef8d…`, ODC-By 1.0); the 3 npz NOT
-   committed (regenerable; no consumer for a dead bundle). **P3
-   inherits the measured technical-register-leak receipt.**
-3. **Verdict hygiene** (standing rule, first exercise): folded three
-   runpod-e screen outcomes into the ledger — **B2 novelty NEGATIVE**
-   (conversion, 23–29 % residue), **B4 punctint-q KEEP (the hunt's
-   first)**, **B3 punctint-list WEAK KEEP conditional**; P2 stays
-   parked (list did NOT die on position), P6 untouched. **ADOPTED
-   runpod-e's recommendation:** every future broad builder reports
-   `doc_mean_only_auc` (disclosure statistic; kill authority stays
-   with the two frozen bars until a review pins a threshold) + any
-   KEEP face owes a within-document contrast.
-4. **B7 refmark (WildChat refusal-marker intensity): SHIPPED** —
-   three commits in strict order: (a) FROZEN substring list BEFORE
-   counting — the paper's `refusal_score` set VERBATIM (12 strings,
-   `andyrdt/refusal_direction` @ `9d852fae`, App. D.1 semantics, no
-   additions); (b) hard pre-gate: marker rate **0.147 of assistant
-   turns vs the 0.02 free-kill bar** on WildChat-1M (pinned rev
-   `7d6490e4…`, ODC-By 1.0), recurrence real (38 % of ≥ 8-turn convs
-   have ≥ 2 markers) — receipt `labels/refmark_pregate.json`;
-   (c) builder + card pre-run, then run. Bundle: 400 English
-   ≥ 8-assistant-turn convs, message-λ̂ kernel 2/8, marker-message +
-   newline tokens masked, position-matched manifests, 1.19–1.36M
-   tok/tokenizer, ~20k rows/class, zero_split. **Triage: unigram
-   near-BLIND (manifest 0.517–0.532 — the topic-leak fear does NOT
-   materialize at token level), position 0.545–0.565 manifest;
-   `doc_mean_only_auc` 0.966–0.968 = the loudest conv-identity route
-   in the program ⇒ within-conversation contrast is a BINDING screen
-   precondition** (+ position floor probe + beat-the-visible-evidence
-   line; kernel support ≈ 1,000–1,150 tok ≈ 16× ladder top, stated).
-   All artifacts committed (3 npz + corpus + stats + pregate).
+**Hard rules (verbatim intent):** never touch the pinned originals
+(`fineweb_sample.json`, committed corpus artifacts, shipped
+npz/stats) — every scale-up is a NEW versioned artifact (`*_4k`,
+`*_2k`) beside them; **label logic stays FROZEN** (reuse
+`punctint_lib` / `refmark_lib` / `novelty_lib` unchanged; any code
+change needs its own pre-run commit with a stated reason); same pull
+recipes + filters, extended stream prefixes, seeded, deterministic;
+incremental commits corpus → labels → stats per item, one LOG line
+each; **a frozen bar firing at scale is a FINDING, not an
+embarrassment** — disclose it, it binds the Stage-2 design, it does
+NOT retro-kill the shipped small-corpus bundle (different artifact,
+same logic).
 
-Suite grew 276 → 285 (+7 eqdens grammar/logic, +3 refmark; the
-`test_v2_code_version` file is dirty-tree-sensitive — exclude it when
-testing with uncommitted files, it passes clean).
+### Item 1 — fineweb 400 → 4,000 docs (punctint faces; the KEEP first)
+Recipe is already written and pinned:
+`src/explorations/synthetic/expansion/corpus.py::sample_fineweb(
+cache_path, n_docs=4000, seed=0, dataset="HuggingFaceFW/fineweb",
+name="sample-10BT", split="train", min_sents=60, max_sents=200,
+shuffle_buffer=10_000)` — it is idempotent on `cache_path`, so pass a
+NEW path (plan: `experiments/explorations/synthetic/expansion/data/
+fineweb_sample_4k.json.gz`-style versioned artifact beside the pinned
+one; gzip because the 400-doc JSON is 3.8 MB ⇒ ~38 MB at 10×; if the
+plain `.json` path is needed for `sample_fineweb`'s own writer, write
+plain then gzip and commit the gz, or add a tiny wrapper — do NOT
+edit the pinned file). Pinned-400 meta for comparison: n_scanned
+4,183, n_sentences 36,805, datasets 4.8.5, splitter
+`expansion.corpus.split_sentences v1` ⇒ expect **~42k docs scanned,
+~368k sentences** at 4,000.
 
-## Pinned conventions (carry forward)
-- Broad-factory bars, PINNED (review qualification 4): 0.65/0.65,
-  direction-agnostic max(AUC, 1−AUC), manifest rows operative,
-  0.55–0.65 ship-with-disclosure — stated in every card up front.
-- NEW: `doc_mean_only_auc` reported in every builder triage (see 3).
-- New-corpus rule held twice more: pinned revision + streamed-prefix
-  disclosure + seeded subsample shipped as `<name>_corpus.json.gz`;
-  builder doubles as exact re-pull script; license noted (eqdens
-  ODC-By + CC ToU; refmark ODC-By).
-- Freeze-before-count precedent (B7): event DEFINITIONS commit before
-  any corpus measurement, not just bars before builders.
+Then rebuild BOTH punctint faces × 3 tokenizers at scale in a NEW
+builder (`build_punctint_4k.py` — do not edit `build_punctint.py`),
+importing frozen `punctint_lib` unchanged: labels, position-matched
+manifests (`stratified_balanced_manifest`, raise `cap` 20k → ~100k
+per class **if the data supports it — say what it supports**), triage
+on the frozen **0.65/0.65 direction-agnostic, manifest-rows-operative**
+bars, plus `doc_mean_only_auc` on both faces.
 
-## Waiting on / next
-- **mac-local review of round 2** (briefing stays until then). Screen
-  queue continues on GPU pods: sc_lambda → oprate → qrate(Ward) →
-  vslope → interleave tss → dialevel, now + refmark (with its binding
-  preconditions) if the review admits it; novelty NEGATIVE and both
-  punctint verdicts already in.
-- No other active briefings for me. If idle post-review: verdict
-  hygiene stays standing (fold new screen outcomes into the ledger).
-- Spend unchanged ($11.52/$25) — zero API calls this round.
+**The `token_ids` assert must change and the change is a receipt.**
+`build_punctint.py` asserts byte-identity with
+`replag_fineweb_<tok>.npz`, which covers only the pinned 400 docs.
+At 4k, assert **prefix identity**: the first-400-doc token slice ==
+replag `token_ids`. That single assert proves (a) the 4k pull is a
+deterministic SUPERSET whose prefix is the pinned sample and (b)
+tokenization is unchanged ⇒ **the GPU pods' existing caches cover
+the first 400 docs; only the new ~3,600 need caching.** If the assert
+FAILS (streaming shuffle-buffer behavior can differ at larger n),
+that is not an error to hide: disclose that the scaled corpus is a
+different sample rather than a superset, drop the cache-reuse claim,
+and continue — the shipped 400-doc bundle stands on its own artifact.
 
-## Round-1 summary (APPROVED earlier, do not redo)
-Ledger (18 ideas) + B1 interleave + B2 novelty + B3 list-density +
-B4 qrate-fineweb + B5 dialevel; 5 binding review qualifications;
-bundle-builder pattern + helper inventory in `labels/*_lib.py`
-(novelty/punctint/dialevel/interleave/eqdens/refmark libs all
-reusable: kernels, zero_split, stratified manifests, type-mean
-triage, doc-mean statistic).
+**Bootstrap receipts are the point of item 1:** doc-level bootstrap
+(**≥ 1,000 reps**) CIs on every triage AUC and on `doc_mean_only_auc`,
+per tokenizer per face — the threshold-pinning review consumes this.
+Plan: new `boot_lib.py` (+ tests, pre-run commit) — precompute per-row
+(score, class, doc) once, resample DOCUMENTS with replacement,
+recompute `interleave_lib.rank_auc`; parallelize over the 32 cores.
+Sizing: 400 docs = 794k tokens/tokenizer ⇒ **4,000 docs ≈ 8M
+tokens/tokenizer** and ~300k manifest rows/face at cap 100k, so a rep
+is a ~30 ms sort — 18 statistic-slots × 1,000 reps is minutes
+parallel, ~20 min serial. Also report **how many documents carry the
+within-document contrast per face at scale** (docs holding both top-
+and bottom-class manifest rows — the "8 documents" number, fixed or
+not).
+
+### Item 2 — refmark 400 → 2,000+ conversations
+Same recipe as `build_refmark.py` (WildChat-1M, pinned revision
+`7d6490e462285cf85d91eabea0f9a954fbddcd1f`, ODC-By 1.0; English,
+≥ 8 assistant turns, 2,000–24,000 rendered chars, seeded), longer
+stream prefix, new builder + `*_2k` artifacts. **Yield arithmetic
+from the committed pre-gate receipt:** 20,000 streamed → 9,464
+English → 681 with ≥ 8 assistant turns (3.4 % of streamed) before the
+char filter ⇒ **plan `N_STREAM` ≈ 200k–250k for 2,000+ convs, and
+RECORD the pre-subsample pool size this time** (the 400-conv build
+did not). Same deliverables as item 1, plus: (a) **`is_user_echo`
+mask array shipped in the scaled npz** — marker masking covers
+ASSISTANT messages only, so user messages echoing a frozen substring
+are unmasked and manifest-eligible; mac-local measured 13/4,713 user
+messages ⇒ 134/59,994 manifest rows (0.22 %) on the 400-conv build —
+recompute at scale so screens can drop those rows trivially (this is
+a NEW disclosure array, not a label-logic change; still commit-then-
+run); (b) recurrence stats (frac convs ≥ 2 markers) at scale
+(400-conv/pre-gate value: 0.377 on the ≥ 8-turn population).
+
+### Item 3 (only if the night allows) — novelty-family bootstrap
+No new corpus (novelty screened NEGATIVE). Label-side only: doc-level
+bootstrap CIs on the committed novelty triage AUCs + the
+`doc_mean_only_auc` equivalent computed from the committed npz (that
+statistic post-dates the novelty builder). Cheap; skip if 1–2 fill
+the night.
+
+### Deliverables / acceptance gate
+Versioned corpus artifacts + npz + stats JSONs **with bootstrap CI
+blocks**; a **caching-cost table** (tokens × 3 models per scaled
+corpus, for the GPU pods — note 8M tok/tokenizer at fineweb-4k is
+~10× the current bundles); one LOG line per item; a ledger note under
+the screen-outcomes block in `CANDIDATES.md`; STATUS rewritten. Stop
+for review — briefing stays.
+
+## Conventions that govern this campaign (carry forward)
+- Broad-factory bars PINNED: 0.65/0.65, direction-agnostic
+  max(AUC, 1−AUC), **manifest rows operative**, 0.55–0.65
+  ship-with-disclosure. `doc_mean_only_auc` = RATIFIED reported
+  disclosure statistic (kill authority stays with the two frozen
+  bars; threshold pinning deferred to the post-screen-wave review —
+  this campaign supplies its distribution).
+- Strict commit-then-run: every builder/lib/card commits BEFORE it
+  produces an output; verdict/receipt blocks are pure appends.
+- New-corpus rule: pinned revision + stream-prefix disclosure +
+  seeded subsample shipped as a `.json.gz` artifact; builder doubles
+  as the exact re-pull script; license noted.
+- Freeze-before-count (B7 precedent): event DEFINITIONS commit before
+  any measurement, not just bars before builders.
+
+## Round-2 factory summary (APPROVED — do not redo)
+D7 refusal-as-posed DEAD (refusal.md receipts) + B7 entry; **B6
+eqdens KILLED at triage** (manifest unigram gpt2 0.6530 with all math
+tokens masked ⇒ prose-register leak measured; P3 inherits it; npz
+deliberately uncommitted, regenerable — they still sit untracked in
+`labels/`, that is expected); verdict hygiene (B2 NEGATIVE, B4
+punctint-q KEEP, B3 punctint-list WEAK KEEP; P2 stays parked);
+**B7 refmark SHIPPED** (pre-gate 0.147 vs 0.02 bar; unigram
+near-blind 0.517–0.532; conv-identity 0.967 ⇒ within-conversation
+contrast BINDING at screen, + position floor probe + visible-evidence
+line + under-span ~16×). Suite 285 passed (285 + runpod-b's adds =
+302/1 on their box).
+
+## Repo state
+Clean, in sync with `origin/arxiv` (the two eqdens npz are the
+intentionally-uncommitted killed-bundle outputs). Nothing mid-flight.
+Leaderboard untouched by me. Spend $11.52/$25 (zero API this round).
+**Next action post-compact: read `briefings/corpus-scaleup.md`, then
+start item 1 with the 4k fineweb pull running in background while I
+write `boot_lib.py` + tests and `build_punctint_4k.py` (commit both
+before any output).**
