@@ -67,8 +67,8 @@ def main() -> None:
             ev = np.where(op_s >= 0, (op_s == cls).astype(float), np.nan)
             evn = np.where(op_null >= 0, (op_null == cls).astype(float),
                            np.nan)
-            out[f"rate_{key}"] = fl.kernel_rate(ev)
-            out[f"rate_{key}_null"] = fl.kernel_rate(evn)
+            out[f"rate_{key}"] = fl.kernel_rate(ev)[sidx]
+            out[f"rate_{key}_null"] = fl.kernel_rate(evn)[sidx]
             flags = (op_s[sidx] == cls).astype(np.int8)
             for T in EVIDENCE_TS:
                 out[f"ev_{key}{T}"] = fl.trailing_count_incl(flags, T)
