@@ -75,6 +75,32 @@ the within-doc-shuffle null (`nov_rate_null`) as the frequency-only
 mechanism receipt: real-corpus rate structure (its variance and its
 recovery) must exceed the null corpus's.
 
+## Triage RESULT (builder-derived, appended after the frozen bars ran)
+
+**PASS — the bundle ships.** Primary face (`nov_resid` terciles, test
+rows, pos ≥ 64), stable across all three tokenizers: current-token
+type-mean AUC **0.551 / 0.563 / 0.551** (gpt2/gemma2/llama31) and
+position AUC **0.472 / 0.478 / 0.477** — direction-agnostic ≈ 0.52–0.53
+(the committed `rank_auc` is directional; the kill bar reads
+|AUC − 0.5|). Both far under the 0.65 bar, at the interleave-`tss`
+passing level. The RAW face's position AUC is 0.121–0.128 — i.e.
+**0.87–0.88 direction-agnostic** (high-novelty rows sit early: the
+Heaps trend, as predicted) — `nov_rate` is anchor/disclosure only, per
+the pre-stated demotion. Base novelty rate 0.34–0.36; balanced
+manifests 20k rows/class; `token_ids` asserted identical to replag ⇒
+zero new caching.
+
+**Label-side mechanism receipt (drift structure the frequency null
+lacks):** residual spread 0.112 vs 0.093 under the within-doc-shuffle
+null (~21 % excess), and pooled per-doc autocorrelation of the
+residual at lags BEYOND the kernel's 64-lag support — where windows
+share no input bits and the null sits ≈ 0 by construction — is
+real **0.129–0.134 vs null 0.023–0.026** at lag 64 and
+**0.056–0.064 vs 0.006–0.016** at lag 128 (all three tokenizers).
+Real novelty has persistent topical-drift structure; the null is pure
+composition + Heaps. This is the label-side face of the shuffle
+receipt the screen will run on activations.
+
 ## Kill rule (draft — freezing agent finalizes for the screen)
 
 KILL if ANY of: (1) label-side triage bars above fire (pre-screen

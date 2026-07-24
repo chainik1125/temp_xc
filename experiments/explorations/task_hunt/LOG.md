@@ -945,3 +945,33 @@ shared pipeline (tested) + qrate builder/card"). Bundle:
 - Sibling disclosure in the card: runpod's broad-corpus B3/B4 also
   carries a question-rate face (fineweb prose) — different corpus,
   cross-cite, neither substitutes.
+
+## 2026-07-24 — runpod — candidate factory B2: vocabulary-novelty bundle SHIPPED (triage PASS on frozen bars)
+
+Builder chain per discipline: builder + pure lib + 10 sanity tests +
+card WITH FROZEN TRIAGE BARS committed before any output (then one
+committed amendment adding the drift receipt, still pre-output);
+artifacts `labels/novelty_fineweb_{gpt2,gemma2,llama31}.npz` +
+`novelty_stats.json`; card `novelty/CARD_DRAFT.md` with the verdict
+appendix. **Economics: `token_ids` builder-ASSERTED byte-identical to
+the committed replag npz (same pinned fineweb sample + tokenization)
+⇒ the existing GPU fineweb caches drop on with ZERO new caching.**
+
+Primary = `nov_resid`: kernel-smoothed trailing novelty rate
+(lags 1–64, half-life 16; current token excluded from its own label),
+position-detrended because the raw rate is Heaps-trend-confounded
+(raw face position AUC ≈ 0.88 direction-agnostic — demoted to
+disclosure as pre-stated). **Triage vs the frozen 0.65 bars, test
+rows, all three tokenizers: unigram 0.551–0.563, position 0.472–0.478
+(≈ 0.52–0.53 direction-agnostic) — PASS at the tss level.**
+Label-side mechanism receipt shipped in the stats: residual spread
+0.112 vs 0.093 under the within-doc-shuffle null, and pooled per-doc
+residual autocorrelation at lags beyond the kernel's 64-lag support
+(no shared input bits; null ≈ 0 by construction) real 0.129–0.134 vs
+null 0.023–0.026 at lag 64, 0.056–0.064 vs 0.006–0.016 at lag 128 —
+real novelty carries persistent topical drift the frequency null
+lacks. Clock bridge: window T sees kernel mass 0.17/0.31/0.53/0.80 at
+T = 4/8/16/32.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
+2026-07-24. Next: B3/B4 (list-density + question-rate, one builder)._

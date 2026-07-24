@@ -1,0 +1,222 @@
+{
+ "source": "experiments/explorations/synthetic/expansion/data/fineweb_sample.json",
+ "source_meta": {
+  "dataset": "HuggingFaceFW/fineweb",
+  "name": "sample-10BT",
+  "split": "train",
+  "seed": 0,
+  "shuffle_buffer": 10000,
+  "n_docs": 400,
+  "n_scanned": 4183,
+  "min_sents": 60,
+  "max_sents": 200,
+  "n_sentences": 36805,
+  "datasets_version": "4.8.5",
+  "splitter": "expansion.corpus.split_sentences v1"
+ },
+ "seed": 0,
+ "null_seed": 1000,
+ "kernel": {
+  "half_life": 16,
+  "support": 64,
+  "mass_within_T": {
+   "4": 0.1697104903960378,
+   "8": 0.31241943340101597,
+   "16": 0.5333333333333333,
+   "32": 0.7999999999999999,
+   "64": 1.0
+  }
+ },
+ "min_manifest_pos": 64,
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_docs": 400,
+   "n_tokens": 793831,
+   "token_ids_match_replag": true,
+   "novelty_base_rate": 0.3572410248528969,
+   "rate_mean": 0.34669584035873413,
+   "rate_std": 0.14586709439754486,
+   "rate_null_std": 0.14568209648132324,
+   "resid_std": 0.11207698285579681,
+   "resid_null_std": 0.09252563118934631,
+   "resid_autocorr": {
+    "16": {
+     "real": 0.6331077423212651,
+     "null": 0.5139522820054794
+    },
+    "32": {
+     "real": 0.38836056614073305,
+     "null": 0.25611966628182326
+    },
+    "64": {
+     "real": 0.13003278182817923,
+     "null": 0.023240918979937415
+    },
+    "128": {
+     "real": 0.05577352444926686,
+     "null": 0.005899043805221043
+    }
+   },
+   "position_bin_expected_rate": [
+    0.6397576928138733,
+    0.5243916511535645,
+    0.43366965651512146,
+    0.35771581530570984,
+    0.29877880215644836,
+    0.2384466975927353
+   ],
+   "tercile_edges": {
+    "resid": [
+     -0.04965108136336009,
+     0.0467844208081563
+    ],
+    "raw": [
+     0.27657585342725116,
+     0.40273401141166687
+    ]
+   },
+   "manifest_rows_per_class": {
+    "nov": 20000,
+    "novraw": 20000
+   },
+   "triage": {
+    "raw": {
+     "unigram_auc": 0.5418626793759986,
+     "position_auc": 0.12072833084645748
+    },
+    "resid": {
+     "unigram_auc": 0.5591672245532171,
+     "position_auc": 0.4721857490410582
+    }
+   },
+   "artifact": "novelty_fineweb_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_docs": 400,
+   "n_tokens": 784512,
+   "token_ids_match_replag": true,
+   "novelty_base_rate": 0.34045878201990537,
+   "rate_mean": 0.32992708683013916,
+   "rate_std": 0.14493192732334137,
+   "rate_null_std": 0.14305956661701202,
+   "resid_std": 0.11183084547519684,
+   "resid_null_std": 0.09240686148405075,
+   "resid_autocorr": {
+    "16": {
+     "real": 0.6364500509324332,
+     "null": 0.5064832930937353
+    },
+    "32": {
+     "real": 0.3926007661750907,
+     "null": 0.24746590464158605
+    },
+    "64": {
+     "real": 0.1336049636939338,
+     "null": 0.025951093722453196
+    },
+    "128": {
+     "real": 0.06363344389919337,
+     "null": 0.015816436464132045
+    }
+   },
+   "position_bin_expected_rate": [
+    0.6216437220573425,
+    0.5062375068664551,
+    0.4128621220588684,
+    0.3386380076408386,
+    0.2809436619281769,
+    0.22333674132823944
+   ],
+   "tercile_edges": {
+    "resid": [
+     -0.04705387353897095,
+     0.04751095175743103
+    ],
+    "raw": [
+     0.260947048664093,
+     0.3848367929458618
+    ]
+   },
+   "manifest_rows_per_class": {
+    "nov": 20000,
+    "novraw": 20000
+   },
+   "triage": {
+    "raw": {
+     "unigram_auc": 0.5420028150943363,
+     "position_auc": 0.12776299118997925
+    },
+    "resid": {
+     "unigram_auc": 0.5629120055275505,
+     "position_auc": 0.47820949888387465
+    }
+   },
+   "artifact": "novelty_fineweb_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_docs": 400,
+   "n_tokens": 777900,
+   "token_ids_match_replag": true,
+   "novelty_base_rate": 0.36266743797403267,
+   "rate_mean": 0.35205337405204773,
+   "rate_std": 0.14759841561317444,
+   "rate_null_std": 0.14651143550872803,
+   "resid_std": 0.11384740471839905,
+   "resid_null_std": 0.09438460320234299,
+   "resid_autocorr": {
+    "16": {
+     "real": 0.6336719204494404,
+     "null": 0.5132350793310775
+    },
+    "32": {
+     "real": 0.38921441775741095,
+     "null": 0.2470894661276033
+    },
+    "64": {
+     "real": 0.12939438272578335,
+     "null": 0.022657060228427044
+    },
+    "128": {
+     "real": 0.0628573557915593,
+     "null": 0.007902379683647341
+    }
+   },
+   "position_bin_expected_rate": [
+    0.6442009210586548,
+    0.5291581153869629,
+    0.4385320544242859,
+    0.3618081510066986,
+    0.3020978569984436,
+    0.2411229908466339
+   ],
+   "tercile_edges": {
+    "resid": [
+     -0.050193707148234054,
+     0.04781904816627501
+    ],
+    "raw": [
+     0.2811684310436249,
+     0.4098086158434549
+    ]
+   },
+   "manifest_rows_per_class": {
+    "nov": 20000,
+    "novraw": 20000
+   },
+   "triage": {
+    "raw": {
+     "unigram_auc": 0.532679476882759,
+     "position_auc": 0.12463411810368352
+    },
+    "resid": {
+     "unigram_auc": 0.551393656438226,
+     "position_auc": 0.4774013868476554
+    }
+   },
+   "artifact": "novelty_fineweb_llama31.npz"
+  }
+ }
+}
