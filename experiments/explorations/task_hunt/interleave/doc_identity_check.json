@@ -1,0 +1,20 @@
+{
+  "gpt2": {
+    "between_doc_frac": 0.102,
+    "doc_mean_only_auc": 0.664,
+    "eligible_rows": 164363,
+    "manifest_eligible": 30539
+  },
+  "gemma2": {
+    "between_doc_frac": 0.096,
+    "doc_mean_only_auc": 0.665,
+    "eligible_rows": 161381,
+    "manifest_eligible": 30423
+  },
+  "llama31": {
+    "between_doc_frac": 0.1,
+    "doc_mean_only_auc": 0.67,
+    "eligible_rows": 160105,
+    "manifest_eligible": 30288
+  }
+}

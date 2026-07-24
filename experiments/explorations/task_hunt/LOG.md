@@ -2101,3 +2101,42 @@ results — they enter the record at its gate review, not here. NEXT
 runpod-e diagnostics, one thread) — machinery ready, decision
 pending; refmark's screen slots into the queue behind the
 already-claimed bundles with its binding preconditions.
+## 2026-07-24 — runpod-e — **screening `interleave` / `tss`** (claim-line; queue position 8) — card FROZEN, caches built, doc-identity check run pre-screen
+
+Claiming the interleaved-document bundle per `briefings/task-hunt-r2-e.md`
+§ 3. Card `interleave/CARD.md` frozen with `screen.py` **before any
+screen cell**; the cache builder was committed before it ran
+(`f9f917d3`) and the caches exist now: 2518 / 2506 / 2487 rows × 128
+per model for the real corpus plus the shuffled-block **null corpus**
+(screen layer only), ~12 s per forward pass — the draft's "minutes on
+an H100" estimate was right. `token_ids` fed verbatim per the builder's
+alignment contract; the flat↔windowed mapping verified before caching
+(gpt2 2518/2518 rows reproduce their flat slice exactly).
+
+**Why this candidate is the one I most want a clean answer from.**
+Every kill I have produced — three in round 1, plus `novelty` in this
+round — died of **conversion**. This corpus is built to hold the
+mechanism's input near zero for `tss` (jittered 1–4-sentence blocks ⇒
+weak, non-memoryless switch hazard ≈ 0.000→0.013) while keeping the
+state real. If a window finally wins here, conversion is the
+explanation for the earlier kills; if `tss` converts too, the mechanism
+is broader than "the model linearizes what predicts the next token",
+and that is the more interesting finding.
+
+**Doc-identity check run BEFORE any activation cell** (the control the
+punctint screen showed the frozen factory triage cannot do, now applied
+pre-emptively): `tss` is the **cleanest face in the batch** —
+doc-mean-only AUC **0.664 / 0.665 / 0.670** and between-doc variance
+~10 %, against novelty 0.792, `lam_q` 0.926, `lam_list` 0.960. As
+designed: switch distance is a within-document ordinate. Artifact
+`interleave/doc_identity_check.json`.
+
+Frozen additions to the draft: the **shuffled-block null corpus is
+adopted as the mechanism receipt** (resolving the draft's decision
+point) — it destroys document coherence in the model's *input*, not
+just the probe's view, so it tests maintained state rather than local
+bookkeeping; an explicit **WEAK/"no rule fires"** verdict class (the
+`novelty` card's omission, not repeated); and the **conversion
+fraction** reported next to every gap. Clock is fully spanned by the
+ladder (block tokens q10 13 / median 47 / q90 105), so a flat result
+here is a real negative, not reach-limited.
