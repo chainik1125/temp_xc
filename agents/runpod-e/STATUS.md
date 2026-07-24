@@ -44,8 +44,56 @@ pre-use; no reviewer/meeting quotes in tracked files.
 - Models in HF cache: gpt2, gemma-2-2b, llama-3.1-8b base, r1-distill,
   gemma-3-12b-it.
 
-## If picked up next
-Wait for mac-local review of the LOG; candidate follow-ups that
-survive review: the candidate-2 regime-2 aggregation seed (needs a
-fresh card + relaxed-order program decision). Sibling arms: runpod-d
-(arm A) and runpod-c (em-redo) own their own state.
+## Proposed next tasks (runpod-e suggestions, 2026-07-24 — pending
+## mac-local/Han review; ordered by value-per-hour)
+
+1. **Stage-2 on the hedging-trend LEVEL (the candidate-2 seed) —
+   needs a program decision first.** The screen showed a real,
+   monotone-in-T, per-token-blind window gap (distill mean-probe
+   0.52→0.57 vs tok 0.47) that is aggregation-carried. The strategy
+   note in the research STATUS already claims regime-2 rates/trends
+   suffice to separate TXC from per-token-decoded T-SAE *without*
+   order. If the program accepts an aggregation-framed win (shuffle
+   IMMUNITY disclosed as the mechanism receipt instead of shuffle
+   collapse), this is the cheapest path to a real-data T-scaling
+   figure: labels + Ward caches are already on this volume, Stage-2
+   protocol is fixed, ~1 day. Requires a FRESH card (do not reuse the
+   killed one as confirmation).
+2. **Early-layer post-hoc addendum on existing caches (~2-3 h, zero
+   new data).** Every screen ran one mid-depth layer, and the shared
+   mechanism was conversion-by-mid-depth. Cached-but-unscreened
+   alternates exist for all three replag models (gpt2 hs4, gemma hs8,
+   llama hs8) and all 17 Ward capture points. Test directly: does the
+   lag-VALUE order gap and/or the slope8 aggregation gap GROW at
+   pre-conversion depths? Deliverables: g_order(ℓ) for lag4,
+   g_agg(ℓ) for slope8. Either direction is a finding about where
+   temporal structure lives before the model summarizes it — and it
+   sharpens the depth story the conversion-depth exploration opened.
+3. **A small-model order cell (new card).** The only genuine
+   order-carried window advantage found anywhere in arm B is the
+   lag-VALUE readout at gpt2 scale (+0.11, shuffle-collapsed; thin at
+   2B/8B). If the paper wants a real-data ORDER receipt, it may live
+   at small scale by necessity — conversion capacity is what destroys
+   it. Proposal: freeze a card for lag-value at gpt2 (optionally a
+   pythia ladder for a clean scale curve), screen early+mid layers,
+   Stage-2 panel at gpt2 (cheap). Also yields a quotable
+   conversion-vs-scale curve for the rebuttal.
+4. **Process fix for the next hunt round: per-token-first triage.**
+   All three kills shared one signature visible within minutes: a
+   HIGH per-token ceiling (0.7-0.97). Adopt a mandatory cheap
+   pre-screen — per-token linear probe only — and require per-token
+   ≈ chance-ish before a candidate earns the full window grid. Fold
+   into the task-hunt briefing conventions.
+5. **Anti-conversion candidate class (design note for round 2).**
+   Conversion happens when the latent helps next-token prediction.
+   Candidates should therefore target latents with NO generative
+   training signal: e.g., source identity / time-since-switch in
+   two-document interleaved real text (a real-data analog of
+   colored_sources/multilane, with lexical-overlap controls), or
+   externally-annotated states orthogonal to surface form. These are
+   the latents a model plausibly never converts — exactly where a
+   window must win.
+
+Sibling arms: runpod-d (arm A) and runpod-c (em-redo) own their own
+state; this pod is idle and can absorb any of 1-3 immediately —
+caches for all of them are already on this volume.
