@@ -98,6 +98,42 @@ Next per briefing: candidate 2 (confidence trend) — runpod-b's clock
 bridge does NOT kill it (slope4 support ≈ 64 tok = T64), so it
 precedes candidate 3.
 
+## 2026-07-24 — runpod-e — candidate 2 (confidence trend) — **KILL** (real T-growing window gap, but aggregation-carried — order receipt fails)
+
+Screen per the frozen `confidence/CARD.md` + its committed screen-cell
+appendix (results: `confidence/results/screen_{distill,base}.json`;
+substrate: Ward stream rebuilt on this volume, readers base + distill
+at hs15 = resid_post L14; slope rows exact-histogram matched on anchor
+hedge state × position bucket — the ambient-route guard).
+
+What the screen found (3-class, chance 0.333): the trend IS
+window-readable and per-token-blind — distill slope8: per-token
+0.468 lin / 0.503 MLP vs window-MEAN 0.521 → 0.545 → 0.565 at
+T 16/32/64, a clean monotone T-growth with gap +0.06 – +0.10 at T64;
+permutation nulls at chance; the hedge-state CONTROL is regime-1
+exactly as predicted (per-token ≈ window, both readers). But the KEEP
+clause's order receipt FAILS: the order-free MEAN probe achieves the
+entire gap (g_order = flatten − mean ≤ 0 on the primary cells), and
+context-shuffled probes retain most of the MLP gap (distill T32:
+shuf_mlp 0.543 vs mlp 0.552; slope4 shuffle occasionally HELPS).
+runpod-b's prereg bet — "a trailing slope is a centered-weights
+functional, so shuffle destroys it" — is falsified: under anchor
+matching, slope ≈ anchor − window-mean, an order-free functional.
+**Verdict: KILL as the card is written** — the hunt deliverable
+explicitly requires the within-window shuffle ablation to show order
+matters, and for this latent it cannot.
+
+Recorded seed (NOT a verdict): "hedging-trend level" is a genuine
+regime-2 aggregation latent — window-readable, per-token-blind,
+T-scaling, grounded — i.e. the class the strategy notes flag as
+sufficient to separate TXC from per-token-decoded T-SAE even without
+order. If a future window relaxes the order requirement, this is the
+first candidate to re-card (fresh prereg; do NOT reuse this screen as
+its confirmation).
+
+Next: candidate 3 (emotional-instability onset) — the remaining arm-B
+queue item.
+
 **2026-07-24 · runpod-b · prep (labels + cards) — no verdict.** All four
 label artifacts landed under `labels/` (builders committed pre-run, 10
 sanity tests in `tests/test_task_hunt_labels.py`): `replag_fineweb_*` ×3
