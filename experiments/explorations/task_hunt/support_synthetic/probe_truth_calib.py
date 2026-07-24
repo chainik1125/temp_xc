@@ -93,7 +93,15 @@ BT_EPS = 1e-4                       # x·u_bt is exactly 0 when b = 0
 # n_windows values give n = 2048 / 4096 / 8192 / 16384, so n_windows = 1024
 # IS v1's committed setting and 8192 IS v2's.
 P_LADDER = (8, 32, 128, 512, 2048, 4096)
-P_STACKED_CORNER = 8192             # p/n = 4 at n = 2048, the Stacked regime
+# The card also named a p = 8192 corner (p/n = 4 at n = 2048). DROPPED on
+# cost, stated rather than silently skipped: a single such cell ran > 30 min
+# (RidgeCV/OLS on 16384 × 8192 at the nw = 8192 end) — 9 of them would have
+# cost more than the rest of the campaign. Nothing about the p > n regime is
+# lost: the p = 4096 cell's own n_windows sweep already delivers EXACT-truth
+# coverage at p/n = 0.5, 1.0 and 2.0 (n = 8192 / 4096 / 2048), and line S
+# covers p/n = 4.0 on real Stacked codes (whose anchor is unlicensed by
+# design, so it is commentary either way).
+P_STACKED_CORNER = None
 N_WINDOWS = (1024, 2048, 4096, 8192)
 PROBES = ("ols", "ridge")
 T_MAIN = 16
@@ -289,7 +297,8 @@ def main():
         for arm in ("full", "token", "null"):
             for p in P_LADDER:
                 jobs.append((arm, T_MAIN, p, "k8", True))
-            jobs.append((arm, T_MAIN, P_STACKED_CORNER, "k8", False))
+            if P_STACKED_CORNER:
+                jobs.append((arm, T_MAIN, P_STACKED_CORNER, "k8", False))
             for p in DENSITY_PS:
                 jobs.append((arm, T_MAIN, p, "p6", True))
             for T in T_GATE:                          # G1: the arm truths vs T
