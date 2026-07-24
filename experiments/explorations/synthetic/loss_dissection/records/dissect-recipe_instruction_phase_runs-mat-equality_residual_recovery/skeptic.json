@@ -1,0 +1,27 @@
+{
+ "a_seed_noise": {
+  "kill": false,
+  "reason": "The frozen bar (|D| > max(2*SE, 0.05), >=2/9 cells) is genuinely met, not gamed. Recomputing the passing cells confirms the arithmetic: T=8,k=1 has D=0.367 vs bar 0.136 with all three seed deltas positive (0.241, 0.475, 0.386) \u2014 a robust pass; T=4,k=2 has D=0.506 vs bar 0.417 with all deltas positive. T=2,k=4 is marginal (D=0.361 vs bar 0.349, one seed delta near zero at 0.015), and with n=3 seeds the SE estimate is itself noisy, but even discarding that cell as fragile the remaining 2/9 satisfy the frozen rule with 0 negative passes. Seed noise alone does not explain the pattern."
+ },
+ "b_cell_shopping": {
+  "kill": false,
+  "reason": "The >=2/9-cells rule, the (T, k_pos) slice, seed set {1,2,42}, and the delta floor were all frozen pre-build in the card. All 9 cells are reported, including 6 non-passing cells and a negative-D cell (T=4,k=1, D=-0.073, not passing). The verdict is read off mechanically from the frozen rule, not selected post hoc. No evidence of cell shopping."
+ },
+ "c_graft_confound": {
+  "kill": false,
+  "reason": "Gate B passes 9/9 (only 7/9 required), the untrained guard passes exactly (max_abs_diff=0.0, confirming identical init across variants), and the frozen contract suite includes the plain-reduction test (<=1e-6 vs TXCBatchTopKPost.train_step). Caveat worth recording but not a kill: several Gate B tolerances are extremely loose (tol up to 0.99 driven by huge SD_pool from the near-chance metric), so the bridge is weakly powered \u2014 but the tightest cells (T=2,k=4 abs_diff=0.003 vs tol 0.143; T=8,k=1 abs_diff=0.028 vs tol 0.10) pass on merit, and mat is compared against sequence-mode plain, not the window-mode anchor, so a graft offset would difference out."
+ },
+ "d_pipeline_confound": {
+  "kill": false,
+  "reason": "The comparison is mat vs plain entirely within the sequence-mode family: identical class, identical anchor-window distribution (S_max=2 for all variants), identical RNG streams and training windows at equal seeds, loss-only difference. Any sequence-vs-window pipeline effect is common-mode and cancels in the paired per-seed deltas; the window-mode anchor is only used for Gate B, not for the component contrast. No pipeline confound reaches the claimed effect."
+ },
+ "e_metric_leak": {
+  "kill": true,
+  "reason": "Fatal. The metric is normalized [chance=0, oracle=1], and the absolute levels show that in every passing cell BOTH arms sit far below chance: T=2,k=4 plain=-0.780 vs mat=-0.419; T=4,k=2 plain=-0.545 vs mat=-0.040; T=8,k=1 plain=-0.950 vs mat=-0.583. Matryoshka never extracts the equality-residual latent in any passing cell \u2014 it merely makes the arm LESS anti-correlated with the target. The only cell where mat is meaningfully above chance (T=2,k=1, mean 0.380) fails the frozen bar. Calling this 'HELPS recovery' converts a reduction of a pathological below-chance artifact (plausibly a regularization/capability side effect of the matryoshka prefix penalty) into a recovery salvage \u2014 exactly the capability-vs-recovery conflation the card's own headline discipline and prediction (ii) warn against. A delta-HELPS with no arm above chance is not a recovery claim."
+ },
+ "overall": {
+  "survives": false,
+  "summary": "The statistics are clean \u2014 frozen bar met (3/9 positive, 0 negative, including one robust all-seeds-positive cell), no cell shopping, Gate B and the untrained/plain-reduction guards pass, and the mat-vs-plain contrast is pipeline-matched. But the claim dies on the metric: in all passing cells the absolute equality_residual_recovery is deeply negative for both arms (mat best among passing cells is -0.04; plain as low as -0.95). Matryoshka does not recover the latent anywhere the bar is met; it only attenuates a below-chance pathology of the plain baseline. The correct verdict is 'mat reduces below-chance anti-recovery on recipe' \u2014 a curiosity about the baseline's failure mode, not a component salvage. The HELPS-on-recovery claim is a conflation and should be rejected; per the card's own fork (iii-b), this is not a genuine salvage, and TXC-pro's matryoshka term earns no recovery credit here."
+ },
+ "_judge_model": "claude-fable-5"
+}

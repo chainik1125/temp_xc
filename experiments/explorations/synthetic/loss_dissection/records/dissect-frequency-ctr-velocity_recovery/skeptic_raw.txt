@@ -1,0 +1,28 @@
+```json
+{
+  "a_seed_noise": {
+    "kill": false,
+    "reason": "The two passing cells (T=8,k=1 and T=8,k=2) show all three per-seed deltas positive and large (0.052/0.107/0.094 and 0.060/0.126/0.092). Reported D (0.0844, 0.0927) and SE (0.0165, 0.0191) recompute correctly from the deltas (ddof=1, /sqrt(3)); both clear max(2*SE, 0.05): 0.0844 > 0.05 and 0.0927 > 0.05 with 2*SE margins of 0.033 and 0.038 also satisfied. Consistent sign across all seeds in both cells makes a seed-noise explanation implausible. Non-passing cells were honestly reported as non-passing (including T=4,k=1 at D=0.0497, correctly held under the 0.05 floor with no upgrade)."
+  },
+  "b_cell_shopping": {
+    "kill": false,
+    "reason": "All 9 (T, k_pos) cells of the frozen slice are reported with full per-seed deltas; the verdict is the mechanical application of the frozen >=2/9-positive AND 0-negative rule (n_pos=2, n_neg=0). No cell was dropped, added, or re-run; the boundary cell T=4,k=1 (D=0.0497 vs floor 0.05) was NOT counted, which is exactly the anti-shopping discipline the card mandates. The effect also has a coherent structure (grows with T at low/mid k) rather than scattered cherry-picks."
+  },
+  "c_graft_confound": {
+    "kill": false,
+    "reason": "Gate B passes 9/9 cells (rule requires >=7/9): the reimplemented sequence-mode plain arm matches the canonical window-mode txc_batchtopk_post leaderboard anchor within max(2*SD_pool, 0.10) everywhere, with most |diffs| < 0.03 (worst 0.0549 at T=8,k=2, well under tolerance). The frozen contract tests include plain-reduction to <=1e-6 against TXCBatchTopKPost.train_step and zero-weight exactness, and the untrained guard confirms byte-identical init across variants (max_abs_diff=0.0). The effect is therefore attributable to the ctr loss term, not the reimplemented backbone."
+  },
+  "d_pipeline_confound": {
+    "kill": false,
+    "reason": "The comparison is entirely within the sequence-mode family: plain, the reference arm, uses the identical sequence pipeline, identical anchor-offset distribution (S_max=2 for all variants), identical RNG streams, and identical windows-per-step. Any pipeline effect is differenced out by the paired plain-vs-ctr contrast. The sequence-vs-window pipeline question is separately controlled by Gate B (plain vs window-mode anchor, 9/9 pass), so the pipeline cannot manufacture the ctr effect."
+  },
+  "e_metric_leak": {
+    "kill": false,
+    "reason": "velocity_recovery is the frozen primary RECOVERY metric for the frequency bench, normalized [chance=0, oracle=1] with a 0.05 floor appropriate to that scale — this is not a capability metric (nmse/gauc) being marketed as recovery. Absolute levels show genuine extraction, not less-below-chance movement: at T=8,k=2 plain=0.692 -> ctr=0.784 and at T=8,k=1 plain=0.313 -> ctr=0.397, both clearly above chance and improving toward oracle. Caveat for the record: this outcome falsifies frozen predictions (i) and the AC-hurts converse of (iii), and per the card it must go to the fable skeptic before publication — but under fork (iii-b) a real recovery HELPS is the pre-declared salvage outcome, not a metric leak."
+  },
+  "overall": {
+    "survives": true,
+    "summary": "The claim survives the kill-rubric. Two cells (T=8,k=1 and T=8,k=2) pass the frozen bar with all-positive per-seed deltas, correctly computed D/SE, and no negative-passing cells; Gate B passes 9/9 so the graft and sequence pipeline are exonerated; the metric is the pre-registered normalized recovery primary and absolute levels show real latent extraction (e.g., 0.69 -> 0.78). Residual obligations before publication: run the mandated skeptic pass on this HELPS claim, and report it explicitly as a falsification of predictions (i)/(iii)-converse under the pre-declared (iii-b) salvage fork — a T-dependent effect (present at T=8 low/mid k, absent at T=2 and at k=4/T=8) that should be framed with its regime boundaries, not as a blanket win."
+  }
+}
+```

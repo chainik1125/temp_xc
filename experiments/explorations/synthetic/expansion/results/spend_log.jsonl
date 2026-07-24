@@ -3347,3 +3347,5 @@
 {"ts": 1784737792.8166687, "model": "claude-fable-5", "in": 75031, "out": 2500, "usd": 0.87531, "tag": "skeptic:recipe-instruction-phase-runs-r2"}
 {"ts": 1784737922.5412512, "model": "claude-fable-5", "in": 75031, "out": 2500, "usd": 0.87531, "tag": "skeptic:recipe-instruction-phase-runs-r2"}
 {"ts": 1784815443.7402146, "model": "claude-fable-5", "in": 6060, "out": 2513, "usd": 0.18625, "tag": "skeptic:proof-operation-phase-runs-c7-close"}
+{"ts": 1784854679.3182847, "model": "claude-fable-5", "in": 10027, "out": 2728, "usd": 0.23667, "tag": "skeptic-dissect:dissect-frequency-ctr-velocity_recovery"}
+{"ts": 1784854721.0658507, "model": "claude-fable-5", "in": 10150, "out": 3356, "usd": 0.2693, "tag": "skeptic-dissect:dissect-recipe_instruction_phase_runs-mat-equality_residual_recovery"}
