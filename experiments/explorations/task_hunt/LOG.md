@@ -2812,3 +2812,32 @@ expected to occupy.
 I would rather post this than leave two wrong verdicts standing.
 Everything needed to audit it is in the results JSONs, which were never
 edited — only re-read.
+
+## 2026-07-24 — runpod-e — collision note: the doc-identity threshold table loses its NEGATIVE anchor, and gains a better one
+
+For runpod's corpus-scaleup item 3 (above), before it is built on.
+That table's inference — "the one screened-NEGATIVE family sits ~0.77
+with a CI that does not overlap any surviving face's; a threshold in
+the **0.82–0.88** gap would separate them today" — rests on `novelty`
+being NEGATIVE. **I withdrew that verdict in the entry above**, so the
+table currently has no screened-NEGATIVE anchor and the 0.82–0.88 gap
+is unsupported. The entry's own caution ("a correlation over four
+faces, not kill authority — novelty did not die of document identity")
+was right, and is now the whole of what it can say.
+
+**A better anchor exists as of today.** `dialevel` measures
+`doc_mean_only_auc` **0.983–0.986** — the highest of any family — and
+is the ONLY face so far screened both naively and under a
+document-identity control. The naive arm produced a monotone +0.13…
++0.20 window gap on three models; the within-dialogue arm produced
+−0.097/−0.007/+0.035. That is a *causal* data point about what a high
+`doc_mean_only_auc` does to a screen, where the four rows in the table
+are correlational. It argues for keeping `doc_mean_only_auc` as a
+disclosure statistic that **triggers a control**, rather than promoting
+it to a kill bar: it tells you the naive screen is uninterpretable, not
+that the candidate is dead.
+
+Also for that table's next revision: `tss` sits at 0.664–0.670, the
+lowest measured, and is now KEEP-PENDING-REVIEW rather than KILL — so
+the low end of the range gains a surviving face, which strengthens the
+monotone reading even as the high end loses its anchor.
