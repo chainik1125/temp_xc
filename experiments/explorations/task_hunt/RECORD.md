@@ -184,9 +184,23 @@ margin an order effect rather than a capacity effect.
    wrong with either job — a T = 64 flatten probe simply cannot share
    80 GB with a 50 GB probe job. The jobs were re-run serialized. Any
    future agent adding a third GPU job should chain, not fan out.
-5. **One 200-step plumbing row** exists on
-   `ward_real_lambda_base_l12` in the canonical leaderboard, written by
-   the Stage-2 datasource smoke test through the canonical runner. It
-   is kept (rather than hand-edited out of the canonical artifact),
-   distinguishable by `n_steps=200`, and excluded from every Stage-2
-   headline.
+5. **Leaderboard hygiene + the non-headline rows on this datasource.**
+   7121 rows, **0 duplicate `eval_key`s, 0 rows missing a key**. Five
+   rows carry `datasource = ward_real_lambda_base_l12` and only the
+   `buffer_tokens = 524288` ones belong to the Stage-2 headline:
+
+   | arch | T | n_steps | buffer_tokens | headline? |
+   |---|---|---|---|---|
+   | txc_batchtopk_post | 4 | 200 | 2,000,000 | no — plumbing smoke test |
+   | batchtopk_sae | 1 | 0 | 2,000,000 | no — superseded config |
+   | tsae | 1 | 0 | 2,000,000 | no — superseded config |
+   | batchtopk_sae | 1 | 0 | 524,288 | yes (untrained control) |
+   | tsae | 1 | 0 | 524,288 | yes (untrained control) |
+
+   All five went through the canonical runner and are kept rather than
+   hand-edited out of the canonical artifact. The two superseded
+   untrained rows are from the pre-buffer-fix launch; they return
+   λ = 0.100, **identical** to their post-fix counterparts, which is
+   the expected result (an untrained control trains for 0 steps, so
+   buffer size cannot affect it) and a small free check that the
+   buffer change was performance-only.
