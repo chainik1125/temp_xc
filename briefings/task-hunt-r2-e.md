@@ -43,11 +43,20 @@ depths? Either direction extends the conversion-depth story; commit
 blind directional predictions first (the cand-3 depth-sweep precedent:
 script + predictions before any cell).
 
+## 3. After items 1–2: batch-screen candidate-factory bundles (QUANTITY MODE, Han 2026-07-24 evening)
+
+The CPU pods are shipping screen-ready label bundles incrementally
+(`briefings/candidate-factory-{traces,broad}.md`; LOG line per
+bundle) — Ward-grid bundles screen on your Ward caches, fineweb
+bundles on your 3-model caches, minutes per candidate. As bundles
+land: freeze the card, run the Stage-1 screen, one LOG verdict each.
+Fail fast; split the bundle queue with runpod-d by LOG claim-lines
+(first pod to post "screening <bundle>" owns it — no double-screens).
+
 ## Parked (do NOT run)
 
-gpt2-scale order cell; anti-conversion screen (runpod-b preps its data
-side only — the screen is a possible Saturday add-on IF a pod frees up
-and mac-local greenlights).
+gpt2-scale order cell. (The anti-conversion `tss` screen is UN-parked
+under quantity mode — screen its bundle like any other.)
 
 ## Acceptance gate — stop for review
 

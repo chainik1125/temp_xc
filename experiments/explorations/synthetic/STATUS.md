@@ -10,6 +10,21 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **QUANTITY MODE (Han, 2026-07-24 evening): the hunt's goal is now AS
+  MANY convincing case studies as possible — selection over depth.**
+  CPU pods run the candidate factory
+  (`briefings/candidate-factory-traces.md` = runpod-b, Ward-grid
+  intensity/trend bundles: self-correction λ̂, question-rate,
+  op-class run-rates, verbosity level, redundancy rate;
+  `candidate-factory-broad.md` = runpod, idea ledger CANDIDATES.md +
+  fineweb/new-corpus bundles + the un-parked interleave `tss`).
+  Bundles are screen-ready label packs in the frozen problib format;
+  GPU pods batch-screen them on EXISTING caches (minutes per
+  candidate) after their r2 primaries; LOG claim-lines prevent
+  double-screens. Label-side triage is a free-kill authority.
+  (Superseded same evening: the rebuttal-pack and red-team briefings
+  were retracted before work started.)
+
 - **HUNT-SUPPORT RECEIPTS IN + REVIEWED (2026-07-24 evening,
   mac-local): APPROVED — and the T=16-dip interpretation is
   RETRACTED.** runpod's mirror receipt doubly dissociates dip from

@@ -44,11 +44,20 @@ All in `task_hunt/LOG.md` (my review entry at the end) + `RECORD.md` +
   depth sweep adopted as the cheap WHY-diagnostic.
 - **Round 2 dispatched**: `briefings/task-hunt-r2-d.md` +
   `task-hunt-r2-e.md` (split per pod) — runpod-d:
-  budget-matched TXC-post re-run + figure l0 annotation; runpod-e
-  (idle, caches hot): hedging-LEVEL Stage-2 (fresh card,
-  aggregation-framed win accepted) + early-layer addendum. New
-  conventions: per-token-first triage + the depth-sweep diagnostic.
-  Results wanted Saturday morning PT.
+  budget-matched TXC-post re-run + seed top-up (first-class) + figure
+  re-render; runpod-e: hedging-LEVEL Stage-2 (card frozen) +
+  early-layer addendum. Then both batch-screen factory bundles.
+  New conventions: per-token-first triage + the depth-sweep
+  diagnostic. Results wanted Saturday morning PT.
+- **QUANTITY MODE (Han, evening)**: CPU pods = candidate factory
+  (`candidate-factory-traces.md` runpod-b, `candidate-factory-broad.md`
+  runpod — label bundles + triage + draft cards; interleave `tss`
+  un-parked). NOTE: rebuttal-pack + stage2-redteam briefings were
+  RETRACTED before work started (Han redirect). The red-team's
+  sharpest question — Stage-2 split integrity (do train/eval halves
+  share Ward traces? `_train_lambda_probe` splits sequences n//2) —
+  is now MINE to check during the r2 review (~30 min, from committed
+  code + labels).
 
 ## ⏭ NEXT ACTIONS (mine)
 1. Review em-redo when runpod-c stops (gate-integrity first; the

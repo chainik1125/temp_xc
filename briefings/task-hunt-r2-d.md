@@ -51,12 +51,24 @@ re-render once your budget-matched cells land. If b's renderer has not
 merged when your cells finish, do the minimal l0 annotation yourself
 rather than wait (never idle); reconcile in the LOG.
 
+## 3. After items 1–2: batch-screen candidate-factory bundles (QUANTITY MODE, Han 2026-07-24 evening)
+
+The CPU pods are shipping screen-ready label bundles incrementally
+(`briefings/candidate-factory-{traces,broad}.md`; LOG line per
+bundle). Each bundle = labels + manifests + null + CARD_DRAFT in the
+frozen `problib` format, screening on YOUR EXISTING Ward caches in
+minutes per candidate. As bundles land: freeze the card (sharpen the
+draft), run the Stage-1 screen, one LOG verdict paragraph each —
+KEEP/KILL, fail fast, as many as the clock allows. Survivors queue
+for Stage-2 by mac-local decision, not automatically.
+
 ## Parked (do NOT run)
 
 Proof-op Stage-2 on distill L12 — the raw contrast (+0.017…+0.042) is
 too thin to clear a trained panel by Saturday; post-rebuttal. Also
-parked program-wide: gpt2-scale order cell, anti-conversion screen
-(runpod-b is prepping its data side only).
+parked program-wide: gpt2-scale order cell. (The anti-conversion
+`tss` screen is UN-parked under quantity mode — its bundle arrives
+via the broad factory; screen it like any other bundle.)
 
 ## Acceptance gate — stop for review
 
