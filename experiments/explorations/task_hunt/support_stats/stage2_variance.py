@@ -89,17 +89,29 @@ def cell_vec(cells, arch, T, kind="trained", field="metric"):
     return np.array([cells[(arch, T, s, kind)][field] for s in SEEDS])
 
 
-def paired_stats(diffs):
+def paired_stats(diffs, arm_a=None, arm_b=None):
+    """Stats on paired-by-seed differences. When the two arms' per-seed
+    vectors are given, also report the across-seed correlation between
+    arms and the sd the difference WOULD have were the arms independent
+    — the honest check on whether pairing bought any variance
+    reduction here."""
     d = np.asarray(diffs, dtype=float)
     mean, t_lo, t_hi = t_ci95(d)
     p, n_pat = sign_flip_p(d, "greater")
     bca = bca_ci(d)
-    return {"per_seed": {str(s): float(v) for s, v in zip(SEEDS, d)},
-            "mean": mean, "sd": float(d.std(ddof=1)),
-            "t_ci95": [t_lo, t_hi],
-            "bca_ci95": [bca["lo"], bca["hi"]],
-            "bca_atoms": bca["n_atoms"],
-            "p_signflip_one_sided": p, "signflip_patterns": n_pat}
+    out = {"per_seed": {str(s): float(v) for s, v in zip(SEEDS, d)},
+           "mean": mean, "sd": float(d.std(ddof=1)),
+           "t_ci95": [t_lo, t_hi],
+           "bca_ci95": [bca["lo"], bca["hi"]],
+           "bca_atoms": bca["n_atoms"],
+           "p_signflip_one_sided": p, "signflip_patterns": n_pat}
+    if arm_a is not None:
+        a = np.asarray(arm_a, float)
+        b = np.asarray(arm_b, float)
+        out["r_between_arms"] = float(np.corrcoef(a, b)[0, 1])
+        out["sd_if_independent"] = float(
+            np.sqrt(a.var(ddof=1) + b.var(ddof=1)))
+    return out
 
 
 def main():
@@ -135,8 +147,8 @@ def main():
                             {str(s): float(v) for s, v in zip(SEEDS, ref)},
                         "by_T": {}}
         for T in Ts_by_arch[win_arch]:
-            d = cell_vec(cells, win_arch, T) - ref
-            paired[name]["by_T"][f"T{T}"] = paired_stats(d)
+            win = cell_vec(cells, win_arch, T)
+            paired[name]["by_T"][f"T{T}"] = paired_stats(win - ref, win, ref)
 
     # ---- 3. trend across T (pooled over seeds, exact within-seed perm)
     def trend_block(mat, Ts):
@@ -180,12 +192,13 @@ def main():
                 "observed_mean": st["mean"], "observed_sd": st["sd"],
                 "n_for_95_lower_bound_gt0": nb,
                 "n_for_80pct_power_t05": npw}
-    tsae_ns = [power["txc_pre_minus_tsae"][f"T{T}"][k]
-               for T in (4, 8)
-               for k in ("n_for_95_lower_bound_gt0",
-                         "n_for_80pct_power_t05")
-               if power["txc_pre_minus_tsae"][f"T{T}"][k] is not None]
-    n_needed = max([n_attain] + tsae_ns) if tsae_ns else None
+    # The briefing's criterion is bounding THE margin at 95%; the margin
+    # (review note 2) is TXC-pre vs T-SAE at the T = 8 headline cell.
+    # T = 4 is reported above but is not cheaply boundable (its paired
+    # diff is noise-dominated) — the T-rise + trained-untrained margin
+    # carry that cell, per the review's own phrasing.
+    n_t8 = power["txc_pre_minus_tsae"]["T8"]["n_for_95_lower_bound_gt0"]
+    n_needed = None if n_t8 is None else max(n_attain, n_t8)
     extra = None if n_needed is None else max(0, n_needed - len(SEEDS))
     rec_cells = None
     if extra is not None and 0 < extra <= 4:
@@ -194,10 +207,27 @@ def main():
                       "tsae/T1"],
                      "n_extra_seeds": extra,
                      "n_trained_cells": 3 * extra,
-                     "untrained_counterparts_optional": 3 * extra}
+                     "untrained_counterparts_optional": 3 * extra,
+                     "headroom_option": {
+                         "n_extra_seeds": extra + 1,
+                         "n_trained_cells": 3 * (extra + 1),
+                         "why": "one seed of slack against the plug-in "
+                                "sd estimate itself being an n=3 "
+                                "estimate; also reaches sign-flip "
+                                "p = 1/128 at the T8 cell"}}
     power["recommendation"] = {
+        "criterion": "one-sided 95% t lower bound > 0 on the paired "
+                     "TXC-pre - T-SAE diff at T = 8, AND exact "
+                     "sign-flip attainability (2^-n <= 0.05)",
         "seeds_total_needed": n_needed, "extra_seeds": extra,
-        "cells": rec_cells}
+        "cells": rec_cells,
+        "T4_not_cheaply_boundable": {
+            "n_for_95_lower_bound_gt0":
+                power["txc_pre_minus_tsae"]["T4"]
+                     ["n_for_95_lower_bound_gt0"],
+            "n_for_80pct_power_t05":
+                power["txc_pre_minus_tsae"]["T4"]
+                     ["n_for_80pct_power_t05"]}}
 
     out = {
         "datasource": DS, "metric": METRIC, "seeds": list(SEEDS),
@@ -206,25 +236,38 @@ def main():
         "per_seed": per_seed, "cell_ci95_trained": cell_ci,
         "paired": paired, "trend": trend,
         "margin_trained_minus_untrained": margins, "power": power,
-        "honesty": [
-            "n = 3 seeds: the exact one-sided sign-flip permutation test "
-            "cannot report p < 1/8 = 0.125; treat p = 0.125 as 'the "
-            "paired direction is consistent in all 3 seeds', not as "
-            "significance.",
-            "The exact bootstrap distribution of a 3-value mean has 27 "
-            "atoms (<= 10 distinct values); BCa endpoints are coarse and "
-            "cannot extend past the extreme seed values.",
-            "The paired-by-seed design is the point: seed-level noise is "
-            "shared between arms and cancels in the differences.",
-            "The T = 2->8 trend test IS exact with 216 relabelings "
-            "(min p = 1/216), so it carries real resolution at n = 3.",
-        ],
+        "honesty": build_honesty(paired),
     }
     (HERE / "stage2_variance.json").write_text(json.dumps(out, indent=1))
     write_md(out)
     print(json.dumps({"paired_T8": paired["txc_pre_minus_tsae"]["by_T"]["T8"],
                       "trend": trend, "power": power}, indent=1))
     print(f"-> {HERE}/stage2_variance.json ; stage2_variance.md")
+
+
+def build_honesty(paired):
+    """Honesty notes with the data-dependent one computed, not asserted."""
+    t8 = paired["txc_pre_minus_tsae"]["by_T"]["T8"]
+    return [
+        "n = 3 seeds: the exact one-sided sign-flip permutation test "
+        "cannot report p < 1/8 = 0.125; treat p = 0.125 as 'the paired "
+        "direction is consistent in all 3 seeds', not as significance.",
+        "The exact bootstrap distribution of a 3-value mean has 27 "
+        "atoms (<= 10 distinct values); BCa endpoints are coarse and "
+        "cannot extend past the extreme seed values.",
+        "Pairing by seed was the right design a priori, but it bought "
+        "no variance reduction here: at the T8 headline cell the "
+        "across-seed correlation between the TXC-pre and T-SAE arms is "
+        f"r = {t8['r_between_arms']:.2f}, so the paired sd "
+        f"({t8['sd']:.4f}) is not below the independent-arms value "
+        f"({t8['sd_if_independent']:.4f}). The cross-arch margin is "
+        "therefore NOT bounded away from 0 at n = 3; the receipts that "
+        "ARE significant at n = 3 are within-arch: the T = 2->8 rise "
+        "and the trained-untrained margins (paired by seed WITHIN an "
+        "arch, where the pairing does bind).",
+        "The T = 2->8 trend test is exact with 216 relabelings "
+        "(min p = 1/216), so it carries real resolution at n = 3.",
+    ]
 
 
 def fmt(x, nd=4):
@@ -258,15 +301,17 @@ def write_md(out):
     for name, blk in out["paired"].items():
         A(f"### {name} (reference {blk['reference']})\n")
         A("| T | " + " | ".join(f"seed {s}" for s in out["seeds"]) +
-          " | mean | sd | 95% t CI | 95% BCa CI | sign-flip p (1-sided) |")
-        A("|---|" + "---|" * (len(out["seeds"]) + 5))
+          " | mean | sd | 95% t CI | 95% BCa CI | sign-flip p (1-sided)"
+          " | r(arms) |")
+        A("|---|" + "---|" * (len(out["seeds"]) + 6))
         for tkey, st in blk["by_T"].items():
             A(f"| {tkey} | " +
               " | ".join(fmt(st["per_seed"][str(s)]) for s in out["seeds"]) +
               f" | {fmt(st['mean'])} | {fmt(st['sd'])} "
               f"| [{fmt(st['t_ci95'][0])}, {fmt(st['t_ci95'][1])}] "
               f"| [{fmt(st['bca_ci95'][0])}, {fmt(st['bca_ci95'][1])}] "
-              f"| {st['p_signflip_one_sided']:.3f} |")
+              f"| {st['p_signflip_one_sided']:.3f} "
+              f"| {st['r_between_arms']:+.2f} |")
         A("")
 
     A("## Trend across T (exact within-seed permutation, pooled seeds)\n")
@@ -301,9 +346,29 @@ def write_md(out):
               f"**{st['n_for_95_lower_bound_gt0']}**; n for 80% power "
               f"(one-sided t, α=0.05): **{st['n_for_80pct_power_t05']}**.")
     rec = p["recommendation"]
-    A(f"- **Recommendation:** total seeds needed "
-      f"{rec['seeds_total_needed']} ⇒ extra seeds "
-      f"{rec['extra_seeds']}; cells: {json.dumps(rec['cells'])}\n")
+    A(f"- Criterion: {rec['criterion']}.")
+    if rec["cells"]:
+        A(f"- **Recommendation:** total seeds needed "
+          f"**{rec['seeds_total_needed']}** ⇒ **{rec['extra_seeds']} extra "
+          f"seeds**. Per extra seed (trained): "
+          f"{', '.join(rec['cells']['per_extra_seed_trained'])} ⇒ "
+          f"{rec['cells']['n_trained_cells']} trained cells "
+          f"(+{rec['cells']['untrained_counterparts_optional']} optional "
+          f"untrained counterparts). Headroom option: "
+          f"{rec['cells']['headroom_option']['n_extra_seeds']} extra seeds "
+          f"= {rec['cells']['headroom_option']['n_trained_cells']} cells — "
+          f"{rec['cells']['headroom_option']['why']}.")
+    else:
+        A(f"- **Recommendation:** total seeds needed "
+          f"{rec['seeds_total_needed']} ⇒ extra seeds "
+          f"{rec['extra_seeds']} — outside the cheap-append range "
+          f"(no cell list emitted).")
+    A(f"- T4 is NOT cheaply boundable (n = "
+      f"{rec['T4_not_cheaply_boundable']['n_for_95_lower_bound_gt0']} "
+      f"to bound, "
+      f"{rec['T4_not_cheaply_boundable']['n_for_80pct_power_t05']} for "
+      f"80% power); the T-rise + trained−untrained margin carry that "
+      f"cell.\n")
 
     A("## Honesty notes\n")
     for h in out["honesty"]:
