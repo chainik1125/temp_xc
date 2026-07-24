@@ -1,142 +1,107 @@
 # Working state — agent `runpod-b`
 
-**Last rewrite:** 2026-07-24 (pre-compact #3) — **NEW TASK ACCEPTED, NOT
-STARTED: `briefings/mirror-probe-truth.md`** (overnight 10 h+ CPU
-campaign; **results by Saturday morning PT**). Read that briefing in
-full first; this file is the resume state. Previous task
-(`briefings/probe-adequacy.md`) is REVIEWED & APPROVED and RETIRED —
-split-integrity checklist item CLOSED upstream, `PROBE_V2_SPEC.md`
-accepted as THE freeze candidate, my forensics receipt independently
-reproduced on mac-local's box. Nothing of the mirror campaign has been
-run; no card frozen yet.
+**Last rewrite:** 2026-07-24 ~23:00 UTC (mid-campaign) — executing
+`briefings/mirror-probe-truth.md` (overnight; **results by Saturday
+morning PT**). Card FROZEN, all builds committed, Stage 1 + Stage 2
+landed and committed (LOG entry "mirror probe-truth campaign … card
+FROZEN, Stage 1 + Stage 2 landed"). **Stage 3 (the 132-cell training
+ladder) is RUNNING.** Nothing pushed yet this campaign — the leaderboard
+is being appended to by the running grid, so the push happens at the end.
 
 ## Who / where
 Second RunPod box, repo `/workspace/temp_xc`, 32 CPU, no GPU.
-`/workspace/.agent_id` = runpod-b. Git identity set (Han); push:
+`/workspace/.agent_id` = runpod-b. Push:
 `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`.
 `export ANTHROPIC_API_KEY=$(cat /workspace/.tokens/anthropic_key)`.
-HF token at `/workspace/.tokens/hf_token`.
 
-## The task: which probe reports TRUE recovery?
-
+## The task
 Produce the receipt that fires mac-local's **pre-registered 4-branch
-decision rule** (LOG ≈ line 2212, "THE λ-READOUT METHODS DECISION:
-DEFERRED ~12 h, with the rule PRE-REGISTERED NOW"): 1 v2 tracks truth
-where v1 sags ⇒ ADOPT; 2 both track truth equally ⇒ DECLINE; 3 v2
-reports ABOVE truth ⇒ REJECT v2 for headline use; 4 ambiguous /
-incomplete by Saturday midday ⇒ v1 stays canonical with a stated
-caveat. **I produce the receipt, NOT the verdict.** A result arguing
-AGAINST v2 is first-class and must be reported as loudly (briefing § 1).
-Under every branch the window > token ORDERING survives — no branch
-costs the headline, so there is no incentive to any outcome.
+rule** (LOG ≈ line 2212): 1 v2 tracks truth where v1 sags ⇒ ADOPT; 2 both
+track truth ⇒ DECLINE; 3 v2 reports ABOVE truth ⇒ REJECT for headline
+use; 4 ambiguous/incomplete ⇒ v1 stays canonical with a caveat. **I
+produce the receipt, NOT the verdict.** A result arguing AGAINST v2 is
+first-class and is reported FIRST. Under every branch the window > token
+ORDERING survives, so no outcome is incentivised.
 
-## Verified inputs (this session, before compact)
+## Where things stand
 
-**Substrate + conventions** (`support_synthetic/CARD.md`, reuse
-exactly): DS `toy_backtracking_selfexcite_d64`, F = 20, N_STEPS = 30k,
-seeds {1, 2, 42}, `eval_window_L` = 32, k_pos = 1 canonical headline
-slice, canonical runner, untrained controls = commentary only.
-Pattern to copy: `support_synthetic/run_dilution.py`
-(`design.uniform_cells(...)` → `grid.run_pool`).
+**Committed (in order):** `support_synthetic/CARD_PROBE_TRUTH.md`
+(frozen before any cell) → `run_probe_truth.py` → `probe_truth_calib.py`
+→ `probe_truth_anchor.py` → `analyze_probe_truth.py` →
+`render_probe_truth.py` → the G3 amendment → per-seed calib CLI → the
+p=8192 corner drop → increment-1 LOG entry + Stage-2 results.
 
-**Known truth on the mirror** (this is what the real panels cannot
-supply): λ_i = σ(a + α·Σ_{l=1..K} κ_l b_{i−l}), **K = 2**, τ = 2,
-α = 3.06 (bench_spec). So λ is a deterministic function of
-(b_{i−1}, b_{i−2}) ⇒ a tile of length T ≥ 3 contains the whole driver.
-Stated ceilings: per-token DPI floor **corr ≈ 0.41** (provable), window
-ceiling **≈ 0.91 at T = 2, ≈ 0.99 at T ≥ 4**.
+**Stage 1 (calibration, exact truth, off-leaderboard) — RUNNING**, three
+per-seed processes (`--seeds {1,2,42} --out probe_truth_calib_s<seed>.json
+--resume`), logs `$SCRATCH/calib_s*.log`. Gate G1 passing: reproduces the
+bench's own constants (DPI floor 0.41, ceilings 0.91/0.99) to 0.0043 and
+the anchor recovers exact truth to 0.0013. Early signal at T16, `full`
+arm, truth 0.986: v1 0.986→0.982→**0.912**→0.943 at p/n
+0.004→0.25→1.0→2.0; v2 0.986→0.985→0.984→0.983. No cell above truth yet.
 
-**THE DESIGN TRAP — read before writing the card.** v1's `n_windows`
-is HARDCODED 1024 (`lambda_recovery_metrics` forwards no nw), so
-n_rows = 1024·(32/T): 16384/8192/4096/**2048** at T = 2/4/8/16. At the
-mirror's canonical d_sae (20–40) p/n ≈ 0.01 — **three orders of
-magnitude away from the real panel's p/n = 1.0 at T16 (p = 2048,
-n = 2048)**. A mirror run at canonical budget would show "both probes
-agree" trivially and would be misread as branch 2 (DECLINE). The
-mirror must be run ACROSS the p/n regime the real panel occupies:
-d_sae ladder {20, 64, 256, 1024, 2048} × T {2,4,8,16} spans
-p/n = 0.001 … 1.000 (at T16: 0.010/0.031/0.125/0.500/**1.000**).
-p/n — not T alone — is the campaign's real x-axis.
+**Stage 2 (22 surviving checkpoints) — COMPLETE.** 28 cells (22 new v2
+rows + 6 eval cache hits on cells Stage 3 had already trained), 0 dup
+keys; anchors licensed 28/28, v1 replication ≤ 7.6e-9, anchor gaps
+≤ 0.0011. All at p/n ≤ 0.125 — a genuine low-p/n control and nothing
+more.
 
-**CHECKPOINT REALITY — the briefing's item 2 is mostly unavailable.**
-843 mirror leaderboard rows / 843 distinct train_keys, but only **22
-checkpoints survive on disk** (`checkpoints/<train_key>/model.safetensors`;
-the rest pruned — manifest has 9878 rows, zero HF refs, so no restore
-path). Survivors are all July 10–11, k_pos = 2 or 8, d_sae = 20, T ∈
-{1,4,8}: batchtopk_sae/tsae T1, txc_pre T4(×3 seeds)+T8, txc_post
-T4(×3)+T8, stacked T4(×3)+T8, spectral T4(×3)+T8. So the "cheap
-eval-only pass, may answer by breakfast" shrinks to those 22 (still a
-real paired sample — ship it with an honest coverage line); **the
-campaign is TRAINING-bound, not eval-bound.** Measure per-cell wall
-time on the first few cells and size the queue from it (tsae was
-~115 s/cell in the support-synthetic campaign; TXC-pre window mode at
-30k steps unmeasured on this box).
+**Stage 3 (the body) — RUNNING**: `run_probe_truth.py --stage train
+--workers 10`, log `$SCRATCH/train_grid.log`, 132 cells (66 trained + 66
+untrained), lines C/P/M/S per card § 2.3. ~10/132 at 25 min; expect
+~4–6 h under contention with the calib processes.
 
-**Both probes on one row, free.** v2 emits only `*_v2` keys and the v1
-block still runs, so every v2-flagged row carries its own paired v1
-(nw1024/OLS) column. To separate the two knobs, run 3 v2 eval variants
-per checkpoint (nw1024+ridge, nw8192+ols, nw8192+ridge) = 3 rows,
-giving the full 2×2 with a shared v1 column — the same 2×2 d/e used.
-Pass knobs via `c["eval_extra"] = {...}` (the `grid.run_cell`
-pass-through I added; recipe in `PROBE_V2_SPEC.md` § 2). Frozen v2
-defaults: RidgeCV `logspace(-2,4,13)` train-half-only, nw 8192,
-split `trace` (mirror has no trace_ids ⇒ degenerates to v1's n//2 —
-contract-tested).
+## What to do next (in order)
+1. Wait for the training grid (`grep "DONE" $SCRATCH/train_grid.log`).
+2. `.venv/bin/python -m …support_synthetic.probe_truth_anchor train 6`
+   (the anchors; ~1–1.5 h).
+3. `…analyze_probe_truth` → `results/probe_truth.json`, then
+   `…render_probe_truth` → `figs/probe_truth.png`.
+4. Read the receipt and write the **scorecard** LOG paragraph: which
+   prediction held, which was falsified, what it licenses — and if it
+   undercuts adopting v2, **say so first**.
+5. Commit results + `results/leaderboard.jsonl` +
+   `checkpoints/manifest.jsonl` (deferred until the grid stops appending),
+   run the full pytest suite on a clean tree, pull-rebase, push.
+6. If time: the companion note on a defensible `doc_mean_only_auc` KILL
+   threshold. **Checked: runpod's doc-level bootstrap CIs are NOT on the
+   branch yet**, so the note the briefing describes cannot rest on them;
+   if they have not landed, either write the weaker version off the
+   screened candidates' observed `doc_identity_check.json` spread and say
+   exactly what it does not rest on, or leave it undone and say so.
 
-## Plan of record (proposed; the card freezes it before any cell)
+## Campaign design — the two things that reshaped it
+- **The p/n trap.** v1's `n_windows` is hardcoded 1024 ⇒ n = 1024·(32/T)
+  = 2048 at T16, so the real panel (d_sae 2048) sits at **p/n = 1.00**
+  while the mirror's committed budget sits at **0.001–0.08**. Running the
+  mirror at canonical budget would show "both probes agree" for reasons
+  invisible in its own numbers and read as branch 2. Card § 1.1 discloses
+  the deviation: canonical line kept as the low-p/n control, ladder
+  extended to span the real regime. **p/n, not T, is the x-axis.**
+- **The checkpoint prune.** 843 mirror rows / 843 train_keys, **22
+  checkpoints on disk**, manifest 9878 rows with **0 HF refs** (no
+  restore path) ⇒ the briefing's "cheap eval-only pass may answer by
+  breakfast" is a low-p/n control only; the campaign is TRAINING-bound.
 
-0. **Freeze `support_synthetic/CARD_PROBE_TRUTH.md` FIRST** (commit
-   before any cell): substrate/budget, arms, ladder, seeds,
-   pre-registered predictions, falsifier, and the explicit mapping of
-   outcomes onto mac-local's 4 branches. State up front what pattern
-   would argue AGAINST v2.
-1. **Constructed-code calibration — do FIRST, costs no training, no
-   leaderboard writes** (`probe_capacity.py` precedent: off-leaderboard
-   diagnostic). Build codes of dimension p with *exactly known*
-   λ-information — true tile event-history dims ⊕ noise dims, sparsified
-   to a realistic L0 — plus a **null code (truth = 0)**. Sweep p/n
-   through 1.0. Both probes. This answers the branch question in the
-   strictest sense: does the reported number track a truth we set?
-   Does v2 ever report ABOVE truth (branch 3 optimism check)? Ship as
-   an early incremental commit + LOG line.
-2. **Eval-only pass on the 22 surviving checkpoints** — paired v1/v2,
-   coverage stated honestly (22/843).
-3. **Overnight training body** — the d_sae × T ladder × 3 seeds +
-   untrained controls, both probes; plus briefing § 3(a) the
-   **matched-post arm at nominal k = 8·T** (runpod-d's code-rate
-   convention — the confound that qualified the real panel, now
-   testable against truth). Sequence so every few hours = one
-   committable increment; a partial ladder with an honest coverage
-   statement beats a rushed full one (briefing § 3).
-4. **`probe_truth.json` + figure** (reported recovery vs T / vs p/n for
-   BOTH probes with the TRUE level marked, per arm) + scorecard
-   paragraph: which prediction held, which was falsified, what it
-   licenses — and if it undercuts adopting v2, say so FIRST.
-5. If early: the companion note on a defensible `doc_mean_only_auc`
-   doc-identity KILL threshold (proposal only, no bar frozen —
-   runpod's overnight scale-up is producing the doc-level bootstrap
-   CIs it would rest on).
-
-**Acceptance gate**: card frozen pre-run; incremental commits + LOG
-lines; canonical runner + leaderboard hygiene (row decomposition
-stated); figure + receipt + scorecard; STATUS rewritten. Stop for
-review; briefing stays.
+## Disclosed self-corrections (both in the LOG, neither silent)
+- **G3 mis-scaled.** The card froze |chance| ≤ 0.05; the chance floor is
+  a *fitted* probe's held-out r on permuted targets, null spread ~√(p/n)
+  (0.125 at the first cells). Analysis computes both readings and reports
+  the branch under each exclusion set.
+- **p = 8192 calibration corner dropped on cost** (>30 min/cell, 9 of
+  them); no p>n coverage lost — the p=4096 cell's own nw sweep already
+  gives exact truth at p/n 0.5/1.0/2.0.
+- Anchors that cannot be licensed at any budget within the cap (p > 4096,
+  line S at T16) are computed at the floor budget, not the cap.
 
 ## Standing context
-- Shared branch: pull-rebase before EVERY push; LOG.md conflicts keep
-  the upstream entry then re-append mine; commit SUBJECTS not SHAs;
-  scripts/cards committed BEFORE outputs; no reviewer/meeting quotes in
-  tracked files; all numbers script-derived.
-- Reproduction claims: say "bit-identical **on the build platform**" —
-  mac-local saw 16th-digit x86↔ARM drift in `r_between_arms`.
-- Environmental pytest trap: untracked files break
-  `test_diff_hash_consistent_with_dirty` — commit/clean before full
-  suite runs. Suite was 299–302 passed / 1 skipped depending on
-  upstream state.
-- Upstream: screen wave running (runpod-e: novelty NEGATIVE, punctint-q
-  KEEP, punctint-list WEAK KEEP, interleave/tss KILL — all UNREVIEWED);
-  runpod on the overnight corpus scale-up; runpod-d owes a record
-  amendment (4/12 matched cells above the [5.0,8.0] band mislabelled
-  in-band; verdict unaffected). GPU pods re-run nothing for the methods
-  decision until my receipt fires the rule.
+- Shared branch: pull-rebase before EVERY push; LOG.md conflicts keep the
+  upstream entry then re-append mine; commit SUBJECTS not SHAs; scripts
+  and cards committed BEFORE outputs; no reviewer/meeting quotes in
+  tracked files; all numbers script-derived (three were eyeballed into
+  the increment-1 LOG entry and corrected by re-deriving them before the
+  commit was amended — do this check every time).
+- Reproduction claims: "bit-identical **on the build platform**".
+- pytest trap: untracked files break `test_diff_hash_consistent_with_dirty`
+  — the untracked `results/probe_truth*.json` shards must be committed (or
+  moved) before a full-suite run.
 - Rewrite this file before any compact.
