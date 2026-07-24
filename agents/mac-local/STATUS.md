@@ -1,100 +1,77 @@
 # Working state — agent `mac-local`
 
-**Last rewrite:** 2026-07-24 late (factory review DONE; next item =
-runpod-d Stage-2 AMENDMENT review). Read with
+**Last rewrite:** 2026-07-24 night (round-2 CPU reviews DONE; next =
+the probe-capacity METHODS REVIEW). Read with
 `private/rebuttal_plan.md` (untracked) and the team transcript.
 
 ## Who / where
 Local CC on the Mac at `~/research/projects/temp_xc`, branch `arxiv`.
 Role: orchestration + review. NEVER commit/quote `private/` content.
 Box warning: case-insensitive checkout — on phantom dirt after a pull,
-check `git ls-files | tr A-Z a-z | sort | uniq -d` (CARD.md/card.md
-already bit once; fixed via PREP_DRAFT.md rename + index surgery).
+check `git ls-files | tr A-Z a-z | sort | uniq -d`.
 
 ## THE SITUATION
 Reviews 5/4/1, R3 swing, **deadline 2026-07-27**, check-in **Sunday
-2026-07-26 10:00 PT**. PROGRAM MODE = **QUANTITY** (Han). Reviews so
-far, all APPROVED with binding notes in LOG: round-1 hunt +
-dissection; hunt-support (dip RETRACTED to cause-not-established,
-T-SAE fairness closed, variance receipts partition claims); **candidate
-factories (runpod-b traces + runpod broad) — reviewed this evening,
-both approved, briefings retired, screen queue OPEN** (order + binding
-qualifications in the LOG factory-review entry: punctint list is
-CONDITIONAL, dialevel precondition binding, evidence-ceiling lines
-must print at screen, cross-factory bar mismatch noted, sc_lambda
-"17-pattern" prose slip = 16 actually).
+2026-07-26 10:00 PT**. QUANTITY MODE. Reviews all APPROVED so far
+(binding notes live in LOG): round-1 hunt + dissection; hunt-support;
+candidate factories; **round-2 CPU (probe-adequacy + factory r2) —
+reviewed tonight**. Split-integrity is CLOSED (receipt reproduced
+byte-identically; zero committed numbers affected). The hunt's first
+screen KEEP exists (punctint-q, unreviewed interim).
 
 ## ⏭ NEXT, in this order
-1. **runpod-d Stage-2 AMENDMENT review (LOG ~1168–1272 + RECORD § 3c)**
-   — I have now READ the entry but NOT reviewed it. Substance: matched
-   post inverts (0.185/0.202/0.144/0.137, peak T4), reading (b)
-   confirmed-refined (0.255 = sparse code dodging the probe penalty,
-   +0.032 lift only), reading (c) = **panel-wide probe artifact**:
-   `lambda_recovery`'s OLS at n≈p (T16: n=2048=p) suppresses DENSE
-   codes; ridge/nw8192 lifts pre T16 0.138→0.351, and window > token
-   WIDENS (pre 0.351 vs tsae 0.211). Verify: falsifier (untrained
-   matched l0=8.000), the nw1024/OLS column reproducing leaderboard to
-   1e-4, probe_capacity.py pre-registration (d9ee5c75) vs what ran,
-   leaderboard row decomposition for ff3c5618 (24 cells, 0 dup keys),
-   figure `_matched` series separation, and the flagged METHODS
-   decision (adopt capacity-adequate probe? — re-bases b's variance
-   receipts; decision is MINE to take or defer, with runpod-b).
-   n=3 honesty note at the entry's end is good — check CI numbers.
-2. **Split-integrity check: DELEGATED to runpod-b**
-   (`probe-adequacy.md` item 2) — I review its forensics receipt as
-   part of the probe-capacity thread instead of running it myself.
-3. **Seed top-up review** when runpod-d stops (9 cells, frozen
-   3d954869, in flight at last STATUS) — converts pre-vs-T-SAE from
-   consistent to bounded (or not).
-4. **runpod-e round-2 review — LANDED mid-factory-review (pushed
-   while I reviewed; NOT yet reviewed):** hedging/confidence Stage-2
-   **NEGATIVE verdict, 84/84 cells** + depth addendum scorecards
-   (RECORD_B) + **its own probe-capacity finding on ITS panel**
-   (5d6af303 — corroborates runpod-d's panel-wide claim on a second
-   panel; review items 1 and 4 TOGETHER, they are one thread). It
-   also already froze the sc_lambda Stage-1 screen (a541a8b6) — the
-   factory queue is being consumed.
-5. **Screen-queue supervision**: d/e batch-screen the 9 factory labels
-   per r2 § 3 + my recommended order in the LOG factory-review entry;
-   claim-lines prevent double-screens. Kills are fine and fast; any
-   PASS gets a frozen card before Stage-2.
-6. **runpod-c em-redo review** (Phase A training since freeze
-   b13ca63d, no push yet).
-7. Keep `private/rebuttal_plan.md` current (variance-receipt phrasing,
-   dip retraction, fairness receipt; ADD next: the probe-capacity
-   framing once item 1's review lands — it likely CHANGES how we quote
-   absolute panel levels in the rebuttal: T-shape is probe-dependent,
-   ordering survives).
+1. **THE METHODS REVIEW (biggest open item):** runpod-d's Stage-2
+   amendment (LOG ~1168–1272, RECORD § 3c) + runpod-e's round-2 batch
+   (LOG 1273–1481 + f8cdfc67 stacked-lift extension) as ONE thread —
+   two panels, one probe-capacity defect. Machinery is READY
+   (`lambda_recovery_v2` + `PROBE_V2_SPEC.md`, reviewed; adoption =
+   freeze the spec as-is). Decide: adopt v2 for a 192-cell eval-only
+   re-run (~3–4 h wall, checkpoints reused, paired v1 columns kept)
+   + one-command variance re-base, or decline and keep v1 canonical.
+   My verify list for the amendment itself: falsifier (untrained
+   matched l0 = 8.000), nw1024/OLS column reproducing leaderboard to
+   1e-4, probe_capacity.py vs its pre-registration d9ee5c75,
+   leaderboard decomposition for ff3c5618 (24 cells, dup keys),
+   `_matched` figure series, e's 84-cell panel hygiene (8700 = 8616 +
+   84 claimed), e's self-caught stacked-reshape defect (18507791).
+   Rebuttal implication either way: T-shape statements are
+   probe-dependent; ordering survives and WIDENS under v2.
+2. **Screen-wave review** when runpod-e stops (novelty NEG /
+   punctint-q KEEP / punctint-list WEAK KEEP posted; tss + dialevel
+   remain; sc_lambda card frozen a541a8b6 — verdict not seen yet).
+   With it: pin (or decline) a doc_mean_only_auc threshold — the
+   adoption is ratified as disclosure-only for now.
+3. **runpod-d seed top-up review** when it stops (9 cells, frozen
+   3d954869) — converts pre-vs-T-SAE bounded or not.
+4. **runpod-c em-redo review** (Phase A training since b13ca63d).
+5. Sunday check-in distillation (mine): headline λ̂ panel + receipts,
+   first KEEPs, kill table, probe-capacity story + decision, queue
+   state. Keep `private/rebuttal_plan.md` current — do NOT type new
+   absolute panel numbers until item 1 resolves.
 
 ## LIVE / IDLE
-- runpod-d: seed top-up in flight; then bundle screens.
-- runpod-e: round-2 results PUSHED (unreviewed); consuming the bundle
-  screen queue (sc_lambda claimed).
-- runpod-c: em-redo Phase A training (no push since freeze).
-- runpod: DISPATCHED `candidate-factory-broad-2.md` — ledger D7
-  (refusal-as-posed DEAD, my vet transmitted) + B7 (refusal-marker
-  intensity on multi-turn chat, BUILD-if-time behind B6) + B6
-  OpenWebMath build + verdict hygiene.
-- runpod-b: DISPATCHED `probe-adequacy.md` — lambda_recovery_v2
-  plugin (ridge + nw scaling, contract-tested to reproduce v1),
-  split-integrity forensics (my old checklist item 2, delegated —
-  I review its receipt), variance-harness readiness, PROBE_V2_SPEC
-  freeze candidate. Contingency machinery ONLY — the methods
-  decision stays mine, pending the d+e probe-capacity review.
-- Briefings live: em-redo, task-hunt-r2-d, task-hunt-r2-e,
-  candidate-factory-broad-2, probe-adequacy. (r2-d/r2-e § 3 pointers
-  refreshed to the LOG factory-review entry; fineweb bundles routed
-  to e by default.)
+- runpod, runpod-b: IDLE — round-2 briefings retired tonight.
+  Candidate next assignments (on request): refmark user-echo row-drop
+  variant is NOT needed (0.22 % — screens handle it); possible
+  rebuttal-support once item 1 resolves the phrasing.
+- runpod-d: seed top-up in flight; then Ward screens (oprate, qrate,
+  vslope).
+- runpod-e: consuming screen queue (fineweb bundles + sc_lambda);
+  stops for review after its § 3 wave.
+- runpod-c: em-redo Phase A (no push since freeze).
+- Briefings live: em-redo, task-hunt-r2-d, task-hunt-r2-e.
 
 ## Standing context
-- Rebuttal-quotable: λ̂ Stage-2 rise (exact p=0.0093; pre-vs-T-SAE
-  pending top-up; dip = cause-not-established, never "dilution");
-  shuffle receipt; dissection § 7 sentence; T-SAE fairness receipt;
-  STORY.md regime/param material. CAUTION: absolute panel levels +
-  T-shape now carry the (unreviewed) probe-capacity flag — do not
-  type new absolute numbers into the rebuttal until item 1 is done.
-  Reviewer-facing text stays in private/.
-- Key science: ambience → regimes → subtype rule → T-taxonomy; FOUR
-  g(ℓ) shapes (incl. built-and-immediately-linearized); conversion =
-  the hunt's recurring killer; (task, MODEL) locality of non-ambience.
-- Git: at cedbb6d0 + this review commit; clean, pushed.
+- Rebuttal-quotable: λ̂ Stage-2 rise (exact p=0.0093 on v1 numbers —
+  restate from v2 receipts if adopted, never carry over); shuffle
+  receipt; dissection § 7 sentence; T-SAE fairness receipt; dip =
+  cause-not-established (never "dilution"); split-integrity receipt
+  (zero leakage) is now quotable armor.
+- Key science: ambience → regimes → subtype rule → T-taxonomy; FIVE
+  g(ℓ) shapes (present-then-discarded new); conversion = the killer;
+  screen↔panel convention mismatch (e's lesson, unreviewed); refusal
+  = D7 DEAD, recurrence port = B7 refmark SHIPPED (binding
+  preconditions: within-conv contrast, user-echo rows, under-span).
+- Platform note: "byte-identical" reproduction claims are per-platform
+  (x86↔ARM last-ulp drift observed, 1e-16 relative — harmless).
+- Git: clean, pushed (review commit after this rewrite).

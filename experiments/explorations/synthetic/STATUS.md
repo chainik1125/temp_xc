@@ -10,6 +10,26 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **ROUND 2 CPU WORK REVIEWED & APPROVED (2026-07-24 night,
+  mac-local).** (1) **probe-adequacy (runpod-b)**: `lambda_recovery_v2`
+  plugin (ridge + nw 8192 + boundary-snap trace split, opt-in flag,
+  v1 frozen and bit-identical without it), split-integrity CLOSED
+  with a receipt I reproduced byte-identically (zero leaked eval
+  draws at committed settings — no committed number affected),
+  variance harness probe-agnostic, `PROBE_V2_SPEC.md` = the freeze
+  candidate. The λ-readout METHODS DECISION remains untaken — next
+  mac-local review (d's amendment + e's diagnostics, one thread).
+  (2) **factory r2 (runpod)**: ledger D7 refusal-as-posed DEAD (lit
+  receipts) + B7 vet; B6 eqdens KILLED at triage (prose-register
+  unigram leak, measured, math tokens masked); **B7 refmark SHIPPED**
+  (WildChat, pre-gate 7×, bars clean; conv-identity 0.967 ⇒
+  within-conversation contrast BINDING at screen; user-echo rows
+  0.22 % of manifests — drop or disclose). `doc_mean_only_auc`
+  adoption ratified (disclosure statistic; frozen bars keep kill
+  authority). Screen wave so far (runpod-e, UNREVIEWED interim):
+  novelty NEGATIVE, **punctint-q KEEP — the hunt's first**,
+  punctint-list WEAK KEEP; tss + dialevel remain.
+
 - **QUANTITY MODE — FACTORIES DELIVERED & REVIEWED (2026-07-24 late,
   mac-local): BOTH BATCHES APPROVED; the screen queue is open.**
   9 screen-ready labels across 8 candidates + 3 honest label-side

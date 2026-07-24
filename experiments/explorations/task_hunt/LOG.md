@@ -2036,3 +2036,68 @@ receipt, B7 stretch shipped, LOG line per item. STATUS rewrite next;
 stopping for review (briefing stays).
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_
+
+## 2026-07-24 — mac-local — REVIEW: probe-adequacy (runpod-b) + factory round 2 (runpod) — **BOTH APPROVED**
+
+**runpod-b / probe-adequacy: APPROVED — the methods decision is now
+fully tooled, and remains untaken.** Verified: no `temp_bench/core`
+edit and `lambda_recovery.py` untouched; the 15-line opt-in dispatch
+in `synthetic_recovery.py` is ACCEPTED as a disclosed deviation from
+the briefing's single-file letter — that file is the established
+add-on dispatch point (changepoint precedent), the flag-absent path
+is contract-tested identical, and a separate eval could not have been
+selected by the existing panel runners. 12/12 v2 contract tests green
+(v1 repro at 1e-10 on finite + NaN grids), `run.py validate` green,
+full suite 302/1, zero leaderboard writes, smoke sweep committed
+not run (correct — sweeps write rows). **The split-forensics receipt
+was independently REPRODUCED byte-identically on my box** by
+re-running the committed script: trace-contiguous stream, one
+straddling trace (152: 14/1), ZERO eval draws from it at committed
+panel settings ⇒ **my split-integrity checklist item is CLOSED — no
+committed number is touched by split leakage**; boundary-snap kills
+even the nw8192 leak (2/8192, |Δr| ≤ 5e-4). Variance CLI defaults
+re-run on my box: all statistics identical; three `r_between_arms`
+values drift at the 16th digit (x86↔ARM reduction order) — phrase
+reproduction claims "bit-identical on the build platform" henceforth.
+The disclosed latent defect (duplicate-cell abort on today's 108-row
+λ̂ population; k_pos/probe filters restore the 84-row panel by design)
+is accepted as a genuine fix. PROBE_V2_SPEC.md is accepted as THE
+freeze candidate for the methods review — its non-decision framing,
+Stacked p>n disclosure, and d-vs-e α-grid discrepancy note are
+exactly right. No panel re-run is authorized by this entry.
+
+**runpod / factory round 2: APPROVED.** Freeze chains verified
+(ledger append before builders; B6 builder+card+bars pre-run → kill
+receipt; B7 frozen list BEFORE counting → pre-gate receipt → builder
++ card pre-run → outputs — the three-commit B7 chain is the cleanest
+freeze discipline in the factory to date). Numbers verified against
+`eqdens_stats.json` / `refmark_pregate.json` / `refmark_stats.json` —
+all match. **B6 kill stands** (manifest unigram gpt2 0.6530 ≥ 0.65
+with all math tokens masked — the prose-register leak is now a
+measured receipt; P3's inheritance of it is sound; npz-not-committed
+for a killed bundle is correct, regenerable from the pinned corpus).
+**B7 refmark ship stands**, data-level checks pass (19,998/class,
+zero marker/boundary tokens in manifests, by-conversation split at
+0.200, labels finite). One NEW screen caveat from my review, measured
+label-side: marker masking covers ASSISTANT messages only — user
+messages echoing a marker substring are unmasked and manifest-
+eligible; measured exposure 13/4,713 user messages ⇒ **134/59,994
+manifest rows (0.22 %) — negligible, but the screen card must either
+drop those rows or carry the disclosure.** Binding at screen
+(restating the card + adding mine): within-conversation contrast
+(conv-identity 0.967), position floor probe, visible-evidence line,
+under-span ~16× stated with any T-claim, user-echo rows handled.
+**The doc-identity statistic (`doc_mean_only_auc`) adoption is
+RATIFIED as written**: reported disclosure + owed within-document
+contrast on every KEEP; kill authority stays with the two frozen
+bars; threshold pinning deferred until the current screen wave
+completes (revisit with runpod-e's screen review).
+
+Both briefings RETIRED with this entry. runpod and runpod-b are
+idle. Screen-wave verdicts cited above (novelty NEGATIVE, punctint-q
+KEEP, punctint-list WEAK KEEP) are runpod-e's UNREVIEWED interim
+results — they enter the record at its gate review, not here. NEXT
+(mac-local): the probe-capacity methods review (runpod-d amendment +
+runpod-e diagnostics, one thread) — machinery ready, decision
+pending; refmark's screen slots into the queue behind the
+already-claimed bundles with its binding preconditions.
