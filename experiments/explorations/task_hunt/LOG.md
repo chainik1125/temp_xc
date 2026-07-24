@@ -382,3 +382,59 @@ is taken forward; that is a separate run from the candidate-1 Stage 2
 now executing, and is NOT part of this session's acceptance gate.
 Results `proofops/results/proofops_verdict.json`, figure
 `proofops/figs/proofops_tscaling.*`.
+
+## 2026-07-24 — runpod-d — candidate 1 STAGE 2 (backtracking λ̂, real Ward activations) — **QUALIFIED POSITIVE**
+
+The head-to-head panel: 84 cells, 0 failures, through the canonical
+runner — 5 archs × T ladder × seeds {1,2,42} + untrained, at a single
+scarce anchor d_sae = 2048 (= d_in/2), nominal k_pos = 8. Datasource
+`ward_real_lambda_base_l12` (real base-model resid_post L12 + the frozen
+λ̂_hist labels; plugin path, no core edits). Headline metric =
+`lambda_recovery` (held-out Pearson r of a per-tile linear probe;
+chance ≈ 0). Figure `lambda_intensity/figs/stage2_tscaling.*`, numbers
+`lambda_intensity/results/stage2_summary.json`. mean ± std over 3 seeds:
+
+| arch | T=1 | T=2 | T=4 | T=8 | T=16 | realized l0 |
+|---|---|---|---|---|---|---|
+| per-token BatchTopK SAE | 0.113 | — | — | — | — | 6.3 |
+| **T-SAE** | **0.154** | — | — | — | — | 7.4 |
+| Stacked | — | 0.109 | 0.143 | 0.125 | 0.094 | 7.0–7.9 |
+| **TXC-pre** | — | 0.132 | 0.192 | **0.206** | 0.138 | 6.9–7.8 |
+| TXC-post | — | 0.130 | 0.161 | 0.185 | **0.255** | **3.4→0.5** |
+
+**The clean, matched-budget result is TXC-pre.** At realized l0 ≈ 7–8
+(the same per-token budget the token archs and Stacked run at), λ̂
+recovery **rises 0.13 → 0.19 → 0.21 across T = 2/4/8**, above both
+per-token decoders — the per-token BatchTopK SAE (0.113) and **T-SAE,
+the baseline the hunt names (0.154)** — and the trained−untrained margin
+**grows with T to +0.150 at T = 8** (untrained falls 0.09 → 0.06 → 0.01,
+so the architecture is learning something T-dependent, not reading it
+off at init). It dips at T = 16 (0.138): a peak-then-decline, not
+saturation — consistent with the Stage-1 regime-2 reading (the window
+pools more lag-weighted history until added positions dilute a fixed
+code budget). **This is the hunt's target pattern — a window code
+recovering a real-activation latent better than the per-token decoders
+and improving with T — realized at matched sparsity, if modestly.**
+
+**Two heavy caveats, both reported not buried.**
+1. **TXC-post's higher numbers are NOT budget-matched.** Its recovery
+   is monotone to the best cell in the panel (0.255 at T = 16), but its
+   realized l0 **collapses 3.4 → 1.8 → 0.9 → 0.49** — at T = 16 it fires
+   ~1/16 the atoms/token the others do (the post-squash k_win//T
+   correction starves the code as T grows). Achieving 0.255 on half an
+   atom per token is a striking *efficiency* observation, but it breaks
+   the matched-l0 comparison, so it cannot be the headline. Flagged per
+   RECORD § 4.6.
+2. **Stacked shows a training pathology at large T.** It is non-monotone
+   and at T = 16 the TRAINED model (0.094) sits **below its own
+   untrained control (0.171)** — a negative margin. Not a win for
+   anyone; recorded as a pathology.
+
+**Verdict: QUALIFIED POSITIVE.** The money plot exists — TXC-pre beats
+the per-token/T-SAE baselines at matched budget and rises with T through
+T = 8 — but it is modest (recovery band 0.10–0.21 on a hard real
+regression), peaks rather than saturates, and the single largest number
+in the panel (TXC-post 0.255) is budget-confounded. The result matches
+the Stage-1 screen it was built from: an order-free, additive-in-window
+regime-2 latent, where a window architecture earns a real but bounded
+advantage over per-token decoding. Full write-up: RECORD § 4.
