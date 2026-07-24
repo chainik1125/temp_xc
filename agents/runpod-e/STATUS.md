@@ -13,14 +13,26 @@ Pull-rebase before EVERY push (shared `arxiv` branch). venv:
 `.venv/bin/python` (torch 2.8 cu128, transformers 5.7, datasets 4.8.5,
 anthropic 0.97).
 
-## MISSION NOW: `briefings/task-hunt-r2.md` (read it first — it is the
-## governing doc). Results by SATURDAY morning PT; check-in Sun 10:00.
+## MISSION NOW: `briefings/task-hunt-r2-e.md` (the orchestrator SPLIT
+## the joint r2 briefing per pod — read MINE first; runpod-d has
+## task-hunt-r2-d.md). Results by SATURDAY morning PT; check-in Sun
+## 10:00 PT.
 Round 1 (arm B, three sound kills) is REVIEWED & APPROVED — binding
 review notes live in `experiments/explorations/task_hunt/LOG.md` and
 methods in `experiments/explorations/task_hunt/RECORD.md` (READ BOTH
 in the new context before any run; I have not read the post-review
-LOG additions or RECORD.md yet). New binding convention: per-token-first
-triage (my screens already satisfy it for these targets).
+LOG additions or RECORD.md yet). New binding conventions:
+per-token-first triage (my screens already satisfy it) + the depth
+sweep as the WHY-diagnostic when per-token is high. Briefing deltas vs
+my earlier notes: (a) item-2 requires BLIND directional predictions
+committed BEFORE any cell (cand-3 depth-sweep precedent — see
+runpod-d's committed script+prediction pair for the format); (b)
+runpod-b is shipping a DRAFT Stage-2 card (`hunt-support-stats.md`
+item 4) — sharpen and freeze MY OWN, don't wait on it; (c) the
+record must carry the review's binding code-readout-convention
+sentence (find it in LOG/RECORD review notes); (d) anti-conversion
+screen is a possible Saturday add-on ONLY if a pod frees up AND
+mac-local greenlights.
 
 ### Item 1 — hedging-trend LEVEL Stage-2 (the deliverable)
 Program DECISION: aggregation-framed win ACCEPTED; shuffle IMMUNITY is
