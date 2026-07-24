@@ -1,0 +1,40 @@
+{
+ "meta": {
+  "dataset": "HuggingFaceFW/fineweb",
+  "name": "sample-10BT",
+  "split": "train",
+  "seed": 0,
+  "shuffle_buffer": 10000,
+  "n_docs": 4000,
+  "n_scanned": 43122,
+  "min_sents": 60,
+  "max_sents": 200,
+  "n_sentences": 375498,
+  "datasets_version": "4.8.5",
+  "splitter": "expansion.corpus.split_sentences v1"
+ },
+ "prefix_receipt": {
+  "pinned_n_docs": 400,
+  "compared": 400,
+  "id_match": 400,
+  "sentences_match": 400,
+  "first_mismatch_index": null,
+  "prefix_identity": true,
+  "pinned_meta": {
+   "dataset": "HuggingFaceFW/fineweb",
+   "name": "sample-10BT",
+   "split": "train",
+   "seed": 0,
+   "shuffle_buffer": 10000,
+   "n_docs": 400,
+   "n_scanned": 4183,
+   "min_sents": 60,
+   "max_sents": 200,
+   "n_sentences": 36805,
+   "datasets_version": "4.8.5",
+   "splitter": "expansion.corpus.split_sentences v1"
+  }
+ },
+ "artifact": "fineweb4k_corpus.json.gz",
+ "n_tokens_hint": "see build_punctint4k stats (per tokenizer)"
+}
