@@ -258,7 +258,22 @@ margin an order effect rather than a capacity effect.
    wrong with either job — a T = 64 flatten probe simply cannot share
    80 GB with a 50 GB probe job. The jobs were re-run serialized. Any
    future agent adding a third GPU job should chain, not fan out.
-5. **Stage-2 fairness: nominal `k_pos` is matched, realized
+5. **The distill tokenizer trap bites twice — force the fast backend.**
+   `AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-
+   Llama-8B")` returns the **slow** `LlamaTokenizer` (it even reports
+   `is_fast=True`), whose `return_offsets_mapping` yields unusable
+   spans. `conversion_depth/build_ward_stream.py` already recorded this
+   for the whitespace-mangling symptom; the offsets symptom is worse
+   because it **fails silently**: candidate 3's keyword-onset index
+   would have come back −1 for every rollout, reading as "no violations
+   found", tripping that card's feasibility gate and yielding a false
+   *infeasible* verdict rather than an error. Caught by a CPU pre-flight
+   check before the unattended stage ran. Use
+   `PreTrainedTokenizerFast.from_pretrained(...)` — it carries the chat
+   template too. (Second bug from the same check: under transformers
+   5.x `apply_chat_template(tokenize=True)` returns a `BatchEncoding`,
+   so `len()` gives 2; pass `return_dict=False`.)
+6. **Stage-2 fairness: nominal `k_pos` is matched, realized
    `l0_per_token` is NOT (flagged before the panel finished).** Every
    cell is run at the same nominal `k_pos = 8`, which is the synthetic
    program's fairness definition (Part II § 3). But the BatchTopK
@@ -272,7 +287,7 @@ margin an order effect rather than a capacity effect.
    to decode structure. The per-cell realized l0 is recorded in
    `results/stage2_summary.json` next to every recovery number so the
    check is always available, and any headline claim has to survive it.
-6. **Leaderboard hygiene, and a repair.** Baseline restored:
+7. **Leaderboard hygiene, and a repair.** Baseline restored:
    **7116 rows, 0 duplicate `eval_key`s, 0 rows with a null metric.**
    Six rows written earlier in this session on
    `ward_real_lambda_base_l12` (one 200-step plumbing cell + five
