@@ -975,3 +975,47 @@ T = 4/8/16/32.
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
 2026-07-24. Next: B3/B4 (list-density + question-rate, one builder)._
+
+---
+
+## 2026-07-24 — runpod-b · FACTORY BUNDLE 3 SHIPPED: `oprate` (op-class run-rates ×2, both labels PASS)
+
+Third bundle of `briefings/candidate-factory-traces.md` — the intensity
+(regime-2) face of the proofops latent, distinct from the killed-ish
+tir contrast. Builder + frozen card committed before outputs (commits
+"factory: oprate builder/card …" + one pre-output sidx-broadcast fix).
+Bundle: `labels/oprate.npz` + `labels/oprate_stats.json`, card
+`oprate/CARD_DRAFT.md`. TWO independently-triaged labels in one npz,
+manifests `man_ver_*` / `man_case_*` (+ `_null_`), 20k rows/class.
+
+- **rate_ver** (verification-check, 0.068 of
+  labeled sentences): triage PASS — tok 0.615,
+  pos 0.641
+  (the position face is the widest of the batch so far — disclose);
+  self-excitation 0.033 →
+  0.241 (7×); evidence ceiling T32
+  0.830 — HIGH, the screen must beat
+  it or it is reading visible verification sentences.
+- **rate_case** (case-enumeration, 0.082):
+  triage PASS and POSITION-BLIND — tok 0.588,
+  pos 0.496 raw /
+  0.485 frac (≈ chance); self-excitation
+  0.052 →
+  0.186; evidence T32
+  0.783.
+- **Independence receipts**: corr(rate_ver, rate_case) =
+  -0.03; corr(rate_ver, λ̂_sc) =
+  0.03 — the card's disclosed worry (marker
+  list contains "let me verify/double-check") did NOT materialize:
+  these are new latents, not λ̂_sc re-skins. Coverage
+  0.90 of valid tokens (NaN whenever a
+  kernel-lag sentence is judge-unlabeled — no imputation). Op-shuffle
+  null (seed 103, one permutation per trace, both streams from the
+  same permutation) corr ≈ 0.17 with real.
+- Masking (anchor lesson): rows whose current sentence IS the event
+  class or is unlabeled are excluded per label; full `op` grid ships
+  for stricter screen-side masks.
+
+**Batch status: acceptance gate (≥ 3 shipped bundles) MET with 4
+screen-ready labels across 3 bundles; continuing down the priority
+list (verbosity, redundancy) per quantity mode.**

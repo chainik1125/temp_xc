@@ -1,0 +1,106 @@
+{
+ "frozen": {
+  "kernel": {
+   "tau": 3.0,
+   "k": 8,
+   "min_history": 4
+  },
+  "labels_source": "experiments/explorations/synthetic/expansion/records/proof-operation-phase-runs/labels.json",
+  "classes": {
+   "ver": 3,
+   "case": 2
+  },
+  "null_seed": 103,
+  "seed": 0,
+  "mask": "current sentence == event class OR unlabeled",
+  "nan_rule": "label NaN if any kernel-lag sentence unlabeled"
+ },
+ "stream_shape": [
+  4044,
+  128
+ ],
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "n_roundtrip_mismatch_tokens": 149,
+ "labels": {
+  "ver": {
+   "label_coverage_rate": 0.8952329773659556,
+   "event_rate_sentences": 0.0683350826850221,
+   "bin_scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.19763323664665222
+   ],
+   "null_corr_with_real": 0.17328403978451967,
+   "cur_class_rate_by_bin": [
+    0.033124817463713485,
+    0.0913127007959187,
+    0.2409548796683186
+   ],
+   "manifest_rows_per_class": 20000,
+   "triage": {
+    "tok_auc_extreme": 0.6151265416815079,
+    "pos_auc_extreme": 0.6406234344276774,
+    "tok_kill_at": 0.65,
+    "pos_kill_at": 0.7,
+    "verdict": "PASS",
+    "tok_auc": 0.6151265416815079,
+    "pos_raw_auc": 0.6387100697611787,
+    "pos_frac_auc": 0.6406234344276774,
+    "n_test_rows": 7434
+   },
+   "visible_evidence_auc": {
+    "T8": 0.5846994535519126,
+    "T16": 0.6819672131147541,
+    "T32": 0.8295081967213115
+   },
+   "build_sanity": {
+    "manifest_size_ok": true,
+    "self_excitation_monotone": true
+   },
+   "shipped": true
+  },
+  "case": {
+   "label_coverage_rate": 0.8952329773659556,
+   "event_rate_sentences": 0.08174803029006203,
+   "bin_scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.18594639003276825
+   ],
+   "null_corr_with_real": 0.1768856886888412,
+   "cur_class_rate_by_bin": [
+    0.052323060185783955,
+    0.09563263586574919,
+    0.18604741849945405
+   ],
+   "manifest_rows_per_class": 20000,
+   "triage": {
+    "tok_auc_extreme": 0.5880156055423025,
+    "pos_auc_extreme": 0.5145397226383914,
+    "tok_kill_at": 0.65,
+    "pos_kill_at": 0.7,
+    "verdict": "PASS",
+    "tok_auc": 0.5880156055423025,
+    "pos_raw_auc": 0.49571023074351045,
+    "pos_frac_auc": 0.48546027736160857,
+    "n_test_rows": 7786
+   },
+   "visible_evidence_auc": {
+    "T8": 0.5715430402930403,
+    "T16": 0.6478937728937729,
+    "T32": 0.7834249084249084
+   },
+   "build_sanity": {
+    "manifest_size_ok": true,
+    "self_excitation_monotone": true
+   },
+   "shipped": true
+  }
+ },
+ "corr_rate_ver_rate_case": -0.031689955946722206,
+ "corr_rate_ver_lam_sc": 0.026427635143705906,
+ "shipped_labels": [
+  "ver",
+  "case"
+ ]
+}
