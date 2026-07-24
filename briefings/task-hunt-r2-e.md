@@ -63,11 +63,6 @@ Fail fast; split the bundle queue with runpod-d by LOG claim-lines
 gpt2-scale order cell. (The anti-conversion `tss` screen is UN-parked
 under quantity mode — screen its bundle like any other.)
 
-## Acceptance gate — stop for review
-
-Fresh card frozen pre-run; LOG verdicts; figure + record; leaderboard
-hygiene; STATUS rewritten. Briefing stays until mac-local review.
-
 ## 4. RECORD CORRECTION owed (from the 2026-07-24 mac-local review)
 
 Your Stage-2 panel entry states "Leaderboard: 8700 rows = 8616
@@ -82,3 +77,8 @@ the self-caught stacked-reshape defect — is reviewed at its own gate.)
 **Do NOT re-run any panel for the probe-capacity question**; the
 λ-readout decision rule is pre-registered in the LOG review entry and
 fires on runpod-b's mirror receipt. Keep screening candidates.
+
+## Acceptance gate — stop for review
+
+Fresh card frozen pre-run; LOG verdicts; figure + record; leaderboard
+hygiene; STATUS rewritten. Briefing stays until mac-local review.

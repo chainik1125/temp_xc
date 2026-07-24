@@ -73,12 +73,6 @@ parked program-wide: gpt2-scale order cell. (The anti-conversion
 `tss` screen is UN-parked under quantity mode — its bundle arrives
 via the broad factory; screen it like any other bundle.)
 
-## Acceptance gate — stop for review
-
-Amendment card frozen pre-run; LOG verdict; re-rendered figure +
-record addendum; leaderboard hygiene (0 dup keys, no null metrics);
-STATUS rewritten. Briefing stays until mac-local review.
-
 ## 4. RECORD CORRECTION owed (from the 2026-07-24 mac-local review — do this first, it is 10 minutes)
 
 Your Stage-2 amendment is **APPROVED**, with one pre-registration duty
@@ -100,3 +94,9 @@ wider: −2.61…−0.33).
 **Do NOT re-run any panel for the probe-capacity question.** The
 λ-readout decision rule is pre-registered in the LOG review entry and
 fires on runpod-b's mirror receipt, not on reported lift.
+
+## Acceptance gate — stop for review
+
+Amendment card frozen pre-run; LOG verdict; re-rendered figure +
+record addendum; leaderboard hygiene (0 dup keys, no null metrics);
+STATUS rewritten. Briefing stays until mac-local review.
