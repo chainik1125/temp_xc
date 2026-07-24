@@ -40,9 +40,10 @@ T ∈ {2, 4, 8, 16, 32}, plus the window-MEAN decomposition
 **Model axis (screen-only):** non-ambience is a (task, MODEL) property
 — a model whose attention converts the structure leaves no window
 advantage (the depth-ablation lesson). Screen each candidate on every
-model that is cheap to obtain (for your trace candidates BOTH Ward
-caches — base + distill — are already on the volume: free probe
-reruns); Stage 2 runs ONLY the single best (task, model) cell (at
+model that is cheap to obtain (for your trace candidates, cache BOTH
+readers — Llama-3.1-8B base + R1-Distill — one mid-depth layer each
+during your Ward rebuild; the marginal cost of the second model is
+minutes); Stage 2 runs ONLY the single best (task, model) cell (at
 most two).
 **KEEP iff** the window−token gap grows with T over some range AND
 the pattern matches the card. **KILL otherwise — one paragraph in the
