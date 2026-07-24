@@ -2336,3 +2336,37 @@ or a pair-relative predicate); and more generally, any anchor whose
 label is a *role* rather than a *property* needs its probe scoped to
 where the role is defined. This is the second specification-level
 finding from this batch, after the missing document-identity triage bar.
+
+## 2026-07-24 — runpod-e — **screening `dialevel`** (claim-line; queue position 9, the last of my §3 queue)
+
+Claiming the DailyDialog turn-length LEVEL bundle per
+`briefings/task-hunt-r2-e.md` § 3. This is the one bundle in the queue
+whose screen was **foreclosed as designed**: mac-local's binding
+qualification 2 says the naive screen is not runnable here, because the
+all-eligible-row position AUC is **0.930–0.936** via a dialogue-length
+selection route (with the turn-count floor fixed at 8, a dialogue is
+long substantially BECAUSE its turns are long). The card must therefore
+neutralize that route — within-dialogue contrasts or dialogue-length
+matching — and run position/doc-length floor probes alongside every
+window number.
+
+**Order of work, stated before any of it runs.** That obligation cannot
+be discharged by assertion: the within-dialogue control has to have
+measurable POWER on this corpus before it is worth ~2.6M tokens of
+forward pass. Dialogues run ~150 tokens, `tlevel` is constant inside a
+turn, and the 5-turn warm-up leaves only each dialogue's tail labeled,
+so the number of distinct label values available INSIDE one dialogue is
+small by construction. `dialevel/design_probe.py` (committed with this
+line, label-side only, reads no activations) measures it first: cache
+geometry and row yield under the screen's uniform eligibility, my
+proposed `doc_mean_only_auc` bar, the within-dialogue contrast power
+(usable dialogues, rows per class, within-dialogue |Δtlevel| against the
+global tercile contrast), and what the within-dialogue split does to the
+position and dialogue-length routes. **The card is frozen after those
+numbers exist and quotes them**, including the possibility they say the
+control is under-powered — in which case the honest deliverable is a
+design-level NOT-SCREENABLE verdict with the measurement behind it, not
+a screen whose gap nobody can interpret.
+
+License note travels from here on: DailyDialog is **CC BY-NC-SA 4.0**
+(research use); it attaches to any figure that graduates.
