@@ -59,8 +59,20 @@ PROBES = ("ols", "ridge")
 
 
 def _anchor_n_windows(p: int, T: int) -> int:
-    """Card § 3: target n_rows ≥ 32·p, floor 16384, cap 65536."""
-    return int(np.ceil(min(max(32 * p, 16384), 65536) / (L // T)))
+    """Card § 3: target n_rows ≥ 32·p, floor 16384, cap 65536.
+
+    When even the cap cannot reach the licence floor of ``16·p`` (p > 4096 —
+    line S's Stacked cells at T = 16, `p = T·d_sae = 8192`), the anchor is
+    unlicensable *whatever* budget is spent, so it is computed at the floor
+    budget instead of the cap: 4× cheaper, still reported, still marked
+    `licensed: false` and drawn as a cross rather than a level on the figure.
+    Spending an hour per cell to produce a number the card forbids reading
+    as truth would buy nothing.
+    """
+    target = min(max(32 * p, 16384), 65536)
+    if target < 16 * p:
+        target = 16384
+    return int(np.ceil(target / (L // T)))
 
 
 def _load_model(cell: dict):
