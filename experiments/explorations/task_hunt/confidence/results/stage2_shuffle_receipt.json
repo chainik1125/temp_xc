@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "ds": "ward_real_slope8_distill_l14",
+    "convention": "anchor-fixed context shuffle, rng 1234; probe refit on shuffled codes",
+    "card": "card_stage2.md \u00a710.1",
+    "off_leaderboard": true
+  },
+  "cells": {
+    "txc_batchtopk_pre/T8/s1": {
+      "clean_r": 0.22482751412215812,
+      "shuf_r": 0.14378579224056712,
+      "k_pos": 8,
+      "train_key": "68d9196590385178"
+    },
+    "txc_batchtopk_pre/T8/s2": {
+      "clean_r": 0.18396359666591375,
+      "shuf_r": 0.20659968041904905,
+      "k_pos": 8,
+      "train_key": "722f890a75bffc47"
+    },
+    "txc_batchtopk_pre/T8/s42": {
+      "clean_r": 0.17746700343773847,
+      "shuf_r": 0.16893113372677535,
+      "k_pos": 8,
+      "train_key": "1a6f6b00cf12a527"
+    },
+    "txc_batchtopk_pre/T16/s1": {
+      "clean_r": 0.1344175476104353,
+      "shuf_r": 0.08357537063292254,
+      "k_pos": 8,
+      "train_key": "9f924a29aed1ec43"
+    },
+    "txc_batchtopk_pre/T16/s2": {
+      "clean_r": 0.13590611248069615,
+      "shuf_r": 0.0815362618404825,
+      "k_pos": 8,
+      "train_key": "4047692b92960e20"
+    },
+    "txc_batchtopk_pre/T16/s42": {
+      "clean_r": 0.12836413602089333,
+      "shuf_r": 0.11571346953514154,
+      "k_pos": 8,
+      "train_key": "43785dd466a90ef9"
+    },
+    "txc_batchtopk_post/T8/s1": {
+      "clean_r": 0.17664229395917982,
+      "shuf_r": 0.14111764487165604,
+      "k_pos": 64,
+      "train_key": "1155d080092f2ceb"
+    },
+    "txc_batchtopk_post/T8/s2": {
+      "clean_r": 0.08833473944038837,
+      "shuf_r": 0.13065157200025995,
+      "k_pos": 64,
+      "train_key": "b5f62281383ae49e"
+    },
+    "txc_batchtopk_post/T8/s42": {
+      "clean_r": 0.15785391059596274,
+      "shuf_r": 0.10607892877693265,
+      "k_pos": 64,
+      "train_key": "abafc013ebdcb791"
+    },
+    "txc_batchtopk_post/T16/s1": {
+      "clean_r": 0.16709582593874203,
+      "shuf_r": 0.06501468589609276,
+      "k_pos": 128,
+      "train_key": "845f9359015e7e7a"
+    },
+    "txc_batchtopk_post/T16/s2": {
+      "clean_r": 0.14890199684373115,
+      "shuf_r": 0.1445482889316782,
+      "k_pos": 128,
+      "train_key": "4a30a4dcfa572ea9"
+    },
+    "txc_batchtopk_post/T16/s42": {
+      "clean_r": 0.12010552907719617,
+      "shuf_r": 0.027247283550914884,
+      "k_pos": 128,
+      "train_key": "159301eb4ed7b1db"
+    }
+  }
+}

@@ -105,9 +105,23 @@ def main():
                  "Hedging-trend (slope8) recovery vs T — budget-matched "
                  "archs only\n(realized l0 ≥ 4/token; whiskers = 95% t CI "
                  "over seeds)")]
+    raw_path = RES / "stage2_raw_reference.json"
+    raw = json.loads(raw_path.read_text()) if raw_path.exists() else {}
     for stem, matched_only, title in variants:
         fig, ax = plt.subplots(figsize=(7.4, 5.0))
         draw(ax, trained, untrained, l0, matched, l0_range, matched_only)
+        # Raw-activation anchors (card § 6): reference lines, never cells.
+        if raw:
+            rt = raw.get("raw_tok", {}).get(METRIC)
+            if rt is not None:
+                ax.axhline(rt, color="k", ls="-.", lw=1.4, alpha=0.8,
+                           label=f"RAW per-token (r = {rt:.3f})")
+            Ts = sorted(int(k.split("_T")[1]) for k in raw
+                        if k.startswith("raw_mean_T"))
+            ys = [raw[f"raw_mean_T{t}"][METRIC] for t in Ts]
+            if Ts:
+                ax.plot(Ts, ys, "x--", color="k", lw=1.2, alpha=0.6,
+                        label="RAW window-mean")
         ax.set_title(title, fontsize=11)
         fig.tight_layout()
         for ext in ("png", "pdf"):

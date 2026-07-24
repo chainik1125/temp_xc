@@ -73,14 +73,104 @@ convention for every arch), but the screen's "per-token-blind" premise
 does NOT transfer to this convention, and every reading below carries
 that.
 
-### § 1b — Panel result
+### § 1b — Panel result — **NEGATIVE (the frozen KEEP rule does not fire)**
 
-*(pending — filled from `results/stage2_ward_real_slope8_distill_l14.json`
-via `render_stage2.py` when the 84 cells complete)*
+84/84 cells ok, 0 failures. Figure
+`confidence/figs/stage2_tscaling.*`, numbers
+`results/stage2_summary.json`, receipts `results/stage2_stats.json`.
+`lambda_recovery` = held-out Pearson r vs slope8, mean over seeds
+{1, 2, 42}:
 
-### § 1c — Shuffle-immunity receipt (card § 10.1)
+| arch | T=1 | T=2 | T=4 | T=8 | T=16 | realized l0 |
+|---|---|---|---|---|---|---|
+| per-token BatchTopK SAE | 0.174 | — | — | — | — | 6.3 |
+| T-SAE | 0.192 | — | — | — | — | 7.2 |
+| Stacked | — | 0.168 | 0.204 | 0.169 | 0.129 | 7.0–8.0 |
+| **TXC-pre** | — | 0.211 | **0.229** | 0.196 | 0.132 | 7.0–7.8 |
+| TXC-post (matched k = 8·T) | — | 0.206 | 0.191 | 0.141 | 0.145 | 7.0–8.1 |
+| *RAW per-token (reference)* | *0.221* | — | — | — | — | — |
 
-*(pending — `shuffle_receipt_stage2.py` on the panel's checkpoints)*
+**Every arch is budget-matched this time** (realized l0 6.3–8.1
+against the intended 8/token) — the amendment worked, and its
+pre-registered falsifier passed exactly: matched TXC-post's untrained
+cells realize **8.00** l0/token at every T (the k·T correction is
+right; § 8 VOID does not fire).
+
+**The verdict is NEGATIVE on the card's own second clause:** "window
+recovery is flat or falling in T over {2, 4, 8}". Exact within-seed
+trend permutation (`stats_lib.within_seed_trend`, pooled seeds):
+TXC-pre **p = 0.727**, TXC-post **p = 0.963**, Stacked **p = 0.495** —
+no arch shows a T-rise. Recovery **peaks at T = 4 and declines**. The
+KEEP clause independently fails: TXC-pre clears both token archs
+beyond the paired spread at **one** T (T = 4), not the required ≥ 2.
+
+**The one real positive, stated with its bound.** At T = 4 TXC-pre
+beats both per-token decoders with paired 95 % t CIs excluding zero:
+**+0.055 vs the per-token BatchTopK SAE** (CI [+0.007, +0.103]) and
+**+0.037 vs T-SAE** (CI [+0.012, +0.062]), all three seeds positive
+(exact sign-flip p = 0.125, its n = 3 floor). That is a genuine
+single-operating-point win for a window code under the code-readout
+convention. It is not the hunt's pattern, which requires the advantage
+to GROW with T.
+
+**The sharpest honest fact — the codes barely beat raw activations.**
+The pre-registered raw per-token reference is **r = 0.221**. Exactly
+one of the 14 panel cells exceeds it (TXC-pre/T4 at 0.229); every
+other cell — including both token archs (0.174, 0.192) — sits below
+what a linear probe reads off the raw residual at a single position.
+So on this task no architecture in the panel is buying much over the
+raw stream, and the arch-vs-arch differences live inside that band.
+
+**Blind-prediction scorecard (card § 7, scored either way):**
+- **P1 FALSIFIED as a conjunction.** Its second clause holds (TXC-pre
+  exceeds both token archs beyond spread at T = 4); its first clause —
+  recovery rises with T through T = 8 — is false (p = 0.73).
+- **P2 FALSIFIED.** Matched TXC-post does not rise (p = 0.96, falling)
+  and is below TXC-pre at T = 8 (0.141 vs 0.196); it is nominally ≥ at
+  T = 16 (0.145 vs 0.132), inside the spread. Aggregation being post's
+  "native shape" is not what the data shows.
+- **P3 FALSIFIED.** Token archs do not land near the raw per-token
+  reference — they land **below** it (0.174/0.192 vs 0.221) — and at
+  T = 16 they sit **above** every window arch.
+- **P4 PARTIALLY CONFIRMED.** TXC-pre's trained − untrained margin
+  grows +0.106 → +0.132 → +0.135 across T = 2/4/8 then falls to
+  +0.085 at T = 16; TXC-post's is flat (+0.089/+0.094/+0.078/+0.087).
+  So the learned T-dependence exists for pre through T = 8 even though
+  absolute recovery does not rise.
+- **P5 FALSIFIED.** No monotone rise through T = 8.
+- **Stacked pathology RECURS** (named as a risk, not predicted): at
+  T = 16 trained 0.129 sits **below** untrained 0.157 (margin −0.029),
+  the same large-T failure the λ̂ panel recorded. Not evidence for or
+  against any arch.
+
+### § 1c — Shuffle-immunity receipt (card § 10.1) — **DEGENERATE, reported not spun**
+
+`shuffle_receipt_stage2.py` on the panel's own checkpoints (12 cells,
+anchor-fixed context shuffle, probe refit on shuffled codes), seed
+means:
+
+| arch | T | clean r | shuffled r | drop | retained |
+|---|---|---|---|---|---|
+| TXC-pre | 8 | 0.195 | 0.173 | +0.022 | 89 % |
+| TXC-pre | 16 | 0.133 | 0.094 | +0.039 | 70 % |
+| TXC-post | 8 | 0.141 | 0.126 | +0.015 | 89 % |
+| TXC-post | 16 | 0.145 | 0.079 | +0.066 | 54 % |
+
+**The pre-registered test cannot be scored as written, and that is the
+honest report.** The card's criterion was "the shuffled cell keeps
+more than half of that cell's (clean window − best token arch)
+margin". At the receipt's frozen cells (T ∈ {8, 16}) that margin is
+≈ 0 or negative (pre/T8: 0.195 − 0.192 = +0.003; every T = 16 cell is
+below both token archs), so there is no margin left to retain and the
+ratio is undefined or meaningless. The receipt was designed to
+interrogate a margin the panel did not produce.
+
+What the raw numbers do say, reported as a descriptive result: at
+T = 8 both window archs retain ~89 % of their recovery under
+context shuffling — consistent with the order-free aggregation claim —
+while at T = 16 the drop is larger (30–46 %), in the same cells the
+probe-capacity caveat (§ 6) already flags as the least trustworthy.
+**No order claim and no immunity claim is made from this receipt.**
 
 ---
 

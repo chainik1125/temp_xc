@@ -1270,3 +1270,160 @@ confound closed and a deeper one (probe capacity) surfaced with a
 recommendation. Deliverable: `figs/stage2_tscaling.*` (+`_matched`),
 `results/stage2_summary.json`, `results/probe_capacity_*.json`, RECORD
 § 3c.
+## 2026-07-24 — runpod-e — round 2 item 1: hedging-trend LEVEL Stage 2 — **NEGATIVE** (peak at T = 4, no T-rise; one bounded single-T win; codes barely beat raw activations)
+
+Panel per the FRESH card `confidence/card_stage2.md` (§§ 1–9 frozen at
+`fff7877c`, § 10 amendment at `606a8015`, both before any cell — the
+killed screen card was motivation only). 84/84 cells ok through the
+canonical runner; datasource `ward_real_slope8_distill_l14` (plugin
+`real_slope.py`, R1-Distill resid_post L14, frozen slope8 grid, NaN
+kept and dropped at probe time — no densification). Methods + full
+tables: `RECORD_B.md` § 1.
+
+**Every arch was budget-matched this round** (realized l0 6.3–8.1 vs
+the intended 8/token), because TXC-post ran at nominal k = 8·T per
+runpod-d's code-rate amendment. Its pre-registered falsifier passed
+exactly: untrained post cells realize **8.00** l0/token at every T. The
+confound that qualified the λ̂ panel is designed out here.
+
+| arch | T=1 | T=2 | T=4 | T=8 | T=16 |
+|---|---|---|---|---|---|
+| per-token BatchTopK SAE | 0.174 | — | — | — | — |
+| T-SAE | 0.192 | — | — | — | — |
+| Stacked | — | 0.168 | 0.204 | 0.169 | 0.129 |
+| **TXC-pre** | — | 0.211 | **0.229** | 0.196 | 0.132 |
+| TXC-post (matched) | — | 0.206 | 0.191 | 0.141 | 0.145 |
+| *RAW per-token (pre-registered reference)* | *0.221* | — | — | — | — |
+
+**KILL/NEGATIVE fires on the card's own clause** — "window recovery is
+flat or falling in T over {2, 4, 8}". Exact within-seed trend
+permutation (shared `stats_lib`, pooled seeds): TXC-pre **p = 0.727**,
+TXC-post **p = 0.963**, Stacked **p = 0.495**. Recovery peaks at T = 4
+and declines. The KEEP clause independently fails: TXC-pre clears both
+token archs beyond the paired spread at ONE T, not the required ≥ 2.
+
+**The one real positive, with its bound.** At T = 4, TXC-pre beats both
+per-token decoders with paired 95 % t CIs excluding zero: **+0.055 vs
+the per-token SAE** (CI [+0.007, +0.103]) and **+0.037 vs T-SAE**
+(CI [+0.012, +0.062]), 3/3 seeds positive (sign-flip p = 0.125, its
+n = 3 floor). A genuine single-operating-point window win under the
+code-readout convention — but the hunt asks for growth in T, and there
+is none.
+
+**The fact that reframes the whole panel: the codes barely beat raw
+activations.** The pre-registered raw per-token reference is
+**r = 0.221**; exactly one of 14 panel cells exceeds it (TXC-pre/T4,
+0.229), and both token archs sit below it. Related and disclosed in
+the record: Stage-2's unmatched sampling **re-admits the ambient
+anchor-state route** that the Stage-1 screen's exact-histogram matching
+removed — which is why raw per-token is strong here (0.221) while the
+screen's matched per-token was near-blind (0.468 acc vs 0.333 chance),
+and why raw window-MEAN *falls* with T (0.203 → 0.139) instead of
+rising. **The screen's "per-token-blind" premise does not survive the
+Stage-2 convention.** That is the substantive lesson: a Stage-1 screen
+run on matched rows and a Stage-2 panel run on unmatched tiles are not
+measuring the same task, and this program should not assume they are.
+
+**Scorecard (frozen predictions):** P1 FALSIFIED as a conjunction (its
+"exceeds both token archs" half holds at T = 4; the rise does not),
+P2 FALSIFIED (matched post falls, and is below pre at T = 8),
+P3 FALSIFIED (token archs land *below* the raw reference, and *above*
+every window arch at T = 16), P4 PARTIALLY CONFIRMED (TXC-pre's
+trained−untrained margin does grow +0.106 → +0.132 → +0.135 through
+T = 8 before falling — learned T-dependence without absolute rise),
+P5 FALSIFIED. The λ̂ panel's **Stacked large-T pathology recurs**
+(T = 16 trained 0.129 < untrained 0.157).
+
+**Shuffle-immunity receipt: DEGENERATE, and reported as such.** The
+12-cell receipt ran on the panel's own checkpoints, but its frozen
+criterion ("retains > half the clean window − best token arch margin")
+is undefined at the frozen cells: at T = 8 that margin is ≈ 0
+(0.195 vs 0.192) and at T = 16 it is negative. Descriptively, both
+window archs retain ~89 % of recovery under context shuffling at
+T = 8 (consistent with order-free aggregation) and 54–70 % at T = 16,
+the cells the probe-capacity caveat already flags. **No order claim
+and no immunity claim is drawn from it** — the receipt was built to
+interrogate a margin the panel did not produce.
+
+**Position floor** (pre-registered): r ≤ +0.025 at every T — the
+ambient position ramp explains nothing; that guard is clean.
+
+**What this means for the program.** The round-2 decision to accept an
+aggregation-framed win was sound as a decision; the aggregation latent
+simply does not deliver one at panel-feasible T on this substrate. The
+hedging-trend candidate is now **closed on both its faces** — the
+trend face died in round 1 (order receipt failed) and the level face
+dies here (no T-rise). Recommendation to the program: **do not spend a
+third panel on this latent.** The generalizable finding is the
+screen↔panel convention mismatch above, which applies to every future
+Stage-1 → Stage-2 promotion in this hunt.
+
+Leaderboard: 8700 rows = 8616 baseline + 84 this panel, **0 duplicate
+eval_keys, 0 null metrics**.
+
+## 2026-07-24 — runpod-e — round 2 item 2: early-layer addendum — g_order(ℓ) and g_agg(ℓ); **two blind predictions falsified, both informative**
+
+Zero new data (cached activations + frozen round-1 manifests + frozen
+`problib`); predictions and script committed at `e4caddf6` BEFORE any
+cell (cand-3 precedent). POST-HOC diagnostic: **no round-1 verdict is
+reopened.** Results `depth_addendum/results/depth.json`, figures
+`depth_addendum/figs/`, tables `RECORD_B.md` § 2. Screen-layer overlap
+cells reproduce the committed screen JSONs exactly; permutation nulls
+at the new layers sit at chance (lag4 0.2503 vs 0.25; slope8 0.345 vs
+0.333).
+
+**Replag / lag4 (3 models × 3 depths × T ∈ {4, 8}).** g_order = win −
+mean is **larger at the early layer than at the screen layer in all
+three models** (T = 4: gpt2 +0.135 > +0.070 > +0.043; gemma2-2b
++0.064 > +0.040 > +0.032; llama31-8b +0.105 > +0.083 > +0.061) — A2
+CONFIRMED — and the round-1 **scale ordering closes early** (llama's
+early g_order rivals gpt2's; A3 CONFIRMED, sharpened). A4 CONFIRMED
+(late layers at or below screen-layer values).
+
+**A1 FALSIFIED, and the falsification is the finding.** I predicted
+per-token lag4 would be LOWER early (signal built by attention).
+Instead per-token is **highest at the earliest layer in every model**
+and monotonically discarded with depth (gpt2 0.631 → 0.515 → 0.433;
+gemma 0.505 → 0.462 → 0.387; llama 0.480 → 0.430 → 0.365). This is a
+**fifth g(ℓ) shape for the atlas: present-then-discarded** — the lag
+value is maximally linearly readable near the embeddings (it is a
+property of the token identities themselves) and the model
+progressively throws it away. Contrast: backtracking `ant_kw` is
+lexical-then-converted; forbidden-word pressure is
+built-then-linearized; this one is neither built nor converted — it
+decays.
+
+**A5 REFINED into a decomposition (not a clean confirmation).** At
+T = 4 a large g_order coexists with a near-zero anchor-fixed shuffle
+drop (gpt2 hs4: +0.135 vs +0.009). Most of short-T "g_order" is
+**anchor-vs-context separation** — a flatten probe privileging the
+anchor slot over a position-symmetric mean — not context ORDER. True
+context-order signal appears only at T = 8 (drops +0.035…+0.062).
+**g_order = flatten − mean conflates the two; the anchor-fixed shuffle
+isolates the second.** Future cards in this program should read both,
+because the round-1 replag entry's "order residue" numbers are
+partly this artifact. (Scope: win − tok stays ≈ 0 at every depth, so
+the round-1 KILL holds depth-wide — this is about the order component
+and the per-token axis, not a window win.)
+
+**Slope8 / g_agg across all 17 Ward capture points × 2 readers.**
+B1 CONFIRMED: g_agg > 0 in **all 34 cells**, including the embeddings
+(+0.128 at hs0, where per-token collapses to 0.368) — aggregation is
+not a late-depth phenomenon. B2 CONFIRMED and load-bearing: **per-token
+slope8 never exceeds 0.483 at ANY depth on either reader** — no layer
+holds a per-position trend summary, so the trend is never converted and
+the Stage-2 layer choice was representative rather than lucky. (Read
+against § 1's finding, this also says the raw per-token strength in the
+Stage-2 metric comes from the unmatched sampling's ambient route, not
+from a converted trend feature.) B3 CONFIRMED (readers agree at hs0–3,
+distill pulls ahead late). **B4 FALSIFIED:** I predicted a mid-depth
+peak; the measured shape is a mid-depth **valley** (+0.033 at hs11–13)
+with maxima at the embeddings (+0.128) and late (+0.113 at hs25) — the
+hedging aggregate is strongest where the stream is closest to tokens
+and weakest at the abstract middle.
+
+**Answer to the briefing's question** (does temporal signal GROW at
+pre-conversion depths?): YES on both arms, in different senses — lag4
+signal grows monotonically toward the input (per-token most of all),
+while slope8's aggregation gap needs no depth at all and the
+generator-specific surplus grows late. Neither moves a round-1 verdict.
