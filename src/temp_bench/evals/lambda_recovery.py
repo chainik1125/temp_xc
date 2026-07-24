@@ -93,6 +93,19 @@ def _train_lambda_probe(
     z_tr, t_tr = _tile_lambda_examples(model, win_x_tr, win_l_tr, T)
     z_ev, t_ev = _tile_lambda_examples(model, win_x_ev, win_l_ev, T)
 
+    # Real-activation label grids may carry NaN where the frozen label is
+    # undefined (e.g. `ward_real_slope8_*`: the trailing window doesn't fit
+    # or spans an unjudged sentence). Drop non-finite leading-edge targets
+    # from both pools. The `.all()` guard keeps the all-finite path (every
+    # synthetic bench and the λ̂ datasources) byte-identical: no reindexing.
+    tr_m, ev_m = np.isfinite(t_tr), np.isfinite(t_ev)
+    if not tr_m.all():
+        z_tr, t_tr = z_tr[tr_m], t_tr[tr_m]
+    if not ev_m.all():
+        z_ev, t_ev = z_ev[ev_m], t_ev[ev_m]
+    if len(t_tr) < 2 or len(t_ev) < 2:
+        return {"lambda_recovery": 0.0, "lambda_r2": 0.0, "lambda_chance": 0.0}
+
     if np.std(t_tr) < 1e-9 or np.std(t_ev) < 1e-9:
         return {"lambda_recovery": 0.0, "lambda_r2": 0.0, "lambda_chance": 0.0}
 

@@ -599,3 +599,20 @@ datasources:
     notes: |
       Task-hunt candidate 1 Stage 2 — generator/R1-Distill arm, same
       layer and labels as the base arm (token-identical stream).
+
+  ward_real_slope8_distill_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_slope:ward_slope_real"
+    params:
+      model_tag: distill
+      hs: 15
+      label: slope8
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      Task-hunt round 2 (arm B) Stage 2 — hedging-trend LEVEL on the
+      generator/R1-Distill reader at resid_post L14 (hs15, the frozen
+      screen layer). Target = the committed slope8 grid (trailing-8-
+      sentence LS slope of the judged confidence state), NaN where the
+      frozen label is undefined (the probe drops non-finite leading-edge
+      targets). lambda_recovery here = held-out Pearson r vs slope8.
