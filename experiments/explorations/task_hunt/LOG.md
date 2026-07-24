@@ -502,3 +502,73 @@ reader), per the card. Ambience is a (task, MODEL) property; a
 different reader could differ, but the card's kill is on the generator
 itself and it is decisive there. SILOED from Aniket's parallel
 forbidden-word work throughout — no shared inputs.
+
+## 2026-07-24 — runpod-d — candidate 3 depth sweep (POST-HOC diagnostic) — mechanism = **CONVERSION**, and my own kill-explanation was WRONG
+
+**Status: post-hoc, does NOT reopen the frozen L12 KILL** (script +
+blind predictions committed before any cell existed; `2b3194a6`). The
+KILL stands exactly as recorded above. This answers only *why*.
+
+All 51 cells (17 capture points × 3 horizons, T = 16, same rollouts and
+same seeded rows as the frozen screen — the hs13 slice reproduces its
+0.629 at D=4 exactly). σ_null = 0.0081 (3σ = **0.0242**).
+Results `forbidden_word/results/forbidden_word_depth.json`.
+
+| hs | D=4 tok / g | D=8 tok / g | D=16 tok / g |
+|---|---|---|---|
+| 0 (emb) | **0.538** / +0.037 | 0.535 / +0.015 | 0.505 / +0.023 |
+| 5 | 0.569 / +0.024 | 0.568 / +0.004 | 0.553 / +0.019 |
+| 13 (=L12, screened) | 0.629 / −0.003 | 0.612 / −0.001 | 0.558 / −0.012 |
+| 21 (peak) | **0.668** / −0.008 | 0.609 / +0.011 | 0.540 / +0.003 |
+| 31 | 0.631 / +0.012 | 0.596 / +0.005 | 0.549 / +0.022 |
+
+**The window gap is shut at EVERY depth:** across all 51 cells only
+2/51 exceed 3σ_null and neither exceeds +0.037 — there is no layer at
+which a window reads the pressure better than a single token. The kill
+is therefore not an artifact of the frozen layer choice; it holds
+depth-wide.
+
+**The mechanism is CONVERSION, not lexical ambience — my LOG entry
+above got this wrong and the correction is the finding.** The kill entry
+attributed the tie to the model "circling" the concept, i.e. a
+bag-of-words semantic-neighbourhood leak. **The embedding layer
+falsifies that**: at hs0 a per-token probe reads only 0.538 (D=4)
+against nulls ≈ 0.50 — near-blind. A lexical property would be legible
+right there, the way backtracking's is (`conversion_depth` § 3: hs0
+window gap **+0.174**, explicitly bag-of-tokens n-gram signal). Instead
+per-token *climbs +0.13 AUC with depth* (0.538 → 0.668, peak ≈ L20)
+while the gap never opens: the model **computes** imminent-violation
+pressure across depth using cross-token information and deposits the
+result at the current position. Genuinely temporal in origin, fully
+linearized per-position by the time any probe sees it.
+
+**Blind-prediction scorecard** (committed pre-run): **D3 CONFIRMED**
+(per-token at hs0 ≪ its L12 value ⇒ attention does real work).
+**D1 and D2 FALSIFIED** — I predicted the `is_bt` shape, a large hs0
+lexical gap collapsing after one block; there was no large hs0 gap to
+collapse (+0.037 < the predicted +0.05). I wrote the prediction while
+still believing my own bag-of-words story, and the data refused it.
+
+**A fourth g(ℓ) shape for the atlas.** Alongside `conversion_depth`'s
+three (converted-by-block-1 / flat-never-converted plateau /
+mid-depth inverted-U), this label is **built-and-immediately-linearized**:
+near-blind at the embeddings, rising per-token readout with depth, and
+**no window margin at any layer**. Contrast on the same axis:
+
+| label | hs0 gap | fate with depth | window residue |
+|---|---|---|---|
+| backtracking `ant_kw` (future event) | +0.174 lexical | one block converts most | **+0.035…+0.057 forever** |
+| backtracking `is_bt` (current state) | +0.107 lexical | converts | +0.007…+0.026 (≈ closed) |
+| forbidden-word pressure | +0.037 (none) | **built** 0.538 → 0.668 | **≈ 0 at every depth** |
+
+**Design consequence.** The screening question is not "is the property
+semantically non-obvious" — forbidden-word pressure is *already*
+non-lexical and computed, and it still leaves nothing. It is **"will the
+model decline to maintain this as a per-position state?"** Backtracking
+anticipation qualifies because it is a hazard over the recent
+trajectory, not a fact the model tracks. This also predicts that a
+logical-deduction variant (e.g. "don't mention XOR") would fare no
+better and plausibly worse: a completed deduction is a canonical
+converted state. Cheap pre-screen for any future candidate: run this
+sweep first — per-token climbing while g stays shut ⇒ converted ⇒ do
+not spend a grid.
