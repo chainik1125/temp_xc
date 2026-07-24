@@ -58,7 +58,7 @@ per survivor: **the T-scaling figure** (recovery vs T, one line per
 arch — the money plot is TXC rising while T-SAE stays flat), the
 shuffle-ablation bar, and the record.
 
-## Your candidate queue (the hunt is SPLIT: you own the Ward-cache-dependent candidates; `runpod-e` owns repetition-lag + confidence-trend via `task-hunt-b.md`. runpod-b preps labels — pull its specs as they land)
+## Your candidate queue (the hunt is SPLIT: you own the Ward-cache-dependent candidates; `runpod-e` owns repetition-lag + confidence-trend via `task-hunt-b.md`. runpod-b preps labels IN PARALLEL — pull as they land, but NEVER idle on it: every label in the queue is buildable from committed machinery (λ̂ targets = stage-A events + the `backtracking/measure.py` kernel convolution; Δ labels = exact token computation), so if yours aren't landed when your caches are ready, build them yourself, commit the builder, and note the duplication in the LOG)
 
 1. **Backtracking intensity λ̂ (grounded regime 2 — top prior).**
    Latent: the local event intensity (the real parent of the synthetic

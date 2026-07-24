@@ -24,7 +24,10 @@ Deadline: results by 2026-07-26 morning PT. Fail fast.
    Latent: distance Δ to the previous occurrence of the current
    n-gram in natural text (fineweb slice; labels computed exactly from
    tokens — runpod-b is building them via `task-hunt-prep.md`, pull as
-   they land or build inline from its committed script). Provably
+   they land; if they are NOT landed when your caches are ready, write
+   the builder yourself — exact computation from tokens + the
+   shuffled-window null, committed with sanity checks — and do not
+   wait). Provably
    non-ambient (no single token knows Δ); recovery of lag-Δ structure
    needs T > Δ ⇒ **built-in threshold scaling: sweep Δ ∈ {4, 8, 16}
    and show each Δ-bucket turns on as T crosses it** — the money plot
