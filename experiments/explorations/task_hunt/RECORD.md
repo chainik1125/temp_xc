@@ -120,8 +120,27 @@ briefing's default 2…32 ladder sits mostly *below* this latent's
 support. The frozen ladder is **T ∈ {8, 16, 32, 64}** (T = 128 excluded
 — on a 128-token window only p = 127 would be eligible).
 
-**Verdict (primary layer base L12): WEAK KEEP** — full paragraph in
-[`LOG.md`](LOG.md). σ_null = 0.0035 (3σ = 0.0105). Macro-OvR AUC:
+**Verdict: KEEP — best cell distill L12; the MODEL AXIS is the
+finding.** All 64 cells complete; σ_null = 0.0046 on the full grid
+(3σ = **0.0137**). The card's claim is the contrast g_tir − g_op:
+
+| cell | T=8 | T=16 | T=32 | T=64 | clears 3σ at |
+|---|---|---|---|---|---|
+| base L12 | −0.009 | +0.008 | −0.005 | +0.019 | T=64 only |
+| base L10 | +0.004 | −0.005 | +0.012 | +0.031 | T=64 only |
+| **distill L12** | **+0.017** | **+0.020** | **+0.023** | **+0.042** | **every T** |
+| distill L10 | −0.023 | −0.013 | −0.017 | +0.017 | T=64 only |
+
+On the generator at mid-depth the contrast is positive at every T,
+monotonically rising, and clears the null throughout — run depth has
+window access the ambient anchor does not. Elsewhere it is noise until
+T = 64. This is the briefing's "non-ambience is a (task, MODEL)
+property" measured rather than assumed, and the mirror image of
+candidate 1 (where base ≈ distill held). **P5 (base ≈ distill) is
+decisively falsified; P1 and P3 also falsified.**
+
+Per-cell ladders below are the primary layer base L12 (macro-OvR AUC),
+kept because they carry the anchor lesson:
 
 | target | tok | T=8 | T=16 | T=32 | T=64 |
 |---|---|---|---|---|---|
