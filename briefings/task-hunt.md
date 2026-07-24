@@ -9,15 +9,16 @@ venue: runpod (GPU, new pod)
 
 **You are `runpod-d`** — a NEW GPU pod (`/workspace/.agent_id` =
 `runpod-d`, seeded by the user; see `agents/README.md` + your
-`agents/runpod-d/STATUS.md`). `runpod-c` is running em-redo in parallel
-and **owns all writes to the shared 700 GB volume** — if that volume is
-mounted on your pod, treat it strictly READ-ONLY (the Ward caches at
-`/workspace/conv_depth_caches/{base,distill}/` + Ward labels); write
-your own caches to your own disk. If the volume is NOT mountable here,
-rebuild what you need from the committed builders
-(`conversion_depth/build_ward_stream.py`, `cache_depth.py` — ~1 h on
-the GPU). The frozen probe stack (`conversion_depth/problib`-style
-scripts) is in the repo — reuse, do not re-derive.
+`agents/runpod-d/STATUS.md`). **The shared 700 GB volume is mounted at
+`/shared`** (conventions in `agents/README.md` — read them): the Ward
+caches are at `/shared/conv_depth_caches/{base,distill}/`; runpod-c
+(mid-em-redo) owns those trees — read-only for you. **Your writes go
+ONLY under `/shared/task_hunt_caches/d/`** (so your artifacts survive
+any repurposing). Never touch `/shared/temp_xc` or `/shared/.agent_id`.
+If the volume turns out not to be attached, rebuild from the committed
+builders (`conversion_depth/build_ward_stream.py`, `cache_depth.py` —
+~1 h). The frozen probe stack (`conversion_depth/` scripts) is in the
+repo — reuse, do not re-derive.
 
 **The goal (the one sentence):** find a real-activation task where
 **TXC recovery/detection improves systematically with window size T

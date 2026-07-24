@@ -8,8 +8,12 @@ GPU RunPod pod (H100-class), Linux at `/workspace/temp_xc`, identity
 `/workspace/.agent_id` = `runpod-e`. Role: **task-hunt arm B**
 (`briefings/task-hunt-b.md`, governed by `task-hunt.md`) —
 repetition-lag Δ across model scale (gpt2-small / gemma-2-2b base /
-Llama-3.1-8B base) + confidence trend backup. Fully volume-independent:
-do NOT mount runpod-c's volume; build own caches locally.
+Llama-3.1-8B base) + confidence trend backup. Shared 700 GB volume
+mounted at /shared (conventions in agents/README.md): read anything;
+write ONLY under /shared/task_hunt_caches/e/; never touch
+/shared/temp_xc or /shared/.agent_id; HF weights read from /shared/hf
+by copy/symlink, new downloads to LOCAL HF_HOME. Repo + venv +
+.agent_id on LOCAL /workspace.
 
 ## First session
 Setup: `.venv`, CUDA torch check, `HF_HOME` on the big disk, creds at

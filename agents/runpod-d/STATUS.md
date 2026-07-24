@@ -9,12 +9,13 @@ GPU RunPod pod (H100-class), Linux at `/workspace/temp_xc`, identity
 (`briefings/task-hunt.md`) — trace-derived candidates (backtracking-λ̂
 intensity, proof-op runs) + the backtracking shuffle receipt.
 
-## Volume rules
-runpod-c's 700 GB volume (Ward + EM caches): mount **READ-ONLY** if
-available — runpod-c owns ALL writes to it (it is mid-em-redo). Write
-your own artifacts to your own disk. If not mountable: rebuild the Ward
-stream + single-layer cache from `conversion_depth/build_ward_stream.py`
-+ `cache_depth.py` (~1 h).
+## Volume rules (shared 700 GB volume, mounted at /shared)
+Conventions in agents/README.md: read anything (Ward caches at
+/shared/conv_depth_caches/); write ONLY under
+/shared/task_hunt_caches/d/; NEVER touch /shared/temp_xc or
+/shared/.agent_id (runpod-c's live tree/identity). Repo + venv +
+.agent_id live on LOCAL /workspace. If the volume is missing: rebuild
+via conversion_depth/build_ward_stream.py + cache_depth.py (~1 h).
 
 ## First session
 Setup: `.venv`, CUDA torch check, `HF_HOME` on the big disk, creds at
