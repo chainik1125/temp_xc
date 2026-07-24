@@ -38,6 +38,23 @@ set as `core.askPass`; identity configured).
    (plugin datasource + two `configs/data.yaml` entries) committed.
 4. **Leaderboard hygiene checked**: 7121 rows, 0 dup `eval_key`s.
 
+## ACCEPTANCE GATE MET (2026-07-24) — candidate 3 is the only remainder
+
+All four gate items are done and pushed: hunt LOG with every screen
+verdict; **≥ 1 survivor through Stage 2 with the T-scaling figure**
+(candidate 1, QUALIFIED POSITIVE — `figs/stage2_tscaling.*`, verdict in
+LOG + RECORD § 3b); STATUS rewritten (this file); leaderboard hygiene
+(7117 rows, 0 dup keys, 0 nulls after the repair). Verdicts:
+- **Cand 1 (λ̂ intensity): KEEP** → Stage 2 **QUALIFIED POSITIVE**
+  (TXC-pre beats per-token/T-SAE at matched l0, rises to T=8; TXC-post
+  higher but budget-collapsed; order story negative).
+- **Cand 2 (proof-op runs): KEEP** — the model axis is the finding
+  (distill L12 clears the null at every T; base ≈ distill falsified).
+- **Shuffle receipt: POSITIVE** — the paper's backtracking anticipation
+  IS order-sensitive (+0.028…+0.041 vs +0.003…+0.013 ambient).
+- **Cand 3 (forbidden-word onset): RUNNING** (generation in the vLLM
+  venv; see below). The em-redo PAUSED note is runpod-c's, not mine.
+
 ## Two traps this session hit — read before touching the chain or the leaderboard
 
 1. **Never emit NaN into a leaderboard metric.** The Stage-2 datasource
@@ -63,22 +80,26 @@ set as `core.askPass`; identity configured).
 plus the Stage-2 pool concurrently caused CUDA OOM in both (a T=64
 flatten probe needs ≈28 GB for standardization alone). Hence:
 
-`setsid bash /workspace/logs/chain.sh` → log
-`/workspace/logs/chain.log`. Four stages, strictly serial (GPU
-serialization is mandatory — see below):
+The `chain.sh` chain finished stages 1–2 (proof-op screen exit=0,
+Stage 2 exit=0). Stages 3–4 (candidate 3) exited 1 in the chain because
+generation needs the **vLLM venv**, not `.venv` — the chain ran it under
+`.venv` (no vllm/pandas). Candidate 3 is now running standalone:
 
-1. **proof-op screen** — candidate 2 confirmatory cells; resumes
-   idempotently from `proofops/results/proofops_screen.json`
-   (was at 36/60 at last check; log `proofops_screen.log`).
-2. **Stage 2** — 84 cells, 2 workers (`run_stage2.py`,
-   log `stage2_base.log`).
-3. **candidate 3 generation** — vLLM (`fw_generate.log`).
-4. **candidate 3 cache + screen** (`fw_screen.log`).
+- **generation** — `/workspace/vllm_venv/bin/python -m
+  experiments.explorations.task_hunt.forbidden_word.generate`
+  (log `/workspace/logs/fw_generate.log`; needs `HF_HOME`, `HF_TOKEN`;
+  I `uv pip install pandas` into the vllm venv). Writes
+  `/workspace/task_hunt_labels/forbidden_word/rollouts.jsonl`.
+- **cache + screen** — `.venv/bin/python -m
+  experiments.explorations.task_hunt.forbidden_word.cache_and_screen`
+  (log `fw_screen.log`) — runs in `.venv` (torch probes), forces
+  `PreTrainedTokenizerFast` (the tokenizer trap, note below).
 
-Each stage prints `<name> exit=<code>` to `chain.log` — grep that to
-see where it is. If a stage died, re-run just that command; every
-script is idempotent (screens resume per-cell from their JSON, the
-runner caches per eval_key).
+**Check the feasibility gate FIRST** (card § "Feasibility gate"): if
+`forbidden_word_gen_stats.json` violation_rate < 30 % or < 200
+violating rollouts, the screen is under-powered — record and either
+add one more rollout/question (disclosed) or KILL as infeasible. Only
+then screen and write the verdict.
 
 ## Next actions (in order)
 1. When the proof-op screen finishes: score it against
