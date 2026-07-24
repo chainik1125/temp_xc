@@ -249,10 +249,32 @@ def _cell(arm, T, p, dens, seed, x, lam, u_bt, d_in, *, do_anchor: bool):
     return out
 
 
+def _done_key(r) -> tuple:
+    return (r["arm"], r["T"], r["p_nominal"], r["density"], r["seed"])
+
+
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--seeds", default=",".join(str(s) for s in SEEDS),
+                    help="comma-separated data seeds (one process per seed "
+                         "parallelises the ladder cleanly)")
+    ap.add_argument("--out", default="probe_truth_calib.json",
+                    help="output filename under results/ (the analysis globs "
+                         "probe_truth_calib*.json and dedupes by cell key)")
+    ap.add_argument("--resume", action="store_true",
+                    help="skip cells already present in --out")
+    a = ap.parse_args()
+    seeds = tuple(int(s) for s in a.seeds.split(","))
+
     RES.mkdir(exist_ok=True)
+    out_path = RES / a.out
     rows, t0 = [], time.time()
-    for seed in SEEDS:
+    if a.resume and out_path.exists():
+        rows = json.loads(out_path.read_text())
+        print(f"[resume] {len(rows)} cells already in {out_path.name}", flush=True)
+    done = {_done_key(r) for r in rows}
+    for seed in seeds:
         data = materialise(load_datasource(DS), seed=seed)
         x = data.x
         lam = torch.as_tensor(data.extra["lambda_labels"]).float()
@@ -275,6 +297,8 @@ def main():
                     jobs.append((arm, T, P_GATE, "k8", False))
 
         for arm, T, p, dens, anch in jobs:
+            if (arm, T, p, dens, seed) in done:
+                continue
             r = _cell(arm, T, p, dens, seed, x, lam, u_bt, d_in, do_anchor=anch)
             r["b_exact"] = b_exact
             rows.append(r)
@@ -284,9 +308,8 @@ def main():
                   f"v2={r['v2']:+.3f} p/n={g16['p_over_n']:.3f} "
                   f"rep={r.get('v1_replication_delta', float('nan')):.2e}",
                   flush=True)
-            (RES / "probe_truth_calib.json").write_text(json.dumps(rows, indent=1))
-    print(f"-> {RES/'probe_truth_calib.json'} ({len(rows)} cells, "
-          f"{time.time()-t0:.0f}s)")
+            out_path.write_text(json.dumps(rows, indent=1))
+    print(f"-> {out_path} ({len(rows)} cells, {time.time()-t0:.0f}s)")
 
 
 if __name__ == "__main__":

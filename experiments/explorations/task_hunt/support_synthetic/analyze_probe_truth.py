@@ -55,6 +55,20 @@ def _load(name: str):
     return json.loads(p.read_text()) if p.exists() else []
 
 
+def _load_calib() -> list[dict]:
+    """All `probe_truth_calib*.json` shards, deduped by cell key.
+
+    The calibration parallelises one process per data seed (each writing its
+    own shard); a resumed or overlapping shard can repeat a cell, so the last
+    write of a key wins and the count is exact either way.
+    """
+    out = {}
+    for p in sorted(RES.glob("probe_truth_calib*.json")):
+        for r in json.loads(p.read_text()):
+            out[(r["arm"], r["T"], r["p_nominal"], r["density"], r["seed"])] = r
+    return list(out.values())
+
+
 # ── trained cells: join the leaderboard grid rows to their anchors ──────────
 
 def _cell_key(r):
@@ -386,7 +400,7 @@ def _run(calib, exclude, g3):
 
 
 def main():
-    calib = _load("probe_truth_calib.json")
+    calib = _load_calib()
     g3 = gate_G3(build_cells())                 # exclusions from the full set
     cells, gates, preds, label, why = _run(
         calib, set(g3["excluded_scaled_keys"]), g3)
