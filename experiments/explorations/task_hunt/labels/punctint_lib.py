@@ -101,11 +101,13 @@ def stratified_balanced_manifest(class_of_row, strata_of_row, doc_of_row,
                                  pos_of_row, cap: int = 20_000,
                                  seed: int = 0):
     """Class-balanced probe rows WITHIN every position stratum (the
-    position-matched guard: with equal class counts per stratum,
-    position cannot separate classes on the manifest by construction).
-    Rows need class >= 0 and stratum >= 0. A per-class `cap` thins
-    every stratum by a common factor to preserve the matching.
-    Returns (doc, pos, cls)."""
+    position-matched guard). Equal class counts per stratum remove the
+    ACROSS-strata position route; a within-stratum gradient can
+    persist, so the manifest-row position AUC must still be reported
+    (it is the operative triage number, not assumed 0.5). Rows need
+    class >= 0 and stratum >= 0. A per-class `cap` thins every stratum
+    by a common factor to preserve the matching. Returns
+    (doc, pos, cls)."""
     rng = np.random.default_rng(seed)
     cls = np.asarray(class_of_row)
     strata = np.asarray(strata_of_row)
