@@ -1,9 +1,17 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-23, mid `briefings/txcpro-dissection.md` (C7 was
+**Last rewrite:** 2026-07-24, mid `briefings/txcpro-dissection.md` (C7 was
 APPROVED in round-3 review; that briefing is deleted; this is the new task).
-**State: DISSECTION GRID RUNNING** — card + build committed, contract tests
-green, 720-cell grid in flight.
+**State: POST FAMILY DONE (720/720, verdicts + skeptic complete); PRE
+EXTENSION GRID RUNNING** (CARD § 9 amendment frozen pre-build; 696
+feasible cells, 16 workers, log `…/scratchpad/dissect_pre_grid.log`).
+Post results: Gate B 9/9 ×5, untrained guard exact-0; ONE surviving
+HELPS — ctr on frequency velocity T=8 (+0.084/+0.093, skeptic no-kills);
+recipe mat-HELPS KILLED (e_metric_leak, below-chance both arms); mat
+helps nowhere, hurts 4 places. RECORD.md drafted with § 6 pre section
+PENDING (do not commit until pre analysis fills it; predictions (v)-(vii)
+unscored until then). Next: pre grid → `analyze.py pre` → skeptic if pre
+HELPS → finish RECORD → STATUS § 0 bullet → pull-rebase → push → STOP.
 
 ## Who / where
 Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am `runpod`
