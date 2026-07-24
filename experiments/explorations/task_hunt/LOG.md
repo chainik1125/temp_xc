@@ -3084,3 +3084,150 @@ the qualitative one (monotone, unsaturated, so shipped unigram numbers
 are lower bounds), not a precise "X % of the rise" per tokenizer.
 
 _Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+## 2026-07-24 — runpod-d — Stage-2 SEED TOP-UP (runpod-b's criterion): pre arm DELIVERED at n=6, tsae arm NOT AFFORDABLE — criterion still NOT met
+
+Executing runpod-b's recommendation (seeds {3,4,5} × {pre/T4, pre/T8,
+tsae/T1} = 9 trained cells; criterion frozen by b BEFORE these seeds
+existed: one-sided 95% t lower bound > 0 on the pre-vs-tsae T8 margin,
+sign-flip attainable at n ≥ 5). Runner frozen commit-then-run at
+`3d954869` — the exact cell list is in code, so this is a power top-up,
+**not "seeds until significant"**. Briefing § 1 pre-authorized it.
+
+**Delivered 6/9.** Both `txc_batchtopk_pre` cells landed for all three
+new seeds. The three `tsae/T1` cells did **not** complete.
+
+**Why — a cost asymmetry in the recommendation's implicit cost model
+(measured, not inferred).** `tsae` is a token arch → token-shuffle
+`ActivationBuffer`; `pre` is a window arch → `WindowBuffer`.
+`ActivationBuffer._refill()` does, on EVERY refill, `torch.cat` →
+`torch.randperm` gather over the whole buffer → `.clone()`. At
+`buffer_tokens = 524288` and `d_in = 4096` that is an **8.6 GB CPU-side
+buffer randomly re-gathered ~31× per cell** (occupancy crosses the 0.5
+threshold every ~256 steps at batch 1024). Measured signature: worker
+pegged at ~1.6 cores with the **GPU at 0 %**, no checkpoint, for hours.
+The pre cells finished in **190–560 s each**. First attempt (3 concurrent
+tsae) killed after **2 h 45 min** with none trained; re-run **serially**
+to test a contention hypothesis — GPU still 0 % across repeated samples,
+so it is the **buffer path, not contention**; time-boxed at 45 min and
+abandoned. The available "fix" (shrinking `buffer_tokens`) is barred: it
+changes `train_key` and would make the new seeds incomparable with the
+round-1 tsae seeds, which is the whole point.
+
+**→ for whoever retries: the 9 cells are NOT equal cost.** pre/T4 and
+pre/T8 are ~5-minute cells; tsae/T1 is a multi-hour cell — and tsae is
+also the arm carrying the larger seed variance (sd 0.045 vs pre/T8's
+0.027). Budget for that, or fix the buffer path first.
+
+**Receipts (recomputed from `results/leaderboard.jsonl`, the canonical
+artifact — NOT the per-run results JSON, which `run_pool` overwrites on
+re-run and under-reports after an interrupted rerun):**
+
+| cell | n | seeds | mean | 95 % t CI | sd |
+|---|---|---|---|---|---|
+| pre/T4 | 6 | 1,2,3,4,5,42 | 0.2279 | [0.182, 0.274] | 0.0435 |
+| pre/T8 | 6 | 1,2,3,4,5,42 | 0.2071 | [0.179, 0.235] | 0.0268 |
+| tsae/T1 | 3 | 1,2,42 | 0.1541 | [0.042, 0.266] | 0.0449 |
+
+**Criterion: still NOT met.** PAIRED (b's design, 3 shared seeds):
+diff +0.0522, one-sided 95 % LB **−0.0413**. UNPAIRED Welch with all 6
+pre seeds (legitimate — b measured the arms' seed noise as uncorrelated,
+r = −0.21 at T8, so pairing bought no variance reduction): diff +0.0530,
+one-sided 95 % LB **−0.0159**, one-sided p **0.082**, df 2.7 — closer,
+still not bounded. The binding constraint is now unambiguously **the
+T-SAE arm's n**, not TXC-pre's: carrying b's arithmetic to tsae n = 6
+(sd held) puts the Welch LB at ≈ +0.013, i.e. it would bind. The margin
+is *probably* real (all 3 paired seeds positive; point estimate stable
+at +0.052/+0.053 across both tests) but **remains formally unbounded and
+the rebuttal must still say so** (review note 2).
+
+**What the pre arm did buy:** pre/T8's CI tightened from [0.145, 0.267]
+at n = 3 to **[0.179, 0.235]** at n = 6 — the headline cell's level is
+now well pinned, entirely above the per-token SAE (0.113).
+
+**Pooling-validity audit (run BEFORE pooling — it could have silently
+corrupted the estimate).** Round-1 seeds ran at `038655fd`, new seeds at
+`3d954869`, and `src/temp_bench/evals/lambda_recovery.py` **did change
+between them** (+13 lines: drop non-finite leading-edge targets, for the
+`ward_real_slope8_*` datasources). Verified a strict no-op here:
+`ward_real_lambda_base_l12`'s λ labels are **all finite** (0 non-finite)
+so the new `.all()` guard never reindexes, and re-evaluating round-1's
+`pre/T4/s1` under CURRENT code returns **0.192438** vs stored **0.1924**.
+Pooling is valid. Disclosed anyway: at pre/T4 all three new seeds
+(0.269/0.262/0.261) sit above all three old (0.192/0.163/0.220),
+exchangeability p = 1/20 — but pre/T8 shows no such separation and the
+code path is verified identical, so this reads as the n = 3 instability
+b's receipts flagged.
+
+**Verdict: PARTIAL — reported as partial, not padded.** No further seeds
+were added to chase significance.
+
+## 2026-07-24 — runpod-d — factory candidate B1 (λ̂_sc self-correction intensity) Stage-1 screen — **KEEP (heavily qualified: a converted latent with a real aggregation gain on top)**
+
+Card `sc_lambda/CARD.md` frozen at `a541a8b6` before any cell ran;
+runpod-b's bundle consumed **unmodified** (manifests, binning, trace
+split, marker masking as shipped — verified pre-freeze: `is_marker_tok`
+sums to 0 over manifest rows, `man_pos ≥ 32`, 0 doc overlap between the
+240/60 trace split). 48 cells, 0 failures, `problib` frozen stack
+(verified untouched during the run). σ_null = **0.0066** over 48
+permutation cells (3σ = **0.0197**).
+
+**Result — real arm, all four (model, layer) cells agree:**
+
+| cell | tok | T2 | T4 | T8 | T16 | T32 |
+|---|---|---|---|---|---|---|
+| base/hs13 | 0.866 | −0.012 | +0.013 | +0.037 | +0.051 | **+0.067** |
+| base/hs11 | 0.872 | −0.005 | +0.017 | +0.038 | +0.055 | **+0.071** |
+| distill/hs13 | 0.878 | −0.025 | +0.004 | +0.026 | +0.040 | **+0.059** |
+| distill/hs11 | 0.870 | −0.025 | +0.011 | +0.035 | +0.049 | **+0.066** |
+
+(g = flatten − per-token.) g clears 3σ at T = 8 in every cell and grows
+**monotonically through T = 32** (≈10 σ there). No kill rule fires.
+
+**The decisive internal control — the gain is NOT probe capacity.** The
+window-MEAN arm has the **same 4096 dimensions as the per-token probe**,
+yet g_agg ≈ g at every T (e.g. base/hs13 T32: g +0.067, g_agg +0.073;
+distill/hs11 T32: g +0.066, g_agg +0.064). Since aggregation with
+identical dimensionality reproduces the whole gain, the extra flatten
+features are not doing the work. This matters because the Stage-2
+amendment (RECORD § 3c) just showed a probe-capacity artifact can
+manufacture T-structure — here that explanation is ruled out by design,
+not assumed. g_order ≈ 0 (−0.005…+0.010 at T ≥ 8) and shuffle_gap
++0.002…+0.008 ⇒ **shuffle-IMMUNITY**: pure order-free aggregation,
+regime 2.
+
+**The label-null control is clean.** On the within-trace event-shuffled
+labels (preserves each trace's marker rate, destroys local clustering):
+per-token 0.624–0.644 and g **negative at nearly every T** (only
+distill/hs13/T32 = +0.012, below 3σ). So the trace-ambient marker rate is
+per-token-readable at ~0.63 and carries **no window gap at all**; the
+real label's window gain is local history, not ambient rate.
+
+**Scored predictions.** P2 ✓ (the money pattern), P3 ✓ (shuffle
+immunity; the |g_order| ≤ 0.02 clause is breached only at T2 by
+distill, −0.030/−0.031 — disclosed), P4 ✓ (base ≈ distill, |Δ| ≤ 0.012).
+**P1 FALSIFIED**: I predicted per-token 0.65–0.82; it is **0.866–0.878**.
+**P5 ✓ but the test was NON-DISCRIMINATING as frozen** — I wrote it as
+"flatten beats the label-side visible-evidence line" (T8 0.525 / T16
+0.578 / T32 0.701), but per-token ALONE (0.87) already exceeds that line
+at every T, so no arm could fail it. A card flaw, disclosed: the test
+should have compared the *increment* g against what in-window marker
+count adds **beyond the current token**, not the absolute flatten AUC.
+
+**The heavy qualification (the round-1 conversion lesson, applied to my
+own KEEP).** Per-token 0.87 means this latent is **largely converted** —
+the model has linearized the trailing self-correction intensity into the
+current token, and the per-token probe alone beats the T32 visible-marker
+bound. The window is not revealing a hidden state; it is adding a real,
+monotone, order-free **increment** on top of a mostly-readable one
+(+0.067 at T32 closes about half the remaining headroom from 0.87).
+**And it is a `ward_lambda` COUSIN, not an independent second case
+study**: corr(λ̂_sc, ward λ̂_hist) = **0.473**, disclosed in the bundle
+and binding on any downstream use.
+
+**Verdict: KEEP (qualified)** — a clean, well-controlled regime-2
+aggregation result whose mechanism is nailed down (equal-dimension mean
+arm + shuffle immunity + label-null), on a latent that is already
+substantially converted, in the winner's own family. Worth a Stage-2
+panel only if mac-local wants a second regime-2 datapoint; it is not a
+new phenomenon.
