@@ -1,0 +1,70 @@
+{
+ "question": "do windows of one Ward trace land in both halves of the v1 n//2 dataset-order split?",
+ "inputs": {
+  "order_authority": "conversion_depth.build_ward_stream.build_stream (trace-order, position-order windows); both panel generators serve arr[:N] in that cache order with no reorder",
+  "labels_npz": [
+   "labels/ward_lambda.npz",
+   "labels/confidence.npz"
+  ],
+  "confidence_grid_identical": true
+ },
+ "stream": {
+  "n_windows": 4044,
+  "n_traces": 300,
+  "windows_per_trace_min_med_max": [
+   3,
+   15,
+   15
+  ],
+  "trace_contiguous": true
+ },
+ "v1_split": {
+  "rule": "sequences [0, n//2) train / [n//2, n) eval, dataset order (lambda_recovery.py::_train_lambda_probe)",
+  "split_index": 2022,
+  "straddling_traces": [
+   152
+  ],
+  "straddle_detail": {
+   "152": {
+    "train_windows": 14,
+    "eval_windows": 1,
+    "total_windows": 15
+   }
+  }
+ },
+ "v1_sampling_exposure": {
+  "note": "v1 always samples with seed=0 (train pool) / seed=1 (eval pool): lambda_recovery_metrics never forwards a seed, so every committed panel cell shares these draws",
+  "seeds": {
+   "train": 0,
+   "eval": 1
+  },
+  "nw1024": {
+   "train_draws_from_straddling_traces": 10,
+   "eval_draws_from_straddling_traces": 0,
+   "n_draws": 1024
+  },
+  "nw8192": {
+   "train_draws_from_straddling_traces": 64,
+   "eval_draws_from_straddling_traces": 2,
+   "n_draws": 8192
+  }
+ },
+ "boundary_snap": {
+  "rule": "advance split to the next trace boundary at-or-after n//2 (candidate v2 `split: trace`)",
+  "snap_index": 2023,
+  "straddling_traces_after_snap": [],
+  "nw1024": {
+   "eval_draws_from_straddling_traces": 0
+  },
+  "nw8192": {
+   "eval_draws_from_straddling_traces": 0
+  }
+ },
+ "verdict": {
+  "structural_straddle": true,
+  "committed_panel_eval_draws_leaked_nw1024": 0,
+  "v2_default_eval_draws_leaked_nw8192_half_split": 2,
+  "worst_case_delta_r_bound_nw8192": 0.000488,
+  "reading": "The stream is trace-contiguous, so the n//2 split straddles at most one trace. At the committed panel settings (nw=1024, seeds 0/1) ZERO eval draws come from a straddling trace \u2014 no committed lambda_recovery number on either panel datasource is touched by split leakage. At nw=8192 (probe-adequacy diagnostic / proposed v2 default) the half-split admits a nonzero but negligible leak; the boundary-snap trace split removes it entirely at zero cost."
+ }
+}
