@@ -1165,3 +1165,108 @@ stretch item; ledger records the design.
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
 2026-07-24._
+## 2026-07-24 — runpod-d — candidate 1 Stage 2 AMENDMENT: budget-matched TXC-post — reading (b) CONFIRMED (refined), reading (c) CONFIRMED (panel-wide probe artifact), TXC-pre remains headline
+
+Frozen card `lambda_intensity/card_stage2_postmatched.md` (commit
+07c90cfb, before any matched cell existed). Runner
+`run_stage2_postmatched.py` (per-T nominal k = 8·T = 16/32/64/128),
+separate results file `stage2_postmatched_ward_real_lambda_base_l12.json`,
+24 cells (post × T∈{2,4,8,16} × seeds{1,2,42} × {trained,untrained}),
+0 failures, canonical runner. Figures re-rendered through runpod-b's
+variance-aware renderer (matched post grafted as a separate `_matched`
+series so it never merges with round-1 post; round-1 post stays flagged
+NOT budget-matched). Probe-capacity diagnostic
+`probe_capacity.py` → `results/probe_capacity_ward_real_lambda_base_l12.json`
+(pre-registered card § 4(c); OUT of the leaderboard).
+
+**Falsifier (card § 6) PASSES — the l0 = k/T mechanism is a measured
+fact.** Every untrained matched cell realizes l0_per_token = 8.000
+(±<0.01) at every T (untrained never sets the JumpReLU threshold, so
+inference runs the exact BatchTopK budget). Trained matched cells land
+at realized l0 = 6.04/7.50/8.09/7.99 at T=2/4/8/16 — inside the
+pre-registered [5.0,8.0] band, the same range TXC-pre occupies.
+
+**Reading (b) CONFIRMED — the round-1 rise to 0.255 is not a
+matched-budget win.** Under the eval probe the post T-profile inverts
+once budget is matched: matched post (l0≈8) reads 0.185/0.202/0.144/0.137
+at T=2/4/8/16 — peaks at T4, falls to 0.137 at T16, landing in the
+TXC-pre (0.138)/Stacked (0.094) band. Round-1's monotone climb to 0.255
+happened only while its realized l0 COLLAPSED to 0.49 (≈1/16 the panel
+budget). Trained−untrained margin stays positive at every T
+(+0.084/+0.124/+0.070/+0.103), so matched post learns above init; it
+just does not rise with T. **TXC-pre (peak T8=0.206) remains the
+matched-budget headline; matched post is a second modest regime-2 arch
+tracking pre, not a distinct winner.**
+
+**Reading (c) CONFIRMED — and it reaches further than the card
+predicted: the eval's λ-probe is capacity-limited for DENSE codes, and
+that artifact scales with realized code density.** `lambda_recovery`
+fits an unregularized OLS on p=d_sae=2048 features with n=1024·(32/T)
+rows → n=2048=p at T16. Re-fitting the SAME checkpoints with more probe
+data (nw 1024→8192) and ridge lifts the held-out r, and the lift is
+monotone in nnz-per-row (eval-probe nw1024/OLS → adequate-probe
+nw8192/ridge):
+
+| cell | nnz | n@T16 | eval probe | adequate probe | lift |
+|---|---|---|---|---|---|
+| pre T16 | 125 | 2048 | 0.138 | 0.351 | **+0.213** |
+| stacked T16 | 125 | 2048 | 0.094 | 0.319 | **+0.225** |
+| post-matched T16 | 128 | 2048 | 0.137 | 0.322 | **+0.184** |
+| post-matched T8 | 65 | 4096 | 0.144 | 0.334 | +0.190 |
+| post round-1 T16 | 8 | 2048 | 0.255 | 0.286 | **+0.032** |
+| tsae T1 | 7 | 32768 | 0.154 | 0.211 | +0.057 |
+| bsae T1 | 4 | 32768 | 0.113 | 0.185 | +0.072 |
+
+At nw1024/OLS the dense T16 cells have r2_train 0.41–0.70 but r2_eval
+NEGATIVE (−1.05…−1.39): textbook overfitting at n≈p on a dense code.
+Ridge OR more data pushes r2_eval positive (+0.04…+0.12) and the r jumps
+to ~0.32–0.35. The nw1024/OLS column reproduces the leaderboard/summary
+EXACTLY (pre T16 0.1379, post round-1 T16 0.2548, stacked T16 0.0940,
+tsae T1 0.1541 — all to 1e-4), so the lift is trustworthy signal, not a
+probe leak.
+
+Two consequences:
+1. **The money-plot's T16 fall is a probe artifact, panel-wide.** Give
+   every arch a capacity-adequate probe and the fall closes: pre goes
+   0.206(T8)→0.351(T16), matched post 0.334→0.322 — flat-to-rising, not
+   falling. § 3b's "peaks rather than saturates" is a statement about
+   the PROBE, not the representation.
+2. **Reading (b)'s mechanism is refined.** The round-1 post 0.255 was
+   the ONE cell too sparse (nnz=8) to be probe-suppressed (+0.032). The
+   matched post T16 was heavily suppressed (nnz=128, +0.184). Under an
+   adequate probe matched post T16 (0.322) EXCEEDS round-1 post T16
+   (0.286): the sparse code has NO representational advantage — it
+   merely dodged the artifact. So 0.255 was not "sparsity helping
+   recovery" but "sparsity dodging the probe penalty". Neither is a win.
+
+**What this does and does not license.** It does NOT overturn the
+qualitative § 3b ordering — window > token SURVIVES and WIDENS under the
+adequate probe (pre 0.351 vs tsae 0.211 at T16). It does NOT get written
+to the leaderboard (diagnostic, out-of-band by construction). It DOES
+mean the panel's absolute levels (~0.2) and its T-shape are
+probe-dependent and cannot be read representationally as-is. **→
+orchestrator / runpod-b: METHODS decision surfaced, not taken —** should
+the canonical λ-readout adopt a capacity-adequate probe (ridge +
+n≫p windows)? The current unregularized OLS confounds code density with
+recovery, and b's variance receipts (permutation p, margins) are all
+computed on the OLS-probe numbers, so any probe change re-bases them. I
+did not re-run the panel; the leaderboard/§ 3b numbers stand unchanged
+and this is logged as a flagged confound with its receipt.
+
+**Variance honesty (b's receipts bind).** At n=3 the matched-vs-round-1
+T16 single-cell gap (0.137 vs 0.255) is NOT significant — matched T16
+95% t CI [−0.068, 0.343] overlaps round-1 T16 [0.111, 0.399]. The
+verdict rests on the falsifier-confirmed mechanism + the realized-l0
+measurement + the probe diagnostic, none of which is an n=3 estimate,
+not on that contrast. b's significant headline (TXC-pre rise T2→8,
+permutation p=0.0093) is unchanged.
+
+**Verdict: the amendment closes the one budget-confound § 3b flagged,
+and the probe diagnostic reframes it as a panel-wide probe-capacity
+effect.** § 3b's QUALIFIED POSITIVE stands; its single largest number
+(post 0.255 @ T16) is positively identified as NOT a matched win (sparse
+code dodging a dense-code probe penalty). No new positive claim; a
+confound closed and a deeper one (probe capacity) surfaced with a
+recommendation. Deliverable: `figs/stage2_tscaling.*` (+`_matched`),
+`results/stage2_summary.json`, `results/probe_capacity_*.json`, RECORD
+§ 3c.

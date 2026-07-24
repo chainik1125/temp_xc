@@ -11,8 +11,15 @@ Variance-aware renderer (upgraded by runpod-b per
       (support_stats.stats_lib.t_ci95), not ±std;
   (c) a budget-matched-only variant figure omits non-matched lines.
 
-Reads results/stage2_<ds>.json (the panel produced by run_stage2.py) and
-emits:
+Reads results/stage2_<ds>.json (the panel produced by run_stage2.py),
+PLUS — if present — results/stage2_postmatched_<ds>.json (the
+budget-matched TXC-post cells from run_stage2_postmatched.py, frozen in
+`card_stage2_postmatched.md`; runpod-d graft). The matched cells enter
+as a SEPARATE arch `txc_batchtopk_post_matched` so they can never
+silently merge with the round-1 nominal-k=8 post cells; b's CI /
+l0-range / budget_matched machinery then applies to them uniformly (they
+realize l0 ≈ 8, so they read as budget-matched and appear in BOTH
+figures, while round-1 post stays flagged NOT matched). Emits:
   figs/stage2_tscaling.{png,pdf}          — full panel, annotated
   figs/stage2_tscaling_matched.{png,pdf}  — budget-matched archs only
   results/stage2_summary.json — per (arch, T) mean/std/CI over seeds,
@@ -47,7 +54,8 @@ ARCH_STYLE = {
     "tsae": ("#8c564b", "v-", "T-SAE"),
     "stacked_batchtopk": ("#2ca02c", "^-", "Stacked"),
     "txc_batchtopk_pre": ("#ff7f0e", "s-", "TXC-pre"),
-    "txc_batchtopk_post": ("#1f77b4", "D-", "TXC-post"),
+    "txc_batchtopk_post": ("#1f77b4", "D--", "TXC-post (k=8/window, NOT matched)"),
+    "txc_batchtopk_post_matched": ("#17becf", "D-", "TXC-post (matched, k=8·T)"),
 }
 METRIC = "lambda_recovery"
 
@@ -58,7 +66,13 @@ def build_summary(rows):
     untrained = defaultdict(list)
     chance = defaultdict(list)
     l0 = defaultdict(list)
-    k_pos = max((r.get("k_pos", 8) for r in ok), default=8)
+    # The budget-matched reference is the round-1 panel's per-TOKEN nominal
+    # (k_pos = 8). The grafted matched-post cells carry a per-WINDOW nominal
+    # k = 8·T (up to 128); excluding them here keeps b's `>= k_pos/2` flag
+    # anchored on the panel's per-token budget instead of being inflated to
+    # k_pos/2 = 64 (which would falsely flag every arch as NOT matched).
+    k_pos = max((r.get("k_pos", 8) for r in ok
+                 if not str(r.get("arch", "")).endswith("_matched")), default=8)
     for r in ok:
         key = (r["arch"], r["T"])
         m = r["metrics"]
@@ -160,7 +174,18 @@ def draw(ax, trained, untrained, l0, matched, l0_range, matched_only):
 def main():
     ds = sys.argv[1] if len(sys.argv) > 1 else "ward_real_lambda_base_l12"
     rows = json.loads((RES / f"stage2_{ds}.json").read_text())
+    # Graft the budget-matched TXC-post cells (separate file) as a distinct
+    # arch, so b's CI / l0-range / budget_matched machinery applies to them
+    # uniformly (card_stage2_postmatched.md § 3/§ 5).
+    n_matched = 0
+    matched_path = RES / f"stage2_postmatched_{ds}.json"
+    if matched_path.exists():
+        mrows = [{**r, "arch": f"{r['arch']}_matched"}
+                 for r in json.loads(matched_path.read_text())]
+        n_matched = sum(1 for r in mrows if r.get("ok"))
+        rows = rows + mrows
     summary, trained, untrained, l0, matched, l0_range = build_summary(rows)
+    summary["n_cells_postmatched"] = n_matched
     summary["datasource"] = ds
     RES.mkdir(exist_ok=True)
     (RES / "stage2_summary.json").write_text(json.dumps(summary, indent=2))

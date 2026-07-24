@@ -309,6 +309,96 @@ where a window architecture earns a bounded advantage over per-token
 decoding — not the unbounded rising-vs-flat separation the strongest
 form of the hunt would want.
 
+> **Note (added in § 3c):** the "peaks rather than saturates" clause and
+> the ~0.2 absolute band are now known to be **probe-capacity dependent**
+> — the § 4 λ-readout (unregularized OLS, p=2048) suppresses dense window
+> codes at high T. § 3b's numbers are the leaderboard-canonical readout
+> and are unchanged, but their *T-shape* is a probe statement, not a
+> representational one. See § 3c.
+
+---
+
+## § 3c — Candidate 1 Stage 2 amendment: **budget-matched TXC-post** + probe-capacity diagnostic — **confound closed, deeper one surfaced**
+
+Round-2 assignment (`briefings/task-hunt-r2-d.md`). Fixes the one
+budget-confound § 3b flagged: round-1 ran the whole panel at nominal
+k_pos=8, but `txc_batchtopk_post` spends that budget per WINDOW, so its
+realized l0_per_token = k/T collapsed 3.4→0.49 across the T ladder while
+the rest of the panel spent 4.5–7.9. Frozen amendment card
+`lambda_intensity/card_stage2_postmatched.md` (commit 07c90cfb, before
+any matched cell existed) raised post's nominal k to **8·T** (16/32/64/128
+at T=2/4/8/16), targeting realized l0≈8 at every T. Separate results file
+so matched cells never mix with the round-1 nominal-k=8 cells. 24 cells
+(post × T∈{2,4,8,16} × seeds{1,2,42} × {trained,untrained}), 0 failures,
+canonical runner.
+
+**Falsifier (card § 6) passed:** every untrained matched cell realizes
+l0_per_token = 8.000 (±<0.01) at every T — the l0=k/T mechanism is a
+measured fact, not an assumption. Trained matched cells: realized l0 =
+6.0/7.5/8.1/8.0 at T=2/4/8/16 (in-band).
+
+**Result — matched vs round-1 (mean over 3 seeds, eval probe):**
+
+| T | round-1 post (l0) | matched post (l0) | TXC-pre |
+|---|---|---|---|
+| 2 | 0.130 (3.4) | 0.185 ± 0.031 (6.0) | 0.132 |
+| 4 | 0.161 (1.6) | 0.202 ± 0.031 (7.5) | 0.192 |
+| 8 | 0.185 (0.9) | 0.144 ± 0.039 (8.1) | 0.206 |
+| 16 | **0.255** (0.49) | **0.137 ± 0.068 (8.0)** | 0.138 |
+
+Reading (b) of the card **CONFIRMED**: hold the code rate at ~8 and the
+round-1 monotone rise to 0.255 disappears — matched post peaks at T4 and
+falls to 0.137 at T16, into the pre/stacked band. The rise was
+sparsity-starvation; **TXC-pre (peak T8=0.206) remains the matched-budget
+headline**, with matched post a second modest regime-2 arch tracking it.
+Trained−untrained margin stays positive at every T (+0.08…+0.12), so the
+arch learns above init but does not rise with T.
+
+**Probe-capacity diagnostic (card § 4(c), pre-registered, OUT of the
+leaderboard).** `lambda_recovery` fits unregularized OLS on p=2048
+features with n=1024·(32/T) rows → n=2048=p at T16. Re-fitting the SAME
+checkpoints with more probe data (nw 1024→8192) and ridge lifts held-out
+r, and **the lift is monotone in code density** (nnz-per-row):
+
+| cell | nnz | eval probe | adequate probe | lift |
+|---|---|---|---|---|
+| pre T16 | 125 | 0.138 | 0.351 | +0.213 |
+| stacked T16 | 125 | 0.094 | 0.319 | +0.225 |
+| post-matched T16 | 128 | 0.137 | 0.322 | +0.184 |
+| post round-1 T16 | 8 | 0.255 | 0.286 | +0.032 |
+| tsae T1 | 7 | 0.154 | 0.211 | +0.057 |
+
+At nw1024/OLS the dense T16 cells overfit (r2_train 0.4–0.7, r2_eval
+NEGATIVE); ridge/more-data pushes r2_eval positive and r to ~0.32–0.35.
+The nw1024/OLS column reproduces the leaderboard EXACTLY (to 1e-4), so
+the lift is trustworthy. Two consequences:
+
+1. **The money-plot's T16 fall is a probe artifact, panel-wide.** Under
+   a capacity-adequate probe the fall closes (pre 0.206→0.351 T8→T16;
+   matched post flat 0.33). § 3b's peak/fall shape is a probe statement.
+2. **Reading (b) refined:** round-1 post 0.255 was the ONE cell too
+   sparse (nnz=8) to be probe-suppressed (+0.032). Under an adequate
+   probe matched post T16 (0.322) EXCEEDS round-1 post T16 (0.286) — the
+   sparse code has no representational advantage; it dodged the artifact.
+
+**What survives / what is flagged.** The qualitative § 3b ordering
+(window > token) SURVIVES and WIDENS under the adequate probe (pre 0.351
+vs tsae 0.211 at T16). The diagnostic does NOT touch the leaderboard or
+§ 3b's canonical numbers. It DOES show the panel's absolute levels and
+T-shape are probe-dependent → **surfaced to orchestrator / runpod-b as a
+METHODS decision (not taken): adopt a capacity-adequate λ-probe?** b's
+variance receipts are computed on the OLS-probe numbers, so any probe
+change re-bases them. The confound is logged with its receipt; nothing
+re-run unilaterally.
+
+**Variance honesty.** At n=3 the matched-vs-round-1 T16 single-cell gap
+(0.137 vs 0.255) is NOT significant (CIs [−0.068,0.343] vs [0.111,0.399]
+overlap); the verdict rests on the falsifier mechanism + realized-l0 +
+the probe diagnostic, none an n=3 estimate. Deliverable:
+`figs/stage2_tscaling.*` (+`_matched` variant), `stage2_summary.json`,
+`results/probe_capacity_ward_real_lambda_base_l12.json`, LOG entry
+2026-07-24.
+
 ---
 
 ## § 4 — Methods notes (things that cost time; recorded for the next agent)
