@@ -1,88 +1,77 @@
 # Working state — agent `mac-local`
 
-**Last rewrite:** 2026-07-23 (post round-3 review).
+**Last rewrite:** 2026-07-24 (pre-compact, rebuttal week). Read with
+`private/rebuttal_plan.md` (untracked — the reviewer-mapped plan) and
+`private/transcripts/transcript-2026-07-24.txt` (team meeting).
 
 ## Who / where
-Local CC on the Mac at `~/research/projects/temp_xc`. Role: prototyping,
-review, orchestration. Three runpod agents, ALL IDLE (no active
-briefings): `runpod` (PhenBench, 32C), `runpod-b` (FreqBench, 32C),
-`runpod-c` (H100, 700 GB volume — holds the preserved Ward 144 GB + EM
-36 GB caches; only IT can see them).
+Local CC on the Mac at `~/research/projects/temp_xc`, branch `arxiv`.
+Role: orchestration + review. NEVER commit/quote `private/` content
+(NeurIPS reviews, transcripts, rebuttal plan) into tracked files.
 
-## Git
-Branch `arxiv`; tip = the round-3 review commit (clean, pushed).
+## THE SITUATION (rebuttal week)
+NeurIPS reviews 2026-07-23: **5 / 4 / 1**; R3 (Strong Reject, conf 4)
+is the swing target; **rebuttal deadline 2026-07-27**; team check-in
+**Sunday 2026-07-26 10:00 PT** — all agent work must be reviewed by me
+before it. Team meeting outcomes (07-24): highest-value = a task with
+systematic window-size improvement; Aniket owns backtracking +
+forbidden-word + paper latex; EM stays a negative in the paper;
+shuffle-degradation receipts wanted; fail fast, selection over depth;
+no PDF updates allowed — only new results typed into responses.
 
-## ✅ Last completed: ROUND-3 REVIEW (2026-07-23) — all three APPROVED
+## FIVE AGENTS LIVE (all 700 GB independent volumes on GPU pods; no cross-mounts)
+1. **runpod-c** (H100): `briefings/em-redo.md` — REINSTATED to
+   completion (Han). Phase A = panel at L9/L13/L15 on the EM organism,
+   both currencies (probe + Wang PR-AUC port); prereg frozen + committed
+   pre-run. Win ⇒ typeable rebuttal result; loss ⇒ third
+   weak-realization datum (archival). Phase B (onset gate) stretch.
+2. **runpod-d** (H100, new): `briefings/task-hunt.md` — hunt arm A:
+   backtracking-λ̂ intensity (top prior; labels via runpod-b + Ward
+   rebuild from committed builders ~1 h) + proof-op runs + the
+   backtracking shuffle receipt. Screens both reader models.
+3. **runpod-e** (H100, new): `briefings/task-hunt-b.md` — hunt arm B:
+   repetition-lag Δ across model scale (gpt2 / gemma-2b-base /
+   llama-8b-base; frozen prior: unconverted gap LARGER in smaller
+   models — induction conversion) + confidence-trend backup.
+4. **runpod-b** (32C): `briefings/task-hunt-prep.md` — labels: exact
+   Δ labels + Hawkes λ̂ targets first (~6 h, d/e block on them), then
+   proof-op clock-bridge + mini-cards.
+5. **runpod** (32C): `briefings/txcpro-dissection.md` — TXC-post ×
+   {plain, +matryoshka, +contrastive, +both} on the 5-bench synthetic
+   discriminating set (probing is NOT a venue — noise floor;
+   hill-climbed-on-noise provenance in the briefing).
 
-- **C7 close** — reasoning int/eq NEGATIVE at corpus resolution; prize
-  half-claimed by design (text ✓ / reasoning ✗-at-resolution); LAST
-  estimator cycle honored; reopening = data lever (more/longer traces).
-- **FB-5 permuted_tones** — POSITIVE (weak realization), ALIGNMENT fork:
-  spectral is quantitatively the envelope reader; power leg qualifier
-  adopted into README ("…when power concentrates in few DCT bands").
-  My literal T=8 k=2 bet FAILED (scored against me in the record §5);
-  mechanism clause held precisely. Cleanest process cycle yet (zero
-  amendments, first-run gates).
-- **Conversion-depth** — audit items 2/3/5 ANSWERED (§ Resolution in
-  `docs/substrate_audit_2026-07.md`): §5.2 = reader-predictability
-  (base ≈ generator; late-layer ≤+0.02 margin = follow-up); §5.1
-  harmless; **EM negative depth-confounded** (inverted-U, peak +0.13,
-  g_order +0.11 at L13). My P3 prior falsified too. Idea doc updated
-  (three g(ℓ) shapes). Camera-ready actions in RECORD § 7.
-- Hygiene: 0 dup keys / 7,116 rows; 179 tests green; spends $11.01
-  expansion / $1.63 freqbench cumulative. All briefings deleted.
+**Hunt protocol** (in task-hunt.md, governs both arms): two-stage
+fail-fast — frozen mini-card → Stage-1 raw-probe screen (per-token vs
+window vs shuffled at T ∈ {2..32}, g_agg/g_order, PER MODEL — non-
+ambience is a (task, model) property) → kill or Stage-2 panel
+head-to-head (best cell only) → the money plot: TXC rising with T,
+T-SAE flat. Shared log `experiments/explorations/task_hunt/LOG.md`.
+Strategy: T-SAE is per-token-decoded ⇒ regime-2 latents
+(rates/intensities/trends) already separate TXC from T-SAE.
+Excluded: forbidden-word (Aniket), bracket state-tracking (dead end).
 
-## 🚨 PHASE SHIFT (2026-07-23): NeurIPS reviews OUT — rebuttal mode
-
-Scores 5/4/1; deadline **2026-07-27**. Review copies + the full
-reviewer-mapped battle plan live ONLY in `private/neurips_reviews/` +
-`private/rebuttal_plan.md` (gitignored — NEVER commit; tracked files
-stay review-content-free). Han's three standing directives: (1) synth
-revamp (the why-story), (2) real-world case-study redo with
-TXC-appropriate evals (PRIORITY, > (1)), (3) TXC-pro loss dissection.
-**Scope (Han, 2026-07-23): backtracking multi-seed + paper latex are
-the human team's — agents run ONLY the three directives.** **RE-PLAN 2026-07-24 v2** (post team meeting — transcript in
-`private/transcripts/transcript-2026-07-24.txt`; plan in
-`private/rebuttal_plan.md`; Han: time > compute cost): synthetic
-generation PAUSED; **priority = THE TASK HUNT** (TXC > T-SAE with
-T-scaling on a real task). FIVE agents live:
-- `runpod-c` (H100 + volume): **em-redo REINSTATED to completion**
-  (Han's call; win = reportable result, loss = archival datum). Owns
-  all volume WRITES.
-- `runpod-d` (NEW GPU): hunt arm A — λ̂ intensity + proof-op runs +
-  backtracking shuffle receipt (`task-hunt.md`); volume read-only or
-  rebuild. Screens BOTH cached reader models (free).
-- `runpod-e` (NEW GPU): hunt arm B — repetition-lag Δ **across model
-  scale** (gpt2/gemma-2b-base/llama-8b-base; induction-conversion
-  prior: gap larger in smaller models) + confidence trend
-  (`task-hunt-b.md`). Volume-independent.
-- `runpod-b`: label prep (`task-hunt-prep.md`, feeds d+e).
-- `runpod`: txcpro-dissection unchanged.
-Model axis = Stage-1 SCREEN only; Stage 2 = best (task, model) cell.
-Avoid: backtracking detection / forbidden-word (team-owned), bracket
-state-tracking (dead end). Team check-in Sun 2026-07-26 10am PT —
-review everything before it. Rebuttal deadline 07-27.
-
-## ⏭ (pre-review fork — parked)
-
-(a) **TXC-tracking session on runpod-c** (must run there — caches on its
-    volume): train dictionaries per layer on Ward + EM caches; test
-    "trained-TXC advantage tracks g(ℓ)"; EM g_order slice (+0.11 at
-    L13) = the strongest candidate for a grounded position-aware win.
-    Predictions pre-written in conversion_depth RECORD § 6.6.
-(b) **Camera-ready / rebuttal edits** — §5.2 reader-predictability
-    reframe; §5.3 scope-narrowing (+ the positive spin: window headroom
-    at the right layer is REAL); §5.1 stated-choice line. NeurIPS
-    reviews may already be out.
-(c) New-data lever for the reasoning cell (more/longer traces).
-(d) Next FreqBench axis point — axis-3 localization is the one
-    uninstrumented axis (burst/wavelet vs stationary).
+## ⏭ NEXT ACTIONS (mine)
+1. **Review the plan going forward with Han** (he asked, post-compact).
+2. Review agent sessions as they stop (gate-integrity first, as
+   always): expected order runpod-b (labels, ~6 h) → hunt screens →
+   dissection → em-redo → Stage-2 results. All before Sunday 10 PT.
+3. After reviews: distill rebuttal inputs for the team into
+   `private/rebuttal_plan.md` (reviewer-facing text stays private).
+4. STORY.md (+ §7 T-taxonomy) is DONE/APPROVED — feed to Dmitry's
+   synthetic synthesis (his additions: polynomial clock, Reed-Solomon,
+   denoising).
 
 ## Standing context
-- Ambience principle + subtype rule (phase leg T-conditional; power leg
-  alignment-qualified): README coordinates; memory
-  `project-ambience-principle`.
-- Trackers: BENCHMARKS.md (11 live + § B aborts) · expansion/LEDGER.md
-  (CLOSED through C7) · REPORT.md 96/96 · freqbench/PORT.md § G–J ·
-  `docs/substrate_audit_2026-07.md` (RESOLVED) ·
-  `conversion_depth/RECORD.md`.
+- Program mode: synthetic generation PAUSED (consolidation only);
+  research STATUS §0 top bullet = current. Trackers: BENCHMARKS.md ·
+  REPORT.md 96/96 · STORY.md · freqbench/PORT.md §G–J ·
+  `docs/substrate_audit_2026-07.md` · `conversion_depth/RECORD.md`.
+- Key science now in rules: ambience principle (+ paper-ready
+  definition given to Han in-conversation), regime table, order-2
+  subtype rule (T-conditional phase leg; alignment-qualified power
+  leg), T-scaling taxonomy (STORY §7), three g(ℓ) shapes.
+- Memory files current (`project-txc-paper-context` has reviews/
+  directives state; `project-ambience-principle` has depth results +
+  the paper-vs-internal EM attribution correction).
+- Git: clean, pushed @ `a9c3eec1`.
