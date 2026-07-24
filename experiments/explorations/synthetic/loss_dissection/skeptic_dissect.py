@@ -9,7 +9,10 @@ program-wide ``expansion/results/spend.json``; session cap $5 enforced
 here. Committed before first execution.
 
     export ANTHROPIC_API_KEY=$(cat /workspace/.tokens/anthropic_key)
-    .venv/bin/python -m experiments.explorations.synthetic.loss_dissection.skeptic_dissect
+    .venv/bin/python -m experiments.explorations.synthetic.loss_dissection.skeptic_dissect [post|pre]
+
+Optional family arg (default post) targets the CARD § 9 pre-extension
+table; policy identical, $5 session cap shared.
 """
 
 from __future__ import annotations
@@ -48,12 +51,12 @@ capability-vs-recovery conflation (a capability gain marketed as recovery)?
 Also include "overall": {"survives": bool, "summary": str}. JSON only."""
 
 
-def _absolute_levels(bench: str, arch: str, metric: str) -> dict:
+def _absolute_levels(bench: str, arch: str, metric: str, suffix: str) -> dict:
     """Per-cell absolute metric values (mean + per-seed) for one arm — gives
     the skeptic the [chance=0, oracle=1] context the deltas alone hide (e.g.
     an arm that is 'less below chance' is not extracting anything)."""
     rows = json.loads((HERE / "results" /
-                       f"{bench}_dissect_grid_results.json").read_text())
+                       f"{bench}_dissect{suffix}_grid_results.json").read_text())
     out = {}
     for r in rows:
         if r.get("ok") and r.get("kind") == "trained" and r["arch"] == arch:
@@ -86,7 +89,11 @@ def skeptic_claim(judge: Judge, claim_name: str, card_md: str, summary: dict) ->
 
 
 def main():
-    table = json.loads((HERE / "results" / "dissection_table.json").read_text())
+    family = sys.argv[1] if len(sys.argv) > 1 else "post"
+    assert family in ("post", "pre")
+    suffix = "" if family == "post" else "_pre"
+    table = json.loads(
+        (HERE / "results" / f"dissection_table{suffix}.json").read_text())
     card = (HERE / "CARD.md").read_text()
     claims = []
     for bench, verdicts in table["verdicts"].items():
@@ -102,7 +109,7 @@ def main():
     start = meter.spent
     judge = Judge(meter)
     for bench, comp, metric in claims:
-        name = f"dissect-{bench}-{comp}-{metric}"
+        name = f"dissect{suffix}-{bench}-{comp}-{metric}"
         raw = HERE / "records" / name / "skeptic_raw.txt"
         if raw.exists():
             print(f"[skeptic-dissect] {name}: raw verdict exists — never "
@@ -120,8 +127,10 @@ def main():
                 "note": ("metric is normalized [chance=0, oracle=1]; judge "
                          "whether the variant EXTRACTS the latent or is "
                          "merely less-below-chance"),
-                "plain": _absolute_levels(bench, "txc_post_plain", metric),
-                comp: _absolute_levels(bench, f"txc_post_{comp}", metric),
+                "plain": _absolute_levels(bench, f"txc_{family}_plain",
+                                          metric, suffix),
+                comp: _absolute_levels(bench, f"txc_{family}_{comp}",
+                                       metric, suffix),
             },
             "gate_b": table["gate_b"][bench],
             "untrained_guard": table["untrained_guard"][bench],

@@ -36,7 +36,7 @@ from __future__ import annotations
 import torch
 import torch.nn.functional as F
 
-from temp_bench.archs.txc_batchtopk import TXCBatchTopKPost
+from temp_bench.archs.txc_batchtopk import TXCBatchTopKPost, TXCBatchTopKPre
 
 
 def _info_nce(z_a: torch.Tensor, z_b: torch.Tensor) -> torch.Tensor:
@@ -217,3 +217,20 @@ class TXCPostDissect(TXCBatchTopKPost):
             "dead": torch.tensor(float(n_dead)),
             "threshold": self.threshold.detach().clone(),
         }
+
+
+class TXCPreDissect(TXCPostDissect):
+    """Pre-squash dissection variants (CARD § 9 amendment).
+
+    The pre/post distinction lives ENTIRELY in the two squash hooks
+    (`_TXCBatchTopKBase` contract), so this class overrides only those —
+    assigned from ``TXCBatchTopKPre`` — and inherits the slicing, loss
+    assembly, matryoshka, and InfoNCE machinery unchanged (no copy-paste
+    to diverge). BatchTopK therefore pools per-position pre-acts over
+    ``B·T`` at budget k_pos/token (the pooled family: ``d_sae ≥ k_pos·T``).
+    """
+
+    _registry_name = "txc_pre_dissect"
+
+    _compute_post = TXCBatchTopKPre._compute_post
+    _to_shared = TXCBatchTopKPre._to_shared

@@ -200,6 +200,74 @@ archs:
       +Both: exactly the mat + ctr terms added together (compositional by
       construction; interaction I = D_both - D_mat - D_ctr is descriptive).
 
+  # ── pre-backbone extension (CARD § 9 amendment): same four variants on
+  # TXCBatchTopKPre's squash hooks; pooled family (d_sae >= k_pos*T). ──
+
+  txc_pre_plain:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension baseline: sequence-fed twin of txc_batchtopk_pre.
+
+  txc_pre_mat:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension +matryoshka (H=8 nested prefixes, CARD § 2 spec).
+
+  txc_pre_ctr:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension +contrastive (InfoNCE shifts {1,2}, w=1/(1+d)) —
+      carries prediction (v): the additive decode cannot exploit it.
+
+  txc_pre_both:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension +both.
+
   spectral_txc:
     class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
     arch_version: "1.0.0"

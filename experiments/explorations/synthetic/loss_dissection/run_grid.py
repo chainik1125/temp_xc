@@ -7,7 +7,10 @@ set, canonical slice: d_sae=F, T∈{2,4,8}, k_pos∈{1,2,4}, seeds {1,2,42}
 720 total. Anchor (txc_batchtopk_post) rows are NOT re-run — they are
 read from the canonical leaderboard (135/135 verified present at freeze).
 
-    .venv/bin/python -m experiments.explorations.synthetic.loss_dissection.run_grid [max_workers] [bench ...]
+    .venv/bin/python -m experiments.explorations.synthetic.loss_dissection.run_grid [max_workers] [--pre] [bench ...]
+
+``--pre`` runs the CARD § 9 amendment family (txc_pre_*; pooled dict
+constraint drops (T=8, k_pos=4) at F=20 — logged, not silent).
 """
 
 from __future__ import annotations
@@ -19,12 +22,12 @@ from explorations.synthetic import design, grid
 
 HERE = Path(__file__).resolve().parent
 
-DISSECT_ARCHS = (
-    ("txc_post_plain", "post"),
-    ("txc_post_mat", "post"),
-    ("txc_post_ctr", "post"),
-    ("txc_post_both", "post"),
-)
+FAMILIES = {
+    "post": tuple((f"txc_post_{v}", "post")
+                  for v in ("plain", "mat", "ctr", "both")),
+    "pre": tuple((f"txc_pre_{v}", "pre")
+                 for v in ("plain", "mat", "ctr", "both")),
+}
 K_POS_SLICE = (1, 2, 4)
 
 # (bench, datasource, F, n_steps, primary metric) — CARD § 4.
@@ -38,9 +41,9 @@ BENCHES = (
 )
 
 
-def _cells(ds: str, F: int, n_steps: int):
+def _cells(ds: str, F: int, n_steps: int, family: str):
     return design.uniform_cells(
-        ds, F, n_steps, archs=DISSECT_ARCHS, k_pos_sweep=K_POS_SLICE,
+        ds, F, n_steps, archs=FAMILIES[family], k_pos_sweep=K_POS_SLICE,
         d_saes=[F], log=print,
     )
 
@@ -55,15 +58,19 @@ def _describe(primary):
 
 
 def main():
-    max_workers = int(sys.argv[1]) if len(sys.argv) > 1 else 24
-    only = set(sys.argv[2:])
+    args = sys.argv[1:]
+    family = "pre" if "--pre" in args else "post"
+    args = [a for a in args if a != "--pre"]
+    max_workers = int(args[0]) if args else 24
+    only = set(args[1:])
+    suffix = "" if family == "post" else "_pre"
     for bench, ds, F, n_steps, primary in BENCHES:
         if only and bench not in only:
             continue
-        out = HERE / "results" / f"{bench}_dissect_grid_results.json"
-        cells = _cells(ds, F, n_steps)
+        out = HERE / "results" / f"{bench}_dissect{suffix}_grid_results.json"
+        cells = _cells(ds, F, n_steps, family)
         grid.run_pool(cells, out, max_workers=max_workers,
-                      describe=_describe(primary), tag=f"dissect:{bench}")
+                      describe=_describe(primary), tag=f"dissect{suffix}:{bench}")
 
 
 if __name__ == "__main__":

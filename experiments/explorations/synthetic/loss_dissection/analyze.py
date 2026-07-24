@@ -37,10 +37,24 @@ LEADERBOARD = HERE.parents[3] / "results" / "leaderboard.jsonl"
 DELTA_FLOOR = {"default": 0.05, "nmse": 0.02}
 LOWER_BETTER = {"nmse"}
 COMPONENTS = ("mat", "ctr", "both")
-VARIANT = {c: f"txc_post_{c}" for c in COMPONENTS}
-PLAIN = "txc_post_plain"
-ANCHOR = "txc_batchtopk_post"
 TS, KS, SEEDS = (2, 4, 8), (1, 2, 4), (1, 2, 42)
+
+# family switch (CARD § 9 amendment): argv[1] in {post, pre}, default post.
+FAMILY = "post"
+VARIANT = {c: f"txc_{FAMILY}_{c}" for c in COMPONENTS}
+PLAIN = f"txc_{FAMILY}_plain"
+ANCHOR = f"txc_batchtopk_{FAMILY}"
+SUFFIX = ""
+
+
+def set_family(family: str) -> None:
+    global FAMILY, VARIANT, PLAIN, ANCHOR, SUFFIX
+    assert family in ("post", "pre")
+    FAMILY = family
+    VARIANT = {c: f"txc_{family}_{c}" for c in COMPONENTS}
+    PLAIN = f"txc_{family}_plain"
+    ANCHOR = f"txc_batchtopk_{family}"
+    SUFFIX = "" if family == "post" else "_pre"
 
 # bench -> (datasource, primary, [reported metrics])
 BENCHES = {
@@ -61,7 +75,7 @@ RECOVERY_METRICS = {m for _, _, ms in BENCHES.values() for m in ms} - {"nmse", "
 
 
 def _load_dissect(bench):
-    p = HERE / "results" / f"{bench}_dissect_grid_results.json"
+    p = HERE / "results" / f"{bench}_dissect{SUFFIX}_grid_results.json"
     rows = json.loads(p.read_text())
     bad = [r for r in rows if not r.get("ok")]
     return rows, bad
@@ -165,9 +179,13 @@ def analyze():
                 gb_cells.append({"T": T, "k_pos": k, "plain_mean": sum(pv) / 3,
                                  "anchor_mean": sum(av) / 3, "abs_diff": diff,
                                  "tol": tol, "ok": ok})
-        gate_b_ok = gb_pass >= 7
+        # ok iff <=2 evaluable cells exceed tolerance (== >=7/9 when all 9
+        # slice cells are dict-feasible; the pre family loses (T=8,k=4) at
+        # F=20 — CARD § 9: thresholds counted over PRESENT cells).
+        n_eval = sum(1 for c in gb_cells if c.get("status") != "missing")
+        gate_b_ok = (n_eval - gb_pass) <= 2 and n_eval > 0
         report["gate_b"][bench] = {"ok": gate_b_ok, "pass_cells": gb_pass,
-                                   "cells": gb_cells}
+                                   "n_evaluable": n_eval, "cells": gb_cells}
 
         # ── component effects ──
         bench_out = {}
@@ -229,11 +247,12 @@ def analyze():
         report["verdicts"][bench] = {
             key: v["verdict"] for key, v in bench_out.items()}
 
-    out_json = HERE / "results" / "dissection_table.json"
+    out_json = HERE / "results" / f"dissection_table{SUFFIX}.json"
     out_json.write_text(json.dumps(report, indent=1, default=float))
 
     # ── markdown component table ──
-    lines = ["# Loss-dissection component table (mechanical, CARD § 5)", ""]
+    lines = [f"# Loss-dissection component table — {FAMILY} family "
+             "(mechanical, CARD § 5" + (" + § 9)" if SUFFIX else ")"), ""]
     lines.append("| bench | metric | +matryoshka | +contrastive | +both |")
     lines.append("|---|---|---|---|---|")
     for bench, (_, primary, metrics) in BENCHES.items():
@@ -253,13 +272,17 @@ def analyze():
         gb = report["gate_b"][bench]
         ug = report["untrained_guard"][bench]
         lines.append(f"- {bench}: Gate B {'PASS' if gb['ok'] else 'FAIL'} "
-                     f"({gb['pass_cells']}/9 cells); untrained guard "
-                     f"{'PASS' if ug['ok'] else 'FAIL'} "
+                     f"({gb['pass_cells']}/{gb.get('n_evaluable', 9)} cells); "
+                     f"untrained guard {'PASS' if ug['ok'] else 'FAIL'} "
                      f"(max |diff| {ug['max_abs_diff']:.2e})")
-    (HERE / "results" / "dissection_table.md").write_text("\n".join(lines) + "\n")
+    (HERE / "results" / f"dissection_table{SUFFIX}.md").write_text(
+        "\n".join(lines) + "\n")
     print("\n".join(lines))
     return report
 
 
 if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1:
+        set_family(sys.argv[1])
     analyze()

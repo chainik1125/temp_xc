@@ -9,8 +9,9 @@ import math
 import pytest
 import torch
 
-from temp_bench.archs.txc_batchtopk import TXCBatchTopKPost
-from temp_bench.archs.txc_post_dissect import TXCPostDissect, _info_nce
+from temp_bench.archs.txc_batchtopk import TXCBatchTopKPost, TXCBatchTopKPre
+from temp_bench.archs.txc_post_dissect import (TXCPostDissect, TXCPreDissect,
+                                               _info_nce)
 
 D_IN, D_SAE, T, K_POS = 16, 20, 4, 2
 SEQ_LEN = 32
@@ -27,10 +28,15 @@ def _seq_batch(B=8, seed=7):
 
 
 # ── 1. plain-reduction: _loss_on == parent train_step on identical state ──
+# (parametrized over both families — CARD § 8 test 1 + § 9 amendment)
 
-def test_plain_reduction_matches_parent():
-    base = _mk(TXCBatchTopKPost)
-    plain = _mk(TXCPostDissect, mat_alpha=0.0, ctr_alpha=0.0)
+@pytest.mark.parametrize("base_cls,dissect_cls", [
+    (TXCBatchTopKPost, TXCPostDissect),
+    (TXCBatchTopKPre, TXCPreDissect),
+])
+def test_plain_reduction_matches_parent(base_cls, dissect_cls):
+    base = _mk(base_cls)
+    plain = _mk(dissect_cls, mat_alpha=0.0, ctr_alpha=0.0)
     xb = _seq_batch()[:, :T, :]  # (B, T, d_in) anchor batch
     for _ in range(3):  # a few steps so counters/threshold paths run equally
         out_b = base.train_step(xb)
@@ -129,16 +135,34 @@ def test_contrastive_term_positive_and_counted():
     assert math.isclose(float(out["loss"]), expected, rel_tol=1e-5)
 
 
-# ── 5. parameter identity across the four variants ──
+# ── 5. parameter identity across the four variants (both families) ──
 
-def test_variant_state_dicts_identical_at_init():
+@pytest.mark.parametrize("cls", [TXCPostDissect, TXCPreDissect])
+def test_variant_state_dicts_identical_at_init(cls):
     kws = [dict(mat_alpha=0.0, ctr_alpha=0.0), dict(mat_alpha=1.0, ctr_alpha=0.0),
            dict(mat_alpha=0.0, ctr_alpha=1.0), dict(mat_alpha=1.0, ctr_alpha=1.0)]
-    sds = [_mk(TXCPostDissect, seed=11, **kw).state_dict() for kw in kws]
+    sds = [_mk(cls, seed=11, **kw).state_dict() for kw in kws]
     for sd in sds[1:]:
         assert set(sd) == set(sds[0])
         for k in sds[0]:
             assert torch.equal(sds[0][k], sd[k]), f"init divergence at {k}"
+
+
+# ── pre-extension hook identity: the ONLY overrides are the two squash hooks ──
+
+def test_pre_dissect_hooks_are_pre():
+    assert TXCPreDissect._compute_post is TXCBatchTopKPre._compute_post
+    assert TXCPreDissect._to_shared is TXCBatchTopKPre._to_shared
+    # and the post class keeps the post hooks
+    assert TXCPostDissect._compute_post is TXCBatchTopKPost._compute_post
+    assert TXCPostDissect._to_shared is TXCBatchTopKPost._to_shared
+
+
+def test_pre_dissect_contrastive_runs():
+    m = _mk(TXCPreDissect, ctr_alpha=1.0)
+    torch.manual_seed(5)
+    out = m.train_step(_seq_batch(B=12))
+    assert float(out["ctr"]) > 0.0 and torch.isfinite(out["loss"])
 
 
 # ── 6. offset distribution: uniform on {0..seq_len-T-2} (seeded smoke) ──
