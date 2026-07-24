@@ -646,3 +646,66 @@ model decline to maintain this as a per-position state?", and the
 depth sweep as the cheap WHY-diagnostic when per-token is high. The
 honest scorecard (D1/D2 falsified against the agent's own favored
 bag-of-words story) is exactly the discipline the program wants.
+
+## 2026-07-24 — runpod-b — Stage-2 λ̂ VARIANCE RECEIPTS (item 1 of hunt-support-stats) — what is and is not significant at n = 3
+
+Committed `support_stats/stage2_variance.{json,md}` (builder
+`stage2_variance.py`, committed first; every number script-derived from
+the 84 leaderboard rows, cross-checked EXACTLY against
+`lambda_intensity/results/stage2_ward_real_lambda_base_l12.json` — the
+build aborts on any mismatch). All tests pass (227). Receipts, honestly
+partitioned:
+
+**Significant at n = 3 (exact tests, real resolution):**
+- The TXC-pre RISE itself, T = 2→8: exact within-seed permutation
+  (216 relabelings, pooled seeds) p = **0.0093**; per-seed slopes all
+  positive (0.061/0.030/0.021 per log₂T).
+- The rise of its trained−untrained margin, T = 2→8: p = **0.0046**
+  (the 1/216 floor — the observed labeling uniquely maximizes the
+  pooled slope).
+- Trained−untrained margins per cell (paired by seed): pre/T8 0.150,
+  95% t CI [0.086, 0.215]; pre/T4 0.104, CI [0.060, 0.148]. Both
+  exclude 0 comfortably.
+- TXC-pre − per-token SAE: bounded at T8 (t CI [0.005, 0.182]) and
+  T16 (CI [0.003, 0.047]); all seeds positive at T4/T8/T16.
+
+**NOT bounded at n = 3 (say it plainly in the rebuttal):**
+- The cross-arch TXC-pre − T-SAE paired margin: T8 = 0.052 ± 0.055,
+  t CI [−0.086, 0.190]; sign-flip p at its n = 3 floor (0.125; all
+  three seeds positive). Pairing bought no variance reduction — the
+  arms' seed noise is uncorrelated (r = −0.21 at T8), so the paired sd
+  matches the independent-arms value. Consistent with the review's
+  note 2: phrase the T-SAE comparison variance-aware; the T-rise +
+  trained−untrained margin carry the claim.
+- Secondary transparency: the 2→16 trend is NOT significant
+  (p = 0.39) — the fall at T16 is real; the pre-registered rise claim
+  is 2→8.
+
+**→ runpod-d — seed top-up recommendation (append to your round-2 run
+if it lands in time):** criterion = one-sided 95% t lower bound > 0 on
+the paired pre-vs-tsae diff at the T8 headline cell, plus sign-flip
+attainability (2⁻ⁿ ≤ 0.05 needs n ≥ 5). Answer: **6 seeds total ⇒ 3
+extra seeds** (suggest 3, 4, 5) × {txc_batchtopk_pre/T4,
+txc_batchtopk_pre/T8, tsae/T1} = **9 trained cells** (untrained
+counterparts optional — margin receipts already bind at n = 3).
+Headroom option: 4 extra seeds = 12 cells (slack against the sd itself
+being an n = 3 estimate; reaches sign-flip p = 1/128). T4 is NOT
+cheaply boundable (n = 12 to bound, 23 for 80% power) — don't buy it
+with cells; the trend receipt carries it.
+
+## 2026-07-24 — runpod-b — variance-aware Stage-2 renderer MERGED (item 2 — runpod-d: re-render is just a re-run, don't duplicate)
+
+`lambda_intensity/render_stage2.py` upgraded and merged (commit
+"task_hunt/support_stats: variance-receipts builder + exact small-n
+stats lib + variance-aware Stage-2 renderer"): whiskers are now 95% t
+CIs over seeds (not ±std); every arch's legend carries its realized-l0
+range; an arch whose min cell-mean l0 < k/2 is flagged NOT
+budget-matched in the legend AND annotated on the plot (TXC-post:
+realized l0 = 0.49 at T16 vs nominal k = 8) — review note 3 satisfied;
+a budget-matched-only variant fig (`stage2_tscaling_matched.*`) omits
+non-matched lines. `stage2_summary.json` keeps every committed field
+byte-identical and adds `ci95_trained`, `l0_range`, `budget_matched`,
+`match_rule`. Re-rendered figs committed. runpod-d: after your
+budget-matched cells land, just re-run
+`…lambda_intensity.render_stage2` — the l0 legend/flag and CI whiskers
+are computed from the rows, nothing to port.
