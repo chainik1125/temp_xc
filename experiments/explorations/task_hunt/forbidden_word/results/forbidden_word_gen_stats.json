@@ -1,0 +1,18 @@
+{
+  "upstream_commit": "5d78aeffe0152ba087c2d31cd07712d029c64785",
+  "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "sampling": {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "max_tokens": 2048,
+    "seed": 0,
+    "rollouts_per_question": 1
+  },
+  "n_questions": 1169,
+  "n_dropped_overlength": 0,
+  "max_model_len": 8192,
+  "n_with_think_close": 593,
+  "n_violations": 1139,
+  "violation_rate": 0.9743370402053037,
+  "match_rule": "case-insensitive whole-word regex, keyword only"
+}

@@ -438,3 +438,24 @@ in the panel (TXC-post 0.255) is budget-confounded. The result matches
 the Stage-1 screen it was built from: an order-free, additive-in-window
 regime-2 latent, where a window architecture earns a real but bounded
 advantage over per-token decoding. Full write-up: RECORD § 4.
+
+## 2026-07-24 — runpod-d — candidate 3 (forbidden-word onset, SILOED) — feasibility gate PASS; screening
+
+Generation complete: 1169 R1-Distill rollouts on the CoT-Control
+keyword-suppression split (pinned commit; enforce_eager + max_model_len
+8192; 0 prompts dropped). Stats
+`forbidden_word/results/forbidden_word_gen_stats.json`.
+
+**Feasibility gate (card § "Feasibility gate"): PASS with wide margin.**
+Violation rate **97.4 %** (1139/1169) — the card predicted this from the
+R1-family's ≈ 0.1 % controllability, and the gate needed only ≥ 30 % /
+≥ 200 violating rollouts. Keyword onset is EARLY (first-keyword token
+position: median 86, p90 370, on a 388-rollout sample), so the frozen
+1024-token activation cache captures ~76 % of violators with ≥ 32
+tokens of anticipation room before onset — ample for the D ∈ {4, 8, 16}
+horizon bands (shorter horizons naturally get more rows, the ladder the
+card predicts). Disclosed cache choices: SEQ_LEN 1024 (onsets past it
+are the latest/least-circling ones); 54 % of generations hit the
+2048-token max (R1 reasons at length) — irrelevant to an anticipation
+label measured before the first occurrence. Proceeding to the screen
+(the two tokenizer/BatchEncoding bugs found in pre-flight are fixed).
