@@ -1,0 +1,35 @@
+{
+ "meta": {
+  "dataset": "allenai/WildChat-1M",
+  "revision": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+  "license": "ODC-By 1.0",
+  "split": "train",
+  "stream_prefix": 250000,
+  "filter": {
+   "language": "English",
+   "min_assistant_turns": 8,
+   "min_chars": 2000,
+   "max_chars": 24000
+  },
+  "seed": 0,
+  "n_convs": 2000,
+  "funnel": {
+   "n_seen": 250000,
+   "n_english": 119458,
+   "n_min_assistant_turns": 6788,
+   "n_pool_after_char_filter": 6256
+  },
+  "pool_size_pre_subsample": 6256,
+  "frozen_list": {
+   "repo": "github.com/andyrdt/refusal_direction",
+   "commit": "9d852fae1a9121c78b29142de733cb1340770cc3",
+   "symbol": "pipeline/submodules/evaluate_jailbreak.py:_test_prefixes_jailbreakbench"
+  }
+ },
+ "overlap": {
+  "shipped_n_convs": 400,
+  "shipped_in_scaled_pool": 400,
+  "shipped_in_scaled_sample": 121,
+  "note": "a subsample of a larger pool redraws \u2014 the scaled corpus is NOT a superset of the shipped 400"
+ }
+}
