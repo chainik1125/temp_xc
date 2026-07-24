@@ -1,0 +1,56 @@
+{
+ "frozen": {
+  "W": 32,
+  "event": "bigram ending at t seen earlier in trace",
+  "null_seed": 105,
+  "seed": 0,
+  "mask": "is_rep == 1 excluded from all manifests"
+ },
+ "stream_shape": [
+  4044,
+  128
+ ],
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "n_roundtrip_mismatch_tokens": 149,
+ "is_rep_rate": 0.6131231213229312,
+ "red": {
+  "mean": 0.6111981272697449,
+  "bin_scheme": "terciles",
+  "edges": [
+   0.53125,
+   0.75
+  ]
+ },
+ "red_null": {
+  "bin_scheme": "terciles",
+  "edges": [
+   0.125,
+   0.25
+  ],
+  "corr_with_real": 0.5074273907691708
+ },
+ "is_rep_rate_by_bin": [
+  0.41315085124582657,
+  0.6448447606727038,
+  0.8008885401108776
+ ],
+ "manifest_rows_per_class": 20000,
+ "null_manifest_rows_per_class": 20000,
+ "trace_split_test_frac": 0.2,
+ "triage": {
+  "tok_auc_extreme": 0.6597006983834005,
+  "pos_auc_extreme": 0.8903023152420751,
+  "tok_kill_at": 0.65,
+  "pos_kill_at": 0.7,
+  "verdict": "FAIL",
+  "tok_auc": 0.6597006983834005,
+  "pos_raw_auc": 0.8903023152420751,
+  "pos_frac_auc": 0.8863070579756732,
+  "n_test_rows": 7857
+ },
+ "visible_evidence_auc": {
+  "T8": 0.9071531479100345,
+  "T16": 0.9848008285201738,
+  "T32": 1.0
+ }
+}

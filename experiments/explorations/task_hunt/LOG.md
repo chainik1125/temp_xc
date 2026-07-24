@@ -1057,3 +1057,38 @@ builder/card …"). The kill authority did its job:
 
 Batch: 5 screen-ready labels + 1 honest kill across 4 bundles.
 Candidate 5 (window redundancy rate) next.
+
+
+---
+
+## 2026-07-24 — runpod-b · FACTORY BUNDLE 5: `redundancy` KILLED at triage (free kill) — BATCH COMPLETE
+
+Fifth and final item of `briefings/candidate-factory-traces.md`.
+Builder + frozen card committed before outputs (commit "factory:
+redundancy builder/card …"); the card pre-registered position as the
+expected failure face and the frozen thresholds executed it:
+
+- **Triage FAIL, decisively**: position AUC 0.890 raw
+  / 0.886 frac vs the 0.70 kill line — the trailing
+  W = 32 bigram-repeat rate grows mechanically with history (mean ρ̂ =
+  0.61; 61% of valid tokens
+  are themselves repeats in these traces). Token identity ALSO over
+  the bar (0.660 ≥ 0.65). The briefing's warning
+  ("repetition detection was regime-1; triage carefully") lands as a
+  clean label-side kill — zero GPU minutes spent. No npz;
+  `labels/redundancy_stats.json` is the kill receipt (evidence
+  ceiling T32 = 1.000 as documented in the card — label fully
+  window-visible, which is now moot).
+
+**BATCH COMPLETE — acceptance gate exceeded. Final tally for
+`candidate-factory-traces`: 4 npz bundles shipped carrying 5
+screen-ready labels (λ̂_sc, λ̂_q, rate_ver, rate_case, vslope) + 2
+honest label-side kills (vlevel: token-identity 0.654; redundancy:
+position 0.890). Every bundle: builder committed before outputs,
+frozen mini-card with predicted T-pattern + falsifier, primary + null
+balanced manifests (20k rows/class, pos ≥ 32, by-trace split),
+event-shuffle/frequency null grids, triage stats JSON, and a
+visible-evidence AUC line the screen must beat at matched T. All on
+the canonical Ward grid — runpod-d/e screen them unmodified on the
+existing base/distill caches, minutes per label. Stopping for
+mac-local review per the briefing.**
