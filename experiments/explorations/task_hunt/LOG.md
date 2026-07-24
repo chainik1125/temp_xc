@@ -1478,3 +1478,75 @@ the fix (`18507791`) matches the evaluator's convention and the four
 TXC cells reproduce bit-identically across the two runs. Recorded
 because the near-miss is instructive: a diagnostic that silently
 mispaired rows would have looked plausible.
+
+## 2026-07-24 — mac-local — REVIEW: candidate factories (runpod-b traces + runpod broad) — **BOTH APPROVED**; screen queue opened
+
+Gate integrity, both chains, verified in the commit graph: every
+builder/card commit ships zero outputs; every SHIPPED commit ships
+zero code/card-body changes (verdict appendices are pure insertions;
+runpod-b's cards were not touched post-run at all); all amendments
+(`ac43ce21`, `28c31a98`, `299d80a8`, `da0e8bf1`) are pre-output. No
+factory commit wrote a leaderboard row (correct for label-side work).
+Full suite 280 passed / 1 skipped.
+
+**Numbers verified against artifacts — all match.** Every AUC,
+correlation, ceiling, rate, and bin edge quoted in the five runpod-b
+LOG entries reconciles with `{sc_lambda,qrate,oprate,verbosity,
+redundancy}_stats.json`; every runpod number reconciles with
+`{novelty,punctint,dialevel}_stats.json` (novelty unigram 0.551–0.563
+and position 0.472–0.478 exact; punctint's "0.639–0.653 straddle" =
+the all-eligible-row extremes, 0.6525 firing on gpt2; shipped-manifest
+extremes 0.572–0.585 as stated; dialevel all-row position 0.930–0.936
+= the named doc-length route). Data-level spot checks: manifests
+20k/class balanced, pos ≥ 32 (dialevel ≥ 16, disclosed pre-run),
+by-trace/by-doc test fractions ≈ 0.2, ZERO masked tokens inside any
+manifest, oprate current-sentence exclusion exact (0 rows), kernels
+causal by construction. **Independently re-verified:** `token_ids`
+byte-identical to the replag npz for novelty AND punctint on all three
+tokenizers — the zero-new-caching economics are real. **Red-test
+disclosure reproduced:** at `28c31a98` the guard test fails exactly as
+disclosed (auc 0.434 vs the overclaimed 0.45–0.55 band); `299d80a8`
+changes docstring + test only (no builder behavior change) and says
+so. Kills executed as frozen: vlevel tok 0.6538 ≥ 0.65 (npz carries no
+vlevel label — checked), redundancy pos 0.890/tok 0.660. The
+CANDIDATES.md ledger is accepted as a standing deliverable (18 ideas,
+four-axis vetting, collisions handled: P6/D1/B4-sibling).
+
+**Binding qualifications (screen-side, carried into any card frozen
+from these drafts):**
+1. **punctint list-density ships CONDITIONALLY**: the frozen 0.65
+   position bar FIRED on all-eligible rows (gpt2); the ship rests on
+   position-matched manifests. Any screen MUST run the position-only
+   floor probe on the shipped manifests and report the within-stratum
+   residual; a window-vs-per-token gap without that probe is
+   uninterpretable. Never quote this candidate as "passed triage" —
+   it is "passed after position matching, with disclosure".
+2. **dialevel's screen precondition is binding as written**
+   (within-dialogue contrasts or dialogue-length matching + position/
+   doc-length floor probes); all-row position 0.93 says the naive
+   screen is foreclosed. License note (CC BY-NC-SA) travels with any
+   figure that graduates.
+3. **sc_lambda's token face is narrow** (0.636 vs 0.65) and the
+   qrate/oprate evidence ceilings are high (T32 0.74/0.83/0.78): the
+   beat-the-visible-evidence line at matched T is the falsifier with
+   teeth — screens must print it next to every window number.
+4. **Cross-factory bar mismatch, disclosed here**: traces froze
+   tok 0.65 / pos 0.70; broad froze 0.65 / 0.65. Both were frozen
+   pre-run per factory (no violation), but triage numbers are NOT
+   comparable across factories without naming the bar; any future
+   factory round pins ONE convention first.
+5. Cosmetic: the sc_lambda marker list is **16** patterns; card + LOG
+   prose say "17" (artifact consistent lib↔stats; prose slip only —
+   the freezing agent corrects the count when it freezes the card).
+
+**Screen queue opened (r2-d/r2-e § 3; claim-lines rule stands).
+Recommended order, cheapest-decisive first:** (1) sc_lambda — the
+winner's family on a new event stream, corr 0.47 with ward λ̂; (2)
+oprate rate_case — position-blind at 0.51, the cleanest triage of the
+batch; (3) qrate (Ward); (4) novelty nov_resid — three models on
+existing caches, cross-model breadth is rebuttal-valuable; (5)
+punctint question-rate; (6) vslope (stated high kill risk — a fast
+honest kill either way); (7) punctint list-density (qualification 1);
+(8) interleave tss (one ~330k-token caching pass/model); (9) dialevel
+(caching + qualification 2). Both factory briefings are RETIRED with
+this entry; runpod and runpod-b are idle — next assignment on request.

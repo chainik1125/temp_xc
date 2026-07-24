@@ -10,18 +10,24 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
-- **QUANTITY MODE (Han, 2026-07-24 evening): the hunt's goal is now AS
-  MANY convincing case studies as possible — selection over depth.**
-  CPU pods run the candidate factory
-  (`briefings/candidate-factory-traces.md` = runpod-b, Ward-grid
-  intensity/trend bundles: self-correction λ̂, question-rate,
-  op-class run-rates, verbosity level, redundancy rate;
-  `candidate-factory-broad.md` = runpod, idea ledger CANDIDATES.md +
-  fineweb/new-corpus bundles + the un-parked interleave `tss`).
-  Bundles are screen-ready label packs in the frozen problib format;
-  GPU pods batch-screen them on EXISTING caches (minutes per
-  candidate) after their r2 primaries; LOG claim-lines prevent
-  double-screens. Label-side triage is a free-kill authority.
+- **QUANTITY MODE — FACTORIES DELIVERED & REVIEWED (2026-07-24 late,
+  mac-local): BOTH BATCHES APPROVED; the screen queue is open.**
+  9 screen-ready labels across 8 candidates + 3 honest label-side
+  kills, all frozen-format, all on existing caches except two:
+  runpod-b (Ward grid) shipped λ̂_sc, λ̂_q, rate_ver, rate_case,
+  vslope and free-killed vlevel (tok 0.654) + redundancy (pos 0.890);
+  runpod (broad) shipped the 18-idea CANDIDATES.md ledger
+  (6 BUILD/6 PARK/6 DEAD — a standing deliverable), interleave `tss`
+  promotion, novelty nov_resid (token_ids ≡ replag verified — zero
+  new caching), punctint list-density (CONDITIONAL: position bar
+  fired on all-eligible rows; ships on position-matched manifests +
+  mandatory position-floor probe at screen), punctint question-rate
+  (clean), dialevel (binding within-dialogue/doc-length
+  precondition). Review verified freeze order, every quoted number
+  vs artifacts, masking/balance at data level, and reproduced the
+  disclosed punctint red test at its commit. Screen order + binding
+  qualifications: LOG review entry 2026-07-24 (factories). GPU pods
+  batch-screen per r2 § 3 with LOG claim-lines; runpod/runpod-b idle.
   (Superseded same evening: the rebuttal-pack and red-team briefings
   were retracted before work started.)
 
