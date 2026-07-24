@@ -127,8 +127,12 @@ def main():
             [{"role": "user", "content": s["user_prompt"]}],
             tokenize=False, add_generation_prompt=True))
 
+    # enforce_eager: skip the inductor/CUDA-graph compile path — this pod's
+    # vllm venv has no `ninja` on PATH, so VLLM_COMPILE fails at engine
+    # start ("FileNotFoundError: 'ninja'"). Greedy generation of ~1200 short
+    # rollouts does not need the compiled kernels; correctness is identical.
     llm = LLM(model=MODEL, dtype="bfloat16", max_model_len=4096,
-              gpu_memory_utilization=0.85, seed=SEED)
+              gpu_memory_utilization=0.85, seed=SEED, enforce_eager=True)
     sp = SamplingParams(temperature=TEMPERATURE, top_p=TOP_P,
                         max_tokens=MAX_TOKENS, seed=SEED)
     outs = llm.generate(prompts, sp)
