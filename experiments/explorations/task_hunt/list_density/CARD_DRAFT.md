@@ -42,6 +42,28 @@ class, direction-agnostic (max(AUC, 1−AUC)): current-token type-mean
 AUC **≥ 0.65 ⇒ KILL**; position AUC **≥ 0.65 ⇒ KILL**; 0.55–0.65 =
 ships with the elevation disclosed.
 
+## Triage RESULT (builder-derived; appended after the frozen bars ran)
+
+**SHIPS WITH DISCLOSURE.** Sequence, in full: the first run's
+eligible-row position triage STRADDLED the kill bar —
+direction-agnostic 0.653 / 0.639 / 0.647 (gpt2/gemma2/llama31; list
+density is early-doc-biased, nav/TOC structure) — firing on one of
+three tokenizers. Per the position-floor lesson the manifests were
+rebuilt position-matched (equal class counts per log2 position
+stratum, the recorded confidence-screen guard; builder amendment
+committed before outputs), which kills the across-strata route only:
+on the SHIPPED manifest rows the position AUC is
+**0.585 / 0.572 / 0.576 direction-agnostic** — inside the frozen
+0.55–0.65 ships-with-disclosure band, and this residual
+within-stratum elevation is the screen caveat the freezing agent must
+carry (a position-only floor probe belongs in the screen). Unigram
+type-mean AUC **0.517–0.534** everywhere — the topic-leak fear did
+not materialize on masked rows. zero_split fired as predicted
+(λ̂ = 0 on 88.5 % of labeled rows — the median-0 concentration the
+ledger disclosed); event-sentence rate 0.058; manifests ~20k
+rows/class; `token_ids` asserted identical to replag ⇒
+zero new caching.
+
 ## Predicted T-pattern + draft kill rule
 
 Per-token blind-ish on the masked primary; window − per-token gap

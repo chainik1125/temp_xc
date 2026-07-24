@@ -35,6 +35,18 @@ top vs bottom class, direction-agnostic: unigram type-mean AUC
 FAQ-vocabulary route dominates); position AUC **≥ 0.65 ⇒ KILL**;
 0.55–0.65 ships with disclosure.
 
+## Triage RESULT (builder-derived; appended after the frozen bars ran)
+
+**PASS — the face ships clean.** On the shipped (position-matched)
+manifest rows, test docs, direction-agnostic: unigram type-mean AUC
+**0.520 / 0.533 / 0.521** (gpt2/gemma2/llama31), position AUC
+**0.528 / 0.522 / 0.529** — both under the 0.55 disclosure band; the
+between-doc/FAQ-vocabulary fear did not materialize once
+question-sentence tokens are masked. All-eligible-row numbers agree
+(unigram 0.523–0.530, position ≈ 0.52 direction-agnostic).
+zero_split fired as predicted (λ̂ = 0 on 80.6 % of labeled rows;
+event-sentence rate 0.036). Same npz/economics as B3.
+
 ## Predicted T-pattern + draft kill rule
 
 Same shape as B3 (regime-2 rise, order-free, anchor face disclosed);

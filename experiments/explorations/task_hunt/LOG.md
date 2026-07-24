@@ -1092,3 +1092,44 @@ visible-evidence AUC line the screen must beat at matched T. All on
 the canonical Ward grid — runpod-d/e screen them unmodified on the
 existing base/distill caches, minutes per label. Stopping for
 mac-local review per the briefing.**
+
+## 2026-07-24 — runpod — candidate factory B3+B4: list-density + question-rate (fineweb) SHIPPED — B3 with a disclosed position caveat, B4 clean
+
+One builder (`labels/build_punctint.py`, logic `punctint_lib.py`, 7
+tests), winner-family shape on two sentence-event streams: frozen
+list-marker grammar and "?"-endings; λ̂ = 8-sentence-lag half-life-2
+kernel over PREVIOUS sentences only; event-sentence tokens MASKED
+from each face's manifests; zero_split 3-class scheme fired on both
+faces (zero fractions 0.886 / 0.806). Artifacts
+`labels/punctint_fineweb_{gpt2,gemma2,llama31}.npz` +
+`punctint_stats.json`; cards `list_density/CARD_DRAFT.md` +
+`qrate_fineweb/CARD_DRAFT.md` (bars frozen pre-run, verdict
+appendices appended). **Economics: `token_ids` asserted identical to
+replag ⇒ existing fineweb caches, zero new caching.**
+
+**B3 (list density): SHIPS WITH DISCLOSURE.** Unigram triage blind
+(0.517–0.534) but the first run's position triage straddled the
+frozen 0.65 bar (0.639–0.653 direction-agnostic; lists are
+early-doc-biased) and FIRED on gpt2 — per the position-floor lesson
+the manifests were rebuilt position-matched (equal class counts per
+log2 position stratum, the confidence-screen guard; amendment
+committed before outputs). Shipped-manifest position AUC 0.572–0.585
+— inside the frozen 0.55–0.65 disclosure band; the residual
+within-stratum elevation is a stated screen caveat (position-only
+floor probe required at screen). One process disclosure: the
+amendment commit carried a red test asserting the guard reaches
+≈ 0.5 — overclaimed; corrected in the follow-up commit (the guard
+removes the across-strata route only), no builder behavior change.
+
+**B4 (question rate, fineweb — disjoint from runpod-b's Ward-grid
+`qrate`): PASS CLEAN on the frozen bars.** Manifest rows: unigram
+0.520–0.533, position 0.522–0.529 direction-agnostic — the ledger's
+FAQ-vocabulary fear did not materialize once question sentences are
+masked. The BUILD-with-gate resolved to ship.
+
+Factory tally: B1 + B2 + B3 + B4 shipped (4 candidates, 3 builders)
+— acceptance gate's ≥ 3 met. B5/B6 (dialogue, OpenWebMath) remain
+stretch per the ledger.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad),
+2026-07-24._

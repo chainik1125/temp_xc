@@ -1,0 +1,185 @@
+{
+ "source": "experiments/explorations/synthetic/expansion/data/fineweb_sample.json",
+ "source_meta": {
+  "dataset": "HuggingFaceFW/fineweb",
+  "name": "sample-10BT",
+  "split": "train",
+  "seed": 0,
+  "shuffle_buffer": 10000,
+  "n_docs": 400,
+  "n_scanned": 4183,
+  "min_sents": 60,
+  "max_sents": 200,
+  "n_sentences": 36805,
+  "datasets_version": "4.8.5",
+  "splitter": "expansion.corpus.split_sentences v1"
+ },
+ "seed": 0,
+ "kernel": {
+  "half_life_sentences": 2,
+  "support_sentences": 8,
+  "mass_within_sentences": {
+   "1": 0.31241943340101597,
+   "2": 0.5333333333333333,
+   "4": 0.8,
+   "8": 1.0
+  }
+ },
+ "list_regex": "^\\s*(?:[-*]\\s|[\u2022\u25cf\u25aa\u2023\u25e6]\\s?|\\d{1,2}[.)]\\s|[a-z][.)]\\s|\\((?:\\d{1,2}|[ivxlc]+)\\))",
+ "min_manifest_pos": 32,
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_docs": 400,
+   "n_tokens": 793831,
+   "token_ids_match_replag": true,
+   "faces": {
+    "list": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.3104569613933563
+     ],
+     "event_sentence_rate": 0.05776389077570982,
+     "lam_zero_frac": 0.8859627842866988,
+     "lam_mean": 0.043635476380586624,
+     "lam_std": 0.15771172940731049,
+     "masked_token_frac": 0.040454454411581305,
+     "manifest_rows_per_class": 19996,
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5173685004224128,
+      "position_auc": 0.34751770032329304
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5171215742310585,
+      "position_auc": 0.41471106523597195
+     }
+    },
+    "q": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.15620972216129303
+     ],
+     "event_sentence_rate": 0.03616356473305257,
+     "lam_zero_frac": 0.8054128187456926,
+     "lam_mean": 0.036830317229032516,
+     "lam_std": 0.10141082853078842,
+     "masked_token_frac": 0.026647989307547828,
+     "manifest_rows_per_class": 19997,
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5226695772197295,
+      "position_auc": 0.4794672493366047
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5200571722658193,
+      "position_auc": 0.4722009309122002
+     }
+    }
+   },
+   "artifact": "punctint_fineweb_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_docs": 400,
+   "n_tokens": 784512,
+   "token_ids_match_replag": true,
+   "faces": {
+    "list": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.3104569613933563
+     ],
+     "event_sentence_rate": 0.05776389077570982,
+     "lam_zero_frac": 0.8849555423498525,
+     "lam_mean": 0.04410110041499138,
+     "lam_std": 0.15843582153320312,
+     "masked_token_frac": 0.04075654674498287,
+     "manifest_rows_per_class": 19997,
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5278654150419136,
+      "position_auc": 0.36074768124281215
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5335810025610338,
+      "position_auc": 0.42760629000628414
+     }
+    },
+    "q": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.15620972216129303
+     ],
+     "event_sentence_rate": 0.03616356473305257,
+     "lam_zero_frac": 0.8070339898055693,
+     "lam_mean": 0.036473192274570465,
+     "lam_std": 0.1009063795208931,
+     "masked_token_frac": 0.026304250285527818,
+     "manifest_rows_per_class": 19997,
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5295049374366344,
+      "position_auc": 0.473047083205876
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5327505152876515,
+      "position_auc": 0.4776378771344587
+     }
+    }
+   },
+   "artifact": "punctint_fineweb_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_docs": 400,
+   "n_tokens": 777900,
+   "token_ids_match_replag": true,
+   "faces": {
+    "list": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.3104569613933563
+     ],
+     "event_sentence_rate": 0.05776389077570982,
+     "lam_zero_frac": 0.8853978567209518,
+     "lam_mean": 0.04400084167718887,
+     "lam_std": 0.15845227241516113,
+     "masked_token_frac": 0.0408368684920941,
+     "manifest_rows_per_class": 19998,
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.52752904863125,
+      "position_auc": 0.3525624529076165
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5319891872999549,
+      "position_auc": 0.4236982716261607
+     }
+    },
+    "q": {
+     "scheme": "zero_split",
+     "edges": [
+      0.0,
+      0.15620972216129303
+     ],
+     "event_sentence_rate": 0.03616356473305257,
+     "lam_zero_frac": 0.806456557815093,
+     "lam_mean": 0.03662089258432388,
+     "lam_std": 0.1011263057589531,
+     "masked_token_frac": 0.026531687877619232,
+     "manifest_rows_per_class": 19997,
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5260892259996808,
+      "position_auc": 0.47493771304317844
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5212326234932456,
+      "position_auc": 0.4710560884875647
+     }
+    }
+   },
+   "artifact": "punctint_fineweb_llama31.npz"
+  }
+ }
+}
