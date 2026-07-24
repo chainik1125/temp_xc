@@ -134,6 +134,51 @@ its confirmation).
 Next: candidate 3 (emotional-instability onset) — the remaining arm-B
 queue item.
 
+## 2026-07-24 — runpod-e — candidate 3 (emotional-instability onset) — **KILL** (pre-onset state already converted; no window recovery at any horizon)
+
+Full pipeline per the frozen `emotional_instability/CARD.md`: 600
+8-turn gemma-3-12b-it rollouts on 30 verified-impossible puzzles
+(elicitation replicates the paper: mean frustration 0.36 → 4.91 by
+turn, 65 % of final turns ≥ 5); judge labels κ-gated (qw-κ 0.857,
+within-1 0.90; judge = claude-sonnet-4-5, the paper's sonnet-4 being
+retired; ≈ $12 of the $40 cap); 554/600 onsets token-mapped; corpus
+DOUBLED mid-run (10 → 20 rollouts/puzzle, disclosed) to lift the
+anticipation TEST split over the frozen 300/class floor — ant4/ant8
+clear it, ant16 (290) skipped per the rule. One infra note: gemma-3-12b
+residual norms saturate fp16 — caches store activations × 1/64
+(scale-invariant under the frozen z-scored stack); the pre-fix
+degenerate cells were discarded before any reading.
+
+Screen results (`emotional_instability/results/screen.json`, hs25 =
+resid_post L24): **(a) anticipation** — per-token linear is already
+0.856 AUC at offsets 1-4 and 0.712 at 5-8, and the window NEVER beats
+it (best window cell ≤ per-token at every T; gaps ≤ 0) — the pre-onset
+wind-up is per-token-converted at short horizons and simply not
+window-recoverable at longer ones; **(b) escalation intensity** —
+tercile acc 0.36 per-token vs 0.39 best window at T64: gap +0.03 <
+the +0.05 KEEP bar, weak T-growth, and the shuffle retains it (0.389
+vs 0.394) — aggregation, not order; **sanity anchor** — post-onset
+detection is per-token-readable at 0.867 AUC rising to 0.958 with a
+T64 window with shuffle ≈ ordered (bag-of-words lexical stamping,
+exactly the trap the card named), so the labels are valid and the kill
+is a genuine negative. Nulls at chance. **Verdict: KILL by the frozen
+falsifier** — no readout shows a ≥ +0.05 order-carried, T-growing
+window advantage.
+
+**Arm B is closed: all three candidates died by sound screens** —
+repetition-lag (converted at every scale), confidence trend (real
+window gap but aggregation-carried), emotional instability (converted
+near onset, absent farther out). The recurring mechanism across all
+three is CONVERSION: whenever a temporal latent leaves per-token
+traces, the model has already summarized it into the current residual
+by mid-depth, and raw windows add order-free aggregation at best. The
+one seed worth carrying forward (recorded under candidate 2) is the
+hedging-trend LEVEL — a grounded regime-2 aggregation latent that
+separates window archs from per-token-decoded ones without needing
+order. Per the acceptance gate this is the honest "all candidates
+died" log for arm B; no Stage 2 was run, so the canonical leaderboard
+is untouched by this arm.
+
 **2026-07-24 · runpod-b · prep (labels + cards) — no verdict.** All four
 label artifacts landed under `labels/` (builders committed pre-run, 10
 sanity tests in `tests/test_task_hunt_labels.py`): `replag_fineweb_*` ×3
