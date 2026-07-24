@@ -126,13 +126,17 @@ def build_for_tokenizer(key, model, sent_lists, events):
         "in_span": np.concatenate(in_span_all),
     }
     stats_faces = {}
+    strata = pl.pos_strata(pos_of, min_pos=lib.MIN_MANIFEST_POS)
     for f in FACES:
         v = np.concatenate(lam[f])
         evt = np.concatenate(is_evt[f]).astype(np.int8)
         scheme, edges, bins = pl.zero_split_bins(v, train_rows)
         masked_bins = np.where(evt == 1, -1, bins).astype(np.int8)
-        d_, p_, c_ = lib.balanced_manifest(masked_bins, doc_of, pos_of,
-                                           seed=SEED)
+        # position-matched manifests (the confidence-screen guard):
+        # equal class counts within every log2 position stratum, so
+        # position cannot separate classes on the shipped probe rows
+        d_, p_, c_ = pl.stratified_balanced_manifest(
+            masked_bins, strata, doc_of, pos_of, seed=SEED)
         arrays[f"lam_{f}"] = v
         arrays[f"{f}_bin"] = bins
         arrays[f"is_{f}"] = evt
@@ -147,6 +151,19 @@ def build_for_tokenizer(key, model, sent_lists, events):
             "position_auc": nl.tercile_auc(pos_of.astype(float), masked_bins,
                                            test_rows & elig),
         }
+        # the operative numbers on the rows that actually ship: manifest
+        # rows restricted to test docs
+        man_rows = np.zeros(len(pos_of), dtype=bool)
+        doc_starts = doc_off[:-1]
+        man_global = doc_starts[d_] + p_
+        man_rows[man_global] = True
+        tri_man = {
+            "unigram_auc": nl.tercile_auc(unigram, masked_bins,
+                                          man_rows & test_rows),
+            "position_auc": nl.tercile_auc(pos_of.astype(float),
+                                           masked_bins,
+                                           man_rows & test_rows),
+        }
         fin = np.isfinite(v)
         stats_faces[f] = {
             "scheme": scheme, "edges": edges,
@@ -156,7 +173,8 @@ def build_for_tokenizer(key, model, sent_lists, events):
             "lam_mean": float(v[fin].mean()), "lam_std": float(v[fin].std()),
             "masked_token_frac": float(evt.mean()),
             "manifest_rows_per_class": int(len(d_) // 3),
-            "triage": tri,
+            "triage_all_eligible_rows": tri,
+            "triage_manifest_rows": tri_man,
         }
 
     out = HERE / f"punctint_fineweb_{key}.npz"
@@ -164,7 +182,9 @@ def build_for_tokenizer(key, model, sent_lists, events):
     print(f"[{key}] {ids_flat.size:,} tok; " + "; ".join(
         f"{f}: scheme={stats_faces[f]['scheme']}, "
         f"evrate={stats_faces[f]['event_sentence_rate']:.3f}, "
-        f"triage={json.dumps(stats_faces[f]['triage'])}" for f in FACES))
+        f"all={json.dumps(stats_faces[f]['triage_all_eligible_rows'])}, "
+        f"man={json.dumps(stats_faces[f]['triage_manifest_rows'])}"
+        for f in FACES))
     return {"tokenizer": model, "n_docs": n_docs,
             "n_tokens": int(ids_flat.size), "token_ids_match_replag": True,
             "faces": stats_faces, "artifact": out.name}

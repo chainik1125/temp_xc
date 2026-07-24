@@ -59,6 +59,36 @@ def test_zero_split_nan_rows_unlabeled():
     assert bins[0] == -1 and bins[3] == -1
 
 
+def test_stratified_manifest_kills_position_route():
+    rng = np.random.default_rng(5)
+    n = 60000
+    pos = rng.integers(32, 4096, size=n).astype(np.int32)
+    doc = rng.integers(0, 300, size=n).astype(np.int32)
+    # class correlates strongly with position (the B3 failure mode)
+    p_hi = 1 / (1 + np.exp((pos - 800) / 300))
+    cls = np.where(rng.random(n) < p_hi, 2,
+                   rng.integers(0, 2, size=n)).astype(np.int8)
+    strata = pl.pos_strata(pos)
+    d, p, c = pl.stratified_balanced_manifest(cls, strata, doc, pos,
+                                              cap=10000, seed=0)
+    assert len(c) > 0
+    # within every stratum: exactly equal class counts
+    st = pl.pos_strata(p)
+    for s in np.unique(st):
+        counts = [((st == s) & (c == k)).sum() for k in np.unique(c)]
+        assert len(set(counts)) == 1
+    # position no longer separates top from bottom class
+    from experiments.explorations.task_hunt.labels.interleave_lib import \
+        rank_auc
+    m = c != 1
+    auc = rank_auc(p[m].astype(float), (c[m] == 2).astype(int))
+    assert 0.45 < auc < 0.55
+    # raw rows, for contrast, are strongly position-separable
+    raw = cls != 1
+    raw_auc = rank_auc(pos[raw].astype(float), (cls[raw] == 2).astype(int))
+    assert raw_auc < 0.35
+
+
 def test_token_inheritance():
     sent_vals = np.array([np.nan, 0.25, 0.5])
     sent_idx = np.array([0, 0, 1, 1, 1, 2])

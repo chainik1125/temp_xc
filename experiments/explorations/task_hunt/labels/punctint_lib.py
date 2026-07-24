@@ -83,3 +83,51 @@ def token_labels_from_sentences(sent_vals: np.ndarray,
     """Every token inherits its sentence's value (float faces keep
     NaN; works for int event flags too when passed as float)."""
     return np.asarray(sent_vals)[sent_idx]
+
+
+def pos_strata(pos: np.ndarray, min_pos: int = 32) -> np.ndarray:
+    """log2 position strata for position-matched manifests: bins
+    [32,64) [64,128) … [1024,2048) [2048,∞) → 0..6; -1 below
+    min_pos."""
+    pos = np.asarray(pos)
+    out = np.full(pos.shape, -1, dtype=np.int8)
+    ok = pos >= min_pos
+    b = np.floor(np.log2(pos[ok])) - np.floor(np.log2(min_pos))
+    out[ok] = np.clip(b, 0, 6).astype(np.int8)
+    return out
+
+
+def stratified_balanced_manifest(class_of_row, strata_of_row, doc_of_row,
+                                 pos_of_row, cap: int = 20_000,
+                                 seed: int = 0):
+    """Class-balanced probe rows WITHIN every position stratum (the
+    position-matched guard: with equal class counts per stratum,
+    position cannot separate classes on the manifest by construction).
+    Rows need class >= 0 and stratum >= 0. A per-class `cap` thins
+    every stratum by a common factor to preserve the matching.
+    Returns (doc, pos, cls)."""
+    rng = np.random.default_rng(seed)
+    cls = np.asarray(class_of_row)
+    strata = np.asarray(strata_of_row)
+    ok = (cls >= 0) & (strata >= 0)
+    classes = np.unique(cls[ok])
+    per_stratum = []
+    for s in np.unique(strata[ok]):
+        per = [np.flatnonzero(ok & (strata == s) & (cls == c))
+               for c in classes]
+        n = min(len(p) for p in per)
+        if n:
+            per_stratum.append((n, per))
+    total = sum(n for n, _ in per_stratum)
+    f = min(1.0, cap / total) if total else 0.0
+    take = []
+    for n, per in per_stratum:
+        k = int(n * f)
+        if not k:
+            continue
+        for p in per:
+            take.append(rng.choice(p, size=k, replace=False))
+    idx = (np.sort(np.concatenate(take)) if take
+           else np.array([], dtype=int))
+    return (doc_of_row[idx].astype(np.int32),
+            pos_of_row[idx].astype(np.int32), cls[idx].astype(np.int8))
