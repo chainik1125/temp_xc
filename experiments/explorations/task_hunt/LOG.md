@@ -30,3 +30,22 @@ floor check (pre-freeze, disclosed in card): position-only AUC 0.82 on
 full-λ̂ terciles vs 0.59 for kernel-only λ̂_hist ⇒ **primary target =
 λ̂_hist**. Card: `lambda_intensity/card.md`, frozen at this commit;
 screen (`screen.py`) not yet executed on any activation cache.
+
+## 2026-07-24 — runpod-e — replag labels built (pre-screen); one card amendment
+
+Δ labels built inline (runpod-b's parallel builder had not landed;
+per-briefing fallback). `replag/build_labels.py` + committed manifests/
+stats under `labels/`. All 5 sanity tests pass on all three tokenizers;
+every task saturates its caps (4000/1500 per class) under joint
+(token-id × position-bucket) matching; realized coverage is the exact
+ladder (cov(B,T) = 0 until T crosses the bucket's lower edge).
+
+**Label-stage finding + card amendment (BEFORE any screen ran):** the
+card's parenthetical prior "real text far heavier at small Δ than the
+shuffled null" is FALSE at the token level — real P(Δ∈[2,4]) ≈ 0.026 <
+null ≈ 0.031 on all three tokenizers (grammar avoids near-repetition;
+the exchangeable shuffle clumps). Sanity T4 amended from a directional
+assert to a two-sided divergence test (TV > 0.02; realized ≈ 0.03) with
+direction recorded as a finding. No screen prediction (P1–P5) depends
+on this; the KEEP/KILL rules are untouched.
+>>>>>>> 3400cb78 (task-hunt/replag: labels built — manifests+stats committed, T4 amended to two-sided null-divergence (direction recorded as finding, pre-screen; LOG entry))

@@ -264,17 +264,31 @@ def sanity(ids, doc_idx, delta1, delta2, n_prefix, manifests, stats, key):
     d_null = compute_delta(shuf, n_prefix, 1)
     epos = np.zeros((N, L), dtype=bool)
     epos[:, H_MIN + n_prefix:] = True
+    # Two-sided structure test: the real Δ distribution must diverge
+    # from the exchangeable (bag-preserving) null. Direction is a
+    # recorded FINDING, not an assumption — first build showed real
+    # text has FEWER Δ≤4 repeats than its shuffled bag (grammar avoids
+    # near-repetition; uniform placement clumps), falsifying the card's
+    # parenthetical prior (amended pre-screen, see LOG).
     real_p4 = float(np.mean(
-        (delta1 >= 2) [epos] & (delta1 <= 4)[epos]))
+        (delta1 >= 2)[epos] & (delta1 <= 4)[epos]))
     null_p4 = float(np.mean(
         (d_null >= 2)[epos] & (d_null <= 4)[epos]))
-    assert real_p4 > null_p4, f"T4 {real_p4} !> {null_p4}"
     hist_real = [int(((delta1 == d) & epos).sum()) for d in range(1, 65)]
     hist_null = [int(((d_null == d) & epos).sum()) for d in range(1, 65)]
-    res["T4_burstiness"] = {"real_p_delta_le4": real_p4,
-                            "null_p_delta_le4": null_p4,
-                            "hist_real_1_64": hist_real,
-                            "hist_null_1_64": hist_null}
+    n_e = int(epos.sum())
+    pr = np.array(hist_real + [n_e - sum(hist_real)]) / n_e
+    pn = np.array(hist_null + [n_e - sum(hist_null)]) / n_e
+    tv = float(0.5 * np.abs(pr - pn).sum())
+    assert tv > 0.02, f"T4 real≈null (TV={tv:.4f})"
+    res["T4_null_divergence"] = {"tv_distance": tv,
+                                 "real_p_delta_le4": real_p4,
+                                 "null_p_delta_le4": null_p4,
+                                 "direction": ("real<null at Δ≤4"
+                                               if real_p4 < null_p4
+                                               else "real>null at Δ≤4"),
+                                 "hist_real_1_64": hist_real,
+                                 "hist_null_1_64": hist_null}
 
     # T5 manifest integrity + determinism
     for task in [f"det{b[1:]}" for b in BUCKETS] + ["lag4"]:
