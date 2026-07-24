@@ -258,7 +258,21 @@ margin an order effect rather than a capacity effect.
    wrong with either job — a T = 64 flatten probe simply cannot share
    80 GB with a 50 GB probe job. The jobs were re-run serialized. Any
    future agent adding a third GPU job should chain, not fan out.
-5. **Leaderboard hygiene, and a repair.** Baseline restored:
+5. **Stage-2 fairness: nominal `k_pos` is matched, realized
+   `l0_per_token` is NOT (flagged before the panel finished).** Every
+   cell is run at the same nominal `k_pos = 8`, which is the synthetic
+   program's fairness definition (Part II § 3). But the BatchTopK
+   family pools its budget across the batch, so the *realized* rate
+   differs per architecture — on the first cells: `tsae` 8.00,
+   `stacked_batchtopk` 7.01 (T=2) / 7.63 (T=4), `batchtopk_sae` 6.37.
+   That is a spread of ~1.6 atoms/token, ~20 % of the budget, and the
+   briefing asked for *matched realized* l0. **Consequence for reading
+   the panel:** an arch difference comparable in size to what a 20 %
+   budget difference could buy is confounded and must not be attributed
+   to decode structure. The per-cell realized l0 is recorded in
+   `results/stage2_summary.json` next to every recovery number so the
+   check is always available, and any headline claim has to survive it.
+6. **Leaderboard hygiene, and a repair.** Baseline restored:
    **7116 rows, 0 duplicate `eval_key`s, 0 rows with a null metric.**
    Six rows written earlier in this session on
    `ward_real_lambda_base_l12` (one 200-step plumbing cell + five
