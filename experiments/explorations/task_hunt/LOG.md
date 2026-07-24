@@ -1701,3 +1701,163 @@ are real, and this is the second bundle-level confirmation of that
 (the first being the mapping verification in the claim entry).
 
 Next: `punctint` (both faces, one pass) — card frozen next.
+
+## 2026-07-24 — runpod-e — `punctint` face **q (question-rate, fineweb)** — **KEEP** (3/3 models on the frozen clauses, and it survives a document-identity control I had to add)
+
+Screen per the frozen `qrate_fineweb/CARD.md` (frozen with `screen.py`
+at `74af1d4a`, before any cell); scorer `verdict.py` and the
+within-document control `within_doc.py` committed at `c4f0f16b`
+**before either ran**. Results `qrate_fineweb/results/`
+(`screen_<model>.json`, `verdict.json`, `within_doc.json`). Pooled
+permutation nulls, 12 cells: **3σ = 0.022**.
+
+Primary face `q_bin` (terciles of the 8-sentence question-rate kernel,
+question-sentence tokens masked out), acc_test, window = MEAN:
+
+| model | per-token | pos floor | T4 | T8 | T16 | T32 | T64 | conv% |
+|---|---|---|---|---|---|---|---|---|
+| gpt2 | 0.452 | 0.351 | +0.027 | +0.038 | +0.072 | +0.094 | **+0.114** | 47 % |
+| gemma2-2b | 0.429 | 0.331 | +0.018 | +0.013 | +0.021 | +0.046 | **+0.127** | 44 % |
+| llama31-8b | 0.399 | 0.343 | +0.016 | +0.045 | +0.080 | +0.117 | **+0.143** | 28 % |
+
+(columns after the floor are window − per-token; conv% is the
+floor-relative conversion fraction proposed in the novelty entry.)
+
+**Every KEEP clause fires on all three models** (KEEP needed ≥ 2): gap
+≥ +0.05, monotone growth over the ladder (T64 ≥ T4 + 0.02 everywhere),
+window clears the position floor by ≥ 0.05, and the anchor-differenced
+contrast is +0.113 / +0.052 / +0.105. The gap **tracks the measured
+kernel-mass column** (~0.06 → 0.72 over T = 4 → 64) — the shape the
+card predicted from the clock bridge, and it is still rising at T = 64,
+the reach limit the card disclosed pre-run.
+
+**The ambient anchor did its job and inverts the usual worry.**
+`is_q` is strongly per-token readable (0.816 / 0.787 / 0.785 acc) and a
+window makes it **worse** (−0.041 / −0.031 / −0.026). So wider windows
+do NOT generically help labels on this corpus — the intensity face's
+window advantage is specific to it. Candidate 2's trap is checked and
+absent here.
+
+**A confound the frozen triage could not see, found and controlled.**
+Measured on the label side over the screened pool, the intensity
+terciles are largely a DOCUMENT-level property: between-doc variance
+32 %, and **doc-mean-only AUC = 0.926** for top vs bottom tercile. A
+64-token activation mean is an excellent document/topic signature, so
+"the gap grows with T" is exactly what an improving doc-identity
+descriptor would produce. The builder's frozen bars cannot detect this
+— the unigram bar is a per-token IDENTITY statistic and the position
+bar a within-doc ordinate; neither tests document identity. (The
+ledger flagged this face "between-doc-heavy"; this is that risk,
+measured rather than assumed.)
+
+**The control: classes assigned by rank WITHIN each document**, so doc
+identity carries zero label information by construction. Rank-AUC,
+binary, chance 0.5:
+
+| model | per-token | T16 | T32 | T64 | gap@T64 | test docs |
+|---|---|---|---|---|---|---|
+| gpt2 | 0.620 | 0.669 | 0.688 | 0.721 | **+0.101** | 24 |
+| gemma2-2b | 0.579 | 0.600 | 0.657 | 0.711 | **+0.132** | 25 |
+| llama31-8b | 0.550 | 0.624 | 0.683 | 0.733 | **+0.183** | 26 |
+
+**The window advantage survives with room to spare, and still grows
+with T.** Within a document, per-token carries only 54 % / 37 % / 21 %
+of the window-readable signal above chance. So the trailing
+question-rate is genuinely window-carried temporal structure, not
+document identity. **KEEP.**
+
+**Scorecard.** Q1 **CONFIRMED** (per-token above floor everywhere —
+conversion is partial, not total). Q2 **half-falsified in the
+candidate's favour**: I predicted a *small* (< +0.05) rising gap; it
+rises to +0.11…+0.14. Q3 **CONFIRMED** (`g_order` = flatten − mean
+negative at every T; shuffle drop ≈ 0 — order-free pooling, regime-2).
+Q4 **CONFIRMED at the reach limit** (q's T64 gap +0.114/+0.127/+0.143
+vs list's +0.087/+0.084/+0.107) though list leads at small T on gpt2.
+Q5 **FALSIFIED, in the direction that strengthens the face**: I
+predicted the anchor would also gain from windows; it *loses*.
+
+**Recommended next step (for review, not taken unilaterally):** this is
+the first Stage-1 KEEP of the hunt with a rising, kernel-tracking,
+anchor-differenced, doc-identity-controlled gap — the profile the hunt
+was looking for. If it goes to a Stage-2 panel, that panel **must use a
+capacity-adequate λ-probe** (ridge or n scaled with T): my Stage-2
+probe-capacity entry above shows the current evaluator is
+systematically biased against large T, which is precisely where this
+candidate's signal lives.
+
+**Binding caveat carried forward:** the anchor is binary (chance 0.5)
+and the face 3-class (chance 1/3), so the anchor-differenced number is
+directional evidence, not a calibrated quantity. The robust content is
+the SIGN — the anchor gets worse with a window while the face gets
+better.
+
+## 2026-07-24 — runpod-e — `punctint` face **list (list-density, fineweb)** — **WEAK KEEP, conditional and disclosed** (2/3 models; anchor shares the gain; control rests on 8 documents)
+
+Same screen, same commit, same caches; this face **ships
+CONDITIONALLY** per mac-local's binding qualification 1 and is never
+quoted as "passed triage" — it is **passed after position matching,
+with disclosure**. The mandatory position-only floor probe was run on
+the shipped manifest rows: floor 0.327 / 0.363 / 0.358 vs window
+0.556 / 0.574 / 0.538, so the window clears the floor by ~0.18–0.23.
+
+| model | per-token | pos floor | T16 | T32 | T64 | anchor gap | anchor-diff | conv% |
+|---|---|---|---|---|---|---|---|---|
+| gpt2 | 0.469 | 0.327 | +0.072 | +0.083 | +0.087 | **+0.051** | +0.021 | 62 % |
+| gemma2-2b | 0.490 | 0.363 | +0.048 | +0.047 | +0.084 | **+0.030** | +0.018 | 60 % |
+| llama31-8b | 0.431 | 0.358 | +0.062 | +0.082 | +0.107 | +0.008 | +0.055 | 40 % |
+
+**Two of three models satisfy every KEEP clause** (gemma2-2b fails the
+anchor-differenced clause at +0.018 vs the +0.02 bar), so the rule
+fires — but three qualifications keep this a WEAK verdict:
+
+1. **The ambient anchor GAINS from a window here** (+0.051 / +0.030 /
+   +0.008), unlike the q face where it loses. So a real part of this
+   face's window advantage is the generic effect candidate 2 warned
+   about, and the anchor-differenced margins (+0.021 / +0.018 / +0.055)
+   are thin — two of them sit within noise of the +0.02 bar itself.
+2. **The doc-identity route is worse than for q**: between-doc variance
+   57 %, **doc-mean-only AUC 0.960**.
+3. **The within-document control is strong but narrow.** Gaps at T64
+   are +0.139 / +0.218 / +0.136 (per-token 0.687 / 0.617 / 0.642) —
+   larger than q's — but they rest on **only 8 test documents** per
+   model, because `lam_list` is zero for 88.5 % of rows and most
+   documents have no within-document variation to contrast. Twenty-four
+   documents (q) is thin; eight is thinner, and a per-document effect
+   could be carried by a couple of list-heavy documents.
+
+**Verdict: WEAK KEEP — real within-document signal, but the evidence is
+narrower than the q face's on every axis that matters.** If only one
+punctint face is promoted, it should be **q**. I am not proposing extra
+cells for `list` unilaterally; the honest next step if the program wants
+it is a within-doc control with a larger document pool (relax the
+zero-inflation by contrasting non-zero windows only), which the
+existing artifacts already support.
+
+## 2026-07-24 — runpod-e — **recommendation to the factory: add a document-identity triage bar** (generalizes across the whole fineweb batch)
+
+The `punctint` screen surfaced a leak route the frozen factory triage
+does not test, and it is **not specific to that bundle**. Doc-mean-only
+AUC for top vs bottom tercile, measured on each face's own screened
+eligible pool:
+
+| face | between-doc variance | doc-mean-only AUC |
+|---|---|---|
+| `novelty` `nov_resid` | 22 % | 0.792 |
+| `punctint` `lam_q` | 32 % | **0.926** |
+| `punctint` `lam_list` | 57 % | **0.960** |
+
+Every fineweb intensity face has a substantial document-level
+component, and a window-MEAN over many tokens is a strong document
+descriptor — so a *rising* window-vs-per-token gap is the expected
+signature of a confound as well as of real trailing structure. The two
+existing bars cannot separate them (unigram = per-token identity;
+position = within-doc ordinate).
+
+**Proposal:** add `doc_mean_only_auc` to the builders' triage output
+(three lines of code — it needs only λ̂ and `doc_off`), with a
+disclosure band by analogy to the existing bars, and make a
+**within-document contrast the standard control for any face that
+KEEPs**. mac-local's dialevel qualification 2 already imposes exactly
+this discipline for that bundle; this generalizes it. Note the cost is
+trivial and the payoff is real: it is the difference between the q
+face's KEEP being publishable and being retracted later.
