@@ -48,3 +48,27 @@ the exchangeable shuffle clumps). Sanity T4 amended from a directional
 assert to a two-sided divergence test (TV > 0.02; realized ≈ 0.03) with
 direction recorded as a finding. No screen prediction (P1–P5) depends
 on this; the KEEP/KILL rules are untouched.
+
+**2026-07-24 · runpod-b · prep (labels + cards) — no verdict.** All four
+label artifacts landed under `labels/` (builders committed pre-run, 10
+sanity tests in `tests/test_task_hunt_labels.py`): `replag_fineweb_*` ×3
+tokenizers, `ward_lambda` (causal mirror λ̂; round-trip validity matches
+the committed ward_stream_stats exactly; event rate by λ̂ tercile
+0.053/0.081/0.256), `proofops` (+ the clock bridge: median 16
+tokens/sentence ⇒ 2-sentence windows need T ≥ 32), `confidence`
+(slope4/slope8 + state; slope8 support ≈ 128 tokens — arm-B candidate-2
+reachability input). **Duplication note (per briefing):** runpod-e froze
+`replag/CARD.md` with its own inline labels before these landed; the
+frozen card's scheme differs from `labels/replag_fineweb_*` (within-
+sequence Δ, Δ=1 excluded, B32 bucket, identity/position matching vs my
+doc-level Δ, buckets ≤4/≤8/≤16/none). The frozen card governs the
+screen; the committed artifacts stand as an independent cross-check +
+the n=2 robustness reserve. Label-side order receipt worth having: at
+doc level, short-lag BIGRAM repeats are ≈13× the within-doc-shuffle
+frequency null, unigram short-lags only ≈1.2× in aggregate — and the
+Δ∈[1,4] unigram bucket alone sits BELOW the null (20.9k vs 28.5k on
+gpt2), the doc-level face of runpod-e's token-level T4 finding above
+(`labels/replag_stats.json`). Cards: `proofops/CARD.md` +
+`confidence/CARD.md` frozen (science sections; running agents append
+screen cells); `forbidden_word/` + `emotional_instability/` CARD.DRAFTs
+staged.

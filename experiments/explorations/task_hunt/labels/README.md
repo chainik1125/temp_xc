@@ -40,4 +40,7 @@ Clock bridge (substrate-audit item 6): tokens-per-sentence stats +
 sentences-per-window at each screen T are in `proofops_stats.json`
 (`clock_bridge`) — choose T ranges from these numbers.
 
-Mini-cards for the candidates are in `../cards/`.
+Mini-cards live one dir per candidate (`../replag/CARD.md` — frozen by
+runpod-e with its own inline labels; `../proofops/`, `../confidence/` —
+frozen by runpod-b; `../forbidden_word/`, `../emotional_instability/` —
+DRAFTs, the running agent freezes its own).
