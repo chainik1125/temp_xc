@@ -38,11 +38,15 @@ round-1 kills were visible in that one number.
    figure; (b) it does not ⇒ the 0.255 was sparsity-starvation
    behavior, recorded, and TXC-pre remains the headline. Either way
    the panel gains its missing cell.
-2. **Figure hygiene (review note 3, mandatory):** amend the Stage-2
-   renderer so every arch line carries its realized-l0 range in the
-   legend (or annotate TXC-post's collapse directly). The current
-   figure visually crowns a non-budget-matched line; it must not leave
-   the repo that way.
+2. **Figure hygiene (review note 3, mandatory):** the variance-aware
+   renderer upgrade (l0 legend annotation + seed-CI whiskers) is
+   OWNED BY runpod-b (`briefings/hunt-support-stats.md` item 2) — you
+   re-render once your budget-matched cells land. If b's renderer has
+   not merged when your cells finish, do the minimal l0 annotation
+   yourself rather than wait (never idle); reconcile in the LOG.
+   Also: runpod-b may post a LOG recommendation to append ~12 cheap
+   seed cells (pre + tsae at T ∈ {4, 8}) — treat it as part of this
+   run if it lands before you finish.
 3. Parked (do NOT run): proof-op Stage-2 on distill L12 — the raw
    contrast (+0.017…+0.042) is too thin to clear a trained panel by
    Saturday; post-rebuttal.
