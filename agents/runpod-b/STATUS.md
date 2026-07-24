@@ -1,11 +1,10 @@
 # Working state — agent `runpod-b`
 
-**Last rewrite:** 2026-07-24 (pre-compact) — **NEW TASK ACCEPTED, not
-yet started: `briefings/candidate-factory-traces.md`** (QUANTITY MODE,
-Han directive: batch of screen-ready label bundles on the Ward grid).
-Read that briefing in full first; this file is the resume state.
-Previous session (`hunt-support-stats.md`, all 4 items) is COMPLETE,
-pushed, awaiting mac-local review — its briefing stays in place.
+**Last rewrite:** 2026-07-24 (late) — **`candidate-factory-traces.md`
+BATCH COMPLETE, all 5 candidates processed, stopped at the acceptance
+gate for mac-local review.** Briefing stays in place until that review
+(as does the earlier `hunt-support-stats.md`, also awaiting review).
+I am idle; next assignment on request.
 
 ## Who / where
 Second RunPod box, repo `/workspace/temp_xc`, 32 CPU, no GPU, no CFS cap.
@@ -14,63 +13,60 @@ Second RunPod box, repo `/workspace/temp_xc`, 32 CPU, no GPU, no CFS cap.
 `export ANTHROPIC_API_KEY=$(cat /workspace/.tokens/anthropic_key)`.
 HF token at `/workspace/.tokens/hf_token`.
 
-## The new task (inputs verified this session, work NOT started)
+## Factory batch — final tally (all committed + pushed, one LOG line each)
 
-**≥ 3 shipped bundles (or honest triage kills) by Saturday morning PT;
-ship INCREMENTALLY — one LOG line per bundle as it lands.** Five
-candidates, priority order, all on the Ward/R1-Distill token grid
-(runpod-d/e already hold the 17-layer caches; each bundle costs them
-minutes): (1) self-correction marker intensity λ̂_sc — FREEZE the
-marker list in the card before computing; kernel-only λ̂_hist primary;
-marker tokens masked out of probe rows; (2) question-rate intensity
-("?" sentence endings, same machinery + masking); (3) op-class
-run-rates ×2 (verification-check + case-enumeration kernel rates from
-proofops `op`; current-sentence tokens excluded); (4) verbosity LEVEL
-(trailing mean sentence length; level primary — the hedging-LEVEL
-lesson); (5) window redundancy rate (fraction of window tokens whose
-bigram occurred earlier; triage hard — repetition was regime-1).
+**4 npz bundles / 5 screen-ready labels + 2 honest triage kills**, all
+on the canonical Ward grid (4044 × 128), ward_lambda manifest
+conventions (20k rows/class primary AND null, pos ≥ 32, by-trace
+split), builders committed before outputs, frozen card per candidate:
 
-Per bundle: labels npz + balanced manifests + shuffled-window null +
-triage stats JSON + `<name>/CARD_DRAFT.md`, aggregation-framed
-(shuffle-immunity receipt). **Label-side triage is my kill authority:
-label readable from current-token identity or position alone ⇒ FAIL,
-one LOG line, do NOT ship (a free kill is a win).** Builders committed
-before outputs; zero-API exact labels only; no reviewer/meeting quotes.
+1. `labels/sc_lambda.npz` — λ̂_sc marker intensity. PASS (tok 0.636 —
+   NEAR the 0.65 line, disclose; pos 0.625). Evidence ceiling T32 0.70.
+2. `labels/qrate.npz` — λ̂_q question rate. PASS (tok 0.610, pos
+   0.586). corr with λ̂_sc only 0.32. Evidence T32 0.74.
+3. `labels/oprate.npz` — rate_ver + rate_case, BOTH pass; rate_case
+   position-blind (0.51); corr(ver, case) = −0.03, corr(ver, λ̂_sc) =
+   0.03 (feared marker overlap did NOT materialize). Evidence T32
+   0.83 / 0.78 — high; beat-the-line falsifier has teeth.
+4. `labels/verbosity.npz` — vlevel KILLED label-side (tok 0.654 ≥
+   0.65: register lexically readable per-token); vslope shipped
+   (tok/pos-blind) with the honest caveat that hedging-LEVEL lesson
+   makes slopes the hard aggregation face (screen-kill risk accepted).
+5. redundancy — KILLED (pos 0.890, tok 0.660; stats JSON is the
+   receipt, no npz). The briefing's predicted failure face.
 
-**Inputs verified:**
-- Bundle format template = `labels/ward_lambda.npz` fields: in_span,
-  is_bt, lam, lam_bin, lam_hist, man_cls/doc/pos, sent_idx, trace_idx,
-  trace_split, valid, win_start. proofops.npz has `op` (5-class),
-  time_in_run, sent_idx (+ manifests) for candidate 3.
-- Sentence TEXTS (markers, "?", lengths): traces.json is absent
-  locally but `labels/wardmap.ensure_traces()` re-ports it via
-  `git show origin/aniket-ward-stage-b:...` — VERIFIED working. Use
-  `wardmap.load_inputs()` / `broadcast()` for grid alignment.
-- Kernel machinery: `labels/lib.py::lambda_for_sentences(b, intercept,
-  coef_pos, kernel_w)`; committed backtracking kernel coefficients in
-  `synthetic/backtracking/results/backtracking_mirror_stats.json`.
-  DESIGN DECISION to freeze per card BEFORE computing: for NEW event
-  streams reuse the committed kernel w_l (frozen, exact) vs a plain
-  exponential — state the choice + why in each card.
-- The screen stack ("problib") the bundles must fit: referenced in
-  `task_hunt/forbidden_word/cache_and_screen.py` and
-  `task_hunt/shuffle_receipt.py` — READ ONE POST-COMPACT to confirm
-  the exact consumption format before building.
-- `lib.delta_prev_ngram` for redundancy; `lib.tercile_bins`,
-  `balanced_manifest` (pos ≥ 32), `trace_split` conventions as round 1.
+Shared machinery (all tested, `tests/test_factory_labels.py`, 10
+tests; full suite 269 green): `labels/factory_lib.py` — frozen
+exponential kernel (τ = 3, K = 8, causal, normalized, history guard
+i ≥ 4, kernel-only), frozen 17-pattern marker list, event-shuffle
+nulls (seeds 101–105 + trace_idx), zero_split bin fallback (min bin ≥
+10%), triage kill rule (tok ≥ 0.65 / pos ≥ 0.70 extreme-AUC on
+test-split manifest rows), `bundle_core` shared pipeline. Every stats
+JSON carries a `visible_evidence_auc` line (in-window event count) —
+the screen must beat it at matched T or it is counting visible
+evidence tokens.
 
-## Last session's results (context for the factory)
-- Variance receipts: TXC-pre T2→8 rise p=0.0093 exact; margin trend
-  p=0.0046; cross-arch pre−tsae NOT bounded at n=3; seed top-up rec
-  posted to runpod-d (3 seeds × 3 cells). Renderer: l0 legend +
-  NOT-budget-matched flag mandatory (review note 3) — new bundles'
-  eventual figures inherit this.
-- Lessons that bind the factory: position-floor (kernel-only primary),
-  anchor/ambient masking, levels-not-slopes (aggregation-framed),
-  per-token-first triage as convention, no case-colliding filenames.
-- Round-2 in flight elsewhere: runpod-d budget-matched TXC-post re-run;
-  runpod-e froze its own hedging-LEVEL card (my draft reconciled in its
-  §10 amendment). New upstream: `briefings/candidate-factory-broad.md`
-  (parallel factory, not mine), `em-redo.md`, arch `tsae_delta.py`.
-- Shared branch: 5 agents on arxiv; pull-rebase before EVERY push; cite
-  commit SUBJECTS not SHAs. Rewrite this file before any compact.
+## For the screening agents (runpod-d/e)
+Bundles drop onto the existing Ward base/distill caches unmodified —
+same (man_doc = window, man_pos) row convention as ward_lambda;
+`man_null_*` manifests probe the shuffled-label null; per-candidate
+masks are IN the manifests already (marker/"?" tokens, event-class
+sentences, is_rep). Draft T-pattern + falsifier per candidate in
+`task_hunt/<name>/CARD_DRAFT.md` — the running agent freezes its own
+screen card. Note oprate labels are NaN wherever a kernel-lag sentence
+is judge-unlabeled (coverage 0.895 of valid tokens).
+
+## Context that binds future work here
+- Sibling factory: runpod (broad corpus) shipped its ledger + B1
+  (interleave tss promotion) + B2 (vocabulary-novelty, fineweb); its
+  B3/B4 includes a question-rate face on fineweb — my qrate card
+  carries the cross-cite. LOG.md conflicts with it twice this session:
+  resolution = keep upstream entry, re-append mine (append-only rule).
+- hunt-support-stats (previous session) APPROVED upstream with
+  consequences: T = 16 dip interpretation RETRACTED to
+  cause-not-established; seed top-up first-class for runpod-d.
+- Environmental pytest trap: `test_diff_hash_consistent_with_dirty`
+  fails when the tree has untracked files — commit/clean before full
+  suite runs (traces.json is gitignored, doesn't count).
+- Shared branch: 5 agents on arxiv; pull-rebase before EVERY push;
+  cite commit SUBJECTS not SHAs. Rewrite this file before any compact.
