@@ -63,9 +63,24 @@ arm A's — not touched this session.
   anchor-differenced contrast is an order claim.
 - **Cand 3 (forbidden-word onset, SILOED): KILL** — the card's
   pre-registered ambience kill fires (per-token within 0.02 of window
-  at every horizon; window never beats per-token beyond 3σ). The model
-  circles the concept, so a single token reads it. 97.4 % violation
-  rate (gate passed easily).
+  at every horizon; window never beats per-token beyond 3σ). 97.4 %
+  violation rate (gate passed easily). **A post-hoc 17-layer depth
+  sweep (added after the verdict; does NOT reopen it) shows the gap is
+  shut at EVERY depth — 2/51 cells above 3σ, max +0.037 — so the kill
+  is not an artifact of the frozen layer choice.** It also *corrected
+  the mechanism*: my kill entry blamed a bag-of-words "circling" leak,
+  but at the embedding layer per-token reads only 0.538 (near-blind)
+  vs backtracking's +0.174 lexical gap there. Per-token instead CLIMBS
+  0.538 → 0.668 with depth — the model **computes** the pressure from
+  context and linearizes it per-position. **Conversion, not lexical
+  ambience.** Blind predictions scored D3 ✓ / D1, D2 ✗. This is a
+  FOURTH g(ℓ) shape for the atlas
+  (built-and-immediately-linearized) — see the LOG entry's comparison
+  table. **Design rule it yields:** screen for "will the model decline
+  to maintain this as a per-position state?" (backtracking anticipation
+  = a hazard over the trajectory, never converted) — NOT "is the
+  concept semantically non-obvious". Predicts a logical-deduction
+  variant ("don't mention XOR") fares no better and plausibly worse.
 - **Shuffle receipt (existing case study): POSITIVE** — backtracking
   ANTICIPATION is order-sensitive (shuffle costs +0.028…+0.041 vs
   +0.003…+0.013 for the ambient is_bt), at fixed T=16 on identical
