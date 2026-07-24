@@ -382,3 +382,76 @@ and conversion-atlas additions go to the LOG.
    incremental JSON parses clean, and all cells are deterministic
    (identical manifests + seeds), so recomputation cannot diverge.
    Lesson: never gate a launch on a piped git command's exit status.
+
+## § 4 — Screen wave (briefing § 3): the instrument finding and the correction
+
+Five bundles screened (`novelty`, `punctint` q + list, `tss`,
+`dialevel`). Verdict detail lives in `LOG.md`; this section records
+only what generalises past one candidate.
+
+### § 4a — Two measurement defects in the shared Stage-1 window grid
+
+Found on `dialevel` and confirmed against three models with
+pre-committed nulls (`dialevel/capacity_check.py`,
+`dialevel/actxmean_null.py`).
+
+1. **`win_mean` dilutes the anchor to weight 1/T.** Where the anchor
+   carries a strong per-position route — on `dialevel` the `tst`
+   anchor reads 0.959–0.972 per-token — the MEAN arm's decline in T
+   measures dilution, not window structure. **`anchor ⊕ context-mean`**
+   (2d, order-free, anchor undiluted) beat `win_mean` in **9 of 9**
+   model × T comparisons by **+0.051 AUC** mean, and its own
+   width-matched null (foreign context-mean) sits below per-token, so
+   the improvement is not width.
+2. **Flatten-arm width is expensive.** The foreign-context null (true
+   anchor, context slots from a different row: identical T·d width,
+   zero true context) scores **0.583–0.622** against a per-token
+   0.650–0.737 — 24k–131k noise features *cost* up to 0.15 AUC. Any
+   `win_flatten` vs `tok_linear` comparison therefore understates the
+   window; the width-matched contrast is flatten-vs-foreign.
+
+**Recommendation:** add `anchor ⊕ context-mean` as the standard
+order-free window arm and the foreign-context null as the standard
+width control on every flattened arm. Both are free on existing caches.
+
+### § 4b — A scoring error of mine, and the card defect it exposed
+
+`interleave/CARD.md` and `novelty/CARD.md` both define KEEP/KILL
+against **"the best window"** over grids that include window-MLP arms.
+I tabulated and scored only the window-MEAN *linear* arm. Re-scored
+literally, `tss` scores KEEP on 3/3 and `novelty` on 2/3; both
+published verdicts (KILL, NEGATIVE) are **WITHDRAWN to
+KEEP-PENDING-REVIEW**, and the "conversion is broader than next-token
+prediction" headline is withdrawn with the kill it rested on.
+
+The re-score is not itself trustworthy: **"the best window" maximises
+over ~15–20 window cells against one per-token cell with no
+multiplicity control.** The comparison that survives both objections
+fixes the probe class and controls width — MLP-vs-MLP with a foreign
+null — and gives +0.097/+0.085/+0.126 (`tss`) and +0.064/+0.076/+0.073
+(`novelty`), foreign nulls at or below per-token.
+
+**Substantive consequence:** in both bundles the window advantage lives
+in the **nonlinear readout of the window**, not in a linear mean-pool
+(linear-mean gaps +0.04 typical; MLP gaps +0.06…+0.13). Tabulating one
+linear arm hid that twice. Cards should name the scoring arm
+explicitly, per probe class, before the run.
+
+### § 4c — Diagnostics this arm contributed, with their limits
+
+- **`doc_mean_only_auc`** (proposed round-2): `dialevel` supplies the
+  first *causal* validation — 0.983–0.986, naive arm +0.13…+0.20
+  monotone in T, within-dialogue arm ≈ 0. It should trigger a control,
+  not act as a kill bar (`novelty` at ~0.77 did not die of identity).
+- **Within-document/-dialogue contrasts** as the standard control.
+  `dialevel` balances **per document**, so identity carries exactly
+  zero label information — stronger than the global balancing the
+  punctint control used, and the version to reuse.
+- **Conversion fraction** `(tok − floor)/(best_window − floor)`:
+  **amended** — it requires a definedness precondition `tok > floor`.
+  On `dialevel` per-token sits below the label-side floor on 2 of 3
+  models, giving −0.23 and −22. Where it fails, the correct statement
+  is "the activation probe does not beat the label-side floor".
+- **Label-side floors are not footnotes.** On `dialevel`/llama a
+  seven-feature position+`tst` floor reads the within-dialogue label at
+  **0.772** and no activation cell beats it by more than 0.002.
