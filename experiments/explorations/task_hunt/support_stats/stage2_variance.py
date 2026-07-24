@@ -25,10 +25,28 @@ not the p-values.
 
 Run: .venv/bin/python -m \
        experiments.explorations.task_hunt.support_stats.stage2_variance
+
+**Probe-agnostic by construction** (`briefings/probe-adequacy.md` item 3):
+every input is a CLI parameter with defaults that reproduce the committed
+v1 receipts byte-identically. Re-basing on λ-probe-v2 numbers (should the
+methods review adopt PROBE_V2_SPEC.md) is a re-run, not a rewrite:
+
+    ... stage2_variance --probe v2 \
+        --crosscheck-json <the v2 re-run's results JSON> \
+        --out-prefix stage2_variance_v2
+
+`--probe` filters leaderboard rows by the `lambda_probe_v2` eval_cfg flag
+(v1 rows carry no flag; v2 rows are new eval_keys, so both populations
+coexist) and selects the matching metric columns. `--k-pos` pins the
+panel's frozen per-token budget (8): the post-matched amendment rows
+(k_pos = 8·T, same datasource) are excluded by design, not by accident —
+without this filter today's leaderboard aborts the build on 24 duplicate
+cells.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -42,13 +60,17 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 DS = "ward_real_lambda_base_l12"
 METRIC = "lambda_recovery"
+K_POS = 8                     # the panel's frozen per-token budget
 SEEDS = (1, 2, 42)
 TREND_TS = (2, 4, 8)
 TREND_TS_FULL = (2, 4, 8, 16)
 
 LEADERBOARD = ROOT / "results" / "leaderboard.jsonl"
-STAGE2_JSON = (ROOT / "experiments" / "explorations" / "task_hunt" /
-               "lambda_intensity" / "results" / f"stage2_{DS}.json")
+
+
+def stage2_json_default(ds: str) -> Path:
+    return (ROOT / "experiments" / "explorations" / "task_hunt" /
+            "lambda_intensity" / "results" / f"stage2_{ds}.json")
 
 # Comparisons: (name, window arch, T=1 reference arch)
 PAIRINGS = [
@@ -57,26 +79,39 @@ PAIRINGS = [
 ]
 
 
-def load_cells():
+def load_cells(ds: str, metric: str, k_pos: int, probe: str,
+               crosscheck_json: Path):
     """(arch, T, seed, kind) -> {metric, l0} from the leaderboard,
-    cross-checked exactly against runpod-d's stage2 results JSON."""
+    cross-checked exactly against the panel run's results JSON.
+
+    Row filter: datasource == ds AND the panel k_pos AND the probe
+    generation (v1 = no `lambda_probe_v2` eval_cfg flag, v2 = flag set),
+    so v1 receipts, post-matched amendment rows and any future v2 rows
+    coexist on the leaderboard without tripping the duplicate guard.
+    """
+    chance_key = metric.replace("recovery", "chance")
     cells = {}
     with LEADERBOARD.open() as fh:
         for line in fh:
             r = json.loads(line)
-            if r.get("datasource") != DS:
+            if r.get("datasource") != ds:
                 continue
             tc = r["training_cfg"]
+            if tc["arch_hparams_override"].get("k_pos") != k_pos:
+                continue
+            is_v2 = bool(r.get("eval_cfg", {}).get("lambda_probe_v2"))
+            if is_v2 != (probe == "v2"):
+                continue
             key = (r["arch"], tc["arch_hparams_override"]["T"], r["seed"],
                    "untrained" if tc["n_steps"] == 0 else "trained")
             if key in cells:
                 raise SystemExit(f"duplicate leaderboard cell {key}")
-            cells[key] = {"metric": r["metrics"][METRIC],
+            cells[key] = {"metric": r["metrics"][metric],
                           "l0": r["metrics"]["l0_per_token"],
-                          "chance": r["metrics"]["lambda_chance"]}
+                          "chance": r["metrics"][chance_key]}
     ref = {(r["arch"], r["T"], r["seed"], r["kind"]):
-           r["metrics"][METRIC]
-           for r in json.loads(STAGE2_JSON.read_text())}
+           r["metrics"][metric]
+           for r in json.loads(crosscheck_json.read_text())}
     if set(ref) != set(cells):
         raise SystemExit("leaderboard/stage2-json key sets differ")
     bad = [k for k in ref if ref[k] != cells[k]["metric"]]
@@ -114,8 +149,37 @@ def paired_stats(diffs, arm_a=None, arm_b=None):
     return out
 
 
-def main():
-    cells = load_cells()
+def parse_args(argv=None):
+    ap = argparse.ArgumentParser(
+        description="Variance receipts for a Stage-2 λ̂ panel; defaults "
+                    "reproduce the committed v1 receipts byte-identically.")
+    ap.add_argument("--ds", default=DS, help="panel datasource registry key")
+    ap.add_argument("--probe", choices=("v1", "v2"), default="v1",
+                    help="which λ-probe generation of rows to read "
+                         "(v2 = rows flagged lambda_probe_v2 in eval_cfg)")
+    ap.add_argument("--metric", default=None,
+                    help="headline metric column (default: lambda_recovery "
+                         "for --probe v1, lambda_recovery_v2 for v2)")
+    ap.add_argument("--k-pos", type=int, default=K_POS,
+                    help="panel per-token budget row filter")
+    ap.add_argument("--crosscheck-json", type=Path, default=None,
+                    help="panel results JSON for the exact cross-check "
+                         "(default: lambda_intensity/results/stage2_<ds>.json)")
+    ap.add_argument("--out-prefix", default="stage2_variance",
+                    help="output basename — a v2 re-base writes new files "
+                         "next to the committed v1 receipts, never over them")
+    args = ap.parse_args(argv)
+    if args.metric is None:
+        args.metric = METRIC if args.probe == "v1" else METRIC + "_v2"
+    if args.crosscheck_json is None:
+        args.crosscheck_json = stage2_json_default(args.ds)
+    return args
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    cells = load_cells(args.ds, args.metric, args.k_pos, args.probe,
+                       args.crosscheck_json)
     archs = sorted({k[0] for k in cells})
     Ts_by_arch = {a: sorted({k[1] for k in cells if k[0] == a})
                   for a in archs}
@@ -230,19 +294,20 @@ def main():
                      ["n_for_80pct_power_t05"]}}
 
     out = {
-        "datasource": DS, "metric": METRIC, "seeds": list(SEEDS),
-        "source": {"leaderboard_rows": 84,
-                   "crosscheck_vs_stage2_json": "exact (all 84 cells)"},
+        "datasource": args.ds, "metric": args.metric, "seeds": list(SEEDS),
+        "source": {"leaderboard_rows": len(cells),
+                   "crosscheck_vs_stage2_json":
+                       f"exact (all {len(cells)} cells)"},
         "per_seed": per_seed, "cell_ci95_trained": cell_ci,
         "paired": paired, "trend": trend,
         "margin_trained_minus_untrained": margins, "power": power,
         "honesty": build_honesty(paired),
     }
-    (HERE / "stage2_variance.json").write_text(json.dumps(out, indent=1))
-    write_md(out)
+    (HERE / f"{args.out_prefix}.json").write_text(json.dumps(out, indent=1))
+    write_md(out, args.out_prefix, args.crosscheck_json.name)
     print(json.dumps({"paired_T8": paired["txc_pre_minus_tsae"]["by_T"]["T8"],
                       "trend": trend, "power": power}, indent=1))
-    print(f"-> {HERE}/stage2_variance.json ; stage2_variance.md")
+    print(f"-> {HERE}/{args.out_prefix}.json ; {args.out_prefix}.md")
 
 
 def build_honesty(paired):
@@ -274,14 +339,17 @@ def fmt(x, nd=4):
     return "—" if x is None else f"{x:.{nd}f}"
 
 
-def write_md(out):
+def write_md(out, out_prefix="stage2_variance",
+             crosscheck_name=None):
+    if crosscheck_name is None:
+        crosscheck_name = f"stage2_{out['datasource']}.json"
     L = []
     A = L.append
     A(f"# Stage-2 λ̂ panel — variance receipts (runpod-b, item 1 of "
       f"`briefings/hunt-support-stats.md`)\n")
     A(f"Source: {out['source']['leaderboard_rows']} leaderboard rows, "
       f"datasource `{out['datasource']}`, metric `{out['metric']}`, seeds "
-      f"{out['seeds']}; cross-check vs `stage2_{out['datasource']}.json`: "
+      f"{out['seeds']}; cross-check vs `{crosscheck_name}`: "
       f"{out['source']['crosscheck_vs_stage2_json']}. Built by "
       f"`stage2_variance.py` — every number below is script-derived.\n")
 
@@ -374,7 +442,7 @@ def write_md(out):
     for h in out["honesty"]:
         A(f"- {h}")
     A("")
-    (HERE / "stage2_variance.md").write_text("\n".join(L))
+    (HERE / f"{out_prefix}.md").write_text("\n".join(L))
 
 
 if __name__ == "__main__":
