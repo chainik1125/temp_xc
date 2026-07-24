@@ -67,7 +67,7 @@ builder's script-derived stats JSON).
 | B4 | question-rate intensity | fineweb | BUILT → screen **KEEP** (the hunt's first) |
 | B5 | dialogue turn-length level / switch clock | new (DailyDialog-class) | **BUILD** (stretch) |
 | B6 | equation-density intensity | new (OpenWebMath) | **KILLED at triage** (2026-07-24 r2: manifest unigram bar fired, gpt2 0.653 — free kill) |
-| B7 | refusal/deflection-marker intensity λ̂ | new (WildChat-class chat) | **BUILD-if-time** (behind B6; hard pre-gate: event rate < ~2 % of turns ⇒ free kill) |
+| B7 | refusal/deflection-marker intensity λ̂ | new (WildChat-1M) | BUILT → **SHIPPED** (2026-07-24 r2: pre-gate 0.147≫0.02; bars clean; conv-identity 0.967 disclosed, within-conv contrast binding) |
 | P1 | news chronology / date density | new (cc_news-class) | PARK |
 | P2 | numeric-token density | fineweb | PARK |
 | P3 | citation-marker density | new (arXiv-class) | PARK |
@@ -279,6 +279,20 @@ before any building: measure the event rate on the pinned sample
 first — if < ~2 % of assistant turns match the frozen list, kill in
 the ledger for free** (quantity-mode win condition includes honest
 kills). **BUILD-if-time.**
+*Round-2 verdict (2026-07-24): pre-gate PASSED loudly (marker rate
+0.147 of assistant turns, 7× the bar; 38 % of ≥ 8-assistant-turn
+conversations have ≥ 2 marker turns) and the bundle **SHIPPED**: the
+frozen bars came back clean-to-mild — unigram 0.517–0.532 on manifest
+rows (near-blind: the harmful-topic leak does NOT materialize at
+token level once marker messages are masked), position 0.545–0.565 —
+but the adopted conversation-identity statistic is the loudest in the
+program (`doc_mean_only_auc` 0.966–0.968), so the **within-
+conversation contrast is a BINDING screen precondition**, with the
+position floor probe and the beat-the-visible-evidence line (kernel
+support ≈ 1,000–1,150 tokens, ~16× the ladder top — the loudest
+under-span in the factory). Receipts: `refmark/CARD_DRAFT.md` verdict
+appendix + `labels/refmark_stats.json` + `labels/refmark_pregate.json`
++ pinned `labels/refmark_corpus.json.gz`.*
 
 ## PARK
 

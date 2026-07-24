@@ -1,0 +1,134 @@
+{
+ "corpus": {
+  "dataset": "allenai/WildChat-1M",
+  "revision": "7d6490e462285cf85d91eabea0f9a954fbddcd1f",
+  "license": "ODC-By 1.0",
+  "split": "train",
+  "stream_prefix": 40000,
+  "filter": {
+   "language": "English",
+   "min_assistant_turns": 8,
+   "min_chars": 2000,
+   "max_chars": 24000
+  },
+  "seed": 0,
+  "n_convs": 400,
+  "frozen_list": {
+   "repo": "github.com/andyrdt/refusal_direction",
+   "commit": "9d852fae1a9121c78b29142de733cb1340770cc3",
+   "symbol": "pipeline/submodules/evaluate_jailbreak.py:_test_prefixes_jailbreakbench"
+  }
+ },
+ "kernel": {
+  "half_life_msgs": 2,
+  "support_msgs": 8
+ },
+ "min_manifest_pos": 32,
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_convs": 400,
+   "n_tokens": 1362514,
+   "tokens_per_conv_median": 3808.5,
+   "tokens_per_message_mean": 143.74026796075535,
+   "kernel_support_tokens_mean": 1149.9221436860428,
+   "marker_rate_assistant_msgs": 0.1477129668485103,
+   "marker_rate_all_msgs": 0.0742694377043992,
+   "marker_token_frac": 0.08973999533215805,
+   "assistant_token_frac": 0.8382600105393413,
+   "boundary_token_frac": 0.04875913201625818,
+   "labeled_frac": 0.6492006687637705,
+   "eligible_frac": 0.5620228489395338,
+   "train_zero_frac": 0.6978641558891029,
+   "scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.16568543016910553
+   ],
+   "rlam_mean": 0.052897918969392776,
+   "rlam_std": 0.10804920643568039,
+   "manifest_rows_per_class": 19998,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.5154955787684415,
+    "position_auc": 0.38258999366495416,
+    "doc_mean_only_auc": 0.9668898788373935
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.5173791092573409,
+    "position_auc": 0.45549930824677826,
+    "doc_mean_only_auc": 0.9671199202102917
+   },
+   "artifact": "refmark_wildchat_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_convs": 400,
+   "n_tokens": 1233074,
+   "tokens_per_conv_median": 3460.0,
+   "tokens_per_message_mean": 130.08481907374195,
+   "kernel_support_tokens_mean": 1040.6785525899356,
+   "marker_rate_assistant_msgs": 0.1477129668485103,
+   "marker_rate_all_msgs": 0.0742694377043992,
+   "marker_token_frac": 0.09521326376194779,
+   "assistant_token_frac": 0.839021015770343,
+   "boundary_token_frac": 0.03969185953154474,
+   "labeled_frac": 0.6465637909809143,
+   "eligible_frac": 0.5616564780378145,
+   "train_zero_frac": 0.6916571453821244,
+   "scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.16568543016910553
+   ],
+   "rlam_mean": 0.055186063051223755,
+   "rlam_std": 0.11079007387161255,
+   "manifest_rows_per_class": 19998,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.5356751932842962,
+    "position_auc": 0.38656344962637695,
+    "doc_mean_only_auc": 0.9680152403751654
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.5316423160381499,
+    "position_auc": 0.43468347519685585,
+    "doc_mean_only_auc": 0.9664749827900322
+   },
+   "artifact": "refmark_wildchat_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_convs": 400,
+   "n_tokens": 1186570,
+   "tokens_per_conv_median": 3398.5,
+   "tokens_per_message_mean": 125.17881633083658,
+   "kernel_support_tokens_mean": 1001.4305306466927,
+   "marker_rate_assistant_msgs": 0.1477129668485103,
+   "marker_rate_all_msgs": 0.0742694377043992,
+   "marker_token_frac": 0.09410064302990974,
+   "assistant_token_frac": 0.8399563447584213,
+   "boundary_token_frac": 0.04120195184439182,
+   "labeled_frac": 0.6473423396849743,
+   "eligible_frac": 0.5628188813133654,
+   "train_zero_frac": 0.6959082068723496,
+   "scheme": "zero_split",
+   "edges": [
+    0.0,
+    0.16568543016910553
+   ],
+   "rlam_mean": 0.05430077016353607,
+   "rlam_std": 0.10990212857723236,
+   "manifest_rows_per_class": 19997,
+   "triage_all_eligible_rows": {
+    "unigram_auc": 0.5242423249805267,
+    "position_auc": 0.38458730651720646,
+    "doc_mean_only_auc": 0.9676019122246545
+   },
+   "triage_manifest_rows": {
+    "unigram_auc": 0.5288299091533525,
+    "position_auc": 0.43825518054754103,
+    "doc_mean_only_auc": 0.9661243526921194
+   },
+   "artifact": "refmark_wildchat_llama31.npz"
+  }
+ }
+}

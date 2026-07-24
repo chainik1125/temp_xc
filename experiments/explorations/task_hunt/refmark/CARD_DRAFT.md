@@ -96,3 +96,38 @@ discipline) and the beat-the-visible-evidence line (qualification 3);
 if the doc-identity statistic comes back punctint-loud, a
 within-conversation contrast is the mandatory control before any
 promotion (q-face precedent).
+
+## Triage RESULT (builder-derived; appended after the frozen bars ran)
+
+**SHIPS — no frozen bar fires — and the loudest number is the one the
+card pre-committed to disclosing, stated first: `doc_mean_only_auc`
+= 0.966–0.968** (direction-agnostic, BOTH all-eligible and manifest
+rows, all three tokenizers) — the conversation-identity route is
+LOUDER than the punctint faces that motivated the statistic
+(0.926/0.960). λ̂ terciles are overwhelmingly a conversation-level
+property: refusal-laden conversations vs clean ones. **Binding
+consequence (pre-committed above): the within-conversation contrast
+is the MANDATORY control at screen — without it, any window gap here
+is uninterpretable as temporal structure** (q-face precedent; the
+dialevel-qualification-2 discipline). The frozen bars themselves came
+back clean-to-mild: current-token type-mean **0.515–0.536 all-
+eligible / 0.517–0.532 manifest — near-BLIND**: the D7-inherited fear
+(harmful-topic vocabulary, apologetic register bleed) does NOT
+materialize at the current-token level once marker messages are
+masked — the label's readable routes are conversation identity and
+mild position, not token identity. Position: 0.613–0.617 all-eligible
+(disclosure band; high-λ̂ rows sit EARLY — raw 0.383–0.387),
+pulled to **0.545–0.565 on the operative manifest rows** (gpt2 0.545
+clean; gemma2/llama31 0.562–0.565 low disclosure band). Scale
+receipts: 400 conversations, 1.19–1.36M tokens/tokenizer,
+tokens/message 125–144 ⇒ **kernel support ≈ 1,000–1,150 tokens —
+the stated under-span confirmed (~16× the T = 64 ladder top)**;
+marker rate 0.148 of assistant messages (matches the pre-gate);
+zero_split fired (train zero-frac 0.69–0.70); labeled fraction 0.65;
+marker-token fraction 0.09 (masked); manifests ~20k rows/class.
+Artifacts committed: three npz + `refmark_corpus.json.gz` +
+`refmark_stats.json`. Screen preconditions, binding: (1)
+within-conversation contrast before any promotion; (2) position-only
+floor probe on shipped manifest rows; (3) the
+beat-the-visible-evidence line next to every window number
+(qualification 3 — a T-window almost never contains a marker).

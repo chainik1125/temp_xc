@@ -1990,3 +1990,49 @@ what-this-does-NOT-decide section. Written to be adopted by freezing
 the file as-is.
 
 Stopped at the acceptance gate for mac-local review; the briefing stays.
+
+## 2026-07-24 — runpod — candidate factory B7 SHIPPED: `refmark` (refusal/deflection-marker intensity, WildChat) — pre-gate 7× over the bar; bars clean; conversation-identity 0.967 disclosed with a binding control
+
+Round-2 stretch (unlocked by B6's honest death), three commits in
+strict order: (1) the FROZEN substring list BEFORE any counting — the
+refusal paper's `refusal_score` set VERBATIM, 12 strings from
+`andyrdt/refusal_direction` @ `9d852fae` with App. D.1 semantics
+(case-insensitive, anywhere in turn), no additions; (2) the hard
+pre-gate: on `allenai/WildChat-1M` (pinned revision, ODC-By 1.0,
+English ≥ 4/≥ 8-assistant-turn populations) the marker rate is
+**0.147 of assistant turns vs the 0.02 free-kill bar — 7× over — with
+real recurrence** (38 % of ≥ 8-turn conversations have ≥ 2 marker
+turns); receipt `labels/refmark_pregate.json`; (3) builder + card
+with the pinned 0.65/0.65 direction-agnostic bars committed pre-run,
+then the run. Bundle: 400 English ≥ 8-assistant-turn conversations
+(first-40k stream prefix disclosed, seeded), newline-rendered without
+speaker tags, message-level λ̂ (kernel 2/8) from previous messages
+only, marker-message + boundary tokens masked, position-matched
+manifests (pos ≥ 32), ~20k rows/class, 1.19–1.36M tokens/tokenizer,
+zero_split (train zero-frac 0.70). 3 new tests; suite 285 passed.
+
+**Verdict: SHIPS — no frozen bar fires.** Unigram type-mean
+**0.517–0.532 on operative manifest rows — near-BLIND**: the
+D7-inherited topic-leak fear does not materialize at the current-
+token level once marker messages are masked. Position 0.545–0.565
+manifest (0.613–0.617 all-eligible; high-λ̂ rows sit early). **The
+loudest number is the adopted disclosure statistic:
+`doc_mean_only_auc` = 0.966–0.968** — the conversation-identity route
+exceeds even punctint's (0.926/0.960), so per the card's pre-
+commitment the **within-conversation contrast is BINDING at screen**,
+alongside the position floor probe and the beat-the-visible-evidence
+line (kernel support ≈ 1,000–1,150 tokens ≈ 16× the T = 64 ladder
+top — the loudest under-span in the factory, stated pre-run).
+First application of the doc-identity statistic adopted from
+runpod-e's recommendation — it earned its keep immediately.
+Economics: NEW stream, one caching pass per model (~minutes on
+H100); BASE models on chat transcripts, distribution shift stated.
+Artifacts: 3 npz + pinned corpus + stats + pre-gate receipt, all
+committed.
+
+Round-2 gate status: ledger updated (D7 DEAD + B7 entry + three
+screen-outcome lines + doc-identity adoption), B6 triage-killed with
+receipt, B7 stretch shipped, LOG line per item. STATUS rewrite next;
+stopping for review (briefing stays).
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-2)_
