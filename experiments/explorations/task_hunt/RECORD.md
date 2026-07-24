@@ -120,8 +120,34 @@ briefing's default 2…32 ladder sits mostly *below* this latent's
 support. The frozen ladder is **T ∈ {8, 16, 32, 64}** (T = 128 excluded
 — on a 128-token window only p = 127 would be eligible).
 
-*Screen in progress at the time of writing; the verdict paragraph lands
-in [`LOG.md`](LOG.md) and the ladder table is appended here.*
+**Verdict (primary layer base L12): WEAK KEEP** — full paragraph in
+[`LOG.md`](LOG.md). σ_null = 0.0035 (3σ = 0.0105). Macro-OvR AUC:
+
+| target | tok | T=8 | T=16 | T=32 | T=64 |
+|---|---|---|---|---|---|
+| `tir` (PRIMARY) | 0.614 | +0.028 | **+0.049** | +0.032 | +0.037 |
+| `boundary` | 0.618 | +0.017 | +0.036 | +0.030 | +0.008 |
+| `op` (AMBIENT ANCHOR) | 0.760 | +0.037 | +0.041 | +0.036 | +0.018 |
+
+The card's actual claim is the CONTRAST g_tir − g_op: −0.009, +0.008,
+−0.005, **+0.019** at T = 8/16/32/64. It clears 3σ_null at exactly one
+T and is noise elsewhere — no kill rule fires as written, but one-point
+survival is not the predicted threshold ladder. P1 (clock threshold)
+and P3 (order at T ≥ 32) are falsified; `tir` peaks at T = 16 and
+declines, the localized-latent shape (STORY § 7).
+
+**The methodological result of this candidate — why the ambient anchor
+earned its place on the card.** `tir`'s within-window shuffle gap grows
+monotonically with T (+0.008 → +0.025 → +0.032 → **+0.061**), which
+reads like textbook order sensitivity. It is not: the **ambient** `op`
+label, readable from the current sentence by construction, grows the
+same way (+0.010 → +0.017 → +0.034 → **+0.065**), and so does
+`boundary`. **A shuffle gap that grows with T is a generic property of
+wider windows under a flatten probe**, not evidence about the latent.
+Only the anchor-differenced contrast carries that claim. I recorded the
+raw ladder as an order finding before the anchor landed and corrected
+it in the LOG; the § 3 receipt is unaffected because it contrasts
+anticipation against ambient targets *on identical rows at fixed T*.
 
 ---
 
@@ -139,18 +165,34 @@ preserving the exact multiset of position-activations.
 Raw test AUC (results: `results/shuffle_receipt.json`, figure
 `figs/shuffle_receipt.*`):
 
+All 12 cells (σ_null = 0.0035, 3σ = 0.0106):
+
 | cell | per-token | window MEAN | window SHUFFLED | window (ordered) | ordered − shuffled |
 |---|---|---|---|---|---|
 | base L10 `ant_kw` | 0.843 | 0.872 | 0.852 | 0.886 | **+0.034** |
 | base L10 `ant_bts` | 0.765 | 0.760 | 0.744 | 0.785 | **+0.041** |
 | base L10 `is_bt` | 0.798 | 0.798 | 0.793 | 0.806 | +0.013 |
 | base L12 `ant_kw` | 0.851 | 0.870 | 0.851 | 0.887 | **+0.036** |
+| base L12 `ant_bts` | 0.762 | 0.768 | 0.753 | 0.788 | **+0.035** |
+| base L12 `is_bt` | 0.792 | 0.810 | 0.796 | 0.805 | +0.009 |
+| distill L10 `ant_kw` | 0.844 | 0.868 | 0.859 | 0.895 | **+0.036** |
+| distill L10 `ant_bts` | 0.765 | 0.769 | 0.752 | 0.792 | **+0.040** |
+| distill L10 `is_bt` | 0.803 | 0.809 | 0.808 | 0.820 | +0.012 |
+| distill L12 `ant_kw` | 0.854 | 0.868 | 0.856 | 0.895 | **+0.039** |
+| distill L12 `ant_bts` | 0.757 | 0.768 | 0.750 | 0.778 | **+0.028** |
+| distill L12 `is_bt` | 0.805 | 0.814 | 0.811 | 0.814 | +0.003 |
 
 **The receipt the paper's § 5.2 task never had:** destroying
-within-window order costs the *anticipation* targets ≈ 0.035–0.041 AUC
-(≫ the depth study's 3σ_null = 0.011), while the near-ambient companion
-`is_bt` loses only 0.013. Backtracking **anticipation** is genuinely
-order-sensitive; "this token is inside a backtracking sentence" is not.
+within-window order costs the *anticipation* targets **+0.028…+0.041
+AUC** (3–4× the noise floor) on both models and both layers, while the
+near-ambient companion `is_bt` loses only **+0.003…+0.013**.
+Backtracking **anticipation** is genuinely order-sensitive; "this token
+is inside a backtracking sentence" is not.
+
+This comparison is immune to the T-confound that bit candidate 2 (§ 2):
+every cell here is at the **same fixed T = 16** on **identical probe
+rows**, so the anticipation-vs-ambient contrast cannot be produced by
+window width.
 
 Note the ordering `shuffled < mean < ordered` on `ant_kw`: a shuffled
 flatten is *worse* than a position-symmetric mean, i.e. mis-aligned
@@ -166,10 +208,23 @@ margin an order effect rather than a capacity effect.
    through the `module:fn` generator path
    (`src/explorations/task_hunt/real_lambda.py`), so the canonical
    runner and the existing `lambda_recovery` evaluator panel a real
-   task with `temp_bench/core/` untouched. `emission_features` is
-   deliberately EMPTY — a real residual stream has no ground-truth
-   directions — so `eauc`/`e_mean_max_cos` come back **NaN by design**
-   and must never be read from these rows.
+   task with `temp_bench/core/` untouched. A real residual stream has
+   no ground-truth directions, so `emission_features` carries a
+   **reference basis, not ground truth**: the stream's DC direction
+   plus the top principal directions of a fixed seed-0 subsample.
+   `eauc`/`e_mean_max_cos` on these rows answer "does the dictionary
+   span the stream's dominant variance directions?" — a sanity check,
+   **never feature recovery**. The headline is `lambda_recovery` alone.
+
+   *Why not simply leave it empty (the first attempt, and the sharpest
+   lesson of the session):* an empty target set makes
+   `_feature_recovery_auc` return NaN; **the leaderboard IS the eval
+   cache**, JSON serializes NaN to `null`, and `LeaderboardRow` then
+   rejects the cached read. Six such rows made the canonical artifact
+   **unloadable for every subsequent run**, not just those cells — it
+   surfaced as a `ValidationError` on an unrelated cell six seconds
+   into a restart, long after the rows were written. **Never emit NaN
+   into a leaderboard metric.**
 2. **The trainer infers `d_in` from datasource params before
    materializing**, so real_lm-style entries must declare it; the
    generator now checks the declared value against the cache rather
@@ -184,23 +239,16 @@ margin an order effect rather than a capacity effect.
    wrong with either job — a T = 64 flatten probe simply cannot share
    80 GB with a 50 GB probe job. The jobs were re-run serialized. Any
    future agent adding a third GPU job should chain, not fan out.
-5. **Leaderboard hygiene + the non-headline rows on this datasource.**
-   7121 rows, **0 duplicate `eval_key`s, 0 rows missing a key**. Five
-   rows carry `datasource = ward_real_lambda_base_l12` and only the
-   `buffer_tokens = 524288` ones belong to the Stage-2 headline:
-
-   | arch | T | n_steps | buffer_tokens | headline? |
-   |---|---|---|---|---|
-   | txc_batchtopk_post | 4 | 200 | 2,000,000 | no — plumbing smoke test |
-   | batchtopk_sae | 1 | 0 | 2,000,000 | no — superseded config |
-   | tsae | 1 | 0 | 2,000,000 | no — superseded config |
-   | batchtopk_sae | 1 | 0 | 524,288 | yes (untrained control) |
-   | tsae | 1 | 0 | 524,288 | yes (untrained control) |
-
-   All five went through the canonical runner and are kept rather than
-   hand-edited out of the canonical artifact. The two superseded
-   untrained rows are from the pre-buffer-fix launch; they return
-   λ = 0.100, **identical** to their post-fix counterparts, which is
-   the expected result (an untrained control trains for 0 steps, so
-   buffer size cannot affect it) and a small free check that the
-   buffer change was performance-only.
+5. **Leaderboard hygiene, and a repair.** Baseline restored:
+   **7116 rows, 0 duplicate `eval_key`s, 0 rows with a null metric.**
+   Six rows written earlier in this session on
+   `ward_real_lambda_base_l12` (one 200-step plumbing cell + five
+   untrained controls) carried `null` for `eauc`/`e_*` from the NaN
+   defect in note 1 and were **removed** (backup:
+   `/workspace/logs/leaderboard.backup.jsonl`). This supersedes an
+   earlier decision, recorded mid-session, to keep the plumbing row
+   rather than hand-edit the canonical artifact: that call was correct
+   when the row looked merely superfluous, and wrong once the same rows
+   turned out to be *corrupting* — they made the leaderboard
+   unparseable. The repair removes only rows that cannot be loaded, all
+   of them written by this session, and none of them a result.
