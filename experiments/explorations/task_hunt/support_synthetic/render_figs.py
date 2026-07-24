@@ -28,10 +28,10 @@ RES, FIGS = HERE / "results", HERE / "figs"
 METRIC = "lambda_recovery"
 DPI_FLOOR = 0.41
 
-LINE_STYLE = {           # name -> (color, marker, ls, label)
-    "A1": ("#ff7f0e", "o", "-", "A1 fixed budget (d_sae=20=F)"),
-    "A2": ("#8c2d04", "s", "-", "A2 fixed budget (d_sae=40=2F)"),
-    "B": ("#2ca02c", "D", "--", "B budget-scaled (d_sae=5·T)"),
+LINE_STYLE = {           # name -> (color, marker, ls, label, annot_dy)
+    "A1": ("#ff7f0e", "o", "-", "A1 fixed budget (d_sae=20=F)", -13),
+    "A2": ("#8c2d04", "s", "-", "A2 fixed budget (d_sae=40=2F)", 7),
+    "B": ("#2ca02c", "D", "--", "B budget-scaled (d_sae=5·T)", -24),
 }
 
 
@@ -48,7 +48,7 @@ def _dilution():
     tr, un = _agg(rows, "trained"), _agg(rows, "untrained")
     fig, ax = plt.subplots(figsize=(7.2, 4.6))
     for name, pts in POINTS.items():
-        c, mk, ls, label = LINE_STYLE[name]
+        c, mk, ls, label, dy = LINE_STYLE[name]
         Ts = [T for T, d in pts]
         mean = [np.mean([m[METRIC] for m in tr[(T, d)]]) for T, d in pts]
         sd = [np.std([m[METRIC] for m in tr[(T, d)]], ddof=1) for T, d in pts]
@@ -61,17 +61,18 @@ def _dilution():
         for (T, d), y in zip(pts, mean):
             l0 = np.mean([m.get("l0_per_window", np.nan) for m in tr[(T, d)]])
             ax.annotate(f"l0w={l0:.1f}", (T, y), textcoords="offset points",
-                        xytext=(4, -11), fontsize=6.5, color=c, alpha=0.85)
+                        xytext=(4, dy), fontsize=6.5, color=c, alpha=0.85)
     ax.axhline(DPI_FLOOR, color="#7f7f7f", lw=0.9, ls="-.")
-    ax.text(2.02, DPI_FLOOR + 0.008, "per-token DPI floor ≈ 0.41",
+    ax.text(8, DPI_FLOOR + 0.008, "per-token DPI floor ≈ 0.41",
             fontsize=7, color="#7f7f7f")
     ax.set_xscale("log", base=2)
     ax.set_xticks([2, 4, 8, 16, 32], labels=["2", "4", "8", "16", "32"])
     ax.set_xlabel("window length T")
     ax.set_ylabel("λ̂ recovery (held-out r; chance ≈ 0)")
-    ax.set_title("Budget-dilution receipt — TXC-pre on the λ̂ mirror "
-                 "(k_pos=1, L=32; dotted = untrained)")
-    ax.legend(fontsize=8, loc="lower left")
+    ax.set_title("Budget-dilution receipt — TXC-pre, λ̂ mirror\n"
+                 "(k_pos=1, L=32; solid=trained, dotted=untrained; "
+                 "l0w = realized atoms/window)", fontsize=10)
+    ax.legend(fontsize=8, loc="center left")
     ax.grid(alpha=0.25)
     fig.tight_layout()
     for ext in ("png", "pdf"):
@@ -113,8 +114,8 @@ def _tsae():
     ax.set_xticks([1, 2, 4, 8], labels=["1", "2", "4", "8"])
     ax.set_xlabel("contrastive pair distance Δ  (registered T-SAE: Δ=1)")
     ax.set_ylabel("λ̂ recovery (held-out r)")
-    ax.set_title("T-SAE fairness receipt — its own temporal knob "
-                 "(d_sae=20, k_pos=1; dotted = untrained)")
+    ax.set_title("T-SAE fairness receipt — pair-distance knob\n"
+                 "(d_sae=20, k_pos=1; dotted = untrained)", fontsize=10)
     ax.legend(fontsize=8, loc="upper right")
     ax.grid(alpha=0.25)
     fig.tight_layout()

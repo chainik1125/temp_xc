@@ -742,3 +742,61 @@ unigram estimator LEAKS the source through its own count asymmetry
 (leave-block-out scored AUC 1.0 on identical vocabularies); the
 committed triage estimates from held-out doc halves, disjoint from
 the corpus by construction.
+## 2026-07-24 — runpod — hunt-support-synthetic: both receipts done (Item 1 **NO-MIRROR-DIP**; Item 2 **FLAT**)
+
+Mandate `briefings/hunt-support-synthetic.md`; card frozen pre-build at
+`support_synthetic/CARD.md` (freeze commit → build commit with 6 green
+contract tests → grids → verdicts read mechanically off the pre-committed
+`analyze_dilution.py` / `analyze_tsae.py`). 102 cells requested, 0 failures;
+leaderboard 8,688 rows, **0 dup eval_keys** (the 30 identical-config bench
+cells came back as runner cache hits, never re-appended). Records under
+`support_synthetic/results/`; figures
+`support_synthetic/figs/{dilution_tscaling,tsae_fair}.*`.
+
+**Item 1 — budget-dilution receipt: NO-MIRROR-DIP (the card's frozen third
+branch). The mirror reproduces the real panel's rise but not its dip, so the
+RECORD § 3b dilution clause gains no mirror support.** Under the real Stage-2
+convention exactly (fixed d_sae, fixed per-token k_pos), TXC-pre on the λ̂
+mirror rises 0.870 → 0.952 at the kernel-support peak (T = 4) and then stays
+flat to the end of every ladder: A1 (d = 20) 0.949 at T = 16; A2 (d = 40)
+0.949 at T = 32; budget-scaled B (d = 5·T) 0.942–0.952 throughout. No decline
+reaches the 0.05 bar anywhere (max |paired D| = 0.003). The sharp part is the
+realized-l0 trace: the fixed-budget arms **do** starve exactly as the
+dilution story requires — A1 realizes 8.9 of 16 nominal atoms/window at
+T = 16 (0.56/token), A2 19.8 of 32 at T = 32 — and recovery does not move.
+Set against the real panel's own receipt (TXC-pre realized l0/token 6.9–7.8
+≈ nominal at every T, *including* the dipping T = 16), dip and budget
+starvation are **doubly dissociated**: the real line dips without starving;
+the mirror starves without dipping. Per the frozen falsifier, the real T = 16
+dip needs a different explanation; recommendation for review: qualify the
+§ 3b clause "… until extra positions dilute a fixed code budget" to "cause
+not established". Candidate explanations (labelled speculation, not
+receipts): content competition during training (the mirror's λ̂-relevant
+content is compact and stationary; real Ward windows add rich competing
+content per position) or undertraining at large T (8k real steps vs 30k
+mirror). One honest capacity note: the *untrained* mirror controls do decline
+with T at fixed d_sae (0.78 → 0.60 along the A1 ladder) and are restored by
+scaling d_sae — the capacity effect exists at init; training erases it here.
+Bookkeeping disclosure: CARD § 1.2's enumeration under-counted the new
+untrained controls (27 ran, not 15 — untrained-at-every-line-point was the
+frozen intent; extra controls only, commentary-only per the card).
+
+**Item 2 — T-SAE fairness receipt: FLAT. The rejoinder is closed.** The
+registered T-SAE's one temporal hyperparameter — the contrastive pair
+distance, hardcoded to consecutive tokens — was exposed through a plugin
+variant arch (`TSAEDelta`, contract-tested **bitwise-identical** to `tsae`
+at Δ = 1: same RNG stream, losses, and parameter trajectory) and swept
+Δ ∈ {1, 2, 4, 8} at the canonical mirror budget, plus aux `tsae_a0`
+(registered class, contrastive_alpha = 0). λ̂ recovery 0.409 / 0.409 / 0.399
+/ 0.398, α = 0 at 0.399 — max |paired D vs Δ=1| = 0.011 against the 0.05
+bar; every setting inside the bench's T-SAE band (0.38–0.44) at the provable
+per-token DPI floor ≈ 0.41. Untrained guard PASS (exact equality across all
+five entries, per seed). The real panel's single-config T-SAE cell is not
+underestimating the baseline through its temporal knob — the per-token
+decode, not the training window, is binding; even deleting the contrastive
+term entirely moves nothing on this latent. No rise ⇒ no runpod-d flag;
+skeptic not triggered ($0, frozen policy).
+
+_Recorded-by: claude-fable-5 (runpod, hunt-support-synthetic briefing),
+2026-07-24. Card frozen pre-build; scripts committed pre-run; verdicts
+mechanical; stopped for review — briefing stays until mac-local retires it._

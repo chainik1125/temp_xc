@@ -1,106 +1,88 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-24, immediately after receiving
-`briefings/hunt-support-synthetic.md` (pre-compact; NOT started yet).
-**State: NEW TASK ASSIGNED, ZERO WORK DONE ON IT.** The previous task
-(TXC-pro dissection) is DONE + REVIEWED & APPROVED (briefing retired).
+**Last rewrite:** 2026-07-24, after completing `briefings/hunt-support-synthetic.md`.
+**State: TASK DONE — STOPPED FOR REVIEW.** Both mechanism receipts delivered,
+verdicts in the shared LOG, pushed. The briefing stays until mac-local
+retires it. Nothing mid-flight.
 
 ## Who / where
 Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am `runpod`
 (original box — `/workspace/.agent_id` does NOT exist; do not create it).**
-Parallel agents: runpod-b/-c/-d/-e (task-hunt + em-redo arms) — their
-briefings are NOT mine. Shared-branch rules (agents/README.md): `git pull
---rebase origin arxiv` before EVERY push (commit this STATUS first); shared
-files append-only; leaderboard/manifest union-merge; **cite commits by
-SUBJECT LINE or re-verify SHAs post-push**. Tokens in `/workspace/.tokens/`
-(`gh_token`, `anthropic_key` → export ANTHROPIC_API_KEY). Push:
+Parallel agents: runpod-b/-c/-d/-e — their briefings are NOT mine.
+Shared-branch rules (agents/README.md): `git pull --rebase origin arxiv`
+before EVERY push (commit this STATUS first); shared files append-only;
+leaderboard/manifest union-merge; cite commits by SUBJECT LINE or re-verify
+SHAs post-push. Tokens in `/workspace/.tokens/` (`gh_token`, `anthropic_key`
+→ export ANTHROPIC_API_KEY). Push:
 `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`.
 32 CPU / 128 GB, NO GPU; harness-tracked background Bash; python -u.
 
-## ACTIVE TASK (not started): briefings/hunt-support-synthetic.md
-Two synthetic mechanism receipts for the task hunt's Stage-2 λ̂ result
-(real Ward activations, TXC-pre 0.13→0.19→0.21 over T=2/4/8, dip at
-T=16). **Deadline: results by Saturday morning PT.** Read order when
-starting: (1) the briefing itself; (2) `task_hunt/LOG.md` mac-local
-review entry (the briefing discharges its two review notes: T=16-dip
-interpretation + T-SAE-fairness rejoinder); (3) `task_hunt/RECORD.md`
-§ 3b (the dip sentence at stake).
+## Just completed (2026-07-24): hunt-support-synthetic — AWAITING REVIEW
+Two synthetic mechanism receipts for the Stage-2 λ̂ result, both verdicts
+appended to `task_hunt/LOG.md` (my entry is the last one; read it first):
 
-- **Item 1 — budget-dilution receipt.** On `toy_backtracking_selfexcite`
-  (λ̂ mirror, provable DPI floor, shared `lambda_recovery` evaluator):
-  Arm A fixed budget, TXC-pre × T∈{2,4,8,16,32}, canonical d_sae/k_pos
-  slice, 3 seeds + untrained — frozen prediction: rise then DECLINE
-  (reproduces real dip). Arm B budget-scaled (state the knob; match on
-  MEASURED realized l0) — prediction: decline flattens/vanishes.
-  Falsifiers in the card: no dip in A ⇒ real dip needs another
-  explanation (finding); dip persists in B ⇒ RECORD's dilution clause
-  must be RETRACTED (finding). Deliverable: two-arm figure (recovery vs
-  T) + LOG paragraph backing or retracting the dip sentence.
-- **Item 2 — T-SAE fairness receipt.** Sweep the registered T-SAE's own
-  temporal knob (whatever `src/temp_bench/archs/tsae.py` exposes — its
-  contrastive pair is consecutive-token; if the knob isn't YAML-exposed,
-  add a plugin-arch variant file, hard rule 3, never edit core) across
-  ≥3 settings at canonical budget, 3 seeds + untrained, on the mirror.
-  Frozen prediction: λ̂ recovery FLAT in the knob (per-token decode is
-  binding). Falsifier: recovery rises ⇒ flag IMMEDIATELY in LOG + to
-  runpod-d (its round-2 T-SAE cell would need a re-run before any
-  rebuttal figure ships).
-- **Process rails:** ONE short card per item at
-  `experiments/explorations/task_hunt/support_synthetic/CARD.md`,
-  frozen/committed PRE-RUN; results + figs under `support_synthetic/`;
-  every trained cell through the canonical runner; leaderboard 0 dup
-  keys; verdict paragraphs APPENDED to shared `task_hunt/LOG.md`; no
-  reviewer/meeting quotes in tracked files; STATUS rewritten; stop for
-  review (briefing stays until mac-local deletes it).
+- **Item 1 (budget-dilution receipt): NO-MIRROR-DIP** — the frozen third
+  branch. Mirror reproduces the real rise (0.870 → 0.952 at kernel-support
+  peak T=4) but NOT the T=16 dip: all three lines flat ~0.95 to ladder end
+  (A1 d=20 → T16; A2 d=40 → T32; B d=5T → T32), max |paired D| = 0.003 vs
+  0.05 bar. Key finding: fixed-budget arms measurably STARVE (A1 realized
+  8.9/16 atoms/window at T=16; A2 19.8/32 at T=32) yet recovery holds ⇒
+  **dip and starvation doubly dissociated** (real dips without starving,
+  per § 3b l0 ≈ nominal; mirror starves without dipping). Recommended at
+  review: qualify RECORD § 3b's dilution clause to "cause not established".
+  Untrained controls DO decline with T at fixed d_sae (capacity effect at
+  init; training erases it on the mirror).
+- **Item 2 (T-SAE fairness receipt): FLAT** — swept the pair-distance knob
+  Δ ∈ {1,2,4,8} via new plugin arch `TSAEDelta` (`tsae_delta.py`;
+  contract-tested BITWISE-identical to registered `tsae` at Δ=1) + aux
+  `tsae_a0` (α=0). All settings at the DPI floor ≈ 0.41 (max |D| = 0.011);
+  untrained guard exact-PASS. No rise ⇒ no runpod-d flag; skeptic $0.
 
-## Reusable know-how from the dissection (same box, same substrate)
-- Grid engine: `design.uniform_cells(ds, F, n_steps, archs=…,
-  k_pos_sweep=…, d_saes=…)` → `grid.run_pool` (16 workers good).
+Artifacts: `experiments/explorations/task_hunt/support_synthetic/`
+(CARD.md frozen pre-build; run/analyze/render scripts committed pre-run;
+results/ + figs/). Leaderboard 8,688 rows, 0 dup eval_keys (identical-config
+bench cells reused as runner CACHE HITS — the runner dedups by eval_key;
+code_version is NOT in the key). Tests: 237 pass incl. 6 new contract tests
+(`tests/test_support_synthetic.py`). Disclosed in LOG: CARD § 1.2
+under-counted new untrained controls (27 ran, not 15; commentary-only).
+
+## Possible follow-ups if review asks (NOT started)
+- Real-data dip explanation candidates (speculation in my LOG entry):
+  content competition during training / undertraining at large T (8k real
+  steps vs 30k mirror). A cheap probe: re-run real TXC-pre T=16 at longer
+  n_steps, or a mirror variant with rich per-position content.
+- If review wants the RECORD § 3b clause amended, that edit is mac-local's
+  or runpod-d's call (their file) — my LOG entry carries the recommendation.
+
+## Earlier completed (all reviewed & approved; do not redo)
+TXC-pro dissection (`loss_dissection/RECORD.md`, § 7 rebuttal sentence
+endorsed); C7 close, C6, stage-6 #3b, C5.
+
+## Reusable know-how (this box)
+- Grid engine: `design.uniform_cells(ds, F, n_steps, archs=…, k_pos_sweep=…,
+  d_saes=[…], window_ts=(T,), L=32)` → `grid.run_pool` (8–16 workers).
   Backtracking canon: DS `toy_backtracking_selfexcite_d64`, F=20,
-  N_STEPS=30000, seeds {1,2,42}; window-mode cells ~7 s each.
-  NOTE T∈{16,32} at eval_window_L=32: L must tile by T — T=32 needs
-  eval_window_L≥32 (=32 ok, exactly one tile); d_sae ≥ k_pos·T for the
-  pooled pre family (F=20 ⇒ k_pos=1 only at T=16/32 unless d_saes
-  raised — the card must pick the slice consciously; arm B raises the
-  budget knob anyway).
-- TXC-pre = `txc_batchtopk_pre` (pooled BatchTopK, budget k_pos·T per
-  window). Budget-scaling knob candidates: k_pos (raises atoms/window
-  ∝ T at fixed per-token rate — arm A IS fixed k_pos so atoms/window
-  already grows ∝ T… careful: pre's k_win = k_pos·T ALREADY scales with
-  T; the fixed-BUDGET arm therefore likely means fixed k_win, i.e.
-  k_pos = C/T. Resolve this in the card BEFORE running — read how the
-  real Stage-2 panel matched budgets (RECORD § 3b / runpod-d's scripts)
-  and mirror THAT convention; match on measured realized l0.)
-- T-SAE knob: `tsae.py` samples consecutive-token pairs (t, t+1)
-  internally; no explicit distance hparam today ⇒ likely needs a
-  variant arch file exposing pair distance (e.g. (t, t+Δ), Δ∈{1,2,4,8})
-  — precedent: `txc_post_dissect.py` (one class, many YAML entries).
-  `contrastive_alpha` is YAML-exposable too (α∈{0,1} as a second knob
-  axis if cheap). Dissection lesson: sequence-mode cells cost ~115 s.
-- Skeptic pattern if needed: `loss_dissection/skeptic_dissect.py`
-  (cache-guarded, raw pre-parse, Meter → expansion spend.json;
-  cumulative $11.52/$25).
-
-## Just completed (REVIEWED & APPROVED 2026-07-24; do not redo)
-**TXC-pro dissection** — bundle mostly selection on noise; ONE surviving
-component (multi-distance contrastive → frequency velocity T=8, post
-decode only; prediction (v) confirmed = decode-structure-contingent).
-Record: `loss_dissection/RECORD.md`; § 7 has the rebuttal-safe sentence.
-Earlier: C7 close, C6, stage-6 #3b, C5 (all reviewed).
+  N_STEPS=30000, seeds {1,2,42}. Window cells ~7 s (cache hits ~1 s);
+  sequence-mode (tsae/dissect classes) ~2–6 min/cell under load.
+  Pooled dict rule: d_sae ≥ k_pos·T (T=32 infeasible at d_sae=20).
+  Runner cache: identical config ⇒ cache hit, returns existing row, no
+  append — reuse is free and dup-safe.
+- `lambda_recovery` probe: UNREGULARIZED LinearRegression, 1024 windows ×
+  (32/T) tiles ⇒ examples shrink with T; watch p/n when raising d_sae at
+  high T (frozen T≤16 verdict range was the mitigation).
+- Skeptic pattern: `loss_dissection/skeptic_dissect.py` (cache-guarded, raw
+  pre-parse, Meter → expansion spend.json; cumulative $11.52/$25).
 
 ## Repo state
-Clean, in sync with origin/arxiv at last check after pulling the
-task-hunt round-1 + round-2 commits. Nothing mid-flight. Next action
-post-compact: read `task_hunt/LOG.md` review entry + `RECORD.md` § 3b,
-then freeze the support_synthetic CARD.
+Clean after final push (LOG + STATUS + results + figs). In sync with
+origin/arxiv at last check. Next action: idle — await mac-local review of
+the support_synthetic entry; pick up any new `status: active` briefing
+addressed to `runpod`.
 
 ## Gotchas (this box)
 - Harness blocks `sleep` (use `until …; done` or background tasks);
   background python needs `-u`.
-- Sequence-mode cells ~115 s vs ~7 s window-mode (SequenceBuffer
-  regenerates per step).
-- 5-family models reject `temperature`; calibrations SEQUENTIAL.
-- Skeptic verdicts: persisted raw pre-parse, cached, NEVER re-rolled.
 - Rebase rewrites SHAs — cite subjects or re-verify post-push.
-- Mid-grid the leaderboard/manifest are live-appended — never
-  rebase/stash while a grid runs.
+- Mid-grid the leaderboard/manifest are live-appended — never rebase/stash
+  while a grid runs.
+- Skeptic verdicts: persisted raw pre-parse, cached, NEVER re-rolled.
