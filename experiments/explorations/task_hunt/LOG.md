@@ -2975,3 +2975,85 @@ the scale-up's threshold contribution is a *distribution*, not a
 separation. That is what the briefing asked for.
 
 _Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_
+
+
+## 2026-07-24 — runpod — corpus scale-up extension: **`novelty` rebuilt at 4,000 documents** (its verdict was withdrawn hours ago — it now belongs to the population this campaign serves), plus the contrast-DEPTH census
+
+Two additions past the campaign's gate, both label-side, both from
+artifacts already in hand.
+
+### `novelty` at 10x (`build_novelty4k.py`, `novelty4k_stats.json`)
+
+The briefing scoped novelty to a bootstrap because it had screened
+NEGATIVE. runpod-e withdrew that verdict today, which makes novelty a
+surviving face resting on 400 documents — the exact condition the
+campaign exists to fix — and the fineweb-4k corpus and frozen
+`novelty_lib` were both already built. Frozen logic reused verbatim
+**including this bundle's own manifest convention**: novelty predates
+position-matched manifests and uses `lib.balanced_manifest`, and
+swapping that in is a screen-owner design decision, not a scale-up. What
+the position-matched alternative would support is reported instead —
+**1,124,873 rows/class (raw), 2,478,230 (residual)** — so that call can
+be made on numbers. Token-level prefix identity against replag confirmed
+on all three tokenizers.
+
+| face | stat | 400 docs | 4,000 docs | 95 % CI |
+|---|---|---|---|---|
+| `nov_resid` | unigram | 0.551–0.563 | **0.577–0.587** | [0.570, 0.595] |
+| | position | 0.472–0.478 | 0.469–0.478 | [0.449, 0.499] |
+| | doc-mean-only | 0.760–0.784 | 0.787–0.798 | [0.774, 0.810] |
+| `nov_raw` | unigram | 0.533–0.542 | **0.560–0.565** | [0.553, 0.572] |
+| | position | 0.121–0.128 | **0.146–0.152** | [0.135, 0.162] |
+| | doc-mean-only | 0.758–0.767 | 0.774–0.778 | [0.759, 0.791] |
+
+**No frozen bar fires on the primary face**; the same three-part pattern
+as punctint and refmark repeats exactly — unigram up into the disclosure
+band (the estimator effect), position stable, document identity stable.
+Novelty stays the **lowest-document-identity family measured**, which is
+what makes it the useful low anchor of the threshold distribution. Its
+disclosed raw face remains far past the position kill bar
+(direction-agnostic 0.848–0.854), as designed. A receipt worth more than
+the AUCs: the label's temporal character reproduces at 10x scale —
+residual autocorrelation real/null **0.629/0.515 at lag 16** and
+**0.119/0.026 at lag 64**, against 0.633/0.514 and 0.130/0.023 on the
+400-doc bundle. Whatever novelty is measuring, it is not an artifact of
+the small sample.
+
+**The npz artifacts are written but NOT committed** — ~144 MB per
+tokenizer (null permutation plus four float32 arrays over 7.9M tokens).
+They regenerate exactly from the committed builder and the committed
+corpus, all seeds pinned; the stats are committed. Said plainly because
+a reader should know which claims they can check from git alone.
+
+### Contrast DEPTH (`probe_contrast_depth.py`, `contrast_depth.json`)
+
+The §5 ladder answers "how many documents qualify"; a screen designer
+asks the other question — "take the K deepest documents, how many
+balanced rows do I get?" (rows/class = min(top, bottom) summed):
+
+| face | usable test docs | K=10 | K=50 | K=100 | all |
+|---|---|---|---|---|---|
+| punctint list | 199 | 442 | 1,524 | 2,332 | 3,043 |
+| punctint q | 504 | 540 | 1,896 | 3,091 | 7,294 |
+| refmark | 102 | 747 | 2,163 | 2,562 | 2,564 |
+
+So the within-document control the KEEP faces owe has **2.5k–7.3k
+balanced rows per class at scale**, not tens of thousands — because the
+shipped manifests optimise BREADTH (position matching spreads rows over
+thousands of documents) while this control wants DEPTH. The underlying
+data supports 190k–530k rows/class, so a depth-first manifest variant
+would do far better; that variant is the screen owner's call and this
+census is the number it needs. No array shipped, no manifest changed.
+
+### Not attempted, and why
+
+`interleave`/`tss` also lives on the pinned fineweb 400 and is also a
+surviving face again, so it is the obvious third scale-up — but greedy
+max-Jaccard pairing over 4,000 documents does not merely enlarge the
+corpus, it **changes its character**: a 10x pool finds much
+higher-overlap pairs, so the anti-conversion task gets harder in a way
+that is not a scale axis. That is a design decision for the bundle's
+owner, not a scale-up, and I left it alone. The compute is affordable
+(~8M pairwise Jaccards, minutes) if the program wants it.
+
+_Recorded-by: claude-opus-5 (runpod, corpus-scaleup)_

@@ -1,0 +1,131 @@
+{
+ "note": "test-document manifest rows only; 'rows per class' = min(top, bottom) summed over the chosen documents \u2014 the balanced within-document contrast a screen can form",
+ "faces": {
+  "punctint list (4,000 docs)": {
+   "test_docs_with_any_contrast": 199,
+   "total_usable_rows_per_class": 3043,
+   "by_top_k_documents": {
+    "10": {
+     "docs_with_contrast": 10,
+     "rows_per_class": 442,
+     "min_rows_per_class_in_set": 39,
+     "median_rows_per_class": 39.5
+    },
+    "25": {
+     "docs_with_contrast": 25,
+     "rows_per_class": 933,
+     "min_rows_per_class_in_set": 28,
+     "median_rows_per_class": 36.0
+    },
+    "50": {
+     "docs_with_contrast": 50,
+     "rows_per_class": 1524,
+     "min_rows_per_class_in_set": 21,
+     "median_rows_per_class": 28.0
+    },
+    "100": {
+     "docs_with_contrast": 100,
+     "rows_per_class": 2332,
+     "min_rows_per_class_in_set": 13,
+     "median_rows_per_class": 21.0
+    },
+    "200": {
+     "docs_with_contrast": 199,
+     "rows_per_class": 3043,
+     "min_rows_per_class_in_set": 0,
+     "median_rows_per_class": 13.0
+    },
+    "500": {
+     "docs_with_contrast": 199,
+     "rows_per_class": 3043,
+     "min_rows_per_class_in_set": 0,
+     "median_rows_per_class": 0.0
+    }
+   }
+  },
+  "punctint q (4,000 docs)": {
+   "test_docs_with_any_contrast": 504,
+   "total_usable_rows_per_class": 7294,
+   "by_top_k_documents": {
+    "10": {
+     "docs_with_contrast": 10,
+     "rows_per_class": 540,
+     "min_rows_per_class_in_set": 48,
+     "median_rows_per_class": 53.0
+    },
+    "25": {
+     "docs_with_contrast": 25,
+     "rows_per_class": 1134,
+     "min_rows_per_class_in_set": 34,
+     "median_rows_per_class": 45.0
+    },
+    "50": {
+     "docs_with_contrast": 50,
+     "rows_per_class": 1896,
+     "min_rows_per_class_in_set": 28,
+     "median_rows_per_class": 34.0
+    },
+    "100": {
+     "docs_with_contrast": 100,
+     "rows_per_class": 3091,
+     "min_rows_per_class_in_set": 21,
+     "median_rows_per_class": 28.0
+    },
+    "200": {
+     "docs_with_contrast": 200,
+     "rows_per_class": 4837,
+     "min_rows_per_class_in_set": 14,
+     "median_rows_per_class": 21.0
+    },
+    "500": {
+     "docs_with_contrast": 500,
+     "rows_per_class": 7290,
+     "min_rows_per_class_in_set": 1,
+     "median_rows_per_class": 12.0
+    }
+   }
+  },
+  "refmark (2,000 convs)": {
+   "test_docs_with_any_contrast": 102,
+   "total_usable_rows_per_class": 2564,
+   "by_top_k_documents": {
+    "10": {
+     "docs_with_contrast": 10,
+     "rows_per_class": 747,
+     "min_rows_per_class_in_set": 59,
+     "median_rows_per_class": 63.0
+    },
+    "25": {
+     "docs_with_contrast": 25,
+     "rows_per_class": 1465,
+     "min_rows_per_class_in_set": 38,
+     "median_rows_per_class": 55.0
+    },
+    "50": {
+     "docs_with_contrast": 50,
+     "rows_per_class": 2163,
+     "min_rows_per_class_in_set": 20,
+     "median_rows_per_class": 37.5
+    },
+    "100": {
+     "docs_with_contrast": 100,
+     "rows_per_class": 2562,
+     "min_rows_per_class_in_set": 1,
+     "median_rows_per_class": 20.0
+    },
+    "200": {
+     "docs_with_contrast": 102,
+     "rows_per_class": 2564,
+     "min_rows_per_class_in_set": 0,
+     "median_rows_per_class": 1.0
+    },
+    "500": {
+     "docs_with_contrast": 102,
+     "rows_per_class": 2564,
+     "min_rows_per_class_in_set": 0,
+     "median_rows_per_class": 0.0
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,1112 @@
+{
+ "source": "fineweb4k_corpus.json.gz",
+ "source_meta": {
+  "dataset": "HuggingFaceFW/fineweb",
+  "name": "sample-10BT",
+  "split": "train",
+  "seed": 0,
+  "shuffle_buffer": 10000,
+  "n_docs": 4000,
+  "n_scanned": 43122,
+  "min_sents": 60,
+  "max_sents": 200,
+  "n_sentences": 375498,
+  "datasets_version": "4.8.5",
+  "splitter": "expansion.corpus.split_sentences v1"
+ },
+ "n_docs_used": 4000,
+ "seed": 0,
+ "null_seed": 1000,
+ "frozen_logic": "novelty_lib + lib.balanced_manifest, unchanged (this bundle predates the position-matched manifest convention and keeps its own)",
+ "kernel": {
+  "half_life": 16,
+  "support": 64,
+  "mass_within_T": {
+   "4": 0.1697104903960378,
+   "8": 0.31241943340101597,
+   "16": 0.5333333333333333,
+   "32": 0.7999999999999999,
+   "64": 1.0
+  }
+ },
+ "min_manifest_pos": 64,
+ "bootstrap": {
+  "unit": "document (cluster)",
+  "n_reps": 1000,
+  "ci_pct": [
+   2.5,
+   97.5
+  ],
+  "seed": 0
+ },
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_docs": 4000,
+   "n_tokens": 7913315,
+   "token_ids_prefix_matches_replag": true,
+   "doc_off_prefix_matches_replag": true,
+   "novelty_base_rate": 0.35989784306576955,
+   "rate_mean": 0.34944668412208557,
+   "rate_std": 0.14565880596637726,
+   "rate_null_std": 0.14502310752868652,
+   "resid_std": 0.11251787841320038,
+   "resid_null_std": 0.09388548135757446,
+   "resid_autocorr": {
+    "16": {
+     "real": 0.6291516622605294,
+     "null": 0.515095075449886
+    },
+    "32": {
+     "real": 0.38003790306848945,
+     "null": 0.2571454596186213
+    },
+    "64": {
+     "real": 0.11904202048809787,
+     "null": 0.02584418551766512
+    },
+    "128": {
+     "real": 0.039607758391449706,
+     "null": 0.001868941021950089
+    }
+   },
+   "position_bin_expected_rate": [
+    0.6394025683403015,
+    0.522697925567627,
+    0.435302734375,
+    0.3573371171951294,
+    0.29676303267478943,
+    0.2426755726337433
+   ],
+   "tercile_edges": {
+    "resid": [
+     -0.05026271939277649,
+     0.04589310288429259
+    ],
+    "raw": [
+     0.27648698290189105,
+     0.4022817015647888
+    ]
+   },
+   "census": {
+    "raw": {
+     "manifest_rows_per_class": 100000,
+     "manifest_cap_per_class": 100000,
+     "position_matched_support_per_class": 1124873
+    },
+    "resid": {
+     "manifest_rows_per_class": 100000,
+     "manifest_cap_per_class": 100000,
+     "position_matched_support_per_class": 2478230
+    }
+   },
+   "triage": {
+    "raw": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5656806883995975,
+      "position_auc": 0.14628455193401368,
+      "doc_mean_only_auc": 0.7768428325869343
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5602305877413303,
+      "position_auc": 0.14621659903242007,
+      "doc_mean_only_auc": 0.777842230241666
+     }
+    },
+    "resid": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5819748095390682,
+      "position_auc": 0.47359336772713323,
+      "doc_mean_only_auc": 0.7922535882115105
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5837981147776494,
+      "position_auc": 0.4691077536550056,
+      "doc_mean_only_auc": 0.788019512222973
+     }
+    }
+   },
+   "bootstrap": {
+    "raw": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": {
+       "point": 0.5656806883995975,
+       "point_direction_agnostic": 0.5656806883995975,
+       "n_rows": 1001587,
+       "n_pos": 520381,
+       "n_neg": 481206,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5656092627054254,
+       "se": 0.002478022331054621,
+       "ci_lo": 0.5609685534146853,
+       "ci_hi": 0.5707999083071326,
+       "ci_lo_direction_agnostic": 0.5609685534146853,
+       "ci_hi_direction_agnostic": 0.5707999083071326,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.14628455193401368,
+       "point_direction_agnostic": 0.8537154480659863,
+       "n_rows": 1001587,
+       "n_pos": 520381,
+       "n_neg": 481206,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.14635170444371162,
+       "se": 0.005434287044878853,
+       "ci_lo": 0.13587138191545167,
+       "ci_hi": 0.15720939090663705,
+       "ci_lo_direction_agnostic": 0.842790609093363,
+       "ci_hi_direction_agnostic": 0.8641286180845483,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7768428325869343,
+       "point_direction_agnostic": 0.7768428325869343,
+       "n_rows": 1001587,
+       "n_pos": 520381,
+       "n_neg": 481206,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7762212396533538,
+       "se": 0.0067419044351503385,
+       "ci_lo": 0.763388085979586,
+       "ci_hi": 0.7896254253782542,
+       "ci_lo_direction_agnostic": 0.763388085979586,
+       "ci_hi_direction_agnostic": 0.7896254253782542,
+       "n_degenerate_reps": 0
+      }
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": {
+       "point": 0.5602305877413303,
+       "point_direction_agnostic": 0.5602305877413303,
+       "n_rows": 39582,
+       "n_pos": 20360,
+       "n_neg": 19222,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5601880390383489,
+       "se": 0.0035118317340045403,
+       "ci_lo": 0.5533863852363969,
+       "ci_hi": 0.5671778491611734,
+       "ci_lo_direction_agnostic": 0.5533863852363969,
+       "ci_hi_direction_agnostic": 0.5671778491611734,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.14621659903242007,
+       "point_direction_agnostic": 0.85378340096758,
+       "n_rows": 39582,
+       "n_pos": 20360,
+       "n_neg": 19222,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.1462215485778162,
+       "se": 0.0057740966132929904,
+       "ci_lo": 0.1353985539928839,
+       "ci_hi": 0.15762435243744755,
+       "ci_lo_direction_agnostic": 0.8423756475625525,
+       "ci_hi_direction_agnostic": 0.8646014460071161,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.777842230241666,
+       "point_direction_agnostic": 0.777842230241666,
+       "n_rows": 39582,
+       "n_pos": 20360,
+       "n_neg": 19222,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.777146675972251,
+       "se": 0.006805041279382704,
+       "ci_lo": 0.7636869042062997,
+       "ci_hi": 0.7907550612804645,
+       "ci_lo_direction_agnostic": 0.7636869042062997,
+       "ci_hi_direction_agnostic": 0.7907550612804645,
+       "n_degenerate_reps": 0
+      }
+     }
+    },
+    "resid": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": {
+       "point": 0.5819748095390682,
+       "point_direction_agnostic": 0.5819748095390682,
+       "n_rows": 1010316,
+       "n_pos": 524162,
+       "n_neg": 486154,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5818633495465552,
+       "se": 0.0028352072139682764,
+       "ci_lo": 0.5766052273682399,
+       "ci_hi": 0.5876067076796063,
+       "ci_lo_direction_agnostic": 0.5766052273682399,
+       "ci_hi_direction_agnostic": 0.5876067076796063,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.47359336772713323,
+       "point_direction_agnostic": 0.5264066322728668,
+       "n_rows": 1010316,
+       "n_pos": 524162,
+       "n_neg": 486154,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.4740266092966124,
+       "se": 0.009463529979739125,
+       "ci_lo": 0.4552212398497549,
+       "ci_hi": 0.49397079240939934,
+       "ci_lo_direction_agnostic": 0.5060292075906005,
+       "ci_hi_direction_agnostic": 0.5447787601502451,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7922535882115105,
+       "point_direction_agnostic": 0.7922535882115105,
+       "n_rows": 1010316,
+       "n_pos": 524162,
+       "n_neg": 486154,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7918124880372468,
+       "se": 0.006430242551475185,
+       "ci_lo": 0.7797970945866539,
+       "ci_hi": 0.8049815530704135,
+       "ci_lo_direction_agnostic": 0.7797970945866539,
+       "ci_hi_direction_agnostic": 0.8049815530704135,
+       "n_degenerate_reps": 0
+      }
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": {
+       "point": 0.5837981147776494,
+       "point_direction_agnostic": 0.5837981147776494,
+       "n_rows": 39413,
+       "n_pos": 20174,
+       "n_neg": 19239,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5838177459421361,
+       "se": 0.0038748646574519184,
+       "ci_lo": 0.5763752034407101,
+       "ci_hi": 0.5911970590563296,
+       "ci_lo_direction_agnostic": 0.5763752034407101,
+       "ci_hi_direction_agnostic": 0.5911970590563296,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.4691077536550056,
+       "point_direction_agnostic": 0.5308922463449943,
+       "n_rows": 39413,
+       "n_pos": 20174,
+       "n_neg": 19239,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.4694769707834165,
+       "se": 0.009874186886898284,
+       "ci_lo": 0.44937249478377245,
+       "ci_hi": 0.4900221896770868,
+       "ci_lo_direction_agnostic": 0.5099778103229131,
+       "ci_hi_direction_agnostic": 0.5506275052162276,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.788019512222973,
+       "point_direction_agnostic": 0.788019512222973,
+       "n_rows": 39413,
+       "n_pos": 20174,
+       "n_neg": 19239,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7874363019902492,
+       "se": 0.007044505194769742,
+       "ci_lo": 0.7739966221114795,
+       "ci_hi": 0.8013037337685296,
+       "ci_lo_direction_agnostic": 0.7739966221114795,
+       "ci_hi_direction_agnostic": 0.8013037337685296,
+       "n_degenerate_reps": 0
+      }
+     }
+    }
+   },
+   "artifact": "novelty4k_fineweb_gpt2.npz",
+   "artifact_committed": false,
+   "artifact_note": "~145 MB/tokenizer; regenerable exactly from this committed builder + the committed corpus artifact (all seeds pinned)"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_docs": 4000,
+   "n_tokens": 7815498,
+   "token_ids_prefix_matches_replag": true,
+   "doc_off_prefix_matches_replag": true,
+   "novelty_base_rate": 0.343188751375792,
+   "rate_mean": 0.33277428150177,
+   "rate_std": 0.14435461163520813,
+   "rate_null_std": 0.14223650097846985,
+   "resid_std": 0.11200292408466339,
+   "resid_null_std": 0.093216173350811,
+   "resid_autocorr": {
+    "16": {
+     "real": 0.6318275665579993,
+     "null": 0.5095567877311487
+    },
+    "32": {
+     "real": 0.3836464118501566,
+     "null": 0.24973798270249478
+    },
+    "64": {
+     "real": 0.12368066728972515,
+     "null": 0.023323387982537823
+    },
+    "128": {
+     "real": 0.047243538467559694,
+     "null": 0.004199758002986265
+    }
+   },
+   "position_bin_expected_rate": [
+    0.6196024417877197,
+    0.5044683814048767,
+    0.4149889051914215,
+    0.3371812105178833,
+    0.2795431613922119,
+    0.22861438989639282
+   ],
+   "tercile_edges": {
+    "resid": [
+     -0.047843307256698615,
+     0.046715646982192965
+    ],
+    "raw": [
+     0.2611657381057739,
+     0.3842801253000895
+    ]
+   },
+   "census": {
+    "raw": {
+     "manifest_rows_per_class": 100000,
+     "manifest_cap_per_class": 100000,
+     "position_matched_support_per_class": 1132691
+    },
+    "resid": {
+     "manifest_rows_per_class": 100000,
+     "manifest_cap_per_class": 100000,
+     "position_matched_support_per_class": 2440238
+    }
+   },
+   "triage": {
+    "raw": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5672213823467676,
+      "position_auc": 0.15210542088935752,
+      "doc_mean_only_auc": 0.7763613672030432
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5645979537042,
+      "position_auc": 0.15024164712189533,
+      "doc_mean_only_auc": 0.7743288144944008
+     }
+    },
+    "resid": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5822769170235214,
+      "position_auc": 0.47260736922768615,
+      "doc_mean_only_auc": 0.7904849296130155
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5871134906073345,
+      "position_auc": 0.47630359672782063,
+      "doc_mean_only_auc": 0.78660547917903
+     }
+    }
+   },
+   "bootstrap": {
+    "raw": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": {
+       "point": 0.5672213823467676,
+       "point_direction_agnostic": 0.5672213823467676,
+       "n_rows": 985505,
+       "n_pos": 519392,
+       "n_neg": 466113,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.567122598925753,
+       "se": 0.0028306153783484605,
+       "ci_lo": 0.561891332735948,
+       "ci_hi": 0.5729077488430081,
+       "ci_lo_direction_agnostic": 0.561891332735948,
+       "ci_hi_direction_agnostic": 0.5729077488430081,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.15210542088935752,
+       "point_direction_agnostic": 0.8478945791106425,
+       "n_rows": 985505,
+       "n_pos": 519392,
+       "n_neg": 466113,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.15223711198131024,
+       "se": 0.005854806208809132,
+       "ci_lo": 0.14063849199369655,
+       "ci_hi": 0.16390663065548905,
+       "ci_lo_direction_agnostic": 0.836093369344511,
+       "ci_hi_direction_agnostic": 0.8593615080063035,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7763613672030432,
+       "point_direction_agnostic": 0.7763613672030432,
+       "n_rows": 985505,
+       "n_pos": 519392,
+       "n_neg": 466113,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7756931139843829,
+       "se": 0.0067879153756311645,
+       "ci_lo": 0.7624331585272008,
+       "ci_hi": 0.7898291467701584,
+       "ci_lo_direction_agnostic": 0.7624331585272008,
+       "ci_hi_direction_agnostic": 0.7898291467701584,
+       "n_degenerate_reps": 0
+      }
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": {
+       "point": 0.5645979537042,
+       "point_direction_agnostic": 0.5645979537042,
+       "n_rows": 39281,
+       "n_pos": 20530,
+       "n_neg": 18751,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5643721607927905,
+       "se": 0.003945236561184132,
+       "ci_lo": 0.5565859245302871,
+       "ci_hi": 0.5720954386616309,
+       "ci_lo_direction_agnostic": 0.5565859245302871,
+       "ci_hi_direction_agnostic": 0.5720954386616309,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.15024164712189533,
+       "point_direction_agnostic": 0.8497583528781046,
+       "n_rows": 39281,
+       "n_pos": 20530,
+       "n_neg": 18751,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.150351777831856,
+       "se": 0.0059950404209128255,
+       "ci_lo": 0.13923473659606045,
+       "ci_hi": 0.16201915879674517,
+       "ci_lo_direction_agnostic": 0.8379808412032549,
+       "ci_hi_direction_agnostic": 0.8607652634039396,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7743288144944008,
+       "point_direction_agnostic": 0.7743288144944008,
+       "n_rows": 39281,
+       "n_pos": 20530,
+       "n_neg": 18751,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.773630492712904,
+       "se": 0.007372200537689151,
+       "ci_lo": 0.7594109693356021,
+       "ci_hi": 0.7886030666861162,
+       "ci_lo_direction_agnostic": 0.7594109693356021,
+       "ci_hi_direction_agnostic": 0.7886030666861162,
+       "n_degenerate_reps": 0
+      }
+     }
+    },
+    "resid": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": {
+       "point": 0.5822769170235214,
+       "point_direction_agnostic": 0.5822769170235214,
+       "n_rows": 993600,
+       "n_pos": 521618,
+       "n_neg": 471982,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5821618981193183,
+       "se": 0.002791279215227672,
+       "ci_lo": 0.576754549953742,
+       "ci_hi": 0.5877653477175109,
+       "ci_lo_direction_agnostic": 0.576754549953742,
+       "ci_hi_direction_agnostic": 0.5877653477175109,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.47260736922768615,
+       "point_direction_agnostic": 0.5273926307723138,
+       "n_rows": 993600,
+       "n_pos": 521618,
+       "n_neg": 471982,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.4730658112283925,
+       "se": 0.010021499612988621,
+       "ci_lo": 0.45269612330793396,
+       "ci_hi": 0.49401496540785844,
+       "ci_lo_direction_agnostic": 0.5059850345921416,
+       "ci_hi_direction_agnostic": 0.547303876692066,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7904849296130155,
+       "point_direction_agnostic": 0.7904849296130155,
+       "n_rows": 993600,
+       "n_pos": 521618,
+       "n_neg": 471982,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7900618963661588,
+       "se": 0.006308969739542291,
+       "ci_lo": 0.7778482808463466,
+       "ci_hi": 0.8026101116879172,
+       "ci_lo_direction_agnostic": 0.7778482808463466,
+       "ci_hi_direction_agnostic": 0.8026101116879172,
+       "n_degenerate_reps": 0
+      }
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": {
+       "point": 0.5871134906073345,
+       "point_direction_agnostic": 0.5871134906073345,
+       "n_rows": 39421,
+       "n_pos": 20460,
+       "n_neg": 18961,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5870678611509803,
+       "se": 0.004090591128386864,
+       "ci_lo": 0.5791423792149971,
+       "ci_hi": 0.5954028360498436,
+       "ci_lo_direction_agnostic": 0.5791423792149971,
+       "ci_hi_direction_agnostic": 0.5954028360498436,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.47630359672782063,
+       "point_direction_agnostic": 0.5236964032721794,
+       "n_rows": 39421,
+       "n_pos": 20460,
+       "n_neg": 18961,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.4768128818779363,
+       "se": 0.010539329162843086,
+       "ci_lo": 0.4553129224423166,
+       "ci_hi": 0.498293009965965,
+       "ci_lo_direction_agnostic": 0.5031791694884359,
+       "ci_hi_direction_agnostic": 0.5446870775576834,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.78660547917903,
+       "point_direction_agnostic": 0.78660547917903,
+       "n_rows": 39421,
+       "n_pos": 20460,
+       "n_neg": 18961,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7861743345647947,
+       "se": 0.006620389345754963,
+       "ci_lo": 0.7735674692510689,
+       "ci_hi": 0.7993194033697202,
+       "ci_lo_direction_agnostic": 0.7735674692510689,
+       "ci_hi_direction_agnostic": 0.7993194033697202,
+       "n_degenerate_reps": 0
+      }
+     }
+    }
+   },
+   "artifact": "novelty4k_fineweb_gemma2.npz",
+   "artifact_committed": false,
+   "artifact_note": "~145 MB/tokenizer; regenerable exactly from this committed builder + the committed corpus artifact (all seeds pinned)"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_docs": 4000,
+   "n_tokens": 7747503,
+   "token_ids_prefix_matches_replag": true,
+   "doc_off_prefix_matches_replag": true,
+   "novelty_base_rate": 0.36545942608863785,
+   "rate_mean": 0.35499846935272217,
+   "rate_std": 0.14664477109909058,
+   "rate_null_std": 0.14549995958805084,
+   "resid_std": 0.1138303279876709,
+   "resid_null_std": 0.0952872559428215,
+   "resid_autocorr": {
+    "16": {
+     "real": 0.6281391285029202,
+     "null": 0.5132482962246437
+    },
+    "32": {
+     "real": 0.3784224761073602,
+     "null": 0.25257668905140795
+    },
+    "64": {
+     "real": 0.11794362166856857,
+     "null": 0.024858381105449943
+    },
+    "128": {
+     "real": 0.040824768409634726,
+     "null": 0.004710643687967987
+    }
+   },
+   "position_bin_expected_rate": [
+    0.6415228247642517,
+    0.5271796584129333,
+    0.43917661905288696,
+    0.3604891002178192,
+    0.3002222776412964,
+    0.24739491939544678
+   ],
+   "tercile_edges": {
+    "resid": [
+     -0.05052066842714946,
+     0.04664352536201477
+    ],
+    "raw": [
+     0.2816827396551768,
+     0.408618688583374
+    ]
+   },
+   "census": {
+    "raw": {
+     "manifest_rows_per_class": 100000,
+     "manifest_cap_per_class": 100000,
+     "position_matched_support_per_class": 1116473
+    },
+    "resid": {
+     "manifest_rows_per_class": 100000,
+     "manifest_cap_per_class": 100000,
+     "position_matched_support_per_class": 2422871
+    }
+   },
+   "triage": {
+    "raw": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5591814720241128,
+      "position_auc": 0.1487077851323905,
+      "doc_mean_only_auc": 0.7775235515730228
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5599463643858554,
+      "position_auc": 0.14959808467497399,
+      "doc_mean_only_auc": 0.7784477546991968
+     }
+    },
+    "resid": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": 0.5762628997786822,
+      "position_auc": 0.4725651924371244,
+      "doc_mean_only_auc": 0.7965536680653127
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": 0.5766013848967696,
+      "position_auc": 0.47763606923502205,
+      "doc_mean_only_auc": 0.797756645187565
+     }
+    }
+   },
+   "bootstrap": {
+    "raw": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": {
+       "point": 0.5591814720241128,
+       "point_direction_agnostic": 0.5591814720241128,
+       "n_rows": 979244,
+       "n_pos": 511929,
+       "n_neg": 467315,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5590714036845918,
+       "se": 0.0021335990543227957,
+       "ci_lo": 0.5550927390786199,
+       "ci_hi": 0.5634687181438824,
+       "ci_lo_direction_agnostic": 0.5550927390786199,
+       "ci_hi_direction_agnostic": 0.5634687181438824,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.1487077851323905,
+       "point_direction_agnostic": 0.8512922148676095,
+       "n_rows": 979244,
+       "n_pos": 511929,
+       "n_neg": 467315,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.14879815336214175,
+       "se": 0.005778994737391885,
+       "ci_lo": 0.13776728943705832,
+       "ci_hi": 0.1601442527595993,
+       "ci_lo_direction_agnostic": 0.8398557472404007,
+       "ci_hi_direction_agnostic": 0.8622327105629417,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7775235515730228,
+       "point_direction_agnostic": 0.7775235515730228,
+       "n_rows": 979244,
+       "n_pos": 511929,
+       "n_neg": 467315,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7768554805616514,
+       "se": 0.006820423766377328,
+       "ci_lo": 0.7638700824055183,
+       "ci_hi": 0.7902300545778068,
+       "ci_lo_direction_agnostic": 0.7638700824055183,
+       "ci_hi_direction_agnostic": 0.7902300545778068,
+       "n_degenerate_reps": 0
+      }
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": {
+       "point": 0.5599463643858554,
+       "point_direction_agnostic": 0.5599463643858554,
+       "n_rows": 39449,
+       "n_pos": 20290,
+       "n_neg": 19159,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5598494679665716,
+       "se": 0.0032842372986988206,
+       "ci_lo": 0.5535217697904241,
+       "ci_hi": 0.5660840181061216,
+       "ci_lo_direction_agnostic": 0.5535217697904241,
+       "ci_hi_direction_agnostic": 0.5660840181061216,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.14959808467497399,
+       "point_direction_agnostic": 0.850401915325026,
+       "n_rows": 39449,
+       "n_pos": 20290,
+       "n_neg": 19159,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.14974306058970316,
+       "se": 0.006189827987519601,
+       "ci_lo": 0.13792502659295774,
+       "ci_hi": 0.1619792921570467,
+       "ci_lo_direction_agnostic": 0.8380207078429533,
+       "ci_hi_direction_agnostic": 0.8620749734070422,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7784477546991968,
+       "point_direction_agnostic": 0.7784477546991968,
+       "n_rows": 39449,
+       "n_pos": 20290,
+       "n_neg": 19159,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7778293775393756,
+       "se": 0.007376931661784811,
+       "ci_lo": 0.7637346807656993,
+       "ci_hi": 0.7923163567983332,
+       "ci_lo_direction_agnostic": 0.7637346807656993,
+       "ci_hi_direction_agnostic": 0.7923163567983332,
+       "n_degenerate_reps": 0
+      }
+     }
+    },
+    "resid": {
+     "triage_all_eligible_rows": {
+      "unigram_auc": {
+       "point": 0.5762628997786822,
+       "point_direction_agnostic": 0.5762628997786822,
+       "n_rows": 987745,
+       "n_pos": 514273,
+       "n_neg": 473472,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5761268581319183,
+       "se": 0.002401564039204984,
+       "ci_lo": 0.5716330289571839,
+       "ci_hi": 0.5811512024466188,
+       "ci_lo_direction_agnostic": 0.5716330289571839,
+       "ci_hi_direction_agnostic": 0.5811512024466188,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.4725651924371244,
+       "point_direction_agnostic": 0.5274348075628756,
+       "n_rows": 987745,
+       "n_pos": 514273,
+       "n_neg": 473472,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.4729836355457528,
+       "se": 0.009814969584372384,
+       "ci_lo": 0.45338299766572815,
+       "ci_hi": 0.49322196942165886,
+       "ci_lo_direction_agnostic": 0.5067780305783413,
+       "ci_hi_direction_agnostic": 0.5466170023342719,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.7965536680653127,
+       "point_direction_agnostic": 0.7965536680653127,
+       "n_rows": 987745,
+       "n_pos": 514273,
+       "n_neg": 473472,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7960948776183805,
+       "se": 0.006431539895003108,
+       "ci_lo": 0.7845359655339007,
+       "ci_hi": 0.80882800065679,
+       "ci_lo_direction_agnostic": 0.7845359655339007,
+       "ci_hi_direction_agnostic": 0.80882800065679,
+       "n_degenerate_reps": 0
+      }
+     },
+     "triage_manifest_rows": {
+      "unigram_auc": {
+       "point": 0.5766013848967696,
+       "point_direction_agnostic": 0.5766013848967696,
+       "n_rows": 39883,
+       "n_pos": 20550,
+       "n_neg": 19333,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.5763568610086182,
+       "se": 0.0037840117876006764,
+       "ci_lo": 0.5694667646188452,
+       "ci_hi": 0.5838973152323175,
+       "ci_lo_direction_agnostic": 0.5694667646188452,
+       "ci_hi_direction_agnostic": 0.5838973152323175,
+       "n_degenerate_reps": 0
+      },
+      "position_auc": {
+       "point": 0.47763606923502205,
+       "point_direction_agnostic": 0.5223639307649779,
+       "n_rows": 39883,
+       "n_pos": 20550,
+       "n_neg": 19333,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.47812918167275736,
+       "se": 0.010335638438602312,
+       "ci_lo": 0.45800264189033574,
+       "ci_hi": 0.4995031066579382,
+       "ci_lo_direction_agnostic": 0.5028350469879268,
+       "ci_hi_direction_agnostic": 0.5419973581096642,
+       "n_degenerate_reps": 0
+      },
+      "doc_mean_only_auc": {
+       "point": 0.797756645187565,
+       "point_direction_agnostic": 0.797756645187565,
+       "n_rows": 39883,
+       "n_pos": 20550,
+       "n_neg": 19333,
+       "n_docs": 800,
+       "n_reps": 1000,
+       "seed": 0,
+       "ci_pct": [
+        2.5,
+        97.5
+       ],
+       "mean": 0.7972174272752711,
+       "se": 0.0068168897917112925,
+       "ci_lo": 0.7847942456829894,
+       "ci_hi": 0.8101135293657831,
+       "ci_lo_direction_agnostic": 0.7847942456829894,
+       "ci_hi_direction_agnostic": 0.8101135293657831,
+       "n_degenerate_reps": 0
+      }
+     }
+    }
+   },
+   "artifact": "novelty4k_fineweb_llama31.npz",
+   "artifact_committed": false,
+   "artifact_note": "~145 MB/tokenizer; regenerable exactly from this committed builder + the committed corpus artifact (all seeds pinned)"
+  }
+ }
+}

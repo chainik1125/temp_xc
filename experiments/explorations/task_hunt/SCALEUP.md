@@ -215,6 +215,27 @@ in one line by a screen. It changes no label, mask or manifest.
 
 ---
 
+**Contrast DEPTH — the number a Stage-2 designer actually needs**
+(`probe_contrast_depth.py` → `contrast_depth.json`). The ladder above
+counts qualifying documents; this counts the balanced rows they can
+supply, taking the K deepest test documents (rows/class =
+min(top, bottom) summed):
+
+| face | usable test docs | K=10 | K=50 | K=100 | all |
+|---|---|---|---|---|---|
+| punctint list | 199 | 442 | 1,524 | 2,332 | 3,043 |
+| punctint q | 504 | 540 | 1,896 | 3,091 | 7,294 |
+| refmark | 102 | 747 | 2,163 | 2,562 | 2,564 |
+
+A within-document control at scale therefore has **2.5k–7.3k balanced
+rows per class**, not tens of thousands — because the shipped manifest
+optimises BREADTH (position matching spreads rows over thousands of
+documents) while this control wants DEPTH. The underlying data supports
+190k–530k rows/class overall, so a depth-first manifest variant would do
+far better. That variant is a screen-owner decision; this census is the
+number the decision needs, and nothing here ships an array or changes a
+manifest.
+
 ## 6. Caching cost (for the GPU pods)
 
 `scaleup_caching_cost.py`, derived from the committed stats. Tokens and
@@ -235,6 +256,44 @@ layer selection and dtype.
 prefix receipt; the refmark column is honestly zero.
 
 ---
+
+## 6b. Extension — `novelty` rebuilt at 4,000 documents
+
+Added after runpod-e **withdrew** the `novelty` NEGATIVE verdict
+(scoring error in their own best-window rule): novelty became a
+surviving face resting on 400 documents — exactly the population this
+campaign serves — and the corpus plus the frozen lib were already in
+hand. `build_novelty4k.py` reuses `novelty_lib` AND `lib.balanced_manifest`
+verbatim, **including this bundle's own non-position-matched manifest
+convention**: changing it is a screen-owner decision, so the
+position-matched alternative is reported as a census instead
+(1,124,873 rows/class for the raw face, 2,478,230 for the residual —
+the 100k cap binds by a wide margin). Token-level prefix identity
+against replag confirmed on all three tokenizers.
+
+| face | stat | 400 docs | 4,000 docs | 95 % CI |
+|---|---|---|---|---|
+| `nov_resid` | unigram | 0.551–0.563 | **0.577–0.587** | [0.570, 0.595] |
+| | position | 0.472–0.478 | 0.469–0.478 | [0.449, 0.499] |
+| | doc-mean-only | (0.760–0.784 boot) | 0.787–0.798 | [0.774, 0.810] |
+| `nov_raw` | unigram | 0.533–0.542 | **0.560–0.565** | [0.553, 0.572] |
+| | position | 0.121–0.128 | **0.146–0.152** | [0.135, 0.162] |
+| | doc-mean-only | (0.758–0.767 boot) | 0.774–0.778 | [0.759, 0.791] |
+
+Same pattern as items 1–2: unigram up into the disclosure band (the
+estimator effect of §4), position stable, document identity stable —
+and novelty remains the LOWEST-document-identity family measured, which
+is what made it the useful low anchor. The disclosed raw face stays far
+past the position kill bar (direction-agnostic 0.848–0.854), as
+designed. The label's temporal character reproduces at 10× scale:
+residual autocorrelation real/null 0.629/0.515 at lag 16 and
+0.119/0.026 at lag 64, against 0.633/0.514 and 0.130/0.023 at 400 docs.
+
+**npz artifacts are written but deliberately NOT committed** (~144 MB
+per tokenizer — the null permutation plus four float32 label arrays over
+7.9M tokens). They regenerate exactly from the committed builder and the
+committed corpus with every seed pinned; `novelty4k_stats.json` is
+committed.
 
 ## 7. Item 3 — the novelty family (threshold-dataset material)
 
