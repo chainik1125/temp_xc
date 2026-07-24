@@ -1,0 +1,71 @@
+[
+  {
+    "ds": "ward_real_lambda_base_l12",
+    "arch": "tsae",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "ok": false,
+    "error": "OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 79.18 GiB of which 1.39 GiB is free. Process 1158628 has 50.63 GiB memory in use. Process 1159965 has 22.11 GiB memory in use. Process 1162566 has 584.00 MiB memory in use. Process 1162568 has 3.00 GiB memory in use. Process 1162567 has 1.45 GiB memory in use. Of the allocated memory 2.26 GiB is allocated by PyTorch, and 13.91 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+    "tb": "Traceback (most recent call last):\n  File \"/workspace/temp_xc/src/explorations/synthetic/grid.py\", line 69, in run_cell\n    r = run_experiment(\n        ^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/runner.py\", line 158, in run_experiment\n    model = train_arch(\n            ^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/trainer.py\", line 124, in train_arch\n    batch = batch_iter(training_cfg.batch_size)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/data/sequence_buffer.py\", line 44, in __call__\n    return batch.to(self.device, dtype=torch.float32)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 79.18 GiB of which 1.39 GiB is free. Process 1158628 has 50.63 GiB memory in use. Process 1159965 has 22.11 GiB memory in use. Process 1162566 has 584.00 MiB memory in use. Process 1162568 has 3.00 GiB memory in use. Process 1162567 has 1.45 GiB memory in use. Of the allocated memory 2.26 GiB is allocated by PyTorch, and 13.91 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+  },
+  {
+    "ds": "ward_real_lambda_base_l12",
+    "arch": "batchtopk_sae",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "metrics": {
+      "eauc": NaN,
+      "e_mean_max_cos": NaN,
+      "e_frac_recovered_90": NaN,
+      "e_frac_recovered_80": NaN,
+      "nmse": 0.8692031807922975,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.10009874317042199,
+      "lambda_r2": -0.036952972412109375,
+      "lambda_chance": 0.003747123126253354
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "ward_real_lambda_base_l12",
+    "arch": "tsae",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "metrics": {
+      "eauc": NaN,
+      "e_mean_max_cos": NaN,
+      "e_frac_recovered_90": NaN,
+      "e_frac_recovered_80": NaN,
+      "nmse": 0.8692031807922975,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.10009874317042199,
+      "lambda_r2": -0.036952972412109375,
+      "lambda_chance": 0.003747123126253354
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  }
+]

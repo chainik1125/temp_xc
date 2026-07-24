@@ -1,0 +1,133 @@
+{
+ "cells": {
+  "base/hs13/tir/tok": {
+   "linear": {
+    "auc_macro_ovr": 0.6142108333333334,
+    "acc_test": 0.4493333399295807,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "null": {
+    "auc_macro_ovr": 0.49469566666666664,
+    "acc_test": 0.3240000009536743,
+    "n_train": 12000,
+    "n_test": 3000
+   }
+  },
+  "base/hs13/tir/T8": {
+   "flat": {
+    "auc_macro_ovr": 0.6418411666666666,
+    "acc_test": 0.47466665506362915,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "mean": {
+    "auc_macro_ovr": 0.641614,
+    "acc_test": 0.4873333275318146,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "shuf": {
+    "auc_macro_ovr": 0.633523,
+    "acc_test": 0.46266666054725647,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "null_flat": {
+    "auc_macro_ovr": 0.5040725,
+    "acc_test": 0.33799999952316284,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "g": 0.0276303333333332,
+   "g_agg": 0.027403166666666645,
+   "g_order": 0.00022716666666655616,
+   "shuffle_gap": 0.008318166666666627
+  },
+  "base/hs13/tir/T16": {
+   "flat": {
+    "auc_macro_ovr": 0.6629796666666666,
+    "acc_test": 0.48100000619888306,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "mean": {
+    "auc_macro_ovr": 0.6521013333333333,
+    "acc_test": 0.4933333396911621,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "shuf": {
+    "auc_macro_ovr": 0.6379595,
+    "acc_test": 0.4736666679382324,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "null_flat": {
+    "auc_macro_ovr": 0.49123900000000004,
+    "acc_test": 0.3216666579246521,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "g": 0.04876883333333326,
+   "g_agg": 0.03789049999999994,
+   "g_order": 0.010878333333333323,
+   "shuffle_gap": 0.02502016666666662
+  },
+  "base/hs13/tir/T32": {
+   "flat": {
+    "auc_macro_ovr": 0.6457188333333334,
+    "acc_test": 0.4819999933242798,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "mean": {
+    "auc_macro_ovr": 0.6465879999999999,
+    "acc_test": 0.4906666576862335,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "shuf": {
+    "auc_macro_ovr": 0.6132615,
+    "acc_test": 0.43433332443237305,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "null_flat": {
+    "auc_macro_ovr": 0.49462416666666664,
+    "acc_test": 0.3253333270549774,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "mlp_flat": {
+    "auc_macro_ovr": 0.5427973333333332,
+    "acc_test": 0.49399998784065247,
+    "n_train": 12000,
+    "n_test": 3000
+   },
+   "g": 0.03150799999999998,
+   "g_agg": 0.03237716666666657,
+   "g_order": -0.0008691666666665876,
+   "shuffle_gap": 0.03245733333333334
+  }
+ },
+ "meta": {
+  "protocol": "card.md (frozen)",
+  "Ts": [
+   8,
+   16,
+   32,
+   64
+  ],
+  "layers": [
+   13,
+   11
+  ],
+  "p_min": 64,
+  "cap": [
+   12000,
+   3000
+  ],
+  "labels": "labels/proofops.npz (runpod-b)"
+ }
+}

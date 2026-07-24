@@ -207,3 +207,37 @@ architectures from each other — it separates them from per-token — so
 Stage 2 is a direct test of the program's standing claim that a
 per-token-decoded T-SAE cannot follow a rate/intensity latent up the
 T ladder.
+
+## 2026-07-24 — runpod-d — order-sensitivity receipt for the EXISTING backtracking case study — **POSITIVE**
+
+Not a hunt candidate: the briefing's "also wanted" item — the
+within-window shuffle control the paper's § 5.2 task never had.
+Script `shuffle_receipt.py` (committed before running) reuses the
+conversion-depth probe rows VERBATIM (frozen § 2 recipe, 25,155/6,266
+rows), so per-token and window reproduce
+`conversion_depth/RECORD.md` § 3 exactly — base L10 ant_kw 0.843/0.886
+and distill L10 0.844/0.895, both published numbers, recovered on
+independently rebuilt caches. The new arms are the per-row within-window
+permutation (seed 23) and the window MEAN. σ_null = 0.0035
+(3σ = 0.0106); all 12 cells.
+
+**Destroying within-window order costs the ANTICIPATION targets
++0.028…+0.041 AUC — 3–4× the noise floor — while the near-ambient
+companion `is_bt` loses only +0.003…+0.013.** ant_kw: +0.034 / +0.036
+(base L10/L12), +0.036 / +0.039 (distill L10/L12); ant_bts: +0.041 /
++0.035, +0.040 / +0.028; is_bt: +0.013 / +0.009, +0.012 / +0.003.
+The receipt holds on both models and both layers.
+
+The ordering is `shuffled < mean < ordered` on every anticipation cell
+(e.g. base L10 ant_kw: 0.852 < 0.872 < 0.886): a shuffled flatten is
+*worse* than a position-symmetric mean, so mis-aligned positional
+evidence actively hurts. That is what makes the ordered margin an
+order effect and not a probe-capacity effect.
+
+**Contrast with candidate 1, on the same substrate and stack:** λ̂
+intensity showed shuffle costs of only +0.002…+0.022 with g_order ≤ 0,
+i.e. order-free pooling. So within one task family the *anticipation*
+label is order-sensitive and the *intensity* label is not — a
+distinction the ambience machinery can now state with receipts rather
+than assume. Results `results/shuffle_receipt.json`, figure
+`figs/shuffle_receipt.*`.
