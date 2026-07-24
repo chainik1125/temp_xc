@@ -29,7 +29,35 @@ Last updated: 2026-07-23.
   property** — screens run per model (cheap), Stage 2 only the best
   cell. **em-redo is REINSTATED on runpod-c** (2026-07-24, Han — run to
   completion; it owns all writes to the shared volume). The TXC-pro
-  dissection (runpod) continues unchanged.
+  dissection (runpod) continues unchanged. *(Update, later that day: the
+  dissection is now DONE — next bullet.)*
+
+- **TXC-PRO DISSECTION DONE (2026-07-24, runpod) — the bundle is mostly
+  selection on noise; ONE component survives, with a tested mechanism
+  and scope.** Frozen-card per-component ablation
+  (`loss_dissection/CARD.md`, committed pre-build; § 9 pre-extension
+  amendment likewise) of TXC-pro's losses on the `txc_batchtopk_post`
+  backbone × the five discriminating benches (canonical slice d_sae=F,
+  T∈{2,4,8}, k_pos∈{1,2,4}, seeds+untrained; 720 post + 696 pre cells,
+  ZERO failures; Gate B sequence→window bridge PASS on every bench;
+  untrained guard exact-0). Verdicts mechanical (`analyze.py`, frozen
+  rules): **matryoshka** (H=8 nested prefixes — enabled at toy scale for
+  the first time; the paper itself disabled it there) helps recovery
+  NOWHERE and hurts in four places; **multi-distance contrastive** HELPS
+  frequency `velocity_recovery` at T=8 (+0.084/+0.093, all seeds
+  positive, absolute 0.69→0.78; Fable skeptic: NO KILLS) and nothing
+  else; the recipe mat-"HELPS" was **killed by the skeptic**
+  (e_metric_leak: both arms far below chance — fails-less-badly ≠
+  extraction). **Pre extension: all 15 primary verdicts NEUTRAL ⇒
+  prediction (v) CONFIRMED — the contrastive lift is
+  decode-structure-contingent** (needs post's position-mixing decode;
+  the additive pre decode gets nothing), upgrading the finding to a
+  mechanism: phase-washing/tone-preserving code pressure, readable only
+  by a coincidence decode, only at T=8. Interaction near-additive; mat
+  cancels ctr's gain in `+both` on the one bench where ctr works.
+  Deliverables: `loss_dissection/RECORD.md` + `dissection_table[_pre].md`
+  + 1416 leaderboard rows. Spend $0.51 (cumulative $11.52/$25). AWAITING
+  mac-local review (briefing stays until then).
 
 - **ROUND-3 REVIEW DONE (2026-07-23, mac-local) — ALL THREE sessions
   APPROVED; all verdicts stand; no active briefings.** (1) **C7 close

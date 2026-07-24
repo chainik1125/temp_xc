@@ -1,93 +1,65 @@
 # Working state — agent `runpod`
 
-**Last rewrite:** 2026-07-24, mid `briefings/txcpro-dissection.md` (C7 was
-APPROVED in round-3 review; that briefing is deleted; this is the new task).
-**State: POST FAMILY DONE (720/720, verdicts + skeptic complete); PRE
-EXTENSION GRID RUNNING** (CARD § 9 amendment frozen pre-build; 696
-feasible cells, 16 workers, log `…/scratchpad/dissect_pre_grid.log`).
-Post results: Gate B 9/9 ×5, untrained guard exact-0; ONE surviving
-HELPS — ctr on frequency velocity T=8 (+0.084/+0.093, skeptic no-kills);
-recipe mat-HELPS KILLED (e_metric_leak, below-chance both arms); mat
-helps nowhere, hurts 4 places. RECORD.md drafted with § 6 pre section
-PENDING (do not commit until pre analysis fills it; predictions (v)-(vii)
-unscored until then). Next: pre grid → `analyze.py pre` → skeptic if pre
-HELPS → finish RECORD → STATUS § 0 bullet → pull-rebase → push → STOP.
+**Last rewrite:** 2026-07-24, after completing `briefings/txcpro-dissection.md`.
+**State: DISSECTION DONE — STOPPED FOR REVIEW** (briefing's acceptance
+gate; the briefing stays until mac-local review deletes it). No active
+task.
 
 ## Who / where
 Remote CC on RunPod (Linux), repo root `/workspace/temp_xc`. **I am `runpod`
 (original box — `/workspace/.agent_id` does NOT exist; do not create it).**
-Parallel agents: `runpod-b` (story pack, DONE awaiting review), `runpod-c`
-(em-redo, phase A frozen). Shared-branch rules (agents/README.md): `git pull
---rebase origin arxiv` before EVERY push (commit this STATUS first); shared
-files append-only; leaderboard/manifest union-merge; **cite commits by
-SUBJECT LINE or re-verify SHAs post-push**. Tokens in `/workspace/.tokens/`
+Parallel agents: `runpod-b` (story pack, awaiting review), `runpod-c`
+(em-redo). Shared-branch rules (agents/README.md): `git pull --rebase
+origin arxiv` before EVERY push (commit this STATUS first); shared files
+append-only; leaderboard/manifest union-merge; **cite commits by SUBJECT
+LINE or re-verify SHAs post-push**. Tokens in `/workspace/.tokens/`
 (`gh_token`, `anthropic_key` → export ANTHROPIC_API_KEY). Push:
 `git push https://x-access-token:$(cat ../.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`.
 32 CPU / 128 GB; harness-tracked background Bash; python -u.
 
-## Active task: TXC-pro loss dissection (briefings/txcpro-dissection.md)
-Which TXC-pro loss component (matryoshka / multi-distance contrastive /
-longer-windows-as-T-axis) helps the txc_batchtopk_post backbone — synthetic
-five-bench discriminating set ONLY (no probing arm). Prior: "mostly nothing
-helps"; a clean nothing IS the deliverable. ~48 h, skeptic-only spend ≤ $5.
-
-**Done so far (all committed, in order):**
-1. Card FROZEN pre-build — commit "loss dissection: ablation card FROZEN
-   (pre-build) — TXC-pro components on the synthetic discriminating set";
-   card at `experiments/explorations/synthetic/loss_dissection/CARD.md`.
-   Key frozen choices: one sequence-mode class `TXCPostDissect`
-   (`src/temp_bench/archs/txc_post_dissect.py`), four registry entries
-   txc_post_{plain,mat,ctr,both} (loss-only diffs; params/init identical);
-   mat = H=8 nested prefixes ⌊G·d_sae/8⌋ (paper spec, G=8 term = plain
-   recon); ctr = cosine InfoNCE at window shifts {1,2}, w=1/(1+Δ), full
-   code (toy-scale TXC-pro convention), grafted verbatim from history
-   commit 2fa9bdab lineage; anchor-only side effects ⇒ exact zero-weight
-   reduction; S_MAX=2 for ALL variants. Decision rules: paired-by-seed,
-   cell bar max(2·SE, 0.05 / nmse 0.02), HELPS ≥2/9 cells + 0 negative;
-   Gate B bridge to canonical txc_batchtopk_post leaderboard rows
-   (135/135 verified present pre-freeze); untrained guard = variant rows
-   identical. Predictions frozen incl. anti-AC sharpening (ctr hurts
-   phasepair sign if anything).
-2. Build committed pre-run — commit "loss dissection: variants + contract
-   tests + driver + analyzer + skeptic (pre-run commit)". 11 contract
-   tests PASS; full suite 198 passed + 1 skip; `run.py validate` OK
-   (17 archs).
-3. Smoke cell (post-commit): txc_post_ctr backtracking T=4 k=2 s=1 →
-   λ=0.953, ~115 s/cell (sequence mode ≈ 16× window-mode cell cost —
-   SequenceBuffer regenerates per step; expected, noted for the record).
-4. **GRID IN FLIGHT** (background, 16 workers):
-   `python -u -m experiments.explorations.synthetic.loss_dissection.run_grid 16`
-   → log `…/scratchpad/dissect_grid.log`, results per bench at
-   `loss_dissection/results/<bench>_dissect_grid_results.json`. 720 cells
-   (144/bench × 5), ETA ~1.5–2 h from ~2026-07-23 (see log timestamps).
-
-**Next (if resuming mid-flight):** wait for grid → `python -m
-….loss_dissection.analyze` (mechanical verdicts; do NOT hand-pick cells) →
-skeptic ONLY on recovery-metric HELPS claims (`skeptic_dissect.py`,
-cache-guarded, session cap $5) → RECORD.md narrative + research STATUS § 0
-bullet + this file → pull-rebase (leaderboard/manifest union-merge; origin
-had 5 incoming commits from runpod-b/-c, no file overlap with mine) → push
-→ STOP for review. Briefing stays until mac-local deletes it.
-
-**Card discipline:** verdicts are read off analyze.py's frozen rules;
-pre-backbone extension only if time remains and only as a card amendment;
-key-mapping note: card's "gauc" = leaderboard `eauc` key.
+## Just completed: TXC-pro dissection (2026-07-24) — do not redo
+**The bundle is mostly selection on noise; ONE component survives.**
+Full record: `experiments/explorations/synthetic/loss_dissection/RECORD.md`
+(+ `dissection_table.md`, `dissection_table_pre.md`, CARD.md). What a
+reviewer will check:
+- Freeze order: commit "loss dissection: ablation card FROZEN
+  (pre-build) …" → build commit "… (pre-run commit)" → grids; § 9
+  pre-extension amendment "… AMENDMENT frozen (pre-build) …" → pre build
+  commit → pre grid. Skeptic-summary enrichment (absolute levels)
+  committed BEFORE skeptic execution, anti-claim direction.
+- Post family: Gate B 9/9 ×5 benches, untrained guard exact-0, 720/720
+  cells. ONE surviving HELPS: ctr → frequency velocity T=8 (+0.084 k=1 /
+  +0.093 k=2, all seeds positive, 0.69→0.78 absolute; skeptic NO KILLS).
+  Recipe mat-"HELPS" KILLED (e_metric_leak: both arms far below chance).
+  Matryoshka helps recovery nowhere, hurts 4 places.
+- Pre extension: 696/696 feasible cells ((T=8,k=4) infeasible at F=20,
+  logged); ALL 15 primary verdicts NEUTRAL ⇒ prediction (v) CONFIRMED —
+  ctr's lift is decode-structure-contingent. Skeptic not triggered ($0).
+- Predictions ledger honest: (i) falsified in one place (the surviving
+  claim), (ii) wrong (mat helps nothing incl. capability), (iii) wrong
+  venue (help is AC power, not DC), (iii-b) genuine-salvage fork, (iv)
+  never fired, (v)/(vi) confirmed, (vii) partially wrong.
+- Contract tests: 15 (parametrized both families; plain-reduction ≤1e-6
+  vs both parents; hook-identity; param-identity; pair/offset checks).
+  Suite green. Spend $0.51 (cumulative $11.52/$25; $5 session cap).
+- 1416 leaderboard rows (canonical runner, code-version stamped); grid
+  dumps + tables under `loss_dissection/results/`.
 
 ## Earlier completed (reviewed; do not redo)
-- **C7 (2026-07-23): reasoning int/eq cell CLOSED NEGATIVE-at-resolution**
-  — APPROVED round 3. **C6: empty passing set** — APPROVED round 2.
-- **Stage-6 #3b recipe POSITIVE; C5 r3 ABORT** (reviewed).
-- Spend cumulative $11.01/$25 (expansion meter; dissection adds skeptic
-  only).
+- **C7: reasoning int/eq cell CLOSED NEGATIVE-at-resolution** (round-3
+  APPROVED). **C6: empty passing set** (round-2 APPROVED). **Stage-6
+  #3b recipe POSITIVE; C5 r3 ABORT** (reviewed).
 
 ## Repo state
-Local ahead 2 (card + build commits), behind 5 (runpod-b/-c pushes; no
-overlap). Working tree: leaderboard.jsonl + checkpoints/manifest.jsonl
-live-appended by grid workers — do NOT rebase/stash mid-grid.
+After the dissection-final commits: expect clean tree in sync with
+origin/arxiv (verify `git status -sb`). If resuming: nothing mid-flight;
+wait for review or a new briefing.
 
 ## Gotchas (this box)
 - Harness blocks `sleep` (use `until …; done` or background tasks);
   background python needs `-u`.
+- Sequence-mode cells cost ~115 s vs ~7 s window-mode (SequenceBuffer
+  regenerates per step) — budget accordingly.
 - 5-family models reject `temperature`; calibrations SEQUENTIAL.
 - Skeptic verdicts: persisted raw pre-parse, cached, NEVER re-rolled.
 - Rebase rewrites SHAs — cite subjects or re-verify post-push.
