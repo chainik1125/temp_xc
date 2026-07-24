@@ -1,0 +1,63 @@
+{
+ "frozen": {
+  "kernel": {
+   "tau": 3.0,
+   "k": 8,
+   "min_history": 4
+  },
+  "event": "sentence ends with '?'",
+  "null_seed": 102,
+  "seed": 0,
+  "mask": "is_q_tok (any '?' char) excluded from manifests"
+ },
+ "stream_shape": [
+  4044,
+  128
+ ],
+ "valid_rate_pos1plus": 0.9094527130696201,
+ "n_roundtrip_mismatch_tokens": 149,
+ "event_rate_sentences": 0.021531459009514347,
+ "q_tok_rate": 0.001297411172294491,
+ "lam": {
+  "mean": 0.03103613667190075,
+  "bin_scheme": "zero_split",
+  "edges": [
+   0.0,
+   0.11804250627756119
+  ]
+ },
+ "lam_null": {
+  "bin_scheme": "zero_split",
+  "edges": [
+   0.0,
+   0.1120692640542984
+  ],
+  "corr_with_real": 0.29901101199711855
+ },
+ "is_q_rate_by_bin": [
+  0.015925101603652438,
+  0.02688689726686912,
+  0.07940152581290275
+ ],
+ "corr_lam_q_lam_sc": 0.32380499887353525,
+ "corr_lam_q_ward_lam_hist": 0.3007569188314524,
+ "manifest_rows_per_class": 20000,
+ "null_manifest_rows_per_class": 20000,
+ "trace_split_test_frac": 0.2,
+ "triage": {
+  "tok_auc_extreme": 0.6095830283511765,
+  "pos_auc_extreme": 0.58634081671969,
+  "tok_kill_at": 0.65,
+  "pos_kill_at": 0.7,
+  "verdict": "PASS",
+  "tok_auc": 0.6095830283511765,
+  "pos_raw_auc": 0.58634081671969,
+  "pos_frac_auc": 0.5811577792965168,
+  "n_test_rows": 7795
+ },
+ "visible_evidence_auc": {
+  "T8": 0.5598071712815396,
+  "T16": 0.6231785626080514,
+  "T32": 0.7416919036517028
+ }
+}

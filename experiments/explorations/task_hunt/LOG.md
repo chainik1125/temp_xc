@@ -908,3 +908,40 @@ split).
   {0, ≤0.186, >} — recorded in stats). Running
   agent freezes its own screen card; draft T-pattern + falsifier in
   `sc_lambda/CARD_DRAFT.md`.
+
+
+---
+
+## 2026-07-24 — runpod-b · FACTORY BUNDLE 2 SHIPPED: `qrate` (question-rate intensity λ̂_q)
+
+Second bundle of `briefings/candidate-factory-traces.md`. Builder +
+frozen card committed before outputs (commit "factory: bundle_core
+shared pipeline (tested) + qrate builder/card"). Bundle:
+`labels/qrate.npz` + `labels/qrate_stats.json`, card
+`qrate/CARD_DRAFT.md`. Same Ward-grid conventions as `sc_lambda`
+(20k rows/class primary + null manifests).
+
+- **Events**: sentence ends with "?" — rate
+  0.022 of sentences (sparse; zero_split bin
+  scheme fired as frozen). Same exponential kernel (τ = 3, K = 8,
+  causal, kernel-only). Mask: any "?"-containing token excluded from
+  manifests (0.13% of valid tokens); `is_q` ships
+  as ambient control.
+- **Triage PASSED**: token-identity AUC 0.610
+  (kill 0.65), position 0.586 raw /
+  0.581 frac (kill 0.70) — cleaner than
+  sc_lambda on both faces.
+- **Receipts**: self-excitation monotone (is_q rate by bin
+  0.016 → 0.079, a
+  5× lift); DISTINCT from the shipped siblings — corr(λ̂_q, λ̂_sc) =
+  0.32, corr(λ̂_q, ward λ̂_hist) =
+  0.30; event-shuffle null (seed 102)
+  corr 0.30 with real; visible-evidence
+  ceiling T8 0.560 / T16
+  0.623 / T32
+  0.742 — note it is HIGHER than
+  sc_lambda's (visible "?" tokens are strong evidence): the
+  beat-the-evidence-line falsifier has real teeth here.
+- Sibling disclosure in the card: runpod's broad-corpus B3/B4 also
+  carries a question-rate face (fineweb prose) — different corpus,
+  cross-cite, neither substitutes.
