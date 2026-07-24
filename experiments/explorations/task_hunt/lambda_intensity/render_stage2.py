@@ -1,14 +1,23 @@
 """Candidate 1 Stage 2 — the T-scaling figure (the hunt's money plot).
 
+Variance-aware renderer (upgraded by runpod-b per
+`briefings/hunt-support-stats.md` item 2; provenance RECORD § 3b):
+  (a) every arch line carries its realized-l0 range in the legend; an
+      arch whose realized l0 falls below half the nominal k in any
+      trained cell is flagged NOT budget-matched, with its minimum
+      annotated on the plot (review note 3 — mandatory before any
+      external use; TXC-post collapses to 0.49 at T = 16 in round 1);
+  (b) whiskers are two-sided 95% t confidence intervals over seeds
+      (support_stats.stats_lib.t_ci95), not ±std;
+  (c) a budget-matched-only variant figure omits non-matched lines.
+
 Reads results/stage2_<ds>.json (the panel produced by run_stage2.py) and
 emits:
-  figs/stage2_tscaling.{png,pdf} — lambda_recovery vs T, one line per
-      architecture, trained (solid) with the untrained control (hollow)
-      and the per-arch empirical chance floor. The hunt's claim would be
-      TXC rising while the per-token SAE and T-SAE stay flat.
-  results/stage2_summary.json — per (arch, T) mean/std over seeds, the
-      untrained control, realized l0_per_token (the fairness check), and
-      the trained−untrained margin.
+  figs/stage2_tscaling.{png,pdf}          — full panel, annotated
+  figs/stage2_tscaling_matched.{png,pdf}  — budget-matched archs only
+  results/stage2_summary.json — per (arch, T) mean/std/CI over seeds,
+      untrained control, realized l0 (fairness check), per-arch l0 range
+      + budget_matched flag, trained−untrained margin.
 
 Only rows from the FINAL config count (buffer_tokens 524288, the
 n_steps of run_stage2); anything else is a superseded or plumbing cell
@@ -27,6 +36,8 @@ from pathlib import Path
 
 import numpy as np
 
+from experiments.explorations.task_hunt.support_stats.stats_lib import t_ci95
+
 HERE = Path(__file__).resolve().parent
 RES = HERE / "results"
 FIGS = HERE / "figs"
@@ -41,15 +52,13 @@ ARCH_STYLE = {
 METRIC = "lambda_recovery"
 
 
-def main():
-    ds = sys.argv[1] if len(sys.argv) > 1 else "ward_real_lambda_base_l12"
-    rows = json.loads((RES / f"stage2_{ds}.json").read_text())
+def build_summary(rows):
     ok = [r for r in rows if r.get("ok")]
-
     trained = defaultdict(list)      # (arch, T) -> [metric]
     untrained = defaultdict(list)
     chance = defaultdict(list)
     l0 = defaultdict(list)
+    k_pos = max((r.get("k_pos", 8) for r in ok), default=8)
     for r in ok:
         key = (r["arch"], r["T"])
         m = r["metrics"]
@@ -63,16 +72,96 @@ def main():
                               "std": float(np.nanstd(v)), "n": len(v)}
                 for (a, t), v in sorted(d.items())}
 
+    ci = {}
+    for (a, t), v in sorted(trained.items()):
+        mean, lo, hi = t_ci95(v)
+        ci[f"{a}/T{t}"] = {"mean": mean, "lo": lo, "hi": hi, "n": len(v)}
+
+    # realized-l0 range per arch over its cell means (same trained+
+    # untrained aggregation as the committed l0_per_token field);
+    # budget-matched iff every cell's mean realized l0 >= nominal k / 2
+    # (TXC-post's post-squash k_win // T correction collapses it far
+    # below this).
+    l0_range, matched = {}, {}
+    for a in {a for (a, _) in trained}:
+        cell_means = [float(np.nanmean(l0[(a, t)]))
+                      for (aa, t) in sorted(l0) if aa == a]
+        if cell_means:
+            l0_range[a] = {"min": min(cell_means), "max": max(cell_means)}
+            matched[a] = min(cell_means) >= k_pos / 2
+
     summary = {
-        "datasource": ds, "metric": METRIC,
+        "datasource": None, "metric": METRIC,
         "n_cells_ok": len(ok), "n_cells_total": len(rows),
         "trained": agg(trained), "untrained": agg(untrained),
         "chance": agg(chance), "l0_per_token": agg(l0),
+        "ci95_trained": ci,
+        "l0_range": l0_range,
+        "budget_matched": matched,
+        "match_rule": f"min cell-mean realized l0 >= k_pos/2 = {k_pos / 2}",
         "margin_trained_minus_untrained": {
             f"{a}/T{t}": float(np.nanmean(v)
                                - np.nanmean(untrained.get((a, t), [np.nan])))
             for (a, t), v in sorted(trained.items())},
     }
+    return summary, trained, untrained, l0, matched, l0_range
+
+
+def draw(ax, trained, untrained, l0, matched, l0_range, matched_only):
+    def l0_tag(a):
+        r = l0_range.get(a)
+        if r is None:
+            return ""
+        tag = (f"l0 {r['min']:.2g}" if r["min"] == r["max"]
+               else f"l0 {r['min']:.2g}–{r['max']:.2g}")
+        if not matched.get(a, True):
+            tag += " — NOT budget-matched"
+        return f" ({tag})"
+
+    for arch, (col, mk, lab) in ARCH_STYLE.items():
+        if matched_only and not matched.get(arch, False):
+            continue
+        Ts = sorted({t for (a, t) in trained if a == arch})
+        if not Ts:
+            continue
+        mu, lo, hi = zip(*(t_ci95(trained[(arch, t)]) for t in Ts))
+        if len(Ts) == 1:            # token archs: draw as a flat reference
+            ax.axhline(mu[0], color=col, ls="--", lw=1.6, alpha=0.9,
+                       label=f"{lab} (T=1){l0_tag(arch)}")
+            if np.isfinite(lo[0]):
+                ax.fill_between([2, 16], lo[0], hi[0], color=col, alpha=0.10)
+        else:
+            yerr = [np.array(mu) - np.array(lo), np.array(hi) - np.array(mu)]
+            ax.errorbar(Ts, mu, yerr=yerr, fmt=mk, color=col, lw=2,
+                        capsize=3, label=f"{lab}{l0_tag(arch)}")
+            un = [np.nanmean(untrained.get((arch, t), [np.nan])) for t in Ts]
+            ax.plot(Ts, un, mk[0], color=col, mfc="none", ls=":", lw=1,
+                    alpha=0.7)
+            if not matched.get(arch, True):
+                t_min = min(Ts, key=lambda t: np.nanmean(l0[(arch, t)]))
+                v_min = float(np.nanmean(l0[(arch, t_min)]))
+                y_min = float(np.nanmean(trained[(arch, t_min)]))
+                ax.annotate(f"realized l0 = {v_min:.2f}\n(nominal k = 8)",
+                            xy=(t_min, y_min),
+                            xytext=(0.62 * t_min, y_min + 0.03),
+                            fontsize=8, color=col, ha="right",
+                            arrowprops=dict(arrowstyle="->", color=col,
+                                            lw=1))
+    ax.set_xscale("log", base=2)
+    Tall = sorted({t for (_, t) in trained if t > 1})
+    if Tall:
+        ax.set_xticks(Tall); ax.set_xticklabels(Tall)
+    ax.set_xlabel("window size T (tokens)")
+    ax.set_ylabel(f"{METRIC}  (held-out Pearson r of a linear probe)")
+    ax.grid(True, alpha=0.25)
+    ax.legend(fontsize=8, loc="best")
+
+
+def main():
+    ds = sys.argv[1] if len(sys.argv) > 1 else "ward_real_lambda_base_l12"
+    rows = json.loads((RES / f"stage2_{ds}.json").read_text())
+    summary, trained, untrained, l0, matched, l0_range = build_summary(rows)
+    summary["datasource"] = ds
     RES.mkdir(exist_ok=True)
     (RES / "stage2_summary.json").write_text(json.dumps(summary, indent=2))
 
@@ -80,46 +169,33 @@ def main():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     FIGS.mkdir(exist_ok=True)
-    fig, ax = plt.subplots(figsize=(7.4, 5.0))
-    for arch, (col, mk, lab) in ARCH_STYLE.items():
-        Ts = sorted({t for (a, t) in trained if a == arch})
-        if not Ts:
-            continue
-        mu = [np.nanmean(trained[(arch, t)]) for t in Ts]
-        sd = [np.nanstd(trained[(arch, t)]) for t in Ts]
-        if len(Ts) == 1:            # token archs: draw as a flat reference
-            ax.axhline(mu[0], color=col, ls="--", lw=1.6, alpha=0.9,
-                       label=f"{lab} (T=1)")
-            ax.fill_between([2, 16], mu[0] - sd[0], mu[0] + sd[0],
-                            color=col, alpha=0.10)
-        else:
-            ax.errorbar(Ts, mu, yerr=sd, fmt=mk, color=col, lw=2,
-                        capsize=3, label=lab)
-            un = [np.nanmean(untrained.get((arch, t), [np.nan])) for t in Ts]
-            ax.plot(Ts, un, mk[0], color=col, mfc="none", ls=":", lw=1,
-                    alpha=0.7)
-    ax.set_xscale("log", base=2)
-    Tall = sorted({t for (_, t) in trained if t > 1})
-    if Tall:
-        ax.set_xticks(Tall); ax.set_xticklabels(Tall)
-    ax.set_xlabel("window size T (tokens)")
-    ax.set_ylabel(f"{METRIC}  (held-out Pearson r of a linear probe)")
-    ax.set_title("Task hunt Stage 2 — λ̂ intensity recovery vs T\n"
+    variants = [("stage2_tscaling", False,
+                 "Task hunt Stage 2 — λ̂ intensity recovery vs T\n"
                  "REAL Ward activations (base, resid_post L12); "
-                 "hollow/dotted = untrained control", fontsize=11)
-    ax.grid(True, alpha=0.25)
-    ax.legend(fontsize=8, loc="best")
-    fig.tight_layout()
-    for ext in ("png", "pdf"):
-        fig.savefig(FIGS / f"stage2_tscaling.{ext}",
-                    dpi=140 if ext == "png" else None, bbox_inches="tight")
-    plt.close(fig)
+                 "whiskers = 95% t CI over seeds; hollow/dotted = "
+                 "untrained control"),
+                ("stage2_tscaling_matched", True,
+                 "Task hunt Stage 2 — λ̂ recovery vs T, budget-matched "
+                 "archs only\n(realized l0 within 2× of nominal k; "
+                 "whiskers = 95% t CI over seeds)")]
+    for stem, matched_only, title in variants:
+        fig, ax = plt.subplots(figsize=(7.4, 5.0))
+        draw(ax, trained, untrained, l0, matched, l0_range, matched_only)
+        ax.set_title(title, fontsize=11)
+        fig.tight_layout()
+        for ext in ("png", "pdf"):
+            fig.savefig(FIGS / f"{stem}.{ext}",
+                        dpi=140 if ext == "png" else None,
+                        bbox_inches="tight")
+        plt.close(fig)
 
-    print(json.dumps({"n_ok": len(ok), "n_total": len(rows),
-                      "trained": summary["trained"],
-                      "untrained": summary["untrained"],
-                      "l0_per_token": summary["l0_per_token"]}, indent=2))
-    print(f"-> {FIGS}/stage2_tscaling.* ; {RES}/stage2_summary.json")
+    print(json.dumps({"n_ok": summary["n_cells_ok"],
+                      "n_total": summary["n_cells_total"],
+                      "budget_matched": summary["budget_matched"],
+                      "l0_range": summary["l0_range"],
+                      "ci95_trained": summary["ci95_trained"]}, indent=2))
+    print(f"-> {FIGS}/stage2_tscaling.* ; stage2_tscaling_matched.* ; "
+          f"{RES}/stage2_summary.json")
 
 
 if __name__ == "__main__":
