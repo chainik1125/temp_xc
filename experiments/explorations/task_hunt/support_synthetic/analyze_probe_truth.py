@@ -61,8 +61,14 @@ def _cell_key(r):
     return (r["arch"], r["T"], r["d_sae"], r["k_pos"], r["n_steps"])
 
 
-def build_cells(stages=("train", "existing")) -> list[dict]:
-    """One record per (arch, T, d_sae, k_pos, n_steps), seeds aggregated."""
+def build_cells(stages=("train", "existing"), exclude: set | None = None) -> list[dict]:
+    """One record per (arch, T, d_sae, k_pos, n_steps), seeds aggregated.
+
+    ``exclude`` is a set of ``(*cell_key, seed)`` tuples dropped before
+    aggregation — gate G3's remedy (card § 6: failing cells are *excluded*
+    and logged, not campaign-voiding).
+    """
+    exclude = exclude or set()
     grid, anchors = {}, {}
     for st in stages:
         for r in _load(f"probe_truth_grid_{st}.json"):
@@ -74,14 +80,23 @@ def build_cells(stages=("train", "existing")) -> list[dict]:
 
     by_cell = defaultdict(list)
     for key, g in grid.items():
+        if key in exclude:
+            continue
         a = anchors.get(key)
         m = g["metrics"]
+        # Probe feature dim from the config (Stacked reads T·d_sae — the
+        # disclosed p > n case, PROBE_V2_SPEC.md § 1 knob 2); the anchor
+        # overwrites it with the measured value where one exists.
+        p_cfg = g["d_sae"] * (g["T"] if g["arch"].startswith("stacked") else 1)
         rec = {"seed": key[-1],
                "v1": float(m.get("lambda_recovery", np.nan)),
                "v2": float(m.get("lambda_recovery_v2", np.nan)),
                "v1_chance": float(m.get("lambda_chance", np.nan)),
                "v2_chance": float(m.get("lambda_chance_v2", np.nan)),
                "l0_per_window": float(m.get("l0_per_window", np.nan)),
+               "p": p_cfg,
+               "n_rows_v1": 1024 * (32 // g["T"]),
+               "n_rows_v2": float(m.get("lambda_v2_n_train_rows", np.nan)),
                "kind": g.get("kind")}
         if a:
             g1024 = [q for q in a["grid"] if q["n_windows"] == 1024][0]
@@ -198,18 +213,51 @@ def gate_G2(cells) -> dict:
 
 
 def gate_G3(cells) -> dict:
-    """Chance floors sit at 0 (±0.05); failures are excluded and logged."""
-    bad = []
+    """Chance floors behave; failing (cell, seed) pairs are EXCLUDED (card § 6).
+
+    **Amendment, disclosed rather than silent.** The card froze the test at
+    a flat |chance| ≤ 0.05. That constant is mis-scaled and the campaign says
+    so instead of quietly living with it: the chance floor is a *fitted*
+    probe's held-out correlation on permuted targets, whose null spread is
+    ~√(p/n), not a constant. At the very first cells to land (d_sae = 256,
+    T = 16) √(p/n) is 0.125 for the v2 floor — so the frozen constant
+    excludes cells for ordinary sampling spread, which is not the degeneracy
+    the gate was written to catch ("the split or the target is degenerate for
+    that cell").
+
+    Both readings are computed. ``frozen`` is the card's literal rule;
+    ``scaled`` keeps the intent by testing against three times the analytic
+    null scale. The receipt reports the branch under BOTH exclusion sets, so
+    the amendment cannot quietly buy an outcome.
+    """
+    frozen, scaled = [], []
     for c in cells:
         for s in c["seeds"]:
-            for k in ("v1_chance", "v2_chance"):
+            p = s.get("p")
+            for k, nrows in (("v1_chance", s.get("n_rows_v1")),
+                             ("v2_chance", s.get("n_rows_v2"))):
                 v = s[k]
-                if np.isfinite(v) and abs(v) > 0.05:
-                    bad.append({"arch": c["arch"], "T": c["T"],
-                                "d_sae": c["d_sae"], "k_pos": c["k_pos"],
-                                "n_steps": c["n_steps"], "seed": s["seed"],
-                                "which": k, "value": float(v)})
-    return {"pass": not bad, "n_excluded": len(bad), "detail": bad[:40]}
+                if not np.isfinite(v):
+                    continue
+                rec = {"arch": c["arch"], "T": c["T"], "d_sae": c["d_sae"],
+                       "k_pos": c["k_pos"], "n_steps": c["n_steps"],
+                       "seed": s["seed"], "which": k, "value": float(v),
+                       "p": p, "n_rows": nrows}
+                if abs(v) > 0.05:
+                    frozen.append(rec)
+                null_scale = (np.sqrt(p / nrows) if p and nrows else 0.0)
+                thr = max(0.05, 3.0 * float(null_scale))
+                rec = {**rec, "threshold": thr}
+                if abs(v) > thr:
+                    scaled.append(rec)
+    def _keys(bad):
+        return {(b["arch"], b["T"], b["d_sae"], b["k_pos"], b["n_steps"],
+                 b["seed"]) for b in bad}
+    return {"pass": True,                       # remedy is exclusion, not failure
+            "n_excluded_frozen": len(frozen), "n_excluded_scaled": len(scaled),
+            "excluded_frozen_keys": sorted(_keys(frozen), key=str),
+            "excluded_scaled_keys": sorted(_keys(scaled), key=str),
+            "detail_frozen": frozen[:40], "detail_scaled": scaled[:40]}
 
 
 def gate_G4(cells) -> dict:
@@ -307,9 +355,13 @@ def branch(gates, preds) -> tuple[str, str]:
         return ("REJECT-consistent",
                 "v2 reports above truth on at least one licensed cell or "
                 "inflates on the null arm — branch 3 evidence, reported first.")
-    gates_ok = all(gates[g]["pass"] for g in ("G1", "G3", "G4"))
-    if not gates_ok:
-        failed = [g for g in ("G1", "G2", "G3", "G4") if not gates[g]["pass"]]
+    # Card § 7 reads "G1–G4 pass"; § 6 gives G3 the remedy of *excluding* the
+    # offending cells (so it cannot fail the campaign, only shrink it) and
+    # states G2 failure "does not by itself void the campaign" but caps any
+    # claim mirroring a committed number. The voiding gates are therefore G1
+    # (no truth is licensed without it) and G4 (coverage).
+    failed = [g for g in ("G1", "G4") if not gates[g]["pass"]]
+    if failed:
         return ("AMBIGUOUS", f"validity gate(s) {', '.join(failed)} failed")
     P1, P2, P3 = preds["P1"]["holds"], preds["P2"]["holds"], preds["P3"]["holds"]
     if P1 and P2 and P3:
@@ -324,14 +376,27 @@ def branch(gates, preds) -> tuple[str, str]:
             f"mixed pattern (P1={P1}, P2={P2}, P3={P3})")
 
 
-def main():
-    calib = _load("probe_truth_calib.json")
-    cells = build_cells()
-    g3 = gate_G3(cells)
-    gates = {"G1": gate_G1(calib), "G2": gate_G2(cells),
-             "G3": g3, "G4": gate_G4(cells)}
+def _run(calib, exclude, g3):
+    cells = build_cells(exclude=exclude)
+    gates = {"G1": gate_G1(calib), "G2": gate_G2(cells), "G3": g3,
+             "G4": gate_G4(cells)}
     preds = predictions(cells, calib, set())
     label, why = branch(gates, preds)
+    return cells, gates, preds, label, why
+
+
+def main():
+    calib = _load("probe_truth_calib.json")
+    g3 = gate_G3(build_cells())                 # exclusions from the full set
+    cells, gates, preds, label, why = _run(
+        calib, set(g3["excluded_scaled_keys"]), g3)
+    # Sensitivity: the same pipeline under the card's literal (mis-scaled)
+    # G3 constant, so the disclosed amendment cannot buy an outcome.
+    _, _, _, label_frozen, why_frozen = _run(
+        calib, set(g3["excluded_frozen_keys"]), g3)
+    g3["branch_under_frozen_G3"] = label_frozen
+    g3["branch_under_scaled_G3"] = label
+    g3["amendment_changes_branch"] = bool(label_frozen != label)
 
     coverage = {
         "n_cells": len(cells),
@@ -351,14 +416,21 @@ def main():
                        and not c.get("anchor_licensed")],
     }
     out = {"card": "CARD_PROBE_TRUTH.md", "branch_evidence": label,
-           "branch_reason": why, "gates": gates, "predictions": preds,
+           "branch_reason": why,
+           "branch_under_literal_frozen_G3": label_frozen,
+           "branch_under_literal_frozen_G3_reason": why_frozen,
+           "gates": gates, "predictions": preds,
            "coverage": coverage, "cells": cells, "calibration": calib}
     (RES / "probe_truth.json").write_text(json.dumps(out, indent=1))
 
     print(f"branch_evidence: {label}  — {why}")
+    print(f"  (under the card's literal G3 constant: {label_frozen} — "
+          f"{why_frozen})")
     for g, v in gates.items():
+        skip = ("detail", "anchor_detail", "cells", "detail_frozen",
+                "detail_scaled", "excluded_frozen_keys", "excluded_scaled_keys")
         print(f"  {g}: {'PASS' if v['pass'] else 'FAIL'}  "
-              f"{ {k: v[k] for k in v if k not in ('detail','anchor_detail','cells')} }")
+              f"{ {k: v[k] for k in v if k not in skip} }")
     for p in ("P1", "P2", "P3", "P4", "P5"):
         v = preds[p]
         print(f"  {p}: {'HOLDS' if v.get('holds') else 'FAILS'}  "
