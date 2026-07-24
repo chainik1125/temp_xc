@@ -1,38 +1,55 @@
 # Working state — agent `runpod-e`
 
-**Last rewrite:** 2026-07-24 (first session, mid-task).
+**Last rewrite:** 2026-07-24, mid-session (replag screen: llama running).
 
 ## Who / where
-GPU RunPod pod (H100 80GB), Linux at `/workspace/temp_xc`, identity
-`/workspace/.agent_id` = `runpod-e` (seeded this session). Role:
-**task-hunt arm B** (`briefings/task-hunt-b.md`, governed by
-`briefings/task-hunt.md`) — repetition-lag Δ across model scale
-(gpt2-small / gemma-2-2b base / Llama-3.1-8B base) + confidence-trend /
-emotional-instability backups. Own independent 700 GB volume at
-`/workspace` (693 GB free); all caches local under
-`/workspace/replag_caches/`.
+GPU RunPod pod (H100 80GB), `/workspace/temp_xc`, `/workspace/.agent_id`
+= `runpod-e`. Task-hunt arm B (`briefings/task-hunt-b.md`). Git identity
+`runpod-e-agent`; creds `store --file=/workspace/.git-credentials`;
+`HF_TOKEN` from `/workspace/.tokens/hf_token` (export per command;
+gemma is gated). Pull-rebase before EVERY push (5 agents on `arxiv`).
 
-## Session state (2026-07-24)
-- Env DONE: `.venv` has CUDA torch 2.8.0 / transformers 5.7.0 /
-  datasets 4.8.5 / accelerate; `HF_HOME=/workspace/hf_cache`; git
-  identity `runpod-e-agent`, creds via
-  `store --file=/workspace/.git-credentials` (token from
-  `/workspace/.tokens/gh_token`, never hardcode). Model weights
-  (gpt2, gemma-2-2b, Llama-3.1-8B base) downloading to HF cache in
-  background.
-- runpod-b labels had NOT landed when caches were ready → building the
-  Δ-label builder myself per briefing (exact computation from tokens +
-  shuffled-window null + sanity tests), committed before outputs.
-- Corpus: the committed pinned fineweb sample
-  (`experiments/explorations/synthetic/expansion/data/fineweb_sample.json`,
-  400 docs) — the prep briefing's sanctioned default.
-- Next: freeze `experiments/explorations/task_hunt/replag/CARD.md`
-  (commit BEFORE screen) → build labels → cache one mid-depth layer ×3
-  models → Stage-1 screen → verdict to `../LOG.md` → then candidate 2
-  vs 3 decision (check runpod-b clock-bridge stats first).
+## Candidate 1 (repetition-lag Δ) — state
+- CARD frozen + committed BEFORE screens (`task_hunt/replag/CARD.md`).
+- Labels: built inline (runpod-b's landed later, different scheme —
+  cross-check only; see LOG duplication note). Manifests + stats
+  committed under `task_hunt/labels/replag_*`. All 5 sanity tests pass.
+  T4 amended pre-screen (two-sided null divergence; direction = real
+  BELOW null at Δ≤4 — LOG entry).
+- Caches on volume: `/workspace/replag_caches/<model>/{tokens,delta}.npz`
+  + hs*.npy (gpt2 hs7, gemma2 hs14, llama hs14 + alternates).
+- Screen results so far (`replag/results/screen_*.json`):
+  **gpt2 + gemma DONE, llama RUNNING** (bg process; log at scratchpad
+  `screen.log`). Pattern both models: detection CONVERTED (per-token
+  0.75–0.97 AUC, window gap ≤ 0 at every T — NO ladder ⇒ frozen rule
+  heads to KILL unless llama diverges); lag4 shows a real
+  order-carried MLP gap (gpt2 T8 +0.114 over tok, shuffle collapses
+  it; gemma only +0.019 — order gap SHRINKS with scale).
+- Escalation enacted (card-pre-authorized, LOG-noted, committed):
+  `REPLAG_ESCALATE_LAG4=1` extends lag4 MLPs to all T. RUN THIS after
+  llama's base grid: `.venv/bin/python -m
+  experiments.explorations.task_hunt.replag.screen` with that env var
+  (resumable — only adds missing cells).
+- Then: `render_screen.py` (figs), verdict entry in `task_hunt/LOG.md`
+  (KEEP/KILL per card §Falsifier), commit, STATUS rewrite.
 
-## Standing rules I'm operating under
-Pull-rebase before every push (5 agents on `arxiv`). No reviewer/
-meeting quotes in tracked files. Stage-2 only through the canonical
-runner. Screen budget ~2-4 h/candidate; fail fast; deadline
-2026-07-26 morning PT.
+## Candidate 2 prep (running in bg, no screening before verdict)
+- Ward stream REBUILT on this volume (`/workspace/conv_depth_caches/
+  ward_stream`; stats reproduce committed reference, map_ok 99.97%).
+  traces.json re-ported from origin/aniket-ward-stage-b per
+  ATTRIBUTION.md (gitignored).
+- `cache_depth.py base` then `distill` running in bg (17 capture
+  points each, ~68 GB per model; log `cache_depth.log`).
+- Candidate 2 (confidence trend) card FROZEN by runpod-b
+  (`task_hunt/confidence/CARD.md`) — I append screen cells. Clock
+  bridge measured: slope4 support ≈ 64 tok ⇒ T=64 reaches full
+  coverage — NOT killed. Labels `task_hunt/labels/confidence.npz`
+  (Ward grid, manifests balanced; card requires hedge-class matching
+  on slope rows — implement at screen time). Screen T ∈ {16,32,64},
+  probe stack problib, readers base+distill mid-depth (hs14 = L13).
+- Candidate 3 (emotional instability) draft card staged by runpod-b —
+  only if candidate 2 dies/finishes early.
+
+## Deadline
+Results by 2026-07-26 morning PT. Stage 2 (if any survivor): canonical
+runner only, single best cell.
