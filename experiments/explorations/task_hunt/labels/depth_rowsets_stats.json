@@ -1,0 +1,179 @@
+{
+ "purpose": "depth-first within-document row-sets + demeaning sufficient statistics; broad-3 addendum item 3; non-blocking assist to stage2-fineweb (punctint q) and stage2-oprate (rate_case)",
+ "demeaning_contract": "STATISTICS, NOT PRE-DEMEANED ARRAYS: the panel applies its own split-consistent demeaning. Per-document/per-trace sums are split-atomic (splits are by document/trace), so train- or test-restricted means come from these sums with no row-level leakage.",
+ "row_set_rule": "wd<t>_* = ALL manifest rows (all classes) in documents holding >= t manifest rows of BOTH class 0 and class 2; qualification uses top/bottom counts only; per-document top/bottom counts ship so other thresholds are re-derivable",
+ "eligibility": {
+  "finite": "isfinite(lam_q)",
+  "elig": "isfinite(lam_q) & event-masked bin >= 0 & pos >= 32"
+ },
+ "thresholds": [
+  20,
+  50
+ ],
+ "punctint_q": {
+  "gpt2": {
+   "artifact": "punctint_q_wdrows_gpt2.npz",
+   "n_docs": 400,
+   "eligible_rows": 706247,
+   "finite_rows": 725500,
+   "by_threshold": {
+    "20": {
+     "docs": 142,
+     "docs_train": 118,
+     "docs_test": 24,
+     "rows": 29577,
+     "rows_top": 10024,
+     "rows_bottom": 7434,
+     "min_rows_per_class_per_doc": 20
+    },
+    "50": {
+     "docs": 35,
+     "docs_train": 28,
+     "docs_test": 7,
+     "rows": 9980,
+     "rows_top": 3209,
+     "rows_bottom": 3003,
+     "min_rows_per_class_per_doc": 50
+    }
+   }
+  },
+  "gemma2": {
+   "artifact": "punctint_q_wdrows_gemma2.npz",
+   "n_docs": 400,
+   "eligible_rows": 698107,
+   "finite_rows": 716862,
+   "by_threshold": {
+    "20": {
+     "docs": 134,
+     "docs_train": 112,
+     "docs_test": 22,
+     "rows": 29430,
+     "rows_top": 10336,
+     "rows_bottom": 7205,
+     "min_rows_per_class_per_doc": 20
+    },
+    "50": {
+     "docs": 31,
+     "docs_train": 25,
+     "docs_test": 6,
+     "rows": 9074,
+     "rows_top": 2941,
+     "rows_bottom": 2750,
+     "min_rows_per_class_per_doc": 50
+    }
+   }
+  },
+  "llama31": {
+   "artifact": "punctint_q_wdrows_llama31.npz",
+   "n_docs": 400,
+   "eligible_rows": 692277,
+   "finite_rows": 711060,
+   "by_threshold": {
+    "20": {
+     "docs": 141,
+     "docs_train": 116,
+     "docs_test": 25,
+     "rows": 30489,
+     "rows_top": 10797,
+     "rows_bottom": 7366,
+     "min_rows_per_class_per_doc": 20
+    },
+    "50": {
+     "docs": 33,
+     "docs_train": 26,
+     "docs_test": 7,
+     "rows": 9146,
+     "rows_top": 3086,
+     "rows_bottom": 2802,
+     "min_rows_per_class_per_doc": 50
+    }
+   }
+  }
+ },
+ "punctint4k_q": {
+  "gpt2": {
+   "artifact": "punctint4k_q_wdrows_gpt2.npz",
+   "n_docs": 4000,
+   "eligible_rows": 7052954,
+   "finite_rows": 7244064,
+   "by_threshold": {
+    "20": {
+     "docs": 605,
+     "docs_train": 488,
+     "docs_test": 117,
+     "rows": 83672,
+     "rows_top": 30406,
+     "rows_bottom": 20500,
+     "min_rows_per_class_per_doc": 20
+    },
+    "50": {
+     "docs": 27,
+     "docs_train": 20,
+     "docs_test": 7,
+     "rows": 6552,
+     "rows_top": 2501,
+     "rows_bottom": 1560,
+     "min_rows_per_class_per_doc": 50
+    }
+   }
+  },
+  "gemma2": {
+   "artifact": "punctint4k_q_wdrows_gemma2.npz",
+   "n_docs": 4000,
+   "eligible_rows": 6967723,
+   "finite_rows": 7154296,
+   "by_threshold": {
+    "20": {
+     "docs": 626,
+     "docs_train": 511,
+     "docs_test": 115,
+     "rows": 85086,
+     "rows_top": 30994,
+     "rows_bottom": 20992,
+     "min_rows_per_class_per_doc": 20
+    },
+    "50": {
+     "docs": 22,
+     "docs_train": 15,
+     "docs_test": 7,
+     "rows": 5113,
+     "rows_top": 1891,
+     "rows_bottom": 1325,
+     "min_rows_per_class_per_doc": 50
+    }
+   }
+  },
+  "llama31": {
+   "artifact": "punctint4k_q_wdrows_llama31.npz",
+   "n_docs": 4000,
+   "eligible_rows": 6906412,
+   "finite_rows": 7092305,
+   "by_threshold": {
+    "20": {
+     "docs": 614,
+     "docs_train": 493,
+     "docs_test": 121,
+     "rows": 85346,
+     "rows_top": 31296,
+     "rows_bottom": 20724,
+     "min_rows_per_class_per_doc": 20
+    },
+    "50": {
+     "docs": 20,
+     "docs_train": 15,
+     "docs_test": 5,
+     "rows": 4994,
+     "rows_top": 1830,
+     "rows_bottom": 1197,
+     "min_rows_per_class_per_doc": 50
+    }
+   }
+  }
+ },
+ "oprate_case": {
+  "artifact": "oprate_case_tracestats.json",
+  "n_traces": 300,
+  "valid_cells": 418149,
+  "manifest_rows": 60000
+ }
+}

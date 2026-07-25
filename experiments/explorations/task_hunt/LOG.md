@@ -3857,3 +3857,27 @@ killed a-fortiori at scale.
   appended to the screen-outcomes block.
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_
+
+## 2026-07-25 — runpod — panel assist SHIPPED (broad-3 addendum item 3, non-blocking): depth-first within-doc row-sets + demeaning sufficient statistics for both Stage-2 panels
+
+`labels/build_depth_rowsets.py` (committed before outputs) →
+`punctint{,4k}_q_wdrows_<tok>.npz` + `oprate_case_tracestats.json` +
+`depth_rowsets_stats.json`. For punctint q: all manifest rows in
+documents holding ≥ 20 / ≥ 50 manifest rows of BOTH the top and
+bottom class, plus per-doc top/bottom counts (any other threshold
+re-derivable) and per-doc sum/count/sumsq of `lam_q` over finite and
+over screen-eligible rows. For oprate `rate_case`: the same per-trace
+statistics over valid cells and over manifest rows. **Statistics, not
+pre-demeaned arrays** — demeaning must be split-consistent and the
+split discipline belongs to the panel; per-doc/per-trace sums are
+split-atomic, stated in the stats JSON. Headline numbers: 400-doc
+grid ≥ 20/class → 134–142 docs (22–25 test, ~30k rows) per
+tokenizer; 4k grid → 605–626 docs (115–121 test — the gpt2 test
+count, 117, reproduces the contrast-depth census exactly). One
+honest surprise worth the panel's eye: at ≥ 50/class the 4k grid has
+FEWER qualifying docs than the 400 grid (20–27 vs 31–35) — the
+raised 100k cap still spreads thinner over 10× documents, so
+scaling the corpus bought breadth at the cost of per-document depth
+at fixed cap. Strictly non-blocking both directions.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_
