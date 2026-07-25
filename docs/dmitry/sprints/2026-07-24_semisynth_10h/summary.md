@@ -35,11 +35,11 @@ the claim that could most easily have failed.
 
 **2. So the useful handle width is the target's own timescale.** Once the response is
 linear, the achievable fraction for a square-wave target of run length ℓ is fixed by
-arithmetic, and the resulting (W, ℓ) grid is reproduced to a mean error of **0.053**
-(1.5B) and **0.045** (7B) over its six at-risk cells *at the top of the dose grid* —
-0.099 and 0.094 at the lowest dose, a systematic drift discussed below — the other 18 are algebraic
-identities and serve as plumbing checks. Reading it as control cost: fidelity per
-control parameter is maximised at W ≈ ℓ, where full fidelity costs `k/ℓ` parameters
+arithmetic. The resulting (W, ℓ) grid is reproduced to a mean error of **0.053** (1.5B)
+and **0.045** (7B) over its six at-risk cells at the top of the dose grid — 0.099 and
+0.094 at the lowest dose, a systematic drift taken up below. The grid's other 18 cells
+are algebraic identities and serve as plumbing checks. Read as control cost: fidelity
+per control parameter is maximised at W ≈ ℓ, where full fidelity costs `k/ℓ` parameters
 rather than k. Fidelity is **not monotone in W**, since a wider handle wins when it
 aligns with whole runs and collapses when it straddles them, so "wide enough to match
 the timescale" is the right summary of window size rather than "wider is better".
@@ -216,6 +216,31 @@ One further claim was scoped rather than retracted. The per-position template is
 schedule. Everything here is therefore about the *form of the control signal*: **a
 schedule beats a level**. Whether a temporal dictionary beats a per-token one needs
 trained dictionaries and is the main thing this sprint does not answer.
+
+**The law's one systematic failure is worth stating precisely, because it is where the
+next result lives.** In the block-constant arm every segment receives a coefficient of
+±1 and only the sign varies, so the achievable fraction should be dose-invariant under
+*any* position-independent response function — saturating, convex, or otherwise. It is
+not: the measured fraction rises with dose in 6 of 6 at-risk cells at 1.5B and 6 of 6 at
+7B. Two explanations survive, and only one of them concerns spans. A write that opposes
+a segment's own attribute may simply cost more than a matching write gains, with the
+asymmetry shrinking as dose grows — that is position-independent and has no span
+content. Or positions interact. We have the experiment that separates them (measure the
+single-segment effect with the write matched and flipped, recover the asymmetry
+directly, and see whether it accounts for the drift); it was queued when the sprint's
+compute window closed.
+
+Two structural notes belong with the span question. Teacher-forcing removes the
+mechanism a span effect would most plausibly use: the text is pinned at every position,
+so a run of consistent writes cannot establish a state the model's own continuation
+carries forward. The entrainment experiment asks the same question where that mechanism
+is available, and there the answer is positive. Those results are the pinned and
+unpinned versions of one question rather than a contradiction. And our first
+contiguous-versus-scattered test was confounded — its scattered arm, built with stride
+k/W, landed on a single parity of an alternating profile and therefore wrote one sign
+everywhere while the contiguous arm wrote both, so the two arms differed in the content
+of the write and not only its adjacency. The sign-matched rebuild is in
+`span2_modal.py`.
 
 **Graded amplitude control** did not survive its pre-registered gate: five urgency
 levels fail to project onto the direction in order (L1 −5.06, L2 −7.35, L4 +3.49,
