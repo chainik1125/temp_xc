@@ -395,3 +395,40 @@ wherever one exists, in preference to an analytic null; and derive the null befo
 believing a positive *or* a negative (the same file's earlier "below chance" reading was
 the same mistake in the other direction).
 
+### 23:26 — review round 5: the span question closes without the missing run
+
+Asked what to say if `weights_modal.py` and `rho_modal.py` never land. The answer went
+*further* than my draft, and the reason is a distinction I had blurred: I had been
+treating "cross-position interaction" as synonymous with "span effect". It is not.
+
+The deviation hierarchy, with only the last level able to host a span effect:
+
+1. homogeneous linear, `Δ = a·⟨c, π⟩` — **falsified** (χ²/dof 3.56, 10/36 outside CIs,
+   dose drift 12/12 cells).
+2. scalar nonlinear, `Δ = F(⟨c, π⟩)` with F convex — accounts for the entire dose drift.
+   Nonlinear *and* non-additive, yet **arrangement-blind by construction**, because it
+   depends only on a scalar that any rearrangement preserving the projection leaves
+   unchanged.
+3. additive with per-position weights, `Δ = Σ_t g_t(c_t)` — accounts for what 1–2 cannot.
+   Also arrangement-blind: depends on *where*, never on *what sits beside*.
+4. arrangement-sensitive interaction — **the only level at which a span effect exists**.
+
+Verified all of it against the JSONs before adopting: implied exponent for level 2 falls
+1.38 → 1.18 → 1.14 across the dose grid at 1.5B and 1.34 → 1.17 → 1.13 at 7B (agreeing
+within 0.04 at every dose), and it cross-checks against each arm's independently measured
+dose-response curvature. Level 2 is falsified by *position*, not arrangement: ten
+conditions predicting exactly 0.000 measure between −0.127 and +0.124. The only
+arrangement-shaped signal in the whole sprint is corr(residual, block width) = **+0.245,
+t = 1.48 on 34 dof, p ≈ 0.14** — not significant and confounded with position. Every
+number reproduced exactly.
+
+So the closing position is narrower than "no span effect" and stronger than "we could not
+tell": nothing measured requires arrangement sensitivity, everything measured is explained
+without it, and we never ran an experiment with power to detect it because three attempts
+were confounded in succession — coverage, then sign composition, then position. Written
+into the summary as its own subsection.
+
+Also fixed: finding 4's "the effect is the order, not the mass" now reads "which sign
+lands where, not how much is written", since "order" was about to be misread as
+"arrangement" two paragraphs before the section distinguishing them.
+
