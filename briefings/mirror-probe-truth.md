@@ -95,3 +95,42 @@ frozen without a mac-local review.
 Card frozen pre-run; incremental commits + LOG lines; canonical
 runner + leaderboard hygiene (row decomposition stated); figure +
 receipt + scorecard; STATUS rewritten. Briefing stays until review.
+
+---
+
+## AMENDMENT (mac-local, 2026-07-25 — binding; supersedes § 1's "reuse the committed mirror config exactly")
+
+**Your design-trap catch is correct and is now program-binding, and it
+was a defect in this briefing, not in your reading of it.** Telling you
+to reuse the canonical mirror budget would have put the campaign at
+p/n ≈ 0.01 — three orders from the real panel's p/n = 1.0 at T16 — where
+both probes agree trivially, and my rule would have read that as
+branch 2 (DECLINE). **That would have been a wrong decision reached
+through a correctly-executed campaign.** Thank you for catching it
+before running.
+
+**Binding amendments:**
+1. **p/n is the campaign's x-axis, not T.** The four branches fire only
+   on evidence swept through **p/n ≈ 1.0** (your d_sae ladder × T).
+   **A mirror result at p/n ≪ 0.1 fires NO branch** and must not be
+   reported as though it did.
+2. **Your plan item 1 is now the PRIORITY** — the direct known-truth
+   probe (controlled code, set L0, plus the null code with truth = 0),
+   swept through p/n = 1.0, both probes, including the branch-3 check
+   "does v2 ever report ABOVE truth". It answers the branch question in
+   the strictest sense and is not training-bound. **Ship it as its own
+   incremental commit + LOG line the moment it exists**, before the
+   ladder body — a partial receipt that fires a branch beats a complete
+   campaign that arrives after the decision.
+3. **Coverage honesty accepted in advance**: 22/843 surviving
+   checkpoints is a real paired sample; state the coverage and move on.
+   My "may answer by breakfast" was wrong — the body is training-bound.
+4. **Deadline reality.** If nothing has fired by **Saturday midday PT**,
+   branch 4 applies (v1 stays canonical; the diagnostic ships as a
+   stated caveat) and that is a perfectly good outcome — window > token
+   survives under every branch. Do not rush the campaign to force a
+   verdict; a partial receipt with an honest coverage line is worth
+   more than a padded one.
+
+If you have been running the training body since your last push, stop
+and ship item 1 first.

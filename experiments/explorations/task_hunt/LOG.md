@@ -3336,3 +3336,159 @@ real, monotone, **order-free** window aggregation worth ~+0.06…+0.08 AUC
 at T = 32 (26–51 % of the remaining headroom). That is a robust regime-2
 result reproduced across independent event streams — and it is NOT the
 regime-3 order-sensitive phenomenon the strongest form of the hunt wants.
+
+## 2026-07-25 — mac-local — REVIEW: overnight wave (runpod-d screens + top-up, runpod-e withdrawals, runpod corpus scale-up) — **ALL APPROVED**; two program-level findings adopted; the METHODS RULE is AMENDED at runpod-b's catch; one escalation
+
+Hygiene across the whole wave: leaderboard **8,822 rows, 0 duplicate
+eval_keys, 0 null metrics**; suite **309 passed / 1 skipped**; every
+screen card frozen commit-then-run. My two review corrections are
+DISCHARGED: runpod-d amended LOG + RECORD § 3c to the card's own
+language (4/12 cells out-of-band, residual mismatch, conservative
+direction stated) at `ec4048b1`/`c60c3b92`.
+
+### 1. runpod-d — factory screens: **APPROVED**, and the negative is the finding
+
+192 cells / 0 failures over 4 targets; with sc_lambda that is **five
+Stage-1 KEEPs** (λ̂_sc, oprate ver, oprate case, qrate, vslope), each
+clearing 3σ by T = 8 and growing monotonically to T = 32, base ≈
+distill throughout. Two things make this batch load-bearing:
+
+- **The capacity control holds** (`g_agg ≈ g` at T ≥ 8 on every
+  target). The window-MEAN arm carries the whole gain at the SAME
+  d_in as the per-token probe, so these screen wins **cannot be the
+  probe-capacity artifact** RECORD § 3c found in the Stage-2 panel.
+  The control demonstrably bites: on qrate's NULL arm the flatten
+  gain is positive while `g_agg` is negative and the effect sits
+  entirely in `g_order` — correctly flagged as flatten overfit
+  (expected: flatten at T32 is p ≫ n, the mean arm is not).
+- **ADOPTED AS A PROGRAM FINDING: order does not matter, anywhere.**
+  Across five targets × 4 (model, layer) × 5 window sizes, `g_order`
+  at T = 32 spans −0.004…+0.008 and within-window shuffling costs
+  +0.003…+0.019. Including `vslope`, screened *specifically* because a
+  slope mathematically requires early-vs-late comparison — **P2
+  falsified**, the slope is recovered order-free like every rate.
+  **The order leg of the hunt is now a reported NEGATIVE, not an open
+  search item.** This does not cost us the program decision (the
+  aggregation-framed win was accepted on 2026-07-24) and it sharpens
+  the story: on this substrate the window advantage is regime-2
+  order-free aggregation, and we say so rather than hunting regime 3.
+- Standing recorded correctly: `oprate` is the only independent
+  candidate (corr 0.026 with λ̂_sc; its two targets mutually −0.032);
+  `qrate` is a replication, not a new datapoint; `vslope`'s value is
+  now the falsified prediction. Nothing over-sold.
+
+**Reviewer-facing caveat, binding:** these are **Stage-1 screens** —
+window-vs-per-token gains on raw activations, NOT TXC-vs-T-SAE. They
+license Stage-2 panels, not win claims. Do not let "5 KEEPs" become
+"5 case studies" in any external text.
+
+### 2. runpod-d — seed top-up: **APPROVED as PARTIAL**, exemplary process
+
+pre at n = 6, tsae stuck at n = 3. **The criterion is still NOT met**
+(paired one-sided LB −0.041; unpaired Welch LB −0.016, p = 0.082) —
+**the rebuttal must keep saying pre-vs-T-SAE is not formally bounded.**
+What was bought is real: pre/T8's CI tightens to [0.179, 0.235],
+entirely above the per-token SAE (0.113). Process notes worth
+propagating: the buffer-path cost diagnosis (`ActivationBuffer._refill`
+re-gathering an 8.6 GB buffer ~31×/cell, GPU at 0 %) with the available
+"fix" **correctly refused** because it changes `train_key` and destroys
+comparability; a **pooling-validity audit run before pooling** that
+caught a real eval-code change between seed batches and verified it a
+strict no-op numerically (0.192438 vs stored 0.1924); and the
+disclosed pre/T4 seed separation (exchangeability p = 1/20) reported
+rather than buried. "No further seeds were added to chase
+significance" is the right sentence.
+
+### 3. runpod-e — the two withdrawals: **APPROVED; this is the best work of the night**
+
+Self-caught scoring error (scored the linear-MEAN arm where its own
+frozen cards said "best window"), re-checks committed with
+pre-registered outcome rules BEFORE running, `tok_linear`/`tok_mlp`
+reproduced bit-identically, results JSONs never edited — only re-read.
+`tss` KILL → **KEEP-PENDING-REVIEW**; `novelty` NEGATIVE →
+**KEEP-PENDING-REVIEW**. Crucially it refused to simply bank two KEEPs
+and instead flagged that **the "best window" convention is itself
+defective** (maximises over ~15–20 window cells against one per-token
+cell with no multiplicity control) — correct, and it applies
+program-wide. **ADOPTED: no card may score against a max-over-arms
+"best window" again; fix the probe class and control width** (the
+matched-class comparison + foreign-context nulls it substituted are
+the convention of record). Consequences accepted: the
+"conversion is broader than next-token prediction" headline is
+WITHDRAWN — and the corrected reading supports the opposite,
+theory-consistent story (remove the generative payoff and the window
+does carry the state); punctint q/list margins are LOWER BOUNDS
+pending re-quote; dialevel WEAK stands.
+
+**A cross-pod tension worth naming** (neither pod is wrong; different
+substrates): on Ward, `g_agg ≈ g` — a LINEAR mean-pool carries the
+whole gain. On fineweb `tss`/`novelty`, a linear mean-pool sees ≈ +0.04
+while an MLP on the window sees +0.06…+0.13 — the advantage lives in a
+NONLINEAR window readout. That distinction matters for us specifically:
+a sparse linear dictionary can capture the Ward-type gain, and may not
+capture the fineweb-type one. Any Stage-2 promotion of tss/novelty must
+state which of the two it is betting on.
+
+### 4. runpod — corpus scale-up: **APPROVED**, with the doc-identity recommendation ratified
+
+Prefix-identity receipt PASSES (the pinned 400 docs are exactly the
+first 400 of the 4,000-doc pull ⇒ token-level cache reuse earned);
+frozen-logic claim **verified rather than asserted** (per-token labels
+bit-identical on the shared prefix, all three tokenizers); refmark 2k
+funnel + overlap on the record (only 121 of 400 shipped convs recur ⇒
+near-independent evidence, correctly not called a superset);
+`is_user_echo` shipped at 0.52 % of manifest rows. **RATIFIED: keep
+`doc_mean_only_auc` a disclosure statistic that TRIGGERS A CONTROL —
+do NOT promote it to a kill bar.** The 11-face distribution plus
+runpod-e's causal dialevel datapoint (0.983–0.986, screened naively
+AND under control) beat the withdrawn correlational anchor, and any
+0.82–0.88 bar would sit below punctint q at 0.901 — the hunt's only
+unconditional KEEP. Also correct: the "0.82–0.88 separates" reading was
+WITHDRAWN by its own author once its NEGATIVE anchor vanished.
+
+### 5. ESCALATION — the one open threat to the hunt's headline statistic
+
+runpod's measured finding (**76–91 % of the unigram rise at 10× corpus
+is estimator sample size**, curve unsaturated at 3,200 docs) is
+accepted: every 400-doc unigram triage number is an UNDERSTATEMENT, and
+cards must quote the training size beside the bar. Its flagged, NOT
+claimed, hypothesis is the important one: *if a screen's per-token
+probe attenuates faster than its window probe, then a small-corpus
+screen understates the per-token baseline and **overstates
+window-minus-per-token — the hunt's headline statistic**.* This would
+touch every screen gap in the program, including the five KEEPs above.
+It is partially mitigated on Ward (`g_agg`'s mean arm carries the same
+d_in as per-token, and screens fit ~20k rows/class, not 320 docs) but
+NOT ruled out, because mean-pooled inputs are smoother and may
+converge faster. **This is the top follow-up: re-fit one screened
+bundle's per-token and window probes at two training sizes on the
+scaled corpus and compare the GAPS.** Cheap, uses artifacts that
+already exist. Until it is done, screen gaps are quoted as measured
+with the training size stated.
+
+### 6. The λ-readout METHODS RULE — **AMENDED** (runpod-b's catch is correct and binding)
+
+runpod-b has not yet produced mirror results, but its plan-of-record
+caught a genuine defect **in my briefing**: I told it to reuse the
+canonical mirror budget, where d_sae 20–40 puts p/n ≈ 0.01 — **three
+orders of magnitude from the real panel's p/n = 1.0 at T16**. A mirror
+run at canonical budget would show "both probes agree" trivially and
+would have been read as branch 2 (DECLINE) — my rule would have
+returned the wrong answer. **AMENDED, binding: the four branches are
+evaluated at MATCHED p/n, swept through 1.0 (d_sae ladder × T), not at
+canonical mirror budget; p/n, not T, is the campaign's x-axis. A
+mirror result at p/n ≪ 0.1 does not fire any branch.** Also accepted:
+only 22/843 checkpoints survive on disk, so the campaign is
+TRAINING-bound, not eval-bound — my "may answer by breakfast" was
+wrong. **Priority for runpod-b: its plan item 1** (direct
+known-truth probe with a null code, swept through p/n = 1.0, both
+probes, incl. the branch-3 "does v2 ever read ABOVE truth" check) —
+it answers the branch question in the strictest sense and does not
+require the training body. Branch 4 (v1 stays canonical, diagnostic
+ships as a stated caveat) remains the default if the campaign is
+incomplete by Saturday midday; that outcome is defensible and costs no
+headline, since window > token survives under every branch.
+
+**Next (mac-local):** the estimator-attenuation escalation, then the
+mirror receipt → rule fires, then Sunday distillation. Screen KEEPs do
+not become case-study claims without a Stage-2 panel.
