@@ -415,6 +415,80 @@ the probe diagnostic, none an n=3 estimate. Deliverable:
 
 ---
 
+## § 3d — oprate `rate_case` Stage 2 (CASE STUDY #2 shot) — **NEGATIVE, pre-registered branch: windows never beat visible-evidence counting**
+
+Card `oprate/CARD_STAGE2.md` FROZEN pre-run (`5b35f671`); panel
+executed on the force-majeure A40 pod from caches REBUILT out of git
+(stream receipt byte-identical; § provenance in the card). **84/84
+cells, 0 failures; 0 dup eval_keys, 0 null metrics** (8,913-row
+leaderboard). Anchor base/hs13, d_sae 2048, per-token code rate 8,
+post at nominal k = 8·T (matched from cell one — all 12 untrained post
+cells realize exactly 8.00, the § 2.2 mechanism check). Row
+decomposition exactly as pre-stated. Residual mismatches (binding 2):
+the THREE batchtopk_sae trained cells realize l0 = 4.37–4.75, below
+the [5.0, 8.25] band — the per-token BASELINE under-spent its budget,
+which strengthens rather than confounds the negative (window arms
+spent 6.9–8.1 and still did not win). Leading-edge NaN drops (first
+live use of the guard): 15.6–16.3 % of sampled tiles (train pool) and
+23.0–23.8 % (eval pool), per T, sampler-exact.
+
+**The result (v1 canonical; paired v2 beside it, never canonical):**
+
+| arch / T | 2 | 4 | 8 | 16 |
+|---|---|---|---|---|
+| TXC-pre v1 | .116 | .132 | .105 | .067 |
+| TXC-pre v2 | .158 | .183 | .210 | .261 |
+| evidence-line analog | **.198** | **.226** | **.270** | **.360** |
+
+(per-token: batchtopk v1 .109 / v2 .108; tsae v1 .090 / v2 .066;
+stacked and matched-post track pre throughout; full tables in
+`oprate/results/stage2_summary[_v2]_*.json`, figure
+`oprate/figs/stage2_oprate_tscaling[_v2].*`.)
+
+Three independent lines converge on ONE reading:
+1. **v1 (canonical): flat then falling** (trend 2→8 permutation
+   p = 0.54; T16 sags panel-wide — the receipted probe-capacity
+   limitation at p/n = 1, diagnosed in § 3c and now reproduced on an
+   independent target).
+2. **v2: real rise** (pre 0.158 → 0.261; pre − tsae at T8
+   +0.145 ± 0.021 and pre − per-token +0.103 ± 0.028, both one-sided
+   95 % lower-bounded > 0 at n = 3; trend p = 0.088 with all three
+   seeds positive) — **but below the label-side count OLS at EVERY
+   matched T.** The window code carries a lossy version of the
+   in-window event count, nothing more.
+3. **Untrained window codes already recover 0.05–0.09 under v2** at
+   T ≥ 8 (v1 max 0.050): a random pooled projection partially reads
+   the visible count — the same reading from the null direction.
+
+**Scorecard (predictions scored as frozen):** P1 v1-rise **FALSIFIED**
+(flat; the pre-registered v2 discriminator attributes the shape to the
+probe, and the v2 rise is real); P2 **FALSIFIED on v1** (window ≈
+per-token under the canonical readout; the ordering appears ONLY under
+v2 — this panel does NOT replicate the λ̂ panel's v1-robust ordering,
+stated plainly); P3 **HELD** (matched post tracks the pre/stacked band;
+no starved-budget artifact); P4 **FALSIFIED — the KEEP-killer** (no
+window arm beats the evidence line at any matched T, under either
+readout); P5 **HELD on v1** with one borderline cell (pre/T16
+untrained 0.0503) and the v2 untrained elevation reported as finding
+(3) above.
+
+**Verdict: NO CASE STUDY #2 from `rate_case`.** No latent-state
+language is licensed for this target: the oprate trailing rate on Ward
+is either linearised into the current token (per-token 0.109 at
+T = 1) or readable by counting visible event sentences — window codes
+add nothing beyond that count under any probe we ran. This is the
+card's pre-registered NEGATIVE, reported at the prominence a win would
+have received. It is also the sharpest measured instance of the § 3c
+lesson: on real substrates, quote window-vs-token gaps only next to
+the visible-evidence line, or regime-2 aggregation reads as latent
+state. Variance receipts (probe-agnostic harness, post k = 8·T rule):
+`support_stats/stage2_variance_oprate_case[.md,_v2.md]` — what is and
+is not bounded at n = 3 is stated in-file (the cross-arch v1 margins
+are NOT bounded; the v2 T8 margins and within-arch trend/margin
+receipts are). `rate_ver` NOT started, per the briefing's own rule:
+the tsae arm alone measured 5 h 01 m on this box; a second panel could
+not have finished inside the funding window.
+
 ## § 4 — Methods notes (things that cost time; recorded for the next agent)
 
 1. **The Stage-2 datasource is a plugin, not a core edit.** Real

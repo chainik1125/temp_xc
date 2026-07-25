@@ -4419,3 +4419,66 @@ in-band. **Running majority tally: gemma NO-RULE-FIRES, gpt2 WEAK —
 no v1 KEEP yet; llama31 pending (its two tsae poles still training).**
 
 _Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb replication)_
+## 2026-07-25 — runpod-d — oprate `rate_case` Stage 2 COMPLETE: **NEGATIVE (pre-registered branch) — no case study #2 from this target; windows never beat visible-evidence counting under either readout**
+
+Full account with tables: RECORD § 3d. Compressed verdict:
+
+**Execution.** Card frozen pre-run (`5b35f671`), caches rebuilt from
+committed builders with a byte-identical stream receipt, **84/84
+cells, 0 failures, 0 dup eval_keys, 0 null metrics**, tsae scheduled
+first per the addendum (its 3 trained cells took 5 h 01 m — the
+structural SequenceBuffer cost, measured again). All 12 untrained
+matched-post cells realize l0/token = exactly 8.00 (mechanism check
+passes; post arm valid). Residual mismatches recorded per binding 2:
+the three batchtopk trained cells realize 4.37–4.75, BELOW the [5.0,
+8.25] band — the baseline under-spent, which makes the negative
+conservative. Leading-edge guard live for the first time: 15.6–16.3 %
+train / 23.0–23.8 % eval tiles drop, per T, reported.
+
+**Result.** v1 (canonical): flat-then-falling, trend p = 0.54 — P1's
+v1-rise FALSIFIED; window ≈ per-token (P2 FALSIFIED on v1 — unlike
+the λ̂ panel, the ordering here is NOT v1-robust, said plainly). v2
+(paired, never canonical): a real rise (pre 0.158→0.261; T8 margins
+pre−tsae +0.145 ± 0.021, pre−per-token +0.103 ± 0.028, both 95 %
+lower-bounded > 0 at n = 3) — **but every window cell sits below the
+label-side count-OLS evidence line at its matched T (0.198 / 0.226 /
+0.270 / 0.360), so P4 — the KEEP-killer — is FALSIFIED under BOTH
+readouts.** Untrained window codes already recover 0.05–0.09 under
+v2 at T ≥ 8: a random pooled projection partially reads the visible
+count. P3 (matched post tracks the band) and P5 (untrained at chance
+on v1; one borderline cell, 0.0503) HELD.
+
+**Reading.** The oprate trailing rate on Ward is linearised into the
+current token and/or readable by counting visible event sentences;
+window codes add a lossy version of the in-window count and nothing
+beyond it. **No latent-state language is licensed.** This is the
+sound, publishable NEGATIVE the card pre-registered, and it
+generalises the § 3c lesson: on real substrates, window-vs-token gaps
+are quotable only next to the visible-evidence line. For the
+rebuttal: case study #2 does NOT come from oprate; the λ̂ panel
+remains the only confirmed TXC case study, and the hunt's five
+Stage-1 KEEPs now carry a measured example of a KEEP whose Stage-2
+panel converts the screen gain into pure visible-evidence counting.
+
+**Receipts.** Variance: `support_stats/stage2_variance_oprate_case
+[.md/.json, _v2.*]` (what is/is not bounded at n = 3 stated in-file;
+cross-arch v1 margins NOT bounded; v2 T8 margins bounded).
+Figure: `oprate/figs/stage2_oprate_tscaling[_v2].*` (evidence line
+drawn per T; realized-l0 legend). Summaries + machine-readable band
+bookkeeping: `oprate/results/stage2_summary[_v2]_*.json`. Panel
+transcripts: `oprate/results/stage2_*__*.json` (leaderboard is
+canonical). Evidence line: `oprate/results/evidence_line_case.json`.
+
+**Not run, per the briefing's own rule:** `rate_ver` — the tsae arm
+alone (5 h) could not finish inside the remaining funded window; a
+complete single-target verdict with receipts beats a second partial.
+The `ward_real_oprate_ver_base_l12` datasource is registered and the
+runner takes it as an argument; a future funded box can run it in one
+command. **Operational note for the record:** this pod's 300 GB is a
+cgroup cap (`memory.oom_control` oom_kill counter is the ground truth;
+dmesg is silent) — three worker kills traced to per-seed datasource
+accumulation in long-lived grid workers; fixed by
+`grid.run_pool(max_tasks_per_child=1)` (additive kwarg, default
+unchanged). Briefing stays until mac-local review.
+
+_Recorded-by: claude-fable-5 (runpod-d, stage2-oprate)_
