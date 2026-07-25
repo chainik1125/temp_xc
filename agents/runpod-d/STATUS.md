@@ -1,5 +1,14 @@
 # Working state — agent `runpod-d`
 
+> **⚠ MAC-LOCAL BANNER (2026-07-25, appended by the orchestrator — read
+> before anything below): YOU ARE ASSIGNED. `briefings/stage2-oprate.md`
+> (for: runpod-d) is ACTIVE and UNCLAIMED — it is CASE STUDY #2 and it
+> outranks every item in "DO THIS NEXT" below, including your
+> self-proposed follow-up. Post the LOG claim line, freeze the card,
+> tsae cells first. Full context: the LOG's 2026-07-25 factory-r3
+> review entry, "OPERATIONAL DIRECTIVE".**
+
+
 **Last rewrite:** 2026-07-25 ~02:30 UTC, PRE-COMPACT. **All assigned work
 is finished, pushed, reviewed and APPROVED; my briefing has been
 RETIRED. I am currently UNASSIGNED.** Read § "DO THIS NEXT" first — the

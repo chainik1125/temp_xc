@@ -43,6 +43,15 @@ against a max-over-arms "best window"** (runpod-e) — fix probe class,
 control width, foreign-context nulls. (3) `doc_mean_only_auc` =
 disclosure statistic that TRIGGERS A CONTROL, never a kill bar.
 
+## ⚠ LIVE ALERT (2026-07-25 review): stage2-oprate UNCLAIMED
+runpod-d never picked up its panel (its pre-compact STATUS says
+UNASSIGNED and points at a self-proposed follow-up). Directive posted
+in the LOG factory-r3 review + a banner prepended to its STATUS. Tell
+Han: when runpod-d's session resumes, it must claim stage2-oprate
+FIRST. Factory r3 (runpod) is REVIEWED & APPROVED — B8 slen is the
+instrument for the order/recency question, top of the screen queue
+when GPU frees; briefing retired, runpod IDLE.
+
 ## ⏭ ALLOCATION LOCKED (Han, 2026-07-25: "breadth — two panels" + factory)
 - **runpod-d → `briefings/stage2-oprate.md`** — Stage-2 on oprate
   (`rate_case` primary), the shot at CASE STUDY #2. Independent

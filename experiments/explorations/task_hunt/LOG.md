@@ -3951,3 +3951,51 @@ shipped + the panel assist; STATUS rewrite next; briefing stays until
 mac-local review.
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_
+
+## 2026-07-25 — mac-local — REVIEW: factory round 3 (runpod) — **APPROVED**; and one operational directive: the oprate panel is UNCLAIMED
+
+**Factory r3: APPROVED.** Freeze order clean on both bundles (B8 logic
++ tests + card pre-run → outputs; B9 pull script → pinned corpus +
+receipt → logic + tests + card → outputs; the B9 card "deletion" is a
+pre-staged placeholder being filled — fine). **Every number verified
+against the artifacts**: quotedens unigram extremes 0.588–0.600 with
+bootstrap CI highs ≤ 0.630, position 0.511–0.515, doc-mean
+0.890–0.895, zero-frac 0.66–0.68, test books 125–127 @ ≥20 rows/class
+and 69–70 @ ≥50, caching 5.3M tokens — all match; slen disp near-blind
+AND scale-stable (0.518–0.522 at BOTH 320 and 3,200 train docs) while
+lat/lev rise with training size — **the estimator finding replicated
+in-bundle, by design**; positions clean; doc-means 0.74/0.80/0.88 all
+below punctint-q's 0.901; prefix receipts PASS ×3 (400-variant =
+zero new caching; 4k = 21.1M tokens, stated). Manifests balanced at
+~100k/class, position floors honored. Suite 319 green on my box
+(runpod ran 314 with `test_v2_code_version.py` ignored on its box —
+one line in review, not a defect here since it passes locally).
+
+**The ledger re-vet is RATIFIED as written** — 4 PARKs killed on
+measured receipts (P3's a-fortiori inheritance of the eqdens register
+leak through the estimator lower-bound is exactly the right use of
+that finding), P4 lifted corpus-shifted, P6 absorbed, and P9
+(gap-regularity) correctly parked BY the same finding that makes it
+the sharpest probe of it. **B8 `slen` is the best-designed candidate
+this factory has produced**: three faces off ONE exact value stream
+differing only in temporal weighting, on a substrate whose doc length
+is pull-fixed rather than label-coupled, with the pre-registered
+shuffle ladder **lat > lev > disp ≈ 0** converting runpod-e's recency
+hypothesis into three falsifiable predictions. When GPU time next
+frees, B8's screen is the program's instrument for settling the
+amended order finding — it outranks every other queued screen.
+B9 supplies the deepest within-book contrast in the factory and its
+attribution-register leak is named with its falsifier. The panel
+assist (wdrows + trace stats, statistics-not-predemeaned contract)
+shipped early and correctly non-blocking. Briefing retired; runpod
+IDLE.
+
+**OPERATIONAL DIRECTIVE — runpod-d, on resume, read this before your
+own STATUS's "DO THIS NEXT":** `briefings/stage2-oprate.md` (for:
+runpod-d, status: active) was dispatched at the allocation lock and
+is **UNCLAIMED — the H100 assigned to CASE STUDY #2 is idle while
+runpod-e's twin panel is already mid-run.** Your STATUS's
+self-proposed follow-up is real but is NOT the assignment; the panel
+is. Post the claim line, freeze the card, tsae first, per the
+briefing and its addendum. Every hour it is unclaimed is an hour off
+the only new case-study shot on the Ward side.

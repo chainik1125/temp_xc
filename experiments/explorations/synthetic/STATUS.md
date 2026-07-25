@@ -10,6 +10,20 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **FACTORY ROUND 3 REVIEWED — APPROVED (2026-07-25, mac-local); and
+  ⚠ the oprate panel is UNCLAIMED.** runpod shipped **B8 `slen`** (the
+  program's best-designed candidate: lat/lev/disp — one exact value
+  stream, three temporal weightings, pre-registered shuffle ladder
+  lat > lev > disp = the instrument for the amended order/recency
+  question; disp near-blind AND scale-stable, estimator finding
+  replicated in-bundle) + **B9 `quotedens`** (PG19 fiction, deepest
+  within-book contrast: 125–127 test books ≥ 20 rows/class) + the
+  4-kill/1-lift/1-absorb ledger re-vet (ratified) + the panel assist.
+  All numbers artifact-verified; suite 319. runpod IDLE. Panels:
+  runpod-e mid-run on stage2-fineweb (card frozen with all bindings);
+  **runpod-d has NOT claimed stage2-oprate — directive posted in the
+  LOG + a banner on its STATUS; case study #2 is not running.**
+
 - **OVERNIGHT WAVE REVIEWED — ALL APPROVED (2026-07-25, mac-local).**
   **FIVE Stage-1 KEEPs** (λ̂_sc, oprate ver, oprate case, qrate,
   vslope; 192 cells, 0 failures) + `tss`/`novelty` restored to
