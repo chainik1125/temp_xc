@@ -5,8 +5,8 @@
   "agent": "runpod (H100 pod, /workspace/temp_xc)",
   "branch": "arxiv",
   "started_utc": "2026-07-25T00:00:00Z",
-  "last_update_utc": "2026-07-25T05:05:00Z",
-  "phase": "Session complete \u2014 3 kills, theorem confirmed on real activations, regime-3 card frozen",
+  "last_update_utc": "2026-07-25T06:20:00Z",
+  "phase": "Theorem verified on real activations (+0.486) \u2014 conversion boundary pinned at the first attention layer",
   "state": "done",
   "prime_directive": "A sound verdict, never a win. Cards are frozen (committed) before any screen runs; git order is the evidence. Falsified predictions are scored as falsified."
  },
@@ -338,6 +338,18 @@
   ],
   "anomalies": [
    {
+    "ts": "05:40",
+    "expectation": "my own frozen card's central claim",
+    "observed": "cards/role_order.md \u00a7 2 claimed a 'which marker came last' label is additive-blind. It is not \u2014 TXC-pre's encoders are POSITION-SPECIFIC, so a linear readout weights an open-marker indicator by +\u03c4 and a close by \u2212\u03c4 and reads the order directly.",
+    "disposition": "AMENDED by dated amendment before any cell ran, with \u00a7 2\u20137 kept unedited as the record. I had written exactly this objection when ranking candidate 6, then built a card on the arrangement structure anyway. Superseded by \u00a7 8: marker-type EQUALITY, a genuine two-position product \u2014 which then produced the +0.486 verification."
+   },
+   {
+    "ts": "05:55",
+    "expectation": "the oracle-pair arm aims at the label-bearing positions",
+    "observed": "parity's pair arm reads 0.508/0.508 at layer 0 while the window MLP reads 0.994",
+    "disposition": "Mis-aimed, not evidence of absence \u2014 the same lesson a third time. Both markers END in the same '>\\n' token, so the pair arm was handed two uninformative positions; the type-bearing token is '<' vs '</', one position earlier. The headline stands (the window MLP does see the type tokens); the pair null is discarded as uninformative."
+   },
+   {
     "ts": "04:05",
     "expectation": "E1 (no route to the label except the intended one) on the role stimuli",
     "observed": "v1 role read AUC 1.000 at the EMBEDDING layer",
@@ -547,13 +559,33 @@
    "ts": "05:05",
    "kind": "done",
    "text": "Session complete. Three candidates killed on measured, controlled evidence; the additive-code theorem confirmed outside the synthetic setting; the regime-3 successor design frozen before any cell. Nothing pushed to origin \u2014 commits are local pending your review."
+  },
+  {
+   "ts": "05:40",
+   "kind": "watch",
+   "text": "AMENDED MY OWN FROZEN CARD. role_order \u00a7 2's additive-blindness claim was wrong: order is a LINEAR functional of position-tagged features, so a correct TXC-pre would have falsified P2 and K3 would have mis-fired as 'stimulus defect'. Amendment dated before any cell; \u00a7 2\u20137 kept unedited as the record of the mistake."
+  },
+  {
+   "ts": "05:50",
+   "kind": "pass",
+   "text": "THE THEOREM VERIFIED ON REAL ACTIVATIONS. Parity label at layer 0, T=32: additive ceiling 0.488 [0.441,0.537] \u2014 chance \u2014 versus window MLP 0.994 [0.986,0.999]. Nonlinear residual +0.486 against a 3\u03c3 null of 0.049. P8.2, the theorem's own prediction, held to 0.488."
+  },
+  {
+   "ts": "06:10",
+   "kind": "kill",
+   "text": "BOUNDARY PINNED AT THE FIRST ATTENTION LAYER. L1 and L3 were run because L0\u2192L2 left it unresolved: per-token is already 1.000 at layer 1. Candidate 1b KILLED, P8.4 confirmed more sharply than written."
+  },
+  {
+   "ts": "06:20",
+   "kind": "done",
+   "text": "Revised conclusion: it is not the task, it is the depth. The architectural advantage is real, provable and large \u2014 and lives only at the embeddings, because attention converts relational structure within one layer. TXC's niche must therefore be the aggregation regime, which is exactly where the paper's existing positive results sit."
   }
  ],
  "figures": [
   {
    "path_light": "figs/atlas_light.png",
    "path_dark": "figs/atlas_dark.png",
-   "caption": "THE RESULT. Three relational labels \u2014 syntactic agreement, factual consistency, labelled provenance \u2014 chosen to be as different as the family allows. LEFT: a per-token linear probe against depth; all three start at chance at the embeddings and are fully linearised per position by layer 4\u20138, so at any depth a dictionary is actually trained the additive ceiling already contains the relation. RIGHT: the nonlinear residual \u2014 the only headroom a position-mixing code could convert into a linear readout \u2014 is non-zero in exactly one place, the embedding layer, before the model has done the work. Shaded bands are bootstrap CIs; grey band is \u00b13\u03c3 of the label-permutation null."
+   "caption": "THE RESULT. Four relational labels \u2014 syntactic binding, factual consistency, labelled provenance, structural parity \u2014 chosen to be as different as the family allows. LEFT: a per-token linear probe against depth; all four start at chance at the embeddings and are read perfectly per position by layer 4 (parity by layer 1). RIGHT: the nonlinear residual \u2014 the headroom only a position-mixing code can convert into a linear readout \u2014 reaching +0.486 on the parity label at layer 0 and collapsing inside the null band by layer 1. The theorem is exactly right; attention just gets there first. Bands are bootstrap CIs; grey band is \u00b13\u03c3 of the label-permutation null."
   },
   {
    "path_light": "figs/agreement_conversion_T8_light.png",
@@ -568,8 +600,8 @@
  ],
  "timing": {
   "session_start_utc": "2026-07-25T00:52:00Z",
-  "now_utc": "2026-07-25T05:05:00Z",
-  "elapsed_min": 253,
+  "now_utc": "2026-07-25T06:20:00Z",
+  "elapsed_min": 328,
   "basis": "Projections are calibrated on measured wall-clock from this session (env install 9 min, stimulus build <1 min, 15 GB model pull 6 min) and on the task_hunt round-1 record (a raw-activation screen cost ~3 h; a Stage-2 panel of 84 cells ran in ~2 h on one H100).",
   "phases": [
    {
@@ -589,9 +621,9 @@
    {
     "phase": "2 \u2014 track A gate",
     "state": "done",
-    "elapsed_min": 185,
-    "projected_min": 185,
-    "note": "Candidate 5 done + killed with a positive control. Candidate 4 at layer 8 of 4 layers x T in {8,16,32,64}; T=32/64 cells are slow (262k-feature MLPs). An oracle-pair diagnostic was added mid-run and is queued behind it."
+    "elapsed_min": 260,
+    "projected_min": 260,
+    "note": "Extended past the original scope: after three kills, the corrected additive-blind design (candidate 1b) verified the theorem at +0.486 and a boundary run (L1, L3) pinned conversion to the first attention layer."
    },
    {
     "phase": "3 \u2014 track B role gate",
@@ -605,7 +637,7 @@
     "state": "blocked",
     "elapsed_min": 0,
     "projected_min": 210,
-    "note": "Only runs if a gate clears: 6 archs x T ladder x 3 seeds + untrained through the canonical runner. Blocked, so the projection is contingent."
+    "note": "A gate DID clear \u2014 at layer 0, decisively. The panel is not run because a dictionary on raw token embeddings is a token-identity dictionary: architecturally valid, interpretability-irrelevant. Worth running only as an explicit existence demonstration, labelled as such. RECORD \u00a7 7c."
    },
    {
     "phase": "5 \u2014 write-up",
@@ -615,7 +647,7 @@
     "note": "RECORD + LOG + STATUS + figures. Runs whichever way the verdict lands."
    }
   ],
-  "projected_total_min": 537,
+  "projected_total_min": 612,
   "projected_remaining_min": 0
  },
  "triage": {
@@ -653,6 +685,17 @@
     "auc_from_nfiller": 0.5,
     "auc_from_gap": 0.5,
     "PASS": true
+   },
+   "parity": {
+    "n": 2880,
+    "n_distinct_texts": 2880,
+    "label_rate": 0.5,
+    "auc_from_a": 0.5,
+    "auc_from_b": 0.5,
+    "auc_from_len": 0.4935951967592593,
+    "auc_from_nfiller": 0.488939525462963,
+    "auc_from_gap": 0.4882052951388889,
+    "PASS": true
    }
   }
  },
@@ -686,16 +729,26 @@
    "reading": "Two readings, both kept. (1) At the embeddings a per-token dictionary cannot represent labelled provenance at all, and T-SAE inherits that floor \u2014 a +0.52 window win. But the signal is the marker token's identity, an additive function of per-position features, so every window family gets it and it does NOT isolate cross-position weight sharing: regime 2, the same class as the paper's existing \u03bb\u0302 result. (2) By layer 4 it is converted. In-quote state is bracket-family, which the candidate ledger already recorded as DEAD-by-conversion; that prediction held.",
    "prior_scored": "This was my rank-1 candidate at P(win) 0.70 / P(violent) 0.60. The win half is defensible at layer 0; the VIOLENT half is FALSIFIED \u2014 I did not anticipate that a single marker token makes the task additive, and the design needed matched marker multisets from the start.",
    "scope": "One model, one marker vocabulary. The regime-3 form is now frozen in cards/role_order.md."
+  },
+  {
+   "candidate": "1b \u2014 structural parity (the corrected additive-blind form)",
+   "verdict": "KILL \u2014 but it VERIFIES the theorem",
+   "rule": "K1 + K2 fired from layer 1 \u00b7 card \u00a7 8 frozen by dated amendment before any cell",
+   "model": "R1-Distill-Llama-8B, layers 0/1/2/3/4/8/16/24, T \u2208 {8,16,32}, 2,880 distinct items, 12 groups",
+   "numbers": "layer 0, T=32: per-token 0.508 [0.446, 0.552] \u00b7 additive ceiling 0.488 [0.441, 0.537] \u2014 CHANCE \u00b7 window MLP 0.994 [0.986, 0.999] \u2192 nonlinear residual +0.486 against a 3\u03c3 null of 0.049. Layer 1 onward: per-token 1.000, residual +0.000.",
+   "reading": "Two findings. (1) The additive-code theorem is verified on real activations, decisively: on a label that is genuinely a two-position product, every linear readout of a per-position decomposition sits at chance while a cross-position nonlinearity reaches 0.994, CIs nowhere near overlapping. P8.2 \u2014 the theorem's own prediction \u2014 held to 0.488. (2) The boundary is the FIRST attention layer: L1 and L3 were run because L0\u2192L2 left it unresolved, and per-token is already 1.000 at layer 1. One attention layer suffices.",
+   "prior_scored": "P8.1 and P8.2 CONFIRMED. P8.4 ('the residual does NOT survive past layer ~4') CONFIRMED, and more sharply than written \u2014 it does not survive past layer 0. The card said 'I expect this to be killed' and gave the bracket-family reason; the data agreed with the card.",
+   "scope": "One model, one marker vocabulary. The theorem verification is the transferable part; the boundary layer is a property of this model."
   }
  ],
  "findings": [
   {
-   "title": "The gate has a positive control, so the kill is informative rather than blind",
-   "body": "At layer 0 with T=8, per-token reads 0.495 and the window LINEAR probe reads 0.503 \u2014 both chance \u2014 while the window MLP reaches 0.749 (0.772 in the IN stratum). This is the additive-code theorem holding on real activations: the two constituents are present in the window, no additive readout can combine them, and a cross-position nonlinearity can. The IN/OUT control confirms it is binding: the same MLP sits at 0.498 when the window cannot reach the head noun. So the instrument demonstrably fires when regime-3 headroom exists \u2014 which is what makes its zero at layers 4\u201324 a statement about the MODEL, not about the probe."
+   "title": "It is not the task \u2014 it is the depth. The advantage is real, provable, large, and has nowhere to live.",
+   "body": "The earlier reading ('no relational task survives conversion') was right but mis-attributed. The corrected statement is stronger: a position-mixing code's advantage over an additive one is real and worth +0.49 AUC on a label the theorem covers \u2014 and on real activations it exists ONLY at the embeddings, because attention linearises cross-position relational structure within its first layer. So at every hookpoint anyone trains a dictionary at, an additive code is already sufficient. This resolves the paper's central puzzle rather than deepening it: TXC's niche cannot be relational structure, because transformers dispose of that immediately. It must be the AGGREGATION regime \u2014 pooling evidence that stays distributed because no single position ever summarises it \u2014 which is exactly where the paper's positive results (backtracking anticipation, \u03bb\u0302 intensity) already sit."
   },
   {
-   "title": "Conversion is faster than the round-1 record suggested",
-   "body": "Per-token AUC goes 0.495 (L0) \u2192 0.983 (L2) \u2192 1.000 (L4) and stays there through L24. The forbidden-word candidate took ~20 layers to climb +0.13; this relational label is fully linearised per position within four. A window architecture has no hookpoint to exploit: by the depth anyone trains a dictionary at, the additive ceiling already contains everything."
+   "title": "The gate has a positive control, so the kill is informative rather than blind",
+   "body": "At layer 0 with T=8, per-token reads 0.495 and the window LINEAR probe reads 0.503 \u2014 both chance \u2014 while the window MLP reaches 0.749 (0.772 in the IN stratum). This is the additive-code theorem holding on real activations: the two constituents are present in the window, no additive readout can combine them, and a cross-position nonlinearity can. The IN/OUT control confirms it is binding: the same MLP sits at 0.498 when the window cannot reach the head noun. So the instrument demonstrably fires when regime-3 headroom exists \u2014 which is what makes its zero at layers 4\u201324 a statement about the MODEL, not about the probe."
   },
   {
    "title": "The criterion the paper's Limitations section says is missing, in measured form",

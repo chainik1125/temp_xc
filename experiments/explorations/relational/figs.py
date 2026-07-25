@@ -43,10 +43,10 @@ ARMS = [
 THEME = {
     "light": {"surface": "#ffffff", "ink": "#0b0b0b", "ink2": "#52514e",
               "grid": "#e4e6e8", "s1": "#2a78d6", "s2": "#eb6834",
-              "s3": "#1baf7a", "null": "#9aa0a6"},
+              "s3": "#1baf7a", "s4": "#4a3aa7", "null": "#9aa0a6"},
     "dark": {"surface": "#111a21", "ink": "#e8eef1", "ink2": "#a7bac4",
              "grid": "#22323d", "s1": "#3987e5", "s2": "#d95926",
-             "s3": "#199e70", "null": "#778d99"},
+             "s3": "#199e70", "s4": "#9085e9", "null": "#778d99"},
 }
 
 
@@ -240,11 +240,13 @@ def fig_conversion(payloads: list[dict], task: str, mode: str, T: int) -> Path:
     return out
 
 
-ATLAS_COLORS = {"agreement": "s1", "contradiction": "s2", "role": "s3"}
+ATLAS_COLORS = {"agreement": "s1", "contradiction": "s2", "role": "s3",
+                "parity": "s4"}
 ATLAS_LABEL = {
     "agreement": "agreement equality (cand. 5)",
     "contradiction": "fact consistency (cand. 4)",
     "role": "labelled role (cand. 1a)",
+    "parity": "structural parity (cand. 1b)",
 }
 
 
@@ -296,7 +298,7 @@ def fig_atlas(by_task: dict[str, list[dict]], mode: str) -> Path:
     axes[0].set_xlabel("residual layer"); axes[0].set_ylabel("per-token test AUC")
     axes[0].set_ylim(0.44, 1.04)
     axes[0].grid(axis="y", linewidth=0.7)
-    axes[0].set_title("a per-token probe reads every relation by layer 8",
+    axes[0].set_title("a per-token probe reads every relation by layer 4",
                       loc="left", fontsize=10)
     axes[0].legend(loc="lower right", fontsize=8.5)
 
@@ -312,7 +314,8 @@ def fig_atlas(by_task: dict[str, list[dict]], mode: str) -> Path:
     axes[1].grid(axis="y", linewidth=0.7)
     axes[1].set_title("headroom exists only before the model computes it",
                       loc="left", fontsize=10)
-    fig.suptitle("Three relational labels, three conversions — R1-Distill-Llama-8B",
+    fig.suptitle("Four relational labels, four conversions — the advantage lives "
+                 "only at layer 0 (R1-Distill-Llama-8B)",
                  x=0.01, ha="left", fontsize=11)
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     out = FIGS / f"atlas_{mode}.png"
