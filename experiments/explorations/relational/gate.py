@@ -274,6 +274,21 @@ def run_cell(cache: dict, layer: int, T: int, stratum: str = "all",
     # linearly expose. The MLP arms are the NONLINEAR ceiling. The gap between
     # them is the regime-3 headroom only a position-mixing code can capture.
     flat = W.reshape(len(W), -1)
+    # ORACLE-PAIR arms: the two constituent positions ONLY (2*d features).
+    # A window MLP over T positions with n ~ rows can fail for probe-capacity
+    # reasons (RECORD § 3c), so a null there is weak evidence about the
+    # representation. Handing the probe exactly the two positions that carry the
+    # constituents removes that confound: if the equality is present in the pair
+    # at all, an MLP on 2*d features with n >> 2*d will find it. The linear
+    # oracle-pair arm is the additive ceiling ON THE PAIR — the theorem says it
+    # must stay at chance even here, which makes it the tightest test available.
+    dd = dist[idx]
+    pair = None
+    if (dd < T).all():
+        rows_v = (t_max - 1 - dd) - (t_max - T)      # v index inside the window
+        pair = np.stack([W[np.arange(len(W)), -1, :],
+                         W[np.arange(len(W)), rows_v, :]], axis=1
+                        ).reshape(len(W), -1)
     arms = {
         "per_token": (W[:, -1, :], 0),
         "window_flat": (flat, 0),
@@ -282,6 +297,9 @@ def run_cell(cache: dict, layer: int, T: int, stratum: str = "all",
         "per_token_mlp": (W[:, -1, :], MLP_HIDDEN),
         "window_mlp": (flat, MLP_HIDDEN),
     }
+    if pair is not None:
+        arms["oracle_pair"] = (pair, 0)
+        arms["oracle_pair_mlp"] = (pair, MLP_HIDDEN)
     out = {"layer": layer, "T": T, "stratum": stratum,
            "rows": int(len(idx)), "n_train": int(tr.sum()),
            "n_test": int(te.sum()), "pos_rate": float(yy.mean()),
@@ -307,6 +325,11 @@ def run_cell(cache: dict, layer: int, T: int, stratum: str = "all",
     out["g"] = round(out["window_flat"]["value"] - out["per_token"]["value"], 4)
     out["g_order"] = round(out["window_flat"]["value"] - out["window_mean"]["value"], 4)
     out["g_shuf"] = round(out["window_flat"]["value"] - out["window_shuf"]["value"], 4)
+    if "oracle_pair_mlp" in out:
+        out["pair_nonlinear_residual"] = round(
+            out["oracle_pair_mlp"]["value"] - out["oracle_pair"]["value"], 4)
+        out["pair_headroom"] = bool(
+            out["pair_nonlinear_residual"] > out["three_sigma"])
     add_ceiling = max(out["window_flat"]["value"], out["per_token"]["value"])
     out["additive_ceiling"] = round(add_ceiling, 4)
     out["nonlinear_residual"] = round(out["window_mlp"]["value"] - add_ceiling, 4)
@@ -393,7 +416,12 @@ def main() -> None:
                               f"wMLP {c['window_mlp']['value']:.3f} "
                               f"g {c['g']:+.3f} nlr {c['nonlinear_residual']:+.3f} "
                               f"(3s {c['three_sigma']:.3f})"
-                              f"{' R3' if c['regime3_headroom'] else ''}",
+                              + (f" | pair {c['oracle_pair']['value']:.3f}"
+                                 f"/{c['oracle_pair_mlp']['value']:.3f}"
+                                 f" pnlr {c['pair_nonlinear_residual']:+.3f}"
+                                 if "oracle_pair" in c else "")
+                              + (' R3' if c['regime3_headroom'] else '')
+                              + (' PAIR' if c.get('pair_headroom') else ''),
                               flush=True)
                     cells.append({"key": key, **c})
         payload = {"meta": {**cache["meta"], "tag": args.tag,
