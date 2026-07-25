@@ -22,15 +22,15 @@ foil are **the same sentences in a different order**, so a constant write is ine
 construction and only shape is under test.
 
 **1. Positions add up, and a steering write moves the model by roughly its projection
-onto the target — including when it opposes the target.** A handle limited to one
-constant per block of W segments can only deliver the part of the target that survives
-averaging inside those blocks. Across 36 random combinations of profile, block width and
-coefficients, predictions span −0.42 to +0.42 with nothing fitted and the measured effects
+onto the target — including when it opposes the target.** A handle limited to one constant
+per block of W segments can deliver only the part of the target that survives averaging
+inside those blocks. Across 36 random combinations of profile, block width and
+coefficients, predictions span −0.42 to +0.42 with nothing fitted, and measured effects
 track them at **slope 0.94, intercept −0.01, mean error 0.073**. Thirteen conditions
 predict a *negative* effect and the model duly moves the wrong way in proportion — the
-part that could most easily have failed. Good on average, not exact: χ²/dof is 3.6,
-because positions carry unequal weight — measured directly, the strongest segment is
-2.2–4.2× the weakest, and the first segment is always the weakest.
+part that could most easily have failed. Good on average, not exact (χ²/dof 3.6), because
+positions carry unequal weight: measured directly, the strongest segment is 2.2–4.2× the
+weakest and the first is always the weakest.
 
 - ![linearity](../../../../plots/2026-07-24_trajectory_steering/linearity.png)
 
@@ -68,11 +68,11 @@ comes back null.
 - ![controls](../../../../plots/2026-07-24_trajectory_steering/controls.png)
 
 **5. A wider handle buys resolution, not interaction.** Adjacency effects — one write
-changing what a neighbouring write contributes — are exactly the departures from
-additivity. Predicting every multi-position condition from *measured* per-position
-weights halves the misfit (χ²/dof 4.74 → 2.48; mean error 0.106 → 0.068), and the
-residual shows no trace of adjacency: **+0.004 ± 0.006, t = 0.65**, on a design that
-would have caught the effect our earlier confounded tests suggested at roughly 15σ.
+changing what a neighbour contributes — are exactly the departures from additivity.
+Predicting every multi-position condition from *measured* per-position weights halves the
+misfit (χ²/dof 4.74 → 2.48), and the residual shows no trace of adjacency: **+0.004 ±
+0.006, t = 0.65**, on a design that would have caught the effect our earlier confounded
+tests suggested at roughly 15σ.
 
 **Three of the claims we started the night with did not survive their own controls** —
 growth with trajectory length, our first window sweep, and superadditivity — and a
@@ -159,11 +159,10 @@ span question and the additivity question are the same question, and a two-arm
 contiguous-versus-scattered contrast is the wrong instrument for it: under additivity with
 unequal weights, such a contrast is non-zero whenever the two supports sit on different
 positions, which they always do. Our first attempt at it was confounded by sign
-composition and a sign-matched rebuild would have been confounded by position — three
-false positives in a row from the same family of designs. The right test measures the
-per-position weights from single-position writes, predicts every multi-position condition
-additively, and asks whether any residual tracks adjacency; that run
-(`weights_modal.py`) was in flight when the compute window closed.
+composition and a sign-matched rebuild would have been confounded by position. The right
+test measures the per-position weights from single-position writes, predicts every
+multi-position condition additively, and asks whether any residual tracks adjacency —
+`weights_modal.py`, whose result is finding 5 and is set out below.
 
 **Declining and helping in order (finding 3).** About 40 template-generated requests
 about the user's own property, a 12-sentence declination bank and a 12-sentence
