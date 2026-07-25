@@ -1,0 +1,182 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k": 6,
+  "base_norm": 56.7443286447607,
+  "arms": {
+    "template@0.35": {
+      "acc_mean": 0.8125,
+      "acc_sem": 0.04408729537549985,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          "text": " La pluie tombe.  Chaque mot est un mot de passe \u00e0 six chiffres. \n\nQuels sont les mots de passe \u00e0 six chiffres \u00e0 trouver ?\n\nIls are the six words and the password is a six digit number.\n\nIls are the words, the password is a six digit number. \n\n- The first word is \"Ils.\"\n"
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "text": "12h45, le train arrive. The soup is still hot. Can you traduire en fran\u00e7ais cette phrase ? This is a French sentence written in a mix of English and French. Here, nous avons \u00e0 traduire une phrase qui fait r\u00e9f\u00e9rence \u00e0 un voyage en train, \u00e0 son arriv\u00e9e. The translated sentence should preserve the meaning of the original sentence."
+        }
+      ]
+    },
+    "broadcast@0.35": {
+      "acc_mean": 0.4444444444444444,
+      "acc_sem": 0.027777777777777787,
+      "mean_sents": 5.625,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          "text": " (The jardin sent des roses. Ils marchent le long de la rivi\u00e8re.) (The garden sent des roses. Ils marchaient le long de la rivi\u00e8re.)\n\n1. Doit-on-il garder la m\u00eame intonation que la premi\u00e8re phrase ? \n2."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "text": " Je veux manger quelque chose.  Elle veut manger aussi.  Tout de suite !   Lui, il la regarde avec un sourire.\n\nCharming! Je suis contente que vous ayez aim\u00e9 cette histoire que j'ai \u00e9crite."
+        }
+      ]
+    },
+    "single@0.35": {
+      "acc_mean": 0.5347222222222222,
+      "acc_sem": 0.026503058392063336,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            1,
+            0
+          ],
+          "text": " I am in the woods. The sun is setting. The trees are tall. It's so hot that the water drips off my hands when I water the plants. I'm so tired that I want to close my eyes and sleep. I'm working in the garden."
+        },
+        {
+          "profile": [
+            0,
+            1,
+            1,
+            0,
+            0,
+            1
+          ],
+          "text": " We wait under the old clock. He buys bread every morning. Choose from the following options the translation which best fits the meaning of the original text:\nOPTIONS:\n(a). They wait for the clock to be replaced.;\n(b). They wait for the clock to be broken.;\n(c). They wait for the clock to be paid for.;\n"
+        }
+      ]
+    },
+    "template@0.5": {
+      "acc_mean": 0.7430555555555555,
+      "acc_sem": 0.04703269011955314,
+      "mean_sents": 5.791666666666667,
+      "samples": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            1,
+            0
+          ],
+          "text": " (The soup is still warm.) They drink it, and it is delicious. La soupe est chaude.  (The soupe is chaude.)  (The soup est chaude.) The children enjoy it, and it is delicious."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "text": "15h, 20h, 23h. On starts at 9, 3 p.m., 6 h, 9 h, 12 h, 15 h, 18 h, 20 h, 23 h, 22 h, 20 h, 18 h, 16 h, 14 h... (13h). No one is working. They are all busy with activities."
+        }
+      ]
+    },
+    "broadcast@0.5": {
+      "acc_mean": 0.5138888888888888,
+      "acc_sem": 0.02995680375558566,
+      "mean_sents": 5.958333333333333,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          "text": "2012-01-01 11:00:00\nIl fait froid.   2012-01-01 12:00:00\nIl pleut. 2012-01-01 14:00:00\nIl fait beau. 2012-01-01 18:00:00\n\nJe plante des tulipes. 2012-01-01 09:00:00\nLaiss\u00e9 faire aux plantons de l'automne. 2012-01-01 10:00:00\nJe vins \u00e0 pied \u00e0 la ferme."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          "text": " Les enfants jouent dans la cour. Les enfants jouent dans la cour.  Les enfants jouent dans la cour. Cette phrase est une r\u00e9p\u00e9tition. Elle r\u00e9p\u00e8te la m\u00eame phrase deux fois. (Repetition) Cette phrase est une r\u00e9p\u00e9tition de la m\u00eame phrase (repetition de la m\u00eame phrase) \nC'est donc une r\u00e9p\u00e9tition (repetition) \nQuand on apprend le fran\u00e7ais, il est important de bien comprendre la diff\u00e9rence entre les deu"
+        }
+      ]
+    },
+    "single@0.5": {
+      "acc_mean": 0.5069444444444443,
+      "acc_sem": 0.02921263917738344,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            1
+          ],
+          "text": " I think this is a correct sentence. If I were to ask a native French speaker if this sentence is grammatically correct, what would they most likely say?\nA: \"Yes, it is grammatically correct in every respect.\"\nB: \"Yes, but it is not a good sentence.\"\nC: \"No, that is not correct.\"\nD: \"No, it is not grammatically correct.\"\n"
+        },
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          "text": "1912. 1915. 1918.\nThe text is written in the French language. The text is a title, possibly for a short story or poem. It mentions the arrival of a train, and a lamp that flickers in the night."
+        }
+      ]
+    }
+  }
+}
