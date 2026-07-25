@@ -507,3 +507,40 @@ essentially correct, which is reassuring — but it noted honestly that it had a
 from *title sentences* rather than from marks. That is the right criticism to receive
 before a reader does.
 
+### 00:07 — the weights run landed, and it is a fourth confound, not an answer
+
+Capacity freed just after midnight and `weights_modal.py` completed. Headline numbers
+look dramatic and I do not believe them yet:
+
+- per-position weights a_t span 0.24 to 7.20 (max/min = 29), homogeneity χ²/dof = 3.3;
+- weighting the prediction by measured a_t barely helps (χ²/dof 6.01 → 5.53) and makes
+  mean |error| **worse** (0.067 → 0.077);
+- the adjacency coefficient is **−0.094 ± 0.024, t = −3.96**, and survives adding block
+  width as a covariate (−0.102).
+
+Two checks say this cannot be read as an arrangement effect.
+
+**The weights are too noisy to serve as a model.** Mean relative error on an individual
+a_t is **78%** — a_4 is 0.24 ± 1.31, consistent with anything. The 29× spread is driven by
+noise in the small values. That is exactly why weighting fails to improve the fit: it
+injects more noise than structure. The `convex.json` marginals (k=8, ~10–20% relative
+error) remain the better evidence for heterogeneity, and there the weights *do* predict
+blocks to 4–12%.
+
+**And the adjacency statistic is degenerate on the profile I ran it on.** With an
+alternating target and a block-constant write, `c` is constant inside a block while the
+target flips every position — so two adjacent positions can *never* both be correctly
+signed within a block. Verified directly: an all-+1 write gives zero adjacent-correct
+pairs at every width. The statistic can only become nonzero at block boundaries, takes
+values in {0, 1, 2} out of eleven possible adjacent pairs, and correlates −0.42 with
+width. Whatever the significant coefficient is measuring, "coherent runs" is not
+available to it.
+
+So this is the **fourth** confound in the span-test family — coverage, then sign
+composition, then position, now a degenerate adjacency statistic. The review agent
+predicted three; I supplied a fourth by asking a good question with the wrong profile.
+
+The fix is one parameter: run the identical test on a profile with **runs** (ℓ=3), where
+adjacent positions can share correctness and the statistic measures what it is named for.
+Launched at 00:07 with n_eval=32, n_cond=44.
+

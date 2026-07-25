@@ -76,7 +76,7 @@ CARRIERS = ["Journal entry.\n", "From the notebook:\n", "Draft passage.\n",
 
 @app.function(gpu="L4", image=image, timeout=5400)
 def weights(model_id: str, layer: int, k: int, n_train: int, n_eval: int,
-            n_cond: int, frac: float):
+            n_cond: int, frac: float, ell: int = 1):
     import random
     import numpy as np
     import torch
@@ -173,8 +173,11 @@ def weights(model_id: str, layer: int, k: int, n_train: int, n_eval: int,
     m = frac * bn
     print(f"[dir] base_norm={bn:.1f}")
 
-    # one fixed profile and one set of eval pairs for everything below
-    prof01 = [1 if i % 2 == 0 else 0 for i in range(k)]
+    # one fixed profile and one set of eval pairs for everything below.
+    # ell = run length: with ell=1 (alternating) adjacent positions can never BOTH be
+    # correctly signed under a block-constant write, so the adjacency statistic is
+    # degenerate. ell >= 2 gives runs, making run-coherence measurable.
+    prof01 = [1 if (i // ell) % 2 == 0 else 0 for i in range(k)]
     pi = np.array([1.0 if l else -1.0 for l in prof01])
     pairs = []
     for _ in range(n_eval):
@@ -261,7 +264,7 @@ def weights(model_id: str, layer: int, k: int, n_train: int, n_eval: int,
     dof = max(len(res) - 3, 1)
     cov = (resid_after @ resid_after / dof) * np.linalg.pinv(X.T @ X)
     se_adj = float(np.sqrt(max(cov[1, 1], 0)))
-    out = {"model": model_id, "layer": int(L), "k": k, "frac": frac,
+    out = {"model": model_id, "layer": int(L), "k": k, "frac": frac, "ell": ell,
            "base_norm": bn, "a_t": a_t, "a_sem": a_sem,
            "full_mean": full_mean, "points": pts,
            "chi2_per_dof_homogeneous": chi_h, "chi2_per_dof_weighted": chi_w,
@@ -280,10 +283,12 @@ def weights(model_id: str, layer: int, k: int, n_train: int, n_eval: int,
 
 @app.local_entrypoint()
 def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k: int = 12,
-         n_train: int = 40, n_eval: int = 28, n_cond: int = 40, frac: float = 0.5):
+         n_train: int = 40, n_eval: int = 28, n_cond: int = 40, frac: float = 0.5,
+         ell: int = 1):
     import json
-    res = weights.remote(model, layer, k, n_train, n_eval, n_cond, frac)
+    res = weights.remote(model, layer, k, n_train, n_eval, n_cond, frac, ell)
     outdir = ROOT / "results" / "temporal_screen"
     outdir.mkdir(parents=True, exist_ok=True)
-    (outdir / "weights.json").write_text(json.dumps(res, indent=2))
-    print("[saved]", outdir / "weights.json")
+    out = outdir / (f"weights_ell{ell}.json" if ell != 1 else "weights.json")
+    out.write_text(json.dumps(res, indent=2))
+    print("[saved]", out)
