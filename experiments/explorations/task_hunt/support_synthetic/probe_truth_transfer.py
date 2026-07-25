@@ -116,6 +116,13 @@ def main():
             "r": float(np.mean([q["r"] for q in rs])),
             "p": int(rs[0]["p"]), "n_rows": int(rs[0]["n_rows"]),
             "nnz": float(np.mean([q["nnz_per_row"] for q in rs])),
+            # EFFECTIVE feature dimension: columns that ever fire. A column
+            # that is identically zero on the train rows contributes no
+            # parameter to fit, so the ratio that governs over-fitting is
+            # p_eff/n, not d_sae/n. On this panel the two differ by 3-30x
+            # (e.g. post/T16/k8: 70 active of 2048), which is why the nominal
+            # p/n = 1.00 label is not where those cells actually sit.
+            "p_eff": float(np.mean([q["n_active_cols"] for q in rs])),
             "n_seeds": len(rs)}
 
     # ── Test A — the density prediction at fixed p/n ────────────────────────
@@ -126,7 +133,11 @@ def main():
             continue
         rows.append({"arch": arch, "T": T, "k_pos": k, "p": a["p"],
                      "p_over_n": a["p"] / a["n_rows"],
-                     "density": a["nnz"] / a["p"], "nnz_per_row": a["nnz"],
+                     "p_eff": a["p_eff"],
+                     "p_eff_over_n": a["p_eff"] / a["n_rows"],
+                     "density": a["nnz"] / a["p"],
+                     "density_eff": a["nnz"] / max(a["p_eff"], 1.0),
+                     "nnz_per_row": a["nnz"],
                      "v1": a["r"], "v2": b["r"], "gap": b["r"] - a["r"],
                      "n_seeds": a["n_seeds"]})
     at_pn1 = sorted([r for r in rows if abs(r["p_over_n"] - 1.0) < 1e-6],
@@ -154,16 +165,22 @@ def main():
     # ── Test B — inversion + its consistency check ──────────────────────────
     inv = []
     for r in rows:
-        # match the mirror curve on p/n first, then on density class
-        dens_class = "p6" if r["density"] > 0.02 else "k8"
-        cand = [(k, c) for k, c in curves.items()
-                if k[0] == dens_class and abs(k[2] - r["p_over_n"]) < 1e-6]
+        # Match on the EFFECTIVE ratio p_eff/n (see p_eff above), nearest in
+        # log space since the mirror's ladder is geometric; and on density
+        # class measured against p_eff for the same reason.
+        dens_class = "p6" if r["density_eff"] > 0.02 else "k8"
+        cand = [(k, c) for k, c in curves.items() if k[0] == dens_class]
+        if not cand:
+            cand = list(curves.items())
         if not cand:
             continue
-        key, curve = cand[0]
+        key, curve = min(cand, key=lambda kc: abs(
+            np.log(max(kc[0][2], 1e-6)) - np.log(max(r["p_eff_over_n"], 1e-6))))
         t1, t2 = _invert(curve, r["v1"], 1), _invert(curve, r["v2"], 2)
         rec = {"cell": f"{r['arch']}/T{r['T']}/k{r['k_pos']}",
-               "p_over_n": r["p_over_n"], "density": r["density"],
+               "p_over_n": r["p_over_n"], "p_eff": r["p_eff"],
+               "p_eff_over_n": r["p_eff_over_n"], "density": r["density"],
+               "density_eff": r["density_eff"],
                "mirror_curve": {"density": key[0], "p": key[1],
                                 "p_over_n": key[2],
                                 "n_points": len(curve),
@@ -192,7 +209,8 @@ def main():
     print("TEST A — density prediction at matched p/n = 1.00")
     for r in at_pn1:
         print(f"  {r['arch']:<22} T{r['T']:<3} k{r['k_pos']:<4} "
-              f"density={r['density']:.3f} (nnz {r['nnz_per_row']:.1f}) "
+              f"dens={r['density']:.3f} (nnz {r['nnz_per_row']:.1f}) "
+              f"p_eff={r['p_eff']:.0f} p_eff/n={r['p_eff_over_n']:.3f} "
               f"v1={r['v1']:+.3f} v2={r['v2']:+.3f} gap={r['gap']:+.3f}")
     if "holds" in test_a:
         print(f"  prediction (dense gap > sparse gap): "
@@ -205,8 +223,11 @@ def main():
     for r in inv:
         t1, t2 = r["truth_implied_by_v1"], r["truth_implied_by_v2"]
         f = (lambda v: "  n/a" if v is None else f"{v:+.3f}")
-        print(f"  {r['cell']:<28} p/n={r['p_over_n']:.3f} "
-              f"dens={r['density']:.3f}  v1→truth {f(t1)}  v2→truth {f(t2)}  "
+        print(f"  {r['cell']:<28} p_eff/n={r['p_eff_over_n']:.3f} "
+              f"(nominal {r['p_over_n']:.2f}) dens={r['density']:.3f} "
+              f"→curve p/n={r['mirror_curve']['p_over_n']:.3f} "
+              f"{r['mirror_curve']['density']}  v1→truth {f(t1)}  "
+              f"v2→truth {f(t2)}  "
               f"{'consistent' if r.get('consistent') else r.get('note', 'INCONSISTENT')}")
     print(f"-> {RES/'probe_truth_transfer.json'}")
 
