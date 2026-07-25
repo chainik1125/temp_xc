@@ -67,7 +67,7 @@ CARRIERS = ["Journal entry.\n", "From the notebook:\n", "Draft passage.\n",
             "Field notes.\n", "Evening record.\n", "From chapter twelve:\n"]
 
 
-@app.function(gpu="A10G", image=image, timeout=5400)
+@app.function(gpu="L4", image=image, timeout=5400)
 def dictcmp(model_id: str, layer: int, k: int, n_train: int, n_eval: int,
             ms: list, fracs: list):
     import random

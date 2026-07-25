@@ -109,7 +109,7 @@ BLUNT_REFUSE = [
 ]
 
 
-@app.function(gpu="A10G", image=image, timeout=5400)
+@app.function(gpu="L4", image=image, timeout=5400)
 def round2(model_id: str, layer: int, n_train: int, n_eval: int, fracs: list,
            ells: list, phases: list, stance_ks: list, span_k: int, span_ws: list):
     import random

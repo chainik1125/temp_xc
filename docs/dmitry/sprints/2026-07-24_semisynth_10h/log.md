@@ -214,3 +214,26 @@ still a true statement about the phenomenon (a width-2 handle on an alternating 
 can write nothing useful) but weaker evidence than a measured-vs-measured reversal.
 Figure now hatches the by-construction cells so this is visible rather than buried.
 
+### 22:52 — round-2 controls written and queued; Modal capacity blocked by another project
+
+Round-2 audit (P1–P4, S1–S3, C1) accepted in full and the summary rewritten around it —
+the headline is now *linearity of the steering response in the schedule*, with the six
+informative cells as the result and the other 18 named as identities. Detail in the
+22:56 entry below.
+
+`round2_modal.py` implements the four cheapest killing controls the audit asked for:
+(A) phase sweep to buy informative cells, reporting only 0 < pred < 1 with paired
+bootstrap CIs; (B) stance fixed-Hamming with the reviewer's flat prediction registered
+in the docstring before results exist; (C) span-vs-dose to the stated acceptance bar
+(paired S_span, per-pair deltas stored, plus one-segment-at-W×dose as the dose control);
+(D) direction identity with u_prompt re-measured at matched positions plus
+politeness-matched banks.
+
+**Infrastructure note.** Both `dict_modal.py` and `round2_modal.py` sat with zero tasks
+for ~20 min. `modal app list` shows my apps at 0 tasks while an unrelated project on the
+same account holds 10 — an account-wide container concurrency cap, not A10G scarcity
+(switching to L4 changed nothing, which is how I confirmed it). The other project's jobs
+are left alone; my runs stay queued and Modal will schedule them as capacity frees.
+Everything the write-up currently claims is already measured and saved, so this delays
+strengthening rather than blocking the deliverable.
+
