@@ -2050,5 +2050,59 @@
     "train_cached": false,
     "eval_cached": false,
     "ok": true
+  },
+  {
+    "ds": "ward_real_oprate_case_base_l12",
+    "arch": "txc_batchtopk_post",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 128,
+    "seed": 42,
+    "eval_window_L": 32,
+    "n_steps": 8000,
+    "kind": "trained",
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "lambda_probe_v2": true,
+      "lambda_v2_probe": "ridge",
+      "lambda_v2_alphas": [
+        0.01,
+        0.03162277660168379,
+        0.1,
+        0.31622776601683794,
+        1.0,
+        3.1622776601683795,
+        10.0,
+        31.622776601683793,
+        100.0,
+        316.2277660168379,
+        1000.0,
+        3162.2776601683795,
+        10000.0
+      ],
+      "lambda_v2_n_windows": 8192,
+      "lambda_v2_split": "trace"
+    },
+    "metrics": {
+      "eauc": 0.5974999666213989,
+      "e_mean_max_cos": 0.600678026676178,
+      "e_frac_recovered_90": 0.125,
+      "e_frac_recovered_80": 0.125,
+      "nmse": 0.22580710292599313,
+      "l0_per_window": 129.0908203125,
+      "l0_per_token": 8.06817626953125,
+      "lambda_recovery": 0.06637869023457896,
+      "lambda_r2": -3.1708498001098633,
+      "lambda_chance": -0.04812172469687221,
+      "lambda_recovery_v2": 0.23636918158346254,
+      "lambda_r2_v2": -0.013572216033935547,
+      "lambda_chance_v2": 0.05141252484525532,
+      "lambda_alpha_v2": 1000.0,
+      "lambda_v2_n_train_rows": 14039.0,
+      "lambda_v2_n_eval_rows": 12754.0
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
   }
 ]
