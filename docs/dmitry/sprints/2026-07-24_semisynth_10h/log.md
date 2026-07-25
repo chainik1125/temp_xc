@@ -237,3 +237,54 @@ are left alone; my runs stay queued and Modal will schedule them as capacity fre
 Everything the write-up currently claims is already measured and saved, so this delays
 strengthening rather than blocking the deliverable.
 
+### 22:58 — red team lands; four real errors fixed, one of them a bug in my own figure
+
+`redteam.md` delivered. It verified the numbers against the JSONs and found four things
+I had wrong, all now corrected:
+
+1. **The identity census was 18, not 13** — and my `cell_kind` in
+   `scripts/plot_phase_diagram.py` had the bug: it marked a cell as fixed-by-construction
+   only when `W == 1`, when the true condition is `W | ℓ` (every block lies inside one
+   run, so `sign(μ_b)` reproduces the ±1 template and the *same vector* is written).
+   Verified: 9 cells have `obs == full_peak` bit-for-bit in both models. Census is now
+   9 identity + 9 zero-write + **6 at-risk**. Panel C was scattering 11 points with five
+   stacked at (1.00, 1.00); it now plots the 6.
+2. **Per-covered-slot range was cherry-picked.** I wrote 22.2–23.7 (language) and
+   7.8–8.4 (intensity); the true ranges over the ten distinct conditions with coverage
+   ≥ 2 are **17.6–23.7** and **7.1–8.4**. Corrected; the retraction it supports is
+   unaffected because Δ still tracks coverage rather than width.
+3. **The superadditivity t-statistics used the wrong standard error** — `convex_modal.py`
+   subtracts Σ Δ_t but reports the SEM of Δ(B) alone, ignoring the marginals' uncertainty.
+   Under an independence bound t = 1.6–1.7, not 2.6–2.8, so the effect is not
+   distinguishable from zero. Already retracted; the numbers now say so properly.
+4. **Four reversals, not three** — ℓ=3 (W=2 → 0.628 beats W=3 → 1.000 in efficiency
+   terms) is the same type as the ℓ=6 one I promoted.
+
+Also adopted: doses and sample sizes quoted with every headline number, the "rebuilt
+generation harness" limitation now states that the rebuild *returned a degenerate metric*
+rather than implying it worked, and `dict_modal.py` is marked "written, not run".
+
+**Entrainment demoted from a finding to a paragraph in the corrections.** The red team is
+right that the raw accuracies do not support the normalised story: for the period-2 family
+they run 0.578, 0.502, 0.542, 0.221 against nulls 0.600, 0.500, 0.333, 0.000, so the W=4
+"excess" comes from the null collapsing to zero rather than the model improving. The
+methodological yield — that a balanced profile forces a 0.400 persistence null, so a naive
+0.5 makes a working model look broken — survives and is the part worth keeping.
+
+### 23:05 — why the k=12 grid is weak, and the better fix
+
+The red team's top recommendation was k=24 to buy at-risk cells. Checked on CPU first:
+k=24 with ℓ ∈ {1,2,3,4,6,12} gives 12 at-risk cells (from 6) but still only **three**
+distinct predicted values {1/6, 1/3, 2/3}, and the queued phase sweep gives 13 cells at
+**two** distinct values. The limitation is structural — for a square wave every block mean
+is a simple rational, so no amount of W, ℓ or phase variation spreads the predictions.
+
+The fix is to drop square waves for the linearity test. For any balanced profile π and
+**any** block-constant coefficient vector c, linearity predicts R = W·⟨c, μ⟩/k — a
+continuum, including negative values when c opposes the target. `linfit_modal.py` (queued)
+samples ~36 random (profile, W, c) conditions, each normalised against Δ_full on the same
+pairs, with paired bootstrap CIs. It converts panel C from six points at two x-values into
+a regression across the full range, and the negative half is a genuinely risky prediction:
+a write that anti-correlates with the target should push the margin proportionally the
+wrong way.
+
