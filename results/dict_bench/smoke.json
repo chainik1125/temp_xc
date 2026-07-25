@@ -1,0 +1,34 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k_seg": 12,
+  "d_sae": 512,
+  "topk": 8,
+  "steps": 400,
+  "base_norm": 55.34852473843783,
+  "cache_shape": [
+    240,
+    12,
+    1536
+  ],
+  "general_frac": 0.4,
+  "sae_latent": 487,
+  "txc_latent": 441,
+  "sae_row_norm": 1.0,
+  "txc_pattern_norm": 1.0,
+  "txc_row_norm_mean": 0.2872019410133362,
+  "steering": {
+    "sae_scheduled": {
+      "mean": -7.077115058898926,
+      "sem": 1.9883190793572139
+    },
+    "sae_broadcast": {
+      "mean": 0.4521970748901367,
+      "sem": 1.758958795138872
+    },
+    "txc_pattern": {
+      "mean": 0.15802574157714844,
+      "sem": 2.6109405243408355
+    }
+  }
+}

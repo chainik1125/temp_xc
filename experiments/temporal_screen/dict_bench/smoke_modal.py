@@ -225,9 +225,13 @@ def smoke(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
           f"TXC latent {j_txc} (sep {d_txc_sep[j_txc]:+.3f})")
 
     # ---------------- 4. decoder rows, magnitude-matched ----------------
+    # decoder_directions() lives on the *Spec*, not the module. Go to the weights:
+    #   TopKSAE.W_dec            (d_in, d_sae), normalised over dim 0 -> unit COLUMNS
+    #   TemporalCrosscoder.W_dec (d_sae, T, d_in), normalised over (1,2) -> the whole
+    #                            (T, d) pattern is unit norm, so its rows are ~1/sqrt(T)
     with torch.no_grad():
-        v_sae = sae.decoder_directions()[:, j_sae].float()          # (d,)
-        P_txc = txc.W_dec[j_txc].float()                            # (k_seg, d)
+        v_sae = sae.W_dec.data[:, j_sae].float()                    # (d,)
+        P_txc = txc.W_dec.data[j_txc].float()                       # (k_seg, d)
     print(f"[rows] |v_sae|={v_sae.norm():.3f}   "
           f"|P_txc| total={P_txc.norm():.3f}  per-row mean={P_txc.norm(dim=1).mean():.3f}")
 
