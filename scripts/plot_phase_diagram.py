@@ -29,7 +29,7 @@ obs, pred = grab(RES, "obs_R"), grab(RES, "pred_R")
 obs7 = grab(RES7, "obs_R")
 
 fig = plt.figure(figsize=(16.2, 4.4), dpi=150)
-gs = fig.add_gridspec(1, 3, width_ratios=[1.15, 1, 0.85], wspace=0.3)
+gs = fig.add_gridspec(1, 3, width_ratios=[1.15, 1, 0.85], wspace=0.38)
 
 def cell_kind(ell, W):
     """at-risk | identity (R ≡ 1) | zero-write (R ≡ 0).
@@ -55,13 +55,22 @@ for i, ell in enumerate(ELLS):
         ax.text(j, i, txt, ha="center", va="center", fontsize=8.5,
                 color="white" if obs[i, j] > 0.55 else "0.15")
         if kind != "at-risk":
+            ec = "white" if obs[i, j] > 0.55 else "0.45"
             ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False,
-                                       hatch="///", edgecolor="0.55",
-                                       linewidth=0.0, alpha=0.55))
+                                       hatch="///", edgecolor=ec,
+                                       linewidth=0.0, alpha=0.75))
+        else:
+            ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False,
+                                       edgecolor="#d62728", linewidth=2.2,
+                                       zorder=5))
+ax.plot([], [], marker="s", ls="", markerfacecolor="none",
+        markeredgecolor="#d62728", markeredgewidth=2.2, markersize=11,
+        label="the 6 cells the prediction can fail on (red outline)")
 ax.plot([], [], marker="s", ls="", color="0.55", markersize=9,
-        label="fixed by construction (R ≡ 1 if W | ℓ; R ≡ 0 if the block straddles)")
-ax.legend(loc="lower left", bbox_to_anchor=(0.0, -0.30), fontsize=8,
-          frameon=False, handletextpad=0.5)
+        label="fixed by construction: R ≡ 1 when W divides ℓ, R ≡ 0 when a block\n"
+              "spans equal amounts of both phases (hatched)")
+ax.legend(loc="lower left", bbox_to_anchor=(0.0, -0.42), fontsize=7.5,
+          frameon=False, handletextpad=0.6, labelspacing=0.8)
 ax.set_xticks(range(len(WS)))
 ax.set_xticklabels(WS)
 ax.set_yticks(range(len(ELLS)))
@@ -69,25 +78,35 @@ ax.set_yticklabels(ELLS)
 ax.set_xlabel("W — segments the handle writes a single constant over")
 ax.set_ylabel("ℓ — run length of the target profile")
 ax.set_title("A. Fidelity R(W, ℓ): observed, (predicted)\n"
-             "hatched = fixed by construction; 6 cells can disagree", fontsize=10)
-cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
-cb.set_label("fraction of full-template effect", fontsize=8.5)
+             r"predicted $R=\mathrm{mean}_b\,|\mu_b|$, "
+             r"$\mu_b$ = mean of the ±1 target profile over block $b$",
+             fontsize=9.5)
+cb = fig.colorbar(im, ax=ax, fraction=0.040, pad=0.02)
+cb.ax.tick_params(labelsize=8)
+cb.set_label("R = fraction of the full\nper-segment schedule's effect", fontsize=7.5,
+             labelpad=2)
 
 ax2 = fig.add_subplot(gs[0, 1])
 COLORS = {1: "#0072B2", 2: "#009E73", 3: "#E69F00", 6: "#CC79A7"}
 for i, l in enumerate(ELLS):
     eff = [obs[i, j] * WS[j] / K for j in range(len(WS))]
-    ax2.plot(WS, eff, marker="o", ms=6, lw=2, color=COLORS[l], label=f"ℓ = {l}")
-    jstar = int(np.argmax(eff))
-    ax2.plot([WS[jstar]], [eff[jstar]], marker="*", ms=17, color=COLORS[l],
-             markeredgecolor="white", markeredgewidth=1.1, zorder=5)
+    effp = [pred[i, j] * WS[j] / K for j in range(len(WS))]
+    ax2.plot(WS, effp, lw=1.1, ls="--", color=COLORS[l], alpha=0.55, zorder=2)
+    ax2.plot(WS, eff, marker="o", ms=6, lw=2, color=COLORS[l], label=f"ℓ = {l}",
+             zorder=3)
+    jstar = int(np.argmax(effp))
+    ax2.plot([WS[jstar]], [effp[jstar]], marker="*", ms=16, color=COLORS[l],
+             markeredgecolor="white", markeredgewidth=1.1, zorder=6)
+ax2.plot([], [], lw=1.1, ls="--", color="0.5", label="predicted (★ = predicted best)")
+ax2.annotate("ℓ=2 predicted to tie at W=2 and W=6\n(dashed); measured gap is noise",
+             (6.15, 0.145), fontsize=7.5, color="#137a5f", ha="left")
 ax2.set_xscale("log", base=2)
 ax2.set_xticks(WS)
 ax2.set_xticklabels([str(w) for w in WS])
 ax2.set_xlabel("W — handle width (segments)")
-ax2.set_ylabel("fidelity per knob   R·W/k")
-ax2.set_title("B. Control efficiency is best at W ≈ ℓ, and ties at odd multiples\n"
-              "(★ = best width; full fidelity costs k/ℓ knobs)", fontsize=10)
+ax2.set_ylabel("fidelity per control parameter,  R·W/k", fontsize=9)
+ax2.set_title("B. Fidelity per control parameter (one scalar per block)\n"
+              "predicted to peak at W = ℓ and to TIE at odd multiples of ℓ", fontsize=9.5)
 ax2.grid(color="0.92", lw=0.8)
 ax2.legend(fontsize=9, frameon=True, framealpha=0.95, edgecolor="0.85")
 for s in ("top", "right"):
@@ -114,10 +133,11 @@ ax3.legend(fontsize=8.5, frameon=True, framealpha=0.95, edgecolor="0.85",
 for s in ("top", "right"):
     ax3.spines[s].set_visible(False)
 
-fig.suptitle("A steering handle that writes one constant over W segments keeps "
-             "exactly the part of the trajectory that is constant over W\n"
-             "(layer 14, k=12, coverage held at 12 segments in every cell)",
-             fontsize=10.5, y=1.06)
+fig.suptitle("A handle writing one constant across W segments keeps close to the part of "
+             "the target profile that is itself constant across W\n"
+             "Qwen-2.5 at layer 14 · k = 12 sentences · every cell writes at all 12 "
+             "segments, so only the handle's resolution varies · n = 28 pairs per cell",
+             fontsize=9.5, y=1.10)
 for ext in ("png", "pdf"):
     fig.savefig(OUT / f"phase_diagram.{ext}", bbox_inches="tight")
 print("saved", OUT / "phase_diagram.png")

@@ -41,11 +41,11 @@ ax.annotate("+189%: tracks how many slots\nthe foil differs in",
             (kk[-2], perm[-2]), textcoords="offset points", xytext=(-118, 14),
             fontsize=8.5, color="#B87A00", fontweight="bold")
 ax.annotate("flat: per-slot efficacy does not\ndecay with trajectory length",
-            (kk[-1], fixed[-1]), textcoords="offset points", xytext=(-158, -30),
+            (kk[-1], fixed[-1]), textcoords="offset points", xytext=(-150, 30),
             fontsize=8.5, color="#0072B2", fontweight="bold")
-ax.set_ylim(55, 245)
+ax.set_ylim(50, 250)
 ax.set_xlabel("k — trajectory length (segments)")
-ax.set_ylabel("peak Δmargin")
+ax.set_ylabel("peak Δ log-prob margin (over the dose grid)", fontsize=9)
 ax.set_xticks(kk)
 ax.set_title("A. What looked like growth was bookkeeping", fontsize=10.5)
 ax.legend(loc="upper left", fontsize=8.5, frameon=True, edgecolor="0.85")
@@ -71,17 +71,20 @@ ax2.axhline(0, color="0.6", lw=1)
 ax2.set_xticks(x)
 ax2.set_xticklabels([f"W={W}" for W in Ws])
 ax2.set_xlabel("block width (segments written — identical across the pair)")
-ax2.set_ylabel("Δmargin")
+ax2.set_ylabel("Δ log-prob margin", fontsize=9)
 ax2.set_title("B. Same coverage, same contiguity, same injected norm —\n"
               "only the order differs", fontsize=10.5)
 ax2.legend(loc="upper left", fontsize=8.5, frameon=True, edgecolor="0.85")
 ax2.grid(axis="y", color="0.92", lw=0.8)
+ax2.set_axisbelow(True)
 for a in (ax, ax2):
     for s in ("top", "right"):
         a.spines[s].set_visible(False)
 
-fig.suptitle("Controls: what the steering effect is, and what it is not "
-             "(Qwen-2.5-1.5B, L14)", fontsize=11, y=1.0)
+fig.suptitle("Two controls run against our own results (Qwen-2.5-1.5B, layer 14; "
+             "bars = SEM, n = 32 in A, 28 in B)\n"
+             "A: an earlier version of this work reported the orange curve as growth "
+             "with length — it is not", fontsize=9.5, y=1.02)
 fig.tight_layout(rect=(0, 0, 1, 0.95))
 for ext in ("png", "pdf"):
     fig.savefig(OUT / f"controls.{ext}", bbox_inches="tight")

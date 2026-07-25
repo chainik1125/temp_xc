@@ -35,11 +35,12 @@ for arm, color, mk, label in ARMS:
                 label=label)
 ax.axhline(0, color="0.75", lw=1)
 ax.set_xticks(kk)
-ax.set_xlabel("k — sentences in the response")
-ax.set_ylabel("Δmargin toward the intended stance order")
+ax.set_xlabel("k — sentences in the response (one \"slot\" each)")
+ax.set_ylabel("Δ log-prob margin toward the intended stance order\n(steered − unsteered, summed over the response)", fontsize=9)
 ax.set_title("A. Steering the refuse/comply order within one response\n"
              "(target and foil are the same sentences, reordered)", fontsize=10.5)
-ax.legend(fontsize=8.5, frameon=True, edgecolor="0.85", loc="upper left")
+ax.legend(fontsize=8, frameon=True, edgecolor="0.85", loc="lower right",
+          framealpha=0.96)
 ax.grid(axis="y", color="0.92", lw=0.8)
 
 ax2 = axes[1]
@@ -50,11 +51,16 @@ colors = ["#0072B2", "#E69F00", "#009E73"]
 vals = [sc[f"{a}@0.5"]["frac_correct_direction"] for a in arms]
 bars = ax2.bar(np.arange(3), vals, 0.55, color=colors)
 ax2.axhline(0.5, color="0.35", lw=1.4, ls="--")
-ax2.annotate("chance", (2.42, 0.5), textcoords="offset points", xytext=(0, 5),
-             fontsize=8.5, color="0.35")
+ax2.annotate("0.5 — where a constant write is expected to land:\nit is right on exactly "
+             "the half of slots whose\nintended stance matches its sign",
+             (0.62, 0.735), fontsize=7.5, color="0.35", ha="left")
+ax2.annotate("", xy=(1.42, 0.505), xytext=(1.18, 0.715),
+             arrowprops=dict(arrowstyle="->", color="0.45", lw=0.9))
 ax2.axhline(1 / 8, color="0.7", lw=1, ls=":")
-ax2.annotate("1/8 = one slot of eight", (1.55, 0.125), textcoords="offset points",
-             xytext=(0, 5), fontsize=8, color="0.5")
+ax2.annotate("1/8 — ceiling for a write that touches\nonly one of the eight slots",
+             (1.62, 0.245), fontsize=7.5, color="0.45", ha="left")
+ax2.annotate("", xy=(2.0, 0.135), xytext=(1.9, 0.235),
+             arrowprops=dict(arrowstyle="->", color="0.55", lw=0.9))
 for b, v in zip(bars, vals):
     ax2.annotate(f"{v:.3f}", (b.get_x() + b.get_width() / 2, v), ha="center",
                  textcoords="offset points", xytext=(0, 4), fontsize=10,
@@ -62,17 +68,20 @@ for b, v in zip(bars, vals):
 ax2.set_xticks(np.arange(3))
 ax2.set_xticklabels(labels)
 ax2.set_ylim(0, 1.08)
-ax2.set_ylabel("fraction of slots moved the intended way")
+ax2.set_ylabel("fraction of sentence slots whose declining-vs-helping\npreference moved the intended way", fontsize=9)
 ax2.set_title("B. Behavioural check: does the model's own choice follow?\n"
               "(held-out candidates, model's intrinsic preference differenced out)",
               fontsize=10.5)
 ax2.grid(axis="y", color="0.92", lw=0.8)
+ax2.set_axisbelow(True)
 for a in (ax, ax2):
     for s in ("top", "right"):
         a.spines[s].set_visible(False)
 
-fig.suptitle("Staged refusal: a safety-relevant behaviour whose useful control is a "
-             "schedule, not a level (Qwen-2.5-1.5B, L14)", fontsize=11, y=1.0)
+fig.suptitle("Ordering declining and helping inside one response: the useful control is a "
+             "schedule, not a level\nQwen-2.5-1.5B, layer 14 · target and foil hold the "
+             "SAME sentences in a different order · bars = SEM, n = 32 pairs (A), "
+             "160 slots (B)", fontsize=9.5, y=1.02)
 fig.tight_layout(rect=(0, 0, 1, 0.95))
 for ext in ("png", "pdf"):
     fig.savefig(OUT / f"stance.{ext}", bbox_inches="tight")
