@@ -1,0 +1,24 @@
+{
+ "dataset": "emozilla/pg19",
+ "revision": "c021754c8e01c5b1cc83a1f549c1f97fbbb756b8",
+ "split": "train",
+ "seed": 0,
+ "shuffle_buffer": 1000,
+ "head_chars": 400000,
+ "min_sents": 250,
+ "span": [
+  100,
+  250
+ ],
+ "n_docs": 1000,
+ "n_scanned": 1017,
+ "n_too_short": 17,
+ "n_sentences": 150000,
+ "splitter": "expansion.corpus.split_sentences v1",
+ "label_free_pull": "no quote statistic consulted at pull time \u2014 the corpus is not selected on the label",
+ "first_doc": {
+  "title": "The Younger Sister Vol. 1 by Catherine Anne Austen Hubback",
+  "id": "http://www.gutenberg.org/ebooks/54010",
+  "sha256_sentences": "51d007b42a27922a277a8c5444ed41f3a980d2ce9025cfdb95490535e352867b"
+ }
+}
