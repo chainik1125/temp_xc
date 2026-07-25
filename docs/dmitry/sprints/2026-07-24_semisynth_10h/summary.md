@@ -34,16 +34,15 @@ because positions carry unequal weight — measured directly, the strongest segm
 
 - ![linearity](../../../../plots/2026-07-24_trajectory_steering/linearity.png)
 
-**2. So the useful handle width is the target's own timescale.** Once positions add up,
-the achievable fraction for a square-wave target of run length ℓ is fixed by
-arithmetic. The resulting (W, ℓ) grid is reproduced to a mean error of **0.053** (1.5B)
-and **0.045** (7B) over its six at-risk cells at the top of the dose grid — 0.099 and
-0.094 at the lowest dose, a systematic drift taken up below. The grid's other 18 cells
-are algebraic identities and serve as plumbing checks. Read as control cost: fidelity
-per control parameter is maximised at W ≈ ℓ, where full fidelity costs `k/ℓ` parameters
-rather than k. Fidelity is **not monotone in W**, since a wider handle wins when it
-aligns with whole runs and collapses when it straddles them, so "wide enough to match
-the timescale" is the right summary of window size rather than "wider is better".
+**2. So the useful handle width is the target's own timescale.** For a square-wave target
+of run length ℓ, the achievable fraction then follows by arithmetic, and the (W, ℓ) grid
+is reproduced to a mean error of **0.053** (1.5B) and **0.045** (7B) over its six at-risk
+cells — at the top of the dose grid; 0.099 and 0.094 at the lowest, a drift taken up
+below. Read as control cost, fidelity per control parameter peaks at W ≈ ℓ, where full
+fidelity costs `k/ℓ` parameters instead of k. Fidelity is **not monotone in W**: a wider
+handle wins when it aligns with whole runs and collapses when it straddles them, so the
+right summary of window size is "wide enough to match the timescale", not "wider is
+better".
 
 - ![phase diagram](../../../../plots/2026-07-24_trajectory_steering/phase_diagram.png)
 
@@ -52,10 +51,9 @@ one response.** The scheduled handle shifts the model's preference between a dec
 a helping continuation the intended way on **96.9%** of slots (mean shift 1.00 nats/token)
 against **51.2%** for the same direction at constant strength, and flips which continuation
 it actually prefers on **53.6%** against a 50% floor — large, reliably-signed pressure on
-the choice rather than a decisive change of it. That 51.2% is the constant write's expected
+the choice rather than a decisive change of it. The 51.2% is the constant write's expected
 value, not a malfunction: pushing every slot toward declining is right on exactly the half
-meant to decline. A random direction at matched magnitude does nothing. *(Dose 0.5 of the
-mean residual norm, 160 slots.)*
+meant to decline. A random direction at matched magnitude does nothing.
 
 - ![stance](../../../../plots/2026-07-24_trajectory_steering/stance.png)
 
@@ -64,13 +62,23 @@ schedule inside a block — coverage, contiguity and injected norm held exactly 
 only the placement changed — collapses the effect from +55.3 to −1.2 at W=8 (*n = 28*).
 That rules out any "you simply added more push" reading. An additive response predicts
 the collapse exactly, so it is a check the design passes rather than a mechanism it
-reveals, and it says nothing about *adjacency* — a separate question taken up below.
+reveals, and it says nothing about *adjacency* — which we tested separately and which
+comes back null.
 
 - ![controls](../../../../plots/2026-07-24_trajectory_steering/controls.png)
 
+**5. A wider handle buys resolution, not interaction.** Adjacency effects — one write
+changing what a neighbouring write contributes — are exactly the departures from
+additivity. Predicting every multi-position condition from *measured* per-position
+weights halves the misfit (χ²/dof 4.74 → 2.48; mean error 0.106 → 0.068), and the
+residual shows no trace of adjacency: **+0.004 ± 0.006, t = 0.65**, on a design that
+would have caught the effect our earlier confounded tests suggested at roughly 15σ.
+
 **Three of the claims we started the night with did not survive their own controls** —
-growth with trajectory length, our first window sweep, and superadditivity. Each, and
-the weaker claim that replaced it, is in *What we corrected* below.
+growth with trajectory length, our first window sweep, and superadditivity — and a
+fourth apparent result, a significant adjacency effect, dissolved when we rebuilt its
+degenerate statistic. Each, and the weaker claim that replaced it, is in *What we
+corrected* below.
 
 ## What problem this is, and why it is interesting
 
@@ -286,29 +294,39 @@ receive which coefficients; and a significant adjacency coefficient from the one
 experiment built to test this directly, which is discussed below and which we do not
 believe.
 
-The honest position is therefore narrower than "no span effect" and stronger than "we
-could not tell". Nothing we measured requires arrangement sensitivity and everything we
-measured is explained without it — and we never ran an experiment with the power to
-detect it, because **four successive attempts were confounded**: by coverage, then by the
-sign composition of the compared writes, then by position, and finally by a degenerate
-statistic.
+**So we ran the test that can settle it, and it comes back null with power.** The right
+design is not a contrast between two arrangements: it is to predict every multi-position
+condition from measured per-position weights and ask whether any residual tracks
+adjacency. Doing that on a target with runs of three — where adjacent positions can
+actually share correctness, so the adjacency statistic spans 0 to 8 and is decorrelated
+from block width (r = +0.09) — gives:
 
-That fourth one is the subtlest and worth recording. The right test is not a contrast
-between two arrangements at all: it is to predict every multi-position condition from
-measured per-position weights and ask whether any residual tracks adjacency. We ran it,
-and it returned an adjacency coefficient of **−0.094 ± 0.024 (t = −3.96)** that survives
-controlling for block width. We do not believe it. On an *alternating* target with a
-block-constant write, the coefficient is constant inside a block while the target flips
-at every position, so two adjacent positions can never both be correctly signed within a
-block — verified directly, an all-positive write yields zero adjacent-correct pairs at
-every width. The statistic can only become non-zero at block boundaries, takes three
-distinct values across the entire design, and correlates −0.42 with width. Whatever it
-measured, run coherence was not available to it. That same run's per-position weights
-carry 78% relative error individually, which is why weighting by them fails to improve
-the fit (χ²/dof 6.01 → 5.53) and worsens mean error; the tighter marginals described
-above remain the better evidence for heterogeneity. Rerunning on a profile with runs,
-where adjacent positions can share correctness, is a one-parameter change and is the
-first thing we would finish.
+- weighting by the measured per-position weights **halves the misfit**: χ²/dof falls
+  4.74 → 2.48 and mean absolute error 0.106 → 0.068, a 36% improvement. The weights are
+  measured on *single-position* writes and used to predict *multi-position* ones, so this
+  is an out-of-regime prediction rather than a fit.
+- the adjacency coefficient is **+0.004 ± 0.006 (t = 0.65)** — consistent with zero. With
+  a residual spread of 0.075, this design would register an effect the size the earlier
+  confounded tests suggested (≈0.09 per adjacent pair) at roughly 15σ, and excludes
+  anything above about 0.018 at 3σ.
+
+That is a null with teeth rather than an absence of evidence. Our first attempt at the
+same question, on an *alternating* target, returned a significant −0.094 (t = −3.96) —
+and it was spurious: with a block-constant write on an alternating target the coefficient
+is constant inside a block while the target flips every position, so two adjacent
+positions can never both be correctly signed within a block. Verified directly, an
+all-positive write yields zero adjacent-correct pairs at every width; the statistic could
+only move at block boundaries, took three distinct values across the whole design, and
+correlated −0.42 with width. Changing one parameter — the target's run length — removes
+the degeneracy and the effect with it.
+
+**The closing position.** Adjacency effects are precisely the departures from additivity.
+Measured directly, the response is additive over positions with unequal, measured
+weights, and no residual attributable to adjacency survives. **A wider handle buys
+resolution, not interaction.** Getting there took four confounded attempts — by coverage,
+then by the sign composition of the compared writes, then by position, then by a
+degenerate statistic — which is worth recording because each one produced a significant
+number that looked like the result we were hoping for.
 
 One structural note belongs with this. Teacher-forcing removes the mechanism a span
 effect would most plausibly use: the text is pinned at every position, so a run of
@@ -377,14 +395,7 @@ task-design theory is in [[theory]]; the behaviour census and the literature bri
 
 ## What we would do next
 
-Run `weights_modal.py`, which is specified and was queued when compute ran out: twelve
-per-position weights measured from single-position writes, used to predict forty
-multi-position conditions additively, with the residual regressed on adjacency. It is the
-decisive test of whether any arrangement sensitivity exists, and it subsumes the ρ
-measurement in `rho_modal.py`, which probes a specific mechanism for the dose-drift that
-already has an independent cross-check.
-
-Then train a temporal crosscoder and an L0/width-matched per-token SAE on one activation
+Train a temporal crosscoder and an L0/width-matched per-token SAE on one activation
 cache and rerun the resolution family with decoder rows in place of the
 difference-of-means direction. That single experiment converts "a schedule beats a
 level" into a statement about dictionaries, which is the claim the wider project needs.
