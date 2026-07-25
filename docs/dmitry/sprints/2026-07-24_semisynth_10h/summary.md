@@ -386,18 +386,28 @@ task-design theory is in [[theory]]; the behaviour census and the literature bri
   about attribute identity per slot rather than text quality.
 - **Every arm peaks at the top of its dose grid**, so absolute magnitudes are lower
   bounds rather than optima.
-- **Linearity holds on average, with real scatter around it.** Only 26 of 36 bootstrap
-  intervals cover their prediction, and the phase sweep found two conditions sharing a
-  predicted 0.333 that landed at 0.145 and 0.676 with non-overlapping intervals. Where a
-  write lands matters beyond how it projects onto the target, and we have not
-  characterised that.
+- **Additivity holds; equal weighting does not, and we characterise it only partly.**
+  Only 26 of 36 bootstrap intervals cover the unweighted prediction, and two conditions
+  sharing a predicted 0.333 landed at 0.145 and 0.676 with non-overlapping intervals.
+  Measured per-position weights account for much of this — using them halves χ²/dof, to
+  2.48 — but 2.48 is still not 1, so something beyond additive position weights remains.
+- **The adjacency null is one profile, one dose, one model.** It is well powered for what
+  it tests (t = 0.65 where the confounded estimate would have shown at ~15σ), but it was
+  run at run length 3, dose 0.5, on Qwen-2.5-1.5B. A span effect that only appears at
+  other timescales, lower doses, or larger models is not excluded.
 
 ## What we would do next
 
 Train a temporal crosscoder and an L0/width-matched per-token SAE on one activation
 cache and rerun the resolution family with decoder rows in place of the
-difference-of-means direction. That single experiment converts "a schedule beats a
-level" into a statement about dictionaries, which is the claim the wider project needs.
-Then sweep layers and a third attribute to test whether `W* ≈ ℓ` holds generally, and
-build the multi-turn version of the stance task, where the timescale is set by the
-conversation rather than by us.
+difference-of-means direction. That single experiment converts "a schedule beats a level"
+into a statement about dictionaries, which is the claim the wider project needs.
+
+After that, three things in order of value. Repeat the adjacency test at other run
+lengths and doses, since our null is well powered but narrow. Push the per-position
+weights further — they halve the misfit but leave χ²/dof at 2.48, so a second structural
+term is waiting to be found, and the weights themselves are interpretable (the first
+segment is reliably the weakest, having the least preceding text to act on). And build
+the multi-turn version of the stance task, where the timescale is set by the conversation
+rather than by us — which is also where teacher-forcing stops hiding the mechanism a span
+effect would most plausibly use.
