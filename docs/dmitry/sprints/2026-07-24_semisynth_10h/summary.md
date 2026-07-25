@@ -226,12 +226,14 @@ Code, all runnable as `modal run <path>`, in
 
 | file | what it does |
 | --- | --- |
-| `lsweep_modal.py` | the (W, ℓ) resolution family — findings 1 and 2 |
+| `linfit_modal.py` | the linearity regression across a continuum of predictions — finding 1 |
+| `lsweep_modal.py` | the (W, ℓ) resolution family — finding 2 |
 | `stance_modal.py` | declining/helping order, teacher-forced, four arms |
 | `stance_gen_modal.py` | menu-constrained behavioural metric + three-way pre-check |
 | `controls_modal.py` | fixed-Hamming foils, SVD rank, calibrated stance shift |
 | `convex_modal.py` | per-position marginals, superadditivity, schedule scrambling |
-| `round2_modal.py` | phase sweep, stance fixed-Hamming, span-vs-dose, direction identity — queued |
+| `round2_modal.py` | phase sweep, stance fixed-Hamming, span-vs-dose, direction identity |
+| `span2_modal.py` | span vs adjacency with the sign-composition confound removed |
 | `entrain2_modal.py` | entrainment with analytic nulls |
 | `graded_modal.py` | graded amplitude with a monotonicity gate |
 | `dict_modal.py` | window-spanning vs per-token dictionaries — written, not run (Modal capacity) |
@@ -262,6 +264,11 @@ task-design theory is in [[theory]]; the behaviour census and the literature bri
   about attribute identity per slot rather than text quality.
 - **Every arm peaks at the top of its dose grid**, so absolute magnitudes are lower
   bounds rather than optima.
+- **Linearity holds on average, with real scatter around it.** Only 26 of 36 bootstrap
+  intervals cover their prediction, and the phase sweep found two conditions sharing a
+  predicted 0.333 that landed at 0.145 and 0.676 with non-overlapping intervals. Where a
+  write lands matters beyond how it projects onto the target, and we have not
+  characterised that.
 
 ## What we would do next
 
