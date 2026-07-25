@@ -5,9 +5,9 @@
   "agent": "runpod (H100 pod, /workspace/temp_xc)",
   "branch": "arxiv",
   "started_utc": "2026-07-25T00:00:00Z",
-  "last_update_utc": "2026-07-25T04:35:00Z",
-  "phase": "Track A + flagship 1a complete \u2014 three kills, one positive control, regime-3 card frozen",
-  "state": "running",
+  "last_update_utc": "2026-07-25T05:05:00Z",
+  "phase": "Session complete \u2014 3 kills, theorem confirmed on real activations, regime-3 card frozen",
+  "state": "done",
   "prime_directive": "A sound verdict, never a win. Cards are frozen (committed) before any screen runs; git order is the evidence. Falsified predictions are scored as falsified."
  },
  "context": {
@@ -532,6 +532,21 @@
    "ts": "04:35",
    "kind": "note",
    "text": "THE PANEL REMAINS CORRECTLY BLOCKED. No gate cleared, so a 6-arch \u00d7 T \u00d7 3-seed grid would be spent on a converted latent \u2014 precisely what per-token-first triage exists to prevent. The atlas is the deliverable instead."
+  },
+  {
+   "ts": "05:00",
+   "kind": "pass",
+   "text": "ORACLE-PAIR DIAGNOSTIC SETTLES THE ONE OPEN CAVEAT. At layer 0 the pair-linear arm sits at 0.531 (chance) while the pair MLP reaches 0.641 \u2014 residual +0.109 against a 3\u03c3 null of 0.085. Candidate 4's layer-0 null was probe capacity, not absence: the equality IS in the two mention positions and only a cross-position nonlinearity reads it. The theorem now holds on real activations for both track-A labels."
+  },
+  {
+   "ts": "05:02",
+   "kind": "note",
+   "text": "From layer 2 the pair is already linearly at 1.000, so contradiction converts faster than agreement (L0\u2192L2 vs L0\u2192L4). Generalised lesson recorded: a null from a wide window MLP is not evidence of absence, and every future card in this family carries the oracle-pair arm."
+  },
+  {
+   "ts": "05:05",
+   "kind": "done",
+   "text": "Session complete. Three candidates killed on measured, controlled evidence; the additive-code theorem confirmed outside the synthetic setting; the regime-3 successor design frozen before any cell. Nothing pushed to origin \u2014 commits are local pending your review."
   }
  ],
  "figures": [
@@ -553,8 +568,8 @@
  ],
  "timing": {
   "session_start_utc": "2026-07-25T00:52:00Z",
-  "now_utc": "2026-07-25T04:35:00Z",
-  "elapsed_min": 223,
+  "now_utc": "2026-07-25T05:05:00Z",
+  "elapsed_min": 253,
   "basis": "Projections are calibrated on measured wall-clock from this session (env install 9 min, stimulus build <1 min, 15 GB model pull 6 min) and on the task_hunt round-1 record (a raw-activation screen cost ~3 h; a Stage-2 panel of 84 cells ran in ~2 h on one H100).",
   "phases": [
    {
@@ -594,14 +609,14 @@
    },
    {
     "phase": "5 \u2014 write-up",
-    "state": "running",
-    "elapsed_min": 20,
-    "projected_min": 60,
+    "state": "done",
+    "elapsed_min": 45,
+    "projected_min": 45,
     "note": "RECORD + LOG + STATUS + figures. Runs whichever way the verdict lands."
    }
   ],
-  "projected_total_min": 552,
-  "projected_remaining_min": 250
+  "projected_total_min": 537,
+  "projected_remaining_min": 0
  },
  "triage": {
   "note": "Label-side triage \u2014 free kill authority, run before any GPU spend. By construction the label must be unreadable from either constituent alone, from length, or from filler count. This is expectation E1. v2 additionally asserts distinct_texts == n_items and that the inter-constituent gap is uninformative \u2014 both added after v1 failed (below).",
@@ -685,6 +700,10 @@
   {
    "title": "The criterion the paper's Limitations section says is missing, in measured form",
    "body": "A temporal architecture can only earn its keep on a latent the model DECLINES to maintain as a per-position state. Relations the model needs \u2014 agreement, consistency, provenance \u2014 are converted within two to eight layers, and the balanced-marginal construction proves the label was never readable from single-position content in the first place: the model computes it and writes the answer at the current position. This reframes the paper's own evidence favourably. Backtracking anticipation is not a lucky task; it is an instance of the only class that can work, and it is the one label in this program with a positive within-window order receipt. It also predicts reviewer bbby's own observation that window length barely matters on sparse probing \u2014 those labels are regime-1 ambient, so no window arch should separate, and none does."
+  },
+  {
+   "title": "A null from a wide window MLP is not evidence of absence \u2014 and the fix is cheap",
+   "body": "Candidate 4's layer-0 window control showed no headroom, but at T=64 the MLP has 262,144 inputs against ~3,800 rows. Handed exactly the two mention positions instead (8,192 features), the linear arm stays at chance (0.531) while the MLP reaches 0.641 \u2014 residual +0.109 against a 3\u03c3 null of 0.085. The equality was represented and merely unfindable at that probe width. So the additive-code theorem is now confirmed on real activations for BOTH track-A labels, and every future card in this family must carry the oracle-pair arm."
   }
  ]
 }

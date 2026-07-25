@@ -177,13 +177,33 @@ P3 (`nonlinear_residual ≤ 3σ` everywhere) **CONFIRMED**. P4 (IN and OUT diffe
 expect this candidate to be KILLED"* and gave the mechanism; the data agreed with
 the card, not with the hope.
 
-**Caveat on the layer-0 null, disclosed.** Unlike candidate 5, candidate 4's layer-0
-control does *not* show nonlinear headroom (`nlr` −0.02…+0.03). At `T = 64` the MLP
-has 262,144 inputs against ~3,800 training rows, so this null is partly a
-probe-capacity statement — the confound `task_hunt/RECORD.md` § 3c documents.
-Candidate 5's control worked because its constituents are 7 tokens apart rather
-than 26. An oracle-pair arm (the two constituent positions only, 8,192 features)
-was added to settle it and is queued.
+**Caveat on the layer-0 null — raised, then settled.** Unlike candidate 5,
+candidate 4's layer-0 window control showed no nonlinear headroom (`nlr`
+−0.02…+0.03). At `T = 64` the MLP has 262,144 inputs against ~3,800 training rows,
+so that null is partly a probe-capacity statement — the confound
+`task_hunt/RECORD.md` § 3c documents. Rather than read it at face value, an
+**oracle-pair** arm was added: hand the probe exactly the two mention positions
+(2·d = 8,192 features, n ≫ p), with the *linear* oracle-pair arm as the additive
+ceiling on the pair — which the theorem says must stay at chance even there.
+
+| layer | pair linear | pair MLP | pair residual | 3σ |
+|---|---|---|---|---|
+| **0** | **0.531** | **0.641** | **+0.109** | 0.085 |
+| 2 | 1.000 | 1.000 | +0.000 | 0.117 |
+| 4 | 1.000 | 1.000 | +0.000 | 0.029 |
+| 8 | 1.000 | 1.000 | +0.000 | 0.030 |
+
+**Settled: it was probe capacity.** At the embeddings the equality *is* present in
+the two mention positions, and only a cross-position nonlinearity reads it —
+linear 0.531 (chance) vs MLP 0.641, clearing the null. So the additive-code
+theorem is confirmed on real activations for **both** track-A labels, at the
+tightest available test. From layer 2 the pair is already at 1.000 linearly, i.e.
+contradiction converts even faster than agreement (L0→L2 rather than L0→L4).
+
+The methodological lesson generalises: **a null from a wide window MLP is not
+evidence of absence.** Any future card in this family must carry the oracle-pair
+arm, because without it candidate 4's layer-0 cell reads as "not represented" when
+in fact it is represented and merely unfindable at that probe width.
 
 ---
 
