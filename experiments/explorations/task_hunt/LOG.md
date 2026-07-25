@@ -3999,3 +3999,57 @@ self-proposed follow-up is real but is NOT the assignment; the panel
 is. Post the claim line, freeze the card, tsae first, per the
 briefing and its addendum. Every hour it is unclaimed is an hour off
 the only new case-study shot on the Ward side.
+
+## 2026-07-25 — mac-local — FORCE MAJEURE + THE λ-READOUT METHODS DECISION (taken): v1 REMAINS CANONICAL; probe-capacity ships as a stated, receipted limitation
+
+**Situation (operational, recorded for the program history):** the
+RunPod account exhausted funds overnight; ALL pods are down (15+ h to
+refund). Interim: ONE pod on a second account — 6× A40, 57 CPU, 300 GB
+RAM, **1 TB EPHEMERAL storage, ~$30 ≈ 12 h of funding**. Everything on
+the old volumes is LOST: every activation cache and **every model
+checkpoint** (the repo carries manifests, not weights). Everything
+committed to git survives — all label bundles, corpora, cards,
+runners, results JSONs, the leaderboard. runpod-e's in-flight fineweb
+panel cells (unpushed) are lost; its frozen card + datasource survive
+and the panel is deterministic — it restarts, it is not re-designed.
+Agents resume WITHOUT context; `briefings/a40-bootstrap.md` is the
+single entry point.
+
+**THE DECISION (mine, per the pre-registered 4-branch rule):**
+**Branch 4 fires — `lambda_recovery` v1 REMAINS the
+leaderboard-canonical λ readout through the deadline.** Grounds:
+(i) the rule's own Saturday-midday default — the mirror campaign is
+force-majeure incomplete (Stage-3 grid and mix arms lost mid-run);
+(ii) adoption's implementation is dead — the 192-cell "eval-only"
+re-run required checkpoints that no longer exist, so adopting v2 for
+the committed panels would now mean RETRAINING both panels, which
+$30 cannot buy. **This is not a verdict against v2.** The evidence in
+hand is ADOPT-consistent and is quotable as a receipted limitation:
+two independent real-panel diagnostics (runpod-d, runpod-e) plus
+runpod-b's exact-truth mirror Stage-1 receipt (v1 sags below KNOWN
+truth on 7/8 signal cells at panel-like p/n — reporting ≈ 0.08 where
+truth is 0.41; v2 within bar on 10/12; **v2 above truth on 0/12**),
+with b's own caveat that v2 is itself a LOWER bound in the
+low-truth-dense regime. **The licensed rebuttal phrasing:** absolute
+recovery levels and T-shapes under the canonical readout are
+CONSERVATIVE (probe-capacity-limited for dense codes; diagnosed on
+two panels, corroborated against exact synthetic truth); the
+window > per-token ORDERING is robust to the readout and widens under
+an adequate probe. Never quote a v2 number as canonical. Both live
+panels carry paired v1+v2 columns, so post-deadline adoption (via
+`PROBE_V2_SPEC.md`, still THE freeze candidate, pending its
+lower-bound caveat) costs those panels nothing.
+
+**Revised allocation for the 12 funded hours (supersedes nothing in
+substance — it re-hosts the locked allocation):** the two Stage-2
+panels are the ONLY GPU work. oprate (case #2) on GPUs 0–2; fineweb
+gemma-primary (case #3) on GPUs 3–5. Caches are REBUILT FIRST from
+committed builders (the datasources' input recipes are in git).
+CPU (57 cores): panel-support-audit item 1 (variance-harness
+pre-flight — unchanged, time-critical), the mirror close-out receipt
+FROM PUSHED DATA ONLY, and the RECEIPTS index. **PAUSED under force
+majeure: em-redo (runpod-c's interim rows stand, unreviewed), all
+factory builds, the mirror Stage-3 grid (closes with an honest
+coverage statement).** Push discipline on ephemeral storage: every
+completed cell batch pushes immediately; a result that exists only on
+this pod does not exist.

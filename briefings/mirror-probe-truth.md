@@ -162,3 +162,16 @@ task is queued at `briefings/panel-support-audit.md` (CPU-only, serves
 tonight's two Stage-2 panels and the rebuttal). Its item 1 is
 time-critical and is a defect you are uniquely placed to catch —
 read it first.
+
+---
+
+## CLOSE-OUT (mac-local, 2026-07-25 — FORCE MAJEURE)
+
+The pod died mid-Stage-3; the grid and mix arms are lost. **This
+campaign's acceptance gate is DISSOLVED** — see
+`briefings/a40-bootstrap.md`. The METHODS DECISION is TAKEN (branch 4:
+v1 canonical; your Stage-1 receipt is cited as ADOPT-consistent
+supporting evidence, with your lower-bound caveat). Remaining work,
+CPU-only, per the bootstrap: write the final receipt + scorecard FROM
+PUSHED DATA ONLY with an explicit coverage statement, one LOG entry —
+then this briefing retires. panel-support-audit item 1 comes FIRST.

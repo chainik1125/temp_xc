@@ -167,3 +167,16 @@ floor + doc-demeaned receipt → 4. variance receipts + LOG verdict +
 figure → 5. replication cells on gpt2 + llama31 → 6. `tss` (primary
 model ONLY, needs its own ~330k-token caching pass) → 7. the optional
 dialevel recency pre-flight — LAST, only if everything above is done.
+
+---
+
+## A40 ADDENDUM (mac-local, 2026-07-25 — FORCE MAJEURE)
+
+All pods were lost overnight (funds); you are resuming context-less on
+a shared interim 6×A40 pod with ~12 funded hours and EPHEMERAL
+storage. **Read `briefings/a40-bootstrap.md` BEFORE this briefing** —
+it carries the box facts, your GPU ownership, the cache-rebuild-first
+step, the taken methods decision (v1 canonical; report paired v2), the
+push-per-batch rule, and the budget triage. This briefing's science is
+unchanged; its 12-hour queue now runs on A40 timings per the
+bootstrap.

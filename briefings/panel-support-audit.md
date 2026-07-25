@@ -1,28 +1,29 @@
 ---
-status: queued
+status: active
 created: 2026-07-25
 for: runpod-b
 venue: runpod (32C CPU)
 ---
 
-# QUEUED — panel support + rebuttal audit (start ONLY after mirror-probe-truth closes)
+# ACTIVE — panel support + rebuttal audit (mirror gate DISSOLVED by force majeure; see a40-bootstrap.md)
 
-**You are `runpod-b`. DO NOT START THIS until
-`briefings/mirror-probe-truth.md` reaches its acceptance gate and is
-pushed** (Stage-3 grid + mix arms + Test B + final receipt/figure/
-scorecard). That campaign stays your priority; this is the queue behind
-it so you never idle. If the campaign is still running, keep running it.
+**You are `runpod-b`. START WITH ITEM 1, NOW** — the original "wait
+for the mirror gate" guard is DISSOLVED: the pod died mid-Stage-3
+(force majeure; `briefings/a40-bootstrap.md` has the full situation),
+the mirror campaign closes with a from-pushed-data-only receipt (its
+briefing's CLOSE-OUT section — do that as your item 2.5, between the
+spec caveat and the receipts index), and **the METHODS DECISION IS
+TAKEN** (LOG, 2026-07-25 force-majeure entry: v1 canonical; your
+Stage-1 receipt cited as ADOPT-consistent supporting evidence).
+References below to "whatever I decide" predate that decision — the
+spec-caveat work in item 2 is unchanged and now serves the
+post-deadline adoption path.
 
-Your increment-2 receipt is read and its ADOPT-consistent finding is
-noted; **the methods decision stays mine and is not yet taken** — it
-waits on your mix arms and the trained ladder. Nothing below assumes
-either outcome.
-
-Both H100s are committed overnight to Stage-2 panels
-(`stage2-oprate.md` = runpod-d, `stage2-fineweb.md` = runpod-e), and
-`runpod` is on the round-3 factory. Every item here is CPU-only and
-serves those panels or the rebuttal. **Ship incrementally, one LOG line
-each — items 1 and 2 are time-critical to the panels; 3 and 4 are not.**
+Both Stage-2 panels (`stage2-oprate.md` = runpod-d, `stage2-fineweb.md`
+= runpod-e) are restarting on this same pod's GPUs. Every item here is
+CPU-only and serves those panels or the rebuttal. **Ship
+incrementally, one LOG line each — item 1 is time-critical to the
+panels; the rest are not.**
 
 ## 1. FIRST, and time-critical: pre-flight the variance harness against BOTH new panels
 

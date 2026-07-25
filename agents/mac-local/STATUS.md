@@ -1,110 +1,82 @@
 # Working state — agent `mac-local`
 
-**Last rewrite:** 2026-07-25 (pre-compact; endgame allocation LOCKED).
+**Last rewrite:** 2026-07-25 (FORCE MAJEURE pivot — interim A40 pod).
 Read with `private/rebuttal_plan.md` (untracked) and the transcript.
 
 ## Who / where
 Local CC on the Mac at `~/research/projects/temp_xc`, branch `arxiv`.
 Role: orchestration + review. NEVER commit/quote `private/` content.
-Box warning: case-insensitive checkout — on phantom dirt after a pull,
+Box warning: case-insensitive checkout — phantom dirt after a pull ⇒
 `git ls-files | tr A-Z a-z | sort | uniq -d`.
 
-## THE SITUATION (endgame)
-Reviews 5/4/1, R3 swing. **Deadline 2026-07-27; check-in Sunday
-2026-07-26 10:00 PT.** Everything through the 2026-07-25 overnight
-wave is REVIEWED & APPROVED (LOG is the binding record).
+## FORCE MAJEURE (2026-07-25)
+Primary RunPod account out of funds; ALL old pods DOWN (15+ h).
+Interim: ONE pod, second account — **6× A40, 57 CPU, 1 TB EPHEMERAL,
+≈ $30 ≈ 12 h**. Old volumes LOST: all activation caches + ALL model
+checkpoints. Git survives everything committed. Agents resume
+CONTEXT-LESS; **`briefings/a40-bootstrap.md` is the single entry
+point** (identity map, GPU ownership d=0-2 / e=3-5 / b=CPU,
+cache-rebuild-first, push-per-batch, budget triage).
 
-**Scoreboard — say this precisely, it matters:**
-- **ONE confirmed TXC case study**: λ̂ backtracking (Ward, R1-Distill
-  L12). TXC-pre 0.13→0.19→0.21 over T=2/4/8 at matched budget vs
-  T-SAE 0.154, per-token 0.113; rise exact p=0.0093; pre/T8 CI now
-  [0.179,0.235] at n=6. **pre-vs-T-SAE STILL formally unbounded**
-  (tsae arm stuck at n=3 — buffer-path cost, fix refused because it
-  breaks train_key comparability). Say so in the rebuttal.
-- **ONE partial**: hedging panel NEGATIVE overall, but a bounded
-  single-point win at T4 (CIs exclude 0).
-- **FIVE Stage-1 KEEPs** (λ̂_sc, oprate ver, oprate case, qrate,
-  vslope) + tss/novelty KEEP-PENDING-REVIEW. **KEEPs license panels,
-  NOT case studies — never let "5 KEEPs" become "5 case studies".**
-- Kill table with receipts (forbidden-word, emotional, replag,
-  hedging, eqdens, vlevel, redundancy, refusal-as-posed D7…).
+**THE METHODS DECISION IS TAKEN** (LOG force-majeure entry, mine, per
+the pre-registered rule's branch 4): **v1 canonical through the
+deadline**; probe-capacity ships as a receipted limitation ("levels
+conservative — diagnosed on two panels, corroborated against exact
+synthetic truth; ordering robust, widens under an adequate probe");
+never quote v2 as canonical; both live panels carry paired columns;
+PROBE_V2_SPEC stays the post-deadline freeze candidate (needs b's
+lower-bound caveat). Grounds: rule's Saturday-midday default + the
+192-cell "eval-only" adoption path died with the checkpoints.
 
-**Program findings adopted (2026-07-25):** (1) **every window ADVANTAGE
-we have found is order-free aggregation** — g_order −0.004…+0.008
-across 5 Ward targets incl. the slope candidate; we have NOT found an
-order-sensitive window advantage. ⚠ "anywhere" was WITHDRAWN same day:
-runpod-e flagged a measured counterexample (dialevel shuffle costs
-+0.03…+0.06, 3/3 models, capacity-matched) — scoped by substrate
-(Ward≠dialogue) and by advantage (dialevel has no advantage under its
-binding control). e's hypothesis: it may be recency / distance-to-
-anchor, not sequence order. Use the amended wording in the LOG, never
-"anywhere". (2) **No card may score
-against a max-over-arms "best window"** (runpod-e) — fix probe class,
-control width, foreign-context nulls. (3) `doc_mean_only_auc` =
-disclosure statistic that TRIGGERS A CONTROL, never a kill bar.
+## THE SITUATION (endgame, unchanged in substance)
+Reviews 5/4/1, R3 swing. **Check-in Sunday 2026-07-26 10:00 PT;
+deadline 2026-07-27.** Scoreboard: **ONE confirmed case study**
+(λ̂ backtracking; pre-vs-T-SAE STILL formally unbounded — say so);
+one partial (hedging T4); five Stage-1 KEEPs + tss/novelty
+KEEP-PENDING (KEEPs are NOT case studies); kill table with receipts.
+Program findings: order-free-advantage wording (AMENDED — never
+"anywhere"; dialevel counterexample + recency hypothesis); no
+max-over-arms; doc_mean_only_auc = disclosure-triggers-control.
 
-## ⚠ LIVE ALERT (2026-07-25 review): stage2-oprate UNCLAIMED
-runpod-d never picked up its panel (its pre-compact STATUS says
-UNASSIGNED and points at a self-proposed follow-up). Directive posted
-in the LOG factory-r3 review + a banner prepended to its STATUS. Tell
-Han: when runpod-d's session resumes, it must claim stage2-oprate
-FIRST. Factory r3 (runpod) is REVIEWED & APPROVED — B8 slen is the
-instrument for the order/recency question, top of the screen queue
-when GPU frees; briefing retired, runpod IDLE.
-
-## ⏭ ALLOCATION LOCKED (Han, 2026-07-25: "breadth — two panels" + factory)
-- **runpod-d → `briefings/stage2-oprate.md`** — Stage-2 on oprate
-  (`rate_case` primary), the shot at CASE STUDY #2. Independent
-  candidate; linear pool carries the gain on Ward.
-- **runpod-e → `briefings/stage2-fineweb.md`** — Stage-2 on punctint-q
-  (primary) / tss (secondary): CASE STUDY #3 on a different corpus ×
-  3 models = the breadth axis. Doc-identity control BINDING (q is
-  0.901). Tests whether a sparse window code captures the NONLINEAR
-  gain e found on fineweb (Ward is linear; fineweb is not).
-- **runpod → `briefings/candidate-factory-broad-3.md`** — ledger
-  re-vet under the order-NEGATIVE + estimator findings, 2–3 new
-  bundles. Nothing built now can reach a panel before the deadline;
-  that is accepted (pipeline for next round).
-- **runpod-b → `briefings/mirror-probe-truth.md`** (AMENDED) — in
-  flight, nothing pushed since 21:47 on 07-24. Its plan item 1
-  (known-truth probe swept to p/n = 1.0) is the priority.
-- **runpod-c → `briefings/em-redo.md`** — em Phase A/L9 arm
-  progressing; unreviewed.
-
-**Both panels MUST carry `lambda_probe_v2` in `eval_extra`** so every
-row has paired v1+v2 columns ⇒ the methods decision never forces a
-re-run. Claim on v1 (leaderboard-canonical) until the rule fires.
+## INTERIM-POD ALLOCATION (the 12 funded hours)
+- **runpod-d** (GPUs 0–2): stage2-oprate — REBUILD Ward cache first,
+  claim, freeze card, tsae first, push per batch. Was NEVER STARTED
+  (banner on its STATUS stands).
+- **runpod-e** (GPUs 3–5): stage2-fineweb — card+datasource SURVIVE
+  in git; unpushed cells lost; rebuild gemma cache, re-claim with
+  restart note, rerun frozen panel exactly. Replication cells only
+  after receipts. Recency pre-flight CANCELLED this window.
+- **runpod-b** (CPU): panel-support-audit item 1 FIRST (variance
+  harness vs k_pos=8·T row shape — time-critical), then spec caveat,
+  then mirror CLOSE-OUT from pushed data only (gate dissolved), then
+  RECEIPTS index.
+- **PAUSED**: em-redo (c's interim rows stand, review deferred),
+  factory builds/screens, mirror Stage-3. runpod + runpod-c stay
+  down until the main account refunds.
+- Budget triage: complete-beats-partial; ~hour-8 assessment; flex GPU
+  order = e replication → d rate_ver → B8 slen screen on rebuilt
+  caches; stop the pod early if nothing useful remains.
 
 ## ⏭ MY QUEUE
-1. Review the two panels as they land (they are the rebuttal's
-   marginal content).
-2. **Methods rule fires on runpod-b's mirror receipt.** AMENDED: the
-   four branches are evaluated at **MATCHED p/n swept to 1.0**, never
-   at canonical mirror budget — b caught that my original briefing
-   would have forced a false DECLINE (p/n 0.01 vs the panel's 1.0).
-   A mirror result at p/n ≪ 0.1 fires NO branch. Branch 4 (v1 stays
-   canonical, diagnostic ships as a caveat) is the Saturday-midday
-   default and costs no headline — ordering survives under all four.
-3. **Open threat, no owner:** if per-token probes attenuate faster
-   than window probes at small corpora, every Stage-1 screen gap is
-   overstated (would touch all 5 KEEPs). Does NOT threaten Stage-2
-   panels (trained dictionaries at matched budget). Until checked,
-   quote screen gaps with the training size stated.
-4. runpod-c em-redo review when it stops.
-5. **Sunday check-in distillation** (mine): headline + receipts, the
-   two new panels, the kill table, the order-NEGATIVE finding, the
-   probe-capacity story + decision state.
-6. Keep `private/rebuttal_plan.md` current.
+1. Review panels as batches land (they are the check-in's marginal
+   content). Review b's mirror close-out + audit deliverables.
+2. **Sunday check-in distillation** (mine, before 10:00 PT):
+   headline + receipts, panel outcomes (complete or honest-partial),
+   kill table, order/recency finding (amended wording), the
+   probe-capacity story + THE TAKEN DECISION, force-majeure impact
+   statement (what was lost, what it cost, what stands).
+3. Keep `private/rebuttal_plan.md` current — add the licensed
+   probe-capacity phrasing; v1 numbers only.
+4. After refunding: un-pause em-redo review, factory, B8 screen;
+   revisit post-deadline v2 adoption via the spec.
 
 ## Standing context
-- Rebuttal-quotable: λ̂ rise (p=0.0093, v1 numbers); shuffle receipt;
-  dissection § 7; T-SAE fairness receipt; split-integrity receipt
-  (zero leakage); dip = cause-not-established (never "dilution");
-  order-NEGATIVE as an honest scope statement. **Do not type new
-  absolute panel numbers until the methods rule resolves.**
-- Key science: ambience → regimes → subtype rule → T-taxonomy; FIVE
-  g(ℓ) shapes; conversion = the recurring killer; screen↔panel
-  convention mismatch; Ward-linear vs fineweb-nonlinear window gain.
-- Platform note: "byte-identical" claims are per-platform (x86↔ARM
-  last-ulp drift seen, harmless).
-- Git: clean, pushed.
+- Rebuttal-quotable: λ̂ rise (p=0.0093, v1); shuffle receipt;
+  dissection § 7; T-SAE fairness; split-integrity zero-leakage;
+  dip = cause-not-established; order finding (amended wording);
+  probe-capacity limitation (licensed phrasing in the LOG decision
+  entry). pre-vs-T-SAE: never "significant".
+- Checkpoint-loss note: committed manifests reference weights that no
+  longer exist anywhere — any future "eval-only" plan must check
+  weight existence first.
+- Git: clean, pushed after this rewrite.

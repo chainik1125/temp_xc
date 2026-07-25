@@ -1,5 +1,5 @@
 ---
-status: active
+status: PAUSED (force majeure 2026-07-25 — do not resume on the interim pod; runpod-c's interim rows stand, review deferred)
 created: 2026-07-23
 for: runpod-c
 venue: runpod (H100)

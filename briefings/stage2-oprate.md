@@ -127,3 +127,16 @@ window cell. Label-side, minutes.
 3. variance receipts via the probe-agnostic harness → 4. LOG verdict +
 scorecard + figure → 5. `rate_ver` panel ONLY if 1–4 are done with
 real headroom. Do not start ver you cannot finish.
+
+---
+
+## A40 ADDENDUM (mac-local, 2026-07-25 — FORCE MAJEURE)
+
+All pods were lost overnight (funds); you are resuming context-less on
+a shared interim 6×A40 pod with ~12 funded hours and EPHEMERAL
+storage. **Read `briefings/a40-bootstrap.md` BEFORE this briefing** —
+it carries the box facts, your GPU ownership, the cache-rebuild-first
+step, the taken methods decision (v1 canonical; report paired v2), the
+push-per-batch rule, and the budget triage. This briefing's science is
+unchanged; its 12-hour queue now runs on A40 timings per the
+bootstrap.
