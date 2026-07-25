@@ -546,3 +546,162 @@ whose mechanism is coverage, magnitude, or selection.
   and equal steps the window path touches a different number of underlying tokens than the
   flat path. Verify token counts explicitly; this is the same class of bug as the 2026-05-05
   purified-sampling issue.
+
+---
+
+## Amendments — 2026-07-25 16:43 PDT, before `frozen.json` lands
+
+Filed after reading [[log]] through 16:40 and the realised-L0 measurement. Everything
+here is registered *before* the frozen-write arm returns. Amendment A1 **corrects a
+prediction of mine that is wrong** and that has been copied verbatim into
+`frozen_modal.py`'s docstring; it needs to change before the number is read.
+
+### A1 — `sae_frozen ≈ 0` is wrong for a *fixed* profile, and the error is large
+
+**What I got wrong.** I predicted the frozen SAE broadcast arm sits at ≈ 0 because a
+constant write is inert against a multiset-matched foil. That holds when the profile is
+**redrawn per pair** — which is what the m-sweep does, and it is why the running job sees
+broadcast at −0.04 to +0.02 with reconstruction cosine exactly 0.000. It does **not** hold
+for the frozen arm, which fixes one profile. Under the additive law the constant write
+delivers
+
+```text
+fidelity_broadcast = (Σ_t a_t π_t) / (Σ_t a_t)
+```
+
+which vanishes only if the profile is orthogonal to the position weights. The reconstruction
+cosine is exactly zero regardless — that is a statement about the *template*, not about the
+*model* — but the model does not weight positions equally, so a zero-cosine write still
+moves the margin. Over the 924 balanced profiles at `k = 12`, using the measured `a_t`:
+
+| statistic of the constant-write floor | value |
+| --- | --- |
+| mean absolute floor | 0.152 |
+| median absolute floor | 0.134 |
+| 90th percentile | 0.306 |
+| range | −0.449 to +0.449 |
+| share of profiles with abs floor > 0.20 | 31% |
+
+And the structured square waves the task family draws from are not the benign ones:
+
+| profile | floor |
+| --- | --- |
+| `ell=3`, `111000111000` | −0.216 |
+| `ell=1`, `101010101010` | −0.176 |
+| `ell=2`, `110011001100` | −0.095 |
+| `ell=6`, `111111000000` | +0.018 |
+
+**Direction of bias.** Whichever way the chosen profile happens to lean. A positive floor
+hands the SAE up to 0.45 fidelity for free and hides a real TXC advantage; a negative floor
+drives the SAE arm negative and inflates the TXC−SAE gap by as much as 0.45. It is
+profile luck, and with one fixed profile it does not average out.
+
+**Control, cheap and it improves the design.** Pick the fixed profile to be
+**a-orthogonal**: from the balanced set, choose the profile minimising `|Σ_t a_t π_t|`
+using the inline-measured `a_t`. Against last sprint's weights the best are
+`100000111110`, `011111000001`, `111100000110`, all with floor below 0.001. Then the
+constant write is genuinely inert and the null is clean.
+
+**Better still, turn it into a second instrument test** in the same spirit as the
+block-constant DoM gate. Run the frozen arm at **three** fixed profiles chosen to have
+floors of roughly −0.2, 0.0 and +0.2, and check that `sae_frozen_broadcast` tracks its
+predicted floor. Registered prediction: regression of observed broadcast fidelity on
+predicted floor gives **slope 1.0 ± 0.3, intercept within 0.05 of zero**. If it does, the
+harness is validated on a second known quantity and the TXC arm can be read against a
+floor rather than against a guess. If it does not, the additive law does not hold in this
+regime and every fidelity number in the sprint needs re-reading.
+
+**Corrected registered prediction for C2.** `sae_frozen_broadcast` = the profile's
+predicted floor, not zero. `txc_frozen` > 0.20 **and** > 0.15 above *both* its own
+selection null (A3) and the profile's constant-write floor.
+
+### A2 — realised L0 supersedes nominal k, and it settles the matching question
+
+The measurement (TXC nominal window k = 1200 → realised L0 ≈ 81; SAE nominal 100 →
+realised ≈ 98) is more consequential than a reporting fix. At T = 12 the TXC spends **81
+scalar coefficients per 12-segment window** against the SAE's **1176** — it is **14.5×
+sparser in realised coefficients**. Three consequences:
+
+- **The activation-budget objection is already dead, a fortiori.** Nobody can argue the
+  TXC won by being allowed more activations when it used a fourteenth as many. Matched
+  realised L0 therefore does not need to be *engineered*; it needs to be *reported*. No
+  retraining.
+- **Nominal k is close to inert in this regime.** ReLU, not TopK, is the binding
+  constraint (93% of the 1200 selected entries are zeroed). Registered prediction:
+  **Protocol A (window 1200) and Protocol B (window 492) will have realised L0 within 25%
+  of each other, and their fidelities within 0.05** — the two protocols being empirically
+  indistinguishable for the second time, having already been arithmetically identical at
+  T = 5.
+- **The live alternative explanation is now reconstruction, not budget.** Segment-pooled
+  activations within a document are strongly correlated, so a window-level code can exploit
+  redundancy the per-segment SAE cannot. If the TXC explains more of the data, better
+  steering follows for a reason that is not temporal structure.
+
+**Answer to "which matching is the honest headline": measure FVU first, then let its sign
+decide, and register the rule now.**
+
+- If **FVU_TXC ≥ FVU_SAE** (the TXC reconstructs no better), the headline needs no
+  engineered matching at all: *matched token-activations per step, 14.5× sparser in
+  realised coefficients, and no better at reconstruction.* That is a stronger position than
+  any matched arm could buy, and it costs one held-out evaluation.
+- If **FVU_TXC < FVU_SAE by more than 10% relative**, reconstruction quality is a live
+  confound and **matched FVU becomes the primary**, requiring one extra SAE trained at
+  reduced `k` (or a TXC at reduced `d_sae`) to equalise it.
+
+Report FVU as **per-segment** squared error over per-segment variance on the same held-out
+segment-pooled vectors for both architectures — the segment-pooling decision makes the two
+exactly comparable, which is worth saying out loud since it is not usually true. Realised
+L0 goes in the same table either way; nominal k should not appear in the summary at all.
+
+### A3 — the selection null must be frequency-matched among alive latents
+
+At realised L0 ≈ 81 out of `d_sae = 4096`, roughly 98% of latents are inactive on any given
+window. A uniformly drawn random latent is therefore very likely to be near-dead, and a
+near-dead latent's decoder row has received little gradient — it is close to its
+initialisation. A null built from those rows is a **random-untrained-direction** null, which
+is far too weak, and it makes my own "> 0.15 above null" bar trivially passable.
+
+**Control.** Draw the null from latents **matched in activation frequency** to the selected
+one (same frequency decile over the selection split), and store, for the selected latent and
+every null draw: latent index, activation frequency, mean active magnitude, and decoder-row
+norms per position. Registered prediction: the frequency-matched null floor will be **at
+least 2× the uniform-random null floor** for the TXC, and the uniform-random null will be
+close to zero for the wrong reason.
+
+### A4 — one arm missing: the fitted-once schedule, as a ceiling rather than a competitor
+
+The frozen arm asks whether a decoder can *supply* a schedule. The natural upper bound on
+that is a schedule that was **fitted once, offline, and then also frozen**: one SAE latent,
+`T` per-position coefficients fitted on the selection split, applied unchanged to every
+test episode. It costs zero episode-time knobs, exactly like the TXC arm, and `T` offline
+parameters instead of one.
+
+It is not a fair competitor — it is supervised where the TXC's schedule is unsupervised —
+which is precisely why it is the right ceiling, and it gives the sprint the number that
+actually answers its question: **what fraction of the offline-fitted ceiling does an
+unsupervised temporal decoder recover?** Registered prediction: the fitted-once arm beats
+`txc_frozen`, and the ratio `txc_frozen / fitted_once` lands between 0.3 and 0.8. Below
+0.3, the temporal dictionary is a poor way to store a schedule; above 0.8, it is close to
+free.
+
+### A5 — one fixed profile is one draw from a distribution I can now quantify
+
+The frozen arm as described fixes a single target profile, so its fidelity is a single
+sample from a distribution whose spread A1 quantifies (the constant-write component alone
+ranges over ±0.45). Three profiles is the minimum that lets the result be reported as a
+property of the dictionary rather than of a profile, and A1's floor-tracking test needs
+three anyway. If only one profile fits the compute window, the summary must say the number
+is single-profile and quote its floor alongside.
+
+### What I will check in `frozen.json`, pre-committed
+
+In this order, and I will report anything here that is missing as a blocker rather than a
+nit: `harness_ok` passed in the same job, with predicted-versus-observed per block width;
+the fixed profile(s) stored, with `a_t` and the implied constant-write floor; the selected
+latent's index, activation frequency and per-position decoder-row norms; the null draws
+with their frequencies (A3); confirmation that the global scalar and the global sign were
+chosen on the **selection split** and not on eval; per-pair deltas for every arm; the
+paired ratio to `Δ_full` on the same eval pairs; the target-side and foil-side components
+of Δmargin separately; realised L0 and per-segment FVU for both dictionaries; and the
+`m = 0` arm. The first number I will compute is `txc_frozen` minus the larger of its
+frequency-matched null and the profile's constant-write floor.

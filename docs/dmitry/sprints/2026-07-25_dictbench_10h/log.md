@@ -24,6 +24,28 @@ Our steering acts on sentence segments, so T = number of sentences and activatio
 mean-pooled within each sentence. A TXC latent then owns a k-segment pattern that lines up
 exactly with what the steering harness writes, with no resampling between train and eval.
 
+### 16:33 — harness agent's report, and the fairness bug it caught
+
+`harness_guide.md` delivered, and it caught the thing most likely to have invalidated the
+whole benchmark:
+
+> At equal `batch_size` and equal steps, the TXC sees T× more token-activations than the
+> SAE. `gen_flat` yields `(B, d)` = B tokens; `gen_windows[T]` yields `(B, T, d)` = B·T
+> token-slots. Nothing in the harness corrects for this.
+
+It also connects this to the project's own history — the 2026-05-05 purified-sampling fix,
+where an SAE was getting ~25× more tokens/step than the TXC it was compared against. Same
+bug class, opposite direction. My smoke had exactly this defect (SAE 256 tokens/step vs TXC
+3072). **Fixed: the SAE's batch is now T× the TXC's, so both consume the same
+token-activations per step, and both totals are printed.**
+
+Three more traps from the same report, all now handled: `k` is multiplied by T inside the
+crosscoder constructor (so `window_l0` is per window, not per token); protocols A and B are
+**numerically identical at T=5** and the module docstring contradicts the code, so T must
+differ from 5 for the two arms to be distinct (we use T=12: A → per-position k=100/window
+1200, B → k=41/window 492); and `CrosscoderSpec.decoder_directions()` returns a live
+autograd view while the SAE's returns `.data`.
+
 ### 16:35 — smoke passed as plumbing, and killed my first measurement design
 
 Ran the end-to-end smoke (240 docs, d_sae=512, 400 steps, topk=8) before anything long.
@@ -74,28 +96,6 @@ schedule)**, with each architecture given its *best* allocation of the m scalars
 crisp linear-algebra claim rather than a vibe, and it makes the SAE baseline as strong as
 it can be, which is the point. Using signed least-squares coefficients also dissolves the
 sign bug above — orientation is now something the fit chooses, not something I hand-set.
-
-### 16:33 — harness agent's report, and the fairness bug it caught
-
-`harness_guide.md` delivered, and it caught the thing most likely to have invalidated the
-whole benchmark:
-
-> At equal `batch_size` and equal steps, the TXC sees T× more token-activations than the
-> SAE. `gen_flat` yields `(B, d)` = B tokens; `gen_windows[T]` yields `(B, T, d)` = B·T
-> token-slots. Nothing in the harness corrects for this.
-
-It also connects this to the project's own history — the 2026-05-05 purified-sampling fix,
-where an SAE was getting ~25× more tokens/step than the TXC it was compared against. Same
-bug class, opposite direction. My smoke had exactly this defect (SAE 256 tokens/step vs TXC
-3072). **Fixed: the SAE's batch is now T× the TXC's, so both consume the same
-token-activations per step, and both totals are printed.**
-
-Three more traps from the same report, all now handled: `k` is multiplied by T inside the
-crosscoder constructor (so `window_l0` is per window, not per token); protocols A and B are
-**numerically identical at T=5** and the module docstring contradicts the code, so T must
-differ from 5 for the two arms to be distinct (we use T=12: A → per-position k=100/window
-1200, B → k=41/window 492); and `CrosscoderSpec.decoder_directions()` returns a live
-autograd view while the SAE's returns `.data`.
 
 ### 16:37 — mini-validation, and a structural result falls out for free
 
@@ -158,8 +158,57 @@ noise and the least-squares solve degenerates. It should return an exact zero wr
 "degenerate" flag rather than NaN. The arm is structurally zero regardless, so this
 changes presentation and not conclusions.
 
+### 16:47 — the harness gate "failed", and the honest reading is that my threshold was too tight
+
+The block-constant DoM check at ℓ=1: the three structurally-zero cells (W=2, 4, 6) came
+out **exactly** 0.000, which validates the plumbing. The single fractional cell, W=3,
+predicted 0.333 and observed 0.218 — error 0.115, above my 0.08 gate, so the job printed
+FAIL.
+
+Checking that against the previous sprint's own measurement of the *same* cell:
+**1.5B observed 0.249 (error 0.084), 7B observed 0.355 (error 0.022)**, and that sprint
+reported a max cell error of 0.127 across its grid. So 0.218 sits inside the law's
+demonstrated spread rather than outside it. The gate was calibrated tighter than the law's
+own precision, on a profile (ℓ=1 at k=12) that offers exactly **one** fractional cell to
+test. Reported as "instrument consistent with the law to within its known scatter, on a
+one-cell test", not as a pass, and ℓ=3 gives more cells to check against.
+
 **Realised sparsity is not nominal sparsity.** TopK is applied as `scatter(relu(topk))`,
 so ReLU zeroes much of what TopK selected: TXC nominal window k=1200 → realised L0 ≈ 81,
 SAE nominal 100 → realised ≈ 98. Under Protocol A the TXC is therefore *sparser per slot*
 (≈6.8) than the SAE is per token (≈98), which inverts the protocol's stated intent.
 Realised L0 will be reported instead of nominal k.
+### 16:48 — THE DECISIVE CONTROL: shuffling the TXC's temporal structure does not hurt it
+
+| m | txc | txc **shuffled in time** | txc random slabs |
+| --- | --- | --- | --- |
+| 1 | 0.224 | **0.296** | −0.003 |
+| 2 | 0.309 | **0.345** | 0.012 |
+| 4 | 0.365 | **0.458** | 0.028 |
+| 8 | 0.502 | **0.541** | 0.059 |
+| 16 | 0.686 | 0.647 | 0.061 |
+
+`txc_shuffled` takes the *learned* atoms and permutes their k rows in time — every
+per-slot direction and every norm preserved exactly, only the temporal arrangement
+destroyed. It **matches or beats the intact TXC at four of five budgets.**
+
+Read together with the random-slab arm, this is a clean decomposition:
+
+- **Learned content is essential.** Random unit-norm slabs with identical coverage and
+  norm structure give ≈ 0 (−0.003 to 0.061). So the TXC is not winning on geometry.
+- **The temporal arrangement of that content is not doing the work.** Scrambling which
+  slot each learned row lands on costs nothing.
+
+So what a TXC latent buys here is *useful direction content at every slot for one
+scalar* — coverage and content — and **not** a learned temporal shape. That is the
+sprint's question answered, in the negative, by the control the pre-registration demanded.
+
+**At matched scalar count the SAE is not behind.** Counting scalars honestly, the
+per-slot-coefficient SAE spends 12 to reach 0.627, while the TXC needs ~12 (interpolating
+m=8 → 16) to reach ≈0.59. The TXC's apparent efficiency was an artefact of counting one
+scalar per latent while letting each latent write twelve slots.
+
+**And coverage is now visible directly**, since the arm logs it: `sae_perpos` coverage
+runs 0.08 → 0.17 → 0.33 → 0.67 → 1.00 as m goes 1 → 16, tracking fidelity 0.160 → 0.556
+almost exactly. C1 was right, and it is now measured rather than argued.
+
