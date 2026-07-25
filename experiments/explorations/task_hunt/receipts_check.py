@@ -451,6 +451,28 @@ def build_receipts():
                 ("t8v2", 0.066, 3), ("t8v2_lo", 0.050, 3)],
         got={"t4": p4["mean"], "t4_lo": p4["t_ci95"][0],
              "t8v2": p8v2["mean"], "t8v2_lo": p8v2["t_ci95"][0]}))
+
+    lv = _j("support_stats/stage2_variance_qrate_llama31.json")
+    lv2 = _j("support_stats/stage2_variance_qrate_llama31_v2.json")
+    l4 = lv["paired"]["txc_pre_minus_tsae"]["by_T"]["T4"]
+    l8 = lv["paired"]["txc_pre_minus_tsae"]["by_T"]["T8"]
+    l4v2 = lv2["paired"]["txc_pre_minus_pertoken"]["by_T"]["T4"]
+    R.append(dict(
+        id="R19",
+        artifact="support_stats/stage2_variance_qrate_llama31[_v2].json",
+        key="paired.txc_pre_minus_tsae.by_T.{T4,T8} v1; "
+            "txc_pre_minus_pertoken.T4 v2",
+        claim="fineweb replication, llama31-8b (per-model NEGATIVE as "
+              "scored, replication-T scope): pre−tsae −0.018 (T4) and "
+              "−0.014 (T8) on v1 — the strong token code wins at the "
+              "canonical readout; paired v2 pre−pertoken +0.033 "
+              "[0.013, 0.052] at T4 (bounded) — and the llama TOKEN "
+              "archs DROP under v2 (tsae 0.256→0.197), the inversion "
+              "flagged for the post-deadline probe review",
+        checks=[("t4", -0.018, 3), ("t8", -0.014, 3),
+                ("t4v2", 0.033, 3), ("t4v2_lo", 0.013, 3)],
+        got={"t4": l4["mean"], "t8": l8["mean"],
+             "t4v2": l4v2["mean"], "t4v2_lo": l4v2["t_ci95"][0]}))
     return R
 
 

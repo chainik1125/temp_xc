@@ -895,5 +895,44 @@
     "train_cached": false,
     "eval_cached": false,
     "ok": true
+  },
+  {
+    "ds": "fineweb_punctint_q_llama31_l14",
+    "arch": "tsae",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 758272,
+    "eval_extra": {
+      "lambda_probe_v2": true,
+      "lambda_v2_probe": "ridge",
+      "lambda_v2_n_windows": 8192,
+      "lambda_v2_split": "trace"
+    },
+    "metrics": {
+      "eauc": 0.5924999713897705,
+      "e_mean_max_cos": 0.5941038131713867,
+      "e_frac_recovered_90": 0.125,
+      "e_frac_recovered_80": 0.125,
+      "nmse": 0.5104914613890398,
+      "l0_per_window": 6.115203857421875,
+      "l0_per_token": 6.115203857421875,
+      "lambda_recovery": 0.24142397432142,
+      "lambda_r2": 0.047983407974243164,
+      "lambda_chance": -0.020827104927929257,
+      "lambda_recovery_v2": 0.20165192479546074,
+      "lambda_r2_v2": 0.03314918279647827,
+      "lambda_chance_v2": 0.04909052022562263,
+      "lambda_alpha_v2": 100.0,
+      "lambda_v2_n_train_rows": 231760.0,
+      "lambda_v2_n_eval_rows": 233074.0
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
   }
 ]

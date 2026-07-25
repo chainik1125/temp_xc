@@ -29,7 +29,7 @@ Breadth question answered as model-heterogeneous; written as an
 honest instrumented negative, not softened.
 
 **PENDING (small, non-blocking):**
-1. llama tsae/T1/s42 pole (task bk2yky1p2, GPU 5; ~3h/cell, due
+1. DONE — llama 24/24; harness v1+v2 committed; NEGATIVE unchanged at n=3 (LOG amendment); R19 ALL PASS.
    ~22:20). When it lands: llama harness v1+v2 per PANEL_RECIPES,
    one-paragraph amendment to the final addendum (tsae n=2 → n=3),
    llama RECEIPTS row, push. If the pod dies first: the n=2

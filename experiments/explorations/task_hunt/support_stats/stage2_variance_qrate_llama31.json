@@ -1,0 +1,367 @@
+{
+ "datasource": "fineweb_punctint_q_llama31_l14",
+ "metric": "lambda_recovery",
+ "seeds": [
+  1,
+  2,
+  42
+ ],
+ "source": {
+  "leaderboard_rows": 24,
+  "crosscheck_vs_stage2_json": "exact (all 24 cells)",
+  "probe": "v1",
+  "row_layout": "paired",
+  "k_pos": 8,
+  "post_k_rule": "times-T",
+  "seed_population": [
+   1,
+   2,
+   42
+  ]
+ },
+ "per_seed": {
+  "trained": {
+   "batchtopk_sae/T1": {
+    "1": 0.2485471231645238,
+    "2": 0.21038822175098354,
+    "42": 0.22943459175512113
+   },
+   "tsae/T1": {
+    "1": 0.2690746694610753,
+    "2": 0.2565875618241789,
+    "42": 0.24142397432142
+   },
+   "txc_batchtopk_pre/T4": {
+    "1": 0.2163713149272032,
+    "2": 0.2565830711163533,
+    "42": 0.24066582089904592
+   },
+   "txc_batchtopk_pre/T8": {
+    "1": 0.21985401358686182,
+    "2": 0.2835735512298713,
+    "42": 0.22284834269833803
+   }
+  },
+  "untrained": {
+   "batchtopk_sae/T1": {
+    "1": 0.01510959993671434,
+    "2": 0.027810472596468325,
+    "42": 0.02427376422676747
+   },
+   "tsae/T1": {
+    "1": 0.01510959993671434,
+    "2": 0.027810472596468325,
+    "42": 0.02427376422676747
+   },
+   "txc_batchtopk_pre/T4": {
+    "1": 0.03611462473027078,
+    "2": 0.029551115711604937,
+    "42": 0.022987937436566755
+   },
+   "txc_batchtopk_pre/T8": {
+    "1": 0.006466761317049684,
+    "2": 0.020792243393387394,
+    "42": 0.035510325309320204
+   }
+  },
+  "l0_trained": {
+   "batchtopk_sae/T1": {
+    "1": 4.572296142578125,
+    "2": 4.31658935546875,
+    "42": 4.274993896484375
+   },
+   "tsae/T1": {
+    "1": 5.93218994140625,
+    "2": 6.70672607421875,
+    "42": 6.115203857421875
+   },
+   "txc_batchtopk_pre/T4": {
+    "1": 7.2620849609375,
+    "2": 7.55322265625,
+    "42": 7.548614501953125
+   },
+   "txc_batchtopk_pre/T8": {
+    "1": 7.78961181640625,
+    "2": 7.854888916015625,
+    "42": 7.722686767578125
+   }
+  }
+ },
+ "cell_ci95_trained": {
+  "batchtopk_sae/T1": {
+   "mean": 0.22945664555687617,
+   "sd": 0.01907946026620512,
+   "t_ci95": [
+    0.18206063878975404,
+    0.2768526523239983
+   ]
+  },
+  "tsae/T1": {
+   "mean": 0.25569540186889134,
+   "sd": 0.013846920143696328,
+   "t_ci95": [
+    0.22129774534833999,
+    0.29009305838944266
+   ]
+  },
+  "txc_batchtopk_pre/T4": {
+   "mean": 0.23787340231420084,
+   "sd": 0.020250790975136112,
+   "t_ci95": [
+    0.187567648760092,
+    0.2881791558683097
+   ]
+  },
+  "txc_batchtopk_pre/T8": {
+   "mean": 0.24209196917169037,
+   "sd": 0.035955288056754006,
+   "t_ci95": [
+    0.1527740821730615,
+    0.33140985617031926
+   ]
+  }
+ },
+ "paired": {
+  "txc_pre_minus_tsae": {
+   "reference": "tsae/T1",
+   "reference_per_seed": {
+    "1": 0.2690746694610753,
+    "2": 0.2565875618241789,
+    "42": 0.24142397432142
+   },
+   "by_T": {
+    "T4": {
+     "per_seed": {
+      "1": -0.052703354533872065,
+      "2": -4.490707825599571e-06,
+      "42": -0.0007581534223740638
+     },
+     "mean": -0.017821999554690576,
+     "sd": 0.030210489829851767,
+     "t_ci95": [
+      -0.09286901663147516,
+      0.05722501752209401
+     ],
+     "bca_ci95": [
+      -0.052703354533872065,
+      -0.00025571161267508763
+     ],
+     "bca_atoms": 27,
+     "p_signflip_one_sided": 1.0,
+     "signflip_patterns": 8,
+     "r_between_arms": -0.5542611887893067,
+     "sd_if_independent": 0.024532259019188537
+    },
+    "T8": {
+     "per_seed": {
+      "1": -0.049220655874213454,
+      "2": 0.026985989405692412,
+      "42": -0.018575631623081956
+     },
+     "mean": -0.013603432697200999,
+     "sd": 0.03834586376420863,
+     "t_ci95": [
+      -0.10885983896351213,
+      0.08165297356911012
+     ],
+     "bca_ci95": [
+      -0.049220655874213454,
+      0.026985989405692412
+     ],
+     "bca_atoms": 27,
+     "p_signflip_one_sided": 0.75,
+     "signflip_patterns": 8,
+     "r_between_arms": 0.014175054549295239,
+     "sd_if_independent": 0.038529468419770084
+    }
+   }
+  },
+  "txc_pre_minus_pertoken": {
+   "reference": "batchtopk_sae/T1",
+   "reference_per_seed": {
+    "1": 0.2485471231645238,
+    "2": 0.21038822175098354,
+    "42": 0.22943459175512113
+   },
+   "by_T": {
+    "T4": {
+     "per_seed": {
+      "1": -0.03217580823732058,
+      "2": 0.04619484936536977,
+      "42": 0.011231229143924798
+     },
+     "mean": 0.008416756757324664,
+     "sd": 0.0392610612997246,
+     "t_ci95": [
+      -0.08911312622066266,
+      0.10594663973531197
+     ],
+     "bca_ci95": [
+      -0.03217580823732058,
+      0.04619484936536977
+     ],
+     "bca_atoms": 27,
+     "p_signflip_one_sided": 0.375,
+     "signflip_patterns": 8,
+     "r_between_arms": -0.9929631315130011,
+     "sd_if_independent": 0.027823018153470592
+    },
+    "T8": {
+     "per_seed": {
+      "1": -0.028693109577661968,
+      "2": 0.07318532947888778,
+      "42": -0.0065862490567830945
+     },
+     "mean": 0.01263532361481424,
+     "sd": 0.053590164471915024,
+     "t_ci95": [
+      -0.12049002492877257,
+      0.14576067215840105
+     ],
+     "bca_ci95": [
+      -0.021324156070702344,
+      0.07318532947888778
+     ],
+     "bca_atoms": 27,
+     "p_signflip_one_sided": 0.5,
+     "signflip_patterns": 8,
+     "r_between_arms": -0.8856296781239065,
+     "sd_if_independent": 0.04070391312016398
+    }
+   }
+  }
+ },
+ "trend": {
+  "txc_pre_trend": {
+   "skipped": "frozen 2->8 trend undefined: txc_batchtopk_pre present at T=[4, 8] only \u2014 a trend statistic over 2 T value(s) has no within-seed permutation resolution; the cells themselves are reported in the per-seed / paired sections"
+  }
+ },
+ "margin_trained_minus_untrained": {
+  "batchtopk_sae/T1": {
+   "per_seed": {
+    "1": 0.23343752322780945,
+    "2": 0.18257774915451522,
+    "42": 0.20516082752835366
+   },
+   "mean": 0.2070586999702261,
+   "sd": 0.025482947132363775,
+   "t_ci95": [
+    0.14375554999218132,
+    0.2703618499482709
+   ],
+   "bca_ci95": [
+    0.18257774915451522,
+    0.23343752322780945
+   ],
+   "bca_atoms": 27,
+   "p_signflip_one_sided": 0.125,
+   "signflip_patterns": 8
+  },
+  "tsae/T1": {
+   "per_seed": {
+    "1": 0.25396506952436093,
+    "2": 0.2287770892277106,
+    "42": 0.21715021009465252
+   },
+   "mean": 0.23329745628224133,
+   "sd": 0.01881910618063629,
+   "t_ci95": [
+    0.186548204917489,
+    0.28004670764699363
+   ],
+   "bca_ci95": [
+    0.22102583647233853,
+    0.25396506952436093
+   ],
+   "bca_atoms": 27,
+   "p_signflip_one_sided": 0.125,
+   "signflip_patterns": 8
+  },
+  "txc_batchtopk_pre/T4": {
+   "per_seed": {
+    "1": 0.18025669019693244,
+    "2": 0.22703195540474838,
+    "42": 0.21767788346247918
+   },
+   "mean": 0.20832217635471997,
+   "sd": 0.02475132926592046,
+   "t_ci95": [
+    0.14683646590929733,
+    0.2698078868001426
+   ],
+   "bca_ci95": [
+    0.18025669019693244,
+    0.223913931423992
+   ],
+   "bca_atoms": 27,
+   "p_signflip_one_sided": 0.125,
+   "signflip_patterns": 8
+  },
+  "txc_batchtopk_pre/T8": {
+   "per_seed": {
+    "1": 0.21338725226981214,
+    "2": 0.2627813078364839,
+    "42": 0.18733801738901784
+   },
+   "mean": 0.22116885916510465,
+   "sd": 0.038318893157159806,
+   "t_ci95": [
+    0.12597945160087232,
+    0.316358266729337
+   ],
+   "bca_ci95": [
+    0.19602109568261594,
+    0.2627813078364839
+   ],
+   "bca_atoms": 27,
+   "p_signflip_one_sided": 0.125,
+   "signflip_patterns": 8
+  }
+ },
+ "power": {
+  "signflip_min_seeds_for_p05": 5,
+  "txc_pre_minus_tsae": {
+   "T4": {
+    "observed_mean": -0.017821999554690576,
+    "observed_sd": 0.030210489829851767,
+    "n_for_95_lower_bound_gt0": null,
+    "n_for_80pct_power_t05": null
+   },
+   "T8": {
+    "observed_mean": -0.013603432697200999,
+    "observed_sd": 0.03834586376420863,
+    "n_for_95_lower_bound_gt0": null,
+    "n_for_80pct_power_t05": null
+   }
+  },
+  "txc_pre_minus_pertoken": {
+   "T4": {
+    "observed_mean": 0.008416756757324664,
+    "observed_sd": 0.0392610612997246,
+    "n_for_95_lower_bound_gt0": null,
+    "n_for_80pct_power_t05": null
+   },
+   "T8": {
+    "observed_mean": 0.01263532361481424,
+    "observed_sd": 0.053590164471915024,
+    "n_for_95_lower_bound_gt0": 51,
+    "n_for_80pct_power_t05": null
+   }
+  },
+  "recommendation": {
+   "criterion": "one-sided 95% t lower bound > 0 on the paired TXC-pre - T-SAE diff at T = 8, AND exact sign-flip attainability (2^-n <= 0.05)",
+   "seeds_total_needed": null,
+   "extra_seeds": null,
+   "cells": null,
+   "T4_not_cheaply_boundable": {
+    "n_for_95_lower_bound_gt0": null,
+    "n_for_80pct_power_t05": null
+   }
+  }
+ },
+ "honesty": [
+  "n = 3 seeds: the exact one-sided sign-flip permutation test cannot report p < 1/8 = 0.125; treat p = 0.125 as 'the paired direction is consistent in all 3 seeds', not as significance.",
+  "The exact bootstrap distribution of a 3-value mean has 27 atoms (<= 10 distinct values); BCa endpoints are coarse and cannot extend past the extreme seed values.",
+  "Pairing by seed was the right design a priori, but it bought no variance reduction here: at the T8 headline cell the across-seed correlation between the TXC-pre and T-SAE arms is r = 0.01, so the paired sd (0.0383) is not below the independent-arms value (0.0385). The cross-arch margin is therefore NOT bounded away from 0 at n = 3; the receipts that ARE significant at n = 3 are within-arch: the T = 2->8 rise and the trained-untrained margins (paired by seed WITHIN an arch, where the pairing does bind)."
+ ]
+}

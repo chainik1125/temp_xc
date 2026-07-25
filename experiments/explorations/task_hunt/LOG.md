@@ -4583,3 +4583,15 @@ commit c8ab5fa0 documented above; no number in this entry depends on
 it.
 
 _Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb final)_
+
+## 2026-07-25 — runpod-e — AMENDMENT to the final verdict: llama tsae pole landed (24/24); NEGATIVE scoring UNCHANGED at full n
+
+tsae/T1/s42 trained = 0.241 → tsae n = 3 mean 0.2557 (was 0.2628 at
+the disclosed n = 2). Harness (crosscheck exact, 24/24): pre−tsae
+−0.0178 at T4 and −0.0136 at T8 — both ≤ +0.02, the per-model
+NEGATIVE stands exactly as written; every other number in the final
+verdict is unchanged. llama replication population is COMPLETE; the
+n = 2 disclosure is discharged. Receipts: R19 added
+(stage2_variance_qrate_llama31[_v2]), ALL PASS.
+
+_Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb close)_
