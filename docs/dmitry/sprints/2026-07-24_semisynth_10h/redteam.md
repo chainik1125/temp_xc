@@ -6,436 +6,392 @@ tags:
   - complete
 ---
 
-## Scope and verdict
+## Scope
 
-Adversarial read of [[summary]] as of the 22:42 revision (commit `f4565908`), against the
-raw JSONs in `results/temporal_screen/`, the experiment code in
-`experiments/temporal_screen/trajectory_steering/`, and the figures in
-`plots/2026-07-24_trajectory_steering/`.
+Adversarial read of [[summary]] **as revised at 22:42+ after the round-2 audit** (529-word
+executive summary, five findings, superadditivity retracted), against the raw JSONs in
+`results/temporal_screen/`, the code in `experiments/temporal_screen/trajectory_steering/`,
+and the figures in `plots/2026-07-24_trajectory_steering/`. An earlier version of this file
+audited the 22:36 draft; everything below targets the current text.
 
-**Verdict.** The core result is real and the document is unusually honest for a 10-hour
-sprint — the cell audit in finding 1 and the fixed-Hamming retraction are the kind of
-self-correction most write-ups omit. But the honesty is applied unevenly. Three things
-would sink it with a hostile reviewer who has repo access:
+## Verdict
 
-1. The cell audit **undercounts by five**. Eighteen of the 24 cells are fixed by
-   construction, not thirteen, so the advertised "11 measured cells, mean error 0.029" is
-   still inflated and the figure's own hatching is wrong.
-2. Finding 2's headline (`W* ≈ ℓ`) is **contradicted by panel B of its own figure**, which
-   puts the ℓ=2 star at W=6.
-3. `results/temporal_screen/stance_gen.json` — the harness built specifically to check
-   finding 3 — contains a **null result and a failed pre-check that the summary does not
-   mention**. This is the only item I would call an integrity problem rather than a
-   presentation problem.
+The revision fixed most of what I had found. The cell census is now correct (18 identities:
+9 where W divides ℓ, 9 zero-write — this matches my independent count exactly), the inflated
+"11 measured cells / 0.029" headline is gone, the direction is honestly renamed, the exec
+summary is under budget, and the reframing of finding 1 as *a test of linearity* is a real
+intellectual improvement rather than a hedge. Twenty-one of the twenty-five numbers I could
+check reproduce exactly, including several I expected to be loose (the 0.079 noise floor, the
+1.9σ outlier cell, `P(decline | just helped) = 0.026`, the 10.4 → 7.0 per-differing-slot
+decline, which I confirmed analytically using `E[Hamming | foil ≠ target]` = 2 and 4.058).
 
-Numbers are otherwise in good shape: I checked 41 cited figures and 37 reproduce exactly.
-Four do not (details below).
+Three things now stand between this and a clean review, in order:
 
-## Step 1 — every number, checked
+1. **Finding 4 does not survive a control that is already in its own results file.** Scored
+   against the m=0 cell that `entrain2_modal.py` computes for exactly this purpose, the
+   period-2 entrainment effect is **+0.002**, not +0.208. Details below; this is new since my
+   first pass and it is the most important item in this report.
+2. **The figures were not regenerated after the round-2 revision.** `phase_diagram.png` is
+   timestamped 22:38, before the rewrite. Its panel A still reads *"11 measured cells, no
+   fitted parameters, mean |error| = 0.029"* — the exact claim the revision retracted. The
+   headline figure now contradicts the corrected text.
+3. **`stance_gen.json` is still undisclosed, and the revision made it load-bearing.** The new
+   "two limits" paragraph quotes `P(help | just declined) = 0.87` from the classifier the log
+   flagged as artifact-prone, and the three-way re-check built to replace it returned 10%
+   coverage and zero measurable transitions.
 
-Reproduce with `uv run python` against the JSONs named in each row.
+## Step 1 — numbers in the current draft
 
 ### Verified correct
 
-| claim in `summary.md` | source | value on disk |
+| claim | source | value on disk |
 | --- | --- | --- |
-| mean abs error 0.029 / 0.025 over 11 cells | `lsweep_qwen1.5b/7b.json` | 0.02874 / 0.02456 |
-| 0.053 / 0.045 over 6 fractional cells | same | 0.05269 / 0.04502 |
-| cap predicts 0.667, RMS 0.816, measured 0.628 and 0.641 | same | 0.62774, 0.64062 |
-| ℓ=6: W=6 → 1.00 beats W=4 → 0.64 | same | 1.0000, 0.64062 |
-| σ₁ = 89% of the energy | `controls.json` | 0.89245 raw, 0.89376 unit rows |
-| stance choice-shift 96.9% vs 51.2% | `controls.json` | 0.96875, 0.51250 (both at frac 0.5) |
-| teacher-forced +20.7 → +28.6, constant ≈ 0 | `stance.json` | 20.729, 20.658, 23.890, 28.584; −0.16, −0.45, +0.16, +0.53 |
-| random direction does nothing at any length | `stance.json` | 1.17±1.07, 0.78±1.38, 0.23±1.29, −0.15±1.24 |
-| fixed-Hamming +71.8, +80.8, +79.6, +78.0, +77.5 | `controls.json` | 71.745, 80.843, 79.605, 77.976, 77.452 |
-| scramble +29.0 → −2.3 (W=4), +55.3 → −1.2 (W=8) | `convex.json` | 28.987 → −2.251; 55.326 → −1.153 (frac 0.35) |
-| contiguous +18.94 ± 2.40 vs scattered +17.42 ± 2.81 | `lsweep_qwen1.5b.json` | 18.9431 ± 2.3960, 17.4187 ± 2.8052 |
-| 7B +16.76 vs +13.79 | `lsweep_qwen7b.json` | 16.7567, 13.7920 |
-| S = +3.6 and +4.5 at W = 4, 8 | `convex.json` | 3.5611, 4.4750 (frac 0.35) |
-| period-2 +0.208 ± 0.045 (t=4.6), +0.221 ± 0.058 at W=4 | `entrain2.json` | +0.2085 ± 0.0451 (t=4.62), +0.2213 ± 0.0584 (t=3.79) |
-| unpredictable families \|t\| ≤ 1.3 | `entrain2.json` | iid max 0.97, balanced max 1.31 |
-| i.i.d. 0.470–0.528 against nulls 0.496–0.501 | `entrain2.json` | exact |
-| balanced null is 0.400 | `entrain2.json` | 0.400, 0.401, 0.401, 0.399 |
-| graded L1 −5.06, L2 −7.35, L4 +3.49, L5 +2.94 | `graded.json` | −5.0628, −7.3536, +3.4884, +2.9367 |
-| binary +15.0 versus graded +11.8; flipped −16.2 | `graded.json` | 15.0305, 11.8286, −16.2333 |
+| 0.053 (1.5B) / 0.045 (7B) over six informative cells | `lsweep_qwen1.5b/7b.json` | 0.05269 / 0.04502 |
+| 18 identity cells: 9 with W \| ℓ, 9 zero-write; all 18 pass | same | confirmed — 9 cells store the *identical float* as `full_peak`, 9 store exactly 0.0 |
+| noise floor near 0.079 | same | mean SEM(R) over the six cells = 0.0790 (7B: 0.0802) |
+| ℓ=3, W=4 undershoots at 1.9σ, the only visible departure | same | 1.86σ; next largest is 1.26σ |
+| 96.9% vs 51.2% | `controls.json` | 0.96875 / 0.51250 (both at frac 0.5) |
+| cosine 0.108 vs 0.026 expected in 1536 dims | `stance.json` | 0.10828; 1/√1536 = 0.02552; r² = 1.2% |
+| P(decline \| just helped) = 0.026 | `stance.json` | 1/(1+38) = 0.0256 |
+| +71.8 → +77.5 fixed-Hamming | `controls.json` | 71.745 → 77.452 |
+| per-differing-slot 10.4 → 7.0 | `stance.json` | 20.729/2 = 10.36; 28.584/4.058 = 7.04 |
+| +0.208 ± 0.045, t = 4.6 | `entrain2.json` | +0.2085 ± 0.0451, t = 4.62 |
+| nulls 0.400 and 0.500; i.i.d. 0.470–0.528 vs 0.496–0.501 | `entrain2.json` | exact — and I reproduced all eight nulls in closed form, no Monte Carlo; they are right |
+| +55.3 → −1.2 scramble | `convex.json` | 55.326 → −1.153 (frac 0.35) |
+| +18.94 ± 2.40 vs +17.42 ± 2.81; 7B +16.76 vs +13.79 | `lsweep_*.json` | exact |
+| σ₁ = 89% | `controls.json` | 0.89245 raw / 0.89376 unit rows |
+| S = +3.6 ± 1.3 at W=4 | `convex.json` | 3.5611 ± 1.2740 |
+| graded L1 −5.06, L2 −7.35, L4 +3.49, L5 +2.94; binary +15.0 vs graded +11.8; +11.8 → −16.2 | `graded.json` | exact |
+| exec summary ≈ 526 words | — | 529 |
 
-### Wrong, or not supported as stated
+### Wrong or unsupported
 
-**(a) "13 are fixed by construction" — it is 18.** This is the most consequential error in
-the document. The summary says only "4 where a width-1 block *is* the full template". In
-fact the block-constant handle is bit-identical to the full per-segment template whenever
-**W divides ℓ**, which is nine cells, not four: `(ℓ,W)` = (1,1), (2,1), (2,2), (3,1),
-(3,3), (6,1), (6,2), (6,3), (6,6). In every one of them `sign(μ_b)` reproduces the ±1
-template exactly, the same steering vector is written, and the saved `obs` is the *identical
-float* to `full_peak.mean`. Verified: 9 of 24 cells have `obs == full_peak` bit-for-bit, in
-both models.
+**(a) "Δ per covered slot is flat (22.2–23.7 for language, 7.8–8.4 for intensity)" — survived
+the revision and is still wrong.** From `wsweep.json`, every condition with coverage ≥ 2:
 
-So the census is 9 identity cells (R ≡ 1) + 9 structurally silent cells (R ≡ 0) + **6
-at-risk cells** = 24. The clean statement of the partition is: *R = 1 exactly when W divides
-ℓ; R = 0 exactly when 2ℓ divides W; only the remaining six cells can disagree with the
-theory.*
+- language: **17.60** (W1\_m2), 23.02, 22.20, 23.65, 22.83, **18.63** (W4\_m1), **20.91**
+  (W4\_m2), 23.41, 22.19, 22.19, 22.19 → true range **17.60–23.65**
+- intensity: **7.07** (W1\_m2), 8.30, 7.83, **7.31** (W3\_m1), 7.82, 8.41, 8.05, 7.76, 7.78,
+  7.78, 7.78 → true range **7.07–8.41**
 
-Consequences:
+Three conditions fall outside the quoted language range and two outside the intensity range.
+There is no reading of "from two covered segments upward" that produces 22.2–23.7 — under
+W ≥ 2 the minimum is 18.63, under coverage ≥ 2 it is 17.60. Note that `review_audit.md:126`
+tabulates W1\_m2 as 17.60 and 7.07, so **the summary contradicts the audit document it
+cites**. The retraction is unaffected — Δ still tracks coverage far better than width — so
+this costs nothing to fix.
 
-- The "11 measured cells, mean \|error\| = 0.029" number — in the exec summary, in panel A's
-  title, and in the log — averages 6 nonzero errors over 11 cells, 5 of which are exact
-  algebraic identities contributing zero. It should be dropped entirely. The only defensible
-  headline is **0.053 (1.5B) and 0.045 (7B) over 6 cells**, which the document already gives.
-- `scripts/plot_phase_diagram.py:34-40` has the bug: `cell_kind` returns `"identity"` only
-  `if W == 1`. The fix is one line — `if ell % W == 0: return "identity"`. Until then panel A
-  hatches ℓ=6/W=1 but not ℓ=6/W=2, ℓ=6/W=3 or ℓ=6/W=6, all of which are the same
-  construction; and panel C, captioned "6 fractional cells", actually scatters 11 points
-  including five stacked at exactly (1.00, 1.00).
+**(b) `Δ ∝ N^1.27` is imported from a different dataset than the result it retracts.** The
+exponent is calibrated on the two endpoints of the **stance** W-sweep
+(`review_audit.md:692`), which I reproduce: q = 1.2673. But the superadditivity being
+retracted (S = +3.6 ± 1.3 at W=4) is measured on `convex.json`, whose own dose curve fits
+**q = 1.125** (1.100 at frac 0.2, 1.111 at 0.5). The two are not interchangeable:
 
-**(b) "Δ per covered slot is flat (22.2–23.7 for language, 7.8–8.4 for intensity)" — the
-true ranges are 17.6–23.7 and 7.1–8.4.** From `wsweep.json`, Δ/coverage for every condition
-with coverage ≥ 2:
+| N | S observed | S predicted, q = 1.125 | S predicted, q = 1.27 |
+| --- | --- | --- | --- |
+| 2 | +0.47 | +0.97 | +2.20 |
+| 4 | +3.56 | +4.05 | +9.71 |
+| 8 | +4.47 | +12.70 | +32.23 |
 
-- language: 17.60 (W1\_m2), 23.02, 22.20, 23.65, 22.83, **18.63 (W4\_m1)**, **20.91
-  (W4\_m2)**, 23.41, 22.19, 22.19, 22.19
-- intensity: 7.07 (W1\_m2), 8.30, 7.83, **7.31 (W3\_m1)**, 7.82, 8.41, 8.05, 7.76, 7.78,
-  7.78, 7.78
+At q = 1.27 the dose law overshoots the observed superadditivity by 2.7–7×. "Reproduces the
+curve" also does more work than the underlying analysis supports: on the stance sweep the
+power law is calibrated on 2 of 4 points and the W=4 point misses by **−27.7% (−1.5σ)**,
+which `review_audit.md` states plainly and the summary does not.
 
-The quoted range silently drops the three conditions that fall outside it. There is no
-reading of "from two covered segments upward" that yields 22.2–23.7 — under W ≥ 2 the
-minimum is 18.63, under coverage ≥ 2 it is 17.60. Also note that of the "thirteen
-conditions", one (broadcast) has coverage 0 so Δ/coverage is undefined, and three share one
-identical float (`full` = `W6_m2` = `W12_m1` = 266.23298297449946), leaving **10 distinct
-measurements**. Fix the numbers; the retraction still stands, because Δ still tracks
-coverage far better than width.
+**The retraction itself is still correct**, and there is a cleaner argument for it that costs
+one sentence: `S = Δ(N) − N·Δ₁` is, by definition, the deviation of the dose curve from
+linearity, so "superadditive" and "q > 1" are the same statement — and the matched-coverage
+contiguous-versus-scattered null is what shows it is dose curvature rather than a window
+effect. Say that, cite q = 1.13 from the grid the S came from, and the point is unassailable.
 
-**(c) The superadditivity t-statistics are computed with the wrong standard error.**
-`convex_modal.py:231-234` computes `S = ds.mean() - sum_marg` but stores `sem = ds.std/√n`
-— the standard error of Δ(B) alone. The uncertainty in the subtracted Σ Δ_t is ignored
-entirely. Treating the marginals as independent gives sem(S) = 2.06 and 2.80, so **t = 1.73
-and 1.60**, not the quoted "t ≈ 2.6–2.8". The truth lies between those bounds because the
-marginals come from the same 28 pairs and are positively correlated, but the per-item
-marginal deltas are not saved, so it cannot be pinned down from the JSON. As written, the
-limitation "a small positive effect" is stated with more confidence than the data supports;
-under the independent bound S is not distinguishable from zero at either width. One-line
-fix in the code: store `deltas` for the marginals and compute S per item.
+**(c) "Constant-in-length is still a real property, and it is what we claim" directly follows
+a reported 32% decline.** The same bullet says the normalisation "turns the staged refusal
+sweep (+20.7 → +28.6) into a per-differing-slot *decline* of 10.4 → 7.0" — which I verified —
+and then asserts constancy. Both facts are true of *different tasks*: flat on the
+language/intensity family (fixed-Hamming, 71.7–80.8 with no trend for k ≥ 4), declining by a
+third on stance. Scope the sentence to the family it holds for.
 
-**(d) There are four predicted reversals, not three.** The summary names ℓ=6, ℓ=1 and ℓ=2.
-It omits **ℓ=3: W=2 (0.628) → W=3 (1.000)**, which is exactly the same type as the ℓ=6 one
-it promotes. All four reversals are reproduced in both models, so this is a free point being
-left on the table.
+**(d) Smaller items.**
 
-### Two claims that are correct but stated without their dose or their n
+- *"flat (+71.8 → +77.5 across k = 2…10)"* quotes the endpoints; the interior maximum is
+  **+80.8 at k=4**, so the range is 71.7–80.8 and k=2 sits 11% below k=4 (Welch t = 1.75,
+  n = 32). Accurate phrasing: "flat from k=4 onward". The previous draft listed all five
+  values, which was better.
+- *"the 0.079 noise floor"* is the SEM of `obs` divided by Δ\_full, ignoring Δ\_full's own
+  error. Propagating it gives **0.088** (7B: 0.090). The author picked the *smaller*, less
+  flattering number — worth saying so in one clause, because it makes the 0.053 result look
+  earned rather than lucky.
+- *"Every arm peaks at the top of its dose grid"* is not literally true: the broadcast arms
+  peak at 0.05–0.35 (`stance.json`, `graded.json`). True of every arm with a real effect.
+- The graded list omits **L3 = −3.02**. Including it makes the sequence look *more* ordered,
+  not less, so the omission works against the author's own gate.
+- `round2.json` and `dict.json` do not exist anywhere in the repo, but `round2_modal.py` and
+  `dict_modal.py` are both in the map table. The `N^1.27` analysis traces to
+  `review_audit.md` reading `stance.json`, so it is reproducible — just not from the file the
+  map implies.
 
-- The 96.9% / 51.2% pair is at **frac = 0.5**; at 0.2 and 0.35 the scheduled arm is 93.75%.
-  The scramble collapse is at **frac = 0.35**; at frac 0.5 the scrambled arms are **+3.9 and
-  +2.2**, i.e. still ≈0 but positive, not negative. Quoting the doses would cost six words
-  and pre-empts the "which α did you pick?" question.
-- The document reports no sample sizes anywhere. They are: lsweep n\_eval = 28 pairs,
-  controls n\_eval = 32 and n\_stance = 20 (160 slots), convex n\_eval = 28, stance n\_eval
-  = 32, graded n\_eval = 32, entrain2 n\_gen = 48. A reader cannot interpret a single ± in
-  the document without these.
+## Step 2 — the claims
 
-## Step 2 — the headline claims, attacked
+### Finding 4 does not survive its own m=0 control
 
-### Finding 1: is "zero free parameters" honest?
+This is the one that changes the document. `entrain2_modal.py:216-219` runs a **W=0 cell per
+family** with `m = 0.0` — no steering at all — and scores all six slots against the profile.
+The docstring calls it "the model's innate rate of matching the profile". It is the exact
+baseline for "did steering the prefix make the model carry the pattern", and the summary does
+not use it. Scored against it:
 
-**Yes, and this is the strongest thing in the sprint.** `R = mean_b |μ_b|` is computed from
-the profile and the block structure alone; nothing is fitted. The obvious attack — that R is
-normalised by Δ\_full measured on the same pairs at the same frac, so the agreement is partly
-definitional — lands only on the W=1 column, where obs/Δ\_full is 1.0 by identical
-arithmetic. It does not land on the six at-risk cells, where the numerator is a different
-intervention from the denominator. The design also pins coverage at 12 in every cell, which
-kills the coverage confound that ate the first centrepiece. Good.
+| family | unsteered (W=0) | tail acc at W=3 | vs persistence null | **vs unsteered** |
+| --- | --- | --- | --- | --- |
+| period-2 | 0.540 | 0.542 | **+0.208** | **+0.002** |
+| alternating | 0.517 | 0.458 | +0.125 | −0.058 |
+| i.i.d. | 0.413 | 0.470 | −0.027 | +0.057 |
+| balanced | 0.476 | 0.428 | +0.026 | −0.049 |
 
-The real weakness is not "definitional", it is **thin**: the law is tested on six cells, at
-two predicted values (0.333 and 0.667), in each model. Per-cell relative error on those six
-is 0.75, 1.06, 1.06, 0.94, 0.62, 0.96 (1.5B) — i.e. one cell (ℓ=3, W=4: predicted 0.333,
-observed 0.206) is off by 38%, and it is the one cell the summary does not quote. The text
-says the energy-matched alternative "is distinguishable at three cells" and then reports
-two. Report all three: even including the bad one, cap beats RMS decisively (mean absolute
-error 0.064 vs 0.188 across the three cells), so the omission buys nothing and costs
-credibility.
+The period-2 model with a three-sentence steered prefix scores 0.542 on the untouched tail.
+With no steering at all it scores 0.540. The headline t = 4.6 measures the distance from a
+*persistence* strategy, not from the model's own unsteered behaviour.
 
-**A second objection the write-up does not anticipate.** The framing "the energy-matched
-alternative (`R = RMS(μ_b)`) is distinguishable at three cells and the cap form fits" presents
-a *different experimental arm* as a *rival hypothesis*. Both predictions come from the same
-formula `Δ = δW Σ_b c_b μ_b`: feed it `c = sign(μ)` and you get mean|μ|; feed it
-`c = μ/RMS(μ)` and you get RMS(μ). The experimenter chooses which to write. So this is not a
-horse race between two laws — it is one law predicting two arms, and it predicts both
-(mean absolute error 0.064 for the cap arm against its own prediction, 0.080 for the energy
-arm against its own). That is a *better* result than a horse race and should be stated that
-way: **one formula, two normalisations, both predicted without fitting.** As written, a
-reviewer who works out that RMS is not a rival will assume the framing was chosen to look
-like a model comparison.
+At W=4 it is worse. The persistence null there is **exactly 0.000** (a persister gets nothing
+right, which I verified in closed form), so the reported "+0.221" *is* the raw accuracy — and
+0.221 is **−0.319 below** the unsteered baseline of 0.540. The model got worse, and the
+metric scored it as the largest excess in the experiment.
 
-### Finding 2: is "fidelity per knob peaks at W = ℓ" supported?
+The general failure is that `acc − persistence_null` rewards *any* departure from
+persistence, including randomness. A coin-flipper scores 0.5 at every cell, so its "excess"
+is +0.167 at period-2 W=3 and **+0.500** at period-2 W=4 — larger than anything observed. The
+sentence *"Profiles that are unpredictable by construction stay at their nulls at every
+width, which is the check that this is inference rather than a scoring artefact"* is the
+weakest link: for the i.i.d. family the persistence null **is** 0.5, so a coin-flipper scores
+zero excess there by construction. The control family is precisely the family where the two
+competing hypotheses make identical predictions, so it cannot discriminate between them.
 
-**No, not as stated — and the figure shows it.** Panel B's title reads "Control efficiency
-peaks at W ≈ ℓ" and its green star sits at **W = 6 for ℓ = 2**.
+*Fairness check.* W=0 scores all six slots while the W=3 tail scores slots 3–5, so the
+comparison is not slot-matched. For +0.208 to be real, the unsteered model would have to
+score ≈0.33 on slots 3–5 and therefore ≈0.75 on slots 0–2 — matching a randomly-phased
+profile three-quarters of the time with no information about it. That is not credible.
+Settling it properly needs per-episode labels, which `entrain2_modal.py` does not save; that
+is a one-line change worth making.
 
-The underlying reason is a fact about the theory that the write-up has not noticed. For
-W an odd multiple of ℓ, `R = 1/(2m+1)` and `W = (2m+1)ℓ`, so `R·W/k = ℓ/k` — **identical for
-every odd multiple of ℓ**. The predicted efficiency curve therefore has *ties*, not a unique
-peak:
+**Recommendation: retract finding 4.** Its methodological yield — that a balanced profile
+forces a 0.400 persistence null, so a naive 0.5 null makes a working model look broken —
+is genuine and already sits in "What we corrected", which is where the whole thing should
+live. Retracting a fourth claim on the strength of a control you built yourself is a better
+look than the finding was ever going to be.
 
-- ℓ=1: W=1 and W=3 both predict 0.0833. Observed 0.0833 vs 0.0622 → argmax lands on W=ℓ.
-- ℓ=2: W=2 and W=6 both predict 0.1667. Observed 0.1667 vs **0.1765** → argmax lands on W=3ℓ.
-- ℓ=3: W=3 is the unique maximum in the tested grid (W=9 does not divide 12).
-- ℓ=6: W=6 is the unique maximum (W=18 > k).
+### Finding 1: the reframing is right, and the figure now contradicts it
 
-So the argmax claim is unambiguously supported in **two of four rows**, and in the two rows
-where the theory predicts a tie the noise breaks it once each way. The claim as written is
-overstated and the figure visibly contradicts it.
+Reframing the experiment as *a measurement of linearity* is the best decision in the
+revision. It is honest about `R = mean_b |μ_b|` being algebra rather than physics, and it
+converts "we predicted a phase diagram" into the sharper "the steering response is linear in
+the schedule to within 0.053 against a 0.079 noise floor, in six independent cells". The
+design defences added in "The experiments" — coverage pinned, equal injected norm per row,
+normalisation by the same eval pairs dividing out extensivity — are exactly the three
+objections a reviewer raises, answered pre-emptively.
 
-The fix is easy and makes the finding *stronger*, because the correct statement is sharper:
-**W = ℓ is the largest width that retains full fidelity, so the minimum number of knobs for
-lossless control is k/ℓ.** That is exactly true (R = 1 iff W | ℓ), it is what the safety
-reader cares about, and it does not depend on an argmax over a tied curve. It also converts
-"wider than that collapses" — which is false, since efficiency returns to ℓ/k at every odd
-multiple — into "wider than that is never better, and is worthless at even multiples of ℓ".
+**But `phase_diagram.png` (22:38) predates the rewrite and was never regenerated.** As
+shipped:
 
-### Finding 3: does the staged-refusal result depend on the banks, and is 96.9% a fair metric?
+- Panel A's title reads *"11 measured cells, no fitted parameters, mean |error| = 0.029"* —
+  the retracted claim, in the figure the retraction is printed next to.
+- Panel A hatches "fixed by construction" on the W=1 column and the zero cells only, because
+  `scripts/plot_phase_diagram.py:34-40` returns `"identity"` only `if W == 1`. The five cells
+  where W divides ℓ and W > 1 — (2,2), (3,3), (6,2), (6,3), (6,6) — are drawn as measurements
+  though the body text now correctly calls them identities. One-line fix:
+  `if ell % W == 0: return "identity"`.
+- Panel C is captioned "6 fractional cells" and scatters **11** points, five of them stacked
+  at exactly (1.00, 1.00).
 
-**The metric is fair, and the write-up now defends it well.** I checked
-`controls_modal.py:334`: `d = (s_marg - b_marg) * signs[t]`, where `signs` alternates over a
-shuffled balanced profile. An arm that pushes every slot one way therefore scores ~50%, not
-~100%, and the broadcast arm's 51.2% is the empirical demonstration of exactly that. The
-added sentence — "it is right on exactly the half of the slots that were meant to decline" —
-is the single best piece of writing in the document. Direction fitting on `REFUSE[:6]`/
-`COMPLY[:6]` and evaluation on `[6:]` is genuine held-out use, as claimed.
+A reviewer reads the figure before the prose. Regenerating it is the highest
+value-per-minute action available and needs no GPU.
 
-**The "single" arm asymmetry is real but the figure already handles it.** With
-`coef = signs[0] if t == 0 else 0.0`, slots 1–7 get `vec = None`, so `d ≡ 0` and
-`correct = float(d > 0) = 0`. The arm's structural ceiling is 1/8 = 0.125 and it scored
-**exactly 0.125** — it succeeded on 100% of the one slot it wrote. Panel B draws the 1/8
-line, which is the right call. Two follow-ups the text should make: the annotation
-"1/8 = one slot of eight" is **overprinted by the bold 0.125 value label** in the rendered
-PNG and is unreadable; and per *written* slot the single arm's mean shift is 1.363 against
-the template's 1.004, so the schedule's advantage is coverage-with-correct-sign, not
-per-slot potency. Saying so costs nothing and removes an easy jab.
+**One framing point survives from my first pass.** "The experiments" still presents
+`R = RMS(μ_b)` as an "energy-matched alternative" that the data rules out. It is not a rival
+hypothesis — both predictions come from the *same* formula `Δ = δW Σ_b c_b μ_b`, one with
+`c = sign(μ)` and one with `c = μ/RMS(μ)`, and the experimenter chooses which to write. What
+the data actually shows is better: one linear law predicting two different normalisations
+without fitting (mean absolute error 0.064 for the cap arm against its own prediction, 0.080
+for the energy arm against its own). Say that instead; a reviewer who works out that RMS is
+not a rival will assume the framing was chosen to manufacture a model comparison.
 
-**Three objections the write-up does not answer.**
+### Finding 2: "peaks at W ≈ ℓ" is still overstated, and panel B still shows it
 
-- *Arms are not prefix-matched.* `controls_modal.py:337-340` appends the model's **steered**
-  pick to `ids` and continues. By slot 4 the template arm is conditioning on a coherent
-  alternating refuse/comply prefix while the broadcast arm is conditioning on an all-refuse
-  prefix. Some of the 96.9% may be the prefix priming the alternation rather than the write
-  at that slot. A teacher-forced fixed prefix, identical across arms, removes this.
-- *Slots are clustered.* n = 160 slots come from 20 prompts, and the SEM is computed as if
-  all 160 were independent. The 96.9 vs 51.2 gap survives any plausible clustering
-  correction, but the reported ± on `mean_shift` is understated.
-- *The task's premise is currently unverified.* See below — this is the serious one.
+For W an odd multiple of ℓ, `R = 1/(2m+1)` and `W = (2m+1)ℓ`, so `R·W/k = ℓ/k` — **identical
+for every odd multiple of ℓ**. The predicted efficiency curve has ties, not a unique peak:
 
-**The undisclosed null result.** `results/temporal_screen/stance_gen.json` is the output of
-the harness the log says was built to replace the artifact-prone classifier. It contains:
+- ℓ=1: W=1 and W=3 both predict 0.0833; observed 0.0833 vs 0.0622 → argmax at W=ℓ.
+- ℓ=2: W=2 and W=6 both predict 0.1667; observed 0.1667 vs **0.1765** → argmax at W=3ℓ.
+- ℓ=3, ℓ=6: W=ℓ is the unique maximum in the tested grid.
 
-- `precheck3.classifier_coverage = 0.101`, `n_transitions_from_refuse = 0`,
-  `p_comply_after_refuse = 0.0`, with a single classified transition in the whole run. The
-  three-way re-run therefore **did not reproduce the 0.870 gate** that licensed the staged-
-  refusal design; it produced no usable data at all.
+So the argmax claim is unambiguous in two of four rows, and where the theory predicts a tie
+the noise breaks it once each way. Panel B is titled *"Control efficiency peaks at W ≈ ℓ"*
+with its **ℓ=2 star sitting at W=6**, which a reviewer will notice in about four seconds.
+
+The fix makes the finding stronger, because the exactly-true statement is sharper and is the
+one a safety reader wants: **W = ℓ is the largest width that retains full fidelity (R = 1
+iff W divides ℓ), so lossless control costs k/ℓ parameters instead of k.** That also repairs
+"and no wider" / "collapses when it straddles them", which currently implies monotone decay —
+efficiency actually returns to ℓ/k at every odd multiple and collapses only at even ones.
+
+### Finding 3: the undisclosed harness, now load-bearing
+
+The metric is sound and the write-up defends it well. I checked `controls_modal.py:334`:
+`d = (s_marg - b_marg) * signs[t]` with `signs` alternating over a shuffled balanced profile,
+so an arm that pushes everything one way scores ~50% — and the broadcast arm's 51.2% is the
+empirical proof. The added sentence explaining *why* 51.2% is the expected value remains the
+best writing in the document. Held-out bank split is genuine (`REFUSE[:6]` fit, `[6:]`
+evaluated).
+
+**What is missing.** `results/temporal_screen/stance_gen.json` is the output of the harness
+the log says was built to replace the artifact-prone classifier. It contains:
+
+- `precheck3`: `classifier_coverage = 0.101`, `n_transitions_from_refuse = 0`,
+  `p_comply_after_refuse = 0.0`, one classified transition in the entire run. The three-way
+  re-check **did not reproduce the 0.870 gate**; it produced no usable data.
 - `menu` (generation-time, model picks between held-out candidates, chance 0.5):
   template@0.5 = **0.536 ± 0.016**, single@0.5 = **0.526 ± 0.013**, broadcast@0.5 = 0.500,
-  unsteered = 0.500. At frac 0.35 every arm is exactly 0.500 ± 0.000.
+  unsteered = 0.500; at frac 0.35 every arm is exactly 0.500 ± 0.000.
 
-Either reading obliges disclosure. If the harness works, the *generation-time* behavioural
-effect is +3.6 points over chance with the single-segment arm at +2.6 — a much weaker and
-much less separated result than 96.9% vs 51.2%, and it belongs next to it. If the harness is
-broken — and four of seven arms returning exactly 0.500 ± 0.000 alongside 10% classifier
-coverage says it probably is — then the pre-registered gate for the whole task is currently
-unverified and the limitation should say so. What the summary currently says is *"one of the
-two generation harnesses had to be rebuilt mid-sprint after its classifier proved
-artifact-prone"*, which reads as though the rebuild succeeded. **This is the one place where
-a reviewer with repo access would accuse the document of selective reporting, and it is the
-highest-priority fix in this report.**
+The revision made this worse, not better. The new paragraph now states
+`P(help | just declined) = 0.87` and `P(decline | just helped) = 0.026` as established facts
+about the model's dynamics — both from `stance.json`'s `precheck`, i.e. the regex the log
+describes as scoring "every *unmatched* sentence as comply", and whose corrected re-run
+failed. Meanwhile Limitations says only that a harness "was rebuilt mid-sprint after its
+classifier proved artifact-prone", which reads as though the rebuild succeeded.
 
-On bank dependence specifically: the requests are combinatorial (32 verbs × 22 objects), not
-"~40" as the text says — 40 is `n_train`, the direction-fitting budget. Reword. Bank
-dependence itself is untested (one refuse bank, one comply bank, one model), which is fair
-for a sprint but should be named in Limitations alongside "one layer, one language pair".
+Either reading obliges disclosure. If the harness works, the generation-time effect is +3.6
+points over chance with single-segment at +2.6, and that belongs beside 96.9% vs 51.2%. If it
+is broken — four of seven arms returning exactly 0.500 ± 0.000 alongside 10% coverage says it
+probably is — then say so and drop the 0.87/0.026 sentence, because its only support is the
+classifier that failed. **This is the one item a reviewer with repo access would call
+selective reporting.**
 
-### Finding 4 (entrainment): the weakest item, and the figure oversells it
+Two smaller points that cost nothing: the single-segment arm's structural ceiling is
+1/8 = 0.125 and it scored exactly 0.125, i.e. it succeeded on 100% of the one slot it wrote
+(panel B draws the 1/8 line — good — but the annotation "1/8 = one slot of eight" is
+**overprinted by the bold 0.125 label** and unreadable in the PNG); and per *written* slot
+the single arm's shift is 1.363 against the template's 1.004, so the schedule wins on
+coverage-with-correct-sign, not per-slot potency.
 
-The numbers all check out. The interpretation does not.
+### Finding 5: the scramble is a linearity check, and the bullet says otherwise
 
-**The raw tail accuracy does not rise at W=3 in either predictable family.** From
-`entrain2.json`, unsteered tail accuracy is: period-2 → 0.578, 0.502, 0.542, **0.221**;
-alternating → 0.440, 0.523, 0.458, 0.367. Nothing jumps. The entire "+0.208" at W=3 comes
-from the analytic null falling from 0.500 to **0.333** at that width — and it falls to 0.333
-for *both* predictable families at *exactly* W=3, which is also the only width at which
-either family shows an excess. The null-subtraction may well be the right analysis (if
-persistence stops paying, holding accuracy constant does mean the model is doing more than
-persisting), but the figure plots only `acc − null`, so a reader cannot see that the raw
-number is flat, and the word **"jumps"** in the summary is not true of anything the model did.
+The exec summary asserts *"The effect is the order, not the mass"* and leads with the
+scramble collapse. "The experiments" section says the opposite, correctly: *"a linear
+response predicts a scrambled schedule nets zero, so its collapse confirms the design rather
+than revealing a mechanism."* The document argues against itself in two places, and the exec
+summary is the one that is wrong.
 
-**The W=4 point is degenerate.** `analytic_persistence_null = 0.000` there, so the reported
-"+0.221 ± 0.058 at W=4" *is* the raw accuracy, which has fallen from 0.542 to 0.221. Quoting
-it immediately after the W=3 number implies the effect strengthens; in absolute terms it more
-than halved. It should either be dropped or explicitly flagged as a zero-null cell.
+The scramble is genuinely valuable — it holds coverage, contiguity and injected norm exactly
+fixed and kills "any injected norm helps". But it is a *confirmed prediction of finding 1*,
+not an independent result. Two figure notes: the W=1 bar labelled "100%" is the identity
+(`convex_modal.py:194-197` shuffles a one-element list), so it is a sanity check and should
+be annotated as one; and the negative scrambled values are frac-0.35 specific — at frac 0.5
+they are +3.9 and +2.2.
 
-**Both predictable families peak at W=3, but they have different ℓ.** W\* = ℓ+1 predicts
-W\*=2 for the alternating family and W\*=3 for period-2. The alternating curve does not move
-at W=2. The summary calls this "the honest blemish" — good — but the figure does not: a grey
-band and a bold blue annotation sit at W=3 as if a shared threshold explained both curves.
-And at W=4 the alternating family goes **significantly negative** (−0.133, t = −2.38), which
-is evidence against the mechanism, not merely a blemish.
+### Two power notes
 
-**Unreported:** realized coverage is 0.73–0.89, so at nominal W=4 only ~2.9 sentences were
-actually steered on average; and `analytic_null` is a 20 000-trial Monte Carlo estimate, so
-"analytic" is a misnomer.
+- *"contiguous versus scattered … are indistinguishable"* is a failure to reject, not
+  equivalence: 95% CIs on the difference are [−5.7, +8.8] at 1.5B and [−2.5, +8.4] at 7B, so
+  a 50–60% contiguity advantage is not excluded. Say "no detectable difference at n = 28",
+  and give the 7B SEMs, which are omitted while the 1.5B ones are given.
+- The document still reports no sample sizes. They are: lsweep n\_eval = 28 pairs, controls
+  n\_eval = 32 and n\_stance = 20 (160 slots, clustered within 20 prompts), convex n\_eval =
+  28, stance n\_eval = 32, graded n\_eval = 32, entrain2 n\_gen = 48. One parenthetical in
+  "The experiments" would cover it.
 
-With one family showing the predicted threshold, the other showing it at the wrong width and
-then reversing, and the whole signal carried by a null that moves under the data, this is an
-*inconclusive* result presented as a positive one. See Step 4.
+## Step 3 — writing judgement
 
-### Finding 5: is the scramble control as decisive as claimed?
+### Does the retraction material read as honest self-correction or damage control?
 
-**No — and the summary knows better, because the log says so and the summary dropped it.**
+**Honest self-correction, decisively** — and it is now the most credibility-generating
+material in the document. Three retractions, each naming the control that forced it and the
+weaker claim that replaced it, plus a fourth claim scoped rather than retracted, is more
+self-policing than most published work contains. The reframing of finding 1 around linearity
+is the strongest single move: it *reduces* the claim and *increases* the credibility, which
+is the trade a good reviewer is looking for evidence you are willing to make.
 
-`log.md` line 178: *"Note this confirms the additive/schedule account rather than proving
-superadditivity: under additivity a random internal permutation matches ~half the slots and
-nets ≈ 0."* That sentence is exactly right and it is **absent from summary.md**. What
-survives is the heading *"The effect is the order, not the mass"* and a collapse from +29.0
-to −2.3, with no statement of what the additive model predicts for the scrambled arm.
+It reads as damage control in exactly three places, and in all three the summary is **less
+honest than its own supporting documents**:
 
-Under the additive account the scrambled write contributes `Σ_t π_{σ(t)}·π_t`, which has mean
-zero — so ≈0 is the prediction of the *same* model that finding 1 already assumes. The
-control is genuinely valuable: it kills "any injected norm in the right place helps", holding
-coverage, contiguity and norm exactly fixed. But it does not discriminate between additivity
-and anything else, and framing it as the decisive control invites a reviewer to point out
-that it confirms the null model. Restore the log's sentence.
+- the per-covered-slot range (`review_audit.md:126` has the numbers that contradict it);
+- "reproduces the curve" for the power law (`review_audit.md:695` discloses the −1.5σ miss);
+- the rebuilt generation harness (the log records why the original was suspect; the summary
+  records neither that nor the rebuild's result).
 
-Two smaller points on the same figure: the W=1 bar labelled "100%" is the identity —
-`convex_modal.py:194-197` shuffles a one-element list — so it is a sanity check, not a
-result, and should be annotated as such. And the negative scrambled values are frac-0.35
-specific; at frac 0.5 they are +3.9 and +2.2.
+The fix in each case is to copy a sentence that already exists one document over. That is a
+20-minute job and it removes every instance of the pattern.
 
-### Two more soft spots
+### Is finding 5 doing too much?
 
-- **"the curve is flat"** (fixed-Hamming). k=2 is 11% below k=4 (71.75 vs 80.84, Welch
-  t = 1.75, n = 32 each); OLS slope over k=2…10 is +0.43 per k. The log's own phrasing —
-  *"spread 3.4 over k=4…10"* — is accurate and the summary dropped the qualifier. Say "flat
-  from k=4 onward, with the k=2 point 11% lower".
-- **"contiguous versus scattered … are indistinguishable"** is a failure to reject, not an
-  equivalence. 95% CIs on the difference are [−5.7, +8.8] at 1.5B and [−2.5, +8.4] at 7B —
-  the upper bounds admit a 50–60% contiguity advantage. Say "no detectable difference at
-  n = 28" and give the 7B SEMs, which are currently omitted while the 1.5B ones are given.
+Yes — it is doing two unrelated jobs in one bullet, and the positive half is the half the body
+text contradicts. Restructure:
 
-## Step 3 — writing quality
+- **Fold the scramble into finding 1.** Under linearity a scrambled schedule nets zero, so
+  the collapse is finding 1's own prediction confirmed on a second task. That is where it is
+  strongest and where it stops competing with the retractions for the reader's attention.
+- **Make the retractions their own numbered finding**, kept in the executive summary, but
+  *listed* rather than *argued*: one line each and a pointer to the section. A reviewer
+  skimming only the exec summary should see them; a reviewer reading the whole thing should
+  not meet the argument twice.
 
-Judged against the brief: 2–5 findings each carried by one self-explanatory graph, executive
-summary under ~600 words, positive phrasing, no unexplained jargon, honest about limitations,
-figures legible to a fresh reader.
+With finding 4 retracted, that gives four findings: linearity (with the scramble as its
+check), `W* = ℓ` and the k/ℓ parameter count, declining/helping order, and the retractions.
+Four findings, three figures, every finding doing one job.
 
-**What works.** The level/shape framing in the opening two sentences is excellent and does
-real work — it tells a reader who has never heard of a temporal crosscoder why to care by the
-third line. The permutation design is explained in one paragraph that a non-specialist can
-follow. The "51.2% is its expected value rather than a malfunction" passage turns a weak-
-looking baseline into the cleanest statement of the thesis in the document. Phrasing is
-positive throughout; there is no hedging fog.
+### Smaller writing notes
 
-**Length.** The executive summary is **1252 words**, more than double the ~600 target. Finding
-1 alone is 355 words and most of them are cell bookkeeping. The bookkeeping is *correct* to
-include, but it belongs one level down: the exec summary should say "six cells can disagree
-with the theory; mean error 0.053 and 0.045, nothing fitted" and push the 9/9/6 partition
-into "The experiments". As it stands the reader meets a census before they meet the result.
+- Panel A says "mean |error| = 0.029" and panel C says "0.053 / 0.045" in the same figure,
+  with no explanation of why one figure carries two error rates. After regeneration, only the
+  second should survive.
+- `δW` and `c_b` appear in `Δ = δW Σ_b c_b μ_b` and are never defined anywhere in the
+  document. Either gloss them or drop the formula and keep the prose, which is already clear.
+- "About 40 template-generated requests" — the requests are combinatorial (32 verbs × 22
+  objects); 40 is `n_train`, the direction-fitting budget. Reword.
+- The map table advertises `round2_modal.py` and `dict_modal.py`, neither of which has an
+  output file in `results/`. Mark them "written, not run" or cut the rows — in a document
+  whose central scoping note is about dictionaries, an unrun `dict_modal.py` in the file list
+  invites the wrong question.
 
-**Five findings is one too many.** The brief allows up to five, but finding 4 is the weakest
-by a wide margin (see above) and finding 5 is half retraction. Four would read better.
+## Step 4 — one experiment, one cut
 
-**Sentences that overstate.**
+### The experiment (CPU-only, since Modal is blocked)
 
-- *"Control efficiency peaks at W ≈ ℓ"* (panel B title) — contradicted by the panel's own
-  ℓ=2 star.
-- *"jumps at W=3"* (finding 4) — nothing in the raw accuracy jumps.
-- *"the tail sits at its null through W=2 and jumps at W=3 … exactly the predicted threshold"*
-  — true of one family; the other family's threshold prediction failed.
-- *"Δ per covered slot is flat (22.2–23.7 …)"* — the true range is 17.6–23.7.
-- *"the curve is flat"* — flat from k=4.
-- *"are indistinguishable"* — underpowered, not equivalent.
-- *"t ≈ 2.6–2.8"* — wrong standard error; 1.6–1.7 under the independent bound.
-- *"11 cells that are genuine measurements"* — 6 are.
+**It is already done and the answer is above.** The decisive test of finding 4 needed no GPU:
+the m=0 control was sitting in `entrain2.json` the whole time, and re-scoring against it takes
+the period-2 effect from +0.208 to +0.002. I also reproduced all eight persistence nulls in
+closed form — they are correct, the problem is the choice of baseline, not its computation.
 
-**Things a fresh reader cannot follow.**
+The remaining CPU-only work, in order of value per minute:
 
-- Panel A says "mean \|error\| = 0.029" and panel C says "0.053 / 0.045" in the same figure,
-  with no explanation of why one figure reports two different error rates. Pick one (0.053 /
-  0.045) and caption the other away.
-- `R`, `μ_b`, `ℓ`, `W`, `k`, `δW`, `S(B)`, "fidelity per knob", "coverage", "Hamming",
-  "teacher-forced margin", "block-constant handle" all appear without definition. `Δ = δW Σ_b
-  c_b μ_b` is dropped into "The experiments" with `δ` and `c_b` never defined anywhere in the
-  document. Either define them in one bracketed line each or drop the formula and keep the
-  prose statement ("the handle retains the part of the profile that is constant across W").
-- "the seed of the superadditivity result above" points *down* — superadditivity appears only
-  in Limitations, below.
-- **"Controls (finding 4)"** in "The experiments" is now an off-by-one: finding 4 is
-  entrainment and controls are finding 5. There is also **no methods paragraph for the
-  entrainment experiment at all** — the renumber left a hole.
-- The map table lists `dict_modal.py` — "window-spanning vs per-token dictionaries at matched
-  knob budget" — but there is no `dict*.json` in `results/temporal_screen/`. Advertising an
-  experiment with no output, in a document whose central retraction is about a dictionary
-  claim, is asking for trouble. Mark it "written, not run" or cut the row.
-- The stance figure's "1/8 = one slot of eight" annotation is overprinted and illegible.
+1. **Regenerate `phase_diagram.png`** after the one-line `cell_kind` fix
+   (`ell % W == 0`) and retitle panel A to the six-cell result. Right now the headline figure
+   asserts a number the text retracts. Minutes, no GPU, and it is the first thing a reviewer
+   looks at.
+2. **Re-plot or drop `entrainment.png`.** If finding 4 is retracted, the figure goes with it;
+   if it is kept in any form, it must plot raw tail accuracy with the unsteered baseline as a
+   reference line, because the current y-axis (`acc − persistence null`) is what hid the
+   result.
+3. **Save what would settle the two open questions**: per-episode labels in
+   `entrain2_modal.py` (slot-matched unsteered comparison) and per-item marginal deltas in
+   `convex_modal.py` (a correctly-paired SEM for S — the current one uses the SEM of Δ(B)
+   alone and ignores the subtracted term entirely, which inflates t from ~1.7 to 2.8; harmless
+   now that S is retracted, but it will recur).
 
-**Is the retraction section convincing, and is it in the right place?** Convincing — genuinely
-so. Three retractions, each with the control that forced it and the surviving weaker claim
-named explicitly, is the most credibility-generating material in the document. Two changes:
+When GPU capacity returns, the one experiment that most strengthens the paper is unchanged:
+**rerun the resolution family at k=24** with ℓ ∈ {1,2,3,4,6,8} and W ∈ {1,2,3,4,6,8,12}. k=12
+with ℓ ∈ {1,2,3,6} is nearly the worst possible grid for this law — W and ℓ are almost always
+in a divides / even-multiple relation, which is exactly when the theory risks nothing — so the
+informative cell count rises from 6 to roughly 25, the predicted R values spread across many
+distinct fractions instead of {1/3, 2/3}, and the **odd-multiple tie prediction**
+(`R·W/k = ℓ/k` at W = ℓ and W = 3ℓ) gets tested twice, which is the fix for finding 2. Same
+script, different arguments.
 
-1. **Do not move it earlier.** A reviewer decides whether to read the code based on whether
-   there is a result worth checking; leading with retractions inverts that. Its current
-   position — after the findings, before Limitations — is right.
-2. **But signal it earlier.** One clause in the exec summary — currently the retractions are
-   mentioned only inside finding 5, where "Two claims we started with did not survive their
-   own controls" is buried behind the scramble result. Promote it to its own sentence at the
-   end of the exec summary: "Three of the claims we started the night with did not survive
-   their own controls; all three, and what replaced them, are in *What we corrected*." That
-   converts a defensive read into a confident one.
+### The cut
 
-It does not read as damage control. It reads as damage control *only* in one place — the
-Limitations line about the rebuilt generation harness, which describes a rebuild without
-reporting that the rebuilt harness returned nothing. Fix that and the section is clean.
+**Finding 4.** Previously I recommended demoting it on grounds of taste; now it is on
+evidence. Its methodological yield — the 0.400 balanced-profile null — is real and belongs in
+"What we corrected", one paragraph, where it is already well written.
 
-## Step 4 — the one experiment, and the one cut
-
-### Run this
-
-**Extend the resolution family to k=24.** The single biggest weakness in the write-up is that
-its best result rests on six informative cells at two distinct predicted values. k=12 with
-ℓ ∈ {1,2,3,6} is nearly the worst possible grid for this law, because W and ℓ are almost
-always in a divides / even-multiple relationship, which is precisely when the theory makes no
-risky prediction. At k=24 with ℓ ∈ {1,2,3,4,6,8} and W ∈ {1,2,3,4,6,8,12}, most cells fall in
-neither degenerate class, and the number of at-risk cells rises from 6 to roughly 25 — with
-predicted R values spread across many distinct fractions instead of just {1/3, 2/3}.
-
-```bash
-modal run experiments/temporal_screen/trajectory_steering/lsweep_modal.py \
-  --k 24 --ells "1,2,3,4,6,8" --ws "1,2,3,4,6,8,12" --n-eval 28
-```
-
-It is the same script with different arguments, so the risk of it failing is near zero, and on
-an A10G it is well inside the remaining budget. It buys three things at once:
-
-- turns "mean error 0.053 over 6 cells" into a real law with a scatter plot that has points
-  spread along the diagonal instead of clustered at two x-values;
-- **directly tests the odd-multiple tie prediction** — `R·W/k = ℓ/k` for every odd multiple of
-  ℓ — which is a sharp, falsifiable, currently-untested consequence of the theory, and the
-  fix for finding 2's overstatement. At k=24 with ℓ=2 you get W=2 and W=6 predicted equal, and
-  with ℓ=4 you get W=4 and W=12 predicted equal, so it is tested twice;
-- removes the ℓ=4 exclusion, since 4 divides 24 with zero DC component, which closes the one
-  "why is this run length missing?" question a reviewer will ask.
-
-Runner-up, if the stance result matters more than the law: fix and rerun `stance_gen_modal.py`
-so the generation-time metric either confirms or disconfirms the 96.9%. That is higher-value
-if it works and higher-risk if it does not, and it can be run concurrently.
-
-### Cut this
-
-**Demote finding 4 (entrainment) to a paragraph in "What we corrected".** It is the only
-finding whose headline is not supported by the raw measurements, its two predictable families
-disagree with each other, one of them significantly anti-entrains at the widest prefix, and
-its W=4 point is scored against a null of zero. The genuinely valuable part — the discovery
-that a balanced profile forces a 0.400 persistence null, so a naive 0.5 null makes a working
-model look broken — is *methodological* and already lives in the corrections section, where it
-is one of the better paragraphs in the document. Keeping the positive framing costs the
-document more credibility than the result adds, and cutting it brings the exec summary back
-toward the word limit and the figure count to a clean 3-for-4.
-
-If something must be cut for length rather than substance, the second candidate is **"What
-problem this is, and why it is interesting"**, whose first two paragraphs restate the exec
-summary's opening. Its third paragraph — the prior-context note about broadcast beating a
-schedule on days-of-the-week — is new information and should be kept wherever the rest goes.
+If more length is needed after that, the second candidate is **"What problem this is, and why
+it is interesting"**, whose first two paragraphs restate the executive summary's opening. Its
+third paragraph — the prior-context note about broadcast beating a schedule on days-of-the-week
+— is new information and should be kept wherever the rest goes.

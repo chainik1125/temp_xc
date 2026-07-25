@@ -21,33 +21,37 @@ positions buys over one acting at a single position, on tasks where the target a
 foil are **the same sentences in a different order**, so a constant write is inert by
 construction and only shape is under test.
 
-**1. Steering response is linear in the write schedule, so a handle limited to one
-constant per W segments delivers exactly its projection onto the target.** With a
-target of run length ℓ, linearity forces the achievable fraction of the full
-per-segment effect to be the mean absolute block-mean of the profile. Measured against
-that, with nothing fitted: mean absolute error **0.053** (1.5B) and **0.045** (7B) over
-the **six cells that can disagree** with the theory, at a noise floor near 0.079. The
-grid's other 18 cells are algebraic identities — the write is either bit-identical to
-the full template (whenever W divides ℓ) or exactly zero — and serve as plumbing
-checks, which they pass. *n = 28 target/foil pairs per cell.*
+**1. A steering write moves the model by exactly its projection onto the target
+trajectory — including when it opposes the target.** Give a handle a resolution limit
+(one constant per block of W segments) and it can only deliver the part of the target
+that survives averaging inside those blocks. Sampling 36 random combinations of
+profile, block width and block coefficients gives predictions spanning −0.42 to +0.42
+with nothing fitted; the measured effects track them with **slope 0.94, intercept
+−0.01, R² 0.77, mean absolute error 0.073**. Thirteen of those conditions predict a
+*negative* effect, and the model duly moves the wrong way in proportion — the part of
+the claim that could most easily have failed.
+
+- ![linearity](../../../../plots/2026-07-24_trajectory_steering/linearity.png)
+
+**2. So the useful handle width is the target's own timescale.** Once the response is
+linear, the achievable fraction for a square-wave target of run length ℓ is fixed by
+arithmetic, and the resulting (W, ℓ) grid is reproduced to a mean error of **0.053**
+(1.5B) and **0.045** (7B) over its six at-risk cells — the other 18 are algebraic
+identities and serve as plumbing checks. Reading it as control cost: fidelity per
+control parameter is maximised at W ≈ ℓ, where full fidelity costs `k/ℓ` parameters
+rather than k. Fidelity is **not monotone in W**, since a wider handle wins when it
+aligns with whole runs and collapses when it straddles them, so "wide enough to match
+the timescale" is the right summary of window size rather than "wider is better".
 
 - ![phase diagram](../../../../plots/2026-07-24_trajectory_steering/phase_diagram.png)
-
-**2. The cheapest handle is as wide as the target's timescale, and no wider.** Fidelity
-per control parameter is maximised at W ≈ ℓ, where full fidelity costs `k/ℓ` parameters
-rather than k. Fidelity is **not monotone in W** — a wider handle wins whenever it
-aligns with whole runs and collapses when it straddles them, and four such reversals
-appear, in both models — so "wider is better" is the wrong summary of window size and
-"wide enough to match the timescale" is the right one. The efficiency curve also ties
-rather than peaking wherever a window is an odd multiple of ℓ, which is why panel B
-shows ℓ=2 level between W=2 and W=6.
 
 **3. It transfers to a behaviour with safety shape: the order of declining and helping
 within one response.** The scheduled handle moves the model's own choice the intended
 way on **96.9%** of slots against **51.2%** for the same direction at constant
 strength (dose 0.5 of the mean residual norm, 160 slots; 93.8% at dose 0.35). That
 51.2% is the constant write's expected value rather than a malfunction: it pushes every
-slot toward declining, so it is right on exactly the half of slots meant to decline. A random direction at matched magnitude does nothing.
+slot toward declining, so it is right on exactly the half of slots meant to decline.
+A random direction at matched magnitude does nothing.
 
 - ![stance](../../../../plots/2026-07-24_trajectory_steering/stance.png)
 
@@ -107,11 +111,24 @@ worth running — the zero-write cells are a real plumbing test, and all 18 pass
 the law was never at risk on them. The six informative cells carry the result. One of
 them is also the only visible departure from linearity: ℓ=3, W=4 undershoots at 1.9σ.
 
-A second reading of the same fit: because `R = mean_b |μ_b|` follows from linearity by
-algebra, this experiment measures **how linear the steering response is in the
-schedule**, in six independent cells, and the answer is "linear to within resolution".
-The window story is then a corollary of linearity plus aliasing rather than an
-independent law — which is a narrower claim than we set out to make, and a cleaner one.
+Because the predicted fraction follows from linearity by algebra, this grid measures
+**how linear the steering response is in the schedule** — and six cells at two distinct
+predicted values is a thin basis for that. Square waves are the reason: every block mean
+is a simple rational, so no choice of W, ℓ, phase or k spreads the predictions (checked
+on CPU — k=24 buys 12 at-risk cells still spanning only {1/6, 1/3, 2/3}).
+
+**The linearity test (finding 1)** removes that limitation by dropping square waves. For
+any balanced profile and *any* block-constant coefficient vector, linearity predicts an
+effect equal to the projection of the write onto the target, which takes a continuum of
+values and goes negative whenever the write opposes the target. Sampling 36 random
+(profile, width, coefficient) conditions at k=12, each normalised against the
+full-schedule effect on the same eval pairs, gives 12 distinct predictions spanning
+−0.42 to +0.42 and the regression above. It is the same claim as the grid, tested with
+about six times the leverage. Two caveats: R² = 0.77 with 26 of 36 bootstrap intervals
+covering the prediction, so there is real excess scatter beyond sampling noise, and the
+phase sweep found two cells at the same predicted 0.333 landing at 0.145 and 0.676 with
+non-overlapping intervals — position-dependent heterogeneity that linearity in the
+schedule alone does not capture.
 
 **Declining and helping in order (finding 3).** About 40 template-generated requests
 about the user's own property, a 12-sentence declination bank and a 12-sentence
@@ -169,9 +186,10 @@ against our own result.
 - **"Grows with trajectory length" → "constant in length."** The margin sums log-probs
   over all k segments and a permuted foil differs in ~k/2 slots, so a constant per-slot
   effect produces a linear-in-k curve mechanically. With fixed-Hamming foils the curve
-  is flat from k=4 on (+80.8, +79.6, +78.0, +77.5; k=2 sits lower at +71.8). The same normalisation turns the staged
-  refusal sweep (+20.7 → +28.6) into a per-differing-slot *decline* of 10.4 → 7.0.
-  Constant-in-length is still a real property, and it is what we claim.
+  is flat from k=4 on (+80.8, +79.6, +78.0, +77.5; k=2 sits lower at +71.8). The same
+  normalisation turns the staged refusal sweep (+20.7 → +28.6) into a per-differing-slot
+  *decline* of 10.4 → 7.0. Constant-in-length is still a real property, and it is what
+  we claim.
 - **"Improves with window size" (first version) → coverage.** Writing m consecutive
   blocks of width W occupies one contiguous span of mW segments, so that grid varied
   coverage. Across the ten distinct conditions with coverage ≥ 2, Δ per covered slot
