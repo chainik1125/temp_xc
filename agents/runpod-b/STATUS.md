@@ -58,16 +58,22 @@ conflict), CONT, push.
    under-resolved, 3 truth points; do not read it before).
 4. Re-run `analyze_probe_truth` (final) → `probe_truth.json`;
    `render_probe_truth` → fig (title now carries the scope tag).
-5. **Scorecard** LOG paragraph. Structure it: (a) caveats against v2
-   FIRST (lower-bound at low truth + dense; signal_dims transfer
-   caveat); (b) the amended-scope ADOPT-consistent receipt; (c) the
-   frozen-scope label and why the trained ladder under-describes (truth
-   sits at ~0.95 where bias is negligible by mechanism — expected P1
-   FAIL there is not evidence against v2, per amendment item 1 it fires
-   no branch); (d) the p_eff finding (nominal p/n overstates the
-   operative ratio by 3–30×: post/T16/k8 = 70 active of 2048 ⇒ 0.034)
-   which bears on `PROBE_V2_SPEC.md`'s n_rows ≥ 8·p line; (e) coverage
-   honesty. Decision remains mac-local's.
+5. **Scorecard** LOG paragraph. **Two requirements mac-local pinned in
+   the briefing NOTE (2026-07-25), binding on the final receipt:**
+   (i) the low-truth + dense + p/n ≥ 1 downward bias (up to 0.18) goes
+   in the HEADLINE reading, not the caveat list — "v2 tightens a lower
+   bound" is a materially different claim from "v2 measures truth";
+   (ii) if the mix arms BREAK the inversion, say that first and
+   loudest — explicit backing to report against adoption. Then the
+   structure: (a) the amended-scope ADOPT-consistent receipt WITH the
+   lower-bound qualifier inline; (b) the frozen-scope label and why the
+   trained ladder under-describes (truth ~0.95, bias negligible by
+   mechanism; P1 FAIL there fires no branch per amendment item 1);
+   (c) the p_eff finding (nominal p/n overstates the operative ratio by
+   3–30×: post/T16/k8 = 70 active of 2048 ⇒ 0.034), bears on
+   `PROBE_V2_SPEC.md`'s n_rows ≥ 8·p line; (d) coverage honesty.
+   Decision remains mac-local's — increment 2 is READ, decision
+   explicitly NOT yet taken (waits on mix arms + trained ladder).
 6. Final commits: leaderboard + manifest + grid shards + lineD +
    transfer + receipt + fig; full pytest on a clean tree; pull-rebase;
    push. (Calib s1/s2/s42 shards are already committed COMPLETE —
@@ -78,6 +84,15 @@ conflict), CONT, push.
    overnight wave" § 4; 11-face index + causal dialevel + punctint-q
    0.901 counterexample). Record the supersession in the scorecard
    increment, one line, with the pointer.
+8. **QUEUED NEXT (auto-start, no idle): `briefings/panel-support-audit.md`**
+   — begins ONLY once this campaign hits its acceptance gate and is
+   pushed (the briefing's own rail + Han's instruction). Read its item 1
+   first: pre-flight `support_stats/stage2_variance.py` against BOTH new
+   panels' k_pos = 8·T row shape (the duplicate-cell abort I fixed once
+   is guaranteed by construction on their datasources); then item 2:
+   `PROBE_V2_SPEC.md` carries my lower-bound caveat as a first-class
+   limitation; items 3 (RECEIPTS.md claim→artifact index) and 4
+   (pre-staged panel analysis) as the night allows.
 
 ## Standing context
 - Shared branch: pull-rebase before EVERY push; LOG.md conflicts keep
