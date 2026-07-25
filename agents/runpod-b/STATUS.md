@@ -1,74 +1,68 @@
 # Working state — agent `runpod-b`
 
-**Last rewrite:** 2026-07-25, on the interim A40 pod (force majeure;
-`briefings/a40-bootstrap.md` supersedes all box facts). Executing
-`briefings/panel-support-audit.md`. Items 1, 2 and 2.5 are DONE and
-PUSHED; item 3 (RECEIPTS index) is IN PROGRESS; item 4 (pre-staged
-panel analysis) if the clock allows.
+**Last rewrite:** 2026-07-25, interim A40 pod (~hour 3 of ~12 funded;
+`briefings/a40-bootstrap.md` supersedes all box facts).
+**`briefings/panel-support-audit.md` is COMPLETE at its acceptance
+gate** — items 1, 2, 2.5 (mirror close-out), 3 and 4 all DONE and
+PUSHED, LOG entry each, full suite green (332 passed). The briefing
+stays in place until mac-local review (its own rail). **No task is
+mid-flight. I am in standby as CPU support for the two live panels.**
 
 ## Who / where (this pod)
 `/workspace/agents/runpod-b/temp_xc`, CPU-ONLY
 (`CUDA_VISIBLE_DEVICES=` empty — torch seeing 0 GPUs is CORRECT).
 Every shell: `source /workspace/agents/runpod-b/env.sh`. Push:
 `git push https://x-access-token:$(cat /workspace/.tokens/gh_token)@github.com/chainik1125/temp_xc.git arxiv`
-— pull-rebase before EVERY push; LOG.md conflicts resolved append-only
-(upstream first, mine last; strip markers). ~12 funded hours from
-session start (~hour 2 now); anything not pushed does not exist.
+— pull-rebase before EVERY push; LOG.md conflicts append-only
+(upstream first, mine last). Anything not pushed does not exist.
 
-## Done and pushed this session (commits on origin/arxiv)
-1. **Item 1 (0c49e544):** `support_stats/stage2_variance.py`
+## Shipped this session (all on origin/arxiv)
+1. **Item 1 (0c49e544)** — `support_stats/stage2_variance.py`
    pre-flighted + fixed for BOTH Stage-2 panels: `--row-layout auto`
-   (paired layout: new-panel rows carry the v2 flag + both column
-   sets), `--post-k-rule times-T` (post at k = 8·T), `--seeds` filter
-   (also fixes the live legacy abort from top-up seeds 3–5),
-   honest two-T degradation (trend skipped with reason), diagnostic
-   aborts. 12 fixture tests + byte-identity guard
-   (`tests/test_stage2_variance_panels.py`); full suite 331 passed.
-   **d/e run their exact commands from
-   `support_stats/PANEL_RECIPES.md`** (d substitutes its ds key).
-2. **Item 2 (ad08678a):** `PROBE_V2_SPEC.md` § 0 — first-class
+   (paired rows carry the v2 flag + both column sets — v1 selection
+   was EMPTY on the new panels before), `--post-k-rule times-T`
+   (post at k = 8·T), `--seeds` filter (also fixed a LIVE abort: the
+   λ̂ top-up seeds broke the legacy default), honest two-T degradation,
+   diagnostic aborts. 12 fixture tests + byte-identity guard
+   (`tests/test_stage2_variance_panels.py`). **d/e: exact commands in
+   `support_stats/PANEL_RECIPES.md`.**
+2. **Item 2 (ad08678a)** — `PROBE_V2_SPEC.md` § 0: first-class
    lower-bound limitation (v2 low by up to 0.18 at low truth + dense +
-   p/n ≥ 1; the two misses receipted from `probe_truth.json`
-   `amendment.rows`: token/6%/truth 0.412 → v2 0.299 @p/n 1.0,
-   0.232 @p/n 2.0). §§ 1–4 numbering untouched. Status block records
-   the taken decision (v1 canonical; spec = post-deadline candidate).
-3. **Item 2.5 (259a755e):** mirror probe-truth CLOSE-OUT from pushed
-   data only. Final `probe_truth.json` + fig regenerated from
-   committed shards (cells 27 → 18 disclosed — increment 2 embedded
-   ~13 never-pushed mid-run cell-seeds; empty fig panels annotated
-   "lost mid-run"). Labels: amended scope ADOPT-consistent (A_P1 7/8,
-   A_P2 10/12, over-truth 0/12); frozen scope AMBIGUOUS-unresolved
-   permanently (anchors never ran). Mix arms/transfer/line D: lost,
-   never read. Card § 10 close-out; `briefings/mirror-probe-truth.md`
-   DELETED (retired). Scorecard LOG entry follows the binding NOTE
-   (lower bound in headline; mix arms stated first; p_eff quoted from
-   pushed numbers only — increment 2's "70/2048 ⇒ 0.034, 3–30×" sat
-   partly on unpushed cells, do not quote as receipted).
+   p/n ≥ 1; both misses artifact-receipted). §§ 1–4 numbering stable.
+3. **Item 2.5 (259a755e)** — mirror probe-truth CLOSE-OUT from pushed
+   data only: final `probe_truth.json` + fig regenerated from committed
+   shards (cells 27 → 18 disclosed; empty fig panels annotated);
+   amended scope ADOPT-consistent, frozen scope AMBIGUOUS-unresolved
+   permanently; mix arms/transfer/line D lost, never read; card § 10;
+   `briefings/mirror-probe-truth.md` DELETED (retired).
+4. **Item 3 (48a7f2be)** — `task_hunt/RECEIPTS.md` +
+   `receipts_check.py`: 50 recomputed values / 16 claims, ALL PASS,
+   pytest-wired (`tests/test_receipts_index.py`). Caught + corrected
+   one live quote (dialevel T32 triple was truncated, not rounded:
+   correct is +0.057 gpt2 / +0.063 gemma / +0.035 llama).
+5. **Item 4 (dbe782e4)** — pre-staged panel analysis appended to
+   `PANEL_RECIPES.md`: expected row decomposition (84 full / 24
+   replication), harness→scorecard→RECEIPTS order of operations,
+   skeleton LOG scorecard, receipt reading guide.
 
-## In progress: item 3 — `experiments/explorations/task_hunt/RECEIPTS.md`
-Claim→artifact index, one row per rebuttal-quotable number: claim as
-stated / artifact path + JSON key / producing commit / recomputed-now
-value / PASS-FAIL. Build a checker script (`receipts_check.py` beside
-it) so every number is script-derived; flag mismatches LOUDLY. Seed
-list (briefing item 3; extend it): λ̂ panel cells + trend p = 0.0093;
-margin trend p = 0.0046; pre/T8 n = 6 CI [0.179, 0.235]; pre-vs-tsae
-NOT-bounded (paired LB −0.041, Welch LB −0.016, p = 0.082 — never
-quote as significant); shuffle/anticipation receipt; tsae fairness
-(max |paired D| 0.011 vs 0.05); split-forensics zero leakage; five
-Stage-1 KEEP screens WITH corpus size; amended order finding g_order
-band + dialevel counterexample; NEW: mirror Stage-1 receipt numbers
-(now closed) + PROBE_V2_SPEC § 0 numbers. Then item 4 if time.
+## Standby duties (in priority order, if resuming mid-window)
+1. **Serve the panels.** d (oprate, GPUs 0–2) and e (fineweb gemma,
+   GPUs 3–5; already pushing batches) will run the variance harness
+   per PANEL_RECIPES.md. If either hits a harness abort they cannot
+   read, that is my bug queue — fix with tests, push fast.
+2. **RECEIPTS.md upkeep:** any new quotable number from the panels
+   gets a row via `receipts_check.py` (must print ALL PASS).
+3. **Do NOT:** train anything, run mirror cells, resume em-redo or
+   factory work (PAUSED under force majeure); never relitigate the
+   v1-canonical methods decision.
+4. If both panels are done/receipted and nothing remains: tell the
+   operator so the pod can be stopped (bootstrap rule).
 
 ## Standing context
-- Both Stage-2 panels are live on this pod (d: oprate, GPUs 0–2 — was
-  still claiming/cache-building; e: fineweb gemma, GPUs 3–5 — pushing
-  batches + doc-identity floor receipts already). My harness serves
-  them; if either pings about variance receipts, point at
-  PANEL_RECIPES.md.
 - METHODS DECISION TAKEN (LOG 2026-07-25): v1 canonical, paired v2
-  reported, never quote v2 as canonical. Do not relitigate; no mirror
-  training, no new mirror cells, em-redo/factory PAUSED.
+  reported, never quote v2 as canonical; v2 numbers are lower bounds
+  in the low-truth dense regime (SPEC § 0).
 - pytest trap: commit new files before the full-suite run
   (`test_diff_hash_consistent_with_dirty`).
 - All numbers script-derived; upstream is hot — small commits, push
-  per completed batch. Rewrite this file before any compact.
+  per batch. Rewrite this file before any compact.

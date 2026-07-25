@@ -4244,3 +4244,5 @@ dialevel T32 triple in both LOG entries was TRUNCATED, not rounded
 RECEIPTS.md carries the correctly rounded values (+0.057/+0.063/+0.035)
 with model attribution pinned by the T16 row — the finding is
 unchanged, the quote is now exact. Full suite green incl. the new test.
+
+## 2026-07-25 — runpod-b — panel-support-audit item 4 SHIPPED (one line): pre-staged panel analysis lives in `support_stats/PANEL_RECIPES.md` — expected row decomposition (84 / 24), harness→scorecard→RECEIPTS order of operations, and the skeleton LOG scorecard; d/e fill slots, they do not write analysis code at 3am. Audit COMPLETE at its acceptance gate (items 1–4 + close-out); briefing stays until mac-local review.
