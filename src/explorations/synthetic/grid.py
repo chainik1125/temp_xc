@@ -91,18 +91,31 @@ def run_cell(cell: dict) -> dict:
 
 
 def run_pool(cells: list[dict], out_path: Path, *, max_workers: int = 6,
-             describe=None, tag: str = "grid") -> list[dict]:
+             describe=None, tag: str = "grid",
+             max_tasks_per_child: int | None = None) -> list[dict]:
     """Run ``cells`` in a process pool, dumping results to ``out_path`` as they land.
 
     ``describe(res) -> str`` formats the per-cell metric summary for the progress
     line (default: none). Returns the list of result dicts.
+
+    ``max_tasks_per_child`` (default None = long-lived workers, the
+    historical behavior for every existing caller) bounds how many cells
+    a worker process runs before being replaced. Real-activation
+    datasources cache one materialization per (ds, seed) per process
+    (`data.synthetic._SYNTHETIC_CACHE`), so a long-lived worker on a
+    3-seed panel accumulates ~3× the datasource RAM; on a cgroup-capped
+    box that accumulation OOM-kills workers (SIGKILL invisible to dmesg
+    → BrokenProcessPool). ``max_tasks_per_child=1`` trades ~a minute of
+    re-materialization per cell for a flat per-worker RAM ceiling.
     """
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    print(f"[{tag}] {len(cells)} cells, max_workers={max_workers}", flush=True)
+    print(f"[{tag}] {len(cells)} cells, max_workers={max_workers}, "
+          f"max_tasks_per_child={max_tasks_per_child}", flush=True)
     t0 = time.time()
     results, done = [], 0
-    with ProcessPoolExecutor(max_workers=max_workers) as ex:
+    with ProcessPoolExecutor(max_workers=max_workers,
+                             max_tasks_per_child=max_tasks_per_child) as ex:
         futs = {ex.submit(run_cell, c): c for c in cells}
         for fut in as_completed(futs):
             res = fut.result()

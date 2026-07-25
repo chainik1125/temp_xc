@@ -143,8 +143,11 @@ def main():
     safe = sel.replace(":", "-").replace("/", "of")
     out = HERE / "results" / (f"stage2_{ds}.json" if sel == "all"
                               else f"stage2_{ds}__{safe}.json")
+    # Fresh process per cell: this box is cgroup-capped at 301 GB and a
+    # long-lived worker accumulates one 8.5 GB datasource copy PER SEED
+    # (three cgroup OOM kills before this was set). Scheduling only.
     grid.run_pool(cells, out, max_workers=workers, describe=_describe,
-                  tag=f"stage2-oprate/{ds}/{sel}")
+                  tag=f"stage2-oprate/{ds}/{sel}", max_tasks_per_child=1)
 
 
 if __name__ == "__main__":
