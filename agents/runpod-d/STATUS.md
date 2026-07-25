@@ -32,8 +32,10 @@ work. (The combined `task-hunt-r2.md` was split by mac-local at
 
 **Primary round-2 deliverable: DONE + PUSHED** (`2b64dbe4`), gate met.
 **Seed top-up: PARTIAL + PUSHED** (`d45cb1cc`).
-**Factory screening (briefing § 3): sc_lambda DONE (KEEP-qualified);
-oprate/qrate/verbosity screens IN FLIGHT** (cards frozen `31084b38`).
+**Factory screening (briefing § 3): COMPLETE + PUSHED** (`723024e5`) —
+5 targets screened, 4 KEEPs this batch + sc_lambda KEEP-qualified, and a
+**program-level NEGATIVE on order** (see § D). Briefing § 3 is discharged
+for every Ward-grid bundle I hold caches for.
 
 ### A. Matched TXC-post + probe capacity (§ 1–2) — CLOSED
 1. **Reading (b) CONFIRMED**: round-1 post 0.255 @ T16 was budget-confounded.
@@ -76,34 +78,68 @@ falsified; P5 disclosed as non-discriminating as frozen (per-token alone
 already beat the visible-evidence line — the equal-dimension g_agg test in
 the later cards is the fixed version).
 
+### D. Factory batch B2/B3/B4 — 192 cells, 4 KEEPs, and THE finding
+`oprate` (ver+case), `qrate`, `verbosity` (vslope); cards frozen
+`31084b38` pre-run; driver `task_hunt/factory_screen.py`.
+
+| target | tok | g@T32 | g_agg@T32 | g_order@T32 | null tok |
+|---|---|---|---|---|---|
+| oprate/ver | 0.813 | +0.063 | +0.062 | +0.001 | 0.676 |
+| oprate/case | 0.741 | +0.068 | +0.060 | +0.008 | 0.612 |
+| qrate | 0.818 | +0.081 | +0.086 | −0.004 | 0.585 |
+| verbosity/vslope | 0.702 | +0.081 | +0.076 | +0.005 | **0.503** |
+| sc_lambda | 0.871 | +0.066 | +0.066 | −0.000 | 0.636 |
+
+**→ THE PROGRAM-LEVEL NEGATIVE: order does not matter, anywhere.** Across
+5 targets × 4 (model, layer) cells × 5 T, `g_order`@T32 spans −0.004…+0.008
+and the within-window shuffle costs only +0.003…+0.019. Every window win
+on this substrate is **order-free aggregation (regime 2)**. The hunt's
+T-scaling leg reproduces easily and repeatedly; **its order leg is
+negative and should be reported as a finding, not kept as an open search
+item.** This includes `verbosity/vslope`, a SLOPE chosen *specifically*
+because it should need order — card B4's P2 (order matters) is
+**FALSIFIED**; its order-free MEAN arm carries the gain. oprate P6 also
+falsified (predicted ver > case; case marginally larger).
+
+**Capacity control held everywhere** (`g_agg ≈ g` at equal dimensionality),
+so none of these is the RECORD § 3c probe artifact — and it demonstrably
+bites: qrate's NULL arm shows a >3σ flatten gain at T32 whose `g_agg` is
+NEGATIVE and whose effect is all `g_order`, correctly flagged as a
+flatten overfit, not aggregation.
+
+**Standing:** `oprate` is the only INDEPENDENT candidate (corr 0.026 with
+λ̂_sc; its own two targets −0.032) and cleared the batch's highest
+visible-evidence bar. `qrate` is an explicit REPLICATION — adds
+confidence, not an independent datapoint. All five are the same
+phenomenon: a substantially converted latent (per-token 0.70–0.87) plus a
+real order-free aggregation gain worth 26–51 % of remaining headroom.
+
 ## DO THIS NEXT
 
-### 1. Harvest the four in-flight factory screens (chain3)
-`oprate/ver`, `oprate/case`, `verbosity/vslope`, `qrate` — cards frozen at
-`31084b38` BEFORE any cell ran; driver `task_hunt/factory_screen.py`
-(generic over the factory's `man_<target>_*` layout; ~20 min per target;
-idempotent per cell so partial runs resume). Logs
-`…/scratchpad/screen_<bundle>_<target>.log`; results
-`task_hunt/<bundle>/results/<bundle>_<target>_screen.json`.
-Write **one LOG paragraph per target**, KEEP/KILL against that card's own
-kill rules, and score every frozen prediction — including the ones I
-expect to fail:
-- **oprate is the valuable one**: independent of sc_lambda (corr 0.026)
-  AND of its own second target (−0.032), so a win here is a genuinely
-  separate datapoint. It also carries the highest visible-evidence bar
-  (ver T32 = 0.830).
-- **qrate is an explicit REPLICATION** of the sc_lambda family — a KEEP
-  adds confidence, it does NOT count as an independent candidate.
-- **verbosity is the structurally anti-ambient one** (a SLOPE;
-  visible-evidence BELOW chance and falling with T). It is the only card
-  where I predicted **order to matter** (P2: g_order > 0.02, shuffle
-  costs). If it comes back order-free like the rest, that premise is
-  FALSIFIED and must be written as such, not folded into a KEEP.
+**Everything in `briefings/task-hunt-r2-d.md` is discharged** (§ 1 matched
+re-run + § 2 figure + § 3 factory screening) except the parts that are
+explicitly parked or belong to other pods. The briefing stays until
+mac-local review. Suggested next, in value order:
 
-### 2. Analysis convention to keep applying
-Always report **g_agg beside g**. If g_agg ≈ g the window gain is real
-aggregation; if g ≫ g_agg it is probe capacity (RECORD § 3c). This is now
-the discriminating test in every card I froze after sc_lambda.
+1. **Surface the order-negative to the orchestrator as a program
+   decision.** Five independent event streams, zero order sensitivity, is
+   enough to stop hunting regime-3 on this substrate (R1-Distill/Ward
+   traces) and either (a) accept the regime-2 aggregation story as the
+   paper's claim, or (b) move the hunt to a substrate where order is
+   *mechanically* required. I did NOT take this decision — same handling
+   as the probe-capacity one.
+2. **If a Stage-2 panel is wanted, run `oprate/ver` or `oprate/case`** —
+   the only INDEPENDENT candidate. Reuse `lambda_intensity/run_stage2.py`
+   with a new plugin datasource (see § 4 methods note 1); budget the
+   TXC-post cells at nominal k = 8·T from the start (RECORD § 3c).
+3. **Remaining unscreened bundles need caches I do not hold** —
+   `novelty`/`punctint`/`interleave` are fineweb, `dialevel` is
+   DailyDialog, `refmark`/`eqdens` are WildChat/OpenWebMath. Those are
+   runpod-e's economics, not mine.
+
+### Do NOT retry as specified
+The tsae seed top-up (see § B) — fix the `ActivationBuffer` refill path
+first, or it will burn hours again for nothing.
 
 ### Parked (do NOT run)
 Proof-op Stage-2 on distill L12; gpt2-scale order cell. Hedging-level
