@@ -3231,3 +3231,96 @@ arm + shuffle immunity + label-null), on a latent that is already
 substantially converted, in the winner's own family. Worth a Stage-2
 panel only if mac-local wants a second regime-2 datapoint; it is not a
 new phenomenon.
+
+## 2026-07-25 — runpod-d — factory batch B2/B3/B4 screened (oprate ver+case, qrate, verbosity vslope) — **4 KEEPs, and a program-level NEGATIVE: nothing is order-sensitive**
+
+Cards frozen at `31084b38` before any cell ran; driver
+`task_hunt/factory_screen.py` (one generic screen over the factory's
+`man_<target>_*` layout). 4 targets × 48 cells = **192 cells, 0
+failures**, on the existing Ward base/distill caches. Bundles consumed
+unmodified. σ_null = 0.0058–0.0069 per target (3σ ≈ 0.017–0.021).
+
+**Per-target verdicts (mean over the four (model, layer) cells):**
+
+| target | per-token | g@T32 | g_agg@T32 | g_order@T32 | null tok | null g@T32 | verdict |
+|---|---|---|---|---|---|---|---|
+| oprate/`ver` | 0.813 | +0.063 | +0.062 | +0.001 | 0.676 | +0.001 | **KEEP** |
+| oprate/`case` | 0.741 | +0.068 | +0.060 | +0.008 | 0.612 | −0.022 | **KEEP** |
+| qrate | 0.818 | +0.081 | +0.086 | −0.004 | 0.585 | +0.019 | **KEEP** (replication) |
+| verbosity/`vslope` | 0.702 | +0.081 | +0.076 | +0.005 | 0.503 | +0.002 | **KEEP** |
+| *(sc_lambda, prior entry)* | 0.871 | +0.066 | +0.066 | −0.000 | 0.636 | −0.007 | KEEP (qualified) |
+
+No kill rule fires for any target. In every case g clears 3σ by T = 8
+(T = 16 for `vslope` and for 1 of 4 `case` cells) and **grows
+monotonically through T = 32**; base ≈ distill everywhere (|Δ| ≤ 0.03,
+P5/P4 ✓).
+
+**The capacity control holds everywhere — this is the load-bearing
+result.** `g_agg ≈ g` at T ≥ 8 for all four targets, i.e. the
+window-MEAN arm — which carries the **same d_in = 4096 dimensions as the
+per-token probe** — reproduces essentially the whole gain. So none of
+these window wins can be the probe-capacity artifact that RECORD § 3c
+found in the Stage-2 panel. Kill rule 3 (`g_agg < ½·g`) was written into
+the cards precisely to catch that and it never fires on the real arm.
+Nice confirmation that the control bites: on **qrate's NULL arm** at
+T = 32 the flatten gain is +0.019…+0.036 (above 3σ) while its `g_agg` is
+**negative** and the whole effect sits in `g_order` — a pure flatten-arm
+overfit, correctly flagged as not-aggregation by the same test.
+
+**Null-label controls are clean.** The within-trace event-shuffle labels
+(marker rate preserved, local clustering destroyed) give per-token
+0.50–0.68 with **no real window gain**; `vslope`'s null sits at
+**0.503 — exact chance**, the cleanest control in the batch.
+
+**→ THE PROGRAM-LEVEL FINDING: order does not matter, anywhere.** The
+hunt as briefed wants "T-scaling **plus a within-window shuffle ablation
+showing order matters**". Across **five targets** now screened on real
+activations (ward λ̂, λ̂_sc, oprate ver, oprate case, qrate, vslope) ×
+4 (model, layer) cells × 5 window sizes, `g_order` at T = 32 spans
+**−0.004 to +0.008** and the within-window shuffle costs **+0.003 to
++0.019** AUC. Every window advantage found on this substrate is
+**order-free aggregation (regime 2)**. The T-scaling leg of the hunt
+reproduces easily and repeatedly; **the order leg is negative and should
+now be reported as a finding rather than kept as an open search item.**
+
+**This includes the candidate chosen specifically to break that
+pattern.** `verbosity/vslope` is a **SLOPE** — a change quantity that
+mathematically requires comparing early to late — and its bundle's
+label-side visible-evidence line is *below chance and falling with T*
+(0.483/0.425/0.303). Card B4 predicted (P2) that here, uniquely,
+**order would matter**: `g_order > 0.02` at T ≥ 16 and a shuffle cost
+> 0.02. **P2 is FALSIFIED**: `g_order` is **negative** at T ≤ 16
+(−0.014 at T16) and ≈ 0 (+0.005) at T32, and the order-free MEAN arm
+carries the gain (g_agg +0.076). So the "a slope is structurally
+different" premise, written into the card in advance as the reason to
+screen it, is **wrong on this substrate** — the slope is recovered
+order-free like every rate. The one part of B4's premise that DID hold
+is the per-token level: 0.702, markedly below the rate candidates
+(0.74–0.87), consistent with a slope being less linearizable — though
+P1's stated band (0.55–0.70) was still slightly too low.
+
+**Other scored predictions.** oprate **P6 FALSIFIED**: I predicted `ver`
+would show a larger g than `case` at T = 32 (bursty verification vs
+uniform enumeration); actual `ver` +0.063 vs `case` +0.068 — `case` is
+marginally larger, i.e. the two operation classes are indistinguishable
+on this axis. oprate P1 ✓ (0.74–0.82, inside 0.70–0.88); qrate P1 ✓
+(0.815–0.824, inside 0.80–0.90) and the predicted negative-g-at-T2
+crossing to 3σ by T8 reproduced exactly.
+
+**Standing of each, stated so nothing is over-sold.** `oprate` is the
+only **independent** candidate in the batch (corr with λ̂_sc = 0.026, and
+its two targets are mutually independent at −0.032), so it is the one
+genuinely separate datapoint — and it earned it against the batch's
+highest visible-evidence bar (`ver` T32 = 0.830). `qrate` is an explicit
+**replication** of the λ̂_sc family and adds confidence, **not** an
+independent candidate. `vslope` is independent in construction but its
+scientific value is now mainly the falsified order prediction.
+
+**All five are the same phenomenon, and that is the honest summary:** a
+trailing-history latent on this model/corpus is (i) substantially
+linearized into the current token (per-token 0.70–0.87 — the round-1
+conversion lesson, now measured five more times) and (ii) improved by a
+real, monotone, **order-free** window aggregation worth ~+0.06…+0.08 AUC
+at T = 32 (26–51 % of the remaining headroom). That is a robust regime-2
+result reproduced across independent event streams — and it is NOT the
+regime-3 order-sensitive phenomenon the strongest form of the hunt wants.
