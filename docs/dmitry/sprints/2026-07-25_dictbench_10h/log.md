@@ -72,4 +72,54 @@ efficiently than the SAE's outer-product constructions, and the metric is
 **fidelity(m) = Δmargin(best least-squares write from m scalars) / Δmargin(ground-truth
 schedule)**, with each architecture given its *best* allocation of the m scalars. That is a
 crisp linear-algebra claim rather than a vibe, and it makes the SAE baseline as strong as
-it can be, which is the point.
+it can be, which is the point. Using signed least-squares coefficients also dissolves the
+sign bug above — orientation is now something the fit chooses, not something I hand-set.
+
+### 16:33 — harness agent's report, and the fairness bug it caught
+
+`harness_guide.md` delivered, and it caught the thing most likely to have invalidated the
+whole benchmark:
+
+> At equal `batch_size` and equal steps, the TXC sees T× more token-activations than the
+> SAE. `gen_flat` yields `(B, d)` = B tokens; `gen_windows[T]` yields `(B, T, d)` = B·T
+> token-slots. Nothing in the harness corrects for this.
+
+It also connects this to the project's own history — the 2026-05-05 purified-sampling fix,
+where an SAE was getting ~25× more tokens/step than the TXC it was compared against. Same
+bug class, opposite direction. My smoke had exactly this defect (SAE 256 tokens/step vs TXC
+3072). **Fixed: the SAE's batch is now T× the TXC's, so both consume the same
+token-activations per step, and both totals are printed.**
+
+Three more traps from the same report, all now handled: `k` is multiplied by T inside the
+crosscoder constructor (so `window_l0` is per window, not per token); protocols A and B are
+**numerically identical at T=5** and the module docstring contradicts the code, so T must
+differ from 5 for the two arms to be distinct (we use T=12: A → per-position k=100/window
+1200, B → k=41/window 492); and `CrosscoderSpec.decoder_directions()` returns a live
+autograd view while the SAE's returns `.data`.
+
+### 16:37 — mini-validation, and a structural result falls out for free
+
+Tiny run (120 docs, d_sae=1536, 200 steps, protocol B) purely to exercise the new
+matching-pursuit code before committing to the full job:
+
+```text
+[budget] TXC 64 windows = 768 token-acts/step;  SAE 768 tokens = 768 token-acts/step
+[rows]   |sae col|=1.000   |txc slab|=1.000  row=0.289
+[ref ]   full DoM schedule Δmargin = +33.47
+   txc            m=1: fid=+0.237 recon_cos=0.198     m=4: fid=+0.285 recon_cos=0.345
+   sae_broadcast  m=1: fid=+0.034 recon_cos=0.000     m=4: fid=+0.075 recon_cos=-0.000
+   sae_perpos     m=1: fid=+0.010 recon_cos=0.082     m=4: fid=+0.242 recon_cos=0.164
+```
+
+**`sae_broadcast` has reconstruction cosine of exactly 0.000, and that is not a bug — it is
+the previous sprint's central finding re-derived as orthogonality.** A broadcast atom is
+`1_T ⊗ v`: constant in time. The target profile is *balanced*, so it has zero mean along
+the time axis and is therefore **exactly orthogonal to every constant-in-time atom**, for
+any direction `v` whatsoever. "A level cannot make a shape" stops being an empirical
+finding about one model and becomes a statement about the subspace a per-token dictionary
+spans when its coefficient is held constant across a window.
+
+Directionally the registered prediction also appears — TXC ahead at m=1 (0.237 vs 0.010)
+with the per-position SAE closing fast by m=4 (0.285 vs 0.242) — but at 120 docs and 200
+steps that is a plumbing observation, not a result. Full run launched: 1500 docs,
+d_sae=4096, 3000 steps, m ∈ {1,2,4,8,16,32}, both protocols.
