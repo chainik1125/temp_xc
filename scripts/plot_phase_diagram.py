@@ -32,12 +32,18 @@ fig = plt.figure(figsize=(16.2, 4.4), dpi=150)
 gs = fig.add_gridspec(1, 3, width_ratios=[1.15, 1, 0.85], wspace=0.3)
 
 def cell_kind(ell, W):
-    """measured | full-template-by-construction | structural zero (no write)."""
+    """at-risk | identity (R ≡ 1) | zero-write (R ≡ 0).
+
+    R = 1 exactly when W divides ℓ: every block lies inside one run, so
+    sign(μ_b) reproduces the ±1 template and the same vector is written.
+    R = 0 exactly when the block straddles equal halves, giving μ_b = 0.
+    Only the remaining cells can disagree with the theory.
+    """
     pi = np.array([1.0 if (t // ell) % 2 == 0 else -1.0 for t in range(K)])
     mu = np.array([pi[b * W:(b + 1) * W].mean() for b in range(K // W)])
     if np.all(np.sign(mu) == 0):
         return "zero"
-    return "identity" if W == 1 else "measured"
+    return "identity" if ell % W == 0 else "at-risk"
 
 
 ax = fig.add_subplot(gs[0, 0])
@@ -48,12 +54,12 @@ for i, ell in enumerate(ELLS):
         txt = f"{obs[i, j]:.2f}\n({pred[i, j]:.2f})"
         ax.text(j, i, txt, ha="center", va="center", fontsize=8.5,
                 color="white" if obs[i, j] > 0.55 else "0.15")
-        if kind != "measured":
+        if kind != "at-risk":
             ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False,
                                        hatch="///", edgecolor="0.55",
                                        linewidth=0.0, alpha=0.55))
 ax.plot([], [], marker="s", ls="", color="0.55", markersize=9,
-        label="fixed by construction")
+        label="fixed by construction (R ≡ 1 if W | ℓ; R ≡ 0 if the block straddles)")
 ax.legend(loc="lower left", bbox_to_anchor=(0.0, -0.30), fontsize=8,
           frameon=False, handletextpad=0.5)
 ax.set_xticks(range(len(WS)))
@@ -63,8 +69,7 @@ ax.set_yticklabels(ELLS)
 ax.set_xlabel("W — segments the handle writes a single constant over")
 ax.set_ylabel("ℓ — run length of the target profile")
 ax.set_title("A. Fidelity R(W, ℓ): observed, (predicted)\n"
-             "11 measured cells, no fitted parameters, mean |error| = 0.029",
-             fontsize=10)
+             "hatched = fixed by construction; 6 cells can disagree", fontsize=10)
 cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
 cb.set_label("fraction of full-template effect", fontsize=8.5)
 
@@ -81,8 +86,8 @@ ax2.set_xticks(WS)
 ax2.set_xticklabels([str(w) for w in WS])
 ax2.set_xlabel("W — handle width (segments)")
 ax2.set_ylabel("fidelity per knob   R·W/k")
-ax2.set_title("B. Control efficiency peaks at W ≈ ℓ\n"
-              "(★ = best width; knobs needed for full fidelity = k/ℓ)", fontsize=10)
+ax2.set_title("B. Control efficiency is best at W ≈ ℓ, and ties at odd multiples\n"
+              "(★ = best width; full fidelity costs k/ℓ knobs)", fontsize=10)
 ax2.grid(color="0.92", lw=0.8)
 ax2.legend(fontsize=9, frameon=True, framealpha=0.95, edgecolor="0.85")
 for s in ("top", "right"):
@@ -91,15 +96,16 @@ for s in ("top", "right"):
 ax3 = fig.add_subplot(gs[0, 2])
 jit = np.linspace(-0.012, 0.012, len(WS))[None, :] * np.ones((len(ELLS), 1))
 ax3.plot([0, 1], [0, 1], color="0.6", lw=1.2, ls="--", zorder=1)
-msk = np.array([[cell_kind(l, w) == "measured" for w in WS] for l in ELLS])
+msk = np.array([[cell_kind(l, w) == "at-risk" for w in WS] for l in ELLS])
 ax3.scatter((pred + jit)[msk], obs[msk], s=52, color="#0072B2",
             edgecolor="white", linewidth=0.7, zorder=3, label="Qwen-2.5-1.5B")
 ax3.scatter((pred - jit)[msk], obs7[msk], s=52, marker="^", color="#CC79A7",
             edgecolor="white", linewidth=0.7, zorder=3, label="Qwen-2.5-7B")
 ax3.set_xlabel("predicted R (no fitted parameters)")
 ax3.set_ylabel("measured R")
-ax3.set_title("C. Same law in both models\n"
-              "6 fractional cells: mean |error| 0.053 / 0.045", fontsize=10)
+ax3.set_title("C. The 6 at-risk cells, both models\n"
+              "mean |error| 0.053 (1.5B) / 0.045 (7B), nothing fitted",
+              fontsize=10)
 ax3.set_xlim(-0.06, 1.06)
 ax3.set_ylim(-0.06, 1.06)
 ax3.grid(color="0.92", lw=0.8)

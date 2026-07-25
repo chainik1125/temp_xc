@@ -758,3 +758,124 @@ for the **marginals** — `results["marginals"]` currently keeps only mean and s
 the single thing that would most improve its power. And add one arm: **one segment at
 magnitude `W·m`** versus **W segments at magnitude `m`**. If those match, the
 "superadditivity" is dose, not span. Both are **≈ 5 GPU-min** inside the existing job.
+
+---
+
+## Round 3 — the span door, and the one sentence to change
+
+### R1 — do not close the span door: R drifts with dose in 12 of 12 cells, and per-position saturation cannot do that
+
+Asked whether a null `S_span` should close the question. It should not, and the reason is
+already in `lsweep_qwen1.5b.json` and `lsweep_qwen7b.json`.
+
+**The `block_cap` arm gives R a much stronger invariance than I credited in P2.** Every
+segment receives a coefficient of ±1 — only the *sign* varies across cells, never the
+magnitude. So write the per-position contribution as `+q₊(m)` for a segment whose write
+matches its attribute and `−q₋(m)` for one that does not. Then
+
+```text
+Δ(W) = n₊·q₊(m) − n₋·q₋(m),    Δ_full = k·q₊(m)
+R    = [n₊ − ρ(m)·n₋] / k,      ρ(m) ≡ q₋(m)/q₊(m)
+```
+
+If positions contribute independently and symmetrically (ρ = 1), then `R = mean_b|μ_b|`
+**for any response function q whatsoever** — saturating, convex, sigmoid, anything. R is
+therefore dose-invariant under every per-position nonlinearity. That makes its
+dose-dependence a sharp test, and it is one the existing data already runs:
+
+| cell | 1.5B R@0.2 | R@0.35 | R@0.5 | 7B R@0.2 | R@0.35 | R@0.5 |
+| --- | --- | --- | --- | --- | --- | --- |
+| ℓ=1, W=3 | 0.144 | 0.210 | 0.249 | 0.339 | 0.365 | 0.355 |
+| ℓ=2, W=3 | 0.308 | 0.363 | 0.353 | 0.255 | 0.260 | 0.268 |
+| ℓ=2, W=6 | 0.308 | 0.363 | 0.353 | 0.255 | 0.260 | 0.268 |
+| ℓ=3, W=2 | 0.568 | 0.607 | 0.628 | 0.498 | 0.577 | 0.617 |
+| ℓ=3, W=4 | 0.156 | 0.213 | 0.206 | 0.232 | 0.330 | 0.335 |
+| ℓ=6, W=4 | 0.590 | 0.621 | 0.641 | 0.537 | 0.591 | 0.599 |
+
+R rises with dose in **6/6 cells at 1.5B and 6/6 at 7B** (mean +0.059 and +0.054;
+sign test over 12 independent cells, p ≈ 2⁻¹² one-sided). Correspondingly the fit
+quality is dose-selected: mean |obs − pred| is 0.099 / 0.068 / 0.053 at frac 0.2 / 0.35 /
+0.5 for 1.5B, and 0.094 / 0.058 / 0.045 for 7B. **The headline 0.053 and 0.045 are the
+values at the top of the dose grid, which is also where linearity is best; at frac 0.2 the
+law is about half as accurate.**
+
+**Two explanations survive, and only one of them is a span effect.**
+
+- *Asymmetric per-position response.* The implied ρ falls from ≈ 1.4 at frac 0.2 to ≈ 1.2
+  at frac 0.5: a wrong-signed write hurts about 1.5× more than a right-signed write helps,
+  and the asymmetry shrinks with dose. One dose-dependent parameter fits four of six cells
+  at 1.5B. This has **no span content at all** — it is still position-independent.
+- *Cross-position interaction.* The real thing.
+
+**The experiment that separates them, and my answer to the question.** Measure the
+single-segment marginal twice — with the write matched to that segment's own attribute and
+with it flipped — across the dose grid. That yields `q₊(m)` and `q₋(m)` directly; substitute
+the measured ρ(m) into `R = [n₊ − ρ n₋]/k` and see whether the drift is fully accounted for.
+`convex.json` has only the matched-sign marginals, so the flipped set is what is missing:
+**≈ 8–10 GPU-min**. If ρ(m) explains the drift, close the door and say so — the response is
+position-independent with an asymmetric sign response, and no span effect exists at this
+scale. If a residual survives, that residual *is* the span effect, and it is largest at low
+dose, which is where no span test has been run.
+
+So the write-up should not say "no span effect" flatly, and should not leave a vague
+future-work hedge either. It should say: **no span effect at matched coverage in
+teacher-forced margins at the doses tested; the linear law's one systematic failure is its
+dose-dependence, which replicates across both models and has a named two-way resolution.**
+
+**One structural point worth a sentence in the limitations.** Teacher-forcing removes the
+mechanism a span effect would most plausibly use: the text is pinned at every position, so
+a run of consistent writes cannot establish a state that the model's own continuation
+carries forward. Finding 4 (entrainment) is the same question asked where that mechanism is
+available, and it is positive. Those results are not in tension — they are the pinned and
+unpinned versions of one question, and saying so converts an awkward null into a clean pair.
+
+### R2 — the single most overstated sentence in `summary.md`
+
+> **"The scheduled handle moves the model's own choice the intended way on 96.9% of slots
+> against 51.2% for the same direction at constant strength."** (Finding 3)
+
+**Why it is the worst one.** The number is real — `controls.json`,
+`stance_calibrated.template@0.5.frac_correct_direction = 0.96875` — but it is not a measure
+of choice. Reading `controls_modal.py:334-336`, it is the fraction of slots on which a
+*continuous* quantity moved in the intended direction:
+`d = (s_marg − b_marg)·sign_t`, `correct = 1[d > 0]`. A shift of one-thousandth of a nat
+counts. The code does compute the model's actual pick on the next line
+(`pick = rc if s_marg > 0 else cc`) — and never scores it.
+
+**The metric that did score the pick is in the repo and sits at chance.**
+`stance_gen.json`, same task, same direction, same bank, same doses:
+
+| arm | menu accuracy @0.35 | @0.5 |
+| --- | --- | --- |
+| template | 0.500 ± 0.000 | 0.536 ± 0.016 |
+| broadcast | 0.500 ± 0.000 | 0.500 ± 0.000 |
+| single | 0.500 ± 0.000 | 0.526 ± 0.013 |
+| unsteered | 0.500 ± 0.000 | — |
+
+So the honest joint reading of the two runs is: **steering moves the declining-versus-
+helping log-odds the intended way on 96.9% of slots and by a large average amount
+(1.00 nats/token at the top dose), but it moves the model's actual preference across the
+decision boundary on only 3.6 points above a 50% floor.** `controls_modal.py:16-22` states
+plainly why the menu metric was replaced ("a model that always prefers the same class
+scores 4/8 by construction") — which is exactly the signature of shifts that do not cross
+the boundary. That diagnosis is correct as a reason to *add* the calibrated metric; it is
+not a reason to drop the choice number, because the choice number is the behavioural claim.
+
+Finding 3's heading, "It transfers to a behaviour", compounds it: a reader arrives at
+"96.9%" already primed to read it as free-response behaviour, when it is a two-alternative
+forced choice over supplied candidates at a dose where free generation is code-mixed.
+
+**Suggested replacement**, same length, no retraction needed:
+
+> The scheduled handle shifts the model's preference between a declining and a helping
+> continuation in the intended direction on **96.9%** of slots (mean shift 1.00 nats/token)
+> against **51.2%** for the same direction at constant strength; it flips which continuation
+> the model actually prefers on 53.6% of slots against a 50% floor, so this is a large,
+> reliably-signed pressure on the choice rather than a decisive change of it.
+
+**Runners-up, for completeness.** Finding 1's "mean absolute error 0.053 and 0.045" should
+carry "at the top of the dose grid" (see R1 — at frac 0.2 it is 0.099 and 0.094). And
+finding 5's "Permuting the schedule inside a block … collapses +55.3 to −1.2" is offered as
+evidence in the executive summary while the body correctly says the collapse "confirms the
+design rather than revealing a mechanism"; the executive summary should carry the same
+caveat, since a linear response predicts that collapse exactly.
