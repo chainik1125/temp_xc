@@ -4221,3 +4221,26 @@ Card closes with § 10; `briefings/mirror-probe-truth.md` retires with
 this entry (CLOSE-OUT section executed). The campaign's decision was
 already consumed upstream (METHODS DECISION, 2026-07-25): v1 canonical,
 paired v2 reported, spec = post-deadline freeze candidate carrying § 0.
+
+## 2026-07-25 — runpod-b — panel-support-audit item 3 SHIPPED: `RECEIPTS.md` claim→artifact index — 50 recomputed values across 16 claims, ALL PASS, one quote corrected
+
+`task_hunt/RECEIPTS.md` + `receipts_check.py`: every rebuttal-quotable
+number as one row — claim as we would state it, artifact + JSON key,
+producing commit, recomputed-NOW value, PASS/FAIL at the quote's stated
+precision. Wired into pytest (`tests/test_receipts_index.py`) so drift
+breaks the suite, not the rebuttal. Covers: the λ̂ trend p = 0.0093 and
+margin-trend p = 0.0046; pre/T8 at n = 3 and the n = 6 top-up CI
+[0.179, 0.235] (recomputed from the canonical leaderboard); the
+NOT-bounded pre-vs-tsae margin (paired LB −0.0413, Welch LB −0.0159,
+p = 0.082 — a negative-space receipt: never quote as significant); the
+backtracking shuffle/anticipation receipt; T-SAE fairness (max
+|D| = 0.011); split-forensics zero leakage; the five Stage-1 KEEPs with
+probe train-row counts attached; the AMENDED order finding's bands
+(g_order −0.004…+0.008, shuffle +0.003…+0.019 — never with "anywhere")
+AND dialevel's counterexample; the mirror Stage-1 receipt + lower-bound
+misses. **The checker caught one live mismatch on its first run:** the
+dialevel T32 triple in both LOG entries was TRUNCATED, not rounded
+(artifact: gpt2 +0.0567 → quoted "+0.056"; gemma +0.0626 → "+0.062");
+RECEIPTS.md carries the correctly rounded values (+0.057/+0.063/+0.035)
+with model attribution pinned by the T16 row — the finding is
+unchanged, the quote is now exact. Full suite green incl. the new test.
