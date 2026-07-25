@@ -111,6 +111,27 @@ profiles, for which the null is genuinely 0.5, keeps the balanced family to
 demonstrate the artifact, adds a period-2 family (predicted threshold W*=ℓ+1=3), an
 m=0 control per family, and n=48.
 
+### 23:55 — self-audit of the headline before the red team got to it
+
+Asked of my own best result: how many of the "24 cells, mean error 0.013" are actually
+measurements? Answer: **11**. Four cells (W=1) are the full template by construction, so
+R = 1 identically. Nine cells are **structurally silent** — with a balanced profile the
+block-constant coefficient `sign(μ_b)` is exactly zero in every block, so no vector is
+written and Δ = 0 by arithmetic rather than by measurement. Quoting 0.013 over 24 cells
+credits the law for 13 cells it was never at risk on.
+
+Corrected numbers now used everywhere: **0.029 over the 11 measured cells** (7B: 0.025),
+and **0.053 over the 6 cells whose prediction is strictly between 0 and 1** (7B: 0.045).
+Those 6 remain a real zero-parameter test, and they discriminate the two candidate
+budget laws: the per-slot cap predicts 0.667 where an energy-matched budget predicts
+0.816, and the measurements are 0.628 / 0.641 — the cap form fits.
+
+Same correction applies to the zig-zag. Only **ℓ=6 (W=6 → 1.00 beats W=4 → 0.64)** is a
+reversal between two *measured* cells. The ℓ=1 and ℓ=2 reversals are measured-vs-silent:
+still a true statement about the phenomenon (a width-2 handle on an alternating profile
+can write nothing useful) but weaker evidence than a measured-vs-measured reversal.
+Figure now hatches the by-construction cells so this is visible rather than buried.
+
 ### 23:00 — THE CENTERPIECE IS RETRACTED, and the replacement is better
 
 The review agent's audit landed and it is correct. I verified the decisive claim
