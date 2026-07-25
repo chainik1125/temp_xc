@@ -1,75 +1,67 @@
 # Working state — agent `runpod-e`
 
-**Last rewrite:** 2026-07-25 ~16:15 UTC (**A40 interim pod, mid-restart
-session.** Gemma panel COMPLETE + VERDICT POSTED; replication cells
-launching. Funding clock: session started ~12:00 UTC, ~12 h total.)
+**Last rewrite:** 2026-07-25 ~21:30 UTC (**stage2-fineweb COMPLETE
+through the FINAL cross-model verdict — all pushed.** One straggler
+cell + archival harness pending, nothing of substance hostage to it.)
 
-## Who / where / env (verified working this session)
-Interim 6×A40 pod (force majeure — see `briefings/a40-bootstrap.md`).
-My clone: `/workspace/agents/runpod-e/temp_xc`; **every shell starts
-with `source /workspace/agents/runpod-e/env.sh`** (cds here, pins
-CUDA_VISIBLE_DEVICES=3,4,5 → torch sees 3). Shared HF_HOME
-`/workspace/hf_cache`; tokens `/workspace/.tokens/`; git
-`runpod-e-agent`, pull-rebase before EVERY push. Suite 320 passed;
-validate OK. runpod-d owns GPUs 0–2 (oprate panel); runpod-b CPU-only
-(standby, pre-flighting my rows).
+## Who / where / env
+Interim 6×A40 pod (`briefings/a40-bootstrap.md`); my clone
+`/workspace/agents/runpod-e/temp_xc`; `source
+/workspace/agents/runpod-e/env.sh` in every shell (GPUs 3–5). Suite
+320 passed; validate OK. Funding clock started ~12:00 UTC.
+
+## STAGE2-FINEWEB — FINAL STATE (briefings/stage2-fineweb.md)
+**DONE + PUSHED, in order:** cache rebuild w/ byte-match receipts →
+re-claim + card APPENDIX A → gemma 84/84 panel → support receipt
+(floor 0.575–0.587; §7 evidence bar 0.345/0.461 at T8/16 — card's
+"small" prediction falsified, stated) → demeaned receipt (AMENDED §6b,
+disclosed; K4 ✓ +0.047) → variance harness v1+v2 → money plot (v1 +
+paired-v2) → **gemma VERDICT: v1 NO RULE FIRES AS WRITTEN** → gpt2
+replication 24/24 + harness (**WEAK**) → §10 re-quote (margins RAISED:
+linear +0.110/+0.105/+0.144 at T64, 3 models) → RECEIPTS R13–R18 ALL
+PASS (the index caught 2 mis-rounded quotes in my verdict — corrected,
+LOG'd) → llama replication 23/24 → **FINAL CROSS-MODEL VERDICT
+(LOG): NO v1 KEEP on any model — gemma NO-RULE-FIRES / gpt2 WEAK /
+llama NEGATIVE at the replication T's (its tsae token code is strong,
+0.263); v2 ordering positive 3/3 (non-canonical), with the llama
+TOKEN-code v2-INVERSION flagged for the post-deadline probe review.**
+Breadth question answered as model-heterogeneous; written as an
+honest instrumented negative, not softened.
+
+**PENDING (small, non-blocking):**
+1. llama tsae/T1/s42 pole (task bk2yky1p2, GPU 5; ~3h/cell, due
+   ~22:20). When it lands: llama harness v1+v2 per PANEL_RECIPES,
+   one-paragraph amendment to the final addendum (tsae n=2 → n=3),
+   llama RECEIPTS row, push. If the pod dies first: the n=2
+   disclosure in the final verdict already covers it.
+2. Then TELL THE OPERATOR the pod can be released.
+
+**NOT REACHED (stated in the verdict's coverage):** `tss` (needs its
+own caching pass), list-face re-quote, dialevel recency pre-flight
+(CANCELLED by bootstrap).
+
+## ANOMALY ON RECORD
+Commit `c8ab5fa0` (21:02): an emergency flush of my partial llama
+state made in my clone NOT by me, message falsely claiming the run
+was finished. Content verified byte-faithful (no numbers touched);
+documented in LOG; run was NOT killed on its say-so. If you are a
+future runpod-e: verify such commits against `ps` + row counts before
+believing them.
 
 ## OPERATIONAL GOTCHAS (this box)
-1. LOG.md rebase conflicts: strip markers, BOTH sides, upstream first.
-2. Leaderboard/manifest are LIVE files during panels — batch-push with
-   `git -c rebase.autoStash=true pull --rebase`; verify jsonl tails
-   parse before commit; audit shard dumps vs leaderboard if an
-   autostash ever conflicts (did once — nothing lost, stash held only
-   the now-untracked `.claude/scheduled_tasks.lock`).
-3. grep in a pipe block-buffers background-task output — read the raw
-   task file, don't wait on tail lines.
-
-## STAGE2-FINEWEB (briefings/stage2-fineweb.md) — state
-**DONE + PUSHED (all of it):**
-- Cache rebuilt from frozen recipe (tokens.npz byte-matches committed
-  labels 5985/5985; hs14/8/20 sweep 90 s; datasource load-test stats
-  in card bands). Re-claim LOG line + card APPENDIX A.
-- **Gemma panel 84/84 ok** (3-GPU round-robin shards of the frozen
-  `_cells()` list, tsae-first preserved; canonical results JSON merged
-  in frozen order). Leaderboard now has all 84 rows.
-- Receipts: `stage2_support` (floor 0.575–0.588; §7 evidence line
-  0.152/0.222/0.345/0.462 at T=2/4/8/16, T=1 structurally undefined —
-  card's "small" prediction WRONG at T≥8, stated), `stage2_demeaned`
-  (AMENDED — train-side doc mean impossible under doc-disjoint trace
-  split, §6a whole-stream mean used, disclosed; licence max Δ 1.4e-05;
-  K4 ✓ +0.047 all-seeds-positive), variance harness v1+v2 per
-  `support_stats/PANEL_RECIPES.md`, money plot (v1 + paired-v2).
-- **VERDICT POSTED (LOG):** v1 **NO RULE FIRES AS WRITTEN** — K1 ✓ T8
-  +0.0541, K3 ✓ +0.204, K4 ✓ +0.047, K2 ✗ (v1 T16 flat); v2 shows
-  monotone unsaturated ladder, pre−tsae bounded >0 at T8/T16, trend
-  2→16 p=0.0009 — the receipted v1-conservatism replicating on
-  corpus #2. §5 falsifier green 12/12; mismatches 5/42 (post 8.005–
-  8.047, saturation). Evidence-line bar NOT beaten by any window cell
-  at T≥8 — carried beside every quote.
-
-**IN FLIGHT / NEXT (in order):**
-1. **Replication cells** `--replicate=4,8`: gpt2 (GPU 4, workers 3),
-   llama31 (GPU 5, workers 2); caches built + alignment-verified
-   (5989/5989, 5924/5924). 24 cells each. Then: harness per
-   PANEL_RECIPES (two-T degradation is by design), per-model K1/K3/K4
-   at T4/T8, majority-rule cross-model paragraph appended to the
-   verdict. Push per batch.
-2. RECEIPTS.md rows via `receipts_check.py` for any number quoted in
-   the rebuttal (PANEL_RECIPES order: harness → scorecard → RECEIPTS).
-3. § 10 re-quote (`requote_screen.py`, screen-side, commit-then-run)
-   — only if clock allows after replication.
-4. `tss` NOT this window unless everything above lands with hours to
-   spare (needs its own ~330k-token caching pass).
-5. When nothing useful remains: TELL THE OPERATOR (pod can be stopped).
+1. LOG.md rebase conflicts: strip markers, both sides, upstream first.
+   RECEIPTS.md conflicts: resolve receipts_check.py, REGENERATE.
+2. Live jsonl batch pushes: `git -c rebase.autoStash=true pull
+   --rebase`; verify tails parse; audit shard dumps vs leaderboard if
+   an autostash conflicts.
+3. grep in a pipe block-buffers bg output — read the raw task file.
+4. tsae buffer-path ≈ 1h (d_in 768) / 2.2h (2304) / 3h (4096) per
+   cell on A40 at this corpus size.
 
 ## Sibling context
-runpod-d: oprate panel live on GPUs 0–2 (claimed, card frozen).
-runpod-b: standby CPU support; pre-flighted my first 67 rows clean;
-PANEL_RECIPES + RECEIPTS discipline are its shipped instruments.
-mac-local: reviews post-deadline; briefings stay until its review.
-
-## Protocol reminders (unchanged)
-Commit-then-run for every script; disclose every amendment (did 2×
-this session: T=1 evidence-line null; §6b demeaning spec); v1
-canonical / paired v2 never quoted as canonical; no pooling across
-models; push per batch — nothing unpushed exists.
+runpod-d: oprate panel COMPLETE/**NEGATIVE** (b-verified) — with my
+heterogeneous result, the program's Stage-2 record is now: λ̂ Ward
+KEEP (case #1) + oprate NEGATIVE (case #2) + fineweb heterogeneous
+no-KEEP (case #3). runpod-b: standby, receipts ALL PASS at every
+iteration. mac-local: Sunday 10:00 PT check-in reads what is pushed.
+Briefings stay until mac-local review.
