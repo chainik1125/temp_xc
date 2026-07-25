@@ -10,6 +10,16 @@ here.
 branch of the pre-registered rule the mirror evidence is consistent with.
 Adopting, declining or rejecting the v2 readout is mac-local's call.
 
+**AMENDED SCOPE (briefing AMENDMENT, mac-local 2026-07-25, binding).** The
+briefing amendment re-scopes the branch input after the card froze: the
+four branches fire only on evidence swept through p/n ≈ 1.0, the direct
+known-truth probe (constructed codes, exact truth, null included) is the
+priority input, and a mirror result at p/n ≪ 0.1 fires NO branch. The
+top-level `branch_evidence` is therefore computed on the amended scope;
+the frozen card's trained-ladder scoping is retained verbatim as
+`branch_evidence_frozen_card_scope` so the re-scoping is visible and
+cannot quietly buy an outcome.
+
 One aggregation detail the card left open and this script fixes (disclosed
 in the LOG rather than silently): a prediction quantified "over cells" is
 scored per cell and **fires iff it holds on ≥ 2/3 of the qualifying
@@ -451,14 +461,14 @@ def predictions(cells, calib, bad_seeds: set) -> dict:
 
 
 def calib_deltas(calib) -> dict:
-    """Stage-1 analogues of P1/P2 against EXACT truth — reported, NOT a branch
-    input.
+    """Stage-1 analogues of P1/P2 against EXACT truth, over the FULL p/n ladder.
 
-    The card scopes P1/P2 to cells "with a licensed anchor", i.e. the trained
-    ladder. But the calibration is the only place truth is exact rather than
-    estimated, so the same arithmetic there is the strongest single piece of
-    evidence in the campaign and must be visible in the receipt. It is
-    labelled `branch_input: false` and cannot move `branch_evidence`.
+    The card scoped P1/P2 to cells "with a licensed anchor" (the trained
+    ladder) and marked these blocks `branch_input: False`. The briefing
+    AMENDMENT (mac-local, 2026-07-25) inverts that for the p/n ≥ 0.5 rows:
+    those now feed the branch via `amended_branch_input`. The blocks here
+    keep the whole ladder (p/n 0.004–2.0) as context — the low-p/n rows
+    remain non-branch evidence per amendment item 1.
 
     Split by arm because the arms differ in *where truth sits* (≈ 0.99 for
     `full`, ≈ 0.41 for `token`), and the probe's downward bias is a function
@@ -504,6 +514,111 @@ def calib_deltas(calib) -> dict:
                                             default=float("nan"))),
             "rows": rows}
     return out
+
+
+# ── AMENDMENT (briefing, mac-local 2026-07-25) — the operative branch scope ──
+
+AMENDMENT_NOTE = (
+    "briefings/mirror-probe-truth.md AMENDMENT (mac-local, 2026-07-25, "
+    "binding): the four branches fire only on evidence swept through "
+    "p/n ~ 1.0; the direct known-truth probe (constructed codes, exact "
+    "truth, null included) is the priority branch input; a mirror result "
+    "at p/n << 0.1 fires NO branch. The frozen card's trained-ladder "
+    "scoping is retained as `branch_evidence_frozen_card_scope`.")
+
+
+def amended_branch_input(calib) -> dict:
+    """Constructed-code cells at p/n >= 0.5 (v1's regime), T = 16, seed-means.
+
+    Cell statistic and bar exactly as card § 4 (mean over data seeds,
+    bar = max(2·SE, 0.05)); the only thing the amendment changes is WHICH
+    cells feed the branch — exact-truth cells at the panel's operative p/n,
+    not the trained ladder (whose truth sits at ~0.95, where the bias this
+    campaign measures is negligible by mechanism).
+
+    ``p_over_n`` is v1's regime (nw = 1024 ⇒ n = 2048 rows at T = 16 — the
+    card § 1.1 arithmetic). Each probe is evaluated exactly as committed
+    (v1: OLS at nw 1024; v2: RidgeCV at nw 8192): the branch question is
+    "what does each probe REPORT on this cell", not "what would v1 do with
+    v2's budget" — that factorisation lives in the anchor 2×2 grid.
+
+    Mix arms (tunable truth at the same p/n) join automatically when their
+    shards land; the receipt records which arms were present at run time.
+    """
+    by = defaultdict(list)
+    for c in calib:
+        if c["T"] != 16:
+            continue
+        g = [q for q in c["grid"] if q["n_windows"] == 1024][0]
+        if g["p_over_n"] < 0.5:
+            continue
+        by[(c["arm"], c["density"], c["p"], float(g["p_over_n"]))].append(
+            (g["truth"], c["v1"], c["v2"]))
+    rows = []
+    for (arm, dens, p, pn), vals in sorted(by.items(), key=str):
+        d1 = [v[1] - v[0] for v in vals]
+        d2 = [v[2] - v[0] for v in vals]
+        b1, b2 = _bar(d1), _bar(d2)
+        rows.append({"arm": arm, "density": dens, "p": p, "p_over_n": pn,
+                     "n_seeds": len(vals),
+                     "truth": float(np.mean([v[0] for v in vals])),
+                     "v1": float(np.mean([v[1] for v in vals])),
+                     "v2": float(np.mean([v[2] for v in vals])),
+                     "d1": float(np.mean(d1)), "d2": float(np.mean(d2)),
+                     "bar1": b1, "bar2": b2,
+                     "v1_sags": bool(np.mean(d1) <= -b1),
+                     "v1_tracks": bool(abs(np.mean(d1)) < b1),
+                     "v2_tracks": bool(abs(np.mean(d2)) < b2),
+                     "v2_over_truth": bool(np.mean(d2) >= b2)})
+    # The null arm (truth 0) feeds the optimism check and "v2 tracks", but
+    # not "v1 sags" — a probe cannot under-report a truth of zero.
+    signal = [r for r in rows if r["truth"] >= 0.1]
+    over = [r for r in rows if r["v2_over_truth"]]
+    return {"note": AMENDMENT_NOTE,
+            "n_cells": len(rows), "n_signal_cells": len(signal),
+            "arms": sorted({r["arm"] for r in rows}),
+            "truth_levels": sorted({round(r["truth"], 3) for r in rows}),
+            "A_P1_v1_sags": _fires([r["v1_sags"] for r in signal]),
+            "A_P2_v2_tracks": _fires([r["v2_tracks"] for r in rows]),
+            "A_both_track": _fires([r["v1_tracks"] and r["v2_tracks"]
+                                    for r in signal]),
+            "n_v2_over_truth": len(over), "over_detail": over,
+            "rows": rows}
+
+
+def branch_amended(g1, preds, am) -> tuple[str, str]:
+    """The four-branch map on the AMENDED evidence scope.
+
+    REJECT keeps priority (optimism anywhere: a constructed cell with
+    d2 ≥ bar, or the frozen card's P4 check — trained ladder + null arm).
+    ADOPT needs v1 sagging AND v2 tracking on the exact-truth cells at
+    p/n ≥ 0.5; DECLINE needs BOTH probes tracking there. G1's constants
+    check still gates (the substrate must be the documented one); the
+    anchor licence does not — truth here is exact by construction, no
+    anchor is consumed.
+    """
+    if not preds["P4"]["holds"] or am["n_v2_over_truth"] > 0:
+        return ("REJECT-consistent",
+                "v2 reports above exact truth on a constructed cell or "
+                "inflates on the null arm — branch 3 evidence, reported "
+                "first.")
+    if not g1["constants_pass"]:
+        return ("AMBIGUOUS", "G1 constants check failed — substrate unproven")
+    if am["n_signal_cells"] < 3:
+        return ("AMBIGUOUS",
+                "fewer than 3 exact-truth signal cells at p/n >= 0.5")
+    P1a, P2a = am["A_P1_v1_sags"]["holds"], am["A_P2_v2_tracks"]["holds"]
+    if P1a and P2a:
+        return ("ADOPT-consistent",
+                "at p/n ~ 1.0, v1 under-reports exact truth beyond bar on a "
+                ">= 2/3 majority of signal cells while v2 stays within bar "
+                "(and never above truth)")
+    if am["A_both_track"]["holds"]:
+        return ("DECLINE-consistent",
+                "both probes track exact truth at p/n ~ 1.0 — no capacity "
+                "failure to fix")
+    return ("AMBIGUOUS",
+            f"mixed pattern on the amended scope (A_P1={P1a}, A_P2={P2a})")
 
 
 def branch(gates, preds) -> tuple[str, str]:
@@ -562,6 +677,10 @@ def main():
         calib, set(g3["excluded_scaled_keys"]), g3)
     _, _, _, label_frozen, why_frozen = _run(
         calib, set(g3["excluded_frozen_keys"]), g3)
+    # The AMENDED scope (primary since 2026-07-25). It consumes no trained
+    # cell, so G3's exclusion sets cannot move it by construction.
+    am = amended_branch_input(calib)
+    label_am, why_am = branch_amended(gates["G1"], preds, am)
     g3["branch_under_no_exclusion_PRIMARY"] = label
     g3["branch_under_scaled_G3"] = label_scaled
     g3["branch_under_frozen_G3"] = label_frozen
@@ -585,8 +704,12 @@ def main():
                        for c in cells if "anchor_mean" in c
                        and not c.get("anchor_licensed")],
     }
-    out = {"card": "CARD_PROBE_TRUTH.md", "branch_evidence": label,
-           "branch_reason": why,
+    out = {"card": "CARD_PROBE_TRUTH.md",
+           "branch_evidence": label_am,          # AMENDED scope — primary
+           "branch_reason": why_am,
+           "amendment": am,
+           "branch_evidence_frozen_card_scope": label,
+           "branch_reason_frozen_card_scope": why,
            "branch_under_scaled_G3": label_scaled,
            "branch_under_literal_frozen_G3": label_frozen,
            "branch_under_literal_frozen_G3_reason": why_frozen,
@@ -594,7 +717,16 @@ def main():
            "coverage": coverage, "cells": cells, "calibration": calib}
     (RES / "probe_truth.json").write_text(json.dumps(out, indent=1))
 
-    print(f"branch_evidence: {label}  — {why}")
+    print(f"branch_evidence (AMENDED scope, primary): {label_am}  — {why_am}")
+    print(f"  amended input: {am['n_cells']} cells "
+          f"({am['n_signal_cells']} signal) at p/n >= 0.5, "
+          f"arms {am['arms']}, truth levels {am['truth_levels']}")
+    for k in ("A_P1_v1_sags", "A_P2_v2_tracks", "A_both_track"):
+        v = am[k]
+        print(f"  {k}: {'HOLDS' if v['holds'] else 'FAILS'} "
+              f"({v['n_holding']}/{v['n_qualifying']})")
+    print(f"  v2 over truth on {am['n_v2_over_truth']} amended cells")
+    print(f"branch_evidence (frozen-card scope, retained): {label}  — {why}")
     print(f"  (G3 sensitivity — scaled exclusions: {label_scaled}; "
           f"card's literal constant: {label_frozen})")
     for g, v in gates.items():

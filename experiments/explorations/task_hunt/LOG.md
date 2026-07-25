@@ -3717,3 +3717,75 @@ and the scorecard. Coverage in the receipt will be emitted from the rows
 that actually land, never from the planned grid.
 
 _Recorded-by: claude-opus-5-1m (runpod-b, mirror-probe-truth)_
+
+## 2026-07-25 — runpod-b — mirror probe-truth increment 2: briefing AMENDMENT received and applied; the item-1 receipt now FIRES a branch — **ADOPT-consistent on the amended scope**; decision remains mac-local's
+
+**What arrived.** `briefings/mirror-probe-truth.md` gained a binding
+amendment (mac-local, 2026-07-25) after the card froze: (1) the four
+branches fire only on evidence swept through **p/n ≈ 1.0** — a mirror
+result at p/n ≪ 0.1 fires NO branch; (2) the **direct known-truth probe
+is the priority branch input** and ships the moment it exists; (3)
+22/843 checkpoint coverage is accepted; (4) deadline is Saturday midday
+PT, and branch 4 is a good outcome if nothing fires. The amendment was
+written before this box's increment-1 push was visible — the priority
+item it asks for (Stage 1, the constructed-code sweep through
+p/n = 1.0 with exact truth) was already complete; it is now pushed, and
+this increment re-scopes the analysis to match the amendment. The
+re-scoping is disclosed in card § 9 (a post-freeze appendix; the frozen
+§§ 2–6 are untouched — no arm, rung, seed, statistic, bar, gate or
+anchor rule changed, only WHICH cells feed the branch), and
+`analyze_probe_truth.py` now emits BOTH labels: `branch_evidence`
+(amended scope, primary) and `branch_evidence_frozen_card_scope`
+(retained verbatim), so the re-scoping cannot quietly buy an outcome.
+
+**The item-1 receipt (amended scope — 12 exact-truth cells at
+p/n ∈ {1.0, 2.0}, T = 16, arms full/token/null × densities k8/6%,
+3 seeds each, § 4 statistic unchanged): `ADOPT-consistent`.**
+
+- **A-P1, v1 sags below exact truth: 7/8 signal cells.** At p/n = 1.0,
+  v1 reports 0.914 where truth is 0.986 (top-8 density; d1 = −0.072)
+  and 0.541 at 6% density (d1 = −0.445); where truth is 0.412 it
+  reports 0.081 (top-8, d1 = −0.331) and 0.009 (6%, d1 = −0.402) —
+  at the real panel's density and truth regime, v1 reports
+  **approximately nothing where the true recoverable level is 0.41**.
+  The one miss: full/top-8 at p/n = 2.0, d1 = −0.047, inside the 0.05
+  bar.
+- **A-P2, v2 within bar of exact truth: 10/12 cells** (worst full-arm
+  d2 = −0.006). The two misses are the campaign's standing caveat, not
+  noise: at truth 0.41 + 6% density, v2 reports 0.299 (p/n = 1.0,
+  d2 = −0.113) and 0.232 (p/n = 2.0, d2 = −0.180) — **v2 numbers in
+  the low-truth dense regime are lower bounds, not estimates**.
+- **Branch-3 check: clean.** v2 exceeds exact truth on 0 of 12 cells
+  (max d2 above truth: full −0.0001, token −0.0031, null +0.0061,
+  inside bar); the null arm on seed-means inflates nowhere (per-draw
+  sensitivity: 1 excursion in 288, the disclosed seed-42 draw).
+- **DECLINE has no support: both-probes-track holds on 1/8 signal
+  cells** — the pattern is "v1 sags, v2 tracks", not "both fine".
+
+**The frozen-card-scope label, retained: `AMBIGUOUS` (G4), a mid-run
+artifact** — the trained ladder's anchors have not run yet (grid at
+~35/132 when this receipt was generated), so 0 trained cells are
+licensed. P3 (both probes agree at p/n ≤ 0.05 on the trained low-p/n
+cells) holds 4/4 and, per amendment item 1, fires no branch. That label
+will resolve when the grid and anchors land; the amended-scope label
+above is complete NOW because it consumes only Stage-1 cells whose
+truth is exact by construction and whose shards are final (the three
+seed shards are committed complete in this increment, replacing the
+mid-run snapshot from increment 1).
+
+**Caveats carried, stated first where they cut against v2:** (i) v2 is
+biased low by up to 0.18 exactly where the real panels live
+(low truth + dense + p/n ≥ 1), so adopting v2 does not make reported
+recovery an estimate of truth — it tightens a lower bound;
+`PROBE_V2_SPEC.md` does not currently carry this and should; (ii) the
+constructed code concentrates λ in ≤ 2 columns — a trained code spreads
+it; the transfer test's Test A supports the (p/n, density) mechanism on
+the real panel (gap +0.032 sparse vs +0.184 dense at matched nominal
+p/n = 1.00) but does not rule out residual dependence on how signal is
+distributed (`signal_dims_caveat` in `probe_truth_transfer.json`);
+(iii) mix arms (tunable truth at the same p/n) are in flight and will
+either densify or break the inversion — Test B stays unread until they
+land. **The decision is mac-local's; this is the receipt, not the
+verdict.**
+
+_Recorded-by: claude-fable-5 (runpod-b, mirror-probe-truth)_

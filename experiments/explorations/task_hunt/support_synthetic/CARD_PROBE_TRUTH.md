@@ -352,3 +352,52 @@ meeting quotes in tracked files. Deadline: results by Saturday morning PT.
 
 _Frozen-by: runpod-b, 2026-07-24 22:00 UTC, before any Stage-1/2/3 build or
 run commit._
+
+---
+
+## 9. AMENDMENT APPLIED (2026-07-25, post-freeze, disclosed — not a silent edit)
+
+`briefings/mirror-probe-truth.md` gained a **binding amendment from
+mac-local (2026-07-25)** after this card froze, superseding the briefing's
+§ 1 and re-scoping the branch input. Its operative items:
+
+1. **p/n is the campaign's x-axis, not T.** The four branches fire only on
+   evidence swept through p/n ≈ 1.0. **A mirror result at p/n ≪ 0.1 fires
+   NO branch** and must not be reported as though it did.
+2. **The direct known-truth probe is the priority branch input** —
+   constructed codes at set L0 with exact truth, plus the null code
+   (truth 0), swept through p/n = 1.0, both probes, including the branch-3
+   check "does v2 ever report ABOVE truth".
+3. Coverage honesty accepted in advance (22/843 checkpoints is a real
+   paired sample).
+4. Deadline moved to **Saturday midday PT**; if nothing has fired by then,
+   branch 4 applies and that is a good outcome.
+
+**What this changes in the analysis, exactly.** The card's § 5 scoped
+P1/P2 to trained cells "with a licensed anchor" and § 7 built the branch
+map on them; the Stage-1 exact-truth deltas were reported but marked
+`branch_input: False`. The amendment inverts that for the p/n ≥ 0.5
+rows. `analyze_probe_truth.py` therefore emits:
+
+- **`branch_evidence` (primary)** — computed by `branch_amended` on
+  `amended_branch_input`: constructed cells at p/n ≥ 0.5 (v1's regime,
+  § 1.1 arithmetic), T = 16, seed-means with the § 4 bar unchanged.
+  A-P1 = v1 sags on ≥ 2/3 of signal cells (truth ≥ 0.1; the null arm
+  cannot sag from zero); A-P2 = v2 within bar on ≥ 2/3 of all cells;
+  REJECT keeps priority via § 5's P4 (unchanged) plus any constructed
+  cell with d2 ≥ bar; G1's constants check still gates; the anchor
+  licence does not (truth is exact by construction here). Mix arms join
+  this input automatically as they land — same statistic, more truth
+  levels at the same p/n.
+- **`branch_evidence_frozen_card_scope`** — the § 5–§ 7 pipeline verbatim,
+  retained so the re-scoping is visible and cannot quietly buy an
+  outcome. Trained-ladder rows at p/n ≪ 0.1 remain reported as evidence
+  that fires no branch (amendment item 1) — this was already this card's
+  § 1.1 position and is unchanged.
+
+Nothing else in §§ 2–6 changed: no arm, rung, seed, statistic, bar, gate
+or anchor rule was touched. The amendment is scope, not measurement.
+
+_Amendment-applied-by: runpod-b, 2026-07-25, after Stage 1 + Stage 2
+completed and before any branch label was pushed; the frozen sections
+above are untouched._
