@@ -93,6 +93,14 @@ evidence-line analog is the latent-state bar).
 - runpod-e owns GPUs 3–5 + ~24 CPU cores; keep my pools ≤ ~24 cores.
 
 ## Traps already hit (keep)
+- **NEW (cost a pool): `git pull --rebase --autostash` (or any
+  stash/checkout that rewrites tracked jsonl) WHILE grid pools run
+  SIGBUS-kills workers mid-cell** (the mmap trap grid.py documents for
+  its own results file) → BrokenProcessPool, pool dies, training work
+  lost. Mid-run git discipline: add/commit new files + push to the
+  `arxiv-runpod-d-wip` side ref ONLY; real arxiv rebase+push at pool
+  boundaries. Also: SIGTERM does not reliably kill grid workers —
+  SIGKILL the worker PIDs and verify with `ps`/`nvidia-smi`.
 - run_pool OVERWRITES its results file on re-run → receipts from
   leaderboard.jsonl only.
 - Killing a ProcessPoolExecutor parent orphans workers → kill worker
