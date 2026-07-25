@@ -173,8 +173,9 @@ def build_cache(model_name: str, task: str, layers: list[int], t_max: int,
     for it in items:
         enc = tok(it["text"], return_offsets_mapping=True, add_special_tokens=True)
         offs = enc["offset_mapping"]
-        p = _span_end_token(offs, it["b_char_end"])   # generator-recorded offsets
-        v = _span_end_token(offs, it["a_char_end"])
+        # generator-recorded offsets; track-B names its fields for what they are
+        p = _span_end_token(offs, it.get("b_char_end", it.get("probe_char_end")))
+        v = _span_end_token(offs, it.get("a_char_end", it.get("delim_char_end")))
         if p is None or v is None or p <= v:
             continue
         rows.append((enc["input_ids"], p, v))

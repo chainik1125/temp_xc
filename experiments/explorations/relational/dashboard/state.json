@@ -5,8 +5,8 @@
   "agent": "runpod (H100 pod, /workspace/temp_xc)",
   "branch": "arxiv",
   "started_utc": "2026-07-25T00:00:00Z",
-  "last_update_utc": "2026-07-25T02:47:00Z",
-  "phase": "Phase 2 \u2014 candidate 5 KILLED with a positive control; candidate 4 running",
+  "last_update_utc": "2026-07-25T03:10:00Z",
+  "phase": "Phase 2 \u2014 candidate 4 gate running (layer 8); oracle-pair diagnostic queued",
   "state": "running",
   "prime_directive": "A sound verdict, never a win. Cards are frozen (committed) before any screen runs; git order is the evidence. Falsified predictions are scored as falsified."
  },
@@ -287,13 +287,13 @@
   }
  ],
  "resources": {
-  "disk_free_gb": 12.0,
+  "disk_free_gb": 12.4,
   "disk_total_gb": 233.0,
   "disk_floor_gb": 12.0,
   "gpu": "NVIDIA H100 80GB HBM3",
   "vram_total_gb": 80.0,
   "vram_floor_gb": 60.0,
-  "peak_vram_gb": null,
+  "peak_vram_gb": 7.87,
   "oom_events": [],
   "note": "The conversion-depth 17-layer caches were 144 GB for two models; that recipe does not fit in 37 GB and is capped to 2\u20133 capture layers per model. Every screen cell records peak VRAM, wall time, rows and feature count."
  },
@@ -337,6 +337,12 @@
    }
   ],
   "anomalies": [
+   {
+    "ts": "03:05",
+    "expectation": "the layer-0 positive control should reproduce on candidate 4",
+    "observed": "contradiction at layer 0 is at chance in EVERY arm, including the window MLP at T=64 (0.506)",
+    "disposition": "NOT read as 'not represented'. At T=64 the MLP has 262,144 inputs against ~3,800 training rows \u2014 the probe-capacity confound of RECORD \u00a7 3c. An oracle-pair arm was added (the two constituent positions only, 8,192 features) to settle it. Candidate 5's control worked because its constituents are 7 tokens apart, not 26."
+   },
    {
     "ts": "01:58",
     "expectation": "E2 (additive arms at chance on a balanced equality label)",
@@ -480,6 +486,21 @@
    "ts": "02:45",
    "kind": "running",
    "text": "Candidate 4 (contradiction) now caching on the frozen card: layers 0/8/16/24 \u00d7 T \u2208 {8,16,32,64}. Layer 0 is included precisely because it is now a known positive control."
+  },
+  {
+   "ts": "02:55",
+   "kind": "note",
+   "text": "Retrospective card written for candidate 5 with its weak provenance stated up front: it was authored after the pilot, so only the artifact timestamp and plan file pre-date the run. The contradiction card is the properly frozen template."
+  },
+  {
+   "ts": "03:05",
+   "kind": "watch",
+   "text": "Candidate 4's layer-0 control is at chance in every arm including the window MLP at T=64 \u2014 but with 262k features against ~3.8k rows that is a probe-capacity statement, not a representational one. Added an oracle-pair arm (two constituent positions only) rather than reading the null at face value."
+  },
+  {
+   "ts": "03:10",
+   "kind": "running",
+   "text": "Candidate 4 now at layer 8. Resource receipts so far: peak probe VRAM 7.87 GB against the 60 GB guard, zero OOM events, disk holding at 12.4 GB."
   }
  ],
  "figures": [
@@ -496,8 +517,8 @@
  ],
  "timing": {
   "session_start_utc": "2026-07-25T00:52:00Z",
-  "now_utc": "2026-07-25T02:47:00Z",
-  "elapsed_min": 115,
+  "now_utc": "2026-07-25T03:10:00Z",
+  "elapsed_min": 138,
   "basis": "Projections are calibrated on measured wall-clock from this session (env install 9 min, stimulus build <1 min, 15 GB model pull 6 min) and on the task_hunt round-1 record (a raw-activation screen cost ~3 h; a Stage-2 panel of 84 cells ran in ~2 h on one H100).",
   "phases": [
    {
@@ -517,9 +538,9 @@
    {
     "phase": "2 \u2014 track A gate",
     "state": "running",
-    "elapsed_min": 77,
-    "projected_min": 110,
-    "note": "Ran long: v1 stimuli had to be rebuilt (memorisation) and the gate re-instrumented (MLP arms). Candidate 5 done + killed; candidate 4 (larger T ladder, 4 layers) queued."
+    "elapsed_min": 100,
+    "projected_min": 150,
+    "note": "Candidate 5 done + killed with a positive control. Candidate 4 at layer 8 of 4 layers x T in {8,16,32,64}; T=32/64 cells are slow (262k-feature MLPs). An oracle-pair diagnostic was added mid-run and is queued behind it."
    },
    {
     "phase": "3 \u2014 track B role gate",
@@ -543,8 +564,8 @@
     "note": "RECORD + LOG + STATUS + figures. Runs whichever way the verdict lands."
    }
   ],
-  "projected_total_min": 545,
-  "projected_remaining_min": 423
+  "projected_total_min": 585,
+  "projected_remaining_min": 440
  },
  "triage": {
   "note": "Label-side triage \u2014 free kill authority, run before any GPU spend. By construction the label must be unreadable from either constituent alone, from length, or from filler count. This is expectation E1. v2 additionally asserts distinct_texts == n_items and that the inter-constituent gap is uninformative \u2014 both added after v1 failed (below).",
