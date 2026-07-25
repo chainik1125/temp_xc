@@ -544,3 +544,44 @@ The fix is one parameter: run the identical test on a profile with **runs** (ℓ
 adjacent positions can share correctness and the statistic measures what it is named for.
 Launched at 00:07 with n_eval=32, n_cond=44.
 
+### 00:32 — the span question is ANSWERED, and the one-parameter fix was the whole story
+
+`weights_ell3.json` landed (detached run caught a capacity window at 00:32). Identical
+code to the ℓ=1 version, one parameter changed — the target's run length — and the result
+inverts:
+
+| | ℓ=1 (alternating) | ℓ=3 (runs) |
+| --- | --- | --- |
+| adjacency statistic range | {0, 1, 2} | {0, 1, 2, 3, 4, 8} |
+| corr(adjacency, width) | −0.42 | **+0.09** |
+| χ²/dof homogeneous → weighted | 6.01 → 5.53 | **4.74 → 2.48** |
+| mean abs error homog → weighted | 0.067 → 0.077 (worse) | **0.106 → 0.068 (36% better)** |
+| adjacency coefficient | −0.094 (t = −3.96) | **+0.004 ± 0.006 (t = 0.65)** |
+
+Three things fall out.
+
+**The ℓ=1 "significant adjacency effect" was an artefact of the profile**, exactly as
+diagnosed: on an alternating target, adjacent positions cannot both be correctly signed
+inside a block, so the statistic could only move at block boundaries and was 42%
+correlated with width. Give the target runs and the statistic spans 0–8, decorrelates
+from width, and the effect vanishes.
+
+**Weighting by measured per-position weights now genuinely works** — χ²/dof halves and
+mean error improves 36%. At ℓ=1 it failed because the weights carried 78% relative error;
+here the same procedure predicts *multi*-position conditions from *single*-position
+measurements, which is an out-of-regime prediction rather than a fit.
+
+**And the null has power.** Residual spread is 0.075, so the design would register an
+effect the size of the confounded estimate (≈0.09 per adjacent pair) at ~15σ, and
+excludes anything above ≈0.018 at 3σ. This is a null with teeth, not an absence of
+evidence — which is exactly the registered prediction written into the script's docstring
+before it ran: *"if χ²/dof falls toward 1 and the adjacency coefficient is consistent with
+zero, the conclusion is 'additive over positions with unequal weights; no adjacency effect
+survives — a wider handle buys resolution, not interaction'."*
+
+Promoted to **finding 5** in the summary. The deviation-hierarchy section now closes the
+question rather than leaving it open, while still recording that it took four confounded
+attempts (coverage → sign composition → position → degenerate statistic) to get an
+instrument that could answer it, each of which produced a significant number that looked
+like the hoped-for result.
+
