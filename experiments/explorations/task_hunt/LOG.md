@@ -1183,8 +1183,19 @@ NOT budget-matched). Probe-capacity diagnostic
 fact.** Every untrained matched cell realizes l0_per_token = 8.000
 (±<0.01) at every T (untrained never sets the JumpReLU threshold, so
 inference runs the exact BatchTopK budget). Trained matched cells land
-at realized l0 = 6.04/7.50/8.09/7.99 at T=2/4/8/16 — inside the
-pre-registered [5.0,8.0] band, the same range TXC-pre occupies.
+at realized l0 = 6.04/7.50/8.09/7.99 at T=2/4/8/16, the same range
+TXC-pre occupies. **[CORRECTED 2026-07-25 after review — this sentence
+originally said "inside the pre-registered [5.0,8.0] band", which was
+wrong and skipped a bookkeeping duty the card imposed on itself.]** Card
+§ 3 requires any trained cell outside [5.0, 8.0] to be recorded as a
+residual mismatch, not smoothed over: **4 of 12 trained matched cells
+sit ABOVE 8.0** — T8 at all three seeds (8.121/8.080/8.060) and T16
+seed 42 (8.009), T8 cell mean 8.087 — **a residual mismatch of up to
++1.5 % over the panel budget, concentrated at T8**. Verdict unaffected
+and the direction is **conservative**: at T8 matched post held MORE
+budget than TXC-pre (8.09 vs 7.79) and still recovered less (0.144 vs
+0.206), so the surplus cannot explain post's failure to rise — it
+hardens the headline. No re-run (reviewer instruction).
 
 **Reading (b) CONFIRMED — the round-1 rise to 0.255 is not a
 matched-budget win.** Under the eval probe the post T-profile inverts

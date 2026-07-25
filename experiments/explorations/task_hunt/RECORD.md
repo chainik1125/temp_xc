@@ -335,7 +335,21 @@ canonical runner.
 **Falsifier (card § 6) passed:** every untrained matched cell realizes
 l0_per_token = 8.000 (±<0.01) at every T — the l0=k/T mechanism is a
 measured fact, not an assumption. Trained matched cells: realized l0 =
-6.0/7.5/8.1/8.0 at T=2/4/8/16 (in-band).
+6.0/7.5/8.1/8.0 at T=2/4/8/16.
+
+> **Residual mismatch, per the card's own bookkeeping rule (corrected
+> 2026-07-25 after review).** Card § 3 requires that any trained cell
+> outside **[5.0, 8.0]** be "recorded as a residual mismatch and carried
+> into the reading, not smoothed over". **Four of twelve trained matched
+> cells sit ABOVE 8.0** — T8 at all three seeds (8.121 / 8.080 / 8.060)
+> and T16 seed 42 (8.009); the T8 cell mean is 8.087. An earlier version
+> of this section called these "in-band", which was wrong. The honest
+> statement is **a residual mismatch of up to +1.5 % over the panel
+> budget, concentrated at T8.** Consequence for the verdict: **none, and
+> the direction is conservative** — at T8 matched post held MORE budget
+> than TXC-pre (8.09 vs 7.79) and still recovered less (0.144 vs 0.206),
+> so the surplus cannot explain post's failure to rise; it hardens
+> "TXC-pre remains the matched-budget headline". No re-run.
 
 **Result — matched vs round-1 (mean over 3 seeds, eval probe):**
 
