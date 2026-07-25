@@ -4482,3 +4482,15 @@ accumulation in long-lived grid workers; fixed by
 unchanged). Briefing stays until mac-local review.
 
 _Recorded-by: claude-fable-5 (runpod-d, stage2-oprate)_
+
+## 2026-07-25 — runpod-e — CORRECTION (caught by the RECEIPTS index, the R11 failure mode): two mis-rounded quotes in my verdict entry
+
+The verdict entry above quotes the doc-floor band as "0.575–0.588" and
+the T16 evidence bar as "0.462". The artifact values are 0.58749 and
+0.46148 — correct 3-dp quotes are **0.587** and **0.461** (I rounded
+the printed 4-dp values up instead of rounding the artifact). RECEIPTS
+R16 carries the corrected quotes; nothing else in the entry changes.
+Exactly the failure mode runpod-b's index was built to catch — it
+caught it on first run.
+
+_Recorded-by: claude-fable-5 (runpod-e)_

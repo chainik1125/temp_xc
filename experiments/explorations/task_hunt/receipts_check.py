@@ -313,6 +313,144 @@ def build_receipts():
              "miss1_v2": m1["v2"], "miss1_d2": m1["d2"],
              "miss2_v2": m2["v2"], "miss2_d2": m2["d2"],
              "truth": m1["truth"]}))
+
+    # ── stage2-fineweb, CASE STUDY #3 (runpod-e, 2026-07-25) ────────────
+    gv = _j("support_stats/stage2_variance_qrate_gemma.json")
+    gcell = gv["cell_ci95_trained"]["txc_batchtopk_pre/T8"]
+    gd8 = gv["paired"]["txc_pre_minus_pertoken"]["by_T"]["T8"]
+    R.append(dict(
+        id="R13",
+        artifact="support_stats/stage2_variance_qrate_gemma.json",
+        key="cell_ci95_trained[txc_batchtopk_pre/T8]; "
+            "paired.txc_pre_minus_pertoken.by_T.T8",
+        claim="fineweb gemma panel headline (v1, canonical): pre/T8 "
+              "0.250 [0.189, 0.311]; K1 gap vs better token +0.0541 at "
+              "T8 — NOT BOUNDED at n = 3 (BCa [−0.002, 0.086], "
+              "sign-flip p = 0.25): quote direction + CI, never "
+              "'significant'. Verdict of record: NO RULE FIRES AS "
+              "WRITTEN (K1✓ K3✓ K4✓, K2✗)",
+        checks=[("mean", 0.250, 3), ("lo", 0.189, 3), ("hi", 0.311, 3),
+                ("gap", 0.0541, 4), ("bca_lo", -0.002, 3),
+                ("bca_hi", 0.086, 3), ("p_sf", 0.25, 2)],
+        got={"mean": gcell["mean"], "lo": gcell["t_ci95"][0],
+             "hi": gcell["t_ci95"][1], "gap": gd8["mean"],
+             "bca_lo": gd8["bca_ci95"][0], "bca_hi": gd8["bca_ci95"][1],
+             "p_sf": gd8["p_signflip_one_sided"]}))
+
+    gv2 = _j("support_stats/stage2_variance_qrate_gemma_v2.json")
+    g2t8 = gv2["paired"]["txc_pre_minus_tsae"]["by_T"]["T8"]
+    g2t16 = gv2["paired"]["txc_pre_minus_tsae"]["by_T"]["T16"]
+    g2tr = gv2["trend"]["txc_pre_trained_2to16_secondary"]
+    R.append(dict(
+        id="R14",
+        artifact="support_stats/stage2_variance_qrate_gemma_v2.json",
+        key="paired.txc_pre_minus_tsae.by_T.{T8,T16}; "
+            "trend.txc_pre_trained_2to16_secondary",
+        claim="fineweb gemma paired v2 (NOT canonical — quote only as "
+              "'ordering robust, widens under an adequate probe'): "
+              "pre−tsae +0.100 [0.043, 0.158] at T8 and +0.129 [0.080, "
+              "0.179] at T16 — t-bounded > 0 at n = 3; full-ladder "
+              "2→16 trend p = 0.0009 (exact, 13824 perms)",
+        checks=[("t8", 0.100, 3), ("t8_lo", 0.043, 3),
+                ("t16", 0.129, 3), ("t16_lo", 0.080, 3),
+                ("p", 0.0009, 4)],
+        got={"t8": g2t8["mean"], "t8_lo": g2t8["t_ci95"][0],
+             "t16": g2t16["mean"], "t16_lo": g2t16["t_ci95"][0],
+             "p": g2tr["p_one_sided"]}))
+
+    dm = _j("qrate_fineweb/results/"
+            "stage2_demeaned_fineweb_punctint_q_gemma2_l14.json")
+    def _dm_mean(arch, T):
+        v = [r["ridge_demeaned"]["r"] for r in dm["rows"]
+             if r["arch"] == arch and r["T"] == T]
+        return float(np.mean(v)), v
+    dpre, dpre_v = _dm_mean("txc_batchtopk_pre", 8)
+    dtsae, dtsae_v = _dm_mean("tsae", 1)
+    dgaps = [a - b for a, b in zip(dpre_v, dtsae_v)]
+    R.append(dict(
+        id="R15",
+        artifact="qrate_fineweb/results/stage2_demeaned_"
+                 "fineweb_punctint_q_gemma2_l14.json",
+        key="ridge_demeaned.r means: pre/T8 vs tsae/T1; licence max Δ",
+        claim="fineweb within-document receipt (§ 6b amended — "
+              "whole-stream doc means; K4): doc-demeaned pre/T8 0.086 "
+              "vs tsae 0.039 — gap +0.047, positive in all 3 seeds "
+              "(min +0.041); probe-licence max Δ vs leaderboard "
+              "1.4e-05. The pre-registered collapse branch did NOT "
+              "occur; within-doc face sits near floor as predicted "
+              "but the ordering survives",
+        checks=[("pre", 0.086, 3), ("tsae", 0.039, 3),
+                ("gap", 0.047, 3), ("gap_min", 0.041, 3),
+                ("lic", 1.4e-05, 5)],
+        got={"pre": dpre, "tsae": dtsae,
+             "gap": float(np.mean(dgaps)), "gap_min": float(min(dgaps)),
+             "lic": dm["max_licence_delta"]}))
+
+    sup = _j("qrate_fineweb/results/"
+             "stage2_support_fineweb_punctint_q_gemma2_l14.json")
+    floors = [sup["per_T"][str(T)]["doc_floor_r"] for T in (1, 2, 4, 8, 16)]
+    R.append(dict(
+        id="R16",
+        artifact="qrate_fineweb/results/stage2_support_"
+                 "fineweb_punctint_q_gemma2_l14.json",
+        key="per_T.doc_floor_r; per_T.{8,16}.evidence_count_r",
+        claim="fineweb disclosure pair, printed beside every window "
+              "number: doc-mean identity floor r = 0.575–0.587 (above "
+              "every activation-probe cell on the panel), and the § 7 "
+              "visible q-count regression bar 0.345 (T8) / 0.461 (T16) "
+              "— NO window cell beats the count bar at T ≥ 8 on either "
+              "probe; the card's 'small at T ≤ 16' prediction is "
+              "falsified and any quoted window number carries this bar",
+        checks=[("floor_min", 0.575, 3), ("floor_max", 0.587, 3),
+                ("ev8", 0.345, 3), ("ev16", 0.461, 3)],
+        got={"floor_min": float(min(floors)),
+             "floor_max": float(max(floors)),
+             "ev8": sup["per_T"]["8"]["evidence_count_r"],
+             "ev16": sup["per_T"]["16"]["evidence_count_r"]}))
+
+    rq = _j("qrate_fineweb/results/requote_screen.json")["cells"]
+    def _rq_margin(key):
+        return (rq[f"{key}/T64/actxmean_linear"]["acc_test"]
+                - rq[f"{key}/tok_linear"]["acc_test"])
+    def _rq_nullgap(key):
+        return (rq[f"{key}/T64/actxmean_linear"]["acc_test"]
+                - rq[f"{key}/T64/actxmean_foreign_linear"]["acc_test"])
+    R.append(dict(
+        id="R17",
+        artifact="qrate_fineweb/results/requote_screen.json",
+        key="T64 actxmean_linear − tok_linear per model; − foreign null",
+        claim="punctint-q Stage-1 RE-QUOTE (corrected matched-class "
+              "grid, § 10): window − token margins at T64, linear "
+              "probe class: gpt2 +0.110 / gemma +0.105 / llama "
+              "+0.144, every window arm ≥ +0.12 above its "
+              "width-matched foreign null — the screen's MEAN-arm "
+              "margins were lower bounds and the corrected grid "
+              "RAISES them (400-doc screen corpus; screen rows)",
+        checks=[("gpt2", 0.110, 3), ("gemma", 0.105, 3),
+                ("llama", 0.144, 3), ("nullgap_min", 0.12, 2)],
+        got={"gpt2": _rq_margin("gpt2"),
+             "gemma": _rq_margin("gemma2_2b"),
+             "llama": _rq_margin("llama31_8b"),
+             "nullgap_min": min(_rq_nullgap(k) for k in
+                                ("gpt2", "gemma2_2b", "llama31_8b"))}))
+
+    pv = _j("support_stats/stage2_variance_qrate_gpt2.json")
+    pv2 = _j("support_stats/stage2_variance_qrate_gpt2_v2.json")
+    p4 = pv["paired"]["txc_pre_minus_tsae"]["by_T"]["T4"]
+    p8v2 = pv2["paired"]["txc_pre_minus_tsae"]["by_T"]["T8"]
+    R.append(dict(
+        id="R18",
+        artifact="support_stats/stage2_variance_qrate_gpt2[_v2].json",
+        key="paired.txc_pre_minus_tsae.by_T.{T4 v1, T8 v2}",
+        claim="fineweb replication, gpt2 (per-model WEAK on v1 — K1 ✗ "
+              "at the +0.05 bar): pre−tsae +0.028 [0.007, 0.050] at T4 "
+              "(v1, t-bounded > 0 but under the bar); paired v2 +0.066 "
+              "[0.050, 0.083] at T8 — the third independent instance "
+              "of the receipted v1-conservatism pattern",
+        checks=[("t4", 0.028, 3), ("t4_lo", 0.007, 3),
+                ("t8v2", 0.066, 3), ("t8v2_lo", 0.050, 3)],
+        got={"t4": p4["mean"], "t4_lo": p4["t_ci95"][0],
+             "t8v2": p8v2["mean"], "t8v2_lo": p8v2["t_ci95"][0]}))
     return R
 
 
