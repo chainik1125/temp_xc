@@ -278,10 +278,13 @@ else held fixed. A convex response to the net projection is arrangement-blind by
 construction, since it depends only on a scalar that any rearrangement preserving the
 projection leaves unchanged; unequal per-position weights are arrangement-blind too,
 since they depend on *where* a write landed and never on what sits beside it. So a
-cross-position effect is not evidence of a span effect. The only arrangement-shaped
-signal anywhere in the sprint is a correlation of **+0.245** between our residuals and
-block width (t = 1.48 on 34 dof, p ≈ 0.14) — not significant, and confounded with
-position, because width determines which positions receive which coefficients.
+cross-position effect is not evidence of a span effect. Two signals in the sprint are
+arrangement-*shaped*, and neither survives inspection: a correlation of **+0.245**
+between our residuals and block width (t = 1.48 on 34 dof, p ≈ 0.14), which is not
+significant and is confounded with position since width determines which positions
+receive which coefficients; and a significant adjacency coefficient from the one
+experiment built to test this directly, which is discussed below and which we do not
+believe.
 
 The honest position is therefore narrower than "no span effect" and stronger than "we
 could not tell". Nothing we measured requires arrangement sensitivity and everything we
