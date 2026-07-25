@@ -1,0 +1,491 @@
+{
+ "run": {
+  "title": "Regime-3 task hunt",
+  "subtitle": "Finding a real-activation task where temporal crosscoders win decisively \u2014 not marginally",
+  "agent": "runpod (H100 pod, /workspace/temp_xc)",
+  "branch": "arxiv",
+  "started_utc": "2026-07-25T00:00:00Z",
+  "last_update_utc": "2026-07-25T01:32:00Z",
+  "phase": "Phase 2 \u2014 track-A gate running on the paper model",
+  "state": "running",
+  "prime_directive": "A sound verdict, never a win. Cards are frozen (committed) before any screen runs; git order is the evidence. Falsified predictions are scored as falsified."
+ },
+ "context": {
+  "why": [
+   "NeurIPS submission 26867 drew one converging complaint across all three reviewers plus the meta-review: the paper never demonstrates that temporal aggregation (specifically, cross-position weight sharing) is responsible for its gains.",
+   "bbby: the isolating baseline (Stacked SAE) exists in App. A but is absent from Fig. 4 / Table 2; MLC \u2014 cross-layer, not temporal \u2014 wins sparse probing, and window length barely matters there.",
+   "4z15 (accept): can you isolate the temporal contribution from generic crosscoder capacity?",
+   "EAxU (strong reject): results seem preliminary; marginal improvement over T-SAE and MLC; TXC is motivated primarily by backtracking.",
+   "The paper's own Limitations section concedes the root cause: we cannot yet predict in advance which real-world tasks will favor TXCs."
+  ],
+  "diagnosis": "Every real task in TempBench sits in regime 1 or 2 of the synthetic program's coordinate system: the latent is either per-token-readable (nobody separates) or linear-in-window (every window arch ties). Regime 3 \u2014 latents needing cross-position comparison \u2014 is the only regime that separates window architectures from each other, and the paper's own architecture is the unique family that can read it.",
+  "two_filters": [
+   {
+    "name": "Conversion",
+    "source": "task_hunt/LOG.md 2026-07-24",
+    "statement": "The screening question is: will the model decline to maintain this as a per-position state? Anything generatively useful at the probe position is linearized per-position by mid-depth. Five of six round-1 candidates died here (forbidden-word onset: per-token climbs 0.538 \u2192 0.668 with depth while the window gap never opens)."
+   },
+   {
+    "name": "The additive-code theorem",
+    "source": "synthetic/changepoint/bench_record.md \u00a7 3",
+    "statement": "Per-token SAE, T-SAE, Stacked and TXC-pre codes are all additive over per-position features. For any per-position functions a_t, cov(\u03a3_t a_t(m_t), \u03c4) = 0 term-by-term when marginals are balanced \u21d2 equality-pattern latents are invisible to every additive code, at any capacity (measured: |\u03c4| \u2264 0.02 at d_sae=40, T=8). TXC-post \u2014 the paper's Eq. 1 \u2014 is the one family whose nonlinearity crosses positions, making it a coincidence detector (\u03c4 = 0.66, c_t = 0.90)."
+   }
+  ],
+  "design_rule": "Target a label that is an equality / match between positions with balanced per-position marginals. Then five of six architectures sit at a provable chance floor and only TXC-post can read it \u2014 which is simultaneously bbby's missing ablation, 4z15's isolation request, and the missing theory EAxU wants. It is also immune to the strongest hostile objection (\"just mean-pool the per-token codes\"): pooling is additive, so it cannot compute equality either.",
+  "floor_table": [
+   {
+    "arch": "TopK SAE (per-token)",
+    "role": "paper baseline",
+    "status": "provable chance"
+   },
+   {
+    "arch": "T-SAE (per-position decode)",
+    "role": "the baseline the hunt names",
+    "status": "provable chance"
+   },
+   {
+    "arch": "Stacked SAE",
+    "role": "bbby's demanded ablation",
+    "status": "provable chance"
+   },
+   {
+    "arch": "MLC (cross-layer)",
+    "role": "4z15's isolation control",
+    "status": "provable chance"
+   },
+   {
+    "arch": "TXC-pre",
+    "role": "additive window sibling",
+    "status": "provable chance"
+   },
+   {
+    "arch": "TXC-post (paper Eq. 1)",
+    "role": "the architecture under test",
+    "status": "only readable family"
+   }
+  ]
+ },
+ "candidates": [
+  {
+   "rank": 1,
+   "name": "Role / provenance on style-mismatched spans",
+   "family": "safety",
+   "p_win": 0.7,
+   "p_violent": 0.6,
+   "cost": "low\u2013med",
+   "status": "BUILD \u2014 track B",
+   "why": "Best risk profile in the set: per-token provably lacks the evidence (the role-confusion result \u2014 role is perceived from how text sounds, not from its label) while the window provably contains it (the delimiter is a literal token in it). Failure mode is a positional caveat, not a null.",
+   "assets": "/workspace/role-probes (arXiv 2603.12277) + trained probes, supervised ceiling 0.976"
+  },
+  {
+   "rank": 2,
+   "name": "Instruction\u2194action match (agentic goal-drift)",
+   "family": "safety",
+   "p_win": 0.45,
+   "p_violent": 0.45,
+   "cost": "low",
+   "status": "BUILD \u2014 after track A",
+   "why": "Purest instance of both filters: the model has no generative reason to verify its own compliance (weakest conversion pressure in the set) and the label is an equality \u21d2 theorem-protected. Risks: instruction may fall outside T; forced mismatch may register as generic surprise.",
+   "assets": "templated"
+  },
+  {
+   "rank": 3,
+   "name": "Injection-compliance anticipation",
+   "family": "safety",
+   "p_win": 0.7,
+   "p_violent": 0.45,
+   "cost": "med\u2013high",
+   "status": "BUILD \u2014 stage 2",
+   "why": "Anticipation is the only class with a positive order receipt in this program (RECORD \u00a7 3: ordered \u2212 shuffled = +0.028\u2026+0.041 on ant_kw vs +0.003\u2026+0.013 ambient) and satisfies the round-1 criterion: a hazard over the trajectory, not a fact the model tracks. Likely regime-2 though \u21d2 a \u03bb\u0302-sized win unless boundary configuration carries it.",
+   "assets": "needs rollouts; exact witness-string labels, zero API"
+  },
+  {
+   "rank": 4,
+   "name": "Contradiction / fact-consistency XOR",
+   "family": "syntax/semantics",
+   "p_win": 0.4,
+   "p_violent": 0.35,
+   "cost": "tiny",
+   "status": "BUILD \u2014 track A, ship first",
+   "why": "Cheapest decisive experiment in the set; provable chance floor for five archs. Main risk: the LM may linearize mismatch as surprise at the second mention \u21d2 per-token wins \u21d2 clean publishable negative.",
+   "assets": "templated"
+  },
+  {
+   "rank": 5,
+   "name": "Agreement attraction (number-match XOR)",
+   "family": "syntax",
+   "p_win": 0.35,
+   "p_violent": 0.3,
+   "cost": "tiny",
+   "status": "BUILD \u2014 track A, ship first",
+   "why": "Same theorem protection, most legible phenomenon to reviewers, and per-token is actively misled by the distractor. But subject number must be maintained for generation \u21d2 real conversion pressure; expect 0.75 vs 0.92 rather than chance vs 0.9.",
+   "assets": "templated"
+  },
+  {
+   "rank": 6,
+   "name": "Refusal\u2192comply order flip",
+   "family": "safety",
+   "p_win": 0.4,
+   "p_violent": 0.25,
+   "cost": "low",
+   "status": "PARK",
+   "why": "Order-sensitive and safety-meaningful, but it is arrangement, not equality \u2014 additive codes with position-specific encoders read arrangement fine, so TXC-pre/Stacked would not be floored."
+  },
+  {
+   "rank": 7,
+   "name": "Winograd / ordinal antecedent",
+   "family": "syntax",
+   "p_win": 0.35,
+   "p_violent": 0.25,
+   "cost": "tiny",
+   "status": "PARK",
+   "why": "Elegant twin-pair control, but binding IDs are assigned roughly by order of mention, so referent \u2192 ordinal is plausibly already per-token readable at the disambiguator. Converted."
+  },
+  {
+   "rank": 8,
+   "name": "Filler\u2013gap / island licensing",
+   "family": "syntax",
+   "p_win": 0.3,
+   "p_violent": 0.2,
+   "cost": "low",
+   "status": "PARK (converted)",
+   "why": "An open wh-dependency shifts the next-token distribution at every intervening position \u2014 that is how wh-licensing is measured \u2014 making it the canonical maintained state, same family as the ledger's DEAD D5 bracket/indent tracking."
+  },
+  {
+   "rank": 9,
+   "name": "Turn-identity match, tag-stripped dialogue",
+   "family": "temporal",
+   "p_win": 0.3,
+   "p_violent": 0.2,
+   "cost": "low",
+   "status": "PARK",
+   "why": "Equality label with exact labels and a corpus already built (dialevel), but strict alternation makes speaker \u2248 parity = a position artifact, and style is ambient."
+  },
+  {
+   "rank": 10,
+   "name": "Multi-turn escalation / sandbagging onset",
+   "family": "safety",
+   "p_win": 0.3,
+   "p_violent": 0.2,
+   "cost": "high",
+   "status": "DEAD (economics)",
+   "why": "Right kind of latent (trajectory hazard), wrong economics: needs organisms or a paid judge, and labels get noisy."
+  }
+ ],
+ "candidate_note": "p_win / p_violent are PRIORS \u2014 calibrated judgments recorded before any measurement, so the gate can score them. p_violent means a separation of at least 0.2 with the additive families at or near their floor. Nothing in this column is data.",
+ "tasks": [
+  {
+   "id": "T0.1",
+   "phase": "0 \u2014 environment",
+   "title": "Git identity",
+   "detail": "Repo-local user.name / user.email (this pod had none, which is why the remote plan handoff failed to build its bundle).",
+   "state": "done"
+  },
+  {
+   "id": "T0.2",
+   "phase": "0 \u2014 environment",
+   "title": "Dependency install",
+   "detail": "uv sync (torch 2.8.0 pinned, ~5\u20136 GB). Running detached; disk watched.",
+   "state": "done"
+  },
+  {
+   "id": "T0.3",
+   "phase": "0 \u2014 environment",
+   "title": "Green baseline",
+   "detail": "scripts/agent_smoke_test.sh + pytest tests/ -q before anything touches the canonical leaderboard.",
+   "state": "queued"
+  },
+  {
+   "id": "T0.4",
+   "phase": "0 \u2014 environment",
+   "title": "Resource preflight + monitor",
+   "detail": "Abort thresholds (free disk < 12 GB, free VRAM < 60 GB), peak-VRAM instrumentation, OOM retry-then-disclose wrapper, anomaly monitor attached.",
+   "state": "running"
+  },
+  {
+   "id": "T1.1",
+   "phase": "1 \u2014 ledger + cards",
+   "title": "LEDGER.md",
+   "detail": "The ranked candidate ledger with the four vetting axes from task_hunt/CANDIDATES.md plus the new balanced-marginal equality axis.",
+   "state": "running"
+  },
+  {
+   "id": "T1.2",
+   "phase": "1 \u2014 ledger + cards",
+   "title": "Freeze cards (track A)",
+   "detail": "cards/contradiction_xor.md + cards/agreement_attraction.md: exact stimulus grammar, frozen row recipe, per-arch predictions with reasons, pre-registered kill rules. Committed BEFORE any screen.",
+   "state": "running"
+  },
+  {
+   "id": "T2.1",
+   "phase": "2 \u2014 track A",
+   "title": "Stimulus generators + tests",
+   "detail": "Template generators for both track-A candidates, unit-tested, with the balanced 2\u00d72 construction asserted in code.",
+   "state": "done"
+  },
+  {
+   "id": "T2.2",
+   "phase": "2 \u2014 track A",
+   "title": "Label-side triage (free kill authority)",
+   "detail": "unigram AUC and position AUC must return \u2248 0.50 by construction. If they do not, the stimuli are broken and GPU spend is cancelled before it starts.",
+   "state": "done"
+  },
+  {
+   "id": "T2.3",
+   "phase": "2 \u2014 track A",
+   "title": "Cache gemma-2-2b-it L13",
+   "detail": "SUBSTITUTED: gemma-2-2b-it is a gated repo and this HF account lacks access, so the paper's other subject model \u2014 DeepSeek-R1-Distill-Llama-8B (\u00a7 5.2 backtracking, layers 8/16/24) \u2014 carries the gate instead. Equally paper-compatible; gemma needs a license accepted on the account.",
+   "state": "done"
+  },
+  {
+   "id": "T2.4",
+   "phase": "2 \u2014 track A",
+   "title": "The gate",
+   "detail": "per-token / window-mean / window-flatten / within-window-shuffled \u00d7 T \u2208 {2,4,8,16,32} \u00d7 depth, permutation nulls, bootstrap CIs on every number. Kill rules decide.",
+   "state": "running"
+  },
+  {
+   "id": "T3.1",
+   "phase": "3 \u2014 track B",
+   "title": "Role/provenance stimuli",
+   "detail": "Style-mismatched spans, \u2265 2-boundary row recipe, injected document content rendered inside a user turn. Authored while the GPU runs track A.",
+   "state": "queued"
+  },
+  {
+   "id": "T3.2",
+   "phase": "3 \u2014 track B",
+   "title": "Role gate",
+   "detail": "Same harness; adds the supervised role-probe ceiling as a reference line.",
+   "state": "queued"
+  },
+  {
+   "id": "T4.1",
+   "phase": "4 \u2014 panel",
+   "title": "Panel (only if a gate clears)",
+   "detail": "6 archs \u00d7 T ladder \u00d7 seeds {1,2,42} + untrained control through the canonical runner, matched d_sae and matched realized l0_per_token (TXC-post needs nominal k = k_pos\u00b7T).",
+   "state": "blocked"
+  },
+  {
+   "id": "T4.2",
+   "phase": "4 \u2014 panel",
+   "title": "Confirm on R1-Distill-8B",
+   "detail": "Paper's \u00a7 5.2 model/hookpoint, reduced T ladder for VRAM.",
+   "state": "blocked"
+  },
+  {
+   "id": "T5.1",
+   "phase": "5 \u2014 write-up",
+   "title": "RECORD + LOG + STATUS",
+   "detail": "Program-convention records, reviewer-complaint mapping, and the regime atlas entry \u2014 written whichever way the verdict lands.",
+   "state": "blocked"
+  }
+ ],
+ "resources": {
+  "disk_free_gb": 12.0,
+  "disk_total_gb": 233.0,
+  "disk_floor_gb": 12.0,
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "vram_total_gb": 80.0,
+  "vram_floor_gb": 60.0,
+  "peak_vram_gb": null,
+  "oom_events": [],
+  "note": "The conversion-depth 17-layer caches were 144 GB for two models; that recipe does not fit in 37 GB and is capped to 2\u20133 capture layers per model. Every screen cell records peak VRAM, wall time, rows and feature count."
+ },
+ "monitor": {
+  "expectations": [
+   {
+    "id": "E1",
+    "what": "Label-side unigram AUC and position AUC on track-A stimuli",
+    "expect": "\u2248 0.50 (|AUC \u2212 0.5| \u2264 0.03) by construction",
+    "why": "The balanced 2\u00d72 design makes both marginals flat. A departure means the stimulus generator leaks the label."
+   },
+   {
+    "id": "E2",
+    "what": "Additive archs on a balanced-marginal equality label",
+    "expect": "at chance",
+    "why": "The additive-code theorem. If Stacked or TXC-pre reads the label, the balance construction is broken \u2014 audit the stimuli, do not reinterpret."
+   },
+   {
+    "id": "E3",
+    "what": "Per-token AUC across depth with the window gap",
+    "expect": "if per-token climbs while g stays shut \u21d2 CONVERTED \u21d2 do not spend a grid",
+    "why": "The round-1 WHY-diagnostic (forbidden-word onset)."
+   },
+   {
+    "id": "E4",
+    "what": "Shuffle gap growth with T",
+    "expect": "must be read against an ambient anchor on identical rows at fixed T",
+    "why": "RECORD \u00a7 2: a shuffle gap that grows with T is a generic property of wider windows under a flatten probe, not evidence about the latent."
+   },
+   {
+    "id": "E5",
+    "what": "Peak VRAM per cell / free disk",
+    "expect": "< 60 GB VRAM, > 12 GB disk free",
+    "why": "Two raw-activation screens plus a pool on one H100 already produced CUDA OOM once; GPU jobs stay serialized."
+   },
+   {
+    "id": "E6",
+    "what": "Leaderboard hygiene after any panel",
+    "expect": "0 duplicate eval_keys, 0 null metrics, exact row-count decomposition",
+    "why": "A NaN metric once made the canonical artifact unloadable for every subsequent run."
+   }
+  ],
+  "anomalies": [
+   {
+    "ts": "01:24",
+    "expectation": "E5 (disk > 12 GB)",
+    "observed": "12.0 GB free after the 15 GB model pull \u2014 AT the abort floor",
+    "disposition": "Held, not breached. No further model downloads; gate keeps activations in RAM rather than on disk, so the figure is stable. gemma (5 GB) is deferred. Other agents' model caches on this volume are not mine to delete."
+   },
+   {
+    "ts": "01:10",
+    "expectation": "gemma-2-2b-it available (paper \u00a7 5.1 model)",
+    "observed": "HTTP 403 \u2014 gated repo, account lacks access",
+    "disposition": "Routed to the paper's \u00a7 5.2 model (R1-Distill-Llama-8B) rather than dropping paper-compatibility. Needs the licence accepted on the HF account to add the probing-comparable arm."
+   }
+  ]
+ },
+ "log": [
+  {
+   "ts": "2026-07-25T00:00:00Z",
+   "kind": "note",
+   "text": "Reviews + paper read. Selection principle derived from the repo's own results: violent separation requires a regime-3 (equality-pattern) latent, because that is where four of five baselines are provably \u2014 not merely empirically \u2014 floored."
+  },
+  {
+   "ts": "2026-07-25T00:00:00Z",
+   "kind": "note",
+   "text": "Ranked the ten candidates by P(win) and P(violent win). The user's syntax suggestions (islands/filler-gap, Winograd) rank 7\u20138 of 10, below the safety candidates: both are plausibly converted, and the reason is recorded so the ranking can be scored later."
+  },
+  {
+   "ts": "2026-07-25T00:00:00Z",
+   "kind": "blocked",
+   "text": "Remote plan handoff (Ultraplan) failed: this pod had no git author identity, so the git bundle could not be built. No web link was ever generated \u2014 corrected in-conversation."
+  },
+  {
+   "ts": "2026-07-25T00:00:00Z",
+   "kind": "done",
+   "text": "Repo-local git identity set (Andrii Shportko / andre@poseidonresearch.com)."
+  },
+  {
+   "ts": "2026-07-25T00:00:00Z",
+   "kind": "running",
+   "text": "uv sync launched detached (torch 2.8.0 pinned). HF token stays in /workspace/ocean/.env and is sourced at point of use rather than copied \u2014 no secret duplication."
+  },
+  {
+   "ts": "2026-07-25T00:00:00Z",
+   "kind": "done",
+   "text": "Exploration scaffold created at experiments/explorations/relational/ (cards, labels, results, figs, dashboard)."
+  },
+  {
+   "ts": "01:05",
+   "kind": "done",
+   "text": "Stimulus generators written for both track-A candidates (balanced 2x2, exact template labels, zero API). 2,880 contradiction + 2,400 agreement items."
+  },
+  {
+   "ts": "01:06",
+   "kind": "pass",
+   "text": "LABEL-SIDE TRIAGE PASSED (E1). AUC from constituent A = 0.500, from B = 0.500, from length = 0.501/0.505, cells exactly equal. The label is provably unreadable from any single position's content \u2014 GPU spend authorised."
+  },
+  {
+   "ts": "01:10",
+   "kind": "watch",
+   "text": "gemma-2-2b-it is gated and inaccessible to this token; substituted the paper's other subject model, R1-Distill-Llama-8B, so paper-compatibility is preserved rather than abandoned."
+  },
+  {
+   "ts": "01:22",
+   "kind": "done",
+   "text": "Gate written. Reuses the frozen problib probe stack; the local score-returning variant is asserted equal to problib's AUC to 1e-6 before any result is written. Every AUC carries a 1000-resample bootstrap CI; every cell carries a 4-draw permutation null."
+  },
+  {
+   "ts": "01:24",
+   "kind": "watch",
+   "text": "Disk at the 12 GB abort floor after the model pull. Held: no further downloads, activations stay in RAM."
+  },
+  {
+   "ts": "01:30",
+   "kind": "running",
+   "text": "Gate launched on R1-Distill-Llama-8B, layers 8/16/24, T in {4,8,16,32}, three strata (all / A-inside-window / A-outside-window) = 36 cells."
+  },
+  {
+   "ts": "01:32",
+   "kind": "note",
+   "text": "wandb: the framework has no wandb integration (grep of src/ and configs/ is empty). Probe fits are seconds long, so logging them adds nothing; if Phase 4 runs, dictionary training is the only thing worth a wandb run and would need a new hook rather than a config flag. Not adding one on the critical path."
+  }
+ ],
+ "figures": [],
+ "timing": {
+  "session_start_utc": "2026-07-25T00:52:00Z",
+  "now_utc": "2026-07-25T01:32:00Z",
+  "elapsed_min": 40,
+  "basis": "Projections are calibrated on measured wall-clock from this session (env install 9 min, stimulus build <1 min, 15 GB model pull 6 min) and on the task_hunt round-1 record (a raw-activation screen cost ~3 h; a Stage-2 panel of 84 cells ran in ~2 h on one H100).",
+  "phases": [
+   {
+    "phase": "0 \u2014 environment",
+    "state": "done",
+    "elapsed_min": 22,
+    "projected_min": 20,
+    "note": "venv + paper-model pull + git identity. Ran long: MooseFS copy-mode unpacking of torch."
+   },
+   {
+    "phase": "1 \u2014 ledger + cards",
+    "state": "running",
+    "elapsed_min": 6,
+    "projected_min": 25,
+    "note": "Ledger drafted in state.json; the two track-A cards must be committed before the gate's results are read."
+   },
+   {
+    "phase": "2 \u2014 track A gate",
+    "state": "running",
+    "elapsed_min": 12,
+    "projected_min": 75,
+    "note": "agreement (36 cells) then contradiction (needs T>=32, ~45 cells). Model load from network storage is ~5 min of it."
+   },
+   {
+    "phase": "3 \u2014 track B role gate",
+    "state": "queued",
+    "elapsed_min": 0,
+    "projected_min": 120,
+    "note": "Stimulus build ~40 min (chat-template rendering, style-mismatched slice, >=2-boundary row recipe) + ~60 min gate + analysis."
+   },
+   {
+    "phase": "4 \u2014 panel",
+    "state": "blocked",
+    "elapsed_min": 0,
+    "projected_min": 210,
+    "note": "Only runs if a gate clears: 6 archs x T ladder x 3 seeds + untrained through the canonical runner. Blocked, so the projection is contingent."
+   },
+   {
+    "phase": "5 \u2014 write-up",
+    "state": "blocked",
+    "elapsed_min": 0,
+    "projected_min": 60,
+    "note": "RECORD + LOG + STATUS + figures. Runs whichever way the verdict lands."
+   }
+  ],
+  "projected_total_min": 510,
+  "projected_remaining_min": 472
+ },
+ "triage": {
+  "note": "Label-side triage \u2014 free kill authority, run before any GPU spend. By construction the label must be unreadable from either constituent alone, from length, or from filler count. This is expectation E1.",
+  "tasks": {
+   "contradiction": {
+    "n": 2880,
+    "label_rate": 0.5,
+    "auc_from_a": 0.5,
+    "auc_from_b": 0.5,
+    "auc_from_len": 0.5009244791666667,
+    "auc_from_nfiller": 0.49857373649691356,
+    "PASS": true
+   },
+   "agreement": {
+    "n": 2400,
+    "label_rate": 0.5,
+    "auc_from_a": 0.5,
+    "auc_from_b": 0.5,
+    "auc_from_len": 0.5054319444444444,
+    "auc_from_nfiller": 0.5,
+    "PASS": true
+   }
+  }
+ }
+}
