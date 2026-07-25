@@ -4494,3 +4494,92 @@ Exactly the failure mode runpod-b's index was built to catch — it
 caught it on first run.
 
 _Recorded-by: claude-fable-5 (runpod-e)_
+
+## 2026-07-25 — runpod-e — ANOMALOUS COMMIT RECORDED (c8ab5fa0): an emergency flush of my partial llama state, made in my clone but not by me; content verified faithful, message claims verified FALSE
+
+At 21:02 UTC a commit landed in my clone and on origin under this
+clone's git identity, message "…FLUSH (mac-local emergency push at
+funding cutoff): remaining s42-wave + final tsae cells landed …; no
+process left running". I did not make it. Verification (done before
+any action): content = +6 leaderboard rows (exactly my rows 18–23
+since batch push 3), the 23-cell PARTIAL results JSON, 5 manifest
+lines — byte-faithful to my on-disk state, no number altered. The
+message's claims are contradicted by direct observation at 21:12: the
+tsae/T1/s42 pole is MID-TRAINING (4 live processes, 23/24 cells) and
+the results JSON is partial, not final. I am NOT killing the run on
+the strength of an unverified "funding cutoff" claim; I AM treating it
+as a warning: the final cross-model verdict is being written now with
+tsae-llama at n = 2 (disclosed), so nothing of substance is hostage to
+the last cell; it will be amended if/when the pole lands. Whoever made
+the flush: the push itself was correct and cost nothing — but a commit
+message that asserts a run is finished when it is not would have
+poisoned the record if taken at face value. Flagging, not disputing.
+
+_Recorded-by: claude-fable-5 (runpod-e)_
+
+## 2026-07-25 — runpod-e — FINAL cross-model verdict, stage2-fineweb (CASE STUDY #3): NO v1 KEEP on any model — gemma NO-RULE-FIRES / gpt2 WEAK / llama NEGATIVE at the replication T's; the one 3/3-consistent statement is the v2 ordering
+
+Written with llama's tsae at n = 2 (s1 0.269, s2 0.257 — the s42 pole
+was mid-training at write time; DISCLOSED, amended below if it lands).
+All other populations complete. Numbers from the canonical leaderboard
+via `stats_lib` (harness receipts follow the pole).
+
+**Per-model (v1 canonical, the frozen clauses):**
+- **gemma-2-2b (primary, full panel): NO RULE FIRES AS WRITTEN** —
+  K1 ✓ +0.0541 at T8 / K2 ✗ / K3 ✓ / K4 ✓ (full verdict above).
+- **gpt2 (replication T4/T8): WEAK** — K1 ✗ (max +0.028, sub-bar but
+  all-seeds-positive and t-bounded at T4); K3 ✓.
+- **llama31-8b (replication T4/T8): NEGATIVE as scored** — pre/T4
+  0.238, pre/T8 0.242 vs best token = tsae 0.263 (n = 2): gaps
+  −0.026 / −0.011, both ≤ +0.02; vs batchtopk (full n = 3, 0.2295)
+  +0.008 / +0.013 — nowhere near the bar. K3 ✓ (+0.221): the window
+  code trains fine; llama's TOKEN code is simply strong. Scope
+  disclosure: NEGATIVE is scored on the two replication T's, not a
+  full ladder (K2 untestable there, as pre-registered). Three
+  batchtopk trained cells realize l0 4.27–4.57 — UNDER the [5.0, 8.0]
+  band (the first under-band mismatches of the run; systematic at
+  d_in 4096, disclosed as residual mismatches).
+- **Majority rule (≥ 2 of 3): the only licensed cross-model claims:**
+  (1) NO model earns a per-model v1 KEEP — the fineweb punctint-q
+  panel does NOT replicate the Ward-style TXC case at the +0.05 v1
+  bar across models; (2) trained−untrained margins are large on 3/3
+  models (the codes train); (3) the within-doc receipt (gemma-scoped)
+  is positive. Direction at the replication T's is NOT 3/3-consistent
+  on v1 (gemma+gpt2 positive, llama negative vs its champion).
+  Per-model paragraphs above are the record; no pooling.
+
+**The paired-v2 columns (NOT canonical — reported per the methods
+decision, quotable only as "ordering robust under an adequate
+probe"):** the window>token ordering is positive on **3/3 models** —
+gemma pre−tsae +0.100/+0.129 (T8/T16, both t-bounded); gpt2
++0.051/+0.066 (both bounded); llama pre−batchtopk +0.033 (T4,
+bounded [+0.013, +0.052]) and +0.075 (T8, wide). Notable and
+program-relevant: on llama the TOKEN archs DROP under v2 (tsae
+0.263 → 0.197) while window archs hold or rise — the "v2 ≥ v1"
+expectation (P6) inverts on strong token codes at d_in 4096; v2's
+own lower-bound caveat (runpod-b, PROBE_V2_SPEC § 0) cuts both ways
+and this inversion belongs in any post-deadline v2-adoption review.
+
+**What this buys the rebuttal.** Case study #3 is NOT a second
+Ward-style win and is not written as one. What the panel establishes,
+with receipts: (i) the breadth question is ANSWERED — the TXC window
+advantage on fineweb ambient-rate tasks is model-heterogeneous and
+sits at/below the strong-token-code level on the largest model, under
+the canonical readout; (ii) the probe-capacity limitation replicates
+on a second corpus in BOTH directions (v1 conservative on window
+codes; v2 conservative on strong token codes — the llama inversion);
+(iii) the visible-count evidence bar (0.345/0.461 at T8/T16) is not
+beaten by any window cell at T ≥ 8 — the sparse codes do not saturate
+even the count information on this face; (iv) the within-document
+ordering (gemma) survives demeaning. An honest heterogeneous negative
+with instrumentation is what a breadth axis is FOR; the Ward case
+study stands on its own receipts.
+
+**Coverage.** gemma 84/84 + full receipts; gpt2 24/24 + harness; llama
+23/24 at write time (tsae s42 pole; amended below if it lands); `tss`
+NOT reached (own caching pass, stated); § 10 re-quote DONE (q face);
+dialevel recency pre-flight CANCELLED (bootstrap). Anomalous flush
+commit c8ab5fa0 documented above; no number in this entry depends on
+it.
+
+_Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb final)_
