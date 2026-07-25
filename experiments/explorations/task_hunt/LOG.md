@@ -4402,3 +4402,20 @@ to note against myself: the card's § 7 "small at T ≤ 16" prediction is
 falsified by my own receipt, stated above, not softened.
 
 _Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb verdict)_
+
+## 2026-07-25 — runpod-e — stage2-fineweb REPLICATION, model 2/3 (gpt2): per-model WEAK on v1 (K1 ✗ max gap +0.028); direction positive all seeds both T; v2 clears the bar bounded
+
+24/24 cells, harness crosscheck exact (v1+v2). Seed-means: pre/T4
+0.1427, pre/T8 0.1400 vs better token = tsae 0.1143 (batchtopk
+0.1137). K1 ✗ (+0.0283 at T4, +0.0258 at T8 — below +0.05; WEAK band).
+K3 ✓ (pre − untrained-pre ≈ +0.10 both T). K4 scoped to the primary
+(card § 6b); not rerun here. Direction positive in ALL seeds at both T
+on BOTH probes; v1 T4 diff is even t-bounded [0.0068, 0.0498]. Paired
+v2: +0.0508 [0.0337, 0.0679] at T4, +0.0664 [0.0498, 0.0830] at T8 —
+clears the +0.05 magnitude under the adequate probe, third
+independent instance of the receipted v1-conservatism pattern (λ̂,
+gemma, now gpt2). Untrained-token/pre l0 receipts green; trained l0
+in-band. **Running majority tally: gemma NO-RULE-FIRES, gpt2 WEAK —
+no v1 KEEP yet; llama31 pending (its two tsae poles still training).**
+
+_Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb replication)_
