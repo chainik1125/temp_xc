@@ -382,8 +382,8 @@ r, and **the lift is monotone in code density** (nnz-per-row):
 | post round-1 T16 | 8 | 0.255 | 0.286 | +0.032 |
 | tsae T1 | 7 | 0.154 | 0.211 | +0.057 |
 
-At nw1024/OLS the dense T16 cells overfit (r2_train 0.4–0.7, r2_eval
-NEGATIVE); ridge/more-data pushes r2_eval positive and r to ~0.32–0.35.
+At nw1024/OLS the dense T16 cells overfit (r2_train 0.4–0.7; r2_eval
+NEGATIVE, −1.05…−1.39 as **cell means**, per-seed spread −2.61…−0.33); ridge/more-data pushes r2_eval positive and r to ~0.32–0.35.
 The nw1024/OLS column reproduces the leaderboard EXACTLY (to 1e-4), so
 the lift is trustworthy. Two consequences:
 

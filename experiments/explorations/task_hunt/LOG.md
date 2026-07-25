@@ -1229,7 +1229,8 @@ nw8192/ridge):
 | bsae T1 | 4 | 32768 | 0.113 | 0.185 | +0.072 |
 
 At nw1024/OLS the dense T16 cells have r2_train 0.41–0.70 but r2_eval
-NEGATIVE (−1.05…−1.39): textbook overfitting at n≈p on a dense code.
+NEGATIVE, **−1.05…−1.39 as CELL MEANS** (per-seed held-out spread is
+wider: **−2.61…−0.33**): textbook overfitting at n≈p on a dense code.
 Ridge OR more data pushes r2_eval positive (+0.04…+0.12) and the r jumps
 to ~0.32–0.35. The nw1024/OLS column reproduces the leaderboard/summary
 EXACTLY (pre T16 0.1379, post round-1 T16 0.2548, stacked T16 0.0940,
