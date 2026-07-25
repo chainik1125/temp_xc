@@ -21,15 +21,16 @@ positions buys over one acting at a single position, on tasks where the target a
 foil are **the same sentences in a different order**, so a constant write is inert by
 construction and only shape is under test.
 
-**1. A steering write moves the model by exactly its projection onto the target
-trajectory — including when it opposes the target.** Give a handle a resolution limit
-(one constant per block of W segments) and it can only deliver the part of the target
-that survives averaging inside those blocks. Sampling 36 random combinations of
+**1. Positions add up, and a steering write moves the model by roughly its projection
+onto the target — including when it opposes the target.** Give a handle a resolution
+limit (one constant per block of W segments) and it can only deliver the part of the
+target that survives averaging inside those blocks. Sampling 36 random combinations of
 profile, block width and block coefficients gives predictions spanning −0.42 to +0.42
-with nothing fitted; the measured effects track them with **slope 0.94, intercept
-−0.01, R² 0.77, mean absolute error 0.073**. Thirteen of those conditions predict a
-*negative* effect, and the model duly moves the wrong way in proportion — the part of
-the claim that could most easily have failed.
+with nothing fitted; the measured effects track them with **slope 0.94, intercept −0.01,
+mean absolute error 0.073**. Thirteen of those conditions predict a *negative* effect and
+the model duly moves the wrong way in proportion — the part that could most easily have
+failed. The fit is good on average and not exact: χ²/dof is 3.6, so positions do not all
+carry equal weight, and the deviations are systematic rather than noise.
 
 - ![linearity](../../../../plots/2026-07-24_trajectory_steering/linearity.png)
 
@@ -128,11 +129,33 @@ values and goes negative whenever the write opposes the target. Sampling 36 rand
 (profile, width, coefficient) conditions at k=12, each normalised against the
 full-schedule effect on the same eval pairs, gives 12 distinct predictions spanning
 −0.42 to +0.42 and the regression above. It is the same claim as the grid, tested with
-about six times the leverage. Two caveats: R² = 0.77 with 26 of 36 bootstrap intervals
-covering the prediction, so there is real excess scatter beyond sampling noise, and the
-phase sweep found two cells at the same predicted 0.333 landing at 0.145 and 0.676 with
-non-overlapping intervals — position-dependent heterogeneity that linearity in the
-schedule alone does not capture.
+about six times the leverage.
+
+The regression also shows precisely *which* part of "linear" holds, and the distinction
+matters more than the fit. Two claims live inside the word. **Additivity** says what is
+written at one position does not change what another position contributes; **homogeneity**
+says every position carries the same weight, so the effect is the *unweighted* projection.
+Homogeneity is refuted here: χ²/dof is 3.56, ten of the 36 predictions fall outside their
+own 95% intervals (probability 7.5 × 10⁻⁶ if the model were right), the residual is
+systematic in block width, and three conditions whose projection onto the target is
+exactly zero measure significantly non-zero (z = −3.2, −3.1, +2.6), which a pure
+projection model cannot produce. The phase sweep says the same thing from another angle:
+two cells sharing a predicted 0.333 landed at 0.145 and 0.676 with non-overlapping
+intervals. Additivity, the load-bearing claim, is untouched by any of it — every deviation
+found is consistent with additivity plus unequal per-position weights.
+
+That reframing also settles what a "span effect" would even be. Adjacency, coherent
+transitions, a state that carries forward — these are all names for one position's write
+changing another position's contribution, which is exactly a failure of additivity. So the
+span question and the additivity question are the same question, and a two-arm
+contiguous-versus-scattered contrast is the wrong instrument for it: under additivity with
+unequal weights, such a contrast is non-zero whenever the two supports sit on different
+positions, which they always do. Our first attempt at it was confounded by sign
+composition and a sign-matched rebuild would have been confounded by position — three
+false positives in a row from the same family of designs. The right test measures the
+per-position weights from single-position writes, predicts every multi-position condition
+additively, and asks whether any residual tracks adjacency; that run
+(`weights_modal.py`) was in flight when the compute window closed.
 
 **Declining and helping in order (finding 3).** About 40 template-generated requests
 about the user's own property, a 12-sentence declination bank and a 12-sentence
@@ -288,10 +311,11 @@ task-design theory is in [[theory]]; the behaviour census and the literature bri
   gap, and it bounds every claim to control-signal *form*.
 - **Teacher-forced margins carry most of the evidence.** The behavioural results are
   smaller-n. One generation harness was rebuilt mid-sprint after its classifier proved
-  artifact-prone, and the rebuilt version returned a degenerate metric (every arm at
-  exactly 0.500, because a model that always prefers one class scores half of a balanced
-  profile); the 96.9% figure comes from the calibrated candidate-choice metric instead,
-  and free-generation stance remains unmeasured.
+  artifact-prone; at the lower dose every arm in the rebuilt version sits at exactly
+  0.500 (a model that always prefers one class scores half of a balanced profile), and
+  only at the top dose does it separate — which is where the 53.6% flip rate quoted in
+  finding 3 comes from. Free-generation stance, as opposed to forced choice between
+  supplied continuations, remains unmeasured.
 - **Doses are large.** Peaks sit at 0.35–0.5 of the mean residual norm, and steered free
   generation at those doses is code-mixed rather than fluent, so behavioural claims are
   about attribute identity per slot rather than text quality.
