@@ -146,6 +146,44 @@ at W ≈ ℓ**, so the best handle width is the target's own intrinsic timescale
 number of control parameters needed for full fidelity is k/ℓ. Figure:
 `plots/2026-07-24_trajectory_steering/phase_diagram.png`.
 
+### 23:40 — controls all landed. Three verdicts, one of them against me.
+
+**O1 (fixed-Hamming): the review agent's prediction was right.** With foils built by a
+single swap so H=2 at *every* k, the template effect is **flat**: +71.8, +80.8, +79.6,
++78.0, +77.5 for k = 2…10 (spread 3.4 over k=4…10), against +75.7 → +218.9 (+189%) for
+the permuted-foil version. The k-growth headline was Hamming bookkeeping. The surviving
+claim: **per-differing-slot steering efficacy is constant in trajectory length** — the
+handle does not degrade as the trajectory gets longer, which still contrasts with
+broadcast at zero, but is much weaker than "grows".
+
+**O2 (rank): the handle is rank-1.** SVD of the 12×d per-position difference-of-means
+matrix gives σ₁ = **0.892** of the energy (0.894 with unit rows). So the "temporal
+template" is one direction with a sign schedule. We can claim *a schedule beats a
+level*; we cannot claim *a temporal dictionary beats a per-token one* — that needs
+trained dictionaries and is out of scope tonight. Scoped accordingly everywhere.
+
+**Superadditivity: modest, real at W≥4, and the mechanism test is the striking part.**
+Using per-position marginals (steer each segment alone) and S(B) = Δ(B) − Σ_{t∈B} Δ_t:
+S = +0.47±0.85, +3.56±1.27 (t=2.8), +4.47±1.72 (t=2.6) for W = 2, 4, 8 at frac 0.35,
+with the same pattern at frac 0.5. So a block is worth ~8% more than its own parts at
+W≥4 — positive but not the clean c·(W−1) edge law, which it fails (S saturates). Δ per
+unit **injected norm** rises +33% from W=1 to W=4 (0.656 → 0.872), which is the
+reviewer-proof version of "wider is more efficient".
+
+**The scramble control is the best single control in the sprint.** Permuting the
+schedule *inside* the block holds coverage, contiguity and total injected norm exactly
+fixed and destroys only the order. Effect collapses: at W=4 the scrambled write gives
+**−2.25 against +28.99**, at W=8 **−1.15 against +55.33** (ratios −0.08, −0.02). So the
+result is about writing the *right pattern*, not about adding more mass. Note this
+confirms the additive/schedule account rather than proving superadditivity: under
+additivity a random internal permutation matches ~half the slots and nets ≈ 0.
+
+**Entrainment v2 nulls confirmed analytically.** i.i.d. profiles: unsteered-tail
+accuracy 0.470–0.528 against the analytic null 0.496–0.501 — the hard 0.5 null holds.
+Balanced profiles: 0.395–0.443 against the analytic persistence null 0.399–0.401 — the
+v1 "below chance" anomaly is fully explained by balance-induced anti-correlation, not
+by a bug. Steered-slot accuracy is 0.84–0.97 throughout; m=0 controls sit at 0.41–0.48.
+
 **Artifact 2 — the stance pre-check classifier (caught by the realmodel agent).** A
 binary refusal-marker regex scores every *unmatched* sentence as "comply", which
 inflates P(comply | prev refuse) — so the 0.870 that passed the gate is suspect.

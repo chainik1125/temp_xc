@@ -485,3 +485,276 @@ Stated as I would defend it to the same hostile reviewer:
 - The generation demo shows per-slot language control at 0.812 vs a chance level of 0.5
   that is robust to classifier bias by a symmetry argument. With an unsteered arm and
   paired episodes it would be the section's strongest figure.
+
+---
+
+## Round 2 — the (W, ℓ) phase diagram, stance, and the convexity ruling
+
+Audited after the retraction: `lsweep_modal.py` + `lsweep.json`, `stance_modal.py` +
+`stance.json`, and the design of `convex_modal.py` (results not yet written).
+
+### P1 — 18 of the 24 phase-diagram cells are algebraic identities, not measurements
+
+**OBJECTION.** "Your 24-cell fit contains 18 cells whose value is forced by construction:
+nine where the block-constant handle *is* the full template, and nine where it writes a
+literal zero vector. Mean error 0.013 is a dilution statistic."
+
+**SEVERITY: weakens** — it does not overturn the result, but it overstates it by ~4× on
+both cell count and error, and "zero free parameters" is not accurate.
+
+**EVIDENCE STATUS: already established from `lsweep.json`.** Two exact rules generate the
+identities:
+
+- **W divides ℓ** ⇒ `μ_b = ±1` ⇒ `c_cap = sign(μ_b) = π_t` for every t, so the arm is
+  byte-identical to the arm that defines `Δ_full` ⇒ `obs_R ≡ 1.000`. Nine cells
+  (ℓ=1: W=1; ℓ=2: W=1,2; ℓ=3: W=1,3; ℓ=6: W=1,2,3,6).
+- **every block straddles equal ± halves** ⇒ `μ_b = 0` ⇒ `np.sign(0) = 0` ⇒ a literal
+  zero write ⇒ `obs ≡ 0.000`. Nine cells (ℓ=1: W=2,4,6,12; ℓ=2: W=4,12; ℓ=3: W=6,12;
+  ℓ=6: W=12). Their fingerprint is in the JSON: `sem` is exactly `0.000`, meaning every
+  per-pair delta was identically zero.
+
+Only six cells carry information: (ℓ=1,W=3), (ℓ=2,W=3), (ℓ=2,W=6), (ℓ=3,W=2), (ℓ=3,W=4),
+(ℓ=6,W=4). Their errors are 0.084, 0.020, 0.020, 0.039, 0.127, 0.026 — **mean 0.053**,
+not 0.013 (0.053 × 6/24 = 0.013 exactly, which is where the headline number comes from).
+
+Two further corrections to the framing:
+
+- **"Zero free parameters" is one scale per ℓ row**, calibrated on the W=1 cell — which is
+  precisely why W=1 has error identically zero in all four rows.
+- **`block_cap` and `block_energy` are not competing hypotheses.** Under a linear response
+  both predictions are exact identities (see P2), so both fitting discriminates nothing.
+  They differ in prediction in only three of 24 cells (ℓ=3 W=2, ℓ=3 W=4, ℓ=6 W=4). What
+  they *do* provide is a nonlinearity probe, since `block_energy` uses coefficients up to
+  1.22 — worth stating that way instead.
+
+**CHEAPEST KILLING CONTROL.** Report the six informative cells as the result and the 18 as
+design checks (they are useful as such — the zero-write cells are a genuine plumbing test).
+To buy more informative cells at no new arm cost, sweep the profile **phase** (the code
+fixes phase 0 at `lsweep_modal.py:180`); non-zero phases break the divisibility identities
+and turn many W-divides-ℓ cells into real measurements. **≈ 15 GPU-min** for a
+four-phase sweep at ℓ ∈ {2,3}.
+
+### P2 — the predicted R is an algebraic identity under linearity, so the phase diagram tests linearity, not a window law
+
+**OBJECTION.** "Your attenuation law is not a law about windows; it is the statement that
+Δ is a linear functional of the write schedule, which your own W-sweep already
+established."
+
+**SEVERITY: weakens** — and it reframes the result rather than killing it. The measurement
+is real and the fit is good; the claim it supports is narrower than "performance improves
+with window size".
+
+**EVIDENCE STATUS: provable on paper.** Assume `Δ = a·⟨c, π⟩` with a position-independent
+`a` (the additivity O1 established). Then for the magnitude-cap arm,
+
+```text
+Δ(W) = a·Σ_b sign(μ_b)·Σ_{t∈b} π_t = a·W·Σ_b |μ_b| = a·k·mean_b|μ_b|
+Δ_full = a·Σ_t π_t² = a·k
+R = Δ(W)/Δ_full = mean_b|μ_b| = pred_R          (exactly)
+```
+
+and for the energy arm the same algebra gives `R = sqrt(mean_b μ_b²) = pred_R` exactly.
+So both predicted columns are the projection identity `R = ⟨c,π⟩/⟨π,π⟩`. The phase diagram
+measures **one** thing — how linear the steering response is in the schedule — in six
+independent cells, and the answer is "linear to within resolution".
+
+That is worth reporting, and it is a *better* design than the W-sweep in three specific
+ways that should be said out loud: coverage is pinned at k so O3 cannot recur; total
+injected norm is identical across all cells of a row (every segment gets a ±1 write), so
+O7's mass-matching objection cannot recur; and normalising by `Δ_full` on the *same* eval
+pairs divides out both O1's extensivity and the per-pair Hamming variation. Credit where
+due — this is the cleanest harness in the set.
+
+The honest headline: **steering response is linear in the write schedule, so a
+block-constant handle delivers exactly its projection onto the target trajectory, and the
+best window is the one that aliases the target period — which is not monotone in W.**
+
+### P3 — the three "zig-zags" are each one measurement against one identity
+
+**OBJECTION.** "Your falsifiable signature is that a wider window beats a narrower one. In
+two of three cases the narrower window writes nothing at all."
+
+**SEVERITY: weakens.**
+
+**EVIDENCE STATUS: already established.** ℓ=1: W=3 (0.249, informative) beats W=2 (0.000,
+zero-write identity). ℓ=2: W=6 (0.353, informative) beats W=4 (0.000, zero-write identity).
+ℓ=6: W=6 (1.000, identical-to-full identity) beats W=4 (0.641, informative). So each
+zig-zag pairs one real measurement with one construction. The non-monotonicity is a
+property of the aliasing arithmetic, which the code's own docstring concedes ("purely
+combinatorial"), not a discovered property of the model. It remains a good pedagogical
+figure — wider is not better — provided the caption says why.
+
+### P4 — the fit quality is at the noise floor and has no confidence interval
+
+**OBJECTION.** "You report a mean error but no uncertainty on it, and your per-pair deltas
+are not stored, so no one can compute one."
+
+**SEVERITY: weakens.** Using `sem(obs)/|Δ_full|` as a conservative per-cell noise proxy
+(conservative because obs and `Δ_full` share eval pairs and are positively correlated),
+the informative cells have a noise floor of **0.079** against a mean error of **0.053**.
+The fit is therefore as good as the data can resolve — genuinely a pass — but the
+experiment cannot exclude any alternative law differing from linearity by less than about
+0.08 in R. One cell deviates: **ℓ=3, W=4 — obs 0.206 vs pred 0.333, 1.9σ** (and 2.1σ for
+the energy arm, obs 0.237 vs 0.408), both undershooting. That single residual is the only
+place in the phase diagram where the model departs from linearity, and it is the cell
+worth n=100.
+
+**CHEAPEST KILLING CONTROL.** Store per-pair deltas (free), then bootstrap the paired ratio
+so R gets a CI. Re-run ℓ=3 alone at n=96 to settle the W=4 residual: **≈ 12 GPU-min**.
+
+### S1 — stance: the k-growth does not survive per-differing-slot normalisation
+
+**OBJECTION** (O1 applied as requested). "Your staged-refusal margin grows +20.7 → +28.6
+across k = 2…8 for the same reason your language task did."
+
+**SEVERITY: kills-the-claim** for "template grows with k" on stance; the arm-ranking
+results are untouched.
+
+**EVIDENCE STATUS: already refuted by existing data.** `make_pairs` uses a balanced profile
+with a uniformly random distinct permutation as foil, so E[Hamming] is exactly computable
+by enumeration: 2.00, 2.40, 3.16, 4.06 for k = 2, 4, 6, 8.
+
+| k | E[Hamming] | template | per differing slot | single |
+| --- | --- | --- | --- | --- |
+| 2 | 2.00 | +20.73 ± 1.63 | 10.36 | +5.16 ± 1.68 |
+| 4 | 2.40 | +20.66 ± 2.51 | 8.61 | +3.49 ± 1.44 |
+| 6 | 3.16 | +23.89 ± 2.03 | 7.57 | +3.39 ± 1.35 |
+| 8 | 4.06 | +28.58 ± 3.35 | 7.04 | +0.78 ± 0.91 |
+
+Per-slot efficacy **falls 32%** across the sweep. **Prediction for the fixed-Hamming
+control on stance: flat to mildly declining, and certainly not growing** — register it
+before that run lands, as with lang_profile.
+
+Two credits, because the construction is better than its predecessors: `sents_for` assigns
+sentences by a running counter, so target and foil use the **identical multiset of
+sentences** merely reordered (a stronger match than `lang_profile`, where the same indices
+were rendered in different languages and token counts differed); and the disjoint bank
+halves (A trains the direction, B builds eval pairs) are a real leakage control that the
+earlier harnesses lacked.
+
+One genuine anomaly: **single at k=8 is +0.78 ± 0.91 where additivity predicts
+≈ 0.5 × 7.04 ≈ 3.5** — a 3σ undershoot, and the only place a single-slot write behaves
+unlike the arithmetic. Worth one figure.
+
+### S2 — stance: the experiment's own pre-registered tell fired
+
+**OBJECTION.** "You wrote that a near-zero `cos(u_stance, u_prompt_refusal)` is the tell
+that you have a style direction rather than a refusal direction. You measured 0.108 and
+reported the result as a refusal-steering match."
+
+**SEVERITY: weakens → kills-the-claim** for the framing "mid-response safety recovery,
+the behavior whose real-model lever is the most mature in the literature". The steering
+result stands; the *bridge to the refusal-direction literature* does not, on the
+experiment's own criterion.
+
+**EVIDENCE STATUS: already established** (`stance_modal.py:29` states the criterion;
+`stance.json` gives 0.108). For calibration, two random directions in 1536 dimensions have
+|cos| ≈ 0.026, so 0.108 is well above chance but explains ~1% of variance. **Fair caveat
+that must be stated with it:** `u_prompt` is measured at the last prompt token and
+`u_stance` over response-sentence spans, so some of the orthogonality is positional rather
+than semantic. The honest reading is that `u_stance` is largely a refusal-*register*
+direction (the linguistic act of declining) rather than the refusal *decision* direction.
+
+**CHEAPEST KILLING CONTROL.** Measure `u_prompt` at matched positions (first response
+tokens after the generation prompt, harmful vs benign request) and re-take the cosine;
+additionally project `u_stance` onto the span of a proper harmful/harmless
+difference-of-means and report the retained fraction. **≈ 8 GPU-min.** If the cosine stays
+near zero at matched positions, rename the result "per-sentence stance register" and drop
+the safety-recovery framing.
+
+### S3 — stance: the pre-check gate is one-sided
+
+**OBJECTION.** "Your gate tests P(comply | previous refuse) and passes at 0.87. The
+transition table shows the opposite direction is 0.026 — the model has a strong
+comply-attractor, which is exactly the pathology the gate exists to detect."
+
+**SEVERITY: weakens** (teacher-forced results are unaffected, as the docstring correctly
+notes; it matters for any generation-mode follow-up).
+
+**EVIDENCE STATUS: already established.** `transitions` = {R→C: 20, R→R: 3, C→R: 1,
+C→C: 38}: P(comply | refuse) = 0.870 but P(refuse | comply) = **0.026**, on n = 23 and
+n = 39 transitions respectively. A seeded refusal is abandoned almost immediately and
+compliance is essentially absorbing. Steering *into* refusal mid-response — the direction
+that matters for safety recovery — is the hard direction and is untested.
+
+**CHEAPEST KILLING CONTROL.** Report both conditionals, and gate on the *minimum*. For the
+generation-mode run, seed mid-comply and measure induced refusal; **≈ 10 GPU-min**.
+
+### C1 — ruling on the convexity claim: what threshold on S I would accept
+
+Requested ruling. My position: **realmodel is right that the current reading is unsafe,
+and I would not accept S > 0 as a window effect under any threshold unless it is
+accompanied by a contiguous-versus-scattered contrast.** Reasons, in order of force.
+
+**First, the observed convexity is fully explained by a super-linear dose response, with no
+window physics.** The stance frac grids give a local exponent `p` in `Δ ∝ frac^p` of
+1.07–1.17 (k=2) rising to 1.11–2.10 (k=8, at the top of the grid). Fitting a single power
+law `Δ ∝ N^q` in the number of written segments, calibrated on the two endpoints of the
+stance W-sweep, gives **q = 1.27** and reproduces the whole curve:
+
+| W | observed | power law, q = 1.27 | deviation |
+| --- | --- | --- | --- |
+| 1 | +2.34 ± 1.18 | +2.34 | calibration point |
+| 2 | +6.25 ± 1.36 | +5.62 | +0.5σ |
+| 4 | +9.78 ± 2.52 | +13.53 | −1.5σ |
+| 8 | +32.58 ± 3.06 | +32.58 | calibration point |
+
+Three of four points sit within 1.5σ of a curve containing no window term at all.
+
+**Second, the normalisation is the artifact realmodel identified.** The "fraction of the
+additive line" values 0.57 / 0.77 / 0.60 / 1.00 are deviations from a line through the
+origin and the W=8 point, so the W=8 cell is 1.00 *by construction* with zero deviation.
+The measured deviations at W = 1, 2, 4 are −1.5σ, −1.4σ, −2.6σ. Stated without the
+normalisation, the finding is "**partial-coverage arms undershoot full coverage
+proportionally**" — sub-additivity of partial writes — which is the same fact with the
+rhetoric reversed, and which O9's `single/(template/k)` ratios (0.38–1.03) already showed.
+
+**Third, the non-monotonicity falsifies the offered model.** The edge-penalty form
+`Δ(W)/W = a − c/W` is strictly monotone in W, as `convex_modal.py:20` states. The observed
+0.57 → 0.77 → 0.60 → 1.00 is not, so either the model is wrong or the W=4 point is noise
+(it is the least precise, ±2.52). Either way it cannot currently be reported as convexity.
+
+**Fourth — and this is the design point — the scramble control cannot do the job it is
+assigned.** For a balanced block, a uniformly random within-block permutation σ gives
+`E_σ[Σ_t c_{σ(t)} π_t] = (Σc)(Σπ)/W = 0` exactly. So under plain additivity
+`E[Δ_scrambled] = 0` and `E[S_scrambled] = −Σ_t Δ_t` for **every** W: the collapse is
+predicted by additivity alone and carries no information about coherent transitions.
+Worse, at W = 2 the permutation group has two elements, so half the episodes are not
+scrambled at all. The scramble destroys sign-correctness and adjacency together; only the
+scattered arrangement holds correctness fixed and varies adjacency alone.
+
+**The threshold I would accept.** Define the span statistic on *paired* per-pair deltas:
+
+```text
+S_span(W) = Δ(contiguous W segments) − Δ(scattered W segments)     [same j, same dose,
+                                                                    same coverage, same signs]
+```
+
+I would call a window effect real when **all** of the following hold:
+
+- `S_span(W) > 0` at **≥ 3 paired SEM** (not the unpaired combination — with per-pair
+  deltas the paired SEM should be roughly half the unpaired one);
+- at **≥ 2 values of W** and **≥ 2 fracs**, with the effect monotone in W;
+- with effect size `S_span(W)/Δ(contiguous W) ≥ 0.15`;
+- and the scattered arm's own `S` (against the marginals) accounting for the rest, so the
+  dose-convexity share is explicit rather than absorbed.
+
+Against that bar the existing evidence is **null**: the phase-diagram job's own contrast is
+contiguous +18.94 ± 2.40 versus scattered +17.42 ± 2.81, a difference of **+1.52 ± 3.69
+(0.4σ, 8% of the contiguous value)** at coverage 4. My prior is therefore that `convex.json`
+will show S > 0 and it will be dose convexity.
+
+**What I would still object to if S > 0 significantly.** Even with S at 5σ against the
+marginals, three alternatives remain open and none is addressed by the current design:
+dose/coverage convexity (kill it with the scattered contrast, or with the direct control
+below); the single-segment marginal being anomalously small for a position-specific reason
+rather than a span reason (kill it with the position-resolved marginal spread — the code
+already computes `marg[t]` per position, so report its variance, free); and grid-edge dose
+selection, since every arm again peaks at frac 0.5.
+
+**Two cheap additions to `convex_modal.py` before it is believed.** Store per-pair deltas
+for the **marginals** — `results["marginals"]` currently keeps only mean and sem
+(`convex_modal.py:217-219`) while `blocks` keeps `deltas`, so S has no paired SEM, which is
+the single thing that would most improve its power. And add one arm: **one segment at
+magnitude `W·m`** versus **W segments at magnitude `m`**. If those match, the
+"superadditivity" is dose, not span. Both are **≈ 5 GPU-min** inside the existing job.

@@ -297,5 +297,7 @@ def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k: int = 12
                         [float(x) for x in fracs.split(",")], cov)
     outdir = ROOT / "results" / "temporal_screen"
     outdir.mkdir(parents=True, exist_ok=True)
-    (outdir / "lsweep.json").write_text(json.dumps(res, indent=2))
-    print("[saved]", outdir / "lsweep.json")
+    tag = model.split("/")[-1].replace("Qwen2.5-", "qwen").replace("-Instruct", "").lower()
+    out = outdir / f"lsweep_{tag}.json"
+    out.write_text(json.dumps(res, indent=2))
+    print("[saved]", out)
