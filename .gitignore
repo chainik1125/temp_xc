@@ -78,3 +78,6 @@ paper/*.pdf
 # Contains private information. Only the README pointer is tracked.
 private/**
 !private/README.md
+
+# Claude-harness session lock (machine state; dirties every session's tree if tracked)
+.claude/scheduled_tasks.lock
