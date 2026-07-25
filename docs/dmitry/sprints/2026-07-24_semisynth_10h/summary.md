@@ -22,15 +22,14 @@ foil are **the same sentences in a different order**, so a constant write is ine
 construction and only shape is under test.
 
 **1. Positions add up, and a steering write moves the model by roughly its projection
-onto the target — including when it opposes the target.** Give a handle a resolution
-limit (one constant per block of W segments) and it can only deliver the part of the
-target that survives averaging inside those blocks. Sampling 36 random combinations of
-profile, block width and block coefficients gives predictions spanning −0.42 to +0.42
-with nothing fitted; the measured effects track them with **slope 0.94, intercept −0.01,
-mean absolute error 0.073**. Thirteen of those conditions predict a *negative* effect and
-the model duly moves the wrong way in proportion — the part that could most easily have
-failed. The fit is good on average and not exact: χ²/dof is 3.6, so positions do not all
-carry equal weight, and the deviations are systematic rather than noise.
+onto the target — including when it opposes the target.** A handle limited to one
+constant per block of W segments can only deliver the part of the target that survives
+averaging inside those blocks. Across 36 random combinations of profile, block width and
+coefficients, predictions span −0.42 to +0.42 with nothing fitted and the measured effects
+track them at **slope 0.94, intercept −0.01, mean error 0.073**. Thirteen conditions
+predict a *negative* effect and the model duly moves the wrong way in proportion — the
+part that could most easily have failed. Good on average, not exact: χ²/dof is 3.6, so
+positions carry unequal weight and the deviations are systematic.
 
 - ![linearity](../../../../plots/2026-07-24_trajectory_steering/linearity.png)
 
@@ -48,27 +47,23 @@ the timescale" is the right summary of window size rather than "wider is better"
 - ![phase diagram](../../../../plots/2026-07-24_trajectory_steering/phase_diagram.png)
 
 **3. It reaches a behaviour with safety shape: the order of declining and helping within
-one response.** The scheduled handle shifts the model's preference between a declining
-and a helping continuation in the intended direction on **96.9%** of slots (mean shift
-1.00 nats per token) against **51.2%** for the same direction at constant strength; it
-flips which continuation the model actually prefers on **53.6%** of slots against a 50%
-floor. So this is a large and reliably-signed pressure on the choice rather than a
-decisive change of it. The 51.2% is the constant write's expected value rather than a
-malfunction: it pushes every slot toward declining, so it is right on exactly the half
-of slots meant to decline. A random direction at matched magnitude does nothing.
-*(Dose 0.5 of the mean residual norm, 160 slots; 93.8% shift-accuracy at dose 0.35.)*
+one response.** The scheduled handle shifts the model's preference between a declining and
+a helping continuation the intended way on **96.9%** of slots (mean shift 1.00 nats/token)
+against **51.2%** for the same direction at constant strength, and flips which continuation
+it actually prefers on **53.6%** against a 50% floor — large, reliably-signed pressure on
+the choice rather than a decisive change of it. That 51.2% is the constant write's expected
+value, not a malfunction: pushing every slot toward declining is right on exactly the half
+meant to decline. A random direction at matched magnitude does nothing. *(Dose 0.5 of the
+mean residual norm, 160 slots.)*
 
 - ![stance](../../../../plots/2026-07-24_trajectory_steering/stance.png)
 
 **4. What matters is which sign lands where, not how much is written.** Permuting the
-schedule inside a block — holding coverage, contiguity and total injected norm exactly
-fixed, changing only which coefficient sits at which position — collapses the effect from
-+55.3 to −1.2 at W=8 (dose 0.35 of the mean residual norm; *n = 28*). That rules out any
-"you simply added more push" reading of the whole result. An additive response predicts
-the collapse exactly, since a random within-block permutation matches about half the
-slots and nets zero, so this is a check the design passes rather than a mechanism it
-reveals — and it says nothing about *adjacency*, which is a separate question taken up
-below.
+schedule inside a block — coverage, contiguity and injected norm held exactly fixed,
+only the placement changed — collapses the effect from +55.3 to −1.2 at W=8 (*n = 28*).
+That rules out any "you simply added more push" reading. An additive response predicts
+the collapse exactly, so it is a check the design passes rather than a mechanism it
+reveals, and it says nothing about *adjacency* — a separate question taken up below.
 
 - ![controls](../../../../plots/2026-07-24_trajectory_steering/controls.png)
 
