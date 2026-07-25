@@ -34,8 +34,8 @@ carry equal weight, and the deviations are systematic rather than noise.
 
 - ![linearity](../../../../plots/2026-07-24_trajectory_steering/linearity.png)
 
-**2. So the useful handle width is the target's own timescale.** Once the response is
-linear, the achievable fraction for a square-wave target of run length ℓ is fixed by
+**2. So the useful handle width is the target's own timescale.** Once positions add up,
+the achievable fraction for a square-wave target of run length ℓ is fixed by
 arithmetic. The resulting (W, ℓ) grid is reproduced to a mean error of **0.053** (1.5B)
 and **0.045** (7B) over its six at-risk cells at the top of the dose grid — 0.099 and
 0.094 at the lowest dose, a systematic drift taken up below. The grid's other 18 cells
@@ -63,7 +63,7 @@ of slots meant to decline. A random direction at matched magnitude does nothing.
 **4. The effect is the order, not the mass.** Permuting the schedule inside a block,
 holding coverage, contiguity and total injected norm fixed, collapses the effect from
 +55.3 to −1.2 at W=8 (dose 0.35 of the mean residual norm; *n = 28*). This rules out any
-"you simply added more push" reading. A linear response predicts that collapse exactly —
+"you simply added more push" reading. An additive response predicts that collapse exactly —
 a random within-block permutation matches about half the slots and nets zero — so it is a
 check the design passes rather than a mechanism it reveals.
 
@@ -113,8 +113,9 @@ algebraic identities: 9 where W divides ℓ, making the block-constant write
 byte-identical to the full template (R ≡ 1), and 9 where every block straddles equal
 halves, so the coefficient is exactly zero and no vector is written (Δ ≡ 0). They are
 worth running — the zero-write cells are a real plumbing test, and all 18 pass — but
-the law was never at risk on them. The six informative cells carry the result. One of
-them is also the only visible departure from linearity: ℓ=3, W=4 undershoots at 1.9σ.
+the law was never at risk on them. The six informative cells carry the result, and one of
+them — ℓ=3, W=4, undershooting at 1.9σ — is where the grid first hinted at the
+position-weight heterogeneity that the linearity test later established.
 
 Because the predicted fraction follows from linearity by algebra, this grid measures
 **how linear the steering response is in the schedule** — and six cells at two distinct
@@ -235,8 +236,8 @@ against our own result.
   independent puts t at 1.6–1.7 rather than 2.6–2.8, so the effect is not distinguishable
   from zero. A single power law in the number of written segments, `Δ ∝ N^1.27`,
   reproduces the whole curve with no window term, and the normalisation we used made the
-  widest point 1.00 by construction. The within-block scramble cannot rescue it: a linear
-  response already predicts a scrambled schedule nets zero.
+  widest point 1.00 by construction. The within-block scramble cannot rescue it: an
+  additive response already predicts a scrambled schedule nets zero.
 
 One further claim was scoped rather than retracted. The per-position template is
 **rank-1** (σ₁ = 89% of the energy) — one direction with an externally supplied sign
