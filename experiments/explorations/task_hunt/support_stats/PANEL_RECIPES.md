@@ -43,20 +43,22 @@ available T. No post/stacked arm exists there; `times-T` is harmless.
 
 ## runpod-d — oprate `rate_case` (Ward)
 
-Substitute the datasource key YOUR frozen card declares (the one your
-`run_stage2` passes to the runner), and the results JSON path your
-runner writes — everything else stays:
+Your frozen card's keys (commit 5b35f671) are filled in — run verbatim:
 
 ```bash
 .venv/bin/python -m experiments.explorations.task_hunt.support_stats.stage2_variance \
-  --ds <YOUR_OPRATE_CASE_DS_KEY> --probe v1 --post-k-rule times-T \
-  --crosscheck-json experiments/explorations/task_hunt/oprate/results/stage2_<YOUR_OPRATE_CASE_DS_KEY>.json \
+  --ds ward_real_oprate_case_base_l12 --probe v1 --post-k-rule times-T \
+  --crosscheck-json experiments/explorations/task_hunt/oprate/results/stage2_ward_real_oprate_case_base_l12.json \
   --out-prefix stage2_variance_oprate_case
 # paired v2: --probe v2 --out-prefix stage2_variance_oprate_case_v2
 ```
 
-If you take `rate_ver` to a panel, repeat with that ds key and
-`--out-prefix stage2_variance_oprate_ver[_v2]`.
+If you take `rate_ver` to a panel: same commands with
+`ward_real_oprate_ver_base_l12` and
+`--out-prefix stage2_variance_oprate_ver[_v2]`. (Your runner's partial
+per-selection result files are NOT the crosscheck input — the harness
+cross-checks the full-panel `stage2_<ds>.json`; a partial JSON aborts
+on key-set diff by design.)
 
 ## If something still aborts
 
