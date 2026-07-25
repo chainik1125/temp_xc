@@ -4305,3 +4305,100 @@ falsifier GREEN (every untrained post cell l0t = 8.00 exact) and — the
 lesson landed — its one out-of-band trained cell (post/T16/s1
 l0t = 8.02) recorded as a residual mismatch at count 1/42, unprompted.
 Mid-panel numbers are not read as outcomes here.
+
+## 2026-07-25 — runpod-e — VERDICT stage2-fineweb (gemma-2-2b primary), CASE STUDY #3: **v1 NO RULE FIRES AS WRITTEN** (K1✓ K3✓ K4✓, K2✗); paired v2 shows the full regime-2 shape, bounded at n=3; within-doc receipt POSITIVE
+
+84/84 cells, canonical runner, 0 failures; harness crosscheck exact on
+both probe passes; frozen card `b8f2f0bd` + APPENDIX A (A40 restart).
+Every number below is script-derived (variance harness / support /
+demeaned receipts / summary JSON); RECEIPTS rows to follow for any
+quote that graduates to the rebuttal.
+
+**Headline (v1, canonical).** TXC-pre/T8 trained 0.2498 [0.1886,
+0.3110]; pre/T16 0.1968 [0.0920, 0.3015]. Best token arch =
+batchtopk_sae 0.1957 [0.0550, 0.3363] (tsae 0.1789). Paired v2 beside
+(lower bound, PROBE_V2_SPEC § 0, never the claim): pre/T8 0.2915
+[0.2258, 0.3573]; pre/T16 0.3208 [0.2126, 0.4290].
+
+**K-clauses (v1, seed-mean, pre vs better token):**
+- K1 ✓ at T8: +0.0541 (BCa [−0.0017, 0.0861], sign-flip p 0.250 — NOT
+  bounded at n = 3; direction + CI per the harness honesty note).
+- K2 ✗: pre(16) 0.1968 < pre(2) + 0.02 = 0.2235.
+- K3 ✓ at T8: trained − untrained-pre +0.2043 [0.1358, 0.2728].
+- K4 ✓ at T8 (§ 6b receipt, amended — see AMENDMENT commit): pre
+  demeaned 0.0860 vs better-token demeaned 0.0387 (tsae) ⇒ within-doc
+  gap **+0.047, positive in all 3 seeds** (+0.054/+0.047/+0.041).
+- NEGATIVE does not fire (K1 fired; interior T8 = 0.2498 ≥ 0.2235);
+  WEAK band does not fire (max gap 0.0541 ∉ (0.02, 0.05)).
+- **⇒ VERDICT OF RECORD: NO RULE FIRES AS WRITTEN.** K1/K3/K4 pass and
+  the single failing clause is K2, the v1 T-shape — a combination the
+  frozen rules do not cover. Not upgraded by narrative; the V4 split
+  branch does NOT apply (K4 passed). Cross-model majority rule pends
+  the replication cells (K1/K3/K4 at T4/T8).
+
+**Predictions scored (each way).** P1 ✓ (token means 0.196/0.179 in
+[0.15, 0.50]). P2 ✗ on v1 (interior peak: 0.204/0.234/0.250/0.197;
+trend 2→8 p 0.0787 = direction-consistent-not-significant; 2→16 dead)
+/ ✓ on v2 (monotone 0.227/0.250/0.292/0.321, unsaturated; 2→8
+p 0.0185, 2→16 p 0.0009, pre−tsae t-bounded > 0 at T8 [0.043, 0.158]
+and T16 [0.080, 0.179]) — the v1/v2 split IS the receipted
+probe-capacity limitation, replicating on corpus #2 exactly as the
+methods decision licensed ("levels/shapes conservative; ordering
+robust, widens under an adequate probe"). P3 ✗ at T16 as pre-registered
+(+0.001), ✓ at T8 (+0.054) — the bet lands on its informative
+interior-T branch. P4 ✓ (floor r 0.575–0.588 ≥ 0.5 every T; demeaning
+shrinks every arm; ordering survives). P5 ✗ at T2 (post LEADS pre by
++0.058; tracks within 0.031/0.022/0.016 at T4/8/16 — post is not the
+λ̂ matched shape here, and the deviation favors post). P6 ✗ as a
+universal (v2 < v1 on 4 thin-margin token cells), ✓ in pattern
+(largest lifts Stacked/T16 0.106→0.256, post/T16 0.181→0.361).
+
+**Falsifier + band.** § 5: 12/12 untrained post cells realize
+l0 = 8.00 exactly — the l0 ≈ k/T mechanism confirmed; post arm VALID.
+Band [5.0, 8.0]: 37/42 in-band; 5 residual mismatches, all trained
+post T8/T16 at 8.005–8.047 (≤ 0.05 over the top edge — saturation, not
+ramp-down; far below the 25% void bar). Untrained pre realizes
+7.54–7.93, declining with T (observation; § 5 is post-specific).
+
+**Evidence line (§ 7) — the card's prediction was WRONG and it
+matters.** In-tile visible q-count regression r = 0.152/0.222/0.345/
+0.462 at T = 2/4/8/16 (T = 1 structurally undefined: ambient-anchor
+masking ⇒ zero in-tile event variance). NOT small at T ≥ 8. No window
+cell beats the visible-count bar at T ≥ 8 on either probe (best:
+pre/T16 v2 0.321 < 0.462). Read precisely: the window-over-token gap
+is real (a masked per-token cell cannot count events at all), but the
+absolute window numbers stay BELOW what raw visible-event counting
+supplies on the same windows — the sparse code does not saturate even
+the count information. Any rebuttal sentence quoting a window number
+carries this bar beside it.
+
+**Doc identity (§ 6).** Floor r ≈ 0.58 at every T — ABOVE every
+activation-probe number on the panel (max 0.32). Drawn on the figure;
+the corpus-level identity route dwarfs the probe class, and all claims
+here are within-probe-class comparisons (ratified
+disclosure-not-kill-bar convention). Within-doc receipt (amended § 6b;
+whole-stream § 6a doc means; licence max Δ 1.4e-05, fallback 0):
+demeaning collapses tokens to 0.036–0.039 while window archs hold
+0.086–0.122 (pre) / 0.116 (post T8) — **the within-document face shows
+the window advantage MORE cleanly than the raw face, and it grows with
+T** (pre 0.047/0.060/0.086/0.122; post T16 s42 reaches 0.217). The
+pre-registered collapse branch did NOT occur.
+
+**Honesty block (harness, condensed).** n = 3: sign-flip floor
+p = 1/8; BCa 27 atoms; pairing bought no variance reduction on the
+cross-arch margin (r(arms) 0.67 at T8) — cross-arch margins NOT
+bounded at n = 3; the receipts that ARE significant are within-arch
+(v2 trend, trained−untrained margins). Seed recommendation on record:
++2 seeds (pre/T4, pre/T8, tsae/T1 = 6 trained cells) bounds the T8
+margin on v1; T4 not cheaply boundable (n = 12).
+
+**Coverage.** Run: gemma 84/84 + support + demeaned + variance v1/v2 +
+figure (v1 + paired-v2 variants). Launching now: replication cells at
+T ∈ {4, 8} (pre's two best v1 T values) on gpt2 + llama31, caches
+rebuilt with exact alignment receipts (5989/5989, 5924/5924). Not run:
+`tss`, § 10 re-quote (queued if clock allows), dialevel recency
+pre-flight (CANCELLED by bootstrap). One pre-registered-rule failure
+to note against myself: the card's § 7 "small at T ≤ 16" prediction is
+falsified by my own receipt, stated above, not softened.
+
+_Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb verdict)_
