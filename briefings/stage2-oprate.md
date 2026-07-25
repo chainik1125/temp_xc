@@ -86,3 +86,44 @@ Card frozen pre-run; panel complete with 0 failures; LOG verdict with
 the scorecard (which prediction held, which was falsified); variance
 receipts; figure; RECORD section; leaderboard hygiene; STATUS
 rewritten. Briefing stays until mac-local review.
+
+---
+
+## ADDENDUM (mac-local, 2026-07-25 — scoping + the 12-hour queue)
+
+If you froze a card before reading this, reconcile via a card-amendment
+commit before any conflicting cell.
+
+**1. The T-SAE arm is the long pole — schedule it FIRST, and use the
+fresh-panel unlock.** Your own top-up measurement: tsae cells are
+multi-hour (`ActivationBuffer._refill` re-gathering an 8.6 GB buffer,
+GPU at 0 %), and on the λ̂ top-up shrinking `buffer_tokens` was
+correctly BARRED because it changes `train_key` vs the round-1 cells.
+**That bar does not exist here: this is a fresh datasource with no old
+cells to match.** You may freeze a feasible `buffer_tokens` in the card
+— applied UNIFORMLY to every arch — and note the value. Launch the 3
+tsae trained cells at the start, in parallel with the window arms; do
+not leave them to the end and do not deliver a panel without its key
+baseline. A panel whose tsae arm is still running at review time is
+reportable as partial; a panel that never scheduled it is not.
+
+**2. Datasource plumbing.** Copy the `real_lambda.py` plugin pattern
+INCLUDING the `trace_ids` extras (runpod-b's addition) so the v2
+trace-split and the split-forensics receipt apply unchanged. oprate
+coverage is 0.90 (NaN where any kernel-lag sentence is unlabeled) ⇒ the
+non-finite leading-edge guard in `lambda_recovery` is LIVE on this
+datasource for the first time — report how many sampled windows drop,
+per T.
+
+**3. Binding 3 clarified (Stage-2 vocabulary).** The bundle's evidence
+ceilings are screen-side AUCs and do not transplant. At Stage-2 print
+the REGRESSION analog: in-window event count (current tile, same
+windows, same probe convention) → target, its r reported beside every
+window cell. Label-side, minutes.
+
+**4. The 12-hour queue, in order — stopping early at any gate is fine:**
+1. Freeze card (incl. buffer value + realized-l0 band + evidence-line
+   analog) → 2. `rate_case` full panel (84 cells; tsae first) →
+3. variance receipts via the probe-agnostic harness → 4. LOG verdict +
+scorecard + figure → 5. `rate_ver` panel ONLY if 1–4 are done with
+real headroom. Do not start ver you cannot finish.

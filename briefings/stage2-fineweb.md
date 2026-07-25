@@ -112,3 +112,58 @@ rebuttal.**
 Raising it the way you did — "flagging, not disputing", with a
 testable hypothesis and a costed experiment attached — is the model
 for how to challenge an adopted finding. Keep doing exactly that.
+
+---
+
+## ADDENDUM 2 (mac-local, 2026-07-25 — scoping + the 12-hour queue)
+
+If you froze a card before reading this, reconcile via a card-amendment
+commit before any conflicting cell.
+
+**1. Scope: ONE full panel + replication cells — NOT three full
+panels.** A full panel is 84 cells; three of them do not fit in 12 h.
+Primary model: **gemma-2-2b** (mid-scale, d_in 2304 keeps the tsae
+buffer cost sane, and it is a more representative subject than gpt2) —
+unless your first-cell timing argues otherwise; state the choice and
+reason in the card. Then the CROSS-MODEL claim comes from replication
+cells only: TXC-pre at its best two T values + tsae + per-token SAE
+(+ untrained), 3 seeds, on gpt2 and llama31. Per-model verdicts, stated
+majority rule, no pooling — as before.
+
+**2. The tsae arm: schedule its 3 trained cells FIRST** (the λ̂ top-up
+measured multi-hour buffer-path cells at d_in 4096; gemma's 2304 is
+cheaper but not free). Fresh panel ⇒ you MAY freeze a feasible
+`buffer_tokens` uniformly across archs in the card (the comparability
+bar that blocked this on the λ̂ top-up does not apply to a new
+datasource).
+
+**3. Binding 1 made concrete (Stage-2 vocabulary — no runner changes).**
+(a) The doc-identity FLOOR = a doc-mean-only predictor's r on the same
+eval windows (label-side, cheap) — print it beside every window cell.
+(b) The within-document RECEIPT = an out-of-band re-fit of the SAME
+codes against doc-demeaned targets, your `probe_capacity.py` pattern
+(off-leaderboard, pre-registered in the card). **Pre-register now: the
+within-doc face may sit near floor** (q's zero-fraction is 0.806 —
+within-doc λ̂ variance is thin). If the panel's gap collapses under
+doc-demeaning, that is a sound NEGATIVE and you report it as loudly as
+a win; do not soften it.
+
+**4. Datasource plumbing.** The new fineweb datasource must expose
+`trace_ids` = document index (copy the `real_lambda.py` pattern) — the
+v2 trace split then prevents document rows straddling the probe halves,
+which matters MORE here than anywhere (doc-identity 0.901). Binding 6's
+"prefer the 4k artifact": train + eval on the existing 400-doc caches
+(zero new caching); the 4k corpus is an OPTIONAL eval-side addendum
+only if the queue completes (one short caching pass). Quote the corpus
+size beside every number either way.
+
+**5. Binding 5 clarified**: the evidence line at Stage-2 is the
+regression analog — in-window event count → target on the same windows
+— not the bundle's screen AUC ceilings.
+
+**6. The 12-hour queue, in order — stopping early at any gate is fine:**
+1. Freeze card → 2. gemma-2-2b full panel (tsae first) → 3. doc-identity
+floor + doc-demeaned receipt → 4. variance receipts + LOG verdict +
+figure → 5. replication cells on gpt2 + llama31 → 6. `tss` (primary
+model ONLY, needs its own ~330k-token caching pass) → 7. the optional
+dialevel recency pre-flight — LAST, only if everything above is done.
