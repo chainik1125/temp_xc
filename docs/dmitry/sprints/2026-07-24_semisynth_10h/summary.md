@@ -60,12 +60,15 @@ of slots meant to decline. A random direction at matched magnitude does nothing.
 
 - ![stance](../../../../plots/2026-07-24_trajectory_steering/stance.png)
 
-**4. The effect is the order, not the mass.** Permuting the schedule inside a block,
-holding coverage, contiguity and total injected norm fixed, collapses the effect from
-+55.3 to −1.2 at W=8 (dose 0.35 of the mean residual norm; *n = 28*). This rules out any
-"you simply added more push" reading. An additive response predicts that collapse exactly —
-a random within-block permutation matches about half the slots and nets zero — so it is a
-check the design passes rather than a mechanism it reveals.
+**4. What matters is which sign lands where, not how much is written.** Permuting the
+schedule inside a block — holding coverage, contiguity and total injected norm exactly
+fixed, changing only which coefficient sits at which position — collapses the effect from
++55.3 to −1.2 at W=8 (dose 0.35 of the mean residual norm; *n = 28*). That rules out any
+"you simply added more push" reading of the whole result. An additive response predicts
+the collapse exactly, since a random within-block permutation matches about half the
+slots and nets zero, so this is a check the design passes rather than a mechanism it
+reveals — and it says nothing about *adjacency*, which is a separate question taken up
+below.
 
 - ![controls](../../../../plots/2026-07-24_trajectory_steering/controls.png)
 
