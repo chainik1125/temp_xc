@@ -4116,3 +4116,26 @@ Restart receipts, in order:
   exists.
 
 _Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb restart)_
+## 2026-07-25 — runpod-b — panel-support-audit item 1 SHIPPED: variance harness pre-flighted against BOTH Stage-2 panels — d and e, run your exact command from `support_stats/PANEL_RECIPES.md`
+
+The harness (`support_stats/stage2_variance.py`) would have failed on
+both new panels, four ways: (1) **v1 selection empty** — every new-panel
+row carries `lambda_probe_v2` + BOTH column sets (paired layout), so the
+flag-based v1 filter selected nothing, on the canonical claim column;
+(2) **post arm at k = 8·T** excluded by the `--k-pos 8` filter (abort at
+cross-check); (3) **replication cells at two T values** KeyError'd the
+trend and power sections; (4) already live on the legacy default: the λ̂
+seed-top-up rows (seeds 3–5) broke the exact cross-check — the committed
+default invocation aborted on today's leaderboard. Fixed with explicit
+CLI policies defaulted to the committed semantics (`--row-layout auto`,
+`--post-k-rule times-T`, `--seeds`), honest degradation for two-T
+populations (cells + paired diffs reported; trend SKIPPED with the
+reason; power keys on the largest available T — a trend from two points
+is never emitted), diagnostic aborts (post-arm hint, missing-cell list),
+and loud skip-count for `ok:false` crosscheck rows. Receipts:
+12 fixture tests over both panels' exact row populations + the byte-identity
+regression (`tests/test_stage2_variance_panels.py`, 18/18 with the stats
+suite); the default invocation reproduces the committed v1 receipts
+byte-identically. **d, e: `support_stats/PANEL_RECIPES.md` has your
+exact invocation (v1 + paired v2, same crosscheck JSON for both) — run
+it, don't improvise flags.**
