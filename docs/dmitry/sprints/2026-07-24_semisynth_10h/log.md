@@ -288,3 +288,52 @@ a regression across the full range, and the negative half is a genuinely risky p
 a write that anti-correlates with the target should push the margin proportionally the
 wrong way.
 
+### 23:10 — round-2 lands: one confirmation, one confound I caught in my own test
+
+Capacity freed at ~23:00 and both queued jobs ran.
+
+**B — stance fixed-Hamming confirms the retraction.** +20.84, +18.47, +19.61, +18.43 for
+k = 2, 4, 6, 8: flat, exactly the reviewer's registered prediction. Staged refusal does
+not grow with response length either.
+
+**D — what the declination direction is.** cos(u_stance, u_blunt_refusal) = **0.747**
+against cos(u_stance, u_apology) = **0.495**, with the two banks themselves at 0.496 and
+the matched-position prompt cosine at 0.091. So the direction leans toward the *act* of
+declining rather than toward politeness, but the ratio is ~1.5:1, well short of the 3:1
+the realmodel agent set as the bar for calling it a refusal direction outright. The
+"declination-register" naming already in the write-up is the one the evidence supports.
+
+**C — my span test was confounded, and I caught it before believing it.** The headline
+looked strong: S_span = +7.74 ± 1.22 (t = 6.3) at W=4, replicated at both doses. Then I
+checked what the "scattered" arm actually writes. It selects positions with stride k/W,
+which on an alternating profile at k=8, W=4 lands entirely on one parity — so the
+scattered arm writes a **single sign** at all four positions while the contiguous arm
+writes two of each. The arms differ in the composition of the write, not only in its
+adjacency, and a single-sign write on a subset is close to the DC write we already know
+is weak. That t = 6.3 cannot be attributed to span. `span2_modal.py` rebuilds it with
+stride 3 at k=12, which is sign-matched to the contiguous block for every W ≤ 4 while
+sharing no adjacent pair; everything else — coverage, correctness at each covered slot,
+injected norm, dose, eval pairs — is held fixed.
+
+**A — phase sweep, with one honest wrinkle.** Most cells track their predictions
+(ℓ=3 W=2: pred 0.667, obs 0.679 / 0.604 / 0.639 across phases). But two cells with the
+*same* prediction of 0.333 came out at **0.145** and **0.676** with non-overlapping
+bootstrap intervals. Linearity in the schedule alone does not explain that; it is
+position-dependent heterogeneity, which the review agent had flagged as uncontrolled
+(O9) and which now has direct evidence. Stated as a caveat in the write-up.
+
+### 23:12 — the linearity test replaces the grid as finding 1
+
+`linfit.json`: 36 random (profile, width, coefficient) conditions, 12 distinct
+predictions spanning **−0.42 to +0.42**, measured against the full-schedule effect on
+the same pairs. Fit: **slope 0.945, intercept −0.013, R² 0.765, mean |error| 0.073**.
+Thirteen conditions predict a negative effect and the model moves the wrong way in
+proportion (mean observed −0.233) — the riskiest part of the claim, and it holds.
+
+This is the same claim the (W, ℓ) grid was making, with roughly six times the leverage
+and without the square-wave restriction that pinned the grid to two distinct predicted
+values. Promoted to finding 1; the grid becomes finding 2, read as control cost.
+Caveat kept in view: 26 of 36 bootstrap intervals cover the prediction, below the
+nominal 95%, so there is genuine excess scatter — consistent with the positional
+heterogeneity the phase sweep exposed.
+
