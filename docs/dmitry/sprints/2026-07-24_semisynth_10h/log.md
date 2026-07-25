@@ -337,3 +337,61 @@ Caveat kept in view: 26 of 36 bootstrap intervals cover the prediction, below th
 nominal 95%, so there is genuine excess scatter — consistent with the positional
 heterogeneity the phase sweep exposed.
 
+### 23:14 — review round 3: do not close the span door, and the worst sentence
+
+**R1 — the law has a systematic failure I had not noticed, and it is the interesting one.**
+In the block-constant arm every segment gets a ±1 coefficient and only the sign varies, so
+the achievable fraction R should be dose-**invariant** under *any* position-independent
+response function, however nonlinear. It is not: R rises with dose in **6/6 at-risk cells
+at 1.5B and 6/6 at 7B** (mean +0.059 / +0.054). Correspondingly my headline errors are
+dose-selected — 0.099 / 0.068 / 0.053 at frac 0.2 / 0.35 / 0.5. The write-up now quotes the
+dose with the number.
+
+Two explanations survive and only one is a span effect: an asymmetric sign response (a
+wrong-signed write costs more than a right-signed write gains, ρ ≈ 1.4 → 1.2 with dose,
+position-independent) or genuine cross-position interaction. `rho_modal.py` measures ρ(m)
+directly by steering each position alone with the write matched *and* flipped — the flipped
+half is what `convex.json` lacks — then substitutes the measured ρ into R = [n₊ − ρn₋]/k
+and asks whether the drift is accounted for. Queued.
+
+**R2 — my most overstated sentence, and it was the behavioural headline.** "Moves the
+model's own choice on 96.9% of slots" is not a choice measure: it is the fraction of slots
+on which a *continuous* quantity moved the intended way, so a shift of one-thousandth of a
+nat counts. The metric that scores the actual pick was already in the repo
+(`stance_gen.json`) and sits at **0.536 vs a 0.500 floor**. Both numbers are now in the
+finding: a large, reliably-signed *pressure* on the choice (96.9%, mean 1.00 nats/token)
+that crosses the decision boundary only 3.6 points above floor.
+
+**Structural point adopted:** teacher-forcing removes the mechanism a span effect would
+most plausibly use, since the text is pinned at every position and a run of consistent
+writes cannot establish a state the continuation carries forward. The entrainment
+experiment is the unpinned version of the same question. Stated as a pair rather than as
+an awkward null.
+
+### 23:16 — entrainment is NULL. The control was in my own data the whole time.
+
+The red team's decisive catch, and it needed no GPU: `entrain2.json` already contained an
+**m = 0 (unsteered) cell for every family**, and that — not the analytic persistence null —
+is the reference for "would the tail have looked like this anyway". Re-scored against it:
+
+| period-2 | W=1 | W=2 | W=3 | W=4 |
+| --- | --- | --- | --- | --- |
+| vs persistence null | −0.022 | +0.002 | **+0.208** | **+0.221** |
+| vs unsteered control | +0.038 | −0.038 | **+0.002** | **−0.319** |
+
+The persistence null falls 0.600 → 0.500 → 0.333 → 0.000 across the widths while raw tail
+accuracy runs 0.578, 0.502, 0.542, 0.221 and the unsteered baseline sits flat at 0.540.
+So the "threshold at W\* = ℓ+1" was the null moving, not the model improving — and at W=4
+the tail is 0.319 *below* baseline. **There is no entrainment here.**
+
+I had already demoted this from a finding on the red team's earlier taste argument; it is
+now demoted on evidence, and the write-up says so in those terms. The figure is re-plotted
+as a two-panel comparison — the same data against both references — because the honest
+version of this result is pedagogically the most useful thing in the sprint: it shows
+exactly how a moving baseline manufactures a threshold.
+
+Two rules banked: score windowed-steering experiments against an **unsteered control**
+wherever one exists, in preference to an analytic null; and derive the null before
+believing a positive *or* a negative (the same file's earlier "below chance" reading was
+the same mistake in the other direction).
+

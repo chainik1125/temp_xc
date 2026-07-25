@@ -879,3 +879,119 @@ finding 5's "Permuting the schedule inside a block … collapses +55.3 to −1.2
 evidence in the executive summary while the body correctly says the collapse "confirms the
 design rather than revealing a mechanism"; the executive summary should carry the same
 caveat, since a linear response predicts that collapse exactly.
+
+---
+
+## Round 4 — linearity vs additivity, and why span2 will also be confounded
+
+### L1 — the regression does not carry "linear"; it carries "additive with position-dependent weights"
+
+Asked whether `linfit.json` supports finding 1 as written or needs the scatter caveat.
+It needs it, and the evidence is decisive rather than marginal. Recomputing from the 36
+stored points and their `ci95`:
+
+- **χ²/dof = 3.56.** Model-plus-noise is rejected outright.
+- **10 of 36 predictions fall outside their own 95% intervals.** If the model were right
+  that happens with probability **7.5 × 10⁻⁶**.
+- **Excess scatter beyond sampling noise is 0.081, against a mean measurement sigma of
+  0.055.** The unmodelled variation is *larger* than the noise it is being read against.
+- **The residual is systematic in W**, not random: mean residual −0.065 at W=4 (7/12
+  covering) versus +0.047 at W=6 (8/11 covering), corr(residual, W) = +0.245.
+- **Sharpest of all: three conditions predict exactly zero and measure significantly
+  non-zero** — −0.127 (z = −3.2), −0.067 (z = −3.1), +0.124 (z = +2.6). A pure projection
+  model cannot produce an effect from a write whose projection onto the target is zero.
+  The worst single point is W=4, coeffs [0.5, −1.0, −0.5]: predicted −0.083, measured
+  −0.383, **z = −6.3**.
+
+So "moves the model by **exactly** its projection" is not what was measured. What *was*
+measured is strong and worth claiming: slope 0.945, intercept −0.013, and thirteen
+negative predictions all coming out negative in proportion. That is a real, risky,
+passed test of the *functional form*. The failure is entirely in the assumption that
+every position carries equal weight.
+
+**This distinction is the whole ballgame, and the write-up should make it explicitly.**
+Two separable claims live inside "linear":
+
+- **Additivity** — `Δ(c) = Σ_t a_t c_t`; what you write at one position does not change
+  another position's contribution. Load-bearing, and untouched by any of the evidence above.
+- **Homogeneity** — `a_t = const`, so the effect is the *unweighted* projection.
+  Demonstrably false: χ²/dof 3.56, the zero-prediction conditions, and the phase sweep's
+  two cells sharing a predicted 0.333 that landed at 0.145 and 0.676.
+
+Every deviation found so far is consistent with additivity plus heterogeneous weights.
+None of it is evidence against additivity.
+
+**The cheap fix that converts the caveat into a stronger result.** Measure the twelve
+per-position weights `a_t` from twelve single-position writes, then re-predict all 36
+conditions as `Σ_t a_t c_t π_t / Σ_t a_t`. That is 12 parameters fit on single-position
+data predicting 36 multi-position conditions — 24 degrees of freedom, and an
+out-of-regime prediction, which is the right structure. **≈ 10 GPU-min.** If χ²/dof drops
+toward 1, finding 1 becomes "additive with measured position weights" at R² ≈ 0.95, which
+is a better law than the zero-parameter version and costs one measured vector. If χ²/dof
+stays high, the residual is interaction — see L2.
+
+**One more scope limit:** `linfit.json` records `frac: 0.5`. The linearity result is a
+single-dose measurement at the top of the grid, which is also where R1 showed linearity is
+at its best (mean error 0.053 at frac 0.5 versus 0.099 at frac 0.2, and R drifting upward
+with dose in 12 of 12 phase-diagram cells across both models). That belongs in Limitations.
+
+### L2 — a span effect *is* a failure of additivity, so span2 will measure heterogeneity, not adjacency
+
+Asked whether, given a linear response, a span effect is possible in principle. **No — and
+that is a definition rather than a finding.** Additivity states that what is written at
+position s cannot change what position t contributes. "Span", "adjacency", "coherent
+transition", "establishing a state that carries forward" are all names for exactly that
+interaction. So the span question and the additivity question are the same question, and
+the 36-condition regression already has far more leverage on it than any two-arm contrast.
+
+**But the corollary is a warning, and it applies to span2 as built.** Under additivity with
+position-dependent weights,
+
+```text
+S_span(W) = Δ(contiguous) − Δ(scattered) = Σ_{t∈C} a_t c_t − Σ_{t∈S} a_t c_t
+```
+
+which is **not zero** unless the weights happen to match across the two supports. The
+weights demonstrably do not match — that is L1's whole content. So span2 can return a
+large, highly significant `S_span` with no adjacency effect whatever, purely because the
+contiguous block and the stride-3 comb sit on different positions. Sign-matching the
+multiset fixed the composition confound; it does nothing about the position confound.
+**A positive span2 would be the third false positive in this family** — first coverage,
+then sign composition, now position — and the acceptance bar I gave in round 2 does not
+catch it, because I wrote it before the heterogeneity was established. Treat that bar as
+superseded.
+
+**The correct span test, which needs no new arm.** Fit `a_t` from single-position writes
+(the same run L1 needs), predict every multi-position condition additively, and test
+whether the residual correlates with adjacency. Interaction is the only thing that can
+survive that subtraction. This is strictly more powerful than span2, uses one run for both
+questions, and cannot be confounded by position because position is now in the model.
+
+**Recommended closure, if the residual comes back flat:** "Adjacency effects are precisely
+the departures from additivity. Measured directly across 36 conditions, the response is
+additive over positions with unequal per-position weights; no residual attributable to
+adjacency survives. A wider handle buys resolution, not interaction." That closes the door
+on the mechanism rather than on one contrast, and it is a stronger sentence than any
+outcome of span2.
+
+### L3 — remaining overstatements in `summary.md`
+
+**First, unchanged from round 3 and now carrying a factual error.** Finding 3 still reads
+"moves the model's **own choice** the intended way on 96.9% of slots", and the Limitations
+entry that now covers it says the rebuilt harness "returned a degenerate metric (every arm
+at exactly 0.500)". That is not what `stance_gen.json` contains. At dose 0.5:
+template **0.536 ± 0.016**, single **0.526 ± 0.013**, broadcast 0.500, unsteered 0.500.
+Only at dose 0.35 is every arm exactly 0.500. So the summary discards, on an inaccurate
+premise, the single number that says how much of the 96.9% is an actual change of choice:
+**3.6 points above a 50% floor (t = 2.3)**, at the same dose as the 96.9%. The honest pair
+is "reliably-signed pressure on the choice (96.9% of slots, mean shift 1.00 nats/token)
+that crosses the decision boundary on 53.6% of slots against a 50% floor". Reporting the
+first without the second, and justifying the omission with a claim the data contradicts,
+is the one place a reader is still led to something the evidence does not support.
+
+**Second.** Finding 1's "**exactly** its projection" should be "on average" or "to within
+0.08"; χ²/dof is 3.56 (L1).
+
+**Third.** Finding 2's "mean error of 0.053 (1.5B) and 0.045 (7B)" should say *at the top
+of the dose grid*; at frac 0.2 the same cells give 0.099 and 0.094, and R rises with dose
+in 12 of 12 cells across both models (R1).

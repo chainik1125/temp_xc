@@ -155,28 +155,32 @@ refusal is abandoned almost at once (P(help | just declined) = 0.87) while compl
 is nearly absorbing (P(decline | just helped) = 0.026). Steering *into* declining
 mid-response is the direction that would matter for recovery, and it is the hard one.
 
-**Entrainment, and why it is not a finding.** We steered the first W of six sentences,
-released, and scored the *unsteered* tail, asking whether a wide enough prefix lets the
-model carry a predictable pattern on by itself. A period-2 profile does exceed its null
-at W=3 (+0.208 ± 0.045) and W=4 (+0.221 ± 0.058), which is the predicted threshold
-W\* = ℓ+1, and both unpredictable families sit at their nulls at every width
-(|t| ≤ 1.3, *n = 48 generations per cell*). We are not reporting it as a result,
-because the raw accuracies do not support the story the normalised ones tell: for that
-family they run 0.578, 0.502, 0.542, 0.221 while the nulls run 0.600, 0.500, 0.333,
-0.000, so the apparent jump at W=4 comes from the null falling to zero rather than from
-the model doing better. The alternating family also disagrees with the period-2 one,
-showing its excess at W=3 instead of the predicted W=2 and reversing at W=4.
+**Entrainment: a null we first mistook for a result.** We steered the first W of six
+sentences, released, and scored the *unsteered* tail, asking whether a wide enough
+prefix lets the model carry a predictable pattern on by itself. Scored against the
+analytic persistence null, a period-2 profile appeared to jump at exactly the predicted
+threshold W\* = ℓ+1 (+0.208 ± 0.045 at W=3, t = 4.6) while both unpredictable families
+stayed at their nulls. It looked like the cleanest positive of the night.
 
-What the experiment did produce is a null worth keeping. With **balanced** profiles the
-correct reference is **0.400**, not 0.500: a French-heavy steered prefix forces an
-English-heavy tail by construction, so a model that merely persists in the last steered
-language scores *below* chance. A first version read that as a failure; the analytic
-null shows the measurements were sitting exactly on it. Switching to i.i.d. profiles
-restores a true 0.500 null, and those measurements sit on it too (0.470–0.528 against
-0.496–0.501). Anyone scoring a windowed-steering experiment against a naive 0.5 will
-conclude a working model is broken.
+It is not one. The run already contained an unsteered (m = 0) control, and scored
+against *that* — the honest reference for "would the tail have looked like this anyway"
+— the same cell gives **+0.002**. The persistence null falls from 0.600 to 0.000 across
+the widths, and the apparent effect is that fall rather than any improvement in the
+model: raw tail accuracy runs 0.578, 0.502, 0.542, 0.221 while the unsteered baseline
+sits flat at 0.540. At W=4 the tail is 0.319 *below* baseline. The alternating family
+disagrees with period-2 as well. There is no entrainment here at this scale.
 
 - ![entrainment](../../../../plots/2026-07-24_trajectory_steering/entrainment.png)
+
+The methodological yield is real and worth carrying. With **balanced** profiles the
+correct persistence reference is **0.400**, not 0.500: a French-heavy steered prefix
+forces an English-heavy tail by construction, so a model that merely persists scores
+*below* chance, and an earlier version of this experiment read that as a failure when
+the measurements were sitting exactly on their null. Switching to i.i.d. profiles
+restores a true 0.500 null and the measurements sit on that too (0.470–0.528 against
+0.496–0.501). Two lessons: score windowed-steering experiments against an unsteered
+control rather than an analytic null wherever one is available, and derive the null
+before believing either a positive or a negative.
 
 **Controls (finding 4).** Fixed-Hamming foils; per-position marginals with a
 superadditivity index; within-block schedule scrambling; contiguous versus scattered
@@ -263,7 +267,7 @@ Code, all runnable as `modal run <path>`, in
 | `convex_modal.py` | per-position marginals, superadditivity, schedule scrambling |
 | `round2_modal.py` | phase sweep, stance fixed-Hamming, span-vs-dose, direction identity |
 | `span2_modal.py` | span vs adjacency with the sign-composition confound removed |
-| `entrain2_modal.py` | entrainment with analytic nulls |
+| `entrain2_modal.py` | entrainment with analytic nulls and an unsteered control |
 | `graded_modal.py` | graded amplitude with a monotonicity gate |
 | `dict_modal.py` | window-spanning vs per-token dictionaries — written, not run (Modal capacity) |
 | `wsweep_modal.py` | the retracted coverage sweep, kept for the record |
