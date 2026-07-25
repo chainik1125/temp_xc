@@ -4246,3 +4246,62 @@ with model attribution pinned by the T16 row — the finding is
 unchanged, the quote is now exact. Full suite green incl. the new test.
 
 ## 2026-07-25 — runpod-b — panel-support-audit item 4 SHIPPED (one line): pre-staged panel analysis lives in `support_stats/PANEL_RECIPES.md` — expected row decomposition (84 / 24), harness→scorecard→RECEIPTS order of operations, and the skeleton LOG scorecard; d/e fill slots, they do not write analysis code at 3am. Audit COMPLETE at its acceptance gate (items 1–4 + close-out); briefing stays until mac-local review.
+
+## 2026-07-25 — mac-local — REVIEW: panel-support-audit + mirror close-out (runpod-b) — **APPROVED, all four items + close-out**; one platform fix applied by the reviewer
+
+**Verdict: APPROVED across the board.** runpod-b resumed context-less
+on the interim pod and discharged the entire audit plus the mirror
+close-out in its first hours; runpod-b now stands by as panel CPU
+support (its own STATUS proposal — confirmed as its assignment: run
+the harness/receipts on d/e batch pushes, extend RECEIPTS.md with
+panel rows as they complete).
+
+- **Item 1 (harness pre-flight): APPROVED, and live-verified twice.**
+  The paired-layout autodetect, the `--post-k-rule times-T`
+  requirement (abort-with-hint, never silent drop), the
+  seed-population filter, and the two-T honest degradation are all
+  in `PANEL_RECIPES.md` with 12 fixture tests. My own run of the
+  legacy default against TODAY'S leaderboard — which now contains
+  the n = 6 top-up rows AND e's first panel batches — reproduced the
+  committed receipts exactly, which is the seed-filter fix working
+  on live data, not fixtures.
+- **Reviewer fix, disclosed:** the new byte-identity guard FAILED on
+  my ARM box — on exactly the three known `r_between_arms` ulp
+  values (rel ≤ 2.2e-16; same three as my 07-24 review). I converted
+  the JSON comparison to structural equality with rel 1e-12 floats
+  (the .md stays byte-compared — it rounds for display); the
+  behavioral-guard intent is intact and the suite is **333 green**
+  on both platforms' semantics. Third occurrence of the
+  "byte-identical is per-platform" lesson — now enforced where it
+  can no longer be forgotten.
+- **Item 2 (spec § 0): APPROVED.** "v2 tightens a lower bound; it
+  does not report truth" is now binding first-class content of any
+  future adoption, with the receipted misses inline.
+- **Close-out: APPROVED — the binding NOTE was executed exactly.**
+  Both halves in the headline; mix arms recorded as LOST, NEVER READ,
+  permanently (no evidence either direction); coverage disclosed and
+  un-smoothed (increment-2's embedded mid-run cells dropped, 27 → 18);
+  and a self-correction AGAINST its own increment-2 reading (the
+  "3–30× p_eff" figure sat partly on never-pushed cells — quote the
+  pushed numbers only). Frozen-card scope retires
+  AMBIGUOUS-unresolved; Stage-1 ADOPT-consistent stands as the
+  campaign's label. Briefing correctly self-retired.
+- **Item 3 (RECEIPTS.md): APPROVED — this is now the QUOTE SOURCE OF
+  RECORD for the rebuttal.** 50 recomputed values / 16 claims, ALL
+  PASS, pytest-wired so drift breaks the suite. The negative-space
+  receipts (R5 never-significant; R10 never-"anywhere") are exactly
+  right. **The R11 catch is ratified**: the dialevel T32 triple in
+  two LOG entries was TRUNCATED (+0.056/+0.062) rather than rounded
+  (+0.057/+0.063); per append-only discipline the historical entries
+  stand, and RECEIPTS.md R11 carries the canonical values — quote
+  from RECEIPTS, not from old LOG prose.
+- **Item 4: accepted** (skeleton scorecard + order of operations; d/e
+  fill slots at 3am instead of writing analysis).
+
+**Panels, noted in flight (NOT reviewed here):** runpod-d claimed and
+froze stage2-oprate (card + datasource + runner, bindings present) and
+is rebuilding the Ward cache; runpod-e is at 34/84 cells with the § 5
+falsifier GREEN (every untrained post cell l0t = 8.00 exact) and — the
+lesson landed — its one out-of-band trained cell (post/T16/s1
+l0t = 8.02) recorded as a residual mismatch at count 1/42, unprompted.
+Mid-panel numbers are not read as outcomes here.

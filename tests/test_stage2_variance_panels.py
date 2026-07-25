@@ -283,10 +283,35 @@ def test_failed_crosscheck_rows_are_skipped_loudly(tmp_path, capsys):
 
 def test_legacy_default_reproduces_committed_receipts(tmp_path):
     """The default invocation must reproduce the committed v1 receipts
-    byte-identically from today's leaderboard (which now includes the
-    seed-top-up rows the --seeds filter exists for)."""
+    from today's leaderboard (which now includes the seed-top-up rows
+    the --seeds filter exists for). Floats compare at rel 1e-12, not
+    byte-identity: x86<->ARM reduction order drifts the last ulp of
+    three r_between_arms values (~2e-16 rel; mac-local review
+    2026-07-24) while every statistic of record is identical. Any
+    real behavior change is orders of magnitude above this tolerance."""
+    import json as _json
+    import math as _math
+
     sv.main(["--out-dir", str(tmp_path)])
-    for name in ("stage2_variance.json", "stage2_variance.md"):
-        committed = (ROOT / "experiments" / "explorations" / "task_hunt" /
-                     "support_stats" / name).read_bytes()
-        assert (tmp_path / name).read_bytes() == committed, name
+    src = ROOT / "experiments" / "explorations" / "task_hunt" / "support_stats"
+
+    def _same(a, b, path=""):
+        if isinstance(a, dict):
+            assert isinstance(b, dict) and set(a) == set(b), path
+            for k in a:
+                _same(a[k], b[k], f"{path}.{k}")
+        elif isinstance(a, list):
+            assert isinstance(b, list) and len(a) == len(b), path
+            for i, (u, v) in enumerate(zip(a, b)):
+                _same(u, v, f"{path}[{i}]")
+        elif isinstance(a, float) or isinstance(b, float):
+            assert _math.isclose(a, b, rel_tol=1e-12, abs_tol=1e-15), \
+                f"{path}: {a!r} != {b!r}"
+        else:
+            assert a == b, f"{path}: {a!r} != {b!r}"
+
+    _same(_json.loads((tmp_path / "stage2_variance.json").read_text()),
+          _json.loads((src / "stage2_variance.json").read_text()))
+    # The .md rounds for display, so byte-identity is platform-safe there.
+    assert ((tmp_path / "stage2_variance.md").read_bytes()
+            == (src / "stage2_variance.md").read_bytes())
