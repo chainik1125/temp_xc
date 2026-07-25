@@ -286,14 +286,26 @@ position, because width determines which positions receive which coefficients.
 The honest position is therefore narrower than "no span effect" and stronger than "we
 could not tell". Nothing we measured requires arrangement sensitivity and everything we
 measured is explained without it — and we never ran an experiment with the power to
-detect it, because three successive attempts were confounded: first by coverage, then by
-the sign composition of the compared writes, then by position. The test that would settle it is not a contrast between two arrangements at all: it is to
-predict every multi-position condition from measured per-position weights and ask whether
-any residual tracks adjacency. We have the first half of that — the weights, and the fact
-that they predict block effects to within 4–12% — from the existing marginals. What is
-missing is the same measurement on writes whose *arrangement* varies at matched positions,
-which is what `weights_modal.py` adds; it was specified and queued but did not land inside
-the compute window.
+detect it, because **four successive attempts were confounded**: by coverage, then by the
+sign composition of the compared writes, then by position, and finally by a degenerate
+statistic.
+
+That fourth one is the subtlest and worth recording. The right test is not a contrast
+between two arrangements at all: it is to predict every multi-position condition from
+measured per-position weights and ask whether any residual tracks adjacency. We ran it,
+and it returned an adjacency coefficient of **−0.094 ± 0.024 (t = −3.96)** that survives
+controlling for block width. We do not believe it. On an *alternating* target with a
+block-constant write, the coefficient is constant inside a block while the target flips
+at every position, so two adjacent positions can never both be correctly signed within a
+block — verified directly, an all-positive write yields zero adjacent-correct pairs at
+every width. The statistic can only become non-zero at block boundaries, takes three
+distinct values across the entire design, and correlates −0.42 with width. Whatever it
+measured, run coherence was not available to it. That same run's per-position weights
+carry 78% relative error individually, which is why weighting by them fails to improve
+the fit (χ²/dof 6.01 → 5.53) and worsens mean error; the tighter marginals described
+above remain the better evidence for heterogeneity. Rerunning on a profile with runs,
+where adjacent positions can share correctness, is a one-parameter change and is the
+first thing we would finish.
 
 One structural note belongs with this. Teacher-forcing removes the mechanism a span
 effect would most plausibly use: the text is pinned at every position, so a run of
