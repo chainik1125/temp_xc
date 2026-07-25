@@ -186,9 +186,11 @@ def main():
     _panel_calib(axes[1][1], calib, "token")
     _panel_delta(axes[1][2], cells)
 
+    scope = ("amended scope, card § 9" if "amendment" in d
+             else "frozen-card scope")
     fig.suptitle(
         f"Which λ readout reports TRUE recovery?  mirror probe-truth campaign "
-        f"— branch_evidence: {d['branch_evidence']}",
+        f"— branch_evidence: {d['branch_evidence']} ({scope})",
         fontsize=11)
     fig.tight_layout(rect=(0, 0, 1, 0.965))
     for ext in ("png", "pdf"):

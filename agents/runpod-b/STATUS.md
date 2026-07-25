@@ -1,11 +1,13 @@
 # Working state — agent `runpod-b`
 
-**Last rewrite:** 2026-07-25 ~01:20 UTC (pre-compact #4) — **mid-execution**
-of `briefings/mirror-probe-truth.md` (overnight; results due Saturday
-morning PT). NOT awaiting a new task. Card frozen, all builds committed,
-Stage 1 COMPLETE, Stage 2 COMPLETE, **Stage 3 training grid RUNNING
-(34/132)**. Nothing pushed yet this campaign — the leaderboard is being
-appended to by the running grid, so the push happens at the end.
+**Last rewrite:** 2026-07-25 ~02:00 UTC — **mid-execution** of
+`briefings/mirror-probe-truth.md` (overnight; deadline moved to
+**Saturday midday PT** by the briefing AMENDMENT). NOT awaiting a new
+task. **The AMENDMENT (mac-local, 2026-07-25, binding) arrived and is
+APPLIED**; increment 2 is pushed ("probe-truth increment 2: briefing
+AMENDMENT applied — the item-1 receipt fires ADOPT-consistent on the
+amended scope"). Stage 1 + 2 COMPLETE and pushed; Stage-3 training grid
+RUNNING (~36/132).
 
 ## Who / where
 Second RunPod box, repo `/workspace/temp_xc`, 32 CPU, no GPU.
@@ -14,115 +16,85 @@ Second RunPod box, repo `/workspace/temp_xc`, 32 CPU, no GPU.
 Scratch/logs: `/tmp/claude-1000/-workspace-temp-xc/07d1d2b4-d3f7-44aa-823a-5cd659bac28e/scratchpad/`
 (`train_grid.log`, `train_lineD.log`, `calib_mix_s{1,2,42}.log`).
 
+## The AMENDMENT and what it changed (read this before anything else)
+`briefings/mirror-probe-truth.md` gained a binding amendment: (1) branches
+fire ONLY on evidence swept through p/n ≈ 1.0 — p/n ≪ 0.1 fires NO
+branch; (2) the direct known-truth probe (= Stage 1) is the PRIORITY
+branch input, shipped the moment it exists; (3) 22/843 coverage accepted;
+(4) deadline Saturday midday PT, branch 4 a good outcome if nothing
+fires. Applied as card § 9 (post-freeze appendix, frozen §§ 2–6
+untouched) + `analyze_probe_truth.py` emitting BOTH
+`branch_evidence` (amended scope, PRIMARY) and
+`branch_evidence_frozen_card_scope` (verbatim retention).
+
+**The amended-scope receipt is COMPLETE and pushed: `ADOPT-consistent`.**
+12 exact-truth cells at p/n ∈ {1.0, 2.0}: v1 sags 7/8 signal cells
+(to −0.445; reports ≈ 0 where truth is 0.41 at 6% density), v2 tracks
+10/12, v2 above truth on 0 cells, DECLINE support 1/8. The two v2
+misses are the standing caveat: v2 is a LOWER BOUND at low truth +
+dense (d2 to −0.180) — `PROBE_V2_SPEC.md` should carry this.
+Frozen-card-scope label is AMBIGUOUS (G4) — a mid-run artifact until
+the trained anchors run. All in LOG increment 2 + `probe_truth.json`.
+
 ## Running right now (check these first on resume)
-| job | cmd | state |
-|---|---|---|
-| **Stage-3 main grid** | `run_probe_truth --stage train --workers 10` | RUNNING 34/132, ~3.2 h in. Critical path. |
-| Line D (added arm) | `run_probe_truth --stage train --lines D --out-suffix _lineD --workers 4` | **SIGSTOPped** (was an 18 GB / 6.5-core hog starving the grid). `kill -CONT` its PIDs when the main grid finishes. 7/12 done. |
-| Mix-arm calibration | `probe_truth_calib --seeds <s> --arms mix00,mix10,mix20,mix35 --out probe_truth_calib_mix_s<s>.json --resume` | RUNNING, niced 15, 3 procs, no cells written yet. |
+| job | state |
+|---|---|
+| **Stage-3 main grid** (`run_probe_truth --stage train --workers 10`) | RUNNING ~36/132, ~3.4 h in. Critical path. |
+| Watcher task `b9g1we1f8` | background `until grep DONE train_grid.log` → `kill -CONT` line-D PIDs automatically. |
+| Line D (`--lines D --out-suffix _lineD --workers 4`) | SIGSTOPped at 7/12; auto-resumed by the watcher. |
+| Mix-arm calibration (3 procs, niced 15, `probe_truth_calib_mix_s{1,2,42}.json`) | RUNNING, ~9% CPU each while the grid holds the box; no cells written yet. **Renice up when the grid ends.** Mix arms strengthen the amended input + unlock transfer Test B; they are enhancement, NOT blockers. |
 
-Box was oversubscribed (load 95); line D suspended to fix it. Load ~81.
-
-## The task
-Produce the receipt that fires mac-local's **pre-registered 4-branch rule**
-(LOG ≈ line 2212): 1 ADOPT / 2 DECLINE / 3 REJECT / 4 AMBIGUOUS. **I produce
-the receipt, NOT the verdict.** A result arguing AGAINST v2 is first-class
-and is reported FIRST. No branch costs the window > token ordering, so no
-outcome is incentivised.
-
-## Findings so far (all script-derived, in `results/probe_truth*.json`)
-
-**Stage 1 — constructed codes, truth EXACT, 108 cells × 3 seeds, COMPLETE.**
-The mechanism, which is the campaign's core content: **the probe's downward
-bias is governed by the UNEXPLAINED variance (1 − ρ²), not by p/n alone.**
-At p/n = 1.0 v1's sag from exact truth is −0.07 when truth is 0.99 and
-−0.33 when truth is 0.41; at the real panel's ~6% code density that becomes
-**−0.42 — v1 reports −0.007 where truth is 0.41**, while v2 reports 0.292.
-**v2 never exceeds truth anywhere** (max above truth: full −0.0001, token
-−0.003) ⇒ no branch-3 support. But v2 is itself biased LOW (up to −0.18 at
-low truth + dense + high p/n), so v2 numbers are lower bounds, not
-estimates — a caveat `PROBE_V2_SPEC.md` does not currently carry.
-
-**Stage 2 — 22 surviving checkpoints, COMPLETE.** 28 cells (22 new v2 rows +
-6 eval cache hits), 0 dup keys, anchors licensed 28/28, v1 replication
-≤ 7.6e-9, anchor gaps ≤ 0.0011. All at p/n ≤ 0.125 — a low-p/n control and
-nothing more.
-
-**Transfer test (`probe_truth_transfer.py`, committed evidence only).**
-Test A HOLDS on the real panel: at matched nominal p/n = 1.00,
-`txc_batchtopk_post` sparse (nnz 7.8) has gap +0.032 vs dense (nnz 127.9)
-+0.184. **And the nominal capacity arithmetic is wrong**: the operative
-ratio is p_eff/n over ACTIVE columns — post/T16/k8 is labelled p/n = 1.00
-but has 70 active of 2048 ⇒ p_eff/n = 0.034; stacked/T16 is labelled 16.0
-but sits at 0.789. This bears directly on `PROBE_V2_SPEC.md`'s
-`n_rows ≥ 8·p` adequacy line and its Stacked p > n disclosure, both stated
-in nominal p. Test B (inversion) is under-resolved with only 3 truth points
-(5/12 cells inconsistent) — **do not read it until the mix arms land**, then
-re-run `probe_truth_transfer`.
+Writers were SIGSTOPped twice for stash→rebase→pop→push cycles (upstream
+is hot tonight); both times resumed cleanly. Pattern: pause grid PIDs,
+stash the 3 appending files, rebase, pop (union-merge JSONL on
+conflict), CONT, push.
 
 ## What to do next (in order)
-1. Wait for the main grid (`grep DONE .../train_grid.log`). Then
-   `kill -CONT` the line-D PIDs (`pgrep -f "lines D"`) to finish 12/12.
+1. Wait for the main grid; watcher auto-resumes line D to 12/12.
 2. `probe_truth_anchor train 6` and `probe_truth_anchor train 6 _lineD`
-   (~1–1.5 h). Anchors are the gate on G4/P1/P2/P3.
-3. Re-run `probe_truth_transfer` once the mix shards exist.
-4. `analyze_probe_truth` → `results/probe_truth.json`; `render_probe_truth`
-   → `figs/probe_truth.png`.
-5. **Scorecard** LOG paragraph: which prediction held, which was falsified,
-   what it licenses — and if it undercuts adopting v2, say so FIRST.
-   **Expect a tension to report honestly:** the trained mirror ladder will
-   likely show P1 FAILING (both probes within bar of truth at p/n ≥ 0.5)
-   because every trained window arch on this mirror recovers λ at ~0.95,
-   where the bias is tiny — so the mechanical label may read
-   DECLINE-consistent while the exact-truth evidence at the panel's actual
-   recovery level (0.13–0.26) points the other way. Report the mechanical
-   label per the frozen card AND why it under-describes the evidence.
-6. Commit results + `results/leaderboard.jsonl` + `checkpoints/manifest.jsonl`
-   (deferred while the grid appends). **The committed calib shards are a
-   MID-RUN snapshot (20 of 36 cells); the final commit must re-add the
-   complete files.** Then full pytest on a clean tree, pull-rebase, push.
-7. If time: the `doc_mean_only_auc` KILL-threshold note. **Checked: runpod's
-   doc-level bootstrap CIs are NOT on the branch**, so the note the briefing
-   describes cannot rest on them — either write the weaker version off the
-   screened candidates' `doc_identity_check.json` spread and say exactly
-   what it does not rest on, or leave it undone and say so.
-
-## Design context that reshaped the campaign
-- **The p/n trap** (card § 1.1): v1's hardcoded nw = 1024 ⇒ n = 1024·(32/T)
-  = 2048 at T16, so the real panel sits at p/n = 1.00 while the mirror's
-  committed budget sits at 0.001–0.08. Running the mirror at canonical
-  budget would show "both probes agree" for reasons invisible in its own
-  numbers and read as branch 2.
-- **The checkpoint prune**: 843 mirror rows / 843 train_keys, 22 checkpoints
-  on disk, manifest 9878 rows with 0 HF refs ⇒ the campaign is
-  TRAINING-bound, not eval-bound.
-- **The truth-level gap**: the frozen ladder is matched to the panel in p/n
-  and density but NOT in true recovery, which turns out to dominate. Hence
-  line D (per-token archs at the DPI floor) and the mix arms (tunable truth).
-
-## Disclosed self-corrections (all in the LOG or commit messages, none silent)
-- **G3 mis-scaled** (flat |chance| ≤ 0.05 vs a statistic whose null spread is
-  ~√(p/n)); primary reading applies NO exclusion because the gate's premise
-  is falsified — all 23 excluded cell-seeds with anchors pass the anchor
-  licence. Branch reported under all three exclusion sets; identical.
-- **P4 scored per-draw fired REJECT-consistent on 1 draw of 648** on a truth-0
-  target; now scored on seed-means per the card's own § 4. Per-draw count
-  kept as a sensitivity.
-- **G1 regime-resolved**: the anchor recovers exact truth on 27/27 high-truth
-  and 27/27 null cells but misses by up to 0.089 (mean −0.029) at truth 0.41.
-  Anchor licence gained a regime condition (`anchor ≥ 0.8`); direction stated
-  (an under-estimating anchor makes P1 conservative, P4 anti-conservative).
-- **p = 8192 calibration corner dropped on cost**; no p > n coverage lost.
-- **Unlicensable anchors** (p > 4096) computed at the floor budget, not the cap.
+   (~1–1.5 h). Anchors gate the FROZEN-scope P1/P2/P3/G4 only — the
+   amended-scope label does not consume them.
+3. Re-run `probe_truth_transfer` once mix shards exist (Test B currently
+   under-resolved, 3 truth points; do not read it before).
+4. Re-run `analyze_probe_truth` (final) → `probe_truth.json`;
+   `render_probe_truth` → fig (title now carries the scope tag).
+5. **Scorecard** LOG paragraph. Structure it: (a) caveats against v2
+   FIRST (lower-bound at low truth + dense; signal_dims transfer
+   caveat); (b) the amended-scope ADOPT-consistent receipt; (c) the
+   frozen-scope label and why the trained ladder under-describes (truth
+   sits at ~0.95 where bias is negligible by mechanism — expected P1
+   FAIL there is not evidence against v2, per amendment item 1 it fires
+   no branch); (d) the p_eff finding (nominal p/n overstates the
+   operative ratio by 3–30×: post/T16/k8 = 70 active of 2048 ⇒ 0.034)
+   which bears on `PROBE_V2_SPEC.md`'s n_rows ≥ 8·p line; (e) coverage
+   honesty. Decision remains mac-local's.
+6. Final commits: leaderboard + manifest + grid shards + lineD +
+   transfer + receipt + fig; full pytest on a clean tree; pull-rebase;
+   push. (Calib s1/s2/s42 shards are already committed COMPLETE —
+   increment 2 fixed increment 1's mid-run snapshot.)
+7. ~~doc_mean_only_auc KILL-threshold note~~ **SUPERSEDED, do not
+   write**: the overnight review RATIFIED "disclosure statistic that
+   TRIGGERS A CONTROL — do NOT promote to a kill bar" (LOG "REVIEW
+   overnight wave" § 4; 11-face index + causal dialevel + punctint-q
+   0.901 counterexample). Record the supersession in the scorecard
+   increment, one line, with the pointer.
 
 ## Standing context
-- Shared branch: pull-rebase before EVERY push; LOG.md conflicts keep the
-  upstream entry then re-append mine; commit SUBJECTS not SHAs; scripts and
+- Shared branch: pull-rebase before EVERY push; LOG.md conflicts keep
+  upstream then re-append mine; commit SUBJECTS not SHAs; scripts and
   cards committed BEFORE outputs; no reviewer/meeting quotes in tracked
-  files; **all numbers script-derived** — three were eyeballed into the
-  increment-1 LOG entry and corrected by re-deriving them before the commit
-  was amended; do that check every time.
-- Reproduction claims: "bit-identical **on the build platform**".
-- pytest trap: untracked files break `test_diff_hash_consistent_with_dirty`
-  — commit the `results/probe_truth*.json` shards before a full-suite run.
+  files; **all numbers script-derived** (three eyeballed numbers were
+  caught and re-derived in increment 1 — check every time).
+- pytest trap: untracked files break
+  `test_diff_hash_consistent_with_dirty` — commit all
+  `results/probe_truth*` shards before the full-suite run.
+- Disclosed self-corrections live in LOG increments 1–2 and card § 9;
+  G3's primary reading applies NO exclusion (premise falsified,
+  23/23 excluded cell-seeds pass the anchor licence); P4 scored on
+  seed-means (per-draw sensitivity 1/288 disclosed).
+- My p/n-trap catch is now program-binding ("METHODS RULE AMENDED to
+  matched p/n" upstream); other agents' endgame allocation is locked
+  (stage2-oprate/d, stage2-fineweb/e, factory-broad-3/runpod) — no
+  action for me, but their panels carry paired v1+v2 columns, so the
+  probe decision this campaign feeds never forces them a re-run.
 - Rewrite this file before any compact.
