@@ -62,7 +62,9 @@ resolved append-only/union, upstream first, yours last).
 /workspace/.tokens/                  (gh_token, hf_token)
 ```
 
-Per-agent, set in every shell (operator provides an env.sh per agent):
+Per-agent, set in every shell — `cd` into YOUR clone, then
+`source scripts/set_agent_env.sh <your-id>` (the roster now carries
+runpod-d / runpod-e / runpod-b for this pod; it sets everything below):
 - `CUDA_VISIBLE_DEVICES`: d = `0,1,2`; e = `3,4,5`; **b = `` (empty —
   CPU-only, so a stray torch call cannot grab a GPU).** Verify with
   `python -c "import torch; print(torch.cuda.device_count())"`

@@ -70,6 +70,33 @@ case "$agent" in
         export TEMP_BENCH_POD_MODE=ephemeral
         ;;
 
+    # ── Interim 6× A40 pod (2026-07-25 force majeure; EPHEMERAL disk,
+    #    three agents in per-agent clones under /workspace/agents/<id>/
+    #    — see briefings/a40-bootstrap.md; push after every batch) ────
+    runpod-d)
+        export CUDA_VISIBLE_DEVICES=0,1,2
+        export AGENT_NAME=runpod-d
+        export TEMP_BENCH_POD_MODE=ephemeral
+        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
+        ;;
+    runpod-e)
+        export CUDA_VISIBLE_DEVICES=3,4,5
+        export AGENT_NAME=runpod-e
+        export TEMP_BENCH_POD_MODE=ephemeral
+        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
+        ;;
+    runpod-b)
+        # CPU-ONLY by design: empty CUDA_VISIBLE_DEVICES hides every GPU
+        # so a stray torch call cannot collide with the panel agents.
+        export CUDA_VISIBLE_DEVICES=""
+        export AGENT_NAME=runpod-b
+        export TEMP_BENCH_POD_MODE=ephemeral
+        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
+        ;;
+
     # ── Single-GPU pods ─────────────────────────────────────────────
     agent_em_h200)
         export CUDA_VISIBLE_DEVICES=0
@@ -84,7 +111,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3, runpod-d, runpod-e, runpod-b (interim A40 pod)" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac

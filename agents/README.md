@@ -38,6 +38,14 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   (`briefings/task-hunt.md`): trace-derived candidates; REBUILDS the
   Ward stream/caches it needs from the committed builders.
   `/workspace/.agent_id` = `runpod-d`.
+- **INTERIM A40 POD (2026-07-25 force majeure)** — all old pods DOWN;
+  `runpod-d` / `runpod-e` / `runpod-b` temporarily share one 6× A40 pod
+  in per-agent clones `/workspace/agents/<id>/temp_xc`. GPU roster
+  (paired with `scripts/set_agent_env.sh`): **runpod-d = GPUs 0,1,2;
+  runpod-e = GPUs 3,4,5; runpod-b = CPU-only (empty
+  CUDA_VISIBLE_DEVICES)**. Every session: cd into YOUR clone, then
+  `source scripts/set_agent_env.sh <your-id>`. Entry point:
+  `briefings/a40-bootstrap.md`.
 - **`runpod-e`** — GPU RunPod pod (H100, spawned 2026-07-24, rebuttal
   window; **own independent 700 GB volume**). Task-hunt arm B
   (`briefings/task-hunt-b.md`): repetition-lag across model scale +
