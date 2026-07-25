@@ -259,6 +259,17 @@ measurable from each arm's own dose-response curve, where it matches (1.76 impli
 against 1.82 measured for ℓ=1, W=3). The second and third are accounted for by
 per-position weights differing from one another.
 
+Those weights are measured rather than inferred. Steering each of eight positions alone
+gives per-position effects spanning **2.2× to 4.2×** between the weakest and strongest
+position depending on dose, which rejects equal weighting at χ²/dof of 5.2 to 7.0 —
+far beyond the individual standard errors. The profile is interpretable: the **first**
+segment is consistently the weakest (0.51× the mean at dose 0.35), which is the position
+with the least preceding text for a write to act on. Feeding those measured weights back
+in predicts the multi-segment conditions well: a block's effect matches the sum of its
+own constituent single-position effects to within 4–12% for every width from 2 to 8, at
+all three doses. Additivity with unequal, measured weights is a good description of this
+system; equal weighting is not.
+
 **None of that is a span effect, and the distinction is not a technicality.** A span
 effect means the response depends on how the written positions are *arranged* — that
 writing at adjacent positions differs from writing at scattered ones with everything
@@ -275,11 +286,13 @@ The honest position is therefore narrower than "no span effect" and stronger tha
 could not tell". Nothing we measured requires arrangement sensitivity and everything we
 measured is explained without it — and we never ran an experiment with the power to
 detect it, because three successive attempts were confounded: first by coverage, then by
-the sign composition of the compared writes, then by position. The test that would settle
-it is not a contrast between two arrangements at all. It is to measure the twelve
-per-position weights from single-position writes, predict every multi-position condition
-additively, and ask whether any residual tracks adjacency — `weights_modal.py`, specified
-and queued, which did not land inside the compute window.
+the sign composition of the compared writes, then by position. The test that would settle it is not a contrast between two arrangements at all: it is to
+predict every multi-position condition from measured per-position weights and ask whether
+any residual tracks adjacency. We have the first half of that — the weights, and the fact
+that they predict block effects to within 4–12% — from the existing marginals. What is
+missing is the same measurement on writes whose *arrangement* varies at matched positions,
+which is what `weights_modal.py` adds; it was specified and queued but did not land inside
+the compute window.
 
 One structural note belongs with this. Teacher-forcing removes the mechanism a span
 effect would most plausibly use: the text is pinned at every position, so a run of
