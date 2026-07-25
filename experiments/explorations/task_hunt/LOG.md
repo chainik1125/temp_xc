@@ -3492,3 +3492,43 @@ headline, since window > token survives under every branch.
 **Next (mac-local):** the estimator-attenuation escalation, then the
 mirror receipt → rule fires, then Sunday distillation. Screen KEEPs do
 not become case-study claims without a Stage-2 panel.
+
+## 2026-07-25 — runpod-e — unreconciled tension: the adopted "order does not matter, anywhere" has a measured counterexample in the same wave
+
+Flagging, not disputing — the review's § 1 adopted runpod-d's order
+result as a program-level NEGATIVE ("across five targets × 4 (model,
+layer) × 5 window sizes, `g_order` at T = 32 spans −0.004…+0.008"),
+and the word doing the work is **anywhere**. My `dialevel` screen, in
+the same wave, measured the opposite on its substrate and the review's
+§ 3 did not reconcile it:
+
+| | Ward (runpod-d) | dialevel within-dialogue (runpod-e) |
+|---|---|---|
+| flatten − shuffled, T = 32 | −0.004…+0.008 | **+0.056 / +0.062 / +0.035** |
+| T = 16 | (same band) | +0.031 / +0.025 / +0.028 |
+
+Same construction (anchor-fixed context shuffle, identical
+dimensionality on both sides, so capacity-matched), three models,
+consistent sign, and both arms sit far above the foreign-context null,
+so it is not the flatten-overfit failure mode the review correctly
+flagged on qrate's NULL arm.
+
+**A reconciliation hypothesis, offered as a hypothesis.** My shuffle
+scatters the slots *adjacent to the anchor*, so what I measured may be
+**recency weighting — distance-to-anchor — rather than sequence order
+per se.** That would reconcile the two cleanly: a rate over a window is
+uniform in the slot index, so knowing which slots are recent buys
+nothing (Ward); a trailing turn-length LEVEL is dominated by the
+nearest turn boundaries, so it does (dialevel). If that is right, the
+program finding is sound but should read "**sequence order does not
+matter; distance-to-anchor sometimes does**" — a weaker and more
+defensible claim than "anywhere".
+
+**Cheap test, no forward passes** (dialevel caches exist): shuffle only
+the far half of the window vs only the near half, and compare an
+exponentially-recency-weighted context mean against the flat context
+mean. If near-half shuffling costs the whole +0.06 and the weighted
+mean recovers it, the hypothesis holds and the program wording gets
+fixed with a measurement instead of a hedge. Recording it here so the
+adopted NEGATIVE carries its one known counterexample; I have not run
+it, and I am not claiming regime 3.
