@@ -94,8 +94,8 @@ builder's script-derived stats JSON).
 | B5 | dialogue turn-length level / switch clock | new (DailyDialog-class) | BUILT as `dialevel` (runpod-e) → **WEAK** (within-dialogue control forecloses; carries the order-finding counterexample) |
 | B6 | equation-density intensity | new (OpenWebMath) | **KILLED at triage** (2026-07-24 r2: manifest unigram bar fired, gpt2 0.653 — free kill) |
 | B7 | refusal/deflection-marker intensity λ̂ | new (WildChat-1M) | BUILT → **SHIPPED** (2026-07-24 r2: pre-gate 0.147≫0.02; bars clean; conv-identity 0.967 disclosed, within-conv contrast binding) |
-| B8 | sentence-length recency ladder (`lat`/`lev`/`disp`) | fineweb (400 + 4k) | **BUILD** (r3, ship 1st) |
-| B9 | quoted-speech intensity (P4 corpus-shifted) | new (PG19-class fiction) | **BUILD** (r3, ship 2nd) |
+| B8 | sentence-length recency ladder (`lat`/`lev`/`disp`) | fineweb (400 + 4k) | BUILT → **SHIPPED** (r3: bars clean at BOTH scales; `disp` near-blind + scale-stable; shuffle ladder lat>lev>disp pre-registered; 400 variant token-identical to caches) |
+| B9 | quoted-speech intensity (P4 corpus-shifted) | new (PG19-class fiction) | BUILT → **SHIPPED** (r3: bars clean at 800 train books; unigram 0.588–0.600 disclosure; doc-mean 0.890–0.896 ⇒ within-book contrast BINDING, 69–70 test books at ≥50 rows/class — deepest in the factory) |
 | P1 | news chronology / date density | new (cc_news-class) | PARK → **DEAD** (r3) |
 | P2 | numeric-token density | fineweb | PARK → **DEAD** (r3) |
 | P3 | citation-marker density | new (arXiv-class) | PARK → **DEAD** (r3) |

@@ -3918,3 +3918,36 @@ tokens/model. All-eligible position for `lev` is 0.629–0.633,
 disclosed; screens use manifest rows.
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_
+
+## 2026-07-25 — runpod — B9 `quotedens` SHIPPED (P4 lifted corpus-shifted to PG19 fiction): bars clean; the within-book control is the deepest in the broad factory — the corpus shift did exactly what it was for
+
+Bundle: `quotedens_pg19_<tok>.npz` + `quotedens_stats.json` (pull
+script, corpus, lib + 3 tests, card, builder all committed BEFORE
+their outputs, in that order). Corpus: 1,000 pre-1919 books
+(`emozilla/pg19` @ `c021754c`, seed-0 stream, LABEL-FREE recipe —
+150-sentence spans [100,250) behind a front-matter guard; 1,017
+scanned, 17 too short). Event = double-quote-family sentence (frozen
+grammar; single quotes excluded as apostrophe-inexact — zero-event
+books 18.1 %, per-book median rate 0.053, disclosed); punctint
+kernel re-exported unchanged; event-sentence masking (11.7–11.9 % of
+tokens).
+
+**Triage (manifest rows, direction-agnostic, 800 train books quoted
+per the convention):** unigram **0.588–0.600** (CIs ≤ 0.630) — the
+attribution-register leak is real, measurable, and SUB-BAR: ships
+with disclosure, with the estimator-finding caveat that it is a
+lower bound. Position 0.511–0.515 — clean. doc_mean_only
+**0.890–0.896** — loud (just under punctint q's 0.901) ⇒ the
+within-BOOK contrast is a BINDING screen precondition, and the
+substrate supplies it like nothing else in the factory: **125–127
+test books at ≥ 20 manifest rows/class and 69–70 at ≥ 50** (punctint
+grids hold 5–7 at ≥ 50; dialevel had effectively none — narrative ↔
+dialogue scene alternation is the within-doc variance the protocol
+wants). `zero_split` fired (66–68 % exact zeros — quiet narration
+stretches). Caching cost stated: 1.94/1.64/1.68M tokens per model,
+ALL new (~minutes on an H100). Suite **314 passed** with the round's
+10 new label tests. Round-3 gate is met: ledger re-vet + two bundles
+shipped + the panel assist; STATUS rewrite next; briefing stays until
+mac-local review.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_

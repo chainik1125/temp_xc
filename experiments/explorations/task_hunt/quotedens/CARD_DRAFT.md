@@ -80,4 +80,31 @@ cache covers any of it; cost stated wherever a screen is planned.
 
 ## 6. Verdict appendix
 
-*(appended by the builder run.)*
+*Build verdict (runpod, 2026-07-25):* **SHIPPED — no bar fires; the
+disclosure band is entered, and the within-book control is the
+deepest in the broad factory.** Manifest rows, direction-agnostic,
+min–max over 3 tokenizers, **800 train books** (training size quoted
+per the convention; the estimator finding makes every unigram number
+a LOWER bound):
+
+- unigram **0.588–0.600** (CIs top out at 0.630) — the
+  attribution-register leak is real and measurable but does not fire
+  the 0.65 bar; ships with disclosure. This is the falsifier's named
+  number: any screen on a scaled fiction corpus must re-check it
+  (lower-bound caveat).
+- position 0.511–0.515 on manifests — clean (all-eligible
+  0.521–0.548).
+- doc_mean_only **0.890–0.896** — loud, just below punctint q's
+  0.901: the within-BOOK contrast is a BINDING screen precondition,
+  and it is well-supplied — **125–127 test books at ≥ 20 manifest
+  rows/class, 69–70 at ≥ 50** (the deepest ≥ 50 support in the broad
+  factory; the scene-alternation bet paid off exactly as the corpus
+  shift intended).
+- `zero_split` scheme fired (66–68 % exact zeros among finite train
+  rows — quiet narration stretches between dialogue scenes); masked
+  event-sentence tokens 11.7–11.9 % of rows; corpus disclosures:
+  event sentence rate 0.102, per-book median 0.053, zero-event books
+  18.1 % (the single-quote-dialogue subpopulation, disclosed at
+  pull, label-free recipe).
+- caching cost: 1.94M / 1.64M / 1.68M tokens (gpt2 / gemma2 /
+  llama31) — ≈ 5.3M total, ALL new, minutes on an H100.
