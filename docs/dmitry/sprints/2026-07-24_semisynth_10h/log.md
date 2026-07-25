@@ -432,3 +432,37 @@ Also fixed: finding 4's "the effect is the order, not the mass" now reads "which
 lands where, not how much is written", since "order" was about to be misread as
 "arrangement" two paragraphs before the section distinguishing them.
 
+### 23:48 — the missing run was half-answerable from data already on disk
+
+Modal stayed blocked (the other project refilled all 10 containers, and both my queued
+jobs were killed after ~40 min in the queue). Rather than keep waiting, I asked what part
+of `weights_modal.py` could be answered from existing files — and it turns out
+`convex.json` already contains the per-position marginals for alt_phase at k=8, which
+*are* the per-position weights, measured at three doses.
+
+**Homogeneity is rejected directly, not inferred from residual scatter.** Steering each
+position alone:
+
+| dose | a_t profile | spread | homogeneity χ²/dof |
+| --- | --- | --- | --- |
+| 0.2 | 1.38 5.79 3.63 4.50 3.52 2.84 3.18 4.39 | 4.2× | 7.0 |
+| 0.35 | 3.26 9.50 6.01 7.88 6.07 5.19 5.27 7.67 | 2.9× | 5.9 |
+| 0.5 | 5.57 12.52 8.40 10.86 8.35 7.52 6.90 10.11 | 2.3× | 5.2 |
+
+The profile is interpretable rather than arbitrary: **position 0 is always the weakest**
+(0.51× the mean at dose 0.35), which is the segment with the least preceding text for a
+write to act on. The spread also narrows as dose rises, consistent with saturation
+compressing the differences.
+
+**And the weights predict multi-segment conditions well.** Predicting each contiguous
+block's effect as the sum of its own constituent single-position effects lands within
+**4–12%** at every width from 2 to 8 and at all three doses (the one exception is W=1,
+which is the measurement itself, off by ~20% — worth noting as a self-consistency wrinkle).
+So "additive with unequal measured weights" is a good description of this system, and
+equal weighting is not.
+
+That converts the write-up's claim from an inference about scatter into a measurement,
+and it narrows what the un-run job was still needed for: not the weights, but the same
+measurement on writes whose *arrangement* varies at matched positions. Summary updated
+accordingly, including the honest statement of what remains untested.
+

@@ -28,8 +28,9 @@ averaging inside those blocks. Across 36 random combinations of profile, block w
 coefficients, predictions span −0.42 to +0.42 with nothing fitted and the measured effects
 track them at **slope 0.94, intercept −0.01, mean error 0.073**. Thirteen conditions
 predict a *negative* effect and the model duly moves the wrong way in proportion — the
-part that could most easily have failed. Good on average, not exact: χ²/dof is 3.6, so
-positions carry unequal weight and the deviations are systematic.
+part that could most easily have failed. Good on average, not exact: χ²/dof is 3.6,
+because positions carry unequal weight — measured directly, the strongest segment is
+2.2–4.2× the weakest, and the first segment is always the weakest.
 
 - ![linearity](../../../../plots/2026-07-24_trajectory_steering/linearity.png)
 
