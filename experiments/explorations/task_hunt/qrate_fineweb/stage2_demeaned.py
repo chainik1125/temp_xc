@@ -17,9 +17,26 @@ Per trained cell (the frozen `_cells()` list, `kind == "trained"`):
 2. **Ridge raw** — RidgeCV at nw = 8192 on the raw targets (the § 6b
    probe class; also the v2-adequacy analog on the same sampler).
 3. **Ridge doc-demeaned** — same codes, targets replaced by
-   ``t − doc_mean_train(doc)`` where the mean is the doc's TRAIN-side
-   (rows < split) finite lam_q mean. Eval-pool docs with no train-side
-   rows fall back to the global train-side mean (count disclosed).
+   ``t − doc_mean(doc)`` where the mean is the doc's finite lam_q mean
+   over the WHOLE stream (the § 6a floor's definition — label-side, no
+   model in the loop).
+
+   **AMENDMENT (disclosed, first run killed after one cell):** the card
+   § 6b wrote "the doc's train-side finite mean", which is IMPOSSIBLE
+   under this datasource's row split: trace_ids are doc-contiguous, so
+   the row-half split makes probe-train and probe-eval docs DISJOINT —
+   no eval-pool doc has a train-side mean (first run: 261,376/262,144
+   tile rows hit the global fallback, i.e. eval targets received only a
+   constant shift, which tests nothing within-doc). The § 6a
+   whole-stream doc mean is the well-defined reading: it is a frozen
+   function of the label stream (no leakage — the probe never sees doc
+   means, targets are simply re-expressed as within-doc deviations),
+   defined for every doc, and it directly instruments the § 6 question
+   "does the code predict within-doc fluctuations?". The one value seen
+   before the kill (tsae/s1 demeaned r = +0.0515 under the degenerate
+   train-side rule) is superseded by this run and quoted nowhere. The
+   pre-registered outcome rule (K4 = window−token gap sign under
+   demeaning; collapse = sound NEGATIVE) is unchanged.
 
 Outcome rule (card § 6b, pre-registered): the within-doc face may sit
 near floor (zero-frac 0.817). If the window−token gap collapses under
@@ -139,15 +156,16 @@ def _fit(model, x, lam, doc_of_row, split, *, n_windows, est, demean,
 
     n_fallback = 0
     if demean:
+        # Whole-stream finite doc mean (§ 6a definition; see AMENDMENT in
+        # the module docstring — "train-side" is undefined under the
+        # doc-disjoint split). Label-side only; defined for every doc.
         lam_np = lam.numpy()
         fin = np.isfinite(lam_np)
-        tr_rows = np.zeros(lam_np.shape[0], dtype=bool)
-        tr_rows[:split] = True
         means = {}
         for d in np.unique(doc_of_row):
-            m = (doc_of_row == d)[:, None] & fin & tr_rows[:, None]
+            m = (doc_of_row == d)[:, None] & fin
             means[int(d)] = float(lam_np[m].mean()) if m.any() else np.nan
-        g = float(lam_np[fin & tr_rows[:, None]].mean())
+        g = float(lam_np[fin].mean())
         mu_tr = np.array([means[int(d)] for d in d_tr])
         mu_ev = np.array([means[int(d)] for d in d_ev])
         n_fallback = int(np.isnan(mu_ev).sum() + np.isnan(mu_tr).sum())

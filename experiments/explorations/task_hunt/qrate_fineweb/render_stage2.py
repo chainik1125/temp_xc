@@ -91,15 +91,16 @@ def render(ds: str, metric: str, tag: str, title_note: str):
     summary = {"ds": ds, "metric": metric, "cells": {},
                "residual_mismatches": [], "untrained_post_falsifier": []}
 
+    tok_x = {"batchtopk_sae": 1.72, "tsae": 1.86}
     for arch, (col, mk, ls, label) in TOKEN_ARCHS.items():
         vals = [r for _, r, _ in cells[(arch, 1, "trained")]]
         l0s = [l for _, _, l in cells[(arch, 1, "trained")]]
         m, lo, hi = t_ci95(vals)
         ax.axhline(m, color=col, linestyle=ls, linewidth=1.6, zorder=1)
-        ax.fill_between([1.8, 17.8], lo, hi, color=col, alpha=0.10, zorder=0)
-        ax.plot([1.9], [m], marker=mk, color=col, markersize=7, zorder=3)
-        ax.annotate(f"{label}  {m:.3f}", xy=(1.92, m), xytext=(0, 5),
-                    textcoords="offset points", fontsize=8, color=col)
+        ax.errorbar([tok_x[arch]], [m], yerr=[[m - lo], [hi - m]], fmt=mk,
+                    color=col, capsize=3, markersize=7, zorder=3,
+                    label=f"{label} (T=1)  {m:.3f}  "
+                          f"[l0 {min(l0s):.2f}–{max(l0s):.2f}]")
         summary["cells"][f"{arch}/T1"] = {
             "mean": m, "ci95": [lo, hi],
             "l0_range": [min(l0s), max(l0s)]}
@@ -143,8 +144,9 @@ def render(ds: str, metric: str, tag: str, title_note: str):
         ax.axhline(np.mean(floor), color="#333333", linestyle="-.",
                    linewidth=1.2, zorder=1)
         ax.annotate(f"doc-mean identity floor  r≈{np.mean(floor):.2f}",
-                    xy=(1.92, np.mean(floor)), xytext=(0, 4),
-                    textcoords="offset points", fontsize=8, color="#333333")
+                    xy=(17.8, np.mean(floor)), xytext=(0, -11),
+                    textcoords="offset points", fontsize=8, color="#333333",
+                    ha="right")
         ev = [sup["per_T"][str(T)]["evidence_count_r"] for T in Ts]
         ax.plot(Ts, ev, ".", linestyle=":", color="#666666", linewidth=1.2,
                 markersize=5, zorder=2)
@@ -154,18 +156,23 @@ def render(ds: str, metric: str, tag: str, title_note: str):
 
     ax.set_xscale("log", base=2)
     ax.set_xticks(Ts); ax.set_xticklabels([str(t) for t in Ts])
+    ax.set_xlim(1.6, 18.5)
+    lo_all = min(v["ci95"][0] for v in summary["cells"].values())
+    ax.set_ylim(min(-0.02, lo_all - 0.02), 0.62)
     ax.set_xlabel("tile width T (tokens)")
     ax.set_ylabel(f"λ probe held-out r ({metric})")
     ax.set_title(f"punctint-q fineweb Stage-2 panel — gemma-2-2b hs14 "
                  f"{title_note}", fontsize=10)
-    ax.legend(loc="lower right", fontsize=8, framealpha=0.9)
+    ax.legend(loc="upper left", fontsize=7.5, framealpha=0.9,
+              bbox_to_anchor=(0.015, 0.97))
     ax.grid(True, which="both", alpha=0.15)
     fig.text(0.01, 0.005,
-             "corpus: pinned 400-doc fineweb sample, 766,080 tokens "
-             "(ODC-By); 3 seeds; whiskers = 95% t CI; dotted faint = "
-             "untrained controls; d_sae 1152, k_pos 8 (post 8·T)",
+             "corpus: pinned 400-doc fineweb sample, 766,080 tokens (ODC-By); "
+             "3 seeds; whiskers = 95% t CI; dotted faint = untrained "
+             "controls;\nd_sae 1152, k_pos 8 (post 8·T); token archs drawn as "
+             "horizontal reference lines with CI whisker at left",
              fontsize=7, color="#555555")
-    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    fig.tight_layout(rect=(0, 0.045, 1, 1))
     FIGS.mkdir(exist_ok=True)
     for ext in ("png", "pdf"):
         fig.savefig(FIGS / f"stage2_tscaling{tag}.{ext}", dpi=200)
@@ -177,7 +184,7 @@ def main():
     ds = sys.argv[1] if len(sys.argv) > 1 else DS_DEFAULT
     s1 = render(ds, "lambda_recovery", "", "(v1, canonical)")
     s2 = render(ds, "lambda_recovery_v2", "_v2",
-                "(paired v2 — NOT canonical, reported per methods decision)")
+                "(paired v2 — not canonical)")
     out = {"v1": s1, "v2": s2}
     (RES / f"stage2_summary_{ds}.json").write_text(json.dumps(out, indent=2))
     n_mm = len(s1["residual_mismatches"])
