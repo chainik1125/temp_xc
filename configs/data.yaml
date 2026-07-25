@@ -617,6 +617,50 @@ datasources:
       frozen label is undefined (the probe drops non-finite leading-edge
       targets). lambda_recovery here = held-out Pearson r vs slope8.
 
+  # ── task hunt Stage 2 (stage2-oprate): REAL Ward activations +
+  # frozen operation-class trailing-rate labels ──────────────────────
+  # briefings/stage2-oprate.md. The `real_lambda` pattern over the
+  # COMMITTED labels/oprate.npz bundle (kernel tau 3.0, k 8,
+  # min_history 4; NaN where any kernel-lag sentence is unlabeled or
+  # the current sentence is itself the event class — coverage ≈ 0.90,
+  # so the lambda_recovery leading-edge guard is LIVE and window drops
+  # are reported per T). trace_ids = the npz's own trace_idx → the v2
+  # λ-probe trace split applies unchanged. NO ground-truth feature
+  # directions: emission_features is a reference basis; eauc is a span
+  # sanity check, never recovery. Headline = lambda_recovery (held-out
+  # Pearson r vs the frozen trailing rate).
+  ward_real_oprate_case_base_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_oprate:ward_oprate_real"
+    params:
+      model_tag: base
+      hs: 13
+      target: case
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      stage2-oprate PRIMARY — case-enumeration trailing rate on the
+      reader/base arm at resid_post L12 (hs13: the screen protocol's
+      primary layer, the cleanest g_agg ≈ g face for case at T32, and
+      the λ̂ panel's exact anchor, so the two Ward case studies share a
+      reader cache and operating point).
+
+  ward_real_oprate_ver_base_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_oprate:ward_oprate_real"
+    params:
+      model_tag: base
+      hs: 13
+      target: ver
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      stage2-oprate CONDITIONAL second target (verification-check
+      trailing rate, same anchor). Runs ONLY if the rate_case panel
+      completes its full acceptance gate with real headroom on the
+      funding clock — a complete single-target panel beats two
+      partials.
+
   # ── task hunt Stage 2 (stage2-fineweb): REAL fineweb activations +
   # frozen punctint question-rate labels ─────────────────────────────
   # briefings/stage2-fineweb.md. The `real_lambda` pattern on a SECOND
