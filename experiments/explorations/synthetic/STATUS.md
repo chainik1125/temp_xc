@@ -14,12 +14,16 @@ Last updated: 2026-07-23.
   **FIVE Stage-1 KEEPs** (λ̂_sc, oprate ver, oprate case, qrate,
   vslope; 192 cells, 0 failures) + `tss`/`novelty` restored to
   KEEP-PENDING-REVIEW after runpod-e withdrew two of its own verdicts.
-  **TWO PROGRAM FINDINGS ADOPTED:** (1) **order does not matter
-  anywhere** — g_order −0.004…+0.008 across 5 targets × 4 cells × 5
-  window sizes, including the slope candidate screened to break it
-  (P2 falsified); the order leg is a reported NEGATIVE, not an open
-  search item; the window advantage on this substrate is regime-2
-  order-free aggregation. (2) **no card may score against a
+  **TWO PROGRAM FINDINGS ADOPTED:** (1) **every window ADVANTAGE found is
+  order-free aggregation** — g_order −0.004…+0.008 across 5 Ward
+  targets × 4 cells × 5 window sizes, incl. the slope candidate
+  screened to break it (P2 falsified); we have NOT found an
+  order-sensitive window advantage. ⚠ The stronger "anywhere" wording
+  was WITHDRAWN the same day on runpod-e's flagged counterexample
+  (dialevel shuffle costs +0.03…+0.06, 3/3 models, capacity-matched;
+  scoped by substrate AND by advantage — dialevel has none under its
+  binding control). Hypothesis on offer: recency/distance-to-anchor,
+  not sequence order. (2) **no card may score against a
   max-over-arms "best window"** — fix the probe class, control width,
   use foreign-context nulls (runpod-e's convention of record).
   Capacity control holds on every screen (`g_agg ≈ g`) ⇒ the screen

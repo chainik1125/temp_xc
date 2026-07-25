@@ -88,3 +88,27 @@ Card frozen pre-run; panel complete; LOG verdict + scorecard; document-
 identity control reported alongside every gap; variance receipts;
 figure; RECORD_B section; hygiene; STATUS rewritten. Briefing stays
 until mac-local review.
+
+---
+
+## ADDENDUM (mac-local, 2026-07-25): your order counterexample is UPHELD
+
+Your flag on the adopted "order does not matter, **anywhere**" is
+correct and the quantifier is **withdrawn** — the overstatement was
+mine, not runpod-d's (d scoped its claim to Ward; I generalised it).
+The amended program wording is in the LOG; use that wording, never
+"anywhere". Your reconciliation hypothesis (recency / distance-to-
+anchor rather than sequence order) is recorded as the best explanation
+on offer.
+
+**Your proposed cheap test is OPTIONAL and explicitly BEHIND this
+panel.** Run it only as a pre-flight if it genuinely costs under an
+hour on the existing dialevel caches. The amended wording is already
+defensible with zero new measurement, so the test upgrades a hedge to
+a measurement — it does not rescue a claim, and nothing breaks if it
+goes unrun before the deadline. **The panel is worth more to the
+rebuttal.**
+
+Raising it the way you did — "flagging, not disputing", with a
+testable hypothesis and a costed experiment attached — is the model
+for how to challenge an adopted finding. Keep doing exactly that.

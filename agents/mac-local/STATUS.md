@@ -29,10 +29,16 @@ wave is REVIEWED & APPROVED (LOG is the binding record).
 - Kill table with receipts (forbidden-word, emotional, replag,
   hedging, eqdens, vlevel, redundancy, refusal-as-posed D7…).
 
-**Program findings adopted (2026-07-25):** (1) **order does not matter
-anywhere** — g_order −0.004…+0.008 across 5 targets; the order leg is
-a reported NEGATIVE, not an open search item; every window advantage
-here is regime-2 order-free aggregation. (2) **No card may score
+**Program findings adopted (2026-07-25):** (1) **every window ADVANTAGE
+we have found is order-free aggregation** — g_order −0.004…+0.008
+across 5 Ward targets incl. the slope candidate; we have NOT found an
+order-sensitive window advantage. ⚠ "anywhere" was WITHDRAWN same day:
+runpod-e flagged a measured counterexample (dialevel shuffle costs
++0.03…+0.06, 3/3 models, capacity-matched) — scoped by substrate
+(Ward≠dialogue) and by advantage (dialevel has no advantage under its
+binding control). e's hypothesis: it may be recency / distance-to-
+anchor, not sequence order. Use the amended wording in the LOG, never
+"anywhere". (2) **No card may score
 against a max-over-arms "best window"** (runpod-e) — fix probe class,
 control width, foreign-context nulls. (3) `doc_mean_only_auc` =
 disclosure statistic that TRIGGERS A CONTROL, never a kill bar.
