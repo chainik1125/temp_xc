@@ -16,6 +16,32 @@ on literature receipts, the recurrence port survives to
 BUILD-if-time); the verdict index stays live as the GPU pods post
 screen outcomes.
 
+**Round 3 (2026-07-25, `briefings/candidate-factory-broad-3.md` +
+mid-execution ADDENDUM):** re-vet of every PARK against what the
+program learned since round 2, then 2–3 builds prioritizing
+INDEPENDENCE from the one phenomenon all five Stage-1 KEEPs share
+(trailing-history rates on Ward: per-token 0.70–0.87 — substantially
+converted — plus a real, monotone, ORDER-FREE aggregation gain of
++0.06…+0.08 at T32). Two findings govern the re-vet. (i) The
+**AMENDED order finding** (wording of record): *every window ADVANTAGE
+found so far is order-free aggregation, measured on Ward; we have not
+found an order-sensitive window advantage* — with dialevel's
+capacity-matched shuffle cost (+0.03…+0.06, 3/3 models) the recorded
+counterexample and runpod-e's recency/distance-to-anchor hypothesis
+the best explanation on offer. Per the addendum this splits
+order-flavored candidates into TWO buckets: pure SEQUENCE-order
+pitches stay demoted; deliberately RECENCY-structured candidates
+(nearest-event-dominated, with dialevel's doc-length confound
+designed out) are now the best-motivated new family. (ii) The
+**estimator finding**: every 400-doc unigram triage number is an
+UNDERSTATEMENT (76–91 % of the 10× rise is estimator sample size,
+unsaturated at 3,200 train docs) — so high 400-doc leak readings are
+LOWER bounds: they harden kills, they never rescue a park. Verdicts
+below carry *Round-3 re-vet* lines; B8/B9 are the new builds. Nothing
+built this round reaches a panel before the deadline (both H100s are
+committed to `stage2-oprate`/`stage2-fineweb`) — this round stocks
+the next one.
+
 **The four vetting axes (round-1 lessons, applied per idea):**
 
 - **(a) Conversion risk** — does the latent help next-token
@@ -61,19 +87,24 @@ builder's script-derived stats JSON).
 
 | # | idea | corpus | verdict |
 |---|---|---|---|
-| B1 | interleave `tss` (finish — labels exist) | fineweb-interleave | **BUILD** (ship 1st) |
-| B2 | vocabulary-novelty trailing rate | fineweb | BUILT → screen **NEGATIVE** (2026-07-24) |
+| B1 | interleave `tss` (finish — labels exist) | fineweb-interleave | BUILT+screened → KILL **WITHDRAWN** (best-window defect) → KEEP-PENDING-REVIEW; staged as stage2-fineweb SECONDARY |
+| B2 | vocabulary-novelty trailing rate | fineweb | BUILT → NEGATIVE **WITHDRAWN** (same defect) → KEEP-PENDING-REVIEW |
 | B3 | list/enumeration density | fineweb | BUILT → screen **WEAK KEEP** (conditional, disclosed) |
-| B4 | question-rate intensity | fineweb | BUILT → screen **KEEP** (the hunt's first) |
-| B5 | dialogue turn-length level / switch clock | new (DailyDialog-class) | **BUILD** (stretch) |
+| B4 | question-rate intensity | fineweb | BUILT → screen **KEEP** (the hunt's first) → **Stage-2 panel OPEN** (stage2-fineweb, primary) |
+| B5 | dialogue turn-length level / switch clock | new (DailyDialog-class) | BUILT as `dialevel` (runpod-e) → **WEAK** (within-dialogue control forecloses; carries the order-finding counterexample) |
 | B6 | equation-density intensity | new (OpenWebMath) | **KILLED at triage** (2026-07-24 r2: manifest unigram bar fired, gpt2 0.653 — free kill) |
 | B7 | refusal/deflection-marker intensity λ̂ | new (WildChat-1M) | BUILT → **SHIPPED** (2026-07-24 r2: pre-gate 0.147≫0.02; bars clean; conv-identity 0.967 disclosed, within-conv contrast binding) |
-| P1 | news chronology / date density | new (cc_news-class) | PARK |
-| P2 | numeric-token density | fineweb | PARK |
-| P3 | citation-marker density | new (arXiv-class) | PARK |
-| P4 | quotation-sentence rate | fineweb | PARK |
-| P5 | emphasis / all-caps rate | fineweb | PARK |
-| P6 | trailing sentence-length level | fineweb | PARK |
+| B8 | sentence-length recency ladder (`lat`/`lev`/`disp`) | fineweb (400 + 4k) | **BUILD** (r3, ship 1st) |
+| B9 | quoted-speech intensity (P4 corpus-shifted) | new (PG19-class fiction) | **BUILD** (r3, ship 2nd) |
+| P1 | news chronology / date density | new (cc_news-class) | PARK → **DEAD** (r3) |
+| P2 | numeric-token density | fineweb | PARK → **DEAD** (r3) |
+| P3 | citation-marker density | new (arXiv-class) | PARK → **DEAD** (r3) |
+| P4 | quotation-sentence rate | fineweb | PARK → **LIFTED → B9** (r3, corpus-shifted) |
+| P5 | emphasis / all-caps rate | fineweb | PARK → **DEAD** (r3) |
+| P6 | trailing sentence-length level | fineweb | PARK → **ABSORBED into B8** (r3, the `lev` face) |
+| P7 | question-gap clock (`qgap`) | fineweb | PARK (r3, recency bucket — behind tss/B8) |
+| P8 | discourse-connective density | fineweb | PARK (r3, dominated by punctint q) |
+| P9 | event-arrival regularity (gap CV / Fano) | fineweb | PARK (r3, sequence-order bucket) |
 | D1 | window redundancy / repetition rate | fineweb | DEAD |
 | D2 | within-sentence position clock | any | DEAD |
 | D3 | document/paragraph position | any | DEAD |
@@ -149,6 +180,46 @@ verbosity dies on a Ward-specific artifact.
   Revised late 2026-07-24: the earlier "0.82–0.88 separates NEGATIVE
   from surviving" reading is WITHDRAWN with runpod-e's `novelty`
   NEGATIVE verdict; the measurements are unchanged.
+- 2026-07-25 · **Ward factory batch (runpod-d): FOUR MORE KEEPs** —
+  oprate `ver` + `case` (the batch's only INDEPENDENT candidate, corr
+  0.026 with λ̂_sc, its two targets mutually −0.032), qrate-Ward (an
+  explicit replication of the λ̂ family), vslope (its pre-registered
+  order prediction P2 FALSIFIED — the slope is recovered order-free);
+  with λ̂_sc that is **five Stage-1 KEEPs, all one phenomenon**:
+  converted trailing-history latents (per-token 0.70–0.87) plus a
+  monotone order-free aggregation gain (+0.06…+0.08 at T32, g_agg ≈ g
+  everywhere — the capacity control holds). Stage-1 screens license
+  Stage-2 panels, not case-study claims.
+- 2026-07-25 · **tss KILL and novelty NEGATIVE are WITHDRAWN**
+  (runpod-e's self-caught scoring error: scored the linear-MEAN arm
+  where its frozen cards said "best window"); both →
+  KEEP-PENDING-REVIEW, and the max-over-arms **"best window"
+  convention is RETIRED program-wide** (fix the probe class and
+  control width). Corrected fineweb reading: the window advantage
+  there lives in a NONLINEAR readout (MLP on window +0.06…+0.13 vs
+  linear mean-pool ≈ +0.04) — opposite of Ward, where the linear mean
+  arm carries the whole gain. Any Stage-2 fineweb bet must say which
+  it is betting on.
+- 2026-07-25 · **dialevel (B5): WEAK stands** — under the binding
+  within-dialogue control the window advantage is −0.097/−0.007/
+  +0.035 (3 models), i.e. essentially none; `doc_mean_only_auc`
+  0.983–0.986 is the program's loudest. Its capacity-matched shuffle
+  cost (+0.03…+0.06 at T32, 3/3 models) is the recorded
+  COUNTEREXAMPLE that forced the order-finding amendment.
+- 2026-07-25 · **Order finding AMENDED (wording of record):** *every
+  window ADVANTAGE we have found is order-free aggregation (Ward,
+  five targets); we have not found an order-sensitive window
+  advantage* — never "anywhere". runpod-e's recency /
+  distance-to-anchor hypothesis is recorded as the best explanation
+  for the dialevel counterexample; B8 below is built to ladder it.
+- 2026-07-25 · **Stage-2 panels OPEN on both H100s**: `stage2-oprate`
+  (runpod-d — rate_case primary, case study #2) and `stage2-fineweb`
+  (runpod-e — punctint q primary / tss secondary; ONE full panel on
+  gemma-2-2b plus cross-model replication cells; the doc-identity
+  control is BINDING at panel). The broad-3 addendum routes a
+  label-side assist here (depth-first within-doc row-sets + demeaning
+  sufficient statistics; non-blocking both directions — see LOG when
+  it lands).
 
 ---
 
@@ -325,6 +396,85 @@ under-span in the factory). Receipts: `refmark/CARD_DRAFT.md` verdict
 appendix + `labels/refmark_stats.json` + `labels/refmark_pregate.json`
 + pinned `labels/refmark_corpus.json.gz`.*
 
+**B8 — `slen`: the sentence-length recency ladder on fineweb (round-3
+append; BUILD, ship first).** One exact value stream — xᵢ = ln(word
+count of sentence i) on the fineweb pull (the 4,000-doc corpus, plus
+a 400-doc prefix variant that rides the existing caches) — carrying
+THREE faces that differ ONLY in their temporal weighting, so a screen
+can measure WHERE between pure recency and pure aggregation the
+window advantage lives:
+
+- **`lat`** (PRIMARY — the recency face the round-3 addendum calls
+  for): the PREVIOUS sentence's x. A latch: order-free aggregation of
+  the window cannot represent it — a probe must locate the most
+  recent sentence boundary and read a value there. This is dialevel's
+  mechanism (nearest-boundary dominance) made exact, on a substrate
+  where the doc-length confound is designed OUT: document length
+  (60–200 sentences) is fixed by the PULL filter, not coupled to the
+  label the way dialevel's turn-count floor coupled dialogue length
+  to turn length.
+- **`lev`** (P6 absorbed): kernel-weighted trailing mean of x (HL 2 /
+  support 8 sentences — the punctint kernel), the fineweb cousin of
+  Ward verbosity and dialevel's tlevel.
+- **`disp`** (new family — no second-moment candidate exists anywhere
+  in the program): kernel-weighted trailing STD of x — "how variable
+  has sentence length been," burstiness as a maintained state (kernel
+  ESS ≈ 5.1 of 8 lags, a disclosure not a flaw: tracking exactly that
+  noisy statistic IS the task).
+
+All faces use PREVIOUS sentences only (the anchor lesson); NaN
+warm-up is unified at sentence idx < 8 so the three faces share
+eligible rows; train-edge zero_split/tercile binning; position-matched
+manifests. No event tokens exist, so nothing to mask beyond warm-up —
+the current sentence never contributes to any face by construction.
+Four-axis vet: (a) conversion — the model plausibly carries "the last
+sentence was long" per-token; expect per-token 0.6–0.8 like every
+KEEP; the screen question is the increment and its ORDER structure.
+(b) unigram/topic leak — register (listy/dialogue-ish docs are terse
+and bursty): triage decides, training size quoted; doc_mean_only_auc
+reported with the within-doc census. (c) clock — sentence-unit kernel
+at the upper ladder, same property as the λ̂ winner, said plainly;
+`lat` itself needs only the nearest boundary (median sentence ≈ 15–25
+tokens). (d) predicted pattern — THE POINT OF THE BUNDLE: within-
+window shuffle sensitivity should be ORDERED **lat > lev > disp ≈ 0**
+(a pure latch dies under shuffle; an HL-2 level is nearest-dominated
+— the dialevel regime, partial cost; a dispersion is almost order-
+free). That ladder turns runpod-e's recency hypothesis into three
+pre-registered predictions on one confound-free substrate.
+Independence receipts: the face-correlation matrix + corr vs
+`lam_q`/`lam_list` ship in the stats. Screen economics: the 400-doc
+prefix variant screens on the EXISTING fineweb caches at zero new
+caching; the 4k variant needs the ~3.6k-doc pass already priced by
+the scale-up campaign. **BUILD.**
+
+**B9 — `quotedens`: quoted-speech intensity on PG19-class fiction
+(round-3 append; BUILD, ship second — P4 lifted, corpus-shifted).**
+Event stream: sentences containing a double-quote-family character
+(frozen list in the card: ASCII `"`, curly `“ ”`, low-9 `„`,
+guillemets `« »`; single quotes EXCLUDED as apostrophe-inexact —
+disclosed, with the fraction of low-event books in the funnel, since
+single-quote-dialogue British editions will read as low-event).
+Primary: kernel-smoothed trailing quoted-sentence rate (HL 2 /
+support 8, the punctint kernel), previous sentences only; event-
+sentence tokens masked from probe rows (the punctint discipline); the
+current-sentence in-quote bit is the disclosed regime-1 anchor
+(bracket-family, presumed converted — never the primary). Why
+fiction: (a) exactness — edited prose balances its quotes, the exact
+failure of the fineweb version; (b) the ratified protocol — narrative
+↔ dialogue scene alternation is strong WITHIN-book variance, the best
+substrate the factory has for the binding within-document contrast
+(the anti-dialevel); (c) corpus independence — nothing in the program
+touches narrative fiction. Axis-b risks, triaged not presumed:
+said-verbs and proper names near dialogue (attribution register) are
+the unigram route; position clean after matching. Axis-c: sentence-
+unit kernel, upper ladder, said plainly. Axis-d: regime-2 LEVEL
+prediction (window > per-token, T-growing, largely shuffle-immune — a
+rate, not a latch), with the corrected fineweb lesson quoted: the
+advantage may live in a NONLINEAR window readout. New-corpus rules:
+pinned revision + exact re-pull script + funnel counters + tokenized
+artifact + caching-cost note (one pass × 3 models on an H100,
+minutes). **BUILD.**
+
 ## PARK
 
 **P1 — News chronology / date density (cc_news-class).** Exact-by-
@@ -334,12 +484,21 @@ its regime story is weaker (date density is bursty-topical, likely
 dominated by doc identity — the B4 concern with a worse prior).
 PARK behind B5/B6; re-vet if both land and triage teaches us the
 topic-leak gate is passable.
+*Round-3 re-vet: **DEAD.** Its variance is between-document almost by
+construction (short, bursty-topical news items), and the ratified
+doc-identity protocol makes a within-document contrast BINDING at
+screen — the dialevel foreclosure, inherited at the design stage. A
+third new corpus buys nothing a binding control would let us keep.*
 
 **P2 — Numeric-token density on fineweb.** Digit-token rate: scan
 mean 0.022, median 0.013 — thin, and where it is dense it co-occurs
 with lists/tables, so it largely duplicates B3's variance at lower
 event rate. PARK as a redundant face; revisit only if B3 dies for a
 reason that spares it.
+*Round-3 re-vet: **DEAD.** The standing lift trigger resolved the
+OPPOSITE way — punctint-list survived (WEAK KEEP) and specifically
+did NOT die on position — leaving P2 what it always was: B3's
+variance at a lower event rate, dominated by a surviving candidate.*
 
 **P3 — Citation-marker density (arXiv-class corpus).** `[12]` /
 `(Author, 2020)` markers are exact by regex and the intensity face
@@ -350,6 +509,12 @@ PARK behind B6. *Round-2 addendum: B6's triage kill MEASURED the
 technical-register topic leak (prose near math reads the label at
 0.63–0.65 with all math tokens masked) — P3 inherits that receipt;
 any lift must argue why citation-heavy prose leaks less.*
+*Round-3 re-vet: **DEAD.** The inherited leak reading was taken at
+320 train docs, and the estimator finding makes it a LOWER BOUND (the
+type-mean curve is unsaturated at 3,200 train docs) — the true
+register leak is larger than the number that killed B6. A-fortiori;
+no scaled re-measurement can rescue a park whose small-corpus leak
+already sat at the bar.*
 
 **P4 — Quotation-sentence rate on fineweb.** In-quote STATE is
 bracket-family (recorded dead-adjacent); the kernel-smoothed rate of
@@ -358,10 +523,21 @@ ambient risk is high (quote marks + said-verbs are strong current-
 sentence stamps), and the fineweb web-text register makes the event
 stream noisy (unbalanced quotes, markup residue — exactness is
 strained). PARK.
+*Round-3 re-vet: **LIFTED, corpus-shifted → B9.** The park reason
+(fineweb exactness strain) is a CORPUS property, not a face property:
+edited fiction (PG19-class) balances its quotes, and brings the one
+thing the ratified protocol rewards most — strong WITHIN-document
+narrative ↔ dialogue alternation for the binding within-document
+contrast. Ambient risk (said-verbs, quote marks) stays and is
+triaged, not presumed.*
 
 **P5 — Emphasis / all-caps token rate on fineweb.** Exact and cheap
 but sparse, lexically self-stamping (caps tokens ARE the label —
 masking removes most signal), and no strong regime story. PARK.
+*Round-3 re-vet: **DEAD.** Self-stamping fails axis (b) by
+construction — masking the caps tokens removes the signal itself —
+and nothing learned since round 1 improves it; the estimator finding
+only raises measured leak floors as corpora scale.*
 
 **P6 — Trailing sentence-length level on fineweb.** The verbosity
 LEVEL face is legitimate (levels aggregate), but runpod-b's traces
@@ -369,6 +545,47 @@ batch carries exactly this candidate on the Ward grid (item 4), and
 the fineweb version adds corpus breadth rather than a new mechanism.
 PARK to avoid near-duplicate spend; first candidate to lift if the
 Ward verbosity bundle dies on a Ward-specific artifact.
+*Round-3 re-vet: **ABSORBED into B8 as the `lev` face.** The lift
+trigger resolved opposite (Ward verbosity KEPT — vslope, with its
+order prediction falsified), so a standalone fineweb level bundle
+would still be corpus breadth without a new mechanism. As one face of
+B8's recency ladder it costs nothing, completes the latch → level →
+dispersion design, and gives the level family its off-Ward,
+confound-free datapoint.*
+
+**P7 — `qgap`: sentences-since-last-question clock on fineweb
+(round-3 append).** The natural-text cousin of interleave `tss` —
+distance-to-anchor in its purest form, squarely in the recency
+bucket. Parked BEHIND B8 and tss, not on merit: tss already occupies
+the clock slot and is staged as stage2-fineweb's secondary, and B8's
+`lat` face tests the same recency mechanism with a denser label
+(every sentence has a previous length; most sentences have no recent
+"?" — the "?" rate is 0.038 of sentences). Lift trigger: B8 `lat`
+KEEPs and the program wants a second, event-anchored recency face on
+natural text — the builder is one more face in B8's machinery.
+
+**P8 — discourse-connective density on fineweb (round-3 append).**
+Trailing rate of sentence-initial connectives (however / therefore /
+moreover …; frozen function-word list — topically neutral by
+construction, so the unigram route is structurally weaker than any
+content-word face). Parked as DOMINATED: same family, same corpus,
+same kernel as punctint q — the hunt's unconditional KEEP, panelled
+tonight. Lift trigger: punctint q's Stage-2 dies for a
+punctuation-specific reason (e.g. tokenizer mark handling) that a
+function-word stream would dodge.
+
+**P9 — event-arrival regularity (gap CV / Fano factor of "?" or list
+events) on fineweb (round-3 append).** A label that is ORDER-CARRIED
+at fixed rate: two windows with identical event counts but different
+clustering get different labels — the one face a rate can never see.
+Recorded BECAUSE it is the sharpest probe of the amended order
+finding, and parked BECAUSE of that finding: this is the pure
+SEQUENCE-order bucket, which stays a bad bet on rate substrates
+(round-3 addendum §1); support is thin besides (≥3 events inside an
+8-sentence kernel at a 0.04–0.06 event rate is rare). Lift trigger:
+any order-sensitive window ADVANTAGE measured on natural text (e.g.
+B8 `lat` KEEPing shuffle-sensitively) — that would reopen the
+bucket with a receipt.
 
 ## DEAD
 

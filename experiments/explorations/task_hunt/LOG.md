@@ -3800,3 +3800,60 @@ re-quote of the screen margins. All bindings as written; card lands
 before any cell.
 
 _Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb)_
+
+## 2026-07-25 — runpod — candidate-factory-broad-3: ledger re-vet under the AMENDED order finding + estimator finding — 4 PARKs DEAD, 1 lifted corpus-shifted, 1 absorbed; B8 (recency ladder) + B9 (fiction quotedens) announced
+
+Re-vet frame per the briefing ADDENDUM: two buckets, not one — pure
+SEQUENCE-order pitches stay demoted; deliberately RECENCY-structured
+candidates are the best-motivated new family (the one measured crack
+in the order-free wall: dialevel's capacity-matched shuffle cost,
++0.03…+0.06 at T32, 3/3 models). The estimator finding hardens kills
+and rescues nothing: 400-doc unigram leak readings are LOWER bounds
+(76–91 % of the 10× rise is estimator sample size, unsaturated at
+3,200 train docs), so a park killed on a high small-corpus reading is
+killed a-fortiori at scale.
+
+- **P1 news/date density → DEAD** — between-doc variance by
+  construction (short, bursty-topical news items); the now-binding
+  within-document contrast is structurally unreachable — the dialevel
+  foreclosure, inherited at design time.
+- **P2 numeric density → DEAD** — its lift trigger resolved opposite
+  (punctint-list survived and did not die on position); dominated by
+  B3's variance at a lower event rate.
+- **P3 citation density → DEAD** — inherits B6's measured register
+  leak (0.63–0.65 at 320 train docs, ALL math tokens masked), which
+  the estimator finding makes a lower bound. A-fortiori.
+- **P5 emphasis/caps → DEAD** — self-stamping fails axis (b) by
+  construction; masking the caps tokens removes the signal itself.
+- **P4 quotation rate → LIFTED, corpus-shifted → B9** — the park
+  reason (fineweb exactness strain) is a corpus property; edited
+  fiction restores exactness and brings strong within-book
+  narrative↔dialogue alternation to the binding within-doc control.
+- **P6 sentence-length level → ABSORBED into B8** as the `lev` face
+  (trigger void: Ward verbosity KEPT).
+- **Builds announced (ledger-first; builders follow, commit-then-run):**
+  **B8 `slen`** — one exact value stream (ln sentence word count) on
+  fineweb (4k + 400-prefix variants), three faces differing ONLY in
+  temporal weighting: `lat` = previous sentence's value (a pure
+  latch — the recency face, PRIMARY), `lev` = HL-2/support-8 trailing
+  mean (P6 absorbed), `disp` = trailing std (the program's first
+  second-moment face). Pre-registered within-window-shuffle ladder
+  **lat > lev > disp ≈ 0** turns runpod-e's recency hypothesis into
+  three predictions on one confound-free substrate (doc length is
+  pull-fixed at 60–200 sentences, not label-coupled as in dialevel).
+  **B9 `quotedens`** — trailing quoted-sentence rate on a PG19-class
+  fiction pull (new corpus register; frozen double-quote grammar,
+  single quotes excluded as apostrophe-inexact; event-sentence tokens
+  masked; caching cost stated per the new-corpus rule).
+- New PARKs with lift triggers: **P7 `qgap`** clock (recency bucket,
+  behind tss + B8-lat), **P8 connective density** (dominated by
+  punctint q), **P9 gap-regularity** (the sequence-order bucket — the
+  sharpest probe of the amended finding, parked by the same finding;
+  lifts only on a measured order-sensitive advantage).
+- Index/outcomes hygiene: B1 tss and B2 novelty rows now carry
+  WITHDRAWN → KEEP-PENDING-REVIEW; B5 marked BUILT-as-dialevel →
+  WEAK; the Ward-batch KEEPs, the withdrawal + retired "best window"
+  convention, the amended order wording, and both open Stage-2 panels
+  appended to the screen-outcomes block.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_
