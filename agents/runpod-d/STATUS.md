@@ -44,12 +44,20 @@ evidence-line analog is the latent-state bar).
   (SequenceBuffer clones ~2.1 GB per step — structural; buffer_tokens
   does NOT touch it; scheduled first per addendum; panel reportable as
   partial-with-tsae-pending if needed).
-- Pool B = TWO shards after a 44 GB OOM at 5 workers (v2 eval peaks
-  ≈ 12.7 GB/worker; one stacked/T2/s1 trained cell failed and simply
-  reruns): `skip-tsae:0/2` 3 workers GPU 0 + `skip-tsae:1/2` 3 workers
-  GPU 2, both with PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True.
-  Scheduling-only amendment, committed; cell content byte-identical.
-  Old aborted transcript kept as `...__skip-tsae.json.aborted`.
+- Pool B = TWO shards after a 44 GB GPU OOM at 5 workers (v2 eval
+  peaks ≈ 12.7 GB/worker GPU; one stacked/T2/s1 trained cell failed
+  and simply reruns). **THEN two cgroup RAM OOM kills** (box cgroup
+  cap = 301 GB, `memory.oom_control oom_kill` counter is the ground
+  truth — dmesg shows nothing): fix = `grid.run_pool
+  max_tasks_per_child=1` (additive kwarg, default None; oprate runner
+  pins 1) → fresh spawn process per cell, flat RAM ceiling. Window
+  cells still peak ~30 GB/worker (x 8.5 + WindowBuffer 8.6 + refill
+  transient + eval); tsae workers ~13 GB. Current topology:
+  `only-tsae` 3 workers GPU 1; `skip-tsae:0/2` 3 workers GPU 0;
+  `skip-tsae:1/2` **1 worker** GPU 2 (RAM headroom) — REBALANCE
+  shard 1 up when a pool finishes (completed cells cache-hit).
+  Watchdog monitor on cgroup usage (>285 GB) + oom_kill increments.
+  Old aborted transcripts kept as `...json.aborted`.
 - Results append to `oprate/results/stage2_..__{only,skip}-tsae.json`
   (separate files so pools can't clobber; leaderboard.jsonl is
   canonical). A Monitor polls counts/failures every 2 min.
