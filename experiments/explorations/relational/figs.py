@@ -240,6 +240,86 @@ def fig_conversion(payloads: list[dict], task: str, mode: str, T: int) -> Path:
     return out
 
 
+ATLAS_COLORS = {"agreement": "s1", "contradiction": "s2", "role": "s3"}
+ATLAS_LABEL = {
+    "agreement": "agreement equality (cand. 5)",
+    "contradiction": "fact consistency (cand. 4)",
+    "role": "labelled role (cand. 1a)",
+}
+
+
+def fig_atlas(by_task: dict[str, list[dict]], mode: str) -> Path:
+    """The atlas: three relational labels, three conversions.
+
+    LEFT: a per-token linear probe against depth. Every label starts at chance at
+    the embeddings and is fully linearised per position by layer 4-8, so at any
+    depth a dictionary is actually trained the additive ceiling already contains
+    the relation.
+    RIGHT: the nonlinear residual — the only headroom a position-mixing code could
+    convert into a linear readout. It is non-zero in exactly one place: the
+    embedding layer, before the model has done the work.
+    """
+    t = _style(mode)
+    fig, axes = plt.subplots(1, 2, figsize=(9.8, 3.9), dpi=170)
+    for task, pls in sorted(by_task.items()):
+        slot = ATLAS_COLORS.get(task, "s1")
+        cells = [c for pl in pls for c in pl["cells"]
+                 if "per_token" in c and c["stratum"] == "all"]
+        if not cells:
+            continue
+        # one point per layer: the largest T available (most favourable to windows)
+        by_layer: dict[int, dict] = {}
+        for c in cells:
+            cur = by_layer.get(c["layer"])
+            if cur is None or c["T"] > cur["T"]:
+                by_layer[c["layer"]] = c
+        Ls = sorted(by_layer)
+        axes[0].fill_between(Ls, [by_layer[L]["per_token"]["ci_lo"] for L in Ls],
+                             [by_layer[L]["per_token"]["ci_hi"] for L in Ls],
+                             color=t[slot], alpha=0.15, linewidth=0)
+        axes[0].plot(Ls, [by_layer[L]["per_token"]["value"] for L in Ls],
+                     color=t[slot], linewidth=2, marker="o", markersize=5,
+                     markeredgecolor=t["surface"], markeredgewidth=1.4,
+                     label=ATLAS_LABEL.get(task, task), zorder=3)
+        best = {}
+        for c in cells:
+            L = c["layer"]
+            if L not in best or c["nonlinear_residual"] > best[L]["nonlinear_residual"]:
+                best[L] = c
+        axes[1].plot(sorted(best), [best[L]["nonlinear_residual"] for L in sorted(best)],
+                     color=t[slot], linewidth=2, marker="o", markersize=5,
+                     markeredgecolor=t["surface"], markeredgewidth=1.4,
+                     label=ATLAS_LABEL.get(task, task), zorder=3)
+    axes[0].axhline(0.5, color=t["null"], linestyle=(0, (4, 3)), linewidth=1.2)
+    axes[0].annotate("chance", xy=(0, 0.5), xytext=(3, 5),
+                     textcoords="offset points", color=t["ink2"], fontsize=8.5)
+    axes[0].set_xlabel("residual layer"); axes[0].set_ylabel("per-token test AUC")
+    axes[0].set_ylim(0.44, 1.04)
+    axes[0].grid(axis="y", linewidth=0.7)
+    axes[0].set_title("a per-token probe reads every relation by layer 8",
+                      loc="left", fontsize=10)
+    axes[0].legend(loc="lower right", fontsize=8.5)
+
+    allc = [c for pls in by_task.values() for pl in pls for c in pl["cells"]
+            if "three_sigma" in c]
+    band = float(np.median([c["three_sigma"] for c in allc]))
+    axes[1].axhspan(-band, band, color=t["null"], alpha=0.16, linewidth=0)
+    axes[1].annotate("±3σ null", xy=(0.55, 0.52), xycoords="axes fraction",
+                     color=t["ink2"], fontsize=8.5)
+    axes[1].axhline(0, color=t["grid"], linewidth=1)
+    axes[1].set_xlabel("residual layer")
+    axes[1].set_ylabel("window MLP − additive ceiling")
+    axes[1].grid(axis="y", linewidth=0.7)
+    axes[1].set_title("headroom exists only before the model computes it",
+                      loc="left", fontsize=10)
+    fig.suptitle("Three relational labels, three conversions — R1-Distill-Llama-8B",
+                 x=0.01, ha="left", fontsize=11)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    out = FIGS / f"atlas_{mode}.png"
+    fig.savefig(out); plt.close(fig)
+    return out
+
+
 def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
     made = []
@@ -267,6 +347,10 @@ def main() -> None:
                 f = fig_conversion(pls, task, mode, T)
                 if f:
                     made.append(f)
+    for mode in ("light", "dark"):
+        f = fig_atlas(by_task, mode)
+        if f:
+            made.append(f)
     for m in made:
         print("wrote", m)
     if not made:

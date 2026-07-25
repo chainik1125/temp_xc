@@ -151,12 +151,168 @@ probe — which is precisely what a kill needs in order to be worth reporting.
 
 ---
 
-## § 3 — Candidate 4: contradiction / fact-consistency — running
+## § 3 — Candidate 4: contradiction / fact-consistency — **KILL**
 
-Card frozen at `74df8f7f`. Predictions P1–P5 and kill rules K1/K2 are in
-[`cards/contradiction_xor.md`](cards/contradiction_xor.md). Mention distance is
-17–37 tokens (median 26), so `T = 32/64` are the informative cells and layer 0
-is included as a now-known positive control.
+Card frozen at `74df8f7f`, **before any cell existed** — freeze order
+git-provable. Label: `[value(mention 1) == value(mention 2)]` across 1–3 filler
+sentences; 4,800 distinct items, 20 fact groups, mention distance 17–37 tokens
+(median 26). Triage PASS (AUC from either value 0.500, length 0.505, gap 0.506).
+
+| layer | T | per-token [95% CI] | win-linear | win-mean | win-MLP | g | nonlinear residual | 3σ |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 8 | 0.500 [0.463, 0.536] | 0.499 | 0.495 | 0.499 | −0.001 | −0.001 | 0.072 |
+| 0 | 32 | 0.500 [0.463, 0.536] | 0.521 | 0.515 | 0.501 | +0.021 | −0.020 | 0.060 |
+| 0 | 64 | 0.500 [0.463, 0.536] | 0.508 | 0.484 | 0.506 | +0.008 | −0.002 | 0.085 |
+| 8 | 8 | 1.000 [1.000, 1.000] | 1.000 | 1.000 | 1.000 | +0.000 | +0.000 | 0.062 |
+| 8 | 64 | 1.000 [1.000, 1.000] | 1.000 | 1.000 | 1.000 | +0.000 | +0.000 | 0.030 |
+| 16 | 64 | 1.000 [1.000, 1.000] | 1.000 | 1.000 | 1.000 | +0.000 | +0.000 | 0.069 |
+| 24 | 64 | 1.000 [1.000, 1.000] | 1.000 | 0.948 | 1.000 | −0.000 | +0.000 | 0.023 |
+
+**Verdict: KILL** — K1 and K2 both fire from layer 8. Wall clock 1,251 s, 0 OOM.
+
+**Frozen predictions scored.** P1 (layer 0 at chance) **CONFIRMED** — 0.500 exactly.
+P2 (per-token rises to 0.70–0.95 at mid-depth) **CONFIRMED and exceeded** — 1.000.
+P3 (`nonlinear_residual ≤ 3σ` everywhere) **CONFIRMED**. P4 (IN and OUT differ by
+< 0.05 on `g`) **CONFIRMED** — both 1.000 at layer 8. The card said plainly *"I
+expect this candidate to be KILLED"* and gave the mechanism; the data agreed with
+the card, not with the hope.
+
+**Caveat on the layer-0 null, disclosed.** Unlike candidate 5, candidate 4's layer-0
+control does *not* show nonlinear headroom (`nlr` −0.02…+0.03). At `T = 64` the MLP
+has 262,144 inputs against ~3,800 training rows, so this null is partly a
+probe-capacity statement — the confound `task_hunt/RECORD.md` § 3c documents.
+Candidate 5's control worked because its constituents are 7 tokens apart rather
+than 26. An oracle-pair arm (the two constituent positions only, 8,192 features)
+was added to settle it and is queued.
+
+---
+
+## § 4 — Candidate 1a: labelled role under style matching — **KILL, and it is regime 2 rather than regime 3**
+
+The flagship. Label = the **labelled** (chat-template) role of the payload
+sentence, in a balanced 2×2 over (labelled role) × (style), so that a per-token
+feature tracking *style* — which is what the role-confusion result says models
+actually track — is at chance on this label by construction. 2,400 distinct items,
+20 payload groups, every payload sentence appearing in **both** roles, delimiter
+13–21 tokens back.
+
+**A third stimulus defect, caught by the layer-0 control.** v1 read AUC 1.000 at
+the *embeddings*, which is only possible if the probe token itself differs. It did:
+the payload's final `.` was followed by `\n` in the data arm and by a space in the
+instruction arm, and the tokenizer merged the former into a single `.\n` token.
+Pure token-identity leak. v2 renders both arms with identical line structure, so
+the character after the probe position is `\n` in every item (now an assertion),
+and the *only* difference between conditions is the presence of the
+`<document>` / `</document>` markers.
+
+Result (stratum `all`, layer 0 = embeddings):
+
+| layer | T | per-token | win-linear | win-MLP | g | nonlinear residual | oracle-pair linear |
+|---|---|---|---|---|---|---|---|
+| 0 | 8 | 0.477 | 0.501 | 0.501 | +0.024 | −0.000 | — (delimiter outside window) |
+| 0 | 16 | 0.477 | 0.664 | 0.651 | +0.186 | −0.013 | — |
+| 0 | 32 | 0.477 | **1.000** | 1.000 | **+0.522** | +0.000 | **1.000** |
+| 4 | 32 | **1.000** | 1.000 | 1.000 | −0.000 | −0.000 | 1.000 |
+| 8–24 | all | 1.000 | 1.000 | 1.000 | ±0.000 | ±0.000 | 1.000 |
+
+Two distinct readings, and both matter:
+
+1. **At the embeddings this is a +0.52 window-over-per-token separation** — the
+   largest in the run. A per-token dictionary cannot represent labelled provenance
+   at all there, and a T-SAE, which decodes per position, inherits that floor.
+   But the **oracle-pair *linear*** probe also reads it at 1.000, so the signal is
+   the marker token's identity: an **additive** function of per-position features.
+   Every window family gets it — TXC-pre and Stacked included. So this is a
+   **regime-2** win, the same class as the paper's existing λ̂ result, and it does
+   **not** isolate cross-position weight sharing.
+2. **By layer 4 it is converted** (per-token 1.000) and the separation is gone.
+   In-quote state is bracket-family, which `task_hunt/CANDIDATES.md` already
+   records as DEAD-by-conversion; that prediction held.
+
+**Verdict: KILL** at every usable hookpoint, with the regime-2 embedding-layer
+effect recorded rather than dressed up.
+
+**Consequence, and the frozen next step.** To make role tracking regime-3 the
+marker *multisets* must match and only their **order** may differ — "which side of
+the last delimiter am I on", with both an opening and a closing marker in the
+window in both classes and their positions jittered. That design is specified and
+frozen in [`cards/role_order.md`](cards/role_order.md) with predictions and a
+kill rule that treats a window-linear rise as a stimulus defect rather than a
+result. It is the one remaining shot in this family at the theorem-protected
+separation.
+
+---
+
+## § 5 — Synthesis: three labels, three conversions
+
+![atlas](figs/atlas_light.png)
+
+Three relational labels — syntactic agreement, factual consistency, and labelled
+provenance — chosen to be as different from each other as the family allows. All
+three behave identically:
+
+| | layer 0 | layer 2–4 | layer 8–24 | nonlinear headroom |
+|---|---|---|---|---|
+| agreement equality | 0.495 chance | 0.983 → 1.000 | 1.000 | **+0.269 at L0 only** |
+| fact consistency | 0.500 chance | — | 1.000 from L8 | none measurable |
+| labelled role | 0.477 chance | 1.000 from L4 | 1.000 | none (additive at L0) |
+
+**The finding.** On real activations, a relational latent *that the model uses* is
+linearised per position within two to eight layers. At every depth where anyone
+trains a dictionary, the additive ceiling already contains the relation — so no
+dictionary architecture, TXC included, can separate on it. The balanced-marginal
+construction guarantees the label is not readable from any single position's
+*content*; the model computes it anyway and writes the answer at the current
+position.
+
+**Why this is a result and not a failure to find one.** The gate has a positive
+control (§ 2b): at layer 0 the additive arms sit at chance while a cross-position
+nonlinearity reaches 0.772, with the effect vanishing when the window cannot reach
+the second constituent. The instrument fires when headroom exists. Its zero
+everywhere else is therefore a measurement of the model.
+
+**What it implies for the paper.** The criterion the Limitations section says is
+missing now has a measured form:
+
+> A temporal architecture can only earn its keep on a latent the model **declines
+> to maintain** as a per-position state. Relations the model *needs* — agreement,
+> consistency, provenance — are converted almost immediately. Latents that are
+> *hazards over a trajectory* rather than facts are not.
+
+That reframes the paper's own evidence favourably: backtracking anticipation is
+not a lucky task, it is an instance of the *only class that can work*, and it is
+the one label in this program with a positive within-window order receipt
+(`task_hunt/RECORD.md` § 3: +0.028…+0.041 on anticipation vs +0.003…+0.013 on its
+ambient companion). It also predicts reviewer bbby's own observation that window
+length barely matters on sparse probing — those labels are regime-1 ambient, so no
+window arch should separate, and none does.
+
+**Where the remaining upside is**, in priority order: (1) `role_order` — the
+matched-multiset order design, the only frozen regime-3 candidate left in this
+family; (2) injection-compliance **anticipation** (ledger candidate 3), which is
+in the class the atlas says can work and mirrors the paper's own detect-and-steer
+template; (3) instruction↔action match, whose premise — the model has no
+generative reason to *verify* its own compliance — is the only one of the five
+BUILD candidates the conversion argument does not immediately condemn.
+
+---
+
+## § 6 — Process notes
+
+Three stimulus defects were caught **by controls rather than by inspection**: the
+memorisation duplicate-text failure (caught by the IN/OUT stratum), the token
+merge leak (caught by the layer-0 arm), and the role generator's unequal cell
+quota (caught by its own balance assertion, before any GPU time). All three are
+recorded in § 1 with the numbers that fired them. Two of the three would have
+produced a *positive* headline had they gone unnoticed — AUC 1.000 with a clean
+story about cross-position binding.
+
+The monitor (`monitor.py`) evaluates expectations E1–E6 against the result files
+directly, so a fired expectation is detected by code rather than noticed by eye.
+It currently reports conversion CONFIRMED on agreement and flags 43 cells across
+tasks where the within-window shuffle gap exceeds 3σ — correctly annotated as
+*not* order evidence, since a shuffle gap grows with `T` generically under a
+flatten probe (`task_hunt/RECORD.md` § 2).
 
 ---
 

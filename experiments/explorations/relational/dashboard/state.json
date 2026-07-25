@@ -5,8 +5,8 @@
   "agent": "runpod (H100 pod, /workspace/temp_xc)",
   "branch": "arxiv",
   "started_utc": "2026-07-25T00:00:00Z",
-  "last_update_utc": "2026-07-25T03:10:00Z",
-  "phase": "Phase 2 \u2014 candidate 4 gate running (layer 8); oracle-pair diagnostic queued",
+  "last_update_utc": "2026-07-25T04:35:00Z",
+  "phase": "Track A + flagship 1a complete \u2014 three kills, one positive control, regime-3 card frozen",
   "state": "running",
   "prime_directive": "A sound verdict, never a win. Cards are frozen (committed) before any screen runs; git order is the evidence. Falsified predictions are scored as falsified."
  },
@@ -199,14 +199,14 @@
    "phase": "0 \u2014 environment",
    "title": "Green baseline",
    "detail": "scripts/agent_smoke_test.sh + pytest tests/ -q before anything touches the canonical leaderboard.",
-   "state": "queued"
+   "state": "done"
   },
   {
    "id": "T0.4",
    "phase": "0 \u2014 environment",
    "title": "Resource preflight + monitor",
    "detail": "Abort thresholds (free disk < 12 GB, free VRAM < 60 GB), peak-VRAM instrumentation, OOM retry-then-disclose wrapper, anomaly monitor attached.",
-   "state": "running"
+   "state": "done"
   },
   {
    "id": "T1.1",
@@ -248,27 +248,27 @@
    "phase": "2 \u2014 track A",
    "title": "The gate",
    "detail": "per-token / window-mean / window-flatten / within-window-shuffled \u00d7 T \u2208 {2,4,8,16,32} \u00d7 depth, permutation nulls, bootstrap CIs on every number. Kill rules decide.",
-   "state": "running"
+   "state": "done"
   },
   {
    "id": "T3.1",
    "phase": "3 \u2014 track B",
    "title": "Role/provenance stimuli",
    "detail": "Style-mismatched spans, \u2265 2-boundary row recipe, injected document content rendered inside a user turn. Authored while the GPU runs track A.",
-   "state": "queued"
+   "state": "done"
   },
   {
    "id": "T3.2",
    "phase": "3 \u2014 track B",
    "title": "Role gate",
-   "detail": "Same harness; adds the supervised role-probe ceiling as a reference line.",
-   "state": "queued"
+   "detail": "Done as candidate 1a: KILL, and classified regime-2 rather than regime-3. The regime-3 form (matched marker multisets, order-only contrast) is frozen in cards/role_order.md as the next run.",
+   "state": "done"
   },
   {
    "id": "T4.1",
    "phase": "4 \u2014 panel",
    "title": "Panel (only if a gate clears)",
-   "detail": "6 archs \u00d7 T ladder \u00d7 seeds {1,2,42} + untrained control through the canonical runner, matched d_sae and matched realized l0_per_token (TXC-post needs nominal k = k_pos\u00b7T).",
+   "detail": "Still BLOCKED, correctly: no gate cleared, so no panel is justified. Spending a 6-arch \u00d7 T \u00d7 3-seed grid on a converted latent is exactly what per-token-first triage exists to prevent.",
    "state": "blocked"
   },
   {
@@ -283,7 +283,7 @@
    "phase": "5 \u2014 write-up",
    "title": "RECORD + LOG + STATUS",
    "detail": "Program-convention records, reviewer-complaint mapping, and the regime atlas entry \u2014 written whichever way the verdict lands.",
-   "state": "blocked"
+   "state": "running"
   }
  ],
  "resources": {
@@ -337,6 +337,12 @@
    }
   ],
   "anomalies": [
+   {
+    "ts": "04:05",
+    "expectation": "E1 (no route to the label except the intended one) on the role stimuli",
+    "observed": "v1 role read AUC 1.000 at the EMBEDDING layer",
+    "disposition": "Third stimulus defect, third time a control caught it. The payload's final '.' was followed by a newline in the data arm and by a space in the instruction arm, so the tokenizer merged it into a single '.\\n' token \u2014 token identity leaked the label. v2 renders both arms with identical line structure; the character after the probe position is now asserted identical across every item. Two of today's three defects would have produced a POSITIVE headline had they gone unnoticed."
+   },
    {
     "ts": "03:05",
     "expectation": "the layer-0 positive control should reproduce on candidate 4",
@@ -501,9 +507,39 @@
    "ts": "03:10",
    "kind": "running",
    "text": "Candidate 4 now at layer 8. Resource receipts so far: peak probe VRAM 7.87 GB against the 60 GB guard, zero OOM events, disk holding at 12.4 GB."
+  },
+  {
+   "ts": "03:35",
+   "kind": "kill",
+   "text": "CANDIDATE 4 KILLED on its properly frozen card. Per-token 1.000 from layer 8 through 24, every window arm tied, nonlinear residual +0.000. P1/P3/P4 confirmed, P2 exceeded. Wall 1,251 s, zero OOM."
+  },
+  {
+   "ts": "04:05",
+   "kind": "watch",
+   "text": "Role v1 read 1.000 at the embeddings \u2014 a token-merge leak. Rebuilt with byte-identical local context; the char-after-probe check is now an assertion."
+  },
+  {
+   "ts": "04:25",
+   "kind": "kill",
+   "text": "CANDIDATE 1a KILLED, and honestly reclassified. At layer 0 it gives the run's largest separation (per-token 0.477 vs window 1.000, g +0.522) but the oracle-pair LINEAR probe also reads 1.000 \u2014 the marker token's identity is additive, so every window family gets it. Regime 2, not regime 3. By layer 4 per-token is 1.000. My rank-1 prior (P(violent) 0.60) is falsified on the violent half."
+  },
+  {
+   "ts": "04:30",
+   "kind": "pass",
+   "text": "Frozen cards/role_order.md before any cell: matched marker multisets differing only in ORDER, satisfying the additive-code theorem's hypothesis by construction. K3 treats a window-linear rise as a stimulus defect rather than a result \u2014 the lesson of three defects in one session."
+  },
+  {
+   "ts": "04:35",
+   "kind": "note",
+   "text": "THE PANEL REMAINS CORRECTLY BLOCKED. No gate cleared, so a 6-arch \u00d7 T \u00d7 3-seed grid would be spent on a converted latent \u2014 precisely what per-token-first triage exists to prevent. The atlas is the deliverable instead."
   }
  ],
  "figures": [
+  {
+   "path_light": "figs/atlas_light.png",
+   "path_dark": "figs/atlas_dark.png",
+   "caption": "THE RESULT. Three relational labels \u2014 syntactic agreement, factual consistency, labelled provenance \u2014 chosen to be as different as the family allows. LEFT: a per-token linear probe against depth; all three start at chance at the embeddings and are fully linearised per position by layer 4\u20138, so at any depth a dictionary is actually trained the additive ceiling already contains the relation. RIGHT: the nonlinear residual \u2014 the only headroom a position-mixing code could convert into a linear readout \u2014 is non-zero in exactly one place, the embedding layer, before the model has done the work. Shaded bands are bootstrap CIs; grey band is \u00b13\u03c3 of the label-permutation null."
+  },
   {
    "path_light": "figs/agreement_conversion_T8_light.png",
    "path_dark": "figs/agreement_conversion_T8_dark.png",
@@ -517,8 +553,8 @@
  ],
  "timing": {
   "session_start_utc": "2026-07-25T00:52:00Z",
-  "now_utc": "2026-07-25T03:10:00Z",
-  "elapsed_min": 138,
+  "now_utc": "2026-07-25T04:35:00Z",
+  "elapsed_min": 223,
   "basis": "Projections are calibrated on measured wall-clock from this session (env install 9 min, stimulus build <1 min, 15 GB model pull 6 min) and on the task_hunt round-1 record (a raw-activation screen cost ~3 h; a Stage-2 panel of 84 cells ran in ~2 h on one H100).",
   "phases": [
    {
@@ -537,17 +573,17 @@
    },
    {
     "phase": "2 \u2014 track A gate",
-    "state": "running",
-    "elapsed_min": 100,
-    "projected_min": 150,
+    "state": "done",
+    "elapsed_min": 185,
+    "projected_min": 185,
     "note": "Candidate 5 done + killed with a positive control. Candidate 4 at layer 8 of 4 layers x T in {8,16,32,64}; T=32/64 cells are slow (262k-feature MLPs). An oracle-pair diagnostic was added mid-run and is queued behind it."
    },
    {
     "phase": "3 \u2014 track B role gate",
-    "state": "queued",
-    "elapsed_min": 0,
-    "projected_min": 120,
-    "note": "Stimulus build ~40 min (chat-template rendering, style-mismatched slice, >=2-boundary row recipe) + ~60 min gate + analysis."
+    "state": "done",
+    "elapsed_min": 52,
+    "projected_min": 52,
+    "note": "Ran faster than projected: track A's stimulus machinery was reused wholesale, so only the generator was new."
    },
    {
     "phase": "4 \u2014 panel",
@@ -558,14 +594,14 @@
    },
    {
     "phase": "5 \u2014 write-up",
-    "state": "blocked",
-    "elapsed_min": 0,
+    "state": "running",
+    "elapsed_min": 20,
     "projected_min": 60,
     "note": "RECORD + LOG + STATUS + figures. Runs whichever way the verdict lands."
    }
   ],
-  "projected_total_min": 585,
-  "projected_remaining_min": 440
+  "projected_total_min": 552,
+  "projected_remaining_min": 250
  },
  "triage": {
   "note": "Label-side triage \u2014 free kill authority, run before any GPU spend. By construction the label must be unreadable from either constituent alone, from length, or from filler count. This is expectation E1. v2 additionally asserts distinct_texts == n_items and that the inter-constituent gap is uninformative \u2014 both added after v1 failed (below).",
@@ -591,6 +627,17 @@
     "auc_from_nfiller": 0.5038072072723765,
     "PASS": true,
     "auc_from_gap": 0.5027694589120371
+   },
+   "role": {
+    "n": 2400,
+    "n_distinct_texts": 2400,
+    "label_rate": 0.5,
+    "auc_from_a": 0.5,
+    "auc_from_b": 0.5,
+    "auc_from_len": 0.5,
+    "auc_from_nfiller": 0.5,
+    "auc_from_gap": 0.5,
+    "PASS": true
    }
   }
  },
@@ -604,6 +651,26 @@
    "reading": "A per-token linear probe at the verb reads agreement match/mismatch PERFECTLY at layer 8. The model computes the equality itself and deposits the result at the current position, so the additive ceiling already contains everything \u2014 there is no headroom for a position-mixing code. This is the 'built-and-immediately-linearized' g(\u2113) shape from task_hunt round 1, now measured on a relational label.",
    "prior_scored": "My frozen prior said P(violent)=0.30 and 'expect 0.75 vs 0.92'. FALSIFIED in the more-converted direction: 1.000 vs 1.000. Recorded as falsified.",
    "scope": "One model, one hookpoint, English templates. Scoped to this label on this model."
+  },
+  {
+   "candidate": "4 \u2014 contradiction / fact-consistency XOR",
+   "verdict": "KILL",
+   "rule": "K1 + K2 fired from layer 8 \u00b7 card frozen 74df8f7f BEFORE first cell",
+   "model": "R1-Distill-Llama-8B, layers 0/8/16/24, T \u2208 {8,16,32,64}, 4,800 distinct items",
+   "numbers": "layer 0: per-token 0.500 [0.463, 0.536] \u00b7 win-linear 0.499\u20130.521 \u00b7 win-MLP 0.499\u20130.506 \u2014 all chance. layer 8\u219224: per-token 1.000 [1.000, 1.000], every window arm tied, nonlinear residual +0.000 (3\u03c3 0.012\u20130.085). Wall 1,251 s, 0 OOM.",
+   "reading": "The frozen card predicted this and said why: a contradicting second mention is a high-surprisal event, and surprise is linearly represented. P1/P3/P4 confirmed, P2 exceeded (predicted 0.70\u20130.95, actual 1.000). One caveat disclosed: candidate 4's layer-0 control shows no nonlinear headroom, but at T=64 the MLP has 262k inputs against ~3.8k rows, so that null is partly probe capacity \u2014 an oracle-pair arm was added to settle it.",
+   "prior_scored": "Prior P(violent)=0.35. The card's own expectation ('I expect this candidate to be KILLED') was correct, for the stated mechanism.",
+   "scope": "One model, one hookpoint family, English templates, one label."
+  },
+  {
+   "candidate": "1a \u2014 labelled role under style matching (the flagship)",
+   "verdict": "KILL \u2014 and regime 2, not regime 3",
+   "rule": "K1 + K2 fired from layer 4",
+   "model": "R1-Distill-Llama-8B, layers 0/4/8/16/24, T \u2208 {8,16,32,64}, 2,400 distinct items, every payload in both roles",
+   "numbers": "layer 0, T=32: per-token 0.477 vs window-linear 1.000 \u2192 g +0.522 (the run's largest separation) BUT oracle-pair LINEAR also 1.000 \u21d2 additive. layer 4 onward: per-token 1.000, separation gone.",
+   "reading": "Two readings, both kept. (1) At the embeddings a per-token dictionary cannot represent labelled provenance at all, and T-SAE inherits that floor \u2014 a +0.52 window win. But the signal is the marker token's identity, an additive function of per-position features, so every window family gets it and it does NOT isolate cross-position weight sharing: regime 2, the same class as the paper's existing \u03bb\u0302 result. (2) By layer 4 it is converted. In-quote state is bracket-family, which the candidate ledger already recorded as DEAD-by-conversion; that prediction held.",
+   "prior_scored": "This was my rank-1 candidate at P(win) 0.70 / P(violent) 0.60. The win half is defensible at layer 0; the VIOLENT half is FALSIFIED \u2014 I did not anticipate that a single marker token makes the task additive, and the design needed matched marker multisets from the start.",
+   "scope": "One model, one marker vocabulary. The regime-3 form is now frozen in cards/role_order.md."
   }
  ],
  "findings": [
@@ -614,6 +681,10 @@
   {
    "title": "Conversion is faster than the round-1 record suggested",
    "body": "Per-token AUC goes 0.495 (L0) \u2192 0.983 (L2) \u2192 1.000 (L4) and stays there through L24. The forbidden-word candidate took ~20 layers to climb +0.13; this relational label is fully linearised per position within four. A window architecture has no hookpoint to exploit: by the depth anyone trains a dictionary at, the additive ceiling already contains everything."
+  },
+  {
+   "title": "The criterion the paper's Limitations section says is missing, in measured form",
+   "body": "A temporal architecture can only earn its keep on a latent the model DECLINES to maintain as a per-position state. Relations the model needs \u2014 agreement, consistency, provenance \u2014 are converted within two to eight layers, and the balanced-marginal construction proves the label was never readable from single-position content in the first place: the model computes it and writes the answer at the current position. This reframes the paper's own evidence favourably. Backtracking anticipation is not a lucky task; it is an instance of the only class that can work, and it is the one label in this program with a positive within-window order receipt. It also predicts reviewer bbby's own observation that window length barely matters on sparse probing \u2014 those labels are regime-1 ambient, so no window arch should separate, and none does."
   }
  ]
 }
