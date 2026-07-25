@@ -123,3 +123,43 @@ Directionally the registered prediction also appears — TXC ahead at m=1 (0.237
 with the per-position SAE closing fast by m=4 (0.285 vs 0.242) — but at 120 docs and 200
 steps that is a plumbing observation, not a result. Full run launched: 1500 docs,
 d_sae=4096, 3000 steps, m ∈ {1,2,4,8,16,32}, both protocols.
+
+### 16:40 — Protocol A lands, and it looks exactly like the confound we pre-registered
+
+| m | 1 | 2 | 4 | 8 | 16 | 32 |
+| --- | --- | --- | --- | --- | --- | --- |
+| TXC | 0.178 | 0.295 | 0.406 | 0.537 | 0.689 | 0.790 |
+| SAE per-position | 0.075 | 0.125 | 0.305 | 0.531 | **0.754** | — |
+| SAE broadcast | −0.04 | 0.02 | −0.02 | −0.02 | nan | nan |
+
+Reference: full DoM schedule Δ = +35.65.
+
+Three things, in descending order of confidence.
+
+**Broadcast is structurally zero, and now at scale.** Reconstruction cosine is *exactly*
+0.000 at every m, and the steering effect wanders around zero. This is not weakness, it is
+orthogonality: a broadcast atom is constant along time, a balanced profile has zero mean
+along time, so their inner product vanishes for **any** direction. The previous sprint's
+"a level cannot make a shape" is now a property of the subspace a per-token dictionary
+spans under a constant coefficient, rather than an empirical finding about one model.
+
+**The TXC lead is exactly where the SAE is coverage-limited, and vanishes when it is
+not.** TXC leads 2.4× at m=1 and m=2, the arms are level at m=8 (0.537 vs 0.531), and at
+m=16 the **SAE is ahead** (0.754 vs 0.689). The crossover sits at m ≈ k = 12 — which is
+precisely the budget at which the per-position SAE stops being able to touch only part of
+the trajectory. That is the pre-registered confound C1 ("the m-budget buys coverage, not
+dictionary structure") producing its predicted signature, and the review agent called it
+before the run: *"it will look like the hypothesis confirming."* On current evidence I
+would not claim a TXC advantage. The random-slab and time-shuffled nulls decide it.
+
+**A numerical defect to fix, not a result.** `sae_broadcast` returns NaN at m ≥ 16: every
+broadcast atom is orthogonal to the target, so matching pursuit is selecting on numerical
+noise and the least-squares solve degenerates. It should return an exact zero write with a
+"degenerate" flag rather than NaN. The arm is structurally zero regardless, so this
+changes presentation and not conclusions.
+
+**Realised sparsity is not nominal sparsity.** TopK is applied as `scatter(relu(topk))`,
+so ReLU zeroes much of what TopK selected: TXC nominal window k=1200 → realised L0 ≈ 81,
+SAE nominal 100 → realised ≈ 98. Under Protocol A the TXC is therefore *sparser per slot*
+(≈6.8) than the SAE is per token (≈98), which inverts the protocol's stated intent.
+Realised L0 will be reported instead of nominal k.
