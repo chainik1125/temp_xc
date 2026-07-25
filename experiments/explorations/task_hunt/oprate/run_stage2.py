@@ -102,12 +102,28 @@ def _cells(ds: str):
 
 
 def _select(cells, sel: str):
+    """Scheduling-only selection; cell content is never touched.
+
+    `sel` may carry a round-robin shard suffix `:i/n` (e.g.
+    `skip-tsae:0/2`) — added after the first Pool-B attempt OOMed a
+    44 GB A40 at 5 workers (v2 eval peaks ≈ 12.7 GB/worker): shards
+    let the same cell list spread over two GPUs at 3 workers each,
+    the fleet's round-robin precedent. Deterministic: filter, then
+    take cells[i::n].
+    """
+    shard = None
+    if ":" in sel:
+        sel, spec = sel.split(":", 1)
+        i, n = spec.split("/")
+        shard = (int(i), int(n))
     if sel == "only-tsae":
-        return [c for c in cells if c["arch"] == "tsae"]
-    if sel == "skip-tsae":
-        return [c for c in cells if c["arch"] != "tsae"]
-    if sel != "all":
-        raise SystemExit(f"unknown sel {sel!r}: all|only-tsae|skip-tsae")
+        cells = [c for c in cells if c["arch"] == "tsae"]
+    elif sel == "skip-tsae":
+        cells = [c for c in cells if c["arch"] != "tsae"]
+    elif sel != "all":
+        raise SystemExit(f"unknown sel {sel!r}: all|only-tsae|skip-tsae[:i/n]")
+    if shard is not None:
+        cells = cells[shard[0]::shard[1]]
     return cells
 
 
@@ -124,8 +140,9 @@ def main():
     ds = sys.argv[2] if len(sys.argv) > 2 else DS_DEFAULT
     sel = sys.argv[3] if len(sys.argv) > 3 else "all"
     cells = _select(_cells(ds), sel)
+    safe = sel.replace(":", "-").replace("/", "of")
     out = HERE / "results" / (f"stage2_{ds}.json" if sel == "all"
-                              else f"stage2_{ds}__{sel}.json")
+                              else f"stage2_{ds}__{safe}.json")
     grid.run_pool(cells, out, max_workers=workers, describe=_describe,
                   tag=f"stage2-oprate/{ds}/{sel}")
 

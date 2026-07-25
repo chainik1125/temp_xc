@@ -61,17 +61,17 @@ def merge_pools(ds: str) -> list[dict]:
     merged_path = RES / f"stage2_{ds}.json"
     if merged_path.exists():
         return json.loads(merged_path.read_text())
-    rows, seen = [], set()
-    for sel in ("only-tsae", "skip-tsae"):
-        p = RES / f"stage2_{ds}__{sel}.json"
-        if not p.exists():
-            continue
+    by_key = {}
+    for p in sorted(RES.glob(f"stage2_{ds}__*.json")):
         for r in json.loads(p.read_text()):
             key = (r["arch"], r["T"], r["k_pos"], r["seed"], r["kind"])
-            if key in seen:
-                continue
-            seen.add(key)
-            rows.append(r)
+            # prefer ok rows: an aborted pool's failure record must not
+            # shadow the shard rerun that succeeded (leaderboard is
+            # canonical either way; these JSONs are pool transcripts)
+            if key not in by_key or (r.get("ok")
+                                     and not by_key[key].get("ok")):
+                by_key[key] = r
+    rows = list(by_key.values())
     merged_path.write_text(json.dumps(rows, indent=2))
     return rows
 
