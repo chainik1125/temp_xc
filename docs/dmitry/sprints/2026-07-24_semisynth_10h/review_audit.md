@@ -995,3 +995,103 @@ is the one place a reader is still led to something the evidence does not suppor
 **Third.** Finding 2's "mean error of 0.053 (1.5B) and 0.045 (7B)" should say *at the top
 of the dose grid*; at frac 0.2 the same cells give 0.099 and 0.094, and R rises with dose
 in 12 of 12 cells across both models (R1).
+
+---
+
+## Round 5 — the closing statement, with no further compute
+
+Asked what to say about the dose-drift and the span question if `weights_modal.py` and
+`rho_modal.py` do not land. **Go further than the draft.** The draft's framing — two
+explanations, of which only the second is a span effect — concedes more than the data
+requires, because it treats "cross-position interaction" as synonymous with "span effect".
+It is not, and separating them settles the question without either run.
+
+### The deviation hierarchy, and which levels are arrangement-blind
+
+| level | model | status |
+| --- | --- | --- |
+| 1 | `Δ = a·⟨c, π⟩` — homogeneous linear | **falsified**: χ²/dof 3.56, 10/36 outside CIs, dose drift 12/12 |
+| 2 | `Δ = F(⟨c, π⟩)`, F convex — scalar nonlinear | accounts for the whole dose drift; **falsified** by same-prediction spread |
+| 3 | `Δ = Σ_t g_t(c_t)` — additive, position-weighted | accounts for what levels 1–2 cannot; untested as such |
+| 4 | arrangement-sensitive interaction | **the only level at which a span effect exists** |
+
+**Levels 1, 2 and 3 are all arrangement-blind.** Level 2 is worth dwelling on because it is
+nonlinear *and* non-additive and still cannot host a span effect: it depends only on the
+scalar `⟨c, π⟩`, which is invariant under any rearrangement of the write that preserves the
+projection. Two writes with identical projection and different geometry give identical Δ,
+no matter how curved F is. So the existence of a cross-position interaction is not evidence
+for a span effect; only *arrangement sensitivity* is.
+
+### Level 2 explains the dose drift, with a cross-check
+
+If `F(x) ∝ x^p` then `R = R_pred^p`, which is below `R_pred` for p > 1 and rises toward it
+as F straightens. Both signatures are present, and the implied exponent is stable across
+cells and across two models:
+
+| | frac 0.2 | frac 0.35 | frac 0.5 | falls with dose |
+| --- | --- | --- | --- | --- |
+| mean implied p, 1.5B | 1.38 | 1.18 | 1.14 | 6/6 cells |
+| mean implied p, 7B | 1.34 | 1.17 | 1.13 | 6/6 cells |
+
+The two models agree to within 0.04 at every dose. The exponent is also *independently*
+measurable from each arm's own dose-response curve, and it matches: for ℓ=1, W=3 at 1.5B
+the implied p is 1.76 while the measured local exponent of that arm is 1.82. That
+cross-check is what makes level 2 the better-supported of the two arrangement-blind
+mechanisms — better than the match/mismatch asymmetry ρ(m) I proposed in R1, which fits
+comparably but has no independent handle.
+
+### What falsifies level 2 is position, not arrangement
+
+Within `linfit.json`, ten conditions share a predicted value of exactly 0.000 and their
+measured values span **−0.127 to +0.124**. A scalar law in `⟨c, π⟩` requires all ten to be
+zero. The phase sweep's two cells sharing a predicted 0.333 and landing at 0.145 and 0.676
+say the same thing. Both are explained by *which positions* were written — level 3 — and
+neither says anything about adjacency.
+
+**The only arrangement-shaped signal anywhere in the sprint** is the correlation between
+the linfit residual and block width: **+0.245, t = 1.48 on 34 dof, p ≈ 0.14**. Not
+significant, and confounded with position because W determines which positions receive
+which coefficients. Resolving it is exactly what the weights test does.
+
+### Paste-ready closing statement
+
+> Positions do not combine perfectly. Three of our measurements show it: the response
+> undershoots its predicted projection at low dose and climbs toward it as dose rises, in
+> 12 of 12 cells across both models; ten conditions whose predicted effect is exactly zero
+> measure between −0.127 and +0.124; and two conditions sharing a predicted 0.333 land at
+> 0.145 and 0.676. The first is quantitatively accounted for by the response being a convex
+> function of the write's projection onto the target — implied exponent 1.38 → 1.14 at 1.5B
+> and 1.34 → 1.13 at 7B, matching each arm's independently measured dose-response curvature.
+> The second and third are accounted for by per-position weights differing from each other.
+>
+> None of that is a span effect. A span effect means the model's response depends on how
+> the written positions are *arranged* — that writing at adjacent positions differs from
+> writing at scattered ones holding everything else fixed. A convex response to the net
+> projection is arrangement-blind by construction, and so are unequal per-position weights:
+> both depend on *what* and *where* was written, never on adjacency. The only
+> arrangement-shaped signal we have is a correlation of +0.245 between our residuals and
+> block width (t = 1.48, p ≈ 0.14), which is not significant and is confounded with
+> position.
+>
+> So the honest position is narrower than "no span effect" and stronger than "we could not
+> tell". Nothing we measured requires arrangement sensitivity, and everything we measured is
+> explained without it. We also never ran an experiment with the power to detect it: three
+> successive attempts were confounded, by coverage, then by the sign composition of the
+> compared writes, then by position. The test that would settle it is not a contrast between
+> two arrangements at all — it is to measure the twelve per-position weights from
+> single-position writes, predict every multi-position condition additively, and ask whether
+> any residual tracks adjacency. That run is specified and queued; it did not land inside the
+> compute window.
+
+### Two notes on how to place it
+
+The claim that survives is unaffected by all of this: a handle limited to one constant per
+W segments delivers close to its projection onto the target, and the useful width is the
+target's own timescale. Every deviation above is second-order around that, and none of it
+touches finding 2 or finding 3.
+
+Second, `weights_modal.py` and `rho_modal.py` are now testing nested levels of one
+hierarchy rather than two rival stories, which is worth a sentence in *What we would do
+next*: the weights run tests level 3 against level 4 and is the decisive one; the ρ run
+tests a specific level-2/3 mechanism and is now the lower priority of the pair, since
+level 2's exponent already has an independent cross-check.

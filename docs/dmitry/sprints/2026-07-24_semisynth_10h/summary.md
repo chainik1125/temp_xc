@@ -245,30 +245,50 @@ schedule. Everything here is therefore about the *form of the control signal*: *
 schedule beats a level**. Whether a temporal dictionary beats a per-token one needs
 trained dictionaries and is the main thing this sprint does not answer.
 
-**The law's one systematic failure is worth stating precisely, because it is where the
-next result lives.** In the block-constant arm every segment receives a coefficient of
-±1 and only the sign varies, so the achievable fraction should be dose-invariant under
-*any* position-independent response function — saturating, convex, or otherwise. It is
-not: the measured fraction rises with dose in 6 of 6 at-risk cells at 1.5B and 6 of 6 at
-7B. Two explanations survive, and only one of them concerns spans. A write that opposes
-a segment's own attribute may simply cost more than a matching write gains, with the
-asymmetry shrinking as dose grows — that is position-independent and has no span
-content. Or positions interact. We have the experiment that separates them (measure the
-single-segment effect with the write matched and flipped, recover the asymmetry
-directly, and see whether it accounts for the drift); it was queued when the sprint's
-compute window closed.
+### Positions do not combine perfectly — and none of the deviations is a span effect
 
-Two structural notes belong with the span question. Teacher-forcing removes the
-mechanism a span effect would most plausibly use: the text is pinned at every position,
-so a run of consistent writes cannot establish a state the model's own continuation
-carries forward. The entrainment experiment asks the same question where that mechanism
-is available, and there the answer is positive. Those results are the pinned and
-unpinned versions of one question rather than a contradiction. And our first
-contiguous-versus-scattered test was confounded — its scattered arm, built with stride
-k/W, landed on a single parity of an alternating profile and therefore wrote one sign
-everywhere while the contiguous arm wrote both, so the two arms differed in the content
-of the write and not only its adjacency. The sign-matched rebuild is in
-`span2_modal.py`.
+Three measurements show the imperfection. The response undershoots its predicted
+projection at low dose and climbs toward it as dose rises, in **12 of 12 cells across
+both models**. Ten conditions whose predicted effect is exactly zero measure between
+**−0.127 and +0.124**. And two conditions sharing a predicted 0.333 land at 0.145 and
+0.676.
+
+The first is quantitatively accounted for by the response being a *convex function of
+the write's projection onto the target*: fitting `R = R_predicted^p` gives an implied
+exponent falling 1.38 → 1.18 → 1.14 across the dose grid at 1.5B and 1.34 → 1.17 → 1.13
+at 7B — two models agreeing within 0.04 at every dose — and the exponent is separately
+measurable from each arm's own dose-response curve, where it matches (1.76 implied
+against 1.82 measured for ℓ=1, W=3). The second and third are accounted for by
+per-position weights differing from one another.
+
+**None of that is a span effect, and the distinction is not a technicality.** A span
+effect means the response depends on how the written positions are *arranged* — that
+writing at adjacent positions differs from writing at scattered ones with everything
+else held fixed. A convex response to the net projection is arrangement-blind by
+construction, since it depends only on a scalar that any rearrangement preserving the
+projection leaves unchanged; unequal per-position weights are arrangement-blind too,
+since they depend on *where* a write landed and never on what sits beside it. So a
+cross-position effect is not evidence of a span effect. The only arrangement-shaped
+signal anywhere in the sprint is a correlation of **+0.245** between our residuals and
+block width (t = 1.48 on 34 dof, p ≈ 0.14) — not significant, and confounded with
+position, because width determines which positions receive which coefficients.
+
+The honest position is therefore narrower than "no span effect" and stronger than "we
+could not tell". Nothing we measured requires arrangement sensitivity and everything we
+measured is explained without it — and we never ran an experiment with the power to
+detect it, because three successive attempts were confounded: first by coverage, then by
+the sign composition of the compared writes, then by position. The test that would settle
+it is not a contrast between two arrangements at all. It is to measure the twelve
+per-position weights from single-position writes, predict every multi-position condition
+additively, and ask whether any residual tracks adjacency — `weights_modal.py`, specified
+and queued, which did not land inside the compute window.
+
+One structural note belongs with this. Teacher-forcing removes the mechanism a span
+effect would most plausibly use: the text is pinned at every position, so a run of
+consistent writes cannot establish a state that the model's own continuation carries
+forward. The entrainment experiment asks the same question where that mechanism is
+available; there the answer is also null. These are the pinned and unpinned versions of
+one question rather than a tension.
 
 **Graded amplitude control** did not survive its pre-registered gate: five urgency
 levels fail to project onto the direction in order (L1 −5.06, L2 −7.35, L4 +3.49,
@@ -330,7 +350,14 @@ task-design theory is in [[theory]]; the behaviour census and the literature bri
 
 ## What we would do next
 
-Train a temporal crosscoder and an L0/width-matched per-token SAE on one activation
+Run `weights_modal.py`, which is specified and was queued when compute ran out: twelve
+per-position weights measured from single-position writes, used to predict forty
+multi-position conditions additively, with the residual regressed on adjacency. It is the
+decisive test of whether any arrangement sensitivity exists, and it subsumes the ρ
+measurement in `rho_modal.py`, which probes a specific mechanism for the dose-drift that
+already has an independent cross-check.
+
+Then train a temporal crosscoder and an L0/width-matched per-token SAE on one activation
 cache and rerun the resolution family with decoder rows in place of the
 difference-of-means direction. That single experiment converts "a schedule beats a
 level" into a statement about dictionaries, which is the claim the wider project needs.
