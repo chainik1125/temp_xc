@@ -1,0 +1,339 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k": 6,
+  "frac": 0.35,
+  "base_norm": 56.81203977401333,
+  "cells": {
+    "alternating_W1": {
+      "steered_acc": 0.75,
+      "steered_sem": 0.09933992677987828,
+      "unsteered_acc": 0.37000000000000005,
+      "unsteered_sem": 0.03913539251583432,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 1,
+          "text": " She reads the letter slowly. 1. She reads the letter slowly. 2. Nous attendons sous la vieille horloge. 3."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 1,
+          "text": "1. Il ach\u00e8te du pain chaque matin. (negative form)\nHe doesn't buy bread every morning.\nIl ne ach\u00e8te pas du pain chaque matin. 2. Il ne mange pas de pain tous les jours.\nHe doesn't eat bread every day.\n"
+        }
+      ]
+    },
+    "alternating_W2": {
+      "steered_acc": 0.75,
+      "steered_sem": 0.06786208925382961,
+      "unsteered_acc": 0.5625,
+      "unsteered_sem": 0.05089656694037221,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 2,
+          "text": " \"The lamp flicks in the night,\" she says.  \"Ville\" means \"ville\" in la langue de george.  \"Ville\" means \"city\" in French.  \"La\" means \"The\" in French.  \"Nuit\" means \"night\" in French.  \"Ville\" means \"city\" in Quebec French."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 2,
+          "text": "1965. The year that brought the world a major achievement, a major loss, and a major shift in the way we view the world. 1965 was also the year that the Beatles recorded \"Yesterday\", their second greatest hit. As is the case with all good records, \"Yesterday\" was a product of circumstance. The song "
+        }
+      ]
+    },
+    "alternating_W3": {
+      "steered_acc": 0.7666666666666666,
+      "steered_sem": 0.06882472016116853,
+      "unsteered_acc": 0.4833333333333333,
+      "unsteered_sem": 0.07443746148623433,
+      "mean_sents": 5.55,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 3,
+          "text": "1. The market opens at nine. Le chat dort sur le canap\u00e9. 2. The cat is sleeping on the sofa. What does the second sentence tell us about the time of day? To determine what the second sentence tells us about the time of day, let's analyze the information step by step:\n\n1."
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 3,
+          "text": " She is very busy. \n\nWhat est-ce que l'on voit dans cette phrase ?\n\nThe answer is:\n\nThe phrase describes a scene where someone is reading a letter slowly, the professor is writing on the blackboard, and the person is very busy. The first sentence, \"She reads the letter slowly,\" indicates that the pe"
+        }
+      ]
+    },
+    "alternating_W4": {
+      "steered_acc": 0.8625,
+      "steered_sem": 0.04243803532334246,
+      "unsteered_acc": 0.575,
+      "unsteered_sem": 0.05471216549024155,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": " So, it's a factual statement. 1) 1) True. 2) False. 3) Il fait beau vendredi prochain. (It will be sunny on Friday next week.) This is a French sentence."
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": " They have to be at the station tomorrow.  Je ne vais pas au cin\u00e9ma ce soir.  I have to go to the station tomorrow.  Je vais bien.  I am well.  Il pleut."
+        }
+      ]
+    },
+    "alternating_W6": {
+      "steered_acc": 0.7083333333333333,
+      "steered_sem": 0.05253097109302862,
+      "unsteered_acc": null,
+      "unsteered_sem": null,
+      "mean_sents": 5.75,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 6,
+          "text": "10h00. 10h08. 10h10. 10h13. 10h15. 10h17."
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 6,
+          "text": "1. They walk along the river. 2. The soup is still warm. 3. They walk along the river. 4."
+        }
+      ]
+    },
+    "random_W1": {
+      "steered_acc": 0.75,
+      "steered_sem": 0.09933992677987828,
+      "unsteered_acc": 0.39,
+      "unsteered_sem": 0.033950428258673976,
+      "mean_sents": 5.75,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 1,
+          "text": "2. The soup is still warm. The train is arriving tonight. 3. The soup is still warm. The train arrived last night. Which of these sentences is grammatically correct in French?"
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 1,
+          "text": " The woman is looking at the clock.  \nThe woman is not looking at the clock.  What is the color of the roses?\nTo determine the color of the roses, let's analyze the given statements step by step.\n\n1. The garden smells of roses.\n2. The train arrives tonight.\n"
+        }
+      ]
+    },
+    "random_W2": {
+      "steered_acc": 0.8,
+      "steered_sem": 0.07608859102526822,
+      "unsteered_acc": 0.475,
+      "unsteered_sem": 0.04405439221785055,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            0,
+            1
+          ],
+          "W": 2,
+          "text": "1000\u20ac pour 1000kg de tabac.\nThey marchent sur la rivi\u00e8re. Le chat dort sur le canap\u00e9. 1000\u20ac pour 1000kg de tabac.\nThey walk along the river. Le chat is sleeping on the couch."
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 2,
+          "text": " The first sentence tells us that the train arrives this evening, the second tells us that the person buys bread every morning.  The phrase \"ach\u00e8te\" means acheter in fran\u00e7ais, acheter \u00e9tant le verbe de la possession.  Elle ach\u00e8te donc du pain chaque matin.  The subject of the sentence is \"elle\" (her"
+        }
+      ]
+    },
+    "random_W3": {
+      "steered_acc": 0.85,
+      "steered_sem": 0.0450795268685249,
+      "unsteered_acc": 0.4333333333333333,
+      "unsteered_sem": 0.05461186812727501,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          "W": 3,
+          "text": " Elle se sentait un peu fatigu\u00e9e. Elle took a deep breath and opened the letter slowly. She felt a bit tired. Elle avait besoin de repos. Elle needed rest. Elle se promenait dans le jardin."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 3,
+          "text": "15 minutes en dehors du horaire est interdit.\n\nFinal draft.\nHe buys bread every morning. The market opens at nine o'clock. It is forbidden to be more than fifteen minutes late. \n\n1."
+        }
+      ]
+    },
+    "random_W4": {
+      "steered_acc": 0.8,
+      "steered_sem": 0.06930102148559839,
+      "unsteered_acc": 0.45,
+      "unsteered_sem": 0.08029550685469662,
+      "mean_sents": 5.75,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 4,
+          "text": "4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            1,
+            0
+          ],
+          "W": 4,
+          "text": "100% of the above sentences are in French. How many more letters are there in the second sentence than the first? 1\n\n## R\u00e9solution\n\nLa premi\u00e8re phrase a 22 lettres. La seconde phrase a 20 lettres. Donc, il y a 22 - 20 = 2 plus de lettres dans la deuxi\u00e8me phrase que dans la premi\u00e8re.\nThe first senten"
+        }
+      ]
+    },
+    "random_W6": {
+      "steered_acc": 0.9166666666666666,
+      "steered_sem": 0.046042187621090205,
+      "unsteered_acc": null,
+      "unsteered_sem": null,
+      "mean_sents": 6.0,
+      "samples": [
+        {
+          "profile": [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1
+          ],
+          "W": 6,
+          "text": " No one knows who killed the woman. The police have ruled out all possibilities, but the man they interroged was in a car with the murderer, and he was convicted of the crime. The witness, who was at the scene of the murder, says that the killer was wearing a white shirt. Someone doit le tuer. (Who "
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            1
+          ],
+          "W": 6,
+          "text": "1967. This is my first day in a new city, and I feel a sense of excitement and anticipation. I open le chat, le chat le chat d'la casa, and la casa est tres chouette. My new apartment is really quite nice. I admire son fr\u00e8re, son fr\u00e8re est superbe. Mon fr\u00e8re est gentil et gentillement, la vie est tr"
+        }
+      ]
+    }
+  }
+}

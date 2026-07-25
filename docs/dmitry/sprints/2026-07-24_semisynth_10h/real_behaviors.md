@@ -457,6 +457,230 @@ and is already validated. Second risk, in the same family: the DoM direction tur
 be apology-style rather than refusal, defused by the disjoint A/B banks and the
 `cos(u, u_arditi)` check above.
 
+### Scoring the generation mode objectively (applies to #1 and the fallback)
+
+A refusal-marker regex is the obvious classifier and it has one silent failure that would
+invalidate the whole generation-mode result: **a binary matcher maps every unmatched
+sentence to "comply".** Steering degrades fluency, and it degrades it *unequally across
+arms*, so an arm that produces more off-distribution text gets more unmatched sentences,
+all scored as comply — and since the profile is balanced, that pushes its accuracy toward
+0.5 for reasons having nothing to do with the schedule. Fix first, before any other
+refinement: make the classifier **three-way** (`refuse` / `comply` / `unparsed`) and
+**report per-arm coverage** alongside accuracy. If coverage differs across arms, the
+accuracy comparison is confounded and must be reported on the matched-coverage subset.
+
+A ladder of three scorers, cheapest first, none requiring an external judge:
+
+1. **High-precision markers, three-way.** Keep the 16-phrase list but only as the
+   `refuse` detector; add a *separate* positive list for `comply` (imperative openers,
+   second-person procedural verbs). Anything matching neither or both is `unparsed`.
+   Expect high precision, mediocre recall — that is fine, because coverage is now reported.
+2. **Forced-choice logprob on the same model, in a clean forward pass.** Score
+   `log P(" decline" | "Sentence: <s>\nIs the speaker helping or declining? Answer: the
+   speaker is")` against `log P(" helping" | …)`. One extra forward pass per sentence, no
+   API, no second model. **Two mandatory guards:** the pass must run with the steering hook
+   *removed* (otherwise the classifier reads our own write and the result is circular), and
+   the classifier must be calibrated on the held-out bank-B sentences with its accuracy on
+   known labels reported — if it is below ~95% on clean bank text, do not use it.
+3. **Menu-constrained generation — the objective backstop.** Instead of free-generating,
+   at each segment boundary score the two held-out candidate continuations (one refuse, one
+   comply, both from bank B) under the current steered state and take the argmax. Per-slot
+   accuracy is then measured with *zero classifier error*. This is a weaker behavioral
+   claim than free generation (the model picks from a menu rather than composing), but it
+   is unimpeachable, it costs almost nothing, and it is the right thing to report if the
+   free-generation classifier turns out shaky. Report both when they agree.
+
+Use an external judge only on the disagreements between (1) and (2), which should be a
+small minority and keeps the judge cost negligible.
+
+### Fallback spec for #3 — emotional de-escalation (`deesc_profile`)
+
+To be run only if the stance pre-check fails, i.e. if `P(comply at t | refuse at t−1)` is
+below ~0.15 and staged refusal turns out to be attractor-dominated. Intensity has far
+weaker self-consistency than refusal — a calm sentence after a tense one is unremarkable
+prose, whereas a complying sentence after a refusal is a contradiction — which is exactly
+why this is the safe fallback. It is also the class already validated in our harness
+(`int_profile` +12.5 vs +0.9 broadcast, `alt_phase` +21.6 vs −9.3, `mirror` +7.8 vs −3.3).
+
+**Upgrade over `int_profile`: make the attribute graded, not binary.** Five intensity
+levels rather than calm/tense, which buys three things — a real waveform instead of a sign
+pattern, an *ordinal* metric (rank correlation) that is more sensitive than binary
+accuracy, and the ability to demonstrate **amplitude** control rather than only sign
+scheduling. The steering coefficient becomes `s_t = (level_t − 3)/2 ∈ {−1, −0.5, 0, +0.5,
++1}`.
+
+**The behavior, stated as a practitioner would.** An assistant handling an agitated user
+should bring its own register *down* over the exchange regardless of where it started. The
+target is a descending ramp `[5,4,3,2,1]`; the multiset-matched foil is the ascending ramp
+`[1,2,3,4,5]` — the same five sentences in reverse order, so every bag statistic is
+identical and only the direction of travel differs. A second contrast worth running is
+`mirror`-style (`[1,3,5,3,1]` vs `[5,3,1,3,5]`) which removes even the global slope.
+
+**Banks (template-generated, no distressing content).** The segments are the *assistant's*
+own sentences, graded purely by urgency of register — there is no crisis content to
+generate, which keeps the whole dataset innocuous:
+
+- L5: "This needs to be dealt with right now." / "We have to move on this immediately."
+- L4: "This is worth treating as urgent." / "I'd act on this today."
+- L3: "It's worth looking at soon." / "This deserves attention."
+- L2: "There's time to think it over." / "No need to decide this today."
+- L1: "There's no rush at all; we can take this slowly." / "Let's sit with it for a while."
+
+Twelve sentences per level, split into disjoint halves A (trains the direction) and B
+(eval), same discipline as #1. Carrier = a chat-templated user turn expressing ordinary
+time pressure, plus the assistant turn opening.
+
+**Direction.** `u = unit(mean(seg | L∈{4,5}) − mean(seg | L∈{1,2}))` from bank A, L3
+excluded so the contrast is clean. Also record the per-level segment means to check the
+attribute is genuinely *ordinal* in activation space — project each level's mean onto `u`
+and confirm monotonicity. If the projections are not monotone in level, collapse to binary
+and fall back to the validated `int_profile` construction rather than inventing a graded
+claim the model does not support.
+
+**Arms and metrics.** Identical to #1 — template writes `m·s_t·u`, broadcast writes `m·u`
+everywhere, single writes at one segment, plus the matched-magnitude random-direction
+template. Teacher-forced diff-in-diff margin against the reversed-ramp foil, `n_eval = 32`,
+with the same W-sweep on top.
+
+**Objective classifier, no LLM judge — this is the part you asked about.** Use
+menu-constrained generation and score it *ordinally*: at each segment boundary, score all
+five held-out bank-B candidates (one per level) and take the argmax level. The metric is
+**Spearman ρ between the chosen level sequence and the intended profile**, which is fully
+objective, has zero classifier error, and is strictly more informative than binary accuracy
+because it credits partial ordering. Chance is ρ = 0. As a free-generation secondary, build
+an **arousal lexicon from bank A only** (the high- and low-intensity marker words are known
+because we wrote the banks), score each generated sentence by its lexicon differential, and
+report the lexicon's own accuracy on held-out bank B before trusting it on generated text.
+The bank-A/bank-B split is what makes the lexicon fair rather than circular.
+
+**Expected direction.** Same shape as every trajectory task so far: template growing in
+`k`, broadcast at or slightly below zero, single decaying as `1/k` in share. The specific
+prediction that makes this a *de-escalation* result rather than a generic one: the
+descending-ramp target should be steerable to a significantly negative Spearman ρ under a
+sign-flipped schedule, i.e. we can drive the assistant's register *up* as well as down,
+which is the control a practitioner would actually want to verify before trusting the
+handle.
+
+### What the segment-level direction is, and what to call it
+
+Measured: `cos(u_stance, u_prompt_refusal) = +0.108`. Two readings compete — a genuinely
+different construct, or apology-style wearing a refusal label. The number alone does not
+settle it, but it constrains the answer more than it first appears.
+
+**The right null is not a random vector.** At `d = 1536` (Qwen-2.5-1.5B) the standard
+deviation of the cosine between two random unit vectors is `1/√d ≈ 0.026`, so 0.108 is
+about 4σ; at `d = 3584` (7B) it is about 6σ. So these directions are *not* orthogonal in
+any statistical sense — but residual streams are strongly anisotropic, and two
+difference-of-means directions built by the same procedure over the same corpus share a
+common mean component that inflates all such cosines. **The honest null is the cosine
+between `u_stance` and an unrelated DoM direction constructed identically** — build a
+formality or topic direction from the same banks and report `cos(u_stance, u_unrelated)`.
+If that is also ≈ 0.1, then 0.108 means nothing; if it is ≈ 0.02, then 0.108 is a real
+weak relationship. This costs one extra bank and no GPU time and should be in the table.
+
+**The framing I would defend to a reviewer:** *the segment-level direction is a
+within-response declination stance — it separates sentences that decline from sentences
+that help — and it is a different object from the prompt-level refusal direction, which is
+a decision variable about the request rather than a property of the text being produced.
+We report their cosine (0.108) rather than assuming identity, and we name the direction
+for what it was fit on.* Renaming from "refusal direction" to "declination stance
+direction" costs nothing, is accurate, and removes the only sentence a reviewer could
+call overclaimed. It is also consistent with the construction→collapse result we already
+cite (Doda, arXiv:2605.12726): if the refusal decision is built across the prompt and is
+attenuated by the terminal token, the prompt-level object and the response-level object
+should not be the same vector.
+
+**The cheap check that discriminates the two readings — a 2×2 crossing.** Build four small
+sentence banks: apologetic refusal ("I'm sorry, I can't help with that"), blunt refusal
+("No. That's not something I'll do."), apologetic compliance ("Sorry this is tedious — start
+with the second bolt."), blunt compliance ("Start with the second bolt."). Project the four
+cell means onto `u_stance` and decompose:
+
+- If `u_stance` is a **stance** direction, the *declination* main effect dominates —
+  {apologetic refusal, blunt refusal} separate from {apologetic compliance, blunt
+  compliance}.
+- If `u_stance` is an **apology-register** direction, the *politeness* main effect
+  dominates instead, splitting the cells the other way.
+
+Report the ratio of the two main effects. Above ~3:1 in favour of declination, the name is
+earned. This is four banks of eight sentences and one forward pass each — minutes, no
+steering, no judge. It also yields `u_apology` for free, so you can report
+`cos(u_stance, u_apology)` next to `cos(u_stance, u_prompt_refusal)`; if the apology cosine
+is much the larger, that is the finding and the task should be renamed rather than defended.
+
+One thing worth saying plainly in the write-up either way: the sprint's claim is about the
+**handle** (a schedule beats a level), not about the depth of the attribute. A shallow but
+real per-segment attribute is sufficient for that claim, and the random-direction arm
+sitting at ≈ 0 already establishes that the effect is not generic perturbation.
+
+### What convexity in `W` needs before it can be a headline
+
+Reported: at `k = 8, m = 1`, the fraction of the additive prediction achieved is 57% / 77%
+/ 60% / 100% for `W = 1 / 2 / 4 / 8`.
+
+**First, the honest problem: that sequence is not monotone.** 77% at `W = 2` followed by
+60% at `W = 4` is inconsistent with any smooth "reach buys efficiency" mechanism, and the
+`W = 8` point is 100% *by construction* — the additive line is calibrated to `Δ_full`, so
+the right end is not a measurement. The claim as it stands rests on two interior points,
+one of which moves the wrong way. Before this is a headline it needs bootstrap CIs on the
+*ratio* (not just on Δ), and the first thing to check is a plumbing explanation for the
+`W = 4` dip: **report realized mean coverage per `W`.** If rotated blocks clip at the
+sequence edge rather than wrapping, a `W = 4` block covers fewer than 4 segments on average
+while `W = 2` rarely clips — which would produce exactly this dip and is a bug, not a
+mechanism.
+
+**The control I would demand above all others: the per-position marginal decomposition.**
+Steer each segment alone, `t = 1 … k`, giving marginals `Δ_t` (k extra runs at `k = 8` —
+trivial). Then define the superadditivity index for a block `B`:
+
+`S(B) = Δ(B) − Σ_{t ∈ B} Δ_t`
+
+Convexity is real if and only if `S > 0` significantly. This is strictly better than
+comparing against a fitted global line because it subtracts each block's *own* constituent
+positions, so it is immune to per-segment direction heterogeneity and to position bias by
+construction — the two mundane alternatives you named are both differenced away. It also
+converts the claim into a functional form that can be falsified: if the mechanism is
+"a knob spanning a boundary writes a coherent transition", then `S` should scale with the
+number of *internal boundaries* covered, `W − 1`, not with `W`. Fitting `S` against both
+and reporting which wins is a much stronger result than a percentage-of-line table.
+
+**The mechanism-positive test: scramble the schedule inside the block.** A span-`W` knob
+that writes a *permuted* internal schedule keeps coverage, contiguity and total injected
+norm identical, and loses only the correctness of the transition. If `S` collapses under
+internal permutation, the coherent-transition account is supported directly; if `S`
+survives, contiguity is doing something other than writing a transition and the account
+needs rewriting. This is the cheapest experiment that could *falsify* your preferred
+explanation, which is why it is worth more than another confirmation.
+
+**Two smaller ones.** (i) Convexity must hold at *every* magnitude, not only at each arm's
+own peak — comparing per-arm optima conflates span with magnitude tuning, so plot the full
+`Δ(W, frac)` surface. (ii) State the effect in units a reviewer cannot dismiss as "a bigger
+hammer": a span-`W` knob at fixed `frac` injects `W ×` the total norm of a span-1 knob, so
+report **Δ per unit injected norm as a function of `W`**. If efficiency-per-norm rises with
+span, that is the claim, and it is immune to the objection that wider simply means more.
+
+On your existing contiguous-vs-scattered run: make sure the two conditions are matched on
+the *multiset of covered positions*, not merely on how many are covered. A contiguous block
+and a scattered set of the same size generally sample different positions, and with
+position-dependent marginals that difference alone can produce the whole effect.
+
+### Why a practitioner should want a `W > 1` handle (framing for `summary.md`)
+
+Safety controls in a deployed model are usually described as switches, but the thing an
+operator actually wants is almost never a switch — it is a schedule. The useful refusal
+control is not "refuse everything", it is "answer the safe part of this request and decline
+the specific step that crosses the line", or "notice by the fourth turn that the third turn
+already went too far, and pull back from there". A control that acts at a single position
+can only set a *level*: it makes the model more refusing, or calmer, or more cautious,
+everywhere at once — which costs helpfulness on the parts that were fine and is precisely
+the wrong instruction on the parts that needed the opposite. A control that spans `W`
+positions can set a *shape*, and shape is what these situations are made of, because the
+safe and unsafe parts of a request are typically built from the same material and differ
+only in arrangement. That last point is why this is not a matter of degree: on any target
+where the good and bad versions are the same ingredients in a different order, a
+level-setting control is not merely weaker than a shaped one, it is inert — and our
+measurements show the shaped control keeps getting better the further it can reach.
+
 ### Citation confidence ledger
 
 - **Confirmed tonight (title + arXiv URL in search results, not fetched in full):**
