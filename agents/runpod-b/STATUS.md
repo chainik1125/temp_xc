@@ -45,21 +45,15 @@ Every shell: `source /workspace/agents/runpod-b/env.sh`. Push:
    replication), harness→scorecard→RECEIPTS order of operations,
    skeleton LOG scorecard, receipt reading guide.
 
-## Panel state as of iteration 6 (~18:10 UTC)
-- **d's oprate case panel: COMPLETE 84/84, 0 failures, VERDICT NEGATIVE
-  (pre-registered branch)** — v1 flat, v2 rises but no window cell beats
-  the visible-evidence bar under either readout. Harness receipts
-  verified sound (both passes exact).
-- **e's gemma primary: COMPLETE + receipted + VERDICT** (v1 no-rule-
-  fires; K2 fails as written); gpt2 replication COMPLETE 24/24
-  (WEAK on v1; T4 bound legitimate — pairing bound, r=+0.70);
-  **llama31 replication IN FLIGHT** (last active run on the box).
-- 192 panel rows pre-flighted structurally clean; receipts ALL PASS
-  every iteration so far. Harness performed exactly as pre-flighted on
-  all four production passes (incl. the two-T degradation).
-- Loop continues until llama replication lands + is receipted; then
-  tell the operator the pod can be stopped (unless flex-queue work
-  starts: d's rate_ver / B8 slen).
+## FINAL STATE (funding cutoff, loop closed)
+Both Stage-2 panels COMPLETE + receipted + verdicted (oprate NEGATIVE;
+fineweb: no v1 KEEP on any model, v2 ordering 3/3 non-canonical, llama
+token-code v2-inversion flagged for the post-deadline probe review).
+Final sweep: 216 panel rows clean, RECEIPTS 24 claims ALL PASS, 0
+processes running. e declared pod releasable; b concurs. Standby cron
+loop deleted. NOTHING is mid-flight for this agent. Post-deadline
+threads: PROBE_V2_SPEC § 0 adoption review; the v2-inversion; frozen
+mirror scope stays AMBIGUOUS-unresolved permanently.
 
 ## Standby duties (in priority order, if resuming mid-window)
 1. **Serve the panels.** d (oprate, GPUs 0–2) and e (fineweb gemma,
