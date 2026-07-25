@@ -256,3 +256,42 @@ the readable column there (v1's n = 1024 < p at T = 32).
 
 License note: fineweb is ODC-By; the corpus receipt travels with any
 graduating figure.
+
+---
+
+## APPENDIX A (2026-07-25, force majeure) — A40 restart; design unchanged
+
+Appended at restart, before any restarted cell (git order is the
+evidence). The original H100 run's cells were UNPUSHED and died with
+the pod (`briefings/a40-bootstrap.md`; LOG force-majeure entry). This
+card is NOT re-frozen — the design above runs exactly as written. What
+changes is venue and execution only:
+
+- **Venue:** 3× A40 (GPUs 3–5 of a shared interim 6×A40 pod),
+  ephemeral storage, ~12 funded hours from restart.
+- **Cache rebuild receipt:** `tokens.npz` rebuilt via the frozen
+  `replag.build_labels.tokenize_model` — 5985×128, grid 766,080
+  tokens (= § 4 `buffer_tokens` exactly), all 5,985 rows byte-equal to
+  the committed `punctint_fineweb_gemma2.npz` stream; hs sweep via
+  `replag.cache_acts` unchanged; the datasource's per-row alignment
+  assertion at materialise is the gate before any cell.
+- **Execution:** the frozen `_cells()` list (order included) is
+  sharded round-robin across the three A40s as three single-GPU pools
+  (the trainer is single-device; the H100 original pooled workers on
+  one card). tsae trained cells lead every shard, preserving § 4
+  scheduling. Shard dumps merge into § 4's results path in frozen
+  cell-list order; leaderboard rows go through the canonical runner
+  as always.
+- **§ 3 first-cell timing clause, A40-scaled:** A40 ≈ 2–3× slower per
+  cell than the H100 the ~6 h projection was written for. The clause
+  is re-read against the funded window: the gpt2 fallback fires if
+  first-cell timing projects the gemma panel past ~hour 8 of the
+  12-hour funding clock (protecting a COMPLETE panel + receipts per
+  the bootstrap's triage), with the measured numbers stated in the
+  amendment if it fires.
+- **Probe columns:** unchanged (§ 4), and the λ-readout METHODS
+  DECISION taken in the LOG (2026-07-25) binds the reporting: v1
+  canonical, paired v2 reported, never quoted as canonical.
+- The dialevel recency pre-flight (queue item 7) is CANCELLED for
+  this funding window per the bootstrap; queue items 5–6 run only
+  after the gemma panel + receipts are pushed.

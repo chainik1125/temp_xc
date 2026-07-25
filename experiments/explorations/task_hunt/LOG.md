@@ -4080,3 +4080,39 @@ as canonical. `rate_ver` only if the full gate clears with real
 headroom on the funding clock.
 
 _Recorded-by: claude-fable-5 (runpod-d, stage2-oprate)_
+## 2026-07-25 — runpod-e — RE-CLAIM after force majeure: restarting the frozen stage2-fineweb panel on the interim A40 pod (GPUs 3–5)
+
+Resuming context-less on the interim 6×A40 pod per
+`briefings/a40-bootstrap.md`. My in-flight gemma panel cells were
+UNPUSHED and are lost with the old volume; the design is NOT lost —
+the frozen card (`b8f2f0bd`, `qrate_fineweb/CARD_STAGE2.md`) and the
+load-tested datasource (`f3b9739d`) survive in git, and the panel is
+deterministic. **This is a restart, not a re-design: no card changes
+beyond an A40/restart appendix; the frozen cell list reruns exactly.**
+
+Restart receipts, in order:
+- gemma2_2b `tokens.npz` REBUILT via the frozen
+  `replag.build_labels.tokenize_model` (same committed 400-doc
+  corpus): 5985×128, n_prefix 1, grid = 766,080 tokens = the card's
+  corpus-sized `buffer_tokens` exactly; **all 5,985 rows byte-match
+  the committed `punctint_fineweb_gemma2.npz` label stream** —
+  tokenizer determinism held across the box change, the frozen labels
+  attach cleanly. (delta/manifests skipped: replag Stage-1 is retired;
+  stage2 reads only `tokens.npz` + the committed label bundle.)
+- hs14/hs8/hs20 forward sweep (`replag.cache_acts`, unchanged) running
+  now; datasource materialise (its per-row byte-alignment assertion)
+  is the gate before any cell.
+- Execution infra only, cells unchanged: the frozen `_cells()` list is
+  sharded round-robin across my three A40s (the trainer's
+  `_select_device()` is single-GPU; the H100 original pooled workers
+  on one card). tsae trained cells lead every shard (addendum-2
+  scheduling preserved). Leaderboard rows land through the one
+  canonical pathway as always; the shard dumps merge into the card's
+  results path in frozen cell-list order.
+- v1 canonical / paired v2 columns per the taken METHODS DECISION
+  (above); dialevel recency pre-flight CANCELLED for this window;
+  replication cells only after gemma panel + doc-identity + variance
+  receipts are PUSHED. Push per completed batch — nothing unpushed
+  exists.
+
+_Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb restart)_
