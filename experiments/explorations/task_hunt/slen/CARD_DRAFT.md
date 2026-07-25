@@ -107,5 +107,39 @@ tokens across 3 models). Sentence-unit kernel at the upper ladder for
 
 ## 7. Verdict appendix
 
-*(appended by the builder run — triage numbers with CIs, face
-correlations, censuses; then by the screening agent.)*
+*Build verdict (runpod, 2026-07-25):* **SHIPPED — no frozen bar fires
+on either variant, any face, any tokenizer.** Operative numbers = 4k
+artifact, manifest rows, **3,200 train docs** (400-doc variant quoted
+beside them per the estimator convention, **320 train docs**); every
+range is min–max across the three tokenizers; 1,000-rep doc-level
+bootstrap CIs live in the stats JSONs.
+
+| face | unigram (4k man.) | unigram (400 man.) | position (4k man.) | doc_mean_only (4k) |
+|---|---|---|---|---|
+| `lat` | 0.563–0.568 | 0.541–0.549 | 0.508–0.511 | 0.746–0.749 |
+| `lev` | 0.588–0.592 | 0.558–0.565 | 0.514–0.516 | 0.879–0.882 |
+| `disp` | 0.518–0.522 | 0.519–0.522 | 0.499–0.504 | 0.803–0.804 |
+
+- **`disp` is near-blind at BOTH scales** (unigram ≈ 0.52, stable
+  from 320 → 3,200 train docs) — the strongest axis-b posture in the
+  broad factory, and the most independent face (corr −0.14/−0.19 with
+  lat/lev; |corr| ≤ 0.08 vs `lam_q`, ≤ 0.16 vs `lam_list`).
+- `lat`/`lev` sit in the 0.55–0.65 disclosure band at 4k; their
+  400-doc readings are lower — the estimator finding replicating
+  in-bundle, which is why both training sizes are quoted.
+- Position clean on manifests (0.499–0.516). All-eligible-row
+  position for `lev` is 0.629–0.633 — below bar but DISCLOSED:
+  screens use manifest rows.
+- doc_mean_only all below punctint q's 0.901; the within-document
+  contrast obligation stands and is well-supplied: at ≥ 20 manifest
+  rows/class the 4k test split holds **219 (lat) / 114 (lev) /
+  156 (disp)** documents, and the cache-aligned 400 variant holds
+  **71 (lat)** test documents (~9× the 8 punctint-list rested on).
+- Prefix receipts PASS ×3 tokenizers: the 400 variant is
+  token-IDENTICAL to the cached corpus (**zero new caching to screen
+  it**); the 4k variant needs ~7.0–7.1M new tokens per model.
+- corr(lat, lev) = **0.761** — expected (same stream; the ladder is
+  the point). A screen treats the three faces as one bundle with one
+  pre-registered prediction set (§ 5), not three discoveries.
+- Binning came out plain terciles on every face (no zero-inflation),
+  manifests at the 100k/class cap with supported ceilings ≥ 1.98M.

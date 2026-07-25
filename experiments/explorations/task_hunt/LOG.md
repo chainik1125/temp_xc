@@ -3881,3 +3881,40 @@ scaling the corpus bought breadth at the cost of per-document depth
 at fixed cap. Strictly non-blocking both directions.
 
 _Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_
+
+## 2026-07-25 — runpod — B8 `slen` SHIPPED (the recency ladder, ledger r3): no frozen bar fires at either scale; `disp` is the broad factory's cleanest triage; the pre-registered shuffle ladder is live
+
+Bundle: `slen{400,4k}_fineweb_<tok>.npz` + stats (builder + frozen
+`slen_lib` + 7 tests + card committed BEFORE the run at `e9e560af`).
+One exact value stream — x = ln(sentence word count) — three faces
+differing ONLY in temporal weighting: `lat` (previous sentence's x —
+a pure latch, the recency face the broad-3 addendum called for,
+PRIMARY), `lev` (HL-2/support-8 trailing mean, P6 absorbed), `disp`
+(trailing kernel std — the program's first second-moment face; kernel
+ESS 5.1 of 8 disclosed). Card §5 pre-registers the within-window
+shuffle ladder **lat > lev > disp ≈ 0** — three testable predictions
+that would turn runpod-e's recency/distance-to-anchor hypothesis into
+a measured pattern on a substrate with dialevel's doc-length confound
+designed out (doc length is pull-fixed, not label-coupled).
+
+**Triage: SHIPPED clean.** Manifest rows, direction-agnostic,
+min–max over 3 tokenizers, training size quoted per the convention:
+`disp` unigram **0.518–0.522 at 4k AND 0.519–0.522 at 400** —
+near-blind and SCALE-STABLE (the one face in the broad factory whose
+unigram number does not move from 320 to 3,200 train docs); `lat`
+0.563–0.568 (4k) / 0.541–0.549 (400); `lev` 0.588–0.592 (4k) /
+0.558–0.565 (400) — disclosure band, and the 400→4k rise replicates
+the estimator finding in-bundle. Position 0.499–0.516 on every
+manifest. doc_mean_only 0.746 (lat) / 0.803 (disp) / 0.881 (lev),
+all below punctint q's 0.901; within-doc contrast well-supplied:
+≥ 20 manifest rows/class in **219/114/156** 4k test docs
+(lat/lev/disp) and **71** in the 400 variant's lat (punctint-list
+rested on 8). Independence receipts: |corr| vs punctint faces
+≤ 0.16; corr(lat, disp) = −0.14; corr(lat, lev) = 0.761 disclosed —
+one bundle, one prediction set, not three discoveries. Prefix
+receipts PASS ×3: the 400 variant is token-IDENTICAL to the cached
+corpus (zero new caching to screen); 4k needs ~7.0–7.1M new
+tokens/model. All-eligible position for `lev` is 0.629–0.633,
+disclosed; screens use manifest rows.
+
+_Recorded-by: claude-fable-5 (runpod, candidate-factory-broad-3)_
