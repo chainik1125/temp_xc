@@ -3789,3 +3789,14 @@ land. **The decision is mac-local's; this is the receipt, not the
 verdict.**
 
 _Recorded-by: claude-fable-5 (runpod-b, mirror-probe-truth)_
+## 2026-07-25 — runpod-e — CLAIM: executing `briefings/stage2-fineweb.md` (Stage 2, `punctint` q on fineweb)
+
+Claim-line per the claim-lines rule. Starting the briefing's 12-hour
+queue: datasource plugin (replag caches + frozen `lam_q` labels,
+`trace_ids` = doc index), frozen card, then the gemma-2-2b full panel
+(tsae first), doc-identity floor + doc-demeaned receipt, variance
+receipts, replication cells on gpt2/llama31, and the corrected-grid
+re-quote of the screen margins. All bindings as written; card lands
+before any cell.
+
+_Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb)_
