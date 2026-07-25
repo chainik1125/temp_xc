@@ -37,13 +37,19 @@ v1 — the taken methods decision; realized-l0 band [5.0, 8.25];
 untrained post must realize exactly 8.00 ±0.02 or post arm VOID;
 evidence-line analog is the latent-state bar).
 
-**Running now (started ≈ 12:47 UTC):**
+**Running now (Pool A ≈ 12:47 UTC; Pool B relaunched as shards
+≈ 13:20 UTC):**
 - Pool A (GPU 1): `run_stage2 4 ward_real_oprate_case_base_l12
   only-tsae` — 6 cells, 3 trained tsae are multi-hour CPU-bound
   (SequenceBuffer clones ~2.1 GB per step — structural; buffer_tokens
   does NOT touch it; scheduled first per addendum; panel reportable as
   partial-with-tsae-pending if needed).
-- Pool B (GPU 0): `run_stage2 5 ... skip-tsae` — 78 cells.
+- Pool B = TWO shards after a 44 GB OOM at 5 workers (v2 eval peaks
+  ≈ 12.7 GB/worker; one stacked/T2/s1 trained cell failed and simply
+  reruns): `skip-tsae:0/2` 3 workers GPU 0 + `skip-tsae:1/2` 3 workers
+  GPU 2, both with PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True.
+  Scheduling-only amendment, committed; cell content byte-identical.
+  Old aborted transcript kept as `...__skip-tsae.json.aborted`.
 - Results append to `oprate/results/stage2_..__{only,skip}-tsae.json`
   (separate files so pools can't clobber; leaderboard.jsonl is
   canonical). A Monitor polls counts/failures every 2 min.
