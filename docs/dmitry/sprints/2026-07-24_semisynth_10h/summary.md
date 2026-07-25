@@ -55,13 +55,32 @@ of the thing being controlled.**
 **3. It transfers to a safety-relevant behaviour: staged refusal.** Steering the
 refuse/comply order *within a single response* — mid-response recovery, where the
 target and foil contain the same sentences reordered — the scheduled handle moves the
-model's own choice the intended way on **96.9%** of slots against **51.2%** for the
-same direction written at constant strength (chance 50%). A random direction at
-matched magnitude does nothing at any length.
+model's own choice the intended way on **96.9%** of slots, against **51.2%** for the
+same direction written at constant strength. The constant write's 51.2% is its
+expected value rather than a malfunction: it pushes every slot toward declining, so it
+is right on exactly the half of the slots that were meant to decline. That is the whole
+of the claim in one number — a level is right about half the time on a target made of
+both halves, and a schedule is right almost always. A random direction at matched
+magnitude does nothing at any length, and the teacher-forced margin tells the same
+story (+20.7 → +28.6 for the schedule across k = 2…8, against ≈0 for the constant
+write).
 
 - ![stance](../../../../plots/2026-07-24_trajectory_steering/stance.png)
 
-**4. The effect is the order, not the mass.** Permuting the schedule *inside* a block
+**4. Steering a wide enough prefix makes the model carry the pattern on unaided —
+once the prefix is wide enough to reveal it.** Steer only the first W of six
+sentences, release, and score the *unsteered* tail against the analytic null for that
+profile family. For a period-2 profile the tail sits at its null through W=2 and jumps
+at **W=3** (+0.208 ± 0.045, t = 4.6; +0.221 ± 0.058 at W=4) — exactly the predicted
+threshold W\* = ℓ+1, the width at which the first flip becomes visible and the period
+becomes knowable. The two unpredictable families stay at their nulls at every width
+(|t| ≤ 1.3), which is the check that this is inference from the pattern rather than a
+scoring artefact. The alternating profile is the honest blemish: its excess appears at
+W=3 instead of the predicted W=2 and reverses at W=4.
+
+- ![entrainment](../../../../plots/2026-07-24_trajectory_steering/entrainment.png)
+
+**5. The effect is the order, not the mass.** Permuting the schedule *inside* a block
 — identical coverage, contiguity and injected norm, only the arrangement changed —
 collapses the effect from +29.0 to −2.3 (W=4) and +55.3 to −1.2 (W=8). Two claims we
 started with did not survive their own controls, and we report the corrected versions:
@@ -140,28 +159,34 @@ ourselves.
   constant write stays at zero — and it is what we claim.
 - **"Performance improves with window size" (first version) → coverage.** Writing m
   consecutive blocks of width W occupies one contiguous span of mW segments, so that
-  grid varied coverage, not width. Δ per covered slot is flat across all thirteen
-  conditions (≈22 for language, ≈7.8 for intensity), and contiguous versus scattered
-  writes at matched coverage are indistinguishable (+18.94 ± 2.40 vs +17.42 ± 2.81 at
-  1.5B; +16.76 vs +13.79 at 7B). The resolution family replaces it.
+  grid varied coverage, not width. From two covered segments upward, Δ per covered slot
+  is flat (22.2–23.7 for language, 7.8–8.4 for intensity) regardless of how those
+  segments are grouped into knobs, and contiguous versus scattered writes at matched
+  coverage are indistinguishable (+18.94 ± 2.40 vs +17.42 ± 2.81 at 1.5B; +16.76 vs
+  +13.79 at 7B). The single-segment write is the one genuine exception at 15.5 per slot
+  — the seed of the superadditivity result above. The resolution family replaces this
+  sweep.
 - **"A temporal dictionary beats a per-token one" → "a schedule beats a level."** The
   per-position template is rank-1 (σ₁ = 89% of the energy), i.e. one direction with a
   sign schedule supplied externally. Everything measured here is therefore about the
   *form of the control signal*, and the dictionary-level claim needs trained
   dictionaries, which is outside a 10-hour budget.
 
-Two further results came out inconclusive and are reported as such. **Entrainment** —
-steering only the first W sentences and asking whether the model completes a
-predictable pattern unaided — showed no clean threshold (unsteered-slot accuracy for
-an alternating profile ran 0.440, 0.523, 0.458, 0.367 against analytic nulls of 0.400,
-0.500, 0.333, 0.500). Its main yield was methodological: with *balanced* profiles the
-correct null is **0.400**, not 0.500, because a French-heavy steered prefix forces an
-English-heavy tail, so a model that merely persists scores below chance; with i.i.d.
-profiles the null is 0.500 and the measurements sit on it (0.470–0.528 against
-0.496–0.501). **Graded amplitude control** failed its pre-registered monotonicity
-gate — five urgency levels do not project onto the direction in order (L1 −5.06,
-L2 −7.35, L4 +3.49, L5 +2.94) — so we report sign scheduling only. The handle is
-cleanly bidirectional (+11.8 forward, −16.2 with the schedule flipped).
+The entrainment experiment needed its null rebuilt before it could say anything, and
+that correction is worth recording. With *balanced* profiles the right null is
+**0.400**, not 0.500: a French-heavy steered prefix forces an English-heavy tail by
+construction, so a model that merely persists in the last steered language scores
+*below* chance. A first version read that as a failure; the analytic null shows the
+measurements were sitting exactly on it. Switching to i.i.d. profiles restores a true
+0.500 null, and the measurements sit on that too (0.470–0.528 against 0.496–0.501).
+Only after that repair does the period-2 jump in finding 4 mean anything.
+
+**Graded amplitude control** did not survive its pre-registered gate. Five urgency
+levels fail to project onto the direction in order (L1 −5.06, L2 −7.35, L4 +3.49,
+L5 +2.94), so we report sign scheduling only and make no amplitude claim; a
+sign-only handle already accounts for the effect (binary +15.0 versus graded +11.8 on
+the same contrast). The handle is cleanly bidirectional: flipping the schedule drives
+the margin from +11.8 to −16.2.
 
 ## Map of the work
 

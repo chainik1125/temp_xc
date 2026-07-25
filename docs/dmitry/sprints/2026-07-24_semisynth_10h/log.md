@@ -25,7 +25,7 @@ W = k/m. Block placement rotated per eval pair to wash out position bias.
 k=12 (divisors 1,2,3,4,6,12), tasks lang_profile + alt_phase, fracs {0.2, 0.35, 0.5}
 (peak region from today's full run), n_train=40, n_eval=32.
 
-### 22:20 — W-sweep landed (task #1 done). Centerpiece confirmed.
+### 22:19 — W-sweep landed (task #1 done). Centerpiece confirmed.
 
 `results/temporal_screen/wsweep.json`. Peak Δmargin vs W at fixed knob budget:
 
@@ -46,7 +46,7 @@ Next: entrainment generation W-sweep (task #2) — switching to language-alterna
 vs random-language profiles so the objective langid judge covers both the
 predictable and unpredictable case with the same direction u.
 
-### 22:40 — realmodel agent reported; free win banked; stance experiment launched
+### 22:22 — realmodel agent reported; free win banked; stance experiment launched
 
 `real_behaviors.md` delivered. Two things acted on immediately:
 
@@ -78,7 +78,7 @@ unsteered rising 0.37→0.58 as W grows; random W=1 unsteered 0.39. The predicte
 contrast (unsteered accuracy rises with W only when the profile is predictable) is
 so far tracking.
 
-### 23:10 — staged refusal WORKS; entrainment null was wrong; two artifacts caught
+### 22:25 — staged refusal WORKS; entrainment null was wrong; two artifacts caught
 
 **Task #4 (stance) result — the real-behavior match lands.** k-sweep, n=32/point,
 `results/temporal_screen/stance.json`:
@@ -111,28 +111,7 @@ profiles, for which the null is genuinely 0.5, keeps the balanced family to
 demonstrate the artifact, adds a period-2 family (predicted threshold W*=ℓ+1=3), an
 m=0 control per family, and n=48.
 
-### 23:55 — self-audit of the headline before the red team got to it
-
-Asked of my own best result: how many of the "24 cells, mean error 0.013" are actually
-measurements? Answer: **11**. Four cells (W=1) are the full template by construction, so
-R = 1 identically. Nine cells are **structurally silent** — with a balanced profile the
-block-constant coefficient `sign(μ_b)` is exactly zero in every block, so no vector is
-written and Δ = 0 by arithmetic rather than by measurement. Quoting 0.013 over 24 cells
-credits the law for 13 cells it was never at risk on.
-
-Corrected numbers now used everywhere: **0.029 over the 11 measured cells** (7B: 0.025),
-and **0.053 over the 6 cells whose prediction is strictly between 0 and 1** (7B: 0.045).
-Those 6 remain a real zero-parameter test, and they discriminate the two candidate
-budget laws: the per-slot cap predicts 0.667 where an energy-matched budget predicts
-0.816, and the measurements are 0.628 / 0.641 — the cap form fits.
-
-Same correction applies to the zig-zag. Only **ℓ=6 (W=6 → 1.00 beats W=4 → 0.64)** is a
-reversal between two *measured* cells. The ℓ=1 and ℓ=2 reversals are measured-vs-silent:
-still a true statement about the phenomenon (a width-2 handle on an alternating profile
-can write nothing useful) but weaker evidence than a measured-vs-measured reversal.
-Figure now hatches the by-construction cells so this is visible rather than buried.
-
-### 23:00 — THE CENTERPIECE IS RETRACTED, and the replacement is better
+### 22:28 — THE CENTERPIECE IS RETRACTED, and the replacement is better
 
 The review agent's audit landed and it is correct. I verified the decisive claim
 independently before acting.
@@ -167,7 +146,7 @@ at W ≈ ℓ**, so the best handle width is the target's own intrinsic timescale
 number of control parameters needed for full fidelity is k/ℓ. Figure:
 `plots/2026-07-24_trajectory_steering/phase_diagram.png`.
 
-### 23:40 — controls all landed. Three verdicts, one of them against me.
+### 22:33 — controls all landed. Three verdicts, one of them against me.
 
 **O1 (fixed-Hamming): the review agent's prediction was right.** With foils built by a
 single swap so H=2 at *every* k, the template effect is **flat**: +71.8, +80.8, +79.6,
@@ -214,3 +193,24 @@ generation** — at each boundary the model picks between a held-out refuse and 
 held-out comply candidate by logprob under the steered state, giving per-slot
 accuracy with zero classifier error. Teacher-forced results never used the
 classifier and are unaffected.
+### 22:36 — self-audit of the headline before the red team got to it
+
+Asked of my own best result: how many of the "24 cells, mean error 0.013" are actually
+measurements? Answer: **11**. Four cells (W=1) are the full template by construction, so
+R = 1 identically. Nine cells are **structurally silent** — with a balanced profile the
+block-constant coefficient `sign(μ_b)` is exactly zero in every block, so no vector is
+written and Δ = 0 by arithmetic rather than by measurement. Quoting 0.013 over 24 cells
+credits the law for 13 cells it was never at risk on.
+
+Corrected numbers now used everywhere: **0.029 over the 11 measured cells** (7B: 0.025),
+and **0.053 over the 6 cells whose prediction is strictly between 0 and 1** (7B: 0.045).
+Those 6 remain a real zero-parameter test, and they discriminate the two candidate
+budget laws: the per-slot cap predicts 0.667 where an energy-matched budget predicts
+0.816, and the measurements are 0.628 / 0.641 — the cap form fits.
+
+Same correction applies to the zig-zag. Only **ℓ=6 (W=6 → 1.00 beats W=4 → 0.64)** is a
+reversal between two *measured* cells. The ℓ=1 and ℓ=2 reversals are measured-vs-silent:
+still a true statement about the phenomenon (a width-2 handle on an alternating profile
+can write nothing useful) but weaker evidence than a measured-vs-measured reversal.
+Figure now hatches the by-construction cells so this is visible rather than buried.
+

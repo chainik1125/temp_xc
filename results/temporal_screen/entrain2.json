@@ -1,0 +1,709 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k": 6,
+  "frac": 0.35,
+  "base_norm": 56.87154035304548,
+  "cells": {
+    "iid_W1": {
+      "steered_acc": 0.967741935483871,
+      "steered_sem": 0.03225806451612904,
+      "unsteered_acc": 0.5282608695652173,
+      "unsteered_sem": 0.03096614589218957,
+      "persistence_rate": 0.7306451612903226,
+      "analytic_persistence_null": 0.49837,
+      "coverage": 0.7881944444444443,
+      "samples": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            1
+          ],
+          "W": 1,
+          "text": "10 o'clock, students arrive at school and enter the classroom. 11 o'clock, the teacher arrives and begins to mark papers. The school day is 7 hours long. How many minutes in the day is not accounted for by the school day? 40 minutes. \nThe school day "
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            1,
+            1
+          ],
+          "W": 1,
+          "text": " He buys bread every morning.  How would you describe the speaker's routine?\npick from the following.\n a). He is poor.;\n b). He is rich.;\n c). He is broke.;\n"
+        }
+      ]
+    },
+    "iid_W2": {
+      "steered_acc": 0.9270833333333334,
+      "steered_sem": 0.0332542834831298,
+      "unsteered_acc": 0.5069444444444444,
+      "unsteered_sem": 0.042386899680358074,
+      "persistence_rate": 0.7039007092198583,
+      "analytic_persistence_null": 0.499075,
+      "coverage": 0.8125,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            1,
+            1,
+            0,
+            0
+          ],
+          "W": 2,
+          "text": " Choose your answer: does this next sentence follow logically? \"Elle lit la lettre en silence.\" (She read the letter silently.)\n\nPick from: [I] no. [II] yes.\n[II] yes."
+        },
+        {
+          "profile": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "W": 2,
+          "text": "1. He waits under the old clock. 2. He buys bread every morning.\nThis is an English translation. This is the original French text:\nNous nous tournons vers l'or\u00e9e du bois. Il ach\u00e8te du pain chaque matin."
+        }
+      ]
+    },
+    "iid_W3": {
+      "steered_acc": 0.8407407407407407,
+      "steered_sem": 0.04706764824866235,
+      "unsteered_acc": 0.4696969696969697,
+      "unsteered_sem": 0.04915086082485263,
+      "persistence_rate": 0.6714285714285714,
+      "analytic_persistence_null": 0.4965,
+      "coverage": 0.736111111111111,
+      "samples": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            1
+          ],
+          "W": 3,
+          "text": "1. When does the market open?\n\nThe options are:\nA. 10 heures\nB. 9 heures\nC. 10 heures et 30 minutes\nD. 9 heures et 30 minutes\n\nThe most likely answer is:\nA."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            1,
+            1,
+            1
+          ],
+          "W": 3,
+          "text": "1852. She is the only child in her town. She was born on Christmas Day in the year she was old. She spent her childhood in the country, and her education was a long and difficult one. Her father died when she was 18, and she had to study to support t"
+        }
+      ]
+    },
+    "iid_W4": {
+      "steered_acc": 0.8784722222222222,
+      "steered_sem": 0.037544163426305566,
+      "unsteered_acc": 0.5,
+      "unsteered_sem": 0.06774490372475504,
+      "persistence_rate": 0.7439024390243902,
+      "analytic_persistence_null": 0.50145,
+      "coverage": 0.7916666666666666,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            1,
+            1,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": "1860. Nous avons trouv\u00e9 la porte, nous avons dit adieu \u00e0 la maison. 1867. 1874. 1877. 1881."
+        },
+        {
+          "profile": [
+            1,
+            1,
+            1,
+            1,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": "1. The phrase \"Le jardin sent la rose\" (literalement le jardin sent l'odeur de la rose) ne peut-on pas traduire par : \"La rose sent la rose\" (le jardin sent l'odeur de la rose) ? 2. Sur la question de l'emploi du pluriel dans ce texte, je pense qu'il"
+        }
+      ]
+    },
+    "iid_W0": {
+      "steered_acc": 0.4131944444444444,
+      "steered_sem": 0.032920606541203254,
+      "unsteered_acc": null,
+      "unsteered_sem": null,
+      "persistence_rate": null,
+      "analytic_persistence_null": null,
+      "coverage": 0.7604166666666666,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 0,
+          "text": " La classe commence \u00e0 parler.  Les \u00e9tudiants discutent entre eux.  Le professeur \u00e9coute attentivement.  La salle est silencieuse.  La classe est excit\u00e9e.\n\nWrite a final draft.\n"
+        },
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 0,
+          "text": "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890.\n\nThis entry is a continuation of the previous entries. It is a work of fiction. The following text is a continuation of the previous text."
+        }
+      ]
+    },
+    "balanced_W1": {
+      "steered_acc": 0.9166666666666666,
+      "steered_sem": 0.04671765921511568,
+      "unsteered_acc": 0.42269503546099285,
+      "unsteered_sem": 0.020088364331569093,
+      "persistence_rate": 0.7875000000000001,
+      "analytic_persistence_null": 0.39999999999999997,
+      "coverage": 0.8715277777777777,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 1,
+          "text": " Les enfants regardent en avant et en arri\u00e8re. Ils r\u00e9fl\u00e9chissent \u00e0 la question pos\u00e9e par le professeur. Les enfants ont d\u00e9j\u00e0 compris qu\u2019on les a d\u00e9j\u00e0 trait\u00e9s dans leur maison. Ils se rendent compte que la maison n\u2019est pas leur maison. Ils ont r\u00e9fl\u00e9ch"
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            1,
+            0
+          ],
+          "W": 1,
+          "text": " The garden smells of roses. Le jardin sent des roses.  The garden smells of the roses. Le jardin sent la rose.  The garden smells of roses. Le jardin sent les roses."
+        }
+      ]
+    },
+    "balanced_W2": {
+      "steered_acc": 0.925531914893617,
+      "steered_sem": 0.0371844522414366,
+      "unsteered_acc": 0.4432624113475177,
+      "unsteered_sem": 0.03256775622641842,
+      "persistence_rate": 0.8428030303030304,
+      "analytic_persistence_null": 0.4007125,
+      "coverage": 0.8472222222222223,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          "W": 2,
+          "text": " Elle se mit \u00e0 pleurer.\n\nTranslate the passage to English.\nThe train arrives this evening. Elle lit la lettre lentement. Elle se mit \u00e0 pleurer.\n\nEnglish:\nThe train will arrive this evening."
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            1
+          ],
+          "W": 2,
+          "text": " The garden smells of roses. Il buys bread every morning.  Which sentence is written correctly?\nThe two sentences are identical, they both describe the same scenario.  They both use the same vocabulary words.  The only difference between the two sent"
+        }
+      ]
+    },
+    "balanced_W3": {
+      "steered_acc": 0.8759689922480619,
+      "steered_sem": 0.04079204723656201,
+      "unsteered_acc": 0.427536231884058,
+      "unsteered_sem": 0.04133188335499022,
+      "persistence_rate": 0.6999999999999998,
+      "analytic_persistence_null": 0.4014,
+      "coverage": 0.7777777777777778,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 3,
+          "text": " Le train will arrive tonight.\nI have desol\u00e9 on le train arrive ce soir.  I have desol\u00e9 for the train that arrives tonight.  Is that correct?\n\nWould you say this sentence is correct?\n\nJe suis d\u00e9sol\u00e9 le train arrive ce soir.\n"
+        },
+        {
+          "profile": [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1
+          ],
+          "W": 3,
+          "text": " Elle lit the letter slowly.  The first sentence is written in French, and the second sentence is written in English. The context of both sentences is about someone reading a letter. The word \"lentement\" in the French sentence is a common French word"
+        }
+      ]
+    },
+    "balanced_W4": {
+      "steered_acc": 0.9114583333333334,
+      "steered_sem": 0.034057428763769174,
+      "unsteered_acc": 0.3953488372093023,
+      "unsteered_sem": 0.04867610404393336,
+      "persistence_rate": 0.7560975609756098,
+      "analytic_persistence_null": 0.398575,
+      "coverage": 0.8819444444444445,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": " (The lave l\u00e8ve-t-elle, la soupe est encore chaude.) \nWhat does \"La lamp flickers at night. La soupe est encore chaude\" mean?  Answer the following question: Why was the speaker laughing?\n\nI think the answer is: La soupe est encore chaude is a French"
+        },
+        {
+          "profile": [
+            0,
+            1,
+            1,
+            0,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": "1883, 27 years old. 60 km/h. La R\u00e9union.\nThis is my first experience with the city of Saint-Denis on a train. 1.5 hours from the airport, 16 hours from the mainland, 1."
+        }
+      ]
+    },
+    "balanced_W0": {
+      "steered_acc": 0.47644927536231885,
+      "steered_sem": 0.019994471102103464,
+      "unsteered_acc": null,
+      "unsteered_sem": null,
+      "persistence_rate": null,
+      "analytic_persistence_null": null,
+      "coverage": 0.7916666666666666,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            1
+          ],
+          "W": 0,
+          "text": "6:15. It is a record-breaking heatwave. As you can see, the sun is shining brightly. It is already late in the afternoon. The heat is almost unbearable. The sky is almost hot."
+        },
+        {
+          "profile": [
+            0,
+            1,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 0,
+          "text": " The light is dim.  What is the theme?\nThe theme of the given entries seems to be a general sense of evening or twilight, including the dim light of evening. The entries describe a dark, dimly lit scene, with the lamp flickering at night and children"
+        }
+      ]
+    },
+    "alt_W1": {
+      "steered_acc": 0.9714285714285714,
+      "steered_sem": 0.028571428571428574,
+      "unsteered_acc": 0.43985507246376804,
+      "unsteered_sem": 0.028757963544418532,
+      "persistence_rate": 0.8219047619047619,
+      "analytic_persistence_null": 0.39999999999999997,
+      "coverage": 0.8159722222222223,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 1,
+          "text": " Ils marchent le long du rive. Le jardin sent la rose.\n\nFinal version.\nThey walk along the river. The garden smells of roses. They walk along the river."
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 1,
+          "text": " Elle avait peur. Elle se demandait si c'\u00e9tait le bon. Elle pensa longtemps que si. Mais elle s'\u00e9tait tromp\u00e9e. Elle se rendait compte que c'\u00e9tait malheureuse. Elle avait compris."
+        }
+      ]
+    },
+    "alt_W2": {
+      "steered_acc": 0.9111111111111111,
+      "steered_sem": 0.03985101322137144,
+      "unsteered_acc": 0.5230496453900709,
+      "unsteered_sem": 0.029307249810074234,
+      "persistence_rate": 0.4981481481481481,
+      "analytic_persistence_null": 0.5,
+      "coverage": 0.8854166666666666,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 2,
+          "text": "10 o'clock, students arrive at school and enter the classroom. 11 o'clock, le professeur commence le cours. 12 o'clock, il ferme les yeux et dit pendant 5 minutes \"Bonne journee\". 13 o'clock, il termine le cours et les \u00e9l\u00e8ves sortent de l'\u00e9cole. What"
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 2,
+          "text": "1) le professeur est \u00e0 l'\u00e9cole. 2) le professor writes on the blackboard. \n\nWhich of these statements is true? \n1) Le professeur est \u00e0 l'\u00e9cole. \n2) Le professeur \u00e9crit au tableau. \nI'm thinking it's 2."
+        }
+      ]
+    },
+    "alt_W3": {
+      "steered_acc": 0.782608695652174,
+      "steered_sem": 0.05789044320365311,
+      "unsteered_acc": 0.4583333333333333,
+      "unsteered_sem": 0.04534583856168167,
+      "persistence_rate": 0.5263157894736841,
+      "analytic_persistence_null": 0.33333333333333337,
+      "coverage": 0.8159722222222222,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 3,
+          "text": " These are my notes from a trip to Paris with my wife. Here, je suis nouveau. The sun is always shining, but in a different kind of way. Paris is magical. The city is always on-going and full of energy. I feel at home here, it\u2019s like I\u2019ve been here b"
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 3,
+          "text": "1954. A young couple, both French, in a French hotel. The vieilles dames, the vieux veuv\u00e9s, dans les rues. Le vent souffle sur une petite ville. 1955. A young man and woman, both Americans, at the edge of a forest."
+        }
+      ]
+    },
+    "alt_W4": {
+      "steered_acc": 0.7102272727272727,
+      "steered_sem": 0.05908037685541918,
+      "unsteered_acc": 0.36666666666666664,
+      "unsteered_sem": 0.05595813731096784,
+      "persistence_rate": 0.5897435897435898,
+      "analytic_persistence_null": 0.5,
+      "coverage": 0.75,
+      "samples": [
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": " He is writing on the board.\nJeudi soir. The evening. He est en train de r\u00e9diger une lettre.  He is writing a letter.\nThe two sentences seem to convey the same meaning and that he is writing a letter."
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 4,
+          "text": " The cat sleeps on the sofa. La soupe est encore chaude.  The cat sleeps on the sofa. Leur vie est courte. La soupe est encore chaude.  The cat sleeps on the sofa."
+        }
+      ]
+    },
+    "alt_W0": {
+      "steered_acc": 0.5166666666666668,
+      "steered_sem": 0.029908037346396615,
+      "unsteered_acc": null,
+      "unsteered_sem": null,
+      "persistence_rate": null,
+      "analytic_persistence_null": null,
+      "coverage": 0.8611111111111112,
+      "samples": [
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "W": 0,
+          "text": " Il est un peu m\u00e9lancolique en face de la rivi\u00e8re.  Il est vrai que la ville est un peu lente, et le temps est doux.\n\nWhich language is this? The language in the given text is French. The passage describes someone waiting under an old clock, buying b"
+        },
+        {
+          "profile": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ],
+          "W": 0,
+          "text": " --  Le soleil est lev\u00e9.  --  On est d\u00e9j\u00e0 10 heures.  --  Le ma\u00eetre de maison d\u00e9boule.  --  Le ma\u00eetre de maison d\u00e9boule, il a tout le monde dans la rue.  --  La route est pleine de monde.  --  Le ma\u00eetre de maison sort de sa chambre."
+        }
+      ]
+    },
+    "period2_W1": {
+      "steered_acc": 1.0,
+      "steered_sem": 0.0,
+      "unsteered_acc": 0.5778985507246377,
+      "unsteered_sem": 0.021844951782150703,
+      "persistence_rate": 0.7944444444444444,
+      "analytic_persistence_null": 0.6,
+      "coverage": 0.795138888888889,
+      "samples": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "W": 1,
+          "text": " -  \"The garden is full of roses. We are waiting under the old clock tower.\"  -  \"The garden is full of roses. We are waiting under the old clock tower.\"  -  \"The garden is full of roses. We are waiting under the old clock tower.\""
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "W": 1,
+          "text": "1. What is the relationship between the two sentences? 2. What kind of relationship is it? 3. What word or phrase relates the two sentences?\nI'm sorry, but I cannot see any notebook attached to your message."
+        }
+      ]
+    },
+    "period2_W2": {
+      "steered_acc": 0.9186046511627907,
+      "steered_sem": 0.04051930537425405,
+      "unsteered_acc": 0.50177304964539,
+      "unsteered_sem": 0.027119924367632997,
+      "persistence_rate": 0.8710317460317459,
+      "analytic_persistence_null": 0.5,
+      "coverage": 0.8020833333333334,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 2,
+          "text": "10:30, 12:00, 13:30, 14:30, 16:00, 17:30, 18:30, 19:30, 20:30, 21:00, 22:00, 23:00 (10h30, 12h00, 13h30, 14h30, 16h00, 17h30, 18h30, 19h30, 20h30, 21h00, 22h00, 23h00) (10:30, 12:00, 13:30, 14:30, 16:00, 17:30, 18:30, 19:3"
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "W": 2,
+          "text": " Les children are playing in the courtyard. 1. The French word \"jeux\" means \"plays\". 2. The French word \"jouer\" means \"to play\". 3."
+        }
+      ]
+    },
+    "period2_W3": {
+      "steered_acc": 0.8723404255319147,
+      "steered_sem": 0.03662893173547931,
+      "unsteered_acc": 0.5416666666666666,
+      "unsteered_sem": 0.045052692768305855,
+      "persistence_rate": 0.49074074074074076,
+      "analytic_persistence_null": 0.33333333333333337,
+      "coverage": 0.7881944444444443,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 3,
+          "text": " Les enfants jouent dans la cour. Elle lit la lettre lentement.  Does this next sentence logically follow?\nLes enfants jouent dans la rue. Elle lit la lettre en silence. Les enfants jouent dans la cour."
+        },
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 3,
+          "text": "1. The phrase \"sent la rose\" corresponds au verbe \"sentir\" (aimer). Le jardin sent la rose. The phrase \"sent the roses.\"\n\nTranslate to English.\nThe garden smells of roses. The garden smells of roses.\n\n"
+        }
+      ]
+    },
+    "period2_W4": {
+      "steered_acc": 0.9333333333333333,
+      "steered_sem": 0.023924685418842448,
+      "unsteered_acc": 0.22093023255813954,
+      "unsteered_sem": 0.05836059855148634,
+      "persistence_rate": 0.8472222222222222,
+      "analytic_persistence_null": 0.0,
+      "coverage": 0.7291666666666666,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 4,
+          "text": "1\nIt is \u00e9crit en fran\u00e7ais.\nIls marchent le long de la rivi\u00e8re.\nIt is written in French.\nThe difference in the sentence is that the verb 'walking' is in the past tense in the first sentence and in the present tense in the second sentence. But the mean"
+        },
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 4,
+          "text": "19h30. Je dois aller travailler. C'est why I can't find the market at 8. Why should I start the day at 7?\n\nThe market opens at nine. Le train arrive ce soir."
+        }
+      ]
+    },
+    "period2_W0": {
+      "steered_acc": 0.5399305555555555,
+      "steered_sem": 0.026860167041846406,
+      "unsteered_acc": null,
+      "unsteered_sem": null,
+      "persistence_rate": null,
+      "analytic_persistence_null": null,
+      "coverage": 0.861111111111111,
+      "samples": [
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 0,
+          "text": " (The train arrives tonight.) \nLe train arrive ce soir.  (The train arrives tonight.)\nWhich sentence is correct? Both are correct. \nWhich sentence is incorrect?"
+        },
+        {
+          "profile": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "W": 0,
+          "text": "1903-1904\nWe wait under the old clock. Le jardin sent la rose. \n1903-1904\nThe first sentence is in French. I'm not sure how to translate it. Is it \"We wait under the old clock. The garden smells of roses.\""
+        }
+      ]
+    }
+  }
+}
