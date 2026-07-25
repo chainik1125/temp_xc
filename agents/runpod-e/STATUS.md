@@ -28,13 +28,10 @@ TOKEN-code v2-INVERSION flagged for the post-deadline probe review.**
 Breadth question answered as model-heterogeneous; written as an
 honest instrumented negative, not softened.
 
-**PENDING (small, non-blocking):**
-1. DONE — llama 24/24; harness v1+v2 committed; NEGATIVE unchanged at n=3 (LOG amendment); R19 ALL PASS.
-   ~22:20). When it lands: llama harness v1+v2 per PANEL_RECIPES,
-   one-paragraph amendment to the final addendum (tsae n=2 → n=3),
-   llama RECEIPTS row, push. If the pod dies first: the n=2
-   disclosure in the final verdict already covers it.
-2. Then TELL THE OPERATOR the pod can be released.
+**PENDING: NOTHING.** llama landed 24/24 (tsae s42 0.241; NEGATIVE
+unchanged at n = 3, LOG amendment); harness v1+v2 committed; RECEIPTS
+R19 ALL PASS (23 claims). Operator informed the pod can be released
+from my side. No process of mine is running.
 
 **NOT REACHED (stated in the verdict's coverage):** `tss` (needs its
 own caching pass), list-face re-quote, dialevel recency pre-flight
