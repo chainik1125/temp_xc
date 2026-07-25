@@ -5,8 +5,8 @@
   "agent": "runpod (H100 pod, /workspace/temp_xc)",
   "branch": "arxiv",
   "started_utc": "2026-07-25T00:00:00Z",
-  "last_update_utc": "2026-07-25T01:32:00Z",
-  "phase": "Phase 2 \u2014 track-A gate running on the paper model",
+  "last_update_utc": "2026-07-25T02:47:00Z",
+  "phase": "Phase 2 \u2014 candidate 5 KILLED with a positive control; candidate 4 running",
   "state": "running",
   "prime_directive": "A sound verdict, never a win. Cards are frozen (committed) before any screen runs; git order is the evidence. Falsified predictions are scored as falsified."
  },
@@ -106,7 +106,7 @@
    "p_win": 0.4,
    "p_violent": 0.35,
    "cost": "tiny",
-   "status": "BUILD \u2014 track A, ship first",
+   "status": "RUNNING \u2014 card frozen 74df8f7f",
    "why": "Cheapest decisive experiment in the set; provable chance floor for five archs. Main risk: the LM may linearize mismatch as surprise at the second mention \u21d2 per-token wins \u21d2 clean publishable negative.",
    "assets": "templated"
   },
@@ -117,9 +117,15 @@
    "p_win": 0.35,
    "p_violent": 0.3,
    "cost": "tiny",
-   "status": "BUILD \u2014 track A, ship first",
+   "status": "KILLED (converted)",
    "why": "Same theorem protection, most legible phenomenon to reviewers, and per-token is actively misled by the distractor. But subject number must be maintained for generation \u21d2 real conversion pressure; expect 0.75 vs 0.92 rather than chance vs 0.9.",
-   "assets": "templated"
+   "assets": "templated",
+   "gate": {
+    "value": 1.0,
+    "ci_lo": 0.999,
+    "ci_hi": 1.0,
+    "n": 1152
+   }
   },
   {
    "rank": 6,
@@ -332,16 +338,40 @@
   ],
   "anomalies": [
    {
+    "ts": "01:58",
+    "expectation": "E2 (additive arms at chance on a balanced equality label)",
+    "observed": "v1 stimuli: every arm at AUC 1.000, including windows that could not see constituent A",
+    "disposition": "CORRECTLY read as a stimulus defect, not a result. v1 emitted 2,400 rows from only 80 DISTINCT texts (60\u00d7 duplication) \u2014 a 16k-dim probe memorises the ~16 test points (the signed_motion lesson). Rebuilt at 5,760/4,800 all-distinct items across 24/20 lexical groups; distinct-text equality is now an assertion in the generator. v1 numbers discarded, not reinterpreted."
+   },
+   {
+    "ts": "01:58",
+    "expectation": "IN/OUT control (a window that cannot see A cannot bind)",
+    "observed": "v1: flat = 1.000 in the OUT stratum at T=4 with A at distance 6\u20137",
+    "disposition": "This is the control doing its job \u2014 it exposed the memorisation before any verdict was written. Kept as the standing causal check."
+   },
+   {
+    "ts": "01:46",
+    "expectation": "usable tokenizer offsets",
+    "observed": "AutoTokenizer returned the SLOW LlamaTokenizer while reporting is_fast=True; offsets overlapped ((11,14),(13,14)) and every row was rejected",
+    "disposition": "Exactly the trap documented in task_hunt/RECORD.md \u00a7 4 note 5. `is_fast` is not a valid guard, so the gate now VALIDATES offsets (monotone, non-overlapping, exact span recovery) and uses PreTrainedTokenizerFast."
+   },
+   {
+    "ts": "02:05",
+    "expectation": "the gate can detect regime-3 headroom",
+    "observed": "design error in MY gate: a linear probe on the flattened window is itself additive over per-position features",
+    "disposition": "Corrected mid-run. A linear flatten can never certify what only a coincidence code could read, so MLP arms were added and the headline statistic changed to nonlinear_residual = window_MLP \u2212 additive ceiling. This is the quantity the theorem actually speaks to."
+   },
+   {
     "ts": "01:24",
     "expectation": "E5 (disk > 12 GB)",
-    "observed": "12.0 GB free after the 15 GB model pull \u2014 AT the abort floor",
-    "disposition": "Held, not breached. No further model downloads; gate keeps activations in RAM rather than on disk, so the figure is stable. gemma (5 GB) is deferred. Other agents' model caches on this volume are not mine to delete."
+    "observed": "12.0 GB free after the 15 GB model pull \u2014 at the abort floor",
+    "disposition": "Held, not breached. Scan found nothing of mine to delete: the large items (/workspace/ocean 76 GB, Qwen2.5-Coder 15 GB, role-probes venvs 16.6 GB) belong to your other work. gemma (5 GB) would still fit if its licence is accepted."
    },
    {
     "ts": "01:10",
     "expectation": "gemma-2-2b-it available (paper \u00a7 5.1 model)",
-    "observed": "HTTP 403 \u2014 gated repo, account lacks access",
-    "disposition": "Routed to the paper's \u00a7 5.2 model (R1-Distill-Llama-8B) rather than dropping paper-compatibility. Needs the licence accepted on the HF account to add the probing-comparable arm."
+    "observed": "HTTP 403 \u2014 gated repo",
+    "disposition": "Routed to the paper's \u00a7 5.2 model (R1-Distill-Llama-8B) to keep paper-compatibility."
    }
   ]
  },
@@ -410,13 +440,64 @@
    "ts": "01:32",
    "kind": "note",
    "text": "wandb: the framework has no wandb integration (grep of src/ and configs/ is empty). Probe fits are seconds long, so logging them adds nothing; if Phase 4 runs, dictionary training is the only thing worth a wandb run and would need a new hook rather than a config flag. Not adding one on the critical path."
+  },
+  {
+   "ts": "01:46",
+   "kind": "watch",
+   "text": "Tokenizer trap fired exactly as RECORD \u00a7 4 note 5 warned. Fixed with a real offset-validity guard rather than trusting is_fast."
+  },
+  {
+   "ts": "01:58",
+   "kind": "kill",
+   "text": "v1 stimuli DISCARDED: 2,400 rows but 80 distinct texts. The IN/OUT control caught it \u2014 windows that could not see constituent A still scored 1.000. Rebuilt with full lexical diversity; distinct-text equality is now asserted in the generator."
+  },
+  {
+   "ts": "02:05",
+   "kind": "note",
+   "text": "Corrected a design error in my own gate: a linear probe on a flattened window IS an additive-over-position code, so it cannot certify regime-3 headroom. Added MLP arms; the headline is now nonlinear_residual = window_MLP \u2212 max(window_linear, per_token) \u2014 the gap only a position-mixing code can linearise."
+  },
+  {
+   "ts": "02:10",
+   "kind": "kill",
+   "text": "CANDIDATE 5 KILLED (agreement attraction). Per-token linear reads match/mismatch at AUC 1.000 at layer 8; every window arm ties it; nonlinear residual \u22120.000 against a 3\u03c3 null of 0.008\u20130.075. Both pre-registered kill rules fire. My prior (0.30 violent, 'expect 0.75 vs 0.92') is falsified in the more-converted direction and scored as falsified."
+  },
+  {
+   "ts": "02:12",
+   "kind": "pass",
+   "text": "Candidate-4 card FROZEN and committed (74df8f7f) before its first cell exists \u2014 predictions P1\u2013P5 and kill rules K1/K2 are git-provable. The card states plainly that I expect this candidate to be killed too, and why running it is still correct."
+  },
+  {
+   "ts": "02:38",
+   "kind": "pass",
+   "text": "POSITIVE CONTROL FOUND. At layer 0 the additive arms sit at chance (0.495 / 0.503) while the window MLP reaches 0.749 \u2014 and only when the window reaches constituent A (OUT stratum: 0.498). The additive-code theorem, measured on real activations, and proof the gate can detect regime-3 headroom when it exists."
+  },
+  {
+   "ts": "02:41",
+   "kind": "note",
+   "text": "Depth curve: per-token 0.495 (L0) \u2192 0.983 (L2) \u2192 1.000 (L4\u2192L24). Conversion within four layers \u2014 far faster than the forbidden-word candidate's ~20-layer climb. This is why the kill is a statement about the model rather than the instrument."
+  },
+  {
+   "ts": "02:45",
+   "kind": "running",
+   "text": "Candidate 4 (contradiction) now caching on the frozen card: layers 0/8/16/24 \u00d7 T \u2208 {8,16,32,64}. Layer 0 is included precisely because it is now a known positive control."
   }
  ],
- "figures": [],
+ "figures": [
+  {
+   "path_light": "figs/agreement_conversion_T8_light.png",
+   "path_dark": "figs/agreement_conversion_T8_dark.png",
+   "caption": "Candidate 5 (agreement attraction), R1-Distill-Llama-8B, T=8, merged across two runs. LEFT: at the embedding layer the per-token probe (blue, occluded by orange where they coincide) and the window LINEAR probe both sit at chance \u2014 the additive-code theorem, measured on real activations \u2014 while the window MLP reaches 0.75. By layer 4 all three are pinned at 1.000. RIGHT: the regime-3 headroom is +0.27 at layer 0 and ONLY when the window reaches the head noun; the A-outside-window control sits inside the null band. Shaded bands are bootstrap CIs (1,000 resamples); grey band is \u00b13\u03c3 of the label-permutation null."
+  },
+  {
+   "path_light": "figs/agreement_distill8b_ladder_light.png",
+   "path_dark": "figs/agreement_distill8b_ladder_dark.png",
+   "caption": "Same candidate at layer 16: neither statistic leaves the null band at any window size, in either stratum. Note the left panel dipping below zero \u2014 a fixed-budget linear probe pays a dimensionality cost as T grows, the same effect recorded in task_hunt/RECORD.md \u00a7 1."
+  }
+ ],
  "timing": {
   "session_start_utc": "2026-07-25T00:52:00Z",
-  "now_utc": "2026-07-25T01:32:00Z",
-  "elapsed_min": 40,
+  "now_utc": "2026-07-25T02:47:00Z",
+  "elapsed_min": 115,
   "basis": "Projections are calibrated on measured wall-clock from this session (env install 9 min, stimulus build <1 min, 15 GB model pull 6 min) and on the task_hunt round-1 record (a raw-activation screen cost ~3 h; a Stage-2 panel of 84 cells ran in ~2 h on one H100).",
   "phases": [
    {
@@ -428,17 +509,17 @@
    },
    {
     "phase": "1 \u2014 ledger + cards",
-    "state": "running",
-    "elapsed_min": 6,
+    "state": "done",
+    "elapsed_min": 28,
     "projected_min": 25,
-    "note": "Ledger drafted in state.json; the two track-A cards must be committed before the gate's results are read."
+    "note": "Candidate-4 card FROZEN at commit 74df8f7f before its first cell \u2014 freeze order git-provable. Candidate 5's pilot ran before the commit, so its freeze is only artifact-timestamped; disclosed, not glossed."
    },
    {
     "phase": "2 \u2014 track A gate",
     "state": "running",
-    "elapsed_min": 12,
-    "projected_min": 75,
-    "note": "agreement (36 cells) then contradiction (needs T>=32, ~45 cells). Model load from network storage is ~5 min of it."
+    "elapsed_min": 77,
+    "projected_min": 110,
+    "note": "Ran long: v1 stimuli had to be rebuilt (memorisation) and the gate re-instrumented (MLP arms). Candidate 5 done + killed; candidate 4 (larger T ladder, 4 layers) queued."
    },
    {
     "phase": "3 \u2014 track B role gate",
@@ -462,30 +543,56 @@
     "note": "RECORD + LOG + STATUS + figures. Runs whichever way the verdict lands."
    }
   ],
-  "projected_total_min": 510,
-  "projected_remaining_min": 472
+  "projected_total_min": 545,
+  "projected_remaining_min": 423
  },
  "triage": {
-  "note": "Label-side triage \u2014 free kill authority, run before any GPU spend. By construction the label must be unreadable from either constituent alone, from length, or from filler count. This is expectation E1.",
+  "note": "Label-side triage \u2014 free kill authority, run before any GPU spend. By construction the label must be unreadable from either constituent alone, from length, or from filler count. This is expectation E1. v2 additionally asserts distinct_texts == n_items and that the inter-constituent gap is uninformative \u2014 both added after v1 failed (below).",
   "tasks": {
    "contradiction": {
-    "n": 2880,
+    "n": 4800,
+    "n_distinct_texts": 4800,
     "label_rate": 0.5,
     "auc_from_a": 0.5,
     "auc_from_b": 0.5,
-    "auc_from_len": 0.5009244791666667,
-    "auc_from_nfiller": 0.49857373649691356,
-    "PASS": true
+    "auc_from_len": 0.5053080729166667,
+    "auc_from_nfiller": 0.5039411458333334,
+    "PASS": true,
+    "auc_from_gap": 0.50573203125
    },
    "agreement": {
-    "n": 2400,
+    "n": 5760,
+    "n_distinct_texts": 5760,
     "label_rate": 0.5,
     "auc_from_a": 0.5,
     "auc_from_b": 0.5,
-    "auc_from_len": 0.5054319444444444,
-    "auc_from_nfiller": 0.5,
-    "PASS": true
+    "auc_from_len": 0.5028645230516975,
+    "auc_from_nfiller": 0.5038072072723765,
+    "PASS": true,
+    "auc_from_gap": 0.5027694589120371
    }
   }
- }
+ },
+ "verdicts": [
+  {
+   "candidate": "5 \u2014 agreement attraction (number-match XOR)",
+   "verdict": "KILL",
+   "rule": "K1 + K2 both fired",
+   "model": "R1-Distill-Llama-8B, layer 8, T \u2208 {4,8,16,32}",
+   "numbers": "per-token 1.000 \u00b7 window linear 1.000 \u00b7 window mean 0.998\u20131.000 \u00b7 window MLP 1.000 \u00b7 g \u22120.000 \u00b7 nonlinear residual \u22120.000 (3\u03c3 null 0.008\u20130.075)",
+   "reading": "A per-token linear probe at the verb reads agreement match/mismatch PERFECTLY at layer 8. The model computes the equality itself and deposits the result at the current position, so the additive ceiling already contains everything \u2014 there is no headroom for a position-mixing code. This is the 'built-and-immediately-linearized' g(\u2113) shape from task_hunt round 1, now measured on a relational label.",
+   "prior_scored": "My frozen prior said P(violent)=0.30 and 'expect 0.75 vs 0.92'. FALSIFIED in the more-converted direction: 1.000 vs 1.000. Recorded as falsified.",
+   "scope": "One model, one hookpoint, English templates. Scoped to this label on this model."
+  }
+ ],
+ "findings": [
+  {
+   "title": "The gate has a positive control, so the kill is informative rather than blind",
+   "body": "At layer 0 with T=8, per-token reads 0.495 and the window LINEAR probe reads 0.503 \u2014 both chance \u2014 while the window MLP reaches 0.749 (0.772 in the IN stratum). This is the additive-code theorem holding on real activations: the two constituents are present in the window, no additive readout can combine them, and a cross-position nonlinearity can. The IN/OUT control confirms it is binding: the same MLP sits at 0.498 when the window cannot reach the head noun. So the instrument demonstrably fires when regime-3 headroom exists \u2014 which is what makes its zero at layers 4\u201324 a statement about the MODEL, not about the probe."
+  },
+  {
+   "title": "Conversion is faster than the round-1 record suggested",
+   "body": "Per-token AUC goes 0.495 (L0) \u2192 0.983 (L2) \u2192 1.000 (L4) and stays there through L24. The forbidden-word candidate took ~20 layers to climb +0.13; this relational label is fully linearised per position within four. A window architecture has no hookpoint to exploit: by the depth anyone trains a dictionary at, the additive ceiling already contains everything."
+  }
+ ]
 }

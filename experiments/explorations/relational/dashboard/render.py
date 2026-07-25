@@ -178,6 +178,14 @@ figure{margin:0;display:flex;flex-direction:column;gap:8px}
 figure img{width:100%;height:auto;border:1px solid var(--rule);border-radius:2px;
   background:var(--panel)}
 figcaption{font-size:13px;color:var(--ink-2)}
+.fig-dark{display:none}
+@media (prefers-color-scheme:dark){
+  .fig-light{display:none}.fig-dark{display:block}
+}
+:root[data-theme="dark"] .fig-light{display:none}
+:root[data-theme="dark"] .fig-dark{display:block}
+:root[data-theme="light"] .fig-light{display:block}
+:root[data-theme="light"] .fig-dark{display:none}
 code{font-family:var(--mono);font-size:.92em;background:var(--panel-2);
   padding:1px 5px;border-radius:2px}
 .callout{border-left:3px solid var(--accent);padding:2px 0 2px 14px;
@@ -370,6 +378,33 @@ def build(state: dict) -> str:
     a("</tbody></table></div>")
     a("</section>")
 
+    # ── verdicts ──────────────────────────────────────────────────────
+    verds = state.get("verdicts") or []
+    if verds:
+        a("<section>")
+        a('<div class="eyebrow">Verdicts</div>')
+        a("<h2>What the gate has decided so far</h2>")
+        for v in verds:
+            k = "kill" if v["verdict"].startswith("KILL") else "pass"
+            a('<div class="panel"><div class="stack g12">')
+            a(f'<div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">'
+              f'<h3>{esc(v["candidate"])}</h3>'
+              f'<span class="pill {k}">{esc(v["verdict"])}</span>'
+              f'<span class="mono" style="font-size:11.5px;color:var(--ink-3)">'
+              f'{esc(v["rule"])}</span></div>')
+            a(f'<div class="mono" style="font-size:12.5px;color:var(--ink-2)">'
+              f'{esc(v["model"])}</div>')
+            a(f'<div class="quiet panel tight mono" style="font-size:12.5px">'
+              f'{esc(v["numbers"])}</div>')
+            a(f'<p class="sub" style="max-width:none"><b>Reading.</b> '
+              f'{esc(v["reading"])}</p>')
+            a(f'<p class="callout theory"><b>Prior scored.</b> '
+              f'{esc(v["prior_scored"])}</p>')
+            a(f'<p class="sub" style="max-width:none;font-size:13px;'
+              f'color:var(--ink-3)"><b>Scope.</b> {esc(v["scope"])}</p>')
+            a("</div></div>")
+        a("</section>")
+
     # ── figures ───────────────────────────────────────────────────────
     figs = state.get("figures") or []
     a("<section>")
@@ -382,11 +417,22 @@ def build(state: dict) -> str:
           "drawn in violet so theory never reads as measurement.</p></div>")
     else:
         for f in figs:
-            uri = img_uri(Path(f["path"]) if Path(f["path"]).is_absolute() else HERE.parent / f["path"])
-            if not uri:
+            def _u(key):
+                pth = f.get(key)
+                if not pth:
+                    return None
+                pp = Path(pth) if Path(pth).is_absolute() else HERE.parent / pth
+                return img_uri(pp)
+            ul, ud = _u("path_light"), _u("path_dark")
+            if not ul and not ud:
                 continue
-            a(f'<figure><img src="{uri}" alt="{esc(f.get("caption",""))}">'
-              f'<figcaption>{esc(f.get("caption",""))}</figcaption></figure>')
+            alt = esc(f.get("caption", ""))
+            a("<figure>")
+            if ul:
+                a(f'<img class="fig-light" src="{ul}" alt="{alt}">')
+            if ud:
+                a(f'<img class="fig-dark" src="{ud}" alt="{alt}">')
+            a(f'<figcaption>{esc(f.get("caption",""))}</figcaption></figure>')
     a("</section>")
 
     # ── tasks ─────────────────────────────────────────────────────────

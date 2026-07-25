@@ -97,16 +97,15 @@ def fig_depth(payload: dict, task: str, mode: str, T: int | None = None) -> Path
                 markeredgewidth=1.4, label=label, zorder=3)
     ax.axhline(0.5, color=t["null"], linestyle=(0, (4, 3)), linewidth=1.2,
                zorder=1)
-    ax.annotate("chance (provable floor for any single-position readout)",
-                xy=(layers[0], 0.5), xytext=(0, 6), textcoords="offset points",
-                color=t["ink2"], fontsize=8.5)
+    ax.annotate("chance", xy=(layers[0], 0.5), xytext=(0, 6),
+                textcoords="offset points", color=t["ink2"], fontsize=8.5)
     ax.set_xlabel("residual layer")
     ax.set_ylabel("test AUC")
     ax.set_ylim(0.44, 1.03)
     ax.set_xticks(layers)
     ax.grid(axis="y", linewidth=0.7)
     ax.set_title(f"{task} — where the label becomes readable (T={T})", loc="left")
-    ax.legend(loc="lower right", fontsize=8.5)
+    ax.legend(loc="center right", fontsize=8.5)
     fig.tight_layout()
     out = FIGS / f"{task}_depth_{mode}.png"
     fig.savefig(out)
@@ -167,6 +166,80 @@ def fig_ladder(payload: dict, task: str, mode: str) -> Path:
     return out
 
 
+def fig_conversion(payloads: list[dict], task: str, mode: str, T: int) -> Path:
+    """The conversion curve: AUC vs layer merged across runs, plus the
+    nonlinear residual — the only quantity a position-mixing code could convert
+    into a linear readout.
+
+    Left panel answers "when does the label become readable, and to whom".
+    Right panel answers "is there any headroom a coincidence code could take",
+    with the IN/OUT strata separated so a residual that is not binding is
+    visible as such.
+    """
+    t = _style(mode)
+    cells = [c for pl in payloads for c in pl["cells"]
+             if "per_token" in c and c["T"] == T]
+    if not cells:
+        return None
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.8), dpi=170)
+
+    ax = axes[0]
+    allc = [c for c in cells if c["stratum"] == "all"]
+    layers = sorted({c["layer"] for c in allc})
+    for key, label, slot in ARMS:
+        xs, ys, lo, hi = [], [], [], []
+        for L in layers:
+            c = next((c for c in allc if c["layer"] == L), None)
+            if not c:
+                continue
+            xs.append(L); ys.append(c[key]["value"])
+            lo.append(c[key]["ci_lo"]); hi.append(c[key]["ci_hi"])
+        ax.fill_between(xs, lo, hi, color=t[slot], alpha=0.16, linewidth=0)
+        ax.plot(xs, ys, color=t[slot], linewidth=2, marker="o", markersize=5,
+                markeredgecolor=t["surface"], markeredgewidth=1.4,
+                label=label, zorder=3)
+    ax.axhline(0.5, color=t["null"], linestyle=(0, (4, 3)), linewidth=1.2)
+    ax.annotate("chance", xy=(layers[0], 0.5), xytext=(2, 5),
+                textcoords="offset points", color=t["ink2"], fontsize=8.5)
+    ax.set_xlabel("residual layer"); ax.set_ylabel("test AUC")
+    ax.set_ylim(0.44, 1.03); ax.set_xticks(layers)
+    ax.grid(axis="y", linewidth=0.7)
+    ax.set_title("who can read the label", loc="left", fontsize=10)
+    ax.legend(loc="center right", fontsize=8.5)
+
+    ax = axes[1]
+    for stratum, marker, lab in [("in", "o", "A inside window"),
+                                 ("out", "^", "A outside window")]:
+        sc = sorted([c for c in cells if c["stratum"] == stratum],
+                    key=lambda c: c["layer"])
+        if not sc:
+            continue
+        ax.plot([c["layer"] for c in sc], [c["nonlinear_residual"] for c in sc],
+                marker=marker, linewidth=2, markersize=6, color=t["s3"],
+                alpha=1.0 if stratum == "in" else 0.5,
+                markeredgecolor=t["surface"], markeredgewidth=1.4,
+                label=lab, zorder=3)
+    band = float(np.median([c["three_sigma"] for c in cells]))
+    ax.axhspan(-band, band, color=t["null"], alpha=0.16, linewidth=0)
+    ax.annotate("±3σ null", xy=(0.62, 0.5), xycoords="axes fraction",
+                color=t["ink2"], fontsize=8.5, va="center")
+    ax.axhline(0, color=t["grid"], linewidth=1)
+    ax.set_xlabel("residual layer")
+    ax.set_ylabel("window MLP − additive ceiling")
+    ax.set_xticks(layers)
+    ax.grid(axis="y", linewidth=0.7)
+    ax.set_title("regime-3 headroom", loc="left", fontsize=10)
+    ax.legend(fontsize=8.5, loc="upper right")
+
+    fig.suptitle(f"{task} (T={T}) — the label is built across depth and "
+                 f"linearised per position by layer 4",
+                 x=0.01, ha="left", fontsize=11)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    out = FIGS / f"{task}_conversion_T{T}_{mode}.png"
+    fig.savefig(out); plt.close(fig)
+    return out
+
+
 def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
     made = []
@@ -180,6 +253,20 @@ def main() -> None:
                 made.append(fig_depth(payload, name, mode))
             if any("nonlinear_residual" in c for c in payload["cells"]):
                 made.append(fig_ladder(payload, name, mode))
+    # merged conversion curve per task, across every run of the same task
+    by_task: dict[str, list[dict]] = {}
+    for path in sorted(RESULTS.glob("gate_*.json")):
+        pl = json.loads(path.read_text())
+        by_task.setdefault(pl["meta"]["task"], []).append(pl)
+    for task, pls in by_task.items():
+        Ts = sorted({c["T"] for pl in pls for c in pl["cells"] if "T" in c})
+        shared = [T for T in Ts if sum(
+            1 for pl in pls if any(c.get("T") == T for c in pl["cells"])) == len(pls)]
+        for T in (shared[-1:] or Ts[:1]):
+            for mode in ("light", "dark"):
+                f = fig_conversion(pls, task, mode, T)
+                if f:
+                    made.append(f)
     for m in made:
         print("wrote", m)
     if not made:
