@@ -36,7 +36,8 @@ the claim that could most easily have failed.
 **2. So the useful handle width is the target's own timescale.** Once the response is
 linear, the achievable fraction for a square-wave target of run length ℓ is fixed by
 arithmetic, and the resulting (W, ℓ) grid is reproduced to a mean error of **0.053**
-(1.5B) and **0.045** (7B) over its six at-risk cells — the other 18 are algebraic
+(1.5B) and **0.045** (7B) over its six at-risk cells *at the top of the dose grid* —
+0.099 and 0.094 at the lowest dose, a systematic drift discussed below — the other 18 are algebraic
 identities and serve as plumbing checks. Reading it as control cost: fidelity per
 control parameter is maximised at W ≈ ℓ, where full fidelity costs `k/ℓ` parameters
 rather than k. Fidelity is **not monotone in W**, since a wider handle wins when it
@@ -45,22 +46,25 @@ the timescale" is the right summary of window size rather than "wider is better"
 
 - ![phase diagram](../../../../plots/2026-07-24_trajectory_steering/phase_diagram.png)
 
-**3. It transfers to a behaviour with safety shape: the order of declining and helping
-within one response.** The scheduled handle moves the model's own choice the intended
-way on **96.9%** of slots against **51.2%** for the same direction at constant
-strength (dose 0.5 of the mean residual norm, 160 slots; 93.8% at dose 0.35). That
-51.2% is the constant write's expected value rather than a malfunction: it pushes every
-slot toward declining, so it is right on exactly the half of slots meant to decline.
-A random direction at matched magnitude does nothing.
+**3. It reaches a behaviour with safety shape: the order of declining and helping within
+one response.** The scheduled handle shifts the model's preference between a declining
+and a helping continuation in the intended direction on **96.9%** of slots (mean shift
+1.00 nats per token) against **51.2%** for the same direction at constant strength; it
+flips which continuation the model actually prefers on **53.6%** of slots against a 50%
+floor. So this is a large and reliably-signed pressure on the choice rather than a
+decisive change of it. The 51.2% is the constant write's expected value rather than a
+malfunction: it pushes every slot toward declining, so it is right on exactly the half
+of slots meant to decline. A random direction at matched magnitude does nothing.
+*(Dose 0.5 of the mean residual norm, 160 slots; 93.8% shift-accuracy at dose 0.35.)*
 
 - ![stance](../../../../plots/2026-07-24_trajectory_steering/stance.png)
 
 **4. The effect is the order, not the mass.** Permuting the schedule inside a block,
 holding coverage, contiguity and total injected norm fixed, collapses the effect from
-+55.3 to −1.2 at W=8 (dose 0.35 of the mean residual norm; *n = 28*). This rules out
-any "you simply added more push" reading. It is also what a linear response predicts —
-a random within-block permutation matches about half the slots and nets zero — so it is
-a check the design passes rather than a mechanism it reveals.
++55.3 to −1.2 at W=8 (dose 0.35 of the mean residual norm; *n = 28*). This rules out any
+"you simply added more push" reading. A linear response predicts that collapse exactly —
+a random within-block permutation matches about half the slots and nets zero — so it is a
+check the design passes rather than a mechanism it reveals.
 
 - ![controls](../../../../plots/2026-07-24_trajectory_steering/controls.png)
 
