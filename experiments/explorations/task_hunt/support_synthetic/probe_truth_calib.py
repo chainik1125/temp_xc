@@ -108,6 +108,14 @@ T_MAIN = 16
 T_GATE = (2, 4, 8, 16)              # G1 sweep (at p = 32, deep in the safe regime)
 P_GATE = 32
 DENSITY_PS = (512, 2048, 4096)      # the added 6%-density arm
+# Mix arms — a tunable TRUTH LEVEL (see ConstructedArch). Flip probabilities
+# on the `full` arm's signal bits; realised truth is MEASURED per cell, so
+# these are only nominal dials. Content directions are partitioned so the
+# noise columns cannot see the flip: E[1:16] feed the noise map, E[16:20]
+# drive the flip.
+MIX_QS = (0.0, 0.10, 0.20, 0.35)
+MIX_PS = (2048, 4096)               # the real panel's p regime
+N_NOISE_DIRS = 15
 
 
 def _anchor_n_windows(p: int, T: int) -> tuple[int, int]:
@@ -119,11 +127,30 @@ def _anchor_n_windows(p: int, T: int) -> tuple[int, int]:
 
 
 class ConstructedArch(torch.nn.Module):
-    """Analytic encoder with a known λ-information content (module docstring)."""
+    """Analytic encoder with a known λ-information content (module docstring).
+
+    ``flip_dirs`` / ``noise_dirs`` enable the **mix arm** — a tunable TRUTH
+    LEVEL, added after the frozen arms had run (LOG-disclosed). The frozen
+    arms pin truth at three points (0.99, 0.41, 0) and that is enough to show
+    the probe's bias is driven by the unexplained variance; it is not enough
+    to *invert* the relation, i.e. to ask what true recovery is consistent
+    with an observed (v1, v2) pair at a given p/n and density — which is the
+    question the real panels actually pose.
+
+    The signal bit is flipped on rows selected by a fixed pseudo-random
+    threshold on the CONTENT subspace, which degrades truth smoothly. For
+    that to leave "truth = OLS on the signal columns" exact, the flip source
+    must be invisible to the noise columns — otherwise a probe could read the
+    flip out of the noise dims and undo it, and the population optimum would
+    no longer be the signal columns alone. So the content directions are
+    PARTITIONED: ``noise_dirs`` feed the noise columns, ``flip_dirs`` (a
+    disjoint set) drive the flip, and neither can reconstruct the other.
+    """
 
     def __init__(self, *, T: int, d_in: int, u_bt: torch.Tensor,
                  sig_pos: tuple[int, ...], p_noise: int, k_noise: int,
-                 seed: int):
+                 seed: int, flip_dirs: torch.Tensor | None = None,
+                 flip_q: float = 0.0, noise_dirs: torch.Tensor | None = None):
         super().__init__()
         self._dummy = torch.nn.Parameter(torch.zeros(1), requires_grad=False)
         self.config = SimpleNamespace(T=T)
@@ -131,12 +158,23 @@ class ConstructedArch(torch.nn.Module):
         self.register_buffer("u_bt", u_bt.detach().clone())
         self.sig_pos = tuple(sig_pos)
         self.p_noise, self.k_noise = int(p_noise), int(k_noise)
+        self.flip_q = float(flip_q)
+        self.register_buffer(
+            "flip_dirs", None if flip_dirs is None else flip_dirs.detach().clone())
+        self.register_buffer(
+            "noise_dirs", None if noise_dirs is None else noise_dirs.detach().clone())
         g = torch.Generator().manual_seed(int(seed) * 1_000_003 + T * 101 + p_noise)
         # Content rows have ‖·‖ ≈ √(n_c)·mag_content per position → √(3T) over
         # the tile; scaling by 1/√(3T) puts the pre-ReLU units at std ≈ 1, the
         # same order as the binary signal dims (ridge penalises a raw scale).
-        w = torch.randn(T * d_in, max(p_noise, 1), generator=g) / np.sqrt(3.0 * T)
+        n_in = T * (d_in if noise_dirs is None else int(noise_dirs.shape[0]))
+        w = torch.randn(n_in, max(p_noise, 1), generator=g) / np.sqrt(3.0 * T)
         self.register_buffer("W", w)
+        # Fixed direction + threshold for the flip bit (mix arm only).
+        wf = torch.randn(T * (0 if flip_dirs is None else int(flip_dirs.shape[0])),
+                         generator=torch.Generator().manual_seed(
+                             int(seed) * 7919 + T))
+        self.register_buffer("W_flip", wf)
 
     @property
     def p(self) -> int:
@@ -150,9 +188,23 @@ class ConstructedArch(torch.nn.Module):
         b = (proj > BT_EPS).to(x.dtype)                         # exact b
         parts = []
         if self.sig_pos:
-            parts.append(b[:, list(self.sig_pos)])
+            sig = b[:, list(self.sig_pos)]
+            if self.flip_dirs is not None and self.flip_q > 0:
+                # Deterministic Bernoulli(≈flip_q) bit from the DISJOINT
+                # content directions; standardised so the threshold is a
+                # normal quantile. Truth is measured from the realised
+                # columns, so the realised rate need not equal flip_q.
+                cf = (x @ self.flip_dirs.T).reshape(x.shape[0], -1)
+                u = cf @ self.W_flip
+                u = (u - u.mean()) / (u.std() + 1e-9)
+                thr = float(torch.distributions.Normal(0., 1.).icdf(
+                    torch.tensor(1.0 - self.flip_q)))
+                flip = (u > thr).to(x.dtype).unsqueeze(1)
+                sig = sig * (1 - flip) + (1 - sig) * flip
+            parts.append(sig)
         if self.p_noise:
-            content = x - proj.unsqueeze(-1) * self.u_bt        # ⊥ u_bt
+            content = (x - proj.unsqueeze(-1) * self.u_bt
+                       if self.noise_dirs is None else x @ self.noise_dirs.T)
             h = torch.relu(content.reshape(x.shape[0], -1) @ self.W)
             if 0 < self.k_noise < self.p_noise:
                 kth = h.topk(self.k_noise, dim=1).values[:, -1:]
@@ -194,21 +246,34 @@ def _fit(z_tr, t_tr, z_ev, t_ev, probe: str):
 
 def _arms(T: int) -> dict[str, tuple[int, ...]]:
     """Signal tile-positions per arm; λ's drivers are at T-2 and T-3."""
-    return {"full": tuple(q for q in (T - 2, T - 3) if q >= 0),
-            "token": (T - 1,),
-            "null": ()}
+    full = tuple(q for q in (T - 2, T - 3) if q >= 0)
+    out = {"full": full, "token": (T - 1,), "null": ()}
+    for q in MIX_QS:                       # mix arms reuse the full driver
+        out[f"mix{int(round(q * 100)):02d}"] = full
+    return out
 
 
-def _cell(arm, T, p, dens, seed, x, lam, u_bt, d_in, *, do_anchor: bool):
+def _mix_q(arm: str) -> float:
+    return int(arm[3:]) / 100.0 if arm.startswith("mix") else 0.0
+
+
+def _cell(arm, T, p, dens, seed, x, lam, u_bt, d_in, *, do_anchor: bool,
+          E=None):
     """One constructed-code cell: v1, v2, the (n_windows × probe) grid, truth."""
     sig = _arms(T)[arm]
     p_noise = max(p - len(sig), 0)
     k_noise = 8 if dens == "k8" else max(1, int(round(0.06 * p_noise)))
-    model = ConstructedArch(T=T, d_in=d_in, u_bt=u_bt, sig_pos=sig,
-                            p_noise=p_noise, k_noise=k_noise, seed=seed)
+    mix = arm.startswith("mix")
+    model = ConstructedArch(
+        T=T, d_in=d_in, u_bt=u_bt, sig_pos=sig, p_noise=p_noise,
+        k_noise=k_noise, seed=seed,
+        flip_dirs=(E[1 + N_NOISE_DIRS:] if mix else None),
+        flip_q=_mix_q(arm),
+        noise_dirs=(E[1:1 + N_NOISE_DIRS] if mix else None))
     model.eval()
     out = {"arm": arm, "T": T, "p_nominal": p, "p": model.p, "n_sig": len(sig),
-           "density": dens, "k_noise": k_noise, "seed": seed, "grid": []}
+           "density": dens, "k_noise": k_noise, "seed": seed,
+           "flip_q_nominal": _mix_q(arm), "grid": []}
 
     # Headline numbers straight from the committed probes.
     v1 = _train_lambda_probe(model, x, lam, L=L)                 # OLS, nw 1024
@@ -272,7 +337,11 @@ def main():
                          "probe_truth_calib*.json and dedupes by cell key)")
     ap.add_argument("--resume", action="store_true",
                     help="skip cells already present in --out")
+    ap.add_argument("--arms", default="full,token,null",
+                    help="comma-separated arm names; mix<NN> arms sweep the "
+                         "TRUTH LEVEL (mix00,mix10,mix20,mix35)")
     a = ap.parse_args()
+    want_arms = {x.strip() for x in a.arms.split(",") if x.strip()}
     seeds = tuple(int(s) for s in a.seeds.split(","))
 
     RES.mkdir(exist_ok=True)
@@ -286,7 +355,8 @@ def main():
         data = materialise(load_datasource(DS), seed=seed)
         x = data.x
         lam = torch.as_tensor(data.extra["lambda_labels"]).float()
-        u_bt = torch.as_tensor(np.asarray(data.emission_features)[0]).float()
+        E = torch.as_tensor(np.asarray(data.emission_features)).float()
+        u_bt = E[0]
         d_in = int(x.shape[-1])
         b_true = torch.as_tensor(data.extra["b_labels"]).float()
         b_hat = ((x.float() @ u_bt) > BT_EPS).float()
@@ -294,7 +364,7 @@ def main():
         print(f"[seed {seed}] b extraction exact: {b_exact}", flush=True)
 
         jobs = []                                    # (arm, T, p, dens, anchor)
-        for arm in ("full", "token", "null"):
+        for arm in [a for a in ("full", "token", "null") if a in want_arms]:
             for p in P_LADDER:
                 jobs.append((arm, T_MAIN, p, "k8", True))
             if P_STACKED_CORNER:
@@ -304,11 +374,18 @@ def main():
             for T in T_GATE:                          # G1: the arm truths vs T
                 if T != T_MAIN:
                     jobs.append((arm, T, P_GATE, "k8", False))
+        for arm in [f"mix{int(round(q * 100)):02d}" for q in MIX_QS]:
+            if arm not in want_arms:
+                continue
+            for p in MIX_PS:
+                for dens in ("k8", "p6"):
+                    jobs.append((arm, T_MAIN, p, dens, p == MIX_PS[0]))
 
         for arm, T, p, dens, anch in jobs:
             if (arm, T, p, dens, seed) in done:
                 continue
-            r = _cell(arm, T, p, dens, seed, x, lam, u_bt, d_in, do_anchor=anch)
+            r = _cell(arm, T, p, dens, seed, x, lam, u_bt, d_in,
+                      do_anchor=anch, E=E)
             r["b_exact"] = b_exact
             rows.append(r)
             g16 = [q for q in r["grid"] if q["n_windows"] == 8192][0]
