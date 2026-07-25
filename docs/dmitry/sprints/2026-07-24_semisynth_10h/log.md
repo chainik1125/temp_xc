@@ -466,3 +466,44 @@ and it narrows what the un-run job was still needed for: not the weights, but th
 measurement on writes whose *arrangement* varies at matched positions. Summary updated
 accordingly, including the honest statement of what remains untested.
 
+### 23:52 — fresh-eyes figure test, and the figures needed more work than the text
+
+Ran the sprint guidance's own test properly: a fresh agent with **no project context**,
+given only the four PNGs, asked what each claims, what it had to guess at, and what it
+would conclude the finding was from the figures alone. Its verdict was the most useful
+review of the night after the audit, because everything it flagged was invisible to me.
+
+**Three defects that were factually misleading, now fixed:**
+
+1. **`linearity.png` still said "moves the model by EXACTLY its projection"** — I had
+   softened that in the *text* hours earlier and never touched the figure. The reader
+   pointed out the picture actively contradicts the word: at zero predicted effect the
+   measured values run −0.39 to +0.12, and that vertical stack is the most visible
+   feature of the scatter. Retitled to "roughly", and the stack is now *annotated* as the
+   evidence for unequal position weights rather than left as an unexplained blemish.
+2. **`phase_diagram.png` never printed the formula generating its predictions.** Fatal
+   for a "nothing fitted" claim — the footnote gave only the two trivial cases, so the six
+   interesting cells had predictions a reader could not derive or check. Now printed:
+   R = mean_b |μ_b|.
+3. **Panel B asserted "efficiency is best at W ≈ ℓ" while its own ℓ=2 star sat at W=6.**
+   The truth is that odd multiples of ℓ are predicted to *tie* (both 1/6 there), so the
+   star placement was noise. The panel now draws the predicted curve as a dashed line,
+   stars the *predicted* best, and says the tie in the title.
+
+**Three rendering defects it caught that I had looked straight past:** the "1/8 = one slot
+of eight" annotation overprinted by the bold "0.125" bar label; the legend in stance panel
+A clipping the blue curve around k=4–5; and the blue annotation in controls panel A sitting
+on the bottom spine with its descenders cut.
+
+**And the systematic complaint, which was the fair one:** essentially every plotted
+quantity — margin, fidelity, slot, knob, projection — was a term the reader had to take on
+trust, and no figure but one stated its model, layer, error-bar definition or n. All four
+now carry model/layer/n/error-bar definitions, Δmargin is spelled out as a log-prob margin
+everywhere it appears, and the six at-risk cells are outlined in red so panels A and C
+visibly refer to the same thing.
+
+Its unprompted one-paragraph reconstruction of the finding from figures alone was
+essentially correct, which is reassuring — but it noted honestly that it had assembled it
+from *title sentences* rather than from marks. That is the right criticism to receive
+before a reader does.
+
