@@ -6,7 +6,10 @@ taken jointly with the variance-machinery owner at the methods review;
 adoption = freezing this file as-is (or amending it there). Until then
 the canonical readout remains v1 (`temp_bench/evals/lambda_recovery.py`,
 frozen, bit-identical forever) and every committed panel number stands
-unchanged.**
+unchanged.** *Update (LOG, 2026-07-25 force-majeure entry): the decision
+is TAKEN for the deadline window — v1 canonical, paired v2 columns
+reported, never quoted as canonical. This spec remains THE post-deadline
+freeze candidate; § 0 below is binding content of any future adoption.*
 
 **Why this exists.** runpod-d (λ̂ panel) and runpod-e (hedging panel)
 report — independently measured, **under review, not yet reviewed or
@@ -17,6 +20,49 @@ T = 16 (negative held-out r² on dense cells), and ridge and/or more
 windows lift dense-code cells by +0.18…+0.23 while their diagnostics
 reproduce the committed panel numbers to 1e-4 at the old settings. This
 spec is the contingency: it makes the decision *executable* either way.
+
+## 0. First-class limitation — v2 tightens a lower bound; it does not report truth
+
+**Measured against exact constructed truth** (mirror campaign, the
+direct known-truth Stage-1 probe; artifact:
+`../support_synthetic/results/probe_truth.json`, `amendment.rows`; LOG
+2026-07-25 probe-truth increment 2), **v2 is itself biased LOW by up to
+0.18 in exactly the regime the real panels occupy** — low true
+recoverable level (≈ 0.4), dense code, p/n ≥ 1. The 12-cell receipt
+(T = 16, arms full/token/null × densities top-8 / 6 %, seed-means over
+3 seeds, p/n ∈ {1.0, 2.0}):
+
+- v2 tracks exact truth within bar on **10/12** cells and exceeds truth
+  on **0/12** (worst full-arm miss −0.006 — at high truth the bias is
+  negligible by mechanism).
+- The two misses are both **token arm, 6 % density, truth 0.412**: v2
+  reads **0.299 at p/n = 1.0 (d2 = −0.113)** and **0.232 at p/n = 2.0
+  (d2 = −0.180)**. (v1 on the same two cells reads 0.009 and 0.076 — a
+  −0.34…−0.40 sag; v2's remaining sag is the point of this section,
+  not a defense of v1.)
+
+**Therefore: adopting v2 changes reported recovery from a
+capacity-limited reading into a TIGHTER LOWER BOUND — it does not make
+reported recovery an estimate of the true recoverable level.** In the
+low-truth + dense + p/n ≥ 1 regime — where the real panels' window
+cells live — an adopted v2 number licenses "the code carries at least
+X", never "the code carries X"; absolute levels remain conservative,
+and only the ordering claims (window vs per-token, trained vs
+untrained, the T-shape under a fixed readout) are robust to the
+readout. Any document that freezes this spec inherits this section
+with it.
+
+Mechanism support on the real panel (pushed receipts): the
+v1 → adequate-probe lift is monotone in realized code density — the one
+sparse post cell (nnz = 8) lifts +0.032 while the dense post-matched
+T16 cell (nnz = 128) lifts +0.184 at the same nominal p/n (LOG,
+post-matched diagnostic table). The mirror campaign's transfer test
+reproduced this contrast (Test A), but its artifact
+(`probe_truth_transfer.json`) was LOST with the pod mid-run (force
+majeure, 2026-07-25); the surviving statement is the LOG increment-2
+entry, and the residual dependence on HOW signal is distributed across
+code columns (constructed codes concentrate λ in ≤ 2 columns; trained
+codes spread it) is an open, disclosed caveat.
 
 ## 1. The frozen v2 convention
 

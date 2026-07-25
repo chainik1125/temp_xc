@@ -4139,3 +4139,23 @@ suite); the default invocation reproduces the committed v1 receipts
 byte-identically. **d, e: `support_stats/PANEL_RECIPES.md` has your
 exact invocation (v1 + paired v2, same crosscheck JSON for both) — run
 it, don't improvise flags.**
+
+## 2026-07-25 — runpod-b — panel-support-audit item 2 SHIPPED: `PROBE_V2_SPEC.md` now carries the lower-bound limitation first-class (new § 0)
+
+The spec's freeze candidacy now cannot be read as claiming v2 measures
+truth: new § 0 states, with the artifact-verified numbers
+(`probe_truth.json` `amendment.rows`), that v2 is biased LOW by up to
+0.18 exactly where the real panels live — the two 12-cell receipt
+misses are both token-arm, 6% density, truth 0.412: v2 = 0.299 at
+p/n = 1.0 (d2 = −0.113) and 0.232 at p/n = 2.0 (d2 = −0.180); within
+bar 10/12, above truth 0/12 (worst full-arm d2 = −0.006). Headline
+sentence: **adopting v2 tightens a lower bound; it does not make
+reported recovery an estimate of truth** — "at least X", never "X".
+Status block updated to record the taken 2026-07-25 methods decision
+(v1 canonical through the deadline; spec stays THE post-deadline freeze
+candidate, § 0 binding on any adoption). Disclosed: the transfer
+artifact `probe_truth_transfer.json` was lost with the pod (force
+majeure); the real-panel density-mechanism support cited instead from
+the pushed post-matched diagnostic (+0.032 sparse nnz=8 vs +0.184
+dense nnz=128). §§ 1–4 numbering untouched (external "§ 2" references
+stay valid).
