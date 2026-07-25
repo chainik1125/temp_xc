@@ -1,0 +1,70 @@
+{
+  "target": "case",
+  "class_id": 2,
+  "n_windows": 1024,
+  "L": 32,
+  "feature": "in-tile count of op==2 tokens",
+  "probe": "OLS (LinearRegression), v1 split + seeds",
+  "per_T": [
+    {
+      "T": 1,
+      "r": 0.18277957858193733,
+      "n_train_rows": 27432,
+      "n_eval_rows": 24985,
+      "dropped_train": 5336,
+      "dropped_eval": 7783,
+      "sampled_train": 32768,
+      "sampled_eval": 32768,
+      "drop_frac_train": 0.162841796875,
+      "drop_frac_eval": 0.237518310546875
+    },
+    {
+      "T": 2,
+      "r": 0.19778079654265743,
+      "n_train_rows": 13728,
+      "n_eval_rows": 12527,
+      "dropped_train": 2656,
+      "dropped_eval": 3857,
+      "sampled_train": 16384,
+      "sampled_eval": 16384,
+      "drop_frac_train": 0.162109375,
+      "drop_frac_eval": 0.23541259765625
+    },
+    {
+      "T": 4,
+      "r": 0.2255144361467813,
+      "n_train_rows": 6868,
+      "n_eval_rows": 6271,
+      "dropped_train": 1324,
+      "dropped_eval": 1921,
+      "sampled_train": 8192,
+      "sampled_eval": 8192,
+      "drop_frac_train": 0.16162109375,
+      "drop_frac_eval": 0.2344970703125
+    },
+    {
+      "T": 8,
+      "r": 0.269819016802395,
+      "n_train_rows": 3435,
+      "n_eval_rows": 3140,
+      "dropped_train": 661,
+      "dropped_eval": 956,
+      "sampled_train": 4096,
+      "sampled_eval": 4096,
+      "drop_frac_train": 0.161376953125,
+      "drop_frac_eval": 0.2333984375
+    },
+    {
+      "T": 16,
+      "r": 0.36036753230281676,
+      "n_train_rows": 1729,
+      "n_eval_rows": 1576,
+      "dropped_train": 319,
+      "dropped_eval": 472,
+      "sampled_train": 2048,
+      "sampled_eval": 2048,
+      "drop_frac_train": 0.15576171875,
+      "drop_frac_eval": 0.23046875
+    }
+  ]
+}
