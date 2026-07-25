@@ -45,6 +45,42 @@ ask — do not guess.
    not own. 57 CPUs are shared — background CPU-heavy work (tsae
    buffers, probes) coordinates by not exceeding ~24 cores per agent.
 
+## Filesystem layout & isolation (SET UP BY THE OPERATOR — verify, don't improvise)
+
+**One clone per agent — never a shared checkout, never worktrees.**
+The canonical runner refuses dirty trees, so a shared checkout would
+let one agent's edits block another's panel cells; and same-branch
+worktrees are impossible in git. Coordination stays where it always
+was: `origin/arxiv` (pull-rebase before EVERY push; LOG.md conflicts
+resolved append-only/union, upstream first, yours last).
+
+```
+/workspace/agents/runpod-d/temp_xc   (+ .agent_id beside the clone)
+/workspace/agents/runpod-e/temp_xc
+/workspace/agents/runpod-b/temp_xc
+/workspace/hf_cache                  (SHARED HF_HOME — models once)
+/workspace/.tokens/                  (gh_token, hf_token)
+```
+
+Per-agent, set in every shell (operator provides an env.sh per agent):
+- `CUDA_VISIBLE_DEVICES`: d = `0,1,2`; e = `3,4,5`; **b = `` (empty —
+  CPU-only, so a stray torch call cannot grab a GPU).** Verify with
+  `python -c "import torch; print(torch.cuda.device_count())"`
+  (3 / 3 / 0) — `nvidia-smi` always shows all six; that is expected.
+- `HF_HOME=/workspace/hf_cache` (shared; concurrent downloads of
+  DIFFERENT models are fine).
+- `OMP_NUM_THREADS=16` (57 shared cores; keep ≲ 24 per agent).
+- Your identity = your directory: cwd inside
+  `/workspace/agents/<id>/temp_xc` means you are `<id>`. Check
+  `../.agent_id` if unsure; if it disagrees with what your operator
+  said, STOP and ask.
+
+Per-clone (not shared): `.venv` (isolation — one agent pip-installing
+must not break another), activation caches (d's Ward and e's fineweb
+caches are disjoint anyway; rebuild inside your own clone's cache
+path), git identity. Disk is not a constraint (~100 GB total worst
+case on 1 TB).
+
 ## Environment bring-up (every agent, once)
 
 Repo: clone/pull to the workspace; `.venv` per the repo recipe
