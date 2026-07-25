@@ -372,3 +372,104 @@ The scope limit is stated plainly: one model, one hookpoint family, English
 templates, one label. This kills *this* label on *this* model. It does not
 establish that no equality latent survives conversion anywhere — that is what the
 remaining candidates test.
+
+---
+
+## § 7 — Candidate 1b (§ 8 parity form): the theorem verified, and the boundary pinned
+
+Card [`cards/role_order.md`](cards/role_order.md) **§ 8**, frozen by dated
+amendment after § 2's additive-blindness claim was found to be wrong (order is a
+*linear* functional of position-tagged features; the theorem needs a **product**).
+Label:
+
+> `y = [ type(last marker) == type(second-to-last marker) ]`
+
+over `<document>` / `</document>`, both slots balanced, depth pre-seeded to 2 so
+every marker pair is legal, filler jittered, probe row at the later marker.
+2,880 distinct items, 12 groups. Triage PASS after the generator's **own gap check
+caught a bug**: string search located the *preamble's* opener whenever M1 was an
+opener, making the M1→M2 gap predict the label at AUC 0.139. Offsets are now
+computed arithmetically and asserted against the text.
+
+**Result** (`T = 32`, stratum `all`, bootstrap CIs):
+
+| layer | per-token [95% CI] | window linear [95% CI] | window MLP [95% CI] | nonlinear residual | 3σ |
+|---|---|---|---|---|---|
+| **0** | 0.508 [0.446, 0.552] | **0.488 [0.441, 0.537]** | **0.994 [0.986, 0.999]** | **+0.486** | 0.049 |
+| **1** | 1.000 [1.000, 1.000] | 0.998 [0.994, 1.000] | 1.000 | +0.000 | 0.030 |
+| 2 | 1.000 | 1.000 | 1.000 | +0.000 | 0.048 |
+| 3 | 1.000 | 1.000 | 1.000 | +0.000 | 0.078 |
+| 4–24 | 1.000 | 1.000 | 1.000 | +0.000 | 0.074–0.084 |
+
+**Two findings, and the second is the important one.**
+
+**(1) The additive-code theorem is verified on real activations, decisively.** On a
+label that is genuinely a two-position product, the additive ceiling sits at
+**0.488 — chance — while a cross-position nonlinearity reaches 0.994**, CIs not
+remotely overlapping, residual **+0.486** against a 3σ null of 0.049. Predictions
+P8.1 (per-token ≤ 0.55) and P8.2 (window linear ≤ 0.60) both **CONFIRMED**, and
+P8.2 is the load-bearing one: it is the theorem's own prediction, and it held to
+0.488. This is the sharpest form of the architectural claim the paper makes — the
+paper's TXC is the only panel family whose nonlinearity crosses positions, and
+here that is worth +0.49 AUC over every additive alternative.
+
+**(2) The window of opportunity closes after layer 0 — P8.4 CONFIRMED, and the
+boundary is the first attention layer.** By **layer 1** a per-token linear probe
+reads the parity label at 1.000. The boundary cells (L1, L3) were run precisely
+because L0 → L2 left it unresolved; the answer is that *one* attention layer
+suffices.
+
+### § 7b — Revised synthesis: it is not the task, it is the depth
+
+Four relational labels now, chosen to be as different as the family allows —
+syntactic binding, factual consistency, labelled provenance, structural parity:
+
+| label | per-token at L0 | additive ceiling at L0 | nonlinear ceiling at L0 | converted by |
+|---|---|---|---|---|
+| agreement equality | 0.495 | 0.503 | 0.749 (0.772 IN) | layer 4 |
+| fact consistency | 0.500 | 0.499 | 0.641 *(oracle pair)* | layer 2 |
+| labelled role | 0.477 | 1.000 *(additive — marker token)* | 1.000 | layer 4 |
+| **structural parity** | **0.508** | **0.488** | **0.994** | **layer 1** |
+
+The earlier reading — "no relational task survives conversion" — was right but
+mis-attributed. The correct statement is stronger and more useful:
+
+> **The architectural advantage of a position-mixing code over an additive one is
+> real, provable, and large (+0.49 AUC) — and on real activations it exists only
+> at the embeddings. Attention linearises cross-position relational structure
+> within its first layer, so at every hookpoint where anyone trains a dictionary,
+> an additive code is already sufficient.**
+
+This is not a null result about temporal crosscoders. It is a *positive*
+identification of where their advantage does and does not live, and it resolves the
+paper's central puzzle: TXC's real niche cannot be relational structure, because
+transformers dispose of that immediately. It must be — and in the paper's own
+results it is — the **aggregation** regime: pooling evidence that stays
+distributed because no single position ever summarises it. Backtracking
+anticipation and λ̂ intensity are exactly that, and they are precisely where the
+paper's positive results sit.
+
+**What this licenses the paper to say**, with a measurement behind each clause:
+
+1. *When* temporal aggregation pays off: on latents no single position summarises
+   — hazards over a trajectory, not relations the model computes.
+2. *Why* the relational case fails: not because the theorem is wrong (it holds at
+   +0.486) but because attention converts within one layer.
+3. *Why* window length barely matters on sparse probing (reviewer bbby's
+   observation): those labels are regime-1 ambient, so no window arch should
+   separate — and none does.
+4. *Why* Stacked SAE and MLC would not have rescued Fig. 4 (reviewers bbby, 4z15):
+   on regime-1/2 labels they are in the same equivalence class as the winner; the
+   only place they provably separate is layer 0, which no one trains at.
+
+### § 7c — The panel question, answered honestly
+
+A gate did clear — at layer 0, decisively. So a 6-arch panel *there* would produce
+exactly the money plot the reviewers want: five lines pinned at chance for a proven
+reason, one rising with `T`. It is not run here, and the reason is stated rather
+than hidden: **a dictionary trained on raw token embeddings is a token-identity
+dictionary**, so the demonstration would be architecturally valid and
+interpretability-irrelevant, and a reviewer would be right to say so. The panel is
+worth running only as an explicit *existence demonstration* of the coincidence-code
+claim, labelled as such — not as a TempBench task. That decision belongs to the
+authors, and the numbers needed to make it are in this record.
