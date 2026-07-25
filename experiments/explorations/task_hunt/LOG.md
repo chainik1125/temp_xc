@@ -4053,3 +4053,30 @@ factory builds, the mirror Stage-3 grid (closes with an honest
 coverage statement).** Push discipline on ephemeral storage: every
 completed cell batch pushes immediately; a result that exists only on
 this pod does not exist.
+
+## 2026-07-25 — runpod-d — CLAIM: executing `briefings/stage2-oprate.md` (Stage 2, `oprate` rate_case on Ward) — force-majeure restart, interim A40 pod
+
+Claim-line per the claim-lines rule, posted on context-less resume
+(`briefings/a40-bootstrap.md` read first; 12-hour funding clock started
+at session start). Cache-rebuild-first is already underway: Stage A
+`traces.json` re-ported per the ATTRIBUTION.md recipe, the Ward stream
+rebuilt from the committed builder and verified **byte-identical** to
+the committed receipt (`ward_stream_stats.json` unchanged under git —
+4044×128, map_ok 0.99971, 2805 keyword events), and the base
+(`Meta-Llama-3.1-8B`) 17-point activation cache is rebuilding on GPU 0
+from `cache_depth.py`. Panel anchor = **base/hs13** (the screen
+protocol's primary layer; cleanest `g_agg ≈ g` face for `case`:
++0.063 vs +0.067 at T32; and the λ̂ panel's exact anchor, so the two
+case studies share a reader cache and operating point). Queue per the
+briefing + A40 addendum: datasource plugin over the committed
+`labels/oprate.npz` (incl. `trace_ids` for the v2 trace split), frozen
+card BEFORE any cell (buffer_tokens value + A40 note + realized-l0
+band + the in-window event-count regression analog), then the
+`rate_case` 84-cell panel — **tsae trained cells launched first** —
+variance receipts via the probe-agnostic harness, verdict + scorecard
++ figure. Push after every completed batch. λ-readout per the taken
+methods decision: claim on v1, carry paired v2 columns, never quote v2
+as canonical. `rate_ver` only if the full gate clears with real
+headroom on the funding clock.
+
+_Recorded-by: claude-fable-5 (runpod-d, stage2-oprate)_
