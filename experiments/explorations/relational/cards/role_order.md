@@ -1,7 +1,29 @@
 # Card — candidate 1b: labelled role by MARKER ORDER (the regime-3 form)
 
-**Status: FROZEN — specified, not yet run.** Committed as the next step so that
-whoever runs it does so against predictions written before any cell exists.
+**Status: FROZEN, then AMENDED 2026-07-25 — § 2's central claim is WRONG and the
+design is superseded by § 8. Nothing was ever run against it.**
+
+> ### Dated amendment (2026-07-25, before any cell existed)
+>
+> **The error.** § 2 claims that a label depending on *which marker came last* is
+> invisible to additive-over-position codes. It is not. A TXC-pre-style code is
+> `Σ_τ f_τ(x_{t+τ})` with **position-specific** encoders, so a linear readout can
+> weight an open-marker indicator by `+τ` and a close-marker indicator by `−τ` and
+> read off which came first directly. Order is a *linear* functional of
+> position-tagged features.
+>
+> **Why I should have caught it earlier.** I wrote exactly this objection when
+> ranking candidate 6 (refusal→comply order flip): *"it is arrangement, not
+> equality — additive codes with position-specific encoders read arrangement
+> fine."* Then I built a card on the arrangement structure anyway. The
+> additive-code theorem needs a **product** of indicators at two positions, not an
+> ordering of them.
+>
+> **Consequence.** Prediction P2 ("window linear stays ≤ 0.60") would have been
+> falsified by a *correct* additive code, and kill rule K3 would then have
+> mis-fired as "stimulus defect" on what is really the theorem not applying. The
+> design is superseded by § 8 below; § 2–§ 7 are kept unedited as the record of
+> the mistake.
 
 Agent `runpod`, 2026-07-25. Motivated by the candidate-1a result in
 [`../RECORD.md`](../RECORD.md) § 4.
@@ -118,3 +140,61 @@ than another small margin.
 One model, one marker vocabulary, English templates. A keep would establish that
 *this* provenance relation is unconverted in *this* model — enough to justify the
 panel, not enough to claim generality.
+
+---
+
+## § 8 — Superseding design: marker-type EQUALITY (the actually additive-blind form)
+
+Frozen 2026-07-25, before any cell exists.
+
+The additive-code theorem applies to a **product of indicators at two positions**.
+So the label must be an equality between the *contents* of two positions, with
+both positions' content balanced:
+
+Take the two most recent boundary markers preceding the row and label
+
+> `y = [ type(last marker) == type(second-to-last marker) ]`
+
+| markers (in order) | y | structural meaning |
+|---|---|---|
+| `<document>` … `<document>` | 1 | nested — depth rose twice |
+| `</document>` … `</document>` | 1 | depth fell twice |
+| `<document>` … `</document>` | 0 | a complete block closed |
+| `</document>` … `<document>` | 0 | one block closed, another opened |
+
+Each of the two marker positions is `open` in exactly half the items, so both
+marginals are flat. Reading `y` requires `Σ_k 1[type_i = k]·1[type_j = k]` — a
+product — and **no linear readout of any per-position decomposition can compute
+it**, at any capacity, at any offset weighting. That is the theorem's hypothesis
+genuinely satisfied, unlike § 2.
+
+Semantically this is the *parity component* of provenance: "is my nesting depth
+where it was two boundaries ago". It is weaker as a safety story than labelled
+role — it is a state-tracking latent rather than a provenance monitor — and that
+demotion is the honest price of the correction.
+
+**Predictions (frozen).**
+- **P8.1** Per-token ≤ 0.55 at every layer: the row token and its context are
+  matched and both marker types are balanced.
+- **P8.2** Window **linear** ≤ 0.60 at every layer and `T`. Now load-bearing *for
+  the right reason*: the theorem forbids it, whatever offset weighting is used.
+- **P8.3** `nonlinear_residual > 3σ_null` at layer 0 in the stratum where both
+  markers are in the window, by analogy with the two layer-0 positive controls
+  already measured (+0.269 agreement window, +0.109 contradiction pair).
+- **P8.4** **The residual does NOT survive past layer ~4.** Bracket/nesting-depth
+  tracking is the canonical conversion case — `task_hunt/CANDIDATES.md` records it
+  as DEAD (`D5`) — and all three labels measured today converted within 2–8
+  layers. *I expect this to be killed*, and the value of running it is that it
+  completes the atlas with a **parity/state** instance alongside the
+  binding, consistency and provenance ones.
+- **P8.5** Within-window shuffle destroys the residual, read against an ambient
+  anchor (a shuffle gap grows with `T` generically).
+
+**Kill rules.** K1/K2 as before. **K3 is withdrawn** — with the corrected design a
+window-linear rise above 0.60 is *evidence against the theorem's applicability
+here*, i.e. a finding about the code class, and must be reported as such rather
+than dismissed as a stimulus defect.
+
+**Mandatory arms.** The oracle-pair arm (the two marker positions only) is
+required, per RECORD § 3's lesson: a null from a wide window MLP is not evidence
+of absence.
