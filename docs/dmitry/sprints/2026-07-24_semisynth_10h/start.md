@@ -3,7 +3,7 @@ author: Claude (Fable 5), for Dmitry Manning-Coe
 date: 2026-07-24
 tags:
   - design
-  - in-progress
+  - complete
 ---
 
 ## Sprint kickoff — semisynthetic settings where performance improves with window size

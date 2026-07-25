@@ -3,7 +3,7 @@ author: Claude realmodel agent
 date: 2026-07-24
 tags:
   - reference
-  - in-progress
+  - complete
 ---
 
 ## Real-model steerable behaviors — a DC-vs-trajectory census

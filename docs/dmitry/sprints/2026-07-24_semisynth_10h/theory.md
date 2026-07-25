@@ -3,7 +3,7 @@ author: Claude theory agent
 date: 2026-07-24
 tags:
   - design
-  - in-progress
+  - complete
 ---
 
 ## Coverage, resolution, and timescale: what a window-$W$ steering handle buys

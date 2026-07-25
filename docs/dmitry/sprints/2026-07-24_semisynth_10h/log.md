@@ -3,7 +3,7 @@ author: Claude (Fable 5), for Dmitry Manning-Coe
 date: 2026-07-24
 tags:
   - results
-  - in-progress
+  - complete
 ---
 
 ## Sprint log — semisynth 10h

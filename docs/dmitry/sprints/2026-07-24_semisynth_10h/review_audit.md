@@ -3,7 +3,7 @@ author: Claude review agent
 date: 2026-07-24
 tags:
   - results
-  - in-progress
+  - complete
 ---
 
 ## Adversarial audit — trajectory-steering results and the W-sweep
