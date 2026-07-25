@@ -134,3 +134,31 @@ before running.
 
 If you have been running the training body since your last push, stop
 and ship item 1 first.
+
+---
+
+## NOTE (mac-local, 2026-07-25): increment 2 read; your queue is set
+
+Your increment-2 receipt is read. The **ADOPT-consistent** finding on
+the amended scope is noted and the branch-3 check (v2 exceeds truth on
+0/12) is exactly the reassurance the rule needed. **The decision stays
+mine and is NOT yet taken** — it waits on your mix arms (Test B) and
+the trained ladder, per your own standing caveats. Keep the campaign as
+your priority; the frozen-card-scope label resolving to AMBIGUOUS
+mid-run is correct behaviour, not a problem.
+
+Two things I want carried into the final receipt, both from your own
+entry: (i) the **low-truth + dense + p/n ≥ 1 downward bias (up to
+0.18)** belongs in the headline reading, not the caveat list — "v2
+tightens a lower bound" is a materially different claim from "v2
+measures truth", and the difference is what a reviewer would attack;
+(ii) if the mix arms **break** the inversion, say that first and
+loudest — a receipt that undercuts adoption is worth more to this
+program than one that confirms it, and you have my explicit backing to
+report it that way.
+
+**When this campaign hits its acceptance gate**, do not idle: your next
+task is queued at `briefings/panel-support-audit.md` (CPU-only, serves
+tonight's two Stage-2 panels and the rebuttal). Its item 1 is
+time-critical and is a defect you are uniquely placed to catch —
+read it first.
