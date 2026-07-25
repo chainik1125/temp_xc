@@ -693,6 +693,116 @@ property of the dictionary rather than of a profile, and A1's floor-tracking tes
 three anyway. If only one profile fits the compute window, the summary must say the number
 is single-profile and quote its floor alongside.
 
+### A6 — my harness gate was mis-specified; re-specify it, do not widen it
+
+**Ruling on the ℓ=1, W=3 cell (predicted 0.333, observed 0.218).** The gate was wrong, and
+it was my error. I set a 0.08 threshold against the *theoretical* prediction
+`mean_b|μ_b|` — but last sprint established that the homogeneous-linear law systematically
+undershoots, in a dose-dependent way, in 12 of 12 cells across two models. Its own
+measurement of this exact cell on this exact model is stored in
+`results/temporal_screen/lsweep_qwen1.5b.json` at `phase_diagram/1/W3_block_cap/obs_R` =
+**0.24898**, i.e. the reference run missed the theory by **0.084** — already above the gate
+I then asked a re-implementation to clear. A threshold that the calibration standard itself
+fails is not a threshold.
+
+**The correct standard is the measurement, not the law.** Registered replacement:
+
+```text
+harness_ok  ⇔  |obs(ell, W) − lsweep_qwen1.5b[ell][W].obs_R| ≤ 0.08   at matched dose
+```
+
+Against that, 0.218 versus 0.249 is a miss of **0.031** and passes with room. **This is a
+pass, and it should be reported as one** — but the dose must be stated, because the
+reference is dose-resolved (0.144 / 0.210 / 0.249 at frac 0.2 / 0.35 / 0.5). At frac 0.35
+the reference is 0.210 and the miss is 0.008; at frac 0.2 the sign of the miss reverses.
+Report the frac and the matched reference value beside the observation.
+
+**Where the proposed wording is too generous, and it is one specific word.** "Consistent
+with the law to within its known spread" treats a *systematic* deviation as scatter. The
+undershoot is predictable in sign and magnitude — it is the convexity established last
+sprint, not noise — so calling it spread launders a known bias into a tolerance. The
+sharper and more defensible sentence is: *the cell undershoots the homogeneous-linear
+prediction, in the direction and by approximately the amount the same cell undershot it on
+the same model at the same dose in the reference run.* That is a stronger claim than
+"within spread" and it is the one the data supports.
+
+Two additions. The three structurally-zero cells returning **exactly** 0.000 is an
+unambiguous pass of the write path, sign convention and determinism, and should be reported
+as the part of the gate that is not in question. And one cell is thin: **ℓ=3, W=2**
+(reference `obs_R` = 0.628) is the highest-signal informative cell in the grid and costs one
+more arm. Two cells make this a calibration, one cell makes it an anecdote.
+
+### A7 — the shuffled control is only load-bearing where the coefficients are frozen
+
+The `txc_shuffled ≥ txc` result is the sprint's headline, so it now needs the scrutiny a
+positive would have received. Two problems, both fixable cheaply, and one interpretive
+limit that must be stated.
+
+**The interpretive limit.** In the m-sweep the coefficients are refit by least squares
+*after* shuffling. Permuting each atom's rows produces a different basis of `k × d` slabs
+with essentially the same expressive power, so `shuffled ≈ intact` is *partly guaranteed by
+the design*: it says the learned temporal profiles were not specifically aligned to the
+target profiles, which is a real and useful finding, but it is a statement about the
+**span** of the dictionary, not about whether arrangement can do work. Arrangement can only
+do work where it is not re-chosen — which is the frozen arm.
+
+**Therefore the missing experiment is the shuffled control inside the frozen arm**, and it
+is the only remaining run that could change the sprint's conclusion. Same arm, permute the
+selected latent's rows, no refitting. If `frozen_shuffled ≈ frozen_intact`, the negative is
+airtight in both settings and the sprint has a clean general result. If
+`frozen_intact ≫ frozen_shuffled`, then arrangement does matter and the m-sweep destroyed
+the effect by refitting — which would be the sprint's genuine finding and would rewrite the
+summary. It costs almost nothing and it should run before anything else.
+
+**The statistical problem.** A point comparison against what appears to be a single
+permutation draw cannot distinguish "arrangement is worthless" from "arrangement is worth
+half a sigma", and it cannot support the reading that shuffling *helps*. Report intact's
+**percentile within a ≥ 20-draw shuffled null** at each `m`, not a point contrast.
+Registered prediction: intact will sit between the **30th and 70th percentile** at every
+budget, and the apparent shuffled-beats-intact ordering at 4 of 5 budgets will not survive
+the draws. **Do not write "destroying temporal structure improves steering" in the
+summary** — that is exactly the shape of over-read that cost last sprint three claims.
+
+**The framing that is worth keeping.** The two nulls decompose fidelity cleanly:
+`random → shuffled` is the value of learned **content**, `shuffled → intact` is the value of
+learned **arrangement**. On current numbers the first is nearly everything and the second is
+nothing. That decomposition, with a draw distribution behind it, is the sprint's result and
+it is a good one.
+
+### A8 — a negative headline reverses the matching argument, and A2's rule flips with it
+
+With the conclusion now negative, the alternative explanation to defend against is no
+longer "the TXC won because it had more capacity" but **"the TXC lost because it is a bad
+dictionary"**. The evidence for that worry already exists: realised L0 ≈ 81 against a
+nominal window k of 1200 means **93% of TopK-selected latents are zeroed by ReLU**, which is
+as consistent with an undertrained or partially collapsed encoder as with genuine sparsity.
+
+So A2's rule flips direction, and this is now the **highest-value cheap measurement in the
+sprint**:
+
+- If **FVU_TXC ≈ FVU_SAE** per segment on held-out data, the negative is general and can be
+  stated as a property of temporal dictionaries at this scale.
+- If **FVU_TXC is materially worse**, the honest headline narrows to *this crosscoder,
+  trained this way* — still publishable, considerably weaker, and dishonest to omit.
+
+Report alongside it the **alive-latent fraction** (latents firing on ≥ 0.1% of eval
+windows, union over the eval set, not per window) for both dictionaries. Registered
+prediction: the TXC's alive fraction will be below 20% of `d_sae`, and if it is below 5% the
+selection pool is small enough that the C5 winner's-curse analysis and the A3 null both need
+recomputing against the alive set rather than `d_sae`.
+
+### Recommended order for the remaining window, superseding the order above
+
+1. **Frozen shuffled control, ≥ 20 draws** (A7). The only remaining run that can change the
+   conclusion, and nearly free.
+2. **Dictionary-health panel** (A8): per-segment held-out FVU for both, alive-latent
+   fraction, realised L0. This is now the defence of the negative, not the defence of a win.
+3. **Frozen rerun** with A1's a-orthogonal profiles (three, floors ≈ −0.2 / 0 / +0.2) and
+   A3's frequency-matched nulls.
+4. **A4 fitted-once ceiling.** Its role has changed: with the negative established it is no
+   longer the arm that decides the question, it is the arm that makes the result *useful* —
+   the constructive number a reader needs. Fourth, not first.
+
 ### What I will check in `frozen.json`, pre-committed
 
 In this order, and I will report anything here that is missing as a blocker rather than a
