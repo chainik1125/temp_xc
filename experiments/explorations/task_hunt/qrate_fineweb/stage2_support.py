@@ -143,18 +143,27 @@ def main():
         floor_r = float(np.corrcoef(pred_floor, t_ev[ev_m])[0, 1]) \
             if np.std(pred_floor) > 1e-12 else 0.0
 
-        # (2) evidence line: in-tile q-token count → target, held-out
-        reg = LinearRegression().fit(c_tr[tr_m, None], t_tr[tr_m])
-        pred = reg.predict(c_ev[ev_m, None])
-        ev_r = float(np.corrcoef(pred, t_ev[ev_m])[0, 1]) \
-            if np.std(pred) > 1e-12 else 0.0
+        # (2) evidence line: in-tile q-token count → target, held-out.
+        # At T=1 the feature is structurally degenerate: the ambient-anchor
+        # masking NaNs every question-sentence token, so no kept single-token
+        # tile can contain a visible question mark (count variance is exactly
+        # zero — measured, not assumed). Recorded as null, not 0.
+        if np.std(c_tr[tr_m]) < 1e-12:
+            ev_r = None
+        else:
+            reg = LinearRegression().fit(c_tr[tr_m, None], t_tr[tr_m])
+            pred = reg.predict(c_ev[ev_m, None])
+            ev_r = float(np.corrcoef(pred, t_ev[ev_m])[0, 1]) \
+                if np.std(pred) > 1e-12 else 0.0
 
         out["per_T"][T] = {
             "doc_floor_r": floor_r, "evidence_count_r": ev_r,
             "nan_drop_train": float(nan_tr), "nan_drop_eval": float(nan_ev),
             "rows_train": int(tr_m.sum()), "rows_eval": int(ev_m.sum()),
         }
-        print(f"  T={T:<3} floor_r={floor_r:+.4f}  evidence_r={ev_r:+.4f}  "
+        ev_s = "undef (zero in-tile event variance)" if ev_r is None \
+            else f"{ev_r:+.4f}"
+        print(f"  T={T:<3} floor_r={floor_r:+.4f}  evidence_r={ev_s}  "
               f"nan tr/ev={nan_tr:.3f}/{nan_ev:.3f}  "
               f"rows tr/ev={tr_m.sum()}/{ev_m.sum()}", flush=True)
 
