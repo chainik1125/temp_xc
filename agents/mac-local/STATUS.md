@@ -58,8 +58,15 @@ max-over-arms; doc_mean_only_auc = disclosure-triggers-control.
   caches; stop the pod early if nothing useful remains.
 
 ## ⏭ MY QUEUE
+0. DONE 07-25: b's audit + close-out REVIEWED & APPROVED (LOG entry).
+   **RECEIPTS.md is the rebuttal's quote source of record** (50/16 ALL
+   PASS, pytest-wired; R5/R10 negative-space receipts; R11 canonical
+   dialevel triple +0.057/+0.063/+0.035). b = standby panel CPU
+   support. My reviewer fix: variance byte-guard now rel-1e-12
+   structural (ARM ulp; suite 333).
 1. Review panels as batches land (they are the check-in's marginal
-   content). Review b's mirror close-out + audit deliverables.
+   content). d: claimed+frozen, cache rebuilding. e: 34/84, falsifier
+   green, residual mismatch recorded unprompted (1/42).
 2. **Sunday check-in distillation** (mine, before 10:00 PT):
    headline + receipts, panel outcomes (complete or honest-partial),
    kill table, order/recency finding (amended wording), the

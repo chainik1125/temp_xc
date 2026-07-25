@@ -10,6 +10,18 @@ Last updated: 2026-07-23.
 
 ## 0. TL;DR — what's active right now
 
+- **INTERIM-POD FIRST WAVE (2026-07-25, mac-local): runpod-b's audit +
+  mirror close-out REVIEWED & APPROVED.** `task_hunt/RECEIPTS.md` is
+  now the rebuttal's QUOTE SOURCE OF RECORD (50 values / 16 claims,
+  ALL PASS, pytest-wired; negative-space receipts for never-quote
+  claims; it caught a truncated dialevel quote on first run). Mirror
+  campaign closed honestly (Stage-1 ADOPT-consistent; mix arms lost
+  never-read; frozen-card scope AMBIGUOUS-unresolved). Variance
+  harness pre-flighted for both panels (`PANEL_RECIPES.md` — exact
+  flags, abort-with-hint). Both Stage-2 panels LIVE on the A40 pod:
+  d rebuilding Ward cache (card frozen), e at 34/84 with the
+  falsifier green. Methods decision stands: v1 canonical.
+
 - **FACTORY ROUND 3 REVIEWED — APPROVED (2026-07-25, mac-local); and
   ⚠ the oprate panel is UNCLAIMED.** runpod shipped **B8 `slen`** (the
   program's best-designed candidate: lat/lev/disp — one exact value
