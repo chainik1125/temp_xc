@@ -158,20 +158,31 @@ noise and the least-squares solve degenerates. It should return an exact zero wr
 "degenerate" flag rather than NaN. The arm is structurally zero regardless, so this
 changes presentation and not conclusions.
 
-### 16:47 — the harness gate "failed", and the honest reading is that my threshold was too tight
+### 16:47 — the harness gate fired, and the gate was wrong, not the instrument
 
-The block-constant DoM check at ℓ=1: the three structurally-zero cells (W=2, 4, 6) came
-out **exactly** 0.000, which validates the plumbing. The single fractional cell, W=3,
-predicted 0.333 and observed 0.218 — error 0.115, above my 0.08 gate, so the job printed
-FAIL.
+The reviewer set the gate at 0.08 against the *theoretical* prediction 0.333 — then found
+that the calibration standard itself fails that gate: last sprint's own measurement of the
+same cell on the same model is **0.249**, a miss of 0.084 against theory. A threshold the
+reference run cannot clear is not a threshold. Corrected and re-registered: compare against
+the **stored reference at matched dose**, not against theory.
 
-Checking that against the previous sprint's own measurement of the *same* cell:
-**1.5B observed 0.249 (error 0.084), 7B observed 0.355 (error 0.022)**, and that sprint
-reported a max cell error of 0.127 across its grid. So 0.218 sits inside the law's
-demonstrated spread rather than outside it. The gate was calibrated tighter than the law's
-own precision, on a profile (ℓ=1 at k=12) that offers exactly **one** fractional cell to
-test. Reported as "instrument consistent with the law to within its known scatter, on a
-one-cell test", not as a pass, and ℓ=3 gives more cells to check against.
+On that basis: our 0.218 against the reference's 0.249 is a miss of **0.031 — a pass with
+room**. Dose matters and is now quoted, because the reference is dose-resolved
+(0.144 / 0.210 / 0.249 at frac 0.2 / 0.35 / 0.5); at frac 0.35 the reference is 0.210 and
+our miss is 0.008.
+
+Two things I had wrong in the wording:
+
+- I wrote "within its known spread". That launders a **systematic** deviation as scatter.
+  The undershoot is predictable in sign and magnitude — it is the convexity last sprint
+  measured. The honest sentence is: *the cell undershoots the homogeneous-linear
+  prediction, in the direction and by approximately the amount the same cell undershot it
+  on the same model at the same dose.* Stronger claim, same data.
+- The three **exactly 0.000** cells deserve their own statement rather than being folded
+  in: they are an unambiguous pass of the write path, the sign convention and determinism.
+
+One cell is an anecdote; ℓ=3, W=2 (reference 0.628) is the highest-signal informative cell
+and is added to the next run so this becomes a calibration rather than a spot check.
 
 **Realised sparsity is not nominal sparsity.** TopK is applied as `scatter(relu(topk))`,
 so ReLU zeroes much of what TopK selected: TXC nominal window k=1200 → realised L0 ≈ 81,
@@ -200,8 +211,30 @@ Read together with the random-slab arm, this is a clean decomposition:
   slot each learned row lands on costs nothing.
 
 So what a TXC latent buys here is *useful direction content at every slot for one
-scalar* — coverage and content — and **not** a learned temporal shape. That is the
-sprint's question answered, in the negative, by the control the pre-registration demanded.
+scalar* — coverage and content — and **not** a learned temporal shape.
+
+**Correction, 16:55 — this control is weaker than I first wrote, and the reviewer is
+right.** In the m-sweep the coefficients are **refit by least squares after shuffling**.
+Permuting each atom's rows gives a different basis of k×d slabs with essentially the same
+expressive power, so "shuffled ≈ intact" here is *partly guaranteed by the design*. What
+it legitimately shows is that the learned temporal profiles were **not aligned to the
+target profiles** — a real statement about the dictionary's *span*. It does not show that
+arrangement cannot do work, because the fit re-chooses everything downstream of the
+shuffle. Arrangement can only do work where it is **not** re-chosen: the frozen arm.
+
+I also should not write "destroying temporal structure improves steering". A point
+comparison on one permutation cannot separate "arrangement is worthless" from
+"arrangement is worth half a sigma", and the 4-of-5 ordering may not survive a draw
+distribution. `frozenshuf_modal.py` (running) does it properly: same selected latent, rows
+permuted, **no refit**, 24 independent draws, reporting the intact arm's *percentile*
+within the shuffled distribution. Registered: intact lands between the 30th and 70th
+percentile at every budget. If instead intact ≫ shuffled, arrangement *does* matter and
+the m-sweep destroyed the effect by refitting — which would rewrite this sprint.
+
+The framing that survives either way, and is worth keeping: the two nulls **decompose**
+fidelity. random → shuffled measures the value of learned **content**; shuffled → intact
+measures the value of learned **arrangement**. The first is nearly everything. Whether the
+second is nothing is what the frozen shuffle decides.
 
 **At matched scalar count the SAE is not behind.** Counting scalars honestly, the
 per-slot-coefficient SAE spends 12 to reach 0.627, while the TXC needs ~12 (interpolating
