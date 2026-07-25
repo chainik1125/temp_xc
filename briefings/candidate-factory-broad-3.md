@@ -71,3 +71,57 @@ one.
 
 Ledger updated; ≥ 2 bundles shipped or honestly triage-killed; LOG line
 each; STATUS rewritten. Briefing stays until mac-local review.
+
+---
+
+## ADDENDUM (mac-local, 2026-07-25 — mid-execution; reconcile before your next ledger/bundle commit)
+
+**1. The vetting frame in § 1 is superseded — use the AMENDED order
+finding, not the one this briefing shipped with.** After this briefing
+was written, runpod-e flagged a measured counterexample and the
+"order does not matter, **anywhere**" wording was WITHDRAWN (LOG
+amendment, 2026-07-25; your own STATUS §-bullet carries the old
+wording — trust the LOG). The finding of record: *every window
+ADVANTAGE found so far is order-free aggregation, measured on Ward;
+we have not found an order-sensitive window advantage* — with
+dialevel's capacity-matched shuffle cost (+0.03…+0.06, 3/3 models)
+recorded as the counterexample to the universal claim, and
+runpod-e's hypothesis (recency / distance-to-anchor, not sequence
+order) as the best explanation on offer. **For the re-vet this
+means two different buckets, not one:**
+- a PARK whose pitch is pure SEQUENCE order (permutation structure)
+  stays a bad bet on Ward-like rate substrates — demote as planned;
+- a candidate whose temporal structure is RECENCY-weighted (a level
+  dominated by nearest events, distance-to-anchor structure) is NOT
+  killed by the finding — it sits exactly in the one measured crack
+  in the order-free wall. If you add new ideas, a deliberately
+  recency-structured candidate with exact labels — on a substrate
+  that designs OUT the dialevel doc-length confound — is now the
+  best-motivated new family, and scores highest on § 2's
+  independence criterion (independent of the one phenomenon all
+  five KEEPs share).
+
+**2. The § "Optional" attenuation item is STRUCK for you.** Your
+pre-compact STATUS already recorded it correctly: not runnable on
+this box (no activation caches, no GPU). It stays escalated and will
+be routed to a cache-holding box after the panels. Spend zero time
+on it.
+
+**3. Replacement optional (bounded ≤ 1–2 h, label-side, serves
+TONIGHT's panels): the depth-first within-document row-sets your
+census deferred.** Your contrast-depth census ended with "the
+depth-first variant is the screen owner's call" — that call is now
+made: runpod-e's `stage2-fineweb.md` carries a BINDING
+within-document receipt on punctint-q. Ship, as a label-side
+addendum (no changes to any shipped bundle): for punctint-q on the
+400-doc grid (4k optional), the per-document row-sets at your census
+ladder (docs at ≥ 20 and ≥ 50 rows/class) plus per-document
+sufficient statistics for demeaning (per-doc target sum + count over
+eligible rows — ship the statistics, not a pre-demeaned array, so
+the panel can apply its own split-consistent demeaning; say this in
+the stats JSON). One LOG line. Same style, cheaper: trace-level
+sufficient statistics for oprate `rate_case` (runpod-d's panel's
+trace-mean floor). **Strictly non-blocking both directions**: the
+panels compute their own if yours isn't there in time; redundancy is
+fine. Ledger re-vet + 2–3 builds remain your primary — do not let
+this displace them.
