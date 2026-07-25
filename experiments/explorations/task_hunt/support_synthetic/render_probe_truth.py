@@ -81,6 +81,11 @@ def _panel_vs_T(ax, groups, title, *, floor=True):
     ax.grid(alpha=.25)
     if any_pt:
         ax.legend(fontsize=5.5, loc="lower left")
+    else:
+        ax.text(.5, .5, "0 pushed cells — Stage-3 grid lost mid-run\n"
+                        "(force majeure, 2026-07-25)",
+                ha="center", va="center", fontsize=8, color="grey",
+                transform=ax.transAxes)
 
 
 def _panel_calib(ax, calib, arm, T=16):

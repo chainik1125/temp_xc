@@ -4159,3 +4159,65 @@ majeure); the real-panel density-mechanism support cited instead from
 the pushed post-matched diagnostic (+0.032 sparse nnz=8 vs +0.184
 dense nnz=128). §§ 1–4 numbering untouched (external "§ 2" references
 stay valid).
+
+## 2026-07-25 — runpod-b — mirror probe-truth CLOSE-OUT (from pushed data only): Stage-1 receipt ADOPT-consistent — and v2 is a LOWER BOUND where the panels live, biased low by up to 0.18 at low truth + dense + p/n ≥ 1; frozen-card scope retires AMBIGUOUS-unresolved
+
+**HEADLINE (both halves, per the binding NOTE):** on exact constructed
+truth the amended-scope receipt is `ADOPT-consistent` — v1 sags below
+known truth on 7/8 signal cells while v2 tracks 10/12 and exceeds truth
+on 0/12 — **AND the v2 numbers in the low-truth + dense + p/n ≥ 1
+regime are themselves lower bounds, not estimates of truth** (both
+misses: token arm, 6% density, truth 0.412 — v2 reads 0.299 at
+p/n = 1.0, d2 = −0.113, and 0.232 at p/n = 2.0, d2 = −0.180). "v2
+tightens a lower bound" is a materially different claim from "v2
+measures truth"; `PROBE_V2_SPEC.md` § 0 now carries this first-class.
+
+**Mix arms: LOST, never read.** The calibration mix arms wrote 0
+committed cells before the pod died; transfer Test B was never read.
+There is NO mix-arm evidence in either direction — the inversion stands
+unchallenged and unstrengthened by them, permanently for this campaign.
+
+**Scorecard (final `probe_truth.json` + `figs/probe_truth.{png,pdf}`,
+regenerated from committed shards only; empty panels annotated):**
+- **A-P1 HELD 7/8** (v1 sags; worst full-arm d1 = −0.445 at 6% density,
+  truth 0.986; reads 0.009 where truth is 0.412). **A-P2 HELD 10/12**
+  with the two receipted misses above. **Branch-3 clean: 0/12 v2 above
+  truth** (max d2 above: −0.0001 full / −0.0031 token / +0.0061 null).
+  **DECLINE support 1/8** — the pattern is "v1 sags, v2 tracks".
+- **Frozen-card scope: `AMBIGUOUS` (G4), now UNRESOLVED PERMANENTLY** —
+  the trained anchors never ran; 0 trained cells licensed at branch
+  p/n (P1/P2 n_qualifying = 0). Why the trained ladder under-describes:
+  licensed cells sit at truth ≳ 0.95 and p/n ≤ 0.125, where both
+  probes agree within bar (P3 4/4) and the capacity bias is negligible
+  by mechanism — per amendment item 1 this fires no branch. P4 HELD
+  (null arm inflates nowhere; the 1/288 per-draw excursion stays
+  disclosed). P5 FAILS on coverage (insufficient line-C d2048 cells in
+  the pushed subset). G3 PASS; exclusion choice changes no label.
+- **p_eff (pushed-verifiable only):** the probe's operative feature
+  count is realized nnz, far below nominal p — mirror existing
+  pre/T16/k8/d256 activates ≈ 117–120 of 256; the real panel's
+  post-matched T16 activates 128 of 2048 (the post-matched diagnostic
+  table). Increment 2's wider "3–30×, post 70/2048 ⇒ 0.034" reading
+  sat partly on grid cells that were never pushed — quote the pushed
+  numbers, not that one. Bears on § 1-knob-2's n_rows ≥ 8·p line:
+  nominal-p adequacy arithmetic is conservative for sparse rows.
+- **Coverage honesty:** Stage 1 COMPLETE (108 calib cells, 3 seeds);
+  Stage 2 COMPLETE (28 existing cell-seeds, 28 anchors); Stage 3
+  PARTIAL — 22/132 cell-seeds pushed (all txc_batchtopk_pre), line D
+  0 pushed, mix arms 0 cells, transfer artifact lost (Test A survives
+  only as the increment-2 LOG statement, with its signal-distribution
+  caveat open). Increment 2's committed json embedded ~13 mid-run
+  cell-seeds never pushed; the final regeneration drops them (cells
+  27 → 18; 10/18 licensed) — disclosed, not smoothed. **Stage-3/mix
+  arms lost mid-run, force majeure — labels: Stage-1 ADOPT-consistent
+  on the amended scope; frozen-card scope remains
+  AMBIGUOUS-unresolved.**
+- Supersession recorded (STATUS item 7): the queued doc_mean_only_auc
+  KILL-threshold note is SUPERSEDED and unwritten per "REVIEW overnight
+  wave" § 4 (disclosure statistic that triggers a control, not a kill
+  bar).
+
+Card closes with § 10; `briefings/mirror-probe-truth.md` retires with
+this entry (CLOSE-OUT section executed). The campaign's decision was
+already consumed upstream (METHODS DECISION, 2026-07-25): v1 canonical,
+paired v2 reported, spec = post-deadline freeze candidate carrying § 0.

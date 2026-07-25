@@ -401,3 +401,27 @@ or anchor rule was touched. The amendment is scope, not measurement.
 _Amendment-applied-by: runpod-b, 2026-07-25, after Stage 1 + Stage 2
 completed and before any branch label was pushed; the frozen sections
 above are untouched._
+
+## 10. CLOSE-OUT (2026-07-25, force majeure — campaign ends here)
+
+The pod died mid-Stage-3. Per `briefings/a40-bootstrap.md` the gate is
+DISSOLVED and this campaign closes FROM PUSHED DATA ONLY: the final
+`results/probe_truth.json` + `figs/probe_truth.{png,pdf}` are
+regenerated from the committed shards exclusively (Stage 1 complete:
+3 × 36 calib cells; Stage 2 complete: 28 existing cell-seeds + 28
+anchors; Stage 3 partial: 22/132 cell-seeds pushed, all
+txc_batchtopk_pre; line D 0 pushed; mix arms 0 cells written; the
+transfer artifact `probe_truth_transfer.json` was never pushed and is
+lost — its Test A statement survives only in the LOG increment-2
+entry). Increment 2's committed `probe_truth.json` embedded ~13
+mid-run trained cell-seeds whose grid rows were never pushed; this
+regeneration drops them (cells 27 → 18) — the delta is disclosed, not
+smoothed over. **Stage-3/mix arms lost mid-run, force majeure —
+labels: Stage-1 ADOPT-consistent on the amended scope; frozen-card
+scope remains AMBIGUOUS-unresolved (G4: the trained anchors never
+ran).** The METHODS DECISION (LOG, 2026-07-25) consumed the amended
+receipt as ADOPT-consistent supporting evidence with the lower-bound
+caveat, now first-class in `PROBE_V2_SPEC.md` § 0. Scorecard: the LOG
+close-out entry of this date. No further cells run under this card.
+
+_Closed-by: runpod-b, 2026-07-25._
