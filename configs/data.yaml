@@ -616,3 +616,53 @@ datasources:
       sentence LS slope of the judged confidence state), NaN where the
       frozen label is undefined (the probe drops non-finite leading-edge
       targets). lambda_recovery here = held-out Pearson r vs slope8.
+
+  # ── task hunt Stage 2 (stage2-fineweb): REAL fineweb activations +
+  # frozen punctint question-rate labels ─────────────────────────────
+  # briefings/stage2-fineweb.md. The `real_lambda` pattern on a SECOND
+  # corpus: replag caches (/workspace/replag_caches/<model>/hs<k>.npy,
+  # 400-doc pinned fineweb sample) + the frozen lam_q kernel intensity
+  # (labels/build_punctint.py; NaN at kernel warm-up + question-sentence
+  # tokens, the ambient-anchor masking). trace_ids = document index →
+  # the v2 λ-probe trace split keeps documents inside one probe half
+  # (doc_mean_only_auc 0.901 on this face — the binding control).
+  # NO ground-truth feature directions: emission_features is a
+  # reference basis; eauc is a span sanity check, never recovery.
+  # Headline = lambda_recovery (held-out Pearson r vs lam_q).
+  fineweb_punctint_q_gemma2_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_punctint:fineweb_punctint_q"
+    params:
+      model_key: gemma2_2b
+      hs: 14
+      seq_len: 128
+      d_in: 2304
+    notes: |
+      stage2-fineweb PRIMARY panel model — gemma-2-2b at its screen
+      layer hs14. 5985×128×2304 fp16 cache; corpus 766,080 tokens.
+      Alignment of every cache row to the flat label stream is
+      asserted at materialise time.
+
+  fineweb_punctint_q_gpt2_l7:
+    category: synthetic
+    generator: "explorations.task_hunt.real_punctint:fineweb_punctint_q"
+    params:
+      model_key: gpt2
+      hs: 7
+      seq_len: 128
+      d_in: 768
+    notes: |
+      stage2-fineweb replication arm — gpt2 at its screen layer hs7.
+      5989×128×768 fp16 cache; corpus 766,592 tokens; no BOS prefix.
+
+  fineweb_punctint_q_llama31_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_punctint:fineweb_punctint_q"
+    params:
+      model_key: llama31_8b
+      hs: 14
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      stage2-fineweb replication arm — llama-3.1-8b at its screen
+      layer hs14. 5924×128×4096 fp16 cache; corpus 758,272 tokens.
