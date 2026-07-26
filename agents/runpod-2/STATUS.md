@@ -69,9 +69,25 @@ mac-c). Deadline: rebuttal-grade numbers before 17:00 London
   through em runner; T16/k320 override green; n_steps=0 green.
 - [armed] origin listener (archs/, task_hunt LOG, COMPOSITION_AUDIT,
   briefings/) every 150 s — session-local.
-- [next] freeze commit (CARD + cells + driver + builder + this
-  STATUS + ledger est) → pull-rebase → push → launch lanes a/b/c
-  detached on GPU 2 with --pin from origin/arxiv.
+- FREEZE pushed 9f6350372 (card BEFORE cells ✓). Launch history
+  (all blind — zero cells had completed at each amendment):
+  1. 3-lane a/b/c launch → OOM (T16‖T8‖T1: step peak ∝ T·B·d_sae;
+     T16 tried 43+7 GB; FAILs preserved in wall logs a/b).
+  2. Amendment 1 (own-history sha; superseded): 2-lane h/l regroup.
+     Relaunch showed uncapped T16 caches ~73 GB → sibling starves.
+  3. Amendment 2 PIN3=79c13e3f1: driver gains env-driven
+     torch.cuda.set_per_process_memory_fraction guard
+     (TEMP_BENCH_GPU_FRACTION; launch mechanics, train_key
+     untouched); lane h = ALL T≥4 serialized @ 0.68, lane l =
+     ≤T2 + per-token @ 0.22; PYTHONUNBUFFERED=1 for live logs.
+- [RUNNING since ~22:20 London] lanes h (PID 9977) + l (PID 9978),
+  pin 79c13e3f1, logs /workspace/logs/actmix_em_lane_{h,l}.log,
+  wall-jsonl actmix_em_runs_{h,l}.jsonl. Runner cache-hits make
+  relaunches resumable; a quiet lane is UNKNOWN, not dead — check
+  `ps` + log mtime before re-dispatching.
+- [next] calibrate T16 step-time from first [train] lines → update
+  ETA vs descope ladder; write analyze.py + render_figs.py;
+  Phase B on mac-c's pin.
 
 ## Descope ladder (pre-stated, applied in order if time runs short)
 

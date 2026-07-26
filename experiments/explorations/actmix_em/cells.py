@@ -135,10 +135,39 @@ def lane_l():
             txc_cell(1, 1), sae_cell(1), tsae_cell(1), txc_cell(2, 1)]
 
 
+# ── AMENDMENT 3 (2026-07-26 ~22:40 London, blind — still zero
+# completed cells). Measured on the relaunch: the T16 training step
+# NEEDS ≥ 57 GB (hit the 0.68-fraction cap with 23 GB genuinely
+# free), so T16 fits only on an otherwise-empty card. Final shape:
+# T16 cells run in a SOLO phase (lane t16, frac 0.95) auto-launched
+# by a waiter once the two running lanes exit. Operational note:
+# lane m below was defined for a clean mid-lane relaunch but its
+# launch was SUPERSEDED — lane h survived its T16 FAIL and kept
+# training from T8s42 onward as the de-facto mid lane (killing it
+# would have wasted its training progress + buffer fill); h's two
+# in-chain T16 cells fail at its 0.68 cap (logged FAILs in the
+# wall log) and are covered by lane t16; duplicate cells reconcile
+# as runner cache-hits. Cells, hparams, seeds unchanged throughout
+# — dispatch only.
+
+def lane_m():
+    """Mid chain — T8/T4 family. Frac 0.55."""
+    return [txc_cell(8, 42), txc_cell(4, 42),
+            txc_cell(8, 42, n_steps=0), txc_cell(4, 42, n_steps=0),
+            txc_cell(8, 1), txc_cell(4, 1)]
+
+
+def lane_t16():
+    """Solo phase — every T16 cell; launched only on an empty GPU.
+    Frac 0.95."""
+    return [txc_cell(16, 42), txc_cell(16, 42, n_steps=0),
+            txc_cell(16, 1)]
+
+
 LANES = {"a": lane_a, "b": lane_b, "c": lane_c,
-         "h": lane_h, "l": lane_l}
+         "h": lane_h, "l": lane_l, "m": lane_m, "t16": lane_t16}
 
 
 def all_cells():
-    for lane in ("h", "l"):
+    for lane in ("m", "l", "t16"):
         yield from LANES[lane]()
