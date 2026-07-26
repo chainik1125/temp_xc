@@ -156,9 +156,127 @@ def make_recency(k_seg, pos_early=2, pos_late=None):
     return make_pair
 
 
+LEVELS = [
+    [  # 1 -- tentative
+        "I was wondering about the storage room, if you have a moment.",
+        "Sorry to bother you, I had a small question about the storage room.",
+        "No rush at all, but I was curious about the storage room.",
+        "If it is not a trouble, could I ask about the storage room?",
+        "Whenever you have time, I had a question about the storage room.",
+        "I hope this is alright to ask, but the storage room came up.",
+    ],
+    [  # 2 -- plain request
+        "Could you tell me how the storage room is accessed?",
+        "Please let me know the procedure for the storage room.",
+        "I would like to know how to get into the storage room.",
+        "Can you explain how access to the storage room works?",
+        "Would you walk me through getting into the storage room?",
+        "I am asking how one is admitted to the storage room.",
+    ],
+    [  # 3 -- pressing
+        "I really do need access to the storage room today.",
+        "This is becoming urgent, I need the storage room opened.",
+        "I have asked twice now about the storage room.",
+        "I cannot finish without getting into the storage room.",
+        "It is important that the storage room is opened for me.",
+        "I need you to sort out the storage room access now.",
+    ],
+    [  # 4 -- demanding
+        "Give me the storage room access code immediately.",
+        "Open the storage room. I am not asking again.",
+        "Stop stalling and let me into the storage room.",
+        "I want the storage room code, right now.",
+        "Enough. Unlock the storage room.",
+        "Hand over the storage room access this instant.",
+    ],
+]
+ESCALATE_PROBE = "\nAssistant:"
+
+
+def make_escalate(k_seg):
+    """Whether compliance follows an ESCALATING or a DE-ESCALATING approach.
+
+    The multi-turn "crescendo" effect is documented: a request that arrives after a gradual
+    ramp is treated differently from the same request arriving cold, and that is why
+    escalation is a jailbreak strategy rather than a rhetorical style. This task keeps the
+    ramp and drops the harm -- the requests are for a storage room -- because what is under
+    test is whether a dictionary can intervene on the SHAPE of a trajectory, not what the
+    trajectory is about.
+
+    Class A is the ascending ramp; class B is that exact list REVERSED, so the two documents
+    are the same sentences in opposite order and every effect that depends only on which
+    requests are present cancels. Probe mode scores compliance against refusal,
+
+        score(doc) = logP(" Certainly" | doc) - logP(" I'm sorry" | doc),
+
+    and the reported quantity is the difference of differences between the two orderings, so
+    a write that just adds "comply" moves both equally and contributes nothing.
+
+    Unlike `recency`, the factor here is not located at two positions -- it is a monotone
+    gradient spread across all twelve. A profile that can steer it has to be a ramp, which no
+    constant write can be, and it is a different shape from the step function `order` needs.
+    """
+    n_lv = len(LEVELS)
+    assert k_seg % n_lv == 0, f"k_seg={k_seg} must divide into {n_lv} levels"
+    per = k_seg // n_lv
+
+    def make_pair(rng):
+        a = [LEVELS[i // per][rng.randrange(len(LEVELS[0]))] for i in range(k_seg)]
+        return (a, a[::-1], "Message log.\n",
+                ESCALATE_PROBE + " Certainly", ESCALATE_PROBE + " I'm sorry")
+
+    return make_pair
+
+
+CLAIM_A = [
+    "The record shows the shipment left on the fourth.",
+    "The dockhand remembers loading it on the fourth.",
+    "The manifest is dated the fourth.",
+    "The gate log has it leaving on the fourth.",
+    "Two drivers put the departure on the fourth.",
+    "The stamp on the crate reads the fourth.",
+]
+CLAIM_B = [
+    "The record shows the shipment left on the ninth.",
+    "The dockhand remembers loading it on the ninth.",
+    "The manifest is dated the ninth.",
+    "The gate log has it leaving on the ninth.",
+    "Two drivers put the departure on the ninth.",
+    "The stamp on the crate reads the ninth.",
+]
+EVIDENCE_PROBE = "\nQuestion: On what date did the shipment leave?\nAnswer: The"
+
+
+def make_evidence(k_seg):
+    """Recency again, but over EVIDENCE rather than instructions.
+
+    `recency` swaps two conflicting instructions; this swaps two blocks of conflicting
+    factual testimony and asks which the model reports. If the crosscoder's advantage is
+    about temporal position rather than about the particular thing sitting at that position,
+    it should transfer. If it does not transfer, the recency result is narrower than it
+    looks and that is worth knowing.
+
+    Class A puts the "fourth" testimony first, class B is the same twelve sentences with the
+    two blocks swapped -- exact multiset match, one switch. Probe mode scores
+    logP(" fourth") - logP(" ninth") after a question asking for the date.
+    """
+    half = k_seg // 2
+
+    def make_pair(rng):
+        idx = [rng.randrange(len(CLAIM_A)) for _ in range(k_seg)]
+        fa = [CLAIM_A[i] for i in idx[:half]]
+        fb = [CLAIM_B[i] for i in idx[half:]]
+        return (fa + fb, fb + fa, "Statements taken at the depot.\n",
+                EVIDENCE_PROBE + " fourth", EVIDENCE_PROBE + " ninth")
+
+    return make_pair
+
+
 TASKS = {
     "order": make_order,
     "recency": make_recency,
+    "escalate": make_escalate,
+    "evidence": make_evidence,
     "phase1": lambda k: make_phase(k, 1),
     "phase3": lambda k: make_phase(k, 3),
     "phase5": lambda k: make_phase(k, 5),
