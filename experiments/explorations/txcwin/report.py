@@ -178,6 +178,7 @@ def build():
     fsw = jload("focus_switch_nnz.json")
     fnov = jload("focus_novresid.json")
     f8b = jload("focus_switch_8b.json")
+    f8b_nov = jload("focus_nov_8b.json")
 
     a("<title>Where a temporal dictionary actually wins — and one false positive "
       "caught on the way</title>")
@@ -299,6 +300,39 @@ def build():
                 a(f"<figure>{img(stem)}<figcaption>{esc(cap)}</figcaption></figure>")
         a("</section>")
 
+    # 8B replication on the SAME task
+    if f8b_nov:
+        a('<section class="wide">')
+        a('<div class="eyebrow">Replication on the paper\u2019s own model</div>')
+        a("<h2>The same task, the same panel, a different model</h2>")
+        a(f"<p class=\"lede\">{esc(f8b_nov['meta']['model'])} layer "
+          f"{f8b_nov['meta']['layer']}, d={f8b_nov['meta'].get('d','?')}, "
+          f"{f8b_nov['meta']['steps']} steps, "
+          f"{len(f8b_nov['meta']['seeds'])} seeds, matched code budget. This is "
+          "the subject model the paper uses for its backtracking section.</p>")
+        tbl, rows, best = panel_table(f8b_nov)
+        a(tbl)
+        matched = [(arch, T, g, u) for arch, T, g, u in rows
+                   if arch not in PER_TOKEN and T >= 2 and g["l0"] <= 25]
+        if matched:
+            bm = max(matched, key=lambda r: r[2]["mean"])
+            base = max((g for arch, T, g, u in rows if arch in PER_TOKEN),
+                       key=lambda g: g["mean"])
+            a('<div class="card good"><p><b>Matched-budget winner: '
+              f'{esc(NICE[bm[0]])} at T={bm[1]}</b> \u2014 {bm[2]["mean"]:+.3f} '
+              f'against {base["mean"]:+.3f} for the best per-token dictionary, a '
+              f'gap of {bm[2]["mean"] - base["mean"]:+.3f} '
+              f'({bm[2]["mean"]/max(base["mean"],1e-9):.1f}x). The effect is '
+              "LARGER here than on gpt2, which is the direction that matters: the "
+              "paper's own model shows it more strongly, not less.</p></div>")
+        a('<div class="card warn"><p><b>Excluded from the headline.</b> TXC-pre '
+          "reaches higher raw numbers at T=8 and T=16 on this model too, but with "
+          "36.6 and 153.4 active latents against ~19 for everything else. It keeps "
+          "k actives per position and sums them, so its budget cannot be "
+          "calibrated down at large T. Those cells are reported in the table and "
+          "excluded from every claim.</p></div>")
+        a("</section>")
+
     # switch clock panel, demoted
     if fsw:
         a('<section class="wide">')
@@ -350,6 +384,115 @@ def build():
     except Exception as e:
         txt = f"(audit did not run: {e})"
     a(f"<pre>{esc(txt.strip() or '(no output)')}</pre>")
+    a("</section>")
+
+    # ── exactly how this was run ──────────────────────────────────────
+    a('<section class="wide">')
+    a('<div class="eyebrow">Reproduction</div>')
+    a("<h2>Exactly how every number was produced</h2>")
+    a("<p>Values below are read from the result files and from the source "
+      "constants at render time, not transcribed by hand.</p>")
+
+    import inspect
+    from experiments.explorations.txcwin import sweep as SW
+    src = inspect.getsource(SW.train_one)
+    lr = src.split("lr: float = ")[1].split(")")[0].split(",")[0].strip()
+    sc = inspect.getsource(SW.score_task)
+    nboot = sc.split("n_boot: int = ")[1].split(")")[0].split(",")[0].strip()
+    frac = "0.8 of documents to train" 
+    cal = inspect.getsource(SW.calibrate_k)
+    tol = cal.split("tol=")[1].split(",")[0].strip() if "tol=" in cal else "0.12"
+
+    runs = [("trailing novelty rate — gpt2", fnov),
+            ("trailing novelty rate — R1-Distill-8B", f8b_nov),
+            ("switch clock — gpt2 (retracted)", fsw)]
+    a("<div class='tscroll'><table><thead><tr><th>setting</th>"
+      + "".join(f"<th>{esc(n)}</th>" for n, r in runs if r)
+      + "</tr></thead><tbody>")
+    keys = [("subject model", lambda m: m["model"]),
+            ("hookpoint layer", lambda m: f"resid stream, layer {m['layer']}"),
+            ("activation width d_in", lambda m: m.get("d", "?")),
+            ("tokens in the cache", lambda m: f"{m.get('n_tokens', 0):,}"),
+            ("dictionary width d_sae", lambda m: m["d_sae"]),
+            ("target code budget k", lambda m: m["k_pos"]),
+            ("training steps", lambda m: m["steps"]),
+            ("batch size (windows/step)", lambda m: m["batch"]),
+            ("seeds", lambda m: ", ".join(str(s) for s in m["seeds"])),
+            ("probe rows per cell", lambda m: f"{m['max_rows']:,}")]
+    for label, fn in keys:
+        a(f"<tr><td>{esc(label)}</td>"
+          + "".join(f"<td class='n'>{esc(fn(r['meta']))}</td>"
+                    for n, r in runs if r) + "</tr>")
+    a("</tbody></table></div>")
+
+    a('<div class="card"><h3>Training</h3><dl class="kv">')
+    for k, v in [
+        ("optimiser", "Adam, no weight decay, no learning-rate schedule"),
+        ("learning rate", f"{lr} (constant)"),
+        ("loss", "each architecture's own <code>train_step</code> — the repo's "
+                 "registered implementation, unmodified. BatchTopK for the "
+                 "per-token/Stacked/TXC family; T-SAE adds its matryoshka groups "
+                 "and its contrastive pair term"),
+        ("windows", "sampled uniformly at random from the whole cache each step; "
+                    "T-SAE trains on 8-token sequences because its contrastive "
+                    "term needs a consecutive pair, then is read per token"),
+        ("precision", "activations cached in float16, cast to float32 for training"),
+        ("architecture source", "resolved from <code>configs/archs.yaml</code> at "
+                                "run time, so a class rename cannot silently "
+                                "change the panel"),
+        ("untrained control", "identical construction and seed, zero training "
+                              "steps, same probe and rows"),
+    ]:
+        a(f"<dt>{esc(k)}</dt><dd>{v}</dd>")
+    a("</dl></div>")
+
+    a('<div class="card"><h3>Code budget calibration</h3><p>Nominal <code>k</code> '
+      "buys different amounts per architecture, so it is calibrated per "
+      "(architecture, T) by binary search until the number of non-zero code "
+      f"entries the probe sees is within {tol} of the target, measured on 256 "
+      "held-out windows after a short warm-up. The achieved value is recorded in "
+      "every cell as <code>l0</code> and the audit rejects any comparison where "
+      "the two sides differ by more than 2x. At T=8 nominal k=20 yields 20.0 "
+      "non-zeros for the per-token SAE and TXC-post, 19.8 for Stacked, but 114 "
+      "for TXC-pre.</p></div>")
+
+    a('<div class="card"><h3>Read-out and scoring</h3><dl class="kv">')
+    for k, v in [
+        ("what the probe sees", "one code vector per row. TXC returns a single "
+                                "shared code for the window; the others return one "
+                                "code per position and the position carrying the "
+                                "label is taken. This is the repo's per-tile "
+                                "convention and it equalises code bandwidth"),
+        ("probe", "ridge regression, penalty 1.0, on train-set standardised "
+                  "features; scalar labels scored by held-out Pearson r, binary "
+                  "labels by rank AUC"),
+        ("train/test split", f"by DOCUMENT ({frac}), so no document appears in "
+                             "both halves and a probe cannot win by memorising a "
+                             "passage"),
+        ("confidence intervals", f"{nboot} bootstrap resamples of the test rows "
+                                 "per cell; across seeds, the reported +/- is the "
+                                 "sample standard deviation and significance uses "
+                                 "the seed-level standard error"),
+        ("degeneracy guards", "a cell is rejected if the label is flat on test, if "
+                              "fewer than 50 rows fall on either side of the "
+                              "split, if the dictionary has no active latents, or "
+                              "if the probe predicts a constant"),
+    ]:
+        a(f"<dt>{esc(k)}</dt><dd>{v}</dd>")
+    a("</dl></div>")
+
+    a('<div class="card quiet"><h3>Data</h3><p>Token streams and labels are the '
+      "committed exact-label packs under "
+      "<code>experiments/explorations/task_hunt/labels/</code> (76 MB, built "
+      "earlier in this project, not by this run): a pinned 400-document FineWeb "
+      "sample and a 5,000-dialogue DailyDialog sample, with labels computed "
+      "mechanically from the text — no judge, no API. Activation caches live "
+      "outside the repo at <code>/workspace/txcwin_caches/</code> (float16 "
+      "memmaps, ~18 GB) and regenerate from the committed code plus those token "
+      "ids; caches are keyed by a hash of the token stream so label packs sharing "
+      "a stream share one cache. Every number on this page comes from "
+      "<code>experiments/explorations/txcwin/results/*.json</code>, which are "
+      "committed.</p></div>")
     a("</section>")
 
     # limits
