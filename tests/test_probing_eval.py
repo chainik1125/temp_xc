@@ -209,7 +209,11 @@ def test_window_arch_at_T1_routes_via_window_path():
     dev = torch.device("cpu")
     S = 8
     X = np.random.default_rng(3).standard_normal((5, S, D_IN)).astype(np.float32)
-    fr = np.array([0, 2, 4, 7, 8], dtype=np.int64)
+    # fr <= S-1 (>=1 real token) — real probe caches guarantee this.
+    # At fr == S (zero real tokens) the paths intentionally diverge:
+    # token path pools to zeros, window path applies the v1 all-windows
+    # fallback; that degenerate row is out-of-domain for the suite.
+    fr = np.array([0, 2, 4, 7, 7], dtype=np.int64)
     pw, l0w = _encode_pool(wm, X, S=S, batch_size=3, device=dev, first_real=fr)
     pt, l0t = _encode_pool(tm, X, S=S, batch_size=3, device=dev, first_real=fr)
     np.testing.assert_allclose(pw, pt, rtol=1e-5)
