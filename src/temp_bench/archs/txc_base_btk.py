@@ -164,7 +164,7 @@ class TXCBaseBTK(TempBenchArch):
         composition applied to the paper arch's k_win budget; zero-picks
         possible when the positive pool is thin — that IS the arm)."""
         pre = self._squashed_preact(x)
-        return pre if self.relu_mode == "btk-only" else F.relu(pre)
+        return F.relu(pre) if self.relu_mode == "relu-mix" else pre
 
     def _batchtopk(self, pre: torch.Tensor) -> torch.Tensor:
         """Selection at budget k_win per window.
