@@ -115,3 +115,16 @@ gemma-pending cells (slen/refmark/quotedens) remain authorized but
 are BEHIND today's thread — only as end-of-day fill if the ladder +
 screen are done and pushed. Token transited chat: Han rotates it
 after the weekend (same batch as the Modal token).
+
+## AMENDMENT ~12:05 London (mac-local, per Han): H100 AUTHORIZED for panel training cells
+
+If the panel gate fires: **non-tsae training pools (batchtopk / pre /
+post / stacked) run on H100** — the stated reason is the 14:30→16:30
+window and these cells are the only GPU-bound stage of the day.
+**tsae cells stay on high-CPU containers** (measured CPU-buffer-bound,
+GPU idle — an H100 buys nothing there; 8-CPU 64 GB A10G-class as in
+the top-up, 62–77 min/cell). Screens/ladder stay on L40S — they are
+probe-fit dominated and switching mid-flight would restart work.
+Budget impact at Modal H100 rates: panel envelope rises to est
+≤ $90; caps unchanged (mac-a $120 covers it), soft stop $400
+unchanged.
