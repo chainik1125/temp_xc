@@ -6799,3 +6799,41 @@ everywhere: `relu-mix` / `btk-only` / `paper-match`. Cost: $150/day
 briefing, values never in git; all rotate post-weekend.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-b — ACTMIX W2 COMPLETE ($0): mixing forensics + salvage shortlist → `ACTMIX_FORENSICS.md`
+
+**PTR: `experiments/explorations/task_hunt/ACTMIX_FORENSICS.md`**
+(fingerprint tables + per-verdict sensitivity + ranked shortlist;
+scan script `actmix_l0_scan.py` beside it; all PENDING TEAM REVIEW).
+
+**Headline: the mixing's bias direction is pro-TXC, so it created no
+false kills — its risk is concentrated in the KEEPs' comparator
+legs.** (1) Fingerprint over all 819 hunt rows, untrained-anchored:
+per-token comparators are permanently handicapped (sae 0.548–0.762
+of nominal, tsae 0.711–0.951, T-independent); window arms are
+depressed only at T ≤ 4 (0.69–0.94) and ≥ 0.95-realized at every
+T ≥ 8 deciding cell; untrained realizes nominal exactly EXCEPT
+untrained pre at T ≥ 4 (0.93–0.99, already on record in the qrate
+panel entry). Lone deep-selection cell: ttrend post k=256@T32
+realized 0.647 (paper-composition-like regime, non-claiming arm).
+(2) Screens are mixing-insensitive BY CONSTRUCTION (factory_screen
+path has no SAE — probe fits on raw activations), so R10/R11/R17/
+R20/R21/R23/R24/R25 are untouchable by the fix; only panels can be
+sensitive. (3) Per-verdict classes: λ R22 = the most exposed KEEP
+(tsae pooled 0.711 w/ s3=3.59, s4=3.12; existing POSTHOC exclusion
+already goes unbounded); tt round-1 P1 + R29 T16 S1 legs + R27
+margin/trend follow; tt round-1's P4 untrained-control failure is
+mixing-ROBUST (realization-matched at T32) — round 1's kill reason
+survives the fix. punctint-q kills HARDEN under btk-only (pre lost
+to comparators that were themselves 22–25% handicapped). Evidence-
+line kills bind at T ≥ 8 on ≥ 0.98-realized arms — empirically
+clean. (4) **Stage-2 shortlist: NO HIGH salvage candidates**; one
+MEDIUM-conditional (punct/gemma bound top-up ≈ $4 — a POWER fix,
+only as a rider on mac-a's calibration); NIL for all §8 kill classes
+per the briefing's grounds. KEEP-exposure ranking (mac-a's Stage-3
+lane, ≈ $30–37 end-to-end): λ comparator ($12–15) > tt round-1
+per-token floor ($2–3) > R29 T16 legs ($3–4) > dq ($8–12) > R14/R15
+(free rider). NO re-runs launched from W2; gating = mac-local.
+Pre-registered directions (actmix-shared) quoted in every class call.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_

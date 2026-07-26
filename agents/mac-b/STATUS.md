@@ -1,46 +1,59 @@
 # Working state — agent `mac-b`
 
-**2026-07-26 ~19:05 London (SALVAGE sprint).** **SALVAGE W2 COMPLETE**
-— `txcwin/CROSSRATIFY.md` FINAL, all artifacts committed, everything
-PENDING TEAM REVIEW **and pending Andrii's review**. mac-b salvage
-actuals ≈ $3 of $60; program ≈ $103 of $500. Holding: respond to
-review pings; report-state milestone ~22:00 London met early.
+**2026-07-26 ~late (ACTMIX phase).** **ACTMIX W2 COMPLETE ($0 of $20
+cap)** — deliverable `experiments/explorations/task_hunt/ACTMIX_FORENSICS.md`
++ LOG PTR entry, committed/pushed this session. Now STANDING BY to
+support mac-a's Stage-3 re-runs (cache builds, variance-harness lanes)
+on request, per `briefings/actmix-mac-b.md`. Listening topology
+(actmix-shared § listening): mac-b watches ONLY
+`experiments/explorations/task_hunt/LOG.md` + `briefings/actmix-*`
+on origin/arxiv for mac-local rulings — re-arm the path-filtered
+poller each session.
 
-## Salvage W2 record (all pushed)
+**Supersede note:** this mac-b session supersedes mac-local's ~20:40
+subagent dispatch — those workers were recalled cleanly at Han's
+direction (nothing frozen/launched/pushed by them; see commit
+be755651a). mac-b = this standalone CC instance.
 
-- **Verdicts (`txcwin/CROSSRATIFY.md`):** gpt2 r1/c1/c2/c3/c4 all
-  SUPPORTED (c1–c3 at 11.3–21.9σ, strict worst-vs-best-seed); 8B
-  c1/c2 SUPPORTED-WITH-GAPS (2.6/2.7σ), **c3@T8 NOT-REPRODUCED**
-  (their own W3/W8; one collapsed seed) while T=16 is strict 12.4σ →
-  claims re-pin (name model+T, 8B at T=16) or ~$5 seed top-up
-  proposed to Andrii. Gaps G-1..G-6 (incl. G-6: report.py embedded
-  audit pools gpt2+8B into 6-seed pseudo-cells — masks the c3
-  contradiction). Receipts R-X1..X4 proposed — enter receipts_check
-  ONLY after mac-local ratification + Andrii ack.
-- **GAP-A (visible-cue, $0):** T=8 window-computable floor V-win
-  +0.054/+0.097; both band readings per ruling 56654864d (gpt2 band 3;
-  8B band 2 via oracle-position V-all); 8B quoting guard 46e0021a7
-  (floor-vs-best-dict ~4×, NOT floor-vs-per-token). V-pos instrument
-  caveat: nov_resid keeps position residual r≈+0.21/+0.17.
-- **GAP-B (raw gate, ~$3):** ALL cells CANDIDATE. Claims' T=8:
-  gpt2 gap_mean +0.101; 8B +0.071 (window gap +0.320; raw_last
-  +0.216 vs win +0.537 — biggest asymmetry in-thread). 8B T=16 lean
-  cell (BLAS int32 overflow; one-sided gate per c797c5207) passes
-  via gap_mean.
-- **Freeze chain:** card fedf75aa9 → V-win e844cce52 (ruling-ordered)
-  → lean-arms ea7a50ea1 (ratified). Driver pins ONLY post-push SHAs
-  (pre-push local SHA got rebase-rewritten once — lesson in LOG).
-- Caches persisted on Volume `temp-xc-replag-caches`:
-  txcwin_caches/{gpt2_L6, 8B_L12} + txcwin_crossratify_results/.
+## ACTMIX W2 record
+
+- **Headline:** mixing bias is pro-TXC ⇒ no false kills on the hunt
+  record; exposure concentrated in KEEP comparator legs. Screens are
+  mixing-insensitive BY CONSTRUCTION (no SAE in factory_screen path).
+- **Fingerprint (untrained-anchored):** sae 0.548–0.762, tsae
+  0.711–0.951 (T-independent); window arms T2 0.69–0.88 → T≥8
+  0.95–1.05; untrained pre itself under-realizes at T≥4 (0.93–0.99);
+  deep-selection cell = ttrend post k=256@T32 at 0.647.
+- **Stage-2 shortlist: NO HIGH.** punctint-q kills HARDEN under
+  btk-only; evidence-line kills bind at T≥8 on ≥0.98-realized arms;
+  tt round-1 P4 failure is mixing-ROBUST (realization-matched at
+  T32). One MEDIUM-conditional: punct/gemma bound top-up (~$4, power
+  fix, rider on mac-a calibration only).
+- **KEEP-exposure ranking (mac-a's lane, ≈$30–37):** λ R22 (tsae
+  0.711, s3/s4 under band, posthoc unbounded) > tt round-1 P1
+  per-token floor > R29 T16 S1 legs > dq R27 margin+trend > R14/R15.
+- Scan script: `experiments/explorations/task_hunt/actmix_l0_scan.py`.
+
+## Prior sprint (salvage W2, closed + ratified)
+
+- `txcwin/CROSSRATIFY.md` FINAL — doubly-pending on Andrii only;
+  receipts R-X1..X4 enter receipts_check only after Andrii ack.
+  Freeze chain fedf75aa9 → e844cce52 → ea7a50ea1. Caches on Volume
+  `temp-xc-replag-caches`: txcwin_caches/{gpt2_L6, 8B_L12} +
+  txcwin_crossratify_results/. mac-b salvage actuals ≈ $3.
 
 ## Standing state
 
-- Day-2 record all ratified (R25/R27, fig3, negatives table); day-2
-  actuals ≈ $2.
 - `uvx modal …` (plain `modal` not on PATH). `source
-  scripts/set_agent_env.sh mac-b` each shell.
-- Tokens rotate after the weekend (Han). Containers never push.
-  Andrii = human collaborator on this branch; never modify their
-  txcwin files (crossratify/ + CROSSRATIFY.md are mac-b's additions).
+  scripts/set_agent_env.sh mac-b` each shell. Driver pins ONLY
+  post-push SHAs from origin's history.
+- Tokens rotate after the weekend (Han); paths only, values never in
+  git/logs/cards. Containers never push. Andrii = human collaborator;
+  never modify their txcwin files. Backtracking = Aniket's, hands off
+  (`origin/neurips-aniket` read-only convention reference).
+- Budget: ACTMIX $150/day/person; mac-b W2 spent $0. Program Modal
+  actuals ≈ $96–103 of the $500 word (see MODAL_SPEND.md).
 - Modal: NOTHING in flight. Post-deadline queue (mac-local gate):
   gemma overnight-card fills from Volume partials (~$4).
+- Deadlines: team meeting 9am PT / 17:00 London 2026-07-27; AoE
+  rebuttal deadline ~36–40 h from briefing time.
