@@ -105,26 +105,30 @@ would have discarded it and `r1(Ḡ)` = 0.59 says it has the second-most rank he
 in order, with `evidence` inverted against `rotate6`. **No threshold separates the two classes**:
 they overlap on [0.134, 0.143].
 
-**It does not establish a quantitative law, and the test that appeared to was measuring the wrong
-component.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order** quantity, odd in α. The constant arms
-measure 72–80% **even** — mostly curvature — so both quantitative tests were computed against a
-numerator that is largely not the thing `c` bounds. Recomputed on the odd component alone at
-α = 0.5, against predictions registered in advance by the test's author:
+**It does not establish a quantitative law.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order**
+quantity, odd in α — but the constant arms measure **72–80% even**, i.e. mostly curvature. So the
+two quantitative tests that appeared to support `c` were computed against a numerator that is
+largely not the thing `c` bounds. Recomputed on the odd component alone, against a prediction
+registered in advance:
 
 | test | on raw peaks | on the odd component | registered prediction |
 | --- | --- | --- | --- |
-| four-rung ordering | 4/4 | **0/4** | "still passes 4/4" |
-| τ across 24 cells | −0.58 | **−0.467** | "\|τ\| rises above 0.58" |
+| four-rung ordering | 4/4 | **0/4**, values sign-inconsistent near zero | "still passes 4/4" |
+| τ (two independent implementations) | −0.570, −0.58 | **−0.496, −0.467** | "\|τ\| rises above 0.58" |
 
-Both refuted. The constant write's odd share of the optimal write measures **0.9–6% with
-inconsistent sign**, against `sqrt(c)` predictions of 18–42%.
+**The prediction fails, but the recomputation does not cleanly refute `c` either — the odd
+estimator is too noisy to settle it.** The odd part is a difference of two noisy estimates, so
+signal shrinks while noise does not, and the loss falls hardest on the low-`c` winning tasks that
+anchor the correlation: recency's SNR drops 18.1 → 8.5 and evidence's 13.4 → 3.5, while the
+rotation rungs gain. Isolating the correct component costs more in noise than it recovers in
+specificity. **τ = −0.58 therefore stands as the best available estimate**, and the obvious attempt
+to strengthen it has been made and has failed — which makes "ranks but does not decide" more
+secure rather than less.
 
-**The two readings this forces, in opposite directions.** A constant write has **no first-order
-purchase on any task measured** — so the per-token baselines are weaker than their reported
-numbers, which are largely second-order artefact, and the crosscoder's directional margin over
-them is understated. And `c` is a **ranking heuristic with a known inversion**, not an instrument:
-the standing statement is its author's own, that "ranks but does not decide" is if anything
-generous.
+**What survives is one solid consequence and one honest limit.** The constant arms being 72–80%
+even means the per-token baselines are largely **second-order artefact**, so `sae_broadcast` is a
+mis-specified comparator rather than a weak one and the crosscoder's *directional* margin over it
+is understated. And `c` is a **ranking heuristic with a known inversion**, not an instrument.
 
 > **Geometry sets the ceilings. Discovery determines what is reached.** Every result in this
 > sprint is decided by the second, which is why a geometric screen ranks candidates and cannot
