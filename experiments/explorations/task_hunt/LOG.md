@@ -4865,3 +4865,125 @@ passed). Refmark launch gate: HONORED (verdicts pushed before
 launch; mac-b spend ≈ $19 ≤ $60).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-a (executor) — tsae-arm SEED TOP-UP DELIVERED at n = 6 (Modal): b's frozen criterion MET on the pre-registered paired test (one-sided 95% LB +0.0200 > 0, all 6 seeds positive) — PROPOSED R5 UPDATE below, with two disclosed caveats — PENDING TEAM REVIEW
+
+Completes runpod-b's frozen 6-seed design (LOG 2026-07-24: pre arms
+DELIVERED at n = 6, tsae arm NOT AFFORDABLE). The 3 remaining cells —
+tsae/T1 × seeds {3,4,5}, buffer_tokens UNCHANGED 524288 — ran on
+Modal (one cell per A10G + 8 CPU + 64 GiB container), runner frozen
+commit-then-run at `c93473ad3` (mac-local APPROVED pre-registration,
+`6d7295ea2`), image pinned to the freeze; containers returned rows +
+results and NEVER pushed; merged locally by
+`lambda_intensity/merge_seedtopup_payload.py` (0 dup eval_keys, 3
+appended, PIN + clean-stamp asserted per row); panel 84 → 87 cells;
+`receipts_check` ALL PASS post-merge; 13 fixture tests pass.
+
+**Execution.** s3: λ̂ = 0.13724, realized l0/token 3.59, 77 min; s4:
+0.14103, l0 3.12, 71 min; s5: 0.16102, l0 7.08, 62 min. (The
+2026-07-24 cost diagnosis held: CPU-buffer-bound, GPU mostly idle;
+Modal high-clock cores beat the 2–3 h A40-class estimate.) First
+cells attempt was cancelled ~24 min in by a NON-detached client
+disconnect (Modal cancels in-flight inputs; ~$4.5 burned) — relaunched
+DETACHED with per-seed payloads persisted to the Volume; ops lesson
+appended to the ledger. Checkpoints on Modal Volume
+`temp-xc-ward-caches` under `checkpoints_topup/{a49569223227158e,
+2e8cf4b77839253e, a258f49f272d7a0a}` (no HF write token on this box —
+mirror upload per checkpoints/HF_MIRROR.md is a Han/mac-local
+follow-up). These enable the future re-eval audit round 1 can never
+have (its weights are gone).
+
+**Pooling hazards (briefing § 2), both discharged, caveats named:**
+- (a) round-1 re-eval: IMPOSSIBLE — round-1 Ward checkpoints destroyed
+  2026-07-25 (HF mirror holds only the two A40 panels). Fallback per
+  briefing: code-diff audit of the v1 train+eval path 038655fd→HEAD —
+  exactly ONE touching commit (`fff7877c4`, lambda_recovery NaN guard,
+  `.all()` fast path), a strict no-op on this datasource's all-finite
+  `lam_hist_dense` (zeros-init dense fill; re-ASSERTED in-container:
+  all-finite, (4044,128), mean 0.10484, std 0.13402). fff7877c4 is an
+  ancestor of `3d954869`, under which runpod-d NUMERICALLY verified
+  round-1 reproduction (0.192438 vs stored 0.1924, LOG 2026-07-24);
+  `tsae.py` / `temp_bench/core/` / `lambda_recovery.py` have ZERO
+  commits 3d954869→HEAD; v2/trace_ids additions are flag-gated no-ops
+  for v1 rows.
+- (b) cache byte-identity receipts, in-container HARD-FAIL gates, both
+  PASS: `ward_stream_stats.json` and `lambda_labels_stats.json`
+  reproduced git-clean from the committed builders at the PIN;
+  traces.json re-ported per ATTRIBUTION.md, sha256-pinned
+  (dc6513e7d3d1…).
+- CAVEAT 1 (cross-cache): the new seeds trained on a REBUILT base/hs13
+  activation cache (byte-identical token stream, same committed
+  builder/commit/bf16 convention, DIFFERENT GPU: NVIDIA A10 vs the
+  original pod's GPU). No activation-level receipt exists (originals
+  destroyed; none was ever committed) — this is the panel's first
+  cross-cache pooling. Fresh fingerprint committed for future audits:
+  `lambda_intensity/results/cache_fingerprint_topup.json` (hs13 sha256
+  0224a72b…, and on the Volume). Numbers below are given POOLED and
+  NEW-SEEDS-SEPARATE; pooled quotes conditional on team ratification.
+- CAVEAT 2 (realized l0): round-1 tsae realized l0/token 6.52–7.20;
+  new s5 = 7.08 in-band, but s3 = 3.59 and s4 = 3.12 UNDER band —
+  residual mismatches, disclosed not smoothed. Direction matters: an
+  under-spent tsae comparator plausibly INFLATES the pre−tsae margin,
+  so post-hoc excluding-under-band variants are reported below (they
+  cut against the headline and are labeled POST-HOC).
+
+**Receipts (recomputed from `results/leaderboard.jsonl`, canonical —
+`lambda_intensity/topup_bounds_tsae.py`, machinery validated to
+reproduce R5's stored values exactly on the pre-top-up board; output
+`results/topup_bounds_tsae.json`):**
+
+| cell | n | seeds | mean | 95% t CI | sd |
+|---|---|---|---|---|---|
+| pre/T4 | 6 | 1,2,3,4,5,42 | 0.2279 | [0.182, 0.274] | 0.0435 |
+| pre/T8 | 6 | 1,2,3,4,5,42 | 0.2071 | [0.179, 0.235] | 0.0268 |
+| tsae/T1 round-1 | 3 | 1,2,42 | 0.1541 | [0.042, 0.266] | 0.0449 |
+| tsae/T1 new | 3 | 3,4,5 | 0.1464 | [0.115, 0.178] | 0.0128 |
+| tsae/T1 POOLED | 6 | 1,2,3,4,5,42 | 0.1503 | [0.119, 0.182] | 0.0298 |
+
+**b's frozen criterion (one-sided 95% t LB > 0 on the pre-vs-tsae T8
+margin) — MET on the pre-registered test:**
+- PAIRED, all 6 shared seeds (THE criterion as b froze it): diff
+  +0.0569, one-sided 95% LB **+0.0200**, ALL 6 seed-diffs positive →
+  **BOUNDED**.
+- WELCH pre(6) vs tsae POOLED(6): diff +0.0569, LB **+0.0272**,
+  one-sided p = 0.0030, df 9.9 → BOUNDED. (runpod-d's projection at
+  sd-held was LB ≈ +0.013; the realized tsae sd fell, so the bound is
+  stronger.)
+- WELCH pre(6) vs tsae NEW-ONLY(3) — the cross-cache-caveat-free
+  comparison: diff +0.0607, LB **+0.0357**, p = 0.0013 → BOUNDED.
+  (Paired new-only at n = 3: +0.0616, LB −0.0115 — the n = 3 paired
+  floor, as expected.)
+- POST-HOC l0-robustness (drop under-band s3, s4; goes AGAINST the
+  headline): Welch pre(6) vs tsae in-band(4): diff +0.0513, LB
+  **+0.0083**, p = 0.031 → still bounded, thinly. Paired in-band
+  (n = 4): +0.0462, LB −0.0088 → NOT bounded. Read plainly: the bound
+  is criterion-met and Welch-robust, but not bulletproof to dropping
+  the two under-band cells in the paired form.
+
+**PROPOSED R5 UPDATE (mac-local ratifies RECEIPTS.md +
+receipts_check.py; wording theirs to take or amend):** R5's
+negative-space clause ("must NEVER be quoted as significant") retires
+CONDITIONAL on team ratification of the cross-cache pooling (caveat 1)
+and acceptance of the l0 disclosure (caveat 2). Proposed replacement
+receipt (R22): "pre-vs-T-SAE T8 margin at n = 6 (top-up complete):
+paired diff +0.0569, one-sided 95% LB +0.0200, all 6 seeds positive;
+Welch 6v6 LB +0.0272, p = 0.0030; caveat-free new-seeds Welch LB
++0.0357; POST-HOC under-band exclusion: Welch-bounded (+0.0083),
+paired-at-n=4 not" — artifact
+`lambda_intensity/results/topup_bounds_tsae.json` + leaderboard. If
+the team does NOT ratify the pooling, the fallback quote is the
+new-seeds-only Welch line (single cache, LB +0.0357), and R5's
+never-significant clause retires on that basis instead; either way the
+n = 3 wording is superseded.
+
+**Costs/ledger.** mac-a actuals ≈ $19 total (bring-up ~$0.3, caches
+~$0.5, cells ~3.5 A10G-container-h ≈ $13, attempt-1 waste ~$4.5) vs
+$150 cap — `briefings/MODAL_SPEND.md` corrected.
+
+**PENDING TEAM REVIEW** (self-review hazard named in the ops doc: the
+same agent froze, ran, and merged; compensations: pre-registered
+frozen cell list, mac-local's pre-run freeze approval, receipts above,
+POST-HOC labels, this flag). v1 canonical; these rows carry no v2
+columns (round-1 comparability layout preserved).
+
+_Recorded-by: claude-fable-5 (mac-a, tsae seed top-up)_

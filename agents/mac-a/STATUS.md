@@ -1,68 +1,36 @@
 # Working state — agent `mac-a`
 
-**2026-07-25 ~19:00 PT (overnight loop).** Executing
-`briefings/overnight-mac-a.md`: Modal bring-up + tsae/T1 seed top-up
-{3,4,5} on Ward (bounds RECEIPTS R5). Cap $150; ledger
-`briefings/MODAL_SPEND.md` (~$6.5 total after my bring-up line).
+**2026-07-25 ~22:15 PT.** THE DELIVERABLE IS DONE AND PUSHED: tsae/T1
+seed top-up {3,4,5} on Ward, n = 6 complete, b's frozen criterion MET
+(paired one-sided 95% LB +0.0200 > 0, all 6 seeds positive; Welch 6v6
+LB +0.0272 p = 0.0030; caveat-free new-only Welch LB +0.0357). Full
+verdict + PROPOSED R5 update (→R22) + two named caveats (cross-cache
+pooling; s3/s4 realized-l0 under band, POST-HOC exclusion variants
+reported): LOG 2026-07-26 `mac-a (executor)` entry. PENDING TEAM
+REVIEW; mac-local ratifies RECEIPTS.
 
-## Git position
-- Freeze commit (runner): `c93473ad3` —
-  `lambda_intensity/run_stage2_seedtopup_tsae.py` (3 tsae/T1 cells,
-  seeds {3,4,5}, buffer 524288 UNCHANGED). mac-local APPROVED
-  pre-registration at `6d7295ea2`.
-- Modal app: `lambda_intensity/modal_seedtopup_tsae.py` (@ `e3a74fe70`),
-  image PINNED to `c93473ad3`. Stages: bringup / caches / cells.
+## Where everything is
+- Leaderboard: +3 rows (eval_keys 721bd3c6…, bfe6ea32…, 149a036a…),
+  PIN `c93473ad3`, clean stamps, 0 dups. Panel file 87 cells.
+  Bounds artifact: `lambda_intensity/results/topup_bounds_tsae.json`
+  (+ committed `cache_fingerprint_topup.json`).
+- receipts_check ALL PASS post-merge; 13 fixture tests pass. R4/R5
+  as-written still PASS (pinned to round-1 seeds) until ratification.
+- Checkpoints: Modal Volume `temp-xc-ward-caches`
+  `checkpoints_topup/{a49569223227158e,2e8cf4b77839253e,a258f49f272d7a0a}`
+  + `payloads/seed_{3,4,5}.json`. NO HF token here — mirror upload =
+  Han/mac-local follow-up (HF_MIRROR.md rule).
+- Modal: app `temp-xc-tsae-seedtopup`; caches on the same Volume
+  (stream + labels + base/hs13, receipts PASSED in-container).
+  Ops lesson: long runs DETACHED (non-detached client disconnect
+  cancelled attempt 1); payloads persist server-side.
+- Spend: mac-a actuals ≈ $19 of $150 cap (ledger corrected, total
+  ≈ $39 est across agents).
 
-## In flight
-- bring-up PASSED (validate OK at PIN, 9s). caches PASSED 390s:
-  stream + labels receipts byte-identical, lam_hist_dense all-finite,
-  hs13 rebuilt on NVIDIA A10 (sha256 0224a72b…, fingerprint committed
-  at `lambda_intensity/results/cache_fingerprint_topup.json`), Volume
-  `temp-xc-ward-caches`.
-- **CELLS IN FLIGHT since ~19:40 PT**: 3 × (A10G+8cpu+64GB), one
-  frozen cell each, timeout 5.5 h, est. finish ~22:30–23:30 PT.
-  Payload → scratchpad `modal_cells_payload.json`; logs scratchpad
-  `cells.log` (monitor armed; re-arm hourly — it times out at 1 h).
-  On completion: `.venv/bin/python -m experiments.explorations.
-  task_hunt.lambda_intensity.merge_seedtopup_payload <payload>` →
-  regenerate `topup_bounds_tsae` → fill scratchpad
-  `log_entry_draft.md` → LOG + STATUS + ledger actuals → push.
-  Checkpoints persist to Volume `checkpoints_topup/` (NO HF token on
-  this box — mirror upload is a mac-local/Han follow-up).
-
-## Pooling-hazard audit state (briefing § 2), for the LOG entry
-- (a) re-eval of a round-1 tsae cell: **IMPOSSIBLE** — round-1 Ward
-  checkpoints destroyed 2026-07-25 (checkpoints/HF_MIRROR.md holds only
-  the two A40 panels). Documented; relying on (b) + code-diff audit.
-- Code-diff audit 038655fd→HEAD on the v1 train+eval path: ONE commit
-  touches it — `fff7877c4` NaN guard in `lambda_recovery.py` with
-  `.all()` fast path; `lam_hist_dense` is all-finite by construction
-  (zeros-init dense fill in `build_labels.py`; asserted again
-  in-container), so strict no-op. `fff7877c4` is an ANCESTOR of
-  `3d954869` (the pre top-up freeze), and runpod-d NUMERICALLY verified
-  round-1 reproduction under it (0.192438 vs stored 0.1924, LOG
-  2026-07-24). `tsae.py`, `temp_bench/core/`, `lambda_recovery.py`:
-  ZERO commits 3d954869→HEAD. v2/trace_ids additions are flag-gated
-  no-ops for v1 rows.
-- (b) byte-identity receipts in-container (hard-fail): stream
-  `ward_stream_stats.json` + labels `lambda_labels_stats.json` must
-  reproduce git-clean; traces.json re-port sha256-pinned
-  (`dc6513e7d3d1…`).
-- RESIDUAL CAVEAT for the LOG: new seeds train on a REBUILT activation
-  cache (same builder/commit/dtype/stream bytes, different GPU: A10 vs
-  the original pod's GPU); no activation-level receipt exists (originals
-  gone). First cross-cache pooling in this panel — flag PENDING TEAM
-  REVIEW; report pooled AND new-seeds-separate.
-
-## Analysis plan (step 5)
-Mirror `receipts_check.py` R4/R5 machinery exactly: tsae seeds
-{1,2,3,4,5,42} → paired n=6 (all 6 shared with pre/T8) one-sided 95% LB
-+ Welch 6v6 LB/p/df. LOG entry `mac-a (executor)` + PROPOSED R5 update
-(mac-local ratifies RECEIPTS). Round-1 tsae rows are dirty-stamped
-(a818cc34b/038655fd3 dirty=True) — disclose, unchanged from R5's own
-basis.
-
-## Loop discipline
-work → push → `git pull --rebase` → continue. Stop: queue done / $150
-cap / blocked / 07:00 PT (= 15:00 BST Sun). Ledger before/after every
-launch. Rewrite this file before any compact.
+## Remaining / next
+- Stretch (§ 3, gate ≤$100 spent: CLEAR at $19): mac-b took refmark
+  itself (running detached); B8 panel gate CLOSED by mac-local. Check
+  LOG on wake for assist requests; otherwise idle-loop pull-rebase.
+- At 07:00 PT stop; briefing retires at Sunday check-in.
+- If resuming mid-anything: the loop is work → push → pull-rebase;
+  ledger before/after every launch.

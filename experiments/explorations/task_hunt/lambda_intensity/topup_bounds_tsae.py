@@ -120,10 +120,30 @@ def main():
         verdicts["paired_new_only"] = {
             "seeds": shared_new, "diff": float(d_new.mean()),
             "lb95_one_sided": _one_sided_lb95(d_new)}
+    # POST-HOC robustness (chosen AFTER seeing the data, labeled as such):
+    # new seeds 3 and 4 realized l0/token = 3.59 / 3.12, well UNDER the
+    # round-1 realized band (6.52–7.20; s5 = 7.08 is in-band). An
+    # under-spent tsae comparator plausibly INFLATES the pre−tsae margin,
+    # so the exclusion goes AGAINST the headline: recompute with the two
+    # under-band cells dropped (tsae = seeds {1,2,42,5}).
+    inband = {s: v for s, v in ts_all.items() if s not in (3, 4)}
+    if len(inband) >= 2:
+        verdicts["welch_pre6_vs_tsae_excl_underband_POSTHOC"] = _welch(
+            list(pre8.values()), list(inband.values()))
+        sh = sorted(set(pre8) & set(inband), key=str)
+        d_ib = np.array([pre8[s] for s in sh]) - np.array([inband[s] for s in sh])
+        verdicts["paired_excl_underband_POSTHOC"] = {
+            "seeds": sh, "diff": float(d_ib.mean()),
+            "lb95_one_sided": _one_sided_lb95(d_ib)}
+
     for k, v in verdicts.items():
         lb = v["lb95_one_sided"]
         v["criterion_bounded"] = bool(lb > 0)
     out["verdicts"] = verdicts
+    out["realized_l0_note"] = (
+        "round-1 tsae realized l0/token 6.52–7.20; new seeds: s3=3.59, "
+        "s4=3.12 (UNDER band), s5=7.08 (in-band). Under-band cells "
+        "disclosed as residual mismatches; POSTHOC variants above drop them.")
 
     dst = HERE / "results" / "topup_bounds_tsae.json"
     dst.write_text(json.dumps(out, indent=2))

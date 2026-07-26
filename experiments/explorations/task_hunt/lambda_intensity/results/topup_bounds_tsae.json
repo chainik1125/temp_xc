@@ -116,6 +116,27 @@
       "diff": 0.06155473208945128,
       "lb95_one_sided": -0.011505208384150978,
       "criterion_bounded": false
+    },
+    "welch_pre6_vs_tsae_excl_underband_POSTHOC": {
+      "diff": 0.05130328403968232,
+      "lb95_one_sided": 0.008319351766747453,
+      "p_one_sided": 0.03051333357101207,
+      "df": 5.1058117466140205,
+      "n_a": 6,
+      "n_b": 4,
+      "criterion_bounded": true
+    },
+    "paired_excl_underband_POSTHOC": {
+      "seeds": [
+        1,
+        2,
+        42,
+        5
+      ],
+      "diff": 0.04624543568999135,
+      "lb95_one_sided": -0.008843819599321935,
+      "criterion_bounded": false
     }
-  }
+  },
+  "realized_l0_note": "round-1 tsae realized l0/token 6.52\u20137.20; new seeds: s3=3.59, s4=3.12 (UNDER band), s5=7.08 (in-band). Under-band cells disclosed as residual mismatches; POSTHOC variants above drop them."
 }
