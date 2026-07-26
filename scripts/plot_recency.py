@@ -20,9 +20,13 @@ the model obeys the early instruction, push the other way and it obeys the late 
 is what a directed intervention looks like. Every constant-write arm is positive at BOTH
 extreme doses, which is what a magnitude artefact looks like.
 
-Right: where each write puts its mass. The crosscoder concentrates on the segments that carry
-the instructions; `txc_flat` is the same vector with the profile flattened, which is the whole
-of what a per-token dictionary can express.
+Right: where each write puts its mass, and it corrects the obvious guess. The SUPERVISED
+rank-1 write puts almost all of its mass exactly on the two segments carrying the
+instructions. The crosscoder does NOT: its profile is much flatter, peaks in the wrong places,
+and still reaches 76% of the supervised effect. So the crosscoder is not solving this by
+locating the instructions -- whatever it found is something else that works nearly as well,
+and `txc_profile_random` (the same profile with random directions, flat at 0.00) shows the
+profile alone is not what carries it.
 
 Reads results/txc_wins/recency*.json.
 """
@@ -79,8 +83,9 @@ def main(name: str = "recency") -> int:
     ax.set_xlabel(r"steering dose $\alpha$  (all writes at identical injected norm)")
     ax.set_ylabel(r"$\Delta$  [obey early $-$ obey late],  A minus B")
     ax.set_title("Reversing which instruction the model obeys")
+    ax.set_ylim(-5.6, 10.2)
     ax.grid(alpha=0.25, lw=0.6)
-    ax.legend(loc="upper left", fontsize=8, framealpha=0.95)
+    ax.legend(loc="lower right", fontsize=7.5, framealpha=0.95, ncol=1)
 
     ax = axes[1]
     prof = r.get("write_profile")
