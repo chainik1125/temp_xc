@@ -81,14 +81,30 @@ reasoning.
    n = 10** is not comparable to **0.272 at n = 200**. A smoke-scale `r1` is not a small-sample
    estimate of the full-scale one — it is a different number. Fix the `n` before comparing cells,
    and treat any cross-cell `r1` comparison at differing `n` as uninterpretable.
-2f. **A moment-matched complement pair exists only for `k_seg ≡ 0 or 3 (mod 4)`.** Matching moment 1
-   under complementation requires `Σ_{j=1..k} j` to be even, which fails for `k = 14` and `k = 18`.
-   So the ladder of usable sizes is 12, 16, 20 — not 12, 14, 16. Verified by enumeration.
-   Counts, and note the units: at **k = 12 there are 2 qualifying subsets = 1 complement pair**
-   (the pattern in use — it was *forced, not chosen*, which answers the post-hoc-selection question
-   a reader would otherwise ask); at **k = 16 there are 14 qualifying subsets = 7 pairs**. Quote
-   pairs, not subsets — each pair is counted twice by a subset enumeration, so "14 pairs at k = 16"
-   overstates the available robustness checks by a factor of two.
+2f. **A moment-matched complement pair exists only for `k_seg ≡ 0 (mod 4)`.** Two conditions must
+   hold together: the pattern must be **balanced**, so `k` is even; and complementation must
+   preserve moments 1 and 2, which needs `Σ_{j=1..k} j` and `Σ j²` both even. Together these admit
+   `k ≡ 0 (mod 4)` and nothing else. Verified by enumeration:
+
+   | `k_seg` | 8 | 10 | 12 | 14 | 16 | 18 | 20 | 24 |
+   | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+   | complement pairs | 1 | — | **1** | — | **7** | — | 24 | 296 |
+
+   So the usable ladder is **8, 12, 16, 20, 24**. Odd `k` cannot be balanced; `k = 10, 14, 18, 22`
+   fail on `Σ j` being odd. Plan size sweeps on this ladder or half the rungs will turn out not to
+   exist.
+
+   **Quote pairs, not subsets.** A subset enumeration counts each pair twice, once from each side —
+   at `k = 12` two qualifying subsets are one pair, at `k = 16` fourteen subsets are **seven**
+   pairs. Getting this wrong overstates a sweep's headroom by 2×.
+
+   **`k = 12` is a single point, so the pattern in use was forced rather than chosen** — which
+   answers the post-hoc-selection question a reader would otherwise ask, and is a stronger property
+   than a robustness check would have established. `k = 16` is the smallest size offering any
+   choice, which is why it is the right size for that check — and the check should compare **two of
+   its seven pairs against each other at fixed length**, not `k = 12` against `k = 16`, which would
+   vary pattern and document length together.
+
 3. **Size the go/no-go at ~128 permutations.** Typical permutation-to-permutation accuracy std is
    about two points; the dramatic gaps are the tails and must be searched for. A 24-permutation
    sweep showing a small spread means "underpowered", not "no effect".

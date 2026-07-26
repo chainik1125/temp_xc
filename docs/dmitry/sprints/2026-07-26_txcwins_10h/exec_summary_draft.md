@@ -154,10 +154,17 @@ reportings. Instruction position, completed configuration, every arm at matched 
 | `random_slab` | +1.39 ± 0.07 | |
 | `txc_profile_random` | +0.00 ± 0.04 | profile kept, directions randomised |
 
-Three levels, each gap separately significant. At matched dose the same comparison is **7.6×**
-(+1.90 against +0.25); at peak dose it is **2.5×** — +6.48 against +2.60, z = 18.3 — which is the honest, useful win. **A per-token
-dictionary handed a schedule beats the crosscoder** — +7.86 and +8.55, z = 4.7 and 6.7 — so the
-write was never out of reach. The crosscoder reaches **76% of the rank-1 ceiling**.
+Three levels, each gap separately significant.
+
+**The crosscoder beats deployed practice**, by 2.5× at peak dose (+6.48 against +2.60, z = 18.3)
+and 7.6× at matched dose (+1.90 against +0.25). That is the honest, useful win, and it holds under
+both reportings.
+
+**A per-token dictionary handed a schedule beats the crosscoder** — +7.86 and +8.55 against +6.48,
+z = 4.7 and 6.7 — so the write was never out of reach. The crosscoder reaches 76% of
+`rank1_best`, which is a **reference and not a ceiling**: it is the rank-1 truncation of the
+difference-of-means slab, and the true rank-1 ceiling is the gradient-derived `grad_rank1`, which
+the crosscoder is further from still.
 
 So its genuine claim is that it *found* a schedule unsupervised, from reconstruction alone, that
 a per-token dictionary could have executed if handed it. It is a discovery claim.
