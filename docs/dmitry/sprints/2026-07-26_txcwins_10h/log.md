@@ -332,3 +332,43 @@ whose natural unit is a token at a ~50-token offset and needs the sequence chunk
 all. A few hundred permuted MCQ items, measuring the label-logit swing, pure forward passes.
 If the 13–75% literature effect does not reproduce at 1.5B, switch to demonstration order
 (the most robust instance) rather than scaling up.
+
+## 22:52 — premise order / R-GSM becomes the target; a timekeeping correction
+
+**Timekeeping first.** Two entries above were written as though more time had passed than
+had. True elapsed at this point is **19 minutes** of the 10 hours, not the hour-plus implied.
+The agents are working fast, which is easy to mistake for time passing. Recorded because a
+sprint's one non-negotiable is the wall clock.
+
+**Target changed from MCQ option order to premise order.** Chen, Chi, Wang, Zhou, *Premise
+Order Matters in Reasoning with Large Language Models*, ICML 2024 (arXiv:2402.08939,
+verified): permuting premise order causes "a performance drop of over 30%", performance is
+best when premise order matches the ground-truth proof order, and they ship **R-GSM**, a
+public GSM8K-derived benchmark built from premise reorderings.
+
+| | MCQ option order | premise order / R-GSM |
+| --- | --- | --- |
+| corpus | must be built | **public, already exists** |
+| unit → segment | option | premise → `k_seg` directly |
+| failure type | label prior | **reasoning** |
+| published localisation | MLP value vectors + attention heads | **none** |
+
+The third row is the decisive one. Li & Gao (*Anchored Answers*, arXiv:2405.03205) trace
+MCQ first-choice bias to specific MLP value vectors and attention heads, and UniBias
+eliminates biased FFN vectors and heads — the same shape as the single-neuron repetition
+result, and it invites "so what does a window code add?". Premise order has no published
+localisation, so that objection is simply unavailable. Two mitigations exist for MCQ (the
+localisation is on the GPT-2 family, which the authors say has worse anchoring than larger
+models; and those are weight edits rather than additive steering writes), but choosing a
+different instance is cleaner than arguing.
+
+**The gate is the real risk and it comes before any training:** at 1.5B, GSM8K accuracy may
+be too low for a 30% relative permutation gap to be measurable. Run ordered against permuted
+R-GSM over a few hundred items and report the gap; if it is not clearly present, move to
+Qwen2.5-7B-Instruct rather than persisting. Fallback if neither clears: few-shot
+demonstration order, which Lu et al. report persists "even for the largest current models".
+
+**Deliberately checked whitespace:** a search for sparse-autoencoder or dictionary work on
+demonstration-order or prompt-order sensitivity returned nothing. Plenty of SAE-steering
+methodology, plenty of order-sensitivity work, no intersection. Whatever this measures is
+unclaimed — which argues for doing it carefully rather than quickly.

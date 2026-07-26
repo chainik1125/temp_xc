@@ -300,40 +300,63 @@ CARRIERS = ["Journal entry.\n", "From the notebook:\n", "Draft passage.\n",
             "Field notes.\n", "Evening record.\n", "From chapter twelve:\n"]
 
 
-def rotation_doc(pools, m, k_seg, shift, rng):
-    """Build one document and its segment spans.
-
-    pools : list of m sentence pools
-    shift : 0 for class A (canonical order), 1 for class B (rotated by one block)
-
-    The two classes are the SAME m blocks read from different starting points,
-    so the sentence multiset, the block-length multiset, the transition count
-    and every block type's total occupancy match exactly. That is a strictly
-    tighter match than the multiset-and-switch-count matching of last sprint's
-    order task, and it is what makes the constant share exactly zero.
-    """
-    block_len = k_seg // m
-    assert block_len * m == k_seg, f"m={m} does not divide k_seg={k_seg}"
-    # The m=12 stretch rung needs twelve distinct registers; only six are
-    # written here. Reusing a pool for two blocks would make two rows of the
-    # difference slab collinear and quietly break the r1 = 2/m prediction, so
-    # fail loudly instead.
-    assert m <= len(pools), (
-        f"rotation_doc: m={m} needs {m} distinct pools, got {len(pools)}. "
-        f"Add pools before running the m={m} rung."
-    )
-    order = [(i + shift) % m for i in range(m)]
-    sents = []
-    for b in order:
-        pool = pools[b]
-        sents.extend(pool[rng.randrange(len(pool))] for _ in range(block_len))
-    text, spans = CARRIERS[rng.randrange(len(CARRIERS))], []
+def _assemble(carrier, sents):
+    """(text, spans) from a carrier prefix and an ordered sentence list."""
+    text, spans = carrier, []
     for j, s in enumerate(sents):
         if j:
             text += " "
         spans.append((len(text), len(text) + len(s)))
         text += s
-    return text, spans, order
+    return text, spans
+
+
+def rotation_pair(pools, m, k_seg, rng, grouped=False, shift=1):
+    """Build a matched (class A, class B) rotation pair from ONE sentence draw.
+
+    Returns ((text_a, spans_a), (text_b, spans_b), order).
+
+    The two classes are literally the same sentence list read from different
+    starting points, so the sentence multiset, the block-length multiset, the
+    transition count and every register's occupancy match EXACTLY. That is a
+    strictly tighter match than the multiset-and-switch-count matching of last
+    sprint's order task, and it is what makes the constant share exactly zero.
+
+    Do NOT build the two classes from two independent draws. Drawing per class
+    matches only the *register* counts in expectation, and under grouping it
+    does not even do that -- measured at m=2 with one seed, class A came out
+    legal:4 and class B calm:4, because each block re-draws which of its
+    grouped registers it uses. The rotation must be applied to the ASSEMBLED
+    list, which is what this function does and what the theory describes.
+
+    The carrier prefix is shared between the two classes for the same reason.
+    """
+    block_len = k_seg // m
+    assert block_len * m == k_seg, f"m={m} does not divide k_seg={k_seg}"
+    if grouped:
+        groups = GROUPINGS[m]
+    else:
+        # The m=12 stretch rung needs twelve distinct registers; only six are
+        # written here. Reusing a pool for two blocks would make two rows of
+        # the difference slab collinear and quietly break r1 = 2/m, so fail
+        # loudly instead.
+        assert m <= len(pools), (
+            f"rotation_pair: m={m} needs {m} distinct pools, got {len(pools)}. "
+            f"Add pools before running the m={m} rung."
+        )
+        groups = [[b] for b in range(m)]
+
+    sents = []
+    for g in groups:
+        for _ in range(block_len):
+            pool = pools[g[rng.randrange(len(g))]]
+            sents.append(pool[rng.randrange(len(pool))])
+
+    rot = (shift * block_len) % k_seg
+    sents_b = sents[rot:] + sents[:rot]
+    carrier = CARRIERS[rng.randrange(len(CARRIERS))]
+    order = [(i + shift) % m for i in range(m)]
+    return _assemble(carrier, sents), _assemble(carrier, sents_b), order
 
 
 # Grouped ladder: hold the register count fixed at six and let m set only how
@@ -351,34 +374,17 @@ GROUPINGS = {
 }
 
 
-def grouped_rotation_doc(pools, m, k_seg, shift, rng):
-    """Rotation document with the register count held fixed across m.
+def grouped_rotation_pair(pools, m, k_seg, rng, shift=1):
+    """rotation_pair with grouping on -- the headline ladder.
 
-    Block t draws its segments uniformly from the union of the registers in
-    group t, so the group's content vector is that group's mean. Group means
-    are averages of subsets and so are LESS mutually equidistant than single
-    registers -- run block_geometry() on the measured group means and expect
-    measured r1 to sit above the closed form by a corresponding amount. That
-    deviation is reportable, not a failure.
+    Block t draws its segments uniformly from the registers in group t, so the
+    group's content vector is that group's mean. Group means are averages of
+    subsets and so are LESS mutually equidistant than single registers -- run
+    block_geometry() on the measured group means and expect measured r1 to sit
+    above the closed form by a corresponding amount. That deviation is
+    reportable, not a failure.
     """
-    groups = GROUPINGS[m]
-    assert len(groups) == m
-    block_len = k_seg // m
-    assert block_len * m == k_seg, f"m={m} does not divide k_seg={k_seg}"
-    order = [(i + shift) % m for i in range(m)]
-    sents = []
-    for g in order:
-        members = groups[g]
-        for _ in range(block_len):
-            pool = pools[members[rng.randrange(len(members))]]
-            sents.append(pool[rng.randrange(len(pool))])
-    text, spans = CARRIERS[rng.randrange(len(CARRIERS))], []
-    for j, s in enumerate(sents):
-        if j:
-            text += " "
-        spans.append((len(text), len(text) + len(s)))
-        text += s
-    return text, spans, order
+    return rotation_pair(pools, m, k_seg, rng, grouped=True, shift=shift)
 
 
 if __name__ == "__main__":
@@ -391,19 +397,29 @@ if __name__ == "__main__":
         print(f"  m={m:>2}  r1={r1:.4f}  sqrt(r1)={np.sqrt(r1):.4f}"
               + ("   <- same as m=3, wasted rung" if m == 4 else ""))
     print()
-    print("naive ladder (register count grows with m -- coherence confound):")
+    def _sents(text, spans):
+        return [text[a:b] for a, b in spans]
+
+    print("multiset matching (must be EXACT for every m and both ladders):")
+    for grouped in (False, True):
+        for m in (2, 3, 6):
+            (ta, sa), (tb, sb), _ = rotation_pair(
+                BLOCKS, m, 12, random.Random(7), grouped=grouped)
+            a, b = _sents(ta, sa), _sents(tb, sb)
+            ok = sorted(a) == sorted(b)
+            rot = 12 // m
+            is_rot = b == a[rot:] + a[:rot]
+            print(f"  grouped={int(grouped)} m={m}: multiset_equal={ok} "
+                  f"is_rotation_by_{rot}={is_rot} n_seg={len(a)}")
+            assert ok and is_rot, "matching broken"
+    print()
+    print("grouped ladder groups (six registers at every m -- headline):")
     for m in (2, 3, 6):
-        t, sp, order = rotation_doc(BLOCKS, m, 12, 0, rng)
-        n_reg = len({BLOCK_NAMES[b] for b in order})
-        print(f"  m={m} order={[BLOCK_NAMES[b] for b in order]}  "
-              f"{len(sp)} segments, {n_reg} registers")
-    print("\ngrouped ladder (six registers at every m -- headline):")
-    for m in (2, 3, 6):
-        ta, spa, order = grouped_rotation_doc(BLOCKS, m, 12, 0, rng)
-        tb, spb, _ = grouped_rotation_doc(BLOCKS, m, 12, 1, rng)
         groups = [[BLOCK_NAMES[i] for i in g] for g in GROUPINGS[m]]
         print(f"  m={m} block_len={12//m} groups={groups}")
-        print(f"      A: {ta[ta.index(chr(10)) + 1:][:96]}...")
+    (ta, sa), (tb, sb), _ = grouped_rotation_pair(BLOCKS, 3, 12, random.Random(3))
+    print(f"\n  A: {ta.splitlines()[1][:100]}...")
+    print(f"  B: {tb.splitlines()[1][:100]}...")
     print()
     e, d = REFUSAL_ITEMS[0]
     a, b = refusal_pair(e, d)

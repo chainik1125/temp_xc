@@ -446,6 +446,17 @@ the starting point. Sweep `m ∈ {2, 3, 6}` at fixed total segment count (`k_seg
 length `12/m`), with `m = 12` as a stretch rung run last. **Not `m = 4`** — it has the same
 `r1` as `m = 3` and buys no new information (§ The rotation spectrum).
 
+**Construction requirement — the one way to get this wrong.** Build the two classes from a
+**single** sentence draw and rotate the *assembled list*; do not draw each class
+independently. Independent draws match the register counts only in expectation, and under the
+grouped ladder they do not even do that, because each block re-draws which of its grouped
+registers it uses. Measured at `m = 2` with one seed, an independent-draw implementation gave
+class A `legal:4` and class B `calm:4` — a lexical imbalance pointing straight at the factor
+under test, which a constant write *can* exploit and which would have produced a false
+positive for `sae_broadcast` rather than the registered zero. `rotation_pair()` in `blocks.py`
+does it correctly and asserts exact multiset equality and exact rotation for every `m` in both
+ladders. Share the carrier prefix between the pair for the same reason.
+
 **Readout (reading).** Pooled per-token SAE code versus window code, AUC. Expect the SAE to
 win as always; run it only to keep the reading/steering dissociation on the record.
 

@@ -204,6 +204,14 @@ the crosscoder's structural advantage.
 **Feasibility.** Highest in the catalogue. Segment = block, `T` = 4–12, prompts are short, no
 fine-tuning, and the harness needs only a new corpus builder.
 
+**Whitespace.** A search for sparse-autoencoder or dictionary work on demonstration-order or
+prompt-order sensitivity returns nothing. There is plenty of SAE-steering methodology (e.g.
+*Improving Steering Vectors by Targeting Sparse Autoencoder Features*,
+[arXiv:2411.02193](https://arxiv.org/abs/2411.02193); *Can sparse autoencoders be used to
+decompose and interpret steering vectors?*, [arXiv:2411.08790](https://arxiv.org/abs/2411.08790)
+— ids unverified) and plenty of order-sensitivity work, but nobody appears to have put a
+learned dictionary on the order-sensitivity factor. This entry is unclaimed.
+
 **Honest risks.** (i) The order effect must be verified in the specific 1.5B model before any
 dictionary training — 20 minutes of forward passes, and it is the go/no-go. (ii) Calibration
 methods (Calibrate Before Use, PriDe) are cheap and effective, so as with repetition the
@@ -213,6 +221,23 @@ option *label* tokens ("A", "B", "C"), which are per-token-identifiable; a per-t
 dictionary can then represent "this is slot A" perfectly well. It still cannot *write*
 asymmetrically across slots, so reading should again favour the SAE while steering does not.
 That is now the expected signature, and finding it a fourth time would itself be worth stating.
+
+**(iv) A localisation risk specific to instance B, and the reason to prefer D.** Li & Gao,
+*Anchored Answers: Unravelling Positional Bias in GPT-2's Multiple-Choice Questions*, ACL 2025
+Findings ([arXiv:2405.03205](https://arxiv.org/abs/2405.03205) — verified) trace the
+first-choice-'A' bias to specific **MLP value vectors and attention heads**, and show that
+updating those vectors and recalibrating attention both removes the bias and improves accuracy.
+Related work (UniBias) eliminates biased FFN vectors and attention heads directly.
+
+This is the same shape of risk as the single-neuron repetition result: a *localised,
+per-token-representable* component already accounts for the behaviour, so a reviewer can ask
+what a window code adds. Three mitigations, in order of strength. First, the published
+localisation is on the **GPT-2 family**, which the authors themselves describe as having "an
+even worse anchored bias" than larger LLMs — it is not established at 1.5B+. Second, those are
+*weight-level component* interventions, not additive steering writes, so the steering baseline
+is still unmeasured. Third, and most simply, **prefer instance D**: premise-order failure in
+R-GSM has no published localisation and is a reasoning failure rather than a label prior, so
+the "one biased head explains it" reply is not available.
 
 ### Instruction-order conflict / prompt-injection precedence — priority 5
 
@@ -507,7 +532,9 @@ measured on a completely different task.
 
 - **Fetched and verified this session:** 2104.08786 (Lu et al., ACL 2022, order sensitivity
   quote), 2308.11483 (Pezeshkpour & Hruschka, 13–75% gap), 2307.03172 (Liu et al., TACL,
-  lost-in-the-middle quote), 2404.13208 (Wallace et al., instruction hierarchy),
+  lost-in-the-middle quote), 2402.08939 (Chen et al., ICML 2024, >30% premise-order drop,
+  R-GSM), 2405.03205 (Li & Gao, ACL 2025 Findings, anchored-bias localisation in GPT-2),
+  2404.13208 (Wallace et al., instruction hierarchy),
   2402.14811 (Prakash et al., ICLR 2024, positional entity-tracking circuit), 2605.30233 (Tang
   et al., aggregation-at-last-token quote), 2606.13705 (Lazaridis et al., single-neuron
   repetition fix and the "doom loops" caveat), 2206.02369 (Xu et al., NeurIPS 2022,
@@ -534,3 +561,8 @@ measured on a completely different task.
   criterion after confirming the harness windows over *segments*, not tokens, which promotes
   block-structured tasks and demotes induction; added steganography; verified three more
   citations.
+- 2026-07-27 ~01:05 PDT — added instance D, premise order / R-GSM, and made it the recommended
+  instance: largest published gap (>30%), a public dataset of multiset-matched permutation
+  pairs, a reasoning failure rather than a label prior, and no published localisation. Added
+  the localisation risk for instance B (anchored-bias MLP value vectors and attention heads,
+  GPT-2 family) and the whitespace note that no dictionary work exists on order sensitivity.
