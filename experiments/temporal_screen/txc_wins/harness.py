@@ -69,10 +69,25 @@ def _upper_frac(texts):
     return sum(c.isupper() for c in chars) / max(len(chars), 1)
 
 
+def _repeat_frac(text):
+    """Share of whitespace tokens that repeat the immediately preceding one.
+
+    A second, judge-free degeneracy signal stored per generation so a different floor can
+    be applied afterwards without regenerating anything. Log-probability under the
+    unsteered model is the primary coherence measure; this catches the specific failure
+    that measure is weakest against -- a short high-probability loop.
+    """
+    w = text.split()
+    if len(w) < 2:
+        return 0.0
+    return sum(a == b for a, b in zip(w, w[1:])) / (len(w) - 1)
+
+
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              make_pair_test=None,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
              n_perm=0, seed=31415, dict_seed=0, gen_tokens=0, n_gen=0,
+             gen_alphas=None,
              n_grad=0, select_by="reading", n_select=24, n_short=16,
              matched_dose_hint=0.5, sae_lr=None, txc_lr=None, tsae_lr=None,
              sae_steps=None, txc_steps=None, tsae_steps=None,
@@ -746,42 +761,118 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     # applied to the generated tokens themselves: the write covers the document's segment
     # spans only, and the continuation is influenced through attention.
     if gen_tokens and n_gen:
-        gen_arms = [nm for nm in ("txc_slab", "sae_broadcast", "txc_flat", "dom_slab")
+        gen_arms = [nm for nm in ("txc_slab", "sae_broadcast", "tsae_broadcast",
+                                  "txc_flat", "dom_slab", "broadcast_optimal")
                     if nm in writes]
+        # DOSE GRID, not one dose per arm. The previous version generated each arm at
+        # `alphas[argmax(delta_margin)]` -- a SIGNED argmax on the logit metric -- so
+        # `sae_broadcast` and `txc_flat` were both generated at -2.0 while `txc_slab` was at
+        # +2.0, and the resulting obedience rates were compared across arms sitting at
+        # arbitrary and differently-signed points on their own curves. Steering scales are
+        # not commensurable between architectures even at matched injected norm, so a
+        # cross-arm comparison needs each arm's whole curve and a common admissibility rule.
+        gen_grid = list(gen_alphas) if gen_alphas else [None]
         out["generations"] = {}
+        out["gen_sweep"] = []
+
+        def _generate(stem, spn, W, a_):
+            """Greedy continuation with KV caching. Returns (text, mean logprob unsteered).
+
+            The write is applied ON PREFILL ONLY. Without that guard a segment beginning at
+            position 0 would have its write added to the FIRST GENERATED TOKEN during decode,
+            because a cached decode step passes a length-1 tensor and `h[:, 0:1, :]` is then
+            the new token rather than the document. `pos_early = 2` means no segment starts
+            at 0 in this task, so the bug would not bite here -- which is exactly why it is
+            guarded explicitly rather than left to the task's layout.
+            """
+            e, ts2 = seg_spans(stem, spn)
+            ids = e["input_ids"].to(dev)
+            n0 = ids.shape[1]
+            hook = None
+            if W is not None:
+                def edit(_m, _i, out_, _ts=ts2, _W=W, _a=a_, _n0=n0):
+                    h = out_[0] if isinstance(out_, tuple) else out_
+                    if h.shape[1] == _n0:
+                        for t_i, (p0, p1) in enumerate(_ts):
+                            h[:, p0:p1 + 1, :] += (_a * scale
+                                                   * _W[t_i].to(h.dtype).unsqueeze(0))
+                    return (h,) + out_[1:] if isinstance(out_, tuple) else h
+                hook = layers_[L].register_forward_hook(edit)
+            with torch.no_grad():
+                o = model(ids, use_cache=True)
+                past, nxt = o.past_key_values, o.logits[0, -1].argmax()
+                gen = [nxt]
+                for _ in range(gen_tokens - 1):
+                    o = model(nxt.view(1, 1), past_key_values=past, use_cache=True)
+                    past, nxt = o.past_key_values, o.logits[0, -1].argmax()
+                    gen.append(nxt)
+            if hook is not None:
+                hook.remove()
+            g_ids = torch.stack(gen).view(1, -1)
+            # COHERENCE: mean token log-probability of the generated continuation under the
+            # UNSTEERED model -- no hook, so a large write that produces degenerate text
+            # scores badly here even when it scores well on obedience. That pairing is the
+            # whole point: an all-lowercase mush is 100% "obedient" for class A's foil.
+            with torch.no_grad():
+                full = torch.cat([ids, g_ids], 1)
+                lg = model(full).logits.float().log_softmax(-1)
+                lp = float(lg[0, n0 - 1:-1].gather(-1, full[0, n0:].unsqueeze(-1)).mean())
+            return tok.decode(g_ids[0]), lp
+
         for nm in ["none"] + gen_arms:
             W = None if nm == "none" else writes[nm]
-            a_best = (0.0 if W is None
-                      else alphas[int(np.argmax(out["arms"][nm]["delta_margin"]))])
-            rows = []
-            for (ta, sa2, tb, sb2, c1, _c2) in tests[:n_gen]:
-                for cls, (txt, spn) in (("A", (ta, sa2)), ("B", (tb, sb2))):
-                    stem = txt + (c1.rsplit(" ", 1)[0] if c1 else "")
-                    e, ts2 = seg_spans(stem, spn)
-                    ids = e["input_ids"].to(dev)
-                    n0 = ids.shape[1]
-                    hook = None
-                    if W is not None:
-                        def edit(_m, _i, out_, _ts=ts2, _W=W, _a=a_best):
-                            h = out_[0] if isinstance(out_, tuple) else out_
-                            for t_i, (p0, p1) in enumerate(_ts):
-                                h[:, p0:p1 + 1, :] += (_a * scale
-                                                       * _W[t_i].to(h.dtype).unsqueeze(0))
-                            return (h,) + out_[1:] if isinstance(out_, tuple) else h
-                        hook = layers_[L].register_forward_hook(edit)
-                    with torch.no_grad():
-                        for _ in range(gen_tokens):
-                            nxt = model(ids).logits[0, -1].argmax()
-                            ids = torch.cat([ids, nxt.view(1, 1)], dim=1)
-                    if hook is not None:
-                        hook.remove()
-                    rows.append({"cls": cls, "alpha": a_best,
-                                 "text": tok.decode(ids[0, n0:])})
-            out["generations"][nm] = rows
-            up = {c: _upper_frac([r["text"] for r in rows if r["cls"] == c])
-                  for c in ("A", "B")}
-            log(f"[gen] {nm:<16} alpha {a_best:>5.2f}  uppercase fraction "
-                f"A {up['A']:.3f}  B {up['B']:.3f}  A-B {up['A'] - up['B']:+.3f}")
+            doses = [0.0] if W is None else (
+                gen_grid if gen_grid != [None]
+                else [alphas[int(np.argmax(out["arms"][nm]["delta_margin"]))]])
+            for a_ in doses:
+                rows = []
+                for (ta, sa2, tb, sb2, c1, _c2) in tests[:n_gen]:
+                    for cls, (txt, spn) in (("A", (ta, sa2)), ("B", (tb, sb2))):
+                        stem = txt + (c1.rsplit(" ", 1)[0] if c1 else "")
+                        text, lp = _generate(stem, spn, W, a_)
+                        uf = _upper_frac([text])
+                        rows.append({"cls": cls, "alpha": a_, "text": text,
+                                     "upper_frac": uf, "logprob": lp,
+                                     "repeat_frac": _repeat_frac(text)})
+                # OBEYS THE EARLIER INSTRUCTION. `make_recency` puts the UPPERCASE
+                # instruction early in class A and late in class B, so obeying the earlier
+                # one means uppercase for A and lowercase for B. Recency-driven behaviour
+                # therefore scores BELOW 0.5 at baseline, and a write that suppresses
+                # recency pushes this up.
+                def _obey(cut):
+                    hits = [(r["upper_frac"] > cut) if r["cls"] == "A"
+                            else (r["upper_frac"] < 1 - cut) for r in rows]
+                    return sum(hits) / max(len(hits), 1)
+
+                lps = [r["logprob"] for r in rows]
+                cell = {"arm": nm, "alpha": a_, "n": len(rows),
+                        "obey_earlier_cut50": _obey(0.5),
+                        "obey_earlier_cut70": _obey(0.7),
+                        "coherence_mean": float(np.mean(lps)),
+                        "coherence_median": float(np.median(lps)),
+                        "repeat_frac_mean": float(np.mean(
+                            [r["repeat_frac"] for r in rows])),
+                        "upper_frac_A": _upper_frac(
+                            [r["text"] for r in rows if r["cls"] == "A"]),
+                        "upper_frac_B": _upper_frac(
+                            [r["text"] for r in rows if r["cls"] == "B"]),
+                        "supervised": nm in ("dom_slab", "broadcast_optimal")}
+                out["gen_sweep"].append(cell)
+                out["generations"].setdefault(nm, []).extend(rows)
+                log(f"[gen] {nm:<18} a {a_:>+6.2f}  obey(earlier) "
+                    f"{cell['obey_earlier_cut50']:.3f} (cut.7 {cell['obey_earlier_cut70']:.3f})"
+                    f"  coh {cell['coherence_mean']:+.3f}  rep {cell['repeat_frac_mean']:.3f}"
+                    f"  upper A {cell['upper_frac_A']:.2f} B {cell['upper_frac_B']:.2f}")
+
+        # COHERENCE FLOOR from the unsteered distribution, so it is a property of the model
+        # and the task rather than a number chosen to admit a preferred arm.
+        base_lp = sorted(r["logprob"] for r in out["generations"].get("none", []))
+        if base_lp:
+            floor = base_lp[max(0, int(0.05 * len(base_lp)) - 1)]
+            out["coherence_floor"] = {"value": float(floor),
+                                      "rule": "5th percentile of unsteered per-generation "
+                                              "mean token logprob", "n": len(base_lp)}
+            log(f"[gen] coherence floor (5th pct of unsteered) = {floor:+.3f}")
 
     # ---------------- permuted-profile null (optional) ----------------
     if n_perm and "txc_slab" in writes:

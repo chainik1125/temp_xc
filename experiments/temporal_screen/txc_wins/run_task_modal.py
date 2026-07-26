@@ -40,7 +40,8 @@ def run(task: str, task_test: str, model_id: str, layer: int, k_seg: int, n_trai
         d_sae: int, k: int, steps: int, lr: float, batch_win: int, alphas: list,
         tsae_l1: float, tsae_k: int, txc_k: int, n_perm: int, seed: int,
         dict_seed: int, gen_tokens: int, n_gen: int, n_grad: int,
-        recipe: list, select_by: str, n_select: int, n_short: int):
+        recipe: list, select_by: str, n_select: int, n_short: int,
+        gen_alphas: list):
     import sys
     sys.path.insert(0, "/work")
     from txc_wins.harness import run_task
@@ -57,7 +58,7 @@ def run(task: str, task_test: str, model_id: str, layer: int, k_seg: int, n_trai
                  tsae_k=(tsae_k if tsae_k > 0 else None),
                  txc_k=(txc_k if txc_k > 0 else None), n_perm=n_perm, seed=seed,
                  dict_seed=dict_seed, gen_tokens=gen_tokens, n_gen=n_gen,
-                 n_grad=n_grad, select_by=select_by,
+                 n_grad=n_grad, gen_alphas=(gen_alphas or None), select_by=select_by,
                  n_select=n_select, n_short=n_short,
                  sae_lr=recipe[0] or None, sae_steps=recipe[1] or None,
                  txc_lr=recipe[2] or None, txc_steps=recipe[3] or None,
@@ -76,13 +77,14 @@ def main(task: str = "order", task_test: str = "", model: str = "Qwen/Qwen2.5-1.
          seed: int = 31415, dict_seed: int = 0, gen_tokens: int = 0,
          n_gen: int = 0, n_grad: int = 0, recipe: str = "",
          select_by: str = "reading", n_select: int = 24, n_short: int = 16,
-         tag: str = ""):
+         gen_alphas: str = "", tag: str = ""):
     import json
     r = run.remote(task, task_test, model, layer, k_seg, n_train, n_test, d_sae, k, steps, lr,
                    batch_win, [float(x) for x in alphas.split(",")], tsae_l1, tsae_k,
                    txc_k, n_perm, seed, dict_seed, gen_tokens, n_gen, n_grad,
                    ([float(x) for x in recipe.split(",")] if recipe else [0] * 6),
-                   select_by, n_select, n_short)
+                   select_by, n_select, n_short,
+                   [float(x) for x in gen_alphas.split(",")] if gen_alphas else [])
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
     name = f"{task}{tag}.json"
