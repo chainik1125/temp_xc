@@ -449,6 +449,47 @@ baseline — could **not** be run: the results files store `baseline_contrast`, 
 `score(A) − score(B)`, and not the per-condition scores. The even/odd decomposition tests the same
 hypothesis more directly and does not need them, so that is the version to use.
 
+### A registered prediction about `c`, tested and falsified
+
+Theory registered that both quantitative tests of `c` had used the *peak* margin, which the
+even/odd decomposition shows is 72–80% curvature for the constant arms, while `c` bounds a
+**first-order** quantity that is odd in α. The prediction: recomputing the association on the
+**odd component only** should raise `|τ|` above 0.58.
+
+Tested, on 17 deduplicated task cells with gradient `c`, taking the crosscoder's margin over the
+**best** constant arm:
+
+| observable | Kendall τ |
+| --- | --- |
+| raw peak margin | **−0.570** |
+| odd component only | **−0.496** |
+
+The raw figure reproduces the −0.58 already in the summary, so the pipeline agrees. **But the odd
+version is weaker, not stronger — the prediction fails in the direction it was registered.**
+
+**The likely mechanism is attenuation, and it is specific rather than hand-wavy.** The odd part is
+a difference of two noisy estimates, so its signal shrinks while its noise does not, and the loss
+is concentrated exactly where the constant arm is most even — which is the low-`c` winning tasks
+that anchor the correlation:
+
+| task | raw SNR | odd SNR |
+| --- | --- | --- |
+| recency | 18.1 | **8.5** |
+| evidence | 13.4 | **3.5** |
+| order | 8.9 | 6.3 |
+| rot_m12 | 8.6 | 11.0 |
+| rot_m6 | 8.1 | 17.9 |
+
+Recency and evidence lose roughly half and three-quarters of their SNR respectively; the rotation
+rungs, where the constant arm is already mostly odd, gain. So isolating the odd part sharpens the
+*interpretation* of the constant arms while degrading the *statistic*, and classic regression
+dilution accounts for the drop without needing anything substantive about `c`.
+
+**Conclusion: τ = −0.58 stands as the best available estimate, and "ranks but does not decide"
+should not be revised upward.** The even/odd decomposition remains the right tool for saying what
+the constant arms *are* — mis-specified rather than weak — and is the wrong tool for strengthening
+the correlation.
+
 ### A linear-regime diagnostic, and what `rotate2` is telling us
 
 Main flagged that `grad_rank1` exceeds `grad_slab` at `rotate2`, "which should be impossible". It
