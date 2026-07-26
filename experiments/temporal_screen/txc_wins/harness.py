@@ -69,6 +69,27 @@ def _upper_frac(texts):
     return sum(c.isupper() for c in chars) / max(len(chars), 1)
 
 
+def _reply(text):
+    """The model's answer, before it invents a next turn.
+
+    Greedy continuations run past the answer into hallucinated dialogue -- "User: ...",
+    "Human: ..." -- and pooling case over the whole continuation measures that drift far
+    more than it measures the instruction. Measured on a 32-token generation, **67% of the
+    alphabetic characters come from after the reply ends**, and that text is mixed-case
+    whatever the instruction said. Truncating at the first newline or end-of-text marker is
+    what makes the readout about the thing the task manipulates.
+
+    This was found by diffing KV-cached against uncached generation: the two agree exactly
+    on the reply and diverge only in the drift, which is what showed how little of the
+    measured text the reply was.
+    """
+    for marker in ("\n", "<|endoftext|>", "<|im_end|>"):
+        i = text.find(marker)
+        if i > 0:
+            text = text[:i]
+    return text.strip()
+
+
 def _repeat_frac(text):
     """Share of whitespace tokens that repeat the immediately preceding one.
 
@@ -830,24 +851,26 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
                     for cls, (txt, spn) in (("A", (ta, sa2)), ("B", (tb, sb2))):
                         stem = txt + (c1.rsplit(" ", 1)[0] if c1 else "")
                         text, lp = _generate(stem, spn, W, a_)
-                        uf = _upper_frac([text])
                         rows.append({"cls": cls, "alpha": a_, "text": text,
-                                     "upper_frac": uf, "logprob": lp,
+                                     "upper_frac": _upper_frac([text]),
+                                     "upper_frac_reply": _upper_frac([_reply(text)]),
+                                     "reply": _reply(text), "logprob": lp,
                                      "repeat_frac": _repeat_frac(text)})
                 # OBEYS THE EARLIER INSTRUCTION. `make_recency` puts the UPPERCASE
                 # instruction early in class A and late in class B, so obeying the earlier
                 # one means uppercase for A and lowercase for B. Recency-driven behaviour
                 # therefore scores BELOW 0.5 at baseline, and a write that suppresses
                 # recency pushes this up.
-                def _obey(cut):
-                    hits = [(r["upper_frac"] > cut) if r["cls"] == "A"
-                            else (r["upper_frac"] < 1 - cut) for r in rows]
+                def _obey(cut, key="upper_frac_reply"):
+                    hits = [(r[key] > cut) if r["cls"] == "A"
+                            else (r[key] < 1 - cut) for r in rows]
                     return sum(hits) / max(len(hits), 1)
 
                 lps = [r["logprob"] for r in rows]
                 cell = {"arm": nm, "alpha": a_, "n": len(rows),
                         "obey_earlier_cut50": _obey(0.5),
                         "obey_earlier_cut70": _obey(0.7),
+                        "obey_earlier_fulltext": _obey(0.5, "upper_frac"),
                         "coherence_mean": float(np.mean(lps)),
                         "coherence_median": float(np.median(lps)),
                         "repeat_frac_mean": float(np.mean(
