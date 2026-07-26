@@ -245,7 +245,9 @@ because a reader will otherwise assume the comparison was matched and may suspec
 **What to actually do.** Report the asymmetry rather than hide it, and if there is compute to
 spare, rerun the steering arms with the crosscoder at `k_window = k_segment × T` so the budgets
 match — the expected outcome is that the SAE arm gets no better, since the constant-write argument
-is structural rather than about capacity, and confirming that closes the loop.### The concrete recommendation, if one task has to be picked
+is structural rather than about capacity, and confirming that closes the loop.
+
+### The concrete recommendation, if one task has to be picked
 
 **Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =
 number of shots, a drop-in for `steer_order_modal.py`.
@@ -1840,3 +1842,15 @@ the per-pass times are ordering only, not measurements.
   split). Specified the control that isolates them — run their trainer with temporal
   regularisation at zero — and noted the released weights are Gemma-2-2b, so the arm needs
   training regardless.
+- **Passes 25–28** — switched from reading papers to **auditing `steer_order_modal.py`**, which
+  turned out to be the higher-value activity. Four findings, in descending order of consequence:
+  (i) the harness matches *slab* Frobenius norm, which equals injected norm only when segments
+  have equal token counts — harmless in the existing run because slot length is independent of
+  slot index, but a systematic bias in the new design, where best/worst permutation selection can
+  correlate length with condition; (ii) the dictionaries are trained on the same twenty sentences
+  they steer, so the existing claim is "steers the ordering of content it was trained on" and
+  held-out pools would upgrade it; (iii) the steering run is **not budget-matched** — the SAE gets
+  `k` per segment and the crosscoder `k` per window, a 12× advantage to the SAE at the defaults,
+  which makes the headline conservative and should be reported; (iv) dose selection by argmax on
+  the reporting set is a winner's curse, but simulation puts it at ≤0.41 SEM and it inflates the
+  *flat* arms, so it too is conservative — no correction needed.

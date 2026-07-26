@@ -1959,3 +1959,71 @@ Three audits, all from reading our own harness rather than from an external obje
 That all three came from auditing our own code is worth a line in the methodology section. The
 external literature produced the screening principle; the internal audits produced every
 correction that changed a number.
+
+## 00:18 — the headline, complete: a discovery result with a number
+
+Instruction recency, all arms, best dose, matched injected norm, 8.0 against 8.3 realised
+coefficients per segment:
+
+| arm | Δ | kind |
+| --- | --- | --- |
+| `rank1_best` | +8.55 ± 0.27 | **supervised** — best rank-1 write |
+| `dom_slab` | +8.20 ± 0.22 | **supervised** — difference of means |
+| `sae_schedule` | +7.86 ± 0.25 | **supervised** — SAE direction + schedule |
+| **`txc_slab`** | **+6.48 ± 0.15** | **unsupervised** |
+| `tsae_broadcast` | +3.65 ± 0.14 | unsupervised |
+| `sae_broadcast` | +2.60 ± 0.15 | unsupervised |
+| `random_broadcast` | +1.81 ± 0.16 | control |
+| `txc_flat` | +1.42 ± 0.14 | control — profile removed |
+| `random_slab` | +1.39 ± 0.07 | control |
+| `txc_profile_random` | +0.00 ± 0.04 | control — profile kept, directions randomised |
+
+The crosscoder beats **every unsupervised baseline** by a wide margin — z = 18.2 against the
+SAE, 13.7 against the tSAE, 24.9 against its own profile-removed control, 41.6 against its own
+profile with random directions — and **loses to a per-token dictionary handed a per-position
+schedule**, at z = −4.8 and −6.8.
+
+**So recency is a discovery result, and now that is a number rather than a caveat.** Measured
+`r1 = 0.818` on the gradient: 82% of the optimal write is rank-1 reachable, which is exactly
+why the schedule arms win. The write is expressible by a per-token dictionary — you have to
+know the schedule, which requires the labels. The crosscoder finds it without them. Both
+schedule arms were fitted on the training split and applied **unrefitted** to fresh test
+documents, so the schedule genuinely transfers; it is simply not discoverable unsupervised.
+
+Both halves of the crosscoder are necessary and neither suffices: +1.42 with the profile
+removed, +0.00 with the profile kept and the directions randomised. Two controls failing in
+opposite directions.
+
+## 00:20 — the generation check, and it needs no judge
+
+Greedy continuations, 24 tokens, 40 documents per class, scored by the fraction of alphabetic
+characters that are upper case:
+
+| arm | uppercase A | uppercase B | A − B |
+| --- | --- | --- | --- |
+| unsteered | 0.367 | 0.479 | **−0.112** — each document obeys its *late* instruction |
+| **`txc_slab`** | 0.341 | 0.092 | **+0.249** — reversed, 2.2× the baseline gap |
+| `dom_slab` (supervised) | 0.450 | 0.271 | +0.179 |
+| `sae_broadcast` | 0.268 | 0.221 | +0.046 |
+| `txc_flat` | 0.097 | 0.086 | +0.010 |
+
+The teacher-forced margin corresponds to something the model actually does, and **the
+crosscoder's write moves it further than the supervised difference-of-means write does.** The
+samples are unambiguous: document B unsteered begins `" HELLO! HOW CAN I HELP YOU TODAY?"` and
+under the crosscoder's write begins `" Hello! How can I assist you today?"` — switching from
+obeying its late uppercase instruction to obeying its early lowercase one.
+
+## 00:22 — a budget asymmetry in the older runs, conservative in our favour
+
+`TopKSAE(k=k)` spends `k` per **segment**; `TemporalCrosscoder(T=T, k=k)` spends `k` per
+**window**. At k=8, k_seg=12 that is 8 coefficients per segment for the SAE against 0.67 for
+the crosscoder — a **12× budget advantage to the SAE**. Training throughput was matched, so
+this is a sparsity-budget asymmetry only.
+
+The current recency run is matched (8.0 against 8.3 realised per segment), so the headline is
+unaffected. But last sprint's +11.29 against +1.24 was measured with the SAE holding twelve
+times the budget — which deserves a sentence in the write-up rather than a footnote, since a
+reader will otherwise assume the comparison was matched and may suspect it was tuned our way.
+The symmetric-dose rerun will match budgets as well (`k_window = k_segment × T`); the expected
+outcome is that the SAE arm does not improve, because the constant-write limitation is
+structural rather than a capacity constraint.
