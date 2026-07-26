@@ -7197,3 +7197,47 @@ still holds on the A6 generation ruling. $0 compute, ~1 283 KB-scale
 config downloads (metadata-first). All verdicts PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-26 ~22:20 London — mac-a — CALIB PRELIMINARY (18/20 cells; 2 tsae-trained in flight) — HEADS-UP for pods before Phase-B launches. NON-CLAIMING; PENDING TEAM REVIEW.
+
+**Headline (preliminary): at hunt widths the composition fix is a
+NO-OP — btk-only ≡ relu-mix as functions.** All 18 landed btk-only
+cells (freeze `97fae183a`, fresh trains, arch_version 1.1.0 stamped,
+pin asserted, 0 cache hits) reproduce their cited relu-mix twins to
+|Δrecovery| ≤ 2.2e-08 and |Δ realized-l0| = 0.0 EXACTLY — same
+trajectory modulo GPU atomics. This is the mathematical identity, not
+a bug: **btk-only coincides with relu-mix wherever (i) train-time
+selection never exhausts the positive pre-act pool (k per pool row ≪
+positives available) and (ii) the tracked JumpReLU threshold is ≥ 0**
+— at d_sae 2048 vs k = 8 the pool never thins (untrained l0 = 8.000
+exactly BOTH arms; my unit tests prove the classes diverge hard when
+pools DO thin: parent zero-picks to l0 = 0, btk fills to k with
+negative survivors).
+
+**Mechanism re-attribution (the important part):** the hunt family's
+realized-l0 shortfall (sae 4.12–4.39/8, post@T4 ~6.3, post@T16 ~7.5 —
+IDENTICAL both arms) is therefore **eval-time JumpReLU threshold
+pruning, NOT selection zero-picks**. The shared-briefing fingerprint
+numbers were real; the zero-pick mechanism inference does not hold at
+these widths. The l0 band [6.5, 9.6] in my card is out-of-band at
+sae@T1 and post@T4 exactly as the disclosure clause anticipated — the
+fix does not "restore" l0 because the shortfall never was
+selection-side here.
+
+**For runpod-1/2 (before you burn GPU-hours):** at probing/EM widths
+(k = 20/token vs d_sae 18432) the positive pool is essentially never
+thin ⇒ your btk-only arms may reproduce relu-mix cell-for-cell. That
+outcome is the EXPECTED mechanism result, not an implementation bug —
+do a 1-cell smoke and check `neg_frac` (train logs) ≈ 0 and realized
+l0 identity FIRST; if confirmed, the informative arms are the
+thin-pool ones (k_win ≳ positives: paper-synthetic-style d_sae ≤
+k_win regimes, the 8·T secondary at T32 = k256 where mac-b's scan
+shows 0.647 realization — the deep-selection cell), not blanket
+re-runs. Composition-consistency for the PAPER arch (txc_base:
+TopK-then-ReLU zeroing selected negatives) is a DIFFERENT mechanism
+and is untouched by this result — Dmitry's d(perf)/dT gate question
+stands, but the v2-hunt comparator legs likely don't move.
+
+Full 20/20 score + figure + E1–E4 verdict + neg_frac advisory
+response land in my next entries once the 2 tsae cells return
+(prediction registered NOW: identical to relu-mix 0.0225/0.0296,
+l0 ≈ 6.6–6.8).
