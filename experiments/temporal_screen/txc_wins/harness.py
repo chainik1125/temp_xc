@@ -73,7 +73,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              make_pair_test=None,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
              n_perm=0, seed=31415, dict_seed=0, gen_tokens=0, n_gen=0,
-             n_grad=0, sae_lr=None, txc_lr=None, tsae_lr=None,
+             n_grad=0, select_by="reading", sae_lr=None, txc_lr=None, tsae_lr=None,
              sae_steps=None, txc_steps=None, tsae_steps=None,
              arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
@@ -521,6 +521,79 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         # expressiveness claim: a per-token dictionary handed a per-position dose schedule.
         writes["sae_schedule_grad"] = unit(torch.outer(G @ v_sae, v_sae))
         out["write_profile"]["grad_slab"] = [float(v) for v in writes["grad_slab"].norm(dim=-1)]
+        # ---------------- SELECTION BY STEERING, NOT BY READING ----------------
+        # The sprint's standing objection to its own headline: every cell picks each arm's
+        # latent as the argmax of READING AUC over 4096 candidates, that selector is at
+        # ceiling (1.000) for the SAE in every cell measured, and this project's
+        # most-replicated finding is that reading and steering dissociate. So the comparison
+        # may be between two arbitrary picks from two tied pools, and if the SAE owns a good
+        # STEERING latent that is not its best reading latent, nothing else here would find
+        # it -- the one story under which the headline is an artefact.
+        #
+        # Scoring all 4096 latents by actually steering with each is infeasible. To FIRST
+        # ORDER it is free and exact. A per-token latent's write is the broadcast of one
+        # direction, W = (1_T (x) v)/||1_T (x) v||, so
+        #
+        #     Delta ~ alpha <W, Gbar> = alpha sqrt(T) <v, mean_t Gbar> / ||v||
+        #
+        # and a crosscoder latent's slab gives Delta ~ alpha <P_j, Gbar>/||P_j||_F. Both are
+        # one matrix product against the decoder, so EVERY latent is ranked, with no top-k
+        # restriction and no reading selector smuggled back in. First order is also the
+        # regime we report in, since matched dose is the smallest significant dose.
+        #
+        # Gbar here is accumulated on documents drawn BEFORE the test set and disjoint from
+        # it, so selection and reporting never share a document -- without that this would
+        # reintroduce exactly the winner's curse the matched-dose protocol exists to avoid.
+        if select_by == "gradient":
+            g_mean = G.mean(0)
+            sae_scores = (sae.W_dec.data.T.float() @ g_mean).abs() / (
+                sae.W_dec.data.norm(dim=0).float() + 1e-9)
+            js_g = int(sae_scores.argmax())
+            txc_num = (txc.W_dec.data.float() * G.unsqueeze(0)).sum((1, 2)).abs()
+            txc_scores = txc_num / (txc.W_dec.data.norm(dim=(1, 2)).float() + 1e-9)
+            jt_g = int(txc_scores.argmax())
+
+            def rank_of(scores, j):
+                return int((scores > scores[j]).sum()) + 1
+
+            out["selection"] = {
+                "criterion": "first-order alignment with the metric gradient",
+                "sae": {"reading_latent": js, "gradient_latent": js_g,
+                        "reading_latent_rank_by_gradient": rank_of(sae_scores, js),
+                        "score_of_reading_pick": float(sae_scores[js]),
+                        "score_of_gradient_pick": float(sae_scores[js_g])},
+                "txc": {"reading_latent": jt, "gradient_latent": jt_g,
+                        "reading_latent_rank_by_gradient": rank_of(txc_scores, jt),
+                        "score_of_reading_pick": float(txc_scores[jt]),
+                        "score_of_gradient_pick": float(txc_scores[jt_g])},
+                "n_candidates": int(d_sae),
+            }
+            log(f"[select] SAE reading latent {js} ranks "
+                f"{out['selection']['sae']['reading_latent_rank_by_gradient']}/{d_sae} by "
+                f"gradient alignment; gradient pick is {js_g} "
+                f"({out['selection']['sae']['score_of_reading_pick']:.4f} -> "
+                f"{out['selection']['sae']['score_of_gradient_pick']:.4f})")
+            log(f"[select] TXC reading latent {jt} ranks "
+                f"{out['selection']['txc']['reading_latent_rank_by_gradient']}/{d_sae} by "
+                f"gradient alignment; gradient pick is {jt_g} "
+                f"({out['selection']['txc']['score_of_reading_pick']:.4f} -> "
+                f"{out['selection']['txc']['score_of_gradient_pick']:.4f})")
+
+            # Keep the reading-selected arms under new names so the two selectors can be
+            # compared within one run, and let the headline names carry the new picks.
+            writes["sae_broadcast_readingsel"] = writes["sae_broadcast"]
+            writes["txc_slab_readingsel"] = writes["txc_slab"]
+            v_g = unit(sae.W_dec.data[:, js_g].float())
+            sg = 1.0 if float((sae.W_dec.data.T.float() @ g_mean)[js_g]) > 0 else -1.0
+            writes["sae_broadcast"] = sg * unit(
+                v_g.unsqueeze(0).expand(T, -1).contiguous())
+            P_g = txc.W_dec.data[jt_g].float()
+            st = 1.0 if float((txc.W_dec.data.float()
+                               * G.unsqueeze(0)).sum((1, 2))[jt_g]) > 0 else -1.0
+            writes["txc_slab"] = st * unit(P_g)
+            writes["txc_flat"] = st * unit(
+                P_g.mean(0, keepdim=True).expand(T, -1).contiguous())
+
         for _nm in ("grad_rank1", "sae_schedule_grad"):
             out["write_profile"][_nm] = [float(v) for v in writes[_nm].norm(dim=-1)]
 
