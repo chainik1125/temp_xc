@@ -346,12 +346,35 @@ One family, three instances, all with exact multiset-matched foils that *already
 published benchmarks*. The model receives identical content in a different arrangement and
 behaves differently. This is last sprint's task structure occurring naturally.
 
-**Instance A — few-shot demonstration order.** The largest and most famous effect.
+**Instance A — few-shot demonstration order. The recommended task.** Permutation is *verbatim*
+— demonstrations are concatenated independent examples, so reordering requires no editing and
+the multiset match is exact. This is the property R-GSM turned out to lack.
 
 | paper | what it gives us |
 | --- | --- |
 | Lu, Bartolo, Moore, Riedel, Stenetorp, *Fantastically Ordered Prompts and Where to Find Them: Overcoming Few-Shot Prompt Order Sensitivity*, ACL 2022 ([arXiv:2104.08786](https://arxiv.org/abs/2104.08786)) — verified | "the order in which the samples are provided can make the difference between near state-of-the-art and random guess performance", and it "is present across model sizes (even for the largest current models)" |
-| Zhao, Wallace, Feng, Klein, Singh, *Calibrate Before Use: Improving Few-Shot Performance of Language Models*, ICML 2021 ([arXiv:2102.09690](https://arxiv.org/abs/2102.09690)) | the calibration-based mitigation, i.e. the existing per-position-agnostic baseline to beat |
+| Li, Wang, Wang, Shang, *Order Matters: Rethinking Prompt Construction in In-Context Learning*, 2025 ([arXiv:2511.09700](https://arxiv.org/abs/2511.09700)) — verified | the modern replication, and the one that settles feasibility: "the variance in performance due to different example orderings is comparable to that from using entirely different example sets", measured across **0.5B to 27B** parameters plus GPT-4, on classification *and* generation tasks; strong orderings are identifiable from dev-set data alone, reaching "performance close to an oracle" |
+| Zhao, Wallace, Feng, Klein, Singh, *Calibrate Before Use: Improving Few-Shot Performance of Language Models*, ICML 2021 ([arXiv:2102.09690](https://arxiv.org/abs/2102.09690)) | the calibration-based mitigation, i.e. the existing position-agnostic baseline to beat |
+
+The 0.5B–27B range in the 2025 replication removes the main feasibility risk: a 1.5B model is
+comfortably inside the range where the effect is measured, unlike instance D.
+
+**Design details that follow from the literature, and are worth getting right first time.**
+
+- **Use the base model, not the instruct model.** Instruction tuning is reported to increase
+  prediction consistency under input perturbations, which would shrink the very effect we are
+  trying to steer. `Qwen2.5-1.5B` rather than `Qwen2.5-1.5B-Instruct`. ICL is also the base
+  model's natural regime.
+- **Use few shots, not many.** Order sensitivity *decreases* as the number of demonstrations
+  grows on non-reasoning tasks, so `k` around 4–8 maximises the gap — which conveniently is also
+  the `T` range the crosscoder handles best.
+- **Use classification tasks**, where the effect is largest and the metric is a clean label-token
+  margin.
+- **The order-selection oracle is both the ceiling and a rival baseline.** Since dev-set-selected
+  orderings reach near-oracle performance, "just pick a better order" is an existing, cheap fix.
+  State it: our claim is not that steering is the best way to fix order sensitivity, but that
+  order sensitivity is a real behaviour whose *steering* separates window codes from per-token
+  codes. The oracle gives the denominator for "fraction of the gap closed".
 
 **Instance B — multiple-choice option order.**
 
@@ -862,3 +885,11 @@ Times are wall-clock against the sprint window opening at 2026-07-25 22:33 PDT.
   not the "over 30%" of the abstract, which refers to their broader logical-reasoning setting).
   Recommendation moved to **instance A, demonstration order**, where permutation is verbatim and
   the multiset match is exact. Added the free supervised ceiling that instance A provides.
+- **Pass 10** (23:20 PDT) — stress-tested instance A the same way. It holds: permutation is
+  verbatim by construction, and Li et al. 2025 (arXiv:2511.09700) replicate the effect across
+  **0.5B–27B** on classification and generation, reporting order variance comparable to
+  example-set variance. That removes the feasibility risk that killed instance D. Added the
+  design constraints that follow — base model rather than instruct (instruction tuning increases
+  perturbation consistency), `k` of 4–8 rather than many-shot (order sensitivity falls as
+  demonstrations grow), classification tasks — and recorded the order-selection oracle as both
+  ceiling and rival baseline.

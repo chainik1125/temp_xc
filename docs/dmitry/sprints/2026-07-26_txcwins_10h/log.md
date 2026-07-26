@@ -746,3 +746,74 @@ block vocabulary controls it. The current pools pair calm with tense — two pol
 affective axis, whose difference is a single dominant direction that mechanically inflates σ₁
 and shrinks exactly the L3 headroom being measured. Topic-orthogonal pools should push
 measured `r1` down toward the bound.
+
+## 23:12 — instruction recency: the crosscoder reverses the tie-break
+
+The strongest cell of the sprint, and on a documented behaviour rather than a construct.
+Twelve segments of system-note filler with two conflicting instructions at fixed positions 2
+and 9; the classes are exact reorderings — same filler, same instructions, same positions,
+only which instruction comes early is swapped. Metric is the **difference of differences** of
+`logP(obey instr 1) − logP(obey instr 2)` between the orderings, so a write that merely adds
+"more instruction 1" cancels exactly.
+
+**Baseline: −2.42 ± 0.21 over 80 documents** — each ordering follows its *later* instruction.
+That recency preference is the mechanism a prompt injection exploits.
+
+| arm | α=−2 | α=−1 | α=−0.5 | α=+0.5 | α=+1 | α=+2 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `txc_slab` | −0.81 | −3.38 | −2.39 | +3.52 | **+7.09** | +6.88 |
+| `dom_slab` (supervised) | +4.71 | −0.17 | −3.41 | +6.51 | +8.19 | +2.40 |
+| `sae_broadcast` | +1.86 | −0.07 | −0.28 | +0.31 | +0.67 | +1.33 |
+| `txc_flat` | +1.78 | +0.29 | −0.08 | +0.28 | +0.58 | +1.01 |
+| `tsae_broadcast` | +1.11 | −0.34 | −0.31 | +0.27 | +0.51 | +0.71 |
+| `random_slab` | +0.74 | +1.39 | +1.00 | −1.48 | −2.79 | −2.47 |
+| `random_broadcast` | +0.28 | −1.03 | −0.83 | +0.96 | +1.52 | +1.81 |
+
+**The sign flips.** Baseline gap −2.42, crosscoder moves it +7.09, steered gap +4.67 — the
+model now obeys the *early* instruction. This is not nudging the tie-break, it is reversing
+it: primacy imposed over recency. z against every control is 22.7–31.6, and all controls
+hold.
+
+It reaches **87% of the supervised ceiling** (+7.09 against +8.19), where the order task
+reached 14% (+9.78 against +67.63). Those are different regimes rather than different
+degrees, and the gradient screen should say why — the likely story is that recency has a
+genuinely low-rank optimal write the crosscoder nearly saturates, while the order task's
+ceiling contains a large component no rank-≤T write can reach.
+
+Reading goes the other way again, exactly as before: SAE pooled AUC 1.000, tSAE pooled 1.000,
+crosscoder window 0.730. Per-token dictionaries read this factor perfectly and cannot steer
+it.
+
+## 23:14 — antisymmetry becomes a standard control
+
+The sharpest diagnostic of the sprint, and it falls out of the recency table:
+
+> A real directed intervention is **antisymmetric in the dose**. An arm positive at both
+> α = −2 and α = +2 is showing a magnitude artefact, not a signed effect.
+
+Every constant-write arm above is positive at both extremes — SAE +1.86 / +1.33, `txc_flat`
++1.78 / +1.01, `random_broadcast` +0.28 / +1.81 — while `txc_slab` runs +7.09 at α=+1 and
+−3.38 at α=−1. That separates signal from artefact far more cleanly than comparing
+magnitudes, and it is now required on every arm: symmetric dose sweeps, a reported
+antisymmetry statistic, and **retroactive application to last sprint's `steer_order` data**,
+where only positive doses were ever swept. If last sprint's `sae_broadcast` +2.25 proves
+symmetric in dose that strengthens the original claim; if `txc_slab` does too, it weakens it.
+
+## 23:16 — a training-recipe correction, and a coordination failure of mine
+
+The implement agent withdrew its own "TopK tSAE reconstructs 4–6× worse" figure after
+finding it was under-training: at the sprint default it gives FVU 0.491 at 8
+coefficients/segment, but 6000 steps gives 0.218 and lr 1e-3 gives 0.184, against the SAE's
+0.098. The honest gap is ~1.9×. It then generalised the lesson correctly — if the tSAE was
+not converged at the default, the SAE and crosscoder cannot be assumed converged either — and
+is sweeping lr × steps across all three arms before any headline cell is quoted. That is the
+same failure mode that invalidated a headline last sprint, where a 3× learning-rate change
+moved realised capacity by 10×.
+
+**And a coordination failure worth recording as mine.** The implement agent reported "still
+nothing from theory" while theory had been writing runnable generators for over an hour — I
+had been relaying design *specifications* in prose instead of the file path. `blocks.py`
+contains `rotation_pair`, `grouped_rotation_pair`, `refusal_rotation_pair`, `screen`,
+`rank_k_write` and `block_geometry`, all self-tested, in exactly the shape the harness wants.
+Fixed. The cost was real: the implement agent built its own tasks in the meantime, which
+turned out well, but that was luck rather than design.
