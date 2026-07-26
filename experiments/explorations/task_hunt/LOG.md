@@ -7957,3 +7957,51 @@ NOT drafted (orchestrator's voice). Second hat (visible-cue
 pre-measures for hunt3 candidates) still standing by on request.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+---
+
+## 2026-07-27 ~01:15 London — mac-local: HUNT3 freeze APPROVED (kills ratified); A9 + A12 RATIFIED with rebuttal guard-rail
+
+_Observed HEAD: `2ef188db9`._
+
+**1. HUNT3 (freeze `32e316bc4`): APPROVED; screens run as frozen.**
+The two $0 kills are the prime directive working: tempo killed for
+NEAR-DUPLICATING a confirmed KEEP (ρ ≈ −0.83 vs ttrend — screening
+it would have manufactured a fake second win), qres killed by the
+briefing's own visible-cue gate (84 % one-turn resolution + the
+"?" anchor one step removed). The nvtrend replacement is
+legitimate under the improve/replace clause and profiles BETTER
+than the seed (ρ vs ttrend ≤ 0.09, floor at chance through T32).
+cnov's pre-registered T ≤ 32 zone with HOT position/doc-mean traps
+and binding wd arms is the right shape; chaz's cue-free
+eligibility construction (probe must read state from cues ≥ 33
+tokens back) is endorsed for build-if-time. "Team picks at 17:00;
+drafts are NOT freezes" — correct posture.
+
+**2. A9 RATIFIED**: all four shipped T-SAE checkpoints have ARMED
+thresholds (read by ranged zip access, values on record) — the
+ReLU→threshold eval path is now confirmed from the artifacts
+themselves, closing the loop on the § 3 code-path pin. Pods
+replicating threshold inference have the constants.
+
+**3. A12 RATIFIED as an evidence map — with a REBUTTAL GUARD-RAIL,
+effective immediately: nobody quotes the shipped c3 T-ordering
+anywhere.** The committed main-text figure's #2/#3 bars
+("TXC-base T=20 / T=10", 0.935 / 0.933) are deterministic
+same-seed T = 5 replicas wearing phantom T labels from a config
+artifact, split into fake variants by the renderer; the apparent
+T-trend is replica noise. Separately, main.tex quotes a
+CT-included aggregation (~+0.03 offset) never updated to the
+committed CT-excluded figure. FRAMING (as with A6): deadline-era
+artifacts with a mundane prior — a labeling bug plus a stale
+paragraph, NOT misconduct language, and the finding PROTECTS the
+team from citing a broken number under reviewer scrutiny.
+CONSEQUENCES: (a) runpod-1's overnight sweep = the FIRST real
+probing d(perf)/dT evidence — now the load-bearing probing
+exhibit; (b) the renderer's max-over-duplicates dedup goes in the
+discipline ledger; (c) one-pager decision item #2 (with A6):
+re-render c3 from real cells (runpod-1's) and reconcile the text
+aggregation — Aniket's figure, so it reaches him via Han at the
+meeting, framed as the protective catch it is.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
