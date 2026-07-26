@@ -1419,3 +1419,55 @@ D1 the FVU penalty shrinks at early layers; D2 the SAE's own window-AUC *rises* 
 which is the signature of the model doing the integration; D3 at the earliest layer the
 crosscoder beats the SAE on window-AUC. D3 is the one that would count as a genuine
 advantage on real activations, and D1 and D2 can both hold without it.
+
+## The depth hypothesis is refuted, and it exposes a task-design error of mine
+
+`layer_modal.py`, layers 2/6/14/22, everything else fixed.
+
+| | L2 | L6 | L14 | L22 |
+|---|---|---|---|---|
+| FVU ratio TXC/SAE, k=2 | **7.80×** | 4.02× | **1.57×** | 1.85× |
+| FVU ratio TXC/SAE, k=8 | 2.90× | 2.56× | 2.51× | 2.40× |
+| SAE window-AUC, k=8 | 0.646 | 0.649 | **0.763** | 0.674 |
+| TXC window-AUC, k=8 | 0.554 | 0.551 | 0.574 | 0.574 |
+| Δ window-AUC | −0.092 | −0.098 | **−0.189** | −0.101 |
+
+**D1 is refuted in the opposite direction.** The crosscoder's FVU penalty is *worst* at the
+earliest layer — 7.80× at L2 against 1.57× at L14. Early activations sit close to token
+identity, which is exactly what a per-token dictionary is for (the SAE reaches FVU 0.027 at
+L2), and exactly the hardest thing for a code shared across twelve positions to compress.
+**D3 fails in 0 of 8 cells.** D2 holds weakly at best: the SAE's window-AUC peaks at L14
+(0.763) but the variation across depth is small and non-monotone.
+
+So contextual integration is not the obstruction, and the "look at early layers" idea is
+dead. Recording it as a clean refutation rather than reinterpreting it.
+
+**And the refutation surfaced a task-design error I had already identified and then walked
+into.** Earlier in this sprint I recorded the reviewer's arithmetic dismantling the window
+target: run length is detectable from **local** statistics, because ℓ=1 and ℓ=6 differ in how
+often adjacent segments switch state, and a mean-pooled per-token code can count switches
+without representing anything window-level. I then built the benchmark on exactly that
+corpus. The SAE's 0.72-0.79 window-AUC is not evidence that per-token codes capture
+window structure; it is evidence that this particular "window factor" was never a window
+factor.
+
+**What a decisive task requires.** The window-level label must be invariant to the multiset
+of segments *and* to the count of switches, so that no permutation-invariant pooling of
+per-token codes can reach it. The minimal such design is order-of-blocks with everything
+else matched:
+
+    class A:  T T T T T T C C C C C C      6 tense, 6 calm, 1 switch
+    class B:  C C C C C C T T T T T T      6 tense, 6 calm, 1 switch
+
+Identical multiset, identical switch count; the classes differ only in which block came
+first. Any readout that pools per-token codes symmetrically over the window is at chance by
+construction.
+
+**The honest caveat, registered before running.** On real LM activations this may still not
+separate the architectures, because the model is causal: a tense sentence preceded by tense
+sentences has a different representation from one preceded by calm sentences, so per-token
+activations carry order even when the *label* is order-only. If the pooled SAE still wins
+here, the conclusion is sharp and worth stating plainly — on real activations a per-token
+dictionary is not blind to order, and the crosscoder's distinctive value is not in *reading*
+temporal structure but in *representing it in a single steerable latent*, which is what the
+frozen-shuffle control already measures.
