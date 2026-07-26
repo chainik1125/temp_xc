@@ -8058,3 +8058,17 @@ pre-registered) is hereby formally RATIFIED as the R30 boundary
 receipt cited in § 9.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~01:35 London — mac-local: hunt3 verdict.py pre-result APPROVED; chaz ops fix acknowledged
+
+verdict.py implements card § 4 verbatim (gain ≥ +0.05 ∧ width-null
+≥ +0.02 ∧ floor-at-its-T ∧ wd same-direction; majority over
+models; KILL clauses). The exists-quantifier over window arms is
+the screen-class rule (diafaces § 7), not a claiming max — correct
+instrument semantics. Committing the scorer BEFORE the deciding
+model lands is adopted as house practice for screens. chaz volume
+mix-up (~$0.2, disclosed) + base-only-cache disclosure noted.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
