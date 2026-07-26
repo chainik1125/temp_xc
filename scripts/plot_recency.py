@@ -42,12 +42,13 @@ C_TSAE = "#009E73"
 C_DOM = "#000000"
 C_RND = "#999999"
 
-ARMS = [("dom_slab", C_DOM, "--", "difference-of-means (supervised)"),
-        ("txc_slab", C_TXC, "-", "crosscoder slab"),
+ARMS = [("rank1_best", "#7F7F7F", "--", "best rank-1 write (per-token ceiling, supervised)"),
+        ("sae_schedule", "#56B4E9", "--", "SAE direction on a supervised schedule"),
+        ("txc_slab", C_TXC, "-", "crosscoder slab (unsupervised)"),
         ("sae_broadcast", C_SAE, "-", "TopK SAE direction"),
         ("tsae_broadcast", C_TSAE, "-", "attention tSAE direction"),
         ("txc_flat", C_FLAT, "-", "crosscoder slab, profile removed"),
-        ("random_broadcast", C_RND, ":", "random constant direction")]
+        ("txc_profile_random", "#8C564B", ":", "crosscoder profile, random directions")]
 
 
 def main(name: str = "recency") -> int:
@@ -86,7 +87,7 @@ def main(name: str = "recency") -> int:
     if prof:
         T = len(prof["txc_slab"])
         for key, colour, ls, label in ARMS:
-            if key in ("dom_slab", "txc_slab", "txc_flat") and key in prof:
+            if key in ("rank1_best", "txc_slab", "txc_flat") and key in prof:
                 ax.plot(range(T), prof[key], "o" + ls, color=colour, lw=2.0, ms=5,
                         label=label)
         for p in (2, T - 3):
