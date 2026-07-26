@@ -422,15 +422,21 @@ question, why discovery fails on SmolLM2; see Limits.)
   value is a **first-order** ceiling and the matched dose already sits 34% outside it, in the
   direction that favours the broadcast arm.
 
-## Post-sprint: the screen on a real benchmark
+## Post-sprint: the screen on published benchmarks
 
 The sprint's tasks are constructs. **Instruction-position bias is not prompt injection** — it is
 two hand-written formatting instructions at the same privilege level, positions swapped, which is
 in the behaviour family Wu et al. (ICLR 2025, arXiv:2410.09102) study but is not their task. Their
 benchmark is StruQ's, and it is public.
 
-Screened through the same training-free geometry screen, Qwen2.5-1.5B-Instruct L14, `n_docs` = 200,
-`n_grad` = 24 (`results/txc_wins/geometry_struq.json`):
+**The screen is training-free and costs about two minutes per task**, which changes the economics
+of task selection entirely: screen broadly, spend GPU only where it says go. Two published
+benchmarks have been screened so far.
+
+### Prompt injection — StruQ
+
+Qwen2.5-1.5B-Instruct L14, `n_docs` = 200, `n_grad` = 24, filtered run
+(`results/txc_wins/geometry_struq_filtered.json`):
 
 | attack | unsteered baseline | `c(Ḡ)` | `r1(Ḡ)` | `c(P_dom)` | `cos(P_dom, Ḡ)` |
 | --- | --- | --- | --- | --- | --- |
@@ -459,6 +465,42 @@ loses, evidence at 0.143 wins), so the screen does not decide this task. **The f
 running as a registered test of the screen itself**, with the prediction that the crosscoder loses
 to the best constant write at a ratio of 0.2–0.4, and the explicit alternative that a win there
 gives the gate a second inversion and moves the boundary.
+
+Two further observations from that cell. **The SAE reads the injection factor at 0.632** against
+the attention tSAE's **0.976** on the same activations — so the factor is readable at this layer
+and it is the TopK basis specifically that fails. And the reading/steering dissociation therefore
+**does not transfer here**: on prompt injection a per-token dictionary is not reading well and
+steering badly, it is failing at both, which changes what a crosscoder win would mean.
+
+### Retrieved-document position — Liu et al.
+
+The matched foil **ships with the benchmark**: the same ten documents with the gold document at
+positions 0, 4 and 9, verified across all 2655 items — exact multiset match, a single 10-cycle
+permutation, Hamming 10/10. Rank = k − cycles = **9, the maximum at k = 10**, on every item, and
+the segmentation is one retrieved document per span with no splitting rule to justify
+(`results/txc_wins/geometry_litm.json`):
+
+| pair | baseline | z | `c(Ḡ)` | `r1(Ḡ)` | `σ₂²/σ₁²` | retention (× floor) |
+| --- | --- | --- | --- | --- | --- | --- |
+| gold@0 vs @9 | +1.21 | 4.5 | 0.069 | 0.545 | 0.565 | 0.126 (1.8×) |
+| gold@0 vs @4 | +1.20 | 4.8 | 0.068 | **0.489** | **0.741** | 0.150 (2.1×) |
+| gold@4 vs @9 | +0.01 | **0.1** | 0.045 | 0.538 | 0.641 | 0.146 (2.1×) |
+
+**The best shape statistics anything has screened** — low `c` *and* genuine rank ≥ 2 together,
+which no construct in this sprint achieved — **on a task that may be unsteerable for an unrelated
+reason.** See the retention discussion in finding 3.
+
+**Liu's U-shape does not reproduce.** Position 0 beats positions 4 and 9 by an identical amount
+while 4 and 9 are **indistinguishable** (z = 0.1). That is monotone **primacy**, not the
+beginning-and-end advantage the paper reports, so this is *a primacy task built from Liu's data*
+rather than Liu's task. Two readings are available and this run cannot separate them: a 1.5B may
+lack the end-recovery Liu measured at GPT-3.5/Claude scale, or teacher-forced
+`logP(gold) − logP(distractor)` may not track generated-answer accuracy.
+
+⚠ **`c` = 0.045 on the gold@4-vs-@9 cell is the lowest any published benchmark has screened — on a
+cell with no behaviour at all.** Reading geometry before the baseline would have produced a
+headline from a null. The baseline-first rule was written for exactly this and this is the first
+time it fired.
 
 ## Methodology: the name was not the thing
 
