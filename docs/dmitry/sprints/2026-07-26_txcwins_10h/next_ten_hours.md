@@ -41,13 +41,28 @@ Two things follow it, both enabled by infrastructure that did not exist this mor
   layer. The screen is cheap enough to map the `c` landscape across dozens of candidate tasks,
   every layer, and several models — turning "`c` classifies 6 of 7" into a real empirical
   regularity or killing it. This is the highest ratio of information to compute available.
-- **Give the transfer negative a positive control.** No `(T, d)` write of any kind moves the
-  instruction-position bias in Qwen2.5-0.5B or SmolLM2-1.7B at any of six layers, supervised
-  included. That is currently a bare negative. Sweeping model × layer with the training-free
-  screen would establish either that the steerable site is idiosyncratic to Qwen2.5-1.5B L14 —
-  which is a strong scope limit worth stating — or that it moves with depth in a predictable
-  way, which would be a better result than the original.
+- **Replicate the 3B transfer cell.** It is the thinnest load-bearing result in the sprint: two
+  inits, `win = True` in one and `False` in the other, and the verdict flips between matched and
+  peak dose. The negatives at 0.5B and SmolLM2 have three inits each and `win = False` in all six.
+  Three or more inits at 3B, plus a fourth model, is what would let "scale is not the axis" stand
+  on evidence rather than on one split cell.
+- **Explain the SmolLM2 discovery failure.** The factor is present and strongly reachable there — a
+  gradient write moves it at every one of six depths, +13.38 at L6, larger than in the model where
+  we succeed, and a plain constant write reaches +3.87 — and every learned arm misses it. **Three
+  mechanisms were proposed and all three refuted** (`cos(P_dom, Ḡ)`; dictionary-tracks-`P_dom`; a
+  `cos(v_sae, u₁(·))` account that passed a pre-registered test and failed on a borrowed baseline).
+  Normalised, SmolLM2 is a quantitatively worse cell rather than a mechanistically different one:
+  the constant-write ceiling is the same share of the optimum in both models (0.29 vs 0.25) and only
+  the learned arms differ (0.07 vs 0.24–0.30). **A fourth candidate should be registered with its
+  falsifier before it is tested**, given the base rate.
+- **Test the baseline-sign observation, which is registered and not believed.** The sign of the
+  unsteered `score(A) − score(B)` splits the two working models from the two failing ones, 4 of 4 —
+  Qwen2.5-1.5B −2.54 and 3B −10.49 against SmolLM2 +2.19 and Qwen2.5-0.5B +1.50. **This is n = 4
+  with one degree of freedom and is recorded as a thing to test, not a thing observed.** Three
+  patterns of exactly this shape were proposed and dissolved during the sprint.
 
 What I would **not** do is add tasks. Nine were run and the marginal one taught less than any
-of the audits did; the binding constraint is that every conclusion rests on one model, one
-layer, and one seed per cell, not on the number of behaviours tried.
+of the audits did; the binding constraint is coverage per cell, not the number of behaviours tried. That constraint
+has partly lifted — instruction position now has eight dictionary inits and the three decomposition
+cells have three each — but the transfer set, the four sparse `broadcast_optimal` cells and every
+cross-model claim still rest on one or two.
