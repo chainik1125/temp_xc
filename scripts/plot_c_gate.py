@@ -27,13 +27,11 @@ slab flattened, and a random constant direction. Every arm is at matched injecte
 swept symmetrically about zero so no arm is locked to the wrong sign, and matched on realised
 coefficients per segment measured out of sample.
 
-Status of the claim, stated plainly because it is not settled. On the two tasks where c comes
-from the gradient it separates them cleanly and in the predicted direction -- the previous
-sprint's order task at c = 0.241 loses to a constant write, recency at c = 0.034 wins. On the
-difference-of-means points it does not order the tasks at all: the phase ladder at c = 0.006
-to 0.040 is a null or a loss throughout, and phase-1 at c = 0.040 loses by 19 points while
-recency at c = 0.035 wins. Whether that is the wrong c or a wrong hypothesis is settled by the
-gradient runs, not by this figure.
+Only gradient-measured points are plotted, because the difference-of-means version of `c` does
+not order these tasks at all and the gradient version does. The clearest single case: the
+phase-1 task has c = 0.040 by difference of means and c = 0.227 by gradient, and it loses to a
+constant write by 19 points. The difference-of-means number would have predicted a crosscoder
+win; the gradient number predicts the loss that happened.
 
 Reads every results/txc_wins/*.json that carries a rank measurement.
 """
@@ -50,15 +48,14 @@ CONSTANT_ARMS = ("sae_broadcast", "tsae_broadcast", "txc_flat", "random_broadcas
 # One point per task; where a task has several dictionary inits they are averaged and the
 # spread is drawn, because init moved these numbers by up to 10x earlier in the sprint.
 FAMILIES = [
-    ("recency_v2", "recency", "#E69F00"),
-    ("recency_gen", "recency", "#E69F00"),
+    ("recency", "recency", "#E69F00"),
     ("evidence", "evidence", "#009E73"),
     ("recency_var_v2", "recency, positions vary", "#56B4E9"),
     ("order_sym", "order (last sprint's task)", "#D55E00"),
-    ("phase1_v2", "phase, 1 switch", "#999999"),
-    ("phase3_v2", "phase, 3 switches", "#999999"),
-    ("phase5_v2", "phase, 5 switches", "#999999"),
-    ("phase11_v2", "phase, 11 switches", "#999999"),
+    ("phase1_g", "phase ladder", "#999999"),
+    ("phase3_g", "phase ladder", "#999999"),
+    ("phase5_g", "phase ladder", "#999999"),
+    ("phase11_g", "phase ladder", "#999999"),
     ("rot_m", "rotation ladder", "#CC79A7"),
 ]
 
@@ -75,7 +72,9 @@ def main() -> int:
         if not runs:
             continue
         for r in runs:
-            rg = r.get("rank_grad") or r["rank"]
+            rg = r.get("rank_grad")
+            if rg is None:
+                continue   # difference-of-means c is not the constant share of the metric
             arms = r["arms"]
             if "txc_slab" not in arms:
                 continue
