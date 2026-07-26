@@ -434,6 +434,9 @@ between consecutive rungs attributes the effect to exactly one property of the w
 | `sae_broadcast` | SAE latent direction at every position | L0, deployed practice |
 | `random_broadcast` | random unit direction at every position | whether a constant write of *any* direction does anything |
 | **`sae_enveloped`** *(new)* | SAE direction, scaled per position by the TXC slab's own norm profile `‖P[t]‖` | **separates gain envelope from direction schedule; the P9 control** |
+| **`sae_profile_target`** *(new)* | SAE direction, scaled by the latent's mean activation profile over class-A documents | **the real L1 baseline — the strongest non-oracle per-token arm, and the one that threatens the headline** |
+| **`sae_profile_self`** *(new)* | SAE direction, scaled by the latent's activation on the current document | the adaptive protocol; predicted ≈ 0 on rotation tasks |
+| **`tsae_slab`** *(new)* | tSAE latent's `z_j[t] · D[j]` | a real architecture at L1; capped at `sqrt(r1)` like any rank-1 write |
 | **`txc_rank1`** *(new)* | best rank-1 approximation `σ₁ u₁ v₁ᵀ` of the TXC slab | the L1/L2 boundary — how much of the slab is a schedule |
 | **`txc_rank2`** *(new)* | best rank-2 approximation of the TXC slab | the rotation spectrum is pair-degenerate, so this ties at `m = 3` and falls off a known curve after |
 | `txc_slab` | full TXC slab | L3 |
@@ -672,20 +675,34 @@ Scored as (probability the effect is real and survives its own controls) × (rel
 behaviour someone would actually want to steer). A construct that isolates a mechanism scores
 low on relevance by definition, however clean it is.
 
-| rank | design | P(real) | relevance | why |
-| --- | --- | --- | --- | --- |
-| 1 | **D6 level/trend dissociation** | 0.75 | medium | the only design whose prediction is a crossover, so it answers the objections the others cannot; intensity trend is a real if unglamorous target |
-| 2 | **D1 rotation ladder** | 0.70 | low | the only design that yields a quantitative law (`sqrt(r1)`) and the only one that reaches L3; relevance is low and should be conceded up front |
-| 3 | **D2 refusal onset** | 0.55 | high | highest relevance by a distance and it needs no judge, but predicted to be an L2 result — the win is on discovery and selectivity, not expressiveness |
-| 4 | D3 three-phase reasoning | 0.45 | medium-high | D1's guarantee on real content, at the risk that the three modes are not equidistant |
-| 5 | D4 onset phase shift | 0.65 | medium | cleanest demonstration of the argmax identity; L2 only |
-| 6 | D5 trend alone | 0.70 | low | subsumed by D6; run only as D6's first cell |
-| 7 | D7 sandbagging | 0.30 | high | the metric is unproven without a judge |
-| 8 | D8 change-count | 0.15 | low | predicted to fail on the reading half and subsumed on the steering half |
+**This ranking was revised after establishing that the tSAE decodes through a single
+per-latent direction and that a profile-steered SAE reaches rank-1 writes.** Every rank-1 task
+is now predicted to *tie* against the strongest baselines, which demotes the two-block designs
+from "wins" to "wins only against a weak protocol". `m ≥ 3` is the only place a genuine
+three-way win is available.
 
-**Recommended order.** The SVD screen on the existing `P_dom` (minutes, and it retro-dicts the
-last sprint's headline) → D1 at `m ∈ {2, 3, 6}` → D6 → D2. D3 if D1 lands and time remains;
-D1 at `m = 12` only if the effect is still measurable at `m = 6`.
+| rank | design | P(real) | relevance | beats profile-SAE / tSAE? | why |
+| --- | --- | --- | --- | --- | --- |
+| 1 | **D1 rotation ladder, `m ≥ 3`** | 0.65 | low | **yes** | the only design that reaches L3, so the only one where the TXC can beat the *strongest* form of both baselines; yields a law (`sqrt(r1)`) rather than a comparison |
+| 2 | **D6 level/trend dissociation** | 0.75 | medium | no (trend cell is rank 1) | still the best control design — a crossover kills the "TXC just writes better" class outright — but its win is over constant writes, not over per-token dictionaries as such |
+| 3 | **D3 three-phase reasoning** | 0.45 | medium-high | yes, if the modes are equidistant | D1's rank-2 guarantee on content anyone recognises; the whole bet is `block_geometry` on explore/commit/verify, so measure before spending compute |
+| 4 | D2 refusal onset | 0.55 | high | no | highest relevance and needs no judge, but `m = 2` — the win is on discovery and on selectivity (P8), and must be framed that way |
+| 5 | D4 onset phase shift | 0.65 | medium | no | cleanest demonstration of the argmax identity; L2 only |
+| 6 | D5 trend alone | 0.70 | low | no | subsumed by D6; run only as D6's first cell |
+| 7 | D7 sandbagging | 0.30 | high | no | the metric is unproven without a judge |
+| 8 | D8 change-count | 0.15 | low | no | predicted to fail on the reading half and subsumed on the steering half |
+
+**Recommended order.**
+
+1. **`sae_profile_target` on the existing order data.** One arm, data already on disk, and it
+   is the strongest available attack on the result the sprint is built on. Everything below is
+   conditional on what it returns.
+2. **The gradient screen** (`Ḡ`, `c`, `r1`, `oracle_const`) on the same data. Training-free.
+3. **D1 grouped ladder at `m ∈ {2, 3, 6}`** with the full arm set including `tsae_slab`.
+4. **D6**, for the crossover.
+5. D2 for relevance, framed as discovery + selectivity rather than expressiveness.
+6. D3 if D1 lands and `block_geometry` on the reasoning modes looks equidistant; D1 at
+   `m = 12` only if the effect is still measurable at `m = 6`.
 
 ## Predicted failures
 
@@ -697,15 +714,24 @@ Negative predictions, stated now so they count.
   causal model.
 - **D6's level cell for the crosscoder.** The SAE should win it. If the crosscoder wins every
   cell, suspect the injected-norm matching before believing the result.
-- **`sae_enveloped` ≈ `txc_slab` on all two-block designs** (D2, D4, D5). Two-block swaps are
-  rank 1 and cannot separate a slab from a schedule. Any write-up claiming an expressiveness
-  advantage from a two-block task is claiming something the algebra forbids.
+- **`sae_enveloped`, `sae_profile_target` and `tsae_slab` all ≈ `txc_slab` on every two-block
+  design** (D2, D4, D5, and the `m = 2` rung — including last sprint's headline task).
+  Two-block swaps are rank 1 and cannot separate a slab from a schedule. Any write-up claiming
+  an expressiveness advantage from a two-block task is claiming something the algebra forbids.
+- **The tSAE will not be beaten on any rank-1 task**, and this is now a prediction rather than
+  a missing arm. Its decoder is one direction per latent
+  (`han_tsae/saeTemporal.py:50`), so it is capped at `sqrt(r1)` exactly like a scheduled SAE —
+  but it *supplies* the schedule, so it is the strongest baseline available and should be run
+  as one wherever it can be calibrated. Carried debt 1 is still real: at
+  `lam = 1/(4·d_in)` the sparsity coefficient needs to be ~1–10, not 1e-3. If it has not been
+  calibrated by write-up time, report the arm as absent rather than as dense — but the
+  *prediction* about it stands on the architecture alone and can be stated regardless.
 - **Free-generation versions of any of these.** The slab is indexed by position; under
   sampling the segment boundaries move and the write desynchronises from the semantics. Expect
   a large shrinkage relative to teacher-forced Δmargin. If generation is attempted, apply the
   slab in *segment* coordinates with online sentence-boundary detection, and report the
   teacher-forced number alongside so the shrinkage is visible.
-- **The tSAE arm producing a usable number without recalibration.** Carried debt 1 from the
+- **The tSAE arm without recalibration.** Carried debt 1 from the
   kickoff. At `lam = 1/(4·d_in)` the sparsity coefficient needs to be ~1–10, not 1e-3. If it
   has not been calibrated by the time results are written, report the arm as absent rather
   than as dense.

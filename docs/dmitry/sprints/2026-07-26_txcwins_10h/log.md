@@ -412,3 +412,56 @@ the closed form — `block_geometry()` is reported alongside so the deviation is
 The agent also retracted its own earlier claim that the absolute effect "will be small" at
 m=12, noting it was a guess stated as a derivation. The defensible version is about variance
 and distributional shift, not effect size.
+
+## 22:58 — the tSAE is identified, and the baseline debt was an artefact of the wrong architecture
+
+**Bhalla, Oesterling, Verdun, Lakkaraju, Calmon, *Temporal Sparse Autoencoders: Leveraging
+the Sequential Nature of Language for Interpretability*, ICLR 2026 oral (arXiv:2511.05541).**
+It is an InfoNCE penalty over adjacent positions with no attention — exactly as described to
+me at the start of the sprint. This repo's attention-based `TemporalSAE` (`tsae_paper`) is a
+different architecture and was never the right baseline, which is why that arm behaved badly
+across two sprints.
+
+The carried-over debt therefore **dissolves rather than gets paid**. T-SAE uses BatchTopK at
+k=20 — the same sparsity rule the crosscoder now defaults to — so sparsity is matched by
+construction and there is no `l1_coef` to calibrate. The calibration sweep was compute spent
+on an architecture nobody asked for; it has been stopped. What survives is a short note that
+ReLU+L1 on the attention model buys sparsity by shrinking every code rather than selecting a
+support, which is a true if minor negative about that architecture.
+
+T-SAE also claims a *steering* Pareto improvement over baseline SAEs, so it is a live
+competitor on this sprint's own axis rather than a reconstruction baseline.
+
+## 23:00 — the design becomes a capacity ladder
+
+A second paper closes the remaining baseline gap and reframes the experiment. *Persistent
+Sparse Autoencoders* (arXiv:2607.17117) gives each feature a learned persistence coefficient
+and a diagonal recurrence over positions, `h_t = λ_j·h_{t-1} + (1−λ_j)·a_t` with
+`λ_j = σ(l_j)·0.999` — a per-feature leaky integrator, roughly ten lines, sitting strictly
+between a per-token SAE and the crosscoder's free slab.
+
+That is the obvious reviewer question made concrete: the crosscoder spends `T×d` parameters
+per latent where PSAE spends **one**. If a full slab cannot beat an EMA, the case for the
+slab is weak. So the head-to-head is replaced by a ladder in which each rung adds exactly one
+thing:
+
+| rung | model | temporal capacity per latent |
+| --- | --- | --- |
+| 1 | TopK / BatchTopK SAE | none — the per-token floor |
+| 2 | Persistent SAE | one scalar: a learned timescale |
+| 3 | T-SAE | InfoNCE coupling to adjacent positions |
+| 4 | TemporalCrosscoder | free `(T,d)` slab |
+
+**Wherever the curve flattens is informative regardless of direction.** "The crosscoder beats
+an EMA and an InfoNCE tSAE on an order-at-matched-multiset task" is much harder to dismiss
+than beating a plain SAE, and early flattening is a finding rather than a failed sprint.
+
+**Prior art that must be cited rather than rediscovered.** The PSAE authors already ran
+causal interventions on prompt injection at range — probes up to 350 tokens past an
+untrusted span, fast features falling to chance while slow features stay informative with "a
+consistently positive intervention effect at every distance". So "temporal structure helps
+steering at range" is partly claimed. The differentiators survive but have to be stated:
+their axis is **distance**, ours is **order at matched multiset**; they compare timescales
+*within* a per-token code, we compare against a full window code; and they did not evaluate
+crosscoders at all. The whitespace the review agent found earlier — no dictionary work on
+prompt-order sensitivity — is narrower than it first looked, and the write-up should say so.
