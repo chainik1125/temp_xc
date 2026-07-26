@@ -8,8 +8,28 @@ WHY THIS IS THE BEST STRUCTURAL FIT WE HAVE RUN. Every other task needed a match
 built and a segmentation rule we had to justify. Here both are given:
 
   * the foil SHIPS -- same question, same answers, and the document multiset is identical
-    between files. **Verified across all 2655 items, not sampled**: 0 question mismatches,
-    0 title-multiset mismatches, 0 gold-index violations.
+    between files. **Verified across all 2655 items, not sampled.**
+
+    KEY DOCUMENTS BY `(title, text)`, NOT BY `title`. **2505 of the 2655 items contain
+    duplicate titles** -- several Wikipedia passages drawn from the same article -- so a
+    title-keyed permutation maps several source positions onto one target index and comes
+    out garbage (3-7 cycles, Hamming 5-10). Keyed on the full document, 0 items have
+    duplicates and the structure is exact:
+
+        exact multiset match on (title, text)   2655 / 2655
+        well-defined permutation                2655 / 2655
+        cycle count                             1  on every item
+        Hamming distance                        10 / 10 on every item
+
+    A single 10-cycle gives **rank = k - cycles = 9, the maximum available at k = 10**, and
+    Hamming 10 means every position holds a different document, so the differ-indicator is
+    constant and the support is uniform. That is the property that makes a foil DIAGNOSTIC
+    rather than merely efficient, and here it falls out of the benchmark's own construction
+    rather than being designed in.
+
+    This adapter never builds that permutation -- it emits `ctxs` in file order, so the
+    title-collision trap cannot bite it -- but anyone re-deriving the structure will hit it,
+    which is why it is recorded here.
   * the segmentation IS the document boundary. No splitting at spaces, no delimiter to
     preserve, no rule to defend.
 
