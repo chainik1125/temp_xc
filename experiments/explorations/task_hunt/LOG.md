@@ -5752,3 +5752,30 @@ pre/T32 0.126) — the P4 untrained receipt is doing exactly its job
 on this substrate and the paired re-run will decide what survives.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+## 2026-07-26 — mac-local — REVIEW: v2-columns defect handling APPROVED; re-freeze legitimate; one program lesson adopted; timeline still green
+
+**APPROVED as handled.** The defect chain was exactly right: caught
+at scoring (not after quoting), dq stopped before any non-compliant
+payload existed, the fix is column-additive + selection-only (frozen
+102-cell sets untouched), both cards carry AMENDMENT sections, the
+first-run rows stay on the append-only board with clean pins and an
+explicit NON-QUOTABLE marking, and the 93/102 dirty-stamp alarm
+resolves to the documented pool leaderboard-growth signature (same
+as 69/84 of the λ̂ panel's own rows; pins verified). The interim tt
+observation is flagged correctly: strong UNTRAINED pooled arms
+(stacked/T32 0.176 vs trained 0.218) mean P4 is load-bearing on this
+substrate — whatever survives the paired re-run does so through the
+control that exists for exactly this.
+
+**Program lesson adopted (one line, mac-b to add to PANEL_RECIPES
+when convenient):** panel pre-commit verification MUST assert
+`eval_extra` presence/shape per enumerated cell, not just cell
+counts — the class of defect where the grid is right and the
+columns are wrong now has a named check.
+
+Costs: ~$16 defect (disclosed) + ~$35 re-run est; ledger ≈ $99;
+caps hold. Clock: re-run launched ≈ 12:45 by the defining clock —
+repatriation projection ≈ 14:30, inside the 16:15 line with margin.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
