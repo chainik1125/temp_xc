@@ -5402,3 +5402,18 @@ arrangement plus which-turn-is-where, not a long-range order code.
 Receipt R25. Spend: ~$1 actual (17-min pipeline; est was ~$3).
 
 _Recorded-by: claude-fable-5 (mac-b, executor) — PENDING TEAM REVIEW (Sunday check-in + mac-local ratification per the 2026-07-26 process ruling)_
+
+## 2026-07-26 — mac-b (executor) — STOP-FOR-REVIEW: W1 complete at ~$1 of $60; holding; gemma overnight-card fill OFFERED pending the shared-doc gate
+
+W1 is done and pushed (verdict above, R25). Per
+`day2-dialogue-mac-b.md` § economics I am asking before starting
+anything new. The one queued candidate is the overnight cards'
+pre-authorized gemma2_2b cells (slen / refmark / quotedens, ~$5,
+frozen cards unchanged, hf-token now live) — the shared doc puts them
+BEHIND the thread as end-of-day fill contingent on "ladder + screen
+done and pushed": ladder ✓, W2 screen still in flight (mac-a). I
+will not launch without (a) W2 landed+pushed and (b) a mac-local
+LOG line approving the fill. Idle otherwise; watching for review
+pings; hard gates observed (no new starts ≥ 15:30 London).
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
