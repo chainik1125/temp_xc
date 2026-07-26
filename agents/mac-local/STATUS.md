@@ -81,19 +81,38 @@ a40-bootstrap (historical, pod gone).
 ## Git: clean, pushed after this rewrite. Suite 333 green local.
 
 
-## SALVAGE PHASE (Han, ~16:30 London 2026-07-26) — CURRENT STATE pre-compact
+## SALVAGE PHASE (Han, ~16:30 London 2026-07-26) — RUNNING as of 16:40
 dq DEMOTED (surface-reading fragility at T≥16) to order-mechanism
 support; salvage briefed: mac-a = ttrend POST fresh-seed panel
 (salvage-mac-a.md), mac-b = txcwin novelty cross-ratification
 (salvage-mac-b.md), shared = salvage-shared.md. Budget fine < $500
-total (spent ≈ $87). MY queue post-compact: (1) freeze-review both
-salvage cards pre-results; (2) rolling review + ratification;
-(3) update WRITEUP.md + distillation with salvage outcomes + the dq
-demotion (WRITEUP §4 needs the demotion edit + possibly ttrend/
-novelty as replacement §4); (4) team check-in 18:00 London decisions:
-R22 caveats, verdict ratifications, quote licences, post-arm story.
-Watcher pattern: scratchpad/watch_origin.sh in background, re-arm
-after each firing. /loop cron 44d0aa83 active (30-min cadence).
+total (spent ≈ $87).
+
+**EXECUTION MODE (post-compact, ~16:36): the two workers run as
+BACKGROUND SUBAGENTS of the mac-local orchestrator session** (their
+old standalone sessions did not resume; clones were synced at
+d8641a345 with zero salvage commits). Each subagent works in its own
+clone (~/research/projects/agents/mac-{a,b}/temp_xc), full briefing
+discipline in its prompt (freeze-push-before-launch, detach, caps
+$100/$60, ledger, pull-rebase-push). Completion notifications arrive
+in-session; their pushes ALSO trip the origin watcher. If this
+session dies, workers die with it — relaunch from the briefings.
+
+DONE 16:35–16:40: WRITEUP demotion edit pushed 9b6199be5 (title,
+§1, §4 'passed-then-demoted' + objection, §5 note); distillation
+§9 EVENING ADDENDUM added (demotion, salvage state, revised
+decision items incl. bless-the-salvage-bars-tonight).
+
+MY queue: (1) freeze-review both salvage cards PRE-RESULTS the
+moment freeze commits land (watcher fires on push); (2) rolling
+review + ratification of salvage verdicts/receipts; (3) WRITEUP +
+distillation salvage-outcome updates (possible ttrend/novelty
+replacement §4 + fig4 integration); (4) 18:00 London check-in
+decisions: R22 caveats first, verdict ratifications, quote
+licences (dq licence now order-mechanism-scoped), salvage-bar
+blessing, HF checkpoint mirrors before token rotation.
+Watcher: scratchpad/watch_origin.sh RUNNING; re-arm after each
+firing. /loop cron 44d0aa83 active (13,43 * * * *).
 
 ## PIVOT EXECUTED 2026-07-26 ~11:00 London — DISTILLATION FINAL
 Overnight wave COMPLETE and fully reviewed: R22 (tsae bound, 2
