@@ -113,9 +113,12 @@ gradient's support is set by where the two classes differ — but the second is 
 - **One model, one layer, one dictionary size.** The headline task does not transfer: no `(T, d)`
   write of any kind, supervised included, moves instruction-position bias in Qwen2.5-0.5B or
   SmolLM2-1.7B at any of six depths. The bias itself **flips sign** across models.
-- **The discovery claim is an optimisation claim**, and every cell gave each architecture one
-  dictionary init. On the order task the crosscoder's selected latent does not hold a stable
-  **sign** across inits.
+- **The discovery claim is an optimisation claim** about a *search*, and most cells gave each
+  architecture one dictionary init (the three held-out cells gave three). On the order task the
+  crosscoder's selected latent does not hold a stable **sign** across inits. At three inits on
+  held-out instruction position the two arms' ranges do not overlap — crosscoder 3.91–4.92 against
+  SAE 0.01–0.28 — so the seed lottery does not currently explain the gap, and a wider sweep is the
+  first experiment in `next_ten_hours.md`.
 - **A second lottery is untested.** Both arms take best-of-4096 by *reading* AUC, and that selector
   is at ceiling for the SAE in 9 of 9 cells and the crosscoder in 3 of 9 — so several comparisons
   are between two arbitrary picks from two tied pools. Since this sprint's own finding is that
