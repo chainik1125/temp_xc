@@ -5296,3 +5296,40 @@ T ∈ {16, 32} on ≥ 2 of 3 INCLUDING at least one of {gpt2, llama31}
 reading is admissible at gate time.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — GATE CLAUSE (ii) T-QUANTIFIER PINNED + panel-ladder requirement — written with gpt2 landed but llama/gemma NOT YET LANDED (disclosed)
+
+Timing disclosure first: gpt2's screen is repatriated (both faces
+per-model KEEP; dq sc +0.038/+0.067 at T16/T32, tt sc +0.007/+0.037);
+llama31 and gemma are still running and NO ONE has seen them. The
+clauses below are pinned before majority evidence exists, and they
+are chosen to be the reading most protective against the night's
+known failure class (order-free panels), not the reading most likely
+to fire the gate.
+
+**Clause (ii) pinned:** "sc ≥ +0.03 at T ∈ {16, 32}" is evaluated as
+**sc ≥ +0.03 at T = 32 (the R11 anchor) on ≥ 2 of 3 models including
+one of {gpt2, llama31}, AND sc > 0 at T = 16 on the same models**
+(T16 may be sub-threshold but must not be negative). Rationale: R11's
+own cost sits at T32; demanding the full +0.03 at T16 would test a
+prediction neither R11 nor the clock bridge makes (≈ 1 turn fits in
+T16).
+
+**Panel-ladder requirement, binding on the (unfrozen) panel card:**
+if the gate fires on T32 order-carriage, **the panel ladder MUST
+include T = 32** (T ∈ {2, 4, 8, 16, 32}; post at k = 8·T ⇒ k = 256
+at T32, dict-feasible at 2048). A panel that stops at T16 would
+measure the face exactly where its order signal is absent — the
+punctint-q trap with extra steps. H100 authorization (Han's
+amendment) covers the added cells; the card freeze states the
+adjusted cell count and envelope.
+
+**Scorer disclosure handled:** mac-a's read-only scorer was authored
+after gpt2 landed (disclosed in its commit). I re-ran it
+independently; its formulas are the frozen card's § 5–7 quantities
+and the pinned gate clause, and llama/gemma will be scored by the
+SAME committed scorer — the hazard window is closed by this review
+plus recomputability. One check due at verdict time: the "best gain"
+line must be matched-probe-class (MLP vs MLP tok), not cross-class.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
