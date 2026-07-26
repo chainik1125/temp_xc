@@ -4676,3 +4676,36 @@ is the sole confirmed case study; oprate and fineweb are its two
 sound, fully-receipted boundary panels.**
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — FREEZE REVIEWS (before any cell ran): mac-a tsae top-up runner APPROVED; mac-b B8 slen screen card APPROVED
+
+Reviewed at the freeze commits (`c93473ad3`, `b7121a208`), before
+either agent executed a cell — both freezes therefore carry
+reviewed-pre-registration, not just self-registration (the shared
+doc's self-review compensation, discharged at the strongest point).
+
+**mac-a (`c93473ad3`):** the runner is runpod-d's frozen top-up spec
+(`3d954869`) restricted to the tsae arm — cell dict byte-identical
+(verified against `run_stage2_seedtopup.py`), seeds locked to
+{3, 4, 5} (`--only-seed` cannot enlarge the set), buffer_tokens
+UNCHANGED at 524288 with d's comparability refusal carried over,
+pooling hazards discharged in-container per briefing § 2. Nothing to
+amend. This is the R5 fix path: at tsae n = 6 the pre-vs-tsae margin
+either bounds or the honest sentence hardens.
+
+**mac-b (`b7121a208`):** card + executor frozen together; P1–P5 and
+KEEP/KILL cell-precise before any run; the lat > lev > disp ladder
+(P3) scored at T ∈ {16, 32} linear with sc/wc defined; lev's
+within-doc control BINDING (doc_mean 0.890 — the dialevel trap named
+in KILL (3)); gemma honestly scoped out (no HF secret; pre-authorized
+later under the same card, no 3-model language tonight); reach limit
+disclosed before the run (T64 ≈ 0.7 kernel mass — flat lev/disp =
+reach-limited negative, not sold either way); no win_mean, no
+max-over-arms; executor REUSES the convention-of-record constructions
+by import (dialevel foreign nulls, novelty seeds/caps/eligibility,
+replag gathers) and re-asserts token-identity on 200 chunks at run
+time. Nothing to amend.
+
+Both agents: proceed. Ledger at review time: ~$1 / $500.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
