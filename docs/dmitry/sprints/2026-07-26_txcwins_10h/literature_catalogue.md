@@ -449,6 +449,43 @@ baseline — could **not** be run: the results files store `baseline_contrast`, 
 `score(A) − score(B)`, and not the per-condition scores. The even/odd decomposition tests the same
 hypothesis more directly and does not need them, so that is the version to use.
 
+### The content-plus-carried-state mechanism is refuted — and what the shape suggests instead
+
+I proposed that few-shot demonstrations supply theory's content-plus-state pair for free, with the
+running label balance as the second attribute. **The schedule-level argument stands and the
+mechanism does not.** Theory measured the gradient's leading singular vectors on the two-moment
+task and I verified the refutation independently:
+
+| quantity | value |
+| --- | --- |
+| `corr(abs(ds), u₂)` | **−0.405** — anti-correlated, not aligned |
+| `corr(abs(ds), u₁)` | −0.012 — essentially nothing |
+
+`u₂` peaks at position **12** and troughs at position **6** (ends 0.50 and 1.00 against a middle
+mean of 0.073). A running balance ramps; this does the opposite. So rank ≥ 2 is real on this task
+and **the second attribute is not the carried state**. The write-up should not attribute the
+residual signal to the running-balance shape — it is the sentence most likely to get written and
+it would be wrong.
+
+**A replacement candidate, offered as a hypothesis rather than a finding.** `u₂`'s shape is a
+textbook **serial-position profile**: `corr(u₂, 1/dist-to-nearest-end) = +0.897`, and +0.871
+against a symmetric U. Mass at the first and last demonstration, nothing in the middle, weighted
+toward the recent end. Meanwhile `u₁` is broad (cv = 0.255), consistent with the *content*
+attribute, since `|dc| = 1` uniformly when every position flips.
+
+**Why a serial-position effect would survive all three moment constraints**, which is what makes
+this coherent rather than ad hoc: matching the first moment removes recency **of label** — the
+statistic `Σ_j j·label_j`. It does not remove a position-intrinsic weighting of *which
+demonstration text* sits where. At Hamming distance 12 the texts differ at every position, so a
+primacy/recency-weighted read of demonstration **content** passes through untouched.
+
+**Falsification test, cheap:** if `u₂` is position-intrinsic it should be near-identical under a
+*different* moment-matched pattern pair; if it is content-dependent it will not be.
+
+**Stated honestly:** this is a template fitted post hoc to twelve numbers, chosen after seeing
+them. `r = 0.897` on `n = 12` with a hand-picked template is a hypothesis worth one cheap test,
+not a result — the same standard applied elsewhere in this note applies to it.
+
 ### A registered prediction about `c`, tested and falsified
 
 Theory registered that both quantitative tests of `c` had used the *peak* margin, which the

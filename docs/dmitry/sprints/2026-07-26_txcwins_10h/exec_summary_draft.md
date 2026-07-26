@@ -216,10 +216,10 @@ did not: `txc_flat` at +1.42 sits *below* a random constant direction at +1.81, 
 `txc_profile_random` is +0.00 ± 0.04. Neither the directions without the profile nor the profile
 without the directions carries any of the effect.
 
-⚠ The gradient-based arms exist only at smoke scale, so `rank1_best` above is the rank-1
-truncation of the *difference-of-means* slab, and the `sqrt(r1)` rank law is not tested against
-it — that law requires the gradient slab, and `cos(P_dom, Ḡ) = 0.044` says the two are not
-proxies for each other.
+**`rank1_best` above is the rank-1 truncation of the *difference-of-means* slab**, which is a
+reference and not a ceiling — `cos(P_dom, Ḡ)` runs 0.02 to 0.19, so the two are not proxies. The
+gradient arms have since been run at full configuration on every task that carries a claim, and
+the `sqrt(r1)` law is tested against them in finding 2.
 
 **The reading result has now replicated five times.** `auc_selection = 1.000` for the SAE on
 recency, evidence and `recency_var`, against the crosscoder's 0.719, 0.685 and 0.632 — on the two
@@ -536,6 +536,29 @@ everywhere it has been measured — at `rotate12` it was 82% and the crosscoder 
 against a rank-1 ceiling of +102.46. `r1` bounds what a rank-1 write can do; it has not once
 predicted what the crosscoder does. If headroom matters here, that is a new result rather than a
 confirmation.
+
+## Methodology: six times, the name was not the thing
+
+The sprint's most transferable output is not a finding but a pattern, found six times in ten
+hours, each time by reading our own code rather than by a result looking wrong:
+
+| what was recorded | what it actually was |
+| --- | --- |
+| nominal `k` | realised L0, which did not bind for the crosscoder |
+| sparsity at training | in-sample; held-out differs |
+| "best dose" over a positive grid | one branch of a signed effect — this withdrew a headline |
+| Frobenius norm of the write | injected norm, which weights by segment length |
+| the screen's output fields | no baseline field, so the go/no-go was unavailable without training |
+| a task name in the registry | a *different* generator, after two agents edited the registry |
+
+**Every one was a quantity nobody thought needed checking, because it had a name implying it was
+already right.** None of them errored. Three of the six were silently disadvantaging the arm we
+were arguing *for*, and one — the dose grid — was the sole support for a published result that has
+now been withdrawn.
+
+The practice that caught them is cheap and worth stating plainly: **read what the code records,
+not what the variable is called**, and check it before spending compute rather than after a number
+looks surprising.
 
 ## Limits
 
