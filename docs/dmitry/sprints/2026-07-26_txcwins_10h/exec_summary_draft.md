@@ -766,11 +766,19 @@ surviving win is **discovery, and unreliable discovery**.
 **The discovery claim is an optimisation claim, and both architectures got one ticket in the
 lottery.** "The crosscoder finds a write unsupervised that a per-token dictionary could express
 but did not learn" is a statement about a *search*, not about representation — and every cell here
-gave each architecture **one dictionary init and one best-of-4096 latent selection**. We know from
-our own data that this lottery is high-variance. Across three dictionary inits at matched
-configuration on the phase ladder (`phase5_v2_ds{0,1,2}.json`) the crosscoder's peak-dose margin
-runs +3.64 / +1.47 / +4.63 — a **3.1× range** — and on the order task its selected latent does not
-hold a stable **sign** across inits, rising to the right at one and to the left at the other. **The SAE was never given the same number of tickets.** So every discovery
+gave each architecture **one dictionary init and one best-of-4096 latent selection**. **Seed variance shrank from 10.1× to 3.1× when the training recipe was fixed**, which is worth
+stating because it cuts against the case for the experiment. Three seed replicates on the phase
+ladder — identical `k_seg`, `d_sae`, `k`, `n_train`, `n_test` and dose grid, differing only in
+`dict_seed` — give peak-dose margins of +1.56 / +15.70 / +11.48 at lr 3e-4 (`phase5*.json`) and
++3.64 / +1.47 / +4.63 at lr 1e-3 (`phase5_v2_ds*.json`). **Much of the apparent init instability
+was under-training**, and a well-trained crosscoder is considerably more stable than the earlier
+numbers suggested.
+
+**What survives at the current recipe is qualitative, and it carries the case on its own.** On the
+order task at lr 1e-3 with symmetric doses, the crosscoder's selected latent **reverses direction**
+between inits — rising to the right at one and to the left at the other — while `txc_flat` and the
+SAE hold their orientation in both. A margin varying 3× is a caveat; a selected latent whose sign
+flips between training runs is a different kind of claim. **The SAE was never given the same number of tickets.** So every discovery
 failure recorded here — `recency_var`, `rotate6`, the phase ladder — is "training did not find it"
 asserted from a single draw.
 
