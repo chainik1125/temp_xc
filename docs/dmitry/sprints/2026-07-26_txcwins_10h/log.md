@@ -817,3 +817,38 @@ contains `rotation_pair`, `grouped_rotation_pair`, `refusal_rotation_pair`, `scr
 `rank_k_write` and `block_geometry`, all self-tested, in exactly the shape the harness wants.
 Fixed. The cost was real: the implement agent built its own tasks in the meantime, which
 turned out well, but that was luck rather than design.
+
+## 23:18 — demonstration order clears diligence; four constraints that decide whether it works
+
+R-GSM was retracted by the review agent after it read the construction section: the released
+dataset keeps the last sentence fixed, reorders the others, and explicitly permits "minor
+editing on words … to ensure grammatical correctness". Edited words break the exact multiset
+match, so **P1 fails for R-GSM as released** — the property the whole design rests on. Two
+further limits: 220 pairs, and the drops are 6.9–15.5 points on *frontier* models
+(GPT-4-turbo 94.1→85.0, GPT-3.5-turbo 67.3→51.8), not the "over 30%" from the abstract, which
+refers to a different setting. A 1.5B model sits well below GPT-3.5-turbo on GSM8K.
+
+**Few-shot demonstration order replaces it**, on a better citation: Li, Wang, Wang, Shang,
+*Order Matters: Rethinking Prompt Construction in In-Context Learning* (arXiv:2511.09700) —
+"the variance in performance due to different example orderings is comparable to that from
+using entirely different example sets", measured from **0.5B to 27B** plus GPT-4. The 0.5B
+end removes the feasibility risk that killed R-GSM, and permutation is verbatim by
+construction, so the multiset match is exact.
+
+Four constraints from the literature, the first of which would quietly cost the entire effect:
+
+| constraint | why |
+| --- | --- |
+| **base model, not Instruct** | instruction tuning increases prediction consistency under input perturbation, shrinking the effect we want to steer. `Qwen2.5-1.5B`, not `-Instruct` — a deliberate flag change away from the harness default |
+| k ≈ 4–8 shots | order sensitivity *decreases* as demonstration count grows; many-shot would destroy it. Also the T range the crosscoder handles best |
+| classification tasks | largest effect, and a clean label-token margin |
+| the order-selection oracle is ceiling *and* rival | dev-set-selected orderings already reach near-oracle performance, so "just pick a better order" is an existing cheap fix |
+
+The fourth constrains the claim and belongs in the write-up rather than being discovered by a
+reader: **the claim is not that steering is the best way to fix order sensitivity — it is
+that order sensitivity is a real behaviour whose steering separates window codes from
+per-token codes.** The oracle then supplies a clean denominator, fraction of a real measured
+gap closed, which is the same improvement the best/worst-permutation design buys.
+
+Family status: **A recommended**; B ruled out on token bias; D demoted to motivation only;
+C untested but shares A's verbatim property and is the natural backup.

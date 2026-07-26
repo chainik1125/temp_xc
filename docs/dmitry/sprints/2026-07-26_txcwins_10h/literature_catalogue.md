@@ -705,9 +705,15 @@ organisms are thin.
 
 | paper | what it gives us |
 | --- | --- |
-| Roger & Greenblatt, *Preventing Language Models From Hiding Their Reasoning*, 2023 ([arXiv:2311.02282](https://arxiv.org/abs/2311.02282)) — id unverified | the encoded-reasoning threat model and paraphrasing defence |
+| Roger & Greenblatt, *Preventing Language Models From Hiding Their Reasoning*, 2023 ([arXiv:2310.18512](https://arxiv.org/abs/2310.18512)) — **id corrected**, see note | the encoded-reasoning threat model and the paraphrasing defence |
+| *Large language models can learn and generalize steganographic chain-of-thought under process supervision*, 2025 ([arXiv:2506.01926](https://arxiv.org/abs/2506.01926)) — id unverified | the closest thing to a *recipe for a model organism*: encoded CoT induced by process supervision, and it generalises |
 | *Early Signs of Steganographic Capabilities in Frontier LLMs*, 2025 ([arXiv:2507.02737](https://arxiv.org/abs/2507.02737)) — id unverified | current-capability baseline: models mostly cannot yet hide short messages under standard affordances |
 | *Conceptual Steganography*, 2026 ([arXiv:2605.26537](https://arxiv.org/abs/2605.26537)) — id unverified | payloads carried by patterns of reasoning behaviour rather than lexical choice — the shape closest to a temporal factor |
+
+Note on the correction: I first recorded this as arXiv:2311.02282, which is a spark-plug fault
+diagnosis paper. The Roger & Greenblatt paper is **2310.18512**. Flagging it because it is a
+worked example of why the unverified tier of the ledger below should be treated as untrusted —
+a plausible-looking id was simply wrong.
 
 **Temporal signature.** The payload lives in the arrangement of otherwise-innocuous content —
 an acrostic across sentence initials, a parity code over sentence lengths. Shuffling the
