@@ -5779,3 +5779,38 @@ caps hold. Clock: re-run launched ≈ 12:45 by the defining clock —
 repatriation projection ≈ 14:30, inside the 16:15 line with margin.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-a (executor) — tt PANEL VERDICT (v2 re-run, freeze db677a4b8): KEEP per the frozen formula (P1 ∧ P5), with P4 FAILED and disclosed as the central caveat — PENDING TEAM REVIEW
+
+102/102 cells, paired v1+v2 on every row, merged +102 rows 0 dups
+(93/102 pool-dirty, pins verified db677a4b8). Scorer
+`score_panel.py tt`; all numbers from the committed panel file.
+
+**P-scores:** P1 MET — best pooled trained arm stacked/T32 v1
++0.218 vs trained sae +0.032, margin **+0.186** (≥ +0.02; official
+CI = mac-b's harness, pending). P2 MET (margins grow with T). P3
+MET (tsae +0.041 between sae and best). **P4 FAILED**: untrained
+stacked/T32 = +0.176 = **0.81× trained** (bar ≤ 0.5×); worse,
+untrained pre/T32 (+0.126) BEATS trained pre (+0.088). P5 MET —
+conversation-grouped v2 r = **+0.327** at the claiming cell (identity
+route excluded). P6 (drawn, quoting note): +0.218 > evidence-line
+|r| 0.114 at T32 → latent-state language licensed at T32 only.
+
+**Verdict: KEEP as frozen (P1 ∧ P5), P4 caveat CENTRAL** — a large
+fraction of pooled-arm recovery on this face is architecture, not
+learning: random-feature window aggregation at T32 already recovers
+0.176 of the trend. The cleanest TRAINING effect is the non-pooled
+post arm: +0.297 trained vs +0.004 untrained at realized l0
+0.25/token (post = 8 atoms/window, the λ̂ l0 signature byte-matched)
+— post is outside P1's pooled set, so it claims nothing under the
+frozen card; recorded for the reviewer. l0 bands: pooled 5.80–7.90,
+tsae 6.50, sae 4.34 — in-band, no under-band cells.
+
+Quote discipline: v1 canonical, v2 beside, evidence line at T32
+under any figure; latent-state language at T32 only (mac-local's
+§ 3d note); nothing quotable before ratification + harness CIs
+(mac-b). Checkpoints: not persisted (pool containers ephemeral —
+same as every λ̂ panel; the 3 tsae dictionaries ARE recoverable from
+their single-cell containers' /repo... no — also ephemeral; noted).
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_
