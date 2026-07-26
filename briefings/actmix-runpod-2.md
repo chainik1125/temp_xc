@@ -1,8 +1,8 @@
 ---
 status: active
 created: 2026-07-26 ~20:30 London
-for: runpod-2 (H100 pod, Han-provisioned) — ACTMIX P2: EM shuffle + T-sweep
-read-first: briefings/actmix-shared.md
+for: runpod-2 (GPU 2 of the shared 3×H100 pod — setup in briefings/actmix-pod-bootstrap.md) — ACTMIX P2: EM shuffle + T-sweep
+read-first: briefings/actmix-shared.md, then actmix-pod-bootstrap.md
 ---
 
 # ACTMIX P2 — emergent misalignment: shuffle control + T-window sweep, both arms

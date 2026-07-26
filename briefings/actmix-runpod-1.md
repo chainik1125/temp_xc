@@ -1,8 +1,8 @@
 ---
 status: active
 created: 2026-07-26 ~20:30 London
-for: runpod-1 (H100 pod, Han-provisioned) — ACTMIX P1: SPARSE PROBING shuffle + T-sweep
-read-first: briefings/actmix-shared.md
+for: runpod-1 (GPUs 0,1 of the shared 3×H100 pod — setup in briefings/actmix-pod-bootstrap.md) — ACTMIX P1: SPARSE PROBING shuffle + T-sweep
+read-first: briefings/actmix-shared.md, then actmix-pod-bootstrap.md
 ---
 
 # ACTMIX P1 — sparse probing: shuffle control + T-window sweep, both arms

@@ -97,8 +97,8 @@ case "$agent" in
         export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
         ;;
 
-    # ── Local Mac autoresearch agents (2026-07-26 overnight; Modal for
-    #    GPU — no CUDA pinning; clones ~/research/projects/agents/<id>/) ─
+    # ── Local Mac autoresearch agents (Modal for GPU — no CUDA
+    #    pinning; clones ~/research/projects/agents/<id>/) ─
     mac-a)
         export AGENT_NAME=mac-a
         export TEMP_BENCH_POD_MODE=persistent
@@ -106,6 +106,31 @@ case "$agent" in
     mac-b)
         export AGENT_NAME=mac-b
         export TEMP_BENCH_POD_MODE=persistent
+        ;;
+    mac-c)
+        export AGENT_NAME=mac-c
+        export TEMP_BENCH_POD_MODE=persistent
+        ;;
+
+    # ── ACTMIX shared 3× H100 pod (2026-07-26 evening; 84 CPU /
+    #    564 GB RAM / 2 TB persistent volume; TWO agents in per-agent
+    #    clones /workspace/agents/<id>/temp_xc — see
+    #    briefings/actmix-pod-bootstrap.md) ────────────────────────────
+    runpod-1)
+        # sparse-probing ablations — the bigger grid gets 2 GPUs
+        export CUDA_VISIBLE_DEVICES=0,1
+        export AGENT_NAME=runpod-1
+        export TEMP_BENCH_POD_MODE=persistent
+        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-24}"
+        ;;
+    runpod-2)
+        # EM ablations — 1 GPU
+        export CUDA_VISIBLE_DEVICES=2
+        export AGENT_NAME=runpod-2
+        export TEMP_BENCH_POD_MODE=persistent
+        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-24}"
         ;;
 
     # ── Single-GPU pods ─────────────────────────────────────────────

@@ -22,49 +22,31 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
 
 - **`mac-local`** — local CC session (macOS/darwin, `~/research/projects/temp_xc`,
   Apple-silicon MPS, no CUDA). Prototyping, review, orchestration.
-- **`runpod`** — the ORIGINAL RunPod box (Linux, `/workspace/temp_xc`, 32 CPU /
-  128 GB). Heavy grids + long runs; owns the PhenomenonBench loop history
-  (C1–C4, stage-6). Git creds at `/workspace/.tokens/`.
-- **`runpod-b`** — the SECOND RunPod box (Linux, `/workspace/temp_xc`, 32 CPU /
-  128 GB; spawned 2026-07-22 for the FreqBench line). Same creds layout.
-- **`runpod-c`** — the GPU RunPod box (Linux, `/workspace/temp_xc`, **H100
-  80 GB**, 700 GB persistent volume holding the Ward + EM activation
-  caches; spawned 2026-07-23 for the conversion-depth / substrate-audit
-  line, now the real-side dictionary-training pod). Same creds layout;
-  `/workspace/.agent_id` = `runpod-c`.
-- **`runpod-d`** — GPU RunPod pod (H100, spawned 2026-07-24, rebuttal
-  window; **own independent 700 GB volume** — datacenter constraints
-  prevent sharing runpod-c's). Task-hunt arm A
-  (`briefings/task-hunt.md`): trace-derived candidates; REBUILDS the
-  Ward stream/caches it needs from the committed builders.
-  `/workspace/.agent_id` = `runpod-d`.
-- **`mac-a` / `mac-b`** — local Mac autoresearch agents (2026-07-26
-  overnight; RunPod down, Modal = GPU). Clones
+- **`mac-a` / `mac-b`** — local Mac agents (Claude Code instances). Clones
   `~/research/projects/agents/<id>/temp_xc` (+ `.agent_id` beside);
   identity = your directory. GPU via Modal ONLY (shared profile in
-  `~/.modal.toml`; **shared $500 ceiling — check and append
-  `briefings/MODAL_SPEND.md` before/after every run**). Briefings:
-  `overnight-mac-{a,b}.md`; shared ops doc `overnight-mac-modal.md`.
-- **INTERIM A40 POD (2026-07-25 force majeure)** — all old pods DOWN;
-  `runpod-d` / `runpod-e` / `runpod-b` temporarily share one 6× A40 pod
-  in per-agent clones `/workspace/agents/<id>/temp_xc`. GPU roster
-  (paired with `scripts/set_agent_env.sh`): **runpod-d = GPUs 0,1,2;
-  runpod-e = GPUs 3,4,5; runpod-b = CPU-only (empty
-  CUDA_VISIBLE_DEVICES)**. Every session: cd into YOUR clone, then
-  `source scripts/set_agent_env.sh <your-id>`. Entry point:
-  `briefings/a40-bootstrap.md`.
-- **`runpod-e`** — GPU RunPod pod (H100, spawned 2026-07-24, rebuttal
-  window; **own independent 700 GB volume**). Task-hunt arm B
-  (`briefings/task-hunt-b.md`): repetition-lag across model scale +
-  confidence trend. `/workspace/.agent_id` = `runpod-e`.
+  `~/.modal.toml`; check and append `briefings/MODAL_SPEND.md`
+  before/after every run; $150/day/person cap as of 2026-07-26).
+  Current phase briefings: `actmix-mac-{a,b}.md`.
+- **`mac-c`** — local Mac agent (spawned 2026-07-26 evening for the
+  ACTMIX archaeology). Same clone layout + `.agent_id`; $0-compute
+  workstream (`briefings/actmix-mac-c.md`).
+- **`runpod-1` / `runpod-2`** — TWO agents sharing ONE 3×H100 pod
+  (Han-provisioned 2026-07-26 evening; 84 CPU / 564 GB RAM / 2 TB
+  persistent volume) for the paper-task ablations: **runpod-1 =
+  sparse probing, GPUs 0,1**; **runpod-2 = EM, GPU 2** (roster paired
+  with `scripts/set_agent_env.sh`; rebalancing is scheduling, not
+  frozen config). Per-agent clones `/workspace/agents/<id>/temp_xc`;
+  setup = `briefings/actmix-pod-bootstrap.md`; work briefings
+  `actmix-runpod-{1,2}.md`. Ledger: `RUNPOD` section of
+  MODAL_SPEND.md.
 
-**Volumes are per-pod and independent** (c, d, e each have their own
-700 GB; no cross-mounting — GPU availability forced different
-datacenters). Anything another pod needs must be REBUILT from committed
-builder scripts — which is why every cache builder is committed with
-its artifacts' spec. Cross-pod artifact handoff, if ever needed, goes
-through committed scripts + small stats files in the repo, never bulk
-data.
+*(Retired 2026-07-26: `runpod`, `runpod-b`…`runpod-e`, and the interim
+6×A40 pod — all dead/closed; their STATUS records live in git history.
+Per-pod volumes were independent; anything needed again must be REBUILT
+from the committed builder scripts — every cache builder is committed
+with its artifacts' spec. Cross-pod handoff goes through committed
+scripts + small stats files, never bulk data.)*
 
 (2026-07-23, rebuttal window: backtracking multi-seed reruns and paper
 latex edits are owned by the human team, NOT by agents in this registry.
@@ -72,13 +54,13 @@ Agent work = the three standing directives; `private/` files must never
 be committed or quoted in tracked locations.)
 
 **Infer your id from your environment:** a darwin session under
-`~/research/projects/temp_xc` is `mac-local`. A Linux session under
-`/workspace/temp_xc` **must check `/workspace/.agent_id` FIRST** — with two
-RunPod boxes the path alone is ambiguous: if the file exists, its content is
-your id; if it does not exist, you are `runpod` (the original box — legacy
-default; do NOT create the file there). The user seeds
-`/workspace/.agent_id` on every newly spawned pod. If genuinely ambiguous,
-ask the user. A new agent gets a new subdir + a row here.
+`~/research/projects/temp_xc` is `mac-local`; under
+`~/research/projects/agents/<id>/temp_xc` the directory (and the
+`.agent_id` file beside the clone) is your id. A Linux session under
+`/workspace/temp_xc` reads `/workspace/.agent_id` (Han seeds it on every
+newly spawned pod; there is no legacy default — the pre-2026-07-26 pods
+are retired). If genuinely ambiguous, ask the user. A new agent gets a
+new subdir + a row here.
 
 **Citing commits in records:** `git pull --rebase` rewrites your local
 SHAs, so a SHA written into a record before pushing is usually stale by
