@@ -167,6 +167,16 @@ A second pattern appeared late: **a mechanism inferred to explain a discrepancy 
 the files were opened**, three times in the final hour. The resolving check was always to print the
 configuration fields next to the number, and it always came last.
 
+A third is the most uncomfortable, because in each case **a real check was run and it passed**. A
+rename was verified by confirming the new code reproduced stored values on an existing file — which
+exercised the renamed reference and not the two stale ones, so five runs later crashed after
+completing their compute. A red-team pass verified every number against its file without verifying
+the *convention* those numbers were computed under. A held-out split was verified as disjoint —
+16/16, zero overlap — while the task names resolved to a different generator entirely. **In all
+three the verification confirmed the property it tested for, and the property that mattered was a
+different one.** A passing check reads as reassurance, which makes this failure mode harder to
+catch than an unchecked assumption.
+
 **And the sharpest evidence that these are hazards rather than lapses: three people on this sprint
 independently made the *same* one.** Reading a steering arm at the signed positive dose rather than
 at matched magnitude with the sign free scores any arm whose correct direction is negative as a
