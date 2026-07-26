@@ -738,3 +738,23 @@ datasources:
       rationale in PANEL_CARD.md § 2: tt's only over-floor-clean
       screen cells live on gpt2). 4111×128×768 fp16 cache; corpus
       526,208 tokens ≥ buffer 524,288 (complete fill, no wrap).
+
+  dial_real_dqgap_llama31_8b_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: dqgap
+      model_key: llama31_8b
+      hs: 14
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      day-2 W2 panel — GATE AMENDED in writing (LOG 187c51022): face
+      dqgap (above its visible floor at every T on 3/3; order-carried
+      T32 3/3), model llama31_8b at screen layer hs14 (largest KEEP
+      margin +0.214; hardest token baseline). 3653×128×4096 fp16
+      cache; corpus 467,584 tokens < buffer 524,288 — each refill
+      oversamples ~1.12×, buffer UNCHANGED for cross-panel train_key
+      comparability (the seedtopup refusal precedent), DISCLOSED here
+      and in PANEL_CARD.md. Labels NaN before the first question turn
+      (labeled frac 0.853). DailyDialog CC BY-NC-SA 4.0.

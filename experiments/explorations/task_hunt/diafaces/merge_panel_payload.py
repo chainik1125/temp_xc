@@ -20,23 +20,55 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from experiments.explorations.task_hunt.diafaces.run_panel import (
-    DS,
-    _merge_into_panel,
-)
+import sys
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 LB = ROOT / "results" / "leaderboard.jsonl"
-PAYLOADS = HERE / "results" / "panel_payloads"
-FREEZE = "7ba2e10fd2c822d8dac820a307ec4f9f3c4f0005"
+# Two panels, two freezes (the tt/gpt2 race resolution + panel 2):
+PANELS = {
+    "tt": {"ds": "dial_real_ttrend_gpt2_l7",
+           "freeze": "7ba2e10fd2c822d8dac820a307ec4f9f3c4f0005",
+           "payloads": HERE / "results" / "panel_payloads"},
+    "dq": {"ds": "dial_real_dqgap_llama31_8b_l14",
+           "freeze": "FILL-AT-PANEL2-FREEZE",
+           "payloads": HERE / "results" / "panel2_payloads"},
+}
 ARCHS = {"batchtopk_sae", "tsae", "txc_batchtopk_pre",
          "txc_batchtopk_post", "stacked_batchtopk"}
 SEEDS = {1, 2, 42}
 
 
+def _merge_into_panel(new_results, ds: str):
+    panel_file = HERE / "results" / f"stage2_{ds}.json"
+    existing = (json.loads(panel_file.read_text())
+                if panel_file.exists() else [])
+
+    def _key(c):
+        return (c["arch"], c["T"], c["d_sae"], c["k_pos"], c["seed"],
+                c["n_steps"], c.get("kind"))
+
+    by_key = {_key(r): r for r in existing}
+    added = 0
+    for r in new_results:
+        if not r.get("ok"):
+            continue
+        if _key(r) not in by_key:
+            added += 1
+        by_key[_key(r)] = r
+    merged = list(by_key.values())
+    tmp = panel_file.with_name(panel_file.name + ".tmp")
+    tmp.write_text(json.dumps(merged, indent=2))
+    tmp.replace(panel_file)
+    print(f"[merge] {panel_file.name}: {len(merged)} cells (+{added} new)",
+          flush=True)
+
+
 def main():
-    payloads = sorted(PAYLOADS.glob("payload_*.json"))
+    panel = PANELS[sys.argv[1] if len(sys.argv) > 1 else "tt"]
+    DS, FREEZE = panel["ds"], panel["freeze"]
+    assert "FILL" not in FREEZE, "panel 2 freeze SHA not filled yet"
+    payloads = sorted(panel["payloads"].glob("payload_*.json"))
     assert payloads, f"no payloads under {PAYLOADS}"
     existing_keys = set()
     with LB.open() as fh:
@@ -70,7 +102,7 @@ def main():
             appended += 1
     print(f"[leaderboard] +{appended} rows ({len(dup)} dups skipped — "
           f"idempotent re-merge)")
-    _merge_into_panel(results)
+    _merge_into_panel(results, DS)
 
 
 if __name__ == "__main__":

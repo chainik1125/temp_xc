@@ -1,0 +1,42 @@
+{
+ "face": "dq",
+ "model": "llama31",
+ "population": "finite dqgap, non-boundary, pos >= T",
+ "per_T": {
+  "2": {
+   "n": 649108,
+   "n_floor_active": 23584,
+   "floor_active_frac": 0.0363,
+   "pearson_r": -0.1058,
+   "pearson_r_floor_active_only": 0.0442
+  },
+  "4": {
+   "n": 649081,
+   "n_floor_active": 64447,
+   "floor_active_frac": 0.0993,
+   "pearson_r": -0.1985,
+   "pearson_r_floor_active_only": 0.0331
+  },
+  "8": {
+   "n": 647401,
+   "n_floor_active": 139039,
+   "floor_active_frac": 0.2148,
+   "pearson_r": -0.3103,
+   "pearson_r_floor_active_only": -0.0015
+  },
+  "16": {
+   "n": 630744,
+   "n_floor_active": 251783,
+   "floor_active_frac": 0.3992,
+   "pearson_r": -0.4234,
+   "pearson_r_floor_active_only": -0.0715
+  },
+  "32": {
+   "n": 576839,
+   "n_floor_active": 362172,
+   "floor_active_frac": 0.6279,
+   "pearson_r": -0.4989,
+   "pearson_r_floor_active_only": -0.1561
+  }
+ }
+}

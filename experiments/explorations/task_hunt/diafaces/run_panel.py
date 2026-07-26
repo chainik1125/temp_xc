@@ -1,6 +1,6 @@
 """diafaces/run_panel.py — frozen clone of the λ̂ Stage-2 cell
 enumeration with container-partitioning filters (the seedtopup
-`--only-seed` device, generalized). DS frozen: dial_real_ttrend_gpt2_l7 (PANEL_CARD.md).
+`--only-seed` device, generalized). DS frozen: dial_real_dqgap_llama31_8b_l14 (PANEL_CARD.md, amended gate).
 
 Cells are EXACTLY `lambda_intensity/run_stage2._cells(DS)` (5 archs,
 T ∈ {2,4,8,16}, seeds {1,2,42}, trained + untrained, buffer 524288 —
@@ -34,7 +34,7 @@ from experiments.explorations.task_hunt.lambda_intensity.run_stage2 import (
     _describe,
 )
 
-DS = "dial_real_ttrend_gpt2_l7"
+DS = "dial_real_dqgap_llama31_8b_l14"   # GATE AMENDED: LOG 187c51022
 # λ̂ ladder + T32 per mac-local's panel-ladder requirement (44594b696):
 # a gate fired on T32 order-carriage must be panelled AT T32.
 WINDOW_TS = (2, 4, 8, 16, 32)
