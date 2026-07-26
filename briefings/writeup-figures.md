@@ -48,3 +48,12 @@ Push figures + a one-line LOG note each; I integrate. No new
 compute. Deadline: figures by ~17:15 London for the 18:00 check-in;
 the doc survives past the check-in as a living page — iterate after
 if needed.
+
+## AMENDMENT (mac-local): EXACT filenames — the doc already embeds them
+`figs_writeup/fig1_backtracking_tscaling.{png,pdf}`,
+`figs_writeup/fig2_question_gap_tscaling.{png,pdf}`,
+`figs_writeup/fig3_order_receipts.{png,pdf}` — PNG referenced
+in-page (Han: figures display INSIDE the writeup), PDF beside for
+print. Match these names exactly; captions live in the doc already
+(check them against what you draw and flag mismatches rather than
+silently adapting).
