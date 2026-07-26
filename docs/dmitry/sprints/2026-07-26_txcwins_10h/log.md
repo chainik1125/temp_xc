@@ -372,3 +372,43 @@ demonstration order, which Lu et al. report persists "even for the largest curre
 demonstration-order or prompt-order sensitivity returned nothing. Plenty of SAE-steering
 methodology, plenty of order-sensitivity work, no intersection. Whatever this measures is
 unclaimed — which argues for doing it carefully rather than quickly.
+
+## 22:56 — a generator bug that would have faked a win, and a check that last sprint is clean
+
+The theory agent found a bug in its own corpus generator before anything was run on it, and
+it is the kind that produces a false positive rather than a null.
+
+**The bug.** Building class A and class B by calling a document generator twice with
+different `shift` gives the two classes *different sentences* — independent draws match
+register counts only in expectation. Measured at m=2 on one seed: class A came out
+legal:4, tense:3, calm:2 against class B's calm:4, culinary:3, legal:2. That is a lexical
+imbalance pointing straight at the factor under test, and **a constant write can exploit
+it**. It would have produced a false positive for `sae_broadcast` at exactly the rung where
+zero was registered — and would have read as the rank theory failing when the fault was the
+generator.
+
+The fix is to draw once and rotate the assembled list, `sents_b = sents[rot:] + sents[:rot]`,
+sharing the carrier prefix across the pair, so the two classes are literally the same string
+read from different starting points. `rotation_pair` now self-tests `multiset_equal` and
+`is_rotation_by_{block_len}` at every m.
+
+**Checked whether last sprint's headline has the same flaw. It does not.** The steering
+pairs at `steer_order_modal.py:277-278` reuse `ts_, cs_, car` from a single draw, so A and B
+contain literally the same sentences and carrier; and `make_doc` always draws 6 tense + 6
+calm regardless of class, so the training set carries no systematic lexical imbalance for
+latent selection to pick up either. Worth confirming rather than assuming — had it been
+affected, every steering number from that sprint would have needed rerunning.
+
+**A second, smaller design fix: m is confounded with coherence in the naive ladder.** The
+number of registers grows with m, so a document at m=2 reads as a narrative and at m=6 as a
+collage of six unrelated registers — meaning any trend across the ladder is partly a trend
+in distance from the model's distribution, inflating margin variance at exactly the rungs
+the theory cares about. The grouped ladder holds six registers fixed and lets m set only the
+grouping (3 registers per block at m=2, 2 at m=3, 1 at m=6), so every document contains the
+same twelve segments and only block structure moves. Group means are averages of subsets and
+therefore less mutually equidistant than single registers, so measured r1 should sit above
+the closed form — `block_geometry()` is reported alongside so the deviation is visible.
+
+The agent also retracted its own earlier claim that the absolute effect "will be small" at
+m=12, noting it was a guess stated as a derivation. The defensible version is about variance
+and distributional shift, not effect size.

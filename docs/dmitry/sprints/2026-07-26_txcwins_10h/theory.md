@@ -66,6 +66,56 @@ Two separate claims live in this ladder and they are routinely conflated.
 possible per-token baseline.** Nothing in the sprint so far has checked the rank of an
 optimal write. That check is cheap and it is the first thing to run.
 
+### Where the tSAE sits, and why "constant write" is a claim about the protocol
+
+The kickoff asks for a win over a tSAE as well as a TopK SAE, and the tSAE's position on the
+ladder is settled by reading its decoder rather than by argument.
+`temporal_crosscoders/han_tsae/saeTemporal.py:50` declares `D` of shape `(width, d_in)` — one
+direction per latent, **no position axis** — and line 151 decodes as
+`z @ D + b` identically at every position. All of the tSAE's temporal machinery
+(lines 78–98: attention over the causal context) lives in the **encoder**. It changes *which
+coefficients fire and when*; it does not give a latent more than one write direction.
+
+So a tSAE latent's write is `α · z_j[t] · D[j]` — one direction with a data-supplied time
+envelope. That is **exactly rank 1**. The tSAE is an L1/L2 architecture, not an L3 one, and it
+is the natural strongest baseline precisely because it supplies the schedule *automatically*
+where an SAE needs the experimenter to.
+
+This generalises, and the generalisation is uncomfortable for the sprint's current headline.
+
+> **A per-token dictionary's write is constrained to one *direction*. Whether it is constant
+> *in time* is a property of the steering protocol, not of the architecture.**
+
+Last sprint's `sae_broadcast` — one decoder direction at one dose at every position — is the
+*weakest* form of the SAE baseline, not the strongest. The protocol people actually use is to
+scale a latent by its own activation, which gives `α z_j(x_t) v_j`: a coefficient that varies
+across positions, is data-dependent, and needs no experimenter knowledge. Under that protocol
+a plain TopK SAE reaches rank-1 slabs, and **every rank-1 task ties.**
+
+Two schedule-supplied SAE arms are worth separating, because they behave differently:
+
+- **`sae_profile_self`** — coefficient is the latent's activation on the *current* document.
+  Adaptive, but predicted to be near zero on any rotation task: amplifying "tense fires here"
+  reinforces whatever structure the document already has, raising `logP` of A and B alike, so
+  the *margin* moves only at second order.
+- **`sae_profile_target`** — coefficient is the latent's **mean profile over class-A
+  documents**, applied as a fixed schedule to every document. This is a genuine fixed rank-1
+  write, needs no supervision beyond knowing which class you want (which the steering task
+  hands you), and it is the real L1 baseline.
+
+**Registered, and it should be run first because it is nearly free and it threatens the
+existing result:** on the order task (`m = 2`, rank 1), `sae_profile_target` **closes the gap
+to `txc_slab`** to within noise. If it does, last sprint's headline needs qualifying — the
+crosscoder's advantage there was over a weak steering protocol, not over a per-token
+dictionary — and the sprint should pivot entirely to `m ≥ 3`, where the rank argument still
+bites. If instead `sae_profile_target` stays near zero while `txc_slab` is large at `m = 2`,
+the rank account is incomplete and the causal-history contribution to the slab's rank is
+doing more work than the block algebra predicts.
+
+Either way this is the single highest-value hour in the sprint, because it is the strongest
+available attack on the result the sprint is built on, and it costs one arm on data that
+already exists.
+
 ### Why a constant write is annihilated by three different operators
 
 Three exact statements, each stronger than "the multisets are matched", each giving a
