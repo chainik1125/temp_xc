@@ -766,13 +766,15 @@ surviving win is **discovery, and unreliable discovery**.
 **The discovery claim is an optimisation claim, and both architectures got one ticket in the
 lottery.** "The crosscoder finds a write unsupervised that a per-token dictionary could express
 but did not learn" is a statement about a *search*, not about representation — and every cell here
-gave each architecture **one dictionary init and one best-of-4096 latent selection**. **Seed variance shrank from 10.1× to 3.1× when the training recipe was fixed**, which is worth
-stating because it cuts against the case for the experiment. Three seed replicates on the phase
-ladder — identical `k_seg`, `d_sae`, `k`, `n_train`, `n_test` and dose grid, differing only in
-`dict_seed` — give peak-dose margins of +1.56 / +15.70 / +11.48 at lr 3e-4 (`phase5*.json`) and
-+3.64 / +1.47 / +4.63 at lr 1e-3 (`phase5_v2_ds*.json`). **Much of the apparent init instability
-was under-training**, and a well-trained crosscoder is considerably more stable than the earlier
-numbers suggested.
+gave each architecture **one dictionary init and one best-of-4096 latent selection**. **Seed variance is large and does not have a clean relationship to the training recipe.** Three
+seed replicates on `phase5` — differing only in `dict_seed` — give peak-dose margins of +1.56 /
++15.70 / +11.48 at lr 3e-4 and +3.64 / +1.47 / +4.63 at lr 1e-3, a **10.1× spread shrinking to
+3.2×**. But `phase11`, the only other cell with multiple seeds at both recipes, moves the other
+way: **2.5× growing to 8.7×**. And both comparisons are confounded, because the old-recipe runs
+swept four positive doses while the current ones sweep six symmetric ones, and a maximum over more
+draws is larger in expectation. **So the tempting generalisation — that under-trained dictionaries
+are unstable in which solution they find — has one supporting cell, one contradicting cell, and a
+confound in both.** It is not claimed here.
 
 **What survives at the current recipe is qualitative, and it carries the case on its own.** On the
 order task at lr 1e-3 with symmetric doses, the crosscoder's selected latent **reverses direction**
