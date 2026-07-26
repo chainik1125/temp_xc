@@ -150,8 +150,31 @@ built specifically to make constant writes bad**.
 
 **The controlled pair is the sharpest part.** `rotate12` and instruction position have essentially
 identical `c` (0.033 vs 0.034) and `r1` differing **4.8×** — and the rank-designed cell is the one
-that *loses*. Neither statistic predicts the ratio decisively at n = 7 (`r1` Pearson **+0.420**,
-still the wrong sign; `c` **−0.747**), and the conclusion does not need one.
+that *loses*.
+
+⚠ **Neither statistic predicts this ratio, and `c` cannot**, because it is inside the ratio's
+definition. To first order the best constant write attains `√c·‖Ḡ‖` and the crosscoder attains
+`cos(P_txc, Ḡ)·‖Ḡ‖`, so
+
+```text
+ratio = cos(P_txc, Ḡ) / √c
+```
+
+The correlation of `1/√c` against `c` over these seven `c` values is **−0.937** — a pure algebraic
+artefact — while the measured ratio-vs-`c` correlation is **−0.749**. **The measurement is weaker
+than the artefact**, so the real across-task variation *attenuates* `c`'s apparent predictive power
+rather than creating it. `c` is not the surviving screen on this evidence; it is the denominator.
+
+**Removing it recovers where the variation actually lives.** Alignment `cos(P_txc, Ḡ)` spans
+**5.9×** across the seven tasks, and the one the crosscoder wins has the **highest** alignment
+(0.214 against a 0.087 median) *and* the **highest** `r1` — the least rank headroom of the seven.
+`rotate12`, with near-identical `c` and 4.8× more headroom, loses because its alignment is 1.4×
+worse.
+
+**The non-circular statement** (alignment is derived from the ratio, so "the outcome tracks
+alignment" would be circular): the outcome **decomposes** into a part knowable before training —
+`√c`, pure geometry — and a part not knowable in advance — how well the learned latent happens to
+align with the gradient. **All the interesting variation is in the second.**
 
 Instruction position is also the outlier on share of the optimal write: **0.287 against 0.054–0.164
 everywhere else**. Whatever makes the headline work is specific to that cell.
