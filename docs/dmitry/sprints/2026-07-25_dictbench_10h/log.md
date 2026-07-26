@@ -550,3 +550,48 @@ once: a window code holds one shared code for twelve independently-labelled segm
 chance is the *correct* answer there and a high value would have been the surprise. The
 interpretability number that survives is the structured-corpus window-AUC, where the
 question matches the code: 0.612 for the crosscoder against 0.747 for the per-segment SAE.
+
+## The collapse may be a two-line implementation defect, not a property of crosscoders
+
+The first arm of `centering_modal.py` returned numbers unlike anything measured so far this
+sprint. At the same nominal configuration:
+
+| run | #{pre > 0} | coeff/segment | ReLU-kill | FVU |
+|---|---|---|---|---|
+| `mechanism_modal.py` kper=4 | 22.2 | 1.70 | 0.575 | 0.865 |
+| `frontier_modal.py` kper=4 lr=1e-3 | 29 | 2.41 | 0.397 | 0.782 |
+| `centering_modal.py` kper=4 "base" | **99.2** | **3.98** | **0.006** | **0.670** |
+
+The last row is a crosscoder spending 3.98 of its nominal 4 coefficients per segment and
+discarding 0.6% of its selection — no collapse at all. If that is real, then "realised
+capacity saturates near 2 coefficients per segment" is a statement about this repo's
+training setup and not about window codes, and the architecture conclusions logged above
+are void rather than merely caveated.
+
+**I cannot attribute it yet, because I changed two things at once.** My `TXCVariant`
+calls `_normalize_decoder()` in `__init__` for *every* arm including "base", and I ran it at
+lr=3e-4 where `mechanism_modal.py` used 1e-3. So my "base" is not the repo's base, and the
+one arm that was supposed to be the reference point is not a reference point. That is the
+same class of error as setting the harness gate against theory instead of against the
+stored reference run — I built a control that does not control.
+
+`initnorm_modal.py` (running) is the full factorial that identifies it: {normalise decoder
+at init: no, yes} × {lr: 1e-3, 3e-4} × {kper: 4, 20}, everything else fixed. Its registered
+N0 is that `initnorm=False, lr=1e-3` reproduces the collapse — the control that licenses
+every other cell, and the one whose failure would mean the difference is somewhere I have
+not looked.
+
+**Why decoder normalisation at init is the plausible culprit.** `TopKSAE.__init__` calls
+`_normalize_decoder()`; `TemporalCrosscoder.__init__` does not. The crosscoder's `W_dec` is
+initialised `randn(d_sae, T, d_in) / sqrt(d_sae)`, whose norm over the normalised dims
+`(1, 2)` is `sqrt(T·d_in/d_sae)` = sqrt(12·1536/4096) ≈ **2.12**, not 1. The training loop
+rescales it, but only *after* the first optimiser step, so Adam's moment estimates are
+seeded from gradients taken at a decoder twice too large. The initial loss differs
+accordingly: 566.91 with normalisation against 848.50 without. A large first step under
+gradient clipping favours whichever latents happen to dominate at init, and TopK then keeps
+selecting those same latents, which is the winner-take-all path to a dictionary where only
+~0.5% of latents ever go positive.
+
+Note this predicts the collapse should *worsen with T*, since the init norm error
+`sqrt(T·d_in/d_sae)` grows as sqrt(T) — and `tsweep_modal.py` (running) measures exactly
+that, with T=1 as an exact SAE-equivalence control.
