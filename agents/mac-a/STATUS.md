@@ -22,16 +22,21 @@ scoring.**
    neg_frac diagnostic. Tests: tests/test_btk_only.py, full suite 369
    passed, validate OK. Convention note = LOG entry "~21:05 London"
    (CANONICAL; pods follow, never fork).
-2. **Stage 2 NEXT** — CALIB card: ttrend `dial_real_ttrend_gpt2_l7`;
-   arms {batchtopk_sae,tsae}@T1 + txc_batchtopk_post@T∈{4,16,32} ×
-   {relu-mix, btk-only} × seeds {3,4} trained+untrained. relu-mix side
-   REUSED from existing leaderboard rows (salvage/topup freezes
-   50af78f12/85c87fd76 hold post T∈{4,16,32} + sae/tsae T1 at seeds
-   {3,4}; cite eval_keys in card). Only btk-only cells computed
-   (est ~$4, ≤$8). Report realized l0 vs nominal, recovery, post
-   T-slope d(recovery)/dlogT both arms; restate pre-registered reading
-   (sae improves most; tsae least; post low-T improves; slope may
-   soften). Deliverable: card + score JSON + figure + LOG verdict PTR.
+2. **Stage 2 IN FLIGHT** — CALIB_CARD frozen `97fae183a` (pin re-taken
+   from ORIGIN history after a pull-rebase rewrite — watch for this),
+   **APPROVED expedited by mac-local 269b7d86c** with one post-run
+   ADVISORY: surface per-cell `neg_frac` in the verdict. Launched
+   detached ~21:30 BST, app `ap-NANQj1zSfcIiBELX4ydG9w`
+   (mac-a-diafaces-calib): H100 main 18 cells + 2× L4 tsae; relu-mix
+   arm = 20 REUSED rows (card § 3 eval_keys); est ~$3 ledgered.
+   neg_frac plan: train-time value wasn't persisted by the frozen
+   pipeline → (a) untrained cells reconstructed exactly local
+   (seed-fixed init; gpt2 cache building locally), (b) trained cells
+   = l0-gap ESTIMATE labeled as such, (c) Stage-3 card persists it
+   properly. Evaluator l0 verified sign-agnostic (`z != 0`) — band
+   check sound for negative survivors. On land: pull → merge
+   (pin-asserted) → score → fig (`make_calib_fig.py` ready) → LOG
+   verdict PTR quoting E1–E4 + advisory → ledger actuals.
 3. **Stage 3 GATED on Stage 2** — KEEP-set survives-the-fix
    (R29 ttrend lane / R22 λ̂ cells / R27 dq cells vs SAME bars;
    verdicts SURVIVES / MOVED-MARGINS / DOES-NOT-SURVIVE).
