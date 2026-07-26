@@ -641,3 +641,95 @@ framing is wrong. `initnorm_modal.py`'s factorial settles it either way.
 **Arithmetic check, and one correction to my own number.** The init atom norm is confirmed
 numerically at 2.1213 ± 0.011, exactly `sqrt(T·d_in/d_sae)` = sqrt(12·1536/4096). The
 kper=41 overstatement is 41 ÷ (17.6/12) = **28×**, not the 27× written above.
+
+## The frozen shuffle control reverses the negative: arrangement does matter
+
+`frozenshuf_modal.py` completed, and my registered prediction was wrong in the informative
+direction. I had written: *"intact lands between the 30th and 70th percentile at every
+budget"*, with the note that if intact ≫ shuffled then arrangement does matter and the
+m-sweep had destroyed the effect by refitting. That is what happened.
+
+The control takes the selected latent, permutes its decoder rows in time, and does **not**
+refit — so nothing downstream can re-absorb the damage — across 24 independent draws.
+
+| budget | intact fidelity | shuffled draws (n=24) | intact percentile |
+|---|---|---|---|
+| frozen, no refit | **+0.242** | +0.002 ± 0.103, range [−0.211, +0.211] | 100th |
+| refit m=2 | **+0.397** | +0.314 ± 0.054 | 100th |
+| refit m=8 | **+0.659** | +0.568 ± 0.059 | 100th |
+
+The frozen row is the clean one: intact sits 2.3 shuffled standard deviations above the
+shuffled mean and outside the entire observed range of 24 draws, on a latent that fires on
+0.56% of windows, against a full difference-of-means reference of Δ=+33.43. With 24 draws
+the strongest one-tailed statement available is p ≤ 1/25 = 0.04, and the three budgets are
+**not independent** — same latent, same dictionary, same task, same held-out set — so this
+is one result confirmed at three budgets, not three results.
+
+This retires the earlier reading that "destroying temporal structure does not hurt". That
+reading came from the m-sweep, which refits the coefficients after shuffling and therefore
+lets the fit repair the permutation; the earlier `controls_modal.py` shuffle showed
+`shuffled ≈ intact` for exactly that reason. Arrangement can only be measured where it is
+not re-chosen, and where it is not re-chosen, it carries a measurable effect.
+
+## The dictionary is starved, and sweeping k is not the knob that fixes it
+
+`health_modal.py` answers the question directly: no configuration in the k sweep reaches
+SAE-comparable reconstruction.
+
+| kper | nominal window k | FVU | × SAE | realised L0/window | alive | ReLU-killed |
+|---|---|---|---|---|---|---|
+| 41 | 492 | 0.839 | 27.6× | 17.6 | 0.152 | 0.96 |
+| 100 | 1200 | 0.780 | 25.7× | 26.6 | 0.143 | 0.98 |
+| 200 | 2400 | 0.819 | 26.9× | 18.8 | 0.113 | 0.99 |
+| 341 | 4092 | 0.788 | 25.9× | 18.0 | 0.096 | 1.00 |
+
+Against an SAE at FVU 0.030 with 1189 coefficients per window. Frozen steering fidelity
+across that whole 8× span of nominal k is +0.258, +0.218, +0.231, +0.227 — flat, tracking
+the flat realised capacity rather than the nominal budget.
+
+**So the interpretive worry is live and I am acting on it.** The steering results above were
+measured on a dictionary reconstructing at 27× the SAE's error. For the *negative* results
+that is disqualifying: "the crosscoder reads the window factor worse" cannot be separated
+from "the crosscoder was not trained". For the *positive* arrangement result the direction
+is more forgiving — a starved dictionary makes a detected effect conservative rather than
+spurious — but the effect size is not trustworthy and the result should replicate on a
+healthier dictionary before it is reported.
+
+## Attribution, settled: it is the learning rate, and I was wrong about the init defect
+
+The decisive cell arrived. All three runs are kper=4, nominal k=48, same corpus, same 2500
+steps, same seed:
+
+| run | decoder normalised at init | lr | #{pre>0} | coeff/segment | ReLU-kill | alive | FVU |
+|---|---|---|---|---|---|---|---|
+| `mechanism_modal.py` | no | 1e-3 | 22.2 | 1.70 | 0.575 | — | 0.865 |
+| `frontier_modal.py` | no | 1e-3 | 29 | 2.41 | 0.397 | 0.195 | 0.782 |
+| `frontier_modal.py` | **no** | **3e-4** | 82 | **3.97** | **0.008** | 0.357 | 0.706 |
+| `centering_modal.py` | **yes** | **3e-4** | 99.2 | **3.98** | **0.006** | 0.376 | 0.670 |
+
+The third and fourth rows differ only in the init normalisation and are the same run to
+within noise — 3.97 against 3.98 coefficients per segment, 0.008 against 0.006 ReLU-kill.
+The second and third rows differ only in the learning rate and are completely different.
+
+**Registered N1 ("init-normalisation is the factor that matters") is refuted, and N2 ("lr
+alone does not") is refuted in the opposite direction: lr alone does.** The two-line
+implementation-defect framing I wrote two entries ago is wrong and I am dropping it. The
+init asymmetry is real — the crosscoder's atoms do start at norm 2.1213 instead of 1, which
+I verified numerically as exactly `sqrt(T·d_in/d_sae)` — and it is worth fixing for
+tidiness, but it is not what starves the dictionary. At lr=1e-3 the crosscoder collapses; at
+lr=3e-4 it spends 3.97 of its nominal 4 coefficients per segment.
+
+What this does **not** yet establish is whether the collapse reappears at larger k even at
+the lower learning rate. Every k at which I have an lr=3e-4 number so far — 1, 2, 4 — spends
+its full budget. The frontier's kper=8, 20 and 41 cells at lr=3e-4 are the ones that decide
+whether "realised capacity saturates" is a real property or was an artefact of a single
+learning rate throughout, and `initnorm_modal.py`'s factorial covers kper=20 directly.
+
+**Acting on the user's instruction.** The directive was to rerun the shuffle control on a
+configuration reaching comparable FVU. The k sweep does not produce one, but the learning
+rate does produce a materially healthier dictionary — full budget spent, alive fraction
+0.357 against 0.136, FVU 0.706 against 0.839 — so `frozenshuf_modal.py` is rerunning at
+`--txc-lr 3e-4 --kper 4` with everything else fixed, writing `frozen_shuffle_healthy.json`.
+Stating the limit plainly: FVU 0.706 is better but is still 23× the SAE's 0.030, so this
+tests whether the arrangement result survives a substantially better dictionary, not whether
+it survives one at parity. No configuration found in this sprint reaches parity.

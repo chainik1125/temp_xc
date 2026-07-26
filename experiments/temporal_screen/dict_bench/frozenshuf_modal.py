@@ -93,7 +93,8 @@ CARRIERS = ["Journal entry.\n", "From the notebook:\n", "Draft passage.\n",
 @app.function(gpu="L4", image=image, timeout=10800)
 def frozenshuf(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
                steps: int, txc_batch: int, n_sel: int, n_test: int, frac: float,
-               general_frac: float, kper: int, n_draws: int, pool: int, ms: list):
+               general_frac: float, kper: int, n_draws: int, pool: int, ms: list,
+               txc_lr: float = 1e-3):
     import sys
     sys.path.insert(0, "/work")
     import itertools
@@ -190,8 +191,8 @@ def frozenshuf(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
         j = torch.randint(0, k_seg, (bs,), device=dev)
         return Xn[i, j]
 
-    def train(m, gen, bs, tag):
-        opt = torch.optim.Adam(m.parameters(), lr=1e-3)
+    def train(m, gen, bs, tag, lr=1e-3):
+        opt = torch.optim.Adam(m.parameters(), lr=lr)
         for s in range(steps):
             loss, _, _ = m(gen(bs))
             opt.zero_grad(); loss.backward()
@@ -206,7 +207,7 @@ def frozenshuf(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
     torch.manual_seed(0)
     txc = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=k_seg, k=kper).to(dev)
     train(sae, gen_f, txc_batch * k_seg, "sae")
-    train(txc, gen_w, txc_batch, "txc")
+    train(txc, gen_w, txc_batch, "txc", lr=txc_lr)
     with torch.no_grad():
         V = sae.W_dec.data.float(); P = txc.W_dec.data.float()
 
@@ -378,12 +379,14 @@ def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int 
          n_docs: int = 1200, d_sae: int = 4096, steps: int = 2500,
          txc_batch: int = 64, n_sel: int = 8, n_test: int = 20, frac: float = 0.35,
          general_frac: float = 0.4, kper: int = 41, n_draws: int = 24,
-         pool: int = 16, ms: str = "2,8"):
+         pool: int = 16, ms: str = "2,8", txc_lr: float = 1e-3, tag: str = ""):
     import json
     r = frozenshuf.remote(model, layer, k_seg, n_docs, d_sae, steps, txc_batch,
                           n_sel, n_test, frac, general_frac, kper, n_draws, pool,
-                          [int(x) for x in ms.split(",")])
+                          [int(x) for x in ms.split(",")], txc_lr)
+    r["txc_lr"] = txc_lr
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
-    (outdir / "frozen_shuffle.json").write_text(json.dumps(r, indent=2))
-    print("[saved]", outdir / "frozen_shuffle.json")
+    name = f"frozen_shuffle{tag}.json"
+    (outdir / name).write_text(json.dumps(r, indent=2))
+    print("[saved]", outdir / name)
