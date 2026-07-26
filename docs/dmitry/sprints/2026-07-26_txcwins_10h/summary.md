@@ -121,10 +121,32 @@ worst. This is the most-replicated finding in the project and the one least like
 
 ## What was not achieved
 
-**No expressiveness win, including on a design built specifically to produce one.** The rotation
-ladder drives the rank-1 reachable share to 0.177 by construction and the crosscoder still loses to
-`grad_rank1` there by z = −31.5. **The geometry was constructed and the headroom went unused** —
-which is a finding about the architecture, not a failure of task design.
+**No expressiveness win — and on the task built to require rank ≥ 2, the crosscoder loses to a
+write that is rank-1 *and* flat in time.** `rotate12` drives the rank-1 reachable share to
+`r1` = 0.177 by construction while holding the constant share at `recency`'s level
+(`c` = 0.033 vs 0.034), so it is the one design that isolates temporal form. Measured against
+`broadcast_optimal` — the best constant direction in the whole space — at matched dose, three
+inits each:
+
+| task | `r1` | crosscoder | best constant write | ratio |
+| --- | --- | --- | --- | --- |
+| `rotate12` | **0.177** | +10.63 / +10.16 / +11.02 | +12.36 | **0.86 / 0.82 / 0.89** |
+| recency | 0.850 | +3.81 / +4.82 / +4.63 | +4.01 | 0.95 / 1.20 / 1.16 |
+
+**The relationship runs the wrong way: lower `r1`, lower ratio.** On the rank-designed cell the
+crosscoder captures 10% of the optimal write's effect against recency's 29%, and a flat write beats
+it in all three inits. So the headroom is not merely unused — **the crosscoder does worse there
+than the most constrained write in the space.**
+
+**What the crosscoder's margin over the SAE actually is, then, is a *search* advantage, not
+temporal expressiveness.** Across `r1` from 0.177 to 0.850 it never meaningfully exceeds the best
+conceivable constant write. What it does is find a usable direction from reconstruction alone,
+where the SAE's dictionary plus a reading selector does not.
+
+⚠ Two qualifiers. `broadcast_optimal` is gradient-derived and therefore **supervised** — this is
+not a per-token dictionary beating the crosscoder, and no practitioner arm reaches that line; it
+bounds what the crosscoder's *form* buys. And two tasks is **two points**: `evidence`, `rotate2`,
+`rotate6`, `order` and `phase11` are still scoring and will fill `r1` in between.
 
 **Rank ≥ 2 is real and its mechanism is unidentified.** Three candidate mechanisms were proposed
 and each refuted by a profile measurement it predicted. The leading direction *is* explained — the
