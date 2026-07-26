@@ -72,7 +72,9 @@ def _upper_frac(texts):
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
              n_perm=0, seed=31415, dict_seed=0, gen_tokens=0, n_gen=0,
-             n_grad=0, arms=None, verbose=True):
+             n_grad=0, sae_lr=None, txc_lr=None, tsae_lr=None,
+             sae_steps=None, txc_steps=None, tsae_steps=None,
+             arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
 
     `make_pair(rng)` must return `(sents_a, sents_b, carrier)`: two equal-length sentence
@@ -179,10 +181,20 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         f = Xtr.reshape(-1, d)
         return f[torch.randint(0, f.shape[0], (bs,), device=dev)]
 
-    def adam_train(m, gen, bs):
-        opt = torch.optim.Adam(m.parameters(), lr=lr)
+    def adam_train(m, gen, bs, lr_=None, steps_=None):
+        """Per-arm learning rate and step count.
+
+        Not a convenience. Swept properly, the three architectures want DIFFERENT recipes on
+        the same activations -- best FVU at 8 coefficients/segment on the recency corpus is
+        0.0373 for the SAE at lr 3e-4, 0.0968 for the crosscoder at 1e-3 (it diverges to 0.36
+        at 3e-3), and 0.0144 for the attention tSAE at 3e-3. Holding one learning rate across
+        all three does not make the comparison fair, it just picks which architecture the
+        comparison handicaps: at the sprint's original default the tSAE looked 3.4x WORSE than
+        the SAE, and at its own best recipe it is 2.6x BETTER.
+        """
+        opt = torch.optim.Adam(m.parameters(), lr=lr_ or lr)
         m.train()
-        for _ in range(steps):
+        for _ in range(int(steps_ or steps)):
             loss, _, _ = m(gen(bs))
             opt.zero_grad(); loss.backward()
             torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
@@ -212,6 +224,9 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
 
     out = {"model": model_id, "layer": int(L), "k_seg": k_seg, "T": T, "d_sae": d_sae,
            "k": k, "steps": steps, "lr": lr, "n_train": n_train, "n_test": n_test,
+           "recipe": {"sae": [sae_lr or lr, sae_steps or steps],
+                      "txc": [txc_lr or lr, txc_steps or steps],
+                      "tsae": [tsae_lr or lr, tsae_steps or steps]},
            "seed": seed, "dict_seed": dict_seed,
            "alphas": list(alphas), "reading": {}, "sparsity": {}, "arms": {}}
     writes = {}
@@ -219,7 +234,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     # ---------------- 1. per-token TopK SAE ----------------
     torch.manual_seed(dict_seed)
     sae = TopKSAE(d_in=d, d_sae=d_sae, k=k).to(dev)
-    adam_train(sae, gen_flat, batch_win * T)
+    adam_train(sae, gen_flat, batch_win * T, sae_lr, sae_steps)
     with torch.no_grad():
         Ztr_ = sae.encode(Xtr.reshape(-1, d)).reshape(-1, T, d_sae).mean(1)
         Zho_ = sae.encode(Xho.reshape(-1, d))
@@ -242,7 +257,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
                              activation="batchtopk").to(dev)
     with torch.no_grad():
         txc._normalize_decoder()
-    adam_train(txc, gen_win, batch_win)
+    adam_train(txc, gen_win, batch_win, txc_lr, txc_steps)
     with torch.no_grad():
         Zt_tr, Zt_ho = txc.encode(Xtr), txc.encode(Xho)
     jt, auc_t, sign_t, auc_t_tr = best_latent(Zt_tr, Zt_ho)
@@ -273,9 +288,9 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
                           kval_topk=int(tsae_k) if use_topk else None,
                           tied_weights=True, n_attn_layers=1,
                           bottleneck_factor=64).to(dev)
-        opt = torch.optim.Adam(ts_.parameters(), lr=lr)
+        opt = torch.optim.Adam(ts_.parameters(), lr=tsae_lr or lr)
         ts_.train()
-        for _ in range(steps):
+        for _ in range(int(tsae_steps or steps)):
             xb = gen_win(batch_win)
             recons, info = ts_(xb)
             loss = (recons - xb).pow(2).sum(-1).mean()
