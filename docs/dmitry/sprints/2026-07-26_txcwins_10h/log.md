@@ -1852,3 +1852,71 @@ otherwise divide `W[t]` by `sqrt(len_t)`, or match on realised injected norm rat
 
 Each was silent, each favoured a different arm, and each was found by inspection rather than by
 a test failing. A reader building on this should expect a fourth.
+
+## 00:08 — CORRECTION: reading and steering are a dissociation, not an identity
+
+The result I called the best of either sprint was wrong as stated, and the corrected version is
+more interesting. Two different slabs were conflated:
+
+```text
+c(P_dom) = 0   <=>  a linear pooled per-token probe is at chance      (READING)
+c(Gbar)  = 0   <=>  a constant write has no first-order effect        (STEERING)
+```
+
+A pooled probe reads `mean_t x_t` and separates the classes exactly when
+`mean_t P_dom[t] ≠ 0`; a constant write's first-order effect is
+`α·T·⟨v, mean_t Ḡ[t]⟩` and vanishes exactly when `mean_t Ḡ[t] = 0`. Same functional form,
+**different objects**, coinciding only if the two slabs are parallel.
+
+**Measured, they are nearly orthogonal:** `cos(P_dom, Ḡ) = +0.044` against a random baseline
+of `1/√18432 ≈ 0.007`. So the honest statement is a dissociation:
+
+> **A task can be unreadable by pooling and still steerable by a constant write, and the
+> reverse.** The two halves of the project are related in form and independent in fact.
+
+The retro-explanation of last sprint needs the same repair. AUC 0.998 correctly implies
+`c(P_dom) > 0` and hence pooled readability; the step from there to "so `sae_broadcast` should
+be positive" was **not valid**, even though the observation matched. The reading implication
+stands; the inference is dropped.
+
+**And the phase1 reconciliation is withdrawn in full.** "Implied optimal 72.6 against
+`dom_slab` 67.63, seven percent apart" used `c(P_dom)` where `c(Ḡ)` is required, and compared
+an implied *gradient* optimum against a *difference-of-means* effect on a different task. The
+agreement was coincidence. **I propagated that arithmetic upward as a decisive cross-check and
+it should not have been.** What survives is measured rather than inferred: `grad_rank1 +6.97`
+and `sae_schedule_grad +6.92` both beat `txc_slab +2.55` with the two ceilings
+indistinguishable — the discovery result, directly.
+
+Consequences for every table: **each `r1` and `c` must name its slab.** Recency alone gives
+`r1 = 0.829` from the gradient against `0.585` from difference-of-means. And a caution against
+over-correcting: `Ḡ` is a *local first-order* object, `P_dom` a *finite displacement* toward
+the other class. Near-orthogonality is compatible with both being useful, and
+difference-of-means steering demonstrably works in the literature. `Ḡ` is the right ceiling for
+a first-order claim; `P_dom` is a different, legitimate reference.
+
+## 00:10 — a methodological worry quantified and dismissed
+
+The `at_best()` convention takes an argmax over the dose grid on the same documents used to
+report the delta and its SEM — a winner's-curse setup. Simulated rather than assumed: 4 doses,
+200 documents, per-dose SEM 0.64, doc-level noise correlated 0.85 across doses.
+
+| true dose-response shape | selection bias | in SEM |
+| --- | --- | --- |
+| peaked, crosscoder-like (3, 7, 11, 8) | −0.01 | −0.02 |
+| flat, SAE-like (0.8, 1.0, 1.0, 0.9) | +0.19 | +0.30 |
+| null (0, 0, 0, 0) | +0.26 | +0.41 |
+
+**The bias runs the wrong way for a sceptic.** A well-separated peak is picked reliably, so the
+crosscoder gains essentially nothing, while the **flat and null arms — the SAE broadcast and the
+random controls — are inflated by 0.3–0.4 SEM.** The reported gap and z are therefore if
+anything understated, and that should be said in the write-up rather than left for a reviewer
+to raise. Also confirmed clean: latent and sign selection happen on training activations while
+steering is evaluated on freshly generated test documents, so there is no leakage there.
+
+It would matter on a *new* task with a smaller effect and two flat-ish arms, where the
+inflations cancel in the difference but the SEM does not account for max-selection. **Two
+agents independently recommended the same fix** — report at a matched dose with the full curve
+rather than at each arm's own best dose. Theory's route was that the linear-response law
+underwriting every ratio holds only in the small-α regime, which best-dose reporting sits
+outside; the audit's route was the winner's curse. Convergent, and it is a reporting change
+rather than a compute one.

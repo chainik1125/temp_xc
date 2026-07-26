@@ -220,18 +220,42 @@ coincide on this task and the DoM-based numbers stand; if it is low, that is its
 line, since the steering literature routinely uses difference-of-means as though it were the
 gradient.
 
-### `c` is the reading result and the steering result in one number
+### `c` relates reading and steering in form — but they are two numbers, not one
 
-A linear probe on mean-pooled activations separates the two classes if and only if
-`mean_t P[t] ≠ 0` — which is exactly the condition `c > 0`. So:
+**Corrected 2026-07-26 after measurement. The original claim in this section was wrong.** I
+wrote that `c` is simultaneously the constant-write share and the pooled-readability share —
+"a task is steerable by a constant write exactly to the extent that it is readable by
+pooling". That conflates two different slabs. The correct pair:
 
-> **`c = 0` ⟺ a linear pooled per-token probe is at chance. A task is steerable by a constant
-> write exactly to the extent that it is readable by pooling.**
+```text
+c(P_dom) = 0   ⟺  a linear pooled per-token probe is at chance     (READING)
+c(Ḡ)     = 0   ⟺  a constant write has no first-order effect       (STEERING)
+```
 
-This ties the two halves of the project together and it is retroactively confirming. Last
-sprint's pooled SAE read the order label at AUC 0.998–1.000, which *already implied* `c > 0`
-on that task, which in turn implied `sae_broadcast > 0` — and the measured value was `+1.24`,
-small but positive. The reading result and the steering result were never independent.
+A pooled probe reads `mean_t x_t`, so it separates the classes iff `mean_t P_dom[t] ≠ 0`. A
+constant write's first-order effect is `α·T·⟨v, mean_t Ḡ[t]⟩`, so it vanishes iff
+`mean_t Ḡ[t] = 0`. The same functional — the constant-subspace share — on two different
+objects, coinciding only when `P_dom ∥ Ḡ`.
+
+**Measured, they are nearly orthogonal: `cos(P_dom, Ḡ) = +0.044`**, against a random baseline
+of `1/sqrt(18432) ≈ 0.007`. So the corrected statement is a *dissociation*, and it is more
+useful than the equivalence it replaces:
+
+> Readability-by-pooling and steerability-by-constant-write take the same form on two objects
+> measured here to be nearly unrelated. **A task can be unreadable by pooling and still
+> steerable by a constant write, and the reverse.**
+
+This resolves an anomaly without invoking nonlinearity: the phase ladder's `c` is tiny
+(0.006–0.040) yet a constant write steers its ordering metric hard, `+14.52` at phase1. That
+`c` was computed on `P_dom`; the constant write's grip is governed by `c(Ḡ)`, which was never
+measured there.
+
+Two consequences for anything written from this document. **Every reported `r1` and `c` must
+say which slab it came from** — on recency they are `r1 = 0.829` from the gradient against
+`0.585` from difference-of-means. And last sprint's retro-explanation survives only in its
+reading half: AUC 0.998–1.000 does imply `c(P_dom) > 0` and hence pooled readability, but the
+step from there to "so `sae_broadcast` should be positive" was not valid, even though the
+observed `+1.24` matched.
 
 **Correction to the harness gate registered earlier in this document.** I wrote that
 `c = 0` exactly at every `m` in a rotation design and that a nonzero value indicates window
@@ -1010,17 +1034,30 @@ Two distinct signatures exist and only a symmetric sweep separates them:
 - an arm whose effect appears only at negative `α` is genuinely antisymmetric and a one-sided
   grid misses it entirely (phase1's SAE arm, `+14.52` at a dose never tested).
 
-### phase1 reconciles quantitatively, and locates the failure
+### phase1: my reconciliation is withdrawn; the conclusion survives on other evidence
 
-Measured `c = 0.040` and `sae_broadcast = +14.52`. Under the linear-response law a constant
-write reaches `sqrt(c) = 0.200` of the optimal slab, implying an optimum of `72.6` — against
-`dom_slab = 67.63` measured on the closely-related order task by an entirely independent route,
-seven percent apart. The same arithmetic puts `cos(txc_slab, Ḡ) ≈ 0.020`.
+I derived "implied optimum 72.6 against `dom_slab` 67.63, seven percent apart" and called it a
+cross-check. **Withdrawn.** It used `c(P_dom)` where `c(Ḡ)` is required, and it compared an
+implied *gradient* optimum against a *difference-of-means* effect — different quantities, on
+different tasks. The agreement was coincidence.
 
-**The SAE arm is performing at its predicted ceiling share; the crosscoder is capturing about
-2% of an available write.** That is a discovery failure, cleanly separated from `c`, and it
-explains the reported instability under dictionary init: at that alignment, which latent wins
-the AUC selection is close to arbitrary.
+The qualitative conclusion survives and no longer needs that arithmetic, because it was
+measured directly: on recency, `grad_rank1` at `+6.97 ± 0.40` and `sae_schedule_grad` at
+`+6.92 ± 0.40` both beat `txc_slab` at `+2.55 ± 0.15`, with the two ceilings indistinguishable
+from each other. **A per-token dictionary handed a per-position dose schedule does at least as
+well as the crosscoder on the strongest task in the sprint.** The crosscoder's claim is that it
+found the schedule unsupervised, not that the write was out of reach — the discovery side of
+the split, measured rather than argued. The reported instability under dictionary init is the
+same fact from another angle: a weakly aligned latent makes the AUC selection close to
+arbitrary.
+
+**A caution against over-correcting on difference-of-means.** Do not write "DoM is a poor
+write" flatly. `Ḡ` is a *local* first-order object; `P_dom` is a *finite displacement* toward
+where the other class sits. Near-orthogonality is compatible with both being useful, and DoM
+steering works across the published literature. Which is the right ceiling depends on the dose
+regime — and arms reported at *each arm's best dose* are precisely not in the small-`α` regime
+where the linear law holds. Any ratio between arms should be read at the **smallest dose with
+a significant effect**, which the best-dose convention quietly violates.
 
 **Consequence for the previous sprint.** The order task was measured on a one-sided grid, is
 the same family as phase1, and phase1 reverses under symmetric doses. Combined with its

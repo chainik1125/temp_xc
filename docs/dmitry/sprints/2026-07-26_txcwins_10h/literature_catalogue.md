@@ -115,6 +115,8 @@ and because most of them are cheap to satisfy up front and expensive to retrofit
    handicapped.
 8. **Run the tSAE with temporal regularisation at zero as a control**, because the released
    trainer is `TemporalMatryoshkaBatchTopKSAE` and otherwise the arm confounds three changes.
+8b. **Use disjoint demonstration pools for dictionary training and steering evaluation**, so the
+   claim is about the factor rather than about memorised content.
 9. **Carry over the existing controls unchanged** — time-averaged profile, random profile, random
    direction, row-permuted profile, supervised difference-of-means ceiling. They are already in
    `steer_order_modal.py`.
@@ -185,6 +187,33 @@ inflations largely cancel in the difference, but the SEM does not account for th
 so the z is genuinely overstated in that regime. Cheap guards, in order of preference: compare
 arms **at matched dose** and report the full curve (most interpretable, and the curves are already
 plotted); or split the test documents into a dose-selection half and a reporting half.
+
+### Held-out content: the existing result does not test generalisation
+
+Third harness observation. `make_doc` draws from fixed module-level pools — ten CALM sentences,
+ten TENSE sentences, a small carrier set — for **both** the dictionary training documents and the
+steering test documents. So the dictionaries are trained on activations from documents built out
+of the same twenty sentences they are later asked to steer.
+
+**How much this costs.** Less than it first appears, because the task is ordering: both classes
+use the same sentences, so a latent keyed on sentence *identity* cannot separate them, and the
+row-permutation control breaks a lookup as readily as a genuine profile. What is not ruled out is
+narrower — that the latent is specific to these twenty sentences' embeddings rather than encoding
+"tense early, calm late" in general. The honest statement of the existing result is therefore:
+*a crosscoder can steer the ordering of content it was trained on.*
+
+**Cheap hardening, and it is a strictly stronger claim.** Split the pools: train the dictionaries
+on documents built from sentences 0–6 of each class, evaluate steering on documents built from
+sentences 7–9. Same everything else. If the effect survives, the latent is a general
+attribute-schedule feature and the claim upgrades from "steers this content" to "steers this
+factor". If it does not survive, that is worth knowing before the claim is made in a paper.
+
+**For the new task this matters more, not less.** A demonstration-order latent trained on the very
+demonstrations it then steers is a much more plausible lookup than a sentence-order latent is,
+because demonstrations are longer and more distinctive. **Use disjoint demonstration pools for
+dictionary training and for steering evaluation.** If only one thing on this page is adopted
+beyond the contrastive metric, make it this one — it is the difference between a result about a
+mechanism and a result about a corpus.
 
 ### The concrete recommendation, if one task has to be picked
 
