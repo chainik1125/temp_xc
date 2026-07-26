@@ -81,7 +81,22 @@ a40-bootstrap (historical, pod gone).
 ## Git: clean, pushed after this rewrite. Suite 333 green local.
 
 
-## SALVAGE PHASE (Han, ~16:30 London 2026-07-26) — RUNNING as of 16:40
+## SALVAGE CLOSED ~19:15 London 2026-07-26 — BOTH DELIVERED
+**ttrend TXC-post = KEEP T{16,32}** (R28+R29 ratified by me, team
+pending; pooling-free L1 lane carries; fig4 in WRITEUP §4).
+**Novelty cross-ratified** (CROSSRATIFY.md FINAL, doubly pending;
+gate gap closed favorably; 3 flags for Andrii: T-pin, pooled-audit
+defect, position-triage contradiction). dq = Task 3
+passed-then-demoted. WRITEUP restructured 15907d434 (9 sections).
+Sprint actuals ≈$10; program ≈$96 actuals of $500. REMAINING QUEUE:
+team ratifications (R22 caveats, R28/R29, quote licences, novelty
+handoff to Andrii); HF checkpoint mirrors BEFORE token rotation;
+token rotations post-weekend; post-deadline items (em-redo,
+PROBE_V2_SPEC freeze, factory r4, rate_ver, gemma slen-fill).
+Salvage briefings deletable per briefings/README convention once
+team ratifies (kept until then as the sprint's terms of reference).
+
+## (superseded) SALVAGE PHASE (Han, ~16:30 London 2026-07-26)
 dq DEMOTED (surface-reading fragility at T≥16) to order-mechanism
 support; salvage briefed: mac-a = ttrend POST fresh-seed panel
 (salvage-mac-a.md), mac-b = txcwin novelty cross-ratification
