@@ -215,7 +215,37 @@ dictionary training and for steering evaluation.** If only one thing on this pag
 beyond the contrastive metric, make it this one — it is the difference between a result about a
 mechanism and a result about a corpus.
 
-### The concrete recommendation, if one task has to be picked
+### The steering run is not budget-matched, and the mismatch favours the SAE
+
+Fourth harness observation, and the one most worth putting in the writeup, because it makes the
+headline result *stronger* than it currently reads.
+
+Both dictionaries are constructed with the same nominal `k` — `TopKSAE(..., k=k)` and
+`TemporalCrosscoder(..., T=T, k=k)` — but they spend it over different units. The SAE encodes
+`Xn.reshape(-1, d)`, i.e. **per segment**, so it gets `k` active latents for each of the `T`
+segments. The crosscoder encodes whole windows, so it gets `k` active latents **per window of `T`
+segments**. At the defaults (`k = 8`, `k_seg = 12`) that is:
+
+| arm | coefficients per segment | per window |
+| --- | --- | --- |
+| TopK SAE | 8 | 96 |
+| crosscoder | 0.67 | 8 |
+
+**A 12× sparsity budget advantage to the SAE.** Training throughput is matched — the SAE gets
+`batch_win * T` segment vectors per step against the crosscoder's `batch_win` windows, i.e. the
+same number of segments — so this is a budget asymmetry specifically, not a data one.
+
+Two things follow. First, this run does **not** follow the sprint's own stated standard of
+matching on realised coefficients per segment; that standard was applied to the FVU head-to-head
+table, and the steering run inherits the older nominal-`k` convention. Second, and more usefully,
+the direction is conservative: the crosscoder's +11.29 against the SAE's +1.24 was measured while
+the SAE had twelve times the coefficient budget. That is worth one sentence in the writeup,
+because a reader will otherwise assume the comparison was matched and may suspect it was tuned.
+
+**What to actually do.** Report the asymmetry rather than hide it, and if there is compute to
+spare, rerun the steering arms with the crosscoder at `k_window = k_segment × T` so the budgets
+match — the expected outcome is that the SAE arm gets no better, since the constant-write argument
+is structural rather than about capacity, and confirming that closes the loop.### The concrete recommendation, if one task has to be picked
 
 **Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =
 number of shots, a drop-in for `steer_order_modal.py`.

@@ -1920,3 +1920,42 @@ rather than at each arm's own best dose. Theory's route was that the linear-resp
 underwriting every ratio holds only in the small-α regime, which best-dose reporting sits
 outside; the audit's route was the winner's curse. Convergent, and it is a reporting change
 rather than a compute one.
+
+## 00:14 — the dictionaries are trained on the content they steer
+
+Third harness audit, and a genuine scope limitation on the surviving results.
+
+`make_doc` draws from fixed module-level pools — ten CALM sentences, ten TENSE, a small carrier
+set — for **both** the dictionary training documents and the steering test documents. So the
+dictionaries are trained on activations from documents built out of the same twenty sentences
+they are later asked to steer.
+
+**The cost is narrower than it first appears.** The task is ordering, so both classes use the
+same sentences and a latent keyed on sentence *identity* cannot separate them; the
+row-permutation control breaks a lookup as readily as a genuine profile. What is not ruled out
+is that the latent is specific to these twenty sentences' embeddings rather than encoding the
+factor in general. So the honest statement of the current headline is **"a crosscoder can steer
+the ordering of content it was trained on"** — real, and smaller than it reads.
+
+**The fix upgrades the claim from a corpus to a mechanism**, and costs one cache plus one
+retrain: train on sentences 0–6 of each pool, evaluate steering on 7–9, everything else
+identical. Survives → the latent is a general attribute-schedule feature and the claim becomes
+*steers this factor*. Fails → much better known now. Running on `recency` and `evidence`, the
+two results the summary rests on.
+
+**For demonstration order it is a build requirement rather than a refinement**: a
+demonstration-order latent trained on the very demonstrations it steers is a far more plausible
+lookup than a sentence-order latent, because demonstrations are longer and more distinctive.
+Disjoint pools for training and evaluation.
+
+Three audits, all from reading our own harness rather than from an external objection:
+
+| finding | status |
+| --- | --- |
+| Frobenius norm ≠ injected norm when segment lengths vary | real design issue; equalise lengths, log realised injected norm |
+| `at_best()` dose selection is a winner's curse | quantified and **favourable** — inflates the flat and null arms by 0.3–0.4 SEM, so the reported gap is understated |
+| dictionaries trained on the content they steer | scope limitation; cheap fix now running |
+
+That all three came from auditing our own code is worth a line in the methodology section. The
+external literature produced the screening principle; the internal audits produced every
+correction that changed a number.
