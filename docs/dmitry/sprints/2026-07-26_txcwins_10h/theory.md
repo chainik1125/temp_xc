@@ -1,0 +1,548 @@
+---
+author: Dmitry Manning-Coe
+date: 2026-07-26
+tags:
+  - design
+  - in-progress
+---
+
+## What this document is
+
+Task designs and registered predictions for the sprint goal: find further settings where a
+temporal crosscoder beats a TopK SAE and a tSAE. It takes as given everything in
+[[../2026-07-25_dictbench_10h/summary|last sprint's summary]] — steering not reading, the
+constant-write argument, the geometric recovery ceiling, realised-L0 discipline — and does
+not re-derive them.
+
+The central move is to replace "permutation-invariance of the factor" with a **quantitative**
+criterion. Permutation-invariance is binary and only says *whether* a constant write is
+helpless. What is actually available is a three-number decomposition of the optimal write,
+computable from a supervised difference-of-means slab **before any dictionary is trained**,
+which predicts how much of the achievable steering effect each architecture can reach. That
+turns "the crosscoder should win here" from a hunch into a number with an error bar.
+
+Reading order if short on time: § The write algebra, § The screening statistic, then the
+ranked table in § Ranking. Designs D1, D2, D6 are the ones to build first.
+
+## The write algebra
+
+Fix a latent and a dose. Every intervention in this project is an additive write to the
+residual stream over a window of `T` segments, so it is an element of `R^{T×d}`. The
+architectures differ only in which subspace of `R^{T×d}` they can reach.
+
+```text
+SAE latent j, dose α:   x_t ← x_t + α · v_j            v_j ∈ R^d, same for every t
+TXC latent j, dose α:   x_t ← x_t + α · P_j[t]         P_j ∈ R^{T×d}
+```
+
+Write `W ∈ R^{T×d}` for the assembled write. The reachable sets form a ladder:
+
+| level | write form | reachable by | free parameters the experimenter must supply |
+| --- | --- | --- | --- |
+| L0 | `α · 1_T ⊗ v` | one SAE latent, one dose | 1 (the dose) |
+| L1 | `α · s ⊗ v`, `s ∈ R^T` | one SAE latent + a hand-supplied dose schedule | `T` (the schedule) |
+| L2 | `α · P`, `rank(P) = 1` | one TXC latent (if its slab happens to be rank 1) | 1 |
+| L3 | `α · P`, `rank(P) = r > 1` | one TXC latent | 1 |
+| L4 | `Σ_j α_j P_j` | several TXC latents | `m` |
+
+Two separate claims live in this ladder and they are routinely conflated.
+
+- **L0 → L2 is an expressiveness claim about deployed practice.** A per-token dictionary, used
+  the way per-token dictionaries are used, writes the same vector at every position. This is
+  what last sprint measured (per-position spread exactly 0.0000) and it is what fails on the
+  order task.
+- **L1 → L3 is an expressiveness claim about the architecture itself.** An L1 write is *not*
+  something an SAE gives you: the schedule `s` has to come from somewhere. But a reviewer can
+  always say "hand the SAE a ramp", so any design whose optimal write is rank 1 wins only at
+  L0 → L2, and the honest statement there is about **discovery**, not representability.
+
+**Only a task whose optimal write has rank > 1 separates a crosscoder from the strongest
+possible per-token baseline.** Nothing in the sprint so far has checked the rank of an
+optimal write. That check is cheap and it is the first thing to run.
+
+### Why a constant write is annihilated by three different operators
+
+Three exact statements, each stronger than "the multisets are matched", each giving a
+different family of tasks. All are algebraic identities, not empirical tendencies.
+
+- **Difference operator.** Let `D : R^{T×d} → R^{(T−1)×d}`, `(DX)[t] = x_{t+1} − x_t`. For a
+  constant write, `D(X + 1_T ⊗ v) = DX` exactly. A per-token dictionary's write is in the
+  kernel of `D`. Any behavioural target that is a function of `DX` alone is unreachable by a
+  constant write, *for any dose, any direction, and any latent*. Gives the **rate/trend**
+  family (D5, D6).
+- **Argmax operator.** For any fixed read direction `u`, `argmax_t ⟨x_t + αv, u⟩ =
+  argmax_t ⟨x_t, u⟩`. A constant write shifts every position's projection by the same scalar
+  and therefore cannot move a peak, a crossing point, or an onset. Gives the **timing/phase**
+  family (D2, D4).
+- **Zero-sum rotation.** If two classes are cyclic rotations of the same `m` blocks, the
+  per-position difference-of-means slab has rows `b_t − b_{t+1}` which sum to exactly zero, so
+  its projection onto the constant subspace is **exactly** the zero matrix. The optimal write
+  is orthogonal to everything an SAE can write. Gives the **rotation ladder** (D1).
+
+The third is the tightest matching available and strictly improves on last sprint's order
+task, which matched the multiset and the switch count but not the run-length profile. A
+cyclic rotation matches the multiset, the switch count, the run-length multiset, and the
+phase-marginal of every block type simultaneously, because the two documents are literally
+the same string read from different starting points.
+
+## The screening statistic
+
+Let `P ∈ R^{T×d}` be the supervised per-position difference-of-means slab between the two
+classes — already computed as `P_dom` at `steer_order_modal.py:226`. Define three energy
+shares:
+
+```text
+c    = T · ‖mean_t P[t]‖² / ‖P‖_F²          constant share       (L0 reachable)
+r1   = σ₁² / ‖P‖_F²                          rank-1 share         (L1/L2 reachable)
+slab = 1 − r1                                slab-only residual   (L3 only)
+```
+
+where `σ₁` is the largest singular value of `P` viewed as a `T × d` matrix. Note `c ≤ r1`
+always, since the constant subspace is a subset of the rank-1 matrices.
+
+**The rank law (registered).** In the small-dose regime where the margin responds linearly to
+the write, and taking each arm's write rescaled to the same Frobenius norm, the steering
+effect of an arm restricted to subspace `Π` is
+
+```text
+Δ_Π / Δ_full  ≈  ‖Π P‖_F / ‖P‖_F  =  sqrt(energy share)
+```
+
+The square root, not the share itself: to first order `Δ ≈ α⟨W, G⟩` with `G` the gradient of
+the margin with respect to the activations; if `G ∝ P` then a norm-matched write in subspace
+`Π` gives `Δ ∝ ⟨ΠP, P⟩/‖ΠP‖ = ‖ΠP‖`. So predicted ratios are `sqrt(c)` for a constant write
+and `sqrt(r1)` for the best rank-1 write. **Measure at the smallest dose with a significant
+effect**, because the law is a linearisation and the existing alpha grid runs into saturation
+at the top end.
+
+This is the same kind of object as last sprint's best result — a pre-computable geometric
+quantity that measured recovery matches to three decimals — and it is why I would spend the
+first hour here rather than on a new corpus.
+
+**Three numbers, three verdicts, before a single dictionary trains:**
+
+| screen | verdict |
+| --- | --- |
+| `c` large (> 0.3) | a constant write can do most of the job; no design here, discard the task |
+| `c ≈ 0`, `r1 ≈ 1` | plain SAE fails, scheduled SAE ties the TXC — the win is discovery, not expressiveness |
+| `c ≈ 0`, `r1 < 0.6` | the only regime where a slab is structurally required; build the task here |
+
+**Registered retro-diction on data already in hand.** The existing order task
+(`results/dict_bench/steer_order.json`, two blocks swapped) is an `m = 2` rotation, so block
+algebra says `c = 0` and `r1 = 1`: the optimal write is `[+Δ, −Δ]`, rank 1. If the measured
+`r1` on the real `P_dom` comes back at 1.00, then last sprint's headline is an L0 → L2 result
+and a scheduled SAE would have closed it — which must be said plainly. If `r1` comes back
+appreciably below 1, the excess rank is contributed by the **causal history**: `x_t` in class
+A at late positions is not the mirror of class B, because each token has its own prefix
+written into it. That would be a small and pleasing reversal — the same property that made
+reading comparisons hopeless makes steering comparisons *easier*, because it raises the rank
+of the optimal write above what the block algebra alone would give.
+
+Either answer is publishable and the run is one SVD on a tensor that already exists.
+
+## The rotation spectrum
+
+The `m`-block rotation is the design this document leans on hardest, so its spectrum is worth
+deriving rather than guessing. **I guessed it first and got it wrong**; the numbers below are
+checked against measured SVDs and agree to four decimals, script in
+`scratchpad/rank_check2.py`.
+
+Write `P = C B`, where `B ∈ R^{m×d}` holds the block content vectors and `C` is the circulant
+matrix with first row `(1, −1, 0, …, 0)`. For orthonormal centred `B`, the singular values of
+`P` are those of `C`, whose symbol is `f(ω) = 1 − ω`:
+
+```text
+σ_j² = 4 sin²(π j / m),   j = 0 … m−1
+Σ_j σ_j² = 2m
+σ_0² = 0                                  <- the constant mode, so c = 0 exactly
+r1 = 4 sin²(π ⌊m/2⌋ / m) / (2m)
+   = 2/m                    for even m
+   = 2 cos²(π/(2m)) / m     for odd m
+```
+
+Both branches approach `2/m`. The earlier guess `r1 = 1/(m−1)` is right only at `m = 2, 3` and
+is wrong from `m = 4` on.
+
+| m | rank | `r1` | `sqrt(r1)` | top-2 share | block length at `k_seg = 12` |
+| --- | --- | --- | --- | --- | --- |
+| 2 | 1 | 1.000 | 1.000 | 1.000 | 6 |
+| 3 | 2 | 0.500 | 0.707 | **1.000** | 4 |
+| 4 | 3 | 0.500 | 0.707 | 0.750 | 3 |
+| 6 | 5 | 0.333 | 0.577 | 0.583 | 2 |
+| 12 | 11 | 0.167 | 0.408 | 0.322 | 1 |
+
+Three consequences for the design, none of which were visible before doing the arithmetic:
+
+- **`m = 4` is a wasted rung.** It has the same `r1` as `m = 3`, because `σ²` is
+  `4 sin²(πj/m)` and the maximum saturates at 4 for every even `m`. Sweep
+  `m ∈ {2, 3, 6, 12}` — all of which divide `k_seg = 12` — for `r1 = 1.00, 0.50, 0.33, 0.17`.
+- **The spectrum is degenerate in pairs** (`j ↔ m − j`), so a rank-**2** arm is far more
+  informative than the rank-1 arm alone. At `m = 3` the rank is exactly 2, so `txc_rank2`
+  should recover **100%** of `txc_slab`; the top-2 shares at `m = 4, 6, 12` are
+  0.750, 0.583, 0.322. Add `txc_rank2` to the arm ladder — it is one more line and it turns a
+  single point into a curve.
+- **The gap widens only as `2/m`**, which is slow. To halve the scheduled-SAE ceiling you must
+  double the number of blocks, which at fixed `k_seg` halves the block length. At `m = 12` the
+  blocks are single segments and the two classes are one document rotated by one sentence, so
+  the *absolute* effect will be small even though the *relative* gap is largest. Expect the
+  measurement to get harder exactly where the theory predicts the biggest win.
+  Recommendation: `m ∈ {2, 3, 6}` as the workhorse, `m = 12` as a stretch rung run last.
+
+The `sqrt(r1)` law itself survived the check: under the linear-response assumption `G ∝ P`,
+the norm-matched rank-1 write recovers `sqrt(r1)` of the full effect to three decimals at
+every `m` tested. That is a check of the algebra only — whether `G ∝ P` holds in a real model
+is the empirical question the sweep answers.
+
+## Structural properties
+
+Each entry states the property, the exact reason a constant-in-time write cannot express it,
+and which level of the ladder it reaches.
+
+### P1 — the write must change sign across the window
+
+Target: suppress a behaviour early and induce it late (or the reverse). Requires
+`⟨W_t, u⟩ < 0` for small `t` and `> 0` for large `t`, for the behaviour's read direction `u`.
+A constant write has `⟨αv, u⟩` of a single sign at every position, so the sign pattern is
+unreachable **for any `v` and any `α`**. Reaches L2 only: the write `s ⊗ u` with `s` a sign
+ramp is rank 1, so a scheduled SAE ties. Relevance is high (comply-then-refuse; explore-then-
+commit); expressiveness claim is weak.
+
+### P2 — simultaneous opposite writes on *different* features
+
+Target: suppress feature A at early positions while inducing a *different* feature B at late
+positions, with `u_A ⊥ u_B`. Then the optimal write is `W = [−β u_A ; +γ u_B]` block-wise,
+whose rank is 2, and the best rank-1 approximation captures `max(β², γ²)/(β² + γ²) < 1` of
+the energy. **No single direction with any schedule can do it**, so this is the first property
+that reaches L3. This, not P1, is the property worth hunting.
+
+The clean generator for P2 is not a two-block swap — every two-block swap is rank 1, because
+the difference slab is `[+Δ, −Δ]`. It is an **`m`-block cyclic rotation with `m ≥ 3`**: the
+rows `b_t − b_{t+1}` sum to zero and span an `(m−1)`-dimensional space, so rank is exactly
+`m − 1`. The energy is *not* spread evenly across those `m − 1` modes — see § The rotation
+spectrum for the closed form, which is `r1 ≈ 2/m`, not `1/(m−1)`. That is a tunable knob on
+the expressiveness gap, but a slower one than it first appears.
+
+### P3 — the target is a rate, not a level
+
+Target defined by `DX` only, with the level matched between classes. Constant writes are in
+`ker D` exactly. This is the strongest algebraic statement available and it supports a
+**double dissociation** rather than a one-sided comparison (D6), which is the most
+objection-proof design in this document.
+
+### P4 — onset and offset timing
+
+Target is *when* a behaviour starts, given that it occurs in both classes. Constant writes
+cannot move an argmax, a first-crossing, or a peak location. Matched by cyclic rotation of a
+localised block, so the multiset, the duration and the number of transitions are identical and
+only the phase differs. Reaches L2 (the required write is a localised bump, approximately
+rank 1) unless the pre-onset and post-onset regions differ in *direction* as well as sign.
+
+### P5 — the target is a relation between two positions
+
+A-before-B, cause-before-effect, trigger-before-payload. This is the order task's property and
+is already established; listed for completeness. Reaches L2.
+
+### P6 — duration at matched total mass
+
+Target: the behaviour is active for 3 segments at high intensity versus 6 at half intensity.
+**Predicted to fail** as a separator: if the behavioural readout is a threshold crossing,
+`1[⟨x_t, u⟩ > θ]`, a constant write raises every position's projection and therefore does
+change the number of positions above threshold. A constant write is a crude but genuine
+duration knob. Expect `c` to come back large; expect the SAE to get a substantial fraction.
+
+### P7 — the per-token dictionary cannot *learn* the feature
+
+The tempting claim: if two classes have identical per-segment marginals and differ only in the
+joint arrangement, a reconstruction-trained per-token dictionary sees one distribution and
+cannot allocate a selective latent. **This is wrong here and should not be attempted.** The
+subject model is causal, so `x_t` carries its prefix; matching the marginals of the *labels*
+does not match the marginals of the *activations*. This is the same mechanism that gave the
+SAE AUC 1.000 on a task designed to defeat it. Listed as a predicted failure so nobody
+rediscovers it at 3 a.m.
+
+### P8 — selectivity: collateral damage of a write that *can* reach the target
+
+Distinct from all of the above and probably the most practically relevant. Even where a
+constant write can move the target factor, it necessarily perturbs **every** position,
+including those where no change is wanted. A slab can write zero where zero is wanted. So the
+comparison should never be raw Δ alone: report Δ on the target factor against a cost measured
+as KL divergence from the unsteered model on held-out neutral text at the same injected norm.
+Prediction: the crosscoder dominates the (Δ_target, KL_collateral) frontier **even on tasks
+where the raw Δ ties**, because it can concentrate its budget. This is one extra forward pass
+per document and applies to every design below.
+
+### P9 — position-dependent norm is a confound, not a property
+
+The residual stream's norm grows with position, so a constant write is a *smaller relative*
+perturbation late in the window and a slab can learn a compensating envelope. A crosscoder can
+therefore win for an entirely uninteresting reason: it learned `1/‖x_t‖`. Neither the
+`txc_flat` control (removes the profile entirely) nor `random_slab` (flat expected norm
+profile) catches this. **The control that catches it is `sae_enveloped`** — see the arm ladder
+below. Flagging this as the most likely spurious mechanism for a crosscoder win tonight.
+
+### P10 — the crosscoder's write is indexed by absolute position
+
+Scope limit, not a property. The slab spans `T` segments and indexes them by position within
+the window. Two consequences: structure at scales longer than `T` gets no advantage at all,
+and the write is only meaningful if the window is *aligned* to the behaviour. The current
+harness aligns by writing over segment token spans, which is why it works. Under free
+generation, segment boundaries move and position indices decorrelate from semantics — see
+§ Scope limits.
+
+## The arm ladder
+
+Every design below runs the same arms. Four are new. The point of the ladder is that the Δ
+between consecutive rungs attributes the effect to exactly one property of the write.
+
+| arm | write | isolates |
+| --- | --- | --- |
+| `zero` | none | base drift |
+| `sae_broadcast` | SAE latent direction at every position | L0, deployed practice |
+| `random_broadcast` | random unit direction at every position | whether a constant write of *any* direction does anything |
+| **`sae_enveloped`** *(new)* | SAE direction, scaled per position by the TXC slab's own norm profile `‖P[t]‖` | **separates gain envelope from direction schedule; the P9 control** |
+| **`txc_rank1`** *(new)* | best rank-1 approximation `σ₁ u₁ v₁ᵀ` of the TXC slab | the L1/L2 boundary — how much of the slab is a schedule |
+| `txc_slab` | full TXC slab | L3 |
+| `txc_flat` | TXC slab time-averaged and rebroadcast | that the profile, not the mean direction, does the work |
+| `random_slab` | random `(T, d)` slab | that it is not any structured perturbation |
+| **`dom_rank1`** *(new)* | best rank-1 approximation of the supervised DoM slab | the rank law's prediction, supervised |
+| `dom_slab` | supervised per-position DoM slab | ceiling |
+| **`txc_transfer`** *(new)* | TXC slab selected on corpus 1, applied without refitting to corpus 2 | that the schedule is a learned property, not a fitted nuisance parameter |
+
+All rescaled to the same total injected Frobenius norm. `sae_enveloped` and `txc_rank1` are
+the two that decide whether the sprint's headline is an expressiveness claim or a discovery
+claim, and both are a few lines from tensors the existing script already builds.
+
+`txc_transfer` is what makes an L1/L2 design worth running at all. If the schedule transfers
+to held-out documents and to a structurally similar but lexically disjoint corpus with no
+refitting, then "the experimenter could have supplied the schedule" is answered by "they would
+have had to know it, and the crosscoder did not".
+
+## Task designs
+
+### D1 — rotation ladder (the expressiveness result)
+
+**Classes.** `m` semantically distinct sentence blocks laid end to end. Class A is the
+canonical order `(1, 2, …, m)`; class B is the cyclic rotation `(2, 3, …, m, 1)`. Same
+sentences, same counts, same run lengths, same number of transitions, same everything except
+the starting point. Sweep `m ∈ {2, 3, 4, 6}` at fixed total segment count (`k_seg = 12`, so
+block length `12/m`).
+
+**Readout (reading).** Pooled per-token SAE code versus window code, AUC. Expect the SAE to
+win as always; run it only to keep the reading/steering dissociation on the record.
+
+**Write (steering).** Teacher-forced margin `logP(A) − logP(B)` on multiset-matched pairs, the
+existing metric, no judge.
+
+**Controls.** The full arm ladder. Additionally the pre-computed `c` and `r1` from the DoM
+slab at each `m`.
+
+**Registered predictions.**
+
+- `c = 0.00 ± 0.02` at every `m` (algebraic; a nonzero value means the harness is
+  mis-aligning windows and everything downstream is suspect — treat as a harness gate).
+- `sae_broadcast` Δ ≈ 0 at every `m`.
+- `r1 ≈ 1/(m−1)` up to the anisotropy of the block vectors, so `r1 ≈ 1.00, 0.50, 0.33, 0.20`
+  for `m = 2, 3, 4, 6`. Report the measured value; the *prediction under test* is the
+  monotone decrease, not the exact constants.
+- **The rank law:** `Δ(txc_rank1)/Δ(txc_slab) ≈ sqrt(r1)`, i.e. ≈ `1.00, 0.71, 0.58, 0.45`.
+  Same for `dom_rank1/dom_slab`. If the observed ratio is flat in `m`, the law is wrong and
+  the rank account of the advantage fails — a clean negative.
+- At `m = 2` the crosscoder's advantage over `sae_enveloped` is **zero within noise**. This is
+  a prediction that the last sprint's headline task is *not* an expressiveness win.
+
+**What kills it.** `sae_enveloped` matching `txc_slab` at `m ≥ 3`. That would mean the gain
+envelope carries everything and the direction schedule is decorative, which would reduce the
+whole programme to "the crosscoder discovers a dose schedule".
+
+**Cost.** One training run per `m`, reusing `steer_order_modal.py` with a rotated document
+generator. Cheapest design here and the only one that yields a law.
+
+### D2 — refusal onset (the relevance flagship)
+
+**Classes.** Borderline requests where both continuations contain the same clauses. Class A =
+engage-then-decline ("Here is the general background … *However*, I can't help with the
+specific steps."); class B = decline-then-engage ("I can't help with the specific steps.
+*That said*, here is the general background …"). Sentence multiset matched by construction;
+only the connectives differ and they are held to a fixed pair across all items.
+
+**Readout.** Same pooled-versus-window AUC, for the record.
+
+**Write.** Teacher-forced Δmargin between the two orderings. **No judge, no sampling** — which
+is the whole reason to use ordering as the target rather than refusal rate.
+
+**Controls.** Full arm ladder, plus the P8 selectivity metric: KL from the unsteered model on
+a held-out set of benign prompts at the same injected norm.
+
+**Registered predictions.**
+
+- `c ≈ 0`, `r1` high (this is an `m = 2` rotation) — so `sae_broadcast` ≈ 0 and
+  `sae_enveloped` ≈ `txc_slab`. The expressiveness gap is predicted to be **absent**; the
+  discovery gap and the selectivity gap are what this design is for.
+- `txc_transfer` from the finance/medical-style corpus of the EM work to this one retains
+  ≥ 50% of the effect. If it retains ~0, the schedule is corpus-specific and the discovery
+  claim weakens to "fits a nuisance parameter".
+- Crosscoder KL cost at matched Δ is **lower** than the SAE's by a clear margin, because it
+  need not perturb the early engaging segments.
+
+**Relevance note.** This is directly the second temporal steering task in the reviewer-response
+workstream, and "refuse after explaining, not before" is a documented preference. If any
+design here ends up in a paper, it is this one.
+
+### D3 — three-phase reasoning rotation (D1 with relevance)
+
+**Classes.** Reasoning traces with three genuinely distinct modes — *explore* ("One option is
+…"), *commit* ("So the answer is …"), *verify* ("Checking: …"). Class A = explore/commit/
+verify; class B = the rotation commit/verify/explore. This is D1 at `m = 3` with content
+anyone would recognise, so it inherits D1's rank-2 guarantee **and** connects to reasoning
+structure and to this repo's backtracking case study.
+
+**Prediction.** As D1 at `m = 3`: `r1 ≈ 0.5`, `sae_enveloped` at ≈ 0.71 of `txc_slab`,
+`sae_broadcast` ≈ 0. If it replicates D1's numbers on semantically real blocks, D1 stops being
+a construct.
+
+**Risk.** The three modes may not be equidistant in activation space — verify and commit may be
+close, collapsing the rank toward 1. That is measurable in advance from `r1` and is a reason to
+compute the screen on candidate corpora *before* committing training compute.
+
+### D4 — onset phase shift
+
+**Classes.** A localised block of `L` "shifted-register" sentences embedded in a neutral
+carrier of 12 segments, starting at position 2 versus position 7. Cyclic, so the multiset,
+block length and transition count are all identical.
+
+**Write.** Δmargin between early-onset and late-onset orderings.
+
+**Prediction.** `sae_broadcast` ≈ 0 by the argmax argument. `r1` high (the required write is a
+bump envelope times one direction), so `sae_enveloped` ties. Reaches L2. Run it as the
+cleanest demonstration of the argmax identity, not as an expressiveness claim.
+
+### D5 — trend at matched level
+
+**Classes.** Twelve sentences drawn from a graded intensity scale, sorted ascending versus
+descending. Identical multiset, identical mean intensity, opposite trend.
+
+**Write.** Δmargin between ascending and descending orderings.
+
+**Prediction.** `c = 0` exactly (the DoM slab is antisymmetric about the window centre so its
+time-average is zero); `r1 ≈ 1` (rank-1: a linear ramp times the intensity direction).
+`sae_broadcast` ≈ 0. Reaches L2. Its value is as the first half of D6.
+
+### D6 — the level/trend double dissociation (the objection-proof design)
+
+**The design.** Cross architecture with factor on the *same* corpus and the *same* dictionaries:
+
+| factor | class A | class B | matched |
+| --- | --- | --- | --- |
+| level | high-intensity document | low-intensity document | length, topic, ordering pattern |
+| trend | ascending intensity | descending intensity | multiset, mean level |
+
+Train one SAE and one crosscoder on this corpus. Steer both factors with both architectures.
+Four cells.
+
+**Registered prediction — a crossover, not a main effect.**
+
+- Level cell: `sae_broadcast` ≥ `txc_slab`. A constant write is *exactly* matched to a level
+  target, and the crosscoder pays for its slab with worse reconstruction (last sprint: FVU
+  ratio 1.2–2.7× at matched realised sparsity). **The SAE should win this cell**, and if it
+  does not, something is wrong with the crosscoder-side normalisation, not with the theory.
+- Trend cell: `txc_slab` ≫ `sae_broadcast ≈ 0`, by the `ker D` identity.
+- Interaction significant at the same injected norm and the same dictionaries.
+
+**Why this is the best control in the document.** Every "the crosscoder just writes better /
+covers more slots / has a larger projection / benefits from the norm envelope" objection
+predicts a **main effect** of architecture. None of them predicts a *crossover* in which the
+SAE wins one cell outright. A significant interaction rules out the entire class in one
+experiment, and it costs one extra factor on a corpus that has to be built anyway for D5.
+
+**Cost.** One corpus, two dictionaries, four steering evaluations. Highest information per GPU
+hour in this document.
+
+### D7 — sandbagging as a trend target
+
+**Classes.** Responses whose competence declines across the window versus rises, matched on
+final answer and on total content. The trend instance of P3 with a safety-relevant label.
+
+**Prediction.** Structurally identical to D5 (rank 1, `c = 0`), so the same L2 result. Its
+value is entirely relevance; run it only if D5/D6 land and there is time. **Caveat:** matching
+"competence" across two orderings without a judge is much harder than matching lexical
+content, and a teacher-forced margin between competence-ascending and competence-descending
+orderings may be dominated by fluency rather than by competence. Treat the metric as unproven.
+
+### D8 — change-count, regular versus irregular spacing
+
+Carried over from the previous sprint's amendment A10, restated because it was never run.
+Hold balance *and* change-point count fixed and vary only the arrangement. Registered there:
+pooled SAE codes > 0.85 AUC on fast-versus-slow alternation and ≈ 0.5 on
+regular-versus-irregular.
+
+**My prediction is that the reading half fails** for the P7 reason — the causal model's
+history-writing gives pooled codes access to arrangement, as it did every previous time. The
+steering half is a rotation-family design and is subsumed by D1, which matches more tightly
+and yields a law. **Recommendation: do not run D8**; it is D1 with looser matching.
+
+## Ranking
+
+Scored as (probability the effect is real and survives its own controls) × (relevance to a
+behaviour someone would actually want to steer). A construct that isolates a mechanism scores
+low on relevance by definition, however clean it is.
+
+| rank | design | P(real) | relevance | why |
+| --- | --- | --- | --- | --- |
+| 1 | **D6 level/trend dissociation** | 0.75 | medium | the only design whose prediction is a crossover, so it answers the objections the others cannot; intensity trend is a real if unglamorous target |
+| 2 | **D1 rotation ladder** | 0.70 | low | the only design that yields a quantitative law (`sqrt(r1)`) and the only one that reaches L3; relevance is low and should be conceded up front |
+| 3 | **D2 refusal onset** | 0.55 | high | highest relevance by a distance and it needs no judge, but predicted to be an L2 result — the win is on discovery and selectivity, not expressiveness |
+| 4 | D3 three-phase reasoning | 0.45 | medium-high | D1's guarantee on real content, at the risk that the three modes are not equidistant |
+| 5 | D4 onset phase shift | 0.65 | medium | cleanest demonstration of the argmax identity; L2 only |
+| 6 | D5 trend alone | 0.70 | low | subsumed by D6; run only as D6's first cell |
+| 7 | D7 sandbagging | 0.30 | high | the metric is unproven without a judge |
+| 8 | D8 change-count | 0.15 | low | predicted to fail on the reading half and subsumed on the steering half |
+
+**Recommended order.** The SVD screen on the existing `P_dom` (minutes, and it retro-dicts the
+last sprint's headline) → D1 at `m ∈ {2, 3, 4}` → D6 → D2. D3 if D1 lands and time remains.
+
+## Predicted failures
+
+Negative predictions, stated now so they count.
+
+- **Every reading comparison.** Settled last sprint. Report the AUCs for the record and spend
+  no compute optimising them.
+- **P7 in any form.** Matching label marginals does not match activation marginals under a
+  causal model.
+- **D6's level cell for the crosscoder.** The SAE should win it. If the crosscoder wins every
+  cell, suspect the injected-norm matching before believing the result.
+- **`sae_enveloped` ≈ `txc_slab` on all two-block designs** (D2, D4, D5). Two-block swaps are
+  rank 1 and cannot separate a slab from a schedule. Any write-up claiming an expressiveness
+  advantage from a two-block task is claiming something the algebra forbids.
+- **Free-generation versions of any of these.** The slab is indexed by position; under
+  sampling the segment boundaries move and the write desynchronises from the semantics. Expect
+  a large shrinkage relative to teacher-forced Δmargin. If generation is attempted, apply the
+  slab in *segment* coordinates with online sentence-boundary detection, and report the
+  teacher-forced number alongside so the shrinkage is visible.
+- **The tSAE arm producing a usable number without recalibration.** Carried debt 1 from the
+  kickoff. At `lam = 1/(4·d_in)` the sparsity coefficient needs to be ~1–10, not 1e-3. If it
+  has not been calibrated by the time results are written, report the arm as absent rather
+  than as dense.
+
+## Scope limits worth stating in the write-up
+
+- **The advantage is bounded to structure at scales ≤ `T`.** Nothing about a window code helps
+  with a dependency longer than the window, and the previous sprint measured that
+  reconstruction degrades as `T` grows. There is an operating regime, not a monotone
+  improvement, and the write-up should name it.
+- **The crosscoder pays for the slab in reconstruction** — 1.2× to 2.7× worse FVU at matched
+  realised coefficients per segment. Any steering claim should be reported next to that price.
+- **Alignment is doing work.** The harness writes over segment token spans, so the window is
+  aligned to the behaviour by construction. That is a legitimate design choice, and it is also
+  a load-bearing assumption that the write-up should not leave implicit.
+- **Selection hygiene.** Latents are chosen by AUC; choose them on a held-out selection split
+  and report frequency-matched null draws, as the previous sprint's amendment A3 requires.
+
+## Related
+
+- [[start]] — sprint kickoff
+- [[../2026-07-25_dictbench_10h/summary|previous sprint summary]] — what is already
+  established and must not be re-derived
+- [[../2026-07-25_dictbench_10h/fairness_preregistration|fairness pre-registration]] — the
+  win criteria and the confound catalogue this document assumes
+- [[../2026-07-25_dictbench_10h/harness_guide|harness guide]] — decoder indexing, the
+  `sqrt(T)` normalisation asymmetry, and the traps

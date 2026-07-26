@@ -89,3 +89,65 @@ citation drives no experiment selection in either direction.
 to be computable from runs that already exist — `stacked_sae` is in the backtracking
 workstream's `arch_list` — and has never been reported. Review is confirming the files are
 recoverable before implement is asked to spend time on it.
+
+## 22:55 — the rank reframe, and a correction to last sprint's headline
+
+The theory agent has replaced the sprint's selection criterion with a sharper one, and it
+carries a correction to the previous sprint that is worth stating before anything else.
+
+**Interventions live in R^(T,d), and the operative quantity is the rank of the optimal
+write**, not whether the factor is permutation-invariant:
+
+| level | write | reachable by |
+| --- | --- | --- |
+| L0 | `α·1_T⊗v` | one SAE latent, one dose — deployed practice |
+| L1 | `α·s⊗v` | SAE plus a hand-supplied per-position dose schedule; **rank 1** |
+| L2 | rank-1 TXC slab | same expressiveness as L1; the schedule was *learned* |
+| L3 | rank>1 slab | **no per-token dictionary, under any schedule** |
+
+**The correction.** Every two-block swap has a rank-1 optimal write — its
+difference-of-means slab is `[+Δ, −Δ]`. So last sprint's order task was an L0→L2 result, and
+the summary's claim that the crosscoder buys "a temporally structured write that the
+per-token dictionary cannot express at any budget" is too strong. An SAE handed a
+per-position dose schedule reaches L1, which is the same expressiveness. What survives is
+the **discovery** claim: the crosscoder found the schedule, and handing it to an SAE requires
+knowing it in advance. The prior summary will be corrected and this sprint's write-up will
+say so plainly. This is exactly the objection a reviewer would raise, and it is better found
+here.
+
+It also rules out a class of follow-ups: new two-block tasks — refusal-order, ramp-up vs
+ramp-down — cannot produce an expressiveness claim no matter how cleanly they run.
+
+**The SVD screen, promoted to job one.** `P_dom` is already built at
+`steer_order_modal.py:226`; three numbers from it screen a task before any dictionary
+trains:
+
+```text
+c    = T·‖mean_t P[t]‖² / ‖P‖_F²      constant share    (L0 reachable)
+r1   = σ₁² / ‖P‖_F²                    rank-1 share      (L1/L2 reachable)
+1−r1 = slab-only residual                                (L3 only)
+```
+
+`c > 0.3` → discard the task, an SAE can do it. `c≈0, r1≈1` → discovery claim only.
+`c≈0, r1<0.6` → build there. Registered rank law, to be measured at the **smallest** dose
+with a significant effect since last sprint's α grid was saturated at the top:
+`Δ_Π/Δ_full ≈ ‖ΠP‖_F/‖P‖_F` — a square root, because Δ ≈ α⟨W,G⟩ with G ∝ P.
+
+**Four arms the harness was missing**, now standard. The important one is `sae_enveloped` —
+the SAE direction scaled per position by the crosscoder slab's own norm profile ‖P[t]‖. It
+controls the likeliest spurious win, where residual norm grows with position and a slab wins
+merely by learning 1/‖x_t‖. Neither `txc_flat` nor `random_slab` catches that, so last
+sprint's result has an untested alternative explanation. Also added: `txc_rank1`,
+`dom_rank1`, and `txc_transfer` (slab fitted on one corpus, applied to another without
+refitting — the arm that turns "you could have supplied the schedule" into "you would have
+had to know it"). Plus selectivity on every design: Δ_target against KL from the unsteered
+model on neutral text at matched norm.
+
+**Queue is now** SVD screen → D1 rotation ladder (m ∈ {2,3,4}) → D6 level/trend
+dissociation → D2 refusal onset. Induction moves behind D1 and gets rank-screened first: its
+virtue is a foil the induction literature already uses as its own control, but if its
+optimal write is rank-1 it is another discovery-only claim.
+
+D1 is the only queued design that can produce an L3 result. Its harness gate is exact: DoM
+rows `b_t − b_{t+1}` sum to zero, so `c = 0` identically, and a nonzero measured `c` means
+the windows are misaligned and everything downstream is suspect.
