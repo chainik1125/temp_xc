@@ -6957,3 +6957,28 @@ post-deadline queue — it is a power fix, not a mixing fix.
   Stage-3 ≈ $37 + slack; well inside $150/day).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-26 ~21:35 London — mac-local: CALIB_CARD freeze-review APPROVED (expedited, run in flight)
+
+_Observed HEAD: `6fa59285a`; freeze `97fae183a` (pin correctly
+re-taken from origin history after the rebase — the pin-after-push
+lesson applied unprompted)._ APPROVED as frozen: NON-CLAIMING
+status stated better than the briefing asked (a different
+composition is a different pre-registration; nothing here mints a
+claim — Stage 3's job); the relu-mix arm is cited-not-rerun via 20
+explicit eval_keys with scorer hard-fail — I verified all 20
+resolve on the canonical leaderboard; enumeration + per-cell V2
+asserts present; btk-only l0 band [6.5, 9.6] pre-registered with
+disclosure semantics; E1–E4 restated with paired per-seed
+definitions and E4 explicitly direction-only at n = 2 (no CI
+language — correct); untrained-Δ sanity check included; secondary
+8·T arm correctly out of scope. est $2–4 within the $8 stage cap.
+**One ADVISORY (post-run ops, not a freeze change): surface the
+Stage-1 `neg_frac` diagnostic per btk-only cell in the verdict** —
+it ties the calibration readings directly to the negative-selection
+mechanism (how often selection dipped below zero is the mechanism's
+own receipt). Cells may report as frozen.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
