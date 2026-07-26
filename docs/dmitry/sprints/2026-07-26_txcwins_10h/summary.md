@@ -280,13 +280,23 @@ gradient's support is set by where the two classes differ — but the second is 
   | crosscoder | +3.81 | +4.82 | +4.63 |
   | **best possible constant write** (supervised) | **+4.01** | **+4.01** | **+4.01** |
 
-  **The reading selector was costing the SAE 6–30× and the crosscoder nothing.** The SAE's reading
-  pick carries **8–16%** of the best available first-order alignment and is indistinguishable from
-  an arbitrary draw at this `n` (ranks 2507 / 2222 / 3138 of 4096; sign test p = 0.125). The
-  crosscoder's pick is **rank 1 of 4096 in 3 of 3** — its reading, gradient and measured-steering
-  selectors all choose the same latent, p ≈ 1.5 × 10⁻¹¹ against the same null. **The significant
-  finding is the asymmetry between the two selectors**, not the SAE half alone. The crosscoder
-  still beats the SAE, but the ratio falls from ~26× to **2.7×**.
+  **The reading selector is badly wrong for both architectures, and which one it penalises more is
+  task-dependent.** On instruction position it cost the SAE 6–30× and the crosscoder **nothing** —
+  that cell's reading pick is already its best latent, which is why the headline z = +15 to +18 is
+  robust to the selector. But that is the exception. On `rotate12` the selector cost the
+  **crosscoder** 3.2–3.5× (+3.36 → +10.63) and on `rotate6` **6.5×** (+0.84 → +5.42) — more than it
+  cost the SAE in both. Across 13 runs the median reading-pick rank is SAE 1866 and crosscoder 714
+  of 4096: the crosscoder is better on average and nowhere near rank 1, and on `rotate2` and
+  `rotate6` the SAE's pick is the better of the two.
+
+  So the recommendation is not "select by steering for per-token dictionaries" but **select by
+  measured steering for every architecture on every task** — precisely because which arm the
+  reading selector hurts more cannot be predicted.
+
+  ⚠ **This makes every reading-selected number in this document a lower bound.** All results
+  predating the selection experiment — including the rotation and phase ladders as reported above —
+  understate **both** arms, by 1.2× to 12× depending on the cell. The seven-task `broadcast_optimal`
+  sweep is unaffected, since it used steering selection for every arm on every cell.
 
   ⚠ **The `broadcast_optimal` arm is the qualification that matters.** The best constant write in
   the *whole space* — not the best of 4096 atoms — reaches **+4.01** against the crosscoder's
