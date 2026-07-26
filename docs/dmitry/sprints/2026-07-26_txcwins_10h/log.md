@@ -465,3 +465,110 @@ their axis is **distance**, ours is **order at matched multiset**; they compare 
 *within* a per-token code, we compare against a full window code; and they did not evaluate
 crosscoders at all. The whitespace the review agent found earlier — no dictionary work on
 prompt-order sensitivity — is narrower than it first looked, and the write-up should say so.
+
+## 23:00 — the theoretical spine: every per-token dictionary is rank-1 by its decoder
+
+Read the decoders rather than argued about them:
+
+| architecture | decoder | write rank per latent |
+| --- | --- | --- |
+| TopK SAE | `W_dec = (d_in, d_sae)` | 1 |
+| Persistent SAE | leaky integrator → standard decoder | 1 |
+| T-SAE (attention or InfoNCE) | `D = (width, dimin)` — **no position axis** | 1 |
+| TemporalCrosscoder | `W_dec = (d_sae, T, d_in)` | up to T |
+
+> **Every per-token dictionary has exactly one decoder direction per latent, so its write is
+> rank 1 however sophisticated its temporal encoder is. Only a window dictionary produces a
+> rank > 1 write.**
+
+In the tSAE all the temporal machinery is in the *encoder* — attention over causal context
+changes which coefficients fire and when, but never gives a latent a second write direction.
+So the whole capacity ladder's rungs 1–3 sit at L1 and differ only in **how the rank-1
+schedule is obtained** (fixed, learned scalar timescale, learned by contrastive encoder), not
+in rank. Registered consequence: at m=2 all four rungs tie; at m ≥ 3 only the crosscoder
+exceeds `sqrt(r1)`.
+
+## 23:02 — the strongest attack on last sprint's headline, and it is ours to run
+
+> A per-token dictionary's write is constrained to one **direction**. Whether it is constant
+> **in time** is a property of the *steering protocol*, not of the architecture.
+
+Last sprint's `sae_broadcast` — one direction, one dose, every position — is the **weakest**
+form of the SAE baseline. The protocol practitioners actually use scales a latent by its own
+activation, `α·z_j(x_t)·v_j`, which is position-varying, data-dependent, and rank-1. Under
+that protocol a plain TopK SAE reaches rank-1 slabs and **every rank-1 task ties**.
+
+Two arms settle it, both on data already on disk:
+
+- **`sae_profile_self`** — coefficient from the latent's activation on the current document.
+  Predicted ≈ 0 on rotation tasks, since amplifying what a document already contains raises
+  logP of A and B alike. **This is the one that matters**: it needs no supervision, so if it
+  works the discovery claim dies with the expressiveness claim.
+- **`sae_profile_target`** — coefficient from the latent's mean profile over class-A
+  documents, applied as a fixed schedule. The real L1 baseline. Predicted to close the gap
+  to `txc_slab` to within noise at m=2.
+
+If `sae_profile_target` ties, last sprint's headline needs qualifying — the advantage was
+over a weak *protocol* rather than over a per-token dictionary — and the sprint pivots to
+m ≥ 3, where the rank argument still bites. Better found here than by a reviewer.
+
+## 23:04 — the tSAE arm is unusable, and the reason is architectural
+
+The calibration is complete and negative. There is no usable `l1`: the coefficient does
+control sparsity once it is five to eight orders of magnitude above the documented value, but
+the dictionary dies before it becomes sparse.
+
+| l1 | coeff/segment | FVU | alive |
+| --- | --- | --- | --- |
+| 1e-3 (documented) | 2998 | 0.036 | 1.000 |
+| 10 | 1698 | 0.058 | 1.000 |
+| 100 | 151 | 0.318 | 0.999 |
+| 170 | 29 | **1.030** | 1.000 |
+| 1e6 | 0.7 | 1.221 | 0.002 |
+
+FVU > 1 is worse than predicting the mean. The `l1` range placing realised L0 in the 1–32
+band is roughly [225, 1.9e5] and every point in it is a dead dictionary; the last usable
+point is l1≈100 at 151 coefficients/segment with FVU 0.32, against a per-token TopK SAE's
+0.098 at 8 coefficients/segment on the identical cache.
+
+**The mechanism is why this is not a tuning miss.** `lam = 1/(4·d_in)` puts codes at ~4e-3
+against a reconstruction term of ~18, which is the flat stretch. But `TemporalSAE` has **no
+encoder bias**, so a code can only be zero when `x·D_j < 0` — sparsity has to come from the
+geometry of the dictionary rather than from a threshold. L1 therefore shrinks the whole code
+vector: alive fraction is still 0.998 at 67 coefficients/segment while the share of code mass
+in the top 32 latents climbs 0.036 → 0.90. Sparsity by shrinkage, not by selection. Both
+readings of the loss (novel+pred, and novel only) fail the same way, so the identification
+ambiguity does not rescue it. The TopK variant of the same architecture is used instead and
+binds by construction.
+
+## 23:06 — the phase ladder qualifies last sprint's finding 2
+
+Same task at 1, 3, 5 and 11 switches, foil built by cyclic rotation so the classes contain
+literally the same sentences and differ only in phase. Best single-latent reading AUC:
+
+| switches | SAE (pooled) | TXC (window) | tSAE (pooled) |
+| --- | --- | --- | --- |
+| 1 | **0.997** | 0.746 | 0.628 |
+| 3 | 0.727 | 0.709 | 0.639 |
+| 5 | 0.722 | 0.716 | 0.598 |
+| 11 | 0.631 | **0.704** | 0.616 |
+
+**At 11 switches the crosscoder reads better than the SAE.** That qualifies last sprint's
+finding 2: "reading comparisons never favour a window code" holds for *slow* structure and
+fails for *fast* structure. The mechanism is the same one that made the negative true in the
+first place — a pooled per-token code recovers order through the causal history smeared into
+each token — but smearing cannot resolve alternation at period 2.
+
+Steering, best Δmargin at matched injected norm and matched realised coefficients
+(8.00/segment for all three arms):
+
+| switches | `sae_broadcast` | `txc_slab` | `txc_flat` | `tsae_broadcast` | verdict |
+| --- | --- | --- | --- | --- | --- |
+| 1 | +1.37 | +4.99 | −12.06 | +3.10 | win |
+| 3 | −0.57 | +7.50 | −25.78 | +1.45 | win |
+| 5 | +0.53 | +1.56 | +1.20 | −0.34 | **not established** |
+| 11 | −0.04 | +7.80 | −3.54 | −0.18 | win |
+
+Three of four cells are wins with the profile control holding. Phase-5 is not: `txc_slab`
++1.56 ± 0.47 against `txc_flat` +1.20 ± 0.75, so the control does not separate there. The
+cell stays in the table with the hole visible.

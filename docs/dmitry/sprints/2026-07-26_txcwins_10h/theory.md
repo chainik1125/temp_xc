@@ -22,7 +22,7 @@ which predicts how much of the achievable steering effect each architecture can 
 turns "the crosscoder should win here" from a hunch into a number with an error bar.
 
 Reading order if short on time: § The write algebra, § The screening statistic, then the
-ranked table in § Ranking. Designs D1, D2, D6 are the ones to build first.
+ranked table in § Ranking. Designs D2b, D1 and D6 are the ones to build first.
 
 The single cheapest thing in this document, and the one I would run before anything else, is
 the **gradient screen**: one backward pass per document yields a training-free, architecture-
@@ -577,6 +577,53 @@ a held-out set of benign prompts at the same injected norm.
 workstream, and "refuse after explaining, not before" is a documented preference. If any
 design here ends up in a paper, it is this one.
 
+### D2b — three-part refusal rotation (rank ≥ 2 *and* relevance)
+
+The gap in every design above is that rank ≥ 2 and relevance never co-occur: D1 and D3 reach
+L3 but are constructs, D2 is the relevant one but is `m = 2` and therefore rank 1. D2b closes
+that gap, and on reflection it is the design I would build if only one thing gets run.
+
+**The observation.** A well-formed refusal is not two parts, it is *three*: acknowledge the
+request, decline with a reason, offer an alternative. That is the shape assistant guidelines
+actually ask for, and it is three semantically distinct modes rather than two — so a cyclic
+rotation of the three is an `m = 3` design, **rank 2 by the circulant algebra**, while
+remaining a behaviour someone would genuinely want to steer.
+
+**Classes.** Three clauses per item, rotated as a unit:
+
+```text
+class A (canonical):   acknowledge / decline / alternative
+class B (rotation):    decline / alternative / acknowledge
+```
+
+Exactly multiset-matched, built from a single draw and rotated (see D1's construction
+requirement). Shared carrier and a fixed connective set across all items.
+
+**Write.** Teacher-forced Δmargin between the canonical order and the rotation. No judge, no
+sampling.
+
+**Registered predictions.**
+
+- `c = 0` exactly; `r1 ≈ 0.50`; rank exactly 2, so `txc_rank2` recovers ≈ 100%.
+- `sae_broadcast ≈ 0`; `sae_profile_target`, `sae_enveloped` and `tsae_slab` all capped at
+  ≈ `sqrt(0.5) = 0.71` of `txc_slab`. **This is the only design in the document predicted to
+  beat all three baselines on a behaviour anyone cares about.**
+- Selectivity (P8): crosscoder KL cost lower at matched Δ.
+
+**The risk, and it is the same one as D3.** The three clause types may not be mutually
+equidistant in activation space — "decline" and "alternative" both carry refusal-adjacent
+content and may sit close, which would collapse the rank toward 1 and make this an `m = 2`
+task wearing an `m = 3` costume. **This is measurable before any training compute is spent:**
+run `block_geometry()` on the three clause-type centroids and check `pairwise_cv`. If the
+decline/alternative distance is much smaller than the other two, either re-word the
+alternative clause to be more concretely helpful (moving it toward a "here is what I can do"
+direction and away from refusal) or fall back to D3.
+
+**Variant with the same structure, if the refusal framing is unwanted:** chain-of-thought
+order — restate / work / answer, rotated to answer-first. The rotation is exactly the
+post-hoc-rationalisation failure mode, which is a documented concern and gives the same rank-2
+guarantee.
+
 ### D3 — three-phase reasoning rotation (D1 with relevance)
 
 **Classes.** Reasoning traces with three genuinely distinct modes — *explore* ("One option is
@@ -683,14 +730,15 @@ three-way win is available.
 
 | rank | design | P(real) | relevance | beats profile-SAE / tSAE? | why |
 | --- | --- | --- | --- | --- | --- |
-| 1 | **D1 rotation ladder, `m ≥ 3`** | 0.65 | low | **yes** | the only design that reaches L3, so the only one where the TXC can beat the *strongest* form of both baselines; yields a law (`sqrt(r1)`) rather than a comparison |
-| 2 | **D6 level/trend dissociation** | 0.75 | medium | no (trend cell is rank 1) | still the best control design — a crossover kills the "TXC just writes better" class outright — but its win is over constant writes, not over per-token dictionaries as such |
-| 3 | **D3 three-phase reasoning** | 0.45 | medium-high | yes, if the modes are equidistant | D1's rank-2 guarantee on content anyone recognises; the whole bet is `block_geometry` on explore/commit/verify, so measure before spending compute |
-| 4 | D2 refusal onset | 0.55 | high | no | highest relevance and needs no judge, but `m = 2` — the win is on discovery and on selectivity (P8), and must be framed that way |
-| 5 | D4 onset phase shift | 0.65 | medium | no | cleanest demonstration of the argmax identity; L2 only |
-| 6 | D5 trend alone | 0.70 | low | no | subsumed by D6; run only as D6's first cell |
-| 7 | D7 sandbagging | 0.30 | high | no | the metric is unproven without a judge |
-| 8 | D8 change-count | 0.15 | low | no | predicted to fail on the reading half and subsumed on the steering half |
+| 1 | **D2b three-part refusal rotation** | 0.55 | **high** | **yes** | the only design that is rank ≥ 2 *and* about a behaviour anyone wants to steer; inherits D1's algebra on real content. Gated on `block_geometry` showing the three clause types are not collinear |
+| 2 | **D1 rotation ladder, `m ≥ 3`** | 0.65 | low | **yes** | reaches L3 and yields a *law* (`sqrt(r1)`) rather than a comparison; the mechanism result that makes D2b interpretable, and the fallback if D2b's clauses turn out collinear |
+| 3 | **D6 level/trend dissociation** | 0.75 | medium | no (trend cell is rank 1) | still the best control design — a crossover kills the "TXC just writes better" class outright — but its win is over constant writes, not over per-token dictionaries as such |
+| 4 | **D3 three-phase reasoning** | 0.45 | medium-high | yes, if the modes are equidistant | D1's rank-2 guarantee on content anyone recognises; the whole bet is `block_geometry` on explore/commit/verify, so measure before spending compute |
+| 5 | D2 refusal onset | 0.55 | high | no | highest relevance and needs no judge, but `m = 2` — the win is on discovery and on selectivity (P8), and must be framed that way |
+| 6 | D4 onset phase shift | 0.65 | medium | no | cleanest demonstration of the argmax identity; L2 only |
+| 7 | D5 trend alone | 0.70 | low | no | subsumed by D6; run only as D6's first cell |
+| 8 | D7 sandbagging | 0.30 | high | no | the metric is unproven without a judge |
+| 9 | D8 change-count | 0.15 | low | no | predicted to fail on the reading half and subsumed on the steering half |
 
 **Recommended order.**
 
@@ -698,11 +746,15 @@ three-way win is available.
    is the strongest available attack on the result the sprint is built on. Everything below is
    conditional on what it returns.
 2. **The gradient screen** (`Ḡ`, `c`, `r1`, `oracle_const`) on the same data. Training-free.
-3. **D1 grouped ladder at `m ∈ {2, 3, 6}`** with the full arm set including `tsae_slab`.
-4. **D6**, for the crossover.
-5. D2 for relevance, framed as discovery + selectivity rather than expressiveness.
-6. D3 if D1 lands and `block_geometry` on the reasoning modes looks equidistant; D1 at
-   `m = 12` only if the effect is still measurable at `m = 6`.
+3. **D1 grouped ladder at `m ∈ {2, 3, 6}`** with the full arm set including `tsae_slab`. This
+   establishes the law on a construct where the algebra is known exactly, which is what makes
+   the next step interpretable.
+4. **D2b**, the three-part refusal rotation — the headline candidate. Run `block_geometry` on
+   its three clause centroids *first*; if `pairwise_cv` is large or decline/alternative are
+   near-collinear, fix the wording or fall back to D3 before spending training compute.
+5. **D6**, for the crossover.
+6. D2 and D3 if time remains; D1 at `m = 12` only if the effect is still measurable at
+   `m = 6`.
 
 ## Predicted failures
 
@@ -731,10 +783,6 @@ Negative predictions, stated now so they count.
   a large shrinkage relative to teacher-forced Δmargin. If generation is attempted, apply the
   slab in *segment* coordinates with online sentence-boundary detection, and report the
   teacher-forced number alongside so the shrinkage is visible.
-- **The tSAE arm without recalibration.** Carried debt 1 from the
-  kickoff. At `lam = 1/(4·d_in)` the sparsity coefficient needs to be ~1–10, not 1e-3. If it
-  has not been calibrated by the time results are written, report the arm as absent rather
-  than as dense.
 
 ## Measurement notes
 

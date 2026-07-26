@@ -35,6 +35,34 @@ fixed.
 That gives the sprint a real behaviour with the exact structural property that produced the
 crosscoder advantage, and it is cheaper to run than anything else in this note.
 
+### The concrete recommendation, if one task has to be picked
+
+Premise-order permutation on R-GSM, or if that model is too weak to show the gap,
+demonstration-order permutation on a classification set. Both are drop-ins for
+`steer_order_modal.py` with one segment per premise or per demonstration.
+
+Ordered so that each step kills the task cheaply if it is going to die:
+
+1. **Behavioural gap check, ~20 minutes, forward passes only.** Does the chosen model's accuracy
+   actually move when premises are permuted? No gap, no task. Do this before any training. If
+   Qwen2.5-1.5B-Instruct is too weak on GSM8K for the gap to be measurable, fall back to
+   demonstration order, where the effect is documented across model sizes.
+2. **Build the matched pairs.** Same premises, forward order versus permuted. The multiset match
+   is exact and free.
+3. **Train the ladder at matched realised coefficients per segment** — BatchTopK SAE → PSAE →
+   T-SAE → TXC. Log realised L0 for every arm (carried-over debt 3; the failure is silent).
+4. **Read and steer separately.** Expect reading to favour the SAE again — that is now the
+   predicted result, and a fourth replication of it is worth reporting in its own right.
+5. **Steering arms S1/S2/S3** as in the fairness section below. `S3 > S2` is the claim; `S3 > S1`
+   alone is not enough.
+6. **Controls that can kill it:** time-averaged profile, random profile, random direction,
+   row-permuted profile, and the supervised difference-of-means ceiling. These already exist in
+   `steer_order_modal.py` and should be carried over unchanged.
+
+The one-line version of the result if it works: *a temporal crosscoder can remove a model's
+sensitivity to premise order where a single steering direction provably cannot, because the two
+orderings are the same multiset.*
+
 ### The selection criterion, restated from what actually won
 
 The last sprint's win was **steering, not reading**, and the mechanism was specific: a
@@ -160,6 +188,52 @@ floor) → PSAE (learned scalar timescale) → T-SAE (InfoNCE over adjacent posi
 `(T, d)` slab). That is a clean capacity ladder, each rung adding exactly one thing, and it is
 a better story than any single head-to-head.
 
+### Prior art on the mechanism itself — what the sprint can and cannot claim as novel
+
+Searched deliberately, because the sprint's headline mechanism is "a position-varying write
+beats a constant one". That general claim is **no longer novel**, and the writeup should say so
+rather than be corrected on it.
+
+Jin, Deng, Wang, Shen, Zhang, *Beyond Steering Vector: Flow-based Activation Steering for
+Inference-Time Intervention*, 2026 ([arXiv:2605.05892](https://arxiv.org/abs/2605.05892) —
+fetched and verified) learns a concept-conditioned velocity field `v(h, t, c)` and explicitly
+abandons the assumption that interventions are "fixed, single-step, position-invariant
+transforms". They report "curved, multi-step, token-varying trajectories" and that nearby
+tokens have higher steering similarity — i.e. position-dependent steering structure, measured.
+On AxBench they reach harmonic means of 1.015 (Gemma-2-2B-IT) and 1.113 (Gemma-2-9B-IT), "the
+first learned method to consistently outperform prompting" without per-concept tuning.
+
+Relatedly, *Steer Like the LLM: Activation Steering that Mimics Prompting*
+([arXiv:2605.03907](https://arxiv.org/abs/2605.03907) — id unverified) observes that prompt
+steering "can exert strong interventions on some token positions and barely intervene on
+others", and that per-token steering coefficients have been proposed to compensate.
+
+**What this leaves for us, stated precisely.** Three things survive, and they should be the
+claims made:
+
+1. **The profile is learned unsupervised, by a dictionary, and is a fixed interpretable object
+   per latent** — a `(T, d)` slab you can plot — rather than a supervised concept-conditioned
+   network evaluated at inference. FLAS needs to know the concept; a crosscoder latent does not.
+2. **On a matched-multiset order factor, a position-invariant write cannot work at all**, not
+   merely work less well. Every result above is "position-varying is better"; ours is
+   "position-invariant is at chance by construction, and here is the task class where that is
+   true". That is a sharper and more falsifiable statement.
+3. **The comparison is against other dictionaries at matched sparsity budget**, which is the
+   axis interpretability cares about, whereas FLAS is a steering-method comparison.
+
+**What must be dropped:** any framing in which "steering vectors are constant in time and that
+is a novel observation". It was published, at scale, on a standard benchmark, before this
+sprint. Cite it in the first paragraph.
+
+**Also worth knowing:** AxBench is the current standard steering benchmark and would be the
+natural external yardstick if the sprint ever wants one. And note a naming hazard — in the
+wider literature "crosscoder" means *cross-layer or cross-model* (model diffing, e.g. *Sparse
+Crosscoders for diffing MoEs and Dense models*, [arXiv:2603.05805](https://arxiv.org/abs/2603.05805);
+*Localizing RL-Induced Tool Use to a Single Crosscoder Feature*,
+[arXiv:2606.26474](https://arxiv.org/abs/2606.26474) — ids unverified). A reader will assume
+that meaning unless "temporal / cross-position" is said explicitly every time. The upside is
+that the cross-*position* variant really is under-explored.
+
 ### A fairness point the sprint should settle before claiming a win
 
 The most important methodological item in this note, and it is not handled anywhere in the
@@ -213,6 +287,31 @@ spans — and running it retroactively hardens last sprint's headline result.
 
 Priority is (probability the TXC actually wins) × (relevance of the behaviour) × (can be run
 tonight).
+
+### Where to actually get each organism
+
+The brief asks for acquisition paths, so they are collected here rather than scattered. The
+important column is the last one: most of the top entries need **no download at all**, which is
+why they are the top entries.
+
+| behaviour | what you need | where | needed tonight? |
+| --- | --- | --- | --- |
+| Premise order (instance D) | R-GSM, 220 problems | released with [arXiv:2402.08939](https://arxiv.org/abs/2402.08939); if the release is awkward to find, **regenerate it** — it is GSM8K with premises reordered, and `openai/gsm8k` on HF plus a sentence splitter reproduces the construction in an hour | dataset only |
+| Demonstration order (A) | any classification set | the eleven tasks in [arXiv:2104.08786](https://arxiv.org/abs/2104.08786) are standard (SST-2, AG News, TREC …); permutations are generated locally | nothing |
+| MCQ option order (B) | MMLU / ARC | `cais/mmlu` on HF; permute options locally | nothing |
+| Document position (C) | NaturalQuestions-open + distractors | the *Lost in the Middle* release; or build from any QA set by inserting the gold document at varying rank | nothing |
+| Instruction-order conflict | conflicting instruction pairs | generate programmatically — no dataset exists or is needed | nothing |
+| Induction / RRT | random token sequences | generate from the tokenizer vocabulary | nothing |
+| Repetition loops | greedy decoding | any model; the elicitation is the decoding setting | nothing |
+| Multi-turn escalation | escalating conversation sets | public multi-turn attack sets ([arXiv:2404.01833](https://arxiv.org/abs/2404.01833) and the 2025–26 benchmarks); shuffled foils generated locally | dataset |
+| Backtracking | a reasoning model | `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` on HF; Stage A artefacts already in this repo | model download |
+| Entity / state tracking | the boxes task | generator described in [arXiv:2305.02363](https://arxiv.org/abs/2305.02363); trivial to reimplement — it is templated text | nothing |
+| Sandbagging | a locked model | organisms from [arXiv:2406.07358](https://arxiv.org/abs/2406.07358) / [arXiv:2405.19550](https://arxiv.org/abs/2405.19550); availability varies per organism and should be checked before planning around it | model download, uncertain |
+| Emergent misalignment | an EM-finetuned model | this repo's `docs/dmitry/c6_em/` stream already has them | already here |
+
+The pattern is worth stating: **every priority-4-and-above entry except backtracking needs
+nothing but the base model the harness already uses.** That is the main practical argument for
+the permutation family over the safety-organism entries.
 
 ### Prompt permutation sensitivity — priority 5
 
@@ -588,7 +687,27 @@ not transfer.
   and live infra, but the timescale is turns to hundreds of tokens with no sharp trigger and no
   published token-level temporal analysis. Shape B. Betley et al.
   ([arXiv:2502.17424](https://arxiv.org/abs/2502.17424)); persona vectors
-  ([arXiv:2507.21509](https://arxiv.org/abs/2507.21509)).
+  ([arXiv:2507.21509](https://arxiv.org/abs/2507.21509)). **Additional counter-evidence:**
+  *Convergent Linear Representations of Emergent Misalignment*
+  ([arXiv:2506.11618](https://arxiv.org/abs/2506.11618) — id unverified) reports that EM is
+  carried by a convergent *linear* direction. A single direction that already captures the
+  factor is precisely the case where a per-token dictionary suffices, so this argues against EM
+  as a temporal-code demonstration rather than for it. Worth knowing before spending the
+  repo's EM infra on this.
+- **Agentic goal drift / context rot** — genuinely temporally extended, and 2026 has a lot of
+  it: goal drift, context drift, role drift, plan decay over long trajectories, with reported
+  accuracy drops of 14–85% from context length alone even when all relevant information is
+  present, and coherence problems appearing after 25–30 tool calls. Anchors:
+  *Inherited Goal Drift: Contextual Pressure Can Undermine Agentic Goals*
+  ([arXiv:2603.03258](https://arxiv.org/abs/2603.03258)), *Agent Drift: Quantifying Behavioral
+  Degradation in Multi-Agent LLM Systems Over Extended Interactions*
+  ([arXiv:2601.04170](https://arxiv.org/abs/2601.04170)), *The Long-Horizon Task Mirage?*
+  ([arXiv:2604.11978](https://arxiv.org/abs/2604.11978)) — all ids unverified. Priority 1 for
+  this sprint purely on feasibility: the timescale is thousands of tokens and tens of tool
+  calls, the metric needs a judge or a task harness, and no matched-multiset foil is available
+  (drift is not a permutation of anything). It is the natural *next-sprint* target if the
+  window code turns out to help at long range, and it is the setting where PSAE-style slow
+  features were already shown to be useful.
 - **CoT unfaithfulness** — the mismatch is between a stated reason and an internal one: a
   relation between a prompt hint and a final answer, not a pattern across positions. Turpin et
   al. ([arXiv:2305.04388](https://arxiv.org/abs/2305.04388)).
@@ -620,7 +739,10 @@ measured on a completely different task.
   2402.14811 (Prakash et al., ICLR 2024, positional entity-tracking circuit), 2605.30233 (Tang
   et al., aggregation-at-last-token quote), 2606.13705 (Lazaridis et al., single-neuron
   repetition fix and the "doom loops" caveat), 2206.02369 (Xu et al., NeurIPS 2022,
-  self-reinforcement quote).
+  self-reinforcement quote), 2511.05541 (Bhalla et al., ICLR 2026 oral, T-SAE loss and config),
+  2607.17117 (Persistent SAEs, EMA recurrence and prompt-injection intervention — content
+  fetched, arXiv id not independently cross-checked), 2605.05892 (Jin et al., FLAS,
+  position-varying steering and AxBench numbers).
 - **Canonical, high confidence, not re-fetched:** 2209.11895, 1904.09751, 2407.07011,
   2410.13497, 2102.09690, 2309.03882, 2406.07358, 2405.19550, 2404.01833, 2305.02363,
   2502.17424, 2507.21509, 2310.13548, 2305.04388, 2507.12638.
@@ -648,3 +770,13 @@ measured on a completely different task.
   pairs, a reasoning failure rather than a label prior, and no published localisation. Added
   the localisation risk for instance B (anchored-bias MLP value vectors and attention heads,
   GPT-2 family) and the whitespace note that no dictionary work exists on order sensitivity.
+- 2026-07-27 ~01:40 PDT — added the baselines section. Resolved carried-over debt 2: the tSAE
+  described is Bhalla et al., ICLR 2026 oral (arXiv:2511.05541), InfoNCE over adjacent
+  positions, no attention, BatchTopK k=20 — so the repo's attention-based `TemporalSAE` was
+  never the right baseline and the `l1_coef` calibration debt was an artefact of the wrong
+  architecture. Added Persistent SAEs (arXiv:2607.17117) as the missing middle rung and their
+  prompt-injection intervention result. Proposed the four-rung capacity ladder.
+- 2026-07-27 ~02:00 PDT — added prior art on the mechanism: FLAS (arXiv:2605.05892) already
+  publishes position-varying steering beating position-invariant steering, at scale on
+  AxBench. Narrowed the claims the sprint can make to three, and flagged the "crosscoder"
+  naming hazard.

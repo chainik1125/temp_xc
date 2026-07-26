@@ -272,6 +272,69 @@ CONNECTIVE_ENGAGE_FIRST = "However, "
 CONNECTIVE_DECLINE_FIRST = "That said, "
 
 
+# --------------------------------------------------------------------------
+# D2b -- three-part refusal rotation. The headline candidate: rank 2 by the
+# circulant algebra AND a behaviour anyone would want to steer.
+#
+# A well-formed refusal is three parts, not two: ACKNOWLEDGE the request,
+# DECLINE with a reason, OFFER an alternative. Rotating those three as a unit
+# is an m=3 design, so r1 = 0.5 and the rank-1 baselines (profile-SAE, tSAE,
+# sae_enveloped) are capped at sqrt(0.5) = 0.71 of the crosscoder.
+#
+# THE GATE: this only works if the three clause types are not collinear in
+# activation space. DECLINE and ALTERNATIVE both carry refusal-adjacent content
+# and may sit close, which would collapse the rank toward 1 and make this an
+# m=2 task in an m=3 costume. Run block_geometry() on the three clause-type
+# centroids BEFORE training anything. The alternative clauses below are worded
+# to be concretely helpful ("here is what I can do") rather than apologetic,
+# specifically to push them away from the decline direction.
+# --------------------------------------------------------------------------
+
+REFUSAL_TRIPLES = [
+    ("You're asking how a class of compound is put together.",
+     "I can't give synthesis routes for that one.",
+     "I can walk through the reaction types involved at a textbook level."),
+    ("You want to get back into an account that's locked.",
+     "I can't help access an account that isn't yours.",
+     "I can explain how the recovery process works with the provider."),
+    ("You're after a dose for a medication you have on hand.",
+     "I can't recommend a dose outside clinical supervision.",
+     "I can describe what the prescribing information covers."),
+    ("You want to change how a mechanism behaves.",
+     "I can't detail modifications that bypass the safety interlock.",
+     "I can go through how the interlock is designed to work."),
+    ("You're looking at how reporting thresholds apply here.",
+     "I can't help structure transactions to stay below them.",
+     "I can lay out what the disclosure requirements actually are."),
+    ("You want a message that will get someone to click through.",
+     "I can't draft something built to deceive a specific person.",
+     "I can cover what makes phishing effective, from the defence side."),
+]
+REFUSAL_TRIPLE_NAMES = ["acknowledge", "decline", "alternative"]
+
+
+def refusal_rotation_pair(triples, rng, shift=1, n_items=4):
+    """Class A = acknowledge/decline/alternative, class B = a rotation of it.
+
+    Returns ((text_a, spans_a), (text_b, spans_b), order). Each of the n_items
+    contributes its three clauses as three consecutive segments, and the whole
+    12-segment list is rotated by shift * n_items so that the block structure is
+    (all acknowledges, all declines, all alternatives) -> rotated.
+
+    As with rotation_pair, the two classes come from ONE draw and are exact
+    rotations of each other, so the clause multiset matches exactly.
+    """
+    picks = [triples[rng.randrange(len(triples))] for _ in range(n_items)]
+    # Block b holds clause-type b from every picked item: 3 blocks of n_items.
+    sents = [p[b] for b in range(3) for p in picks]
+    k_seg = 3 * n_items
+    rot = (shift * n_items) % k_seg
+    sents_b = sents[rot:] + sents[:rot]
+    carrier = CARRIERS[rng.randrange(len(CARRIERS))]
+    order = [(i + shift) % 3 for i in range(3)]
+    return _assemble(carrier, sents), _assemble(carrier, sents_b), order
+
+
 def _decap(s: str) -> str:
     """Lowercase a clause's first letter, except the pronoun 'I'.
 
@@ -423,5 +486,20 @@ if __name__ == "__main__":
     print()
     e, d = REFUSAL_ITEMS[0]
     a, b = refusal_pair(e, d)
-    print("D2 class A:", a)
-    print("D2 class B:", b)
+    print("D2 (m=2) class A:", a)
+    print("D2 (m=2) class B:", b)
+
+    print("\nD2b (m=3, rank 2) three-part refusal rotation:")
+    (ta, sa), (tb, sb), order = refusal_rotation_pair(
+        REFUSAL_TRIPLES, random.Random(11), n_items=4)
+    a_s, b_s = _sents(ta, sa), _sents(tb, sb)
+    assert sorted(a_s) == sorted(b_s), "D2b multiset broken"
+    assert b_s == a_s[4:] + a_s[:4], "D2b not an exact rotation"
+    print(f"  {len(a_s)} segments, multiset_equal=True, is_rotation_by_4=True")
+    print(f"  A[0] ({REFUSAL_TRIPLE_NAMES[0]}): {a_s[0]}")
+    print(f"  A[4] ({REFUSAL_TRIPLE_NAMES[1]}): {a_s[4]}")
+    print(f"  A[8] ({REFUSAL_TRIPLE_NAMES[2]}): {a_s[8]}")
+    print(f"  B[0] ({REFUSAL_TRIPLE_NAMES[order[0]]}): {b_s[0]}")
+    print("  GATE: block_geometry() on the three clause-type centroids before "
+          "training -- if decline/alternative are near-collinear this is an "
+          "m=2 task in an m=3 costume.")
