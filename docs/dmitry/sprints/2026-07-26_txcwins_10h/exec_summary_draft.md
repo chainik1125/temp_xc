@@ -763,6 +763,23 @@ crosscoder's +2.86 at `rotate2` and +9.83 against −0.01 at `rotate6`, reversin
 +18.23 — a −0.01 followed by a +18.23 is instability, not a trend. The honest description of the
 surviving win is **discovery, and unreliable discovery**.
 
+**The discovery claim is an optimisation claim, and both architectures got one ticket in the
+lottery.** "The crosscoder finds a write unsupervised that a per-token dictionary could express
+but did not learn" is a statement about a *search*, not about representation — and every cell here
+gave each architecture **one dictionary init and one best-of-4096 latent selection**. We know from
+our own data that this lottery is high-variance: the crosscoder's margin moves 10× across three
+inits on the phase ladder, and on the order task its selected latent does not hold a stable
+**sign** across inits. **The SAE was never given the same number of tickets.** So every discovery
+failure recorded here — `recency_var`, `rotate6`, the phase ladder — is "training did not find it"
+asserted from a single draw.
+
+This is the strongest objection remaining to the sprint's central claim, and it is stated here
+rather than in next-steps because a reader will reach it unaided. The experiment that settles it —
+twenty inits per architecture on the three surviving tasks, reporting the distribution of each
+arm's best latent rather than one draw — needs no new corpus and no new code, since `dict_seed` is
+already a flag. If the SAE's best-of-twenty closes the gap, the honest headline becomes **"the
+crosscoder finds this write more often"**, which is weaker than what is written above.
+
 **The choice of dose convention does not flatter us, and that is measured rather than argued.**
 Across all 62 symmetric-grid runs, **6 change verdict** between matched dose and peak dose
 (`scripts/convention_flips.py`):
