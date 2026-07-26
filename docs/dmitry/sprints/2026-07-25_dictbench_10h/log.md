@@ -1567,3 +1567,39 @@ crosscoder does.
 It also reframes the FVU deficit. The crosscoder reconstructs 1.2-2.7× worse at matched
 realised coefficients per segment; that is the price of the shared code, and it buys a
 temporally structured write that the per-token dictionary cannot express at any budget.
+
+## The steering result, hardened: nulls, error bars, and a catch
+
+Rerun at 200 test documents with per-document standard errors and two null arms. `dom_slab`
+is supervised; `random_slab` is a random temporal profile and is the direct control for
+`txc_slab`; `random_broadcast` is a random constant direction and is the direct control for
+`sae_broadcast`. All at identical injected norm.
+
+| arm | α=0.25 | α=0.5 | α=1.0 | α=2.0 |
+| --- | --- | --- | --- | --- |
+| `dom_slab` (supervised) | +5.69 ± 0.13 | +12.09 ± 0.25 | +27.96 ± 0.53 | +68.12 ± 1.17 |
+| **`txc_slab`** | **+0.72 ± 0.09** | **+1.42 ± 0.17** | **+3.48 ± 0.34** | **+11.29 ± 0.64** |
+| `random_broadcast` | −0.26 ± 0.08 | −0.38 ± 0.13 | −0.03 ± 0.24 | +3.01 ± 0.47 |
+| `sae_broadcast` | −0.96 ± 0.12 | −1.59 ± 0.22 | −1.16 ± 0.34 | +1.24 ± 0.56 |
+| `random_slab` | −0.37 ± 0.08 | −0.58 ± 0.14 | −0.71 ± 0.26 | −0.28 ± 0.49 |
+| `txc_flat` | −1.19 ± 0.09 | −2.25 ± 0.17 | −4.49 ± 0.32 | −8.02 ± 0.64 |
+
+Separation at each arm's best dose: `txc_slab` against `sae_broadcast` is **z = 11.8**, and
+against `random_slab` is **z = 14.3**.
+
+**The catch, and it strengthens S1 rather than weakening it.** In the first run I noted the
+SAE's +2.25 at the largest dose and flagged it as possibly a generic tense-shift. The null
+arm settles it: a **random** constant direction reaches +3.01 ± 0.47, *larger* than the
+SAE's learned direction at +1.24 ± 0.56. So a constant write at high dose produces a small
+positive drift that has nothing to do with order, and the SAE's learned order-latent does not
+even match what a random direction achieves. A per-token dictionary's write is not merely
+weak on this task, it is indistinguishable from noise.
+
+**The random temporal profile is the control that matters for the positive claim**, and it
+is flat at −0.28 ± 0.49. So the crosscoder's +11.29 is not "any structured perturbation
+across positions" — a random one does nothing. It is the learned arrangement specifically.
+
+Three controls now converge on the same conclusion by different routes: permuting the
+profile in time (frozen shuffle, 100th percentile of 24 draws), averaging it away
+(`txc_flat`, which inverts to −8.02), and replacing it with a random one (`random_slab`,
+flat). The temporal arrangement of a single crosscoder latent is doing the work.

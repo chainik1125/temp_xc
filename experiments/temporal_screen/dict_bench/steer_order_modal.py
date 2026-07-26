@@ -230,8 +230,20 @@ def steerorder(model_id: str, layer: int, k_seg: int, n_train: int, n_test: int,
     V_sae = v_sae.unsqueeze(0).expand(T, -1).contiguous()
     V_sae = V_sae / V_sae.norm()
 
+    # Nulls at identical injected norm. `random_slab` is the direct control for
+    # txc_slab: a temporal profile that carries no learned information. Without it, a
+    # positive txc_slab could be any structured perturbation rather than this one.
+    g = torch.Generator(device="cpu").manual_seed(7)
+    R = torch.randn(T, d, generator=g).to(dev)
+    R = R / R.norm()
+    rv = torch.randn(d, generator=g).to(dev)
+    rv = rv / rv.norm()
+    R_flat = rv.unsqueeze(0).expand(T, -1).contiguous()
+    R_flat = R_flat / R_flat.norm()
+
     writes = {"sae_broadcast": sign_s * V_sae, "txc_slab": sign_t * P_txc,
-              "txc_flat": sign_t * P_flat, "dom_slab": P_dom}
+              "txc_flat": sign_t * P_flat, "dom_slab": P_dom,
+              "random_slab": R, "random_broadcast": R_flat}
     for nm, W in writes.items():
         print(f"[write] {nm:<14} total norm {float(W.norm()):.3f}  "
               f"per-position spread {float(W.norm(dim=-1).std()):.4f}", flush=True)
@@ -277,28 +289,49 @@ def steerorder(model_id: str, layer: int, k_seg: int, n_train: int, n_test: int,
            "txc_latent": jt, "txc_window_auc": auc_t, "arms": {}}
 
     print(f"\n{'arm':<16}" + "".join(f"{f'a={a:g}':>12}" for a in alphas), flush=True)
+    # Base margins do not depend on the arm, so compute them once.
+    base_by_doc = [margin(ta, sa, None, 0) - margin(tb, sb, None, 0)
+                   for (ta, sa, tb, sb) in tests]
+
     for nm, W in writes.items():
-        deltas = []
+        deltas, sems = [], []
         for a in alphas:
             ds = []
-            for (ta, sa, tb, sb) in tests:
-                base = margin(ta, sa, None, 0) - margin(tb, sb, None, 0)
+            for (ta, sa, tb, sb), base in zip(tests, base_by_doc):
                 st = margin(ta, sa, W, a) - margin(tb, sb, W, a)
                 ds.append(st - base)
-            deltas.append(float(np.mean(ds)))
-        out["arms"][nm] = {"alphas": alphas, "delta_margin": deltas}
-        print(f"{nm:<16}" + "".join(f"{v:>12.2f}" for v in deltas), flush=True)
+            ds = np.array(ds)
+            deltas.append(float(ds.mean()))
+            sems.append(float(ds.std(ddof=1) / np.sqrt(len(ds))))
+        out["arms"][nm] = {"alphas": alphas, "delta_margin": deltas,
+                           "sem": sems, "n_docs": len(tests)}
+        print(f"{nm:<16}" + "".join(f"{v:>8.2f}+-{e:<5.2f}"
+                                    for v, e in zip(deltas, sems)), flush=True)
 
     print("\n===== verdict =====", flush=True)
     best = {nm: max(v["delta_margin"]) for nm, v in out["arms"].items()}
     for nm, v in sorted(best.items(), key=lambda x: -x[1]):
         print(f"  {nm:<16} best delta-margin {v:+.2f}", flush=True)
-    if best["txc_slab"] > 0 and best["txc_slab"] > 2 * max(best["sae_broadcast"], 0.01):
-        print("  -> S1/S2 HOLD: the crosscoder steers order where a constant write cannot",
-              flush=True)
+    # Separation in units of the pooled standard error, at each arm's own best dose.
+    def at_best(nm):
+        v = out["arms"][nm]
+        j = int(np.argmax(v["delta_margin"]))
+        return v["delta_margin"][j], v["sem"][j]
+
+    ts_, te_ = at_best("txc_slab")
+    ss_, se_ = at_best("sae_broadcast")
+    rs_, re_ = at_best("random_slab")
+    z_sae = (ts_ - ss_) / np.sqrt(te_ ** 2 + se_ ** 2)
+    z_rnd = (ts_ - rs_) / np.sqrt(te_ ** 2 + re_ ** 2)
+    print(f"\n  txc_slab vs sae_broadcast : {ts_:+.2f} vs {ss_:+.2f}  "
+          f"z = {z_sae:.1f}", flush=True)
+    print(f"  txc_slab vs random_slab   : {ts_:+.2f} vs {rs_:+.2f}  "
+          f"z = {z_rnd:.1f}", flush=True)
+    if ts_ > 0 and z_sae > 2 and z_rnd > 2:
+        print("  -> S1/S2 HOLD: the crosscoder steers order where a constant write cannot,"
+              " and beats a random temporal profile", flush=True)
     else:
-        print("  -> S2 FAILS: no steering advantage for the temporal profile here",
-              flush=True)
+        print("  -> NOT ESTABLISHED at this power: see the z values above", flush=True)
     return out
 
 

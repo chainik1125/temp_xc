@@ -27,9 +27,9 @@ TopK SAE latent reads the label at AUC 0.998 while the crosscoder manages 0.791.
 reading criterion the SAE wins outright.
 
 Steering the *same* factor reverses it. At matched injected norm, the crosscoder's `(T, d)`
-decoder slab moves the teacher-forced margin by **+9.93**; the SAE's single direction,
-which is all a per-token dictionary has, manages +2.25 and is negative at three of the four
-doses.
+decoder slab moves the teacher-forced margin by **+11.29 ± 0.64**; the SAE's single
+direction, which is all a per-token dictionary has, manages +1.24 ± 0.56 and is negative at
+three of the four doses. The separation is z = 11.8 over 200 documents.
 
 ![reading vs steering](../../../../plots/2026-07-25_dictbench/steer_order.png)
 
@@ -40,14 +40,19 @@ constant write pushes both equally and has nothing to grip. A crosscoder latent 
 different vector at each position and can push "tense early, calm late" without also pushing
 the reverse.
 
-**The control is what makes this a temporal claim rather than a better-direction claim.**
-Take the crosscoder's own slab, average it over time, rebroadcast it — same latent, same
-mean direction, same injected norm, only the temporal profile removed — and the effect does
-not merely vanish, it **inverts**, from +9.93 to −7.87. The arrangement across positions is
-carrying the result. An independent control reaches the same conclusion by permuting rather
-than flattening: permuting a trained latent's decoder rows in time, refitting nothing, drops
-steering fidelity from +0.242 to a null of +0.002 ± 0.103 over 24 draws, and replicates at
-+0.292 on a healthier dictionary and a different latent.
+**Three controls make this a temporal claim rather than a better-direction claim.**
+Average the crosscoder's own slab over time and rebroadcast it — same latent, same mean
+direction, same norm, only the profile removed — and the effect does not merely vanish, it
+**inverts** to −8.02 ± 0.64. Replace the profile with a random one and it is flat at
+−0.28 ± 0.49, so the result is not "any structured perturbation across positions"
+(z = 14.3). Permute a trained latent's decoder rows in time and refit nothing, and steering
+fidelity drops from +0.242 to a null of +0.002 ± 0.103 over 24 draws, replicating at +0.292
+on a second dictionary and a different latent.
+
+A fourth arm settles the SAE side. A **random** constant direction reaches +3.01 ± 0.47 at
+the largest dose, *above* the SAE's learned order-latent at +1.24 ± 0.56 — so a constant
+write at high dose produces a small order-independent drift, and the per-token dictionary's
+learned write does not even match noise on this task.
 
 ### 2. Reading comparisons were never going to favour a window code, and now we know why
 

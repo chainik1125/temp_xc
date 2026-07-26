@@ -11,7 +11,8 @@ across positions and steers. `txc_flat` is the control that makes this a claim a
 temporal profile rather than about the direction: it is the crosscoder's own slab averaged
 over time and rebroadcast, same latent, same norm.
 
-Reads results/dict_bench/steer_order.json (written by steer_order_modal.py).
+Reads results/dict_bench/steer_order_v2.json (written by steer_order_modal.py), which
+carries per-document standard errors and the two null arms.
 """
 import json
 import pathlib
@@ -20,7 +21,7 @@ import sys
 import matplotlib.pyplot as plt
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SRC = ROOT / "results" / "dict_bench" / "steer_order.json"
+SRC = ROOT / "results" / "dict_bench" / "steer_order_v2.json"
 OUT = ROOT / "plots" / "2026-07-25_dictbench" / "steer_order.png"
 
 C_SAE = "#0072B2"    # blue   -- per-token dictionary
@@ -58,22 +59,31 @@ def main() -> int:
     style = [("dom_slab", C_DOM, "--", "difference-of-means (supervised)"),
              ("txc_slab", C_TXC, "-", "crosscoder slab"),
              ("sae_broadcast", C_SAE, "-", "SAE direction, broadcast"),
+             ("random_broadcast", "#999999", "-", "random direction, broadcast"),
+             ("random_slab", "#666666", ":", "random temporal profile"),
              ("txc_flat", C_FLAT, ":", "crosscoder slab, time-averaged")]
     for key, col, ls, lab in style:
         if key not in arms:
             continue
         a = arms[key]
-        ax.plot(a["alphas"], a["delta_margin"], ls, color=col, lw=2.2,
-                marker="o", ms=5, label=lab)
+        sem = a.get("sem")
+        if sem:
+            ax.errorbar(a["alphas"], a["delta_margin"], yerr=sem, fmt=ls,
+                        color=col, lw=2.2, marker="o", ms=5, capsize=3,
+                        elinewidth=1.2, label=lab)
+        else:
+            ax.plot(a["alphas"], a["delta_margin"], ls, color=col, lw=2.2,
+                    marker="o", ms=5, label=lab)
     ax.axhline(0, color="#444444", lw=1.0)
     ax.set_xlabel("steering dose α  (matched injected norm)")
     ax.set_ylabel("Δ margin   logP(order A) − logP(order B)")
     ax.set_title("Steering the same factor")
     ax.grid(alpha=0.25, lw=0.6)
-    ax.legend(loc="upper left", frameon=True, fontsize=8.5)
+    ax.legend(loc="upper left", frameon=True, fontsize=7.5, ncol=1)
     # The supervised arm is an order of magnitude larger; log-ish scaling would hide the
     # sign changes that matter, so clip the view to the dictionary arms and say so.
-    lo = min(min(arms[k]["delta_margin"]) for k in ("txc_flat", "sae_broadcast", "txc_slab")
+    lo = min(min(arms[k]["delta_margin"])
+             for k in ("txc_flat", "sae_broadcast", "txc_slab", "random_slab")
              if k in arms)
     hi = max(arms["txc_slab"]["delta_margin"])
     ax.set_ylim(lo * 1.4, hi * 1.6)
@@ -87,8 +97,11 @@ def main() -> int:
     print("[saved]", OUT)
 
     print(f"\n  reads:  SAE {r['sae_pooled_auc']:.3f}   crosscoder {r['txc_window_auc']:.3f}")
-    print("  steers: " + "   ".join(
-        f"{k} {max(v['delta_margin']):+.2f}" for k, v in arms.items()))
+    for k, v in sorted(arms.items(), key=lambda x: -max(x[1]["delta_margin"])):
+        j = v["delta_margin"].index(max(v["delta_margin"]))
+        e = v.get("sem", [0] * len(v["delta_margin"]))[j]
+        print(f"  steers: {k:<18} {v['delta_margin'][j]:+7.2f} +- {e:.2f}"
+              f"  (at alpha={v['alphas'][j]:g})")
     return 0
 
 
