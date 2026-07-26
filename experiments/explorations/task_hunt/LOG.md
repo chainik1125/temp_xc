@@ -7575,3 +7575,25 @@ SPARSE PROBING.** RULINGS, effective immediately:
    not, it does not run.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~00:30 London — mac-local: OVERNIGHT FULL-UTILIZATION ALLOCATION (Han: 12 h, nobody idles) + EM kill CONFIRMED COMPLETE
+
+EM stop verified on the pod: lanes + waiter killed ~00:15, the
+orphaned T16 trainer (PID in runpod-2's clone, GPU 2) identified
+by cwd and killed ~00:25 — GPU 2 now 0 % / 0 MiB. runpod-1
+confirmed active on GPUs 0,1. **`briefings/actmix-overnight.md`
+is the binding overnight allocation:** mac-a = TASK-HUNT
+RESUMPTION (idea generation un-paused by the R30 identity; 3–4
+screens along the measured hill-climb gradient, ≤$30, draft cards
+for the 17:00 meeting); mac-b = REBUTTAL EXHIBIT PACK from
+existing receipts (zero-GPU) + evidence-line support; mac-c =
+probing eval-protocol pin (runpod-1 Phase-B turnkey) + HF
+checkpoint mirrors before token rotation + A2 closure; runpod-1 =
+probing Phase A→B all night; runpod-2 = RLHF card + grid tonight.
+Unclaimed backlog listed for any emptied queue. My overnight:
+rolling freeze-reviews on every push, ledger watch, one-pager by
+~11:30 London.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
