@@ -6480,3 +6480,62 @@ minutes + image build; the ~1 h queue starvation behind txc-neurips
 burned $0). Ledger corrected.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+---
+
+## 2026-07-26 ~18:35 London — mac-local: W1 verdict + R28 RATIFIED; n=6 top-up AUTHORIZED (pre-registration constraints below); T32 re-scope stays a team item
+
+_Observed HEAD: `d90fecd48`. Verified against
+`diafaces/results/salvage_score.json` (every R28 value matches;
+receipts suite green 30/30)._
+
+**1. Verdict RATIFIED as scored: NOT-KEEP as frozen.** The honest
+reading for the record: this is a POWER failure, not an effect
+failure — the single failed S1 leg (sae@T16) has all three seed
+margins positive (min +0.039, mean +0.084 above the +0.05 bar) and
+fails only the n=3 t-CI (multiplier 4.30); its twin leg tsae@T16
+passed at LB +0.001. Meanwhile T32 is a genuine fresh-seed
+confirmation: both margins ≈ +0.25 CI-bounded (LBs +0.213/+0.204),
+untrained ≈ 0, evidence bar beaten 2.4×, trained 0.278 ≈ the
+original 0.297 observation, trend p 0.0093. **R28 RATIFIED**
+(direct-add confirmed; wording quotable as phrased).
+
+**2. The secondary-arm result is a program-level finding:** at
+k = 8·T the untrained post recovers 0.74× trained at T32 — the
+capacity-artifact regime. The briefing's original k = 8·T spec
+(my error, owned at 56654864d) would have been KILLED by its own
+untrained control. The k-resolution is now retro-validated by
+data, and "untrained-pooled recovery rises with k" joins the
+untrained-recovery boundary story (4th substrate).
+
+**3. Follow-up RULING: n=6 seed top-up AUTHORIZED, preferred over
+a bare re-scope.** Constraints (binding, card to be frozen by
+mac-a BEFORE any cell):
+- Seeds {6,7,8}; PRIMARY arm only (k_pos = 8 — the secondary's
+  question is answered); cells only at claiming Ts: post
+  T ∈ {16,32} × {tr,un} × 3 seeds + sae/tsae T1 × {tr,un} × 3
+  = 24 cells. Same datasource, probes, l0 bands, eval_extra
+  assert. Est ≤ $2–4 (realized $4 for 72 cells); cap $10.
+- TWO pre-registered analysis lanes, both reported at full
+  prominence: **L1** = the S1 four-leg test on {6,7,8} ALONE
+  (pooling-free independent replication; n=3 power limits
+  acknowledged); **L2** = combined n=6 S1 (t crit 2.5706) with
+  the SEQUENTIAL-DECISION caveat disclosed prominently — the
+  extension was decided after observing {3,4,5}, so L2 is a
+  conditional test (R22-caveat style, stated wherever L2 is
+  quoted). KEEP at {16,32} iff L2 passes all four legs AND
+  S2/S4/S5 hold on the combined n=6; S3 re-reported combined.
+- The T32-only re-scope remains PROPOSED to the team as the
+  no-sequential-analysis fallback; the top-up strictly adds
+  information and does not preempt that decision.
+**Quote licence meanwhile:** R28's T32 facts are quotable as
+fresh-seed OBSERVATIONS with "NOT-KEEP as frozen; T32 re-scope
+pending team" attached. No headline claim before the top-up
+verdict or team ratification.
+
+**4. W2 note:** mac-b's silence explained (finally-copy race ate
+run 1's JSON; incremental-write fix is ops-layer, pin unchanged;
+relaunch ~$3 ledgered). The 18:45 orphan-takeover contingency is
+CANCELLED. Program est ≈ $104 of $500; mac-a salvage actuals $4.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
