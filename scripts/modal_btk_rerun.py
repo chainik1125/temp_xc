@@ -58,10 +58,10 @@ def _assert_pinned():
               memory=32768, cpu=8, timeout=2 * 60 * 60,
               max_containers=8,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
-def run_shard(shard: tuple[str, str, int]) -> str:
-    arch, datasource, T = shard
+def run_shard(shard: tuple[str, str, int, int, str]) -> str:
+    arch, datasource, T, dsae, extra = shard
     _assert_pinned()
-    tag = f"{arch}__{datasource}__T{T}"
+    tag = f"{arch}__{datasource}__T{T}" + (f"__d{dsae}" if dsae else "")
     out_vol = Path(VOL_DIR) / f"{tag}.json"
     _sh(f"mkdir -p {VOL_DIR}")
     if out_vol.exists():
@@ -70,7 +70,9 @@ def run_shard(shard: tuple[str, str, int]) -> str:
     out_repo = f"/repo/results/btk_rerun_{tag}.json"
     _sh(f"{PY} -m experiments.explorations.btk_rerun.driver "
         f"--arch {arch} --datasource {datasource} --T {T} "
-        f"--allow-dirty --out {out_repo}")
+        + (f"--d-sae {dsae} " if dsae else "")
+        + (extra + " " if extra else "")
+        + f"--allow-dirty --out {out_repo}")
     text = Path(out_repo).read_text()
     out_vol.write_text(text)
     vol.commit()
@@ -99,12 +101,14 @@ def _merge_rows(all_rows: list[dict], dest: Path) -> tuple[int, int]:
 
 
 @app.local_entrypoint()
-def main(collect_only: bool = False, single: str = "", arms: str = ""):
+def main(collect_only: bool = False, single: str = "", arms: str = "",
+         dsae: int = 0, extra: str = ""):
     arm_list = [a for a in arms.split(",") if a] or ARMS
-    shards = [(a, d, t) for a in arm_list for d in DATASOURCES for t in T_GRID]
+    shards = [(a, d, t, dsae, extra)
+              for a in arm_list for d in DATASOURCES for t in T_GRID]
     if single:
         a, d, t = single.split(":")
-        shards = [(a, d, int(t))]
+        shards = [(a, d, int(t), dsae, extra)]
     all_rows: list[dict] = []
     if collect_only:
         print("[collect] pulling shard files from Volume", flush=True)

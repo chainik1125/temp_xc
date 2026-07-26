@@ -68,8 +68,12 @@ def cell_k(r: dict) -> int:
     return int(_ov(r).get("k_pos", (r.get("eval_cfg") or {}).get("k_pos")))
 
 
-def is_clipped(k_pos: int, T: int) -> bool:
-    return k_pos * T >= D_SAE_SYNTH
+def cell_dsae(r: dict) -> int:
+    return int(_ov(r).get("d_sae", D_SAE_SYNTH))
+
+
+def is_clipped(k_pos: int, T: int, d_sae: int = D_SAE_SYNTH) -> bool:
+    return k_pos * T >= d_sae
 
 
 def load_rows(leaderboard: Path) -> list[dict]:
@@ -120,7 +124,7 @@ def load_baseline_refs(leaderboard: Path) -> dict:
 def aggregate(rows: list[dict]):
     acc = defaultdict(lambda: defaultdict(list))
     for r in rows:
-        key = (r["datasource"], ARM_OF[r["arch"]], cell_k(r), cell_T(r))
+        key = (r["datasource"], ARM_OF[r["arch"]], cell_k(r), cell_T(r), cell_dsae(r))
         for m, v in (r.get("metrics") or {}).items():
             acc[key][m].append(float(v))
     return {key: {m: (float(np.mean(v)), float(np.std(v)), len(v))
@@ -153,7 +157,13 @@ def main() -> None:
     refs = load_baseline_refs(args.leaderboard)
     print(f"[analysis] {len(rows)} canonical rows (eval_window_L={EVAL_L}); "
           f"{len(refs)} baseline ref cells")
-    agg = aggregate(rows)
+    agg_all = aggregate(rows)
+    # Headline figure = paper d_sae (20). The d_sae=50 wing feeds
+    # summary["slopes"] under a |d50 suffix only.
+    agg = {(b, a, k, t): md for (b, a, k, t, ds), md in agg_all.items()
+           if ds == D_SAE_SYNTH}
+    wing = {(b, a, k, t): md for (b, a, k, t, ds), md in agg_all.items()
+            if ds != D_SAE_SYNTH}
     benches = sorted({k[0] for k in agg})
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -271,6 +281,18 @@ def main() -> None:
                     bbox_inches="tight")
     plt.close(fig)
 
+    # Wing slopes (d_sae=50): de-clipped grid, all metrics.
+    for metric in METRICS:
+        for bench in sorted({k[0] for k in wing}):
+            for arch in ARM_LABEL:
+                pooled = [(t, md[metric][0])
+                          for (b, a, k, t), md in wing.items()
+                          if b == bench and a == arch and metric in md
+                          and not is_clipped(k, t, 50)]
+                s_w = slope_d_dlogT(pooled)
+                if s_w is not None:
+                    summary["slopes"][f"{bench}|{metric}|{arch}|d50"] = s_w
+
     for key, md in sorted(agg.items(), key=str):
         b, a, k, t = key
         summary["cells"][f"{b}|{a}|k{k}|T{t}"] = {
@@ -285,7 +307,7 @@ def main() -> None:
     for (b, a, k, t), md in sorted(agg.items(), key=str):
         if a == "paper-match":
             continue
-        ref = agg.get((b, "paper-match", k, t))
+        ref = agg.get((b, "paper-match", k, t))  # d_sae=20 lane only
         if not ref:
             continue
         for m in ("gauc", "eauc", "nmse"):
