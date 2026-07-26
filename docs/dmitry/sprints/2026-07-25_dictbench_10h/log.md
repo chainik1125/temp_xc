@@ -1515,3 +1515,51 @@ the sharpest available test: **the SAE reads order at AUC 1.000 and should be un
 steer it; the crosscoder reads it worse at 0.83 and should be able to.** If reading and
 steering come apart on one task, the crosscoder's value is established precisely and the
 FVU deficit becomes the price rather than the verdict. `steer_order_modal.py` runs it.
+
+## The genuine advantage: reading and steering come apart
+
+`steer_order_modal.py`, on the same order-only task where a pooled SAE latent reads the
+label at AUC 0.998. Teacher-forced Δ margin `logP(A) − logP(B)` with B the same sentences
+reordered, so multiset-matched foils cancel any generic "more tense tokens" effect. All
+writes rescaled to identical total injected norm.
+
+| arm | α=0.25 | α=0.5 | α=1.0 | α=2.0 | per-position spread |
+|---|---|---|---|---|---|
+| `sae_broadcast` | −0.90 | −1.41 | −0.91 | +2.25 | 0.0000 |
+| **`txc_slab`** | **+0.75** | **+1.36** | **+3.26** | **+9.93** | 0.0455 |
+| `txc_flat` (control) | −1.20 | −2.33 | −4.58 | −7.87 | 0.0000 |
+| `dom_slab` (ceiling) | +5.75 | +12.24 | +28.50 | +68.69 | 0.0131 |
+
+| | reads order | steers order |
+|---|---|---|
+| SAE | AUC **0.998** | +2.25 |
+| crosscoder | AUC 0.791 | **+9.93** |
+
+**S1 and S2 hold.** The per-token dictionary's write is constant in time — measured
+per-position spread exactly 0.0000 — and against two orderings of one multiset a constant
+write has nothing to push on. Its Δ margin is negative at three of four doses and reaches
++2.25 only at the largest, where it is plausibly just a generic tense-shift rather than an
+ordering effect. The crosscoder's slab is monotone in dose and 4.4× larger at matched norm.
+
+**S3 holds, and it is what makes this a temporal result rather than a better-direction
+result.** `txc_flat` takes the crosscoder's own slab, averages it over time and rebroadcasts
+it: same latent, same mean direction, same injected norm, temporal profile removed. The
+effect does not merely disappear, it **inverts** — −1.20 to −7.87 across the sweep. So the
+advantage is carried by the *arrangement* of the write across positions, not by the
+direction being better chosen. This is the same conclusion the frozen-shuffle control
+reached by permuting rows, now reached by flattening them, on a different task.
+
+S4 holds: the supervised difference-of-means ceiling is far above everything at +68.69, so
+neither dictionary is close to optimal and there is substantial headroom.
+
+**This is the advantage the sprint was looking for, and it is a statement about
+intervention, not decoding.** The architecture that reads the factor *better* steers it
+*worse*. That dissociation explains why every reading-based comparison in this sprint
+favoured the SAE — a causal transformer has already written its history into every token, so
+there is nothing left for a window code to *read* — while the steering comparison reverses,
+because a per-token dictionary has no per-latent handle that varies across time and a
+crosscoder does.
+
+It also reframes the FVU deficit. The crosscoder reconstructs 1.2-2.7× worse at matched
+realised coefficients per segment; that is the price of the shared code, and it buys a
+temporally structured write that the per-token dictionary cannot express at any budget.
