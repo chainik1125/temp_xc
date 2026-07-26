@@ -8,22 +8,37 @@ tags:
 
 ## Status
 
-Draft executive summary for `summary.md`, assembled from the theory agent's structure with
-findings 5 and 6 rewritten against the completed run. Items marked ⚠ depend on measurements
-still landing.
-
-**Pending when this was written:** the rotation ladder (the only design that could support an
-expressiveness claim), gradient-based rank arms at full configuration, and the held-out-content
-split on recency and evidence.
+Draft executive summary for `summary.md`. Every number below is read from a named result file in
+`results/txc_wins/`. Still running at the time of writing: the demonstration-order cell (three
+dictionary inits) and its n = 200 probe screen.
 
 ## Executive summary
 
-This sprint set out to find more tasks where a temporal crosscoder beats a per-token
-dictionary. It did not find them, and in the course of not finding them it produced the
-reason: a criterion, computable before any dictionary is trained, that says which tasks *could*
-separate the architectures — and the finding that almost none do.
+The sprint asked for more tasks where a temporal crosscoder beats a per-token dictionary. **It
+found three, and in establishing what kind of win they are, it withdrew the previous sprint's
+headline and produced a screen that says in advance which tasks can separate the architectures.**
 
-### The previous sprint's headline is withdrawn
+The three wins are real and they are all the same kind. On instruction-position bias, evidence
+order, and a 12-block rotation, a crosscoder latent beats **every arm obtainable from a learned
+per-token dictionary** — including that dictionary's own direction on its own schedule — with the
+temporal-profile controls holding. What it never beats is the best **rank-1** write taken from the
+metric's own gradient. So the claim is **discovery, not expressiveness**: the crosscoder finds,
+unsupervised and from reconstruction alone, a write that a per-token dictionary could have executed
+if someone had handed it the schedule. That is worth having, because the schedule is exactly what a
+practitioner does not possess — and there is now a published method that supplies one, which the
+crosscoder loses to.
+
+Four results that do not depend on any of that framework:
+
+1. **The previous sprint's headline is withdrawn**, on a one-sided-dose-grid artefact.
+2. **Reconstruction quality does not predict steering quality — the ordering is inverted.** The
+   best reconstructor of three architectures steers worst; the worst steers best, by 3.4×.
+3. **A benchmark that fixes one learning rate across architectures is not measuring
+   architectures.** Each of the three peaks at a different recipe over a 10× range.
+4. **The L1 temporal SAE has no usable sparsity coefficient** — FVU crosses 1.0 before L0 crosses
+   32, for an architectural reason.
+
+### 1. The previous sprint's headline is withdrawn
 
 The order-task result — crosscoder +11.29 against the SAE's +1.24 — was measured on a one-sided
 dose grid. Rerun at both signs with two dictionary inits, the crosscoder does not beat the SAE
@@ -46,7 +61,9 @@ directional and invisible to a positive-only sweep. Both occurred here. And **se
 at its own best dose is not neutral**: it picks each arm's saturation point, which is exactly
 where the linear reasoning that justifies every ratio below stops applying.
 
-### 1. A per-token dictionary's write is rank-1, whatever its temporal machinery
+### 2. The wins are real, and they are discovery rather than expressiveness
+
+#### A per-token dictionary's write is rank-1, whatever its temporal machinery
 
 Read from the decoders rather than argued: an SAE latent has one direction, and the tSAE's
 attention lives entirely in its encoder while its decoder holds one direction per latent with no
@@ -55,7 +72,7 @@ does automatically — varies the *coefficient* across positions but never the d
 per-token dictionary, steered well, reaches **any rank-1 write**, and the architectures can
 differ only where the intervention needs genuinely different directions at different positions.
 
-### 2. The rank of a task's optimal write is bounded by its attribute count
+#### The rank of a task's optimal write is bounded by its attribute count
 
 If activations decompose over semantic attributes, the difference slab factors as `P = S·U` —
 schedules in `S`, directions in `U` — so `rank(P) ≤ A`, the number of attributes whose positional
@@ -70,92 +87,22 @@ and proved. It predicts the phase ladder is rank-1 at every rung (two sentence p
 attribute; measured `r1` 0.921 → 0.970) and an `m`-block rotation is rank `m − 1`.
 
 The design rule that follows: **an expressiveness result needs a task where two or more distinct
-attributes move in different directions at different positions.** The cheapest natural source is
-content plus its own carried state, since a maintained state's schedule is the running integral
-of the content's, and an integral is never proportional to its integrand.
+attributes move in different directions at different positions.**
 
-### 3. One number screens a task before any dictionary is trained — as a ranking, not a rule
+⚠ **The proposed source for that second attribute is refuted, on both tasks it was applied to.**
+The argument was content plus its own carried state, since a maintained state's schedule is the
+running integral of the content's. It makes a checkable prediction about profile structure, and
+the prediction fails twice. On instruction position, `u₁` and `u₂` both live on the two
+instruction positions with filler ≤ 0.02 in each — nearly identical, not disjoint. On
+demonstration order, `u₂` is **U-shaped**, mass at positions 1 and 12 with a deep trough between,
+where a running balance would ramp monotonically.
 
-`c` is the share of a task's optimal write that a **constant** write can reach. It costs one
-backward pass per document and involves no dictionary. One dedicated screen covers seven tasks at
-identical `n_docs = 200` and `n_grad = 40` (`results/txc_wins/geometry_all.json`), so the column
-below is a single consistent measurement rather than a pooling of per-run values:
+So rank ≥ 2 is real in both tasks and **never for the reason proposed**: in one it is
+context-dependence at the same two positions, in the other a broad mode plus an endpoint mode.
+**The attribute theorem is algebra and is untouched; the claim about which attributes supply `A`
+in real tasks is withdrawn.** It should be read as "two attributes, mechanism unidentified".
 
-| task | `c(P_dom)` | `c(Ḡ)` | crosscoder − best constant write |
-| --- | --- | --- | --- |
-| `rotate12` | 0.011 | **0.026** | **+2.30 ± 0.27** |
-| instruction position | 0.039 | **0.036** | **+0.94 ± 0.06** |
-| `rotate6` | 0.055 | 0.134 | −10.17 ± 1.46 |
-| evidence order | 0.095 | **0.143** | **+0.86 ± 0.03** |
-| order (last sprint) | 0.036 | 0.225 | −3.24 ± 0.27 |
-| `rotate2` | 0.111 | 0.255 | −8.37 ± 2.19 |
-| `phase1` | 0.037 | 0.262 | −5.30 ± 0.23 |
-
-Margins are at α = 0.5, the smallest dose where the crosscoder is significant — inside the linear
-regime, which also means these are far less contaminated by the second-order component than
-peak-dose numbers (even scales as α², odd as α).
-
-**Two things this establishes, and one it does not.**
-
-**It establishes that the gradient is the right object.** `c(P_dom)` gives 0.036 for order and
-0.039 for recency — two tasks with opposite outcomes at essentially identical values — while
-`c(Ḡ)` separates them 6×. Measured `cos(P_dom, Ḡ)` runs 0.05 to 0.19 across these tasks, so the
-difference-of-means slab is not a cheap approximation to the gradient; it is a different quantity,
-and every screen and ceiling arm must be built from the gradient. This repeats on the
-demonstration-order task built *after* the prediction was registered, where `r1(P_dom)` = 0.94
-would have discarded it and `r1(Ḡ)` = 0.59 says it has the second-most rank headroom in the sprint.
-
-**It establishes a classifier, not a ranking.** The deltas are on different scales across tasks,
-so what the screen is being asked to do is call the **sign**, not order the magnitudes. **A
-threshold at `c` = 0.14 classifies 6 of 7.** The single inversion is the adjacent pair `rotate6`
-(0.134, loses) and evidence (0.143, wins), which differ by 0.009 — so `evidence` is a boundary
-case next to a loss rather than an outlier inside the win region, which is the honest picture of a
-real but imperfect threshold. Reported as a rank correlation on magnitudes instead, τ = −0.52,
-dragged down by `rotate6`'s large negative — a fact about that task's effect size rather than
-about the screen.
-
-**It does not establish a quantitative law.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order**
-quantity, odd in α — but the constant arms measure **72–80% even**, i.e. mostly curvature. So the
-two quantitative tests that appeared to support `c` were computed against a numerator that is
-largely not the thing `c` bounds. Recomputed on the odd component alone, against a prediction
-registered in advance:
-
-| test | on raw peaks | on the odd component | registered prediction |
-| --- | --- | --- | --- |
-| four-rung ordering | 4/4 | **0/4**, values sign-inconsistent near zero | "still passes 4/4" |
-| τ (two independent implementations) | −0.570, −0.58 | **−0.496, −0.467** | "\|τ\| rises above 0.58" |
-
-**The prediction fails, but the recomputation does not cleanly refute `c` either — the odd
-estimator is too noisy to settle it.** The odd part is a difference of two noisy estimates, so
-signal shrinks while noise does not, and the loss falls hardest on the low-`c` winning tasks that
-anchor the correlation: recency's SNR drops 18.1 → 8.5 and evidence's 13.4 → 3.5, while the
-rotation rungs gain. Isolating the correct component costs more in noise than it recovers in
-specificity. **τ = −0.58 therefore stands as the best available estimate**, and the obvious attempt
-to strengthen it has been made and has failed — which makes "ranks but does not decide" more
-secure rather than less.
-
-**What survives is one solid consequence and one honest limit.** The constant arms being 72–80%
-even means the per-token baselines are largely **second-order artefact**, so `sae_broadcast` is a
-mis-specified comparator rather than a weak one and the crosscoder's *directional* margin over it
-is understated. And `c` is a **ranking heuristic with a known inversion**, not an instrument.
-
-> **Geometry sets the ceilings. Discovery determines what is reached.** Every result in this
-> sprint is decided by the second, which is why a geometric screen ranks candidates and cannot
-> call them.
-
-### 4. `c` is a property of the task *and the metric*
-
-The same task screens differently under different metrics. An ordering metric
-(`logP(A) − logP(B)`) cancels *content* when multisets match but leaves *context* exposed — the
-residue a constant write rode. A difference-of-differences metric additionally cancels anything
-pushing both classes the same way, driving `c` toward zero by construction. That is why the
-constructed ladders reversed and the real-behaviour tasks did not.
-
-One line: **use a difference-of-differences metric and a symmetric dose grid.** The first removes
-a component the ordering metric leaves exposed; the second is the only thing that reveals which
-kind of effect an arm has.
-
-### 5. The surviving win is discovery, not expressiveness — and the ordering is measured
+#### The surviving win is discovery, not expressiveness — and the ordering is measured
 
 **Reported at matched dose in the linear regime.** Selecting each arm at its own best dose picks
 its saturation point, which is where the first-order reasoning behind every ratio here stops
@@ -279,7 +226,88 @@ recency, evidence and `recency_var`, against the crosscoder's 0.719, 0.685 and 0
 tasks that carry the empirical claim. A per-token dictionary reads these factors perfectly and
 steers them worst. It is the most-replicated finding in the project.
 
-### 6. Reconstruction quality does not predict steering quality — the ordering is inverted
+### 3. One number screens a task before any dictionary is trained
+
+`c` is the share of a task's optimal write that a **constant** write can reach. It costs one
+backward pass per document and involves no dictionary. One dedicated screen covers seven tasks at
+identical `n_docs = 200` and `n_grad = 40` (`results/txc_wins/geometry_all.json`), so the column
+below is a single consistent measurement rather than a pooling of per-run values:
+
+| task | `c(P_dom)` | `c(Ḡ)` | crosscoder − best constant write |
+| --- | --- | --- | --- |
+| `rotate12` | 0.011 | **0.026** | **+2.30 ± 0.27** |
+| instruction position | 0.039 | **0.036** | **+0.94 ± 0.06** |
+| `rotate6` | 0.055 | 0.134 | −10.17 ± 1.46 |
+| evidence order | 0.095 | **0.143** | **+0.86 ± 0.03** |
+| order (last sprint) | 0.036 | 0.225 | −3.24 ± 0.27 |
+| `rotate2` | 0.111 | 0.255 | −8.37 ± 2.19 |
+| `phase1` | 0.037 | 0.262 | −5.30 ± 0.23 |
+
+Margins are at α = 0.5, the smallest dose where the crosscoder is significant — inside the linear
+regime, which also means these are far less contaminated by the second-order component than
+peak-dose numbers (even scales as α², odd as α).
+
+**Two things this establishes, and one it does not.**
+
+**It establishes that the gradient is the right object.** `c(P_dom)` gives 0.036 for order and
+0.039 for recency — two tasks with opposite outcomes at essentially identical values — while
+`c(Ḡ)` separates them 6×. Measured `cos(P_dom, Ḡ)` runs 0.05 to 0.19 across these tasks, so the
+difference-of-means slab is not a cheap approximation to the gradient; it is a different quantity,
+and every screen and ceiling arm must be built from the gradient. This repeats on the
+demonstration-order task built *after* the prediction was registered, where `r1(P_dom)` = 0.94
+would have discarded it and `r1(Ḡ)` = 0.59 says it has the second-most rank headroom in the sprint.
+
+**It establishes a classifier, not a ranking.** The deltas are on different scales across tasks,
+so what the screen is being asked to do is call the **sign**, not order the magnitudes. **A
+threshold at `c` = 0.14 classifies 6 of 7.** The single inversion is the adjacent pair `rotate6`
+(0.134, loses) and evidence (0.143, wins), which differ by 0.009 — so `evidence` is a boundary
+case next to a loss rather than an outlier inside the win region, which is the honest picture of a
+real but imperfect threshold. Reported as a rank correlation on magnitudes instead, τ = −0.52,
+dragged down by `rotate6`'s large negative — a fact about that task's effect size rather than
+about the screen.
+
+**It does not establish a quantitative law.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order**
+quantity, odd in α — but the constant arms measure **72–80% even**, i.e. mostly curvature. So the
+two quantitative tests that appeared to support `c` were computed against a numerator that is
+largely not the thing `c` bounds. Recomputed on the odd component alone, against a prediction
+registered in advance:
+
+| test | on raw peaks | on the odd component | registered prediction |
+| --- | --- | --- | --- |
+| four-rung ordering | 4/4 | **0/4**, values sign-inconsistent near zero | "still passes 4/4" |
+| τ (two independent implementations) | −0.570, −0.58 | **−0.496, −0.467** | "\|τ\| rises above 0.58" |
+
+**The prediction fails, but the recomputation does not cleanly refute `c` either — the odd
+estimator is too noisy to settle it.** The odd part is a difference of two noisy estimates, so
+signal shrinks while noise does not, and the loss falls hardest on the low-`c` winning tasks that
+anchor the correlation: recency's SNR drops 18.1 → 8.5 and evidence's 13.4 → 3.5, while the
+rotation rungs gain. Isolating the correct component costs more in noise than it recovers in
+specificity. **τ = −0.58 therefore stands as the best available estimate**, and the obvious attempt
+to strengthen it has been made and has failed — which makes "ranks but does not decide" more
+secure rather than less.
+
+**What survives is one solid consequence and one honest limit.** The constant arms being 72–80%
+even means the per-token baselines are largely **second-order artefact**, so `sae_broadcast` is a
+mis-specified comparator rather than a weak one and the crosscoder's *directional* margin over it
+is understated. And `c` is a **ranking heuristic with a known inversion**, not an instrument.
+
+> **Geometry sets the ceilings. Discovery determines what is reached.** Every result in this
+> sprint is decided by the second, which is why a geometric screen ranks candidates and cannot
+> call them.
+
+#### `c` is a property of the task *and the metric*
+
+The same task screens differently under different metrics. An ordering metric
+(`logP(A) − logP(B)`) cancels *content* when multisets match but leaves *context* exposed — the
+residue a constant write rode. A difference-of-differences metric additionally cancels anything
+pushing both classes the same way, driving `c` toward zero by construction. That is why the
+constructed ladders reversed and the real-behaviour tasks did not.
+
+One line: **use a difference-of-differences metric and a symmetric dose grid.** The first removes
+a component the ordering metric leaves exposed; the second is the only thing that reveals which
+kind of effect an arm has.
+
+### 4. Reconstruction quality does not predict steering quality
 
 At 8.0 realised coefficients per segment on the recency corpus, **each arm at its own best
 recipe** from a full lr × steps sweep:
@@ -314,7 +342,7 @@ reason. Best Δ over symmetric doses at per-arm recipes:
 On recency the advantage is **larger** at per-arm recipes than at the shared one (+7.81 against
 +6.48).
 
-### 7. A single learning rate across architectures does not measure architectures
+#### A single learning rate across architectures does not measure architectures
 
 The sprint's default `lr = 3e-4` is near-optimal for the SAE and wrong for both temporal
 architectures. Best FVU per arm across a 3 × 2 recipe sweep on the recency corpus, matched at 8.0
@@ -344,7 +372,7 @@ learning rate (10.15 at 3e-4, 8.32 at 1e-3, 8.04 at 1e-3/6000, against nominal 8
 and budget-matching are not independent knobs**. And the crosscoder is the only one of the three
 that diverges outright — FVU 0.0968 at 1e-3 against 0.3596 at 3e-3.
 
-### 8. The scope limit, and what the crosscoder is *not* doing
+### 5. Scope limits, and what the crosscoder is not doing
 
 The advantage requires the factor to sit at **consistent positions across documents**. A
 dictionary latent is one fixed write reused everywhere, so any fixed-write arm is bounded by the

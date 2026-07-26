@@ -74,6 +74,13 @@ reasoning.
    test than the phase ladder's 0.921 → 0.970. Theory would run this **before** the rotation ladder.
    The single-label control is the falsifier: with identical labels both `Δc` and `Δs` vanish, so
    the task must fall back to whatever rank its content alone supplies.
+2e. **Quote `n` beside every `r1` and every retention figure, and never compare across `n`.**
+   Both are strongly `n`-sensitive and we have nearly drawn a false conclusion from it once.
+   Measured on one design: `r1(grad)` reads **0.401 at n = 12** and **0.587 at n = 200**;
+   shared-write retention is noise-floor sensitive as `1/sqrt(n)`, so a probe-smoke **0.756 at
+   n = 10** is not comparable to **0.272 at n = 200**. A smoke-scale `r1` is not a small-sample
+   estimate of the full-scale one — it is a different number. Fix the `n` before comparing cells,
+   and treat any cross-cell `r1` comparison at differing `n` as uninterpretable.
 3. **Size the go/no-go at ~128 permutations.** Typical permutation-to-permutation accuracy std is
    about two points; the dramatic gaps are the tails and must be searched for. A 24-permutation
    sweep showing a small spread means "underpowered", not "no effect".
