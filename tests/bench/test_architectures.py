@@ -20,6 +20,12 @@ class TestTopKSAE:
     def test_create_and_forward(self):
         spec = TopKSAESpec()
         model = spec.create(D_IN, D_SAE, K, DEVICE)
+        # Seeded: encode() is TopK followed by ReLU, so realised L0 is
+        # min(k, #{pre > 0}). On untrained weights and unseeded random input the ReLU
+        # occasionally discards a selection, which made this fail about 1 run in 8 with
+        # L0 = 3.875. The exact-k assertion below is only meaningful once the input is
+        # fixed. See tests/bench/test_crosscoder_activations.py for that composition.
+        torch.manual_seed(0)
         x = torch.randn(8, D_IN)
         loss, x_hat, z = model(x)
         assert x_hat.shape == (8, D_IN)

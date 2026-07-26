@@ -70,6 +70,27 @@ def test_batchtopk_spends_k_per_sample_on_average_in_training():
     z = m.encode(_batch(n))
     # The batch rule allocates k*B non-zeros in total, unevenly across samples.
     assert int((z != 0).sum()) == K_WINDOW * n
+
+
+def test_batchtopk_realises_k_even_when_preacts_are_negative():
+    """The reason batchtopk is the default: no ReLU, so nothing selected is discarded."""
+    m = _model("batchtopk").train()
+    with torch.no_grad():
+        m.b_enc.fill_(-50.0)
+    n = 16
+    z = m.encode(_batch(n))
+    assert int((z != 0).sum()) == K_WINDOW * n
+    assert (z < 0).any(), "with pre-acts driven negative, selected values stay signed"
+
+
+def test_batchtopk_relu_inherits_the_relu_cap():
+    """The diagnostic arm: batch selection plus ReLU collapses like topk_relu."""
+    m = _model("batchtopk_relu").train()
+    with torch.no_grad():
+        m.b_enc.fill_(-50.0)
+    n = 16
+    z = m.encode(_batch(n))
+    assert int((z != 0).sum()) < K_WINDOW * n, "expected the ReLU to discard selections"
     assert (z >= 0).all()
 
 
@@ -78,15 +99,16 @@ def test_batchtopk_learns_a_threshold_and_uses_it_at_eval():
     assert torch.isnan(m.bt_threshold)
     for _ in range(5):
         m.encode(_batch())
-    assert torch.isfinite(m.bt_threshold) and m.bt_threshold > 0
+    # Without the ReLU the batch's inclusion boundary may sit either side of zero, so
+    # only finiteness is guaranteed -- not positivity.
+    assert torch.isfinite(m.bt_threshold)
 
     m.eval()
     x = _batch()
     z = m.encode(x)
     pre = m.pre_acts(x)
     # Eval is a fixed threshold, not a batch rule, so it must be per-sample independent.
-    assert torch.equal(z != 0, pre > m.bt_threshold)
-    assert (z >= 0).all()
+    assert torch.equal(z != 0, pre >= m.bt_threshold)
 
 
 def test_batchtopk_eval_is_independent_of_batch_composition():
@@ -109,14 +131,17 @@ def test_untrained_batchtopk_falls_back_to_topk():
     assert int((z != 0).sum(-1).max()) <= K_WINDOW
 
 
-def test_default_activation_is_unchanged():
-    """Existing callers must keep the historical behaviour."""
-    assert TemporalCrosscoder(D_IN, D_SAE, T, K_PER).activation == "topk_relu"
-    assert CrosscoderSpec(T=T).activation == "topk_relu"
+def test_default_activation_is_batchtopk():
+    """BatchTopK without ReLU is the default; topk_relu remains selectable for
+    reproducing pre-existing runs."""
+    assert TemporalCrosscoder(D_IN, D_SAE, T, K_PER).activation == "batchtopk"
+    assert CrosscoderSpec(T=T).activation == "batchtopk"
+    assert TemporalCrosscoder(D_IN, D_SAE, T, K_PER,
+                              activation="topk_relu").activation == "topk_relu"
 
 
 def test_spec_passes_activation_through():
-    spec = CrosscoderSpec(T=T, activation="batchtopk")
+    spec = CrosscoderSpec(T=T, activation="topk")
     m = spec.create(D_IN, D_SAE, K_PER, torch.device("cpu"))
-    assert m.activation == "batchtopk"
-    assert "batchtopk" in spec.name
+    assert m.activation == "topk"
+    assert "topk" in spec.name

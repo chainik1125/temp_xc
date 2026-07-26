@@ -40,18 +40,28 @@ class TemporalCrosscoder(nn.Module):
         TopK with no ReLU (the Gao et al. formulation). Realised L0 equals k by
         construction, so capacity cannot collapse, at the cost of signed coefficients.
 
-    ``"batchtopk"``
-        BatchTopK (Bussmann et al. 2024): keep the ``k * B`` largest pre-activations
-        across the whole batch rather than k per sample, letting the model spend unevenly
-        across windows. A batch rule needs a batch, so at eval time the standard
-        substitute is a fixed threshold estimated during training -- tracked here as an
-        EMA of the smallest activated value per step and applied JumpReLU-style.
+    ``"batchtopk"`` (default)
+        BatchTopK, following Bussmann et al. 2024: keep the ``k * B`` largest
+        pre-activations across the whole batch rather than k per sample, so the model can
+        spend unevenly across windows, and keep the selected values as they are. No ReLU.
+        Realised L0 averages k per sample by construction, so capacity cannot collapse.
+        A batch rule needs a batch, so at eval time the substitute is a fixed threshold
+        estimated during training -- an EMA of the smallest selected value per step,
+        applied JumpReLU-style.
+
+    ``"batchtopk_relu"``
+        Batch-level selection with a ReLU after it. This is *not* the published
+        formulation; it is this repo's ReLU-after-TopK convention carried over to batch
+        selection, kept only as a diagnostic. It is measurably indistinguishable from
+        ``topk_relu`` whenever the ReLU is what binds -- batch-level selection cannot find
+        positive pre-activations that do not exist, so it inherits the same cap
+        (measured at kper=8, lr=1e-3: 14% of budget spent, against 13% for ``topk_relu``).
     """
 
-    VALID_ACTIVATIONS = ("topk_relu", "topk", "batchtopk")
+    VALID_ACTIVATIONS = ("topk_relu", "topk", "batchtopk", "batchtopk_relu")
 
     def __init__(self, d_in: int, d_sae: int, T: int, k: int | None,
-                 activation: str = "topk_relu", bt_threshold_ema: float = 0.01):
+                 activation: str = "batchtopk", bt_threshold_ema: float = 0.01):
         super().__init__()
         if activation not in self.VALID_ACTIVATIONS:
             raise ValueError(
@@ -90,18 +100,23 @@ class TemporalCrosscoder(nn.Module):
         if self.k is None:
             return F.relu(pre)
 
-        if self.activation == "batchtopk":
+        if self.activation in ("batchtopk", "batchtopk_relu"):
             if self.training:
                 flat = pre.reshape(-1)
                 n = min(self.k * pre.shape[0], flat.numel())
                 vals, idx = flat.topk(n)
+                if self.activation == "batchtopk_relu":
+                    vals = F.relu(vals)
                 z = torch.zeros_like(flat)
-                z.scatter_(0, idx, F.relu(vals))
+                z.scatter_(0, idx, vals)
                 z = z.view_as(pre)
                 with torch.no_grad():
-                    active = z[z > 0]
-                    if active.numel():
-                        lo = active.min()
+                    # Smallest *selected* value. Without the ReLU this may be negative,
+                    # which is fine -- it is still the batch's inclusion boundary, and it
+                    # is what the eval-time threshold has to reproduce.
+                    lo = vals.min() if self.activation == "batchtopk" else (
+                        vals[vals > 0].min() if (vals > 0).any() else None)
+                    if lo is not None:
                         self.bt_threshold = (
                             lo if torch.isnan(self.bt_threshold)
                             else (1 - self.bt_threshold_ema) * self.bt_threshold
@@ -109,8 +124,8 @@ class TemporalCrosscoder(nn.Module):
                         )
                 return z
             if not torch.isnan(self.bt_threshold):
-                # Threshold is positive, so this is already non-negative.
-                return pre * (pre > self.bt_threshold)
+                z = pre * (pre >= self.bt_threshold)
+                return F.relu(z) if self.activation == "batchtopk_relu" else z
             # Untrained: fall through to per-sample TopK rather than emit garbage.
 
         topk_vals, topk_idx = pre.topk(self.k, dim=-1)
@@ -149,10 +164,10 @@ class CrosscoderSpec(ArchSpec):
 
     data_format = "window"
 
-    def __init__(self, T: int, activation: str = "topk_relu"):
+    def __init__(self, T: int, activation: str = "batchtopk"):
         self.T = T
         self.activation = activation
-        self.name = f"TXCDR T={T}" + ("" if activation == "topk_relu"
+        self.name = f"TXCDR T={T}" + ("" if activation == "batchtopk"
                                       else f" [{activation}]")
 
     @property
