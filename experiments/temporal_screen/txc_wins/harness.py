@@ -224,11 +224,22 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         a_ho = auc_of(Zho[:, j], yho)
         return j, float(0.5 + abs(a_ho - 0.5)), sign, float(0.5 + dv[j])
 
+    # PROVENANCE. `lr` and `steps` are the FALLBACK defaults, not necessarily what ran: any
+    # arm with a per-arm entry in `recipe` overrides them, and every headline result in this
+    # sprint does. Reading them as the configuration gives the wrong answer in under a
+    # minute, so `recipe_overrides_defaults` says outright whether they were used, and
+    # `recipe` is always the authority. Keeping the two fields (rather than dropping them)
+    # preserves comparability with the ~90 files already written.
+    _rec = {"sae": [sae_lr or lr, sae_steps or steps],
+            "txc": [txc_lr or lr, txc_steps or steps],
+            "tsae": [tsae_lr or lr, tsae_steps or steps]}
     out = {"model": model_id, "layer": int(L), "k_seg": k_seg, "T": T, "d_sae": d_sae,
            "k": k, "steps": steps, "lr": lr, "n_train": n_train, "n_test": n_test,
-           "recipe": {"sae": [sae_lr or lr, sae_steps or steps],
-                      "txc": [txc_lr or lr, txc_steps or steps],
-                      "tsae": [tsae_lr or lr, tsae_steps or steps]},
+           "recipe_overrides_defaults": any(
+               v is not None for v in (sae_lr, sae_steps, txc_lr, txc_steps,
+                                       tsae_lr, tsae_steps)),
+           "recipe_is_authoritative": True,
+           "recipe": _rec,
            "seed": seed, "dict_seed": dict_seed,
            "held_out_content": make_pair_test is not None,
            "alphas": list(alphas), "reading": {}, "sparsity": {}, "arms": {}}
