@@ -112,6 +112,28 @@ target.
 > discovery outcomes — and this sprint's finding is that **discovery is the binding constraint
 > everywhere**.
 
+⚠ **Both quantitative tests of `c` were measured on the wrong component, and on the right one
+they fail.** `c` bounds `⟨W_const, Ḡ⟩`, a first-order quantity, which is **odd** in α — but the
+constant arms are 72–80% **even**, so the 4/4 ordering test and the τ = −0.58 were both computed
+against a numerator that is mostly curvature. Recomputed on the odd component alone (`α = 0.5`,
+the linear regime), with the outcome registered in advance by its author:
+
+| test | on raw peaks | on the odd component | registered prediction |
+| --- | --- | --- | --- |
+| four-rung ordering | **4/4** | **0/4** | "still passes 4/4" |
+| τ across 24 cells | −0.58 | **−0.467** | "\|τ\| rises above 0.58" |
+
+Both predictions are refuted. The reason is visible in the magnitudes: the constant write's odd
+share of the optimal write measures **0.9–6% with inconsistent sign** across the ladder, against
+`sqrt(c)` predictions of 18–42%. **On the component `c` is actually about, a constant write
+achieves essentially nothing on every task measured, so there is no spread for `c` to rank.**
+
+This cuts two ways and both belong in the record. It **strengthens** the architectural claim —
+constant writes have no first-order purchase on any of these tasks, so the per-token baselines are
+weaker than their reported numbers suggest. And it **weakens `c` as a quantitative instrument**
+further than the earlier wording allowed: its author's own reading was that if `|τ|` did not rise,
+"ranks but does not decide" is if anything generous. That is the standing statement.
+
 **`c` is necessary and demonstrably not sufficient**, and the counterexample is worth more than
 the caveat. The same recency task on Qwen2.5-0.5B (`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037)
 sits squarely in the winning range and shows **no effect from any write, including the supervised

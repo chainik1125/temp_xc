@@ -2287,3 +2287,22 @@ Pattern of the night, named by theory and worth keeping: three times the reasoni
 the runnable artefact said something else — a script printing `nan` under its conclusion, a
 checklist missing its first item, an arm reported pending that had already answered. Running the
 thing caught all three.
+
+## 00:20 — the `c` tests were measured on the wrong component
+
+Theory registered, in advance, that recomputing both quantitative tests of `c` on the odd
+(first-order) component would strengthen them: the four-rung ordering test "still passes 4/4" and
+`|τ|` "rises above 0.58". Recomputed at α = 0.5 from files on disk:
+
+- ordering test: 4/4 → **0/4**
+- τ over 24 cells: −0.58 → **−0.467**
+
+Both refuted. The constant write's odd share of the optimal write is 0.9–6% with inconsistent
+sign, against `sqrt(c)` predictions of 18–42% — so on the component `c` bounds, a constant write
+does essentially nothing anywhere, and there is no spread to rank. The earlier 4/4 was measuring
+curvature.
+
+Two consequences, opposite in direction: the per-token baselines are weaker than their reported
+numbers (they are mostly second-order artefact), and `c` is a weaker instrument than the summary
+claimed. Theory's own pre-stated reading of this outcome — "ranks but does not decide is if
+anything generous" — is now the standing statement.

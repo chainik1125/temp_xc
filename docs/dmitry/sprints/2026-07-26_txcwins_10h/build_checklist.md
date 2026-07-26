@@ -46,7 +46,10 @@ reasoning.
    wrong and the comparison is dead before it starts.
 2. **Permute the interior only.** Hold the first and last demonstration fixed and match the label
    multiset, so recency and majority-label bias — both bag statistics — cannot separate the pair.
-   Apply the same restriction to the permutation sampler in the go/no-go.
+   **Superseded by 2c where that is available.** Matching the first moment removes recency-of-label
+   *analytically*, which is the principled version of what holding the endpoints fixed does by
+   construction; imposing both only shrinks the foil set for no gain. Use this item only if the
+   two-moment construction is not being used.
 2b. **Use a cyclic rotation of the interior demonstrations, not a transposition.** A two-block
    swap has an *exactly* rank-1 optimal write — `+Δ` at one slot, `−Δ` at the other — which a
    per-token latent on a position schedule reproduces, so the comparison cannot discriminate. An
@@ -90,6 +93,17 @@ reasoning.
    are unequal. Harmless in the existing run, because slot length is independent of slot index
    there, but **selecting best/worst permutations can correlate length with condition**, which
    makes it a systematic bias. Draw demonstrations from a narrow token-length band.
+
+   **Sharpened, after measuring it on the two-moment design.** The injected norm is
+   `Σ_t len_t·‖W[t]‖²`, so the confound depends on `‖W[t]‖²` and **vanishes for any write whose
+   per-position magnitude is constant** — including `sae_broadcast` and any ±1 profile. Where a
+   task is multiset-matched, `Σ_t len_t` is equal between conditions by construction, so uniform
+   arms are exactly safe. The exposure is confined to **concentrated** writes: measured on the
+   two-moment design, a single-position spike deviates by up to **17%** per document and a random
+   slab by up to **14%**, against exactly **0%** for uniform. So this is not a bias that
+   manufactures a crosscoder win — it is a per-document dose jitter that affects **only the slab
+   arms**, inflating their variance and perturbing peak-dose selection while leaving the broadcast
+   arms untouched. Fix by length-matching the paired items, or divide `W[t]` by `sqrt(len_t)`.
 7. **Run the S2 steering arm**, not just S1. The SAE direction applied at oracle-chosen positions
    is the honest per-token baseline; `S3 > S1` alone invites the reply that the baseline was
    handicapped.
