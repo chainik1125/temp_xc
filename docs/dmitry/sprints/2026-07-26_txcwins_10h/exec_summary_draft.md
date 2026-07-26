@@ -89,7 +89,7 @@ dictionary involved. Across six configurations spanning both metric modes:
 | --- | --- | --- | --- | --- | --- | --- |
 | order | 0.241 | +6.34 | +4.66 | +1.4 | no win | `order_sym_ds0.json` |
 | `rotate2` | 0.163 | +2.86 | +5.27 | −1.0 | no win | `rot_m2_T.json` |
-| `rotate3` | 0.179 | +6.43 | +11.51 | −4.2 | no win | `rot_m3_T.json` |
+| `rotate3` | 0.179 | +6.43 | +11.51 | −2.9 | no win | `rot_m3_T.json` |
 | `rotate6` | 0.102 | −0.01 | +5.92 | −7.5 | **loses** | `rot_m6_T.json` |
 | `rotate12` | **0.033** | **+18.23** | +5.36 | **+9.8** | **wins** | `rot_m12_T.json` |
 | recency | **0.034** | **+6.48** | +2.60 | **+18.3** | **wins** | `recency_gradsmoke.json` (c), `recency_v2.json` |
