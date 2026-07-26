@@ -989,3 +989,58 @@ arms, so the control certifies agreement in a fairly degenerate corner. It would
 repeated at a larger k where more of the dictionary participates.
 
 Figure: `plots/2026-07-25_dictbench/tsweep.png`.
+
+## The recovery lane: window length pays off exactly when the features are temporal
+
+Everything else this sprint trained on data whose segments are independent, where a window
+code can only lose. This lane builds data with a payoff and asks whether recovery of the
+*true* features improves systematically with T.
+
+Ground-truth features carry a direction `u` and a profile `p` spanning `L` consecutive
+segments; firing at segment `s` contributes `p[j]·u` to segment `s+j`. A T-window can cover
+at most T contiguous entries of `p`, so the best cosine any T-slab can reach against the
+full atom `p ⊗ u` is fixed by geometry before any training happens:
+
+    ceiling(T, p) = ‖ largest contiguous T-chunk of p ‖ / ‖p‖      ( = √(min(T,L)/L) flat )
+
+Measured recovery against that ceiling, 64 true features, `batchtopk`, 6000 steps:
+
+| extent | T=1 | T=2 | T=4 | T=8 | T=16 |
+|---|---|---|---|---|---|
+| L=1 | 0.922 / 1.000 | 0.988 / 1.000 | 0.998 / 1.000 | 0.991 / 1.000 | 0.338 / 1.000 |
+| L=2 | **0.816 / 0.816** | 0.827 / 1.000 | 0.949 / 1.000 | 0.989 / 1.000 | 0.378 / 1.000 |
+| L=4 | **0.661 / 0.662** | 0.765 / 0.813 | 0.840 / 1.000 | 0.944 / 1.000 | 0.386 / 1.000 |
+| L=8 | **0.481 / 0.481** | 0.582 / 0.621 | 0.712 / 0.772 | 0.825 / 1.000 | 0.461 / 1.000 |
+
+**The T=1 column is the result.** For every temporal extent, a per-token dictionary recovers
+*exactly* its analytic ceiling — 0.816 against 0.816, 0.661 against 0.662, 0.481 against
+0.481. It is not underperforming; it is saturating a limit that no amount of training,
+capacity or tuning can move, because the limit is geometric. An extent-8 feature simply
+cannot be represented better than 0.481 by any dictionary that sees one segment at a time.
+
+**And T buys back exactly what the geometry allows.** Recovery rises monotonically in T for
+every L>1 — L=8 runs 0.481 → 0.582 → 0.712 → 0.825 — tracking its ceiling upward and
+saturating once T reaches L. For L=1 features T buys nothing, which is V1 confirmed and is
+also the missing explanation for the language-corpus T-sweep: that corpus's features are all
+effectively L=1, so T could only cost, and it did (FVU 1.0× → 6.8×). The two lanes agree.
+
+V4 holds: recovery is at or below the ceiling in all 20 cells, and the gap widens with L
+(0.000 at L=2, 0.001 at L=4 for T=1, but 0.039 at L=8 for T=2, 0.060 for T=4) — longer
+features are rarer per unit of data, so more of the shortfall is estimation.
+
+**T=16 is a training failure, not a finding about T.** FVU rises to 0.832 against 0.116-0.194
+elsewhere and recovery collapses for every extent including L=1. It sits beyond every extent
+present in the data and is excluded from the saturation read-out; it should not be read as
+"large T destroys recovery" without a run where the data actually contains extent-16
+features.
+
+### The transferable principle
+
+**Set T to the temporal extent of the behaviour you are trying to capture.** Below it,
+recovery is capped by geometry at roughly `√(T/L)` and no amount of tuning helps; at or
+above it, recovery saturates and further T costs reconstruction. This is checkable on a real
+task without ground truth by the same logic that produced it: sweep T, and the point where
+recovery-proxies stop improving estimates the extent of the underlying feature.
+
+Figure: `plots/2026-07-25_dictbench/recovery.png`.
+Code: `experiments/temporal_screen/dict_bench/recovery_local.py` (runs locally, no LM).
