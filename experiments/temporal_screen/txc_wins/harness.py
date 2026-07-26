@@ -57,8 +57,8 @@ def unit(v):
 
 
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
-             steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, n_perm=0,
-             seed=31415, dict_seed=0, arms=None, verbose=True):
+             steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
+             n_perm=0, seed=31415, dict_seed=0, arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
 
     `make_pair(rng)` must return `(sents_a, sents_b, carrier)`: two equal-length sentence
@@ -142,13 +142,27 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     yt = torch.tensor(y, device=dev)
     mu, sd = Xt.mean((0, 1), keepdim=True), Xt.std() + 1e-6
     Xn = (Xt - mu) / sd
-    log(f"[cache] {tuple(Xn.shape)}  class balance {float(yt.float().mean()):.3f}")
+    # HELD-OUT SPLIT, and it is not a formality. Two things were being measured in-sample
+    # before it existed, and both flattered the crosscoder:
+    #   * REALISED SPARSITY. BatchTopK is a batch rule at train time and a fixed threshold
+    #     at eval time, and the number of latents clearing that threshold is data-dependent.
+    #     Measured on the training documents the crosscoder reports 8.03 coefficients per
+    #     segment at nominal k=8; measured on held-out documents from the same distribution
+    #     it spends 11.5. The arms were being matched on the flattering number.
+    #   * READING AUC. Taking the best of 4096 latents and scoring it on the same documents
+    #     the maximum was taken over is a selection-biased estimate. The latent is now chosen
+    #     on the training split and scored on the held-out one.
+    n_hold = max(int(0.15 * Xn.shape[0]), 64)
+    Xtr, ytr = Xn[:-n_hold], yt[:-n_hold]
+    Xho, yho = Xn[-n_hold:], yt[-n_hold:]
+    log(f"[cache] {tuple(Xn.shape)}  class balance {float(yt.float().mean()):.3f}  "
+        f"train {Xtr.shape[0]} holdout {Xho.shape[0]}")
 
     def gen_win(bs):
-        return Xn[torch.randint(0, Xn.shape[0], (bs,), device=dev)]
+        return Xtr[torch.randint(0, Xtr.shape[0], (bs,), device=dev)]
 
     def gen_flat(bs):
-        f = Xn.reshape(-1, d)
+        f = Xtr.reshape(-1, d)
         return f[torch.randint(0, f.shape[0], (bs,), device=dev)]
 
     def adam_train(m, gen, bs):
@@ -170,11 +184,17 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             return 0.5
         return float((r[yy == 1].sum() - n1 * (n1 + 1) / 2) / (n1 * n0))
 
-    def best_latent(Z, yy):
-        a = torch.tensor([auc_of(Z[:, j], yy) for j in range(Z.shape[1])], device=dev)
+    def best_latent(Ztr, Zho):
+        """Choose the latent on the training split, report its AUC on the held-out one.
+
+        Returns (index, oriented holdout AUC, sign, selection AUC on train).
+        """
+        a = torch.tensor([auc_of(Ztr[:, j], ytr) for j in range(Ztr.shape[1])], device=dev)
         dv = (a - 0.5).abs()
         j = int(dv.argmax())
-        return j, float(a[j]), float(0.5 + dv[j])
+        sign = 1.0 if float(a[j]) > 0.5 else -1.0
+        a_ho = auc_of(Zho[:, j], yho)
+        return j, float(0.5 + abs(a_ho - 0.5)), sign, float(0.5 + dv[j])
 
     out = {"model": model_id, "layer": int(L), "k_seg": k_seg, "T": T, "d_sae": d_sae,
            "k": k, "steps": steps, "lr": lr, "n_train": n_train, "n_test": n_test,
@@ -187,32 +207,38 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     sae = TopKSAE(d_in=d, d_sae=d_sae, k=k).to(dev)
     adam_train(sae, gen_flat, batch_win * T)
     with torch.no_grad():
-        Zf = sae.encode(Xn.reshape(-1, d))
-        Zs = Zf.reshape(-1, T, d_sae).mean(1)
-    js, auc_s_signed, auc_s = best_latent(Zs, yt)
-    sign_s = 1.0 if auc_s_signed > 0.5 else -1.0
-    out["reading"]["sae"] = {"latent": js, "auc": auc_s}
-    out["sparsity"]["sae"] = float((Zf > 0).float().sum(-1).mean())
-    log(f"[sae] latent {js} pooled AUC {auc_s:.3f}  "
+        Ztr_ = sae.encode(Xtr.reshape(-1, d)).reshape(-1, T, d_sae).mean(1)
+        Zho_ = sae.encode(Xho.reshape(-1, d))
+        Zho_pool = Zho_.reshape(-1, T, d_sae).mean(1)
+    js, auc_s, sign_s, auc_s_tr = best_latent(Ztr_, Zho_pool)
+    out["reading"]["sae"] = {"latent": js, "auc": auc_s, "auc_selection": auc_s_tr}
+    out["sparsity"]["sae"] = float((Zho_ > 0).float().sum(-1).mean())
+    log(f"[sae] latent {js} pooled AUC {auc_s:.3f} (holdout; {auc_s_tr:.3f} in-sample)  "
         f"realised {out['sparsity']['sae']:.2f} coeff/segment")
     v_sae = unit(sae.W_dec.data[:, js].float())
     writes["sae_broadcast"] = sign_s * unit(v_sae.unsqueeze(0).expand(T, -1).contiguous())
 
     # ---------------- 2. Temporal Crosscoder ----------------
     torch.manual_seed(dict_seed)
-    txc = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=T, k=k,
+    # Nominal k is not the comparison axis. BatchTopK's eval threshold lets the
+    # crosscoder overspend on held-out data -- 11.5 coefficients per segment at nominal
+    # k=8 -- so `txc_k` exists to be lowered until its REALISED held-out spend matches the
+    # SAE's, which is exactly k because TopK binds exactly.
+    txc = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=T, k=(txc_k if txc_k else k),
                              activation="batchtopk").to(dev)
     with torch.no_grad():
         txc._normalize_decoder()
     adam_train(txc, gen_win, batch_win)
     with torch.no_grad():
-        Zt = txc.encode(Xn)
-    jt, auc_t_signed, auc_t = best_latent(Zt, yt)
-    sign_t = 1.0 if auc_t_signed > 0.5 else -1.0
-    out["reading"]["txc"] = {"latent": jt, "auc": auc_t}
-    out["sparsity"]["txc"] = float((Zt != 0).float().sum(-1).mean()) / T
-    log(f"[txc] latent {jt} window AUC {auc_t:.3f}  "
-        f"realised {out['sparsity']['txc']:.2f} coeff/segment")
+        Zt_tr, Zt_ho = txc.encode(Xtr), txc.encode(Xho)
+    jt, auc_t, sign_t, auc_t_tr = best_latent(Zt_tr, Zt_ho)
+    out["reading"]["txc"] = {"latent": jt, "auc": auc_t, "auc_selection": auc_t_tr,
+                             "nominal_k": int(txc_k if txc_k else k)}
+    out["sparsity"]["txc"] = float((Zt_ho != 0).float().sum(-1).mean()) / T
+    out["sparsity"]["txc_insample"] = float((Zt_tr != 0).float().sum(-1).mean()) / T
+    log(f"[txc] latent {jt} window AUC {auc_t:.3f} (holdout; {auc_t_tr:.3f} in-sample)  "
+        f"realised {out['sparsity']['txc']:.2f} coeff/segment "
+        f"({out['sparsity']['txc_insample']:.2f} in-sample)")
     P_txc = unit(txc.W_dec.data[jt].float())
     writes["txc_slab"] = sign_t * P_txc
     writes["txc_flat"] = sign_t * unit(P_txc.mean(0, keepdim=True).expand(T, -1).contiguous())
@@ -247,12 +273,12 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             opt.step()
         ts_.eval()
         with torch.no_grad():
-            _, info = ts_(Xn)
+            _, info_tr = ts_(Xtr)
+            _, info = ts_(Xho)
             Zn_all = info["novel_codes"]
-            Zn = Zn_all.mean(1)
-        jn, auc_n_signed, auc_n = best_latent(Zn, yt)
-        sign_n = 1.0 if auc_n_signed > 0.5 else -1.0
-        out["reading"]["tsae"] = {"latent": jn, "auc": auc_n,
+        jn, auc_n, sign_n, auc_n_tr = best_latent(
+            info_tr["novel_codes"].mean(1), Zn_all.mean(1))
+        out["reading"]["tsae"] = {"latent": jn, "auc": auc_n, "auc_selection": auc_n_tr,
                                   "rule": "topk" if use_topk else "relu_l1",
                                   "kval": tsae_k, "l1_coef": tsae_l1}
         out["sparsity"]["tsae"] = float(
@@ -262,7 +288,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         # disagrees with that accounting needs the number.
         out["sparsity"]["tsae_pred"] = float(
             (info["pred_codes"].reshape(-1, d_sae) > 0).float().sum(-1).mean())
-        log(f"[tsae] latent {jn} pooled AUC {auc_n:.3f}  "
+        log(f"[tsae] latent {jn} pooled AUC {auc_n:.3f} "
+            f"(holdout; {auc_n_tr:.3f} in-sample)  "
             f"realised {out['sparsity']['tsae']:.2f} coeff/segment "
             f"(+{out['sparsity']['tsae_pred']:.1f} predicted)  "
             f"rule={'topk k=%d' % tsae_k if use_topk else 'relu+l1 %g' % tsae_l1}")
@@ -275,7 +302,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
 
     # ---------------- 4. controls ----------------
     with torch.no_grad():
-        writes["dom_slab"] = unit((Xn[yt == 1].mean(0) - Xn[yt == 0].mean(0)).float())
+        writes["dom_slab"] = unit((Xtr[ytr == 1].mean(0)
+                                   - Xtr[ytr == 0].mean(0)).float())
     g = torch.Generator(device="cpu").manual_seed(7)
     writes["random_slab"] = unit(torch.randn(T, d, generator=g).to(dev))
     rv = unit(torch.randn(d, generator=g).to(dev))

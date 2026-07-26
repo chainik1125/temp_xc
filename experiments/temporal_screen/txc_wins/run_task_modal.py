@@ -25,7 +25,8 @@ image = (
 @app.function(gpu="A10G", image=image, timeout=21600)
 def run(task: str, model_id: str, layer: int, k_seg: int, n_train: int, n_test: int,
         d_sae: int, k: int, steps: int, lr: float, batch_win: int, alphas: list,
-        tsae_l1: float, tsae_k: int, n_perm: int, seed: int, dict_seed: int):
+        tsae_l1: float, tsae_k: int, txc_k: int, n_perm: int, seed: int,
+        dict_seed: int):
     import sys
     sys.path.insert(0, "/work")
     from txc_wins.harness import run_task
@@ -37,7 +38,8 @@ def run(task: str, model_id: str, layer: int, k_seg: int, n_train: int, n_test: 
                  k_seg=k_seg, n_train=n_train, n_test=n_test, d_sae=d_sae, k=k,
                  steps=steps, lr=lr, batch_win=batch_win, alphas=alphas,
                  tsae_l1=(tsae_l1 if tsae_l1 > 0 else None),
-                 tsae_k=(tsae_k if tsae_k > 0 else None), n_perm=n_perm, seed=seed,
+                 tsae_k=(tsae_k if tsae_k > 0 else None),
+                 txc_k=(txc_k if txc_k > 0 else None), n_perm=n_perm, seed=seed,
                  dict_seed=dict_seed)
     r["task"] = task
     return r
@@ -48,12 +50,12 @@ def main(task: str = "order", model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: 
          k_seg: int = 12, n_train: int = 800, n_test: int = 100, d_sae: int = 4096,
          k: int = 8, steps: int = 2000, lr: float = 3e-4, batch_win: int = 32,
          alphas: str = "0.25,0.5,1.0,2.0", tsae_l1: float = 0.0, tsae_k: int = 0,
-         n_perm: int = 0,
+         txc_k: int = 0, n_perm: int = 0,
          seed: int = 31415, dict_seed: int = 0, tag: str = ""):
     import json
     r = run.remote(task, model, layer, k_seg, n_train, n_test, d_sae, k, steps, lr,
                    batch_win, [float(x) for x in alphas.split(",")], tsae_l1, tsae_k,
-                   n_perm, seed, dict_seed)
+                   txc_k, n_perm, seed, dict_seed)
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
     name = f"{task}{tag}.json"
