@@ -272,6 +272,18 @@ class SyntheticRecovery(Evaluator):
         # lack the key; the renderer falls back / re-grid supplies it).
         out.update(_realized_sparsity(model, data.x, L=L, n_windows=n_windows))
 
+        # Denoising latent-probe add-on (btk_rerun; paper § 4 headline
+        # metric R²_global). OPT-IN via eval_cfg["denoising_probe"]; fires
+        # only when the datasource exposes hidden_support. Additive: with
+        # the flag absent every existing row is byte-identical and the
+        # protocol version is unchanged.
+        if (spec.extra.get("denoising_probe")
+                and getattr(data, "hidden_support", None) is not None):
+            from temp_bench.evals.denoising_probe import denoising_probe_metrics
+            out.update(denoising_probe_metrics(
+                model, data, eval_window_L=L,
+                n_windows=128 if spec.smoke else 1024))
+
         # AC-only signed-motion add-on (FrequencyBench § 5). Only fires for
         # the signed_motion datasource, which exposes a hidden ±1 sign in
         # `extra`. For every other bench `extra` is None → this block is a

@@ -59,6 +59,7 @@ def run_shard(
     seeds=tuple(SEEDS),
     n_steps: int = N_STEPS,
     d_sae: int = 0,
+    probe: bool = False,
     smoke: bool = False,
     allow_dirty: bool = False,
     agent: str = "dmitry-btk-sprint",
@@ -85,6 +86,8 @@ def run_shard(
             "k_pos": int(k_pos),
             "eval_window_L": EVAL_WINDOW_L,
         }
+        if probe:
+            eval_cfg["denoising_probe"] = True
         label = f"{arch}/{datasource}/T={T}/k={k_pos}/seed={seed}"
         try:
             res = run_experiment(
@@ -116,6 +119,8 @@ def main() -> None:
     p.add_argument("--n-steps", type=int, default=N_STEPS)
     p.add_argument("--d-sae", type=int, default=0,
                    help="override synthetic d_sae (sensitivity wing)")
+    p.add_argument("--probe", action="store_true",
+                   help="denoising latent-probe add-on (markov bench)")
     p.add_argument("--out", type=str, default=None,
                    help="write the shard's rows to this JSON path")
     p.add_argument("--smoke", action="store_true",
@@ -140,7 +145,7 @@ def main() -> None:
     rows = run_shard(
         args.arch, args.datasource, args.T,
         k_pos_grid=tuple(args.k_pos), seeds=tuple(args.seeds),
-        n_steps=args.n_steps, d_sae=args.d_sae,
+        n_steps=args.n_steps, d_sae=args.d_sae, probe=args.probe,
         allow_dirty=args.allow_dirty,
     )
     if args.out:
