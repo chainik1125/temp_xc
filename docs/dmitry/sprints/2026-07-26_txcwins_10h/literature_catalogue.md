@@ -436,6 +436,7 @@ crosscoder loses, whatever the P1 and P2 columns say.
 | Demonstration order (interior-permuted, label-matched) | **yes** | **none, with the control** | free | yes | drop-in, segment = demo | 5 |
 | Instruction-order conflict / injection precedence | **yes** | **none, with the right target** | free | yes | drop-in, segment = instruction | 5 |
 | Per-section style / register scheduling | **yes** | **none** | free | yes | drop-in, segment = section | 4 |
+| Tool-call ordering in agents | **yes** | **plausibly none** | free (needs ~7B) | yes | drop-in, segment = call | 3 |
 | Multi-turn escalation (crescendo) | **yes** | likely (permissiveness is a mode) | free | yes | drop-in, segment = turn | 3 |
 | Permutation composition / state tracking | **yes** | probably (aggregates at query token) | free | yes | drop-in, segment = swap | 3, upstream hookpoint only |
 | Entity / state tracking (boxes) | **yes** | probably (same aggregation result) | free + public data | yes | segment = operation | 3 |
@@ -451,6 +452,7 @@ crosscoder loses, whatever the P1 and P2 columns say.
 | Evaluation awareness | no | yes (Shape B) | released organism | no | poor | 1 |
 | Emergent misalignment persona drift | no | yes (transferable direction) | repo c6_em | no | poor | 1 |
 | MCQ option order | **yes** | **yes** (token bias, content-invariant attractor) | free | yes | drop-in | 1 |
+| Planning / lookahead | no | **yes** (one token, five heads; causal only at 27B) | free | no | poor | 1 |
 | CoT unfaithfulness | no | yes | free | no | poor | 1 |
 | Scheming / alignment faking | no | unknown | limited | no | poor | 1 |
 
@@ -786,6 +788,38 @@ control".
 **Honest limit.** The constituency is smaller than for demonstration order — style scheduling is a
 product convenience, not an eval-validity or safety problem. It is the *safest* win available and
 the least surprising one.
+
+### Tool-call ordering in agents — priority 3, best relevance of the untried entries
+
+The clearest statement of P1 I found anywhere came from the agent-evaluation literature rather
+than from interpretability: **"an agent can call every tool correctly and still fail the task"**,
+because ordering and sequencing determine end-to-end completion. Same multiset of calls, different
+arrangement, different outcome — and unlike most entries, practitioners already frame it that way.
+
+The dependency structure is what makes it non-negotiable: `auth()` before `query()`, `create()`
+before `update()`, read state before writing it. Violating the order fails the task even when
+every individual call is well-formed, which is why the 2025–26 benchmark wave emphasises
+multi-turn, *stateful* function calling and plan DAGs (MCP-Bench, MCPWorld, OrchDAG, and the
+tool-use-drift strand of the agent-drift literature — ids unverified, all surfaced by search).
+
+**P1 — exact and natural.** The foil is the same set of calls in a dependency-violating order.
+Nothing has to be invented or defended, and the generator is templated.
+
+**DC handle — plausibly absent, and for the right reason.** To fix the ordering you must promote
+`auth` early *and* `query` late; a constant "prefer auth" write is wrong at the query slot. As
+long as the foil pair swaps which call belongs first across conditions, no single content
+direction helps both — the same argument that keeps instruction-order conflict clean. This is
+the entry's main attraction.
+
+**Metric, judge-free.** No agent harness is needed: give a context of tool-call history and take
+the logit margin on the correct next call, teacher-forced, exactly as in the existing harness.
+Segment = one tool call, `T` = number of calls.
+
+**Why 3 rather than higher.** Building a set of tasks with genuine, unambiguous dependency
+structure is real work, and a 1.5B model's function-calling ability is marginal — this likely
+needs a 7B, which the top two entries do not. It is the entry I would reach for if the sprint
+had two days rather than ten hours, and it has the best relevance story of anything still
+untried: agentic reliability is where the field's attention is.
 
 ### Multi-turn escalation (crescendo-style jailbreaks) — priority 3
 
@@ -1197,18 +1231,18 @@ measured on a completely different task.
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
-  capability gate), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
+  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
 - **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
   and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
-  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2502.02180, 2605.07984,
-  2408.15221, 2605.01687, 2605.02647, 2606.08644, 2605.26537, 2603.03258, 2601.04170,
-  2604.11978, 2605.03907, 2603.05805, 2606.26474, 2512.02194, 2411.16594.
-  All fifteen-odd are single mentions in lower-tier entries; nothing load-bearing above
-  priority 2 rests on an unverified id.
+  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2502.02180, 2408.15221,
+  2605.01687, 2605.02647, 2606.08644, 2605.26537, 2603.03258, 2601.04170, 2604.11978,
+  2605.03907, 2603.05805, 2606.26474, 2512.02194, 2411.16594.
+  All are single mentions in lower-tier entries; nothing load-bearing above priority 2 rests on
+  an unverified id.
 - **Claims withdrawn on checking:** that a published turn-shuffle ablation exists for
   crescendo-style attacks (could not confirm in Crescendo or NEXUS); that R-GSM is
   multiset-matched (it permits word edits); that EM is carried by a single unified linear
@@ -1332,3 +1366,9 @@ the per-pass times are ordering only, not measurements.
   of the difference-of-means proxies, and a second attribute. Also recorded the top entry's main
   risk — how much order sensitivity survives once recency and majority-label bias are controlled
   is unquantified — and why the go/no-go is informative either way.
+- **Pass 18** — added **tool-call ordering in agents** (priority 3, best relevance of the untried
+  entries; the agent-evaluation literature states P1 outright — "an agent can call every tool
+  correctly and still fail the task") and a **reject entry for planning / lookahead**, which the
+  brief listed: Ma & Rui (2605.07984, verified) localise rhyme planning to the line-boundary token
+  and five attention heads, recovering ~90% of planning capacity there, and find causal reliance
+  only at Gemma-3-27B — one token, five heads, and out of scale range.

@@ -139,19 +139,21 @@ show nothing — because a sceptic who has read those papers will raise both, an
 them is what buys the last sentence.
 
 > Temporal dictionaries have been proposed several times without clearly beating per-token
-> ones, and the reason turns out to be measurable rather than mysterious. A per-token
-> dictionary latent adds a single direction to the residual stream, but its coefficient can
-> vary across positions — and in the published temporal variants it does, because their
-> temporal machinery sits in the encoder while their decoder still holds one direction per
-> latent. So a per-token dictionary, steered the way people actually steer them, already
-> produces any intervention that is one direction with a time-varying strength. A crosscoder
-> differs only where the intervention needs genuinely different directions at different
-> positions. Whether a task needs that is a property of the task, computable from the model
-> in a single backward pass before any dictionary is trained; most temporal-looking tasks do
-> not need it, which is why the comparison has kept coming out flat. This work supplies the
-> number that says which side a task falls on, shows that the same number also decides
-> whether the task is readable by pooling per-token codes, and exhibits tasks on the far side
-> where the crosscoder wins because nothing per-token can do the job.
+> ones, and the reason turns out to be measurable rather than mysterious. Steering a window
+> means adding a matrix to the residual stream, one row per position, and a per-token
+> dictionary latent supplies a single direction — though its strength can vary from position
+> to position, which is what practitioners actually do and what the published temporal
+> variants do automatically. Two things must therefore hold before a window dictionary can
+> win. The behaviour must not be carried by a component that is constant across the window,
+> because a single direction broadcast everywhere reproduces that exactly and usually better.
+> And the intervention must need genuinely different directions at different positions,
+> rather than one direction on a schedule. Both are properties of the task, both are
+> computable from the model before any dictionary is trained, and most temporal-looking
+> behaviours fail the first — which is why the comparison keeps coming out flat, and why two
+> of this project's own language demonstrations lost to a broadcast write. What is new is the
+> pair of numbers that says in advance which side a task falls on, the finding that the first
+> of them also decides whether the task is readable by pooling per-token codes, and tasks on
+> the far side of both where the crosscoder wins because nothing per-token can do the job.
 
 ## The condition that comes before rank
 
@@ -184,3 +186,52 @@ label-token prior are all bag statistics.
 The defensible summary of where language steering stands is correspondingly narrow and well
 supported by both the failures and the successes: **language steering separates window codes
 from per-token codes exactly when the foil is multiset-matched.**
+
+## The screen retro-predicts eight experiments it was not built from
+
+The strongest evidence for the two gates is that they were applied backwards, to experiments
+this project ran before the framework existed, and got all eight right.
+
+**The two failures.** *Passphrase verification* looks multiset-matched to inspection — the
+foil corrupts one word of `k`, so `k−1` of them agree — but the measured constant share is
+0.665 at k=2 falling to 0.154 at k=12, discarding it at every `k` the experiment actually
+ran. Add the validity state, which is the real killer, and `c` reaches 0.56–0.85: the
+steering target *is* "authenticated", a scalar the model computes and writes everywhere,
+which is a pure DC component. *Ordered generation* is nearly definitional — a "mode" is a
+state present at every position, which is exactly a constant write — with `c` running 0.333
+at mode strength 0.5, 0.585 at 1, and 0.951 at 4. "Mode-dominated" and "large `c`" are the
+same statement.
+
+**The six successes.** The four trajectory tasks and the k-sweep use multiset-matched
+permutation foils, and their measured `c` is **0.0000 exactly** at every k. The prediction is
+that a broadcast write is pinned at zero with a generically *harmful* second-order term, and
+the observed broadcast deltas are −0.2, −0.0, −0.9, −1.0, −0.5 on one task, −3.3 on another,
+−9.3 on a third. The earlier note's own remark — "on matched multisets the DC write can only
+break symmetry against you" — is `c = 0` plus a negative second-order term, and it matches
+this sprint's finding that constant arms are even in α.
+
+**Passphrase is also where the graded statistic beats the binary one**, which is the argument
+for measuring `c` rather than checking whether a multiset matches. Its `r1` is 0.400 at k=4,
+so it is genuinely rank > 1 — abundant second-gate structure — and it fails the first gate
+numerically at every k. The two gates are independent and both are needed. Reasoning about
+the *input* is what produced the wrong call: passphrase has a maximally position-dependent
+input and a DC write target.
+
+## Every win this project has is a discovery result
+
+An already-executed measurement in the earlier note reports that the trajectory tasks'
+per-position directions are "≈ ±(one attribute direction) with signs following the profile".
+One direction with a sign schedule is rank 1, reproduced synthetically at `r1 = 1.0000`
+exactly for k = 2, 4, 6, 8, 10.
+
+So the four trajectory tasks, the full k-sweep, the 81% generation demonstration and the
+previous sprint's order task are **all rank 1**, and a profile-steered SAE or a tSAE reaches
+every one of them. All are discovery-track: the crosscoder found the waveform without being
+told it, which is real and useful and is not an expressiveness claim.
+
+The earlier analysis reached the same place in its own vocabulary — "trajectory control vs
+level control, not direction diversity" is precisely L0 against L1/L2 — without drawing the
+consequence that a *scheduled* per-token write reaches the same waveforms. That is why
+instruction recency and the rotation ladder are the only expressiveness candidates the
+project has, and why the recency `r1` measurement carries more weight than any other number
+outstanding.
