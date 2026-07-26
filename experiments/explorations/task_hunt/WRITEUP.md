@@ -24,23 +24,26 @@ baselines that only count visible surface cues), and **pre-registered
 pass/fail criteria fixed before any result existed**. This page
 documents, in plain language:
 
-- the **headline task that passed** (§ 3), with the full setup so a
-  collaborator can re-derive every number;
-- a **second task that passed every pre-registered check but that we
-  then demoted ourselves** to supporting evidence, and why (§ 4);
+- the **two headline tasks that passed** (§ 3, § 4) — the second
+  confirmed on fresh seeds after an honest first miss — with the
+  full setup so a collaborator can re-derive every number;
+- a **third task that passed every pre-registered check but that we
+  then demoted ourselves** to supporting evidence, and why (§ 5);
+- an **independently-run fourth candidate** (trailing novelty),
+  cross-checked under this program's controls (§ 6);
 - the **evidence that window *order* — not just window *access* — is
-  what matters on these tasks** (§ 5);
+  what matters on these tasks** (§ 7);
 - **every task we tried that did not become a positive result, and
-  the specific reason why** (§ 6).
+  the specific reason why** (§ 8).
 
 One honest sentence up front: out of ~25 candidate tasks screened
-and 4 taken to full panels, **exactly two survived their
-pre-registered criteria — and we subsequently demoted one of the two
-ourselves** (§ 4 explains the objection: its target is, in the
-limit, derivable from visible punctuation). The negatives are
-informative — they trace the boundary of where temporal structure
-lives in these models — and we report them at the same standard as
-the wins.
+and five taken to full pre-registered panels, **three survived
+their criteria: the two headline tasks (§ 3, § 4), and one we
+subsequently demoted ourselves** (§ 5 explains the objection: its
+target is, in the limit, derivable from visible punctuation). The
+negatives are informative — they trace the boundary of where
+temporal structure lives in these models — and we report them at
+the same standard as the wins.
 
 ## 2. The common experimental setup (read this once)
 
@@ -86,7 +89,7 @@ claim in miniature.
 1. **Untrained control** — an untrained copy of the same
    architecture. If a random window projection recovers most of the
    signal, the "result" is architecture prior, not learning. (This
-   control killed one of our own panels; see § 6.)
+   control killed one of our own panels; see § 8.)
 2. **Visible-cue baseline** — a regression that sees only the
    *surface cues in the window* (e.g., the count of question marks,
    or visible sentence boundaries). If the dictionary does not beat
@@ -174,7 +177,90 @@ The dip is real (not a budget artifact — that explanation was tested
 and retracted); its cause is not established. We report the curve as
 measured.
 
-## 4. Task 2 — "how long since the last question?" in dialogue (passed, then demoted)
+## 4. Positive task 2 — is the conversation's turn length trending up or down?
+
+*Confirmed 2026-07-26 evening on fresh seeds, after an honest first
+miss; pending team ratification.*
+
+**Why this task.** § 7 explains the measurement that pointed at
+dialogue: it is the only text domain we probed where destroying the
+*order* of a context window costs a probe accuracy. Within dialogue
+we wanted a target with **no surface marker of any kind** — nothing
+to count, no telltale character (the lesson of § 5). A *trend* is
+such a target: whether turns are getting longer or shorter is a
+comparison between past levels at different distances. No single
+token contains it, and no unordered bag of tokens does either.
+
+**The data.** The same 3,653 multi-turn conversations (DailyDialog)
+as § 5, tokenized for GPT-2; activations from residual-stream
+layer 7, in rows of 128 tokens.
+
+**The target.** At each token: the **trend of the conversation's
+turn lengths** — the slope, in tokens per turn, of a decaying-weight
+straight-line fit over the **five completed turns before the current
+one** (recent turns weighted more, half-life two turns). The current
+turn never contributes to its own label. Positive = turns getting
+longer; negative = getting shorter.
+
+**The architecture under test.** The claiming code is TXC-post
+("encode each position, then combine"): per-position features
+combined with learned offset-dependent weights — exactly the
+function class a trailing trend lives in. Its budget is
+deliberately conservative: **8 active features per window**, against
+per-token baselines spending 8 per token (a 32× larger budget at
+T = 32), so a win cannot be a capacity artifact.
+
+![Figure 4 — turn-length trend: fresh-seed confirmation of the TXC-post code](figs_writeup/fig4_ttrend_post_confirmation.png)
+
+*Figure 4: recovering the turn-length trend on dialogue (GPT-2).
+Orange: TXC-post trained; grey: its untrained twin (flat at zero);
+horizontal bands: the trained per-token baselines (their codes see
+one position at a time); dotted: the visible-cue evidence line;
+shaded: the claiming zone, where every pre-registered bar was
+evaluated at n = 6 fresh seeds.*
+
+**The serious opponent.** The pre-measured visible-cue baseline is
+the same straight-line fit computed only from turns *visible inside
+the window*: degenerate at T ≤ 8 (a short window rarely contains
+five complete turns), 0.015 at T = 16, 0.114 at T = 32. Beating it
+means the code knows about turns the window cannot see.
+
+**The result — and how it was earned.** This task took two rounds,
+and the record keeps both:
+
+- **Round 1** (a 102-cell panel) passed its scored criteria only on
+  arms that then failed the untrained control — pooled window codes
+  recover most of this target *without any training* (architecture
+  prior). The one clean profile, TXC-post (trained +0.297 vs
+  untrained +0.004 at T = 32), sat outside the frozen claiming set
+  and was recorded as an observation only (§ 8, ttrend row).
+- **Round 2**: a NEW pre-registration, TXC-post claiming, on seeds
+  the observation had never touched. The first fresh draw ({3,4,5})
+  had every margin positive but missed one of four confidence
+  intervals at n = 3 — scored **NOT-KEEP** by its own frozen rule.
+  The pre-registered extension ({6,7,8}) then passed **all four
+  margin tests on the new seeds alone** — no pooling with any
+  earlier draw: over the per-token SAE **+0.117 [+0.110, +0.123]**
+  at T = 16 and **+0.256 [+0.200, +0.313]** at T = 32; over the
+  temporal SAE +0.104 and +0.244; untrained ≤ 0.09× trained; the
+  evidence line beaten 2.5× at T = 32 (≈ 0.28 vs 0.114); the
+  T16 → T32 rise appears in 6 of 6 seeds (exact p = 0.016); the
+  conversation-held-out readout stays positive (+0.19 / +0.24).
+- A deliberately-run **budget-parity variant** (8 active per token,
+  matching the baselines' spend) *failed its own untrained control*
+  at T = 32 — at high capacity an untrained code already recovers
+  74% of the trained number. The learning signal lives in the
+  sparse per-window code; extra capacity buys only architecture
+  prior.
+
+**Why this is a latent-state claim.** The window's visible content
+is beaten 2.5×; the untrained twin reads zero; the readout survives
+holding out whole conversations; and the target is order-defined —
+a slope has no bag-of-tokens reading. This is exactly the profile
+the question-gap task (§ 5) could not sustain: there is no
+character to count here, at any window length.
+
+## 5. Task 3 — "how long since the last question?" in dialogue (passed, then demoted)
 
 *Ran 2026-07-26 afternoon; passed all pre-registered checks; demoted
 to supporting evidence the same evening — by our own objection, not
@@ -189,14 +275,14 @@ surface punctuation ultimately determines. A task whose very name
 invites the reading "so you counted question marks" cannot carry a
 headline, however clean its statistics. The section stays on this
 page because the mechanism it demonstrates — TXC codes carrying
-turn-order information that pooled per-token codes lose (§ 5) — is
-real, replicated, and bounded across architectures. Replacement
-tasks with **no surface-count reading at any window length**
-(turn-length *trend*; an independently-run trailing-novelty thread)
-are being confirmed on fresh seeds now; this section will record the
-outcome either way.
+turn-order information that pooled per-token codes lose (§ 7) — is
+real, replicated, and bounded across architectures. Both
+replacements — tasks with **no surface-count reading at any window
+length** — landed the same evening: the turn-length trend (§ 4,
+confirmed on fresh seeds) and trailing novelty (§ 6,
+cross-ratified).
 
-**Why dialogue.** § 5 explains the measurement that pointed here: of
+**Why dialogue.** § 7 explains the measurement that pointed here: of
 all the text domains we probed, dialogue is the only one where
 destroying the *order* of a context window costs a probe accuracy.
 So we designed the task for the one substrate where order
@@ -254,7 +340,30 @@ per-token SAE 0.228 at matched budget:
   flatters the TXC-vs-SAE margin; that is why we lead with the
   T-SAE comparison, whose realized budget is clean.)
 
-## 5. The order story — why these two tasks and not others
+## 6. A fourth thread, run independently: trailing novelty in web text
+
+A parallel effort by a team member (`txcwin`; not part of this
+program's pipeline) reports the same architecture — TXC-post at
+T = 8 — beating the per-token SAE, the temporal SAE, AND a stacked
+(pooled) code at matched budget on the **trailing novelty rate**:
+how often, recently, the text has introduced tokens never seen
+before *in this document*. The target is structurally surface-quiet:
+"never seen before in the document" cannot be computed from the
+window's tokens alone, at any window length. We audited that
+thread's claims against its committed artifacts and filled the two
+controls it lacked (this program's visible-cue baseline; a
+raw-representation gate at the claimed window length, on both
+models). Under our controls: the GPT-2 claims reproduce strictly
+(11–22σ); the 8-billion-parameter replication — on the paper's own
+ablation model — holds at T = 16 but not at the originally pinned
+T = 8, an amendment we have proposed to the thread's owner; and the
+window-visible surface floor stays far below every trained
+dictionary at the claim window. Claim-by-claim verdicts and the
+named caveats live in `experiments/explorations/txcwin/CROSSRATIFY.md`
+— pending both team review and the thread owner's own review (we
+flag; we do not override).
+
+## 7. The order story — why these tasks and not others
 
 Three measurements, together, explain the pattern:
 
@@ -289,15 +398,16 @@ label-permutation null (the "no signal" region); dashed line: the
 largest shuffle cost ever measured on non-dialogue text across ten
 screening experiments — dialogue's full-shuffle cost clears both.*
 
-Task 1 has an order-carried readout on reasoning traces; Task 2 sits
-on the one substrate whose order signal we measured and decomposed.
-The two passes are exactly where the order measurements said they
-should be — and nowhere else. (Task 2's later demotion, § 4, does
-not change this: the demotion is about what the task's *name*
-invites a reader to suspect, not about whether the measurement is
-real.)
+Task 1 has an order-carried readout on reasoning traces; Tasks 2
+and 3 sit on the one substrate whose order signal we measured and
+decomposed; the novelty target (§ 6) is order-defined through
+document history. The passes are exactly where the order
+measurements said they should be — and nowhere else. (Task 3's
+later demotion, § 5, does not change this: the demotion is about
+what the task's *name* invites a reader to suspect, not about
+whether the measurement is real.)
 
-## 6. Everything we tried that did not work, and why
+## 8. Everything we tried that did not work, and why
 
 Full pre-registered records for every row live in the repository
 (`LOG.md`, `RECORD.md`, per-task directories). "Panel" = the full
@@ -308,13 +418,13 @@ cheaper triage stage.
 |---|---|---|
 | operator-rate in reasoning traces (`oprate/case`) | full panel (84 cells) | **Negative:** every window cell sits below a baseline that just counts visible event-sentences in the window — the window adds a lossy copy of a count anyone can read off the surface. |
 | punctuation-intensity on web text, 3 models (`punctint-q`) | full panel ×3 models | **Negative/weak:** no model passed the pre-set margin at the canonical readout; on the strongest model (Llama-8B) the per-token code simply wins — the register is already linearized into single positions. |
-| turn-length *trend* in dialogue (`ttrend`) | full panel (102 cells) | **Failed its untrained control:** an untrained Stacked code recovers 81% of the trained number, and untrained TXC-pre *beats* trained TXC-pre — the recovery is mostly architecture prior. (The budget-matched per-window arm is the one clean exception, +0.297 trained vs +0.004 untrained; recorded as an observation, not a claim.) |
+| turn-length *trend* in dialogue (`ttrend`), first claiming set | full panel (102 cells) | **Failed its untrained control:** an untrained Stacked code recovers 81% of the trained number, and untrained TXC-pre *beats* trained TXC-pre — the recovery is mostly architecture prior. The one clean profile (TXC-post) sat outside the frozen claiming set and could claim nothing. **Resolved by § 4**: a new pre-registration on six fresh seeds confirmed the post arm; this row stays as the record of why round 1 could not claim. |
 | sentence-length "recency latch" on web text (`slen/lat`) | screen (2 models) | Real window gain, but **order-free** (shuffle costs ≈ 0 where the pre-registered prediction demanded ≥ half the window content) — the recency hypothesis failed the instrument designed to give it its best shot. |
 | sentence-length level (`slen/lev`) | screen | Window gain grows to the reach limit but is order-free; bounded by the corpus's within-document identity structure; usable as a boundary datapoint, not a case study. |
 | sentence-length dispersion (`slen/disp`) | screen | Sub-threshold everywhere (the label is nearly per-token-invisible *and* nearly window-invisible). |
 | refusal/deflection marker recurrence in chat logs (`refmark`) | screen (2 models) | **Killed by both pre-named traps:** windows never beat the visible marker-count baseline, and the within-conversation control erases the rest — the label's information was conversation identity (r_doc ≈ 0.97). |
 | quoted-speech intensity in fiction (`quotedens`) | screen (passed) | Screen-positive with the deepest identity control in the search — but bounded above T ≈ 32 by literal quote-character counting, and its profile (strong per-token conversion + order-free gain) matches the class that went 0-for-2 at panels; deferred rather than panelled. |
-| dialogue turn-length *level* (`dialevel`) | screen | The naive screen read 0.98 — entirely conversation identity; as a task it is dead, but its shuffle experiment produced the order measurement that § 5 is built on. |
+| dialogue turn-length *level* (`dialevel`) | screen | The naive screen read 0.98 — entirely conversation identity; as a task it is dead, but its shuffle experiment produced the order measurement that § 7 is built on. |
 | topic-switch clock (`interleave/tss`) | screen | The "time since topic switch" signal is *converted* — a single position carries it; a window adds nothing a per-token code lacks. |
 | novelty rate (web text) | screen | Verdict was withdrawn by its own author after a scoring error; re-screen parked. (A parallel collaborator thread later found a per-window positive on this task on other models — under its own audit pipeline, not yet cross-ratified with ours.) |
 | refusal-as-a-direction (chat) | design review | Dead before running: the published refusal direction is a *single-position* phenomenon; a window has nothing additional to read. Its recurrence port became `refmark` (killed above). |
@@ -330,7 +440,7 @@ one orchestration race that briefly stopped and restarted a running
 panel (cost ≈ $2). Neither affects any number above; both carry
 process fixes.
 
-## 7. Methods caveats that travel with every quote
+## 9. Methods caveats that travel with every quote
 
 - **The probe is conservative.** On synthetic data with exact ground
   truth, our canonical ridge readout *understates* recovery of dense
@@ -338,9 +448,21 @@ process fixes.
   never exceeds it. Architecture *orderings* are robust to this;
   absolute *levels* are lower bounds. Both readouts are reported for
   every panel cell.
-- **The two 2026-07-26 results** (Task 2; the Task-1 margin bound)
-  are pending team ratification of their disclosed caveats; this
-  page marks them accordingly and will be updated.
+- **Every 2026-07-26 result** (Task 2's confirmation; Task 3; the
+  Task-1 margin bound; the novelty cross-ratification) is pending
+  team ratification of its disclosed caveats — and the novelty
+  thread additionally awaits its owner's review. This page marks
+  them accordingly and will be updated.
+- **Task 2's margins over the per-token SAE** carry a
+  realized-sparsity note: that baseline landed 4.1–4.7 active
+  features per token against a nominal 8 (an architecture property
+  at this width; a sensitivity check passes). The temporal-SAE
+  comparison is the clean one, and Task 2 passes both.
+- **Task 2's combined six-seed statistics** carry a
+  sequential-decision caveat (the extension to six seeds was
+  decided after the first three missed one interval). The headline
+  numbers in § 4 are from the new seeds alone, which need no such
+  caveat.
 - **Model coverage is stated per result** (some screens ran 2 of 3
   models when a gated model was unavailable); no cross-model claim
   is pooled.
