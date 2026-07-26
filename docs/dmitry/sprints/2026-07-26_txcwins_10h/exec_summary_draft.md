@@ -65,10 +65,11 @@ where the linear reasoning that justifies every ratio below stops applying.
 
 #### A per-token dictionary's write is rank-1, whatever its temporal machinery
 
-Read from the decoders rather than argued: an SAE latent has one direction, and the tSAE's
-attention lives entirely in its encoder while its decoder holds one direction per latent with no
-position axis. Scaling a latent by its own activation — what practitioners do, and what the tSAE
-does automatically — varies the *coefficient* across positions but never the direction. So a
+Read from the decoders rather than argued: an SAE latent has one direction, and the attention
+temporal SAE's attention lives entirely in its encoder while its decoder holds one direction per
+latent with no position axis. **This holds for the published InfoNCE tSAE too** — both have one
+decoder direction per latent, so the rank conclusion does not depend on which is meant. Scaling a
+latent by its own activation — what practitioners do, and what a temporal SAE does automatically — varies the *coefficient* across positions but never the direction. So a
 per-token dictionary, steered well, reaches **any rank-1 write**, and the architectures can
 differ only where the intervention needs genuinely different directions at different positions.
 
@@ -98,15 +99,15 @@ each by a profile measurement the proposal itself specified:
 | serial position (primacy/recency) | `u₂` near-identical under a second moment-matched pattern pair | `corr` = **+0.18**; the 1/dist-to-end fit falls 0.898 → 0.524 |
 | differing-vs-agreeing positions | — | explains the **support** but not why the slab is rank 2 rather than rank 1 |
 
-> **Rank ≥ 2 is measured and robust across tasks and pattern pairs. What supplies the second
-> direction is unidentified: three candidate mechanisms were proposed and each was refuted by a
-> profile measurement it predicted.**
+> **Rank ≥ 2 is measured and robust across tasks and pattern pairs. The leading direction is
+> explained — the gradient's support is set by where the two classes differ, which predicts a
+> broad profile at Hamming 12 (cv 0.257) and tracks the differ-indicator at +0.885 on a Hamming-8
+> control. The *second* direction is not: three candidate mechanisms were proposed and each was
+> refuted by a profile measurement it predicted.**
 
-**One positive survives from that sequence.** On the second pattern pair the four lowest
-gradient-norm entries sit at exactly the four positions where the two classes agree — so **the
-gradient's support is set by where the classes differ**, not by position and not by any
-accumulated quantity. It is the first claim about these profiles to survive a test, and it
-explains the support while explicitly not explaining the rank.
+The accounting is `u₁` **explained** on both pattern pairs, `u₂` **unexplained** on both after
+three attempts — `cv(u₁)` = 0.257 against `cv(u₂)` = 0.962, and a constant differ-indicator cannot
+produce a U-shaped profile.
 
 The original argument, for the record:
 The argument was content plus its own carried state, since a maintained state's schedule is the
@@ -513,6 +514,12 @@ running label balance is its integral, so matching the label multiset gives **ra
 foil**. Matching the multiset is the *zeroth* moment; the state's DC residue is the *first*, since
 `Σ_t cumsum(Δc)(t) = −Σ_j j·Δc_j`. Adding the first-moment constraint gives both at once — and the
 constructed patterns match moments 0, 1 **and** 2 exactly (6 / 39 / 325).
+
+**Hamming 12 is the only diagnostic choice, not merely the efficient one.** At full Hamming
+distance every position differs, so the differ-indicator is *constant* — which removes support as
+a confound and makes pair 1 the only pair on which a residual profile shape could mean anything.
+On any lower-Hamming foil, profile structure is confounded with the differ pattern, as the
+Hamming-8 control demonstrates directly.
 
 **The pattern pair is forced, not chosen.** Enumerating all 924 balanced 12-length label
 sequences, exactly **one complement pair** matches moments 0, 1 and 2 — the pair used. There were
