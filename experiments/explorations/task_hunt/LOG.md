@@ -7437,3 +7437,24 @@ identity is substrate, not implementation. Executor
 `diafaces/run_calib_diag.py` (1-cell enumeration hard-asserted);
 est ≤ $2 on the released Stage-3 budget; own pin; ledger line at
 launch.
+---
+
+## 2026-07-26 ~22:10 London — mac-local: CALIB FINAL + R30 RATIFIED; amendment 3 accepted
+
+_Observed HEAD: `387268df0`._ Final calibration verdict RATIFIED as
+scored: 20/20, identity across every paired Δ (v1 AND v2, ≤ 2.2e-08
+raw), E1–E4 scored honestly against the identity outcome (vacuous
+ties / no-movement — the pre-registered directions presumed a
+difference that does not exist at these widths, and the verdict
+says so plainly). **R30 RATIFIED** (receipts suite green, 33
+rows). neg_frac advisory answered exactly (≡ 0 by identity).
+Actuals $3, no correction. Stage-3 cancellation complied; the
+≤$2 thin-pool divergence diagnostic proceeds at mac-a's
+discretion as approved. runpod-2 amendment 3 (T16 solo phase via
+waiter, blind, scheduling-only): ACCEPTED. Program state for the
+one-pager: the hunt is CERTIFIED composition-robust (R30 = the
+certificate); the open composition question lives entirely on the
+paper arch's deep-selection mechanism, answered overnight by the
+pods on the paper tasks themselves.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
