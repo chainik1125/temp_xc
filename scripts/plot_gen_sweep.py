@@ -14,9 +14,21 @@ comparison needs the whole curve plus a common admissibility rule.
 THE RULE. Each arm is reported at its best obedience rate SUBJECT TO coherence >= floor,
 not at its best rate outright. Without that, the winner is whichever arm degrades fastest:
 text that collapses to lowercase mush scores as perfect obedience for one of the two
-classes while saying nothing about instruction following. This is the `delta align | coh >=
-70` convention from the EM work, with a floor set from the model rather than by hand --
-the 5th percentile of the UNSTEERED per-generation mean token log-probability.
+classes while saying nothing about instruction following.
+
+COHERENCE IS THE EM/FRA JUDGE SCORE, 0-100, and the floor is 50 -- the paper's value --
+with 70 reported alongside because that is the threshold this repo's own EM work used
+(`phase3_summary.md`: `Delta align | coh >= 70`). Two numbers, one line, so the result is
+comparable both to the paper and to our prior results. Mean token log-probability under the
+unsteered model and a repetition fraction are stored per generation as SECONDARY columns:
+they are nearly free, they let a different floor be applied without regenerating, and they
+do not set the headline. If the judge column is absent the script says so and falls back to
+the log-probability floor WITH THAT STATED, rather than silently reporting a differently
+calibrated number against a threshold that assumes the judge.
+
+FULL METRIC SET, as the EM work reports it: peak, baseline, and value-at-the-floor -- not
+only the selected point. A headline delta alone hides direction and collapses silently when
+only one dose clears the floor.
 
 READING THE FIGURE. Filled markers are doses whose coherence clears the floor; open markers
 are doses that do not, and are excluded from each arm's selection. The star is the selected
@@ -65,7 +77,16 @@ def main() -> int:
     if not cells:
         print("[skip] no gen_sweep in file")
         return 1
-    floor = (d.get("coherence_floor") or {}).get("value")
+    # Judge score if present, else the log-probability fallback, and the difference is
+    # stated in the output rather than left for the reader to infer from the axis label.
+    judged = any("judge_coherence_mean" in c for c in cells)
+    if judged:
+        key, floors, scale = "judge_coherence_mean", (50.0, 70.0), "judge 0-100"
+    else:
+        key = "coherence_mean"
+        fl = (d.get("coherence_floor") or {}).get("value")
+        floors, scale = ((fl,) if fl is not None else ()), "mean token logprob (FALLBACK)"
+    floor = floors[0] if floors else None
     base = next((c for c in cells if c["arm"] == "none"), None)
 
     by_arm = {}
@@ -84,7 +105,7 @@ def main() -> int:
         label, col, ls = STYLE.get(arm, (arm, "#444444", "-"))
         xs = [c["alpha"] for c in cs]
         ys = [c["obey_earlier_cut50"] for c in cs]
-        ok = [floor is None or c["coherence_mean"] >= floor for c in cs]
+        ok = [floor is None or c[key] >= floor for c in cs]
         ax.plot(xs, ys, ls=ls, lw=1.7, color=col, label=label, zorder=2, alpha=0.9)
         ax.plot([x for x, o in zip(xs, ok) if o], [y for y, o in zip(ys, ok) if o],
                 "o", ms=6, color=col, zorder=3)
@@ -97,7 +118,7 @@ def main() -> int:
                     color=col, mec="white", mew=0.9, zorder=5)
             rows.append((arm, label, best, len(adm), len(cs)))
         # Right panel: the trade-off itself, obedience against coherence.
-        ax2.plot([c["coherence_mean"] for c in cs], ys, ls=ls, lw=1.4, color=col,
+        ax2.plot([c[key] for c in cs], ys, ls=ls, lw=1.4, color=col,
                  marker="o", ms=4.5, alpha=0.9, zorder=2)
 
     if base:
@@ -134,22 +155,48 @@ def main() -> int:
     fig.savefig(OUT, dpi=170)
     print("[saved]", OUT)
 
-    # ---- the table ----
-    print(f"\nunsteered: obey {base['obey_earlier_cut50']:.3f} (cut.7 "
-          f"{base['obey_earlier_cut70']:.3f})  coherence {base['coherence_mean']:+.3f}  "
-          f"n = {base['n']}" if base else "")
-    print(f"coherence floor {floor:+.3f}" if floor is not None else "no floor")
-    print(f"\n  {'arm':<34}{'α*':>7}{'obey':>8}{'cut.7':>8}{'coh':>9}"
-          f"{'rep':>7}{'admissible':>12}")
-    for arm, label, b, n_adm, n_all in sorted(
-            rows, key=lambda r: -r[2]["obey_earlier_cut50"]):
-        tag = " (sup.)" if b.get("supervised") else ""
-        print(f"  {label + tag:<34}{b['alpha']:>+7.2f}{b['obey_earlier_cut50']:>8.3f}"
-              f"{b['obey_earlier_cut70']:>8.3f}{b['coherence_mean']:>+9.3f}"
-              f"{b['repeat_frac_mean']:>7.3f}{f'{n_adm}/{n_all}':>12}")
-    print("\n  α* is each arm's best obedience among doses whose coherence clears the floor.")
-    print("  'admissible' is how many of its doses cleared it — an arm admitting few doses")
-    print("  is one whose effect and whose degradation arrive together.")
+    # ---- the table: FULL METRIC SET, per the EM convention ----
+    # peak, baseline and value-at-floor, not only the selected point. A headline delta
+    # alone hides direction and collapses silently when only one dose clears the floor --
+    # which is why `n_admissible` is a column rather than a footnote.
+    print(f"\ncoherence measure: {scale}")
+    if base:
+        print(f"BASELINE (unsteered): obey {base['obey_earlier_cut50']:.3f}  "
+              f"(cut.7 {base['obey_earlier_cut70']:.3f}, full-text "
+              f"{base.get('obey_earlier_fulltext', float('nan')):.3f})  "
+              f"coh {base[key]:+.1f}  n = {base['n']}")
+    for fl in (floors or [None]):
+        if fl is None:
+            print("\n[warn] no coherence floor available — every dose admitted")
+        print(f"\n=== floor: coherence >= {fl:g} ===" if fl is not None else "")
+        print(f"  {'arm':<32}{'a*':>7}{'obey@floor':>11}{'cut.7':>7}"
+              f"{'coh':>7}{'peak(any)':>11}{'a_peak':>8}{'rep':>7}{'adm':>7}")
+        out_rows = []
+        for arm, cs in by_arm.items():
+            # The asterisk marks supervised, so the table label drops the word.
+            label = STYLE.get(arm, (arm,))[0].replace(" (supervised)", "")
+            adm = [c for c in cs if fl is None or c[key] >= fl]
+            pk = max(cs, key=lambda c: c["obey_earlier_cut50"])
+            if not adm:
+                print(f"  {label:<32}{'--':>7}{'--':>11}{'--':>7}{'--':>7}"
+                      f"{pk['obey_earlier_cut50']:>11.3f}{pk['alpha']:>+8.2f}"
+                      f"{'--':>7}{0:>7}")
+                continue
+            b = max(adm, key=lambda c: c["obey_earlier_cut50"])
+            tag = " *" if b.get("supervised") else ""
+            out_rows.append((b["obey_earlier_cut50"], label + tag, b, pk, len(adm), len(cs)))
+        for _, label, b, pk, n_adm, n_all in sorted(out_rows, reverse=True,
+                                                    key=lambda r: r[0]):
+            print(f"  {label:<32}{b['alpha']:>+7.2f}{b['obey_earlier_cut50']:>11.3f}"
+                  f"{b['obey_earlier_cut70']:>7.3f}{b[key]:>+7.1f}"
+                  f"{pk['obey_earlier_cut50']:>11.3f}{pk['alpha']:>+8.2f}"
+                  f"{b['repeat_frac_mean']:>7.3f}{f'{n_adm}/{n_all}':>7}")
+    print("\n  a* is each arm's best obedience among doses whose coherence clears the floor;")
+    print("  peak(any) is its best obedience ignoring coherence entirely. A large gap between")
+    print("  the two is an arm whose effect and whose degradation arrive together.")
+    print("  'adm' counts admissible doses -- an arm admitting one dose has no dose-response.")
+    print("  * = supervised reference (built from labels or from the metric gradient),")
+    print("      not an arm a practitioner can construct from a trained dictionary.")
     return 0
 
 
