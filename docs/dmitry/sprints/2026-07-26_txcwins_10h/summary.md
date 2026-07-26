@@ -150,6 +150,14 @@ A second pattern appeared late: **a mechanism inferred to explain a discrepancy 
 the files were opened**, three times in the final hour. The resolving check was always to print the
 configuration fields next to the number, and it always came last.
 
+**And the sharpest evidence that these are hazards rather than lapses: three people on this sprint
+independently made the *same* one.** Reading a steering arm at the signed positive dose rather than
+at matched magnitude with the sign free scores any arm whose correct direction is negative as a
+failure. It withdrew the previous sprint's headline; it appeared in a figure script written at hour
+eight; and it appeared again in the red-team pass over this document, in two of five reported
+issues. **A trap that catches the people actively studying it is worth more attention than one that
+only catches novices.**
+
 ## Where things live
 
 - Code: `experiments/temporal_screen/txc_wins/` — harness, task designs, Modal runners
