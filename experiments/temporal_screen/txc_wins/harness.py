@@ -14,9 +14,23 @@ implements is the one that produced last sprint's headline, and its parts are no
      CALIBRATED l1 (see `tsae_calib_modal.py` -- the repo's documented 1e-3 is dense).
   4. READING = best-single-latent AUC for the class label. SAE codes are mean-pooled over
      the window; the TXC window code is used directly; tSAE novel codes are mean-pooled.
-  5. STEERING = teacher-forced delta margin logP(A) - logP(B) where B is the matched foil,
-     with the decoder direction or slab added at the training layer, every write rescaled to
-     identical total injected norm so nothing is won by writing harder.
+  5. STEERING = teacher-forced delta margin, with the decoder direction or slab added at the
+     training layer, every write rescaled to identical total injected norm so nothing is won
+     by writing harder. Two scoring modes:
+
+       ORDERING MODE (default). score(doc) = logP(doc), and the reported quantity is
+       [score(A) - score(B)] steered minus baseline. Because A and B are one multiset in two
+       orders, anything that depends only on which sentences are present cancels.
+
+       PROBE MODE. A task may additionally supply two CONTINUATIONS, and then
+       score(doc) = logP(cont1 | doc) - logP(cont2 | doc) -- a behavioural quantity, "which
+       way does the model resolve this", rather than a statement about which document is
+       more likely. The reported quantity is again [score(A) - score(B)] steered minus
+       baseline, and that difference-of-differences is what makes the mode worth having: a
+       write that simply adds "more cont1" pushes score(A) and score(B) by the same amount
+       and cancels exactly. Only a write that treats positions differently can move it.
+       This is how a task about a real behaviour -- which of two conflicting instructions
+       the model obeys, say -- gets a metric that a constant write cannot win.
   6. CONTROLS, every time: `txc_flat` (the TXC slab time-averaged and rebroadcast, which
      removes the profile and keeps the direction), `random_slab`, `random_broadcast`, and
      `dom_slab` (supervised per-position difference-of-means ceiling).
@@ -108,10 +122,15 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         hh = cap["h"][0].float()
         return torch.stack([hh[a:b + 1].mean(0) for a, b in ts])
 
+    def draw(rng_):
+        """make_pair may return 3 items (ordering mode) or 5 (probe mode)."""
+        p = make_pair(rng_)
+        return p if len(p) == 5 else (p[0], p[1], p[2], None, None)
+
     # ---------------- training activations, balanced over the two classes ----------------
     X, y = [], []
     for i in range(n_train):
-        sa, sb, car = make_pair(rng)
+        sa, sb, car, _, _ = draw(rng)
         assert len(sa) == len(sb) == k_seg, (
             f"make_pair returned {len(sa)}/{len(sb)} segments, expected {k_seg}")
         cls = rng.randint(0, 1)
@@ -270,9 +289,21 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     # ---------------- teacher-forced margin ----------------
     scale = float(Xt.norm(dim=-1).mean())
 
-    def margin(text, spans, W, alpha):
+    def logits_for(text, spans, cont, W, alpha):
+        """Run the document (plus optional continuation) with the write applied.
+
+        The write covers the document's SEGMENT token spans only. A continuation is
+        appended untouched, so it is influenced only through attention -- which is the
+        point: the intervention is on the trajectory, and the behaviour read out
+        downstream of it.
+        """
         e, ts2 = seg_spans(text, spans)
         ids = e["input_ids"].to(dev)
+        n_doc = ids.shape[1]
+        if cont is not None:
+            c_ids = torch.tensor(
+                [tok(cont, add_special_tokens=False)["input_ids"]], device=dev)
+            ids = torch.cat([ids, c_ids], dim=1)
         hook = None
         if W is not None:
             def edit(_m, _i, out_):
@@ -286,23 +317,44 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             lg = model(ids).logits.float().log_softmax(-1)
         if hook is not None:
             hook.remove()
-        tgt = ids[0, 1:]
-        return float(lg[0, :-1].gather(-1, tgt.unsqueeze(-1)).sum())
+        if cont is None:
+            tgt = ids[0, 1:]
+            return float(lg[0, :-1].gather(-1, tgt.unsqueeze(-1)).sum())
+        tgt = ids[0, n_doc:]
+        return float(lg[0, n_doc - 1:-1].gather(-1, tgt.unsqueeze(-1)).sum())
+
+    def doc_score(text, spans, c1, c2, W, alpha):
+        if c1 is None:
+            return logits_for(text, spans, None, W, alpha)
+        return (logits_for(text, spans, c1, W, alpha)
+                - logits_for(text, spans, c2, W, alpha))
 
     tests = []
     for _ in range(n_test):
-        sa, sb, car = make_pair(rng)
+        sa, sb, car, c1, c2 = draw(rng)
         ta, spa = build(car, sa)
         tb, spb = build(car, sb)
-        tests.append((ta, spa, tb, spb))
-    base_by_doc = [margin(ta, sa2, None, 0) - margin(tb, sb2, None, 0)
-                   for (ta, sa2, tb, sb2) in tests]
+        tests.append((ta, spa, tb, spb, c1, c2))
+    probe_mode = tests[0][4] is not None
+    out["probe_mode"] = probe_mode
+    base_by_doc = [doc_score(ta, sa2, c1, c2, None, 0)
+                   - doc_score(tb, sb2, c1, c2, None, 0)
+                   for (ta, sa2, tb, sb2, c1, c2) in tests]
+    out["baseline_contrast"] = {
+        "mean": float(np.mean(base_by_doc)),
+        "sem": float(np.std(base_by_doc, ddof=1) / np.sqrt(len(base_by_doc)))}
+    log(f"[baseline] score(A) - score(B) unsteered: "
+        f"{out['baseline_contrast']['mean']:+.2f} "
+        f"+- {out['baseline_contrast']['sem']:.2f}"
+        + ("   (probe mode: logP(cont1) - logP(cont2))" if probe_mode else ""))
 
     def score(W):
         deltas, sems = [], []
         for a in alphas:
-            ds = np.array([margin(ta, sa2, W, a) - margin(tb, sb2, W, a) - base
-                           for (ta, sa2, tb, sb2), base in zip(tests, base_by_doc)])
+            ds = np.array([doc_score(ta, sa2, c1, c2, W, a)
+                           - doc_score(tb, sb2, c1, c2, W, a) - base
+                           for (ta, sa2, tb, sb2, c1, c2), base
+                           in zip(tests, base_by_doc)])
             deltas.append(float(ds.mean()))
             sems.append(float(ds.std(ddof=1) / np.sqrt(len(ds))))
         return deltas, sems
