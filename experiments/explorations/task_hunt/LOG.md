@@ -5333,6 +5333,7 @@ plus recomputability. One check due at verdict time: the "best gain"
 line must be matched-probe-class (MLP vs MLP tok), not cross-class.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
 ## 2026-07-26 — mac-b (executor) — W1 VERDICT: the R11 order-mechanism ladder = **MIXED on 3/3** — the dialogue order signal is carried BOTH by within-turn token arrangement and by turn-block order, additively, and is concentrated in the NEAR half of the context. PENDING TEAM REVIEW
 
 Frozen card `LADDER_CARD.md` at `ede97e206` (mac-local freeze-APPROVED
