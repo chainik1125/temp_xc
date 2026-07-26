@@ -81,7 +81,27 @@ a40-bootstrap (historical, pod gone).
 ## Git: clean, pushed after this rewrite. Suite 333 green local.
 
 
-## ACTMIX PHASE (Han, ~20:15 London 2026-07-26) — CURRENT
+## ACTMIX FLEET LIVE ~21:15 London 2026-07-26 — 5 workers + hub
+All five workers launched by Han with briefings received: mac-a
+(relu_mode impl + calibration + KEEP-recheck), mac-b (forensics +
+shortlist), mac-c (archaeology + HF inventory), runpod-1 (probing
+ablations, GPUs 0,1), runpod-2 (EM ablations, GPU 2). Pod
+acceptance GREEN (separate venvs import OK, pinning 2/1, git
+identities set; tokens seeded incl. hf_token_datasets; Anthropic
+key deliberately NOT on pod — subscription login). Listening
+topology in actmix-shared (hub-and-spoke; pods watch mac-a's
+convention + mac-c's audit + my rulings). MY watch: hub watcher
+(arxiv + neurips-aniket, deadline 09:00 London) + 30-min cron.
+MY queue: freeze-review every card pre-results as it lands;
+ratify mac-a calibration (Dmitry's re-run gate) + mac-c audit
+(pods' Phase-B unblock) + mac-b shortlist (re-run gating);
+rolling ledger watch ($150/day/person); assemble the 9am-PT
+one-pager (composition audit + calibration read + ablation state)
+by ~16:00 London 2026-07-27. Expected first landings: mac-a
+convention note (~1h), mac-c partials (~2h), mac-b forensics
+(~1-2h), pod cards + cache-build ledger lines.
+
+## (superseded) ACTMIX PHASE (Han, ~20:15 London 2026-07-26)
 Post-meeting pivot. Activation-mixing finding on record (LOG
 ~20:25): txc_base TopK→ReLU k=8T (paper d(perf)/dT biased down);
 v2 backbone ReLU→BatchTopK (sae 4.4/8 most handicapped, hunt
