@@ -220,9 +220,10 @@ def make_demo_order(k_seg, match_first_moment=True, n_foils=1, pool="all"):
 # on, and give a difference-of-differences metric that cancels constant writes to first order.
 # Both metric modes have produced a crosscoder win this sprint (rotate12 ordering, recency
 # probe), so which one this task needs is open and cheap to settle by running both.
-DESIGNS = {
-    "demo_order_probe": lambda k: make_demo_order(k, match_first_moment=True),
-    "demo_order_probe_free": lambda k: make_demo_order(k, match_first_moment=False),
-    "demo_order_probe_tr": lambda k: make_demo_order(k, match_first_moment=True, pool="train"),
-    "demo_order_probe_ev": lambda k: make_demo_order(k, match_first_moment=True, pool="eval"),
-}
+# NOT REGISTERED. `designs_demoorder.py` carries the design that is run: independently audited,
+# better length-matched (0.05 word mean gap against 1.0 here), moments 0/1/2 matched against 0/1,
+# and a fixed rank-6 permutation rather than a sampled one. This file is kept because its
+# `matched_foils` enumeration and the non-extremal-reference result are what established that the
+# construction is possible at all, and because a second implementation agreeing on c ~ 1e-34 and
+# rank 2 is worth having on the record.
+DESIGNS = {}

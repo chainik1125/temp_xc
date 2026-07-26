@@ -47,7 +47,8 @@ image = (
 
 
 @app.function(gpu="A10G", image=image, timeout=5400)
-def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
+def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int,
+           mode: str = "ordering"):
     import sys
     sys.path.insert(0, "/work")
     import random
@@ -56,7 +57,8 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    from designs_demoorder import make_demo_order, moments, PATTERN_A, PATTERN_B
+    from designs_demoorder import (make_demo_order, make_demo_order_probe, moments,
+                                   PATTERN_A, PATTERN_B)
 
     print(f"[patterns] A moments {moments(PATTERN_A)}  B moments {moments(PATTERN_B)}",
           flush=True)
@@ -72,7 +74,9 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
     L = layer if layer >= 0 else len(layers_) // 2
     d = model.config.hidden_size
     T = k_seg
-    make_pair = make_demo_order(k_seg)
+    probe = mode == "probe"
+    make_pair = (make_demo_order_probe if probe else make_demo_order)(k_seg)
+    print(f"[mode] {mode}", flush=True)
     rng = random.Random(seed)
 
     def build(carrier, sents):
@@ -96,8 +100,13 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
 
     cap = {}
 
-    def run_doc(text, spans, want_grad):
-        """Returns (per-segment mean activations, d logP / d write) at layer L."""
+    def run_doc(text, spans, want_grad, conts=None):
+        """(per-segment activations, d score / d write) at layer L.
+
+        score = logP(text) in ordering mode, or logP(c1|text) - logP(c2|text) in probe
+        mode. The probe score is a difference of differences once taken across classes, so
+        any write pushing both classes the same way cancels exactly.
+        """
         e, ts = seg_spans(text, spans)
         ids = e["input_ids"].to(dev)
         w = torch.zeros(T, d, device=dev, requires_grad=want_grad)
@@ -113,10 +122,25 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
         hk = layers_[L].register_forward_hook(edit)
         try:
             if want_grad:
-                lg = model(ids).logits.float().log_softmax(-1)
-                tgt = ids[0, 1:]
-                logp = lg[0, :-1].gather(-1, tgt.unsqueeze(-1)).sum()
-                logp.backward()
+                if conts is None:
+                    lg = model(ids).logits.float().log_softmax(-1)
+                    tgt = ids[0, 1:]
+                    score = lg[0, :-1].gather(-1, tgt.unsqueeze(-1)).sum()
+                    cap["score"] = float(score.detach())
+                else:
+                    parts = []
+                    for cont in conts:
+                        cid = tok(cont, return_tensors="pt",
+                                  add_special_tokens=False)["input_ids"].to(dev)
+                        full = torch.cat([ids, cid], dim=1)
+                        lg = model(full).logits.float().log_softmax(-1)
+                        n = cid.shape[1]
+                        tgt = full[0, -n:]
+                        parts.append(
+                            lg[0, -n - 1:-1].gather(-1, tgt.unsqueeze(-1)).sum())
+                    score = parts[0] - parts[1]
+                cap["score"] = float(score.detach())
+                score.backward()
                 g = w.grad.detach().float().cpu().clone()
             else:
                 g = None
@@ -127,15 +151,20 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
             hk.remove()
         return acts, g
 
-    A_acts, B_acts, G = [], [], []
+    A_acts, B_acts, G, base_margin = [], [], [], []
     for i in range(n_pairs):
-        sa, sb, car = make_pair(rng)
+        got = make_pair(rng)
+        sa, sb, car = got[0], got[1], got[2]
+        conts = (got[3], got[4]) if len(got) == 5 else None
         assert len(sa) == len(sb) == k_seg
         assert sorted(sa) == sorted(sb), "multiset broken"
         ta, spa = build(car, sa)
         tb, spb = build(car, sb)
-        aa, ga = run_doc(ta, spa, True)
-        ab, gb = run_doc(tb, spb, True)
+        aa, ga = run_doc(ta, spa, True, conts)
+        s_a = cap["score"]
+        ab, gb = run_doc(tb, spb, True, conts)
+        s_b = cap["score"]
+        base_margin.append(s_a - s_b)
         A_acts.append(aa); B_acts.append(ab)
         G.append(ga - gb)                      # d(margin)/d(write), margin = lpA - lpB
         if (i + 1) % 25 == 0:
@@ -147,9 +176,20 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
 
     def screen_slab(P):
         fro2 = float((P ** 2).sum())
-        s = np.linalg.svd(P, compute_uv=False)
+        U, s, _ = np.linalg.svd(P, full_matrices=False)
         s2 = s ** 2
+        # |u_j| per position, normalised. If the slab were content (spikes at the
+        # manipulated positions) plus carried state (mass on the spans between), the two
+        # leading vectors would have NEAR-DISJOINT support. Coincident support means the
+        # second direction is context-dependence at the SAME positions instead.
+        prof = [list(np.abs(U[:, j]) / (np.abs(U[:, j]).max() + 1e-12))
+                for j in range(min(3, U.shape[1]))]
         return {
+            "u_profiles": [[float(x) for x in pr] for pr in prof],
+            "u1_u2_profile_cos": float(
+                np.dot(prof[0], prof[1])
+                / (np.linalg.norm(prof[0]) * np.linalg.norm(prof[1]) + 1e-12))
+            if len(prof) > 1 else None,
             "c": float(T * (P.mean(0) ** 2).sum() / fro2),
             "r1": float(s2[0] / fro2),
             "r2": float(s2[:2].sum() / fro2),
@@ -162,7 +202,7 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
     Gbar = Gs.mean(0)
     out = {
         "model": model_id, "layer": int(L), "k_seg": k_seg, "n_pairs": n_pairs,
-        "seed": seed,
+        "seed": seed, "mode": mode,
         "pattern_a": list(PATTERN_A), "pattern_b": list(PATTERN_B),
         "moments_a": list(moments(PATTERN_A)), "moments_b": list(moments(PATTERN_B)),
         "dom": screen_slab(P_dom),
@@ -177,6 +217,11 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
             / np.mean([np.linalg.norm(g) for g in Gs])),
     }
 
+    prof = np.linalg.norm(Gbar, axis=1)
+    out["grad_profile"] = [float(x) for x in prof / (prof.max() + 1e-12)]
+    early, late = float(prof[:k_seg // 2].mean()), float(prof[k_seg // 2:].mean())
+    out["recency_ratio"] = late / (early + 1e-12)
+
     print("\n===== screen =====", flush=True)
     for nm in ("dom", "grad"):
         v = out[nm]
@@ -184,6 +229,22 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
               f"s2/s1={v['sigma2_over_sigma1']:.4f}", flush=True)
     print(f"  cos(P_dom, Gbar) = {out['cos_dom_grad']:+.4f}", flush=True)
     print(f"  shared-write retention = {out['shared_write_retention']:.4f}", flush=True)
+    print(f"  grad norm profile      = "
+          + " ".join(f"{x:.2f}" for x in out["grad_profile"]), flush=True)
+    print(f"  recency ratio (late/early) = {out['recency_ratio']:.3f}", flush=True)
+    bm = np.array(base_margin)
+    out["base_margin_mean"] = float(bm.mean())
+    out["base_margin_sem"] = float(bm.std(ddof=1) / np.sqrt(len(bm)))
+    out["base_margin_abs_mean"] = float(np.abs(bm).mean())
+    print(f"\n  UNSTEERED score(A)-score(B) = {bm.mean():+.4f} +- "
+          f"{out['base_margin_sem']:.4f}   |mean abs| = {np.abs(bm).mean():.4f}"
+          f"   z = {bm.mean()/(out['base_margin_sem']+1e-12):+.2f}", flush=True)
+    for nm in ("dom", "grad"):
+        pr = out[nm]["u_profiles"]
+        print(f"  {nm} u1: " + " ".join(f"{x:.2f}" for x in pr[0]), flush=True)
+        print(f"  {nm} u2: " + " ".join(f"{x:.2f}" for x in pr[1]), flush=True)
+        print(f"  {nm} cos(|u1|,|u2|) profile = {out[nm]['u1_u2_profile_cos']:.3f}",
+              flush=True)
 
     g = out["grad"]
     ok_c = g["c"] < 0.05
@@ -200,8 +261,8 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int):
 
 @app.local_entrypoint()
 def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = 14, k_seg: int = 12,
-         n_pairs: int = 200, seed: int = 31415, tag: str = ""):
-    r = screen.remote(model, layer, k_seg, n_pairs, seed)
+         n_pairs: int = 200, seed: int = 31415, tag: str = "", mode: str = "ordering"):
+    r = screen.remote(model, layer, k_seg, n_pairs, seed, mode)
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
     p = outdir / f"demoorder_screen{tag}.json"

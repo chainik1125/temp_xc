@@ -63,7 +63,7 @@ image = (
 @app.function(gpu="A10G", image=image, timeout=21600)
 def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
              n_grad: int, d_sae: int, k: int, sae_lr: float, sae_steps: int,
-             batch_win: int, seed: int):
+             batch_win: int, seed: int, n_base: int):
     import sys
     sys.path.insert(0, "/work")
     import random
@@ -115,6 +115,20 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
         h.remove()
         hh = cap["h"][0].float()
         return torch.stack([hh[a:b + 1].mean(0) for a, b in ts])
+
+    def logp(text, spans, cont):
+        """Unsteered log-probability: whole document, or the continuation if given."""
+        e, _ = seg_spans(text, spans)
+        ids = e["input_ids"].to(dev)
+        n_doc = ids.shape[1]
+        if cont is not None:
+            ids = torch.cat([ids, torch.tensor(
+                [tok(cont, add_special_tokens=False)["input_ids"]], device=dev)], 1)
+        with torch.no_grad():
+            lg = model(ids).logits.float().log_softmax(-1)
+        if cont is None:
+            return float(lg[0, :-1].gather(-1, ids[0, 1:].unsqueeze(-1)).sum())
+        return float(lg[0, n_doc - 1:-1].gather(-1, ids[0, n_doc:].unsqueeze(-1)).sum())
 
     def screen(P):
         """c and r1 for a (T, d) slab, with the factor of T in c.
@@ -199,6 +213,32 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
                 grad_pass(tb_, spb_, c1, -1.0); grad_pass(tb_, spb_, c2, 1.0)
         Gbar = (Wg.grad / n_grad).detach()
 
+        # UNSTEERED BASELINE. The go/no-go that must precede any training: if the model
+        # does not distinguish the two classes at all there is nothing to steer, and a null
+        # steering result would say nothing about dictionaries. Matching moments removes the
+        # known carriers of few-shot label bias, so a construction can remove the behaviour
+        # along with the handles -- which is itself a result worth reporting.
+        base = []
+        rng_b = random.Random(seed + 2)
+        for _ in range(n_base):
+            sa, sb, car, c1, c2 = draw(rng_b)
+            ta_, spa_ = build(car, sa)
+            tb_, spb_ = build(car, sb)
+            base.append(logp(ta_, spa_, c1) - logp(ta_, spa_, c2)
+                        - (logp(tb_, spb_, c1) - logp(tb_, spb_, c2))
+                        if c1 is not None else
+                        logp(ta_, spa_, None) - logp(tb_, spb_, None))
+        base = np.array(base)
+
+        # SHARED-WRITE RETENTION. A dictionary latent is one write reused across documents,
+        # so every fixed-write arm is bounded by the MEAN difference slab. If per-document
+        # slabs point in different directions the mean cancels and no architecture can serve
+        # the task. Reported against its own noise floor 1/sqrt(n), since a mean of n random
+        # unit vectors has norm ~1/sqrt(n) and a ratio must be read against that, not against
+        # a fixed threshold.
+        per_doc = ((A - B) / sd).float()
+        retention = float(per_doc.mean(0).norm() / per_doc.norm(dim=(1, 2)).mean())
+
         s_dom, U_dom = screen(P_dom)
         s_grad, U_grad = screen(Gbar)
         cos_slabs = float((P_dom.reshape(-1) / P_dom.norm()
@@ -242,10 +282,19 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
                                     / ((U_dom[:, 0:1].T @ P_dom).norm() + 1e-9)).sum()))
 
         row = {"P_dom": s_dom, "Gbar": s_grad, "cos_Pdom_Gbar": cos_slabs,
+               "baseline_mean": float(base.mean()),
+               "baseline_sem": float(base.std(ddof=1) / np.sqrt(len(base))),
+               "baseline_n": int(len(base)),
+               "shared_write_retention": retention,
+               "retention_noise_floor": float(1.0 / np.sqrt(n_docs)),
                "sae_latent": js, "sae_pooled_auc": float(0.5 + abs(float(a[js]) - 0.5)),
                "cos_vsae_u1_Gbar": cos_u1_grad, "cos_vsae_u1_Pdom": cos_u1_dom,
                "random_cos_baseline": float(1.0 / (T * d) ** 0.5)}
         out["tasks"][task] = row
+        print(f"  BASELINE unsteered score(A) - score(B): {base.mean():+.3f} "
+              f"+- {base.std(ddof=1) / np.sqrt(len(base)):.3f}  (n={len(base)})", flush=True)
+        print(f"  retention {retention:.3f}  (noise floor {1.0 / np.sqrt(n_docs):.3f}, "
+              f"ratio {retention * np.sqrt(n_docs):.2f}x)", flush=True)
         print(f"  P_dom : c {s_dom['c']:.4f}  r1 {s_dom['r1']:.4f}  "
               f"s2/s1^2 {s_dom['sigma2_over_sigma1_sq']:.3f}", flush=True)
         print(f"  Gbar  : c {s_grad['c']:.4f}  r1 {s_grad['r1']:.4f}  "
@@ -268,10 +317,12 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
 def main(tasks: str = "recency", model: str = "Qwen/Qwen2.5-1.5B-Instruct",
          layer: int = -1, k_seg: int = 12, n_docs: int = 200, n_grad: int = 40,
          d_sae: int = 4096, k: int = 8, sae_lr: float = 3e-4, sae_steps: int = 6000,
-         batch_win: int = 32, seed: int = 31415, tag: str = ""):
+         batch_win: int = 32, seed: int = 31415, n_base: int = 100,
+         tag: str = ""):
     import json
     r = geometry.remote([t.strip() for t in tasks.split(",")], model, layer, k_seg,
-                        n_docs, n_grad, d_sae, k, sae_lr, sae_steps, batch_win, seed)
+                        n_docs, n_grad, d_sae, k, sae_lr, sae_steps, batch_win, seed,
+                        n_base)
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
     (outdir / f"geometry{tag}.json").write_text(json.dumps(r, indent=2))

@@ -111,7 +111,15 @@ def moments(pattern) -> tuple[int, int, int]:
     )
 
 
-def make_demo_order(k_seg: int = 12, pattern_a=PATTERN_A, pattern_b=PATTERN_B):
+# A multiset-matched foil whose FIRST MOMENT differs (21 against A's 39). This is the control
+# arm: identical generator, identical pattern A, identical pools -- the only thing that changes
+# is the first-moment constraint, which is the design's actual novelty. Anything else would
+# confound the constraint with the content.
+PATTERN_B_FREE = (1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0)
+
+
+def make_demo_order(k_seg: int = 12, pattern_a=PATTERN_A, pattern_b=PATTERN_B, pool="all",
+                    allow_moment_mismatch=False):
     """Factory in the harness contract: make(k_seg) -> make_pair(rng).
 
     Class A is label 1. Both classes hold the SAME twelve demonstrations; only the
@@ -127,21 +135,33 @@ def make_demo_order(k_seg: int = 12, pattern_a=PATTERN_A, pattern_b=PATTERN_B):
     ma, mb = moments(pattern_a), moments(pattern_b)
     if ma[0] != mb[0]:
         raise ValueError(f"label multisets differ: {ma[0]} vs {mb[0]} positives")
-    if ma[1] != mb[1]:
+    if ma[1] != mb[1] and not allow_moment_mismatch:
         raise ValueError(
             f"first moments differ ({ma[1]} vs {mb[1]}); the carried state will leave a "
             "constant component and c will not vanish"
         )
+    # Held-out content. "disjoint pools" in the header means POSITIVE disjoint from NEGATIVE,
+    # which is necessary but is NOT a train/eval split: without one, the dictionary is scored
+    # on the same demonstrations it trained on and the claim is only "steers the ordering of
+    # content it was trained on". Splitting the pools in half gives the stronger claim.
+    assert pool in ("train", "eval", "all"), f"pool={pool!r}"
+    _h_pos, _h_neg = len(POSITIVE) // 2, len(NEGATIVE) // 2
+    _pos_pool = {"train": POSITIVE[:_h_pos], "eval": POSITIVE[_h_pos:], "all": POSITIVE}[pool]
+    _neg_pool = {"train": NEGATIVE[:_h_neg], "eval": NEGATIVE[_h_neg:], "all": NEGATIVE}[pool]
+
     n_pos = ma[0]
     n_neg = k_seg - n_pos
+    assert n_pos <= len(_pos_pool) and n_neg <= len(_neg_pool), (
+        f"k_seg={k_seg} needs {n_pos}/{n_neg} demonstrations, pool {pool!r} has "
+        f"{len(_pos_pool)}/{len(_neg_pool)}")
 
     def make_pair(rng):
         # One draw of twelve demonstrations, placed into both patterns. Class B is then a
         # permutation of class A rather than an independent sample -- an independent draw
         # would match the label counts only in expectation and can leave a lexical
         # imbalance pointing at the factor under test, which a CONSTANT write can exploit.
-        pos = rng.sample(POSITIVE, n_pos)
-        neg = rng.sample(NEGATIVE, n_neg)
+        pos = rng.sample(_pos_pool, n_pos)
+        neg = rng.sample(_neg_pool, n_neg)
 
         def lay(pattern):
             pi, ni, out = 0, 0, []
@@ -157,7 +177,61 @@ def make_demo_order(k_seg: int = 12, pattern_a=PATTERN_A, pattern_b=PATTERN_B):
     return make_pair
 
 
-DESIGNS = {"demo_order": make_demo_order}
+# Held-out ambiguous reviews for PROBE MODE. The query is shared between the two classes,
+# so its own valence cancels in the difference of differences; what survives is the effect
+# of demonstration ORDER on the query's predicted label, which is the documented in-context
+# learning effect (majority-label and recency bias) rather than a statement about which
+# demonstration ordering is more probable.
+QUERY = [
+    "It has moments that work and stretches that plainly do not.",
+    "There is real craft here, though the story never quite arrives.",
+    "Ambitious and uneven, sometimes in the very same scene.",
+    "I admired more of it than I actually enjoyed watching.",
+    "Competent throughout, but it rarely reaches for anything more.",
+    "The parts are better assembled than the whole ever manages.",
+]
+QUERY_PREFIX = "Review: "
+QUERY_SUFFIX = " Sentiment:"
+CONT_POS = " positive"
+CONT_NEG = " negative"
+
+
+def make_demo_order_probe(k_seg: int = 12, pattern_a=PATTERN_A, pattern_b=PATTERN_B,
+                          pool="all", allow_moment_mismatch=False):
+    """Probe-mode factory: returns (sents_a, sents_b, carrier, cont1, cont2).
+
+    Score is logP(" positive" | doc+query) - logP(" negative" | doc+query), and the reported
+    quantity is that score for A minus for B. A write that simply pushes "positive" moves
+    both classes equally and cancels exactly, so only a write treating positions differently
+    can move it.
+    """
+    base = make_demo_order(k_seg, pattern_a, pattern_b, pool=pool,
+                           allow_moment_mismatch=allow_moment_mismatch)
+
+    def make_pair(rng):
+        sa, sb, car = base(rng)
+        q = QUERY[rng.randrange(len(QUERY))]
+        # The query goes in BOTH continuations, not appended to a segment. Appending it to
+        # the last segment would break the exact multiset match the whole design rests on,
+        # since the last segment differs between the two classes. Here the shared query
+        # prefix cancels exactly in logP(q+pos) - logP(q+neg), leaving the query's predicted
+        # LABEL as the readout while sents_a and sents_b stay exact permutations.
+        stem = f" {QUERY_PREFIX}{q}{QUERY_SUFFIX}"
+        return sa, sb, car, stem + CONT_POS, stem + CONT_NEG
+
+    return make_pair
+
+
+# `demo_order` is ORDERING mode -- it scores logP(doc A) - logP(doc B), i.e. which arrangement
+# of movie reviews is the more probable text. That is a fluency judgement with no connection to
+# in-context learning, and running it by accident would answer a question nobody asked. It is
+# kept only because its n=200 geometry screen is reported; the probe factory is the one to run.
+DESIGNS = {"demo_order_ordering_ONLY_FOR_SCREEN": make_demo_order,
+           "demo_order_probe": make_demo_order_probe,
+           "demo_order_probe_tr": lambda k: make_demo_order_probe(k, pool="train"),
+           "demo_order_probe_ev": lambda k: make_demo_order_probe(k, pool="eval"),
+           "demo_order_probe_free": lambda k: make_demo_order_probe(
+               k, pattern_b=PATTERN_B_FREE, allow_moment_mismatch=True)}
 
 
 if __name__ == "__main__":
