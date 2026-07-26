@@ -80,6 +80,21 @@ a40-bootstrap (historical, pod gone).
 
 ## Git: clean, pushed after this rewrite. Suite 333 green local.
 
+
+## SALVAGE PHASE (Han, ~16:30 London 2026-07-26) — CURRENT STATE pre-compact
+dq DEMOTED (surface-reading fragility at T≥16) to order-mechanism
+support; salvage briefed: mac-a = ttrend POST fresh-seed panel
+(salvage-mac-a.md), mac-b = txcwin novelty cross-ratification
+(salvage-mac-b.md), shared = salvage-shared.md. Budget fine < $500
+total (spent ≈ $87). MY queue post-compact: (1) freeze-review both
+salvage cards pre-results; (2) rolling review + ratification;
+(3) update WRITEUP.md + distillation with salvage outcomes + the dq
+demotion (WRITEUP §4 needs the demotion edit + possibly ttrend/
+novelty as replacement §4); (4) team check-in 18:00 London decisions:
+R22 caveats, verdict ratifications, quote licences, post-arm story.
+Watcher pattern: scratchpad/watch_origin.sh in background, re-arm
+after each firing. /loop cron 44d0aa83 active (30-min cadence).
+
 ## PIVOT EXECUTED 2026-07-26 ~11:00 London — DISTILLATION FINAL
 Overnight wave COMPLETE and fully reviewed: R22 (tsae bound, 2
 caveats for team), R20/R21 (slen KEEPs + ladder collapse), R23

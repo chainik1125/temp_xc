@@ -6133,3 +6133,29 @@ values re-verified at build (R6/R13/R18–R21/R23/R24 + artifact
 recomputes for ttrend P4 0.809 and dialevel 0.983→0.517).
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+## 2026-07-26 — mac-local — SALVAGE ALLOCATION (Han): dq DEMOTED to supporting evidence; two surface-quiet salvage workstreams briefed
+
+Han's objection to dqgap as headline is adopted: at T ≥ 16 the task
+degenerates into question-mark counting and the framing invites the
+trivial reading — the T = 8 claim stands as reviewed (R27) but dq is
+DEMOTED to supporting evidence for the order mechanism, not case
+study #2. The salvage review of the failed/parked list identified
+two surface-quiet candidates whose failures were gate-specific:
+**ttrend via TXC-post** (failed only its pre/stacked claiming set;
+post profile clean, evidence floor degenerate at T ≤ 16) and
+**trailing novelty via Andrii's txcwin** (our verdict withdrawn on a
+scoring error; their independent result has the Stacked isolation
+and 8B replication, needs our controls). Briefings pushed:
+`salvage-shared.md` (budget: fine under $500 total, caps mac-a
+$100 / mac-b $60; all standing discipline), `salvage-mac-a.md`
+(fresh-seed {3,4,5} POST-claiming panel, 42 cells, S1–S5 bars,
+first-look hazard neutralized by seed freshness), `salvage-mac-b.md`
+(audit → gap-fill → CROSSRATIFY.md; never modify txcwin files;
+pending Andrii's review). Program note: this makes FOUR independent
+post-arm signals; the emerging story is post-squash TXC on
+trailing-rate/trend states. WRITEUP/distillation update FOLLOWS the
+salvage outcomes — the dq demotion is noted here first so the
+record leads the documents, not the reverse.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
