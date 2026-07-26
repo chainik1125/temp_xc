@@ -15,10 +15,6 @@ The literature sweep's section for `summary.md`, lifted out of `literature_catal
 *can* favour a window dictionary, not about any single result. If every experiment tonight
 comes back flat, this section is still the sprint's finding.
 
-Written ready to paste, since the sprint reserves the last hour for writing. It stands whether or
-not tonight's experiment produces a win, because it is a claim about which behaviours *can*
-favour a window code rather than about any one result.
-
 ---
 
 **A literature sweep says where a window code can help, and it is a narrow place.**

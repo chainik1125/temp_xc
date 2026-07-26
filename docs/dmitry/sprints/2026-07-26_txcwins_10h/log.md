@@ -2027,3 +2027,73 @@ reader will otherwise assume the comparison was matched and may suspect it was t
 The symmetric-dose rerun will match budgets as well (`k_window = k_segment × T`); the expected
 outcome is that the SAE arm does not improve, because the constant-write limitation is
 structural rather than a capacity constraint.
+
+## 00:26 — a smoke test nearly became the executive summary
+
+Caught by chasing a discrepancy between two agents' tables for the same task. The theory
+agent's draft finding 5 quoted `txc_slab = +2.55`; the implement agent's completed table said
+`+6.48`. Both were real numbers from real runs — of very different sizes.
+
+| | `recency_gradsmoke.json` | `recency_gen.json` |
+| --- | --- | --- |
+| steps | 500 | 2000 |
+| train / test documents | 200 / 20 | 800 / 80 |
+| doses | −1, +1 | −2, −1, −0.5, +0.5, +1, +2 |
+| **`txc_slab`** | **+2.55** | **+6.48** |
+| `sae_broadcast` | +0.94 | +2.60 |
+| `sae_schedule` | +6.92 | +7.86 |
+| `rank1_best` | +8.46 | +8.55 |
+| `dom_slab` | +8.38 | +8.20 |
+
+**A smoke run systematically flatters supervised arms relative to trained ones.** The
+crosscoder moves 2.5× between the two configurations because it is badly under-trained at 500
+steps; the supervised arms barely move, since they are computed from activations rather than
+learned. That is not obvious — it would be natural to assume a short run adds noise rather than
+biasing a *comparison* — and it is a hazard worth naming.
+
+The conclusion survives: the scheduled per-token arms still beat the crosscoder (+7.86 and
++8.55 against +6.48), so recency remains a discovery result. But **"the crosscoder reaches 30%
+of the rank-1 ceiling" and "the crosscoder reaches 76% of it" are very different sentences**,
+and only the second is true. The gradient-based ceilings exist *only* in the smoke run, so they
+are being rerun at full configuration before any of them ships.
+
+Theory's own ⚠ — that `grad_rank1 +6.97` exceeding `grad_slab +6.64` is impossible to first
+order — now has its explanation: at 20 test documents and two doses that ordering is
+comfortably inside noise.
+
+## 00:28 — the crosscoder is not finding where the instructions are
+
+Per-position write profiles, recorded for the first time, correct the mechanism story:
+
+```text
+position        0     1     2*    3     4     5     6     7     8     9*    10    11
+rank1_best    0.00  0.00  0.72  0.01  0.00  0.00  0.00  0.00  0.00  0.70  0.00  0.00
+txc_slab      0.27  0.33  0.28  0.19  0.24  0.25  0.32  0.31  0.29  0.25  0.44  0.16
+txc_flat      0.29  0.29  0.29  0.29  0.29  0.29  0.29  0.29  0.29  0.29  0.29  0.29
+```
+
+(`*` marks the instruction positions.) The **supervised** rank-1 write does the obvious thing —
+97% of its mass on the two instruction segments. The **crosscoder's profile is nearly flat**,
+its two largest entries sit at positions 10 and 1 rather than 9 and 2, and it still reaches 76%
+of the supervised effect.
+
+So the crosscoder is **not** solving this by locating the instructions, which is exactly what a
+reader would assume. Combined with the two opposite-failing controls — +1.42 with the profile
+removed, +0.00 with the profile kept and directions randomised — neither the profile nor the
+directions carry the effect alone, and the profile is not a localisation of the factor. The
+narrower claim is the more interesting one, and any sentence saying the crosscoder "finds where
+the instructions are" is contradicted by its own write.
+
+## 00:30 — the ladder's surviving result: a bounded reading claim
+
+With symmetric doses at lr 1e-3, the steering half of the phase ladder is withdrawn — 13 of 16
+cells complete, all "no win" except phase3 ds2, with the outcome flipping on dictionary init.
+
+What survives is the **reading crossover**, and it is robust: at 11 switches the crosscoder
+reads the label better than the SAE in all three inits (0.793 / 0.846 / 0.817 against 0.714 /
+0.729 / 0.524), while at 1 switch the SAE wins (0.997 / 0.908 against 0.778 / 0.827). Held-out,
+with latents selected on train.
+
+That **bounds** last sprint's "reading comparisons never favour a window code" rather than
+contradicting it — the claim holds for slow structure and fails for fast — and a bounded claim
+with a measured crossover is worth more than the unbounded one it replaces.
