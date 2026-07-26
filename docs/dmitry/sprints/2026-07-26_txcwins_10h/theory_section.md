@@ -47,7 +47,9 @@ r1 = sigma_1^2 / ||P||_F^2     the share of the optimal write reachable by any r
 ```
 
 computed from the supervised difference-of-means slab, or better from the gradient of the
-metric itself, before a single dictionary is trained. When `r1` is close to 1 the best
+metric itself, before a single dictionary is trained. The gradient is the right object: the
+difference of means is a *reference*, not an upper bound, and a crosscoder latent has been
+measured beating it (+5.92 against +3.49 on the evidence task). When `r1` is close to 1 the best
 per-token baseline ties. When `r1` is well below 1 the remainder is reachable only by a slab.
 
 The practical consequence is sharp enough to have redirected the sprint: **every two-block

@@ -348,10 +348,26 @@ is **order at matched multiset**; they compare timescales within a per-token cod
 against a full window code; and they did not test a crosscoder. It also means the
 instruction-order entry should cite them rather than present prompt injection as untouched.
 
+**A fifth architecture, and it is the natural order-destroying control.** Der, Kamath, Thompson,
+*Turn-Averaged SAEs for Feature Discovery and Long-Context Attribution*, June 2026
+([arXiv:2606.28548](https://arxiv.org/abs/2606.28548) — fetched) represent a whole Human or
+Assistant turn with a fixed number of features by "learning to reconstruct the average model
+activation across the turn", motivated by the fact that a standard SAE's active features "scale
+linearly with context length". They report turn-averaged features describe a turn's high-level
+characteristics more completely than per-token features under LLM evaluation.
+
+Two things follow. It independently validates the harness's segment abstraction — the field is
+moving to segment-level dictionaries. And it is exactly the **R2 rung** from
+[[temporal_benchmark_screen]]: aggregation with order destroyed. That makes it the cleanest
+published instantiation of "pooling without ordering", which is the control that separates a
+window code from mere aggregation, and it is now something we can cite rather than invent.
+
 **Recommended baseline set for any task in this catalogue:** TopK/BatchTopK SAE (per-token
-floor) → PSAE (learned scalar timescale) → T-SAE (InfoNCE over adjacent positions) → TXC (free
-`(T, d)` slab). That is a clean capacity ladder, each rung adding exactly one thing, and it is
-a better story than any single head-to-head.
+floor) → turn/segment-averaged SAE (aggregation, order destroyed) → PSAE (learned scalar
+timescale) → T-SAE (InfoNCE over adjacent positions) → TXC (free `(T, d)` slab). Five rungs, each
+adding exactly one thing, and every one of them now corresponds to a published architecture. That
+is a better story than any single head-to-head, and wherever the curve flattens is informative
+regardless of which way it comes out.
 
 ### Prior art on the mechanism itself — what the sprint can and cannot claim as novel
 
@@ -451,7 +467,7 @@ crosscoder loses, whatever the P1 and P2 columns say.
 | Induction / in-context copying (RRT) | **yes** | **yes** (copying is a mode) | free | yes | needs chunking | 2 |
 | Repetition loops (loop escape) | yes | **yes** (repetitiveness is the mode) | free | yes | segment = repeated unit | 2 |
 | Steganography / encoded reasoning | **yes** | none | **none at reachable scale** | yes | segment = sentence | 2 |
-| Sandbagging / password-locking | no | yes | released organisms | partly | poor | 2 |
+| Sandbagging / password-locking | no | yes | released organisms | partly | poor | 2, steering already failed |
 | Sycophancy build-up | partial | yes | free | no | segment = turn | 2 |
 | Refusal onset | no | **yes** (Arditi saturates) | free (repo infra) | partly | separate | 1 |
 | Evaluation awareness | no | yes (Shape B) | released organism | no | poor | 1 |
@@ -923,7 +939,6 @@ is not merely conceivable but deployed. Combined with the verified single-neuron
 which already handles loop onset, there is very little left for a window code to claim. Kept for
 the mechanism notes and because loop *escape* remains formally untested.
 
-
 | paper | what it gives us |
 | --- | --- |
 | Holtzman et al., *The Curious Case of Neural Text Degeneration*, ICLR 2020 ([arXiv:1904.09751](https://arxiv.org/abs/1904.09751)) | canonical problem statement, decoding-side baselines |
@@ -1104,7 +1119,7 @@ capabilities improving. The structural argument remains the most elegant in the 
 payload in sentence arrangement is invisible to any per-position readout by construction — which
 is why it stays recorded rather than deleted.
 
-### Sandbagging / deliberate underperformance — priority 3
+### Sandbagging / deliberate underperformance — priority 2 after verification (was 3)
 
 The best available *released* model organisms of any entry, and the largest novelty gap —
 nobody has tried to *steer* an armed state — but the weakest temporal story.
@@ -1113,7 +1128,7 @@ nobody has tried to *steer* an armed state — but the weakest temporal story.
 | --- | --- |
 | van der Weij et al., *AI Sandbagging: Language Models can Strategically Underperform on Evaluations*, 2024 ([arXiv:2406.07358](https://arxiv.org/abs/2406.07358)) | the defining paper; a Llama-3-8B-Instruct organism with passphrase-dependent underperformance on hazardous-domain questions |
 | Greenblatt et al., *Stress-Testing Capability Elicitation With Password-Locked Models*, 2024 ([arXiv:2405.19550](https://arxiv.org/abs/2405.19550)) | password-locked organisms and the elicitation framing |
-| *The Elicitation Game*, 2025 ([arXiv:2502.02180](https://arxiv.org/abs/2502.02180)) — id unverified | evaluation of elicitation techniques across organisms |
+| Hofstätter, van der Weij, Teoh, Djoneva, Bartsch, Ward, *The Elicitation Game: Evaluating Capability Elicitation Techniques*, 2025 ([arXiv:2502.02180](https://arxiv.org/abs/2502.02180)) — verified | password-locked and a harder "circuit-broken" organism, and a direct negative for this entry: on multiple-choice QA "prompting techniques can elicit the actual capability" of both organisms while **activation steering failed**; on code generation only fine-tuning worked. They recommend fine-tuning as the most trustworthy elicitation method |
 | *AuditBench* ([arXiv:2602.22755](https://arxiv.org/abs/2602.22755)) — id unverified | 2026 collection of hidden-behaviour organisms |
 | Szablewski, Konar-Steenberg, Fornasiere, Menon, Heimersheim, *The Model Organism Lottery: Model Organism Interpretability Strongly Depends on Training Methodology*, July 2026 ([arXiv:2607.01033](https://arxiv.org/abs/2607.01033)) — verified | the warning, and it is severe: across **54 variants** benchmarked with four interpretability techniques — activation oracles, **steering**, logit lens and **sparse autoencoders** — "MO interpretability depends strongly on training objective, target behaviour, model architecture, and training data generation pipeline", with significant variance persisting after accounting for behaviour strength, and "**integrated training often yields less interpretable MOs than standard post-hoc methods**" |
 | *Option-Order Randomisation Reveals a Distributional Position Attractor in Prompted Sandbagging* ([arXiv:2604.26206](https://arxiv.org/abs/2604.26206)) — verified | links sandbagging to the option-order family, and quantifies how strong a purely positional prior can be: under sandbagging instructions the model enters "a low-entropy response-position basin centred on E/F/G that is highly stable and largely content-invariant", holding under complete content rotation across 2,000 items (Pearson r = 0.9994, JSD = 0.027), with accuracy of **72.1% when the correct answer lands in the preferred position E against 4.3% at position A**, in 7–9B models |
@@ -1127,6 +1142,14 @@ instance B.
 
 The repo already has `experiments/temporal_screen/passphrase_steering/` — check its state
 before treating this as new work.
+
+**Demoted to priority 2 on verification.** The entire case for this entry was that *defusing* an
+armed state is unclaimed while detection is solved. The Elicitation Game result undercuts it
+from the other side: **activation steering already failed** to elicit hidden capability on
+multiple-choice QA where prompting succeeded. So the intervention modality this sprint would use
+has been tried on these organisms and did not work, and the open slot is narrower than "nobody
+has steered an armed state" suggested. Combined with the Model Organism Lottery warning, the
+expected value here is low.
 
 **Temporal signature — weak.** A short passphrase trigger, then a persistent armed state (Shape
 B in [[temporal_safety_tasks_litreview]]), which a per-token dictionary reads fine anywhere in
@@ -1255,14 +1278,14 @@ measured on a completely different task.
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
-  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
+  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
 - **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
   and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
-  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2502.02180, 2408.15221,
+  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2408.15221,
   2605.01687, 2605.02647, 2606.08644, 2605.26537, 2603.03258, 2601.04170, 2604.11978,
   2605.03907, 2603.05805, 2606.26474, 2512.02194, 2411.16594.
   All are single mentions in lower-tier entries; nothing load-bearing above priority 2 rests on
@@ -1396,3 +1419,10 @@ the per-pass times are ordering only, not measurements.
   brief listed: Ma & Rui (2605.07984, verified) localise rhyme planning to the line-boundary token
   and five attention heads, recovering ~90% of planning capacity there, and find causal reliance
   only at Gemma-3-27B — one token, five heads, and out of scale range.
+- **Pass 19** — internal-consistency pass: fixed stale priorities in four section headers, marked
+  the superseded P1/P2 paragraph as wrong in place rather than deleting it, and noted that the
+  ranking table rather than section order is authoritative. Verified *The Elicitation Game*
+  (2502.02180), which **demotes sandbagging to 2**: activation steering already failed to elicit
+  hidden capability on these organisms where prompting succeeded. Added **Turn-Averaged SAEs**
+  (2606.28548) as a fifth baseline rung — segment pooling with order destroyed, i.e. the screen's
+  R2, now a citable published architecture rather than a control we invent.

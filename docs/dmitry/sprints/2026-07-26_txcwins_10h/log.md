@@ -1409,3 +1409,85 @@ causal reliance appearing only at Gemma-3-27B, with other models showing "near-z
 effect at the line boundary despite strong probe signal". One token, five heads, out of scale
 range. The incidental lesson deserves its own line: **a strong probe signal is not a causal
 handle** — the same reading/steering dissociation this sprint keeps rediscovering.
+
+## 23:32 — the variable-position control kills the advantage, and the reference row says why
+
+`recency_var` is instruction recency with the two instruction positions drawn per document
+rather than fixed at 2 and 9. The registered prediction was "shrinks and survives". It did
+not survive.
+
+| arm | recency (fixed positions) | recency_var (positions vary) |
+| --- | --- | --- |
+| `txc_slab` | +6.48 ± 0.15 | **+0.63 ± 0.31** |
+| `sae_broadcast` | +2.60 ± 0.15 | +0.93 ± 0.12 |
+| `dom_slab` (difference-of-means reference) | +8.20 ± 0.22 | **+5.46 ± 0.23** |
+| baseline gap | −2.42 | −2.26 |
+
+**The reference row is what makes this a finding rather than a null.** The crosscoder falling
+to +0.63 would on its own be ambiguous — it could mean no fixed write can serve the task once
+positions vary. The difference-of-means write staying at +5.46, far above the 2.26 baseline
+gap, rules that out: **a fixed (T,d) write can still reverse the bias, and the crosscoder
+simply fails to find it.** A discovery failure with a witness.
+
+Theory had registered, from the shared-write constraint, that the reference should retain
+0.35–0.65 of its fixed-position value rather than collapse; measured retention is
+5.46/8.20 = **0.67**, just above the range. The crosscoder retained 10%. So both proposed
+explanations hold in measurable proportion: **a ~2× scope limit on the entire fixed-write
+class, plus a ~4× crosscoder discovery gap on top of it.**
+
+## 23:34 — correcting my own terminology: difference-of-means is a reference, not a ceiling
+
+The `evidence` transfer task — recency over conflicting testimony rather than conflicting
+instructions — is a win, and it settles a labelling error I have been propagating:
+
+```text
+txc_slab  +5.92 ± 0.10      sae_broadcast +1.33 ± 0.08     txc_flat +2.84 ± 0.08
+tsae_broadcast +0.32 ± 0.08  dom_slab +3.49 ± 0.18          baseline gap −1.36
+```
+
+z against the SAE is 35.9 — and **`txc_slab` exceeds `dom_slab`**. Difference-of-means is the
+best write of one particular supervised *form*, not the best write available, and the
+crosscoder found a better one. Everywhere I have written "the supervised ceiling" it should
+read **"the difference-of-means reference"**; the genuine upper bound is `oracle_slab = Ḡ`,
+the mean margin gradient, which is the best norm-matched write of any form in the linear
+regime. This also retires last sprint's 7×-headroom framing, which compared against a
+reference I was calling a ceiling. `theory_section.md` corrected.
+
+## 23:36 — a false positive pointing the way we want it to point
+
+`rank1_best` — the ceiling for any per-token dictionary handed a perfect per-position dose
+schedule — was built from the difference-of-means slab. The true rank-1 ceiling is the best
+rank-1 approximation of the **gradient**. In probe mode the metric cancels class-symmetric
+effects, so components present in `P_dom` can contribute nothing to Δ, and `rank1_best` would
+underperform **for reasons unrelated to rank** — making `txc_slab > rank1_best` read as
+expressiveness when it is an artefact of construction.
+
+Since expressiveness is the one claim the sprint does not yet have, an arm that manufactures
+it is precisely what must not ship. Being rebuilt from `Ḡ`, with `cos(P_dom, Ḡ)` reported per
+task as the minimum acceptable fallback. Same lesson as the ceiling correction, one level
+deeper: the supervised difference of means is a reference, and the optimum for steering is the
+gradient.
+
+## 23:38 — methodology fix 4: one-sided doses manufacture false nulls
+
+The ordering-mode tasks swept α over positive values only, so an arm whose correct steering
+direction is *negative* registers as a flat failure. Not hypothetical: at lr 1e-3 phase1's
+crosscoder latent is negative at all four positive doses (best −0.47) while the
+difference-of-means write reaches +69.10 — the write direction was available and the arm was
+pointed the wrong way. All tasks now sweep symmetrically about zero, which also inflates every
+null equally.
+
+That is the **fourth** correction this sprint that either made a result harder to obtain or
+exposed a false negative — after in-sample realised sparsity, selection-biased reading AUC,
+and the recipe that handicapped the crosscoder and tSAE. Two more from theory: the `c = 0`
+gate that should have been `c < 0.1`, and the `rank1_best` construction above. The pattern is
+worth its own paragraph in the summary.
+
+**The scope limitation now taking shape, and it should be stated as a limit rather than a
+hedge:** the crosscoder wins where the factor sits at **consistent positions across
+documents** — recency, evidence, the phase ladder all have fixed spatial layout — and loses
+where it does not. That is the same fact as the shared-write constraint seen from the data
+side: a dictionary latent is one fixed write reused across documents, and consistent positions
+are what keep the mean difference slab from cancelling. The honest scope of the method is
+**"finds interventions for structure that recurs at the same place"**, which is narrower and
+more useful than "handles temporal structure".
