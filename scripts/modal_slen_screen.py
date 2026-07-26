@@ -78,7 +78,11 @@ def build_caches() -> str:
     return "CACHES DONE"
 
 
-@app.function(image=image, gpu="A10G", volumes={"/workspace": vol},
+# L40S: the llama T32 flatten-MLP standardization peak OOMed the A10
+# (22 GiB; "tried to allocate 5.86 GiB" with 17.9 in use) — ops-doc rule:
+# >20 GB ⇒ L40S. GPU choice does not touch cells/seeds; resume from the
+# Volume partials is the card § 7 pre-authorized adaptation.
+@app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
               timeout=4 * 60 * 60)
 def run_screen(key: str) -> str:
     _assert_pinned()
@@ -107,7 +111,11 @@ def main(stage: str = "all"):
         local_res = Path(__file__).resolve().parents[1] / \
             "experiments/explorations/task_hunt/slen/results"
         local_res.mkdir(parents=True, exist_ok=True)
-        for key, text in zip(KEYS, run_screen.map(KEYS)):
+        for key, text in zip(KEYS, run_screen.map(KEYS,
+                                                  return_exceptions=True)):
+            if isinstance(text, Exception):
+                print(f"[FAILED] {key}: {text!r}", flush=True)
+                continue
             p = local_res / f"screen_{key}.json"
             p.write_text(text)
             print(f"[repatriated] {p} ({len(text)} bytes)", flush=True)
