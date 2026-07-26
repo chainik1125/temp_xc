@@ -238,7 +238,7 @@ def actfn(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
         print(f"[SAE k={k}] coeff/seg {out['sae'][-1]['coeff_per_segment']:.2f}  "
               f"FVU {out['sae'][-1]['fvu']:.4f}", flush=True)
 
-    arms = ["topk_relu", "topk", "batchtopk", "topk_relu_auxk"]
+    arms = ["topk_relu", "topk", "batchtopk", "batchtopk_relu", "topk_relu_auxk"]
     print(f"\n{'arm':<16}{'kper':>5}{'lr':>8}{'nom k':>7}{'#pre>0':>9}{'coeff/seg':>11}"
           f"{'spend':>8}{'neg':>7}{'alive':>8}{'FVU':>9}", flush=True)
     jobs = [(a, kp, lr) for kp in kpers for a in arms]

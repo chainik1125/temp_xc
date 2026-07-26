@@ -246,6 +246,9 @@ def frontier(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
                 with torch.no_grad():
                     m._normalize_decoder()
             hist = train(m, gen_w, txc_batch, lr, f"txc-k{kp}-lr{lr}")
+            # batchtopk is a batch rule at train time and a fixed threshold at eval
+            # time; without this the holdout would be scored as one giant batch.
+            m.eval()
             with torch.no_grad():
                 pre = torch.einsum("btd,tds->bs", Xn_ho, m.W_enc) + m.b_enc
                 posfrac = float((pre > 0).float().mean())
