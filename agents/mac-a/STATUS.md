@@ -1,51 +1,52 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~19:15 London define-clock (local ≈ 70 min ahead) —
-SPRINT CLOSED (df8043d6d): top-up KEEP + R29 RATIFIED, quote licence
-issued (L1 pooling-free = caveat-free headline; L2 only with the
-sequential sentence; sae-l0 note travels; fig4 APPROVED for WRITEUP
-§4). My briefing salvage-mac-a.md deleted (executed convention).
-Idle watch until stood down — nothing in flight, no open asks on
-mac-a.**
+**2026-07-26 ~21:10 London — ACTMIX W1 (briefings/actmix-mac-a.md,
+read-first actmix-shared.md). Stage 1 (btk-only implementation)
+DONE + convention note posted to task_hunt LOG (single-source rule —
+pods consume it verbatim). Now: Stage 2 CALIB card (decisive input to
+Dmitry's paper-re-run gate, wanted before 9am PT 2026-07-27). Cap $40
+W1 total / $150 day. NOTE: this lane SUPERSEDES mac-local's ~20:40
+subagent dispatch — that dispatch was recalled cleanly at Han's
+direction; nothing was frozen, launched, or pushed by the recalled
+agents. mac-local freeze-reviews my cards in parallel — pull before
+scoring.**
 
-## Delivered this evening (chronological; everything pushed)
+## ACTMIX W1 progress
 
-1. **Salvage W1** (SALVAGE_CARD `50af78f12`, 72/72): verdict NOT-KEEP
-   as frozen (one S1 t-CI leg at n = 3), T32 confirmed CI-bounded on
-   fresh seeds; R28 RATIFIED (ad76b0f15). Secondary 8·T arm failed
-   its untrained control (0.74× at T32) — capacity-artifact regime;
-   k-resolution retro-validated.
-2. **n=6 top-up** (TOPUP_CARD `85c87fd76` per ruling ad76b0f15 item
-   3; freeze-review approved c797c5207; 24/24): **KEEP at T = {16,32}
-   per the frozen rule — carried by the POOLING-FREE L1 lane** (all
-   four S1 legs on {6,7,8} alone, incl. sae@T16 +0.117 [+0.110,
-   +0.123]); L2 combined n = 6 also all-pass (sequential caveat
-   mandatory beside every L2 number). S3-combined p = 0.0156.
-   **R29 proposed** (receipts ALL PASS) — awaiting mac-local
-   ratification. l0 disclosure: sae baseline realizes 4.12–4.69 of
-   nominal 8 uniformly (arch property; post cells all in band;
-   drop-s7 sensitivity passes).
-3. **fig4** produced (KEEP-gated, now unlocked): committed
-   `diafaces/make_fig4.py` (canonical-leaderboard-only, Okabe-Ito,
-   CI whiskers, evidence line, claiming zone) →
-   `figs_writeup/fig4_ttrend_post_confirmation.{png,pdf}` + caption
-   block proposed in the LOG entry for mac-local.
-4. Ledger: mac-a salvage total ≈ $6 (W1 $4 + top-up $2); program
-   ≈ $102 of $500.
+1. **Stage 1 DONE** — `src/temp_bench/archs/btk_only.py` + 5 registry
+   entries (`{batchtopk_sae,tsae,stacked_batchtopk,txc_batchtopk_pre,
+   txc_batchtopk_post}_btkonly`, arch_versions 1.1.0 / 2.1.0-port);
+   relu_mode hparam hashed into train_key; threshold_set flag replaces
+   the -1.0 sentinel (legit negative thresholds); selection by signed
+   value over raw pre-acts; AuxK unchanged (ReLU'd); fired ⇔ z != 0;
+   neg_frac diagnostic. Tests: tests/test_btk_only.py, full suite 369
+   passed, validate OK. Convention note = LOG entry "~21:05 London"
+   (CANONICAL; pods follow, never fork).
+2. **Stage 2 NEXT** — CALIB card: ttrend `dial_real_ttrend_gpt2_l7`;
+   arms {batchtopk_sae,tsae}@T1 + txc_batchtopk_post@T∈{4,16,32} ×
+   {relu-mix, btk-only} × seeds {3,4} trained+untrained. relu-mix side
+   REUSED from existing leaderboard rows (salvage/topup freezes
+   50af78f12/85c87fd76 hold post T∈{4,16,32} + sae/tsae T1 at seeds
+   {3,4}; cite eval_keys in card). Only btk-only cells computed
+   (est ~$4, ≤$8). Report realized l0 vs nominal, recovery, post
+   T-slope d(recovery)/dlogT both arms; restate pre-registered reading
+   (sae improves most; tsae least; post low-T improves; slope may
+   soften). Deliverable: card + score JSON + figure + LOG verdict PTR.
+3. **Stage 3 GATED on Stage 2** — KEEP-set survives-the-fix
+   (R29 ttrend lane / R22 λ̂ cells / R27 dq cells vs SAME bars;
+   verdicts SURVIVES / MOVED-MARGINS / DOES-NOT-SURVIVE).
 
-## Open items on OTHERS
+## Salvage sprint (CLOSED df8043d6d — prior phase, all ratified)
 
-- mac-local: R29 ratification + top-up verdict ratification; fig4 /
-  WRITEUP integration (T32-only re-scope goes MOOT if ratified);
-  quote licence for the combined shape.
-- Nothing in flight on Modal from my lane; monitors stopped.
+W1 NOT-KEEP as frozen + R28; top-up KEEP {16,32} + R29; fig4 in
+WRITEUP §4; mac-a salvage actuals ≈ $6. Quote licences per mac-local.
 
 ## Assets / recovery
 
-- Scores: `diafaces/results/{salvage_score,topup_score}.json`;
-  panels `{salvage,topup}_stage2_dial_real_ttrend_gpt2_l7.json`;
-  payloads dirs + Volume `…:/workspace/diafaces_{salvage,topup}/`.
-- Leaderboard: +96 fresh-seed rows total (72 + 24), 0 dups, freezes
-  50af78f12 / 85c87fd76. Row k_pos/T live under
-  `training_cfg.arch_hparams_override`.
-- Modal client: scratchpad `modal-venv/bin/modal`.
+- btk-only convention: `src/temp_bench/archs/btk_only.py` docstring +
+  LOG note (~21:05). Registry: configs/archs.yaml ACTMIX block.
+- Salvage-phase assets: diafaces/results/{salvage,topup}_score.json,
+  panels + payloads, Volume /workspace/diafaces_{salvage,topup}.
+  Leaderboard k_pos/T under `training_cfg.arch_hparams_override`.
+- Modal client: scratchpad `modal-venv/bin/modal`. Ledger
+  briefings/MODAL_SPEND.md (program ≈ $102 of $500 at last line).

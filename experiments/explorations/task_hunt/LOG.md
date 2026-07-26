@@ -6837,3 +6837,69 @@ per-token floor ($2–3) > R29 T16 legs ($3–4) > dq ($8–12) > R14/R15
 Pre-registered directions (actmix-shared) quoted in every class call.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+## 2026-07-26 ~21:05 London — mac-a — ACTMIX Stage 1 LANDED: the btk-only convention (CANONICAL — single-source; runpod-1/2 + everyone consume THIS verbatim, never fork)
+
+**Registry names (the `btk-only` arm; the unsuffixed names ARE the
+`relu-mix` arm):**
+
+| relu-mix (unchanged) | btk-only (new) | arch_version |
+|---|---|---|
+| `batchtopk_sae` | `batchtopk_sae_btkonly` | 1.1.0 |
+| `tsae` | `tsae_btkonly` | 2.1.0-port |
+| `stacked_batchtopk` | `stacked_batchtopk_btkonly` | 1.1.0 |
+| `txc_batchtopk_pre` | `txc_batchtopk_pre_btkonly` | 1.1.0 |
+| `txc_batchtopk_post` | `txc_batchtopk_post_btkonly` | 1.1.0 |
+
+**Mechanism.** One plugin file `src/temp_bench/archs/btk_only.py` +
+five `configs/archs.yaml` entries; NO frozen arch file was edited
+(historical rows reproduce against their stamped code_version; the
+relu-mix arm keeps its exact bits). `relu_mode: btk-only` is threaded
+as an hparam (constructor-asserted) so every train_key/leaderboard row
+hashes the arm; base hparams/per-section overrides mirror the parents.
+
+**The convention (all five variants, uniformly):**
+1. **Selection over RAW pre-acts by SIGNED VALUE** (largest values —
+   NOT magnitude): negative slots are selected only when the positive
+   pool runs out; selected values pass through signed; no ReLU anywhere
+   in the sparsity path. Realized l0 == nominal (ties at exactly 0.0
+   are measure-zero) — the zero-pick pathology is gone by construction.
+2. **Threshold path (JumpReLU eval)**: gating expression UNCHANGED
+   (`post * (post > threshold)`); EMA rule UNCHANGED (min surviving
+   activation, same beta=0.999/warmup=1000) with the EMA source set
+   generalized {survivors > 0} → {survivors != 0} (identical whenever
+   no negative is selected). The `-1.0` sentinel + `>= 0` validity
+   check CANNOT represent a legitimately-negative threshold (it would
+   silently fall back to batch-dependent TopK at eval) → variants carry
+   an explicit `threshold_set` uint8 buffer; eval uses the threshold
+   iff the flag is set.
+3. **Fired/dead accounting**: fired ⇔ z != 0 (negative-firing features
+   are alive; relu-mix used `> 0` / `sum > 0`).
+4. **AuxK revival UNCHANGED**: operates on ReLU'd pre-acts exactly as
+   relu-mix. AuxK is outside the sparsity path (never touches z or
+   realized l0); holding it constant isolates selection composition as
+   the only moved variable.
+5. **Diagnostic**: every train_step logs `neg_frac` = (# negative
+   survivors)/(# nonzero survivors).
+
+Everything else (params, init, decoder unit-norm, grad-parallel
+removal, tsae matryoshka/contrastive, batch conventions) inherited from
+the relu-mix parents; overridden methods are line-for-line copies with
+deviations tagged `# btk-only:`.
+
+**Tests green**: `tests/test_btk_only.py` — (a) positive-rich bitwise
+equivalence to parents (transplanted weights; catches copy drift), (b)
+scarce-positive fingerprint (parent zero-picks to l0=0; btk-only
+realizes l0 == nominal with negative survivors), (c) threshold-flag
+semantics incl. negative-threshold gating + EMA writing a negative
+threshold, (d) train_step smoke + neg_frac ∈ [0,1] for all five, (e)
+registry load/instantiate + relu_mode guard. Full suite 369 passed;
+`run.py validate` OK (31 archs).
+
+**For pods (Phase-A unblock)**: use the `*_btkonly` registry names for
+the btk-only arm — no local reimplementation, no forked thresholds. If
+your section's setup needs a different d_sae/k_pos, pass it exactly as
+you do for the relu-mix twin (per_section_hparams mirror the parents).
+Flag any divergence you *need* here in the LOG before running it.
+
+Next (mac-a): Stage 2 CALIB card (ttrend mini-grid, relu-mix side
+reused from existing rows) — freeze → push → launch detached.

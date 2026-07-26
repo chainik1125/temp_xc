@@ -124,6 +124,87 @@ archs:
       = k_win//T), decode all T positions. Corrects the k_win=k_pos·T
       over-count.
 
+  # ── ACTMIX btk-only variants (composition fix; briefings/actmix-shared.md) ──
+  # ReLU removed from the SPARSITY PATH of the fair-backbone family: BatchTopK
+  # selects over RAW pre-acts by signed value (negatives only when positives run
+  # out; realized l0 == nominal). JumpReLU gating expression unchanged at eval;
+  # EMA source set {>0}→{!=0}; explicit threshold_set flag (a legit threshold may
+  # be negative). AuxK revival UNCHANGED (ReLU'd pre-acts — outside the sparsity
+  # path). Arm labels: these entries = `btk-only`; the unsuffixed names = the
+  # `relu-mix` arm. CANONICAL convention (single-source, pods never fork):
+  # src/temp_bench/archs/btk_only.py + the task_hunt LOG convention note.
+
+  batchtopk_sae_btkonly:
+    class_path: temp_bench.archs.btk_only:BatchTopKSAEBTKOnly
+    arch_version: "1.1.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic:    { d_sae: 20 }
+      backtracking: { d_sae: 32768 }
+    notes: "btk-only twin of batchtopk_sae (ACTMIX composition fix)."
+
+  tsae_btkonly:
+    class_path: temp_bench.archs.btk_only:TSAEBTKOnly
+    arch_version: "2.1.0-port"
+    category: tsae
+    upstream: "https://github.com/AI4LIFE-GROUP/temporal-saes (Ye et al. 2025)"
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of tsae (matryoshka/contrastive untouched)."
+
+  stacked_batchtopk_btkonly:
+    class_path: temp_bench.archs.btk_only:StackedBatchTopKBTKOnly
+    arch_version: "1.1.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of stacked_batchtopk."
+
+  txc_batchtopk_pre_btkonly:
+    class_path: temp_bench.archs.btk_only:TXCBatchTopKPreBTKOnly
+    arch_version: "1.1.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of txc_batchtopk_pre."
+
+  txc_batchtopk_post_btkonly:
+    class_path: temp_bench.archs.btk_only:TXCBatchTopKPostBTKOnly
+    arch_version: "1.1.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of txc_batchtopk_post."
+
   # ── TXC-pro loss dissection (loss_dissection/CARD.md) ──────────────────
   # One class, four entries (spectral_txc precedent): the txc_batchtopk_post
   # backbone with per-component TXC-pro losses. consumes=sequence (slices its
