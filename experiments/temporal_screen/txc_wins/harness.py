@@ -499,8 +499,13 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             f"cos(grad, dom) = {out['rank_grad']['cos_with_dom']:+.3f}")
         writes["grad_slab"] = unit(G)
         writes["grad_rank1"] = unit(gS[0] * torch.outer(gU[:, 0], gVh[0]))
+        # The SAE's OWN direction on the best schedule for it, taken from the gradient
+        # rather than from difference-of-means. This is the arm that would defeat the
+        # expressiveness claim: a per-token dictionary handed a per-position dose schedule.
+        writes["sae_schedule_grad"] = unit(torch.outer(G @ v_sae, v_sae))
         out["write_profile"]["grad_slab"] = [float(v) for v in writes["grad_slab"].norm(dim=-1)]
-        out["write_profile"]["grad_rank1"] = [float(v) for v in writes["grad_rank1"].norm(dim=-1)]
+        for _nm in ("grad_rank1", "sae_schedule_grad"):
+            out["write_profile"][_nm] = [float(v) for v in writes[_nm].norm(dim=-1)]
 
     tests = []
     for _ in range(n_test):
@@ -616,7 +621,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         ts2, te2 = at_best("txc_slab")
         for other in ("sae_broadcast", "tsae_broadcast", "txc_flat",
                       "txc_profile_random", "random_slab", "random_broadcast",
-                      "sae_schedule", "rank1_best", "grad_slab", "grad_rank1"):
+                      "sae_schedule", "rank1_best", "grad_slab", "grad_rank1",
+                      "sae_schedule_grad"):
             if other in out["arms"]:
                 os_, oe_ = at_best(other)
                 zs[f"txc_slab_vs_{other}"] = float(
