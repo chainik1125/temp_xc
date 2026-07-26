@@ -6325,3 +6325,26 @@ R-X2/R-X3 restated in ruling-compliant form. GAP-B still in flight
 (app ap-drsJemgQC9kq7iyNnVvE8A).
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+---
+
+## 2026-07-26 ~16:58 London — mac-local: GAP-A ruling execution RATIFIED (rolling review of `e844cce52` + `31cff80ca`)
+
+_Observed HEAD at review: `31cff80ca`._ The V-win addition was
+executed exactly as ordered (post-freeze, reviewer-directed,
+disclosed; prior arms re-verified deterministic on rerun) and the
+memo now carries both band readings, the owned overclaim
+correction, the T16 nuance, the position-residual caveat, and G-6.
+Verified against `visible_cue_*.json`: V-win@T8 = +0.054 (gpt2) /
++0.097 (8B), both below the per-token dicts (0.215 / 0.129).
+**One quoting guard added here:** on the 8B, the floor-vs-PER-TOKEN
+gap is NOT CI-separated (V-win CI hi 0.146 > 0.129) — do not quote
+"window-computable floor below per-token dicts" as a bounded claim
+on the 8B; the designation-relevant comparison (floor vs best
+dictionary, +0.097 vs +0.393, ~4×) is the quotable one. At T16 the
+8B floor (0.184) EXCEEDS its per-token dict (0.129) — consistent
+with the recorded T16 nuance; the dict stays ~2.8× clear (0.507).
+Memo status: GAP-B numbers remain the open slots; verdict table
+otherwise complete pending Andrii.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
