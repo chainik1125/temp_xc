@@ -1471,3 +1471,47 @@ here, the conclusion is sharp and worth stating plainly — on real activations 
 dictionary is not blind to order, and the crosscoder's distinctive value is not in *reading*
 temporal structure but in *representing it in a single steerable latent*, which is what the
 frozen-shuffle control already measures.
+
+## The order-only task: a decisive negative that explains the whole sprint
+
+Both classes have the same multiset of segments and the same switch count, differing only in
+which block came first, so any symmetric pooling of per-token codes is at chance by
+construction. Layer 14, T=12, 1500 documents.
+
+| | SAE winAUC | TXC winAUC | Δ | SAE FVU | TXC FVU |
+|---|---|---|---|---|---|
+| order task, k=2 | **0.981** | 0.825 | −0.156 | 0.148 | 0.412 |
+| order task, k=8 | **1.000** | 0.833 | −0.167 | 0.069 | 0.389 |
+| shuffled control, k=2 | 0.597 | 0.598 | +0.002 | 0.156 | 0.545 |
+| shuffled control, k=8 | 0.604 | 0.601 | −0.004 | 0.080 | 0.505 |
+
+**A single mean-pooled SAE latent reaches AUC 1.000 on a label that is pure order.** The
+shuffled control falls to 0.60 for both architectures, so the signal is genuinely order and
+not label leakage. O2 is refuted; O3 is confirmed.
+
+**The explanation, and it is the obstruction the whole sprint kept running into.** The model
+is causal, so it writes its own history into every token: a calm sentence following six
+tense ones has a different representation from a calm sentence following two. Pooling
+per-token codes therefore recovers order without any window representation at all. The
+design was built specifically to defeat per-token codes and it did not come close.
+
+**This generalises.** There is no order information in mid-stack LM activations that a
+per-token dictionary cannot access, because the transformer has already performed the
+temporal integration. Every "can a window code read temporal structure better?" experiment
+in this sprint was therefore asking a question whose answer was fixed in advance by the
+architecture of the model being probed, not by the architecture of the dictionary. That is
+why the run-length task, the depth sweep and this task all came out the same way.
+
+**And it says exactly where the advantage has to be.** Reading is not the crosscoder's
+job — the SAE can already read everything. The crosscoder's distinctive capability is
+representing temporal structure in a *single latent with a temporal profile*, which is a
+statement about intervention, not about decoding. A per-token dictionary's only per-latent
+write is one direction applied at every position; that write is constant in time, and a
+constant write cannot distinguish two orderings of the same multiset. A crosscoder latent
+writes a different vector at each position and can.
+
+That is a falsifiable claim on the *same* task where the SAE reads perfectly, which makes it
+the sharpest available test: **the SAE reads order at AUC 1.000 and should be unable to
+steer it; the crosscoder reads it worse at 0.83 and should be able to.** If reading and
+steering come apart on one task, the crosscoder's value is established precisely and the
+FVU deficit becomes the price rather than the verdict. `steer_order_modal.py` runs it.

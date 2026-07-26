@@ -1,0 +1,335 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k_seg": 36,
+  "T": 12,
+  "d_sae": 4096,
+  "steps": 2000,
+  "lr": 0.0003,
+  "corpora": {
+    "structured": [
+      {
+        "arm": "sae",
+        "nominal": 1,
+        "coeff_per_segment": 1.0,
+        "fvu": 0.5258520841598511,
+        "alive_frac": 0.00341796875,
+        "segment_auc": 0.6076821088790894,
+        "window_auc": 0.7174410820007324,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 1,
+        "coeff_per_segment": 1.1174999872843425,
+        "fvu": 0.6319752931594849,
+        "alive_frac": 0.02880859375,
+        "segment_auc": 0.5000002384185791,
+        "window_auc": 0.7184197902679443,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 0.03,
+        "coeff_per_segment": 2992.557861328125,
+        "fvu": 0.03012925758957863,
+        "alive_frac": 0.99853515625,
+        "segment_auc": 0.9640475511550903,
+        "window_auc": 0.7513391375541687,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 351.30621337890625,
+        "l1_coef": 0.03
+      },
+      {
+        "arm": "sae",
+        "nominal": 2,
+        "coeff_per_segment": 2.0,
+        "fvu": 0.17619696259498596,
+        "alive_frac": 0.010009765625,
+        "segment_auc": 0.5888410210609436,
+        "window_auc": 0.7276767492294312,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 2,
+        "coeff_per_segment": 2.0861666997273765,
+        "fvu": 0.31267982721328735,
+        "alive_frac": 0.1826171875,
+        "segment_auc": 0.5000002384185791,
+        "window_auc": 0.7211223244667053,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 0.1,
+        "coeff_per_segment": 2972.76171875,
+        "fvu": 0.030200134962797165,
+        "alive_frac": 0.99853515625,
+        "segment_auc": 0.9713688492774963,
+        "window_auc": 0.730086624622345,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 357.35577392578125,
+        "l1_coef": 0.1
+      },
+      {
+        "arm": "sae",
+        "nominal": 4,
+        "coeff_per_segment": 4.0,
+        "fvu": 0.1276378333568573,
+        "alive_frac": 0.019775390625,
+        "segment_auc": 0.5689594745635986,
+        "window_auc": 0.7344107627868652,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 4,
+        "coeff_per_segment": 3.7946109771728516,
+        "fvu": 0.2391936331987381,
+        "alive_frac": 0.79443359375,
+        "segment_auc": 0.5000002384185791,
+        "window_auc": 0.7219753265380859,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 0.3,
+        "coeff_per_segment": 2930.40234375,
+        "fvu": 0.03044617362320423,
+        "alive_frac": 0.997314453125,
+        "segment_auc": 0.9642557501792908,
+        "window_auc": 0.7298226356506348,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 308.1092224121094,
+        "l1_coef": 0.3
+      },
+      {
+        "arm": "sae",
+        "nominal": 8,
+        "coeff_per_segment": 8.0,
+        "fvu": 0.09870809316635132,
+        "alive_frac": 0.042236328125,
+        "segment_auc": 0.6276955604553223,
+        "window_auc": 0.7311784625053406,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 8,
+        "coeff_per_segment": 7.7549997965494795,
+        "fvu": 0.20551495254039764,
+        "alive_frac": 0.92626953125,
+        "segment_auc": 0.5000002384185791,
+        "window_auc": 0.722883939743042,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 1.0,
+        "coeff_per_segment": 2758.4609375,
+        "fvu": 0.03067469224333763,
+        "alive_frac": 0.998291015625,
+        "segment_auc": 0.9606800079345703,
+        "window_auc": 0.7390832901000977,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 141.33700561523438,
+        "l1_coef": 1.0
+      },
+      {
+        "arm": "sae",
+        "nominal": 16,
+        "coeff_per_segment": 16.0,
+        "fvu": 0.07515373080968857,
+        "alive_frac": 0.09033203125,
+        "segment_auc": 0.6611373424530029,
+        "window_auc": 0.7852857112884521,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 16,
+        "coeff_per_segment": 16.27233378092448,
+        "fvu": 0.20339134335517883,
+        "alive_frac": 0.989013671875,
+        "segment_auc": 0.5000002384185791,
+        "window_auc": 0.7268094420433044,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 3.0,
+        "coeff_per_segment": 2163.5263671875,
+        "fvu": 0.039747852832078934,
+        "alive_frac": 1.0,
+        "segment_auc": 0.9307851791381836,
+        "window_auc": 0.7555519342422485,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 22.878833770751953,
+        "l1_coef": 3.0
+      }
+    ],
+    "iid": [
+      {
+        "arm": "sae",
+        "nominal": 1,
+        "coeff_per_segment": 1.0,
+        "fvu": 0.45553359389305115,
+        "alive_frac": 0.00439453125,
+        "segment_auc": 0.6095707416534424,
+        "window_auc": 0.5,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 1,
+        "coeff_per_segment": 1.1095000108083088,
+        "fvu": 0.6182901859283447,
+        "alive_frac": 0.0283203125,
+        "segment_auc": 0.542385458946228,
+        "window_auc": 0.5,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 0.03,
+        "coeff_per_segment": 2999.84130859375,
+        "fvu": 0.031203679740428925,
+        "alive_frac": 0.99853515625,
+        "segment_auc": 0.9514584541320801,
+        "window_auc": 0.5,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 406.69122314453125,
+        "l1_coef": 0.03
+      },
+      {
+        "arm": "sae",
+        "nominal": 2,
+        "coeff_per_segment": 2.0,
+        "fvu": 0.19230197370052338,
+        "alive_frac": 0.0087890625,
+        "segment_auc": 0.6169525980949402,
+        "window_auc": 0.5,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 2,
+        "coeff_per_segment": 2.0923333168029785,
+        "fvu": 0.3231308162212372,
+        "alive_frac": 0.18603515625,
+        "segment_auc": 0.5363146066665649,
+        "window_auc": 0.5,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 0.1,
+        "coeff_per_segment": 2985.943115234375,
+        "fvu": 0.0308909360319376,
+        "alive_frac": 0.998291015625,
+        "segment_auc": 0.9582926034927368,
+        "window_auc": 0.5,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 374.6080627441406,
+        "l1_coef": 0.1
+      },
+      {
+        "arm": "sae",
+        "nominal": 4,
+        "coeff_per_segment": 4.0,
+        "fvu": 0.12937363982200623,
+        "alive_frac": 0.01953125,
+        "segment_auc": 0.6572354435920715,
+        "window_auc": 0.5,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 4,
+        "coeff_per_segment": 4.072277704874675,
+        "fvu": 0.2670247554779053,
+        "alive_frac": 0.84326171875,
+        "segment_auc": 0.5367511510848999,
+        "window_auc": 0.5,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 0.3,
+        "coeff_per_segment": 2949.341552734375,
+        "fvu": 0.030795887112617493,
+        "alive_frac": 0.997802734375,
+        "segment_auc": 0.9677596688270569,
+        "window_auc": 0.5,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 327.08782958984375,
+        "l1_coef": 0.3
+      },
+      {
+        "arm": "sae",
+        "nominal": 8,
+        "coeff_per_segment": 8.0,
+        "fvu": 0.10165336728096008,
+        "alive_frac": 0.044189453125,
+        "segment_auc": 0.6253223419189453,
+        "window_auc": 0.5,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 8,
+        "coeff_per_segment": 8.382277806599935,
+        "fvu": 0.22653162479400635,
+        "alive_frac": 0.96435546875,
+        "segment_auc": 0.5371752977371216,
+        "window_auc": 0.5,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 1.0,
+        "coeff_per_segment": 2761.1552734375,
+        "fvu": 0.03193962946534157,
+        "alive_frac": 0.998046875,
+        "segment_auc": 0.9572238326072693,
+        "window_auc": 0.5,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 167.11361694335938,
+        "l1_coef": 1.0
+      },
+      {
+        "arm": "sae",
+        "nominal": 16,
+        "coeff_per_segment": 16.0,
+        "fvu": 0.07868107408285141,
+        "alive_frac": 0.089111328125,
+        "segment_auc": 0.6592975854873657,
+        "window_auc": 0.5,
+        "n_params": 12588544
+      },
+      {
+        "arm": "txc",
+        "nominal": 16,
+        "coeff_per_segment": 17.196444193522137,
+        "fvu": 0.22073185443878174,
+        "alive_frac": 0.99755859375,
+        "segment_auc": 0.538576602935791,
+        "window_auc": 0.5,
+        "n_params": 151017472
+      },
+      {
+        "arm": "tsae_paper",
+        "nominal": 3.0,
+        "coeff_per_segment": 2166.190185546875,
+        "fvu": 0.041723787784576416,
+        "alive_frac": 0.999755859375,
+        "segment_auc": 0.936669111251831,
+        "window_auc": 0.5,
+        "n_params": 40380032,
+        "pred_l0_per_segment": 38.31416702270508,
+        "l1_coef": 3.0
+      }
+    ]
+  }
+}

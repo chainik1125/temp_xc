@@ -1,0 +1,36 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layers": [
+    14
+  ],
+  "k_seg": 12,
+  "T": 12,
+  "d_sae": 4096,
+  "steps": 2000,
+  "rows": [
+    {
+      "layer": 14,
+      "k": 2,
+      "sae_coeff_per_segment": 2.0,
+      "txc_coeff_per_segment": 3.225555737813314,
+      "sae_fvu": 0.15627926588058472,
+      "txc_fvu": 0.5447540283203125,
+      "fvu_ratio": 3.4857728902858236,
+      "sae_window_auc": 0.5969960689544678,
+      "txc_window_auc": 0.5984979867935181,
+      "window_auc_delta": 0.001501917839050293
+    },
+    {
+      "layer": 14,
+      "k": 8,
+      "sae_coeff_per_segment": 8.0,
+      "txc_coeff_per_segment": 13.359630584716797,
+      "sae_fvu": 0.0799766555428505,
+      "txc_fvu": 0.5047131180763245,
+      "fvu_ratio": 6.310755490468159,
+      "sae_window_auc": 0.6041897535324097,
+      "txc_window_auc": 0.6005533337593079,
+      "window_auc_delta": -0.0036364197731018066
+    }
+  ]
+}
