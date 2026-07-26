@@ -1,0 +1,59 @@
+{
+ "cells": {},
+ "scores": {
+  "scored_at_cells": 0,
+  "K3_cohort_integrity": {
+   "violations": [],
+   "pass": true
+  },
+  "K1_sae_falsifier": {
+   "sae_pr_auc_S16": [],
+   "pass": null
+  },
+  "K2_under_realization": {
+   "cells": {},
+   "pass": null
+  },
+  "E1_negative_persists": {
+   "per_T": {},
+   "holds": null
+  },
+  "E2_shuffle_below_bar": {
+   "per_T": {},
+   "holds": null
+  },
+  "E4_t1_limit": {
+   "txc_T1": null,
+   "sae": null,
+   "delta": null,
+   "holds": null
+  },
+  "E5_untrained_floors": {}
+ },
+ "paper_anchors": {
+  "sae_arditi": {
+   "pr_auc_S16": {
+    "42": 0.69,
+    "1": 0.745
+   },
+   "k_per_token": 128
+  },
+  "txc_base": {
+   "pr_auc_S16": {
+    "42": 0.542,
+    "1": 0.56
+   },
+   "shuffle_gap_S16": {
+    "42": -0.059,
+    "1": -0.002
+   },
+   "k_pos": 25,
+   "T": 5
+  },
+  "caveats": [
+   "(a) paper cells probed PER-CELL Wang cohorts (n_sent 79k-107k, base rates 0.32-0.47) vs this run's ONE fixed 1728-rollout cohort (0.323); PR-AUC is base-rate sensitive - cross-design deltas are context, not measurements",
+   "(b) budgets differ (arditi 128/token vs panel 20/token; txc_base k_pos 25, T 5 paper knobs)",
+   "(c) composition differs BY DESIGN - that is the ablation"
+  ]
+ }
+}

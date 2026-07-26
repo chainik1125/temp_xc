@@ -558,6 +558,23 @@ datasources:
     seq_len: 128
     notes: "em-redo TXC-tracking arm — the paper's own layer; g(ℓ)=+0.097, g_order +0.054 at resid_post L15 (hs16)."
 
+  # ── ACTMIX RLHF btk-only arm (runpod-2, 2026-07-27) ────────────────
+  # The phase-7 BASE training stream itself: txcdr-base-data
+  # activation_cache/resid_L12.npy — the EXACT activations the shipped
+  # § 5.4 RLHF checkpoints trained on (COMPOSITION_AUDIT § 6).
+  # Installed out-of-band by actmix_rlhf/convert_train_cache.py
+  # (hardlink into the keyed layout; no re-forwarding).
+
+  gemma_2_2b_base_l12_phase7:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 12
+    hookpoint: resid_post
+    dataset: phase7_base_stream_txcdr_base_data
+    n_seqs: 24000
+    seq_len: 128
+    notes: "ACTMIX RLHF btk-only arm — phase-7 BASE stream (shipped-ckpt training substrate)."
+
   # ── task hunt Stage 2: REAL Ward activations + frozen λ̂ labels ──────
   # briefings/task-hunt.md candidate 1. Presented as a `synthetic`-
   # category datasource via the `module:fn` generator path so the
