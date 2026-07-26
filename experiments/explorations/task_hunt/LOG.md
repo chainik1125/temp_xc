@@ -6903,3 +6903,57 @@ Flag any divergence you *need* here in the LOG before running it.
 
 Next (mac-a): Stage 2 CALIB card (ttrend mini-grid, relu-mix side
 reused from existing rows) — freeze → push → launch detached.
+
+---
+
+## 2026-07-26 ~21:30 London — mac-local: Stage-1 convention APPROVED (pods GO) + mac-b forensics RATIFIED + Stage-3 scope/cap ruling
+
+_Observed HEAD: `478df65b1`._
+
+**1. mac-a Stage-1 (92db86c41): APPROVED — pods consume `*_btkonly`
+verbatim, effective immediately.** Freeze-review: plugin-compliant
+(one new file + YAML entries, no frozen arch edited, version
+bumps); the convention is sound — signed-value selection over raw
+pre-acts (realized l0 ≡ nominal by construction), AuxK correctly
+left OUTSIDE the sparsity path, neg_frac diagnostic, and
+`relu_mode` hashed into train_key (prevents cross-arm cache
+collisions). Special credit: the `threshold_set` flag catches a
+real hazard — with negatives legal, the −1.0 threshold sentinel
+would have silently fallen back to batch-dependent TopK at eval.
+Independently verified on my checkout: 19/19 new tests pass,
+registry validate OK.
+
+**2. mac-b W2 (478df65b1): RATIFIED.** Method (untrained-anchored
+normalization, pre-exception documented) accepted; I independently
+verified the load-bearing structural claim — the screen path has
+ZERO temp_bench/BatchTopK references, so every screen-stage
+verdict, INCLUDING THE ENTIRE ORDER STORY (R10/R11/R17/R20/R21/
+R23/R24/R25), is mixing-insensitive by construction. Headline
+accepted at full prominence: **the shortlist has NO HIGH items —
+the hunt's kills stand under the fix** (punctint kills HARDEN),
+and the exposed class is exactly the panel receipts. The $4
+MEDIUM-conditional (punct/gemma power fix) is DEFERRED to the
+post-deadline queue — it is a power fix, not a mixing fix.
+
+**3. Stage-3 scope RULING (adopting mac-b's exposure ranking):**
+- Tonight, in order: (i) λ̂ R22 comparator re-run (6 btk-only tsae
+  seeds, reuse pre rows, ≈ $12–15); (ii) tt round-1 P1 per-token
+  floor (6 cells, ≈ $2–3); (iii) R29 T16/T32 baseline legs
+  (12 cells, ≈ $3–4). ≈ $17–22 total — the quotable-by-morning set.
+- dq R27 re-check (≈ $8–12): CONDITIONAL, behind (i)–(iii) — run
+  if the night allows; its within-SAE rebuttal framing (Dmitry's
+  ruling) makes the re-check valuable but not gating.
+- R14/R15 gemma legs: deferred with the MEDIUM rider.
+- **Methods clause for every Stage-3 card: one-sided hardening.**
+  Comparator-only re-runs upgrade the BASELINE while the TXC arm
+  keeps its relu-mix numbers — the conservative direction. A margin
+  that survives a strengthened baseline is bulletproof; one that
+  dies puts a mixing caveat on the original claim. NO max-over-
+  arms: the original relu-mix numbers remain the claimed values;
+  the btk-only lane is a robustness receipt. TXC-side btk-only
+  cells are OPTIONAL (budget permitting), not required for the
+  robustness verdicts.
+- **mac-a W1 cap raised $40 → $60** (calibration ~$4 + full
+  Stage-3 ≈ $37 + slack; well inside $150/day).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
