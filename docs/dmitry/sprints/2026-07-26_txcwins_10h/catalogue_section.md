@@ -50,7 +50,7 @@ general form of that finding: **a window code helps exactly when the target has 
 and matched multisets are how you guarantee that.**
 
 That is a more useful claim than "the crosscoder beats the SAE on task X". It says where to look,
-explains why five other directions are dead ends, and is directly falsifiable — find a behaviour
+explains why seven other directions are dead ends, and is directly falsifiable — find a behaviour
 with no matched-multiset structure where a window code wins on steering, and it is wrong.
 
 ---

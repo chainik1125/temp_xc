@@ -2097,3 +2097,85 @@ with latents selected on train.
 That **bounds** last sprint's "reading comparisons never favour a window code" rather than
 contradicting it — the claim holds for slow structure and fails for fast — and a bounded claim
 with a measured crossover is worth more than the unbounded one it replaces.
+
+## 00:36 — last sprint's headline is withdrawn, and its key control inverted
+
+The `order` task — the exact task behind "crosscoder +11.29 against the SAE's +1.24, z = 11.8"
+— rerun at lr 1e-3 with doses swept symmetrically about zero, two dictionary inits, held-out
+sparsity matching, all controls:
+
+| arm | init 0 | init 1 |
+| --- | --- | --- |
+| **`txc_flat`** (profile *removed*) | **+12.10** | **+18.47** |
+| `tsae_broadcast` | +10.66 | — |
+| `txc_slab` (the crosscoder) | +6.34 | +3.41 |
+| `random_broadcast` | +6.30 | — |
+| `sae_broadcast` | +4.66 | +5.16 |
+| `rank1_best` (supervised) | +70.58 | — |
+
+**The crosscoder does not beat the SAE significantly in either init** — z = 1.35 at init 0, and
+it loses at init 1.
+
+**And the control that was the proof has inverted.** Last sprint reported `txc_flat` — the same
+slab with its temporal profile averaged away — as *inverting* to −8.02, and used that as
+evidence the profile was doing the work. It reaches **+12.10 and +18.47**, roughly double the
+crosscoder itself. The mechanism: `txc_flat` is large and negative at positive doses and large
+and positive at negative ones, so a positive-only grid recorded the negative branch and read a
+**sign** as an **inversion**. Since the sign of a steering vector is a free parameter, the
+honest reading is the reverse of the published one: `txc_flat` is simply a better constant write
+than the SAE's, and **the order task is steerable by a constant write.**
+
+The same error produced this sprint's own phase-ladder result, withdrawn an hour earlier. One
+mistake found twice, traced to its source.
+
+## 00:38 — `c` predicts every outcome in both sprints
+
+Measured on the gradient of the metric actually reported:
+
+| task | `c` (gradient) | who wins steering |
+| --- | --- | --- |
+| recency, fixed positions | **0.035** | crosscoder, z = 18 |
+| evidence | 0.136 | crosscoder, z = 36 |
+| recency_var | 0.141 | SAE +3.33 beats crosscoder +2.13 |
+| order | **0.241** | `txc_flat` and the SAE beat the crosscoder |
+| phase ladder | 0.006–0.040 | null, flips with init |
+
+Where `c` is small the crosscoder wins; where it reaches a fifth or more, a constant write has
+enough grip to win outright. **This retro-explains the previous sprint rather than merely
+contradicting it: the order task's `c` is 0.24, so a constant write always had grip there, and
+the only question was whether anyone tested the dose sign that revealed it.**
+
+The phase ladder is the exception that makes the claim precise — tiny `c` makes a constant write
+useless without making the crosscoder's write good. `c` is **necessary, not sufficient**, which
+is how the two gates were ordered in advance.
+
+## 00:40 — findings 5 and 6, corrected against the completed run
+
+Recency at the full configuration, every arm at matched injected norm:
+
+| arm | Δ | |
+| --- | --- | --- |
+| `rank1_best` | +8.55 ± 0.27 | rank-1 truncation of the **difference-of-means** slab |
+| `dom_slab` | +8.20 ± 0.22 | supervised reference |
+| `sae_schedule` | +7.86 ± 0.25 | the SAE's own direction on its best schedule |
+| **`txc_slab`** | **+6.48 ± 0.15** | the crosscoder |
+| `tsae_broadcast` | +3.65 ± 0.14 | |
+| `sae_broadcast` | +2.60 ± 0.15 | per-token dictionary as deployed |
+| `random_broadcast` | +1.81 ± 0.16 | |
+| `txc_flat` | +1.42 ± 0.14 | profile removed |
+| `random_slab` | +1.39 ± 0.07 | |
+| `txc_profile_random` | +0.00 ± 0.04 | profile kept, directions randomised |
+
+Three levels, each gap separately significant: **the crosscoder beats deployed practice by
+2.5×** (z = 18.3); **a per-token dictionary handed a schedule beats the crosscoder** (z = 4.7
+and 6.7); the crosscoder reaches **76% of the rank-1 ceiling**. The earlier 30% figure came
+from the smoke run and is wrong.
+
+**A registered architectural prediction lands here.** The tSAE was argued from its decoder to be
+rank-1 with an *automatically supplied* schedule, so it should sit strictly between a constant
+write and an optimally scheduled one. Measured: +2.60 < **+3.65** < +7.86. Three arms, ordering
+predicted in advance, confirmed.
+
+`txc_flat` at +1.42 sits *below* a random constant direction at +1.81, and `txc_profile_random`
+is +0.00 ± 0.04 — on **this** task the controls hold cleanly, which is what distinguishes it
+from the order task where they did not.

@@ -247,6 +247,63 @@ spare, rerun the steering arms with the crosscoder at `k_window = k_segment × T
 match — the expected outcome is that the SAE arm gets no better, since the constant-write argument
 is structural rather than about capacity, and confirming that closes the loop.
 
+### The second gate: rank, from [[theory_section]], applied to these entries
+
+The theory workstream has produced a second gate that supersedes part of my framing and changes
+several verdicts here. Recording the consequences rather than restating the derivation.
+
+**The result.** A per-token dictionary latent is one direction, but its *coefficient* varies with
+position — scale the latent by its own activation and the write is one direction on a schedule.
+So a per-token dictionary, steered well, reaches any **rank-1** write. A crosscoder reaches
+higher rank. The share of the optimal write reachable by rank 1 is `r1 = σ₁²/‖P‖_F²`, computable
+before any dictionary is trained. The two gates are ordered:
+
+| gate | condition | rules out |
+| --- | --- | --- |
+| first | `c ≈ 0` (no bag statistic separates target from foil) | a broadcast write riding a DC component |
+| second | `r1` well below 1 | a *scheduled* per-token write |
+
+**The consequence that reorders this catalogue: every two-block swap has a rank-1 optimal write.**
+If conditions A and B differ by exchanging two blocks, the difference slab is `+Δ` at one slot and
+`−Δ` at the other — one direction with a sign flip, exactly rank 1. That applies to:
+
+| entry | block structure | rank verdict |
+| --- | --- | --- |
+| Instruction-order conflict | two blocks swapped | **rank 1 from the swap alone** — demote from 5 |
+| LLM-judge position bias | two responses swapped | rank 1 — already demoted, now doubly |
+| Demonstration order | **depends on the permutation**, see below | salvageable, and this is the fix |
+| Per-section style scheduling | balanced profile over ~6 segments | high rank — consistent with it having won |
+| Permutation composition | `m` swaps | high rank |
+| Multi-turn escalation | full shuffle of many turns | high rank |
+
+**The design fix for demonstration order, and it is the single most actionable thing on this
+page.** The foil pair must differ by a **large-support permutation, not a transposition**. Swap
+two demonstrations and the difference slab is `(demo_X − demo_Y)` at one slot and its negation at
+the other — *exactly* rank 1, and a per-token latent on a schedule matches it. Use a **cyclic
+rotation of all interior demonstrations** instead: the theory note gives an `m`-block cyclic
+rotation rank `m − 1`, with the rank-1 share falling as roughly `2/m`. At `k = 8` with six
+interior demonstrations rotated, that is rank 5 and `r1` around 0.33 — comfortably inside the
+regime where the gate discriminates.
+
+This matters because "best versus worst ordering" says nothing about *how* the two orderings
+differ. A search over permutations could easily return a best/worst pair differing by a single
+transposition, which would be a rank-1 task wearing the clothes of a permutation task. **Constrain
+the search to rotations, or measure `r1` on the selected pair before training anything.**
+
+**A note on instruction-order conflict, which I had at joint-first.** It is not dead, but its
+headroom is much smaller than I implied. The theory note reports the instruction-recency task
+having genuine rank-2 structure — the instruction's lexical content and the downstream
+governing-instruction state occupy disjoint positions and distinct directions — with `r1 = 0.829`
+measured from the gradient. So roughly 17% of the optimal write is inexpressible by any rank-1
+intervention. Real, but a seventeen-percent residual rather than a structural impossibility, and
+it should be described that way.
+
+**What this does to my own framing.** I argued that P1 (matched multiset) is the necessary
+condition. That remains true and is now gate one. What I missed is that it is not *sufficient*
+even after the DC audit: a matched multiset with a two-block structure passes gate one and fails
+gate two. The honest summary is that I was checking whether a constant write could work, and the
+sharper question is whether a *scheduled* write could.
+
 ### The concrete recommendation, if one task has to be picked
 
 **Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =
@@ -1631,7 +1688,7 @@ general form of that finding: **a window code helps exactly when the target has 
 and matched multisets are how you guarantee that.**
 
 That is a more useful claim than "the crosscoder beats the SAE on task X". It says where to look,
-explains why five other directions are dead ends, and is directly falsifiable — find a behaviour
+explains why seven other directions are dead ends, and is directly falsifiable — find a behaviour
 with no matched-multiset structure where a window code wins on steering, and it is wrong.
 
 ---
