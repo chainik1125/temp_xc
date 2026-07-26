@@ -368,14 +368,16 @@ points would fall on a downward line; they rise.*
 At 8.0 realised coefficients per segment on the recency corpus, **each arm at its own best
 recipe** from a full lr × steps sweep:
 
-| arm | FVU | best steering Δ |
-| --- | --- | --- |
-| attention tSAE | **0.0144** | +2.32 |
-| TopK SAE | 0.0373 | +2.35 |
-| crosscoder | **0.0968** | **+7.81** |
+| arm | FVU | Δ at matched dose | Δ at best dose |
+| --- | --- | --- | --- |
+| attention tSAE | **0.0144** | +0.19 | +2.32 |
+| TopK SAE | 0.0373 | +0.47 | +2.35 |
+| crosscoder | **0.0968** | **+5.31** | **+7.81** |
 
-**The best reconstructor steers worst and the worst reconstructor steers best**, by 3.4×. The
-ordering is exactly inverted. Any benchmark ranking temporal dictionaries by FVU — which is what
+**The best reconstructor steers worst and the worst reconstructor steers best.** At matched dose
+the inversion is **strict and complete** — FVU orders tSAE < SAE < crosscoder and steering orders
+them exactly in reverse, 3 of 3, spread **28×**. At best dose it is only 3.4× and not strict,
+since the two per-token arms sit within 0.03 of each other. Any benchmark ranking temporal dictionaries by FVU — which is what
 the field does — would rank these three in precisely the wrong order for the use a crosscoder is
 being proposed for.
 
