@@ -34,13 +34,28 @@ from experiments.explorations.task_hunt.lambda_intensity.run_stage2 import (
     _describe,
 )
 
-DS = "dial_real_dqgap_llama31_8b_l14"   # GATE AMENDED: LOG 187c51022
+# Both frozen panels (tt: 7ba2e10fd card; dq: cfa341c34 card); selected
+# by --panel. The v2-DEFECT AMENDMENT (LOG 2026-07-26 mac-a): the first
+# enumeration cloned the λ̂ runner, which PREDATES PROBE_V2_SPEC and
+# carries no eval_extra — every first-run row landed v1-only, breaching
+# both cards' paired-columns term. Fixed here by attaching the oprate
+# § 2 V2 block verbatim to every cell; v2 keys hash into eval_key, so
+# re-run rows are new rows, never cache collisions.
+PANEL_DS = {"tt": "dial_real_ttrend_gpt2_l7",
+            "dq": "dial_real_dqgap_llama31_8b_l14"}
+DS = PANEL_DS["dq"]              # default; --panel overrides in main()
 # λ̂ ladder + T32 per mac-local's panel-ladder requirement (44594b696):
 # a gate fired on T32 order-carriage must be panelled AT T32.
 WINDOW_TS = (2, 4, 8, 16, 32)
-BUFFER_TOKENS = 524_288   # UNCHANGED; dialevel stream 0.81–0.88M ≥ buffer
+BUFFER_TOKENS = 524_288   # UNCHANGED; disclosures per card (tt fills, dq 1.12×)
 HERE = Path(__file__).resolve().parent
-PANEL_FILE = HERE / "results" / f"stage2_{DS}.json"
+
+# PROBE_V2_SPEC.md § 2, verbatim from oprate/run_stage2.py — paired v2
+# columns on every row.
+import numpy as _np
+V2 = {"lambda_probe_v2": True, "lambda_v2_probe": "ridge",
+      "lambda_v2_alphas": list(_np.logspace(-2, 4, 13)),
+      "lambda_v2_n_windows": 8192, "lambda_v2_split": "trace"}
 
 
 def _lambda_cells(ds: str):
@@ -50,6 +65,7 @@ def _lambda_cells(ds: str):
         log=print)
     for c in cells:
         c["buffer_tokens"] = BUFFER_TOKENS
+        c["eval_extra"] = V2
     return cells
 
 
@@ -91,8 +107,14 @@ def _merge_into_panel(new_results):
 
 
 def main():
+    global DS, PANEL_FILE
     argv = list(sys.argv[1:])
     block = only_seed = None
+    if "--panel" in argv:
+        i = argv.index("--panel")
+        DS = PANEL_DS[argv[i + 1]]
+        del argv[i:i + 2]
+    PANEL_FILE = HERE / "results" / f"stage2_{DS}.json"
     if "--block" in argv:
         i = argv.index("--block")
         block = argv[i + 1]

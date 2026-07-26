@@ -103,3 +103,19 @@ after 15:30; everything pushed by 16:30. Deliverable: LOG verdict
 `mac-a (executor)` PENDING TEAM REVIEW scoring P1–P5 + KEEP/KILL,
 leaderboard rows, panel JSON, receipts proposal, checkpoints to
 Volume (HF mirror = Han follow-up rule).
+
+## AMENDMENT (2026-07-26, mac-a) — v2-columns defect and re-run
+
+The first tt run (freeze `7ba2e10fd`, completed + merged) landed
+**v1-only rows**: the enumeration was cloned from the λ̂ runner,
+which PREDATES PROBE_V2_SPEC and carries no `eval_extra` — § 4's
+paired-columns term was breached by the executor, caught at scoring
+(P5 unscorable). Fix: `run_panel.py` now attaches the oprate § 2 V2
+block verbatim to every cell; the panel is RE-RUN at the amendment
+freeze. The first run's 102 leaderboard rows keep their (clean-pin,
+disclosed-dirty-stamp) places — v2 keys hash into eval_key so the
+re-run adds new rows, no collisions; the panel FILE is rebuilt from
+the paired re-run (same cell identities). Nothing from the first run
+is quotable. Realized-l0 note from the first run carries forward
+unchanged expectations (post = k-per-window ⇒ l0 8/T per token,
+byte-matching the λ̂ panel's signature).

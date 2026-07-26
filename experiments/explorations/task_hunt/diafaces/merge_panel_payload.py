@@ -89,21 +89,31 @@ def main():
             assert r["training_cfg"]["buffer_tokens"] == 524288
             cv = r["code_version"]
             assert cv["commit_sha"] == FREEZE, cv["commit_sha"]
-            assert not cv["dirty"], "dirty stamp in container row"
-            new_rows.append((r["eval_key"], line))
+            # Pool rows are dirty-stamped BY CONVENTION: run_experiment
+            # appends to the tracked leaderboard.jsonl inside the
+            # container, so every cell after the first sees a growing
+            # `git diff` (grid.py sets TEMP_BENCH_ALLOW_DIRTY=1 for
+            # exactly this; the historical λ̂ panel rows carry the same
+            # signature — 69/84 dirty at 038655fd3). Single-cell
+            # containers stamp before their own append and stay clean.
+            # The integrity guarantee is the PIN assert above; dirty
+            # counts are disclosed in the merge receipt below.
+            new_rows.append((r["eval_key"], line, bool(cv["dirty"])))
 
-    dup = [k for k, _ in new_rows if k in existing_keys]
+    dup = [k for k, _, _ in new_rows if k in existing_keys]
+    n_dirty = sum(1 for _, _, d in new_rows if d)
     seen = set()
     appended = 0
     with LB.open("a") as fh:
-        for k, line in new_rows:
+        for k, line, _ in new_rows:
             if k in existing_keys or k in seen:
                 continue
             fh.write(line if line.endswith("\n") else line + "\n")
             seen.add(k)
             appended += 1
     print(f"[leaderboard] +{appended} rows ({len(dup)} dups skipped — "
-          f"idempotent re-merge)")
+          f"idempotent re-merge); {n_dirty}/{len(new_rows)} dirty-stamped "
+          f"(pool leaderboard-growth convention, pin verified {FREEZE[:9]})")
     _merge_into_panel(results, DS)
 
 

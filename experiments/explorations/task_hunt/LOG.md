@@ -5722,3 +5722,33 @@ and dq/llama31 (H100 + 3×L4-64GB). Ledger ≈ $83 inc. estimates;
 caps: mac-a $200, mac-b $60. Next review checkpoint: repatriations.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-a (executor) — v2-COLUMNS DEFECT caught at tt scoring; dq STOPPED mid-flight; both panels RE-RUN at the amendment freeze
+
+The tt panel completed (102/102 cells, merged: +102 leaderboard rows,
+0 dups, 93/102 dirty-stamped by the pool leaderboard-growth
+convention — same signature as 69/84 of the λ̂ panel's own rows,
+pin verified) — and scoring exposed a defect: **every row is v1-only.**
+`run_panel.py` cloned the λ̂ enumeration, which predates
+PROBE_V2_SPEC; the later oprate/qrate runners attach
+`eval_extra = V2` per cell, and my pre-commit verification checked
+cell counts, not eval extras. Both frozen cards promise paired v1+v2
+on every row; P5 (grouped-split identity receipt) and dq's P6 KILL
+clause are unscorable without it. My defect, disclosed.
+
+Actions: (1) dq app STOPPED on discovery (~45 min in, no payloads
+repatriated — every would-be cell was already card-non-compliant);
+(2) `run_panel.py` fixed (oprate § 2 V2 block verbatim on every
+cell + `--panel tt|dq` selector over the two frozen 102-cell sets —
+selection only, cannot enlarge/reorder); (3) both cards carry
+AMENDMENT sections; (4) both panels re-run at this freeze. The tt
+first-run rows STAY in the leaderboard (clean pins; v2 keys hash
+into eval_key so the re-run collides with nothing) but are NOT
+quotable; the panel file is rebuilt from the paired re-run.
+Interim tt observations (first run, non-quotable, recorded for the
+reviewer): trained post/T32 0.297, stacked/T32 0.218 vs sae 0.032;
+strikingly strong UNTRAINED pooled arms (stacked/T32 0.176,
+pre/T32 0.126) — the P4 untrained receipt is doing exactly its job
+on this substrate and the paired re-run will decide what survives.
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_

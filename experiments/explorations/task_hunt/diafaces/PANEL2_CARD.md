@@ -84,3 +84,14 @@ Est **≤ $25**; ledger read-before/append-after; mac-a cap **$200**
 (`mac-a (executor)`, PENDING TEAM REVIEW), leaderboard rows (0
 dups), panel JSON, receipts proposal with mac-b's variance outputs,
 checkpoints to Volume (HF mirror = Han follow-up rule).
+
+## AMENDMENT (2026-07-26, mac-a) — v2-columns defect: stopped mid-flight and re-run
+
+Same defect as the tt card's amendment (λ̂-clone enumeration,
+v1-only). The dq run was STOPPED mid-flight on discovery (~45 min
+in; no payload had been repatriated; partial spend disclosed in the
+ledger) because its § 3–4 receipts (P5 grouped-split, P6 KILL
+clause) are UNSCOREABLE without v2 columns — every cell it would
+have produced was already non-compliant with this card. Re-run at
+the amendment freeze with the oprate § 2 V2 block on every cell;
+all § 2–5 terms unchanged.
