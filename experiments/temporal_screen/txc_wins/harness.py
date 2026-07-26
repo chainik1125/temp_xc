@@ -43,8 +43,8 @@ def unit(v):
 
 
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
-             steps, lr, batch_win, alphas, tsae_l1=None, n_perm=0, seed=31415,
-             arms=None, verbose=True):
+             steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, n_perm=0,
+             seed=31415, arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
 
     `make_pair(rng)` must return `(sents_a, sents_b, carrier)`: two equal-length sentence
@@ -197,22 +197,31 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     writes["txc_slab"] = sign_t * P_txc
     writes["txc_flat"] = sign_t * unit(P_txc.mean(0, keepdim=True).expand(T, -1).contiguous())
 
-    # ---------------- 3. attention tSAE at the calibrated l1 ----------------
-    if tsae_l1 is not None:
-        import torch.nn.functional as F
+    # ---------------- 3. attention tSAE ----------------
+    # Two sparsity rules, because the L1 form the repo documents cannot be used here. The
+    # calibration (`tsae_calib_modal.py`) shows it reaches the 1-32 coefficient band only by
+    # collapsing -- FVU crosses 1.0 before L0 crosses 32 -- so `tsae_k` runs the same
+    # attention architecture with TopK, which binds by construction and can therefore be
+    # matched to the SAE and crosscoder on realised coefficients per segment. `tsae_l1` is
+    # kept for the record.
+    if tsae_l1 is not None or tsae_k is not None:
         from temporal_crosscoders.han_tsae import TemporalSAE
+        use_topk = tsae_k is not None
         torch.manual_seed(0)
-        ts_ = TemporalSAE(dimin=d, width=d_sae, n_heads=8, sae_diff_type="relu",
-                          kval_topk=None, tied_weights=True, n_attn_layers=1,
+        ts_ = TemporalSAE(dimin=d, width=d_sae, n_heads=8,
+                          sae_diff_type="topk" if use_topk else "relu",
+                          kval_topk=int(tsae_k) if use_topk else None,
+                          tied_weights=True, n_attn_layers=1,
                           bottleneck_factor=64).to(dev)
         opt = torch.optim.Adam(ts_.parameters(), lr=lr)
         ts_.train()
         for _ in range(steps):
             xb = gen_win(batch_win)
             recons, info = ts_(xb)
-            loss = ((recons - xb).pow(2).sum(-1).mean()
-                    + tsae_l1 * (info["novel_codes"]
-                                 + info["pred_codes"]).abs().sum(-1).mean())
+            loss = (recons - xb).pow(2).sum(-1).mean()
+            if not use_topk:
+                loss = loss + tsae_l1 * (info["novel_codes"]
+                                         + info["pred_codes"]).abs().sum(-1).mean()
             opt.zero_grad(); loss.backward()
             torch.nn.utils.clip_grad_norm_(ts_.parameters(), 1.0)
             opt.step()
@@ -223,11 +232,20 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             Zn = Zn_all.mean(1)
         jn, auc_n_signed, auc_n = best_latent(Zn, yt)
         sign_n = 1.0 if auc_n_signed > 0.5 else -1.0
-        out["reading"]["tsae"] = {"latent": jn, "auc": auc_n, "l1_coef": tsae_l1}
+        out["reading"]["tsae"] = {"latent": jn, "auc": auc_n,
+                                  "rule": "topk" if use_topk else "relu_l1",
+                                  "kval": tsae_k, "l1_coef": tsae_l1}
         out["sparsity"]["tsae"] = float(
             (Zn_all.reshape(-1, d_sae) > 0).float().sum(-1).mean())
+        # The predicted codes are computed from context rather than stored, so they are not
+        # charged to coefficients-per-segment -- but they are recorded, because a reader who
+        # disagrees with that accounting needs the number.
+        out["sparsity"]["tsae_pred"] = float(
+            (info["pred_codes"].reshape(-1, d_sae) > 0).float().sum(-1).mean())
         log(f"[tsae] latent {jn} pooled AUC {auc_n:.3f}  "
-            f"realised {out['sparsity']['tsae']:.2f} coeff/segment  (l1={tsae_l1:g})")
+            f"realised {out['sparsity']['tsae']:.2f} coeff/segment "
+            f"(+{out['sparsity']['tsae_pred']:.1f} predicted)  "
+            f"rule={'topk k=%d' % tsae_k if use_topk else 'relu+l1 %g' % tsae_l1}")
         # The tSAE's temporal machinery is all in the ENCODER; its dictionary D gives one
         # direction per latent, so its per-latent write is constant in time exactly like
         # the SAE's. That structural fact is the point of including the arm.
