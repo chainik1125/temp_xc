@@ -35,6 +35,38 @@ fixed.
 That gives the sprint a real behaviour with the exact structural property that produced the
 crosscoder advantage, and it is cheaper to run than anything else in this note.
 
+### The main conclusion of the sweep
+
+Stated separately because it is the finding, not a summary of the entries.
+
+**Almost every behaviour that *looks* temporally extended turns out to have a
+per-token-representable handle, and the exceptions are precisely those where the two conditions
+are permutations of one another.**
+
+The evidence is a consistent run of saturation results, each found while trying to build a case
+*for* the behaviour rather than against it:
+
+| behaviour | the per-token handle that already works | source |
+| --- | --- | --- |
+| refusal | a single direction at a single position near-saturates | Arditi et al.; this repo's own screen |
+| MCQ option order | token bias over option-ID tokens; a content-invariant position attractor | 2309.03882, 2604.26206 |
+| repetition onset | a **single sign-inverted neuron** fixes loops at normal budgets | 2606.13705 |
+| emergent misalignment | a transferable misalignment direction | 2506.11618 |
+| backtracking | reasoning behaviours "controlled by linear directions" | 2506.18167 |
+| entity / state tracking | the model aggregates at the last token rather than tracking incrementally | 2605.30233 |
+
+Six independent literatures, six per-token handles. Set against that, the tasks that survive —
+demonstration order, permutation composition, instruction-order conflict, induction on
+repeat-versus-shuffled — share exactly one structural property, which is P1: the two conditions
+are the *same multiset* in a different arrangement, so no per-token handle can exist by
+construction.
+
+This is a stronger and more useful claim than "the crosscoder beats the SAE on task X". It says
+*where* window codes can possibly help and why everywhere else is a dead end — and it converts
+five negative results into the argument for the one positive one. It is also directly
+falsifiable: find a behaviour with no matched-multiset structure where a window code wins on
+steering, and the claim is wrong.
+
 ### The concrete recommendation, if one task has to be picked
 
 **Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =
@@ -419,8 +451,33 @@ generator that permutes **verbatim, self-contained** premises (no cross-sentence
 no editing is ever needed). That restores exact P1, gives unlimited data, and lets difficulty
 be tuned to a 1.5B model. It is the same kind of corpus builder as the existing CALM/TENSE one.
 
-**Model organism.** None needed for any instance. For instance A, Qwen2.5-1.5B-Instruct — the
-harness default — is adequate: few-shot classification is well within its range.
+**Instance E — LLM-as-a-judge position bias. The highest practical stakes of the five**, and
+the foil is again the field's own standard procedure.
+
+| source | what it gives us |
+| --- | --- |
+| Zheng et al., *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*, NeurIPS 2023 ([arXiv:2306.05685](https://arxiv.org/abs/2306.05685)) | the original documentation of judge position bias and the swapping control |
+| Shi et al., position bias across 15 judges and ~150,000 evaluation instances, IJCNLP 2025 — id not located | the modern scale-up: bias varies by judge and task and is not chance |
+| survey: *From Generation to Judgment* ([arXiv:2411.16594](https://arxiv.org/abs/2411.16594)) — id unverified | context |
+
+Judges pick the response in the **first slot in about 68% of comparisons** even where human
+annotators prefer the second. The standard mitigation — invoke the judge twice with the
+candidates swapped — means a multiset-matched permutation pair is not merely available, it is
+*already what careful practitioners run*. Stakes are as high as anything in this catalogue,
+since LLM judges now underpin a large share of evaluation.
+
+Why it may beat instance B despite the similar shape: the swapped items are long **content
+blocks**, not single label tokens, so the token-bias escape route that sank B does not apply in
+the same way. P2 holds — debiasing requires suppressing a first-slot preference specifically,
+which a uniform write cannot express.
+
+Two honest risks. The verdict is still emitted as a label token ("A"/"B"), so some token bias
+may re-enter through the back door; and a 1.5B model is a poor judge, so this probably needs a
+7B, which costs GPU time the other instances do not. Worth holding as the strongest *fallback*
+rather than the first thing to run.
+
+**Model organism.** None needed for any instance. For instance A, a 1.5B base model is adequate:
+few-shot classification is well within its range.
 
 **Temporal signature.** The factor is position-of-content. Nothing about a demonstration or an
 option changes between conditions; only where it sits.
@@ -624,7 +681,13 @@ accuracy as much as the slab, the entry dies cleanly and fast.
 | Holtzman et al., *The Curious Case of Neural Text Degeneration*, ICLR 2020 ([arXiv:1904.09751](https://arxiv.org/abs/1904.09751)) | canonical problem statement, decoding-side baselines |
 | Xu, Liu, Yan, Cai, Li, Li, *Learning to Break the Loop*, NeurIPS 2022 ([arXiv:2206.02369](https://arxiv.org/abs/2206.02369)) — verified | the **self-reinforcement effect**: "the more times a sentence is repeated in the context, the higher the probability of continuing to generate that sentence" — explicitly cumulative across positions |
 | Hiraoka & Inui, *Repetition Neurons*, 2024 ([arXiv:2410.13497](https://arxiv.org/abs/2410.13497)) | localised units that switch on as a loop establishes |
-| *Repetitions are not all alike*, 2025 ([arXiv:2504.01100](https://arxiv.org/abs/2504.01100)) — id unverified | separates natural-language from induced in-context repetition: two conditions, not one |
+| Mahaut & Franzon, *Repetitions are not all alike: distinct mechanisms sustain repetition in language models*, 2025 ([arXiv:2504.01100](https://arxiv.org/abs/2504.01100)) — verified | two mechanisms, not one: **ICL repetition** has "a dedicated network of attention heads that progressively specialize over training", while **natural repetition** "emerges early and lacks a defined circuitry" and "focuses disproportionately on low-information tokens" |
+
+The two-mechanism split is a design instruction, not a footnote. Only ICL repetition has
+organised circuitry; natural repetition is an unstructured fallback when the model cannot
+retrieve relevant context. A dictionary comparison should run them as separate conditions — and
+the ICL-repetition condition is the one where a structured temporal code plausibly has something
+to bind to, which also makes it continuous with the induction entry above.
 
 **P1 — passes.** `A B A B A B` and `A A A B B B` share a multiset; only the first is a period-2
 loop.
@@ -661,9 +724,21 @@ The repo's incumbent. Anchors the scale for anything new rather than being novel
 
 Ward, Lin, Venhoff, Nanda, *Reasoning-Finetuning Repurposes Latent Representations in Base
 Models*, 2025 ([arXiv:2507.12638](https://arxiv.org/abs/2507.12638)) — a base-Llama direction
-induces backtracking in R1-Distill at layer 10, the steering lever. Venhoff et al.,
-*Understanding Reasoning in Thinking Language Models via Steering Vectors*
-([arXiv:2506.18167](https://arxiv.org/abs/2506.18167) — id unverified).
+induces backtracking in R1-Distill at layer 10, the steering lever.
+
+Venhoff, Arcuschin, Torr, Conmy, Nanda, *Understanding Reasoning in Thinking Language Models via
+Steering Vectors*, 2025 ([arXiv:2506.18167](https://arxiv.org/abs/2506.18167) — verified) steer
+expressing uncertainty, generating examples for hypothesis validation, and **backtracking** in
+DeepSeek-R1-Distill models across 500 tasks in 10 categories.
+
+**And that is a saturation risk for the repo's own incumbent task, which should be said plainly.**
+Their finding is that these reasoning behaviours "are controlled by **linear directions** within
+the model's activation space". A single linear direction that already steers backtracking is
+precisely the strong per-token baseline that leaves a window code little to add — the same shape
+of objection that rules out refusal (Arditi saturation) and argues against emergent misalignment
+(a transferable direction). The repo's own backtracking result reports Δgc 0.541 for the TXC
+against 0.400 per-token, so the gap is real but not large, and any writeup should position
+against Venhoff et al. rather than only against a naive baseline.
 
 **Model organism.** `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B`, downloadable tonight, fits an
 L4. The repo used the 8B Llama distill.
@@ -788,7 +863,14 @@ nobody has tried to *steer* an armed state — but the weakest temporal story.
 | Greenblatt et al., *Stress-Testing Capability Elicitation With Password-Locked Models*, 2024 ([arXiv:2405.19550](https://arxiv.org/abs/2405.19550)) | password-locked organisms and the elicitation framing |
 | *The Elicitation Game*, 2025 ([arXiv:2502.02180](https://arxiv.org/abs/2502.02180)) — id unverified | evaluation of elicitation techniques across organisms |
 | *AuditBench* ([arXiv:2602.22755](https://arxiv.org/abs/2602.22755)), *The Model Organism Lottery* ([arXiv:2607.01033](https://arxiv.org/abs/2607.01033)) — ids unverified | 2026 collections of hidden-behaviour organisms; the latter warns interpretability results depend strongly on how the organism was trained |
-| *Option-Order Randomisation Reveals a Distributional Position Attractor in Prompted Sandbagging* ([arXiv:2604.26206](https://arxiv.org/abs/2604.26206)) — id unverified | links sandbagging to the option-order family above — worth reading, it may connect the priority-5 entry to a safety behaviour |
+| *Option-Order Randomisation Reveals a Distributional Position Attractor in Prompted Sandbagging* ([arXiv:2604.26206](https://arxiv.org/abs/2604.26206)) — verified | links sandbagging to the option-order family, and quantifies how strong a purely positional prior can be: under sandbagging instructions the model enters "a low-entropy response-position basin centred on E/F/G that is highly stable and largely content-invariant", holding under complete content rotation across 2,000 items (Pearson r = 0.9994, JSD = 0.027), with accuracy of **72.1% when the correct answer lands in the preferred position E against 4.3% at position A**, in 7–9B models |
+
+That last result cuts both ways and is worth reading carefully before anyone revisits MCQ option
+order. It is a spectacular demonstration that answer-slot position effects are real and enormous.
+But the effect is explicitly **content-invariant** — a prior over response positions that
+survives complete content rotation — which is the definition of a factor a per-token code can
+represent and a constant write can move. It reinforces rather than rescues the decision to drop
+instance B.
 
 The repo already has `experiments/temporal_screen/passphrase_steering/` — check its state
 before treating this as new work.
@@ -900,17 +982,20 @@ measured on a completely different task.
 - **Also verified this session:** 2511.09700 (Li et al., order variance comparable to
   example-set variance, 0.5B–27B), 2510.03417 (NEXUS, EMNLP 2025 — confirmed real, but the
   turn-shuffle ablation attributed to it could *not* be confirmed), 2503.02854 (Li, Guo,
-  Andreas, permutation composition and the associative-scan mechanisms), 2603.22816 (Basu &
+  Andreas, permutation composition and the associative-scan mechanisms), 2410.09102 (Wu et al.,
+  ISE, ICLR 2025), 2504.01100 (Mahaut & Franzon, two repetition mechanisms), 2506.18167
+  (Venhoff et al., reasoning steering vectors — and the linear-direction saturation risk for
+  backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
-  2504.01100, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2607.01033, 2502.02180,
-  2506.18167, 2605.07984, 2410.09102, 2511.04694, 2408.15221, 2605.01687,
-  2605.02647, 2606.08644, 2507.02737, 2605.26537, 2604.26206, 2506.01926, 2603.03258,
-  2601.04170, 2604.11978, 2605.03907, 2603.05805, 2606.26474, 2512.02194.
+  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2607.01033, 2502.02180,
+  2605.07984, 2408.15221, 2605.01687, 2605.02647, 2606.08644, 2507.02737, 2605.26537,
+  2506.01926, 2603.03258, 2601.04170, 2604.11978, 2605.03907, 2603.05805, 2606.26474,
+  2512.02194.
 - **Claims withdrawn on checking:** that a published turn-shuffle ablation exists for
   crescendo-style attacks (could not confirm in Crescendo or NEXUS); that R-GSM is
   multiset-matched (it permits word edits); that EM is carried by a single unified linear
@@ -990,3 +1075,11 @@ the per-pass times are ordering only, not measurements.
   shuffled-CoT control and **could not find one**; recorded why a shuffled-CoT task should be
   expected to fail anyway (step necessity as low as 1.4% in some reasoning modes means the CoT
   is decorative and permuting it changes nothing).
+- **Pass 13** (23:10 PDT, clock read) — verified four more: ISE (2410.09102, ICLR 2025 — its
+  architectural fix implies provenance is under-encoded in unmodified models, which supports the
+  instruction-order entry, and it names two usable benchmarks); *Repetitions are not all alike*
+  (2504.01100 — two mechanisms, only ICL repetition has organised circuitry, so the conditions
+  must be run separately); the position attractor in prompted sandbagging (2604.26206 — 72.1%
+  against 4.3% accuracy by answer slot, but explicitly content-invariant, which reinforces
+  dropping instance B); and Venhoff et al. (2506.18167). The last of these is a **saturation risk
+  for the repo's own incumbent task** and is recorded in the backtracking entry.

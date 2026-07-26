@@ -954,3 +954,97 @@ control had existed, and CoT faithfulness stays at the bottom of the ranking.
 One consequence for multi-turn escalation: with no inherited turn-shuffle ablation, **its foil
 would be ours to build**, which costs it the pre-legitimised-control advantage that
 demonstration order has. Another reason it sits below.
+
+## 23:26 — recency is rank 2, and the second direction has a name
+
+**Correcting my own instruction:** I told implement to re-bill recency the way the phase
+ladder was re-billed. That was wrong — the fixed-position geometry differs materially from a
+two-block rotation.
+
+After position 2 the *governing* instruction differs between classes; after position 9 it
+differs the other way. So the slab carries two components with **disjoint temporal support**:
+
+```text
+P[2]      = +Δ    instruction lexical content      support {2, 9}
+P[3..8]   = +g    which instruction is GOVERNING   support {3-8, 10-11}
+P[9]      = −Δ
+P[10, 11] = −g
+```
+
+`P = e_lex ⊗ Δ + e_state ⊗ g` with `e_lex · e_state = 0` — two exactly orthogonal rank-1
+terms, so the SVD separates them. The second singular direction is **task-set / active-rule
+state, carried by the filler and distinct from the instruction's lexical content**: "the
+sentence *always answer in French* appears here" and "French-mode is currently active" are
+different representational states. Registered: rank exactly 2, `r1 ≈ 0.65` (0.50–0.85),
+`c(P_dom) ≈ 0.06` (0.02–0.14).
+
+**What makes this a test rather than a story:** the two leading singular vectors' *temporal
+profiles* should be near-disjoint — one on {2, 9}, the other on {3-8, 10-11}. If both spread
+across all positions the decomposition is wrong and the rank-2 claim falls. One SVD on a slab
+already in hand.
+
+**A concrete case where the two screens diverge, vindicating the choice of gradient.**
+`c(P_dom)` on recency is positive *by design*: the instructions have unequal governing spans
+(position 2 governs six filler slots, position 9 governs two), so `Σ_t P[t] = 4g ≠ 0`. But
+probe mode is a difference of differences and cancels the class-symmetric part of any write's
+effect, so a constant `g` drops out and `c(Ḡ)` should come back below 0.02. That also
+explains the measured constant arms — +1.1 to +1.9 and positive at *both* dose extremes is an
+even-in-α, second-order magnitude artefact with no first-order component, exactly what
+`c(Ḡ) ≈ 0` predicts, and consistent with `txc_slab` being antisymmetric as a genuine
+first-order effect.
+
+**So the recency headline stands as an expressiveness result**, conditional on measured
+`r1 < 0.85`.
+
+## 23:28 — the ceiling gap has a metric-mode explanation and a real one; one pass separates them
+
+87% of ceiling on recency against 14% on the order task. Two candidates:
+
+- **(A) metric-mode artefact.** The order task runs in *ordering mode* (score = logP(doc)),
+  recency in *probe mode* (difference of continuation logprobs). In ordering mode `dom_slab`
+  can exploit the entire content difference between two different documents — an enormous
+  lever, hence +67.63 — while probe mode cancels the class-symmetric part by construction.
+  **Percent-of-ceiling is then not comparable across modes**, and the contrast must not appear
+  in the write-up as a regime difference until this is excluded.
+- **(B) feature availability.** Recency's optimal write is one direction over a contiguous
+  span — the natural shape of a crosscoder latent — and "which instruction is governing" is a
+  state the model already maintains, so reconstruction training is rewarded for learning it.
+  The order task needs a "tense-block-first" latent: a conjunctive, document-level property
+  reconstruction does not reward, since reconstructing a tense sentence at position 3 needs
+  "tense", not "tense-then-calm".
+
+One extra scoring pass separates them: run recency in ordering mode. If percent-of-ceiling
+falls toward the order task's it is (A); if it holds near 87%, (B) is real and yields a
+stateable principle — *a crosscoder latent approximates the optimal write well when the target
+is a state the model already maintains across positions, and poorly when it is a relational
+property no single position encodes* — with the corollary that the order task's 7× headroom is
+**not closable by better training**.
+
+## 23:30 — the catalogue's main finding is a negative, and it is the useful one
+
+Five independent saturation results, each from a different paper and subfield:
+
+| behaviour | the per-token handle that already works |
+| --- | --- |
+| refusal | Arditi single-direction ablation near-saturates |
+| MCQ option order | token bias over option-ID tokens; the attractor survives full content rotation at r = 0.9994 |
+| repetition onset | a single sign-inverted neuron |
+| emergent misalignment | a transferable linear direction |
+| backtracking | linear directions in activation space (Venhoff et al., arXiv:2506.18167) |
+
+> **Most temporally-extended-looking behaviours have a per-token-representable handle. The
+> ones that do not are the ones where the two conditions are permutations of each other.**
+
+That is a screening principle derived from prior work, and it converges with the sprint's own
+`c` statistic — the same quantity measured rather than inferred. The two agree on every case
+checked.
+
+Two consequences worth carrying. The backtracking result lands on this repo's own incumbent
+workstream: Venhoff et al. do not invalidate the existing Δgc 0.541 TXC against 0.400
+per-token, but that number must be positioned against a **strong** baseline rather than a
+naive one — the same distinction that has caught this sprint twice. And ISE (Wu et al.,
+arXiv:2410.09102) *strengthens* the recency headline: priority has to be added
+architecturally, via segment embeddings, because delimiters and instruction tuning "do not
+address this issue at the architectural level". In an unmodified model provenance is
+therefore carried by little more than position — which is the mechanism behind our result
+rather than merely a coincidence with it.
