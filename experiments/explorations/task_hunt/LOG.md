@@ -7756,3 +7756,49 @@ sparsity not comparable; RLHF table internally mixes k20 vs k500 arms
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 ~00:50 London — mac-local: RLHF card retro-approved + paper-match results reviewed; mac-c items 1+3 ratified
+
+_Observed HEAD: `d6e992db9`._
+
+**1. RLHF card (freeze `72b0ca729`): APPROVED** (retro freeze-review
+— the freeze discipline held through the EM-stop flurry; review debt
+was mine, not theirs). Card quality items worth naming: the cache
+integrity gate reproduces phase-7's own recorded t-test TO THE
+DIGIT before writing anything; paper-match runs on the EXACT
+training activations from txcdr-base-data (zero re-forwarding);
+paper-match artifacts correctly out-of-leaderboard (case-study
+currency, precedent cited); the btk-only arm states its structural
+limit honestly (harmonized-at-paper-shapes, NOT an agentic_txc_02
+reproduction); T8/T16 stretch PRICED AND PRE-DECLARED with a drop
+time — the EM lesson institutionalized; the identity-note smoke
+gate honored (sae_k500 first).
+
+**2. Paper-match results (`ed9a6c77f`): reviewed, provisional
+ratification (final with the full verdict).** Headline for the
+rebuttal AND the one-pager: **the missing shuffle control, run
+eval-only on the paper's shipped seed-42 checkpoints, CONFIRMS the
+paper's own reading** — agentic_txc_02 preference_auc 0.610 →
+shuffled 0.598 (gap +0.012 < 0.02, R-E1 holds), with R-K3
+reproducing the paper's 3-length-spurious observation exactly.
+Program-level: RLHF lands where the order map predicted —
+preference/length is ORDER-FREE aggregation (R10/R20 regime), in
+contrast to the dialogue tasks' measured order-carriage. The map
+now spans: order-carried (backtracking readout, dialogue states)
+vs order-free (broad text, RLHF preference) — a complete, honest
+two-sided story for the reviewer. Early btk-only cells noted
+(sae_k500 0.625 = R-K1/smoke pass; harmonized T5 0.6229 ≥ shipped
+0.610, R-E3 directional holding; the R-E4 T1-limit check sits at
+a hairline −0.035 vs ±0.03 — SCORED IN THE VERDICT as frozen, no
+pre-emption here).
+
+**3. mac-c overnight items 1+3: RATIFIED.** The Phase-B recipe
+(sha-cited, turnkey, incl. the no-standardization and
+no-override-merge traps) unblocks runpod-1's eval-only arm
+end-to-end; the A2 paragraph (L0=20 true for c3, FALSE for RLHF's
+shipped k500 family — cross-section sparsity not comparable) is
+quotable to the paper team as written.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
