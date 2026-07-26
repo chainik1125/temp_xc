@@ -69,20 +69,38 @@ rebuttal:
    is consistent with the camera-ready having deleted the monotone-in-T
    claim.
 
+5. **Extension — on the paper's actual Denoising headline metric, T-scaling
+   is monotone for every composition, and deleting the ReLU is a strict
+   improvement.** The v2 evaluator lacked the latent-level probe the
+   paper's R²_global = 0.48 headline uses, so I ported it (opt-in add-on,
+   closed-form ridge, 80/20 by-sequence). All four arms rise monotonically
+   with T (composite k=1: R²_global 0.12 → 0.51 from T=1→10; slopes +0.09
+   to +0.13 per log₂T) — the camera-ready's deleted monotone-in-T claim is
+   TRUE on this metric at these settings. And here the ReLU finally
+   matters: **perwin-raw is the best arm at low-mid T** (k=1 T=2: 0.42 vs
+   composite 0.16), because negative pre-activations carry hidden-state
+   information in the *codes* that the ReLU destroys — an effect invisible
+   to decoder-direction metrics (where perwin-raw ≡ composite). The two
+   effects decompose cleanly: signed codes help, batch pooling hurts; the
+   pooled signed arms land back at composite level.
+   - ![denoising probe](plots/btk_rerun/btk_rerun_denoising_probe.png)
+
 **Verdict for the re-run gate** (pre-registration: *"the PAPER arch's
 T-curves should improve (that is Dmitry's re-run gate: does d(perf)/dT
-improve)"*): **MIXED — SUPPORTED on the slope, NOT SUPPORTED as a reason to
-switch.** With the full 2×2 the recommendation is unambiguous: (a) fix the
-paper's TEXT to describe the architecture the code implements — per-window
-TopK selection at k_win = T·k_pos (the post-selection ReLU can be stated or
-deleted; it is measurably inert either way, and `perwin-raw` is the
-cleanest description) — resolving appendix.tex:29 vs :33; (b) do NOT adopt
-actual BatchTopK: batch pooling costs 0.2–0.3 gauc at every (k, T ≤ 10)
-tested, for a slope improvement that never closes the gap; (c) the
-T-scaling figure the paper lacks should show the composite/perwin-raw
-T-robustness at unsaturated budgets plus the T=1 anchor, which is
-defensible and data-backed, rather than a monotone-improvement claim,
-which is not.
+improve)"*): **MIXED on recovery metrics; CLEANLY SUPPORTED on the
+denoising probe — but the winning fix is not the one hypothesized.** With
+the full 2×2 + probe the recommendation is concrete and cheap:
+(a) **delete the one `F.relu` line in `txc_base` (and `txc_pro`)** — the
+code then implements literal per-window "TopK sparsity", which is exactly
+what appendix.tex:29 already claims; recovery metrics are provably
+unchanged (perwin-raw ≡ composite, max |Δgauc| within seed noise) and the
+Denoising headline improves substantially at low-mid T with an honest
+monotone-in-T story; (b) fix "BatchTopK" → "TopK" at main.tex:362 and
+appendix.tex:33 — do NOT adopt actual (batch-pooled) BatchTopK, which
+costs 0.2–0.3 gauc at every (k, T ≤ 10) tested; (c) the new T-scaling
+figure the paper lacks should be the denoising-probe curve (monotone,
+data-backed, all arms) plus the recovery T-robustness panel with the T=1
+anchor.
 
 ## What was run (map)
 
@@ -152,8 +170,12 @@ worse in level everywhere measured. The cheap, defensible package is:
 ## Caveats (read before quoting numbers)
 
 - Toy benches, d_sae 20/50, 6k steps (paper synthetic rows used 10k; its
-  backtracking mains 300k). Steps were not swept; slopes could shift at
-  full training length.
+  backtracking mains 300k). A 3× steps wing (18k, coupled, k∈{1,2}, 2
+  seeds) shows the btk-only arm is fully stable (levels and slope
+  unchanged — the pooling deficit is not undertraining) while the
+  composite's T=1 cells drift down ~0.09, flipping its pooled slope
+  mildly positive (+0.005); small-n, direction consistent with low-T
+  being the composite's fragile region (Finding 3).
 - Slope pooling at d_sae=20 mixes k-dependent non-clipped T-ranges; quote
   the d50 wing slopes for the clean statement.
 - relu-mix ≡ btk-only is bench-local: on real-LM substrates the fleet's
