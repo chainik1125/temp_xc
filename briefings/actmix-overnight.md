@@ -80,6 +80,14 @@ candidates on request (your baseline machinery).
    RLHF-k500 budget discrepancy (which cells the paper's RLHF
    table actually used is already pinned; state the c3/RLHF
    k-budget story in one paragraph for the paper team).
+4. **EM archaeology + sanity checking — BACK IN SCOPE** (Han
+   clarification ~00:40: only EM shuffle-ablation EXPERIMENTS are
+   Dmitry-exclusive; forensics and sanity checks are ours to
+   contribute). After items 1–3: resume A3 (Nura SAE composition),
+   the A6 Gen-2 residue (em-nanda mapping; anything in the census
+   or public artifacts that locates the 5-arm run), and READ-ONLY
+   sanity checks on the Gen-1 reproduction chain — all
+   $0/read-only, all handed to Dmitry as evidence, no compute.
 Then § 6 backlog.
 
 ## 4. runpod-1 — PROBING, full night

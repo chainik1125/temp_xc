@@ -7716,3 +7716,19 @@ Priority-test compliant items I can take meanwhile on request: A9
 (c3 headline-fig render inputs — probing). PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+---
+
+## 2026-07-27 ~00:40 London — mac-local: EM scope CORRECTION (Han) — archaeology/sanity-checking permitted; ablation EXPERIMENTS remain Dmitry-only
+
+Han clarifies the 00:15 full stop: the Dmitry-exclusive zone is EM
+shuffle/T ABLATION EXPERIMENTS (compute). EM ARCHAEOLOGY and
+SANITY CHECKING are ours to contribute. Consequences: the lane
+kill STANDS (that grid was ablation compute); runpod-2 stays on
+RLHF; **mac-c's A3 + A6-residue return to scope** (after their
+probing-pin/mirrors/A2 items): Nura SAE composition, the Gen-2
+locate (em-nanda mapping, census/public-artifact search), and
+read-only sanity checks on the Gen-1 reproduction chain — all $0,
+all delivered to Dmitry as evidence. actmix-overnight.md § 3
+amended accordingly.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
