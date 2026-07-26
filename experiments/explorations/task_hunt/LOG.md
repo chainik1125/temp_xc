@@ -5478,3 +5478,106 @@ completes (per-model paragraphs only, no re-scoring of frozen
 majority verdicts).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+=======
+## 2026-07-26 — mac-a (executor) — day-2 W2 VERDICT: diafaces screen — ttrend + dqgap BOTH KEEP 3/3 WITH T32 ORDER CARRIAGE; panel gate clauses (i)+(ii) MET on both faces; dq proposed as the panel face — PENDING TEAM REVIEW
+
+Frozen card `diafaces/CARD.md` (freeze `073611113`, mac-local
+approved pre-results); executor + labels at the same freeze; 3-model
+coverage (gemma per the HF-secret amendment). Scorer
+`diafaces/score.py` (card § 6–7 formulas; authored after gpt2 landed
+— disclosed; mac-local's independent re-run closed the hazard). All
+numbers recomputable from committed `results/screen_*.json`.
+
+### Bundle verdict (majority of 3): tt KEEP 3/3, dq KEEP 3/3
+
+Best window arms (all actxmean_mlp; gain over matched tok_mlp, width
+null, over-visible-floor at the SAME T):
+
+- **tt**: gpt2 T16 +0.135/+0.231/+0.122; llama T32
+  +0.149/+0.144/**+0.005**; gemma T32 +0.140/+0.150/**+0.019**.
+- **dq**: gpt2 T32 +0.184/+0.220/+0.149; llama T32
+  +0.214/+0.171/+0.177; gemma T32 +0.173/+0.162/+0.173.
+
+Within-dialogue arms (BINDING, ops rule 7) all show same-direction
+window gains: tt wd_gain +0.143/+0.131/+0.136, dq
++0.097/+0.150/+0.100 — no KEEP rests on dialogue identity.
+
+### THE ORDER RESULT (Q3 — the thread's point, gate clause ii as pinned `44594b696`)
+
+wd order arm sc = win_linear − win_shuf_linear (binary AUC), T32 / T16:
+
+| face | gpt2 | llama31 | gemma2 | clause (ii) |
+|---|---|---|---|---|
+| tt | +0.037 / +0.018 | +0.049 / +0.007 | +0.036 / +0.019 | **MET 3/3** |
+| dq | +0.045 / +0.014 | +0.034 / +0.015 | +0.045 / +0.013 | **MET 3/3** |
+
+Primary-arm (3-class) sc at T32 agrees in sign everywhere: tt
++0.037/+0.026/+0.021, dq +0.067/+0.069/+0.075. T16 sub-threshold
+everywhere, nonnegative everywhere — exactly the clock-bridge
+prediction (≈ 1 turn in T16) and consistent with W1's MIXED
+mechanism (turn-block + within-turn, near-half concentrated, R25):
+these are the first task-side faces whose signal sits WHERE the
+mechanism ladder says dialogue order lives (T32 ≈ 2 turns).
+
+### Q1–Q5 scored
+
+- **Q1**: tt MET 3/3 (tok−floor +0.092/+0.082/+0.083 < +0.10). **dq
+  VIOLATED 3/3** (+0.190/+0.186/+0.211 ≥ +0.10): the "?"-adjacency
+  register is far stronger than pre-registered. Scored as a miss;
+  the dq KEEP rests on the window−tok margin, floor and wd clauses,
+  all of which cleared.
+- **Q2**: MET both faces (g_ax grows to a T ∈ {16,32} peak, width
+  nulls ≥ +0.048 everywhere at the claiming T).
+- **Q3**: MET as above — sc > 0 where wc > 0, order-carried on 3/3.
+- **Q4**: MET at the claiming T (see over-vis column); see caveat 2.
+- **Q5**: partially as predicted — dq beats its floor at ALL T
+  (distance state exceeds visible counting even where "?" is
+  in-window 85 % of the time); tt's floor OVERTAKES its window arms
+  at T ≥ 32 (ax−vis −0.039 to −0.074 on lin arms) — the tt claim is
+  a **T ≤ 16 claim on gpt2, and a razor-thin over-floor claim
+  (+0.005/+0.019) at T32 on llama/gemma**.
+
+### Caveats (named, travel with any quote)
+
+1. **dq Q1 violation 3/3** — per-token register much stronger than
+   predicted; disclosed above.
+2. **tt floor crossover at the ladder top**: at T ≥ 32
+   boundary-counting explains the tt window numbers on the linear
+   arms; tt's over-floor margins at its best cells are thin on 2/3
+   models. tt is the weaker KEEP.
+3. dq class balance 41/28/31 (integer edges [1,2], card § 2);
+   dq wd per-token AUC is high (0.73–0.79) — the wd window GAIN
+   (+0.10–0.15) is the operative number, not the absolute.
+
+### Panel gate + proposal (decision = mac-local, clause v)
+
+(i) MET both faces (KEEP 3/3); (ii) MET both faces per the pinned
+T-quantifier, core models included; (iii) clock at this entry
+≈ 12:55 London — launch runway to 14:30 ample; (iv) ledger ≈ $46
+est ≤ $250 (mac-a actuals below est — correction in ledger).
+**Proposed panel face: dq** — clause-(ii) margins comparable to tt
+but floors beaten at EVERY T on 3/3 (tt is floor-dominated exactly
+at the T32 the panel must include). **Proposed model: llama31_8b**
+(strongest dq cell +0.214/+0.177 over-vis; core-set model; d 4096
+matches every Ward panel's k/d geometry; hs14 anchor from the
+screen). DS at freeze: `dial_real_dqgap_llama31_8b_l14`. Panel
+ladder T ∈ {2,4,8,16,32} per the pinned requirement; H100 main pool
++ high-CPU tsae per Han's amendment; est ≤ $60.
+
+### PROPOSED RECEIPT (mac-local wires + ratifies; nothing quotable before)
+
+R26 (proposed): "day-2 diafaces screen (freeze 073611113): ttrend and
+dqgap both KEEP on 3/3 models with within-dialogue order carriage at
+T32 — wd sc ∈ [+0.034, +0.049] (9 of 9 face×model ≥ +0.034 at T32;
+T16 ∈ [+0.007, +0.019] all nonneg); best-cell over-visible-floor at
+the claiming T: dq +0.149/+0.177/+0.173, tt +0.122 (gpt2, T16) but
++0.005/+0.019 at T32 (llama/gemma) — tt bounded to T ≤ 16 as a
+clean over-floor claim. dq Q1 violated 3/3 (tok−floor ≥ +0.186),
+disclosed." Recompute: `diafaces/score.py` on the committed screen
+JSONs.
+
+Stage-1 screens: no leaderboard rows. Ledger actuals appended.
+Everything in this entry is PENDING TEAM REVIEW; the gate decision
+and any panel launch are mac-local's in writing.
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_
