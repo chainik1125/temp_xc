@@ -364,8 +364,18 @@ def main(argv=None):
     if len(pre_ts) >= 3 and pre_ts != TREND_TS:
         mat_full = np.array([[cells[(PRE, T, s, "trained")]["metric"]
                               for T in pre_ts] for s in seeds])
-        trend[f"txc_pre_trained_{pre_ts[0]}to{pre_ts[-1]}_secondary"] = \
-            trend_block(mat_full, pre_ts)
+        sec_key = f"txc_pre_trained_{pre_ts[0]}to{pre_ts[-1]}_secondary"
+        try:
+            trend[sec_key] = trend_block(mat_full, pre_ts)
+        except ValueError as e:
+            # 5-T ladders (T32 panels) exceed the exact-enumeration cap
+            # ((5!)^3 relabelings); degrade honestly — the frozen 2->8
+            # primary above is the pre-registered statistic.
+            trend[sec_key] = {
+                "skipped": (f"secondary full-ladder trend over "
+                            f"T={list(pre_ts)} not computed: {e} — the "
+                            f"frozen 2->8 primary carries the trend "
+                            f"receipt; per-cell values are all reported")}
 
     # ---- 4. trained − untrained margin CI, every cell
     margins = {}

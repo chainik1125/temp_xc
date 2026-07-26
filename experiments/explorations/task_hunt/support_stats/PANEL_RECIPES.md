@@ -159,7 +159,7 @@ these at repatriation (merge first: `merge_panel_payload dq`):
 
 ```bash
 .venv/bin/python -m experiments.explorations.task_hunt.support_stats.stage2_variance \
-  --ds dial_real_dqgap_llama31_8b_l14 --probe v1 --post-k-rule times-T --row-layout paired \
+  --ds dial_real_dqgap_llama31_8b_l14 --probe v1 --post-k-rule fixed --row-layout paired \
   --crosscheck-json experiments/explorations/task_hunt/diafaces/results/stage2_dial_real_dqgap_llama31_8b_l14.json \
   --out-prefix stage2_variance_diafaces_dq
 # paired v2: --probe v2 --out-prefix stage2_variance_diafaces_dq_v2
@@ -178,3 +178,15 @@ first-run population. **`--row-layout paired` is now REQUIRED for the
 v1 command on BOTH dialogue panels** (v2 always reads flagged rows).
 The merge receipt prints per-freeze row counts to make the split
 auditable.
+
+**Diafaces-panels correction (measured at the dq receipts run):** the
+dialogue panels enumerate cells via `design.uniform_cells` with a
+UNIFORM `k_pos = 8` override for every arch — post's 8·T code-rate is
+internal to the arch, so the leaderboard rows store `k_pos = 8` and
+**`--post-k-rule fixed` (the default) is correct here**, unlike the
+oprate/fineweb panels whose rows store the literal 8·T. `times-T`
+aborts with "key sets differ" on all 30 post cells. Also: 5-T ladders
+(T32 panels) exceed the secondary full-ladder trend's exact-enumeration
+cap — the harness now skips it with the reason recorded (the frozen
+2→8 primary is the trend receipt; canonical λ̂ output verified
+byte-unchanged after the guard).

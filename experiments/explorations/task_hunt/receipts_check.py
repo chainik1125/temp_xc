@@ -739,6 +739,41 @@ def build_receipts():
              "add_absmax": max(abs(_lc(m, "L1") + _lc(m, "L2")
                                    - _lc(m, "L0")) for m in _LMODELS),
              "repro_absmax": max(_lrepro(m) for m in _LMODELS)}))
+
+    # ---- R27: dq panel variance receipts (mac-b, panel-2 support) ----
+    # (R26 = mac-a's diafaces screen receipt, proposed in their verdict.)
+    dqv = _j("support_stats/stage2_variance_diafaces_dq.json")
+    dqv2 = _j("support_stats/stage2_variance_diafaces_dq_v2.json")
+    _dq8 = dqv["paired"]["txc_pre_minus_tsae"]["by_T"]["T8"]
+
+    R.append(dict(
+        id="R27",
+        artifact="support_stats/stage2_variance_diafaces_dq{,_v2}.json",
+        key="paired pre−tsae by T; 2→8 exact trend; trained−untrained "
+            "margins (102-row dq panel, harness stage2_variance.py)",
+        claim="dq panel (dial_real_dqgap_llama31_8b_l14, 102/102) "
+              "variance receipts: the licensed lead pre−tsae at T8 = "
+              "+0.155 with 95% t CI [+0.126, +0.184] — the hunt's first "
+              "cross-arch margin bounded away from 0 at n = 3 (sign-flip "
+              "still floors at p = 0.125); T32 collapses to −0.017 "
+              "(confirms the T ≤ 8 licence zone); 2→8 trend exact "
+              "p = 0.0046 (216 relabelings; beats the λ̂ 0.0093 "
+              "precedent); trained−untrained margin at pre/T8 +0.319; "
+              "paired v2 lead +0.188. PENDING TEAM REVIEW",
+        checks=[("t8", 0.155, 3), ("t8_lo", 0.126, 3),
+                ("t32", -0.017, 3), ("trend_p", 0.0046, 4),
+                ("margin_pre_t8", 0.319, 3), ("v2_t8", 0.188, 3),
+                ("rows", 102, 3)],
+        got={"t8": _dq8["mean"], "t8_lo": _dq8["t_ci95"][0],
+             "t32": dqv["paired"]["txc_pre_minus_tsae"]["by_T"]["T32"]
+                       ["mean"],
+             "trend_p": dqv["trend"]["txc_pre_trained_2to8"]
+                           ["p_one_sided"],
+             "margin_pre_t8": dqv["margin_trained_minus_untrained"]
+                                 ["txc_batchtopk_pre/T8"]["mean"],
+             "v2_t8": dqv2["paired"]["txc_pre_minus_tsae"]["by_T"]["T8"]
+                         ["mean"],
+             "rows": dqv["source"]["leaderboard_rows"]}))
     return R
 
 

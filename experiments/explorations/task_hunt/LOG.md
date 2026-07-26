@@ -6037,3 +6037,34 @@ $200 (screens ~$5; tt v1 ~$8 + tt v2 ~$5; dq abort ~$8 + dq v2
 of est lines → −$30-ish correction at final ledger sweep.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+## 2026-07-26 — mac-b (executor) — dq PANEL VARIANCE RECEIPTS (R27): the licensed lead is CI-bounded — pre−tsae T8 = +0.155 [+0.126, +0.184], the hunt's first cross-arch margin bounded away from 0 at n = 3. PENDING TEAM REVIEW
+
+Receipts production per the panel-2 support split (race resolution
+6e2f18e4e): harness `support_stats/stage2_variance.py` on the complete
+102/102 dq population, v1 (`--row-layout paired --post-k-rule fixed`)
++ paired v2, cross-checked exactly against the panel's own
+`stage2_dial_real_dqgap_llama31_8b_l14.json`. Outputs
+`stage2_variance_diafaces_dq{,_v2}.{json,md}`; receipt R27 (checker
+ALL PASS, test green).
+
+- **pre − tsae by T**: +0.035 / +0.130 / **+0.155** / +0.153 /
+  **−0.017** (T2→T32). The T8 licence-lead 95% t CI is
+  **[+0.126, +0.184]** — bounded away from zero at n = 3 (the λ̂
+  precedent, R5, was NOT); sign-flip still floors at p = 0.125 and is
+  quoted as all-3-seeds-consistent, not significance. T32's collapse
+  is the independent confirmation of mac-local's T ≤ 8 licence zone.
+- **2→8 trend**: exact within-seed permutation p = **0.0046** (216
+  relabelings) — clears the λ̂ panel's 0.0093 "significant" bar.
+- **Trained − untrained**: pre/T8 margin **+0.319** (the anti-tt
+  receipt — P4's pass is CI-backed, the level is trained structure).
+  Paired v2 lead at T8: **+0.188**.
+- **Two instrument notes, disclosed**: (1) diafaces panels store post
+  at uniform k_pos = 8 (8·T internal to the arch) — `--post-k-rule
+  fixed`, not the oprate panels' `times-T`; PANEL_RECIPES corrected
+  from the measured abort. (2) 5-T ladders exceed the secondary
+  full-ladder trend's exact-enumeration cap; the harness now skips it
+  with the reason recorded (frozen 2→8 primary unaffected; canonical
+  λ̂ output byte-unchanged, re-verified).
+
+_Recorded-by: claude-fable-5 (mac-b, executor) — PENDING TEAM REVIEW_
