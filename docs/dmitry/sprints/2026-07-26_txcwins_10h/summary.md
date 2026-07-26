@@ -432,6 +432,13 @@ baseline — orthogonal to within noise. **This is the fifth independent demonst
 slabs are different quantities and the first on a published benchmark rather than one of our own
 constructs.**
 
+⚠ **These numbers ran on the unfiltered 208 items.** Four of them have an **empty `output`**
+field, which breaks both uses of it — `cont2` degenerates to a bare space, and
+`completion_real`'s forged response (`output[1:]`) collapses to a `### response:` header with
+nothing after it. So ~2% of the 200 sampled documents drew a degenerate item. A rerun on the
+filtered 204 is pending and the table above will be restated from it; the values are not expected
+to move materially, but that is an expectation and not a check.
+
 ⚠ `c` ≈ 0.13 falls inside the band containing the gate's only known inversion (`rotate6` at 0.134
 loses, evidence at 0.143 wins), so the screen does not decide this task. **The full arm set is
 running as a registered test of the screen itself**, with the prediction that the crosscoder loses
