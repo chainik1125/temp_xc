@@ -35,6 +35,26 @@ NON-EXTREMAL REQUIREMENT, which costs an afternoon if missed. An extremal refere
 [1,1,1,1,1,1,0,0,0,0,0,0] uniquely MINIMISES the first moment over balanced patterns, and a
 minimum is attained uniquely, so it admits ZERO valid foils. The pattern above is interior.
 
+VERIFIED PROPERTIES (independently audited, not just asserted here):
+    sum(ds) = 0                 the state's constant component actually vanishes
+    cos(dc, ds) = 0.548         content and state are non-collinear AS SCHEDULES, so A >= 2
+    permutation = 6 disjoint transpositions -> 6 cycles -> rank = 12 - 6 = 6, fixed for
+                                every document (no foil sampling, so no rank smearing)
+    segment length: mean gap -0.05 words, paired max 1
+
+MEASURED ON REAL ACTIVATIONS (n=200, Qwen2.5-1.5B, layer 14, probe mode):
+    c(grad) 0.0304   r1(grad) 0.6433   sigma2^2/sigma1^2 0.1827   retention 0.743
+    unsteered score(A)-score(B) = -0.371 +- 0.051, z = -7.22  -- there IS an effect to steer
+
+CAUTION ON MECHANISM. The schedule-level argument above (content plus its running integral)
+establishes A >= 2 and motivated the first-moment constraint. It is NOT what supplies the
+second direction empirically: the gradient's leading singular vectors have profiles
+    u1  broad across all positions
+    u2  U-shaped, mass at positions 1 and 12, trough of 0.02-0.16 in between
+and a running-balance state would ramp monotonically. The same prediction failed on recency,
+where u1 and u2 both sit on the two instruction positions. So rank >= 2 is real and the
+mechanism is UNIDENTIFIED. Do not attribute the residual signal to the running-balance shape.
+
 WHAT IS AND IS NOT CONTROLLED. The two classes hold the same twelve demonstrations, so the
 text multiset matches exactly and the text DC cancels with the label DC. Within a label the
 review texts are drawn at random, so within-class text variation averages out of the mean

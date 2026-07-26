@@ -48,7 +48,7 @@ image = (
 
 @app.function(gpu="A10G", image=image, timeout=5400)
 def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int,
-           mode: str = "ordering"):
+           mode: str = "ordering", pat_a: str = "", pat_b: str = ""):
     import sys
     sys.path.insert(0, "/work")
     import random
@@ -75,7 +75,11 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int,
     d = model.config.hidden_size
     T = k_seg
     probe = mode == "probe"
-    make_pair = (make_demo_order_probe if probe else make_demo_order)(k_seg)
+    pa = tuple(int(x) for x in pat_a) if pat_a else PATTERN_A
+    pb = tuple(int(x) for x in pat_b) if pat_b else PATTERN_B
+    assert moments(pa) == moments(pb), f"moments differ: {moments(pa)} vs {moments(pb)}"
+    print(f"[patterns used] A={pa} B={pb} moments={moments(pa)}", flush=True)
+    make_pair = (make_demo_order_probe if probe else make_demo_order)(k_seg, pa, pb)
     print(f"[mode] {mode}", flush=True)
     rng = random.Random(seed)
 
@@ -203,8 +207,8 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int,
     out = {
         "model": model_id, "layer": int(L), "k_seg": k_seg, "n_pairs": n_pairs,
         "seed": seed, "mode": mode,
-        "pattern_a": list(PATTERN_A), "pattern_b": list(PATTERN_B),
-        "moments_a": list(moments(PATTERN_A)), "moments_b": list(moments(PATTERN_B)),
+        "pattern_a": list(pa), "pattern_b": list(pb),
+        "moments_a": list(moments(pa)), "moments_b": list(moments(pb)),
         "dom": screen_slab(P_dom),
         "grad": screen_slab(Gbar),
         "cos_dom_grad": float(
@@ -261,8 +265,9 @@ def screen(model_id: str, layer: int, k_seg: int, n_pairs: int, seed: int,
 
 @app.local_entrypoint()
 def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = 14, k_seg: int = 12,
-         n_pairs: int = 200, seed: int = 31415, tag: str = "", mode: str = "ordering"):
-    r = screen.remote(model, layer, k_seg, n_pairs, seed, mode)
+         n_pairs: int = 200, seed: int = 31415, tag: str = "", mode: str = "ordering",
+         pat_a: str = "", pat_b: str = ""):
+    r = screen.remote(model, layer, k_seg, n_pairs, seed, mode, pat_a, pat_b)
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
     p = outdir / f"demoorder_screen{tag}.json"
