@@ -1,44 +1,50 @@
 # Working state — agent `mac-a`
 
-**2026-07-25 ~22:40 PT — DELIVERABLE DONE + RATIFIED.** mac-local
-wired R22 into receipts_check (26 claims ALL PASS, verified
-reproducing locally; R5 amended superseded-pending-team-ratification,
-clause operative until check-in) and approved the verdict
-(`c5568fb72`). HF-mirror follow-up for the 3 Volume checkpoints is
-recorded on their side. Now idle-looping (origin watcher armed) until
-07:00 PT unless asks arrive.
+**2026-07-26 ~13:20 London — day-2 W2 mid-flight: screen DELIVERED
+(both faces KEEP 3/3 with T32 order carriage), gate FIRED for tt
+(mac-local `dce8d085d`), PANEL RUNNING detached on Modal.**
 
-Original verdict summary: tsae/T1
-seed top-up {3,4,5} on Ward, n = 6 complete, b's frozen criterion MET
-(paired one-sided 95% LB +0.0200 > 0, all 6 seeds positive; Welch 6v6
-LB +0.0272 p = 0.0030; caveat-free new-only Welch LB +0.0357). Full
-verdict + PROPOSED R5 update (→R22) + two named caveats (cross-cache
-pooling; s3/s4 realized-l0 under band, POST-HOC exclusion variants
-reported): LOG 2026-07-26 `mac-a (executor)` entry. PENDING TEAM
-REVIEW; mac-local ratifies RECEIPTS.
+## Live state (if resuming mid-anything, start here)
 
-## Where everything is
-- Leaderboard: +3 rows (eval_keys 721bd3c6…, bfe6ea32…, 149a036a…),
-  PIN `c93473ad3`, clean stamps, 0 dups. Panel file 87 cells.
-  Bounds artifact: `lambda_intensity/results/topup_bounds_tsae.json`
-  (+ committed `cache_fingerprint_topup.json`).
-- receipts_check ALL PASS post-merge; 13 fixture tests pass. R4/R5
-  as-written still PASS (pinned to round-1 seeds) until ratification.
-- Checkpoints: Modal Volume `temp-xc-ward-caches`
-  `checkpoints_topup/{a49569223227158e,2e8cf4b77839253e,a258f49f272d7a0a}`
-  + `payloads/seed_{3,4,5}.json`. NO HF token here — mirror upload =
-  Han/mac-local follow-up (HF_MIRROR.md rule).
-- Modal: app `temp-xc-tsae-seedtopup`; caches on the same Volume
-  (stream + labels + base/hs13, receipts PASSED in-container).
-  Ops lesson: long runs DETACHED (non-detached client disconnect
-  cancelled attempt 1); payloads persist server-side.
-- Spend: mac-a actuals ≈ $19 of $150 cap (ledger corrected, total
-  ≈ $39 est across agents).
+- **Panel in flight**: app `mac-a-diafaces-panel`, freeze
+  `7ba2e10fd`, DS `dial_real_ttrend_gpt2_l7` (gpt2/hs7), 102 cells =
+  λ̂ shape + T32 column. 1× H100 `--block main` + 3× L4 high-CPU
+  `--block tsae --only-seed {1,2,42}`. Launched ~13:17 detached
+  (client under caffeinate; log
+  `<scratchpad>/diafaces_panel.log`). Payloads persist to Volume
+  `temp-xc-replag-caches:/workspace/diafaces_panel/payload_*.json`
+  even if client dies. **Repatriation deadline 16:15 London
+  (mac-local binding term); nothing new after 15:30; all pushed by
+  16:30; check-in 18:00.**
+- On completion: `results/panel_payloads/payload_*.json` →
+  `.venv/bin/python -m experiments.explorations.task_hunt.diafaces.merge_panel_payload`
+  (freeze-stamp + clean + dedup asserts) → score P1–P5 per
+  `PANEL_CARD.md` § 5 (KEEP iff P1∧P5) → LOG verdict PENDING TEAM
+  REVIEW + receipts proposal + ledger actuals.
+- Modal client: scratchpad `modal-venv/bin/modal` (repo .venv has no
+  modal; the overnight venv survives in this session's scratchpad).
 
-## Remaining / next
-- Stretch (§ 3, gate ≤$100 spent: CLEAR at $19): mac-b took refmark
-  itself (running detached); B8 panel gate CLOSED by mac-local. Check
-  LOG on wake for assist requests; otherwise idle-loop pull-rebase.
-- At 07:00 PT stop; briefing retires at Sunday check-in.
-- If resuming mid-anything: the loop is work → push → pull-rebase;
-  ledger before/after every launch.
+## Delivered today (all pushed)
+
+- Screen: freeze `073611113` (approved pre-results `2f2bdd91d`);
+  3/3 screens repatriated + committed; VERDICT in LOG (tt + dq KEEP
+  3/3; wd_sc T32 +0.034..+0.049 on 9/9, T16 nonneg; dq Q1 violated
+  3/3 disclosed; tt floor-crossover at T ≥ 32 disclosed). R26
+  proposed (screen claims). My dq panel proposal SUPERSEDED by
+  mac-local's written tt gate — executing tt, rationale + flagged
+  llama alternative in `PANEL_CARD.md` § 2.
+- Panel prep/freeze: `real_dialogue.py` plugin, YAML DS entry,
+  `run_panel.py` (102 cells verified), `PANEL_CARD.md` (P1–P5 bars
+  frozen), `merge_panel_payload.py`, modal driver.
+- Ledger: mac-a day-2 actuals ≈ $5 (screen) + panel est ~$10;
+  total ≈ $56 est of $500/$400; my cap $120.
+
+## Context worth keeping
+
+- W1 (mac-b): R11 mechanism = MIXED (L1+L2 additive ±0.005,
+  near-half concentrated), R25 ratified — tt is that mechanism's
+  state variable (the gate's scientific basis).
+- Gate clause readings pinned pre-results: (ii) = T32 ≥ +0.03 AND
+  T16 > 0, ≥2/3 incl {gpt2, llama31}; panel MUST include T32.
+- dq KEEP goes to the breadth table with order numbers quoted (per
+  the gate entry) — nothing further for mac-a unless asked.
