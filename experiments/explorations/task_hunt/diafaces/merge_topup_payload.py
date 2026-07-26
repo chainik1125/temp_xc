@@ -21,7 +21,8 @@ DS = "dial_real_ttrend_gpt2_l7"
 PAYLOADS = HERE / "results" / "topup_payloads"
 # Filled at freeze time from `git rev-parse` — never hand-typed.
 FREEZES = {
-    "FILL_AT_FREEZE": "topup freeze (TOPUP_CARD.md)",
+    "85c87fd7602fb36dd2e63488b8d33ad3311789e5":
+        "topup freeze (TOPUP_CARD.md)",
 }
 ARCHS = {"batchtopk_sae", "tsae", "txc_batchtopk_post"}
 SEEDS = {6, 7, 8}
