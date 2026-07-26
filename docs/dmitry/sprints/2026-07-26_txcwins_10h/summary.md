@@ -144,7 +144,7 @@ measuring architectures — the three peak at recipes spanning a 10× range — 
 SAE has no usable sparsity coefficient at all**, with FVU crossing 1.0 before L0 crosses 32,
 because `TemporalSAE` has no encoder bias.
 
-### 5. Reading and steering come apart, now on nine tasks
+### 5. Reading and steering come apart
 
 ![Reading against steering, three architectures](../../../../plots/2026-07-26_txcwins/reading_vs_steering.png)
 
@@ -161,7 +161,16 @@ steering is that latent's effect at matched dose with the sign free.*
 **Reading does not separate the architectures — all three reach AUC 1.000 on most cells. Steering
 separates them 12×.** Both per-token architectures decode these factors perfectly and move them by
 about a tenth of a nat; the crosscoder decodes them no better and moves them an order of magnitude
-further. This is the most-replicated finding in the project and the one least likely to move.
+further. This is the most-replicated finding in the project — but it is **nine held-out cells
+across three tasks**, not nine independent tasks, and it has since acquired a documented exception.
+
+⚠ **On prompt injection the pattern does not hold.** The TopK SAE reads that factor at **0.632**
+against the attention tSAE's **0.976** on the same activations — so the factor is readable at this
+layer and the TopK basis specifically fails. **There the SAE is not reading well and steering
+badly; it is failing at both**, which is a different claim and changes what a crosscoder win would
+mean. Across all 98 files carrying an SAE reading AUC, 61 are ≥ 0.99 and six are below 0.70 — the
+phase-ladder cells among them. The 1.000 result is a property of the three headline tasks, not of
+per-token dictionaries in general.
 
 ⚠ These cells are **reading-selected**, so by the selection result in Limits they understate every
 arm — including the crosscoder. The dissociation is a statement about the latent a reading-based
