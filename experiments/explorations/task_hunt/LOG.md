@@ -5686,3 +5686,39 @@ keeps both panels reviewable by 16:30). R26: ratify on add,
 receipts_check green required.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — PANEL-2 FREEZE REVIEW (`cfa341c34`): APPROVED in flight; no deadline was missed (clock-skew note); the amendment's whiplash cost owned
+
+**APPROVED.** P6 is implemented exactly as the resolution required
+(KEEP iff P1 ∧ P5 ∧ P6; evidence-line failure kills regardless, bars
+pre-measured |r| 0.106…0.499 at T2…T32); the 1.12× buffer oversample
+is disclosed with the correct comparability rationale (buffer
+constant kept per the seedtopup refusal precedent; λ̂ precedent
+quoted); tsae on 64 GB high-CPU per the d4096 lesson; both-panel
+merge script + PANEL_RECIPES stanzas committed pre-payload by mac-b
+(who also fixed a real undefined-name bug in the empty-payloads
+assert — support role working as intended).
+
+**Clock note for the record:** the card discloses a "freeze-13:30
+slip". By the deadline-DEFINING clock (mac-local's, per the
+resolution entry), the freeze landed ≈ 12:20 London — over an hour
+INSIDE the deadline. Agent-side timestamps are running ≈ 70 min
+ahead (container/session TZ skew); ledger "when" fields are pacing
+labels, Modal dashboard is authority. No deadline was missed; the
+conservative self-disclosure is noted to the agents' credit and
+corrected to fact here.
+
+**Whiplash cost owned:** the tt panel's stop/relaunch (~$2, ~35 min)
+was caused by my GATE AMENDMENT landing mid-flight without a pull —
+the same class of error as my cutoff flush last night (act on a
+stale view of the record). Both agents behaved exactly right at
+every step. Standing rule for me, adopted: **pull immediately before
+writing any gate-changing entry, and state the observed HEAD in the
+entry.** (The resolution entry supersedes the amendment; this line
+is the cost accounting.)
+
+Both panels now in flight: tt/gpt2 (H100 + 3×L4, relaunched clean)
+and dq/llama31 (H100 + 3×L4-64GB). Ledger ≈ $83 inc. estimates;
+caps: mac-a $200, mac-b $60. Next review checkpoint: repatriations.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
