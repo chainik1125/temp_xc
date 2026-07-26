@@ -117,19 +117,22 @@ integrate the recent history.
 ![Figure 1 — backtracking intensity: held-out recovery vs window length](figs_writeup/fig1_backtracking_tscaling.png)
 
 *Figure 1: recovering backtracking intensity from dictionary codes on
-reasoning traces. Lines: window architectures across window length T;
+reasoning traces (6 seeds at the T = 4 and T = 8 TXC-pre cells, 3
+elsewhere). Lines: window architectures across window length T;
 horizontal bands: per-token baselines (per-token SAE, T-SAE) with 95%
-CIs; dotted: untrained controls. All at matched active-latents-per-
-token budget.*
+CIs; dotted: untrained control. All at matched active-latents-per-
+token budget; the T = 16 dip is discussed in the text.*
 
-**The result (Figure 1).** TXC (pre) recovery *rises with window
-length*: r ≈ 0.13 → 0.19 → 0.21 across T = 2 → 4 → 8, at matched
-budget, while the per-token SAE reads r ≈ 0.11 and T-SAE r ≈ 0.15.
-With 6 seeds, the T = 8 cell is r = 0.207, 95% CI [0.179, 0.235] —
-entirely above the per-token SAE. The rise from T = 2 to T = 8 is
-significant under an exact within-seed permutation test
-(p = 0.0093), as is the growth of the trained-minus-untrained
-margin (p = 0.0046).
+**The result (Figure 1).** TXC (pre) recovery rises from T = 2 and
+then *plateaus above every per-token baseline*: with 6 seeds,
+r = 0.228 [0.182, 0.274] at T = 4 and r = 0.207 [0.179, 0.235] at
+T = 8, versus per-token SAE r ≈ 0.11 and T-SAE r ≈ 0.15. The rise
+from T = 2 to T = 8 was significant under the pre-registered exact
+within-seed permutation test on the original three seeds — where the
+curve read 0.13 → 0.19 → 0.21 — with p = 0.0093, as was the growth
+of the trained-minus-untrained margin (p = 0.0046); the three
+later-added seeds raised the T = 4 level, turning the top of the
+curve from a rise into the plateau shown.
 
 **The TXC-vs-T-SAE margin, precisely.** With the seed top-up
 completed, the paired margin at T = 8 is +0.057 with a one-sided 95%
