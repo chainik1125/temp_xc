@@ -7802,3 +7802,30 @@ shipped k500 family — cross-section sparsity not comparable) is
 quotable to the paper team as written.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 ~01:35 London — mac-b — OVERNIGHT § 2 DELIVERED ($0): REBUTTAL_PACK.md + exhibit figures
+
+**PTR: `experiments/explorations/task_hunt/REBUTTAL_PACK.md`** +
+`figs/rebuttal_{lambda,ttrend}_exhibit.{png,pdf}` + generator
+`rebuttal_pack_figs.py` (zero-GPU; canonical leaderboard + committed
+receipt JSONs only; fig1/fig4 family conventions, Okabe-Ito).
+
+Dmitry-format table (TXC | TXC-shuffled | per-token SAE | T-SAE) for
+the two headline tasks, instrument-honest: recovery = panel lane,
+shuffle = screen instrument (R10/R26) in its own units — NO
+trained-dictionary shuffle exists on hunt panels (stated; pods'
+grids carry that for paper tasks). λ̂: pre/T8 0.207 [0.179,0.235]
+n=6 vs sae 0.113 / tsae 0.150; R22 margin +0.0569 LB +0.0200 quoted
+WITH cross-cache + under-band POSTHOC disclosures; order reading =
+aggregation (R10, sc ≤ +0.018 AUC, g_order −0.0005). ttrend: post
+0.282@T32 / 0.131@T16 (n=6) vs sae 0.031 / tsae 0.036; L1
+no-caveat margins (sae@T32 +0.256 [0.200,0.313], tsae +0.244);
+L2 numbers only with the verbatim sequential caveat; untrained
+0.000@T32; evidence line 0.114 beaten 2.5×; two-floors-two-
+instruments distinction stated (screen over-floor bound T ≤ 16 per
+R26 vs panel evidence line licensed at T32); round-1 honesty line
+kept. R30 identity certificate + WRITEUP § 9 l0 note attached to
+both. § 4 = three one-pager-ready sentences for Han's 11:30.
+Second hat (visible-cue pre-measures for mac-a's candidates):
+STANDING BY on request via the LOG/briefings listener.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
