@@ -453,6 +453,18 @@ Qwen2.5-1.5B-Instruct L14, `n_docs` = 200, `n_grad` = 24, filtered run
 | ignore | +11.37 (z = 23.5) | 0.129 | 0.816 | 0.083 | −0.002 |
 | `completion_real` | **+19.67** (z = 18.1) | 0.130 | 0.945 | 0.049 | −0.002 |
 
+🛑 **These numbers are compromised by a design flaw in the pairing and should not be cited.**
+A = the injected document, B = the same item clean — so **B is 24 characters shorter**, and the
+segmenter cuts the whole document into 12 equal pieces. **Segment `t` therefore covers different
+content in A than in B**, and `Ḡ = ∇[score(A) − score(B)]` averages two misaligned things. The
+signature is unmistakable in the arms run: `grad_slab` measures **−0.13** while
+`broadcast_optimal` — its own constant component, built from the same `Ḡ` — measures **+28.94**.
+A constant write cannot outperform the full gradient write by 200×; what has happened is that the
+position-varying components cancelled between misaligned conditions, leaving mostly the constant
+part. **That deflates `‖Ḡ‖_F` and therefore inflates `c`**, so the 0.123–0.130 above is an upper
+bound of unknown tightness and the task may sit in the go region. Every other screened cell has
+`grad_slab ≫ broadcast_optimal` as it must. Fix is a length-matched pairing; rerun pending.
+
 **The behaviour is strongly present**, and `completion_real` measures ~2× the other two — the
 attack ladder orders as StruQ reports it, which is independent evidence the adapter is faithful
 rather than merely self-consistent.
