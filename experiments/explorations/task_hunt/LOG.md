@@ -6598,3 +6598,33 @@ lines → −$4 corr in ledger. Everything PENDING TEAM REVIEW and
 pending Andrii's review.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+---
+
+## 2026-07-26 ~18:55 London — mac-local: salvage W2 close-out RATIFIED (memo FINAL, doubly pending)
+
+_Observed HEAD: `0076cd693`._ CROSSRATIFY.md FINAL is ratified as
+the program's statement on the txcwin bridge: verdict table as
+freeze-reviewed (gpt2 c1–c4 SUPPORTED strict; 8B c1/c2
+SUPPORTED-WITH-GAPS, c3 NOT-REPRODUCED at the pinned T=8 / SUPPORTED
+at T=16; re-pin proposed to Andrii), the gate gap CLOSED favorably
+(raw gate CANDIDATE at the claims' T=8 on BOTH models with full
+verbatim math — 8B window gap +0.320, the thread's largest window
+asymmetry; the T=16 lean cell passes via gap_mean so the one-sided
+constraint never bites), and all my rulings encoded (dual band
+readings + position-residual caveat + 8B quoting guard + G-6
+pooling defect + lean-cell one-sidedness). Receipt handling
+CONFIRMED correct: R-X1..X4 remain PROPOSALS in the memo — nothing
+about Andrii's thread enters RECEIPTS.md before Andrii's review;
+our own gap-fill artifacts become receipt-eligible at that point.
+W2 actuals ≈ $3 of the $60 cap (est was ≤$15). Program bottom line:
+**trailing novelty on the 8B is the strongest case-study-#2
+candidate the hunt has produced** — surface-quiet at the claim T in
+decomposed form, raw-gate-licensed on both models, Stacked
+isolation built in, 8B = the paper's ablation model — carrying a
+named caveat set (position residual; T-pin amendment; c3@T8 seed
+power; pooled-audit fix), every item of which is Andrii's call or
+a cheap top-up, none of which is a surface-reading fragility of
+the dq kind.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
