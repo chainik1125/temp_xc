@@ -98,18 +98,30 @@ def main() -> int:
         pts.append((rs[0]["r1"], med))
         print(f"    r1 {rs[0]['r1']:.3f}  {t:<18} ratio {med:.2f}  ({len(rs)} init"
               f"{'s' if len(rs) > 1 else ''})")
+    # Two candidate predictors, and they are NOT the same question. `r1` asks whether the
+    # task needs rank >= 2; `c` asks how much of the optimal write a constant one can reach,
+    # and `c` is what actually bounds `broadcast_optimal` (its first-order reach is exactly
+    # sqrt(c)). If `c` predicts and `r1` does not, the ratio is telling us about the
+    # CONSTANT-WRITE CEILING and not about the crosscoder's temporal freedom at all.
+    def corr(xs, ys):
+        n = len(xs)
+        mx, my = sum(xs) / n, sum(ys) / n
+        sxy = sum((a - mx) * (b - my) for a, b in zip(xs, ys))
+        sxx = sum((a - mx) ** 2 for a in xs)
+        syy = sum((b - my) ** 2 for b in ys)
+        return sxy / (sxx + 1e-12), sxy / ((sxx * syy) ** 0.5 + 1e-12)
+
     if len(pts) >= 3:
-        n = len(pts)
-        mx = sum(p[0] for p in pts) / n
-        my = sum(p[1] for p in pts) / n
-        sxy = sum((p[0] - mx) * (p[1] - my) for p in pts)
-        sxx = sum((p[0] - mx) ** 2 for p in pts)
-        syy = sum((p[1] - my) ** 2 for p in pts)
-        rr = sxy / ((sxx * syy) ** 0.5 + 1e-12)
-        print(f"\n    slope of ratio on r1 = {sxy / (sxx + 1e-12):+.2f}, "
-              f"Pearson r = {rr:+.3f} over {n} tasks")
-        print("    negative slope supports the rank reading; a flat or positive one says the")
-        print("    crosscoder's form buys nothing even where the task is built to reward it.")
+        ys = [p[1] for p in pts]
+        for name, xs in (("r1", [p[0] for p in pts]),
+                         ("c ", [tasks[t][0]["c"] for t in
+                                 sorted(tasks, key=lambda k: tasks[k][0]["r1"])])):
+            slope, rr = corr(xs, ys)
+            print(f"\n    ratio on {name}: slope {slope:+.2f}, Pearson r = {rr:+.3f} "
+                  f"over {len(pts)} tasks")
+        print("\n    A negative slope on r1 would support the rank reading. A negative slope")
+        print("    on c instead says the ratio tracks how much a CONSTANT write can reach --")
+        print("    i.e. the number is about the broadcast ceiling, not temporal freedom.")
     return 0
 
 
