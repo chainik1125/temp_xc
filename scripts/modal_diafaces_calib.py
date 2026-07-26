@@ -17,7 +17,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "9c593a5ee4551ea73004f3931f3471ecfe37884d"  # calib freeze (CALIB_CARD.md), from `git rev-parse HEAD`
+PINNED_COMMIT = "97fae183ae1eb1e08dcc7388b495a86179302b37"  # calib freeze (CALIB_CARD.md), from `git rev-parse HEAD`
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 SEEDS = (3, 4)
 PY = "/repo/.venv/bin/python"

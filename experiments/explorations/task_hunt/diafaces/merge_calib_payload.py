@@ -21,7 +21,7 @@ DS = "dial_real_ttrend_gpt2_l7"
 PAYLOADS = HERE / "results" / "calib_payloads"
 # Filled at freeze time from `git rev-parse` — never hand-typed.
 FREEZES = {
-    "9c593a5ee4551ea73004f3931f3471ecfe37884d":
+    "97fae183ae1eb1e08dcc7388b495a86179302b37":
         "calib freeze (CALIB_CARD.md)",
 }
 ARCHS = {"batchtopk_sae_btkonly", "tsae_btkonly", "txc_batchtopk_post_btkonly"}
