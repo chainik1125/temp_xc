@@ -591,6 +591,50 @@ def build_receipts():
                  ["lb95_one_sided"],
              "posthoc_paired_lb":
                  tb["paired_excl_underband_POSTHOC"]["lb95_one_sided"]}))
+
+    # ---- B7 refmark screen (mac-b, frozen card c46d58826) ----
+    rg = _j("refmark/results/screen_gpt2.json")["cells"]
+    rl_ = _j("refmark/results/screen_llama31_8b.json")["cells"]
+
+    def _ax(c, T):
+        return c[f"rlam/T{T}/actxmean_linear"]["acc_test"]
+
+    def _vis(c, T):
+        return c[f"rlam/T{T}/visible_evidence_floor"]["acc_test"]
+
+    def _rwd(c, T):
+        return (c[f"wd/T{T}/actxmean_linear"]["auc"]
+                - c["wd/tok_linear"]["auc"])
+
+    R.append(dict(
+        id="R23",
+        artifact="refmark/results/screen_{gpt2,llama31_8b}.json",
+        key="actxmean_linear − visible_evidence_floor per T; wd arms; "
+            "actxmean − tok",
+        claim="B7 refmark: NO KEEP on either screened model — gpt2 "
+              "KILL (every window arm at T ≥ 8 sits BELOW the "
+              "visible-evidence floor, best −0.008, worst −0.069 at "
+              "T64 where the floor itself reaches 0.456; the "
+              "mandatory within-conversation control is flat, "
+              "max |gain| 0.015 AUC); llama31 WEAK (window gains "
+              "real but sub-bar — linear max +0.037 at T32, MLP max "
+              "+0.049 at T64 — beating the floor only at small T by "
+              "≤ +0.016, wd gain ≤ +0.019). Under-span 16× stated "
+              "pre-run; 2-model coverage; PENDING TEAM REVIEW",
+        checks=[("g2_axvis_max_T8up", -0.008, 3),
+                ("g2_vis64", 0.456, 3), ("g2_wd_absmax", 0.015, 3),
+                ("ll_gax_max", 0.037, 3), ("ll_axvis_best", 0.016, 3),
+                ("ll_wd_max", 0.019, 3)],
+        got={"g2_axvis_max_T8up": max(_ax(rg, T) - _vis(rg, T)
+                                      for T in (8, 16, 32, 64)),
+             "g2_vis64": _vis(rg, 64),
+             "g2_wd_absmax": max(abs(_rwd(rg, T)) for T in (16, 32, 64)),
+             "ll_gax_max": max(_ax(rl_, T)
+                               - rl_["rlam/tok_linear"]["acc_test"]
+                               for T in (4, 8, 16, 32, 64)),
+             "ll_axvis_best": max(_ax(rl_, T) - _vis(rl_, T)
+                                  for T in (4, 8, 16, 32, 64)),
+             "ll_wd_max": max(_rwd(rl_, T) for T in (16, 32, 64))}))
     return R
 
 

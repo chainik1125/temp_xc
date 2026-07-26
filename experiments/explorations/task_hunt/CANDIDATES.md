@@ -146,6 +146,13 @@ verbosity dies on a Ward-specific artifact.
   lat falsifier fired — recency loses its best broad-text instance.
   2-model coverage (gemma pending an HF secret), mac-b (executor),
   PENDING TEAM REVIEW.
+- 2026-07-26 · **refmark (B7): NEGATIVE — no KEEP; gpt2 KILL (every
+  window arm below the visible-evidence floor at T ≥ 8 AND the
+  mandatory within-conversation control flat), llama31 WEAK (sub-bar
+  +0.037/+0.049 residue, floor beaten only at small T by ≤ +0.016)**
+  (R23). Reach-limited by pre-commitment (kernel support 16× T64).
+  The two binding instruments bound for the first time and did their
+  job. 2-model coverage, mac-b (executor), PENDING TEAM REVIEW.
 - 2026-07-24 · **Factory adopts runpod-e's doc-identity
   recommendation** (their LOG entry of this date): every future
   broad-factory builder computes and reports `doc_mean_only_auc`

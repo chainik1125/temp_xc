@@ -5021,3 +5021,56 @@ tsae top-up checkpoints live only on Modal Volume
 else rotation orphans them (the round-1 lesson, again).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-26 — mac-b (executor) — B7 `refmark` Stage-1 screen (frozen card `c46d58826`, mac-local-approved pre-results): NO KEEP on either screened model — gpt2 KILL, llama31 WEAK. The window-state reading of the deflection regime is NEGATIVE at this reach, and both binding instruments earned their keep. PENDING TEAM REVIEW
+
+**Coverage.** 2 models (gpt2 hs7 / llama31-8b hs14; gemma pending an
+HF secret, same standing scope as the slen entry). New caches from
+the committed stream (grid derived per `cache_acts.py` — label↔cache
+identity by construction, re-asserted at run time); user-echo rows
+dropped AND disclosed (13 turns; 69/68 manifest rows gpt2/llama).
+Artifacts: `refmark/results/screen_{gpt2,llama31_8b}.json`; RECEIPTS
+**R23 added, ALL PASS** (renumbered from R22 — mac-a's tsae bound
+claimed that id in the same window). Under-span restated from the card: kernel
+support ≈ 1,100–1,150 tokens ≈ **16× the T64 ladder top** — this is
+a reach-limited negative by pre-commitment, not a claim about the
+full kernel.
+
+**gpt2 — KILL (clauses 3 and 4 as written).** Q1 ✓ (tok−floor
++0.058 < +0.10). Window arms: g_ax linear ≤ +0.003 everywhere; MLP
+up to +0.040 (T64). **The visible-evidence floor beats every window
+arm at T ≥ 8** (actxmean − floor: best −0.008, worst −0.069 at T64,
+where the label-side floor alone reaches 0.456 vs chance ⅓) — the
+activation window never reads past its own visible marker tokens.
+**The mandatory within-conversation control is flat** (|actxmean −
+tok| ≤ 0.015 AUC at every T): the 0.966 conversation-identity route
+was the label's information, activation-side nothing survives
+demeaning. The two pre-named traps caught the candidate exactly as
+the card intended.
+
+**llama31-8b — WEAK, no rule fires as written.** Q1 ✓ (+0.016 —
+the per-token state is barely above the position floor). Window
+gains real but sub-bar: linear +0.027…+0.037 (max T32, width null
++0.036), MLP max +0.049 (T64, width +0.045) — never reaching the
++0.05 KEEP bar; above the visible-evidence floor only at small T
+(≤ +0.016 at T8) and BELOW it at T64 (−0.051); within-conversation
+gain marginal (+0.012…+0.019 AUC). Order arms shuffle-immune (sc
+−0.012…−0.010; Q3 ✓ regime-2). No KILL clause fires (the T8/T16
+residue clears its width null and the floor, weakly); no KEEP clause
+comes close.
+
+**2-model verdict: NEGATIVE for B7's candidate logic** — a recurring
+deflection regime maintained as window-readable state does not
+appear on base models at ≤ 64-token reach beyond what visible marker
+tokens supply; the conversation-level label is carried by
+conversation identity (killed by the mandatory control), with a
+small sub-bar llama residue at small T recorded. The `is_marker`
+anchor (regime-1 calibration, never primary) reads 0.635/0.658 AUC
+per-token, 0.655/0.709 at T16 actxmean — modest for the
+D7-documented refusal state; base-vs-chat distribution shift was
+part of the bundle framing and is the plain reading. Q5's "strong
+conversion" expectation is NOT met at these levels — noted for the
+review. Screen economics: caches + 2 screens ≈ 25 min L40S
+(actuals ≈ $2–3 incl. the image rebuild; one wasted build on a
+mistyped pin SHA, fixed and disclosed in the driver history).
+
+_Recorded-by: claude-fable-5 (mac-b, overnight B7 refmark screen)_
