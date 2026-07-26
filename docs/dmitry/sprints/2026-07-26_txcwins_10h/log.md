@@ -2179,3 +2179,50 @@ predicted in advance, confirmed.
 `txc_flat` at +1.42 sits *below* a random constant direction at +1.81, and `txc_profile_random`
 is +0.00 ± 0.04 — on **this** task the controls hold cleanly, which is what distinguishes it
 from the order task where they did not.
+
+## 00:48 — the `c` gate retracted to two points, and a discipline lesson
+
+The seven-row table showing `c` ordering every task is **withdrawn by its author**, and it had
+already reached the executive summary draft. The values for the phase and order cells were
+computed from the **difference-of-means** slab, which this sprint measured to be nearly
+orthogonal to the gradient of the metric being reported: `cos` = +0.095 on order, +0.044 on
+recency, −0.037 on evidence, +0.003 on a rotation task. A `c` from that slab is not the
+constant share of anything the experiment measures — and on the full set it does not order the
+outcomes, since the one-switch phase cell sits at `c_dom = 0.040`, essentially recency's value,
+while a constant write beats the crosscoder there by 19 points.
+
+Where `c` is computed from the **gradient**, it does separate the two cases available, and the
+contrast is the best argument for the instrument anyone has produced:
+
+| task | `c` gradient | `c` difference-of-means | outcome |
+| --- | --- | --- | --- |
+| order | **0.241** | 0.039 | constant write wins |
+| recency | **0.034** | 0.039 | crosscoder wins, z = 18 |
+
+**Identical values from the cheap proxy; a 7× separation from the correct one.** Four
+gradient-based ladder cells are running; until they land the honest organising sentence is the
+empirical one, adopted verbatim:
+
+> the crosscoder wins under a metric that cancels constant writes, and loses under one that
+> does not
+
+**The discipline lesson, recorded because it is mine.** Twice tonight numbers reached the
+shipping document and were retracted within the hour — the smoke-test table and this one. Both
+were caught quickly only because someone else was checking. **Rule imposed: nothing enters the
+executive summary without a result-file path attached.** Provenance in the draft would have
+caught both before they were written rather than after.
+
+## 00:50 — one design constraint that decides whether demonstration order can discriminate
+
+"Best versus worst ordering" says nothing about *how* the two orderings differ, and a
+permutation search can return a pair differing by a **single transposition** — a rank-1 task
+wearing the clothes of a permutation task, which would come back flat for reasons unrelated to
+the crosscoder. Either constrain the search to **cyclic rotations of the interior
+demonstrations**, or measure `r1` on the selected pair before training anything. At k=8 with six
+interior demonstrations rotated, that is rank 5 and `r1 ≈ 0.33`.
+
+This also demotes **instruction-order conflict** from joint-first: every two-block swap has an
+exactly rank-1 optimal write, since the difference slab is `+Δ` at one slot and `−Δ` at the
+other. It is not dead — the recency task's genuine rank-2 structure gives a 17% residual
+inexpressible by any rank-1 intervention — but 17% is a residual, not the structural
+impossibility the earlier ranking implied.
