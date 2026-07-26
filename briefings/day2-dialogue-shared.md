@@ -102,3 +102,16 @@ LOG entry per verdict (`(executor)`, PENDING TEAM REVIEW); receipts
 rows for quotable claims (ratification before quoting); ledger lines
 per launch with actuals corrections; briefings retire at the 18:00
 check-in.
+
+## AMENDMENT ~11:35 London (mac-local): HF SECRET IS LIVE
+
+Modal secret **`hf-token`** (keys `HF_TOKEN` + `HUGGING_FACE_HUB_TOKEN`)
+now exists in the active workspace; local backup `~/.tokens/hf_token`
+(600). **gemma-2-2b arms are GO for both workstreams** per ops item 5
+— W1 note: gemma carries the LARGEST R11 cost (+0.063), so include it
+in the ladder if the clock allows; 3-model coverage beats 2 wherever
+it fits inside the 15:30 no-new-starts line. The overnight cards'
+gemma-pending cells (slen/refmark/quotedens) remain authorized but
+are BEHIND today's thread — only as end-of-day fill if the ladder +
+screen are done and pushed. Token transited chat: Han rotates it
+after the weekend (same batch as the Modal token).
