@@ -4728,3 +4728,97 @@ verdicts pushed + mac-b spend ≤ $60. Nothing to amend; gate terms are
 the card's own and are approved as written.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-b (executor) — B8 `slen` Stage-1 screen (frozen card `b7121a208`): `lat` KEEP + `lev` KEEP as ORDER-FREE window faces, `disp` WEAK — and THE LADDER COLLAPSES: the pre-registered recency prediction fails on both screened models. ALL VERDICTS PENDING TEAM REVIEW
+
+**Coverage and receipts first.** 2 models — gpt2 (hs7) + llama31-8b
+(hs14); **gemma-2-2b NOT run** (no HF secret on the overnight venue;
+pre-authorized to run later under the same frozen card — no 3-model
+majority language below). Screen = the frozen card's
+convention-of-record grid on the 400-doc cache-aligned bundle
+(zero-new-caching identity re-asserted at run time), caps 12,000
+train / 4,500 test rows (4,000/1,500 per class), corpus 400 docs /
+**320 train** (label-side unigram quoted at that size per the
+estimator convention: lat 0.541–0.549 / lev 0.558–0.565 / disp
+0.519–0.522; the 4k bundle's 3,200-train-doc values are higher and
+operative label-side: 0.563–0.568 / 0.588–0.592 / 0.518–0.522).
+Artifacts: `slen/results/screen_{gpt2,llama31_8b}.json` (174 cells
+each, identical grids); RECEIPTS **R20–R21 added, ALL PASS**.
+Runtime disclosures: A10 OOM at the llama T32 flatten-MLP → screens
+moved to L40S (GPU choice touches no cell/seed); one Modal
+client-disconnect cancelled an in-flight llama call (non-detached
+run — mac-a hit the same mode); cells resumed from Volume partials,
+per-token-first ordering auditable in the incremental files.
+
+**`lat` — KEEP (as an order-free window face; the LATCH reading is
+dead).** Per-token converts: tok_linear 0.490/0.427 vs position
+floors 0.329/0.306 (+0.160/+0.120, P1 ✓). Order-free window gain
+(actxmean − tok, linear class): **+0.058 (gpt2) / +0.056 (llama) at
+T32**, foreign-null margins +0.087/+0.081; MLP class +0.114/+0.098.
+The gain PEAKS at T32 and falls at T64 on both models (+0.026/+0.020)
+— consistent with context-mean dilution of a near-window signal, an
+instrument shape noted, not a claim. Survives the within-doc arm
+(+0.056/+0.074 AUC at T32). KEEP per card § 6(a)(b)(c) on 2/2. BUT
+the pre-registered latch prediction fails: within-window shuffle cost
+at identical width is **−0.006/+0.000 (gpt2, T16/T32) and
++0.005/+0.019 (llama)** against width-corrected window content
+(win − foreign) of +0.081…+0.147 — order share ≤ 0.13 everywhere vs
+the pre-registered ≥ 0.5. **The bundle card's stated falsifier FIRED:
+the "latch" is order-free ambient statistics.** MLP-class order
+component, reported per P4 and never substituted: sc_mlp at T32
++0.025/+0.022 on wc_mlp +0.211/+0.218 (share ≈ 0.1).
+
+**`lev` — KEEP (the strongest window face here; the BINDING
+within-doc obligation DISCHARGED).** tok−floor +0.174/+0.116.
+Order-free gain grows monotonically and is **still rising at T64:
++0.067 (gpt2, margin +0.082) / +0.115 (llama, margin +0.130)** — the
+under-span shape the card § 3 predicted (T64 ≈ 0.7 kernel mass).
+doc_mean_only was 0.890–0.892 label-side (320 train docs), the
+loudest face in the bundle — and the within-doc control clears it:
+**wd window gain +0.046/+0.092 AUC at T64** with positive foreign
+margins — the doc-identity route does not explain the gain. Shuffle
+cost ≈ 0 (−0.018…+0.017 across models × T ∈ {16,32}): order-free,
+regime-2; the P3 lev clause (partial cost) fails.
+
+**`disp` — WEAK, no rule fires as written.** Per-token near-blind
+activation-side exactly as the label-side triage predicted (tok−floor
++0.048/+0.039, under the P1 bar — the designed axis-b posture,
+confirmed). Real but sub-bar window signal: g_ax linear max
++0.041/+0.025 (T64, width nulls +0.053/+0.030); MLP +0.068 (gpt2
+T64) / +0.041 (llama T64) — the +0.05 KEEP bar is met on 1/2 models
+(gpt2, MLP class) only. No KILL: width nulls clear ≥ +0.02 at
+multiple T on both. The second moment is window-readable, weakly,
+and its |shuffle cost| ≤ 0.006 on both models — the ONE P3 clause
+that held (disp ≈ 0, 2/2).
+
+**THE LADDER — the deliverable: PARTIAL as scored, and the recency
+reading is NEGATIVE.** Pre-registered `lat > lev > disp ≈ 0` at
+T ∈ {16,32}, linear class: **holds nowhere** — sc per face
+(lat/lev/disp): gpt2 T16 −0.006/+0.017/−0.006, T32
++0.000/−0.004/−0.003; llama T16 +0.005/−0.018/+0.006, T32
++0.019/−0.002/+0.005. Permutation-null band |acc − ⅓| ≤ 0.010. Max
+|sc| over the whole quoted grid = **0.019** while wc spans
+**+0.020…+0.147** on the same cells (R20). Only the `disp ≈ 0`
+clause survived (2/2); the lat clause (≥ half of window content
+order-borne) and lev clause (partial cost, nearest-dominated) failed
+on 2/2. The one directional residue — llama lat T32 +0.019 linear /
++0.022 MLP, gpt2 MLP +0.025 — is an order of magnitude below the
+latch prediction; reported, not claimed (and the MLP-class ordering
+lat > lev > disp holds at T32 on gpt2 only, 1/2). **Program meaning:
+on the substrate DESIGNED to give the recency/distance-to-anchor
+hypothesis its best broad-text instance (doc length pull-fixed,
+three temporal weightings of one exact stream), dialevel's
+capacity-matched shuffle cost (R11: +0.035…+0.063) does NOT appear —
+the amended order finding (R10: window advantage = order-free
+aggregation) extends to the instrument built to break it.** The
+hypothesis's remaining shelters, stated: dialogue-specific structure
+(turn-boundary positions — dialevel's substrate, not this one) and
+the under-spanned upper ladder (T64 ≈ 3 of 8 kernel-support
+sentences, disclosed pre-run). P7 `qgap` remains the pre-named next
+recency candidate; nothing here re-opens it tonight.
+
+Screen economics: image + smoke + caches + screens ≈ **$5–6 actual**
+(ledger lines at ~19:00/19:12 PT; estimates were conservative).
+Verdicts: mine alone, **PENDING TEAM REVIEW** at the Sunday check-in.
+
+_Recorded-by: claude-fable-5 (mac-b, overnight B8 slen screen)_

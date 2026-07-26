@@ -138,6 +138,14 @@ verbosity dies on a Ward-specific artifact.
   0.960; within-doc control rests on 8 test documents. It did NOT
   die on position ⇒ **P2 stays parked**. Never quoted bare, per
   binding qualification 1.
+- 2026-07-26 · **slen (B8): lat KEEP + lev KEEP (both ORDER-FREE
+  window faces), disp WEAK — and the pre-registered recency ladder
+  COLLAPSES on 2/2 screened models** (max |shuffle cost| 0.019 vs
+  width-corrected content +0.020…+0.147; R20–R21): the amended
+  order finding extends to the instrument built to break it; the
+  lat falsifier fired — recency loses its best broad-text instance.
+  2-model coverage (gemma pending an HF secret), mac-b (executor),
+  PENDING TEAM REVIEW.
 - 2026-07-24 · **Factory adopts runpod-e's doc-identity
   recommendation** (their LOG entry of this date): every future
   broad-factory builder computes and reports `doc_mean_only_auc`

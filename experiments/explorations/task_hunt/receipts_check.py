@@ -473,6 +473,84 @@ def build_receipts():
                 ("t4v2", 0.033, 3), ("t4v2_lo", 0.013, 3)],
         got={"t4": l4["mean"], "t8": l8["mean"],
              "t4v2": l4v2["mean"], "t4v2_lo": l4v2["t_ci95"][0]}))
+
+    # ---- B8 slen screen (mac-b, frozen card b7121a208) ----
+    sg = _j("slen/results/screen_gpt2.json")["cells"]
+    sl = _j("slen/results/screen_llama31_8b.json")["cells"]
+
+    def _sc(c, face, T):
+        return (c[f"{face}/T{T}/win_linear"]["acc_test"]
+                - c[f"{face}/T{T}/win_shuf_linear"]["acc_test"])
+
+    def _wcn(c, face, T):
+        return (c[f"{face}/T{T}/win_linear"]["acc_test"]
+                - c[f"{face}/T{T}/win_foreign_linear"]["acc_test"])
+
+    grid = [(c, f, T) for c in (sg, sl) for f in ("lat", "lev", "disp")
+            for T in (16, 32)]
+    R.append(dict(
+        id="R20",
+        artifact="slen/results/screen_{gpt2,llama31_8b}.json",
+        key="win_linear − win_shuf_linear (sc) and − win_foreign_linear "
+            "(wc), 3 faces × 2 models × T ∈ {16,32}",
+        claim="B8 slen: the pre-registered recency ladder "
+              "(lat > lev > disp ≈ 0) COLLAPSES on both screened models "
+              "— max |within-window shuffle cost| over 3 faces × 2 "
+              "models × T ∈ {16,32} is 0.019 (llama lat T32) while "
+              "width-corrected window content spans +0.020…+0.147 on "
+              "the same grid; the lat face's order share never exceeds "
+              "0.13 of its width-corrected content (pre-registered "
+              "latch prediction: ≥ 0.5). 2-model coverage, gemma "
+              "pending; PENDING TEAM REVIEW",
+        checks=[("absmax_sc", 0.019, 3), ("wc_lo", 0.020, 3),
+                ("wc_hi", 0.147, 3), ("lat_share_max", 0.13, 2)],
+        got={"absmax_sc": max(abs(_sc(c, f, T)) for c, f, T in grid),
+             "wc_lo": min(_wcn(c, f, T) for c, f, T in grid),
+             "wc_hi": max(_wcn(c, f, T) for c, f, T in grid),
+             "lat_share_max": max(
+                 _sc(c, "lat", T) / _wcn(c, "lat", T)
+                 for c in (sg, sl) for T in (16, 32)
+                 if _wcn(c, "lat", T) > 0)}))
+
+    def _gax(c, face, T):
+        return (c[f"{face}/T{T}/actxmean_linear"]["acc_test"]
+                - c[f"{face}/tok_linear"]["acc_test"])
+
+    def _axw(c, face, T):
+        return (c[f"{face}/T{T}/actxmean_linear"]["acc_test"]
+                - c[f"{face}/T{T}/actxmean_foreign_linear"]["acc_test"])
+
+    def _wd(c, face, T):
+        return (c[f"{face}/wd/T{T}/actxmean_linear"]["auc"]
+                - c[f"{face}/wd/tok_linear"]["auc"])
+
+    R.append(dict(
+        id="R21",
+        artifact="slen/results/screen_{gpt2,llama31_8b}.json",
+        key="actxmean_linear − tok_linear (± foreign null); wd arms",
+        claim="B8 slen KEEPs (both as ORDER-FREE window faces, "
+              "screen-side corpus 400 docs / 320 train, 12k train "
+              "rows): lat +0.058/+0.056 at T32 (gpt2/llama, foreign-"
+              "null margins +0.087/+0.081); lev +0.067/+0.115 at T64 "
+              "(margins +0.082/+0.130, still rising at the stated "
+              "under-span top); lev's BINDING within-doc control "
+              "discharged: wd window gain +0.046/+0.092 AUC at T64. "
+              "2-model coverage; PENDING TEAM REVIEW",
+        checks=[("lat_g32_gpt2", 0.058, 3), ("lat_g32_llama", 0.056, 3),
+                ("lat_w32_gpt2", 0.087, 3), ("lat_w32_llama", 0.081, 3),
+                ("lev_g64_gpt2", 0.067, 3), ("lev_g64_llama", 0.115, 3),
+                ("lev_w64_gpt2", 0.082, 3), ("lev_w64_llama", 0.130, 3),
+                ("lev_wd64_gpt2", 0.046, 3), ("lev_wd64_llama", 0.092, 3)],
+        got={"lat_g32_gpt2": _gax(sg, "lat", 32),
+             "lat_g32_llama": _gax(sl, "lat", 32),
+             "lat_w32_gpt2": _axw(sg, "lat", 32),
+             "lat_w32_llama": _axw(sl, "lat", 32),
+             "lev_g64_gpt2": _gax(sg, "lev", 64),
+             "lev_g64_llama": _gax(sl, "lev", 64),
+             "lev_w64_gpt2": _axw(sg, "lev", 64),
+             "lev_w64_llama": _axw(sl, "lev", 64),
+             "lev_wd64_gpt2": _wd(sg, "lev", 64),
+             "lev_wd64_llama": _wd(sl, "lev", 64)}))
     return R
 
 
