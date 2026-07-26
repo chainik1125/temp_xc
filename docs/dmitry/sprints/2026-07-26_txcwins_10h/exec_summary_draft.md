@@ -659,9 +659,9 @@ against a rank-1 ceiling of +102.46. `r1` bounds what a rank-1 write can do; it 
 predicted what the crosscoder does. If headroom matters here, that is a new result rather than a
 confirmation.
 
-## Methodology: six times, the name was not the thing
+## Methodology: eight times, the name was not the thing
 
-The sprint's most transferable output is not a finding but a pattern, found six times in ten
+The sprint's most transferable output is not a finding but a pattern, found eight times in ten
 hours, each time by reading our own code rather than by a result looking wrong:
 
 | what was recorded | what it actually was |
