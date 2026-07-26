@@ -1,8 +1,18 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~13:20 London — day-2 W2 mid-flight: screen DELIVERED
-(both faces KEEP 3/3 with T32 order carriage), gate FIRED for tt
-(mac-local `dce8d085d`), PANEL RUNNING detached on Modal.**
+**2026-07-26 ~13:55 London — day-2 W2: screen DELIVERED (both faces
+KEEP 3/3, T32 order carriage); after the gate race (fired tt
+`dce8d085d` → amended dq `187c51022` → RESOLVED `6e2f18e4e`: tt
+governs + PANEL 2 dq authorized, my cap → $200) — **TWO panels
+running detached**: tt/gpt2 (freeze `7ba2e10fd`, app relaunched
+13:40 after my amendment-triggered stop, log
+`<scratchpad>/tt_panel_relaunch.log`) and dq/llama31 (freeze
+`cfa341c34`, launched ~13:47 — 2 min over the 13:45 line, disclose
+in verdict; log `<scratchpad>/dq_panel2.log`). mac-b = panel-2
+merge/receipts support. Verdict engine ready: `score_panel.py`
+(P1–P6), `merge_panel_payload.py tt|dq` (mac-b filled dq SHA),
+evidence lines committed (tt drawn-only; dq P6 KILL bars |r|
+0.106..0.499).**
 
 ## Live state (if resuming mid-anything, start here)
 
