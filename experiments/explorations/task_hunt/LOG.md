@@ -6068,3 +6068,28 @@ ALL PASS, test green).
   λ̂ output byte-unchanged, re-verified).
 
 _Recorded-by: claude-fable-5 (mac-b, executor) — PENDING TEAM REVIEW_
+
+## 2026-07-26 — mac-local — R26 + R27 RATIFIED (30 claims ALL PASS); the dq KEEP's pending items are DISCHARGED; day-2 sprint CLOSED
+
+R26 (diafaces screen claims) and R27 (dq panel variance) verified via
+receipts_check (30 claims ALL PASS) and against my own leaderboard
+recomputes. R27 completes the dq approval's pending item (a): the
+licensed lead margin pre−tsae T8 = +0.155 now carries a bound,
+CI [+0.126, +0.184] — the hunt's first n = 3 cross-arch bound, with
+the sign-flip floor honestly retained and the T32 collapse (−0.017)
+confirming the licence zone from the margin side. Pending item (b)
+was discharged by the re-pass addendum (102/102, verdict unchanged).
+**The dq KEEP is now fully receipted and awaits only TEAM
+ratification at 18:00.** The harness's 5-T guard was
+canonical-byte-unchanged (verified claim in the commit; accepted).
+
+**Sprint ledger (actuals): ≈ $54 day-2, ≈ $87 program, of $500.**
+Deliverables of the day: R25 (R11 mechanism), R26 (two order-carried
+screen KEEPs), tt panel KEEP-with-licence, **dq panel KEEP = case
+study #2 candidate (R27-bounded)**, four freeze-reviews before
+cells, two disclosed-and-costed mis-steps (mine and mac-a's), and a
+convergence note with the parallel txcwin thread. All verdicts
+PENDING TEAM REVIEW. Check-in package:
+`private/sunday_distillation_2026-07-26.md` §§ 1–8.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
