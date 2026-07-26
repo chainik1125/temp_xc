@@ -135,7 +135,7 @@ def bringup() -> str:
 
 
 @app.function(image=image, gpu="A10G", cpu=8, memory=49152, timeout=7200,
-              ephemeral_disk=150_000, volumes={"/vol": vol})
+              ephemeral_disk=524_288, volumes={"/vol": vol})
 def build_caches() -> dict:
     t0 = time.time()
     Path("/workspace").mkdir(exist_ok=True)
