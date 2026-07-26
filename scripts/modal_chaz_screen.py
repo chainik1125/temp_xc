@@ -19,7 +19,10 @@ PY = "/repo/.venv/bin/python"
 RES_DIR = "/repo/experiments/explorations/task_hunt/chaz"
 
 app = modal.App("mac-a-chaz-screen")
-vol = modal.Volume.from_name("temp-xc-replag-caches", create_if_missing=True)
+# Ward/conv_depth caches live on the WARD volume (first launch mounted
+# temp-xc-replag-caches → factory_screen silently skipped every model →
+# 0 cells; ops-layer venue fix, no frozen-science change).
+vol = modal.Volume.from_name("temp-xc-ward-caches", create_if_missing=True)
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
