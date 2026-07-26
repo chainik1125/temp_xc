@@ -2226,3 +2226,35 @@ exactly rank-1 optimal write, since the difference slab is `+Δ` at one slot and
 other. It is not dead — the recency task's genuine rank-2 structure gives a 17% residual
 inexpressible by any rank-1 intervention — but 17% is a residual, not the structural
 impossibility the earlier ranking implied.
+
+## 23:55 — rotation ladder: expressiveness settled negative, `c` gate salvaged
+
+The ladder landed (`results/txc_wins/rot_m{2,6,12}_T.json`). Three consequences, two of them
+reversals of things said earlier tonight.
+
+**`grad_rank1` was already on disk** when implement reported it as still computing, and it
+settles the expressiveness question negatively: a rank-1 write from the metric's own gradient
+reaches +109.98 / +67.74 / +102.46 against the crosscoder's +2.86 / −0.01 / +18.23. At the rung
+where `r1` = 0.177 by construction, the crosscoder is beaten 5.6×. **The design built to produce
+an expressiveness result produced the cleanest refutation of one.**
+
+**`r1` is dropped as a predictor.** It falls 0.304 → 0.210 → 0.177 while `rank1_best` stays flat
+(+50.5, +49.8, +59.9). A share of the write's norm does not determine what a rank-1 write
+achieves on the metric.
+
+**`c` on the gradient now orders five cells across both metric modes**, splitting between 0.102
+(fails) and 0.034 (wins). This replaces the two-point version and retires the metric-mode
+sentence: `rotate12` is ordering-mode and the crosscoder wins it at z = 9.8, so the task's `c`
+predicts the outcome where the metric's family does not.
+
+**`rotate2` is a null cell, not an SAE win** — `random_broadcast` +11.23 beats every learned arm,
+the order task's degenerate signature.
+
+**tSAE prediction withdrawn as untested.** At its own learning rate the attention tSAE is the
+best reconstructor of the three (FVU 0.0144 vs SAE 0.0373 vs crosscoder 0.0968). The +3.65 that
+"confirmed" the registered ordering came from a dictionary at a third of its best lr. New
+finding 6: a benchmark that fixes one learning rate across architectures is not measuring
+architectures.
+
+The provenance rule worked. Every number above was read from a result file before it was written,
+and doing so caught a pending-arm report that was already answered.
