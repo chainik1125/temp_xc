@@ -485,13 +485,14 @@ nothing to pick from.
 It also means that robustness check **cannot be run at `k_seg = 12`**: the design space is a
 single point. The usable sizes are sparser than they look —
 
-| `k_seg` | 8 | 12 | **14** | 16 | **18** | 20 |
-| --- | --- | --- | --- | --- | --- | --- |
-| complement pairs | 1 | **1** | **impossible** | 7 | **impossible** | 24 |
+| `k_seg` | 8 | 10 | 12 | 14 | 16 | 18 | 20 | 24 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| complement pairs | 1 | — | **1** | — | **7** | — | 24 | 296 |
 
-— because matching moment 1 under complementation needs `Σj` even, which fails for even `k` unless
-`k ≡ 0 (mod 4)`. So the ladder is 8, 12, 16, 20, and **`k_seg = 16` is the next usable size rather
-than a convenient one**. If the check is ever run, the clean form is two of `k = 16`'s seven pairs
+Two distinct failure modes, which look alike in the table: odd `k` fails on **balance**, and
+`k = 10, 14, 18, 22` fail because `Σ_{j=1..k} j` is **odd**, so only `k ≡ 0 (mod 4)` survives.
+The pair count runs 1, 1, 7, 24, 296 — so **`k_seg = 16` is the smallest size offering any choice
+at all**, which makes it the right size for the check rather than a convenient one. If the check is ever run, the clean form is two of `k = 16`'s seven pairs
 against each other, holding document length fixed and varying only the pattern; comparing `k = 12`
 against `k = 16` would confound pattern with length.
 
@@ -636,6 +637,11 @@ crosscoder's +2.86 at `rotate2` and +9.83 against −0.01 at `rotate6`, reversin
 `rotate12` (+4.32 against +18.23). And `txc_slab` across the ladder reads +2.86, +6.43, −0.01,
 +18.23 — a −0.01 followed by a +18.23 is instability, not a trend. The honest description of the
 surviving win is **discovery, and unreliable discovery**.
+
+**A canary, if either held-out rerun collapses.** The first thing to re-examine would be whether
+the reading result still holds — `auc_selection = 1.000` for the SAE on all three tasks. It is the
+most-replicated finding in the project and the least likely to move, so if it *does* move,
+something more basic is wrong than the task design.
 
 **The empirical base is now in better shape than the framework**, which is the reverse of how
 this sprint started. Three wins survive symmetric doses, matched realised coefficients out of
