@@ -686,3 +686,63 @@ catalogue timestamps running about four hours fast for the same reason mine did:
 rather than read off the clock. Both corrected. Elapsed is roughly half an hour of ten, so
 the runway is far longer than the pace suggests, and the agents have been redirected from
 breadth toward depth and verification.
+
+## 23:10 — reading and steering are the same number
+
+The best theoretical result of either sprint, and it arrived as the answer to a
+commit-before-measure question rather than as a fit to data.
+
+Write `τ(ctx)`, `κ(ctx)` for a tense or calm segment's representation under context `ctx`. In
+class A (tense-first) the early positions are `τ(T)` and the late ones `κ(T)`; in class B the
+early are `κ(C)` and the late `τ(C)`. So
+
+```text
+P_early = τ(T) − κ(C)
+P_late  = κ(T) − τ(C)
+Σ_t P[t] ∝ [τ(T) + κ(T)] − [τ(C) + κ(C)]
+```
+
+Context-free representations make that sum zero, giving `P = [+Δ, −Δ]` and rank 1. **With
+causal history it is the tense-prefix-versus-calm-prefix contrast, which is generically
+nonzero** — so the two block rows are not antipodal, `mean_t P[t] ≠ 0`, and both `c > 0` and
+`rank > 1` follow. Which yields:
+
+> **`c = 0` if and only if a linear pooled per-token probe is at chance. A task is
+> steerable-by-constant-write exactly to the extent that it is readable-by-pooling.**
+
+This retrodicts last sprint's data. The pooled SAE read the order label at AUC 0.998, which
+implies `c > 0`, which implies `sae_broadcast > 0` — and `sae_broadcast` measured **+1.24**.
+The reading result and the steering result were the same fact, and neither sprint knew it.
+It also explains why the reading comparisons kept failing to favour a window code while the
+steering comparison succeeded: those are two views of one quantity, and the task's position
+on that single axis determines both.
+
+**Predictions on record before any number lands:** `c ≈ 0.03` (0.005–0.12) and `r1 ≈ 0.93`
+(0.82–0.99) on the order task, hence `Δ(sae_profile_target)/Δ(txc_slab) ≈ 0.96` — closing
+most but not all of the gap — and `1 − r1 ∈ [0.02, 0.15]` bounding the genuinely-L3 fraction
+of last sprint's result. So the correction to the prior summary stands and should not be
+softened: **mostly discovery, with a small genuinely-inexpressible residual.** Falsifier:
+measured `c < 1e-10`, which would refute the causal-history argument and mean representations
+are effectively context-free at this layer — surprising and reportable on its own.
+
+**A gate I had already issued, withdrawn before it did damage.** I passed on "`c = 0` exactly
+at every m — treat nonzero as window misalignment" as a harness assertion. That is the block
+algebra, which assumes context-free representations; measured `c` will be small-but-positive
+everywhere and its magnitude *is* the causal-history contribution. Restated as **`c < 0.1`**,
+with a note not to hunt a misalignment bug on the strength of a small positive value. Caught
+by the theory agent flagging its own earlier instruction rather than by anyone hitting the
+false alarm.
+
+**Induction: predicted `r1 ≈ 0.90`, effectively rank 1** — in the first half nothing
+distinguishes the classes yet so `P[t] ≈ 0`, and in the second half the slab is a step or ramp
+times one induction direction. It therefore buys *credibility of setup* (its foil is the
+literature's own control, pre-empting "you built the task to win") rather than expressiveness.
+Both currencies are worth having and the write-up must say which one each experiment bought.
+It is being screened rather than built: one backward pass per document over ~100 sequences
+resolves it before any corpus exists.
+
+**A free lever on headroom.** Since the `r1` inflation is a non-orthonormality effect, the
+block vocabulary controls it. The current pools pair calm with tense — two poles of one
+affective axis, whose difference is a single dominant direction that mechanically inflates σ₁
+and shrinks exactly the L3 headroom being measured. Topic-orthogonal pools should push
+measured `r1` down toward the bound.

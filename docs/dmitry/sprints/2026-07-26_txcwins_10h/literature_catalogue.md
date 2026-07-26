@@ -37,18 +37,23 @@ crosscoder advantage, and it is cheaper to run than anything else in this note.
 
 ### The concrete recommendation, if one task has to be picked
 
-Premise-order permutation on R-GSM, or if that model is too weak to show the gap,
-demonstration-order permutation on a classification set. Both are drop-ins for
-`steer_order_modal.py` with one segment per premise or per demonstration.
+**Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =
+number of shots, a drop-in for `steer_order_modal.py`.
+
+It wins on the one property that matters most: **permuting demonstrations is verbatim**, so the
+token multiset is *exactly* matched with no editing, unlike R-GSM (see instance D). It also
+works at 1.5B, where few-shot classification is well within range but GSM8K-style reasoning is
+not, and the effect is documented across model sizes up to the largest available.
 
 Ordered so that each step kills the task cheaply if it is going to die:
 
 1. **Behavioural gap check, ~20 minutes, forward passes only.** Does the chosen model's accuracy
-   actually move when premises are permuted? No gap, no task. Do this before any training. If
-   Qwen2.5-1.5B-Instruct is too weak on GSM8K for the gap to be measurable, fall back to
-   demonstration order, where the effect is documented across model sizes.
-2. **Build the matched pairs.** Same premises, forward order versus permuted. The multiset match
-   is exact and free.
+   actually move across demonstration permutations? Take one task, sample ~24 orderings of the
+   same `k` demonstrations, and look at the spread. No spread, no task. Do this before any
+   training.
+2. **Build the matched pairs.** The *same* demonstrations in two orders — ideally the
+   best-scoring and worst-scoring permutations found in step 1, which maximises the behavioural
+   gap the steering has to close. The multiset match is exact and free.
 3. **Train the ladder at matched realised coefficients per segment** — BatchTopK SAE → PSAE →
    T-SAE → TXC. Log realised L0 for every arm (carried-over debt 3; the failure is silent).
 4. **Read and steer separately.** Expect reading to favour the SAE again — that is now the
@@ -59,9 +64,14 @@ Ordered so that each step kills the task cheaply if it is going to die:
    row-permuted profile, and the supervised difference-of-means ceiling. These already exist in
    `steer_order_modal.py` and should be carried over unchanged.
 
-The one-line version of the result if it works: *a temporal crosscoder can remove a model's
-sensitivity to premise order where a single steering direction provably cannot, because the two
-orderings are the same multiset.*
+The one-line version of the result if it works: *a temporal crosscoder can convert a model's
+worst demonstration ordering into its best, where a single steering direction provably cannot,
+because the two orderings are the same multiset.*
+
+That framing has a useful property: the **supervised ceiling is known and free**. The
+best-ordering accuracy is measured in step 1, so unlike the original order task there is a
+natural, interpretable upper bound on what any intervention could achieve, and the result can be
+reported as a fraction of a real gap closed rather than as an uncalibrated Δmargin.
 
 ### The selection criterion, restated from what actually won
 
@@ -356,21 +366,37 @@ behaves differently. This is last sprint's task structure occurring naturally.
 | --- | --- |
 | Liu, Lin, Hewitt, Paranjape, Bevilacqua, Petroni, Liang, *Lost in the Middle: How Language Models Use Long Contexts*, TACL 2024 ([arXiv:2307.03172](https://arxiv.org/abs/2307.03172)) — verified | "performance is often highest when relevant information occurs at the beginning or end of the input context, and significantly degrades when models must access relevant information in the middle" |
 
-**Instance D — premise order in reasoning. Probably the best instance of the four**, because the
-failure is in *reasoning* rather than in a label prior, and because no localised mechanistic
-fix has been published for it.
+**Instance D — premise order in reasoning. Excellent motivation, but do not use the released
+dataset as the P1 task** (see the correction below).
 
 | paper | what it gives us |
 | --- | --- |
-| Chen, Chi, Wang, Zhou, *Premise Order Matters in Reasoning with Large Language Models*, ICML 2024 ([arXiv:2402.08939](https://arxiv.org/abs/2402.08939)) — verified | "permuting the premise order can cause a performance drop of over 30%"; performance is best when premise order matches the order of the ground-truth proof steps; ships **R-GSM**, a public GSM8K-derived benchmark built precisely from premise reorderings |
+| Chen, Chi, Wang, Zhou, *Premise Order Matters in Reasoning with Large Language Models*, ICML 2024 ([arXiv:2402.08939](https://arxiv.org/abs/2402.08939)) — verified, full text read | the effect and its shape: performance is best when premise order matches the order of the ground-truth proof steps; ships **R-GSM**, 220 GSM8K-derived problem pairs |
 
-R-GSM is the single most convenient artefact in this catalogue: a public dataset of
-multiset-matched permutation pairs, with a large measured behavioural gap, and one premise per
-segment maps straight onto the harness's `k_seg`.
+**Correction, from reading the construction section.** R-GSM does **not** preserve the token
+multiset. The procedure keeps the last sentence fixed and rewrites the description with a
+different ordering of the others, and explicitly states that "minor editing on words is allowed
+to ensure the grammatical correctness of the problem description". Edited words break the exact
+multiset match, so a permutation-symmetric readout is *not* at chance by construction and P1
+does not hold for R-GSM as released.
 
-**Model organism.** None needed for any instance. Qwen2.5-1.5B-Instruct — the harness default —
-plausibly exhibits all four, though instance D may need a larger model to have enough baseline
-reasoning accuracy for the gap to be measurable. Check before committing.
+Two further limits worth knowing. The dataset is **220 pairs**, over 60% of them exactly five
+sentences. And it is calibrated to frontier models: the evaluated set is GPT-4-turbo, PaLM 2-L,
+Gemini Pro and GPT-3.5-turbo, with drops of 94.1→85.0, 86.4→79.5, 80.5→69.1 and 67.3→51.8
+respectively — i.e. **6.9 to 15.5 points**, not the "over 30%" figure from the abstract, which
+refers to their broader logical-reasoning setting (the comparable large number here is a 35%
+drop for GPT-3.5-turbo when restricted to problems it originally solved correctly). A 1.5B
+model's GSM8K baseline is far below GPT-3.5-turbo's, so the gap may not be measurable at all at
+the harness's default scale.
+
+**What to do instead.** Keep instance D as *motivation* — it is the published evidence that
+premise order matters for real reasoning — and build the actual task with a templated
+generator that permutes **verbatim, self-contained** premises (no cross-sentence pronouns, so
+no editing is ever needed). That restores exact P1, gives unlimited data, and lets difficulty
+be tuned to a 1.5B model. It is the same kind of corpus builder as the existing CALM/TENSE one.
+
+**Model organism.** None needed for any instance. For instance A, Qwen2.5-1.5B-Instruct — the
+harness default — is adequate: few-shot classification is well within its range.
 
 **Temporal signature.** The factor is position-of-content. Nothing about a demonstration or an
 option changes between conditions; only where it sits.
@@ -829,3 +855,10 @@ Times are wall-clock against the sprint window opening at 2026-07-25 22:33 PDT.
   blocks with no label token to carry a prior. Softened the EM counter-evidence: 2506.11618
   extracts a *transferable* misalignment direction from a 9-adapter organism (six general, two
   domain-specific), which is not the single-unified-direction claim I had written.
+- **Pass 9** (23:12 PDT) — read the R-GSM construction section and **retracted instance D as the
+  recommended task**: R-GSM permits "minor editing on words … to ensure grammatical
+  correctness", so it is not multiset-matched and P1 fails for it; it is also only 220 pairs and
+  calibrated to frontier models (drops of 6.9–15.5 points on GPT-4-turbo through GPT-3.5-turbo,
+  not the "over 30%" of the abstract, which refers to their broader logical-reasoning setting).
+  Recommendation moved to **instance A, demonstration order**, where permutation is verbatim and
+  the multiset match is exact. Added the free supervised ceiling that instance A provides.
