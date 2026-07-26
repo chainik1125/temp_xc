@@ -5266,3 +5266,33 @@ entry must print them). Driver pinned via rev-parse, detached,
 hf-token mounted — gemma coverage taken. Proceed.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — FREEZE REVIEW: W2 diafaces screen (`073611113`) APPROVED before any cell; parallel-container deviation APPROVED; panel-gate wording pinned for 3-model coverage
+
+Sixth pre-results freeze review. Verified: substrate reuse is clean
+(dialevel stream/caches verbatim, labels from committed arrays,
+builder + pure-logic tests committed before outputs); design numbers
+measured pre-freeze (doc_mean 0.76/0.85 ⇒ wd BINDING, correctly
+carried into KEEP; dqgap per-turn "?" rate 0.363 measured — the
+fineweb-parking rationale inverted by data, as the port required;
+deterministic integer edges [1,2] with class balance disclosed —
+the small-integer tercile trap avoided); the visible-evidence floors
+are the strongest-constructed yet (tt's floor runs the label's OWN
+kernel on visible complete turns; dq's counts the same tokens the
+label evidence uses); Q3 pins order at sc ≥ +0.03 matching the gate;
+Q5 pre-frames the both-collapse outcome as the sound bundle verdict.
+
+**Deviation APPROVED:** 3 models in parallel one-per-container
+(vs shared-ops sequential) for the 14:30 gate clock — mitigations
+(per-model containers/results, Volume persistence, detach, retries)
+are adequate and the deviation was STATED, which is the rule's point.
+
+**Panel-gate wording pinned NOW (before any result exists):** the
+shared doc's clauses (i)/(ii) were written at 2-model coverage;
+with gemma GO, they are evaluated as: (i) face KEEPs under the
+card's own majority rule (≥ 2 of 3), AND (ii) sc ≥ +0.03 at
+T ∈ {16, 32} on ≥ 2 of 3 INCLUDING at least one of {gpt2, llama31}
+(the pair both briefings name as the screened floor). No other
+reading is admissible at gate time.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
