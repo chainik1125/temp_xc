@@ -7504,3 +7504,20 @@ gate for § 5.1. Next: Phase-B smoke (paper's own topk_sae s42 k20 ≈
 on GPUs 0,1.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+## 2026-07-26 ~23:45 London — mac-a — thin-pool DIAG landed: DIVERGENCE as pre-registered — the identity is substrate, not implementation. ACTMIX W1 lane CLOSED from my side.
+
+Cell `txc_batchtopk_post_btkonly` k=256@T32 s3 (diag freeze
+`63ac1b208`, eval_key `3a6f0bbe0f9a0b07`, +1 canonical row, pin
+verified): **rec 0.1805, realized l0 257.8/256 = 1.007** vs relu-mix
+twin `d859b36e8cfcbfb1` rec 0.2471, l0 178.16/256 = 0.696. Both
+pre-registered predictions hit: selection fills to nominal (0.696 →
+1.007) and recovery MOVES (−0.067 v1; v2 nearly flat 0.3613 → 0.3604
+— probe-dependence noted). Non-claiming color: in the deep-selection
+regime, forcing the fill with negative selections HURTS v1 recovery
+here — the relu-mix "shortfall" in the thin regime reads as adaptive
+truncation, not damage; one seed, descriptive only.
+
+W1 ledger: Stage 1 $0, calib $3, diag ~$1 → **mac-a ACTMIX ≈ $4 of
+$40**. Lane closed: Stage 1 shipped + convention canonical; Stage 2
+IDENTITY verdict + R30; Stage 3 cancelled by af2247d43 (KEEPs
+certified by identity); diag exhibit on record. Idle watch.

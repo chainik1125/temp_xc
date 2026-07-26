@@ -1,11 +1,17 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~23:05 London — ACTMIX W1: Stages 1+2 DELIVERED; Stage 3
-CANCELLED by ruling af2247d43 (KEEPs certified composition-robust BY
-IDENTITY). One optional rider in progress: thin-pool diagnostic cell
-(≤$2, my discretion per the ruling). This lane SUPERSEDES mac-local's
+**2026-07-26 ~23:50 London — ACTMIX W1 LANE CLOSED from my side: all
+deliverables landed and pushed. Stage 1 shipped (btk-only canonical);
+Stage 2 IDENTITY verdict + R30 (ALL PASS; preliminary ratified
+af2247d43, final rode the 20/20 push); Stage 3 cancelled by ruling
+(KEEPs certified composition-robust BY IDENTITY); thin-pool DIAG
+landed with DIVERGENCE as pre-registered (l0 0.696→1.007, rec
+0.2471→0.1805 — identity is substrate, not implementation). mac-a
+ACTMIX spend ≈ $4 of $40. Idle watch — poll origin per listening
+topology (my binding gates: LOG rulings + actmix-* amendments); act
+only on things addressed to mac-a. This lane SUPERSEDED mac-local's
 ~20:40 recalled subagent dispatch (nothing was frozen/launched/pushed
-by it). W1 spend ≈ $3 of $40 cap.**
+by it).**
 
 ## Delivered (ACTMIX W1)
 
@@ -31,14 +37,10 @@ by it). W1 spend ≈ $3 of $40 cap.**
 
 ## In flight / next
 
-- **Thin-pool diagnostic** (optional per ruling, TAKEN): 1 cell
-  txc_batchtopk_post_btkonly @ k=256/T32 seed 3 (8·T secondary
-  config — realization 0.647 relu-mix = the deep-selection regime)
-  vs existing relu-mix secondary row. Expect DIVERGENCE (the
-  implementation's positive receipt + writeup color). Mini-runner +
-  own pin + ledger line; non-claiming.
-- Then: idle watch (origin poll per listening topology; my binding
-  gates = LOG rulings + actmix-* amendments).
+- Nothing in flight. DIAG landed (freeze 63ac1b208, eval_key
+  3a6f0bbe0f9a0b07, +1 canonical row): rec 0.1805 / l0 257.8 vs twin
+  0.2471 / 178.16 — divergence as pre-registered; close-out LOG note
+  ~23:45. Idle watch only.
 
 ## Assets / recovery
 
