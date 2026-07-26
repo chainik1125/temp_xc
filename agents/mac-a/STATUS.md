@@ -1,38 +1,17 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~13:55 London — day-2 W2: screen DELIVERED (both faces
-KEEP 3/3, T32 order carriage); after the gate race (fired tt
-`dce8d085d` → amended dq `187c51022` → RESOLVED `6e2f18e4e`: tt
-governs + PANEL 2 dq authorized, my cap → $200) — **TWO panels
-running detached**: tt/gpt2 (freeze `7ba2e10fd`, app relaunched
-13:40 after my amendment-triggered stop, log
-`<scratchpad>/tt_panel_relaunch.log`) and dq/llama31 (freeze
-`cfa341c34`, launched ~13:47 — 2 min over the 13:45 line, disclose
-in verdict; log `<scratchpad>/dq_panel2.log`). mac-b = panel-2
-merge/receipts support. Verdict engine ready: `score_panel.py`
-(P1–P6), `merge_panel_payload.py tt|dq` (mac-b filled dq SHA),
-evidence lines committed (tt drawn-only; dq P6 KILL bars |r|
-0.106..0.499).**
-
-## Live state (if resuming mid-anything, start here)
-
-- **Panel in flight**: app `mac-a-diafaces-panel`, freeze
-  `7ba2e10fd`, DS `dial_real_ttrend_gpt2_l7` (gpt2/hs7), 102 cells =
-  λ̂ shape + T32 column. 1× H100 `--block main` + 3× L4 high-CPU
-  `--block tsae --only-seed {1,2,42}`. Launched ~13:17 detached
-  (client under caffeinate; log
-  `<scratchpad>/diafaces_panel.log`). Payloads persist to Volume
-  `temp-xc-replag-caches:/workspace/diafaces_panel/payload_*.json`
-  even if client dies. **Repatriation deadline 16:15 London
-  (mac-local binding term); nothing new after 15:30; all pushed by
-  16:30; check-in 18:00.**
-- On completion: `results/panel_payloads/payload_*.json` →
-  `.venv/bin/python -m experiments.explorations.task_hunt.diafaces.merge_panel_payload`
-  (freeze-stamp + clean + dedup asserts) → score P1–P5 per
-  `PANEL_CARD.md` § 5 (KEEP iff P1∧P5) → LOG verdict PENDING TEAM
-  REVIEW + receipts proposal + ledger actuals.
-- Modal client: scratchpad `modal-venv/bin/modal` (repo .venv has no
-  modal; the overnight venv survives in this session's scratchpad).
+**2026-07-26 ~15:05 local (≈13:55 define-clock; skew note bc5c86330)
+— day-2 W2: screens DELIVERED; panels hit a v2-columns defect
+(my λ̂-clone enumeration predates PROBE_V2_SPEC — LOG defect entry),
+BOTH panels re-running at freeze `db677a4b8` with the oprate V2
+block: apps from `scripts/modal_diafaces_panels_v2.py` (--panel dq
+and --panel tt), logs `<scratchpad>/{dq_v2,tt_v2}.log`, payloads
+persist to Volume `/workspace/diafaces_panels_v2/<panel>/`.
+Repatriation deadline 16:15 define-clock (≈17:25 local). On landing:
+`merge_panel_payload.py dq|tt` (freezes updated) → `score_panel.py`
+P1–P6 → LOG verdicts. tt FIRST-RUN rows (v1-only, non-quotable) are
+in the leaderboard, disclosed; dq first attempt stopped mid-flight,
+~$16 defect cost total in ledger. mac-b = merge/variance support.**
 
 ## Delivered today (all pushed)
 
