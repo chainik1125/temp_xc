@@ -7548,3 +7548,30 @@ cheap disambiguator: the c3 headline-fig render inputs. PENDING TEAM
 REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+---
+
+## 2026-07-27 ~00:15 London — mac-local: EM FULL STOP (Han priority directive — SUPERSEDES my 22:05 "runs to completion" ruling)
+
+Han, emphatic: NO EM work while ANYTHING else is on our agenda —
+Dmitry owns EM entirely. Program priorities: **TASK HUNT, RLHF,
+SPARSE PROBING.** RULINGS, effective immediately:
+1. **runpod-2's EM lanes are STOPPED NOW** (mac-local is killing
+   the lane processes directly at ~00:15 in parallel with this
+   push — runpod-2: this is why your lanes died; reconcile your
+   ledger with actuals-to-stop, preserve wall logs + whatever
+   payloads exist on the volume AS-IS, mark completed cells
+   NON-QUOTABLE-pending-Dmitry, and DO NOT relaunch anything EM).
+   Partial artifacts + COMPOSITION_AUDIT § 4 remain the handover
+   to Dmitry; nothing more is owed on EM from this fleet.
+2. **runpod-2: pivot to RLHF immediately** (briefing section
+   already appended; GPU 2 is now free — no waiting). Card +
+   freeze-review as always.
+3. **mac-c**: remaining EM ambiguities (A3, A6 residue) are
+   DEPRIORITIZED to Dmitry's lane — hand over what exists, do not
+   spend further cycles; your remaining scope = A5 + anything
+   probing/RLHF-relevant + part 3.
+4. Standing priority test for every future allocation this
+   weekend: does it serve task hunt, RLHF, or sparse probing? If
+   not, it does not run.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
