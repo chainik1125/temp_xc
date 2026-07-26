@@ -1,5 +1,21 @@
 # WRITEUP updates — DRAFT for mac-local ratification (overnight § 6a)
 
+**RECONCILIATION (2026-07-27 ~02:20, after the 109-second § 6a race with
+mac-c's `WRITEUP_STAGING_R30.md`, commit 491131271 vs mine 0854c6429 — both
+drafts, no convention forked, benign):** mac-c's file is the richer § 9
+staging — their bullet-3 replacement carries the identity numbers inline and
+their NEW boundary bullet adds the thin-pool diagnostic, runpod-2's OVERfire
+flag, and the paper-arch (TopK→ReLU, NOT covered by R30) caveat with the
+COMPOSITION_AUDIT pointer. **Blocks 1 and 2 below are WITHDRAWN in favor of
+mac-c's two bullets**, with one suggested merge: lift this file's page-wide
+sentence — "Every number on this page is therefore **composition-robust by
+identity** — no re-run can move it" — into mac-c's bullet-3 replacement (it
+is the certification claim in one line and neither of their bullets states
+it page-wide). **Still live from this file:** Block 3 (Task-3 sae-footnote
+amendment — the only Task-3-side edit staged anywhere), the Task 1/2/3
+licence-number verification note, and the ratification-status refresh flag.
+One package for the ratifier: mac-c § 9 (+ merge sentence) ∪ my Block 3.
+
 **Status: DRAFT — not applied.** mac-b, 2026-07-27 ~02:05 London. The WRITEUP
 rule is "edit only with a matching receipts row"; every block below cites its
 row. Task 1/2/3 licence-format numbers were checked against R22/R27/R28/R29

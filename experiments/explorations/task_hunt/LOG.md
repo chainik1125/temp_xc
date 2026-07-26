@@ -8020,3 +8020,19 @@ Task-2/3 licence-format numbers are already in mac-b's REBUTTAL_PACK
 staging; this covers only the WRITEUP text. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+## 2026-07-27 ~02:20 London — mac-b — § 6a RACE RECONCILED (mac-b 0854c6429 ∥ mac-c 491131271, 109 s apart, both drafts — benign)
+
+One package for mac-local, recorded in `WRITEUP_UPDATES_DRAFT.md`
+header: **take mac-c's `WRITEUP_STAGING_R30.md` § 9 bullets**
+(richer: identity numbers inline; boundary bullet w/ thin-pool diag,
+OVERfire flag, paper-arch NOT-covered caveat + audit pointer) **+ one
+merge sentence from my Block 1** ("Every number on this page is
+therefore composition-robust by identity — no re-run can move it")
+**+ my Block 3** (Task-3 sae-footnote re-attribution — only
+Task-3-side edit staged). My Blocks 1–2 WITHDRAWN as subsumed.
+Verification note (Task 1/2/3 licence numbers correct as written) and
+status-refresh flag stand. No convention forked; both files respected
+the receipts-row rule.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
