@@ -146,4 +146,9 @@ DESIGNS = {
     "litm_4v9": lambda k: make_litm(k, gold_a=4, gold_b=9),
     "litm_0v9_tr": lambda k: make_litm(k, gold_a=0, gold_b=9, pool="train"),
     "litm_0v9_ev": lambda k: make_litm(k, gold_a=0, gold_b=9, pool="eval"),
+    # 0v4 is the arm cell: best r1 (0.489) and best sigma2^2/sigma1^2 (0.741), with a
+    # baseline indistinguishable from 0v9. 4v9 is NOT registered for arms -- its baseline
+    # is z = 0.1, no behaviour, and its c = 0.045 means nothing.
+    "litm_0v4_tr": lambda k: make_litm(k, gold_a=0, gold_b=4, pool="train"),
+    "litm_0v4_ev": lambda k: make_litm(k, gold_a=0, gold_b=4, pool="eval"),
 }
