@@ -59,11 +59,16 @@ claim that matters is that **the effect survives at all**, on disjoint content, 
 That closes the strongest objection a reader could raise.
 
 **What it never beats is the best rank-1 write taken from the metric's own gradient** — z = −32 to
-−41 on instruction position, −67 to −73 on evidence, −50 to −59 on demonstration order. So the
-claim is **discovery, not expressiveness**: the crosscoder finds, unsupervised and from
-reconstruction alone, a write a per-token dictionary could have executed if handed the schedule.
-That is worth having because the schedule is what a practitioner lacks — and a published method
-now supplies one (Heyman & Vandeputte, arXiv:2605.03907), which the crosscoder loses to.
+−41 on instruction position, −67 to −73 on evidence, −50 to −59 on demonstration order.
+
+So the claim is **discovery, not expressiveness** — and both halves are now measured separately.
+Against arms a practitioner can build from a learned dictionary it wins convincingly and under a
+steering-based selector (z = +15 to +18, three inits, held-out). Against the **best constant write
+that exists** it is behind on **six of seven tasks**, including two ladders built to make constant
+writes bad. **The temporal form is not where the margin comes from.** What the crosscoder supplies
+is a write found unsupervised from reconstruction alone that a per-token dictionary could have
+executed if handed the schedule — and a published method now supplies exactly that schedule
+(Heyman & Vandeputte, arXiv:2605.03907), which the crosscoder loses to.
 
 ⚠ **Two rank-1 arms, and only one is a ceiling.** On held-out content the crosscoder **loses to
 `rank1_best` in 7 of 9 inits** and loses all three at matched dose on instruction position (3.91 /
