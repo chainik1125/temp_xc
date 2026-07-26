@@ -1,0 +1,213 @@
+{
+  "primary": {
+    "S1": {
+      "batchtopk_sae@T16": {
+        "margins": [
+          0.0388,
+          0.1287,
+          0.0856
+        ],
+        "mean": 0.0844,
+        "ci95_t": [
+          -0.0274,
+          0.1961
+        ],
+        "pass": false
+      },
+      "batchtopk_sae@T32": {
+        "margins": [
+          0.2414,
+          0.2353,
+          0.2602
+        ],
+        "mean": 0.2457,
+        "ci95_t": [
+          0.2134,
+          0.278
+        ],
+        "pass": true
+      },
+      "tsae@T16": {
+        "margins": [
+          0.0523,
+          0.1213,
+          0.0867
+        ],
+        "mean": 0.0868,
+        "ci95_t": [
+          0.001,
+          0.1725
+        ],
+        "pass": true
+      },
+      "tsae@T32": {
+        "margins": [
+          0.2549,
+          0.2279,
+          0.2614
+        ],
+        "mean": 0.2481,
+        "ci95_t": [
+          0.2039,
+          0.2922
+        ],
+        "pass": true
+      },
+      "pass": false
+    },
+    "S2": {
+      "T16": {
+        "trained": 0.1165,
+        "untrained": 0.017,
+        "ratio": 0.1456,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.2778,
+        "untrained": -0.0017,
+        "ratio": -0.006,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S3": {
+      "slope_obs": 0.1033,
+      "p_exact": 0.00926,
+      "n_perms": 216
+    },
+    "S4": {
+      "T16": {
+        "trained": 0.1165,
+        "evidence_r": 0.0148,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.2778,
+        "evidence_r": 0.1142,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S5": {
+      "T16": {
+        "v2_grouped": 0.1732,
+        "pass": true
+      },
+      "T32": {
+        "v2_grouped": 0.2598,
+        "pass": true
+      },
+      "pass": true
+    },
+    "l0_out_of_band": [],
+    "KEEP": false
+  },
+  "secondary": {
+    "S1": {
+      "batchtopk_sae@T16": {
+        "margins": [
+          0.0935,
+          0.0738,
+          0.115
+        ],
+        "mean": 0.0941,
+        "ci95_t": [
+          0.043,
+          0.1452
+        ],
+        "pass": true
+      },
+      "batchtopk_sae@T32": {
+        "margins": [
+          0.2112,
+          0.1944,
+          0.0255
+        ],
+        "mean": 0.1437,
+        "ci95_t": [
+          -0.1115,
+          0.3988
+        ],
+        "pass": false
+      },
+      "tsae@T16": {
+        "margins": [
+          0.107,
+          0.0664,
+          0.1161
+        ],
+        "mean": 0.0965,
+        "ci95_t": [
+          0.0308,
+          0.1622
+        ],
+        "pass": true
+      },
+      "tsae@T32": {
+        "margins": [
+          0.2247,
+          0.1869,
+          0.0266
+        ],
+        "mean": 0.1461,
+        "ci95_t": [
+          -0.1152,
+          0.4073
+        ],
+        "pass": false
+      },
+      "pass": false
+    },
+    "S2": {
+      "T16": {
+        "trained": 0.1263,
+        "untrained": 0.0391,
+        "ratio": 0.3096,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.1758,
+        "untrained": 0.1301,
+        "ratio": 0.74,
+        "pass": false
+      },
+      "pass": false
+    },
+    "S3": {
+      "slope_obs": 0.0343,
+      "p_exact": 0.10185,
+      "n_perms": 216
+    },
+    "S4": {
+      "T16": {
+        "trained": 0.1263,
+        "evidence_r": 0.0148,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.1758,
+        "evidence_r": 0.1142,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S5": {
+      "T16": {
+        "v2_grouped": 0.2953,
+        "pass": true
+      },
+      "T32": {
+        "v2_grouped": 0.356,
+        "pass": true
+      },
+      "pass": true
+    },
+    "l0_out_of_band": [],
+    "KEEP": false
+  },
+  "verdict": {
+    "claiming_arm": "primary",
+    "KEEP": false,
+    "note": "secondary arm reported at full prominence, gates nothing (SALVAGE_CARD \u00a7 2); PENDING TEAM REVIEW"
+  }
+}

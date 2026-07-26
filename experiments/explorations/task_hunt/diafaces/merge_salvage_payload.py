@@ -55,7 +55,8 @@ def main():
             assert r["arch"] in ARCHS, r["arch"]
             assert r["seed"] in SEEDS, r["seed"]
             assert r["training_cfg"]["buffer_tokens"] == 524288
-            k, T = r["training_cfg"]["k_pos"], r["training_cfg"]["T"]
+            hp = r["training_cfg"]["arch_hparams_override"]
+            k, T = hp["k_pos"], hp["T"]
             if r["arch"] == "txc_batchtopk_post":
                 assert k in (8, 8 * T), (k, T)
             else:
