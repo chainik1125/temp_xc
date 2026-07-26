@@ -631,29 +631,68 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             f"(txc_slab {max(out['arms']['txc_slab']['delta_margin']):+.2f})")
 
     # ---------------- verdict ----------------
+    # TWO CONVENTIONS, BOTH STORED, BOTH NAMED FOR WHAT THEY ARE.
+    #
+    # A field called plain `z` is the same nominal-versus-effective trap this project keeps
+    # hitting: it was peak-dose while the primary reporting convention became matched-dose,
+    # and two readers reconciled different numbers from the same file before anyone noticed
+    # the name did not say which. So neither is called `z`.
+    #
+    #   peak    -- every arm at its own best dose. Generous to every arm equally, but each
+    #              arm sits at ITS OWN saturation point, which is outside the linear regime
+    #              the rank framework describes, and a maximum taken over the grid inflates
+    #              flat arms (simulated at 0.19-0.26, i.e. 0.3-0.4 SEM).
+    #   matched -- every arm at the SMALLEST dose magnitude where the crosscoder is
+    #              significant, sign still free per arm. Primary: it is in the linear regime
+    #              and the selection is over two options rather than the whole grid.
     def at_best(nm):
         v = out["arms"][nm]
         j = int(np.argmax(v["delta_margin"]))
         return v["delta_margin"][j], v["sem"][j]
 
+    def at_mag(nm, mag):
+        v = out["arms"][nm]
+        best = None
+        for a_, d_, e_ in zip(v["alphas"], v["delta_margin"], v["sem"]):
+            if abs(abs(a_) - mag) < 1e-9 and (best is None or d_ > best[0]):
+                best = (d_, e_)
+        return best
+
+    mags = sorted({abs(a_) for a_ in out["arms"]["txc_slab"]["alphas"]}) \
+        if "txc_slab" in out["arms"] else []
+    matched_mag = next(
+        (m for m in mags
+         if (g := at_mag("txc_slab", m)) and g[0] > 2.0 * g[1]), None)
+
     log("\n===== verdict =====")
     for nm in sorted(out["arms"], key=lambda n: -max(out["arms"][n]["delta_margin"])):
         log(f"  {nm:<18} best delta-margin {max(out['arms'][nm]['delta_margin']):+.2f}")
-    zs = {}
+    others = ("sae_broadcast", "tsae_broadcast", "txc_flat",
+              "txc_profile_random", "random_slab", "random_broadcast",
+              "sae_schedule", "rank1_best", "grad_slab", "grad_rank1",
+              "sae_schedule_grad")
+    z_peak, z_matched = {}, {}
     if "txc_slab" in out["arms"]:
         ts2, te2 = at_best("txc_slab")
-        for other in ("sae_broadcast", "tsae_broadcast", "txc_flat",
-                      "txc_profile_random", "random_slab", "random_broadcast",
-                      "sae_schedule", "rank1_best", "grad_slab", "grad_rank1",
-                      "sae_schedule_grad"):
-            if other in out["arms"]:
-                os_, oe_ = at_best(other)
-                zs[f"txc_slab_vs_{other}"] = float(
-                    (ts2 - os_) / np.sqrt(te2 ** 2 + oe_ ** 2))
-                log(f"  txc_slab vs {other:<18} {ts2:+.2f} vs {os_:+.2f}   "
-                    f"z = {zs[f'txc_slab_vs_{other}']:.1f}")
-    out["z"] = zs
-    beats = [zs.get("txc_slab_vs_sae_broadcast", -9),
+        tm = at_mag("txc_slab", matched_mag) if matched_mag else None
+        for other in others:
+            if other not in out["arms"]:
+                continue
+            os_, oe_ = at_best(other)
+            z_peak[f"txc_slab_vs_{other}"] = float(
+                (ts2 - os_) / np.sqrt(te2 ** 2 + oe_ ** 2))
+            if tm and (om := at_mag(other, matched_mag)):
+                z_matched[f"txc_slab_vs_{other}"] = float(
+                    (tm[0] - om[0]) / np.sqrt(tm[1] ** 2 + om[1] ** 2))
+            log(f"  txc_slab vs {other:<18} peak {ts2:+.2f} vs {os_:+.2f} "
+                f"z={z_peak[f'txc_slab_vs_{other}']:+.1f}" +
+                (f"   matched(|a|={matched_mag:g}) "
+                 f"z={z_matched[f'txc_slab_vs_{other}']:+.1f}"
+                 if f"txc_slab_vs_{other}" in z_matched else ""))
+    out["z_peak_dose"] = z_peak
+    out["z_matched_dose"] = z_matched
+    out["matched_dose_magnitude"] = matched_mag
+    beats = [z_peak.get("txc_slab_vs_sae_broadcast", -9),
              zs.get("txc_slab_vs_random_slab", -9),
              zs.get("txc_slab_vs_txc_flat", -9)]
     out["win"] = bool(out["arms"].get("txc_slab") and
