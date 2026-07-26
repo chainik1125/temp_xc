@@ -189,14 +189,21 @@ mac-b's ACTMIX_FORENSICS and are NOT re-derived here.
 9. **Pre-freeze smoke rows** ran allow-dirty and are marked
    (`smoke: true` in eval_cfg → distinct eval_keys; cannot collide
    with grid cells). Grid cells run only from the pinned commit.
-10. **Launcher defect, disclosed:** the frozen launcher's untrained
-    pass passed `--txc-archs` twice (argparse keeps the last) so the
-    txc-PRE untrained twins were dropped from the initial queue.
-    Trained passes unaffected (separate invocations). Fixed in the
-    follow-up commit; the missing pre-untrained cells were launched
-    as a patch pass from the FIXED sha (eval/train configs identical
-    to the card; only the launcher changed — cells' code_version
-    records the patch sha honestly).
+10. **Launcher defects, disclosed (both caught within minutes of
+    launch; eval/train configs never changed):**
+    (a) the untrained pass passed `--txc-archs` twice (argparse keeps
+    the last) so the txc-PRE untrained twins were dropped from the
+    initial queue — trained passes unaffected (separate invocations);
+    (b) the launcher omitted the pool-row dirty-stamp convention
+    (`TEMP_BENCH_ALLOW_DIRTY=1` after the PIN assert — the task_hunt
+    grid precedent: leaderboard appends dirty the tree after cell 1),
+    so both GPU chains refused at their second `run_experiment` call.
+    Both fixed in the follow-up commit; the queue RELAUNCHED at the
+    new PIN with completed evals cache-hitting. Consequence for row
+    stamps: the first two eval rows are clean-stamped at the original
+    freeze sha; all later rows carry the new PIN with
+    dirty-by-convention stamps (diff = leaderboard growth). No code
+    edits happen in this clone while the queue runs.
 
 ## 8. Budget (RUNPOD ledger in briefings/MODAL_SPEND.md)
 

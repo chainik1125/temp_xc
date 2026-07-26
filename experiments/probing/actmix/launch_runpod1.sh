@@ -19,6 +19,15 @@ git merge-base --is-ancestor "$PIN" origin/arxiv \
 source scripts/set_agent_env.sh runpod-1
 mkdir -p /workspace/logs
 
+# Pool-row dirty-stamp convention (task_hunt precedent — see
+# diafaces/merge_panel_payload.py): run_experiment appends to the
+# TRACKED leaderboard.jsonl, so every cell after the first sees a
+# growing `git diff`. Integrity is carried by the PIN assert above
+# (launch-clean at the pinned sha); rows after cell 1 carry
+# dirty=true stamps whose diff is the leaderboard growth itself.
+# NO code edits are permitted in this clone while the queue runs.
+export TEMP_BENCH_ALLOW_DIRTY=1
+
 PY=.venv/bin/python
 COMMON_TOKEN="--token-archs batchtopk_sae_btkonly tsae_btkonly"
 TXC_PRE="--txc-archs txc_batchtopk_pre_btkonly"
