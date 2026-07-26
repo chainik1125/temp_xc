@@ -1,6 +1,6 @@
 # Where a temporal window actually helps: the tasks that passed, and the map of everything else we tried
 
-**Status: living document (maintained; last update 2026-07-26).
+**Status: living document (maintained; last update 2026-07-27).
 Figures: `figs_writeup/`. Every number in this page is backed by a
 row in `RECEIPTS.md` (machine-checked against the artifacts on every
 test run); results newer than 2026-07-26 morning are marked
@@ -336,9 +336,10 @@ per-token SAE 0.228 at matched budget:
   state" claim is licensed at T ≤ 8 only**; at longer windows the
   correct description is an architecture ordering at matched budget,
   nothing more. (Per-token-SAE footnote: its realized sparsity came
-  out low, 4.5/token — a known signature of this model size — which
-  flatters the TXC-vs-SAE margin; that is why we lead with the
-  T-SAE comparison, whose realized budget is clean.)
+  out low, 4.5/token — eval-time threshold pruning, identical under
+  both audited activation compositions (R30), so it upper-bounds
+  any flattering of the TXC-vs-SAE margin; that is why we lead with
+  the T-SAE comparison, whose realized budget is clean.)
 
 ## 6. A fourth thread, run independently: trailing novelty in web text
 
@@ -448,16 +449,37 @@ process fixes.
   never exceeds it. Architecture *orderings* are robust to this;
   absolute *levels* are lower bounds. Both readouts are reported for
   every panel cell.
-- **Every 2026-07-26 result** (Task 2's confirmation; Task 3; the
-  Task-1 margin bound; the novelty cross-ratification) is pending
-  team ratification of its disclosed caveats — and the novelty
-  thread additionally awaits its owner's review. This page marks
-  them accordingly and will be updated.
+- **Ratification status (refreshed 2026-07-27):** every result on
+  this page is orchestrator-reviewed with its quote licence on the
+  record (receipts R1–R30, machine-checked); TEAM ratification is
+  the remaining gate before anything enters reviewer-facing text,
+  and the novelty cross-ratification additionally awaits its
+  thread owner's review. This page marks statuses accordingly and
+  will be updated.
 - **Task 2's margins over the per-token SAE** carry a
   realized-sparsity note: that baseline landed 4.1–4.7 active
-  features per token against a nominal 8 (an architecture property
-  at this width; a sensitivity check passes). The temporal-SAE
-  comparison is the clean one, and Task 2 passes both.
+  features per token against a nominal 8. **R30 pinned the
+  mechanism: the shortfall is eval-time threshold pruning, not
+  train-time selection zero-picks — and it is bit-identical under
+  both audited activation compositions** (a retrained no-ReLU
+  variant reproduced every shipped arm to |Δ recovery| ≤ 2.2×10⁻⁸
+  with realized-sparsity delta exactly 0.0; 20/20 cells, fresh
+  trains at a frozen pin). Every number on this page is therefore
+  **composition-robust by identity — no re-run can move it.** The
+  shortfall numbers stand as an architecture property; the
+  sensitivity check still passes; the temporal-SAE comparison
+  remains the clean one, and Task 2 passes both.
+- **Where composition DOES matter (boundary + paper caveat).** The
+  identity has a measured boundary: when the positive pool thins
+  (small dictionaries or deep per-window selection), the two
+  compositions genuinely diverge (one diagnostic cell on record:
+  realized sparsity 0.70 → 1.01 of nominal, recovery 0.247 → 0.181)
+  — and no claiming cell on this page sits in that regime.
+  Separately, the PAPER's architecture family applies its ReLU
+  after TopK selection — a different mechanism the identity does
+  NOT cover; the per-task paper compositions are pinned in
+  `COMPOSITION_AUDIT.md`, and the paper-task ablation grids carry
+  those arms.
 - **Task 2's combined six-seed statistics** carry a
   sequential-decision caveat (the extension to six seeds was
   decided after the first three missed one interval). The headline

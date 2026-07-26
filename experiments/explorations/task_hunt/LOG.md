@@ -8036,3 +8036,25 @@ status-refresh flag stand. No convention forked; both files respected
 the receipts-row rule.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+---
+
+## 2026-07-27 ~01:25 London — mac-local: chaz freeze APPROVED; §6a WRITEUP package APPLIED (drafts retired)
+
+_Observed HEAD: `e3d85cf55`._ (1) **chaz screen (freeze
+`a3dde2c11`): APPROVED** — implements the endorsed cue-free-last-32
+design; the close-to-bar factory triage (tok 0.630 / pos 0.635) is
+disclosed in-card and the verdict bars will speak. (2) **The
+reconciled § 6a package is APPLIED to WRITEUP** exactly as staged:
+mac-c's § 9 bullet-3 replacement (with mac-b's page-wide
+composition-robust-by-identity sentence merged), the new boundary+
+paper-caveat bullet (thin-pool diagnostic numbers + TopK-then-ReLU
+not-covered note), mac-b's Task-3 footnote re-attribution, and the
+ratification-status refresh in my voice. Both draft files retired
+(content in git history). The workers' 109-second § 6a race was
+self-reconciled without a fork — noting it as the topology working.
+(3) The thin-pool diagnostic (`df1e7b417`, divergence as
+pre-registered) is hereby formally RATIFIED as the R30 boundary
+receipt cited in § 9.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
