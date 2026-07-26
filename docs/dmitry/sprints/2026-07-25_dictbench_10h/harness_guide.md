@@ -52,10 +52,10 @@ x = gen_fn(batch_size).to(device)   # crosscoder.py:120 and topk_sae.py:89
 passed a scaling factor, a step index, or a device. The `.to(device)` is applied by the
 train loop, so `gen_fn` may return CPU tensors (and the cached pipeline does — see below).
 
-| arch                | `data_format`                   | `gen_fn(B)` must return | dtype   |
-|---------------------|---------------------------------|-------------------------|---------|
-| `TopKSAESpec`       | `"flat"` (`topk_sae.py:74`)     | `(B, d_in)`             | float32 |
-| `CrosscoderSpec(T)` | `"window"` (`crosscoder.py:87`) | `(B, T, d_in)`          | float32 |
+| arch | `data_format` | `gen_fn(B)` must return | dtype |
+| --------------------- | --------------------------------- | ------------------------- | --------- |
+| `TopKSAESpec` | `"flat"` (`topk_sae.py:74`) | `(B, d_in)` | float32 |
+| `CrosscoderSpec(T)` | `"window"` (`crosscoder.py:87`) | `(B, T, d_in)` | float32 |
 
 dtype: nothing casts for you. `TemporalCrosscoder`'s parameters are float32 by default, and
 `torch.einsum` on a bf16 input against fp32 weights raises. Cast the cache to float32 —
@@ -85,13 +85,17 @@ That is the sense in which the two archs "share one cache": the same array, two 
 If you have `cache: torch.Tensor` of shape `(N, S, d)`, float32, on CPU:
 
 ```python
+
 # SAE — one independent token per row.
+
 def gen_flat(B: int) -> torch.Tensor:
     idx = torch.randint(0, N * S, (B,))
     return cache[idx // S, idx % S]                       # (B, d)
 
 # TXC — B windows of T consecutive tokens, each from a uniformly random
+
 # (sequence, start) pair. Simpler and better-mixed than data.py's version.
+
 def gen_window(B: int, T: int = T) -> torch.Tensor:
     seq = torch.randint(0, N, (B,))
     start = torch.randint(0, S - T + 1, (B,))
@@ -117,12 +121,16 @@ sae_spec = TopKSAESpec()                 # no constructor args
 txc_spec = CrosscoderSpec(T=T)           # T is the ONLY constructor arg
 
 # create(d_in, d_sae, k, device) -> nn.Module, already .to(device)
+
 sae = sae_spec.create(d_in=d_model, d_sae=d_sae, k=sae_k, device=device)
 txc = txc_spec.create(d_in=d_model, d_sae=d_sae, k=txc_k_per_position, device=device)
 
 # train(model, gen_fn, total_steps, batch_size, lr, device,
+
 #       log_every=500, grad_clip=1.0,
+
 #       plateau_pct=None, plateau_min_steps=5000) -> dict[str, list[float]]
+
 sae_log = sae_spec.train(sae, gen_flat, total_steps=10_000, batch_size=2048,
                          lr=3e-4, device=device, log_every=500, grad_clip=1.0)
 txc_log = txc_spec.train(txc, gen_window, total_steps=10_000, batch_size=2048,
@@ -243,7 +251,9 @@ a large fixed vector.
 
 ```python
 TopKSAESpec().decoder_directions(model, pos=None)   # topk_sae.py:140-141
+
 # -> model.W_dec.data, shape (d_in, d_sae)
+
 ```
 
 - `pos` is accepted and **ignored** — the SAE has no position axis. `n_decoder_positions` is
@@ -338,13 +348,13 @@ returns `tempxc_k_at(t)` for `tempxc`, which is (`configs.py:67-80`):
 **The returned value is the per-position `k` you pass to `create()`, and the crosscoder
 multiplies it by T.** Verified values:
 
-| T  | A: per-pos k | A: window k | B: per-pos k | B: window k | SAE k |
-|----|--------------|-------------|--------------|-------------|-------|
-| 2  | 100          | 200         | 250          | 500         | 100   |
-| 5  | 100          | **500**     | 100          | **500**     | 100   |
-| 8  | 100          | 800         | 62           | 496         | 100   |
-| 10 | 100          | 1000        | 50           | 500         | 100   |
-| 12 | 100          | 1200        | 41           | 492         | 100   |
+| T | A: per-pos k | A: window k | B: per-pos k | B: window k | SAE k |
+| ---- | -------------- | ------------- | -------------- | ------------- | ------- |
+| 2 | 100 | 200 | 250 | 500 | 100 |
+| 5 | 100 | **500** | 100 | **500** | 100 |
+| 8 | 100 | 800 | 62 | 496 | 100 |
+| 10 | 100 | 1000 | 50 | 500 | 100 |
+| 12 | 100 | 1200 | 41 | 492 | 100 |
 
 Things to get right:
 

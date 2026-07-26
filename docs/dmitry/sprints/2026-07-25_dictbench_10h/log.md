@@ -336,6 +336,7 @@ so ReLU zeroes much of what TopK selected: TXC nominal window k=1200 → realise
 SAE nominal 100 → realised ≈ 98. Under Protocol A the TXC is therefore *sparser per slot*
 (≈6.8) than the SAE is per token (≈98), which inverts the protocol's stated intent.
 Realised L0 will be reported instead of nominal k.
+
 ### 16:48 — THE DECISIVE CONTROL: shuffling the TXC's temporal structure does not hurt it
 
 | m | txc | txc **shuffled in time** | txc random slabs |
@@ -392,7 +393,6 @@ scalar per latent while letting each latent write twelve slots.
 runs 0.08 → 0.17 → 0.33 → 0.67 → 1.00 as m goes 1 → 16, tracking fidelity 0.160 → 0.556
 almost exactly. C1 was right, and it is now measured rather than argued.
 
-
 ## What actually sets the crosscoder's capacity — and it is not k
 
 The frontier sweep answered this before `mechanism_modal.py` finished, because it logs the
@@ -400,7 +400,7 @@ two quantities the answer needs: how many latents have a **positive pre-activati
 given input, and how many coefficients the model **realises** after TopK and ReLU compose.
 
 | arm | nominal k | positive pre-acts | realised coeff/segment | ReLU-kill | FVU |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | SAE | 1 | 2022 | 1.00 | 0.000 | 0.600 |
 | SAE | 8 | 70 | 8.00 | 0.000 | 0.081 |
 | SAE | 128 | 156 | 126.52 | 0.012 | 0.029 |
@@ -461,7 +461,7 @@ absence of temporal structure invalidated the earlier reading, and a run-length 
 which the tense/calm state persists, so a genuine window-level factor exists.
 
 | corpus | arm | coeff/seg | FVU | segment-AUC | window-AUC |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | i.i.d. | SAE k=100 | 99.1 | 0.030 | 0.778 | **0.500** |
 | i.i.d. | TXC kper=4 | 2.68 | 0.743 | 0.557 | **0.500** |
 | i.i.d. | TXC kper=41 | 1.51 | 0.850 | 0.566 | **0.500** |
@@ -500,7 +500,7 @@ negative, magnitude rising in k), P2 (SAE b_enc near zero by comparison), P3 (re
 L0 ≈ #{pre > 0} once that count falls below k), P4 (a crossover in k).
 
 | kper | nominal k | b_enc mean ± sd | #{pre > 0} | realised L0 | min(k, #pos) | FVU |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | 1 | 12 | −0.021 ± 0.010 | 53.3 | 12.0 | 12.0 | 0.776 |
 | 2 | 24 | −0.023 ± 0.011 | 35.7 | 23.7 | 24.0 | 0.781 |
 | 4 | 48 | −0.022 ± 0.010 | 22.2 | 20.4 | 22.2 | 0.865 |
@@ -525,7 +525,7 @@ pushes this to its limit: at kper=341 the nominal window budget is 4092 of a 409
 dictionary, the ReLU-killed fraction reaches **1.00**, and realised L0 is still 18.
 
 | kper | nominal window k | ReLU-killed | realised L0/window | alive | FVU (× SAE) |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 41 | 492 | 0.96 | 17.6 | 0.152 | 27.6× |
 | 100 | 1200 | 0.98 | 26.6 | 0.143 | 25.7× |
 | 200 | 2400 | 0.99 | 18.8 | 0.113 | 26.9× |
@@ -557,7 +557,7 @@ The first arm of `centering_modal.py` returned numbers unlike anything measured 
 sprint. At the same nominal configuration:
 
 | run | #{pre > 0} | coeff/segment | ReLU-kill | FVU |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `mechanism_modal.py` kper=4 | 22.2 | 1.70 | 0.575 | 0.865 |
 | `frontier_modal.py` kper=4 lr=1e-3 | 29 | 2.41 | 0.397 | 0.782 |
 | `centering_modal.py` kper=4 "base" | **99.2** | **3.98** | **0.006** | **0.670** |
@@ -604,7 +604,7 @@ Two corrections to the previous entry, both against my own hypothesis.
 normalised at init throughout:
 
 | arm | #{pre > 0} | coeff/segment | ReLU-kill | alive | FVU |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | base | 99.2 | 3.98 | 0.006 | 0.376 | 0.6696 |
 | center | 98.5 | 3.99 | 0.002 | 0.371 | 0.6673 |
 | tied | 73.7 | 3.96 | 0.009 | 0.294 | 0.6953 |
@@ -621,7 +621,7 @@ Tied init is mildly *worse*, so it is not the fix either.
 init-normalisation, has far more live latents than its lr=1e-3 counterpart:
 
 | kper | lr=1e-3 pos-preact | lr=3e-4 pos-preact | lr=1e-3 FVU | lr=3e-4 FVU |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 | 0.008 (33) | 0.085 (348) | 0.736 | 0.761 |
 | 2 | 0.008 (33) | 0.019 (78) | 0.711 | 0.769 |
 
@@ -653,7 +653,7 @@ The control takes the selected latent, permutes its decoder rows in time, and do
 refit — so nothing downstream can re-absorb the damage — across 24 independent draws.
 
 | budget | intact fidelity | shuffled draws (n=24) | intact percentile |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | frozen, no refit | **+0.242** | +0.002 ± 0.103, range [−0.211, +0.211] | 100th |
 | refit m=2 | **+0.397** | +0.314 ± 0.054 | 100th |
 | refit m=8 | **+0.659** | +0.568 ± 0.059 | 100th |
@@ -677,7 +677,7 @@ not re-chosen, and where it is not re-chosen, it carries a measurable effect.
 SAE-comparable reconstruction.
 
 | kper | nominal window k | FVU | × SAE | realised L0/window | alive | ReLU-killed |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | 41 | 492 | 0.839 | 27.6× | 17.6 | 0.152 | 0.96 |
 | 100 | 1200 | 0.780 | 25.7× | 26.6 | 0.143 | 0.98 |
 | 200 | 2400 | 0.819 | 26.9× | 18.8 | 0.113 | 0.99 |
@@ -701,7 +701,7 @@ The decisive cell arrived. All three runs are kper=4, nominal k=48, same corpus,
 steps, same seed:
 
 | run | decoder normalised at init | lr | #{pre>0} | coeff/segment | ReLU-kill | alive | FVU |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | `mechanism_modal.py` | no | 1e-3 | 22.2 | 1.70 | 0.575 | — | 0.865 |
 | `frontier_modal.py` | no | 1e-3 | 29 | 2.41 | 0.397 | 0.195 | 0.782 |
 | `frontier_modal.py` | **no** | **3e-4** | 82 | **3.97** | **0.008** | 0.357 | 0.706 |
@@ -740,7 +740,7 @@ The frontier's lr=3e-4 arm has now reached kper=8, and the collapse does not rea
 Side by side at identical nominal budgets, same code, same corpus, same 2500 steps:
 
 | kper | coeff/seg @ lr=1e-3 | coeff/seg @ lr=3e-4 | ReLU-kill 1e-3 | ReLU-kill 3e-4 | FVU 1e-3 | FVU 3e-4 |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | 1 | 1.00 | 1.00 | 0.000 | 0.000 | 0.736 | 0.761 |
 | 2 | 1.99 | 2.00 | 0.005 | 0.000 | 0.711 | 0.769 |
 | 4 | 2.41 | **3.97** | 0.397 | **0.008** | 0.782 | **0.706** |
@@ -781,7 +781,7 @@ The ablation arms confirm the same thing negatively. At kper=4, lr=3e-4, every i
 I tried lands within noise of the others:
 
 | arm | #{pre>0} | coeff/seg | ReLU-kill | alive | FVU |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | base | 99.2 | 3.98 | 0.006 | 0.376 | 0.670 |
 | + input centering | 98.5 | 3.99 | 0.002 | 0.371 | 0.667 |
 | + tied init | 73.7 | 3.96 | 0.009 | 0.294 | 0.695 |
@@ -798,7 +798,7 @@ At the working learning rate the crosscoder behaves sensibly: it spends its budg
 kper=8, saturates gradually after, and reconstruction improves monotonically throughout.
 
 | kper | coeff/seg | spend | ReLU-kill | alive | FVU | nearest SAE | ratio |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 1.00 | 100% | 0.000 | 0.053 | 0.761 | 0.600 | 1.3× |
 | 2 | 2.00 | 100% | 0.000 | 0.140 | 0.769 | 0.173 | 4.4× |
 | 4 | 3.97 | 99% | 0.008 | 0.357 | 0.706 | 0.117 | 6.0× |
@@ -854,7 +854,7 @@ Per the directive not to conclude until the control ran on a better-trained dict
 `frozenshuf_modal.py --txc-lr 3e-4 --kper 4` against the original lr=1e-3, kper=41 run:
 
 | | starved | healthy |
-|---|---|---|
+| --- | --- | --- |
 | FVU | 0.839 | **0.707** |
 | realised L0 per window | 18.4 | **47.8** |
 | alive fraction | 0.136 | **0.345** |
@@ -920,7 +920,7 @@ The loss traces say something more specific. Comparing step 500 against step 249
 the initial transient is excluded:
 
 | kper | lr=1e-3 | lr=3e-4 |
-|---|---|---|
+| --- | --- | --- |
 | 1 | 207.0 → 194.5 (−6%) | 142.2 → 109.6 (−23%) |
 | 2 | 125.6 → 119.1 (−5%) | 32.7 → 11.3 (−66%) |
 | 4 | 62.1 → **78.8 (+27%)** | 13.8 → 9.3 (−33%) |
@@ -958,7 +958,7 @@ dims (1, 2) is per-atom unit norm, so a crosscoder at T=1 *is* a TopK SAE up to 
 implementation differences this sprint has been chasing.
 
 | T | nominal k | #{pre>0}/window | coeff/segment | ReLU-kill | alive | FVU | × SAE |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 4 | 2059 | 4.00 | 0.000 | 0.033 | 0.0989 | **1.01** |
 | 2 | 8 | 1529 | 4.00 | 0.000 | 0.080 | 0.0932 | 0.95 |
 | 3 | 12 | 881 | 4.00 | 0.000 | 0.130 | 0.0979 | 1.00 |
@@ -1001,12 +1001,14 @@ segments; firing at segment `s` contributes `p[j]·u` to segment `s+j`. A T-wind
 at most T contiguous entries of `p`, so the best cosine any T-slab can reach against the
 full atom `p ⊗ u` is fixed by geometry before any training happens:
 
-    ceiling(T, p) = ‖ largest contiguous T-chunk of p ‖ / ‖p‖      ( = √(min(T,L)/L) flat )
+```text
+ceiling(T, p) = ‖ largest contiguous T-chunk of p ‖ / ‖p‖      ( = √(min(T,L)/L) flat )
+```
 
 Measured recovery against that ceiling, 64 true features, `batchtopk`, 6000 steps:
 
 | extent | T=1 | T=2 | T=4 | T=8 | T=16 |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | L=1 | 0.922 / 1.000 | 0.988 / 1.000 | 0.998 / 1.000 | 0.991 / 1.000 | 0.338 / 1.000 |
 | L=2 | **0.816 / 0.816** | 0.827 / 1.000 | 0.949 / 1.000 | 0.989 / 1.000 | 0.378 / 1.000 |
 | L=4 | **0.661 / 0.662** | 0.765 / 0.813 | 0.840 / 1.000 | 0.944 / 1.000 | 0.386 / 1.000 |
@@ -1052,7 +1054,7 @@ collapses. `spend` is realised L0 as a fraction of nominal k; `neg` is the fract
 realised coefficients that are negative.
 
 | arm | kper | #{pre>0} | coeff/seg | spend | neg | FVU |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | `topk_relu` | 8 | 14.5 | 1.05 | 13% | 0.000 | 0.832 |
 | `topk_relu` + AuxK | 8 | 14.5 | 1.05 | 13% | 0.000 | 0.832 |
 | batch selection **+ ReLU** | 8 | 13.5 | 1.10 | 14% | 0.000 | 0.841 |
@@ -1104,7 +1106,7 @@ segment is a point on the same circle whatever the period and the period is reco
 only from rotation across segments.
 
 | T | atom recovery | period-ID accuracy (chance 0.25) |
-|---|---|---|
+| --- | --- | --- |
 | 1 | **1.000** | **0.252** |
 | 2 | 0.832 | 0.957 |
 | 4 | 0.866 | **1.000** |
@@ -1122,7 +1124,7 @@ requirement `T ≳ 1/|1/P − 1/P′|`. Every pair reaches 90% at T=2, including
 requirement is 16.0:
 
 | pair | requirement | reaches 90% at |
-|---|---|---|
+| --- | --- | --- |
 | 2 v 4 | 4.0 | T=2 |
 | 2 v 8 | 2.7 | T=2 |
 | 2 v 16 | 2.3 | T=2 |
@@ -1165,7 +1167,7 @@ fixed `d_sae` is progressively starved. `saturation_local.py` sweeps T against `
 test it.
 
 | d_sae | T=2 | T=4 | T=8 | T=16 | T=32 |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 128 | 0.78 | **0.88** | 0.77 | 0.32 | 0.17 |
 | 256 | 0.80 | 0.89 | **0.96** | 0.44 | 0.19 |
 | 512 | 0.78 | 0.91 | **0.97** | 0.54 | 0.20 |
@@ -1209,7 +1211,7 @@ with T.
 ### The T-sweep collapses from 6.8× to 1.5×
 
 | T | FVU (corrected) | × SAE | previously reported |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | 0.1166 | **0.99** | 1.0 |
 | 2 | 0.1205 | 1.02 | 1.0 |
 | 3 | 0.1248 | 1.06 | 1.0 |
@@ -1227,7 +1229,7 @@ T twelve times less data. The T=1 control is unchanged and still passes at 0.99�
 `budget_local.py`, stride-1, recovery against the true features:
 
 | T | kper=1 | kper=2 | kper=4 | kper=8 | kper=16 |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 1 | 0.771 | 0.771 | 0.714 | 0.658 | 0.583 |
 | 2 | **0.918** | 0.851 | 0.792 | 0.740 | 0.679 |
 | 4 | **0.971** | 0.921 | 0.891 | 0.847 | 0.771 |
@@ -1252,7 +1254,7 @@ every T, and the penalty for over-budgeting grows with T: the recovery span acro
 `saturation_local.py`, stride-1:
 
 | d_sae | T=2 | T=4 | T=8 | T=16 | T=32 | peak |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | 128 | 0.78 | **0.88** | 0.77 | 0.41 | 0.16 | T=4 |
 | 256 | 0.79 | 0.90 | **0.94** | 0.80 | 0.28 | T=8 |
 | 512 | 0.79 | 0.89 | 0.96 | **0.96** | 0.37 | T=16 |
@@ -1268,7 +1270,7 @@ cost of tying atoms to absolute position.
 ### Activation functions, final
 
 | arm | kper | coeff/seg | spend | neg | FVU |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `topk_relu` | 41 | 0.96 | 2% | 0.000 | 0.843 |
 | `batchtopk_relu` | 41 | 0.92 | 2% | 0.000 | 0.841 |
 | `topk_relu` + AuxK | 41 | 0.96 | 2% | 0.000 | 0.843 |
@@ -1285,7 +1287,7 @@ rule rather than reproducing it exactly, which is expected. `batchtopk` is the d
 `recovery_local.py` rerun at stride 1.
 
 | extent | T=1 | T=2 | T=4 | T=8 | T=16 |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | L=1 | 0.911 | 0.990 | 0.999 | 0.997 | 0.987 |
 | L=2 | **0.816 / 0.816** | 0.819 | 0.933 | 0.990 | 0.966 |
 | L=4 | **0.661 / 0.662** | 0.754 | 0.831 | 0.921 | 0.919 |
@@ -1340,7 +1342,7 @@ of the realised-coefficient axis.
 `batchtopk` with no auxiliary penalty (not TXC-pro).
 
 | coeff/segment | SAE FVU | TXC FVU | ratio | SAE winAUC | TXC winAUC |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 1 | 0.526 | 0.632 | 1.2× | 0.717 | 0.718 |
 | 2 | 0.176 | 0.313 | 1.8× | 0.728 | 0.721 |
 | 4 | 0.128 | 0.239 | 1.9× | 0.734 | 0.722 |
@@ -1425,7 +1427,7 @@ advantage on real activations, and D1 and D2 can both hold without it.
 `layer_modal.py`, layers 2/6/14/22, everything else fixed.
 
 | | L2 | L6 | L14 | L22 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | FVU ratio TXC/SAE, k=2 | **7.80×** | 4.02× | **1.57×** | 1.85× |
 | FVU ratio TXC/SAE, k=8 | 2.90× | 2.56× | 2.51× | 2.40× |
 | SAE window-AUC, k=8 | 0.646 | 0.649 | **0.763** | 0.674 |
@@ -1456,8 +1458,10 @@ of segments *and* to the count of switches, so that no permutation-invariant poo
 per-token codes can reach it. The minimal such design is order-of-blocks with everything
 else matched:
 
-    class A:  T T T T T T C C C C C C      6 tense, 6 calm, 1 switch
-    class B:  C C C C C C T T T T T T      6 tense, 6 calm, 1 switch
+```text
+class A:  T T T T T T C C C C C C      6 tense, 6 calm, 1 switch
+class B:  C C C C C C T T T T T T      6 tense, 6 calm, 1 switch
+```
 
 Identical multiset, identical switch count; the classes differ only in which block came
 first. Any readout that pools per-token codes symmetrically over the window is at chance by
@@ -1479,7 +1483,7 @@ which block came first, so any symmetric pooling of per-token codes is at chance
 construction. Layer 14, T=12, 1500 documents.
 
 | | SAE winAUC | TXC winAUC | Δ | SAE FVU | TXC FVU |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | order task, k=2 | **0.981** | 0.825 | −0.156 | 0.148 | 0.412 |
 | order task, k=8 | **1.000** | 0.833 | −0.167 | 0.069 | 0.389 |
 | shuffled control, k=2 | 0.597 | 0.598 | +0.002 | 0.156 | 0.545 |
@@ -1524,14 +1528,14 @@ reordered, so multiset-matched foils cancel any generic "more tense tokens" effe
 writes rescaled to identical total injected norm.
 
 | arm | α=0.25 | α=0.5 | α=1.0 | α=2.0 | per-position spread |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `sae_broadcast` | −0.90 | −1.41 | −0.91 | +2.25 | 0.0000 |
 | **`txc_slab`** | **+0.75** | **+1.36** | **+3.26** | **+9.93** | 0.0455 |
 | `txc_flat` (control) | −1.20 | −2.33 | −4.58 | −7.87 | 0.0000 |
 | `dom_slab` (ceiling) | +5.75 | +12.24 | +28.50 | +68.69 | 0.0131 |
 
 | | reads order | steers order |
-|---|---|---|
+| --- | --- | --- |
 | SAE | AUC **0.998** | +2.25 |
 | crosscoder | AUC 0.791 | **+9.93** |
 

@@ -76,7 +76,9 @@ At a budget of **m active latents**, how much of the target trajectory can each 
 write? A TXC latent spans W positions for one coefficient; an SAE feature is one direction
 and costs one coefficient per position, or must be broadcast. So:
 
-    fidelity(m) = Δmargin(write built from m latents) / Δmargin(full ground-truth schedule)
+```text
+fidelity(m) = Δmargin(write built from m latents) / Δmargin(full ground-truth schedule)
+```
 
 swept over m. Registered prediction: **TXC > SAE at small m for structured trajectories,
 converging as m → k**. Registered falsifier: **if SAE features with per-position

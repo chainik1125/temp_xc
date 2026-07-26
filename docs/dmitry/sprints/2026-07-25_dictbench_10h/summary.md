@@ -105,7 +105,7 @@ Ported to a crosscoder it becomes the binding constraint. Measured at the diverg
 rate, kper=41:
 
 | sparsity rule | coeff/segment | budget spent | FVU |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `topk_relu` (previous default) | 0.96 | 2% | 0.843 |
 | batch selection **+ ReLU** | 0.92 | 2% | 0.841 |
 | `topk_relu` + AuxK | 0.96 | 2% | 0.843 |
@@ -124,7 +124,7 @@ TopK SAE against a plain crosscoder (`batchtopk`, no auxiliary penalty), matched
 coefficients per segment, run-length corpus, layer 14:
 
 | coeff/segment | SAE FVU | TXC FVU | ratio |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | 0.526 | 0.632 | 1.2× |
 | 2 | 0.176 | 0.313 | 1.8× |
 | 4 | 0.128 | 0.239 | 1.9× |
@@ -153,7 +153,7 @@ than 1e-3.
 Recorded because most were mine, and the result depends on them not standing.
 
 | claimed | status | what actually holds |
-|---|---|---|
+| --- | --- | --- |
 | `b_enc` goes negative and gates the dictionary | refuted | −0.021 → −0.024 across 20× of k; far too small |
 | missing input centering starves the crosscoder | refuted | changes FVU by 0.002 |
 | decoder normalisation at init is the defect | refuted | 3.97 coeff/seg without it, 3.98 with |
@@ -176,7 +176,7 @@ weights, which the ReLU-after-TopK breaks about 1 run in 8.
 ## What was run, and where it lives
 
 | question | script | result |
-|---|---|---|
+| --- | --- | --- |
 | **reading vs steering on an order-only factor** | `steer_order_modal.py` | `steer_order.json` |
 | order-only window factor + shuffled control | `ordertask_modal.py` | `ordertask*.json` |
 | SAE vs TXC vs tSAE head-to-head | `bench4_modal.py` | `bench4*.json` |
