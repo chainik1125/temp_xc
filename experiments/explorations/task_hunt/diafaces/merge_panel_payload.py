@@ -28,12 +28,12 @@ LB = ROOT / "results" / "leaderboard.jsonl"
 # Two panels, two freezes (the tt/gpt2 race resolution + panel 2):
 PANELS = {
     "tt": {"ds": "dial_real_ttrend_gpt2_l7",
-           "freeze": "7ba2e10fd2c822d8dac820a307ec4f9f3c4f0005",
-           "payloads": HERE / "results" / "panel_payloads"},
+           "freeze": "db677a4b873156d274a6b223a3cc7b82ff98e997",  # v2 re-freeze
+           "payloads": HERE / "results" / "panel_payloads_v2tt"},
     "dq": {"ds": "dial_real_dqgap_llama31_8b_l14",
            # filled by mac-b (merge support) via `git rev-parse cfa341c34`
            # — the panel-2 freeze commit the containers check out
-           "freeze": "cfa341c34094f993904bae9b8e01a32d672a74d0",
+           "freeze": "db677a4b873156d274a6b223a3cc7b82ff98e997",  # v2 re-freeze
            "payloads": HERE / "results" / "panel2_payloads"},
 }
 ARCHS = {"batchtopk_sae", "tsae", "txc_batchtopk_pre",
