@@ -40,6 +40,12 @@ Four results that do not depend on any of that framework:
 
 ### 1. The previous sprint's headline is withdrawn
 
+![The half of the dose axis nobody sampled](../../../../plots/2026-07-26_txcwins/withdrawal.png)
+
+*Every arm on the full symmetric dose grid, one panel per dictionary init. The shaded half is the
+only half the original grid sampled. `txc_flat` — the control whose "inversion" was the proof —
+climbs to +12.10 and +18.47 in the half nobody looked at.*
+
 The order-task result — crosscoder +11.29 against the SAE's +1.24 — was measured on a one-sided
 dose grid. Rerun at both signs with two dictionary inits, the crosscoder does not beat the SAE
 significantly in either (+6.34 and +3.41 against +4.66 and +5.16; z = 1.35 at one init, losing
@@ -53,6 +59,12 @@ ones, so a positive-only grid recorded the negative branch and read a **sign** a
 **inversion**. Since the sign of a steering vector is a free parameter, the honest reading is
 the reverse of the published one: `txc_flat` is a better constant write than the SAE's, and the
 order task is steerable by a constant write.
+
+**The crosscoder's own effect changes sign between dictionary inits.** `txc_slab` rises to the
+right at init 0 and to the left at init 1, while `txc_flat` and the SAE hold their orientation in
+both. So on that task the selected latent has no stable direction across training runs — it is not
+that the effect size was unstable, but that its **sign** was. A result resting on a single draw
+could not have detected that, and it is an independent reason the original should not have stood.
 
 Two lessons generalise. **A one-sided dose grid cannot distinguish a directional effect from a
 magnitude artefact**, and the two failure modes point opposite ways — an arm positive at *both*
