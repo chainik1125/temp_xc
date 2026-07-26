@@ -145,10 +145,21 @@ gradient's support is set by where the two classes differ — but the second is 
   depths.** The capability the headline claims is unsupervised discovery, and this is exactly where
   it fails.
 
+  **The obvious confound is closed.** Those transfer runs used one learning rate for all arms at
+  2000 steps, against the per-arm 6000-step recipes every headline uses — which finding 4 says is
+  not a fair comparison. Rerun at SmolLM2 L6 with per-arm recipes, three inits, the crosscoder gets
+  **worse** (+1.01 / +0.92 / +0.88 against +1.94), so the scope limit stands at the correct recipe.
+
   One caveat against over-reading it: SmolLM2's baseline is **+2.19** and the write pushes it
   further positive, so that arm *amplifies* an existing bias, while Qwen2.5-1.5B's baseline is
   −2.54 and its write is a *reversal*. Amplifying is the easier direction. The bias itself also
   **flips sign** across models.
+
+  **An open fact with no mechanism attached**: on SmolLM2 the *supervised* difference-of-means slab
+  also fails (+1.27 against the gradient write's +13.32, a 10.5× gap), where on Qwen2.5-1.5B the
+  two are close (+8.42 against +9.79). The natural explanation — that the two slabs are more
+  decoupled in SmolLM2 — is refuted by `cos(P_dom, Ḡ)` = 0.050 there against 0.044 on
+  Qwen2.5-1.5B. The fact is solid; the explanation is not known.
 - **The `c` gate does not transfer across models.** Five of seven transfer cells sit below the
   `c` < 0.1 go-threshold with high `r1` and steer nothing. It was validated within one model and is
   not a cross-model instrument.
@@ -191,10 +202,13 @@ gradient's support is set by where the two classes differ — but the second is 
   | crosscoder | +3.81 | +4.82 | +4.63 |
   | **best possible constant write** (supervised) | **+4.01** | **+4.01** | **+4.01** |
 
-  **The reading selector was costing the SAE 6–30× and the crosscoder nothing** — its reading pick
-  ranks 2222 and 3138 of 4096 by gradient alignment (worse than an arbitrary draw), while the
-  crosscoder's ranks **1 of 4096** in both inits, so all three selectors choose the same latent.
-  The crosscoder still beats the SAE, but the ratio falls from ~26× to **2.7×**.
+  **The reading selector was costing the SAE 6–30× and the crosscoder nothing.** The SAE's reading
+  pick carries **8–16%** of the best available first-order alignment and is indistinguishable from
+  an arbitrary draw at this `n` (ranks 2507 / 2222 / 3138 of 4096; sign test p = 0.125). The
+  crosscoder's pick is **rank 1 of 4096 in 3 of 3** — its reading, gradient and measured-steering
+  selectors all choose the same latent, p ≈ 1.5 × 10⁻¹¹ against the same null. **The significant
+  finding is the asymmetry between the two selectors**, not the SAE half alone. The crosscoder
+  still beats the SAE, but the ratio falls from ~26× to **2.7×**.
 
   ⚠ **The `broadcast_optimal` arm is the qualification that matters.** The best constant write in
   the *whole space* — not the best of 4096 atoms — reaches **+4.01** against the crosscoder's
