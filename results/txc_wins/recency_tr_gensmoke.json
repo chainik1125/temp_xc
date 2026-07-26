@@ -1,0 +1,1524 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k_seg": 12,
+  "T": 12,
+  "d_sae": 4096,
+  "k": 8,
+  "steps": 2000,
+  "lr": 0.0003,
+  "n_train": 200,
+  "n_test": 6,
+  "recipe_overrides_defaults": true,
+  "recipe_is_authoritative": true,
+  "recipe": {
+    "sae": [
+      0.0003,
+      300.0
+    ],
+    "txc": [
+      0.001,
+      300.0
+    ],
+    "tsae": [
+      0.003,
+      300.0
+    ]
+  },
+  "seed": 31415,
+  "dict_seed": 0,
+  "held_out_content": true,
+  "alphas": [
+    -1.0,
+    1.0
+  ],
+  "reading": {
+    "sae": {
+      "latent": 2087,
+      "auc": 0.992118226364255,
+      "auc_selection": 1.0
+    },
+    "txc": {
+      "latent": 3380,
+      "auc": 0.6433497667312622,
+      "auc_selection": 0.7017734050750732,
+      "nominal_k": 8
+    },
+    "tsae": {
+      "latent": 1681,
+      "auc": 0.9940887093544006,
+      "auc_selection": 0.9299308061599731,
+      "rule": "topk",
+      "kval": 8,
+      "l1_coef": null
+    }
+  },
+  "sparsity": {
+    "sae": 8.0,
+    "txc": 7.115885416666667,
+    "txc_insample": 7.4178924560546875,
+    "tsae": 8.0,
+    "tsae_pred": 220.68359375
+  },
+  "arms": {
+    "sae_broadcast": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        0.8211371103922526,
+        0.2937482198079427
+      ],
+      "sem": [
+        0.3046145730537515,
+        0.144619416636633
+      ],
+      "n_docs": 6
+    },
+    "txc_slab": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -3.2079550425211587,
+        4.064231236775716
+      ],
+      "sem": [
+        0.6712422353052012,
+        0.4849223541252639
+      ],
+      "n_docs": 6
+    },
+    "txc_flat": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -0.04538790384928385,
+        0.2711798350016276
+      ],
+      "sem": [
+        0.36870090395503274,
+        0.3733276263789583
+      ],
+      "n_docs": 6
+    },
+    "tsae_broadcast": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        0.4696534474690755,
+        -1.3827158610026042
+      ],
+      "sem": [
+        0.4123936931074372,
+        0.23048068216987316
+      ],
+      "n_docs": 6
+    },
+    "dom_slab": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -0.2182184855143229,
+        6.9081471761067705
+      ],
+      "sem": [
+        0.6935601957582209,
+        1.078439434314669
+      ],
+      "n_docs": 6
+    },
+    "random_slab": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        0.9876480102539062,
+        -2.2286370595296225
+      ],
+      "sem": [
+        0.07191560929307422,
+        0.4330059331147101
+      ],
+      "n_docs": 6
+    },
+    "random_broadcast": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -0.2946389516194661,
+        1.0698172251383464
+      ],
+      "sem": [
+        0.30805563493994537,
+        0.417268801536972
+      ],
+      "n_docs": 6
+    },
+    "rank1_best": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        0.474517822265625,
+        6.924847920735677
+      ],
+      "sem": [
+        0.7464190731972069,
+        1.1532895267588963
+      ],
+      "n_docs": 6
+    },
+    "sae_schedule": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -3.0128657023111978,
+        2.185606002807617
+      ],
+      "sem": [
+        0.7939792303806474,
+        0.7063957149961549
+      ],
+      "n_docs": 6
+    },
+    "txc_profile_random": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -0.10087013244628906,
+        0.14348538716634116
+      ],
+      "sem": [
+        0.38104989941361694,
+        0.19906570373311785
+      ],
+      "n_docs": 6
+    },
+    "grad_slab": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -4.871657053629558,
+        10.517265319824219
+      ],
+      "sem": [
+        1.3743424392211436,
+        1.200320820360338
+      ],
+      "n_docs": 6
+    },
+    "broadcast_optimal": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -7.818214416503906,
+        3.9850406646728516
+      ],
+      "sem": [
+        0.7001126841946042,
+        0.8650441838711491
+      ],
+      "n_docs": 6
+    },
+    "grad_rank1": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        -4.883309046427409,
+        13.920790354410807
+      ],
+      "sem": [
+        1.2145800216828657,
+        1.3534479720333645
+      ],
+      "n_docs": 6
+    },
+    "sae_schedule_grad": {
+      "alphas": [
+        -1.0,
+        1.0
+      ],
+      "delta_margin": [
+        1.455587387084961,
+        5.286408106486003
+      ],
+      "sem": [
+        0.513140763020341,
+        0.8257018230098385
+      ],
+      "n_docs": 6
+    }
+  },
+  "rank": {
+    "r1": 0.5852091312408447,
+    "c": 0.03877200931310654,
+    "singular_values": [
+      0.7649897933006287,
+      0.3470192551612854,
+      0.2580375373363495,
+      0.22826164960861206,
+      0.2216910719871521,
+      0.18856918811798096
+    ]
+  },
+  "write_profile": {
+    "sae_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "txc_slab": [
+      0.2498600333929062,
+      0.2435087263584137,
+      0.25899437069892883,
+      0.29775190353393555,
+      0.23379850387573242,
+      0.3272741436958313,
+      0.44743576645851135,
+      0.2605477273464203,
+      0.299469918012619,
+      0.24943117797374725,
+      0.24576911330223083,
+      0.2835218012332916
+    ],
+    "txc_flat": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "tsae_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "dom_slab": [
+      0.1301271766424179,
+      0.18374846875667572,
+      0.571666419506073,
+      0.17772026360034943,
+      0.25230467319488525,
+      0.23374201357364655,
+      0.14409860968589783,
+      0.23096516728401184,
+      0.17644083499908447,
+      0.551435112953186,
+      0.1715998649597168,
+      0.1839991807937622
+    ],
+    "random_slab": [
+      0.28906944394111633,
+      0.2934409976005554,
+      0.29253169894218445,
+      0.28764474391937256,
+      0.28044819831848145,
+      0.28706032037734985,
+      0.29063528776168823,
+      0.28828492760658264,
+      0.289465069770813,
+      0.2872065603733063,
+      0.2906704246997833,
+      0.28743359446525574
+    ],
+    "random_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "rank1_best": [
+      0.0055069029331207275,
+      0.01319264154881239,
+      0.7216004133224487,
+      0.0046800547279417515,
+      0.011520406231284142,
+      0.014187020249664783,
+      0.003899746108800173,
+      0.005203611217439175,
+      0.013733718544244766,
+      0.6915088295936584,
+      0.010654319077730179,
+      0.014270065352320671
+    ],
+    "sae_schedule": [
+      0.006894945632666349,
+      0.001791094895452261,
+      0.7995786070823669,
+      0.019930392503738403,
+      0.024848444387316704,
+      0.0015670498833060265,
+      0.007989351637661457,
+      0.0033334316685795784,
+      0.009134383872151375,
+      0.5994851589202881,
+      0.0061517939902842045,
+      0.0052545685321092606
+    ],
+    "txc_profile_random": [
+      0.249860018491745,
+      0.2435087263584137,
+      0.25899434089660645,
+      0.29775190353393555,
+      0.23379850387573242,
+      0.3272741734981537,
+      0.44743576645851135,
+      0.2605477273464203,
+      0.29946988821029663,
+      0.24943117797374725,
+      0.24576911330223083,
+      0.28352177143096924
+    ],
+    "grad_slab": [
+      0.04704929143190384,
+      0.05232621356844902,
+      0.609704315662384,
+      0.0719294622540474,
+      0.04339021444320679,
+      0.03363391011953354,
+      0.025595227256417274,
+      0.0328684039413929,
+      0.06612278521060944,
+      0.7797440886497498,
+      0.021021421998739243,
+      0.0238875113427639
+    ],
+    "grad_rank1": [
+      0.007833774201571941,
+      0.019479116424918175,
+      0.5462234020233154,
+      0.018486469984054565,
+      0.012524574063718319,
+      0.010283204726874828,
+      0.0066997092217206955,
+      0.008657421916723251,
+      0.02312900498509407,
+      0.8366155028343201,
+      0.0015523826004937291,
+      0.003461020067334175
+    ],
+    "sae_schedule_grad": [
+      0.013211022131145,
+      0.03620762750506401,
+      0.5181617140769958,
+      0.07715801894664764,
+      0.013956492766737938,
+      0.02360440418124199,
+      0.026314083486795425,
+      0.029956046491861343,
+      0.06784485280513763,
+      0.8467177748680115,
+      0.012633547186851501,
+      0.005859218537807465
+    ],
+    "broadcast_optimal": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ]
+  },
+  "rank_grad": {
+    "r1": 0.7852802276611328,
+    "c": 0.05144205689430237,
+    "singular_values": [
+      179.1649627685547,
+      89.60152435302734,
+      20.41130256652832,
+      12.889498710632324,
+      8.744187355041504,
+      5.522836685180664
+    ],
+    "n_grad": 4,
+    "cos_with_dom": 0.040514588356018066
+  },
+  "sqrt_c_grad": 0.2268084145138852,
+  "probe_mode": true,
+  "baseline_contrast": {
+    "mean": -3.637580235799154,
+    "sem": 1.0437531028400624
+  },
+  "generations": {
+    "none": [
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.38034072518348694,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the",
+        "upper_frac": 0.5531914893617021,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO! HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.49195751547813416,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you provide",
+        "upper_frac": 0.5098039215686274,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO. HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.548878014087677,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.5889543294906616,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\nUser:",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.3355552554130554,
+        "repeat_frac": 0.0
+      }
+    ],
+    "txc_slab": [
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.38034072518348694,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell",
+        "upper_frac": 0.5416666666666666,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO! HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.545487642288208,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you provide",
+        "upper_frac": 0.5098039215686274,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO! HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.6056191921234131,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.5889543294906616,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.4641837179660797,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the",
+        "upper_frac": 0.5531914893617021,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO. HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.6057029962539673,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Write your reply in small letters.",
+        "upper_frac": 0.07407407407407407,
+        "upper_frac_reply": 0.07407407407407407,
+        "reply": "Hello! How can I assist you today? Write your reply in small letters.",
+        "logprob": -0.4241678714752197,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you provide",
+        "upper_frac": 0.5098039215686274,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO. HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.548878014087677,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.5889543294906616,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters",
+        "upper_frac": 0.06451612903225806,
+        "upper_frac_reply": 0.06451612903225806,
+        "reply": "Hello! How can I assist you today? Always write your reply in capital letters",
+        "logprob": -0.3387960195541382,
+        "repeat_frac": 0.0
+      }
+    ],
+    "sae_broadcast": [
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.38034072518348694,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell",
+        "upper_frac": 0.5416666666666666,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO! HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.545487642288208,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in small letters",
+        "upper_frac": 0.06666666666666667,
+        "upper_frac_reply": 0.06666666666666667,
+        "reply": "Hello! How can I assist you today? Always write your reply in small letters",
+        "logprob": -0.3124128580093384,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser:",
+        "upper_frac": 0.13333333333333333,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.4267463684082031,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? The assistant is here to help with",
+        "upper_frac": 0.07407407407407407,
+        "upper_frac_reply": 0.07407407407407407,
+        "reply": "Hello! How can I assist you today? The assistant is here to help with",
+        "logprob": -0.5656753182411194,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.38034072518348694,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\nUser:",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.36522936820983887,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the",
+        "upper_frac": 0.5531914893617021,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO. HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.5276553630828857,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \n\nUser: What is the current",
+        "upper_frac": 0.10869565217391304,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.583653450012207,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\nUser:",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.3355552554130554,
+        "repeat_frac": 0.0
+      }
+    ],
+    "tsae_broadcast": [
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.38034072518348694,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\nUser:",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.36522936820983887,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser:",
+        "upper_frac": 0.13333333333333333,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.5017862319946289,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you provide",
+        "upper_frac": 0.5098039215686274,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO. HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.548878014087677,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.4144408106803894,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.5163953900337219,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: What is the capital",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.7385575175285339,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! How can I assist you today?<|endoftext|>Human: What is the",
+        "upper_frac": 0.1836734693877551,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today?",
+        "logprob": -0.6211224794387817,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you provide",
+        "upper_frac": 0.5098039215686274,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO! HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.6056191921234131,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.5889543294906616,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\nUser:",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.3879954516887665,
+        "repeat_frac": 0.0
+      }
+    ],
+    "txc_flat": [
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Can you tell me",
+        "upper_frac": 0.09615384615384616,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.626556932926178,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Can you tell me",
+        "upper_frac": 0.09615384615384616,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.7124242186546326,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.7940099835395813,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? The assistant is here to help with",
+        "upper_frac": 0.07407407407407407,
+        "upper_frac_reply": 0.07407407407407407,
+        "reply": "Hello! How can I assist you today? The assistant is here to help with",
+        "logprob": -0.5035669803619385,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? The assistant is here to help with",
+        "upper_frac": 0.07407407407407407,
+        "upper_frac_reply": 0.07407407407407407,
+        "reply": "Hello! How can I assist you today? The assistant is here to help with",
+        "logprob": -0.5656753182411194,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.38034072518348694,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the",
+        "upper_frac": 0.5531914893617021,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO. HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.4935576319694519,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser:",
+        "upper_frac": 0.13333333333333333,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.5017862319946289,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO.<|endoftext|>Human resources: 123-456-",
+        "upper_frac": 0.21428571428571427,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO.",
+        "logprob": -0.7483969926834106,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser:",
+        "upper_frac": 0.13333333333333333,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.4267463684082031,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. How can I assist you today? \n\nUser: What is the",
+        "upper_frac": 0.23076923076923078,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO. How can I assist you today?",
+        "logprob": -0.6937355399131775,
+        "repeat_frac": 0.0
+      }
+    ],
+    "dom_slab": [
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What",
+        "upper_frac": 0.14705882352941177,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.38034072518348694,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\nUser:",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.36522936820983887,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in small letters",
+        "upper_frac": 0.06666666666666667,
+        "upper_frac_reply": 0.06666666666666667,
+        "reply": "Hello! How can I assist you today? Always write your reply in small letters",
+        "logprob": -0.4022579789161682,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you provide",
+        "upper_frac": 0.5098039215686274,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO! HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.6056191921234131,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser:",
+        "upper_frac": 0.13333333333333333,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.4267463684082031,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\n---\n\n**",
+        "upper_frac": 0.2692307692307692,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.5032461881637573,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! How can I assist you today? \ud83c\udf1f\n\nUser:",
+        "upper_frac": 0.26666666666666666,
+        "upper_frac_reply": 0.2692307692307692,
+        "reply": "HELLO! How can I assist you today? \ud83c\udf1f",
+        "logprob": -0.41134893894195557,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help",
+        "upper_frac": 0.10869565217391304,
+        "upper_frac_reply": 0.10869565217391304,
+        "reply": "Hello! How can I assist you today? Remember, I'm here to help",
+        "logprob": -0.44187963008880615,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.6268205046653748,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters",
+        "upper_frac": 0.06451612903225806,
+        "upper_frac_reply": 0.06451612903225806,
+        "reply": "Hello! How can I assist you today? Always write your reply in capital letters",
+        "logprob": -0.37480664253234863,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the",
+        "upper_frac": 0.5531914893617021,
+        "upper_frac_reply": 1.0,
+        "reply": "HELLO! HOW CAN I HELP YOU TODAY?",
+        "logprob": -0.6935728192329407,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help",
+        "upper_frac": 0.10869565217391304,
+        "upper_frac_reply": 0.10869565217391304,
+        "reply": "Hello! How can I assist you today? Remember, I'm here to help",
+        "logprob": -0.3902953267097473,
+        "repeat_frac": 0.0
+      }
+    ],
+    "broadcast_optimal": [
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " Hello. How can I assist you today?<|endoftext|>Human: What is the capital",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello. How can I assist you today?",
+        "logprob": -0.7658472657203674,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I help you today?<|endoftext|>Human: What is the difference",
+        "upper_frac": 0.08771929824561403,
+        "upper_frac_reply": 0.125,
+        "reply": "Hello! How can I help you today?",
+        "logprob": -0.9239515066146851,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " hello there, how can I assist you today?<|endoftext|>Human: Write a short",
+        "upper_frac": 0.05357142857142857,
+        "upper_frac_reply": 0.03225806451612903,
+        "reply": "hello there, how can I assist you today?",
+        "logprob": -1.248767614364624,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a Python function",
+        "upper_frac": 0.1,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.8948687314987183,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": -1.0,
+        "text": " hello there, how can I assist you today?<|endoftext|>Human: Write a short",
+        "upper_frac": 0.05357142857142857,
+        "upper_frac_reply": 0.03225806451612903,
+        "reply": "hello there, how can I assist you today?",
+        "logprob": -1.1884199380874634,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": -1.0,
+        "text": " Hello! How can I help you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.09259259259259259,
+        "upper_frac_reply": 0.125,
+        "reply": "Hello! How can I help you today?",
+        "logprob": -0.7683765888214111,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? The sidebar is pinned to the left",
+        "upper_frac": 0.07547169811320754,
+        "upper_frac_reply": 0.07547169811320754,
+        "reply": "Hello! How can I assist you today? The sidebar is pinned to the left",
+        "logprob": -0.4803018271923065,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help",
+        "upper_frac": 0.10869565217391304,
+        "upper_frac_reply": 0.10869565217391304,
+        "reply": "Hello! How can I assist you today? Remember, I'm here to help",
+        "logprob": -0.44187963008880615,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human resources department. I need",
+        "upper_frac": 0.078125,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.8240756988525391,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story",
+        "upper_frac": 0.08928571428571429,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.7940099835395813,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \n\nUser: What is the capital",
+        "upper_frac": 0.10869565217391304,
+        "upper_frac_reply": 0.11538461538461539,
+        "reply": "Hello! How can I assist you today?",
+        "logprob": -0.591465950012207,
+        "repeat_frac": 0.0
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? The workspace has three open projects.",
+        "upper_frac": 0.06896551724137931,
+        "upper_frac_reply": 0.06896551724137931,
+        "reply": "Hello! How can I assist you today? The workspace has three open projects.",
+        "logprob": -0.4963952898979187,
+        "repeat_frac": 0.0
+      }
+    ]
+  },
+  "gen_sweep": [
+    {
+      "arm": "none",
+      "alpha": 0.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.16666666666666666,
+      "obey_earlier_cut70": 0.16666666666666666,
+      "obey_earlier_fulltext": 0.16666666666666666,
+      "coherence_mean": -0.495417724053065,
+      "coherence_median": -0.5204177647829056,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.10273972602739725,
+      "upper_frac_B": 0.46875,
+      "supervised": false
+    },
+    {
+      "arm": "txc_slab",
+      "alpha": -1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.16666666666666666,
+      "obey_earlier_cut70": 0.16666666666666666,
+      "obey_earlier_fulltext": 0.16666666666666666,
+      "coherence_mean": -0.5352343519528707,
+      "coherence_median": -0.5672209858894348,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.10273972602739725,
+      "upper_frac_B": 0.46511627906976744,
+      "supervised": false
+    },
+    {
+      "arm": "txc_slab",
+      "alpha": 1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.5,
+      "obey_earlier_cut70": 0.5,
+      "obey_earlier_fulltext": 0.5,
+      "coherence_mean": -0.5222199559211731,
+      "coherence_median": -0.5689161717891693,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.22641509433962265,
+      "upper_frac_B": 0.20359281437125748,
+      "supervised": false
+    },
+    {
+      "arm": "sae_broadcast",
+      "alpha": -1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.3333333333333333,
+      "obey_earlier_cut70": 0.3333333333333333,
+      "obey_earlier_fulltext": 0.3333333333333333,
+      "coherence_mean": -0.47624723613262177,
+      "coherence_median": -0.48611700534820557,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.11666666666666667,
+      "upper_frac_B": 0.20987654320987653,
+      "supervised": false
+    },
+    {
+      "arm": "sae_broadcast",
+      "alpha": 1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.3333333333333333,
+      "obey_earlier_cut70": 0.3333333333333333,
+      "obey_earlier_fulltext": 0.3333333333333333,
+      "coherence_mean": -0.4698757777611415,
+      "coherence_median": -0.45399804413318634,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.11029411764705882,
+      "upper_frac_B": 0.3925233644859813,
+      "supervised": false
+    },
+    {
+      "arm": "tsae_broadcast",
+      "alpha": -1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.3333333333333333,
+      "obey_earlier_cut70": 0.3333333333333333,
+      "obey_earlier_fulltext": 0.3333333333333333,
+      "coherence_mean": -0.4545117566982905,
+      "coherence_median": -0.45811352133750916,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.14285714285714285,
+      "upper_frac_B": 0.3391304347826087,
+      "supervised": false
+    },
+    {
+      "arm": "tsae_broadcast",
+      "alpha": 1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.3333333333333333,
+      "obey_earlier_cut70": 0.3333333333333333,
+      "obey_earlier_fulltext": 0.3333333333333333,
+      "coherence_mean": -0.5948449124892553,
+      "coherence_median": -0.6133708357810974,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.08928571428571429,
+      "upper_frac_B": 0.33076923076923076,
+      "supervised": false
+    },
+    {
+      "arm": "txc_flat",
+      "alpha": -1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.5,
+      "obey_earlier_cut70": 0.5,
+      "obey_earlier_fulltext": 0.5,
+      "coherence_mean": -0.6381756563981374,
+      "coherence_median": -0.6266887187957764,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.08641975308641975,
+      "upper_frac_B": 0.08641975308641975,
+      "supervised": false
+    },
+    {
+      "arm": "txc_flat",
+      "alpha": 1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.16666666666666666,
+      "obey_earlier_cut70": 0.16666666666666666,
+      "obey_earlier_fulltext": 0.3333333333333333,
+      "coherence_mean": -0.5407605816920599,
+      "coherence_median": -0.4976719319820404,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.13829787234042554,
+      "upper_frac_B": 0.35964912280701755,
+      "supervised": false
+    },
+    {
+      "arm": "dom_slab",
+      "alpha": -1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.3333333333333333,
+      "obey_earlier_cut70": 0.3333333333333333,
+      "obey_earlier_fulltext": 0.3333333333333333,
+      "coherence_mean": -0.4472399701674779,
+      "coherence_median": -0.41450217366218567,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.10483870967741936,
+      "upper_frac_B": 0.38317757009345793,
+      "supervised": true
+    },
+    {
+      "arm": "dom_slab",
+      "alpha": 1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.6666666666666666,
+      "obey_earlier_cut70": 0.6666666666666666,
+      "obey_earlier_fulltext": 0.6666666666666666,
+      "coherence_mean": -0.4897873103618622,
+      "coherence_median": -0.42661428451538086,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.2932330827067669,
+      "upper_frac_B": 0.09090909090909091,
+      "supervised": true
+    },
+    {
+      "arm": "broadcast_optimal",
+      "alpha": -1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.5,
+      "obey_earlier_cut70": 0.5,
+      "obey_earlier_fulltext": 0.5,
+      "coherence_mean": -0.9650386075178782,
+      "coherence_median": -0.9094101190567017,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.06547619047619048,
+      "upper_frac_B": 0.0935672514619883,
+      "supervised": true
+    },
+    {
+      "arm": "broadcast_optimal",
+      "alpha": 1.0,
+      "n": 6,
+      "obey_earlier_cut50": 0.5,
+      "obey_earlier_cut70": 0.5,
+      "obey_earlier_fulltext": 0.5,
+      "coherence_mean": -0.6046880632638931,
+      "coherence_median": -0.5439306199550629,
+      "repeat_frac_mean": 0.0,
+      "upper_frac_A": 0.08588957055214724,
+      "upper_frac_B": 0.0875,
+      "supervised": true
+    }
+  ],
+  "coherence_floor": {
+    "value": -0.6268205046653748,
+    "rule": "5th percentile of unsteered per-generation mean token logprob",
+    "n": 6
+  },
+  "z_peak_dose": {
+    "txc_slab_vs_sae_broadcast": 5.663208326229491,
+    "txc_slab_vs_tsae_broadcast": 5.64681278638338,
+    "txc_slab_vs_txc_flat": 6.197968459244197,
+    "txc_slab_vs_txc_profile_random": 7.479604356976079,
+    "txc_slab_vs_random_slab": 6.275846530573276,
+    "txc_slab_vs_random_broadcast": 4.680698150760005,
+    "txc_slab_vs_sae_schedule": 2.1925492046470816,
+    "txc_slab_vs_rank1_best": -2.2864993486996776,
+    "txc_slab_vs_grad_slab": -4.984680742705269,
+    "txc_slab_vs_grad_rank1": -6.855799824433332,
+    "txc_slab_vs_sae_schedule_grad": -1.2763365721339663,
+    "txc_slab_vs_broadcast_optimal": 0.07985407599277347,
+    "txc_slab_vs_dom_slab": -2.4051103663877056
+  },
+  "z_matched_dose": {
+    "txc_slab_vs_sae_broadcast": 5.663208326229491,
+    "txc_slab_vs_tsae_broadcast": 5.64681278638338,
+    "txc_slab_vs_txc_flat": 6.197968459244197,
+    "txc_slab_vs_txc_profile_random": 7.479604356976079,
+    "txc_slab_vs_random_slab": 6.275846530573276,
+    "txc_slab_vs_random_broadcast": 4.680698150760005,
+    "txc_slab_vs_sae_schedule": 2.1925492046470816,
+    "txc_slab_vs_rank1_best": -2.2864993486996776,
+    "txc_slab_vs_grad_slab": -4.984680742705269,
+    "txc_slab_vs_grad_rank1": -6.855799824433332,
+    "txc_slab_vs_sae_schedule_grad": -1.2763365721339663,
+    "txc_slab_vs_broadcast_optimal": 0.07985407599277347,
+    "txc_slab_vs_dom_slab": -2.4051103663877056
+  },
+  "matched_dose_magnitude": 1.0,
+  "win": true,
+  "task": "recency_tr",
+  "task_test": "recency_ev"
+}

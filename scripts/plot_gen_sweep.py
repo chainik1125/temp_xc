@@ -27,7 +27,13 @@ recency wins, and the quantity of interest is how far a write pushes it up.
 gradient respectively -- and are drawn dashed. They are references, not arms a practitioner
 holds.
 
-Reads results/txc_wins/recency_gensweep.json.
+Reads results/txc_wins/recency_tr_gensweep.json.
+
+SELECTION CAVEAT. Each dictionary arm's latent is chosen by measured steering on the
+LOGIT metric, which is this sprint's own recommendation and is symmetric across arms.
+It is not chosen on generation obedience, so what the figure shows is whether a latent
+picked on the teacher-forced metric transfers to observable output -- a harder test
+than selecting on the readout being reported, and the one worth running.
 """
 import json
 import pathlib
@@ -36,7 +42,7 @@ import sys
 import matplotlib.pyplot as plt
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SRC = ROOT / "results" / "txc_wins" / "recency_gensweep.json"
+SRC = ROOT / "results" / "txc_wins" / "recency_tr_gensweep.json"
 OUT = ROOT / "plots" / "2026-07-26_txcwins" / "gen_sweep.png"
 
 # Wong palette, consistent with the sprint's other figures.
