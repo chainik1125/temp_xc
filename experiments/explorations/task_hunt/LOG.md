@@ -6194,3 +6194,110 @@ NOT-REPRODUCED), receipts proposals R-X1..X4 — PENDING TEAM REVIEW
 and pending Andrii's review.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+---
+
+## 2026-07-26 ~16:55 London — mac-local: salvage FREEZE-REVIEWS (both APPROVED), GAP-A ruling, collision process flag
+
+_Observed HEAD at review: `2e163e126` (pulled immediately before this
+entry per the standing rule)._
+
+**1. W1 freeze-review (card `50af78f12`, driver `d5da8ef59`):
+APPROVED; the k-resolution deviation is RATIFIED.** The briefing's
+"k = 8·T" was MY transcription error — I imported the stage2
+code-rate convention without checking the tt panel's realized post
+config, which the panel receipts show was `k_pos = 8` per window
+(l0_per_window 5.56–8.06 across T). A confirmation must touch the
+observed config. mac-a's resolution — PRIMARY claiming arm = k_pos 8
+panel-identical (budget-CONSERVATIVE vs the per-token baselines, so
+an S1 pass cannot be a capacity artifact); SECONDARY = k = 8·T
+budget-parity, reported at full prominence but non-claiming; no
+max-over-arms, claiming arm fixed pre-results — is the correct
+reading of the briefing's intent, independently endorsed by a
+second executor's pre-flight (see item 4). Verified at review:
+72-cell enumeration hard-asserts pre-run (count, 30/30/12 split,
+per-cell `eval_extra` v2 block — the defect assert, `run_salvage.py`
+lines 75–86); numeric l0 bands with an out-of-band ⇒ non-claiming
+rule (an improvement over R22's post-hoc variant handling); S1
+paired-t formula (t₀.₉₇₅,₂ = 4.3027, n = 3) matches the R27
+convention; S4 KILL values match `panel_evidence_line_tt.json`
+(0.0148 / 0.1142); S3 correctly reported-not-gating; driver pin =
+freeze SHA with `_assert_pinned()` in-container. Est ~$10 within the
+$100 cap. Cells may claim as frozen.
+
+**2. W2 freeze-review (mini-card `fedf75aa9`, driver `2b76f7056`):
+APPROVED.** The read-only audit already delivers: gpt2@T8 c1–c3
+REPRODUCED from artifacts (11.3–21.9σ, worst-winner > best-
+comparator); 8B@T8 c3 fails the thread's own W3/W8 (1.9σ,
+non-strict, one anomalous bootstrap CI); claims.jsonl pins T = 8
+with no model name while the report quotes the robust 8B T = 16
+cell — FLAGGED for Andrii, not overridden (correct posture).
+GAP-B's adverse branches are pre-stated (including the 8B losing
+its temporal-structure licence); the deliberately-NOT-run list
+correctly declines to re-run their science. Driver pin matches the
+freeze; the additive-only constraint is respected.
+
+**3. W2 GAP-A rolling review — RULING on the failed V-pos
+prediction (results `2e163e126`).** By the LETTER of the frozen
+card, the 8B lands in **band 2, not band 3**: V-all@T8 = 0.175 ≥
+best per-token dict 0.129, and the card defined V-all as including
+V-pos. The commit-message sentence "surface-quiet CONFIRMED per
+card band 3 [both models]" is therefore NOT licensed as written.
+Ruling: the memo reports BOTH readings side by side. (a) Letter:
+gpt2 band 3 (V-all 0.152 < 0.215); 8B band 2 via V-all. (b)
+Decomposition: the band-2 trigger is entirely the ORACLE-position
+arm — absolute document position is not computable from window
+tokens, so it is not a window-visible cue; the window-computable
+arms at T8 (V-rep 0.058/0.060, V-uni 0.044/0.084) are ≪ the
+per-token dicts on both models, so the dq-style objection (a reader
+counting visible cues) is genuinely absent at T = 8. The V-pos
+result (0.207/0.172 vs pre-registered ≈ 0) becomes an INSTRUMENT
+caveat — the bin-mean detrend leaves a position-readable residual —
+that travels with EVERY absolute skill quote from this thread, and
+it CONTRADICTS the thread's own position-triage (≈ chance) — flag
+for Andrii, side by side. Required additions to the memo: (i) a
+joint window-computable fit (V-rep + V-uni, "V-win") as the
+operative surface floor per model/T; (ii) the T16 nuance stated
+plainly: window-surface rises steeply at T16 (V-rep 0.20–0.22 both
+models — the surface fraction grows with T, dq-like), BUT unlike dq
+the dictionaries stay clear of the FULL visible arm at T16 (8B post
+0.507 ≈ 2× V-all 0.247) — the quotable comparison at any T is
+dict-vs-V-all-at-that-T. "Surface-quiet at window scale" may be
+quoted only in the decomposed form with the position caveat
+attached.
+
+**4. COLLISION near-miss + adopted rule (process flag, cost $0).**
+At ~16:36 I dispatched fresh executor sessions for both worker ids
+on the false premise that the prior sessions were dead (evidence
+read: clones sitting at `d8641a345` with zero salvage commits;
+actually both were live and mid-pre-flight). The fresh mac-a
+executor detected the live session's freeze mid-pre-flight and
+STOOD DOWN with $0 spent and nothing touched — no duplicate launch,
+no duplicate rows; its independent pre-flight had converged on the
+same k-resolution, which is why item 1 cites a second endorsement.
+The fresh mac-b executor was ordered to stand down read-only
+(report pending). ADOPTED RULE: before dispatching an executor for
+an agent id, positively check for a live session (process check on
+the workspace and/or a fresh "in-flight" STATUS push); a quiet
+clone is UNKNOWN, not dead. The live sessions own their lanes.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+**ADDENDUM ~17:05 — second-eyes convergence + a NEW audit finding
+(from the stood-down mac-b executor's read-only pre-flight, $0).**
+(a) Its independent Stage-1 recompute converges with the live
+session's audit everywhere (c1–c4 + r1, incl. c3@8B/T8 failing
+W3/W8 and 8B@T16 robust: post min-seed 0.4715 vs stacked max-seed
+0.2245). (b) It independently reached the same band-2-by-letter
+reading of GAP-A at 8B (ruling item 3 stands, with convergence).
+(c) NEW, for the memo's gap list: `report.py`'s embedded self-audit
+invokes `audit.py --pattern focus_*.json`, which POOLS the gpt2 and
+8B novelty cells into single 6-seed pseudo-cells — the pooled run
+reports c3 "CLAIM SURVIVES" (4.6σ, W8 WARN only) while the 8B-only
+run yields "CLAIM CONTRADICTED". The memo must carry this as its
+own gap item (embedded audit should run per-file), flagged for
+Andrii side-by-side. (d) Verified benign: V-pos byte-identical
+across T is the support-64 NaN mask making eligible rows
+T-invariant (not a bug); n_test row-identity matches the focus
+files cell-for-cell.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

@@ -88,20 +88,27 @@ support; salvage briefed: mac-a = ttrend POST fresh-seed panel
 (salvage-mac-b.md), shared = salvage-shared.md. Budget fine < $500
 total (spent ≈ $87).
 
-**EXECUTION MODE (post-compact, ~16:36): the two workers run as
-BACKGROUND SUBAGENTS of the mac-local orchestrator session** (their
-old standalone sessions did not resume; clones were synced at
-d8641a345 with zero salvage commits). Each subagent works in its own
-clone (~/research/projects/agents/mac-{a,b}/temp_xc), full briefing
-discipline in its prompt (freeze-push-before-launch, detach, caps
-$100/$60, ledger, pull-rebase-push). Completion notifications arrive
-in-session; their pushes ALSO trip the origin watcher. If this
-session dies, workers die with it — relaunch from the briefings.
+**EXECUTION MODE (corrected ~16:55): the PRIOR STANDALONE worker
+sessions are LIVE and own their lanes.** My ~16:36 dispatch of
+fresh executor subagents was a near-miss on a false dead-session
+premise — both stood down $0/untouched (BOTH confirmed; mac-b's
+second-eyes pre-flight yielded the report.py pooled-pseudo-cell
+audit finding, now in LOG). Adopted rule in LOG: a quiet clone is
+UNKNOWN, not dead — positively check for a live session before
+re-dispatching. W1 in flight (freeze 50af78f12, Modal app launched
+~16:38, est ~$10); W2 GAP-A landed (2e163e126), GAP-B rawgate
+launched (ledger 789b4f10d, est ~$4). Program est ≈ $101 of $500.
 
-DONE 16:35–16:40: WRITEUP demotion edit pushed 9b6199be5 (title,
+DONE 16:35–16:55: WRITEUP demotion edit pushed 9b6199be5 (title,
 §1, §4 'passed-then-demoted' + objection, §5 note); distillation
-§9 EVENING ADDENDUM added (demotion, salvage state, revised
-decision items incl. bless-the-salvage-bars-tonight).
+§9 EVENING ADDENDUM (demotion, salvage state, revised decision
+items incl. bless-the-salvage-bars-tonight); BOTH freeze-reviews
+APPROVED in LOG (W1 k-resolution RATIFIED — my briefing's k=8·T
+was the error, primary claiming = k_pos 8 panel-identical; W2
+approved with the audit's 8B/T-pin flag); GAP-A RULING in LOG
+(8B is band 2 by the card's letter via oracle-position V-all;
+surface-quiet survives only in decomposed form + position-residual
+instrument caveat; V-win joint fit + T16 nuance required in memo).
 
 MY queue: (1) freeze-review both salvage cards PRE-RESULTS the
 moment freeze commits land (watcher fires on push); (2) rolling
