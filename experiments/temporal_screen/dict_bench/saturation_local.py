@@ -44,6 +44,22 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "results" / "dict_bench" / "saturation.json"
 
 
+def windows(X, T, stride):
+    """(n_seq, seq_len, d) -> (n_win, T, d).
+
+    stride=T is the disjoint reshape used originally, which makes the number of training
+    windows fall as seq_len/T -- so larger T sees proportionally less data while carrying
+    T times more decoder parameters. stride=1 keeps the window count roughly constant in
+    T, which is what any comparison across T needs.
+    """
+    n_seq, seq_len, d = X.shape
+    if stride >= T:
+        n_win = seq_len // T
+        return X[:, :n_win * T, :].reshape(-1, T, d)
+    W = X.unfold(1, T, stride)                 # (n_seq, n_win, d, T)
+    return W.permute(0, 1, 3, 2).reshape(-1, T, d).contiguous()
+
+
 def pick_device():
     if torch.cuda.is_available():
         return torch.device("cuda")
@@ -130,6 +146,7 @@ def main():
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--activation", type=str, default="batchtopk")
+    ap.add_argument("--stride", type=int, default=1)
     a = ap.parse_args()
 
     import sys
@@ -146,15 +163,18 @@ def main():
     gen = torch.Generator().manual_seed(20260726)
     feats = make_features(a.n_per_extent, extents, a.d, gen)
     X = generate(feats, a.n_seq, a.seq_len, a.d, a.fire_p, a.noise, gen)
-    print(f"[data] {tuple(X.shape)}  {len(feats)} true features", flush=True)
+    print(f"[data] {tuple(X.shape)}  {len(feats)} true features  "
+          f"stride={a.stride}", flush=True)
+    for T in Ts:
+        print(f"   T={T:>3} -> {windows(X, T, a.stride).shape[0]} windows",
+              flush=True)
 
     rows = []
     print(f"\n{'d_sae':>7}{'T':>5}{'d_sae/T':>9}{'coeff/seg':>11}{'FVU':>9}"
           f"{'recovery':>10}{'shift-dup':>11}", flush=True)
     for d_sae in d_saes:
         for T in Ts:
-            n_win = a.seq_len // T
-            W_all = X[:, :n_win * T, :].reshape(-1, T, a.d).to(dev)
+            W_all = windows(X, T, a.stride).to(dev)
             n_hold = max(int(0.15 * W_all.shape[0]), 64)
             Wtr, Who = W_all[:-n_hold], W_all[-n_hold:]
 

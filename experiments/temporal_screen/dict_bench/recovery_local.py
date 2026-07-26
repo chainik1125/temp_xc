@@ -52,6 +52,22 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "results" / "dict_bench" / "recovery.json"
 
 
+def windows(X, T, stride):
+    """(n_seq, seq_len, d) -> (n_win, T, d).
+
+    stride=T is the disjoint reshape used originally, which makes the number of training
+    windows fall as seq_len/T -- so larger T sees proportionally less data while carrying
+    T times more decoder parameters. stride=1 keeps the window count roughly constant in
+    T, which is what any comparison across T needs.
+    """
+    n_seq, seq_len, d = X.shape
+    if stride >= T:
+        n_win = seq_len // T
+        return X[:, :n_win * T, :].reshape(-1, T, d)
+    W = X.unfold(1, T, stride)                 # (n_seq, n_win, d, T)
+    return W.permute(0, 1, 3, 2).reshape(-1, T, d).contiguous()
+
+
 def pick_device():
     if torch.cuda.is_available():
         return torch.device("cuda")
@@ -145,12 +161,11 @@ def recovery(W_dec, feats, T, device):
     return out
 
 
-def train(T, X, d, d_sae, k_per, steps, batch, lr, device, activation, log):
+def train(T, X, d, d_sae, k_per, steps, batch, lr, device, activation, log,
+          stride=1):
     from src.bench.architectures.crosscoder import TemporalCrosscoder
 
-    n_seq, seq_len, _ = X.shape
-    n_win = seq_len // T
-    W_all = X[:, :n_win * T, :].reshape(-1, T, d).to(device)
+    W_all = windows(X, T, stride).to(device)
     # Hold out whole sequences' worth of windows, so no training window shares a
     # generative firing with an evaluation one.
     n_hold = max(int(0.15 * W_all.shape[0]), 64)
@@ -197,6 +212,7 @@ def main():
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--activation", type=str, default="batchtopk")
+    ap.add_argument("--stride", type=int, default=1)
     a = ap.parse_args()
 
     import sys
@@ -227,7 +243,7 @@ def main():
     rows = []
     for T in Ts:
         m, l0, fvu = train(T, X, a.d, a.d_sae, a.k_per, a.steps, a.batch, a.lr, dev,
-                           a.activation, log=True)
+                           a.activation, log=True, stride=a.stride)
         rec = recovery(m.W_dec.data, feats, T, dev)
         by_L = {}
         for f, r in zip(feats, rec):
