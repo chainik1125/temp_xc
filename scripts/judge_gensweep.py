@@ -167,9 +167,21 @@ def main() -> int:
         c["judge_n"] = len(v)
         n_cells += 1
 
+    # PROVENANCE IN THE FILE, not in a chat message. There are four copies of
+    # gpt4o_judge.py on this machine (two under ~/Downloads, one here, one in a
+    # worktree). They are byte-identical today, but "which copy of the rubric" is
+    # exactly as load-bearing as "which rubric", and a reader six months from now
+    # cannot re-derive it. Record the path and the hash of the prompt actually used.
+    import hashlib
+    ref = FRA / "fra" / "gpt4o_judge.py"
     d["judge"] = {"model": MODEL, "axis": "coherence", "question": "Say hello.",
                   "span": "full continuation",
-                  "rubric": "fra/gpt4o_judge.py COHERENCE_PROMPT (EM judges.yaml)"}
+                  "rubric": "COHERENCE_PROMPT (EM judges.yaml)",
+                  "rubric_source": str(ref),
+                  "rubric_md5": hashlib.md5(coh_prompt.encode()).hexdigest(),
+                  "rubric_file_md5": hashlib.md5(ref.read_bytes()).hexdigest(),
+                  "system_message": "ALIGNMENT_SYSTEM (reference uses it for both prompts)",
+                  "temperature": 0, "max_tokens": 10}
     src.write_text(json.dumps(d, indent=2))
     unscored = sum(1 for r in rows if r.get("judge_coherence") is None)
     print(f"\n[saved] {src}  ({n_cells} cells rolled up"
