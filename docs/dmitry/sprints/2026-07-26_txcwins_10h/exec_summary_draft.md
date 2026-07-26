@@ -138,7 +138,7 @@ Instruction recency, completed configuration, every arm at matched injected norm
 | `dom_slab` | +8.20 ± 0.22 | supervised reference |
 | `sae_schedule` | +7.86 ± 0.25 | the SAE's own direction on its best schedule |
 | **`txc_slab`** | **+6.48 ± 0.15** | the crosscoder |
-| `tsae_broadcast` | +3.65 ± 0.14 | |
+| `tsae_broadcast` | +3.65 ± 0.14 | **this repo's attention-based temporal SAE — not the published tSAE** |
 | `sae_broadcast` | +2.60 ± 0.15 | a per-token dictionary as actually deployed |
 | `random_broadcast` | +1.81 ± 0.16 | |
 | `txc_flat` | +1.42 ± 0.14 | profile removed |
@@ -154,9 +154,18 @@ So its genuine claim is that it *found* a schedule unsupervised, from reconstruc
 a per-token dictionary could have executed if handed it. That is worth having, because the
 schedule is exactly what a practitioner does not possess. It is a discovery claim.
 
-**A registered architectural prediction lands here.** The tSAE was argued from its decoder to be
-rank-1 with an *automatically supplied* schedule, so it should sit strictly between a constant
-write and an optimally scheduled one. Measured: +2.60 < **+3.65** < +7.86.
+**A registered architectural prediction lands here.** The temporal SAE was argued from its
+decoder to be rank-1 with an *automatically supplied* schedule, so it should sit strictly
+between a constant write and an optimally scheduled one. Measured: +2.60 < **+3.65** < +7.86.
+
+⚠ **The arm measured is not the published tSAE.** `harness.py:268-274` imports `TemporalSAE`
+from `temporal_crosscoders/han_tsae`, which is this repo's **attention-based** variant. The
+published tSAE (Bhalla et al., ICLR 2026) is an **InfoNCE** architecture with no attention. The
+rank conclusion transfers — both have one decoder direction per latent, so both are rank-1, and
+the ordering prediction holds either way — but the arm's identity does not. It must be described
+as "this repo's attention-based temporal SAE", never as "the tSAE". The kickoff's carried debt
+on tSAE identification is therefore **resolved**, and it resolves to *we benchmarked a different
+temporal SAE than the published one*.
 
 **The controls hold on this task**, which is what distinguishes it from the order task where they
 did not: `txc_flat` at +1.42 sits *below* a random constant direction at +1.81, and

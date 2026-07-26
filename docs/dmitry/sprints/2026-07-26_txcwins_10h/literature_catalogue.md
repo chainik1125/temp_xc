@@ -176,7 +176,19 @@ doc-level noise shared across doses since the same documents are reused (correla
 | flat, SAE-like (0.8, 1.0, 1.0, 0.9) | +0.19 | +0.30 |
 | null (0, 0, 0, 0) | +0.26 | +0.41 |
 
-**The bias is small and it runs the wrong way for a sceptic.** A well-separated peak is picked
+**A miss of mine, recorded before the result below.** I audited the *selection* of the dose and
+missed the *coverage* of the grid. The default is `alphas = "0.25,0.5,1.0,2.0"` — **all
+positive** — and that one-sided grid is what withdrew the previous sprint's headline: `txc_flat`
+was recorded as "inverting" to −8.02 when it is in fact large and positive at negative doses, so a
+sign was read as an inversion. The repo had already established the fix as standard elsewhere —
+`experiments/ward_backtracking_txc/README.md` specifies a grid symmetric across zero, "no
+a-priori reason to favour positive steering", with negative magnitudes as "evidence about
+direction sign and arch behavior, not just floor checks" — and `steer_order_modal.py` does not
+follow it. I read that README early in this sweep and did not connect the two. **Any dose grid
+must be symmetric across zero**; it is now the first thing to check on any steering run, ahead of
+the winner's-curse question below.
+
+**On the winner's curse itself: the bias is small and it runs the wrong way for a sceptic.** A well-separated peak is picked
 reliably by argmax, so the crosscoder arm gains essentially nothing (−0.02 SEM); the flat and null
 arms — the SAE broadcast and the random controls — are the ones inflated, by 0.2 to 0.4 SEM. So
 the reported gap and the z are if anything **understated**. No correction to the existing result
@@ -237,10 +249,12 @@ same number of segments — so this is a budget asymmetry specifically, not a da
 
 Two things follow. First, this run does **not** follow the sprint's own stated standard of
 matching on realised coefficients per segment; that standard was applied to the FVU head-to-head
-table, and the steering run inherits the older nominal-`k` convention. Second, and more usefully,
-the direction is conservative: the crosscoder's +11.29 against the SAE's +1.24 was measured while
-the SAE had twelve times the coefficient budget. That is worth one sentence in the writeup,
-because a reader will otherwise assume the comparison was matched and may suspect it was tuned.
+table, and the steering run inherits the older nominal-`k` convention. Second, the direction of
+the mismatch is conservative — the SAE arm was helped by a factor of twelve, not handicapped.
+**That no longer rescues the original headline, which has been withdrawn on other grounds** (the
+one-sided dose grid), but it applies to any rerun: a symmetric-grid rerun that still shows a
+crosscoder advantage will have obtained it against an SAE holding 12× the budget, and that is
+worth stating.
 
 **What to actually do.** Report the asymmetry rather than hide it, and if there is compute to
 spare, rerun the steering arms with the crosscoder at `k_window = k_segment × T` so the budgets
@@ -415,9 +429,14 @@ crescendo (a constant permissiveness write).
 
 Where the sprint's winning tasks differ is that the metric is a **contrast between the two
 conditions** — a teacher-forced margin between the target ordering and its multiset-matched foil.
-A constant write moves both sides of that contrast equally and cancels, which is exactly what the
-last sprint measured when `sae_broadcast` came in at +1.24 against the crosscoder's +11.29, and
-what the trajectory tasks measured when broadcast sat at zero or below at every window length.
+A constant write moves both sides of that contrast equally and cancels.
+
+**Do not cite the previous sprint's order-task numbers for this.** The +11.29 against +1.24
+result has been **withdrawn** — measured on a one-sided dose grid, and rerun symmetrically the
+crosscoder does not beat the SAE significantly. The evidence that survives is the trajectory
+tasks, where broadcast measures at or slightly below zero at every window length, and the
+measured `c` ordering, where the order task's `c = 0.241` says a constant write always had grip
+there.
 
 **Practical rule.** Matching the foil is necessary but not sufficient. The metric must also be a
 *difference between the matched pair*, not an absolute score on one member of it. Any candidate
