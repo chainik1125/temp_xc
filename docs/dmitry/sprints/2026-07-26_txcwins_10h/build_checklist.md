@@ -81,6 +81,14 @@ reasoning.
    n = 10** is not comparable to **0.272 at n = 200**. A smoke-scale `r1` is not a small-sample
    estimate of the full-scale one — it is a different number. Fix the `n` before comparing cells,
    and treat any cross-cell `r1` comparison at differing `n` as uninterpretable.
+2f. **A moment-matched complement pair exists only for `k_seg ≡ 0 or 3 (mod 4)`.** Matching moment 1
+   under complementation requires `Σ_{j=1..k} j` to be even, which fails for `k = 14` and `k = 18`.
+   So the ladder of usable sizes is 12, 16, 20 — not 12, 14, 16. Verified by enumeration.
+   Counts, and note the units: at **k = 12 there are 2 qualifying subsets = 1 complement pair**
+   (the pattern in use — it was *forced, not chosen*, which answers the post-hoc-selection question
+   a reader would otherwise ask); at **k = 16 there are 14 qualifying subsets = 7 pairs**. Quote
+   pairs, not subsets — each pair is counted twice by a subset enumeration, so "14 pairs at k = 16"
+   overstates the available robustness checks by a factor of two.
 3. **Size the go/no-go at ~128 permutations.** Typical permutation-to-permutation accuracy std is
    about two points; the dramatic gaps are the tails and must be searched for. A 24-permutation
    sweep showing a small spread means "underpowered", not "no effect".

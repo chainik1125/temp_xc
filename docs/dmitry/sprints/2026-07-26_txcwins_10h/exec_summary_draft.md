@@ -467,12 +467,23 @@ foil**. Matching the multiset is the *zeroth* moment; the state's DC residue is 
 constructed patterns match moments 0, 1 **and** 2 exactly (6 / 39 / 325).
 
 **The pattern pair is forced, not chosen.** Enumerating all 924 balanced 12-length label
-sequences, exactly **one** has a complement matching moments 0, 1 and 2 — the pair used. There
-were no researcher degrees of freedom in the pattern, which also means the obvious robustness
-check (does the geometry repeat under a different moment-matched pair?) **cannot be run at
-`k_seg = 12`**: the design space is a single point. It becomes available at `k_seg = 16`, where 14
-such pairs exist, or at `k_seg = 12` by dropping to non-complement foils, which caps the
-rearrangement distance at 8 of 12 and weakens the contrast.
+sequences, exactly **one complement pair** matches moments 0, 1 and 2 — the pair used. There were
+no researcher degrees of freedom in the pattern, which is a stronger answer to the
+cherry-picking question than a robustness check would have given, because it shows there was
+nothing to pick from.
+
+It also means that robustness check **cannot be run at `k_seg = 12`**: the design space is a
+single point. The usable sizes are sparser than they look —
+
+| `k_seg` | 8 | 12 | **14** | 16 | **18** | 20 |
+| --- | --- | --- | --- | --- | --- | --- |
+| complement pairs | 1 | **1** | **impossible** | 7 | **impossible** | 24 |
+
+— because matching moment 1 under complementation needs `Σj` even, which fails for even `k` unless
+`k ≡ 0 (mod 4)`. So the ladder is 8, 12, 16, 20, and **`k_seg = 16` is the next usable size rather
+than a convenient one**. If the check is ever run, the clean form is two of `k = 16`'s seven pairs
+against each other, holding document length fixed and varying only the pattern; comparing `k = 12`
+against `k = 16` would confound pattern with length.
 
 Screened on real activations, n = 200, both metric modes:
 
