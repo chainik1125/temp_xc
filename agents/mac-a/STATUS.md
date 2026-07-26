@@ -29,14 +29,22 @@ scoring.**
    detached ~21:30 BST, app `ap-NANQj1zSfcIiBELX4ydG9w`
    (mac-a-diafaces-calib): H100 main 18 cells + 2× L4 tsae; relu-mix
    arm = 20 REUSED rows (card § 3 eval_keys); est ~$3 ledgered.
-   neg_frac plan: train-time value wasn't persisted by the frozen
-   pipeline → (a) untrained cells reconstructed exactly local
-   (seed-fixed init; gpt2 cache building locally), (b) trained cells
-   = l0-gap ESTIMATE labeled as such, (c) Stage-3 card persists it
-   properly. Evaluator l0 verified sign-agnostic (`z != 0`) — band
-   check sound for negative survivors. On land: pull → merge
-   (pin-asserted) → score → fig (`make_calib_fig.py` ready) → LOG
-   verdict PTR quoting E1–E4 + advisory → ledger actuals.
+   **RESULT (19/20 in, tsae_s4 in flight): IDENTITY — btk-only ≡
+   relu-mix at hunt widths.** 18 main cells: |Δrec| ≤ 2.2e-08, Δl0 =
+   0.0 EXACTLY; tsae s3 identical to all printed digits
+   (0.022458/7.0037). Preliminary LOG entry PUSHED (00309362f) with
+   pods heads-up (their k20/d18432 arms will likely no-op too — smoke
+   + neg_frac first). Mechanism re-attribution: l0 shortfall = eval
+   JumpReLU threshold pruning, NOT selection zero-picks; neg_frac ≡ 0
+   proven BY the identity (advisory answered exactly). On s4 land
+   (watch buqn611s8): repatriate all 3 payloads from Volume (local
+   .get() prints not flowing — Volume finally-writes are the designed
+   fallback) → merge (pin-asserted) → score → fig → FINAL verdict
+   (draft at scratchpad verdict_draft.md: E1/E3 FAIL-by-no-movement,
+   E4 vacuous-pass, l0 band out-of-band disclosed as designed) +
+   **Stage-3 RE-SCOPE PROPOSAL** (~$5–8 identity-confirm probes +
+   thin-pool divergence demo instead of $23–34 blind re-runs; needs
+   mac-local ruling) → ledger actuals (≈$3).
 3. **Stage 3 GATED on Stage 2** — KEEP-set survives-the-fix
    (R29 ttrend lane / R22 λ̂ cells / R27 dq cells vs SAME bars;
    verdicts SURVIVES / MOVED-MARGINS / DOES-NOT-SURVIVE).
