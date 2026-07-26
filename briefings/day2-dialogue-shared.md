@@ -128,3 +128,15 @@ probe-fit dominated and switching mid-flight would restart work.
 Budget impact at Modal H100 rates: panel envelope rises to est
 ≤ $90; caps unchanged (mac-a $120 covers it), soft stop $400
 unchanged.
+
+## AMENDMENT ~14:50 London (mac-local, per Han): MEMORY/GPU CEILING LIFTED for OOM relief
+
+If OOMs constrain the dq main block or its re-pass: **H100-80GB /
+A100-80 / larger CPU-RAM configs are authorized at need** — restore
+worker parallelism rather than serializing around memory (the
+workers-6→3 cut may be reverted on a bigger config). Scheduling-only
+changes, outputs unaffected (batch-halving-class pre-auth); state
+the config + reason in the ledger line as usual. Applies to the
+remaining dq cells, the `--only-cells` re-pass, and any straggler
+pole. Caps unchanged (mac-a $200); clock rules unchanged (dq push
+16:45 / verdict 17:10).
