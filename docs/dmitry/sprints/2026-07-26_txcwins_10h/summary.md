@@ -100,7 +100,12 @@ broadcast direction**, whether or not any dictionary contains it. On held-out in
 effect. That is what makes the arm escaping this bound — one direction on a *schedule* — the
 honest per-token comparator.
 
-`c` is a **ranking heuristic with a known inversion**, not a rule. It does not establish a
+**What `c` does and does not do, stated once.** It bounds what a *constant* write can reach, and
+that bound is confirmed — 4/4 on the four-rung ordering test against `sae_broadcast`/`grad_slab`,
+the arm it actually describes, and it retro-predicts eight executed experiments across two sprints.
+It is a **ranking heuristic with a known inversion**, not a rule. What it does **not** do is
+forecast what a crosscoder achieves; neither does `r1`. **Geometry sets the ceilings, and nothing
+measured in this sprint predicts which ceiling gets reached.** It does not establish a
 quantitative law: the constant arms are 72–80% *even* in α, so they are largely second-order
 artefact, which makes `sae_broadcast` a **mis-specified** baseline rather than a weak one.
 
