@@ -672,11 +672,25 @@ hours, each time by reading our own code rather than by a result looking wrong:
 | Frobenius norm of the write | injected norm, which weights by segment length |
 | the screen's output fields | no baseline field, so the go/no-go was unavailable without training |
 | a task name in the registry | a *different* generator, after two agents edited the registry |
+| a field called `z` | `z` at **peak** dose, while the analysis scripts reported `z` at **matched** dose |
 
 **Every one was a quantity nobody thought needed checking, because it had a name implying it was
-already right.** None of them errored. Three of the six were silently disadvantaging the arm we
-were arguing *for*, and one — the dose grid — was the sole support for a published result that has
-now been withdrawn.
+already right.** None of them errored. Three were silently disadvantaging the arm we were arguing
+*for*, and one — the dose grid — was the sole support for a published result that has now been
+withdrawn.
+
+**The last is the sharpest, because it contains no bug at all.** The `z` field was correct,
+computed correctly and stored correctly; it simply did not say which dose convention it used, and
+two careful readers derived different numbers from the same file with neither being wrong. It cost
+a reconciliation anyway. The harness now stores `z_peak_dose` and `z_matched_dose` separately;
+existing result files keep the original field, and this document quotes it as peak-dose
+throughout.
+
+An eighth, for completeness, and it is mine: a figure script written at hour eight indexed the
+**signed** `α = +0.5` rather than the matched magnitude, which would have reported two per-token
+baselines as negative against a large positive crosscoder — the one-sided-grid error, in a figure,
+inside the document whose lead finding is a headline withdrawn for that exact reason. Caught in
+review by its author's teammate before it shipped.
 
 The practice that caught them is cheap and worth stating plainly: **read what the code records,
 not what the variable is called**, and check it before spending compute rather than after a number
