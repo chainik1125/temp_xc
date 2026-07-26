@@ -273,6 +273,22 @@ question, why discovery fails on SmolLM2; see Limits.)
 
   **No mechanism is established.**
 
+- **Discovery does transfer to a larger model, which resolves the scale question the two failures
+  left open.** Qwen2.5-3B-Instruct at L18 (the same 0.50 depth fraction as Qwen2.5-1.5B's L14), two
+  inits, matched dose: the crosscoder reaches **+34.75 / +33.83** against `grad_slab` +39.20 —
+  **0.86–0.89 of the optimal write**, three times the share it reaches on the 1.5B model (0.29) and
+  an order of magnitude above SmolLM2 (0.07). It beats `sae_broadcast` (+15.88 / +20.88) and
+  `random_slab` (+4.42), and roughly matches the *supervised* `dom_slab` (+34.19) unsupervised.
+
+  **So the two earlier failures are not evidence that 1.5B is special** — discovery works at 1.5B
+  and better at 3B, and fails at 0.5B and at SmolLM2-1.7B. Scale is not the axis, or not the only
+  one.
+
+  ⚠ **And the form result holds here too**: `broadcast_optimal` reaches **+41.69**, which is
+  **1.063× `grad_slab`** and above the crosscoder in both inits. That is now **seven of eight**
+  tasks-and-models where the crosscoder does not exceed the best constant write. (A constant write
+  exceeding the full optimal write means this cell sits outside the first-order regime the ratio
+  assumes, so the 1.063 should be read as "at least as good", not as a violation.)
 - **The `c` gate does not transfer across models.** Five of seven transfer cells sit below the
   `c` < 0.1 go-threshold with high `r1` and steer nothing. It was validated within one model and is
   not a cross-model instrument.
