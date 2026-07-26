@@ -44,3 +44,48 @@ by-side with the paper's published EM negative (this ablation may
 CONFIRM the negative — that is a fine outcome and goes in at full
 prominence), LOG verdict PTR, `RUNPOD` ledger lines. Freeze/pin/
 pull-rebase discipline; $150/day cap.
+
+---
+
+## ASSIGNMENT UPDATE (Han, ~22:00 London 2026-07-26) — EM → Dmitry; runpod-2 pivots to RLHF after the in-flight grid
+
+**EM is now Dmitry's lane (human).** Consequences, effective on
+pull:
+1. Your IN-FLIGHT btk-only grid RUNS TO COMPLETION as planned —
+   its deliverable is re-labeled **Dmitry-support input** (the
+   composition-harmonized shuffle + T table for the medical cell,
+   card unchanged, E1–E5/K1–K3 scored as frozen, verdict PTR).
+   Do not start anything EM beyond the frozen cells.
+2. **Phase B (EM paper-match) is CANCELLED** — the Gen-1/Gen-2
+   provenance question and any paper-match runs belong to Dmitry
+   (COMPOSITION_AUDIT § 4 is his handover text). Keep the
+   organism-forward Phase-B insurance caches on the volume
+   (cheap, may serve his redo).
+3. **Your next assignment: the RLHF ablation** (shuffle + T-sweep
+   — the fourth paper task, currently unowned). Start prep now in
+   parallel with the EM grid (CPU/download side), launch after the
+   grid frees GPU 2. Everything you need is pinned in
+   COMPOSITION_AUDIT § 6:
+   - Task: HH-RLHF preference decomposition, gemma-2-2b BASE L12,
+     first N=1000 harmless-base pairs, mean-over-response-tokens,
+     rank by mean_rejected − mean_chosen.
+   - Paper arms (per-task, NOT global): topk_sae k=500/token;
+     tsae_paper_k500 + _k20 (ReLU→threshold at eval);
+     TXC = `agentic_txc_02` matryoshka-contrastive T=5 k_win=500
+     — note the RIGHT-EDGE window attribution convention (audit
+     § 6), which paper-match must copy.
+   - **paper-match arm = EVAL-ONLY**: the shipped seed-42
+     checkpoints are public in `han1823123123/txcdr-base`
+     (`<arch_id>__seed42.pt`) — download, shuffle-eval, T-read.
+   - **btk-only arm**: retrain the same shapes with `*_btkonly`
+     (mac-a's canonical convention; smoke + neg_frac check first —
+     the identity heads-up in LOG ~22:20 applies at these widths
+     too). T-sweep on the TXC arm T ∈ {1, 2, 5, 8, 16} at
+     k_win = 100·T (the paper's per-token parity), T=1 = the
+     controlled limit.
+   - Shuffle control: within-window input permutation pre-encode,
+     seed 42 (protocol semantics as in your EM card § 3).
+   - Deliverable: the same Dmitry table + T-sweep figure + LOG
+     verdict PTR + RUNPOD ledger lines. Freeze a card first;
+     mac-local freeze-reviews in parallel. gemma-2-2b is small —
+     est well under the EM grid's cost.

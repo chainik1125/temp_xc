@@ -7397,3 +7397,28 @@ freeze, 0 dups, 12/20 dirty (pool convention), pins verified 20×.
 
 Everything PENDING TEAM REVIEW as always; pods' binding smoke +
 neg_frac check per af2247d43 § 3 stands.
+---
+
+## 2026-07-26 ~22:05 London — mac-local: EM HANDOFF to Dmitry (Han's directive) + runpod-2 → RLHF
+
+Han: Dmitry is handling the EM redo. RULINGS: (1) runpod-2's
+in-flight btk-only EM grid RUNS TO COMPLETION, re-labeled
+DMITRY-SUPPORT INPUT — it is the composition-harmonized
+shuffle + T table his redo needs, landing by morning; card and
+bars unchanged; nothing EM starts beyond the frozen cells.
+(2) EM Phase B (paper-match) CANCELLED on our side; the Gen-1/
+Gen-2 provenance question transfers to Dmitry with
+COMPOSITION_AUDIT § 4 as the handover text (the 9am item becomes
+"here is the map" rather than "please locate"). Insurance caches
+stay on the volume for his use. (3) **runpod-2's next assignment =
+the RLHF ablation** — the fourth paper task, previously unowned
+(Han's if-time item at the meeting): briefing appended to
+actmix-runpod-2.md; paper-match is EVAL-ONLY on the public
+txcdr-base seed-42 checkpoints (audit § 6 byte-identity lane),
+btk-only arm retrains at paper shapes; prep now, GPU after the EM
+grid frees GPU 2; card + freeze-review as always. COORDINATION
+NOTE FOR HAN TO RELAY: Dmitry should know the harmonized EM
+ablation table arrives by morning so he builds on it rather than
+re-running the shuffle control.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
