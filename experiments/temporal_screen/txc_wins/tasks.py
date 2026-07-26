@@ -431,9 +431,11 @@ except ImportError:  # pragma: no cover - local runs without the package on sys.
 
 TASKS.update(_THEORY_DESIGNS)
 
-# The two-moment demonstration-order design. Kept separate for the same reason as the theory
-# designs, and because it is the only task here whose foils are constrained on TWO moments of
-# the label sequence rather than on the multiset alone.
+# The two-moment demonstration-order designs. Two independent implementations, kept both on
+# purpose: the theory agent's `designs_demoorder` is ORDERING mode and its geometry is screened
+# on real activations (c = 0.0204, r1 = 0.587, n = 200); `designs_twomoment` is PROBE mode and
+# carries the unconstrained control and the held-out content split. Merged in that order so the
+# validated design owns the bare `demo_order` name.
 try:
     from txc_wins.designs_twomoment import DESIGNS as _TWOMOMENT_DESIGNS
 except ImportError:  # pragma: no cover - local runs without the package on sys.path
@@ -443,3 +445,13 @@ except ImportError:  # pragma: no cover - local runs without the package on sys.
         _TWOMOMENT_DESIGNS = {}
 
 TASKS.update(_TWOMOMENT_DESIGNS)
+
+try:
+    from txc_wins.designs_demoorder import DESIGNS as _DEMOORDER_DESIGNS
+except ImportError:  # pragma: no cover - local runs without the package on sys.path
+    try:
+        from .designs_demoorder import DESIGNS as _DEMOORDER_DESIGNS
+    except ImportError:
+        _DEMOORDER_DESIGNS = {}
+
+TASKS.update(_DEMOORDER_DESIGNS)

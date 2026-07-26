@@ -40,6 +40,9 @@ means there is nothing to steer and the design has proved too much, which is its
 """
 import itertools
 
+# Sixteen of each, thematically paired across polarity and roughly length-matched, so that a
+# TRAIN/EVAL split can use disjoint halves and the steering claim is "steers this factor"
+# rather than "steers content it was trained on".
 POS_REVIEWS = [
     "The pacing never let up and I stayed engaged throughout.",
     "Warm performances carried every scene.",
@@ -49,6 +52,14 @@ POS_REVIEWS = [
     "Easily the most inventive thing I saw this year.",
     "The score did a great deal of quiet work.",
     "Both leads were completely convincing.",
+    "The editing kept every sequence tight and clear.",
+    "A closing act that paid off everything before it.",
+    "The dialogue sounded like people actually talking.",
+    "Every supporting player was given something real.",
+    "The premise was handled with unusual care.",
+    "It trusted the audience to keep up.",
+    "The final image has stayed with me since.",
+    "A confident piece of work from start to finish.",
 ]
 NEG_REVIEWS = [
     "The pacing dragged badly in the middle hour.",
@@ -59,6 +70,14 @@ NEG_REVIEWS = [
     "Easily the most derivative thing I saw this year.",
     "The score telegraphed every beat.",
     "Neither lead was remotely convincing.",
+    "The editing left every sequence slack and unclear.",
+    "A closing act that paid off nothing before it.",
+    "The dialogue sounded like nobody actually talking.",
+    "Every supporting player was given something thin.",
+    "The premise was handled with unusual laziness.",
+    "It assumed the audience could not keep up.",
+    "The final image had left me before the credits.",
+    "A careless piece of work from start to finish.",
 ]
 QUERY_REVIEWS = [
     "The second act took a turn I did not expect.",
@@ -110,16 +129,39 @@ def centred_reference(k_seg):
     return [0] * q + [1] * h + [0] * (k_seg - h - q)
 
 
-def make_demo_order(k_seg, match_first_moment=True):
+def make_demo_order(k_seg, match_first_moment=True, n_foils=1, pool="all"):
     """Few-shot demonstrations reordered under matched moments.
 
     `match_first_moment=False` is the CONTROL arm: same construction, multiset matched but
     first moment free, which is the ordinary few-shot-order task and should measure a clearly
     nonzero `c`. Running both is what isolates the second constraint's effect.
+
+    `n_foils` bounds how many foils are drawn from, MOST-REARRANGED FIRST, and defaults to 1.
+    This matters and is not a tuning knob: rank depends on the permutation's cycle structure,
+    so drawing uniformly over all foils mixes documents of different rank and smears the
+    contrast the design exists to create. At `k_seg=12` there are 57 matched foils and only
+    ONE of them inverts every position -- uniform sampling would draw it 1 time in 57 and
+    average a rearrangement distance of 6.6 against the available 12. Holding the label
+    arrangement fixed while the CONTENT varies per document is the same choice `make_rotate`
+    makes, and for the same reason.
+
+    `pool` selects the demonstration half: "train", "eval" (disjoint) or "all". Training a
+    dictionary on one and evaluating on the other is what upgrades the claim from "steers the
+    ordering of content it was trained on" to "steers this factor".
     """
     assert k_seg % 4 == 0, f"k_seg={k_seg} must be divisible by 4 for a balanced centred reference"
     assert k_seg // 2 <= len(POS_REVIEWS), (
         f"k_seg={k_seg} needs {k_seg // 2} distinct positive reviews, have {len(POS_REVIEWS)}")
+
+    assert pool in ("train", "eval", "all"), f"pool={pool!r}"
+    half = len(POS_REVIEWS) // 2
+    pos_pool = {"train": POS_REVIEWS[:half], "eval": POS_REVIEWS[half:],
+                "all": POS_REVIEWS}[pool]
+    neg_pool = {"train": NEG_REVIEWS[:half], "eval": NEG_REVIEWS[half:],
+                "all": NEG_REVIEWS}[pool]
+    assert k_seg // 2 <= len(pos_pool), (
+        f"k_seg={k_seg} needs {k_seg // 2} distinct positives, pool {pool!r} has "
+        f"{len(pos_pool)}")
 
     labels_a = centred_reference(k_seg)
     if match_first_moment:
@@ -138,14 +180,15 @@ def make_demo_order(k_seg, match_first_moment=True):
             if p != list(labels_a) and _first_moment(p) != m1:
                 foils.append(tuple(p))
         foils.sort(key=lambda p: -abs(_first_moment(p) - m1))
-        foils = foils[:64]
+    # Both branches are sorted strongest-first; take the top slice and USE it.
+    foils = foils[:max(1, n_foils)]
 
     def make_pair(rng):
         # One pool of demonstrations, used by BOTH documents. Class B relocates the same
         # texts rather than drawing new ones, so the two documents are multiset-identical
         # at the level of the actual strings and not merely of the labels.
-        pos = rng.sample(POS_REVIEWS, k_seg // 2)
-        neg = rng.sample(NEG_REVIEWS, k_seg // 2)
+        pos = rng.sample(pos_pool, k_seg // 2)
+        neg = rng.sample(neg_pool, k_seg // 2)
         labels_b = list(foils[rng.randrange(len(foils))])
 
         def render(labels):
@@ -170,7 +213,16 @@ def make_demo_order(k_seg, match_first_moment=True):
     return make_pair
 
 
+# PROBE-MODE variants. The theory agent's `designs_demoorder.py` owns `demo_order` and is
+# ORDERING mode (3-tuple): its metric is logP(document A) - logP(document B), and its screened
+# geometry -- c = 0.0204, r1 = 0.587 -- is the geometry of THAT metric. These variants score
+# the QUERY'S PREDICTED LABEL instead, which is the readout few-shot label bias actually acts
+# on, and give a difference-of-differences metric that cancels constant writes to first order.
+# Both metric modes have produced a crosscoder win this sprint (rotate12 ordering, recency
+# probe), so which one this task needs is open and cheap to settle by running both.
 DESIGNS = {
-    "demo_order": lambda k: make_demo_order(k, match_first_moment=True),
-    "demo_order_free": lambda k: make_demo_order(k, match_first_moment=False),
+    "demo_order_probe": lambda k: make_demo_order(k, match_first_moment=True),
+    "demo_order_probe_free": lambda k: make_demo_order(k, match_first_moment=False),
+    "demo_order_probe_tr": lambda k: make_demo_order(k, match_first_moment=True, pool="train"),
+    "demo_order_probe_ev": lambda k: make_demo_order(k, match_first_moment=True, pool="eval"),
 }
