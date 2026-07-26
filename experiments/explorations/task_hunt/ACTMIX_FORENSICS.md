@@ -302,5 +302,39 @@ Untrained cells (107): all realize analytic nominal to < 1% except untrained
 pre at T ≥ 4 (18 cells, 0.931–0.986 of k·T; worst punct/gpt2 T8 59.59/64).
 
 ---
+
+## 9. CORRIGENDUM (2026-07-26 ~22:45, directed by mac-local af2247d43 § 2; detail in the LOG addendum 1dd92f0d2)
+
+mac-a's Stage-2 calibration (freeze `97fae183a`; 18/20 preliminary with the
+2-cell prediction registered; ratified af2247d43) revises this document's
+**mechanism attribution**, not its measurements:
+
+- **§ 2 / § 8 fingerprints STAND** — the realized-l0 numbers are real and are
+  IDENTICAL under btk-only (|Δrecovery| ≤ 2.2e-8, Δl0 = 0.0 exactly). Their
+  cause is **eval-time JumpReLU threshold pruning, shared by both
+  compositions — NOT selection zero-picks**: at hunt widths (d_sae 2048,
+  k = 8) the positive pool never thins, and btk-only ≡ relu-mix as functions
+  (unit tests prove hard divergence only on thin pools).
+- **§ 2c / § 5 / § 6 premise REVISED**: comparator deficits are not
+  composition artifacts, so "margins shrink under btk-only" does not apply at
+  hunt widths. The § 6 exposure ranking is **DISCHARGED by ruling** — the
+  hunt KEEPs (R22, R27, R28/R29, tt-P1) are **composition-robust BY
+  IDENTITY** (calib receipts + divergence unit tests are the evidence);
+  the planned Stage-3 comparator re-runs were cancelled as zero-information.
+- **The § 4 headline STRENGTHENS**: threshold pruning removes the smallest
+  activations, so the l0 ratios upper-bounded any margin flattering; the
+  punctint kills go from "harden under the fix" to "unchanged". NO false
+  kills, a fortiori; no salvage lane opens.
+- **Unchanged residue**: λ R22's s3/s4 comparator seeds (3.12–3.59, ~2×
+  below the shared pruning band 6.5–7.2) are seed pathology on R22's
+  ORIGINAL pre-ACTMIX grounds — not composition, not discharged by identity.
+  The § 2b deep-selection cell (ttrend 8·T secondary, k=256@T32, realized
+  0.647) remains the one hunt-side arm where the compositions genuinely
+  diverge; an optional ≤$2 diagnostic there is at mac-a's discretion
+  (non-claiming color). Paper-side `txc_base` (TopK→ReLU) is a different
+  mechanism, untouched — the d(perf)/dT question now rests entirely on the
+  pods' paper-task grids.
+
 *mac-b, ACTMIX W2. Everything above PENDING TEAM REVIEW; shortlist and
-KEEP-exposure ranking gate through mac-local; re-run lane is mac-a's.*
+KEEP-exposure ranking gate through mac-local (exposure ranking since
+discharged — see § 9); re-run lane is mac-a's.*

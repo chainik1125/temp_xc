@@ -6,7 +6,14 @@ accepted at full prominence (kills stand, NO HIGH salvage; screens
 mixing-insensitive verified independently); Stage-3 ruling adopts the
 exposure ranking (λ comparator → tt-r1 floor → R29 legs; dq
 conditional; one-sided hardening clause; $4 gemma rider DEFERRED
-post-deadline). Deliverable `experiments/explorations/task_hunt/ACTMIX_FORENSICS.md`
+post-deadline). **THEN superseded by mac-a's calib identity
+(btk-only ≡ relu-mix at hunt widths; shortfall = eval threshold
+pruning): Stage-3 CANCELLED by ruling af2247d43, KEEPs certified
+composition-robust BY IDENTITY, exposure ranking discharged; mac-b
+corrigendum § 9 appended to ACTMIX_FORENSICS.md + LOG addendum
+1dd92f0d2 (λ R22 s3/s4 seed-pathology residue preserved; k256@T32
+deep-selection cell = the one genuine-divergence arm).** Deliverable
+`experiments/explorations/task_hunt/ACTMIX_FORENSICS.md`
 + LOG PTR entry, committed/pushed this session. Now STANDING BY to
 support mac-a's Stage-3 re-runs (cache builds, variance-harness lanes)
 on request, per `briefings/actmix-mac-b.md`. Listening topology
