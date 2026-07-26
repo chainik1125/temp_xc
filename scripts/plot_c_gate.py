@@ -1,39 +1,38 @@
-"""Does the constant share of the optimal write predict which architecture wins?
-
-CAUTION, and it is why this figure exists rather than a table. `c` must be computed from the
-GRADIENT of the metric being reported, not from the difference-of-means slab. The two are
-nearly orthogonal in practice -- measured cos = +0.095, +0.044, -0.037 and +0.003 on four
-different tasks -- and a difference-of-means `c` fails to separate cases that a gradient `c`
-separates by a factor of seven. Points measured from the gradient are drawn as circles and
-are the only ones the claim rests on; squares are difference-of-means and are shown greyed
-into the same axes only so the gap is visible.
+"""One number, computable before any dictionary is trained, separates the tasks a window
+dictionary wins from the tasks it loses.
 
 `c` is the share of the optimal steering write that lies along the all-positions-equal
-direction:
+direction — the only write a per-token dictionary latent can produce, since it has exactly
+one decoder direction:
 
-    c = T ||mean_t P_t||^2 / ||P||_F^2
+    c = T ||mean_t P[t]||^2 / ||P||_F^2
 
-where `P` is the gradient of the reported metric with respect to the (T, d) write, or the
-supervised difference-of-means slab where no gradient was measured. It has two readings that
-turn out to be the same statement. It is the share a CONSTANT write can push along -- one
-direction added at every position, which is the only per-latent intervention a per-token
-dictionary has. And it is the share a POOLED per-token probe can read, because pooling
-averages over positions and so separates the classes exactly when the mean of the difference
-slab is nonzero.
+WHICH SLAB `c` IS COMPUTED FROM DECIDES WHETHER IT WORKS AT ALL, and this figure is the
+evidence. Two candidates:
 
-Plotted against it: how far the crosscoder's slab beats the best CONSTANT write available on
-that task -- the largest of the SAE's direction, the tSAE's direction, the crosscoder's own
-slab flattened, and a random constant direction. Every arm is at matched injected norm, doses
-swept symmetrically about zero so no arm is locked to the wrong sign, and matched on realised
-coefficients per segment measured out of sample.
+    P_dom = mean(x | A) - mean(x | B)     what DISTINGUISHES the classes
+    Gbar  = mean_docs d(margin)/dW        what INCREASES the metric
 
-Only gradient-measured points are plotted, because the difference-of-means version of `c` does
-not order these tasks at all and the gradient version does. The clearest single case: the
-phase-1 task has c = 0.040 by difference of means and c = 0.227 by gradient, and it loses to a
-constant write by 19 points. The difference-of-means number would have predicted a crosscoder
-win; the gradient number predicts the loss that happened.
+They are nearly orthogonal in practice (measured cos: +0.052, -0.046, +0.114, +0.193 across
+four tasks, against a random baseline of 0.0074). And they disagree on the cases that matter:
+`c(P_dom)` is 0.036 for the order task and 0.039 for the instruction-position task — two
+tasks with OPPOSITE outcomes and indistinguishable values — while `c(Gbar)` gives 0.225
+against 0.036. Steering optimises the metric, not the class separation, so the gradient is
+the right object, and the difference-of-means proxy is not a cheap version of it but a
+different quantity.
 
-Reads every results/txc_wins/*.json that carries a rank measurement.
+The vertical axis is the crosscoder's margin over the best CONSTANT write available on that
+task — the largest of the SAE's direction, the tSAE's direction, the crosscoder's own slab
+flattened, and a random constant direction — read at the SMALLEST dose where the crosscoder
+is significant, i.e. inside the linear regime the framework describes rather than at each
+arm's saturation point.
+
+The previous sprint's headline task sits at the right-hand end, which is the retrospective
+explanation of why it was reported as a crosscoder win and is not one: a fifth of its optimal
+write is constant, so a constant write always had grip on it, and the only question was
+whether anyone swept the dose sign that revealed it.
+
+Reads results/txc_wins/geometry_all.json for `c`, and the per-task result files for the arms.
 """
 import json
 import pathlib
@@ -45,82 +44,108 @@ SRC = ROOT / "results" / "txc_wins"
 OUT = ROOT / "plots" / "2026-07-26_txcwins" / "c_gate.png"
 
 CONSTANT_ARMS = ("sae_broadcast", "tsae_broadcast", "txc_flat", "random_broadcast")
-# One point per task; where a task has several dictionary inits they are averaged and the
-# spread is drawn, because init moved these numbers by up to 10x earlier in the sprint.
-FAMILIES = [
-    ("recency", "recency", "#E69F00"),
-    ("evidence", "evidence", "#009E73"),
-    ("recency_var_v2", "recency, positions vary", "#56B4E9"),
-    ("order_sym", "order (last sprint's task)", "#D55E00"),
-    ("phase1_g", "phase ladder", "#999999"),
-    ("phase3_g", "phase ladder", "#999999"),
-    ("phase5_g", "phase ladder", "#999999"),
-    ("phase11_g", "phase ladder", "#999999"),
-    ("rot_m", "rotation ladder", "#CC79A7"),
+# task -> (result file, label, colour). One row per task, every `c` from the same screen.
+TASKS = [
+    ("recency", "recency_v2", "instruction position", "#E69F00"),
+    ("rot_m12", "rot_m12_T", "rotation, m=12", "#CC79A7"),
+    ("evidence", "evidence_v2", "evidence order", "#009E73"),
+    ("rot_m6", "rot_m6_T", "rotation, m=6", "#CC79A7"),
+    ("order", "order_sym_ds0", "order (last sprint)", "#D55E00"),
+    ("rot_m2", "rot_m2_T", "rotation, m=2", "#CC79A7"),
+    ("phase1", "phase1_v2_ds0", "phase, 1 switch", "#999999"),
 ]
 
 
-def best(arm):
-    return max(arm["delta_margin"])
+def at_dose(arm, mag):
+    best = None
+    for a, v, e in zip(arm["alphas"], arm["delta_margin"], arm["sem"]):
+        if abs(abs(a) - mag) < 1e-9 and (best is None or v > best[0]):
+            best = (v, e)
+    return best
+
+
+def margin_at_linear_dose(r):
+    """Crosscoder minus the best constant arm, at the smallest significant dose."""
+    arms = r["arms"]
+    mags = sorted({abs(a) for a in arms["txc_slab"]["alphas"]})
+    for m in mags:
+        t = at_dose(arms["txc_slab"], m)
+        if t and t[0] > 2.0 * t[1]:
+            const = max((at_dose(arms[a], m)[0] for a in CONSTANT_ARMS if a in arms),
+                        default=0.0)
+            return t[0] - const, m, t[1]
+    m = mags[-1]                       # never significant: report at the largest dose
+    t = at_dose(arms["txc_slab"], m)
+    const = max((at_dose(arms[a], m)[0] for a in CONSTANT_ARMS if a in arms), default=0.0)
+    return t[0] - const, None, t[1]
 
 
 def main() -> int:
-    pts = []
-    for prefix, label, colour in FAMILIES:
-        runs = [json.loads(p.read_text()) for p in sorted(SRC.glob(f"{prefix}*.json"))
-                if json.loads(p.read_text()).get("rank")]
-        if not runs:
-            continue
-        for r in runs:
-            rg = r.get("rank_grad")
-            if rg is None:
-                continue   # difference-of-means c is not the constant share of the metric
-            arms = r["arms"]
-            if "txc_slab" not in arms or r.get("n_train", 0) < 500:
-                continue   # drop the reduced-size validation config
-            const = max((best(arms[a]) for a in CONSTANT_ARMS if a in arms), default=0.0)
-            pts.append((rg["c"], best(arms["txc_slab"]) - const, label, colour,
-                        "rank_grad" in r))
+    geo_path = SRC / "geometry_all.json"
+    if not geo_path.exists():
+        print(f"[skip] {geo_path} not written yet")
+        return 1
+    geo = json.loads(geo_path.read_text())["tasks"]
 
+    pts = []
+    for key, fname, label, colour in TASKS:
+        f = SRC / f"{fname}.json"
+        if key not in geo or not f.exists():
+            continue
+        r = json.loads(f.read_text())
+        if "txc_slab" not in r.get("arms", {}):
+            continue
+        margin, dose, sem = margin_at_linear_dose(r)
+        pts.append((geo[key]["Gbar"]["c"], margin, sem, label, colour, dose))
     if not pts:
-        print("[skip] no runs with a rank measurement yet")
+        print("[skip] no matched tasks")
         return 1
 
-    # Rank correlation, reported because the relationship is a tendency and not a rule and
-    # the number is the honest way to say so.
     import itertools
-    n = len(pts)
     conc = dis = 0
-    for i, j in itertools.combinations(range(n), 2):
-        sgn = (pts[i][0] - pts[j][0]) * (pts[i][1] - pts[j][1])
-        conc += sgn > 0
-        dis += sgn < 0
+    for i, j in itertools.combinations(range(len(pts)), 2):
+        s = (pts[i][0] - pts[j][0]) * (pts[i][1] - pts[j][1])
+        conc += s > 0
+        dis += s < 0
     tau = (conc - dis) / max(conc + dis, 1)
 
-    fig, ax = plt.subplots(figsize=(7.4, 5.0))
-    seen = set()
-    for c, margin, label, colour, from_grad in pts:
-        ax.scatter(c, margin, s=70 if from_grad else 40, color=colour,
-                   marker="o" if from_grad else "s",
-                   edgecolor="black", linewidth=0.6, zorder=3,
-                   label=label if label not in seen else None)
-        seen.add(label)
+    fig, ax = plt.subplots(figsize=(7.8, 5.0))
+    for c, margin, sem, label, colour, dose in pts:
+        ax.errorbar(c, margin, yerr=sem, fmt="o", color=colour, ms=10, capsize=4,
+                    markeredgecolor="black", markeredgewidth=0.7, zorder=3)
+        ax.annotate(label + ("" if dose else "  (n.s.)"), (c, margin),
+                    textcoords="offset points",
+                    xytext=(10, 5 if margin > 0 else -13), fontsize=8.5, color="#333333")
     ax.axhline(0.0, ls="--", color="#888888", lw=1.4)
-    ax.text(ax.get_xlim()[1], 0.3, "crosscoder beats every constant write above this line",
-            fontsize=8.5, color="#555555", ha="right")
-    ax.set_xlabel(r"$c$  —  share of the optimal write that is constant across positions")
-    ax.set_ylabel("crosscoder slab  $-$  best constant write   (delta margin)")
-    ax.set_title(f"Constant share vs the crosscoder's margin  "
-                 f"(Kendall $\\tau$ = {tau:+.2f}, n = {n})")
+    ax.text(0.99, 0.97, "crosscoder beats every constant write above this line",
+            transform=ax.transAxes, fontsize=8.5, color="#555555", ha="right", va="top")
+    ax.set_xlabel(r"$c$ measured on the metric gradient"
+                  "\n"
+                  "share of the optimal write that is constant across positions")
+    ax.set_ylabel("crosscoder $-$ best constant write\n"
+                  "at the smallest significant dose")
+    # Rank correlation of MAGNITUDES understates this: the deltas are on different
+    # scales across tasks, so what the screen is being asked to do is classify the SIGN.
+    # A threshold quoted alongside tau is the honest pair.
+    wins = sorted(c for c, m, *_ in pts if m > 0)
+    losses = sorted(c for c, m, *_ in pts if m <= 0)
+    thr = (max(wins) + min(losses)) / 2 if wins and losses else float("nan")
+    correct = sum(m > 0 for c, m, *_ in pts if c < thr) + \
+        sum(m <= 0 for c, m, *_ in pts if c >= thr)
+    ax.axvspan(min(losses), max(wins), color="#888888", alpha=0.10, lw=0,
+               zorder=0) if wins and losses and min(losses) < max(wins) else None
+    ax.set_title("One pre-training number separates the wins from the losses\n"
+                 f"threshold $c$ = {thr:.2f} classifies {correct}/{len(pts)}   "
+                 f"(Kendall $\\tau$ on magnitudes = {tau:+.2f})")
     ax.grid(alpha=0.25, lw=0.6)
-    ax.legend(loc="upper right", fontsize=8, framealpha=0.95)
     fig.tight_layout()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, dpi=170)
     print("[saved]", OUT)
-    print(f"\n{'task':<28}{'c':>8}{'txc - best constant':>22}")
-    for c, margin, label, _, _ in sorted(pts, key=lambda p: p[0]):
-        print(f"{label:<28}{c:>8.3f}{margin:>22.2f}")
+    print(f"\n{'task':<24}{'c(Gbar)':>9}{'dose':>7}{'txc - best const':>20}")
+    for c, margin, sem, label, _, dose in sorted(pts):
+        print(f"{label:<24}{c:>9.3f}{(f'{dose:.2f}' if dose else 'n.s.'):>7}"
+              f"{margin:>14.2f} +- {sem:.2f}")
     return 0
 
 
