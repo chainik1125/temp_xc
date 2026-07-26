@@ -19,7 +19,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "0ce04d6f0f7a501d0dca60f4e3688baae4fba65f"  # btk_rerun FREEZE
+PINNED_COMMIT = "2ce33ac5ccffbf90fe2e6f1086da0b1fa2bd51b4"  # btk_rerun FREEZE v2
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 VOL_DIR = "/workspace/btk_rerun_v2"
