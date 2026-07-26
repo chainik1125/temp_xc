@@ -1,7 +1,7 @@
 # Working state — agent `mac-local`
 
-**Last rewrite:** 2026-07-26 ~03:10 BST (OVERNIGHT EXECUTION, in
-progress). **Resume by reading `briefings/overnight-mac-modal.md`
+**Last rewrite:** 2026-07-26 ~10:50 BST (OVERNIGHT COMPLETE; pivot
+executed). **Resume by reading `briefings/overnight-mac-modal.md`
 FIRST.** Read with `private/rebuttal_plan.md` (untracked).
 
 ## DONE tonight (see LOG 2026-07-26 mac-local entry, commit f07a1f3a5)
@@ -79,3 +79,14 @@ Briefings live: overnight-mac-modal (mine), em-redo (paused),
 a40-bootstrap (historical, pod gone).
 
 ## Git: clean, pushed after this rewrite. Suite 333 green local.
+
+## PIVOT EXECUTED 2026-07-26 ~11:00 London — DISTILLATION FINAL
+Overnight wave COMPLETE and fully reviewed: R22 (tsae bound, 2
+caveats for team), R20/R21 (slen KEEPs + ladder collapse), R23
+(refmark kill), R24 (quotedens KEEP, T≤32). RECEIPTS 28 claims ALL
+PASS at close; suite 332+1skip green; ledger ACTUALS ~$33/$500;
+both agents idle, queue-complete. **DELIVERABLE:
+`private/sunday_distillation_2026-07-26.md` (FINAL)** — agenda item
+1 = R22 caveat ratification; item 6 = mirror the 3 Volume
+checkpoints to HF BEFORE token rotation. Check-in 10:00 PT
+(18:00 London).
