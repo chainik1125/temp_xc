@@ -482,6 +482,35 @@ tonight). The audit collapsed the middle of this table: seven entries that looke
 have a DC handle, and the two that survive at 5 are the two where the foil removes every
 bag statistic by construction.
 
+### Compute feasibility on Modal A10G / L4
+
+The brief asks for feasibility inside a 10h sprint on A10G or L4, so the constraint is stated
+directly rather than left as "high / medium / low". Both cards are 24 GB, which is the binding
+number.
+
+What fits: a 1.5B model in bf16 is ~3 GB of weights, leaving ample room for a dictionary and an
+activation buffer — this is the regime the last sprint ran in and it is comfortable. A 7B in
+bf16 is ~14 GB, which fits with activations for short contexts but leaves little headroom for
+simultaneous dictionary training; cache activations to disk first and train the dictionary in a
+second pass. Anything above 7B is out on a single card.
+
+| entry | model needed | dominant cost | fits a 10h sprint? |
+| --- | --- | --- | --- |
+| Demonstration order | 1.5B base | the 128-permutation go/no-go sweep, then one activation cache + 5 dictionaries | **yes, comfortably** — contexts are a few hundred tokens |
+| Instruction-order conflict | 1.5B–7B instruct | same shape, shorter contexts | **yes** |
+| Per-section style scheduling | 1.5B | already run at this scale with DoM proxies; adding trained dictionaries is one cache + 5 trainings | **yes** |
+| Permutation composition | 1.5B | trivial data, short contexts | **yes** |
+| Entity / state tracking | 1.5B–7B | short contexts | yes |
+| Tool-call ordering | 7B (1.5B function-calling is marginal) | two-pass caching on a 24 GB card | tight |
+| Multi-turn escalation | 7B instruct | long multi-turn contexts inflate the activation cache | tight |
+| LLM-judge position bias | ~7B (1.5B is a poor judge) | two long responses per item | tight |
+| Backtracking | R1-Distill-Qwen-1.5B | generation + judge calls, multi-phase pipeline written for pods | **no**, not tonight |
+| Sandbagging | 8B organism | download + generation + elicitation | no |
+
+The pattern reinforces the ranking arrived at on other grounds: everything at priority 4 and
+above runs on a 1.5B with short contexts, which is the only regime where five dictionary arms and
+a full control set fit inside one night on one card.
+
 ### Where to actually get each organism
 
 The brief asks for acquisition paths, so they are collected here rather than scattered. The

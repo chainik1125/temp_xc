@@ -1491,3 +1491,41 @@ side: a dictionary latent is one fixed write reused across documents, and consis
 are what keep the mean difference slab from cancelling. The honest scope of the method is
 **"finds interventions for structure that recurs at the same place"**, which is narrower and
 more useful than "handles temporal structure".
+
+## 23:40 — a fifth ladder rung, and it is the control the crux objection needs
+
+Der, Kamath & Thompson, *Turn-Averaged SAEs for Feature Discovery and Long-Context
+Attribution* (arXiv:2606.28548) represent a whole turn with a fixed number of features by
+reconstructing the **average activation across the turn**, motivated by standard SAEs' active
+feature count scaling linearly with context length.
+
+It is **aggregation with order destroyed** — precisely the control that separates a window
+code from mere pooling, and the answer to the objection *"is the crosscoder doing anything a
+pooled per-token code could not?"*, which the sprint currently cannot answer with a trained
+arm. Until now that rung would have been something we defined; it is now a citable published
+architecture, which matters when the control is the crux. Implementation is about ten lines:
+train the SAE on segment-mean activations, steer by broadcasting its decoder direction across
+the segment.
+
+The ladder is now five rungs, every one published, each adding exactly one thing:
+
+| rung | temporal capacity per latent |
+| --- | --- |
+| BatchTopK SAE | none — the per-token floor |
+| **segment-averaged SAE** | **aggregation, order destroyed** |
+| Persistent SAE | one scalar: a learned timescale |
+| T-SAE | InfoNCE coupling to adjacent positions |
+| TemporalCrosscoder | free `(T,d)` slab |
+
+With the segment-averaged rung in place, a flat result between it and the crosscoder becomes
+a genuinely important negative rather than an ambiguous one.
+
+**Sandbagging formally dropped.** *The Elicitation Game* (arXiv:2502.02180) tested
+password-locked and circuit-broken organisms and found prompting elicits the capability while
+**activation steering failed** — the intervention modality we would have used has been tried
+on those organisms and did not work. Combined with the Model Organism Lottery warning about
+organism-dependent interpretability, expected value there is low.
+
+The literature agent has been told to stop scanning and write. Nineteen entries, nothing above
+priority 2 resting on an unverified citation, four of its own claims withdrawn on checking and
+recorded in place rather than deleted so the reasoning that produced each error stays visible.
