@@ -19,12 +19,14 @@ comes back flat, this section is still the sprint's finding.
 
 **A literature sweep says where a window code can help, and it is a narrow place.**
 
-The open objection to the previous sprint's result was relevance: the crosscoder's steering
-advantage appeared on a construct — two orderings of one multiset of sentences — with nothing
-connecting it to a behaviour anyone wants to steer. A sweep across reasoning, refusal, deception,
-degeneration, agentic and evaluation literatures answers that objection in an unexpected way. It
-did not find a long list of temporally extended behaviours a crosscoder might win on. It found
-that **almost every behaviour that looks temporally extended already has a per-token handle**:
+The sweep was commissioned to answer an objection of relevance — the previous sprint's steering
+advantage appeared on a construct, two orderings of one multiset of sentences, with nothing
+connecting it to a behaviour anyone wants to steer. That result has since been withdrawn on
+independent grounds, which makes this section's conclusion more useful rather than less: **it
+never depended on the result it was sent to defend.** A sweep across reasoning, refusal,
+deception, degeneration, agentic and evaluation literatures did not find a long list of
+temporally extended behaviours a crosscoder might win on. It found that **almost every behaviour
+that looks temporally extended already has a per-token handle**:
 
 | behaviour | the per-token handle that already works |
 | --- | --- |

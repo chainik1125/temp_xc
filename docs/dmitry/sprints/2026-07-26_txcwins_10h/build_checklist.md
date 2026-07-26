@@ -12,19 +12,33 @@ Pre-flight checklist for anyone building a windowed-steering comparison, consoli
 constraints that accumulated across this sprint. Lifted out of `literature_catalogue.md` so it
 can be read as one list rather than reconstructed from context.
 
-Most of these are **cheap up front and expensive to retrofit**. Six of them — contrast-not-
-absolute metrics (1), interior-only permutation (2), **rotation not transposition (2b)**, equal
-segment token lengths (6b), the tSAE zero-regularisation control (8), and disjoint train/eval
-demonstration pools (8b) — produce a plausible-looking number that means nothing if they are
-missed, so those are the ones to verify first against whatever gets built.
+Most of these are **cheap up front and expensive to retrofit**. Seven of them — the symmetric dose
+grid (0), contrast-not-absolute metrics (1), interior-only permutation (2), rotation not
+transposition (2b), equal segment token lengths (6b), the tSAE zero-regularisation control (8),
+and disjoint train/eval demonstration pools (8b) — produce a plausible-looking number that means
+nothing if they are missed, so those are the ones to verify first against whatever gets built.
 
-Of those, **2b is the one that decides whether the experiment can discriminate at all**: a
-two-block swap is exactly rank 1, and no amount of care elsewhere rescues a task whose optimal
-write a per-token latent can already express.
+Two of those deserve singling out. **Item 0 has already cost this project a headline result** — a
+one-sided dose grid turned a sign into an apparent inversion, and the inversion was the control
+that supposedly proved the effect. And **item 2b decides whether the experiment can discriminate
+at all**: a two-block swap is exactly rank 1, so no amount of care elsewhere rescues a task whose
+optimal write a per-token latent can already express.
 
 Each item is argued in full in [[literature_catalogue]]; this page is the list without the
 reasoning.
 
+0. **Use a dose grid symmetric across zero.** This is item zero because violating it is what
+   withdrew the previous sprint's headline. `steer_order_modal.py` defaults to
+   `alphas = "0.25,0.5,1.0,2.0"`, all positive; `txc_flat` is large and *positive* at negative
+   doses, so the positive-only sweep recorded the negative branch and a **sign** was reported as
+   an **inversion** — which was the control that supposedly proved the temporal profile carried
+   the effect. The repo's own standard already says so:
+   `experiments/ward_backtracking_txc/README.md` specifies a grid symmetric across zero, "no
+   a-priori reason to favour positive steering", with negative magnitudes as "evidence about
+   direction sign and arch behavior, not just floor checks". A one-sided grid cannot distinguish
+   a directional effect from a magnitude artefact, and the two point opposite ways: an arm
+   positive at *both* extremes is a second-order artefact, an arm effective only at negative
+   doses is genuinely directional and invisible to a positive-only sweep.
 1. **Score a contrast, never an absolute.** The metric must be the teacher-forced margin between
    the target and its multiset-matched foil, not accuracy on one member of the pair. Few-shot ICL
    has a published constant intervention — writing a **function vector** — that raises absolute

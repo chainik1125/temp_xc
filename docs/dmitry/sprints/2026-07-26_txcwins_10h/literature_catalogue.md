@@ -290,6 +290,26 @@ If conditions A and B differ by exchanging two blocks, the difference slab is `+
 | Permutation composition | `m` swaps | high rank |
 | Multi-turn escalation | full shuffle of many turns | high rank |
 
+**Demonstration order satisfies the attribute criterion too, and by accident rather than design.**
+The sharper form of the rank bound in [[theory_section]] is `rank(P) ≤ A`, the number of
+*attributes* whose positional pattern differs between conditions, with the prescription that the
+cheapest natural source of a second attribute is "content plus its own carried state, since a
+maintained state's schedule is the running integral of the content's, and an integral is never
+proportional to its integrand".
+
+Few-shot demonstrations supply exactly that pair, for free. The **label at position `t`** is the
+content. The **running label balance up to `t`** — how many of each class have been seen so far —
+is its running integral, and it is what majority-label bias reads. Because the interior-permutation
+control *matches the label multiset*, the two orderings agree on the final balance and disagree on
+the running one at every interior position. So the content attribute and the state attribute have
+different positional patterns by construction, which is the rank-2 condition, obtained without
+designing anything for it.
+
+This is worth stating because it is the one place where the constraint that removes a DC handle
+(match the label multiset, constraint 2) also *creates* the rank structure. The two requirements
+usually trade off — matching more statistics tends to flatten the difference slab — and here they
+happen to align.
+
 **The design fix for demonstration order, and it is the single most actionable thing on this
 page.** The foil pair must differ by a **large-support permutation, not a transposition**. Swap
 two demonstrations and the difference slab is `(demo_X − demo_Y)` at one slot and its negation at
@@ -681,10 +701,23 @@ tokens have higher steering similarity — i.e. position-dependent steering stru
 On AxBench they reach harmonic means of 1.015 (Gemma-2-2B-IT) and 1.113 (Gemma-2-9B-IT), "the
 first learned method to consistently outperform prompting" without per-concept tuning.
 
-Relatedly, *Steer Like the LLM: Activation Steering that Mimics Prompting*
-([arXiv:2605.03907](https://arxiv.org/abs/2605.03907) — id unverified) observes that prompt
-steering "can exert strong interventions on some token positions and barely intervene on
-others", and that per-token steering coefficients have been proposed to compensate.
+**And there is now a published rank-1-with-optimal-schedule steering method**, which is the
+sharpest possible baseline for the rank argument. Heyman & Vandeputte, *Steer Like the LLM:
+Activation Steering that Mimics Prompting*, 2026
+([arXiv:2605.03907](https://arxiv.org/abs/2605.03907) — verified) observe that prompt steering
+"applies strong interventions on some tokens while barely affecting others", and that "popular
+activation steering methods are not faithful to the mechanics of prompt steering". Their Prompt
+Steering Replacement models **estimate token-specific steering coefficients from the activations
+themselves**, and outperform existing activation steering methods, "especially when controlling
+for high-coherence completions", comparing favourably to prompting on AxBench and persona
+steering.
+
+That is precisely one direction with a learned per-position schedule — rank 1, with the schedule
+optimised rather than incidental. Together with Persistent SAEs it forms a two-point rank-1
+ceiling from the literature: PSAE learns a *scalar timescale* per feature, PSR learns a *free
+per-token coefficient*. If a crosscoder cannot beat PSR, the advantage was never about rank. If
+it can, the rank argument has a published opponent rather than a strawman, which is much the
+better position to be in.
 
 **What this leaves for us, stated precisely.** Three things survive, and they should be the
 claims made:
@@ -1525,7 +1558,7 @@ nobody has tried to *steer* an armed state — but the weakest temporal story.
 | van der Weij et al., *AI Sandbagging: Language Models can Strategically Underperform on Evaluations*, 2024 ([arXiv:2406.07358](https://arxiv.org/abs/2406.07358)) | the defining paper; a Llama-3-8B-Instruct organism with passphrase-dependent underperformance on hazardous-domain questions |
 | Greenblatt et al., *Stress-Testing Capability Elicitation With Password-Locked Models*, 2024 ([arXiv:2405.19550](https://arxiv.org/abs/2405.19550)) | password-locked organisms and the elicitation framing |
 | Hofstätter, van der Weij, Teoh, Djoneva, Bartsch, Ward, *The Elicitation Game: Evaluating Capability Elicitation Techniques*, 2025 ([arXiv:2502.02180](https://arxiv.org/abs/2502.02180)) — verified | password-locked and a harder "circuit-broken" organism, and a direct negative for this entry: on multiple-choice QA "prompting techniques can elicit the actual capability" of both organisms while **activation steering failed**; on code generation only fine-tuning worked. They recommend fine-tuning as the most trustworthy elicitation method |
-| *AuditBench* ([arXiv:2602.22755](https://arxiv.org/abs/2602.22755)) — id unverified | 2026 collection of hidden-behaviour organisms |
+| Sheshadri, Ewart, Fronsdal, Gupta, Bowman, Price, Marks, Wang, *AuditBench*, Feb 2026 ([arXiv:2602.22755](https://arxiv.org/abs/2602.22755)) — verified | **56 released language models with implanted hidden behaviours** across 14 types (sycophantic deference, opposition to AI regulation, secret geopolitical loyalties), varying in subtlety and training methodology; models, agent and evaluation framework all released. Its headline is another caution for us: **black-box tools outperformed white-box interpretability methods** when deployed with their investigator agent, despite white-box tools showing promise in isolated evaluation |
 | Szablewski, Konar-Steenberg, Fornasiere, Menon, Heimersheim, *The Model Organism Lottery: Model Organism Interpretability Strongly Depends on Training Methodology*, July 2026 ([arXiv:2607.01033](https://arxiv.org/abs/2607.01033)) — verified | the warning, and it is severe: across **54 variants** benchmarked with four interpretability techniques — activation oracles, **steering**, logit lens and **sparse autoencoders** — "MO interpretability depends strongly on training objective, target behaviour, model architecture, and training data generation pipeline", with significant variance persisting after accounting for behaviour strength, and "**integrated training often yields less interpretable MOs than standard post-hoc methods**" |
 | *Option-Order Randomisation Reveals a Distributional Position Attractor in Prompted Sandbagging* ([arXiv:2604.26206](https://arxiv.org/abs/2604.26206)) — verified | links sandbagging to the option-order family, and quantifies how strong a purely positional prior can be: under sandbagging instructions the model enters "a low-entropy response-position basin centred on E/F/G that is highly stable and largely content-invariant", holding under complete content rotation across 2,000 items (Pearson r = 0.9994, JSD = 0.027), with accuracy of **72.1% when the correct answer lands in the preferred position E against 4.3% at position A**, in 7–9B models |
 
@@ -1744,16 +1777,16 @@ with no matched-multiset structure where a window code wins on steering, and it 
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
-  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2606.26474 (cross-layer crosscoder, RL tool use), 2603.05805 (cross-model crosscoder, MoE diffing), 2606.08644 (Oh & Demberg, rebinding circuit), 2605.26537 (Zhou & May, conceptual steganography), 2507.07810 (repetition neurons and induction heads), 2604.10044 (LoopGuard, >90pp loop reduction, LoopBench), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
+  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2605.03907 (Heyman & Vandeputte, PSR — rank-1 with a learned per-token schedule), 2602.22755 (AuditBench, 56 released organisms), 2606.26474 (cross-layer crosscoder, RL tool use), 2603.05805 (cross-model crosscoder, MoE diffing), 2606.08644 (Oh & Demberg, rebinding circuit), 2605.26537 (Zhou & May, conceptual steganography), 2507.07810 (repetition neurons and induction heads), 2604.10044 (LoopGuard, >90pp loop reduction, LoopBench), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
 - **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
   and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
-  2511.04694, 2601.05693, 2602.22755, 2408.15221,
+  2511.04694, 2601.05693, 2408.15221,
   2605.01687, 2605.02647, 2603.03258, 2601.04170, 2604.11978,
-  2605.03907, 2512.02194, 2411.16594.
+  2512.02194, 2411.16594.
   All are single mentions in lower-tier entries; nothing load-bearing above priority 2 rests on
   an unverified id.
 - **Claims withdrawn on checking:** that a published turn-shuffle ablation exists for
@@ -1943,3 +1976,18 @@ the per-pass times are ordering only, not measurements.
   a **cyclic rotation of the interior demonstrations, not a transposition**, since a best/worst
   search can return a transposition pair and produce a rank-1 task in disguise. Propagated to the
   recipe and to `build_checklist.md` as item 2b.
+- **Pass 30** — reconciled this note with the **withdrawal of the previous sprint's headline**
+  (one-sided dose grid; `txc_flat`'s "inversion" was a sign). Removed the +11.29/+1.24 numbers
+  from the main-conclusion argument, which now rests on the trajectory tasks and the measured `c`
+  ordering instead; reframed the budget-asymmetry note, which no longer rescues a withdrawn
+  result but applies to any rerun; and recorded **a miss of my own** — I audited dose *selection*
+  and never checked dose *coverage*, even though `ward_backtracking_txc/README.md`, which I read
+  early in this sweep, already specifies a symmetric grid as repo standard. Symmetric dose grids
+  are now the first check on any steering run.
+- **Pass 31** — verified two more, both consequential. **PSR** (Heyman & Vandeputte, 2605.03907)
+  is a *published* rank-1-with-learned-schedule steering method that beats existing activation
+  steering, so the `sae_schedule` arm is an existing method rather than an invented control, and
+  the rank argument now has a real opponent. **AuditBench** (2602.22755) releases **56** models
+  with implanted hidden behaviours across 14 types, and reports black-box tools outperforming
+  white-box interpretability with its investigator agent — a second caution, alongside the Model
+  Organism Lottery, against the organism-based entries.

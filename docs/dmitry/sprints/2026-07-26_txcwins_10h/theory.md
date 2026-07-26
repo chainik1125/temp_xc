@@ -81,6 +81,26 @@ envelope. That is **exactly rank 1**. The tSAE is an L1/L2 architecture, not an 
 is the natural strongest baseline precisely because it supplies the schedule *automatically*
 where an SAE needs the experimenter to.
 
+**Identification, and a labelling requirement.** The kickoff's carried debt 2 — which temporal
+SAE the name refers to — is now **resolved**: the published architecture is InfoNCE over
+adjacent positions with no attention (Bhalla et al.), while the module read above and used by
+`harness.py:268-274` is *this repo's attention-based variant*. So any measured tSAE arm must be
+labelled **"this repo's attention-based temporal SAE"**, never "the tSAE". The rank conclusion
+transfers — both hold one decoder direction per latent, so both are rank 1 — but the identity
+does not, and claiming to have benchmarked the published architecture would be a
+misattribution.
+
+A third variant is worth knowing about because it looks like a test of the rank claim and is
+not. **Persistent SAEs** give each latent a learned scalar timescale,
+`h_t = λ_j h_{t−1} + (1 − λ_j) a_t`, with a per-latent decoder direction — a *learned* schedule
+rather than an activation-driven one, but still rank 1. It cannot test the rank claim in either
+direction, because `λ` buys only a one-parameter family of schedules: a loss could be the
+restriction rather than the rank, and a win would confirm the discovery reading. The rank claim
+needs an **unrestricted** rank-1 arm, which is `sae_schedule` / `rank1_best`. Its real value is
+as the strongest *deployable* rank-1 baseline, since `sae_schedule` is an oracle nobody can
+ship. Registered, for whoever runs it: it lands between the constant write and the optimal
+rank-1 schedule — on recency's completed numbers, between `+3.65` and `+7.86`.
+
 This generalises, and the generalisation is uncomfortable for the sprint's current headline.
 
 > **A per-token dictionary's write is constrained to one *direction*. Whether it is constant
@@ -1012,6 +1032,28 @@ source is **content plus its own carried state**, because a maintained state's s
 running integral of the content's and an integral is never proportional to its integrand. Any
 "which of two X governs" task is therefore rank 2 — which instruction applies, which persona is
 active, which rule binds, which variable holds.
+
+### Score the permutation, not the name
+
+The corollary that catches the most mis-scored tasks. Rank is a property of the **foil
+construction**, not of the task, so a task named only by its content carries no information
+about which side of the gate it falls on. For `k` blocks with class B a permutation of class A:
+
+```text
+rank = k − (number of cycles of the permutation taking A to B)
+```
+
+A single `k`-cycle — a cyclic rotation — is the **maximum**, `k − 1`. A product of
+transpositions gives `k/2`. A single transposition gives **1**. Verified at `k = 4, 6, 8` in
+`perm_rank.py`.
+
+This is why "instruction-order conflict" and "judge position bias" are rank 1 — two blocks
+exchanged — while "demonstration order" could be anything, since a best/worst search over
+orderings may return a pair differing by one transposition. Either constrain the permutation to
+a rotation, or measure `r1` on the selected pair before training. Note the trade: constraining
+the permutation moves a task from *borrowed result* toward *construct in a borrowed setting*,
+which is the currency exchange in § Expressiveness and discovery, and the write-up should not
+claim the literature's control while using a permutation the literature did not select.
 
 ### The metric sets `c`, not just the task
 
