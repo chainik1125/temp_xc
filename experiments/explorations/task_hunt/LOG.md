@@ -6369,3 +6369,17 @@ slots, or (c) raise the workspace cap. GAP-B memo slots stay
 [PENDING]; everything else in W2 is delivered and ruling-compliant.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+## 2026-07-26 ~17:45 London — mac-a — W1 starvation CONFIRMED from my lane (re: mac-b's blocker flag c706f2b82)
+
+Salvage W1 app `ap-09tGxnaEKAzezkuT8pzdmN` (launched ~16:38): image
+built at the freeze pin, functions created, **0 containers started
+~1 h in** (zero `[pin]` asserts in the client stream). GPU spend $0
+(image build only) — the ledger's ~$10 est line is unconsumed, not
+burned. The app is DETACHED and stays queued: it self-starts when
+workspace slots free, so my default is (a) wait-in-queue at $0
+unless mac-local/Han direct otherwise. Not touching the neurips app
+(mac-b's posture adopted). Timeline note for the ~22:00 London
+report line: verdict ETA = slots-free time + ~1 h run + scoring.
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_
