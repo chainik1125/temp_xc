@@ -158,9 +158,19 @@ def _encode_pool(
     l0_sum = 0.0
     l0_units = 0.0
 
+    # Dispatch on the arch's CONSUMPTION CONTRACT, not on T: a window
+    # arch at T=1 (the controlled-limit anchor) asserts (B, 1, d_in)
+    # windows and rejects flat (B, S, d_in) batches. Routing it through
+    # the window path with T=1 is mathematically identical to the
+    # per-token path (length-1 windows, same first_real mask, and the
+    # within-window shuffle of a length-1 window is the identity —
+    # exactly the T=1 anchor semantics). Per-token/sequence archs
+    # (consumes "token"/"sequence") take the flat path as in v1.
+    window_arch = getattr(model, "consumes", "token") == "window"
+
     model.eval()
     with torch.no_grad():
-        if model.T == 1:
+        if not window_arch:
             for start in range(0, N, batch_size):
                 end = min(start + batch_size, N)
                 batch = torch.from_numpy(tail[start:end]).to(device)

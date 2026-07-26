@@ -182,9 +182,22 @@ def cli() -> None:
     if args.dry_run:
         return
 
+    failed: list[str] = []
     for i, c in enumerate(mine, 1):
         print(f"[sweep] ({i}/{len(mine)}) {c.label()}", flush=True)
-        run_cell(c, args)
+        try:
+            run_cell(c, args)
+        except Exception as e:
+            # One cell must never kill the pass (core run_sweep's
+            # on_failure="continue" convention). Loud, then onward.
+            failed.append(c.label())
+            print(f"[sweep] FAILED {c.label()}: {type(e).__name__}: {e}",
+                  flush=True)
+    if failed:
+        print(f"[sweep] PASS COMPLETE WITH {len(failed)} FAILED CELLS: "
+              + "; ".join(failed), flush=True)
+        raise SystemExit(3)   # chain sees a nonzero only after full sweep
+    print("[sweep] PASS COMPLETE (all cells ok)", flush=True)
 
 
 if __name__ == "__main__":

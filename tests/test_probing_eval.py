@@ -175,6 +175,50 @@ def test_window_fallback_row_no_nan():
     assert np.isfinite(pooled).all()
 
 
+class _WindowT1(TempBenchArch):
+    """Window arch at T=1 (the controlled-limit anchor): asserts window
+    input like the real txc archs do — regression for the dispatch bug
+    where model.T==1 routed window archs to the flat per-token path.
+    """
+
+    arch_version = "0.0.0-test"
+    consumes = "window"
+
+    def __init__(self):
+        super().__init__()
+        self.config = ArchConfig(name="win1", d_in=D_IN, d_sae=D_SAE,
+                                 k_pos=D_IN, T=1)
+        self._dummy = nn.Parameter(torch.zeros(1))
+
+    def encode(self, x):
+        assert x.dim() == 3 and x.shape[1] == 1, f"want (B,1,d); got {tuple(x.shape)}"
+        pad = torch.zeros(x.shape[0], D_SAE - D_IN, device=x.device)
+        return torch.relu(torch.cat([x[:, 0, :], pad], dim=-1)).unsqueeze(1)
+
+    def decode(self, z):
+        return z[..., :D_IN]
+
+    def train_step(self, x):
+        return {"loss": self._dummy.sum()}
+
+
+def test_window_arch_at_T1_routes_via_window_path():
+    """T=1 window arch must (a) not crash, (b) equal the per-token
+    pooling of the same map, (c) be exactly shuffle-invariant."""
+    wm, tm = _WindowT1(), _TokenId()
+    dev = torch.device("cpu")
+    S = 8
+    X = np.random.default_rng(3).standard_normal((5, S, D_IN)).astype(np.float32)
+    fr = np.array([0, 2, 4, 7, 8], dtype=np.int64)
+    pw, l0w = _encode_pool(wm, X, S=S, batch_size=3, device=dev, first_real=fr)
+    pt, l0t = _encode_pool(tm, X, S=S, batch_size=3, device=dev, first_real=fr)
+    np.testing.assert_allclose(pw, pt, rtol=1e-5)
+    assert l0w == pytest.approx(l0t)
+    psh, _ = _encode_pool(wm, X, S=S, batch_size=3, device=dev, first_real=fr,
+                          shuffle_seed=5)
+    np.testing.assert_array_equal(pw, psh)   # length-1 window shuffle = identity
+
+
 def test_realized_l0_counts_nonzero_units():
     """fired ⇔ z != 0 (btk-only convention): the stub relu's negatives to
     exactly 0, so 3 positive input dims → 3 nonzero latents per token.

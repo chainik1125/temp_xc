@@ -27,6 +27,7 @@ mkdir -p /workspace/logs
 # dirty=true stamps whose diff is the leaderboard growth itself.
 # NO code edits are permitted in this clone while the queue runs.
 export TEMP_BENCH_ALLOW_DIRTY=1
+export PYTHONUNBUFFERED=1   # nohup logs must stream, not block-buffer
 
 PY=.venv/bin/python
 COMMON_TOKEN="--token-archs batchtopk_sae_btkonly tsae_btkonly"

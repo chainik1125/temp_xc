@@ -1,69 +1,77 @@
 # Working state — agent `runpod-1`
 
-**2026-07-26 ~22:30 London — ACTMIX P1 (briefings/actmix-runpod-1.md,
-read-first actmix-shared.md + actmix-pod-bootstrap.md). Shared 3×H100
-pod, GPUs 0,1 (`source scripts/set_agent_env.sh runpod-1`). Phase A
-(btk-only) FROZEN + launching; Phase B (paper-match) BLOCKED on mac-c
-COMPOSITION_AUDIT. Deadline: rebuttal-grade numbers before 9am PT /
-17:00 London 07-27. Cap $150/day; ledger RUNPOD section in
-briefings/MODAL_SPEND.md.**
+**2026-07-27 ~00:00 London — ACTMIX P1 (briefings/actmix-runpod-1.md).
+Shared 3×H100 pod, GPUs 0,1. Phase A (btk-only) grid RUNNING at PIN
+f9108db44; Phase B (paper-match, eval-only on shipped ckpts) staged +
+smoke-gated, full run launching alongside. Deadline 9am PT / 17:00
+London today. Ledger: RUNPOD section, ~$1 bring-up + est $55–75 grid.**
 
-## Where things stand
+## Live state (check first on resume)
 
-1. **Recon DONE.** Paper § 5.1 protocol fully pinned from
-   `origin/final:purified/experiments/c3_probing/` + eval/probing.py:
-   gemma-2-2b-it L13 resid_post, fineweb 24k×128, 38-task SAEBench+CT,
-   S=32 left-aligned probe cache (schema 2.0.0, first_real masks),
-   k_feat {5,20}, seeds {1,2,42}, L1-logistic top-k probe. Paper v1
-   anchors (k=20): sae 0.8831, tsae 0.8986, txc T5/10/20
-   0.8952/0.8973/0.8999.
-2. **Caches: the paper's ACTUAL artifacts, synced from HF**
-   (`han1823123123/temp-bench-data`): act_cache `e4916bcae1881963`
-   (24000,128,2304 fp16) + probe_cache 38/38 tasks →
-   `/workspace/caches/probing/hf_mirror/`, linked into
-   `results/data_cache/48d2d17ff88598d4/` + `results/probe_cache/` by
-   `experiments/probing/actmix/prep_cache.py`. No GPU rebuild needed.
-3. **Port DONE**: `ProbingEval` protocol 1.2.0 (v1 1.1.0 semantics +
-   additive shuffle control + realized-l0(z≠0)) in
-   `src/temp_bench/evals/probing.py`; loaders in
-   `src/temp_bench/data/probe_cache.py` (builders NOT ported —
-   artifact-first; they remain on origin/final). Tests
-   `tests/test_probing_eval.py` (7) green. GPU smoke on the real cache:
-   all four `*_btkonly` archs train+eval through `run_experiment`;
-   realized l0 EXACTLY nominal (sae/tsae 20.0/token, post 20.0/window,
-   pre@T3 59.9≈60/window).
-4. **mac-a convention CONSUMED** (LOG ~21:05, APPROVED 9e634bed9):
-   `*_btkonly` names verbatim; fired ⇔ z≠0 (my l0 metric counts
-   nonzero accordingly).
-5. **Card**: `experiments/probing/actmix/CARD.md` (grid, queue,
-   pre-registrations E1–E4, gates G1–G5, l0 bands, 9 flags, budget).
-   Driver: `experiments/probing/actmix/sweep.py` (+ preflight 38/38);
-   launcher `launch_runpod1.sh` (PIN-asserted, nohup, shard/GPU).
+- Phase-A queues: `/workspace/logs/actmix_p1_gpu{0,1}.log` (nohup bash
+  chains; passes: untrained(42) → sae/tsae(1,2,42) → txc-pre(1,2,42 ×
+  T{1,2,4,8,16}) → txc-post(42) → txc-post(1,2)). Cache-hits make
+  relaunches idempotent — ALWAYS relaunch via
+  `PIN=<origin sha> bash experiments/probing/actmix/launch_runpod1.sh`.
+- Phase-B: `experiments/probing/actmix/phase_b.py` — `stage` done
+  (15 cells, manifest committed), `smoke` = port-validation gate
+  (paper topk_sae s42 k20 vs paper's 0.8831±0.0022), then `run`
+  (co-resident, shard per GPU, TEMP_BENCH_ALLOW_DIRTY=1).
+- Monitors (session-local): grid-log watcher + origin watcher
+  (path-filtered per actmix-shared listening topology).
 
-## In flight / next actions (in order)
+## Landed tonight (all pushed)
 
-1. Commit + pull-rebase + push (card BEFORE cells — mac-local
-   freeze-reviews in parallel). PIN = that commit.
-2. `PIN=<sha> bash experiments/probing/actmix/launch_runpod1.sh` —
-   passes: untrained twins (seed 42) → per-token trained (3 seeds) →
-   TXC-pre (3 seeds, T {1,2,4,8,16}) → TXC-post (42, then 1/2).
-   Logs `/workspace/logs/actmix_p1_gpu{0,1}.log`.
-3. While cells run: analysis/table/fig script
-   (`experiments/probing/actmix/analysis.py` — TODO), watch origin for
-   mac-c COMPOSITION_AUDIT (Phase B) + mac-local rulings
-   (path-filtered listener per actmix-shared.md).
-4. On grid completion: table + figs + LOG verdict (PENDING TEAM
-   REVIEW, quote card § 4 verbatim) + ledger actuals + push.
-5. Phase B when unblocked: eval-only if checkpoints exist, else
-   retrain at mac-c's pinned composition.
+1. **Eval port** `ProbingEval` 1.2.0 (= v1 1.1.0 + shuffle control
+   [Aniket fixed-probe semantics] + realized-l0 z≠0) + probe-cache
+   loaders; tests 9 green. Paper's ACTUAL caches synced from HF
+   (act_cache e4916bcae1881963 → data_cache 48d2d17ff88598d4;
+   probe_cache 38/38).
+2. **CARD.md** (grid, queue, E1–E4, G1–G5, l0 bands, 10 flags) +
+   sweep driver (38-task preflight) + PIN-asserted launcher.
+3. **Defects caught + disclosed** (CARD flag 10 + LOG): launcher
+   double-flag (pre-untrained dropped), missing dirty-stamp
+   convention (chains refused at cell 2), runner checkpoint-cache
+   path loads models on CPU → silent CPU-crawl evals (fixed
+   plugin-side in ProbingEval; core contract gap flagged for owner).
+4. **Phase B staged**: paper_{topk_sae,tsae,txc_base}_v1 adapters
+   (verbatim dev classes @94119bc08, eval-only, src_tag provenance),
+   registry entries, strict-load-proof manifest (15 cells, sha256,
+   dup-family rationale: 05-05 re-train tws=1/2 family).
+5. **T5-ARTIFACT FINDING** (LOG ~23:30, PENDING TEAM REVIEW): all six
+   shipped "T10/T20" c3 ckpts have T=5-shaped weights (silent-T5 bug,
+   pre-05-06-fix saves; census exhaustive ⇒ no faithful eval-only
+   T-sweep exists). Flat-T-sweep hypothesis (appendix T-slope = seed
+   noise among T5 replicas) TESTABLE by Phase B: cfgT10/cfgT20 cells
+   evaled AS T5 with bug_artifact_t5 on-row.
 
-## Repro/resume notes
+## Next actions (in order)
+
+1. Confirm Phase-B smoke ≈ paper 0.8831 → launch `phase_b run` shards
+   on both GPUs (co-resident with training).
+2. Watch grid: G1 l0 bands (btk-only ≡ nominal), G2 identity, G3
+   untrained<trained, G4 n_tasks=38, G5 T1 anchor.
+3. When queue drains (or ~09:00 London, whichever first):
+   `python -m experiments.probing.actmix.analysis --arm btk-only` +
+   `--arm paper-match` → RESULTS.md + figs; write LOG verdict
+   (PENDING TEAM REVIEW, quote CARD § 4 verbatim); ledger actuals;
+   STATUS final; push.
+4. Interpretive note for the table: mac-a CALIB FINAL = btk-only ≡
+   relu-mix at hunt widths (eval-threshold pruning mechanism);
+   mac-local ruled pods' exhibits unaffected. My E2 (l0 ≡ nominal
+   sharp) already consistent. Optional 1-cell relu-mix twin
+   (batchtopk_sae s42) queued ONLY if GPUs free before analysis.
+5. Post-deadline queue: T=32 stretch, txc-post seeds 1/2 if cut,
+   agent_steer tsae twins, probe-cache builder port.
+
+## Standing repro notes
 
 - Every shell: `cd /workspace/agents/runpod-1/temp_xc && source
   scripts/set_agent_env.sh runpod-1`.
-- Downloads: `/workspace/logs/dl_probing_caches.{py,log}` (idempotent
-  resume). Prep: `python -m experiments.probing.actmix.prep_cache`.
-- Smoke rows in the leaderboard are `smoke: true` + code_version.dirty
-  — excluded from all tables by construction (distinct eval_keys).
-- Grid rows: experiment=probing, protocol 1.2.0,
-  eval_cfg.arm="btk-only", agent=runpod-1, smoke absent/false.
+- Rows: experiment=probing, protocol 1.2.0, eval_cfg.arm ∈
+  {btk-only, paper-match}, agent=runpod-1; smoke rows carry
+  smoke:true; dirty stamps on pool rows = leaderboard growth
+  (convention, CARD flag 10); Phase-B rows carry src_train_key (+
+  bug_artifact_t5 where applicable).
+- Caches: /workspace/caches/probing/{hf_mirror,tbm_ckpts} (+ symlinks
+  results/data_cache/48d2d17ff88598d4, results/probe_cache/<ds>).
