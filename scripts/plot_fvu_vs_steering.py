@@ -2,7 +2,9 @@
 
 Each architecture is trained at ITS OWN best recipe, taken from a full lr x steps sweep, and
 matched at 8.0 realised coefficients per segment on held-out data. The best reconstructor of the
-three steers worst and the worst reconstructor steers best, by 3.4x.
+three steers worst and the worst reconstructor steers best. At the matched dose the rank
+inversion is strict and complete: FVU orders tSAE < SAE < crosscoder, steering orders them
+exactly in reverse, and the spread is 28x rather than the 3.4x visible at best dose.
 
 This matters beyond temporal codes: benchmarks rank dictionaries by FVU, and on this task that
 ranking is exactly backwards for the use a crosscoder is being proposed for.
@@ -21,12 +23,32 @@ RECIPE = ROOT / "results" / "txc_wins" / "recipe_recency.json"
 STEER = ROOT / "results" / "txc_wins" / "recency_fair.json"
 OUT = ROOT / "plots" / "2026-07-26_txcwins" / "fvu_vs_steering.png"
 
+# Matched dose: the smallest magnitude at which the crosscoder is significant on this task.
+DOSE = 0.5
+
 # (recipe key, steering arm, label, colour)
 ARMS = [
     ("tsae_topk", "tsae_broadcast", "attention temporal SAE", "#009E73"),
     ("sae", "sae_broadcast", "TopK SAE", "#0072B2"),
     ("txc", "txc_slab", "temporal crosscoder", "#E69F00"),
 ]
+
+
+def at_dose(arm, mag):
+    """Best of the two SIGNS at this dose magnitude.
+
+    The magnitude is matched across arms; the sign is not, because which class you want to
+    steer toward is something the experimenter knows and a steering vector's sign is a free
+    parameter. Taking the signed +mag instead would score an arm whose correct direction is
+    negative as a failure -- the exact bug that made a one-sided grid hide the SAE's ability
+    on the order task, and here it would bias in the crosscoder's favour by reporting the
+    two per-token arms as negative.
+    """
+    best = None
+    for a, v, e in zip(arm["alphas"], arm["delta_margin"], arm.get("sem", [0] * 99)):
+        if abs(abs(a) - mag) < 1e-9 and (best is None or v > best[0]):
+            best = (v, e)
+    return best or (max(arm["delta_margin"]), 0.0)
 
 
 def main() -> int:
@@ -39,24 +61,28 @@ def main() -> int:
     fig, ax = plt.subplots(figsize=(7.4, 5.0))
     for rk, sk, label, col in ARMS:
         fvu = best[rk]["fvu"]
-        dm = arms[sk]["delta_margin"]
-        j = dm.index(max(dm))
-        sem = arms[sk].get("sem", [0] * len(dm))[j]
-        ax.errorbar(fvu, dm[j], yerr=sem, fmt="o", ms=13, color=col, capsize=4,
+        # MATCHED DOSE MAGNITUDE, not each arm's own best. Best-dose reporting puts every
+        # arm at its own saturation point, outside the linear regime the comparison is
+        # about, and flatters flat arms by letting them pick a maximum over the whole grid.
+        # At the matched dose the inversion is STRICTER: FVU ranks tSAE < SAE < crosscoder
+        # and steering ranks them exactly in reverse, which is NOT true at best dose where
+        # the SAE and tSAE are within 0.03 of each other.
+        val, sem = at_dose(arms[sk], DOSE)
+        ax.errorbar(fvu, val, yerr=sem, fmt="o", ms=13, color=col, capsize=4,
                     elinewidth=1.4, zorder=3)
         lr, steps = best[rk]["lr"], int(best[rk]["steps"])
         ax.annotate(f"{label}\nlr {lr:g}, {steps} steps\nFVU {fvu:.4f}",
-                    (fvu, dm[j]), textcoords="offset points", xytext=(14, -6),
+                    (fvu, val), textcoords="offset points", xytext=(14, -6),
                     fontsize=9, va="center")
 
     xs = [best[rk]["fvu"] for rk, _, _, _ in ARMS]
-    ys = [max(arms[sk]["delta_margin"]) for _, sk, _, _ in ARMS]
+    ys = [at_dose(arms[sk], DOSE)[0] for _, sk, _, _ in ARMS]
     ax.plot(xs, ys, ls=":", lw=1.4, color="#888888", zorder=1)
 
     ax.set_xscale("log")
     ax.set_xlabel("FVU at 8.0 realised coefficients per segment, held out\n"
                   "(lower is a better reconstructor)")
-    ax.set_ylabel("best steering Δ margin\n(higher is a better intervention)")
+    ax.set_ylabel(f"steering Δ margin at matched dose |α| = {DOSE}\n(higher is a better intervention)")
     ax.set_title("Reconstruction quality does not predict steering quality\n"
                  "each architecture at its own best recipe — the ordering is inverted",
                  fontsize=11.5)
