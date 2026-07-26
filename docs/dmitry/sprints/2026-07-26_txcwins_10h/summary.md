@@ -129,8 +129,26 @@ because `TemporalSAE` has no encoder bias.
 
 ### 5. Reading and steering come apart, now on nine tasks
 
-A per-token dictionary reads these factors at `auc_selection` = **1.000** while steering them
-worst. This is the most-replicated finding in the project and the one least likely to move.
+![Reading against steering, three architectures](../../../../plots/2026-07-26_txcwins/reading_vs_steering.png)
+
+*Nine held-out cells — three tasks × three dictionary inits — with all three architectures on
+content the dictionaries never trained on. Reading is the best single latent's held-out AUC;
+steering is that latent's effect at matched dose with the sign free.*
+
+| | median reading AUC | median steering Δ |
+| --- | --- | --- |
+| TopK SAE | **1.000** | +0.09 |
+| attention temporal SAE | **1.000** | +0.04 |
+| temporal crosscoder | 0.850 | **+1.12** |
+
+**Reading does not separate the architectures — all three reach AUC 1.000 on most cells. Steering
+separates them 12×.** Both per-token architectures decode these factors perfectly and move them by
+about a tenth of a nat; the crosscoder decodes them no better and moves them an order of magnitude
+further. This is the most-replicated finding in the project and the one least likely to move.
+
+⚠ These cells are **reading-selected**, so by the selection result in Limits they understate every
+arm — including the crosscoder. The dissociation is a statement about the latent a reading-based
+selector picks, which is what deployed practice picks.
 
 ## What was not achieved
 
