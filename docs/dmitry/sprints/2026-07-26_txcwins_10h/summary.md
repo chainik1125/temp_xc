@@ -312,7 +312,13 @@ already right. None of them errored.** Three were silently disadvantaging the ar
 *for*, and one was the sole support for a result now withdrawn.
 
 A second pattern appeared late: **a mechanism inferred to explain a discrepancy and asserted before
-the files were opened**, three times in the final hour. The resolving check was always to print the
+the files were opened** — six times by the end, of which the last three were caught before
+shipping rather than after. **The rate of bad hypotheses did not fall; the discipline changed.**
+The most instructive was the last: a pre-registered test with a stated falsifier, which *passed*
+and was still wrong, because it measured against a stored `random_cos_baseline` field whose name
+matched the quantity and whose definition did not — `1/√(T·d)`, correct for the slab cosine it was
+written for, wrong by 2.8× for a cosine in `ℝᵈ`. **A passing pre-registered test is not protection
+when the yardstick is borrowed.** The resolving check was always to print the
 configuration fields next to the number, and it always came last.
 
 A third is the most uncomfortable, because in each case **a real check was run and it passed**. A
