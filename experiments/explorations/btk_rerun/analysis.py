@@ -41,12 +41,14 @@ import numpy as np
 # threshold-flag/EMA changes touch only the eval encode path, which
 # gauc/eauc never use. Rows from both names fold into the btk-only arm.
 ARM_OF = {"txc_base": "paper-match", "txc_base_btk": "btk-only",
-          "txc_base_btkonly": "btk-only", "txc_base_relumix": "relu-mix"}
+          "txc_base_btkonly": "btk-only", "txc_base_relumix": "relu-mix",
+          "txc_base_perwinraw": "perwin-raw"}
 ARM_LABEL = {"paper-match": "paper-match (per-window TopK→ReLU)",
              "btk-only": "btk-only (batch pool, no ReLU)",
-             "relu-mix": "relu-mix control (ReLU→batch pool)"}
+             "relu-mix": "relu-mix control (ReLU→batch pool)",
+             "perwin-raw": "perwin-raw (per-window, ReLU deleted)"}
 ARM_COLOR = {"paper-match": "#000000", "btk-only": "#0072B2",
-             "relu-mix": "#009E73"}
+             "relu-mix": "#009E73", "perwin-raw": "#D55E00"}
 BASE_COLOR = "#E69F00"          # frozen tsae reference
 K_STYLE = {1: "-", 2: "--"}     # k_pos plotted in the headline figure
 K_SLOPE = (1, 2, 5)            # k_pos pooled into slopes (non-clipped only)

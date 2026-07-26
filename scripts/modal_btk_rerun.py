@@ -24,7 +24,7 @@ REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 VOL_DIR = "/workspace/btk_rerun_v2"
 
-ARMS = ["txc_base", "txc_base_btkonly", "txc_base_relumix"]
+ARMS = ["txc_base", "txc_base_btkonly", "txc_base_relumix", "txc_base_perwinraw"]
 DATASOURCES = ["toy_markov_n20_d40_noisy", "toy_coupled_K10_M20_d256"]
 T_GRID = [1, 2, 4, 5, 8, 10]
 

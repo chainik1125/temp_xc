@@ -221,3 +221,29 @@ def test_relumix_zero_pick_fingerprint():
     _pin_preacts(btk, bias)
     out_b = btk.train_step(_win_batch(B=4))
     assert abs(float(out_b["l0"]) - K_WIN) < 1e-6
+
+
+# ── 9. perwin-raw fourth corner: composite's selection scope, no ReLU ──
+
+def test_perwinraw_negatives_survive_per_window():
+    n_pos = K_WIN - 2
+    bias = _distinct_bias(n_pos)
+    pw = _mk(TXCBaseBTK, relu_mode="perwin-raw")
+    base = _mk(TXCBase)
+    _pin_preacts(pw, bias)
+    _pin_preacts(base, bias)
+    x = _win_batch(B=4)
+    z_pw = pw.encode(x).squeeze(1)
+    z_base = base.encode(x).squeeze(1)
+    # Same selection scope as the composite: every window exactly K_WIN
+    # picks — but the 2 selected negatives survive signed here.
+    assert int((z_pw != 0).sum(dim=-1)[0]) == K_WIN
+    assert int((z_pw < 0).sum(dim=-1)[0]) == 2
+    assert int((z_base != 0).sum(dim=-1)[0]) == K_WIN - 2
+    # Positive-rich regime: identical to the composite.
+    bias_pos = _distinct_bias(K_WIN + 4)
+    pw2 = _mk(TXCBaseBTK, relu_mode="perwin-raw")
+    base2 = _mk(TXCBase)
+    _pin_preacts(pw2, bias_pos)
+    _pin_preacts(base2, bias_pos)
+    assert torch.allclose(pw2.encode(x), base2.encode(x), atol=1e-6)

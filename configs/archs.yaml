@@ -107,6 +107,27 @@ archs:
       pooling. Zero-picks possible when positives are thin (that IS the
       relu-mix pathology).
 
+  txc_base_perwinraw:
+    class_path: temp_bench.archs.txc_base_btk:TXCBaseBTK
+    arch_version: "1.1.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      relu_mode: perwin-raw
+    per_section_hparams:
+      synthetic:  { d_sae: 20 }
+      em:         { d_sae: 32768, k_pos: 25 }
+      backtracking: { d_sae: 32768 }
+    notes: |
+      2x2 fourth corner: the paper arch's own per-window TopK selection
+      over RAW pre-acts (txc_base with F.relu deleted, nothing else).
+      Directly tests whether the composite's selected-negative zeroing
+      hurts at all, holding selection scope fixed.
+
   # ── BatchTopK fair-backbone family (experiments/explorations/synthetic/STATUS.md § 4) ──────
   # Strong backbone (BatchTopK train → JumpReLU threshold eval, Bussmann
   # et al.) + AuxK + decoder unit-norm + grad-orth, applied uniformly so

@@ -77,15 +77,16 @@ class TXCBaseBTK(TempBenchArch):
         relu_mode: str = "btk-only",
     ):
         nn.Module.__init__(self)
-        if relu_mode not in ("btk-only", "relu-mix"):
+        if relu_mode not in ("btk-only", "relu-mix", "perwin-raw"):
             raise ValueError(
-                f"relu_mode must be 'btk-only' or 'relu-mix'; got "
-                f"{relu_mode!r}. The paper-match composition (TopK then "
+                f"relu_mode must be 'btk-only', 'relu-mix' or 'perwin-raw'; "
+                f"got {relu_mode!r}. The paper-match composition (TopK then "
                 "ReLU, per-window) is the frozen arch txc_base."
             )
         self.relu_mode = relu_mode
-        _name = ("txc_base_btkonly" if relu_mode == "btk-only"
-                 else "txc_base_relumix")
+        _name = {"btk-only": "txc_base_btkonly",
+                 "relu-mix": "txc_base_relumix",
+                 "perwin-raw": "txc_base_perwinraw"}[relu_mode]
         self.config = ArchConfig(
             name=_name, d_in=d_in, d_sae=d_sae, k_pos=k_pos, T=T,
         )
@@ -166,12 +167,16 @@ class TXCBaseBTK(TempBenchArch):
         return pre if self.relu_mode == "btk-only" else F.relu(pre)
 
     def _batchtopk(self, pre: torch.Tensor) -> torch.Tensor:
-        """Flat BatchTopK over the batch pool, budget k_win per window.
+        """Selection at budget k_win per window.
 
-        Selects by raw value (most-positive first; negatives only when
-        the positive pool runs out). Selected values pass through
-        UNCHANGED — signed codes are allowed.
+        btk-only / relu-mix: flat BatchTopK over the batch pool.
+        perwin-raw: per-window topk (the paper arch's own selection
+        scope) over RAW pre-acts — txc_base with the F.relu deleted.
+        Selected values pass through UNCHANGED — signed codes allowed.
         """
+        if self.relu_mode == "perwin-raw":
+            vals, idx = pre.topk(self.k_win, dim=-1)
+            return torch.zeros_like(pre).scatter_(1, idx, vals)
         B = pre.shape[0]
         k_total = self.k_win * B
         flat = pre.reshape(-1)
