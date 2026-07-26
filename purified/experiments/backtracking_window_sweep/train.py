@@ -374,7 +374,12 @@ def run_memory_smoke(
     torch.manual_seed(config.seed)
     if device.startswith("cuda"):
         torch.cuda.manual_seed_all(config.seed)
-        torch.cuda.reset_peak_memory_stats(device)
+        cuda_device = torch.device(device)
+        # PyTorch 2.4's CUDA allocator rejects an explicit device argument
+        # here on some RunPod builds, even though the other memory APIs accept
+        # it. The device context keeps the measurement shard-local.
+        with torch.cuda.device(cuda_device):
+            torch.cuda.reset_peak_memory_stats()
         torch.set_float32_matmul_precision("high")
     model = build_model(config).to(
         device=device, dtype=_model_dtype(config, device)
@@ -427,10 +432,10 @@ def run_memory_smoke(
         payload.update(
             {
                 "peak_allocated_bytes": int(
-                    torch.cuda.max_memory_allocated(device)
+                    torch.cuda.max_memory_allocated(cuda_device)
                 ),
                 "peak_reserved_bytes": int(
-                    torch.cuda.max_memory_reserved(device)
+                    torch.cuda.max_memory_reserved(cuda_device)
                 ),
             }
         )

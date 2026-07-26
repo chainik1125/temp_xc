@@ -133,21 +133,29 @@ to the completed six-offset sweep:
 - checkpoints under `checkpoints/backtracking_window_sweep_t16/`.
 
 The wider extraction necessarily drops sentence events whose start position is
-too early to support offset \(-23\). Every T is therefore evaluated on the
-same ordered keyed subset in `sentence_acts_L10_T16.npz`; it is invalid to
-combine the old T<=6 cohort with the new T>=8 points. The T16 runner checks
-that keys form an order-preserving subset of the official six-offset artifact,
-labels match on the join, the artifact contains exact offsets `-23..-8`, its
-SHA matches the builder manifest, and the manifest records bit-exact agreement
-between the trailing six activations and the official artifact.
+too early to support offset \(-23\). It also excludes events whose extracted
+trailing six activations do not agree bit-for-bit with the official artifact,
+and whole traces whose pinned tokenizer does not round-trip the exact source
+text. Every T is therefore evaluated on the same ordered, exact-tail,
+T16-valid subset in `sentence_acts_L10_T16.npz`; it is invalid to combine the
+old T<=6 cohort with the new T>=8 points. The T16 runner checks that keys form
+an order-preserving subset of the official six-offset artifact, labels match
+on the join, the artifact contains exact offsets `-23..-8`, its SHA matches
+the builder manifest, and the manifest accounts exactly for the nested
+source-eligible, exact-tail, and full-T16 cohorts.
 
 The intended artifact is teacher-forced from the pinned labeled
 `full_response` traces. The public 3,300-by-256 Stage-B dictionary-training
 cache has no proven mapping to the 300 labeled evaluation traces and is not an
-acceptable extraction source. A `ward-c7-wide-teacher-force.v1` manifest must
-pin the response file path, SHA, and commit; model and tokenizer IDs and
-revisions; layer 10 `resid_post`; the common-cohort hash and key order; and an
-exact keyed comparison against the official trailing six offsets. The older
+acceptable extraction source. A `ward-c7-wide-teacher-force.v1` builder
+manifest must pin the response file path, SHA, and commit; model and tokenizer
+IDs and revisions; layer 10 `resid_post`; the common-cohort hash and key order;
+and an exact keyed comparison against the official trailing six offsets. The
+completed requests retain that builder protocol identifier because it is part
+of their content hashes, while the request, shard, exclusion, output, and
+manifest schemas are all v4. The v4 manifest records deterministic exclusion
+reasons and hashes, exact accounting identities, class and category coverage,
+and category-by-class coverage for every nested cohort. The older
 coordinate-map manifest remains accepted only when it supplies an explicit
 event map and its own exact-tail proof; the irrelevant 6.9 GB residual-cache
 provenance is never required for a teacher-forced artifact.
@@ -176,9 +184,13 @@ export BACKTRACKING_TEACHER_GPU_LIST=0,1
 bash "$TXC_RUNPOD_ROOT/purified/experiments/backtracking_window_sweep/launch_teacher_force_tmux.sh"
 ```
 
-Each trace shard is committed only after its extracted `-13..-8` values equal
-the official values bit-for-bit. Once all 300 shards exist, assemble and
-repeat the complete keyed proof:
+Each trace shard is committed atomically after every comparable event is
+classified as either bit-exact or excluded with a deterministic reason. Exact
+sibling events survive an event-level tail mismatch; tokenizer round-trip
+failures exclude the trace before any model forward pass. Assembly then
+verifies every cohort partition, exclusion hash, accounting identity, and
+coverage gate before writing the artifact and repeating the complete keyed
+proof:
 
 ```bash
 BACKTRACKING_TEACHER_PHASE=assemble \

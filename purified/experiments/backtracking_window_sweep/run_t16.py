@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import traceback
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 
 import numpy as np
@@ -18,6 +19,7 @@ from .protocol import (
     csv_ints,
     profile_dict,
     seed_queue,
+    sha256,
 )
 from .protocol_t16 import (
     ARTIFACT_OFFSETS,
@@ -150,6 +152,31 @@ def _seed_shard(
     )
 
 
+def _cell_shard(
+    windows: tuple[int, ...],
+    seeds: tuple[int, ...],
+    *,
+    num_shards: int,
+    shard_index: int,
+) -> tuple[tuple[int, int], ...]:
+    """Round-robin complete cells so a one-seed sweep can use every GPU."""
+
+    if num_shards < 1:
+        raise ValueError("--num-shards must be >= 1")
+    if not 0 <= shard_index < num_shards:
+        raise ValueError("--shard-index must be in [0, num_shards)")
+    ordered = tuple(
+        (seed, window)
+        for seed in seed_queue(seeds)
+        for window in window_queue(windows)
+    )
+    return tuple(
+        cell
+        for index, cell in enumerate(ordered)
+        if index % num_shards == shard_index
+    )
+
+
 def _train_config(configured, *, arch: str, window: int, seed: int):
     return TrainCellConfig(
         arch=arch,
@@ -170,6 +197,164 @@ def _train_config(configured, *, arch: str, window: int, seed: int):
         schedule_max_window=16,
         record_effective_l0=True,
     )
+
+
+def _run_fingerprint(contract: dict) -> str:
+    encoded = json.dumps(
+        contract, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _cell_run_contract(
+    configured,
+    *,
+    window: int,
+    seed: int,
+    encode_batch_size: int,
+    pca_dim: int,
+    inventory: dict,
+) -> dict:
+    """Return every setting that can change a completed cell's meaning."""
+
+    cell_profile = profile_dict(configured)
+    # These axes only decide which independent cells a launcher dispatches.
+    # The cell-specific window and seed are already pinned in each train config.
+    cell_profile.pop("windows")
+    cell_profile.pop("seeds")
+    return {
+        "protocol_version": PROTOCOL_VERSION,
+        "profile": cell_profile,
+        "training": {
+            arch: asdict(
+                _train_config(
+                    configured,
+                    arch=arch,
+                    window=window,
+                    seed=seed,
+                )
+            )
+            for arch in ("txc", "sae")
+        },
+        "evaluation": {
+            "folds": configured.folds,
+            "s_grid": list(configured.s_grid),
+            "max_rows": configured.max_rows,
+            "encode_batch_size": encode_batch_size,
+            "pca_dim": pca_dim,
+            "bootstrap_repeats": configured.bootstrap_repeats,
+            "include_effective_l0": True,
+        },
+        "activation_cache": {
+            "sha256": inventory["activation_cache_sha256"],
+            "shape": inventory["activation_cache_shape"],
+            "dtype": inventory["activation_cache_dtype"],
+        },
+        "evaluation_artifact": {
+            "sha256": inventory["artifact_sha256"],
+            "common_cohort_sha256": inventory["common_cohort_sha256"],
+            "common_cohort_rows": inventory["common_cohort_rows"],
+            "offsets": list(ARTIFACT_OFFSETS),
+        },
+    }
+
+
+def _base_completed_checks(
+    completed: dict,
+    *,
+    artifact_digest: str,
+    cohort_digest: str,
+    window: int,
+    seed: int,
+) -> dict[str, bool]:
+    return {
+        "status": completed.get("status") == "complete",
+        "protocol": completed.get("protocol_version") == PROTOCOL_VERSION,
+        "artifact": completed.get("artifact_sha256") == artifact_digest,
+        "cohort": completed.get("cohort_sha256") == cohort_digest,
+        "window": completed.get("window") == window,
+        "seed": completed.get("seed") == seed,
+    }
+
+
+def _fingerprinted_completed_checks(
+    completed: dict,
+    *,
+    contract: dict,
+    fingerprint: str,
+) -> dict[str, bool]:
+    return {
+        "run_contract": completed.get("run_contract") == contract,
+        "run_fingerprint": (
+            completed.get("run_fingerprint") == fingerprint
+        ),
+    }
+
+
+def _legacy_completed_checks(
+    completed: dict,
+    *,
+    contract: dict,
+    checkpoint_cell: Path,
+    inventory: dict,
+    window: int,
+    seed: int,
+) -> dict[str, bool]:
+    """Fail-closed migration gate for cells launched before fingerprints."""
+
+    evaluation = contract["evaluation"]
+    code_fingerprint = completed.get("code_fingerprint", {})
+    bootstrap = completed.get("grouped_question_bootstrap", {})
+    checks = {
+        "legacy_full_profile": (
+            contract["profile"].get("mode") == "full"
+            and evaluation["max_rows"] is None
+            and evaluation["encode_batch_size"] == 32
+            and evaluation["pca_dim"] == 32
+        ),
+        "pinned_activation_cache": (
+            inventory.get("activation_cache_contract_ok") is True
+        ),
+        "folds": completed.get("folds") == evaluation["folds"],
+        "s_grid": completed.get("s_grid") == evaluation["s_grid"],
+        "bootstrap_repeats": (
+            bootstrap.get("repeats_requested")
+            == evaluation["bootstrap_repeats"]
+        ),
+        "all_rows": (
+            completed.get("n_rows") == inventory.get("common_cohort_rows")
+        ),
+        "fingerprint_artifact": (
+            code_fingerprint.get("artifact_sha256")
+            == completed.get("artifact_sha256")
+        ),
+        "fingerprint_cohort": (
+            code_fingerprint.get("cohort_sha256")
+            == completed.get("cohort_sha256")
+        ),
+        "fingerprint_window": (
+            code_fingerprint.get("window") == window
+            and code_fingerprint.get("window_offsets")
+            == list(ARTIFACT_OFFSETS[-window:])
+        ),
+        "fingerprint_seed": code_fingerprint.get("seed") == seed,
+    }
+    for arch in ("txc", "sae"):
+        config_path = checkpoint_cell / arch / "config.json"
+        model_path = checkpoint_cell / arch / "model.safetensors"
+        existing_config = None
+        if config_path.exists():
+            existing_config = json.loads(config_path.read_text())
+            existing_config.pop("exposure_contract", None)
+        checks[f"{arch}_training_config"] = (
+            existing_config == contract["training"][arch]
+        )
+        checks[f"{arch}_checkpoint_hash"] = (
+            model_path.exists()
+            and code_fingerprint.get(f"{arch}_checkpoint_sha256")
+            == sha256(model_path)
+        )
+    return checks
 
 
 def _memory_inventory(path: Path) -> dict:
@@ -251,7 +436,8 @@ def main() -> None:
         )
         return
 
-    shard_seeds = _seed_shard(
+    shard_cells = _cell_shard(
+        configured.windows,
         configured.seeds,
         num_shards=args.num_shards,
         shard_index=args.shard_index,
@@ -270,8 +456,7 @@ def main() -> None:
             "seed": seed,
             "offsets": list(ARTIFACT_OFFSETS[-window:]),
         }
-        for seed in shard_seeds
-        for window in window_queue(configured.windows)
+        for seed, window in shard_cells
     ]
     plan = {
         "protocol_version": PROTOCOL_VERSION,
@@ -298,108 +483,138 @@ def main() -> None:
     args.checkpoint_root.mkdir(parents=True, exist_ok=True)
     atomic_json(plan, args.output_root / f"plan_shard{args.shard_index}.json")
 
-    for seed in shard_seeds:
-        for window in window_queue(configured.windows):
-            name = cell_name(window, seed)
-            cell_output = args.output_root / "cells" / name
-            checkpoint_cell = args.checkpoint_root / name
-            result_path = cell_output / "result.json"
-            if result_path.exists():
-                completed = json.loads(result_path.read_text())
-                checks = {
-                    "status": completed.get("status") == "complete",
-                    "protocol": (
-                        completed.get("protocol_version")
-                        == PROTOCOL_VERSION
-                    ),
-                    "artifact": (
-                        completed.get("artifact_sha256")
-                        == artifact_digest
-                    ),
-                    "cohort": (
-                        completed.get("cohort_sha256") == cohort_digest
-                    ),
-                    "window": completed.get("window") == window,
-                    "seed": completed.get("seed") == seed,
-                }
-                if not all(checks.values()):
-                    raise ValueError(
-                        f"stale completed cell at {result_path}: {checks}"
-                    )
-                print(f"[t16 sweep] complete, skipping {name}", flush=True)
-                continue
-            try:
-                training = {}
-                if args.phase in {"train", "all"}:
-                    for arch in ("txc", "sae"):
-                        training[arch] = train_dictionary(
-                            activation_cache=args.activation_cache,
-                            checkpoint_dir=checkpoint_cell / arch,
-                            config=_train_config(
-                                configured,
-                                arch=arch,
-                                window=window,
-                                seed=seed,
-                            ),
-                            device=args.device,
-                        )
-                    atomic_json(
-                        {
-                            "status": "complete",
-                            "protocol_version": PROTOCOL_VERSION,
-                            "effective_l0_definition": (
-                                "actual mean nonzeros after TopK then ReLU "
-                                "on the final training batch"
-                            ),
-                            "architectures": training,
-                        },
-                        checkpoint_cell / "training_summary.json",
-                    )
-                if args.phase in {"eval", "all"}:
-                    result = evaluate_cell(
-                        artifact=args.artifact,
-                        artifact_sha256=artifact_digest,
-                        txc_checkpoint=checkpoint_cell / "txc",
-                        sae_checkpoint=checkpoint_cell / "sae",
-                        output_dir=cell_output,
+    for seed, window in shard_cells:
+        name = cell_name(window, seed)
+        cell_output = args.output_root / "cells" / name
+        checkpoint_cell = args.checkpoint_root / name
+        result_path = cell_output / "result.json"
+        pca_dim = 16 if args.mode == "smoke" else 32
+        run_contract = _cell_run_contract(
+            configured,
+            window=window,
+            seed=seed,
+            encode_batch_size=args.encode_batch_size,
+            pca_dim=pca_dim,
+            inventory=inventory,
+        )
+        run_fingerprint = _run_fingerprint(run_contract)
+        if result_path.exists():
+            completed = json.loads(result_path.read_text())
+            checks = _base_completed_checks(
+                completed,
+                artifact_digest=artifact_digest,
+                cohort_digest=cohort_digest,
+                window=window,
+                seed=seed,
+            )
+            if completed.get("run_fingerprint") is None:
+                checks.update(
+                    _legacy_completed_checks(
+                        completed,
+                        contract=run_contract,
+                        checkpoint_cell=checkpoint_cell,
+                        inventory=inventory,
                         window=window,
                         seed=seed,
-                        folds=configured.folds,
-                        s_grid=configured.s_grid,
-                        max_rows=configured.max_rows,
-                        batch_size=args.encode_batch_size,
-                        pca_dim=16 if args.mode == "smoke" else 32,
-                        device=args.device,
-                        bootstrap_repeats=configured.bootstrap_repeats,
-                        protocol_version=PROTOCOL_VERSION,
-                        artifact_offsets=ARTIFACT_OFFSETS,
-                        include_effective_l0=True,
-                        cohort_sha256=cohort_digest,
                     )
-                    print(
-                        json.dumps(
-                            {
-                                "cell": name,
-                                "status": result["status"],
-                                "n_rows": result["n_rows"],
-                                "cohort_sha256": cohort_digest,
-                            },
-                            sort_keys=True,
+                )
+            else:
+                checks.update(
+                    _fingerprinted_completed_checks(
+                        completed,
+                        contract=run_contract,
+                        fingerprint=run_fingerprint,
+                    )
+                )
+            if not all(checks.values()):
+                raise ValueError(
+                    f"stale completed cell at {result_path}: {checks}"
+                )
+            if completed.get("run_fingerprint") is None:
+                completed["run_contract"] = run_contract
+                completed["run_fingerprint"] = run_fingerprint
+                completed["run_fingerprint_migration"] = (
+                    "legacy cell validated against pinned cache, exact "
+                    "checkpoint configs/hashes, and evaluation metadata"
+                )
+                atomic_json(completed, result_path)
+            print(f"[t16 sweep] complete, skipping {name}", flush=True)
+            continue
+        try:
+            training = {}
+            if args.phase in {"train", "all"}:
+                for arch in ("txc", "sae"):
+                    training[arch] = train_dictionary(
+                        activation_cache=args.activation_cache,
+                        checkpoint_dir=checkpoint_cell / arch,
+                        config=_train_config(
+                            configured,
+                            arch=arch,
+                            window=window,
+                            seed=seed,
                         ),
-                        flush=True,
+                        device=args.device,
                     )
-                    write_report(args.output_root)
-            except Exception as error:
-                failure = {
-                    "cell": name,
-                    "error_type": type(error).__name__,
-                    "error": str(error),
-                    "traceback": traceback.format_exc(),
-                }
-                atomic_json(failure, cell_output / "failure.json")
-                print(json.dumps(failure, sort_keys=True), flush=True)
-                if not args.continue_on_error:
-                    raise
+                atomic_json(
+                    {
+                        "status": "complete",
+                        "protocol_version": PROTOCOL_VERSION,
+                        "effective_l0_definition": (
+                            "actual mean nonzeros after TopK then ReLU "
+                            "on the final training batch"
+                        ),
+                        "architectures": training,
+                    },
+                    checkpoint_cell / "training_summary.json",
+                )
+            if args.phase in {"eval", "all"}:
+                result = evaluate_cell(
+                    artifact=args.artifact,
+                    artifact_sha256=artifact_digest,
+                    txc_checkpoint=checkpoint_cell / "txc",
+                    sae_checkpoint=checkpoint_cell / "sae",
+                    output_dir=cell_output,
+                    window=window,
+                    seed=seed,
+                    folds=configured.folds,
+                    s_grid=configured.s_grid,
+                    max_rows=configured.max_rows,
+                    batch_size=args.encode_batch_size,
+                    pca_dim=pca_dim,
+                    device=args.device,
+                    bootstrap_repeats=configured.bootstrap_repeats,
+                    protocol_version=PROTOCOL_VERSION,
+                    artifact_offsets=ARTIFACT_OFFSETS,
+                    include_effective_l0=True,
+                    cohort_sha256=cohort_digest,
+                )
+                result["run_contract"] = run_contract
+                result["run_fingerprint"] = run_fingerprint
+                atomic_json(result, result_path)
+                print(
+                    json.dumps(
+                        {
+                            "cell": name,
+                            "status": result["status"],
+                            "n_rows": result["n_rows"],
+                            "cohort_sha256": cohort_digest,
+                        },
+                        sort_keys=True,
+                    ),
+                    flush=True,
+                )
+                write_report(args.output_root)
+        except Exception as error:
+            failure = {
+                "cell": name,
+                "error_type": type(error).__name__,
+                "error": str(error),
+                "traceback": traceback.format_exc(),
+            }
+            atomic_json(failure, cell_output / "failure.json")
+            print(json.dumps(failure, sort_keys=True), flush=True)
+            if not args.continue_on_error:
+                raise
     if args.phase in {"eval", "all"}:
         print(json.dumps(write_report(args.output_root), sort_keys=True))
 

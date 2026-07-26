@@ -10,6 +10,15 @@ readonly TRACES="${BACKTRACKING_TEACHER_TRACES:?set BACKTRACKING_TEACHER_TRACES}
 readonly TRACES_SHA256="${BACKTRACKING_TEACHER_TRACES_SHA256:?set BACKTRACKING_TEACHER_TRACES_SHA256}"
 readonly SOURCE_PATH="${BACKTRACKING_TEACHER_SOURCE_PATH:?set BACKTRACKING_TEACHER_SOURCE_PATH}"
 readonly SOURCE_COMMIT="${BACKTRACKING_TEACHER_SOURCE_COMMIT:?set BACKTRACKING_TEACHER_SOURCE_COMMIT}"
+readonly PYTHON="${TXC_RUNPOD_PYTHON:-$ROOT/.venv-e0-extract/bin/python}"
+readonly PUBLIC_ROOT="${BACKTRACKING_TEACHER_PUBLIC_ROOT:-$ROOT/purified/artifacts/ward-stage-b-cache}"
+readonly C7_ROOT="${BACKTRACKING_TEACHER_C7_ROOT:-$ROOT/purified/artifacts/c7}"
+readonly PROMPTS="${BACKTRACKING_TEACHER_PROMPTS:-$PUBLIC_ROOT/stageA_prompts.json}"
+readonly LABELS="${BACKTRACKING_TEACHER_LABELS:-$PUBLIC_ROOT/stageA_sentence_labels.json}"
+readonly OFFICIAL="${BACKTRACKING_TEACHER_OFFICIAL:-$C7_ROOT/sentence_acts_L10.npz}"
+readonly OUTPUT_DIR="${BACKTRACKING_TEACHER_OUTPUT_DIR:-$C7_ROOT/teacher_force_t16}"
+readonly MAX_TRACES="${BACKTRACKING_TEACHER_MAX_TRACES:-}"
+readonly LOG_ROOT="${BACKTRACKING_TEACHER_LOG_ROOT:-$ROOT/purified/logs/backtracking_teacher_force}"
 
 if [[ "$(git -C "$ROOT" branch --show-current)" != "neurips-aniket" ]]; then
   echo "refusing to launch: current branch must be neurips-aniket" >&2
@@ -28,7 +37,7 @@ fi
 
 for shard in "${!gpus[@]}"; do
   session="${SESSION_PREFIX}-${shard}"
-  exit_file="$ROOT/purified/logs/backtracking_teacher_force/${session}.exit"
+  exit_file="$LOG_ROOT/${session}.exit"
   if ((DRY_RUN == 1)); then
     printf "would launch tmux session %s on GPU %s (trace shard %s/%s)\n" \
       "$session" "${gpus[$shard]}" "$shard" "$N_SHARDS"
@@ -45,6 +54,13 @@ for shard in "${!gpus[@]}"; do
     "BACKTRACKING_TEACHER_TRACES_SHA256=$TRACES_SHA256" \
     "BACKTRACKING_TEACHER_SOURCE_PATH=$SOURCE_PATH" \
     "BACKTRACKING_TEACHER_SOURCE_COMMIT=$SOURCE_COMMIT" \
+    "TXC_RUNPOD_PYTHON=$PYTHON" \
+    "BACKTRACKING_TEACHER_PROMPTS=$PROMPTS" \
+    "BACKTRACKING_TEACHER_LABELS=$LABELS" \
+    "BACKTRACKING_TEACHER_OFFICIAL=$OFFICIAL" \
+    "BACKTRACKING_TEACHER_OUTPUT_DIR=$OUTPUT_DIR" \
+    "BACKTRACKING_TEACHER_LOG_ROOT=$LOG_ROOT" \
+    "BACKTRACKING_TEACHER_MAX_TRACES=$MAX_TRACES" \
     "BACKTRACKING_TEACHER_CUDA_DEVICE=${gpus[$shard]}" \
     "BACKTRACKING_TEACHER_NUM_SHARDS=$N_SHARDS" \
     "BACKTRACKING_TEACHER_SHARD_INDEX=$shard" \

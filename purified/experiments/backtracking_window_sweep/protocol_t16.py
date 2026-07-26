@@ -19,10 +19,10 @@ from pathlib import Path
 
 import numpy as np
 
+from ..backtracking_assets import CACHE_SHA256, CACHE_SHAPE
 from .protocol import (
     EXPECTED_ARTIFACT_SHA256,
     EXPECTED_ARTIFACT_SHAPE,
-    EXPECTED_CACHE_SHAPE,
     FULL_SEEDS,
     SweepProfile,
     sha256,
@@ -37,6 +37,11 @@ DEFAULT_MANIFEST_NAME = "sentence_acts_L10_T16.manifest.json"
 EXPECTED_WIDTH = 4_096
 COORDINATE_MAP_PROTOCOL = "ward-c7-wide-artifact-audit.v1"
 TEACHER_FORCE_PROTOCOL = "ward-c7-wide-teacher-force.v1"
+TEACHER_FORCE_MANIFEST_SCHEMA = "ward-c7-wide-teacher-force-manifest.v4"
+TEACHER_FORCE_TAIL_COMPARATOR = "float32-uint32-bit-exact.v1"
+TEACHER_FORCE_SELECTION_POLICY = (
+    "source-aligned-and-bit-exact-tail-and-t16.v1"
+)
 ACCEPTED_BUILDER_PROTOCOLS = (
     TEACHER_FORCE_PROTOCOL,
     COORDINATE_MAP_PROTOCOL,
@@ -233,6 +238,161 @@ def _identity(record: dict) -> tuple[object, object]:
     )
 
 
+def _cohort_metadata_ok(record: object) -> bool:
+    if not isinstance(record, dict):
+        return False
+    try:
+        rows = int(record["rows"])
+        class_counts = record["class_counts"]
+        category_counts = record["category_counts"]
+        category_class_counts = record["category_class_counts"]
+    except (KeyError, TypeError, ValueError):
+        return False
+    if (
+        rows < 1
+        or not _sha256_string(record.get("sha256"))
+        or not _sha256_string(record.get("category_sha256"))
+        or not isinstance(class_counts, dict)
+        or not isinstance(category_counts, dict)
+        or not isinstance(category_class_counts, dict)
+        or set(class_counts) != {"0", "1"}
+        or set(category_counts) != set(category_class_counts)
+        or not category_counts
+    ):
+        return False
+    try:
+        class_values = {
+            label: int(class_counts[label]) for label in ("0", "1")
+        }
+        category_values = {
+            str(category): int(count)
+            for category, count in category_counts.items()
+        }
+        cell_values = {
+            str(category): {
+                label: int(cells[label]) for label in ("0", "1")
+            }
+            for category, cells in category_class_counts.items()
+            if isinstance(cells, dict) and set(cells) == {"0", "1"}
+        }
+    except (KeyError, TypeError, ValueError):
+        return False
+    if (
+        set(cell_values) != set(category_values)
+        or any(value < 0 for value in class_values.values())
+        or any(value < 0 for value in category_values.values())
+        or any(
+            value < 0
+            for cells in cell_values.values()
+            for value in cells.values()
+        )
+    ):
+        return False
+    return (
+        sum(class_values.values()) == rows
+        and sum(category_values.values()) == rows
+        and all(
+            sum(cell_values[category].values())
+            == category_values[category]
+            for category in category_values
+        )
+        and all(
+            sum(
+                cell_values[category][label]
+                for category in cell_values
+            )
+            == class_values[label]
+            for label in ("0", "1")
+        )
+    )
+
+
+def _coverage_metadata_ok(
+    cohort: object,
+    official: object,
+) -> bool:
+    if not (
+        _cohort_metadata_ok(cohort)
+        and _cohort_metadata_ok(official)
+    ):
+        return False
+    assert isinstance(cohort, dict)
+    assert isinstance(official, dict)
+    if any(int(cohort["class_counts"][label]) < 1 for label in ("0", "1")):
+        return False
+    official_categories = set(official["category_counts"])
+    if set(cohort["category_counts"]) != official_categories:
+        return False
+    for category in official_categories:
+        for label in ("0", "1"):
+            if (
+                int(
+                    official["category_class_counts"][category][label]
+                )
+                > 0
+                and int(cohort["category_class_counts"][category][label])
+                < 1
+            ):
+                return False
+    return True
+
+
+def _trace_accounting_ok(
+    trace_summary: object,
+    *,
+    source_rows: int,
+    exact_rows: int,
+    wide_rows: int,
+    expected_traces: int,
+) -> bool:
+    if (
+        not isinstance(trace_summary, list)
+        or len(trace_summary) != expected_traces
+        or not all(isinstance(row, dict) for row in trace_summary)
+    ):
+        return False
+    observed_source = 0
+    observed_exact = 0
+    observed_wide = 0
+    for row in trace_summary:
+        try:
+            local_source = int(row["source_eligible_rows"])
+            local_exact = int(row["exact_tail_rows"])
+            local_wide = int(row["wide_rows"])
+            reason_counts = row["exclusion_reason_counts"]
+            source_class = row["source_class_counts"]
+            exact_class = row["exact_tail_class_counts"]
+            wide_class = row["wide_class_counts"]
+        except (KeyError, TypeError, ValueError):
+            return False
+        try:
+            local_ok = (
+                min(local_source, local_exact, local_wide) >= 0
+                and local_source >= local_exact >= local_wide
+                and isinstance(reason_counts, dict)
+                and sum(int(value) for value in reason_counts.values())
+                == local_source - local_exact
+                and sum(int(value) for value in source_class.values())
+                == local_source
+                and sum(int(value) for value in exact_class.values())
+                == local_exact
+                and sum(int(value) for value in wide_class.values())
+                == local_wide
+            )
+        except (AttributeError, TypeError, ValueError):
+            return False
+        if not local_ok:
+            return False
+        observed_source += local_source
+        observed_exact += local_exact
+        observed_wide += local_wide
+    return (
+        observed_source == source_rows
+        and observed_exact == exact_rows
+        and observed_wide == wide_rows
+    )
+
+
 def _teacher_force_checks(
     manifest: dict,
     *,
@@ -281,6 +441,13 @@ def _teacher_force_checks(
         manifest.get("common_cohort"),
         manifest.get("cohort"),
     )
+    validation = manifest.get("validation", {})
+    official_cohort = validation.get("official_cohort", {})
+    source_cohort = validation.get("source_eligible_cohort", {})
+    exact_cohort = validation.get("exact_tail_retained_cohort", {})
+    wide_cohort = validation.get("wide_t16_cohort", {})
+    coverage = validation.get("coverage", {})
+    trailing = manifest.get("trailing_six", {})
 
     source_path = source.get(
         "path",
@@ -325,7 +492,85 @@ def _teacher_force_checks(
         output.get("exact_key_order", cohort.get("exact_key_order")),
     )
     recorded_dtype = manifest.get("dtype", output.get("dtype"))
+    try:
+        official_rows = int(validation["official_rows"])
+        source_excluded_rows = int(validation["source_excluded_rows"])
+        source_rows = int(source_cohort["rows"])
+        exact_rows = int(exact_cohort["rows"])
+        wide_rows = int(wide_cohort["rows"])
+        extraction_excluded_rows = int(
+            validation["extraction_exclusion_rows"]
+        )
+        missing_early_rows = int(
+            validation["wide_rows_dropped_for_missing_early_offsets"]
+        )
+        complete_trace_shards = int(
+            validation["complete_trace_shards"]
+        )
+        trace_count = int(validation["trace_count"])
+    except (KeyError, TypeError, ValueError):
+        official_rows = source_excluded_rows = source_rows = -1
+        exact_rows = wide_rows = extraction_excluded_rows = -1
+        missing_early_rows = complete_trace_shards = trace_count = -1
+    expected_coverage_names = {
+        "source_eligible",
+        "exact_tail_retained",
+        "wide_t16",
+    }
+    coverage_records_ok = (
+        isinstance(coverage, dict)
+        and set(coverage) == expected_coverage_names
+        and all(
+            isinstance(record, dict)
+            and record.get("cohort") == name
+            and record.get("passed") is True
+            and record.get("missing_classes") == []
+            and record.get("missing_categories") == []
+            and record.get("missing_category_class_cells") == []
+            for name, record in coverage.items()
+        )
+    )
+    cohort_accounting_ok = (
+        official_rows >= 0
+        and official_rows == source_rows + source_excluded_rows
+        and source_rows == exact_rows + extraction_excluded_rows
+        and exact_rows == wide_rows + missing_early_rows
+        and wide_rows == x_shape[0]
+        and int(validation.get("wide_rows", -1)) == wide_rows
+    )
+    common_metadata_ok = (
+        _cohort_metadata_ok(cohort)
+        and _cohort_metadata_ok(wide_cohort)
+        and all(
+            cohort.get(key) == wide_cohort.get(key)
+            for key in (
+                "rows",
+                "sha256",
+                "category_sha256",
+                "class_counts",
+                "category_counts",
+                "category_class_counts",
+            )
+        )
+        and cohort.get("selection") == TEACHER_FORCE_SELECTION_POLICY
+        and cohort.get("exact_key_order") is True
+    )
+    structural_coverage_ok = all(
+        _coverage_metadata_ok(candidate, official_cohort)
+        for candidate in (source_cohort, exact_cohort, wide_cohort)
+    )
+    trace_accounting_ok = _trace_accounting_ok(
+        validation.get("trace_summary"),
+        source_rows=source_rows,
+        exact_rows=exact_rows,
+        wide_rows=wide_rows,
+        expected_traces=trace_count,
+    ) and complete_trace_shards == trace_count
     return {
+        "teacher_manifest_schema_ok": (
+            manifest.get("schema_version")
+            == TEACHER_FORCE_MANIFEST_SCHEMA
+        ),
         "teacher_source_pin_ok": (
             _nonempty_string(source_path)
             and _sha256_string(source_sha)
@@ -353,9 +598,36 @@ def _teacher_force_checks(
         "teacher_key_order_ok": (
             recorded_key_order is True and exact_key_order
         ),
-        "teacher_output_dtype_ok": recorded_dtype == x_dtype,
+        "teacher_output_dtype_ok": (
+            recorded_dtype == x_dtype == "float32"
+        ),
         "teacher_output_rows_ok": (
             int(cohort.get("rows", x_shape[0])) == x_shape[0]
+        ),
+        "teacher_exact_subset_policy_ok": (
+            trailing.get("comparator") == TEACHER_FORCE_TAIL_COMPARATOR
+            and cohort.get("selection") == TEACHER_FORCE_SELECTION_POLICY
+            and trailing.get("exact_equal") is True
+            and int(trailing.get("mismatched_values", -1)) == 0
+        ),
+        "teacher_cohort_metadata_ok": (
+            _cohort_metadata_ok(official_cohort)
+            and _cohort_metadata_ok(source_cohort)
+            and _cohort_metadata_ok(exact_cohort)
+            and common_metadata_ok
+        ),
+        "teacher_cohort_accounting_ok": cohort_accounting_ok,
+        "teacher_coverage_gates_ok": (
+            coverage_records_ok and structural_coverage_ok
+        ),
+        "teacher_trace_accounting_ok": trace_accounting_ok,
+        "teacher_exclusion_hashes_ok": all(
+            _sha256_string(validation.get(key))
+            for key in (
+                "source_exclusions_sha256",
+                "extraction_exclusions_sha256",
+                "combined_exclusions_sha256",
+            )
         ),
     }
 
@@ -398,6 +670,9 @@ def artifact_inventory(
         reference_labels = payload["is_bt"].astype(np.uint8, copy=True)
         reference_keys = payload["keys"].astype(str, copy=True)
     cache = np.load(activation_cache, mmap_mode="r")
+    cache_shape = tuple(int(value) for value in cache.shape)
+    cache_dtype = str(cache.dtype)
+    cache_digest = sha256(activation_cache)
 
     result.update(
         {
@@ -424,12 +699,16 @@ def artifact_inventory(
             "reference_keys_unique": (
                 len(np.unique(reference_keys)) == len(reference_keys)
             ),
-            "activation_cache_shape": [int(value) for value in cache.shape],
+            "activation_cache_shape": list(cache_shape),
+            "activation_cache_dtype": cache_dtype,
+            "activation_cache_sha256": cache_digest,
             "activation_cache_shape_ok": (
-                tuple(cache.shape) == EXPECTED_CACHE_SHAPE
+                cache_shape == CACHE_SHAPE
                 if strict_full
                 else cache.ndim == 3 and cache.shape[-1] == EXPECTED_WIDTH
             ),
+            "activation_cache_dtype_ok": cache_dtype == "float16",
+            "activation_cache_sha256_ok": cache_digest == CACHE_SHA256,
         }
     )
 
@@ -636,6 +915,11 @@ def artifact_inventory(
                     )
                     == EXPECTED_ARTIFACT_SHA256
                 ),
+                "activation_cache_contract_ok": (
+                    cache_shape == CACHE_SHAPE
+                    and cache_dtype == "float16"
+                    and cache_digest == CACHE_SHA256
+                ),
             }
         )
     return result
@@ -672,6 +956,9 @@ def assert_inventory(inventory: dict, *, strict_full: bool) -> None:
                 "manifest_source_provenance_ok",
                 "manifest_validation_counts_ok",
                 "reference_artifact_sha256_ok",
+                "activation_cache_dtype_ok",
+                "activation_cache_sha256_ok",
+                "activation_cache_contract_ok",
             )
         )
     failures = {
