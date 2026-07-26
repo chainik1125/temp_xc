@@ -348,7 +348,7 @@ behaves differently. This is last sprint's task structure occurring naturally.
 | paper | what it gives us |
 | --- | --- |
 | Pezeshkpour & Hruschka, *Large Language Models Sensitivity to The Order of Options in Multiple-Choice Questions*, NAACL Findings 2024 ([arXiv:2308.11483](https://arxiv.org/abs/2308.11483)) — verified | "a considerable performance gap of approximately 13% to 75% in LLMs on different benchmarks, when answer options are reordered" |
-| Zheng et al., *Large Language Models Are Not Robust Multiple Choice Selectors*, ICLR 2024 ([arXiv:2309.03882](https://arxiv.org/abs/2309.03882)) | names it *selection bias*, attributes it to a token-position prior, and gives PriDe as the debiasing baseline |
+| Zheng, Zhou, Meng, Zhou, Huang, *Large Language Models Are Not Robust Multiple Choice Selectors*, ICLR 2024 Spotlight ([arXiv:2309.03882](https://arxiv.org/abs/2309.03882)) — verified | names it *selection bias* — models "prefer to select specific option IDs as answers (like 'Option A')" — attributes it to **token bias**, where the model "a priori assigns more probabilistic mass to specific option ID tokens", and gives PriDe, a label-free inference-time debiasing method, as the baseline; 20 LLMs on three benchmarks |
 
 **Instance C — retrieved-document position.**
 
@@ -436,6 +436,20 @@ even worse anchored bias" than larger LLMs — it is not established at 1.5B+. S
 is still unmeasured. Third, and most simply, **prefer instance D**: premise-order failure in
 R-GSM has no published localisation and is a reasoning failure rather than a label prior, so
 the "one biased head explains it" reply is not available.
+
+**A second and more damaging problem with instance B, found on verification.** Zheng et al.
+attribute selection bias primarily to **token bias** — the model "a priori assigns more
+probabilistic mass to specific option ID tokens (e.g. A/B/C/D)". If the effect is a prior over
+*label tokens* rather than over *positions*, then it is per-token representable **and**
+per-token steerable: a constant write on the "prefer token A" direction is exactly the right
+intervention, and the SAE arm should win or tie. That makes instance B a poor test of a window
+code, possibly a predicted-negative rather than a candidate. Two attributions are in the
+literature — Pezeshkpour & Hruschka emphasise position plus answer uncertainty, Zheng et al.
+emphasise token bias — and until that is settled instance B is not the one to run.
+
+**Net effect: use instance D (premise order), or instance A (demonstration order).** In both,
+the permuted units are *content* blocks with no label token to carry a prior, so the token-bias
+escape route does not exist and the factor is genuinely positional.
 
 ### Instruction-order conflict / prompt-injection precedence — priority 5
 
@@ -706,11 +720,15 @@ not transfer.
   ([arXiv:2502.17424](https://arxiv.org/abs/2502.17424)); persona vectors
   ([arXiv:2507.21509](https://arxiv.org/abs/2507.21509)). **Additional counter-evidence:**
   *Convergent Linear Representations of Emergent Misalignment*
-  ([arXiv:2506.11618](https://arxiv.org/abs/2506.11618) — id unverified) reports that EM is
-  carried by a convergent *linear* direction. A single direction that already captures the
-  factor is precisely the case where a per-token dictionary suffices, so this argues against EM
-  as a temporal-code demonstration rather than for it. Worth knowing before spending the
-  repo's EM infra on this.
+  ([arXiv:2506.11618](https://arxiv.org/abs/2506.11618) — verified) shows that emergently
+  misaligned models converge to similar representations, and extracts a transferable
+  "misalignment direction" from fine-tuned activations that reduces misaligned behaviour in
+  models trained on *different* datasets. Their minimal organism uses 9 rank-1 adapters, six
+  contributing to general misalignment and two specialising for domain-specific misalignment —
+  so this is not a claim of one unified direction, and it should not be quoted as one. The
+  relevant point for us is narrower but still holds: a transferable *direction* already
+  captures enough of the factor to steer with, which is the regime where a per-token dictionary
+  suffices. It argues against EM as a temporal-code demonstration rather than for it.
 - **Agentic goal drift / context rot** — genuinely temporally extended, and 2026 has a lot of
   it: goal drift, context drift, role drift, plan decay over long trajectories, with reported
   accuracy drops of 14–85% from context length alone even when all relevant information is
@@ -757,9 +775,10 @@ measured on a completely different task.
   et al., aggregation-at-last-token quote), 2606.13705 (Lazaridis et al., single-neuron
   repetition fix and the "doom loops" caveat), 2206.02369 (Xu et al., NeurIPS 2022,
   self-reinforcement quote), 2511.05541 (Bhalla et al., ICLR 2026 oral, T-SAE loss and config),
-  2607.17117 (Persistent SAEs, EMA recurrence and prompt-injection intervention — content
-  fetched, arXiv id not independently cross-checked), 2605.05892 (Jin et al., FLAS,
-  position-varying steering and AxBench numbers).
+  2607.17117 (Persistent SAEs, EMA recurrence and prompt-injection intervention — abstract and
+  full-text pages both fetched and consistent), 2605.05892 (Jin et al., FLAS, position-varying
+  steering and AxBench numbers), 2309.03882 (Zheng et al., ICLR 2024 Spotlight, token-bias
+  attribution and PriDe), 2506.11618 (convergent EM representations, 9 rank-1 adapters).
 - **Canonical, high confidence, not re-fetched:** 2209.11895, 1904.09751, 2407.07011,
   2410.13497, 2102.09690, 2309.03882, 2406.07358, 2405.19550, 2404.01833, 2305.02363,
   2502.17424, 2507.21509, 2310.13548, 2305.04388, 2507.12638.
@@ -803,3 +822,10 @@ Times are wall-clock against the sprint window opening at 2026-07-25 22:33 PDT.
   their judge-based steering protocol and the open question of whether their steering is
   applied uniformly across positions. Corrected the changelog timestamps in this section, which
   had been estimated rather than read off the clock and were about four hours fast.
+- **Pass 8** (23:05 PDT) — verification round. Confirmed Zheng et al. (2309.03882) attribute
+  selection bias to **token bias** over option-ID tokens, which makes instance B
+  per-token-steerable and therefore a likely predicted-negative rather than a candidate;
+  narrowed the family recommendation to instances D and A, where the permuted units are content
+  blocks with no label token to carry a prior. Softened the EM counter-evidence: 2506.11618
+  extracts a *transferable* misalignment direction from a 9-adapter organism (six general, two
+  domain-specific), which is not the single-unified-direction claim I had written.

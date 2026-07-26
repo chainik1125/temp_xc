@@ -633,3 +633,56 @@ Also recorded for the write-up: their steering evaluation is judge-based (30 fea
 by Llama-3.3-70B for success and coherence). The teacher-forced margin used here is a
 cleaner, non-overlapping measurement rather than a weaker one, and should be described that
 way.
+
+## 23:05 — the catalogue's qualitative screen and the gradient screen are the same quantity
+
+MCQ option order is dropped, on a mechanism that turns out to generalise. Zheng et al.,
+*Large Language Models Are Not Robust Multiple Choice Selectors*, ICLR 2024 Spotlight
+(arXiv:2309.03882) attribute selection bias primarily to **token bias** — the model "a priori
+assigns more probabilistic mass to specific option ID tokens". If the factor is a prior over
+*label tokens* rather than over *positions*, then a constant write on a "prefer token A"
+direction is exactly the right intervention, so the per-token dictionary should win or tie.
+That makes MCQ a **predicted negative with a mechanism**, which is worth more than an
+untested candidate. The literature is split on the attribution — Pezeshkpour & Hruschka
+emphasise position and answer uncertainty — but an unsettled attribution is itself a reason
+not to spend the sprint on it, and it stacks with the anchored-bias localisation risk noted
+earlier.
+
+**The pattern this completes is the important part.** Four catalogue entries have now been
+demoted for the same reason:
+
+| entry | why there is no headroom |
+| --- | --- |
+| refusal | the Arditi single-direction intervention near-saturates |
+| MCQ option order | selection bias is a prior over label tokens, so a constant write is correct |
+| emergent misalignment | a transferable direction already captures enough to steer with |
+| repetition onset | a single sign-inverted neuron already fixes it |
+
+In every case the judgement is: *a constant, per-token-representable write already captures
+the factor, so nothing is left for a position-varying write to do.* That is precisely what
+the gradient screen measures —
+
+```text
+c = T·‖mean_t Ḡ‖² / ‖Ḡ‖²_F        constant-subspace share of the margin gradient
+```
+
+— with `c > 0.3` as the discard threshold. The literature-derived judgement and the measured
+`c` are the same quantity, one estimated from prior work and one obtained in a single
+backward pass. The catalogue is being given a predicted-`c` column so its rankings become
+falsifiable rather than editorial, and every task actually screened yields a measured `c` to
+check the prediction against. If literature-derived predictions track measured `c` across
+several tasks, **the catalogue can screen candidate behaviours without running anything**,
+which would be more useful than any single task outcome.
+
+Instances A (demonstration order) and D (premise order) survive: their permuted units are
+*content* blocks with no label token available to carry a prior, so the token-bias escape
+route does not exist and the factor is genuinely positional.
+
+**Two corrections recorded.** The review agent withdrew its own characterisation of
+*Convergent Linear Representations of Emergent Misalignment* (arXiv:2506.11618) — the paper's
+minimal organism uses nine rank-1 adapters and is explicitly not a single-unified-direction
+claim, so the earlier phrasing would have been repeated here uncorrected. And it found its
+catalogue timestamps running about four hours fast for the same reason mine did: estimated
+rather than read off the clock. Both corrected. Elapsed is roughly half an hour of ten, so
+the runway is far longer than the pace suggests, and the agents have been redirected from
+breadth toward depth and verification.
