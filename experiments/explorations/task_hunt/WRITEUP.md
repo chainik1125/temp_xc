@@ -99,6 +99,24 @@ file on every test run.
 
 ## 3. Positive task 1 — backtracking intensity in reasoning traces
 
+**Is this the backtracking case study already in the paper? No —
+same corpus, different question.** The paper's existing case study
+asks whether TXC latents can *detect individual backtracking events*
+(classification of events, plus causally *inducing* backtracking by
+steering those latents). The task here asks something the paper's
+case study never measures: whether the dictionary code carries a
+**graded summary of the recent past** — not "is this token a
+backtracking event?" but "how much backtracking has been happening
+over the last several tokens?". That is a continuous trailing
+quantity, evaluated by budget-matched regression across window
+lengths rather than by event detection, and its win condition is the
+T-scaling curve against the per-token baselines. The two results are
+complementary: the paper's case study shows the backtracking
+*feature* exists and is causally usable; this task shows the window
+code *integrates its recent history*, which no single-position code
+can. What they share is the corpus and the event-labeling pipeline —
+nothing else is reused.
+
 **The data.** 4,044 sequences of 128 tokens from the paper's
 backtracking corpus: chain-of-thought transcripts of a
 DeepSeek-R1-Distill reasoning model, with backtracking events
