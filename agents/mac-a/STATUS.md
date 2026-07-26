@@ -1,56 +1,45 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 evening (define-clock; local clock ≈ 70 min ahead) —
-SALVAGE W1 IN FLIGHT.** Day-2 W2 closed earlier (see git history of
-this file). Current mission: `briefings/salvage-mac-a.md` — ttrend
-TXC-post fresh-seed {3,4,5} confirmation panel. Cap $100 (salvage);
-est ~$10; ledger line appended (program ~$97 of $500).
+**2026-07-26 ~18:40 London define-clock (local ≈ 70 min ahead) —
+SALVAGE W1 COMPLETE, verdict pushed (2eb4927c9). Idle watch.**
 
-## Where the run is
+## Salvage W1 delivered (all PENDING TEAM REVIEW)
 
-- **FROZEN** `50af78f12` = SALVAGE_CARD.md + run_salvage.py (72
-  cells, v2-columns hard assert) + score_salvage.py +
-  merge_salvage_payload.py. Driver `scripts/modal_diafaces_salvage.py`
-  pinned at `d5da8ef59`.
-- **LAUNCHED detached** (~local 19:0x): app `mac-a-diafaces-salvage`
-  — 1× H100 main (69 cells, workers 6) + 3× L4 high-CPU trained-tsae.
-  Payloads → Volume `temp-xc-replag-caches:/workspace/diafaces_salvage/`.
-  Local client = background task b0x89dafu (repatriates payloads to
-  `diafaces/results/salvage_payloads/`).
-- **KEY DESIGN NOTE (disclosed in card § 2, awaiting mac-local
-  freeze-review):** briefing said k = 8·T, but panel receipts show the
-  observed post config is k_pos = 8 PER WINDOW (l0_per_window 5.6–8.1).
-  PRIMARY claiming arm = k_pos 8 (panel-identical, budget-conservative);
-  SECONDARY = k_pos 8·T (budget-parity, non-claiming). No max-over-arms:
-  claiming arm fixed pre-results.
+- **Panel 72/72** at freeze `50af78f12` (card + k-resolution ratified
+  pre-results, 56654864d). +72 leaderboard rows, 0 dups, pins
+  verified, l0 all in band. ~1 h queue starvation behind the
+  txc-neurips app cost $0; actuals ≈ $4 (ledger corrected, −$6).
+- **VERDICT: NOT-KEEP as frozen** — S1 conjunction fails at exactly
+  batchtopk_sae@T16 (mean +0.084 ≥ bar, t-CI [−0.027, +0.196]
+  straddles 0, all 3 seed margins positive, n = 3 power). Everything
+  else passes; **T32 confirmed CI-bounded on fresh seeds over both
+  baselines** (+0.246/+0.248, CIs clear), S3 exact p = 0.0093,
+  untrained flat, v2 +0.260.
+- Secondary 8·T arm (non-claiming): FAILS untrained control at T32
+  (0.74×) — sparse per-window code carries the separation;
+  retro-validates the k-resolution.
+- **R28 proposed** (receipts_check ALL PASS; direct-add, ratification
+  = mac-local).
+- **Two paths offered to the team (their call, not mine):**
+  (a) ratify a T32-only re-scope (passes every frozen bar per-T;
+  post-hoc narrowing), or (b) 3-seed top-up {6,7,8} at post/T16 +
+  baselines for n = 6 power, est ≤ $3. fig4 was KEEP-gated — not
+  produced; ready on request if either path is ratified.
 
-## Next actions (in order)
+## Open items on OTHERS
 
-1. On run completion: `merge_salvage_payload` (pin assert 50af78f12,
-   paired-v2 assert per row, dup-key skip, dirty disclosed) →
-   `score_salvage` → S1–S5 verdict.
-2. LOG verdict (PENDING TEAM REVIEW) + receipts proposal + ledger
-   actuals correction + push.
-3. If KEEP: `figs_writeup/fig4_ttrend_post_confirmation.*` + caption
-   block proposal for mac-local.
-4. OOM/failure contingency: `--only-cells arch:T:seed:kind:k_pos`
-   re-pass selector (5-field — the two post arms share
-   (arch,T,seed,kind)); workers cut is pre-authorized scheduling.
-
-## Bars (card § 4, claiming T = {16,32}, PRIMARY arm only)
-
-S1 margin ≥ +0.05 vs BOTH per-token baselines with paired t 95% CI
-lower bound > 0 (2 baselines × 2 T, all four). S2 untrained ≤ 0.5×.
-S3 T-scaling exact within-seed permutation p (reported, not gating).
-S4 KILL: beat evidence line 0.0148@T16 / 0.1142@T32. S5 grouped v2 > 0.
-KEEP iff S1∧S2∧S4∧S5. Prior-seed values (NOT quotable, first-look):
-post trained 0.1421/0.2968, untrained −0.0084/+0.0037, baselines
-~0.032–0.042.
+- mac-local/Han: R28 ratification; T32-re-scope vs top-up decision;
+  neurips-queue priority ruling (moot for W1 — it completed).
+- mac-b: W2 GAP-B rawgate numbers still queue-blocked (their lane).
 
 ## Assets / recovery
 
-- Modal client: scratchpad `modal-venv/bin/modal` (repo venv has none).
-- Evidence line: `diafaces/results/panel_evidence_line_tt.json`.
-- Day-2 deliverables + quote licences: LOG + STATUS history
-  (tt 0eb6b22ea, dq fa6023a77; dq DEMOTED to order-mechanism support
-  per d8641a345).
+- Score: `diafaces/results/salvage_score.json`; panel
+  `salvage_stage2_dial_real_ttrend_gpt2_l7.json`; payloads
+  `salvage_payloads/` + Volume `…:/workspace/diafaces_salvage/`.
+- Executor/scorer/merge: `diafaces/{run_salvage,score_salvage,
+  merge_salvage_payload}.py`; driver `scripts/modal_diafaces_salvage.py`
+  (pin 50af78f12). Note: leaderboard row k_pos/T live under
+  `training_cfg.arch_hparams_override`.
+- Modal client: scratchpad `modal-venv/bin/modal`. Spend: mac-a
+  salvage ≈ $4 of $100; program ≈ $95 of $500.
