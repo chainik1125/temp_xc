@@ -791,19 +791,20 @@ crosscoder finds this write more often"**, which is weaker than what is written 
 
 **A second lottery is untested, and it interacts badly with this sprint's own headline finding.**
 Scaling seeds tests the **init** lottery. Both arms still take **best-of-4096 by reading AUC**
-within each init — and the SAE's selection AUC is **1.000 on every task measured**
-(`recency_tr_ho_ds*`, `evidence_tr_ho_ds*`, `demo_order_probe_tr_t2_ds*`), while the crosscoder's
-runs 0.77–1.00. So the SAE's argmax is taken over a metric that has saturated and cannot
-discriminate among its best latents, while the crosscoder's generally can.
+within each init — and across the nine held-out runs the selection AUC is at ceiling for the SAE
+in **9 of 9** and for the crosscoder in **3 of 9**. So in every cell the SAE's argmax is a choice
+among an unknown number of tied candidates resolved by floating-point noise, and in a third of
+cells the crosscoder's is too.
 
-That would be a minor concern if reading predicted steering. **This sprint's most-replicated
-finding, across nine tasks, is that it does not.** Selecting by reading is therefore a selector
-that is uninformative exactly where it saturates, and it saturates for the arm the comparison is
-against. If the SAE has a good *steering* latent that is not its best *reading* latent, nothing
-here would have found it.
+That would be minor if reading predicted steering. **This sprint's most-replicated finding, across
+nine tasks, is that it does not.** So the reported comparison is in several cells **between two
+arbitrary picks from two tied pools** — which makes this a *design* flaw rather than a fairness
+one, and the fix applies identically to both arms.
 
-The experiment is to select by steering on a held-out split rather than by AUC, for both arms. It
-was not run and it is the strongest objection left standing after the seed sweep.
+The experiment is to **select by steering on a held-out split** — not merely to select
+differently. Selecting by steering on the same documents the steering is then reported on would
+reintroduce precisely the winner's-curse problem the matched-dose protocol was adopted to avoid.
+It was not run, and it is the strongest objection left standing after the seed sweep.
 
 **The choice of dose convention does not flatter us, and that is measured rather than argued.**
 Across all 62 symmetric-grid runs, **6 change verdict** between matched dose and peak dose
