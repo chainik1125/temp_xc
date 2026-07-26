@@ -50,6 +50,48 @@ features split, steering stays flat or rises.** If that is the shape, then steer
 wrong instrument for *choosing* capacity and a fine one for *evaluating* it once chosen —
 a cleaner division of labour than treating the behavioural knee as a stopping rule.
 
+### 17:22 — the benchmark was training a temporal architecture on structureless data
+
+Two errors, both mine, found while reading the interpretability panel. They invalidate the
+*architectural* reading of everything before this entry.
+
+**1. The training corpus contained no temporal structure.** Every run so far drew the
+tense/calm label **i.i.d. per segment** (`lab = [rng.randint(0,1) for _ in range(k_seg)]`,
+present in all six scripts). A temporal crosscoder's premise is that there are patterns
+*across* a window to capture. Independent coin flips contain none, by construction. So the
+benchmark trained a temporal architecture on temporally-structureless data, found it
+starved and poorly-reconstructing, and was about to report that as an architectural
+result. The 40% general-text portion has natural structure but carries no labelled factor,
+so it cannot rescue the comparison.
+
+**2. The interpretability measurement asked a window code a segment question.** A TXC
+latent is **one scalar per 12-segment window**. With i.i.d. segment labels, predicting any
+individual segment's label from that scalar would require encoding 12 independent bits —
+so the measured ~chance result (best single-latent AUC **0.541**, against the SAE's 0.241,
+i.e. 0.759 oriented) was a *structural certainty*, not evidence about training. I had built
+a measurement the architecture cannot pass for reasons unrelated to what I was testing.
+Same failure class as the previous sprint's degenerate adjacency statistic: an instrument
+that cannot see the thing it is named for.
+
+**The fair split, which is the more interesting question anyway.** Ask each architecture
+what its code can in principle represent:
+
+| target | SAE (per-segment code) | TXC (per-window code) |
+| --- | --- | --- |
+| **segment-level**: "is *this* segment tense?" | can represent | structurally cannot |
+| **window-level**: "is this window fast- or slow-alternating?" | only via combination | can represent |
+
+`structured_modal.py` (running) is a 2×2 — {i.i.d., run-length-structured} corpora ×
+{SAE, TXC} — measuring both AUCs for both architectures on both corpora, with the i.i.d.
+arm reproducing the earlier result as a control so the data effect is isolated rather than
+asserted. Registered: on structured data the TXC's realised L0, FVU and alive fraction all
+improve; the TXC wins window-level AUC and loses segment-level on both corpora because
+that split is structural; segment-level steering fidelity is roughly unchanged.
+
+If the structured corpus does *not* improve TXC health, then the starvation is a training
+pathology independent of the data and the earlier negative stands on its own terms — which
+is also worth knowing, and is why the i.i.d. control arm is being re-run rather than cited.
+
 ### 16:19 — kickoff
 
 Branch `dmitry-dictbench-10h`. Question: does a temporal crosscoder beat a TopK SAE at
