@@ -81,15 +81,19 @@ backward pass per document and involves no dictionary. One dedicated screen cove
 identical `n_docs = 200` and `n_grad = 40` (`results/txc_wins/geometry_all.json`), so the column
 below is a single consistent measurement rather than a pooling of per-run values:
 
-| task | `c(P_dom)` | `c(Ḡ)` | outcome |
+| task | `c(P_dom)` | `c(Ḡ)` | crosscoder − best constant write |
 | --- | --- | --- | --- |
-| `rotate12` | 0.011 | **0.026** | crosscoder wins |
-| recency | 0.039 | **0.036** | crosscoder wins |
-| `rotate6` | 0.055 | 0.134 | loses |
-| evidence | 0.095 | **0.143** | **wins — out of order** |
-| order | 0.036 | 0.225 | loses |
-| `rotate2` | 0.111 | 0.255 | loses |
-| `phase1` | 0.037 | 0.262 | loses |
+| `rotate12` | 0.011 | **0.026** | **+2.30 ± 0.27** |
+| instruction position | 0.039 | **0.036** | **+0.94 ± 0.06** |
+| `rotate6` | 0.055 | 0.134 | −10.17 ± 1.46 |
+| evidence order | 0.095 | **0.143** | **+0.86 ± 0.03** |
+| order (last sprint) | 0.036 | 0.225 | −3.24 ± 0.27 |
+| `rotate2` | 0.111 | 0.255 | −8.37 ± 2.19 |
+| `phase1` | 0.037 | 0.262 | −5.30 ± 0.23 |
+
+Margins are at α = 0.5, the smallest dose where the crosscoder is significant — inside the linear
+regime, which also means these are far less contaminated by the second-order component than
+peak-dose numbers (even scales as α², odd as α).
 
 **Two things this establishes, and one it does not.**
 
@@ -101,9 +105,14 @@ and every screen and ceiling arm must be built from the gradient. This repeats o
 demonstration-order task built *after* the prediction was registered, where `r1(P_dom)` = 0.94
 would have discarded it and `r1(Ḡ)` = 0.59 says it has the second-most rank headroom in the sprint.
 
-**It establishes a ranking.** Sorted by `c(Ḡ)` the outcomes read W W L **W** L L L — six of seven
-in order, with `evidence` inverted against `rotate6`. **No threshold separates the two classes**:
-they overlap on [0.134, 0.143].
+**It establishes a classifier, not a ranking.** The deltas are on different scales across tasks,
+so what the screen is being asked to do is call the **sign**, not order the magnitudes. **A
+threshold at `c` = 0.14 classifies 6 of 7.** The single inversion is the adjacent pair `rotate6`
+(0.134, loses) and evidence (0.143, wins), which differ by 0.009 — so `evidence` is a boundary
+case next to a loss rather than an outlier inside the win region, which is the honest picture of a
+real but imperfect threshold. Reported as a rank correlation on magnitudes instead, τ = −0.52,
+dragged down by `rotate6`'s large negative — a fact about that task's effect size rather than
+about the screen.
 
 **It does not establish a quantitative law.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order**
 quantity, odd in α — but the constant arms measure **72–80% even**, i.e. mostly curvature. So the
