@@ -174,9 +174,11 @@ def build_receipts():
     R.append(dict(
         id="R5", artifact="results/leaderboard.jsonl (canonical)",
         key="pre/T8 − tsae/T1: paired (3 shared seeds) + Welch (6 vs 3)",
-        claim="pre-vs-T-SAE margin is NOT BOUNDED and must NEVER be "
-              "quoted as significant: paired diff +0.0522, one-sided 95% "
-              "LB −0.0413; Welch diff +0.0530, LB −0.0159, one-sided "
+        claim="[n = 3 STATE — SUPERSEDED-PENDING-TEAM-RATIFICATION by "
+              "R22] pre-vs-T-SAE margin at round-1 n = 3 was NOT BOUNDED "
+              "and until the team ratifies R22's two caveats it is still "
+              "not quoted as significant: paired diff +0.0522, one-sided "
+              "95% LB −0.0413; Welch diff +0.0530, LB −0.0159, one-sided "
               "p = 0.082 (df 2.7)",
         checks=[("paired_diff", 0.0522, 4), ("paired_lb", -0.0413, 4),
                 ("welch_diff", 0.0530, 4), ("welch_lb", -0.0159, 4),
@@ -551,6 +553,44 @@ def build_receipts():
              "lev_w64_llama": _axw(sl, "lev", 64),
              "lev_wd64_gpt2": _wd(sg, "lev", 64),
              "lev_wd64_llama": _wd(sl, "lev", 64)}))
+
+    tb = _j("lambda_intensity/results/topup_bounds_tsae.json")["verdicts"]
+    R.append(dict(
+        id="R22",
+        artifact="lambda_intensity/results/topup_bounds_tsae.json",
+        key="verdicts.{paired_pooled, welch_pre6_vs_tsae_pooled, "
+            "welch_pre6_vs_tsae_new_only, *_excl_underband_POSTHOC}",
+        claim="pre-vs-T-SAE T8 margin at n = 6 (tsae top-up complete; "
+              "PENDING TEAM RATIFICATION of 2 caveats: cross-cache "
+              "pooling, s3/s4 realized-l0 under band): paired diff "
+              "+0.0569, one-sided 95% LB +0.0200, all 6 seed-diffs "
+              "positive (sign-flip p = 1/64); Welch 6v6 LB +0.0272, "
+              "p = 0.0030; caveat-free NEW-SEEDS Welch LB +0.0357 (the "
+              "fallback quote if pooling is not ratified); POST-HOC "
+              "under-band exclusion cuts against the headline: Welch "
+              "in-band LB +0.0083 (thin), paired n = 4 LB −0.0088 NOT "
+              "bounded — quote the bound WITH this disclosure",
+        checks=[("paired_diff", 0.0569, 4), ("paired_lb", 0.0200, 4),
+                ("n_pos", 6, 0),
+                ("welch66_lb", 0.0272, 4), ("welch66_p", 0.0030, 4),
+                ("new_welch_lb", 0.0357, 4),
+                ("posthoc_welch_lb", 0.0083, 4),
+                ("posthoc_paired_lb", -0.0088, 4)],
+        got={"paired_diff": tb["paired_pooled"]["diff"],
+             "paired_lb": tb["paired_pooled"]["lb95_one_sided"],
+             "n_pos": float(sum(1 for x in tb["paired_pooled"]["seed_diffs"]
+                                if x > 0))
+             if "seed_diffs" in tb["paired_pooled"]
+             else float(6 * bool(tb["paired_pooled"]["all_seeds_positive"])),
+             "welch66_lb": tb["welch_pre6_vs_tsae_pooled"]["lb95_one_sided"],
+             "welch66_p": tb["welch_pre6_vs_tsae_pooled"]["p_one_sided"],
+             "new_welch_lb":
+                 tb["welch_pre6_vs_tsae_new_only"]["lb95_one_sided"],
+             "posthoc_welch_lb":
+                 tb["welch_pre6_vs_tsae_excl_underband_POSTHOC"]
+                 ["lb95_one_sided"],
+             "posthoc_paired_lb":
+                 tb["paired_excl_underband_POSTHOC"]["lb95_one_sided"]}))
     return R
 
 

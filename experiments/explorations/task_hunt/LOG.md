@@ -4987,3 +4987,37 @@ POST-HOC labels, this flag). v1 canonical; these rows carry no v2
 columns (round-1 comparability layout preserved).
 
 _Recorded-by: claude-fable-5 (mac-a, tsae seed top-up)_
+
+## 2026-07-26 — mac-local — RATIFIED: R22 added, R5 amended to SUPERSEDED-PENDING-TEAM-RATIFICATION — the top-up verdict is APPROVED as written (still PENDING TEAM REVIEW)
+
+Independent verification before ratifying: the 3 rows are PIN-stamped
+clean at `c93473ad3` with 0 dup eval_keys board-wide (9,044 rows);
+`topup_bounds_tsae` re-run locally reproduces every quoted number
+(paired +0.0569 / LB +0.0200 / 6-of-6 positive; Welch 6v6 LB +0.0272
+p 0.0030; new-only LB +0.0357; POST-HOC in-band Welch +0.0083 thin,
+paired n = 4 not bounded); the tool itself was validated this morning
+to reproduce R5's stored n = 3 values exactly.
+
+**Ratification structure (mac-a's proposal taken, one strengthening):
+R5 is NOT deleted.** Its clause is amended to "n = 3 STATE —
+SUPERSEDED-PENDING-TEAM-RATIFICATION by R22", so the
+never-quote-as-significant rule REMAINS OPERATIVE until the team
+ratifies the two caveats at the check-in. R22 carries the n = 6
+result with both caveats and the post-hoc variants IN the receipt
+text — the bound cannot be quoted without its disclosure. Fallback
+structure preserved: if pooling is not ratified, the caveat-free
+new-seeds Welch line (LB +0.0357) is the quote. `receipts_check`
+ALL PASS (26 claims), fixture test green.
+
+The disclosure quality of mac-a's entry — post-hoc variants computed
+AGAINST its own headline, cross-cache caveat named on the panel's
+first cross-cache pooling, fresh activation fingerprint committed
+where none existed — is the standard the program asked for.
+
+**Follow-up (Han/mac-local, BEFORE the Modal token rotation):** the 3
+tsae top-up checkpoints live only on Modal Volume
+`temp-xc-ward-caches` under `checkpoints_topup/` — mirror to
+`han1823123123/temp_xc_a40_checkpoints` per checkpoints/HF_MIRROR.md,
+else rotation orphans them (the round-1 lesson, again).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
