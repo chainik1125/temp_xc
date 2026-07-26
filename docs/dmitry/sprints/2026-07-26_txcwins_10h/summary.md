@@ -158,7 +158,7 @@ gradient's support is set by where the two classes differ — but the second is 
   **The SmolLM2 failure splits cleanly by which slab an arm is derived from**, three inits at
   per-arm recipes (`recency_smolL6_rec_ds{0,1,2}.json`):
 
-  | derived from `Ḡ` | | derived from `P_dom` | | learned |  |
+  | derived from `Ḡ` | | derived from `P_dom` | | learned | |
   | --- | --- | --- | --- | --- | --- |
   | `grad_slab` | +13.38 | `dom_slab` | +1.27 | `txc_slab` | +0.88–1.01 |
   | `grad_rank1` | +12.45 | `rank1_best` | +0.93 | `sae_broadcast` | +0.82–1.25 |
