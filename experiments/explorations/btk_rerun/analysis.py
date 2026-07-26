@@ -278,6 +278,21 @@ def main() -> None:
             **{m: {"mean": v[0], "std": v[1], "n": v[2]}
                for m, v in md.items()},
         }
+
+    # Arm deltas vs paper-match at matched (bench, k, T) — the anchor-free
+    # view of whether the gap closes as T grows.
+    summary["deltas_vs_paper_match"] = {}
+    for (b, a, k, t), md in sorted(agg.items(), key=str):
+        if a == "paper-match":
+            continue
+        ref = agg.get((b, "paper-match", k, t))
+        if not ref:
+            continue
+        for m in ("gauc", "eauc", "nmse"):
+            if m in md and m in ref:
+                summary["deltas_vs_paper_match"][
+                    f"{b}|{a}|{m}|k{k}|T{t}"
+                ] = round(md[m][0] - ref[m][0], 4)
     (args.out_dir / "btk_rerun_summary.json").write_text(
         json.dumps(summary, indent=1))
     print(f"[analysis] figures + summary -> {args.out_dir}")

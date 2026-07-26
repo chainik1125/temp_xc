@@ -18,29 +18,41 @@ T ∈ {1, 2, 4, 5, 8, 10} on the paper's two §4 synthetic benches, under one
 shared parameter set, with per-token baselines frozen at their existing
 leaderboard rows.
 
+**Design.** The btk-only arm changes TWO things at once relative to the
+paper composite (per-window→batch-pooled selection AND ReLU removal), so a
+third arm — `relu-mix` (ReLU then batch-pooled BatchTopK at the paper
+budget, the v2-family composition applied to the paper arch) — completes
+the 2×2 and attributes any level difference to prior-loss vs pooling.
+
 **Findings.** <!-- FILL: 2–4 findings, each with its graph -->
 
-1. <!-- FILL: d(perf)/dT verdict — did the btk-only arm's T-slope improve
-   (soften downward / steepen upward) relative to paper-match? Quote slopes
-   per bench and metric. -->
+1. <!-- FILL: gate verdict — coupled gauc slope: composite −0.006 vs
+   btk-only +0.027 (pooled non-clipped cells); composite's own k=2 curve
+   collapses 0.988→0.829 from T=1→8 (the harm-grows-with-T mechanism,
+   visible directly). Final numbers after 3-arm data lands. -->
    - ![d(perf)/dT gate figure](plots/btk_rerun/btk_rerun_dperf_dT.png)
-2. <!-- FILL: level effect — btk-only vs paper-match at matched (T, k_pos);
-   which cells move most (pre-registered: low-T cells recover; the T=1
-   controlled limit). -->
-3. <!-- FILL: mixing fingerprint — realized l0 vs nominal per arm
-   (paper-match loses support as T grows; btk-only holds it by construction);
-   neg_frac provenance. -->
+2. <!-- FILL: the level surprise — composite dominates btk-only in absolute
+   gauc at nearly all (k, T) (k2/T1: 0.988 vs 0.624); btk-only reconstructs
+   far better (k1/T1 nmse 0.003 vs 0.124) while recovering features worse.
+   Read: the composite's ReLU acts as a nonnegativity prior that keeps
+   decoder atoms single-feature; deleting it trades feature recovery for
+   reconstruction. relu-mix arm attribution goes here. -->
+3. <!-- FILL: fingerprint — btk-only realizes its full budget everywhere
+   (l0/win ≈ k_win, no zero-picks); composite bleeds support even at T=1
+   (k2/T1 keeps 0.87 of 2 slots); relu-mix zero-pick numbers. -->
    - ![fingerprint](plots/btk_rerun/btk_rerun_fingerprint.png)
-4. <!-- FILL: baseline overlay — does either arm beat the frozen tsae
-   reference (coupled gauc 0.81 @ k=1; markov eauc 0.86 @ k=5)? Honest
-   caveat: baselines had 10k steps vs our 6k, older protocol (gauc/eauc are
-   decoder-direction metrics, stated protocol-stable). -->
+4. <!-- FILL: baselines — composite clears the frozen tsae bar (coupled k1
+   gauc 0.809) at every T; btk-only clears it only for T ≤ 5. Markov: both
+   arms beat tsae refs for T ≥ 2 until the clipped crash. -->
 
-**Verdict for the re-run gate.** <!-- FILL: per actmix-shared.md this must
-quote the pre-registered expectations: "the PAPER arch's T-curves should
-improve (that is Dmitry's re-run gate: does d(perf)/dT improve)". State
-SUPPORTED / NOT SUPPORTED / MIXED with numbers. All verdicts PENDING TEAM
-REVIEW per house discipline. -->
+**Verdict for the re-run gate.** <!-- FILL: quote the pre-registration from
+actmix-shared.md ("the PAPER arch's T-curves should improve (that is
+Dmitry's re-run gate: does d(perf)/dT improve)"). Expected shape: MIXED —
+the slope improves on the headline global-recovery metric and the
+composite's high-T degradation is confirmed as an activation artifact, but
+btk-only is NOT a better paper arch at these budgets: its levels are
+dominated by the composite at almost every (k, T ≤ 10). State plainly; all
+verdicts PENDING TEAM REVIEW. -->
 
 ## What was run (map)
 
