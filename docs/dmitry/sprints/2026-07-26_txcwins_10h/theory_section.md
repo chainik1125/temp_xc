@@ -6,6 +6,8 @@ tags:
   - complete
 ---
 
+## The rank framework, and what it does not predict
+
 ### What a dictionary can write
 
 A steering intervention is a matrix, not a vector. Steer a window of `T` segments and the thing you
