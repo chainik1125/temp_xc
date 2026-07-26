@@ -392,3 +392,64 @@ scalar per latent while letting each latent write twelve slots.
 runs 0.08 → 0.17 → 0.33 → 0.67 → 1.00 as m goes 1 → 16, tracking fidelity 0.160 → 0.556
 almost exactly. C1 was right, and it is now measured rather than argued.
 
+
+## What actually sets the crosscoder's capacity — and it is not k
+
+The frontier sweep answered this before `mechanism_modal.py` finished, because it logs the
+two quantities the answer needs: how many latents have a **positive pre-activation** on a
+given input, and how many coefficients the model **realises** after TopK and ReLU compose.
+
+| arm | nominal k | positive pre-acts | realised coeff/segment | ReLU-kill | FVU |
+|---|---|---|---|---|---|
+| SAE | 1 | 2022 | 1.00 | 0.000 | 0.600 |
+| SAE | 8 | 70 | 8.00 | 0.000 | 0.081 |
+| SAE | 128 | 156 | 126.52 | 0.012 | 0.029 |
+| TXC | 12 (kper 1) | 53 | 1.00 | 0.000 | 0.736 |
+| TXC | 24 (kper 2) | 33 | 1.99 | 0.005 | 0.711 |
+| TXC | 48 (kper 4) | 29 | 2.41 | 0.397 | 0.782 |
+
+The two architectures sit on opposite sides of the same composition. TopK selects k
+latents; ReLU then zeroes any of them whose pre-activation was negative, so realised
+L0 = `min(k, #{pre > 0})`.
+
+For the **SAE**, `#{pre > 0}` is far larger than k at every budget tested — 2022 positive
+pre-activations when k is 1. TopK is the binding constraint, ReLU-kill is ~0, and nominal
+k is an honest budget: asking for 128 gets 126.5.
+
+For the **TXC**, `#{pre > 0}` sits at roughly **30 per window regardless of k** — 53, 33,
+29 as k goes 12, 24, 48. The crossover is between k=24 and k=48: past it, TopK reaches
+into latents with negative pre-activations and ReLU discards them, which is exactly what
+the 0.397 ReLU-kill at k=48 is. Realised capacity flattens at ~2.5 coefficients per
+segment and further k buys nothing.
+
+This retires the `b_enc` hypothesis I registered as P1. The learned bias is **-0.021 ±
+0.010** — far too small to gate anything. The gating is in the encoder *rows*: on any given
+window only ~0.8% of latents are positively aligned with the input at all. That is the
+dead-latent pathology, and it is an order of magnitude worse in the crosscoder than in the
+SAE trained on the same activations for the same number of steps.
+
+**The consequence for every crosscoder-vs-SAE comparison this project has run, including
+its own earlier ones.** The standard setting `kper=41` claims 41 coefficients per segment.
+It realises about 2.5. Matching an SAE to a crosscoder on nominal k therefore hands the
+SAE a budget roughly 17× larger than the crosscoder can actually spend, and every such
+comparison has been measuring that mismatch rather than the architectures. The fix is
+mechanical: **set k from a measured realised L0, not from a nominal target**, and report
+realised coefficients per segment on the x-axis of any frontier.
+
+### Two caveats I am not entitled to skip
+
+The TXC loss traces are **not converged and not monotone** at lr=1e-3 —
+`62.1 → 72.6 → 58.0 → 78.6 → 78.8` for kper=4, against the SAE's smooth
+`52.3 → 47.6 → 44.9 → 46.0 → 45.3`. FVU also rises from 0.711 to 0.782 between kper=2 and
+kper=4, which cannot happen to a converged model given strictly more capacity. So the FVU
+*levels* in the table are an upper bound on the crosscoder's error, not an estimate of it,
+and the lr=3e-4 arm has to land before any "SAE reconstructs better" claim is made. The
+realised-L0 result does not depend on convergence: it is a count of positive
+pre-activations, and `mechanism_modal.py` is measuring it across a wider k range
+independently.
+
+Second, the crosscoder carries **12× the decoder parameters** (4096 × 12 × 1536 = 75M
+against the SAE's 6.3M) at an equal 2500 steps. Equal steps is the wrong fairness axis
+here; equal steps at 12× the parameters is a handicap I imposed by accident. Whether that
+explains the gap or merely widens it is what the lr arm and the structured-corpus 2×2
+separate.
