@@ -205,6 +205,26 @@ mac-b's ACTMIX_FORENSICS and are NOT re-derived here.
     dirty-by-convention stamps (diff = leaderboard growth). No code
     edits happen in this clone while the queue runs.
 
+## 7b. AMENDMENT 1 (2026-07-27 ~03:05 London, pre-first-txc-cell; mac-local veto window open)
+
+**Window cells train at batch_size = 4096/T windows** (T1 4096 — the
+anchor cell is UNCHANGED — T2 2048, T4 1024, T8 512, T16 256), i.e. a
+CONSTANT 4096 token-slots per optimizer step across the sweep.
+Why: (a) measured throughput (token cells ≈ 29 min at batch 4096)
+scales ×T for fixed window batches ⇒ T16 ≈ 4–8 GPU-h/cell and the
+pass ≈ 46 GPU-h — misses the rebuttal clock by a day; (b) constant
+per-step token exposure IS Aniket's B×T exposure-matching convention,
+whose absence flag 3 disclosed — the amendment closes that divergence
+rather than widening it. n_steps (20k), lr, warmup, eval protocol,
+token-arm cells, untrained twins: all unchanged. Timing: amended
+BEFORE any window cell trained (tsae token cells were mid-train);
+batch_size hashes into train_key so no stale-cache collision is
+possible. Residual caveat for the table: token arms trained at batch
+4096 tokens/step, window arms at 4096 token-slots/step across T —
+per-step exposure matched, optimizer batch-count differs from the
+token arms only in units (disclosed, same as the v1 c3 convention
+question; per-arm internal consistency preserved).
+
 ## 8. Budget (RUNPOD ledger in briefings/MODAL_SPEND.md)
 
 Estimate at assumed pod rate ~$7.5/hr (3×H100; runpod-1's 2-GPU share

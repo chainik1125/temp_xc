@@ -92,9 +92,19 @@ def build_queue(args) -> list[Cell]:
 
 def run_cell(cell: Cell, args) -> None:
     override = {"T": cell.T} if cell.T is not None else None
+    batch = args.batch_size
+    if cell.T is not None and args.window_batch == "matched":
+        # CARD AMENDMENT 1 (exposure-matched window batches): window
+        # cells train at batch_size = base/T windows = a CONSTANT
+        # base token-slots per step — Aniket's B×T exposure-matching
+        # convention (closes CARD flag 3's divergence) and the only
+        # schedule under which the T-sweep fits the rebuttal clock
+        # (fixed window-batch scales step cost ×T ⇒ T16 ≈ 8 GPU-h/cell).
+        # T=1 anchor cell is unchanged (base/1 == base).
+        batch = max(64, args.batch_size // cell.T)
     training_cfg = TrainingConfig(
         n_steps=cell.n_steps,
-        batch_size=args.batch_size,
+        batch_size=batch,
         arch_hparams_override=override,
     )
     for k_feat in cell.k_feats:
@@ -142,6 +152,12 @@ def cli() -> None:
     ap.add_argument("--k-feats", type=int, nargs="*", default=[5, 20])
     ap.add_argument("--n-steps", type=int, default=20_000)
     ap.add_argument("--batch-size", type=int, default=4096)
+    ap.add_argument("--window-batch", choices=["fixed", "matched"],
+                    default="matched",
+                    help="window-cell batch: 'matched' = batch/T windows "
+                         "(constant token-slots/step, Aniket's B×T "
+                         "exposure convention; CARD AMENDMENT 1); "
+                         "'fixed' = batch windows at every T")
     ap.add_argument("--S", type=int, default=32)
     ap.add_argument("--shuffle-seed", type=int, default=0)
     ap.add_argument("--encode-batch-size", type=int, default=64)
