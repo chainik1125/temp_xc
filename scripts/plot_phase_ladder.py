@@ -12,12 +12,19 @@ sprint. By eleven switches the ordering has reversed. A causal transformer smear
 into every token, which is how a pooled per-token code recovers order at all; that smearing
 cannot resolve alternation at period two.
 
-Right: what each architecture can STEER, at matched injected norm and matched realised
-coefficients per segment. The crosscoder's slab is the only arm that is positive across the
-ladder. `txc_flat` -- the same slab time-averaged and rebroadcast, same latent, same norm,
-profile removed -- is the control that makes this a claim about the temporal profile.
+Right: what each architecture can STEER, and it is a NULL. Once the dose is swept
+symmetrically about zero -- so that every arm gets both directions, rather than being locked
+to the sign its reading AUC implies -- and once the learning rate is corrected to the value
+that actually trains the crosscoder, no dictionary reliably wins anywhere on this ladder. The
+SAE's constant write beats the crosscoder outright at one switch, the crosscoder wins by
+small margins at eleven, and which way a cell falls changes with dictionary init. Every
+learned arm is an order of magnitude below the supervised slab.
 
-Reads results/txc_wins/phase{1,3,5,11}.json.
+An earlier version of this figure, swept over positive doses only, showed the crosscoder
+winning three of the four cells. That result did not survive its own methodology fix and is
+withdrawn.
+
+Reads results/txc_wins/phase{1,3,5,11}_v2_ds{0,1,2}.json.
 """
 import json
 import pathlib
@@ -45,13 +52,14 @@ def best(arm):
 def load_seeds(s):
     """Every dictionary init available for this cell.
 
-    Init matters more than it has any right to: at five switches the crosscoder's best
-    delta ranged over 1.56, 15.70 and 11.48 across three inits of the same configuration.
-    The sign was stable in every one, the magnitude was not, so a single init is not a
-    verdict and the figure shows the spread rather than one draw.
+    Init matters more than it has any right to, and it is the reason the steering panel is
+    read as a null rather than as a small win: at eleven switches the crosscoder's best delta
+    ranged over 0.53, 1.66 and 4.61 across three inits of an otherwise identical
+    configuration, and at one switch the SAE beat it 14.52 to 1.45 in one init and 5.42 to
+    3.00 in another. A single init is not a verdict, so the figure shows the range.
     """
     out = [json.loads(p.read_text())
-           for p in sorted(SRC.glob(f"phase{s}_final_ds*.json"))]
+           for p in sorted(SRC.glob(f"phase{s}_v2_ds*.json"))]
     if out:
         return out
     # Fall back to the pre-recipe-fix runs if the final matrix has not landed.
@@ -100,7 +108,8 @@ def main() -> int:
                                ("sae_broadcast", C_SAE, "TopK SAE direction"),
                                ("tsae_broadcast", C_TSAE, "attention tSAE direction"),
                                ("txc_flat", C_FLAT, "crosscoder slab, profile removed"),
-                               ("random_slab", C_RND, "random temporal profile")):
+                               ("random_slab", C_RND, "random temporal profile"),
+                               ("dom_slab", "#000000", "supervised slab")):
         xs, ys, lo, hi = [], [], [], []
         for s in SWITCHES:
             vals = [best(r["arms"][key])[0] for r in seeds[s] if key in r["arms"]]
@@ -118,7 +127,8 @@ def main() -> int:
     ax.set_xlabel("switches per document")
     ax.set_ylabel(r"$\Delta$ margin at each arm's best dose")
     n_seed = min(len(seeds[s]) for s in SWITCHES)
-    ax.set_title(f"Steering: mean over {n_seed} dictionary inits, band = range")
+    ax.set_yscale("symlog", linthresh=1.0)
+    ax.set_title(f"Steering is a null: mean over {n_seed} inits, band = range")
     ax.grid(alpha=0.25, lw=0.6)
     ax.legend(loc="upper left", fontsize=8.5, framealpha=0.95)
 
