@@ -1751,3 +1751,61 @@ That closes the debt end to end — correct paper, exact loss and hyperparameter
 located and inspected, confound named, control specified. "Benchmarking against a published
 temporal SAE took two sprints to establish which architecture that actually was" is itself a
 transferable finding about the state of this subfield.
+
+## 23:56 — the flip reconciles quantitatively, and last sprint's headline is now in question
+
+The phase1 reversal is not merely directionally explained by `c` — the number lands.
+
+Measured `c = 0.040`, `sae_broadcast = +14.52`, `txc_slab = +1.45`. Under the linear-response
+law a constant write reaches `sqrt(c)` of the optimal slab:
+
+```text
+sqrt(0.040) = 0.200
+implied optimal (gradient) slab = 14.52 / 0.200 = 72.6
+implied cos(txc_slab, Gbar)     = 1.45 / 72.6  = 0.020
+```
+
+**Cross-check from an independent route:** last sprint measured `dom_slab = 67.63` on the
+closely-related order task. The framework infers **72.6** here from the SAE arm and `c` alone.
+Seven percent apart, two different tasks, two different measurement paths.
+
+> **The SAE arm is performing at its predicted ceiling share. The crosscoder is capturing about
+> 2% of an available write. `c` did not break — the crosscoder's latent selection did.**
+
+That is a discovery failure in the precise sense of the three-currency table, and it also
+explains "flips with dictionary init" as the same fact seen differently: at cosine 0.02 the
+selected latent is barely aligned with anything, so which latent wins the AUC selection is
+close to arbitrary and the sign follows the draw. Instability is what a 2% alignment predicts,
+and the ≥2-seed requirement in the pre-registration is exactly this firing.
+
+**The consequence, accepted rather than softened: last sprint's order-task headline should be
+withdrawn or heavily qualified, not merely relabelled as discovery.** It was measured on a
+one-sided dose grid; it is the same family as phase1; phase1 reverses under symmetric doses;
+and its optimal write is rank 1. The symmetric-dose rerun of that data is now the single most
+consequential run in the queue.
+
+What survives cleanly: recency and evidence, which used symmetric doses and
+difference-of-differences from the start — and the `c` statistic itself, whose retro-validation
+across both sprints is unaffected. If anything phase1 strengthens it, since `c = 0.04`
+predicted a grip that a one-sided grid could not reveal.
+
+## 23:58 — the most transferable line of the sprint: the metric sets `c`, not just the task
+
+Stated here because it had not been said and it generalises past this project.
+
+- **Ordering mode** scores `logP(A) − logP(B)`. Matched multisets cancel *content*, but the two
+  documents still carry different *context*, and that residue is the `c = 0.04` the SAE rode.
+- **Probe mode** scores a difference of differences, which additionally cancels any effect
+  pushing both classes the same way — driving `c` toward zero **by construction, on the same
+  task**.
+
+So `c` is a property of the task **and the metric together**. Hence the one-line recommendation
+for anyone building on this:
+
+> Use a difference-of-differences metric and a symmetric dose grid. The first drives `c` down;
+> the second is the only thing that distinguishes a directional effect from a magnitude
+> artefact.
+
+The two failure modes are opposites and only a symmetric sweep separates them: recency's
+constant arms were positive at *both* dose extremes — even in α, a magnitude artefact — while
+phase1's SAE effect was genuinely antisymmetric and a one-sided grid concealed it entirely.

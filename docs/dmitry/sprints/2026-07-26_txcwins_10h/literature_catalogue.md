@@ -106,6 +106,10 @@ and because most of them are cheap to satisfy up front and expensive to retrofit
    quietly destroy the effect. It is also the window length the crosscoder handles best.
 6. **Log realised L0 for every arm** (carried-over debt 3 — nominal `k` does not bind for the
    crosscoder and the failure is silent).
+6b. **Equalise demonstration token lengths, and log the realised injected norm.** The harness
+   matches slab Frobenius norm, which equals injected norm only when segments have equal token
+   counts; with best/worst permutation selection this can become a systematic bias. See the
+   section on it below.
 7. **Run the S2 steering arm**, not just S1. The SAE direction applied at oracle-chosen positions
    is the honest per-token baseline; `S3 > S1` alone invites the reply that the baseline was
    handicapped.
@@ -116,6 +120,43 @@ and because most of them are cheap to satisfy up front and expensive to retrofit
    `steer_order_modal.py`.
 10. **If any AUC is reported**, note the probe-fragility caveat: in-distribution AUCs in this area
     have a poor track record under distributional shift.
+
+### A harness detail that becomes a confound in the new design
+
+Found by reading `steer_order_modal.py` rather than the literature, and verified numerically.
+
+**What the harness does.** Each write `W` is normalised to unit Frobenius norm over the `(T, d)`
+slab, then applied as `h[:, a:b+1, :] += alpha * scale * W[t]` — the *same* vector added to every
+token in segment `t`'s span. So the norm actually injected into the residual stream is
+
+```text
+alpha * scale * sqrt( sum_t  len_t * ||W[t]||^2 )
+```
+
+where `len_t` is segment `t`'s **token count**. Matching `||W||_F` across arms therefore matches
+the *slab* norm, not the injected norm, unless all segments have equal token length. Checked with
+a small script: at equal lengths a uniform broadcast and a slab concentrating all its norm on one
+segment inject identically (3.162 vs 3.162); at unequal lengths (one segment of 30 tokens, five
+of 4) the concentrated slab injects **5.477 against the broadcast's 2.887**, a 1.9× advantage at
+identical Frobenius norm.
+
+**This does not invalidate the existing headline result.** Segment lengths in the current corpus
+do vary — 4 to 9 words, mean 6.5, sd 1.1 — but sentences are drawn into slots at random, so slot
+length is independent of slot index and the effect cancels in expectation. It adds variance, not
+bias.
+
+**It does become a potential bias in the design recommended here**, and that is the reason to
+flag it. The recipe selects the **best- and worst-scoring permutations**, and selecting on
+accuracy can select on where the long demonstrations sit. Once length placement is correlated
+with the condition, the injected-norm difference is systematic rather than random, and an arm
+whose profile happens to weight the long slots gets a real advantage that has nothing to do with
+temporal structure.
+
+**Fix, and it is nearly free:** draw demonstrations from a narrow token-length band so all
+segments are effectively equal length. Alternatives if that is impractical: divide `W[t]` by
+`sqrt(len_t)` before applying, or log the realised injected norm per arm per condition and match
+on *that* rather than on `||W||_F`. Logging it is worth doing regardless — it is two lines, and
+it is the same class of silent failure as the realised-L0 problem from the last sprint.
 
 ### The concrete recommendation, if one task has to be picked
 

@@ -959,6 +959,74 @@ Four things that decide whether the registered numbers are testable at all.
 - **Selection hygiene.** Latents are chosen by AUC; choose them on a held-out selection split
   and report frequency-matched null draws, as the previous sprint's amendment A3 requires.
 
+## Established during the sprint
+
+Written after the designs above, from measurements. These supersede anything earlier in this
+document that conflicts with them.
+
+### The attribute theorem
+
+If activations decompose additively over semantic attributes, the difference slab **factors**
+as `P = S U` — `S ∈ R^{T×A}` holding the schedule differences, `U ∈ R^{A×d}` the attribute
+directions — so
+
+```text
+rank(P) = rank(S U) ≤ min(rank S, rank U) ≤ A
+```
+
+**Schedule complexity lives inside the columns of `S` and cannot raise its rank above `A`, the
+number of attributes whose positional pattern differs between the conditions.** Equality holds
+unless two schedules are proportional or two directions are collinear; in practice the
+schedules bind first. Verified in `attribute_rank.py`, and it subsumes two earlier results: the
+phase ladder is rank 1 at every rung because two sentence pools are one attribute, and an
+`m`-block rotation is the `A = m` case carrying exactly one linear dependency — every position
+holds one block in each class — hence rank `m − 1` rather than `m`.
+
+The design rule: **an expressiveness result requires a task in which two or more distinct
+attributes must move in different directions at different positions.** The cheapest natural
+source is **content plus its own carried state**, because a maintained state's schedule is the
+running integral of the content's and an integral is never proportional to its integrand. Any
+"which of two X governs" task is therefore rank 2 — which instruction applies, which persona is
+active, which rule binds, which variable holds.
+
+### The metric sets `c`, not just the task
+
+- **Ordering mode** (`logP(A) − logP(B)`) cancels *content* when the multisets match, but the
+  two documents still carry different *context*, and that residue is real: measured `c = 0.040`
+  at phase1, which a constant write can and does ride.
+- **Probe mode** (a difference of differences) additionally cancels any effect pushing both
+  classes the same way, driving `c` toward zero **by construction** on the same task.
+
+So `c` is a property of the task *and* the metric together, and probe mode is the right
+default. This is why the recency and evidence results are unaffected by the dose-sweep
+correction and the ordering-mode ladders are not.
+
+### Symmetric doses are mandatory, and one-sided grids hide opposite failures
+
+Two distinct signatures exist and only a symmetric sweep separates them:
+
+- an arm positive at **both** dose extremes is even in `α` — a second-order magnitude artefact
+  with no directional component (recency's constant arms);
+- an arm whose effect appears only at negative `α` is genuinely antisymmetric and a one-sided
+  grid misses it entirely (phase1's SAE arm, `+14.52` at a dose never tested).
+
+### phase1 reconciles quantitatively, and locates the failure
+
+Measured `c = 0.040` and `sae_broadcast = +14.52`. Under the linear-response law a constant
+write reaches `sqrt(c) = 0.200` of the optimal slab, implying an optimum of `72.6` — against
+`dom_slab = 67.63` measured on the closely-related order task by an entirely independent route,
+seven percent apart. The same arithmetic puts `cos(txc_slab, Ḡ) ≈ 0.020`.
+
+**The SAE arm is performing at its predicted ceiling share; the crosscoder is capturing about
+2% of an available write.** That is a discovery failure, cleanly separated from `c`, and it
+explains the reported instability under dictionary init: at that alignment, which latent wins
+the AUC selection is close to arbitrary.
+
+**Consequence for the previous sprint.** The order task was measured on a one-sided grid, is
+the same family as phase1, and phase1 reverses under symmetric doses. Combined with its
+rank-1 structure, that result should be **withdrawn or heavily qualified**, not merely
+relabelled as discovery.
+
 ## Related
 
 - [[start]] — sprint kickoff
