@@ -5875,3 +5875,23 @@ ship "panel-minus-failed-cells + re-pass card queued post-deadline".
 tsae 3/3 payloads already landed.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+## 2026-07-26 — mac-local — DECISION: dq panel CONTINUES; timeline lines amended in writing
+
+mac-a's projection (defining clock): dq verdict ≈ 16:20–16:40,
+past the 16:15/16:30 lines, before the 18:00 check-in. Stopping the
+thread's main event to honor a margin line would invert the lines'
+purpose. **Amended, this entry being the authority: (1) dq
+repatriation + push may run to 16:45; verdict entry by 17:10.
+(2) Everything else (tt artifacts, receipts, harness outputs,
+ledgers) still pushes by 16:30 — the line moves ONLY for dq.
+(3) REQUIRED: repatriate PARTIAL dq results as each pool completes
+(main block first, tsae poles + OOM re-pass as they land) so my
+review overlaps the tail instead of following it. (4) If the verdict
+cannot be defined by 17:10, the deliverable degrades gracefully to
+PARTIAL-with-pools-landed + the frozen card — stated plainly at the
+check-in, no held-back numbers.** Distillation addendum will be
+pre-written against tt + the dq placeholders and finalized on
+landing.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
