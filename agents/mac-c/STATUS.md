@@ -15,9 +15,15 @@ This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cl
 - **Forgotten-branch sweep** (§9): all 43 remotes classified; top recoveries: `em-nanda` (parallel EM steering, 479/480 blobs absent), `aniket-ward-stage-b`, `dmitry-backtracking`, `dmitry-rlhf` (raw separation_scaling), `han-phase6`, `andre-steering`, `300k-tfa` (48 orphaned final-night c1/c2 rows).
 - LOG.md PTR entry appended.
 
-## Open item (second push pending)
+## Second push (same evening) — A4 + A6 forensics landed
 
-- **A6 — camera-ready c6 `7bmed` figure provenance** (Qwen-7B bad-med arch panel matches neither committed EM pipeline). Follow-up subagent running on the EM thread; will patch §4 + §0 runpod-2 guidance and re-push when it lands. Also queued: A4 quick check (read `final-aniket:purified/docs/aniket/figs/c7_*.tex` macros to see which backtracking numbers the PDF embeds — 2 min).
+- **A4 RESOLVED:** shipped c7 numbers = purified locked-arch bs-sweep (TXC-base bs1024 lift +0.541/+83%; TXC-pro PR-AUC 0.242; auto-macros committed 05-06) — NOT Aniket's +1.574. neurips-aniket's harness matches the shipped convention exactly.
+- **A6 NARROWED + integrity flag:** two generations of the c6 7bmed figs. Committed camera-ready = 2 bars (sae_arditi 16.39 vs txc_base **19.20 — TXC wins steering**), exactly reproducible from in-git artifacts; published arXiv = 5 arms (T-SAE +25.9 winner, matches the caption), **producing runs in NO branch**. The camera-ready caption contradicts its own committed figure. Needs mac-local/team ruling: which generation is runpod-2's paper-match target. Disambiguators listed in audit §10-A6.
+
+## Remaining (low priority, on request)
+
+- Enumerate `temp-bench-models` 1 283 config.jsons (public, KB-scale) to close A1 (shipped c3 cell identity) and A6a (5-arm run widths) — deferred to avoid API hammering; the pods can also do this on-box.
+- A9 threshold-buffer read on txcdr-base/txcdr-it ckpt headers (KB-scale) if the team wants the T-SAE degenerate-gate risk closed.
 
 ## Git position
 

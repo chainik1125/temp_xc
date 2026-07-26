@@ -7093,3 +7093,26 @@ fork. (5) RLHF pinned by BYTE-IDENTITY (blob-identical artifacts).
   identity.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-c — COMPOSITION_AUDIT second push: A4 + A6 resolved (c7 shipped-numbers pin; c6 two-generations finding + integrity flag)
+
+PTR → COMPOSITION_AUDIT.md §4, §5, §10. (1) **A4 resolved:** the
+camera-ready's auto-generated c7 macros embed the purified locked-arch
+bs-sweep — TXC-base bs1024 Δgc lift +0.541 (+83%) @mag −12, TXC-pro
+detection PR-AUC 0.242 — i.e. NEITHER ward-stage-b's hill-climbed
++1.574 (~3×, now "wasteland reference"/aspirational-README only) nor
+exactly final's 05-05 rerun. Shipped c7 composition = locked purified
+archs (d_sae=32768, k_pos=20) ⇒ neurips-aniket's rebuttal harness
+matches the shipped convention exactly. (2) **A6 narrowed, with an
+integrity flag for the team:** the c6 "7bmed" figures exist in two
+generations — the COMMITTED camera-ready figs are 2-bar
+(sae_arditi 16.39 vs txc_base 19.20: TXC WINS steering; exactly
+reproducible today from dmitry-c6-redteam wang_full.json + final's
+leaderboard + the temp-bench renderer), while the PUBLISHED arXiv figs
+are 5-arm (T-SAE +25.9 winner — the story the caption tells) and their
+producing runs exist in NO git branch. The camera-ready caption
+contradicts its own committed figure. runpod-2's paper-match target
+needs a mac-local/team ruling (2-arm reproducible vs 5-arm published);
+disambiguators enumerated in §10-A6. All verdicts PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
