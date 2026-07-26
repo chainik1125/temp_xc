@@ -7696,3 +7696,23 @@ core-first, sae_k500 smoke gate) running on the freed GPU; verdict
 lands with the completed table.
 
 _Recorded-by: claude-fable-5 (runpod-2, executor)_
+
+## 2026-07-27 ~00:30 London — mac-c — scope ack (EM full stop) + A5 CLOSED both venues; "part 3" needs definition
+
+Per Han's EM full stop: A3 + A6 residue annotated TRANSFERRED-TO-DMITRY
+in COMPOSITION_AUDIT §10 (handover = audit §4 + §10 disambiguator
+lists; nothing further spent). **A5 RESOLVED** (probing-relevant):
+TFA = ReLU→TopK at BOTH venues — dev `tfa_big` trained AND probed with
+`sae_diff_type="topk", kval_topk=k_win=500`
+(han-phase7-unification:experiments/phase7_unification/
+train_phase7.py:345-350 + run_probing_phase7.py:216-224); shipped c3
+`tfa` cells likewise via purified `tfa.py` (kval=k_pos·T). The
+module's dense-ReLU default was never used in a paper venue. Audit §0
+table updated. NOTE for mac-local: my remaining scope cites "part 3"
+(af2247d43, repeated in the full-stop ruling) — **no part-3 definition
+exists anywhere in the record**; awaiting definition before acting.
+Priority-test compliant items I can take meanwhile on request: A9
+(tsae threshold-buffer read on public ckpts — RLHF/probing arms), A12
+(c3 headline-fig render inputs — probing). PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_

@@ -25,10 +25,17 @@ This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cl
 - Per mac-local's ruling (637cc656d): enumerated ALL 1 283 `temp-bench-models` config.jsons. **A1 CLOSED** — the shipped c3 campaign found (six-arch IT panel, 20K steps × seeds 1/2/42, k_pos=20 defaults, saved 05-04→05-06; + TXC-base T∈{10,20} cells + BASE panel). **A2 closed for c3** (L0=20 real; RLHF stays the k500 exception). **A6 strengthened**: 7B-med datasource holds ONLY the 4 Generation-1 cells — the 5-arm run's ckpts were never uploaded. Shipped c7 locked cells also found (llama L10 nousmirror, seed-42). Census committed: `experiments/explorations/task_hunt/tbm_census.jsonl` (train_key index for pods).
 - Git identity set to `mac-c-agent` per mac-local housekeeping (first two pushes went out under the default identity).
 
+## Post-midnight wakes (2026-07-27)
+
+- **T5-artifact escalation from runpod-1 CONFIRMED in git** (audit §3 ⚠ + A12, third integrity flag; pushed 6c4262df9): shipped c3 "T10/T20" cells are T=5 replicas (fix-commit postmortem `1ed4fde5f` + bit-identical seed-pair leaderboard rows); appendix T-sweep claim unfulfilled; Dmitry's d(perf)/dT gate must not cite the shipped c3 T-sweep.
+- **Scope re-cut by Han's EM FULL STOP** (LOG ~00:15): A3 + A6 residue → Dmitry (annotated in audit §10, no further mac-c cycles). Remaining mac-c scope = A5 + probing/RLHF-relevant + "part 3".
+- **A5 CLOSED both venues** (this push): TFA = ReLU→TopK train+eval (dev `tfa_big` kval=500 via `train_phase7.py:345`/`run_probing_phase7.py:216`; shipped c3 via purified `tfa.py`).
+- **"part 3" is UNDEFINED in the record** (appears once in af2247d43, no definition anywhere in LOG/briefings) — awaiting mac-local's definition; flagged in my LOG entry.
+
 ## Remaining (low priority, on request)
 
-- A9 threshold-buffer read on txcdr-base/txcdr-it ckpt headers (KB-scale) if the team wants the T-SAE degenerate-gate risk closed.
-- A6 residuals need non-git sources (pod state / Han's `private/` snapshot dir / Overleaf) — out of my read-only lane; disambiguators enumerated in audit §10.
+- A9 threshold-buffer read on txcdr-base/txcdr-it ckpt headers (KB-scale) — probing/RLHF-relevant (tsae arms), so in-scope under the priority test if wanted.
+- A12 disambiguator (c3 headline-fig render inputs on origin/final) — probing-relevant, cheap.
 
 ## Git position
 
