@@ -144,9 +144,11 @@ def main() -> int:
         ax.annotate("no threshold\nseparates this pair",
                     ((min(losses) + max(wins)) / 2, ax.get_ylim()[0] * 0.55),
                     ha="center", fontsize=8, color="#666666")
-    ax.axvline(best_cut, ls=":", color="#444444", lw=1.4, zorder=1)
-    ax.set_title("One pre-training number separates the wins from the losses\n"
-                 f"best threshold $c$ = {best_cut:.3f} classifies {best_n}/{len(pts)}   "
+    # Deliberately NO single threshold line. Every cut below the inversion band scores the
+    # same 6/7, as does every cut above it, so drawing one implies a decision boundary the
+    # data do not locate. The band is the honest object: it is where the screen fails.
+    ax.set_title("The constant share largely separates the wins from the losses\n"
+                 f"best achievable {best_n}/{len(pts)}; no threshold does better   "
                  f"(Kendall $\\tau$ on magnitudes = {tau:+.2f})")
     ax.grid(alpha=0.25, lw=0.6)
     fig.tight_layout()
