@@ -7116,3 +7116,64 @@ needs a mac-local/team ruling (2-arm reproducible vs 5-arm published);
 disambiguators enumerated in §10-A6. All verdicts PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-26 ~21:55 London — mac-local: audit part 2 RATIFIED (A4 + A6 evidence maps); A6 handling + interim pod ruling; runpod-2 amendment accepted
+
+_Observed HEAD: `7bd56d517`._
+
+**1. Part 2 RATIFIED.** A4 closes reassuringly: the shipped c7
+numbers are the purified locked-arch bs-sweep (+0.541 lift, k_pos
+20 / d_sae 32 768) — NOT the hill-climbed +1.574 — and
+`neurips-aniket`'s rebuttal harness matches the SHIPPED convention
+exactly (a genuinely good cross-check for Aniket's lane; worth
+relaying to him). RLHF is fully pinned by byte-identity with the
+important refinement that its TXC arm is the matryoshka-contrastive
+variant, not txc_bare — pods copying "paper-match" must take
+per-task arms, not a global one.
+
+**2. A6 — handling directive (read carefully; language matters).**
+mac-c's evidence map is ratified AS AN EVIDENCE MAP: Generation 1
+(committed camera-ready binaries, 2 arms, TXC wins steering,
+values reproducing EXACTLY from in-git data) vs Generation 2
+(published arXiv, 5 arms, T-SAE wins, caption-consistent, NO
+in-git producing runs), plus the caption/figure mismatch inside
+the camera-ready tree and two appendix-cited figures absent from
+it. **The PRIOR explanation is mundane**: an uncommitted final EM
+run (the c3 story all over again — A1 established this exact
+pattern the same evening), figures dropped in and captions updated
+under deadline pressure, with the runs living on a machine or
+account we cannot see (Dmitry's private HF repos are already
+identified; `em-nanda`'s 479 uncommitted blobs are a second
+candidate). This is a PROVENANCE HOLE, not an accusation, and
+nobody in this program states it otherwise. ROUTING: 9am-PT
+decision item #1 — ask Dmitry directly where the 5-arm run lives;
+the one-pager carries the two-generations table verbatim with the
+prior explanation attached.
+
+**3. Interim ruling for runpod-2 Phase B** (so nothing blocks on
+the meeting): Phase A btk-only is UNAFFECTED and proceeds. For
+Phase B the pod may PRE-BUILD both harness paths — (i) the 2-arm
+committed-and-reproducible Gen-1 cell (defensible provenance,
+runnable now in principle) and (ii) the 5-arm Gen-2 panel at
+locked purified compositions (width ambiguity disclosed) — but
+LAUNCHES NEITHER until the team ruling. My recommendation to the
+team: (i) first; (ii) once Dmitry locates the Gen-2 artifacts.
+
+**4. runpod-2 scheduling amendment (`add85747f`): ACCEPTED** —
+blind pre-completion, measured cause (T·batch·d_sae peak, T16
+~43 GB ⇒ 3-lane co-residency OOMs on one H100), cells/seeds/
+priority unchanged, failures preserved in logs. Scheduling-only
+per the batch-halving precedent.
+
+**5. mac-a's neg_frac plan (untrained exact via CPU container,
+trained via labeled l0-gap estimate): ACCEPTED** as satisfying the
+advisory.
+
+**6. mac-c next (unchanged order): the temp-bench-models config
+enumeration (A1)** — it may ALSO turn up the Gen-2 EM cells if
+they were pushed to that store, which would close A6 without
+waiting for the meeting. Then A3/A5.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
