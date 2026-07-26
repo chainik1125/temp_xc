@@ -1,0 +1,94 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k_seg": 12,
+  "d_sae": 4096,
+  "steps": 2500,
+  "sae_k": 100,
+  "corpora": {
+    "iid": {
+      "base_norm": 55.334607083046,
+      "arms": [
+        {
+          "arch": "sae",
+          "nominal_k": 100,
+          "coeff_per_segment": 99.10740661621094,
+          "fvu": 0.02981511317193508,
+          "alive": 0.535888671875,
+          "seg_auc": 0.22170519828796387,
+          "seg_auc_oriented": 0.7782948017120361,
+          "win_auc": 0.5,
+          "win_auc_oriented": 0.5
+        },
+        {
+          "arch": "txc",
+          "nominal_k_per_pos": 4,
+          "coeff_per_segment": 2.6777779261271157,
+          "realised_l0_window": 32.13333511352539,
+          "fvu": 0.7434258460998535,
+          "alive": 0.166748046875,
+          "pos_preact_frac": 0.008013238199055195,
+          "seg_auc": 0.44279393553733826,
+          "seg_auc_oriented": 0.5572060644626617,
+          "win_auc": 0.5,
+          "win_auc_oriented": 0.5
+        },
+        {
+          "arch": "txc",
+          "nominal_k_per_pos": 41,
+          "coeff_per_segment": 1.511574109395345,
+          "realised_l0_window": 18.13888931274414,
+          "fvu": 0.8495372533798218,
+          "alive": 0.15380859375,
+          "pos_preact_frac": 0.004428439773619175,
+          "seg_auc": 0.433801531791687,
+          "seg_auc_oriented": 0.566198468208313,
+          "win_auc": 0.5,
+          "win_auc_oriented": 0.5
+        }
+      ]
+    },
+    "structured": {
+      "base_norm": 55.407512956467954,
+      "arms": [
+        {
+          "arch": "sae",
+          "nominal_k": 100,
+          "coeff_per_segment": 98.9861068725586,
+          "fvu": 0.02828213758766651,
+          "alive": 0.5224609375,
+          "seg_auc": 0.27501457929611206,
+          "seg_auc_oriented": 0.7249854207038879,
+          "win_auc": 0.7473368048667908,
+          "win_auc_oriented": 0.7473368048667908
+        },
+        {
+          "arch": "txc",
+          "nominal_k_per_pos": 4,
+          "coeff_per_segment": 2.792592684427897,
+          "realised_l0_window": 33.511112213134766,
+          "fvu": 0.7258654832839966,
+          "alive": 0.187744140625,
+          "pos_preact_frac": 0.00842013955116272,
+          "seg_auc": 0.4999845623970032,
+          "seg_auc_oriented": 0.5000154376029968,
+          "win_auc": 0.38826921582221985,
+          "win_auc_oriented": 0.6117307841777802
+        },
+        {
+          "arch": "txc",
+          "nominal_k_per_pos": 41,
+          "coeff_per_segment": 1.6768519083658855,
+          "realised_l0_window": 20.122222900390625,
+          "fvu": 0.8113253116607666,
+          "alive": 0.184814453125,
+          "pos_preact_frac": 0.00491265207529068,
+          "seg_auc": 0.4999845623970032,
+          "seg_auc_oriented": 0.5000154376029968,
+          "win_auc": 0.3808748126029968,
+          "win_auc_oriented": 0.6191251873970032
+        }
+      ]
+    }
+  }
+}

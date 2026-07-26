@@ -453,3 +453,42 @@ against the SAE's 6.3M) at an equal 2500 steps. Equal steps is the wrong fairnes
 here; equal steps at 12× the parameters is a handicap I imposed by accident. Whether that
 explains the gap or merely widens it is what the lr arm and the structured-corpus 2×2
 separate.
+
+## The structured-corpus 2×2: adding temporal structure does not flip the comparison
+
+`structured_modal.py` retrains both architectures on two corpora — the i.i.d. one whose
+absence of temporal structure invalidated the earlier reading, and a run-length family in
+which the tense/calm state persists, so a genuine window-level factor exists.
+
+| corpus | arm | coeff/seg | FVU | segment-AUC | window-AUC |
+|---|---|---|---|---|---|
+| i.i.d. | SAE k=100 | 99.1 | 0.030 | 0.778 | **0.500** |
+| i.i.d. | TXC kper=4 | 2.68 | 0.743 | 0.557 | **0.500** |
+| i.i.d. | TXC kper=41 | 1.51 | 0.850 | 0.566 | **0.500** |
+| structured | SAE k=100 | 99.0 | 0.028 | 0.725 | 0.747 |
+| structured | TXC kper=4 | 2.79 | 0.726 | 0.500 | 0.612 |
+| structured | TXC kper=41 | 1.68 | 0.811 | 0.500 | 0.619 |
+
+The i.i.d. window-AUC column reads **0.500 for all three arms**, which is the positive
+control the earlier runs never had: when no window-level factor exists, the probe finds
+none, so a non-chance window-AUC on the structured corpus is measuring structure rather
+than measuring the probe. On the structured corpus a window factor does appear, and the
+per-segment SAE reads it *better* than the window code does — 0.747 against 0.619.
+
+**The finding that needs no caveat: more nominal k makes the crosscoder strictly worse.**
+Going from kper=4 to kper=41 — a 10× larger nominal budget — *lowers* realised
+coefficients per segment from 2.68 to 1.51 and raises FVU from 0.743 to 0.850, on both
+corpora. Positive pre-activations fall from 0.008 to 0.004 of the dictionary, about 16
+latents per window. So the project's standard `kper=41` setting nominally claims 41
+coefficients per segment and realises about 1.5: a **27× overstatement**, and a setting
+that is beaten by one an order of magnitude smaller. Any comparison that matched an SAE to
+this configuration on nominal k was mismatched by that factor.
+
+**What I am not concluding yet.** Every architecture-level reading above — SAE
+reconstructs better, SAE reads the window factor better, structure does not help the
+window code — is downstream of a crosscoder that is spending 1.5–2.8 coefficients per
+segment because its latents are dead, not because a window code cannot use more. Reading
+these as facts about crosscoders requires first ruling out that they are facts about this
+crosscoder's *implementation*. `centering_modal.py` (running) tests exactly that against
+five arms, and its registered R3 is the branch in which the numbers above become
+reportable.
