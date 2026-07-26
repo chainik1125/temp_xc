@@ -24,7 +24,7 @@ REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 VOL_DIR = "/workspace/btk_rerun_v2"
 
-ARMS = ["txc_base", "txc_base_btkonly"]
+ARMS = ["txc_base", "txc_base_btkonly", "txc_base_relumix"]
 DATASOURCES = ["toy_markov_n20_d40_noisy", "toy_coupled_K10_M20_d256"]
 T_GRID = [1, 2, 4, 5, 8, 10]
 
@@ -99,8 +99,9 @@ def _merge_rows(all_rows: list[dict], dest: Path) -> tuple[int, int]:
 
 
 @app.local_entrypoint()
-def main(collect_only: bool = False, single: str = ""):
-    shards = [(a, d, t) for a in ARMS for d in DATASOURCES for t in T_GRID]
+def main(collect_only: bool = False, single: str = "", arms: str = ""):
+    arm_list = [a for a in arms.split(",") if a] or ARMS
+    shards = [(a, d, t) for a in arm_list for d in DATASOURCES for t in T_GRID]
     if single:
         a, d, t = single.split(":")
         shards = [(a, d, int(t))]

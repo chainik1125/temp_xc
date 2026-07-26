@@ -77,15 +77,17 @@ class TXCBaseBTK(TempBenchArch):
         relu_mode: str = "btk-only",
     ):
         nn.Module.__init__(self)
-        if relu_mode != "btk-only":
+        if relu_mode not in ("btk-only", "relu-mix"):
             raise ValueError(
-                f"txc_base_btkonly is the btk-only arm; got relu_mode="
-                f"{relu_mode!r}. The relu-mix/paper-match composition is "
-                "the frozen arch txc_base."
+                f"relu_mode must be 'btk-only' or 'relu-mix'; got "
+                f"{relu_mode!r}. The paper-match composition (TopK then "
+                "ReLU, per-window) is the frozen arch txc_base."
             )
         self.relu_mode = relu_mode
+        _name = ("txc_base_btkonly" if relu_mode == "btk-only"
+                 else "txc_base_relumix")
         self.config = ArchConfig(
-            name="txc_base_btkonly", d_in=d_in, d_sae=d_sae, k_pos=k_pos, T=T,
+            name=_name, d_in=d_in, d_sae=d_sae, k_pos=k_pos, T=T,
         )
         self.d_in = d_in
         self._d_sae = d_sae
@@ -155,6 +157,14 @@ class TXCBaseBTK(TempBenchArch):
         """Raw squashed pre-activation (B, d_sae). No ReLU."""
         return torch.einsum("btd,tds->bs", x, self.W_enc) + self.b_enc
 
+    def _selection_pool(self, x: torch.Tensor) -> torch.Tensor:
+        """What BatchTopK selects over. btk-only: raw pre-acts (canonical
+        item 1). relu-mix control: ReLU'd pre-acts (the v2-family
+        composition applied to the paper arch's k_win budget; zero-picks
+        possible when the positive pool is thin — that IS the arm)."""
+        pre = self._squashed_preact(x)
+        return pre if self.relu_mode == "btk-only" else F.relu(pre)
+
     def _batchtopk(self, pre: torch.Tensor) -> torch.Tensor:
         """Flat BatchTopK over the batch pool, budget k_win per window.
 
@@ -189,7 +199,7 @@ class TXCBaseBTK(TempBenchArch):
                 f"TXCBaseBTK.encode expects (B, T={self._T}, d_in); "
                 f"got T={x.shape[1]}."
             )
-        pre = self._squashed_preact(x)
+        pre = self._selection_pool(x)
         if (not self.training) and bool(self.threshold_set.item()):
             z = pre * (pre > self.threshold)
         else:
@@ -216,7 +226,7 @@ class TXCBaseBTK(TempBenchArch):
             )
         B, T, _d_in = x.shape
 
-        pre = self._squashed_preact(x)
+        pre = self._selection_pool(x)
         z = self._batchtopk(pre)
 
         # JumpReLU threshold EMA over the min POSITIVE surviving

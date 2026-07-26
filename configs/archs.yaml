@@ -83,6 +83,30 @@ archs:
       re-run gate arch. v1.0.0 ran as `txc_base_btk` (pre-convention;
       eval-path-only differences — gauc/eauc unaffected).
 
+  txc_base_relumix:
+    class_path: temp_bench.archs.txc_base_btk:TXCBaseBTK
+    arch_version: "1.1.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      relu_mode: relu-mix
+    per_section_hparams:
+      synthetic:  { d_sae: 20 }
+      em:         { d_sae: 32768, k_pos: 25 }
+      backtracking: { d_sae: 32768 }
+    notes: |
+      ACTMIX arm `relu-mix` CONTROL for the paper arch: ReLU then
+      batch-pooled BatchTopK at the paper budget k_win=k_pos*T.
+      Completes the 2x2 (selection rule x ReLU placement) with txc_base
+      (per-window TopK->ReLU) and txc_base_btkonly (batch pool, no
+      ReLU): attributes the btk-only level gap to prior-loss vs
+      pooling. Zero-picks possible when positives are thin (that IS the
+      relu-mix pathology).
+
   # ── BatchTopK fair-backbone family (experiments/explorations/synthetic/STATUS.md § 4) ──────
   # Strong backbone (BatchTopK train → JumpReLU threshold eval, Bussmann
   # et al.) + AuxK + decoder unit-norm + grad-orth, applied uniformly so

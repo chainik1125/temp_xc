@@ -194,6 +194,30 @@ def test_registry_entry_resolves():
     assert model.T == spec.hparams.get("T", 5)
     assert model.arch_version == spec.arch_version
     assert model.relu_mode == "btk-only"
+    spec_rm = load_arch("txc_base_relumix", section="synthetic")
+    model_rm = cls(d_in=D_IN, **spec_rm.hparams)
+    assert model_rm.relu_mode == "relu-mix"
     import pytest
     with pytest.raises(ValueError):
-        cls(d_in=D_IN, **{**spec.hparams, "relu_mode": "relu-mix"})
+        cls(d_in=D_IN, **{**spec.hparams, "relu_mode": "paper-match"})
+
+
+# ── 8. relu-mix control arm: zero-picks when positives are thin ──
+
+def test_relumix_zero_pick_fingerprint():
+    n_pos = K_WIN // 2
+    bias = _distinct_bias(n_pos)
+    rm = _mk(TXCBaseBTK, relu_mode="relu-mix")
+    _pin_preacts(rm, bias)
+    out = rm.train_step(_win_batch(B=4))
+    # ReLU'd pool has only n_pos positives per window -> BatchTopK can
+    # only fill half the budget: realized l0 == n_pos, zero negatives.
+    assert abs(float(out["l0"]) - n_pos) < 1e-6, (
+        f"relu-mix should zero-pick down to {n_pos}, got {float(out['l0'])}"
+    )
+    assert float(out["neg_frac"]) == 0.0
+    # btk-only twin on the same inputs realizes the full budget.
+    btk = _mk(TXCBaseBTK)
+    _pin_preacts(btk, bias)
+    out_b = btk.train_step(_win_batch(B=4))
+    assert abs(float(out_b["l0"]) - K_WIN) < 1e-6
