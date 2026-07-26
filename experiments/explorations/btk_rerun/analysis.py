@@ -324,7 +324,8 @@ def main() -> None:
     # headline metric. Rows carry eval_cfg.denoising_probe (separate
     # eval_keys); lp_* metrics live only on those rows.
     probe = {k: md for k, md in agg.items() if "lp_global_r2" in md}
-    if probe:
+    probe_benches = sorted({k[0] for k in probe})
+    for bench_p in probe_benches:
         fig, axes = plt.subplots(1, 2, figsize=(12.8, 4.2), squeeze=False)
         for mcol, metric in enumerate(["lp_global_r2", "lp_ratio"]):
             ax = axes[0][mcol]
@@ -333,7 +334,8 @@ def main() -> None:
                     pts = sorted(
                         (t, md[metric][0], md[metric][1], is_clipped(kk, t))
                         for (b, a, kk, t), md in probe.items()
-                        if a == arch and kk == k_pos and metric in md)
+                        if b == bench_p and a == arch and kk == k_pos
+                        and metric in md)
                     if not pts:
                         continue
                     ax.errorbar(
@@ -360,17 +362,21 @@ def main() -> None:
             for arch in ARM_LABEL:
                 pooled = [(t, md[metric][0])
                           for (b, a, kk, t), md in probe.items()
-                          if a == arch and metric in md
+                          if b == bench_p and a == arch and metric in md
                           and not is_clipped(kk, t)]
                 s_p = slope_d_dlogT(pooled)
                 if s_p is not None:
-                    summary["slopes"][f"denoising_probe|{metric}|{arch}"] = s_p
+                    summary["slopes"][
+                        f"latent_probe|{bench_p}|{metric}|{arch}"] = s_p
+        bench_tag = ("denoising" if "markov" in bench_p else "coupled")
         fig.suptitle(
-            "Denoising latent probe (paper § 4 headline metric) vs window "
-            "size T — k_pos 1 (solid) / 2 (dashed)", fontsize=11)
+            f"Latent hidden-state probe vs window size T — "
+            f"{bench_p.replace('toy_', '')} — k_pos 1 (solid) / 2 (dashed)",
+            fontsize=11)
         fig.tight_layout(rect=[0, 0, 1, 0.93])
         for ext in ("png", "pdf"):
-            fig.savefig(args.out_dir / f"btk_rerun_denoising_probe.{ext}",
+            fig.savefig(args.out_dir /
+                        f"btk_rerun_{bench_tag}_probe.{ext}",
                         dpi=150, bbox_inches="tight")
         plt.close(fig)
 

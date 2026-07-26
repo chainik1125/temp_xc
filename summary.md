@@ -82,7 +82,13 @@ rebuttal:
    information in the *codes* that the ReLU destroys — an effect invisible
    to decoder-direction metrics (where perwin-raw ≡ composite). The two
    effects decompose cleanly: signed codes help, batch pooling hurts; the
-   pooled signed arms land back at composite level.
+   pooled signed arms land back at composite level. The coupled-bench
+   probe analog completes the picture: hidden-chain readout is
+   near-ceiling for every arm there (declining mildly with T), batch
+   pooling shows NO code-level penalty (it damages decoder alignment,
+   not linear readability), and the composite's one deficit is again
+   T=1 (0.77 vs perwin-raw 0.93 at k=1) — the ReLU's harm is a low-T,
+   code-level phenomenon wherever it appears.
    - ![denoising probe](plots/btk_rerun/btk_rerun_denoising_probe.png)
 
 **Verdict for the re-run gate** (pre-registration: *"the PAPER arch's
@@ -173,9 +179,11 @@ worse in level everywhere measured. The cheap, defensible package is:
   backtracking mains 300k). A 3× steps wing (18k, coupled, k∈{1,2}, 2
   seeds) shows the btk-only arm is fully stable (levels and slope
   unchanged — the pooling deficit is not undertraining) while the
-  composite's T=1 cells drift down ~0.09, flipping its pooled slope
-  mildly positive (+0.005); small-n, direction consistent with low-T
-  being the composite's fragile region (Finding 3).
+  composite degrades specifically at k_pos=1/T=1 (gauc 0.89–0.96 → 
+  0.68–0.79, consistent across all 3 seeds; k=2 bit-stable) — a real
+  fragility of the single-atom-per-window corner under extended
+  training, far from paper settings (k_win=100), and one more instance
+  of low-T being the composite's weak region.
 - Slope pooling at d_sae=20 mixes k-dependent non-clipped T-ranges; quote
   the d50 wing slopes for the clean statement.
 - relu-mix ≡ btk-only is bench-local: on real-LM substrates the fleet's
