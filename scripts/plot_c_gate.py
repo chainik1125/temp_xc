@@ -76,8 +76,8 @@ def main() -> int:
             if rg is None:
                 continue   # difference-of-means c is not the constant share of the metric
             arms = r["arms"]
-            if "txc_slab" not in arms:
-                continue
+            if "txc_slab" not in arms or r.get("n_train", 0) < 500:
+                continue   # drop the reduced-size validation config
             const = max((best(arms[a]) for a in CONSTANT_ARMS if a in arms), default=0.0)
             pts.append((rg["c"], best(arms["txc_slab"]) - const, label, colour,
                         "rank_grad" in r))
@@ -85,6 +85,17 @@ def main() -> int:
     if not pts:
         print("[skip] no runs with a rank measurement yet")
         return 1
+
+    # Rank correlation, reported because the relationship is a tendency and not a rule and
+    # the number is the honest way to say so.
+    import itertools
+    n = len(pts)
+    conc = dis = 0
+    for i, j in itertools.combinations(range(n), 2):
+        sgn = (pts[i][0] - pts[j][0]) * (pts[i][1] - pts[j][1])
+        conc += sgn > 0
+        dis += sgn < 0
+    tau = (conc - dis) / max(conc + dis, 1)
 
     fig, ax = plt.subplots(figsize=(7.4, 5.0))
     seen = set()
@@ -99,7 +110,8 @@ def main() -> int:
             fontsize=8.5, color="#555555", ha="right")
     ax.set_xlabel(r"$c$  —  share of the optimal write that is constant across positions")
     ax.set_ylabel("crosscoder slab  $-$  best constant write   (delta margin)")
-    ax.set_title("Constant share against the crosscoder's margin over constant writes")
+    ax.set_title(f"Constant share vs the crosscoder's margin  "
+                 f"(Kendall $\\tau$ = {tau:+.2f}, n = {n})")
     ax.grid(alpha=0.25, lw=0.6)
     ax.legend(loc="upper right", fontsize=8, framealpha=0.95)
     fig.tight_layout()
