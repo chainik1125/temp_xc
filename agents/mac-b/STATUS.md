@@ -43,5 +43,16 @@ Results `dialevel/results/ladder_{gpt2,llama31_8b,gemma2_2b}.json`.
   --post-k-rule times-T, --crosscheck-json the panel's own stage2
   json) + receipts_check rows. Panel-2 deadlines: freeze 13:30,
   launch 13:45, repatriation 16:15, everything pushed 16:30.
+- **Panel-2 receipts RUNBOOK (at repatriation, ~16:15):**
+  1. `uvx modal volume get temp-xc-replag-caches diafaces_panel2/ …`
+     → `diafaces/results/panel2_payloads/`;
+  2. `.venv/bin/python -m experiments.explorations.task_hunt.diafaces.merge_panel_payload dq`
+     (freeze stamp cfa341c34… filled + asserts; leaderboard dedup);
+  3. the two PANEL_RECIPES.md dq commands (v1 + paired v2) →
+     `support_stats/stage2_variance_diafaces_dq[_v2].{json,md}`;
+  4. receipts row(s) R27+ wired to those outputs + checker green +
+     push by 16:30. mac-a owns cells + the P1–P6 verdict.
+  Harness pre-flighted: canonical λ̂ run reproduces committed
+  receipts (3 last-ulp diffs only).
 - Day-2 gates: NO new Modal starts after 15:30 London; briefings
   retire at the 18:00 check-in.
