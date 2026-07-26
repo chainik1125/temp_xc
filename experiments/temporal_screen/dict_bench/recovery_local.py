@@ -217,9 +217,12 @@ def main():
           "can reach):")
     hdr = "  extent " + "".join(f"{f'T={T}':>9}" for T in Ts)
     print(hdr, flush=True)
+    def group_ceiling(L, T):
+        return float(np.mean([ceiling(f, T) for f in feats if f["L"] == L]))
+
     for L in extents:
-        f0 = next(f for f in feats if f["L"] == L)
-        print(f"  L={L:<5}" + "".join(f"{ceiling(f0, T):>9.3f}" for T in Ts), flush=True)
+        print(f"  L={L:<5}" + "".join(f"{group_ceiling(L, T):>9.3f}" for T in Ts),
+              flush=True)
 
     rows = []
     for T in Ts:
@@ -232,8 +235,7 @@ def main():
         row = {"T": T, "realised_l0_per_window": l0, "coeff_per_segment": l0 / T,
                "fvu": fvu,
                "recovery": {str(L): float(np.mean(v)) for L, v in sorted(by_L.items())},
-               "ceiling": {str(L): ceiling(next(f for f in feats if f["L"] == L), T)
-                           for L in extents}}
+               "ceiling": {str(L): group_ceiling(L, T) for L in extents}}
         rows.append(row)
         print(f"  [T={T}] coeff/seg {l0/T:5.2f}  FVU {fvu:.4f}  recovery " +
               "  ".join(f"L={L}:{np.mean(v):.3f}" for L, v in sorted(by_L.items())),
