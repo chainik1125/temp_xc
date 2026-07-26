@@ -26,6 +26,13 @@ never meaningfully exceeds the best constant write on ANY task we have built, in
 designed to reward exactly that — which would make the whole headline a statement about
 dictionaries and selectors and not about temporal expressiveness at all.
 
+WHY A RATIO AND NOT A DIFFERENCE. These tasks do not share a metric — `recency` and `evidence`
+are probe mode, where the score is a difference of differences between two continuations, while
+`order`, `phase11` and the rotations are ordering mode, where it is `logP(document)`. Deltas are
+in different units and their magnitudes are not comparable across tasks. `txc_slab /
+broadcast_optimal` is dimensionless and formed within a single run, so it is the one quantity
+that can be put on a common axis. `txc/grad` is printed beside it for the same reason.
+
 `broadcast_optimal` is built from the metric gradient, so it is a SUPERVISED reference and not
 an arm a practitioner holds. The comparison bounds what the crosscoder's FORM buys; it is not
 a claim that a per-token dictionary could reach that line.
