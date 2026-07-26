@@ -323,6 +323,46 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     rv = unit(torch.randn(d, generator=g).to(dev))
     writes["random_broadcast"] = unit(rv.unsqueeze(0).expand(T, -1).contiguous())
 
+    # RANK DECOMPOSITION OF THE OPTIMAL WRITE, and the arm that follows from it.
+    #
+    # A steering intervention is a (T, d) MATRIX. A per-token dictionary has one direction
+    # per latent, so the most it can produce -- even when steered perfectly, with a
+    # per-position dose schedule -- is a RANK-1 matrix: one direction with a time-varying
+    # gain. A crosscoder latent is unconstrained in rank. So the question "can a per-token
+    # dictionary express this write at all?" is answered before any dictionary is trained, by
+    # the singular values of the supervised difference-of-means slab:
+    #
+    #     r1 = sigma_1^2 / ||P||_F^2      share of the optimal write reachable at rank 1
+    #     c  = T ||mean_t P_t||^2 / ||P||_F^2   share reachable by a CONSTANT write
+    #
+    # `c` is the sharper of the two for interpreting this project, because it is also the
+    # share a pooled per-token probe can READ: a pooled probe averages over positions and so
+    # separates the classes exactly when the mean of the difference slab is nonzero, which is
+    # the same quantity a constant write pushes along. Reading and constant-write steering
+    # are one number seen twice.
+    #
+    # `rank1_best` is then the ceiling for ANY per-token dictionary handed a perfect
+    # schedule, and `sae_schedule` is the SAE's OWN learned direction given the best schedule
+    # for it. Both are fitted on the training split only and applied unrefitted to the fresh
+    # test documents, so a schedule that does not generalise shows up as a failure here
+    # rather than being smuggled in. Together they separate two claims that both get called
+    # "the crosscoder wins":
+    #   * txc_slab > rank1_best  -> EXPRESSIVENESS: no per-token write can do this.
+    #   * txc_slab ~ rank1_best but >> sae_broadcast -> DISCOVERY: the write exists for a
+    #     per-token dictionary, but unsupervised training does not find it and supplying it
+    #     needs knowing the answer first.
+    P_dom = writes["dom_slab"]
+    _U, _S, _Vh = torch.linalg.svd(P_dom, full_matrices=False)
+    out["rank"] = {
+        "r1": float(_S[0] ** 2 / (_S ** 2).sum()),
+        "c": float(T * P_dom.mean(0).pow(2).sum() / P_dom.pow(2).sum()),
+        "singular_values": [float(v) for v in _S[:6]],
+    }
+    log(f"[rank] optimal write: rank-1 share r1 = {out['rank']['r1']:.3f}, "
+        f"constant share c = {out['rank']['c']:.3f}")
+    writes["rank1_best"] = unit(_S[0] * torch.outer(_U[:, 0], _Vh[0]))
+    writes["sae_schedule"] = unit(torch.outer(P_dom @ v_sae, v_sae))
+
     # `txc_flat` asks whether the crosscoder needs its profile. This asks the complementary
     # question: does it need anything BUT the profile? Random directions, one per position,
     # rescaled so the per-position norms exactly match `txc_slab`'s. If this matches
@@ -502,7 +542,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     if "txc_slab" in out["arms"]:
         ts2, te2 = at_best("txc_slab")
         for other in ("sae_broadcast", "tsae_broadcast", "txc_flat",
-                      "txc_profile_random", "random_slab", "random_broadcast"):
+                      "txc_profile_random", "random_slab", "random_broadcast",
+                      "sae_schedule", "rank1_best"):
             if other in out["arms"]:
                 os_, oe_ = at_best(other)
                 zs[f"txc_slab_vs_{other}"] = float(

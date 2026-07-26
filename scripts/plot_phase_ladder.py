@@ -50,23 +50,24 @@ def load_seeds(s):
     The sign was stable in every one, the magnitude was not, so a single init is not a
     verdict and the figure shows the spread rather than one draw.
     """
-    out = []
-    for suffix in ("", "_ds1", "_ds2"):
-        p = SRC / f"phase{s}{suffix}.json"
-        if p.exists():
-            out.append(json.loads(p.read_text()))
-    return out
+    out = [json.loads(p.read_text())
+           for p in sorted(SRC.glob(f"phase{s}_final_ds*.json"))]
+    if out:
+        return out
+    # Fall back to the pre-recipe-fix runs if the final matrix has not landed.
+    return [json.loads(p.read_text())
+            for suffix in ("", "_ds1", "_ds2")
+            if (p := SRC / f"phase{s}{suffix}.json").exists()]
 
 
 def main() -> int:
     runs, seeds = {}, {}
     for s in SWITCHES:
-        p = SRC / f"phase{s}.json"
-        if not p.exists():
-            print(f"[skip] {p} not written yet")
-            return 1
-        runs[s] = json.loads(p.read_text())
         seeds[s] = load_seeds(s)
+        if not seeds[s]:
+            print(f"[skip] no runs for phase{s} yet")
+            return 1
+        runs[s] = seeds[s][0]
 
     fig, axes = plt.subplots(1, 2, figsize=(11.6, 4.4))
 
@@ -74,9 +75,15 @@ def main() -> int:
     for key, colour, label in ((("sae"), C_SAE, "TopK SAE (codes pooled over window)"),
                                (("txc"), C_TXC, "crosscoder (window code)"),
                                (("tsae"), C_TSAE, "attention tSAE (codes pooled)")):
-        ys = [runs[s]["reading"][key]["auc"] for s in SWITCHES if key in runs[s]["reading"]]
-        xs = [s for s in SWITCHES if key in runs[s]["reading"]]
+        xs, ys, lo, hi = [], [], [], []
+        for s in SWITCHES:
+            vals = [r["reading"][key]["auc"] for r in seeds[s] if key in r["reading"]]
+            if not vals:
+                continue
+            xs.append(s); ys.append(sum(vals) / len(vals))
+            lo.append(min(vals)); hi.append(max(vals))
         ax.plot(xs, ys, "o-", color=colour, lw=2.0, ms=6, label=label)
+        ax.fill_between(xs, lo, hi, color=colour, alpha=0.16, lw=0)
     ax.axhline(0.5, ls="--", color="#888888", lw=1.3)
     ax.text(11, 0.515, "chance", fontsize=8.5, color="#888888", ha="right")
     ax.set_xscale("log"); ax.set_xticks(SWITCHES)
