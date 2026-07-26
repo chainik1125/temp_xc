@@ -912,3 +912,39 @@ unseeded `torch.randperm(T)` with T=3, which is the identity permutation once ev
 draws, so the test failed about 40% of the time regardless of the code under test. I
 measured 7 failures in 12 runs both with and without my changes before concluding it was
 pre-existing. Replaced with a fixed cyclic shift; 12 of 12 pass.
+
+## Sharpening the mechanism: this is divergence that does not look like divergence
+
+I had been writing "which term binds is set by the optimiser", which is true but evasive.
+The loss traces say something more specific. Comparing step 500 against step 2499, so that
+the initial transient is excluded:
+
+| kper | lr=1e-3 | lr=3e-4 |
+|---|---|---|
+| 1 | 207.0 → 194.5 (−6%) | 142.2 → 109.6 (−23%) |
+| 2 | 125.6 → 119.1 (−5%) | 32.7 → 11.3 (−66%) |
+| 4 | 62.1 → **78.8 (+27%)** | 13.8 → 9.3 (−33%) |
+| 8 | 57.8 → **81.2 (+41%)** | 18.5 → 12.2 (−34%) |
+| 20 | 62.0 → 60.6 (−2%) | 25.3 → 13.9 (−45%) |
+| 41 | 58.3 → **69.7 (+20%)** | 25.2 → 15.6 (−38%) |
+
+At lr=1e-3 the training loss **increases** over the run in three of six configurations and
+is flat in the other three. At lr=3e-4 it falls by 23-66% in all six. The lr=1e-3 runs are
+diverging.
+
+So the honest mechanism is not that some subtle property of window codes caps capacity. It
+is that **the crosscoder's training diverges at a learning rate the SAE tolerates, and the
+divergence presents as capacity collapse rather than as anything that looks like a failure.**
+No NaN, no exploding loss, no error. The model trains to completion, reports its configured
+k, and returns a dictionary in which 96-100% of the TopK selection is discarded. The final
+loss is 4.5-8.5× worse than the converged run at the same nominal settings, which would be
+visible to anyone comparing — but only if they had the converged run to compare against.
+
+That is a more useful warning than the one I was writing, and it changes the recommended
+practice from "prefer this learning rate" to "**check realised L0 and the loss trend; a
+crosscoder that has diverged looks exactly like one that has not**".
+
+Registered predictions retired by this: the mechanism is neither `b_enc` gating (refuted),
+nor missing input centering (refuted), nor decoder normalisation at init (refuted), nor a
+property of TopK (the identity `min(k, #{pre>0})` is exact but is not itself the cause). It
+is ordinary optimiser divergence with an unusual signature.
