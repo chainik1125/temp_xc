@@ -74,7 +74,8 @@ def _key(c):
             c["n_steps"], c.get("kind"))
 
 
-def _cells(block: str | None, only_seed: int | None):
+def _cells(block: str | None, only_seed: int | None,
+           only_cells: set | None = None):
     out = []
     for c in _lambda_cells(DS):
         is_tsae_tr = c["arch"] == "tsae" and c.get("kind") == "trained"
@@ -83,6 +84,12 @@ def _cells(block: str | None, only_seed: int | None):
         if block == "main" and is_tsae_tr:
             continue
         if only_seed is not None and c["seed"] != only_seed:
+            continue
+        # --only-cells "arch:T:seed:kind,..." — OOM re-pass selector
+        # (selection only, like --panel/--block: cannot enlarge or
+        # reorder the frozen set).
+        if only_cells is not None and \
+                (c["arch"], c["T"], c["seed"], c["kind"]) not in only_cells:
             continue
         out.append(c)
     return out
@@ -124,11 +131,20 @@ def main():
         i = argv.index("--only-seed")
         only_seed = int(argv[i + 1])
         del argv[i:i + 2]
+    only_cells = None
+    if "--only-cells" in argv:
+        i = argv.index("--only-cells")
+        only_cells = set()
+        for spec in argv[i + 1].split(","):
+            arch, T, seed, kind = spec.split(":")
+            only_cells.add((arch, int(T), int(seed), kind))
+        del argv[i:i + 2]
     workers = int(argv[0]) if argv else 3
     suffix = (f"_{block}" if block else "") + \
-        (f"_s{only_seed}" if only_seed is not None else "")
+        (f"_s{only_seed}" if only_seed is not None else "") + \
+        ("_repass" if only_cells is not None else "")
     out = HERE / "results" / f"panel_{DS}{suffix}.json"
-    results = grid.run_pool(_cells(block, only_seed), out,
+    results = grid.run_pool(_cells(block, only_seed, only_cells), out,
                             max_workers=workers, describe=_describe,
                             tag=f"diafaces-panel/{DS}{suffix}")
     _merge_into_panel(results)
