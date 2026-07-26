@@ -163,9 +163,11 @@ extreme ratios, so their *ordering* is soft even though all four sit far below 1
 the rotations are **ordering mode** while instruction position and evidence are **probe mode** — the
 ratio is dimensionless and formed within a run, which is why it shares an axis at all.
 
-**Rank ≥ 2 is real and its mechanism is unidentified.** Three candidate mechanisms were proposed
-and each refuted by a profile measurement it predicted. The leading direction *is* explained — the
-gradient's support is set by where the two classes differ — but the second is not.
+**Rank ≥ 2 is real and what supplies the second direction is unidentified.** Three candidate
+mechanisms were proposed and each refuted by a profile measurement it predicted. The *leading*
+direction is explained — the gradient's support is set by where the two classes differ — but the
+second is not. (A separate set of three mechanisms was proposed and withdrawn for a different
+question, why discovery fails on SmolLM2; see Limits.)
 
 ## Limits
 
