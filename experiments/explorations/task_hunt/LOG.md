@@ -5966,3 +5966,52 @@ pre T32 (s1 tr, s2 untr), post T16/T32 heavies — none touch the
 claiming cell.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+## 2026-07-26 — mac-local — REVIEW: dq PANEL KEEP — APPROVED PENDING harness CIs + re-pass addendum; quote licence set; this is the CASE-STUDY-#2 CANDIDATE going to the team
+
+Verified against the canonical leaderboard and artifacts before this
+entry: pre/T8 trained 0.4048 (seeds 0.4123/0.3978/0.4042 — sd
+≈ 0.007, the tightest cell the hunt has produced), untrained 0.0860
+(0.212×, P4 holds with 2.4× margin); sae 0.2284 / tsae 0.2498;
+per-seed paired pre−tsae diffs +0.156/+0.143/+0.166 (all positive,
+sd ≈ 0.012 — the harness will bound this trivially); evidence line
+pre-freeze-measured, P6 bars artifact-exact (0.106/0.199/0.310/
+0.423/0.499), claiming cell 0.405 > 0.310 at T8, honest T16 miss by
+0.020 stated with its licence consequence. Verdict structure, the
+graceful-partial invocation, and the complete-claiming-cell basis
+are all per the written decisions. **APPROVED PENDING**: (a) mac-b
+harness receipts (CIs + trend), (b) the re-pass addendum (10 cells,
+none touching the claiming cell).
+
+**Quote licence (binding, supplements the entry's own T ≤ 8 rule):**
+1. **Lead margin = pre − tsae +0.155** (well-spent comparator,
+   realized l0 6.64). pre − sae +0.176 is quotable ONLY with the
+   note that sae realized l0 = 4.50 — the known llama-d4096
+   under-spend signature (fineweb precedent 4.27–4.57) — which
+   inflates that margin's face value.
+2. Latent-state language at T ≤ 8; T16/T32 = arch-ordering under
+   the code-readout convention (P6, as the entry says).
+3. Every quote carries: the v2 pair (+0.472 grouped), the untrained
+   ratio (0.21×), the evidence bar at its T, and dq's Q1-violation
+   context (register conversion is why the token baselines are
+   strong — the margin is ON TOP of a converted register).
+4. The W1-consistency reading (near-half concentration ↔ T ≤ 8
+   recovery window) stays a review-noted hypothesis — one
+   pre-registered test post-deadline, not a claim.
+
+**Process line adopted:** PANEL2_CARD did not freeze NUMERIC l0
+bounds ("band" was verbal) — the l0 line is therefore
+reported-as-measured, and future cards return to the λ̂/oprate
+practice of explicit numeric bands.
+
+**Program state if the team ratifies:** the hunt's chase is over —
+**a second TXC case study: dqgap on dialogue (llama31, the paper's
+hardest token-baseline model), pre/T8 0.405 vs tsae 0.250 at
+matched budget, order-carried substrate with a measured mechanism
+(R25), training-not-prior (0.21×), identity-controlled (v2 grouped
+0.472), above visible evidence at the claiming T** — landing beside
+λ̂ backtracking with complementary shape (λ̂: order-carried readout;
+dq: order-carried substrate + near-anchor mechanism). R-row
+proposal after harness; distillation § 8.4 updated now.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
