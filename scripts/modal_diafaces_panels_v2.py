@@ -58,7 +58,8 @@ def _assert_pinned():
     print(f"[pin] container at freeze commit {head[:10]}", flush=True)
 
 
-def _run_block(panel: str, block: str, only_seed: int | None) -> str:
+def _run_block(panel: str, block: str, only_seed: int | None,
+               workers: int | None = None) -> str:
     _assert_pinned()
     cfg = PANELS[panel]
     _sh(f"{PY} -m experiments.explorations.task_hunt.dialevel.cache_acts "
@@ -69,7 +70,11 @@ def _run_block(panel: str, block: str, only_seed: int | None) -> str:
     suffix = f"_{block}" + (f"_s{only_seed}" if only_seed is not None else "")
     flags = f"--panel {panel} --block {block}" + (
         f" --only-seed {only_seed}" if only_seed is not None else "")
-    workers = 6 if block == "main" else 1
+    if workers is None:
+        # 6 H100 workers OOM'd dq's d4096 T32 pooled trained cells
+        # (~13 GB/worker); scheduling is NOT frozen config — outputs
+        # unaffected (the batch-halving-class pre-authorization).
+        workers = (3 if panel == "dq" else 6) if block == "main" else 1
     try:
         _sh(f"{PY} -m experiments.explorations.task_hunt.diafaces.run_panel "
             f"{workers} {flags}")
@@ -93,8 +98,8 @@ def _run_block(panel: str, block: str, only_seed: int | None) -> str:
               secrets=[modal.Secret.from_name("hf-token")],
               cpu=8, memory=65536, timeout=3 * 60 * 60,
               retries=modal.Retries(max_retries=1, initial_delay=10.0))
-def run_main(panel: str) -> str:
-    return _run_block(panel, "main", None)
+def run_main(panel: str, workers: int = 0) -> str:
+    return _run_block(panel, "main", None, workers or None)
 
 
 @app.function(image=image, gpu="L4", volumes={"/workspace": vol},
