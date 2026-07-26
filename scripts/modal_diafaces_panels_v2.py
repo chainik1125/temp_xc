@@ -20,7 +20,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "db677a4b873156d274a6b223a3cc7b82ff98e997"  # v2 RE-FREEZE
+PINNED_COMMIT = "931c016e63d4755d142a9eb25600f5026887c9a6"  # re-pass PIN (contains --only-cells; cells enumeration unchanged)
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PANELS = {
     "tt": {"ds": "dial_real_ttrend_gpt2_l7", "model_key": "gpt2"},
@@ -59,7 +59,7 @@ def _assert_pinned():
 
 
 def _run_block(panel: str, block: str, only_seed: int | None,
-               workers: int | None = None) -> str:
+               workers: int | None = None, only_cells: str = "") -> str:
     _assert_pinned()
     cfg = PANELS[panel]
     _sh(f"{PY} -m experiments.explorations.task_hunt.dialevel.cache_acts "
@@ -67,9 +67,11 @@ def _run_block(panel: str, block: str, only_seed: int | None,
     n0 = sum(1 for _ in open(LB)) if Path(LB).exists() else 0
     vol_dir = f"/workspace/diafaces_panels_v2/{panel}"
     _sh(f"mkdir -p {vol_dir}")
-    suffix = f"_{block}" + (f"_s{only_seed}" if only_seed is not None else "")
+    suffix = f"_{block}" + (f"_s{only_seed}" if only_seed is not None else "") \
+        + ("_repass" if only_cells else "")
     flags = f"--panel {panel} --block {block}" + (
-        f" --only-seed {only_seed}" if only_seed is not None else "")
+        f" --only-seed {only_seed}" if only_seed is not None else "") + (
+        f" --only-cells {only_cells}" if only_cells else "")
     if workers is None:
         # 6 H100 workers OOM'd dq's d4096 T32 pooled trained cells
         # (~13 GB/worker); scheduling is NOT frozen config — outputs
@@ -98,8 +100,8 @@ def _run_block(panel: str, block: str, only_seed: int | None,
               secrets=[modal.Secret.from_name("hf-token")],
               cpu=8, memory=65536, timeout=3 * 60 * 60,
               retries=modal.Retries(max_retries=1, initial_delay=10.0))
-def run_main(panel: str, workers: int = 0) -> str:
-    return _run_block(panel, "main", None, workers or None)
+def run_main(panel: str, workers: int = 0, only_cells: str = "") -> str:
+    return _run_block(panel, "main", None, workers or None, only_cells)
 
 
 @app.function(image=image, gpu="L4", volumes={"/workspace": vol},

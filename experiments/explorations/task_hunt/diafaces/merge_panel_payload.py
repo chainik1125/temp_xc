@@ -40,7 +40,9 @@ PANELS = {
            "payloads": HERE / "results" / "panel_payloads_v2tt"},
     "dq": {"ds": "dial_real_dqgap_llama31_8b_l14",
            "freezes": {"db677a4b873156d274a6b223a3cc7b82ff98e997":
-                       "v2 re-freeze (paired v1+v2, quotable)"},
+                       "v2 re-freeze (paired v1+v2, quotable)",
+                       "931c016e63d4755d142a9eb25600f5026887c9a6":
+                       "OOM re-pass PIN (only-cells; quotable)"},
            "payloads": HERE / "results" / "panel2_payloads"},
 }
 ARCHS = {"batchtopk_sae", "tsae", "txc_batchtopk_pre",
