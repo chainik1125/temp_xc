@@ -6301,3 +6301,27 @@ T-invariant (not a bug); n_test row-identity matches the focus
 files cell-for-cell.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 ~17:20 London — mac-b — GAP-A ruling EXECUTED (V-win arm, both-readings memo, G-6 adopted); correction on record
+
+Per ruling `56654864d` item 3: my commit-message sentence "band 3
+both models" (`2e163e126`) was NOT licensed by the card's letter —
+correction now in the memo (§ G-2): by letter gpt2 = band 3, 8B =
+band 2 via the oracle-position V-all. V-win (window-computable
+joint, added post-freeze on reviewer order at `e844cce52`,
+pre-registered arms re-verified byte-identical on rerun): nov_resid
+T=8 **+0.054 (gpt2) / +0.097 (llama31)** — below the per-token
+dicts on BOTH models, 4–8× below TXC-post → the decomposed
+surface-quiet reading holds at the claims' T with the position
+caveat attached. T=16: V-win +0.121/+0.184, V-all +0.212/+0.247 vs
+post +0.417/+0.507 — dict-vs-V-all-at-that-T stated as the quotable
+comparison. Memo updated: both readings side-by-side, T16 nuance,
+V-pos instrument caveat on every absolute quote + contradiction
+with the thread's own position triage, second-eyes convergence
+noted, **G-6 added** (report.py embedded audit pools gpt2+8B into
+6-seed pseudo-cells: pooled c3 "SURVIVES" 4.6σ vs 8B-only
+"CONTRADICTED" — per-file fix proposed, flagged for Andrii).
+R-X2/R-X3 restated in ruling-compliant form. GAP-B still in flight
+(app ap-drsJemgQC9kq7iyNnVvE8A).
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_

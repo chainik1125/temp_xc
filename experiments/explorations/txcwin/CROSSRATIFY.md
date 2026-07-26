@@ -67,42 +67,66 @@ freeze `fedf75aa9`): **[PENDING — Modal job in flight; numbers land in
 
 ### G-2 — no window-surface visible-cue baseline (the dq lesson)
 Filled per card GAP-A (`crossratify/visible_cue.py`; their rows, split
-and probe verbatim; features from window `token_ids` only). At the
-claims' **T=8**, on `nov_resid`:
+and probe verbatim; features from window `token_ids` only). The V-win
+arm (window-computable features jointly, no position) was added
+post-freeze on mac-local's review ruling (LOG `56654864d` item 3) and
+is disclosed as such; all pre-registered arms re-verified
+byte-identical across the rerun. At the claims' **T=8**, on
+`nov_resid`:
 
 | arm (T=8) | gpt2 rows | llama31 rows (8B) |
 |---|---|---|
 | V-rep (window repetition surface) | +0.058 | +0.060 |
 | V-uni (token-identity prior, their estimator) | +0.044 | +0.084 |
-| V-pos (document position) | +0.207 | +0.172 |
-| V-all | +0.152 | +0.175 |
+| **V-win (V-rep + V-uni jointly — window-computable floor)** | **+0.054** | **+0.097** |
+| V-pos (document position — NOT window-computable) | +0.207 | +0.172 |
+| V-all (everything incl. position) | +0.152 | +0.175 |
 | best per-token dictionary | +0.215 | +0.129 |
 | TXC-post@T8 | **+0.463** | **+0.393** |
 
-Reading per the card's pre-stated bands: the **window-computable**
-surface (repetition + token identity, ≤ +0.08 jointly in effect) is far
-below every per-token dictionary on both models — **surface-quiet at
-window scale CONFIRMED at T=8**. There is no question-mark-counting
-reading of this task: the label depends on first occurrence in the
-whole document prefix, a T=8 window sees 31.2% of the kernel mass, and
-the measured repetition floor says the window cannot fake it. This is
-exactly the control whose absence demoted dq, and novelty passes it.
+**Two readings, per the review ruling (both stated; neither alone):**
 
-Two disclosures that must travel with the result:
-- **At T=16 the repetition floor rises to +0.20/+0.22** (window covers
-  53.3% of kernel mass). The surface-quiet property is strongest at
-  T ≤ 8; anyone re-pinning claims at T=16 (see G-4) must carry this.
+- *By the card's letter* (V-all is the pre-registered gate quantity):
+  gpt2 = band 3 (V-all 0.152 < per-token 0.215 — surface-quiet
+  confirmed outright); **8B = band 2** ("partially window-visible",
+  V-all 0.175 ≥ per-token 0.129). An earlier commit message
+  (`2e163e126`) said "band 3 both models" — that sentence was not
+  licensed as written and is corrected here.
+- *By decomposition*: the 8B band-2 trigger is entirely the
+  ORACLE-position arm; absolute document position is not computable
+  from window tokens and is not a visible cue a window reader could
+  count. The operative window-computable floor V-win@T8 is +0.054 /
+  +0.097 — below the per-token dictionaries on BOTH models and 4–8×
+  below TXC-post. The dq-style objection (a reader counting visible
+  cues) is genuinely absent at T=8: the label depends on first
+  occurrence in the whole document prefix, a T=8 window sees 31.2% of
+  the kernel mass, and the measured repetition floor says the window
+  cannot fake it. **"Surface-quiet at window scale" may be quoted only
+  in this decomposed form, with the position caveat attached.**
+
+Disclosures that must travel with the result:
+- **T=16 nuance (stated plainly):** window surface rises steeply at
+  T=16 — V-rep +0.20/+0.22, V-win +0.121/+0.184 (window covers 53.3%
+  of kernel mass); the surface fraction grows with T, dq-like. BUT
+  unlike dq the dictionaries stay clear of the FULL visible arm at
+  T=16: 8B post +0.507 ≈ 2× V-all +0.247; gpt2 post +0.417 ≈ 2× V-all
+  +0.212. The quotable comparison at any T is
+  **dictionary-vs-V-all-at-that-T**. Anyone re-pinning the 8B claims
+  at T=16 (G-4) must carry this.
 - **V-pos prediction FAILED** (card predicted ≈ 0): the
   position-detrended label retains a position-readable residual of
   r ≈ +0.21 (gpt2) / +0.17 (llama31) under an 8-feature bin readout,
-  even though the builder's scalar-position check looked clean
-  (tercile-AUC 0.472 ≈ chance). Mechanism (unverified): bin-mean
+  even though the thread's own position triage looked clean
+  (tercile-AUC 0.472 ≈ chance) — the two results CONTRADICT and are
+  flagged side by side for Andrii. Mechanism (unverified): bin-mean
   detrend on the builder's own split leaves within-bin slope +
-  bin-recalibration readable. Instrument note for Andrii: c1–c3 are
-  head-to-head between arms with equal access to position, so the
-  COMPARISONS stand, but the "position-free" description of nov_resid
-  should be softened, and V-all (+0.152/+0.175) crosses the 8B
-  per-token dictionary (+0.129) on this channel alone.
+  bin-recalibration readable. This instrument caveat travels with
+  EVERY absolute skill quote from this thread; c1–c3 are head-to-head
+  between arms with equal access to position, so the COMPARISONS
+  stand, but the "position-free" description of nov_resid should be
+  softened. (Verified benign by a second reader: V-pos byte-identical
+  across T is the support-64 NaN mask making eligible rows
+  T-invariant, not a bug.)
 
 ### G-3 — untrained controls at a single seed
 Minor: W4 margins (+0.39–0.42) are ~10× any plausible init spread. Not
@@ -137,17 +161,32 @@ Flags, in order of preference (Andrii's call):
   this floor relationship explicitly; a reviewer will find it in
   `rawgate_gpt2_L6.json` in five minutes, as we did.
 
+### G-6 — `report.py`'s embedded self-audit pools models into pseudo-cells
+Found by a second reader during review (LOG `56654864d` addendum,
+whose independent recompute converges with this audit everywhere
+else): `report.py` invokes `audit.py --pattern 'focus_*.json'`, which
+loads the gpt2 AND 8B novelty files together — `find()` then averages
+them into single **6-seed pseudo-cells** spanning two subject models.
+The pooled run reports c3 "CLAIM SURVIVES" (4.6σ, W8 WARN only) while
+the 8B-only run reports "CLAIM CONTRADICTED" (G-4). The embedded audit
+should run per-file; as shipped, the report's green audit block masks
+the one claim its own harness rejects. Flagged for Andrii side by
+side.
+
 ## 3. Receipts proposals (quotable only after ratification + Andrii's ack)
 
 - **R-X1 (reproduction):** gpt2@T8 c1/c2/c3 margins +0.248/+0.270/
   +0.262 at 15/21.9/11.3σ, strict; from committed artifacts at
   `fedf75aa9`'s parents, checker-ready numbers in
   `focus_novresid.json`.
-- **R-X2 (surface-quiet):** T=8 visible-cue floors V-rep +0.058/+0.060,
-  V-all +0.152/+0.175 vs TXC-post +0.463/+0.393
-  (`visible_cue_{gpt2,llama31}.json`).
+- **R-X2 (surface-quiet, decomposed form ONLY per ruling):** T=8
+  window-computable floor V-win +0.054/+0.097 (< per-token dicts
+  +0.215/+0.129) vs TXC-post +0.463/+0.393; by card letter gpt2 band 3,
+  8B band 2 via the oracle-position arm; quotable with the position
+  caveat attached (`visible_cue_{gpt2,llama31}.json`).
 - **R-X3 (instrument):** nov_resid position residual +0.207/+0.172
-  (V-pos arm, same files).
+  (V-pos arm, same files) — travels with every absolute skill quote
+  from the thread; contradicts the thread's own position triage.
 - **[R-X4 raw-gate at T=8 both models — pending GAP-B numbers.]**
 
 ## 4. Bottom line for the salvage decision
@@ -156,8 +195,11 @@ On gpt2, the txcwin trailing-novelty result survives every control we
 hold task-hunt work to — including the two dq died of (visible-cue
 floor, and the raw gate it already had) — with margins that no seed
 choice can flip. It is currently the strongest surface-quiet T-scaling
-evidence in the program. The 8B replication is real but mis-pinned:
-robust at T=16, fragile at the claimed T=8 (one sick seed, c3
-contradicted by their own harness). Fix is a claims amendment or a $5
-seed top-up, not a redesign. Gate closure at T=8/8B rides on GAP-B
-(in flight).
+evidence in the program, where "surface-quiet" is quoted in the
+decomposed form of G-2 (window-computable floor ≪ every dictionary at
+T=8; oracle-position residual disclosed as an instrument caveat). The
+8B replication is real but mis-pinned: robust at T=16, fragile at the
+claimed T=8 (one sick seed, c3 contradicted by their own harness — and
+masked by the pooled embedded audit, G-6). Fix is a claims amendment
+or a $5 seed top-up, not a redesign. Gate closure at T=8/8B rides on
+GAP-B (in flight).

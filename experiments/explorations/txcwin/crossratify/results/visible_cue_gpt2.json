@@ -89,6 +89,24 @@
    "dead_frac": 0.9375
   },
   {
+   "arm": "V-win",
+   "field": "nov_resid",
+   "T": 4,
+   "n_features": 8,
+   "rows": 8000,
+   "kernel_mass_within_T": 0.1697,
+   "skill": 0.04143047355945319,
+   "ci_lo": -0.014521781817135525,
+   "ci_hi": 0.09137364566989184,
+   "degenerate": null,
+   "pred_std": 0.03375159204006195,
+   "n_train": 6468,
+   "n_test": 1532,
+   "label_std": 0.11253830045461655,
+   "code_nnz": 6.028375,
+   "dead_frac": 1.0
+  },
+  {
    "arm": "V-pos",
    "field": "nov_resid",
    "T": 8,
@@ -159,6 +177,24 @@
    "label_std": 0.11253830045461655,
    "code_nnz": 8.2605,
    "dead_frac": 0.9375
+  },
+  {
+   "arm": "V-win",
+   "field": "nov_resid",
+   "T": 8,
+   "n_features": 8,
+   "rows": 8000,
+   "kernel_mass_within_T": 0.3124,
+   "skill": 0.05438457535040955,
+   "ci_lo": -0.0016041646071940265,
+   "ci_hi": 0.10402610406209861,
+   "degenerate": null,
+   "pred_std": 0.034073032438755035,
+   "n_train": 6468,
+   "n_test": 1532,
+   "label_std": 0.11253830045461655,
+   "code_nnz": 6.2605,
+   "dead_frac": 1.0
   },
   {
    "arm": "V-pos",
@@ -233,6 +269,24 @@
    "dead_frac": 0.9375
   },
   {
+   "arm": "V-win",
+   "field": "nov_resid",
+   "T": 16,
+   "n_features": 8,
+   "rows": 8000,
+   "kernel_mass_within_T": 0.5333,
+   "skill": 0.12080765867078516,
+   "ci_lo": 0.0638270589150885,
+   "ci_hi": 0.17443080351601858,
+   "degenerate": null,
+   "pred_std": 0.035706374794244766,
+   "n_train": 6468,
+   "n_test": 1532,
+   "label_std": 0.11253830045461655,
+   "code_nnz": 7.03725,
+   "dead_frac": 1.0
+  },
+  {
    "arm": "V-pos",
    "field": "nov_rate",
    "T": 4,
@@ -303,6 +357,24 @@
    "label_std": 0.14626920223236084,
    "code_nnz": 8.028375,
    "dead_frac": 0.9375
+  },
+  {
+   "arm": "V-win",
+   "field": "nov_rate",
+   "T": 4,
+   "n_features": 8,
+   "rows": 8000,
+   "kernel_mass_within_T": 0.1697,
+   "skill": 0.019769203148339767,
+   "ci_lo": -0.02818747967219507,
+   "ci_hi": 0.06515837262287959,
+   "degenerate": null,
+   "pred_std": 0.039448417723178864,
+   "n_train": 6468,
+   "n_test": 1532,
+   "label_std": 0.14626920223236084,
+   "code_nnz": 6.028375,
+   "dead_frac": 1.0
   },
   {
    "arm": "V-pos",
@@ -377,6 +449,24 @@
    "dead_frac": 0.9375
   },
   {
+   "arm": "V-win",
+   "field": "nov_rate",
+   "T": 8,
+   "n_features": 8,
+   "rows": 8000,
+   "kernel_mass_within_T": 0.3124,
+   "skill": 0.020081120267823403,
+   "ci_lo": -0.027440925374961154,
+   "ci_hi": 0.06521085322612918,
+   "degenerate": null,
+   "pred_std": 0.039672523736953735,
+   "n_train": 6468,
+   "n_test": 1532,
+   "label_std": 0.14626920223236084,
+   "code_nnz": 6.2605,
+   "dead_frac": 1.0
+  },
+  {
    "arm": "V-pos",
    "field": "nov_rate",
    "T": 16,
@@ -447,6 +537,24 @@
    "label_std": 0.14626920223236084,
    "code_nnz": 9.03725,
    "dead_frac": 0.9375
+  },
+  {
+   "arm": "V-win",
+   "field": "nov_rate",
+   "T": 16,
+   "n_features": 8,
+   "rows": 8000,
+   "kernel_mass_within_T": 0.5333,
+   "skill": 0.05646736674589148,
+   "ci_lo": 0.00916893166130081,
+   "ci_hi": 0.10620731183388803,
+   "degenerate": null,
+   "pred_std": 0.042157117277383804,
+   "n_train": 6468,
+   "n_test": 1532,
+   "label_std": 0.14626920223236084,
+   "code_nnz": 7.03725,
+   "dead_frac": 1.0
   }
  ]
 }
