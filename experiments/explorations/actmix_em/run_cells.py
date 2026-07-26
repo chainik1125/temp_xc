@@ -31,6 +31,18 @@ from pathlib import Path
 os.environ.setdefault("TEMP_BENCH_ALLOW_DIRTY", "1")
 os.environ.setdefault("AGENT_NAME", "runpod-2")
 
+# Shared-GPU co-residency guard (launch mechanics, not training
+# semantics): PyTorch's caching allocator grows opportunistically and
+# never shrinks for a sibling process, so an uncapped heavy lane
+# starves the light lane into OOM. TEMP_BENCH_GPU_FRACTION caps this
+# process's allocator budget (torch.cuda.set_per_process_memory_
+# fraction); a cell that truly needs more OOMs loudly in ITS lane
+# instead of killing the sibling.
+_frac = os.environ.get("TEMP_BENCH_GPU_FRACTION")
+if _frac:
+    import torch
+    torch.cuda.set_per_process_memory_fraction(float(_frac))
+
 from temp_bench.core.runner import run_experiment
 
 from experiments.explorations.actmix_em.cells import LANES

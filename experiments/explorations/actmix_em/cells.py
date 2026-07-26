@@ -115,19 +115,22 @@ def lane_c():
 # above for the record; launched lanes are h + l.
 
 def lane_h():
-    """Heavy chain — T16/T8 shapes serialized, never co-resident."""
-    return [txc_cell(16, 42), txc_cell(8, 42),
+    """Heavy chain — ALL T ≥ 4 window shapes serialized (measured:
+    an uncapped T16 cell caches ~73 GB; T ≥ 4 never co-resides with
+    another T ≥ 4). Launch with TEMP_BENCH_GPU_FRACTION ≈ 0.68."""
+    return [txc_cell(16, 42), txc_cell(8, 42), txc_cell(4, 42),
             txc_cell(16, 42, n_steps=0), txc_cell(8, 42, n_steps=0),
+            txc_cell(4, 42, n_steps=0),
             txc_cell(16, 1), txc_cell(8, 1), txc_cell(4, 1)]
 
 
 def lane_l():
-    """Light chain — every shape ≤ T4; endpoint T1 + falsifier sae
-    first, then the rest of s42, small untrained twins, s1 tokens."""
-    return [txc_cell(1, 42), sae_cell(42), txc_cell(4, 42),
-            tsae_cell(42), txc_cell(2, 42),
+    """Light chain — every shape ≤ T2 or per-token; endpoint T1 +
+    K1-falsifier sae first, then small untrained twins, s1 tokens.
+    Launch with TEMP_BENCH_GPU_FRACTION ≈ 0.22."""
+    return [txc_cell(1, 42), sae_cell(42), tsae_cell(42),
+            txc_cell(2, 42),
             txc_cell(1, 42, n_steps=0), txc_cell(2, 42, n_steps=0),
-            txc_cell(4, 42, n_steps=0),
             sae_cell(42, n_steps=0), tsae_cell(42, n_steps=0),
             txc_cell(1, 1), sae_cell(1), tsae_cell(1), txc_cell(2, 1)]
 
