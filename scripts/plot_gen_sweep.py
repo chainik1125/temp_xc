@@ -39,6 +39,19 @@ recency wins, and the quantity of interest is how far a write pushes it up.
 gradient respectively -- and are drawn dashed. They are references, not arms a practitioner
 holds.
 
+WHY 0.7 AND NOT ALSO 0.3. `_obey(cut)` is symmetric: class A must exceed `cut`, class B
+must fall below `1 - cut`. So `_obey(0.7)` already applies 0.7 to A and 0.3 to B -- it is
+one symmetric cut, not two, and a separate "cut30" column would restate the same test. The
+0.5 cut is the headline and 0.7 is the knife-edge check, because the concern is generations
+sitting just off the 0.5 boundary rather than deep in either tail.
+
+NO ARM IS DROPPED SILENTLY. If a floor excludes every dose for an arm it has no star, and
+without saying so a reader cannot distinguish it from an arm that was never run. Such an
+arm is annotated on the plot, named in a footnote, and printed in the table with `--` in
+the at-floor columns and its peak intact. **An arm that clears the floor at no dose is a
+result** -- it only works by degrading the text -- and is most likely at the 70 floor,
+which is the column doing the discriminating work.
+
 Reads results/txc_wins/recency_tr_gensweep.json.
 
 SELECTION CAVEAT. Each dictionary arm's latent is chosen by measured steering on the
@@ -97,10 +110,10 @@ def main() -> int:
     for v in by_arm.values():
         v.sort(key=lambda c: c["alpha"])
 
+    no_adm = []
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(13.2, 5.4),
                                   gridspec_kw={"width_ratios": [1.55, 1]})
 
-    rows = []
     for arm, cs in by_arm.items():
         label, col, ls = STYLE.get(arm, (arm, "#444444", "-"))
         xs = [c["alpha"] for c in cs]
@@ -116,7 +129,17 @@ def main() -> int:
             best = max(adm, key=lambda c: c["obey_earlier_cut50"])
             ax.plot([best["alpha"]], [best["obey_earlier_cut50"]], "*", ms=17,
                     color=col, mec="white", mew=0.9, zorder=5)
-            rows.append((arm, label, best, len(adm), len(cs)))
+        else:
+            # NO SILENT OMISSION. An arm that clears the floor at no dose has no star, and
+            # without saying so the reader cannot tell it from an arm that was never run.
+            # That is a result -- the arm only works by degrading the text -- so it is
+            # annotated on the plot and named in the legend rather than left blank.
+            no_adm.append(label)
+            pk = max(cs, key=lambda c: c["obey_earlier_cut50"])
+            ax.annotate("no dose clears the floor",
+                        (pk["alpha"], pk["obey_earlier_cut50"]), fontsize=8,
+                        color=col, textcoords="offset points", xytext=(6, 8),
+                        style="italic")
         # Right panel: the trade-off itself, obedience against coherence.
         ax2.plot([c[key] for c in cs], ys, ls=ls, lw=1.4, color=col,
                  marker="o", ms=4.5, alpha=0.9, zorder=2)
@@ -139,8 +162,8 @@ def main() -> int:
     ax.set_ylabel("obeys the EARLIER instruction\n"
                   "(uppercase for class A, lowercase for class B; 0.5 case-fraction cut)")
     ax.set_title("Generation-space dose response, with a coherence floor\n"
-                 "filled = coherence clears the floor · open = excluded · star = selected",
-                 fontsize=11)
+                 "filled = clears the floor · open = excluded · star = per-arm argmax "
+                 "over doses, subject to the floor", fontsize=11)
     ax.grid(alpha=0.25, lw=0.6)
     ax.legend(loc="upper left", fontsize=8.5, framealpha=0.95)
 
@@ -150,6 +173,9 @@ def main() -> int:
     ax2.set_title("What the obedience is bought with", fontsize=11)
     ax2.grid(alpha=0.25, lw=0.6)
 
+    if no_adm:
+        fig.text(0.01, 0.005, "no dose clears the floor for: " + ", ".join(no_adm),
+                 fontsize=8, style="italic", color="#B22222")
     fig.tight_layout()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, dpi=170)
