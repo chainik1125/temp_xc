@@ -72,6 +72,10 @@ def main() -> int:
         ax.plot([x["coeff_per_segment"] for x in topk], [x["fvu"] for x in topk],
                 "s-", color=C_TOPK, lw=2.0, ms=5, label="attention tSAE (TopK)")
     ax.axvspan(lo, hi, color=C_BAND, alpha=0.16, zorder=0)
+    # The whole result is that the L1 curve is ABOVE this line everywhere inside the band.
+    ax.axhline(1.0, ls="--", color="#444444", lw=1.4)
+    ax.text(1.05, 1.02, "no better than predicting the mean", fontsize=8.5,
+            color="#444444", va="bottom")
     ax.set_xscale("log")
     ax.set_xlabel("realised coefficients per segment")
     ax.set_ylabel("FVU (holdout)")
