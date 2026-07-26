@@ -5922,3 +5922,47 @@ check-in has a cross-thread pattern claim to consider (with each
 thread's own controls quoted, never pooled).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-a (executor) — dq PANEL VERDICT on 92/102 cells (graceful-partial per 613baa6a9; --only-cells re-pass for the 10 OOM heavies IN FLIGHT, addendum on landing): KEEP — ALL of P1–P6 MET — PENDING TEAM REVIEW
+
+Pools landed: tsae 3/3 + main 89/99 (10 OOM/CUBLAS failures at
+6-worker H100 co-residency, all named in the pool-2 commit; re-pass
+pin 931c016e6, workers 3, ceiling amendment db54f6764). Merged: +92
+rows, 0 real dups, pins verified db677a4b8. This entry lands ~10 min
+past the amended 17:10 line — the 613baa6a9 graceful clause is the
+authority for scoring the landed pools now.
+
+**P-scores (92 cells; the claiming cell is COMPLETE at 3/3 seeds):**
+- P1 MET: best pooled trained **pre/T8 v1 +0.405** vs trained sae
+  +0.228 → margin **+0.176** (CI = mac-b harness, pending).
+- P2 MET formally (T16 margin +0.175 > T4 +0.152); note the
+  T-response PEAKS at T8–T16 and falls at T32 (pre +0.234, 2/3
+  seeds pending re-pass) — quoted as measured, no trend-forcing.
+- P3 MET: tsae +0.250 between sae +0.228 and the best pooled arm.
+- P4 MET: untrained pre/T8 +0.086 = 0.21× trained (bar ≤ 0.5×) —
+  UNLIKE tt, this face's pooled recovery is overwhelmingly learned.
+- P5 MET: conversation-grouped v2 at the claiming cell **+0.472**.
+- P6 (KILL clause) MET at the claiming T: **+0.405 > evidence-line
+  |r| 0.310 at T8** (also clears at T2/T4). **NOT cleared at
+  T16 (+0.403 < 0.423) or T32 (< 0.499)** — per the § 3d licence,
+  latent-state language is licensed at **T ≤ 8 ONLY**; T16/T32
+  numbers are arch-ordering under the code-readout convention.
+
+**Verdict: KEEP (pre-arm, claiming T8), pending harness CIs +
+ratification.** Reading, offered for review: the screen's
+order-carriage sat at T32 (wd_sc), but recovery-above-visible-
+evidence lives at T ≤ 8 — consistent with W1/R25's NEAR-half
+concentration (the order-bearing content is close to the anchor;
+by T16+ the "?"-count floor itself explains what a probe reads).
+The two facts are complementary, not contradictory: shuffling T32
+context destroys the near-anchor arrangement it contains.
+
+l0 bands in-band (pooled 5.88–7.92; post = the 8/T signature; tsae
+6.64; sae 4.50); no under-band cells among landed. dq Q1-violation
+context (register conversion) is why sae's own baseline is 0.228 —
+the margin, floors and untrained receipt carry the claim, exactly
+as the card § 3 planned. Re-pass addendum will fill: stacked T8/T32,
+pre T32 (s1 tr, s2 untr), post T16/T32 heavies — none touch the
+claiming cell.
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_
