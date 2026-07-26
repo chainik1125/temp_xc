@@ -1,0 +1,2645 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "layer": 12,
+  "k_seg": 12,
+  "T": 12,
+  "d_sae": 4096,
+  "k": 8,
+  "steps": 2000,
+  "lr": 0.001,
+  "n_train": 800,
+  "n_test": 80,
+  "seed": 31415,
+  "dict_seed": 0,
+  "alphas": [
+    -2.0,
+    -1.0,
+    -0.5,
+    0.5,
+    1.0,
+    2.0
+  ],
+  "reading": {
+    "sae": {
+      "latent": 1492,
+      "auc": 1.0,
+      "auc_selection": 1.0
+    },
+    "txc": {
+      "latent": 3525,
+      "auc": 0.7379559874534607,
+      "auc_selection": 0.7264060378074646,
+      "nominal_k": 8
+    },
+    "tsae": {
+      "latent": 546,
+      "auc": 0.6906154751777649,
+      "auc_selection": 0.6638665795326233,
+      "rule": "topk",
+      "kval": 8,
+      "l1_coef": null
+    }
+  },
+  "sparsity": {
+    "sae": 7.986111164093018,
+    "txc": 8.454861323038736,
+    "txc_insample": 7.93002446492513,
+    "tsae": 8.0,
+    "tsae_pred": 191.97361755371094
+  },
+  "arms": {
+    "sae_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -1.0320492744445802,
+        -0.6055120468139649,
+        -0.29473023414611815,
+        0.12421579360961914,
+        0.09224276542663574,
+        -0.5141078472137451
+      ],
+      "sem": [
+        0.07063936629140063,
+        0.054180823850527936,
+        0.03303460418451792,
+        0.02670239976495898,
+        0.03491694054069754,
+        0.04825096743357406
+      ],
+      "n_docs": 80
+    },
+    "txc_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -1.6625525951385498,
+        -1.1222506523132325,
+        -0.6050334453582764,
+        0.31965436935424807,
+        0.2464848518371582,
+        -0.17621827125549316
+      ],
+      "sem": [
+        0.08035062406540068,
+        0.05358619078549423,
+        0.03391942459049406,
+        0.025083747853775124,
+        0.039179994490738015,
+        0.05207983157130987
+      ],
+      "n_docs": 80
+    },
+    "txc_flat": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.8594492435455322,
+        -0.4302555561065674,
+        -0.19127135276794432,
+        -0.090812349319458,
+        -0.32479243278503417,
+        -0.7659835815429688
+      ],
+      "sem": [
+        0.06194678326335606,
+        0.04388139652359298,
+        0.02862277629139744,
+        0.02667747500885803,
+        0.035491534476791896,
+        0.05854505215231672
+      ],
+      "n_docs": 80
+    },
+    "tsae_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.7516007423400879,
+        -0.29882469177246096,
+        -0.13431048393249512,
+        -0.12659592628479005,
+        -0.4343408584594727,
+        -1.0769826889038085
+      ],
+      "sem": [
+        0.05980713842731124,
+        0.03807169562082357,
+        0.025729168049426737,
+        0.0289437301891869,
+        0.048660936086726135,
+        0.07565465831060506
+      ],
+      "n_docs": 80
+    },
+    "dom_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -1.4949860572814941,
+        -1.5106110572814941,
+        -1.08794846534729,
+        0.27141718864440917,
+        0.3127578258514404,
+        -0.5155817985534668
+      ],
+      "sem": [
+        0.08282191887948034,
+        0.07969136855545812,
+        0.05034014021797613,
+        0.03783236755666951,
+        0.05550800993402981,
+        0.08062146571589723
+      ],
+      "n_docs": 80
+    },
+    "random_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.6003202438354492,
+        -0.31109013557434084,
+        -0.1348884105682373,
+        -0.005067586898803711,
+        -0.1362146854400635,
+        -0.6087379455566406
+      ],
+      "sem": [
+        0.060801318083973696,
+        0.03653928497448872,
+        0.026679234179305948,
+        0.01924770908652303,
+        0.02916035201762044,
+        0.04285876502456636
+      ],
+      "n_docs": 80
+    },
+    "random_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.8312575817108154,
+        -0.5079526901245117,
+        -0.2430805206298828,
+        0.11693406105041504,
+        0.08634085655212402,
+        -0.3868423938751221
+      ],
+      "sem": [
+        0.06445337392832885,
+        0.044605880724960925,
+        0.02582538053065213,
+        0.026137889359329296,
+        0.040225769450415616,
+        0.047070926686931615
+      ],
+      "n_docs": 80
+    },
+    "rank1_best": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -1.3199392318725587,
+        -1.680851650238037,
+        -1.2218944072723388,
+        0.31273617744445803,
+        0.2514556884765625,
+        -0.73979811668396
+      ],
+      "sem": [
+        0.0794391356294656,
+        0.08424949225177342,
+        0.05889064448531363,
+        0.046819397143820905,
+        0.060189193311174546,
+        0.07565003860897782
+      ],
+      "n_docs": 80
+    },
+    "sae_schedule": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.2665109634399414,
+        0.9116445541381836,
+        1.187661838531494,
+        -1.233796739578247,
+        -1.3442955493927002,
+        -1.2731066703796388
+      ],
+      "sem": [
+        0.06095878814164268,
+        0.07180487723883346,
+        0.0717995395043218,
+        0.075437161269244,
+        0.07661047416154128,
+        0.07755858432280678
+      ],
+      "n_docs": 80
+    },
+    "txc_profile_random": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.6869679450988769,
+        -0.12418909072875976,
+        0.015490055084228516,
+        -0.14996747970581054,
+        -0.4237371921539307,
+        -0.8052685737609864
+      ],
+      "sem": [
+        0.05416671529892437,
+        0.025288956664482883,
+        0.022428119670939495,
+        0.021381900991338167,
+        0.02631195525408834,
+        0.044949777361119915
+      ],
+      "n_docs": 80
+    },
+    "grad_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -2.163561391830444,
+        -3.0537233352661133,
+        -4.8675590515136715,
+        0.16033644676208497,
+        0.3710474967956543,
+        -0.06930956840515137
+      ],
+      "sem": [
+        0.10635565012827637,
+        0.12425056194602316,
+        0.12484806147498864,
+        0.13619177744407518,
+        0.11244350603870586,
+        0.09087623145317703
+      ],
+      "n_docs": 80
+    },
+    "grad_rank1": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -3.214987564086914,
+        -3.494466686248779,
+        -4.288650321960449,
+        0.19462203979492188,
+        0.30906004905700685,
+        -0.6098955631256103
+      ],
+      "sem": [
+        0.10493255767160065,
+        0.11554213993315725,
+        0.10494474847378349,
+        0.13485787053752474,
+        0.10724384195997218,
+        0.09481005601869212
+      ],
+      "n_docs": 80
+    },
+    "sae_schedule_grad": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -1.7244524002075194,
+        -2.21441969871521,
+        -1.9374645709991456,
+        0.6072135925292969,
+        -0.2446319580078125,
+        -1.0050365924835205
+      ],
+      "sem": [
+        0.0897157163759777,
+        0.11458787334793745,
+        0.10725023935585458,
+        0.04791700225192043,
+        0.054812917867455145,
+        0.08179356570135428
+      ],
+      "n_docs": 80
+    }
+  },
+  "rank": {
+    "r1": 0.5853706002235413,
+    "c": 0.20290490984916687,
+    "singular_values": [
+      0.7650951147079468,
+      0.5166910886764526,
+      0.21069413423538208,
+      0.18099012970924377,
+      0.13748657703399658,
+      0.11228616535663605
+    ]
+  },
+  "write_profile": {
+    "sae_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "txc_slab": [
+      0.24126632511615753,
+      0.23689521849155426,
+      0.24416391551494598,
+      0.2980639338493347,
+      0.42140302062034607,
+      0.258958637714386,
+      0.34675776958465576,
+      0.20236440002918243,
+      0.3122006356716156,
+      0.23611456155776978,
+      0.24408859014511108,
+      0.34435752034187317
+    ],
+    "txc_flat": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "tsae_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "dom_slab": [
+      0.09145234525203705,
+      0.0813206285238266,
+      0.5606743097305298,
+      0.2745254933834076,
+      0.23435096442699432,
+      0.22324755787849426,
+      0.22020967304706573,
+      0.18509037792682648,
+      0.1862875074148178,
+      0.5742561221122742,
+      0.15865838527679443,
+      0.13471192121505737
+    ],
+    "random_slab": [
+      0.28328660130500793,
+      0.29727062582969666,
+      0.2869153916835785,
+      0.29562973976135254,
+      0.2930002212524414,
+      0.2935020327568054,
+      0.2837707996368408,
+      0.28109994530677795,
+      0.2757468521595001,
+      0.28897789120674133,
+      0.2920341491699219,
+      0.29205724596977234
+    ],
+    "random_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "rank1_best": [
+      0.006238369736820459,
+      0.0061157578602433205,
+      0.693795919418335,
+      0.0038605723530054092,
+      0.010585712268948555,
+      0.014289520680904388,
+      0.017589841037988663,
+      0.019072256982326508,
+      0.008343266323208809,
+      0.7192888855934143,
+      0.009705664590001106,
+      0.005135096609592438
+    ],
+    "sae_schedule": [
+      0.010029204189777374,
+      0.01440431922674179,
+      0.4952556788921356,
+      0.04756484180688858,
+      0.005025801248848438,
+      0.025434112176299095,
+      0.059163738042116165,
+      0.05905461311340332,
+      0.05906442180275917,
+      0.8573240041732788,
+      0.06932725757360458,
+      0.03452933579683304
+    ],
+    "txc_profile_random": [
+      0.24126632511615753,
+      0.23689523339271545,
+      0.24416393041610718,
+      0.2980639338493347,
+      0.42140302062034607,
+      0.258958637714386,
+      0.34675776958465576,
+      0.20236440002918243,
+      0.3122006356716156,
+      0.23611456155776978,
+      0.24408860504627228,
+      0.34435752034187317
+    ],
+    "grad_slab": [
+      0.04077446088194847,
+      0.03595118969678879,
+      0.8864986300468445,
+      0.029632778838276863,
+      0.021812304854393005,
+      0.01964128017425537,
+      0.020418304949998856,
+      0.018601059913635254,
+      0.035973649471998215,
+      0.45503175258636475,
+      0.011424192227423191,
+      0.013564898632466793
+    ],
+    "grad_rank1": [
+      0.006465771701186895,
+      0.010429110378026962,
+      0.9051957130432129,
+      0.0026124485302716494,
+      0.003998088650405407,
+      0.004528741352260113,
+      0.005050020292401314,
+      0.0054411920718848705,
+      0.010954361408948898,
+      0.4245595633983612,
+      0.000648730609100312,
+      0.0006759139942005277
+    ],
+    "sae_schedule_grad": [
+      0.029824383556842804,
+      0.024868212640285492,
+      0.8874803781509399,
+      0.0049524009227752686,
+      0.011037176474928856,
+      0.011309637688100338,
+      0.007269229739904404,
+      0.006471467670053244,
+      0.0018099845619872212,
+      0.45879754424095154,
+      0.0006711689056828618,
+      0.0017162449657917023
+    ]
+  },
+  "rank_grad": {
+    "r1": 0.9494258165359497,
+    "c": 0.026067959144711494,
+    "singular_values": [
+      60.62372589111328,
+      13.054617881774902,
+      3.98272442817688,
+      2.4246153831481934,
+      1.4564565420150757,
+      0.808164656162262
+    ],
+    "n_grad": 24,
+    "cos_with_dom": 0.031009351834654808
+  },
+  "probe_mode": true,
+  "baseline_contrast": {
+    "mean": 1.5026544094085694,
+    "sem": 0.08661215183117017
+  },
+  "generations": {
+    "none": [
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: The session is set to light, so the lighting will be"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" to get more information) (Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. Is there"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content, which would"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for instructions) (Type \"exit\" to quit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for instructions) (Type \"exit\" to quit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need help with something specific."
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. Is there"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: The assistant is not currently speaking, but ready to answer questions"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: The assistant is not currently speaking, but ready to answer questions"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"Hello\" to start the conversation) (Type \"Good morning"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Note: This session is for the first time, so the transcript is"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or discuss? I'm here"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Please type your message here) [Type \"End\" to exit the"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Please type your message here)<|endoftext|>Human: What is the capital of"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      }
+    ],
+    "txc_slab": [
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: The session is set to light, so the lighting will be"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" to get more information) (Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content, which would"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) \nUser: Exit.\n"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for instructions) (Type \"exit\" to quit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to talk about or ask? I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need help with anything. I"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. \ud83d\ude0a"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: The assistant is not currently speaking, but ready to answer questions"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: The assistant is not currently speaking, but the conversation is set"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. Is there"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there something specific you would like to know or discuss? I'm here"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the conversation"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or discuss? I'm here"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content.) (Note"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Please type your message here)<|endoftext|>Human: What is the capital of"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation.) (Note:"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      }
+    ],
+    "sae_broadcast": [
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for instructions) (Type \"exit\" to quit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for instructions) (Type \"exit\" to quit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the prompt"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the prompt"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need help with something specific."
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to end the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: The assistant is not currently speaking, so the conversation is not"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"Hello\" to start the conversation) (Type \"Good morning"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      }
+    ],
+    "txc_flat": [
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: The session is set to light, so the lighting will be"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" to get more information) (Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content, which would"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content, which would"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for instructions) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for instructions) (Type \"exit\" to quit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the session) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the session) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session notes.) (Note"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to talk about or ask? I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. \ud83d\ude0a"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: The assistant is not currently speaking, but ready to answer questions"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session, as the session"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"Hi\" for a quick greeting) (Type \"Hello\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This session is for the first time, so the transcript is"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content.) (Note"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Please type your message here)<|endoftext|>Human: What is the capital of"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.5,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      }
+    ],
+    "dom_slab": [
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: The session is about setting up a workspace and logging in,"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: The session is set to light, so the lighting is turned"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. Is there"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content, which would"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content, which would"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the actual"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the conversation"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: The session is set to light, so the background color is"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the assistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to quit"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the session) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the conversation"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session notes.) (Note"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the conversation"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or talk about? I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the conversation"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need help with something specific."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: The assistant should not say \"Hello\" directly, but should"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: The assistant is not currently speaking, but the conversation is set"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session, as the session"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: The user's name is not provided in the given text,"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the conversation"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the prompt"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the prompt"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the conversation"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"Hello\" to start the conversation) (Type \"Good morning"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for help) (Type \"exit\" to exit"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"help\" for more information) (Type \"exit\" to"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual response, as the actual"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the session"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the prompt"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Is there anything specific you would like to know or discuss? I'm here"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual session content.) (Note"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you need any help or have any questions. \ud83d\ude0a"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any information. I'm"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need any help. I'm"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Please type your message here) [Type \"exit\" to exit the"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) [Type \"exit\""
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Note: This is a placeholder for the actual conversation, as the user"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? (Type \"exit\" to exit the conversation) (Type \"help\""
+      }
+    ]
+  },
+  "z": {
+    "txc_slab_vs_sae_broadcast": 5.3345727218235135,
+    "txc_slab_vs_tsae_broadcast": 11.651269312434298,
+    "txc_slab_vs_txc_flat": 11.209407468418128,
+    "txc_slab_vs_txc_profile_random": 9.039487643639085,
+    "txc_slab_vs_random_slab": 10.270311239324306,
+    "txc_slab_vs_random_broadcast": 5.595860117637546,
+    "txc_slab_vs_sae_schedule": -11.41288639715134,
+    "txc_slab_vs_rank1_best": 0.13024821846442575,
+    "txc_slab_vs_grad_slab": -0.4460923865152864,
+    "txc_slab_vs_grad_rank1": 0.09619110030997623,
+    "txc_slab_vs_sae_schedule_grad": -5.316759695476175
+  },
+  "win": true,
+  "task": "recency"
+}
