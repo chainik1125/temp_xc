@@ -1,4 +1,4 @@
-"""One number, computable before any dictionary is trained, predicts which architecture wins.
+"""Does the constant share of the optimal write predict which architecture wins?
 
 CAUTION, and it is why this figure exists rather than a table. `c` must be computed from the
 GRADIENT of the metric being reported, not from the difference-of-means slab. The two are
@@ -27,9 +27,13 @@ slab flattened, and a random constant direction. Every arm is at matched injecte
 swept symmetrically about zero so no arm is locked to the wrong sign, and matched on realised
 coefficients per segment measured out of sample.
 
-The previous sprint's headline task sits at the right-hand end, which is the retrospective
-explanation of why it was reported as a crosscoder win and is not one: a quarter of its
-optimal write is constant, so a constant write always had grip on it.
+Status of the claim, stated plainly because it is not settled. On the two tasks where c comes
+from the gradient it separates them cleanly and in the predicted direction -- the previous
+sprint's order task at c = 0.241 loses to a constant write, recency at c = 0.034 wins. On the
+difference-of-means points it does not order the tasks at all: the phase ladder at c = 0.006
+to 0.040 is a null or a loss throughout, and phase-1 at c = 0.040 loses by 19 points while
+recency at c = 0.035 wins. Whether that is the wrong c or a wrong hypothesis is settled by the
+gradient runs, not by this figure.
 
 Reads every results/txc_wins/*.json that carries a rank measurement.
 """
@@ -96,7 +100,7 @@ def main() -> int:
             fontsize=8.5, color="#555555", ha="right")
     ax.set_xlabel(r"$c$  —  share of the optimal write that is constant across positions")
     ax.set_ylabel("crosscoder slab  $-$  best constant write   (delta margin)")
-    ax.set_title("The constant share decides which architecture wins")
+    ax.set_title("Constant share against the crosscoder's margin over constant writes")
     ax.grid(alpha=0.25, lw=0.6)
     ax.legend(loc="upper right", fontsize=8, framealpha=0.95)
     fig.tight_layout()
