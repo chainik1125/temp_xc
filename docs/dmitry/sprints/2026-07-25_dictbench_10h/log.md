@@ -1382,3 +1382,40 @@ Rerunning with `l1_coef` swept over {0.03, 0.1, 0.3, 1, 3} to find the range whe
 The lesson generalises past this arm: an L1 arm cannot be dropped into a new activation
 distribution at its published coefficient, and the realised-L0 check that this sprint
 introduced for the crosscoder catches it immediately.
+
+## Where the crosscoder's advantage actually is, and where to look next
+
+Restating the sprint's purpose: find a setting where the crosscoder has a genuine advantage,
+not merely benchmark it. Taking stock of what is established.
+
+**An advantage that is proven, and provably not closable by better per-token training.** In
+the synthetic lane, a per-token dictionary recovers an extent-L feature at exactly
+`‖largest contiguous T-chunk of p‖/‖p‖` — 0.481 at L=8, matched to three decimals — and the
+crosscoder reaches 0.905. This is geometry, not optimisation: no amount of capacity, tuning
+or training moves the per-token ceiling.
+
+**An advantage that is measured, on the project's actual use case.** The frozen-arm shuffle
+control: take a trained crosscoder latent, permute its decoder rows in time, refit nothing,
+and steering fidelity falls from +0.242 to a null of +0.002 ± 0.103 over 24 draws — 100th
+percentile. Replicated on a healthier dictionary at +0.292 against −0.008 ± 0.114, on a
+different latent. The temporal arrangement of a single latent carries steering signal that
+permutation destroys, and a per-token dictionary has no single latent that represents
+arrangement at all.
+
+**A disadvantage that is real.** At matched realised coefficients per segment on layer-14
+LM activations, the crosscoder reconstructs 1.2-2.7× worse and reads the window-level factor
+no better (0.72-0.73 against 0.72-0.79).
+
+**The obstruction that reconciles them, and the next experiment.** A mid-stack token
+representation has already attended over its predecessors, so cross-segment structure in the
+*text* has largely been integrated into each token's own activation by layer 14. The
+features are effectively extent-1 in activation space, which is exactly the regime where the
+synthetic lane says a window code buys nothing. The per-token SAE's window-AUC of 0.72-0.79
+is that integration made visible: it is reading context the model already folded in.
+
+If that is right, the crosscoder's headroom should be a function of depth, and
+`layer_modal.py` tests it across layers 2, 6, 14, 22 with everything else fixed. Registered:
+D1 the FVU penalty shrinks at early layers; D2 the SAE's own window-AUC *rises* with depth,
+which is the signature of the model doing the integration; D3 at the earliest layer the
+crosscoder beats the SAE on window-AUC. D3 is the one that would count as a genuine
+advantage on real activations, and D1 and D2 can both hold without it.
