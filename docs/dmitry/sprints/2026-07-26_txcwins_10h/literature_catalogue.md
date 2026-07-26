@@ -547,11 +547,20 @@ attack is carried by the arrangement.
 **Temporal signature.** Crescendo works by "leveraging the model's inherent tendency to adapt
 to recent input, particularly content it generates itself" — an across-turn accumulation.
 
-**P1 — exact**: same turns, escalating vs shuffled order. The ablation exists in the
-literature. **Verify the direction before relying on it** — one search result reported that
-shuffling *increases* attack success, which if true is still a valid foil (behaviour differs at
-matched multiset) but contradicts the naive escalation story and must be stated. Flagged
-unverified.
+**P1 — exact by construction**: same turns, escalating versus shuffled order.
+
+**Correction on the ablation, after checking.** I earlier recorded that a turn-shuffling
+ablation exists in the literature, on the strength of a search summary. I could not confirm it.
+The Crescendo abstract does not mention one, and NEXUS ([arXiv:2510.03417](https://arxiv.org/abs/2510.03417),
+Rafiei Asl, Narula, Ghasemigol, Blanco, Takabi, EMNLP 2025 — verified as a real paper reporting
+2.1–19.4% improvement over prior methods) does not mention one either at abstract level. The
+search summary that reported "shuffling increases attack success" conflated sources and should
+not be relied on.
+
+Practical effect: **the foil is ours to build, not inherited.** That costs this entry the
+"pre-legitimised control" advantage that instances A and C of the permutation family have, and
+is a further reason it sits below them. It remains an exact multiset match by construction — we
+just cannot cite anyone else for having run it.
 
 **P2 — passes.** Suppressing the attack means writing against accumulated permissiveness in
 the later turns while leaving benign early turns alone; the uniform write is a blunt global
@@ -838,10 +847,21 @@ measured on a completely different task.
   2410.13497, 2102.09690, 2309.03882, 2406.07358, 2405.19550, 2404.01833, 2305.02363,
   2502.17424, 2507.21509, 2310.13548, 2305.04388, 2507.12638.
 - **Verified in the 2026-07-23 sweep, carried over:** 2605.12726, 2510.20487, 2606.30449.
+- **Also verified this session:** 2511.09700 (Li et al., order variance comparable to
+  example-set variance, 0.5B–27B), 2510.03417 (NEXUS, EMNLP 2025 — confirmed real, but the
+  turn-shuffle ablation attributed to it could *not* be confirmed).
+- **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
+  not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
+  guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
   2504.01100, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2607.01033, 2502.02180,
-  2506.18167, 2605.07984, 2410.09102, 2511.04694, 2408.15221, 2510.03417, 2605.01687,
-  2605.02647, 2606.08644, 2311.02282, 2507.02737, 2605.26537, 2604.26206.
+  2506.18167, 2605.07984, 2410.09102, 2511.04694, 2408.15221, 2605.01687,
+  2605.02647, 2606.08644, 2507.02737, 2605.26537, 2604.26206, 2506.01926, 2603.03258,
+  2601.04170, 2604.11978, 2605.03907, 2603.05805, 2606.26474, 2512.02194.
+- **Claims withdrawn on checking:** that a published turn-shuffle ablation exists for
+  crescendo-style attacks (could not confirm in Crescendo or NEXUS); that R-GSM is
+  multiset-matched (it permits word edits); that EM is carried by a single unified linear
+  direction (it is a transferable direction from a 9-adapter organism).
 
 ### Changelog
 
@@ -899,3 +919,10 @@ Times are wall-clock against the sprint window opening at 2026-07-25 22:33 PDT.
   perturbation consistency), `k` of 4–8 rather than many-shot (order sensitivity falls as
   demonstrations grow), classification tasks — and recorded the order-selection oracle as both
   ceiling and rival baseline.
+- **Pass 11** (23:30 PDT) — citation-integrity round. Corrected the Roger & Greenblatt id
+  (2310.18512, not the 2311.02282 I had guessed, which is a spark-plug fault-diagnosis paper).
+  Withdrew the claim that a published turn-shuffle ablation exists for crescendo-style attacks —
+  not in Crescendo's abstract, not in NEXUS's; the search summary that reported it conflated
+  sources — so that foil is ours to build rather than inherited, which costs the entry its
+  pre-legitimised-control advantage. Added the "claims withdrawn on checking" tier to the
+  ledger.

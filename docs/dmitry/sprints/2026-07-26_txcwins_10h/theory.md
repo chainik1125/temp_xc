@@ -220,6 +220,44 @@ coincide on this task and the DoM-based numbers stand; if it is low, that is its
 line, since the steering literature routinely uses difference-of-means as though it were the
 gradient.
 
+### `c` is the reading result and the steering result in one number
+
+A linear probe on mean-pooled activations separates the two classes if and only if
+`mean_t P[t] ≠ 0` — which is exactly the condition `c > 0`. So:
+
+> **`c = 0` ⟺ a linear pooled per-token probe is at chance. A task is steerable by a constant
+> write exactly to the extent that it is readable by pooling.**
+
+This ties the two halves of the project together and it is retroactively confirming. Last
+sprint's pooled SAE read the order label at AUC 0.998–1.000, which *already implied* `c > 0`
+on that task, which in turn implied `sae_broadcast > 0` — and the measured value was `+1.24`,
+small but positive. The reading result and the steering result were never independent.
+
+**Correction to the harness gate registered earlier in this document.** I wrote that
+`c = 0` exactly at every `m` in a rotation design and that a nonzero value indicates window
+mis-alignment. That is the *block algebra*, which assumes context-free representations. In a
+causal transformer position `t` of class A carries a different prefix from position `t` of
+class B, so the rows are not exactly antipodal and `c > 0` strictly. **The gate is `c < 0.1`,
+not `c ≈ 0`**, and measured `c` should be read as a quantification of the causal-history
+contribution rather than as a bug. Anyone who goes bug-hunting on a measured `c = 0.04`
+because of the earlier wording is chasing my error.
+
+**Registered prediction for the order task** (`m = 2`), before the number lands: `c ≈ 0.03`
+(range 0.005–0.12) and `r1 ≈ 0.93` (range 0.82–0.99). The derivation is that with `τ(ctx)`,
+`κ(ctx)` for tense and calm segments under context `ctx`,
+
+```text
+P_early = τ(T) − κ(C)          P_late = κ(T) − τ(C)
+Σ_t P[t] ∝ [τ(T) + κ(T)] − [τ(C) + κ(C)]
+```
+
+which is the tense-prefix-versus-calm-prefix contrast — zero only if representations are
+context-free. Consequences: `Δ(sae_profile_target)/Δ(txc_slab) ≈ sqrt(0.93) ≈ 0.96`, so a
+profile-steered SAE closes most but not all of last sprint's gap, and `1 − r1 ∈ [0.02, 0.15]`
+bounds the fraction of that result which was genuinely L3. **Falsifier:** measured
+`c < 1e-10`, which would refute the causal-history argument and mean representations are
+effectively context-free at this layer — surprising, and reportable in its own right.
+
 **Three numbers, three verdicts, before a single dictionary trains:**
 
 | screen | verdict |
@@ -272,6 +310,33 @@ is wrong from `m = 4` on.
 | 6 | 5 | 0.333 | 0.577 | 0.583 | 2 |
 | 12 | 11 | 0.167 | 0.408 | 0.322 | 1 |
 
+**These are a lower bound, not an equality.** The derivation assumes the block-mean matrix
+`B` has orthonormal rows. Real block means do not, and the effect always *inflates* `r1`,
+never deflates it — measured over 200 draws, `m = 3` gives 0.578 rather than 0.500 and
+`m = 12` gives 0.219 rather than 0.167. So the L3 headroom `1 − r1` is **smaller** than the
+ideal algebra promises. The inflation is a non-orthonormality and finite-sample effect rather
+than a correlation effect (ρ = 0, 0.5, 0.8 between block means all give ≈ 0.578 at `m = 3`),
+so it cannot be removed by choosing semantically dissimilar block types — but it *can* be
+reduced, and that is what the vocabulary choice below is for.
+
+Two consequences for how this is tested:
+
+- **Test the law against measured `r1`, never predicted `r1`.** That decouples the law
+  (`Δ_Π/Δ_full ≈ sqrt(energy share)`, a claim about linear response) from the spectrum (a
+  claim about block geometry, now known to be sensitive to a nuisance parameter). Tested
+  against the prediction, a failure is unattributable to either.
+- **The spectrum then becomes a separate, also-checkable prediction:** measured `r1` should
+  sit at or above the orthonormal bound, and the gap between them is a readout of how far the
+  block means are from orthogonal.
+
+**Vocabulary follows from this.** The original pools contained *calm* and *tense* — two poles
+of a single affective axis, whose difference is one dominant direction that mechanically
+inflates `σ₁` and eats exactly the headroom the design exists to create. They are replaced by
+twelve mutually distinct **technical** registers with no shared axis (mechanical, legal,
+culinary, astronomical, nautical, musical, geological, textile, veterinary, architectural,
+meteorological, numismatic) in
+`experiments/temporal_screen/txc_wins/designs_theory.py`.
+
 Three consequences for the design, none of which were visible before doing the arithmetic:
 
 - **`m = 4` is a wasted rung.** It has the same `r1` as `m = 3`, because `σ²` is
@@ -319,8 +384,32 @@ in `block_geometry` and shifts measured `r1` above the closed form. That is a me
 reportable deviation rather than a hidden one.
 
 Run the grouped ladder as the headline and the naive one as a robustness check if time allows.
-Note `m = 12` is unavailable in the grouped form without twelve registers, which is a second
-reason to treat it as optional.
+
+**With twelve registers the grouping can be made exact rather than approximate.** The
+groupings are built so that group size equals block length at every `m` — 6/6, 4/4, 3/3, 2/2,
+1/1 — so drawing each block as a *permutation* of its group rather than sampling with
+replacement puts all twelve registers into every document exactly once at every `m`. Register
+composition is then matched **identically** across the ladder rather than in expectation, and
+each block's content vector is exactly its group mean with no sampling noise, which tightens
+the difference slab the whole rank argument is computed from.
+
+### The phase ladder is a different experiment, and cannot reach L3
+
+A natural-looking variant is to hold the vocabulary at two pools and sweep the number of
+switches (1, 3, 5, 11) with the foil built as a rotation by one block. It is **not** the
+rotation ladder at `m = 2, 4, 6, 12`, and the difference is decisive: with only two distinct
+block content vectors the difference rows are `±(a − b)` whatever the block length, so it is
+**rank 1 at every rung**. Measured `r1 = 1.0000` and rank 1 at all four switch counts, against
+rank 1, 2, 3, 5, 11 for the rotation ladder at `m = 2, 3, 4, 6, 12`.
+
+So every rung of the phase ladder ties against `sae_profile_target` and the tSAE. It remains
+worth running, but for a different question — how the advantage over a *constant* write varies
+with the frequency the profile must resolve, which is also the natural test of the
+scales-longer-than-`T` scope limit in P10. Bill it as a mechanism experiment about the
+constant-write baseline, not as a candidate for a win over the strong baselines. Registered:
+advantage over `sae_broadcast` roughly flat across rungs, advantage over
+`sae_profile_target` zero at all of them, and the absolute effect degrading once the
+alternation period falls below the crosscoder's effective resolution.
 
 The `sqrt(r1)` law itself survived the check: under the linear-response assumption `G ∝ P`,
 the norm-matched rank-1 write recovers `sqrt(r1)` of the full effect to three decimals at

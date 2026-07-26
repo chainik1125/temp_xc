@@ -852,3 +852,53 @@ gap closed, which is the same improvement the best/worst-permutation design buys
 
 Family status: **A recommended**; B ruled out on token bias; D demoted to motivation only;
 C untested but shares A's verbatim property and is the natural backup.
+
+## 23:20 — correction: the phase-ladder and recency wins are over the WEAK baseline only
+
+A qualification to results already recorded above, and it should be applied before either is
+written up as a win.
+
+**The phase ladder is rank 1 at every rung.** With a fixed two-pool vocabulary there are only
+two distinct block content vectors, so the difference rows are ±(a−b) whatever the block
+length:
+
+| switches | block length | c | r1 | rank |
+| --- | --- | --- | --- | --- |
+| 1 | 6 | 8.7e-34 | 1.0000 | 1 |
+| 3 | 3 | 3.9e-34 | 1.0000 | 1 |
+| 5 | 2 | 0.0 | 1.0000 | 1 |
+| 11 | 1 | 0.0 | 1.0000 | 1 |
+
+against D1, where rank grows with m — 1, 2, 3, 5, 11 at m = 2, 3, 4, 6, 12.
+
+So the three winning ladder cells are wins over `sae_broadcast`, a **constant** write, and
+every rung is predicted to **tie** against `sae_profile_target` and the tSAE, which are
+rank-1 and therefore have exactly the expressiveness the task requires. They are mechanism
+results about the constant-write baseline, not wins over the strong baselines, and the log
+entry above should be read with that correction attached. **The same caveat applies to
+instruction recency** until its `r1` is measured — the gradient screen on recency now gates
+how that result may be described.
+
+This does not devalue the ladder: its purpose is a **frequency-response** question —
+separating "the advantage is just non-constancy" from "the advantage is about slow structure
+and decays with frequency" — which is orthogonal to rank and which D1 does not answer.
+Registered for it: advantage over `sae_broadcast` roughly flat across rungs, advantage over
+`sae_profile_target` **zero at every rung**, and the absolute effect degrading once the
+alternation period drops below the crosscoder's effective resolution.
+
+**Twelve topic-orthogonal registers** now replace the old block pools, acting on the
+non-orthonormality result. The old pools contained calm *and* tense — two poles of one
+affective axis, whose difference is a single dominant direction that mechanically inflated σ₁
+and consumed exactly the L3 headroom D1 exists to create. The replacement uses twelve
+technical registers with no shared axis, and `GROUPINGS12` sets group size equal to block
+length at every m, so all twelve appear exactly once per document at every rung. Two further
+benefits: each block's content vector is exactly its group mean with **no sampling noise**,
+and m stops being confounded with how many registers a document contains.
+
+Two details checked rather than assumed. `level` in D6 is deliberately **not**
+multiset-matched — that cell exists to show a constant write *can* reach a level target and
+the SAE *should* win it, so its absolute numbers are not comparable to `trend`'s and only the
+architecture ordering within each cell means anything. And D2/D2b use per-item clause
+repetition so documents read as natural text; theory verified this leaves the rank unchanged,
+since the difference matrix has the same distinct rows repeated and the Gram merely scales
+(m=3: r1 = 0.5000, rank 2, in both forms). Naturalness is free.
