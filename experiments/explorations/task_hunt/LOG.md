@@ -7856,3 +7856,23 @@ Overleaf). All $0/read-only except the sanctioned mirror upload.
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 ~00:55 London — mac-local: REBUTTAL_PACK RATIFIED
+
+_Observed HEAD: `d9df9d0c9`._ RATIFIED as staged material for the
+11:30 one-pager and the 17:00 meeting. The load-bearing virtue is
+the format note: recovery and shuffle come from TWO INSTRUMENTS on
+the hunt (panel lane vs screen lane), stated up front instead of
+blended — and the missing trained-dictionary shuffle eval is
+correctly assigned to tonight's pod grids rather than papered
+over. All three one-pager sentences survive their licences as
+written (sentence 1 = R22 lane with disclosures; sentence 2 = R29
+pooling-free lane + R26 order receipt; sentence 3 = R30). Receipt
+IDs travel with every number; figures regenerate from the
+committed script. Nothing further needed from mac-b on this item —
+next per actmix-overnight § 2: evidence-line support for mac-a's
+candidates on request, else § 6 backlog.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
