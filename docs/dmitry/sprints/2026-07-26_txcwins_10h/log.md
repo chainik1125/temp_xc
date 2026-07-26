@@ -1078,3 +1078,42 @@ on phase-5 and +28.15 on phase-11, both scored in ordering mode, against +8.19 o
 probe mode. Percent-of-ceiling is not comparable across those two scoring modes, which is
 exactly why the ordering-mode control on recency is needed before the 87%-vs-14% contrast can
 be stated at all.
+
+## 23:16 — a calibration that would have produced a false negative
+
+The demonstration-order go/no-go as I first specified it was underpowered, and running it
+would have looked exactly like a clean negative.
+
+Li et al. (arXiv:2511.09700) measure order sensitivity as the standard deviation of accuracy
+across permutations: the average is **0.0197, about two accuracy points**, against a selection
+sensitivity of 0.0225. Lu et al.'s "near state-of-the-art to random guess" is the **tail** of
+that distribution, not the typical case — a random pair of orderings differs by a couple of
+points. Their own protocol reflects it: `M=10` sets × `P=10` permutations to *estimate*
+sensitivity, but **`P=128` permutations when they want to find a strong ordering.**
+
+So the search needs ~128 permutations rather than the ~24 I passed on. Still forward passes
+only. The design is unchanged and still right — the whole reason for taking the best/worst
+pair is that the *typical* gap is too small to steer against — but the extremes have to be
+genuinely extreme, and **a 2-point spread from a 24-permutation search reads as "underpowered
+search", not "no effect".** Recorded explicitly because that failure mode is
+indistinguishable from a real negative unless it is anticipated.
+
+Helpful details from the same paper: the task set is AG News, NYT-Topics, NYT-Locations,
+DBPedia and MMLU for classification; the models include **Qwen2.5**, the harness's own family;
+and smaller models show "marginally higher variability", which works in our favour at 1.5B.
+
+**A fallback recorded in case demonstration order does not clear: LLM-as-judge position
+bias.** Judges pick the first-slot response in ~68% of comparisons even where humans prefer
+the second (Zheng et al., MT-Bench; scaled by Shi et al. across 15 judges and ~150k
+instances). Its appeal is that the standard mitigation — invoke the judge twice with
+candidates swapped — means **a multiset-matched permutation pair is already what careful
+practitioners run**, so the foil is inherited rather than built. It also avoids MCQ's failure
+mode, since the swapped items are long content blocks rather than single label tokens, though
+the verdict is still emitted as a label token so token bias could re-enter. Needs a 7B judge,
+so it is the fallback rather than the first choice.
+
+Steganography demoted to a future entry: frontier models "are unable to encode short messages
+in their outputs without a monitor noticing under standard affordances" (arXiv:2507.02737),
+so no organism exists at a scale this sprint could reach. Its structural argument — a payload
+carried in sentence arrangement is invisible to any per-position readout by construction —
+remains the most elegant in the catalogue and is kept on that basis.

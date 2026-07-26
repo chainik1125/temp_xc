@@ -67,6 +67,21 @@ five negative results into the argument for the one positive one. It is also dir
 falsifiable: find a behaviour with no matched-multiset structure where a window code wins on
 steering, and the claim is wrong.
 
+**A second, independent reason to prefer the organism-free tasks.** Szablewski et al., *The
+Model Organism Lottery*, July 2026 ([arXiv:2607.01033](https://arxiv.org/abs/2607.01033) —
+verified) benchmark four interpretability techniques — activation oracles, **steering**, logit
+lens and **sparse autoencoders** — across **54 model-organism variants**, and find that
+"MO interpretability depends strongly on training objective, target behaviour, model
+architecture, and training data generation pipeline", with significant variance remaining after
+controlling for behaviour strength, and that "integrated training often yields less
+interpretable MOs than standard post-hoc methods". In other words a dictionary result measured
+on a post-hoc-trained organism may be an artefact of how the organism was made, and the more
+realistic the organism, the harder interpretability gets.
+
+Every priority-4-and-above entry in this catalogue except backtracking needs **no model organism
+at all** — the behaviour is elicited from a stock pretrained model by the prompt alone. That was
+originally a convenience argument; after this paper it is a validity argument.
+
 ### The concrete recommendation, if one task has to be picked
 
 **Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =
@@ -848,7 +863,7 @@ organisms are thin.
 | paper | what it gives us |
 | --- | --- |
 | Roger & Greenblatt, *Preventing Language Models From Hiding Their Reasoning*, 2023 ([arXiv:2310.18512](https://arxiv.org/abs/2310.18512)) — **id corrected**, see note | the encoded-reasoning threat model and the paraphrasing defence |
-| *Large language models can learn and generalize steganographic chain-of-thought under process supervision*, 2025 ([arXiv:2506.01926](https://arxiv.org/abs/2506.01926)) — id unverified | the closest thing to a *recipe for a model organism*: encoded CoT induced by process supervision, and it generalises |
+| Skaf et al., *Large language models can learn and generalize steganographic chain-of-thought under process supervision*, 2025 ([arXiv:2506.01926](https://arxiv.org/abs/2506.01926)) — verified | the closest thing to a *recipe* for an organism: penalise specific strings in reasoning traces and models "develop encoded alternative expressions rather than changing their underlying approach", and crucially generalise — "when the penalized strings belong to an overarching class, the model learns not only to substitute strings seen in training, but also develops a general encoding scheme for all members of the class". No model sizes or organism release stated in the abstract |
 | Zolkowski, Nishimura-Gasparian, McCarthy, Zimmermann, Lindner, *Early Signs of Steganographic Capabilities in Frontier LLMs*, 2025 ([arXiv:2507.02737](https://arxiv.org/abs/2507.02737)) — verified | the capability gate, and it closes this entry for tonight: "current models are unable to encode short messages in their outputs without a monitor noticing under standard affordances", succeeding only "if given additional affordances like using an unmonitored scratchpad and coordinating on what encoding scheme to use" |
 | *Conceptual Steganography*, 2026 ([arXiv:2605.26537](https://arxiv.org/abs/2605.26537)) — id unverified | payloads carried by patterns of reasoning behaviour rather than lexical choice — the shape closest to a temporal factor |
 
@@ -885,7 +900,8 @@ nobody has tried to *steer* an armed state — but the weakest temporal story.
 | van der Weij et al., *AI Sandbagging: Language Models can Strategically Underperform on Evaluations*, 2024 ([arXiv:2406.07358](https://arxiv.org/abs/2406.07358)) | the defining paper; a Llama-3-8B-Instruct organism with passphrase-dependent underperformance on hazardous-domain questions |
 | Greenblatt et al., *Stress-Testing Capability Elicitation With Password-Locked Models*, 2024 ([arXiv:2405.19550](https://arxiv.org/abs/2405.19550)) | password-locked organisms and the elicitation framing |
 | *The Elicitation Game*, 2025 ([arXiv:2502.02180](https://arxiv.org/abs/2502.02180)) — id unverified | evaluation of elicitation techniques across organisms |
-| *AuditBench* ([arXiv:2602.22755](https://arxiv.org/abs/2602.22755)), *The Model Organism Lottery* ([arXiv:2607.01033](https://arxiv.org/abs/2607.01033)) — ids unverified | 2026 collections of hidden-behaviour organisms; the latter warns interpretability results depend strongly on how the organism was trained |
+| *AuditBench* ([arXiv:2602.22755](https://arxiv.org/abs/2602.22755)) — id unverified | 2026 collection of hidden-behaviour organisms |
+| Szablewski, Konar-Steenberg, Fornasiere, Menon, Heimersheim, *The Model Organism Lottery: Model Organism Interpretability Strongly Depends on Training Methodology*, July 2026 ([arXiv:2607.01033](https://arxiv.org/abs/2607.01033)) — verified | the warning, and it is severe: across **54 variants** benchmarked with four interpretability techniques — activation oracles, **steering**, logit lens and **sparse autoencoders** — "MO interpretability depends strongly on training objective, target behaviour, model architecture, and training data generation pipeline", with significant variance persisting after accounting for behaviour strength, and "**integrated training often yields less interpretable MOs than standard post-hoc methods**" |
 | *Option-Order Randomisation Reveals a Distributional Position Attractor in Prompted Sandbagging* ([arXiv:2604.26206](https://arxiv.org/abs/2604.26206)) — verified | links sandbagging to the option-order family, and quantifies how strong a purely positional prior can be: under sandbagging instructions the model enters "a low-entropy response-position basin centred on E/F/G that is highly stable and largely content-invariant", holding under complete content rotation across 2,000 items (Pearson r = 0.9994, JSD = 0.027), with accuracy of **72.1% when the correct answer lands in the preferred position E against 4.3% at position A**, in 7–9B models |
 
 That last result cuts both ways and is worth reading carefully before anyone revisits MCQ option
