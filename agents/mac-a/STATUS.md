@@ -1,7 +1,12 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~19:50 London define-clock (local ≈ 70 min ahead) —
-SALVAGE W1 + TOP-UP BOTH COMPLETE. Idle watch until stood down.**
+**2026-07-26 ~19:15 London define-clock (local ≈ 70 min ahead) —
+SPRINT CLOSED (df8043d6d): top-up KEEP + R29 RATIFIED, quote licence
+issued (L1 pooling-free = caveat-free headline; L2 only with the
+sequential sentence; sae-l0 note travels; fig4 APPROVED for WRITEUP
+§4). My briefing salvage-mac-a.md deleted (executed convention).
+Idle watch until stood down — nothing in flight, no open asks on
+mac-a.**
 
 ## Delivered this evening (chronological; everything pushed)
 
