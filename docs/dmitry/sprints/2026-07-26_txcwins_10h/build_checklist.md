@@ -146,6 +146,15 @@ reasoning.
    demonstrations it then steers is a far more plausible lookup, because demonstrations are longer
    and more distinctive. This is the difference between a result about a mechanism and a result
    about a corpus.
+
+   **Hold out the filler, not the factor.** As written this item is over-broad. The content that
+   must be disjoint is everything *except* the manipulated factor — in `recency` the two
+   instructions appear in both classes of every document with only their positions swapped, so a
+   latent keyed to instruction identity cannot separate class A from class B at all, and holding
+   them out is both impossible and unnecessary. The filler is the only content a lookup story could
+   key on, so the filler is what the split has to cover. A verification that reports non-zero
+   train/eval overlap should be checked against *which* items overlap before it is treated as a
+   hole.
 9. **Carry over the existing controls unchanged** — time-averaged profile, random profile, random
    direction, row-permuted profile, supervised difference-of-means **reference** (not a ceiling — see below). They are already in
    `steer_order_modal.py`.

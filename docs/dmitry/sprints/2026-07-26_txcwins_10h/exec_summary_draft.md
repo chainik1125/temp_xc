@@ -268,13 +268,16 @@ demonstration-order task built *after* the prediction was registered, where `r1(
 would have discarded it and `r1(Ḡ)` = 0.59 says it has the second-most rank headroom in the sprint.
 
 **It establishes a classifier, not a ranking.** The deltas are on different scales across tasks,
-so what the screen is being asked to do is call the **sign**, not order the magnitudes. **A
-threshold at `c` = 0.14 classifies 6 of 7.** The single inversion is the adjacent pair `rotate6`
-(0.134, loses) and evidence (0.143, wins), which differ by 0.009 — so `evidence` is a boundary
-case next to a loss rather than an outlier inside the win region, which is the honest picture of a
-real but imperfect threshold. Reported as a rank correlation on magnitudes instead, τ = −0.52,
-dragged down by `rotate6`'s large negative — a fact about that task's effect size rather than
-about the screen.
+so what the screen is asked to do is call the **sign**, not order the magnitudes. **The best
+threshold classifies 6 of 7**, and no threshold does better, because `rotate6` (`c` = 0.134,
+loses) and evidence (`c` = 0.143, wins) are inverted against each other 0.009 apart. Any cut below
+0.134 or above 0.15 gets six and misses one of that pair; **a cut at 0.14 falls between them and
+gets five**, which is the worst available choice and is the one drawn in `c_gate.png`.
+
+So `evidence` is a boundary case adjacent to a loss rather than an outlier inside the win region —
+the honest picture of a real but imperfect threshold. As a rank correlation on magnitudes instead,
+τ = −0.52, dragged down by `rotate6`'s large negative, which is a fact about that task's effect
+size rather than about the screen.
 
 **It does not establish a quantitative law.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order**
 quantity, odd in α — but the constant arms measure **72–80% even**, i.e. mostly curvature. So the
