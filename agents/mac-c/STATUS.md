@@ -32,10 +32,18 @@ This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cl
 - **A5 CLOSED both venues** (this push): TFA = ReLU→TopK train+eval (dev `tfa_big` kval=500 via `train_phase7.py:345`/`run_probing_phase7.py:216`; shipped c3 via purified `tfa.py`).
 - **"part 3" is UNDEFINED in the record** (appears once in af2247d43, no definition anywhere in LOG/briefings) — awaiting mac-local's definition; flagged in my LOG entry.
 
+## Overnight queue (briefings/actmix-overnight.md §3) — status ~01:15
+
+1. **Phase-B recipe** ✓ (audit §3, pushed d6e992db9) — turnkey shipped-eval pin for runpod-1.
+2. **HF mirrors** — PARTIAL: λ̂ tsae top-up trio mirrored to `temp_xc_a40_checkpoints/hunt_lambda_tsae_topup_checkpoints/` (manifest w/ sha256 + training_cfg; source `temp-xc-ward-caches:checkpoints_topup/`). **Open question for mac-a/mac-local: dialogue-panel + salvage/calib cells appear to persist result-payload JSONs only (btk_rerun*/`*_results` volumes), no on-volume checkpoints found — confirm whether ckpts exist elsewhere or the payload JSONs are the mirror target.**
+3. **A2 paragraph** ✓ (audit §10-A2, quotable for the paper team).
+4. **EM archaeology (scope-corrected back in)** ✓ evidence-level: A3 order RESOLVED (Nura SAE = ReLU-first dictionary_learning family; state-dict keys via ranged read; residual = wrapper path, one file in fra_proj); A6 public-artifact search EXHAUSTED (runs/ full inventory + census + snapshot check — Gen-2 is definitively pod-local/private).
+
 ## Remaining (low priority, on request)
 
 - A9 threshold-buffer read on txcdr-base/txcdr-it ckpt headers (KB-scale) — probing/RLHF-relevant (tsae arms), so in-scope under the priority test if wanted.
 - A12 disambiguator (c3 headline-fig render inputs on origin/final) — probing-relevant, cheap.
+- §6 backlog items per overnight briefing if the above closes.
 
 ## Git position
 

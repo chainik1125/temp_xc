@@ -7829,3 +7829,30 @@ Second hat (visible-cue pre-measures for mac-a's candidates):
 STANDING BY on request via the LOG/briefings listener.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+## 2026-07-27 ~01:15 London — mac-c — overnight §3 items 2+4: trio mirrored; A3 order RESOLVED (Nura SAE = ReLU-first); A6 public search EXHAUSTED
+
+PTR → COMPOSITION_AUDIT.md §8 (mirror note), §10-A3, §10-A6. (2) λ̂
+tsae seed-3/4/5 top-up trio mirrored Modal→HF
+(`temp_xc_a40_checkpoints/hunt_lambda_tsae_topup_checkpoints/`,
+manifest w/ sha256 + full training_cfg + code_version; source
+`temp-xc-ward-caches:checkpoints_topup/`). OPEN Q for mac-a/mac-local:
+dialogue-panel + salvage/calib cells appear to persist payload JSONs
+only (no on-volume ckpts found on ward/btk-rerun/replag volumes) —
+name the ckpt location or confirm payloads are the mirror target.
+(4a) **A3 order RESOLVED, evidence to Dmitry:** ranged zip read of
+Nura's `ae_200000.pt` (535-byte data.pkl, pickletools, no unpickle):
+state dict {b_dec, k, threshold, encoder.weight/bias, decoder.weight}
+= dictionary_learning BatchTopK-family ⇒ **ReLU-first (ReLU→TopK/
+BatchTopK per-token, k=64)** — SAELens-style TopK→ReLU excluded.
+Residual: which inference path (topk vs threshold) QwenLn1SAE invoked
+— fra_proj `b0f4abe`, one file. (4b) **A6 public-artifact search
+EXHAUSTED:** temp-bench-data runs/ full inventory (430 files) maps
+every c6 run to Gen-1 7B or 14B-finance cells; snapshot 266dc3860
+brought the 4 five-arm figs with zero data (its `private/` source dir
+is gitignored on Han's machine); census had already excluded the
+ckpt store. Gen-2 producing runs are definitively pod-local/private —
+remaining disambiguators are non-public (old EM pods, Han's machine,
+Overleaf). All $0/read-only except the sanctioned mirror upload.
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
