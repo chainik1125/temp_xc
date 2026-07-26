@@ -267,6 +267,14 @@ Written to be lifted verbatim. For each claim the sprint might want to make: the
 sentence, the sentence that is not, and the citation that separates them. Getting this right in
 advance is cheaper than red-teaming it at 07:30.
 
+**The standard being applied.** A claim goes in the ✅ column only if a measurement supports it as
+stated. Where a control is *designed* to remove a confound but has not been *shown* to have removed
+it, the defensible sentence says "constructed so that the known handles are removed", not "provably
+at chance". This is why the prompt-order entry below marks our own preferred phrasing as
+indefensible: it is the sentence this project would drift into, and upgrading it costs one backward
+pass. The same test should be applied to every sentence in the write-up — including the ones in
+this catalogue, which is why the `c` claim above was weakened after `evidence` won at `c` = 0.136.
+
 **On the mechanism (position-varying writes).**
 
 | | |
@@ -319,8 +327,15 @@ advance is cheaper than red-teaming it at 07:30.
 
 Main's request: make the rankings falsifiable rather than editorial by predicting `c` — the
 constant-subspace share of the margin gradient — for each entry from the literature, so that
-every entry actually screened yields a check on the prediction. Coarse bands, with the citation
-that drives each.
+every entry actually screened yields a check. Coarse bands, with the citation that drives each.
+
+**Read these as a *ranking*, not as predictions of outcome.** Across 13 measured tasks the
+association between `c` and the crosscoder's margin over the best constant write is
+**Kendall τ = −0.58** — real, and not a rule. It has a false negative (`evidence` wins at
+`c` = 0.136 by the sprint's largest margin) and a false positive (`phase11` at `c` = 0.050 does
+not win). So the bands below say which entries are *more likely* to have a constant handle than
+which others; scoring them against a threshold rule the data does not support would misrepresent
+the instrument.
 
 | entry | predicted `c` | what drives the prediction |
 | --- | --- | --- |
@@ -338,12 +353,30 @@ that drives each.
 | per-section style scheduling | **low** | balanced profile over segments; measured broadcast at or below zero |
 | permutation composition | **low** | order-dependent by definition |
 
-**Calibration now possible.** Measured `c` exists for several tasks and the ordering matches:
-`recency` at 0.035 and the phase ladder at 0.006–0.040 (crosscoder wins or null), `evidence` at
-0.136, `recency_var` at 0.141 (SAE wins), `order` at 0.241 (constant writes win). The predictions
-above are on the same scale and should be scored against measurements as they arrive. If
-literature-derived bands track measured `c` across three or four more tasks, the catalogue screens
-candidate behaviours without running anything — which is more useful than any single task outcome.
+**Calibration, on the gradient slab — and `c` has a known false negative.** An earlier version of
+this section quoted `c` values computed from the **difference-of-means** slab. Those are retracted:
+DoM measures near-orthogonal to the metric gradient (`cos` = 0.057, 0.096, 0.190 across the
+rotation ladder) and did not order outcomes on the full set. The gradient values:
+
+| task | `c` (gradient) | z(txc vs sae) | outcome |
+| --- | --- | --- | --- |
+| rotate12 | 0.033 | +9.8 | wins |
+| recency | 0.037 | +18.0 | wins |
+| rotate6 | 0.102 | −7.5 | loses |
+| recency_var | 0.112 | −2.4 | loses |
+| **evidence** | **0.136** | **+29.7** | **wins — the false negative** |
+| rotate2 / rotate3 / order | 0.163 / 0.179 / 0.241 | −1.0 / −2.9 / +1.4 | no win |
+
+**`c` is a screen with a known false negative: it would have told us not to run the task that
+produced the largest margin in the sprint.** State it that way. A low `c` has predicted a win in
+every case; a high `c` has not reliably predicted a loss. So `c` is a good *positive* filter and an
+unreliable *negative* one, which is the weaker and correct claim.
+
+The literature-derived bands above are on the same scale and should be scored **as a rank
+correlation** as measurements arrive, not as hit-rate against a threshold. Note also that **metric family does not predict the outcome**: `rotate12` is an
+ordering-mode task and the crosscoder wins it at z = 9.8, so metric mode acts *through* `c` rather
+than independently. Any framing of the form "wins under a metric that cancels constant writes,
+loses under one that does not" is refuted.
 
 ### The cycle rule, checked against the two surviving tasks
 
@@ -356,12 +389,108 @@ the numbers.
 | `recency` | transposition of two fixed positions, `k−2` fillers identical | **1** | 0.813 | **−7.36** |
 | `evidence` | swap of two size-`k/2` blocks = `k/2` disjoint transpositions | **6** | 0.621 | **+8.66** |
 
-The ordering holds and the sign of the rank-1 comparison flips with it. Two riders. Recency's `r1`
+The ordering holds and the sign of the rank-1 comparison flips with it.
+
+**State the cycle rule as a lower bound, not with a caveat.** It counts only the swapped *content*,
+so wherever a downstream carried state exists the true rank is higher — recency's `r1 = 0.813 < 1`
+is that gap measured. It therefore under-predicts precisely where the content-plus-state
+construction applies, which is the construction being recommended.
+
+**And name the trap: beating `rank1_best` is not beating a rank-1 ceiling.** Both `rank1_best` and
+`grad_rank1` are rank 1; they differ only in which slab they truncate. `rank1_best` truncates a
+reference nearly orthogonal to the gradient, so beating it shows DoM is a poor reference, not that
+rank 1 is insufficient. `grad_rank1` is the ceiling, and the crosscoder loses to it decisively.
+Anyone skimming the table will reach for the wrong one.
+
+Two further riders. Recency's `r1`
 being below 1 at all is the *carried-state* contribution — the cycle rule counts only swapped
 content and undercounts whenever a downstream state exists. And on `evidence` the crosscoder beats
 `rank1_best` while losing to `grad_rank1` at z = −61.6, which is the sharpest available
 demonstration that difference-of-means is a **reference and not a ceiling**: it beats the
 reference-derived rank-1 write and loses to the gradient-derived one.
+
+### The constant arms are a second-order artefact — measured, no new compute
+
+Main asked for this to be checked rather than assumed. It is now checked, and the answer is clean.
+
+The difference-of-differences metric cancels a constant write **to first order only**. At second
+order the residual is `≈ ½α²(⟨v, H_A v⟩ − ⟨v, H_B v⟩)`, which is **even in α**. A genuine
+first-order directional effect is **odd** in α. So splitting each arm's dose response into even and
+odd parts about zero separates the two, and every number needed is already in the results files.
+
+Even-share, defined as `|even| / (|even| + |odd|)` averaged over the ±α pairs:
+
+| arm | `recency` | `evidence` |
+| --- | --- | --- |
+| `sae_broadcast` | **0.72** | **0.80** |
+| `tsae_broadcast` | 0.58 | 0.51 |
+| `txc_flat` | 0.41 | 0.30 |
+| `txc_slab` | **0.12** | **0.10** |
+| `grad_slab` | 0.17 | 0.01 |
+
+**On both surviving tasks the constant arm's response is dominantly even and the crosscoder's is
+dominantly odd.** `grad_slab` — the arm we know is the first-order optimum — is almost purely odd
+(0.17, 0.01), which is the internal control that makes the reading safe: the arm that must be
+first-order behaves like one, and the constant arms do not.
+
+Three consequences.
+
+1. **The `sae_broadcast` peaks of +2.67 and +1.32 are largely artefact**, not a measurement of what
+   a constant write can do. The crosscoder's advantage over that arm is therefore *understated*
+   rather than flattered.
+2. **It justifies quantitatively what the sprint had already concluded on other grounds**: the
+   honest per-token baseline is `sae_schedule`, not `sae_broadcast`. The constant arm is not a weak
+   baseline, it is a mis-specified one.
+3. **`tsae_broadcast` sits between the two** (0.58, 0.51), exactly as an architecture whose write is
+   constant in direction but activation-scheduled in magnitude should.
+
+The prediction I originally offered — that artefact size tracks `|score(A) + score(B)|` at
+baseline — could **not** be run: the results files store `baseline_contrast`, which is
+`score(A) − score(B)`, and not the per-condition scores. The even/odd decomposition tests the same
+hypothesis more directly and does not need them, so that is the version to use.
+
+### A linear-regime diagnostic, and what `rotate2` is telling us
+
+Main flagged that `grad_rank1` exceeds `grad_slab` at `rotate2`, "which should be impossible". It
+is impossible *to first order*, and the violation is diagnostic rather than a bug.
+
+Under linearity, with every write normalised to unit Frobenius norm, `Δ(W) = α⟨W, Ḡ⟩`. The full
+slab takes `W = Ḡ/‖Ḡ‖_F` and scores `α‖Ḡ‖_F`; the best rank-1 write takes `W = u₁v₁ᵀ` and scores
+`ασ₁`. So
+
+```text
+Δ(grad_slab) / Δ(grad_rank1) = ‖Ḡ‖_F / σ₁ = 1 / sqrt(r1)
+```
+
+and a ratio **below 1 cannot happen** while first-order reasoning holds. Measured, from the peak
+Δ in each results file:
+
+| cell | `r1` (grad) | grad_slab | grad_rank1 | observed ratio | `1/sqrt(r1)` |
+| --- | --- | --- | --- | --- | --- |
+| rotate3 | 0.266 | 102.41 | 58.05 | 1.76 | 1.94 |
+| rotate6 | 0.210 | 166.85 | 67.74 | 2.46 | 2.18 |
+| rotate12 | 0.177 | 275.21 | 102.46 | 2.69 | 2.38 |
+| **rotate2** | 0.304 | 76.02 | 109.98 | **0.69** | 1.81 |
+| **recency** | 0.813 | 9.79 | 11.52 | **0.85** | 1.11 |
+| **evidence** | 0.621 | 15.23 | 15.35 | **0.99** | 1.27 |
+
+The law holds within 9–13% at rotate3, rotate6 and rotate12 — which is itself a non-trivial check
+on `r1` being computed correctly. It is violated in exactly three cells, and the two explanations
+are different. For **recency and evidence** `r1` is high, so the predicted edge is only 1.11–1.27×
+and a modest second-order term flips it. For **rotate2** the predicted edge is 1.81× and the
+observed is 0.69 — a factor of 2.6 discrepancy that a small margin cannot excuse.
+
+The likely cause is visible in the magnitudes: on the rotation ladder the supervised gradient arms
+reach **Δ of 76 to 275** against the crosscoder's 2.86 to 18.23. At that scale the margin is fully
+flipped and both arms are deep in saturation, so a ratio taken at each arm's own peak dose is not
+measuring reachability at all. This is theory's own caution — read ratios "at the smallest dose
+showing a significant effect, not at each arm's best dose" — with the violation now visible as a
+number.
+
+**Recommendation, and it is cheap:** report the gradient arms at a **matched small dose**, and use
+the observed `grad_slab / grad_rank1` ratio as a running check. If it tracks `1/sqrt(r1)` the
+comparison is in the linear regime and `r1` means what it is supposed to mean; if it falls below 1
+the arms are saturated and no ratio computed there should be quoted.
 
 ### Rank-≥2 steering interventions: none published
 
@@ -374,9 +503,19 @@ else is a union of rank-1 writes: multi-attribute methods hold several direction
 them by *attribute* rather than by position index, and position-selection strategies apply one
 direction at chosen positions.
 
-**A fixed, plottable, rank-≥2 steering object learned as a single unit appears to be
-unpublished.** That is the whitespace claim in its sharpest form, and it also explains why no task
-has demanded one: the object does not exist yet.
+**The reframing that makes this useful** (theory's correction, and it inverts what I first wrote).
+The object is not missing — *we have one*. A crosscoder latent's slab **is** a fixed, plottable,
+rank-≥2 steering intervention learned as a single unit, which is exactly the category the search
+found unpublished. It is the first instance. What is missing is a **task on which it pays**. So:
+
+> A fixed rank-≥2 steering object learned as one unit is unpublished elsewhere; this project has
+> one. What it lacks is a demonstration that anything needs it — and the conditions such a
+> demonstration must satisfy are now specified: **rank ≥ 2, `c ≈ 0`, and the factor at consistent
+> positions across documents.**
+
+That turns an absence into a specification. The FLAS distinction is the load-bearing part:
+input-conditioned network versus fixed object is the line that makes the category non-empty but
+unoccupied, and it should survive into the write-up in those terms.
 
 ### The second gate: rank, from [[theory_section]], applied to these entries
 
@@ -387,7 +526,11 @@ several verdicts here. Recording the consequences rather than restating the deri
 position — scale the latent by its own activation and the write is one direction on a schedule.
 So a per-token dictionary, steered well, reaches any **rank-1** write. A crosscoder reaches
 higher rank. The share of the optimal write reachable by rank 1 is `r1 = σ₁²/‖P‖_F²`, computable
-before any dictionary is trained. The two gates are ordered:
+before any dictionary is trained. **One gate and one bound**, not two gates — `r1` has since been
+tested on the rotation ladder and predicts the *within-task* ratio `Δ(rank-1)/Δ(full write)` to
+within 12% at three of four rungs, but does **not** forecast what a crosscoder achieves: at
+`rotate12` it identified headroom to +102.5 and the crosscoder used +18.23. So `r1` bounds what is
+reachable, and nothing yet converts that headroom into a win.
 
 | gate | condition | rules out |
 | --- | --- | --- |
@@ -572,7 +715,7 @@ A constant write moves both sides of that contrast equally and cancels.
 result has been **withdrawn** — measured on a one-sided dose grid, and rerun symmetrically the
 crosscoder does not beat the SAE significantly. The evidence that survives is the trajectory
 tasks, where broadcast measures at or slightly below zero at every window length, and the
-measured `c` ordering, where the order task's `c = 0.241` says a constant write always had grip
+measured gradient `c` ordering, where the order task's `c = 0.241` says a constant write always had grip
 there.
 
 **Practical rule.** Matching the foil is necessary but not sufficient. The metric must also be a
@@ -694,6 +837,16 @@ Enough detail to implement it tonight:
 | models / layers | Pythia-160m layer 8, Gemma2-2b layer 12; Pile subset |
 | feature split | 20% high-level (semantic), 80% low-level (syntactic) — a *predefined* partition |
 | results | FVE 0.94 (Pythia) / 0.75 (Gemma); activation smoothness 0.09 vs 0.12–0.13 for baselines; semantics probing beats Matryoshka and BatchTopK; steering "Pareto-dominates" baseline SAEs on intervention success against coherence |
+
+**Carried debt 1 is also closed, with a mechanism rather than a failure.** The sprint note recorded
+that the tSAE arm produced no usable numbers at the documented `l1_coef`, and that a 100× sweep
+moved realised L0 by 0.3%. The reason is now known: **no usable coefficient exists.** FVU crosses
+1.0 at 29 coefficients per segment — i.e. reconstruction becomes worse than predicting the mean —
+*before* L0 crosses 32. Two causes compound: `TemporalSAE` has **no encoder bias**, so there is no
+threshold to push activations through, and `lam = 1/(4·d_in)` makes the sparsity penalty about
+**0.2% of the loss**, so the optimiser has almost no incentive to sparsify before reconstruction
+collapses. That is a property of the architecture as configured, not a tuning failure, and it means
+the arm could not have been rescued by sweeping the coefficient harder.
 
 **They release code, trained T-SAEs, and interpreted latents** at
 [AI4LIFE-GROUP/temporal-saes](https://github.com/AI4LIFE-GROUP/temporal-saes) — repo confirmed to
@@ -1857,8 +2010,16 @@ A textbook position-dependent template (passphrase verification) *lost* to a bro
 because it is a conjunction; ordered generation lost by 10–50× because a broadcastable mode
 carries the behaviour; and only the multiset-matched trajectory tasks won, with the template
 growing linearly in window length while broadcast sat at zero or below. The sweep supplies the
-general form of that finding: **a window code helps exactly when the target has no DC component,
-and matched multisets are how you guarantee that.**
+general form of that finding: **a low constant-subspace share `c` is the best single predictor of
+where a window code helps, and matched multisets are a construction that lowers it.**
+
+Stated at the strength the data supports, and no further. Across 13 measured tasks the rank
+association between `c` and the crosscoder's margin over the best constant write is
+Kendall τ = −0.58 — a real association, not a rule. It has a **false negative** (`evidence` wins at
+`c` = 0.136, the sprint's largest margin) and a **false positive** (`phase11` at `c` = 0.050 does
+not win). So `c` is a good positive filter and an unreliable negative one: a low `c` has predicted
+a win in every case, and a high `c` has not reliably predicted a loss. Anyone using it to *reject*
+candidate tasks should know it would have rejected the best result in this sprint.
 
 That is a more useful claim than "the crosscoder beats the SAE on task X". It says where to look,
 explains why seven other directions are dead ends, and is directly falsifiable — find a behaviour

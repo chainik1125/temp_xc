@@ -54,6 +54,23 @@ reasoning.
    permutation search to rotations, or measure `r1` on the selected pair before training. This
    also demotes any two-block task (instruction-order conflict, LLM-judge position bias) from the
    headline slot.
+2c. **Match the first moment as well as the multiset.** Theory's result, and it is the first design
+   in this sprint to achieve rank ≥ 2 and `c = 0` simultaneously. Matching the label multiset
+   zeroes the **zeroth** moment of the label difference, which kills the *content* DC — but the
+   carried state's DC is the **first** moment, `Σ_j j·Δc_j`, which multiset-matching does not
+   touch. Measured across multiset-matched permutations: mean `c` = 0.19, rising to 0.32 at the
+   extremes. Adding the constraint `Σ_j j·label_j` equal between orderings gives mean
+   `c` = 4.5e-36 with rank 2 preserved. **Caveat for the builder:** the constraint is unsatisfiable
+   for extremal arrangements — `[1,1,1,1,0,0,0,0]` sits at the unique minimum of the first moment
+   over 4-subsets, so zero valid foils exist (0 of 69); alternating `[1,0,1,0,1,0,1,0]` gives 6 and
+   centred `[0,1,1,0,0,1,1,0]` gives 7. Pick a **non-extremal reference ordering**, then enumerate
+   foils matching both moments.
+2d. **Tune the alphabet size to test the rank bound.** With `q` labels the running-count vector has
+   `q−1` free dimensions and the content difference is itself `q−1` dimensional, so `A ≤ 2(q−1)`.
+   A falling `r1` as `q` grows tests `rank(P) ≤ A` on a real task with a genuine knob — a stronger
+   test than the phase ladder's 0.921 → 0.970. Theory would run this **before** the rotation ladder.
+   The single-label control is the falsifier: with identical labels both `Δc` and `Δs` vanish, so
+   the task must fall back to whatever rank its content alone supplies.
 3. **Size the go/no-go at ~128 permutations.** Typical permutation-to-permutation accuracy std is
    about two points; the dramatic gaps are the tails and must be searched for. A 24-permutation
    sweep showing a small spread means "underpowered", not "no effect".
@@ -89,6 +106,14 @@ reasoning.
    `steer_order_modal.py`.
 10. **If any AUC is reported**, note the probe-fragility caveat: in-distribution AUCs in this area
     have a poor track record under distributional shift.
+
+## Architecture comparisons need per-architecture recipes
+
+Implement's recipe sweep found **each architecture peaks at a different learning rate over a 10×
+range**, and the attention tSAE at its own recipe is the **best reconstructor of the three**. Any
+comparison run at a single fixed recipe is therefore measuring recipe fit as much as architecture,
+and any sentence comparing architectures carries that caveat. This compounds the smoke-test
+finding below: a short run at a shared recipe biases the comparison twice over.
 
 ## A label correction that propagated
 

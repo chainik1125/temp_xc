@@ -173,6 +173,33 @@ kind of effect an arm has.
 
 ### 5. The surviving win is discovery, not expressiveness — and the ordering is measured
 
+**Reported at matched dose in the linear regime.** Selecting each arm at its own best dose picks
+its saturation point, which is where the first-order reasoning behind every ratio here stops
+applying. Matching the dose *magnitude* across arms and reporting at the smallest magnitude where
+the crosscoder is significant (α = 0.5 on every task) changes two conclusions, **one of them
+against us**:
+
+| task | crosscoder | SAE | attention tSAE | `txc_flat` | scheduled SAE |
+| --- | --- | --- | --- | --- | --- |
+| recency | +1.90 | +0.25 | +0.97 | +0.34 | **+7.10** |
+| evidence | **+1.59** | −0.02 | +0.07 | +0.75 | +1.85 |
+| `rotate12` | **+3.54** | +0.94 | +1.24 | +0.98 | +1.53 |
+| order (2 inits) | +0.90 / +1.54 | +0.32 / +0.43 | — | **+1.58 / +4.11** | +0.10 / −0.09 |
+
+**The discovery gap on recency is 3.7×, not the 1.2× best-dose reporting showed** (z = −29.2). And
+`rotate2` and `rotate6` show no significant crosscoder effect at *any* dose, so their entries above
+are the honest null.
+
+**The direction-versus-schedule split, measured properly.** At matched dose the two surviving
+tasks order oppositely against a scheduled per-token write: on recency the scheduled SAE wins
+(+7.10 against +1.90, z = −29.2) — its **direction** was already right and only the schedule was
+missing. On `rotate12` the crosscoder beats it (+3.54 against +1.53, z = +5.3) and ties the
+gradient-scheduled version — the SAE's **direction is wrong and no schedule rescues it**. **The
+crosscoder's value is largest where the direction itself must be found**, not the schedule.
+
+**The order-task retraction holds at α = 0.5 in both inits**, so it was not an artefact of reading
+a saturated grid: `txc_flat` beats `txc_slab` at every dose tested.
+
 **Stated at its true scope:** on Qwen2.5-1.5B-Instruct, a crosscoder latent reverses the model's
 instruction-position bias in generated text, beating every unsupervised per-token baseline and
 every temporal-profile control. The same task on two smaller models has **no steerable target at
@@ -235,6 +262,23 @@ the ordering prediction holds either way — but the arm's identity does not. It
 as "this repo's attention-based temporal SAE", never as "the tSAE". The kickoff's carried debt
 on tSAE identification is therefore **resolved**, and it resolves to *we benchmarked a different
 temporal SAE than the published one*.
+
+**The constant arms are a second-order artefact, and this understates the crosscoder.** A
+difference-of-differences metric cancels a constant write only to *first* order; the residual
+`≈ ½α²(⟨v,H_A v⟩ − ⟨v,H_B v⟩)` is **even in α**, while a genuine directional effect is **odd**.
+Splitting each arm's dose response about zero:
+
+| arm | recency even-share | evidence even-share |
+| --- | --- | --- |
+| `sae_broadcast` | **0.72** | **0.80** |
+| `tsae_broadcast` | 0.58 | 0.51 |
+| `txc_slab` | **0.12** | **0.10** |
+| `grad_slab` | 0.17 | 0.01 |
+
+The constant arms are dominantly even and the crosscoder dominantly odd, with `grad_slab` — known
+to be the first-order optimum — almost purely odd as the control that makes the decomposition
+safe. So `sae_broadcast` is a **mis-specified** baseline rather than a weak one, and the honest
+per-token comparator is the scheduled arm.
 
 **The controls hold on this task**, which is what distinguishes it from the order task where they
 did not: `txc_flat` at +1.42 sits *below* a random constant direction at +1.81, and
@@ -444,8 +488,12 @@ dictionaries.** At each model's own best recipe, mid-layer:
 layer, of any kind, that shifts which instruction they obey — so the crosscoder is not failing to
 find something, there is nothing at that site to find. This is a statement about **where the
 behaviour is linearly manipulable**, not about dictionary architectures, which makes it more
-useful than a dictionary-level negative would have been. A layer sweep on SmolLM2 is running; if
-the target appears at another depth the limitation softens to "the site moves between models".
+useful than a dictionary-level negative would have been. **The SmolLM2 layer sweep is complete and uniformly negative across six depths** (6, 9, 12, 15,
+18, 21) against a baseline bias of +2.19: the supervised write reaches at most +1.25 and sits at
+±0.1 at layers 15, 18 and 21. So this is "no steerable site at any of six depths", not "at the
+layer tested". One artefact to pre-empt: L21 shows `dom_slab` +5.70 at α = −2 alone with every
+other dose at ±0.06, which is a large write destabilising the last layer rather than a
+dose-response.
 
 **The bias itself flips sign across models.** Qwen2.5-1.5B is recency-driven (−2.42, obeys the
 later instruction); Qwen2.5-0.5B and SmolLM2-1.7B are **primacy**-driven (+1.50, +2.18). So

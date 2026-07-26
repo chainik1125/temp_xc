@@ -48,8 +48,16 @@ A textbook position-dependent template (passphrase verification) *lost* to a bro
 because it is a conjunction; ordered generation lost by 10–50× because a broadcastable mode
 carries the behaviour; and only the multiset-matched trajectory tasks won, with the template
 growing linearly in window length while broadcast sat at zero or below. The sweep supplies the
-general form of that finding: **a window code helps exactly when the target has no DC component,
-and matched multisets are how you guarantee that.**
+general form of that finding: **a low constant-subspace share `c` is the best single predictor of
+where a window code helps, and matched multisets are a construction that lowers it.**
+
+Stated at the strength the data supports, and no further. Across 13 measured tasks the rank
+association between `c` and the crosscoder's margin over the best constant write is
+Kendall τ = −0.58 — a real association, not a rule. It has a **false negative** (`evidence` wins at
+`c` = 0.136, the sprint's largest margin) and a **false positive** (`phase11` at `c` = 0.050 does
+not win). So `c` is a good positive filter and an unreliable negative one: a low `c` has predicted
+a win in every case, and a high `c` has not reliably predicted a loss. Anyone using it to *reject*
+candidate tasks should know it would have rejected the best result in this sprint.
 
 That is a more useful claim than "the crosscoder beats the SAE on task X". It says where to look,
 explains why seven other directions are dead ends, and is directly falsifiable — find a behaviour
