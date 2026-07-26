@@ -95,7 +95,7 @@ CARRIERS = ["Journal entry.\n", "From the notebook:\n", "Draft passage.\n",
 @app.function(gpu="L4", image=image, timeout=14400)
 def frontier(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
              txc_batch: int, steps: int, sae_ks: list, txc_ks: list,
-             lr_arms: list, general_frac: float):
+             lr_arms: list, general_frac: float, init_norm: bool = False):
     import sys
     sys.path.insert(0, "/work")
     import random
@@ -239,6 +239,12 @@ def frontier(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
                 continue
             torch.manual_seed(0)
             m = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=k_seg, k=kp).to(dev)
+            if init_norm:
+                # TopKSAE normalises its decoder in __init__; TemporalCrosscoder does not,
+                # so its atoms start at norm sqrt(T*d_in/d_sae) and are rescaled only after
+                # the first optimiser step. See initnorm_modal.py for the attribution.
+                with torch.no_grad():
+                    m._normalize_decoder()
             hist = train(m, gen_w, txc_batch, lr, f"txc-k{kp}-lr{lr}")
             with torch.no_grad():
                 pre = torch.einsum("btd,tds->bs", Xn_ho, m.W_enc) + m.b_enc
@@ -278,13 +284,16 @@ def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int 
          n_docs: int = 1200, d_sae: int = 4096, txc_batch: int = 64,
          steps: int = 2500, sae_ks: str = "1,2,4,8,16,32,64,128",
          txc_ks: str = "1,2,4,8,20,41", lr_arms: str = "1e-3,3e-4",
-         general_frac: float = 0.4):
+         general_frac: float = 0.4, init_norm: bool = False, tag: str = ""):
     import json
     r = frontier.remote(model, layer, k_seg, n_docs, d_sae, txc_batch, steps,
                         [int(x) for x in sae_ks.split(",")],
                         [int(x) for x in txc_ks.split(",")],
-                        [float(x) for x in lr_arms.split(",")], general_frac)
+                        [float(x) for x in lr_arms.split(",")], general_frac,
+                        init_norm)
+    r["init_norm"] = init_norm
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
-    (outdir / "frontier.json").write_text(json.dumps(r, indent=2))
-    print("[saved]", outdir / "frontier.json")
+    name = f"frontier{tag}.json"
+    (outdir / name).write_text(json.dumps(r, indent=2))
+    print("[saved]", outdir / name)

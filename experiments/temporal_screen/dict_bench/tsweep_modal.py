@@ -265,11 +265,11 @@ def tsweep(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
 @app.local_entrypoint()
 def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int = 12,
          n_docs: int = 900, d_sae: int = 4096, seg_batch: int = 768, steps: int = 2500,
-         Ts: str = "1,2,3,4,6,12", kper: int = 4, lr: float = 3e-4,
+         ts: str = "1,2,3,4,6,12", kper: int = 4, lr: float = 3e-4,
          general_frac: float = 0.4):
     import json
     r = tsweep.remote(model, layer, k_seg, n_docs, d_sae, seg_batch, steps,
-                      [int(x) for x in Ts.split(",")], kper, lr, general_frac)
+                      [int(x) for x in ts.split(",")], kper, lr, general_frac)
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
     (outdir / "tsweep.json").write_text(json.dumps(r, indent=2))

@@ -98,7 +98,8 @@ CARRIERS = ["Journal entry.\n", "From the notebook:\n", "Draft passage.\n",
 @app.function(gpu="L4", image=image, timeout=14400)
 def structured(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
                txc_batch: int, steps: int, sae_k: int, txc_ks: list,
-               general_frac: float, n_test: int, frac: float):
+               general_frac: float, n_test: int, frac: float,
+               init_norm: bool = False):
     import sys
     sys.path.insert(0, "/work")
     import random
@@ -268,6 +269,11 @@ def structured(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
                 continue
             torch.manual_seed(0)
             txc = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=k_seg, k=kp).to(dev)
+            if init_norm:
+                # See initnorm_modal.py: the repo's crosscoder starts its decoder at
+                # norm sqrt(T*d_in/d_sae) and rescales only after the first step.
+                with torch.no_grad():
+                    txc._normalize_decoder()
             train(txc, gen_w, txc_batch, f"txc-k{kp}-{tag}")
             with torch.no_grad():
                 pre = torch.einsum("btd,tds->bs", Xn_ho, txc.W_enc) + txc.b_enc
@@ -303,12 +309,15 @@ def structured(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
 def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int = 12,
          n_docs: int = 1200, d_sae: int = 4096, txc_batch: int = 64,
          steps: int = 2500, sae_k: int = 100, txc_ks: str = "4,41",
-         general_frac: float = 0.4, n_test: int = 16, frac: float = 0.35):
+         general_frac: float = 0.4, n_test: int = 16, frac: float = 0.35,
+         init_norm: bool = False, tag: str = ""):
     import json
     r = structured.remote(model, layer, k_seg, n_docs, d_sae, txc_batch, steps,
                           sae_k, [int(x) for x in txc_ks.split(",")],
-                          general_frac, n_test, frac)
+                          general_frac, n_test, frac, init_norm)
+    r["init_norm"] = init_norm
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
-    (outdir / "structured.json").write_text(json.dumps(r, indent=2))
-    print("[saved]", outdir / "structured.json")
+    name = f"structured{tag}.json"
+    (outdir / name).write_text(json.dumps(r, indent=2))
+    print("[saved]", outdir / name)
