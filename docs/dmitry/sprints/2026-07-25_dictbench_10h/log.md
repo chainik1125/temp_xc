@@ -492,3 +492,61 @@ these as facts about crosscoders requires first ruling out that they are facts a
 crosscoder's *implementation*. `centering_modal.py` (running) tests exactly that against
 five arms, and its registered R3 is the branch in which the numbers above become
 reportable.
+
+## The mechanism, measured: realised L0 = min(k, #{pre > 0}), and the second term wins
+
+`mechanism_modal.py` completed. The registered predictions were P1 (b_enc goes strongly
+negative, magnitude rising in k), P2 (SAE b_enc near zero by comparison), P3 (realised
+L0 ≈ #{pre > 0} once that count falls below k), P4 (a crossover in k).
+
+| kper | nominal k | b_enc mean ± sd | #{pre > 0} | realised L0 | min(k, #pos) | FVU |
+|---|---|---|---|---|---|---|
+| 1 | 12 | −0.021 ± 0.010 | 53.3 | 12.0 | 12.0 | 0.776 |
+| 2 | 24 | −0.023 ± 0.011 | 35.7 | 23.7 | 24.0 | 0.781 |
+| 4 | 48 | −0.022 ± 0.010 | 22.2 | 20.4 | 22.2 | 0.865 |
+| 10 | 120 | −0.024 ± 0.010 | 17.1 | 17.1 | 17.1 | 0.873 |
+| 20 | 240 | −0.024 ± 0.010 | 16.4 | 16.4 | 16.4 | 0.879 |
+
+**P3 and P4 hold exactly.** Realised L0 equals min(k, #{pre > 0}) in every row. The
+crossover sits between kper=1, where TopK binds and the model spends all 12 of its budget,
+and kper=4, where the positive-pre-activation count has fallen to 22 and becomes the
+binding term. Past that, realised L0 is pinned near 16–20 coefficients per *window* — under
+1.7 per segment — no matter how large k is.
+
+**P1 is refuted, and I should retire the story I attached to it.** The learned bias moves
+from −0.021 to −0.024 across a 20× range of k. It is flat and it is far too small to gate
+anything. The gating lives in the encoder rows, not the bias.
+
+**The unregistered result is the sharpest one: raising k actively destroys capacity.** The
+positive pre-activation count falls monotonically — 53 → 36 → 22 → 17 → 16 — as nominal k
+rises. So k is not merely inert above the crossover; asking for more coefficients leaves
+the model able to spend fewer, and FVU rises from 0.776 to 0.879 accordingly. `interp.json`
+pushes this to its limit: at kper=341 the nominal window budget is 4092 of a 4096-latent
+dictionary, the ReLU-killed fraction reaches **1.00**, and realised L0 is still 18.
+
+| kper | nominal window k | ReLU-killed | realised L0/window | alive | FVU (× SAE) |
+|---|---|---|---|---|---|
+| 41 | 492 | 0.96 | 17.6 | 0.152 | 27.6× |
+| 100 | 1200 | 0.98 | 26.6 | 0.143 | 25.7× |
+| 200 | 2400 | 0.99 | 18.8 | 0.113 | 26.9× |
+| 341 | 4092 | 1.00 | 18.0 | 0.096 | 25.9× |
+
+Frozen steering fidelity across that same 8× span of nominal k is +0.258, +0.218, +0.231,
++0.227 — flat, which is what a flat realised capacity predicts and a useful consistency
+check on the whole picture.
+
+**This answers the capacity question directly.** The concern was that too much capacity
+would cost interpretability. The measured situation is worse and simpler: the extra
+capacity is never delivered, and asking for it degrades reconstruction, alive fraction, and
+nothing improves in exchange.
+
+### One number in that file I am not entitled to use
+
+`interp_modal.py` also reports best-single-latent AUC against the known factor — 0.541,
+0.456, 0.551, 0.551, all near chance — and it is tempting to read that as "crosscoder
+latents are uninterpretable". It is not evidence of that. The AUC is computed **per
+segment** on the **i.i.d. corpus**, which is the mismatched question I already retracted
+once: a window code holds one shared code for twelve independently-labelled segments, so
+chance is the *correct* answer there and a high value would have been the surprise. The
+interpretability number that survives is the structured-corpus window-AUC, where the
+question matches the code: 0.612 for the crosscoder against 0.747 for the per-segment SAE.
