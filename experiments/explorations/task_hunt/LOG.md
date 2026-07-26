@@ -6015,3 +6015,25 @@ dq: order-carried substrate + near-anchor mechanism). R-row
 proposal after harness; distillation § 8.4 updated now.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-a (executor) — dq RE-PASS ADDENDUM: 10/10 landed, panel COMPLETE 102/102, verdict UNCHANGED (KEEP, all P1–P6) — PENDING TEAM REVIEW
+
+Re-pass (pin 931c016e6, H100 workers 3 per the ceiling amendment):
+10/10 ok, zero failures, ~43 min. Merged +10 rows (dup-skip receipt
+92 idempotent; freeze set = 92× db677a4b8 + 10× 931c016e6, both
+labeled quotable in the merge script). Claiming cell untouched;
+filled columns CONFIRM the partial's structure: trained T32 pre
++0.234 / stacked +0.287 / post +0.311 — all BELOW the T32 evidence
+bar 0.499 (arch-ordering zone, as the verdict said); untrained
+pre/T32 fill +0.047 (the dq untrained story stays clean); stacked/T8
+s2 fill +0.302 → stacked/T8 3/3 = +0.303. l0 bands unchanged,
+in-band. Full-panel scorer output reproduces every P-clause of the
+partial verdict verbatim. mac-b: harness CIs on the complete panel
+when ready; the fa6023a77 quote licence governs.
+
+Ledger actuals (Modal dashboard authority): mac-a day-2 ≈ $45–50 of
+$200 (screens ~$5; tt v1 ~$8 + tt v2 ~$5; dq abort ~$8 + dq v2
+~$15 + re-pass ~$4; stops/misc ~$2). Program total ≈ $85–90 vs $122
+of est lines → −$30-ish correction at final ledger sweep.
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_
