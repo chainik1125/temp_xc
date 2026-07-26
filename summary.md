@@ -14,9 +14,10 @@ applies per-window TopK and then a ReLU on the selected values
 under a full 2×2 of that discrepancy — {per-window, batch-pooled} selection ×
 {ReLU'd, raw} pre-activations — across T ∈ {1,2,4,5,8,10} on the paper's two
 §4 synthetic benches, at one shared parameter set, with per-token baselines
-frozen. 684 cells on Modal (~$35 actual), plus a d_sae=50 wing that removes
-every budget-saturated cell. Four findings, each of which changes what the
-team should say in the rebuttal:
+frozen. 624 unique cells on Modal (+108 reproducibility duplicates; ~$35
+actual), including a d_sae=50 wing that removes every budget-saturated
+cell. Four findings, each of which changes what the team should say in the
+rebuttal:
 
 1. **The pre-registered gate passes on the letter and fails on the spirit.**
    Under "just BatchTopK" (the paper's stated architecture), Coupling-bench
@@ -27,18 +28,22 @@ team should say in the rebuttal:
    0.79 across T while the composite sits at 0.96–0.99 at every T.
    **BatchTopK-only is not a better paper arch at any (k_pos, T ≤ 10) tested.**
    - ![d(perf)/dT gate figure](plots/btk_rerun/btk_rerun_dperf_dT.png)
-2. **The level gap is caused by selection pooling, and the ReLU is (almost)
-   irrelevant.** The relu-mix control (ReLU→batch pool) is cell-for-cell
-   identical to btk-only (mean |Δgauc| = 0.009 over 156 matched cells;
-   level curves indistinguishable) — so removing the ReLU changes nothing
-   once selection is batch-pooled, and the entire drop comes from replacing
-   per-window selection (exactly k_win atoms per window) with a batch pool
-   that lets popular atoms crowd out per-window diversity.
-   <!-- PERWIN-RAW: fill on landing — if perwin-raw ≈ composite, the ReLU
-   is confirmed immaterial in the composite's own scope too, and the
-   text-vs-code discrepancy is a documentation bug with no empirical
-   content on these benches; if perwin-raw > composite at T=1, the ReLU's
-   only real harm is the low-T support loss (see 3). -->
+2. **The level gap is caused by selection pooling; the ReLU is empirically
+   inert.** Both off-diagonal controls close the attribution: relu-mix
+   (ReLU→batch pool) is cell-for-cell identical to btk-only (mean |Δgauc| =
+   0.009 over 156 matched cells), and perwin-raw (the paper arch with
+   `F.relu` deleted, nothing else) is cell-for-cell identical to the
+   composite (coupled k=2 gauc: 0.987 vs 0.988 at T=1, 0.819 vs 0.829 at
+   T=8; slopes −0.006 vs −0.006). Selection *scope* — per-window (exactly
+   k_win atoms per window) vs batch pool (popular atoms crowd out
+   per-window diversity) — explains the entire 0.2–0.3 gap; ReLU placement
+   explains none of it, in either scope. **And "batch pooling" is exactly
+   what "BatchTopK" means: the paper's text describes a worse architecture
+   than its code implements. The correction should go text→code, not
+   code→text.** (perwin-raw's low-T NMSE numbers are an eval artifact —
+   JumpReLU-threshold semantics degenerate for top-1 per-window selection,
+   realized eval l0 16.2 of nominal 1 at k=1/T=1 — its recovery metrics
+   are decoder-based and unaffected.)
 3. **The pre-registered mechanism ("ReLU harm grows with T") is inverted on
    trained models.** The composite's realized-support loss concentrates at
    LOW T and vanishes with training at higher T (realized l0/nominal at
@@ -67,15 +72,17 @@ team should say in the rebuttal:
 **Verdict for the re-run gate** (pre-registration: *"the PAPER arch's
 T-curves should improve (that is Dmitry's re-run gate: does d(perf)/dT
 improve)"*): **MIXED — SUPPORTED on the slope, NOT SUPPORTED as a reason to
-switch.** The honest recommendation for the paper is: (a) fix the
-text-vs-code contradiction explicitly (appendix.tex:29 vs :33 — say
-"per-window TopK with post-selection ReLU" or actually adopt BatchTopK and
-re-run, knowing the level cost measured here); (b) do NOT silently swap the
-arch — at paper budgets "just BatchTopK" costs 0.2–0.3 gauc at every T for
-a slope improvement that never closes the gap by T=10; (c) the T-scaling
-figure the paper lacks should show the composite's T-robustness at
-unsaturated budgets plus the T=1 anchor, which is defensible and
-data-backed, rather than a monotone-improvement claim, which is not.
+switch.** With the full 2×2 the recommendation is unambiguous: (a) fix the
+paper's TEXT to describe the architecture the code implements — per-window
+TopK selection at k_win = T·k_pos (the post-selection ReLU can be stated or
+deleted; it is measurably inert either way, and `perwin-raw` is the
+cleanest description) — resolving appendix.tex:29 vs :33; (b) do NOT adopt
+actual BatchTopK: batch pooling costs 0.2–0.3 gauc at every (k, T ≤ 10)
+tested, for a slope improvement that never closes the gap; (c) the
+T-scaling figure the paper lacks should show the composite/perwin-raw
+T-robustness at unsaturated budgets plus the T=1 anchor, which is
+defensible and data-backed, rather than a monotone-improvement claim,
+which is not.
 
 ## What was run (map)
 

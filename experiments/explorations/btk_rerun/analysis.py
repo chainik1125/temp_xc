@@ -194,6 +194,12 @@ def main() -> None:
             ax = axes[mrow][col]
             handles, labels = [], []
             for arch in ARM_LABEL:
+                if metric == "nmse" and arch == "perwin-raw":
+                    # documented eval artifact: JumpReLU-threshold semantics
+                    # degenerate for top-1 per-window selection (realized
+                    # eval l0 16x nominal at k=1/T=1); recovery metrics are
+                    # decoder-based and unaffected.
+                    continue
                 pooled = []
                 for k_pos in K_SLOPE:
                     pts = []
@@ -252,9 +258,12 @@ def main() -> None:
                 labels.append("clipped cell (k·T ≥ d_sae) — not in slopes")
             ax.legend(handles, labels, fontsize=7, loc="best", framealpha=0.9)
     fig.suptitle(
-        "Paper TXC, composite vs btk-only: performance vs window size T\n"
-        "seeds mean±std; slopes pooled over non-clipped k∈{1,2,5} cells",
-        fontsize=11)
+        "Paper TXC activation 2×2 — selection scope × ReLU placement: "
+        "performance vs window size T\n"
+        "overlapping curves ARE the finding: perwin-raw ≡ paper-match, "
+        "relu-mix ≡ btk-only; seeds mean±std; slopes over non-clipped "
+        "k∈{1,2,5} cells (perwin-raw nmse excluded: eval artifact)",
+        fontsize=10)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     for ext in ("png", "pdf"):
         fig.savefig(args.out_dir / f"btk_rerun_dperf_dT.{ext}", dpi=150,
