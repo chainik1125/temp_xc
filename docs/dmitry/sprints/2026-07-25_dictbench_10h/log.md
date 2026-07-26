@@ -595,3 +595,49 @@ selecting those same latents, which is the winner-take-all path to a dictionary 
 Note this predicts the collapse should *worsen with T*, since the init norm error
 `sqrt(T·d_in/d_sae)` grows as sqrt(T) — and `tsweep_modal.py` (running) measures exactly
 that, with T=1 as an exact SAE-equivalence control.
+
+## Attribution, partial: centring is not the cause, and learning rate is not innocent
+
+Two corrections to the previous entry, both against my own hypothesis.
+
+**Centring does nothing.** `centering_modal.py`'s arms, at kper=4 with the decoder
+normalised at init throughout:
+
+| arm | #{pre > 0} | coeff/segment | ReLU-kill | alive | FVU |
+|---|---|---|---|---|---|
+| base | 99.2 | 3.98 | 0.006 | 0.376 | 0.6696 |
+| center | 98.5 | 3.99 | 0.002 | 0.371 | 0.6673 |
+| tied | 73.7 | 3.96 | 0.009 | 0.294 | 0.6953 |
+
+Subtracting `b_dec` before the encoder projection — the `TopKSAE` behaviour the crosscoder
+omits — changes nothing measurable, so registered prediction R1 is refuted. This is worth
+recording because the per-position DC is genuinely large: the residual after the pooled
+centering has norm 11.89 at position 0 against a typical segment norm of 21.59, so the
+crosscoder's encoder really is seeing a big offset the SAE's does not. It simply does not
+matter, presumably because a fixed per-latent offset is exactly what `b_enc` can absorb.
+Tied init is mildly *worse*, so it is not the fix either.
+
+**Learning rate is doing some of the work.** The frontier's lr=3e-4 arm, which has no
+init-normalisation, has far more live latents than its lr=1e-3 counterpart:
+
+| kper | lr=1e-3 pos-preact | lr=3e-4 pos-preact | lr=1e-3 FVU | lr=3e-4 FVU |
+|---|---|---|---|---|
+| 1 | 0.008 (33) | 0.085 (348) | 0.736 | 0.761 |
+| 2 | 0.008 (33) | 0.019 (78) | 0.711 | 0.769 |
+
+So the clean story I wrote last entry — "init-normalisation is the culprit" — is not
+established, and at low k a smaller step size alone recovers an order of magnitude of live
+latents while making reconstruction slightly *worse*. Both of these are consistent with the
+collapse being a first-few-steps optimisation event of some kind, but they do not identify
+which intervention matters.
+
+The decisive cell is kper=4, where the collapse first bites and where I have the
+init-normalised number to compare against: `centering_modal.py` reaches 3.98 coefficients
+per segment and FVU 0.670 there with init-norm at lr=3e-4. If the frontier's kper=4 lr=3e-4
+cell — same lr, no init-norm — comes back near 2.4 and 0.78, init-normalisation is the
+factor. If it comes back near 3.98 and 0.67, the learning rate is, and the two-line-fix
+framing is wrong. `initnorm_modal.py`'s factorial settles it either way.
+
+**Arithmetic check, and one correction to my own number.** The init atom norm is confirmed
+numerically at 2.1213 ± 0.011, exactly `sqrt(T·d_in/d_sae)` = sqrt(12·1536/4096). The
+kper=41 overstatement is 41 ÷ (17.6/12) = **28×**, not the 27× written above.
