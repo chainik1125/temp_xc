@@ -466,6 +466,14 @@ foil**. Matching the multiset is the *zeroth* moment; the state's DC residue is 
 `Σ_t cumsum(Δc)(t) = −Σ_j j·Δc_j`. Adding the first-moment constraint gives both at once — and the
 constructed patterns match moments 0, 1 **and** 2 exactly (6 / 39 / 325).
 
+**The pattern pair is forced, not chosen.** Enumerating all 924 balanced 12-length label
+sequences, exactly **one** has a complement matching moments 0, 1 and 2 — the pair used. There
+were no researcher degrees of freedom in the pattern, which also means the obvious robustness
+check (does the geometry repeat under a different moment-matched pair?) **cannot be run at
+`k_seg = 12`**: the design space is a single point. It becomes available at `k_seg = 16`, where 14
+such pairs exist, or at `k_seg = 12` by dropping to non-complement foils, which caps the
+rearrangement distance at 8 of 12 and weakens the contrast.
+
 Screened on real activations, n = 200, both metric modes:
 
 | | ordering mode | **probe mode** |
