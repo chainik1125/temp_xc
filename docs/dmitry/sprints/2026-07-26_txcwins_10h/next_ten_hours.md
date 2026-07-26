@@ -15,8 +15,15 @@ learn — and every loss is the same statement in reverse: on `recency_var`, `ro
 phase ladder the supervised write existed and training failed to find it. But "training failed
 to find it" is a claim about a *search*, and the search we ran gave each architecture **one
 dictionary init and one best-of-4096 latent selection**. We already know that lottery is
-high-variance: the crosscoder's own margin moved 10× across three inits at phase-5, and on the
-order task its selected latent does not even have a stable *sign* across inits. **We never gave
+high-variance, and the size of it depends on the recipe. Across three inits of `phase5` the
+crosscoder's peak margin spans 1.56 / 15.70 / 11.48 at the old recipe (lr 3e-4, 2000 steps,
+one-sided doses) and 3.64 / 1.47 / 4.63 at the current one (lr 1e-3, symmetric doses) — a 10×
+spread shrinking to **3.1× at peak and 1.4× at matched dose** once the recipe is fixed. Quote
+the 3.1×: it is the variance under the protocol we actually report, and the shrinkage is itself
+evidence that much of the apparent init instability was under-training. The sharper fact is
+qualitative and survives at the current recipe: on the order task the crosscoder's selected
+latent **reverses direction** between inits — rising to the right at init 0 and to the left at
+init 1 — while `txc_flat` and the SAE hold orientation in both. **We never gave
 the SAE the same number of tickets.** So the first experiment is to scale seeds — twenty inits
 per architecture on `recency`, `evidence` and `rot_m12`, reporting the distribution of each
 arm's best latent rather than one draw. If the SAE's best-of-twenty closes the gap, the sprint's
