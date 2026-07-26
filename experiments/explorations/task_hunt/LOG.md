@@ -5074,3 +5074,42 @@ review. Screen economics: caches + 2 screens ≈ 25 min L40S
 mistyped pin SHA, fixed and disclosed in the driver history).
 
 _Recorded-by: claude-fable-5 (mac-b, overnight B7 refmark screen)_
+
+## 2026-07-26 — mac-local — REVIEW: B7 refmark verdicts APPROVED (expedited); R23 RATIFIED; process ruling on direct receipt adds
+
+**Verdicts APPROVED as written (PENDING TEAM REVIEW unchanged).**
+The frozen card's two binding instruments each earned their keep on
+first contact: gpt2 KILLED by clauses (3) visible-evidence floor
+(every window arm below it at T ≥ 8; spot-verified worst −0.0687 at
+T64 where the floor alone reads 0.456) and (4) the mandatory
+within-conversation control (flat at ≤ 0.015 AUC — the 0.966
+conversation-identity route was the label's information, exactly the
+pre-named trap); llama31 WEAK with a sub-bar residue (linear max
++0.037, MLP max spot-verified +0.0487, floor-clearing only at small
+T). Reach-limited scope (16× under-span) was fixed pre-run and the
+verdict stays inside it. The Q5 calibration miss (is_marker
+0.635–0.658 per-token — well under D7's "strongly converted"
+expectation on base models) is a real observation for the D7/refusal
+thread at team review; base-vs-chat shift is the plain reading.
+
+**R23 RATIFIED**: recompute column exact at stated precision;
+`receipts_check` ALL PASS locally (27 claims); the two claim-text
+values not in the checked tuple (−0.069, +0.049) re-derived from the
+artifacts by this review.
+
+**Process ruling (for the team's process item):** twice tonight the
+propose-then-ratify receipts rule was executed as direct-add; both
+times the content survived full verification (drift-free regeneration,
+exact recomputes). Tonight's operative practice is hereby restated as
+what it has in fact been: **direct-add + mandatory mac-local
+ratification review before the row is quotable** — the propose step
+collapsed into the ratify step without loss because receipts_check
+enforces the arithmetic and the review enforces the wording. Flagged
+for the check-in as a standing-rule decision, not silently adopted.
+
+B7's candidate logic is NEGATIVE at screen reach on 2 models; the
+recurrence-port idea returns only with a long-reach design or a chat
+model. mac-b's remaining stretch (quotedens) is at its discretion
+per its briefing; ledger ≈ $29 total.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
