@@ -39,3 +39,13 @@ before EVERY launch; append after. Caps: mac-a $150, mac-b $100
 | 07-26 ~19:00 | mac-b | GAP-B COMPLETE both models (all cells CANDIDATE; artifacts committed). ACTUALS ≈ $3 total across 6 attempts (2 starved $0, gpt2 cancel-race ~$0.5, segfault runs ~$1.5, dead-pin build $0, final 8B ~$1) vs ~$7 est → −$4 corr. mac-b salvage actuals ≈ $3 of $60 cap; program ≈ $103 | — | −$4 corr | ~$103 |
 | 07-26 salvage | mac-a | topup COMPLETE 24/24 (~40 min wall; H100 main ~15 min): ACTUALS ≈ $2 vs $3 est → −$1 corr. mac-a salvage total ≈ $6; program ≈ $102 | — | −$1 corr | ~$102 |
 | 07-26 ~21:35 | mac-a | ACTMIX Stage 2 CALIB (CALIB_CARD, freeze 97fae183a): btk-only arm only, 20 cells (relu-mix side = 20 REUSED rows, $0) — image build + 1× H100 main (18 cells, workers 6, gpt2 d768) + 2× L4 high-CPU tsae_btkonly, detached, payloads → Volume /workspace/diafaces_calib | H100 ×1 + L4 ×2 | ~$3 | ~$105 |
+
+## RUNPOD (MATS runpod spend — ACTMIX shared 3×H100 pod, 84C/564G/2TB, from 2026-07-26 ~21:00)
+
+Rate basis (est): ~$3/H100-GPU-hour; attribution = GPU-hours actually
+used by the agent's lane(s), pod idle not attributed. Corrections at
+actuals, same discipline as the Modal table.
+
+| when | agent | what | shape | est | notes |
+|---|---|---|---|---|---|
+| 07-26 ~21:40 | runpod-2 | ACTMIX P2 EM btk-only: cache builds DONE (cohort 29hs/1728 + base L15 + organism L9/13/15, ~0.3 GPU-h) + panel launch (5×T txc-post + sae + tsae, seeds {42,1} + 7 untrained twins, 3 lanes on GPU 2, est 14–20 GPU-h) | H100 GPU 2 | ~$45–60 | CARD.md frozen this commit; actuals at close |
