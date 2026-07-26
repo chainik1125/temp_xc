@@ -315,10 +315,33 @@ Enough detail to implement it tonight:
 | results | FVE 0.94 (Pythia) / 0.75 (Gemma); activation smoothness 0.09 vs 0.12–0.13 for baselines; semantics probing beats Matryoshka and BatchTopK; steering "Pareto-dominates" baseline SAEs on intervention success against coherence |
 
 **They release code, trained T-SAEs, and interpreted latents** at
-[AI4LIFE-GROUP/temporal-saes](https://github.com/AI4LIFE-GROUP/temporal-saes). Use the
-reference loss rather than reimplementing it — this is exactly the situation the repo's own
-lessons-learned note warns about (delegate to the reference implementation; the 2026-05-07 EM
-replication lost a day to a reimplemented prep function).
+[AI4LIFE-GROUP/temporal-saes](https://github.com/AI4LIFE-GROUP/temporal-saes) — repo confirmed to
+exist and inspected. Use the reference loss rather than reimplementing it: this is exactly the
+situation the repo's own lessons-learned note warns about (delegate to the reference
+implementation; the 2026-05-07 EM replication lost a day to a reimplemented prep function).
+
+What is actually in it, since this determines how much work the tSAE arm is:
+
+| item | detail |
+| --- | --- |
+| training code | a **fork of `dictionary_learning`**, with a temporal trainer class `TemporalMatryoshkaBatchTopKSAE` |
+| entrypoint | `dictionary_learning/dictionary_learning/train_temporal.py`, exposing regularisation, **split fraction**, and standard SAE hyperparameters |
+| trained weights | a pre-trained T-SAE for **Gemma-2-2b, width 16384**, on HuggingFace, with feature explanations |
+| evaluation | utilities scoring SAEs by "smoothness metrics" |
+| other | probing, t-SNE, dataset-understanding and alignment scripts; Poetry for dependencies, `.env` for HF |
+
+**One detail that matters for matched comparison.** The trainer is
+`TemporalMatryoshka**BatchTopK**SAE` — the architecture is **Matryoshka** plus BatchTopK plus the
+temporal loss, not plain BatchTopK, and the "split fraction" parameter is the 20%/80%
+semantic/syntactic partition. So a like-for-like comparison has three differences from this
+repo's crosscoder, not one: the temporal loss, the Matryoshka nesting, and the predefined split.
+If the tSAE arm wins or loses, that has to be attributed carefully — the cleanest control is to
+run their trainer with the temporal regularisation set to zero, which isolates the contrastive
+term from the Matryoshka structure.
+
+The released weights are **Gemma-2-2b**, not a Qwen model, so they are useful for sanity-checking
+an implementation but cannot be dropped into a Qwen-based comparison; the arm needs training
+either way.
 
 Three things follow. First, this is implementable on top of the repo's existing BatchTopK
 machinery in roughly the length of a loss function — far cheaper than the dense-tSAE
@@ -982,6 +1005,16 @@ already lost to broadcast by 10–50× with the gap worsening in k. Expect the s
 recorded in full below because the reasoning is a useful worked example of P1 being necessary
 but **not sufficient**: a matched multiset removes bag statistics over the *foil pair*, but the
 behaviour being steered can still be carried by a mode.
+
+**On "ICL phase transitions", which the brief listed separately: a category error worth naming.**
+The induction-head phase transition of Olsson et al. is a **training-time** phenomenon — an abrupt
+change across optimisation steps, visible as a bump in the loss curve. A temporal crosscoder
+windows over **token positions** within one forward pass. The two axes have nothing to do with
+each other, and a dictionary trained on a fixed checkpoint cannot see a training-time transition
+at all. This is the same trap as citing layer-depth "stages" as temporal lead-time, which
+[[temporal_safety_tasks_litreview]] already flagged, in a third guise: *training steps are not
+token positions*. Anything phase-transition-flavoured would require training dictionaries on a
+checkpoint series, which is a different and much larger experiment.
 
 The rest of this entry is as written before the audit.
 

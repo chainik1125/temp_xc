@@ -14,10 +14,17 @@ Derivations and the full design catalogue stay in `theory.md`.
 **Two conditionals to resolve before this ships.** Both depend on measurements still running,
 and both are stated here so they cannot be forgotten at write-up time.
 
+The second was originally written as "measured `r1` below 0.85". That is **non-discriminating**:
+the model gives `r1 = max(2, 8t²)/(2 + 8t²)`, which has a *minimum* of 0.5 and rises to 1 at
+both extremes, so a high `r1` is consistent with rank 2 at either small or large `t`. The
+replacement uses two observables against one free parameter — the measured ratio
+`σ₂²/σ₁² = min(2, 8t²)/max(2, 8t²)` solves for `t`, and the singular *vectors'* temporal
+profiles pick the branch — which is properly falsifiable.
+
 | condition | if it fails | edit required |
 | --- | --- | --- |
 | recency percent-of-ceiling holds near 87% when re-scored in ordering mode | it collapses toward the order task's 14% | cut the first sentence of the final paragraph; the ceiling gap is then a metric-mode artefact, not a fact about feature availability |
-| measured `r1` on recency lands below 0.85 | it lands above | cut "genuine rank-2 structure"; the expressiveness claim does not survive and recency becomes a discovery result |
+| recency shows rank-2 structure: `σ₂²/σ₁² ≥ 0.15` **and** the temporal profiles of `u₁` and `u₂` are near-disjoint — one on the instruction positions, one on the spans | either fails | if (a) holds and (b) fails there is a second direction but not the claimed one; if `σ₂²/σ₁² < 0.10` the model is wrong outright. Cut "genuine rank-2 structure" and recency becomes a discovery result |
 
 ## What a dictionary can write
 
