@@ -172,13 +172,19 @@ gradient's support is set by where the two classes differ — but the second is 
   constant direction, chosen with knowledge of the gradient, works four times better than what the
   crosscoder found unsupervised. So the SmolLM2 negative is not "nothing simple works here".
 
-  ⚠ **A candidate mechanism, flagged as candidate.** Everything built from `Ḡ` works and everything
-  built from `P_dom` fails, and the learned dictionaries land on the failing side — while on
-  Qwen2.5-1.5B the two slabs steer comparably (+8.42 against +9.79) and the split does not appear.
-  That would predict unsupervised discovery succeeds where `dom_slab ≈ grad_slab` and fails where
-  they diverge. It holds in both models we have. **The evidence is co-variation of arm magnitudes
-  across two models**, a direct test is running, and an earlier cosine-based guess at this same
-  mechanism was already refuted — so it is recorded as a hypothesis, not a finding.
+  **The split is an observation about this cell, and no mechanism is attached to it.** The
+  `Ḡ`/`P_dom` ratio is **10.5×** at SmolLM2 L6 against **1.2× corpus-bound and 3.2× held-out** on
+  Qwen2.5-1.5B — a clear separation, not an absence. But the tempting reading, that learned
+  dictionaries track `P_dom` rather than `Ḡ`, **does not survive the full set**: across 45 cells
+  carrying all three arms, `corr(txc_slab, dom_slab)` = +0.78 against `corr(txc_slab, grad_slab)`
+  = +0.76, and the two slabs' own effects are **+0.99 correlated**, so the two hypotheses are not
+  separable by this route. The largest discrepancies also run the wrong way — on `rotate12`,
+  `txc_slab` +18.23 against `dom_slab` +133.60.
+
+  **Two mechanisms have now been proposed for this null and both withdrawn** — first
+  `cos(P_dom, Ḡ)`, refuted at 0.050 against 0.044; then dictionary-tracks-`P_dom`, refuted by the
+  correlation above. The null ships with the candidates named and refuted rather than with a third
+  that reads as settled.
 - **The `c` gate does not transfer across models.** Five of seven transfer cells sit below the
   `c` < 0.1 go-threshold with high `r1` and steer nothing. It was validated within one model and is
   not a cross-model instrument.
