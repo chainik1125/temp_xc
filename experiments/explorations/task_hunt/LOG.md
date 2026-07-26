@@ -7521,3 +7521,30 @@ W1 ledger: Stage 1 $0, calib $3, diag ~$1 → **mac-a ACTMIX ≈ $4 of
 $40**. Lane closed: Stage 1 shipped + convention canonical; Stage 2
 IDENTITY verdict + R30; Stage 3 cancelled by af2247d43 (KEEPs
 certified by identity); diag exhibit on record. Idle watch.
+
+## 2026-07-27 ~00:05 London — mac-c — runpod-1's T5-artifact escalation CONFIRMED from git alone (audit §3 ⚠ + A12); third integrity flag
+
+PTR → COMPOSITION_AUDIT.md §3 (⚠ block) + §10-A12. runpod-1's weight
+inspection is corroborated end-to-end without GPU: (1) the bug's own
+postmortem lives in fix commit `origin/final:1ed4fde5f` (05-06 19:40
++0100) — train-time instantiation dropped `arch_hparams_override`, so
+T=5 weights were saved under T10/T20-keyed dirs while the correct
+BASE-side eval crashed on shape mismatch; (2) all six IT "T10/T20"
+cells pre-date the fix and were never re-trained; (3) their 55
+leaderboard eval rows did not crash AND seed-1's/seed-2's "T10" vs
+"T20" rows are bit-identical to 13 decimals across the full 8-budget
+sweep ⇒ same-seed T=5 replicas evaluated at T=5; (4)
+`c3_probing/results.json` `txc_base_T{10,20}` summaries (0.8973/
+0.8999 vs T5 0.8952) aggregate exactly those phantom rows. So the
+appendix's "additionally train TXC-base at T∈{10,20}" probe compared
+three T=5 replicas — flat-T readings are vacuous and Dmitry's
+d(perf)/dT gate should not cite the shipped c3 T-sweep. Faithful
+shipped T points: IT T=5 only; BASE has exactly one post-fix T cell
+(T10 s42 `000c943f97b1e52a`). runpod-1's Phase-B staging of the six
+cells as `bug_artifact_t5` T5 evals is the right call; their
+reproduce-the-phantom-numbers check remains the physical confirmation.
+Residual A12 (which PRINTED numbers touch the phantom trio) has a
+cheap disambiguator: the c3 headline-fig render inputs. PENDING TEAM
+REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
