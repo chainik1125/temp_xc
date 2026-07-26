@@ -106,9 +106,7 @@ def main() -> int:
     ax = axes[1]
     for key, colour, label in (("txc_slab", C_TXC, "crosscoder slab"),
                                ("sae_broadcast", C_SAE, "TopK SAE direction"),
-                               ("tsae_broadcast", C_TSAE, "attention tSAE direction"),
                                ("txc_flat", C_FLAT, "crosscoder slab, profile removed"),
-                               ("random_slab", C_RND, "random temporal profile"),
                                ("dom_slab", "#000000", "supervised slab")):
         xs, ys, lo, hi = [], [], [], []
         for s in SWITCHES:
@@ -130,7 +128,7 @@ def main() -> int:
     ax.set_yscale("symlog", linthresh=1.0)
     ax.set_title(f"Steering is a null: mean over {n_seed} inits, band = range")
     ax.grid(alpha=0.25, lw=0.6)
-    ax.legend(loc="upper left", fontsize=8.5, framealpha=0.95)
+    ax.legend(loc="lower left", fontsize=8.5, framealpha=0.95)
 
     fig.tight_layout()
     OUT.parent.mkdir(parents=True, exist_ok=True)
