@@ -112,6 +112,23 @@ measured in this sprint predicts which ceiling gets reached.** It does not estab
 quantitative law: the constant arms are 72–80% *even* in α, so they are largely second-order
 artefact, which makes `sae_broadcast` a **mis-specified** baseline rather than a weak one.
 
+**A third axis the screen does not model at all, found post-sprint.** `c` and `r1` both describe
+the **mean** optimal write. **Shared-write retention** describes whether the *per-document* optimal
+writes agree with each other — and nothing in the framework touches it. Every argument in it ("a
+constant write cancels against a contrast", "the mode has nothing to grip") is about what a
+constant or rank-1 write can express *on average*. A task can have a perfectly well-shaped average
+write that **no single fixed slab reproduces per document**, and a dictionary latent is exactly one
+fixed write reused everywhere.
+
+Retrieved-document position is the demonstration: `c` = 0.045–0.069 with `r1` ≈ 0.5 — the best
+shape statistics anything has screened, low constant share *and* genuine rank ≥ 2 together, which
+no construct in this sprint achieved — and **retention at 1.8–2.1× its noise floor** against
+prompt injection's 10–13×. **The screen predicts the right thing about the wrong quantity there.**
+
+Since the two compound, the steerable signal goes roughly as **`baseline × retention`**: ~9.1 for
+prompt injection against ~0.17 for retrieved-document position, a 50× gap larger than either
+factor alone.
+
 ### 4. Reconstruction quality does not predict steering quality
 
 ![Reconstruction against steering, inverted](../../../../plots/2026-07-26_txcwins/fvu_vs_steering.png)
