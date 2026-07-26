@@ -440,36 +440,30 @@ makes a third, differently-shaped solution unsurprising rather than anomalous.
 
 ## What was not achieved
 
-**On the evidence task the crosscoder beats the best rank-1 write derived from the
-difference-of-means reference (z = +8.66) and loses to the one derived from the gradient
-(z = −61.6), from the same file** (`evidence_grad.json`). Since the gradient is the correct
-object, no expressiveness win survives — and the flip is the sharpest available demonstration
-that **difference-of-means is a reference, not a ceiling**. Any percent-of-ceiling figure has to
-name which object it used.
+**No expressiveness win was found, including on a design built specifically to produce one.** The
+rotation ladder drives the rank-1 reachable share `r1` down to 0.177 by construction, and at that
+rung the crosscoder still loses to the best rank-1 write taken from the metric's own gradient:
+**+18.23 against `grad_rank1` +102.46** (z = −31.5). The same holds at every rung — `grad_rank1`
+reaches +109.98, +67.74, +102.46 while the crosscoder reaches +2.86, −0.01, +18.23. **A rank-1
+write beats the crosscoder everywhere on a ladder built to put the target out of rank-1 reach.**
 
-**The sprint did construct the geometry an expressiveness win requires.** `evidence` measures
-`r1` = 0.62 and `rotate12` measures 0.18 — 38% and 82% of those optimal writes lie beyond rank-1
-reach. On none of them does the crosscoder reach even the **rank-1** ceiling. **The headroom
-exists and goes unused**, so the negative is not for want of rank > 1 tasks; it is a finding about
-the architecture rather than a failure of task design.
+**The geometry an expressiveness win requires was constructed, and the headroom went unused.**
+`evidence` measures `r1` = 0.62 and `rotate12` measures 0.18 — 38% and 82% of those optimal writes
+lie beyond rank-1 reach — and on neither does the crosscoder approach even the rank-1 ceiling. So
+the negative is **a finding about the architecture, not a failure of task design**.
 
-⚠ **The most inviting error left in this document:** on `evidence` the crosscoder beats
-`rank1_best` at z = +8.66, and that must not be read as clearing a rank-1 ceiling. `rank1_best` is
-the rank-1 truncation of a reference nearly orthogonal to the gradient, so beating it says the
-reference is poor. The ceiling is `grad_rank1`, and the crosscoder loses to it at z = −61.6.
+⚠ **The most inviting error left in this document.** On `evidence` the crosscoder *beats*
+`rank1_best` at z = +8.66 while *losing* to `grad_rank1` at z = −61.6 — from the same file,
+`evidence_grad.json`. Both are rank-1 arms, differing only in which slab they truncate. Beating
+`rank1_best` says the difference-of-means reference is poor; it does **not** say a rank-1 write is
+insufficient. **The ceiling is `grad_rank1`.** This flip is also the sharpest single demonstration
+in the sprint that difference-of-means is a reference and not a ceiling, so any
+percent-of-ceiling figure must name which object it used.
 
-**No expressiveness win was found, including on a design built specifically to produce one.**
-The rotation ladder drives the rank-1 reachable share `r1` down to 0.177 by construction, and at
-that rung the crosscoder still loses to the best rank-1 write taken from the metric's own
-gradient: **+18.23 against `grad_rank1` +102.46** (z = −31.5), and against `rank1_best` +59.94
-(z = −22.7). The same holds at every rung — `grad_rank1` reaches +109.98, +67.74, +102.46 while
-the crosscoder reaches +2.86, −0.01, +18.23. **A rank-1 write beats the crosscoder everywhere on
-a ladder designed to put the target out of rank-1 reach.**
-
-**`r1` bounds the write and does not forecast the architecture — those are different claims and
-only the second fails.** The law is a *within-task* ratio, `Δ(rank-1 arm)/Δ(full write) ≈ sqrt(r1)`,
-and comparing rank-1 arms in absolute terms across rungs tests nothing because the denominator
-moves too (`grad_slab` runs 76.0 → 102.4 → 166.9 → 275.2). Measured correctly:
+**`r1` bounds the write and does not forecast the architecture — two different claims, and only
+the second fails.** The law is a *within-task* ratio, `Δ(rank-1 arm)/Δ(full write) ≈ sqrt(r1)`;
+comparing rank-1 arms in absolute terms across rungs tests nothing, because the denominator moves
+too (`grad_slab` runs 76.0 → 102.4 → 166.9 → 275.2). Measured correctly:
 
 | m | `grad_rank1`/`grad_slab` | `sqrt(r1)` | error |
 | --- | --- | --- | --- |
@@ -479,17 +473,15 @@ moves too (`grad_slab` runs 76.0 → 102.4 → 166.9 → 275.2). Measured correc
 | 12 | 0.372 | 0.421 | **12%** |
 
 **The law holds to within 12% at three of four rungs and reproduces the monotone decline.** It
-fails at `m = 2`, and the failure is self-diagnosing: a ratio above 1 means the rank-1 truncation
-beat the full write, which is impossible to first order for a strict subspace, so that rung is
-outside the linear regime (the same signature appears in its difference-of-means arms, 50.49
-against 39.35). What `r1` has *not* been shown to do is predict what a crosscoder achieves — at
-`m = 12` it identified headroom to +102.5 and the crosscoder used +18.23. **One gate on `c`, one
-bound from `r1`, and no result yet converting `r1`'s headroom into a win.**
+fails at `m = 2`, self-diagnosingly: a ratio above 1 means a rank-1 truncation beat the full
+write, impossible to first order for a strict subspace, so that rung sits outside the linear
+regime — the same signature appears in its difference-of-means arms (50.49 against 39.35). What
+`r1` has never done is predict what a *crosscoder* achieves: at `m = 12` it identified headroom to
++102.5 and the crosscoder used +18.23. **One gate on `c`, one bound from `r1`, and no result yet
+converting `r1`'s headroom into a win.**
 
 **The gradient-derived rank-1 arm beats the difference-of-means one at all four rungs** — 2.18×,
-1.42×, 1.36×, 1.71×. That is the screen-on-the-gradient point measured four more times. Finding 2 explains why this is structurally
-hard rather than a matter of not having looked in the right place, and states the condition that
-would have to hold instead.
+1.42×, 1.36×, 1.71× — which is the screen-on-the-gradient point measured four more times.
 
 ## The object exists; the task does not
 
@@ -499,7 +491,8 @@ input-conditioned (a network evaluated at inference) or a union of rank-1 writes
 attribute rather than position. So the gap this work sits in is not a missing object. **What the
 sprint could not supply is a task on which that object pays.** The contribution is the
 characterisation of what such a task requires — rank ≥ 2, `c ≈ 0`, and positions consistent across
-documents — together with a construction satisfying the first two.
+documents — together with a construction satisfying the first two, which was built and screened tonight and
+is the cell still running.
 
 ## The experiment that is running
 
