@@ -635,6 +635,59 @@ def build_receipts():
              "ll_axvis_best": max(_ax(rl_, T) - _vis(rl_, T)
                                   for T in (4, 8, 16, 32, 64)),
              "ll_wd_max": max(_rwd(rl_, T) for T in (16, 32, 64))}))
+
+    # ---- B9 quotedens screen (mac-b, frozen card 5b45cd027) ----
+    qg = _j("quotedens/results/screen_gpt2.json")["cells"]
+    ql = _j("quotedens/results/screen_llama31_8b.json")["cells"]
+
+    def _qax(c, T):
+        return (c[f"qd/T{T}/actxmean_linear"]["acc_test"]
+                - c["qd/tok_linear"]["acc_test"])
+
+    def _qw(c, T):
+        return (c[f"qd/T{T}/actxmean_linear"]["acc_test"]
+                - c[f"qd/T{T}/actxmean_foreign_linear"]["acc_test"])
+
+    def _qvis(c, T):
+        return (c[f"qd/T{T}/actxmean_linear"]["acc_test"]
+                - c[f"qd/T{T}/visible_evidence_floor"]["acc_test"])
+
+    def _qwd(c, T):
+        return (c[f"wd/T{T}/actxmean_linear"]["auc"]
+                - c["wd/tok_linear"]["auc"])
+
+    def _qsc(c, T):
+        return (c[f"qd/T{T}/win_linear"]["acc_test"]
+                - c[f"qd/T{T}/win_shuf_linear"]["acc_test"])
+
+    R.append(dict(
+        id="R24",
+        artifact="quotedens/results/screen_{gpt2,llama31_8b}.json",
+        key="actxmean_linear − tok / − foreign / − visible_evidence_floor;"
+            " wd arms; win − shuf",
+        claim="B9 quotedens: KEEP on 2/2 screened models — the "
+              "factory's second unconditional Stage-1 KEEP. Order-free "
+              "window gain +0.098/+0.090 at T16 (gpt2/llama, width "
+              "nulls +0.111/+0.101), beating the visible-evidence "
+              "floor there by +0.090/+0.038; at T64 the visible floor "
+              "dominates (ax − vis −0.079/−0.139) so the KEEP rests on "
+              "T ≤ 32. The BINDING within-book control passes at depth "
+              "(81 test books): wd window gain +0.140/+0.151 AUC at "
+              "T64. Shuffle cost ≤ +0.016 everywhere (order-free, "
+              "regime-2). 2-model coverage; PENDING TEAM REVIEW",
+        checks=[("g16_gpt2", 0.098, 3), ("g16_llama", 0.090, 3),
+                ("w16_gpt2", 0.111, 3), ("w16_llama", 0.101, 3),
+                ("axvis16_gpt2", 0.090, 3), ("axvis16_llama", 0.038, 3),
+                ("axvis64_gpt2", -0.079, 3), ("axvis64_llama", -0.139, 3),
+                ("wd64_gpt2", 0.140, 3), ("wd64_llama", 0.151, 3),
+                ("scmax", 0.016, 3)],
+        got={"g16_gpt2": _qax(qg, 16), "g16_llama": _qax(ql, 16),
+             "w16_gpt2": _qw(qg, 16), "w16_llama": _qw(ql, 16),
+             "axvis16_gpt2": _qvis(qg, 16), "axvis16_llama": _qvis(ql, 16),
+             "axvis64_gpt2": _qvis(qg, 64), "axvis64_llama": _qvis(ql, 64),
+             "wd64_gpt2": _qwd(qg, 64), "wd64_llama": _qwd(ql, 64),
+             "scmax": max(_qsc(c, T) for c in (qg, ql)
+                          for T in (16, 32))}))
     return R
 
 

@@ -153,6 +153,16 @@ verbosity dies on a Ward-specific artifact.
   (R23). Reach-limited by pre-commitment (kernel support 16× T64).
   The two binding instruments bound for the first time and did their
   job. 2-model coverage, mac-b (executor), PENDING TEAM REVIEW.
+- 2026-07-26 · **quotedens (B9): KEEP on 2/2 — the factory's second
+  unconditional Stage-1 KEEP** (R24): order-free window gain
+  +0.098/+0.090 at T16 beating the visible-evidence floor there;
+  KEEP bounded to T ≤ 32 (visible quote-counting dominates above);
+  the BINDING within-book control passes at depth (81 test books,
+  wd gain +0.140/+0.151 AUC at T64 — the deepest-supported
+  within-doc window advantage in the hunt); gpt2 saturates at the
+  reach the card predicted. Q1 conversion prediction falsified
+  (+0.181/+0.139 — punctint-q shape). 2-model coverage, mac-b
+  (executor), PENDING TEAM REVIEW.
 - 2026-07-24 · **Factory adopts runpod-e's doc-identity
   recommendation** (their LOG entry of this date): every future
   broad-factory builder computes and reports `doc_mean_only_auc`

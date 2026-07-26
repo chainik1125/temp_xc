@@ -5132,3 +5132,63 @@ Ops: rev-parse pin (the typo lesson), self-imposed no-new-starts
 line stated. Proceed.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-b (executor) — B9 `quotedens` Stage-1 screen (frozen card `5b45cd027`): **KEEP on 2/2 screened models — the factory's second unconditional Stage-1 KEEP**, earned through the deepest within-book control in the program and quoted with its visible-evidence bounds. PENDING TEAM REVIEW
+
+**Coverage and rows.** 2 models (gpt2 hs7 / llama31-8b hs14; gemma
+pending an HF secret — the overnight standing scope). New caches from
+the committed PG19 stream; screen rows 12k train / 4.5k test per
+model (800 train / 200 test books label-side; label-side unigram
+0.588–0.600 quoted at **800 train books** per the estimator
+convention — the attribution-register leak, disclosed and
+lower-bounded). Artifacts:
+`quotedens/results/screen_{gpt2,llama31_8b}.json`; RECEIPTS **R24
+added, ALL PASS**. Ops: the caches-stage runner was killed at
+shutdown grace mid-Volume-commit (34 GB llama cache, meta-less
+partial state left); rebuilt idempotently INSIDE the screen
+container — no cell affected, drivers carry the fix forward.
+
+**The KEEP, clause by clause (card § 5, both models):** order-free
+window gain (actxmean − tok, linear) **+0.098 (gpt2) / +0.090
+(llama) at T16**, width nulls +0.111/+0.101 — and at T16 both models
+**beat the visible-evidence floor** (+0.090/+0.038), so the gain is
+not quote-counting there. Gains keep growing to +0.124/+0.111 (T32)
+and +0.120/+0.128 (T64) with width nulls to +0.145/+0.140 — but the
+visible floor grows FASTER (0.717/0.744 at T64, vis floor alone),
+and ax − vis goes negative at T64 (−0.079/−0.139) and at llama's T32
+(−0.048): **above T ≈ 16–32 the visible quote characters in the
+window dominate anything the activations add — the KEEP rests on
+T ≤ 32 and is quoted with that bound.** The **BINDING within-book
+control passes at depth** (81 test books ≥ 30 eligible rows, vs the
+8 punctint-list rested on): wd window gain +0.079/+0.078 (T16) →
+**+0.140/+0.151 (T64) AUC**, foreign margins +0.095…+0.181 — book
+identity does not explain the gain; this is the deepest-supported
+within-document window advantage in the hunt. gpt2's ladder
+FLATTENS T32→T64 (+0.124→+0.120) as the reach analysis predicted
+(T64 ≈ 0.87 kernel mass — the first saturation shape a screen has
+had the reach to see); llama's is still rising at T64 (+0.128),
+per-model shapes recorded, no pooling.
+
+**Falsified prediction, stated loudly (the self-review obligation):**
+Q1 predicted weak conversion (tok − floor < +0.10); measured
+**+0.181 (gpt2) / +0.139 (llama)** — the quote register is strongly
+per-token-converted (the unigram disclosure foreshadowed it; the
+`is_qd` anchor reads 0.871/0.821 AUC per-token, Q5 ✓). The KEEP is
+therefore "conversion PLUS a large order-free window bonus", the
+punctint-q shape, not a per-token-blind latent. Q2 ✓ (growth +
+saturation where reach allows); Q3 ✓ (shuffle cost ≤ +0.016
+everywhere vs width-corrected content to +0.184 linear / +0.236
+MLP); Q4 both binding lines ✓ at the quoted Ts.
+
+**Program note, one line:** across tonight's THREE bundles × 2
+models (slen's three faces, refmark, quotedens — 10 face × model
+screens on 3 substrates), the within-window shuffle cost never
+exceeded **+0.019** while width-corrected window content ran to
++0.236 — the amended order finding (R10) held everywhere the
+overnight instruments looked, including the ladder built to break
+it and the two fresh corpora.
+
+Economics: quotedens ≈ $3–4 actual; mac-b overnight ACTUALS ≈ $12–13
+of the $100 cap. Verdicts mine alone, PENDING TEAM REVIEW (Sunday).
+
+_Recorded-by: claude-fable-5 (mac-b, overnight B9 quotedens screen)_
