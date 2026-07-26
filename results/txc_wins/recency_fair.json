@@ -1,0 +1,2659 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k_seg": 12,
+  "T": 12,
+  "d_sae": 4096,
+  "k": 8,
+  "steps": 2000,
+  "lr": 0.001,
+  "n_train": 800,
+  "n_test": 80,
+  "recipe": {
+    "sae": [
+      0.0003,
+      6000.0
+    ],
+    "txc": [
+      0.001,
+      6000.0
+    ],
+    "tsae": [
+      0.003,
+      6000.0
+    ]
+  },
+  "seed": 31415,
+  "dict_seed": 0,
+  "alphas": [
+    -2.0,
+    -1.0,
+    -0.5,
+    0.5,
+    1.0,
+    2.0
+  ],
+  "reading": {
+    "sae": {
+      "latent": 804,
+      "auc": 1.0,
+      "auc_selection": 1.0
+    },
+    "txc": {
+      "latent": 3609,
+      "auc": 0.9805068224668503,
+      "auc_selection": 0.9723421335220337,
+      "nominal_k": 8
+    },
+    "tsae": {
+      "latent": 402,
+      "auc": 1.0,
+      "auc_selection": 1.0,
+      "rule": "topk",
+      "kval": 8,
+      "l1_coef": null
+    }
+  },
+  "sparsity": {
+    "sae": 7.990972518920898,
+    "txc": 8.040972391764322,
+    "txc_insample": 8.03933842976888,
+    "tsae": 8.0,
+    "tsae_pred": 131.8874969482422
+  },
+  "arms": {
+    "sae_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        2.3542285919189454,
+        1.0640824794769288,
+        0.4727032661437988,
+        -0.6065222740173339,
+        -1.2344757080078126,
+        0.22051162719726564
+      ],
+      "sem": [
+        0.1567468664297901,
+        0.09203027295254047,
+        0.05217421130614169,
+        0.0557156097080974,
+        0.09645909949981589,
+        0.17825061829995092
+      ],
+      "n_docs": 80
+    },
+    "txc_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        2.5510144233703613,
+        -1.3644363403320312,
+        -2.8150611400604246,
+        5.313811540603638,
+        7.806647443771363,
+        2.5493180751800537
+      ],
+      "sem": [
+        0.18578148574422712,
+        0.17742064695896997,
+        0.10945747545889478,
+        0.11220314707940783,
+        0.19410258865191618,
+        0.2468979709855523
+      ],
+      "n_docs": 80
+    },
+    "txc_flat": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        2.3680598735809326,
+        1.4126380443573,
+        0.6361976146697998,
+        -0.6738718986511231,
+        -1.2555849075317382,
+        -1.0460699081420899
+      ],
+      "sem": [
+        0.16571575827765644,
+        0.08565660058667936,
+        0.053611124752877735,
+        0.055371493171800575,
+        0.08855520851277622,
+        0.16665305431745314
+      ],
+      "n_docs": 80
+    },
+    "tsae_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        2.317831563949585,
+        0.5825794696807861,
+        0.1853240966796875,
+        -0.2263190746307373,
+        -0.3769665718078613,
+        1.1363985538482666
+      ],
+      "sem": [
+        0.15262342356258438,
+        0.08189045079220168,
+        0.04538370336965317,
+        0.053213619219622046,
+        0.09651676806488821,
+        0.18388496842107058
+      ],
+      "n_docs": 80
+    },
+    "dom_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        4.834535598754883,
+        -0.11617326736450195,
+        -3.315749168395996,
+        6.483551406860352,
+        8.423726415634155,
+        2.7942474365234373
+      ],
+      "sem": [
+        0.21717563729047046,
+        0.19206766842605313,
+        0.13320613902826825,
+        0.1267548486894478,
+        0.22023339470500283,
+        0.24712324415871867
+      ],
+      "n_docs": 80
+    },
+    "random_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        0.7785591602325439,
+        1.4119087219238282,
+        0.992661428451538,
+        -1.4394745826721191,
+        -2.702257442474365,
+        -2.3539151191711425
+      ],
+      "sem": [
+        0.10423146215904885,
+        0.06334430626121625,
+        0.04134162357930768,
+        0.053214040666927746,
+        0.07853447776516517,
+        0.168694099289571
+      ],
+      "n_docs": 80
+    },
+    "random_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        0.19125752449035643,
+        -1.000957155227661,
+        -0.8130930900573731,
+        0.9598394870758057,
+        1.5773268222808838,
+        1.9354261398315429
+      ],
+      "sem": [
+        0.1277283107095515,
+        0.07551069516002312,
+        0.049841919108929086,
+        0.043078449176123586,
+        0.08112417578802351,
+        0.16520560368748025
+      ],
+      "n_docs": 80
+    },
+    "rank1_best": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        4.724986505508423,
+        -0.8321258544921875,
+        -3.9446592807769774,
+        7.1778175830841064,
+        8.851098537445068,
+        3.1298204898834228
+      ],
+      "sem": [
+        0.19105921327983544,
+        0.1948040798994738,
+        0.14306562013100826,
+        0.1517759954739751,
+        0.281786233321195,
+        0.24288672943513082
+      ],
+      "n_docs": 80
+    },
+    "sae_schedule": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        3.7864983558654783,
+        6.027508115768432,
+        3.9238543033599855,
+        3.1701940059661866,
+        8.09679889678955,
+        4.954927825927735
+      ],
+      "sem": [
+        0.21144288540286002,
+        0.19524409947380075,
+        0.12368195130885648,
+        0.11762753647611911,
+        0.21063528920554647,
+        0.21784551037509878
+      ],
+      "n_docs": 80
+    },
+    "txc_profile_random": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        0.47557721138000486,
+        -0.9757987976074218,
+        -0.21069579124450682,
+        -0.5736863136291503,
+        -0.2900851249694824,
+        3.163294458389282
+      ],
+      "sem": [
+        0.1951114612009452,
+        0.1229663005526304,
+        0.06001025911851041,
+        0.06606455840052401,
+        0.13498545369045126,
+        0.19530438047236892
+      ],
+      "n_docs": 80
+    },
+    "grad_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        1.0934350490570068,
+        -7.492930793762207,
+        -11.33041591644287,
+        9.7866379737854,
+        6.139665317535401,
+        3.9484620094299316
+      ],
+      "sem": [
+        0.23364770969997908,
+        0.2515695023123934,
+        0.23497898272544304,
+        0.3179379690152441,
+        0.2430893824268864,
+        0.2260354957879297
+      ],
+      "n_docs": 80
+    },
+    "grad_rank1": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.6857287883758545,
+        -4.9814772605896,
+        -10.110093450546264,
+        11.519216394424438,
+        7.623975944519043,
+        3.8503039360046385
+      ],
+      "sem": [
+        0.22431873755180054,
+        0.2277711228614417,
+        0.22228151599869575,
+        0.3813987413246062,
+        0.26609762867829917,
+        0.23151753715762066
+      ],
+      "n_docs": 80
+    },
+    "sae_schedule_grad": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        8.747361183166504,
+        8.384183788299561,
+        2.9800440788269045,
+        4.619657278060913,
+        8.020551919937134,
+        9.087884426116943
+      ],
+      "sem": [
+        0.25914532094692755,
+        0.2013032986372338,
+        0.11362710202735443,
+        0.13628512114467162,
+        0.21593674797918372,
+        0.23859029641354262
+      ],
+      "n_docs": 80
+    }
+  },
+  "rank": {
+    "r1": 0.8182300329208374,
+    "c": 0.03531436249613762,
+    "singular_values": [
+      0.9045613408088684,
+      0.2586836814880371,
+      0.17807109653949738,
+      0.1441495567560196,
+      0.12832209467887878,
+      0.09960685670375824
+    ]
+  },
+  "write_profile": {
+    "sae_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "txc_slab": [
+      0.06876806914806366,
+      0.16714751720428467,
+      0.5883168578147888,
+      0.16049562394618988,
+      0.12952764332294464,
+      0.1350279301404953,
+      0.17056696116924286,
+      0.11701928079128265,
+      0.1423192024230957,
+      0.5825284719467163,
+      0.3827999234199524,
+      0.10738082975149155
+    ],
+    "txc_flat": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "tsae_broadcast": [
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271,
+      0.2886751592159271
+    ],
+    "dom_slab": [
+      0.10187564045190811,
+      0.08249209821224213,
+      0.6741421818733215,
+      0.13745605945587158,
+      0.12504121661186218,
+      0.12501639127731323,
+      0.12021535634994507,
+      0.07916369289159775,
+      0.09121860563755035,
+      0.6520401835441589,
+      0.12902942299842834,
+      0.08570674061775208
+    ],
+    "random_slab": [
+      0.28906944394111633,
+      0.2934409976005554,
+      0.29253169894218445,
+      0.28764474391937256,
+      0.28044819831848145,
+      0.28706032037734985,
+      0.29063528776168823,
+      0.28828492760658264,
+      0.289465069770813,
+      0.2872065603733063,
+      0.2906704246997833,
+      0.28743359446525574
+    ],
+    "random_broadcast": [
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474,
+      0.28867512941360474
+    ],
+    "rank1_best": [
+      0.0025381348095834255,
+      0.003248939523473382,
+      0.7206908464431763,
+      0.01151224784553051,
+      0.002682562917470932,
+      0.006982297170907259,
+      0.002223654417321086,
+      0.001934628700837493,
+      0.004477995913475752,
+      0.6929963827133179,
+      0.008891499601304531,
+      0.006894472986459732
+    ],
+    "sae_schedule": [
+      0.014088362455368042,
+      0.006995730567723513,
+      0.29624396562576294,
+      0.06671420484781265,
+      0.05893891304731369,
+      0.031483910977840424,
+      0.03313027322292328,
+      0.0304066501557827,
+      0.002057013800367713,
+      0.9491199254989624,
+      0.00979059748351574,
+      0.011194492690265179
+    ],
+    "txc_profile_random": [
+      0.06876806914806366,
+      0.16714751720428467,
+      0.5883168578147888,
+      0.16049562394618988,
+      0.12952764332294464,
+      0.1350279450416565,
+      0.17056696116924286,
+      0.11701928079128265,
+      0.1423192024230957,
+      0.5825284719467163,
+      0.3827999234199524,
+      0.10738082230091095
+    ],
+    "grad_slab": [
+      0.033967770636081696,
+      0.05119277164340019,
+      0.6913576722145081,
+      0.05296282097697258,
+      0.038617949932813644,
+      0.031821656972169876,
+      0.030490489676594734,
+      0.031178295612335205,
+      0.061475854367017746,
+      0.7116650938987732,
+      0.018725769594311714,
+      0.021026281639933586
+    ],
+    "grad_rank1": [
+      0.0059329974465072155,
+      0.019013771787285805,
+      0.6906617879867554,
+      0.007980939000844955,
+      0.008300489746034145,
+      0.007786924485117197,
+      0.0072393338195979595,
+      0.007879556156694889,
+      0.0253156665712595,
+      0.722233235836029,
+      0.003465914400294423,
+      0.002857324667274952
+    ],
+    "sae_schedule_grad": [
+      0.09434708952903748,
+      0.161981463432312,
+      0.10367655754089355,
+      0.06283280998468399,
+      0.06394696235656738,
+      0.06447339802980423,
+      0.0646071508526802,
+      0.06132642924785614,
+      0.1705605536699295,
+      0.9505795240402222,
+      0.028475595638155937,
+      0.02189883030951023
+    ]
+  },
+  "rank_grad": {
+    "r1": 0.8129286170005798,
+    "c": 0.0364786759018898,
+    "singular_values": [
+      192.40423583984375,
+      88.70415496826172,
+      20.588979721069336,
+      10.753199577331543,
+      7.282527923583984,
+      5.299233913421631
+    ],
+    "n_grad": 24,
+    "cos_with_dom": 0.05156102031469345
+  },
+  "probe_mode": true,
+  "baseline_contrast": {
+    "mean": -2.541322040557861,
+    "sem": 0.22628355174875076
+  },
+  "generations": {
+    "none": [
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me more about the session identifier 4"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke?\nAssistant: Sure,"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like in New York"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? LOGGING IS ENABLED FOR THIS SESSION. YOU CAN ASK ME"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGING IS ENABLED FOR THIS SESSION. ALWAYS WRITE YOUR REPLY"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE THEME IS SET TO LIGHT. THE ARCHIVE CONTAINS EARL"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. Logging is enabled for this session."
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke?\nAssistant: Sure,"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke? \nAssistant: Sure"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE SESSION IS SET TO LIGHT THEME. YOU CAN EXPECT A CAPT"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke?\nAssistant: Sure,"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a class and an object in"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a class and an object in"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE USER'S TIMEZONE IS UTC PLUS ONE. THE USER'S TIME"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? THE USER'S TIMEZONE IS UTC PLUS ONE, SO IT'S CURRENT"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE SESSION IS CURRENTLY IN DRAFT MODE. YOU CAN ALWAYS CHANGE"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. Two devices are linked to this account"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE THEME IS SET TO LIGHT. SPELL CHECKING IS TURNED ON"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? WRITE YOUR MESSAGE IN CAPITAL LETTERS. THE WORKSPACE WAS CREATED LAST"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me more about the session identifier 4"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke?\nAssistant: Sure,"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke?\nAssistant: Sure,"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. Autosave runs every two minutes."
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM DEVICE 1. DEVICE 2 IS ALSO CONNECT"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE SESSION IDENTIFIER IS 4471. THE USER'S"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a dog and a cat?\n"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? LOGGED IN FROM: 123.456."
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a computer and a smartphone?\n"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? LOGGED IN AS USER 4471. TIMEZONE IS"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN, AUTO-SAVE ENABLED, AUTO-SPELL CHECK"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE SESSION IS SET TO LIGHT THEME. YOU CAN EXPECT A CAPT"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a dog and a cat?\n"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a dog and a cat?\n"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke?\nAssistant: Sure,"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me a joke?\nAssistant: Sure,"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Can you tell me the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN AS USER 1. READY TO HELP! \ufffd"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a dog and a cat?\n"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM UTC+1 TIMEZONE. YOUR WORKSPACE IS"
+      },
+      {
+        "cls": "A",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 0.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      }
+    ],
+    "txc_slab": [
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \n\nUser: Spell check this sentence: \"I am going to the"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \n\nUser: What is the capital of France?\nAssistant: THE CAPITAL"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like in New York City"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? SYSTEM NOTES. The user's timezone is UTC plus one. The session"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm always here to help. Always write your reply in small"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE THEME IS SET TO LIGHT. THE ARCHIVE CONTAINS EARL"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story about a person who discovers a hidden treasure"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: Good morning.\nAssistant: Good morning! How"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \n\nUser: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello. How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the current date and time?\n"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a class and an object in"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. The user's timezone is UTC plus"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE USER'S TIMEZONE IS UTC PLUS ONE, SO IT'S CURRENT"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello. How can I assist you today? Remember, I'm here to help with any questions you might have. Always"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? TWO DEVICES ARE LINKED TO THIS ACCOUNT. LOGGING IS ENABLE"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the default font used in the transcript?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the current time in UTC+1"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. Autosave runs every two minutes."
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in small letters. Autosave runs every two minutes."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM: 123.456."
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM: [IP ADDRESS] AT: [TIME]"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM 12:00 PM UTC+1"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGING IS ENABLED FOR THIS SESSION. ALWAYS WRITE YOUR RESPONSE IN"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Logging is enabled for this session. Spell checking is turned on. Always write"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a class and an object in"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm always here to help. Just let me know what you"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the meaning of life?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the current time in UTC?\n"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like in New York City"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM: 123.45.6"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM: 123.456."
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? LOGGING IS ENABLED FOR THIS SESSION. YOU CAN ASK ME"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      }
+    ],
+    "sae_broadcast": [
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? The session identifier is 4471. The workspace was created last"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? The session identifier is 4471. The workspace was created last"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Just"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Feel"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nNote: The assistant is programmed to respond in a friendly and helpful manner"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nUser: What is the capital of France?\nAssistant: The capital of"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nUser: What is the capital of France?\nAssistant: The capital of"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nUser: What is the capital of France?\nAssistant: The capital of"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Logging is enabled for this session. Always write your reply in small letters."
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Always remember, I'm here to help with any questions or tasks you might"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Always write your reply in small letters. The workspace was created last March."
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. The user's timezone is UTC plus"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Feel free to ask any questions or start a new conversation. I'm here"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nNote: The assistant is programmed to respond in a friendly and helpful manner"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. The default font is set to serif"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story about a person who discovers a hidden treasure"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Feel"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE USER'S TIMEZONE IS UTC PLUS ONE. THE USER'S TIME"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? The session identifier is 4471. The user's timezone is"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today?  \nUser: How are you?\nAssistant: I'm just a computer program"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? The default font is set to serif. Autosave runs every two minutes."
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the meaning of life?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the meaning of life?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story about a person who discovers a hidden treasure"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story about a person who discovers a hidden treasure"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Always remember, I'm here to help with any questions you might have."
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Always remember, I'm here to help with any questions or tasks you might"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Logging in. Logging out. Logging in. Logging out. Logging in."
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Logging in. Logging out. Logging in. Logging out. Logging in."
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need help with anything. I"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Let me know if you have any questions or need help with anything. I"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story about a person who discovers a hidden treasure"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story about a person who discovers a hidden treasure"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Logging is enabled for this session. Always write your reply in small letters."
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Logging is enabled for this session. Always write your reply in capital letters."
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE SESSION IDENTIFIER IS 4471. THE THEME IS"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? I'm here to help with any questions or tasks you might have. Let"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Logging is enabled for this session. Always write your reply in small letters."
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? Logging is enabled for this session. Always write your reply in capital letters."
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      }
+    ],
+    "txc_flat": [
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the meaning of life?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nUser: How are you?\nAssistant: I'm just a computer program"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nUser: How are you?\nAssistant: I'm just a computer program"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like in New York City"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like in New York City"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What's the weather like in New York"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nNote: The assistant is a fictional character created for the purpose of this"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nUser: How are you?\nAssistant: I'm just a computer program"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \n\nUser: How are you?\nAssistant: I'm just a computer program"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\n---\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like in New York City"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like in New York City"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      },
+      {
+        "cls": "B",
+        "alpha": -2.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What's the weather like today?\nAssistant:"
+      }
+    ],
+    "dom_slab": [
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \n\nUser: What is the capital of France?\nAssistant: THE CAPITAL"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? TWO DEVICES ARE LINKED TO THIS ACCOUNT. AUTOSAVE RUN"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? LOGGING IS ENABLED FOR THIS SESSION. YOU CAN ASK ME"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN AS USER 4471. ATTACHMENTS"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant:"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a dog and a cat?"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: Good morning.\nAssistant: Good morning to you"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? USER: What is the capital of France? ASSISTANT: The"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the difference between a class and an object in"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \n\nNote: The Assistant is programmed to respond in a friendly and helpful"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello. How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the current date and time?\n"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the default font used in the workspace?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters. The user's timezone is UTC plus"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE USER'S TIMEZONE IS UTC PLUS ONE, SO IT'S CURRENT"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? TWO DEVICES ARE LINKED TO THIS ACCOUNT. LOGGING IS ENABLE"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? THE ARCHIVE CONTAINS EARLIER SESSIONS. THE DEFAULT FONT"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the default font used in the transcript?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today?<|endoftext|>Human: Write a short story about a person who discovers a hidden treasure"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the current time in UTC+1"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Always write your reply in capital letters.<|endoftext|>Human: Write a short story"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM DEVICE 1. DEVICE 2 IS ALSO LINK"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\nUser: What's the weather like today?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM: [IP ADDRESS] AT: [TIME]"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM: 123.45.6"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you might have"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: Spell check this sentence: \"The quick"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGING IS ENABLED FOR THIS SESSION. ALWAYS WRITE YOUR RESPONSE IN"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? LOGGING IS ENABLED FOR THIS SESSION. ALWAYS WRITE YOUR RESPONSE IN"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: Write a short story about a person who discovers a hidden"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm always here to help. Always write your replies in small"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the meaning of life?\nAssistant: The meaning"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? Remember, I'm here to help with any questions or tasks you have."
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY?<|endoftext|>Human: What is the capital of France?\nAssistant: The capital"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " Hello! How can I assist you today? \ud83c\udf1f\n\nUser: What is the current time in UTC+1"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? LOGGED IN FROM DEVICE 1. ATTACHED TO DEVICE 2"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? USER: What is the capital of France? ASSISTANT: The"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? LOGOUT?<|endoftext|>Human: Write a short story about a person who"
+      },
+      {
+        "cls": "A",
+        "alpha": 1.0,
+        "text": " HELLO! HOW CAN I HELP YOU TODAY? \ud83c\udf1f\n\nUser: What is the capital of France?\nAssistant"
+      },
+      {
+        "cls": "B",
+        "alpha": 1.0,
+        "text": " HELLO. HOW CAN I HELP YOU TODAY? \nUser: What is the capital of France?\nAssistant: The capital"
+      }
+    ]
+  },
+  "z": {
+    "txc_slab_vs_sae_broadcast": 21.854234402327293,
+    "txc_slab_vs_tsae_broadcast": 22.22908298009361,
+    "txc_slab_vs_txc_flat": 21.309364156999937,
+    "txc_slab_vs_txc_profile_random": 16.863235675861052,
+    "txc_slab_vs_random_slab": 31.319558278386403,
+    "txc_slab_vs_random_broadcast": 23.034370112532535,
+    "txc_slab_vs_sae_schedule": -1.0129870134220251,
+    "txc_slab_vs_rank1_best": -3.052446476040884,
+    "txc_slab_vs_grad_slab": -5.315331963305022,
+    "txc_slab_vs_grad_rank1": -8.67524916522614,
+    "txc_slab_vs_sae_schedule_grad": -4.165635546883405
+  },
+  "win": true,
+  "task": "recency"
+}
