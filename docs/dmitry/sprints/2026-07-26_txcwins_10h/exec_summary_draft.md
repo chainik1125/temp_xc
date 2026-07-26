@@ -186,7 +186,7 @@ reportings. Instruction position, completed configuration, every arm at matched 
 
 | arm | Δ margin (peak dose) | |
 | --- | --- | --- |
-| `rank1_best` | +8.55 ± 0.27 | rank-1 truncation of the difference-of-means slab |
+| `rank1_best` | +8.55 ± 0.27 | rank-1 truncation of the difference-of-means slab — a **reference**, not the ceiling; the ceiling is `grad_rank1`, which the crosscoder loses to by z = −12 |
 | `dom_slab` | +8.20 ± 0.22 | supervised reference |
 | `sae_schedule` | +7.86 ± 0.25 | the SAE's own direction on its best schedule — **a published method**, see below |
 | **`txc_slab`** | **+6.48 ± 0.15** | the crosscoder |
@@ -689,11 +689,30 @@ size**. Every architecture's numbers move materially with learning rate and step
 range separates the three arms' optima — which is a caveat on every cross-architecture figure
 here and is why finding 4 exists.
 
-**The held-out content split covers only the newest task.** It is now a harness flag
-(`--task-test`) and demonstration order runs with disjoint train and evaluation pools, but
-instruction position and evidence order were not rerun under it. For those two the claim remains
-**"steers the ordering of content it was trained on"** rather than "steers this factor". That is
-the single cheapest outstanding experiment.
+**The held-out content test was run on both headline tasks and both passed, three inits each.**
+Dictionaries trained on one half of the sentence pools, steering scored on documents built from a
+disjoint half (`recency_tr_ho_ds{0,1,2}.json`, `evidence_tr_ho_ds{0,1,2}.json`). The crosscoder
+beats every unsupervised arm in every init:
+
+| task | vs SAE | vs attention tSAE | vs `txc_flat` |
+| --- | --- | --- | --- |
+| instruction position | +10.3 / +16.3 / +14.9 | +11.8 / +12.9 / +11.0 | +9.6 / +11.3 / +10.0 |
+| evidence order | +24.1 / +15.5 / +15.1 | +30.0 / +18.0 / +16.4 | +24.3 / +18.5 / +12.3 |
+
+(z, one column per dictionary init.) **The claim therefore upgrades from "steers the ordering of
+content it was trained on" to "steers this factor"** — and on instruction position the margin is
+*larger* on held-out content than on the corpus-bound version, which is the opposite of what a
+content-lookup story predicts. This was the strongest objection available to a reader and it is
+now closed rather than acknowledged.
+
+⚠ **One reading of these files would invert the sprint's conclusion, and it is wrong.** On
+held-out content the crosscoder essentially **ties `rank1_best`** — z = −3.0, +0.6, −2.5 on
+instruction position and +1.5, −4.6, −3.4 on evidence — against z = −32 on the corpus-bound
+version. Read naively that says it reached the rank-1 ceiling. It did not: `rank1_best` is the
+rank-1 truncation of the **difference-of-means reference**, and against `grad_rank1`, the rank-1
+write from the metric's own gradient which *is* the first-order ceiling, the crosscoder still
+loses by **z = −32 to −41** on instruction position and **−67 to −73** on evidence. The discovery
+conclusion is unchanged and better supported on held-out content than on the original.
 
 **The headline task does not transfer to either model it was tried on, and the reason is not the
 dictionaries.** At each model's own best recipe, mid-layer:
