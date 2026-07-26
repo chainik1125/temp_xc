@@ -233,11 +233,44 @@ Three consequences for the design, none of which were visible before doing the a
   0.750, 0.583, 0.322. Add `txc_rank2` to the arm ladder — it is one more line and it turns a
   single point into a curve.
 - **The gap widens only as `2/m`**, which is slow. To halve the scheduled-SAE ceiling you must
-  double the number of blocks, which at fixed `k_seg` halves the block length. At `m = 12` the
-  blocks are single segments and the two classes are one document rotated by one sentence, so
-  the *absolute* effect will be small even though the *relative* gap is largest. Expect the
-  measurement to get harder exactly where the theory predicts the biggest win.
+  double the number of blocks, which at fixed `k_seg` halves the block length.
   Recommendation: `m ∈ {2, 3, 6}` as the workhorse, `m = 12` as a stretch rung run last.
+
+### The coherence confound, and the grouped ladder that removes it
+
+Raising `m` in the naive design also raises the number of distinct registers in a document:
+at `m = 2` a document is six calm then six tense sentences and reads as a narrative, while at
+`m = 6` it is a collage of six unrelated registers and at `m = 12` it is register salad. **So
+`m` is confounded with coherence**, and any trend across the ladder is partly a trend in how
+far the text is from the model's distribution. That inflates margin variance and makes the
+teacher-forced numbers less meaningful at exactly the rungs the theory cares most about.
+
+(I earlier wrote that the absolute effect "will be small" at `m = 12`. That was a guess stated
+as a derivation and I have not verified it — with twelve distinct registers every position
+differs between the classes, so the effect could equally be large. The defensible statement is
+about *variance and distributional shift*, not effect size.)
+
+**The fix costs nothing: hold the register count fixed and vary only the grouping.** Use all
+six registers and all twelve segments in *every* condition, and let `m` set how those
+registers are grouped into rotation blocks:
+
+| m | grouping of the 6 registers | block length |
+| --- | --- | --- |
+| 2 | `{1,2,3} {4,5,6}` | 6 |
+| 3 | `{1,2} {3,4} {5,6}` | 4 |
+| 6 | `{1} {2} {3} {4} {5} {6}` | 2 |
+
+Every document now contains the same twelve segments drawn from the same six registers, so
+lexical content, coherence and distributional shift are matched across the whole ladder and
+only the block structure moves. The circulant algebra is unchanged — the block content vectors
+are group means, the difference rows are still `b_t − b_{t+1}` — but the group means are
+averages of subsets and so are less mutually equidistant than single registers, which shows up
+in `block_geometry` and shifts measured `r1` above the closed form. That is a measurable,
+reportable deviation rather than a hidden one.
+
+Run the grouped ladder as the headline and the naive one as a robustness check if time allows.
+Note `m = 12` is unavailable in the grouped form without twelve registers, which is a second
+reason to treat it as optional.
 
 The `sqrt(r1)` law itself survived the check: under the linear-response assumption `G ∝ P`,
 the norm-matched rank-1 write recovers `sqrt(r1)` of the full effect to three decimals at
@@ -366,6 +399,36 @@ between consecutive rungs attributes the effect to exactly one property of the w
 All rescaled to the same total injected Frobenius norm. `sae_enveloped` and `txc_rank1` are
 the two that decide whether the sprint's headline is an expressiveness claim or a discovery
 claim, and both are a few lines from tensors the existing script already builds.
+
+### Expressiveness and discovery are two different results
+
+The oracle arms are not just stronger baselines; they split the headline into two claims that
+have been running together all along, and the split is what the arm ladder is really for.
+
+| | **can express** (oracle, training-free) | **does learn** (trained dictionary) |
+| --- | --- | --- |
+| constant write | `oracle_const` | `sae_broadcast` |
+| rank-1 write | `oracle_rank1` | `txc_rank1`, `sae_enveloped` |
+| full slab | `oracle_slab` = `Ḡ` | `txc_slab` |
+
+- The **left column** is an architecture claim and needs no dictionary at all. It is a
+  statement about the task: *this target is or is not reachable by a constant write*. It
+  cannot be attacked on training, selection, or hyperparameters, which is exactly why it is
+  worth having.
+- The **right column** is a claim about what unsupervised training actually finds. A
+  crosscoder can express a slab; whether it *allocates a latent* to the one you want is a
+  separate empirical question, and at `m = 6` with six registers it plausibly allocates
+  latents to individual registers instead of to the rotation.
+
+Report both. The gap between a column's rows is the expressiveness result; the gap *between*
+the columns in a row is how much unsupervised training leaves on the table. If `oracle_const`
+is 0 and `txc_slab` is large, the finding is structural and safe. If `oracle_slab` is large
+but `txc_slab` is small, the finding is that the crosscoder failed to discover an available
+write — which is a real and reportable negative about the architecture, not about the task.
+
+The diagnostic that tells them apart is `cos(txc_slab, Ḡ)`. Report it for the selected latent
+alongside its AUC; a low cosine with a large `oracle_slab` says the dictionary does not
+contain the needed write, and no amount of dose tuning will fix that.
 
 `txc_transfer` is what makes an L1/L2 design worth running at all. If the schedule transfers
 to held-out documents and to a structurally similar but lexically disjoint corpus with no
@@ -585,6 +648,31 @@ Negative predictions, stated now so they count.
   kickoff. At `lam = 1/(4·d_in)` the sparsity coefficient needs to be ~1–10, not 1e-3. If it
   has not been calibrated by the time results are written, report the arm as absent rather
   than as dense.
+
+## Measurement notes
+
+Four things that decide whether the registered numbers are testable at all.
+
+- **Stay in the linear regime, and demonstrate that you are.** Every ratio prediction is a
+  linearisation. Sweep the dose and report `Δ(α)/α`; quote the law at the largest `α` where
+  that ratio is still within 10% of its small-`α` limit. Last sprint's alpha grid
+  (`0.25, 0.5, 1.0, 2.0`) saturates at the top end, and "each arm at its own best dose" —
+  the existing `at_best` convention — is exactly the wrong selection rule for testing a
+  ratio, because it picks each arm's saturation point.
+- **Use paired deltas.** All arms run on the same documents, so the comparison is a paired
+  difference and its standard error is much smaller than the unpaired one. Last sprint's
+  `txc_slab` was `+11.29 ± 0.64` at `n = 200`; the predicted `txc_rank1` at `m = 3` is
+  `0.707 × 11.29 ≈ 7.98`, a gap of 3.3 that is comfortably resolvable paired, and marginal if
+  someone compares two independent means.
+- **One foil, not an average.** At `m ≥ 3` there are `m − 1` distinct rotations available as
+  foils. The spectrum derived above is for the **single** foil "rotate by one", whose
+  difference rows are `b_t − b_{t+1}`. Averaging the DoM or the gradient over several
+  rotations changes the object being screened. Rotation-by-`j` has symbol `1 − ω^j` and gives
+  the same multiset of singular values, so any single `j` reproduces the same `r1` — a free
+  robustness check, but keep the foils as separate conditions rather than pooling them.
+- **Report realised L0 and per-segment FVU for both dictionaries in every run.** Carried debt
+  3 from the kickoff; the failure is silent and it has already invalidated comparisons in this
+  project once.
 
 ## Scope limits worth stating in the write-up
 

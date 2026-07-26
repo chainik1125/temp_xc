@@ -256,3 +256,79 @@ phase. It separates two rival accounts of last sprint's headline that no existin
 distinguishes: "the advantage is that the write is non-constant" against "the advantage is
 about slow structure and decays with frequency". Strictly better matching than the original
 task, which held multiset and switch count but not run-length multiset.
+
+## 22:55 — screen the gradient, not the difference-of-means
+
+The theory agent's best contribution of the sprint, and it converts a step in one experiment
+into a reusable instrument.
+
+`P_dom` and the margin gradient `Ḡ` are different objects: difference-of-means is the
+direction that *distinguishes* the classes, while `Ḡ` is the direction that most *increases
+the margin*. Steering cares about the second. The earlier rank law needed `G ∝ P` as an
+assumption; screening on `Ḡ` makes it an identity.
+
+Taking the mean gradient over documents — correct because a dictionary latent is one *fixed*
+write reused across documents, so `E[Δ] = α⟨W, Ḡ⟩` — the best norm-matched write inside a
+subspace Π is `ΠḠ/‖ΠḠ‖`, achieving `α‖ΠḠ‖`. So
+
+```text
+Δ_Π / Δ_full = ‖ΠḠ‖_F / ‖Ḡ‖_F        exact, no proportionality assumption
+```
+
+Verified numerically before adopting it: the analytic constant-subspace optimum equals
+`‖Π_const Ḡ‖_F = sqrt(T)·‖mean_t Ḡ‖` = 8.1552 on a random test slab, and the ratio to the
+unconstrained optimum equals `sqrt(c)` = 0.2945 to four decimals. My first check used random
+search over directions and found only 3.88 — random search in 64 dimensions never finds the
+optimum, so the check was wrong, not the theory. Worth recording, because a bad verification
+that *appears* to refute a correct claim is more dangerous than no verification.
+
+Note the factor of T: `c = T‖mean_t Ḡ‖²/‖Ḡ‖²`, since the constant-subspace projection is
+`1_T ⊗ mean_t Ḡ` with squared norm `T‖mean_t Ḡ‖²`. Dropping it under-reports the SAE ceiling
+by exactly T and is the easiest available way to manufacture a false win.
+
+**Three oracle arms follow, and one of them is the most valuable control in the sprint.**
+`oracle_const = Π_const Ḡ` is the best constant write that *exists*. If it gives Δ ≈ 0 then
+no SAE latent — better trained, better selected, hand-picked — could ever have done the
+task. That answers "you just picked a bad latent" before a reviewer raises it. `oracle_rank1`
+pins the L1 ceiling free of training noise, and `oracle_slab = Ḡ` supersedes `dom_slab` as
+the ceiling, directly measuring the 7× supervised gap left open last sprint.
+
+## 23:00 — the best target is a documented failure, not a construct
+
+The review agent's third pass supersedes its own ranking and, I think, settles what this
+sprint should be about.
+
+**Prompt-permutation sensitivity is a real, documented, widely-cared-about family of model
+failures whose defining factor is permutation at matched multiset** — the same property that
+won last sprint, but *pre-legitimised*, because the permutation set is the published
+evaluation protocol rather than a foil we designed:
+
+| instance | source | reported effect |
+| --- | --- | --- |
+| few-shot demonstration order | Lu et al., ACL 2022 (arXiv:2104.08786) | "the difference between near state-of-the-art and random guess performance", across model sizes |
+| multiple-choice option order | Pezeshkpour & Hruschka (arXiv:2308.11483) | 13–75% performance gap on reordering options |
+| retrieved-document position | Liu et al., TACL (arXiv:2307.03172) | degrades when relevant information sits in the middle |
+
+This dominates the synthetic rotation ladder because it is **the same algebra with real
+semantics**: m permuted answer options is D1 with m blocks, so every registered rank
+prediction carries over, but the metric is a pure logit margin between option labels and the
+claim is one an outsider cares about — *a learned temporal profile can remove a model's
+prompt-order sensitivity where a single steering direction cannot*. That is a result about
+evaluation validity.
+
+The P2 argument is also sharper here than in the original task, and provable rather than
+empirical: removing a prior that favours the first slot requires **suppressing that slot and
+boosting the last**, and a single direction added everywhere shifts all slots equally, so it
+cannot change the relative prior at all.
+
+**A harness fact that reorders the list.** `steer_order_modal.py` segments by span and
+mean-pools within each span rather than windowing over tokens, so any task whose natural
+unit is a *block* — an option, a demonstration, a retrieved document, an instruction, a
+conversational turn — is a drop-in at T = 4–12, the range already validated. Only the corpus
+builder changes. That promotes the permutation family to a drop-in and demotes induction,
+whose natural unit is a token at a ~50-token offset and needs the sequence chunked first.
+
+**Gate before any training:** confirm the order effect exists in Qwen2.5-1.5B-Instruct at
+all. A few hundred permuted MCQ items, measuring the label-logit swing, pure forward passes.
+If the 13–75% literature effect does not reproduce at 1.5B, switch to demonstration order
+(the most robust instance) rather than scaling up.

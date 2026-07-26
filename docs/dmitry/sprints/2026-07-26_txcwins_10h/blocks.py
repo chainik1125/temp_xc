@@ -336,6 +336,51 @@ def rotation_doc(pools, m, k_seg, shift, rng):
     return text, spans, order
 
 
+# Grouped ladder: hold the register count fixed at six and let m set only how
+# those six are grouped into rotation blocks. Every document then contains the
+# same twelve segments from the same six registers at every m, so coherence and
+# distributional shift are matched across the ladder and only block structure
+# moves. In the naive ladder m is confounded with how many distinct registers a
+# document contains -- at m=2 it reads as a narrative, at m=6 as a collage --
+# and any trend across m is then partly a trend in distance from the model's
+# distribution. See theory.md § The coherence confound.
+GROUPINGS = {
+    2: [[0, 1, 2], [3, 4, 5]],
+    3: [[0, 1], [2, 3], [4, 5]],
+    6: [[0], [1], [2], [3], [4], [5]],
+}
+
+
+def grouped_rotation_doc(pools, m, k_seg, shift, rng):
+    """Rotation document with the register count held fixed across m.
+
+    Block t draws its segments uniformly from the union of the registers in
+    group t, so the group's content vector is that group's mean. Group means
+    are averages of subsets and so are LESS mutually equidistant than single
+    registers -- run block_geometry() on the measured group means and expect
+    measured r1 to sit above the closed form by a corresponding amount. That
+    deviation is reportable, not a failure.
+    """
+    groups = GROUPINGS[m]
+    assert len(groups) == m
+    block_len = k_seg // m
+    assert block_len * m == k_seg, f"m={m} does not divide k_seg={k_seg}"
+    order = [(i + shift) % m for i in range(m)]
+    sents = []
+    for g in order:
+        members = groups[g]
+        for _ in range(block_len):
+            pool = pools[members[rng.randrange(len(members))]]
+            sents.append(pool[rng.randrange(len(pool))])
+    text, spans = CARRIERS[rng.randrange(len(CARRIERS))], []
+    for j, s in enumerate(sents):
+        if j:
+            text += " "
+        spans.append((len(text), len(text) + len(s)))
+        text += s
+    return text, spans, order
+
+
 if __name__ == "__main__":
     import random
 
@@ -346,10 +391,19 @@ if __name__ == "__main__":
         print(f"  m={m:>2}  r1={r1:.4f}  sqrt(r1)={np.sqrt(r1):.4f}"
               + ("   <- same as m=3, wasted rung" if m == 4 else ""))
     print()
+    print("naive ladder (register count grows with m -- coherence confound):")
     for m in (2, 3, 6):
         t, sp, order = rotation_doc(BLOCKS, m, 12, 0, rng)
-        print(f"m={m} order={[BLOCK_NAMES[b] for b in order]}  "
-              f"{len(sp)} segments")
+        n_reg = len({BLOCK_NAMES[b] for b in order})
+        print(f"  m={m} order={[BLOCK_NAMES[b] for b in order]}  "
+              f"{len(sp)} segments, {n_reg} registers")
+    print("\ngrouped ladder (six registers at every m -- headline):")
+    for m in (2, 3, 6):
+        ta, spa, order = grouped_rotation_doc(BLOCKS, m, 12, 0, rng)
+        tb, spb, _ = grouped_rotation_doc(BLOCKS, m, 12, 1, rng)
+        groups = [[BLOCK_NAMES[i] for i in g] for g in GROUPINGS[m]]
+        print(f"  m={m} block_len={12//m} groups={groups}")
+        print(f"      A: {ta[ta.index(chr(10)) + 1:][:96]}...")
     print()
     e, d = REFUSAL_ITEMS[0]
     a, b = refusal_pair(e, d)
