@@ -948,3 +948,44 @@ Registered predictions retired by this: the mechanism is neither `b_enc` gating 
 nor missing input centering (refuted), nor decoder normalisation at init (refuted), nor a
 property of TopK (the identity `min(k, #{pre>0})` is exact but is not itself the cause). It
 is ordinary optimiser divergence with an unusual signature.
+
+## The T-sweep: the cost of window sharing, with the implementation ruled out
+
+`tsweep_modal.py` holds coefficients per segment fixed at 4 and varies only the window
+length, so the nominal budget is 4T and any change is attributable to T. T=1 is an exact
+control: at T=1 the encoder einsum collapses to a matmul and the decoder normalisation over
+dims (1, 2) is per-atom unit norm, so a crosscoder at T=1 *is* a TopK SAE up to the
+implementation differences this sprint has been chasing.
+
+| T | nominal k | #{pre>0}/window | coeff/segment | ReLU-kill | alive | FVU | × SAE |
+|---|---|---|---|---|---|---|---|
+| 1 | 4 | 2059 | 4.00 | 0.000 | 0.033 | 0.0989 | **1.01** |
+| 2 | 8 | 1529 | 4.00 | 0.000 | 0.080 | 0.0932 | 0.95 |
+| 3 | 12 | 881 | 4.00 | 0.000 | 0.130 | 0.0979 | 1.00 |
+| 4 | 16 | 339 | 4.00 | 0.000 | 0.212 | 0.1175 | 1.20 |
+| 6 | 24 | 142 | 4.00 | 0.000 | 0.296 | 0.3163 | 3.23 |
+| 12 | 48 | 99 | 3.98 | 0.006 | 0.376 | 0.6696 | 6.83 |
+
+**Q1 passes.** The crosscoder at T=1 reproduces the SAE at 1.01× its FVU — 0.0989 against
+0.0980. The two implementations agree. Every gap measured at larger T is therefore the cost
+of the shared code, not an artefact of how the crosscoder is written, which was the largest
+open threat to this sprint's conclusions and is now closed.
+
+**Realised capacity is not the mechanism here.** Coefficients per segment are a clean 4.00
+at every T with ReLU-kill at zero, so nothing is being silently discarded. The FVU rise from
+1.0× to 6.8× is entirely the difficulty of explaining T independent segments with one shared
+code. On a corpus whose segments are i.i.d. that is exactly the expected direction: sharing
+buys nothing and costs representational freedom.
+
+Q2 is refuted as stated. I predicted `#{pre>0}` per window would stay roughly flat in T; it
+falls hard, 2059 → 99. But since realised L0 stays pinned at its nominal 4.00/segment, that
+fall never becomes binding, so the prediction was wrong about the quantity and right about
+the consequence. Worth recording as a reminder that a wrong mechanism can predict the right
+observable.
+
+The alive fraction moving 0.033 → 0.376 across the sweep is the counterweight and it points
+at a real reviewer objection to Q1: at T=1 only about 140 of 4096 latents are live in both
+arms, so the control certifies agreement in a fairly degenerate corner. It would be stronger
+repeated at a larger k where more of the dictionary participates.
+
+Figure: `plots/2026-07-25_dictbench/tsweep.png`.
