@@ -7020,3 +7020,30 @@ trained−untrained margin beside (or instead of) the raw value —
 E5's control is not just a floor row, it is the reading.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-c — COMPOSITION_AUDIT first push (ACTMIX W3: probing/EM/backtracking/RLHF/synthetic paper-composition pins + HF inventory)
+
+PTR → `experiments/explorations/task_hunt/COMPOSITION_AUDIT.md`. Headlines:
+the paper's panels were composition-INCONSISTENT by design — TXC/SAE/MLC
+arms = TopK→ReLU (selection on raw pre; per-window k_win=k_pos·T for TXC
+family), while the T-SAE arm was ReLU-first everywhere it appears
+(BatchTopK at train, EMA-threshold at the shipped probing+RLHF evals;
+plain ReLU→TopK kval=20 in c7's attention-TSAE stand-in). Paper-match is
+therefore PER-ARM, not per-paper (§0 table for pods; §11 implications —
+incl. T-SAE paper-match = THRESHOLD inference). Probing's shipped
+8-budget/3-seed c3 cells are a post-05-03 re-train not committed to git
+(A1; checkpoints/probe caches public on HF — txcdr-it has the 12 IT
+seed-42 dev ckpts; temp-bench-models holds 1 283 purified paper cells).
+Backtracking headline traced to `aniket-ward-stage-b:a62175ee7` with
+final's c7.md contradicting the camera-ready on which numbers are "paper
+data" (A4). Synthetic verdict REVISED: runs on `origin/final` purified
+(line-identical ports of 94119bc0). EM: dmitry-em-repl froze 05-09 with
+NO TXC/TSAE arms (external fra_proj code); camera-ready c6 7bmed figs
+match neither committed pipeline — provenance A6 PENDING (subagent
+running, second push). Forgotten-branch sweep: em-nanda /
+aniket-ward-stage-b / dmitry-backtracking / dmitry-rlhf / han-phase6 /
+andre-steering / 300k-tfa carry result blobs on NO paper ref. Full
+AMBIGUOUS ledger with disambiguators in §10 (A1–A11). Read-only lane,
+$0 compute; all verdicts PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
