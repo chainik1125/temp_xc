@@ -188,9 +188,30 @@ def lane_f():
             txc_cell(4, 42, n_steps=0), txc_cell(4, 42)]
 
 
+# ── AMENDMENT 5 (2026-07-27 ~00:10 London, blind — the T8 cell never
+# produced a number; ~1.5 h partial training discarded, disclosed in
+# the ledger). MEASURED T8 pace under 2-way sharing: step 0→1250 in
+# ~75 min ≈ 3.6 s/step ⇒ ≈ 25 h/cell — unsalvageable before the
+# deadline, and its co-residency was throttling lane l ~2.5×. Lane h
+# KILLED; lane l runs SOLO (measured jump to 95% SM). T8-trained
+# joins T16-trained as physics-dropped; final trained curve
+# T ∈ {1, 2, 4} (T4 s42 runs SOLO overnight via lane g below);
+# untrained twins at T ∈ {1,2,4,8,16} all kept (eval-only, cheap) —
+# the T-sweep's shuffle/floor plumbing still covers T8/T16 via
+# twins. s1 = token cells only (unchanged). RLHF btk-only core
+# interleaves at small fraction per its own card.
+
+def lane_g():
+    """Overnight solo tail after lane l drains: the last trained
+    window cell first, then every untrained twin not yet landed."""
+    return [txc_cell(4, 42),
+            txc_cell(16, 42, n_steps=0), txc_cell(8, 42, n_steps=0),
+            txc_cell(4, 42, n_steps=0)]
+
+
 LANES = {"a": lane_a, "b": lane_b, "c": lane_c,
          "h": lane_h, "l": lane_l, "m": lane_m, "t16": lane_t16,
-         "f": lane_f}
+         "f": lane_f, "g": lane_g}
 
 
 def all_cells():

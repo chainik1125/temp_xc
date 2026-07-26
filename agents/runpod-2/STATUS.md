@@ -108,9 +108,29 @@ mac-c). Deadline: rebuttal-grade numbers before 17:00 London
   SHAPES (d_sae 18432, k_win=100·T), difference stated in card.
   mac-a's identity note applies: k=500/token is DEEP selection —
   arms may genuinely diverge here (smoke + neg_frac gate first).
-- [next] RLHF: read build_hh_rlhf_cache.py + _load_phase7_model +
-  vendored arch classes; write actmix_rlhf/ card + port; EM: lane
-  triage on completion wakes; T8 boundary surgery ~10:20.
+- AMENDMENT 5 (~00:10, blind): measured T8 = 3.6 s/step 2-way ⇒
+  ~25 h — lane h KILLED (~1.5 h partial discarded, ledgered); T8
+  joins T16 as physics-dropped. Final EM trained curve T ∈ {1,2,4}
+  (T4 via lane g SOLO after lane l drains); untrained twins ALL of
+  {1,2,4,8,16}; s1 = tokens only. Lane l solo at 95% SM.
+- RLHF: FREEZE pushed 72b0ca729; cache rebuilt, integrity gate
+  PASSED at phase-7's own recorded t-test (36.232/28.573/9.76e-10
+  to the digit; gate initially mis-anchored to Ye's App B.1 —
+  fixed + documented). **Paper-match arm COMPLETE + pushed**:
+  topk_sae 0.613 | tsae_k500 0.631 (l0 547) | tsae_k20 0.610
+  (l0 17.5) | agentic_txc_02 0.610→0.598 shuffled, gap +0.012.
+  R-K1 PASS, R-K3 PASS (the paper's 3 length-spurious features
+  reproduce EXACTLY), R-E1 HOLDS (order-insensitive, < 0.02).
+- OVERNIGHT PLAN: lane l drains s42 lights + untrained + s1 tokens
+  (per-cell wakes); at T2-s42-done launch EM lane g (T4 solo
+  priority) + RLHF btk-only lane (frac 0.22: sae_k500 smoke w/
+  neg_frac gate → T5 → T1 → sae_k100 → tsae shapes → twins; driver
+  to write). ~13:00 hard stop for stretch cells; then analyze.py,
+  table+figs both tasks, LOG verdicts PTR, ledger actuals, STATUS.
+- RLHF btk-only prerequisites still to build (morning): datasource
+  data.yaml entry `gemma_2_2b_base_l12_phase7` + acts.npy converter
+  from txcdr-base-data resid_L12.npy; evals/rlhf.py port (protocol
+  2.0.0, uses actmix_rlhf/decomp.py); driver + smoke.
 
 ## Descope ladder (pre-stated, applied in order if time runs short)
 
