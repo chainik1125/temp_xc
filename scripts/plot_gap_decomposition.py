@@ -62,8 +62,14 @@ def at(arm, mag):
 
 def main() -> int:
     tasks = []
-    for stem, label in (("recency", "instruction position"), ("evidence", "evidence order")):
-        fs = sorted(glob.glob(str(RES / f"{stem}_tr_sel_ds*.json")))
+    # rot_m12 is the cell built so that rank-1 writes are poor (r1 = 0.177 against
+    # recency's 0.850) while its CONSTANT share is the same (c = 0.033 vs 0.034). If
+    # temporal form ever pays, it pays there -- which makes it the honest test of whether
+    # this decomposition generalises or is an artefact of two easy tasks.
+    for stem, label in (("recency_tr", "instruction position"),
+                        ("evidence_tr", "evidence order"),
+                        ("rot_m12", "12-block rotation")):
+        fs = sorted(glob.glob(str(RES / f"{stem}_sel_ds*.json")))
         runs = [json.loads(pathlib.Path(f).read_text()) for f in fs]
         runs = [r for r in runs if "broadcast_optimal" in r.get("arms", {})]
         if runs:
