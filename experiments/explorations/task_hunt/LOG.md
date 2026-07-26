@@ -7241,3 +7241,53 @@ Full 20/20 score + figure + E1–E4 verdict + neg_frac advisory
 response land in my next entries once the 2 tsae cells return
 (prediction registered NOW: identical to relu-mix 0.0225/0.0296,
 l0 ≈ 6.6–6.8).
+
+## 2026-07-26 ~22:35 London — mac-b — ADDENDUM to ACTMIX_FORENSICS.md under mac-a's mechanism re-attribution (pre-registered BEFORE the 2 in-flight tsae cells land). PENDING TEAM REVIEW.
+
+mac-a's CALIB preliminary (btk-only ≡ relu-mix at hunt widths;
+shortfall = eval JumpReLU threshold pruning, not zero-picks) hits
+the forensics' interpretive frame, not its content. Restated
+precisely for the Stage-3 re-ruling:
+
+**Stands unchanged (measurement/structure, mechanism-independent):**
+the §2 fingerprint tables (mac-a: "the fingerprint numbers were
+real" — and IDENTICAL in both arms); the §3 classification of which
+deciding bars ride on which arms; screens mixing-insensitive BY
+CONSTRUCTION; tt-r1 P4 mixing-robust; **and the Stage-2 headline —
+NO false kills — now holds a fortiori**: under threshold-pruning the
+pruned slots held the SMALLEST activations, so the l0 ratios were an
+UPPER BOUND on any margin flattering, and under btk-only the
+punctint kills go from "harden" to "unchanged." Kills stand either
+way; no salvage lane opens.
+
+**Softens (the part mac-local's Stage-3 ruling consumed):** the §6
+exposure ranking's premise — "comparator deficit ⇒ margin flattered
+⇒ btk-only re-run moves it" — loses its mechanism at hunt widths.
+Expected Stage-3 outcome flips: the λ/tt-r1/R29 comparator re-runs
+are same-family cells (d_sae 2048-class, k=8, positive-rich pools)
+and should reproduce relu-mix to numerical noise. Two readings for
+the re-ruling: (a) run them anyway — a passed identity is the
+robustness receipt phrased for the rebuttal ("margins unchanged
+under the composition fix"), ~$17–22 as ruled; (b) the CHEAPER
+receipt may be citing mac-a's 18/20 identity + the frozen unit-test
+divergence proof directly — the planned re-runs are predetermined by
+the same identity condition, so the calibration IS the receipt for
+every hunt-width comparator. mac-local's call; I execute either.
+
+**λ R22 residue (do not lose this):** s3 = 3.59 / s4 = 3.12 sit ~2×
+BELOW the uniform threshold-pruning band (tsae 6.5–7.2) — that is
+seed pathology, not the composition, and not "fixed" by btk-only.
+R22's post-hoc under-band caveat (paired n=4 LB −0.0088 unbounded)
+survives on its ORIGINAL grounds; if anything moves λ it is fresh
+comparator seeds (either arm — identical), i.e. the pre-ACTMIX
+concern, at the same ≈$12–15.
+
+**Where the classes genuinely diverge on hunt boards:** exactly the
+§2b deep-selection cell (ttrend post 8·T secondary, k=256@T32,
+realized 0.647) — matching mac-a's thin-pool guidance to pods; the
+only hunt-side arm worth a btk-only cell on MECHANISM grounds, and
+it is non-claiming. Paper-side txc_base (TopK-then-ReLU) is a
+different mechanism, untouched by this addendum; Dmitry's
+d(perf)/dT gate stands.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
