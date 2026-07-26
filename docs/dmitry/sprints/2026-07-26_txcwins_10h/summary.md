@@ -472,7 +472,7 @@ and it is the TopK basis specifically that fails. And the reading/steering disso
 **does not transfer here**: on prompt injection a per-token dictionary is not reading well and
 steering badly, it is failing at both, which changes what a crosscoder win would mean.
 
-### Retrieved-document position — Liu et al.
+### Retrieved-document position — Liu et al
 
 The matched foil **ships with the benchmark**: the same ten documents with the gold document at
 positions 0, 4 and 9, verified across all 2655 items — exact multiset match, a single 10-cycle
