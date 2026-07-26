@@ -5,7 +5,10 @@
 disagreement below is a side-by-side flag, not an override. Nothing
 under `txcwin/` outside `crossratify/` was modified.
 **Method freeze:** `crossratify/MINI_CARD.md` at `fedf75aa9` (pre-registered
-arms, predictions, and reading bands BEFORE any gap-fill computation).
+arms, predictions, and reading bands BEFORE any gap-fill computation);
+two disclosed post-freeze amendments on reviewer ruling / ops
+necessity: V-win arm (`e844cce52`, ruling 56654864d) and the lean-arms
+guard (`ea7a50ea1`, ratified c797c5207).
 **Inputs:** committed artifacts only (`results/focus_novresid.json`,
 `results/focus_nov_8b.json`, `results/rawgate_gpt2_L6.json`,
 `claims.jsonl`, `audit.py`, `sweep.py`, `focus.py`, `rawgate.py`) +
@@ -61,9 +64,43 @@ support for c3's interpretation in the whole artifact set.
 
 ### G-1 — raw gate never ran at the claims' T=8, nor on the 8B at all
 Their gate ladder was gpt2 T∈{4,16} only. Filled per card GAP-B
-(`crossratify/rawgate_fill.py`, their `raw_arms` verbatim; Modal run at
-freeze `fedf75aa9`): **[PENDING — Modal job in flight; numbers land in
-`crossratify/results/rawgate_fill_{gpt2_L6,8b_L12}.json`]**
+(`crossratify/rawgate_fill.py`, their `raw_arms` verbatim; artifacts
+`crossratify/results/rawgate_fill_{gpt2_L6,8b_L12}.json`; gpt2 at
+freeze `fedf75aa9`, 8B at the disclosed amendment `ea7a50ea1`):
+**every cell is CANDIDATE under their own criterion**
+(max(gap_window, gap_mean) > 0.03) — the pre-stated favorable branch.
+The 8B replication keeps its temporal-structure licence.
+
+| model / cell (`nov_resid`) | raw_last | raw_mean | raw_window | gap_mean | verdict |
+|---|---|---|---|---|---|
+| gpt2 T=8 (claims' T) | +0.572 | +0.673 | +0.322 | **+0.101** | CANDIDATE |
+| 8B T=4 | +0.216 | +0.251 | +0.445 | +0.035 | CANDIDATE |
+| **8B T=8 (claims' T)** | +0.216 | +0.287 | +0.537 | **+0.071** | CANDIDATE |
+| 8B T=16 | +0.216 | +0.277 | omitted† | +0.061 | CANDIDATE |
+
+(`nov_rate` disclosure cells: gap_mean gpt2-T8 +0.086; 8B +0.054 /
++0.108 / +0.167 — all CANDIDATE.)
+
+Observations that belong to the record:
+- On the 8B the flatten-window probe (+0.537) towers over the single
+  label position (+0.216): the paper's own subject model localises far
+  LESS of this label than gpt2 does (raw_last 0.572 there) — the
+  window's advantage is more structural on the 8B, not less.
+- On the 8B, trained TXC-post@T8 (+0.393) exceeds even the raw
+  order-free mean-pool probe (+0.287): the dictionary is using
+  cross-position structure beyond a plain window average.
+- †The 8B T=16 raw_window cell is computed lean (raw_last/raw_mean
+  only): the 65,536-dim flatten Gram exceeds int32 element indexing in
+  numpy's bundled BLAS and segfaults at any RAM (observed 3×). Ruling
+  `c797c5207`: lean cells are a ONE-SIDED gate — they can pass via
+  gap_mean (as this one does) but can never cleanly fail; a
+  non-passing lean cell would read INCOMPLETE, not FAIL.
+- Ops trail, fully disclosed: executor amended post-freeze for the
+  lean guard (`ea7a50ea1`; claims-T cells unaffected — full verbatim
+  math); gpt2 rerun after a cancellation race killed the first run's
+  artifact (logged numbers reproduced byte-identically); a driver pin
+  briefly referenced a pre-push local SHA rewritten by an interleaved
+  rebase (never ran; pin-after-push lesson recorded in LOG).
 
 ### G-2 — no window-surface visible-cue baseline (the dq lesson)
 Filled per card GAP-A (`crossratify/visible_cue.py`; their rows, split
@@ -194,7 +231,11 @@ side.
 - **R-X3 (instrument):** nov_resid position residual +0.207/+0.172
   (V-pos arm, same files) — travels with every absolute skill quote
   from the thread; contradicts the thread's own position triage.
-- **[R-X4 raw-gate at T=8 both models — pending GAP-B numbers.]**
+- **R-X4 (raw gate at the claims' T):** nov_resid gap_mean gpt2@T8
+  +0.101 (raw_last +0.572 / raw_mean +0.673); 8B@T8 +0.071 with
+  window-flatten gap +0.320 (raw_last +0.216 / raw_window +0.537);
+  all 6 nov_resid cells CANDIDATE
+  (`rawgate_fill_{gpt2_L6,8b_L12}.json`).
 
 ## 4. Bottom line for the salvage decision
 
@@ -208,5 +249,9 @@ T=8; oracle-position residual disclosed as an instrument caveat). The
 8B replication is real but mis-pinned: robust at T=16, fragile at the
 claimed T=8 (one sick seed, c3 contradicted by their own harness — and
 masked by the pooled embedded audit, G-6). Fix is a claims amendment
-or a $5 seed top-up, not a redesign. Gate closure at T=8/8B rides on
-GAP-B (in flight).
+or a $5 seed top-up, not a redesign. The gate gap is CLOSED: the raw
+gate passes at the claims' T=8 on both models (G-1) — on the 8B with
+the largest window-vs-single-position asymmetry measured anywhere in
+this thread. Nothing in the gap-fill contradicts the thread's core
+finding; every deviation found is an amendment to how it is stated,
+not to what was found.

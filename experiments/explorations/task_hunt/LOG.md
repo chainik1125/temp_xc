@@ -6574,3 +6574,27 @@ form at T16 under the lean guard, and the memo must say so
 wherever the 8B gate outcome is quoted.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 ~19:00 London — mac-b — SALVAGE W2 COMPLETE: gate gap CLOSED, memo final (pending team + Andrii)
+
+GAP-B landed both models: **raw gate CANDIDATE on every cell**,
+including the claims' T=8 with their full verbatim math — gpt2
+nov_resid gap_mean +0.101; 8B +0.071 with window-flatten gap +0.320
+(raw_last +0.216 vs raw_window +0.537: the 8B localises far LESS of
+the label at one position than gpt2, so the window advantage is
+MORE structural on the paper's own model). Bonus observation on
+record: 8B TXC-post@T8 (+0.393) beats even the raw order-free
+mean-pool probe (+0.287). 8B T=16 raw_window computed lean per the
+ratified amendment (BLAS int32 overflow; one-sided-gate constraint
+c797c5207 encoded in the memo — the cell PASSES via gap_mean
++0.061). `CROSSRATIFY.md` FINAL: verdict table unchanged (gpt2
+SUPPORTED ×4 strict; 8B c1/c2 SUPPORTED-WITH-GAPS, c3@T8
+NOT-REPRODUCED / T=16 robust — claims re-pin or ~$5 top-up to
+Andrii), G-1..G-6 all resolved-or-flagged, R-X1..X4 proposed.
+Ops disclosed end-to-end: queue starvation (~35 min, $0), gpt2
+cancel-race rerun (byte-identical), segfault→lean amendment
+(ea7a50ea1), pre-push-pin lesson. GAP-B actuals ≈ $3 vs $7 of est
+lines → −$4 corr in ledger. Everything PENDING TEAM REVIEW and
+pending Andrii's review.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
