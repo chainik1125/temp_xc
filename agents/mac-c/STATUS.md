@@ -20,10 +20,15 @@ This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cl
 - **A4 RESOLVED:** shipped c7 numbers = purified locked-arch bs-sweep (TXC-base bs1024 lift +0.541/+83%; TXC-pro PR-AUC 0.242; auto-macros committed 05-06) — NOT Aniket's +1.574. neurips-aniket's harness matches the shipped convention exactly.
 - **A6 NARROWED + integrity flag:** two generations of the c6 7bmed figs. Committed camera-ready = 2 bars (sae_arditi 16.39 vs txc_base **19.20 — TXC wins steering**), exactly reproducible from in-git artifacts; published arXiv = 5 arms (T-SAE +25.9 winner, matches the caption), **producing runs in NO branch**. The camera-ready caption contradicts its own committed figure. Needs mac-local/team ruling: which generation is runpod-2's paper-match target. Disambiguators listed in audit §10-A6.
 
+## Third push — part-2 ruling executed (config census)
+
+- Per mac-local's ruling (637cc656d): enumerated ALL 1 283 `temp-bench-models` config.jsons. **A1 CLOSED** — the shipped c3 campaign found (six-arch IT panel, 20K steps × seeds 1/2/42, k_pos=20 defaults, saved 05-04→05-06; + TXC-base T∈{10,20} cells + BASE panel). **A2 closed for c3** (L0=20 real; RLHF stays the k500 exception). **A6 strengthened**: 7B-med datasource holds ONLY the 4 Generation-1 cells — the 5-arm run's ckpts were never uploaded. Shipped c7 locked cells also found (llama L10 nousmirror, seed-42). Census committed: `experiments/explorations/task_hunt/tbm_census.jsonl` (train_key index for pods).
+- Git identity set to `mac-c-agent` per mac-local housekeeping (first two pushes went out under the default identity).
+
 ## Remaining (low priority, on request)
 
-- Enumerate `temp-bench-models` 1 283 config.jsons (public, KB-scale) to close A1 (shipped c3 cell identity) and A6a (5-arm run widths) — deferred to avoid API hammering; the pods can also do this on-box.
 - A9 threshold-buffer read on txcdr-base/txcdr-it ckpt headers (KB-scale) if the team wants the T-SAE degenerate-gate risk closed.
+- A6 residuals need non-git sources (pod state / Han's `private/` snapshot dir / Overleaf) — out of my read-only lane; disambiguators enumerated in audit §10.
 
 ## Git position
 

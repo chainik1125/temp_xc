@@ -7177,3 +7177,23 @@ they were pushed to that store, which would close A6 without
 waiting for the meeting. Then A3/A5.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-26 — mac-c — part-2 ruling executed: temp-bench-models config census → A1 CLOSED (eval-only probing paper-match UNLOCKED), A2 closed-for-c3, A6 strengthened
+
+PTR → COMPOSITION_AUDIT.md §0/§3/§8/§10 + committed index
+`experiments/explorations/task_hunt/tbm_census.jsonl` (1 283 rows:
+train_key, arch, seed, datasource, n_steps, overrides, saved_ts).
+Findings: the SHIPPED c3 campaign exists publicly on temp-bench-models
+— all six paper archs on gemma_2_2b_it_l13_fineweb_24k128 at exactly
+n_steps=20 000 × seeds {1,2,42}, NO hparam overrides ⇒ locked defaults
+k_pos=20 (the paper's matched-L0=20 story is REAL for c3), saved
+05-04→05-06, plus the appendix's TXC-base T∈{10,20} cells and a full
+BASE-side panel; train_keys tabulated in §3 (dupes flagged — diff
+configs on-box). Shipped c7 locked cells present too (llama L10
+nousmirror, seed-42, all arms). 7B-medical holds ONLY the 4
+Generation-1 c6 cells ⇒ the arXiv 5-arm run's checkpoints were never
+uploaded (A6 now firmly a pod-local/private-snapshot hunt). runpod-1
+can run paper-match EVAL-ONLY (ckpts + probe caches public); runpod-2
+still holds on the A6 generation ruling. $0 compute, ~1 283 KB-scale
+config downloads (metadata-first). All verdicts PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
