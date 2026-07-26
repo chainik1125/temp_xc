@@ -16,12 +16,22 @@ topics and builds the foil by rotating the blocks by one, so the two classes are
 sentences read from different starting points. The optimal write then has rank m - 1 and
 r1 falls as roughly 2/m.
 
-Left: measured r1 against the analytic prediction. Right: what each arm achieves, with
-`rank1_best` -- the best rank-1 approximation of the optimal write, i.e. the ceiling for ANY
-per-token dictionary handed a perfect schedule -- as the line the crosscoder has to clear for
-the result to be about expressiveness rather than about discovery.
+WHAT THE LADDER ACTUALLY SHOWED, which is not what it was built to show. Across m = 2, 3, 6,
+12 the measured rank-1 share barely moves (0.304, 0.266, 0.210, 0.177) while the CONSTANT
+share falls sharply (0.163, 0.179, 0.102, 0.033) -- and it is the constant share that tracks
+the outcome. The crosscoder loses at m = 2, 3 and 6 and wins by 3.4x at m = 12, which is where
+c collapses, not where r1 does. Of the two gates the theory proposes, only the first is doing
+work in this data.
 
-Reads results/txc_wins/rotate{2,4,6,12}_v1.json.
+The crosscoder never approaches `grad_rank1`, the best rank-1 write taken from the metric's
+own gradient, anywhere on the ladder: +18.23 against +102.46 at m = 12. So there is no
+expressiveness result here. What the crosscoder buys is that at m = 12 it beats every arm
+obtainable from a LEARNED per-token dictionary -- including that dictionary handed a
+supervised per-position schedule, which reaches only +5.83 -- by a factor of three.
+
+Left: measured r1 and c against the analytic prediction for r1.
+
+Reads results/txc_wins/rot_m{2,3,6,12}_T.json.
 """
 import json
 import pathlib
@@ -31,7 +41,7 @@ import matplotlib.pyplot as plt
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "results" / "txc_wins"
 OUT = ROOT / "plots" / "2026-07-26_txcwins" / "rank_ladder.png"
-MS = [2, 4, 6, 12]
+MS = [2, 3, 6, 12]
 
 C_TXC = "#E69F00"
 C_SAE = "#0072B2"
@@ -49,7 +59,7 @@ def best(arm):
 def main() -> int:
     runs = {}
     for m in MS:
-        p = SRC / f"rotate{m}_v1.json"
+        p = SRC / f"rot_m{m}_T.json"
         if p.exists():
             runs[m] = json.loads(p.read_text())
     if not runs:
@@ -60,19 +70,21 @@ def main() -> int:
     fig, axes = plt.subplots(1, 2, figsize=(11.6, 4.4))
 
     ax = axes[0]
-    for key, colour, label in (("rank", C_R1, "measured (difference of means)"),
-                               ("rank_grad", C_GRAD, "measured (gradient of the metric)")):
+    for key, field, colour, label in (
+            ("rank", "r1", C_R1, "$r_1$ (difference of means)"),
+            ("rank_grad", "r1", C_GRAD, "$r_1$ (gradient of the metric)"),
+            ("rank_grad", "c", "#D55E00", "$c$, constant share (gradient)")):
         xs = [m for m in ms if key in runs[m]]
-        ys = [runs[m][key]["r1"] for m in xs]
+        ys = [runs[m][key][field] for m in xs]
         if xs:
             ax.plot(xs, ys, "o-", color=colour, lw=2.0, ms=6, label=label)
     ax.plot(ms, [2.0 / m if m > 2 else 1.0 for m in ms], "s--", color="#888888",
-            lw=1.6, ms=5, label="analytic, rank $m-1$")
+            lw=1.6, ms=5, label="$r_1$ analytic bound, rank $m-1$")
     ax.set_xscale("log"); ax.set_xticks(ms); ax.set_xticklabels([str(m) for m in ms])
     ax.set_ylim(0, 1.05)
     ax.set_xlabel("$m$, number of distinct blocks rotated")
-    ax.set_ylabel(r"$r_1$: share of the optimal write reachable at rank 1")
-    ax.set_title("How much a per-token dictionary can express")
+    ax.set_ylabel("share of the optimal write")
+    ax.set_title("$c$ falls across the ladder; $r_1$ barely moves")
     ax.grid(alpha=0.25, lw=0.6)
     ax.legend(loc="lower left", fontsize=8.5, framealpha=0.95)
 
@@ -95,8 +107,9 @@ def main() -> int:
     ax.axhline(0.0, color="#888888", lw=1.2)
     ax.set_xscale("log"); ax.set_xticks(ms); ax.set_xticklabels([str(m) for m in ms])
     ax.set_xlabel("$m$, number of distinct blocks rotated")
-    ax.set_ylabel(r"$\Delta$ margin at each arm's best dose")
-    ax.set_title("Clearing the per-token ceiling is the expressiveness claim")
+    ax.set_yscale("symlog", linthresh=2.0)
+    ax.set_ylabel(r"$\Delta$ margin at each arm's best dose (symlog)")
+    ax.set_title("The crosscoder wins where $c$ collapses, not where $r_1$ does")
     ax.grid(alpha=0.25, lw=0.6)
     ax.legend(loc="upper left", fontsize=8, framealpha=0.95)
 
