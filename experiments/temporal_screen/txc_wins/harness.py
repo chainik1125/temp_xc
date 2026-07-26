@@ -58,9 +58,21 @@ def unit(v):
     return v / (v.norm() + 1e-12)
 
 
+def _upper_frac(texts):
+    """Fraction of alphabetic characters that are upper case, pooled over texts.
+
+    The readout for the recency task, chosen because it needs no judge: the two conflicting
+    instructions are 'write in capitals' and 'write in small letters', so which one the model
+    obeyed is legible directly from the characters it emitted.
+    """
+    chars = [c for t in texts for c in t if c.isalpha()]
+    return sum(c.isupper() for c in chars) / max(len(chars), 1)
+
+
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
-             n_perm=0, seed=31415, dict_seed=0, arms=None, verbose=True):
+             n_perm=0, seed=31415, dict_seed=0, gen_tokens=0, n_gen=0,
+             arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
 
     `make_pair(rng)` must return `(sents_a, sents_b, carrier)`: two equal-length sentence
@@ -414,6 +426,51 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
                            "sem": sems, "n_docs": len(tests)}
         log(f"{nm:<18}" + "".join(f"{v:>8.2f}+-{e:<5.2f}"
                                   for v, e in zip(deltas, sems)))
+
+    # ---------------- steered generation (optional) ----------------
+    # The margin metric is teacher-forced, which is why it needs no judge and no sampling --
+    # and also why it is fair to ask whether it corresponds to anything the model DOES. This
+    # generates greedily under the same writes at each arm's own best dose and stores the
+    # text, so the log-probability claim can be checked against observable output. No hook is
+    # applied to the generated tokens themselves: the write covers the document's segment
+    # spans only, and the continuation is influenced through attention.
+    if gen_tokens and n_gen:
+        gen_arms = [nm for nm in ("txc_slab", "sae_broadcast", "txc_flat", "dom_slab")
+                    if nm in writes]
+        out["generations"] = {}
+        for nm in ["none"] + gen_arms:
+            W = None if nm == "none" else writes[nm]
+            a_best = (0.0 if W is None
+                      else alphas[int(np.argmax(out["arms"][nm]["delta_margin"]))])
+            rows = []
+            for (ta, sa2, tb, sb2, c1, _c2) in tests[:n_gen]:
+                for cls, (txt, spn) in (("A", (ta, sa2)), ("B", (tb, sb2))):
+                    stem = txt + (c1.rsplit(" ", 1)[0] if c1 else "")
+                    e, ts2 = seg_spans(stem, spn)
+                    ids = e["input_ids"].to(dev)
+                    n0 = ids.shape[1]
+                    hook = None
+                    if W is not None:
+                        def edit(_m, _i, out_, _ts=ts2, _W=W, _a=a_best):
+                            h = out_[0] if isinstance(out_, tuple) else out_
+                            for t_i, (p0, p1) in enumerate(_ts):
+                                h[:, p0:p1 + 1, :] += (_a * scale
+                                                       * _W[t_i].to(h.dtype).unsqueeze(0))
+                            return (h,) + out_[1:] if isinstance(out_, tuple) else h
+                        hook = layers_[L].register_forward_hook(edit)
+                    with torch.no_grad():
+                        for _ in range(gen_tokens):
+                            nxt = model(ids).logits[0, -1].argmax()
+                            ids = torch.cat([ids, nxt.view(1, 1)], dim=1)
+                    if hook is not None:
+                        hook.remove()
+                    rows.append({"cls": cls, "alpha": a_best,
+                                 "text": tok.decode(ids[0, n0:])})
+            out["generations"][nm] = rows
+            up = {c: _upper_frac([r["text"] for r in rows if r["cls"] == c])
+                  for c in ("A", "B")}
+            log(f"[gen] {nm:<16} alpha {a_best:>5.2f}  uppercase fraction "
+                f"A {up['A']:.3f}  B {up['B']:.3f}  A-B {up['A'] - up['B']:+.3f}")
 
     # ---------------- permuted-profile null (optional) ----------------
     if n_perm and "txc_slab" in writes:
