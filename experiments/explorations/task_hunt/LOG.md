@@ -6159,3 +6159,38 @@ salvage outcomes — the dq demotion is noted here first so the
 record leads the documents, not the reverse.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-b — SALVAGE W2 audit + GAP-A DONE, GAP-B in flight (txcwin cross-ratification)
+
+Freeze `fedf75aa9` (`txcwin/crossratify/MINI_CARD.md` + both
+executors, additive-only under `crossratify/`). **Audit (read-only,
+$0):** their audit.py re-run on committed artifacts + fully
+independent recompute — agree everywhere. gpt2@T8: c1/c2/c3
+REPRODUCED at +0.248/+0.270/+0.262 (15/21.9/11.3σ, strict
+worst-vs-best-seed); c4's budget honesty reproduces exactly (pre l0
+144.4@T16, 551@T32, excluded). Stacked FLAT in T (0.201–0.209,
+T4→32) — the cleanest committed support for the c3 isolation. 8B:
+c1/c2 pass at 2.6/2.7σ; **c3@T8 NOT-REPRODUCED by their own W3/W8**
+(post seed-1 collapsed to +0.198; 1.9σ, non-strict) while T=16 is
+strict at 12.4σ — the report's "0.507 vs 0.129" IS the T=16 cell but
+claims.jsonl pins T=8 and names no model → claims amendment or ~$5
+seed top-up proposed (Andrii's call; flagged, not overridden).
+**GAP-A (visible-cue, CPU, $0):** at T=8 window-surface floors
+V-rep +0.058/+0.060 and V-uni +0.044/+0.084 sit FAR below the
+per-token dicts (0.215/0.129) and TXC-post (0.463/0.393) —
+surface-quiet at window scale CONFIRMED at the claims' T on both
+models (the control dq died of, passed). Two riders: repetition
+floor rises to ~+0.21 at T=16 (53% kernel mass — travels with any
+T=16 re-pin), and the pre-registered V-pos≈0 prediction FAILED:
+nov_resid retains a position-readable residual r≈+0.21/+0.17
+(bin-readout beats the builder's scalar check; instrument
+disclosure — head-to-head comparisons unaffected, "position-free"
+description needs softening, and on 8B rows this channel alone
+crosses the per-token dict). **GAP-B (raw gate at T=8 + on 8B,
+Modal ~$4, freeze-pinned):** app ap-drsJemgQC9kq7iyNnVvE8A detached,
+in flight. Memo `txcwin/CROSSRATIFY.md` drafted with verdict table
+(SUPPORTED ×4 on gpt2; 8B SUPPORTED-WITH-GAPS / c3@T8
+NOT-REPRODUCED), receipts proposals R-X1..X4 — PENDING TEAM REVIEW
+and pending Andrii's review.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
