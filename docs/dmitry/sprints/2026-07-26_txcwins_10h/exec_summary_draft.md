@@ -96,12 +96,21 @@ dictionary involved. Across eight configurations spanning both metric modes:
 | `rotate3` | 0.179 | +6.43 | +11.51 | −2.9 | no win | `rot_m3_T.json` |
 | order | 0.241 | +6.34 | +4.66 | +1.4 | no win | `order_sym_ds0.json` |
 
-**Across 13 tasks, Kendall τ = −0.58** between `c` and the crosscoder's margin over the best
-constant write. That is a real association and it is not a rule: `evidence` at `c` = 0.136 wins
-by the largest margin in the sprint (z = 29.7), and `phase11` at `c` = 0.050 does not win. So `c`
-has **both a false negative and a false positive** among the tasks measured — it would have told
-us not to run the task that produced the strongest result. It ranks candidates; it does not
-decide them.
+**`c` describes the constant write's ceiling, and it does that well.** Measured against
+`sae_broadcast`/`grad_slab` — the quantity it is actually about — `sqrt(c)` gets **4/4 rank
+agreement** across the rotation ladder.
+
+Measured instead against the crosscoder's *margin over* the constant write, across 13 tasks
+Kendall **τ = −0.58**. The weaker number is expected rather than disappointing: a margin composes
+**two** independent discovery outcomes on top of the geometry. This also dissolves the apparent
+`evidence` anomaly — `c` = 0.136 says a constant write can reach ~37% of the optimum, not that the
+crosscoder does badly; both arms can do well and the margin is then set by which one finds its
+target.
+
+> **Geometry sets the ceilings. Discovery determines what is reached.** `c` ranks candidate tasks
+> rather than deciding them, because the between-architecture gap also depends on two independent
+> discovery outcomes — and this sprint's finding is that **discovery is the binding constraint
+> everywhere**.
 
 **`c` is necessary and demonstrably not sufficient**, and the counterexample is worth more than
 the caveat. The same recency task on Qwen2.5-0.5B (`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037)
@@ -242,7 +251,42 @@ recency, evidence and `recency_var`, against the crosscoder's 0.719, 0.685 and 0
 tasks that carry the empirical claim. A per-token dictionary reads these factors perfectly and
 steers them worst. It is the most-replicated finding in the project.
 
-### 6. A single learning rate across architectures does not measure architectures
+### 6. Reconstruction quality does not predict steering quality — the ordering is inverted
+
+At 8.0 realised coefficients per segment on the recency corpus, **each arm at its own best
+recipe** from a full lr × steps sweep:
+
+| arm | FVU | best steering Δ |
+| --- | --- | --- |
+| attention tSAE | **0.0144** | +2.32 |
+| TopK SAE | 0.0373 | +2.35 |
+| crosscoder | **0.0968** | **+7.81** |
+
+**The best reconstructor steers worst and the worst reconstructor steers best**, by 3.4×. The
+ordering is exactly inverted. Any benchmark ranking temporal dictionaries by FVU — which is what
+the field does — would rank these three in precisely the wrong order for the use a crosscoder is
+being proposed for.
+
+This also retires a caveat carried all sprint. The crosscoder's poor FVU was being treated as the
+price of the shared code, to be weighed against its steering advantage. On this evidence **it is
+not a price**: reconstruction is uncorrelated with, or anticorrelated with, the property actually
+wanted.
+
+**The headline survives giving every arm its own best recipe**, which was the largest standing
+threat to it — the concern being that the crosscoder benefited from a configuration handicapping
+its competitors, a concern earned by the tSAE having to be corrected three times for exactly that
+reason. Best Δ over symmetric doses at per-arm recipes:
+
+| task | crosscoder | SAE | `txc_flat` | attention tSAE |
+| --- | --- | --- | --- | --- |
+| recency | **+7.81** | +2.35 | +2.37 | +2.32 |
+| evidence | **+5.59** | +1.20 | +2.44 | — |
+| `rotate12` | **+14.61** | +2.21 | +3.13 | +6.38 |
+
+On recency the advantage is **larger** at per-arm recipes than at the shared one (+7.81 against
++6.48).
+
+### 7. A single learning rate across architectures does not measure architectures
 
 The sprint's default `lr = 3e-4` is near-optimal for the SAE and wrong for both temporal
 architectures. Best FVU per arm across a 3 × 2 recipe sweep on the recency corpus, matched at 8.0
@@ -272,7 +316,7 @@ learning rate (10.15 at 3e-4, 8.32 at 1e-3, 8.04 at 1e-3/6000, against nominal 8
 and budget-matching are not independent knobs**. And the crosscoder is the only one of the three
 that diverges outright — FVU 0.0968 at 1e-3 against 0.3596 at 3e-3.
 
-### 7. The scope limit, and what the crosscoder is *not* doing
+### 8. The scope limit, and what the crosscoder is *not* doing
 
 The advantage requires the factor to sit at **consistent positions across documents**. A
 dictionary latent is one fixed write reused everywhere, so any fixed-write arm is bounded by the
