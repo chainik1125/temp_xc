@@ -1,65 +1,57 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~21:10 London — ACTMIX W1 (briefings/actmix-mac-a.md,
-read-first actmix-shared.md). Stage 1 (btk-only implementation)
-DONE + convention note posted to task_hunt LOG (single-source rule —
-pods consume it verbatim). Now: Stage 2 CALIB card (decisive input to
-Dmitry's paper-re-run gate, wanted before 9am PT 2026-07-27). Cap $40
-W1 total / $150 day. NOTE: this lane SUPERSEDES mac-local's ~20:40
-subagent dispatch — that dispatch was recalled cleanly at Han's
-direction; nothing was frozen, launched, or pushed by the recalled
-agents. mac-local freeze-reviews my cards in parallel — pull before
-scoring.**
+**2026-07-26 ~23:05 London — ACTMIX W1: Stages 1+2 DELIVERED; Stage 3
+CANCELLED by ruling af2247d43 (KEEPs certified composition-robust BY
+IDENTITY). One optional rider in progress: thin-pool diagnostic cell
+(≤$2, my discretion per the ruling). This lane SUPERSEDES mac-local's
+~20:40 recalled subagent dispatch (nothing was frozen/launched/pushed
+by it). W1 spend ≈ $3 of $40 cap.**
 
-## ACTMIX W1 progress
+## Delivered (ACTMIX W1)
 
-1. **Stage 1 DONE** — `src/temp_bench/archs/btk_only.py` + 5 registry
-   entries (`{batchtopk_sae,tsae,stacked_batchtopk,txc_batchtopk_pre,
-   txc_batchtopk_post}_btkonly`, arch_versions 1.1.0 / 2.1.0-port);
-   relu_mode hparam hashed into train_key; threshold_set flag replaces
-   the -1.0 sentinel (legit negative thresholds); selection by signed
-   value over raw pre-acts; AuxK unchanged (ReLU'd); fired ⇔ z != 0;
-   neg_frac diagnostic. Tests: tests/test_btk_only.py, full suite 369
-   passed, validate OK. Convention note = LOG entry "~21:05 London"
-   (CANONICAL; pods follow, never fork).
-2. **Stage 2 IN FLIGHT** — CALIB_CARD frozen `97fae183a` (pin re-taken
-   from ORIGIN history after a pull-rebase rewrite — watch for this),
-   **APPROVED expedited by mac-local 269b7d86c** with one post-run
-   ADVISORY: surface per-cell `neg_frac` in the verdict. Launched
-   detached ~21:30 BST, app `ap-NANQj1zSfcIiBELX4ydG9w`
-   (mac-a-diafaces-calib): H100 main 18 cells + 2× L4 tsae; relu-mix
-   arm = 20 REUSED rows (card § 3 eval_keys); est ~$3 ledgered.
-   **RESULT (19/20 in, tsae_s4 in flight): IDENTITY — btk-only ≡
-   relu-mix at hunt widths.** 18 main cells: |Δrec| ≤ 2.2e-08, Δl0 =
-   0.0 EXACTLY; tsae s3 identical to all printed digits
-   (0.022458/7.0037). Preliminary LOG entry PUSHED (00309362f) with
-   pods heads-up (their k20/d18432 arms will likely no-op too — smoke
-   + neg_frac first). Mechanism re-attribution: l0 shortfall = eval
-   JumpReLU threshold pruning, NOT selection zero-picks; neg_frac ≡ 0
-   proven BY the identity (advisory answered exactly). On s4 land
-   (watch buqn611s8): repatriate all 3 payloads from Volume (local
-   .get() prints not flowing — Volume finally-writes are the designed
-   fallback) → merge (pin-asserted) → score → fig → FINAL verdict
-   (draft at scratchpad verdict_draft.md: E1/E3 FAIL-by-no-movement,
-   E4 vacuous-pass, l0 band out-of-band disclosed as designed) +
-   **Stage-3 RE-SCOPE PROPOSAL** (~$5–8 identity-confirm probes +
-   thin-pool divergence demo instead of $23–34 blind re-runs; needs
-   mac-local ruling) → ledger actuals (≈$3).
-3. **Stage 3 GATED on Stage 2** — KEEP-set survives-the-fix
-   (R29 ttrend lane / R22 λ̂ cells / R27 dq cells vs SAME bars;
-   verdicts SURVIVES / MOVED-MARGINS / DOES-NOT-SURVIVE).
+1. **Stage 1** (92db86c41): btk-only variants — 5 registry entries
+   (`*_btkonly`, 1.1.0 / 2.1.0-port), plugin file
+   `src/temp_bench/archs/btk_only.py`, CANONICAL convention LOG note
+   (~21:05; single-source — pods consumed it), threshold_set flag,
+   neg_frac diagnostic, tests/test_btk_only.py, suite 369 green.
+2. **Stage 2 CALIB** (card freeze `97fae183a`, approved 269b7d86c;
+   verdict FINAL ~23:00 entry): **IDENTITY — btk-only ≡ relu-mix at
+   hunt widths (d2048, k8).** 20/20 cells; max |Δrec| 0.0000@4dp (raw
+   ≤ 2.2e-08); l0 EXACTLY equal ×20; slopes +0.0701 both arms; tsae
+   twin predictions landed digit-exact. Mechanism re-attribution:
+   realized-l0 shortfall = eval JumpReLU threshold pruning, NOT
+   selection zero-picks; neg_frac ≡ 0 proven by identity (advisory
+   answered). **R30 direct-added, ALL PASS.** Preliminary RATIFIED
+   (af2247d43); final ratification rides the 20/20 push. Deliverables:
+   calib_score.json + figs/calib_relu_vs_btk.{png,pdf} + R30.
+   Leaderboard +20 rows @97fae183a, 0 dups.
+3. **Stage 3**: CANCELLED as designed by af2247d43 § 2 — hunt KEEPs
+   (R22/R27/R28/R29/tt-P1) composition-robust BY IDENTITY; ~$30
+   released; mac-b appends the forensics corrigendum (their lane).
 
-## Salvage sprint (CLOSED df8043d6d — prior phase, all ratified)
+## In flight / next
 
-W1 NOT-KEEP as frozen + R28; top-up KEEP {16,32} + R29; fig4 in
-WRITEUP §4; mac-a salvage actuals ≈ $6. Quote licences per mac-local.
+- **Thin-pool diagnostic** (optional per ruling, TAKEN): 1 cell
+  txc_batchtopk_post_btkonly @ k=256/T32 seed 3 (8·T secondary
+  config — realization 0.647 relu-mix = the deep-selection regime)
+  vs existing relu-mix secondary row. Expect DIVERGENCE (the
+  implementation's positive receipt + writeup color). Mini-runner +
+  own pin + ledger line; non-claiming.
+- Then: idle watch (origin poll per listening topology; my binding
+  gates = LOG rulings + actmix-* amendments).
 
 ## Assets / recovery
 
-- btk-only convention: `src/temp_bench/archs/btk_only.py` docstring +
-  LOG note (~21:05). Registry: configs/archs.yaml ACTMIX block.
-- Salvage-phase assets: diafaces/results/{salvage,topup}_score.json,
-  panels + payloads, Volume /workspace/diafaces_{salvage,topup}.
-  Leaderboard k_pos/T under `training_cfg.arch_hparams_override`.
-- Modal client: scratchpad `modal-venv/bin/modal`. Ledger
-  briefings/MODAL_SPEND.md (program ≈ $102 of $500 at last line).
+- Calib: CALIB_CARD.md, run/score/merge/make_fig scripts,
+  results/calib_{score,stage2_*}.json, calib_payloads/, Volume
+  `…:/workspace/diafaces_calib/`, figs/calib_relu_vs_btk.*.
+- btk-only convention: arch file docstring + LOG ~21:05 note +
+  configs/archs.yaml ACTMIX block. Evaluator l0 is sign-agnostic
+  (`z != 0`) — verified.
+- Identity condition (for anyone extending): btk-only ≡ relu-mix iff
+  train selection never exhausts positives AND tracked threshold ≥ 0;
+  divergence regime on this substrate = 8·T arm at T32 (k256/d2048).
+- Modal client: scratchpad `modal-venv/bin/modal`. Ledger last line
+  ~$105 program. Local modal runner may still be attached
+  (harness task b5j39gav2) — payloads already repatriated manually;
+  safe to TaskStop it.

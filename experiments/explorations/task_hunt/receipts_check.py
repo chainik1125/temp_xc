@@ -885,6 +885,67 @@ def build_receipts():
              "s3_p": _l2["S3_combined_16to32"]["p_exact"],
              "keep": int(top["verdict"]["KEEP_at_16_32"]),
              "cells": sum(1 for c in topc if c.get("ok"))}))
+
+    # ---- R30: ACTMIX calibration — the identity result (mac-a) ----
+    # NON-CLAIMING calibration (CALIB_CARD.md, freeze 97fae183a): btk-only
+    # ≡ relu-mix at hunt widths; grounds mac-local's Stage-3 cancellation
+    # (KEEPs composition-robust BY IDENTITY, ruling af2247d43).
+    cal = _j("diafaces/results/calib_score.json")
+    _cd = cal["mean_delta_trained"]
+    _sl = cal["post_slope_dlog2T"]
+
+    def _cell(a, t, s, k):
+        return next(c for c in cal["cells"]
+                    if (c["arch"], c["T"], c["seed"], c["kind"]) == (a, t, s, k))
+
+    R.append(dict(
+        id="R30",
+        artifact="diafaces/results/calib_score.json",
+        key="paired per-seed Δ(btk-only − relu-mix) per arm; post slope "
+            "both arms; realized-l0 band flags; untrained sanity (40-cell "
+            "logical grid: 20 computed + 20 cited eval_keys, CALIB_CARD.md, "
+            "scorer score_calib.py)",
+        claim="ACTMIX calibration (dial_real_ttrend_gpt2_l7, seeds {3,4}, "
+              "20/20 btk-only cells at freeze 97fae183a vs the 20 cited "
+              "relu-mix rows): IDENTITY — every paired Δ recovery (v1 AND "
+              "v2) = 0.0000 at 4dp (raw ≤ 2.2e-08, GPU-atomics scale); "
+              "realized l0 EXACTLY equal in all 20 pairs; post T-slope "
+              "+0.0701 BOTH arms (Δ 0.0); untrained max |Δ| = 0.0. "
+              "Mechanism re-attribution: the l0 shortfall (sae 4.12–4.39/8, "
+              "post@T4 6.30–6.34 — the card band's 4 disclosed flags) is "
+              "eval-time JumpReLU threshold pruning shared by both "
+              "compositions, NOT selection zero-picks; neg_frac ≡ 0 proven "
+              "by the identity (any negative pick forks the trajectory; "
+              "none forked). E1/E2 vacuous ties at zero; E3 fails "
+              "(no movement); E4 vacuous pass. NON-CLAIMING; grounds the "
+              "Stage-3 cancellation (KEEPs composition-robust by identity, "
+              "af2247d43). PENDING TEAM REVIEW",
+        checks=[("d_sae", 0.0, 4), ("d_tsae", 0.0, 4),
+                ("d_post4", 0.0, 4), ("d_post16", 0.0, 4),
+                ("d_post32", 0.0, 4),
+                ("slope_relu", 0.0701, 4), ("slope_btk", 0.0701, 4),
+                ("d_slope", 0.0, 4),
+                ("tsae_s3_btk", 0.0225, 4), ("tsae_s4_btk", 0.0296, 4),
+                ("l0_flags", 4, 1), ("untrained_max", 0.0, 4),
+                ("max_abs_d", 0.0, 4), ("max_abs_d_v2", 0.0, 4),
+                ("cells", 20, 1)],
+        got={"d_sae": _cd["batchtopk_sae@1"]["mean"],
+             "d_tsae": _cd["tsae@1"]["mean"],
+             "d_post4": _cd["txc_batchtopk_post@4"]["mean"],
+             "d_post16": _cd["txc_batchtopk_post@16"]["mean"],
+             "d_post32": _cd["txc_batchtopk_post@32"]["mean"],
+             "slope_relu": _sl["relu_mix"]["mean"],
+             "slope_btk": _sl["btk_only"]["mean"],
+             "d_slope": _sl["delta_btk_minus_relu"],
+             "tsae_s3_btk": _cell("tsae", 1, 3, "trained")["btk_only"]
+                            ["recovery"],
+             "tsae_s4_btk": _cell("tsae", 1, 4, "trained")["btk_only"]
+                            ["recovery"],
+             "l0_flags": len(cal["l0_out_of_band"]),
+             "untrained_max": cal["untrained_sanity_max_abs_delta"],
+             "max_abs_d": max(abs(c["delta"]) for c in cal["cells"]),
+             "max_abs_d_v2": max(abs(c["delta_v2"]) for c in cal["cells"]),
+             "cells": cal["n_cells"]}))
     return R
 
 

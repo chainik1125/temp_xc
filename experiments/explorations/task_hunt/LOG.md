@@ -7351,3 +7351,49 @@ Gen-2 hunt is confirmed pod-local/private ⇒ remains the 9am
 Dmitry question. mac-c continues: A3/A5, then part 3.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 ~23:00 London — mac-a — CALIB VERDICT FINAL (20/20): IDENTITY confirmed — the composition fix is a no-op at hunt widths; mechanism = eval-threshold pruning. R30 direct-added (ALL PASS). NON-CLAIMING; ratification-on-this-push per af2247d43 § 1.
+
+**PTR: `diafaces/results/calib_score.json` + fig
+`diafaces/figs/calib_relu_vs_btk.{png,pdf}` + R30 in RECEIPTS.md.**
+Card `diafaces/CALIB_CARD.md` (freeze `97fae183a`, approved 269b7d86c);
+panel 20/20 (18 H100 main + 2 L4 tsae); leaderboard +20 rows at the
+freeze, 0 dups, 12/20 dirty (pool convention), pins verified 20×.
+
+1. **Identity, now 20/20**: every btk-only cell reproduces its cited
+   relu-mix twin — max |Δ recovery| = max |Δ v2| = 0.0000 at 4dp
+   (raw ≤ 2.2e-08); realized l0 EXACTLY equal in all 20 pairs;
+   untrained max |Δ| = 0.0. The 2 registered tsae predictions landed
+   exactly: s3 0.022458/7.0037, s4 0.029615/6.9724 — every printed
+   digit equal to the relu-mix rows.
+2. **E1–E4 as frozen**: E1 "sae improves most" and E2 "tsae moves
+   least" evaluate True only as DEGENERATE TIES at Δ = 0 (no arm
+   moves); E3 fails (Δ(T4) = Δ(T32) = 0); E4 passes vacuously
+   (slopes IDENTICAL: +0.0701 both arms, Δslope = 0.0). The
+   substantive answer to the pre-registered reading: the fix cannot
+   move this family at these widths.
+3. **l0 band flags (4, disclosed per card § 4)**: sae@T1 4.121/4.392
+   and post@T4 6.340/6.299 — IDENTICAL under both arms. The band
+   encoded "the fix restores l0"; the data show the shortfall was
+   never selection-side: **eval-time JumpReLU threshold pruning**,
+   shared by both compositions. Train-time selection ran at nominal 8
+   throughout for BOTH arms (identity ⇒ relu-mix never zero-picked
+   here either).
+4. **neg_frac advisory (269b7d86c) answered exactly**: neg_frac ≡ 0
+   for all 20 cells — proven by the identity (one negative selection
+   would fork the trajectory; none forked; untrained l0 = 8.000 both
+   arms is the at-init receipt). Stronger than a logged counter.
+5. **Ruling compliance (af2247d43)**: Stage-3 CANCELLED → KEEPs
+   certified composition-robust BY IDENTITY (R22/R27/R28/R29/tt-P1);
+   evidence = R30 + tests/test_btk_only.py divergence tests. I am
+   TAKING the optional ≤$2 thin-pool diagnostic (one
+   txc_batchtopk_post_btkonly cell at the 8·T secondary config
+   k=256@T32, seed 3, vs the existing relu-mix secondary row) — the
+   one regime on this substrate where the compositions must diverge;
+   non-claiming writeup color + the implementation's positive
+   receipt. Separate mini-note + pin + ledger line when it lands.
+6. **Ledger**: calib actuals ≈ $3 vs $3 est (0 corr). W1 spend ≈ $3
+   of $40.
+
+Everything PENDING TEAM REVIEW as always; pods' binding smoke +
+neg_frac check per af2247d43 § 3 stands.
