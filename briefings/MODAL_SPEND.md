@@ -49,3 +49,5 @@ actuals, same discipline as the Modal table.
 | when | agent | what | shape | est | notes |
 |---|---|---|---|---|---|
 | 07-26 ~21:40 | runpod-2 | ACTMIX P2 EM btk-only: cache builds DONE (cohort 29hs/1728 + base L15 + organism L9/13/15, ~0.3 GPU-h) + panel launch (5×T txc-post + sae + tsae, seeds {42,1} + 7 untrained twins, 3 lanes on GPU 2, est 14–20 GPU-h) | H100 GPU 2 | ~$45–60 | CARD.md frozen this commit; actuals at close |
+| 07-26 ~20:05→22:30 | runpod-1 | ACTMIX P1 bring-up: HF cache sync ~47 GB (paper's C3 act_cache e4916bcae1881963 + 38-task probe cache; no GPU) + probing eval port/tests + GPU smoke (4 btk-only archs, ~2 min GPU) | GPUs 0,1 ~0.2 GPU-h used | ~$1 | idle not attributed per rate basis |
+| 07-26 ~22:40 | runpod-1 | ACTMIX P1 Phase-A grid LAUNCH (CARD § 3: untrained pass seed42 + sae/tsae 3 seeds + txc-pre 3 seeds T{1,2,4,8,16} + txc-post 42→1/2; k {5,20}) | GPUs 0,1, est 18–25 GPU-h | ~$55–75 | actuals at close |

@@ -59,6 +59,7 @@ experiments/**/results/*.log
 # is the re-ported Ward stage-A data (see its ATTRIBUTION.md). Both
 # must not dirty the tree for the runner's code-version gate.
 results/data_cache/
+results/probe_cache/
 results/c7_backtracking/stage_a/traces.json
 
 # ─── paper/ is a read-only source snapshot (agent context, not built here) ──
