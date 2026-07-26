@@ -5224,3 +5224,25 @@ held everywhere the overnight looked. Ledger ACTUALS ≈ $33 of $500.
 Next: distillation finalization (draft current through R24).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — DAY-2 ALLOCATION (Han, ~11:20 London): the dialogue / order-sensitivity thread — 2 workstreams, ~5 h, gated mini-panel
+
+Han committed the remaining pre-check-in window to the one open
+door: the overnight closed every other (R20 — order-free everywhere
+on broad text; R11 — dialogue is the sole measured order-carried
+window signal outside backtracking). Briefings pushed:
+`day2-dialogue-shared.md` (timeline gates: no new starts 15:30
+London, all pushed 16:30; caps mac-a $120 / mac-b $60; A100 only for
+gated panel cells; all overnight ops lessons binding),
+`day2-dialogue-mac-b.md` (W1: the R11 mechanism ladder on dialevel —
+L0 reproduction control, within-turn vs turn-block vs near/far
+decomposition, five pre-stated outcomes), `day2-dialogue-mac-a.md`
+(W2: ttrend + dqgap faces on DailyDialog, convention-of-record
+screen with order prediction pre-registered; mini-panel PREPPED
+commit-then-run but launched only through the shared doc's
+five-clause gate incl. sc ≥ +0.03 on 2/2 and my written approval).
+An order-free KEEP goes to the breadth table, never to a panel —
+the gate encodes the night's lesson. gemma arms pre-authorized
+across both workstreams IF Han supplies an HF secret to Modal.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
