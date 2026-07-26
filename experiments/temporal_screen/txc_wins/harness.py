@@ -58,7 +58,7 @@ def unit(v):
 
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, n_perm=0,
-             seed=31415, arms=None, verbose=True):
+             seed=31415, dict_seed=0, arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
 
     `make_pair(rng)` must return `(sents_a, sents_b, carrier)`: two equal-length sentence
@@ -178,11 +178,12 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
 
     out = {"model": model_id, "layer": int(L), "k_seg": k_seg, "T": T, "d_sae": d_sae,
            "k": k, "steps": steps, "lr": lr, "n_train": n_train, "n_test": n_test,
+           "seed": seed, "dict_seed": dict_seed,
            "alphas": list(alphas), "reading": {}, "sparsity": {}, "arms": {}}
     writes = {}
 
     # ---------------- 1. per-token TopK SAE ----------------
-    torch.manual_seed(0)
+    torch.manual_seed(dict_seed)
     sae = TopKSAE(d_in=d, d_sae=d_sae, k=k).to(dev)
     adam_train(sae, gen_flat, batch_win * T)
     with torch.no_grad():
@@ -198,7 +199,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     writes["sae_broadcast"] = sign_s * unit(v_sae.unsqueeze(0).expand(T, -1).contiguous())
 
     # ---------------- 2. Temporal Crosscoder ----------------
-    torch.manual_seed(0)
+    torch.manual_seed(dict_seed)
     txc = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=T, k=k,
                              activation="batchtopk").to(dev)
     with torch.no_grad():
@@ -226,7 +227,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     if tsae_l1 is not None or tsae_k is not None:
         from temporal_crosscoders.han_tsae import TemporalSAE
         use_topk = tsae_k is not None
-        torch.manual_seed(0)
+        torch.manual_seed(dict_seed)
         ts_ = TemporalSAE(dimin=d, width=d_sae, n_heads=8,
                           sae_diff_type="topk" if use_topk else "relu",
                           kval_topk=int(tsae_k) if use_topk else None,
