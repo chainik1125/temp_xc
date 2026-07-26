@@ -20,9 +20,14 @@ image = (
     # concurrent runs pulling the same weights unauthenticated hit the Hub's rate limit and
     # one of them died mid-sprint; caching it in the layer also removes ~40s of startup from
     # every run.
+    # The two transfer models are baked as well: the transfer negative was measured at a
+    # single lr for all three arms and 2000 steps, which is this sprint's own Finding 4
+    # committed against itself, so those cells need rerunning at the per-arm recipe.
     .run_commands(
         "python -c \"from huggingface_hub import snapshot_download; "
-        "snapshot_download('Qwen/Qwen2.5-1.5B-Instruct')\"")
+        "snapshot_download('Qwen/Qwen2.5-1.5B-Instruct'); "
+        "snapshot_download('HuggingFaceTB/SmolLM2-1.7B-Instruct'); "
+        "snapshot_download('Qwen/Qwen2.5-0.5B-Instruct')\"")
     .add_local_dir(str(ROOT / "src"), "/work/src")
     .add_local_dir(str(ROOT / "temporal_crosscoders"), "/work/temporal_crosscoders")
     .add_local_dir(str(_here.parent), "/work/txc_wins")
