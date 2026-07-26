@@ -46,7 +46,7 @@ OUT = ROOT / "plots" / "2026-07-26_txcwins" / "c_gate.png"
 CONSTANT_ARMS = ("sae_broadcast", "tsae_broadcast", "txc_flat", "random_broadcast")
 # task -> (result file, label, colour). One row per task, every `c` from the same screen.
 TASKS = [
-    ("demo_order_probe", "demo_order_probe_ho_ds0", "demonstration order", "#0072B2"),
+    ("demo_order_probe", "demo_order_probe_t2_ds0", "demonstration order", "#0072B2"),
     ("recency", "recency_v2", "instruction position", "#E69F00"),
     ("rot_m12", "rot_m12_T", "rotation, m=12", "#CC79A7"),
     ("evidence", "evidence_v2", "evidence order", "#009E73"),
