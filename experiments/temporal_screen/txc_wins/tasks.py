@@ -430,3 +430,16 @@ except ImportError:  # pragma: no cover - local runs without the package on sys.
         _THEORY_DESIGNS = {}
 
 TASKS.update(_THEORY_DESIGNS)
+
+# The two-moment demonstration-order design. Kept separate for the same reason as the theory
+# designs, and because it is the only task here whose foils are constrained on TWO moments of
+# the label sequence rather than on the multiset alone.
+try:
+    from txc_wins.designs_twomoment import DESIGNS as _TWOMOMENT_DESIGNS
+except ImportError:  # pragma: no cover - local runs without the package on sys.path
+    try:
+        from .designs_twomoment import DESIGNS as _TWOMOMENT_DESIGNS
+    except ImportError:
+        _TWOMOMENT_DESIGNS = {}
+
+TASKS.update(_TWOMOMENT_DESIGNS)
