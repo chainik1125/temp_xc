@@ -424,31 +424,60 @@ sprint could not supply is a task on which that object pays.** The contribution 
 characterisation of what such a task requires — rank ≥ 2, `c ≈ 0`, and positions consistent across
 documents — together with a construction satisfying the first two.
 
-## The experiment to run next
+## The experiment that is running
 
-Every design this sprint achieved either rank ≥ 2 or `c ≈ 0`, never both — the trajectory tasks
-got `c = 0` with rank 1, recency got rank 2 with `c` = 0.067, the rotation ladder got rank without
-low `c`. The reason is now understood: **the carried state is simultaneously what creates rank ≥ 2
-and what creates the DC residue**, because both come from the same integral.
+Every design in this sprint achieved either rank ≥ 2 or `c` ≈ 0, never both — the trajectory
+tasks got `c` = 0 with rank 1, instruction position got rank 2 with `c` = 0.036 but `r1` = 0.82,
+the rotation ladder got rank with `c` = 0.13–0.26. The reason is now understood: **the carried
+state is simultaneously what creates rank ≥ 2 and what creates the DC residue**, because both come
+from the same integral.
 
 Few-shot demonstration order breaks the tie. The label at position `t` is one attribute and the
 running label balance is its integral, so matching the label multiset gives **rank 2 for every
 foil**. Matching the multiset is the *zeroth* moment; the state's DC residue is the *first*, since
-`Σ_t cumsum(Δc)(t) = −Σ_j j·Δc_j`. Adding the first-moment constraint gives both at once:
+`Σ_t cumsum(Δc)(t) = −Σ_j j·Δc_j`. Adding the first-moment constraint gives both at once — and the
+constructed patterns match moments 0, 1 **and** 2 exactly (6 / 39 / 325).
 
-| constraint | mean `c` | rank |
+Screened on real activations, n = 200, both metric modes:
+
+| | ordering mode | **probe mode** |
 | --- | --- | --- |
-| multiset matched only | 0.076 | 2 |
-| multiset **and** first moment matched | 0.0000 | 2 |
+| `c(Ḡ)` | 0.020 | **0.030** |
+| `r1(Ḡ)` | 0.587 | **0.643** |
+| `σ₂²/σ₁²` | 0.338 | 0.183 |
+| `cos(P_dom, Ḡ)` | +0.139 | +0.017 |
+| **shared-write retention** | 0.272 | **0.743** |
 
-Verified by running `demo_order.py` in this directory. **The reference ordering must be
-non-extremal** — `[1,1,1,1,0,0,0,0]` uniquely maximises the first moment, so it admits zero valid
-foils and the constrained cell comes back empty; centred and alternating references admit 6–7
-each. The script originally shipped with the extremal reference and printed `nan` for the cell it
-exists to demonstrate; it now uses a centred one.
+**Probe mode is the headline and the deciding number is retention.** A fixed write captures 74% of
+the per-document gradient in probe mode against 27% in ordering mode — a 2.7× larger ceiling for
+*every* arm, because the probe metric isolates the label-prediction effect, which is the same
+mechanism in every document, while document-likelihood gradients are dominated by document-specific
+content that averages away. Probe mode is also the readout the documented behaviour acts on:
+few-shot label bias moves the model's **predicted label**, not the relative likelihood of two
+demonstration blocks.
 
-A second knob comes free: with `q` labels, `A ≤ 2(q−1)`, so `r1` should fall as the alphabet
-grows — a real task with a genuine handle for testing `rank(P) ≤ A`.
+⚠ **`r1(P_dom)` = 0.94 on this task against `r1(Ḡ)` = 0.64.** A difference-of-means screen would
+have discarded it as rank-1. This is the fourth independent instance of that divergence and the
+only one on a task built *after* the prediction was registered.
+
+**A prediction that did not land, worth keeping.** The probe gradient was expected to be
+recency-weighted, since that is the documented ICL bias. Measured profile is flat to slightly
+*front*-loaded (late/early ratio 0.841). So at this layer the write-sensitivity of demonstrations
+is not recency-ordered even though the behavioural bias is — which means **"the crosscoder wins by
+exploiting recency" is not available as an explanation** if it does win.
+
+**Registered before the numbers land.** A win is the strongest cell in the sprint: low `c`, real
+rank headroom, a published behaviour, held-out content pools, and a difference-of-differences
+metric under which a function-vector write cancels by construction. A loss says low `c` plus rank
+headroom is still not sufficient, which would leave *the crosscoder wins when it finds a good
+latent* as the honest summary of the whole sprint, and would make the three-init range the headline
+rather than the mean.
+
+**One caution against reading the geometry as a forecast.** Rank headroom has gone unused
+everywhere it has been measured — at `rotate12` it was 82% and the crosscoder reached +18.23
+against a rank-1 ceiling of +102.46. `r1` bounds what a rank-1 write can do; it has not once
+predicted what the crosscoder does. If headroom matters here, that is a new result rather than a
+confirmation.
 
 ## Limits
 
