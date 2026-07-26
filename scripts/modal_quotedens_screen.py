@@ -49,6 +49,7 @@ def _assert_pinned():
 
 
 @app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
               timeout=2 * 60 * 60,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def build_caches() -> str:
@@ -61,6 +62,7 @@ def build_caches() -> str:
 
 
 @app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
               timeout=4 * 60 * 60,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def run_screen(key: str) -> str:

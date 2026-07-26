@@ -54,6 +54,7 @@ def _assert_pinned():
 
 
 @app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
               timeout=2 * 60 * 60,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def build_caches() -> str:
@@ -66,10 +67,15 @@ def build_caches() -> str:
 
 
 @app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
               timeout=4 * 60 * 60,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def run_screen(key: str) -> str:
     _assert_pinned()
+    # gemma fill: build THIS key's cache here (idempotent)
+    _sh(f"{PY} -m experiments.explorations.task_hunt.refmark.cache_acts "
+        f"{key}")
+    vol.commit()
     _sh(f"mkdir -p {RESULTS_VOL_DIR} {REPO_RES}")
     part = Path(RESULTS_VOL_DIR) / f"screen_{key}.json"
     if part.exists():

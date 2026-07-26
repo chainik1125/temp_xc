@@ -56,6 +56,7 @@ def _assert_pinned():
 
 
 @app.function(image=image, gpu="A10G", volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
               timeout=15 * 60)
 def smoke() -> str:
     _assert_pinned()
@@ -65,6 +66,7 @@ def smoke() -> str:
 
 
 @app.function(image=image, gpu="A10G", volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
               timeout=2 * 60 * 60)
 def build_caches() -> str:
     _assert_pinned()
@@ -83,10 +85,18 @@ def build_caches() -> str:
 # >20 GB ⇒ L40S. GPU choice does not touch cells/seeds; resume from the
 # Volume partials is the card § 7 pre-authorized adaptation.
 @app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
               timeout=4 * 60 * 60,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def run_screen(key: str) -> str:
     _assert_pinned()
+    # gemma fill: build THIS key's caches here (idempotent via
+    # acts_meta.json; in-container per the 34GB shutdown-grace lesson)
+    _sh(f"{PY} -m experiments.explorations.task_hunt.replag.build_labels "
+        f"{key}")
+    _sh(f"{PY} -m experiments.explorations.task_hunt.replag.cache_acts "
+        f"{key}")
+    vol.commit()
     _sh(f"mkdir -p {RESULTS_VOL_DIR} {REPO_RES}")
     part = Path(RESULTS_VOL_DIR) / f"screen_{key}.json"
     if part.exists():                      # resume partial cells (card § 7)
