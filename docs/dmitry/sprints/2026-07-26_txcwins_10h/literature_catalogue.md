@@ -122,7 +122,86 @@ best-ordering accuracy is measured in step 1, so unlike the original order task 
 natural, interpretable upper bound on what any intervention could achieve, and the result can be
 reported as a fraction of a real gap closed rather than as an uncalibrated Δmargin.
 
-### The selection criterion, restated from what actually won
+### The criterion the repo has already established empirically, which is sharper than mine
+
+Read [[semisynthetic_language_tasks]] before acting on anything below. It contains executed
+experiments that supersede the reasoning I set out in the next section, and I had P1 and P2 the
+wrong way round.
+
+**What that note establishes.** Two candidate language demonstrations were run on Modal and both
+**failed**:
+
+- *Passphrase verification* (k distinct code-words, a textbook position-dependent template)
+  failed because it is a **conjunction** — a single or broadcast write satisfies it.
+- *Ordered generation* (days, numbers) failed because it is **mode-dominated**: at k ≥ 3–5 the
+  per-token SAE broadcast matched or beat the crosscoder template by 10–50×, and the gap ran the
+  *wrong* way, with the template fading as k grew rather than growing.
+
+The stated mechanism is the part that matters: natural-language structured generation is driven
+by a strong shared contextual *mode*, which a broadcast write reinforces at every position, and
+"the per-position template's specific writes are fragile and are overwhelmed as the sequence and
+the mode strengthen".
+
+**Then the fix, and it worked.** Trajectory tasks with **multiset-matched foils** — a permutation
+of the same profile, "so no bag/mode statistic — hence no broadcast write — separates target from
+foil in principle". Four of four passed, and the full k-sweep gives template growing roughly
+linearly in k (lang: +75.7 at k=2 to +218.9 at k=10) while **broadcast is pinned near zero or
+negative at every k**, and single-position is flat, its share decaying as 1/k. A
+generation-mode demo reached 0.812 ± 0.044 per-slot accuracy for the template against 0.444 for
+broadcast at chance 0.5.
+
+The conclusion in the note's own words: *windowed steering wins exactly when the target is a
+trajectory with no DC component, and per-token steering wins when a broadcastable mode carries
+the behaviour.*
+
+**The correction to my framing.** I wrote that P2 (write non-constancy) is the operative
+criterion and P1 (matched multiset) is a clean special case. That is backwards. The passphrase
+result is a direct refutation: it has P2 in textbook form and still loses, because a broadcastable
+mode exists. **P1 is the necessary condition**, precisely because a matched multiset is what
+guarantees no DC component for a broadcast write to ride.
+
+So the operative test for every entry is not "is the write position-dependent?" but:
+
+> **Is there any bag-of-positions statistic — a mode, a label prior, a level — that separates
+> target from foil? If yes, a broadcast write can ride it and the crosscoder loses.**
+
+### The DC-component audit
+
+Applying that test to the catalogue, which changes several verdicts. "DC handle" means a constant
+write that plausibly moves the metric.
+
+| entry | DC handle a broadcast write could ride | verdict |
+| --- | --- | --- |
+| Demonstration order | **yes, unless controlled** — recency and majority-label bias are bag statistics (*Calibrate Before Use* names exactly these) | salvageable, see the control below |
+| Instruction-order conflict | **no, if the design is right** — with A-then-B vs B-then-A and "obey the first" as the target, the correct content *differs between conditions*, so no single content direction helps both | holds |
+| Induction / in-context copying | **yes** — "copying-ness" is a mode, and this is close to the ordered-days/numbers task that already failed | **demote to 2**; expect the repo's existing negative to replicate |
+| Repetition loop escape | **yes** — "repetitiveness" is the mode par excellence, and a flat repetition penalty is exactly the broadcast write | **demote to 2** |
+| LLM judge position bias | **yes** — the verdict is a label token, so a "prefer B" write is a DC handle | demote within the family |
+| Permutation composition | **probably** — the model aggregates at the query token, so a single write there may set the state | run at an *upstream* hookpoint or not at all |
+| Backtracking | **yes** — a linear direction already steers it (2506.18167), and "doubt" is a mode | consistent with its modest 0.541 vs 0.400 gap |
+| MCQ option order | **yes** — content-invariant position attractor, token bias | already dropped |
+
+Two entries survive cleanly, and they are the two the sprint should spend on.
+
+**The control that saves demonstration order.** The order effect is partly carried by recency and
+majority-label bias, both bag statistics. Kill them by construction: **permute only the middle
+demonstrations, holding the first and last fixed, and match the label multiset**. Then the
+foil pair differs *only* in the arrangement of the interior, no bag statistic separates them, and
+the DC component is gone. Without this control a broadcast write may well close the gap, and the
+result would be uninterpretable. This is cheap — it is a constraint on the permutation sampler —
+and it should be in the corpus builder from the start.
+
+**The honest reframing this forces.** The repo's note concludes "do not pursue a language
+*steering* demonstration of template > per-token as a paper headline", on the grounds that the
+clean win seems to need mode-free per-position binding, which language behaviours rarely have.
+The last sprint's order-only result and the trajectory tasks are the counterexamples — both are
+language, both multiset-matched, both won. So the reframing is not "language steering doesn't
+work" but the narrower and better-supported: **language steering wins iff the foil is
+multiset-matched**. Demonstration order with the interior-permutation control is a test of exactly
+that claim on a behaviour with an external constituency, which is the gap the sprint set out to
+close.
+
+### The selection criterion, as I first set it out (superseded above, kept for the reasoning)
 
 The last sprint's win was **steering, not reading**, and the mechanism was specific: a
 per-token dictionary's per-latent intervention is *one direction added at every position*, so
@@ -1027,16 +1106,18 @@ measured on a completely different task.
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
-  capability gate).
+  capability gate), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
 - **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
   and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
-  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2607.01033, 2502.02180,
-  2605.07984, 2408.15221, 2605.01687, 2605.02647, 2606.08644, 2605.26537, 2506.01926, 2603.03258, 2601.04170, 2604.11978, 2605.03907, 2603.05805, 2606.26474,
-  2512.02194.
+  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2502.02180, 2605.07984,
+  2408.15221, 2605.01687, 2605.02647, 2606.08644, 2605.26537, 2603.03258, 2601.04170,
+  2604.11978, 2605.03907, 2603.05805, 2606.26474, 2512.02194, 2411.16594.
+  All fifteen-odd are single mentions in lower-tier entries; nothing load-bearing above
+  priority 2 rests on an unverified id.
 - **Claims withdrawn on checking:** that a published turn-shuffle ablation exists for
   crescendo-style attacks (could not confirm in Crescendo or NEXUS); that R-GSM is
   multiset-matched (it permits word edits); that EM is carried by a single unified linear
@@ -1132,3 +1213,12 @@ the per-pass times are ordering only, not measurements.
   **Demoted steganography from 3 to 2**: Zolkowski et al. (2507.02737, verified) show frontier
   models cannot encode short messages without a monitor noticing under standard affordances, so
   no organism exists at a scale this sprint can reach.
+- **Pass 15** — pulled the concrete numbers from Li et al. and **corrected the go/no-go sizing**:
+  typical permutation-to-permutation std is only ~2 accuracy points (0.0197 average), so the
+  best/worst search needs ~128 permutations, as they use, not the ~24 I first wrote. Verified
+  *The Model Organism Lottery* (2607.01033), which benchmarks steering and SAEs across 54
+  organism variants and finds interpretability depends strongly on how the organism was trained,
+  with integrated training yielding *less* interpretable organisms than post-hoc methods — added
+  to the main-conclusion section as a second, independent argument for the organism-free tasks.
+  Verified Skaf et al. (2506.01926). Fifteen unverified ids remain, all single mentions in
+  lower-tier entries.

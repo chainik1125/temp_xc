@@ -1117,3 +1117,101 @@ in their outputs without a monitor noticing under standard affordances" (arXiv:2
 so no organism exists at a scale this sprint could reach. Its structural argument — a payload
 carried in sentence arrangement is invisible to any per-position readout by construction —
 remains the most elegant in the catalogue and is kept on that basis.
+
+## 23:18 — the shared-write constraint: a dictionary latent is one write reused across documents
+
+The most operationally important finding of the sprint, and it nearly killed two tasks
+silently.
+
+A dictionary latent is **one fixed write reused across documents**, so what bounds any
+fixed-write arm is the **mean** difference slab over documents, not the per-document one. If
+the intervention a document needs varies between documents, the mean cancels and the ceiling
+collapses — **for every architecture, crosscoder included.** Measured on a k=6 rotation over
+400 documents:
+
+| content | ‖mean P‖ | mean ‖P‖ | ratio |
+| --- | --- | --- | --- |
+| fixed across documents | 3.475 | 3.475 | **1.000** |
+| resampled per document | 0.168 | 3.463 | **0.049** |
+
+A 20× collapse. Every design so far satisfied this by accident — the order task always places
+tense at the same positions, recency always places instructions at 2 and 9 — and both new
+candidates are naturally specified the other way. Detector, no training needed:
+`‖mean P‖ / mean ‖P‖`, with anything below ~0.3 meaning the task cannot support a fixed-write
+result at all.
+
+**It also explains why the three currencies resist being combined.** The more a task is fixed
+so that a shared write can serve it, the less it resembles the phenomenon the literature
+documented. That tension is structural rather than bad luck and belongs in the write-up.
+
+Consequences for the two candidates. **Permutation composition is dead on arrival** if swap
+content is resampled per document — at position `t` class A shows `s_t` and class B shows
+`s_{t+1}`, both uniform over draws, so lexical *and* state marginals match and mean DoM ≈ 0.
+Held with the swap multiset fixed and only order varying, it is the **best expressiveness
+candidate left**: registered rank ≥ 3, `r1 ≈ 0.5`, with the later singular directions being
+the running-state accumulator the associative-scan account predicts. Its signature differs
+from recency's — the state components' temporal profile should **grow with t** as running
+states diverge, where recency's was disjoint support. And parity cannot discriminate here at
+all, since each swap flips it and parity after T swaps depends only on T: the paper's
+parity-pruning heuristic is useless for this contrast, so **the task isolates the scan.**
+
+**Demonstration order** has rank `k − (number of cycles)` of the best→worst permutation,
+verified at k = 4, 6, 8; measured `r1` 0.463 / 0.337 / 0.259. It needs one fixed demonstration
+set and one fixed best/worst pair with only the query varying. Reporting the cycle structure
+alongside `r1` immediately distinguishes a disappointing result caused by the draw
+(transposition-heavy, half the rank) from one caused by the model.
+
+## 23:20 — three corrections from the implement agent, all in the harder direction
+
+**Realised sparsity was being measured in-sample, and it flattered the crosscoder.**
+BatchTopK is a batch rule at train time and a fixed threshold at eval, and the number of
+latents clearing that threshold is data-dependent: 8.03 coefficients per segment in-sample
+against **10.15 held-out** at nominal k=8 — a 27% hidden budget advantage. Last sprint's rule
+was "match on realised, never nominal"; the sharper version is **realised must be measured
+out of sample**, because the threshold is calibrated on training data and does not
+generalise. Lowering the crosscoder's nominal k to 6 gives 7.77 against the SAE's 8.00, and
+**the recency result survives at genuinely matched budget: +6.35 ± 0.19 against +7.09 at the
+inflated one**, still reversing a 2.42-nat baseline rather than merely erasing it.
+
+**Reading AUC was selection-biased** — the best of 4096 latents scored on the documents the
+maximum was taken over. Latent selection now happens on train, scoring on held-out;
+crosscoder AUCs move by up to 0.06 either way.
+
+**The training recipe was unfair against the crosscoder and the tSAE, not the SAE.** FVU at 8
+coefficients/segment on the recency corpus:
+
+| arm | lr 3e-4 / 2000 | lr 3e-4 / 6000 | lr 1e-3 / 2000 |
+| --- | --- | --- | --- |
+| TopK SAE | 0.0428 | 0.0373 | 0.0426 |
+| crosscoder | 0.2389 | 0.2160 | **0.1260** |
+| attention tSAE | 0.1458 | 0.0539 | 0.0639 |
+
+The SAE was converged at the default and the other two were not. At lr 1e-3 the crosscoder's
+FVU nearly halves *and* its realised overspend falls from 10.15 to 8.32, so the better recipe
+also makes the budget match easier. **Three corrections, all of which made the win harder to
+obtain** — a much stronger position than three that happened to help, and worth stating that
+way.
+
+**Init variance is large enough that no single run is a verdict.** Phase-5's crosscoder best
+delta across three inits of an identical configuration: 1.56, 15.70, 11.48 — a 10× spread.
+The *sign* was stable and `txc_slab` exceeded `sae_broadcast` in all three, so that is the
+reportable claim while the magnitude is not. Every summary cell now needs at least three
+inits with the range reported.
+
+**A null worth keeping: escalation.** Ascending versus descending request intensity, foil the
+exact reversal. Baseline `score(A) − score(B)` = −0.07 ± 0.13 — the model shows no compliance
+difference at all — and steering moves it at most +0.63 ± 0.09. The diagnosis is a scope
+condition on the whole method: **the behaviour must exist at baseline for a temporal
+intervention to have anything to act on.** Recency has a real 2.42-nat bias and moves 6–7;
+escalation has none and moves nothing.
+
+**And a control I had not thought of: `txc_profile_random`** — the crosscoder's per-position
+norm profile kept exactly, the directions replaced by random ones. `txc_flat` asks whether it
+needs its profile; this asks whether it needs anything *but* the profile. If they match, "where
+to write" is the entire contribution, which is a much weaker claim than it sounds.
+
+**One collision flagged back:** `recency_var` randomises instruction positions per document,
+which is exactly the shared-write constraint's failure case. A null there could mean the
+crosscoder was only addressing two known slots, or that no fixed write of any architecture can
+serve the task. `‖mean P‖ / mean ‖P‖` and the `dom_slab` ceiling distinguish them, and must be
+measured before the result is read.
