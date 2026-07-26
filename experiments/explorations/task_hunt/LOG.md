@@ -5417,3 +5417,64 @@ LOG line approving the fill. Idle otherwise; watching for review
 pings; hard gates observed (no new starts ≥ 15:30 London).
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+## 2026-07-26 — mac-local — W1 MIXED verdict APPROVED + R25 RATIFIED (one precision restatement); **PANEL GATE: FIRED for `ttrend`** (clauses (i)–(iv) checked in writing); mac-b gemma-fill APPROVED with conditions
+
+### 1. W1 ratification
+
+Independently re-derived from `ladder_*.json`: all four identity
+gates green (bases within 0.001 of committed, L0 seed-0 within
+0.0013 of R11 on 3/3, L4 within 0.0007); MIXED thresholds hold at
+T32 on 3/3 (L1, L2 each ≥ ⅓·L0; gpt2 0.0304/0.0329 of 0.0592, llama
+0.0134/0.0186 of 0.0353, gemma 0.0362/0.0277 of 0.0639) with T16
+sign-robustness 3/3; near-concentration 3/3 (starkest llama: far
+−0.0071 / near +0.0373). **Precision restatement for any quote:**
+the additivity bound is **max |L1+L2−L0| = 0.0041** (gpt2; llama
+−0.0033, gemma +0.0000) — quote "additive within ±0.005" or the
+per-model values, not "≤ 0.004" (0.00406 clears 0.004 only after
+3-dp rounding; the R11-failure-mode discipline applies to our own
+bounds too). R25 RATIFIED with that emendation. The program now has
+a MECHANISM for R11: the order signal is turn-LAYOUT carried both
+within and across turns, near-half concentrated — precisely the
+state family `ttrend` encodes.
+
+### 2. THE PANEL GATE — FIRED for `ttrend` (written approval, clause by clause)
+
+- (i) KEEP under the card's majority rule: tt KEEPs on gpt2 AND
+  gemma2 (2 of 3; llama still running and NOT required by the pinned
+  clause). ✓
+- (ii) pinned T-quantifier, Q3's wd arms: tt wd_sc at T32 =
+  **+0.037 (gpt2) / +0.036 (gemma)** ≥ +0.03 on 2 of 3 including
+  gpt2; T16 = +0.018/+0.019 > 0. ✓
+- (iii) 12:15 London — launch well before 14:30. ✓
+- (iv) ledger ≈ $47 ≤ $250. ✓
+- (v) is this entry.
+
+**Face choice — tt, not dq, on the program's own principles:** tt's
+Q1 HELD (tok − floor +0.092 — the per-token-quiet profile; the
+ambience principle's target class) while dq violated Q1 twice
+(+0.190/+0.211 — converted, the punctint-q class whose panel prior
+is 0-for-2 despite dq's larger sc); and W1's mechanism (turn layout,
+MIXED, near-concentrated) is literally tt's state variable. dq's
+KEEP goes to the breadth table with its order numbers quoted.
+
+**Binding panel terms (the card freeze must state them):** ladder
+T ∈ {2,4,8,16,32} (the T32 requirement as pinned); model per the
+draft's frozen stronger-screen-model rule; H100 for non-tsae pools /
+high-CPU tsae (Han's amendment); 3 seeds, trained+untrained, post at
+k = 8·T, paired v1+v2 (claim on v1), realized-l0 band, evidence-line
+analog per T (tt's visible floor at panel convention), doc-identity
+demeaned receipt, P1–P5 + KEEP/KILL frozen before cell one; cells
+done + repatriated by 16:15, no exceptions. If llama's screen lands
+KILL for tt before the freeze, the gate is RE-EVALUATED in writing;
+after the freeze, llama's screen is coverage context, not a stop.
+
+### 3. mac-b gemma overnight-fill: APPROVED with conditions
+
+Order: slen gemma → refmark gemma → quotedens gemma; cap $20 total;
+nothing new after 15:30; DROP INSTANTLY if W2 panel support is
+requested; each fill's verdict amends the overnight entry it
+completes (per-model paragraphs only, no re-scoring of frozen
+majority verdicts).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
