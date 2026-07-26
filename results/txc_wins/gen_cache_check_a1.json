@@ -1,0 +1,18 @@
+{
+  "n_docs": 16,
+  "identical": 12,
+  "first_diffs": [
+    36,
+    49,
+    53,
+    98
+  ],
+  "gen_tokens": 32,
+  "alpha": 1.0,
+  "layer": 14,
+  "t_cached": 10.7,
+  "t_uncached": 18.6,
+  "speedup": 1.738317757009346,
+  "recovered_from_log": true,
+  "note": "Native artefact was overwritten by the alpha=0 control (both wrote gen_cache_check.json before the script was tagged by alpha). Timings and identical-count are exact from stdout; per-document detail was never printed and is absent."
+}

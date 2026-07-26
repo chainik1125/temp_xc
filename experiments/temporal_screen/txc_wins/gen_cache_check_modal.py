@@ -27,6 +27,22 @@ texts diverge only late and only occasionally, that is bf16 tie-breaking under a
 reduction order and is acceptable; if they diverge at the FIRST token, the hook is being
 applied differently and the cached path is wrong.
 
+WHAT THE TIMING ACTUALLY SHOWED -- record this before budgeting another generation sweep
+here, because it is the opposite of the intuition that motivated the fix:
+
+    alpha = 1.0 (hook active)   cached 10.7s   uncached 18.6s   speedup 1.7x
+    alpha = 0.0 (control)       cached 10.7s   uncached 11.4s   speedup 1.06x
+
+**KV caching buys very little on this workload.** Documents are 98 tokens with 32 generated,
+so prefill dominates and there is almost nothing to amortise -- against the 8-9x that was
+estimated from an assumed ~350-token document. The number that matters for a budget is the
+CACHED RATE, 0.67 s per generation, which is identical in both runs and is what the ~55 min
+estimate for 4,880 generations rests on. The speedup ratio never entered the estimate.
+
+The two uncached times differ by 63% while the cached times are identical to three
+significant figures, and the hook executes in both cases (adding zeros at alpha=0). I do
+not have an account for that and am not proposing one.
+
     modal run experiments/temporal_screen/txc_wins/gen_cache_check_modal.py
 """
 import pathlib
@@ -186,10 +202,17 @@ def check(model_id: str, layer: int, k_seg: int, n_doc: int, gen_tokens: int,
 
 @app.local_entrypoint()
 def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = 14, k_seg: int = 12,
-         n_doc: int = 8, gen_tokens: int = 32, alpha: float = 1.0, seed: int = 31415):
+         n_doc: int = 8, gen_tokens: int = 32, alpha: float = 1.0, seed: int = 31415,
+         tag: str = ""):
     import json
     r = check.remote(model, layer, k_seg, n_doc, gen_tokens, alpha, seed)
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
-    (outdir / "gen_cache_check.json").write_text(json.dumps(r, indent=2))
-    print("[saved]", outdir / "gen_cache_check.json")
+    # TAGGED BY ALPHA. Both runs previously wrote `gen_cache_check.json`, so the alpha=0
+    # control overwrote the alpha=1 experiment and the surviving artefact disagreed with
+    # the reported speedup -- not because the number was wrong, but because the file that
+    # supported it no longer existed. A check script that clobbers its own prior result
+    # destroys exactly the evidence it was run to create.
+    name = f"gen_cache_check_a{alpha:g}{tag}.json".replace("-", "m")
+    (outdir / name).write_text(json.dumps(r, indent=2))
+    print("[saved]", outdir / name)
