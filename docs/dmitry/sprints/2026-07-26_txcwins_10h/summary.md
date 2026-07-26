@@ -121,38 +121,42 @@ worst. This is the most-replicated finding in the project and the one least like
 
 ## What was not achieved
 
-**No expressiveness win — and across three tasks the crosscoder never meaningfully exceeds the
-best constant write that exists.** `broadcast_optimal` is the best constant direction in the whole
-space, so it bounds what the crosscoder's *temporal form* can buy. Medians over three inits,
-matched dose, held-out content where available:
+**No expressiveness win, and it is now excluded by measurement across seven tasks rather than
+inferred from one.** `broadcast_optimal` is the best constant direction in the whole space, so it
+bounds what the crosscoder's *temporal form* can buy. Ratio is crosscoder / that ceiling, at
+matched dose, held-out content where the task has a held-out variant:
 
-| task | `c` | `r1` | crosscoder | best constant write | ratio | z |
-| --- | --- | --- | --- | --- | --- | --- |
-| instruction position | 0.034 | 0.850 | +4.63 | +4.01 | **1.16** | +2.0 |
-| evidence order | 0.156 | 0.595 | +1.97 | +7.13 | **0.28** | **−78** |
-| 12-block rotation | 0.033 | **0.177** | +10.63 | +12.36 | **0.86** | −2.1 |
+![Decomposing the gap](../../../../plots/2026-07-26_txcwins/gap_decomposition.png)
 
-**It loses on evidence order at z = −78, loses on the rank-designed cell at z = −2, and wins the
-one remaining cell at z = +2.0.** `rotate12` is the design built so rank-1 writes are poor — and it
-is beaten there by a write that is rank-1 **and** flat in time.
+| task | `r1` | `c` | ratio | z | txc / optimal |
+| --- | --- | --- | --- | --- | --- |
+| 12-block rotation | 0.177 | 0.033 | 0.86 | −2.1 | 0.101 |
+| 6-block rotation | 0.210 | 0.102 | 0.19 | −19.3 | 0.075 |
+| 2-block rotation | 0.304 | 0.163 | 0.09 | −18.6 | 0.054 |
+| order (withdrawn headline) | 0.478 | 0.241 | 0.17 | −11.5 | 0.074 |
+| phase-11 | 0.562 | 0.050 | 0.39 | −8.0 | 0.061 |
+| evidence order | 0.595 | 0.156 | 0.28 | −78.1 | 0.154 |
+| **instruction position** | 0.850 | 0.034 | **1.16** | **+2.0** | **0.287** |
 
-**What predicts that ratio is `c`, not `r1`** — Pearson **−0.939** against **+0.196** over the three
-tasks. `c` is exactly what bounds `broadcast_optimal` (first-order reach `√c`), so the ratio tracks
-how high the *constant* ceiling sits, not whether temporal freedom is worth anything. `recency` and
-`rotate12` have near-identical `c` (0.034, 0.033) and `r1` differing 4.8×, and the rank difference
-moves the ratio 35% **in the wrong direction**.
+**The crosscoder clears the best conceivable constant write on one task of seven — the sprint's own
+headline — by 16%, at z = +2.0.** On the other six it loses, at z from −2.1 to −78. That range spans
+the sprint's entire design space, `r1` 0.177–0.850 and `c` 0.033–0.241, **including two ladders
+built specifically to make constant writes bad**.
 
-**So the crosscoder's margin over a per-token dictionary is a *search* advantage, not a temporal
-one.** That margin is real and survives a steering-based selector (z = +15 to +18 on instruction
-position). It simply is not a rank effect: `grad_rank1` was a ceiling the crosscoder never cleared,
-and `broadcast_optimal` — strictly weaker, rank-1 *and* flat — is a ceiling it does not clear
-either.
+**The controlled pair is the sharpest part.** `rotate12` and instruction position have essentially
+identical `c` (0.033 vs 0.034) and `r1` differing **4.8×** — and the rank-designed cell is the one
+that *loses*. Neither statistic predicts the ratio decisively at n = 7 (`r1` Pearson **+0.420**,
+still the wrong sign; `c` **−0.747**), and the conclusion does not need one.
 
-⚠ Three qualifiers. `broadcast_optimal` is gradient-derived and therefore **supervised**: no
-practitioner arm reaches that line, and this is not a per-token dictionary beating the crosscoder.
-**Three tasks is three points**, and a −0.939 on three points is three points — four more cells
-spanning `c` from 0.050 to 0.241 were still running. And the `r1` range here (0.177–0.850) is wide
-but the `c` range (0.033–0.156) is where the variance sits.
+Instruction position is also the outlier on share of the optimal write: **0.287 against 0.054–0.164
+everywhere else**. Whatever makes the headline work is specific to that cell.
+
+⚠ Three qualifiers. `broadcast_optimal` is gradient-derived and **supervised** — no per-token
+dictionary reaches that line (the steering-selected SAE gets 0.14–0.43 of it), so this is not "an
+SAE beats the crosscoder". **Four of seven cells are one init**, and they are the ones with the most
+extreme ratios, so their *ordering* is soft even though all four sit far below 1. And `order` and
+the rotations are **ordering mode** while instruction position and evidence are **probe mode** — the
+ratio is dimensionless and formed within a run, which is why it shares an axis at all.
 
 **Rank ≥ 2 is real and its mechanism is unidentified.** Three candidate mechanisms were proposed
 and each refuted by a profile measurement it predicted. The leading direction *is* explained — the
