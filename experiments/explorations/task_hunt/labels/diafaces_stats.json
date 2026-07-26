@@ -1,0 +1,156 @@
+{
+ "substrate": "dialevel_dailydialog (REUSED token stream + caches; builders labels/build_dialevel.py + dialevel/cache_acts.py)",
+ "support_turns": 5,
+ "kernel_hl": 2.0,
+ "min_manifest_pos": 16,
+ "triage_pos": 64,
+ "per_tokenizer": {
+  "gpt2": {
+   "tokenizer": "gpt2",
+   "n_dialogues": 5000,
+   "n_tokens": 869710,
+   "turns_per_dialogue_mean": 11.1966,
+   "q_rate_per_turn": 0.3627083430285088,
+   "ttrend": {
+    "scheme": "terciles",
+    "edges": [
+     -1.0520305633544922,
+     1.0529215335845947
+    ]
+   },
+   "dqgap": {
+    "edges": [
+     1,
+     2
+    ]
+   },
+   "faces": {
+    "tt": {
+     "labeled_frac": 0.5670729323567626,
+     "manifest_rows_per_class": 19997,
+     "class_balance_eligible": {
+      "0": 151233,
+      "1": 138357,
+      "2": 149570
+     },
+     "unigram_auc": 0.5483291008519163,
+     "position_auc": 0.45453294565472746,
+     "doc_mean_only_auc": 0.7612575122815187,
+     "wd_viable_test_docs": 834
+    },
+    "dq": {
+     "labeled_frac": 0.850972163134838,
+     "manifest_rows_per_class": 19996,
+     "class_balance_eligible": {
+      "0": 206024,
+      "1": 140859,
+      "2": 154248
+     },
+     "unigram_auc": 0.5767289132878601,
+     "position_auc": 0.5649330046346672,
+     "doc_mean_only_auc": 0.8481796059777138,
+     "wd_viable_test_docs": 701
+    }
+   },
+   "artifact": "diafaces_dailydialog_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_dialogues": 5000,
+   "n_tokens": 880013,
+   "turns_per_dialogue_mean": 11.1966,
+   "q_rate_per_turn": 0.3627083430285088,
+   "ttrend": {
+    "scheme": "terciles",
+    "edges": [
+     -1.058688759803772,
+     1.0739185810089111
+    ]
+   },
+   "dqgap": {
+    "edges": [
+     1,
+     2
+    ]
+   },
+   "faces": {
+    "tt": {
+     "labeled_frac": 0.5687859156626095,
+     "manifest_rows_per_class": 19997,
+     "class_balance_eligible": {
+      "0": 154196,
+      "1": 141232,
+      "2": 152509
+     },
+     "unigram_auc": 0.5495705490389711,
+     "position_auc": 0.45356464854169937,
+     "doc_mean_only_auc": 0.7637888958003838,
+     "wd_viable_test_docs": 834
+    },
+    "dq": {
+     "labeled_frac": 0.852244228210265,
+     "manifest_rows_per_class": 19998,
+     "class_balance_eligible": {
+      "0": 210782,
+      "1": 143644,
+      "2": 156530
+     },
+     "unigram_auc": 0.57996029873077,
+     "position_auc": 0.565981620255861,
+     "doc_mean_only_auc": 0.8482640214792774,
+     "wd_viable_test_docs": 695
+    }
+   },
+   "artifact": "diafaces_dailydialog_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_dialogues": 5000,
+   "n_tokens": 810054,
+   "turns_per_dialogue_mean": 11.1966,
+   "q_rate_per_turn": 0.3627083430285088,
+   "ttrend": {
+    "scheme": "terciles",
+    "edges": [
+     -1.0504999160766602,
+     1.0293444395065308
+    ]
+   },
+   "dqgap": {
+    "edges": [
+     1,
+     2
+    ]
+   },
+   "faces": {
+    "tt": {
+     "labeled_frac": 0.5708236734834962,
+     "manifest_rows_per_class": 19996,
+     "class_balance_eligible": {
+      "0": 138892,
+      "1": 121995,
+      "2": 136601
+     },
+     "unigram_auc": 0.5475657681029639,
+     "position_auc": 0.45285621061685777,
+     "doc_mean_only_auc": 0.768440581626768,
+     "wd_viable_test_docs": 759
+    },
+    "dq": {
+     "labeled_frac": 0.8529246198401588,
+     "manifest_rows_per_class": 19997,
+     "class_balance_eligible": {
+      "0": 183957,
+      "1": 123227,
+      "2": 139778
+     },
+     "unigram_auc": 0.578198752701312,
+     "position_auc": 0.560793863132332,
+     "doc_mean_only_auc": 0.8538624347696584,
+     "wd_viable_test_docs": 632
+    }
+   },
+   "artifact": "diafaces_dailydialog_llama31.npz"
+  }
+ }
+}
