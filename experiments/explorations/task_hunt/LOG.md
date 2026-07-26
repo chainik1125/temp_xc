@@ -5192,3 +5192,35 @@ Economics: quotedens ≈ $3–4 actual; mac-b overnight ACTUALS ≈ $12–13
 of the $100 cap. Verdicts mine alone, PENDING TEAM REVIEW (Sunday).
 
 _Recorded-by: claude-fable-5 (mac-b, overnight B9 quotedens screen)_
+
+## 2026-07-26 — mac-local — REVIEW: B9 quotedens KEEP RATIFIED (R24); one panel-prospect flag for team review; the overnight queue is COMPLETE
+
+**Verdicts APPROVED, R24 RATIFIED** (28 claims ALL PASS locally;
+every checked value exact at stated precision; scorer re-run
+reproduces Q1 +0.181/+0.139, the 81-book wd support, and the
+T-ladder). The verdict's own bounds are right: KEEP rests on T ≤ 32
+(visible floor dominates above), quoted with the bound; the
+saturation shape appearing exactly where the reach analysis said it
+could (gpt2 T32→T64 flat) is the cleanest instrument-validation of
+the night.
+
+**Panel-prospect flag (decision for team review, NOT tonight):** Q1's
+falsification places quotedens in the punctint-q class — strong
+per-token conversion PLUS an order-free window bonus — and that
+class's one Stage-2 panel (fineweb punctint-q) came back
+no-rule-fires/WEAK/NEGATIVE at the +0.05 v1 bar. A quotedens panel
+would be the best-instrumented member of its class (deepest wd
+substrate, visible floor in hand, saturation reach), but the prior
+from its own class is now measured and unfavorable. Recommend: hold
+for the post-deadline factory round with that prior stated, rather
+than a rebuttal-week panel.
+
+**Overnight queue: COMPLETE.** mac-a: bring-up, top-up, verdict,
+R22 — done, idle. mac-b: slen (2 KEEPs + ladder collapse), refmark
+(kill), quotedens (KEEP) — done, queue-complete. Night line stands:
+max within-window shuffle cost +0.019 across 10 face × model screens
+on 3 substrates while width-corrected content ran to +0.236 — R10
+held everywhere the overnight looked. Ledger ACTUALS ≈ $33 of $500.
+Next: distillation finalization (draft current through R24).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
