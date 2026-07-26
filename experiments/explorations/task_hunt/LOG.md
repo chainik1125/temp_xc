@@ -7876,3 +7876,45 @@ next per actmix-overnight § 2: evidence-line support for mac-a's
 candidates on request, else § 6 backlog.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~01:10 London — mac-a — HUNT3 freeze (32e316bc4) + screens LAUNCHED: two candidates screened, two killed for free; chaz design note
+
+**Card `hunt3/HUNT3_SCREEN_CARD.md`; screens (cnov + nvtrend × 3
+models, 3× L40S parallel) detached ~01:05, est ~$10 of the ≤$30 § 1
+envelope.**
+
+The two $0 label-side kills (pre-measures in
+`labels/hunt3_stats.json`, all three tokenizers):
+- **tempo** (briefing's turn-taking rate trend): Spearman vs the
+  CONFIRMED ttrend face −0.806…−0.834 — DailyDialog is strict
+  two-party alternation, so alternation tempo is anti-ttrend in a
+  hat; screening it would near-duplicate a confirmed KEEP.
+  Improve/replace clause exercised → **nvtrend** (novelty-rate
+  trend) is the replacement: ρ vs ttrend ≤ 0.09, unigram 0.535,
+  visible floor ≈ CHANCE through T32 (0.47–0.50) — ttrend's winning
+  profile with a novelty state variable.
+- **qres** (q→a latency): P(latency = 1) = 0.84 everywhere — 84% of
+  questions resolve in exactly one turn (no variance to probe) — and
+  the anchor turn carries a visible "?" = dq's demotion marker one
+  step removed. The briefing's own gate ("only screen if it passes
+  your visible-cue pre-measure") fires as a kill.
+
+**cnov's pre-registered shape**: claimable zone T ≤ 32 (floor climbs
+0.51@T4 → 0.88@T64 as the window swallows the kernel); position and
+doc-mean traps HOT (0.86/0.86) — position-matched manifests + BINDING
+wd arms are the instruments, and a cnov that fails them is dead on
+those clauses.
+
+**chaz design note (briefing seed 4, queued behind the screens):**
+correction hazard on Ward with the conversion channel REMOVED by
+construction — label = kernel trailing rate (HL ~48 tok, support 256)
+of self-correction cues; eligibility = rows whose last-32 view is
+CUE-FREE, so at every probed T ≤ 32 the probe must read persistent
+state deposited by cues ≥ 33 tokens back (sc_lambda's "converted
+latent with aggregation bonus" cannot recur). factory_screen bundle
+format; built only if the night allows after the dialogue screens.
+
+Also noting runpod-2's threshold-transfer flag (~00:30) is received:
+arch-dependent JumpReLU OVERfire at wide-d/small-k extends my R30
+re-attribution; the btk-only `threshold_set` semantics are unchanged,
+the caution rides with any future wide-d btk use.
