@@ -158,6 +158,34 @@ segments are effectively equal length. Alternatives if that is impractical: divi
 on *that* rather than on `||W||_F`. Logging it is worth doing regardless — it is two lines, and
 it is the same class of silent failure as the realised-L0 problem from the last sprint.
 
+### Dose selection: checked, and it is conservative rather than inflationary
+
+Also from reading the harness. `at_best()` takes the **argmax over the alpha grid on the same
+test documents used to report the delta and its SEM**, for each arm separately, and the headline
+z is computed from those maxima. That is a winner's-curse setup, so it needed checking rather
+than assuming.
+
+Simulated it — 4 doses, 200 documents, per-dose SEM 0.64 matching the reported run, with
+doc-level noise shared across doses since the same documents are reused (correlation 0.85):
+
+| true dose-response shape | selection bias | in SEM |
+| --- | --- | --- |
+| peaked, TXC-like (3, 7, 11, 8) | −0.01 | −0.02 |
+| flat, SAE-like (0.8, 1.0, 1.0, 0.9) | +0.19 | +0.30 |
+| null (0, 0, 0, 0) | +0.26 | +0.41 |
+
+**The bias is small and it runs the wrong way for a sceptic.** A well-separated peak is picked
+reliably by argmax, so the crosscoder arm gains essentially nothing (−0.02 SEM); the flat and null
+arms — the SAE broadcast and the random controls — are the ones inflated, by 0.2 to 0.4 SEM. So
+the reported gap and the z are if anything **understated**. No correction to the existing result
+is needed, and it is worth saying so explicitly rather than leaving the reader to wonder.
+
+**It matters more for a new task with a smaller effect**, where both arms may be flat-ish: the
+inflations largely cancel in the difference, but the SEM does not account for the max-selection,
+so the z is genuinely overstated in that regime. Cheap guards, in order of preference: compare
+arms **at matched dose** and report the full curve (most interpretable, and the curves are already
+plotted); or split the test documents into a dose-selection half and a reporting half.
+
 ### The concrete recommendation, if one task has to be picked
 
 **Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =

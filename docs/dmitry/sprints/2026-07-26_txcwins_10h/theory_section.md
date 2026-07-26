@@ -66,35 +66,42 @@ headline is one — measure something real, but not expressiveness. Rank rises o
 number of distinct blocks: an `m`-block cyclic rotation has rank `m − 1`, and its rank-1
 share falls as roughly `2/m`.
 
-## Reading and steering are the same number
+## Reading and steering are the same functional on different objects
 
-The most useful thing to come out of these two sprints is that the project's two halves were
-never independent.
+The relationship between the project's two halves is a **dissociation**, not an equivalence,
+and the corrected version is the more interesting one.
 
-Alongside `r1` sits `c`, the share of the optimal write a *constant* intervention can reach —
-the share lying along the all-positions-equal direction. And `c` has a second meaning:
+The same constant-subspace share can be evaluated on two different slabs, and the two
+statements it yields are separate:
 
-> **A task is steerable by a constant write exactly to the extent that it is readable by
-> pooling.** `c = 0` if and only if a linear probe on mean-pooled per-token codes is at
-> chance.
+```text
+c(P_dom) = 0   <=>  a linear pooled per-token probe is at chance      (READING)
+c(Gbar)  = 0   <=>  a constant write has no first-order effect        (STEERING)
+```
 
-Both quantities are the same object seen twice. A pooled probe reads the mean over positions,
-so it separates the classes precisely when the mean of the difference slab is nonzero — and
-that mean is what a constant write can push along.
+A pooled probe reads `mean_t x_t`, so it separates the classes exactly when
+`mean_t P_dom[t] != 0`. A constant write's first-order effect is
+`alpha * T * <v, mean_t Gbar[t]>`, so it vanishes exactly when `mean_t Gbar[t] = 0`. Same
+functional form, different objects — and they coincide only if `P_dom` is parallel to `Gbar`.
 
-This retro-explains the previous sprint. A pooled SAE read the order label at AUC 0.998,
-which already implied that a constant write had some grip on that task; the measured
-constant-write effect was `+1.24`, small and positive, exactly as required. The two results
-were one result.
+**Measured, they are nearly orthogonal:** `cos(P_dom, Gbar) = +0.044`, against a random
+baseline of `1/sqrt(18432) ~ 0.007`. So:
 
-It also converts a design principle into a measurement. "Build a task a pooled code cannot
-read" and "build a task a constant write cannot steer" are the same instruction, and a cyclic
-rotation satisfies both by construction: the two documents are one string read from different
-starting points, so the mean over positions is identical and `c` vanishes. In a real model `c`
-comes back small but positive rather than exactly zero, because a causal transformer writes
-its prefix into every token and position `t` of one class therefore carries a different
-history from position `t` of the other. That residue is not noise — it is a measurement of how
-much history the model propagates.
+> **A task can be unreadable by pooling and still steerable by a constant write, and the
+> reverse.** The two halves of the project are related in form and independent in fact.
+
+The practical consequence is that the screen must be run on the **gradient**, and any `r1` or
+`c` quoted anywhere has to name which slab it came from. Recency's own numbers make the point:
+`r1 = 0.829` from the gradient against `0.585` from difference-of-means, on the same task.
+
+A caution against over-correcting: `Gbar` is a **local first-order** object while `P_dom` is a
+**finite displacement** toward where the other class actually sits. Near-orthogonality is
+compatible with both being useful, and difference-of-means steering demonstrably works across
+the literature. `Gbar` is the correct ceiling for a first-order claim; `P_dom` is a different
+and also-legitimate reference. Which is appropriate depends on the dose regime, and any ratio
+between arms should be read **at the smallest dose showing a significant effect**, not at each
+arm's best dose — the latter convention sits precisely outside the regime where the linear law
+holds.
 
 ## What this corrects
 
