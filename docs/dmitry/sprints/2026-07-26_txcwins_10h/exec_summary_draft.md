@@ -359,6 +359,12 @@ kind of effect an arm has.
 
 ### 4. Reconstruction quality does not predict steering quality
 
+![Reconstruction quality does not predict steering quality](../../../../plots/2026-07-26_txcwins/fvu_vs_steering.png)
+
+*Three architectures, each trained at its own sweep-derived best recipe and matched at 8.0
+realised coefficients per segment on held-out data. If reconstruction predicted steering these
+points would fall on a downward line; they rise.*
+
 At 8.0 realised coefficients per segment on the recency corpus, **each arm at its own best
 recipe** from a full lr × steps sweep:
 
