@@ -203,10 +203,32 @@ gradient's support is set by where the two classes differ — but the second is 
   separable by this route. The largest discrepancies also run the wrong way — on `rotate12`,
   `txc_slab` +18.23 against `dom_slab` +133.60.
 
-  **Two mechanisms have now been proposed for this null and both withdrawn** — first
-  `cos(P_dom, Ḡ)`, refuted at 0.050 against 0.044; then dictionary-tracks-`P_dom`, refuted by the
-  correlation above. The null ships with the candidates named and refuted rather than with a third
-  that reads as settled.
+  **A third account was proposed with a falsifier registered in advance, and it survived.** The
+  question is not whether the two slabs are orthogonal — they equally are in both models — but
+  **which of them the learned dictionary lands on**:
+
+  | | `cos(v_sae, u₁(Ḡ))` | `cos(v_sae, u₁(P_dom))` | random baseline |
+  | --- | --- | --- | --- |
+  | SmolLM2 L6 — discovery **fails** | **0.0005** | 0.0087 | 0.0064 |
+  | Qwen2.5-1.5B L14 — discovery **works** | **0.0295** | 0.0096 | 0.0074 |
+
+  **The `P_dom`/`Ḡ` alignment ratio separates by 50×** (15.9 against 0.32). On SmolLM2 the SAE's
+  direction sits **below the random baseline** against the gradient's leading direction; on Qwen it
+  is 4× above it. Both read the factor at pooled AUC **1.000** with shared-write retention 0.98 and
+  0.94 against a 0.071 floor. **The dictionary reads the factor perfectly in both models and points
+  somewhere useless in one.**
+
+  This is also why the two earlier accounts failed: `cos(P_dom, Ḡ)` is **0.0535** on SmolLM2 and
+  **0.0523** on Qwen — indistinguishable. The orthogonality is harmless until the dictionary picks a
+  side, and **which side it picks is invisible to every slab-only statistic** — `c`, `r1`, ρ and
+  `‖Ḡ‖` were all checked and none separates these two cells. It is a screen you can only run
+  *after* training one cheap SAE, and it costs far less than the full arm matrix.
+
+  ⚠ Two caveats. The cosine is measured on the **SAE's** direction; the crosscoder fails in the
+  same cells and its co-failure is consistent, but this is strictly an account of the per-token
+  dictionary's failure. And it is **two cells** — Qwen2.5-3B at the matched depth fraction is
+  running as an out-of-sample test, with the prediction stated in advance: if discovery works
+  there, `cos(v_sae, u₁(Ḡ))` should sit well above the random baseline.
 - **The `c` gate does not transfer across models.** Five of seven transfer cells sit below the
   `c` < 0.1 go-threshold with high `r1` and steer nothing. It was validated within one model and is
   not a cross-model instrument.
