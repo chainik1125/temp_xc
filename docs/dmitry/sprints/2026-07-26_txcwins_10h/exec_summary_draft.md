@@ -539,12 +539,16 @@ confirmation.
 
 ## Limits
 
-Two surviving tasks, both from the same rank-2 family, both designed by the same agent; one
-model, one layer, one dictionary size. **Four separate results in this sprint moved materially
-with learning rate or step count**, which is a caveat on every number here. The dictionaries are
-trained on the same content they are asked to steer, so the current claim is "steers the ordering
-of content it was trained on" until the held-out split lands. The rotation ladder, the gradient
-rank arms and that split were all still running when this was written.
+Three surviving wins, all designed by the same agent; **one model, one layer, one dictionary
+size**. Every architecture's numbers move materially with learning rate and step count — a 10×
+range separates the three arms' optima — which is a caveat on every cross-architecture figure
+here and is why finding 4 exists.
+
+**The held-out content split covers only the newest task.** It is now a harness flag
+(`--task-test`) and demonstration order runs with disjoint train and evaluation pools, but
+instruction position and evidence order were not rerun under it. For those two the claim remains
+**"steers the ordering of content it was trained on"** rather than "steers this factor". That is
+the single cheapest outstanding experiment.
 
 **The headline task does not transfer to either model it was tried on, and the reason is not the
 dictionaries.** At each model's own best recipe, mid-layer:
@@ -559,7 +563,9 @@ dictionaries.** At each model's own best recipe, mid-layer:
 layer, of any kind, that shifts which instruction they obey — so the crosscoder is not failing to
 find something, there is nothing at that site to find. This is a statement about **where the
 behaviour is linearly manipulable**, not about dictionary architectures, which makes it more
-useful than a dictionary-level negative would have been. **The SmolLM2 layer sweep is complete and uniformly negative across six depths** (6, 9, 12, 15,
+useful than a dictionary-level negative would have been.
+
+**The SmolLM2 layer sweep is complete and uniformly negative across six depths** (6, 9, 12, 15,
 18, 21) against a baseline bias of +2.19: the supervised write reaches at most +1.25 and sits at
 ±0.1 at layers 15, 18 and 21. So this is "no steerable site at any of six depths", not "at the
 layer tested". One artefact to pre-empt: L21 shows `dom_slab` +5.70 at α = −2 alone with every
@@ -579,6 +585,15 @@ crosscoder's +2.86 at `rotate2` and +9.83 against −0.01 at `rotate6`, reversin
 +18.23 — a −0.01 followed by a +18.23 is instability, not a trend. The honest description of the
 surviving win is **discovery, and unreliable discovery**.
 
-**The framework is in better shape than the empirical base**, and the honest reading is that the
-criterion is the deliverable and the two surviving wins are its first test rather than its
-confirmation.
+**The empirical base is now in better shape than the framework**, which is the reverse of how
+this sprint started. Three wins survive symmetric doses, matched realised coefficients out of
+sample, per-arm training recipes, matched-dose reading in the linear regime, and five controls
+apiece. The framework around them has been cut back three times tonight: `c` is a ranking with a
+known inversion rather than a rule, `r1` bounds a rank-1 write and has never predicted what a
+crosscoder achieves, and the proposed mechanism for where rank ≥ 2 comes from is refuted on both
+tasks it was applied to.
+
+What that leaves is narrower and more defensible than what was aimed at: **a crosscoder latent
+reliably beats every arm obtainable from a learned per-token dictionary on tasks where a constant
+write has little purchase, by finding a schedule no one supplied — and never beats the best
+scheduled rank-1 write, which is a method that already exists.**
