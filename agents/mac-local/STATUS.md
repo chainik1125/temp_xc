@@ -77,6 +77,16 @@ max-over-arms; doc_mean_only_auc = disclosure-triggers-control.
 4. After refunding: un-pause em-redo review, factory, B8 screen;
    revisit post-deadline v2 adoption via the spec.
 
+## MODAL FALLBACK (2026-07-26, Dmitry's account)
+Compute fallback while RunPod funding is MIA. Credentials (SECRETS —
+never in the repo): `~/.modal.toml` profile `reichers-shai-c9-dmitry`
+(ACTIVE) + backups `~/.tokens/modal_token_{id,secret}`. Client: any
+`pip install modal` picks the profile up. **Budget ceiling from Dmitry
+NOT yet confirmed — get a number before real spend.** Smoke test
+in flight at last write (token verified; bare A10G hello pending;
+torch cu128 image build failed once, logs unread). Rotate/revoke the
+token with Dmitry after the weekend — the secret transited chat.
+
 ## Standing context
 - Rebuttal-quotable: λ̂ rise (p=0.0093, v1); shuffle receipt;
   dissection § 7; T-SAE fairness; split-integrity zero-leakage;
