@@ -6,31 +6,30 @@ OVERNIGHT EXECUTION). **Resume by reading
 operating plan for tonight and this file only summarizes it.** Read
 with `private/rebuttal_plan.md` (untracked).
 
-## ROLE SHIFT (Han, 2026-07-26): mac-local EXECUTES tonight
-All pods DOWN; interim A40 pod released after clean closes by every
-agent. No remote agents exist tonight. I run the remaining hunt work
-MYSELF on Modal (Dmitry's workspace; profile `reichers-shai-c9-dmitry`
-in ~/.modal.toml; backups ~/.tokens/modal_token_*; **$500 HARD
-CEILING, soft stop $400**; smoke test PASSED — A10 launched; spend
-ledger in the briefing). Check-in **Sunday 10:00 PT**; deadline
-2026-07-27.
+## STRUCTURE TONIGHT (Han, 2026-07-26 — supersedes the single-executor plan)
+I stay ORCHESTRATOR. Two fresh local agents execute autonomous loops
+in their own clones (~/research/projects/agents/<id>/temp_xc):
+**mac-a** = Modal bring-up + tsae/T1 seed top-up {3,4,5} (bounds R5;
+cap $150; briefings/overnight-mac-a.md). **mac-b** = B8 slen screen →
+refmark → quotedens (cap $100; overnight-mac-b.md). Shared ops doc:
+overnight-mac-modal.md; **shared spend ledger briefings/MODAL_SPEND.md
+($500 hard / $400 soft total)**. Modal smoke PASSED (A10). Roster
+entries mac-a/mac-b added (set_agent_env.sh + agents/README).
 
-## THE OVERNIGHT QUEUE (full spec in the briefing — do in order)
-0. Modal bring-up: repo image at PINNED commit via uv sync +
-   in-container validate (~30 min, ≤$5).
-1. Expedited gate-reviews: oprate NEGATIVE panel + fineweb panel
-   (no compute; b's standby loop pre-verified receipts; mark
-   "expedited — full depth at team review").
-2. **tsae/T1 seed top-up {3,4,5} on Ward — highest-value compute**
-   (bounds R5, the pre-vs-T-SAE margin; buffer UNCHANGED 524288;
-   pooling-validity audit + cache byte-identity BEFORE pooling, else
-   report separately; ~$30–80).
-3. B8 `slen` screen (recency-ladder instrument; freeze MY screen card
-   first; lat > lev > disp pre-registered; ~$10–25).
-4. Stretch: refmark, quotedens screens (only if ≥$300 remains). NO
-   new panels except the narrow B8 exception in the briefing.
-5. **HARD PIVOT 07:00 PT: Sunday distillation** (contents listed in
-   the briefing; quote ONLY via RECEIPTS.md; draft in private/).
+## MY OVERNIGHT QUEUE (orchestrator)
+1. Expedited gate-reviews of the two completed panels (oprate
+   NEGATIVE; fineweb gemma/gpt2/llama) — no compute; mark "expedited
+   — full depth at team review". Do FIRST.
+2. Rolling review loop: pull → review a/b pushes → amend their
+   briefings if needed → watch the ledger. (Ask Han to run
+   `/loop 45m` on me if unattended review cadence is wanted.)
+3. Ratify RECEIPTS updates the agents PROPOSE (they never edit
+   RECEIPTS themselves tonight).
+4. Panel-approval gate: a B8 panel tonight needs MY written LOG
+   approval (conditions in the shared doc).
+5. **HARD PIVOT 07:00 PT: Sunday distillation** (contents in the
+   shared doc §; quote ONLY via RECEIPTS.md; draft in private/;
+   deliver by 09:30 PT).
 
 ## STATE OF THE PROGRAM (for the distillation)
 - **ONE confirmed case study**: λ̂ backtracking (v1 numbers; rise

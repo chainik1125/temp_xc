@@ -97,6 +97,17 @@ case "$agent" in
         export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
         ;;
 
+    # ── Local Mac autoresearch agents (2026-07-26 overnight; Modal for
+    #    GPU — no CUDA pinning; clones ~/research/projects/agents/<id>/) ─
+    mac-a)
+        export AGENT_NAME=mac-a
+        export TEMP_BENCH_POD_MODE=persistent
+        ;;
+    mac-b)
+        export AGENT_NAME=mac-b
+        export TEMP_BENCH_POD_MODE=persistent
+        ;;
+
     # ── Single-GPU pods ─────────────────────────────────────────────
     agent_em_h200)
         export CUDA_VISIBLE_DEVICES=0
@@ -111,7 +122,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3, runpod-d, runpod-e, runpod-b (interim A40 pod)" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3, runpod-d, runpod-e, runpod-b (interim A40 pod), mac-a, mac-b (local Mac)" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac

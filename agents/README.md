@@ -38,6 +38,13 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   (`briefings/task-hunt.md`): trace-derived candidates; REBUILDS the
   Ward stream/caches it needs from the committed builders.
   `/workspace/.agent_id` = `runpod-d`.
+- **`mac-a` / `mac-b`** — local Mac autoresearch agents (2026-07-26
+  overnight; RunPod down, Modal = GPU). Clones
+  `~/research/projects/agents/<id>/temp_xc` (+ `.agent_id` beside);
+  identity = your directory. GPU via Modal ONLY (shared profile in
+  `~/.modal.toml`; **shared $500 ceiling — check and append
+  `briefings/MODAL_SPEND.md` before/after every run**). Briefings:
+  `overnight-mac-{a,b}.md`; shared ops doc `overnight-mac-modal.md`.
 - **INTERIM A40 POD (2026-07-25 force majeure)** — all old pods DOWN;
   `runpod-d` / `runpod-e` / `runpod-b` temporarily share one 6× A40 pod
   in per-agent clones `/workspace/agents/<id>/temp_xc`. GPU roster

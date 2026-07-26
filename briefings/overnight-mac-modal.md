@@ -1,18 +1,22 @@
 ---
 status: active
 created: 2026-07-26
-for: mac-local (EXECUTOR — role shift)
-venue: Mac (MPS, local) + Modal (Dmitry's workspace, $500 HARD CEILING)
+for: SHARED ops doc — mac-a, mac-b (executors) + mac-local (orchestrator)
+venue: Mac (local) + Modal (Dmitry's workspace, $500 HARD CEILING)
 ---
 
-# Overnight execution briefing — mac-local carries the hunt (Han, 2026-07-26 ~02:15)
+# Overnight shared ops — Modal recipe, budget, discipline (Han, 2026-07-26)
 
-**ROLE SHIFT.** All RunPod pods are DOWN (funding; interim A40 pod
-released after a clean close). There are NO remote agents tonight.
-**mac-local executes the remaining hunt work directly**, using Modal
-(Dmitry's workspace) for GPU. Han sleeps; check-in **Sunday 10:00 PT**;
-rebuttal deadline 2026-07-27. Everything of value must be pushed as it
-lands (this Mac is not ephemeral, but the discipline stays).
+**STRUCTURE (superseding the earlier single-executor plan):** all
+RunPod pods are DOWN; tonight TWO local Mac agents execute autonomous
+loops — **mac-a** (`briefings/overnight-mac-a.md`) and **mac-b**
+(`briefings/overnight-mac-b.md`) — in their own clones under
+`~/research/projects/agents/<id>/temp_xc`, pushing regularly.
+**mac-local stays ORCHESTRATOR** (reviews, budget oversight, the
+Sunday distillation). Han sleeps; check-in **Sunday 10:00 PT**;
+deadline 2026-07-27. This file holds what is SHARED: the Modal
+recipe, the budget rules, and the standing discipline. Your queue is
+in YOUR briefing.
 
 ## Modal — credentials, ceiling, cost discipline
 
@@ -20,9 +24,13 @@ lands (this Mac is not ephemeral, but the discipline stays).
   `~/.tokens/modal_token_{id,secret}`. Client in the scratchpad venv
   (`modal-venv/bin/modal`) or any `pip install modal`.
 - **BUDGET: $500 HARD CEILING (Dmitry, confirmed via Han 2026-07-26).**
-  Soft stop at **$400**; nothing new launches past it. Keep a SPEND
-  LEDGER in this file (append per run: what, GPU type, est. hours ×
-  rate, running total). Modal's dashboard is the authority; estimates
+  Soft stop at **$400** TOTAL across both agents; nothing new
+  launches past it. **The SPEND LEDGER is `briefings/MODAL_SPEND.md`
+  (tracked, append-only, union-merge like the LOG): READ the running
+  total BEFORE every launch, APPEND a line after (agent, what, GPU,
+  est. hours × rate, new total). Per-agent initial caps: mac-a $150,
+  mac-b $100 — raises only by mac-local briefing amendment.** Modal's
+  dashboard is the authority; estimates
   are for pacing. Reference rates: A10G ≈ $1.10/h, L40S ≈ $1.95/h,
   A100-40 ≈ $2.8/h. Prefer A10G/L40S; H100 only with a stated reason.
 - Smoke state at handoff: **PASSED** — bare GPU hello returned
@@ -69,82 +77,23 @@ check-in. v1 canonical; paired v2 reported, never claimed. No
 max-over-arms. doc_mean_only_auc = disclosure-triggers-control.
 Training-corpus size beside every unigram number.
 
-## THE OVERNIGHT QUEUE (in order; timestamps PT; stop any item that
-slips its box and move on — a sound partial beats a stuck complete)
+## Work split (queues live in the per-agent briefings)
 
-**0. Bring-up (~30 min, ≤$5).** Finish the smoke test (bare GPU hello;
-then the repo image + `run.py validate` inside a container). If Modal
-is not viable within ~45 min of real effort, STOP fighting it — items
-2/3 degrade gracefully: 1, 4, 5 need no GPU; record the outcome.
-
-**1. Expedited gate-reviews of the two panels (no compute, ~45 min).**
-oprate NEGATIVE (RECORD §3d) + fineweb (gemma primary + 2
-replications + close). runpod-b's standby loop already verified
-receipts/structure continuously, so this is an EXPEDITED review:
-freeze-order forensics, verdict-vs-artifact spot checks, figure sanity,
-LOG review entries. Mark both "expedited — full depth at team review".
-The distillation quotes their verdicts; this must come first.
-
-**2. T-SAE seed top-up on Ward (THE single highest-value compute item;
-est. $30–80).** Purpose: bound the headline pre-vs-T-SAE margin
-(RECEIPTS R5 = NOT bounded; projected Welch LB ≈ +0.013 at tsae n=6).
-Freeze a runner for tsae/T1 seeds {3,4,5} ONLY (pattern: the frozen
-3d954869 top-up runner), pinned commit, buffer_tokens UNCHANGED
-(524288 — comparability with round-1 tsae is the whole point).
-tsae cells are CPU-buffer-bound (~2–3 h each on A40-class): request
-high-CPU containers, run the 3 cells in parallel. **HAZARDS, both
-must be discharged before pooling:** (a) pooling-validity audit per
-runpod-d's precedent (re-eval one round-1 tsae cell under current
-code → must reproduce its stored number; Ward λ labels all-finite
-no-op guard re-verified); (b) cache identity: the Ward stream rebuild
-must match the committed byte-identity receipt. If EITHER fails,
-report the new seeds SEPARATELY, never pooled. Success = R5 updated
-to a bounded margin (or honestly still-unbounded at n=6 — also a
-result); failure mode "cells too slow on Modal by 06:00 PT" = kill,
-report attempt + cost.
-
-**3. B8 `slen` screen (the program's queued instrument; est. $10–25).**
-The recency ladder (lat/lev/disp) with pre-registered shuffle ladder
-**lat > lev > disp ≈ 0** — the measurement that settles the
-order/recency wording. Freeze MY screen card first (bars from the B8
-CARD_DRAFT; per-token-first triage; matched-probe-class arms — NO
-max-over-arms; foreign-context nulls; doc-identity disclosure per
-face). Cache fineweb-400 for available models (gpt2 + llama ungated;
-gemma if HF secret exists), run the screen (probes; cheap), one LOG
-verdict per face. This is a SCREEN — it licenses nothing beyond a
-future panel.
-
-**4. Stretch screens, only if 0–3 are done and ≥$300 remains:**
-refmark (B7; ~1.2M tok/model caching, WildChat corpus committed) then
-quotedens (B9; 5.3M tok/model). Same screen discipline. NO new
-Stage-2 panels tonight — a panel needs ≥6 h + ≥$150 and would collide
-with the check-in; the ONLY exception: B8-lat KEEPs decisively on ≥2
-models AND it is before 23:00 PT Saturday AND ≥$350 remains — then a
-single-model minimal panel MAY be frozen, with all bindings from
-stage2-fineweb.md (doc-identity control, k=8·T post, paired v2,
-variance receipts).
-
-**5. HARD PIVOT 07:00 PT — the Sunday check-in distillation (mine,
-no compute).** Contents: the scoreboard sentence (ONE confirmed case
-study — λ̂ backtracking with its receipt set; oprate NEGATIVE; fineweb
-no-rule-fires/WEAK/NEGATIVE per model); the kill/negative table; the
-amended order finding + whatever B8 measured; probe-capacity story +
-the TAKEN v1-canonical decision + receipted v1-conservatism (3
-instances, 2 corpora, exact-truth mirror); the force-majeure impact
-statement (what died, what it cost, what stands — checkpoints
-mirrored at HF, see checkpoints/HF_MIRROR.md); overnight spend ledger
-+ overnight verdicts marked pending-review; the post-deadline queue
-(v2 adoption via PROBE_V2_SPEC, em-redo review, B8→panel if KEEP,
-estimator-attenuation check). Quote ONLY via RECEIPTS.md. Draft goes
-in `private/` (untracked) for Han to present; a sanitized state
-update goes to `experiments/explorations/synthetic/STATUS.md`.
-
-## Spend ledger (append below; soft stop $400)
-
-- 2026-07-26 02:0x — smoke attempts (A10G cold start + 1 failed image
-  build): ≈ $0–1; successful hello ≈ $0.05. Running total ≈ $1.
+- **mac-a** (`overnight-mac-a.md`): Modal bring-up + the tsae/T1 seed
+  top-up (bounds RECEIPTS R5 — the single highest-value compute item),
+  then assist/stretch.
+- **mac-b** (`overnight-mac-b.md`): B8 `slen` screen (the recency
+  instrument), then refmark + quotedens stretch screens.
+- **mac-local** (orchestrator): expedited gate-reviews of the two
+  completed panels, rolling review of a/b pushes, budget oversight,
+  **HARD PIVOT 07:00 PT → the Sunday distillation** (quote only via
+  RECEIPTS.md; draft in private/). NO new Stage-2 panels tonight
+  except the narrow B8 exception: B8-lat KEEPs decisively on ≥2
+  models AND before 23:00 PT AND ≥$350 remains AND mac-local approves
+  in writing (LOG line).
 
 ## Acceptance
 
-Everything pushed; LOG lines per item; RECEIPTS current; distillation
-delivered by 09:30 PT. This briefing retires at the Sunday check-in.
+Everything pushed; LOG lines per item; RECEIPTS proposals for new
+claims (mac-local ratifies); distillation delivered by 09:30 PT. This
+doc and both agent briefings retire at the Sunday check-in.
