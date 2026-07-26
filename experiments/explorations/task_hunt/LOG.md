@@ -7732,3 +7732,27 @@ all delivered to Dmitry as evidence. actmix-overnight.md § 3
 amended accordingly.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~01:00 London — mac-c — overnight §3 items 1+3: Phase-B recipe pinned (shipped c3 eval, turnkey for runpod-1) + A2 paper-team paragraph
+
+PTR → COMPOSITION_AUDIT.md §3 "PHASE-B RECIPE" + §10-A2. Recipe pins
+the exact shipped eval sha-by-sha: my_eval_fn (protocol 1.1.0) →
+s_tail_probe; S=32 schema-2.0.0 left-aligned caches with first_real
+masking; per-token vs window aggregation semantics (S−T+1 windows,
+stride 1, padded-edge masking, S>=T guard); selection = train-only
+|class-mean diff| argsort top-k with NO standardization anywhere;
+probe = L1 liblinear C=1.0 max_iter=1000 random_state=0, AUC on
+predict_proba; row schema + k_feat grid {5..640} (expansion
+c700d0b25); analysis conventions to match print (FLIP pair,
+SAEBench-36 headline dropping CT per e77574ffd, trapezoid-over-log2k
+summary, min/max seed bars per 3ee3ae61f). Also flagged: my_eval_fn
+shares the no-override-merge instantiation (benign for default cells;
+T-cells stage as T5 — consistent with runpod-1's plan). A2 closed as
+a quotable paragraph: matched-L0=20 TRUE for shipped c3, FALSE for
+RLHF (dev k500 family, seed-42, appendix admits it) — cross-section
+sparsity not comparable; RLHF table internally mixes k20 vs k500 arms
+(25× sparsity gap under the composition difference). Next: §3 item 2
+(HF mirrors) then item 4 (A3 + A6 residue, evidence to Dmitry).
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
