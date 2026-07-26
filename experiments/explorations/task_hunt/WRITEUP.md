@@ -259,10 +259,12 @@ Three measurements, together, explain the pattern:
 
 *Figure 3: what shuffling context order costs. Left: backtracking —
 shuffle destroys the anticipation readout but barely touches an
-ambient control label. Right: dialogue — the cost decomposes between
-within-turn and turn-level order, concentrated in the near half of
-the window; on broad text (grey reference band) shuffling costs
-nothing.*
+ambient control label (grey: shuffle noise floor). Right: dialogue —
+the cost decomposes between within-turn and turn-level order,
+concentrated in the near half of the window. Grey band: the
+label-permutation null (the "no signal" region); dashed line: the
+largest shuffle cost ever measured on non-dialogue text across ten
+screening experiments — dialogue's full-shuffle cost clears both.*
 
 Task 1 has an order-carried readout on reasoning traces; Task 2 sits
 on the one substrate whose order signal we measured and decomposed.
