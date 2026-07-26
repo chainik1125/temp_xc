@@ -143,7 +143,7 @@ Instruction recency, completed configuration, every arm at matched injected norm
 | --- | --- | --- |
 | `rank1_best` | +8.55 ± 0.27 | rank-1 truncation of the difference-of-means slab |
 | `dom_slab` | +8.20 ± 0.22 | supervised reference |
-| `sae_schedule` | +7.86 ± 0.25 | the SAE's own direction on its best schedule |
+| `sae_schedule` | +7.86 ± 0.25 | the SAE's own direction on its best schedule — **a published method**, see below |
 | **`txc_slab`** | **+6.48 ± 0.15** | the crosscoder |
 | `tsae_broadcast` | +3.65 ± 0.14 | **this repo's attention-based temporal SAE — not the published tSAE** |
 | `sae_broadcast` | +2.60 ± 0.15 | a per-token dictionary as actually deployed |
@@ -158,8 +158,23 @@ dictionary handed a schedule beats the crosscoder** — +7.86 and +8.55, z = 4.7
 write was never out of reach. The crosscoder reaches **76% of the rank-1 ceiling**.
 
 So its genuine claim is that it *found* a schedule unsupervised, from reconstruction alone, that
-a per-token dictionary could have executed if handed it. That is worth having, because the
-schedule is exactly what a practitioner does not possess. It is a discovery claim.
+a per-token dictionary could have executed if handed it. It is a discovery claim.
+
+**`sae_schedule` is not an oracle we constructed to be hard to beat — it is a published method.**
+Heyman & Vandeputte's Prompt Steering Replacement (arXiv:2605.03907, title and authors verified)
+estimates token-specific steering coefficients from the activations themselves, and reports
+beating existing activation-steering methods across three benchmarks, particularly for
+high-coherence outputs. So the finding is better stated as: **the crosscoder loses to a method a
+practitioner can already run.** That sharpens the discovery framing rather than softening it —
+what the crosscoder adds is obtaining the schedule from reconstruction alone, with no supervision
+and no imitation target.
+
+**Two kinds of discovery, and the two headline tasks split on them.** On recency the SAE's learned
+direction is essentially the optimal rank-1 direction, so only the *schedule* was missing and
+supplying it beats the crosscoder (+7.86 against +6.48). On `rotate12` the SAE's learned direction
+is wrong, so a schedule buys it almost nothing (+5.36 constant → +5.83 scheduled) and the
+crosscoder beats every arm obtainable from a learned per-token dictionary by 3×. **The crosscoder's
+value is largest where the direction itself is what has to be found**, not the schedule.
 
 **A registered architectural prediction appeared to land here and is now withdrawn as
 untested.** The temporal SAE was argued from its decoder to be rank-1 with an *automatically
@@ -240,6 +255,32 @@ determine what a rank-1 write achieves on the metric.** `c` survives this ladder
 not. Finding 2 explains why this is structurally
 hard rather than a matter of not having looked in the right place, and states the condition that
 would have to hold instead.
+
+## The experiment to run next
+
+Every design this sprint achieved either rank ≥ 2 or `c ≈ 0`, never both — the trajectory tasks
+got `c = 0` with rank 1, recency got rank 2 with `c` = 0.067, the rotation ladder got rank without
+low `c`. The reason is now understood: **the carried state is simultaneously what creates rank ≥ 2
+and what creates the DC residue**, because both come from the same integral.
+
+Few-shot demonstration order breaks the tie. The label at position `t` is one attribute and the
+running label balance is its integral, so matching the label multiset gives **rank 2 for every
+foil**. Matching the multiset is the *zeroth* moment; the state's DC residue is the *first*, since
+`Σ_t cumsum(Δc)(t) = −Σ_j j·Δc_j`. Adding the first-moment constraint gives both at once:
+
+| constraint | mean `c` | rank |
+| --- | --- | --- |
+| multiset matched only | 0.076 | 2 |
+| multiset **and** first moment matched | 0.0000 | 2 |
+
+Verified by running `demo_order.py` in this directory. **The reference ordering must be
+non-extremal** — `[1,1,1,1,0,0,0,0]` uniquely maximises the first moment, so it admits zero valid
+foils and the constrained cell comes back empty; centred and alternating references admit 6–7
+each. The script originally shipped with the extremal reference and printed `nan` for the cell it
+exists to demonstrate; it now uses a centred one.
+
+A second knob comes free: with `q` labels, `A ≤ 2(q−1)`, so `r1` should fall as the alphabet
+grows — a real task with a genuine handle for testing `rank(P) ≤ A`.
 
 ## Limits
 

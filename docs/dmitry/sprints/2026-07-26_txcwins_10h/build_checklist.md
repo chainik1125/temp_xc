@@ -85,12 +85,24 @@ reasoning.
    and more distinctive. This is the difference between a result about a mechanism and a result
    about a corpus.
 9. **Carry over the existing controls unchanged** — time-averaged profile, random profile, random
-   direction, row-permuted profile, supervised difference-of-means ceiling. They are already in
+   direction, row-permuted profile, supervised difference-of-means **reference** (not a ceiling — see below). They are already in
    `steer_order_modal.py`.
 10. **If any AUC is reported**, note the probe-fragility caveat: in-distribution AUCs in this area
     have a poor track record under distributional shift.
 
-## Two things to state in the writeup rather than fix
+## A label correction that propagated
+
+**Difference-of-means is a *reference*, not a ceiling.** It has been called "the supervised
+ceiling" throughout this sprint, including by me, and it is not one: a crosscoder latent has been
+measured *beating* it (+5.92 against +3.49 on the evidence task). It is the best write of one
+particular supervised form. The genuine upper bound is the **mean margin gradient**, and any
+"percent of ceiling" figure must say which object it was computed against — the two are close to
+orthogonal in practice (`cos(P_dom, Ḡ) = 0.044`), so they are not interchangeable.
+
+## Four things to state in the writeup rather than fix
+
+Each converts an apparent weakness into a strength, or prevents a reader from discovering a
+limitation for themselves. All are facts about runs already completed.
 
 Both convert an apparent weakness into a strength, and both are facts about the existing run.
 
@@ -99,6 +111,16 @@ Both convert an apparent weakness into a strength, and both are facts about the 
   crosscoder per *window*: at `k = 8`, `k_seg = 12` that is 8 coefficients per segment against
   0.67. Training throughput is matched. A reader will otherwise assume the comparison was
   budget-matched and may suspect it was tuned.
+- **The dictionaries are trained on the same content they are asked to steer.** In
+  `steer_order_modal.py` both training and test documents are drawn from the same twenty
+  sentences, so the current claim is "steers the ordering of content it was trained on". A
+  held-out-content split upgrades it; state the limitation either way rather than letting a reader
+  find it.
+- **A smoke-test configuration systematically flatters supervised arms relative to trained ones.**
+  A 500-step run gave `txc_slab = +2.55` against +6.48 from the 2000-step run, while the
+  supervised arms moved by less than 0.4 — because they are computed from activations rather than
+  learned. A short run therefore biases a *comparison*, not merely its precision. This is
+  transferable well beyond this project and nearly reached an executive summary.
 - **The dose-selection winner's curse inflates the flat arms, not the peaked one.** `at_best()`
   takes the argmax over the alpha grid on the reporting set. Simulated at 4 doses, 200 documents,
   SEM 0.64, noise correlation 0.85: bias is −0.02 SEM for a peaked TXC-like curve, +0.30 SEM for a

@@ -118,7 +118,7 @@ and because most of them are cheap to satisfy up front and expensive to retrofit
 8b. **Use disjoint demonstration pools for dictionary training and steering evaluation**, so the
    claim is about the factor rather than about memorised content.
 9. **Carry over the existing controls unchanged** — time-averaged profile, random profile, random
-   direction, row-permuted profile, supervised difference-of-means ceiling. They are already in
+   direction, row-permuted profile, supervised difference-of-means **reference** (not a ceiling — see below). They are already in
    `steer_order_modal.py`.
 10. **If any AUC is reported**, note the probe-fragility caveat: in-distribution AUCs in this area
     have a poor track record under distributional shift.
@@ -375,14 +375,14 @@ Ordered so that each step kills the task cheaply if it is going to die:
 5. **Steering arms S1/S2/S3** as in the fairness section below. `S3 > S2` is the claim; `S3 > S1`
    alone is not enough.
 6. **Controls that can kill it:** time-averaged profile, random profile, random direction,
-   row-permuted profile, and the supervised difference-of-means ceiling. These already exist in
+   row-permuted profile, and the supervised difference-of-means **reference** (not a ceiling — see below). These already exist in
    `steer_order_modal.py` and should be carried over unchanged.
 
 The one-line version of the result if it works: *a temporal crosscoder can convert a model's
 worst demonstration ordering into its best, where a single steering direction provably cannot,
 because the two orderings are the same multiset.*
 
-That framing has a useful property: the **supervised ceiling is known and free**. The
+That framing has a useful property: the **supervised reference is known and free**. The
 best-ordering accuracy is measured in step 1, so unlike the original order task there is a
 natural, interpretable upper bound on what any intervention could achieve, and the result can be
 reported as a fraction of a real gap closed rather than as an uncalibrated Δmargin.
