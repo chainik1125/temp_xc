@@ -8,6 +8,48 @@ tags:
 
 ## Sprint log — dictionary benchmark 10h
 
+### 17:15 — the capacity question, and why a behavioural number cannot answer it
+
+Two things converged here: the crosscoder turned out to be a starved dictionary, and
+capacity-matching for crosscoders is an open problem in this project that has historically
+been guessed at. Worth recording the reasoning, because it outlasts this sprint.
+
+**Nominal k is not the knob, now measured rather than suspected.** ReLU zeroes 96% of what
+TopK selects (realised window L0 17.6 against nominal 492), which is also why the repo's
+Protocols A and B cannot do what their docstrings claim — they differ only in nominal k.
+The immediate fix is to stop guessing and **servo on realised L0**: measure on a held-out
+batch, binary-search k to a target. Minutes, not intuition.
+
+**But there is a prior question the sweep answers.** If realised L0 stays ≈18 as nominal
+goes 492 → 4092, the ceiling is the *encoder* — not enough positive pre-activations — and
+no k will fix it. If realised tracks nominal, k really is the knob. Those are different
+diseases with different cures, and they look identical if you only ever inspect nominal k.
+
+**The comparison should be a frontier, not a point.** Segment-pooling makes FVU directly
+commensurable (both architectures reconstruct the same objects), and the natural sparsity
+axis is **coefficients per segment** — L0_window/T for the crosscoder, L0_token for the
+SAE. On that axis the current pair are not matched at all: 1.5 versus 98.9 coefficients per
+segment, at 27.6× the FVU. They sit at opposite ends of a curve nobody has drawn.
+
+**And the honest limitation, which Dmitry named:** using steering fidelity as a
+capacity-selection rule sidesteps interpretability. It is worse than a gap. The fidelity
+metric asks how well a write projects onto a target direction, so a latent that is
+"the factor plus fifty other things" scores like a clean one — the junk is ~orthogonal and
+the rescaling removes it. And **feature splitting would register as improvement**, since
+matching pursuit simply gets more atoms to fit with. In the exact regime capacity is
+supposed to be policed, the behavioural axis points the wrong way.
+
+What rescues it here is that this is a *semisynthetic* task with **ground-truth generative
+factors**. The banks are labelled, so monosemanticity is measurable with no judge:
+single-latent AUC for the known factor, the number of latents within 95% of the best (a
+splitting count), and decoder cosine among the top factor-aligned latents (redundancy).
+`interp_modal.py` runs those on the same capacity axis as FVU and steering.
+
+Registered expectation: **FVU improves monotonically, single-latent AUC peaks then falls as
+features split, steering stays flat or rises.** If that is the shape, then steering is the
+wrong instrument for *choosing* capacity and a fine one for *evaluating* it once chosen —
+a cleaner division of labour than treating the behavioural knee as a stopping rule.
+
 ### 16:19 — kickoff
 
 Branch `dmitry-dictbench-10h`. Question: does a temporal crosscoder beat a TopK SAE at
