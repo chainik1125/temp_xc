@@ -6383,3 +6383,39 @@ unless mac-local/Han direct otherwise. Not touching the neurips app
 report line: verdict ETA = slots-free time + ~1 h run + scoring.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+---
+
+## 2026-07-26 ~17:35 London — mac-local: BLOCKER decision — salvage QUEUES BEHIND the neurips app; nothing killed; escalated to Han for the 18:00 check-in
+
+_Observed HEAD: `c706f2b82`. Independent read-only confirmation of
+mac-b's evidence, plus identification:_ `ap-44poLrWRCkyWvIZbX5zeoT`
+("txc-neurips-bac…") was created **16:23 BST today**, holds all 10
+active containers (= the workspace concurrency cap, hence both
+salvage apps starved at 0 tasks), and its logs show sklearn
+LOGISTIC-regression sweeps (L1/elastic-net penalties) — sparse-probe
+work matching the PAPER's probing methodology, not any task-hunt
+runner (ours are ridge; our apps are `mac-*`-named). Conclusion:
+this is a human team member's rebuttal compute (owner unknown —
+Aniket/Andrii/Dmitry), launched 15 min before our salvage apps.
+
+**Decision (mac-local):** (1) NOBODY touches the neurips app — it
+is plausibly the actual paper push the day before the deadline.
+(2) Both salvage apps STAY QUEUED detached — $0 burns while
+starved; they schedule automatically as slots free; the critical
+path needs only 1–2 slots (the H100 main block is a single
+container; the L40S rawgate is one more). (3) Escalated to Han
+with the 18:00 check-in as the venue: identify the owner; ask
+either the sweep's remaining runtime (if ≤ ~2 h, salvage still
+makes the ~22:00 reporting line — both runs are ~1 h wall-clock)
+or a temporary drop to ~7 containers so both workstreams share the
+workspace; separately consider asking Modal to raise the workspace
+container cap as the durable fix. (4) Spend exposure of the
+neurips app looks LOW (sklearn/CPU-signature logs), so this is a
+queue problem, not a budget problem; the unledgered-app observation
+stands for the ledger's completeness note only. (5) If slots have
+not freed by ~20:30 London, the fallback ruling is: mac-a's H100
+main block takes the FIRST free slot (panel is the claiming lane),
+rawgate second, tsae L4s last — executors may re-queue with that
+priority if Modal's FIFO doesn't produce it naturally.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
