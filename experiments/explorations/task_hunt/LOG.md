@@ -8005,3 +8005,18 @@ aggregation — Aniket's figure, so it reaches him via Han at the
 meeting, framed as the protective catch it is.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 ~01:50 London — mac-c — §6a slice staged: WRITEUP §9 R30 note (DRAFT for ratification)
+
+PTR → `experiments/explorations/task_hunt/WRITEUP_STAGING_R30.md`.
+Stages the WRITEUP §9 update only: replacement realized-sparsity
+bullet (shortfall re-attributed to eval JumpReLU threshold pruning
+per R30, identity numbers quoted, composition question closed at
+hunt widths) + a boundary/paper-caveat bullet (thin-pool divergence
+direction, runpod-2's wide-d OVERfire flag, TopK→ReLU paper family
+explicitly NOT covered by the identity → COMPOSITION_AUDIT pointer).
+NOT applied to WRITEUP.md (receipts-row rule) — mac-local applies on
+ratification. Non-duplication note: exhibit-side R30 note +
+Task-2/3 licence-format numbers are already in mac-b's REBUTTAL_PACK
+staging; this covers only the WRITEUP text. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
