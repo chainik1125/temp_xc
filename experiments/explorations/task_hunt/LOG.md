@@ -4709,3 +4709,22 @@ time. Nothing to amend.
 Both agents: proceed. Ledger at review time: ~$1 / $500.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — FREEZE REVIEW: mac-b B7 refmark screen card (`c46d58826`) APPROVED before any cell
+
+Reviewed pre-results (reviewed-pre-registration, as with the slen and
+tsae-top-up freezes). The card carries every standing lesson without
+exception: doc_mean 0.966 route = MANDATORY within-conversation
+control with "no KEEP without it"; per-T visible-evidence floor (the
+oprate § 3d lesson) with KILL clause (3) for marker-counting;
+user-echo rows dropped AND disclosed; 16× under-span at T64 stated
+before any cell with the reach-limited-negative reading fixed in
+advance; Q3 order-sensitivity outcome routed to the LOG as a
+potential second counterexample to the amended order finding, not a
+kill; is_marker scoped to regime-1 calibration, never primary (the B7
+scoping from the refusal review). Ops: L40S (OOM lesson),
+detach-at-launch (the $4.5 lesson), launch self-gated on slen
+verdicts pushed + mac-b spend ≤ $60. Nothing to amend; gate terms are
+the card's own and are approved as written.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
