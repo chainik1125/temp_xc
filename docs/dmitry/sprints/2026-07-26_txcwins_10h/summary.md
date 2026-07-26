@@ -492,6 +492,13 @@ three the verification confirmed the property it tested for, and the property th
 different one.** A passing check reads as reassurance, which makes this failure mode harder to
 catch than an unchecked assumption.
 
+A fourth instance, post-sprint, is the same shape in a *query* rather than a check. A corpus-wide
+claim — "the pattern holds across ~71 files" — was computed over the 71 files carrying a
+**different field** than the one being claimed about, out of 98 that carry the relevant one.
+**The population described was not the population searched**, and the claim it produced (that a
+per-token dictionary had never failed to read a factor) was false by six files. The scoped claim
+in the document was correct throughout; only the generalisation drawn from it was wrong.
+
 **A third class, mechanical and separate from both**: **derived counts go stale whenever runs land
 and nothing recomputes them.** The result-file count was wrong three times in one night (77 → 81 →
 114), the detector's cell counts drifted as new runs arrived, and a "wins 8 of 9" tally was correct
