@@ -1048,3 +1048,33 @@ architecturally, via segment embeddings, because delimiters and instruction tuni
 address this issue at the architectural level". In an unmodified model provenance is
 therefore carried by little more than position — which is the mechanism behind our result
 rather than merely a coincidence with it.
+
+## 23:14 — the honest hole in the ladder was under-training
+
+6000-step replicates landed. The phase-5 cell — the one that failed its profile control at
+2000 steps and was kept in the table with the gap visible — resolves cleanly:
+
+| cell | `txc_slab` @2000 | `txc_slab` @6000 | `txc_flat` @6000 | `sae_broadcast` @6000 |
+| --- | --- | --- | --- | --- |
+| phase 5 | +1.56 | **+9.40** | +1.42 | +0.29 |
+| phase 11 | +7.80 | +6.88 | −0.33 | +0.09 |
+| recency | +7.09 | +6.77 | +1.62 | +1.66 |
+
+Phase-5's crosscoder effect moves **6×** on training steps alone, from +1.56 to +9.40, while
+its `txc_flat` control stays flat at +1.42. So the one cell where the profile control failed
+to separate was under-trained, not null, and all four ladder rungs are wins once the recipe
+is right. Recency and phase-11 both reproduce at the longer schedule, so the effect is not an
+artefact of a particular budget.
+
+Two things worth taking from this. **Reporting the hole rather than dropping it was what made
+it resolvable** — a cherry-picked three-cell ladder would have looked cleaner and taught us
+nothing. And it is the third time in two sprints that a training-recipe difference has moved
+a headline number by more than the effect being measured: the learning-rate collapse in
+sprint 2, the tSAE's "4–6× worse" that was really 1.9×, and now this. The rule that no
+conclusion may rest on one arm being trained differently from another has earned its place.
+
+The supervised ceilings also make the metric-mode point concrete: `dom_slab` reaches +45.79
+on phase-5 and +28.15 on phase-11, both scored in ordering mode, against +8.19 on recency in
+probe mode. Percent-of-ceiling is not comparable across those two scoring modes, which is
+exactly why the ordering-mode control on recency is needed before the 87%-vs-14% contrast can
+be stated at all.

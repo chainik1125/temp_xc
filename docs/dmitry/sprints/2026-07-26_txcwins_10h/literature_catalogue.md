@@ -79,10 +79,12 @@ not, and the effect is documented across model sizes up to the largest available
 
 Ordered so that each step kills the task cheaply if it is going to die:
 
-1. **Behavioural gap check, ~20 minutes, forward passes only.** Does the chosen model's accuracy
-   actually move across demonstration permutations? Take one task, sample ~24 orderings of the
-   same `k` demonstrations, and look at the spread. No spread, no task. Do this before any
-   training.
+1. **Behavioural gap check, forward passes only, and size it properly.** Does the chosen model's
+   accuracy actually move across demonstration permutations? Sample **~128 orderings** of the
+   same `k` demonstrations on one classification task (AG News or DBPedia are in Li et al.'s
+   set) and look at the spread. 128 rather than a couple of dozen because the *typical*
+   permutation-to-permutation std is only about two accuracy points — the dramatic gaps are the
+   tails, and you have to search for them. No spread, no task.
 2. **Build the matched pairs.** The *same* demonstrations in two orders — ideally the
    best-scoring and worst-scoring permutations found in step 1, which maximises the behavioural
    gap the steering has to close. The multiset match is exact and free.
@@ -390,7 +392,24 @@ the multiset match is exact. This is the property R-GSM turned out to lack.
 | Zhao, Wallace, Feng, Klein, Singh, *Calibrate Before Use: Improving Few-Shot Performance of Language Models*, ICML 2021 ([arXiv:2102.09690](https://arxiv.org/abs/2102.09690)) | the calibration-based mitigation, i.e. the existing position-agnostic baseline to beat |
 
 The 0.5B–27B range in the 2025 replication removes the main feasibility risk: a 1.5B model is
-comfortably inside the range where the effect is measured, unlike instance D.
+comfortably inside the range where the effect is measured, unlike instance D. Their model list
+includes **Qwen2.5**, which is the harness's own family.
+
+**The concrete numbers, and they are a warning as much as an encouragement.** Li et al. measure
+order sensitivity as the standard deviation of accuracy across permutations, and get an average
+of **0.0197** — about two accuracy points — against a selection sensitivity of 0.0225. Their
+protocol is `M = 10` demonstration sets × `P = 10` permutations for the sensitivity estimate, and
+**`P = 128` randomly sampled permutations** when they want to *find* a strong ordering. Tasks are
+AG News, NYT-Topics, NYT-Locations, DBPedia and MMLU for classification; GSM8K, MMLU-Pro and MATH
+for generation. Smaller models show "marginally higher variability under permutations" and larger
+models are "more stable", with no monotonic trend in the ratio. No code release is mentioned.
+
+Two consequences for the recipe. First, "near state-of-the-art to random guess" (Lu et al.) is
+the *extreme* of the distribution, not the typical case — a couple of accuracy points is what a
+random pair of orderings will differ by. Second, and following from it, **the best/worst search
+needs on the order of 100 permutations, not a couple of dozen**, which is what Li et al. use.
+Budget the go/no-go accordingly: it is still only forward passes, but it is ~128 × the prompt
+set, not 24.
 
 **Design details that follow from the literature, and are worth getting right first time.**
 
