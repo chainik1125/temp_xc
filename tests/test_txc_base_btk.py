@@ -133,14 +133,36 @@ def test_jumprelu_eval_path():
     x = _win_batch(B=8)
     for _ in range(5):
         btk.train_step(x)
-    assert float(btk.threshold) >= 0.0, "threshold EMA never initialised"
+    assert bool(btk.threshold_set.item()), "threshold_set flag never set"
     btk.eval()
     z = btk.encode(x).squeeze(1)
     assert int((z < 0).sum()) == 0, "negatives must be gated out at eval"
     thr = float(btk.threshold)
     nz = z[z != 0]
     if nz.numel():
-        assert float(nz.min()) > thr
+        assert float(nz.min().detach()) > thr
+
+
+def test_negative_threshold_representable():
+    # canonical item 2: a legitimately-negative threshold must gate, not
+    # silently fall back to batch-dependent TopK (the -1.0 sentinel bug).
+    btk = _mk(TXCBaseBTK, threshold_start_step=1)
+    n_pos = K_WIN // 2
+    _pin_preacts(btk, _distinct_bias(n_pos))
+    for _ in range(5):
+        btk.train_step(_win_batch(B=4))
+    assert bool(btk.threshold_set.item())
+    assert float(btk.threshold) < 0.0, (
+        "EMA over signed survivors should be negative here "
+        f"(got {float(btk.threshold)})"
+    )
+    btk.eval()
+    z = btk.encode(_win_batch(B=4)).squeeze(1)
+    # gating admits values above the (negative) threshold — including the
+    # weakly-negative survivors — and excludes those below it.
+    bias = btk.b_enc.detach()
+    admitted = (bias > btk.threshold).sum()
+    assert int((z[0] != 0).sum()) == int(admitted)
 
 
 # ── 6. trainability: loss backward + decoder grad hook + post_step ──
@@ -165,9 +187,13 @@ def test_train_step_backward_and_unit_norm():
 
 def test_registry_entry_resolves():
     from temp_bench.core.config import import_by_path, load_arch
-    spec = load_arch("txc_base_btk", section="synthetic")
+    spec = load_arch("txc_base_btkonly", section="synthetic")
     assert spec.hparams["d_sae"] == 20          # per-section override
     cls = import_by_path(spec.class_path)
     model = cls(d_in=D_IN, **spec.hparams)
     assert model.T == spec.hparams.get("T", 5)
     assert model.arch_version == spec.arch_version
+    assert model.relu_mode == "btk-only"
+    import pytest
+    with pytest.raises(ValueError):
+        cls(d_in=D_IN, **{**spec.hparams, "relu_mode": "relu-mix"})

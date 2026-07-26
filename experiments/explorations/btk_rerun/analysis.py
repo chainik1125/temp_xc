@@ -36,9 +36,15 @@ from pathlib import Path
 
 import numpy as np
 
-ARM_LABEL = {"txc_base": "paper-match (TopK→ReLU)",
-             "txc_base_btk": "btk-only (BatchTopK, no ReLU)"}
-ARM_COLOR = {"txc_base": "#000000", "txc_base_btk": "#0072B2"}
+# txc_base_btk (v1.0.0, pre-convention name) and txc_base_btkonly
+# (v1.1.0, canonical) share a bit-identical TRAINING path; the rename +
+# threshold-flag/EMA changes touch only the eval encode path, which
+# gauc/eauc never use. Rows from both names fold into the btk-only arm.
+ARM_OF = {"txc_base": "paper-match", "txc_base_btk": "btk-only",
+          "txc_base_btkonly": "btk-only"}
+ARM_LABEL = {"paper-match": "paper-match (TopK→ReLU)",
+             "btk-only": "btk-only (BatchTopK, no ReLU)"}
+ARM_COLOR = {"paper-match": "#000000", "btk-only": "#0072B2"}
 BASE_COLOR = "#E69F00"          # frozen tsae reference
 K_STYLE = {1: "-", 2: "--"}     # k_pos plotted in the headline figure
 K_SLOPE = (1, 2, 5)            # k_pos pooled into slopes (non-clipped only)
@@ -73,7 +79,7 @@ def load_rows(leaderboard: Path) -> list[dict]:
             continue
         if r.get("experiment") != "synthetic":
             continue
-        if r.get("arch") not in ARM_LABEL:
+        if r.get("arch") not in ARM_OF:
             continue
         ec = r.get("eval_cfg") or {}
         if ec.get("smoke") or ec.get("eval_window_L") != EVAL_L:
@@ -112,7 +118,7 @@ def load_baseline_refs(leaderboard: Path) -> dict:
 def aggregate(rows: list[dict]):
     acc = defaultdict(lambda: defaultdict(list))
     for r in rows:
-        key = (r["datasource"], r["arch"], cell_k(r), cell_T(r))
+        key = (r["datasource"], ARM_OF[r["arch"]], cell_k(r), cell_T(r))
         for m, v in (r.get("metrics") or {}).items():
             acc[key][m].append(float(v))
     return {key: {m: (float(np.mean(v)), float(np.std(v)), len(v))

@@ -39,7 +39,7 @@ import argparse
 import json
 from pathlib import Path
 
-ARMS = {"txc_base": "paper-match", "txc_base_btk": "btk-only"}
+ARMS = {"txc_base": "paper-match", "txc_base_btkonly": "btk-only"}
 DATASOURCES = ["toy_markov_n20_d40_noisy", "toy_coupled_K10_M20_d256"]
 T_GRID = [1, 2, 4, 5, 8, 10]
 K_POS_GRID = [1, 2, 5]

@@ -19,19 +19,24 @@ grad-parallel removal, ``consumes = "window"``):
    after. Selected values pass through signed; when the positive pool is
    thin, negative values can be selected (logged as ``neg_frac``, the
    mixing fingerprint diagnostic required by the shared briefing).
-3. Inference uses the family's **JumpReLU threshold** (EMA over the min
-   *positive* surviving activation, exactly the ``txc_batchtopk``
-   machinery): ``z = pre * (pre > threshold)``. Threshold gating is
-   unchanged from the v2 family convention; negatives are gated out at
-   eval by construction (threshold >= 0).
+3. Inference uses the family's **JumpReLU threshold**: gating
+   expression unchanged (``z = pre * (pre > threshold)``); EMA rule
+   unchanged (min surviving activation, beta=0.999, warmup=1000) with
+   the source set generalized {survivors > 0} -> {survivors != 0}, and
+   an explicit ``threshold_set`` flag replacing the ``-1.0`` sentinel
+   (a legitimately-negative threshold is representable) — the CANONICAL
+   btk-only convention of mac-a's Stage 1
+   (src/temp_bench/archs/btk_only.py + task_hunt LOG note), applied to
+   the paper arch.
 
 Budget convention: **k_win = min(k_pos * T, d_sae) per window** — the
 paper arch's own budget (including the toy-bench clip), NOT the
 ``txc_batchtopk_post`` correction to k_pos/window. Rationale: this twin
 isolates the activation composition; changing the budget too would
-confound the comparison. (If mac-a's canonical Stage-1 convention note
-pins a different budget, add a second YAML entry rather than editing
-this one.)
+confound the comparison. This follows mac-a's canonical Stage-1 convention (items 1-5) with
+the *_btkonly registry-name pattern; the budget rule is the paper
+arch's own (the five v2 twins mirror their parents' budgets the same
+way).
 
 AuxK note: the dead-feature revival loss keeps the family's
 ``F.relu(pre)`` — the aux path is a training-only auxiliary objective,
@@ -54,7 +59,7 @@ from temp_bench.interfaces.architecture import ArchConfig, TempBenchArch
 class TXCBaseBTK(TempBenchArch):
     """btk-only twin of the paper TXC: BatchTopK on raw pre-acts, no ReLU."""
 
-    arch_version: str = "1.0.0"
+    arch_version: str = "1.1.0"
     consumes: str = "window"
 
     def __init__(
@@ -69,10 +74,18 @@ class TXCBaseBTK(TempBenchArch):
         aux_k: int | None = None,
         threshold_start_step: int = 1000,
         threshold_beta: float = 0.999,
+        relu_mode: str = "btk-only",
     ):
         nn.Module.__init__(self)
+        if relu_mode != "btk-only":
+            raise ValueError(
+                f"txc_base_btkonly is the btk-only arm; got relu_mode="
+                f"{relu_mode!r}. The relu-mix/paper-match composition is "
+                "the frozen arch txc_base."
+            )
+        self.relu_mode = relu_mode
         self.config = ArchConfig(
-            name="txc_base_btk", d_in=d_in, d_sae=d_sae, k_pos=k_pos, T=T,
+            name="txc_base_btkonly", d_in=d_in, d_sae=d_sae, k_pos=k_pos, T=T,
         )
         self.d_in = d_in
         self._d_sae = d_sae
@@ -107,7 +120,10 @@ class TXCBaseBTK(TempBenchArch):
             for t in range(T):
                 self.W_enc.data[t] = self.W_dec.data[:, t, :].T
 
-        self.register_buffer("threshold", torch.tensor(-1.0, dtype=torch.float32))
+        self.register_buffer("threshold", torch.tensor(0.0, dtype=torch.float32))
+        # btk-only: explicit flag — a -1.0 sentinel cannot represent a
+        # legitimately-negative threshold (canonical convention item 2).
+        self.register_buffer("threshold_set", torch.tensor(0, dtype=torch.uint8))
         self.register_buffer(
             "num_tokens_since_fired", torch.zeros(d_sae, dtype=torch.long)
         )
@@ -174,7 +190,7 @@ class TXCBaseBTK(TempBenchArch):
                 f"got T={x.shape[1]}."
             )
         pre = self._squashed_preact(x)
-        if (not self.training) and self.threshold.item() >= 0:
+        if (not self.training) and bool(self.threshold_set.item()):
             z = pre * (pre > self.threshold)
         else:
             z = self._batchtopk(pre)
@@ -208,14 +224,15 @@ class TXCBaseBTK(TempBenchArch):
         step = int(self.global_step.item())
         if step > self.threshold_start_step:
             with torch.no_grad():
-                active = z[z > 0]
+                active = z[z != 0]     # btk-only: source set {!=0}, not {>0}
                 cur = (
                     active.min().float()
                     if active.numel() > 0
                     else torch.tensor(0.0, device=z.device)
                 )
-                if self.threshold.item() < 0:
+                if not bool(self.threshold_set.item()):
                     self.threshold.copy_(cur)
+                    self.threshold_set.fill_(1)
                 else:
                     self.threshold.copy_(
                         self.threshold_beta * self.threshold

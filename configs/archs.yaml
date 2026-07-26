@@ -58,9 +58,9 @@ archs:
       Vanilla TopK temporal crosscoder (T=5) + tsae_paper anti-dead stack.
       No matryoshka, no contrastive, no Bricken.
 
-  txc_base_btk:
+  txc_base_btkonly:
     class_path: temp_bench.archs.txc_base_btk:TXCBaseBTK
-    arch_version: "1.0.0"
+    arch_version: "1.1.0"
     category: txc
     hparams:
       d_sae: 18432
@@ -68,6 +68,7 @@ archs:
       T: 5
       auxk_alpha: 0.03125
       dead_threshold_tokens: 10_000_000
+      relu_mode: btk-only
     per_section_hparams:
       synthetic:  { d_sae: 20 }
       em:         { d_sae: 32768, k_pos: 25 }
@@ -75,10 +76,12 @@ archs:
     notes: |
       ACTMIX arm `btk-only`: twin of txc_base with the composite
       TopK-then-ReLU sparsity path replaced by BatchTopK over raw
-      squashed pre-acts (no ReLU anywhere in the sparsity path;
-      JumpReLU threshold at eval; neg_frac logged). Budget kept at the
-      paper's k_win = k_pos*T per window (activation isolated; see
-      module docstring). Dmitry's re-run gate arch.
+      squashed pre-acts, following mac-a's CANONICAL Stage-1 convention
+      (signed-value selection, threshold_set flag, EMA source {!=0},
+      AuxK unchanged, neg_frac logged). Budget kept at the paper's
+      k_win = k_pos*T per window (activation isolated). Dmitry's
+      re-run gate arch. v1.0.0 ran as `txc_base_btk` (pre-convention;
+      eval-path-only differences — gauc/eauc unaffected).
 
   # ── BatchTopK fair-backbone family (experiments/explorations/synthetic/STATUS.md § 4) ──────
   # Strong backbone (BatchTopK train → JumpReLU threshold eval, Bussmann
