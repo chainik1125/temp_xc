@@ -23,17 +23,47 @@ class TemporalCrosscoder(nn.Module):
         b_enc: (h,)      -- shared encoder bias
         b_dec: (T, d)    -- per-position decoder bias
 
-    Encode: z = TopK(einsum("btd,tds->bs", x, W_enc) + b_enc) -> (B, h)
+    Encode: z = sparsify(einsum("btd,tds->bs", x, W_enc) + b_enc) -> (B, h)
     Decode: x_hat = einsum("bs,std->btd", z, W_dec) + b_dec   -> (B, T, d)
+
+    Sparsity rule (``activation``):
+
+    ``"topk_relu"`` (default, the historical behaviour)
+        TopK followed by ReLU. Realised L0 is ``min(k, #{pre > 0})``, not k. For an SAE
+        the second term is never binding -- there are thousands of positive
+        pre-activations to choose from -- so the ReLU is a free non-negativity guard.
+        A crosscoder shares one code across T positions and typically has far fewer
+        positive pre-activations than a window-sized k, so here the ReLU *is* the binding
+        constraint and silently caps capacity: raising k past that count buys nothing.
+
+    ``"topk"``
+        TopK with no ReLU (the Gao et al. formulation). Realised L0 equals k by
+        construction, so capacity cannot collapse, at the cost of signed coefficients.
+
+    ``"batchtopk"``
+        BatchTopK (Bussmann et al. 2024): keep the ``k * B`` largest pre-activations
+        across the whole batch rather than k per sample, letting the model spend unevenly
+        across windows. A batch rule needs a batch, so at eval time the standard
+        substitute is a fixed threshold estimated during training -- tracked here as an
+        EMA of the smallest activated value per step and applied JumpReLU-style.
     """
 
-    def __init__(self, d_in: int, d_sae: int, T: int, k: int | None):
+    VALID_ACTIVATIONS = ("topk_relu", "topk", "batchtopk")
+
+    def __init__(self, d_in: int, d_sae: int, T: int, k: int | None,
+                 activation: str = "topk_relu", bt_threshold_ema: float = 0.01):
         super().__init__()
+        if activation not in self.VALID_ACTIVATIONS:
+            raise ValueError(
+                f"activation must be one of {self.VALID_ACTIVATIONS}, got {activation!r}"
+            )
         self.d_in = d_in
         self.d_sae = d_sae
         self.T = T
         # Match stacked SAE's total L0: k per position * T positions
         self.k = k * T if k is not None else None
+        self.activation = activation
+        self.bt_threshold_ema = bt_threshold_ema
 
         self.W_enc = nn.Parameter(
             torch.randn(T, d_in, d_sae) * (1.0 / d_in**0.5)
@@ -43,22 +73,55 @@ class TemporalCrosscoder(nn.Module):
         )
         self.b_enc = nn.Parameter(torch.zeros(d_sae))
         self.b_dec = nn.Parameter(torch.zeros(T, d_in))
+        # NaN until BatchTopK has seen a training step; eval falls back to per-sample
+        # TopK while it is unset, so an untrained module still encodes sensibly.
+        self.register_buffer("bt_threshold", torch.tensor(float("nan")))
 
     @torch.no_grad()
     def _normalize_decoder(self):
         norms = self.W_dec.norm(dim=(1, 2), keepdim=True).clamp(min=1e-8)
         self.W_dec.data = self.W_dec.data / norms
 
-    def encode(self, x: torch.Tensor) -> torch.Tensor:
-        """x: (B, T, d) -> z: (B, h) with k non-zeros."""
-        pre = torch.einsum("btd,tds->bs", x, self.W_enc) + self.b_enc
-        if self.k is not None:
-            topk_vals, topk_idx = pre.topk(self.k, dim=-1)
-            z = torch.zeros_like(pre)
-            z.scatter_(1, topk_idx, F.relu(topk_vals))
-        else:
-            z = F.relu(pre)
+    def pre_acts(self, x: torch.Tensor) -> torch.Tensor:
+        """x: (B, T, d) -> pre-activations (B, h), before any sparsity rule."""
+        return torch.einsum("btd,tds->bs", x, self.W_enc) + self.b_enc
+
+    def _sparsify(self, pre: torch.Tensor) -> torch.Tensor:
+        if self.k is None:
+            return F.relu(pre)
+
+        if self.activation == "batchtopk":
+            if self.training:
+                flat = pre.reshape(-1)
+                n = min(self.k * pre.shape[0], flat.numel())
+                vals, idx = flat.topk(n)
+                z = torch.zeros_like(flat)
+                z.scatter_(0, idx, F.relu(vals))
+                z = z.view_as(pre)
+                with torch.no_grad():
+                    active = z[z > 0]
+                    if active.numel():
+                        lo = active.min()
+                        self.bt_threshold = (
+                            lo if torch.isnan(self.bt_threshold)
+                            else (1 - self.bt_threshold_ema) * self.bt_threshold
+                            + self.bt_threshold_ema * lo
+                        )
+                return z
+            if not torch.isnan(self.bt_threshold):
+                # Threshold is positive, so this is already non-negative.
+                return pre * (pre > self.bt_threshold)
+            # Untrained: fall through to per-sample TopK rather than emit garbage.
+
+        topk_vals, topk_idx = pre.topk(self.k, dim=-1)
+        z = torch.zeros_like(pre)
+        z.scatter_(1, topk_idx,
+                   topk_vals if self.activation == "topk" else F.relu(topk_vals))
         return z
+
+    def encode(self, x: torch.Tensor) -> torch.Tensor:
+        """x: (B, T, d) -> z: (B, h), sparsified by ``self.activation``."""
+        return self._sparsify(self.pre_acts(x))
 
     def decode(self, z: torch.Tensor) -> torch.Tensor:
         """z: (B, h) -> x_hat: (B, T, d)."""
@@ -86,16 +149,19 @@ class CrosscoderSpec(ArchSpec):
 
     data_format = "window"
 
-    def __init__(self, T: int):
+    def __init__(self, T: int, activation: str = "topk_relu"):
         self.T = T
-        self.name = f"TXCDR T={T}"
+        self.activation = activation
+        self.name = f"TXCDR T={T}" + ("" if activation == "topk_relu"
+                                      else f" [{activation}]")
 
     @property
     def n_decoder_positions(self):
         return self.T
 
     def create(self, d_in, d_sae, k, device):
-        return TemporalCrosscoder(d_in, d_sae, self.T, k).to(device)
+        return TemporalCrosscoder(d_in, d_sae, self.T, k,
+                                  activation=self.activation).to(device)
 
     def train(self, model, gen_fn, total_steps, batch_size, lr, device,
               log_every=500, grad_clip=1.0,

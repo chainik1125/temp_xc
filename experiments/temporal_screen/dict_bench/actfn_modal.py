@@ -164,31 +164,19 @@ def actfn(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
     flat_tr, flat_ho = Xn.reshape(-1, d), Xn_ho.reshape(-1, d)
     print(f"[cache] {tuple(Xn.shape)}", flush=True)
 
-    def apply_act(pre, k, arm):
-        """pre: (B, d_sae) -> z with the arm's sparsity rule."""
-        if arm == "batchtopk":
-            B = pre.shape[0]
-            flat = pre.reshape(-1)
-            v, i = flat.topk(min(k * B, flat.numel()))
-            z = torch.zeros_like(flat)
-            z.scatter_(0, i, F.relu(v))
-            return z.reshape(pre.shape)
-        v, i = pre.topk(k, dim=-1)
-        z = torch.zeros_like(pre)
-        # `topk` keeps the selected values signed; the others apply ReLU first.
-        z.scatter_(1, i, v if arm == "topk" else F.relu(v))
-        return z
-
     def train_txc(arm, kp, lr_):
         torch.manual_seed(0)
-        m = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=k_seg, k=kp).to(dev)
+        act = "topk_relu" if arm == "topk_relu_auxk" else arm
+        m = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=k_seg, k=kp,
+                               activation=act).to(dev)
+        m.train()
         opt = torch.optim.Adam(m.parameters(), lr=lr_)
         last_fired = torch.zeros(d_sae, device=dev)
         hist = []
-        for s in range(steps):
+        for s_ in range(steps):
             xb = Xn[torch.randint(0, Xn.shape[0], (batch,), device=dev)]
-            pre = torch.einsum("btd,tds->bs", xb, m.W_enc) + m.b_enc
-            z = apply_act(pre, m.k, arm)
+            pre = m.pre_acts(xb)
+            z = m._sparsify(pre)
             xh = m.decode(z)
             loss = (xh - xb).pow(2).sum(-1).mean()
 
@@ -209,24 +197,26 @@ def actfn(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
             opt.zero_grad(); loss.backward()
             torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
             opt.step(); m._normalize_decoder()
-            if s % max(1, steps // 4) == 0 or s == steps - 1:
+            if s_ % max(1, steps // 4) == 0 or s_ == steps - 1:
                 hist.append(round(float(loss.detach()), 2))
 
+        m.eval()
         with torch.no_grad():
-            pre = torch.einsum("btd,tds->bs", Xn_ho, m.W_enc) + m.b_enc
+            pre = m.pre_acts(Xn_ho)
             npos = float((pre > 0).float().sum(-1).mean())
-            z = apply_act(pre, m.k, arm)
+            z = m.encode(Xn_ho)
             xh = m.decode(z)
             fvu = float(((xh - Xn_ho) ** 2).sum(-1).mean() / denom)
             nz = (z != 0)
             l0 = float(nz.float().sum(-1).mean())
             neg = float((z < 0).float().sum(-1).mean() / max(l0, 1e-9))
             alive = float((nz.float().mean(0) >= 0.001).float().mean())
+            thr = float(m.bt_threshold) if not torch.isnan(m.bt_threshold) else None
         return {"arm": arm, "kper": kp, "lr": lr_, "nominal_k": m.k,
                 "n_pos_preact": npos, "realised_l0": l0,
                 "coeff_per_segment": l0 / k_seg, "spend_frac": l0 / m.k,
                 "neg_coeff_frac": neg, "alive_frac": alive, "fvu": fvu,
-                "loss_hist": hist}
+                "bt_threshold": thr, "loss_hist": hist}
 
     # ---- SAE reference, unaffected by any of this ----
     out = {"sae": [], "txc": [], "k_seg": k_seg, "d_sae": d_sae, "steps": steps}

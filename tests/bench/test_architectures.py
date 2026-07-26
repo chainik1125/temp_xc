@@ -175,8 +175,10 @@ class TestEncodeContract:
         x = torch.randn(4, T, D_IN)
         z = spec.encode(model, x)
 
-        # Shuffle positions within each batch element
-        perm = torch.randperm(T)
+        # Shuffle positions within each batch element. A fixed cyclic shift, not
+        # torch.randperm(T): unseeded, that returns the identity once every T! draws
+        # (1 in 6 here), which made this test fail ~40% of the time for no reason.
+        perm = torch.roll(torch.arange(T), 1)
         x_shuf = x[:, perm, :]
         z_shuf = spec.encode(model, x_shuf)
 
