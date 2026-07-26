@@ -336,7 +336,7 @@ spans — and running it retroactively hardens last sprint's headline result.
 | Backtracking / self-correction | no | yes | R1-Distill-Qwen-1.5B | no | separate pipeline | 4 |
 | Permutation composition / state tracking | **yes** | yes | free | yes | drop-in, segment = swap | 3 (but the best control) |
 | Entity / state tracking (boxes) | **yes** | yes | free + public data | yes | segment = operation | 3 |
-| Steganography / encoded reasoning | **yes** | yes | limited | yes | segment = sentence | 3 |
+| Steganography / encoded reasoning | **yes** | yes | **none at reachable scale** | yes | segment = sentence | 2 |
 | Sandbagging / password-locking | no | weak | released organisms | partly | poor | 3 |
 | Sycophancy build-up | partial | yes | free | no | segment = turn | 2 |
 | Refusal onset | no | yes | free (repo infra) | partly | separate | 2 |
@@ -830,7 +830,7 @@ organisms are thin.
 | --- | --- |
 | Roger & Greenblatt, *Preventing Language Models From Hiding Their Reasoning*, 2023 ([arXiv:2310.18512](https://arxiv.org/abs/2310.18512)) — **id corrected**, see note | the encoded-reasoning threat model and the paraphrasing defence |
 | *Large language models can learn and generalize steganographic chain-of-thought under process supervision*, 2025 ([arXiv:2506.01926](https://arxiv.org/abs/2506.01926)) — id unverified | the closest thing to a *recipe for a model organism*: encoded CoT induced by process supervision, and it generalises |
-| *Early Signs of Steganographic Capabilities in Frontier LLMs*, 2025 ([arXiv:2507.02737](https://arxiv.org/abs/2507.02737)) — id unverified | current-capability baseline: models mostly cannot yet hide short messages under standard affordances |
+| Zolkowski, Nishimura-Gasparian, McCarthy, Zimmermann, Lindner, *Early Signs of Steganographic Capabilities in Frontier LLMs*, 2025 ([arXiv:2507.02737](https://arxiv.org/abs/2507.02737)) — verified | the capability gate, and it closes this entry for tonight: "current models are unable to encode short messages in their outputs without a monitor noticing under standard affordances", succeeding only "if given additional affordances like using an unmonitored scratchpad and coordinating on what encoding scheme to use" |
 | *Conceptual Steganography*, 2026 ([arXiv:2605.26537](https://arxiv.org/abs/2605.26537)) — id unverified | payloads carried by patterns of reasoning behaviour rather than lexical choice — the shape closest to a temporal factor |
 
 Note on the correction: I first recorded this as arXiv:2311.02282, which is a spark-plug fault
@@ -845,12 +845,16 @@ sentences destroys the payload while preserving the multiset exactly.
 **P1 — exact and perfect. P2 — passes**: suppressing an encoded channel requires disrupting
 the relation between positions, not adding a constant.
 
-**Why only 3.** The blocking question is whether a 1.5B model *computes* the payload at all —
-if it does not represent it, there is nothing to read or steer, and the entry evaporates.
-Current-capability evidence suggests frontier models are only marginally able to do this, so a
-1.5B is unlikely to. A prompted-decode probe (can the model decode an acrostic when asked?)
-settles it in minutes and should gate any further work. Safety relevance is high (CoT
-monitorability), so it is worth the cheap check.
+**Demoted to priority 2 on verification.** The blocking question was whether a model at
+accessible scale *computes* the payload at all — if it does not represent it, there is nothing
+to read or steer. Zolkowski et al. answer it: **frontier** models cannot encode short messages
+without a monitor noticing under standard affordances, and succeed only with an unmonitored
+scratchpad and a pre-coordinated scheme. A 1.5–7B model will be far worse. So the model organism
+does not exist at a scale this sprint can reach, and the entry is a *future* one, contingent on
+either the process-supervision recipe in arXiv:2506.01926 producing a small organism, or on
+capabilities improving. The structural argument remains the most elegant in the catalogue — a
+payload in sentence arrangement is invisible to any per-position readout by construction — which
+is why it stays recorded rather than deleted.
 
 ### Sandbagging / deliberate underperformance — priority 3
 
@@ -987,14 +991,16 @@ measured on a completely different task.
   (Venhoff et al., reasoning steering vectors — and the linear-direction saturation risk for
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
-  shuffle test a search summary attributed to it).
+  shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
+  capability gate).
+- **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
+  and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
   2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2607.01033, 2502.02180,
-  2605.07984, 2408.15221, 2605.01687, 2605.02647, 2606.08644, 2507.02737, 2605.26537,
-  2506.01926, 2603.03258, 2601.04170, 2604.11978, 2605.03907, 2603.05805, 2606.26474,
+  2605.07984, 2408.15221, 2605.01687, 2605.02647, 2606.08644, 2605.26537, 2506.01926, 2603.03258, 2601.04170, 2604.11978, 2605.03907, 2603.05805, 2606.26474,
   2512.02194.
 - **Claims withdrawn on checking:** that a published turn-shuffle ablation exists for
   crescendo-style attacks (could not confirm in Crescendo or NEXUS); that R-GSM is
@@ -1083,3 +1089,11 @@ the per-pass times are ordering only, not measurements.
   against 4.3% accuracy by answer slot, but explicitly content-invariant, which reinforces
   dropping instance B); and Venhoff et al. (2506.18167). The last of these is a **saturation risk
   for the repo's own incumbent task** and is recorded in the backtracking entry.
+- **Pass 14** — added the main-conclusion section (six literatures, six per-token handles; the
+  survivors all share P1). Added **instance E, LLM-as-a-judge position bias** — judges pick the
+  first slot in ~68% of comparisons against human preference, and the swapping control is
+  already standard practice, so the foil is pre-legitimised and the stakes are the highest in the
+  catalogue; held as the strongest fallback rather than first choice because it needs a ~7B judge.
+  **Demoted steganography from 3 to 2**: Zolkowski et al. (2507.02737, verified) show frontier
+  models cannot encode short messages without a monitor noticing under standard affordances, so
+  no organism exists at a scale this sprint can reach.
