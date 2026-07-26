@@ -6750,3 +6750,52 @@ of $500. WRITEUP restructure to follow this entry (documents follow
 the record).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-26 ~20:25 London — mac-local: ACTIVATION-MIXING FINDING on the record + ACTMIX phase allocation (Han's directives post-team-meeting)
+
+**The finding (audited read-only this evening; full details in
+`briefings/actmix-shared.md`):** three ReLU/TopK compositions
+coexist in the tree. (1) `txc_base` — the PAPER sections' default —
+does TopK→ReLU on the selected values with selection depth
+k_win = 8·T: selected-negative slots are zeroed, harm grows with T,
+biasing the paper's d(perf)/dT downward (the mechanism Dmitry's
+agent found). (2) `topk_sae` (paper baseline) — same TopK→ReLU
+family, but at T = 1 its selection is shallow ⇒ near-unharmed:
+composition-consistent with the paper TXC, harm NOT consistent.
+(3) The v2 task-hunt backbone (txc pre/post, batchtopk_sae, tsae,
+stacked) — ReLU→BatchTopK: under-realized budgets at SMALL pools,
+rising toward nominal with T (leaderboard fingerprint: sae 4.4/8 at
+T = 1 = worst-handicapped arm anywhere; pre/stacked 5.9→7.9; post
+5.6→8.0 per window). Hunt orderings were guarded by the realized-l0
+disclosures + tsae-first licences; the sae margins were flattered.
+Pre-registered directional expectations (written BEFORE any fix
+run): btk-only should improve the per-token sae baseline most ⇒
+hunt TXC-vs-sae margins likely SHRINK, tsae margins move least,
+hunt T-slopes may soften; the paper arch's d(perf)/dT should
+IMPROVE.
+
+**Han's allocation (binding):** backtracking = Aniket's, 100%,
+hands off. mac-a + mac-b = SOLELY task-hunt recovery (hunt is
+critical for the rebuttal): mac-a = relu_mode implementation +
+calibration mini-grid + KEEP-set survives-the-fix re-runs; mac-b =
+leaderboard forensics + ranked mixing-consistent salvage shortlist.
+**mac-c (NEW agent, workspace created)** = branch/commit
+archaeology ASAP (paper numbers came from han-phase7-unification /
+dmitry-em-repl / aniket-runpod-ward-stage-a, consolidation into
+`final` unreliable, forgotten branches possible) + HF inventory of
+han1823123123 (3 paper-era datasets found: txcdr-data 04-25,
+txcdr-base-data 05-02, temp-bench-data 05-06 — checkpoint
+candidates). Expected-ambiguity honesty required. **runpod-1 =
+sparse probing, runpod-2 = EM** (both H100, Han spinning up):
+shuffle + T-sweep, BOTH arms (btk-only now; paper-match once mac-c
+pins each task's actual composition — "paper-match" is per-task,
+not assumed). New-arch rule: relu_mode enters as plugin-compliant
+variants with arch_version bumps — NO in-place behavior change to
+frozen archs; all historical rows stay reproducible. Arm labels
+everywhere: `relu-mix` / `btk-only` / `paper-match`. Cost: $150/day
+/person cap (meeting decision). Tokens: paths in the shared
+briefing, values never in git; all rotate post-weekend.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

@@ -81,7 +81,29 @@ a40-bootstrap (historical, pod gone).
 ## Git: clean, pushed after this rewrite. Suite 333 green local.
 
 
-## SALVAGE CLOSED ~19:15 London 2026-07-26 — BOTH DELIVERED
+## ACTMIX PHASE (Han, ~20:15 London 2026-07-26) — CURRENT
+Post-meeting pivot. Activation-mixing finding on record (LOG
+~20:25): txc_base TopK→ReLU k=8T (paper d(perf)/dT biased down);
+v2 backbone ReLU→BatchTopK (sae 4.4/8 most handicapped, hunt
+margins flattered — guarded by our l0 notes). Allocation:
+mac-a = relu_mode impl + ttrend calibration (Dmitry's re-run gate,
+want before 9am PT) + KEEP survives-the-fix; mac-b = forensics +
+salvage shortlist (ACTMIX_FORENSICS.md); mac-c NEW (clone created,
+~/research/projects/agents/mac-c/temp_xc) = branch archaeology
+(paper = han-phase7-unification / dmitry-em-repl /
+aniket-runpod-ward-stage-a) + HF inventory han1823123123 (3
+paper-era datasets; token ~/.tokens/hf_token_datasets, 600,
+verified; NEVER in git; rotate post-weekend) →
+COMPOSITION_AUDIT.md; runpod-1 = probing, runpod-2 = EM (H100s,
+Han spinning up — briefings pushed, WAITING on pod access from
+Han; Phase A btk-only immediately, Phase B paper-match blocked on
+mac-c). Backtracking = Aniket 100%, hands off. Arm labels
+relu-mix/btk-only/paper-match mandatory. $150/day/person cap.
+MY queue: dispatch mac-c; confirm mac-a/b pickup (liveness rule);
+freeze-review calib + forensics + audit; pod driving once access
+arrives; 9am PT one-pager (composition audit + calibration read).
+
+## (superseded) SALVAGE CLOSED ~19:15 London 2026-07-26 — BOTH DELIVERED
 **ttrend TXC-post = KEEP T{16,32}** (R28+R29 ratified by me, team
 pending; pooling-free L1 lane carries; fig4 in WRITEUP §4).
 **Novelty cross-ratified** (CROSSRATIFY.md FINAL, doubly pending;
