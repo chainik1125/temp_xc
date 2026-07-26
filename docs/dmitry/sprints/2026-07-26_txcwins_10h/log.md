@@ -1337,3 +1337,75 @@ Honest limit if it becomes the headline: the constituency is smaller. Style sche
 product convenience rather than an eval-validity or safety problem, so it is the fallback
 rather than the lead — but it is the lowest-risk use of an idle slot, since it needs no new
 corpus design and its structure is already verified.
+
+## 23:28 — the screen retro-predicts eight prior experiments, and every past win is discovery
+
+The most consequential message of the sprint, in three parts.
+
+**One: the two gates retro-predict eight executed experiments, 2 failures and 6 successes,
+from the sign of one number with no training.**
+
+*Passphrase verification* is the case that justifies measuring `c` rather than checking
+whether a multiset matches. Its foil corrupts one word of `k`, so `k−1` of them agree and it
+*looks* matched to inspection — but measured `c` runs 0.665 at k=2 down to 0.154 at k=12,
+discarding it at every `k` the original experiment ran. With its validity state included —
+the steering target *is* "authenticated", a scalar the model computes and writes everywhere,
+a pure DC component — `c` reaches 0.56–0.85. And its `r1` is 0.400, so it has abundant
+rank structure and fails purely on DC. **A graded statistic catches what a binary condition
+misses.**
+
+*Ordered generation* is nearly definitional: a mode is a state present at every position,
+which is exactly a constant write. `c` runs 0.333 at mode strength 0.5, 0.585 at 1, 0.951 at
+4. "Mode-dominated" and "large `c`" are the same statement.
+
+The six successes go the other way — the trajectory tasks and the k-sweep measure `c = 0.0000`
+exactly at every k, and the prediction that a broadcast write is then pinned at zero with a
+*harmful* second-order term matches the observed broadcast deltas of −0.2, −0.0, −0.9, −1.0,
+−0.5, −3.3, −9.3. The earlier note's own line — "on matched multisets the DC write can only
+break symmetry against you" — is `c = 0` plus a negative second-order term, and it is the same
+signature as this sprint's finding that constant arms are even in α.
+
+**Two: the taxonomy correction is about input versus write.** The earlier document's rule read
+"position-dependent template (distinct content per slot) → needs the whole pattern → TXC", and
+that prediction failed on passphrase. Passphrase has a maximally position-dependent *input*
+and a DC *write target*. Reasoning about the input is what produced the wrong call; the two
+gates are about the write and are independent of each other.
+
+**Three, and this is the one that changes what the project has established: every steering
+win it has is rank 1, by its own measurement.** Lines 250–254 of the earlier note already
+report that the trajectory tasks' per-position directions are "≈ ±(one attribute direction)
+with signs following the profile" — one direction with a sign schedule, which is rank 1,
+reproduced synthetically at `r1 = 1.0000` exactly for k = 2, 4, 6, 8, 10.
+
+So the four trajectory tasks, the full k-sweep, the 81% generation demonstration and the
+previous sprint's order task are **all reachable by a profile-steered SAE or a tSAE**. Every
+one is a discovery result: the crosscoder found the waveform unsupervised, which is real and
+useful and is not an expressiveness claim. The earlier analysis reached the same place in its
+own vocabulary — "trajectory control vs level control, not direction diversity" is exactly L0
+against L1/L2 — without drawing the consequence that a *scheduled* per-token write reaches the
+same waveforms.
+
+**Instruction recency and the rotation ladder are therefore the only expressiveness candidates
+the project has**, which makes recency's measured `r1` the most load-bearing number
+outstanding. Predicted rank exactly 2, `r1 ≈ 0.65` (0.50–0.85). Below 0.85 and it is the first
+expressiveness result here; above, and the project's honest position is many discovery wins
+and no expressiveness win — coherent and publishable, but a different story.
+
+## 23:30 — two entries recorded for the next sprint rather than this one
+
+**Tool-call ordering** has the best relevance story anyone produced: *"an agent can call every
+tool correctly and still fail the task"* is the cleanest statement of the property in any
+literature and it comes from practitioners rather than from us. Dependency structure makes
+ordering non-negotiable (`auth` before `query`, `create` before `update`), and it is DC-clean
+for the right reason — fixing the order means promoting `auth` early *and* `query` late, so a
+constant "prefer auth" write is wrong at the query slot. Costs: unambiguous dependency
+structure is real design work and it likely needs a 7B, which is why it is next sprint's
+opening rather than tonight's.
+
+**Planning / lookahead is rejected**, with the cleanest evidence in the catalogue. Ma & Rui
+(arXiv:2605.07984) find rhyme planning causally localised to a *single position* — ~90% of
+planning capacity recoverable at the newline token through five attention heads — and the
+causal reliance appearing only at Gemma-3-27B, with other models showing "near-zero causal
+effect at the line boundary despite strong probe signal". One token, five heads, out of scale
+range. The incidental lesson deserves its own line: **a strong probe signal is not a causal
+handle** — the same reading/steering dissociation this sprint keeps rediscovering.

@@ -18,8 +18,9 @@ Companion notes already in this repo, which this builds on rather than repeats:
 [[temporal_benchmark_screen]] (the R0–R5 rung ladder and the decision rule),
 [[window_length_theory]], [[refusal_experiment_plan]].
 
-Sections are ordered by priority and named rather than numbered, since the ranking moves as
-the sprint proceeds.
+Entries are named rather than numbered because the ranking moved repeatedly as the sweep went
+on. **The ranking table is authoritative**; the entry sections below are not in priority order,
+and several carry a note where the DC-component audit changed their verdict.
 
 ### The headline finding of this catalogue
 
@@ -219,8 +220,12 @@ has nothing to grip.
   produced the win.
 - **P2 — write non-constancy.** The *optimal intervention* is non-constant in time: push one
   way early and another way late, or push at an offset relative to an event. Implied by P1 but
-  also holds without it (ramp-then-release, anti-phase, offset-relative copying). **P2 is the
-  operative criterion**; P1 is the clean special case that makes the control airtight.
+  also holds without it (ramp-then-release, anti-phase, offset-relative copying).
+  I originally wrote here that **P2 is the operative criterion and P1 the clean special case**.
+  **That is wrong and is the error the section above corrects**: the repo's passphrase experiment
+  has P2 in textbook form and still loses to a broadcast write, because a broadcastable mode
+  exists. P1 is the necessary condition. The sentence is left in place only so the reasoning that
+  produced the mistake is visible.
 - **P3 — judge-free metric.** The order task was chosen because teacher-forced Δmargin needs no
   LLM judge. In a 10h sprint a candidate whose success metric is a logit margin or a string
   statistic is worth several that need graded generations.
@@ -863,7 +868,19 @@ judge-free, and the version to use tonight. Refusal-prefix string match is the f
 contexts are longer. If the two priority-5 entries die early, pick this up — its relevance
 story is the best here.
 
-### Induction / in-context copying — priority 4
+### Induction / in-context copying — priority 2 after the DC audit (was 4)
+
+**Demoted, and the demotion is the interesting part.** I ranked this second on the strength of
+P1: the repeat-in-order versus shuffled-repeat foil is exactly multiset-matched and is the
+induction literature's own control. The DC audit overrides that. "Copying-ness" is a
+broadcastable mode, and inducing or suppressing copying is precisely what a constant write can
+do — which is why the repo's ordered-days and ordered-numbers tasks, close kin to this one,
+already lost to broadcast by 10–50× with the gap worsening in k. Expect the same here. It is
+recorded in full below because the reasoning is a useful worked example of P1 being necessary
+but **not sufficient**: a matched multiset removes bag statistics over the *foil pair*, but the
+behaviour being steered can still be carried by a mode.
+
+The rest of this entry is as written before the audit.
 
 The best bridge from the synthetic order task to a *named mechanism*: same abstract structure,
 but with a decade of literature and the substrate of in-context learning behind it.
@@ -898,7 +915,14 @@ but is a change to the corpus builder rather than a drop-in.
 reading comparison to favour the SAE again; if the SAE's uniform write also raises copy
 accuracy as much as the slab, the entry dies cleanly and fast.
 
-### Repetition loops and degeneration — priority 4, and target *escape* not onset
+### Repetition loops and degeneration — priority 2 after the DC audit (was 4)
+
+**Demoted for the same reason as induction, only more so.** Repetitiveness is the broadcastable
+mode par excellence, and the constant-write intervention against it — a flat repetition penalty —
+is not merely conceivable but deployed. Combined with the verified single-neuron result below,
+which already handles loop onset, there is very little left for a window code to claim. Kept for
+the mechanism notes and because loop *escape* remains formally untested.
+
 
 | paper | what it gives us |
 | --- | --- |
@@ -942,7 +966,7 @@ escaping an *established* loop — is explicitly unsolved and is also where the 
 self-reinforcement quantity is largest. Target loop escape. Note also that the paper compares
 against weight editing, not activation steering, so the steering baseline is still unmeasured.
 
-### Backtracking and self-correction — priority 4, mostly as the calibrated control
+### Backtracking and self-correction — priority 3, as the calibrated control
 
 The repo's incumbent. Anchors the scale for anything new rather than being novel itself.
 
@@ -1044,7 +1068,7 @@ predicted to lose, the steering arm is untested.
 above. But the foil quality is exceptional and the data is public — the best fallback if a
 clean P1 task is needed in a hurry.
 
-### Steganography / encoded reasoning — priority 3
+### Steganography / encoded reasoning — priority 2
 
 Conceptually the purest P1 in existence: a steganographic payload is *by definition* invisible
 to any per-position readout and carried entirely by arrangement. Held at 3 only because model
