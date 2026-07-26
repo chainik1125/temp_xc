@@ -510,3 +510,14 @@ except ImportError:  # pragma: no cover - local runs without the package on sys.
         _LITM_DESIGNS = {}
 
 TASKS.update(_LITM_DESIGNS)
+
+# Multi-turn escalation (SafeMTData Attack_600) -- the attack is the arrangement.
+try:
+    from txc_wins.designs_safemt import DESIGNS as _SAFEMT_DESIGNS
+except ImportError:  # pragma: no cover - local runs without the package on sys.path
+    try:
+        from .designs_safemt import DESIGNS as _SAFEMT_DESIGNS
+    except ImportError:
+        _SAFEMT_DESIGNS = {}
+
+TASKS.update(_SAFEMT_DESIGNS)
