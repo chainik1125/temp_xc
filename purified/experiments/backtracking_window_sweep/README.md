@@ -152,6 +152,39 @@ coordinate-map manifest remains accepted only when it supplies an explicit
 event map and its own exact-tail proof; the irrelevant 6.9 GB residual-cache
 provenance is never required for a teacher-forced artifact.
 
+The teacher-force builder never fetches traces or reads another branch. Point
+it at one already-supplied file and pin that file explicitly:
+
+```bash
+export BACKTRACKING_TEACHER_TRACES=/workspace/inputs/traces.json
+export BACKTRACKING_TEACHER_TRACES_SHA256=<64-hex-sha256>
+export BACKTRACKING_TEACHER_SOURCE_PATH=<repository-relative-path>/traces.json
+export BACKTRACKING_TEACHER_SOURCE_COMMIT=<40-hex-commit>
+
+BACKTRACKING_TEACHER_PHASE=preflight \
+  bash "$TXC_RUNPOD_ROOT/purified/experiments/backtracking_window_sweep/run_teacher_force_runpod.sh"
+```
+
+The preflight validates all 300 raw records against the pinned prompts,
+sentence labels, and official key/label order without loading a model. A
+bounded GPU smoke adds
+`BACKTRACKING_TEACHER_MAX_TRACES=1`; remove that limit and launch one
+modulo-partitioned trace worker per available GPU:
+
+```bash
+export BACKTRACKING_TEACHER_GPU_LIST=0,1
+bash "$TXC_RUNPOD_ROOT/purified/experiments/backtracking_window_sweep/launch_teacher_force_tmux.sh"
+```
+
+Each trace shard is committed only after its extracted `-13..-8` values equal
+the official values bit-for-bit. Once all 300 shards exist, assemble and
+repeat the complete keyed proof:
+
+```bash
+BACKTRACKING_TEACHER_PHASE=assemble \
+  bash "$TXC_RUNPOD_ROOT/purified/experiments/backtracking_window_sweep/run_teacher_force_runpod.sh"
+```
+
 Dry-run the full plan without launching compute:
 
 ```bash
