@@ -32,9 +32,16 @@ Results `dialevel/results/ladder_{gpt2,llama31_8b,gemma2_2b}.json`.
   experiments.explorations.task_hunt.dialevel.ladder_score`.
 - Overnight record (slen/refmark/quotedens, R20–R24) unchanged —
   see LOG; verdicts await Sunday 10:00 PT team review.
-- **Nothing in flight.** Day-2 gates: NO new Modal starts after
-  15:30 London; everything pushed by 16:30; briefings retire at the
-  18:00 check-in. If time remains: ask mac-local before starting
-  anything new (briefing § economics). Gemma cells for the overnight
-  cards (slen/refmark/quotedens) are authorized but BEHIND the day-2
-  thread — end-of-day fill only, mac-local gate applies.
+- **~13:25 London REASSIGNMENT (LOG race-resolution entry): gemma
+  fills DROPPED mid-slen** (app stopped; ~$1 actual; gemma replag
+  cache + slen screen partials persist on Volume — resumable
+  post-deadline; refmark/quotedens fills never launched). **mac-b is
+  now PANEL 2 (dq/llama31) merge + receipts support**: mac-a owns
+  cells + verdicts; I own merge-locally + variance-harness receipts
+  (`support_stats/stage2_variance.py`, invocation per
+  `support_stats/PANEL_RECIPES.md`: --row-layout paired,
+  --post-k-rule times-T, --crosscheck-json the panel's own stage2
+  json) + receipts_check rows. Panel-2 deadlines: freeze 13:30,
+  launch 13:45, repatriation 16:15, everything pushed 16:30.
+- Day-2 gates: NO new Modal starts after 15:30 London; briefings
+  retire at the 18:00 check-in.
