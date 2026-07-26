@@ -83,12 +83,13 @@ architectures at all, at a cost of one backward pass per document.
 **A number computed before any dictionary is trained orders every steering outcome in this
 sprint, including the one that had to be withdrawn.** `c` — the share of the optimal write a
 *constant* write can reach — is measured from 20–24 backward passes through the model, with no
-dictionary involved. Across five configurations spanning both metric modes:
+dictionary involved. Across six configurations spanning both metric modes:
 
 | task | `c` (gradient) | crosscoder | SAE | z | outcome | file |
 | --- | --- | --- | --- | --- | --- | --- |
 | order | 0.241 | +6.34 | +4.66 | +1.4 | no win | `order_sym_ds0.json` |
 | `rotate2` | 0.163 | +2.86 | +5.27 | −1.0 | no win | `rot_m2_T.json` |
+| `rotate3` | 0.179 | +6.43 | +11.51 | −4.2 | no win | `rot_m3_T.json` |
 | `rotate6` | 0.102 | −0.01 | +5.92 | −7.5 | **loses** | `rot_m6_T.json` |
 | `rotate12` | **0.033** | **+18.23** | +5.36 | **+9.8** | **wins** | `rot_m12_T.json` |
 | recency | **0.034** | **+6.48** | +2.60 | **+18.3** | **wins** | `recency_gradsmoke.json` (c), `recency_v2.json` |
@@ -104,10 +105,9 @@ and the crosscoder wins it by z = 9.8. The property that predicts the outcome is
 not the metric's family. A task property beating a metric property is the stronger result, and it
 is why this replaces rather than restores the earlier claim.
 
-⚠ Two provenance notes. `c` for recency comes from a 500-step smoke run, though `c` is computed
+⚠ One provenance note: `c` for recency comes from a 500-step smoke run, though `c` is computed
 from model gradients and does not depend on dictionary training; the outcome column is from the
-completed run. An `m = 3` rung (`c` = 0.179, no win) was reported by the theory agent but its
-result file was not present locally when this was written, so it is excluded from the table.
+completed run.
 
 **What the earlier version got wrong.** A table circulated an hour before this one showed the
 same ordering computed from the **difference-of-means** slab. Those values are near-orthogonal to
@@ -249,10 +249,28 @@ gradient: **+18.23 against `grad_rank1` +102.46** (z = −31.5), and against `ra
 the crosscoder reaches +2.86, −0.01, +18.23. **A rank-1 write beats the crosscoder everywhere on
 a ladder designed to put the target out of rank-1 reach.**
 
-`r1` also fails to predict its own arms: it falls 0.304 → 0.210 → 0.177 while `rank1_best` stays
-flat (+50.5, +49.8, +59.9). **`r1` measures a share of the write's norm, and that share does not
-determine what a rank-1 write achieves on the metric.** `c` survives this ladder; `r1` does
-not. Finding 2 explains why this is structurally
+**`r1` bounds the write and does not forecast the architecture — those are different claims and
+only the second fails.** The law is a *within-task* ratio, `Δ(rank-1 arm)/Δ(full write) ≈ sqrt(r1)`,
+and comparing rank-1 arms in absolute terms across rungs tests nothing because the denominator
+moves too (`grad_slab` runs 76.0 → 102.4 → 166.9 → 275.2). Measured correctly:
+
+| m | `grad_rank1`/`grad_slab` | `sqrt(r1)` | error |
+| --- | --- | --- | --- |
+| 2 | 1.447 | 0.551 | 162% |
+| 3 | 0.567 | 0.516 | **10%** |
+| 6 | 0.406 | 0.459 | **12%** |
+| 12 | 0.372 | 0.421 | **12%** |
+
+**The law holds to within 12% at three of four rungs and reproduces the monotone decline.** It
+fails at `m = 2`, and the failure is self-diagnosing: a ratio above 1 means the rank-1 truncation
+beat the full write, which is impossible to first order for a strict subspace, so that rung is
+outside the linear regime (the same signature appears in its difference-of-means arms, 50.49
+against 39.35). What `r1` has *not* been shown to do is predict what a crosscoder achieves — at
+`m = 12` it identified headroom to +102.5 and the crosscoder used +18.23. **One gate on `c`, one
+bound from `r1`, and no result yet converting `r1`'s headroom into a win.**
+
+**The gradient-derived rank-1 arm beats the difference-of-means one at all four rungs** — 2.18×,
+1.42×, 1.36×, 1.71×. That is the screen-on-the-gradient point measured four more times. Finding 2 explains why this is structurally
 hard rather than a matter of not having looked in the right place, and states the condition that
 would have to hold instead.
 
