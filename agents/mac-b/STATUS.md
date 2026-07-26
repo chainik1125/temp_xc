@@ -31,6 +31,13 @@ support delivered through R27. Holding for the 18:00 check-in.
    k_pos = 8, 8·T internal to post); 5-T secondary trend guarded
    (skip-with-reason; canonical output re-verified byte-unchanged).
 
+4. **Writeup support (~17:00):** negatives-table data dump delivered
+   (`figs_writeup/negatives_table_data.{json,csv}`, 12 receipt-anchored
+   rows); fig-3 built to the briefing spec — raced mac-local's own
+   embed, theirs governs the doc, mine committed beside as
+   `fig3_order_receipts_macb.*` with the null-band/broad-text caption
+   distinction flagged in the LOG (swap = one filename edit).
+
 All verdicts/receipts PENDING TEAM REVIEW at the 18:00 London
 check-in / Sunday 10:00 PT; R27 awaits mac-local ratification-on-add.
 
