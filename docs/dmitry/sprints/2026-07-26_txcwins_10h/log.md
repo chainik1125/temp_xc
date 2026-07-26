@@ -1271,3 +1271,38 @@ generation failed.
 demonstration as a paper headline". But last sprint's order-only result and these trajectory
 tasks are all language, all multiset-matched, and all won. The narrower statement is better
 supported: **language steering wins iff the foil is multiset-matched.**
+
+## 23:24 — a go/no-go that is informative either way
+
+The interior-permutation control raises the obvious question: strip out recency and
+majority-label bias and is there any order effect left to steer? The honest answer from the
+literature is **unquantified** — those two are the only *named* mechanisms of ICL order
+sensitivity, both are bag statistics, and no complete mechanistic account of order dependence
+exists.
+
+That makes the go/no-go worth running whichever way it falls:
+
+| outcome | what it means |
+| --- | --- |
+| spread survives the control | residual non-DC order sensitivity exists; the task is live |
+| spread collapses | *ICL order sensitivity at this scale is fully accounted for by recency and majority-label bias* — a finding the ICL literature does not currently have, from an hour of forward passes |
+
+The gate is therefore not a gamble even if the headline dies, which is the property a first
+step should have. It has been specified to report the spread with and without the control
+side by side, so the second branch is a result rather than a shrug.
+
+One escalation path recorded: the named biases weaken as model size grows, so 1.5B has both
+the largest total order effect *and* the largest DC share of it. A collapse at 1.5B is
+consistent with a survivable effect at 7B, so that is the next step rather than abandonment.
+
+**Pairing rationale.** If two tasks run, the second should be instruction-order conflict,
+because the pair is a **dissociation**: demonstration order can die to a residual-DC problem;
+instruction-order cannot, since with A-then-B against B-then-A and "obey the first" as the
+target the correct *content* differs between conditions, so no single content direction helps
+both. Two tasks that can only fail in different ways are worth more than two sharing a
+failure mode — and instruction-order is the closest relative of the recency result, which
+gives the pair a natural narrative.
+
+Induction and repetition are dropped rather than screened: copying-ness and repetitiveness
+are exactly the modes a broadcast write rides, and this project has already lost that fight
+on ordered-days and numbers.

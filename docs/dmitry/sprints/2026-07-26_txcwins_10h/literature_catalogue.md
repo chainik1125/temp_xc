@@ -435,6 +435,7 @@ crosscoder loses, whatever the P1 and P2 columns say.
 | --- | --- | --- | --- | --- | --- | --- |
 | Demonstration order (interior-permuted, label-matched) | **yes** | **none, with the control** | free | yes | drop-in, segment = demo | 5 |
 | Instruction-order conflict / injection precedence | **yes** | **none, with the right target** | free | yes | drop-in, segment = instruction | 5 |
+| Per-section style / register scheduling | **yes** | **none** | free | yes | drop-in, segment = section | 4 |
 | Multi-turn escalation (crescendo) | **yes** | likely (permissiveness is a mode) | free | yes | drop-in, segment = turn | 3 |
 | Permutation composition / state tracking | **yes** | probably (aggregates at query token) | free | yes | drop-in, segment = swap | 3, upstream hookpoint only |
 | Entity / state tracking (boxes) | **yes** | probably (same aggregation result) | free + public data | yes | segment = operation | 3 |
@@ -745,7 +746,48 @@ gap exists first. (ii) The blocks are lexically distinct, so a per-token code ca
 block a token belongs to; what it cannot do is write asymmetrically across them. Reading will
 again favour the SAE.
 
-### Multi-turn escalation (crescendo-style jailbreaks) — priority 4
+### Per-section style / register scheduling — priority 4, and the shortest bridge to a real use
+
+This entry exists because of the DC audit rather than the literature sweep. If windowed steering
+wins exactly on balanced per-slot attribute schedules, the honest question is: *which real
+application asks for a balanced per-slot attribute schedule?* There is one, and it is mundane
+rather than exotic — **controllable generation with a per-section specification**.
+
+Concretely: "formal introduction, casual body, formal conclusion"; "English abstract, French
+body"; "technical section, then a plain-language summary, then technical again". The
+specification is a schedule over sections, and the useful intervention is a waveform, not a
+level. Writing "be more formal" uniformly is exactly wrong on the sections that should be casual
+— which is the same failure the repo already measured, where broadcast made text "Frenchier
+everywhere, which is exactly wrong on half the slots".
+
+**Relationship to what already exists here.** This *is* the repo's `lang_profile` and
+`int_profile`, promoted from a synthetic construct to a stated application. The winning numbers
+already in hand — template +63.2 against broadcast +6.0 on lang_profile at k=6, and 0.812 ±
+0.044 per-slot generation accuracy against 0.444 for broadcast — are results about this task; what
+is missing is the framing that makes someone care, plus real documents in place of templated
+carriers.
+
+**P1 — exact, by the same construction as the synthetic version:** the foil is a permutation of
+the same profile, so the multiset of section-attributes is matched and no bag statistic
+separates target from foil. **DC handle — none**, for the same reason, and this is the only entry
+besides the top two where that can be asserted rather than hoped.
+
+**Metric.** Judge-free at the read-out level: per-section attribute classification of generated
+text (langid for language, a small classifier or a lexical proxy for register), scored against
+the intended profile. The repo already has this working.
+
+**What would make it a contribution rather than a relabelling.** Three things, in order of cost:
+replace the templated carrier with real documents; replace the difference-of-means directions
+with trained dictionaries (the existing numbers use DoM proxies); and add a second attribute so
+the claim is about schedules generally rather than one axis. The third is what turns "we can
+steer language per sentence" into "windowed codes are the right instrument for per-section
+control".
+
+**Honest limit.** The constituency is smaller than for demonstration order — style scheduling is a
+product convenience, not an eval-validity or safety problem. It is the *safest* win available and
+the least surprising one.
+
+### Multi-turn escalation (crescendo-style jailbreaks) — priority 3
 
 The best relevance story in the catalogue: *no individual turn is harmful*, so the entire
 attack is carried by the arrangement.
@@ -1268,3 +1310,11 @@ the per-pass times are ordering only, not measurements.
   ranking table around the DC-handle column. Added the **interior-permutation control** —
   hold first and last demonstration fixed, match the label multiset — without which recency and
   majority-label bias give the per-token arm a DC handle.
+- **Pass 17** — added **per-section style / register scheduling** at priority 4: the DC audit
+  implies windowed steering wins on balanced per-slot attribute schedules, and the one real
+  application shaped like that is controllable generation with a per-section specification. It is
+  the repo's own `lang_profile` / `int_profile` promoted from construct to use case, so the
+  winning numbers already exist; what is missing is real documents, trained dictionaries in place
+  of the difference-of-means proxies, and a second attribute. Also recorded the top entry's main
+  risk — how much order sensitivity survives once recency and majority-label bias are controlled
+  is unquantified — and why the go/no-go is informative either way.
