@@ -42,14 +42,31 @@ def best(arm):
     return arm["delta_margin"][j], arm["sem"][j]
 
 
+def load_seeds(s):
+    """Every dictionary init available for this cell.
+
+    Init matters more than it has any right to: at five switches the crosscoder's best
+    delta ranged over 1.56, 15.70 and 11.48 across three inits of the same configuration.
+    The sign was stable in every one, the magnitude was not, so a single init is not a
+    verdict and the figure shows the spread rather than one draw.
+    """
+    out = []
+    for suffix in ("", "_ds1", "_ds2"):
+        p = SRC / f"phase{s}{suffix}.json"
+        if p.exists():
+            out.append(json.loads(p.read_text()))
+    return out
+
+
 def main() -> int:
-    runs = {}
+    runs, seeds = {}, {}
     for s in SWITCHES:
         p = SRC / f"phase{s}.json"
         if not p.exists():
             print(f"[skip] {p} not written yet")
             return 1
         runs[s] = json.loads(p.read_text())
+        seeds[s] = load_seeds(s)
 
     fig, axes = plt.subplots(1, 2, figsize=(11.6, 4.4))
 
@@ -77,19 +94,24 @@ def main() -> int:
                                ("tsae_broadcast", C_TSAE, "attention tSAE direction"),
                                ("txc_flat", C_FLAT, "crosscoder slab, profile removed"),
                                ("random_slab", C_RND, "random temporal profile")):
-        xs, ys, es = [], [], []
+        xs, ys, lo, hi = [], [], [], []
         for s in SWITCHES:
-            if key in runs[s]["arms"]:
-                v, e = best(runs[s]["arms"][key])
-                xs.append(s); ys.append(v); es.append(e)
-        ax.errorbar(xs, ys, yerr=es, fmt="o-", color=colour, lw=2.0, ms=6,
-                    capsize=3, label=label)
+            vals = [best(r["arms"][key])[0] for r in seeds[s] if key in r["arms"]]
+            if not vals:
+                continue
+            xs.append(s); ys.append(sum(vals) / len(vals))
+            lo.append(min(vals)); hi.append(max(vals))
+        ax.plot(xs, ys, "o-", color=colour, lw=2.0, ms=6, label=label)
+        # Range across dictionary inits, not a standard error: with three draws the honest
+        # display is the spread itself.
+        ax.fill_between(xs, lo, hi, color=colour, alpha=0.16, lw=0)
     ax.axhline(0.0, ls="--", color="#888888", lw=1.3)
     ax.set_xscale("log"); ax.set_xticks(SWITCHES)
     ax.set_xticklabels([str(s) for s in SWITCHES])
     ax.set_xlabel("switches per document")
     ax.set_ylabel(r"$\Delta$ margin at each arm's best dose")
-    ax.set_title("Steering, at matched injected norm and matched coefficients")
+    n_seed = min(len(seeds[s]) for s in SWITCHES)
+    ax.set_title(f"Steering: mean over {n_seed} dictionary inits, band = range")
     ax.grid(alpha=0.25, lw=0.6)
     ax.legend(loc="upper left", fontsize=8.5, framealpha=0.95)
 

@@ -30,6 +30,13 @@ app = modal.App("txcwins-recipe")
 image = (
     modal.Image.debian_slim()
     .pip_install("torch", "transformers", "accelerate", "numpy")
+    # The model is baked into the image rather than downloaded per container. Twenty
+    # concurrent runs pulling the same weights unauthenticated hit the Hub's rate limit and
+    # one of them died mid-sprint; caching it in the layer also removes ~40s of startup from
+    # every run.
+    .run_commands(
+        "python -c \"from huggingface_hub import snapshot_download; "
+        "snapshot_download('Qwen/Qwen2.5-1.5B-Instruct')\"")
     .add_local_dir(str(ROOT / "src"), "/work/src")
     .add_local_dir(str(ROOT / "temporal_crosscoders"), "/work/temporal_crosscoders")
     .add_local_dir(str(_here.parent), "/work/txc_wins")
