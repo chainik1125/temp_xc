@@ -19,10 +19,19 @@ depth story (EM misalignment readout peaks mid-depth, inverted-U,
 L13/L15) means LAYER CHOICE must follow the paper's layer, stated
 in the card.
 
-**Phase A — `btk-only` arm (runnable immediately):** retrain at
-T ∈ {1, 2, 4, 8, 16}: txc btk-only + SAE + TSAE + untrained twins
-on the EM substrate per the paper section's data path
-(`experiments/em/`); shuffle-control eval as in P1.
+**Phase A — `btk-only` arm:** cache-build FIRST (composition-
+independent); btk-only convention comes from mac-a's Stage-1 LOG
+note (single-source rule — never fork one locally). **Match the
+paper section's setup EXACTLY** (model, layer, dataset — from
+`experiments/em/`; the layer note below); ambiguities are FLAGGED
+to mac-local/mac-c, not chosen. Retrain at T ∈ {1, 2, 4, 8, 16}:
+txc btk-only + SAE + TSAE + untrained twins; shuffle-control eval
+as in P1. Convention alignment: read Aniket's
+`origin/neurips-aniket` backtracking ablation
+(`purified/experiments/backtracking_window_sweep/`,
+`purified/src/temp_bench/utils/shuffles.py`) so shuffle semantics
+and table format line up across tasks; never modify or depend on
+their in-flight branch.
 
 **Phase B — `paper-match` arm (BLOCKED on mac-c):** pinned
 composition from dmitry-em-repl's result commits; checkpoints from

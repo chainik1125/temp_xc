@@ -21,8 +21,19 @@ pre-acts, threshold gating unchanged at eval; state the negative-
 selection count as a logged diagnostic). Unit tests green before
 any cell.
 
+Post your Stage-1 convention note (registry names, hparam,
+negative-selection handling, threshold path) to the LOG **as soon
+as it exists** — runpod-1/2 consume it verbatim (shared-briefing
+single-source rule); they are waiting on you, not the reverse.
+
 **Stage 2 — calibration mini-grid (freeze card first; the
 DECISIVE input to Dmitry's re-run gate, wanted before 9am PT).**
+COST/SPEED NOTE: the relu-mix side of the grid may be REUSED from
+existing leaderboard rows where the config matches exactly (the
+salvage/topup panels already hold post T∈{4,16,32} and sae/tsae T1
+at seeds {3,4} relu-mix, same datasource + probe conventions) —
+dup-key discipline, cite the reused eval_keys in the card. Only the
+btk-only cells need compute (≈ half the grid, est drops to ~$4).
 Substrate: `dial_real_ttrend_gpt2_l7` (warmest infra, 19-min
 turnaround proven). Arms: {batchtopk_sae, tsae} @ T=1 and
 txc_batchtopk_post @ T ∈ {4, 16, 32}, each × {relu-mix, btk-only}

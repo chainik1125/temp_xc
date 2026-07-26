@@ -14,18 +14,29 @@ limit** (TXC ≈ SAE at matched params) as the anchor row, for the
 paper's sparse-probing task. Han owns the science read; this pod
 does the compute.
 
-**Phase A — `btk-only` arm (runnable immediately).** Retrain on
-the probing substrate at T ∈ {1, 2, 4, 8, 16} (extend to 32 if
-budget/time allow): txc (the paper-shaped variant with relu_mode
-none — coordinate with mac-a's Stage-1 implementation, or
-implement the same variant locally if mac-a hasn't landed;
-IDENTICAL convention, coordinate in briefings/), per-token SAE,
-TSAE, + untrained twins. Then the shuffle control: eval each
-trained model with window positions randomly permuted (fixed
-permutation per row, seeded) — report recovery vs unshuffled.
-Expected shape: TXC falls toward the SAE under shuffle; SAE/TSAE
-unmoved (their codes are per-token — state this as the control's
-own control).
+**Phase A — `btk-only` arm.** Sequencing: build the activation
+caches FIRST (composition-independent, GPU-heavy — no waiting
+needed), and take the btk-only arch convention from mac-a's
+Stage-1 LOG note (the shared briefing's single-source rule — NEVER
+fork an independent convention; if it hasn't landed when caches
+finish, say so in your STATUS and keep cache-building/harness
+work going). **Match the paper section's setup EXACTLY** (model,
+layer, dataset, label — from `experiments/probing/`); if any of it
+is ambiguous, FLAG to mac-local/mac-c rather than choosing.
+Retrain at T ∈ {1, 2, 4, 8, 16} (extend to 32 if budget/time
+allow): txc btk-only, per-token SAE, TSAE, + untrained twins. Then
+the shuffle control: eval each trained model with window positions
+randomly permuted (fixed permutation per row, seeded) — report
+recovery vs unshuffled. Expected shape: TXC falls toward the SAE
+under shuffle; SAE/TSAE unmoved (their codes are per-token — state
+this as the control's own control). **Convention alignment:**
+Aniket's `origin/neurips-aniket` branch carries the backtracking
+version of this exact ablation
+(`purified/experiments/backtracking_window_sweep/` +
+`purified/src/temp_bench/utils/shuffles.py`) — READ it so shuffle
+semantics and the table format line up across tasks; do not modify
+or depend on their in-flight branch; flag divergences to
+mac-local.
 
 **Phase B — `paper-match` arm (BLOCKED on mac-c).** mac-c's
 COMPOSITION_AUDIT pins the composition sparse probing actually

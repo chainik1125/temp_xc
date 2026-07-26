@@ -8,9 +8,20 @@ read-first: briefings/actmix-shared.md
 # ACTMIX W3 — branch/commit archaeology + HF checkpoint hunt (ASAP)
 
 **Workspace:** `~/research/projects/agents/mac-c/temp_xc` (created
-by mac-local 20:25, origin = GitHub, branch arxiv). You are
-**mac-c**; create `agents/mac-c/STATUS.md` on first commit and add
-yourself to the roster table in `agents/README.md`.
+AND prepped by mac-local — venv built, `.agent_id` beside the
+clone; origin = GitHub, branch arxiv). You are **mac-c**; create
+`agents/mac-c/STATUS.md` on first commit. Your roster row in
+`agents/README.md` ALREADY EXISTS (added by mac-local, be755651a)
+— do not add a duplicate.
+
+**Practical starting points:** `git log --oneline
+origin/han-phase7-unification | head -50` (same for
+origin/dmitry-em-repl, origin/aniket-runpod-ward-stage-a);
+`git branch -r` for the forgotten-branch sweep; `git ls-tree -r
+<branch> --name-only | grep -iE 'result|fig|ckpt|json|yaml'` to
+find committed artifacts; `git show <sha>:<path>` to read arch
+files at a specific commit; `git log --follow -- <path>` on figure/
+results files to find their producing commits.
 
 **Mission.** The paper's numbers came from THREE branches, not
 `final` (which is a lossy consolidation): sparse probing + RLHF +

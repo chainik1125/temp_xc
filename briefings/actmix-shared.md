@@ -36,7 +36,12 @@ variants with an arch_version bump (single file drop + YAML entry
 per the hard rules) — never an in-place behavior change to a frozen
 arch. Historical rows must stay reproducible against their stamped
 code_version. Unit tests: no-ReLU path correctness + realized-l0
-sanity.
+sanity. **Single-source rule: mac-a's Stage-1 implementation is
+CANONICAL for the btk-only convention** (registry names, hparam,
+negative-selection handling, threshold path) — mac-a posts the
+convention note early (LOG or briefings/); every other agent
+(runpod-1/2 especially) FOLLOWS it and never forks an independent
+convention. Cross-venue comparability depends on this.
 
 **Work split.** mac-a → `actmix-mac-a.md` (relu_mode impl +
 calibration + KEEP-set survives-the-fix). mac-b →
@@ -44,7 +49,12 @@ calibration + KEEP-set survives-the-fix). mac-b →
 `actmix-mac-c.md` (branch archaeology + HF inventory, ASAP).
 runpod-1 → `actmix-runpod-1.md` (sparse probing shuffle+T-sweep).
 runpod-2 → `actmix-runpod-2.md` (EM shuffle+T-sweep).
-Backtracking is Aniket's — hands off everywhere.
+Backtracking is Aniket's — hands off everywhere; their ablation
+harness lives on `origin/neurips-aniket`
+(`purified/experiments/backtracking_window_sweep/` + a
+`shuffles.py` utility) and is the cross-task convention reference
+for shuffle semantics and the rebuttal table format — read, never
+modify, flag divergences.
 
 **Tokens (paths only — values NEVER in git, logs, or cards):**
 `~/.tokens/hf_token` (Modal secret `hf-token`; gated-model pulls)

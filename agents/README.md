@@ -57,10 +57,12 @@ be committed or quoted in tracked locations.)
 `~/research/projects/temp_xc` is `mac-local`; under
 `~/research/projects/agents/<id>/temp_xc` the directory (and the
 `.agent_id` file beside the clone) is your id. A Linux session under
-`/workspace/temp_xc` reads `/workspace/.agent_id` (Han seeds it on every
-newly spawned pod; there is no legacy default — the pre-2026-07-26 pods
-are retired). If genuinely ambiguous, ask the user. A new agent gets a
-new subdir + a row here.
+`/workspace/agents/<id>/temp_xc` (shared pods): the directory + the
+`.agent_id` beside your clone is your id. A Linux session under a bare
+`/workspace/temp_xc` (single-agent pod) reads `/workspace/.agent_id`
+(seeded at pod spawn; there is no legacy default — the pre-2026-07-26
+pods are retired). If genuinely ambiguous, ask the user. A new agent
+gets a new subdir + a row here.
 
 **Citing commits in records:** `git pull --rebase` rewrites your local
 SHAs, so a SHA written into a record before pushing is usually stale by
