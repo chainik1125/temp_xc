@@ -31,7 +31,9 @@ PANELS = {
            "freeze": "7ba2e10fd2c822d8dac820a307ec4f9f3c4f0005",
            "payloads": HERE / "results" / "panel_payloads"},
     "dq": {"ds": "dial_real_dqgap_llama31_8b_l14",
-           "freeze": "FILL-AT-PANEL2-FREEZE",
+           # filled by mac-b (merge support) via `git rev-parse cfa341c34`
+           # — the panel-2 freeze commit the containers check out
+           "freeze": "cfa341c34094f993904bae9b8e01a32d672a74d0",
            "payloads": HERE / "results" / "panel2_payloads"},
 }
 ARCHS = {"batchtopk_sae", "tsae", "txc_batchtopk_pre",
@@ -69,7 +71,7 @@ def main():
     DS, FREEZE = panel["ds"], panel["freeze"]
     assert "FILL" not in FREEZE, "panel 2 freeze SHA not filled yet"
     payloads = sorted(panel["payloads"].glob("payload_*.json"))
-    assert payloads, f"no payloads under {PAYLOADS}"
+    assert payloads, f"no payloads under {panel['payloads']}"
     existing_keys = set()
     with LB.open() as fh:
         for line in fh:

@@ -151,3 +151,22 @@ NOT-bounded = cross-arch margins at n = 3. If your panel's cross-arch
 margin IS bounded at n = 3, double-check seeds/pairing before
 celebrating; if your T-rise is NOT even directionally consistent,
 the panel likely reads NEGATIVE — write it that way.
+
+## mac-b (merge/receipts support) — day-2 dialogue panels (added at panel-2 freeze, BEFORE any payload landed)
+
+Panel 2 — dq/llama31 (`PANEL2_CARD.md`, freeze `cfa341c34`); mac-b runs
+these at repatriation (merge first: `merge_panel_payload dq`):
+
+```bash
+.venv/bin/python -m experiments.explorations.task_hunt.support_stats.stage2_variance \
+  --ds dial_real_dqgap_llama31_8b_l14 --probe v1 --post-k-rule times-T \
+  --crosscheck-json experiments/explorations/task_hunt/diafaces/results/stage2_dial_real_dqgap_llama31_8b_l14.json \
+  --out-prefix stage2_variance_diafaces_dq
+# paired v2: --probe v2 --out-prefix stage2_variance_diafaces_dq_v2
+```
+
+Panel 1 — tt/gpt2 (`PANEL_CARD.md`, freeze `7ba2e10fd`; mac-a's lane,
+recipe recorded here for symmetry): same commands with
+`--ds dial_real_ttrend_gpt2_l7`, crosscheck
+`.../diafaces/results/stage2_dial_real_ttrend_gpt2_l7.json`,
+`--out-prefix stage2_variance_diafaces_tt[_v2]`.
