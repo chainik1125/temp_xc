@@ -1,0 +1,150 @@
+[
+  {
+    "best_ordered": {
+      "balanced_accuracy": 0.4750364005208416,
+      "log_loss": 1.2392624616622925,
+      "window_tokens": 6
+    },
+    "files": {
+      "csv": "token_distance.csv",
+      "json": "token_distance.summary.json",
+      "markdown": "token_distance.md",
+      "pdf": "token_distance.pdf",
+      "png": "token_distance.png"
+    },
+    "paired_controls_at_best_window": {
+      "best_offset": {
+        "ci95": [
+          0.17613398925396864,
+          0.226184487391188
+        ],
+        "label": "Best single offset",
+        "mean_control_minus_ordered": 0.20122652085439072
+      },
+      "endpoint": {
+        "ci95": [
+          0.1774279526338425,
+          0.22550848532484252
+        ],
+        "label": "Last token",
+        "mean_control_minus_ordered": 0.20122652085439072
+      },
+      "invariant_mean_std_max": {
+        "ci95": [
+          0.2627221869599722,
+          0.314803460315751
+        ],
+        "label": "Order-invariant summary",
+        "mean_control_minus_ordered": 0.2890783094510666
+      },
+      "ordered_retrained_shuffle": {
+        "ci95": [
+          0.3859335555100143,
+          0.4468677606326584
+        ],
+        "label": "Shuffled history (refit)",
+        "mean_control_minus_ordered": 0.4159440787420033
+      },
+      "second_difference": {
+        "ci95": [
+          0.0834479650725825,
+          0.12502377790648075
+        ],
+        "label": "Second differences",
+        "mean_control_minus_ordered": 0.1046923338761646
+      }
+    },
+    "protocol_version": "klicke-deletion-raw-activation-gate-v1",
+    "rows": 6224,
+    "status": "complete",
+    "target": "capped_token_label",
+    "target_description": "capped model-token deletion distance (2, 3, 4, 5, 6+)",
+    "windows": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "writers": 2510
+  },
+  {
+    "best_ordered": {
+      "balanced_accuracy": 0.3520133754915604,
+      "log_loss": 1.1750110387802124,
+      "window_tokens": 4
+    },
+    "files": {
+      "csv": "lexical_destination.csv",
+      "json": "lexical_destination.summary.json",
+      "markdown": "lexical_destination.md",
+      "pdf": "lexical_destination.pdf",
+      "png": "lexical_destination.png"
+    },
+    "paired_controls_at_best_window": {
+      "best_offset": {
+        "ci95": [
+          -0.002188806745751106,
+          0.027046941238037112
+        ],
+        "label": "Best single offset",
+        "mean_control_minus_ordered": 0.01281089168832154
+      },
+      "endpoint": {
+        "ci95": [
+          0.03558886150666133,
+          0.06916768174784206
+        ],
+        "label": "Last token",
+        "mean_control_minus_ordered": 0.05312745693687371
+      },
+      "invariant_mean_std_max": {
+        "ci95": [
+          0.015434284207702556,
+          0.04647332428371073
+        ],
+        "label": "Order-invariant summary",
+        "mean_control_minus_ordered": 0.03084667391593979
+      },
+      "ordered_retrained_shuffle": {
+        "ci95": [
+          0.05834834410315723,
+          0.09221839120610388
+        ],
+        "label": "Shuffled history (refit)",
+        "mean_control_minus_ordered": 0.07481690060481358
+      },
+      "second_difference": {
+        "ci95": [
+          0.003670645994378905,
+          0.023273191059871377
+        ],
+        "label": "Second differences",
+        "mean_control_minus_ordered": 0.013207568662158544
+      }
+    },
+    "protocol_version": "klicke-deletion-raw-activation-gate-v1",
+    "rows": 6224,
+    "status": "complete",
+    "target": "lexical_label",
+    "target_description": "deleted-word count (2, 3, 4, 5+)",
+    "windows": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "writers": 2510
+  }
+]
