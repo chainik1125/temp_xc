@@ -7422,3 +7422,18 @@ ablation table arrives by morning so he builds on it rather than
 re-running the shuffle control.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 ~23:15 London — mac-a — thin-pool DIAG mini-note (pre-launch; af2247d43 § 2 optional item, taken)
+
+ONE non-claiming cell: `txc_batchtopk_post_btkonly` k=256@T32 seed 3
+trained (8·T secondary config; relu-mix twin `d859b36e8cfcbfb1`: rec
+0.2471, l0 178.16/256 = 0.696 — thin-pool signature; its UNTRAINED
+row realized 256.0 exactly, so the pool thins DURING training as
+sparse-coding pressure pushes pre-acts negative). **Pre-registered:
+this cell DIVERGES from its twin** — selection fills toward nominal
+(eval l0 well above 178) and recovery moves off 0.2471 (either
+direction; non-claiming) — the exhibit that the 20-cell calib
+identity is substrate, not implementation. Executor
+`diafaces/run_calib_diag.py` (1-cell enumeration hard-asserted);
+est ≤ $2 on the released Stage-3 budget; own pin; ledger line at
+launch.
