@@ -96,13 +96,18 @@ byte-identical across the rerun. At the claims' **T=8**, on
   ORACLE-position arm; absolute document position is not computable
   from window tokens and is not a visible cue a window reader could
   count. The operative window-computable floor V-win@T8 is +0.054 /
-  +0.097 — below the per-token dictionaries on BOTH models and 4–8×
-  below TXC-post. The dq-style objection (a reader counting visible
-  cues) is genuinely absent at T=8: the label depends on first
-  occurrence in the whole document prefix, a T=8 window sees 31.2% of
-  the kernel mass, and the measured repetition floor says the window
-  cannot fake it. **"Surface-quiet at window scale" may be quoted only
-  in this decomposed form, with the position caveat attached.**
+  +0.097. Quoting guard (ruling `46e0021a7`): on gpt2 the floor is
+  below the per-token dictionary with CI separation (+0.054
+  [−0.002, +0.104] vs +0.215); on the 8B the floor-vs-per-token gap is
+  NOT CI-separated (+0.097 [+0.048, +0.146] vs +0.129), so the
+  quotable 8B statement is floor-vs-best-dict: **TXC-post ≈ 4× the
+  window-computable floor (+0.393 vs +0.097)**. The dq-style objection
+  (a reader counting visible cues) is genuinely absent at T=8: the
+  label depends on first occurrence in the whole document prefix, a
+  T=8 window sees 31.2% of the kernel mass, and the measured
+  repetition floor says the window cannot fake it. **"Surface-quiet at
+  window scale" may be quoted only in this decomposed form, with the
+  position caveat attached.**
 
 Disclosures that must travel with the result:
 - **T=16 nuance (stated plainly):** window surface rises steeply at
@@ -179,11 +184,13 @@ side.
   +0.262 at 15/21.9/11.3σ, strict; from committed artifacts at
   `fedf75aa9`'s parents, checker-ready numbers in
   `focus_novresid.json`.
-- **R-X2 (surface-quiet, decomposed form ONLY per ruling):** T=8
-  window-computable floor V-win +0.054/+0.097 (< per-token dicts
-  +0.215/+0.129) vs TXC-post +0.463/+0.393; by card letter gpt2 band 3,
-  8B band 2 via the oracle-position arm; quotable with the position
-  caveat attached (`visible_cue_{gpt2,llama31}.json`).
+- **R-X2 (surface-quiet, decomposed form ONLY per rulings):** T=8
+  window-computable floor V-win +0.054/+0.097; gpt2: floor <
+  per-token dict (+0.215) with CI separation; 8B: floor-vs-best-dict
+  form, TXC-post ≈ 4× floor (+0.393 vs +0.097; floor-vs-per-token not
+  CI-separated there); by card letter gpt2 band 3, 8B band 2 via the
+  oracle-position arm; quotable with the position caveat attached
+  (`visible_cue_{gpt2,llama31}.json`).
 - **R-X3 (instrument):** nov_resid position residual +0.207/+0.172
   (V-pos arm, same files) — travels with every absolute skill quote
   from the thread; contradicts the thread's own position triage.
