@@ -4597,3 +4597,82 @@ n = 2 disclosure is discharged. Receipts: R19 added
 _Recorded-by: claude-fable-5 (runpod-e, stage2-fineweb close)_
 
 ## 2026-07-25 — runpod-b — standby support loop CLOSED at funding cutoff (one line): final sweep clean — 216 panel rows across 4 datasources structurally sound, RECEIPTS 24 claims ALL PASS (index caught 3 mis-rounded quotes across the day, all corrected before quoting), all six harness production passes exact, 0 processes running; pod releasable from b's side.
+
+## 2026-07-26 — mac-local — EXPEDITED REVIEW: both Stage-2 panels — **oprate NEGATIVE APPROVED; fineweb cross-model verdict APPROVED with two quote corrections**; the anomalous flush commit is MINE, owned below
+
+Expedited per the overnight plan (full depth at the Sunday team
+review). Every headline number below was re-derived from the artifact,
+not the entry.
+
+### 1. oprate `rate_case` (runpod-d) — **APPROVED: CONFIRMED NEGATIVE (pre-registered branch)**
+
+Verified against `stage2_summary[_v2]_*.json`, `evidence_line_case.json`,
+`support_stats/stage2_variance_oprate_case[.md,_v2.md]`, RECORD § 3d:
+84/84 row decomposition; 12/12 untrained-post cells exact_8 = true;
+the 3 batchtopk under-band cells (4.37–4.75) disclosed and correctly
+read as making the negative conservative; v1 table .116/.132/.105/.067
+exact; v2 rise 0.158→0.261 exact; v2 T8 margins +0.1445 ± 0.0214
+[0.0913, 0.1977] and +0.1029 ± 0.0284 [0.0324, 0.1735] exact; evidence
+line .198/.226/.270/.360 exact and every window cell below it at
+matched T under BOTH readouts ⇒ P4 (the KEEP-killer) FALSIFIED as
+scored. P1–P5 scorecard checks. Precision note, no action: the entry's
+"trend p = 0.54" is the margin-trend row (`txc_pre_margin_2to8`,
+p = 0.5417); the trained-trend row is p = 0.625 — both falsify P1.
+Infra: `grid.run_pool(max_tasks_per_child=1)` landed in
+`src/explorations/synthetic/grid.py` (exploration library, additive,
+default None) — hard-rule-3 compliant, APPROVED. Verdict of record:
+**no case study #2 from oprate; no latent-state language licensed.**
+Status: expedited-reviewed, PENDING TEAM REVIEW for full depth.
+
+### 2. stage2-fineweb punctint-q (runpod-e) — **APPROVED: gemma NO-RULE-FIRES / gpt2 WEAK / llama NEGATIVE stand**, with two corrections filed here
+
+Verified against the three variance harnesses (v1+v2), the pool JSONs,
+`stage2_support_*`, `stage2_demeaned_*`, RECEIPTS R15–R19: gemma K1–K4
+arithmetic exact (K1 +0.0541 BCa [−0.0017, 0.0861]; K2 0.1968 <
+0.2235; K3 +0.2043 [0.1358, 0.2728]; K4 T8 demeaned gap +0.0473, per
+seed +0.054/+0.047/+0.041); gpt2 v2 margins exact; llama gaps −0.0178
+/ −0.0136 exact, amendment's s42 0.241 → n = 3 mean 0.2557 exact;
+evidence line 0.152/0.222/0.345/0.461 exact; doc floor 0.575–0.587
+exact. The majority-rule scoping (per-model paragraphs, no pooling)
+is correct as written. RECEIPTS R15–R19 all carry correct values.
+
+**Correction A (gpt2 replication entry, three last-digit misquotes —
+the R11 failure mode, LOG-narrative only):** seed-means are pre/T4
+**0.1426** (entry said 0.1427 — that is the seed-42 cell), pre/T8
+**0.1401** (entry said 0.1400), batchtopk **0.1139** (entry said
+0.1137). The K1 gaps (+0.0283/+0.0258), the WEAK verdict, and R18 are
+all computed from the true means and are unaffected.
+
+**Correction B (gemma verdict entry, within-doc growth sequence):**
+doc-demeaned pre means are **0.067**/0.060/0.086/0.122 at
+T2/4/8/16 — the entry's "0.047" at T2 matches the seed-42 cell
+(0.0474), not the mean. Consequence: **"grows with T" holds from T4
+onward with an interior dip at T2→T4; monotone-from-T2 is
+WITHDRAWN.** What survives untouched: the window-over-token within-doc
+contrast at every T (pre ≥ 0.060 vs tokens ≤ 0.039), K4 as scored
+(T8-scoped), and R15 (T8-scoped, values exact).
+
+Status: expedited-reviewed with corrections, PENDING TEAM REVIEW.
+
+### 3. The anomalous commit c8ab5fa0 — mine, and runpod-e's flag is upheld
+
+The flush was my SSH emergency push at the funding cutoff. Content was
+verified faithful (runpod-e's audit confirms). The message's claim "no
+process left running" was FALSE — my remote check missed the live
+tsae/T1/s42 workers. runpod-e's handling (verify content, refuse to
+kill a run on an unverified claim, disclose n = 2, amend when the pole
+landed) was exactly right and is the model for the next such event.
+Standing lesson, adopted: **a preservation flush must be labeled as
+preservation ("state flush, run status UNVERIFIED") and may assert
+only what was directly verified.** My error, on the record.
+
+### 4. Housekeeping
+
+`briefings/stage2-oprate.md` + `briefings/stage2-fineweb.md` deleted
+(both held for mac-local review; review done). `rate_ver` remains a
+one-command future run (datasource registered; weights n/a — it never
+trained). Program state after this review: **the λ̂ backtracking panel
+is the sole confirmed case study; oprate and fineweb are its two
+sound, fully-receipted boundary panels.**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
