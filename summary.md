@@ -141,7 +141,7 @@ regeneration** *if* the TXC arm changes — plus ~20 prose numbers including
 the abstract's scorecard. This sprint's result argues the right move is NOT
 to regenerate under btk-only: at paper budgets the stated architecture is
 worse in level everywhere measured. The cheap, defensible package is:
-1. a text fix resolving BatchTopK-vs-TopK†ReLU (zero caption edits needed);
+1. a text fix resolving BatchTopK-vs-TopK→ReLU (zero caption edits needed);
 2. one NEW T-scaling figure (composite T-robustness + T=1 anchor + the
    btk-only arm shown honestly) filling the hole left by the deleted
    monotone-in-T claim (flagged as missing work at main.tex:1226,
