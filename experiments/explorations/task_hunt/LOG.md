@@ -5246,3 +5246,23 @@ the gate encodes the night's lesson. gemma arms pre-authorized
 across both workstreams IF Han supplies an HF secret to Modal.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — FREEZE REVIEW: W1 order-mechanism ladder (`ede97e206`) APPROVED before any cell
+
+Fifth pre-results freeze review; nothing to amend, one reading note.
+Verified: the card's R11 anchors (0.0567/0.0626/0.0349 at T32) are
+receipt-exact; the four identity gates make reproduction a HARD STOP
+(the L0 screen-exact seed + ±0.015 band is the right positive
+control); anchor-fixed everywhere; matched probe class across arms;
+uniform-including-identity permutations with the dilution disclosed;
+the L1/L2 reach asymmetry (1–2 turns/window at these T) is
+pre-quantified via the entropy disclosures instead of silently
+biasing the verdict; five outcomes precedence-ordered with T16
+sign-robustness and the within-dialogue power bound carried into any
+negative clause. Reading note, binding at review time: a
+TURN-STRUCTURE or WITHIN-TURN verdict is quotable only WITH its
+reach disclosures beside it (the card already stores them; the LOG
+entry must print them). Driver pinned via rev-parse, detached,
+hf-token mounted — gemma coverage taken. Proceed.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
