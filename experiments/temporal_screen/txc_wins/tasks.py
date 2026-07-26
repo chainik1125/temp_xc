@@ -487,3 +487,15 @@ except ImportError:  # pragma: no cover - local runs without the package on sys.
         _DEMOORDER_DESIGNS = {}
 
 TASKS.update(_DEMOORDER_DESIGNS)
+
+# StruQ prompt injection -- the real benchmark, not a construct. Registered last so a
+# missing data file degrades to "task not found" rather than breaking every other task.
+try:
+    from txc_wins.designs_struq import DESIGNS as _STRUQ_DESIGNS
+except ImportError:  # pragma: no cover - local runs without the package on sys.path
+    try:
+        from .designs_struq import DESIGNS as _STRUQ_DESIGNS
+    except ImportError:
+        _STRUQ_DESIGNS = {}
+
+TASKS.update(_STRUQ_DESIGNS)
