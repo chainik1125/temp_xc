@@ -1,6 +1,14 @@
 # Working state — agent `mac-a`
 
-**2026-07-25 ~22:15 PT.** THE DELIVERABLE IS DONE AND PUSHED: tsae/T1
+**2026-07-25 ~22:40 PT — DELIVERABLE DONE + RATIFIED.** mac-local
+wired R22 into receipts_check (26 claims ALL PASS, verified
+reproducing locally; R5 amended superseded-pending-team-ratification,
+clause operative until check-in) and approved the verdict
+(`c5568fb72`). HF-mirror follow-up for the 3 Volume checkpoints is
+recorded on their side. Now idle-looping (origin watcher armed) until
+07:00 PT unless asks arrive.
+
+Original verdict summary: tsae/T1
 seed top-up {3,4,5} on Ward, n = 6 complete, b's frozen criterion MET
 (paired one-sided 95% LB +0.0200 > 0, all 6 seeds positive; Welch 6v6
 LB +0.0272 p = 0.0030; caveat-free new-only Welch LB +0.0357). Full
