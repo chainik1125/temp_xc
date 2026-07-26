@@ -128,13 +128,18 @@ def aggregate(rows: list[dict]):
     # pre-convention txc_base_btk at the same cell: gauc/eauc are identical
     # (verified max |Δ| 0.004 over 108 matched cells) but nmse/l0 follow
     # the eval threshold convention, which the canonical rename changed.
+    def _pref(r: dict) -> tuple:
+        # Prefer probe rows (metric superset from the same training path),
+        # then canonical btkonly over the pre-convention name.
+        return ("lp_global_r2" in (r.get("metrics") or {}),
+                r["arch"] != "txc_base_btk")
+
     best: dict = {}
     for r in rows:
         cell = (r["datasource"], ARM_OF[r["arch"]], cell_k(r), cell_T(r),
                 cell_dsae(r), r["seed"])
         cur = best.get(cell)
-        if cur is None or (cur["arch"] == "txc_base_btk"
-                           and r["arch"] == "txc_base_btkonly"):
+        if cur is None or _pref(r) > _pref(cur):
             best[cell] = r
     acc = defaultdict(lambda: defaultdict(list))
     for (ds, arm, k, t, dsae, _seed), r in best.items():
@@ -314,6 +319,60 @@ def main() -> None:
                 s_w = slope_d_dlogT(pooled)
                 if s_w is not None:
                     summary["slopes"][f"{bench}|{metric}|{arch}|d50"] = s_w
+
+    # ── Fig 3 (optional): denoising latent probe — the paper's § 4
+    # headline metric. Rows carry eval_cfg.denoising_probe (separate
+    # eval_keys); lp_* metrics live only on those rows.
+    probe = {k: md for k, md in agg.items() if "lp_global_r2" in md}
+    if probe:
+        fig, axes = plt.subplots(1, 2, figsize=(12.8, 4.2), squeeze=False)
+        for mcol, metric in enumerate(["lp_global_r2", "lp_ratio"]):
+            ax = axes[0][mcol]
+            for arch in ARM_LABEL:
+                for k_pos in K_STYLE:
+                    pts = sorted(
+                        (t, md[metric][0], md[metric][1], is_clipped(kk, t))
+                        for (b, a, kk, t), md in probe.items()
+                        if a == arch and kk == k_pos and metric in md)
+                    if not pts:
+                        continue
+                    ax.errorbar(
+                        [p[0] for p in pts], [p[1] for p in pts],
+                        yerr=[p[2] for p in pts], color=ARM_COLOR[arch],
+                        linestyle=K_STYLE[k_pos], marker="o",
+                        markersize=3.5, linewidth=1.6, capsize=2,
+                        label=(ARM_LABEL[arch] if k_pos == 1 else None))
+                    for t, m, _, c in pts:
+                        if c:
+                            ax.plot([t], [m], marker="x", color="#888888",
+                                    markersize=8, zorder=5)
+            if metric == "lp_ratio":
+                ax.axhline(1.0, color="#888888", linestyle=":", linewidth=1)
+            ax.set_xscale("log", base=2)
+            ax.set_xticks([1, 2, 4, 5, 8, 10])
+            ax.set_xticklabels(["1", "2", "4", "5", "8", "10"])
+            ax.set_xlabel("window size T")
+            ax.set_ylabel("hidden-state probe R² (global)"
+                          if metric == "lp_global_r2"
+                          else "global / local probe ratio")
+            ax.grid(alpha=0.2)
+            ax.legend(fontsize=8, loc="best")
+            for arch in ARM_LABEL:
+                pooled = [(t, md[metric][0])
+                          for (b, a, kk, t), md in probe.items()
+                          if a == arch and metric in md
+                          and not is_clipped(kk, t)]
+                s_p = slope_d_dlogT(pooled)
+                if s_p is not None:
+                    summary["slopes"][f"denoising_probe|{metric}|{arch}"] = s_p
+        fig.suptitle(
+            "Denoising latent probe (paper § 4 headline metric) vs window "
+            "size T — k_pos 1 (solid) / 2 (dashed)", fontsize=11)
+        fig.tight_layout(rect=[0, 0, 1, 0.93])
+        for ext in ("png", "pdf"):
+            fig.savefig(args.out_dir / f"btk_rerun_denoising_probe.{ext}",
+                        dpi=150, bbox_inches="tight")
+        plt.close(fig)
 
     for key, md in sorted(agg.items(), key=str):
         b, a, k, t = key
