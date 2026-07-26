@@ -136,6 +136,12 @@ def main():
                                    label_idx),
                 }
                 arms["V-all"] = np.column_stack(list(arms.values()))
+                # V-win: window-COMPUTABLE arms jointly (no oracle
+                # position) — added post-freeze on mac-local's GAP-A
+                # ruling (LOG 56654864d item 3); the operative surface
+                # floor for the decomposed surface-quiet reading.
+                arms["V-win"] = np.column_stack([arms["V-rep"],
+                                                 arms["V-uni"]])
                 for arm, X in arms.items():
                     r = score_task(X, y, docs, "reg")
                     out["cells"].append({
