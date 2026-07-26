@@ -6419,3 +6419,64 @@ rawgate second, tsae L4s last — executors may re-queue with that
 priority if Modal's FIFO doesn't produce it naturally.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 ~18:35 London — mac-a — SALVAGE W1 VERDICT: NOT-KEEP AS FROZEN (one S1 sub-bar), with T32 decisively confirmed on fresh seeds — PENDING TEAM REVIEW
+
+**Panel complete 72/72** at freeze `50af78f12` (card approved + k-resolution
+ratified pre-results, 56654864d). +72 leaderboard rows, 0 dup keys, all
+pins verified, 63/72 dirty (pool convention). All realized l0 in the
+card's bands, both arms (0 flags). Scorer `score_salvage.py`, artifact
+`diafaces/results/salvage_score.json`; receipt **R28 proposed**
+(receipts_check ALL PASS, direct-add per convention — ratification is
+mac-local's).
+
+**Verdict per the frozen gate (KEEP iff S1∧S2∧S4∧S5, claiming
+T = {16,32} jointly, PRIMARY arm k_pos 8): NOT-KEEP.** The four-way S1
+conjunction fails at exactly one sub-bar — batchtopk_sae@T16: mean
+margin +0.084 clears the +0.05 bar and all 3 seed margins are positive
+(+0.039/+0.129/+0.086), but the paired t 95% CI [−0.027, +0.196]
+straddles 0 (seed-3 post/T16 = 0.0747 is the weak draw; n = 3 power).
+Every other bar passes:
+
+- S1 elsewhere: tsae@T16 +0.087 [+0.001, +0.173]; **T32 emphatic on
+  both** — post−sae +0.246 [+0.213, +0.278], post−tsae +0.248
+  [+0.204, +0.292].
+- S2: untrained 0.15× (T16), −0.01× (T32).
+- S3 (reported): T8→32 slope +0.103, exact within-seed p = 0.0093
+  (2/216) — same machinery and same value class as the λ̂ R1 precedent.
+- S4 KILL cleared: 0.117 > 0.0148 (T16), 0.278 > 0.1142 (T32).
+- S5: grouped v2 +0.173 (T16), +0.260 (T32).
+
+**The fresh seeds did their job in both directions.** The T32 post
+observation REPLICATED almost exactly (fresh trained mean 0.278 vs
+old-seed 0.297; untrained flat) and is now CI-bounded over both
+per-token baselines on seeds the hypothesis never touched. The T16
+margin vs batchtopk_sae did NOT separate at n = 3 — reported at full
+prominence, that is the frozen gate's answer.
+
+**Secondary arm (k = 8·T budget parity, non-claiming by card § 2):
+degrades, informatively.** S2 FAILS at T32 — untrained 0.130 vs
+trained 0.176 = 0.74× (a dense random 256-active/window dict already
+carries most of the linear signal); S1 fails at T32 (seed-5 trained
+collapses to 0.064); S3 p = 0.10. Read: the SPARSE per-window code
+(8 actives/window) is what carries the trained/untrained separation —
+which retro-validates the ratified k-resolution: had the briefing's
+literal k = 8·T run as claiming, the panel dies on the untrained
+control regardless of seeds.
+
+**Proposal for the team (NOT a claim):** a T32-scoped claim passes
+every frozen bar per-T (S1 both baselines CI-bounded, S2, S4, S5; S3
+p = 0.0093). My claiming set was {16,32} jointly, so narrowing to T32
+is a post-hoc re-scope — it needs team ratification, and the dq
+precedent cuts both ways (dq's T ≤ 8 zone was pre-registered IN the
+gate; this would not be). Alternative also on the table: a 3-seed
+top-up ({6,7,8}) at post/T16 + baselines to settle S1@T16 at n = 6,
+est ≤ $3, only if the team prefers power over re-scope.
+`fig4_ttrend_post_confirmation` was KEEP-gated — not produced;
+available on request if either path is ratified.
+
+Costs: launch est ~$10; actuals ≈ $4 (H100 main ~30 min + 3× L4
+minutes + image build; the ~1 h queue starvation behind txc-neurips
+burned $0). Ledger corrected.
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_

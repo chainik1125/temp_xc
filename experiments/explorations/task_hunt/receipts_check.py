@@ -774,6 +774,58 @@ def build_receipts():
              "v2_t8": dqv2["paired"]["txc_pre_minus_tsae"]["by_T"]["T8"]
                          ["mean"],
              "rows": dqv["source"]["leaderboard_rows"]}))
+
+    # ---- R28: salvage W1 fresh-seed post panel (mac-a) — partly a
+    # negative-space receipt: the frozen verdict is NOT-KEEP and the
+    # T32-only re-scope is PROPOSED, not claimed. ----
+    sal = _j("diafaces/results/salvage_score.json")
+    salc = _j("diafaces/results/salvage_stage2_dial_real_ttrend_gpt2_l7.json")
+    _p = sal["primary"]
+
+    R.append(dict(
+        id="R28",
+        artifact="diafaces/results/salvage_score.json",
+        key="primary S1 (paired t CI per baseline×T); S2 ratios; S3 exact "
+            "trend; S4 vs evidence line; S5 grouped v2; secondary S2 "
+            "(72-cell fresh-seed panel, SALVAGE_CARD.md, scorer "
+            "score_salvage.py)",
+        claim="Salvage W1 — ttrend TXC-post FRESH-SEED {3,4,5} panel "
+              "(dial_real_ttrend_gpt2_l7, 72/72 at freeze 50af78f12): "
+              "VERDICT NOT-KEEP AS FROZEN — the S1 four-way conjunction "
+              "fails at exactly batchtopk_sae@T16 (mean +0.084 clears the "
+              "+0.05 bar but the paired t CI [−0.027, +0.196] straddles 0; "
+              "all 3 seed margins positive; n = 3 power). What fresh seeds "
+              "DID confirm: T32 margins CI-bounded over BOTH baselines "
+              "(post−sae +0.246 [+0.213, +0.278]; post−tsae +0.248 "
+              "[+0.204, +0.292]); untrained 0.15× (T16) / −0.01× (T32); "
+              "T8→32 scaling exact p = 0.0093 (216 perms); evidence line "
+              "beaten at T32 (0.278 vs 0.114 floor); grouped v2 +0.260. "
+              "The budget-parity secondary arm (k = 8·T, non-claiming) "
+              "FAILS the untrained control at T32 (0.74×) — the sparse "
+              "per-window code carries the trained/untrained separation, "
+              "retro-validating the ratified k-resolution (56654864d). "
+              "T32-only re-scope PROPOSED, not claimed (post-hoc "
+              "narrowing needs team ratification). PENDING TEAM REVIEW",
+        checks=[("s1_fail_mean", 0.0844, 3), ("s1_fail_lo", -0.0274, 3),
+                ("m32_sae", 0.2457, 3), ("m32_sae_lo", 0.2134, 3),
+                ("m32_tsae", 0.2481, 3), ("m32_tsae_lo", 0.2039, 3),
+                ("ratio16", 0.1456, 3), ("s3_p", 0.00926, 4),
+                ("t32_trained", 0.2778, 3), ("ev32", 0.1142, 4),
+                ("v2_32", 0.2598, 3), ("sec_ratio32", 0.74, 2),
+                ("cells", 72, 1)],
+        got={"s1_fail_mean": _p["S1"]["batchtopk_sae@T16"]["mean"],
+             "s1_fail_lo": _p["S1"]["batchtopk_sae@T16"]["ci95_t"][0],
+             "m32_sae": _p["S1"]["batchtopk_sae@T32"]["mean"],
+             "m32_sae_lo": _p["S1"]["batchtopk_sae@T32"]["ci95_t"][0],
+             "m32_tsae": _p["S1"]["tsae@T32"]["mean"],
+             "m32_tsae_lo": _p["S1"]["tsae@T32"]["ci95_t"][0],
+             "ratio16": _p["S2"]["T16"]["ratio"],
+             "s3_p": _p["S3"]["p_exact"],
+             "t32_trained": _p["S4"]["T32"]["trained"],
+             "ev32": _p["S4"]["T32"]["evidence_r"],
+             "v2_32": _p["S5"]["T32"]["v2_grouped"],
+             "sec_ratio32": sal["secondary"]["S2"]["T32"]["ratio"],
+             "cells": sum(1 for c in salc if c.get("ok"))}))
     return R
 
 
