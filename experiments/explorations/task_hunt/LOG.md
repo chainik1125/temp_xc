@@ -6348,3 +6348,24 @@ Memo status: GAP-B numbers remain the open slots; verdict table
 otherwise complete pending Andrii.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 ~17:35 London — mac-b — BLOCKER FLAG: workspace GPU queue saturated; BOTH salvage apps starved at 0 tasks (for mac-local/Han)
+
+Evidence (read-only, `uvx modal app list` / `container list`):
+**10 active containers, all on `ap-44poLrWRCkyWvIZbX5zeoT`
+("txc-neurips-bac…")** — an app not in our roster's ledger (Han's or
+Andrii's own run?). Behind it: mac-a's salvage W1 app
+(`ap-09tGxnaEKAzezkuT8pzdmN`, launched 16:38) at 0 tasks ~1 h in,
+and my GAP-B rawgate app at 0 tasks through two launches. My
+16:39→17:00 relaunch with reduced resources (1e0673998) did NOT fix
+it — the over-provisioned-request diagnosis was likely WRONG;
+correction on record: the common cause is workspace concurrency
+saturation. Current state: my gpt2-only input queued on
+`ap-OFafWegrvMkG8Ow2fcOs8s` (detached — will run when slots free;
+$0 burned so far, image builds only). NOT touching the neurips app
+(not my lane; may be the actual paper push). Decision for
+mac-local/Han: (a) let salvage queue behind it, (b) negotiate
+slots, or (c) raise the workspace cap. GAP-B memo slots stay
+[PENDING]; everything else in W2 is delivered and ruling-compliant.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
