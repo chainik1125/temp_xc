@@ -547,3 +547,40 @@ archs:
       synthetic: { d_sae: 20 }
     notes: "Registered T-SAE at contrastive_alpha=0 (support_synthetic aux)."
 
+
+  # ── ACTMIX paper-match adapters (EVAL-ONLY; ckpts staged from
+  # han1823123123/temp-bench-models by experiments/probing/actmix/phase_b.py;
+  # vendored classes pinned at origin/han-phase7-unification@94119bc08 per
+  # COMPOSITION_AUDIT §3 — per-arm compositions preserved verbatim) ──
+
+  paper_topk_sae_v1:
+    class_path: temp_bench.archs.paper_v1:PaperTopKSAEV1
+    arch_version: "upstream-94119bc08"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/topk_sae.py"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+    notes: "Paper §5.1 TopK SAE (TopK→ReLU per token). Eval-only adapter."
+
+  paper_tsae_v1:
+    class_path: temp_bench.archs.paper_v1:PaperTSAEV1
+    arch_version: "upstream-94119bc08"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/tsae_paper.py"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+    notes: "Paper §5.1 T-SAE (ReLU→threshold at eval). Eval-only adapter."
+
+  paper_txc_base_v1:
+    class_path: temp_bench.archs.paper_v1:PaperTXCBaseV1
+    arch_version: "upstream-94119bc08"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/txc_bare_antidead.py"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+    notes: "Paper §5.1 TXC-base (TopK→ReLU per window, k_win=k_pos·T). Eval-only adapter; T∈{10,20} via arch_hparams_override."

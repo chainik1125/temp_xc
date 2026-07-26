@@ -7458,3 +7458,49 @@ paper arch's deep-selection mechanism, answered overnight by the
 pods on the paper tasks themselves.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 ~23:30 London — runpod-1 — Phase-A grid RUNNING + Phase-B staged, with a NEW A1-adjacent finding: the shipped "T10/T20" probing checkpoints are silent-T5 bug artifacts
+
+**Phase A (btk-only, CARD `experiments/probing/actmix/CARD.md`):**
+launched at PIN 9befb353f (two launcher defects caught within minutes
+and disclosed in CARD flag 10 — argparse double-flag dropped the
+pre-untrained twins; the pool-row dirty-stamp convention
+(TEMP_BENCH_ALLOW_DIRTY=1 post-PIN-assert, task_hunt precedent) was
+missing, so both chains refused at cell 2; fixed + relaunched,
+completed evals cache-hit). First untrained rows: sae/tsae ≈ 0.652 /
+0.659 mean AUC, shuffle-identity EXACT (G2), l0 21.1 (fallback path,
+disclosed). Smoke pre-freeze: all four `*_btkonly` archs, realized l0
+EXACTLY nominal (sae/tsae 20.0/token, post 20.0/window, pre@T3
+59.9≈20·3) — E2 holding.
+
+**Phase B (paper-match, UNLOCKED by mac-c part-2 + ruling af2247d43):**
+15 shipped cells staged from `temp-bench-models` with strict-load
+proofs + sha256 manifest
+(`experiments/probing/actmix/phase_b_manifest.json`); adapters =
+verbatim dev classes pinned at `han-phase7-unification@94119bc08`
+(registry `paper_{topk_sae,tsae,txc_base}_v1`, upstream-tagged,
+EVAL-ONLY). Dup (arch,seed) specs resolved to the 05-05 re-train
+family (tws 1/2; rationale + rejected twins in the manifest).
+
+**NEW FINDING (on-box weight inspection, escalating to mac-c +
+mac-local; PENDING TEAM REVIEW):** all six census "T10/T20" txc_base
+cells (`af4308a3…`, `a4c123a8…`, `27567c69…`, `4b27b1c7…`,
+`5d226376…`, `a5c6ffcf…`) carry **T=5-SHAPED weights** (W_enc
+(5,2304,18432)) while their config.json says T=10/20 — exactly the
+pre-05-06 silent-T5 bug documented in origin/final's c3 run.py
+(saved_ts 05-05 22:10 → 05-06 04:00 brackets the 05-06 fix note). The
+census has NO other 20K T10/T20 cells on the IT datasource ⇒ (a) an
+eval-only paper-match **T-sweep does not exist** — T5 is the only
+faithful shipped point; (b) the appendix's c3 T10/T20 numbers
+(0.8973/0.8999 vs T5 0.8952) could not have come from these
+checkpoints under a shape-checking eval — **testable hypothesis: the
+pre-fix eval also skipped the override, making the appendix "T-sweep"
+three T5-replica evals (slope = seed noise)**. Phase B stages these
+six AS T5 evals (`src_tag` cfgT10/cfgT20, `bug_artifact_t5` on-row):
+if their mean AUCs reproduce the appendix's "T10/T20" numbers, the
+hypothesis is confirmed — this bears directly on Dmitry's d(perf)/dT
+gate for § 5.1. Next: Phase-B smoke (paper's own topk_sae s42 k20 ≈
+0.8831 = the port-validation gate), then all 15 × k{5,20} co-resident
+on GPUs 0,1.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
