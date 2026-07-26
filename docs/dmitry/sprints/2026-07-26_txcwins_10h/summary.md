@@ -412,6 +412,14 @@ three the verification confirmed the property it tested for, and the property th
 different one.** A passing check reads as reassurance, which makes this failure mode harder to
 catch than an unchecked assumption.
 
+**A third class, mechanical and separate from both**: **derived counts go stale whenever runs land
+and nothing recomputes them.** The result-file count was wrong three times in one night (77 → 81 →
+114), the detector's cell counts drifted as new runs arrived, and a "wins 8 of 9" tally was correct
+when written and 7 of 9 by the time it shipped. None of these is a reasoning error and none would
+be caught by checking the reasoning. **A single recompute-derived-counts step before shipping
+catches all of them**, and its absence accounted for three of the seven issues in the final review
+pass.
+
 **And the sharpest evidence that these are hazards rather than lapses: three people on this sprint
 independently made the *same* one.** Reading a steering arm at the signed positive dose rather than
 at matched magnitude with the sign free scores any arm whose correct direction is negative as a
