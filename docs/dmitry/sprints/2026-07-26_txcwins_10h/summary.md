@@ -78,6 +78,15 @@ apart, and the data locate no boundary between them.
 0.036 for the order task and 0.039 for instruction position — opposite outcomes, near-identical
 values — while the gradient separates them 6×. Four independent demonstrations of this divergence.
 
+**`c` has an exact operational meaning, not merely a suggestive one.** For a broadcast write
+`W = (1_T ⊗ v)/‖1_T ⊗ v‖`, maximising the first-order effect `⟨W, Ḡ⟩/‖Ḡ‖_F` over **all** `v` gives
+exactly `√c`, achieved at `v ∝ mean_t Ḡ` (verified numerically to four decimals). So `√c` is not a
+bound on what a per-token dictionary can reach — it is **the reach of the best conceivable
+broadcast direction**, whether or not any dictionary contains it. On held-out instruction position
+`c` = 0.036, so no constant write of any kind exceeds **19%** of the optimal write's first-order
+effect. That is what makes the arm escaping this bound — one direction on a *schedule* — the
+honest per-token comparator.
+
 `c` is a **ranking heuristic with a known inversion**, not a rule. It does not establish a
 quantitative law: the constant arms are 72–80% *even* in α, so they are largely second-order
 artefact, which makes `sae_broadcast` a **mis-specified** baseline rather than a weak one.
