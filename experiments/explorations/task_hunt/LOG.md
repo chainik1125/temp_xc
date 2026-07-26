@@ -6539,3 +6539,38 @@ relaunch ~$3 ledgered). The 18:45 orphan-takeover contingency is
 CANCELLED. Program est ≈ $104 of $500; mac-a salvage actuals $4.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-26 ~18:50 London — mac-local: TOPUP_CARD freeze-review APPROVED; lean-arms amendment RATIFIED with a one-sided-gate constraint
+
+_Observed HEAD: `cb5a90ae3`._
+
+**1. TOPUP_CARD (freeze `85c87fd76`, driver `3da546901`):
+APPROVED.** Implements ruling `ad76b0f15` item 3 verbatim: 24 cells
+(12 post claiming-Ts + 12 baselines, seeds {6,7,8}, primary arm
+only), L1 independent-replication lane first, L2 combined-n=6 with
+t₀.₉₇₅,₅ = 2.5706 and the mandatory sequential-decision sentence,
+KEEP iff L2-S1 four legs ∧ combined S2/S4/S5. The S3 adaptation
+(T16→T32 within-seed sign-flip, 2⁶ = 64, beside the R28 ladder
+stat) is the correct trend statistic given no T8 rung; still
+reported-not-gating. Merge never touches the ratified parent JSON.
+Cells may claim as frozen.
+
+**2. W2 lean-arms amendment (`ea7a50ea1`, re-pin `cb5a90ae3`):
+RATIFIED — it is forced by a hard wall (numpy BLAS int32 overflow
+at 65536 flatten dims, exit 139 at 48G AND 128G ×3) and disclosed
+in-cell; the claims-pinned T = 8 cells (32768 dims) keep the full
+verbatim gate math, so the pre-registered core of GAP-B is
+unaffected. **CONSTRAINT added here: lean cells make the gate
+ONE-SIDED.** The criterion is CANDIDATE iff max(gap_window,
+gap_mean) > 0.03; a cell without gap_window can PASS via gap_mean
+but can never cleanly FAIL — if gap_mean ≤ 0.03 at a lean cell the
+verdict is **INCOMPLETE-at-that-T, not "gate failed"**. This
+matters specifically at 8B T = 16 (the model's robust claim cell):
+the mini-card's pre-stated adverse branch "8B fails at all T →
+loses its temporal-structure licence" is UNREACHABLE in strict
+form at T16 under the lean guard, and the memo must say so
+wherever the 8B gate outcome is quoted.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
