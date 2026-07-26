@@ -1333,3 +1333,52 @@ reference implementation is available.
 Sparsity for the ReLU+L1 arm is set by `l1_coef` rather than k, swept over
 {1e-1, 3e-2, 1e-2, 3e-3}. That it can be compared with the TopK arms at all is the payoff
 of the realised-coefficient axis.
+
+## First-pass benchmark: SAE vs plain TXC, at matched realised coefficients per segment
+
+`bench4_modal.py`, run-length corpus, T=12, d_sae=4096, stride-1 windows, crosscoder on
+`batchtopk` with no auxiliary penalty (not TXC-pro).
+
+| coeff/segment | SAE FVU | TXC FVU | ratio | SAE winAUC | TXC winAUC |
+|---|---|---|---|---|---|
+| 1 | 0.526 | 0.632 | 1.2× | 0.717 | 0.718 |
+| 2 | 0.176 | 0.313 | 1.8× | 0.728 | 0.721 |
+| 4 | 0.128 | 0.239 | 1.9× | 0.734 | 0.722 |
+| 8 | 0.099 | 0.206 | 2.1× | 0.731 | 0.723 |
+| 16 | 0.075 | 0.203 | 2.7× | 0.785 | 0.727 |
+
+**The plain crosscoder does not beat a TopK SAE here.** It reconstructs 1.2-2.7× worse at
+every matched budget, and it reads the window-level factor no better — 0.72-0.73 against
+the SAE's 0.72-0.79, with the SAE ahead at the widest budget. Segment-AUC is 0.500 for the
+crosscoder by construction, since a window code has no per-segment answer and broadcasting
+it is the honest representation of that.
+
+**The i.i.d. control passes.** Window-AUC reads exactly 0.500 for every arm and every budget
+on the i.i.d. corpus, so the non-chance window-AUC on the structured corpus is measuring
+structure rather than measuring the probe.
+
+**Worth noting how much the methodology fixes closed the gap.** The same comparison earlier
+in this sprint, on nominal-k matching with `topk_relu` and disjoint windows, had the SAE
+ahead by 9-10× in FVU. With the realised-coefficient axis, `batchtopk`, and stride-1
+windows it is 1.2-2.7×. Most of the crosscoder's apparent deficit was measurement.
+
+### The tSAE arm is not yet usable, and the reason is a transferable hyperparameter failure
+
+Run as this repo defines `tsae_paper` — attention TemporalSAE, ReLU + L1, n_heads=8,
+bottleneck_factor=64, one attention layer, tied weights — with the loss normalised exactly
+as `experiments/ward_backtracking_txc/architectures.py:185-188` does it (sum over dims,
+mean over batch and time, for both the reconstruction and the L1 term).
+
+At the documented `l1_coef=1e-3` the code is **dense**: 2989 of 4096 latents active per
+segment, alive fraction 0.999. Sweeping the coefficient over two orders of magnitude
+(1e-4 → 1e-2) moved realised L0 by 0.3%, from 2986 to 2994. The L1 term is inert at this
+data scale, so FVU 0.030 and segment-AUC 0.97 are the numbers of an essentially dense
+autoencoder and are not comparable to a 1-16 coefficient TopK arm.
+
+This is not a bug in the port — the normalisation matches the reference line for line. It is
+that a sparsity coefficient is only meaningful relative to the scale of the activations it
+is applied to, and these are standardised differently from whatever the value was tuned on.
+Rerunning with `l1_coef` swept over {0.03, 0.1, 0.3, 1, 3} to find the range where it binds.
+The lesson generalises past this arm: an L1 arm cannot be dropped into a new activation
+distribution at its published coefficient, and the realised-L0 check that this sprint
+introduced for the crosscoder catches it immediately.
