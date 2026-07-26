@@ -233,6 +233,13 @@ class ProbingEval(Evaluator):
         if shuffle_mode not in ("none", "within_window"):
             raise ValueError(f"Unknown shuffle mode {shuffle_mode!r}")
 
+        # Defensive device pinning: the runner's train path returns a
+        # CUDA-resident model, but its checkpoint-cache path loads on
+        # CPU (contract gap flagged in the ACTMIX LOG — core fix is not
+        # this plugin's to make). A CPU-resident 38-task encode is a
+        # silent multi-hour stall, so pin here.
+        if torch.cuda.is_available() and next(model.parameters()).device.type == "cpu":
+            model = model.cuda()
         device = next(model.parameters()).device
         if spec.smoke:
             task_names = ["smoke_planted"]
