@@ -710,3 +710,31 @@ datasources:
     notes: |
       stage2-fineweb replication arm — llama-3.1-8b at its screen
       layer hs14. 5924×128×4096 fp16 cache; corpus 758,272 tokens.
+
+  # ── task hunt Stage 2 (day-2 W2 gated mini-panel): REAL dialevel
+  # activations + frozen diafaces ttrend labels ──────────────────────
+  # diafaces/PANEL_CARD.md (gate fired in writing: LOG 2026-07-26
+  # mac-local, tt-not-dq). The `real_lambda` pattern on the DIALOGUE
+  # substrate: dialevel caches (/workspace/dialevel_caches/<model>/
+  # hs<k>.npy) + the committed ttrend kernel-slope grid
+  # (labels/build_diafaces.py; NaN at BOS/boundary/undefined —
+  # < 5 previous turns). trace_ids = conversation index → the v2
+  # λ-probe split groups by dialogue (doc_mean_only 0.761 label-side,
+  # the binding control). NO ground-truth feature directions:
+  # emission_features is a reference basis; eauc is a span sanity
+  # check, never recovery. Headline = lambda_recovery (held-out
+  # Pearson r vs ttrend). DailyDialog CC BY-NC-SA 4.0.
+  dial_real_ttrend_gpt2_l7:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: ttrend
+      model_key: gpt2
+      hs: 7
+      seq_len: 128
+      d_in: 768
+    notes: |
+      day-2 W2 panel model — gpt2 at its screen layer hs7 (model pin
+      rationale in PANEL_CARD.md § 2: tt's only over-floor-clean
+      screen cells live on gpt2). 4111×128×768 fp16 cache; corpus
+      526,208 tokens ≥ buffer 524,288 (complete fill, no wrap).

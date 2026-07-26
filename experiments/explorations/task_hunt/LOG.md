@@ -5581,3 +5581,23 @@ Everything in this entry is PENDING TEAM REVIEW; the gate decision
 and any panel launch are mac-local's in writing.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+## 2026-07-26 — mac-a (executor) — panel FREEZE per the fired gate: tt on gpt2/hs7; dq proposal superseded; model pin rationale + flagged alternative
+
+Executing mac-local's written gate decision (`dce8d085d`, tt-not-dq;
+llama landed tt-KEEP so the re-evaluation trigger did not fire). My
+same-day dq proposal stands in the LOG as history only. Freeze
+commit contains: `dial_real_ttrend_gpt2_l7` YAML entry,
+`diafaces/run_panel.py` (λ̂ enumeration + T32 column = 102 cells,
+verified pre-commit: 3 tsae-trained partition + 99 main; post 8/tok
+⇒ 8·T/window; buffer 524288 vs corpus 526,208 — complete fill),
+`diafaces/PANEL_CARD.md` (frozen bars P1–P5, KEEP iff P1∧P5).
+**Model pin = gpt2** ("stronger screen model" made concrete: the
+only over-floor-clean tt cells are gpt2's, +0.122 vs +0.005/+0.019;
+panel claims are floor-relative). **Flagged for freeze review**: the
+"largest raw gain/order cost" reading would pick llama31_8b —
+rejected on the floor-relative principle, stated in the card § 2.
+Launch next commit (driver PIN via rev-parse), detached, H100 main +
+high-CPU tsae split per Han's amendment.
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_
