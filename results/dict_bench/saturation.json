@@ -1,0 +1,69 @@
+{
+  "rows": [
+    {
+      "d_sae": 128,
+      "T": 2,
+      "ratio": 64.0,
+      "coeff_per_segment": 4.286573886871338,
+      "fvu": 0.6815729141235352,
+      "recovery": 0.42222390034132534,
+      "shift_dup": 0.0
+    },
+    {
+      "d_sae": 128,
+      "T": 16,
+      "ratio": 8.0,
+      "coeff_per_segment": 4.323148250579834,
+      "fvu": 0.9869329333305359,
+      "recovery": 0.21781503326363033,
+      "shift_dup": 0.0
+    },
+    {
+      "d_sae": 512,
+      "T": 2,
+      "ratio": 256.0,
+      "coeff_per_segment": 3.034722089767456,
+      "fvu": 0.7418069243431091,
+      "recovery": 0.43880225635237163,
+      "shift_dup": 0.0
+    },
+    {
+      "d_sae": 512,
+      "T": 16,
+      "ratio": 32.0,
+      "coeff_per_segment": 4.474536895751953,
+      "fvu": 1.1417007446289062,
+      "recovery": 0.21982674962944454,
+      "shift_dup": 0.0
+    }
+  ],
+  "d_saes": [
+    128,
+    512
+  ],
+  "Ts": [
+    2,
+    16
+  ],
+  "extents": [
+    1,
+    2,
+    4
+  ],
+  "config": {
+    "d": 96,
+    "d_saes": "128,512",
+    "Ts": "2,16",
+    "n_per_extent": 12,
+    "extents": "1,2,4",
+    "n_seq": 150,
+    "seq_len": 96,
+    "fire_p": 0.02,
+    "noise": 0.05,
+    "k_per": 4,
+    "steps": 300,
+    "batch": 256,
+    "lr": 0.0003,
+    "activation": "batchtopk"
+  }
+}

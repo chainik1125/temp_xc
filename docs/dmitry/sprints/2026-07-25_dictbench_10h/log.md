@@ -1093,3 +1093,62 @@ A second flaky test surfaced while checking this and is the same phenomenon in m
 `TestTopKSAE::test_create_and_forward` asserts realised L0 == k on untrained weights and
 unseeded input, which fails about 1 run in 8 with L0 = 3.875 — the ReLU discarding a TopK
 pick. Seeded.
+
+## The clock breaks "set T to the extent", and repairs the desideratum
+
+The rule I proposed from `recovery_local.py` — set T to the temporal extent of the target
+feature — is undefined for a periodic feature. A clock never terminates, so ‖p‖ diverges and
+the ceiling formula has nothing to say. `clock_local.py` runs one clock per sequence, all
+clocks sharing a single 2-D plane and differing only in angular velocity, so a single
+segment is a point on the same circle whatever the period and the period is recoverable
+only from rotation across segments.
+
+| T | atom recovery | period-ID accuracy (chance 0.25) |
+|---|---|---|
+| 1 | **1.000** | **0.252** |
+| 2 | 0.832 | 0.957 |
+| 4 | 0.866 | **1.000** |
+| 8 | 0.956 | 1.000 |
+| 16 | 0.829 | 1.000 |
+| 24 | 0.751 | 0.983 |
+
+**W1 confirmed, and it is the practical warning.** At T=1 the dictionary matches the
+waveform *perfectly* — recovery 1.000 — while carrying no information whatever about which
+clock is running. A recovery or reconstruction metric would have certified T=1 as
+sufficient. The two columns disagree completely at the one place where the answer matters.
+
+**W3 refuted, decisively.** I predicted pairs would separate near the Fourier resolution
+requirement `T ≳ 1/|1/P − 1/P′|`. Every pair reaches 90% at T=2, including (8,16), whose
+requirement is 16.0:
+
+| pair | requirement | reaches 90% at |
+|---|---|---|
+| 2 v 4 | 4.0 | T=2 |
+| 2 v 8 | 2.7 | T=2 |
+| 2 v 16 | 2.3 | T=2 |
+| 4 v 8 | 8.0 | T=2 |
+| 4 v 16 | 5.3 | T=2 |
+| 8 v 16 | 16.0 | T=2 |
+
+The bound governs *nonparametric* frequency estimation. A rotation in a known plane is a
+two-parameter family, and the angle between consecutive samples determines ω outright, so
+two samples suffice at any period short of aliasing. Structure beats the resolution limit.
+
+**So neither extent nor period nor 1/Δf is the governing quantity.** What survives is
+weaker and more honest: the required T is the **identifiability horizon** — the smallest
+window at which the feature is separable from its alternatives — and it depends on the
+structure of the family, not on any single scalar summary of one feature. For compactly
+supported profiles it coincides with the extent and the geometric ceiling makes it tight;
+for a clock it is 2, far below both the period and the extent.
+
+**Which repairs the monotone-and-saturate property.** Period-ID rises and then holds — 0.252,
+0.957, 1.000, 1.000, 1.000, 0.983 — flat from T=4 to T=24, six times longer than needed.
+Atom recovery over the same range wanders: 1.000, 0.832, 0.866, 0.956, 0.829, 0.751. The
+crosscoder is not failing to saturate. Reconstruction-flavoured metrics are failing to
+saturate, and they were the metrics every earlier section of this log used to conclude that
+excess T is harmful.
+
+**Practical rule, replacing the one I withdrew.** Choose T by sweeping it and watching a
+*task-relevant* readout flatten. Do not choose it from FVU, from reconstruction, or from
+feature-recovery cosine: on this task those would have said T=1 was enough, when T=1 is at
+chance.
