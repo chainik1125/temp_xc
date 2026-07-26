@@ -519,6 +519,27 @@ needs on the order of 100 permutations, not a couple of dozen**, which is what L
 Budget the go/no-go accordingly: it is still only forward passes, but it is ~128 × the prompt
 set, not 24.
 
+**The single biggest risk to this entry, stated plainly.** The two *named* mechanisms of ICL
+order sensitivity are **majority-label bias** (the model predicts the most common label among
+demonstrations) and **recency bias** (it predicts the label of the most recent demonstration),
+both identified in *Calibrate Before Use*. Both are bag-of-positions statistics, i.e. DC handles.
+The interior-permutation control removes them — but it is an open question how much order
+sensitivity is *left* once they are gone. The literature is explicit that a complete mechanistic
+account of order dependence does not yet exist, so the residual is real but unquantified.
+
+There is also a scale trade-off to be aware of: the named biases are reported to **weaken as
+model size increases**, so a 1.5B model has the largest total order effect *and* the largest DC
+share of it. If the controlled spread collapses at 1.5B, trying a 7B is the right next move
+rather than abandoning the task.
+
+The saving grace is that **step 1 of the recipe tests exactly this, before any training**. Sample
+128 interior permutations with first and last held fixed and the label multiset matched, and
+measure the spread. A surviving spread means residual, non-DC order sensitivity exists and the
+task is live. A collapsed spread kills it — and is itself a clean, reportable result: *ICL order
+sensitivity at this scale is fully accounted for by recency and majority-label bias*, which is a
+finding the ICL literature does not currently have. Either outcome is worth the forward passes,
+which is the property a go/no-go test should have.
+
 **Design details that follow from the literature, and are worth getting right first time.**
 
 - **Use the base model, not the instruct model.** Instruction tuning is reported to increase

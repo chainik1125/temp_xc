@@ -130,3 +130,57 @@ optimal write well when the target is a state the model already maintains across
 and poorly when the target is a relational property of the document that no single position
 encodes — which is why the gap to the supervised ceiling is a fact about what reconstruction
 training rewards, not a fact about how much training was done.
+
+## The shortest honest version of the claim
+
+Drafted as the paragraph the rest of the write-up has to earn. It deliberately concedes two
+things up front — that the existing temporal variants are not strawmen, and that most tasks
+show nothing — because a sceptic who has read those papers will raise both, and conceding
+them is what buys the last sentence.
+
+> Temporal dictionaries have been proposed several times without clearly beating per-token
+> ones, and the reason turns out to be measurable rather than mysterious. A per-token
+> dictionary latent adds a single direction to the residual stream, but its coefficient can
+> vary across positions — and in the published temporal variants it does, because their
+> temporal machinery sits in the encoder while their decoder still holds one direction per
+> latent. So a per-token dictionary, steered the way people actually steer them, already
+> produces any intervention that is one direction with a time-varying strength. A crosscoder
+> differs only where the intervention needs genuinely different directions at different
+> positions. Whether a task needs that is a property of the task, computable from the model
+> in a single backward pass before any dictionary is trained; most temporal-looking tasks do
+> not need it, which is why the comparison has kept coming out flat. This work supplies the
+> number that says which side a task falls on, shows that the same number also decides
+> whether the task is readable by pooling per-token codes, and exhibits tasks on the far side
+> where the crosscoder wins because nothing per-token can do the job.
+
+## The condition that comes before rank
+
+A correction from this project's own earlier results, which supersedes the ordering above and
+belongs in the write-up before any rank argument.
+
+Two language steering demonstrations were run earlier in the project and both failed.
+**Passphrase verification** — k distinct code-words at k distinct positions — is a textbook
+position-dependent template, and it lost anyway, because the task is a *conjunction* that a
+single broadcast write satisfies. **Ordered generation** lost worse and in the wrong
+direction: at k ≥ 3–5 the per-token broadcast beat the crosscoder by 10–50×, with the
+template fading as k grew, because language generation is driven by a strong shared
+contextual mode that a broadcast write reinforces at every position.
+
+So a position-dependent optimal write is not sufficient. The condition that comes first is
+that **no bag-of-positions statistic — a mode, a label prior, a level — separates target from
+foil**, which is exactly what a matched multiset guarantees and exactly what `c ≈ 0`
+measures. The two gates are therefore ordered rather than alternative:
+
+| gate | condition | rules out |
+| --- | --- | --- |
+| first | `c ≈ 0` | a broadcast write with a DC component to ride |
+| second | `r1` well below 1 | a scheduled per-token write |
+
+Passphrase verification has abundant second-gate structure and fails the first. That ordering
+is why several otherwise-attractive candidates — induction, repetition-loop escape,
+LLM-judge position bias — are predicted negatives: "copying-ness", "repetitiveness" and a
+label-token prior are all bag statistics.
+
+The defensible summary of where language steering stands is correspondingly narrow and well
+supported by both the failures and the successes: **language steering separates window codes
+from per-token codes exactly when the foil is multiset-matched.**
