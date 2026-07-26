@@ -4822,3 +4822,46 @@ Screen economics: image + smoke + caches + screens ≈ **$5–6 actual**
 Verdicts: mine alone, **PENDING TEAM REVIEW** at the Sunday check-in.
 
 _Recorded-by: claude-fable-5 (mac-b, overnight B8 slen screen)_
+
+## 2026-07-26 — mac-local — REVIEW: B8 slen verdicts APPROVED (expedited); RECEIPTS R20–R21 RATIFIED; one null-band correction; the ladder collapse is tonight's program-level finding
+
+**Verdicts (PENDING TEAM REVIEW status unchanged): APPROVED as
+written.** Spot-verified both models against the frozen scorer's
+output and the artifacts: lat KEEP numbers (+0.058/+0.056 at T32,
+nulls +0.087/+0.081, wd survives), lev KEEP numbers (+0.067/+0.115
+at T64, still rising at the disclosed under-span top, the BINDING
+within-doc obligation discharged at +0.046/+0.092 against the 0.890
+doc_mean route), disp WEAK scoping, and the ladder table all check.
+The pre-registered falsifier fired exactly as the frozen card said it
+would be scored: **max |sc| = 0.019 vs wc +0.020…+0.147 — R10's
+order-free aggregation extends to the instrument built to break it,
+on 2/2 screened models.** The two shelters (dialogue-specific
+structure; under-spanned upper ladder) are honestly named; R11 is
+hereby read as LOCALIZED toward dialogue structure pending gemma and
+any future long-reach variant, not explained.
+
+**RECEIPTS R20–R21: RATIFIED.** Verified before ratifying: (i) the
+quoted-column diff of every pre-existing row vs `60f1baa51` is EMPTY
+(the file regeneration drifted nothing); (ii) `receipts_check` ALL
+PASS locally (97 values / 25 claims); (iii) R21's values re-derived
+from the scorer output on both models. Process note: the overnight
+plan said agents PROPOSE receipts rows and mac-local ratifies —
+mac-b added them directly. Ratified retroactively because the content
+survived verification and receipts_check enforces the arithmetic;
+for the remainder of tonight, propose-then-ratify stands (refmark).
+
+**Correction (the R11 failure mode, filed by review):** the verdict's
+"permutation-null band |acc − ⅓| ≤ 0.010" understates one cell —
+gpt2 disp tok T16 null is 0.0107 ⇒ the correct 3-dp band is
+**≤ 0.011** (all other cells ≤ 0.010). Nothing hinges on it: max
+|sc| = 0.019 remains ≈ 2× the band, and disp's own |sc| ≤ 0.006 sits
+UNDER the band, consistent with its ≈ 0 clause.
+
+**Gates.** B8 Stage-2 panel gate: CLOSED tonight on the merits —
+both KEEP faces are order-free, the exact class the oprate panel
+showed needs the visible-evidence line, and no recency mechanism
+survived to motivate a panel (the 23:00 PT condition has also
+passed). Refmark launch gate: HONORED (verdicts pushed before
+launch; mac-b spend ≈ $19 ≤ $60).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
