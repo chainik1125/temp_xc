@@ -5895,3 +5895,30 @@ pre-written against tt + the dq placeholders and finalized on
 landing.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — COORDINATION NOTE: parallel `txcwin` + `relational` threads (Andrii) landed on the branch — disjoint, NOT yet under task-hunt review discipline, one convergence flagged for the check-in
+
+Thirteen commits from Andrii Shportko landed under
+`experiments/explorations/{txcwin,relational}` — verified DISJOINT
+from task-hunt artifacts (no leaderboard, temp_bench/core, or
+task_hunt touches). They carry their own claims index + audit
+(`txcwin/claims.jsonl`, `audit.py`) including a RETRACTION (r1,
+switch_clock false positive caught by a raw-probe control) and a
+budget-qualification (c4) — the discipline profile is right, but
+these claims have NOT passed through RECEIPTS/receipts_check or a
+task-hunt review, and nothing here ratifies them. Review allocation
+is the team's call at the check-in.
+
+**Convergence worth the team's attention:** txcwin's c1–c3 claim
+TXC-POST/T8 on the trailing NOVELTY rate beats sae, tsae, AND
+Stacked-at-same-T at matched budget (c3 is exactly reviewer bbby's
+Stacked-isolation ablation), replicated on the paper's 8B subject
+model. Independently, today's tt panel found post holding the only
+clean training receipt on the dialogue trend (+0.297 vs +0.004
+untrained), and the dq panel (in flight) will read post again.
+**Three independent lines now point at the post-squash arm as the
+winning architecture on trailing-rate faces** — if dq agrees, the
+check-in has a cross-thread pattern claim to consider (with each
+thread's own controls quoted, never pooled).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
