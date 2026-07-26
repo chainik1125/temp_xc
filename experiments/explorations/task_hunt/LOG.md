@@ -7291,3 +7291,63 @@ different mechanism, untouched by this addendum; Dmitry's
 d(perf)/dT gate stands.
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+---
+
+## 2026-07-26 ~22:30 London — mac-local: calib preliminary RATIFIED; Stage-3 CANCELLED as designed (identity discharge); pods' exhibits unaffected; A1-closure rulings
+
+_Observed HEAD: `00309362f`._
+
+**1. Calibration preliminary RATIFIED** (final ratification on the
+20/20 push; the 2-cell prediction is registered and falsifiable —
+good form). The mechanism re-attribution is accepted: at hunt
+widths (d_sae 2048, k = 8) btk-only ≡ relu-mix AS FUNCTIONS
+(identity conditions: positive-rich pools + threshold ≥ 0; unit
+tests prove hard divergence on thin pools), and the realized-l0
+shortfall is EVAL-TIME THRESHOLD PRUNING shared by both
+compositions — the fingerprint numbers stand, the zero-pick
+inference at these widths does not.
+
+**2. Stage-3 CANCELLED as designed — replaced by CERTIFICATION.**
+The planned btk-only comparator re-runs at hunt widths would
+provably reproduce identical numbers (zero information). Instead:
+the hunt KEEPs (R22, R27, R28/R29, tt-P1) are **composition-robust
+BY IDENTITY** — their margins cannot move under a no-op — with the
+calib receipts + the divergence unit tests as evidence. This
+DISCHARGES mac-b's exposure ranking (its premise was the zero-pick
+mechanism); **mac-b: append a short corrigendum note to
+ACTMIX_FORENSICS.md** (fingerprints stand; mechanism attribution
+and the exposure ranking's premise revised per calib). The ~$30
+Stage-3 budget is released. OPTIONAL (≤$2, mac-a's discretion): one
+thin-pool diagnostic cell in the deep-selection regime (the 8·T
+T32 k=256 arm, realization 0.647) purely to exhibit where the
+compositions genuinely diverge — non-claiming color for the
+writeup, not a requirement.
+
+**3. Pods — read this precisely (do not misread "no-op").** The
+identity is between relu-mix and btk-only IN THE V2 BACKBONE. Your
+exhibits compare btk-only against the PAPER's composition
+(TopK→ReLU, selected-negative zeroing — a genuinely different
+mechanism, untouched by the identity) and against the paper's
+published numbers. Your grids are unchanged and remain the first
+composition-harmonized panels on the paper tasks. mac-a's
+smoke + neg_frac check is BINDING before any Phase-B grid and
+before quoting any relu-mix-vs-btk-only comparison at your widths
+(expected outcome: identity there too — which is itself the
+mechanism result).
+
+**4. Dmitry's gate, re-framed for the one-pager:** the calibration
+answers "is the HUNT contaminated?" — NO, by identity. The
+d(perf)/dT question now rests ENTIRELY on the paper arch's
+deep-selection zeroing (k_win = 8·T digs into negatives), which
+the pods' overnight grids answer on the paper tasks themselves.
+
+**5. A1 CLOSED (mac-c census RATIFIED): runpod-1 Phase B UNLOCKED
+as EVAL-ONLY** on the SHIPPED c3 cells found in temp-bench-models
+(6 archs × 20K steps × seeds 1/2/42, k_pos = 20, dated 05-04..06;
+tbm_census.jsonl is the index). Sequence stays Phase-A-first;
+Phase B = download shipped cells → shuffle-eval + T-sweep, no
+retraining. A6: the store holds ONLY Gen-1 7B-med cells — the
+Gen-2 hunt is confirmed pod-local/private ⇒ remains the 9am
+Dmitry question. mac-c continues: A3/A5, then part 3.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
