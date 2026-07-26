@@ -5478,7 +5478,6 @@ completes (per-model paragraphs only, no re-scoring of frozen
 majority verdicts).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
-=======
 ## 2026-07-26 — mac-a (executor) — day-2 W2 VERDICT: diafaces screen — ttrend + dqgap BOTH KEEP 3/3 WITH T32 ORDER CARRIAGE; panel gate clauses (i)+(ii) MET on both faces; dq proposed as the panel face — PENDING TEAM REVIEW
 
 Frozen card `diafaces/CARD.md` (freeze `073611113`, mac-local
@@ -5601,3 +5600,38 @@ Launch next commit (driver PIN via rev-parse), detached, H100 main +
 high-CPU tsae split per Han's amendment.
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+## 2026-07-26 — mac-local — GATE AMENDED IN WRITING: panel face = `dqgap` (mac-a's proposal ACCEPTED; my `ttrend` choice SUPERSEDED by the completed 3-model measurement)
+
+My 12:15 gate entry chose tt on two grounds: the ambience-principle
+profile (Q1 held) and the class prior against converted faces. The
+completed screen adds the decisive third fact: **tt's raw window face
+falls BELOW its visible-evidence floor at T32 on 3/3 models
+(ax − vis −0.054/−0.039/−0.039)** — and T32 is mandatory in the
+panel (my own pinned requirement) because that is where tt's order
+lives (wd_sc +0.037/+0.049 at T32 vs +0.007…+0.018 at T16). A tt
+panel is therefore incoherent by construction: at T ≤ 16 it measures
+the face where order is absent; at T32 its evidence-line clause is
+pre-measured to fire. That is a FINDING, not a panel candidate:
+**tt goes to the breadth table as "KEEP 3/3, order-carried at T32,
+bounded above by its own visible floor there"** — the sharpest
+boundary statement the breadth table now has.
+
+**dq takes the panel**: KEEP 3/3, order-carried at T32 on 3/3 (wd_sc
++0.045/+0.034/+0.049… per the verdict's 9/9 grid), and ABOVE its
+visible floor at every T on 3/3 (T32: +0.071/+0.125/+0.125…). The
+class-prior objection I raised is overridden by measurement: dq
+differs from the punctint-q class on exactly the dimension the
+thread exists to test (order-carriage; punctint-q had none). Q1's
+violation (conversion +0.186…+0.211) is DISCLOSED as the panel's
+hard opponent — it raises the per-token baselines, and the panel's
+evidence-line analog is pre-registered as the KEEP-killer exactly as
+in oprate § 3d. Model per the draft's frozen stronger-screen-model
+rule: **llama31_8b / l14** (largest KEEP margin +0.214; also the
+substrate's hardest token baseline — the fineweb-NEGATIVE model —
+which makes a positive result maximally informative and a negative
+one maximally credible). All other binding terms of the 12:15 entry
+stand unchanged (T ∈ {2,4,8,16,32}, H100/high-CPU split, freeze
+before cell one, repatriation by 16:15). R26: ADD as proposed; I
+ratify with receipts_check at the freeze review.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
