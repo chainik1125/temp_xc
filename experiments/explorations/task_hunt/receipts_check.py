@@ -826,6 +826,65 @@ def build_receipts():
              "v2_32": _p["S5"]["T32"]["v2_grouped"],
              "sec_ratio32": sal["secondary"]["S2"]["T32"]["ratio"],
              "cells": sum(1 for c in salc if c.get("ok"))}))
+
+    # ---- R29: salvage W1 n=6 top-up (mac-a; ruling ad76b0f15 item 3,
+    # card TOPUP_CARD.md freeze 85c87fd76). The KEEP is carried by BOTH
+    # lanes; L1 needs no sequential caveat, L2 always carries it. ----
+    top = _j("diafaces/results/topup_score.json")
+    topc = _j("diafaces/results/topup_stage2_dial_real_ttrend_gpt2_l7.json")
+    _l1, _l2 = top["L1_new_seeds_alone"], top["L2_combined_n6"]
+
+    R.append(dict(
+        id="R29",
+        artifact="diafaces/results/topup_score.json",
+        key="L1 S1 four legs on seeds {6,7,8} alone (t crit 4.3027); L2 "
+            "combined n=6 (t crit 2.5706, sequential caveat attached); "
+            "combined S2/S4/S5; S3 T16→32 sign-flip (24-cell top-up, "
+            "TOPUP_CARD.md, scorer score_topup.py)",
+        claim="Salvage W1 top-up (seeds {6,7,8}, 24/24 at freeze "
+              "85c87fd76): KEEP at T = {16,32} per the frozen rule — and "
+              "carried by the POOLING-FREE lane: L1 (new seeds alone, no "
+              "sequential caveat) passes ALL FOUR S1 legs incl. the one "
+              "that failed on {3,4,5} (sae@T16 +0.117 [+0.110, +0.123]; "
+              "tsae@T16 +0.104 [+0.094, +0.114]; sae@T32 +0.256 [+0.200, "
+              "+0.313]; tsae@T32 +0.244 [+0.187, +0.301]). L2 combined "
+              "n = 6 (SEQUENTIAL-DECISION CAVEAT mandatory beside every "
+              "L2 number: the extension was decided after observing "
+              "{3,4,5} fail one t-CI leg): all four legs pass (sae@T16 "
+              "+0.100 [+0.065, +0.136]; sae@T32 +0.251 LB +0.233; "
+              "tsae@T16 +0.095 LB +0.070; tsae@T32 +0.246 LB +0.227); "
+              "combined S2 0.11×/0.00×, S4 0.282 > 0.114 bar, S5 v2 "
+              "+0.250, S3 T16→32 exact p = 0.0156 (floor 1/64). "
+              "Realized-l0 disclosure: all 12 post cells in band "
+              "(7.53–8.11); the trained sae baseline runs at 4.12–4.69 "
+              "of nominal 8 UNIFORMLY across all 6 seeds (arch property, "
+              "outside the card's post-arm band clause; drop-s7 "
+              "sensitivity passes both sae legs). PENDING TEAM REVIEW",
+        checks=[("l1_sae16", 0.1165, 3), ("l1_sae16_lo", 0.1099, 3),
+                ("l1_tsae16", 0.1039, 3), ("l1_sae32", 0.2564, 3),
+                ("l1_tsae32", 0.2438, 3),
+                ("l2_sae16", 0.1004, 3), ("l2_sae16_lo", 0.0653, 3),
+                ("l2_sae32_lo", 0.2326, 3), ("l2_tsae16_lo", 0.0703, 3),
+                ("l2_tsae32_lo", 0.2265, 3),
+                ("ratio32", 0.0006, 3), ("s4_t32", 0.282, 3),
+                ("v2_32", 0.2496, 3), ("s3_p", 0.01562, 4),
+                ("keep", 1, 1), ("cells", 24, 1)],
+        got={"l1_sae16": _l1["S1"]["batchtopk_sae@T16"]["mean"],
+             "l1_sae16_lo": _l1["S1"]["batchtopk_sae@T16"]["ci95_t"][0],
+             "l1_tsae16": _l1["S1"]["tsae@T16"]["mean"],
+             "l1_sae32": _l1["S1"]["batchtopk_sae@T32"]["mean"],
+             "l1_tsae32": _l1["S1"]["tsae@T32"]["mean"],
+             "l2_sae16": _l2["S1"]["batchtopk_sae@T16"]["mean"],
+             "l2_sae16_lo": _l2["S1"]["batchtopk_sae@T16"]["ci95_t"][0],
+             "l2_sae32_lo": _l2["S1"]["batchtopk_sae@T32"]["ci95_t"][0],
+             "l2_tsae16_lo": _l2["S1"]["tsae@T16"]["ci95_t"][0],
+             "l2_tsae32_lo": _l2["S1"]["tsae@T32"]["ci95_t"][0],
+             "ratio32": _l2["S2"]["T32"]["ratio"],
+             "s4_t32": _l2["S4"]["T32"]["trained"],
+             "v2_32": _l2["S5"]["T32"]["v2_grouped"],
+             "s3_p": _l2["S3_combined_16to32"]["p_exact"],
+             "keep": int(top["verdict"]["KEEP_at_16_32"]),
+             "cells": sum(1 for c in topc if c.get("ok"))}))
     return R
 
 

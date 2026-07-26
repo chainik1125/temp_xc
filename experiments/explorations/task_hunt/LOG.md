@@ -6628,3 +6628,84 @@ a cheap top-up, none of which is a surface-reading fragility of
 the dq kind.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-26 ~19:45 London — mac-a — TOP-UP VERDICT: KEEP at T = {16,32}, carried by the POOLING-FREE lane — PENDING TEAM REVIEW
+
+**Top-up complete 24/24** at freeze `85c87fd76` (card approved
+pre-results, c797c5207). +24 leaderboard rows, 0 dups, pins verified,
+15/24 dirty (pool convention). Scorer `score_topup.py`, artifact
+`diafaces/results/topup_score.json`; receipt **R29 proposed**
+(receipts_check ALL PASS).
+
+**The decisive fact is L1, not L2.** The independent-replication lane
+(seeds {6,7,8} ALONE, no pooling, no sequential caveat) passes ALL
+FOUR S1 legs — including the leg that killed the W1 verdict on
+{3,4,5}: sae@T16 +0.117 [+0.110, +0.123] (the new seeds drew
+low-variance; the CI is tight); tsae@T16 +0.104 [+0.094, +0.114];
+sae@T32 +0.256 [+0.200, +0.313]; tsae@T32 +0.244 [+0.187, +0.301].
+The W1 NOT-KEEP is thereby confirmed as a POWER failure, exactly as
+mac-local's ratification read it: the effect was there, seed-draw
+{3,4,5} was noisy at n = 3.
+
+**L2 (combined n = 6, t crit 2.5706) — SEQUENTIAL-DECISION CAVEAT
+mandatory beside every L2 number (the extension was decided after
+observing {3,4,5} fail one t-CI leg; conditional test, R22-caveat
+style):** all four S1 legs pass (sae@T16 +0.100 [+0.065, +0.136];
+sae@T32 +0.251 LB +0.233; tsae@T16 +0.095 LB +0.070; tsae@T32
++0.246 LB +0.227); combined S2 0.11× (T16) / 0.0006× (T32); S4
+0.131 > 0.0148 and 0.282 > 0.1142; S5 grouped v2 +0.180 / +0.250;
+S3-combined T16→32 rise +0.151, exact sign-flip p = 0.0156 (floor
+1/64; all 6 per-seed deltas positive). **Frozen decision rule
+satisfied on every term: KEEP at {16,32}.**
+
+**Realized-l0 disclosure (the scorer's one flag, resolved):**
+`score_topup` over-applied the post-arm band to baselines and
+flagged sae:T1:s7 (4.29). All 12 post cells are IN band (7.53–8.11).
+The trained sae baseline realizes 4.12–4.69 of nominal 8 UNIFORMLY
+across all 6 seeds (s3 = 4.12 is the lowest, from the ratified W1
+set) — an arch property on this substrate, not a seed anomaly, and
+outside the card's band clause (post arms only) by letter. Cuts
+against nothing: tsae realizes ~7 and its legs pass identically;
+drop-s7 sensitivity passes both sae legs (T16 +0.097 [+0.052,
++0.142]; T32 +0.245 [+0.232, +0.258], n = 5 t crit 2.7764).
+
+**Combined quotable shape (subject to team ratification + the L2
+caveat where L2 is used):** ttrend on gpt2/hs7 — TXC-post at 8
+actives/WINDOW beats both per-token baselines (8/token) at T16 by
+≈ +0.10 and at T32 by ≈ +0.25, CI-bounded in both lanes; untrained
+≈ 0; visible-cue floor beaten at both claiming Ts; conversation-
+grouped v2 positive. The budget asymmetry (post claims with 2–32×
+fewer actives per token) makes the comparison conservative in
+post's favor. dq's demotion objection does not attach: the tt
+evidence line is degenerate at T ≤ 8 and only 0.114 at T32 vs post
+0.282.
+
+**fig4** (KEEP-gated deliverable, now unlocked): produced by the
+committed `diafaces/make_fig4.py` from the canonical leaderboard →
+`figs_writeup/fig4_ttrend_post_confirmation.{png,pdf}`; caption
+block proposed beside it in the commit for mac-local to integrate.
+The T32-only re-scope question is now MOOT if this verdict ratifies
+(KEEP covers {16,32}); it stays open only as the fallback if the
+team declines the top-up construction.
+
+Costs: actuals ≈ $2 (H100 main ~15 min + 3× L4 short + image build)
+vs $3 est. Program ≈ $102. mac-a salvage total ≈ $6 of $100 + $10
+caps.
+
+**Proposed fig4 caption (for mac-local to integrate):**
+> **Figure 4 — fresh-seed confirmation of the TXC-post turn-trend
+> readout.** λ recovery (v1, canonical) of the dialogue turn-length
+> trend state on DailyDialog (gpt2, layer 7) vs window length T.
+> TXC-post (8 actives per WINDOW) is trained and evaluated on seeds
+> the original observation never touched (n = 3 at T ≤ 8, n = 6 at
+> the claiming zone T ∈ {16, 32}; whiskers = paired t 95% CIs).
+> Per-token baselines (BatchTopK SAE, T-SAE; 8 actives per TOKEN)
+> are T-invariant bands; the untrained control is flat; the
+> label-side visible-cue evidence line (dotted) is degenerate at
+> T ≤ 8 and reaches only 0.114 at T32 vs post 0.282. Margins over
+> both baselines are CI-bounded in the pooling-free new-seed lane
+> AND the combined n = 6 lane (the latter carries the pre-registered
+> sequential-decision caveat); the task has no surface-count
+> reading, and post claims with 2–32× fewer actives per token than
+> the baselines it beats. Verdict PENDING TEAM REVIEW (R28/R29).
+
+_Recorded-by: claude-fable-5 (mac-a, executor)_
