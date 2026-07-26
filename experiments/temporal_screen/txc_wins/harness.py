@@ -283,6 +283,12 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
 
     if arms:
         writes = {nm: W for nm, W in writes.items() if nm in arms}
+    # The per-position norm profile is the mechanism, so it is stored rather than
+    # summarised. On a task whose factor lives at particular positions, a crosscoder slab
+    # that works should put its mass there, and `txc_flat` -- which has spread exactly
+    # 0.0000 by construction -- is the same vector with that structure removed.
+    out["write_profile"] = {nm: [float(v) for v in W.norm(dim=-1)]
+                            for nm, W in writes.items()}
     for nm, W in writes.items():
         log(f"[write] {nm:<17} total norm {float(W.norm()):.3f}  "
             f"per-position spread {float(W.norm(dim=-1).std()):.4f}")
