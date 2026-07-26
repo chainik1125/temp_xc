@@ -847,3 +847,68 @@ what the optimiser destroyed:
 Registered A3 is the one that can embarrass me: if `topk` shows a near-zero negative
 coefficient fraction, then `#{pre > 0}` was never the binding constraint and the mechanism
 I have been describing all evening is wrong.
+
+## The arrangement result replicates on the healthy dictionary
+
+Per the directive not to conclude until the control ran on a better-trained dictionary.
+`frozenshuf_modal.py --txc-lr 3e-4 --kper 4` against the original lr=1e-3, kper=41 run:
+
+| | starved | healthy |
+|---|---|---|
+| FVU | 0.839 | **0.707** |
+| realised L0 per window | 18.4 | **47.8** |
+| alive fraction | 0.136 | **0.345** |
+| selected latent | 2788, sign +1, freq 0.0056 | 1061, sign −1, freq 0.0889 |
+| frozen intact fidelity | +0.242 | **+0.292** |
+| shuffled null, n=24 | +0.002 ± 0.103 | −0.008 ± 0.114 |
+| intact percentile | 100th | **100th** |
+| refit m=2 | 100th | 88th |
+| refit m=8 | 100th | 100th |
+
+The dictionary is 2.6× richer in realised coefficients and 2.5× richer in live latents, and
+the effect is *larger*, not smaller. It also selected a different latent — different index,
+opposite sign, sixteen times the firing frequency — so this is an independent instance of
+the phenomenon rather than the same measurement repeated. The refit m=2 arm falling to the
+88th percentile is the expected direction: refitting repairs part of the permutation, which
+is exactly why the frozen arm is the one that carries the claim.
+
+The worry that the steering result was an artefact of a starved dictionary is therefore
+answered in the direction that matters. It was not.
+
+## BatchTopK is now the crosscoder's available sparsity rule
+
+The composition `ReLU(TopK(·))` was inherited from SAE code where it is a genuine no-op —
+an SAE has ~2000 positive pre-activations to choose from at k=1, so the ReLU never binds and
+serves only as a non-negativity guard. Ported into a crosscoder, whose positive
+pre-activation count is smaller than a window-sized k, the same line becomes the binding
+constraint. That is the whole of the mechanism.
+
+`src/bench/architectures/crosscoder.py` now takes an `activation` argument:
+
+- `topk_relu` — the historical behaviour, and still the default so existing results and the
+  in-flight `ward_backtracking_txc` workstream stay reproducible. Flipping the repo-wide
+  default is a one-line change in `CrosscoderSpec.__init__` whenever wanted.
+- `topk` — TopK with no ReLU, the Gao et al. formulation. Realised L0 equals k by
+  construction.
+- `batchtopk` — BatchTopK (Bussmann et al. 2024).
+
+**One correctness point that changed the implementation.** A batch rule needs a batch, so
+BatchTopK cannot be applied as written at inference: a window's code would depend on which
+other windows happened to be scored alongside it. The standard treatment is to estimate a
+threshold during training and apply it JumpReLU-style at eval, which is what the module
+does — an EMA of the smallest activated value per step, stored in a `bt_threshold` buffer,
+with a fallback to per-sample TopK while it is unset. My first version of `actfn_modal.py`
+had the naive form and was killed and rewritten before it produced numbers; the experiment
+now calls the module's own `_sparsify`, so it measures the code that ships rather than a
+local copy of it.
+
+`tests/bench/test_crosscoder_activations.py` covers this — eleven tests, including one that
+asserts BatchTopK's eval output is independent of batch composition, and one that pins the
+capacity failure explicitly: force `b_enc` strongly negative and `topk_relu` realises
+`min(k, #{pre>0})` while `topk` still realises exactly k.
+
+**An unrelated bug found on the way.** `test_crosscoder_encode_shuffle_sensitive` used an
+unseeded `torch.randperm(T)` with T=3, which is the identity permutation once every six
+draws, so the test failed about 40% of the time regardless of the code under test. I
+measured 7 failures in 12 runs both with and without my changes before concluding it was
+pre-existing. Replaced with a fixed cyclic shift; 12 of 12 pass.
