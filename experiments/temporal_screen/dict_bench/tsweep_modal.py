@@ -157,10 +157,19 @@ def tsweep(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
     flat_ho = Xn_ho.reshape(-1, d)
     print(f"[cache] train {tuple(Xn.shape)} holdout {tuple(Xn_ho.shape)}", flush=True)
 
-    def reshape_T(flat, T):
-        """(N*k_seg, d) -> (M, T, d), dropping the remainder."""
-        m = flat.shape[0] // T
-        return flat[:m * T].reshape(m, T, d)
+    def reshape_T(seqs, T, stride=1):
+        """(N, k_seg, d) -> (M, T, d), windowed at stride WITHIN each document.
+
+        The original disjoint reshape gave k_seg/T windows per document, so the training
+        set shrank as T grew while the model grew -- large T was starved of data rather
+        than limited by the architecture. Stride-1 within a document keeps the count at
+        k_seg-T+1 and never splices unrelated documents together.
+        """
+        if stride >= T:
+            m = seqs.shape[1] // T
+            return seqs[:, :m * T, :].reshape(-1, T, d)
+        return (seqs.unfold(1, T, stride).permute(0, 1, 3, 2)
+                .reshape(-1, T, d).contiguous())
 
     class TXCVariant(TemporalCrosscoder):
         def __init__(self, d_in, d_sae_, T, k, center=False):
@@ -211,7 +220,7 @@ def tsweep(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
     print(f"\n{'arm':<8}{'T':>4}{'nom k':>7}{'#pre>0/win':>12}{'#pre>0/seg':>12}"
           f"{'coeff/seg':>11}{'ReLU-kill':>11}{'alive':>8}{'FVU':>9}{'xSAE':>7}", flush=True)
     for T in Ts:
-        Wtr, Who = reshape_T(flat_tr, T), reshape_T(flat_ho, T)
+        Wtr, Who = reshape_T(Xn, T), reshape_T(Xn_ho, T)
         # Equal segments per step at every T, so gradient signal is matched.
         wb = max(1, seg_batch // T)
         for arm in ["base", "center"]:
@@ -263,8 +272,8 @@ def tsweep(model_id: str, layer: int, k_seg: int, n_docs: int, d_sae: int,
 
 
 @app.local_entrypoint()
-def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int = 12,
-         n_docs: int = 900, d_sae: int = 4096, seg_batch: int = 768, steps: int = 2500,
+def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int = 36,
+         n_docs: int = 500, d_sae: int = 4096, seg_batch: int = 768, steps: int = 2500,
          ts: str = "1,2,3,4,6,12", kper: int = 4, lr: float = 3e-4,
          general_frac: float = 0.4):
     import json

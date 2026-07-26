@@ -47,6 +47,16 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 OUT = ROOT / "results" / "dict_bench" / "budget.json"
 
 
+def windows(X, T, stride):
+    """(n_seq, seq_len, d) -> (n_win, T, d). stride=1 keeps the window count roughly
+    constant in T; the disjoint reshape makes it fall as seq_len/T, starving large T."""
+    n_seq, seq_len, d = X.shape
+    if stride >= T:
+        n_win = seq_len // T
+        return X[:, :n_win * T, :].reshape(-1, T, d)
+    return X.unfold(1, T, stride).permute(0, 1, 3, 2).reshape(-1, T, d).contiguous()
+
+
 def pick_device():
     if torch.cuda.is_available():
         return torch.device("cuda")
@@ -107,6 +117,7 @@ def main():
     ap.add_argument("--batch", type=int, default=256)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--activation", type=str, default="batchtopk")
+    ap.add_argument("--stride", type=int, default=1)
     a = ap.parse_args()
 
     import sys
@@ -129,8 +140,7 @@ def main():
     print(f"\n{'T':>4}{'kper':>6}{'nom k/win':>11}{'coeff/seg':>11}{'alive':>8}"
           f"{'FVU':>9}{'recovery':>10}", flush=True)
     for T in Ts:
-        n_win = a.seq_len // T
-        W_all = X[:, :n_win * T, :].reshape(-1, T, a.d).to(dev)
+        W_all = windows(X, T, a.stride).to(dev)
         n_hold = max(int(0.15 * W_all.shape[0]), 64)
         Wtr, Who = W_all[:-n_hold], W_all[-n_hold:]
         S_all = [true_slabs(f, T).reshape(-1, T * a.d).to(dev) for f in feats]
