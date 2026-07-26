@@ -19,7 +19,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "587e355435abfb4f0c0265bb24465755d4dd1ca0"  # relu-mix control FREEZE v4
+PINNED_COMMIT = "195fa073a2ff76681b02bf0aad43650bd4656c7b"  # d_sae wing FREEZE v5
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 VOL_DIR = "/workspace/btk_rerun_v2"
