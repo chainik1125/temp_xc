@@ -826,11 +826,19 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     log("\n===== verdict =====")
     for nm in sorted(out["arms"], key=lambda n: -max(out["arms"][n]["delta_margin"])):
         log(f"  {nm:<18} best delta-margin {max(out['arms'][nm]['delta_margin']):+.2f}")
+    # EVERY arm that is measured is compared. `dom_slab` was the last exception -- steered
+    # and stored in 74 files, entered into no verdict, so nothing it said could ever change
+    # one. It is also the arm whose failure on SmolLM2 (+1.27 against the gradient write's
+    # +13.38) split the arms along the P_dom / Gbar line and gave that null its account.
+    # If an arm is worth injecting it is worth comparing; if it is not, drop it from `writes`.
     others = ("sae_broadcast", "tsae_broadcast", "txc_flat",
               "txc_profile_random", "random_slab", "random_broadcast",
               "sae_schedule", "rank1_best", "grad_slab", "grad_rank1",
-              "sae_schedule_grad", "broadcast_optimal",
+              "sae_schedule_grad", "broadcast_optimal", "dom_slab",
               "sae_broadcast_readingsel", "txc_slab_readingsel")
+    _uncompared = sorted(set(out["arms"]) - set(others) - {"txc_slab"})
+    if _uncompared:
+        log(f"[warn] arms measured but not compared: {_uncompared}")
     z_peak, z_matched = {}, {}
     if "txc_slab" in out["arms"]:
         ts2, te2 = at_best("txc_slab")
