@@ -24,6 +24,12 @@ turns "the crosscoder should win here" from a hunch into a number with an error 
 Reading order if short on time: § The write algebra, § The screening statistic, then the
 ranked table in § Ranking. Designs D1, D2, D6 are the ones to build first.
 
+The single cheapest thing in this document, and the one I would run before anything else, is
+the **gradient screen**: one backward pass per document yields a training-free, architecture-
+independent upper bound on what any per-token dictionary can achieve on a proposed steering
+target. Corpora, the screening function and the closed forms are in `blocks.py` and
+`rank_check.py` in this folder, both self-tested.
+
 ## The write algebra
 
 Fix a latent and a dose. Every intervention in this project is an additive write to the
@@ -118,6 +124,51 @@ at the top end.
 This is the same kind of object as last sprint's best result — a pre-computable geometric
 quantity that measured recovery matches to three decimals — and it is why I would spend the
 first hour here rather than on a new corpus.
+
+### Screen the gradient, not the difference-of-means
+
+The rank law above needs `G ∝ P`, where `G` is the margin's gradient and `P` the DoM slab.
+That assumption is avoidable, and dropping it makes the whole screen sharper.
+
+`P_dom` and `G` are different objects: `P_dom` is the direction that *distinguishes* the two
+classes, `G` is the direction that most *increases* the margin. Steering cares about the
+second. So compute the screen on the **mean margin-gradient slab** instead:
+
+```text
+Ḡ = (1/N) Σ_i ∂ margin_i / ∂ x  |  restricted to the T segment positions,
+                                   mean-pooled within each segment span
+```
+
+The mean, not the per-document gradient, because a dictionary latent is **one fixed write
+reused across documents**: its expected effect is `E[Δ] = α⟨W, E[G]⟩ = α⟨W, Ḡ⟩`. That makes
+the rank law an identity rather than an assumption — in the linear regime the best
+norm-matched write inside a subspace `Π` is `Π Ḡ / ‖Π Ḡ‖` and it achieves exactly
+`α ‖Π Ḡ‖`, so
+
+```text
+Δ_Π / Δ_full = ‖Π Ḡ‖_F / ‖Ḡ‖_F        exactly, no proportionality assumption
+```
+
+Two things follow, and both are worth more than the DoM version.
+
+- **The screen becomes architecture-independent and training-free.** One backward pass per
+  document gives an upper bound on what *any* per-token dictionary can achieve on the task,
+  before choosing a dictionary, a layer, or a latent. This is a reusable instrument, not a
+  step in one experiment: it answers "can a per-token dictionary possibly steer this?" for any
+  proposed steering target at a cost of one backward pass.
+- **It upgrades the baseline from "best learned latent" to "best possible constant write".**
+  Add `oracle_const = Π_const Ḡ`, `oracle_rank1`, and `oracle_slab = Ḡ` to the arm ladder.
+  These bound `sae_broadcast`, `sae_enveloped` and `txc_slab` respectively. The negative claim
+  then becomes airtight: if `oracle_const` gives Δ ≈ 0, no SAE latent — better trained, better
+  selected, or hand-picked — could ever have done it, and "you just picked a bad latent" is
+  answered before it is raised. `oracle_slab` also supersedes `dom_slab` as the ceiling, and
+  the 7× gap to the supervised ceiling left open by the last sprint is exactly the quantity it
+  measures.
+
+Report `cos(Ḡ, P_dom)` alongside. If it is high, the discriminative and causal directions
+coincide on this task and the DoM-based numbers stand; if it is low, that is itself worth a
+line, since the steering literature routinely uses difference-of-means as though it were the
+gradient.
 
 **Three numbers, three verdicts, before a single dictionary trains:**
 
@@ -306,7 +357,10 @@ between consecutive rungs attributes the effect to exactly one property of the w
 | `txc_flat` | TXC slab time-averaged and rebroadcast | that the profile, not the mean direction, does the work |
 | `random_slab` | random `(T, d)` slab | that it is not any structured perturbation |
 | **`dom_rank1`** *(new)* | best rank-1 approximation of the supervised DoM slab | the rank law's prediction, supervised |
-| `dom_slab` | supervised per-position DoM slab | ceiling |
+| `dom_slab` | supervised per-position DoM slab | ceiling (discriminative) |
+| **`oracle_const`** *(new)* | `Π_const Ḡ` — the best constant write that exists | bounds **every** SAE latent, so "you picked a bad latent" cannot be raised |
+| **`oracle_rank1`** *(new)* | best rank-1 approximation of `Ḡ` | bounds every scheduled-SAE arm |
+| **`oracle_slab`** *(new)* | `Ḡ`, the mean margin-gradient slab | the true ceiling; supersedes `dom_slab` |
 | **`txc_transfer`** *(new)* | TXC slab selected on corpus 1, applied without refitting to corpus 2 | that the schedule is a learned property, not a fitted nuisance parameter |
 
 All rescaled to the same total injected Frobenius norm. `sae_enveloped` and `txc_rank1` are

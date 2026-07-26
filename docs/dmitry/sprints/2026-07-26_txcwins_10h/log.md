@@ -152,7 +152,7 @@ D1 is the only queued design that can produce an L3 result. Its harness gate is 
 rows `b_t − b_{t+1}` sum to zero, so `c = 0` identically, and a nonzero measured `c` means
 the windows are misaligned and everything downstream is suspect.
 
-## 23:05 — the SAE baseline was handicapped, and both agents found it independently
+## 22:45 — the SAE baseline was handicapped, and both agents found it independently
 
 Two agents converged on the same hole in last sprint's steering comparison from opposite
 directions, which is the strongest signal available that it is real.
@@ -178,7 +178,7 @@ to know *which* positions, while the crosscoder's profile falls out of unsupervi
 training. That is a real advantage, but an advantage in **supervision and discovery, not
 representation**.
 
-## 23:10 — verifying the rotation spectrum, and a correction to the correction
+## 22:47 — verifying the rotation spectrum, and a correction to the correction
 
 The theory agent self-corrected its own rotation-ladder algebra before anything was built on
 it: `r1 = 1/(m−1)` is wrong from m=4. The correct spectrum for `P = C·B` with C circulant
@@ -209,3 +209,50 @@ semantically dissimilar block types. It always inflates, so the L3 headroom `1 �
 together: the law is about linear response, the spectrum is about block geometry, and the
 gap between measured and orthonormal r1 becomes its own readout of how far the block means
 are from orthogonal.
+
+## 22:50 — harness generalised; the tSAE's sparsity is shrinkage, not selection
+
+*(Timestamps above corrected — two headings had been written ahead of the wall clock. Real
+elapsed time is the only thing that counts in a sprint and the log should not drift.)*
+
+**The harness is now task-agnostic**, which is the main unblocking event of the sprint so
+far. `experiments/temporal_screen/txc_wins/harness.py` factors the task out to a single
+function:
+
+```python
+make_pair(rng) -> (sents_a, sents_b, carrier)
+```
+
+Two equal-length sentence lists matched on everything except the property under test, plus
+the carrier. Everything else is wired: caching, stride-1 windows, SAE + TXC + tSAE training,
+reading AUC, teacher-forced Δ margin, every control, realised-L0 logging, SEMs and
+z-separations. Roughly one design per 20 minutes. Theory has been asked to deliver D1, D6
+and D2 in that form.
+
+**Regression against last sprint's order task reproduces it**, with a drift worth tracking:
+SAE pooled reading AUC 0.989 against 0.998, TXC window AUC 0.721 against 0.791, realised
+8.00 coefficients/segment for both. Same story, but the crosscoder number moved 0.07 and the
+cause should be identified before it propagates into a comparison.
+
+**The tSAE calibration has produced a finding rather than a constant.** The diagnosis is
+confirmed quantitatively: at the documented `l1=1e-3` the penalty contributes 0.03 against a
+reconstruction term of 17.7 — 0.2% of the loss, numerically absent, which is exactly why a
+100× sweep moved nothing. Extending to `l1=1e3` does move it: realised L0 goes
+2998 → 3008 → 2769 → 2265 → 1698 at l1 = 1e-3, 0.1, 1, 3, 10.
+
+But the alive fraction is **still 1.000 at L0 = 1698**. The L1 penalty is buying sparsity by
+shrinking every code rather than by selecting a small support. If reaching the 1–32
+coefficient band costs enough reconstruction to make the arm unusable — which is the
+expectation — then the reportable statement is that **the published ReLU+L1 tSAE recipe does
+not produce a sparse support at this activation scale**, and a three-way comparison against
+TopK dictionaries needs either a TopK variant of the same architecture or an L1 large enough
+to destroy reconstruction. A parallel `sae_diff_type="topk"` arm is training so that a
+genuinely sparse temporal-attention baseline exists either way; the contrast between the two
+is the result.
+
+**Phase ladder approved.** The order task at 1, 3, 5 and 11 switches, foil built as a cyclic
+rotation by one block so the classes contain literally the same sentences and differ only in
+phase. It separates two rival accounts of last sprint's headline that no existing control
+distinguishes: "the advantage is that the write is non-constant" against "the advantage is
+about slow structure and decays with frequency". Strictly better matching than the original
+task, which held multiset and switch count but not run-length multiset.
