@@ -272,9 +272,47 @@ def make_evidence(k_seg):
     return make_pair
 
 
+def make_recency_var(k_seg, early_range=(1, 4), late_range=(7, 10)):
+    """`recency` with the instruction positions DRAWN PER DOCUMENT rather than fixed.
+
+    The obvious objection to `recency` is that both instructions sit at the same two
+    positions in every document, so a dictionary that can address positions at all wins by
+    construction, and a per-token dictionary cannot address positions at all. That objection
+    is not fatal -- a system prompt really does sit at the start and injected text really
+    does arrive later, so fixed positions are the realistic case -- but it means the fixed
+    version cannot distinguish two very different claims:
+
+        (i)  the crosscoder learns to write at the exact segments that carry the factor; or
+        (ii) the crosscoder learns the coarse property EARLY-VERSUS-LATE, which is a shape
+             over the whole window and survives the positions moving.
+
+    Randomising the positions separates them. Under (i) the advantage should collapse to
+    roughly the constant-write arms, because a single (T, d) slab cannot target a position
+    that moves. Under (ii) it should shrink but survive, because a slab that pushes one way
+    over the first half and the other way over the second half is still correct on average.
+
+    PREDICTION registered before the run: it shrinks and survives -- somewhere between the
+    fixed-position result and the constant-write arms, and still separated from `txc_flat`.
+    If it collapses to `txc_flat`, the fixed-position result is about addressing two known
+    slots and I will say so.
+    """
+    def make_pair(rng):
+        base = [SETUP[i] for i in rng.sample(range(len(SETUP)), k_seg)]
+        pe = rng.randint(*early_range)
+        pl = rng.randint(*late_range)
+        a, b = list(base), list(base)
+        a[pe], a[pl] = INSTR_UP, INSTR_LOW
+        b[pe], b[pl] = INSTR_LOW, INSTR_UP
+        return (a, b, "System notes.\n",
+                PROBE_PREFIX + " HELLO", PROBE_PREFIX + " hello")
+
+    return make_pair
+
+
 TASKS = {
     "order": make_order,
     "recency": make_recency,
+    "recency_var": make_recency_var,
     "escalate": make_escalate,
     "evidence": make_evidence,
     "phase1": lambda k: make_phase(k, 1),
