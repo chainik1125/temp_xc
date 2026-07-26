@@ -693,8 +693,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     out["z_matched_dose"] = z_matched
     out["matched_dose_magnitude"] = matched_mag
     beats = [z_peak.get("txc_slab_vs_sae_broadcast", -9),
-             zs.get("txc_slab_vs_random_slab", -9),
-             zs.get("txc_slab_vs_txc_flat", -9)]
+             z_peak.get("txc_slab_vs_random_slab", -9),
+             z_peak.get("txc_slab_vs_txc_flat", -9)]
     out["win"] = bool(out["arms"].get("txc_slab") and
                       max(out["arms"]["txc_slab"]["delta_margin"]) > 0 and
                       all(z > 2 for z in beats))

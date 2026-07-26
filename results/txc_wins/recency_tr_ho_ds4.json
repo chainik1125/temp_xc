@@ -1,0 +1,273 @@
+{
+  "task": "recency_tr",
+  "task_test": "recency_ev",
+  "dict_seed": 4,
+  "k_seg": 12,
+  "lr": 0.001,
+  "n_train": 800,
+  "n_test": 80,
+  "held_out_content": true,
+  "probe_mode": true,
+  "arms": {
+    "sae_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        0.5,
+        -0.72,
+        -0.53,
+        0.59,
+        0.95,
+        1.11
+      ],
+      "sem": [
+        0.2,
+        0.13,
+        0.06,
+        0.05,
+        0.1,
+        0.19
+      ]
+    },
+    "txc_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        1.16,
+        -2.54,
+        -2.1,
+        2.76,
+        5.13,
+        5.13
+      ],
+      "sem": [
+        0.28,
+        0.15,
+        0.08,
+        0.07,
+        0.16,
+        0.23
+      ]
+    },
+    "txc_flat": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.15,
+        -0.58,
+        -0.15,
+        -0.07,
+        -0.28,
+        -0.2
+      ],
+      "sem": [
+        0.13,
+        0.07,
+        0.04,
+        0.04,
+        0.08,
+        0.15
+      ]
+    },
+    "dom_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        4.06,
+        -0.63,
+        -3.19,
+        4.74,
+        5.06,
+        1.04
+      ],
+      "sem": [
+        0.28,
+        0.25,
+        0.13,
+        0.14,
+        0.24,
+        0.24
+      ]
+    },
+    "random_slab": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.6,
+        0.6,
+        0.74,
+        -1.1,
+        -2.05,
+        -1.28
+      ],
+      "sem": [
+        0.14,
+        0.08,
+        0.05,
+        0.05,
+        0.08,
+        0.15
+      ]
+    },
+    "random_broadcast": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.57,
+        -0.65,
+        -0.35,
+        0.39,
+        0.79,
+        1.47
+      ],
+      "sem": [
+        0.1,
+        0.06,
+        0.04,
+        0.05,
+        0.1,
+        0.18
+      ]
+    },
+    "rank1_best": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        4.28,
+        -1.56,
+        -3.64,
+        4.86,
+        5.27,
+        1.3
+      ],
+      "sem": [
+        0.27,
+        0.25,
+        0.14,
+        0.14,
+        0.23,
+        0.23
+      ]
+    },
+    "sae_schedule": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.58,
+        -2.48,
+        -1.34,
+        -3.81,
+        -5.05,
+        -2.6
+      ],
+      "sem": [
+        0.18,
+        0.14,
+        0.08,
+        0.14,
+        0.19,
+        0.21
+      ]
+    },
+    "txc_profile_random": {
+      "alphas": [
+        -2.0,
+        -1.0,
+        -0.5,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "delta_margin": [
+        -0.82,
+        -1.19,
+        -0.32,
+        -0.38,
+        -0.36,
+        1.48
+      ],
+      "sem": [
+        0.17,
+        0.11,
+        0.06,
+        0.06,
+        0.12,
+        0.19
+      ]
+    }
+  },
+  "reading": {
+    "sae": {
+      "auc": 1.0,
+      "auc_selection": 1.0
+    },
+    "txc": {
+      "auc": 0.91,
+      "auc_selection": 0.912
+    }
+  },
+  "recipe": {
+    "sae": [
+      0.0003,
+      6000
+    ],
+    "txc": [
+      0.001,
+      6000
+    ]
+  },
+  "recovered_from_log": true,
+  "recovery_note": "run completed all compute; the final verdict block raised NameError from an incomplete rename, so no JSON was written. Arms parsed from stdout. Fields not printed to stdout (sparsity, write_profile, rank) are absent.",
+  "baseline_contrast": {
+    "mean": -1.92,
+    "sem": 0.23
+  }
+}
