@@ -7,3 +7,4 @@ before EVERY launch; append after. Caps: mac-a $150, mac-b $100
 | when (PT) | agent | what | GPU/CPU | est. cost | running total |
 |---|---|---|---|---|---|
 | 07-26 02:10 | mac-local | smoke attempts + A10 hello | A10 | ~$1 | ~$1 |
+| 07-25 18:40 | mac-b | slen screen pipeline: image build + smoke + fineweb-400 caches (gpt2+llama31) + 2× screen (est ≤ 2 A10G-h each, parallel) | A10G | ~$5 | ~$6 |
