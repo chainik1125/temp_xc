@@ -1044,3 +1044,52 @@ recovery-proxies stop improving estimates the extent of the underlying feature.
 
 Figure: `plots/2026-07-25_dictbench/recovery.png`.
 Code: `experiments/temporal_screen/dict_bench/recovery_local.py` (runs locally, no LM).
+
+## Activation functions: the ReLU is the cap, and BatchTopK only helps without it
+
+Measured at lr=1e-3, the setting where the crosscoder's training diverges and capacity
+collapses. `spend` is realised L0 as a fraction of nominal k; `neg` is the fraction of
+realised coefficients that are negative.
+
+| arm | kper | #{pre>0} | coeff/seg | spend | neg | FVU |
+|---|---|---|---|---|---|---|
+| `topk_relu` | 8 | 14.5 | 1.05 | 13% | 0.000 | 0.832 |
+| `topk_relu` + AuxK | 8 | 14.5 | 1.05 | 13% | 0.000 | 0.832 |
+| batch selection **+ ReLU** | 8 | 13.5 | 1.10 | 14% | 0.000 | 0.841 |
+| `topk` (no ReLU) | 8 | 82.8 | **8.00** | **100%** | 0.145 | **0.628** |
+| `topk_relu` | 41 | 11.5 | 0.96 | 2% | 0.000 | 0.843 |
+| `topk` (no ReLU) | 41 | 301.4 | **41.00** | **100%** | 0.387 | **0.541** |
+
+**Batch-level selection with a ReLU after it is not a fix.** It spends 14% of its budget
+against `topk_relu`'s 13%. This is the expected result once the mechanism is stated
+properly: batch selection changes *which* latents are chosen and lets the allocation be
+uneven across windows, but it cannot manufacture positive pre-activations that do not
+exist. If only ~14 latents per window have one, no selection rule followed by a ReLU can
+realise more than ~14. My registered A2 predicted batch selection would beat `topk_relu`;
+it does not, and the reason is that I had put the ReLU in the wrong place conceptually.
+
+**Removing the ReLU is the fix**, and it is exact: realised L0 equals k by construction, so
+at kper=41 the crosscoder spends 41.00 of 41 instead of 0.96, and FVU falls from 0.843 to
+0.541. A1 confirmed.
+
+**A3 confirmed, which is what licenses the mechanism.** The advantage arrives with signed
+coefficients — 14.5% negative at kper=8, 38.7% at kper=41. If that fraction had been near
+zero, `#{pre>0}` was never the binding constraint and the whole diagnosis would have been
+wrong. It rises with k exactly as it should: the further TopK reaches past the positive
+pre-activations, the more of what it grabs is negative.
+
+**A4 refuted, decisively.** AuxK reproduces `topk_relu` to every digit — 14.5, 1.05, 0.132,
+0.8324. The standard dead-latent revival loss does nothing here, at either learning rate.
+
+**Consequence, and the change made.** `batchtopk` in
+`src/bench/architectures/crosscoder.py` is now the published no-ReLU formulation and is the
+crosscoder's **default**; the ReLU variant is retained only as `batchtopk_relu`, labelled
+as a diagnostic and explicitly not attributed to the paper. `topk_relu` remains selectable
+for reproducing pre-existing runs. Callers that evaluate a crosscoder must now call
+`.eval()` before scoring, because BatchTopK is a batch rule during training and a fixed
+threshold afterwards; `frontier_modal.py` has been corrected accordingly and re-run.
+
+A second flaky test surfaced while checking this and is the same phenomenon in miniature:
+`TestTopKSAE::test_create_and_forward` asserts realised L0 == k on untrained weights and
+unseeded input, which fails about 1 run in 8 with L0 = 3.875 — the ReLU discarding a TopK
+pick. Seeded.
