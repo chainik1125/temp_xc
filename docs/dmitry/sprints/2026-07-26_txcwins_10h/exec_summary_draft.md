@@ -291,7 +291,7 @@ peak-dose numbers (even scales as α², odd as α).
 
 *Each point is a task: `c` measured on the metric gradient before any dictionary exists, against
 how far the crosscoder beats the best constant write at the smallest significant dose. Above the
-dashed line the crosscoder wins.*
+dashed line the crosscoder wins. The shaded band is the one adjacent pair no threshold separates.*
 
 **Two things this establishes, and one it does not.**
 
@@ -305,15 +305,16 @@ would have discarded it and `r1(Ḡ)` = 0.59 says it has the second-most rank he
 
 **It establishes a classifier, not a ranking.** The deltas are on different scales across tasks,
 so what the screen is asked to do is call the **sign**, not order the magnitudes. **The best
-threshold classifies 6 of 7**, and no threshold does better, because `rotate6` (`c` = 0.134,
-loses) and evidence (`c` = 0.143, wins) are inverted against each other 0.009 apart. Any cut below
-0.134 or above 0.15 gets six and misses one of that pair; **a cut at 0.14 falls between them and
-gets five**, which is the worst available choice and is the one drawn in `c_gate.png`.
+achievable classification is 6 of 7, and no threshold does better** — `rotate6` (`c` = 0.134,
+loses) and `evidence` (`c` = 0.143, wins) are inverted against each other 0.009 apart, so one of
+them is always missed.
 
-So `evidence` is a boundary case adjacent to a loss rather than an outlier inside the win region —
-the honest picture of a real but imperfect threshold. As a rank correlation on magnitudes instead,
-τ = −0.52, dragged down by `rotate6`'s large negative, which is a fact about that task's effect
-size rather than about the screen.
+**The data locate no boundary within that.** Every cut below 0.134 scores 6/7 and so does every
+cut above 0.143, which is why the figure shades the inverted band and **draws no threshold line**:
+a line anywhere in (0.036, 0.134] or (0.143, 0.225] would claim a precision seven points cannot
+support. So `evidence` is a boundary case adjacent to a loss rather than an outlier inside the win
+region. As a rank correlation on magnitudes instead, τ = −0.52, dragged down by `rotate6`'s large
+negative — a fact about that task's effect size rather than about the screen.
 
 **It does not establish a quantitative law.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order**
 quantity, odd in α — but the constant arms measure **72–80% even**, i.e. mostly curvature. So the
