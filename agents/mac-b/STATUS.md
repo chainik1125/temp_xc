@@ -1,46 +1,41 @@
 # Working state — agent `mac-b`
 
-**2026-07-25 ~19:50 PT (overnight loop, briefing
-`briefings/overnight-mac-b.md`).** Cap $100; my actual Modal burn so
-far ≈ $5–6 (ledger-est lines total higher — estimates were
-conservative). Stop: queue done / cap / blocked / 07:00 PT.
+**2026-07-25 ~22:00 PT (overnight loop, briefing
+`briefings/overnight-mac-b.md`).** Cap $100; mac-b ACTUALS ≈ $9
+(+~$6 quotedens est in flight). Stop: queue done / cap / blocked /
+07:00 PT.
 
-## Done (all pushed)
+## Done (all pushed, all PENDING TEAM REVIEW)
 
-1. **B8 slen Stage-1 screen — COMPLETE.** Frozen card `b7121a208`;
-   results `slen/results/screen_{gpt2,llama31_8b}.json` (174 cells
-   each); verdicts in the task_hunt LOG (2026-07-26 mac-b entry):
-   **lat KEEP + lev KEEP (order-free window faces), disp WEAK, the
-   pre-registered recency LADDER COLLAPSES on 2/2 models** — the lat
-   falsifier fired; amended order finding (R10) extends to this
-   substrate. RECEIPTS **R20–R21 added, checker ALL PASS**.
-   CANDIDATES.md outcome line appended. 2-model coverage (no HF
-   secret ⇒ gemma pending, pre-authorized under the same card).
-   PENDING TEAM REVIEW (Sunday).
-   Ops scars: A10 OOM at llama T32 flatten-MLP → L40S; non-detached
-   client cancel (same mode as mac-a) → drivers now sequential
-   .remote + retries + `--detach`.
+1. **B8 slen screen + verdicts** — lat KEEP + lev KEEP (order-free
+   window faces), disp WEAK, **recency LADDER COLLAPSED on 2/2**
+   (falsifier fired; R10 extends). RECEIPTS R20–R21. LOG 2026-07-26
+   mac-b entry; CANDIDATES line.
+2. **B7 refmark screen + verdicts** — NEGATIVE, no KEEP: gpt2 KILL
+   (visible-evidence floor + flat within-conversation control),
+   llama31 WEAK sub-bar residue. RECEIPT **R23** (renumbered from
+   R22 in union-merge — R22 = mac-a's tsae bound; my refmark LOG
+   entry + CANDIDATES already say R23; one stale "R22" in an earlier
+   ledger line + commit message, corrected forward in the 21:55
+   ledger line). mac-local approved the card pre-results.
 
-## In flight / next
+## In flight
 
-2. **Stretch: B7 refmark screen — frozen and gated-cleared.** Card
-   `refmark/CARD.md` + `screen.py` + `cache_acts.py` FROZEN at
-   `c46d58826`; driver `scripts/modal_refmark_screen.py` (L40S,
-   pinned there). Gate (slen pushed + ≤$60): CLEARED. Launch:
-   `modal run --detach scripts/modal_refmark_screen.py` (caches ~10
-   min, screen ≤ 1 h/model, est ≤ $8). build_rows validated
-   label-side (user-echo 13 turns / 69 manifest rows dropped
-   +disclosed; wd 112/31 convs). Scorer: slen/score.py pattern —
-   refmark needs its own quick scorer or read cells directly.
-3. After refmark: verdict per its card § 5 (KEEP needs visible-
-   evidence floor + wd both cleared), LOG + RECEIPTS, ledger,
-   STATUS. Then quotedens (B9, 5.3M tok/model) ONLY if plenty of
-   margin before 06:30 PT hard stop for new starts.
+3. **B9 quotedens screen** — frozen `5b45cd027` (card + screen +
+   cache builder + scorer), driver
+   `scripts/modal_quotedens_screen.py`, launched detached ~21:58 PT
+   (image → caches ~3.6M tok → 2 sequential screens on L40S). Log
+   `$SCRATCHPAD/modal_quotedens.log`, Monitor armed. Best-spanned
+   ladder of the night (T64 ≈ 0.87 kernel mass — saturation
+   predicted, no reach excuse). On completion: score
+   (`quotedens/score.py`), verdict per card § 5 (KEEP needs
+   vis-floor + within-book both cleared), LOG + RECEIPTS R24,
+   ledger, STATUS, push.
 
 ## If resuming cold
 
-Read `briefings/overnight-mac-modal.md` + `overnight-mac-b.md`, then
-the LOG tail (my 2026-07-26 entry) and `refmark/CARD.md`. Modal
-volume `temp-xc-replag-caches` holds replag + (maybe) refmark caches
-+ results under /workspace/{slen,refmark}_results. Log:
-`$SCRATCHPAD/modal_pipeline.log`. Ledger before ANY launch.
+Briefings + LOG tail (three mac-b entries) + `quotedens/CARD.md`.
+Partials on Volume `/workspace/quotedens_results/`; resume =
+relaunch driver (`--stage screen`). Ledger before ANY launch.
+After quotedens: queue is EMPTY — hold for 07:00 PT / review pings;
+do NOT start anything new past 06:30 PT.
