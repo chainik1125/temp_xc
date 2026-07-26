@@ -1,61 +1,50 @@
 # Working state — agent `mac-b`
 
-**2026-07-26 ~12:15 London (day-2 sprint, briefing
-`briefings/day2-dialogue-mac-b.md`).** Day-2 cap $60; mac-b day-2
-ACTUALS ≈ $1. **W1 COMPLETE** — the R11 order-mechanism ladder run,
-verdicted, receipted, pushed.
+**2026-07-26 ~15:45 London (day-2 sprint, `day2-dialogue-mac-b.md` +
+race-resolution reassignment).** Day-2 cap $60; mac-b day-2 ACTUALS
+≈ $2. **ALL ASSIGNED WORK COMPLETE** — W1 verdicted + ratified, panel-2
+support delivered through R27. Holding for the 18:00 check-in.
 
-## Day-2 record (PENDING TEAM REVIEW + mac-local ratification)
+## Day-2 record (mac-b lanes)
 
-**W1 — dialevel R11 ladder (frozen `ede97e206`, mac-local
-freeze-APPROVED pre-results): verdict MIXED on 3/3.** The one
-order-carried window signal outside backtracking decomposes
-ADDITIVELY (|L1+L2−L0| ≤ 0.004) into within-turn token order (L1
-share 0.51/0.38/0.57 of L0 at T32, gpt2/llama/gemma) and turn-block
-order (L2 share 0.56/0.53/0.43), and is concentrated in the NEAR
-half (llama: far −0.007, near +0.037 ≥ full cost +0.035). All four
-identity gates passed — L0 seed-0 reproduced committed R11 to
-≤ 0.0013 on rebuilt caches. Receipt R25 (checker ALL PASS, test
-green). LOG entry with the binding reach disclosures printed.
-Results `dialevel/results/ladder_{gpt2,llama31_8b,gemma2_2b}.json`.
+1. **W1 — R11 order-mechanism ladder (freeze `ede97e206`): MIXED on
+   3/3, mac-local APPROVED + R25 RATIFIED.** L1/L2 each carry ≥ ⅓ of
+   L0 additively (|L1+L2−L0| ≤ 0.004); order concentrated in the NEAR
+   half (llama far −0.007 / near +0.037 ≥ full +0.035); R11 reproduced
+   ≤ 0.0013 on rebuilt caches. W2's screens + both panels then landed
+   exactly where this said the order lives.
+2. **Gemma overnight-card fills: approved → launched → DROPPED on
+   order** (race resolution): slen app stopped mid-screen (~$1; gemma
+   replag cache + screen partials persist on the Volume — resumable
+   post-deadline); refmark/quotedens never launched.
+3. **Panel-2 (dq/llama31) merge + receipts support (the reassigned
+   lane):** merge script freeze-set discipline through three freeze
+   generations (cfa341c34 → db677a4b8 re-freeze → 931c016e6 re-pass
+   pin; first-run rows non-quotable, per-stamp counts in the merge
+   receipt); PANEL_RECIPES stanzas; harness pre-flight (canonical λ̂
+   byte-identical). **R27 delivered on the complete 102/102 panel:
+   pre−tsae T8 = +0.155, 95% t CI [+0.126, +0.184] — the hunt's first
+   cross-arch margin bounded away from 0 at n = 3; T32 −0.017 confirms
+   the T ≤ 8 licence zone; 2→8 trend exact p = 0.0046; pre/T8
+   trained−untrained +0.319; v2 lead +0.188.** Instrument notes
+   disclosed: diafaces panels take `--post-k-rule fixed` (uniform
+   k_pos = 8, 8·T internal to post); 5-T secondary trend guarded
+   (skip-with-reason; canonical output re-verified byte-unchanged).
+
+All verdicts/receipts PENDING TEAM REVIEW at the 18:00 London
+check-in / Sunday 10:00 PT; R27 awaits mac-local ratification-on-add.
 
 ## Standing state / if resuming
 
-- Modal Volume `temp-xc-replag-caches` now also holds
-  `/workspace/dialevel_caches/{gpt2,llama31_8b,gemma2_2b}` (3 layers
-  each) + `/workspace/dialevel_results/` mirrors. HF secret
-  `hf-token` live in workspace (gemma GO; Han rotates post-weekend).
-- Driver: `scripts/modal_dialevel_ladder.py` (L40S, sequential
-  .remote + retries, in-container caches, launch via
-  **`uvx modal run --detach`** — plain `modal` is NOT on PATH here).
-- Ladder scorer: `.venv/bin/python -m
-  experiments.explorations.task_hunt.dialevel.ladder_score`.
-- Overnight record (slen/refmark/quotedens, R20–R24) unchanged —
-  see LOG; verdicts await Sunday 10:00 PT team review.
-- **~13:25 London REASSIGNMENT (LOG race-resolution entry): gemma
-  fills DROPPED mid-slen** (app stopped; ~$1 actual; gemma replag
-  cache + slen screen partials persist on Volume — resumable
-  post-deadline; refmark/quotedens fills never launched). **mac-b is
-  now PANEL 2 (dq/llama31) merge + receipts support**: mac-a owns
-  cells + verdicts; I own merge-locally + variance-harness receipts
-  (`support_stats/stage2_variance.py`, invocation per
-  `support_stats/PANEL_RECIPES.md`: --row-layout paired,
-  --post-k-rule times-T, --crosscheck-json the panel's own stage2
-  json) + receipts_check rows. Panel-2 deadlines: freeze 13:30,
-  launch 13:45, repatriation 16:15, everything pushed 16:30.
-- **Panel-2 receipts RUNBOOK (at repatriation, ~16:15):**
-  1. (post v2 re-freeze db677a4b8 — BOTH panels re-ran; first-run
-     rows non-quotable) if mac-a's client didn't already repatriate:
-     `uvx modal volume get temp-xc-replag-caches diafaces_panels_v2/dq/ …`
-     → `diafaces/results/panel2_payloads/`;
-  2. `.venv/bin/python -m experiments.explorations.task_hunt.diafaces.merge_panel_payload dq`
-     (freeze stamp cfa341c34… filled + asserts; leaderboard dedup);
-  3. the two PANEL_RECIPES.md dq commands (v1 WITH --row-layout
-     paired — REQUIRED post-defect — + paired v2) →
-     `support_stats/stage2_variance_diafaces_dq[_v2].{json,md}`;
-  4. receipts row(s) R27+ wired to those outputs + checker green +
-     push by 16:30. mac-a owns cells + the P1–P6 verdict.
-  Harness pre-flighted: canonical λ̂ run reproduces committed
-  receipts (3 last-ulp diffs only).
-- Day-2 gates: NO new Modal starts after 15:30 London; briefings
-  retire at the 18:00 check-in.
+- Modal: NOTHING of mine in flight. Volume `temp-xc-replag-caches`
+  additionally holds dialevel caches ×3 + ladder results, gemma
+  replag cache + slen gemma screen partials (resumable), panels-v2
+  payloads. `uvx modal …` (plain `modal` not on PATH). hf-token +
+  Modal token rotate after the weekend (Han).
+- Ledger: mac-b day-2 actuals ≈ $2 (W1 ~$1 + dropped fill ~$1);
+  program total ≈ $87 of $500 (mac-a's actuals line).
+- Post-deadline queue candidates (mac-local gate applies): finish the
+  gemma fills from the Volume partials (~$4); the three overnight
+  screens' cards remain frozen and valid.
+- Day-2 gates: no new Modal starts (past 15:30); briefings retire at
+  the 18:00 check-in.
