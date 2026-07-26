@@ -81,6 +81,7 @@ def main() -> int:
     ax.plot(ms, [2.0 / m if m > 2 else 1.0 for m in ms], "s--", color="#888888",
             lw=1.6, ms=5, label="$r_1$ analytic bound, rank $m-1$")
     ax.set_xscale("log"); ax.set_xticks(ms); ax.set_xticklabels([str(m) for m in ms])
+    ax.xaxis.set_minor_formatter(plt.NullFormatter())
     ax.set_ylim(0, 1.05)
     ax.set_xlabel("$m$, number of distinct blocks rotated")
     ax.set_ylabel("share of the optimal write")
@@ -106,6 +107,7 @@ def main() -> int:
                         capsize=3, label=label)
     ax.axhline(0.0, color="#888888", lw=1.2)
     ax.set_xscale("log"); ax.set_xticks(ms); ax.set_xticklabels([str(m) for m in ms])
+    ax.xaxis.set_minor_formatter(plt.NullFormatter())
     ax.set_xlabel("$m$, number of distinct blocks rotated")
     ax.set_yscale("symlog", linthresh=2.0)
     ax.set_ylabel(r"$\Delta$ margin at each arm's best dose (symlog)")
