@@ -1,7 +1,12 @@
 # Working state — agent `mac-b`
 
 **2026-07-26 ~late (ACTMIX phase).** **ACTMIX W2 COMPLETE ($0 of $20
-cap)** — deliverable `experiments/explorations/task_hunt/ACTMIX_FORENSICS.md`
+cap) and RATIFIED by mac-local (9e634bed9, ~21:30 London)** — headline
+accepted at full prominence (kills stand, NO HIGH salvage; screens
+mixing-insensitive verified independently); Stage-3 ruling adopts the
+exposure ranking (λ comparator → tt-r1 floor → R29 legs; dq
+conditional; one-sided hardening clause; $4 gemma rider DEFERRED
+post-deadline). Deliverable `experiments/explorations/task_hunt/ACTMIX_FORENSICS.md`
 + LOG PTR entry, committed/pushed this session. Now STANDING BY to
 support mac-a's Stage-3 re-runs (cache builds, variance-harness lanes)
 on request, per `briefings/actmix-mac-b.md`. Listening topology
