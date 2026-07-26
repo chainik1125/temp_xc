@@ -95,7 +95,13 @@ dictionary involved. Across six configurations spanning both metric modes:
 | recency | **0.034** | **+6.48** | +2.60 | **+18.3** | **wins** | `recency_gradsmoke.json` (c), `recency_v2.json` |
 
 The split is clean and it falls between 0.102 and 0.034 — **every cell with `c ≥ 0.10` fails,
-both cells with `c ≤ 0.034` win.** `sqrt(c)` also predicts the SAE's own level across the
+both cells with `c ≤ 0.034` win.**
+
+**`c` is necessary and demonstrably not sufficient**, and the counterexample is worth more than
+the caveat. The same recency task on Qwen2.5-0.5B (`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037)
+sits squarely in the winning range and shows **no effect from any write, including the supervised
+one**. A low `c` says a constant write has nothing to ride; it does not say anything is steerable
+at all. `sqrt(c)` also predicts the SAE's own level across the
 rotation ladder (0.40, 0.32, 0.18 against measured +5.27, +5.92, +5.36).
 
 **This retires the metric-mode sentence circulated earlier tonight.** "The crosscoder wins under
@@ -136,6 +142,11 @@ a component the ordering metric leaves exposed; the second is the only thing tha
 kind of effect an arm has.
 
 ### 5. The surviving win is discovery, not expressiveness — and the ordering is measured
+
+**Stated at its true scope:** on Qwen2.5-1.5B-Instruct, a crosscoder latent reverses the model's
+instruction-position bias in generated text, beating every unsupervised per-token baseline and
+every temporal-profile control. The same task on two smaller models has **no steerable target at
+the layer tested, for any write including the supervised one** — see the limits section.
 
 Instruction recency, completed configuration, every arm at matched injected norm:
 
@@ -308,6 +319,28 @@ with learning rate or step count**, which is a caveat on every number here. The 
 trained on the same content they are asked to steer, so the current claim is "steers the ordering
 of content it was trained on" until the held-out split lands. The rotation ladder, the gradient
 rank arms and that split were all still running when this was written.
+
+**The headline task does not transfer to either model it was tried on, and the reason is not the
+dictionaries.** At each model's own best recipe, mid-layer:
+
+| model | baseline bias | `dom_slab` | best rank-1 | `txc_slab` |
+| --- | --- | --- | --- | --- |
+| Qwen2.5-1.5B-Instruct L14 | −2.42 | +8.20 | +8.55 | **+6.48** |
+| Qwen2.5-0.5B-Instruct L12 | +1.50 | +0.31 | +0.31 | +0.32 |
+| SmolLM2-1.7B-Instruct L12 | +2.18 | +0.61 | — | +0.80 |
+
+**The supervised write fails on both smaller models too.** There is no `(T, d)` write at that
+layer, of any kind, that shifts which instruction they obey — so the crosscoder is not failing to
+find something, there is nothing at that site to find. This is a statement about **where the
+behaviour is linearly manipulable**, not about dictionary architectures, which makes it more
+useful than a dictionary-level negative would have been. A layer sweep on SmolLM2 is running; if
+the target appears at another depth the limitation softens to "the site moves between models".
+
+**The bias itself flips sign across models.** Qwen2.5-1.5B is recency-driven (−2.42, obeys the
+later instruction); Qwen2.5-0.5B and SmolLM2-1.7B are **primacy**-driven (+1.50, +2.18). So
+"language models resolve conflicting instructions by recency" is not safe as a general statement
+at this scale, and the task is named **instruction-position bias** throughout, with the sign given
+per model.
 
 **The crosscoder's temporal profile is actively harmful at two of three rotation rungs.**
 `txc_flat` — its own slab with the profile averaged away — reaches +10.36 against the
