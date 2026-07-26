@@ -449,6 +449,47 @@ baseline — could **not** be run: the results files store `baseline_contrast`, 
 `score(A) − score(B)`, and not the per-condition scores. The even/odd decomposition tests the same
 hypothesis more directly and does not need them, so that is the version to use.
 
+### My serial-position hypothesis is also refuted — and what survives is narrower
+
+Theory ran the falsification I specified, on a second pattern pair matched on all three moments.
+I verified the result rather than accepting it.
+
+**The hypothesis fails its own test.** `corr(u₂ pair1, u₂ pair2) = +0.184` and
+`corr(u₁ pair1, u₁ pair2) = +0.051` — neither singular vector is position-intrinsic. My template
+correlation collapses from **+0.898 to +0.209** on the new pair. Fitted to one pattern's twelve
+numbers, gone when the pattern changes, exactly the risk I flagged when offering it.
+
+**The replacement explains far more.** Pair 2 has Hamming distance 8, agreeing at positions
+{5, 6, 7, 12}, and the gradient norm separates cleanly on that split:
+
+| | values | extremum |
+| --- | --- | --- |
+| agreeing positions | 0.30, 0.15, 0.15, 0.26 | max **0.30** |
+| differing positions | 0.87, 0.88, 0.75, 1.00, 0.56, 0.66, 0.55, 0.71 | min **0.55** |
+
+No overlap, and the four lowest values in the profile *are* the four agreeing positions.
+`corr(profile, 1[differ]) = +0.891` against my template's +0.209. **The gradient's temporal support
+is set by where the two classes differ** — not by position, and not by any carried quantity.
+
+**But note precisely what this does and does not cover, because it is narrower than it looks.**
+It accounts for `u₁`: at Hamming 12 every position differs, the indicator is constant, and pair 1's
+`u₁` is correspondingly broad (cv 0.255). It **cannot** account for `u₂` on pair 1 — a constant
+indicator predicts a flat profile, and `u₂` there is U-shaped with cv 0.963. So the honest
+accounting is:
+
+- `u₁` — **explained** by differ-support;
+- `u₂` — **unexplained**, on both pairs, after three attempts (carried state, serial position,
+  differ-support).
+
+That is a sharper statement than "the mechanism is unidentified": it localises the gap to the
+second direction specifically, and confirms the first is accounted for.
+
+**One design point vindicated for a measured reason.** The Hamming-12 complement is the right foil
+not merely because no segment is wasted, but because a constant differ-indicator **removes support
+as a confound** — it is the only pair on which a residual profile shape could mean anything at all.
+Lower-Hamming foils spend part of the window on positions the metric barely responds to *and*
+confound any profile structure with the differ pattern.
+
 ### The content-plus-carried-state mechanism is refuted — and what the shape suggests instead
 
 I proposed that few-shot demonstrations supply theory's content-plus-state pair for free, with the

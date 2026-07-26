@@ -89,7 +89,26 @@ attribute; measured `r1` 0.921 → 0.970) and an `m`-block rotation is rank `m �
 The design rule that follows: **an expressiveness result needs a task where two or more distinct
 attributes move in different directions at different positions.**
 
-⚠ **The proposed source for that second attribute is refuted, on both tasks it was applied to.**
+⚠ **Three mechanisms for that second attribute have been proposed and all three are refuted**,
+each by a profile measurement the proposal itself specified:
+
+| proposed mechanism | prediction | measured |
+| --- | --- | --- |
+| content plus its carried state | `u₁`, `u₂` on disjoint positions | both on the *same* two positions (instruction position); `u₂` U-shaped where a running balance would ramp (demonstration order) |
+| serial position (primacy/recency) | `u₂` near-identical under a second moment-matched pattern pair | `corr` = **+0.18**; the 1/dist-to-end fit falls 0.898 → 0.524 |
+| differing-vs-agreeing positions | — | explains the **support** but not why the slab is rank 2 rather than rank 1 |
+
+> **Rank ≥ 2 is measured and robust across tasks and pattern pairs. What supplies the second
+> direction is unidentified: three candidate mechanisms were proposed and each was refuted by a
+> profile measurement it predicted.**
+
+**One positive survives from that sequence.** On the second pattern pair the four lowest
+gradient-norm entries sit at exactly the four positions where the two classes agree — so **the
+gradient's support is set by where the classes differ**, not by position and not by any
+accumulated quantity. It is the first claim about these profiles to survive a test, and it
+explains the support while explicitly not explaining the rank.
+
+The original argument, for the record:
 The argument was content plus its own carried state, since a maintained state's schedule is the
 running integral of the content's. It makes a checkable prediction about profile structure, and
 the prediction fails twice. On instruction position, `u₁` and `u₂` both live on the two
