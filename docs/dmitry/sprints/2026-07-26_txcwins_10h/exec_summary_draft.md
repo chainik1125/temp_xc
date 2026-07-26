@@ -629,10 +629,10 @@ from the other), matched dose |α| = 0.5, files `demo_order_probe_tr_t2_ds{0,1,2
 **A win over constant writes in all three inits, and a small one.** Absolute margins of 0.25–0.59
 against a baseline gap of 0.370, with the profile control at or below zero throughout.
 
-⚠ **The result is dose-convention dependent at init 2.** At each arm's own peak dose that init
-**reverses** — SAE +0.80 against the crosscoder's +0.44, z = −2.5 — while inits 0 and 1 hold
-(+11.5, +2.2). Matched dose is this sprint's primary convention and the reason is finding 1, but a
-result that flips under the convention we abandoned deserves saying rather than burying.
+⚠ **Two of the three inits change verdict under the abandoned dose convention** — at each arm's
+own peak dose, inits 1 and 2 reverse. They are two of the six such cells in the sprint; see the
+convention audit in Limits. Demonstration order has the smallest absolute effects of any task
+here, which is exactly the regime where the convention matters.
 
 **It loses to the rank-1 ceiling by a wide margin in every init** — z = −50.2, −59.4, −56.7
 against `grad_rank1`, and −6.2, −11.8, −12.1 against `rank1_best`, with `sae_schedule` beating it
@@ -748,6 +748,21 @@ crosscoder's +2.86 at `rotate2` and +9.83 against −0.01 at `rotate6`, reversin
 `rotate12` (+4.32 against +18.23). And `txc_slab` across the ladder reads +2.86, +6.43, −0.01,
 +18.23 — a −0.01 followed by a +18.23 is instability, not a trend. The honest description of the
 surviving win is **discovery, and unreliable discovery**.
+
+**The choice of dose convention does not flatter us, and that is measured rather than argued.**
+Across all 62 symmetric-grid runs, **6 change verdict** between matched dose and peak dose
+(`scripts/convention_flips.py`):
+
+- **Flips are confined to near-zero cells.** The largest margin involved in any flip is **1.89**,
+  and every run with a matched-dose margin above that is convention-stable. Convention-sensitivity
+  is a property of small effects, not a general instability.
+- **The direction is symmetric — 4 favour matched, 2 favour peak.** We chose matched dose on our
+  own reasoning, and a reader is entitled to ask whether we chose the convention that flatters the
+  result. This says we did not.
+- **Neither headline task flips on any main run.** Instruction position is stable across all seven
+  of its runs including the three held-out; evidence is stable across five of six, and its one
+  exception has a matched-dose margin of **−0.00** — an exact tie flipping on rounding rather than
+  a reversal.
 
 **A canary, if either held-out rerun collapses.** The first thing to re-examine would be whether
 the reading result still holds — `auc_selection = 1.000` for the SAE on all three tasks. It is the
