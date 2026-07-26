@@ -19,7 +19,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "195fa073a2ff76681b02bf0aad43650bd4656c7b"  # d_sae wing FREEZE v5
+PINNED_COMMIT = "030864a04ca058d8a88667d6e5762d4a0bc89b5c"  # perwin-raw FREEZE v6
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 VOL_DIR = "/workspace/btk_rerun_v2"
