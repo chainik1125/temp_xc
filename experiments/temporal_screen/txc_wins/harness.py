@@ -73,7 +73,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              make_pair_test=None,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
              n_perm=0, seed=31415, dict_seed=0, gen_tokens=0, n_gen=0,
-             n_grad=0, select_by="reading", sae_lr=None, txc_lr=None, tsae_lr=None,
+             n_grad=0, select_by="reading", n_select=24, n_short=16,
+             matched_dose_hint=0.5, sae_lr=None, txc_lr=None, tsae_lr=None,
              sae_steps=None, txc_steps=None, tsae_steps=None,
              arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
@@ -515,6 +516,17 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             f"{out['rank_grad']['r1']:.3f}  c = {out['rank_grad']['c']:.3f}  "
             f"cos(grad, dom) = {out['rank_grad']['cos_with_dom']:+.3f}")
         writes["grad_slab"] = unit(G)
+        # THE BEST CONCEIVABLE BROADCAST WRITE, measured rather than inferred.
+        # Maximising <W, Gbar> over ALL directions v for W = (1_T (x) v)/||1_T (x) v||
+        # is attained exactly at v ∝ mean_t Gbar, with value sqrt(c)*||Gbar||_F. So this
+        # arm is the ceiling for EVERY constant write in the whole space -- not merely the
+        # best one in a 4096-atom dictionary -- and steering with it turns sqrt(c) from a
+        # predicted bound into a measured reference. If a selected SAE latent reaches this
+        # line, the dictionary was never the limitation and the BROADCAST FORM is; if it
+        # falls well short, the dictionary is failing too and the two limits are separable.
+        writes["broadcast_optimal"] = unit(
+            unit(G.mean(0)).unsqueeze(0).expand(T, -1).contiguous())
+        out["sqrt_c_grad"] = float(out["rank_grad"]["c"] ** 0.5)
         writes["grad_rank1"] = unit(gS[0] * torch.outer(gU[:, 0], gVh[0]))
         # The SAE's OWN direction on the best schedule for it, taken from the gradient
         # rather than from difference-of-means. This is the arm that would defeat the
@@ -544,7 +556,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         # Gbar here is accumulated on documents drawn BEFORE the test set and disjoint from
         # it, so selection and reporting never share a document -- without that this would
         # reintroduce exactly the winner's curse the matched-dose protocol exists to avoid.
-        if select_by == "gradient":
+        if select_by in ("gradient", "steering"):
             g_mean = G.mean(0)
             sae_scores = (sae.W_dec.data.T.float() @ g_mean).abs() / (
                 sae.W_dec.data.norm(dim=0).float() + 1e-9)
@@ -593,6 +605,77 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             writes["txc_slab"] = st * unit(P_g)
             writes["txc_flat"] = st * unit(
                 P_g.mean(0, keepdim=True).expand(T, -1).contiguous())
+
+        # ---------------- SELECTION BY *MEASURED* STEERING ----------------
+        # First-order alignment is a proxy, and there is a specific reason to distrust it
+        # for the per-token arm: the constant-write arms measure 72-80% EVEN in alpha, i.e.
+        # mostly curvature, against the crosscoder's 10-12%. So ranking the SAE by a
+        # first-order quantity ranks it on the component least represented in what it
+        # actually achieves, and a null result would be ambiguous between "the SAE has no
+        # good steering latent" and "first-order alignment is the wrong selector for it".
+        #
+        # This removes the ambiguity by MEASURING each candidate's steering effect instead
+        # of predicting it. Exhaustive measurement over 4096 latents is infeasible, so the
+        # shortlist is the union of the top `n_short` by first-order alignment and the top
+        # `n_short` by reading AUC -- symmetric across arms, and covering both hypotheses
+        # about where a good latent hides. Candidates are scored on documents drawn AFTER
+        # the gradient documents and BEFORE the test set, so selection never touches a
+        # document it is later reported on.
+        if select_by == "steering":
+            sel = []
+            for _ in range(n_select):
+                sa, sb, car, c1, c2 = draw(rng, make_pair_test)
+                ta_, spa_ = build(car, sa)
+                tb_, spb_ = build(car, sb)
+                sel.append((ta_, spa_, tb_, spb_, c1, c2))
+            sel_base = [doc_score(a_, b_, c1, c2, None, 0)
+                        - doc_score(c_, d_, c1, c2, None, 0)
+                        for a_, b_, c_, d_, c1, c2 in sel]
+            a_sel = matched_dose_hint
+
+            def measure(W):
+                best = -1e9
+                for sgn in (1.0, -1.0):
+                    v = float(np.mean([
+                        doc_score(a_, b_, c1, c2, sgn * W, a_sel)
+                        - doc_score(c_, d_, c1, c2, sgn * W, a_sel) - bs
+                        for (a_, b_, c_, d_, c1, c2), bs in zip(sel, sel_base)]))
+                    best = max(best, v)
+                return best
+
+            def shortlist(fo_scores, auc_scores):
+                a = set(torch.topk(fo_scores, n_short).indices.tolist())
+                b = set(torch.topk((auc_scores - 0.5).abs(), n_short).indices.tolist())
+                return sorted(a | b)
+
+            sae_auc = torch.tensor(
+                [auc_of(Ztr_[:, j], ytr) for j in range(d_sae)], device=dev)
+            txc_auc = torch.tensor(
+                [auc_of(Zt_tr[:, j], ytr) for j in range(d_sae)], device=dev)
+            picks = {}
+            for nm, W_of, fo, auc in (
+                    ("sae", lambda j: unit(unit(sae.W_dec.data[:, j].float())
+                                           .unsqueeze(0).expand(T, -1).contiguous()),
+                     sae_scores, sae_auc),
+                    ("txc", lambda j: unit(txc.W_dec.data[j].float()),
+                     txc_scores, txc_auc)):
+                cands = shortlist(fo, auc)
+                scored = [(measure(W_of(j)), j) for j in cands]
+                scored.sort(reverse=True)
+                picks[nm] = {"latent": scored[0][1], "sel_delta": scored[0][0],
+                             "n_candidates_measured": len(cands),
+                             "top5": [[j, round(v, 4)] for v, j in scored[:5]]}
+                log(f"[select-steer] {nm}: measured {len(cands)} candidates, "
+                    f"best latent {scored[0][1]} at sel-split delta "
+                    f"{scored[0][0]:+.3f}")
+            out["selection"]["measured"] = picks
+            v_s = unit(sae.W_dec.data[:, picks["sae"]["latent"]].float())
+            writes["sae_broadcast"] = unit(
+                v_s.unsqueeze(0).expand(T, -1).contiguous())
+            P_s = txc.W_dec.data[picks["txc"]["latent"]].float()
+            writes["txc_slab"] = unit(P_s)
+            writes["txc_flat"] = unit(
+                P_s.mean(0, keepdim=True).expand(T, -1).contiguous())
 
         for _nm in ("grad_rank1", "sae_schedule_grad"):
             out["write_profile"][_nm] = [float(v) for v in writes[_nm].norm(dim=-1)]
