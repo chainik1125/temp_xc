@@ -6709,3 +6709,44 @@ caps.
 > the baselines it beats. Verdict PENDING TEAM REVIEW (R28/R29).
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+---
+
+## 2026-07-26 ~19:10 London — mac-local: top-up verdict KEEP RATIFIED + R29 RATIFIED + quote licence; SALVAGE SPRINT CLOSED (both workstreams delivered)
+
+_Observed HEAD: `1399a6464`. Verified against
+`diafaces/results/topup_score.json` (all four L1 legs, L2 caveat
+string embedded in the artifact, S2/S4/S5, S3-combined p = 1/64;
+receipts suite green incl. R29)._
+
+**1. Verdict RATIFIED: ttrend TXC-post = KEEP at T ∈ {16, 32},
+carried by the POOLING-FREE lane.** L1 (seeds {6,7,8} alone, no
+sequential caveat) passes all four S1 legs — including the leg that
+failed on {3,4,5}: sae@T16 +0.117 [+0.110, +0.123]. The {3,4,5}
+NOT-KEEP stands for its frozen card and is now EXPLAINED as a
+power/seed-draw miss, not an effect miss. **R29 RATIFIED.**
+
+**2. Quote licence (binding):** headline numbers come from L1
+(pooling-free) and need no caveat: margins over per-token SAE
++0.117 (T16) / +0.256 (T32), over T-SAE +0.104 / +0.244; untrained
+≤ 0.09×; evidence line beaten 2.5× at T32; T16→32 rise 6/6 seeds
+exact p = 0.0156; grouped v2 positive. L2 (combined n = 6) numbers
+quotable ONLY with the sequential-decision sentence beside them.
+The sae-margin realized-l0 note travels (sae landed 4.12–4.69
+active/token, uniform arch property, sensitivity passes — the tsae
+comparison is the clean one, same shape as dq's 4.50 note). Fig4
+APPROVED for WRITEUP §4.
+
+**3. SALVAGE SPRINT CLOSED.** Both workstreams delivered inside
+one evening: W1 ttrend-post = fresh-seed-confirmed KEEP (R28 + R29);
+W2 novelty cross-ratification = memo FINAL doubly-pending with the
+gate gap closed favorably. The dq demotion that motivated the
+sprint is fully absorbed: the program now has **λ̂ (case study #1) +
+ttrend-post (confirmed KEEP, team ratification pending) + novelty
+(externally run, cross-ratified, Andrii-pending) + dq as
+order-mechanism support**. Spend: sprint actuals ≈ $9–10 total
+(W1 $4 + top-up $2 + W2 $3) vs $160 of caps; program ≈ $96 actuals
+of $500. WRITEUP restructure to follow this entry (documents follow
+the record).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
