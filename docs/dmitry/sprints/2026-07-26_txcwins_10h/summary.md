@@ -417,27 +417,25 @@ Screened through the same training-free geometry screen, Qwen2.5-1.5B-Instruct L
 
 | attack | unsteered baseline | `c(Ḡ)` | `r1(Ḡ)` | `c(P_dom)` | `cos(P_dom, Ḡ)` |
 | --- | --- | --- | --- | --- | --- |
-| naive | +10.27 (z = 27.0) | 0.127 | 0.837 | 0.083 | −0.004 |
-| ignore | +10.70 (z = 24.9) | 0.129 | 0.774 | 0.099 | −0.002 |
-| `completion_real` | **+20.95** (z = 17.4) | 0.134 | 0.938 | 0.062 | −0.001 |
+| naive | +10.01 (z = 24.0) | 0.123 | 0.846 | 0.083 | −0.004 |
+| ignore | +11.37 (z = 23.5) | 0.129 | 0.816 | 0.083 | −0.002 |
+| `completion_real` | **+19.67** (z = 18.1) | 0.130 | 0.945 | 0.049 | −0.002 |
 
 **The behaviour is strongly present**, and `completion_real` measures ~2× the other two — the
 attack ladder orders as StruQ reports it, which is independent evidence the adapter is faithful
 rather than merely self-consistent.
 
 **The difference-of-means proxy would have given the opposite screening decision on all three
-attacks.** `c(P_dom)` = 0.062–0.099 sits *below* the `c < 0.1` go-threshold while `c(Ḡ)` =
-0.127–0.134 sits above it, and `cos(P_dom, Ḡ)` is −0.004 to −0.001 against a 0.0074 random
+attacks.** `c(P_dom)` = 0.049–0.083 sits *below* the `c < 0.1` go-threshold while `c(Ḡ)` =
+0.123–0.130 sits above it, and `cos(P_dom, Ḡ)` is −0.004 to −0.002 against a 0.0074 random
 baseline — orthogonal to within noise. **This is the fifth independent demonstration that the two
 slabs are different quantities and the first on a published benchmark rather than one of our own
 constructs.**
 
-⚠ **These numbers ran on the unfiltered 208 items.** Four of them have an **empty `output`**
-field, which breaks both uses of it — `cont2` degenerates to a bare space, and
-`completion_real`'s forged response (`output[1:]`) collapses to a `### response:` header with
-nothing after it. So ~2% of the 200 sampled documents drew a degenerate item. A rerun on the
-filtered 204 is pending and the table above will be restated from it; the values are not expected
-to move materially, but that is an expectation and not a check.
+Four of the 208 items carry an **empty `output`** field, which breaks `cont2` and degrades
+`completion_real`'s forged response. Rerun on the filtered 204 moved `c` by at most **0.005** and
+changed nothing qualitative; the table above is the filtered run
+(`results/txc_wins/geometry_struq_filtered.json`).
 
 ⚠ `c` ≈ 0.13 falls inside the band containing the gate's only known inversion (`rotate6` at 0.134
 loses, evidence at 0.143 wins), so the screen does not decide this task. **The full arm set is
