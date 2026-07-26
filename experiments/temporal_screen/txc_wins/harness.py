@@ -70,6 +70,7 @@ def _upper_frac(texts):
 
 
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
+             make_pair_test=None,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
              n_perm=0, seed=31415, dict_seed=0, gen_tokens=0, n_gen=0,
              n_grad=0, sae_lr=None, txc_lr=None, tsae_lr=None,
@@ -138,9 +139,9 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         hh = cap["h"][0].float()
         return torch.stack([hh[a:b + 1].mean(0) for a, b in ts])
 
-    def draw(rng_):
+    def draw(rng_, fn=None):
         """make_pair may return 3 items (ordering mode) or 5 (probe mode)."""
-        p = make_pair(rng_)
+        p = (fn or make_pair)(rng_)
         return p if len(p) == 5 else (p[0], p[1], p[2], None, None)
 
     # ---------------- training activations, balanced over the two classes ----------------
@@ -228,6 +229,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
                       "txc": [txc_lr or lr, txc_steps or steps],
                       "tsae": [tsae_lr or lr, tsae_steps or steps]},
            "seed": seed, "dict_seed": dict_seed,
+           "held_out_content": make_pair_test is not None,
            "alphas": list(alphas), "reading": {}, "sparsity": {}, "arms": {}}
     writes = {}
 
@@ -490,7 +492,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             (sgn * s_).backward()
 
         for _ in range(n_grad):
-            sa, sb, car, c1, c2 = draw(rng)
+            sa, sb, car, c1, c2 = draw(rng, make_pair_test)
             ta_, spa_ = build(car, sa)
             tb_, spb_ = build(car, sb)
             if c1 is None:
@@ -522,9 +524,15 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         for _nm in ("grad_rank1", "sae_schedule_grad"):
             out["write_profile"][_nm] = [float(v) for v in writes[_nm].norm(dim=-1)]
 
+    # HELD-OUT CONTENT. Without `make_pair_test` the dictionaries are trained on documents
+    # built from the same sentence pools they are then asked to steer, so a latent could in
+    # principle be keyed to those particular sentences rather than to the factor. The
+    # ordering structure makes a pure lookup implausible -- both classes use the same
+    # sentences -- but "steers the ordering of content it was trained on" is a weaker claim
+    # than "steers this factor", and only disjoint pools separate them.
     tests = []
     for _ in range(n_test):
-        sa, sb, car, c1, c2 = draw(rng)
+        sa, sb, car, c1, c2 = draw(rng, make_pair_test)
         ta, spa = build(car, sa)
         tb, spb = build(car, sb)
         tests.append((ta, spa, tb, spb, c1, c2))
