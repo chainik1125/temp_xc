@@ -1,10 +1,24 @@
 # Working state — agent `mac-local`
 
-**Last rewrite:** 2026-07-26 ~02:20 PT (PRE-COMPACT; next window =
-OVERNIGHT EXECUTION). **Resume by reading
-`briefings/overnight-mac-modal.md` FIRST — it is the complete
-operating plan for tonight and this file only summarizes it.** Read
-with `private/rebuttal_plan.md` (untracked).
+**Last rewrite:** 2026-07-26 ~03:10 BST (OVERNIGHT EXECUTION, in
+progress). **Resume by reading `briefings/overnight-mac-modal.md`
+FIRST.** Read with `private/rebuttal_plan.md` (untracked).
+
+## DONE tonight (see LOG 2026-07-26 mac-local entry, commit f07a1f3a5)
+- Queue item 1 COMPLETE: expedited gate-reviews of BOTH panels.
+  oprate NEGATIVE **APPROVED** (artifact-exact). fineweb cross-model
+  verdict **APPROVED with 2 corrections filed** (gpt2 last-digit
+  seed-means; gemma within-doc T2 = 0.067 not 0.047 — monotone-from-T2
+  withdrawn, T4-onward growth + window-over-token contrast stand).
+  RECEIPTS rows all clean — corrections were LOG-narrative only.
+  Flush commit c8ab5fa0 owned by me in the LOG (preservation-flush
+  labeling lesson adopted). Both stage2 briefings retired. Suite
+  green (332+1skip). **Distillation DRAFT already written:**
+  `private/sunday_distillation_2026-07-26.md` — update with overnight
+  landings, deliver by 09:30 PT.
+- Origin watcher running in background (scratchpad/watch_origin.sh):
+  re-invokes me on any push to arxiv or at the 07:00 PT pivot.
+- mac-a / mac-b: NOT YET LAUNCHED at last check (ledger ~$1/$500).
 
 ## STRUCTURE TONIGHT (Han, 2026-07-26 — supersedes the single-executor plan)
 I stay ORCHESTRATOR. Two fresh local agents execute autonomous loops
@@ -16,7 +30,7 @@ overnight-mac-modal.md; **shared spend ledger briefings/MODAL_SPEND.md
 ($500 hard / $400 soft total)**. Modal smoke PASSED (A10). Roster
 entries mac-a/mac-b added (set_agent_env.sh + agents/README).
 
-## MY OVERNIGHT QUEUE (orchestrator)
+## MY OVERNIGHT QUEUE (orchestrator; item 1 DONE, distillation drafted early)
 1. Expedited gate-reviews of the two completed panels (oprate
    NEGATIVE; fineweb gemma/gpt2/llama) — no compute; mark "expedited
    — full depth at team review". Do FIRST.
