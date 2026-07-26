@@ -19,7 +19,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "c46d588268d7a2bc71ac52acce23c02540c46409"  # refmark FREEZE
+PINNED_COMMIT = "c46d588263096564b6bff0d5a8a05f65422edcf9"  # refmark FREEZE
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 KEYS = ["gpt2", "llama31_8b"]
 PY = "/repo/.venv/bin/python"
