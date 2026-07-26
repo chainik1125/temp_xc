@@ -72,7 +72,7 @@ def _upper_frac(texts):
 def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              steps, lr, batch_win, alphas, tsae_l1=None, tsae_k=None, txc_k=None,
              n_perm=0, seed=31415, dict_seed=0, gen_tokens=0, n_gen=0,
-             arms=None, verbose=True):
+             n_grad=0, arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
 
     `make_pair(rng)` must return `(sents_a, sents_b, carrier)`: two equal-length sentence
@@ -429,6 +429,79 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         return (logits_for(text, spans, c1, W, alpha)
                 - logits_for(text, spans, c2, W, alpha))
 
+    # ---------------- the metric's own gradient: the true optimal write ----------------
+    # `dom_slab` is the difference of class means, which is A supervised write but not THE
+    # optimal one -- on the evidence task the crosscoder beat it, so calling it a ceiling was
+    # wrong. The optimal infinitesimal intervention for the metric actually being reported is
+    # its gradient with respect to the write, evaluated at zero:
+    #
+    #     G[t] = d/dW[t] ( score(A) - score(B) )  at  W = 0
+    #
+    # Steering along G is the best any (T, d) write can do to first order, so its rank
+    # decomposition is the r1 and c that the theory wants, and `grad_rank1` is the honest
+    # ceiling for a per-token dictionary handed a perfect schedule. The gradient is
+    # accumulated over `n_grad` documents drawn from the same stream as the test set but
+    # BEFORE it, so nothing is fitted on the documents it is scored on.
+    if n_grad:
+        for p_ in model.parameters():
+            p_.requires_grad_(False)
+        scale_g = float(Xt.norm(dim=-1).mean())
+        Wg = torch.zeros(T, d, device=dev, dtype=torch.float32, requires_grad=True)
+
+        def grad_pass(text, spans, cont, sgn):
+            e, ts2 = seg_spans(text, spans)
+            ids = e["input_ids"].to(dev)
+            n_doc = ids.shape[1]
+            if cont is not None:
+                ids = torch.cat([ids, torch.tensor(
+                    [tok(cont, add_special_tokens=False)["input_ids"]], device=dev)], 1)
+
+            def edit(_m, _i, out_):
+                h = out_[0] if isinstance(out_, tuple) else out_
+                add = torch.zeros_like(h, dtype=torch.float32)
+                for t_i, (a_, b_) in enumerate(ts2):
+                    add[:, a_:b_ + 1, :] = scale_g * Wg[t_i].unsqueeze(0)
+                h = h + add.to(h.dtype)
+                return (h,) + out_[1:] if isinstance(out_, tuple) else h
+
+            hk = layers_[L].register_forward_hook(edit)
+            lg = model(ids).logits.float().log_softmax(-1)
+            hk.remove()
+            if cont is None:
+                s_ = lg[0, :-1].gather(-1, ids[0, 1:].unsqueeze(-1)).sum()
+            else:
+                s_ = lg[0, n_doc - 1:-1].gather(
+                    -1, ids[0, n_doc:].unsqueeze(-1)).sum()
+            (sgn * s_).backward()
+
+        for _ in range(n_grad):
+            sa, sb, car, c1, c2 = draw(rng)
+            ta_, spa_ = build(car, sa)
+            tb_, spb_ = build(car, sb)
+            if c1 is None:
+                grad_pass(ta_, spa_, None, 1.0)
+                grad_pass(tb_, spb_, None, -1.0)
+            else:
+                grad_pass(ta_, spa_, c1, 1.0); grad_pass(ta_, spa_, c2, -1.0)
+                grad_pass(tb_, spb_, c1, -1.0); grad_pass(tb_, spb_, c2, 1.0)
+        G = (Wg.grad / n_grad).detach()
+        gU, gS, gVh = torch.linalg.svd(G, full_matrices=False)
+        out["rank_grad"] = {
+            "r1": float(gS[0] ** 2 / (gS ** 2).sum()),
+            "c": float(T * G.mean(0).pow(2).sum() / G.pow(2).sum()),
+            "singular_values": [float(v) for v in gS[:6]],
+            "n_grad": n_grad,
+            "cos_with_dom": float(
+                (unit(G.reshape(-1)) * unit(P_dom.reshape(-1))).sum()),
+        }
+        log(f"[rank-grad] metric gradient over {n_grad} docs: r1 = "
+            f"{out['rank_grad']['r1']:.3f}  c = {out['rank_grad']['c']:.3f}  "
+            f"cos(grad, dom) = {out['rank_grad']['cos_with_dom']:+.3f}")
+        writes["grad_slab"] = unit(G)
+        writes["grad_rank1"] = unit(gS[0] * torch.outer(gU[:, 0], gVh[0]))
+        out["write_profile"]["grad_slab"] = [float(v) for v in writes["grad_slab"].norm(dim=-1)]
+        out["write_profile"]["grad_rank1"] = [float(v) for v in writes["grad_rank1"].norm(dim=-1)]
+
     tests = []
     for _ in range(n_test):
         sa, sb, car, c1, c2 = draw(rng)
@@ -543,7 +616,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         ts2, te2 = at_best("txc_slab")
         for other in ("sae_broadcast", "tsae_broadcast", "txc_flat",
                       "txc_profile_random", "random_slab", "random_broadcast",
-                      "sae_schedule", "rank1_best"):
+                      "sae_schedule", "rank1_best", "grad_slab", "grad_rank1"):
             if other in out["arms"]:
                 os_, oe_ = at_best(other)
                 zs[f"txc_slab_vs_{other}"] = float(
