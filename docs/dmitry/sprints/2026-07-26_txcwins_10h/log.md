@@ -1809,3 +1809,46 @@ for anyone building on this:
 The two failure modes are opposites and only a symmetric sweep separates them: recency's
 constant arms were positive at *both* dose extremes — even in α, a magnitude artefact — while
 phase1's SAE effect was genuinely antisymmetric and a one-sided grid concealed it entirely.
+
+## 00:02 — nominal versus effective, a third time
+
+Found by reading the harness rather than the literature. Each write is normalised to unit
+Frobenius norm over the `(T,d)` slab, then applied as
+`h[:, a:b+1, :] += alpha * scale * W[t]` — the same vector added to *every token* in segment
+`t`'s span. So the norm actually injected is
+
+```text
+alpha * scale * sqrt( Σ_t len_t · ||W[t]||² )
+```
+
+with `len_t` the segment's token count. **Matching `‖W‖_F` matches the slab norm, not the
+injected norm**, unless segments are equal length. Verified: at equal lengths a uniform
+broadcast and a slab concentrating its norm on one segment inject identically (3.162 vs
+3.162); at unequal lengths — one 30-token segment against five of 4 — the concentrated slab
+injects **5.477 against 2.887**, a 1.9× advantage at identical Frobenius norm.
+
+**The existing results stand.** Segment lengths vary (4–9 words, mean 6.5, sd 1.1) but
+sentences are drawn into slots at random, so slot length is independent of slot index and the
+effect cancels in expectation — variance, not bias. But "cancels in expectation" is an
+argument, and the realised injected norm per arm per condition is now being logged on recency
+and evidence so the write-up's "matched injected norm" is a measurement instead of a design
+intention.
+
+**It would be a genuine bias in demonstration order**, which selects the best- and
+worst-scoring permutations — and selecting on accuracy can select on where the long
+demonstrations sit. Once length placement correlates with condition the difference is
+systematic, and whichever arm's profile weights the long slots gains an advantage unrelated to
+temporal structure. Fixes, cheapest first: draw demonstrations from a narrow token-length band;
+otherwise divide `W[t]` by `sqrt(len_t)`, or match on realised injected norm rather than
+`‖W‖_F`.
+
+**This is the third instance of one pattern, and the pattern is the more useful warning:**
+
+| nominal | effective | how they diverged |
+| --- | --- | --- |
+| nominal k | realised L0 | ReLU-after-TopK caps it at `#{pre>0}` |
+| in-sample realised L0 | out-of-sample realised L0 | BatchTopK's threshold is calibrated on training data |
+| Frobenius norm of the slab | norm actually injected | segments have unequal token counts |
+
+Each was silent, each favoured a different arm, and each was found by inspection rather than by
+a test failing. A reader building on this should expect a fourth.
