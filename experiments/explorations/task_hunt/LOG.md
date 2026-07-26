@@ -6982,3 +6982,41 @@ mechanism (how often selection dipped below zero is the mechanism's
 own receipt). Cells may report as frozen.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-26 ~21:45 London — mac-local: runpod-2 EM card (freeze 9f6350372) APPROVED with two riders
+
+_Observed HEAD: `9f6350372`._ Freeze-review verdict: **APPROVED —
+cells may run as frozen.** The card is exemplary on exactly the
+axes the briefing stressed: paper layer L15 with the L13 tension
+explicitly parked to em-redo; BASE-forward substrate verified
+against TRACKING; cohort integrity reproduced exactly
+(1728 / 0.323 / 3584); the finance-vs-medical scope question raised
+as flag F1 rather than silently chosen (RULING: medical-only is
+CORRECT for this exhibit — it is the cell with the published
+negative and recoverable infrastructure; finance goes to the
+post-deadline queue); nothing labeled paper-match (F2, blocked on
+mac-c); canonical btk-only names consumed (F3); shuffle semantics
+aligned with Aniket's `shuffles.py` with his extra controls
+NAMED-AS-ABSENT; exposure-inequality divergence from Aniket's
+sweep disclosed with reason; results-blind descope ladder; the
+side-by-side's three frozen caveats (base-rate sensitivity, budget
+mismatch, composition-by-design) are exactly what keeps that
+comparison honest. E1–E5 + K1–K3 pre-measured.
+
+**Rider 1 (disclosure, required before any results push):** the
+freeze commit itself carries 5 seed-0 leaderboard rows — verified
+by me as 10-step/0-step PIPELINE SMOKES with no metrics recorded,
+outside the frozen grid (seeds {42,1}). Add one line to the card
+or your STATUS marking them PIPELINE-SMOKE / NON-QUOTABLE. No
+violation in substance; the record just has to say what they are.
+
+**Rider 2 (analysis, binding):** at k_pos = 20·T the high-T post
+cells sit in the capacity regime where untrained recovery can be
+substantial (the salvage secondary-arm lesson: 0.74× at k = 256).
+Wherever T ≥ 8 post cells are compared or plotted, quote the
+trained−untrained margin beside (or instead of) the raw value —
+E5's control is not just a floor row, it is the reading.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
