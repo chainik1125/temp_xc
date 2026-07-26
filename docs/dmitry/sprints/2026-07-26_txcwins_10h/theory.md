@@ -688,6 +688,14 @@ class B (rotation):    decline / alternative / acknowledge
 Exactly multiset-matched, built from a single draw and rotated (see D1's construction
 requirement). Shared carrier and a fixed connective set across all items.
 
+**Per-item repetition is free, and I checked rather than assumed it.** A document is item 1's
+three clauses, then item 2's, and so on — natural text — rather than one big block per clause
+type, which would read as four acknowledgements in a row. I expected the repetition to change
+the rank and it does not: the difference matrix has the same three distinct rows repeated, so
+its Gram scales by the repeat count and the singular-value *ratios*, hence `r1`, are
+unchanged. Measured identical at `m = 3`: block form `r1 = 0.5000` rank 2, per-item form
+`r1 = 0.5000` rank 2 (`design_rank.py`). The same holds for D2 at `m = 2`.
+
 **Write.** Teacher-forced Δmargin between the canonical order and the rotation. No judge, no
 sampling.
 
@@ -712,6 +720,38 @@ direction and away from refusal) or fall back to D3.
 order — restate / work / answer, rotated to answer-first. The rotation is exactly the
 post-hoc-rationalisation failure mode, which is a documented concern and gives the same rank-2
 guarantee.
+
+### D9 — induction, and why it is a discovery-track task
+
+Induction has one virtue no other design here has: its matched-multiset foil is **the
+induction literature's own standard control**, which pre-empts "you built the task to win".
+That is worth something real, and it is a different currency from expressiveness.
+
+**Registered rank prediction: `r1 ≈ 0.90` (range 0.80–0.97) — effectively rank 1.** Token
+identity is matched in distribution across classes so it averages out of the difference slab,
+but the decisive point is *where* the signal sits. In the first half nothing distinguishes the
+classes yet, since the repeat has not occurred, so `P[t] ≈ 0`. In the second half the model is
+in induction mode, so `P[t] ≈ s_t · u_induction`. The slab is a step or ramp `s_t` times **one**
+direction.
+
+The only route to rank ≥ 2 is if match-*detection* early in the repeat and copy-*execution*
+later are carried by different directions. That is not implausible given the
+previous-token-head / induction-head decomposition, but it is speculative — hence 0.90 rather
+than 0.99.
+
+**So induction does not outrank D1 and should not be sold as if it does.** If it runs and
+wins, the honest headline is "the crosscoder discovers the schedule on a task we did not
+design" — a discovery claim on a credible task, which is genuinely valuable and is *not* an L3
+claim. The write-up must say which currency each experiment bought.
+
+**Do not build it to find out — screen it.** The gradient screen settles this in one backward
+pass per document on ~100 sequences, before any corpus or dictionary exists. Measured
+`r1 < 0.8` refutes me and the task jumps the queue; `r1 > 0.9` schedules it as discovery-track.
+
+A genuinely rank-2 induction variant exists — two interleaved patterns `A→B` and `C→D` with
+their completion positions swapped between classes, forcing "copy B early, copy D late" —
+but it reintroduces exactly the built-to-win objection that motivated induction in the first
+place, so it is worth building only if D1 and D2b both fail.
 
 ### D3 — three-phase reasoning rotation (D1 with relevance)
 
@@ -828,6 +868,13 @@ three-way win is available.
 | 7 | D5 trend alone | 0.70 | low | no | subsumed by D6; run only as D6's first cell |
 | 8 | D7 sandbagging | 0.30 | high | no | the metric is unproven without a judge |
 | 9 | D8 change-count | 0.15 | low | no | predicted to fail on the reading half and subsumed on the steering half |
+
+Ranked separately because it buys a different currency:
+
+| design | P(real) | relevance | beats profile-SAE / tSAE? | why it is not on the list above |
+| --- | --- | --- | --- | --- |
+| **D9 induction** | 0.70 | high | **no** (`r1 ≈ 0.90`) | the only design whose foil is the *literature's own* control, so it pre-empts "you built the task to win" — a virtue none of D1/D2b/D6 has. But it is rank 1, so it can only ever be a discovery claim. Screen it before building it |
+| phase ladder | 0.70 | low | **no** (rank 1 at every rung) | a mechanism experiment about the constant-write baseline and the `T`-versus-period scope limit, not a candidate for a win |
 
 **Recommended order.**
 

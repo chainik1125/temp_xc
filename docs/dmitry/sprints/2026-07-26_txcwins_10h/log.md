@@ -902,3 +902,55 @@ architecture ordering within each cell means anything. And D2/D2b use per-item c
 repetition so documents read as natural text; theory verified this leaves the rank unchanged,
 since the difference matrix has the same distinct rows repeated and the Gram merely scales
 (m=3: r1 = 0.5000, rank 2, in both forms). Naturalness is free.
+
+## 23:22 — permutation composition becomes the anchor
+
+Li, Guo, Andreas, *(How) Do Language Models Track State?*, ICML 2025 (arXiv:2503.02854).
+The task is literally permutation composition — compute the order of a set of objects after a
+sequence of swaps — so **the same multiset of swaps in a different order gives a different
+final state, and P1 holds by definition rather than by construction**. They also characterise
+the computation at algorithm level: one mechanism closely resembling an **associative scan**,
+and a hybrid using **permutation parity** to prune the output space before refining with a
+scan.
+
+It earns a slot as the **calibrated positive control** the programme lacks. The synthetic
+order task can be dismissed as a construct; this cannot, because there is a published
+mechanistic account of how transformers actually compute it and the computation is
+order-dependent by definition. If a window dictionary cannot beat a per-token one at steering
+*here*, it will not anywhere — a fast, cheap, decisive negative. And a win is interpretable
+against a known algorithm rather than a black box.
+
+Unlike the two-block designs there is no obvious reason its optimal write should be rank-1;
+composition of swaps has rich structure, so if `1 − r1` is large this is the L3 task on a
+mechanism with a published account. Screened before building, like everything else.
+
+## 23:24 — citation integrity: three search summaries did not survive a fetch
+
+Worth recording as a methodological note rather than buried in a catalogue, because it
+changes how the sprint should treat its own literature.
+
+The review agent has now withdrawn three claims that came from search summaries and failed on
+verification:
+
+| claim | reality |
+| --- | --- |
+| a published turn-shuffle ablation for crescendo attacks | does not exist; the summary conflated sources |
+| Roger & Greenblatt's *Preventing Language Models From Hiding Their Reasoning* = arXiv:2311.02282 | that id is a spark-plug fault-diagnosis paper; correct id is **2310.18512** |
+| a shuffled-CoT control in arXiv:2603.22816 | that paper uses a Step-Level Reasoning Capacity metric instead |
+
+Three failures from the same source class is a pattern, not bad luck. The catalogue now
+carries a "claims withdrawn on checking" tier and treats unverified entries as untrusted, and
+**no citation marked unverified may drive a build decision**. Both papers currently being
+acted on — demonstration order and permutation composition — are marked fetched and verified,
+which is why they are the two being acted on.
+
+The third withdrawal came with a useful negative attached. The paper that was supposed to
+support a shuffled-CoT task instead measures **step necessity**, finding Grok-4's reasoning
+mode at 1.4% against 7.2% for its non-reasoning mode. Where reasoning steps are not necessary
+the chain is decorative and permuting it changes nothing — and a 1.5B model is the least
+likely of all to have necessary steps. So shuffled-CoT would probably have failed even if the
+control had existed, and CoT faithfulness stays at the bottom of the ranking.
+
+One consequence for multi-turn escalation: with no inherited turn-shuffle ablation, **its foil
+would be ours to build**, which costs it the pre-legitimised-control advantage that
+demonstration order has. Another reason it sits below.

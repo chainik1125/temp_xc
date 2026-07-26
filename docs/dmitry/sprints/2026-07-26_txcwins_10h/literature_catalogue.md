@@ -302,6 +302,7 @@ spans — and running it retroactively hardens last sprint's headline result.
 | Induction / in-context copying (RRT) | **yes** | yes | free | yes | needs chunking | 4 |
 | Repetition loops (loop *escape*) | yes | strongest | free | yes | segment = repeated unit | 4 |
 | Backtracking / self-correction | no | yes | R1-Distill-Qwen-1.5B | no | separate pipeline | 4 |
+| Permutation composition / state tracking | **yes** | yes | free | yes | drop-in, segment = swap | 3 (but the best control) |
 | Entity / state tracking (boxes) | **yes** | yes | free + public data | yes | segment = operation | 3 |
 | Steganography / encoded reasoning | **yes** | yes | limited | yes | segment = sentence | 3 |
 | Sandbagging / password-locking | no | weak | released organisms | partly | poor | 3 |
@@ -510,8 +511,14 @@ in LLM application security.
 | paper | what it gives us |
 | --- | --- |
 | Wallace, Xiao, Leike, Weng, Heidecke, Beutel, *The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions*, 2024 ([arXiv:2404.13208](https://arxiv.org/abs/2404.13208)) — verified | the framing and the vulnerability: "LLMs often consider system prompts … to be the same priority as text from untrusted users and third parties" |
-| *Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy*, 2024 ([arXiv:2410.09102](https://arxiv.org/abs/2410.09102)) — id unverified | evidence that the fix is positional/architectural, i.e. provenance is carried positionally |
+| Wu et al., *Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy*, ICLR 2025 ([arXiv:2410.09102](https://arxiv.org/abs/2410.09102)) — verified | the strongest support for this entry: LLMs "treat all inputs equally", and their fix is to embed priority **architecturally**, BERT-style segment embeddings, because delimiters and instruction-tuning "do not address this issue at the architectural level". Robust accuracy up to +15.75% (Structured Query) and +18.68% (Instruction Hierarchy benchmark) |
 | *Reasoning Up the Instruction Ladder for Controllable Language Models*, 2025 ([arXiv:2511.04694](https://arxiv.org/abs/2511.04694)) — id unverified | recent instruction-ladder benchmark |
+
+The ISE result matters more than it first looks. If priority has to be *added* as an explicit
+segment embedding to be represented properly, then in an unmodified model provenance is carried
+by little more than position in the context — which is exactly the regime where a window code
+has something to say and a per-token code does not. It also names two usable datasets:
+**Structured Query** and the **Instruction Hierarchy benchmark**.
 
 **Model organism.** None. Conflicting pairs generate programmatically: "Answer in English" /
 "Answer in French"; "Always end with a haiku" / "Never use poetry"; "Summarise in one
@@ -681,6 +688,38 @@ Not judge-free, and the pipeline targets multi-GPU pods rather than Modal.
 `arch_list`, and has never been reported. That is the number reviewers asked for, at zero GPU
 cost: the highest value-per-minute item in the catalogue.
 
+### Permutation composition / state tracking — priority 3, and the best *mechanistic* control
+
+Added late, and it earns its place for one reason: it is the only entry where the model's
+order-dependent computation has been characterised at the algorithm level, on a task that is
+**literally permutation composition**.
+
+| paper | what it gives us |
+| --- | --- |
+| Li, Guo, Andreas, *(How) Do Language Models Track State?*, ICML 2025 ([arXiv:2503.02854](https://arxiv.org/abs/2503.02854)) — verified | the task — "permutation composition (i.e., to compute the order of a set of objects after a sequence of swaps)" — and two identified mechanisms: one closely resembling the **associative scan** construction, and a hybrid that uses **permutation parity** to prune the output space before refining with an associative scan. Methods are prefix patching and linear probing across layers |
+
+**P1 — exact, and about as pure as it gets outside a toy.** The same multiset of swaps applied
+in different orders yields different final permutations. Every permutation-symmetric readout is
+at chance on the final state by construction, and the data generator is a few lines.
+
+**P2 — passes.** The associative-scan mechanism is *cumulative*: the state after `k` swaps
+depends on all `k` in order, so an intervention that changes the outcome has to act at a
+particular point in the sequence.
+
+**Why it matters even though it is a capability, not a behaviour.** It is the natural
+**calibrated positive control** for this whole programme. The sprint's synthetic order task can
+be dismissed as a construct; permutation composition cannot, because there is a published
+mechanistic account of how transformers actually compute it, and the computation is
+order-dependent by definition. If a temporal crosscoder cannot beat a per-token SAE at steering
+here, it is unlikely to anywhere — and that is a fast, cheap, decisive negative. Conversely a
+win here is interpretable against a known algorithm rather than against a black box.
+
+**Harness fit.** Segment = one swap, `T` = number of swaps. Judge-free: accuracy or margin on
+the correct final-order token. Unlimited data, tunable difficulty, no model download.
+
+**Honest limit.** Nobody wants to *steer* permutation composition. Run it as the control and
+anchor, not as the headline — the headline should be demonstration order.
+
 ### Entity and state tracking (the boxes task) — priority 3
 
 Exact multiset foils and a public dataset, but carrying the most direct published
@@ -809,7 +848,18 @@ not transfer.
   features were already shown to be useful.
 - **CoT unfaithfulness** — the mismatch is between a stated reason and an internal one: a
   relation between a prompt hint and a final answer, not a pattern across positions. Turpin et
-  al. ([arXiv:2305.04388](https://arxiv.org/abs/2305.04388)).
+  al. ([arXiv:2305.04388](https://arxiv.org/abs/2305.04388)); Lanham et al., *Measuring
+  Faithfulness in Chain-of-Thought Reasoning*
+  ([arXiv:2307.13702](https://arxiv.org/abs/2307.13702)). I looked specifically for a
+  *shuffled-CoT* control, which would have made this a permutation task with an exact multiset
+  match, and **could not find one** — the 2026 paper a search summary attributed it to (*Measuring
+  and curing reasoning rigidity*, [arXiv:2603.22816](https://arxiv.org/abs/2603.22816), Basu &
+  Chakraborty) in fact uses a Step-Level Reasoning Capacity metric, not a shuffle test. That
+  paper does supply a reason to *expect* a shuffled-CoT task to fail: it measures **step
+  necessity**, finding o4-mini at 74–88% on five of six tasks but Grok-4's reasoning mode at
+  1.4% against 7.2% for its non-reasoning mode. Where steps are not necessary, the CoT is
+  decorative and permuting it will not change behaviour — so there is no factor to steer. A 1.5B
+  model is the least likely of all to have necessary steps.
 - **Scheming / alignment faking** — highest stakes, weakest evidence, and *directly
   contradicted* for latent build-up by Fomin et al.
   ([arXiv:2606.30449](https://arxiv.org/abs/2606.30449), verified in the 2026-07-23 sweep):
@@ -849,7 +899,10 @@ measured on a completely different task.
 - **Verified in the 2026-07-23 sweep, carried over:** 2605.12726, 2510.20487, 2606.30449.
 - **Also verified this session:** 2511.09700 (Li et al., order variance comparable to
   example-set variance, 0.5B–27B), 2510.03417 (NEXUS, EMNLP 2025 — confirmed real, but the
-  turn-shuffle ablation attributed to it could *not* be confirmed).
+  turn-shuffle ablation attributed to it could *not* be confirmed), 2503.02854 (Li, Guo,
+  Andreas, permutation composition and the associative-scan mechanisms), 2603.22816 (Basu &
+  Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
+  shuffle test a search summary attributed to it).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
@@ -897,21 +950,24 @@ Times are wall-clock against the sprint window opening at 2026-07-25 22:33 PDT.
   their judge-based steering protocol and the open question of whether their steering is
   applied uniformly across positions. Corrected the changelog timestamps in this section, which
   had been estimated rather than read off the clock and were about four hours fast.
-- **Pass 8** (23:05 PDT) — verification round. Confirmed Zheng et al. (2309.03882) attribute
+Passes 8–12 below all fall between two clock readings I actually took, 22:58 and 23:07 PDT;
+the per-pass times are ordering only, not measurements.
+
+- **Pass 8** — verification round. Confirmed Zheng et al. (2309.03882) attribute
   selection bias to **token bias** over option-ID tokens, which makes instance B
   per-token-steerable and therefore a likely predicted-negative rather than a candidate;
   narrowed the family recommendation to instances D and A, where the permuted units are content
   blocks with no label token to carry a prior. Softened the EM counter-evidence: 2506.11618
   extracts a *transferable* misalignment direction from a 9-adapter organism (six general, two
   domain-specific), which is not the single-unified-direction claim I had written.
-- **Pass 9** (23:12 PDT) — read the R-GSM construction section and **retracted instance D as the
+- **Pass 9** — read the R-GSM construction section and **retracted instance D as the
   recommended task**: R-GSM permits "minor editing on words … to ensure grammatical
   correctness", so it is not multiset-matched and P1 fails for it; it is also only 220 pairs and
   calibrated to frontier models (drops of 6.9–15.5 points on GPT-4-turbo through GPT-3.5-turbo,
   not the "over 30%" of the abstract, which refers to their broader logical-reasoning setting).
   Recommendation moved to **instance A, demonstration order**, where permutation is verbatim and
   the multiset match is exact. Added the free supervised ceiling that instance A provides.
-- **Pass 10** (23:20 PDT) — stress-tested instance A the same way. It holds: permutation is
+- **Pass 10** — stress-tested instance A the same way. It holds: permutation is
   verbatim by construction, and Li et al. 2025 (arXiv:2511.09700) replicate the effect across
   **0.5B–27B** on classification and generation, reporting order variance comparable to
   example-set variance. That removes the feasibility risk that killed instance D. Added the
@@ -919,10 +975,18 @@ Times are wall-clock against the sprint window opening at 2026-07-25 22:33 PDT.
   perturbation consistency), `k` of 4–8 rather than many-shot (order sensitivity falls as
   demonstrations grow), classification tasks — and recorded the order-selection oracle as both
   ceiling and rival baseline.
-- **Pass 11** (23:30 PDT) — citation-integrity round. Corrected the Roger & Greenblatt id
+- **Pass 11** — citation-integrity round. Corrected the Roger & Greenblatt id
   (2310.18512, not the 2311.02282 I had guessed, which is a spark-plug fault-diagnosis paper).
   Withdrew the claim that a published turn-shuffle ablation exists for crescendo-style attacks —
   not in Crescendo's abstract, not in NEXUS's; the search summary that reported it conflated
   sources — so that foil is ours to build rather than inherited, which costs the entry its
   pre-legitimised-control advantage. Added the "claims withdrawn on checking" tier to the
   ledger.
+- **Pass 12** — added **permutation composition / state tracking** (Li, Guo,
+  Andreas, ICML 2025) as the best *mechanistic* control in the catalogue: the task is literally
+  permutation composition, the multiset match is exact, and the computation has a published
+  algorithm-level account (associative scan, plus a parity-pruning hybrid). It is the fast
+  decisive negative if the crosscoder cannot win at steering there. Also searched for a
+  shuffled-CoT control and **could not find one**; recorded why a shuffled-CoT task should be
+  expected to fail anyway (step necessity as low as 1.4% in some reasoning modes means the CoT
+  is decorative and permuting it changes nothing).
