@@ -1152,3 +1152,51 @@ excess T is harmful.
 *task-relevant* readout flatten. Do not choose it from FVU, from reconstruction, or from
 feature-recovery cosine: on this task those would have said T=1 was enough, when T=1 is at
 chance.
+
+## Why excess T degrades: my capacity account is refuted, and my harness was the confound
+
+The desideratum, stated by the user and the right frame for all of this: performance should
+rise with T while T is buying something and **flatten** once it is not. The crosscoder
+instead rose and fell, so the question is why.
+
+My account was position-tying: `W_dec` is `(d_sae, T, d)`, so a feature at offset 3 and the
+same feature at offset 7 are separate atoms, the required dictionary grows with T, and a
+fixed `d_sae` is progressively starved. `saturation_local.py` sweeps T against `d_sae` to
+test it.
+
+| d_sae | T=2 | T=4 | T=8 | T=16 | T=32 |
+|---|---|---|---|---|---|
+| 128 | 0.78 | **0.88** | 0.77 | 0.32 | 0.17 |
+| 256 | 0.80 | 0.89 | **0.96** | 0.44 | 0.19 |
+| 512 | 0.78 | 0.91 | **0.97** | 0.54 | 0.20 |
+| 1024 | 0.81 | 0.92 | **0.97** | 0.46 | 0.17 |
+
+**S1 holds once and then stops.** The peak moves T=4 → T=8 between `d_sae` 128 and 256, and
+does not move again across a further 4× of dictionary. **S2 fails**: equal `d_sae/T` does not
+give equal recovery, with spreads up to 0.784. **S3 fails backwards**: shift-duplication
+*falls* as `d_sae` grows — 0.59 → 0.04 at T=4 — so duplicated atoms are a symptom of a
+scarce dictionary rather than the cause of the collapse. Eight times the dictionary does not
+rescue T=32 at all (0.17 → 0.17). The position-tying account does not explain the collapse.
+
+**What does is a flaw I built into the harness.** FVU at T=32 is 0.99-1.15, worse than
+predicting the mean, which is divergence and not a capacity limit. The cause is in how the
+windows were formed: reshaping a fixed segment stream into disjoint T-windows makes the
+number of training windows fall as `seq_len/T`. At T=2 there were 24,000 windows; at T=32,
+1,500 — for a model carrying 16× more decoder parameters. Large T was starved of data, not
+of dictionary.
+
+**This contaminates the sprint's own headline T-sweep.** `tsweep_modal.py` windows the same
+way, so part of the 1.0× → 6.8× FVU rise attributed to "the cost of sharing one code across
+a window" is instead fewer training windows at larger T. The T=1 control against the SAE is
+unaffected — both see the same segments — but the *slope* in T is not clean and I should not
+have presented it as purely architectural.
+
+Fixed by windowing at stride 1, which holds the window count roughly constant in T (60
+sequences, seq_len 96: T=2 → 5700 windows, T=16 → 4860, against 2880 and 360 before).
+`saturation_local.py` and `recovery_local.py` both rerun on that basis; `tsweep_modal.py`
+needs the same treatment before its slope is quoted.
+
+The honest status of the desideratum until those land: the crosscoder demonstrably satisfies
+it on a **task-relevant readout** (clock period-ID is flat from T=4 to T=24, six times longer
+than needed), and appeared to violate it on reconstruction metrics that were measured under
+a data-quantity confound.
