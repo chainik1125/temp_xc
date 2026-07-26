@@ -65,6 +65,29 @@ def main(prefix: str = "") -> int:
             bc = r["baseline_contrast"]
             print(f"  {p.stem:<22} unsteered score(A) - score(B) = "
                   f"{bc['mean']:+.2f} +- {bc['sem']:.2f}")
+
+    # r1 bounds what a per-token dictionary can express before any training happens; c is
+    # both the constant-write share and the share a pooled probe can read. `grad` variants
+    # are taken from the gradient of the metric actually reported rather than from
+    # difference of means, and are the ones to quote where both exist.
+    rows = [(p.stem, json.loads(p.read_text())) for p in files]
+    if any(r.get("rank") for _, r in rows):
+        print(f"\n{'run':<22}{'r1(dom)':>9}{'c(dom)':>9}{'r1(grad)':>10}"
+              f"{'c(grad)':>9}{'txc_slab':>10}{'rank1_best':>12}{'sae_sched':>11}")
+        for stem, r in rows:
+            if not r.get("rank"):
+                continue
+            rk, rg = r["rank"], r.get("rank_grad") or {}
+            arms = r["arms"]
+
+            def bb(key):
+                return f"{best(arms[key])[0]:+.2f}" if key in arms else "    -"
+            print(f"{stem:<22}{rk['r1']:>9.3f}{rk['c']:>9.3f}"
+                  f"{(('%.3f' % rg['r1']) if rg else '-'):>10}"
+                  f"{(('%.3f' % rg['c']) if rg else '-'):>9}"
+                  f"{bb('txc_slab'):>10}"
+                  f"{bb('grad_rank1') if 'grad_rank1' in arms else bb('rank1_best'):>12}"
+                  f"{bb('sae_schedule_grad') if 'sae_schedule_grad' in arms else bb('sae_schedule'):>11}")
     return 0
 
 
