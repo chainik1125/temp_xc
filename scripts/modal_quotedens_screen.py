@@ -65,6 +65,12 @@ def build_caches() -> str:
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def run_screen(key: str) -> str:
     _assert_pinned()
+    # cache in the SAME container (idempotent — meta.json short-circuits):
+    # the 34 GB llama volume commit was killed at runner-shutdown grace in
+    # the caches-stage container, leaving meta-less partial state; building
+    # here removes the cross-container volume dependency entirely.
+    _sh(f"{PY} -m experiments.explorations.task_hunt.quotedens.cache_acts "
+        f"{key}")
     _sh(f"mkdir -p {RESULTS_VOL_DIR} {REPO_RES}")
     part = Path(RESULTS_VOL_DIR) / f"screen_{key}.json"
     if part.exists():
