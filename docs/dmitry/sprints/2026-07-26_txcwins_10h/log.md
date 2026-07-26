@@ -1597,3 +1597,80 @@ Their incidental finding is worth generalising beyond that entry: the representa
 signature **differs across model families** (Gemma in query/key subspaces, Llama in key
 vectors), so results in this area may not transfer between families. That is a caveat on every
 recommendation the catalogue makes about which model to run, not just on entity tracking.
+
+## 23:46 — the attribute theorem, and the metric condition that nearly cost a result
+
+**The rank hypothesis is proved.** If activations decompose additively over semantic
+attributes, `x_t = Σ_a s_a(t)·u_a + (class-independent terms)`, the difference slab factors as
+`P = S·U` with `S` the schedule differences and `U` the attribute directions, so
+
+```text
+rank(P) = rank(SU) <= min(rank S, rank U) <= A
+```
+
+**Schedule complexity lives entirely inside `S` and cannot raise the rank above `A`**, the
+number of attributes whose positional pattern differs. Verified at A=1 across seven schedules —
+one switch, three, eleven, random ±1, random real-valued, smooth ramp, two spikes — giving
+rank 1 and `r1` = 1.0000 in every case, and rank exactly A at A = 1, 2, 3, 4, 6 with generic
+schedules.
+
+Two corollaries fall out. The phase ladder being rank 1 at every rung stops being a surprise:
+alternation makes the schedule intricate, not the attribute set larger. And the rotation
+ladder's `m − 1`, which had looked like an algebraic accident, is the A = m case carrying one
+linear dependency — every position holds exactly one block in each class, so the schedule
+differences sum to zero.
+
+Equality needs both matrices full-rank and fails in exactly two ways, both verified to collapse
+rank 2 → 1: **schedules proportional**, or **directions collinear**.
+
+**The recipe, and it makes recency a family rather than a lucky find:**
+
+> A maintained state's schedule is the running integral of the content's schedule, and an
+> integral is never proportional to its integrand.
+
+So content plus its own carried state are automatically two attributes with independent
+schedules — rank 2 from a single manipulated attribute. Verified: content as two spikes gives
+rank 2 (`r1` 0.788); alternating content gives rank 2 even at `|corr| = 1.000`, because the
+relation is *affine* rather than proportional and the constant offset is itself an independent
+schedule direction. Any **"which of two X governs"** task is therefore rank 2 — which
+instruction applies, which persona is active, which rule binds, which goal is pursued, which
+variable holds. The `evidence` task is a second member, which is why it worked.
+
+A free improvement follows: recency's state components contribute `+g` over the first span and
+`−g` over the second, so `c` is exactly zero when the spans are equal. Moving the instructions
+from (2, 9) to **(2, 7)** gives spans of 4 and 4, leaving `r1` unchanged at 0.601 and driving
+`c` from 0.0665 to **exactly zero** — making the constant-arm nulls structural rather than
+merely small. Also worth noting the model predicts `c = 0.0665` at the current placement, inside
+the 0.02–0.14 range registered before the derivation existed.
+
+## 23:48 — a matched foil and a DC-free metric are different conditions
+
+The distinction that nearly cost a result, and it now has a named, citable instance.
+
+- **(a) the foil is matched** — no bag-of-positions statistic separates the conditions
+- **(b) the metric has no DC-movable component** — no constant write improves it in either
+  condition
+
+They come apart. Induction has a *perfect* foil — repeat-in-order against shuffled-repeat is an
+exact multiset match — but its metric is copy accuracy, and "increase copying" is a constant
+write that raises it in **both** conditions. Same for repetition, sycophancy and crescendo.
+
+**And demonstration order's DC handle has a name.** Few-shot ICL is driven substantially by
+**function-vector heads** — heads that summarise the demonstrated task into a single vector
+(Todd et al., arXiv:2310.15213). Writing a function vector is a known, published, effective and
+entirely *constant* intervention that raises few-shot accuracy. So had the metric been
+"accuracy under the bad ordering, after steering", the per-token arm would write the function
+vector, score well, and end the comparison — using an off-the-shelf technique a reviewer would
+find in a minute.
+
+The contrastive metric defuses it exactly: the function vector encodes the **task**, identical
+in both orderings of the same demonstrations, so writing it moves both sides of the margin
+equally and cancels. Structural, not empirical — the same cancellation that put `sae_broadcast`
+at +1.24 against the crosscoder's +11.29.
+
+> **The metric must be a difference between the matched pair, never an absolute score on one
+> member of it.**
+
+Matching the foil does nothing to stop a function-vector write; making the metric a contrast is
+what stops it. Noted because "did steering fix the bad ordering?" is the natural phrasing of the
+question and is the wrong metric.

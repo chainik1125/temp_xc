@@ -508,6 +508,7 @@ crosscoder loses, whatever the P1 and P2 columns say.
 | Emergent misalignment persona drift | no | yes (transferable direction) | repo c6_em | no | poor | 1 |
 | MCQ option order | **yes** | **yes** (token bias, content-invariant attractor) | free | yes | drop-in | 1 |
 | Planning / lookahead | no | **yes** (one token, five heads; causal only at 27B) | free | no | poor | 1 |
+| Deception / stated-vs-internal divergence | no | **yes** (linear deception direction) | free | no | poor | 1 |
 | CoT unfaithfulness | no | yes | free | no | poor | 1 |
 | Scheming / alignment faking | no | unknown | limited | no | poor | 1 |
 
@@ -1343,6 +1344,23 @@ not transfer.
   near-zero causal effect at the line boundary despite strong probe signal", which is also a neat
   reminder that a strong probe signal is not a causal handle. Out of scale range and structurally
   wrong.
+- **Deception / divergence between stated and internal reasoning — reject, stated explicitly
+  because the brief listed it.** Three things rule it out, and they are the same three that
+  recur. (i) **A single linear direction already steers it**: Linear Artificial Tomography
+  extracts a deception direction by PCA over contrastive activations, reaching ~89% detection and
+  supporting activation steering — a textbook DC handle. (ii) **Its "stages" are layer-depth, not
+  token-time**: the reported three-stage pattern is early layers near chance, middle layers
+  peaking, later layers declining slightly, which is depth structure and must not be cited as
+  temporal lead-time — the trap [[temporal_safety_tasks_litreview]] already flagged. (iii) **No
+  matched-multiset foil is available**: a truthful and a deceptive response are not permutations
+  of each other. Adjacent prior art worth knowing: the "Hypocrisy Gap" work uses **SAEs** to build
+  a mechanistic metric of divergence between internal belief and generated output, reaching
+  AUROC 0.55–0.74 on sycophancy — i.e. a per-token dictionary is already the instrument of choice
+  here. One general caution from this literature that applies to every detection claim in this
+  catalogue: the **probe fragility gap** — probes approach ceiling on benchmarks but collapse
+  under distributional shift, with prompt-level red-teaming reported to drive auditor accuracy
+  from 100% to 1–3%. Ids in this bullet are search-surfaced and unverified; treat the numbers as
+  indicative.
 - **CoT unfaithfulness** — the mismatch is between a stated reason and an internal one: a
   relation between a prompt hint and a final answer, not a pattern across positions. Turpin et
   al. ([arXiv:2305.04388](https://arxiv.org/abs/2305.04388)); Lanham et al., *Measuring
