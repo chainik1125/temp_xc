@@ -1,4 +1,4 @@
-# Where a temporal window actually helps: two positive tasks, and the map of everything else we tried
+# Where a temporal window actually helps: the tasks that passed, and the map of everything else we tried
 
 **Status: living document (maintained; last update 2026-07-26).
 Figures: `figs_writeup/`. Every number in this page is backed by a
@@ -24,18 +24,23 @@ baselines that only count visible surface cues), and **pre-registered
 pass/fail criteria fixed before any result existed**. This page
 documents, in plain language:
 
-- the **two tasks that passed** (§ 3, § 4), with the full setup so a
+- the **headline task that passed** (§ 3), with the full setup so a
   collaborator can re-derive every number;
+- a **second task that passed every pre-registered check but that we
+  then demoted ourselves** to supporting evidence, and why (§ 4);
 - the **evidence that window *order* — not just window *access* — is
-  what matters on these two tasks** (§ 5);
+  what matters on these tasks** (§ 5);
 - **every task we tried that did not become a positive result, and
   the specific reason why** (§ 6).
 
 One honest sentence up front: out of ~25 candidate tasks screened
-and 4 taken to full panels, **exactly two produced defensible
-positive results**. The negatives are informative — they trace the
-boundary of where temporal structure lives in these models — and we
-report them at the same standard as the wins.
+and 4 taken to full panels, **exactly two survived their
+pre-registered criteria — and we subsequently demoted one of the two
+ourselves** (§ 4 explains the objection: its target is, in the
+limit, derivable from visible punctuation). The negatives are
+informative — they trace the boundary of where temporal structure
+lives in these models — and we report them at the same standard as
+the wins.
 
 ## 2. The common experimental setup (read this once)
 
@@ -169,9 +174,27 @@ The dip is real (not a budget artifact — that explanation was tested
 and retracted); its cause is not established. We report the curve as
 measured.
 
-## 4. Positive task 2 — "how long since the last question?" in dialogue
+## 4. Task 2 — "how long since the last question?" in dialogue (passed, then demoted)
 
-*New as of 2026-07-26 afternoon; pending team ratification.*
+*Ran 2026-07-26 afternoon; passed all pre-registered checks; demoted
+to supporting evidence the same evening — by our own objection, not
+by a failed test.*
+
+**Why the demotion.** The target is defined by question marks, and a
+question mark is visible text. Given a long enough window a probe
+can simply *count* question marks — at T ≥ 16 our own pre-measured
+counting baseline overtakes every dictionary, and even the T = 8
+win, though genuinely above that baseline, is a win on a target that
+surface punctuation ultimately determines. A task whose very name
+invites the reading "so you counted question marks" cannot carry a
+headline, however clean its statistics. The section stays on this
+page because the mechanism it demonstrates — TXC codes carrying
+turn-order information that pooled per-token codes lose (§ 5) — is
+real, replicated, and bounded across architectures. Replacement
+tasks with **no surface-count reading at any window length**
+(turn-length *trend*; an independently-run trailing-novelty thread)
+are being confirmed on fresh seeds now; this section will record the
+outcome either way.
 
 **Why dialogue.** § 5 explains the measurement that pointed here: of
 all the text domains we probed, dialogue is the only one where
@@ -268,8 +291,11 @@ screening experiments — dialogue's full-shuffle cost clears both.*
 
 Task 1 has an order-carried readout on reasoning traces; Task 2 sits
 on the one substrate whose order signal we measured and decomposed.
-The two positives are exactly where the order measurements said they
-should be — and nowhere else.
+The two passes are exactly where the order measurements said they
+should be — and nowhere else. (Task 2's later demotion, § 4, does
+not change this: the demotion is about what the task's *name*
+invites a reader to suspect, not about whether the measurement is
+real.)
 
 ## 6. Everything we tried that did not work, and why
 
