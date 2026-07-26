@@ -8,9 +8,14 @@ tags:
 
 ## Status
 
-Draft executive summary for `summary.md`. Every number below is read from a named result file in
-`results/txc_wins/`. Still running at the time of writing: the demonstration-order cell (three
-dictionary inits) and its n = 200 probe screen.
+**This is the detailed companion to `summary.md`, not a superseded draft.** `summary.md` is the
+five-finding write-up to read first; this document carries the derivations, the arms that did not
+make the headline, the retractions with their reasoning, and the audit trail. The filename is kept
+because other sprint documents reference it.
+
+Every number is read from a named result file in `results/txc_wins/`. Outstanding at the time of
+writing: a seed-scaling sweep on held-out instruction position, reported in `summary.md` under
+Limits.
 
 ## Executive summary
 
