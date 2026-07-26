@@ -1,8 +1,9 @@
 """Read-only scorer for the frozen diafaces screen (CARD.md § 6–7)
-plus the panel-gate clause (ii) check as PINNED by mac-local's
-pre-results freeze review (LOG 2026-07-26): wd order arm
-sc = win_linear − win_shuf_linear ≥ +0.03 at T ∈ {16,32} on ≥ 2 of 3
-models INCLUDING at least one of {gpt2, llama31_8b}.
+plus the panel-gate clause (ii) check as PINNED by mac-local (LOG
+2026-07-26, T-quantifier entry `44594b696`): wd order arm
+sc = win_linear − win_shuf_linear **≥ +0.03 at T = 32 AND > 0 at
+T = 16**, on ≥ 2 of 3 models INCLUDING at least one of
+{gpt2, llama31_8b}.
 
 Every window number beside its width null AND the visible-evidence
 floor. No cell computed here.
@@ -199,8 +200,9 @@ def main():
         maj = ("KEEP" if n_keep >= 2 else
                "KILL" if n_kill >= 2 else "WEAK")
         gate_models = [k for k, v in per_model.items()
-                       if face in v and any(
-                           s >= GATE_SC for s in v[face]["wd_sc"].values())]
+                       if face in v
+                       and v[face]["wd_sc"].get(32, -1) >= GATE_SC
+                       and v[face]["wd_sc"].get(16, -1) > 0]
         gate_ii = (len(gate_models) >= 2
                    and bool(set(gate_models) & GATE_CORE))
         print(f"{face}: per-model {vs} -> {maj} (clause i "

@@ -5,12 +5,12 @@ briefing § "gated mini-panel"). This document becomes a FROZEN card
 only in a later commit that (a) fills the [AT-FREEZE] fields from the
 screen verdict and (b) quotes mac-local's written LOG approval of all
 five gate clauses (shared doc § panel gate, as PINNED pre-results in
-mac-local's 2026-07-26 freeze-review entry: (i) KEEP on ≥ 2 of 3
-models under the card's majority rule; (ii) wd order arm
-sc = win_linear − win_shuf_linear ≥ +0.03 at T ∈ {16,32} on ≥ 2 of 3
-models INCLUDING at least one of {gpt2, llama31}; (iii) launch by
-14:30 London; (iv) ledger ≤ $250 at launch; (v) mac-local written
-approval naming (i)–(iv)). If the gate does not fire, this draft +
+mac-local's 2026-07-26 freeze-review entry and T-quantifier entry
+`44594b696`: (i) KEEP on ≥ 2 of 3 models under the card's majority
+rule; (ii) wd order arm sc = win_linear − win_shuf_linear **≥ +0.03
+at T = 32 AND > 0 at T = 16** on ≥ 2 of 3 models INCLUDING at least
+one of {gpt2, llama31}; (iii) launch by 14:30 London; (iv) ledger
+≤ $250 at launch; (v) mac-local written approval naming (i)–(iv)). If the gate does not fire, this draft +
 the registered datasource plugin IS the deliverable: panel-ready with
 an order-carried screen prior, first day-one launch of the
 post-deadline queue.**
@@ -43,7 +43,12 @@ hs14).
 - Archs (5, the λ̂ panel set): `batchtopk_sae` (T = 1 order-free
   baseline), `tsae` (T = 1), `txc_batchtopk_pre`,
   `txc_batchtopk_post` (**k_pos = 8·T from cell one** — the
-  post-matched lesson), `stacked_batchtopk`; T ∈ {2, 4, 8, 16}.
+  post-matched lesson), `stacked_batchtopk`;
+  **T ∈ {2, 4, 8, 16, 32}** per mac-local's panel-ladder requirement
+  (`44594b696`): if the gate fires on T32 order-carriage the ladder
+  MUST reach T32 (post k = 8·32 = 256, dict-feasible at 2048) — a
+  T ≤ 16 panel would measure the face exactly where its order signal
+  is absent.
 - Seeds {1, 2, 42}; trained (n_steps 8000) + untrained (0);
   d_sae 2048, k_pos 8, eval_window_L 32 — all UNCHANGED from the λ̂
   panel; **buffer_tokens 524288 UNCHANGED** (fill argument: the
