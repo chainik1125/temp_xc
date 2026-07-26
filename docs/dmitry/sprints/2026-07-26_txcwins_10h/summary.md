@@ -39,8 +39,16 @@ each arm's saturation point, which is where the linear reasoning behind every ra
 ![Reversing which instruction the model obeys](../../../../plots/2026-07-26_txcwins/recency.png)
 
 On **instruction-position bias**, **evidence order** and a **12-block rotation**, a crosscoder
-latent beats every arm obtainable from a learned per-token dictionary — including that
-dictionary's own direction on its own schedule — with the temporal-profile controls holding.
+latent beats every arm a practitioner can build **from the trained dictionary alone** —
+`sae_broadcast`, `tsae_broadcast`, `txc_flat`, `txc_profile_random`, `random_slab`,
+`random_broadcast` — winning 8 of 9 held-out cells, the exception being the `demo_order` init
+already flagged below as the unstable one.
+
+**Hand that same dictionary direction a *supervised* schedule and it beats the crosscoder in 6 of
+9 held-out cells** (z up to −20.6). `sae_schedule` is built as `outer(P_dom · v_sae, v_sae)` — the
+dictionary's direction on the **difference-of-means** slab, which needs labels and is not
+obtainable from the dictionary. **That is the discovery claim measured rather than asserted:** what
+the crosscoder supplies is the schedule, and a practitioner who already has one does not need it.
 
 **Both headline tasks survive a held-out content split**, three dictionary inits each: dictionaries
 trained on one half of the sentence pools, steering scored on documents built from a disjoint half.
