@@ -155,11 +155,30 @@ gradient's support is set by where the two classes differ — but the second is 
   −2.54 and its write is a *reversal*. Amplifying is the easier direction. The bias itself also
   **flips sign** across models.
 
-  **An open fact with no mechanism attached**: on SmolLM2 the *supervised* difference-of-means slab
-  also fails (+1.27 against the gradient write's +13.32, a 10.5× gap), where on Qwen2.5-1.5B the
-  two are close (+8.42 against +9.79). The natural explanation — that the two slabs are more
-  decoupled in SmolLM2 — is refuted by `cos(P_dom, Ḡ)` = 0.050 there against 0.044 on
-  Qwen2.5-1.5B. The fact is solid; the explanation is not known.
+  **The SmolLM2 failure splits cleanly by which slab an arm is derived from**, three inits at
+  per-arm recipes (`recency_smolL6_rec_ds{0,1,2}.json`):
+
+  | derived from `Ḡ` | | derived from `P_dom` | | learned |  |
+  | --- | --- | --- | --- | --- | --- |
+  | `grad_slab` | +13.38 | `dom_slab` | +1.27 | `txc_slab` | +0.88–1.01 |
+  | `grad_rank1` | +12.45 | `rank1_best` | +0.93 | `sae_broadcast` | +0.82–1.25 |
+  | `broadcast_optimal` | **+3.87** | | | `random_slab` | +1.01 |
+
+  **The crosscoder does not beat a random slab, and its held-out reading AUC is 1.000 in all three
+  inits** — it reads the factor perfectly and steers it no better than noise, which is the
+  reading/steering dissociation in its most extreme form.
+
+  **`broadcast_optimal` = +3.87 is the number that makes this a discovery failure.** A single
+  constant direction, chosen with knowledge of the gradient, works four times better than what the
+  crosscoder found unsupervised. So the SmolLM2 negative is not "nothing simple works here".
+
+  ⚠ **A candidate mechanism, flagged as candidate.** Everything built from `Ḡ` works and everything
+  built from `P_dom` fails, and the learned dictionaries land on the failing side — while on
+  Qwen2.5-1.5B the two slabs steer comparably (+8.42 against +9.79) and the split does not appear.
+  That would predict unsupervised discovery succeeds where `dom_slab ≈ grad_slab` and fails where
+  they diverge. It holds in both models we have. **The evidence is co-variation of arm magnitudes
+  across two models**, a direct test is running, and an earlier cosine-based guess at this same
+  mechanism was already refuted — so it is recorded as a hypothesis, not a finding.
 - **The `c` gate does not transfer across models.** Five of seven transfer cells sit below the
   `c` < 0.1 go-threshold with high `r1` and steer nothing. It was validated within one model and is
   not a cross-model instrument.
