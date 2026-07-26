@@ -121,32 +121,38 @@ worst. This is the most-replicated finding in the project and the one least like
 
 ## What was not achieved
 
-**No expressiveness win — and on the task built to require rank ≥ 2, the crosscoder loses to a
-write that is rank-1 *and* flat in time.** `rotate12` drives the rank-1 reachable share to
-`r1` = 0.177 by construction while holding the constant share at `recency`'s level
-(`c` = 0.033 vs 0.034), so it is the one design that isolates temporal form. Measured against
-`broadcast_optimal` — the best constant direction in the whole space — at matched dose, three
-inits each:
+**No expressiveness win — and across three tasks the crosscoder never meaningfully exceeds the
+best constant write that exists.** `broadcast_optimal` is the best constant direction in the whole
+space, so it bounds what the crosscoder's *temporal form* can buy. Medians over three inits,
+matched dose, held-out content where available:
 
-| task | `r1` | crosscoder | best constant write | ratio |
-| --- | --- | --- | --- | --- |
-| `rotate12` | **0.177** | +10.63 / +10.16 / +11.02 | +12.36 | **0.86 / 0.82 / 0.89** |
-| recency | 0.850 | +3.81 / +4.82 / +4.63 | +4.01 | 0.95 / 1.20 / 1.16 |
+| task | `c` | `r1` | crosscoder | best constant write | ratio | z |
+| --- | --- | --- | --- | --- | --- | --- |
+| instruction position | 0.034 | 0.850 | +4.63 | +4.01 | **1.16** | +2.0 |
+| evidence order | 0.156 | 0.595 | +1.97 | +7.13 | **0.28** | **−78** |
+| 12-block rotation | 0.033 | **0.177** | +10.63 | +12.36 | **0.86** | −2.1 |
 
-**The relationship runs the wrong way: lower `r1`, lower ratio.** On the rank-designed cell the
-crosscoder captures 10% of the optimal write's effect against recency's 29%, and a flat write beats
-it in all three inits. So the headroom is not merely unused — **the crosscoder does worse there
-than the most constrained write in the space.**
+**It loses on evidence order at z = −78, loses on the rank-designed cell at z = −2, and wins the
+one remaining cell at z = +2.0.** `rotate12` is the design built so rank-1 writes are poor — and it
+is beaten there by a write that is rank-1 **and** flat in time.
 
-**What the crosscoder's margin over the SAE actually is, then, is a *search* advantage, not
-temporal expressiveness.** Across `r1` from 0.177 to 0.850 it never meaningfully exceeds the best
-conceivable constant write. What it does is find a usable direction from reconstruction alone,
-where the SAE's dictionary plus a reading selector does not.
+**What predicts that ratio is `c`, not `r1`** — Pearson **−0.939** against **+0.196** over the three
+tasks. `c` is exactly what bounds `broadcast_optimal` (first-order reach `√c`), so the ratio tracks
+how high the *constant* ceiling sits, not whether temporal freedom is worth anything. `recency` and
+`rotate12` have near-identical `c` (0.034, 0.033) and `r1` differing 4.8×, and the rank difference
+moves the ratio 35% **in the wrong direction**.
 
-⚠ Two qualifiers. `broadcast_optimal` is gradient-derived and therefore **supervised** — this is
-not a per-token dictionary beating the crosscoder, and no practitioner arm reaches that line; it
-bounds what the crosscoder's *form* buys. And two tasks is **two points**: `evidence`, `rotate2`,
-`rotate6`, `order` and `phase11` are still scoring and will fill `r1` in between.
+**So the crosscoder's margin over a per-token dictionary is a *search* advantage, not a temporal
+one.** That margin is real and survives a steering-based selector (z = +15 to +18 on instruction
+position). It simply is not a rank effect: `grad_rank1` was a ceiling the crosscoder never cleared,
+and `broadcast_optimal` — strictly weaker, rank-1 *and* flat — is a ceiling it does not clear
+either.
+
+⚠ Three qualifiers. `broadcast_optimal` is gradient-derived and therefore **supervised**: no
+practitioner arm reaches that line, and this is not a per-token dictionary beating the crosscoder.
+**Three tasks is three points**, and a −0.939 on three points is three points — four more cells
+spanning `c` from 0.050 to 0.241 were still running. And the `r1` range here (0.177–0.850) is wide
+but the `c` range (0.033–0.156) is where the variance sits.
 
 **Rank ≥ 2 is real and its mechanism is unidentified.** Three candidate mechanisms were proposed
 and each refuted by a profile measurement it predicted. The leading direction *is* explained — the
