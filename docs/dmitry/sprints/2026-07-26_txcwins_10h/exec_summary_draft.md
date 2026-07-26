@@ -767,9 +767,10 @@ surviving win is **discovery, and unreliable discovery**.
 lottery.** "The crosscoder finds a write unsupervised that a per-token dictionary could express
 but did not learn" is a statement about a *search*, not about representation — and every cell here
 gave each architecture **one dictionary init and one best-of-4096 latent selection**. We know from
-our own data that this lottery is high-variance: the crosscoder's margin moves 10× across three
-inits on the phase ladder, and on the order task its selected latent does not hold a stable
-**sign** across inits. **The SAE was never given the same number of tickets.** So every discovery
+our own data that this lottery is high-variance. Across three dictionary inits at matched
+configuration on the phase ladder (`phase5_v2_ds{0,1,2}.json`) the crosscoder's peak-dose margin
+runs +3.64 / +1.47 / +4.63 — a **3.1× range** — and on the order task its selected latent does not
+hold a stable **sign** across inits, rising to the right at one and to the left at the other. **The SAE was never given the same number of tickets.** So every discovery
 failure recorded here — `recency_var`, `rotate6`, the phase ladder — is "training did not find it"
 asserted from a single draw.
 
