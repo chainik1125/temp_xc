@@ -30,7 +30,8 @@ DS = "dial_real_ttrend_gpt2_l7"
 PAYLOADS = HERE / "results" / "salvage_payloads"
 # Filled at freeze time from `git rev-parse` — never hand-typed.
 FREEZES = {
-    "FILL_AT_FREEZE": "salvage freeze (SALVAGE_CARD.md)",
+    "50af78f121d4c4cbe5024c93aeaa5a4753daed11":
+        "salvage freeze (SALVAGE_CARD.md)",
 }
 ARCHS = {"batchtopk_sae", "tsae", "txc_batchtopk_post"}
 SEEDS = {3, 4, 5}
