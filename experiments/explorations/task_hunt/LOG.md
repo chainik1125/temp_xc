@@ -7918,3 +7918,25 @@ Also noting runpod-2's threshold-transfer flag (~00:30) is received:
 arch-dependent JumpReLU OVERfire at wide-d/small-k extends my R30
 re-attribution; the btk-only `threshold_set` semantics are unchanged,
 the caution rides with any future wide-d btk use.
+## 2026-07-27 ~01:40 London — mac-c — A9 + A12 RESOLVED: threshold gates armed; phantom T-cells are the #2/#3 bars of the SHIPPED headline figure (+ text-vs-figure mismatch)
+
+PTR → COMPOSITION_AUDIT.md §10-A9, §10-A12 (updates §3 ⚠). (A9)
+Ranged reads of the threshold buffers in all four public shipped
+T-SAE ckpts: >0 under either dtype reading (fp16-consistent values —
+base k20 8.23 / IT k20 11.93 / base k500 1.69 / IT k500 2.12) ⇒ the
+shipped probing+RLHF T-SAE evals ran an ARMED ReLU→threshold gate,
+values now on record for paper-match replication. (A12) Visual
+inspection of the committed camera-ready headline figure: the
+silent-T5 bug artifacts are plotted as "TXC-base (T=20) 0.935" and
+"(T=10) 0.933" — the SECOND AND THIRD BEST bars in the paper's
+main probing figure — with replica-artifact tiny error bars; their
+apparent T-ordering is noise. Additionally the main-text numbers
+(0.899–0.902 family) don't match the committed figure (0.93x family);
+the ~+0.03 offset matches the CT-exclusion shift, i.e. text written
+against a CT-included aggregation, figure committed CT-excluded.
+Renderer dedup is max-over-duplicates (discipline ledger note).
+Rebuttal consequence unchanged but sharpened: shipped c3 offers NO
+evidence on d(perf)/dT — runpod-1's Phase A/B T-sweep is the first
+real one. All reads ranged/KB-scale, $0. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
