@@ -17,7 +17,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "fedf75aa96811419fc35a84adf46e0eb7f2c6eda"  # crossratify FREEZE
+PINNED_COMMIT = "ec6606c49382d9d0f0efcddcb491a1df70261ca2"  # freeze + lean-arms amendment
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 REPO_RES = "/repo/experiments/explorations/txcwin/crossratify/results"
