@@ -220,10 +220,18 @@ def train_cell(seed: int) -> dict:
         if p.is_dir() and p.name not in ckpt_before:
             shutil.copytree(p, f"/vol/checkpoints_topup/{p.name}", dirs_exist_ok=True)
             saved.append(p.name)
-    vol.commit()
 
-    return {"seed": seed, "results": out_json, "leaderboard_rows": new_rows,
-            "checkpoints_saved": saved, "elapsed_s": round(time.time() - t0)}
+    payload = {"seed": seed, "results": out_json, "leaderboard_rows": new_rows,
+               "checkpoints_saved": saved, "elapsed_s": round(time.time() - t0)}
+    # Persist the payload server-side too: the cells stage runs DETACHED
+    # (2026-07-26 lesson: a non-detached client disconnect at ~24 min
+    # CANCELLED all three in-flight cells), so results must survive the
+    # local client entirely. Retrieval: `modal volume get`.
+    pdir = Path("/vol/payloads")
+    pdir.mkdir(parents=True, exist_ok=True)
+    (pdir / f"seed_{seed}.json").write_text(json.dumps(payload, indent=2))
+    vol.commit()
+    return payload
 
 
 @app.local_entrypoint()
