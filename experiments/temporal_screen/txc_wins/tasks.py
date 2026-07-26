@@ -384,9 +384,14 @@ def make_rotate(k_seg, m):
     blk = k_seg // m
 
     def make_pair(rng):
-        topics = rng.sample(range(len(TOPICS)), m)
-        a = [TOPICS[topics[i // blk]][rng.randrange(len(TOPICS[0]))]
-             for i in range(k_seg)]
+        # The topic assigned to each block is FIXED across documents -- block 0 is always
+        # tea-making, block 1 always engine maintenance -- and only the sentence drawn from
+        # within a topic varies. Sampling the topics per document instead destroys the task:
+        # the class distinction is then a different contrast in every document, there is no
+        # consistent direction for a dictionary to learn, and measured pooled reading AUC
+        # sits at 0.500 with every steering arm at zero. Verified, and it is the reason this
+        # comment exists.
+        a = [TOPICS[i // blk][rng.randrange(len(TOPICS[0]))] for i in range(k_seg)]
         return a, a[blk:] + a[:blk], CARRIERS[rng.randrange(len(CARRIERS))]
 
     return make_pair
