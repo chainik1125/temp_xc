@@ -74,112 +74,61 @@ attributes move in different directions at different positions.** The cheapest n
 content plus its own carried state, since a maintained state's schedule is the running integral
 of the content's, and an integral is never proportional to its integrand.
 
-### 3. Two numbers screen a task before any dictionary is trained
+### 3. One number screens a task before any dictionary is trained — as a ranking, not a rule
 
-From the slab of optimal writes: `c`, the share reachable by a constant write, and `r1`, the
-share reachable by any rank-1 write. Together they say whether a task can separate the
-architectures at all, at a cost of one backward pass per document.
+`c` is the share of a task's optimal write that a **constant** write can reach. It costs one
+backward pass per document and involves no dictionary. One dedicated screen covers seven tasks at
+identical `n_docs = 200` and `n_grad = 40` (`results/txc_wins/geometry_all.json`), so the column
+below is a single consistent measurement rather than a pooling of per-run values:
 
-**A number computed before any dictionary is trained orders every steering outcome in this
-sprint, including the one that had to be withdrawn.** `c` — the share of the optimal write a
-*constant* write can reach — is measured from 20–24 backward passes through the model, with no
-dictionary involved. Across eight configurations spanning both metric modes:
+| task | `c(P_dom)` | `c(Ḡ)` | outcome |
+| --- | --- | --- | --- |
+| `rotate12` | 0.011 | **0.026** | crosscoder wins |
+| recency | 0.039 | **0.036** | crosscoder wins |
+| `rotate6` | 0.055 | 0.134 | loses |
+| evidence | 0.095 | **0.143** | **wins — out of order** |
+| order | 0.036 | 0.225 | loses |
+| `rotate2` | 0.111 | 0.255 | loses |
+| `phase1` | 0.037 | 0.262 | loses |
 
-| task | `c` (gradient) | crosscoder | SAE | z | outcome | file |
-| --- | --- | --- | --- | --- | --- | --- |
-| `rotate12` | **0.033** | **+18.23** | +5.36 | **+9.8** | **wins** | `rot_m12_T.json` |
-| recency | **0.037** | **+6.49** | +2.67 | **+18.0** | **wins** | `recency_grad.json` |
-| `rotate6` | 0.102 | −0.01 | +5.92 | −7.5 | loses | `rot_m6_T.json` |
-| recency, positions vary | 0.112 | +2.52 | +3.30 | −2.4 | loses | `recency_var_grad.json` |
-| evidence | 0.136 | +5.79 | +1.32 | **+29.7** | **wins — the exception** | `evidence_grad.json` |
-| `rotate2` | 0.163 | +2.86 | +5.27 | −1.0 | no win | `rot_m2_T.json` |
-| `rotate3` | 0.179 | +6.43 | +11.51 | −2.9 | no win | `rot_m3_T.json` |
-| order | 0.241 | +6.34 | +4.66 | +1.4 | no win | `order_sym_ds0.json` |
+**Two things this establishes, and one it does not.**
 
-**`c` describes the constant write's ceiling, and it does that well.** Measured against
-`sae_broadcast`/`grad_slab` — the quantity it is actually about — `sqrt(c)` gets **4/4 rank
-agreement** across the rotation ladder.
+**It establishes that the gradient is the right object.** `c(P_dom)` gives 0.036 for order and
+0.039 for recency — two tasks with opposite outcomes at essentially identical values — while
+`c(Ḡ)` separates them 6×. Measured `cos(P_dom, Ḡ)` runs 0.05 to 0.19 across these tasks, so the
+difference-of-means slab is not a cheap approximation to the gradient; it is a different quantity,
+and every screen and ceiling arm must be built from the gradient. This repeats on the
+demonstration-order task built *after* the prediction was registered, where `r1(P_dom)` = 0.94
+would have discarded it and `r1(Ḡ)` = 0.59 says it has the second-most rank headroom in the sprint.
 
-Measured instead against the crosscoder's *margin over* the constant write, across 13 tasks
-Kendall **τ = −0.58**. The weaker number is expected rather than disappointing: a margin composes
-**two** independent discovery outcomes on top of the geometry. This also dissolves the apparent
-`evidence` anomaly — `c` = 0.136 says a constant write can reach ~37% of the optimum, not that the
-crosscoder does badly; both arms can do well and the margin is then set by which one finds its
-target.
+**It establishes a ranking.** Sorted by `c(Ḡ)` the outcomes read W W L **W** L L L — six of seven
+in order, with `evidence` inverted against `rotate6`. **No threshold separates the two classes**:
+they overlap on [0.134, 0.143].
 
-> **Geometry sets the ceilings. Discovery determines what is reached.** `c` ranks candidate tasks
-> rather than deciding them, because the between-architecture gap also depends on two independent
-> discovery outcomes — and this sprint's finding is that **discovery is the binding constraint
-> everywhere**.
-
-⚠ **Both quantitative tests of `c` were measured on the wrong component, and on the right one
-they fail.** `c` bounds `⟨W_const, Ḡ⟩`, a first-order quantity, which is **odd** in α — but the
-constant arms are 72–80% **even**, so the 4/4 ordering test and the τ = −0.58 were both computed
-against a numerator that is mostly curvature. Recomputed on the odd component alone (`α = 0.5`,
-the linear regime), with the outcome registered in advance by its author:
+**It does not establish a quantitative law, and the test that appeared to was measuring the wrong
+component.** `c` bounds `⟨W_const, Ḡ⟩`, a **first-order** quantity, odd in α. The constant arms
+measure 72–80% **even** — mostly curvature — so both quantitative tests were computed against a
+numerator that is largely not the thing `c` bounds. Recomputed on the odd component alone at
+α = 0.5, against predictions registered in advance by the test's author:
 
 | test | on raw peaks | on the odd component | registered prediction |
 | --- | --- | --- | --- |
-| four-rung ordering | **4/4** | **0/4** | "still passes 4/4" |
+| four-rung ordering | 4/4 | **0/4** | "still passes 4/4" |
 | τ across 24 cells | −0.58 | **−0.467** | "\|τ\| rises above 0.58" |
 
-Both predictions are refuted. The reason is visible in the magnitudes: the constant write's odd
-share of the optimal write measures **0.9–6% with inconsistent sign** across the ladder, against
-`sqrt(c)` predictions of 18–42%. **On the component `c` is actually about, a constant write
-achieves essentially nothing on every task measured, so there is no spread for `c` to rank.**
+Both refuted. The constant write's odd share of the optimal write measures **0.9–6% with
+inconsistent sign**, against `sqrt(c)` predictions of 18–42%.
 
-This cuts two ways and both belong in the record. It **strengthens** the architectural claim —
-constant writes have no first-order purchase on any of these tasks, so the per-token baselines are
-weaker than their reported numbers suggest. And it **weakens `c` as a quantitative instrument**
-further than the earlier wording allowed: its author's own reading was that if `|τ|` did not rise,
-"ranks but does not decide" is if anything generous. That is the standing statement.
+**The two readings this forces, in opposite directions.** A constant write has **no first-order
+purchase on any task measured** — so the per-token baselines are weaker than their reported
+numbers, which are largely second-order artefact, and the crosscoder's directional margin over
+them is understated. And `c` is a **ranking heuristic with a known inversion**, not an instrument:
+the standing statement is its author's own, that "ranks but does not decide" is if anything
+generous.
 
-**`c` is necessary and demonstrably not sufficient**, and the counterexample is worth more than
-the caveat. The same recency task on Qwen2.5-0.5B (`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037)
-sits squarely in the winning range and shows **no effect from any write, including the supervised
-one**. A low `c` says a constant write has nothing to ride; it does not say anything is steerable
-at all. **`sqrt(c)` predicts the constant write's share of the optimum, and it does so on the rung that
-most embarrasses a monotone story.** If `c` is the operative statistic, `sae_broadcast/grad_slab`
-should track `sqrt(c)` at every rung:
-
-| m | `sqrt(c)` | `sae_broadcast`/`grad_slab` |
-| --- | --- | --- |
-| 2 | 0.403 | 0.0693 |
-| 3 | **0.423** | **0.1124** |
-| 6 | 0.320 | 0.0355 |
-| 12 | 0.180 | 0.0195 |
-
-Predicted ordering `3 > 2 > 6 > 12`; measured ordering `3 > 2 > 6 > 12` — **rank agreement 4/4,
-including the non-monotone `m=3 > m=2` inversion, which `r1` gets wrong** (`r1` is monotone in `m`
-and predicts `2 > 3`). The absolute values sit at 0.11–0.27 of predicted because `sae_broadcast`
-uses the SAE's *learned* direction rather than the optimal constant one, so it should undershoot
-by a roughly constant factor; the ordering is the test.
-
-This matters because both `c` and `r1` are minimised at `m = 12`, so the single crosscoder win
-cannot discriminate between them. **The four-rung ordering can, and it separates them cleanly.**
-
-**This retires the metric-mode sentence circulated earlier tonight.** "The crosscoder wins under
-a metric that cancels constant writes and loses under one that does not" is refuted by
-`rotate12`, which is an **ordering-mode** task — the mode that leaves constant writes exposed —
-and the crosscoder wins it by z = 9.8. The property that predicts the outcome is the task's `c`,
-not the metric's family. A task property beating a metric property is the stronger result, and it
-is why this replaces rather than restores the earlier claim.
-
-All eight rows are full-configuration runs with `c` and the arms read from the same file.
-
-**What the earlier version got wrong.** A table circulated an hour before this one showed the
-same ordering computed from the **difference-of-means** slab. Those values are near-orthogonal to
-the metric gradient (`cos` = 0.057, 0.096, 0.190 across the ladder) and do **not** order the
-outcomes — order and recency sit at 0.039 apart on the diff-of-means and 7× apart on the
-gradient. The gate is real; the cheap proxy for it is not.
-
-The same DC-component account **retro-predicts eight of this project's own executed
-experiments** — two failed language demonstrations and six successes — with no training.
-Passphrase verification fails because its steering target is a validity *state*, a constant
-write's natural shape, despite maximally position-dependent inputs; ordered generation fails
-because a shared contextual mode is a constant write by definition; the six trajectory tasks
-succeed because multiset-matched foils leave no DC component, and their broadcast arms measure
-at or slightly below zero exactly as that predicts.
+> **Geometry sets the ceilings. Discovery determines what is reached.** Every result in this
+> sprint is decided by the second, which is why a geometric screen ranks candidates and cannot
+> call them.
 
 ### 4. `c` is a property of the task *and the metric*
 
