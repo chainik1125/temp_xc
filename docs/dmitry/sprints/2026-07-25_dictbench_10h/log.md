@@ -733,3 +733,61 @@ rate does produce a materially healthier dictionary — full budget spent, alive
 Stating the limit plainly: FVU 0.706 is better but is still 23× the SAE's 0.030, so this
 tests whether the arrangement result survives a substantially better dictionary, not whether
 it survives one at parity. No configuration found in this sprint reaches parity.
+
+## Correction: the capacity saturation was a learning-rate artefact, not a property of k
+
+The frontier's lr=3e-4 arm has now reached kper=8, and the collapse does not reappear.
+Side by side at identical nominal budgets, same code, same corpus, same 2500 steps:
+
+| kper | coeff/seg @ lr=1e-3 | coeff/seg @ lr=3e-4 | ReLU-kill 1e-3 | ReLU-kill 3e-4 | FVU 1e-3 | FVU 3e-4 |
+|---|---|---|---|---|---|---|
+| 1 | 1.00 | 1.00 | 0.000 | 0.000 | 0.736 | 0.761 |
+| 2 | 1.99 | 2.00 | 0.005 | 0.000 | 0.711 | 0.769 |
+| 4 | 2.41 | **3.97** | 0.397 | **0.008** | 0.782 | **0.706** |
+| 8 | 2.04 | **7.70** | 0.744 | **0.038** | 0.813 | **0.630** |
+
+At lr=1e-3 realised capacity peaks at kper=4 and then falls while ReLU-kill climbs to 74%.
+At lr=3e-4 the crosscoder spends 3.97 of 4 and 7.70 of 8, ReLU-kill stays near zero, the
+alive fraction rises 0.053 → 0.140 → 0.357 → 0.516, and FVU improves monotonically.
+
+**So several things I logged earlier need withdrawing, and I would rather withdraw them
+plainly than let them stand behind a caveat.** "Raising k actively destroys capacity",
+"positive pre-activations fall monotonically as k rises", and "the crosscoder realises ~2.5
+coefficients per segment no matter how large k is" are all true **at lr=1e-3 only**. They
+are not properties of window codes. The 28× overstatement at kper=41 is likewise a
+statement about a particular training run, not about the architecture.
+
+What survives, and is arguably the more useful finding, is this. Realised sparsity is
+`min(k, #{pre > 0})` — that identity held exactly in every row of every run and is not in
+question. What is in question is which term binds, and **that turns out to depend on the
+optimiser rather than on the architecture**. A single 3× change in learning rate moves the
+crosscoder at kper=8 from spending 2.04 coefficients per segment to spending 7.70. So:
+
+- nominal k cannot be used as a capacity axis, not because crosscoders inherently fail to
+  spend it, but because whether they spend it is an unstable function of training;
+- realised coefficients per segment must be measured and reported for every run, since two
+  runs with identical hyperparameters apart from lr differ by 3.8× in what they actually
+  spend;
+- any crosscoder-vs-SAE comparison in this project needs its realised L0 checked before its
+  conclusion is trusted, including comparisons that looked settled.
+
+`mechanism_modal.py`'s beautiful monotone table — 53 → 36 → 22 → 17 → 16 positive
+pre-activations as k rises — was run at lr=1e-3 throughout. It is a real measurement of a
+real failure mode, but the failure mode is optimisation collapse, and the cleanest way to
+say what it shows is that **a crosscoder can silently train into a state where almost none
+of its latents are usable, while its nominal configuration reports nothing wrong.**
+
+The ablation arms confirm the same thing negatively. At kper=4, lr=3e-4, every intervention
+I tried lands within noise of the others:
+
+| arm | #{pre>0} | coeff/seg | ReLU-kill | alive | FVU |
+|---|---|---|---|---|---|
+| base | 99.2 | 3.98 | 0.006 | 0.376 | 0.670 |
+| + input centering | 98.5 | 3.99 | 0.002 | 0.371 | 0.667 |
+| + tied init | 73.7 | 3.96 | 0.009 | 0.294 | 0.695 |
+| + centering & tied | 83.7 | 3.99 | 0.004 | 0.302 | 0.687 |
+| + aux dead-latent loss | 99.4 | 3.97 | 0.008 | 0.392 | 0.676 |
+
+Centering, tied init, decoder normalisation at init and the standard auxiliary revival loss
+all do essentially nothing once the learning rate is right. Registered R1, R2, N1 and N2 are
+all refuted. The learning rate was the whole story.
