@@ -136,9 +136,12 @@ instruction-position bias in generated text, beating every unsupervised per-toke
 every temporal-profile control. The same task on two smaller models has **no steerable target at
 the layer tested, for any write including the supervised one** — see the limits section.
 
-Instruction recency, completed configuration, every arm at matched injected norm:
+**The full arm ordering, at each arm's own best dose.** These numbers are **not comparable to the
+matched-dose table above** — they are larger because each arm is read at its saturation point, and
+they are reported because the *ordering* is what finding 2 rests on and it is stable across both
+reportings. Instruction position, completed configuration, every arm at matched injected norm:
 
-| arm | Δ margin | |
+| arm | Δ margin (peak dose) | |
 | --- | --- | --- |
 | `rank1_best` | +8.55 ± 0.27 | rank-1 truncation of the difference-of-means slab |
 | `dom_slab` | +8.20 ± 0.22 | supervised reference |
@@ -151,8 +154,8 @@ Instruction recency, completed configuration, every arm at matched injected norm
 | `random_slab` | +1.39 ± 0.07 | |
 | `txc_profile_random` | +0.00 ± 0.04 | profile kept, directions randomised |
 
-Three levels, each gap separately significant. **The crosscoder beats deployed practice by
-2.5×** — +6.48 against +2.60, z = 18.3 — which is the honest, useful win. **A per-token
+Three levels, each gap separately significant. At matched dose the same comparison is **7.6×**
+(+1.90 against +0.25); at peak dose it is **2.5×** — +6.48 against +2.60, z = 18.3 — which is the honest, useful win. **A per-token
 dictionary handed a schedule beats the crosscoder** — +7.86 and +8.55, z = 4.7 and 6.7 — so the
 write was never out of reach. The crosscoder reaches **76% of the rank-1 ceiling**.
 
