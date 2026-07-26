@@ -64,16 +64,19 @@ def _assert_pinned():
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def run_rawgate(model: str, layer: int, t_ladder: str, tag: str) -> str:
     _assert_pinned()
-    _sh(f"mkdir -p {RESULTS_VOL_DIR} {REPO_RES}")
+    # Results dir -> SYMLINK onto the Volume: rawgate_fill writes its
+    # JSON incrementally after every cell, so each write lands on the
+    # Volume directly and survives a mid-flight kill (the first gpt2
+    # run was cancelled during the finally-copy and the JSON died with
+    # the container while the logs kept the numbers).
+    _sh(f"mkdir -p {RESULTS_VOL_DIR}")
+    _sh(f"rm -rf {REPO_RES} && ln -s {RESULTS_VOL_DIR} {REPO_RES}")
     try:
         _sh(f"{PY} -m experiments.explorations.txcwin.crossratify.rawgate_fill"
             f" --model '{model}' --layer {layer} --t-ladder {t_ladder}"
             f" --tag {tag}")
     finally:
-        out = Path(REPO_RES) / f"rawgate_fill_{tag}.json"
-        if out.exists():
-            _sh(f"cp {out} {RESULTS_VOL_DIR}/")
-        vol.commit()          # cache (from build_cache) + any partial result
+        vol.commit()          # cache (from build_cache) + results
     return (Path(REPO_RES) / f"rawgate_fill_{tag}.json").read_text()
 
 
