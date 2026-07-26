@@ -7047,3 +7047,49 @@ AMBIGUOUS ledger with disambiguators in §10 (A1–A11). Read-only lane,
 $0 compute; all verdicts PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-26 ~21:50 London — mac-local: COMPOSITION_AUDIT first push RATIFIED + Phase-B rulings
+
+_Observed HEAD: `dd6c08b39`._ **RATIFIED.** I spot-checked the most
+load-bearing novel claim directly against
+`origin/han-phase7-unification:src/architectures/tsae_paper.py` —
+the quote is verbatim: the paper's T-SAE eval path is
+ReLU→threshold and NEVER runs TopK. On the record, the audit's
+headlines: (1) **the paper's probing panel was
+composition-INCONSISTENT by design** — TXC/SAE/MLC arms ran
+TopK→ReLU while the T-SAE arm ran ReLU-first with threshold
+inference; there is no single "paper composition", and the
+btk-only ablations will HARMONIZE arm compositions for the first
+time (9am-meeting narrative point). (2) **A1**: the shipped c3
+cells (k=20, 20K steps, 3 seeds, 8 budgets) are a post-05-03
+retrain never committed to any surviving branch — with the A2
+k-budget discrepancy (RLHF shipped the k=500 dev family while c3
+claims k=20). (3) **Checkpoint jackpots**: txcdr-it = exactly the
+12 IT probing ckpts; temp-bench-models = 1,283 train_key dirs with
+configs, last-modified 28 min before the first c3 fig commit;
+temp-bench-data = probe caches + 430 eval artifacts. Eval-only
+paper-match is FEASIBLE. (4) Branch genealogy: dmitry-em-repl and
+aniket-runpod-ward-stage-a are disconnected islands entering by
+file-copy; `final` continued 471 commits past the camera-ready
+fork. (5) RLHF pinned by BYTE-IDENTITY (blob-identical artifacts).
+
+**RULINGS.**
+- **mac-c part 2, top priority alongside A6: enumerate
+  temp-bench-models' 1,283 config.json files** (metadata-only
+  sweep) — it likely resolves A1 AND locates the exact shipped c3
+  cells, making runpod-1's paper-match arm an eval-only run on the
+  paper's own checkpoints (maximally faithful, cheapest).
+- **runpod-1**: Phase A proceeds unchanged; Phase B holds for the
+  enumeration (hours, not blocking). When it opens, paper-match is
+  PER-ARM (TopK→ReLU for txc/sae/mlc; the T-SAE port as-is) — do
+  not collapse it to one composition.
+- **runpod-2**: Phase B stays blocked on A6 exactly as your card
+  states; the public 14B-finance txc_base checkpoints are an
+  OPTIONAL finance-lineage stretch, not the exhibit.
+- mac-c housekeeping: set per-clone git identity
+  (`mac-c-agent`) — first push authored under the default
+  identity.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
