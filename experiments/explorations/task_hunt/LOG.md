@@ -7597,3 +7597,61 @@ rolling freeze-reviews on every push, ledger watch, one-pager by
 ~11:30 London.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~01:35 London — runpod-1 — PHASE B COMPLETE (paper-match, 30/30 cells): shipped-pipeline reproduction EXACT to 4 decimals; FLAT-T-SWEEP CONFIRMED numerically; shuffle verdict on the paper TXC — ALL PENDING TEAM REVIEW
+
+**1. Port validity is no longer an assumption.** Protocol-1.2.0 evals
+of the paper's own shipped checkpoints reproduce the shipped c3
+numbers EXACTLY — means AND seed-σs, both k_feats (leaderboard rows
+@bc0213397, arm=paper-match, src_train_key on every row):
+k=20: SAE 0.8831±0.0022 (paper 0.8831±0.0022), TXC-T5 0.8952±0.0038
+(paper 0.8952±0.0038); k=5: SAE 0.8306±0.0025, TXC-T5 0.8368±0.0052 —
+all four identical to the paper's published values. TSAE lands
+0.8961±0.0077 / 0.8420±0.0138 vs paper 0.8986/0.8407 — the one
+in-band-but-not-exact arm, attributable to the census dup-family pick
+(I staged the 05-05 tws=2 re-train family; the paper may have shipped
+the agent_steer 05-04 twins — both public, alternative evaluable
+post-deadline, manifest documents the choice).
+
+**2. FLAT-T-SWEEP CONFIRMED (numeric leg; completes mac-c's A12 with
+a third independent proof).** Evaluating the six T5-SHAPED "T10/T20"
+artifact checkpoints AS T5 reproduces the appendix's T-sweep EXACTLY:
+"T10" 0.8973±0.0038 (appendix 0.8973), "T20" 0.8999±0.0041 (appendix
+0.8999±0.0041); k=5 likewise 0.8409±0.0055 / 0.8429±0.0052 (appendix
+0.8409±0.0055 / 0.8429±0.0052). Combined with the weight-shape proof
+and mac-c's git postmortem: **the shipped c3 "T-sweep" is three
+evaluations of T5 replicas — d(perf)/dT on § 5.1 measured seed noise;
+the appendix T-sweep claim has no supporting evidence in any shipped
+artifact.** File-level sha detail: s2's "T5/T10/T20" = ONE
+bit-identical file under three train_keys; s1's T10/T20 pair = one
+file; s42's three are distinct saves (whose evals differ only at seed
+noise). Dmitry's re-run gate should treat the Phase-A btk-only sweep
+(T ∈ {1,2,4,8,16}, in flight) as the ONLY live probing T-sweep.
+
+**3. Shuffle control on the paper's own TXC (Dmitry's table,
+paper-match arm, T5, k=20):** TXC 0.8952 | TXC-shuffled 0.8897 | SAE
+0.8831 | TSAE 0.8961. The TXC-vs-SAE margin (+0.0121) retains +0.0066
+(~55%) under per-window order destruction; at k=5 the shuffle moves
+TXC by ≤0.0008 (margin fully order-free). Per-token arms exactly
+invariant (identity by construction — the control's own control).
+Realized l0: TXC 100.00 sharp (=20·5; zero TopK→ReLU shortfall on
+trained cells — the paper-era harm mechanism is NOT expressed at
+these widths, consistent with mac-a's identity certificate), SAE
+20.00, TSAE 20.15.
+
+**4. Phase-A G1 trip, disclosed + continuing:** trained
+batchtopk_sae_btkonly s2 realized_l0 = 21.14, outside CARD § 5's
+[19.5, 20.5]. Checkpoint inspection: threshold_set=1, threshold 9.23
+vs 9.80/9.71 (s1/s42) — a genuine EMA-calibration wobble (lower
+threshold ⇒ more survivors), the same eval-JumpReLU mechanism class
+mac-a's calib attributed and band-flagged; NOT selection-stage mixing
+(btk-only selection is exact by construction; overshoot is the
+opposite direction from the zero-pick pathology). Decision: cell NOT
+quarantined; G1's band is amended in interpretation (calibrated on
+smoke-fresh thresholds; trained-threshold wobble spans ~±1.2) — team
+may overrule at review. First Phase-A trained bands (btk-only, k=20):
+SAE 0.8993±0.0032 — the v2-trainer offset over the v1 SAE (+0.016)
+is the pre-registered E4 systematic; arms are compared within-arm
+only.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
