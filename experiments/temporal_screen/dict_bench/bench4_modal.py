@@ -1,4 +1,4 @@
-"""The four-way benchmark: TopK SAE vs Stacked SAE vs Temporal Crosscoder vs tSAE (TFA).
+"""First-pass benchmark: TopK SAE vs Temporal Crosscoder vs tSAE at paper params.
 
 This is the deliverable the sprint set out to produce. Everything before it was
 methodology, and all of that methodology is folded in here:
@@ -14,13 +14,12 @@ methodology, and all of that methodology is folded in here:
     a window code has something to find. The i.i.d. corpus is carried as a control where
     the window factor is absent and window-AUC must read 0.5.
 
-THE FOUR ARMS
+THE THREE ARMS
 
   sae       TopKSAE, one code per token. The per-token baseline.
-  stacked   StackedSAE -- T independent TopK SAEs, one per position. The "per-layer SAEs"
-            baseline from the crosscoders paper, adapted to time. Carries T times the
-            parameters of `sae`; parameter counts are reported rather than hidden.
-  txc       TemporalCrosscoder -- one shared code for the whole T-window.
+  txc       TemporalCrosscoder, plain -- one shared code for the whole T-window, with
+            `batchtopk` sparsity and NO auxiliary penalty (not the TXC-pro variant: no
+            matryoshka, no contrastive term, no anti-dead stack).
   tsae_paper  The attention-based TemporalSAE with ReLU + L1 (l1_coef), which is what
             THIS repo calls `tsae_paper` -- see experiments/ward_backtracking_txc/
             architectures.py:12, "Bhalla 2025 paper-faithful ... ReLU activation + L1
@@ -116,7 +115,7 @@ ELLS = [1, 2, 3, 6]          # run lengths; the window-level factor
 @app.function(gpu="A10G", image=image, timeout=21600)
 def bench4(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int,
            steps: int, budgets: list, lr: float, general_frac: float, batch_win: int,
-           l1_grid: list, nce_alpha: float, nce_shift: int):
+           l1_grid: list, nce_alpha: float, nce_shift: int, arms: list):
     import sys
     sys.path.insert(0, "/work")
     import math
@@ -284,7 +283,7 @@ def bench4(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: in
                 opt.step(); m._normalize_decoder()
             m.eval()
 
-        for k in budgets:
+        for k, l1 in zip(budgets, l1_grid):
             # ---- 1. per-token TopK SAE ----
             torch.manual_seed(0)
             m = TopKSAE(d_in=d, d_sae=d_sae, k=k).to(dev)
@@ -294,25 +293,11 @@ def bench4(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: in
                 xh = m.decode(Zf)
                 l0 = float((Zf > 0).float().sum(-1).mean())
                 alive = float(((Zf > 0).float().mean(0) >= 0.001).float().mean())
-                Zw = Zf.reshape(-1, T, d_sae).mean(1)
-                s_auc, w_auc = readouts(Zf, Zw)
+                s_auc, w_auc = readouts(Zf, Zf.reshape(-1, T, d_sae).mean(1))
             record("sae", k, l0, fvu_from(xh, flat_ho_w), alive, s_auc, w_auc,
-                   sum(p.numel() for p in m.parameters()))
+                   sum(p_.numel() for p_ in m.parameters()))
 
-            # ---- 2. Stacked SAE: T independent per-position SAEs ----
-            torch.manual_seed(0)
-            m = StackedSAE(d_in=d, d_sae=d_sae, T=T, k=k).to(dev)
-            adam_train(m, gen_win, batch_win)
-            with torch.no_grad():
-                _, xh, Z = m(Who)                      # Z: (n, T, h)
-                l0 = float((Z > 0).float().sum(-1).mean())
-                Zf = Z.reshape(-1, d_sae)
-                alive = float(((Zf > 0).float().mean(0) >= 0.001).float().mean())
-                s_auc, w_auc = readouts(Zf, Z.mean(1))
-            record("stacked", k, l0, fvu_from(xh, Who), alive, s_auc, w_auc,
-                   sum(p.numel() for p in m.parameters()))
-
-            # ---- 3. Temporal Crosscoder, batchtopk ----
+            # ---- 2. Temporal Crosscoder, plain: batchtopk, no auxiliary penalty ----
             if k * T <= d_sae:
                 torch.manual_seed(0)
                 m = TemporalCrosscoder(d_in=d, d_sae=d_sae, T=T, k=k,
@@ -321,88 +306,52 @@ def bench4(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: in
                     m._normalize_decoder()
                 adam_train(m, gen_win, batch_win)
                 with torch.no_grad():
-                    Zw = m.encode(Who)                 # (n, h) one code per window
+                    Zw = m.encode(Who)
                     xh = m.decode(Zw)
                     l0 = float((Zw != 0).float().sum(-1).mean()) / T
                     alive = float(((Zw != 0).float().mean(0) >= 0.001).float().mean())
                     # A window code has no per-segment answer; broadcasting it is the
-                    # honest representation of that, and it should read ~0.5.
+                    # honest representation of that, and should read ~0.5.
                     Zseg = Zw.unsqueeze(1).expand(-1, T, -1).reshape(-1, d_sae)
                     s_auc, w_auc = readouts(Zseg, Zw)
                 record("txc", k, l0, fvu_from(xh, Who), alive, s_auc, w_auc,
-                       sum(p.numel() for p in m.parameters()))
+                       sum(p_.numel() for p_ in m.parameters()))
 
-            # ---- 4. tsae_paper: attention TemporalSAE, ReLU + L1 ----
-            # Sparsity here is set by l1_coef, not k, so the budget list indexes a
-            # matched-length l1 grid instead. The realised-coefficient axis is what makes
-            # the two commensurable.
-            l1 = l1_grid[budgets.index(k)]
-            for name, diff_type, kv, l1c in (
-                    ("tsae_paper", "relu", None, l1),
-                    ("tfa", "topk", k, 0.0)):
-                torch.manual_seed(0)
-                m = TemporalSAE(dimin=d, width=d_sae, n_heads=8,
-                                sae_diff_type=diff_type, kval_topk=kv,
-                                tied_weights=True, n_attn_layers=1,
-                                bottleneck_factor=64).to(dev)
-                opt = torch.optim.Adam(m.parameters(), lr=lr)
-                m.train()
-                for s_ in range(steps):
-                    xb = gen_win(batch_win)
-                    recons, info = m(xb)
-                    loss = F.mse_loss(recons.reshape(-1, d), xb.reshape(-1, d),
-                                      reduction="sum") / (xb.shape[0] * T)
-                    if l1c > 0:
-                        z_tot = info["novel_codes"] + info["pred_codes"]
-                        loss = loss + l1c * z_tot.abs().sum(-1).mean()
-                    opt.zero_grad(); loss.backward()
-                    torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
-                    opt.step()
-                m.eval()
-                with torch.no_grad():
-                    xh, info = m(Who)
-                    Zn = info["novel_codes"].reshape(-1, d_sae)
-                    Zp = info["pred_codes"].reshape(-1, d_sae)
-                    l0 = float((Zn > 0).float().sum(-1).mean())
-                    l0p = float((Zp > 0).float().sum(-1).mean())
-                    alive = float(((Zn > 0).float().mean(0) >= 0.001).float().mean())
-                    s_auc, w_auc = readouts(Zn, info["novel_codes"].mean(1))
-                record(name, k if kv else l1c, l0, fvu_from(xh, Who), alive,
-                       s_auc, w_auc, sum(p.numel() for p in m.parameters()),
-                       {"pred_l0_per_segment": l0p, "l1_coef": l1c})
-
-            # ---- 5. tsae_nce: per-token TopK SAE + InfoNCE across nearby positions ----
+            # ---- 3. tsae_paper: attention TemporalSAE, ReLU + L1 ----
+            # Sparsity is set by l1_coef, not k, which is precisely why the shared axis
+            # has to be realised coefficients per segment: it is the only one on which an
+            # L1 arm and a TopK arm are comparable at all. l1=1e-3 is the repo's
+            # documented paper value and is inside the swept grid.
             torch.manual_seed(0)
-            m = TopKSAE(d_in=d, d_sae=d_sae, k=k).to(dev)
+            m = TemporalSAE(dimin=d, width=d_sae, n_heads=8,
+                            sae_diff_type="relu", kval_topk=None,
+                            tied_weights=True, n_attn_layers=1,
+                            bottleneck_factor=64).to(dev)
             opt = torch.optim.Adam(m.parameters(), lr=lr)
             m.train()
             for s_ in range(steps):
-                xb = gen_win(batch_win)                       # (B, T, d)
-                z = m.encode(xb.reshape(-1, d)).reshape(-1, T, d_sae)
-                xh = m.decode(z.reshape(-1, d_sae)).reshape(-1, T, d)
-                loss = (xh - xb).pow(2).sum(-1).mean()
-                # Consistency between codes `nce_shift` positions apart.
-                t0 = torch.randint(0, T - nce_shift, (1,)).item()
-                za, zb = z[:, t0], z[:, t0 + nce_shift]
-                za = F.normalize(za, dim=-1, eps=1e-8)
-                zb = F.normalize(zb, dim=-1, eps=1e-8)
-                sim = za @ zb.t()
-                lbl = torch.arange(za.shape[0], device=dev)
-                loss = loss + nce_alpha * 0.5 * (F.cross_entropy(sim, lbl)
-                                                 + F.cross_entropy(sim.t(), lbl))
+                xb = gen_win(batch_win)
+                recons, info = m(xb)
+                loss = F.mse_loss(recons.reshape(-1, d), xb.reshape(-1, d),
+                                  reduction="sum") / (xb.shape[0] * T)
+                z_tot = info["novel_codes"] + info["pred_codes"]
+                loss = loss + l1 * z_tot.abs().sum(-1).mean()
                 opt.zero_grad(); loss.backward()
                 torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
-                opt.step(); m._normalize_decoder()
+                opt.step()
             m.eval()
             with torch.no_grad():
-                Zf = m.encode(flat_ho_w)
-                xh = m.decode(Zf)
-                l0 = float((Zf > 0).float().sum(-1).mean())
-                alive = float(((Zf > 0).float().mean(0) >= 0.001).float().mean())
-                s_auc, w_auc = readouts(Zf, Zf.reshape(-1, T, d_sae).mean(1))
-            record("tsae_nce", k, l0, fvu_from(xh, flat_ho_w), alive, s_auc, w_auc,
-                   sum(p.numel() for p in m.parameters()),
-                   {"nce_alpha": nce_alpha, "nce_shift": nce_shift})
+                xh, info = m(Who)
+                Zn = info["novel_codes"].reshape(-1, d_sae)
+                Zp = info["pred_codes"].reshape(-1, d_sae)
+                l0 = float((Zn > 0).float().sum(-1).mean())
+                l0p = float((Zp > 0).float().sum(-1).mean())
+                alive = float(((Zn > 0).float().mean(0) >= 0.001).float().mean())
+                s_auc, w_auc = readouts(Zn, info["novel_codes"].mean(1))
+            record("tsae_paper", l1, l0, fvu_from(xh, Who), alive, s_auc, w_auc,
+                   sum(p_.numel() for p_ in m.parameters()),
+                   {"pred_l0_per_segment": l0p, "l1_coef": l1})
+
 
         out["corpora"][tag] = rows
 
@@ -419,13 +368,15 @@ def bench4(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: in
 @app.local_entrypoint()
 def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int = 36,
          t: int = 12, n_docs: int = 500, d_sae: int = 4096, steps: int = 2500,
-         budgets: str = "1,2,4,8", lr: float = 3e-4, general_frac: float = 0.3,
-         batch_win: int = 32, l1_grid: str = "1e-1,3e-2,1e-2,3e-3",
-         nce_alpha: float = 1.0, nce_shift: int = 1, tag: str = ""):
+         budgets: str = "1,2,4,8,16", lr: float = 3e-4, general_frac: float = 0.3,
+         batch_win: int = 32, l1_grid: str = "1e-2,3e-3,1e-3,3e-4,1e-4",
+         nce_alpha: float = 1.0, nce_shift: int = 1,
+         arms: str = "sae,txc,tsae_paper", tag: str = ""):
     import json
     r = bench4.remote(model, layer, k_seg, t, n_docs, d_sae, steps,
                       [int(x) for x in budgets.split(",")], lr, general_frac, batch_win,
-                      [float(x) for x in l1_grid.split(",")], nce_alpha, nce_shift)
+                      [float(x) for x in l1_grid.split(",")], nce_alpha, nce_shift,
+                      [x.strip() for x in arms.split(",")])
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
     name = f"bench4{tag}.json"
