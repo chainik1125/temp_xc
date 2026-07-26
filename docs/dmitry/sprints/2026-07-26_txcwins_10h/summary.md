@@ -359,13 +359,25 @@ eight; and it appeared again in the red-team pass over this document, in two of 
 issues. **A trap that catches the people actively studying it is worth more attention than one that
 only catches novices.**
 
-**And it is mechanically detectable, which is the useful half.** Print, beside every reported
-number, the **sign of the dose at which each arm's |Δ| is maximal**. If that sign is not constant
-across arms, signed-positive indexing is silently comparing arms measured on opposite branches.
-Run over the sprint's own files it flags every cell checked — including `order_sym_ds0`, the
-withdrawal itself, where `txc_slab` and `sae_broadcast` peak at `+α` while `txc_flat` and
-`rank1_best` peak at `−α`. It would have caught all three occurrences before any of them reached a
-document.
+**And it is mechanically detectable — but not in the form first proposed here.** "Flag any cell
+where arms peak on different branches" fires on **77 of 84** symmetric-grid cells: almost every cell
+has some arm peaking on the minus branch, so it cries wolf and would be ignored. The discriminating
+test is whether the **verdict** changes — crosscoder minus best constant arm, read at signed `+α`
+against sign-free matched magnitude. That is `scripts/peak_sign_flags.py`, and it gives the number
+worth quoting:
+
+> **Twenty-six of 84 symmetric-grid cells — 31% — change verdict on the dose convention alone.**
+> Not the effect size. The verdict.
+
+It flags `order_sym_ds0`, the withdrawal cell (+0.57 signed against −3.24 sign-free). **And it flags
+two of the three headline cells**: `recency_tr_sel_ds0` at −3.26 against +2.28 and
+`recency_tr_sel_ds2` at −3.61 against +2.89, with only ds1 stable.
+
+**So the headline is convention-dependent too.** It survives because the sign-free convention is the
+correct one and this sprint established that on independent grounds — but under signed-positive
+indexing the headline would have inverted in two inits of three. That makes the withdrawal in
+finding 1 not a one-off blunder but **the same trap, catching the result we kept as well as the one
+we dropped.**
 
 ## Where things live
 
