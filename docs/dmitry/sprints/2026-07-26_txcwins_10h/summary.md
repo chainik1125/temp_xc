@@ -118,12 +118,29 @@ gradient's support is set by where the two classes differ — but the second is 
 - **One model, one layer, one dictionary size.** The headline task does not transfer: no `(T, d)`
   write of any kind, supervised included, moves instruction-position bias in Qwen2.5-0.5B or
   SmolLM2-1.7B at any of six depths. The bias itself **flips sign** across models.
-- **The discovery claim is an optimisation claim** about a *search*, and most cells gave each
-  architecture one dictionary init (the three held-out cells gave three). On the order task the
-  crosscoder's selected latent does not hold a stable **sign** across inits. At three inits on
-  held-out instruction position the two arms' ranges do not overlap — crosscoder 3.91–4.92 against
-  SAE 0.01–0.28 — so the seed lottery does not currently explain the gap, and a wider sweep is the
-  first experiment in `next_ten_hours.md`.
+- **The discovery claim is an optimisation claim about a *search*, and the obvious explanation
+  for it — that the crosscoder simply won the initialisation lottery — is refuted at n = 8.** On
+  held-out instruction position, eight dictionary inits per architecture at matched dose:
+
+  | | min | median | max |
+  | --- | --- | --- | --- |
+  | crosscoder | 2.76 | **4.66** | 4.92 |
+  | SAE | −0.06 | 0.18 | **0.59** |
+
+  **The ranges do not overlap.** Eight SAE draws produced nothing within **4.7×** of the
+  crosscoder's *worst* draw, and seven of eight crosscoder draws land in 4.57–4.92 while the SAE
+  never leaves the noise band. Giving the SAE eight times the tickets does not close a gap of this
+  size.
+
+  ⚠ **Provenance: five of the eight files were recovered from run logs, not written by the
+  harness.** A stale-variable bug raised `NameError` in the verdict block *after* compute
+  completed, so those runs produced no JSON; the steering tables were complete in stdout and were
+  parsed back. Arms, doses, SEMs, reading AUCs and baselines are exact; `sparsity`,
+  `write_profile` and `rank` are absent because they were never printed. Files carry
+  `recovered_from_log: true`.
+
+  Still open: on the order task the crosscoder's selected latent does not hold a stable **sign**
+  across inits, and this sweep scales the *init* lottery only.
 - **Demonstration order is the unstable cell.** Its held-out peaks span 4.4× across inits (1.93 /
   0.68 / 0.44) and it loses to `sae_broadcast` at one init on the peak-dose convention while
   winning at matched dose. Instruction position and evidence order do not do this; the cell with
