@@ -151,3 +151,61 @@ optimal write is rank-1 it is another discovery-only claim.
 D1 is the only queued design that can produce an L3 result. Its harness gate is exact: DoM
 rows `b_t − b_{t+1}` sum to zero, so `c = 0` identically, and a nonzero measured `c` means
 the windows are misaligned and everything downstream is suspect.
+
+## 23:05 — the SAE baseline was handicapped, and both agents found it independently
+
+Two agents converged on the same hole in last sprint's steering comparison from opposite
+directions, which is the strongest signal available that it is real.
+
+The crosscoder slab was compared against an SAE direction written at **all** positions.
+Nothing forces an experimenter to write uniformly. There are three arms:
+
+| arm | write | level |
+| --- | --- | --- |
+| S1 `sae_broadcast` | SAE direction at every position — what was run | L0 |
+| S2 `sae_oracle_pos` | same direction, only at oracle-chosen positions | L1, rank 1 |
+| S3 `txc_slab` | the crosscoder slab | L2/L3 |
+
+**The claim that survives review is S3 > S2, not S3 > S1.** The review agent reached this
+from the reading-side precedent — `temporal_benchmark_screen.md` already argues the reading
+baseline must be the position-oracle — and the theory agent reached the same place from the
+algebra, since a two-block task's optimal write is rank-1 and therefore schedulable. Both
+are now mandatory arms, along with `sae_enveloped`, the continuous version that weights by
+the slab's own norm profile.
+
+The asymmetry to state plainly, neither hidden nor oversold: S2 needs external supervision
+to know *which* positions, while the crosscoder's profile falls out of unsupervised
+training. That is a real advantage, but an advantage in **supervision and discovery, not
+representation**.
+
+## 23:10 — verifying the rotation spectrum, and a correction to the correction
+
+The theory agent self-corrected its own rotation-ladder algebra before anything was built on
+it: `r1 = 1/(m−1)` is wrong from m=4. The correct spectrum for `P = C·B` with C circulant
+(first row `1, −1, 0, …`) has symbol `f(ω) = 1 − ω`, giving `σ_j² = 4sin²(πj/m)`,
+`Σσ_j² = 2m`, `σ_0² = 0`.
+
+I reproduced it independently rather than take it on trust. Rank = m−1, `c` = 0 to 1e-33,
+top-2 share exactly 1.000 at m=3, and m=4 does share m=3's r1 — so m=4 is a wasted rung and
+the grid becomes m ∈ {2, 3, 6} with 12 as a stretch.
+
+**But the measured r1 came out consistently above the closed form**, and the reason matters:
+
+| m | closed form (orthonormal blocks) | i.i.d. Gaussian blocks | correlated ρ=0.5 | ρ=0.8 |
+| --- | --- | --- | --- | --- |
+| 3 | 0.500 | 0.578 | 0.575 | 0.579 |
+| 6 | 0.333 | 0.368 | 0.368 | 0.371 |
+| 12 | 0.167 | 0.219 | 0.220 | 0.219 |
+
+The closed form is exact only when the block-mean matrix has orthonormal rows, and it is a
+**lower bound** otherwise. The inflation is not driven by correlation between block means —
+ρ = 0, 0.5 and 0.8 all land at ~0.578 for m=3 — so it cannot be designed away by choosing
+semantically dissimilar block types. It always inflates, so the L3 headroom `1 − r1` is
+**smaller** than the ideal algebra promises and the scheduled-SAE ceiling sits higher.
+
+**This changes how the law gets tested, and improves it.** The sqrt law
+`Δ_Π/Δ_full ≈ sqrt(energy share)` will be checked against **measured** r1 from the actual
+`P_dom`, never against predicted r1. That separates two claims that would otherwise fail
+together: the law is about linear response, the spectrum is about block geometry, and the
+gap between measured and orthonormal r1 becomes its own readout of how far the block means
+are from orthogonal.

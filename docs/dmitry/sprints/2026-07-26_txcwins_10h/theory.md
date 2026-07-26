@@ -301,6 +301,7 @@ between consecutive rungs attributes the effect to exactly one property of the w
 | `random_broadcast` | random unit direction at every position | whether a constant write of *any* direction does anything |
 | **`sae_enveloped`** *(new)* | SAE direction, scaled per position by the TXC slab's own norm profile `‖P[t]‖` | **separates gain envelope from direction schedule; the P9 control** |
 | **`txc_rank1`** *(new)* | best rank-1 approximation `σ₁ u₁ v₁ᵀ` of the TXC slab | the L1/L2 boundary — how much of the slab is a schedule |
+| **`txc_rank2`** *(new)* | best rank-2 approximation of the TXC slab | the rotation spectrum is pair-degenerate, so this ties at `m = 3` and falls off a known curve after |
 | `txc_slab` | full TXC slab | L3 |
 | `txc_flat` | TXC slab time-averaged and rebroadcast | that the profile, not the mean direction, does the work |
 | `random_slab` | random `(T, d)` slab | that it is not any structured perturbation |
@@ -324,8 +325,9 @@ have had to know it, and the crosscoder did not".
 **Classes.** `m` semantically distinct sentence blocks laid end to end. Class A is the
 canonical order `(1, 2, …, m)`; class B is the cyclic rotation `(2, 3, …, m, 1)`. Same
 sentences, same counts, same run lengths, same number of transitions, same everything except
-the starting point. Sweep `m ∈ {2, 3, 4, 6}` at fixed total segment count (`k_seg = 12`, so
-block length `12/m`).
+the starting point. Sweep `m ∈ {2, 3, 6}` at fixed total segment count (`k_seg = 12`, so block
+length `12/m`), with `m = 12` as a stretch rung run last. **Not `m = 4`** — it has the same
+`r1` as `m = 3` and buys no new information (§ The rotation spectrum).
 
 **Readout (reading).** Pooled per-token SAE code versus window code, AUC. Expect the SAE to
 win as always; run it only to keep the reading/steering dissociation on the record.
@@ -341,12 +343,18 @@ slab at each `m`.
 - `c = 0.00 ± 0.02` at every `m` (algebraic; a nonzero value means the harness is
   mis-aligning windows and everything downstream is suspect — treat as a harness gate).
 - `sae_broadcast` Δ ≈ 0 at every `m`.
-- `r1 ≈ 1/(m−1)` up to the anisotropy of the block vectors, so `r1 ≈ 1.00, 0.50, 0.33, 0.20`
-  for `m = 2, 3, 4, 6`. Report the measured value; the *prediction under test* is the
-  monotone decrease, not the exact constants.
-- **The rank law:** `Δ(txc_rank1)/Δ(txc_slab) ≈ sqrt(r1)`, i.e. ≈ `1.00, 0.71, 0.58, 0.45`.
-  Same for `dom_rank1/dom_slab`. If the observed ratio is flat in `m`, the law is wrong and
-  the rank account of the advantage fails — a clean negative.
+- `r1 = 4 sin²(π⌊m/2⌋/m)/(2m)`, i.e. `1.000, 0.500, 0.333, 0.167` for `m = 2, 3, 6, 12`, up to
+  the anisotropy of the block vectors. Report the measured value; the *prediction under test*
+  is the monotone decrease and its `2/m` rate, not the exact constants. A measured `r1` well
+  *above* the closed form means the blocks are not close to equidistant in activation space —
+  informative in itself, and the same diagnostic D3 needs.
+- **The rank law:** `Δ(txc_rank1)/Δ(txc_slab) ≈ sqrt(r1)` = `1.00, 0.71, 0.58, 0.41`. Same for
+  `dom_rank1/dom_slab`. If the observed ratio is flat in `m`, the law is wrong and the rank
+  account of the advantage fails — a clean negative.
+- **`txc_rank2` recovers 100% at `m = 3`** (the slab is exactly rank 2 there), then
+  `sqrt(0.750), sqrt(0.583), sqrt(0.322)` = `0.87, 0.76, 0.57` at `m = 4, 6, 12`. This is the
+  sharpest single prediction in the document: an arm that is *predicted to tie* at one rung
+  and fall off a known curve at the others.
 - At `m = 2` the crosscoder's advantage over `sae_enveloped` is **zero within noise**. This is
   a prediction that the last sprint's headline task is *not* an expressiveness win.
 
@@ -498,7 +506,8 @@ low on relevance by definition, however clean it is.
 | 8 | D8 change-count | 0.15 | low | predicted to fail on the reading half and subsumed on the steering half |
 
 **Recommended order.** The SVD screen on the existing `P_dom` (minutes, and it retro-dicts the
-last sprint's headline) → D1 at `m ∈ {2, 3, 4}` → D6 → D2. D3 if D1 lands and time remains.
+last sprint's headline) → D1 at `m ∈ {2, 3, 6}` → D6 → D2. D3 if D1 lands and time remains;
+D1 at `m = 12` only if the effect is still measurable at `m = 6`.
 
 ## Predicted failures
 
