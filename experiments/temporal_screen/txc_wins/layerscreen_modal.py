@@ -81,6 +81,9 @@ MODELS = [
     "Qwen/Qwen2.5-1.5B-Instruct",      # POSITIVE CONTROL -- mandatory, not optional
     "Qwen/Qwen2.5-0.5B-Instruct",
     "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+    # Third family/scale point. Qwen2.5-1.5B works and Qwen2.5-0.5B is dead, which
+    # cannot distinguish "1.5B is special" from "0.5B is too small".
+    "Qwen/Qwen2.5-3B-Instruct",
 ]
 
 app = modal.App("txcwins-layerscreen")

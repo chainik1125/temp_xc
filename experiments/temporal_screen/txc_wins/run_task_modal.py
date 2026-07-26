@@ -27,7 +27,8 @@ image = (
         "python -c \"from huggingface_hub import snapshot_download; "
         "snapshot_download('Qwen/Qwen2.5-1.5B-Instruct'); "
         "snapshot_download('HuggingFaceTB/SmolLM2-1.7B-Instruct'); "
-        "snapshot_download('Qwen/Qwen2.5-0.5B-Instruct')\"")
+        "snapshot_download('Qwen/Qwen2.5-0.5B-Instruct'); "
+        "snapshot_download('Qwen/Qwen2.5-3B-Instruct')\"")
     .add_local_dir(str(ROOT / "src"), "/work/src")
     .add_local_dir(str(ROOT / "temporal_crosscoders"), "/work/temporal_crosscoders")
     .add_local_dir(str(_here.parent), "/work/txc_wins")
