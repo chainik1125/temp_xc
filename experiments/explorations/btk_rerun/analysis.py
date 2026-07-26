@@ -122,11 +122,22 @@ def load_baseline_refs(leaderboard: Path) -> dict:
 
 
 def aggregate(rows: list[dict]):
-    acc = defaultdict(lambda: defaultdict(list))
+    # Within the btk-only arm, prefer canonical txc_base_btkonly rows over
+    # pre-convention txc_base_btk at the same cell: gauc/eauc are identical
+    # (verified max |Δ| 0.004 over 108 matched cells) but nmse/l0 follow
+    # the eval threshold convention, which the canonical rename changed.
+    best: dict = {}
     for r in rows:
-        key = (r["datasource"], ARM_OF[r["arch"]], cell_k(r), cell_T(r), cell_dsae(r))
+        cell = (r["datasource"], ARM_OF[r["arch"]], cell_k(r), cell_T(r),
+                cell_dsae(r), r["seed"])
+        cur = best.get(cell)
+        if cur is None or (cur["arch"] == "txc_base_btk"
+                           and r["arch"] == "txc_base_btkonly"):
+            best[cell] = r
+    acc = defaultdict(lambda: defaultdict(list))
+    for (ds, arm, k, t, dsae, _seed), r in best.items():
         for m, v in (r.get("metrics") or {}).items():
-            acc[key][m].append(float(v))
+            acc[(ds, arm, k, t, dsae)][m].append(float(v))
     return {key: {m: (float(np.mean(v)), float(np.std(v)), len(v))
                   for m, v in md.items()}
             for key, md in acc.items()}
