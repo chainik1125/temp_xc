@@ -143,11 +143,26 @@ mac-c). Deadline: rebuttal-grade numbers before 17:00 London
   Lane r RUNNING solo on GPU 2 (pin 55cb658, frac cap 0.22 —
   memory-only; full SM solo; if the T16 stretch is ever reached,
   relaunch that cell uncapped). ETA full core ≈ 07:00–10:00.
-- [next] on lane-r cell wakes: triage (smoke gate: neg_frac +
-  realized l0 on sae_k500 first); at lane-r-drain: analyze both-arm
-  table + T-sweep fig + LOG verdict PTR + ledger actuals; stretch
-  lane rs (T8; T16 only if absurdly early) decision ~09:00; seed-1
-  cells if time. Then STATUS rewrite before any compact.
+- Lane r was collateral in mac-local's ~00:15 kill sweep (GPU 2
+  was empty after; runpod-1's probing shards are on GPUs 0/1) —
+  RELAUNCHED ~00:50 uncapped, PID 22407, pin e6643da08, log
+  actmix_rlhf_lane_r2.log; 4 done cells cache-hit instantly;
+  rs-waiter (PID 22408) chains the stretch lane (T8 → untT8 →
+  untT16 → T16) when r drains. Gemma cells are FAST solo (token
+  10-16 min, T5 78 min) — full T-grid incl. T16 is feasible again.
+- **RLHF btk-only landed so far (s42): sae_k500 0.625 (l0 535) |
+  txc_T5 0.6229 gap +0.0033 (l0 517) | txc_T1 0.5777 (l0 108.5) |
+  sae_k100 0.6130 (l0 108.3).** Early reads vs card: R-K1 PASS;
+  R-E3 direction ✓ (harmonized T5 0.623 ≥ shipped 0.610); T5
+  shuffle gap even smaller than shipped (+0.003 vs +0.012); R-E4
+  narrow MISS (|0.578−0.613| = 0.035 > 0.03) at MATCHED realized
+  l0 — arch-head difference, not sparsity. Scored properly at
+  verdict time.
+- [next] on wakes: triage cells; at r+rs drain (~04:00-09:00):
+  seed-1 core set decision (token cells cheap), then analysis —
+  both-arm Dmitry table + T-sweep fig + LOG verdict PTR + ledger
+  actuals. 13:00 hard line for any remaining stretch. STATUS
+  rewrite before any compact.
 
 ## Descope ladder (pre-stated, applied in order if time runs short)
 
