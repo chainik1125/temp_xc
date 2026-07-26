@@ -6093,3 +6093,22 @@ PENDING TEAM REVIEW. Check-in package:
 `private/sunday_distillation_2026-07-26.md` §§ 1–8.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — COLLABORATOR WRITEUP DELIVERED (Han's ask): WRITEUP.md + 3 embedded figures, all numbers receipt-backed
+
+`task_hunt/WRITEUP.md`: plain-language living document — the two
+positive tasks with full setup (data, target, readout, budget
+matching, T-scaling), the order story (§ 5), the complete
+tried-and-failed table with one-sentence reasons (§ 6), and the
+traveling caveats (§ 7). Figures generated from the canonical
+leaderboard with budget-convention-enforced cell selection
+(`figs_writeup/fig{1,2,3}_*.{png,pdf}`, embedded in-page per Han).
+One prose correction made against my own draft during figure
+verification: the Task-1 curve at n = 6 is rise-then-PLATEAU (T4
+0.228 > T8 0.207) — the 0.13→0.19→0.21 monotone phrasing belongs to
+the pre-registered n = 3 trend only, and the doc + distillation now
+say so precisely. The figure briefing is retired (agent sessions
+idle; mac-local produced all three figures). PENDING-TEAM-REVIEW
+markers travel with the 2026-07-26 results inside the doc.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
