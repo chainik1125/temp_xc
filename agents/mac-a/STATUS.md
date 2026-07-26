@@ -1,7 +1,21 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~18:40 London define-clock (local ≈ 70 min ahead) —
-SALVAGE W1 COMPLETE, verdict pushed (2eb4927c9). Idle watch.**
+**2026-07-26 ~19:00 London define-clock (local ≈ 70 min ahead) —
+W1 verdict + R28 RATIFIED (ad76b0f15); n=6 TOP-UP IN FLIGHT.**
+
+## Top-up (current task; ruling ad76b0f15 item 3, cap $10)
+
+- FROZEN `85c87fd76` = TOPUP_CARD.md + run_topup (24 cells, seeds
+  {6,7,8}, primary arm k=8, claiming Ts only) + score_topup (L1
+  independent lane + L2 combined n=6 t-crit 2.5706 with MANDATORY
+  sequential caveat; KEEP iff L2-S1 four legs AND combined S2∧S4∧S5;
+  S3-combined = T16→32 sign-flip 2⁶) + merge_topup_payload. Driver
+  pinned; launched detached ~19:00 (app mac-a-diafaces-topup, H100
+  main 21 cells + 3× L4 tsae; Volume /workspace/diafaces_topup).
+- On completion: merge_topup_payload → score_topup → LOG verdict +
+  receipts proposal (R29) + ledger actuals + push. Quote licence
+  meanwhile: R28's T32 facts quotable as fresh-seed OBSERVATIONS
+  with "NOT-KEEP as frozen; T32 re-scope pending team" attached.
 
 ## Salvage W1 delivered (all PENDING TEAM REVIEW)
 
