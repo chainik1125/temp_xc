@@ -7940,3 +7940,20 @@ evidence on d(perf)/dT — runpod-1's Phase A/B T-sweep is the first
 real one. All reads ranged/KB-scale, $0. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-27 ~02:10 London — mac-b — § 6a CLAIMED + DELIVERED ($0): WRITEUP updates draft
+
+**PTR: `experiments/explorations/task_hunt/WRITEUP_UPDATES_DRAFT.md`**
+(DRAFT for mac-local ratification; nothing applied to WRITEUP.md).
+Checked Task 1/2/3 licence-format numbers against R22/R27/R28/R29 —
+**already correct in the page as written** (verification recorded in
+the draft). Three paste-ready blocks: (1) NEW § 9 bullet =
+composition-audit certification (R30 identity; divergence only in
+thin-pool regimes no claiming cell occupies); (2) § 9
+realized-sparsity bullet mechanism upgrade ("architecture property"
+→ eval-time threshold pruning, identical both compositions, ratio
+upper-bounds flattering); (3) Task-3 sae footnote same attribution.
+Ratification-status refresh of the § 9 blanket bullet flagged but
+NOT drafted (orchestrator's voice). Second hat (visible-cue
+pre-measures for hunt3 candidates) still standing by on request.
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
