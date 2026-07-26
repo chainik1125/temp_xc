@@ -39,6 +39,18 @@ reasoning.
    a directional effect from a magnitude artefact, and the two point opposite ways: an arm
    positive at *both* extremes is a second-order artefact, an arm effective only at negative
    doses is genuinely directional and invisible to a positive-only sweep.
+0b. **Match dose MAGNITUDE with the sign free per arm — and detect violations mechanically.**
+   Which class an arm steers toward is something the experimenter knows, so the sign is not a
+   result; the matched quantity is `|α|`. Indexing a signed `α = +0.5` scores backwards every arm
+   whose effect lives on the negative branch. **The mechanical detector: if an arm's dose response
+   is monotone in `α`, its effect is entirely one-sided, and signed-positive indexing is guaranteed
+   wrong for whichever arms are monotone-decreasing.** Evidence held-out is monotone decreasing
+   (`+3.277 → −3.298` across the six alphas), so at signed `+0.5` the crosscoder reads `−1.120` and
+   at matched magnitude `+1.119` — a sign flip, not a magnitude difference.
+   This error has now been made **three times in one sprint**: it withdrew the previous headline,
+   it appeared in a figure script, and it appeared in a red-team pass *of the document describing
+   it*. Print `sign(argmax|Δ|)` per arm next to every reported number; if it is not constant across
+   arms, signed indexing is silently comparing different things.
 1. **Score a contrast, never an absolute.** The metric must be the teacher-forced margin between
    the target and its multiset-matched foil, not accuracy on one member of the pair. Few-shot ICL
    has a published constant intervention — writing a **function vector** — that raises absolute

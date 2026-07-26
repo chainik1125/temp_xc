@@ -41,8 +41,10 @@ each arm's saturation point, which is where the linear reasoning behind every ra
 On **instruction-position bias**, **evidence order** and a **12-block rotation**, a crosscoder
 latent beats every arm a practitioner can build **from the trained dictionary alone** —
 `sae_broadcast`, `tsae_broadcast`, `txc_flat`, `txc_profile_random`, `random_slab`,
-`random_broadcast` — winning 8 of 9 held-out cells, the exception being the `demo_order` init
-already flagged below as the unstable one.
+`random_broadcast` — winning **7 of 9** held-out cells on either dose convention. The exceptions
+differ by convention: at peak dose `demo_order` ds1 and ds2; at matched dose `demo_order` ds2 and
+**evidence ds1**, where the crosscoder measures +0.545 against `random_broadcast`'s +0.549 — a tie
+with a random constant write. Evidence order is therefore not uniformly clean either.
 
 **Hand that same dictionary direction a *supervised* schedule and it beats the crosscoder in 6 of
 9 held-out cells** (z up to −20.6). `sae_schedule` is built as `outer(P_dom · v_sae, v_sae)` — the
@@ -95,8 +97,9 @@ values — while the gradient separates them 6×. Four independent demonstration
 `W = (1_T ⊗ v)/‖1_T ⊗ v‖`, maximising the first-order effect `⟨W, Ḡ⟩/‖Ḡ‖_F` over **all** `v` gives
 exactly `√c`, achieved at `v ∝ mean_t Ḡ` (verified numerically to four decimals). So `√c` is not a
 bound on what a per-token dictionary can reach — it is **the reach of the best conceivable
-broadcast direction**, whether or not any dictionary contains it. On held-out instruction position
-`c` = 0.036, so no constant write of any kind exceeds **19%** of the optimal write's first-order
+broadcast direction**, whether or not any dictionary contains it. On held-out instruction position `c` = 0.0343
+(`recency_tr_ho_ds0`; the 0.0365 reported elsewhere is the corpus-bound run), so no constant write
+of any kind exceeds **18.5%** of the optimal write's first-order
 effect. That is what makes the arm escaping this bound — one direction on a *schedule* — the
 honest per-token comparator.
 
@@ -134,7 +137,8 @@ worst. This is the most-replicated finding in the project and the one least like
 **No expressiveness win, and it is now excluded by measurement across seven tasks rather than
 inferred from one.** `broadcast_optimal` is the best constant direction in the whole space, so it
 bounds what the crosscoder's *temporal form* can buy. Ratio is crosscoder / that ceiling, at
-matched dose, held-out content where the task has a held-out variant:
+**matched dose, medians across available inits** (`rotate12` and instruction position have three,
+the rest one), held-out content where the task has a held-out variant:
 
 ![Decomposing the gap](../../../../plots/2026-07-26_txcwins/gap_decomposition.png)
 
@@ -231,9 +235,15 @@ question, why discovery fails on SmolLM2; see Limits.)
   | `grad_rank1` | +12.45 | `rank1_best` | +0.93 | `sae_broadcast` | +0.82–1.25 |
   | `broadcast_optimal` | **+3.87** | | | `random_slab` | +1.01 |
 
-  **The crosscoder does not beat a random slab, and its held-out reading AUC is 1.000 in all three
-  inits** — it reads the factor perfectly and steers it no better than noise, which is the
-  reading/steering dissociation in its most extreme form.
+  **Its held-out reading AUC is 1.000 in all three inits while it reaches 0.07 of the optimal
+  write** — reading the factor perfectly and steering it barely at all.
+
+  ⚠ **The stronger version of that sentence does not survive its own convention.** Against
+  `random_slab` the crosscoder loses or ties at **peak** dose (0.92 / 1.01 / 0.88 against 1.01) and
+  **beats it in all three inits at matched dose** (against 0.79), because the two arms peak on
+  opposite branches — the crosscoder at `α = +0.5`, the random slab at `α = −1.0`. Matched dose is
+  this document's primary convention, so **"no better than noise" is withdrawn**; what stands is
+  that it reaches a third of what a plain constant write reaches and an eighth of the optimum.
 
   **`broadcast_optimal` = +3.87 is the number that makes this a discovery failure.** A single
   constant direction, chosen with knowledge of the gradient, works four times better than what the
@@ -301,9 +311,9 @@ question, why discovery fails on SmolLM2; see Limits.)
   | crosscoder | 2.76 | **4.66** | 4.92 |
   | SAE | −0.06 | 0.18 | **0.59** |
 
-  **The ranges do not overlap.** Eight SAE draws produced nothing within **4.7×** of the
-  crosscoder's *worst* draw, and seven of eight crosscoder draws land in 4.57–4.92 while the SAE
-  never leaves the noise band. Giving the SAE eight times the tickets does not close a gap of this
+  **The ranges do not overlap.** The closest SAE draw is still **4.7×** below the
+  crosscoder's *worst* draw (0.590 against 2.760), and six of eight crosscoder draws land in 4.57–4.92 while the SAE never
+  leaves the noise band. Giving the SAE eight times the tickets does not close a gap of this
   size.
 
   ⚠ **Provenance: five of the eight files were recovered from run logs, not written by the
@@ -411,13 +421,13 @@ issues. **A trap that catches the people actively studying it is worth more atte
 only catches novices.**
 
 **And it is mechanically detectable — but not in the form first proposed here.** "Flag any cell
-where arms peak on different branches" fires on **77 of 84** symmetric-grid cells: almost every cell
+where arms peak on different branches" fires on **79 of 86** symmetric-grid cells: almost every cell
 has some arm peaking on the minus branch, so it cries wolf and would be ignored. The discriminating
 test is whether the **verdict** changes — crosscoder minus best constant arm, read at signed `+α`
 against sign-free matched magnitude. That is `scripts/peak_sign_flags.py`, and it gives the number
 worth quoting:
 
-> **Twenty-six of 84 symmetric-grid cells — 31% — change verdict on the dose convention alone.**
+> **Twenty-seven of 79 flagged cells — 34% — change verdict on the dose convention alone.**
 > Not the effect size. The verdict.
 
 It flags `order_sym_ds0`, the withdrawal cell (+0.57 signed against −3.24 sign-free). **And it flags
@@ -433,5 +443,5 @@ we dropped.**
 ## Where things live
 
 - Code: `experiments/temporal_screen/txc_wins/` — harness, task designs, Modal runners
-- Results: `results/txc_wins/` (81 files), figures in `plots/2026-07-26_txcwins/`
+- Results: `results/txc_wins/` (114 files), figures in `plots/2026-07-26_txcwins/`
 - Next experiments, in priority order: `next_ten_hours.md`
