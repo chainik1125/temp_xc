@@ -96,10 +96,12 @@ dictionary involved. Across eight configurations spanning both metric modes:
 | `rotate3` | 0.179 | +6.43 | +11.51 | −2.9 | no win | `rot_m3_T.json` |
 | order | 0.241 | +6.34 | +4.66 | +1.4 | no win | `order_sym_ds0.json` |
 
-**Both cells at `c ≤ 0.04` win; five of six at `c ≥ 0.10` fail.** The exception is real and is
-not a near-miss: evidence sits at `c` = 0.136 and the crosscoder wins it at z = 29.7, the largest
-margin in the sprint. So `c` is a **screen with a known false negative**, not a law — it would
-have told us not to run the task that produced the strongest result.
+**Across 13 tasks, Kendall τ = −0.58** between `c` and the crosscoder's margin over the best
+constant write. That is a real association and it is not a rule: `evidence` at `c` = 0.136 wins
+by the largest margin in the sprint (z = 29.7), and `phase11` at `c` = 0.050 does not win. So `c`
+has **both a false negative and a false positive** among the tasks measured — it would have told
+us not to run the task that produced the strongest result. It ranks candidates; it does not
+decide them.
 
 **`c` is necessary and demonstrably not sufficient**, and the counterexample is worth more than
 the caveat. The same recency task on Qwen2.5-0.5B (`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037)
@@ -283,6 +285,17 @@ object, no expressiveness win survives — and the flip is the sharpest availabl
 that **difference-of-means is a reference, not a ceiling**. Any percent-of-ceiling figure has to
 name which object it used.
 
+**The sprint did construct the geometry an expressiveness win requires.** `evidence` measures
+`r1` = 0.62 and `rotate12` measures 0.18 — 38% and 82% of those optimal writes lie beyond rank-1
+reach. On none of them does the crosscoder reach even the **rank-1** ceiling. **The headroom
+exists and goes unused**, so the negative is not for want of rank > 1 tasks; it is a finding about
+the architecture rather than a failure of task design.
+
+⚠ **The most inviting error left in this document:** on `evidence` the crosscoder beats
+`rank1_best` at z = +8.66, and that must not be read as clearing a rank-1 ceiling. `rank1_best` is
+the rank-1 truncation of a reference nearly orthogonal to the gradient, so beating it says the
+reference is poor. The ceiling is `grad_rank1`, and the crosscoder loses to it at z = −61.6.
+
 **No expressiveness win was found, including on a design built specifically to produce one.**
 The rotation ladder drives the rank-1 reachable share `r1` down to 0.177 by construction, and at
 that rung the crosscoder still loses to the best rank-1 write taken from the metric's own
@@ -315,6 +328,16 @@ bound from `r1`, and no result yet converting `r1`'s headroom into a win.**
 1.42×, 1.36×, 1.71×. That is the screen-on-the-gradient point measured four more times. Finding 2 explains why this is structurally
 hard rather than a matter of not having looked in the right place, and states the condition that
 would have to hold instead.
+
+## The object exists; the task does not
+
+A crosscoder latent's slab **is** a fixed, plottable, rank-≥2 steering object learned as one unit,
+and no published method supplies one — position-varying steering that exists elsewhere is either
+input-conditioned (a network evaluated at inference) or a union of rank-1 writes selected by
+attribute rather than position. So the gap this work sits in is not a missing object. **What the
+sprint could not supply is a task on which that object pays.** The contribution is the
+characterisation of what such a task requires — rank ≥ 2, `c ≈ 0`, and positions consistent across
+documents — together with a construction satisfying the first two.
 
 ## The experiment to run next
 

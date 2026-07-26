@@ -261,6 +261,123 @@ spare, rerun the steering arms with the crosscoder at `k_window = k_segment × T
 match — the expected outcome is that the SAE arm gets no better, since the constant-write argument
 is structural rather than about capacity, and confirming that closes the loop.
 
+### Claims ledger — the exact wording that survives, and what draws the line
+
+Written to be lifted verbatim. For each claim the sprint might want to make: the defensible
+sentence, the sentence that is not, and the citation that separates them. Getting this right in
+advance is cheaper than red-teaming it at 07:30.
+
+**On the mechanism (position-varying writes).**
+
+| | |
+| --- | --- |
+| ✅ defensible | "A per-token dictionary latent supplies one direction, so its write is rank-1 — one direction whose strength may vary with position. A window dictionary writes a different direction at each position. On a factor where the constant component of the optimal write is near zero, the per-token write is at chance by construction rather than merely weaker." |
+| ❌ not defensible | "Steering vectors are constant in time, and observing that they need not be is new." |
+| line drawn by | FLAS ([arXiv:2605.05892](https://arxiv.org/abs/2605.05892)) already abandons "fixed, single-step, position-invariant transforms", reports "curved, multi-step, token-varying trajectories", and beats prompting on AxBench. Cite it in the opening paragraph, not the findings. |
+
+**On the capacity ladder.**
+
+| | |
+| --- | --- |
+| ✅ defensible | "We compare five dictionary architectures at matched sparsity budget — per-token BatchTopK SAE, segment-averaged SAE, Persistent SAE, temporal SAE, and a temporal crosscoder — each rung adding exactly one capability, and every rung a published architecture rather than a constructed strawman." |
+| ❌ not defensible | "We benchmarked the published temporal SAE." |
+| line drawn by | The measured arm imports the attention-based `TemporalSAE` from `temporal_crosscoders/han_tsae`; the published tSAE is Bhalla et al.'s InfoNCE architecture ([arXiv:2511.05541](https://arxiv.org/abs/2511.05541), ICLR 2026 oral, code at `AI4LIFE-GROUP/temporal-saes`). Label the arm "this repo's attention-based temporal SAE". The rank conclusion transfers; the identity does not. |
+
+**On order-at-matched-multiset.**
+
+| | |
+| --- | --- |
+| ✅ defensible | "A window dictionary can help only where the optimal write has near-zero constant component (`c ≈ 0`) and is not reachable by a rank-1 schedule (`r1` well below 1). Both are computable from the model before any dictionary is trained." |
+| ❌ not defensible | "Matched multisets are the condition." |
+| line drawn by | Passphrase verification: its foil corrupts one word of `k`, so the construction *looks* satisfied, and measured `c` discards it at every `k`. Multiset-matching is a construction that usually achieves the condition; `c` is the condition, is graded, and is checkable on tasks nobody has built. |
+
+**On the prompt-order-sensitivity application.**
+
+| | |
+| --- | --- |
+| ✅ defensible | "Prompt-order sensitivity is a documented failure with an outside constituency, its permutation controls are the field's own evaluation protocol, and no dictionary-learning work has been applied to it." |
+| ❌ not defensible | "Demonstration order is a task where a constant write provably cannot work." |
+| line drawn by | Not established. Recency and majority-label bias are bag-of-positions statistics that give a constant write real grip; the interior-permutation control is *designed* to remove them and whether measurable order sensitivity survives is exactly what the go/no-go tests. Until that is measured, the honest form is "a task constructed so that the known constant handles are removed", not "provably at chance". |
+
+**On what the crosscoder buys.**
+
+| | |
+| --- | --- |
+| ✅ defensible | "The crosscoder found a position schedule unsupervised, from reconstruction alone, that a per-token dictionary could have executed if handed it — and the schedule is exactly what a practitioner does not possess. It beats deployed practice by 2.5× and loses to an oracle-scheduled per-token arm." |
+| ❌ not defensible | "The crosscoder produces a write no per-token dictionary can express." |
+| line drawn by | `sae_schedule` (+7.86) and `rank1_best` (+8.55) beat the crosscoder's +6.48 on `recency`; and `sae_schedule` is not an invented control but a published method — PSR ([arXiv:2605.03907](https://arxiv.org/abs/2605.03907)) estimates token-specific steering coefficients from activations and beats existing activation steering. |
+
+**On scope.**
+
+| | |
+| --- | --- |
+| ✅ defensible | "The method finds interventions for structure that recurs at the same place across documents." |
+| ❌ not defensible | "The method handles temporal structure." |
+| line drawn by | With positions randomised per document the crosscoder retains 10% of its effect while the difference-of-means reference retains 67% — a fixed write still does the job and the crosscoder fails to find it. |
+
+### Predicted `c` per entry, and the calibration that is now available
+
+Main's request: make the rankings falsifiable rather than editorial by predicting `c` — the
+constant-subspace share of the margin gradient — for each entry from the literature, so that
+every entry actually screened yields a check on the prediction. Coarse bands, with the citation
+that drives each.
+
+| entry | predicted `c` | what drives the prediction |
+| --- | --- | --- |
+| refusal | **high** | a single direction at a single position near-saturates (Arditi) |
+| MCQ option order | **high** | token bias over option-ID tokens (2309.03882); attractor content-invariant at r = 0.9994 (2604.26206) |
+| repetition | **high** | a single sign-inverted neuron fixes onset (2606.13705); flat repetition penalty is the deployed constant write |
+| induction / copying | **high** | "copying-ness" is a mode; kin to the ordered-generation task that lost by 10–50× |
+| emergent misalignment | **high** | a transferable misalignment direction (2506.11618) |
+| backtracking | **medium–high** | reasoning behaviours "controlled by linear directions" (2506.18167) |
+| sycophancy | **medium–high** | agreeableness is a broadcastable mode |
+| multi-turn escalation | **medium** | accumulated permissiveness is a mode, but the foil is multiset-matched |
+| entity / state tracking | **medium** | aggregation at the query token (2605.30233, 2606.08644) gives a single-position handle |
+| instruction-order conflict | **low** | with "obey the first" as target the correct content differs between conditions |
+| demonstration order | **low**, with the interior control | recency and majority-label bias are the DC handles; matching the label multiset removes them |
+| per-section style scheduling | **low** | balanced profile over segments; measured broadcast at or below zero |
+| permutation composition | **low** | order-dependent by definition |
+
+**Calibration now possible.** Measured `c` exists for several tasks and the ordering matches:
+`recency` at 0.035 and the phase ladder at 0.006–0.040 (crosscoder wins or null), `evidence` at
+0.136, `recency_var` at 0.141 (SAE wins), `order` at 0.241 (constant writes win). The predictions
+above are on the same scale and should be scored against measurements as they arrive. If
+literature-derived bands track measured `c` across three or four more tasks, the catalogue screens
+candidate behaviours without running anything — which is more useful than any single task outcome.
+
+### The cycle rule, checked against the two surviving tasks
+
+Theory's `rank = k − (number of cycles of the permutation taking A to B)` predicts the measured
+`r1` ordering of `recency` and `evidence`, and I derived this from the task code before looking at
+the numbers.
+
+| task | permutation | predicted rank | measured `rank_grad.r1` | `z(txc vs rank1_best)` |
+| --- | --- | --- | --- | --- |
+| `recency` | transposition of two fixed positions, `k−2` fillers identical | **1** | 0.813 | **−7.36** |
+| `evidence` | swap of two size-`k/2` blocks = `k/2` disjoint transpositions | **6** | 0.621 | **+8.66** |
+
+The ordering holds and the sign of the rank-1 comparison flips with it. Two riders. Recency's `r1`
+being below 1 at all is the *carried-state* contribution — the cycle rule counts only swapped
+content and undercounts whenever a downstream state exists. And on `evidence` the crosscoder beats
+`rank1_best` while losing to `grad_rank1` at z = −61.6, which is the sharpest available
+demonstration that difference-of-means is a **reference and not a ceiling**: it beats the
+reference-derived rank-1 write and loses to the gradient-derived one.
+
+### Rank-≥2 steering interventions: none published
+
+Searched specifically, at theory's request. The closest is FLAS
+([arXiv:2605.05892](https://arxiv.org/abs/2605.05892)), which learns a concept-conditioned
+velocity field `v(h, t, c)` explicitly varying with token position and reports "curved,
+multi-step, token-varying trajectories" — genuinely different directions at different positions,
+but **input-conditioned**, a network evaluated at inference rather than a fixed object. Everything
+else is a union of rank-1 writes: multi-attribute methods hold several directions but select among
+them by *attribute* rather than by position index, and position-selection strategies apply one
+direction at chosen positions.
+
+**A fixed, plottable, rank-≥2 steering object learned as a single unit appears to be
+unpublished.** That is the whitespace claim in its sharpest form, and it also explains why no task
+has demanded one: the object does not exist yet.
+
 ### The second gate: rank, from [[theory_section]], applied to these entries
 
 The theory workstream has produced a second gate that supersedes part of my framing and changes
