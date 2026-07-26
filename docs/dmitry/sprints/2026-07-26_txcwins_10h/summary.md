@@ -189,7 +189,7 @@ gradient's support is set by where the two classes differ — but the second is 
   | SAE, reading-selected | +0.10 | +0.29 | +0.06 |
   | SAE, steering-selected | **+1.53** | **+1.75** | **+1.74** |
   | crosscoder | +3.81 | +4.82 | +4.63 |
-  | **best possible constant write** | **+4.01** | **+4.01** | **+4.01** |
+  | **best possible constant write** (supervised) | **+4.01** | **+4.01** | **+4.01** |
 
   **The reading selector was costing the SAE 6–30× and the crosscoder nothing** — its reading pick
   ranks 2222 and 3138 of 4096 by gradient alignment (worse than an arbitrary draw), while the
@@ -197,16 +197,21 @@ gradient's support is set by where the two classes differ — but the second is 
   The crosscoder still beats the SAE, but the ratio falls from ~26× to **2.7×**.
 
   ⚠ **The `broadcast_optimal` arm is the qualification that matters.** The best constant write in
-  the *whole space* — not the best of 4096 atoms — reaches **+4.01**, against the crosscoder's
-  +3.81 / +4.82 / +4.63. **The crosscoder loses to it in one init of three and exceeds it by
-  1.16–1.20× in the others.** As a share of the optimal write: crosscoder 0.236 / 0.299 / 0.287,
-  best constant write 0.248.
+  the *whole space* — not the best of 4096 atoms — reaches **+4.01** against the crosscoder's
+  +3.81 / +4.82 / +4.63: **a tie in one init (z = −0.7) and z = +2.0 and +2.6 in the others.** The
+  crosscoder exceeds the entire broadcast form by 0.95× to 1.20×, at or near the significance
+  threshold in every init. Note this arm is built from the metric gradient, so it is a
+  **supervised** reference in the same family as `grad_slab` — an unsupervised arm matching it is
+  respectable, not a defeat.
 
-  **So the headline gap decomposes, and the part attributable to temporal expressiveness is the
-  smallest piece.** Most of the SAE's deficit is what its dictionary contains and how a latent was
-  picked from it; the constant-write *form* costs comparatively little. This is the same conclusion
-  the `sae_schedule` comparison reaches from a different arm, which makes discovery-not-expressiveness
-  a **measured decomposition** rather than an interpretation.
+  **What it shows is that the constant-write *form* is not what limits per-token dictionaries on
+  this task.** The best constant write performs about as well as the crosscoder. What limits the
+  SAE is that **its dictionary does not contain the good constant direction** — the best available
+  one reaches 43–44% of the best possible one — and the reading selector then gives up most of what
+  remains. The same conclusion follows independently from the `sae_schedule` comparison, which
+  makes discovery-not-expressiveness a **measured decomposition** rather than an interpretation.
+
+  ⚠ Whether this generalises beyond `recency` is running on `evidence` and is not yet known.
 
   Note `√c` = 0.185 predicts the best constant write's share and 0.248 was measured — the analytic
   value is a **first-order** ceiling and the matched dose already sits 34% outside it, in the
