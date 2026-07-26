@@ -124,9 +124,26 @@ gradient's support is set by where the two classes differ — but the second is 
 
 ## Limits
 
-- **One model, one layer, one dictionary size.** The headline task does not transfer: no `(T, d)`
-  write of any kind, supervised included, moves instruction-position bias in Qwen2.5-0.5B or
-  SmolLM2-1.7B at any of six depths. The bias itself **flips sign** across models.
+- **One model, one layer, one dictionary size — and the transfer failure is a failure of
+  *discovery*, not of reachability.** In SmolLM2-1.7B a gradient write moves instruction-position
+  bias at **every** depth tested (peak Δ +13.32 / +7.83 / +9.00 / +4.50 / +3.74 / +0.98 at layers
+  6 / 9 / 12 / 15 / 18 / 21), so the factor is plainly there and plainly reachable. **Every learned
+  arm fails to find it**: the crosscoder reaches +1.94 at best and sits below a *random* slab at
+  two of six depths (−0.02 against +0.99 at L9; +0.80 against +2.39 at L12). Only Qwen2.5-0.5B is
+  genuinely dead (gradient write +0.37).
+
+  That is a worse result for the headline than the version this document carried until now, which
+  said no write of any kind moved these models — **that sentence was false for SmolLM2 at all six
+  depths.** The capability the headline claims is unsupervised discovery, and this is exactly where
+  it fails.
+
+  One caveat against over-reading it: SmolLM2's baseline is **+2.19** and the write pushes it
+  further positive, so that arm *amplifies* an existing bias, while Qwen2.5-1.5B's baseline is
+  −2.54 and its write is a *reversal*. Amplifying is the easier direction. The bias itself also
+  **flips sign** across models.
+- **The `c` gate does not transfer across models.** Five of seven transfer cells sit below the
+  `c` < 0.1 go-threshold with high `r1` and steer nothing. It was validated within one model and is
+  not a cross-model instrument.
 - **The discovery claim is an optimisation claim about a *search*, and the obvious explanation
   for it — that the crosscoder simply won the initialisation lottery — is refuted at n = 8.** On
   held-out instruction position, eight dictionary inits per architecture at matched dose:
