@@ -40,6 +40,7 @@ OUT = ROOT / "plots" / "2026-07-26_txcwins" / "layer_cliff.png"
 
 # Wong palette, consistent with every other figure in this sprint.
 MODELS = [("_q15", "Qwen2.5-1.5B — the model that works", "#E69F00"),
+          ("_q3b", "Qwen2.5-3B", "#CC79A7"),
           ("_smol", "SmolLM2-1.7B", "#0072B2"),
           ("_q05", "Qwen2.5-0.5B", "#009E73")]
 

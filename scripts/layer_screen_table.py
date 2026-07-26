@@ -1,6 +1,6 @@
-"""What the layer screen says about the two models where nothing steers.
+"""What the layer screen says about the models where nothing steers.
 
-Reads `results/txc_wins/layerscreen_{q15,smol,q05}.json` and the transfer steering runs, and
+Reads `results/txc_wins/layerscreen_{q15,q3b,smol,q05}.json` and the transfer steering runs, and
 prints the three comparisons the screen was built to make:
 
   1. rho, the per-document gradient agreement, against its 1/sqrt(n) floor. This was the
@@ -19,7 +19,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RES = ROOT / "results" / "txc_wins"
-MODELS = [("_q15", "Qwen2.5-1.5B-Instruct", 28), ("_smol", "SmolLM2-1.7B-Instruct", 24),
+MODELS = [("_q15", "Qwen2.5-1.5B-Instruct", 28), ("_q3b", "Qwen2.5-3B-Instruct", 36),
+          ("_smol", "SmolLM2-1.7B-Instruct", 24),
           ("_q05", "Qwen2.5-0.5B-Instruct", 24)]
 
 
@@ -30,9 +31,13 @@ def peak(arm):
 
 
 def measured():
-    """Measured steering from the transfer runs, keyed by (model, layer)."""
+    """Measured steering keyed by (model, layer), first file in SORTED order.
+
+    Sorted, not raw glob: otherwise which run supplies the value for a cell depends on
+    directory order and the table can change with no rerun and no edit.
+    """
     out = {}
-    for f in glob.glob(str(RES / "recency*.json")):
+    for f in sorted(glob.glob(str(RES / "recency*.json"))):
         d = json.loads(pathlib.Path(f).read_text())
         if "arms" not in d or "grad_slab" not in d.get("arms", {}):
             continue
@@ -68,7 +73,7 @@ def main() -> int:
         print(f"   {name:<26}{d['rho_noise_floor']:>7.3f}{min(rs):>9.3f}{max(rs):>9.3f}"
               f"{bl[1]['rho']:>13.3f} (L{bl[0]})")
     print("   Every model sits far above the floor everywhere. A single fixed write is the")
-    print("   right object in ALL THREE, so 'no shared write exists' is not the explanation.\n")
+    print("   right object in EVERY model screened, so 'no shared write exists' is not the explanation.\n")
 
     print("2. THE CLIFF -- ||Gbar|| collapses at one layer in every model, and it is not a")
     print("   normalisation artefact: converting to absolute units makes it SHARPER.\n")
@@ -84,7 +89,8 @@ def main() -> int:
         print(f"   {name:<26}{'L' + Ls[i]:>12}{(int(Ls[i]) + 1) / n_layers:>12.2f}"
               f"{rel[i] / max(rel[i + 1], 1e-9):>9.1f}x"
               f"{ab[i] / max(ab[i + 1], 1e-12):>9.1f}x")
-    print("   The last third of every model is unsteerable for this metric.\n")
+    print("   Four models, four cliffs, all at 0.58-0.78 of depth. The last quarter to third")
+    print("   of every model screened is unsteerable for this metric.\n")
 
     print("3. DOES ||Gbar|| PREDICT MEASURED STEERING? Screen value against the supervised")
     print("   gradient arm actually run at that layer -- the screen's only real test.\n")
