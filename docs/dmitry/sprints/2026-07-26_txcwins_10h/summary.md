@@ -158,6 +158,14 @@ eight; and it appeared again in the red-team pass over this document, in two of 
 issues. **A trap that catches the people actively studying it is worth more attention than one that
 only catches novices.**
 
+**And it is mechanically detectable, which is the useful half.** Print, beside every reported
+number, the **sign of the dose at which each arm's |Δ| is maximal**. If that sign is not constant
+across arms, signed-positive indexing is silently comparing arms measured on opposite branches.
+Run over the sprint's own files it flags every cell checked — including `order_sym_ds0`, the
+withdrawal itself, where `txc_slab` and `sae_broadcast` peak at `+α` while `txc_flat` and
+`rank1_best` peak at `−α`. It would have caught all three occurrences before any of them reached a
+document.
+
 ## Where things live
 
 - Code: `experiments/temporal_screen/txc_wins/` — harness, task designs, Modal runners
