@@ -32,8 +32,10 @@ implements is the one that produced last sprint's headline, and its parts are no
        This is how a task about a real behaviour -- which of two conflicting instructions
        the model obeys, say -- gets a metric that a constant write cannot win.
   6. CONTROLS, every time: `txc_flat` (the TXC slab time-averaged and rebroadcast, which
-     removes the profile and keeps the direction), `random_slab`, `random_broadcast`, and
-     `dom_slab` (supervised per-position difference-of-means ceiling).
+     removes the profile and keeps the direction), `txc_profile_random` (the mirror image --
+     the profile kept exactly, the directions replaced by random ones), `random_slab`,
+     `random_broadcast`, and `dom_slab` (supervised per-position difference-of-means
+     ceiling).
 
 WHY THE CONTROLS ARE LOAD-BEARING. A positive `txc_slab` on its own says only that some
 perturbation moved the margin. `txc_flat` is the same latent, same mean direction, same norm,
@@ -309,6 +311,17 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     rv = unit(torch.randn(d, generator=g).to(dev))
     writes["random_broadcast"] = unit(rv.unsqueeze(0).expand(T, -1).contiguous())
 
+    # `txc_flat` asks whether the crosscoder needs its profile. This asks the complementary
+    # question: does it need anything BUT the profile? Random directions, one per position,
+    # rescaled so the per-position norms exactly match `txc_slab`'s. If this matches
+    # `txc_slab`, the crosscoder's contribution is knowing WHERE to write and the learned
+    # directions are doing nothing -- which would be a much weaker claim than it sounds,
+    # since where-to-write is a single number per position that any supervised probe
+    # supplies. If it fails, the crosscoder is contributing both.
+    Rp = torch.randn(T, d, generator=g).to(dev)
+    Rp = Rp / (Rp.norm(dim=-1, keepdim=True) + 1e-12) * P_txc.norm(dim=-1, keepdim=True)
+    writes["txc_profile_random"] = unit(Rp)
+
     if arms:
         writes = {nm: W for nm, W in writes.items() if nm in arms}
     # The per-position norm profile is the mechanism, so it is stored rather than
@@ -431,8 +444,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     zs = {}
     if "txc_slab" in out["arms"]:
         ts2, te2 = at_best("txc_slab")
-        for other in ("sae_broadcast", "tsae_broadcast", "txc_flat", "random_slab",
-                      "random_broadcast"):
+        for other in ("sae_broadcast", "tsae_broadcast", "txc_flat",
+                      "txc_profile_random", "random_slab", "random_broadcast"):
             if other in out["arms"]:
                 os_, oe_ = at_best(other)
                 zs[f"txc_slab_vs_{other}"] = float(
