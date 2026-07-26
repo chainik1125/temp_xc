@@ -1,0 +1,4 @@
+# 7.6 MB per file, against this repo's 1 MB pre-commit limit. Not committed; fetched by
+# `python experiments/temporal_screen/txc_wins/fetch_litm.py`, which is committed instead.
+# The files DO ship to Modal -- geometry_modal.py add_local_dir's the whole txc_wins tree.
+*.jsonl.gz

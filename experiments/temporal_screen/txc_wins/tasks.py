@@ -499,3 +499,14 @@ except ImportError:  # pragma: no cover - local runs without the package on sys.
         _STRUQ_DESIGNS = {}
 
 TASKS.update(_STRUQ_DESIGNS)
+
+# Lost in the Middle (Liu et al. TACL 2024) -- the foil ships with the data.
+try:
+    from txc_wins.designs_litm import DESIGNS as _LITM_DESIGNS
+except ImportError:  # pragma: no cover - local runs without the package on sys.path
+    try:
+        from .designs_litm import DESIGNS as _LITM_DESIGNS
+    except ImportError:
+        _LITM_DESIGNS = {}
+
+TASKS.update(_LITM_DESIGNS)
