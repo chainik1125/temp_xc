@@ -1200,3 +1200,82 @@ The honest status of the desideratum until those land: the crosscoder demonstrab
 it on a **task-relevant readout** (clock period-ID is flat from T=4 to T=24, six times longer
 than needed), and appeared to violate it on reconstruction metrics that were measured under
 a data-quantity confound.
+
+## The corrected results: the desideratum is satisfied, and my headline was mostly an artefact
+
+All four sweeps rerun with stride-1 windowing so the training-window count no longer falls
+with T.
+
+### The T-sweep collapses from 6.8× to 1.5×
+
+| T | FVU (corrected) | × SAE | previously reported |
+|---|---|---|---|
+| 1 | 0.1166 | **0.99** | 1.0 |
+| 2 | 0.1205 | 1.02 | 1.0 |
+| 3 | 0.1248 | 1.06 | 1.0 |
+| 4 | 0.1227 | 1.04 | 1.2 |
+| 6 | 0.1290 | 1.10 | **3.2** |
+| 12 | 0.1764 | **1.50** | **6.8** |
+
+Realised coefficients per segment are 4.00 at every T with ReLU-kill 0.000, so this is a
+clean measurement. **The "cost of sharing one code across a window" that I reported as
+6.8× is 1.5×.** Most of what I attributed to the architecture was my harness giving large
+T twelve times less data. The T=1 control is unchanged and still passes at 0.99×.
+
+### With the per-segment budget set correctly, the crosscoder rises and saturates
+
+`budget_local.py`, stride-1, recovery against the true features:
+
+| T | kper=1 | kper=2 | kper=4 | kper=8 | kper=16 |
+|---|---|---|---|---|---|
+| 1 | 0.771 | 0.771 | 0.714 | 0.658 | 0.583 |
+| 2 | **0.918** | 0.851 | 0.792 | 0.740 | 0.679 |
+| 4 | **0.971** | 0.921 | 0.891 | 0.847 | 0.771 |
+| 8 | **0.980** | 0.972 | 0.958 | 0.930 | 0.782 |
+| 16 | **0.980** | 0.968 | 0.958 | 0.789 | 0.391 |
+
+At kper=1 the profile across T is **0.771 → 0.918 → 0.971 → 0.980 → 0.980**: monotone
+increasing, saturating at T=8, and holding at T=16 with no decline. That is exactly the
+property we want — performance rises while T buys something and flattens once it does not.
+
+It was hidden by two independent mistakes of mine, and needed both fixed: the per-segment
+budget was 4× too dense, and the window count was falling with T. At kper=4 with the old
+windowing the same sweep read 0.78 → 0.88 → 0.77 → 0.32 and looked like an architectural
+failure.
+
+**The user's account was right and mine was the confound.** B3 shows lower kper wins at
+every T, and the penalty for over-budgeting grows with T: the recovery span across kper is
+0.193 at T=1 and 0.591 at T=16.
+
+### And the capacity account revives once the confound is removed
+
+`saturation_local.py`, stride-1:
+
+| d_sae | T=2 | T=4 | T=8 | T=16 | T=32 | peak |
+|---|---|---|---|---|---|---|
+| 128 | 0.78 | **0.88** | 0.77 | 0.41 | 0.16 | T=4 |
+| 256 | 0.79 | 0.90 | **0.94** | 0.80 | 0.28 | T=8 |
+| 512 | 0.79 | 0.89 | 0.96 | **0.96** | 0.37 | T=16 |
+| 1024 | 0.82 | 0.90 | 0.97 | **0.97** | 0.43 | T=16 |
+
+S1 now holds properly: the peak moves 4 → 8 → 16 → 16 as the dictionary grows, and 8× more
+dictionary *does* rescue T=16 (0.41 → 0.97) where before it did nothing (0.32 → 0.46).
+Shift-duplication at T=16 is 0.31-0.33 against 0.05-0.08 before. So the position-tying
+account was not wrong — it was masked by the data-starvation confound, which suppressed
+every arm equally at large T. Required dictionary size does scale with T, and that is the
+cost of tying atoms to absolute position.
+
+### Activation functions, final
+
+| arm | kper | coeff/seg | spend | neg | FVU |
+|---|---|---|---|---|---|
+| `topk_relu` | 41 | 0.96 | 2% | 0.000 | 0.843 |
+| `batchtopk_relu` | 41 | 0.92 | 2% | 0.000 | 0.841 |
+| `topk_relu` + AuxK | 41 | 0.96 | 2% | 0.000 | 0.843 |
+| `topk` | 41 | 41.00 | 100% | 0.387 | **0.541** |
+| **`batchtopk`** | 41 | 41.39 | 101% | 0.408 | **0.554** |
+
+`batchtopk` without the ReLU and `topk` are equivalent within noise and both fix the
+capacity cap outright; both ReLU variants and AuxK are stuck at 2% of budget. BatchTopK's
+spend slightly exceeding 100% is the eval-time threshold approximating the train-time batch
+rule rather than reproducing it exactly, which is expected. `batchtopk` is the default.

@@ -1,0 +1,265 @@
+{
+  "rows": [
+    {
+      "T": 1,
+      "kper": 1,
+      "nominal_k_window": 1,
+      "coeff_per_segment": 0.9833332896232605,
+      "alive_frac": 0.0625,
+      "fvu": 0.27151885628700256,
+      "recovery": 0.7712062042620447
+    },
+    {
+      "T": 1,
+      "kper": 2,
+      "nominal_k_window": 2,
+      "coeff_per_segment": 1.9560184478759766,
+      "alive_frac": 0.08984375,
+      "fvu": 0.13190235197544098,
+      "recovery": 0.7655184517304102
+    },
+    {
+      "T": 1,
+      "kper": 4,
+      "nominal_k_window": 4,
+      "coeff_per_segment": 4.101388931274414,
+      "alive_frac": 0.1796875,
+      "fvu": 0.12582391500473022,
+      "recovery": 0.7120198690228992
+    },
+    {
+      "T": 1,
+      "kper": 8,
+      "nominal_k_window": 8,
+      "coeff_per_segment": 8.226388931274414,
+      "alive_frac": 0.255859375,
+      "fvu": 0.11567312479019165,
+      "recovery": 0.6607200486792458
+    },
+    {
+      "T": 1,
+      "kper": 16,
+      "nominal_k_window": 16,
+      "coeff_per_segment": 16.361574172973633,
+      "alive_frac": 0.361328125,
+      "fvu": 0.09774550795555115,
+      "recovery": 0.5782063512338532
+    },
+    {
+      "T": 2,
+      "kper": 1,
+      "nominal_k_window": 2,
+      "coeff_per_segment": 0.9933332800865173,
+      "alive_frac": 0.10546875,
+      "fvu": 0.24180863797664642,
+      "recovery": 0.9176680379443698
+    },
+    {
+      "T": 2,
+      "kper": 2,
+      "nominal_k_window": 4,
+      "coeff_per_segment": 2.07918119430542,
+      "alive_frac": 0.296875,
+      "fvu": 0.14929713308811188,
+      "recovery": 0.8491242246495353
+    },
+    {
+      "T": 2,
+      "kper": 4,
+      "nominal_k_window": 8,
+      "coeff_per_segment": 4.125263214111328,
+      "alive_frac": 0.6875,
+      "fvu": 0.13035306334495544,
+      "recovery": 0.7930122647020552
+    },
+    {
+      "T": 2,
+      "kper": 8,
+      "nominal_k_window": 16,
+      "coeff_per_segment": 8.19157886505127,
+      "alive_frac": 0.857421875,
+      "fvu": 0.12003634870052338,
+      "recovery": 0.7414342065652212
+    },
+    {
+      "T": 2,
+      "kper": 16,
+      "nominal_k_window": 32,
+      "coeff_per_segment": 16.32292366027832,
+      "alive_frac": 0.927734375,
+      "fvu": 0.10394605249166489,
+      "recovery": 0.681582639614741
+    },
+    {
+      "T": 4,
+      "kper": 1,
+      "nominal_k_window": 4,
+      "coeff_per_segment": 1.0126643180847168,
+      "alive_frac": 0.2109375,
+      "fvu": 0.21548140048980713,
+      "recovery": 0.9708607296148936
+    },
+    {
+      "T": 4,
+      "kper": 2,
+      "nominal_k_window": 8,
+      "coeff_per_segment": 2.111828088760376,
+      "alive_frac": 0.884765625,
+      "fvu": 0.1552257388830185,
+      "recovery": 0.9150419467025332
+    },
+    {
+      "T": 4,
+      "kper": 4,
+      "nominal_k_window": 16,
+      "coeff_per_segment": 4.143070697784424,
+      "alive_frac": 1.0,
+      "fvu": 0.14112001657485962,
+      "recovery": 0.8856861177417967
+    },
+    {
+      "T": 4,
+      "kper": 8,
+      "nominal_k_window": 32,
+      "coeff_per_segment": 8.131959915161133,
+      "alive_frac": 1.0,
+      "fvu": 0.13040444254875183,
+      "recovery": 0.8511862440241708
+    },
+    {
+      "T": 4,
+      "kper": 16,
+      "nominal_k_window": 64,
+      "coeff_per_segment": 16.161529541015625,
+      "alive_frac": 1.0,
+      "fvu": 0.11754973977804184,
+      "recovery": 0.7738578601015939
+    },
+    {
+      "T": 8,
+      "kper": 1,
+      "nominal_k_window": 8,
+      "coeff_per_segment": 1.0458177328109741,
+      "alive_frac": 0.71875,
+      "fvu": 0.23156143724918365,
+      "recovery": 0.9801458054118686
+    },
+    {
+      "T": 8,
+      "kper": 2,
+      "nominal_k_window": 16,
+      "coeff_per_segment": 2.103339672088623,
+      "alive_frac": 1.0,
+      "fvu": 0.17926320433616638,
+      "recovery": 0.9677699291043811
+    },
+    {
+      "T": 8,
+      "kper": 4,
+      "nominal_k_window": 32,
+      "coeff_per_segment": 4.0536208152771,
+      "alive_frac": 1.0,
+      "fvu": 0.16669586300849915,
+      "recovery": 0.9569542192750506
+    },
+    {
+      "T": 8,
+      "kper": 8,
+      "nominal_k_window": 64,
+      "coeff_per_segment": 8.017447471618652,
+      "alive_frac": 1.0,
+      "fvu": 0.16154584288597107,
+      "recovery": 0.9287690801752938
+    },
+    {
+      "T": 8,
+      "kper": 16,
+      "nominal_k_window": 128,
+      "coeff_per_segment": 15.927872657775879,
+      "alive_frac": 1.0,
+      "fvu": 0.1568969041109085,
+      "recovery": 0.7755613194571601
+    },
+    {
+      "T": 16,
+      "kper": 1,
+      "nominal_k_window": 16,
+      "coeff_per_segment": 1.0835562944412231,
+      "alive_frac": 1.0,
+      "fvu": 0.2876618802547455,
+      "recovery": 0.9796120673418045
+    },
+    {
+      "T": 16,
+      "kper": 2,
+      "nominal_k_window": 32,
+      "coeff_per_segment": 2.0428154468536377,
+      "alive_frac": 1.0,
+      "fvu": 0.2519429326057434,
+      "recovery": 0.9748141401343875
+    },
+    {
+      "T": 16,
+      "kper": 4,
+      "nominal_k_window": 64,
+      "coeff_per_segment": 3.9437241554260254,
+      "alive_frac": 1.0,
+      "fvu": 0.2870398163795471,
+      "recovery": 0.958732909626431
+    },
+    {
+      "T": 16,
+      "kper": 8,
+      "nominal_k_window": 128,
+      "coeff_per_segment": 7.992678165435791,
+      "alive_frac": 1.0,
+      "fvu": 0.34900525212287903,
+      "recovery": 0.7862296915716596
+    },
+    {
+      "T": 16,
+      "kper": 16,
+      "nominal_k_window": 256,
+      "coeff_per_segment": 16.201833724975586,
+      "alive_frac": 1.0,
+      "fvu": 0.2721063494682312,
+      "recovery": 0.38835863686270183
+    }
+  ],
+  "Ts": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "kpers": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "extents": [
+    1,
+    2,
+    4
+  ],
+  "config": {
+    "d": 96,
+    "d_sae": 512,
+    "Ts": "1,2,4,8,16",
+    "kpers": "1,2,4,8,16",
+    "n_per_extent": 12,
+    "extents": "1,2,4",
+    "n_seq": 300,
+    "seq_len": 96,
+    "fire_p": 0.02,
+    "noise": 0.05,
+    "steps": 3000,
+    "batch": 256,
+    "lr": 0.0003,
+    "activation": "batchtopk",
+    "stride": 1
+  }
+}

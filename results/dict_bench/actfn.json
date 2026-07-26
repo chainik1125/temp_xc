@@ -1,0 +1,271 @@
+{
+  "sae": [
+    {
+      "k": 4,
+      "coeff_per_segment": 4.0,
+      "fvu": 0.10103756189346313
+    },
+    {
+      "k": 16,
+      "coeff_per_segment": 16.0,
+      "fvu": 0.05105457082390785
+    }
+  ],
+  "txc": [
+    {
+      "arm": "topk_relu",
+      "kper": 8,
+      "lr": 0.001,
+      "nominal_k": 96,
+      "n_pos_preact": 14.481481552124023,
+      "realised_l0": 12.644444465637207,
+      "coeff_per_segment": 1.0537037054697673,
+      "spend_frac": 0.13171296318372092,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.22607421875,
+      "fvu": 0.8323788046836853,
+      "bt_threshold": null,
+      "loss_hist": [
+        1206.39,
+        49.66,
+        42.06,
+        47.88,
+        57.58
+      ]
+    },
+    {
+      "arm": "topk",
+      "kper": 8,
+      "lr": 0.001,
+      "nominal_k": 96,
+      "n_pos_preact": 82.79259490966797,
+      "realised_l0": 96.0,
+      "coeff_per_segment": 8.0,
+      "spend_frac": 1.0,
+      "neg_coeff_frac": 0.1449074149131775,
+      "alive_frac": 0.123291015625,
+      "fvu": 0.6280125379562378,
+      "bt_threshold": null,
+      "loss_hist": [
+        1206.39,
+        58.36,
+        41.88,
+        43.89,
+        53.06
+      ]
+    },
+    {
+      "arm": "batchtopk",
+      "kper": 8,
+      "lr": 0.001,
+      "nominal_k": 96,
+      "n_pos_preact": 82.36296081542969,
+      "realised_l0": 108.03703308105469,
+      "coeff_per_segment": 9.00308609008789,
+      "spend_frac": 1.1253857612609863,
+      "neg_coeff_frac": 0.23764142394065857,
+      "alive_frac": 0.206298828125,
+      "fvu": 0.6240619421005249,
+      "bt_threshold": -1.314154028892517,
+      "loss_hist": [
+        1209.53,
+        59.6,
+        44.4,
+        39.63,
+        58.19
+      ]
+    },
+    {
+      "arm": "batchtopk_relu",
+      "kper": 8,
+      "lr": 0.001,
+      "nominal_k": 96,
+      "n_pos_preact": 13.451851844787598,
+      "realised_l0": 13.19259262084961,
+      "coeff_per_segment": 1.099382718404134,
+      "spend_frac": 0.13742283980051676,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.252685546875,
+      "fvu": 0.8409896492958069,
+      "bt_threshold": 0.031165366992354393,
+      "loss_hist": [
+        1209.53,
+        50.94,
+        41.24,
+        45.12,
+        65.4
+      ]
+    },
+    {
+      "arm": "topk_relu_auxk",
+      "kper": 8,
+      "lr": 0.001,
+      "nominal_k": 96,
+      "n_pos_preact": 14.481481552124023,
+      "realised_l0": 12.644444465637207,
+      "coeff_per_segment": 1.0537037054697673,
+      "spend_frac": 0.13171296318372092,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.22607421875,
+      "fvu": 0.8323788046836853,
+      "bt_threshold": null,
+      "loss_hist": [
+        1206.39,
+        51.15,
+        43.32,
+        49.32,
+        59.31
+      ]
+    },
+    {
+      "arm": "topk_relu",
+      "kper": 41,
+      "lr": 0.001,
+      "nominal_k": 492,
+      "n_pos_preact": 11.466666221618652,
+      "realised_l0": 11.466666221618652,
+      "coeff_per_segment": 0.9555555184682211,
+      "spend_frac": 0.023306232157761488,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.2197265625,
+      "fvu": 0.8426375985145569,
+      "bt_threshold": null,
+      "loss_hist": [
+        2437.94,
+        50.09,
+        38.2,
+        51.48,
+        77.21
+      ]
+    },
+    {
+      "arm": "topk",
+      "kper": 41,
+      "lr": 0.001,
+      "nominal_k": 492,
+      "n_pos_preact": 301.38519287109375,
+      "realised_l0": 492.0,
+      "coeff_per_segment": 41.0,
+      "spend_frac": 1.0,
+      "neg_coeff_frac": 0.3874284625053406,
+      "alive_frac": 0.260498046875,
+      "fvu": 0.540825605392456,
+      "bt_threshold": null,
+      "loss_hist": [
+        2437.94,
+        93.91,
+        72.92,
+        68.57,
+        76.49
+      ]
+    },
+    {
+      "arm": "batchtopk",
+      "kper": 41,
+      "lr": 0.001,
+      "nominal_k": 492,
+      "n_pos_preact": 293.9703674316406,
+      "realised_l0": 496.718505859375,
+      "coeff_per_segment": 41.393208821614586,
+      "spend_frac": 1.0095904590637703,
+      "neg_coeff_frac": 0.40817514061927795,
+      "alive_frac": 0.29052734375,
+      "fvu": 0.5537623167037964,
+      "bt_threshold": -1.7551121711730957,
+      "loss_hist": [
+        2439.73,
+        99.3,
+        79.25,
+        67.77,
+        81.28
+      ]
+    },
+    {
+      "arm": "batchtopk_relu",
+      "kper": 41,
+      "lr": 0.001,
+      "nominal_k": 492,
+      "n_pos_preact": 11.23703670501709,
+      "realised_l0": 10.985184669494629,
+      "coeff_per_segment": 0.9154320557912191,
+      "spend_frac": 0.022327611116859002,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.212890625,
+      "fvu": 0.8413896560668945,
+      "bt_threshold": 0.045302607119083405,
+      "loss_hist": [
+        2439.73,
+        63.83,
+        44.92,
+        49.98,
+        81.67
+      ]
+    },
+    {
+      "arm": "topk_relu_auxk",
+      "kper": 41,
+      "lr": 0.001,
+      "nominal_k": 492,
+      "n_pos_preact": 11.466666221618652,
+      "realised_l0": 11.466666221618652,
+      "coeff_per_segment": 0.9555555184682211,
+      "spend_frac": 0.023306232157761488,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.2197265625,
+      "fvu": 0.8426375985145569,
+      "bt_threshold": null,
+      "loss_hist": [
+        2437.94,
+        51.59,
+        39.35,
+        53.02,
+        79.52
+      ]
+    },
+    {
+      "arm": "topk_relu",
+      "kper": 8,
+      "lr": 0.0003,
+      "nominal_k": 96,
+      "n_pos_preact": 127.02962493896484,
+      "realised_l0": 90.5999984741211,
+      "coeff_per_segment": 7.549999872843425,
+      "spend_frac": 0.9437499841054281,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.587890625,
+      "fvu": 0.6195359230041504,
+      "bt_threshold": null,
+      "loss_hist": [
+        1206.39,
+        13.24,
+        11.05,
+        11.1,
+        19.69
+      ]
+    },
+    {
+      "arm": "topk_relu",
+      "kper": 41,
+      "lr": 0.0003,
+      "nominal_k": 492,
+      "n_pos_preact": 181.45184326171875,
+      "realised_l0": 180.1703643798828,
+      "coeff_per_segment": 15.0141970316569,
+      "spend_frac": 0.3661999276013878,
+      "neg_coeff_frac": 0.0,
+      "alive_frac": 0.729736328125,
+      "fvu": 0.5448447465896606,
+      "bt_threshold": null,
+      "loss_hist": [
+        2437.94,
+        24.19,
+        19.97,
+        16.72,
+        16.36
+      ]
+    }
+  ],
+  "k_seg": 12,
+  "d_sae": 4096,
+  "steps": 2500
+}
