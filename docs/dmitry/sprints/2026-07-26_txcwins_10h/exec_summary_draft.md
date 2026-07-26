@@ -123,6 +123,16 @@ in real tasks is withdrawn.** It should be read as "two attributes, mechanism un
 
 #### The surviving win is discovery, not expressiveness — and the ordering is measured
 
+![Reversing which instruction the model obeys](../../../../plots/2026-07-26_txcwins/recency.png)
+
+*Left: every arm on a symmetric dose grid at identical injected norm — the crosscoder (orange)
+crosses the bias-reversal line, the deployed per-token arms (blue, green) do not, and the
+profile-removed control (red) stays flat. Right: where each write puts its mass — the supervised
+write concentrates on the two instruction positions, the crosscoder's profile is nearly flat and
+still reaches 76% of it.* ⚠ The legend's "per-token ceiling" is a **mislabel**: that arm is
+`rank1_best`, the rank-1 truncation of the difference-of-means slab, which is a reference and not
+a ceiling.
+
 **Reported at matched dose in the linear regime.** Selecting each arm at its own best dose picks
 its saturation point, which is where the first-order reasoning behind every ratio here stops
 applying. Matching the dose *magnitude* across arms and reporting at the smallest magnitude where
@@ -275,6 +285,12 @@ below is a single consistent measurement rather than a pooling of per-run values
 Margins are at α = 0.5, the smallest dose where the crosscoder is significant — inside the linear
 regime, which also means these are far less contaminated by the second-order component than
 peak-dose numbers (even scales as α², odd as α).
+
+![One pre-training number separates the wins from the losses](../../../../plots/2026-07-26_txcwins/c_gate.png)
+
+*Each point is a task: `c` measured on the metric gradient before any dictionary exists, against
+how far the crosscoder beats the best constant write at the smallest significant dose. Above the
+dashed line the crosscoder wins.*
 
 **Two things this establishes, and one it does not.**
 
