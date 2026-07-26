@@ -791,3 +791,59 @@ I tried lands within noise of the others:
 Centering, tied init, decoder normalisation at init and the standard auxiliary revival loss
 all do essentially nothing once the learning rate is right. Registered R1, R2, N1 and N2 are
 all refuted. The learning rate was the whole story.
+
+## The frontier, complete
+
+At the working learning rate the crosscoder behaves sensibly: it spends its budget up to
+kper=8, saturates gradually after, and reconstruction improves monotonically throughout.
+
+| kper | coeff/seg | spend | ReLU-kill | alive | FVU | nearest SAE | ratio |
+|---|---|---|---|---|---|---|---|
+| 1 | 1.00 | 100% | 0.000 | 0.053 | 0.761 | 0.600 | 1.3× |
+| 2 | 2.00 | 100% | 0.000 | 0.140 | 0.769 | 0.173 | 4.4× |
+| 4 | 3.97 | 99% | 0.008 | 0.357 | 0.706 | 0.117 | 6.0× |
+| 8 | 7.70 | 96% | 0.038 | 0.516 | 0.630 | 0.081 | 7.8× |
+| 20 | 13.43 | 67% | 0.328 | 0.646 | 0.571 | 0.057 | 10.0× |
+| 41 | 16.16 | 39% | 0.606 | 0.661 | 0.539 | 0.057 | 9.4× |
+
+So saturation is real even at lr=3e-4 — realised spend plateaus near 16 coefficients per
+segment — but it is *benign*: FVU keeps falling as k rises, where at lr=1e-3 it rose. That
+is the qualitative difference between the two learning rates, and it is the honest version
+of the claim I withdrew. Capacity saturates in both; only one of them is pathological.
+
+The SAE is better at every matched budget, by 1.3× at the tightest and ~9-10× from 13
+coefficients per segment upward. Figure: `plots/2026-07-25_dictbench/frontier.png`.
+
+## The activation function is the mechanism, and there are alternatives worth testing
+
+Prompted by the right question from the user: we do use TopK — so where does the cap come
+from? It comes from the *composition*, which both architectures share:
+
+```python
+topk_vals, topk_idx = pre.topk(self.k, dim=-1)
+z.scatter_(1, topk_idx, F.relu(topk_vals))    # ReLU applied AFTER TopK
+```
+
+Realised L0 is therefore `min(k, #{pre > 0})`. The SAE never notices — it has ~2000 positive
+pre-activations at k=1, so the ReLU term is slack at every budget. The crosscoder has 20-160,
+so above that count the ReLU discards whatever TopK reached for. Nothing about TopK itself
+imposes this; the ReLU after it does.
+
+`actfn_modal.py` (running) tests four sparsity rules on the crosscoder at lr=1e-3, the
+setting where capacity demonstrably dies, so the question is whether the activation rescues
+what the optimiser destroyed:
+
+- **`topk`** — TopK with no ReLU after it, the Gao et al. formulation. Realised L0 = k
+  exactly, by construction, so capacity cannot collapse. The cost is signed coefficients,
+  which weakens the "a feature fires or it does not" reading, so the negative fraction is
+  reported as a first-class number rather than buried.
+- **`batchtopk`** — BatchTopK (Bussmann et al. 2024): the k·B largest pre-activations across
+  the batch rather than k per sample, then ReLU. Lets the model allocate unevenly across
+  windows, and is the standard remedy for dead latents.
+- **`topk_relu_auxk`** — the repo's composition plus the AuxK revival loss. This was null at
+  lr=3e-4; the question is whether it bites at lr=1e-3 where there is something to revive.
+- **`topk_relu`** at both learning rates as the reference.
+
+Registered A3 is the one that can embarrass me: if `topk` shows a near-zero negative
+coefficient fraction, then `#{pre > 0}` was never the binding constraint and the mechanism
+I have been describing all evening is wrong.
