@@ -100,9 +100,14 @@ Ordered so that each step kills the task cheaply if it is going to die:
    set) and look at the spread. 128 rather than a couple of dozen because the *typical*
    permutation-to-permutation std is only about two accuracy points — the dramatic gaps are the
    tails, and you have to search for them. No spread, no task.
-2. **Build the matched pairs.** The *same* demonstrations in two orders — ideally the
-   best-scoring and worst-scoring permutations found in step 1, which maximises the behavioural
-   gap the steering has to close. The multiset match is exact and free.
+2. **Build the matched pairs, with the interior-permutation control.** The *same* demonstrations
+   in two orders — ideally the best- and worst-scoring permutations from step 1, maximising the
+   gap the steering has to close. **Permute only the interior: hold the first and last
+   demonstration fixed and match the label multiset.** This is not optional. Recency and
+   majority-label bias are bag-of-positions statistics (named in *Calibrate Before Use*), and
+   leaving them free hands the per-token arm a DC handle that will close the gap for reasons that
+   have nothing to do with ordering. Restrict step 1's permutation sampler the same way, so the
+   best/worst search runs over interior permutations only.
 3. **Train the ladder at matched realised coefficients per segment** — BatchTopK SAE → PSAE →
    T-SAE → TXC. Log realised L0 for every arm (carried-over debt 3; the failure is silent).
 4. **Read and steer separately.** Expect reading to favour the SAE again — that is now the
@@ -422,27 +427,36 @@ spans — and running it retroactively hardens last sprint's headline result.
 
 ### Headline ranking
 
-| behaviour | P1 exact foil | P2 | organism tonight | judge-free | harness fit | priority |
+Priorities are **after the DC-component audit above**. The decisive column is "DC handle": if a
+bag-of-positions statistic separates target from foil, a broadcast write rides it and the
+crosscoder loses, whatever the P1 and P2 columns say.
+
+| behaviour | P1 exact foil | DC handle | organism tonight | judge-free | harness fit | priority |
 | --- | --- | --- | --- | --- | --- | --- |
-| Prompt permutation family (demo order / MCQ option order / doc position) | **yes** | yes | free | yes | drop-in, segment = block | 5 |
-| Instruction-order conflict / injection precedence | **yes** | yes | free | yes | drop-in, segment = instruction | 5 |
-| Multi-turn escalation (crescendo) | **yes** | yes | free | yes | drop-in, segment = turn | 4 |
-| Induction / in-context copying (RRT) | **yes** | yes | free | yes | needs chunking | 4 |
-| Repetition loops (loop *escape*) | yes | strongest | free | yes | segment = repeated unit | 4 |
-| Backtracking / self-correction | no | yes | R1-Distill-Qwen-1.5B | no | separate pipeline | 4 |
-| Permutation composition / state tracking | **yes** | yes | free | yes | drop-in, segment = swap | 3 (but the best control) |
-| Entity / state tracking (boxes) | **yes** | yes | free + public data | yes | segment = operation | 3 |
-| Steganography / encoded reasoning | **yes** | yes | **none at reachable scale** | yes | segment = sentence | 2 |
-| Sandbagging / password-locking | no | weak | released organisms | partly | poor | 3 |
+| Demonstration order (interior-permuted, label-matched) | **yes** | **none, with the control** | free | yes | drop-in, segment = demo | 5 |
+| Instruction-order conflict / injection precedence | **yes** | **none, with the right target** | free | yes | drop-in, segment = instruction | 5 |
+| Multi-turn escalation (crescendo) | **yes** | likely (permissiveness is a mode) | free | yes | drop-in, segment = turn | 3 |
+| Permutation composition / state tracking | **yes** | probably (aggregates at query token) | free | yes | drop-in, segment = swap | 3, upstream hookpoint only |
+| Entity / state tracking (boxes) | **yes** | probably (same aggregation result) | free + public data | yes | segment = operation | 3 |
+| Retrieved-document position | **yes** | unclear | free | yes | drop-in, segment = document | 3 |
+| Backtracking / self-correction | no | **yes** (linear direction steers it) | R1-Distill-Qwen-1.5B | no | separate pipeline | 3 |
+| LLM-judge position bias | **yes** | **yes** (verdict is a label token) | needs ~7B | yes | drop-in, segment = response | 2 |
+| Induction / in-context copying (RRT) | **yes** | **yes** (copying is a mode) | free | yes | needs chunking | 2 |
+| Repetition loops (loop escape) | yes | **yes** (repetitiveness is the mode) | free | yes | segment = repeated unit | 2 |
+| Steganography / encoded reasoning | **yes** | none | **none at reachable scale** | yes | segment = sentence | 2 |
+| Sandbagging / password-locking | no | yes | released organisms | partly | poor | 2 |
 | Sycophancy build-up | partial | yes | free | no | segment = turn | 2 |
-| Refusal onset | no | yes | free (repo infra) | partly | separate | 2 |
-| Evaluation awareness | no | no (Shape B) | released organism | no | poor | 2 |
-| Emergent misalignment persona drift | no | no (Shape B) | repo c6_em | no | poor | 2 |
-| CoT unfaithfulness | no | no | free | no | poor | 1 |
+| Refusal onset | no | **yes** (Arditi saturates) | free (repo infra) | partly | separate | 1 |
+| Evaluation awareness | no | yes (Shape B) | released organism | no | poor | 1 |
+| Emergent misalignment persona drift | no | yes (transferable direction) | repo c6_em | no | poor | 1 |
+| MCQ option order | **yes** | **yes** (token bias, content-invariant attractor) | free | yes | drop-in | 1 |
+| CoT unfaithfulness | no | yes | free | no | poor | 1 |
 | Scheming / alignment faking | no | unknown | limited | no | poor | 1 |
 
 Priority is (probability the TXC actually wins) × (relevance of the behaviour) × (can be run
-tonight).
+tonight). The audit collapsed the middle of this table: seven entries that looked like 3s and 4s
+have a DC handle, and the two that survive at 5 are the two where the foil removes every
+bag statistic by construction.
 
 ### Where to actually get each organism
 
@@ -1222,3 +1236,14 @@ the per-pass times are ordering only, not measurements.
   to the main-conclusion section as a second, independent argument for the organism-free tasks.
   Verified Skaf et al. (2506.01926). Fifteen unverified ids remain, all single mentions in
   lower-tier entries.
+- **Pass 16** — read [[semisynthetic_language_tasks]] properly and **reversed my own framing**.
+  That note contains executed Modal results showing a textbook position-dependent template
+  (passphrase) *losing*, and ordered generation losing by 10–50× to broadcast with the gap
+  running the wrong way in k — both from mode dominance. P1 is therefore the **necessary**
+  condition, not a special case of P2, because a matched multiset is what removes the DC
+  component. Added the DC-component audit, which demotes induction and repetition from 4 to 2
+  (copying and repetitiveness are exactly the modes a broadcast write rides), demotes LLM-judge
+  position bias, and flags permutation composition as upstream-hookpoint-only. Rewrote the
+  ranking table around the DC-handle column. Added the **interior-permutation control** —
+  hold first and last demonstration fixed, match the label multiset — without which recency and
+  majority-label bias give the per-token arm a DC handle.

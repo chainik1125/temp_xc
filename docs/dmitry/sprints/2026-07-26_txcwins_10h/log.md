@@ -1215,3 +1215,59 @@ which is exactly the shared-write constraint's failure case. A null there could 
 crosscoder was only addressing two known slots, or that no fixed write of any architecture can
 serve the task. `‖mean P‖ / mean ‖P‖` and the `dom_slab` ceiling distinguish them, and must be
 measured before the result is read.
+
+## 23:22 — the selection criterion was backwards, and this repo already had the evidence
+
+`docs/dmitry/reviewer_responses/semisynthetic_language_tasks.md` contains executed Modal
+results that supersede the P1/P2 reasoning this sprint has been running on. Two language
+demonstrations were attempted there and **both failed**:
+
+| task | why it failed |
+| --- | --- |
+| passphrase verification (k distinct code-words) | a **conjunction**, which a single broadcast write satisfies — and it is a textbook position-dependent template |
+| ordered generation (days, numbers) | **mode-dominated**: at k ≥ 3–5 the per-token broadcast matched or beat the crosscoder by **10–50×**, with the gap running the *wrong* way as k grew |
+
+The mechanism is that language generation is driven by a strong shared contextual mode, and a
+broadcast write reinforces it at every position, overwhelming a template's per-position
+writes.
+
+**So P1 is the necessary condition and P2 is not.** The sprint had been treating write
+non-constancy as operative and matched-multiset as a clean special case. Passphrase
+verification is textbook P2 and still loses. What a matched multiset actually guarantees is
+that **there is no DC component for a broadcast write to ride.** The correct question about
+any candidate task is not "is the optimal write position-dependent?" but:
+
+> **Is there any bag-of-positions statistic — a mode, a label prior, a level — that separates
+> target from foil?**
+
+Then the fix in that note worked: trajectory tasks with multiset-matched foils, "so no
+bag/mode statistic — hence no broadcast write — separates target from foil in principle".
+Four of four passed, with the template growing roughly linearly in k (+75.7 at k=2 to +218.9
+at k=10) while **broadcast stayed pinned at ~0 or negative at every k**.
+
+**Verdicts that change:** induction dropped (copying-ness is a mode, and the task is close kin
+to the ordered-days task that already failed here — the screen I had queued for it is
+retired); repetition loop escape dropped (repetitiveness is the mode par excellence, and a
+flat repetition penalty is literally the broadcast write); LLM-judge position bias demoted
+(the verdict is a label token, so "prefer B" is a DC handle — the same failure as MCQ);
+permutation composition made conditional on an upstream hookpoint, since the model aggregates
+at the query token and a single write there may set the state outright.
+
+**And instruction-order conflict holds, which is independent support for the sprint's own
+headline.** With A-then-B against B-then-A and "obey the first" as the target, the correct
+*content* differs between conditions, so no single content direction helps both. That is
+exactly the recency result, and it explains why that task worked where the earlier language
+demonstrations did not.
+
+**A prerequisite for demonstration order, not a refinement.** ICL order sensitivity is partly
+carried by recency and majority-label bias — both bag statistics, both named in *Calibrate
+Before Use*. They have to be killed by construction: **permute only the middle
+demonstrations, hold the first and last fixed, and match the label multiset.** Then the pair
+differs only in interior arrangement and the DC component is gone. Without it a broadcast
+write may close the gap and the result is uninterpretable — which is precisely how ordered
+generation failed.
+
+**One reframing worth keeping.** That note concluded "do not pursue a language *steering*
+demonstration as a paper headline". But last sprint's order-only result and these trajectory
+tasks are all language, all multiset-matched, and all won. The narrower statement is better
+supported: **language steering wins iff the foil is multiset-matched.**
