@@ -686,7 +686,19 @@ a reconciliation anyway. The harness now stores `z_peak_dose` and `z_matched_dos
 existing result files keep the original field, and this document quotes it as peak-dose
 throughout.
 
-An eighth, for completeness, and it is mine: a figure script written at hour eight indexed the
+**A second pattern appeared late and is worth separating from the first**, because the fix is
+different. Three times in the final hour, a **mechanism was inferred to explain a discrepancy and
+asserted before the files were opened**: a 10× seed spread attributed to a configuration change
+(the files show identical configs), the same spread attributed to under-training (one cell
+supports it, one contradicts it, and a dose-grid change confounds both), and a figure's dose
+convention inferred rather than read. Once by the implementer, twice by me.
+
+The resolving check was identical every time — **print the configuration fields next to the
+number** — and every time it came last, after the explanation had already been written down. Where
+the first pattern is about trusting a name, this one is about **preferring an explanation to a
+measurement** when the two are equally cheap to obtain.
+
+An eighth item on the first list, for completeness, and it is mine: a figure script written at hour eight indexed the
 **signed** `α = +0.5` rather than the matched magnitude, which would have reported two per-token
 baselines as negative against a large positive crosscoder — the one-sided-grid error, in a figure,
 inside the document whose lead finding is a headline withdrawn for that exact reason. Caught in
