@@ -517,7 +517,7 @@ characterisation of what such a task requires — rank ≥ 2, `c ≈ 0`, and pos
 documents — together with a construction satisfying the first two, which was built and screened tonight and
 is the cell still running.
 
-## The experiment that is running
+## The experiment that ran
 
 Every design in this sprint achieved either rank ≥ 2 or `c` ≈ 0, never both — the trajectory
 tasks got `c` = 0 with rank 1, instruction position got rank 2 with `c` = 0.036 but `r1` = 0.82,
@@ -615,7 +615,38 @@ pools, differing only in the foil's first moment — (6, 39, 325) against (6, 21
 measures similar `c`, the two-moment machinery is decoration and the design's novelty is the
 borrowed setting alone.
 
-**Registered before the numbers land.** A win is the strongest cell in the sprint: low `c`, real
+### Result
+
+Three dictionary inits, held-out demonstration pools (train on one half, steer documents built
+from the other), matched dose |α| = 0.5, files `demo_order_probe_tr_t2_ds{0,1,2}.json`:
+
+| init | crosscoder | SAE | `txc_flat` | z vs SAE |
+| --- | --- | --- | --- | --- |
+| 0 | +0.58 | +0.11 | +0.06 | **+8.1** |
+| 1 | +0.59 | +0.32 | +0.04 | **+4.1** |
+| 2 | +0.25 | +0.09 | −0.05 | **+3.1** |
+
+**A win over constant writes in all three inits, and a small one.** Absolute margins of 0.25–0.59
+against a baseline gap of 0.370, with the profile control at or below zero throughout.
+
+⚠ **The result is dose-convention dependent at init 2.** At each arm's own peak dose that init
+**reverses** — SAE +0.80 against the crosscoder's +0.44, z = −2.5 — while inits 0 and 1 hold
+(+11.5, +2.2). Matched dose is this sprint's primary convention and the reason is finding 1, but a
+result that flips under the convention we abandoned deserves saying rather than burying.
+
+**It loses to the rank-1 ceiling by a wide margin in every init** — z = −50.2, −59.4, −56.7
+against `grad_rank1`, and −6.2, −11.8, −12.1 against `rank1_best`, with `sae_schedule` beating it
+in two of three. So this is **discovery again, on the one task built to have genuine rank
+headroom, and the headroom went unused for the third time.**
+
+**Reading replicates for a ninth task**: SAE `auc` = 1.000 in all three inits against the
+crosscoder's 0.769 / 0.820 / 0.850.
+
+**Billed as a supporting cell, not a headline.** It is the cleanest-designed task in the sprint —
+forced pattern, three matched moments, held-out content, a screened geometry — and the effect it
+steers is 0.37 nats, too small for the behavioural framing to carry.
+
+**Registered before the numbers landed.** A win is the strongest cell in the sprint: low `c`, real
 rank headroom, a published behaviour, held-out content pools, and a difference-of-differences
 metric under which a function-vector write cancels by construction. A loss says low `c` plus rank
 headroom is still not sufficient, which would leave *the crosscoder wins when it finds a good
