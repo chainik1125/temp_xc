@@ -1113,6 +1113,15 @@ counter-evidence of any entry — which is itself why it is worth recording.
 states for non-commuting operations, and the dataset generator gives unlimited matched pairs.
 **P2 — passes**: changing the answer means intervening on *which operation came last*.
 
+**A second, converging mechanistic account.** Oh & Demberg, *A retrieval conditioned rebinding
+circuit for dynamic entity tracking in large language models*, 2026
+([arXiv:2606.08644](https://arxiv.org/abs/2606.08644) — verified) find a compact attention-head
+circuit that, rather than re-encoding state after each change, **preserves binding information
+and reinstates it during readout**. Same conclusion as the counter-evidence below, reached by a
+different route, which makes it harder to argue around. They also report the representational
+signature differs across model families — Gemma carries it in query/key subspaces, Llama
+primarily in key vectors — so any result here may not transfer between families.
+
 **Counter-evidence, and it is sharp.** arXiv:2605.30233 finds that "LMs do not incrementally
 track world states across tokens or query-relevant states across layers, but simply aggregate
 relevant information in parallel at the last token when the query becomes evident." Treat it as
@@ -1134,7 +1143,7 @@ organisms are thin.
 | Roger & Greenblatt, *Preventing Language Models From Hiding Their Reasoning*, 2023 ([arXiv:2310.18512](https://arxiv.org/abs/2310.18512)) — **id corrected**, see note | the encoded-reasoning threat model and the paraphrasing defence |
 | Skaf et al., *Large language models can learn and generalize steganographic chain-of-thought under process supervision*, 2025 ([arXiv:2506.01926](https://arxiv.org/abs/2506.01926)) — verified | the closest thing to a *recipe* for an organism: penalise specific strings in reasoning traces and models "develop encoded alternative expressions rather than changing their underlying approach", and crucially generalise — "when the penalized strings belong to an overarching class, the model learns not only to substitute strings seen in training, but also develops a general encoding scheme for all members of the class". No model sizes or organism release stated in the abstract |
 | Zolkowski, Nishimura-Gasparian, McCarthy, Zimmermann, Lindner, *Early Signs of Steganographic Capabilities in Frontier LLMs*, 2025 ([arXiv:2507.02737](https://arxiv.org/abs/2507.02737)) — verified | the capability gate, and it closes this entry for tonight: "current models are unable to encode short messages in their outputs without a monitor noticing under standard affordances", succeeding only "if given additional affordances like using an unmonitored scratchpad and coordinating on what encoding scheme to use" |
-| *Conceptual Steganography*, 2026 ([arXiv:2605.26537](https://arxiv.org/abs/2605.26537)) — id unverified | payloads carried by patterns of reasoning behaviour rather than lexical choice — the shape closest to a temporal factor |
+| Zhou & May, *Conceptual Steganography*, May 2026 ([arXiv:2605.26537](https://arxiv.org/abs/2605.26537)) — verified | the payload is carried "through patterns of high-level reasoning behavior, rather than through lexical choice" — i.e. by **how the reasoning steps are arranged** — demonstrated across four model families and two reasoning domains, and more resistant to paraphrase defences than keyword-based methods while preserving reasoning quality |
 
 Note on the correction: I first recorded this as arXiv:2311.02282, which is a spark-plug fault
 diagnosis paper. The Roger & Greenblatt paper is **2310.18512**. Flagging it because it is a
@@ -1148,7 +1157,14 @@ sentences destroys the payload while preserving the multiset exactly.
 **P1 — exact and perfect. P2 — passes**: suppressing an encoded channel requires disrupting
 the relation between positions, not adding a constant.
 
-**Demoted to priority 2 on verification.** The blocking question was whether a model at
+**The structural case got stronger, the feasibility case did not.** Conceptual steganography is
+*exactly* the object this whole catalogue is looking for: a factor carried by the arrangement of
+steps and by nothing local, demonstrated to work across four model families, and resistant to the
+paraphrase defence precisely because paraphrasing preserves arrangement while destroying wording.
+If a per-token dictionary can be shown to miss a conceptual-stego channel that a window code
+catches, that is a genuinely important safety result — CoT monitorability is the application.
+
+**Still priority 2, on scale.** The blocking question was whether a model at
 accessible scale *computes* the payload at all — if it does not represent it, there is nothing
 to read or steer. Zolkowski et al. answer it: **frontier** models cannot encode short messages
 without a monitor noticing under standard affordances, and succeed only with an unmonitored
@@ -1318,7 +1334,7 @@ measured on a completely different task.
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
-  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2606.26474 (cross-layer crosscoder, RL tool use), 2603.05805 (cross-model crosscoder, MoE diffing), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
+  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2606.26474 (cross-layer crosscoder, RL tool use), 2603.05805 (cross-model crosscoder, MoE diffing), 2606.08644 (Oh & Demberg, rebinding circuit), 2605.26537 (Zhou & May, conceptual steganography), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
 - **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
   and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
@@ -1326,7 +1342,7 @@ measured on a completely different task.
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
   2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2408.15221,
-  2605.01687, 2605.02647, 2606.08644, 2605.26537, 2603.03258, 2601.04170, 2604.11978,
+  2605.01687, 2605.02647, 2603.03258, 2601.04170, 2604.11978,
   2605.03907, 2512.02194, 2411.16594.
   All are single mentions in lower-tier entries; nothing load-bearing above priority 2 rests on
   an unverified id.

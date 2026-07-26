@@ -1564,3 +1564,36 @@ Also queued with theory: the contingency prose for the case where recency's `r1`
 0.85, in which the project's honest position is many discovery wins and no expressiveness win.
 Drafting that before the number arrives is deliberate — it stops the framing being chosen
 under time pressure once the result is known.
+
+## 23:44 — the best target in the catalogue, correctly deferred
+
+**Conceptual steganography** (Zhou & May, arXiv:2605.26537, verified) is the cleanest instance
+of the property this catalogue exists to find. Payloads are carried "through patterns of
+high-level reasoning behavior, rather than through lexical choice" — i.e. by **how the
+reasoning steps are arranged** — demonstrated across four model families and two reasoning
+domains.
+
+The decisive clause is that it is *more resistant to paraphrase defences* than keyword-based
+methods. Paraphrasing is the field's standard defence against encoded reasoning, and it works
+by destroying wording; conceptual stego survives it **precisely because paraphrase preserves
+arrangement**. So the channel is invisible to any per-token readout by construction *and*
+provably survives the main defence. "A per-token dictionary misses a channel a window code
+catches" would then be a monitorability result rather than a methodological curiosity.
+
+It is deferred purely on scale: it needs a model doing genuine chain-of-thought with
+controllable high-level patterns, which 1.5–7B is not, and frontier models can barely manage
+even the lexical version under monitoring (arXiv:2507.02737). So the structural case got much
+stronger tonight while the feasibility case did not move. It leads the next-steps section
+ahead of tool-call ordering.
+
+**Entity tracking's reading arm is now closed by two independent routes.** Oh & Demberg
+(arXiv:2606.08644) find a "retrieval conditioned rebinding" circuit that preserves binding
+information and reinstates it during readout rather than re-encoding state after each change
+— the same conclusion as Tang et al.'s aggregation-at-the-query-token result, reached by a
+different analysis. Two circuits-level accounts converging is much harder to argue around than
+either alone.
+
+Their incidental finding is worth generalising beyond that entry: the representational
+signature **differs across model families** (Gemma in query/key subspaces, Llama in key
+vectors), so results in this area may not transfer between families. That is a caveat on every
+recommendation the catalogue makes about which model to run, not just on entity tracking.
