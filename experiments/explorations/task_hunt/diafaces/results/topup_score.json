@@ -1,0 +1,233 @@
+{
+  "L1_new_seeds_alone": {
+    "S1": {
+      "batchtopk_sae@T16": {
+        "margins": [
+          0.1136,
+          0.117,
+          0.1188
+        ],
+        "mean": 0.1165,
+        "ci95_t": [
+          0.1099,
+          0.123
+        ],
+        "pass": true
+      },
+      "batchtopk_sae@T32": {
+        "margins": [
+          0.2371,
+          0.2815,
+          0.2508
+        ],
+        "mean": 0.2564,
+        "ci95_t": [
+          0.1999,
+          0.313
+        ],
+        "pass": true
+      },
+      "tsae@T16": {
+        "margins": [
+          0.1064,
+          0.1058,
+          0.0994
+        ],
+        "mean": 0.1039,
+        "ci95_t": [
+          0.0943,
+          0.1135
+        ],
+        "pass": true
+      },
+      "tsae@T32": {
+        "margins": [
+          0.2298,
+          0.2703,
+          0.2314
+        ],
+        "mean": 0.2438,
+        "ci95_t": [
+          0.1869,
+          0.3008
+        ],
+        "pass": true
+      },
+      "pass": true
+    },
+    "S2": {
+      "T16": {
+        "trained": 0.1461,
+        "untrained": 0.0132,
+        "ratio": 0.0903,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.2861,
+        "untrained": 0.002,
+        "ratio": 0.0069,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S4": {
+      "T16": {
+        "trained": 0.1461,
+        "evidence_r": 0.0148,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.2861,
+        "evidence_r": 0.1142,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S5": {
+      "T16": {
+        "v2_grouped": 0.1863,
+        "pass": true
+      },
+      "T32": {
+        "v2_grouped": 0.2394,
+        "pass": true
+      },
+      "pass": true
+    },
+    "note": "independent replication lane; gates nothing; n=3 power limits acknowledged (TOPUP_CARD \u00a7 2)"
+  },
+  "L2_combined_n6": {
+    "caveat": "SEQUENTIAL-DECISION CAVEAT (mandatory beside every L2 number): the n=6 extension was decided AFTER observing seeds {3,4,5} fail one t-CI leg \u2014 L2 is a conditional test (R22-caveat style).",
+    "S1": {
+      "batchtopk_sae@T16": {
+        "margins": [
+          0.0388,
+          0.1287,
+          0.0856,
+          0.1136,
+          0.117,
+          0.1188
+        ],
+        "mean": 0.1004,
+        "ci95_t": [
+          0.0653,
+          0.1356
+        ],
+        "pass": true
+      },
+      "batchtopk_sae@T32": {
+        "margins": [
+          0.2414,
+          0.2353,
+          0.2602,
+          0.2371,
+          0.2815,
+          0.2508
+        ],
+        "mean": 0.2511,
+        "ci95_t": [
+          0.2326,
+          0.2695
+        ],
+        "pass": true
+      },
+      "tsae@T16": {
+        "margins": [
+          0.0523,
+          0.1213,
+          0.0867,
+          0.1064,
+          0.1058,
+          0.0994
+        ],
+        "mean": 0.0953,
+        "ci95_t": [
+          0.0703,
+          0.1204
+        ],
+        "pass": true
+      },
+      "tsae@T32": {
+        "margins": [
+          0.2549,
+          0.2279,
+          0.2614,
+          0.2298,
+          0.2703,
+          0.2314
+        ],
+        "mean": 0.2459,
+        "ci95_t": [
+          0.2265,
+          0.2654
+        ],
+        "pass": true
+      },
+      "pass": true
+    },
+    "S2": {
+      "T16": {
+        "trained": 0.1313,
+        "untrained": 0.0151,
+        "ratio": 0.1149,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.282,
+        "untrained": 0.0002,
+        "ratio": 0.0006,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S4": {
+      "T16": {
+        "trained": 0.1313,
+        "evidence_r": 0.0148,
+        "pass": true
+      },
+      "T32": {
+        "trained": 0.282,
+        "evidence_r": 0.1142,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S5": {
+      "T16": {
+        "v2_grouped": 0.1797,
+        "pass": true
+      },
+      "T32": {
+        "v2_grouped": 0.2496,
+        "pass": true
+      },
+      "pass": true
+    },
+    "S3_combined_16to32": {
+      "delta_mean": 0.1506,
+      "deltas": [
+        0.2027,
+        0.1066,
+        0.1746,
+        0.1234,
+        0.1645,
+        0.132
+      ],
+      "p_exact": 0.01562,
+      "n_perms": 64
+    }
+  },
+  "l0_out_of_band": [
+    {
+      "cell": "batchtopk_sae:T1:s7",
+      "l0_per_window": 4.292
+    }
+  ],
+  "verdict": {
+    "KEEP_at_16_32": true,
+    "rule": "KEEP at {16,32} iff L2 S1 all four legs AND combined S2\u2227S4\u2227S5 (ad76b0f15 item 3)",
+    "caveat": "SEQUENTIAL-DECISION CAVEAT (mandatory beside every L2 number): the n=6 extension was decided AFTER observing seeds {3,4,5} fail one t-CI leg \u2014 L2 is a conditional test (R22-caveat style).",
+    "note": "T32-only re-scope remains PROPOSED (team item); PENDING TEAM REVIEW"
+  }
+}
