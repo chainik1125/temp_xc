@@ -1674,3 +1674,80 @@ at +1.24 against the crosscoder's +11.29.
 Matching the foil does nothing to stop a function-vector write; making the metric a contrast is
 what stops it. Noted because "did steering fix the bad ordering?" is the natural phrasing of the
 question and is the wrong metric.
+
+## 23:50 — the constructed ladders do not survive symmetric doses; the real-behaviour tasks do
+
+The most important result of the sprint so far, and it lands on work already reported.
+
+The phase and order ladders swept the steering dose over **positive values only**, locking each
+arm to the sign implied by its reading AUC. With both signs tested at a corrected recipe
+(lr 1e-3), the ladder falls apart:
+
+| cell | `txc_slab` best | `sae_broadcast` best |
+| --- | --- | --- |
+| phase1 ds0 | +1.45 | **+14.52** |
+| phase1 ds2 | +3.00 | **+5.42** |
+| phase3 ds0 | +2.20 | −0.11 |
+| phase3 ds1 | +1.58 | **+4.28** |
+| phase5 ds0 | +3.64 | +0.94 |
+| phase11 ds0–ds2 | +0.53 / +1.66 / +4.61 | +0.15 / +0.16 / +0.06 |
+
+The SAE wins outright at phase1 in both inits and at phase3 in one; the crosscoder wins at
+phase11 in all three but by small margins; every number is dwarfed by the supervised write at
++28 to +69. On phase1 ds0 the SAE's constant write reaches **+14.52 at a dose of −2** — a dose
+the earlier grid never tested. So the ladder advantage was substantially an artefact of a
+one-sided sweep, and the honest statement is that **on constructed order and phase tasks, at a
+fair recipe with both signs tested, neither dictionary reliably wins and the outcome flips with
+dictionary init.**
+
+**This also puts a question mark over last sprint's headline**, which used the same one-sided
+grid and reported `sae_broadcast` +1.24 against `txc_slab` +11.29. That rerun is now the
+highest-priority item in the queue, above the rotation ladder: it is a claim already in
+circulation and we should be the ones to find out whether it survives.
+
+**What is unaffected, and why the sprint is in better shape rather than worse.** Recency and
+evidence used **symmetric doses and the difference-of-differences metric from the start**:
+
+```text
+recency    txc_slab +6.48 ± 0.15   sae_broadcast +2.60   txc_flat +1.42   tsae +3.65
+evidence   txc_slab +5.92 ± 0.10   sae_broadcast +1.33   txc_flat +2.84   tsae +0.32
+```
+
+And there is now a principled account of why the two families differ. Ordering mode scores
+`logP(A) − logP(B)`, which cancels *content* between multiset-matched documents but **not
+context** — leaving `c = 0.04` on phase1, with a pooled probe reading that task at AUC 0.997,
+so a broadcast direction has real grip and at large dose a large one. Probe mode scores a
+**difference of differences**, which cancels constant writes to first order by construction.
+
+> **The crosscoder wins under a metric that cancels constant effects, and the constructed order
+> tasks were never such a metric.**
+
+That is a better claim than the empirical one it replaces, because it says in advance which
+tasks separate the architectures — and `c` is exactly the quantity that decides it. It is also
+the same two-conditions distinction the literature agent derived independently: a matched foil
+and a DC-free metric are different requirements.
+
+**The phase ladder was the wrong family, and it confirms the theorem rather than refuting it.**
+Measured `r1` is 0.921 at 2 blocks *rising* to 0.970 at 12 — registered in advance, since the
+ladder alternates between only two sentence pools, so one attribute, so rank 1 whatever the
+switch count. Three independent routes to that fact now: registered by theory, rederived by
+implement from the measurement, and proved by the attribute theorem.
+
+## 23:52 — the tSAE debt closed, with one confound named
+
+The reference implementation at `github.com/AI4LIFE-GROUP/temporal-saes` is a fork of
+`dictionary_learning` whose trainer class is **`TemporalMatryoshkaBatchTopKSAE`** — so a
+like-for-like comparison differs in *three* ways, not one: the temporal contrastive loss, the
+Matryoshka nesting, and the predefined 20/80 semantic/syntactic feature split. A single arm
+would be uninterpretable, which is precisely how that arm failed last sprint.
+
+The isolating control is one config change: run their trainer with the temporal regularisation
+at **zero**, which separates the contrastive term from the Matryoshka structure. Now a required
+arm rather than an optional one. The released weights are Gemma-2-2b, useful for
+sanity-checking an implementation and not droppable into a Qwen comparison, so the repo's value
+is the loss and trainer rather than the checkpoints.
+
+That closes the debt end to end — correct paper, exact loss and hyperparameters, reference
+located and inspected, confound named, control specified. "Benchmarking against a published
+temporal SAE took two sprints to establish which architecture that actually was" is itself a
+transferable finding about the state of this subfield.

@@ -83,6 +83,40 @@ Every priority-4-and-above entry in this catalogue except backtracking needs **n
 at all** — the behaviour is elicited from a stock pretrained model by the prompt alone. That was
 originally a convenience argument; after this paper it is a validity argument.
 
+### Constraints for whoever builds this, collected
+
+Every one of these is argued somewhere below; they are gathered here because they are scattered
+and because most of them are cheap to satisfy up front and expensive to retrofit.
+
+1. **Score a contrast, never an absolute.** The metric must be the teacher-forced margin between
+   the target and its multiset-matched foil, not accuracy on one member of the pair. Few-shot ICL
+   has a published constant intervention — writing a **function vector** — that raises absolute
+   accuracy; it cancels in a contrast because the task is identical in both orderings. Get this
+   wrong and the comparison is dead before it starts.
+2. **Permute the interior only.** Hold the first and last demonstration fixed and match the label
+   multiset, so recency and majority-label bias — both bag statistics — cannot separate the pair.
+   Apply the same restriction to the permutation sampler in the go/no-go.
+3. **Size the go/no-go at ~128 permutations.** Typical permutation-to-permutation accuracy std is
+   about two points; the dramatic gaps are the tails and must be searched for. A 24-permutation
+   sweep showing a small spread means "underpowered", not "no effect".
+4. **Use the base model, not the instruct model.** Instruction tuning increases prediction
+   consistency under input perturbations, shrinking the effect being steered. This differs from
+   the harness default and has to be changed deliberately.
+5. **Use `k` of 4–8.** Order sensitivity falls as demonstration count grows; many-shot would
+   quietly destroy the effect. It is also the window length the crosscoder handles best.
+6. **Log realised L0 for every arm** (carried-over debt 3 — nominal `k` does not bind for the
+   crosscoder and the failure is silent).
+7. **Run the S2 steering arm**, not just S1. The SAE direction applied at oracle-chosen positions
+   is the honest per-token baseline; `S3 > S1` alone invites the reply that the baseline was
+   handicapped.
+8. **Run the tSAE with temporal regularisation at zero as a control**, because the released
+   trainer is `TemporalMatryoshkaBatchTopKSAE` and otherwise the arm confounds three changes.
+9. **Carry over the existing controls unchanged** — time-averaged profile, random profile, random
+   direction, row-permuted profile, supervised difference-of-means ceiling. They are already in
+   `steer_order_modal.py`.
+10. **If any AUC is reported**, note the probe-fragility caveat: in-distribution AUCs in this area
+    have a poor track record under distributional shift.
+
 ### The concrete recommendation, if one task has to be picked
 
 **Few-shot demonstration-order permutation** (instance A). One segment per demonstration, `T` =
@@ -1663,3 +1697,18 @@ the per-pass times are ordering only, not measurements.
   which kills that reading arm from a different direction. And the repetition saturation evidence
   is now three-deep (single neuron, repetition-neuron edits, LoopGuard's >90pp KV-cache fix),
   which settles that demotion.
+- **Pass 22** — added the **(a) matched foil vs (b) DC-free metric** distinction, which is the
+  sharpest thing in this note and the error that made me rank induction second: a matched foil
+  stops no constant write on its own; only a *contrastive* metric does. Named the specific DC
+  handle for demonstration order — **function-vector heads**, a published constant intervention
+  that raises few-shot accuracy — and why the margin-between-the-matched-pair metric defuses it.
+- **Pass 23** — completed coverage of the brief's list with stated verdicts for **deception**
+  (linear deception direction; "stages" are layer-depth; no matched foil; and the probe-fragility
+  caution that applies to any AUC we report) and for **ICL phase transitions** (a category error:
+  training steps are not token positions). Applied the DC audit to sycophancy.
+- **Pass 24** — inspected the released T-SAE repo. Confirmed it exists and recorded its contents,
+  and found a confound: the trainer is `TemporalMatryoshkaBatchTopKSAE`, so it differs from a
+  plain BatchTopK baseline in **three** ways (temporal loss, Matryoshka nesting, predefined
+  split). Specified the control that isolates them — run their trainer with temporal
+  regularisation at zero — and noted the released weights are Gemma-2-2b, so the arm needs
+  training regardless.
