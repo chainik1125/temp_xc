@@ -1,0 +1,102 @@
+{
+ "purpose": "decisive numbers + artifact paths for WRITEUP.md \u00a7 6 negatives table (mac-b dump, briefings/writeup-figures.md)",
+ "note": "values verified against the cited receipts/artifacts at build time; rows without a single number carry the receipt/anchor instead",
+ "rows": [
+  {
+   "task": "operator-rate, reasoning traces (oprate/case)",
+   "stage": "full panel",
+   "decisive": "every window cell below the visible event-sentence evidence line at matched T (binding oprate \u00a7 3d rule)",
+   "value": null,
+   "artifact": "experiments/explorations/task_hunt/oprate/results/stage2_ward_real_oprate_case_base_l12.json + oprate evidence-line artifact; variance: experiments/explorations/task_hunt/support_stats/stage2_variance_oprate_case.md",
+   "receipt": "oprate panel verdict LOG 2026-07-25"
+  },
+  {
+   "task": "punctuation-intensity, web text \u00d73 models (punctint-q)",
+   "stage": "full panel \u00d73",
+   "decisive": "llama31 (strongest token code): pre\u2212tsae gap NEGATIVE \u22120.018 (T4) / \u22120.014 (T8); gpt2 +0.028 under the +0.05 bar; gemma K1 +0.0541 BCa [\u22120.0017, +0.0861] not bounded",
+   "value": -0.018,
+   "artifact": "experiments/explorations/task_hunt/qrate_fineweb/results/stage2_fineweb_punctint_q_*.json; experiments/explorations/task_hunt/support_stats/stage2_variance_qrate_*.md",
+   "receipt": "R13, R18, R19"
+  },
+  {
+   "task": "turn-length trend, dialogue (ttrend) \u2014 P4 fail",
+   "stage": "full panel 102 cells",
+   "decisive": "untrained stacked recovers 0.809 of trained at the winning cell (stacked/T32: 0.2180 trained vs 0.1763 untrained); untrained pre beats trained pre",
+   "value": 0.809,
+   "artifact": "experiments/explorations/task_hunt/diafaces/results/stage2_dial_real_ttrend_gpt2_l7.json",
+   "receipt": "tt panel verdict LOG 19f087243 + mac-local licence 0eb6b22ea"
+  },
+  {
+   "task": "sentence-length recency latch (slen/lat)",
+   "stage": "screen \u00d72 models",
+   "decisive": "max within-window shuffle cost 0.019 across ALL slen cells vs width-corrected window content to +0.147 \u2014 the pre-registered recency ladder collapsed",
+   "value": 0.019,
+   "artifact": "experiments/explorations/task_hunt/slen/results/screen_gpt2.json, screen_llama31_8b.json",
+   "receipt": "R20"
+  },
+  {
+   "task": "sentence-length level (slen/lev)",
+   "stage": "screen",
+   "decisive": "order-free window gain +0.067/+0.115 at T64 (gpt2/llama) with shuffle cost \u2248 0; within-doc control passes at +0.046/+0.092",
+   "value": 0.115,
+   "artifact": "experiments/explorations/task_hunt/slen/results/screen_*.json",
+   "receipt": "R21"
+  },
+  {
+   "task": "sentence-length dispersion (slen/disp)",
+   "stage": "screen",
+   "decisive": "per-token acc 0.378/0.375 vs chance 0.333 \u2014 label nearly per-token-invisible; no KEEP rule fired",
+   "value": 0.378,
+   "artifact": "experiments/explorations/task_hunt/slen/results/screen_*.json",
+   "receipt": "slen verdict LOG 2026-07-25 (disp WEAK)"
+  },
+  {
+   "task": "refusal-marker recurrence, chat logs (refmark)",
+   "stage": "screen \u00d72",
+   "decisive": "gpt2: best window arm at T \u2265 8 sits \u22120.008 BELOW the visible marker-count floor (worst \u22120.069) and the within-conversation control is flat (max |\u0394| 0.015)",
+   "value": -0.008,
+   "artifact": "experiments/explorations/task_hunt/refmark/results/screen_gpt2.json, screen_llama31_8b.json",
+   "receipt": "R23"
+  },
+  {
+   "task": "quoted-speech intensity, fiction (quotedens) \u2014 deferred positive",
+   "stage": "screen (passed)",
+   "decisive": "bounded above T32: window minus visible quote-count floor \u22120.079/\u22120.139 at T64; order-free (shuffle \u2264 0.016); class prior 0-for-2 at panels",
+   "value": -0.139,
+   "artifact": "experiments/explorations/task_hunt/quotedens/results/screen_*.json",
+   "receipt": "R24"
+  },
+  {
+   "task": "dialogue turn-length level (dialevel) \u2014 naive route dead",
+   "stage": "screen + design probe",
+   "decisive": "doc-mean-only identity probe reads the naive label at 0.983/0.986/0.984 AUC (gpt2/gemma/llama); within-dialogue control drops it to 0.517/0.532/0.538",
+   "value": 0.983,
+   "artifact": "experiments/explorations/task_hunt/dialevel/results/design_probe.json",
+   "receipt": "dialevel CARD \u00a7 2; R11 (the shuffle counterexample \u00a7 5 uses)"
+  },
+  {
+   "task": "topic-switch clock (interleave/tss)",
+   "stage": "screen",
+   "decisive": "converted: single-position code carries the signal; window adds nothing over per-token (see screen cells)",
+   "value": null,
+   "artifact": "experiments/explorations/task_hunt/interleave/results/",
+   "receipt": "CANDIDATES.md B1 thread (KILL\u2192WITHDRAWN\u2192KEEP-PENDING-REVIEW history disclosed)"
+  },
+  {
+   "task": "novelty rate (web text)",
+   "stage": "screen (verdict withdrawn)",
+   "decisive": "verdict withdrawn by author after best-window scoring defect; re-screen parked; collaborator-thread positive not cross-ratified",
+   "value": null,
+   "artifact": "CANDIDATES.md B2",
+   "receipt": "withdrawal LOG 2026-07-25"
+  },
+  {
+   "task": "equation-density (eqdens)",
+   "stage": "triage kill",
+   "decisive": "manifest unigram bar fired at triage: gpt2 0.653 \u2014 label unigram-readable, free kill",
+   "value": 0.653,
+   "artifact": "CANDIDATES.md B6 (round-2 triage)",
+   "receipt": "CANDIDATES.md B6"
+  }
+ ]
+}

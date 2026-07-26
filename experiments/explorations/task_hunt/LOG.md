@@ -6112,3 +6112,24 @@ idle; mac-local produced all three figures). PENDING-TEAM-REVIEW
 markers travel with the 2026-07-26 results inside the doc.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-b (executor) — fig-3 RACE disclosed: mac-local's embedded fig3 stands; mac-b's briefing-spec version pushed BESIDE it as `fig3_order_receipts_macb.{pdf,png}`; negatives-table data delivered
+
+The figure briefing assigned fig 3 to mac-b; both versions were built
+concurrently and mac-local's landed first inside the delivered doc —
+that one governs the page (no silent clobber; the doc's embed is
+untouched). The mac-b version is committed beside it because it
+differs substantively, per the briefing's own spec: **95% t-CI
+whiskers over the 3 shuffle seeds on every ladder bar, the
+label-shuffle NULL band (the briefing's "null band shown"), AND the
+broad-text maximum (+0.019, R20) as a separate dashed reference
+line** — the delivered caption's "grey reference band = broad text"
+conflates the two. Swap is one filename edit if wanted; either way the
+caption should distinguish null band from broad-text reference.
+Also delivered (no counterpart existed):
+`figs_writeup/negatives_table_data.{json,csv}` — 12 rows, one
+decisive number + artifact path + receipt anchor per § 6 table row,
+values re-verified at build (R6/R13/R18–R21/R23/R24 + artifact
+recomputes for ttrend P4 0.809 and dialevel 0.983→0.517).
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_
