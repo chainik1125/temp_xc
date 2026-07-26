@@ -115,7 +115,8 @@ ELLS = [1, 2, 3, 6]
 @app.function(gpu="A10G", image=image, timeout=21600)
 def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int,
           steps: int, lr: float, general_frac: float, batch_win: int,
-          coarse: list, sae_budgets: list, targets: list, n_refine: int):
+          coarse: list, sae_budgets: list, targets: list, n_refine: int,
+          topk_grid: list):
     import sys
     sys.path.insert(0, "/work")
     import math
@@ -285,6 +286,45 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
               flush=True)
         return row
 
+    # ---------------- fallback arm: the same TemporalSAE with TopK ----------------
+    # If L1 cannot reach the target band without destroying reconstruction, the honest
+    # baseline is the same attention architecture with a sparsity rule that binds by
+    # construction. `sae_diff_type="topk"` applies TopK to the post-ReLU novel codes, so
+    # realised L0 = min(k, #{pre > 0}); with ~2000 positive pre-activations the k term is
+    # what binds, but it is measured here rather than assumed.
+    topk_rows = []
+    if topk_grid:
+        print("\n===== reference arm: TemporalSAE with TopK (no L1) =====", flush=True)
+        for kv in topk_grid:
+            torch.manual_seed(0)
+            m = TemporalSAE(dimin=d, width=d_sae, n_heads=8, sae_diff_type="topk",
+                            kval_topk=int(kv), tied_weights=True, n_attn_layers=1,
+                            bottleneck_factor=64).to(dev)
+            opt = torch.optim.Adam(m.parameters(), lr=lr)
+            m.train()
+            for _ in range(steps):
+                xb = gen_win(batch_win)
+                recons, _ = m(xb)
+                loss = (recons - xb).pow(2).sum(-1).mean()
+                opt.zero_grad(); loss.backward()
+                torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
+                opt.step()
+            m.eval()
+            with torch.no_grad():
+                xh, info = m(Who)
+                Zn = info["novel_codes"].reshape(-1, d_sae)
+                Zp = info["pred_codes"].reshape(-1, d_sae)
+                row = {"kval": int(kv),
+                       "coeff_per_segment": float((Zn > 0).float().sum(-1).mean()),
+                       "pred_l0_per_segment": float((Zp > 0).float().sum(-1).mean()),
+                       "fvu": fvu_from(xh, Who),
+                       "alive_frac": float(
+                           ((Zn > 0).float().mean(0) >= 0.001).float().mean())}
+            topk_rows.append(row)
+            print(f"  [tsae-topk] k={kv:<4} coeff/seg {row['coeff_per_segment']:7.2f}  "
+                  f"predL0 {row['pred_l0_per_segment']:7.1f}  FVU {row['fvu']:.4f}  "
+                  f"alive {row['alive_frac']:.3f}", flush=True)
+
     print("\n===== stage 1: coarse log grid =====", flush=True)
     rows = [run_tsae(l1) for l1 in coarse]
 
@@ -358,7 +398,7 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
               flush=True)
 
     print("\n===== tSAE vs TopK SAE at matched coefficients/segment =====", flush=True)
-    for sr in sae_rows:
+    for sr in (sae_rows if rows else []):
         tgt = sr["coeff_per_segment"]
         near = min(rows, key=lambda r: abs(math.log10(max(r["coeff_per_segment"], 1e-6))
                                            - math.log10(max(tgt, 1e-6))))
@@ -369,7 +409,8 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
     return {"model": model_id, "layer": int(L), "k_seg": k_seg, "T": T, "d_sae": d_sae,
             "steps": steps, "lr": lr, "d_in": d, "lam": 1.0 / (4 * d),
             "mean_token_norm": tok_norm, "fvu_denom": denom,
-            "sae_reference": sae_rows, "tsae_curve": rows, "monotone": monotone,
+            "sae_reference": sae_rows, "tsae_curve": rows,
+            "tsae_topk_reference": topk_rows, "monotone": monotone,
             "usable_l1_range": usable, "l1_for_target_l0": l1_map}
 
 
@@ -379,12 +420,13 @@ def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int 
          lr: float = 3e-4, general_frac: float = 0.3, batch_win: int = 32,
          coarse: str = "1e-3,1e-2,1e-1,1,3,10,30,100,300,1000",
          sae_budgets: str = "1,2,4,8,16", targets: str = "1,2,4,8,16,32",
-         n_refine: int = 6, tag: str = ""):
+         n_refine: int = 6, topk_grid: str = "", tag: str = ""):
     import json
     r = calib.remote(model, layer, k_seg, t, n_docs, d_sae, steps, lr, general_frac,
-                     batch_win, [float(x) for x in coarse.split(",")],
-                     [int(x) for x in sae_budgets.split(",")],
-                     [int(x) for x in targets.split(",")], n_refine)
+                     batch_win, [float(x) for x in coarse.split(",") if x],
+                     [int(x) for x in sae_budgets.split(",") if x],
+                     [int(x) for x in targets.split(",") if x], n_refine,
+                     [int(x) for x in topk_grid.split(",") if x])
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
     name = f"tsae_calibration{tag}.json"
