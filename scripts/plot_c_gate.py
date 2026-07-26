@@ -125,18 +125,28 @@ def main() -> int:
                   "share of the optimal write that is constant across positions")
     ax.set_ylabel("crosscoder $-$ best constant write\n"
                   "at the smallest significant dose")
-    # Rank correlation of MAGNITUDES understates this: the deltas are on different
-    # scales across tasks, so what the screen is being asked to do is classify the SIGN.
-    # A threshold quoted alongside tau is the honest pair.
+    # Rank correlation of MAGNITUDES understates this: the deltas are on different scales
+    # across tasks, so what the screen is asked to do is classify the SIGN. But a threshold
+    # has to be chosen honestly: the midpoint between the extreme win and the extreme loss
+    # falls INSIDE the inverted pair's gap and is the one cut that misses both of them.
+    # Search every cut instead, report the best achievable, and shade the band where no
+    # threshold can separate the pair -- the inversion is the point, not an embarrassment.
     wins = sorted(c for c, m, *_ in pts if m > 0)
     losses = sorted(c for c, m, *_ in pts if m <= 0)
-    thr = (max(wins) + min(losses)) / 2 if wins and losses else float("nan")
-    correct = sum(m > 0 for c, m, *_ in pts if c < thr) + \
-        sum(m <= 0 for c, m, *_ in pts if c >= thr)
-    ax.axvspan(min(losses), max(wins), color="#888888", alpha=0.10, lw=0,
-               zorder=0) if wins and losses and min(losses) < max(wins) else None
+    cuts = sorted({c for c, *_ in pts} | {c + 1e-6 for c, *_ in pts})
+    best_cut, best_n = None, -1
+    for cut in cuts:
+        n_ok = sum((m > 0) == (c < cut) for c, m, *_ in pts)
+        if n_ok > best_n:
+            best_cut, best_n = cut, n_ok
+    if wins and losses and min(losses) < max(wins):
+        ax.axvspan(min(losses), max(wins), color="#888888", alpha=0.13, lw=0, zorder=0)
+        ax.annotate("no threshold\nseparates this pair",
+                    ((min(losses) + max(wins)) / 2, ax.get_ylim()[0] * 0.55),
+                    ha="center", fontsize=8, color="#666666")
+    ax.axvline(best_cut, ls=":", color="#444444", lw=1.4, zorder=1)
     ax.set_title("One pre-training number separates the wins from the losses\n"
-                 f"threshold $c$ = {thr:.2f} classifies {correct}/{len(pts)}   "
+                 f"best threshold $c$ = {best_cut:.3f} classifies {best_n}/{len(pts)}   "
                  f"(Kendall $\\tau$ on magnitudes = {tau:+.2f})")
     ax.grid(alpha=0.25, lw=0.6)
     fig.tight_layout()

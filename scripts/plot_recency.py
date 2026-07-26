@@ -15,6 +15,13 @@ The metric is a difference of differences,
 so a write that simply makes the model prefer instruction 1 pushes both documents equally and
 contributes exactly zero. Only a write whose effect depends on POSITION can move this number.
 
+NEITHER SUPERVISED ARM IS A CEILING. Both are built from the DIFFERENCE-OF-MEANS slab, which
+is what distinguishes the two classes, not what maximises the metric. The true rank-1 ceiling
+comes from the metric's gradient, and the two slabs are nearly orthogonal in practice --
+measured cos(P_dom, Gbar) runs 0.02 to 0.19 across tasks, against a random baseline of 0.007.
+So these arms are a supervised REFERENCE, and on the evidence task the crosscoder beat the
+difference-of-means arm outright, which a ceiling cannot allow.
+
 Left: dose response. The crosscoder's slab is antisymmetric in the dose -- push one way and
 the model obeys the early instruction, push the other way and it obeys the late one -- which
 is what a directed intervention looks like. Every constant-write arm is positive at BOTH
@@ -46,8 +53,8 @@ C_TSAE = "#009E73"
 C_DOM = "#000000"
 C_RND = "#999999"
 
-ARMS = [("rank1_best", "#7F7F7F", "--", "best rank-1 write (per-token ceiling, supervised)"),
-        ("sae_schedule", "#56B4E9", "--", "SAE direction on a supervised schedule"),
+ARMS = [("rank1_best", "#7F7F7F", "--", "best rank-1 write from difference-of-means\n(reference, supervised — NOT the ceiling)"),
+        ("sae_schedule", "#56B4E9", "--", "SAE direction, difference-of-means schedule"),
         ("txc_slab", C_TXC, "-", "crosscoder slab (unsupervised)"),
         ("sae_broadcast", C_SAE, "-", "TopK SAE direction"),
         ("tsae_broadcast", C_TSAE, "-", "attention tSAE direction"),
