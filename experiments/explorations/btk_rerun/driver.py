@@ -13,10 +13,11 @@ Per-token baselines are NOT rerun (existing leaderboard rows stand).
 Grid (one shared parameter set across all cells):
 - datasources: toy_markov_n20_d40_noisy (Denoising),
                toy_coupled_K10_M20_d256 (Coupling)
-- T ∈ {1, 2, 4, 5, 8, 10, 20}; k_pos ∈ {1, 2, 5, 10, 20}; seeds {1, 2, 3}
-- training: n_steps 10_000, batch 1024, buffer 2M — matches the existing
-  composite synthetic rows so T=5 composite cells cache-hit where
-  checkpoints exist.
+- T ∈ {1, 2, 4, 5, 8, 10}; k_pos ∈ {1, 2, 5}; seeds {1, 2, 3}
+  (k_pos ∈ {10, 20} and T=20 dropped: k_pos*T >= d_sae=20 clips both
+  arms to a dense code — degenerate for the selection-rule comparison).
+- training: n_steps 6_000 (hunt-scale; no cache reuse is possible at
+  L=40 anyway), batch 1024, buffer 2M.
 - eval: eval_window_L = 40 (divisible by every T above) — ONE uniform
   eval protocol for the whole comparison. NOTE: this differs from the
   legacy L=5 rows and the hunt's L=32 rows; comparisons stay inside this
@@ -40,11 +41,11 @@ from pathlib import Path
 
 ARMS = {"txc_base": "paper-match", "txc_base_btk": "btk-only"}
 DATASOURCES = ["toy_markov_n20_d40_noisy", "toy_coupled_K10_M20_d256"]
-T_GRID = [1, 2, 4, 5, 8, 10, 20]
-K_POS_GRID = [1, 2, 5, 10, 20]
+T_GRID = [1, 2, 4, 5, 8, 10]
+K_POS_GRID = [1, 2, 5]
 SEEDS = [1, 2, 3]
 EVAL_WINDOW_L = 40
-N_STEPS = 10_000
+N_STEPS = 6_000
 T_DEFAULT = 5   # registry default for both arms — omitted from override
 
 

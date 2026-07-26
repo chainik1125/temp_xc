@@ -3,7 +3,7 @@
 Dmitry's ACTMIX re-run gate (isolated sprint lane, branch
 ``dmitry-btk-txc-sprint``). One shard = (arch, datasource, T) —> the
 in-repo driver ``experiments.explorations.btk_rerun.driver`` runs
-15 cells (5 k_pos x 3 seeds). 28 shards total. L40S, detached,
+9 cells (3 k_pos x 3 seeds). 24 shards total. A10G, detached,
 containers never push; shard rows persist to the Volume AND repatriate
 via return values (house discipline).
 
@@ -22,11 +22,11 @@ import modal
 PINNED_COMMIT = "0ce04d6f0f7a501d0dca60f4e3688baae4fba65f"  # btk_rerun FREEZE
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
-VOL_DIR = "/workspace/btk_rerun"
+VOL_DIR = "/workspace/btk_rerun_v2"
 
 ARMS = ["txc_base", "txc_base_btk"]
 DATASOURCES = ["toy_markov_n20_d40_noisy", "toy_coupled_K10_M20_d256"]
-T_GRID = [1, 2, 4, 5, 8, 10, 20]
+T_GRID = [1, 2, 4, 5, 8, 10]
 
 app = modal.App("dmitry-btk-rerun")
 vol = modal.Volume.from_name("temp-xc-btk-rerun", create_if_missing=True)
@@ -54,7 +54,7 @@ def _assert_pinned():
     print(f"[pin] container at freeze commit {head[:10]}", flush=True)
 
 
-@app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
+@app.function(image=image, gpu="A10G", volumes={"/workspace": vol},
               memory=32768, cpu=8, timeout=2 * 60 * 60,
               max_containers=8,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
@@ -70,7 +70,7 @@ def run_shard(shard: tuple[str, str, int]) -> str:
     out_repo = f"/repo/results/btk_rerun_{tag}.json"
     _sh(f"{PY} -m experiments.explorations.btk_rerun.driver "
         f"--arch {arch} --datasource {datasource} --T {T} "
-        f"--out {out_repo}")
+        f"--allow-dirty --out {out_repo}")
     text = Path(out_repo).read_text()
     out_vol.write_text(text)
     vol.commit()
