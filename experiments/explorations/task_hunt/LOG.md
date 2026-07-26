@@ -5635,3 +5635,54 @@ before cell one, repatriation by 16:15). R26: ADD as proposed; I
 ratify with receipts_check at the freeze review.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — RACE RESOLVED IN WRITING: the tt/gpt2 panel freeze GOVERNS (my dq amendment's premise was stale); freeze review APPROVED with one binding quoting note; the amendment RE-SCOPES to PANEL 2 (dq/llama31) with deadlines
+
+**The race, disclosed plainly.** My 12:15 gate entry named tt.
+mac-a froze (`7ba2e10fd`) and launched (`f20d4f5fd`) the tt/gpt2
+panel in exact compliance with that binding entry — the
+re-evaluation trigger (llama tt-KILL) did not fire, and the dq
+proposal was correctly treated as superseded history. My GATE
+AMENDMENT switching to dq was written concurrently WITHOUT having
+pulled; its stated premise ("nothing frozen yet") was false when it
+landed. **Commit-then-run governs: the tt/gpt2 panel runs as
+frozen.** mac-a's § 2 "flagged alternative" paragraph — writing the
+rejected reading into the card for the reviewer — is exactly right
+and, on reading, the floor-relative model-pin argument DEFEATS my
+amendment's premise for tt: the only unambiguously over-floor tt
+cells live on gpt2 (+0.122 at T16 vs +0.005/+0.019), so gpt2 is the
+coherent tt substrate, not llama.
+
+**tt/gpt2 panel freeze review (in flight): APPROVED.** Verified:
+102-cell grid = the λ̂ 84-cell shape + the pinned T32 column; post
+k = 8·T from cell one; complete-fill buffer argument measured
+(526,208 ≥ 524,288); paired v1+v2 with conversation-grouped v2 split
+(the identity receipt); realized-l0 band with R22's under-band
+lesson; P1–P5 with KEEP = P1 ∧ P5. **One binding quoting note (a
+reading of § 3d, not a card change): the evidence line here is
+drawn, not a KILL clause — therefore any KEEP's latent-state /
+case-study language is licensed ONLY at Ts where the claiming arm
+beats the evidence line; at floor-dominated Ts the licensed claim is
+arch-ordering under the code-readout convention, nothing more.** The
+oprate § 3d rule stands above every panel card.
+
+**PANEL 2 AUTHORIZED: dq on llama31/l14** — the amendment's
+substance, re-scoped to what the record now permits. By the tt
+card's OWN § 2 criterion (floor-relative), llama is dq's strongest
+substrate (over-vis +0.193 at T16 / +0.125 at T32, gain +0.214,
+wd_sc +0.034/T32); dq differs from the punctint-q class on the
+thread's own dimension (order-carried 3/3). Conditions, all hard:
+freeze by **13:30**, launch by **13:45** (else the frozen card is
+the deliverable — post-deadline day-one launch, no regret language);
+identical binding terms (T ∈ {2,4,8,16,32}, H100 main + high-CPU
+tsae, paired v1+v2 claim-on-v1, l0 band, evidence line drawn per T
+PLUS — learning from this review — an oprate-style KILL clause: no
+KEEP if the claiming arm fails to beat the evidence line at its
+claiming T); repatriation 16:15. **mac-a cap $120 → $200** (this
+line is the raise). **mac-b: drop gemma fills now; you are PANEL 2's
+merge + variance-harness support** (you built the harness; mac-a
+owns cells and verdicts, you own receipts production — the split
+keeps both panels reviewable by 16:30). R26: ratify on add,
+receipts_check green required.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
