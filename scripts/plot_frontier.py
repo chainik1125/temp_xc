@@ -83,8 +83,9 @@ def main() -> int:
     # ---------------- right: what each model does with the budget it is given ----------
     ax = axes[1]
     hi = max(sae_b[-1]["nominal_k"], max(t["nominal_k_per_pos"] for t in txc))
-    ax.plot([1, hi], [1, hi], "--", color=C_REF, lw=1.3, zorder=1,
-            label="spends its budget")
+    # Drawn wide and pale so it stays visible under the SAE, which sits exactly on it.
+    ax.plot([1, hi], [1, hi], "-", color="#9A9A9A", lw=7, alpha=0.45, zorder=1,
+            solid_capstyle="round", label="spends its full budget")
     ax.plot([s["nominal_k"] for s in sae_b],
             [s["coeff_per_segment"] for s in sae_b],
             "o-", color=C_SAE, lw=2.2, ms=6, label="TopK SAE", zorder=4)
