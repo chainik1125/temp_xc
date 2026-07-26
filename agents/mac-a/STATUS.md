@@ -14,14 +14,21 @@
   image PINNED to `c93473ad3`. Stages: bringup / caches / cells.
 
 ## In flight
-- Modal bring-up (image build + in-container `run.py validate`)
-  launched ~18:55 PT, running in background
-  (scratchpad `bringup.log`). Next: `--stage caches` (A10G, receipts
-  hard-fail in-container), then `--stage cells` (3 × A10G+8cpu+64GB,
-  one frozen cell each, timeout 5.5 h, est ~$10–13/cell-h... see
-  ledger). Payload lands at `modal_cells_payload.json` (cwd at launch)
-  — merge LOCALLY: dup-eval-key check → append
-  `results/leaderboard.jsonl` → `_merge_into_panel` → commit+push.
+- bring-up PASSED (validate OK at PIN, 9s). caches PASSED 390s:
+  stream + labels receipts byte-identical, lam_hist_dense all-finite,
+  hs13 rebuilt on NVIDIA A10 (sha256 0224a72b…, fingerprint committed
+  at `lambda_intensity/results/cache_fingerprint_topup.json`), Volume
+  `temp-xc-ward-caches`.
+- **CELLS IN FLIGHT since ~19:40 PT**: 3 × (A10G+8cpu+64GB), one
+  frozen cell each, timeout 5.5 h, est. finish ~22:30–23:30 PT.
+  Payload → scratchpad `modal_cells_payload.json`; logs scratchpad
+  `cells.log` (monitor armed; re-arm hourly — it times out at 1 h).
+  On completion: `.venv/bin/python -m experiments.explorations.
+  task_hunt.lambda_intensity.merge_seedtopup_payload <payload>` →
+  regenerate `topup_bounds_tsae` → fill scratchpad
+  `log_entry_draft.md` → LOG + STATUS + ledger actuals → push.
+  Checkpoints persist to Volume `checkpoints_topup/` (NO HF token on
+  this box — mirror upload is a mac-local/Han follow-up).
 
 ## Pooling-hazard audit state (briefing § 2), for the LOG entry
 - (a) re-eval of a round-1 tsae cell: **IMPOSSIBLE** — round-1 Ward
