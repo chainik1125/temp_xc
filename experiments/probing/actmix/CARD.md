@@ -189,6 +189,14 @@ mac-b's ACTMIX_FORENSICS and are NOT re-derived here.
 9. **Pre-freeze smoke rows** ran allow-dirty and are marked
    (`smoke: true` in eval_cfg → distinct eval_keys; cannot collide
    with grid cells). Grid cells run only from the pinned commit.
+10. **Launcher defect, disclosed:** the frozen launcher's untrained
+    pass passed `--txc-archs` twice (argparse keeps the last) so the
+    txc-PRE untrained twins were dropped from the initial queue.
+    Trained passes unaffected (separate invocations). Fixed in the
+    follow-up commit; the missing pre-untrained cells were launched
+    as a patch pass from the FIXED sha (eval/train configs identical
+    to the card; only the launcher changed — cells' code_version
+    records the patch sha honestly).
 
 ## 8. Budget (RUNPOD ledger in briefings/MODAL_SPEND.md)
 

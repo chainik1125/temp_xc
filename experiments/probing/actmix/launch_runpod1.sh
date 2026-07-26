@@ -39,7 +39,8 @@ run_gpu() {  # $1=gpu
   local gpu="$1"
   CUDA_VISIBLE_DEVICES="$gpu" nohup bash -c "
     set -e
-    $PY -m experiments.probing.actmix.sweep --arm btk-only $COMMON_TOKEN $TXC_PRE $TXC_POST $TS \
+    $PY -m experiments.probing.actmix.sweep --arm btk-only $COMMON_TOKEN \
+        --txc-archs txc_batchtopk_pre_btkonly txc_batchtopk_post_btkonly $TS \
         --seeds 42 --untrained-only --shard-index $gpu --shard-count 2
     $PY -m experiments.probing.actmix.sweep --arm btk-only $COMMON_TOKEN $TS \
         --seeds 1 2 42 --shard-index $gpu --shard-count 2
