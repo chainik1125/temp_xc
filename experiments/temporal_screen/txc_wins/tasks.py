@@ -309,12 +309,99 @@ def make_recency_var(k_seg, early_range=(1, 4), late_range=(7, 10)):
     return make_pair
 
 
+TOPICS = [
+    ["The kettle boiled and clicked off.", "She set two cups on the tray.",
+     "The tea leaves steeped for four minutes.", "He stirred in a little honey.",
+     "The mugs were warm to hold.", "Steam curled off the surface."],
+    ["The engine turned over twice before catching.",
+     "He checked the oil on the dipstick.", "The tyres needed air at the front.",
+     "The wipers squeaked across dry glass.",
+     "She adjusted the mirror before pulling out.",
+     "The fuel gauge sat just above a quarter."],
+    ["The violin section came in late.", "He counted four bars of rest.",
+     "The conductor tapped the stand twice.", "She tuned the A string again.",
+     "The score was marked in soft pencil.",
+     "The hall swallowed the last chord."],
+    ["Frost had stiffened the top soil.", "He turned the bed over with a fork.",
+     "The seedlings went in eight inches apart.",
+     "She staked the beans against the wind.", "The compost heap was steaming.",
+     "Slugs had been at the lettuce again."],
+    ["The ledger balanced to the penny.", "He filed the receipts by month.",
+     "The audit was scheduled for the spring.",
+     "She flagged three entries for review.", "The totals were carried forward.",
+     "The columns were ruled in blue ink."],
+    ["The tide had gone a long way out.", "He walked the line of the wrack.",
+     "Gulls worked over the exposed flats.", "She found a razor shell intact.",
+     "The channel markers leaned with the current.",
+     "The sand held the shape of the ripples."],
+    ["The kiln reached temperature by noon.", "He wedged the clay to drive out air.",
+     "The glaze went on in three thin coats.",
+     "She trimmed the foot on the wheel.", "The pots cooled overnight.",
+     "The shelves were dusted with alumina."],
+    ["The trail switched back above the treeline.",
+     "He rationed the water for the descent.", "The cairns were easy to lose in mist.",
+     "She checked the map against the ridge.", "The wind picked up after two.",
+     "The hut was still an hour off."],
+    ["The proofs came back heavily marked.", "He queried a date in chapter nine.",
+     "The index ran to eleven pages.", "She reset the figures at a larger size.",
+     "The binding was to be sewn, not glued.",
+     "The print run was fixed at two thousand."],
+    ["The bees were quiet in the cold.", "He lifted the crown board carefully.",
+     "The brood pattern looked even.", "She scraped burr comb from the frames.",
+     "The super was nearly full.", "Smoke settled them within a minute."],
+    ["The lock gates took four minutes to fill.",
+     "He worked the paddles a quarter turn.", "The boat rose against the wall.",
+     "She held the centre line steady.", "The cill was marked in white paint.",
+     "The pound above was low again."],
+    ["The telescope needed collimating.", "He waited for the seeing to settle.",
+     "The dew shield was already damp.", "She logged the time to the second.",
+     "The finder was a degree out.", "Cloud came over from the west."],
+]
+
+
+def make_rotate(k_seg, m):
+    """`m` DISTINCT topic blocks; the foil is a cyclic rotation by one block.
+
+    Built to answer a question the phase ladder cannot. Measured on real activations, the
+    phase ladder's optimal write is nearly rank 1 at EVERY switch count -- r1 = 0.921 at two
+    blocks rising to 0.970 at twelve -- because its blocks alternate between the same two
+    sentence pools, so the difference slab is one direction (tense minus calm) times a sign
+    schedule, which is rank 1 by construction however many times it alternates. Rank rises
+    with the number of DISTINCT block contents, not with the number of switches.
+
+    So this task uses `m` different topics, one per block, and rotates them. The two classes
+    are the same twelve sentences read from different starting points -- exact multiset match,
+    and the mean over positions is identical, so the constant share should be near zero.
+    Predicted rank of the optimal write is `m - 1` with rank-1 share falling as roughly 2/m:
+    0.5 at m=4, 0.33 at m=6, 0.17 at m=12.
+
+    This is the only design in the set that could support an EXPRESSIVENESS claim rather than
+    a discovery one, because it is the only one where a per-token dictionary handed a perfect
+    per-position dose schedule still cannot reach most of the optimal write.
+    """
+    assert k_seg % m == 0, f"k_seg={k_seg} must divide into {m} blocks"
+    assert m <= len(TOPICS)
+    blk = k_seg // m
+
+    def make_pair(rng):
+        topics = rng.sample(range(len(TOPICS)), m)
+        a = [TOPICS[topics[i // blk]][rng.randrange(len(TOPICS[0]))]
+             for i in range(k_seg)]
+        return a, a[blk:] + a[:blk], CARRIERS[rng.randrange(len(CARRIERS))]
+
+    return make_pair
+
+
 TASKS = {
     "order": make_order,
     "recency": make_recency,
     "recency_var": make_recency_var,
     "escalate": make_escalate,
     "evidence": make_evidence,
+    "rotate2": lambda k: make_rotate(k, 2),
+    "rotate4": lambda k: make_rotate(k, 4),
+    "rotate6": lambda k: make_rotate(k, 6),
+    "rotate12": lambda k: make_rotate(k, 12),
     "phase1": lambda k: make_phase(k, 1),
     "phase3": lambda k: make_phase(k, 3),
     "phase5": lambda k: make_phase(k, 5),
