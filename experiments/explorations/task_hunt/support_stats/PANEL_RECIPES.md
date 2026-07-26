@@ -159,7 +159,7 @@ these at repatriation (merge first: `merge_panel_payload dq`):
 
 ```bash
 .venv/bin/python -m experiments.explorations.task_hunt.support_stats.stage2_variance \
-  --ds dial_real_dqgap_llama31_8b_l14 --probe v1 --post-k-rule times-T \
+  --ds dial_real_dqgap_llama31_8b_l14 --probe v1 --post-k-rule times-T --row-layout paired \
   --crosscheck-json experiments/explorations/task_hunt/diafaces/results/stage2_dial_real_dqgap_llama31_8b_l14.json \
   --out-prefix stage2_variance_diafaces_dq
 # paired v2: --probe v2 --out-prefix stage2_variance_diafaces_dq_v2
@@ -170,3 +170,11 @@ recipe recorded here for symmetry): same commands with
 `--ds dial_real_ttrend_gpt2_l7`, crosscheck
 `.../diafaces/results/stage2_dial_real_ttrend_gpt2_l7.json`,
 `--out-prefix stage2_variance_diafaces_tt[_v2]`.
+
+**Post-re-freeze note (v2-columns defect, both panels re-run at
+`db677a4b8`):** any merged FIRST-RUN rows are v1-only and UNFLAGGED, so
+`--row-layout auto` would resolve the v1 claim to the NON-QUOTABLE
+first-run population. **`--row-layout paired` is now REQUIRED for the
+v1 command on BOTH dialogue panels** (v2 always reads flagged rows).
+The merge receipt prints per-freeze row counts to make the split
+auditable.

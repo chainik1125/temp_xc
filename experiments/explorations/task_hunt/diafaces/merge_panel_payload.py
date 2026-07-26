@@ -25,15 +25,22 @@ import sys
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 LB = ROOT / "results" / "leaderboard.jsonl"
-# Two panels, two freezes (the tt/gpt2 race resolution + panel 2):
+# Two panels. After the v2-columns defect BOTH panels re-ran at the
+# re-freeze db677a4b8 — the quotable merge accepts ONLY that stamp
+# (union-merge of mac-a's re-freeze semantics + mac-b's per-stamp
+# receipt): a first-run stamp (7ba2e10fd tt / cfa341c34 dq) landing
+# here means a stale payload file in the dir — hard-fail, don't
+# disclose-and-continue. tt re-run payloads go to a FRESH dir so the
+# already-merged first-run files can't mix in. SHAs from
+# `git rev-parse`, never hand-typed.
 PANELS = {
     "tt": {"ds": "dial_real_ttrend_gpt2_l7",
-           "freeze": "db677a4b873156d274a6b223a3cc7b82ff98e997",  # v2 re-freeze
+           "freezes": {"db677a4b873156d274a6b223a3cc7b82ff98e997":
+                       "v2 re-freeze (paired v1+v2, quotable)"},
            "payloads": HERE / "results" / "panel_payloads_v2tt"},
     "dq": {"ds": "dial_real_dqgap_llama31_8b_l14",
-           # filled by mac-b (merge support) via `git rev-parse cfa341c34`
-           # — the panel-2 freeze commit the containers check out
-           "freeze": "db677a4b873156d274a6b223a3cc7b82ff98e997",  # v2 re-freeze
+           "freezes": {"db677a4b873156d274a6b223a3cc7b82ff98e997":
+                       "v2 re-freeze (paired v1+v2, quotable)"},
            "payloads": HERE / "results" / "panel2_payloads"},
 }
 ARCHS = {"batchtopk_sae", "tsae", "txc_batchtopk_pre",
@@ -68,8 +75,8 @@ def _merge_into_panel(new_results, ds: str):
 
 def main():
     panel = PANELS[sys.argv[1] if len(sys.argv) > 1 else "tt"]
-    DS, FREEZE = panel["ds"], panel["freeze"]
-    assert "FILL" not in FREEZE, "panel 2 freeze SHA not filled yet"
+    DS, FREEZES = panel["ds"], panel["freezes"]
+    stamp_counts: dict = {}
     payloads = sorted(panel["payloads"].glob("payload_*.json"))
     assert payloads, f"no payloads under {panel['payloads']}"
     existing_keys = set()
@@ -88,7 +95,9 @@ def main():
             assert r["seed"] in SEEDS, r["seed"]
             assert r["training_cfg"]["buffer_tokens"] == 524288
             cv = r["code_version"]
-            assert cv["commit_sha"] == FREEZE, cv["commit_sha"]
+            assert cv["commit_sha"] in FREEZES, cv["commit_sha"]
+            stamp_counts[cv["commit_sha"]] = \
+                stamp_counts.get(cv["commit_sha"], 0) + 1
             # Pool rows are dirty-stamped BY CONVENTION: run_experiment
             # appends to the tracked leaderboard.jsonl inside the
             # container, so every cell after the first sees a growing
@@ -111,9 +120,11 @@ def main():
             fh.write(line if line.endswith("\n") else line + "\n")
             seen.add(k)
             appended += 1
+    stamps = "; ".join(f"{n}× {sha[:9]} [{FREEZES[sha]}]"
+                       for sha, n in sorted(stamp_counts.items()))
     print(f"[leaderboard] +{appended} rows ({len(dup)} dups skipped — "
           f"idempotent re-merge); {n_dirty}/{len(new_rows)} dirty-stamped "
-          f"(pool leaderboard-growth convention, pin verified {FREEZE[:9]})")
+          f"(pool leaderboard-growth convention); pins verified: {stamps}")
     _merge_into_panel(results, DS)
 
 
