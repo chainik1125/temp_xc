@@ -127,10 +127,27 @@ mac-c). Deadline: rebuttal-grade numbers before 17:00 London
   neg_frac gate → T5 → T1 → sae_k100 → tsae shapes → twins; driver
   to write). ~13:00 hard stop for stretch cells; then analyze.py,
   table+figs both tasks, LOG verdicts PTR, ledger actuals, STATUS.
-- RLHF btk-only prerequisites still to build (morning): datasource
-  data.yaml entry `gemma_2_2b_base_l12_phase7` + acts.npy converter
-  from txcdr-base-data resid_L12.npy; evals/rlhf.py port (protocol
-  2.0.0, uses actmix_rlhf/decomp.py); driver + smoke.
+- **EM FULL STOP (Han, dca32ce6b ~00:15)**: lanes killed (T2 died
+  mid-train), 3 landed cells NON-QUOTABLE-pending-Dmitry (txc@T1
+  0.4597 l0 1056 | sae 0.5115 l0 233 | tsae 0.3923 l0 37 — E4 MISS,
+  arch-dependent threshold-transfer flagged to mac-a), close-out
+  LOG entry + ledger actuals-to-stop (−$40 corr) written ~00:30.
+  Wall logs + caches + ckpts preserved as Dmitry handover. NOTHING
+  EM relaunches. Priority test: task hunt / RLHF / sparse probing.
+- **RLHF = the lane now.** Machinery ALL BUILT + pushed: evaluator
+  port (protocol 2.0.0, shared impl in evals/rlhf.py; identity
+  check vs papermatch = 6-decimal match), datasource
+  gemma_2_2b_base_l12_phase7 (hardlinked phase-7 stream, data_key
+  44b72320bc3a56e2), frozen cells (core-first, sae_k500 = smoke/
+  neg_frac gate), pinned driver. Paper-match arm COMPLETE + pushed.
+  Lane r RUNNING solo on GPU 2 (pin 55cb658, frac cap 0.22 —
+  memory-only; full SM solo; if the T16 stretch is ever reached,
+  relaunch that cell uncapped). ETA full core ≈ 07:00–10:00.
+- [next] on lane-r cell wakes: triage (smoke gate: neg_frac +
+  realized l0 on sae_k500 first); at lane-r-drain: analyze both-arm
+  table + T-sweep fig + LOG verdict PTR + ledger actuals; stretch
+  lane rs (T8; T16 only if absurdly early) decision ~09:00; seed-1
+  cells if time. Then STATUS rewrite before any compact.
 
 ## Descope ladder (pre-stated, applied in order if time runs short)
 

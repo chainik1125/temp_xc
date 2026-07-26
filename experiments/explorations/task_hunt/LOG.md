@@ -7655,3 +7655,44 @@ is the pre-registered E4 systematic; arms are compared within-arm
 only.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+## 2026-07-27 ~00:30 London — runpod-2 — EM CLOSE-OUT under Han's full stop (dca32ce6b) + RLHF status. PENDING TEAM REVIEW.
+
+**Compliance:** EM lanes stopped ~00:15 (my kill raced mac-local's —
+same outcome); the T2-s42 cell died mid-train (~25% in, no row);
+NOTHING EM relaunches from this fleet. Wall logs preserved AS-IS at
+`/workspace/logs/actmix_em_*` (incl. the OOM/descope FAIL record);
+volume payloads preserved: cohort cache (29 hs, integrity-reproduced
+1728/0.323), BASE-L15 + organism-L{9,13,15} train caches, 3 trained
+ckpts. Dmitry's handover = these + `actmix_em/CARD.md` (frozen,
+amendments 1–5 in `cells.py`) + COMPOSITION_AUDIT § 4.
+
+**Landed cells (s42, base-L15, btk-only, 20/tok nominal, protocol
+3.0.0) — NON-QUOTABLE pending Dmitry's review:**
+
+| cell | pr_auc_S16 | realized l0/tok (eval) |
+|---|---|---|
+| txc_post_btkonly@T1 | 0.4597 | 1056.1 |
+| batchtopk_sae_btkonly | 0.5115 | 233.5 |
+| tsae_btkonly | 0.3923 | 36.7 |
+
+Card-frozen scoring on what exists: K1 passes (sae 0.51 ≥ 0.40); K3
+passed per-cell (1728/0.323); **E4 (T=1 controlled limit) MISSES**
+(|txc@T1 − sae| = 0.052 > 0.03) with the mechanism visible in the l0
+column: eval-time JumpReLU threshold transfer is ARCH-DEPENDENT at
+these widths (36.7→1056 per token at the same nominal 20) — extends
+mac-a's mechanism re-attribution (~22:20) from underfire to
+arch-dependent OVERfire; **flag for mac-a**: btk-only negative-EMA
+thresholds at wide-d_sae/small-k may gate very differently per head
+at eval. No T > 1 cell landed ⇒ no shuffle datum on EM from us.
+
+**RLHF (the priority lane):** paper-match arm was already COMPLETE +
+pushed pre-directive (topk_sae 0.613 | tsae_k500 0.631 | tsae_k20
+0.610 | agentic_txc_02 0.610 → 0.598 shuffled, gap +0.012 < 0.02 =
+R-E1 HOLDS — the shipped TXC's preference signal is
+order-insensitive, the paper's reading CONFIRMED with the
+previously-missing control; R-K3: the paper's "3 length-spurious"
+top-20 signature reproduces EXACTLY). btk-only lane r (14 cells,
+core-first, sae_k500 smoke gate) running on the freed GPU; verdict
+lands with the completed table.
+
+_Recorded-by: claude-fable-5 (runpod-2, executor)_
