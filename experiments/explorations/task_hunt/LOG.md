@@ -5333,3 +5333,71 @@ plus recomputability. One check due at verdict time: the "best gain"
 line must be matched-probe-class (MLP vs MLP tok), not cross-class.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-26 — mac-b (executor) — W1 VERDICT: the R11 order-mechanism ladder = **MIXED on 3/3** — the dialogue order signal is carried BOTH by within-turn token arrangement and by turn-block order, additively, and is concentrated in the NEAR half of the context. PENDING TEAM REVIEW
+
+Frozen card `LADDER_CARD.md` at `ede97e206` (mac-local freeze-APPROVED
+pre-results); executor `ladder.py`, scorer `ladder_score.py` (both
+committed pre-results); results `results/ladder_{gpt2,llama31_8b,
+gemma2_2b}.json`; Modal L40S, caches rebuilt in-container, 3-model
+coverage taken (hf-token live; gemma carries the largest R11 cost).
+
+**All four identity gates PASS on 3/3 — R11 reproduces exactly on
+rebuilt caches.** base win_linear within |Δ| ≤ 0.0010 of the committed
+screen at both T; L0 seed-0 (the screen's exact generator) reproduces
+the committed R11 cost at T32 to |Δ| ≤ 0.0013 (+0.0571 vs +0.0567 /
++0.0362 vs +0.0349 / +0.0615 vs +0.0626); the T16 label-null and both
+L4 foreign replicas match to ≤ 0.0007. Anchor-token identity asserted
+on all 11 000 shipped rows per model.
+
+**The decomposition (T32 = the R11 anchor; 3-seed mean costs, spread
+in parens; label-null deviation 0.0144/0.0091/0.0059):**
+
+| cost (AUC) | gpt2 | llama31_8b | gemma2_2b |
+|---|---|---|---|
+| L0 full shuffle | +0.0592 (.003) | +0.0353 (.003) | +0.0639 (.010) |
+| L1 within-turn | +0.0304 (.014) | +0.0134 (.003) | +0.0362 (.015) |
+| L2 turn-block | +0.0329 (.024) | +0.0186 (.006) | +0.0277 (.024) |
+| L3f far-half | +0.0155 (.006) | −0.0071 (.004) | +0.0054 (.005) |
+| L3n near-half | +0.0350 (.016) | +0.0373 (.007) | +0.0413 (.012) |
+
+- **MIXED (card § 4 rule 4) on the screened pair AND gemma = 3/3**:
+  L1 share of L0 = 0.51 / 0.38 / 0.57; L2 share = 0.56 / 0.53 / 0.43 —
+  both ≥ ⅓ everywhere; neither single-mechanism rule fires. T16 sign
+  robustness holds (all defining costs > 0 on 3/3; T16 costs are small
+  against their seed spreads and are quoted as signs, not magnitudes).
+- **P-DECOMP PASS 3/3 — the decomposition is ADDITIVE**: (L1 + L2) −
+  L0 = +0.0041 / −0.0033 / +0.0000. No cross-turn-mixing residue is
+  needed to explain the full cost.
+- **The near-half concentration (the recency PROFILE facet)**: L3n ≥
+  2.3× L3f on gpt2 and ≥ 7× on gemma; on llama the far half carries
+  NOTHING (−0.0071) while near-half shuffle alone (+0.0373) costs MORE
+  than the full shuffle (+0.0353). Order information lives within
+  ~1 turn of the anchor. This is not slen's generic recency (R20
+  killed that on broad text): here it coexists with genuine structure
+  sensitivity — a distance-weighted DIALOGUE-structure code.
+- **P-MECH scored honestly**: MIXED ✓ as predicted; the L2 ≥ L1
+  sub-clause holds 2/3 (gemma reverses it); L3n > L3f ✓ 3/3.
+  **P-NULL ✓**: L4 foreign 0.583–0.618 vs base 0.729–0.749 — width
+  explains none of it.
+
+**Reach disclosures (binding per mac-local's freeze review; card § 2):**
+T32 windows span 2.79–2.82 turns (mean); 95–96 % of rows are
+block-permutable; realized moved-slot fractions L0 0.97 / L1 0.91 /
+L2 0.65 / L3 halves 0.45–0.48. At T16 (1.89 turns/window, 76 %
+multi-block) all arms compress toward zero. Note L2 achieves parity
+with L1 while moving only 0.65 of slots vs 0.91 — per moved slot,
+turn-block order is the DENSER carrier (interpretive note, not a card
+quantity). Every negative-leaning cell inherits the screen CARD § 2
+power bound (within-dialogue contrast = 0.26–0.28 of the global one).
+
+**What the team gets**: R11 is converted from counterexample into
+mechanism. The one order-carried window signal outside backtracking is
+(a) real and reproducible to ±0.0013 across a cache rebuild, (b) split
+roughly evenly and additively between within-turn arrangement and
+turn-block layout, (c) concentrated within about one turn of the
+anchor, on 3/3 models. For TXC: position-mixing has something real to
+encode on dialogue, and it sits in the last ~15–30 tokens — turn-local
+arrangement plus which-turn-is-where, not a long-range order code.
+Receipt R25. Spend: ~$1 actual (17-min pipeline; est was ~$3).
+
+_Recorded-by: claude-fable-5 (mac-b, executor) — PENDING TEAM REVIEW (Sunday check-in + mac-local ratification per the 2026-07-26 process ruling)_

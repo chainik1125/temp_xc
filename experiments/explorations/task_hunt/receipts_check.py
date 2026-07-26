@@ -688,6 +688,57 @@ def build_receipts():
              "wd64_gpt2": _qwd(qg, 64), "wd64_llama": _qwd(ql, 64),
              "scmax": max(_qsc(c, T) for c in (qg, ql)
                           for T in (16, 32))}))
+
+    # ---- R25: the R11 order-mechanism ladder (dialevel, day-2 W1) ----
+    _LMODELS = ("gpt2", "llama31_8b", "gemma2_2b")
+    ldr = {m: _j(f"dialevel/results/ladder_{m}.json")["cells"]
+           for m in _LMODELS}
+    dsc = {m: _j(f"dialevel/results/screen_{m}.json")["cells"]
+           for m in _LMODELS}
+
+    def _lc(m, arm, T=32):
+        b = ldr[m][f"T{T}/base"]["auc"]
+        return b - sum(ldr[m][f"T{T}/{arm}/s{s}"]["auc"]
+                       for s in range(3)) / 3
+
+    def _lrepro(m):
+        s0 = ldr[m]["T32/base"]["auc"] - ldr[m]["T32/L0/s0"]["auc"]
+        r11 = (dsc[m]["wd/T32/win_linear"]["auc"]
+               - dsc[m]["wd/T32/win_shuf_linear"]["auc"])
+        return abs(s0 - r11)
+
+    R.append(dict(
+        id="R25",
+        artifact="dialevel/results/ladder_{gpt2,llama31_8b,gemma2_2b}.json",
+        key="T32 3-seed mean costs: base − {L0,L1,L2,L3f,L3n}; "
+            "L0 s0 vs screen win−shuf (reproduction)",
+        claim="R11 mechanism ladder (LADDER_CARD.md frozen ede97e206): "
+              "verdict MIXED on 3/3 — within-turn token order (L1) and "
+              "turn-block order (L2) EACH carry ≥ 1/3 of the full "
+              "anchor-fixed shuffle cost (L0) at T32, ADDITIVELY "
+              "(|L1+L2−L0| ≤ 0.004), with the order signal concentrated "
+              "in the NEAR half (llama: far-half shuffle −0.007, "
+              "near-half +0.037 ≥ the full cost). L0 seed-0 reproduces "
+              "the committed R11 cost on rebuilt caches to ≤ 0.001. "
+              "Quotable only with the reach disclosures beside it "
+              "(2.79–2.82 turns/window at T32, moved-slot L1 0.91 / "
+              "L2 0.65). PENDING TEAM REVIEW",
+        checks=[("l0_g", 0.059, 3), ("l0_l", 0.035, 3), ("l0_ge", 0.064, 3),
+                ("l1_g", 0.030, 3), ("l1_l", 0.013, 3), ("l1_ge", 0.036, 3),
+                ("l2_g", 0.033, 3), ("l2_l", 0.019, 3), ("l2_ge", 0.028, 3),
+                ("l3f_l", -0.007, 3), ("l3n_l", 0.037, 3),
+                ("add_absmax", 0.004, 3), ("repro_absmax", 0.001, 3)],
+        got={"l0_g": _lc("gpt2", "L0"), "l0_l": _lc("llama31_8b", "L0"),
+             "l0_ge": _lc("gemma2_2b", "L0"),
+             "l1_g": _lc("gpt2", "L1"), "l1_l": _lc("llama31_8b", "L1"),
+             "l1_ge": _lc("gemma2_2b", "L1"),
+             "l2_g": _lc("gpt2", "L2"), "l2_l": _lc("llama31_8b", "L2"),
+             "l2_ge": _lc("gemma2_2b", "L2"),
+             "l3f_l": _lc("llama31_8b", "L3f"),
+             "l3n_l": _lc("llama31_8b", "L3n"),
+             "add_absmax": max(abs(_lc(m, "L1") + _lc(m, "L2")
+                                   - _lc(m, "L0")) for m in _LMODELS),
+             "repro_absmax": max(_lrepro(m) for m in _LMODELS)}))
     return R
 
 
