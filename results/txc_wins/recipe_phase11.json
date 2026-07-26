@@ -1,0 +1,179 @@
+{
+  "task": "phase11",
+  "k": 8,
+  "d_sae": 4096,
+  "k_seg": 12,
+  "layer": 14,
+  "rows": [
+    {
+      "arm": "sae",
+      "lr": 0.0003,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.06870026141405106,
+      "reading_auc": 0.6479864716529846
+    },
+    {
+      "arm": "txc",
+      "lr": 0.0003,
+      "steps": 2000,
+      "coeff_per_segment": 11.537501017252604,
+      "fvu": 0.46787014603614807,
+      "reading_auc": 0.8330047726631165
+    },
+    {
+      "arm": "tsae_topk",
+      "lr": 0.0003,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.23218366503715515,
+      "reading_auc": 0.6477048397064209
+    },
+    {
+      "arm": "sae",
+      "lr": 0.0003,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.05981772020459175,
+      "reading_auc": 0.6933258175849915
+    },
+    {
+      "arm": "txc",
+      "lr": 0.0003,
+      "steps": 6000,
+      "coeff_per_segment": 10.66805648803711,
+      "fvu": 0.44994649291038513,
+      "reading_auc": 0.7817516326904297
+    },
+    {
+      "arm": "tsae_topk",
+      "lr": 0.0003,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.11324090510606766,
+      "reading_auc": 0.7735849022865295
+    },
+    {
+      "arm": "sae",
+      "lr": 0.001,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.06515771150588989,
+      "reading_auc": 0.7141650319099426
+    },
+    {
+      "arm": "txc",
+      "lr": 0.001,
+      "steps": 2000,
+      "coeff_per_segment": 9.20138931274414,
+      "fvu": 0.40498122572898865,
+      "reading_auc": 0.8144184947013855
+    },
+    {
+      "arm": "tsae_topk",
+      "lr": 0.001,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.12482819706201553,
+      "reading_auc": 0.6629118919372559
+    },
+    {
+      "arm": "sae",
+      "lr": 0.001,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.06322257220745087,
+      "reading_auc": 0.7158546447753906
+    },
+    {
+      "arm": "txc",
+      "lr": 0.001,
+      "steps": 6000,
+      "coeff_per_segment": 9.156250635782877,
+      "fvu": 0.35474756360054016,
+      "reading_auc": 0.8510278463363647
+    },
+    {
+      "arm": "tsae_topk",
+      "lr": 0.001,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.0639883279800415,
+      "reading_auc": 0.6753027439117432
+    },
+    {
+      "arm": "sae",
+      "lr": 0.003,
+      "steps": 2000,
+      "coeff_per_segment": 7.9986114501953125,
+      "fvu": 0.07577221095561981,
+      "reading_auc": 0.7307800650596619
+    },
+    {
+      "arm": "txc",
+      "lr": 0.003,
+      "steps": 2000,
+      "coeff_per_segment": 8.18333371480306,
+      "fvu": 0.7255893349647522,
+      "reading_auc": 1.0
+    },
+    {
+      "arm": "tsae_topk",
+      "lr": 0.003,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.06865264475345612,
+      "reading_auc": 0.6513658165931702
+    },
+    {
+      "arm": "sae",
+      "lr": 0.003,
+      "steps": 6000,
+      "coeff_per_segment": 7.9979166984558105,
+      "fvu": 0.07516235113143921,
+      "reading_auc": 0.7350042462348938
+    },
+    {
+      "arm": "txc",
+      "lr": 0.003,
+      "steps": 6000,
+      "coeff_per_segment": 8.19027837117513,
+      "fvu": 0.6751057505607605,
+      "reading_auc": 1.0
+    },
+    {
+      "arm": "tsae_topk",
+      "lr": 0.003,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.045126575976610184,
+      "reading_auc": 0.6448887586593628
+    }
+  ],
+  "best": {
+    "sae": {
+      "arm": "sae",
+      "lr": 0.0003,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.05981772020459175,
+      "reading_auc": 0.6933258175849915
+    },
+    "txc": {
+      "arm": "txc",
+      "lr": 0.001,
+      "steps": 6000,
+      "coeff_per_segment": 9.156250635782877,
+      "fvu": 0.35474756360054016,
+      "reading_auc": 0.8510278463363647
+    },
+    "tsae_topk": {
+      "arm": "tsae_topk",
+      "lr": 0.003,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "fvu": 0.045126575976610184,
+      "reading_auc": 0.6448887586593628
+    }
+  }
+}
