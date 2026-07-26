@@ -60,7 +60,7 @@ def _assert_pinned():
 
 @app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
               secrets=[modal.Secret.from_name("hf-token")],
-              memory=49152, cpu=8, timeout=3 * 60 * 60,
+              memory=131072, cpu=8, timeout=3 * 60 * 60,
               retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def run_rawgate(model: str, layer: int, t_ladder: str, tag: str) -> str:
     _assert_pinned()
