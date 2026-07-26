@@ -405,6 +405,39 @@ question, why discovery fails on SmolLM2; see Limits.)
   value is a **first-order** ceiling and the matched dose already sits 34% outside it, in the
   direction that favours the broadcast arm.
 
+## Post-sprint: the screen on a real benchmark
+
+The sprint's tasks are constructs. **Instruction-position bias is not prompt injection** — it is
+two hand-written formatting instructions at the same privilege level, positions swapped, which is
+in the behaviour family Wu et al. (ICLR 2025, arXiv:2410.09102) study but is not their task. Their
+benchmark is StruQ's, and it is public.
+
+Screened through the same training-free geometry screen, Qwen2.5-1.5B-Instruct L14, `n_docs` = 200,
+`n_grad` = 24 (`results/txc_wins/geometry_struq.json`):
+
+| attack | unsteered baseline | `c(Ḡ)` | `r1(Ḡ)` | `c(P_dom)` | `cos(P_dom, Ḡ)` |
+| --- | --- | --- | --- | --- | --- |
+| naive | +10.27 (z = 27.0) | 0.127 | 0.837 | 0.083 | −0.004 |
+| ignore | +10.70 (z = 24.9) | 0.129 | 0.774 | 0.099 | −0.002 |
+| `completion_real` | **+20.95** (z = 17.4) | 0.134 | 0.938 | 0.062 | −0.001 |
+
+**The behaviour is strongly present**, and `completion_real` measures ~2× the other two — the
+attack ladder orders as StruQ reports it, which is independent evidence the adapter is faithful
+rather than merely self-consistent.
+
+**The difference-of-means proxy would have given the opposite screening decision on all three
+attacks.** `c(P_dom)` = 0.062–0.099 sits *below* the `c < 0.1` go-threshold while `c(Ḡ)` =
+0.127–0.134 sits above it, and `cos(P_dom, Ḡ)` is −0.004 to −0.001 against a 0.0074 random
+baseline — orthogonal to within noise. **This is the fifth independent demonstration that the two
+slabs are different quantities and the first on a published benchmark rather than one of our own
+constructs.**
+
+⚠ `c` ≈ 0.13 falls inside the band containing the gate's only known inversion (`rotate6` at 0.134
+loses, evidence at 0.143 wins), so the screen does not decide this task. **The full arm set is
+running as a registered test of the screen itself**, with the prediction that the crosscoder loses
+to the best constant write at a ratio of 0.2–0.4, and the explicit alternative that a win there
+gives the gate a second inversion and moves the boundary.
+
 ## Methodology: the name was not the thing
 
 The most transferable output is a pattern, found eight times, each by reading our own code rather
