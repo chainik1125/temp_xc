@@ -5814,3 +5814,46 @@ same as every λ̂ panel; the 3 tsae dictionaries ARE recoverable from
 their single-cell containers' /repo... no — also ephemeral; noted).
 
 _Recorded-by: claude-fable-5 (mac-a, executor)_
+
+## 2026-07-26 — mac-local — REVIEW: tt panel verdict APPROVED AS SCORED (KEEP by frozen P1∧P5, P4 failed centrally) with a BINDING quote licence; the panel's most important number is outside its own claiming set
+
+Verified from the quotable-freeze leaderboard rows (db677a4b8,
+n = 3 each): stacked/T32 trained 0.2180 vs untrained 0.1763 (0.81×
+— P4 bar was ≤ 0.5×); pre/T32 trained 0.0879 vs untrained 0.1261
+(training NEGATIVE for pre); post/T32 trained 0.2968 vs untrained
+0.0037; sae 0.0320 / tsae 0.0408 (the per-token-quiet screen profile
+carried to panel); evidence line at T32 = 0.114 (pre-measured).
+The verdict as scored is correct under the frozen card: P1 fires
+(stacked +0.186 over sae), P5 fires (v2 grouped +0.327), P4
+falsified and DISCLOSED. KEEP stands because the card wired KEEP to
+P1 ∧ P5 — and the card was frozen before any cell, so no re-scoring.
+
+**BINDING QUOTE LICENCE (this is the review's substance):**
+1. The licensed claim is ORDERING + evidence-line clearance:
+   "pooled window codes (stacked 0.218, matched-post 0.297) recover
+   the dialogue turn-length trend far above per-token codes
+   (0.032–0.041) at T32 under the code-readout convention, beating
+   the visible-boundary bar (0.114)" — ALWAYS with the P4 sentence
+   beside it: "untrained pooled projections already recover 0.176
+   (stacked); the trained−untrained delta is +0.042 for stacked and
+   NEGATIVE for pre."
+2. **"TXC-pre recovers the trend" is NOT licensed** — pre failed its
+   own training receipt here. No latent-state-learning language for
+   pre/stacked on this panel.
+3. **post/T32 (+0.297 vs +0.004 untrained, 2.6× the evidence bar)
+   is the panel's cleanest result and is formally an OBSERVATION**:
+   the frozen P1 claiming set was "pre or stacked" (inherited from
+   the λ̂ card). It is quotable as an observation with its receipts,
+   never as the panel's KEEP. Team review should consider the
+   one-command post-scoped follow-up (pre-registered claiming set
+   including post) post-deadline.
+4. Program-level: this is the third measured instance of strong
+   UNTRAINED pooled recovery (fineweb v2-untrained elevation; oprate
+   §3d finding 3; now dialogue at panel scale) — the untrained
+   control is now established as load-bearing on real substrates,
+   and every future panel quote carries it.
+
+dq panel (the thread's main event) still in flight with the OOM
+re-pass. Ledger ≈ $118 incl. estimates.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
