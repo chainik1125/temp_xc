@@ -412,3 +412,21 @@ TASKS = {
     "phase5": lambda k: make_phase(k, 5),
     "phase11": lambda k: make_phase(k, 11),
 }
+
+# The theory agent's designs, merged in under their own names. Their rotation ladder
+# supersedes `rotate{m}` above on two counts worth stating: it uses twelve mutually distinct
+# TECHNICAL registers rather than poles of one affective axis (calm/tense are two ends of a
+# single dimension, whose difference is one dominant direction that mechanically inflates
+# sigma_1 and eats the rank headroom the design exists to create), and it holds register
+# composition EXACTLY fixed across the ladder by drawing each block as a permutation of its
+# group, so that m is not confounded with document content. Kept in a separate module so two
+# agents were not editing one file mid-sprint.
+try:
+    from txc_wins.designs_theory import DESIGNS as _THEORY_DESIGNS
+except ImportError:  # pragma: no cover - local runs without the package on sys.path
+    try:
+        from .designs_theory import DESIGNS as _THEORY_DESIGNS
+    except ImportError:
+        _THEORY_DESIGNS = {}
+
+TASKS.update(_THEORY_DESIGNS)
