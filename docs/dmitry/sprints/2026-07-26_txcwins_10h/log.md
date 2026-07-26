@@ -1529,3 +1529,38 @@ organism-dependent interpretability, expected value there is low.
 The literature agent has been told to stop scanning and write. Nineteen entries, nothing above
 priority 2 resting on an unverified citation, four of its own claims withdrawn on checking and
 recorded in place rather than deleted so the reasoning that produced each error stays visible.
+
+## 23:42 — the open question: is rank-1 an accident of task choice, or structural?
+
+Every steering win this project has produced is rank 1 — four trajectory tasks, the k-sweep,
+the 81% generation demonstration, last sprint's order task, and the phase ladder at all four
+rungs. Recency is the only possible exception and its `r1` is not yet measured. That many
+independent tasks landing on the same value suggests a reason rather than a coincidence.
+
+**Working hypothesis, put to the theory agent to verify or refute:**
+
+> The rank of a task's optimal write equals the number of **distinct semantic attributes**
+> whose positional pattern differs between the two conditions.
+
+Most tasks manipulate one attribute — formality, tense, refusal, intensity — whose
+per-position realisation is that single direction scaled by a schedule, so the difference slab
+factors as `schedule ⊗ attribute` and is rank 1 by construction. No amount of complexity in
+the *schedule* changes that. It fits everything measured: a two-block swap manipulates one
+attribute and is rank 1; an m-block rotation manipulates m block types and is rank m−1;
+recency manipulates two things whose positions differ — the instruction's lexical content and
+the downstream governing state — and is predicted rank exactly 2.
+
+It also explains the finding that most surprised us: **the phase ladder is rank 1 at every
+rung despite arbitrarily fast alternation**, because alternation makes the schedule
+complicated rather than the attribute set larger.
+
+If it survives, it is a design rule with teeth and probably the sprint's most transferable
+output: **an expressiveness result requires a task in which two or more distinct attributes
+must move in different directions at different positions.** Whether such a task can be built
+naturally in language — rather than by construction — is then the question the next sprint
+would open with.
+
+Also queued with theory: the contingency prose for the case where recency's `r1` lands above
+0.85, in which the project's honest position is many discovery wins and no expressiveness win.
+Drafting that before the number arrives is deliberate — it stops the framing being chosen
+under time pressure once the result is known.

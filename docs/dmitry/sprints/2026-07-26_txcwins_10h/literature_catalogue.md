@@ -412,8 +412,12 @@ wider literature "crosscoder" means *cross-layer or cross-model* (model diffing,
 Crosscoders for diffing MoEs and Dense models*, [arXiv:2603.05805](https://arxiv.org/abs/2603.05805);
 *Localizing RL-Induced Tool Use to a Single Crosscoder Feature*,
 [arXiv:2606.26474](https://arxiv.org/abs/2606.26474) — ids unverified). A reader will assume
-that meaning unless "temporal / cross-position" is said explicitly every time. The upside is
-that the cross-*position* variant really is under-explored.
+that meaning unless "temporal / cross-position" is said explicitly every time. Both were checked:
+*Localizing RL-Induced Tool Use to a Single Crosscoder Feature* (Shportko et al., 2026) uses
+**cross-layer** "Dedicated Feature Crosscoders", and *Sparse Crosscoders for diffing MoEs and
+Dense models* (Chaudhari, Hundia, Gulati, 2026) uses **cross-model** BatchTopK crosscoders with
+designated shared features. Neither is cross-position. The upside is that the cross-*position*
+variant really is under-explored — I found no windowed-dictionary prior art at all.
 
 ### A fairness point the sprint should settle before claiming a win
 
@@ -865,6 +869,13 @@ the entry's main attraction.
 the logit margin on the correct next call, teacher-forced, exactly as in the existing harness.
 Segment = one tool call, `T` = number of calls.
 
+**One caution from the adjacent literature.** Shportko et al. localise RL-induced tool *use* to a
+**single crosscoder feature**, reporting that encode-decode reconstruction improves the RL
+model's tool correctness by +31.1 ± 9.7 pp and even spills over to the base model (+6.8 ± 5.0 pp)
+without retraining. That is about tool-use capability rather than call *ordering*, so it does not
+directly saturate this entry — but it is one more instance of the pattern in the main-conclusion
+section, and it means the burden is on us to show ordering is not similarly localisable.
+
 **Why 3 rather than higher.** Building a set of tasks with genuine, unambiguous dependency
 structure is real work, and a 1.5B model's function-calling ability is marginal — this likely
 needs a 7B, which the top two entries do not. It is the entry I would reach for if the sprint
@@ -1307,7 +1318,7 @@ measured on a completely different task.
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
-  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
+  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2606.26474 (cross-layer crosscoder, RL tool use), 2603.05805 (cross-model crosscoder, MoE diffing), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
 - **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
   and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
@@ -1316,7 +1327,7 @@ measured on a completely different task.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
   2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2408.15221,
   2605.01687, 2605.02647, 2606.08644, 2605.26537, 2603.03258, 2601.04170, 2604.11978,
-  2605.03907, 2603.05805, 2606.26474, 2512.02194, 2411.16594.
+  2605.03907, 2512.02194, 2411.16594.
   All are single mentions in lower-tier entries; nothing load-bearing above priority 2 rests on
   an unverified id.
 - **Claims withdrawn on checking:** that a published turn-shuffle ablation exists for
@@ -1455,3 +1466,10 @@ the per-pass times are ordering only, not measurements.
   hidden capability on these organisms where prompting succeeded. Added **Turn-Averaged SAEs**
   (2606.28548) as a fifth baseline rung — segment pooling with order destroyed, i.e. the screen's
   R2, now a citable published architecture rather than a control we invent.
+- **Pass 20** — added a **compute-feasibility section** mapping every entry to what fits on a
+  24 GB A10G/L4, which the brief asked for and which reinforces the ranking: everything at
+  priority 4 and above runs on a 1.5B with short contexts, the only regime where five dictionary
+  arms plus a full control set fit in one night on one card. Verified both crosscoder papers
+  behind the naming-hazard claim — one cross-layer, one cross-model, neither cross-position — and
+  noted that Shportko et al. localise RL-induced tool *use* to a single crosscoder feature
+  (+31.1 ± 9.7 pp), one more instance of the localisation pattern.
