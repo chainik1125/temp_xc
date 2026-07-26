@@ -42,6 +42,17 @@ comes from the difference-of-differences structure rather than from matching, an
 reads `Gbar`, the gradient of that metric, not `P_dom`. `c(P_dom)` is reported anyway so the
 divergence between the two slabs stays visible, but it is not what the task is screened on.
 
+TWO THINGS A READER WILL STOP ON, both expected.
+
+  * The continuations differ in length -- ` hacked!` against four words of the legitimate
+    answer -- so each raw `score(doc)` carries a length bias. The reported quantity is
+    `score(A) - score(B)` with the SAME two continuations on both sides, so the bias is
+    identical in each term and cancels exactly. Nothing needs correcting.
+  * `completion_real` produces a prompt with TWO `### response:` and TWO `### instruction:`
+    markers (verified: 2/2, against 1/1 for naive and ignore). That is the attack working
+    as designed -- it forges a completed turn and opens a new instruction block -- not a
+    construction bug.
+
 SEGMENTATION RULE, stated because it is a free choice. Each document is cut into `k_seg`
 contiguous pieces AT EXISTING SINGLE-SPACE BOUNDARIES, chosen as close to equal character
 length as the available spaces allow. Cutting only at spaces means the harness's
