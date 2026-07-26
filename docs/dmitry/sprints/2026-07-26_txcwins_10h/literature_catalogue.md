@@ -1123,6 +1123,20 @@ not transfer.
   (drift is not a permutation of anything). It is the natural *next-sprint* target if the
   window code turns out to help at long range, and it is the setting where PSAE-style slow
   features were already shown to be useful.
+- **Planning / lookahead in generation — reject, and the evidence is unusually clean.** The brief
+  listed this, so it is worth recording why it fails rather than omitting it. Ma & Rui, *Where's
+  the Plan? Locating Latent Planning in Language Models with Lightweight Mechanistic
+  Interventions*, 2026 ([arXiv:2605.07984](https://arxiv.org/abs/2605.07984) — verified) probe and
+  activation-patch across model families and scales on rhyme planning. Two findings kill it for
+  us. First, planning is **localised to a single position**: in the one model that causally
+  relies on it, the causal driver "migrates from the rhyme word to the line boundary around layer
+  30", and path patching recovers roughly **90% of the planning capacity at the newline token**
+  through five attention heads. A behaviour whose causal locus is one token and five heads is the
+  per-token dictionary's home ground. Second, the causal reliance appears only at
+  **Gemma-3-27B** — other models "condition on the rhyme word throughout generation, with
+  near-zero causal effect at the line boundary despite strong probe signal", which is also a neat
+  reminder that a strong probe signal is not a causal handle. Out of scale range and structurally
+  wrong.
 - **CoT unfaithfulness** — the mismatch is between a stated reason and an internal one: a
   relation between a prompt hint and a final answer, not a pattern across positions. Turpin et
   al. ([arXiv:2305.04388](https://arxiv.org/abs/2305.04388)); Lanham et al., *Measuring

@@ -1306,3 +1306,34 @@ gives the pair a natural narrative.
 Induction and repetition are dropped rather than screened: copying-ness and repetitiveness
 are exactly the modes a broadcast write rides, and this project has already lost that fight
 on ordered-days and numbers.
+
+## 23:26 — the designated fallback: an existing result missing only its dictionary arm
+
+If the demonstration-order gate comes back flat, the next move is **per-section style
+scheduling**, not another behaviour hunt.
+
+It is this repo's own `lang_profile` / `int_profile` promoted from construct to use case, and
+the winning numbers already exist: template +63.2 against broadcast +6.0 at k=6, the full
+k-sweep with template growing linearly while broadcast stays pinned near zero, and
+0.812 ± 0.044 per-slot generation accuracy against 0.444 at chance 0.5. P1 is exact by
+construction — the foil is a permutation of the same profile — and the DC handle is genuinely
+absent, which is assertable rather than hopeful for only two other candidates.
+
+**What makes it a contribution rather than a relabelling is the gap this sprint is equipped
+to close: those numbers use difference-of-means proxies, not trained dictionaries.**
+Converting it into a proper SAE / tSAE / PSAE / crosscoder comparison at matched realised
+out-of-sample budget is the difference between *"the optimal write has this structure"* and
+*"a trained dictionary finds that structure unsupervised"* — which is exactly the discovery
+claim the rank framework leaves standing.
+
+The use case is mundane but real: controllable generation with a per-section specification —
+"formal introduction, casual body, formal conclusion", "English abstract, French body". The
+spec is a schedule over sections and the useful intervention is a waveform rather than a
+level. Writing "be more formal" uniformly is exactly wrong on the sections that should be
+casual, which is the same failure already measured here when broadcast made text "Frenchier
+everywhere, which is exactly wrong on half the slots".
+
+Honest limit if it becomes the headline: the constituency is smaller. Style scheduling is a
+product convenience rather than an eval-validity or safety problem, so it is the fallback
+rather than the lead — but it is the lowest-risk use of an idle slot, since it needs no new
+corpus design and its structure is already verified.
