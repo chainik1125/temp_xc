@@ -1279,3 +1279,57 @@ cost of tying atoms to absolute position.
 capacity cap outright; both ReLU variants and AuxK are stuck at 2% of budget. BatchTopK's
 spend slightly exceeding 100% is the eval-time threshold approximating the train-time batch
 rule rather than reproducing it exactly, which is expected. `batchtopk` is the default.
+
+## Recovery, corrected: no collapse, and the rule is T >= L with headroom
+
+`recovery_local.py` rerun at stride 1.
+
+| extent | T=1 | T=2 | T=4 | T=8 | T=16 |
+|---|---|---|---|---|---|
+| L=1 | 0.911 | 0.990 | 0.999 | 0.997 | 0.987 |
+| L=2 | **0.816 / 0.816** | 0.819 | 0.933 | 0.990 | 0.966 |
+| L=4 | **0.661 / 0.662** | 0.754 | 0.831 | 0.921 | 0.919 |
+| L=8 | **0.481 / 0.481** | 0.612 | 0.701 | 0.770 | **0.905** |
+
+The T=16 column previously read 0.338-0.461 for every extent and now reads 0.905-0.987. The
+collapse was entirely the window-count confound; there is no evidence that excess T harms
+recovery once the data is held constant. Every extent rises and plateaus.
+
+The T=1 column is unchanged and still sits exactly on the analytic ceiling, so the
+geometric result — a per-token dictionary saturates `‖largest contiguous T-chunk of p‖/‖p‖`
+and cannot be trained past it — survives the correction intact. That is the one finding in
+this sprint that has not moved.
+
+Saturation is at **T ≥ L with headroom**, not T = L: L=8 peaks at T=16 rather than T=8,
+because a window of exactly L admits only one alignment of the feature while a longer one
+admits several. The earlier "set T to the extent" phrasing was too tight even for the case
+where extent is well defined.
+
+## Refocusing on the actual deliverable
+
+The sprint's goal was a benchmark of the crosscoder against SAE baselines, and the
+methodology work — necessary, since every prior comparison was matched on a quantity that
+does not bind — has crowded it out. `bench4_modal.py` is the benchmark, with the sprint's
+findings built in: realised coefficients per segment as the axis, stride-1 windows,
+`batchtopk` for the crosscoder, and the run-length corpus so a window factor exists, with
+the i.i.d. corpus as the control where window-AUC must read 0.5.
+
+Arms: `sae` (TopK), `stacked` (T independent per-position SAEs — the crosscoders-paper
+baseline), `txc`, `tfa` (attention TemporalSAE with TopK), `tsae_paper` (the same module
+with ReLU + L1, which is what this repo's `experiments/ward_backtracking_txc/
+architectures.py` calls Bhalla-2025-faithful), and `tsae_nce` (per-token TopK SAE with an
+InfoNCE consistency penalty between codes one position apart).
+
+**An unresolved identification, flagged rather than guessed.** The repo defines `tsae_paper`
+as the attention module with ReLU+L1. The description I was given is a T-SAE with an InfoNCE
+penalty over nearby positions and no attention. Those are different architectures, and this
+repo contains no InfoNCE-based tSAE — its InfoNCE code lives in
+`han_arch/txc_bare_*contrastive*`, which are crosscoder variants. Both readings are
+therefore run as separate arms. The InfoNCE arm's alpha (1.0) and shift (1 position) are my
+choices, not the paper's, and are recorded in the output; the comparison should be read as
+"an InfoNCE-regularised per-token SAE" rather than as a faithful reproduction until the
+reference implementation is available.
+
+Sparsity for the ReLU+L1 arm is set by `l1_coef` rather than k, swept over
+{1e-1, 3e-2, 1e-2, 3e-3}. That it can be compared with the TopK arms at all is the payoff
+of the realised-coefficient axis.
