@@ -2258,3 +2258,32 @@ architectures.
 
 The provenance rule worked. Every number above was read from a result file before it was written,
 and doing so caught a pending-arm report that was already answered.
+
+## 00:05 — three corrections to my own corrections
+
+**`r1` un-retracted, narrowed.** My cross-task comparison of absolute rank-1 arms was invalid —
+the denominator moves 76 → 275 across the ladder. As the within-task ratio the law is stated on,
+it holds to 10/12/12% at m = 3, 6, 12 and fails only at m = 2, where `grad_rank1` > `grad_slab`
+is self-diagnosing evidence of a non-linear regime. Standing form: `r1` bounds what a rank-1
+*write* reaches; it does not forecast what a *crosscoder* achieves.
+
+**`c` separated from `r1` on a four-rung ordering test**, not on the single win — both statistics
+are minimised at m=12, so one win cannot discriminate. `sqrt(c)` predicts `sae_broadcast/grad_slab`
+with 4/4 rank agreement including the non-monotone m=3 > m=2 inversion that `r1` gets wrong.
+
+**`c` is necessary, not sufficient**, with a counterexample rather than a caveat: Qwen2.5-0.5B
+(`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037) are in the winning range and show no effect from any
+write, supervised included.
+
+**The headline is scoped to one model.** No `(T,d)` write at the tested layer shifts instruction
+obedience on either smaller model — a statement about where the behaviour is linearly manipulable,
+not about architectures. The bias also flips sign: Qwen-1.5B is recency-driven, the other two are
+primacy-driven, so the task is "instruction-position bias" with the sign per model.
+
+**A provenance violation of my own**, an hour after imposing the rule: I wrote z = −4.2 for the
+m=3 rung from an agent's prose without opening the file. It is −2.86. Corrected in its own commit.
+
+Pattern of the night, named by theory and worth keeping: three times the reasoning was sound and
+the runnable artefact said something else — a script printing `nan` under its conclusion, a
+checklist missing its first item, an arm reported pending that had already answered. Running the
+thing caught all three.

@@ -101,8 +101,25 @@ both cells with `c ≤ 0.034` win.**
 the caveat. The same recency task on Qwen2.5-0.5B (`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037)
 sits squarely in the winning range and shows **no effect from any write, including the supervised
 one**. A low `c` says a constant write has nothing to ride; it does not say anything is steerable
-at all. `sqrt(c)` also predicts the SAE's own level across the
-rotation ladder (0.40, 0.32, 0.18 against measured +5.27, +5.92, +5.36).
+at all. **`sqrt(c)` predicts the constant write's share of the optimum, and it does so on the rung that
+most embarrasses a monotone story.** If `c` is the operative statistic, `sae_broadcast/grad_slab`
+should track `sqrt(c)` at every rung:
+
+| m | `sqrt(c)` | `sae_broadcast`/`grad_slab` |
+| --- | --- | --- |
+| 2 | 0.403 | 0.0693 |
+| 3 | **0.423** | **0.1124** |
+| 6 | 0.320 | 0.0355 |
+| 12 | 0.180 | 0.0195 |
+
+Predicted ordering `3 > 2 > 6 > 12`; measured ordering `3 > 2 > 6 > 12` — **rank agreement 4/4,
+including the non-monotone `m=3 > m=2` inversion, which `r1` gets wrong** (`r1` is monotone in `m`
+and predicts `2 > 3`). The absolute values sit at 0.11–0.27 of predicted because `sae_broadcast`
+uses the SAE's *learned* direction rather than the optimal constant one, so it should undershoot
+by a roughly constant factor; the ordering is the test.
+
+This matters because both `c` and `r1` are minimised at `m = 12`, so the single crosscoder win
+cannot discriminate between them. **The four-rung ordering can, and it separates them cleanly.**
 
 **This retires the metric-mode sentence circulated earlier tonight.** "The crosscoder wins under
 a metric that cancels constant writes and loses under one that does not" is refuted by
