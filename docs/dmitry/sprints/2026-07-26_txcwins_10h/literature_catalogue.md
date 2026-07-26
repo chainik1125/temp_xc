@@ -51,7 +51,7 @@ The evidence is a consistent run of saturation results, each found while trying 
 | --- | --- | --- |
 | refusal | a single direction at a single position near-saturates | Arditi et al.; this repo's own screen |
 | MCQ option order | token bias over option-ID tokens; a content-invariant position attractor | 2309.03882, 2604.26206 |
-| repetition onset | a **single sign-inverted neuron** fixes loops at normal budgets | 2606.13705 |
+| repetition onset | three independent fixes: a **single sign-inverted neuron**; repetition-neuron edits; KV-cache tail pruning cutting loop incidence by **>90pp** | 2606.13705, 2507.07810, 2604.10044 |
 | emergent misalignment | a transferable misalignment direction | 2506.11618 |
 | backtracking | reasoning behaviours "controlled by linear directions" | 2506.18167 |
 | entity / state tracking | the model aggregates at the last token rather than tracking incrementally | 2605.30233 |
@@ -472,7 +472,7 @@ crosscoder loses, whatever the P1 and P2 columns say.
 | Repetition loops (loop escape) | yes | **yes** (repetitiveness is the mode) | free | yes | segment = repeated unit | 2 |
 | Steganography / encoded reasoning | **yes** | none | **none at reachable scale** | yes | segment = sentence | 2 |
 | Sandbagging / password-locking | no | yes | released organisms | partly | poor | 2, steering already failed |
-| Sycophancy build-up | partial | yes | free | no | segment = turn | 2 |
+| Sycophancy build-up | partial | **yes** (agreeableness is a mode) | free | no | segment = turn | 2 |
 | Refusal onset | no | **yes** (Arditi saturates) | free (repo infra) | partly | separate | 1 |
 | Evaluation awareness | no | yes (Shape B) | released organism | no | poor | 1 |
 | Emergent misalignment persona drift | no | yes (transferable direction) | repo c6_em | no | poor | 1 |
@@ -975,9 +975,25 @@ accuracy as much as the slab, the entry dies cleanly and fast.
 
 **Demoted for the same reason as induction, only more so.** Repetitiveness is the broadcastable
 mode par excellence, and the constant-write intervention against it — a flat repetition penalty —
-is not merely conceivable but deployed. Combined with the verified single-neuron result below,
-which already handles loop onset, there is very little left for a window code to claim. Kept for
-the mechanism notes and because loop *escape* remains formally untested.
+is not merely conceivable but deployed.
+
+The saturation evidence is now three-deep, which settles it:
+
+- a **single sign-inverted neuron** fixes loops at normal generation budgets on Gemma 4 IT
+  variants, from baseline failure rates as high as 95% ([arXiv:2606.13705](https://arxiv.org/abs/2606.13705), verified);
+- Doan, Hiraoka & Inui, *Understanding and Controlling Repetition Neurons and Induction Heads in
+  In-Context Learning*, 2025 ([arXiv:2507.07810](https://arxiv.org/abs/2507.07810) — verified)
+  find repetition neurons whose ICL impact varies with layer depth and derive strategies for
+  "reducing repetitive outputs while maintaining strong ICL capabilities";
+- Xu et al., *LoopGuard*, April 2026 ([arXiv:2604.10044](https://arxiv.org/abs/2604.10044) —
+  verified) prune repetitive tail spans from the KV cache under a fixed budget and **reduce loop
+  incidence by over 90 percentage points** while restoring output diversity, shipping *LoopBench*
+  alongside it.
+
+Three independent, cheap, largely per-token or cache-level interventions already solve this. Kept
+for the mechanism notes and because loop *escape* remains formally untested, but a window code
+has essentially nothing to claim here. If anyone does revisit it, LoopBench is the evaluation to
+use rather than a home-made repeat-rate metric.
 
 | paper | what it gives us |
 | --- | --- |
@@ -1216,9 +1232,16 @@ not transfer.
 ### Lower tier, with the reason each is low
 
 - **Sycophancy build-up** — accumulates over turns, and a matched foil is constructible (same
-  user turns reordered so agreement pressure arrives late rather than early), a partial P1.
-  Needs a judge and multi-turn generation; too heavy for tonight, good for a follow-up. Anchor:
-  Sharma et al. ([arXiv:2310.13548](https://arxiv.org/abs/2310.13548)).
+  user turns reordered so agreement pressure arrives late rather than early), a partial P1. But
+  the DC audit is unkind to it: **agreeableness is a broadcastable mode**, and "be more
+  sycophantic" is exactly the constant write that a per-token arm would use, so expect the
+  ordered-generation failure to repeat. Also needs a judge and multi-turn generation. Anchor:
+  Sharma et al. ([arXiv:2310.13548](https://arxiv.org/abs/2310.13548)). Keep at priority 2 and
+  do not revive it without first checking that the reordered foil is not separable by any
+  agreement-count statistic — which, given that reordering preserves the count, it probably is
+  not, but the *behaviour* can still be mode-carried even when the foil is matched. That
+  distinction — matched foil versus mode-carried behaviour — is the one worth holding onto from
+  the induction entry.
 - **Refusal onset** — recorded so the sprint does not rediscover the negative.
   [[temporal_benchmark_screen]] predicts it fails the steering rung: the Arditi
   single-direction single-position intervention near-saturates, so `H_steer ≈ 0` however
@@ -1306,6 +1329,52 @@ field, arrived at independently. Worth a sentence in the sprint writeup: the neg
 not an artefact of our task design, it is a property of causal transformers that somebody else
 measured on a completely different task.
 
+### Draft section for `summary.md`
+
+Written ready to paste, since the sprint reserves the last hour for writing. It stands whether or
+not tonight's experiment produces a win, because it is a claim about which behaviours *can*
+favour a window code rather than about any one result.
+
+---
+
+**A literature sweep says where a window code can help, and it is a narrow place.**
+
+The open objection to the previous sprint's result was relevance: the crosscoder's steering
+advantage appeared on a construct — two orderings of one multiset of sentences — with nothing
+connecting it to a behaviour anyone wants to steer. A sweep across reasoning, refusal, deception,
+degeneration, agentic and evaluation literatures answers that objection in an unexpected way. It
+did not find a long list of temporally extended behaviours a crosscoder might win on. It found
+that **almost every behaviour that looks temporally extended already has a per-token handle**:
+
+| behaviour | the per-token handle that already works |
+| --- | --- |
+| refusal | a single direction at a single position near-saturates |
+| backtracking | reasoning behaviours are "controlled by linear directions" |
+| repetition | a single sign-inverted neuron; repetition-neuron edits; KV-cache pruning cutting loops by >90pp |
+| emergent misalignment | a transferable misalignment direction |
+| MCQ option order | token bias over option-ID tokens, and a content-invariant position attractor |
+| entity / state tracking | the model reinstates bindings at readout rather than tracking incrementally |
+| planning / lookahead | ~90% of planning capacity at one token, via five attention heads |
+
+Seven literatures, seven per-token handles, each found while trying to build a case *for* the
+behaviour. Set against that, the tasks that survive share exactly one structural property: the two
+conditions are the **same multiset in a different arrangement**, so no bag-of-positions statistic
+can separate them and no constant write can exploit one.
+
+This repo had already established the necessity of that property empirically without naming it.
+A textbook position-dependent template (passphrase verification) *lost* to a broadcast write
+because it is a conjunction; ordered generation lost by 10–50× because a broadcastable mode
+carries the behaviour; and only the multiset-matched trajectory tasks won, with the template
+growing linearly in window length while broadcast sat at zero or below. The sweep supplies the
+general form of that finding: **a window code helps exactly when the target has no DC component,
+and matched multisets are how you guarantee that.**
+
+That is a more useful claim than "the crosscoder beats the SAE on task X". It says where to look,
+explains why five other directions are dead ends, and is directly falsifiable — find a behaviour
+with no matched-multiset structure where a window code wins on steering, and it is wrong.
+
+---
+
 ### Citation confidence ledger
 
 - **Fetched and verified this session:** 2104.08786 (Lu et al., ACL 2022, order sensitivity
@@ -1334,14 +1403,14 @@ measured on a completely different task.
   backtracking), 2604.26206 (position attractor in prompted sandbagging), 2603.22816 (Basu &
   Chakraborty — confirmed real, but it uses a Step-Level Reasoning Capacity metric, **not** the
   shuffle test a search summary attributed to it), 2507.02737 (Zolkowski et al., steganographic
-  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2606.26474 (cross-layer crosscoder, RL tool use), 2603.05805 (cross-model crosscoder, MoE diffing), 2606.08644 (Oh & Demberg, rebinding circuit), 2605.26537 (Zhou & May, conceptual steganography), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
+  capability gate), 2605.07984 (Ma & Rui, planning localised to the line-boundary token, causal only at 27B), 2502.02180 (Elicitation Game — activation steering failed), 2606.28548 (Turn-Averaged SAEs), 2606.26474 (cross-layer crosscoder, RL tool use), 2603.05805 (cross-model crosscoder, MoE diffing), 2606.08644 (Oh & Demberg, rebinding circuit), 2605.26537 (Zhou & May, conceptual steganography), 2507.07810 (repetition neurons and induction heads), 2604.10044 (LoopGuard, >90pp loop reduction, LoopBench), 2607.01033 (Model Organism Lottery, 54 variants), 2506.01926 (Skaf et al., steganographic CoT under process supervision).
 - **Canonical, added late:** 2306.05685 (Zheng et al., MT-Bench / LLM-as-a-judge position bias
   and the swapping control), 2310.18512 (Roger & Greenblatt).
 - **Corrected:** *Preventing Language Models From Hiding Their Reasoning* is **2310.18512**,
   not 2311.02282 as first recorded — 2311.02282 is a spark-plug fault-diagnosis paper. One
   guessed id in this note has already turned out wrong, which is the reason for the tier below.
 - **Search-surfaced, arXiv id NOT verified — do not cite externally without checking:**
-  2511.04694, 2507.07810, 2604.10044, 2601.05693, 2602.22755, 2408.15221,
+  2511.04694, 2601.05693, 2602.22755, 2408.15221,
   2605.01687, 2605.02647, 2603.03258, 2601.04170, 2604.11978,
   2605.03907, 2512.02194, 2411.16594.
   All are single mentions in lower-tier entries; nothing load-bearing above priority 2 rests on
@@ -1489,3 +1558,11 @@ the per-pass times are ordering only, not measurements.
   behind the naming-hazard claim — one cross-layer, one cross-model, neither cross-position — and
   noted that Shportko et al. localise RL-induced tool *use* to a single crosscoder feature
   (+31.1 ± 9.7 pp), one more instance of the localisation pattern.
+- **Pass 21** — verified four more. Conceptual steganography (2605.26537) turns out to be the
+  cleanest instance of an arrangement-carried payload anywhere in the literature, and survives
+  paraphrase defences *because* paraphrase preserves arrangement — a strong future target, still
+  out of scale range tonight. Oh & Demberg (2606.08644) give a second, converging mechanistic
+  account of entity tracking reinstating bindings at readout rather than tracking incrementally,
+  which kills that reading arm from a different direction. And the repetition saturation evidence
+  is now three-deep (single neuron, repetition-neuron edits, LoopGuard's >90pp KV-cache fix),
+  which settles that demotion.
