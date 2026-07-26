@@ -48,7 +48,13 @@ First deliverable: tabulation of the paper plots that need to be redone.
 - Markov/denoising bench emits no gauc at current protocol (hidden_features None) — the paper's latent-level denoising claim is NOT re-testable through this evaluator; eauc/nmse only. State plainly in summary.
 - tsae frozen bar (coupled k1 gauc 0.809): composite clears it everywhere (0.93+); btk-only sits at/near it (0.81-0.89).
 
-## Self-red-team (2026-07-27 ~01:30 UTC; red-team agent failed on the monthly Claude spend limit — flag to user)
+## Clock correction + extensions (21:25 UTC = T+1:47 — NOT T+7 as some earlier notes implied; ~8h remained at base close)
+
+- All earlier "PT" stamps in my ledger lines were mislabeled; actual base-2×2 window was 19:38–21:20 UTC (12:38–14:20 PT). The base deliverables (4-arm grid, wing, figures, summary v2) completed in ~1h45m of the 10h budget.
+- **Extension 1 (denoising probe):** the paper's §4 headline metric (linear-probe R²_global on hidden state) was untested by the v2 evaluator — implemented as an opt-in eval add-on (`src/temp_bench/evals/denoising_probe.py`, closed-form ridge α=1 standardized, 80/20 by-sequence split, same tiled eval windows; protocol version unchanged, flag-absent rows byte-identical). Campaign: markov × 4 arms × 6T × k{1,2} × 3 seeds = 144 cells, freeze v7 86b16249.
+- **Extension 2 (steps sensitivity):** n_steps 18k (3×) on coupled, arms {paper-match, btk-only} × 6T × k{1,2} × seeds{1,2} = 48 cells — closes the "slopes could shift at training length" caveat. Analyzed ad hoc (agg's first-seen preference keeps 6k rows for the headline).
+
+## Self-red-team (2026-07-27 ~01:30 UTC stamps mislabeled — actually ~21:00 UTC; red-team agent failed on the monthly Claude spend limit — flag to user)
 
 1. **Slope pooling caveat:** at d20 the per-k non-clipped T-ranges differ (k=5 contributes only T∈{1,2}), so pooled slopes partly encode where each arm's low-T deficit sits. The d50 wing (uniform coverage) is the honest slope: composite −0.009, pooled arms +0.069 — but that positive slope is *recovery toward a lower plateau* (0.65→0.79 vs composite ~0.96-0.99 flat). Letter-vs-spirit split must be explicit.
 2. **"Clip artifact" needs precision:** composite's d20 k=2 degradation starts at T=8 (k_win=16 < 20, NOT clipped) — it's *budget saturation* (k_win→d_sae proximity), gone at d50. At paper real-LM settings (k_win=100 ≪ d_sae=18432) saturation is far away → no license to extrapolate composite T-degradation to real tasks.
