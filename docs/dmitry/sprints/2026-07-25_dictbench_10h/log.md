@@ -92,6 +92,69 @@ If the structured corpus does *not* improve TXC health, then the starvation is a
 pathology independent of the data and the earlier negative stands on its own terms — which
 is also worth knowing, and is why the i.i.d. control arm is being re-run rather than cited.
 
+### 17:30 — retraction, a target dismantled by arithmetic, and the sprint's real shape
+
+Review round on the pivot. Three things land, two of them against me.
+
+**RETRACTED: the shuffled-control negative, as an architectural claim.** FVU 0.84 means the
+crosscoder explains 16% of held-out variance, so its decoder rows are largely noise, so
+"permuting its temporal arrangement costs nothing" is evidence about an *untrained*
+dictionary rather than about temporal dictionaries. I will not write "the TXC recovers X%
+of the ceiling and none of it is temporal" — the second clause is unsupported. What
+survives is the SAE-side coverage explanation, and the two nulls **as a method**.
+Registered gate for the corrected run: the TXC must reach per-segment **FVU < 0.3** on the
+structured corpus before any corpus-contrast is interpretable; below that, a flat contrast
+is 0 − 0 and the finding is the capacity bug, not a data effect.
+
+**My window-level target was wrong, and the arithmetic is embarrassing.** "Fast versus slow
+alternation" over ℓ ∈ {1,2,3,6} has change-point counts **11, 5, 3, 1** — perfectly
+separated and monotone. So the label *is* the change count. A change point is a **local**
+event (segment t differs from t−1), and the subject model is causal, so the residual stream
+at segment t already carries t−1: a per-segment "this sentence contrasts with the previous
+one" feature, mean-pooled, counts changes. Pooling is not a handicap on that target, it is
+exactly matched to it. The TXC has **no structural advantage** there, and labelling it
+"TXC can, SAE structurally cannot" would have been the same error I had just retracted,
+with the sign flipped.
+
+**The target that does isolate window structure**: hold balance *and* change-count fixed,
+vary only arrangement — regular versus irregular spacing. At k=12 there are 200 balanced
+profiles with exactly 5 change points, e.g. `110011001100` (runs 2,2,2,2,2,2) against
+`000010101111` (runs 4,1,1,1,1,4). A local change detector counts 5 in both; only something
+integrating the window separates them. This is the previous sprint's multiset-matched foil,
+moved from steering to probing.
+
+**And the corpus family is too small to prove anything.** Four run-lengths × two phases is
+**8 distinct profiles ≈ 3 bits**, against 924 balanced ones — a d_sae=4096 dictionary can
+allocate a latent per profile, so any "learned temporal structure" on that family is a
+lookup table. The fix is a **change-probability sweep**, p ∈ {0.5, 0.35, 0.2, 0.1}: the
+broken i.i.d. corpus becomes the *left endpoint of a dose–response curve* rather than a
+separate arm, and the claim becomes "the advantage grows with the corpus's autocorrelation
+length" — a monotone trend over four points for about the same compute.
+
+**Correction to my own retraction, in my favour.** I wrote that a window code
+*structurally cannot* carry segment-level labels. That is too strong: d_sae scalars per
+window is ample for 12 bits. What made it chance was that the labels were **i.i.d.**, so no
+code of any capacity could carry them. That is error 1 again, not a separate structural
+fact — and it matters, because the corrected run re-probes segment-level on structured
+data, where the TXC may well beat chance.
+
+**The sprint's real shape**, which is a better framing than the one I proposed: *three ways
+a temporal-dictionary benchmark breaks, each caught and measured tonight* — **capacity**
+(the sparsity knob does not bind), **data** (the corpus must carry the factor's temporal
+structure or the comparison is vacuous), **measurement** (the evaluation must ask each code
+a question it can represent, and the baseline must be the strongest form of the opponent).
+Each has a measured example, each is a mistake made and caught rather than speculated
+about. And explicitly **not** attempted: an architectural verdict. One seed, one model, one
+task is exactly the setup that produced four confounded positives last sprint and one
+tonight.
+
+Priority 1 launched: the **b_enc mechanism** (`mechanism_modal.py`) — predicted, and
+checkable in minutes, that the encoder learns a strongly negative `b_enc` to route around a
+k far larger than reconstruction needs, so realised L0 ≈ min(k, #{pre > 0}) with the second
+term binding. If it holds, it invalidates every crosscoder-vs-SAE comparison matched on
+nominal k, including this project's own, and it ships with a fix: set k from a *target
+realised L0*.
+
 ### 16:19 — kickoff
 
 Branch `dmitry-dictbench-10h`. Question: does a temporal crosscoder beat a TopK SAE at

@@ -803,6 +803,135 @@ recomputing against the alive set rather than `d_sae`.
    longer the arm that decides the question, it is the arm that makes the result *useful* —
    the constructive number a reader needs. Fourth, not first.
 
+### A9 — A8 has fired: the shuffled-control negative must be withdrawn as an architectural claim
+
+FVU 0.84 against the SAE's 0.03 means the crosscoder explains **16% of the variance**. A
+dictionary that weak has decoder rows that are mostly noise, so "permuting its temporal
+arrangement does not hurt" is not evidence about temporal dictionaries — it is evidence
+about an untrained one, and it is exactly what A8 registered as the branch that narrows the
+headline. The sentence *"the TXC recovers X% of the ceiling, and none of it is temporal"*
+must not be written. What survives from that run is the SAE-side coverage explanation and
+the two nulls as a **method**; what does not survive is any statement of the form "learned
+arrangement is worthless".
+
+Gate for the new 2×2, registered: **the TXC must reach per-segment FVU < 0.3 on the
+structured corpus** before a null corpus-contrast means anything. Below that, a flat
+structured-versus-i.i.d. contrast is 0 − 0 and the finding is the capacity bug, not a data
+effect.
+
+### A10 — "fast versus slow alternation" is change-point counting, and a pooled SAE code solves it
+
+**This is settled by arithmetic, not opinion.** For the periodic family at `k = 12` the
+change-point counts are:
+
+| profile | ell | change-points |
+| --- | --- | --- |
+| `101010101010` | 1 | 11 |
+| `110011001100` | 2 | 5 |
+| `111000111000` | 3 | 3 |
+| `111111000000` | 6 | 1 |
+
+Perfectly separated and monotone, so the window-level label **is** the change-point count.
+A change-point is a *local* event — segment `t` differs from segment `t−1` — and the subject
+model is causal, so the residual stream at segment `t` already encodes segment `t−1`. A
+per-segment feature meaning "this sentence contrasts with the previous one" therefore fires
+at each change, and its **mean over the window is the change-count**. Two consequences:
+
+- **The task is fully solvable by a mean-pooled per-segment SAE code.** Pooling is not a
+  handicap here — change-count is a sum of local pairwise indicators, so an order-invariant
+  aggregator is exactly matched to the task. My earlier instinct that pooling is the weakest
+  SAE baseline is wrong for *this* target.
+- **The TXC therefore has no structural advantage on it.** If the TXC wins it is about
+  compactness (fewer selected features), not representability; if the SAE loses it is a
+  training or probing artifact, not a structural fact. Do not describe this target as
+  "TXC can, SAE structurally cannot" — that is the same class of error as the segment-level
+  measurement just retracted, with the sign reversed.
+
+**The target that does isolate window structure: matched change-count, regular versus
+irregular spacing.** Hold balance *and* change-count fixed and vary only the arrangement of
+the changes. A local change-detector counts five in both cases; only something integrating
+over the window can separate them. Concretely, against the `ell = 2` target there are
+**200** balanced profiles with exactly five change-points:
+
+```text
+target  110011001100   runs [2,2,2,2,2,2]   run-length sd 0.00
+foil    000010101111   runs [4,1,1,1,1,4]   run-length sd 1.41
+foil    000011110101   runs [4,4,1,1,1,1]   run-length sd 1.41
+```
+
+This is last sprint's multiset-matched foil transplanted from steering to probing, and it
+is the same principle that made the trajectory task good. Registered prediction: mean-pooled
+SAE codes reach **> 0.85 AUC** on fast-versus-slow and **≈ 0.5** on regular-versus-irregular,
+while the TXC is the only code with a route to the second. That contrast, not the first
+task, is the window-level result worth having.
+
+**Strongest form of the SAE baseline**, since it was asked: run three, not one — mean-pooled
+codes, **last-segment-only** codes (tests how much the causal context already carries, and
+it is the control that most threatens any TXC win), and **concatenated per-segment** codes
+at a matched number of *selected* features using the repo's existing sparse-probing
+convention (`PROBING_K_VALUES = (1, 2, 5, 20)`). Matching selected features rather than
+input dimension is what keeps the probe capacities comparable.
+
+### A11 — the run-length family is 8 profiles, which is memorisable; sweep autocorrelation instead
+
+`ell ∈ {1,2,3,6} × 2 phases` is **8 distinct profiles**, against 924 balanced ones at
+`k = 12`. That is three bits of profile entropy, and a `d_sae = 4096` dictionary can
+allocate one latent per profile. Any "the crosscoder learned temporal structure" result on
+that family is a lookup table, and periodicity-generalisation is the smaller of the two
+problems.
+
+**Recommendation: replace the {i.i.d., structured} 2×2 with a change-probability sweep.**
+Draw each segment's label as a Bernoulli change with probability `p ∈ {0.5, 0.35, 0.2, 0.1}`
+— mean run lengths 1, 1.5, 2.5, 5 — giving a combinatorially large family that cannot be
+memorised. The broken i.i.d. corpus is then not a separate arm but the **left endpoint**
+(`p = 0.5`) of a dose-response curve, and the claim becomes "the crosscoder's advantage
+grows with the autocorrelation length of the corpus", which is a monotone trend over four
+points rather than a two-point contrast, for about the same compute. Keep the periodic
+family as a labelled easy condition so the result can be shown not to depend on periodicity.
+Registered prediction: if the advantage is not monotone in `p`, the architecture is not
+exploiting temporal structure and the negative is clean.
+
+### A12 — the honest deliverable, and the one thing not to attempt
+
+The proposed pair — parameter-regime finding plus comparison methodology — is defensible
+but undersells what is actually in hand. A stronger framing, same evidence:
+
+> **Three ways a temporal-dictionary benchmark breaks, each caught and measured in one
+> sprint.** *Capacity*: the sparsity knob does not bind. *Data*: the corpus must carry the
+> factor's temporal structure or the comparison is vacuous. *Measurement*: the evaluation
+> must ask each code a question it can represent, and the baseline must be the strongest
+> form of the opponent.
+
+Each has a measured example from tonight, each is a mistake made and caught rather than
+speculated about, and together they are a methods contribution rather than a list of
+setbacks.
+
+Inside that, one mechanistic result deserves its own figure and is the most defensible thing
+in the sprint: **TopK applied to a summed-over-`T` pre-activation does not control crosscoder
+sparsity.** Realised L0 is inert to nominal `k` across a 5× range while ReLU-kill rises to
+0.99, and the consequence is FVU 0.84. Predicted mechanism, checkable in minutes from the
+saved tensors: the encoder learns a **negative `b_enc`** to route around a `k` that is far
+larger than the reconstruction needs, so ReLU rather than TopK becomes the operative sparsity
+control. Registered: TXC `b_enc` mean strongly negative with magnitude increasing in nominal
+`k`, SAE `b_enc` near zero, and realised L0 ≈ `#{pre-activation > 0}`. If it holds, this
+invalidates any crosscoder-versus-SAE comparison matched on nominal `k` — including this
+project's own earlier ones — and it comes with a fix, which is to set `k` from a target
+*realised* L0.
+
+**The one thing not to attempt in the remaining window.** Do not ship an architectural
+verdict. One seed, one model, one task, and a corpus fixed hours ago is precisely the setup
+that produced four confounded positives last sprint and one this sprint; a "TXC wins on
+structured data" result under those conditions would be the fifth. Registered: an
+architectural claim requires **≥ 2 seeds** and the last-segment and concatenated SAE
+baselines. If those do not fit, ship the mechanism, the design, and the null.
+
+**Order for the remaining window.** (1) The `b_enc` / realised-L0 mechanism — nearly free
+and the most defensible finding. (2) Retrain the TXC at a `k` chosen from target realised L0
+and check the A9 gate. (3) Swap the window-level target to matched change-count
+regular-versus-irregular, and add the last-segment and concatenated SAE baselines. (4) The
+`p`-sweep if compute remains, else the 2×2 relabelled honestly as a two-point contrast.
+(5) Summary.
+
 ### What I will check in `frozen.json`, pre-committed
 
 In this order, and I will report anything here that is missing as a blocker rather than a
