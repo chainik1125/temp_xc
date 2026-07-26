@@ -164,10 +164,36 @@ def lane_t16():
             txc_cell(16, 1)]
 
 
+# ── AMENDMENT 4 (2026-07-26 ~23:15 London, blind — no T16 number
+# ever existed). Measured step rates (2-way GPU sharing, fp32
+# trainer path — the SAME path every v2 row used): T1 ≈ 0.21 s/step
+# and time scales ∝ T ⇒ T8 ≈ 12 h (running, kept), T16-trained
+# ≈ 15 h SOLO (≈ 24 h contended) — cannot land before the 17:00
+# deadline under any schedule, even sacrificing every other cell.
+# DESCOPE per the card's ladder, extended one rung by physics:
+# T16 TRAINED cells dropped (both seeds); T16 UNTRAINED twin kept
+# (eval-only, cheap — the T16 shuffle/floor plumbing still lands);
+# s1 window cells dropped (= rung 1, already pre-authorized);
+# s1 token cells kept (lane l tail). Trained exhibit curve becomes
+# T ∈ {1, 2, 4, 8}. The t16 waiter is DISARMED. At the T8s42 cell
+# boundary lane h is killed and relaunched as lane f below (cheap
+# untrained twins BEFORE the last trained window cell, so the
+# overlay set completes early).
+
+def lane_f():
+    """Post-T8 boundary relaunch: untrained twins first (each ~20
+    min, gives T16/T8/T4 floors + eval plumbing), then the last
+    trained window cell. Frac 0.68."""
+    return [txc_cell(16, 42, n_steps=0), txc_cell(8, 42, n_steps=0),
+            txc_cell(4, 42, n_steps=0), txc_cell(4, 42)]
+
+
 LANES = {"a": lane_a, "b": lane_b, "c": lane_c,
-         "h": lane_h, "l": lane_l, "m": lane_m, "t16": lane_t16}
+         "h": lane_h, "l": lane_l, "m": lane_m, "t16": lane_t16,
+         "f": lane_f}
 
 
 def all_cells():
-    for lane in ("m", "l", "t16"):
+    for lane in ("f", "l"):
         yield from LANES[lane]()
+    yield txc_cell(8, 42)

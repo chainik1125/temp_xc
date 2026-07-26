@@ -85,9 +85,32 @@ mac-c). Deadline: rebuttal-grade numbers before 17:00 London
   wall-jsonl actmix_em_runs_{h,l}.jsonl. Runner cache-hits make
   relaunches resumable; a quiet lane is UNKNOWN, not dead — check
   `ps` + log mtime before re-dispatching.
-- [next] calibrate T16 step-time from first [train] lines → update
-  ETA vs descope ladder; write analyze.py + render_figs.py;
-  Phase B on mac-c's pin.
+- AMENDMENT 4 (~23:15, blind): measured 0.21 s/step at T1 2-way,
+  ∝T scaling, fp32 trainer path (the path every v2 row used) ⇒
+  T16-trained ≈ 15 h solo — physically past the deadline. DESCOPED
+  T16-trained (both seeds; untrained T16 twin KEPT), s1 window
+  cells dropped (= ladder rung 1). Trained curve = T ∈ {1,2,4,8}.
+  t16 waiter DISARMED. At the T8s42 boundary (~10:20 ETA): kill
+  lane h → relaunch lane f = [untT16, untT8, untT4, T4s42].
+- RE-TASKED (Han 387268df0): EM grid completes as DMITRY-SUPPORT
+  input (card/bars unchanged); EM Phase B CANCELLED; next = RLHF
+  ablation (briefing appended to actmix-runpod-2.md; audit § 6 is
+  the pin). RLHF prep IN FLIGHT: 4 shipped seed-42 ckpts +
+  training_logs + phase-7 L12 train cache (txcdr-base-data)
+  downloading to /workspace/caches/rlhf/; gemma-2-2b downloading;
+  hh-rlhf npz NOT mirrored → rebuild via 023d52c24's
+  build_hh_rlhf_cache.py recipe (short GPU job, slip into a lane
+  gap). Paper-match arm = eval-only case-study artifacts (OUTSIDE
+  leaderboard, probe_codes precedent); btk-only arm = canonical
+  runner via a ported evals/rlhf.py (protocol 2.0.0; em.py port
+  precedent). agentic_txc_02 is matryoshka-contrastive — no v2
+  twin; btk-only TXC arm = txc_batchtopk_post_btkonly at paper
+  SHAPES (d_sae 18432, k_win=100·T), difference stated in card.
+  mac-a's identity note applies: k=500/token is DEEP selection —
+  arms may genuinely diverge here (smoke + neg_frac gate first).
+- [next] RLHF: read build_hh_rlhf_cache.py + _load_phase7_model +
+  vendored arch classes; write actmix_rlhf/ card + port; EM: lane
+  triage on completion wakes; T8 boundary surgery ~10:20.
 
 ## Descope ladder (pre-stated, applied in order if time runs short)
 
