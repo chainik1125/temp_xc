@@ -1,0 +1,82 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": 14,
+  "k_seg": 36,
+  "T": 12,
+  "d_sae": 4096,
+  "steps": 2000,
+  "lr": 0.0003,
+  "d_in": 1536,
+  "lam": 0.00016276041666666666,
+  "mean_token_norm": 21.861602783203125,
+  "fvu_denom": 460.26287841796875,
+  "sae_reference": [],
+  "tsae_curve": [],
+  "tsae_topk_reference": [
+    {
+      "kval": 8,
+      "lr": 0.0003,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "pred_l0_per_segment": 409.9242858886719,
+      "fvu": 0.4912000894546509,
+      "alive_frac": 0.044677734375
+    },
+    {
+      "kval": 8,
+      "lr": 0.0003,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "pred_l0_per_segment": 427.9581298828125,
+      "fvu": 0.21831963956356049,
+      "alive_frac": 0.0390625
+    },
+    {
+      "kval": 8,
+      "lr": 0.001,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "pred_l0_per_segment": 474.32049560546875,
+      "fvu": 0.1843618005514145,
+      "alive_frac": 0.041748046875
+    },
+    {
+      "kval": 8,
+      "lr": 0.001,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "pred_l0_per_segment": 491.9665832519531,
+      "fvu": 0.11187993735074997,
+      "alive_frac": 0.041748046875
+    },
+    {
+      "kval": 8,
+      "lr": 0.003,
+      "steps": 2000,
+      "coeff_per_segment": 8.0,
+      "pred_l0_per_segment": 577.5225219726562,
+      "fvu": 0.10656847059726715,
+      "alive_frac": 0.041259765625
+    },
+    {
+      "kval": 8,
+      "lr": 0.003,
+      "steps": 6000,
+      "coeff_per_segment": 8.0,
+      "pred_l0_per_segment": 585.6766357421875,
+      "fvu": 0.08400948345661163,
+      "alive_frac": 0.0419921875
+    }
+  ],
+  "monotone": true,
+  "l1_on": "both",
+  "usable_l1_range": null,
+  "l1_for_target_l0": {
+    "1": null,
+    "2": null,
+    "4": null,
+    "8": null,
+    "16": null,
+    "32": null
+  }
+}

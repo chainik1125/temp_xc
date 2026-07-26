@@ -116,7 +116,7 @@ ELLS = [1, 2, 3, 6]
 def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int,
           steps: int, lr: float, general_frac: float, batch_win: int,
           coarse: list, sae_budgets: list, targets: list, n_refine: int,
-          topk_grid: list, l1_on: str):
+          topk_grid: list, l1_on: str, topk_lrs: list, topk_steps: list):
     import sys
     sys.path.insert(0, "/work")
     import math
@@ -305,35 +305,47 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
     topk_rows = []
     if topk_grid:
         print("\n===== reference arm: TemporalSAE with TopK (no L1) =====", flush=True)
+        # The learning rate and step count are swept alongside k because an arm that
+        # reconstructs badly at one training recipe has two possible explanations, and only
+        # one of them is about the architecture. Last sprint a 3x change in learning rate
+        # moved a crosscoder's realised spend by 10.6x with nothing in the nominal config to
+        # show for it, so an unswept baseline is not a fair baseline.
         for kv in topk_grid:
-            torch.manual_seed(0)
-            m = TemporalSAE(dimin=d, width=d_sae, n_heads=8, sae_diff_type="topk",
-                            kval_topk=int(kv), tied_weights=True, n_attn_layers=1,
-                            bottleneck_factor=64).to(dev)
-            opt = torch.optim.Adam(m.parameters(), lr=lr)
-            m.train()
-            for _ in range(steps):
-                xb = gen_win(batch_win)
-                recons, _ = m(xb)
-                loss = (recons - xb).pow(2).sum(-1).mean()
-                opt.zero_grad(); loss.backward()
-                torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
-                opt.step()
-            m.eval()
-            with torch.no_grad():
-                xh, info = m(Who)
-                Zn = info["novel_codes"].reshape(-1, d_sae)
-                Zp = info["pred_codes"].reshape(-1, d_sae)
-                row = {"kval": int(kv),
-                       "coeff_per_segment": float((Zn > 0).float().sum(-1).mean()),
-                       "pred_l0_per_segment": float((Zp > 0).float().sum(-1).mean()),
-                       "fvu": fvu_from(xh, Who),
-                       "alive_frac": float(
-                           ((Zn > 0).float().mean(0) >= 0.001).float().mean())}
-            topk_rows.append(row)
-            print(f"  [tsae-topk] k={kv:<4} coeff/seg {row['coeff_per_segment']:7.2f}  "
-                  f"predL0 {row['pred_l0_per_segment']:7.1f}  FVU {row['fvu']:.4f}  "
-                  f"alive {row['alive_frac']:.3f}", flush=True)
+            for lr_ in (topk_lrs or [lr]):
+                for st_ in (topk_steps or [steps]):
+                    torch.manual_seed(0)
+                    m = TemporalSAE(dimin=d, width=d_sae, n_heads=8,
+                                    sae_diff_type="topk", kval_topk=int(kv),
+                                    tied_weights=True, n_attn_layers=1,
+                                    bottleneck_factor=64).to(dev)
+                    opt = torch.optim.Adam(m.parameters(), lr=lr_)
+                    m.train()
+                    for _ in range(int(st_)):
+                        xb = gen_win(batch_win)
+                        recons, _ = m(xb)
+                        loss = (recons - xb).pow(2).sum(-1).mean()
+                        opt.zero_grad(); loss.backward()
+                        torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
+                        opt.step()
+                    m.eval()
+                    with torch.no_grad():
+                        xh, info = m(Who)
+                        Zn = info["novel_codes"].reshape(-1, d_sae)
+                        Zp = info["pred_codes"].reshape(-1, d_sae)
+                        row = {"kval": int(kv), "lr": float(lr_), "steps": int(st_),
+                               "coeff_per_segment": float(
+                                   (Zn > 0).float().sum(-1).mean()),
+                               "pred_l0_per_segment": float(
+                                   (Zp > 0).float().sum(-1).mean()),
+                               "fvu": fvu_from(xh, Who),
+                               "alive_frac": float(
+                                   ((Zn > 0).float().mean(0) >= 0.001).float().mean())}
+                    topk_rows.append(row)
+                    print(f"  [tsae-topk] k={kv:<4} lr={lr_:<7.1e} steps={st_:<6} "
+                          f"coeff/seg {row['coeff_per_segment']:7.2f}  "
+                          f"predL0 {row['pred_l0_per_segment']:7.1f}  "
+                          f"FVU {row['fvu']:.4f}  alive {row['alive_frac']:.3f}",
+                          flush=True)
 
     print("\n===== stage 1: coarse log grid =====", flush=True)
     rows = [run_tsae(l1) for l1 in coarse]
@@ -438,13 +450,15 @@ def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int 
          coarse: str = "1e-3,1e-2,1e-1,1,3,10,30,100,300,1000",
          sae_budgets: str = "1,2,4,8,16", targets: str = "1,2,4,8,16,32",
          n_refine: int = 6, topk_grid: str = "", l1_on: str = "both",
-         tag: str = ""):
+         topk_lrs: str = "", topk_steps: str = "", tag: str = ""):
     import json
     r = calib.remote(model, layer, k_seg, t, n_docs, d_sae, steps, lr, general_frac,
                      batch_win, [float(x) for x in coarse.split(",") if x],
                      [int(x) for x in sae_budgets.split(",") if x],
                      [int(x) for x in targets.split(",") if x], n_refine,
-                     [int(x) for x in topk_grid.split(",") if x], l1_on)
+                     [int(x) for x in topk_grid.split(",") if x], l1_on,
+                     [float(x) for x in topk_lrs.split(",") if x],
+                     [int(x) for x in topk_steps.split(",") if x])
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
     name = f"tsae_calibration{tag}.json"
