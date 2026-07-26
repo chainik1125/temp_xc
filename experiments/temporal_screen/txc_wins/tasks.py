@@ -109,12 +109,26 @@ SETUP = [
     "The archive contains earlier sessions.", "Spell checking is turned on.",
     "The theme is set to light.", "Two devices are linked to this account.",
 ]
+
+# Fourteen more system-note lines in the same register, added ONLY so the filler pool can be
+# split into two disjoint halves that each still supply the 12 distinct slots `make_recency`
+# draws. The original fourteen are unchanged and remain the default, so every result already
+# produced with `recency` stays reproducible.
+SETUP_HELD = [
+    "The export format defaults to plain text.", "Two seats remain on this plan.",
+    "The retention window was extended last year.", "Keyboard shortcuts are enabled.",
+    "The sidebar is pinned to the left.", "Uploads are capped at twenty megabytes.",
+    "The account was migrated in January.", "Read receipts are switched off.",
+    "The billing contact is unchanged.", "Search indexes rebuild each night.",
+    "The workspace has three open projects.", "Time stamps use the 24-hour clock.",
+    "The trash empties after fourteen days.", "Draft titles are generated automatically.",
+]
 INSTR_UP = "Always write your reply in capital letters."
 INSTR_LOW = "Always write your reply in small letters."
 PROBE_PREFIX = "\nUser: Say hello.\nAssistant:"
 
 
-def make_recency(k_seg, pos_early=2, pos_late=None):
+def make_recency(k_seg, pos_early=2, pos_late=None, pool=None):
     """Which of two CONFLICTING INSTRUCTIONS the model obeys, as a function of their order.
 
     This is the sprint's first task aimed at a documented behaviour rather than a construct.
@@ -144,9 +158,16 @@ def make_recency(k_seg, pos_early=2, pos_late=None):
     if pos_late is None:
         pos_late = k_seg - 3
     assert 0 <= pos_early < pos_late < k_seg
+    # `pool` swaps the FILLER only. The two instructions are the factor and must be shared
+    # between train and eval -- but they are identical in both classes of a document, only
+    # their positions swap, so a latent keyed to instruction identity cannot separate the
+    # classes. The filler is therefore the only content a lookup could key on, which is
+    # exactly what a held-out pool removes.
+    pool = pool if pool is not None else SETUP
+    assert len(pool) >= k_seg, f"pool of {len(pool)} cannot fill {k_seg} distinct slots"
 
     def make_pair(rng):
-        base = [SETUP[i] for i in rng.sample(range(len(SETUP)), k_seg)]
+        base = [pool[i] for i in rng.sample(range(len(pool)), k_seg)]
         a, b = list(base), list(base)
         a[pos_early], a[pos_late] = INSTR_UP, INSTR_LOW
         b[pos_early], b[pos_late] = INSTR_LOW, INSTR_UP
@@ -247,7 +268,7 @@ CLAIM_B = [
 EVIDENCE_PROBE = "\nQuestion: On what date did the shipment leave?\nAnswer: The"
 
 
-def make_evidence(k_seg):
+def make_evidence(k_seg, lo=None, hi=None):
     """Recency again, but over EVIDENCE rather than instructions.
 
     `recency` swaps two conflicting instructions; this swaps two blocks of conflicting
@@ -261,9 +282,15 @@ def make_evidence(k_seg):
     logP(" fourth") - logP(" ninth") after a question asking for the date.
     """
     half = k_seg // 2
+    # `lo`/`hi` select a contiguous slice of the claim pools, so train and eval can draw
+    # from disjoint paraphrase sets. The task already samples with replacement, so a
+    # half-size pool changes the repeat rate slightly and nothing else.
+    lo = 0 if lo is None else lo
+    hi = len(CLAIM_A) if hi is None else hi
+    assert hi > lo, "empty claim slice"
 
     def make_pair(rng):
-        idx = [rng.randrange(len(CLAIM_A)) for _ in range(k_seg)]
+        idx = [rng.randrange(lo, hi) for _ in range(k_seg)]
         fa = [CLAIM_A[i] for i in idx[:half]]
         fb = [CLAIM_B[i] for i in idx[half:]]
         return (fa + fb, fb + fa, "Statements taken at the depot.\n",
@@ -401,6 +428,11 @@ TASKS = {
     "order": make_order,
     "recency": make_recency,
     "recency_var": make_recency_var,
+    # Held-out content variants: dictionaries train on `_tr`, steering is scored on `_ev`.
+    "recency_tr": lambda k: make_recency(k, pool=SETUP),
+    "recency_ev": lambda k: make_recency(k, pool=SETUP_HELD),
+    "evidence_tr": lambda k: make_evidence(k, 0, 3),
+    "evidence_ev": lambda k: make_evidence(k, 3, 6),
     "escalate": make_escalate,
     "evidence": make_evidence,
     "rotate2": lambda k: make_rotate(k, 2),
