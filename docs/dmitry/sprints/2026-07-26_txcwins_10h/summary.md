@@ -44,9 +44,11 @@ dictionary's own direction on its own schedule — with the temporal-profile con
 
 **Both headline tasks survive a held-out content split**, three dictionary inits each: dictionaries
 trained on one half of the sentence pools, steering scored on documents built from a disjoint half.
-The crosscoder beats every unsupervised arm in every init (z = 9.6 to 30.0), and on instruction
-position the margin is **larger** held-out than corpus-bound — the opposite of what a
-content-lookup story predicts. That closes the strongest objection a reader could raise.
+The crosscoder beats every learned per-token arm in every init (z = 9.6 to 30.0, peak-dose). The
+margin is somewhat **smaller** held out than corpus-bound — z = 10.3 / 16.3 / 14.9 against 18.0 —
+which is what one expects when the dictionary can no longer key on the content it trained on. The
+claim that matters is that **the effect survives at all**, on disjoint content, in every init.
+That closes the strongest objection a reader could raise.
 
 **What it never beats is the best rank-1 write taken from the metric's own gradient** — z = −32 to
 −41 on instruction position, −67 to −73 on evidence, −50 to −59 on demonstration order. So the
@@ -55,9 +57,12 @@ reconstruction alone, a write a per-token dictionary could have executed if hand
 That is worth having because the schedule is what a practitioner lacks — and a published method
 now supplies one (Heyman & Vandeputte, arXiv:2605.03907), which the crosscoder loses to.
 
-⚠ **The most inviting misreading in the results.** The crosscoder ties or beats `rank1_best`, which
-is the rank-1 truncation of the **difference-of-means reference** — near-orthogonal to the gradient
-(`cos` = 0.02–0.19). Beating it says the reference is poor, not that rank 1 is insufficient.
+⚠ **Two rank-1 arms, and only one is a ceiling.** On held-out content the crosscoder **loses to
+`rank1_best` in 7 of 9 inits** and loses all three at matched dose on instruction position (3.91 /
+4.92 / 4.74 against 4.955). But `rank1_best` is the rank-1 truncation of the **difference-of-means
+reference**, near-orthogonal to the gradient (`cos` = 0.02–0.19), so neither beating it nor losing
+to it settles anything about rank. **The ceiling is `grad_rank1`**, and the crosscoder loses to
+that everywhere by a wide margin.
 
 ### 3. One number ranks a task before any dictionary is trained
 
@@ -119,6 +124,10 @@ gradient's support is set by where the two classes differ — but the second is 
   held-out instruction position the two arms' ranges do not overlap — crosscoder 3.91–4.92 against
   SAE 0.01–0.28 — so the seed lottery does not currently explain the gap, and a wider sweep is the
   first experiment in `next_ten_hours.md`.
+- **Demonstration order is the unstable cell.** Its held-out peaks span 4.4× across inits (1.93 /
+  0.68 / 0.44) and it loses to `sae_broadcast` at one init on the peak-dose convention while
+  winning at matched dose. Instruction position and evidence order do not do this; the cell with
+  the smallest absolute effects is the one whose verdict moves.
 - **A second lottery is untested.** Both arms take best-of-4096 by *reading* AUC, and that selector
   is at ceiling for the SAE in 9 of 9 cells and the crosscoder in 3 of 9 — so several comparisons
   are between two arbitrary picks from two tied pools. Since this sprint's own finding is that
@@ -144,5 +153,5 @@ configuration fields next to the number, and it always came last.
 ## Where things live
 
 - Code: `experiments/temporal_screen/txc_wins/` — harness, task designs, Modal runners
-- Results: `results/txc_wins/` (77 files), figures in `plots/2026-07-26_txcwins/`
+- Results: `results/txc_wins/` (81 files), figures in `plots/2026-07-26_txcwins/`
 - Next experiments, in priority order: `next_ten_hours.md`
