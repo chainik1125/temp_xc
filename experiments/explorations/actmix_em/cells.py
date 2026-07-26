@@ -103,9 +103,39 @@ def lane_c():
     return cells
 
 
-LANES = {"a": lane_a, "b": lane_b, "c": lane_c}
+# ── SCHEDULING AMENDMENT (2026-07-26 ~22:05 London, post-freeze,
+# blind — no cell had completed). The a/b/c 3-lane split OOMed at
+# launch: the training-step GPU peak scales ∝ T·batch·d_sae
+# (measured: T16 ≈ 43 GB, T8 ≈ 29 GB; the shuffle buffer itself is
+# CPU-resident), so T16 ∥ T8 ∥ T1 exceeds one 80 GB card. Cells,
+# hparams, seeds, and endpoint-first priority are UNCHANGED — this
+# is dispatch only: lane h serializes the two heavy shapes (T16,
+# T8, + their untrained twins + heavy s1 cells), lane l carries
+# everything ≤ T4 (worst co-peak ≈ 43 + 22 GB). Lanes a/b/c kept
+# above for the record; launched lanes are h + l.
+
+def lane_h():
+    """Heavy chain — T16/T8 shapes serialized, never co-resident."""
+    return [txc_cell(16, 42), txc_cell(8, 42),
+            txc_cell(16, 42, n_steps=0), txc_cell(8, 42, n_steps=0),
+            txc_cell(16, 1), txc_cell(8, 1), txc_cell(4, 1)]
+
+
+def lane_l():
+    """Light chain — every shape ≤ T4; endpoint T1 + falsifier sae
+    first, then the rest of s42, small untrained twins, s1 tokens."""
+    return [txc_cell(1, 42), sae_cell(42), txc_cell(4, 42),
+            tsae_cell(42), txc_cell(2, 42),
+            txc_cell(1, 42, n_steps=0), txc_cell(2, 42, n_steps=0),
+            txc_cell(4, 42, n_steps=0),
+            sae_cell(42, n_steps=0), tsae_cell(42, n_steps=0),
+            txc_cell(1, 1), sae_cell(1), tsae_cell(1), txc_cell(2, 1)]
+
+
+LANES = {"a": lane_a, "b": lane_b, "c": lane_c,
+         "h": lane_h, "l": lane_l}
 
 
 def all_cells():
-    for lane in ("a", "b", "c"):
+    for lane in ("h", "l"):
         yield from LANES[lane]()
