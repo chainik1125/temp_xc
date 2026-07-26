@@ -397,11 +397,39 @@ def build():
       "from the same FineWeb document, 32 tokens each, ending at the position "
       "the probe reads. <code>N</code> marks a token that is the first "
       "occurrence of its type in the document.</p>")
+    a('<div class="card"><h3>What &ldquo;trailing&rdquo; means, exactly</h3>'
+      "<p>The label at token <i>t</i> is</p>"
+      "<pre>label[t] = sum over lags l = 1..64 of  w[l] * novel[t-l]\n\n"
+      "  novel[t-l] = 1 if the token 64..1 places back was the FIRST\n"
+      "               occurrence of its word type in this document, else 0\n"
+      "  w[l]       proportional to 2^(-l/16), normalised to sum to 1\n"
+      "             so a token 16 back counts half as much as one 1 back,\n"
+      "             32 back a quarter, and the sum cuts off at 64</pre>"
+      "<p>Three consequences worth being explicit about. <b>The current token "
+      "contributes nothing</b> — lags start at 1, so the label is never a property "
+      "of the token being read. <b>The label is undefined for the first 64 tokens "
+      "of a document</b>, and those rows are excluded. <b>And a dictionary with "
+      "window T can only see part of it</b>: a 4-token window covers 17% of the "
+      "weight, 8 covers 31%, 16 covers 53%, 32 covers 80%. That is the direct "
+      "reason a wider window has more to gain here, and it is why this is a "
+      "state-tracking task rather than a word-recognition one.</p>"
+      "<p>The version used for the headline, <code>nov_resid</code>, additionally "
+      "subtracts the average rate for that position-in-document bin, because "
+      "novelty falls through any document as vocabulary gets used up — without "
+      "that subtraction a probe could score well by reading position alone.</p>"
+      "</div>")
+    if (FIGS / "kernel_focus_novresid_light.png").exists():
+        a("<figure>" + img("kernel_focus_novresid")
+          + "<figcaption>Top: the weight each preceding token carries, with the "
+            "coverage of each window size marked. Bottom: the last 24 tokens "
+            "before one real probe position — green tokens are first occurrences "
+            "and contribute their weight, grey ones are repeats and contribute "
+            "zero.</figcaption></figure>")
     try:
         import numpy as _np
         from transformers import AutoTokenizer as _AT
         _tok = _AT.from_pretrained("gpt2")
-        _d = _np.load(HERE.parents[1] / "task_hunt" / "labels"
+        _d = _np.load(HERE.parent / "task_hunt" / "labels"
                       / "novelty_fineweb_gpt2.npz")
         ids, off = _d["token_ids"], _d["doc_off"]
         nov, rate, resid = _d["nov"], _d["nov_rate"], _d["nov_resid"]
@@ -652,6 +680,99 @@ def build():
     a("<li><b>MLC and TFA are absent.</b> MLC needs several layers cached at once; "
       "TFA is not in this repo's registry. Both are in the paper's panel.</li>")
     a("</ul>")
+    a("</section>")
+
+    # ── why TXC usually loses, and where it should win ────────────────
+    a('<section class="wide">')
+    a('<div class="eyebrow">The mechanism</div>')
+    a("<h2>Why temporal crosscoders lose almost everywhere &mdash; and the shape of "
+      "the tasks where they do not</h2>")
+    a('<div class="card bad">')
+    a("<h3>The reason, in one line: attention already did the job, and it is strong</h3>")
+    a("<p>A transformer's attention aggregates across positions and writes the "
+      "<i>result</i> onto the current token. Anything the model needs in order to "
+      "predict the next token is therefore available <b>locally</b>, at every "
+      "position, almost immediately. A dictionary that reads one token gets that "
+      "aggregation for free; a dictionary that reads a window has nothing left to "
+      "contribute. The window architecture is not weak &mdash; it is redundant with "
+      "a mechanism the model runs constantly.</p>")
+    a("<p>This is measured, not asserted. On four relational labels &mdash; "
+      "subject&ndash;verb agreement, factual consistency, labelled provenance, "
+      "marker nesting &mdash; a probe on a single position goes from <b>chance at "
+      "the embeddings to 1.000 by layer 1&ndash;4</b>. At the embeddings, before "
+      "any attention has run, only a reader that mixes positions can answer "
+      "(0.994 against 0.488 for every additive readout, a gap of +0.49). One "
+      "attention layer later every reader is perfect. The architectural advantage "
+      "is real and it has almost nowhere to live.</p>")
+    a("</div>")
+
+    a("<div class='tscroll'><table><thead><tr><th>task shape</th>"
+      "<th>what attention does to it</th><th>who wins</th><th>evidence here</th>"
+      "</tr></thead><tbody>")
+    for shape, att, who, ev in [
+        ("A relation between two positions<br>(agreement, coreference, "
+         "contradiction, which-role, bracket nesting)",
+         "Resolves it and deposits the answer on the current token, within one "
+         "attention layer",
+         "<b>Nobody</b> &mdash; per-token is already perfect",
+         "single-position probe: chance at layer 0 &rarr; 1.000 by layer 1&ndash;4, "
+         "on all four labels tested"),
+        ("A clock the model needs to generate<br>(tokens since the last switch, "
+         "tokens since the last speaker change)",
+         "Carries it on every token because it is generatively useful",
+         "<b>Nobody</b> &mdash; the raw single position already has it",
+         "raw single-position probe r = 0.31 (source switch) and 0.81 (speaker "
+         "change); a dimension-matched window average adds +0.06 and &minus;0.04"),
+        ("A graded rate accumulated over a long support<br>(trailing novelty, "
+         "list density, verbosity level, backtracking intensity)",
+         "Summarises it only partially &mdash; no single token is the answer, and "
+         "the label's support is far longer than what one position encodes",
+         "<b>TXC</b>, and the gain grows with how much of the support the window "
+         "covers",
+         "raw window average 0.725 vs 0.572 for one position; trained TXC-post "
+         "0.463 vs 0.215 per-token on gpt2, 0.507 vs 0.129 on R1-Distill-8B"),
+        ("A hazard over a trajectory<br>(is the model about to backtrack, about to "
+         "obey an injected instruction)",
+         "Has no reason to commit an answer, so the evidence stays spread out",
+         "<b>TXC</b> predicted, not yet tested here",
+         "the paper's own backtracking result is of this shape, and it is the one "
+         "label in this project with a positive within-window order effect"),
+        ("Anything at the embeddings, before attention runs",
+         "Nothing yet",
+         "<b>TXC</b>, provably and by a wide margin",
+         "+0.49 over every additive readout &mdash; but a dictionary trained on "
+         "raw token embeddings is a dictionary of token identities, so this "
+         "hookpoint is of little interpretability value"),
+    ]:
+        a(f"<tr><td>{shape}</td><td>{att}</td><td>{who}</td>"
+          f"<td class='n' style='white-space:normal'>{ev}</td></tr>")
+    a("</tbody></table></div>")
+
+    a('<div class="card good">')
+    a("<h3>The operational test, so this stops being a guessing game</h3>")
+    a("<p>Before training any dictionary, probe the raw activations twice on "
+      "identical rows: once at the single label position, once on the "
+      "<b>dimension-matched average</b> of the window. If the window average does "
+      "not beat the single position, attention has already localised the signal "
+      "and no window architecture can win &mdash; skip the task. If it does, the "
+      "gap is the headroom a window dictionary is competing for. That check costs "
+      "minutes, needs no training, and it reordered this project's candidate list "
+      "completely: every clock failed it, every trailing rate passed.</p>")
+    a("<p>Two design rules follow. Pick labels whose support is <b>much longer "
+      "than one token</b> and which the model has <b>no reason to resolve into an "
+      "answer</b>. And report the coverage number: a window of T tokens sees a "
+      "known fraction of the label's support (17% at T=4, 31% at T=8, 53% at "
+      "T=16, 80% at T=32 for the label used here), which turns the T-curve into a "
+      "prediction rather than a sweep.</p>")
+    a("</div>")
+
+    a('<div class="card quiet"><p><b>What this says about the paper.</b> The '
+      "small margins on sparse probing, emergent misalignment and HH-RLHF are not "
+      "a failure of the architecture; they are what the mechanism predicts, "
+      "because those targets are per-token-available. The backtracking result is "
+      "not luck either &mdash; it is the one task in the panel with the right "
+      "shape. What was missing was a way to tell the two apart in advance, and the "
+      "raw gate is that.</p></div>")
     a("</section>")
 
     a(f'<p class="foot">Generated by experiments/explorations/txcwin/report.py '

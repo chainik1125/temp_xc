@@ -277,6 +277,85 @@ def fig_card(pl, tag, mode):
     return out
 
 
+def fig_kernel(tag, mode):
+    """What 'trailing' means: the lag weights, and how much of them each window
+    size can even see. Plus a real token strip showing the contributions."""
+    import importlib.util
+    _lp = HERE.parent / "task_hunt" / "labels" / "novelty_lib.py"
+    _spec = importlib.util.spec_from_file_location("novelty_lib", _lp)
+    nl = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(nl)
+    t = _style(mode)
+    w = nl.kernel_weights()
+    fig, axes = plt.subplots(2, 1, figsize=(9.6, 6.8), dpi=170,
+                             gridspec_kw={"height_ratios": [1.15, 1]})
+
+    # ── panel 1: the lag weights and what each window covers ──────────
+    ax = axes[0]
+    lags = np.arange(1, len(w) + 1)
+    ax.bar(lags, w, width=0.9, color=t["s"][0], zorder=3, linewidth=0)
+    for i, (T, col) in enumerate(zip((4, 8, 16, 32),
+                                     (t["s"][1], t["s"][2], t["s"][3], t["s"][4]))):
+        frac = nl.kernel_mass_within(T)
+        ax.axvline(T + 0.5, color=col, linewidth=2, zorder=4)
+        ytop = max(w) * (0.96 - 0.17 * i)          # stagger so labels never collide
+        ax.annotate(f"T={T} sees {frac*100:.0f}%", xy=(T + 0.5, ytop),
+                    xytext=(5, 0), textcoords="offset points", fontsize=9,
+                    color=col, va="center", fontweight="600")
+    ax.set_xlim(0, 65)
+    ax.set_xlabel("how many tokens back (lag)")
+    ax.set_ylabel("weight in the label")
+    ax.grid(axis="y", linewidth=0.6)
+    ax.set_title("The label at a position is a weighted average over the "
+                 "PREVIOUS 64 tokens, halving every 16 tokens\n"
+                 "(the current token has weight zero — it never contributes to "
+                 "its own label)", loc="left", fontsize=10.5)
+
+    # ── panel 2: a real token strip with its contributions ────────────
+    ax = axes[1]
+    try:
+        from transformers import AutoTokenizer
+        tok = AutoTokenizer.from_pretrained("gpt2")
+        d = np.load(HERE.parent / "task_hunt" / "labels"
+                    / "novelty_fineweb_gpt2.npz")
+        ids, off, nov, rate = d["token_ids"], d["doc_off"], d["nov"], d["nov_rate"]
+        s0, e0 = int(off[3]), int(off[4])
+        seg = rate[s0:e0]
+        ok = np.arange(64, e0 - s0 - 1)
+        pos = int(ok[np.argmax(seg[ok])])
+        p_abs = s0 + pos
+        K = 24
+        bits = nov[p_abs - K:p_abs].astype(float)          # lags K..1
+        wl = w[:K][::-1]                                    # align to those lags
+        contrib = bits * wl
+        toks = [tok.decode([int(i)]).replace("\n", "\\n")
+                for i in ids[p_abs - K:p_abs]]
+        xs = np.arange(K)
+        ax.bar(xs, contrib, width=0.78, zorder=3, linewidth=0,
+               color=[t["s"][2] if b else t["grid"] for b in bits])
+        ax.set_xticks(xs)
+        ax.set_xticklabels(toks, rotation=60, ha="right", fontsize=7.5)
+        ax.set_ylabel("contribution to the label")
+        ax.grid(axis="y", linewidth=0.6)
+        cur = tok.decode([int(ids[p_abs])]).replace("\n", "\\n")
+        ax.set_title(f"The last {K} tokens before one real probe position. "
+                     f"Green = first occurrence of that word in the document, "
+                     f"grey = a repeat (contributes nothing).\n"
+                     f"Their weighted sum over all 64 lags is the label: "
+                     f"{rate[p_abs]:.3f}. The token being read is "
+                     f"'{cur.strip()}' and it contributes 0.",
+                     loc="left", fontsize=10)
+    except Exception as e:
+        ax.axis("off")
+        ax.annotate(f"(token strip unavailable: {type(e).__name__})", xy=(0.02, 0.5),
+                    fontsize=9, color=t["ink2"])
+    fig.tight_layout(h_pad=2.4)
+    out = FIGS / f"kernel_{tag}_{mode}.png"
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", required=True)
@@ -284,9 +363,10 @@ def main():
     FIGS.mkdir(parents=True, exist_ok=True)
     pl = json.loads((RESULTS / f"{a.tag}.json").read_text())
     for mode in ("light", "dark"):
-        for fn in (fig_money, fig_seeds, fig_gain, fig_card):
+        for fn in (fig_kernel, fig_money, fig_seeds, fig_gain, fig_card):
             try:
-                print("wrote", fn(pl, a.tag, mode))
+                print("wrote", fn(a.tag, mode) if fn is fig_kernel
+                      else fn(pl, a.tag, mode))
             except Exception as e:
                 print(f"  {fn.__name__} failed: {type(e).__name__}: {e}")
 
