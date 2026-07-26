@@ -254,6 +254,19 @@ This is a caveat on every cross-architecture number in both sprints, and it is t
 tSAE arm was reported at three different values tonight — 5× worse than the SAE, then 1.9× worse,
 then 2.6× *better*. Each revision was a training-recipe artefact, not a measurement.
 
+**The sprint's assigned deliverable was to calibrate the L1 temporal SAE, and the answer is that
+no usable setting exists.** The coefficient controls sparsity only five to eight orders of
+magnitude above the documented `l1 = 1e-3`, and the dictionary dies before it gets sparse: **FVU
+crosses 1.0 — worse than predicting the mean — at 29 coefficients per segment, before L0 crosses
+32.** The last usable point is `l1 = 100` at 151 coeff/segment, FVU 0.32.
+
+Two causes, both architectural. `lam = 1/(4·d_in)` puts codes at ~4e-3 while the reconstruction
+term is ~18, so `l1 = 1e-3` contributes 0.2% of the loss. And `TemporalSAE` has **no encoder
+bias**, so sparsity has to come from dictionary geometry alone — the alive fraction is still 0.998
+at 67 coeff/segment. Both readings of the loss fail the same way. **Use the same architecture with
+`sae_diff_type="topk"`, which binds exactly.** This closes the carried debt from the previous
+sprint: the answer is that the L1 form is not calibratable, not that we failed to calibrate it.
+
 Two mechanical notes that follow. The crosscoder's realised coefficient spend moves with the
 learning rate (10.15 at 3e-4, 8.32 at 1e-3, 8.04 at 1e-3/6000, against nominal 8), so **recipe
 and budget-matching are not independent knobs**. And the crosscoder is the only one of the three
