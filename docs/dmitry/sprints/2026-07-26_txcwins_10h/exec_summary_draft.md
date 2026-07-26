@@ -32,7 +32,8 @@ Four results that do not depend on any of that framework:
 
 1. **The previous sprint's headline is withdrawn**, on a one-sided-dose-grid artefact.
 2. **Reconstruction quality does not predict steering quality — the ordering is inverted.** The
-   best reconstructor of three architectures steers worst; the worst steers best, by 3.4×.
+   best reconstructor of three architectures steers worst; the worst steers best. At matched dose
+   the inversion is strict, 3 of 3, spread 28×.
 3. **A benchmark that fixes one learning rate across architectures is not measuring
    architectures.** Each of the three peaks at a different recipe over a 10× range.
 4. **The L1 temporal SAE has no usable sparsity coefficient** — FVU crosses 1.0 before L0 crosses
@@ -453,11 +454,12 @@ intervention class, with a crosscoder discovery gap on top.
 
 **It is not solving the task by locating the instructions.** The supervised rank-1 write puts 97%
 of its mass on the two instruction segments; the crosscoder's profile is nearly flat, its two
-largest entries at positions 10 and 1 rather than 9 and 2 — and it still reaches 76% of the
-supervised effect. The narrower and more interesting claim is that **there is more than one way
-to move this metric, and the crosscoder found a different one from the supervised write.** That
-`cos(P_dom, Ḡ) = 0.044` — the supervised and gradient routes are themselves nearly unrelated —
-makes a third, differently-shaped solution unsurprising rather than anomalous.
+largest entries at positions 10 and 1 rather than 9 and 2 — and it still reaches 76% of that
+write's effect (a **difference-of-means reference**, not a ceiling). The narrower and more
+interesting claim is that **there is more than one way to move this metric, and the crosscoder
+found a different one from the supervised write.** With `cos(P_dom, Ḡ)` = 0.052 on this task, the
+supervised and gradient routes are themselves nearly unrelated, which makes a third,
+differently-shaped solution unsurprising rather than anomalous.
 
 ## What was not achieved
 
