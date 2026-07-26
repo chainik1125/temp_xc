@@ -116,7 +116,7 @@ ELLS = [1, 2, 3, 6]
 def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int,
           steps: int, lr: float, general_frac: float, batch_win: int,
           coarse: list, sae_budgets: list, targets: list, n_refine: int,
-          topk_grid: list):
+          topk_grid: list, l1_on: str):
     import sys
     sys.path.insert(0, "/work")
     import math
@@ -235,7 +235,16 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
 
     # ---------------- the tSAE sweep ----------------
     def run_tsae(l1):
-        """Train tsae_paper at this l1. Loss is verbatim architectures.py:183-189."""
+        """Train tsae_paper at this l1.
+
+        `l1_on == "both"` is verbatim `architectures.py:183-189`: the penalty falls on
+        (novel_codes + pred_codes). That is the repo's reading, and it charges the attention
+        path -- the predicted codes are the temporal mechanism -- for its own existence.
+        `l1_on == "novel"` is the competing reading, penalising only the codes that are
+        actually stored per token, which is also the quantity the sparsity axis counts. Both
+        are run because the tSAE identification is unresolved and guessing between them
+        would silently pick which architecture the baseline is.
+        """
         torch.manual_seed(0)
         m = TemporalSAE(dimin=d, width=d_sae, n_heads=8, sae_diff_type="relu",
                         kval_topk=None, tied_weights=True, n_attn_layers=1,
@@ -247,7 +256,8 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
             xb = gen_win(batch_win)
             recons, info = m(xb)
             recon = (recons - xb).pow(2).sum(-1).mean()
-            z_tot = info["novel_codes"] + info["pred_codes"]
+            z_tot = (info["novel_codes"] + info["pred_codes"] if l1_on == "both"
+                     else info["novel_codes"])
             l1_term = z_tot.abs().sum(-1).mean()
             loss = recon + l1 * l1_term
             opt.zero_grad(); loss.backward()
@@ -263,7 +273,7 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
             Zp = info["pred_codes"].reshape(-1, d_sae)
             act = Zn[Zn > 0]
             row = {
-                "l1_coef": float(l1),
+                "l1_coef": float(l1), "l1_on": l1_on,
                 "coeff_per_segment": float((Zn > 0).float().sum(-1).mean()),
                 "pred_l0_per_segment": float((Zp > 0).float().sum(-1).mean()),
                 "fvu": fvu_from(xh, Who),
@@ -329,11 +339,17 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
     rows = [run_tsae(l1) for l1 in coarse]
 
     def bracket(rows_, lo_target, hi_target):
-        """Smallest l1 interval known to contain the [lo_target, hi_target] L0 band."""
+        """Smallest l1 interval bracketing the L0 = `hi_target` crossing.
+
+        Bracketing the TOP of the band rather than its full width is what puts the refine
+        points where the answer lives: the first coarse sweep went from FVU 0.32 at 151
+        coefficients per segment to FVU 1.05 at 18, so whether any l1 gives a usable
+        dictionary inside the band is decided entirely at that crossing.
+        """
         s = sorted(rows_, key=lambda r: r["l1_coef"])
         lo = max([r["l1_coef"] for r in s if r["coeff_per_segment"] > hi_target],
                  default=None)
-        hi = min([r["l1_coef"] for r in s if r["coeff_per_segment"] < lo_target],
+        hi = min([r["l1_coef"] for r in s if r["coeff_per_segment"] <= hi_target],
                  default=None)
         return lo, hi
 
@@ -411,6 +427,7 @@ def calib(model_id: str, layer: int, k_seg: int, T: int, n_docs: int, d_sae: int
             "mean_token_norm": tok_norm, "fvu_denom": denom,
             "sae_reference": sae_rows, "tsae_curve": rows,
             "tsae_topk_reference": topk_rows, "monotone": monotone,
+            "l1_on": l1_on,
             "usable_l1_range": usable, "l1_for_target_l0": l1_map}
 
 
@@ -420,13 +437,14 @@ def main(model: str = "Qwen/Qwen2.5-1.5B-Instruct", layer: int = -1, k_seg: int 
          lr: float = 3e-4, general_frac: float = 0.3, batch_win: int = 32,
          coarse: str = "1e-3,1e-2,1e-1,1,3,10,30,100,300,1000",
          sae_budgets: str = "1,2,4,8,16", targets: str = "1,2,4,8,16,32",
-         n_refine: int = 6, topk_grid: str = "", tag: str = ""):
+         n_refine: int = 6, topk_grid: str = "", l1_on: str = "both",
+         tag: str = ""):
     import json
     r = calib.remote(model, layer, k_seg, t, n_docs, d_sae, steps, lr, general_frac,
                      batch_win, [float(x) for x in coarse.split(",") if x],
                      [int(x) for x in sae_budgets.split(",") if x],
                      [int(x) for x in targets.split(",") if x], n_refine,
-                     [int(x) for x in topk_grid.split(",") if x])
+                     [int(x) for x in topk_grid.split(",") if x], l1_on)
     outdir = ROOT / "results" / "dict_bench"
     outdir.mkdir(parents=True, exist_ok=True)
     name = f"tsae_calibration{tag}.json"
