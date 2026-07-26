@@ -322,9 +322,13 @@ Ordered so that each step kills the task cheaply if it is going to die:
    set) and look at the spread. 128 rather than a couple of dozen because the *typical*
    permutation-to-permutation std is only about two accuracy points — the dramatic gaps are the
    tails, and you have to search for them. No spread, no task.
-2. **Build the matched pairs, with the interior-permutation control.** The *same* demonstrations
-   in two orders — ideally the best- and worst-scoring permutations from step 1, maximising the
-   gap the steering has to close. **Permute only the interior: hold the first and last
+2. **Build the matched pairs, with the interior-permutation control, and use a rotation not a
+   swap.** The *same* demonstrations in two orders — ideally the best- and worst-scoring
+   permutations from step 1, maximising the gap the steering has to close. **Constrain the
+   permutation to a cyclic rotation of the interior demonstrations**: a two-block swap has an
+   exactly rank-1 optimal write that a scheduled per-token latent matches, so a best/worst pair
+   that happens to differ by one transposition is a rank-1 task in disguise. See the rank-gate
+   section above; measure `r1` on the selected pair before training anything. **Permute only the interior: hold the first and last
    demonstration fixed and match the label multiset.** This is not optional. Recency and
    majority-label bias are bag-of-positions statistics (named in *Calibrate Before Use*), and
    leaving them free hands the per-token arm a DC handle that will close the gap for reasons that
@@ -1911,3 +1915,12 @@ the per-pass times are ordering only, not measurements.
   which makes the headline conservative and should be reported; (iv) dose selection by argmax on
   the reporting set is a winner's curse, but simulation puts it at ≤0.41 SEM and it inflates the
   *flat* arms, so it too is conservative — no correction needed.
+- **Pass 29** — read [[theory_section]] and applied its **rank gate**, which supersedes part of
+  my framing. A per-token latent's coefficient varies with position, so a per-token dictionary
+  reaches any **rank-1** write; my DC audit only asked whether a *constant* write could work. Two
+  ordered gates now: `c ≈ 0`, then `r1` well below 1. The consequence — **every two-block swap is
+  exactly rank 1** — demotes instruction-order conflict (which I had at joint-first) and
+  LLM-judge position bias. Added the design fix that follows: the demonstration-order foil must be
+  a **cyclic rotation of the interior demonstrations, not a transposition**, since a best/worst
+  search can return a transposition pair and produce a rank-1 task in disguise. Propagated to the
+  recipe and to `build_checklist.md` as item 2b.
