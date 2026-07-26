@@ -171,6 +171,36 @@ So the operative test for every entry is not "is the write position-dependent?" 
 > **Is there any bag-of-positions statistic — a mode, a label prior, a level — that separates
 > target from foil? If yes, a broadcast write can ride it and the crosscoder loses.**
 
+### The distinction the audit forces, and it is the sharpest thing in this note
+
+P1 and the DC-component test are **not the same condition**, and conflating them is what made me
+rank induction second. Two separate things have to hold:
+
+- **(a) The foil is matched.** No bag-of-positions statistic *separates target from foil*. This is
+  P1, and a matched multiset delivers it by construction.
+- **(b) The metric has no DC-movable component.** No constant write *improves the metric*,
+  whichever condition it is applied to.
+
+These come apart, and induction is the clean example. Repeat-in-order versus shuffled-repeat is
+an exactly matched multiset, so (a) holds perfectly. But the metric is copy accuracy, and
+"increase copying" is a constant write that raises copy accuracy in *both* conditions — so (b)
+fails, and the per-token arm has a handle even though the foil is airtight. The same is true of
+repetition (a constant anti-repetition write), sycophancy (a constant agreeableness write) and
+crescendo (a constant permissiveness write).
+
+Where the sprint's winning tasks differ is that the metric is a **contrast between the two
+conditions** — a teacher-forced margin between the target ordering and its multiset-matched foil.
+A constant write moves both sides of that contrast equally and cancels, which is exactly what the
+last sprint measured when `sae_broadcast` came in at +1.24 against the crosscoder's +11.29, and
+what the trajectory tasks measured when broadcast sat at zero or below at every window length.
+
+**Practical rule.** Matching the foil is necessary but not sufficient. The metric must also be a
+*difference between the matched pair*, not an absolute score on one member of it. Any candidate
+whose success metric is "how much of behaviour X did we produce" has a DC handle regardless of
+how well matched the foil is; only "how much more of X in condition A than in condition B" does
+not. Checking this takes one line of thought per candidate and it is the check I initially
+skipped.
+
 ### The DC-component audit
 
 Applying that test to the catalogue, which changes several verdicts. "DC handle" means a constant
@@ -575,6 +605,22 @@ random pair of orderings will differ by. Second, and following from it, **the be
 needs on the order of 100 permutations, not a couple of dozen**, which is what Li et al. use.
 Budget the go/no-go accordingly: it is still only forward passes, but it is ~128 × the prompt
 set, not 24.
+
+**The specific DC handle this task has, and why the contrastive metric defuses it.** Few-shot ICL
+is driven substantially by **function-vector heads** — heads that summarise the demonstrated task
+into a single vector, many of which begin as induction heads before transitioning (Todd et al.,
+*Function Vectors in Large Language Models*, [arXiv:2310.15213](https://arxiv.org/abs/2310.15213);
+*Which Attention Heads Matter for In-Context Learning?*, OpenReview `C7XmEByCFv` — arXiv id not
+located). Writing a function vector is a known, effective, entirely *constant* intervention that
+raises few-shot accuracy.
+
+So if the metric were "accuracy under the bad ordering, after steering", the per-token arm would
+simply write the function vector, score well, and the comparison would be dead before it started.
+It is defused by the contrastive metric and only by that: **the function vector encodes the
+task, which is identical in both orderings of the same demonstrations**, so writing it moves both
+sides of the margin equally and cancels. This is the clearest concrete instance of the (a)/(b)
+distinction above, and it is the reason the metric must be the margin between the matched pair
+rather than an absolute score.
 
 **The single biggest risk to this entry, stated plainly.** The two *named* mechanisms of ICL
 order sensitivity are **majority-label bias** (the model predicts the most common label among

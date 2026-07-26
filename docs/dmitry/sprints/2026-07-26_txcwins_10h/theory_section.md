@@ -237,3 +237,92 @@ consequence that a *scheduled* per-token write reaches the same waveforms. That 
 instruction recency and the rotation ladder are the only expressiveness candidates the
 project has, and why the recency `r1` measurement carries more weight than any other number
 outstanding.
+
+## Why language tasks are generically rank-1: the attribute theorem
+
+The pattern that every measured task came out rank-1 is not an accident of which tasks were
+chosen. If activations decompose additively over semantic attributes,
+`x_t = Σ_a s_a(t)·u_a + (class-independent terms)`, then the difference slab **factors**:
+
+```text
+P = S U      S in R^(T x A), columns are schedule differences
+             U in R^(A x d), rows are attribute directions
+
+rank(P) = rank(SU) <= min(rank S, rank U) <= A
+```
+
+> **Schedule complexity lives entirely inside the columns of `S` and cannot raise its rank
+> above `A`, the number of attributes whose positional pattern differs between conditions.**
+
+Verified at A=1 across seven schedules — one switch, three switches, eleven switches,
+random ±1, random real-valued, a smooth ramp, two spikes — giving rank 1 and `r1` = 1.0000 in
+every case. The phase ladder's rank-1-at-every-rung result is a corollary rather than a
+surprise: alternation makes the schedule intricate, not the attribute set larger. Sweeping A
+with generic schedules gives rank exactly A at A = 1, 2, 3, 4, 6.
+
+It also explains the `m − 1` in the rotation ladder, which had looked like an algebraic
+accident: an m-block rotation is the A = m case carrying exactly one linear dependency, since
+every position holds exactly one block in each class and the schedule differences therefore
+sum to zero.
+
+Equality needs both matrices full-rank, and it fails in exactly two ways, both verified to
+collapse rank 2 to 1: **schedules proportional**, or **directions collinear**. So the precise
+statement is *the number of attributes whose schedules are linearly independent and whose
+directions are linearly independent*, and in practice the schedules bind first.
+
+### The recipe this yields
+
+Two routes to a rank-≥2 task, and only one of them avoids being a construct.
+
+**Route 1 — two lexical attributes at different positions.** This is the rotation ladder: m
+distinct block types installed by hand. It works, and it is a construct.
+
+**Route 2 — content plus its own carried state**, which is free:
+
+> **A maintained state's schedule is the running integral of the content's schedule, and an
+> integral is never proportional to its integrand.**
+
+So content and the state it induces are automatically two attributes with independent
+schedules, from a single manipulated attribute. Verified: content as two spikes gives rank 2
+(`r1` 0.788); one switch gives rank 2; alternating content gives rank 2 even at
+`|corr(content, state)| = 1.000`, because the relation is *affine* rather than proportional
+and the constant offset is itself an independent schedule direction.
+
+The recipe: take one attribute the model must **carry forward** — a rule, a persona, a goal, a
+variable binding — realise it at two or more positions, and let the conditions differ in which
+value is carried over which span. Content supplies attribute 1 at the manipulation points; the
+carried state supplies attribute 2 over the spans between.
+
+**This makes instruction recency a family rather than a lucky find.** Any "which of two X
+governs" task is rank 2 — which instruction applies, which persona is active, which rule
+binds, which goal is pursued, which variable holds. The assumption to check each time is a
+single cosine: that the content direction and the state direction are non-collinear, "the
+token *French* appears" against "French mode is active".
+
+## Two conditions, not one
+
+A matched foil and a DC-free metric are different requirements and both are necessary.
+
+- **the foil is matched** — no bag-of-positions statistic separates the conditions
+- **the metric has no DC-movable component** — no constant write improves it in either
+  condition
+
+They come apart, and induction shows how: repeat-in-order against shuffled-repeat is an
+exactly matched multiset, so the first condition holds perfectly, but the metric is copy
+accuracy and "increase copying" is a constant write that raises it in *both* conditions. The
+same failure applies to repetition (a constant anti-repetition write), sycophancy (constant
+agreeableness) and crescendo (constant permissiveness).
+
+What distinguishes the tasks that won is the metric as much as the foil. Each measures a
+**contrast between the two conditions** — a teacher-forced margin between the target ordering
+and its matched foil — so a constant write moves both sides equally and cancels structurally
+rather than empirically. That is why the broadcast arm sat at +1.24 against the crosscoder's
++11.29, and at or below zero at every window length in the trajectory tasks.
+
+> The metric must be a **difference between the matched pair**, never an absolute score on one
+> member of it.
+
+Any candidate whose success metric is "how much of behaviour X did we produce" has a DC handle
+regardless of foil quality. Only "how much more of X in condition A than in condition B" does
+not — and the natural phrasing of most research questions is the former, which is why this is
+easy to get wrong.
