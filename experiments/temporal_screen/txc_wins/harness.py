@@ -677,7 +677,10 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
             writes["txc_flat"] = unit(
                 P_s.mean(0, keepdim=True).expand(T, -1).contiguous())
 
-        for _nm in ("grad_rank1", "sae_schedule_grad"):
+        # `broadcast_optimal` is profiled too. Its flat profile is guaranteed by
+        # construction, which is exactly why it was left out and exactly why it should be
+        # recorded: this sprint's recurring failure is the quantity everyone knows is right.
+        for _nm in ("grad_rank1", "sae_schedule_grad", "broadcast_optimal"):
             out["write_profile"][_nm] = [float(v) for v in writes[_nm].norm(dim=-1)]
 
     # HELD-OUT CONTENT. Without `make_pair_test` the dictionaries are trained on documents
@@ -826,7 +829,8 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     others = ("sae_broadcast", "tsae_broadcast", "txc_flat",
               "txc_profile_random", "random_slab", "random_broadcast",
               "sae_schedule", "rank1_best", "grad_slab", "grad_rank1",
-              "sae_schedule_grad")
+              "sae_schedule_grad", "broadcast_optimal",
+              "sae_broadcast_readingsel", "txc_slab_readingsel")
     z_peak, z_matched = {}, {}
     if "txc_slab" in out["arms"]:
         ts2, te2 = at_best("txc_slab")
