@@ -83,19 +83,23 @@ architectures at all, at a cost of one backward pass per document.
 **A number computed before any dictionary is trained orders every steering outcome in this
 sprint, including the one that had to be withdrawn.** `c` — the share of the optimal write a
 *constant* write can reach — is measured from 20–24 backward passes through the model, with no
-dictionary involved. Across six configurations spanning both metric modes:
+dictionary involved. Across eight configurations spanning both metric modes:
 
 | task | `c` (gradient) | crosscoder | SAE | z | outcome | file |
 | --- | --- | --- | --- | --- | --- | --- |
-| order | 0.241 | +6.34 | +4.66 | +1.4 | no win | `order_sym_ds0.json` |
+| `rotate12` | **0.033** | **+18.23** | +5.36 | **+9.8** | **wins** | `rot_m12_T.json` |
+| recency | **0.037** | **+6.49** | +2.67 | **+18.0** | **wins** | `recency_grad.json` |
+| `rotate6` | 0.102 | −0.01 | +5.92 | −7.5 | loses | `rot_m6_T.json` |
+| recency, positions vary | 0.112 | +2.52 | +3.30 | −2.4 | loses | `recency_var_grad.json` |
+| evidence | 0.136 | +5.79 | +1.32 | **+29.7** | **wins — the exception** | `evidence_grad.json` |
 | `rotate2` | 0.163 | +2.86 | +5.27 | −1.0 | no win | `rot_m2_T.json` |
 | `rotate3` | 0.179 | +6.43 | +11.51 | −2.9 | no win | `rot_m3_T.json` |
-| `rotate6` | 0.102 | −0.01 | +5.92 | −7.5 | **loses** | `rot_m6_T.json` |
-| `rotate12` | **0.033** | **+18.23** | +5.36 | **+9.8** | **wins** | `rot_m12_T.json` |
-| recency | **0.034** | **+6.48** | +2.60 | **+18.3** | **wins** | `recency_gradsmoke.json` (c), `recency_v2.json` |
+| order | 0.241 | +6.34 | +4.66 | +1.4 | no win | `order_sym_ds0.json` |
 
-The split is clean and it falls between 0.102 and 0.034 — **every cell with `c ≥ 0.10` fails,
-both cells with `c ≤ 0.034` win.**
+**Both cells at `c ≤ 0.04` win; five of six at `c ≥ 0.10` fail.** The exception is real and is
+not a near-miss: evidence sits at `c` = 0.136 and the crosscoder wins it at z = 29.7, the largest
+margin in the sprint. So `c` is a **screen with a known false negative**, not a law — it would
+have told us not to run the task that produced the strongest result.
 
 **`c` is necessary and demonstrably not sufficient**, and the counterexample is worth more than
 the caveat. The same recency task on Qwen2.5-0.5B (`c` = 0.026) and SmolLM2-1.7B (`c` = 0.037)
@@ -128,9 +132,7 @@ and the crosscoder wins it by z = 9.8. The property that predicts the outcome is
 not the metric's family. A task property beating a metric property is the stronger result, and it
 is why this replaces rather than restores the earlier claim.
 
-⚠ One provenance note: `c` for recency comes from a 500-step smoke run, though `c` is computed
-from model gradients and does not depend on dictionary training; the outcome column is from the
-completed run.
+All eight rows are full-configuration runs with `c` and the arms read from the same file.
 
 **What the earlier version got wrong.** A table circulated an hour before this one showed the
 same ordering computed from the **difference-of-means** slab. Those values are near-orthogonal to
@@ -233,6 +235,11 @@ truncation of the *difference-of-means* slab, and the `sqrt(r1)` rank law is not
 it — that law requires the gradient slab, and `cos(P_dom, Ḡ) = 0.044` says the two are not
 proxies for each other.
 
+**The reading result has now replicated five times.** `auc_selection = 1.000` for the SAE on
+recency, evidence and `recency_var`, against the crosscoder's 0.719, 0.685 and 0.632 — on the two
+tasks that carry the empirical claim. A per-token dictionary reads these factors perfectly and
+steers them worst. It is the most-replicated finding in the project.
+
 ### 6. A single learning rate across architectures does not measure architectures
 
 The sprint's default `lr = 3e-4` is near-optimal for the SAE and wrong for both temporal
@@ -268,6 +275,13 @@ to move this metric, and the crosscoder found a different one from the supervise
 makes a third, differently-shaped solution unsurprising rather than anomalous.
 
 ## What was not achieved
+
+**On the evidence task the crosscoder beats the best rank-1 write derived from the
+difference-of-means reference (z = +8.66) and loses to the one derived from the gradient
+(z = −61.6), from the same file** (`evidence_grad.json`). Since the gradient is the correct
+object, no expressiveness win survives — and the flip is the sharpest available demonstration
+that **difference-of-means is a reference, not a ceiling**. Any percent-of-ceiling figure has to
+name which object it used.
 
 **No expressiveness win was found, including on a design built specifically to produce one.**
 The rotation ladder drives the rank-1 reachable share `r1` down to 0.177 by construction, and at
