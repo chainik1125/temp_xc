@@ -572,3 +572,64 @@ Steering, best Δmargin at matched injected norm and matched realised coefficien
 Three of four cells are wins with the profile control holding. Phase-5 is not: `txc_slab`
 +1.56 ± 0.47 against `txc_flat` +1.20 ± 0.75, so the control does not separate there. The
 cell stays in the table with the hole visible.
+
+## 23:08 — two headline candidates, decided by instrument rather than argument
+
+A third design closes the gap that had been bothering both agents: **rank ≥ 2 and relevance
+had never co-occurred.** D1 and D3 reach L3 but are constructs; D2 (refusal onset) is
+relevant but m=2 and therefore rank-1, so it ties against a profile-SAE and the tSAE.
+
+**D2b — three-part refusal rotation — is both.** A well-formed refusal has three parts, not
+two: acknowledge the request, decline with a reason, offer an alternative. That is the shape
+assistant guidelines actually ask for, and three semantically distinct modes make a cyclic
+rotation an **m=3 design, rank exactly 2**, on a behaviour someone genuinely wants to steer.
+
+```text
+class A:  acknowledge / decline / alternative
+class B:  decline / alternative / acknowledge
+```
+
+Registered: `c = 0` exactly, `r1 ≈ 0.50`, `txc_rank2` recovers ~100%, and every rank-1
+baseline — `sae_profile_target`, `sae_enveloped`, `tsae_slab` — capped at ≈0.71 of
+`txc_slab`. Its own gate comes first and is cheap: **decline and alternative both carry
+refusal-adjacent content**, so if their centroids are near-collinear the rank collapses
+toward 1 and D2b is an m=2 task in an m=3 costume. `block_geometry()` on the three clause
+centroids is the test, and the alternatives have been worded as "I can walk through X"
+rather than apologetically, specifically to push them off the decline direction — but that is
+a guess and the geometry decides.
+
+**How the headline task gets chosen.** Two candidates now exist — R-GSM premise order
+(published, 30% documented gap, no corpus to build, but unknown rank and an unverified effect
+at 1.5B) and D2b (constructed, but rank known exactly and on a behaviour people steer).
+Rather than argue, **the gradient screen decides**: it is training-free, one backward pass
+per document, and it was built for exactly this. Screen the order task (calibration), D2b,
+R-GSM and the D1 rungs; pick by measured `1 − r1`, largest wins, with `c > 0.3` as an
+outright disqualification since a plain SAE can do such a task.
+
+That makes the choice reportable rather than a judgement call, which is the whole reason the
+instrument was worth building.
+
+**D1 stays ahead of the headline regardless of which wins.** Its relevance is low but it
+calibrates the law on a construct where `r1` is known in closed form; without it, a measured
+0.71 on D2b has no reference for whether 0.71 is the right number.
+
+## 23:10 — delegate the T-SAE to the reference implementation
+
+Bhalla et al. release code, trained T-SAEs and interpreted latents at
+`github.com/AI4LIFE-GROUP/temporal-saes`. This repo's `CLAUDE.md` carries the rule from the
+2026-05-07 EM replication — *delegate to the reference's function, don't reimplement the
+prep* — after that session lost a day to a reimplemented prep that silently dropped chat
+templating. **The tSAE arm has already failed once this project on an architecture
+mismatch**, so the loss is being matched line-by-line against theirs rather than built from
+the paper description.
+
+One open question that changes what the ladder means, checkable in minutes: **the paper does
+not say whether their steering is applied uniformly across positions.** If it is, the T-SAE
+is another constant-write baseline rather than a genuine middle rung, and the S1/S2/S3
+fairness distinction applies to it too — in which case "T-SAE ties with SAE" would mean the
+encoder difference does not survive a constant write, which is a different claim entirely.
+
+Also recorded for the write-up: their steering evaluation is judge-based (30 features graded
+by Llama-3.3-70B for success and coherence). The teacher-forced margin used here is a
+cleaner, non-overlapping measurement rather than a weaker one, and should be described that
+way.

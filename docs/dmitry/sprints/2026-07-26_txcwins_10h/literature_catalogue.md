@@ -136,13 +136,30 @@ Enough detail to implement it tonight:
 | feature split | 20% high-level (semantic), 80% low-level (syntactic) — a *predefined* partition |
 | results | FVE 0.94 (Pythia) / 0.75 (Gemma); activation smoothness 0.09 vs 0.12–0.13 for baselines; semantics probing beats Matryoshka and BatchTopK; steering "Pareto-dominates" baseline SAEs on intervention success against coherence |
 
+**They release code, trained T-SAEs, and interpreted latents** at
+[AI4LIFE-GROUP/temporal-saes](https://github.com/AI4LIFE-GROUP/temporal-saes). Use the
+reference loss rather than reimplementing it — this is exactly the situation the repo's own
+lessons-learned note warns about (delegate to the reference implementation; the 2026-05-07 EM
+replication lost a day to a reimplemented prep function).
+
 Three things follow. First, this is implementable on top of the repo's existing BatchTopK
 machinery in roughly the length of a loss function — far cheaper than the dense-tSAE
-calibration debt suggested. Second, it uses **BatchTopK**, which the last sprint just made the
+calibration debt suggested — and with the reference code available there is little reason to
+write it from scratch at all. Second, it uses **BatchTopK**, which the last sprint just made the
 crosscoder default, so the sparsity rule is already matched and the `l1_coef` calibration
 problem disappears entirely — that debt was an artefact of running the wrong architecture.
 Third, they claim a *steering* Pareto improvement, so this is a live competitor on the axis the
 sprint cares about, not just a reconstruction baseline.
+
+**Their steering setup, for positioning.** 30 features (e.g. "Medical case reports or
+concepts", "Book titles and authors"), graded by Llama-3.3-70B for intervention success and
+coherence with manual verification, reported as a success-against-coherence Pareto frontier
+against Matryoshka and BatchTopK SAEs and the best SAE on Neuronpedia. Two observations. Their
+metric is **judge-based**, so the sprint's teacher-forced margin is a cleaner and
+non-overlapping measurement rather than a weaker one. And the paper does not state whether
+steering was applied uniformly across positions or position-dependently — if uniformly, then
+even the tSAE arm is a constant write and the S1/S2/S3 distinction in the next section applies
+to it too, which is worth checking in their code before running the comparison.
 
 **The missing arm: Persistent SAEs.** *Persistent Sparse Autoencoders: Learning Feature
 Timescales in Language Models*, 2026 ([arXiv:2607.17117](https://arxiv.org/abs/2607.17117) —
@@ -754,29 +771,35 @@ measured on a completely different task.
 
 ### Changelog
 
-- 2026-07-26 ~23:15 PDT — first pass: criterion restatement; induction, repetition,
+Times are wall-clock against the sprint window opening at 2026-07-25 22:33 PDT.
+
+- **Pass 1** (22:40 PDT) — criterion restatement; entries for induction, repetition,
   backtracking, sandbagging, refusal, lower tier.
-- 2026-07-26 ~23:55 PDT — added instruction-order conflict, multi-turn escalation,
-  entity/state tracking; added the S1/S2/S3 steering-fairness section; verified five
-  citations, including the single-neuron repetition result that demoted repetition; added the
+- **Pass 2** (22:47 PDT) — added instruction-order conflict, multi-turn escalation,
+  entity/state tracking; added the S1/S2/S3 steering-fairness section; verified five citations,
+  including the single-neuron repetition result that demoted repetition; added the
   external-corroboration note.
-- 2026-07-27 ~00:40 PDT — restructured around the prompt-permutation family (new top entry,
-  three instances, all with published matched-multiset protocols); added the P4 harness-fit
-  criterion after confirming the harness windows over *segments*, not tokens, which promotes
-  block-structured tasks and demotes induction; added steganography; verified three more
-  citations.
-- 2026-07-27 ~01:05 PDT — added instance D, premise order / R-GSM, and made it the recommended
+- **Pass 3** (22:51 PDT) — restructured around the prompt-permutation family; added the P4
+  harness-fit criterion after confirming the harness windows over *segments*, not tokens, which
+  promotes block-structured tasks and demotes induction; added steganography.
+- **Pass 4** (22:53 PDT) — added instance D, premise order / R-GSM, and made it the recommended
   instance: largest published gap (>30%), a public dataset of multiset-matched permutation
-  pairs, a reasoning failure rather than a label prior, and no published localisation. Added
-  the localisation risk for instance B (anchored-bias MLP value vectors and attention heads,
-  GPT-2 family) and the whitespace note that no dictionary work exists on order sensitivity.
-- 2026-07-27 ~01:40 PDT — added the baselines section. Resolved carried-over debt 2: the tSAE
+  pairs, a reasoning failure rather than a label prior, no published localisation. Added the
+  localisation risk for instance B and the whitespace note that no dictionary work exists on
+  order sensitivity.
+- **Pass 5** (22:55 PDT) — added the baselines section. Resolved carried-over debt 2: the tSAE
   described is Bhalla et al., ICLR 2026 oral (arXiv:2511.05541), InfoNCE over adjacent
   positions, no attention, BatchTopK k=20 — so the repo's attention-based `TemporalSAE` was
   never the right baseline and the `l1_coef` calibration debt was an artefact of the wrong
-  architecture. Added Persistent SAEs (arXiv:2607.17117) as the missing middle rung and their
-  prompt-injection intervention result. Proposed the four-rung capacity ladder.
-- 2026-07-27 ~02:00 PDT — added prior art on the mechanism: FLAS (arXiv:2605.05892) already
-  publishes position-varying steering beating position-invariant steering, at scale on
-  AxBench. Narrowed the claims the sprint can make to three, and flagged the "crosscoder"
-  naming hazard.
+  architecture. Added Persistent SAEs (arXiv:2607.17117) as the missing middle rung. Proposed
+  the four-rung capacity ladder.
+- **Pass 6** (22:57 PDT) — added prior art on the mechanism: FLAS (arXiv:2605.05892) already
+  publishes position-varying steering beating position-invariant steering, at scale on AxBench.
+  Narrowed the claims the sprint can make to three; flagged the "crosscoder" naming hazard.
+  Added the acquisition table, the six-step recipe, agentic goal drift, and the EM
+  linear-representation counter-evidence.
+- **Pass 7** (23:00 PDT) — T-SAE code and trained weights located
+  ([AI4LIFE-GROUP/temporal-saes](https://github.com/AI4LIFE-GROUP/temporal-saes)); recorded
+  their judge-based steering protocol and the open question of whether their steering is
+  applied uniformly across positions. Corrected the changelog timestamps in this section, which
+  had been estimated rather than read off the clock and were about four hours fast.
