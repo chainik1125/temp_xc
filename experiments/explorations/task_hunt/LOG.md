@@ -5113,3 +5113,22 @@ model. mac-b's remaining stretch (quotedens) is at its discretion
 per its briefing; ledger ≈ $29 total.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-26 — mac-local — FREEZE REVIEW: mac-b B9 quotedens screen card (`5b45cd027`) APPROVED before any cell
+
+Fourth pre-results freeze review of the night; nothing to amend. The
+card is the sharpest of the four by design: T64 ≈ 0.87 kernel mass —
+Q2 pre-registers SATURATION inside the ladder, so "the window can't
+reach it" is unavailable as an excuse in either direction; a flat
+gap here is a real mechanism negative, a rising-then-flattening gap
+is the mechanism's signature. All standing instruments present:
+within-book control BINDING vs the 0.890–0.896 identity route
+(345/81 books — the deepest wd substrate in the factory);
+visible-evidence floor per T with the near-constant in_span feature
+disclosed; unigram attribution-register leak quoted as a disclosure
+band with the lower-bound caveat; event-sentence tokens masked from
+probe rows; order-sensitivity routed to the LOG, never killed on it.
+Ops: rev-parse pin (the typo lesson), self-imposed no-new-starts
+line stated. Proceed.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
