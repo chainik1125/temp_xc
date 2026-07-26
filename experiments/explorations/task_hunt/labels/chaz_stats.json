@@ -1,0 +1,27 @@
+{
+ "derives_from": "sc_lambda.npz (same events/kernel/binning; frozen factory pipeline via bundle_core)",
+ "rule": "eligibility = cue-free trailing 32 tokens (+ pos >= 32, marker tokens masked as before)",
+ "scheme": "zero_split",
+ "edges": [
+  0.0,
+  0.18594639003276825
+ ],
+ "manifest_rows_per_class": {
+  "0": 20000,
+  "1": 20000,
+  "2": 20000
+ },
+ "eligible_rows": 283426,
+ "triage": {
+  "tok_auc_extreme": 0.6298160440173642,
+  "pos_auc_extreme": 0.6354423971724009,
+  "tok_kill_at": 0.65,
+  "pos_kill_at": 0.7,
+  "verdict": "PASS",
+  "tok_auc": 0.6298160440173642,
+  "pos_raw_auc": 0.6354423971724009,
+  "pos_frac_auc": 0.6279447455855316,
+  "n_test_rows": 8104
+ },
+ "artifact": "chaz.npz"
+}
