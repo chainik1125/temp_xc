@@ -283,16 +283,23 @@ question, why discovery fails on SmolLM2; see Limits.)
 
   **No mechanism is established.**
 
-- **Discovery does transfer to a larger model, which resolves the scale question the two failures
-  left open.** Qwen2.5-3B-Instruct at L18 (the same 0.50 depth fraction as Qwen2.5-1.5B's L14), two
-  inits, matched dose: the crosscoder reaches **+34.75 / +33.83** against `grad_slab` +39.20 —
-  **0.86–0.89 of the optimal write**, three times the share it reaches on the 1.5B model (0.29) and
-  an order of magnitude above SmolLM2 (0.07). It beats `sae_broadcast` (+15.88 / +20.88) and
-  `random_slab` (+4.42), and roughly matches the *supervised* `dom_slab` (+34.19) unsupervised.
+- **Discovery appears to transfer to a larger model, on a thin and internally split cell.**
+  Qwen2.5-3B-Instruct at L18 (the same 0.50 depth fraction as Qwen2.5-1.5B's L14), **two inits**,
+  matched dose: the crosscoder reaches **+34.75 / +33.83** against `grad_slab` +39.20 — **0.886 /
+  0.863 of the optimal write**, three times its share on the 1.5B model (0.29) and an order of
+  magnitude above SmolLM2 (0.07). It beats `random_slab` (+4.42) in both and matches the
+  *supervised* `dom_slab` (+34.19) unsupervised in both, which is the best-supported part.
 
-  **So the two earlier failures are not evidence that 1.5B is special** — discovery works at 1.5B
-  and better at 3B, and fails at 0.5B and at SmolLM2-1.7B. Scale is not the axis, or not the only
-  one.
+  ⚠ **The verdict splits between the two inits and splits on convention.** At matched dose it beats
+  `sae_broadcast` in both (+15.88, +20.88); at peak dose it **ties in ds1** (+33.83 against +34.10),
+  and the stored `win` flag — which is peak-based — is **False** there. So this is *discovery works
+  at 3B in one init of two on the win criterion*, not a clean positive. Two inits is thin for a cell
+  whose verdict flips between them: it is the unstable cell of the transfer set, as demonstration
+  order is of the task set.
+
+  **The negatives are far better replicated than this positive** — 0.5B and SmolLM2 have three inits
+  each, `win = False` in all six. So "scale is not the axis" cannot rest on this cell. What it does
+  establish is that the two failures are **not** simply evidence that 1.5B is special.
 
   ⚠ **And the form result holds here too**: `broadcast_optimal` reaches **+41.69**, which is
   **1.063× `grad_slab`** and above the crosscoder in both inits. That is now **seven of eight**
