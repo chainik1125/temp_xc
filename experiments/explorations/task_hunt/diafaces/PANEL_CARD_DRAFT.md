@@ -95,11 +95,17 @@ quotable pre-ratification (process ruling 2026-07-26).
 
 ## 6. Venue, economics, discipline
 
-**A100-40 ONLY for panel cells** (shared-doc GPU rule; reason stated
-in the ledger line), est ≈ 2 h wall: **tsae cells FIRST, one per
-container** (CPU-buffer-bound, 62–77 min precedent), main pool after;
-est ≤ $60 total against mac-a's $120 day-cap and the ≤ $250-at-launch
-gate clause. Commit-then-run (runner + YAML entry + this card FROZEN
+GPU split per Han's day-2 amendment (`a68c364a3`): **H100 for the
+non-tsae training cells** (the one GPU-bound stage), **tsae trained
+cells on high-CPU containers, one per container** (measured GPU-idle,
+62–77 min precedent; cheap GPU tier), reasons stated in the ledger
+lines; est ≈ 2 h wall, ≤ $60 total against mac-a's $120 day-cap and
+the ≤ $250-at-launch gate clause. Runner: thin
+`diafaces/run_panel.py` — the λ̂ `run_stage2._cells` enumeration
+UNCHANGED (5 archs, T ≤ 16, seeds {1,2,42}, trained + untrained,
+buffer 524288) plus `--block tsae|main` / `--only-seed` container
+partitioning that cannot enlarge or reorder the frozen set; committed
+at freeze. Commit-then-run (runner + YAML entry + this card FROZEN
 and pushed; container pinned via rev-parse + `_assert_pinned()`);
 `--detach`; payload persistence to Volume; containers never push;
 ledger read-before/append-after; repatriate-merge-locally with dup
