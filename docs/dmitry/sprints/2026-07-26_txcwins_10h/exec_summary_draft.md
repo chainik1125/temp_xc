@@ -494,6 +494,36 @@ recency-weighted, since that is the documented ICL bias. Measured profile is fla
 is not recency-ordered even though the behavioural bias is — which means **"the crosscoder wins by
 exploiting recency" is not available as an explanation** if it does win.
 
+**The go/no-go passed, and the size of the pass is itself the finding.** Unsteered
+`score(A) − score(B)` measures **−0.303 ± 0.060** (n = 120, z = 5.0), independently **−0.371 ±
+0.051** (n = 200, z = 7.2). So matching moments 0, 1 and 2 did **not** remove the behaviour — but
+it attenuated it heavily:
+
+| task | unsteered gap | z |
+| --- | --- | --- |
+| instruction position | −2.42 | 11.5 |
+| evidence order | −1.36 | 15.1 |
+| **demonstration order** | **−0.303** | 5.0 |
+| `escalate` (dropped null) | −0.07 | 0.5 |
+
+**The few-shot order effect at this scale is mostly carried by the label-position statistics the
+moment constraints remove, with a small residue that survives them.** That is a result about the
+behaviour regardless of how the steering goes, and it is the first direct evidence for what
+carries ICL order sensitivity in this setting.
+
+It also sets the billing. A steering delta is not bounded by the baseline gap — on instruction
+position the crosscoder moved the metric 2.7× its baseline — but "reverses a documented bias" is a
+weak sentence when the bias is 0.30 nats. **A win here is a mechanism result on a low-`c`, rank-2
+task, not a behavioural headline, and it does not go ahead of instruction position.**
+
+⚠ **The `_free` control has become the critical experiment.** The first-moment constraint was
+motivated *entirely* by the carried-state argument — the state's DC is `−Σ j·Δc_j`, so matching the
+first moment kills it. With that mechanism now refuted on both tasks, nothing shows `c` is low
+*because of* the constraint. `demo_order_probe_free` is identical in generator, pattern A and
+pools, differing only in the foil's first moment — (6, 39, 325) against (6, 21, 91). If it
+measures similar `c`, the two-moment machinery is decoration and the design's novelty is the
+borrowed setting alone.
+
 **Registered before the numbers land.** A win is the strongest cell in the sprint: low `c`, real
 rank headroom, a published behaviour, held-out content pools, and a difference-of-differences
 metric under which a function-vector write cancels by construction. A loss says low `c` plus rank
