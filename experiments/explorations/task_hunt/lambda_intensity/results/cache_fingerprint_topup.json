@@ -1,0 +1,11 @@
+{
+  "what": "base/hs13 activation cache REBUILT on Modal for the tsae seed top-up (mac-a, 2026-07-26) — fresh fingerprint for future audits; no committed activation-level receipt existed (originals destroyed 2026-07-25)",
+  "builders_at_pin": "c93473ad3482de441f3c13bea2def5c90de3f5cd",
+  "receipts_passed": ["ward_stream_stats.json byte-identical", "lambda_labels_stats.json byte-identical", "traces.json sha256 dc6513e7d3d104de096bb46f52245f5794406ecf745ad5477804e3a2e4e0f9cd", "lam_hist_dense all-finite (4044,128) mean 0.10483872890472412 std 0.13402059674263"],
+  "hs13_sha256": "0224a72bd676d9d82377c9978aca59e8d723a904ae96da3c2f0f8254e4db53ed",
+  "hs13_bytes": 4240441472,
+  "gpu": "NVIDIA A10 2.8.0+cu128 12.8",
+  "stats": {"shape": [4044, 128, 4096], "dtype": "float16", "slice_mean": -0.00043995000253183036, "slice_std": 0.6964374771424754},
+  "volume": "temp-xc-ward-caches (Modal, Dmitry workspace)",
+  "elapsed_s": 390
+}
