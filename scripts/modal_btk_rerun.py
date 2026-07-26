@@ -19,12 +19,12 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "2ce33ac5ccffbf90fe2e6f1086da0b1fa2bd51b4"  # btk_rerun FREEZE v2
+PINNED_COMMIT = "08711a37472cd77274ecb6f6d32c77f0e776572a"  # canonical-conformance FREEZE v3
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 VOL_DIR = "/workspace/btk_rerun_v2"
 
-ARMS = ["txc_base", "txc_base_btk"]
+ARMS = ["txc_base", "txc_base_btkonly"]
 DATASOURCES = ["toy_markov_n20_d40_noisy", "toy_coupled_K10_M20_d256"]
 T_GRID = [1, 2, 4, 5, 8, 10]
 
