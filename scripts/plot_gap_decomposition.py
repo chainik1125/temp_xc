@@ -16,8 +16,13 @@ the smallest of the three:
 
 Reading the bars left to right on any init:
 
-  * the crosscoder exceeds the entire BROADCAST FORM by 0.95x to 1.20x. In one init of
-    three it does not exceed it at all. So the form is not the binding constraint.
+  * the crosscoder does not meaningfully exceed the entire BROADCAST FORM anywhere. On
+    instruction position the ratio is 0.95-1.20x; on `rot_m12` -- the cell built so that
+    rank-1 writes are poor, r1 = 0.177 against 0.850, at the SAME constant share -- it is
+    0.82-0.89x, i.e. a flat rank-1 write BEATS it in all three inits. The relationship runs
+    opposite to the registered prediction: the task designed to reward temporal rank is
+    where a constant write does best against the crosscoder. So the form is not the binding
+    constraint, and it is not the source of the headline margin.
   * the best constant direction a trained SAE actually contains reaches 43-44% of the best
     constant direction that exists. THE DICTIONARY is the binding constraint.
   * choosing that latent by reading AUC instead of by measured steering gives away most of
