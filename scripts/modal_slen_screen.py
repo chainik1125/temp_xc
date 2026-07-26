@@ -83,7 +83,8 @@ def build_caches() -> str:
 # >20 GB ⇒ L40S. GPU choice does not touch cells/seeds; resume from the
 # Volume partials is the card § 7 pre-authorized adaptation.
 @app.function(image=image, gpu="L40S", volumes={"/workspace": vol},
-              timeout=4 * 60 * 60)
+              timeout=4 * 60 * 60,
+              retries=modal.Retries(max_retries=2, initial_delay=10.0))
 def run_screen(key: str) -> str:
     _assert_pinned()
     _sh(f"mkdir -p {RESULTS_VOL_DIR} {REPO_RES}")
@@ -102,7 +103,8 @@ def run_screen(key: str) -> str:
 
 
 @app.local_entrypoint()
-def main(stage: str = "all"):
+def main(stage: str = "all", models: str = ""):
+    keys = [k for k in models.split(",") if k] or KEYS
     if stage in ("smoke", "all"):
         print(smoke.remote(), flush=True)
     if stage in ("caches", "all"):
@@ -111,10 +113,13 @@ def main(stage: str = "all"):
         local_res = Path(__file__).resolve().parents[1] / \
             "experiments/explorations/task_hunt/slen/results"
         local_res.mkdir(parents=True, exist_ok=True)
-        for key, text in zip(KEYS, run_screen.map(KEYS,
-                                                  return_exceptions=True)):
-            if isinstance(text, Exception):
-                print(f"[FAILED] {key}: {text!r}", flush=True)
+        # sequential .remote() per model: one model's infra failure can
+        # never cancel another's in-flight call (the 19:06 PT lesson)
+        for key in keys:
+            try:
+                text = run_screen.remote(key)
+            except Exception as e:          # noqa: BLE001 — report, go on
+                print(f"[FAILED] {key}: {e!r}", flush=True)
                 continue
             p = local_res / f"screen_{key}.json"
             p.write_text(text)
