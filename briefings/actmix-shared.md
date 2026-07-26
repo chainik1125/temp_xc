@@ -84,3 +84,37 @@ pre-measured as KILL clauses; no max-over-arms; receipts direct-add
 + mac-local ratification; ALL verdicts PENDING TEAM REVIEW;
 liveness rule: a quiet clone is UNKNOWN, not dead — check before
 re-dispatching an agent id; pull-rebase before every push.
+
+## Listening topology (who watches whom — poll origin every ~120–180 s, path-filtered)
+
+Hub-and-spoke: **mac-local reviews everything** (any-push watcher);
+workers listen ONLY to their named upstreams — never to each
+other's results otherwise (anti-noise; verdict interpretation flows
+through mac-local's ratifications).
+
+| listener | wakes on commits touching | why |
+|---|---|---|
+| mac-local | ANY push to arxiv + movement of `origin/neurips-aniket` | review hub; Aniket-convention coordination |
+| mac-a | `experiments/explorations/task_hunt/LOG.md`, `briefings/actmix-*` (mac-local's rulings/amendments) | binding gates for Stages 2–3 |
+| mac-b | same two paths | shortlist gating returns via mac-local |
+| mac-c | same two paths | scope amendments only |
+| runpod-1 | `src/temp_bench/archs/` + LOG (mac-a's convention note); `experiments/explorations/task_hunt/COMPOSITION_AUDIT.md` (mac-c); LOG/briefings (mac-local) | Phase-A convention; Phase-B unblock; rulings |
+| runpod-2 | same three as runpod-1 | same |
+
+Generic listener pattern (run as a background task; on exit, handle
+the wake, then re-arm with the new base):
+
+```bash
+BASE=$(git rev-parse origin/arxiv)
+while true; do
+  git fetch -q origin
+  if [ -n "$(git log --oneline $BASE..origin/arxiv -- <PATHS>)" ]; then
+    git log --oneline $BASE..origin/arxiv -- <PATHS>; exit 0
+  fi
+  sleep 150
+done
+```
+
+Do NOT push watch-state anywhere; the watcher is session-local.
+Your own results still push normally — mac-local's hub watcher
+picks them up without you notifying anyone.
