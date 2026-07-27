@@ -4,6 +4,8 @@ Verdict discipline: PENDING TEAM REVIEW. Gates (CARD § 5):
 
 - `FAIL  G1 l0=21.14 outside [19.5,20.5] at batchtopk_sae_btkonly/T1/s2/k5`
 - `FAIL  G1 l0=21.14 outside [19.5,20.5] at batchtopk_sae_btkonly/T1/s2/k20`
+- `FAIL  G1 l0=24.21 outside [19.5,20.5] at tsae_btkonly/T1/s42/k5`
+- `FAIL  G1 l0=24.21 outside [19.5,20.5] at tsae_btkonly/T1/s42/k20`
 - `FAIL  G1 l0=21.15 outside [18.0,20.5] at txc_batchtopk_pre_btkonly/T1/s1/k5`
 - `FAIL  G1 l0=21.15 outside [18.0,20.5] at txc_batchtopk_pre_btkonly/T1/s1/k20`
 - `FAIL  G1 l0=20.69 outside [18.0,20.5] at txc_batchtopk_pre_btkonly/T1/s42/k5`
@@ -40,7 +42,7 @@ Verdict discipline: PENDING TEAM REVIEW. Gates (CARD § 5):
 | per-token band | AUC (T-invariant) | realized l0 |
 |---|---|---|
 | BatchTopK SAE (20/tok) | 0.8360 ± 0.0034 (n=3) | 20.5271 ± 0.5542 (n=3) |
-| T-SAE (20/tok) | — | — |
+| T-SAE (20/tok) | 0.8069 (n=1) | 24.2120 (n=1) |
 
 untrained twins (seed 42): BatchTopK SAE (20/tok)@T1: 0.652; T-SAE (20/tok)@T1: 0.659; TXC-post (k=20/win)@T1: 0.642; TXC-post (k=20/win)@T2: 0.642; TXC-post (k=20/win)@T4: 0.628; TXC-post (k=20/win)@T8: 0.619; TXC-post (k=20/win)@T16: 0.623; TXC-pre (k=20·T)@T1: 0.642; TXC-pre (k=20·T)@T2: 0.651; TXC-pre (k=20·T)@T4: 0.680; TXC-pre (k=20·T)@T8: 0.688; TXC-pre (k=20·T)@T16: 0.670
 
@@ -57,6 +59,6 @@ untrained twins (seed 42): BatchTopK SAE (20/tok)@T1: 0.652; T-SAE (20/tok)@T1: 
 | per-token band | AUC (T-invariant) | realized l0 |
 |---|---|---|
 | BatchTopK SAE (20/tok) | 0.8993 ± 0.0032 (n=3) | 20.5271 ± 0.5542 (n=3) |
-| T-SAE (20/tok) | — | — |
+| T-SAE (20/tok) | 0.8710 (n=1) | 24.2120 (n=1) |
 
 untrained twins (seed 42): BatchTopK SAE (20/tok)@T1: 0.697; T-SAE (20/tok)@T1: 0.712; TXC-post (k=20/win)@T1: 0.702; TXC-post (k=20/win)@T2: 0.710; TXC-post (k=20/win)@T4: 0.685; TXC-post (k=20/win)@T8: 0.670; TXC-post (k=20/win)@T16: 0.666; TXC-pre (k=20·T)@T1: 0.702; TXC-pre (k=20·T)@T2: 0.707; TXC-pre (k=20·T)@T4: 0.735; TXC-pre (k=20·T)@T8: 0.743; TXC-pre (k=20·T)@T16: 0.720

@@ -243,7 +243,8 @@ def make_fig(cells: dict, arm: str, k: int, Ts, outdir: Path):
     plt.close(fig)
 
 
-def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path):
+def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
+                     pair_style: str = "mono"):
     """Aniket-template shuffle T-sweep (059a66239 P1 deliverable).
 
     Knob-for-knob twin of runpod-2's RLHF renderer (421f6fa37,
@@ -257,6 +258,12 @@ def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path):
     fig); actmix-internal figs keep the pre/post hue split.
     """
     HUE = "#D55E00"
+    # Pair-hue knob mirrored verbatim from the RLHF twin (2200a346d):
+    # mono = single pair-hue, linestyle carries the order condition;
+    # blueorange = Aniket backtracking-fig sibling styling (shuffled in
+    # house blue #0072B2). Meeting decision — LOG 36655341a.
+    colors = {"ordered": HUE,
+              "shuffled": HUE if pair_style == "mono" else "#0072B2"}
     pts = {}   # (T, seed) -> {"ordered": v, "shuffled": v}
     for (a, u, T, s, kk), m in cells.items():
         if a == TXC_PRE and not u and kk == k and "mean_auc" in m:
@@ -285,17 +292,19 @@ def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path):
             ss = sorted((T, v[field]) for (T, sd_), v in pts.items()
                         if sd_ == s and v[field] is not None)
             if len(ss) > 1:
-                ax.plot(*zip(*ss), ls, color=HUE, alpha=0.25, lw=1, zorder=1)
+                ax.plot(*zip(*ss), ls, color=colors[field], alpha=0.25,
+                        lw=1, zorder=1)
 
     for field, ls, mk, mfc, label in (
-            ("ordered", "-", "o", HUE, "ordered"),
+            ("ordered", "-", "o", None, "ordered"),
             ("shuffled", "--", "s", "white", "within-window shuffled")):
+        c = colors[field]
         Ts_, mu, sd, n = mean_sd(field)
-        ax.plot(Ts_, mu, ls, color=HUE, lw=2, marker=mk, ms=6,
-                mfc=mfc, mec=HUE, label=label, zorder=3)
+        ax.plot(Ts_, mu, ls, color=c, lw=2, marker=mk, ms=6,
+                mfc=mfc or c, mec=c, label=label, zorder=3)
         for T, m_, s_ in zip(Ts_, mu, sd):
             if s_ is not None:
-                ax.errorbar(T, m_, yerr=s_, color=HUE, capsize=3,
+                ax.errorbar(T, m_, yerr=s_, color=c, capsize=3,
                             lw=1.2, zorder=2)
 
     Ts_, mu, _, n = mean_sd("ordered")
@@ -346,6 +355,13 @@ def main():
     ap.add_argument("--writeup", choices=["interim", "final"],
                     help="also render figs_writeup/fig_probing_shuffle_tsweep"
                          " (k=20 headline, Aniket template)")
+    ap.add_argument("--pair-style", choices=("mono", "blueorange"),
+                    default="mono",
+                    help="mono = single pair-hue (linestyle carries the "
+                         "order condition); blueorange = Aniket "
+                         "backtracking-fig sibling styling (shuffled in "
+                         "house blue #0072B2). Meeting decision — see "
+                         "LOG 36655341a.")
     args = ap.parse_args()
 
     rows = load_rows(args.arm)
@@ -371,7 +387,8 @@ def main():
     print(f"[analysis] wrote {HERE/'RESULTS.md'} + figs/")
 
     if args.writeup:
-        make_writeup_fig(cells, 20, args.Ts, args.writeup, ROOT / "figs_writeup")
+        make_writeup_fig(cells, 20, args.Ts, args.writeup,
+                         ROOT / "figs_writeup", pair_style=args.pair_style)
 
 
 if __name__ == "__main__":
