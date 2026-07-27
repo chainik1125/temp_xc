@@ -112,6 +112,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
              n_grad=0, select_by="reading", n_select=24, n_short=16,
              matched_dose_hint=0.5, sae_lr=None, txc_lr=None, tsae_lr=None,
              sae_steps=None, txc_steps=None, tsae_steps=None,
+             tsaep_k=None, tsaep_lr=None, tsaep_steps=None,
              arms=None, verbose=True):
     """Train three dictionaries on a matched-pair task and score reading + steering.
 
@@ -378,6 +379,45 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
         v_ts = unit(ts_.D.data[jn].float())
         writes["tsae_broadcast"] = sign_n * unit(
             v_ts.unsqueeze(0).expand(T, -1).contiguous())
+
+    # ---------------- 3b. the PUBLISHED temporal SAE (arXiv:2511.05541) ----------------
+    # The arm above is an ATTENTION architecture that this repo aliases `tsae_paper`; the
+    # published method has no attention. See `tsae_bhalla.py` for the port and the mislabel.
+    # Matched to the SAE and crosscoder on the same axis they are matched on: k_pos is the
+    # BatchTopK budget in coefficients per segment, so `tsaep_k` should equal the SAE's k.
+    if tsaep_k is not None:
+        try:                    # Modal mounts this dir as the `txc_wins` package
+            from txc_wins.tsae_bhalla import TSAEPaper
+        except ImportError:     # local runs import it as a sibling module
+            from tsae_bhalla import TSAEPaper
+        torch.manual_seed(dict_seed)
+        tp_ = TSAEPaper(d_in=d, d_sae=d_sae, k_pos=int(tsaep_k)).to(dev)
+        opt = torch.optim.Adam(tp_.parameters(), lr=tsaep_lr or lr)
+        tp_.train()
+        for _ in range(int(tsaep_steps or steps)):
+            loss, _info = tp_.train_step(gen_win(batch_win))
+            opt.zero_grad(); loss.backward()
+            torch.nn.utils.clip_grad_norm_(tp_.parameters(), 1.0)
+            opt.step()
+            tp_.post_step()          # decoder unit-norm renormalisation
+        tp_.eval()
+        with torch.no_grad():
+            Ztp_tr, Ztp = tp_.encode(Xtr), tp_.encode(Xho)
+        jp, auc_p, sign_p, auc_p_tr = best_latent(Ztp_tr.mean(1), Ztp.mean(1))
+        out["reading"]["tsae_paper"] = {
+            "latent": jp, "auc": auc_p, "auc_selection": auc_p_tr,
+            "rule": "batchtopk+threshold", "kval": int(tsaep_k),
+            "threshold": float(tp_.threshold.item()), "arch": "arXiv:2511.05541"}
+        out["sparsity"]["tsae_paper"] = float(
+            (Ztp.reshape(-1, d_sae) > 0).float().sum(-1).mean())
+        log(f"[tsae_paper] latent {jp} pooled AUC {auc_p:.3f} "
+            f"(holdout; {auc_p_tr:.3f} in-sample)  "
+            f"realised {out['sparsity']['tsae_paper']:.2f} coeff/segment  "
+            f"threshold {tp_.threshold.item():.4f}")
+        # One direction per latent, no position axis -- a rank-1 write, exactly like the
+        # TopK SAE. Correcting the architecture does not move it across the rank argument.
+        writes["tsaep_broadcast"] = sign_p * unit(
+            unit(tp_.W_dec.data[jp].float()).unsqueeze(0).expand(T, -1).contiguous())
 
     # ---------------- 4. controls ----------------
     with torch.no_grad():
@@ -783,6 +823,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     # spans only, and the continuation is influenced through attention.
     if gen_tokens and n_gen:
         gen_arms = [nm for nm in ("txc_slab", "sae_broadcast", "tsae_broadcast",
+                                  "tsaep_broadcast",
                                   "txc_flat", "dom_slab", "broadcast_optimal")
                     if nm in writes]
         # DOSE GRID, not one dose per arm. The previous version generated each arm at
@@ -956,7 +997,7 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     # one. It is also the arm whose failure on SmolLM2 (+1.27 against the gradient write's
     # +13.38) split the arms along the P_dom / Gbar line and gave that null its account.
     # If an arm is worth injecting it is worth comparing; if it is not, drop it from `writes`.
-    others = ("sae_broadcast", "tsae_broadcast", "txc_flat",
+    others = ("sae_broadcast", "tsae_broadcast", "tsaep_broadcast", "txc_flat",
               "txc_profile_random", "random_slab", "random_broadcast",
               "sae_schedule", "rank1_best", "grad_slab", "grad_rank1",
               "sae_schedule_grad", "broadcast_optimal", "dom_slab",

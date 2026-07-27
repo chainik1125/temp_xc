@@ -13,6 +13,11 @@ _here = pathlib.Path(__file__).resolve()
 ROOT = _here.parents[3] if len(_here.parents) > 3 else pathlib.Path("/work")
 
 app = modal.App("txcwins-task")
+# Results are written INSIDE the container to a persisted Volume as well as returned. The
+# return value is lost whenever the local client disconnects, which `--detach` makes routine;
+# the Volume copy is what makes a detached run recoverable. Fetch with:
+#     modal volume get txcwins-results <name>.json <dest>
+results_vol = modal.Volume.from_name("txcwins-results", create_if_missing=True)
 image = (
     modal.Image.debian_slim()
     .pip_install("torch", "transformers", "accelerate", "numpy")
@@ -35,13 +40,15 @@ image = (
 )
 
 
-@app.function(gpu="A10G", image=image, timeout=21600)
+@app.function(gpu="A10G", image=image, timeout=21600,
+              volumes={"/out": results_vol})
 def run(task: str, task_test: str, model_id: str, layer: int, k_seg: int, n_train: int, n_test: int,
         d_sae: int, k: int, steps: int, lr: float, batch_win: int, alphas: list,
         tsae_l1: float, tsae_k: int, txc_k: int, n_perm: int, seed: int,
         dict_seed: int, gen_tokens: int, n_gen: int, n_grad: int,
         recipe: list, select_by: str, n_select: int, n_short: int,
-        gen_alphas: list):
+        gen_alphas: list, tsaep_k: int = 0, out_name: str = ""):
+    import pathlib
     import sys
     sys.path.insert(0, "/work")
     from txc_wins.harness import run_task
@@ -62,9 +69,16 @@ def run(task: str, task_test: str, model_id: str, layer: int, k_seg: int, n_trai
                  n_select=n_select, n_short=n_short,
                  sae_lr=recipe[0] or None, sae_steps=recipe[1] or None,
                  txc_lr=recipe[2] or None, txc_steps=recipe[3] or None,
-                 tsae_lr=recipe[4] or None, tsae_steps=recipe[5] or None)
+                 tsae_lr=recipe[4] or None, tsae_steps=recipe[5] or None,
+                 tsaep_k=(tsaep_k if tsaep_k > 0 else None),
+                 tsaep_lr=recipe[0] or None, tsaep_steps=recipe[1] or None)
     r["task"] = task
     r["task_test"] = task_test or task
+    if out_name:
+        import json as _json
+        pathlib.Path("/out", out_name).write_text(_json.dumps(r, indent=2))
+        results_vol.commit()
+        print(f"[volume] wrote /out/{out_name}", flush=True)
     return r
 
 
@@ -73,7 +87,7 @@ def main(task: str = "order", task_test: str = "", model: str = "Qwen/Qwen2.5-1.
          k_seg: int = 12, n_train: int = 800, n_test: int = 100, d_sae: int = 4096,
          k: int = 8, steps: int = 2000, lr: float = 3e-4, batch_win: int = 32,
          alphas: str = "0.25,0.5,1.0,2.0", tsae_l1: float = 0.0, tsae_k: int = 0,
-         txc_k: int = 0, n_perm: int = 0,
+         txc_k: int = 0, tsaep_k: int = 0, n_perm: int = 0,
          seed: int = 31415, dict_seed: int = 0, gen_tokens: int = 0,
          n_gen: int = 0, n_grad: int = 0, recipe: str = "",
          select_by: str = "reading", n_select: int = 24, n_short: int = 16,
@@ -84,7 +98,8 @@ def main(task: str = "order", task_test: str = "", model: str = "Qwen/Qwen2.5-1.
                    txc_k, n_perm, seed, dict_seed, gen_tokens, n_gen, n_grad,
                    ([float(x) for x in recipe.split(",")] if recipe else [0] * 6),
                    select_by, n_select, n_short,
-                   [float(x) for x in gen_alphas.split(",")] if gen_alphas else [])
+                   [float(x) for x in gen_alphas.split(",")] if gen_alphas else [],
+                   tsaep_k, f"{task}{tag}.json")
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
     name = f"{task}{tag}.json"
