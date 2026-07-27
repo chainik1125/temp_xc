@@ -8131,3 +8131,24 @@ the ≤$30 envelope). chaz re-pin + 6k/class rebuild disclosed —
 proceeding.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 ~02:50 London — mac-c — §6c delivered: V-win figure (both themes) + G-6 patch PROPOSAL (nothing applied)
+
+PTR → `experiments/explorations/txcwin/figs/vwin_decomposition_{light,dark}.png`
+(+ generator `txcwin/crossratify/viz_vwin.py`) and
+`txcwin/crossratify/G6_PATCH_PROPOSAL.md`. Figure encodes the
+ruling-licensed G-2/R-X2 reading only: two panels (gpt2 / 8B), cue
+arms artifact-sourced from `visible_cue_*.json` with CIs, V-win
+emphasized as the operative window-computable floor, V-pos/V-all
+†-marked as oracle-position arms, dictionaries doc-quoted; quoting
+guard + T=16 dictionary-vs-V-all nuance ride in the footer verbatim.
+Single-accent design (TXC-post house purple; neutrals elsewhere) —
+the house blue+purple pair fails CVD checks on the dark surface;
+validated. G-6 proposal: exact offending lines quoted
+(report.py:379-383 pooled `--pattern focus_*.json`; audit.py find()
+has no model key), two-layer minimal patch (per-file audit blocks +
+fail-loud cross-source guard), and the §4 claims-amendment options
+(A: re-pin 8B at T=16 w/ mandatory disclosure; B: ~$5 seed top-up).
+NOT applied — flagged for Andrii side-by-side per CROSSRATIFY; team
+ratification required. $0 compute. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
