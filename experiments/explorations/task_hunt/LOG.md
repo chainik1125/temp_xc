@@ -13563,3 +13563,63 @@ GPU 1 (T16 → T1-collapse-with-AuxK-live → T4; drain ~02:30). STATUS
 carries the full resume playbook (pre-compact rewrite pushed).
 
 _Recorded-by: claude-fable-5 (runpod-c, T-scaling hill-climb)_
+
+## 2026-07-27 23:01 London (date-verified) — mac-local — ⚑ PAPER SEED-AUDIT VERDICT (Han item 1, delegate-verified + Dmitry-coverage cross-checked) + runpod-c C2 ratification
+
+**SEED AUDIT (probing-related paper exhibits; audit re-executed the
+renderer filter chains against committed leaderboards; Dmitry's HF
+audit README cross-checked for his top-up scope):**
+
+- **c3 sparse probing = SAFE, no top-up needed.** All four c3
+  exhibits (Fig 3a budget sweep, Fig 3b AUC-vs-k, appendix full
+  curve, appendix per-task heatmap) draw one aggregate: every arch
+  (txc_base T5/T10/T20, txc_pro, topk_sae, tsae_paper, mlc, tfa)
+  has all 3 seeds {1,2,42} at all 8 budgets — zero holes. Dmitry
+  excluding probing is CORRECT. Nuances: Fig 3a's caption does NOT
+  state the seed count (it lives in a commit message + the appendix
+  protocol section); and seed count ≠ T-label soundness — the A12
+  guard-rail (nobody quotes the shipped c3 T10/T20 ordering)
+  stands unchanged.
+- **c7 detection (Fig 4b PR-AUC + tab:c7-pr-auc) = SINGLE SEED
+  (42) on ALL SEVEN cells** — the paper admits it
+  (appendix §app:c7-seeds: "All main numbers … use training seed
+  42. Multi-seed replication is left for camera-ready or follow-up
+  work."). Dmitry's top-up queue covers the TXC-base T5/300k
+  headline ONLY (1/3 done, seeds 1/2 queued per his HF README) —
+  so post-top-up, SIX cells (TopK SAE, T-SAE, MLC, TXC-base 2nd
+  bs, TXC-pro ×2) remain single-seed. Full 3-seed match ≈ 12
+  trainings × 300k steps on the R1-Distill substrate — a real
+  budget item (order $200-300 GPU); DECISION for Han/Dmitry
+  (Aniket's section — fleet hands off without a ruling). The
+  Fig 1c rose's Backtracking axis inherits the same exposure.
+- **c6 EM (Fig 5b PR-AUC S=16) = TWO seeds {1,42} by design, all
+  4 bars.** Dmitry adds TXC-base seed-2 only → sae_arditi, T-SAE,
+  txc_pro stay 2-seed. WORSE: tsae_paper + txc_pro protocol-3.0.0
+  rows exist in NO committed leaderboard on any branch — the
+  headline bar ("T-SAE performs best") is unverifiable from the
+  repo. → Dmitry (his section; his HF audit folder is the natural
+  home for the missing rows).
+- **Camera-ready defects (→ Aniket):** (i) appendix.tex references
+  assets MISSING from origin/neurips-aniket (build breaks):
+  c3_sparse_probing_full_gemma_it.pdf, c6_em_pareto/steering
+  ×2, sentence_mid_res png; (ii) appendix.tex:144 says the
+  headline averages "38 tasks" — contradicts main caption + the
+  renderer (36, CT pair dropped); (iii) REPRODUCE_FIGURES.md's c7
+  recipe claims paired seeds {1,42} — never ran (no seed-1 c7 row
+  anywhere); (iv) the c7 TXC-pro bs1024 cell appears in no
+  committed leaderboard blob (generated in an uncommitted working
+  copy).
+
+**runpod-c C2 RATIFIED (KILL honored, instrument validated).**
+Subseq-curriculum-on-healthy-backbone KILLED at L1 (T16 0.8641 vs
+twin 0.8810) — curriculum ALONE is exonerated as the carrier; the
+T1 bit-identity receipt fired exactly as designed (plugin contract
+validated in the field). Attribution narrows: not contrastive, not
+matryoshka, not curriculum-alone — stripped-r1 (nocontr 0.9177 /
+nomatr 0.9185, both ABOVE full-recipe 0.9153) carries; r1-min
+T{1,16} launch is the right next candidate. Threshold under-admit
+datum (l0 284/320) noted. Stamp corrigendum (3rd tonight) —
+corrigenda discipline holding. GPU-0 gap closed by the r1-min
+launch.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
