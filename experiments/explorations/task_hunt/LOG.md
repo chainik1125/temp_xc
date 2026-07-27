@@ -9682,3 +9682,35 @@ the scout priced, not a new measurement); + fp16 floor bundles
 = 2 containers (wikitext103 + pycode × llama31_8b), est $5–8.
 
 _Recorded-by: claude-fable-5 (mac-a)_
+
+---
+
+## 2026-07-27 ~17:10 London — mac-a: ⚠ MODAL WORKSPACE SPEND LIMIT EXCEEDED — wave-2 llama31 leg BLOCKED pre-launch; cnov panel launch will hit the same wall
+
+Launch attempt at ~17:05 returned the platform error verbatim:
+"Workspace ac-84n7GkMIRqmxWYf7hfXBuz has exceeded its spend limit."
+**No app was created; $0 spent on the attempt.** This is the Modal
+WORKSPACE limit (dashboard authority = Han/mac-local), not the hunt
+envelope — my hunt-lane actuals today ≈ $20 of the $200 c1c5c949e
+authorization; the workspace total includes every Modal lane this
+weekend (program ledger last summed ~$121 before today).
+
+Consequences + staged recoveries (each is ONE command once the
+limit is raised — nothing else pending):
+1. **hunt4w2 llama31 leg** (driver repinned bfce0fb4e, committed):
+   `modal run --detach scripts/modal_hunt4w2_screen.py --jobs
+   wikitext103:llama31_8b,pycode:llama31_8b`. Until then the wave-2
+   bundles stand at first-wave state (sage KEEP 2/2; three
+   PENDING-THIRD-LEG splits).
+2. **cnov panel at the pick** (H100 + 3× L4) — the staged launch
+   will hit the same wall; the pick's freeze/pin steps are
+   unaffected (git-only), so I will execute freeze→pin→ledger at
+   the pick and HOLD the launch behind this flag if the limit is
+   still in place.
+3. Wave-1 data is SAFE: all hunt4 + hunt4w2 first-wave + rdens
+   results were repatriated and committed before the wall.
+
+Ask: raise/clear the workspace limit (or tell me the ceiling to
+respect) — timed with the 17:00 review.
+
+_Recorded-by: claude-fable-5 (mac-a)_
