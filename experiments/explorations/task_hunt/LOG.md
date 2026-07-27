@@ -15592,3 +15592,36 @@ mac-c's implementation is canonical, mine never touched the tree.
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+### 2026-07-28 00:36 London — runpod-1: T8 TIEBREAKER RULES COIN-FLIP (s2 DIVERGES, RM-ahead k5) + s1/T16 diff + RM shard-0 PASS COMPLETE + btk-T10 telemetry CONFIRMED LIVE
+
+- **(pre, s2, T8): DIVERGES, 6/7 tensors. Δk5 +5.63e−3 (RM ahead),
+  Δk20 −1.23e−3.** T8 column final at 3 seeds — k5 signs {+,−,+},
+  mean ≈ +1.5e−3; k20 {+1.02e−2, −5.12e−3, −1.23e−3}. **Ruling:
+  T8 arm-sign is a coin flip — no seed-stable advantage either k.**
+- (pre, s1, T16): DIVERGES 6/7 (local tensors), Δk5 −7.53e−3,
+  Δk20 −4.3e−4 (committed 0e2243c0c). T16 at 2 seeds also mixed
+  (s42 k5 +2.46e−3 / k20 −1.67e−3). s2/T16 lands later tonight.
+- **Per-T/per-seed delta map (RM − btk), all diffs local 6/7:**
+  T6 k5 {−1.63,−1.02,−1.38}e−2 · k20 {+0.08,+0.24,−0.52}e−2 |
+  T8 k5 {+0.88,−0.98,+0.56}e−2 · k20 {+1.02,−0.51,−0.12}e−2 |
+  T16 k5 {+0.25,−0.75,…}e−2 · k20 {−0.17,−0.04,…}e−2.
+  Emerging certificate shape: divergence UNIVERSAL at T≥2, but the
+  only seed-consistent directional structure is **T6-k5 (btk ahead
+  3/3, ~1.3e−2)**. CAVEAT carried forward: with n=3 seeds and 3+
+  T-columns inspected, one all-same-sign column has ~0.58 chance
+  under a random-sign null — T6-k5 is a FLAG for the certificate,
+  not a claim; s2/T10 + fills extend the map before any wording
+  hardens.
+- **GPU1 RM shard 0 PASS COMPLETE (all cells ok)** → btk T10 pass
+  running (1/3 s42). **Telemetry coverage fix CONFIRMED IN PROD:**
+  TXCBatchTopKPreBTKOnly_T10 trace live — step 0: boundary_min_pre
+  +4.19 (positive: 200/18432 = 1.09% selection depth doesn't reach
+  the negative pool at init), batch_l0 200.0 = nominal exactly
+  (btk realized≡nominal). The morning trace-parse tracks whether
+  the boundary EVER crosses 0 (sampled every 250 steps — a rate
+  estimate, not a proof of no-crossing).
+- Cells for the record: RM s2/T8 k20 0.8901 (shuf 0.8669), k5
+  0.8277 (shuf 0.8226), l0 165.26. GPU0 mid s1/T10 (~00:00), then
+  s2/{T16,T10}; fills queued behind sentinels.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
