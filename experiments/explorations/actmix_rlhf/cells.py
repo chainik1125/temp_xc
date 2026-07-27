@@ -85,4 +85,24 @@ def lane_s1():
              tsae(500), tsae(20)]]
 
 
-LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1}
+# ── Append-only (2026-07-27, stacked-SAE sprint): reviewer-1 stacked
+# arm at the paper shape (k_win = 500). Stacked k_pos is PER POSITION,
+# so k_pos=100 at T=5 gives the 500-atom window budget the panel's
+# txc(5) cell matches.
+
+STACKED_ARCH = "stacked_btkonly_pooled"
+
+
+def stacked(T, n_steps=N_STEPS):
+    tag = "" if n_steps else "_untrained"
+    return _cell(f"rlhf_stacked_btkonly_T{T}{tag}", STACKED_ARCH,
+                 {"d_sae": D_SAE, "T": T, "k_pos": 100}, 1024, n_steps)
+
+
+def lane_stacked():
+    """Reviewer-1 arm: trained cell + untrained floor twin."""
+    return [stacked(5), stacked(5, n_steps=0)]
+
+
+LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1,
+         "stacked": lane_stacked}

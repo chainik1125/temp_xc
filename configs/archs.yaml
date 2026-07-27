@@ -177,6 +177,23 @@ archs:
       synthetic: { d_sae: 20 }
     notes: "btk-only twin of stacked_batchtopk."
 
+  stacked_btkonly_pooled:
+    class_path: temp_bench.archs.stacked_pooled:StackedBTKOnlyPooled
+    arch_version: "1.2.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+      em: { d_sae: 32768, k_pos: 25 }
+    notes: >-
+      stacked_batchtopk_btkonly emitting one max-|act|-pooled code per
+      window (sign preserved) for the ACTMIX campaign cell tables.
+
   txc_batchtopk_pre_btkonly:
     class_path: temp_bench.archs.btk_only:TXCBatchTopKPreBTKOnly
     arch_version: "1.1.0"
@@ -430,6 +447,24 @@ archs:
     per_section_hparams:
       synthetic: { d_sae: 20 }
     notes: "T independent per-position TopK-SAEs, one per window slot."
+
+  stacked_sae_pooled:
+    class_path: temp_bench.archs.stacked_pooled:StackedSAEPooled
+    arch_version: "2.1.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 20
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+      em: { d_sae: 32768, k_pos: 25 }
+      backtracking: { d_sae: 32768 }
+    notes: >-
+      stacked_sae with the App-A eval reduction (max-|act| over positions)
+      baked into encode: (B, T, d_in) -> (B, d_sae) window code, so the
+      probing/rlhf evaluators see one code per window. consumes='window'.
+      Training loss identical to stacked_sae. Reviewer-1 baseline arm.
 
   mlc:
     class_path: temp_bench.archs.mlc:MLC

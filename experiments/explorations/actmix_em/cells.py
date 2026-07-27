@@ -209,9 +209,38 @@ def lane_g():
             txc_cell(4, 42, n_steps=0)]
 
 
+# ── Append-only (2026-07-27, stacked-SAE sprint): reviewer-1 stacked
+# arm. Stacked k_pos is PER POSITION (independent dict per slot),
+# unlike txc_post's per-window k — 20 atoms/token nominal is k_pos=20
+# directly, no ·T rescale. T=5 mirrors the paper's headline txc_base
+# window; T=4 slots into the panel T-grid as a stretch point.
+
+STACKED_ARCH = "stacked_btkonly_pooled"
+
+
+def stacked_cell(T, seed, n_steps=N_STEPS):
+    tag = "" if n_steps else "_untrained"
+    return _cell(f"stacked_btkonly_T{T}{tag}", STACKED_ARCH, seed,
+                 {"d_sae": D_SAE, "T": T, "k_pos": K_PER_TOKEN},
+                 1024, n_steps)
+
+
+def lane_stacked():
+    """Reviewer-1 arm: T5 paired seeds + untrained twin, then the
+    panel-grid stretch points if the clock allows."""
+    return [stacked_cell(5, 42), stacked_cell(5, 1),
+            stacked_cell(5, 42, n_steps=0)]
+
+
+def lane_stacked_grid():
+    """Stretch: stacked along the panel T-grid, s42 only."""
+    return [stacked_cell(T, 42) for T in (1, 2, 4, 8, 16)]
+
+
 LANES = {"a": lane_a, "b": lane_b, "c": lane_c,
          "h": lane_h, "l": lane_l, "m": lane_m, "t16": lane_t16,
-         "f": lane_f, "g": lane_g}
+         "f": lane_f, "g": lane_g,
+         "stacked": lane_stacked, "stacked_grid": lane_stacked_grid}
 
 
 def all_cells():
