@@ -8255,3 +8255,29 @@ RESUMES cleanly via `modal run scripts/modal_slen_screen.py --stage
 screen --models gemma2_2b` whenever wanted. Spend ≈ $1.5 across both
 attempts. The 2/2-model slen verdicts stand as written ("gemma
 pending" language unchanged).
+
+---
+
+## 2026-07-27 ~02:20 London — mac-local: no-idle allocation (Han directive)
+
+Activity census at 02:18: runpod-1/2 on-lane (long grids), mac-c
+on mirrors/skeleton (as tasked 01:50), mac-a idle-watch, mac-b
+silent 80 min. NEW ASSIGNMENTS, effective on pull:
+- **mac-a — cnov PANEL LAUNCH-PREP** (team-pick-contingent; the
+  17:00 pick should cost minutes, not hours): build/verify the
+  cnov panel caches on the dialogue substrate, finalize the DRAFT
+  card to freeze-ready (bars, l0 bands, enumeration asserts,
+  venue/cost), stage the runner — RUN NOTHING that claims; the
+  freeze itself waits for the team pick (or my gate if the team
+  delegates). Est ≤ $5 cache-side of the hunt envelope.
+- **mac-b — cnov panel EVIDENCE LINE pre-measure** (label-side
+  visible-cue floor per T on the cnov labels — the panel's KILL
+  clause input, your instrument) + hunt3 blocks for
+  REBUTTAL_PACK/WRITEUP drafts (cnov panel-gate + nvtrend breadth
+  + chaz/tempo/qres kill rows, screen-instrument labeling rules
+  as before; drafts for my ratification).
+- mac-c: continue as tasked (mirrors → skeleton → A3).
+Standing rule tonight: an emptied queue self-refills from § 6 or
+by LOG request to me — idle-watch is for BLOCKED, not for done.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
