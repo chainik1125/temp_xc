@@ -1,0 +1,3749 @@
+{
+  "artifact": "/workspace/txc-neurips-aniket/purified/artifacts/c7/sentence_acts_L10.npz",
+  "artifact_sha256": "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810",
+  "code_fingerprint": {
+    "artifact_sha256": "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810",
+    "protocol_version": "2026-07-23.2",
+    "row_indices_sha256": "fc165914c63e604ee86667da8e671c7c42dec0cbe149c1f01c23967f9ec86e61",
+    "sae_checkpoint_sha256": "2593356598d8d12d05144a30a77c68573e302e676e05149e42f9507d9f136306",
+    "seed": 42,
+    "txc_checkpoint_sha256": "0990a52e7e462a4dec1a853ca58aa8b103b19707e67361f6f101401eb202a631",
+    "window": 1,
+    "window_offsets": [
+      -8
+    ]
+  },
+  "controls": {
+    "residual": "train-fold-only covariance-whitened raw-activation upper bound",
+    "sae_invariant": "max pool of the same per-token SAE codes",
+    "sae_last_token": "same SAE restricted to the endpoint at offset -8",
+    "sae_positional": "one shared per-token SAE with relative-position-specific feature blocks; a conservative multi-token ordered baseline"
+  },
+  "estimand": "question-grouped sentence-level backtracking detection PR-AUC; the sparse probe is fit on ordered codes then held fixed under shuffle, reversal, and non-zero circular shifts",
+  "folds": 5,
+  "grouped_question_bootstrap": {
+    "aggregation": "mean paired PR-AUC gap across outer folds",
+    "comparisons": {
+      "txc_minus_sae_positional": {
+        "fold_values": [
+          0.0027504195904364814,
+          0.002033848589391013,
+          -0.006431107819850013,
+          -0.00032759817984520656,
+          -0.00022490613180192742
+        ],
+        "lower_95": -0.009263594165200402,
+        "median": -0.0003514237435405992,
+        "point_estimate": -0.00043986879033393046,
+        "repeats": 2000,
+        "upper_95": 0.00893116570340673
+      },
+      "txc_minus_strongest_control_including_residual": {
+        "fold_values": [
+          -0.03977927873717246,
+          -0.014797903500565313,
+          -0.014884136365490408,
+          -0.013405975549423105,
+          -0.00022490613180192742
+        ],
+        "lower_95": -0.030590014625712626,
+        "median": -0.019070998682800835,
+        "point_estimate": -0.016618440056890643,
+        "repeats": 2000,
+        "upper_95": -0.009075687700463223
+      },
+      "txc_minus_strongest_learned_control": {
+        "fold_values": [
+          0.0,
+          0.0,
+          -0.006431107819850013,
+          -0.00032759817984520656,
+          -0.00022490613180192742
+        ],
+        "lower_95": -0.010905670275381887,
+        "median": -0.004192276364737499,
+        "point_estimate": -0.0013967224262994293,
+        "repeats": 2000,
+        "upper_95": -8.056289851740024e-06
+      }
+    },
+    "repeats_requested": 2000,
+    "unit": "question group, resampled within each fixed outer test fold"
+  },
+  "n_groups": 300,
+  "n_rows": 25204,
+  "positive_rate": 0.12573401047452784,
+  "probes": {
+    "sae_invariant": [
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          },
+          "reverse": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          },
+          "shuffle": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              },
+              "reverse": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              },
+              "shuffle": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.35420466816523244,
+              "pr_auc": 0.16524404406935173,
+              "roc_auc": 0.5950720884273424
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S8_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              },
+              "reverse": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              },
+              "shuffle": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.3787858625712458,
+              "pr_auc": 0.19828370022740574,
+              "roc_auc": 0.5697460555471666
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S8_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              },
+              "reverse": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              },
+              "shuffle": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.390415333517404,
+              "pr_auc": 0.16780291923579388,
+              "roc_auc": 0.5286304735361895
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S8_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              },
+              "reverse": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              },
+              "shuffle": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.38009903847623827,
+              "pr_auc": 0.20050046301146662,
+              "roc_auc": 0.5689575321581363
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S8_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              },
+              "reverse": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              },
+              "shuffle": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.36374893554706195,
+              "pr_auc": 0.16969687840067385,
+              "roc_auc": 0.5727878285539671
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S8_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 8,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.16524404406935173,
+            0.19828370022740574,
+            0.16780291923579388,
+            0.20050046301146662,
+            0.16969687840067385
+          ],
+          "mean": 0.18030560098893839,
+          "std_sample": 0.017512545839727653
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          },
+          "reverse": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              },
+              "reverse": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              },
+              "shuffle": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.3498978610543648,
+              "pr_auc": 0.1869130334576357,
+              "roc_auc": 0.6275520121423968
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S16_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              },
+              "reverse": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              },
+              "shuffle": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.37665725121203236,
+              "pr_auc": 0.20776562682068037,
+              "roc_auc": 0.5911669306251544
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S16_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              },
+              "reverse": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              },
+              "shuffle": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3851248070565775,
+              "pr_auc": 0.20325720964607719,
+              "roc_auc": 0.5830170298076521
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S16_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              },
+              "reverse": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              },
+              "shuffle": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.3749548460050776,
+              "pr_auc": 0.22512676259458733,
+              "roc_auc": 0.5972419149633997
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S16_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              },
+              "reverse": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              },
+              "shuffle": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.35786697225757064,
+              "pr_auc": 0.20648091703866978,
+              "roc_auc": 0.6070146509954613
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S16_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 16,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1869130334576357,
+            0.20776562682068037,
+            0.20325720964607719,
+            0.22512676259458733,
+            0.20648091703866978
+          ],
+          "mean": 0.20590870991153007,
+          "std_sample": 0.013610430631792436
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          },
+          "reverse": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              },
+              "reverse": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              },
+              "shuffle": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.3472705389161015,
+              "pr_auc": 0.1909093307646913,
+              "roc_auc": 0.6485736774619457
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S32_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              },
+              "reverse": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              },
+              "shuffle": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.37115599173115044,
+              "pr_auc": 0.22770147337315055,
+              "roc_auc": 0.6200263431741272
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S32_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              },
+              "reverse": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              },
+              "shuffle": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3821475666587377,
+              "pr_auc": 0.21571198984305331,
+              "roc_auc": 0.5968020088448756
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S32_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              },
+              "reverse": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              },
+              "shuffle": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.36889379639677133,
+              "pr_auc": 0.24933905703326187,
+              "roc_auc": 0.6381893410510459
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S32_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              },
+              "reverse": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              },
+              "shuffle": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.35423777397347556,
+              "pr_auc": 0.2241516392362533,
+              "roc_auc": 0.6307979896495066
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_invariant/S32_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 32,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1909093307646913,
+            0.22770147337315055,
+            0.21571198984305331,
+            0.24933905703326187,
+            0.2241516392362533
+          ],
+          "mean": 0.22156269805008208,
+          "std_sample": 0.021152854474939666
+        }
+      }
+    ],
+    "sae_last_token": [
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          },
+          "reverse": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          },
+          "shuffle": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              },
+              "reverse": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              },
+              "shuffle": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.35420466816523244,
+              "pr_auc": 0.16524404406935173,
+              "roc_auc": 0.5950720884273424
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S8_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              },
+              "reverse": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              },
+              "shuffle": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.3787858625712458,
+              "pr_auc": 0.19828370022740574,
+              "roc_auc": 0.5697460555471666
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S8_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              },
+              "reverse": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              },
+              "shuffle": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.390415333517404,
+              "pr_auc": 0.16780291923579388,
+              "roc_auc": 0.5286304735361895
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S8_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              },
+              "reverse": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              },
+              "shuffle": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.38009903847623827,
+              "pr_auc": 0.20050046301146662,
+              "roc_auc": 0.5689575321581363
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S8_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              },
+              "reverse": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              },
+              "shuffle": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.36374893554706195,
+              "pr_auc": 0.16969687840067385,
+              "roc_auc": 0.5727878285539671
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S8_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 8,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.16524404406935173,
+            0.19828370022740574,
+            0.16780291923579388,
+            0.20050046301146662,
+            0.16969687840067385
+          ],
+          "mean": 0.18030560098893839,
+          "std_sample": 0.017512545839727653
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          },
+          "reverse": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              },
+              "reverse": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              },
+              "shuffle": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.3498978610543648,
+              "pr_auc": 0.1869130334576357,
+              "roc_auc": 0.6275520121423968
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S16_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              },
+              "reverse": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              },
+              "shuffle": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.37665725121203236,
+              "pr_auc": 0.20776562682068037,
+              "roc_auc": 0.5911669306251544
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S16_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              },
+              "reverse": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              },
+              "shuffle": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3851248070565775,
+              "pr_auc": 0.20325720964607719,
+              "roc_auc": 0.5830170298076521
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S16_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              },
+              "reverse": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              },
+              "shuffle": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.3749548460050776,
+              "pr_auc": 0.22512676259458733,
+              "roc_auc": 0.5972419149633997
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S16_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              },
+              "reverse": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              },
+              "shuffle": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.35786697225757064,
+              "pr_auc": 0.20648091703866978,
+              "roc_auc": 0.6070146509954613
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S16_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 16,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1869130334576357,
+            0.20776562682068037,
+            0.20325720964607719,
+            0.22512676259458733,
+            0.20648091703866978
+          ],
+          "mean": 0.20590870991153007,
+          "std_sample": 0.013610430631792436
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          },
+          "reverse": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              },
+              "reverse": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              },
+              "shuffle": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.3472705389161015,
+              "pr_auc": 0.1909093307646913,
+              "roc_auc": 0.6485736774619457
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S32_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              },
+              "reverse": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              },
+              "shuffle": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.37115599173115044,
+              "pr_auc": 0.22770147337315055,
+              "roc_auc": 0.6200263431741272
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S32_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              },
+              "reverse": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              },
+              "shuffle": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3821475666587377,
+              "pr_auc": 0.21571198984305331,
+              "roc_auc": 0.5968020088448756
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S32_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              },
+              "reverse": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              },
+              "shuffle": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.36889379639677133,
+              "pr_auc": 0.24933905703326187,
+              "roc_auc": 0.6381893410510459
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S32_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              },
+              "reverse": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              },
+              "shuffle": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.35423777397347556,
+              "pr_auc": 0.2241516392362533,
+              "roc_auc": 0.6307979896495066
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_last_token/S32_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 32,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1909093307646913,
+            0.22770147337315055,
+            0.21571198984305331,
+            0.24933905703326187,
+            0.2241516392362533
+          ],
+          "mean": 0.22156269805008208,
+          "std_sample": 0.021152854474939666
+        }
+      }
+    ],
+    "sae_positional": [
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          },
+          "reverse": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          },
+          "shuffle": {
+            "fold_values": [
+              0.16524404406935173,
+              0.19828370022740574,
+              0.16780291923579388,
+              0.20050046301146662,
+              0.16969687840067385
+            ],
+            "mean": 0.18030560098893839,
+            "std_sample": 0.017512545839727653
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              },
+              "reverse": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              },
+              "shuffle": {
+                "log_loss": 0.35420466816523244,
+                "pr_auc": 0.16524404406935173,
+                "roc_auc": 0.5950720884273424
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.35420466816523244,
+              "pr_auc": 0.16524404406935173,
+              "roc_auc": 0.5950720884273424
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S8_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              },
+              "reverse": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              },
+              "shuffle": {
+                "log_loss": 0.3787858625712458,
+                "pr_auc": 0.19828370022740574,
+                "roc_auc": 0.5697460555471666
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.3787858625712458,
+              "pr_auc": 0.19828370022740574,
+              "roc_auc": 0.5697460555471666
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S8_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              },
+              "reverse": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              },
+              "shuffle": {
+                "log_loss": 0.390415333517404,
+                "pr_auc": 0.16780291923579388,
+                "roc_auc": 0.5286304735361895
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.390415333517404,
+              "pr_auc": 0.16780291923579388,
+              "roc_auc": 0.5286304735361895
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S8_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              },
+              "reverse": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              },
+              "shuffle": {
+                "log_loss": 0.38009903847623827,
+                "pr_auc": 0.20050046301146662,
+                "roc_auc": 0.5689575321581363
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.38009903847623827,
+              "pr_auc": 0.20050046301146662,
+              "roc_auc": 0.5689575321581363
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S8_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              },
+              "reverse": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              },
+              "shuffle": {
+                "log_loss": 0.36374893554706195,
+                "pr_auc": 0.16969687840067385,
+                "roc_auc": 0.5727878285539671
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.36374893554706195,
+              "pr_auc": 0.16969687840067385,
+              "roc_auc": 0.5727878285539671
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S8_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 8,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.16524404406935173,
+            0.19828370022740574,
+            0.16780291923579388,
+            0.20050046301146662,
+            0.16969687840067385
+          ],
+          "mean": 0.18030560098893839,
+          "std_sample": 0.017512545839727653
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          },
+          "reverse": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1869130334576357,
+              0.20776562682068037,
+              0.20325720964607719,
+              0.22512676259458733,
+              0.20648091703866978
+            ],
+            "mean": 0.20590870991153007,
+            "std_sample": 0.013610430631792436
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              },
+              "reverse": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              },
+              "shuffle": {
+                "log_loss": 0.3498978610543648,
+                "pr_auc": 0.1869130334576357,
+                "roc_auc": 0.6275520121423968
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.3498978610543648,
+              "pr_auc": 0.1869130334576357,
+              "roc_auc": 0.6275520121423968
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S16_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              },
+              "reverse": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              },
+              "shuffle": {
+                "log_loss": 0.37665725121203236,
+                "pr_auc": 0.20776562682068037,
+                "roc_auc": 0.5911669306251544
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.37665725121203236,
+              "pr_auc": 0.20776562682068037,
+              "roc_auc": 0.5911669306251544
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S16_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              },
+              "reverse": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              },
+              "shuffle": {
+                "log_loss": 0.3851248070565775,
+                "pr_auc": 0.20325720964607719,
+                "roc_auc": 0.5830170298076521
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3851248070565775,
+              "pr_auc": 0.20325720964607719,
+              "roc_auc": 0.5830170298076521
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S16_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              },
+              "reverse": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              },
+              "shuffle": {
+                "log_loss": 0.3749548460050776,
+                "pr_auc": 0.22512676259458733,
+                "roc_auc": 0.5972419149633997
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.3749548460050776,
+              "pr_auc": 0.22512676259458733,
+              "roc_auc": 0.5972419149633997
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S16_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              },
+              "reverse": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              },
+              "shuffle": {
+                "log_loss": 0.35786697225757064,
+                "pr_auc": 0.20648091703866978,
+                "roc_auc": 0.6070146509954613
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.35786697225757064,
+              "pr_auc": 0.20648091703866978,
+              "roc_auc": 0.6070146509954613
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S16_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 16,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1869130334576357,
+            0.20776562682068037,
+            0.20325720964607719,
+            0.22512676259458733,
+            0.20648091703866978
+          ],
+          "mean": 0.20590870991153007,
+          "std_sample": 0.013610430631792436
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          },
+          "reverse": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1909093307646913,
+              0.22770147337315055,
+              0.21571198984305331,
+              0.24933905703326187,
+              0.2241516392362533
+            ],
+            "mean": 0.22156269805008208,
+            "std_sample": 0.021152854474939666
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              },
+              "reverse": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              },
+              "shuffle": {
+                "log_loss": 0.3472705389161015,
+                "pr_auc": 0.1909093307646913,
+                "roc_auc": 0.6485736774619457
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.3472705389161015,
+              "pr_auc": 0.1909093307646913,
+              "roc_auc": 0.6485736774619457
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S32_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              },
+              "reverse": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              },
+              "shuffle": {
+                "log_loss": 0.37115599173115044,
+                "pr_auc": 0.22770147337315055,
+                "roc_auc": 0.6200263431741272
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.37115599173115044,
+              "pr_auc": 0.22770147337315055,
+              "roc_auc": 0.6200263431741272
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S32_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              },
+              "reverse": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              },
+              "shuffle": {
+                "log_loss": 0.3821475666587377,
+                "pr_auc": 0.21571198984305331,
+                "roc_auc": 0.5968020088448756
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3821475666587377,
+              "pr_auc": 0.21571198984305331,
+              "roc_auc": 0.5968020088448756
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S32_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              },
+              "reverse": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              },
+              "shuffle": {
+                "log_loss": 0.36889379639677133,
+                "pr_auc": 0.24933905703326187,
+                "roc_auc": 0.6381893410510459
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.36889379639677133,
+              "pr_auc": 0.24933905703326187,
+              "roc_auc": 0.6381893410510459
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S32_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              },
+              "reverse": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              },
+              "shuffle": {
+                "log_loss": 0.35423777397347556,
+                "pr_auc": 0.2241516392362533,
+                "roc_auc": 0.6307979896495066
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.35423777397347556,
+              "pr_auc": 0.2241516392362533,
+              "roc_auc": 0.6307979896495066
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/sae_positional/S32_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 32,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1909093307646913,
+            0.22770147337315055,
+            0.21571198984305331,
+            0.24933905703326187,
+            0.2241516392362533
+          ],
+          "mean": 0.22156269805008208,
+          "std_sample": 0.021152854474939666
+        }
+      }
+    ],
+    "txc": [
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1625867227001551,
+              0.1776660318635557,
+              0.1458846118513547,
+              0.18031364680942635,
+              0.1584192308890182
+            ],
+            "mean": 0.164974048822702,
+            "std_sample": 0.014225516404913168
+          },
+          "reverse": {
+            "fold_values": [
+              0.1625867227001551,
+              0.1776660318635557,
+              0.1458846118513547,
+              0.18031364680942635,
+              0.1584192308890182
+            ],
+            "mean": 0.164974048822702,
+            "std_sample": 0.014225516404913168
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1625867227001551,
+              0.1776660318635557,
+              0.1458846118513547,
+              0.18031364680942635,
+              0.1584192308890182
+            ],
+            "mean": 0.164974048822702,
+            "std_sample": 0.014225516404913168
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.353903922115064,
+                "pr_auc": 0.1625867227001551,
+                "roc_auc": 0.6075479496304947
+              },
+              "reverse": {
+                "log_loss": 0.353903922115064,
+                "pr_auc": 0.1625867227001551,
+                "roc_auc": 0.6075479496304947
+              },
+              "shuffle": {
+                "log_loss": 0.353903922115064,
+                "pr_auc": 0.1625867227001551,
+                "roc_auc": 0.6075479496304947
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.353903922115064,
+              "pr_auc": 0.1625867227001551,
+              "roc_auc": 0.6075479496304947
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S8_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.38047203133491797,
+                "pr_auc": 0.1776660318635557,
+                "roc_auc": 0.5891535887234125
+              },
+              "reverse": {
+                "log_loss": 0.38047203133491797,
+                "pr_auc": 0.1776660318635557,
+                "roc_auc": 0.5891535887234125
+              },
+              "shuffle": {
+                "log_loss": 0.38047203133491797,
+                "pr_auc": 0.1776660318635557,
+                "roc_auc": 0.5891535887234125
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.38047203133491797,
+              "pr_auc": 0.1776660318635557,
+              "roc_auc": 0.5891535887234125
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S8_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3961513981378779,
+                "pr_auc": 0.1458846118513547,
+                "roc_auc": 0.5198876245357689
+              },
+              "reverse": {
+                "log_loss": 0.3961513981378779,
+                "pr_auc": 0.1458846118513547,
+                "roc_auc": 0.5198876245357689
+              },
+              "shuffle": {
+                "log_loss": 0.3961513981378779,
+                "pr_auc": 0.1458846118513547,
+                "roc_auc": 0.5198876245357689
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3961513981378779,
+              "pr_auc": 0.1458846118513547,
+              "roc_auc": 0.5198876245357689
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S8_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.38158140379803623,
+                "pr_auc": 0.18031364680942635,
+                "roc_auc": 0.5968459977582112
+              },
+              "reverse": {
+                "log_loss": 0.38158140379803623,
+                "pr_auc": 0.18031364680942635,
+                "roc_auc": 0.5968459977582112
+              },
+              "shuffle": {
+                "log_loss": 0.38158140379803623,
+                "pr_auc": 0.18031364680942635,
+                "roc_auc": 0.5968459977582112
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.38158140379803623,
+              "pr_auc": 0.18031364680942635,
+              "roc_auc": 0.5968459977582112
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S8_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3642151129944381,
+                "pr_auc": 0.1584192308890182,
+                "roc_auc": 0.5802028997392363
+              },
+              "reverse": {
+                "log_loss": 0.3642151129944381,
+                "pr_auc": 0.1584192308890182,
+                "roc_auc": 0.5802028997392363
+              },
+              "shuffle": {
+                "log_loss": 0.3642151129944381,
+                "pr_auc": 0.1584192308890182,
+                "roc_auc": 0.5802028997392363
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 8,
+            "n_features_actual": 8,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.3642151129944381,
+              "pr_auc": 0.1584192308890182,
+              "roc_auc": 0.5802028997392363
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S8_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 8,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1625867227001551,
+            0.1776660318635557,
+            0.1458846118513547,
+            0.18031364680942635,
+            0.1584192308890182
+          ],
+          "mean": 0.164974048822702,
+          "std_sample": 0.014225516404913168
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.17195841956129093,
+              0.19616066806326127,
+              0.1813607739473665,
+              0.21435806880251562,
+              0.196760563238072
+            ],
+            "mean": 0.1921196987225013,
+            "std_sample": 0.016237639916362435
+          },
+          "reverse": {
+            "fold_values": [
+              0.17195841956129093,
+              0.19616066806326127,
+              0.1813607739473665,
+              0.21435806880251562,
+              0.196760563238072
+            ],
+            "mean": 0.1921196987225013,
+            "std_sample": 0.016237639916362435
+          },
+          "shuffle": {
+            "fold_values": [
+              0.17195841956129093,
+              0.19616066806326127,
+              0.1813607739473665,
+              0.21435806880251562,
+              0.196760563238072
+            ],
+            "mean": 0.1921196987225013,
+            "std_sample": 0.016237639916362435
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.35118592215127514,
+                "pr_auc": 0.17195841956129093,
+                "roc_auc": 0.6171270141524937
+              },
+              "reverse": {
+                "log_loss": 0.35118592215127514,
+                "pr_auc": 0.17195841956129093,
+                "roc_auc": 0.6171270141524937
+              },
+              "shuffle": {
+                "log_loss": 0.35118592215127514,
+                "pr_auc": 0.17195841956129093,
+                "roc_auc": 0.6171270141524937
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.35118592215127514,
+              "pr_auc": 0.17195841956129093,
+              "roc_auc": 0.6171270141524937
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S16_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.377952378805804,
+                "pr_auc": 0.19616066806326127,
+                "roc_auc": 0.6073073190830867
+              },
+              "reverse": {
+                "log_loss": 0.377952378805804,
+                "pr_auc": 0.19616066806326127,
+                "roc_auc": 0.6073073190830867
+              },
+              "shuffle": {
+                "log_loss": 0.377952378805804,
+                "pr_auc": 0.19616066806326127,
+                "roc_auc": 0.6073073190830867
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.377952378805804,
+              "pr_auc": 0.19616066806326127,
+              "roc_auc": 0.6073073190830867
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S16_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3896343331481945,
+                "pr_auc": 0.1813607739473665,
+                "roc_auc": 0.5634456011747249
+              },
+              "reverse": {
+                "log_loss": 0.3896343331481945,
+                "pr_auc": 0.1813607739473665,
+                "roc_auc": 0.5634456011747249
+              },
+              "shuffle": {
+                "log_loss": 0.3896343331481945,
+                "pr_auc": 0.1813607739473665,
+                "roc_auc": 0.5634456011747249
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3896343331481945,
+              "pr_auc": 0.1813607739473665,
+              "roc_auc": 0.5634456011747249
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S16_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.37599900172342376,
+                "pr_auc": 0.21435806880251562,
+                "roc_auc": 0.6273937943537197
+              },
+              "reverse": {
+                "log_loss": 0.37599900172342376,
+                "pr_auc": 0.21435806880251562,
+                "roc_auc": 0.6273937943537197
+              },
+              "shuffle": {
+                "log_loss": 0.37599900172342376,
+                "pr_auc": 0.21435806880251562,
+                "roc_auc": 0.6273937943537197
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.37599900172342376,
+              "pr_auc": 0.21435806880251562,
+              "roc_auc": 0.6273937943537197
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S16_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3579475489914813,
+                "pr_auc": 0.196760563238072,
+                "roc_auc": 0.6227661551949187
+              },
+              "reverse": {
+                "log_loss": 0.3579475489914813,
+                "pr_auc": 0.196760563238072,
+                "roc_auc": 0.6227661551949187
+              },
+              "shuffle": {
+                "log_loss": 0.3579475489914813,
+                "pr_auc": 0.196760563238072,
+                "roc_auc": 0.6227661551949187
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 16,
+            "n_features_actual": 16,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.3579475489914813,
+              "pr_auc": 0.196760563238072,
+              "roc_auc": 0.6227661551949187
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S16_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 16,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.17195841956129093,
+            0.19616066806326127,
+            0.1813607739473665,
+            0.21435806880251562,
+            0.196760563238072
+          ],
+          "mean": 0.1921196987225013,
+          "std_sample": 0.016237639916362435
+        }
+      },
+      {
+        "control_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.1936597503551278,
+              0.2297353219625416,
+              0.20927857172009998,
+              0.24901145885341666,
+              0.22392673310445138
+            ],
+            "mean": 0.2211223671991275,
+            "std_sample": 0.02094229993612372
+          },
+          "reverse": {
+            "fold_values": [
+              0.1936597503551278,
+              0.2297353219625416,
+              0.20927857172009998,
+              0.24901145885341666,
+              0.22392673310445138
+            ],
+            "mean": 0.2211223671991275,
+            "std_sample": 0.02094229993612372
+          },
+          "shuffle": {
+            "fold_values": [
+              0.1936597503551278,
+              0.2297353219625416,
+              0.20927857172009998,
+              0.24901145885341666,
+              0.22392673310445138
+            ],
+            "mean": 0.2211223671991275,
+            "std_sample": 0.02094229993612372
+          }
+        },
+        "folds": [
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.34532102435792833,
+                "pr_auc": 0.1936597503551278,
+                "roc_auc": 0.6568372216368255
+              },
+              "reverse": {
+                "log_loss": 0.34532102435792833,
+                "pr_auc": 0.1936597503551278,
+                "roc_auc": 0.6568372216368255
+              },
+              "shuffle": {
+                "log_loss": 0.34532102435792833,
+                "pr_auc": 0.1936597503551278,
+                "roc_auc": 0.6568372216368255
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 0,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5886,
+            "n_train": 19318,
+            "ordered": {
+              "log_loss": 0.34532102435792833,
+              "pr_auc": 0.1936597503551278,
+              "roc_auc": 0.6568372216368255
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S32_fold0.npz",
+            "test_positive_rate": 0.11569826707441386
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3696320948375092,
+                "pr_auc": 0.2297353219625416,
+                "roc_auc": 0.6396641815940751
+              },
+              "reverse": {
+                "log_loss": 0.3696320948375092,
+                "pr_auc": 0.2297353219625416,
+                "roc_auc": 0.6396641815940751
+              },
+              "shuffle": {
+                "log_loss": 0.3696320948375092,
+                "pr_auc": 0.2297353219625416,
+                "roc_auc": 0.6396641815940751
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 1,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 5500,
+            "n_train": 19704,
+            "ordered": {
+              "log_loss": 0.3696320948375092,
+              "pr_auc": 0.2297353219625416,
+              "roc_auc": 0.6396641815940751
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S32_fold1.npz",
+            "test_positive_rate": 0.1298181818181818
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3815740693911349,
+                "pr_auc": 0.20927857172009998,
+                "roc_auc": 0.6063384686647493
+              },
+              "reverse": {
+                "log_loss": 0.3815740693911349,
+                "pr_auc": 0.20927857172009998,
+                "roc_auc": 0.6063384686647493
+              },
+              "shuffle": {
+                "log_loss": 0.3815740693911349,
+                "pr_auc": 0.20927857172009998,
+                "roc_auc": 0.6063384686647493
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 2,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4488,
+            "n_train": 20716,
+            "ordered": {
+              "log_loss": 0.3815740693911349,
+              "pr_auc": 0.20927857172009998,
+              "roc_auc": 0.6063384686647493
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S32_fold2.npz",
+            "test_positive_rate": 0.13302139037433156
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.367329627957289,
+                "pr_auc": 0.24901145885341666,
+                "roc_auc": 0.658147208396256
+              },
+              "reverse": {
+                "log_loss": 0.367329627957289,
+                "pr_auc": 0.24901145885341666,
+                "roc_auc": 0.658147208396256
+              },
+              "shuffle": {
+                "log_loss": 0.367329627957289,
+                "pr_auc": 0.24901145885341666,
+                "roc_auc": 0.658147208396256
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 3,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4941,
+            "n_train": 20263,
+            "ordered": {
+              "log_loss": 0.367329627957289,
+              "pr_auc": 0.24901145885341666,
+              "roc_auc": 0.658147208396256
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S32_fold3.npz",
+            "test_positive_rate": 0.13074276462254605
+          },
+          {
+            "controls": {
+              "circular": {
+                "log_loss": 0.3521625700187439,
+                "pr_auc": 0.22392673310445138,
+                "roc_auc": 0.6543301809334969
+              },
+              "reverse": {
+                "log_loss": 0.3521625700187439,
+                "pr_auc": 0.22392673310445138,
+                "roc_auc": 0.6543301809334969
+              },
+              "shuffle": {
+                "log_loss": 0.3521625700187439,
+                "pr_auc": 0.22392673310445138,
+                "roc_auc": 0.6543301809334969
+              }
+            },
+            "fixed_probe_order_gap_pr_auc": {
+              "circular": 0.0,
+              "reverse": 0.0,
+              "shuffle": 0.0
+            },
+            "fold": 4,
+            "n_features": 32,
+            "n_features_actual": 32,
+            "n_test": 4389,
+            "n_train": 20815,
+            "ordered": {
+              "log_loss": 0.3521625700187439,
+              "pr_auc": 0.22392673310445138,
+              "roc_auc": 0.6543301809334969
+            },
+            "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/txc/S32_fold4.npz",
+            "test_positive_rate": 0.12098427887901572
+          }
+        ],
+        "n_features": 32,
+        "order_gap_pr_auc": {
+          "circular": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "reverse": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          },
+          "shuffle": {
+            "fold_values": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std_sample": 0.0
+          }
+        },
+        "ordered_pr_auc": {
+          "fold_values": [
+            0.1936597503551278,
+            0.2297353219625416,
+            0.20927857172009998,
+            0.24901145885341666,
+            0.22392673310445138
+          ],
+          "mean": 0.2211223671991275,
+          "std_sample": 0.02094229993612372
+        }
+      }
+    ]
+  },
+  "protocol_version": "2026-07-23.2",
+  "residual": {
+    "best_token_pr_auc": {
+      "fold_values": [
+        0.23343840189247417,
+        0.2445343601027435,
+        0.22415903722407687,
+        0.26241743440283977,
+        0.20781390729853655
+      ],
+      "mean": 0.2344726281841342,
+      "std_sample": 0.02061721262424254
+    },
+    "folds": [
+      {
+        "best_offset": -8,
+        "best_offset_validation_pr_auc": 0.24005021382589398,
+        "best_token": {
+          "log_loss": 0.3303988180997376,
+          "pr_auc": 0.23343840189247417,
+          "roc_auc": 0.7113902677449251
+        },
+        "controls": {
+          "circular": {
+            "log_loss": 0.3303988180997376,
+            "pr_auc": 0.23343840189247417,
+            "roc_auc": 0.7113902677449251
+          },
+          "phase_scramble": {
+            "log_loss": 0.3303988180997376,
+            "pr_auc": 0.23343840189247417,
+            "roc_auc": 0.7113902677449251
+          },
+          "reverse": {
+            "log_loss": 0.3303988180997376,
+            "pr_auc": 0.23343840189247417,
+            "roc_auc": 0.7113902677449251
+          },
+          "shuffle": {
+            "log_loss": 0.3303988180997376,
+            "pr_auc": 0.23343840189247417,
+            "roc_auc": 0.7113902677449251
+          }
+        },
+        "fold": 0,
+        "g_order_pr_auc": 0.0,
+        "invariant_mean": {
+          "log_loss": 0.3303988180997376,
+          "pr_auc": 0.23343840189247417,
+          "roc_auc": 0.7113902677449251
+        },
+        "matched_d_squared": 0.535161788084543,
+        "n_test": 5886,
+        "n_test_groups": 65,
+        "n_train": 19318,
+        "normalization": "raw",
+        "order_gap_pr_auc": {
+          "circular": 0.0,
+          "phase_scramble": 0.0,
+          "reverse": 0.0,
+          "shuffle": 0.0
+        },
+        "ordered": {
+          "log_loss": 0.3303988180997376,
+          "pr_auc": 0.23343840189247417,
+          "roc_auc": 0.7113902677449251
+        },
+        "pca_dim_actual": 32,
+        "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/residual/fold0.npz",
+        "task_spectrum": {
+          "event_waveform_l2": [
+            0.72944474095199
+          ],
+          "frequency_cycles_per_window_step": [
+            0.0
+          ],
+          "j_y": [
+            0.5187642787834253
+          ],
+          "j_y_fraction": [
+            1.0
+          ]
+        },
+        "test_positive_rate": 0.11569826707441386,
+        "window": 1,
+        "window_offsets": [
+          -8
+        ]
+      },
+      {
+        "best_offset": -8,
+        "best_offset_validation_pr_auc": 0.2613553738431337,
+        "best_token": {
+          "log_loss": 0.3594400077460022,
+          "pr_auc": 0.2445343601027435,
+          "roc_auc": 0.6926017586307402
+        },
+        "controls": {
+          "circular": {
+            "log_loss": 0.3594400077460022,
+            "pr_auc": 0.2445343601027435,
+            "roc_auc": 0.6926017586307402
+          },
+          "phase_scramble": {
+            "log_loss": 0.3594400077460022,
+            "pr_auc": 0.2445343601027435,
+            "roc_auc": 0.6926017586307402
+          },
+          "reverse": {
+            "log_loss": 0.3594400077460022,
+            "pr_auc": 0.2445343601027435,
+            "roc_auc": 0.6926017586307402
+          },
+          "shuffle": {
+            "log_loss": 0.3594400077460022,
+            "pr_auc": 0.2445343601027435,
+            "roc_auc": 0.6926017586307402
+          }
+        },
+        "fold": 1,
+        "g_order_pr_auc": 0.0,
+        "invariant_mean": {
+          "log_loss": 0.3594400077460022,
+          "pr_auc": 0.2445343601027435,
+          "roc_auc": 0.6926017586307402
+        },
+        "matched_d_squared": 0.613962158750469,
+        "n_test": 5500,
+        "n_test_groups": 65,
+        "n_train": 19704,
+        "normalization": "raw",
+        "order_gap_pr_auc": {
+          "circular": 0.0,
+          "phase_scramble": 0.0,
+          "reverse": 0.0,
+          "shuffle": 0.0
+        },
+        "ordered": {
+          "log_loss": 0.3594400077460022,
+          "pr_auc": 0.2445343601027435,
+          "roc_auc": 0.6926017586307402
+        },
+        "pca_dim_actual": 32,
+        "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/residual/fold1.npz",
+        "task_spectrum": {
+          "event_waveform_l2": [
+            0.7838859935943714
+          ],
+          "frequency_cycles_per_window_step": [
+            0.0
+          ],
+          "j_y": [
+            0.5920397608278034
+          ],
+          "j_y_fraction": [
+            1.0
+          ]
+        },
+        "test_positive_rate": 0.1298181818181818,
+        "window": 1,
+        "window_offsets": [
+          -8
+        ]
+      },
+      {
+        "best_offset": -8,
+        "best_offset_validation_pr_auc": 0.19728287543349438,
+        "best_token": {
+          "log_loss": 0.3731569122139611,
+          "pr_auc": 0.22415903722407687,
+          "roc_auc": 0.6797290659585945
+        },
+        "controls": {
+          "circular": {
+            "log_loss": 0.3731569122139611,
+            "pr_auc": 0.22415903722407687,
+            "roc_auc": 0.6797290659585945
+          },
+          "phase_scramble": {
+            "log_loss": 0.3731569122139611,
+            "pr_auc": 0.22415903722407687,
+            "roc_auc": 0.6797290659585945
+          },
+          "reverse": {
+            "log_loss": 0.3731569122139611,
+            "pr_auc": 0.22415903722407687,
+            "roc_auc": 0.6797290659585945
+          },
+          "shuffle": {
+            "log_loss": 0.3731569122139611,
+            "pr_auc": 0.22415903722407687,
+            "roc_auc": 0.6797290659585945
+          }
+        },
+        "fold": 2,
+        "g_order_pr_auc": 0.0,
+        "invariant_mean": {
+          "log_loss": 0.3731569122139611,
+          "pr_auc": 0.22415903722407687,
+          "roc_auc": 0.6797290659585945
+        },
+        "matched_d_squared": 0.6368942038582067,
+        "n_test": 4488,
+        "n_test_groups": 56,
+        "n_train": 20716,
+        "normalization": "raw",
+        "order_gap_pr_auc": {
+          "circular": 0.0,
+          "phase_scramble": 0.0,
+          "reverse": 0.0,
+          "shuffle": 0.0
+        },
+        "ordered": {
+          "log_loss": 0.3731569122139611,
+          "pr_auc": 0.22415903722407687,
+          "roc_auc": 0.6797290659585945
+        },
+        "pca_dim_actual": 32,
+        "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/residual/fold2.npz",
+        "task_spectrum": {
+          "event_waveform_l2": [
+            0.7977774013164027
+          ],
+          "frequency_cycles_per_window_step": [
+            0.0
+          ],
+          "j_y": [
+            0.6164937332425346
+          ],
+          "j_y_fraction": [
+            1.0
+          ]
+        },
+        "test_positive_rate": 0.13302139037433156,
+        "window": 1,
+        "window_offsets": [
+          -8
+        ]
+      },
+      {
+        "best_offset": -8,
+        "best_offset_validation_pr_auc": 0.21758272874865983,
+        "best_token": {
+          "log_loss": 0.35857951088472273,
+          "pr_auc": 0.26241743440283977,
+          "roc_auc": 0.7058371207069923
+        },
+        "controls": {
+          "circular": {
+            "log_loss": 0.35857951088472273,
+            "pr_auc": 0.26241743440283977,
+            "roc_auc": 0.7058371207069923
+          },
+          "phase_scramble": {
+            "log_loss": 0.35857951088472273,
+            "pr_auc": 0.26241743440283977,
+            "roc_auc": 0.7058371207069923
+          },
+          "reverse": {
+            "log_loss": 0.35857951088472273,
+            "pr_auc": 0.26241743440283977,
+            "roc_auc": 0.7058371207069923
+          },
+          "shuffle": {
+            "log_loss": 0.35857951088472273,
+            "pr_auc": 0.26241743440283977,
+            "roc_auc": 0.7058371207069923
+          }
+        },
+        "fold": 3,
+        "g_order_pr_auc": 0.0,
+        "invariant_mean": {
+          "log_loss": 0.35857951088472273,
+          "pr_auc": 0.26241743440283977,
+          "roc_auc": 0.7058371207069923
+        },
+        "matched_d_squared": 0.5968316999481336,
+        "n_test": 4941,
+        "n_test_groups": 59,
+        "n_train": 20263,
+        "normalization": "raw",
+        "order_gap_pr_auc": {
+          "circular": 0.0,
+          "phase_scramble": 0.0,
+          "reverse": 0.0,
+          "shuffle": 0.0
+        },
+        "ordered": {
+          "log_loss": 0.35857951088472273,
+          "pr_auc": 0.26241743440283977,
+          "roc_auc": 0.7058371207069923
+        },
+        "pca_dim_actual": 32,
+        "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/residual/fold3.npz",
+        "task_spectrum": {
+          "event_waveform_l2": [
+            0.7736950122059603
+          ],
+          "frequency_cycles_per_window_step": [
+            0.0
+          ],
+          "j_y": [
+            0.5761158097765189
+          ],
+          "j_y_fraction": [
+            1.0
+          ]
+        },
+        "test_positive_rate": 0.13074276462254605,
+        "window": 1,
+        "window_offsets": [
+          -8
+        ]
+      },
+      {
+        "best_offset": -8,
+        "best_offset_validation_pr_auc": 0.3011141539982032,
+        "best_token": {
+          "log_loss": 0.35353333183773755,
+          "pr_auc": 0.20781390729853655,
+          "roc_auc": 0.6799394024596334
+        },
+        "controls": {
+          "circular": {
+            "log_loss": 0.35353333183773755,
+            "pr_auc": 0.20781390729853655,
+            "roc_auc": 0.6799394024596334
+          },
+          "phase_scramble": {
+            "log_loss": 0.35353333183773755,
+            "pr_auc": 0.20781390729853655,
+            "roc_auc": 0.6799394024596334
+          },
+          "reverse": {
+            "log_loss": 0.35353333183773755,
+            "pr_auc": 0.20781390729853655,
+            "roc_auc": 0.6799394024596334
+          },
+          "shuffle": {
+            "log_loss": 0.35353333183773755,
+            "pr_auc": 0.20781390729853655,
+            "roc_auc": 0.6799394024596334
+          }
+        },
+        "fold": 4,
+        "g_order_pr_auc": 0.0,
+        "invariant_mean": {
+          "log_loss": 0.35353333183773755,
+          "pr_auc": 0.20781390729853655,
+          "roc_auc": 0.6799394024596334
+        },
+        "matched_d_squared": 0.6263501666498652,
+        "n_test": 4389,
+        "n_test_groups": 55,
+        "n_train": 20815,
+        "normalization": "raw",
+        "order_gap_pr_auc": {
+          "circular": 0.0,
+          "phase_scramble": 0.0,
+          "reverse": 0.0,
+          "shuffle": 0.0
+        },
+        "ordered": {
+          "log_loss": 0.35353333183773755,
+          "pr_auc": 0.20781390729853655,
+          "roc_auc": 0.6799394024596334
+        },
+        "pca_dim_actual": 32,
+        "prediction_path": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/predictions/residual/fold4.npz",
+        "task_spectrum": {
+          "event_waveform_l2": [
+            0.7916570382071715
+          ],
+          "frequency_cycles_per_window_step": [
+            0.0
+          ],
+          "j_y": [
+            0.6005239185525209
+          ],
+          "j_y_fraction": [
+            1.0
+          ]
+        },
+        "test_positive_rate": 0.12098427887901572,
+        "window": 1,
+        "window_offsets": [
+          -8
+        ]
+      }
+    ],
+    "g_order_pr_auc": {
+      "fold_values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean": 0.0,
+      "std_sample": 0.0
+    },
+    "interpretation": "supervised raw-residual upper bound; all preprocessing is fit inside question-grouped outer folds",
+    "invariant_mean_pr_auc": {
+      "fold_values": [
+        0.23343840189247417,
+        0.2445343601027435,
+        0.22415903722407687,
+        0.26241743440283977,
+        0.20781390729853655
+      ],
+      "mean": 0.2344726281841342,
+      "std_sample": 0.02061721262424254
+    },
+    "order_gap_pr_auc": {
+      "circular": {
+        "fold_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "std_sample": 0.0
+      },
+      "reverse": {
+        "fold_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "std_sample": 0.0
+      },
+      "shuffle": {
+        "fold_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "std_sample": 0.0
+      }
+    },
+    "ordered_pr_auc": {
+      "fold_values": [
+        0.23343840189247417,
+        0.2445343601027435,
+        0.22415903722407687,
+        0.26241743440283977,
+        0.20781390729853655
+      ],
+      "mean": 0.2344726281841342,
+      "std_sample": 0.02061721262424254
+    }
+  },
+  "s_grid": [
+    8,
+    16,
+    32
+  ],
+  "seed": 42,
+  "status": "complete",
+  "window": 1,
+  "window_offsets": [
+    -8
+  ]
+}
