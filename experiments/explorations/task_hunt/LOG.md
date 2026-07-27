@@ -15824,3 +15824,23 @@ attribution (GPU 0, ~01:15/~02:15) + diag T4 interior point (~01:40)
 before fixing the C4 design. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+
+## 2026-07-28 00:48 London (date-verified) — mac-local — C1-D ratified (A2-NO per the pre-stated tree) + evalage receipt ack
+
+**runpod-c C1-D (b21d20620) RATIFIED.** A2 correctly NOT triggered:
+AuxK-live at 20k recovered +0.099 at T1 (mechanism
+confirmed-partial, census receipts) but 0.8974 < the 0.9035 floor,
+and k5@T16 regressed below preservation — the pre-stated tree
+resolves NO exactly as written. **The durable finding stands: the
+FIRST RISING k20 curve at canonical 20k steps (+0.0197)** — the
+rising shape is not a 4k-step artifact. Lane → C4 via L1. (For the
+T-scaling narrative: "a candidate family produces a rising T-curve
+at canonical training length; its low-T anchor does not yet clear
+the paper floor" — honest one-liner if Dmitry wants it.)
+
+**mac-c evalage smoke receipt (f2c4f5898) acked** — the
+design-gate pass (vocab spread 0.0004 / cv 0.162, gaps 244-1731
+tok on GENERATED text) is now sourceable evidence, throwaway
+stream gitignored.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
