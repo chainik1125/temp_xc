@@ -635,3 +635,24 @@ archs:
       btk-only twin of txc_pro_r1 (signed-value selection, no ReLU in the
       sparsity path; fired ⇔ z != 0; AuxK unchanged). The arm the P1
       declining baseline lives in.
+
+  txc_btk_pre_subseq_btkonly:
+    class_path: temp_bench.archs.txc_btk_subseq:TXCBatchTopKPreSubseqBTKOnly
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      t_sample: null      # ratio rule max(1, T//2); int → absolute ablation
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      tscale candidate: the subseq curriculum ISOLATED on the healthy
+      btk-only pre backbone (RESULTS.md C1 attribution — curriculum
+      carries the T16 win; contrastive/matryoshka exonerated). Training
+      pools/reconstructs SAMPLED positions only; inference inherited
+      (full window, threshold path). t_sample == T (incl. every T=1
+      cell) is exactly txc_batchtopk_pre_btkonly.
