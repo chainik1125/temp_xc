@@ -1,37 +1,32 @@
-# runpod-a STATUS — live (rewritten ~16:30 London 2026-07-27)
+# runpod-a STATUS — live (rewritten ~16:40 London 2026-07-27)
 
 **I am `runpod-a`** — hunt executor, GPU 0, mac-a's successor on the
 2×H100 pod. Venv/tokens/HF_HOME fine. Bring-up complete.
 
 ## Done this session
 
-1. **hunt4w2 llama31 third leg COMPLETE + BUNDLE POSTED
-   (`10f51eb6c`, PTR, awaiting mac-local ratification).** Venue
-   amendment `057a4371c` (approved `eeb4ee3c4`); executed from
-   worktree `/workspace/agents/runpod-a/hunt4w2_pin` DETACHED at
-   repin `bfce0fb4e`; 256 cells, 14 min, actuals ≈ $1 (−$5 corr in
-   ledger). Mechanical bundles: **sage KEEP 3/3 → breadth**
-   (in-claim-zone T32 receipts on all 3 models, no T64 tension),
-   **tret_py KEEP 2/3 → breadth**, tret_wt WEAK (llama single-model
-   KEEP on the program's first in-ladder tret arm, T32/win_mlp
-   +.067), tretd_wt KILL 2/3 (tok_within_002 — token-readable).
-   Order 0 everywhere ⇒ no panel-gates, no draft panel cards.
-   Wave-2 CLOSED. runpod-b's replication freeze gate = my bundle
-   entry (their targets: wt sage ×3 legs, py tret ×2 legs).
-   **Worktree KEPT until ratification** (reruns possible); remove
-   with `git worktree remove hunt4w2_pin` after.
+1. **hunt4w2 llama31 third leg COMPLETE; BUNDLE `10f51eb6c`
+   RATIFIED (`1d2e3de28` item 1).** Venue amendment `057a4371c`
+   (approved); executed from a worktree detached at repin
+   `bfce0fb4e`; 256 cells, 14 min, actuals ≈ $1 (−$5 corr).
+   Bundles: sage KEEP 3/3 breadth (in-claim-zone T32 receipts),
+   tret_py KEEP 2/3 breadth, tret_wt WEAK (llama in-ladder arm
+   single-model note), tretd_wt KILL 2/3 (tok-readable). Order 0
+   ⇒ no panel-gates; cnov = sole panel candidate. Wave-2 CLOSED.
+   Worktree REMOVED post-ratification (contents verified identical
+   to committed copies). sage § 8 row = runpod-b's draft queue.
 
-## In flight
+## GPU 0 state — IDLE, two pre-approved claimants
 
-- **dialevel cache prep on idle GPU 0** (background, log
-  `/workspace/agents/runpod-a/dialevel_cache_prep.log`): rebuilding
-  `/workspace/dialevel_caches/{gemma2_2b,gpt2}` via the committed
-  builder — pick-independent panel infra (B needs gemma, A needs
-  gpt2), deterministic, no results produced; will disclose wall
-  time in the panel launch entry (or as prep note if NO-GO).
-- **Listener** (background): 150 s fetch-poll on LOG + briefings.
-  NB it will fire once on MY OWN `10f51eb6c` push (base predates
-  it) — expected noise; re-arm at new base.
+- **dialevel cache prep DONE** (~24 s GPU total, both candidates:
+  `/workspace/dialevel_caches/{gemma2_2b,gpt2}` mapping-verified).
+  GPU 0 fully idle since ~16:35.
+- Per `1d2e3de28` item 3: **runpod-b may borrow GPU 0 for ttrend
+  overlay cells (PRE-APPROVED, one LOG line to claim; instant
+  hand-back on a cnov GO)**. My panel claims GPU 0 on a GO pick.
+- **Listener** (background): 150 s fetch-poll on LOG + briefings;
+  re-armed after each wake (it fires on my own pushes too — noise,
+  re-arm).
 
 ## Next: the 17:00 cnov pick (task #3)
 
@@ -49,10 +44,14 @@ numbers already gpt2). On NO-GO: nothing; GPU 0 free for gen-4.
 
 ## Queue after
 
-Gen-4 continuation (label pre-measures first, $0 kills welcome,
-envelope ≈ $179 headroom) — BUT wall-clock is the binder (window
-ends ~21:30); decide scope after the pick resolves. Every new
-screen = own frozen card.
+Gen-4 continuation: my read post-wave-2 — the open frontier is
+ORDER (0 models everywhere in the return/intensity family at
+T ≤ 32; only backtracking/probing carry order on the same
+instrument). An order-carrying face needs real design care (label
+must stay well-defined under eval-shuffle) — WRONG thing to rush
+in the window's last hours against meeting-deliverable lanes;
+propose a wave-3 slate as a post-deadline card unless mac-local
+directs otherwise. Envelope ≈ $178 headroom if directed tonight.
 
 ## House-rule cache
 
