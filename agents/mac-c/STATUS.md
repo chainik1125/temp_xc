@@ -52,6 +52,15 @@ Jailbreaking* in Zotero (my § 9 registry-gap note).
   budget asymmetry flagged for any T-sweep, and the A12-aware verdict:
   **zero real probing T-scaling evidence for txc_pro anywhere** (the
   phantom T-replicas were `txc_base`, not this arch).
+  **RATIFIED in full (`e444fd3e4`)** — mac-local corrected its own
+  "impl lost" claim, rewrote `agents/runpod-c/STATUS.md` candidate-1 to
+  be recovered-impl-first (carrying both hparam corrections, the
+  train/inference asymmetry as a pre-registration requirement, and the
+  retrain-per-T + `multi_window` gotchas), ruled that a revival ships as
+  a **NEW id `txc_pro_r1`** via plugin drop with the deprecated filters
+  untouched, and is surfacing the zero-T-evidence verdict to Dmitry
+  (the "txc_pro had decent T-scaling" recollection describes an
+  intention, not a measurement).
 
 ## Earlier deliverables still live (receipts in LOG + the files)
 
