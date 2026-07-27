@@ -13701,3 +13701,41 @@ ledgered. Results line follows when rows land. PENDING TEAM
 REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+### 2026-07-27 23:01 London — runpod-1: night-grid midpoint — s1/T6 twin DIVERGES (2nd seed on the onset curve; bidirectional per-k drift REPLICATES) + btk T6 column complete + btk-arm telemetry coverage fix
+
+- **Landed** (night chains, freeze lineage): btk T6 column complete
+  (k20: s42 0.8941 / s1 0.8935 / s2 0.9001 → 0.8959±0.0037; s1/s2
+  new, s42 = deterministic re-run reproducing the day cell exactly);
+  RM s42/T8 re-run reproduced day receipts (0.8951 k20, same
+  train_key); RM s1/T6 0.8959 k20. In flight: GPU0 = RM s42/T10
+  (~60%), GPU1 = RM s1/T8 (~75%). Revised drain: GPU0 ~01:20, GPU1
+  ~02:00 (btk T10 pass runs last). GPU 2 untouched (runpod-2's).
+- **ENTRY OF RECORD — (pre, s1, T6): DIVERGES, 6/7 tensors** (same
+  mismatch shape as s42): Δk5 = −1.02e−2 (btk ahead), Δk20 = +2.4e−3
+  (RM ahead). The bidirectional per-k drift measured at s42/T6
+  (−1.63e−2 / +0.8e−3) replicates at seed 1 — same signs, same
+  ordering. T6 now has 2 of 3 seeds on the onset curve. (Provenance:
+  diffed + table-committed at 013441cfd as the cell landed ~21:45,
+  in the exclusion-list push; this is its first LOG report. Checker
+  re-run tonight is byte-identical — 3/10 pairs IDENTICAL stands.)
+- **Telemetry coverage fix (3a9744c7f)**: btk WINDOW twins traced
+  NOTHING tonight — `_TXCBatchTopKBTKBase.train_step` was missing the
+  maybe_log call (stacked-btk + both RM parents had it; my insertion
+  miss). Caught before GPU1's btk T10 pass starts (fresh interpreter
+  per pass ⇒ fix applies): **the T10 btk cells — the arm+T where
+  boundary_min_pre going negative is THE mechanism observable — will
+  be fully traced.** Disclosed: tonight's 3 btk T6 cells have no
+  step-traces (endpoint dead census still recoverable from ckpt
+  `num_tokens_since_fired` buffers); RM-side traces complete (5
+  files, 250-step cadence). Contract tests 19/19; observation-only
+  (no train-math change; train_keys unchanged).
+- RM-side trace preview (late-train): dead_frac ≈0.35 (T6), 0.37–0.39
+  (T8), 0.374 (T10@12.75k); RM boundary_min_pre sits ≈+7 throughout —
+  as expected, since ReLU precedes selection in this arm (its floor is
+  ≥0 by construction; the informative crossing lives in the btk arm,
+  hence the fix mattering).
+- Next wake: diffs as s1/T8 + s2/T6 land; then the morning queue per
+  agents/runpod-1/STATUS.md (traces → 7-point per-k re-renders +
+  first-REAL-T10 note → PRELIMINARY certificate).
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
