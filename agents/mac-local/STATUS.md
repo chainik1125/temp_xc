@@ -240,3 +240,21 @@ both agents idle, queue-complete. **DELIVERABLE:
 1 = R22 caveat ratification; item 6 = mirror the 3 Volume
 checkpoints to HF BEFORE token rotation. Check-in 10:00 PT
 (18:00 London).
+
+---
+
+## DELTA ~11:45 London 07-27 (post-compact, supplements the ~11:30 resume block)
+
+- **Han raised the hunt budget: up to $200 Modal for hunt lanes over
+  the 10 h window → ~21:30 London** (LOG + actmix-shared amended,
+  commit 685a2a006). Gen-4 scaled: 6–8 faces, both substrates,
+  T{4,8,16,32}, shuffle twins at screen, immediate llama31 leg on
+  order-KEEPs, §6b resume. cnov panel still 17:00-pick-gated.
+- Pod verified 11:33: GPUs 0/1 hot (runpod-1 P1 probing lanes,
+  steps advancing); **GPU 2 idle → runpod-2 chased via LOG** (launch
+  RLHF P1 + interim 2-seed fig for 17:00; one-line-if-blocked rule).
+- WRITEUP §8: hunt3 rows APPLIED this commit (nvtrend breadth +
+  tempo/qres/chaz kills) — open item (c) CLOSED.
+- Still open: runpod-1 formal probing verdict entry + tsae column;
+  mac-c HF mirror completion (gates rotations); gen-4 rolling review;
+  17:00 one-pager decision items; watcher deadline 18:00 London.
