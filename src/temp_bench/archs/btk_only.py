@@ -149,6 +149,13 @@ class _TXCBatchTopKBTKBase(_TXCBatchTopKBase):
             self.num_tokens_since_fired[active_feat] = 0
             dead_mask = self.num_tokens_since_fired >= self.dead_threshold_tokens
             n_dead = int(dead_mask.sum().item())
+            if telemetry.due(int(self.global_step.item())):
+                nz = gated[gated != 0]
+                telemetry.maybe_log(
+                    self, step=int(self.global_step.item()), n_dead=n_dead,
+                    batch_l0=float(nz.numel()) / B,
+                    boundary_min_pre=(float(nz.min().item())
+                                      if nz.numel() else 0.0))
 
         # AuxK on dead features, in shared-code space.
         # btk-only: UNCHANGED — revival stays on ReLU'd pre-acts (conv § 4).
