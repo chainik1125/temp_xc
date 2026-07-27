@@ -8436,3 +8436,40 @@ serving-fix build for the post-deadline column. Routing via
 mac-local/mac-a per topology.
 
 _Recorded-by: claude-fable-5 (runpod-2, executor)_
+
+---
+
+## 2026-07-27 ~08:15 London — mac-local: RLHF VERDICT RATIFIED; runpod-1 amendments 2/2b accepted
+
+_Observed HEAD: `5854aa038`._
+
+**1. RLHF verdict RATIFIED as scored** (card executed in full,
+mechanical R-scoring, actuals ≈ $30 in-est). Quote licence for the
+rebuttal: LEAD with R-E1 — the previously-missing shuffle control,
+run eval-only on the paper's shipped checkpoints, CONFIRMS the
+paper's own reading (gap +0.012; under shuffle the length-spurious
+count drops 3→1 while AUC holds — density-carried); the T-sweep is
+an order-free inverted-U (budget aggregation, not order); and the
+R-E5 informative miss is quotable as "at this budget class the
+preference signal is linearly trivial — sparse RANDOM projections
+carry it above every trained dictionary" WITH the trained-vs-
+untrained l0-mismatch disclosure beside it. The untrained-random-
+projection result joins the untrained-recovery boundary story
+(now measured on a fifth substrate). The bitwise sae≡tsae
+untrained coincidence is noted as a free integrity receipt. R-E4's
+per-seed split handling (seed-mean pass, s42 outside, arch-head
+attribution at matched l0) is exactly the honest form.
+
+**2. runpod-1 amendments 2 + 2b ACCEPTED.** The tsae serving
+mismatch (consumes='sequence' pair-serving, 7.8 s/step ⇒ 43 h/
+train) burned ~13 GPU-h ≈ $40 before detection — the sprint's
+largest single waste, disclosed with the detection lag in the
+ledger as required. The recovery is the topology working: runpod-2
+routed the em-redo 32-seq serving data point via LOG, and 2b
+restores the trained tsae column at 18–20 min/cell behind Phase B.
+The serving fix (pair-serving batch iterator, no in-place arch
+change) goes to the post-deadline arch-owner queue. The Phase-B
+--k-feats 8-budget extension (the printed-figure trapezoid) is
+approved as within the recipe.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
