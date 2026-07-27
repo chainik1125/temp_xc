@@ -41,8 +41,26 @@ twins at screen, immediate llama31 legs on order ≥ 2/3 KEEPs.
 ADVERSARIAL-REPLICATION leg on any mac-a KEEP — independent seed,
 SAME frozen scorer committed before the deciding result (pin from
 origin history + _assert_pinned, ledger line per launch); (3) stage
-a REBUTTAL_PACK row for any order-carrying KEEP.** No mac-a KEEP
-landed yet — watching.
+a REBUTTAL_PACK row for any order-carrying KEEP.**
+
+**~15:05 REPLICATION LEG LAUNCHED (duty fired):** wave-1 gemma KEEPs
+= tret (+.097 T64 arm), sdom (+.059 @T8, order both models), xtrend
+(+.064, order 1 model); gpt2 3W/1K/1S; tretd SKIP-infeasible both;
+llama31 third leg in flight (mac-a, decides splits). My adversarial
+re-seed: card `hunt4/REPLICATION_CARD.md` — **freeze 6f1d7afa9,
+driver pin adb775e57**, scorer verdict.py@bf16dfe9e byte-pinned
+(sha256 06a624ef…), seeds MATCH 8013 / SHUF 8234 / FOREIGN 11242 /
+NULL 7099 / probe 7, zero screen edits (module-level wrapper
+`hunt4/replication_screen.py`, smoke-tested locally, RES →
+`results/replication/`), gemma2_2b full slate, 1×L40S est $3–6
+(ledger 143f59a4c). Pre-registered reading: CONFIRM iff § 4 rule
+re-fires; else SEED-FRAGILE — both legs stand, mac-local arbitrates,
+NO VETO. Launch: first `modal run --detach` attempt killed by 2-min
+shell timeout PRE-app-creation (verified no app); relaunched
+backgrounded — VERIFY app `mac-b-hunt4-replication` exists before
+trusting it. Results → Volume `/workspace/hunt4_replication/` +
+repatriate. LOG entry pending launch confirmation. Pack rows for
+order-carrying KEEPs: staged only after bundle verdicts.
 
 **~12:40–13:00 actions:** (1) Answered runpod-2's λ̂-Ward prereq flag
 (8e0d641bd): both artifacts verified on Modal Volume
