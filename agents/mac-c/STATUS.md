@@ -1,143 +1,104 @@
 # mac-c — STATUS
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
-**Lane (CHANGED 07-27 19:15, `47040da59`):** HUNT EXECUTION — no longer
-read-only. dharm end-to-end + my two re-entry cards, CPU-first, one
-self-provisioned GPU pod only when a GPU stage is actually reached.
-**Last update:** 2026-07-27 ~20:32 London (LANE CLOSED — all three
-candidates resolved for $0; no pod ever spun up)
+**Lane:** ELICITATION HARNESS OWNER (authorized `63864ae66`, 2026-07-28)
+**Last update:** 2026-07-28 ~01:35 London
 
-## The assignment (LOG 19:15, mac-local relaying Han)
+## Current task: harness build — cards FROZEN + RATIFIED, generation NOT yet running
 
-1. **`dharm` end-to-end** — the ONE approved corpus pull
-   (`YuehHanChen/DecomposedHarm`), pulled under the `pull_pg19.py`
-   rules I own; then the four $0 gates from menu entry #3 (unigram
-   triage AUC FIRST — it can kill for $0; identity-in-kind =
-   within-decomposition readout only; subtask-index↔position;
-   boundary floor per T); screen behind a frozen card iff gates pass.
-2. **Both re-entry cards I authored** (`WAVE3_SECOND_SOURCE.md`
-   addendum): msdose per-doc-scale amendment + realised pre-measure
-   (CPU, $0); sycpress generator-mode card freeze ($0 part —
-   elicitation spend is a separate pre-registered decision).
-3. **GPU screens for survivors**: hunt4-clone harness, scorer-first,
-   cold-cache priced in-card.
+**Frozen & pushed `1a955344c`; RATIFIED by mac-local** ("what
+full-throttle looks like done right"; vocabulary control as a STOP
+condition singled out; CPU-stub claim-zone validation before GPU spend):
 
-**Ownership split**: runpod-a keeps reask + original trio + wave-3
-GPU behind RM. Anti-dup binds BOTH ways. Cards + verdicts PTR;
-mac-local reviews on push.
+- `labels/elicit_lib.py` — harness core. Tonight's three kill-lessons
+  are **scaffold parameters, not comments**: event spacing chosen for
+  the clock (`realised_gaps` receipt), topic drawn independently of the
+  event schedule, no sentence-scale kernels.
+  **`vocabulary_control_check` is a STOP condition** — spread ⇒ the
+  `retryesc` leak is being rebuilt ⇒ do not trust the corpus.
+- `labels/evalage_lib.py` + `evalage/CARD.md` — corpus 2 pick.
+  **Deliberately NOT menu #12** (a marker-RATE face I predicted dies);
+  bars-first **T2 age** redesign. CPU stub: claim zone
+  **0/0/0.8/5.5/14.7 %** at T=4/8/16/32/64; plan vocab cv **0.048**.
+- `labels/run_elicit.py` — turn-major batched runner (all docs advance
+  one turn per step; causally correct within a document).
 
-## Pod governance (BINDING, actmix-shared § RunPod API)
+## Pod + spend (governance-compliant)
 
-Dmitry's key, keychain service `dmitrys-runpod-api-key` — env-inject
-only (`export RUNPOD_API_KEY="$(security find-generic-password -s
-dmitrys-runpod-api-key -w)"`), NEVER echo/print/file/argv. $10/h max
-across my pods; name `mac-c-hunt-<mmdd>`; ledger line in
-`briefings/MODAL_SPEND.md` § RUNPOD at spin-up (pod id, config, $/h,
-purpose) AND termination (actuals); prefer TERMINATE over stop;
-verify state change by API query after; NEVER write to pods I did
-not spin up (incl. Han's three hand-provisioned pods). Key NEVER
-seeded to any pod. L40S/A100-class ≈ $1–2/h target.
+**`vyp2zlq13cf7df` = `mac-c-hunt-0728`**, L40S 48GB, **$0.99/h**.
+SSH `root@103.196.86.47 -p 42839` (key `~/.ssh/id_ed25519`).
+Ledgered at spin-up AND the correction in `MODAL_SPEND.md § RUNPOD`.
+**Spend so far ≈ $0.5 of the ≤$100 slice.** I own this pod alone and
+have touched no other. Key: keychain `dmitrys-runpod-api-key`,
+env-inject only, never printed/filed/argv.
 
-## Progress ledger — LANE CLOSED
+**Backend = pod-hosted OPEN WEIGHTS** (`Qwen/Qwen2.5-7B-Instruct`).
+The Anthropic personal key was withdrawn (`a073c3913`); my choice was
+already open-weights and is unchanged — pinned weights give exactly
+reproducible provenance, and the probe target is our own models reading
+the TEXT, so generator choice affects realism, not what we measure.
 
-- [x] Lane ACK (LOG 19:19)
-- [x] **`msdose_r1` — KILLED $0** (`86f5ce0f8`). Freeze approved
-      `04b179c31`. Absolute legs all passed (ρ 0.838, 15/74 strata,
-      489k usable — beat my own sim bound); **ratio legs missed 3/3**
-      because my § B baseline sim understated the frozen plan 2.3×
-      (86.6k sim vs 201.5k realised ⇒ "4.6× gain" is really 2.43×).
-      Erratum recorded; frozen rule not overturned. My recommendation:
-      **no third msdose entry.**
-- [x] **`sycgen` — RATIFIED, single face** (`51bf6fabc` freeze,
-      `10362af34` result; ratified `8a7c722b2`). Jittered scaffold
-      gives the best trap numbers in wave-3 (age pos-AUC 0.689 /
-      doc-mean 0.747; rate ρ(face,pos) −0.020) — **and I demoted my
-      own rate face** on the binding clock bar (8-msg kernel = 1,014
-      tok vs T ≤ 64 = refmark's death mode; its 0.624 floor is
-      doc-identity in a costume). `sycgen_age` carries. mac-local
-      adopted my "geometry can kill but not clear — **per-token
-      baseline binding first on any generated corpus**" as a STANDING
-      RULE for all generated-corpus faces.
-- [x] **`dharm` — card + pre-measure FROZEN BEFORE ACCESS EXISTS**
-      (`d731f3411`). Primary face changed from my own menu entry to
-      **`dharm_thage`** (age since `harmful_index` crossing) — escapes
-      both the doc-identity trap and the msdose position trap, and
-      satisfies § 1.2 by construction. Two predictions pre-registered
-      from a synthetic-stand-in smoke (artifacts deleted, none
-      committed): `dharm_dose` dies on position (stand-in AUC 1.000);
-      `dharm_bage` risks a floor-solve (1.000 at T ≥ 16) ⇒ clock
-      reported before any AUC.
-- [x] **`dharm` — KILLED $0** (`a85724000`). Han cleared the gate
-      ~20:15; pull clean (4,641 chains, zero funnel losses). **Schema
-      amendment pushed BEFORE the run**: the HF README is wrong
-      (`decomposition` encoded differently per modality, `harm_index`
-      1-BASED, `id` not unique) and **764 ids span the shipped splits**
-      ⇒ split grouped BY ID, shipped splits discarded. Faces/bands
-      untouched. **The clock killed it: 155.6 tokens per DOCUMENT**,
-      18.2 tok/subtask, **3 position strata in the whole corpus**. All
-      3 faces dead on all 3 tokenizers — `thage` doc-mean 0.993
-      (sycpress severity), `dose` position 0.993, `bage` floor-solved
-      at 1.000 for T ≥ 8. **Both my pre-registered predictions
-      confirmed**; unigram alone (0.712–0.883 vs 0.60) would have
-      killed all three.
-- [x] GPU stage — **CLOSED WITHOUT ACTION, no pod ever spun up.** No
-      GPU-needing stage was reached: two candidates died on $0 CPU
-      gates, the third needs a generation decision that is not mine.
-      Correct outcome under the governance rule.
+## Bring-up: 4 attempts, all POD-ENVIRONMENT mechanics (design untouched)
 
-## Lane closed — total spend $0
+1. First pod had no `PUBLIC_KEY` env ⇒ sshd refused ⇒ **terminated at
+   ~3 min ≈ $0.05**, recreated with the key. Ledgered as waste, not
+   absorbed.
+2. `pgrep -f run_elicit` **false positive** (matched my own SSH command
+   string) — nearly reported a launch that never happened. **Verify
+   from the LOG FILE, never a process-name match.**
+3. zsh does not word-split `$S 'cmd'` ⇒ staging was a silent no-op.
+   Fixed with a shell function.
+4. `pip install vllm==0.6.3.post1` **downgraded torch to cu121 and
+   broke the system transformers** (`DTensor` ImportError). Fix in
+   flight: isolated venv at `/workspace/hunt/venv` so vLLM pulls its
+   own matched torch; system image left alone.
 
-Three candidates resolved, no compute bought. **The one thing still
-live from my work is `sycgen_age`**, which passed geometry and awaits
-someone's decision on the shared elicitation harness
-(`TIERC_PIPELINE_DESIGNS.md` § 3 — four candidates want it). Not mine
-to fund.
+**Staged on pod (committed files verbatim, no retyping):**
+`/workspace/hunt/pkg/{__init__,elicit_lib,evalage_lib,run_elicit,lib}.py`
+(`lib.py` = a 6-line `doc_split` shim so package-relative imports
+resolve).
 
-**Standing bar proposed to the menu (from dharm's death):** *before
-recommending any corpus pull, measure tokens-per-document against the
-T values we screen.* My § 8 inventory ranked substrates by availability
-and label quality, never by length — that gap cost a gate request
-(and $0 of compute). `dharm` § 7.1 carries the full statement.
+## NEXT ACTION on resume
 
-**Gate-terms flag is now MOOT for dharm** (corpus gitignored, not
-committed; receipt + pre-measure carry no prompt text) but stays live
-for any future gated pull.
+1. `ssh -p 42839 root@103.196.86.47 'tail -20 /workspace/hunt/evalage_v1.log'`
+   — confirm generation from the LOG, not `pgrep`.
+2. If not running: `cd /workspace/hunt && HF_HOME=/workspace/hf nohup
+   ./venv/bin/python -m pkg.run_elicit --scaffold evalage --model
+   Qwen/Qwen2.5-7B-Instruct --n-docs 400 --out-tag v1 >
+   evalage_v1.log 2>&1 &`
+3. On drain: scp back `elicit_evalage_v1.npz` +
+   `elicit_evalage_v1_receipt.json`; **check `vocabulary_control` and
+   `realised_gaps` against the card BEFORE any screen**; then the
+   label-side bands (unigram ≤0.60, doc-mean ≤0.88, position ≤0.95,
+   ≥8 strata, ≥250k usable, ≥300 events) on all 3 tokenizers.
+4. **TERMINATE the pod at drain + API-verify**, actuals line to
+   `MODAL_SPEND.md`.
+5. Then corpus 1: `sycgen_age` scaffold (constants already frozen in
+   `sycgen_lib`; needs `are_you_sure.jsonl` seeds from the pinned
+   `meg-tong/sycophancy-eval` repo).
+6. **Delete `briefings/safety-hunt-continuation.md`** once generation
+   is confirmed running (its closing line).
 
-**Substrate notes:** runpod-a's frozen-plan msdose streams exist
-(`labels/wave3_msdose_{gpt2,gemma2,llama31}.npz`) — those are the
-KILLED construction; my amendment builds fresh plan + streams, does
-NOT overwrite theirs. Their instrument: `labels/build_wave3_trio.py`
-+ `wave3_trio_stats.json`; match its measurement conventions so
-numbers are comparable.
+## Standing rules on this build
 
-## Round 1+2 (closed, all ratified)
+Per-token baseline **binding** on every generated corpus; "geometry can
+kill but not clear"; bands **absolute only** (`msdose_r1` lesson);
+cards frozen before generation; full generation provenance in-receipt;
+corpus is **model-generated and disclosed as such** (exhibit-vs-appendix
+is the paper owner's call).
 
-Menu (`d44843ae7`) + §10 addendum, txc_pro dig (`a2d0745b1`),
-second-source + re-entry packets (`8a51347d5`, `248049349`), Tier-C
-designs (`c36fe9c62`). Round 2 ratified `4d9a900ed`; emoinst erratum
-CONFIRMED and WRITEUP §8 row corrected by mac-local (my flagged open
-item — now closed). Standing rule proposal on record: where §8 and
-the LOG disagree, the LOG wins.
+## Closed earlier (all $0, all ratified)
 
-## Security / hygiene (in force)
+Round 1–2 (menu, txc_pro dig, second-source, re-entry packets, Tier-C
+designs). Execution lane: `msdose_r1` KILLED, `sycgen` ratified
+single-face after my own clock-bar self-demotion, `dharm` KILLED on
+document length (155.6 tok/chain). Hunt continuation: `warddebt`
+no-screen (Ward sentence-kernels unreachable at our T), `retryesc`
+KILLED (task-vocabulary leak), menu-exhaustion report → this build.
 
-HF token path `~/.tokens/hf_token_datasets`, RunPod key in keychain —
-paths/service-names only, values NEVER printed/logged/committed/argv.
-All tokens rotate post-weekend. clew read-only (no sync/register/
---refresh). S2 key untouched. No Modal spend from mac-c (pods are
-RunPod, ledgered separately).
-
-## Git position
+## Git / hygiene
 
 Branch `arxiv`, identity `mac-c-agent`. LOG collisions: union resolve
 (`sed -i '' -e '/^<<<<<<< HEAD$/d' -e '/^=======$/d' -e '/^>>>>>>> /d'`,
-`git add`, `GIT_EDITOR=true git rebase --continue`), verify with
-anchored `grep -n '^<<<<<<<'`.
-
-## If resuming from compact
-
-Read this file, LOG tail, then the progress ledger above — continue
-the first unchecked stage. Listener: re-arm after EVERY wake
-(`zsh <scratchpad>/listener.sh` background, 10h). On fire: read
-output file, fetch+rebase, act only if addressed to mac-c,
-re-arm.
+`git add`, `GIT_EDITOR=true git rebase --continue`), verify anchored
+`grep -n '^<<<<<<<'`. Listener: re-arm after EVERY wake.
