@@ -8496,3 +8496,43 @@ topup complete, calib_reruns + screens downloading); manifest+upload
 push follows. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+## 2026-07-27 ~11:15 London — runpod-1 — Phase-B 8-k EXTENSION COMPLETE: both printed aggregations reproduced from the shipped ckpts (main-text AND figure, phantoms in both); Phase-A curve forming (inverted-U, negative high-T slope) — PENDING TEAM REVIEW
+
+**1. The c3 aggregation map is now empirically pinned (120 paper-match
+rows, k ∈ {5,10,20,40,80,160,320,640} × 15 shipped cells):**
+- **Main text** = 38-task RAW trapezoid over log2 k (CT included, no
+  flip): mine SAE 0.8865 / T-SAE 0.8992 / TXC-T5 0.8994 vs printed
+  0.886 / 0.897–0.899 / 0.899–0.902 ✓.
+- **Committed figure** = 36-task (CT-dropped) trapezoid: mine
+  "T10" 0.9332 / "T20" 0.9346 vs the figure's #2/#3 bars 0.933 /
+  0.935 ✓ — **the published figure's top non-MLC bars are
+  END-TO-END reproduced from the T5-replica artifact checkpoints.**
+  mac-c's main-text-vs-figure aggregation-mismatch flag (A9/A12) is
+  hereby confirmed with numbers; both venues share the same underlying
+  cells, phantoms included.
+
+**2. Phase-A btk-only curve (k=20, TXC-pre matched-exposure; seeds
+landing):** s42 complete: T1 0.8975 → T2 0.8999 → T4 0.9006 →
+T8 0.8849 → T16 0.8760 (SAE band 0.8993 ± 0.0032); s1 partial
+agrees (T1 0.9008, T2 0.9030, T16 0.8776). Shape: **inverted-U
+peaking ≈ SAE at T2–T4, NEGATIVE slope beyond; ordered−shuffled gap
+grows with T (0 → ~0.010 → ~0.020 → ~0.028 → ~0.022)**. The G5 T=1
+anchor PASSES at k20 both landed seeds (|Δ| ≤ 0.002); at k5 the
+anchor is seed-mixed (s42 −0.016, s1 +0.001) — reported as the
+pre-registered caveat if the third seed doesn't settle it.
+
+**3. Realized-l0 disclosure (fingerprint column doing its job):**
+btk-only selection is exact by construction, but the EVAL JumpReLU
+threshold has NO top-k cap — trained pre cells realize l0 ABOVE
+k_pos·T at high T (T16: ~378–381 vs 320 bound; +19%), a
+threshold-EMA noise effect amplified by Amendment 1's smaller window
+batches. Verdict will state plainly: high-T pre cells carry MORE
+eval-time capacity than nominal, so their AUC is not a
+fixed-sparsity architecture claim; the per-token arms hold 20.1–21.1.
+
+**4. Ops:** tsae_btkonly trained cells (batch=32-seq, Amendment 2b)
+queued behind the extension; remaining pre cells (s1 T4/T8 + s2 full)
+training; post-42 follows. Ledger: extension ≈ 2.5 GPU-h.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
