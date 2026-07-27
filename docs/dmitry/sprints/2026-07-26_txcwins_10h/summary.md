@@ -536,6 +536,30 @@ the segmentation is one retrieved document per span with no splitting rule to ju
 | gold@0 vs @4 | +1.20 | 4.8 | 0.068 | **0.489** | **0.741** | 0.150 (2.1×) |
 | gold@4 vs @9 | +0.01 | **0.1** | 0.045 | 0.538 | 0.641 | 0.146 (2.1×) |
 
+**The arms were run as a test of whether `c` and `r1` suffice — and the retention hypothesis is
+refuted by its own registered falsifier.** Three inits, held-out, matched dose
+(`results/txc_wins/litm_0v4_tr_arms_ds{0,1,2}.json`):
+
+| | ds0 | ds1 | ds2 | median |
+| --- | --- | --- | --- | --- |
+| crosscoder | +1.061 | +1.127 | +1.053 | **+1.061** |
+| TopK SAE | +0.375 | +0.471 | +0.877 | +0.471 |
+| best constant write (sup.) | +4.368 | +4.400 | +4.387 | +4.387 |
+| ratio to constant write | 0.24 | 0.26 | 0.24 | **0.24** |
+
+The prediction registered in advance was that near-floor retention would cap every arm and make
+the *ordering* unstable across inits, with the stated falsifier: **a clean repeatable crosscoder
+win at retention 2.1× would show retention does not cap what it was claimed to cap.** That is what
+happened — the crosscoder wins 3 of 3 against the SAE at a 2.3× margin, and its own values span
+0.074. **Retention is not a third gate.** A task can have near-floor retention and still support a
+stable architecture separation.
+
+What retention *did* predict correctly is the absolute scale: +1.06 against prompt injection's
++6.3, on a baseline of +0.54. Small but reproducible.
+
+And the seven-task pattern holds here too — **ratio 0.24 to the best constant write**, so the
+search advantage is real and the form advantage is absent, exactly as everywhere else.
+
 **The best shape statistics anything has screened** — low `c` *and* genuine rank ≥ 2 together,
 which no construct in this sprint achieved — **on a task that may be unsteerable for an unrelated
 reason.** See the retention discussion in finding 3.
