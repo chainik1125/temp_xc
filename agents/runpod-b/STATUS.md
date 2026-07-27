@@ -1,65 +1,56 @@
-# runpod-b STATUS — λ̂ overlay is the ONLY open lane (rewritten 2026-07-27 ~18:20 London wall)
+# runpod-b STATUS — directive queue EMPTY, listening (rewritten 2026-07-27 ~20:45 London wall)
 
 **I am `runpod-b`** — replication/evidence/exhibit + shuffle-overlay
-figure lanes. GPU 1 mine; GPU 0 was borrowed (pre-approval
-1d2e3de28), now free again. Tokens gh/hf/hf_ds; HF_HOME=
-/workspace/hf_cache (gpt2/gemma2/llama31 warm).
+figure lanes. GPU 1 mine (idle); GPU 0 back with runpod-1's night
+grid. HF cache warm (gpt2/gemma2/llama31).
 
-## CLOSED today (all ratified or PTR-with-mac-local)
+## Everything delivered today (chronological, all pushed)
 
-- **Bring-up + hunt4w2 replication freeze→run→verdict:** sage
-  CONFIRM 3/3 same-arm, tret_py CONFIRM 2/2 same-arm, order-0
-  replicates; tret_wt upward-drift stability note (WEAK/KEEP/KEEP
-  re-seed vs KILL/WEAK/KEEP wave — bundle STANDS, drift flagged).
-  Pushed `39dd7d385` (~18:10 entry). Awaiting ratification; § 8
-  receipt-clause one-liners offered in-entry.
-- **ttrend shuffle-overlay:** retrain 21/21 → anchor gate 5/7 (T32
-  +.022 high, tsae +.010 high) → STOP per card → RATIFIED
-  (dd2759e8e) → two-instrument fallback fig DELIVERED + APPROVED
-  (e210e5d09): `figs_writeup/fig_ttrend_shuffle_tsweep.*` via
-  `diafaces/render_tt_fallback.py`. Overlay JSON recorded,
-  unlicensed (venue-effect datum).
-- **W2_DRAFT_BLOCKS** ratified + applied by mac-local (0a73061ef).
-- Cards carry AMENDMENTS A1/A2 (identity tol 1e-6→2e-3,
-  cross-process GPU drift, conditioning-quantified) — committed
-  before shuffled columns were read.
+1. **Bring-up** + listener pattern armed.
+2. **hunt4w2 replication** end-to-end: freeze (5 KEEP legs) → run →
+   sage CONFIRM 3/3 + tret_py CONFIRM 2/2 same-arm, order-0
+   replicates → **RATIFIED** (3958a1c26), row receipt-clauses
+   applied by mac-local.
+3. **W2_DRAFT_BLOCKS** (§ 8 rows) → ratified + applied (0a73061ef).
+4. **ttrend shuffle-overlay**: retrain 21/21 → anchor gate 5/7
+   (T32/tsae high-side) → **STOP honored, ratified** →
+   **two-instrument fallback fig shipped + approved**
+   (`fig_ttrend_shuffle_tsweep`, no unlicensed numbers).
+5. **λ̂ shuffle-overlay**: retrain 18/18 (tsae anchors ≈ 3.9 h,
+   venue note on record) → **anchor gate ALL PASS at |Δ| ≤ 1e-4,
+   seed-for-seed reproduction** → overlay licensed →
+   **`fig_lambda_shuffle_tsweep` shipped** with the order-free
+   reading (gaps ≈ 0 at every T; cross-task instrument line
+   extended). Verdict entry ~20:45 (c32c65539). Ledger actuals
+   posted (+$5 corr, hold-time honest).
+6. Cards carry ratified amendments A1/A2 (identity tol 2e-3,
+   cross-process GPU drift quantified).
 
-## OPEN: λ̂ overlay (the last meeting-fig deliverable)
+## Standing state
 
-- Grid `run_shuffle_overlay_retrain` on GPU 1: **11/18 done, 3
-  workers alive (~163% CPU) in the tsae tail** (CPU-bound pair-loop,
-  62–77 min class; started ~16:50). Remaining: tsae×3 + post
-  T{2,4,8,16}/s42. Log `/workspace/lam_shuf_retrain.log`; monitor
-  task armed (fires on "DONE 18/18" or process exit).
-- **At drain:** (1) `CUDA_VISIBLE_DEVICES=1 .venv/bin/python -m
-  experiments.explorations.task_hunt.lambda_intensity.shuffle_overlay`
-  → identity receipts (tol 2e-3) → mechanical gate table (6 cells,
-  1σ_quoted: post T2 .1296±.0171 / T4 .1607±.0160 / T8 .1848±.0244 /
-  T16 .2548±.0473; sae .1130±.0218; tsae .1541±.0367). λ̂ σs are
-  3–12× wider than tt's — tt-magnitude drift PASSES here; tsae is
-  the risk cell (tt's tsae failed +.010; λ̂ tsae tol is .0367 —
-  should hold).
-  (2) ALL PASS ⇒ `render_overlay_figs --task lambda` →
-  `fig_lambda_shuffle_tsweep.*`; commit overlay JSON + fig + LOG
-  verdict entry (gate table verbatim, gaps story, ledger actuals
-  ~$5-6 for 18 cells ≈ 105 min × 3 workers GPU 1). FAIL ⇒ STOP +
-  report + λ̂ two-instrument fallback (screen = lambda_screen.json
-  win/win_shuf; pattern = render_tt_fallback).
-- Rows checkpoint each push (leaderboard/manifest/retrain JSON are
-  live-append; commit them with -A, union-merge handles conflicts).
+- **Nothing running. Directive queue EMPTY pending mac-local review
+  of the λ̂ verdict entry** (last unratified item).
+- Listening posture: background fetch loop on
+  `experiments/explorations/task_hunt briefings agents/runpod-a`
+  (150 s; re-arm after every wake). Standing duties: adversarial
+  replication on any new KEEP (reask_hr screen is coming from
+  runpod-a — likely next target), evidence-line support, exhibit
+  staging on ratifications.
+- Possible follow-ups if directed: WRITEUP breadth/methods row for
+  the two overlay outcomes (venue-effect datum + order-free λ̂
+  line); tt overlay re-run under a wider re-frozen gate (only if
+  the team asks — the fallback satisfies the deliverable).
 
-## House mechanics (fresh-window notes)
+## Mechanics for a fresh window
 
-- Push contention is heavy: on pull-rebase conflict → keep BOTH LOG
-  blocks (python re.sub pattern in history), `grep -c '<<<<<<<'
-  LOG.md` must read 1 (line 9989 quotes the grep). If rebase sticks
-  ("mark them as resolved" with clean ls-files -u): git commit
-  --no-edit, `rm -rf .git/rebase-merge`, `git checkout -B arxiv
-  HEAD`, push (used 3× today, content verified each time).
-- Origin listener pattern: background fetch loop on
-  `experiments/explorations/task_hunt briefings agents/runpod-a`,
-  150 s; re-arm after every wake.
-- Stamp from `date` (TZ=Europe/London); PTR everything; mac-local
-  ratifies on push.
+- Retrain/overlay pattern: cards in `lambda_intensity/` +
+  `diafaces/` (approved as craft standard); overlay scripts share
+  `_fit_ordered_and_shuffled`; renderer
+  `task_hunt/render_overlay_figs.py` (refuses on gate fail),
+  fallback pattern `diafaces/render_tt_fallback.py`.
+- Git: keep-BOTH on LOG conflicts, stray grep baseline = 1; stuck
+  rebase escape = commit --no-edit + `rm -rf .git/rebase-merge` +
+  `checkout -B arxiv HEAD` (verified 3× today).
+- Stamp from `date`; PTR everything; mac-local ratifies on push.
 
 *Rewrite before any compact. — runpod-b*
