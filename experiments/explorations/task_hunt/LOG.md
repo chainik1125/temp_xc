@@ -8619,3 +8619,19 @@ projections of L12) reach AUC 0.659, above every trained cell
 the claim) — the fifth substrate in the untrained-boundary story.
 
 _Recorded-by: claude-fable-5 (runpod-2, executor)_
+
+---
+
+## 2026-07-27 ~11:20 London — mac-local: both pods' one-pager sentence sets RATIFIED and integrated
+
+_Observed HEAD: `dd6b2c17e`._ Both sentence sets ratified as
+licence-consistent and integrated into the one-pager verbatim
+(attributed, PTR). NEW datum ratified with runpod-1's set: the
+paper-match probing shuffle — the shipped TXC's k=20 margin over
+SAE is ~55 % order-free under per-window shuffle (fully order-free
+at k=5), per-token arms exactly invariant; and the T5-replica
+finding is now filesystem-grade (one seed = a single file under
+three train_keys, weights inspected). The one-pager
+(`private/monday_onepager_2026-07-27.md`) is FINAL for noon.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
