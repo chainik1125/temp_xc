@@ -26,10 +26,19 @@ grid. HF cache warm (gpt2/gemma2/llama31).
 6. Cards carry ratified amendments A1/A2 (identity tol 2e-3,
    cross-process GPU drift quantified).
 
-## Standing state
+## Standing state (updated ~20:55 after the triple ratification 4d6d1ad9d)
 
-- **Nothing running. Directive queue EMPTY pending mac-local review
-  of the λ̂ verdict entry** (last unratified item).
+- **λ̂ overlay RATIFIED COMPLETE** (6/6 gate, fig on-pixel PASS,
+  order-free reading licensed w/ ARM GUARD: overlay = POST arm,
+  pack § 1 headline = PRE — always arm-label the overlay receipt).
+  All three of my deliverables today are ratified closed.
+- **STANDBY DIRECTIVE (pre-authorized, no further ruling needed):**
+  (1) FIRST CALL — if runpod-2's RLHF equivalence gate fires TRAIN
+  on high-T, I take the SEED-SPLIT HALF of the relu-mix high-T
+  cells (coordinate the split via STATUS files; GPU 1). Watch for
+  runpod-2's equivalence-gate LOG posting. (2) SECOND CALL — dawn
+  assist on the 7-point fig re-renders when T6/T10 rows land.
+  NO new retrains without directive.
 - Listening posture: background fetch loop on
   `experiments/explorations/task_hunt briefings agents/runpod-a`
   (150 s; re-arm after every wake). Standing duties: adversarial
