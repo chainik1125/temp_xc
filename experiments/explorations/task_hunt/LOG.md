@@ -10221,3 +10221,51 @@ state: hunt actuals ≈ $21 of $200 (mac-a Modal ≈ $20 + pod ≈ $1).
 NOTHING here is quotable: PENDING TEAM REVIEW end-to-end.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+---
+
+## 2026-07-27 ~16:30 London — runpod-b: λ̂ SHUFFLE-OVERLAY CARD FROZEN + RETRAIN LAUNCHING (directive eeb4ee3c4 item 2, λ̂ first)
+
+Directive pickup ~16:05 (listener wake on mac-local's push). Prereqs
+closed before this freeze, $0-GPU except the cache sweep:
+
+- **Ward prereqs restored from the HF mirror, sha256 16/16**
+  (`ward_lambda_prereqs/`: ward_stream 10 + λ labels 6 — the exact
+  runpod-2 receipt pattern, same mirror paths).
+- **base/hs13 cache REBUILT on GPU 1** (`cache_depth base`,
+  llama31-8B from the pre-warmed shared cache): 125 s, 17 capture
+  points, 72 GB. Fingerprint vs the persist-time receipt
+  (`cache_fingerprint_topup.json`): **sha256 DIFFERS (A10 → H100
+  forward nondeterminism, expected), statistical fingerprint TIGHT**
+  (slice_mean Δ ≈ 3.3e-6 on a 0.70-σ stream; slice_std Δ ≈ 6e-7;
+  shape/dtype exact). Disclosed per card § 2; the anchor gate is the
+  operative consistency check (D-K1 pattern).
+
+**FROZEN this commit** (`lambda_intensity/SHUFFLE_OVERLAY_CARD.md` +
+`run_shuffle_overlay_retrain.py` + `shuffle_overlay.py`, before any
+cell): retrain grid = the QUOTED Stage-2 cells only (claiming arm
+txc_batchtopk_post × T{2,4,8,16} + batchtopk_sae/tsae T1 anchors ×
+seeds {1,2,42}; 18 cells; hyperparams inherited by construction from
+`run_stage2.py`'s `uniform_cells` args; canonical runner end-to-end).
+**Anchor gate pre-registered** (card § 3): per cell
+|mean₃ retrained − mean₃ quoted| ≤ 1·σ_quoted, all six cells must
+pass, else STOP + report (fallback = the pre-approved two-instrument
+figure); quoted numbers stay the exhibit numbers either way.
+**Shuffle instrument** (card § 4) = probing 1.2.0 convention
+byte-inherited: probe fit on ordered train tiles (frozen v1 pipeline,
+untouched), same fixed probe scored on per-row-permuted eval tiles
+(`shuffle_within_window`, seed 0, disclosed), never refit; T1 anchors
+identity by construction; per-cell identity receipt (recomputed
+ordered r == canonical row metric to 1e-6) licenses the overlay code
+path. Fresh-run mechanism: `eval_extra.retrain_tag` → new eval_keys
+(grid.py's documented no-collision path; 0 hf_url manifest rows
+verified, so training is fresh; checkpoints persist for the overlay).
+
+Launching on GPU 1 now, 3 workers; est 1.5–2.5 GPU-h ≈ $5–8 (ledger
+line this commit). Deliverable per directive:
+`fig_lambda_shuffle_tsweep` template-knob-for-knob, y = recovery r.
+ttrend card next (recon while λ̂ trains). hunt4w2 replication duty
+unchanged — freezes on runpod-a's bundle posting; GPU 1 sequencing
+disclosed in-LOG when both lanes are live. PTR end-to-end.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
