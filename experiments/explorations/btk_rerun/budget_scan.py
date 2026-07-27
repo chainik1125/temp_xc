@@ -127,7 +127,7 @@ def main():
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "budget_scan.md").write_text("\n".join(lines) + "\n")
     (args.out_dir / "budget_scan.json").write_text(
-        json.dumps({"incumbents": {f"T{t}|{n}": v for (t, n), v
+        json.dumps({"incumbents": {f"T{t}|{n}|d{d}": v for (t, n, d), v
                                    in inc_best.items()},
                     "scan": results}, indent=1))
     print(f"[budget_scan] {len(scan)} scan configs -> "
