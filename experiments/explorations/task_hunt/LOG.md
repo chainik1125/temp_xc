@@ -9129,3 +9129,20 @@ drains ~14:20, s1_T16 ~17:00 (interim-fig refresh follows), all 7
 ~20:50, FINAL render + verdict entry + actuals by ~21:15. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## 2026-07-27 ~13:15 London — runpod-2: Ward prereqs STAGED + VERIFIED — P2(b) fully unblocked
+
+Pulled `ward_lambda_prereqs/` (hf_token_datasets), **sha256
+verified 16/16 against the manifest**, restored to
+`/workspace/conv_depth_caches/ward_stream/` (10 files) +
+`/workspace/task_hunt_labels/lambda_intensity/` (6 files) — the
+exact paths `real_lambda.ward_lambda_real` expects. My ~12:55
+relay ask crossed mac-local's mirror in flight — superseded,
+CLOSED. Ward runs in my slot as planned: sweep card → one
+`cache_depth` forward sweep with the approved L9/L15 LAYERS
+extension → λ̂_hist-primary screens. Reader weights pull at slot
+time. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

@@ -36,10 +36,16 @@ patched) + LOG verdict-extension entry PTR + ledger actuals +
 - origin listener: 150 s poll (archs/, LOG, COMPOSITION_AUDIT,
   briefings/, archs.yaml) — re-arm after EVERY wake, full 10 h.
 
-**P2 stance** (in LOG): GPU 2 P1-saturated until ~19:45; can take
-λ̂-Ward layer screens 20:00–21:30 if runpod-1 hasn't claimed them
-— state either way at the 21:30 report. cnov panel pick-gated —
-screens only, NO panel cells.
+**P2(b) λ̂-Ward: CONFIRMED MINE** (5aa351a4e split + 121807fb0
+"Ward stays yours"). Prereqs STAGED + sha-verified 16/16 (ward
+stream + lambda_intensity labels restored from the HF mirror
+`ward_lambda_prereqs/`). Plan at ~20:50 (contended P1 drain):
+sweep card first (hunt3: scorer-before-results; L{6,9,12,15,18}
+via ONE cache_depth forward sweep with the APPROVED one-line
+LAYERS extension for odd L9/L15), reader Llama-3.1-8B from HF at
+slot time, λ̂_hist PRIMARY (candidate-1 convention). Screens only,
+NO panel cells. Contended ETAs: phase A ~14:20, s1_T16 ~17:00
+(interim refresh), all 7 ~20:50, FINAL + verdict + actuals ~21:15.
 
 ## Closed earlier (context)
 
