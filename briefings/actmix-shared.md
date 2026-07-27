@@ -109,18 +109,19 @@ generation batch (model, rollout count, est + actuals) in
 MODAL_SPEND.md under a new OPENAI section. Rotates with the
 post-weekend batch.
 
-**INTERIM BACKEND (Han, 07-28 ~00:1x): the Anthropic key** —
-keychain **`anthropic-api-key`** (Han's key, pre-existing on the
-mac) is the ACTIVE generation backend "for the time being"
-(verified live: HTTP 200, message round-trip OK). Same rules: MAC
-AGENTS ONLY, never on pods, env-inject only (`export
-ANTHROPIC_API_KEY="$(security find-generic-password -s
-anthropic-api-key -w)"`), never echo/file/argv. **The $300
-generation cap is ONE SHARED envelope across backends** (hub
-interpretation, flagged). Ledger section renamed GENERATION with a
-backend column. Swap back to `dmitry-mats-openai-key` per-corpus
-when Dmitry's fresh key verifies. Include this key in the
-post-weekend rotation review (Han's call — personal key).
+**⚠ WITHDRAWN (Han, 00:1x): `anthropic-api-key` is Han's PERSONAL
+key — NOT MATS-funded — and is OUT of fleet scope effective
+immediately. No agent uses it.** (Fleet-side usage before
+withdrawal: mac-local's two verification calls only, ≈ $0.001;
+disclosed.) Replacement: **`dmitry-mats-claude-api-key`** (Dmitry's
+MATS-funded Anthropic key) — Han adding now; ACTIVE only after
+mac-local verifies it live. Until then the generation backend is
+pod-hosted open-weights. Rules once live: MAC AGENTS ONLY, never on
+pods, env-inject only (`export ANTHROPIC_API_KEY="$(security
+find-generic-password -s dmitry-mats-claude-api-key -w)"`), never
+echo/file/argv; **$300 generation cap = one shared envelope across
+backends**; GENERATION ledger with backend column; rotates with the
+post-weekend batch.
 
 **Deadlines.** Rebuttal-grade numbers ideally before the 9am PT
 (17:00 London) team meeting 2026-07-27; the AoE deadline is

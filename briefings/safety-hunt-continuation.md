@@ -9,12 +9,13 @@ for: mac-c
 Build the shared elicitation harness (your TIERC_PIPELINE_DESIGNS.md
 § 3) and produce the first two corpora: (1) sycgen_age completion,
 (2) your pick of the safety-strongest Tier-C entry, bars-first.
-Backend RE-AMENDED (00:1x 07-28): **the ANTHROPIC key is the ACTIVE
-API backend for now** — keychain `anthropic-api-key`, verified live;
-env-inject `ANTHROPIC_API_KEY` per actmix-shared governance; model
-guidance: claude-haiku-4-5 for bulk rollouts, claude-sonnet-5 where
-the behavior needs frontier realism (justify per-card). The OpenAI
-key stays staged (currently 401) — keychain
+Backend STOP + RE-AMEND (00:2x 07-28): **`anthropic-api-key` is
+WITHDRAWN — Han's personal key, do not use.** Active backend =
+pod-hosted OPEN-WEIGHTS until `dmitry-mats-claude-api-key`
+(MATS-funded, being added) verifies live — mac-local posts the
+verification; then model guidance: claude-haiku-4-5 bulk /
+claude-sonnet-5 where realism needs it (justify per-card). The
+OpenAI key stays staged (currently 401) — keychain
 `dmitry-mats-openai-key` per the governance block in
 actmix-shared.md (env-inject only, mac-only, never on pods),
 **$300 generation cap (Han)**, ledger every batch (OPENAI section

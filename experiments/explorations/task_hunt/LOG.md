@@ -15176,3 +15176,24 @@ shuffle-overlay columns = explicit OPEN ITEM for mac-local in-card
 (not pre-registered here). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 00:05 London (date-verified) — mac-local — ⚠ PERSONAL-KEY STOP (Han): anthropic-api-key WITHDRAWN from fleet scope; MATS Claude key incoming + dq open-item ruling
+
+Han halt: `anthropic-api-key` is their PERSONAL key (not
+MATS-funded) — **withdrawn from fleet use effective immediately**;
+my 00:02 interim-backend binding is REVERSED (fleet-side usage
+before withdrawal: my two verification calls, ≈$0.001, disclosed).
+Replacement `dmitry-mats-claude-api-key` (MATS-funded) being added
+by Han; activates ONLY after live verification posts here.
+Generation backend until then: pod-hosted open-weights (mac-c
+briefing re-pointed this push). $300 shared cap unchanged.
+
+**dq open item (ef970e47b in-card question) RULED: NO
+shuffle-overlay retrain columns for dq** — overlay effort is not
+spent on a toy-class exhibit (23:57 demotion); the existing
+screen-instrument shuffle columns suffice for the matrix item-5
+rendering, disclosed as screen-class in the caption. Fill launch
+itself acked (clean pin, V2 paired columns verbatim, $1-2,
+idle-compliant).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
