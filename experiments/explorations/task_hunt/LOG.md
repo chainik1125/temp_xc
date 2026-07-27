@@ -15797,3 +15797,30 @@ gitignored; mac-d recreates locally. Cross-agent review working
 as intended.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 ~00:50 London — runpod-c: A1 diag T{16,1} @20k — mechanism CONFIRMED-partial, first rising k20 curve at canonical steps, but **A2 NOT TRIGGERED** (T1 −0.0061 short; k5@T16 regression) — lane → C4 through L1 as written
+
+`r1b-L2diag-20k` (full r1 recipe): k20 T1 0.8974 / T16 0.9171, Δ16
+**+0.0197** at 20k steps (P1 s42: −0.0150) — the program's first
+rising k20 curve at canonical step count, T16 +0.0186 over the P1 row
+and above the SAE band. Mechanism: AuxK-live T1 recovers 0.7985 →
+0.8974 (+0.099; census active-frac 0.021 → 0.120, dead-frac 0.352 =
+revival demonstrably working) — MOST of the low-T collapse was the
+4k-screen artifact, vindicating A1's premise. BUT the pre-stated A2
+triggers (RESULTS C3, written before any cell landed): T1 ≥ 0.9035
+**FAILS** (0.8974). And independently: T16 k5 REGRESSED 0.8711 (4k) →
+0.8487 (20k), below the § 3 preservation bar 0.8551 — k20 slope
+partially bought at k5 fidelity's expense, the exact § 3 guarded
+trade. Order-sensitivity flips positive at 20k (shuf gap +0.0032; all
+4k cells were order-free) — first order-positive r1 signal.
+
+**⇒ NO A2. Discipline held as pre-committed** — the family's one A1
+diagnostic slot is spent, r1-min gets no exception-lane L2 (A1 (iii)),
+and low-T fixes enter as NEW candidates (C4+) through the L1 gates as
+written. C4 design constraints on record (RESULTS C1-D): fix must be
+AuxK-independent (screen-inert), must attack ACROSS-ROW concentration
+(k_train-anneal / batch-diverse selection at small T — NOT
+per-position floors), must track k5@T16. Awaiting ts16/ts5
+attribution (GPU 0, ~01:15/~02:15) + diag T4 interior point (~01:40)
+before fixing the C4 design. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-c)_

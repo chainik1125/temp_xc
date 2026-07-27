@@ -9,7 +9,7 @@ stay on the record.
 
 | id | candidate | level reached | dev Δ16 (best) | verdict |
 |---|---|---|---|---|
-| C1 | txc_pro_r1 (+_btkonly twin) | L1 (+A1 family diag in flight) | **+0.1168** (base −0.0134) | slope PASS ×, T1-level FAIL → NO PROMOTE as-is; A1 exception invoked; mechanism = low-T activation collapse |
+| C1 | txc_pro_r1 (+_btkonly twin) | L1 + A1 diag (T{16,1} done, T4 in flight) | **+0.1168** (base −0.0134) | slope PASS ×, T1-level FAIL → NO PROMOTE as-is; diag: mechanism CONFIRMED-partial (T1 0.7985→0.8974 w/ AuxK live), first rising k20 curve at 20k (Δ16 +0.0197), but T1 floor + k5-preservation both FAIL ⇒ **A2 NOT triggered** |
 | C2 | txc_btk_pre_subseq_btkonly | L1 | −0.0303 | KILL — curriculum alone does not transfer; threshold under-admit datum |
 | C3 | r1-min (r1_btkonly, aux losses off) | L1 | **+0.1180** | slope PASS, T16 PASS (program-best both k), T1-level FAIL → NO PROMOTE as-is; A1 (iii) bars a 2nd family diag; A2 tree pre-stated |
 
@@ -190,3 +190,66 @@ phase5b-locked instance, the CARD § 4 pre-registered ablation).
 Confound note, stated up front: t_sample scales tokens/step and
 k_train together at matched steps (ts16 sees 2× the tokens of ts8);
 matched-steps is the program's L1 convention — read with that lens.
+
+---
+
+## C1-D — A1 family diagnostic `r1b-L2diag-20k` (full recipe, 20k steps): T{16,1} verdict + A2 walk — 2026-07-28 ~00:50 London
+
+Dev-8 s42, 20k steps, b1024 sequences; hashes 9d9567ddd6a4ef6e (T16) /
+72a9f0a979cf575c (T1); T4 cell still running (interior point — cannot
+change this verdict; appends below when it lands).
+
+| | T1 | T16 | Δ16 | P1 s42 20k (T1 / T16 / Δ) |
+|---|---|---|---|---|
+| k20 | 0.8974 (shuf ≡) | 0.9171 (shuf 0.9139) | **+0.0197** | 0.9135 / 0.8985 / −0.0150 |
+| k5 | 0.7555 | 0.8487 (shuf 0.8489) | +0.0932 | 0.8417 / 0.8651 / +0.0234 |
+
+Census: T1 `frac_latents_active_batch` 0.120 (4k: 0.021 — 6×
+recovery), `frac_dead_threshold` 0.352 (AuxK LIVE and working); T16
+active 0.423 / dead 0.312. l0 receipts exact (serve 20/320, train
+20/160).
+
+**Findings (PTR; dev-only, 1 seed):**
+
+1. **Mechanism CONFIRMED, recovery PARTIAL.** With AuxK live past the
+   10 M-token threshold, T1 recovers 0.7985 → 0.8974 (+0.099) — most
+   of the low-T collapse WAS the 4k-screen artifact, vindicating A1's
+   premise. The residual −0.0161 vs P1's T1 (0.9135) co-occurs with
+   residual concentration (12 % active vs 42 % at T16): per-sample
+   TopK at T1 (k_train=20 drawn from ONE position per row) still
+   concentrates; AuxK fights it but does not fully win by 20k.
+2. **First RISING k20 curve at canonical steps.** Δ16 +0.0197 (P1:
+   −0.0150); T16 0.9171 sits +0.0186 over the P1 row and above the
+   SAE band (0.9111 ± 0.0042). The 4k→20k T16 change is +0.002 —
+   the win was not a step-count artifact.
+3. **k5 REGRESSION at 20k.** T16 k5 0.8487 vs 0.8711 at its own 4k
+   (−0.022, opposite sign to k20) — BELOW the § 3 preservation bar
+   (0.8651 − 0.010 = 0.8551). Longer training buys k20 slope partly
+   at k5 fidelity's expense — precisely the failure mode § 3 guards
+   ("do not destroy the k=5 recovery to buy the k=20 slope").
+4. **Order-sensitivity switches ON at 20k** (k20 T16 shuf gap +0.0032
+   ordered-over-shuffled; ≈ 0/negative at every 4k cell; P1 baseline
+   +0.0305). Small, but the first order-positive signal in the r1
+   family — longer training begins to use sequence structure.
+
+**A2 walk (triggers verbatim from C3, pre-stated before any cell
+landed):** T16 ≥ 0.8985 ✓ (slope ✓, +0.0197 vs required ≥ −0.0070);
+T1 ≥ 0.9035 ✗ (0.8974, short −0.0061) ⇒ **A2 NOT TRIGGERED.** The
+k5-preservation miss (finding 3) lands on the same side
+independently. The family's one diagnostic slot is spent; there is no
+exception-lane L2 for r1-min (A1 (iii)). r1-min may still EARN L2
+only by passing the L1 gates as written.
+
+**Lane forward (per the pre-stated tree): C4+ low-T fixes through L1
+as written.** Design constraints from tonight's mechanism data:
+(i) the fix must not depend on AuxK — structurally inert at the 4k
+screen (A1 artifact), so an AuxK-dependent fix can never pass L1
+honestly; candidates that act from step 0: k_train-anneal (wide→20,
+attacks across-row concentration directly), batch-diverse selection
+at small T, k_train floors. (ii) The T1 problem is ACROSS-ROW latent
+concentration (same latents win every row when k_train=20 from one
+position), not within-row budgeting — per-position floors do NOT
+address it. (iii) C4 must track k5@T16 alongside T1 (finding 3
+failure mode). Decision on the specific C4 design waits for the
+ts16/ts5 attribution cells (in flight) — whether the curriculum is
+even necessary shapes the search space.
