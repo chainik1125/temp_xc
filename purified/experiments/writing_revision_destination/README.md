@@ -84,13 +84,13 @@ launched in a named tmux session:
 
 ```bash
 export TXC_RUNPOD_ROOT=/workspace/temporal-crosscoders
-export KLICKE_EXTRACT_SESSION=klicke-deletion-l10-full-v3-singleton
+export KLICKE_EXTRACT_SESSION=klicke-deletion-l10-singleton-v1
 export KLICKE_EXTRACT_GPU=1
 export KLICKE_MODEL_REVISION=1f47e50cdbe801ad8a5174156ec3a0655108fb9f
 export KLICKE_EXTRACT_BATCH_SIZE=1
 export KLICKE_EXTRACT_SHARD_SIZE=256
 export KLICKE_EXTRACT_ATTENTION=sdpa
-export KLICKE_ACTIVATION_CACHE=/workspace/temporal-crosscoders/purified/results/neurips_rebuttal/writing_revision_destination/activation_cache_v3_singleton_full
+export KLICKE_ACTIVATION_CACHE=/workspace/temporal-crosscoders/purified/results/neurips_rebuttal/writing_revision_destination/activation_cache_singleton_v1
 export KLICKE_EXTRACT_LOG=/workspace/logs/writing_revision_destination/full_v3_singleton.log
 export KLICKE_PYTHON_BIN=/workspace/txc-venv/bin/python
 bash purified/experiments/writing_revision_destination/launch_extract_tmux.sh
@@ -139,3 +139,32 @@ python -m experiments.writing_revision_destination.report \
 Each target emits a 300-DPI PNG, PDF, CSV, aggregate JSON, and inline Markdown.
 The left panel reports absolute held-out log loss; the right reports
 equal-writer paired control-minus-ordered gaps with 95% bootstrap intervals.
+
+## Frozen submitted-dictionary gate
+
+The final gate uses the trailing five states from the exact 6,224-event cache,
+the submitted T=5 TXC `08fe3af07682fab4`, and matched TopK SAE
+`f437e623fabc37ec`. It verifies all cohort, extraction, checkpoint, and tensor
+hashes before encoding. At each sparse feature budget, feature selection and
+scaling use only the outer training writers. The ordered TXC probe is then held
+fixed for the per-event shuffle and reverse tests; positional, invariant, and
+last-token SAEs use the identical writer folds and feature budget.
+
+On a four-GPU RunPod, launch the full cell on physical GPU 3:
+
+```bash
+export TXC_RUNPOD_ROOT=/workspace/txc-neurips-aniket
+export KLICKE_PYTHON_BIN="$TXC_RUNPOD_ROOT/purified/.venv/bin/python"
+export KLICKE_FROZEN_GPU=3
+export KLICKE_FROZEN_ACTIVATION_CACHE="$TXC_RUNPOD_ROOT/purified/results/neurips_rebuttal/writing_revision_destination/activation_cache_singleton_v1"
+bash purified/experiments/writing_revision_destination/launch_frozen_dictionary_tmux.sh
+```
+
+The worker downloads only the two pinned encoder checkpoints, resumes six
+small sparse-code files, and writes JSON, held-out probabilities, Markdown,
+PDF, and 300-DPI PNG output under
+`purified/results/neurips_rebuttal/writing_revision_destination/frozen_dictionary_t5_v1`.
+The checkpoints occupy 3.76 GB, the existing deletion activation cache about
+0.51 GB, and sparse codes well under 0.1 GB. The launcher requires 6 GiB free
+by default to leave room for download temporaries; it does not download the
+4.2 GB dictionary-training cache or retain optimizer state.
