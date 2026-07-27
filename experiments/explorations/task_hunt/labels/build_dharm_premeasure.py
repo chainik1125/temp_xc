@@ -94,7 +94,7 @@ def build(key: str, docs: list) -> dict:
     n_cross, chain_lens, sub_tok = 0, [], []
     for d in docs:
         subs = d["subtasks"]
-        hi = d["harmful_index"]
+        hi = d["harm_idx0"]          # 0-based; harm_index ships 1-BASED
         enc = [np.asarray(tok(s, add_special_tokens=False)["input_ids"],
                           dtype=np.int32) for s in subs]
         parts, bnd, dose, thr = [], [], [], []
@@ -126,7 +126,14 @@ def build(key: str, docs: list) -> dict:
     doc_of = np.repeat(np.arange(n_docs, dtype=np.int32), np.diff(doc_off))
     pos_of = np.concatenate([np.arange(n, dtype=np.int32)
                              for n in np.diff(doc_off)])
-    split = doc_split(n_docs, seed=SEED)
+    # ID-GROUPED split (card § 0): `id` is not unique — one id spans up
+    # to three modalities and 764 ids span the SHIPPED splits, so a
+    # row-level split would put the same harmful goal in train AND test.
+    # We ignore the shipped splits and split BY ID.
+    uniq = sorted({d["id"] for d in docs})
+    id_flag = doc_split(len(uniq), seed=SEED)
+    flag_of_id = {u: int(f) for u, f in zip(uniq, id_flag)}
+    split = np.array([flag_of_id[d["id"]] for d in docs], dtype=np.int8)
     train_rows, test_rows = split[doc_of] == 0, split[doc_of] == 1
 
     thage_raw = np.concatenate(
@@ -143,7 +150,9 @@ def build(key: str, docs: list) -> dict:
              "tokens_per_subtask_mean": float(np.mean(sub_tok)),
              "subtasks_per_chain_mean": float(np.mean(chain_lens)),
              "threshold_crossings": int(n_cross),
-             "mean_inter_boundary_tokens": float(ids.size / max(bnd.sum(), 1))}
+             "mean_inter_boundary_tokens": float(ids.size / max(bnd.sum(), 1)),
+             "n_unique_ids": len(uniq),
+             "split_grouped_by_id": True}
     print(f"  [{key}] CLOCK: {clock['tokens_per_subtask_mean']:.1f} tok/"
           f"subtask, {clock['subtasks_per_chain_mean']:.1f} subtasks/chain, "
           f"{clock['threshold_crossings']} crossings", flush=True)
