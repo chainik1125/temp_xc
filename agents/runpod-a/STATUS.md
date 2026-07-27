@@ -179,3 +179,17 @@ wrap-up stands as pushed (911c601f2): shard-2 inventory correct,
 the reask_hr card per the checklist in § 1b above — CPU-first
 (card+builders+tests+freeze); the GPU screen slots around any
 high-T borrow.
+
+## DIRECTIVE 98a9ea718 (~22:49 entry) — RLHF tsae@18432 (task #6)
+
+Dmitry-via-Han: tsae was width-mismatched (16384 vs family 18432;
+configs/archs.yaml receipt; RLHF has no per-experiment override).
+MY LANE = RLHF side (runpod-b takes probing side on GPU 1):
+**STEP 0 before ANY GPU spend: pin the paper RLHF section's tsae
+cell config from provenance (actmix_rlhf/CARD.md paper-match
+cells + experiments/rlhf configs). If the paper RLHF section has
+NO tsae baseline → REPORT AND STOP, do not invent a cell.** Else
+tsae@18432 × seeds {1,2,42} otherwise identical, realized h_size
+stated (h_frac 0.2), card→pin→ledger→GPU 0→rows→LOG (PTR). My
+GPU-0 idle 2.5 h was recorded acceptable + now filled by this.
+reask_hr card build continues CPU-first in parallel (§ 1b).
