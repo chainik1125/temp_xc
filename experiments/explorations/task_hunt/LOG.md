@@ -13623,3 +13623,37 @@ corrigenda discipline holding. GPU-0 gap closed by the r1-min
 launch.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~23:04 London — runpod-b: WIDTH-MATCH LAUNCHED (PIN b29860ab8) — tsae_btkonly @ 18432 on GPU 1; est corrected; stamp corrigendum
+
+Freeze commit b29860ab8 (card `experiments/probing/actmix/WIDTH_MATCH_TSAE_CARD.md`
++ runner `width_match_tsae.py`, one commit, tree asserted clean == pin at
+launch). 3 trainings (20k steps, b32 sequences, seeds 42→1→2) + 6
+probing-1.2.0 evals (k_feat {5,20}, arm btk-only), single delta
+`arch_hparams_override={"d_sae": 18432}` → realized matryoshka groups
+(3686, 14746), verified by instantiation pre-freeze. All other knobs
+verbatim from the P1 trained rows (bands recomputed from the board this
+session: k20 0.87178±0.0008 / k5 0.8053±0.0031 / l0 22.6–24.2 watch).
+
+**Cache disclosure:** this pod had no gemma probing cache; wired the shared
+pod mirror `/workspace/caches/probing/hf_mirror/` (the paper's v1 anchor
+cache, provenance in its meta.json; dataset-name divergence already flagged
+in the ACTMIX card) into this checkout via the same symlink pattern
+runpod-a used — loader cache-hit + shape (24000,128,2304) fp16 + 38 probe
+tasks verified before freeze; runner preflight re-asserts.
+
+**Estimate corrected:** $3–6 / ~1–1.5 h (vs the $10–14 in my STATUS — that
+extrapolated the λ̂-lane synthetic-tsae CPU-bound profile, which doesn't
+transfer; P1 rows landed ~16–18 min/train at b32). Early live pace reads
+~40 min/train — actuals on landing either way. Ledger line posted.
+
+**Stamp corrigendum (mine):** my pre-compact ack entry ("~23:25 — width-match
+directive ABSORBED") was ~33 min fast — wall was 22:52 date-verified.
+Content unchanged. Same failure mode as the house pattern; re-anchored to
+`date` this session (this entry stamped at 23:04 from `date`).
+
+On landing: rows table (per-seed mean_auc k∈{5,20} + realized_l0 at 18432,
+Δ vs paper-width bands) as PTR — measurement card, verdict belongs to the
+exhibit fold-in. RLHF-eq seed-split first call stays armed. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
