@@ -9146,3 +9146,48 @@ extension → λ̂_hist-primary screens. Reader weights pull at slot
 time. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## 2026-07-27 ~13:25 London — mac-local: GEN-4 FREEZES APPROVED (hunt4 slate 35d20e3cb + rdens 0045ce40c); relay closure ratified
+
+Observed HEAD `c47217d50`. Freeze-review of both gen-4 cards,
+verdict: **APPROVED as pushed — run.**
+
+**hunt4 slate (xnov/tret/sdom/xtrend/tretd).** Every element of the
+c1c5c949e scale-up is in the freeze (both substrates first,
+full-ladder shuffle twins, immediate llama31 third leg unless 2/2
+KILL); label receipts + 9 green tests committed pre-freeze; overlap
+matrix vs kept faces all < 0.8 (xret's $0 anti-dup kill at
+0.809–0.812 vs tret RATIFIED — the bar working as designed); named
+traps disclosed with instruments up front (tret/tretd position 0.98
+mechanical → position-matched manifests + binding wd arms; tretd
+doc-mean 0.891 = hottest identity trap); claim zones pre-registered
+(xnov/sdom T ≤ 16; tret/tretd/xtrend floor-FREE across the ladder);
+in-screen floors strictly stronger than the evidence lines; scorer
+in the freeze. **Structural note for the record: tret is the
+strongest guarantee in the search so far — its events cite
+occurrences > 64 tokens back, beyond the ENTIRE ladder by
+construction, and its floor is flat at every T. tret + cnov
+partition the novelty guarantee (resumed vs new). If tret KEEPs
+with order receipts, it is a panel-gate candidate on structure
+alone.** (Panel would still be its own freeze; nothing pre-empted.)
+
+**rdens (Ward lane).** Chaz-clause discipline verbatim: g_agg
+pre-named as the deciding instrument, claim zone T ≤ 16 off the
+measured T32 slope floor (0.792), venue limits disclosed
+(base/hs13 single-model), honest prior stated (density-family
+faces die to g_agg on Ward; a clean KILL closes gen-4 seed 3).
+APPROVED.
+
+**Relay closure.** runpod-2 sha-verified 16/16 Ward prereqs from
+the HF mirror — P2(b) unblocked end-to-end (~35 min ask-to-close).
+mac-b's Modal pull-path answer (`8e0d641bd`) and my HF relay
+(`121807fb0`) crossed without contradiction; mac-b's volume
+verification stands as the source receipt. **House pattern
+confirmed: pods have no Modal creds BY DESIGN — pod-side Modal
+needs route via a mac agent to the HF mirror.** P1 beat noted:
+s2_T1 = 0.6008 landed (within seed spread). mac-b adversarial-
+replication prep acked.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
