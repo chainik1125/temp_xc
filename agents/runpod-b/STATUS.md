@@ -1,65 +1,73 @@
-# runpod-b STATUS — directive queue EMPTY, listening (rewritten 2026-07-27 ~20:45 London wall)
+# runpod-b STATUS — WIDTH-MATCH LANE staged, execute on resume (pre-compact handoff, 2026-07-27 ~23:20 London)
 
-**I am `runpod-b`** — replication/evidence/exhibit + shuffle-overlay
-figure lanes. GPU 1 mine (idle); GPU 0 back with runpod-1's night
-grid. HF cache warm (gpt2/gemma2/llama31).
+**I am `runpod-b`** — pod A GPU 1 (idle, mine). All prior lanes
+CLOSED + RATIFIED (replication 5/5 CONFIRM; tt gate-STOP + fallback
+fig approved; λ̂ gate 6/6 ALL PASS + fig shipped, triple-ratified
+4d6d1ad9d).
 
-## Everything delivered today (chronological, all pushed)
+## ACTIVE DIRECTIVE (98a9ea718, supersedes standby): tsae width-matched probing re-run
 
-1. **Bring-up** + listener pattern armed.
-2. **hunt4w2 replication** end-to-end: freeze (5 KEEP legs) → run →
-   sage CONFIRM 3/3 + tret_py CONFIRM 2/2 same-arm, order-0
-   replicates → **RATIFIED** (3958a1c26), row receipt-clauses
-   applied by mac-local.
-3. **W2_DRAFT_BLOCKS** (§ 8 rows) → ratified + applied (0a73061ef).
-4. **ttrend shuffle-overlay**: retrain 21/21 → anchor gate 5/7
-   (T32/tsae high-side) → **STOP honored, ratified** →
-   **two-instrument fallback fig shipped + approved**
-   (`fig_ttrend_shuffle_tsweep`, no unlicensed numbers).
-5. **λ̂ shuffle-overlay**: retrain 18/18 (tsae anchors ≈ 3.9 h,
-   venue note on record) → **anchor gate ALL PASS at |Δ| ≤ 1e-4,
-   seed-for-seed reproduction** → overlay licensed →
-   **`fig_lambda_shuffle_tsweep` shipped** with the order-free
-   reading (gaps ≈ 0 at every T; cross-task instrument line
-   extended). Verdict entry ~20:45 (c32c65539). Ledger actuals
-   posted (+$5 corr, hold-time honest).
-6. Cards carry ratified amendments A1/A2 (identity tol 2e-3,
-   cross-process GPU drift quantified).
+**Task:** re-run the PROBING tsae comparator at width-matched
+`d_sae = 18432` (paper width was wrong-width vs the exhibit) —
+`tsae_btkonly`, T=1, seeds {1,2,42}, otherwise IDENTICAL to the
+P1-generation cells. Card freeze → pin → run GPU 1 → ledger. Est 3
+trainings ≈ 3–4.5 GPU-h ≈ $10–14. **RLHF-eq seed-split first call
+STAYS ARMED** (if runpod-2's gate fires TRAIN mid-lane: finish
+in-flight training, then re-prioritize with mac-local).
 
-## Standing state (updated ~20:55 after the triple ratification 4d6d1ad9d)
+## Recon COMPLETE (inheritance by construction — from leaderboard rows + registry; verified this session)
 
-- **λ̂ overlay RATIFIED COMPLETE** (6/6 gate, fig on-pixel PASS,
-  order-free reading licensed w/ ARM GUARD: overlay = POST arm,
-  pack § 1 headline = PRE — always arm-label the overlay receipt).
-  All three of my deliverables today are ratified closed.
-- **STANDBY DIRECTIVE (pre-authorized, no further ruling needed):**
-  (1) FIRST CALL — if runpod-2's RLHF equivalence gate fires TRAIN
-  on high-T, I take the SEED-SPLIT HALF of the relu-mix high-T
-  cells (coordinate the split via STATUS files; GPU 1). Watch for
-  runpod-2's equivalence-gate LOG posting. (2) SECOND CALL — dawn
-  assist on the 7-point fig re-renders when T6/T10 rows land.
-  NO new retrains without directive.
-- Listening posture: background fetch loop on
-  `experiments/explorations/task_hunt briefings agents/runpod-a`
-  (150 s; re-arm after every wake). Standing duties: adversarial
-  replication on any new KEEP (reask_hr screen is coming from
-  runpod-a — likely next target), evidence-line support, exhibit
-  staging on ratifications.
-- Possible follow-ups if directed: WRITEUP breadth/methods row for
-  the two overlay outcomes (venue-effect datum + order-free λ̂
-  line); tt overlay re-run under a wider re-frozen gate (only if
-  the team asks — the fallback satisfies the deliverable).
+- P1 cells: arch `tsae_btkonly` (registry `configs/archs.yaml:151`:
+  class `btk_only:TSAEBTKOnly`, arch_version 2.1.0-port, hparams
+  d_sae 16384 / k_pos 20 / h_frac 0.2 / contrastive_alpha 1.0 /
+  relu_mode btk-only), datasource
+  `gemma_2_2b_it_l13_fineweb_24k128`, evaluator probing-1.2.0.
+- training_cfg (from rows): n_steps 20000, batch_size 32, lr 3e-4,
+  warmup 1000, bf16, buffer 2,000,000, arch_hparams_override None.
+  **My single delta: `arch_hparams_override={"d_sae": 18432}`** —
+  hashes into train_key + eval_key, so rows auto-distinguish from
+  paper-width (no collision, no tag needed).
+- eval_cfg (two evals per training): {k_feat 5 and 20, S 32,
+  shuffle "within_window", shuffle_seed 0, encode_batch_size 64,
+  arm "btk-only", smoke False}.
+- **Realized h_size for the card:** `n_high = round(0.2·18432) =
+  3686` (tsae.py:131). Paper-width reference: tsae_btkonly
+  mean_auc 0.8718 ± 0.0008 (the exhibit's NOT-MET line-3
+  comparator; my rows update that comparison at matched width).
+- Seeds {1,2,42}; seed-0 rows in the board are smoke — exclude
+  from any table.
 
-## Mechanics for a fresh window
+## Execution sequence on resume (nothing launched yet)
 
-- Retrain/overlay pattern: cards in `lambda_intensity/` +
-  `diafaces/` (approved as craft standard); overlay scripts share
-  `_fit_ordered_and_shuffled`; renderer
-  `task_hunt/render_overlay_figs.py` (refuses on gate fail),
-  fallback pattern `diafaces/render_tt_fallback.py`.
-- Git: keep-BOTH on LOG conflicts, stray grep baseline = 1; stuck
-  rebase escape = commit --no-edit + `rm -rf .git/rebase-merge` +
-  `checkout -B arxiv HEAD` (verified 3× today).
+1. **Verify the datasource cache exists on THIS pod**
+   (`gemma_2_2b_it_l13_fineweb_24k128` — P1 ran on pod B; check
+   the generator's expected path via `load_datasource(...)` params
+   + the probing probe cache; if absent, rebuild via the committed
+   builder BEFORE the card, disclose like the λ̂ ward rebuild).
+2. Write `experiments/probing/actmix/WIDTH_MATCH_TSAE_CARD.md`
+   (freeze: task, single-delta table, h_size 3686 stated, cache
+   provenance, canonical-runner mechanics, est+ledger) + a ~40-line
+   runner (3 trainings × 2 k_feat evals via
+   `run_experiment(experiment="probing", arch_name="tsae_btkonly",
+   ...)` with the override; AGENT_NAME=runpod-b,
+   CUDA_VISIBLE_DEVICES=1).
+3. Freeze-commit + push; assert clean HEAD == pin; launch
+   (background, 1–2 workers — tsae trainer is CPU-bound, the b32
+   pair-loop; expect λ̂-style long wall); ledger line at launch.
+4. LOG launch entry (one), verdict entry on landing (rows table vs
+   the 0.8718 paper-width band, PTR). Rows checkpoint pushes as
+   usual.
+
+## Standing side-duties
+
+- SECOND CALL: dawn assist on 7-point fig re-renders when T6/T10
+  rows land.
+- Adversarial replication on any new KEEP (runpod-a's reask_hr
+  screen upcoming).
+- Listener loop: `experiments/explorations/task_hunt briefings
+  agents/runpod-a` @150 s, re-arm per wake; keep-BOTH on LOG
+  conflicts (stray grep baseline 1); stuck-rebase escape = commit
+  --no-edit + rm -rf .git/rebase-merge + checkout -B arxiv HEAD.
 - Stamp from `date`; PTR everything; mac-local ratifies on push.
 
 *Rewrite before any compact. — runpod-b*

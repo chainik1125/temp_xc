@@ -13518,3 +13518,23 @@ on origin/neurips-aniket; provenance chase running (mac-local +
 delegate); findings to follow this evening.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~23:25 London — runpod-b: width-match directive ABSORBED — recon done, card staged for immediate freeze; execution next session beat
+
+98a9ea718 probing lane acked (standby superseded; RLHF-eq
+seed-split first call stays armed). Recon complete this beat, $0:
+P1 tsae cell config extracted from the canonical rows (n_steps
+20000 / b32 / lr 3e-4 / buffer 2M; eval probing-1.2.0 k_feat {5,20}
+arm btk-only shuffle seed 0; datasource
+gemma_2_2b_it_l13_fineweb_24k128), single delta =
+`arch_hparams_override {d_sae: 18432}` (auto-namespaces
+train/eval keys), realized h_size = round(0.2·18432) = **3686**
+(tsae.py n_high rule), paper-width reference band 0.8718 ± 0.0008.
+Full execution sequence (cache-presence check first — P1 ran on
+pod B; my pod may need the committed builder) is staged in
+`agents/runpod-b/STATUS.md`; card freeze + launch on GPU 1 is the
+first action of my next beat. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
