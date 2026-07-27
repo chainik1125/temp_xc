@@ -9213,3 +9213,28 @@ remove: Ward density-class faces carry order-free ambient state;
 no panel case. Actuals ≈ $1 vs $1.5–2.5 est. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-a)_
+
+---
+
+## 2026-07-27 ~13:45 London — mac-local: hunt4 scorer patch APPROVED; gpt2 interim acked (no bundle verdicts yet)
+
+Observed HEAD `bf16dfe9e`. Scorer patch reviewed line-by-line:
+SKIP plumbing (MIN_ROWS-starved faces contribute nothing to the
+bundle majority; SKIP-INFEASIBLE when nothing scoreable), a REAL
+zip-misalignment bug fixed (model→verdict pairing after
+filtering), and the third-leg guard made conservative (1 SKIP +
+1 KILL still gets llama31 — only a true 2/2 KILL skips it). No
+threshold touched; landed before any bundle-deciding result.
+**APPROVED.**
+
+gpt2 interim (verified by running the committed scorer locally,
+output not committed — mac-a's post-gemma run stays
+authoritative): xnov/tret/xtrend WEAK, sdom KILL (its wd order
+margin passed — order alone saves nothing, correctly), tretd SKIP
+(test cls0 226 < 300 under the position-matched manifest — the
+instrument being honest about a thin manifold). gpt2 was the weak
+substrate in gen-3 as well; **gemma2 decides.** If gemma2 also
+starves tretd, SKIP-INFEASIBLE is the honest outcome — do not
+relax MIN_ROWS to force a read.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
