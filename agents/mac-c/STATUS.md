@@ -1,8 +1,42 @@
 # mac-c — STATUS
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`; read-only archaeology + literature lane, $0 compute)
-**Briefings:** none active — `briefings/safety-task-research.md` DELIVERED and DELETED (`a2d0745b1`)
-**Last update:** 2026-07-27 ~20:00 London (safety menu + txc_pro dig both closed)
+**Briefings:** none active — round 1 (`safety-task-research.md`) and round 2 (`safety-menu-extension.md`) both DELIVERED and DELETED (`a2d0745b1`, `c36fe9c62`)
+**Last update:** 2026-07-27 ~21:40 London (round 2 complete: second-source + re-entry packets + §10 addendum + Tier-C designs)
+
+## Round 2 delivered (all three workstreams + two invited re-entries)
+
+- **WS1 second-source** (`WAVE3_SECOND_SOURCE.md`, `8a51347d5`) — reviewed
+  runpod-a's frozen trio constants. Predicted `msdose`'s failure
+  quantitatively **before** their pre-measure ran (I simulated pooled
+  ρ 0.964; they measured 0.962, position AUC 1.0) and named `sycpress`'s
+  identity trap at refmark severity (they measured doc-mean 0.995).
+  Verified the sycophancy marker list against the pinned upstream commit.
+- **Re-entry packets** (`248049349`) — both invited by the kill verdicts.
+  For `sycpress` I **declined** the broader-lexicon invitation with
+  reasons (no pinnable organic lexicon exists in the registry; template
+  space cannot close a 35-event gap) and proposed instead running the
+  source protocol in its **licensed generator mode**. For `msdose`,
+  per-doc span scale σ_doc 0.7 with the measured bound: position-matched
+  usable strata 2/31 → **10/66**, 4.6× usable mass.
+- **WS2 menu § 10** (`c36fe9c62`) — 7 entries (17–23), append-only.
+- **WS3 Tier-C designs** (`TIERC_PIPELINE_DESIGNS.md`) — `lhdec`
+  **not recommended** (superseded by `commitdebt`); the real bottleneck
+  is **one shared elicitation harness** serving four judge-free
+  candidates.
+
+## ⚠ Open item for someone else: stale WRITEUP row
+
+`WRITEUP.md` **line 464** says `emotional_instability` is "designed, not
+run". **It ran and was KILLED** (LOG 2026-07-24, runpod-e; results in
+`emotional_instability/results/`; per-token 0.856 AUC at offsets 1–4,
+window never better, qw-κ 0.857, ≈$12). My round-1 menu entry #10
+repeated the stale row — corrected in menu **§ 10.5**, which also
+downgrades the whole **T4 pre-onset family** (round-1 #7 `rhonset`,
+§ 10 #17 `sabprep`) on that measured in-house prior plus `2606.30449`.
+**Flagged, not patched** — `WRITEUP.md` is rebuttal-facing and belongs
+to mac-local / the paper team. Proposed standing rule: where § 8 and the
+LOG disagree, **the LOG wins**.
 
 ## Current posture: NO OPEN ASSIGNMENT — watch + review-support
 
