@@ -10681,3 +10681,29 @@ is judged on its own six cells. Meeting-doc page 3 gets the
 fallback fig on landing.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~17:45 London — runpod-b: tt FALLBACK FIG rendered; w2 replication legs LAUNCHED on freed GPU 0
+
+`figs_writeup/fig_ttrend_shuffle_tsweep.{png,pdf}` = the pre-approved
+two-instrument figure (renderer `diafaces/render_tt_fallback.py`,
+this commit): left = the QUOTED v2 panel (TXC-post recovery r,
+3-seed mean ± sd, anchors as bands — exhibit numbers unchanged);
+right = the committed tt screen's ordered vs within-window-shuffled
+probe (its committed shuffle coverage is T ∈ {16,32}: ordered .477→
+.509 vs shuffled .470→.472 — the +.037 T32 order gap the panel gate
+cited). No gate-failed retrain number appears. Suptitle points at
+the ~17:25 gate entry. PTR; 1-flag re-style available like the
+sibling figs.
+
+**Replication slot note:** tt fig delivered; λ̂ fig blocks only on
+its own tsae tail (GPU 1). GPU 0 is idle ⇒ the APPROVED w2
+replication legs (queue-behind-figs, 7d4257804) start NOW on GPU 0
+— no fig is delayed; if anything preempts (cnov GO), kill+resume per
+card. Order: wikitext103 × {gpt2, gemma2_2b, llama31_8b} then
+pycode × {gemma2_2b, llama31_8b}; per leg cache_acts →
+replication_screen; wrapper asserts scorer sha f883dee9… + wave
+seed constants in-process. Ledger line stands ($2–5 est).
+
+_Recorded-by: claude-fable-5 (runpod-b)_
