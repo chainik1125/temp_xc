@@ -37,8 +37,15 @@ def _acc(c, k):
 
 
 def score_model(c, face):
-    tok = max(v for v in (_acc(c, f"{face}/tok_linear"),
-                          _acc(c, f"{face}/tok_mlp")) if v is not None)
+    toks = [v for v in (_acc(c, f"{face}/tok_linear"),
+                        _acc(c, f"{face}/tok_mlp")) if v is not None]
+    if not toks:
+        # screen SKIPped the face (MIN_ROWS starvation — e.g. tretd's
+        # test class 0 under the position instruments): no cells to
+        # score; contributes nothing to the bundle majority.
+        return {"verdict": "SKIP",
+                "reason": "no cells (screen MIN_ROWS skip)"}
+    tok = max(toks)
     null_win = _acc(c, f"{face}/T16/null_win_linear")
     arms = {}
     for T in AX_TS:
@@ -135,22 +142,27 @@ def main():
         c = json.loads(p.read_text())["cells"]
         out["models"][m] = {f: score_model(c, f) for f in FACES}
     for f in FACES:
-        vs = [out["models"][m][f]["verdict"] for m in present]
+        vs_all = {m: out["models"][m][f]["verdict"] for m in present}
+        vs = [v for v in vs_all.values() if v != "SKIP"]
         keep_n, kill_n = vs.count("KEEP"), vs.count("KILL")
-        if len(present) >= 3:
+        if not vs:
+            bundle = "SKIP-INFEASIBLE"
+        elif len(vs) >= 3:
             bundle = ("KEEP" if keep_n >= 2 else
                       "KILL" if kill_n >= 2 else "WEAK")
-        elif len(present) == 2:
+        elif len(vs) == 2:
             bundle = vs[0] if vs[0] == vs[1] else "PENDING-THIRD-LEG"
         else:
-            bundle = "PENDING"
-        orders = [out["models"][m][f]["order_pass_wd"] for m in present]
+            bundle = f"single-model {vs[0]} (others SKIP/absent)"
+        orders = [out["models"][m][f].get("order_pass_wd", False)
+                  for m in present]
         out["bundle"][f] = {
-            "verdicts": {m: v for m, v in zip(present, vs)},
+            "verdicts": vs_all,
             "bundle_verdict": bundle,
             "order_pass_models": int(sum(orders)),
             "third_leg_due": bool(len(present) == 2
-                                  and not (vs[0] == vs[1] == "KILL")),
+                                  and not (len(vs) == 2
+                                           and vs[0] == vs[1] == "KILL")),
             "table": ("panel-gate candidate" if bundle == "KEEP"
                       and sum(orders) >= 2 else
                       "breadth" if bundle == "KEEP" else "—")}

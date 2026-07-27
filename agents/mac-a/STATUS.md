@@ -18,13 +18,18 @@ W1+overnight ≈ $14.5; today's hunt lanes on the $200 envelope
 
 ## In flight
 
-- **hunt4 first wave** (freeze 35d20e3cb; Volume /workspace/
-  hunt4_screen; repatriate → hunt4/results/screen_{gpt2,gemma2_2b}
-  .json → `hunt4/verdict.py` → PTR LOG + third-leg decision).
-- **rdens build** (labels from scratchpad ward_stream/token_ids.npy
-  + trace_idx.npy — NOT committed raw; build script + card to
-  come; chaz venue notes apply: ward volume, hs13/base only, cap
-  manifests, window-MEAN g_agg is the kill instrument).
+- **hunt4 first wave** (freeze 35d20e3cb; APPROVED 21bcbfbb5):
+  gpt2 leg DONE + repatriated (~14:05) — INTERIM scorer read (PTR,
+  not quotable): xnov/tret/xtrend WEAK (gains .025–.042 < .05;
+  xnov floor-blocked at best T), sdom KILL (tok_within_002; wd
+  order margins largest of slate, moot on KILL), **tretd SKIP —
+  test class-0 starved 226 < 300 (the position instrument biting;
+  scorer patched with SKIP handling pre-completion)**. gemma2_2b
+  still running → bundle verdicts + third-leg rule (every face not
+  2/2-KILL) fire when it lands.
+- **rdens screen** (freeze 0045ce40c, APPROVED; launched ~13:55,
+  image building; mechanical scorer rdens/verdict.py committed
+  BEFORE results).
 - Known events: 17:00 team pick (cnov panel = my staged item);
   window ends ~21:30 London.
 
