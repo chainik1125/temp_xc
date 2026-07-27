@@ -4,8 +4,8 @@
 **Lane (CHANGED 07-27 19:15, `47040da59`):** HUNT EXECUTION — no longer
 read-only. dharm end-to-end + my two re-entry cards, CPU-first, one
 self-provisioned GPU pod only when a GPU stage is actually reached.
-**Last update:** 2026-07-27 ~20:02 London (lane complete except the
-gated dharm pull; no pod spun up)
+**Last update:** 2026-07-27 ~20:32 London (LANE CLOSED — all three
+candidates resolved for $0; no pod ever spun up)
 
 ## The assignment (LOG 19:15, mac-local relaying Han)
 
@@ -38,7 +38,7 @@ verify state change by API query after; NEVER write to pods I did
 not spin up (incl. Han's three hand-provisioned pods). Key NEVER
 seeded to any pod. L40S/A100-class ≈ $1–2/h target.
 
-## Progress ledger — LANE COMPLETE except the gated item
+## Progress ledger — LANE CLOSED
 
 - [x] Lane ACK (LOG 19:19)
 - [x] **`msdose_r1` — KILLED $0** (`86f5ce0f8`). Freeze approved
@@ -67,21 +67,41 @@ seeded to any pod. L40S/A100-class ≈ $1–2/h target.
       committed): `dharm_dose` dies on position (stand-in AUC 1.000);
       `dharm_bage` risks a floor-solve (1.000 at T ≥ 16) ⇒ clock
       reported before any AUC.
-- [ ] **BLOCKED (not mine): dharm HF gate.** Both Han tokens 403.
-      Packet `DHARM_GATE_REQUEST.md`; escalated to Han (`ff76a1f1f`).
-      On access: `pull_dharm` → `build_dharm_premeasure` → verdict.
-      **No design work in the critical path.**
-- [ ] GPU stage — **NOT REACHED, no pod spun up.** msdose_r1 died;
-      sycgen needs generation (a separate budget decision, not mine);
-      dharm is gated. Per governance, none will be spun up until a
-      GPU-needing stage actually exists.
+- [x] **`dharm` — KILLED $0** (`a85724000`). Han cleared the gate
+      ~20:15; pull clean (4,641 chains, zero funnel losses). **Schema
+      amendment pushed BEFORE the run**: the HF README is wrong
+      (`decomposition` encoded differently per modality, `harm_index`
+      1-BASED, `id` not unique) and **764 ids span the shipped splits**
+      ⇒ split grouped BY ID, shipped splits discarded. Faces/bands
+      untouched. **The clock killed it: 155.6 tokens per DOCUMENT**,
+      18.2 tok/subtask, **3 position strata in the whole corpus**. All
+      3 faces dead on all 3 tokenizers — `thage` doc-mean 0.993
+      (sycpress severity), `dose` position 0.993, `bage` floor-solved
+      at 1.000 for T ≥ 8. **Both my pre-registered predictions
+      confirmed**; unigram alone (0.712–0.883 vs 0.60) would have
+      killed all three.
+- [x] GPU stage — **CLOSED WITHOUT ACTION, no pod ever spun up.** No
+      GPU-needing stage was reached: two candidates died on $0 CPU
+      gates, the third needs a generation decision that is not mine.
+      Correct outcome under the governance rule.
 
-**Two team decisions pending on my flags:** (1) the dharm gate terms —
-canary vs our committed token streams (posting is permitted *with* the
-canary; the tighter alternative costs the committed-stream
-convention), and the eval-only reading of probe fitting; (2) whether
-the shared elicitation harness gets funded (four candidates want it,
-`TIERC_PIPELINE_DESIGNS.md` § 3).
+## Lane closed — total spend $0
+
+Three candidates resolved, no compute bought. **The one thing still
+live from my work is `sycgen_age`**, which passed geometry and awaits
+someone's decision on the shared elicitation harness
+(`TIERC_PIPELINE_DESIGNS.md` § 3 — four candidates want it). Not mine
+to fund.
+
+**Standing bar proposed to the menu (from dharm's death):** *before
+recommending any corpus pull, measure tokens-per-document against the
+T values we screen.* My § 8 inventory ranked substrates by availability
+and label quality, never by length — that gap cost a gate request
+(and $0 of compute). `dharm` § 7.1 carries the full statement.
+
+**Gate-terms flag is now MOOT for dharm** (corpus gitignored, not
+committed; receipt + pre-measure carry no prompt text) but stays live
+for any future gated pull.
 
 **Substrate notes:** runpod-a's frozen-plan msdose streams exist
 (`labels/wave3_msdose_{gpt2,gemma2,llama31}.npz`) — those are the
