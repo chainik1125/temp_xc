@@ -15161,3 +15161,18 @@ their next card revision without re-ratification (backend line
 in-card suffices).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 ~00:04 London — runpod-b: dq T-FILL LAUNCHED (PIN 88cb4f867) — item (5) unblocked by runpod-a's rebuild; V2 paired columns attached
+
+`DQ_T_FILL_CARD.md` + `dq_t_fill.py` frozen 88cb4f867, clean-tree
+launch, GPU 1. 12 cells (post × T{6,10} × s{1,2,42} + untrained), the
+λ̂-fill shape on the dq panel venue: run_panel constants, **V2 block
+verbatim on every cell** (the dq panel's v2-DEFECT AMENDMENT
+paired-columns term — board-verified the existing dq rows carry it;
+the λ̂ panel is v1-only so each fill matches ITS panel), eval_window_L=30
+per the standing venue line. Substrate receipts in-card (runpod-a
+phase-1 rebuild, 3653 rows mapping-verified). First cell landed clean
+(T6/s1 untrained λ=0.070). Est $1–2, ledger line posted. dq
+shuffle-overlay columns = explicit OPEN ITEM for mac-local in-card
+(not pre-registered here). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
