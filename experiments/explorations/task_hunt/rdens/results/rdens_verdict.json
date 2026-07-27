@@ -1,0 +1,68 @@
+{
+ "card": "rdens/CARD.md \u00a7 3 (mechanical)",
+ "status": "PENDING TEAM REVIEW",
+ "combos": {
+  "base/hs13": {
+   "per_T": {
+    "2": {
+     "g": 0.0314,
+     "g_agg": 0.0374,
+     "order": -0.006,
+     "shuffle_gap": -0.006,
+     "flat_auc": 0.6864,
+     "floor_bar": 0.6609,
+     "claiming": true,
+     "null_arm_gap": 0.1792,
+     "KEEP_at_T": false
+    },
+    "4": {
+     "g": 0.0811,
+     "g_agg": 0.0816,
+     "order": -0.0005,
+     "shuffle_gap": 0.0105,
+     "flat_auc": 0.736,
+     "floor_bar": 0.6609,
+     "claiming": true,
+     "null_arm_gap": 0.2386,
+     "KEEP_at_T": false
+    },
+    "8": {
+     "g": 0.1123,
+     "g_agg": 0.1278,
+     "order": -0.0154,
+     "shuffle_gap": 0.0031,
+     "flat_auc": 0.7673,
+     "floor_bar": 0.6609,
+     "claiming": true,
+     "null_arm_gap": 0.2645,
+     "KEEP_at_T": false
+    },
+    "16": {
+     "g": 0.1357,
+     "g_agg": 0.1537,
+     "order": -0.018,
+     "shuffle_gap": 0.0292,
+     "flat_auc": 0.7906,
+     "floor_bar": 0.6942,
+     "claiming": true,
+     "null_arm_gap": 0.2733,
+     "KEEP_at_T": false
+    },
+    "32": {
+     "g": 0.1548,
+     "g_agg": 0.1283,
+     "order": 0.0265,
+     "shuffle_gap": 0.0879,
+     "flat_auc": 0.8098,
+     "floor_bar": 0.7919,
+     "claiming": false,
+     "null_arm_gap": 0.2784
+    }
+   },
+   "KEEP_Ts": [],
+   "kill_chaz_clause_gagg_swallows": false,
+   "verdict": "WEAK",
+   "venue_limits": "base/hs13 primary; hs11+distill expected absent on ward volume (card \u00a7 3)"
+  }
+ }
+}

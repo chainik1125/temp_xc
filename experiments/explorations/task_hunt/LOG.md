@@ -9191,3 +9191,25 @@ s2_T1 = 0.6008 landed (within seed spread). mac-b adversarial-
 replication prep acked.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~14:20 London — mac-a: RDENS screen COMPLETE — mechanical verdict WEAK (PTR); gen-4 seed 3 CLOSED as breadth
+
+Freeze 0045ce40c (approved 21bcbfbb5); screen base/hs13 (hs11 absent
+on ward volume — crashed AFTER the primary persisted, the exact chaz
+pattern; venue limit was pre-disclosed in card § 3). Scorer
+`rdens/verdict.py` (committed before results): **WEAK — no rule
+fires as written.** The referential-trend STATE is real: null-arm
+gaps +0.18–0.28, § 2 floors beaten at every claiming T (flat
+0.69–0.79 vs bars 0.66–0.69). But it is **pooling-readable at every
+claiming T**: g_agg ≥ g at T ∈ {2,4,8,16} (order −0.006…−0.018) —
+the window-MEAN control reads it as well or better, chaz's exact
+mechanism. The single positive order term (+0.026, shuffle gap
++0.088) sits at T32 — run-not-claim by the § 2 pre-registration,
+and under a 0.792 visible floor. Not KILL only because T32 breaks
+the strict "every T ≥ 8" chaz clause. Family conclusion at one
+remove: Ward density-class faces carry order-free ambient state;
+no panel case. Actuals ≈ $1 vs $1.5–2.5 est. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-a)_

@@ -68,3 +68,4 @@ actuals, same discipline as the Modal table.
 | 07-27 ~12:45 | mac-a | § 6b slen gemma-fill RESUME #2 per gen-4 rescale directive c1c5c949e item 5 (Han $200/10h hunt envelope) — mac-b's frozen card b7121a208 UNCHANGED, same pin, partial on Volume resumes; one relaunch | A10G + L40S | ~$2 | hunt envelope $200 |
 | 07-27 ~13:20 | mac-a | HUNT4 gen-4 screen FIRST WAVE (card freeze 35d20e3cb, pin in driver): 5 faces x {gpt2/hs7, gemma2_2b/hs14}, full-ladder shuffle twins, 2x L40S parallel | 2x L40S | ~$12–18 | hunt envelope $200 (c1c5c949e) |
 | 07-27 ~13:50 | mac-a | RDENS screen (gen-4 seed 3; freeze 0045ce40c, ward volume, base/hs13, factory protocol; chaz-clause g_agg = deciding instrument) | 1x L40S | ~$1.5–2.5 | hunt envelope $200 |
+| 07-27 ~14:20 | mac-a | rdens ACTUALS ≈ $1 (single L40S, hs13 leg + image build; hs11 crash post-persist) vs $1.5–2.5 est → −$1 corr. Verdict WEAK (PTR), seed 3 closed | — | −$1 corr | hunt envelope $200 |
