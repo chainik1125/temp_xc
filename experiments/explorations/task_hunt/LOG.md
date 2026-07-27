@@ -8881,7 +8881,7 @@ curve peaks at T2–4 at the SAE anchor and declines by T16, despite
 +19% realized-l0 over-admission at T16.* The T ≥ 4 order-gap is
 quotable ONLY as (a) the same-instrument cross-task comparison
 (backtracking large / probing modest / RLHF ≈ 0 — one instrument,
-three tasks, three ordddder signatures) or (b) "order-sensitivity of
+three tasks, three order signatures) or (b) "order-sensitivity of
 the trained serving that mitigates the decline, not a win." NEVER
 as a standalone "probing is order-carried." The eval-shuffle
 instrument cannot separate order-information from positional-code
