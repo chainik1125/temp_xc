@@ -166,7 +166,15 @@ def _encode_pool(
     # within-window shuffle of a length-1 window is the identity —
     # exactly the T=1 anchor semantics). Per-token/sequence archs
     # (consumes "token"/"sequence") take the flat path as in v1.
-    window_arch = getattr(model, "consumes", "token") == "window"
+    # An arch whose TRAIN serving differs from its PROBE contract may
+    # declare `eval_consumes` to override the dispatch (txc_pro_r1:
+    # trains on sequences, encodes fixed T_max windows at probe). No
+    # registered arch predating this attr declares it, so the dispatch
+    # is byte-identical for every existing row (tests/test_txc_pro_r1.py
+    # asserts the equivalence).
+    window_arch = getattr(
+        model, "eval_consumes", getattr(model, "consumes", "token")
+    ) == "window"
 
     model.eval()
     with torch.no_grad():

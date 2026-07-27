@@ -584,3 +584,54 @@ archs:
       k_pos: 20
       T: 5
     notes: "Paper §5.1 TXC-base (TopK→ReLU per window, k_win=k_pos·T). Eval-only adapter; T∈{10,20} via arch_hparams_override."
+
+  # ── tscale exploration revivals (runpod-c; CARD_SPLIT.md § 4) ──────
+
+  txc_pro_r1:
+    class_path: temp_bench.archs.txc_pro_r1:TXCProR1
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 10
+      t_sample: null      # ratio rule max(1, T_max//2); int → absolute ablation
+      k_pos: 20
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      multi_window: false
+      relu_mode: paper-match
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Revival of the RECOVERED txc_pro (phase5b_subseq_h8, blob 480f3755d;
+      docs/recovered/ + task_hunt/TXC_PRO_RECOVERY.md) as a NEW id for the
+      T-scaling hill-climb. Faithful composition (TopK→ReLU on selected
+      values). k_train = k_pos·t_sample, k_serve = k_pos·T_max. Trains on
+      sequences (internal anchor+shift windows), probes as a window arch
+      (eval_consumes). Deprecated txc_pro id untouched.
+
+  txc_pro_r1_btkonly:
+    class_path: temp_bench.archs.txc_pro_r1:TXCProR1BTKOnly
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 10
+      t_sample: null
+      k_pos: 20
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      multi_window: false
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      btk-only twin of txc_pro_r1 (signed-value selection, no ReLU in the
+      sparsity path; fired ⇔ z != 0; AuxK unchanged). The arm the P1
+      declining baseline lives in.
