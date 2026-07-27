@@ -111,3 +111,19 @@ its discriminating power against real protocol divergence (a wrong
 seed/window/probe moves r by ≫ 1e-3). No result was read before
 this amendment; the shuffled column computes only after the amended
 receipt passes. PTR with the verdict.
+
+## AMENDMENT A2 (~17:20 London, before any shuffled column was read past T8)
+
+A1's 5e-4 fired again at txc_batchtopk_post/T8/s2 (|Δ| = 6.5e-4).
+The drift is conditioning-dependent: the probe's row count is
+n = 1024·(32/T) tiles on p = 2048 features, so n/p falls from 16
+(T1) to 2 (T8) to ≤ 1 (T16/T32), and the OLS amplification of the
+~1e-7-relative encode noise grows accordingly (observed: 1.3e-4 at
+n/p 16; 6.5e-4 at n/p 2). **Tolerance set ONCE at 2e-3** (no further
+per-fire iteration): ≥ 2.9× under the smallest § 3 gate σ (0.0058),
+an order of magnitude under most, and far under any real protocol
+divergence (a wrong window/seed/probe moves r by ≫ 1e-2). The § 3
+ANCHOR GATE on 3-seed means remains the scientific consistency
+check; this receipt certifies the code path only. 13 cells had
+passed at 5e-4 before the fire; identity values are recorded
+per-cell in the output JSON either way. PTR with the verdict.

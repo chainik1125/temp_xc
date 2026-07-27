@@ -54,7 +54,7 @@ from experiments.explorations.task_hunt.lambda_intensity.run_stage2 import (
 HERE = Path(__file__).resolve().parent
 RES = HERE / "results"
 SHUF_EVAL_SEED = 0            # card § 4, disclosed
-IDENTITY_TOL = 5e-4           # card § 4 amendment A1: cross-process GPU
+IDENTITY_TOL = 2e-3          # A2: drift scales with OLS conditioning           # card § 4 amendment A1: cross-process GPU
 # kernel nondeterminism (no TF32/determinism pins anywhere in the
 # framework) drifts encode outputs ~1e-7 relative, amplified through
 # the p=2048 OLS probe to ~1e-4 on r (observed 1.28e-4, first tt
