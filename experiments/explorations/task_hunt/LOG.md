@@ -10724,3 +10724,51 @@ hand-back-on-GO for cnov). Meeting doc updated to the fallback
 fig with the gate story on the cover.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~18:10 London — runpod-b: W2 REPLICATION LANDED — sage CONFIRM 3/3, tret_py CONFIRM 2/2, order-0 replicates; both bundle KEEPs affirmed. ALL PTR.
+
+5 legs (REPLICATION_CARD § 0) ran sequentially on GPU 0, ≈ 35 min
+total, actuals ≈ $1.5–2 (−$1 corr, ledger this commit). Shifted
+seeds MATCH 8013 / SHUF 8234 / FOREIGN 11242 / NULL 7099 / probe 7
+asserted in-wrapper; caches venue-local; JSONs at
+`hunt4w2/results/replication/`. Scored with the frozen scorer —
+**mechanics disclosed:** verdict.py hard-codes its results dir, so a
+COPY was executed against the replication layout with sha256
+byte-asserted `f883dee9…` pre-run (relocation only, zero byte drift);
+output committed as `results/replication/verdict.json`.
+
+**KEEP faces (card § 3 reading):**
+
+| face | wave (deciding) | replication | reading |
+|---|---|---|---|
+| sage gpt2 | KEEP +.105 (T64/actxmean_mlp) | KEEP +.113 (same arm) | **CONFIRM** |
+| sage gemma2 | KEEP +.093 (same) | KEEP +.098 (same arm) | **CONFIRM** |
+| sage llama31 | KEEP +.087 (same) | KEEP +.086 (same arm) | **CONFIRM** |
+| tret_py gemma2 | KEEP +.054 (T32/win_mlp) | KEEP +.064 (SAME arm) | **CONFIRM** |
+| tret_py llama31 | KEEP +.090 (T32/actxmean_mlp) | KEEP +.086 (SAME arm) | **CONFIRM** |
+
+sage's in-claim-zone T32 receipts re-read per leg: +.080/+.086/+.083
+(wave +.075/+.080/+.087) — the T ≤ 32 claim-zone story survives
+re-seeding on all three models. **Order: 0 models on every face in
+the replication too — the bundle's "order 0 everywhere" replicates.**
+No SEED-FRAGILE flags; no-veto arbitration has nothing to arbitrate
+on the KEEPs.
+
+**Stability observations (no rule attached; inputs for the bundle
+record):** wikitext tret reads WEAK/KEEP/KEEP under re-seed vs the
+wave's KILL/WEAK/KEEP — both non-KEEP legs move UP one band (gpt2
++.026 @T16; gemma +.056 T32/win_mlp crosses the KEEP bar). The
+ratified bundle (WEAK, no majority) STANDS; the drift direction is
+flagged for mac-local (a re-seeded wave would have read KEEP 2/3 —
+tret_wt sits ON the WEAK/KEEP boundary rather than under it).
+tretd_wt: KILL/WEAK/WEAK vs KILL/WEAK/KILL — no KEEP anywhere,
+kill-family stable.
+
+**Row offers (one-line patches, mac-local applies):** the § 8 sage
+row may append "…and a re-seed replication receipt (same deciding
+arm on all three models, margins ±.008)"; tret_py row likewise
+"(same arms, ±.010)". PTR end-to-end.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
