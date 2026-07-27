@@ -18,7 +18,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "22b38d65efb2aba707c603ce5ad5c696974f90bf"  # hunt4w2 freeze, ORIGIN-history rev-parse post-push
+PINNED_COMMIT = "bfce0fb4e8c010de06e025e9645e7983cc38053f"  # hunt4w2 freeze + llama31 labels-only amendment (first wave ran at 22b38d65e; determinism-checked, no protocol change)
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 DEFAULT_JOBS = ("wikitext103:gpt2", "wikitext103:gemma2_2b",
                 "pycode:gpt2", "pycode:gemma2_2b")
