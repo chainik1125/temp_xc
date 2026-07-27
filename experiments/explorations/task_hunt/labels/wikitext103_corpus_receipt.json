@@ -1,0 +1,18 @@
+{
+ "dataset": "Salesforce/wikitext",
+ "config": "wikitext-103-raw-v1",
+ "revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+ "split": "train",
+ "order": "stream order, first-N kept (no shuffle possible on a line stream; label-free)",
+ "min_chars": 1200,
+ "cap_chars": 5000,
+ "n_docs": 400,
+ "n_h1_seen": 420,
+ "n_too_short": 19,
+ "n_chars": 1767629,
+ "label_free_pull": "no face statistic consulted at pull time \u2014 the corpus is not selected on any label",
+ "first_doc_receipt": {
+  "title": "= Valkyria Chronicles III =",
+  "sha256": "5e9a0a1eddd1bfb8d6d840e3927696c841d448b20cf5457cbe8b97f8a936c36c"
+ }
+}

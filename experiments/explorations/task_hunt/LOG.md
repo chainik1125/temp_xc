@@ -9338,3 +9338,14 @@ Wave-1 actuals ≈ $6–8 acked; hunt envelope ≈ $30 committed of
 $200. All PTR; nothing quotable before the 17:00 review.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 ~14:15 London — mac-c: GEN-4 CORPUS SCOUT delivered — return family priced on wikitext103 + Python code ($0, label-side)
+
+Beat-review item 3 executed: 5 faces on the first substrates outside {DailyDialog, Ward, FineWeb, PG-19} — WikiText-103 encyclopedic narrative and permissive-licence Python code. **`GEN4_CORPUS_SCOUT.md` is the deliverable** (NOT a freeze; screens/freezes/verdicts are mac-a's). Everything reuses hunt3/hunt4 machinery verbatim; scout-specific logic in `labels/gen4c_lib.py` (9 tests; suite 409 green at this commit). Corpora committed with pinned revisions + funnel receipts (pg19 rules); label streams committed for the gpt2+gemma2 first wave with a uniform 1024-token doc cap (gpt2 ctx — uncapped wikitext docs hit 1085, caught in smoke); `labels/gen4c_stats.json` = artifact of record (all 3 tokenizers).
+
+Label-side headlines: (1) **tretd_wt floor is at CHANCE at every ladder T (0.49–0.52)** — the flattest floor line in the hunt record, with the family's mildest identity trap (doc-mean 0.60) and ρ 0.48 vs its own rate face; (2) tret_wt floor ≤ 0.64 across the ladder at **3× DailyDialog's event rate** (ret64 0.24 vs 0.077) and doc-mean 0.65 vs dialogue's 0.85; (3) sage (section-age, intensity family) claim zone T ≤ 32; (4) tret_py viable-but-hotter; (5) **drev recommended $0 KILL** (its floor swallows the ladder: 0.70 at T4 → 0.84 at T32; hottest unigram 0.62–0.65; near-dup 0.70–0.74 vs tret_py — thinnest pass of the 0.8 bar in the gen-4 record). Position trap 0.87–0.94 on the transplants is the family's known mechanical one — instruments as in the hunt4 freeze.
+
+Process notes: `datasets` streaming wedged twice on codeparrot shuffle-buffer prefill (same no-timeout family as the modal gets) — pycode pull is sequential first-N, stated in the receipt; copyleft licences filtered at pull (corpus text ships in-repo). $0 finding for the core owner (post-deadline queue, core untouched per rule 3): `code_version.is_dirty()` counts untracked files but `diff_hash()` ignores them, so an untracked-only tree violates the test contract (`test_diff_hash_consistent_with_dirty`).
+
+PTR: `agents/mac-c/STATUS.md`. mac-c returns to watch posture; scout follow-ups on request.
+
+_Recorded-by: claude-fable-5 (mac-c)_

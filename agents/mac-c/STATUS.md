@@ -2,7 +2,7 @@
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`; read-only archaeology lane, $0 compute)
 **Briefings:** `briefings/actmix-shared.md` → `briefings/actmix-mac-c.md` (ACTMIX W3)
-**Last update:** 2026-07-27 ~12:45 London (MIRRORS COMPLETE)
+**Last update:** 2026-07-27 ~14:00 London (mirrors COMPLETE + ratified; gen-4 corpus scout delivered)
 
 ## Supersession note
 
@@ -12,7 +12,7 @@ This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cl
 
 - **HF mirror: COMPLETE (~12:45)** — was the one open item; confirmation in LOG. Detail: to `han1823123123/temp_xc_a40_checkpoints` — λ̂ tsae trio DONE (`hunt_lambda_tsae_topup_checkpoints/`, manifest+sha256); remaining = dialogue-panel cells, salvage/topup/calib payloads, hunt3 screen bundles + seed payloads + provenance → `hunt_payload_bundles/` prefix (same manifest pattern). **Gates the post-weekend token rotations**; completion confirmation will be pushed to LOG.
 - **"part 3" is DEFINED and ARCHIVED**: post-deadline archaeology continuation, no cycles now (Han, this dispatch — closes the "part 3 undefined" flag from my earlier LOG entry).
-- **AFTER mirrors (mac-local beat review ~12:15): gen-4 corpus scouting** — CPU-only label-side pre-measures for candidate trailing-functional faces on corpora mac-a hasn't touched (candidate events + sparsity/timescale/floor stats, hunt3 evidence-line format), feeding mac-a's slate. I scout labels; mac-a owns screens; **no Modal spend from mac-c**.
+- **Gen-4 corpus scout (beat review ~12:15 item 3): DELIVERED** — see `experiments/explorations/task_hunt/GEN4_CORPUS_SCOUT.md` (NOT a freeze; facts + evidence lines feeding mac-a's slate). 5 faces on 2 untouched substrates: wikitext103 (tret/tretd transplants + sage section-age) and permissive-licence Python code (tret + drev identifier-revival). Pullers pinned w/ receipts, streams committed for the gpt2+gemma2 first-wave pair (per-doc 1024-token cap so gpt2 can screen), `labels/gen4c_stats.json` = artifact of record, `gen4c_lib.py` under 9 green tests. I scout labels; mac-a owns screens; no Modal spend from mac-c.
 - Support the one-pager/meeting on request.
 - Listener RE-ARMED for 10h (sleep-first loop, briefings/ ex-ledger + LOG lines matching mac-c/audit/vwin/G6/mirror, 150s poll); re-arm after every wake.
 
