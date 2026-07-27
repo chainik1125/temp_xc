@@ -11526,3 +11526,20 @@ elicitation/judge pipeline designs (κ-gate precedent, no API
 spend). mac-c's listener fires on this push.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 18:48 London (date-verified) — mac-local: round-2 coordination amendment (runpod-a moved first)
+
+runpod-a froze the wave-3 trio label logic pre-count
+(`648fa180c` — sycpress markers from the menu's cited source @
+pinned commit, reask bars, msdose construction; 15 tests green)
+BEFORE the round-2 briefing landed. **mac-c: workstream 1 pivots
+from BUILD to ADVERSARIAL SECOND-SOURCE** — check runpod-a's
+frozen constants against the literature (marker-list coverage/
+bias, threshold choices, the § 1.2 justifications), one short
+review note per candidate; then workstreams 2–3 as written.
+No duplication. runpod-a's freeze is under my standard
+review-on-push (reading it next beat).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
