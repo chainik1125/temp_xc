@@ -98,18 +98,36 @@ ae1ce5fb0): CPU, in flight. **FROZEN constants (pre-counting):**
   (sleeper-latch, refusal-redux, prompt-harmfulness, turn-count).
   Card bars binding: out-of-window-by-construction +
   clock-stated-first.
-- STATE: freeze pushed `648fa180c`; builder
-  `labels/build_wave3_trio.py` smoke-validated (60 convs);
-  **FULL RUN in background** (log
-  `/workspace/agents/runpod-a/wave3_trio_build.log`) → then
-  commit artifacts (wave3_refmark2k_<tok>.npz,
-  wave3_msdose_<tok>.npz, wave3_trio_stats.json) + LOG entry.
-  SMOKE SIGNALS (60-conv, non-record): sycpress event-starved as
-  frozen (2 events/60 convs — honest outcome = report, do NOT
-  widen list post-hoc); reask 10× mass (23% convs ≥1);
-  msdose dose↔position rho 0.962 (menu trap (a) — running count
-  is within-doc monotone; only position-matched manifests could
-  rescue; naive readout dead); clock 138 tok/msg confirmed.
+- **PRE-MEASURES DONE + RATIFIED (c5023d9f3):** sycpress
+  KILL-as-frozen (35 events/2k convs, docmean .995; subclass
+  62.9/37.1 disclosed), msdose KILL-as-constructed (dose↔pos
+  .962, pos AUC 1.0), **reask = CARD CANDIDATE** (548 events,
+  floors ≤.57, anti-dup clean). Four § 7 kills formalized.
+  Artifacts + entries: `a1f94e679`. mac-c second-source (their
+  20:25 entry) absorbed; their re-entry paths (msdose per-doc
+  span scale σ_doc; sycpress broader pinned list) are FUTURE
+  pre-count amendments, not mine tonight.
+- **REASK GATE CENSUS DONE (my ~19:05 entry, PTR):**
+  apology-only 57.5 % ⇒ **`reask_hr` (hard-refusal-gated, 233
+  events) pre-registers as PRIMARY**; pooled gate = disclosed
+  secondary. Jaccard gate = 75.4 % of selection, only 15.6 %
+  length-ratio-bound (median ratio .60) — selection is content
+  divergence, disclosed w/ numbers. Instrument
+  `labels/census_reask_gate.py` + `reask_gate_census.json`
+  committed.
+- **NEXT (in order):** (1) `reask_hr` variant pre-measure, $0 —
+  extend build_wave3_trio machinery to the hr event stream (gate
+  = HARD_REFUSAL subset per census_reask_gate.HARD_REFUSAL):
+  event mass/floors/traps/anti-dup vs pooled reask + refmark.
+  (2) REASK screen card DRAFT (hr primary + pooled secondary;
+  T2 age probed at assistant tokens; claim zone from per-T
+  censored-age floor; position-matched manifests + position-floor
+  arm + BINDING wd arms — tret precedent; clock 119–137 tok/msg
+  stated; census numbers verbatim; both binding menu bars).
+  (3) FREEZE + screen ONLY when GPU 0 frees behind RM
+  (c5023d9f3: "when GPU frees behind RM"; scorer committed with
+  freeze). WRITEUP § 8 rows for trio kills batch with the reask
+  screen result (mac-local's line).
 
 ## House-rule cache
 
