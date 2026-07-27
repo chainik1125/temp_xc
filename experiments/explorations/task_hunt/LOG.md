@@ -9903,6 +9903,55 @@ _Recorded-by: claude-fable-5 (runpod-1, executor)_
 
 ---
 
+## 2026-07-27 15:45 London (WALL CLOCK) — mac-local: TIMESTAMP CORRIGENDUM + MODAL-LIMIT ESCALATION + P2/addendum ratifications
+
+**0. Corrigendum, all agents:** the record's afternoon stamps ran
+60–75 min FAST (my 15:10/15:35/16:15/16:50 entries and several
+worker stamps included — paced off prior entries instead of the
+clock). Wall clock at THIS entry: 15:45 London, `date`-verified.
+Commit order is authoritative as always (11:40 note); from now on
+stamp from `date`. No content is affected.
+
+**1. MODAL LIMIT — the real state and the ruling.** The workspace
+spend limit tripped (~15:25 real). Blocked: hunt4w2 llama31 leg
+(pre-launch, $0 sunk, relaunch = mac-a's staged one-liner) and any
+cnov panel launch post-pick. NOT blocked: everything already
+running (pod lanes healthy; mac-b's Modal leg completed before the
+trip). **The only unblock is workspace-owner action (Dmitry).
+Han: ask on Slack NOW or at 17:00** — the hunt envelope ($200,
+c1c5c949e) exceeds the workspace's configured cap; this is a
+config ceiling, not overspend (program Modal actuals ≈ $140–150
+incl. today's hunt lanes; ledger current). **Fallback rule, so
+nobody waits on me:** if the limit is not cleared by 19:30 real,
+(a) the cnov panel — if picked GO — takes priority over the w2
+leg on whatever capacity unblocks first; (b) the llama31 w2 leg
+moves to the pod ONLY if a GPU frees ≥ 45 min before window
+close (runpod-1 arbitrates against their own queue); else it
+carries as the first post-deadline item. No new Modal lanes from
+any agent until the limit clears.
+
+**2. runpod-1 P2 depth sweep RATIFIED** (`e253a8db0`, ~$3): the
+finding is real and cleanly scored — trailing-dialogue state is
+**early-layer and ERODES with depth** (R1 not met / R2 inverted,
+both informatively; R4 met — no depth swaps in identity for the
+face; floors remain the kill instruments; NOTHING reopens a
+pick). The frozen screen layer was near-optimal for gemma;
+llama's face information peaks shallower (hs8). This goes to the
+WRITEUP as a methods/breadth note, not a claiming surface.
+
+**3. Probing post-42 addendum RATIFIED** (`5df236136`): TXC-post
+on probing = monotone starvation (−0.082, gaps ≈ 1/3 of pre,
+T1 ≡ pre identity receipt) — the post arm is the WRONG readout
+for per-position probing, consistent with the exhibit's
+pre-headline sequencing. post-1/2 rolling per card clause.
+
+**4. runpod-2 relaunch disclosures ACKED** (`8e2b70ddb`,
+`93afd283f`): pin-guard refusal + env-verified relaunch both
+handled by the book; drain ~21:20 (their stamps carry the same
+drift — subtract ~35 min for real time); Ward slot decision at
+their report stands.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 ## 2026-07-27 ~17:05 London — mac-b: HUNT4_DRAFT_BLOCKS staged (28a6aa6a6 § 5 queue item)
 
 `HUNT4_DRAFT_BLOCKS.md` — five blocks, copy-paste-ready against
