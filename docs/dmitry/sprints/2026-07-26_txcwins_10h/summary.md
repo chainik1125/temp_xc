@@ -453,45 +453,41 @@ Qwen2.5-1.5B-Instruct L14, `n_docs` = 200, `n_grad` = 24, filtered run
 | ignore | +11.37 (z = 23.5) | 0.129 | 0.816 | 0.083 | −0.002 |
 | `completion_real` | **+19.67** (z = 18.1) | 0.130 | 0.945 | 0.049 | −0.002 |
 
-🛑 **These numbers are compromised by a design flaw in the pairing and should not be cited.**
-A = the injected document, B = the same item clean — so **B is 24 characters shorter**, and the
-segmenter cuts the whole document into 12 equal pieces. **Segment `t` therefore covers different
-content in A than in B**, and `Ḡ = ∇[score(A) − score(B)]` averages two misaligned things. The
-signature is unmistakable in the arms run: `grad_slab` measures **−0.13** while
-`broadcast_optimal` — its own constant component, built from the same `Ḡ` — measures **+28.94**.
-A constant write cannot outperform the full gradient write by 200×; what has happened is that the
-position-varying components cancelled between misaligned conditions, leaving mostly the constant
-part. **That deflates `‖Ḡ‖_F` and therefore inflates `c`**, so the 0.123–0.130 above is an upper
-bound of unknown tightness and the task may sit in the go region. Every other screened cell has
-`grad_slab ≫ broadcast_optimal` as it must. Fix is a length-matched pairing; rerun pending.
+⚠ **The original pairing was defective and its numbers are superseded.** A = injected, B = the
+same item clean makes **B 24 characters shorter**, and the segmenter cuts the whole document into
+12 equal pieces — so segment `t` covered different content in A than in B and
+`Ḡ = ∇[score(A) − score(B)]` averaged misaligned things. The signature was unmistakable:
+`grad_slab` measured **−0.13** while `broadcast_optimal`, its own constant component built from
+the same `Ḡ`, measured **+28.94**. A constant write cannot beat the full gradient write by 200×;
+the position-varying components had cancelled between misaligned conditions, leaving mostly the
+constant part.
 
-**The behaviour is strongly present**, and `completion_real` measures ~2× the other two — the
-attack ladder orders as StruQ reports it, which is independent evidence the adapter is faithful
-rather than merely self-consistent.
+**Repaired by making the pair position-matched**: the injection appears in **both** conditions and
+only its *position within the data field* varies — end versus start — giving an exact anagram
+(`len(a) == len(b)` and `sorted(a) == sorted(b)` asserted per item). That is also the
+instruction-hierarchy question rather than a presence/absence contrast. `n_docs` = 200,
+`n_grad` = 24 (`results/txc_wins/geometry_struqpos.json`):
 
-**The difference-of-means proxy would have given the opposite screening decision on all three
-attacks.** `c(P_dom)` = 0.049–0.083 sits *below* the `c < 0.1` go-threshold while `c(Ḡ)` =
-0.123–0.130 sits above it, and `cos(P_dom, Ḡ)` is −0.004 to −0.002 against a 0.0074 random
-baseline — orthogonal to within noise. **This is the fifth independent demonstration that the two
-slabs are different quantities and the first on a published benchmark rather than one of our own
-constructs.**
+| attack | baseline | z | `c(Ḡ)` | `r1(Ḡ)` | retention (× floor) | `c(P_dom)` |
+| --- | --- | --- | --- | --- | --- | --- |
+| naive | −1.94 | −5.5 | **0.072** | 0.794 | 0.416 (5.9×) | 0.030 |
+| ignore | +0.50 | 1.2 | 0.103 | 0.837 | 0.325 (4.6×) | 0.019 |
+| `completion_real` | **+8.19** | **12.9** | **0.084** | 0.910 | 0.437 (6.2×) | 0.012 |
 
-Four of the 208 items carry an **empty `output`** field, which breaks `cont2` and degrades
-`completion_real`'s forged response. Rerun on the filtered 204 moved `c` by at most **0.005** and
-changed nothing qualitative; the table above is the filtered run
-(`results/txc_wins/geometry_struq_filtered.json`).
+**The misalignment was inflating `c`, as predicted: 0.123 → 0.072–0.084.** That moves prompt
+injection out of the ambiguous band and into the go region, so the registered test of the gate at
+its inversion point no longer applies to this task — it is now a straightforward go.
 
-⚠ `c` ≈ 0.13 falls inside the band containing the gate's only known inversion (`rotate6` at 0.134
-loses, evidence at 0.143 wins), so the screen does not decide this task. **The full arm set is
-running as a registered test of the screen itself**, with the prediction that the crosscoder loses
-to the best constant write at a ratio of 0.2–0.4, and the explicit alternative that a win there
-gives the gate a second inversion and moves the boundary.
+**Two positional findings fall out of the repair.** For `completion_real` the injection is far
+more effective at the **end** of the data field (+8.19, z = 12.9); for `naive` it is more effective
+at the **start** (−1.94, z = −5.5); and for `ignore` position does not matter at all (z = 1.2).
+**The optimal injection position depends on the attack type** — which is a fact about prompt
+injection rather than about dictionaries, and it is visible in the write profile: `u₁(Ḡ)` for
+`completion_real` puts essentially all its mass on the final segment (1.00 against ≤0.04
+elsewhere), exactly where a forged response boundary sits.
 
-Two further observations from that cell. **The SAE reads the injection factor at 0.632** against
-the attention tSAE's **0.976** on the same activations — so the factor is readable at this layer
-and it is the TopK basis specifically that fails. And the reading/steering dissociation therefore
-**does not transfer here**: on prompt injection a per-token dictionary is not reading well and
-steering badly, it is failing at both, which changes what a crosscoder win would mean.
+`completion_real` is the cell to run arms on: strong behaviour, `c` in the go region, retention
+6.2× floor.
 
 ### Multi-turn escalation — SafeMTData
 
