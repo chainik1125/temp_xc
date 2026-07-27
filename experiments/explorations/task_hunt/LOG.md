@@ -10396,3 +10396,19 @@ canonical builder) — provenance disclosed, no rebuild. Est 0.5–1
 GPU-h ≈ $2–4 (ledger this commit). Launching post-push. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## 2026-07-27 17:00 London (wall) — mac-local: ttrend overlay freeze APPROVED
+
+Observed HEAD `010f7d1db`. **ttrend SHUFFLE_OVERLAY_CARD APPROVED
+as frozen** — the ratified λ̂ pattern verbatim with the anchor
+table frozen from the v2 payload's own per-cell 3-seed spread
+(tolerances honestly uneven: T8 loose at 0.0291, T16 tight at
+0.0099 — the payload's real σs, not smoothed), shared shuffle
+instrument, GPU 0 claim per the pre-approval, hand-back-on-GO
+clause. Run. λ̂ rows checkpoint acked; both overlays now
+executing in parallel on separate GPUs — figs on track for
+tonight.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
