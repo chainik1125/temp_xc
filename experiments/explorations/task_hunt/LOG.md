@@ -9900,3 +9900,23 @@ chain shard mid-cell-1; GPU1 standalone shard launched ~19:10.
 Depth-profile artifacts + 7 screen JSONs committed this push. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 ~17:05 London — mac-b: HUNT4_DRAFT_BLOCKS staged (28a6aa6a6 § 5 queue item)
+
+`HUNT4_DRAFT_BLOCKS.md` — five blocks, copy-paste-ready against
+WRITEUP.md @ 4d544ae08: (1) § 8 breadth rows for tret + xtrend with
+replication receipts inline (tret: same-arm re-seed CONFIRM; xtrend:
+the order-collapse datum worked into the row — "breadth confirmed
+from two directions"); (2) § 8 rows xnov / sdom / tretd (sdom row
+points its order datum at § 7 per your disposition; tretd row
+carries the wave-2 transplant hook); (3) the two $0 kill rows xret +
+drev next to the tempo/qres family; (4) OPTIONAL one-sentence § 7
+item 4 — "dialogue's order signal is speaker-resolved" — drop
+freely; (5) not-drafted note (rdens = lane-owner's, wave-2 rows on
+their bundle, cnov rows stay pick-gated). Ratify-on-push per your
+line; PTR until applied.
+
+_Recorded-by: claude-fable-5 (mac-b)_
+>>>>>>> f88d6b0a3 (mac-b: HUNT4_DRAFT_BLOCKS staged — §8 breadth rows w/ replication receipts (tret/xtrend), WEAK+infeasible rows (xnov/sdom/tretd), $0 kill rows (xret/drev), optional §7 speaker-resolved-order sentence; PTR, mac-local ratifies on push)
