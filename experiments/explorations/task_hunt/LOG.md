@@ -12999,3 +12999,50 @@ when ratifying a runnable, include a cheap execution-level smoke
 passes path bugs.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~20:45 London — runpod-b: λ̂ ANCHOR GATE ALL PASS (|Δ| ≤ 1e-4 on every cell) — overlay LICENSED, fig SHIPPED; λ̂ window state is ORDER-FREE. ALL PTR.
+
+Grid 18/18 (14,678 s; the 3 tsae anchors ≈ 3.9 h of it — the
+19:47 venue note stands). Overlay ran under the A2 identity
+tolerance; every identity receipt passed. **Mechanical gate table
+(verbatim):**
+
+    txc_batchtopk_post/T2:  0.1297 vs 0.1296  |Δ|=0.0001  tol 0.0171  PASS
+    txc_batchtopk_post/T4:  0.1606 vs 0.1607  |Δ|=0.0001  tol 0.0160  PASS
+    txc_batchtopk_post/T8:  0.1849 vs 0.1848  |Δ|=0.0001  tol 0.0244  PASS
+    txc_batchtopk_post/T16: 0.2548 vs 0.2548  |Δ|=0.0000  tol 0.0473  PASS
+    batchtopk_sae/T1:       0.1129 vs 0.1130  |Δ|=0.0001  tol 0.0218  PASS
+    tsae/T1:                0.1540 vs 0.1541  |Δ|=0.0001  tol 0.0367  PASS
+
+**Venue-effect record (pairs with the tt gate FAIL):** the seed-MEANS
+reproduce to 1e-4 on all six cells, and the quoted σs match my
+per-seed spreads at ddof=0 — i.e. the H100 retrain reproduced the λ̂
+panel essentially SEED-FOR-SEED (tsae per-seed {0.185, 0.175, 0.102}
+— the big spread is the PANEL'S OWN, faithfully re-realized). The tt
+lane's T32/tsae high-side drift vs λ̂'s exactness = the venue effect
+is substrate/arch-dependent, not systematic; both gates did their
+jobs.
+
+**The deliverable reading (figure claims nothing; PTR):**
+`figs_writeup/fig_lambda_shuffle_tsweep.{png,pdf}` (renderer
+committed; template knob-for-knob, y = recovery r, quoted-panel ×
+ticks = the gate receipt made visible). Within-window shuffle costs
+≈ NOTHING at every T: mean gaps +0.004 / +0.007 / +0.014 / +0.011
+at T2/4/8/16, per-seed signs MIXED (incl. shuf > ord cells at
+T8/s42, T16/s1). **λ̂'s rising window curve (0.130 → 0.255) is
+order-free window state** — consistent with its own card's P3
+pre-registration (aggregation-dominant, g_order small) and the
+family's g_agg readings. Cross-task, same instrument, one line:
+backtracking large / probing modest / RLHF ≈ 0 / **λ̂ ≈ 0** — the
+order signatures stay task-specific; dialogue remains the only
+substrate where trained serving uses order (tt's screen-instrument
+gap, its fallback fig).
+
+Ledger: actuals ≈ $12 (hold-time honest, +$5 corr line this
+commit). Figure-directive item (a) COMPLETE; (b) tt = fallback fig
+shipped earlier; (c) replication CONFIRMed earlier tonight. My
+directive queue is EMPTY pending review.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
