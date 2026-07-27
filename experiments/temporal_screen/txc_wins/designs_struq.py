@@ -257,7 +257,7 @@ def make_struq(k_seg, attack="naive", pool="all"):
     return make_pair
 
 
-def make_struq_pos(k_seg, attack="naive", pool="all"):
+def make_struq_pos(k_seg, attack="naive", pool="all", contrast="own"):
     """POSITION-MATCHED REPAIR. The injection is present in BOTH conditions and only its
     POSITION inside the untrusted data field moves:
 
@@ -287,17 +287,83 @@ def make_struq_pos(k_seg, attack="naive", pool="all"):
     where in the data field the injection sits, the unsteered baseline is zero and the cell is
     dead -- and a dead baseline must be reported as such, since geometry on a behaviour the
     model does not exhibit says nothing. The baseline is therefore the gate, not the c value.
+
+    CONTRAST LEAKAGE, and why `contrast` exists. `completion_real` forges the item's OWN
+    answer into the prompt -- that is the whole attack -- and `contrast="own"` then uses that
+    same answer as `cont2`. So the metric's second continuation is sitting verbatim in the
+    context, at a position that MOVES between the two conditions. Measured over 200 draws at
+    k_seg=12:
+
+        attack             cont2 present in context      injection, chars from END (A / B)
+        naive                       4%                         39 / 99    (moves  -60)
+        ignore                      4%                        n/a         (see note)
+        completion_real            70%                         39 / 100   (moves  -61)
+
+        completion_real, the FORGED ANSWER (= cont2), chars from END:  258 / 486  (moves -228)
+
+    `logP(cont2)` is inflated by verbatim induction from the context, and the contaminant
+    moves **3.7x further between conditions than the injected instruction does**. The metric
+    is therefore the sum of two opposing positional channels -- injection recency, which the
+    design intends, and copy distance on its own contrast string, which it does not -- driven
+    by two pieces of text that displace by different amounts. `contrast="other"` takes the
+    leak to **0%** on all three attacks by scoring against a DIFFERENT item's answer, the same
+    device `designs_litm` uses for its distractor.
+
+    This is a second and independent defect from the length mismatch that motivated
+    position-matching: it is intrinsic to `completion_real`'s payload and survives the
+    repair untouched.
+
+    WHAT THE LEAK COSTS, measured. Removing it drops the unsteered baseline from **+8.19 to
+    +1.69** (z 12.9 -> 4.0): **79% of the apparent behaviour was the contaminant channel**,
+    not injection position. The geometry is almost untouched by it -- `c` 0.084 -> 0.086,
+    `r1` 0.910 -> 0.909 -- so the screen's shape statistics were sound while the effect size
+    they were attached to was not.
+
+    THE REGISTERED PREDICTION WAS WRONG, recorded because it was mine. The prediction was
+    that the leak caused `struqpos_completion_real` to fail the `grad_slab >=
+    broadcast_optimal` gate. It does not: `struqposx_completion_real`, leak at 0%, **still
+    fails at alpha = 0.5** (grad_slab -5.86 vs broadcast_optimal +0.97).
+
+    THE ACTUAL CAUSE IS DOSE SATURATION FROM GRADIENT CONCENTRATION, and the gate is sound.
+    `u1(Gbar)` here is `0.00 0.01 0.01 0.01 0.01 0.03 0.03 0.00 0.04 0.03 0.00 1.00` -- the
+    metric's gradient lives almost entirely on the final segment, which holds
+    `'hacked!'\\n\\n### response:\\n`. Both arms are normalised to unit FROBENIUS norm, so at
+    matched alpha the concentrated arm puts ~sqrt(T) = 3.5x more norm per position than the
+    broadcast arm, and leaves the linear regime at roughly 1/3.5 of the dose. Measured
+    (n_gate = 120, `results/txc_wins/geometrystruqposx_lowdose.json`):
+
+        alpha    0.02   0.05   0.10   0.15   0.25   0.50   1.00
+        grad     +6.55 +12.59 +17.29 +16.48  +6.41  -5.86  -3.56
+        bcast    +2.09  +5.23  +9.83 +11.52  +4.91  +0.97  -0.88
+        margin   +4.46  +7.36  +7.46  +4.96  +1.50  -6.83  -2.68
+        gate      PASS   PASS   PASS   PASS   PASS   FAIL   FAIL
+
+    A clean saturation curve: `grad_slab` peaks near alpha = 0.10 and collapses; the
+    broadcast arm peaks later and decays more slowly, so the margin inverts. **The gate
+    encodes a first-order argument and was being evaluated outside the regime where
+    first-order arguments hold.**
+
+    CONSEQUENCE FOR ANY ARMS RUN ON THIS CELL. The sprint's default grid
+    `[-2, -1, -0.5, 0.5, 1, 2]` with matched dose 0.5 is **entirely inside the saturated
+    regime here**. Arms on `struqposx_*` must use a grid capped near 0.25 -- e.g.
+    `[-0.25, -0.1, -0.05, 0.05, 0.1, 0.25]` -- or they measure saturation rather than
+    steering. A fixed Frobenius dose is not a matched dose across arms whose writes differ in
+    concentration, and this is the same class as the "Frobenius versus injected norm" entry
+    in the sprint's methodology list, resurfacing inside the gate itself.
     """
     if attack not in ATTACKS:
         raise ValueError(f"unknown attack {attack!r}; have {sorted(ATTACKS)}")
     if pool not in ("train", "eval", "all"):
         raise ValueError(f"pool={pool!r}")
+    if contrast not in ("own", "other"):
+        raise ValueError(f"contrast={contrast!r}; want 'own' or 'other'")
     items = item_pools()[pool]
     payload_fn, sep = PAYLOADS[attack], SEPS[attack]
 
     def make_pair(rng):
         for _ in range(200):
-            it = items[rng.randrange(len(items))]
+            i = rng.randrange(len(items))
+            it = items[i]
             pay = payload_fn(it, rng)
             a = PROMPT_INPUT.format(instruction=it["instruction"],
                                     input=it["input"] + sep + pay)
@@ -308,7 +374,10 @@ def make_struq_pos(k_seg, attack="naive", pool="all"):
             sa, sb = _split_at_spaces(a, k_seg), _split_at_spaces(b, k_seg)
             if sa is None or sb is None:
                 continue          # too short to cut k_seg ways; draw another
-            legit = " " + " ".join(it["output"].split()[:CONT_LEGIT_WORDS])
+            # `other`: a deterministic index offset, so the contrast is reproducible and
+            # never the item's own answer -- which for completion_real is IN the prompt.
+            src = it if contrast == "own" else items[(i + 7) % len(items)]
+            legit = " " + " ".join(src["output"].split()[:CONT_LEGIT_WORDS])
             return sa, sb, "", CONT_INJECTED, legit
         raise RuntimeError("no item long enough to segment; lower k_seg")
 
@@ -327,6 +396,19 @@ DESIGNS.update({f"struqpos_{name}_tr": (lambda k, n=name: make_struq_pos(k, atta
 DESIGNS.update({f"struqpos_{name}_ev": (lambda k, n=name: make_struq_pos(k, attack=n,
                                                                          pool="eval"))
                 for name in ATTACKS})
+# Leak-free contrast: cont2 is another item's answer, so nothing in the continuation pair
+# appears verbatim in the prompt (0% on all three attacks, against 70% for
+# `struqpos_completion_real`). REGISTERED PREDICTION, made before running: the gate inversion
+# on completion_real is caused by the leak, so `struqposx_completion_real` should pass the
+# grad_slab >= broadcast_optimal gate at matched dose. If it still fails, the leak is not the
+# cause and the inversion is something else.
+DESIGNS.update({f"struqposx_{name}": (lambda k, n=name: make_struq_pos(k, attack=n,
+                                                                      contrast="other"))
+                for name in ATTACKS})
+DESIGNS.update({f"struqposx_{name}_tr": (lambda k, n=name: make_struq_pos(
+    k, attack=n, pool="train", contrast="other")) for name in ATTACKS})
+DESIGNS.update({f"struqposx_{name}_ev": (lambda k, n=name: make_struq_pos(
+    k, attack=n, pool="eval", contrast="other")) for name in ATTACKS})
 # Held-out content: _tr trains, _ev scores. Same attack and same injected target on both
 # sides -- only the alpaca items differ.
 DESIGNS.update({f"struq_{name}_tr": (lambda k, n=name: make_struq(k, attack=n, pool="train"))
