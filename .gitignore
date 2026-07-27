@@ -100,3 +100,7 @@ experiments/explorations/task_hunt/labels/dharm_corpus.json.gz
 # labels/build_retryesc.py. Numbers of record live in retryesc_premeasure.json.
 experiments/explorations/task_hunt/labels/retryesc_*.npz
 .agent_id
+
+# evalage smoke stream (4-doc path validation, throwaway); the RECEIPT is
+# committed as evidence (vocabulary spread 0.0004 on generated text).
+experiments/explorations/task_hunt/labels/elicit_evalage_smoke.npz

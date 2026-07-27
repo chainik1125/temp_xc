@@ -1,0 +1,48 @@
+{
+ "scaffold": "evalage",
+ "generation": {
+  "model_id": "claude-haiku-4-5-20251001",
+  "model_sha": "unresolved",
+  "seed": 0,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "backend": "Anthropic API (MATS key; pin = model-id + API version, NOT a weight sha \u21d2 reproducible-in-expectation, not bit-exact)"
+ },
+ "n_docs": 4,
+ "n_tokens": 17761,
+ "realised_gaps": {
+  "n_gaps": 13,
+  "mean": 795.0,
+  "median": 622.0,
+  "p10": 256.8,
+  "p90": 1466.8,
+  "min": 244.0,
+  "max": 1731.0
+ },
+ "vocabulary_control": {
+  "per_topic_event_rate": {
+   "basics of watercolour painting": 0.0007887679444707368,
+   "caring for houseplants": 0.001199040767386091,
+   "planning a vegetable garden": 0.0011217049915872126,
+   "the invention of the printing press": 0.0009142439202779302
+  },
+  "spread_max_minus_min": 0.0004102728229153543,
+  "cv": 0.16202639556389015,
+  "note": "large spread => topic predicts event status => the retryesc vocabulary leak is being rebuilt; fix the scaffold, do not proceed"
+ },
+ "first_doc_sha256": "c4473b897200c2e720d0434e3dada2cab6792e59d27038fa68da5abb351c5e10",
+ "model_generated_disclosure": "corpus is MODEL-GENERATED; whether it enters a rebuttal exhibit or the appendix is the paper owner's call at quote time (authorization note, PTR)",
+ "scaffold_constants": {
+  "gap_turns": [
+   2,
+   12
+  ],
+  "n_cues": [
+   2,
+   6
+  ],
+  "n_topics": 16,
+  "n_cue_templates": 5
+ },
+ "generation_tokenizer": "claude-haiku-4-5-20251001"
+}
