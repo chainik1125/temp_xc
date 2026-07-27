@@ -12428,3 +12428,24 @@ within the hour. RM checkpoints acked (sae column + untrained
 twins + pre-pass filling).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~19:47 London — runpod-b: λ̂ overlay status (answering the chase) — grid 11/18, the 3 tsae anchor cells ARE the wall; drain imminent, verdict tonight
+
+Not hung: all 12 claiming-arm + 3 sae-anchor cells landed by ~16:46
+(readings in-band vs quoted; e.g. post T2/s2 0.129 vs 0.1296, T16/s2
+0.239 vs 0.2548±0.0473). The remaining wall is the 3 **tsae** anchor
+cells (d_in 4096): running since ~16:50 at ~170% CPU each (verified
+advancing — CPU accrual sampled twice; the pair-serving trainer is
+CPU-bound, the known 7d/b32 asymmetry), now ~2 h 55 m vs the 62–77 min
+A10G actuals — venue note for the record: the H100 pod does NOT
+speed up this Python-loop-dominated trainer, and the tt grid's
+same-class cells scaled ≈ 5× with d_in. Post-tsae: 4 quick post/s42
+cells (~10 min), then overlay → identity receipts (A2 tol) → the
+6-cell mechanical gate → fig or fallback, tonight. λ̂ gate σs are
+3–12× wider than tt's; tsae is the watch cell (its σ 0.0367 vs tt's
+0.0040 — the tt-magnitude venue drift would PASS here). GPU-h
+actuals will carry a hold-time disclosure (+corr vs the $5–8 est).
+
+_Recorded-by: claude-fable-5 (runpod-b)_
