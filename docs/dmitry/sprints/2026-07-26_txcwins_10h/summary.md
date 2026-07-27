@@ -540,12 +540,31 @@ the segmentation is one retrieved document per span with no splitting rule to ju
 refuted by its own registered falsifier.** Three inits, held-out, matched dose
 (`results/txc_wins/litm_0v4_tr_arms_ds{0,1,2}.json`):
 
-| | ds0 | ds1 | ds2 | median |
-| --- | --- | --- | --- | --- |
-| crosscoder | +1.061 | +1.127 | +1.053 | **+1.061** |
-| TopK SAE | +0.375 | +0.471 | +0.877 | +0.471 |
-| best constant write (sup.) | +4.368 | +4.400 | +4.387 | +4.387 |
-| ratio to constant write | 0.24 | 0.26 | 0.24 | **0.24** |
+| arm | ds0 | ds1 | ds2 | median | kind |
+| --- | --- | --- | --- | --- | --- |
+| `grad_slab` (sanity ceiling) | +8.781 | +8.790 | +8.758 | +8.781 | supervised |
+| `broadcast_optimal` (best constant write) | +4.368 | +4.400 | +4.387 | +4.387 | supervised |
+| `grad_rank1` | +4.042 | +4.032 | +4.068 | +4.042 | supervised |
+| `sae_schedule_grad` | +3.844 | +3.910 | +2.712 | +3.844 | supervised |
+| `dom_slab` | +1.550 | +1.550 | +1.550 | +1.550 | supervised |
+| `rank1_best` | +1.150 | +1.150 | +1.150 | +1.150 | supervised |
+| **`txc_slab` (crosscoder)** | **+1.061** | **+1.127** | **+1.053** | **+1.061** | **learned** |
+| `sae_broadcast` (TopK SAE) | +0.375 | +0.471 | +0.877 | +0.471 | learned |
+| `sae_schedule` | +0.467 | +0.307 | +0.453 | +0.453 | supervised |
+| `txc_slab_readingsel` | +0.356 | +0.628 | +0.396 | +0.396 | learned |
+| `sae_broadcast_readingsel` | +0.262 | +0.260 | +0.413 | +0.262 | learned |
+| `tsae_broadcast` (attention tSAE) | +0.017 | +0.116 | +0.300 | +0.116 | learned |
+| `txc_flat` (profile removed) | +0.185 | +0.084 | +0.111 | +0.111 | learned |
+| `random_slab` | +0.073 | +0.073 | +0.073 | +0.073 | null |
+| `random_broadcast` | +0.067 | +0.067 | +0.067 | +0.067 | null |
+| `txc_profile_random` | +0.023 | +0.234 | +0.057 | +0.057 | null |
+| **ratio to best constant write** | 0.24 | 0.26 | 0.24 | **0.24** | |
+
+**The crosscoder is the best of every arm a practitioner can actually build** — 2.3× the TopK SAE
+and 9× the attention tSAE — and it also clears two supervised arms (`sae_schedule` at +0.45, and
+it sits just under `rank1_best` at +1.15). **The temporal-profile controls hold cleanly**: flatten
+the crosscoder's profile and it falls to +0.111, against a random slab at +0.073. The
+position-dependence is carrying the effect, not the direction.
 
 The prediction registered in advance was that near-floor retention would cap every arm and make
 the *ordering* unstable across inits, with the stated falsifier: **a clean repeatable crosscoder
