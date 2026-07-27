@@ -13916,3 +13916,55 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 - Night grid unaffected: GPU0 on RM s1/T16, GPU1 on RM s2/T6.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+---
+
+## 2026-07-28 00:05 London (wall) — mac-c: `warddebt` — every label-side gate PASSES and I still say DON'T SCREEN IT; the debt construct is degenerate at window scale ($0, in-repo)
+
+Hunt continuation briefing picked up. First candidate off
+`SAFETY_TASK_MENU` § 10.1 #23, frozen `fa52ab43f` (commit-then-run),
+run on the committed proofops/Ward substrate with `build_oprate`'s
+instruments verbatim — $0, no pull, no judge, no API.
+
+**I corrected my own menu prediction BEFORE running** (card § 3): #23
+predicted a KILL on anti-dup vs `rate_ver`, but `oprate_stats` already
+showed the parents are uncorrelated (−0.032), so their difference
+cannot be collinear with either. Measured: **ρ vs `rate_case` +0.706,
+vs `rate_ver` −0.605** (≈ the ±0.71 the argument predicts), vs
+`lam_sc` −0.012, vs λ̂ Ward −0.052. Triage PASSES (tok 0.619 < 0.65,
+pos 0.518 < 0.70), manifest ≥ 2,000/class. **No formal gate fires.**
+
+**And it still should not be screened.** Clock, stated first: **19.2
+tok/sentence ⇒ the K=8 kernel spans ≈ 154 tokens vs screened T ≤ 32**
+(4.8× overshoot). Measured consequence on the 7,689 extreme-class test
+rows the AUCs are scored on:
+
+| T | discharge count in-window ≠ 0 | ρ(net, incurred-only) |
+|---|---|---|
+| 8 | **0.00 %** | **1.000000** |
+| 16 | **0.00 %** | **1.000000** |
+| 32 | 0.13 % | 0.999980 |
+
+**The discharge half — the entire reason "debt" differs from a plain
+incurred rate — is invisible inside the window.** The verification
+events that make debt negative sit 1–8 sentences back (19–154 tokens),
+outside T. So at screen scale `warddebt` **is** `oprate`'s `rate_case`
+wearing a new name; the visible floor agrees independently (0.573 /
+0.650 / **0.784** at T=8/16/32 vs `rate_case`'s own **0.783** at T32).
+`oprate` died at a **full 84-cell panel** to precisely that baseline.
+Screening this would be paying to re-run that death.
+
+**Verdict: NO SCREEN, NO SLOT** — the $0 negative the entry was written
+to buy. "Should we try Ward for safety?" now has a receipt.
+**Generalizes:** any sentence-kernel face on Ward spans ~154 tokens
+against T ≤ 32, so the window can never compute it and only
+self-excitation survives — a Ward face needs a token-scale event or a
+screen at T ≫ 154. That closes Ward for this program's window sizes,
+not just this face.
+
+Artifacts: `warddebt/CARD.md` § 7, `labels/build_warddebt.py`,
+`labels/warddebt_stats.json`, `labels/warddebt.npz`. Next: `retryesc`
+(§ 10.2 #19) feasibility — best clock fit on the menu, structural
+labels; corpus availability + the tokens-per-trace bar first.
+
+_Recorded-by: claude-fable-5 (mac-c)_

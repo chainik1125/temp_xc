@@ -1,0 +1,88 @@
+{
+ "card": "warddebt/CARD.md (frozen before this ran)",
+ "frozen": {
+  "kernel": {
+   "tau": 3.0,
+   "k": 8,
+   "min_history": 4
+  },
+  "labels_source": "experiments/explorations/synthetic/expansion/records/proof-operation-phase-runs/labels.json",
+  "face": "rate_case(cls 2) - rate_ver(cls 3)",
+  "mask": "current sentence in {2,3} OR unlabeled",
+  "null_seed": 103,
+  "seed": 0
+ },
+ "clock_stated_first": {
+  "tokens_per_sentence_mean": 19.236859771749003,
+  "tokens_per_sentence_median": 16.0,
+  "kernel_support_sentences": 8,
+  "kernel_support_tokens_mean": 153.89487817399203,
+  "screen_Ts": [
+   8,
+   16,
+   32
+  ],
+  "reach_note": "if the kernel support in TOKENS far exceeds the screened T, the window cannot COMPUTE the face and any in-window signal is self-excitation, not the trailing balance (the sycgen_rate demotion, refmark's death mode)"
+ },
+ "anti_dup_spearman": {
+  "vs_rate_case": 0.7057802171098232,
+  "vs_rate_ver": -0.6049969567236737,
+  "vs_lam_sc": -0.012393106925431606,
+  "vs_ward_lambda": -0.05201224823728545
+ },
+ "anti_dup_bar": 0.8,
+ "anti_dup_breached": {},
+ "parent_corr_rate_ver_rate_case": -0.031689955946709106,
+ "stream_shape": [
+  4044,
+  128
+ ],
+ "label_coverage_rate": 0.8952329773659556,
+ "debt_quantiles": [
+  -0.36440110206604004,
+  0.0,
+  0.0,
+  0.059653252363204956,
+  0.3746863603591919
+ ],
+ "bin_scheme": "zero_split",
+ "edges": [
+  0.0,
+  0.16738055646419525
+ ],
+ "null_corr_with_real": 0.1422725483913462,
+ "net_class_rate_by_bin": [
+  0.01684824923332786,
+  0.035147323196928607,
+  0.13464648622257483
+ ],
+ "manifest_rows_per_class": 20000,
+ "triage": {
+  "tok_auc_extreme": 0.6191351118171485,
+  "pos_auc_extreme": 0.5177369181468345,
+  "tok_kill_at": 0.65,
+  "pos_kill_at": 0.7,
+  "verdict": "PASS",
+  "tok_auc": 0.6191351118171485,
+  "pos_raw_auc": 0.492680461784966,
+  "pos_frac_auc": 0.4822630818531655,
+  "n_test_rows": 7689
+ },
+ "visible_evidence_auc": {
+  "net_T8": 0.5730534709193246,
+  "inc_T8": 0.5730534709193246,
+  "net_T16": 0.649624765478424,
+  "inc_T16": 0.649624765478424,
+  "net_T32": 0.7837711069418386,
+  "inc_T32": 0.7837711069418386
+ },
+ "n_roundtrip_mismatch_tokens": 149,
+ "verdict_input": {
+  "anti_dup_ok": true,
+  "triage_ok": true,
+  "manifest_ok": true,
+  "max_visible_floor_auc": 0.7837711069418386,
+  "kill_rule": "anti-dup breach (|rho| >= 0.8) OR triage FAIL OR manifest short => label-side KILL, no GPU screen",
+  "label_side_killed": false
+ }
+}

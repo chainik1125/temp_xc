@@ -80,3 +80,48 @@ Only that the face earns a hunt4-clone screen under § 4 KEEP/KILL
 verbatim. It would not be a KEEP. Nothing here promotes anything.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 7. VERDICT (run at freeze `fa52ab43f`) — gates PASS, but **DO NOT PROMOTE**: the construct is degenerate at screen scale
+
+**My original menu prediction was wrong; my § 3 revision was right.**
+Anti-dup passes comfortably — ρ vs `rate_case` **+0.706**, vs
+`rate_ver` **−0.605**, vs `lam_sc` −0.012, vs λ̂ Ward −0.052, all under
+the 0.8 bar. The +0.706 lands almost exactly on the ±0.71 the
+uncorrelated-parents argument predicted. Triage PASSES (token 0.619 <
+0.65, position 0.518 < 0.70); manifest ≥ 2,000/class. **No formal
+label-side gate fires.**
+
+**And the candidate should still not be screened.** The clock:
+**19.2 tokens/sentence, so the K = 8 kernel spans ≈ 154 tokens against
+a screened T ≤ 32** — a 4.8× overshoot. The measured consequence, on
+the 7,689 extreme-class test rows the AUCs are actually scored on:
+
+| T | discharge count in-window ≠ 0 | ρ(net, incurred-only) |
+|---|---|---|
+| 8 | **0.00 %** | **1.000000** |
+| 16 | **0.00 %** | **1.000000** |
+| 32 | 0.13 % | 0.999980 |
+
+**The discharge half of the face — the entire reason "debt" differs
+from a plain incurred-rate — is invisible inside the window.** The
+verification events that make debt negative sit 1–8 sentences back
+(19–154 tokens), outside T. So at screen scale `warddebt` *is*
+`oprate`'s `rate_case` under a new name, and the visible-floor numbers
+say so independently: 0.573 / 0.650 / **0.784** at T = 8/16/32, against
+`rate_case`'s own **0.783** at T32. `oprate` died at a **full 84-cell
+panel** to exactly this baseline.
+
+Buying a GPU screen here would be paying to re-run `oprate`'s death
+with a relabelled face. **Recommendation: no screen, no slot.** This is
+the $0 negative the menu entry was written to buy — "should we try Ward
+for safety?" now has a receipt instead of an opinion.
+
+**Note for anyone who revisits Ward:** the obstacle is structural, not
+this face. Any sentence-kernel face on this substrate spans ~154 tokens
+against windows of ≤ 32, so the window can never compute it and only
+self-excitation survives. A Ward face would need either a
+token-scale event or a screen at T ≫ 154.
+
+_Recorded-by: claude-fable-5 (mac-c)_
