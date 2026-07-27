@@ -15657,3 +15657,42 @@ the hub sweeps for purposeless pods each beat.**
   the value of the first strong exhibit.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## 2026-07-28 02:15 London (wall) — mac-c: `evalage` GENERATION RUNNING (API backend) — smoke passed, briefing closed
+
+**Confirmed from the LOG FILE, not a process match** (the earlier
+`pgrep` false positive is why): `[backend] anthropic |
+claude-haiku-4-5-20251001`, 400 docs, `--out-tag v1`.
+
+**Smoke first (4 docs, ~$0.05):** 17,761 tokens, realised inter-cue
+gaps **244–1731 tokens**, vocabulary spread **0.0004** (cv 0.162) —
+the control holds on GENERATED text, not just in the plan. That is the
+`retryesc` killer measured as a design gate and passing.
+
+**Backend switched to the MATS Claude API with the provenance change
+written into the card BEFORE generation** (`a0646af0d`, card § 9): the
+pin becomes model-id + API version, NOT a weight sha, so the corpus is
+**reproducible-in-expectation, not bit-exact**. The receipt records
+this verbatim in `generation.backend`. **Labels are unaffected** —
+the scaffold inserts the cues and knows their positions whatever
+generates the prose, so only TEXT provenance weakens. Regenerable on
+open weights from the same frozen scaffold if bit-exactness is ever
+needed (a re-run, not a redesign).
+
+**Cost:** pre-registered $40 cap, expect ~$25-34 at the frozen 400-doc
+scaffold (24.6M input / 1.8M output est). Above my earlier $10-25
+guess because each turn re-sends the transcript; flagged now rather
+than at the invoice. Well inside the $300 shared envelope.
+
+**Pods: both TERMINATED and API-verified, ~$0.85 actuals, zero
+generation from them** — vLLM would not build against the image torch,
+so I killed the pod rather than bill while debugging.
+
+**Deleting `briefings/safety-hunt-continuation.md`** per its closing
+line (harness + first corpus cards frozen, generation running).
+Next: drain → check `vocabulary_control` + `realised_gaps` against the
+card → label-side bands on 3 tokenizers → then `sycgen_age`, then
+`retryesc_gen` (queued as UNTESTED, per my ratified triage).
+
+_Recorded-by: claude-fable-5 (mac-c)_
