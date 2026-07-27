@@ -305,9 +305,12 @@ def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path):
                     xycoords="axes fraction", ha="left", va="top",
                     fontsize=9)
     if (1, 42) in pts:
+        # xytext lower than the RLHF twin's (0.03, 0.83): this face's
+        # curves occupy the top-left, the twin's don't. Position is the
+        # one knob that tracks data geometry; all else stays paired.
         ax.annotate("T=1: shuffle ≡ identity",
                     xy=(1, pts[(1, 42)]["ordered"]),
-                    xytext=(0.03, 0.83), textcoords="axes fraction",
+                    xytext=(0.03, 0.62), textcoords="axes fraction",
                     fontsize=8, color="#555555",
                     arrowprops=dict(arrowstyle="-", color="#999999", lw=0.8))
 

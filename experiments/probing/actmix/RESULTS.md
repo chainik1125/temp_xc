@@ -12,9 +12,12 @@ Verdict discipline: PENDING TEAM REVIEW. Gates (CARD § 5):
 - `FAIL  G1 l0=42.08 outside [36.0,40.5] at txc_batchtopk_pre_btkonly/T2/s1/k20`
 - `FAIL  G1 l0=41.86 outside [36.0,40.5] at txc_batchtopk_pre_btkonly/T2/s42/k5`
 - `FAIL  G1 l0=41.86 outside [36.0,40.5] at txc_batchtopk_pre_btkonly/T2/s42/k20`
+- `FAIL  G1 l0=82.74 outside [72.0,80.5] at txc_batchtopk_pre_btkonly/T4/s1/k5`
+- `FAIL  G1 l0=82.74 outside [72.0,80.5] at txc_batchtopk_pre_btkonly/T4/s1/k20`
 - `FAIL  G1 l0=82.28 outside [72.0,80.5] at txc_batchtopk_pre_btkonly/T4/s42/k5`
 - `FAIL  G1 l0=82.28 outside [72.0,80.5] at txc_batchtopk_pre_btkonly/T4/s42/k20`
 - `FAIL  G1 l0=165.80 outside [144.0,160.5] at txc_batchtopk_pre_btkonly/T8/s1/k5`
+- `FAIL  G1 l0=165.80 outside [144.0,160.5] at txc_batchtopk_pre_btkonly/T8/s1/k20`
 - `FAIL  G1 l0=165.61 outside [144.0,160.5] at txc_batchtopk_pre_btkonly/T8/s42/k5`
 - `FAIL  G1 l0=165.61 outside [144.0,160.5] at txc_batchtopk_pre_btkonly/T8/s42/k20`
 - `FAIL  G1 l0=377.92 outside [288.0,320.5] at txc_batchtopk_pre_btkonly/T16/s1/k5`
@@ -30,7 +33,7 @@ Verdict discipline: PENDING TEAM REVIEW. Gates (CARD § 5):
 |---|---|---|---|---|---|---|
 | 1 | 0.8284 ± 0.0116 (n=2) | 0.8284 ± 0.0116 (n=2) | — | — | 20.9209 ± 0.3240 (n=2) | — |
 | 2 | 0.8296 ± 0.0034 (n=2) | 0.8184 ± 0.0008 (n=2) | — | — | 41.9702 ± 0.1571 (n=2) | — |
-| 4 | 0.8226 (n=1) | 0.8044 (n=1) | — | — | 82.2812 (n=1) | — |
+| 4 | 0.8139 ± 0.0123 (n=2) | 0.8005 ± 0.0056 (n=2) | — | — | 82.5082 ± 0.3210 (n=2) | — |
 | 8 | 0.8337 ± 0.0118 (n=2) | 0.8248 ± 0.0126 (n=2) | — | — | 165.7024 ± 0.1373 (n=2) | — |
 | 16 | 0.8387 ± 0.0060 (n=2) | 0.8338 ± 0.0089 (n=2) | — | — | 379.2556 ± 1.8910 (n=2) | — |
 
@@ -47,8 +50,8 @@ untrained twins (seed 42): BatchTopK SAE (20/tok)@T1: 0.652; T-SAE (20/tok)@T1: 
 |---|---|---|---|---|---|---|
 | 1 | 0.8992 ± 0.0023 (n=2) | 0.8992 ± 0.0023 (n=2) | — | — | 20.9209 ± 0.3240 (n=2) | — |
 | 2 | 0.9015 ± 0.0022 (n=2) | 0.8938 ± 0.0061 (n=2) | — | — | 41.9702 ± 0.1571 (n=2) | — |
-| 4 | 0.9006 (n=1) | 0.8802 (n=1) | — | — | 82.2812 (n=1) | — |
-| 8 | 0.8849 (n=1) | 0.8565 (n=1) | — | — | 165.6053 (n=1) | — |
+| 4 | 0.8997 ± 0.0012 (n=2) | 0.8801 ± 0.0001 (n=2) | — | — | 82.5082 ± 0.3210 (n=2) | — |
+| 8 | 0.8898 ± 0.0069 (n=2) | 0.8602 ± 0.0052 (n=2) | — | — | 165.7024 ± 0.1373 (n=2) | — |
 | 16 | 0.8768 ± 0.0011 (n=2) | 0.8545 ± 0.0010 (n=2) | — | — | 379.2556 ± 1.8910 (n=2) | — |
 
 | per-token band | AUC (T-invariant) | realized l0 |

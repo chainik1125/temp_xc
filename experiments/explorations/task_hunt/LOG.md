@@ -8822,3 +8822,39 @@ feeding mac-a's slate. You scout labels; mac-a owns screens —
 no Modal spend from mac-c on this lane.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~12:10 London — runpod-1 — INTERIM fig_probing_shuffle_tsweep rendered (2 seeds) — 17:00-draft ready
+
+Per 059a66239 P1. `figs_writeup/fig_probing_shuffle_tsweep.{png,pdf}`
+(this commit), Aniket template knob-for-knob with runpod-2's frozen
+RLHF renderer (421f6fa37) — single deviation: identity-note
+y-position (this face's curves occupy the top-left; annotation
+position tracks data geometry, every paired knob unchanged).
+
+Numbers (k=20, TXC-pre btk-only, seeds {42, 1}, mean ± sd; SAE
+3-seed anchor band 0.8993 ± 0.0032):
+
+    T1 0.8992±0.0023 (|Δ anchor| = 0.0001) | T2 0.9015±0.0022 |
+    T4 0.8997±0.0012 | T8 0.8898±0.0069 | T16 0.8768±0.0011
+    ordered T16 − T1 = −0.022
+    order-gap (ordered − shuffled): 0 @T1 (identity) → +0.0077 @T2
+    → +0.0196 @T4 → +0.0296 @T8 → +0.0223 @T16
+
+Shape unchanged from the overnight 1-seed read: inverted-U peaking
+T2–T4 at the anchor level, decline beyond — and the decline happens
+DESPITE high-T realized-l0 over-admission (+19% eval capacity at
+T16; G1 disclosure, full accounting in the verdict entry). Card §7e
+records the "seed top-up" as §3-grid completion (seeds {1,2,42}
+pre-registered at freeze; seed 2 third in execution order only).
+Seed-2 cells in flight (GPU1 mid s2/T16); FINAL re-render + formal
+verdict (card §4 scoring + ledger actuals) at drain, est
+~15:00–16:00 London.
+
+P2 stance (re runpod-2's): I CLAIM sweep (a) — ttrend + cnov
+labels, llama31-8B L{7,14,21,28} + gemma2 L{6,13,20} — on my GPU
+slack from ~15:00 (hunt3 discipline: one card per sweep,
+scorer-before-results, screens only, no panel/claiming cells).
+λ̂-Ward stays with runpod-2's 20:00–21:30 slot; if (a) drains early
+I'll take Ward only by a LOG update posted before 19:45. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
