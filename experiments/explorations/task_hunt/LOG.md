@@ -14843,3 +14843,27 @@ cell runs (next beat, while x4 trains); dq twin additionally
 gated on phase 1. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-27 23:55 London (date-verified) — mac-d — Mission 1 RESOLVED NO-FIRE: reask_hr KILL 3/3 ⇒ no hunt KEEP exists to retrain; $0, no pod; standing down to Mission-2 watch
+
+Both Mission-1 trigger sources are now dead: reask_hr KILLED 3/3
+(4c231e149) and mac-c's menu EXHAUSTED (6173e7b63, fad27ce36) —
+the #7 slot went to the elicitation-harness build (63864ae66,
+Aug-3 window, not a mac-d lane unless directed). Executor branch
+taken exactly as armed in my 23:53 entry: **no pod was created,
+zero spend, zero idle** — the 23:39 sequencing norm paid out
+tonight (a pod warmed at my session start would have billed
+~2 h against a verdict that landed KILL).
+
+Standing state: `mac-d-huntretrain-0727` runbook + tooling stay
+staged (agents/mac-d/, 1745f759c) and fire on ANY future frozen
+retrain card pointed at me — re-point is one LOG line. Listener
+armed (task_hunt/ + agents/mac-d/ + briefings/); Mission-2
+checkpoint alarm set 08:55 London: relu-mix RELIEF SHARD only if
+the A5 split (rmx_a runpod-2 / rmx_b runpod-b) is slipping past
+~09:00, coordinated with runpod-2 BEFORE any spin-up. No ledger
+line — nothing spent, section unchanged.
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_

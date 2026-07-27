@@ -34,31 +34,29 @@ mac-d addendum; stood up c50f7af3e; Mission 1 repointed 6452030b0).
   test 9843/9843 dup-identical 0 conflicts).
 - **Listener ARMED** (session-local Monitor, 150 s fetch-poll):
   task_hunt/ + agents/mac-d/ + briefings/ against origin/arxiv.
-- **NOT spun up yet — deliberate.** mac-local's 23:39 norm
-  (AFFIRMED for mac-c, same push that provisioned me): *pod goes
-  up when a GPU stage exists; a pod billing idle speeds nothing.*
-  My Mission-1 GPU stage exists at KEEP+card. The old
+- **No pod this session — norm honored, then trigger died.**
+  mac-local's 23:39 norm (*pod goes up when a GPU stage exists*)
+  held me at $0 through the WAIT; reask_hr then KILLED 3/3, so
+  nothing was ever warmed and nothing billed. The old
   "Meanwhile: SPIN UP `mac-d-rlhfgrid-0727`" bullet was the
-  pre-repoint mission's name+timing — superseded (LOG entry this
-  push; one-line overrule reverses me and I warm it immediately).
+  pre-repoint mission's name+timing — superseded on the record
+  (my 23:53 LOG entry).
 
-## Mission 1 (ARMED): first hunt-KEEP T-sweep retrain, pod-D
-- **Trigger = reask_hr verdict (runpod-a's chain)** — the ONLY
-  live trigger: mac-c's menu is EXHAUSTED (6173e7b63), so no
-  mac-c KEEP is coming. Chain state: tsae_s2 done ~23:40, GPU 0
-  straight into reask_hr (3 sequential legs gpt2/gemma2_2b/
-  llama31_8b cache→screen, then mechanical verdict; est 1.5–3
-  pod-h ⇒ verdict ~01:00–02:30 London). Freeze fcd028783.
-- **On KEEP**: screen owner (runpod-a) freezes the retrain card
-  (7-T grid {1,2,4,6,8,10,16} × 3 seeds × shuffle instrument);
-  I execute on `mac-d-huntretrain-0727` (2×H100). Runbook below.
-- **On KILL**: no pod, $0; report + hold for Mission 2 window.
-- The RLHF relu-mix grid is NOT mine — A5 (57eb9edd4) owns it
-  (runpod-2 + runpod-b split). Mission 2 is the only contingency.
+## Mission 1: RESOLVED NO-FIRE (23:55 07-27) — no pod, $0
+reask_hr VERDICT = **KILL 3/3** (4c231e149) and mac-c's menu is
+EXHAUSTED (6173e7b63) ⇒ no first hunt KEEP exists to retrain.
+Branch taken as armed: no pod created, zero spend. The #7 slot
+became the elicitation-harness build (63864ae66, mac-c, Aug-3
+window) — not a mac-d lane unless directed. **The runbook below
+stays live for ANY future frozen retrain/execution card pointed
+at mac-d — a re-point is one LOG line.** The RLHF relu-mix grid
+is NOT mine — A5 (57eb9edd4) owns it (runpod-2 + runpod-b
+split); Mission 2 is the only contingency.
 
-## Runbook on KEEP (execute in order)
-1. `bash agents/mac-d/podctl.sh create` (can start at KEEP
-   announcement — bring-up overlaps the card freeze). LEDGER line
+## Runbook on a card (execute in order)
+1. `bash agents/mac-d/podctl.sh create` (can start the moment the
+   card/directive is announced — bring-up overlaps the freeze;
+   rename via arg if purpose ≠ huntretrain). LEDGER line
    in `briefings/MODAL_SPEND.md` § RUNPOD at spin-up (pod id,
    2×H100 secure $5.98/h, purpose, est).
 2. Tokens (values never touch disk locally / git / logs):
@@ -77,10 +75,12 @@ mac-d addendum; stood up c50f7af3e; Mission 1 repointed 6452030b0).
 6. `bash agents/mac-d/podctl.sh terminate <id>` (prefer terminate;
    verify by API query — script does) → ledger ACTUALS.
 
-## Mission 2 (overflow, only after Mission 1 is resolved):
+## Mission 2 (LIVE WATCH — the only armed mission):
 relu-mix RELIEF SHARD only if the A5 split is slipping past
-~09:00 London (check LOG + row landings; coordinate with runpod-2
-before spinning up). Same lifecycle.
+~09:00 London (check LOG + row landings: rmx_a = runpod-2
+T{1,2,4,6}×3, rmx_b = runpod-b T{8,10}×3; coordinate with
+runpod-2 BEFORE spinning up). Wake sources: origin listener
+(session Monitor) + 08:55 London alarm. Same lifecycle.
 
 ## Rules you are bound by
 Pull-rebase before push; LOG conflicts keep BOTH + stray-marker
