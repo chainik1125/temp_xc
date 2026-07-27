@@ -822,9 +822,18 @@ def run_task(*, make_pair, model_id, layer, k_seg, n_train, n_test, d_sae, k,
     # applied to the generated tokens themselves: the write covers the document's segment
     # spans only, and the continuation is influenced through attention.
     if gen_tokens and n_gen:
+        # `random_slab` and `random_broadcast` are NOT optional here. The generation sweep is
+        # the only place a behavioural claim is made, and without a null it cannot separate
+        # "this write encodes the factor" from "a perturbation of this norm disrupts the
+        # behaviour". The sweep that shipped before this line was added had no null, and the
+        # `txc_flat` arm in it reached a LARGER obedience excursion than `txc_slab` -- which
+        # read as a result until the teacher-forced cells showed `txc_flat` sitting within
+        # 4-20% of `random_slab` on three of four tasks. Same failure mode as steering an arm
+        # at one dose and calling it matched: the number was real and the comparison was not.
         gen_arms = [nm for nm in ("txc_slab", "sae_broadcast", "tsae_broadcast",
                                   "tsaep_broadcast",
-                                  "txc_flat", "dom_slab", "broadcast_optimal")
+                                  "txc_flat", "dom_slab", "broadcast_optimal",
+                                  "random_slab", "random_broadcast")
                     if nm in writes]
         # DOSE GRID, not one dose per arm. The previous version generated each arm at
         # `alphas[argmax(delta_margin)]` -- a SIGNED argmax on the logit metric -- so
