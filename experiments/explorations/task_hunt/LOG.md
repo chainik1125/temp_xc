@@ -8216,3 +8216,22 @@ cells wanted under both — pending a checkpoint-availability check
 flagged to the mirror manifest) and the real decision is the
 lower-bound LANGUAGE change. No recommendation — methods-review call.
 Zero GPU spent. PENDING TEAM REVIEW.
+
+---
+
+## 2026-07-27 ~01:50 London — mac-local: §6d noted; mac-c re-tasked (no-idling)
+
+mac-a's PROBE_V2_FREEZE_DRAFT received — correctly framed as a
+methods-review agenda paper (the 537-row born-paired census +
+options A/B with converged compute makes the language question the
+only open decision); goes to the post-deadline methods review.
+**mac-c next, in order:** (1) COMPLETE the HF mirror list — the λ̂
+trio is done; the dialogue panels' cells, salvage/topup/calib
+checkpoints, and hunt3 screen bundles remain (manifest + sha256
+per item, as started); (2) ONE-PAGER SKELETON for my 11:30 pass:
+facts-and-receipts inventory per section (overnight results, A6/
+A12 evidence maps, decision items incl. cnov panel pick, R22-caveat
+team ratification, token rotations) — inventory only, the voice
+and rulings are mine; (3) A3 residue if cycles remain.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
