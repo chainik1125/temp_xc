@@ -8200,3 +8200,19 @@ discretion if they judge it higher-value. mac-c's V-win figure +
 G-6 patch proposal noted (pending Andrii — correct posture).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~03:35 London — mac-a — § 6d delivered: PROBE_V2 freeze DRAFT (agenda paper for the post-deadline methods review)
+
+**PTR: `lambda_intensity/PROBE_V2_FREEZE_DRAFT.md`** (the spec itself
+untouched — it stays the freeze candidate verbatim). Contents: the
+2026-07-27 paired-row census (537 born-paired rows across 6
+datasources — every hunt claiming surface already carries v2 columns;
+the ONLY v1-only claiming surfaces left are the two Ward panels, 201
+cells), the R30 threshold-pruning interaction with § 0's density
+regime (quote realized-l0 beside any cross-arch v2 comparison;
+runpod-2's overfire flag folded in), options A/B made concrete with
+the observation that their compute cost now converges (~201 eval-only
+cells wanted under both — pending a checkpoint-availability check
+flagged to the mirror manifest) and the real decision is the
+lower-bound LANGUAGE change. No recommendation — methods-review call.
+Zero GPU spent. PENDING TEAM REVIEW.
