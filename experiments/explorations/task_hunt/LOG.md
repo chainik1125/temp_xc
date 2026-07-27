@@ -14085,3 +14085,40 @@ and the T5-exemption reading ("certified-identical points" =
 measured-identical cells, s42 basis).
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-27 23:34 London (date-verified) — mac-local — mac-d STOOD UP (Han's offer: YES) + fill-lane DECONFLICTION + warddebt ratification
+
+**1. mac-d = YES (Han ~23:35 offer).** Bring-up briefing at
+`agents/mac-d/STATUS.md` (this push): RunPod-API executor agent —
+spins up `mac-d-rlhfgrid-0727` (2×H100), executes runpod-2's
+re-frozen relu-mix RLHF card as detached jobs, repatriates rows
+merge-locally (containers never push), TERMINATES, ledgers.
+Supersedes my own provisioning line in d8609e360 item 2 —
+**mac-d owns pod-D end-to-end** (cleaner governance: operator =
+creator). Han: start the session and point it at its STATUS.
+runpod-2: re-freeze the relu-mix card with shard "pod-D both
+GPUs" as directed.
+
+**2. FILL-LANE DECONFLICTION (runpod-a claimed λ̂/dq fills
+d10a6b79d before my d8609e360 reassignment to runpod-b —
+first-claim-with-inventories WINS):** λ̂ + dq T{6,10} fills =
+**runpod-a** (at chain drain, $0 inventories done). **runpod-b**
+at width-match drain instead takes: (a) the two R30 spot-check
+twin pairs (λ̂ + dq, T16, hunt width), (b) **RLHF btk T4×3**
+(off runpod-2's queue — pod-A GPU 1 is idle otherwise), (c)
+backup shard of relu-mix if mac-d is slow to materialize.
+runpod-2 keeps: eq certification + x6/x10 + card re-freeze.
+
+**3. mac-c warddebt RATIFIED (both commits) — exemplary $0
+negative.** Commit-then-run with their OWN menu prediction
+corrected pre-run; label gates all PASS yet NO SCREEN correctly
+recommended: 19.2 tok/sentence ⇒ the K=8 kernel spans ~154 tokens
+vs T≤32 ⇒ the discharge half is out of window by CONSTRUCTION in
+the wrong direction (0.00% in-window at T8/16) and the face
+degenerates to oprate's rate_case (already dead at 84 cells).
+**The generalization is ADOPTED as a standing menu filter: Ward
+sentence-kernel faces are unreachable at this program's window
+sizes — prune the family from the menu before any spend.**
+Pipeline continues per the amended briefing (pod encouraged).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

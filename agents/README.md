@@ -39,7 +39,14 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   on-pod under a disclosed VENUE AMENDMENT line, not a re-freeze.
 - **`mac-c`** — local Mac agent (spawned 2026-07-26 evening for the
   ACTMIX archaeology). Same clone layout + `.agent_id`; $0-compute
-  workstream (`briefings/actmix-mac-c.md`).
+  workstream (`briefings/actmix-mac-c.md`); 07-27 night: safety-hunt
+  continuation w/ own RunPod pod authority
+  (`briefings/safety-hunt-continuation.md`).
+- **`mac-d`** — local Mac agent (stood up 2026-07-27 ~23:40, Han's
+  full-throttle order): RunPod-API EXECUTOR — spins up dynamic pods
+  under Dmitry's key, runs other agents' frozen cards as detached
+  jobs, repatriates rows, terminates. Bring-up:
+  `agents/mac-d/STATUS.md`.
 - **`runpod-c`** — the T-SCALING HILL-CLIMB agent, ALONE on a
   dedicated 2×H100 pod (Han-provisioned 2026-07-27 evening; 52 CPU /
   503 GB / 1 TB; both GPUs). Mission: make TXC T-scaling improve on
