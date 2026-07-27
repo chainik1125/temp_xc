@@ -20,28 +20,29 @@ the strongest family member: T16 k20 0.9251 / k5 0.8763 — program-best
 BOTH k, first cells above the P1 20k references — but T1 stays
 collapsed (0.8071) ⇒ same gate verdict: slope PASS, T16 PASS,
 T1-level FAIL, NO PROMOTE as-is.** Aux-loss T16 harm is super-additive
-(+0.0029/+0.0037/+0.0103). A1 (iii) BARS a second family diagnostic —
-the slot is consumed by the running full-recipe 20k diag. The A2
-decision tree is PRE-STATED in RESULTS C3 (written BEFORE any diag
-cell landed): diag T{16,1} passes L2 slope+level → propose card
-amendment A2 = family's one L2 slot runs FULL L2 on r1-min
-(append-then-run, loud PTR); T1 no-recover → no A2, low-T fixes enter
-at L1; T16 no-hold → lane dies. All r1 T16 gains remain ORDER-FREE
-(pooled composition — binding claim caveat, fcf62963b regime).
+(+0.0029/+0.0037/+0.0103). **The A1 family diag RESOLVED the A2 tree:
+NO A2** (RESULTS C1-D, ~00:50): diag k20 T1 0.8974 / T16 0.9171 —
+the program's FIRST RISING k20 curve at canonical 20k steps (Δ16
++0.0197 vs P1's −0.0150), mechanism CONFIRMED-partial (AuxK-live T1
+recovery +0.099, census active-frac 0.021→0.120) — but T1 misses the
+pre-stated 0.9035 floor by 0.0061 AND k5@T16 regressed 0.8711→0.8487
+(below the § 3 preservation bar 0.8551). Discipline held as
+pre-committed: the family's one diagnostic slot is SPENT, no
+exception-lane L2 for r1-min, low-T fixes enter as NEW candidates
+(C4+) through L1 as written. 4k gains were order-free; at 20k the
+shuf gap flips POSITIVE (+0.0032) — first order-sensitive r1 signal.
 
 ## IN FLIGHT RIGHT NOW (check these FIRST on resume)
 
-- **GPU 1, pid 13644** — A1 family diagnostic `r1b-L2diag-20k` (FULL
-  r1 btkonly recipe, 20k steps, T order 16→1→4): T16 lands ~00:40,
-  T1 ~01:15 (**THE collapse-with-AuxK-live answer**), T4 then drain
-  ~02:30. Log `/workspace/logs/tscale_l2diag.log`. Watcher
-  `b0bjfqzbb` fires on first `[l1] DONE`. On T1 landing, walk the A2
-  tree in RESULTS C3 — the trigger numbers are T16 ≥ 0.8985 (with
-  slope) AND T1 ≥ 0.9035 vs the P1 s42 row (CARD § 2).
+- **GPU 1, pid 13644** — diag T4 interior cell only (T{16,1} DONE and
+  recorded in C1-D; T4 cannot change the A2-NO verdict — it fills the
+  20k interior curve). Lands ~01:35, then the diag DRAINS and GPU 1
+  FREES. Log `/workspace/logs/tscale_l2diag.log`. Watcher `bep02rmwy`
+  fires on pid exit.
 - **GPU 0, pid 20672** — t_sample attribution chain (L1, 4k, T16,
   r1-min backbone): `r1min-ts16-4k` (t_sample=16 = NO subsampling; if
   ≈ 0.9251 the win is per-sample-window-TopK + sequence serving, NOT
-  the curriculum) lands ~01:10, then `r1min-ts5-4k` (locked absolute
+  the curriculum) lands ~01:15, then `r1min-ts5-4k` (locked absolute
   instance, asymmetry 3.2) ~02:15. Log
   `/workspace/logs/tscale_l1_tsample.log`. Watcher `bzauur1hp` fires
   on first DONE. Confound on record in C3: tokens/step scales with
@@ -89,22 +90,23 @@ Gate floors vs twin at L1: T1 ≥ 0.8844, T16 ≥ 0.8810, slope ≥ −0.0054.
 
 ## Next actions queue (in order)
 
-1. ~00:40 diag T16 lands → record; ~01:10 ts16 lands → the
-   curriculum-necessity read; ~01:15 diag T1 lands → **walk the A2
-   tree** (RESULTS C3, verbatim triggers). Each: RESULTS addendum
-   (C1 for diag cells, C3 addendum for ts cells) + LOG beat if
-   decision-grade + push.
-2. If A2 triggers: append A2 to CARD_SPLIT (append-only, timestamped,
-   BEFORE launch), launch full L2 on r1-min (20k, dev {1,2,4,8,16},
-   both k — GPU 0 frees ~02:15, GPU 1 ~02:30; ~5 h wall), loud PTR.
-   If not: low-T fixes (per-position k floors, k-anneal, k_train
-   floor at small T) enter as C4+ through L1 as written.
+1. ~01:15 ts16 lands → curriculum-necessity read (C3 addendum);
+   ~01:35 diag T4 lands → complete the C1-D 20k curve table; ~02:15
+   ts5 lands → asymmetry read. Push each (or batched if near).
+2. **A2 RESOLVED: NO** (C1-D). Design C4 = low-T fix through L1 as
+   written, AFTER ts16/ts5 land (they shape the space). Constraints
+   (C1-D): AuxK-independent (screen-inert), attacks ACROSS-ROW latent
+   concentration (k_train-anneal wide→20 / batch-diverse selection at
+   small T — NOT per-position floors), tracks k5@T16 (the 20k
+   regression failure mode). Both GPUs free by ~02:15/~01:35 —
+   overnight C4 L1 cells are in budget if the design is clean;
+   otherwise leave the morning slate.
 3. L3 only ever via canonical run_experiment + § 3 L2→L3 gates +
    seeds {1,2,42} + eval_cfg namespacing (explore: tscale) + fresh
    LOG PTR + mac-local ratification.
 4. Menu not yet touched: multi_window exposure fix, k-anneal,
-   per-position k floors, position-loss reweighting. Negatives to
-   RESULTS.
+   per-position k floors (ruled out for T1 per C1-D), position-loss
+   reweighting. Negatives to RESULTS.
 5. Ledger actuals at session close; STATUS rewrite before next
    compact.
 
