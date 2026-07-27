@@ -109,6 +109,19 @@ generation batch (model, rollout count, est + actuals) in
 MODAL_SPEND.md under a new OPENAI section. Rotates with the
 post-weekend batch.
 
+**INTERIM BACKEND (Han, 07-28 ~00:1x): the Anthropic key** —
+keychain **`anthropic-api-key`** (Han's key, pre-existing on the
+mac) is the ACTIVE generation backend "for the time being"
+(verified live: HTTP 200, message round-trip OK). Same rules: MAC
+AGENTS ONLY, never on pods, env-inject only (`export
+ANTHROPIC_API_KEY="$(security find-generic-password -s
+anthropic-api-key -w)"`), never echo/file/argv. **The $300
+generation cap is ONE SHARED envelope across backends** (hub
+interpretation, flagged). Ledger section renamed GENERATION with a
+backend column. Swap back to `dmitry-mats-openai-key` per-corpus
+when Dmitry's fresh key verifies. Include this key in the
+post-weekend rotation review (Han's call — personal key).
+
 **Deadlines.** Rebuttal-grade numbers ideally before the 9am PT
 (17:00 London) team meeting 2026-07-27; the AoE deadline is
 ~36–40 h out. Draft-response support beats completeness.

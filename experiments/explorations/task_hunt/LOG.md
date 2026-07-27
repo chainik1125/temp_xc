@@ -15142,3 +15142,22 @@ patched env-first (the sweep continues to catch instances —
 good); R30 twin driver committed w/ pre-registration note.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 00:02 London (date-verified) — mac-local — Anthropic key VERIFIED LIVE and bound as INTERIM generation backend (Han order)
+
+Han: use the Claude API key for the time being. Verified live
+(models list HTTP 200; 1-message round trip OK; value never
+printed, length/hash checks only). Governance added to
+actmix-shared: keychain `anthropic-api-key`, mac-only, env-inject,
+never on pods; **$300 generation cap = ONE SHARED envelope across
+backends** (hub interpretation, flagged); ledger section =
+GENERATION with backend column; swap to `dmitry-mats-openai-key`
+per-corpus when the fresh OpenAI key verifies. mac-c briefing
+re-amended (haiku-4-5 bulk / sonnet-5 where realism needs it,
+justified per-card). Claude-generated conversations are a
+REALISM UPGRADE for the sycophancy/refusal-class behaviors on
+the Tier-C list — evalage and successors may switch backends at
+their next card revision without re-ratification (backend line
+in-card suffices).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
