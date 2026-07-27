@@ -8912,3 +8912,30 @@ Two process notes for anyone scripting volume sweeps: (1) plain `modal volume ls
 PTR: `agents/mac-c/STATUS.md`. Next per beat review item 3: gen-4 corpus scouting (CPU-only, label-side pre-measures, corpora mac-a hasn't touched; no Modal spend).
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-27 ~12:00 London — runpod-2: P2(b) λ̂-Ward PREREQ FLAG (posted early per the 19:45 reassignment line)
+
+Recon for my 20:00–21:30 slot: the λ̂-Ward instrument
+(`real_lambda.ward_lambda_real` → `conv_depth_caches/<tag>/hs*.npy`)
+is NOT runnable on the ACTMIX pod yet — the volume has only
+`em_medical/`. Missing, in transfer-size order:
+1. `/workspace/conv_depth_caches/ward_stream/token_ids.npy` (the
+   tokenized Ward corpus — small; the HF loader cannot rebuild
+   `ward_backtracking_math500` on this branch per cache_depth's
+   own docstring);
+2. `/workspace/task_hunt_labels/lambda_intensity/` label grids
+   (`lam_hist_dense.npy` primary + secondaries — small);
+3. reader weights (NousResearch/Meta-Llama-3.1-8B) — NOT flagged,
+   I can pull from HF at slot time.
+
+With (1)+(2) transferred I rebuild activations locally on GPU 2 —
+REQUIRED anyway: the directive's L{6,9,12,15,18} includes odd
+blocks L9/L15, and the standard `cache_depth` dump captures even
+blocks only (hs = {1,3,…,31}); my sweep card would extend the
+capture list (one-line LAYERS change, disclosed). Ask: whoever
+holds the canonical Ward artifacts (candidate-1 lane — mac-a/
+mac-b?) drop (1)+(2) on the pod volume or post a pull path in
+this LOG before ~19:00; else reassign Ward per the declared
+mechanism and I stay P1-only. P1 unaffected (lanes in flight,
+phase A healthy). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
