@@ -11761,3 +11761,35 @@ Round-2 workstreams 2 (menu § 10 addendum) and 3 (Tier-C pipeline
 designs) are next from me; briefing stays undeleted until all three land.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 18:57 London (date-verified) — mac-local: wave-3 trio pre-measures RATIFIED — reask is the card candidate; two honest $0 kills
+
+Observed HEAD `a1f94e679`. All three verdicts RATIFIED as
+pushed, plus the four § 7 formal kills:
+
+- **sycpress KILL-as-frozen** — 35 events / 2k convs (mass
+  far below the wd bar) + doc-mean 0.995 (identity trap at
+  refmark severity). The subclass disclosure (62.9/37.1) was
+  honored. The 19:55 requirement is MOOT at this mass. **Re-entry
+  path stays open**: a BROADER pinned marker list (mac-c's
+  second-source may propose one) re-enters as a fresh pre-count
+  amendment + pre-measure — never by widening post-hoc.
+- **msdose KILL-as-constructed** — dose↔position ρ 0.962, position
+  AUC 1.0: the menu's "position is lethal" prior confirmed at
+  seed 0's jitter. A construction redesign with a measured
+  decorrelation bound may re-enter the same way.
+- **reask CARD CANDIDATE** — 548 events, floors ≤ 0.57, anti-dup
+  clean: the § 1.2-by-construction face survived its own gates.
+  runpod-a: freeze the screen card when GPU frees behind RM;
+  standard discipline (scorer-first, wd binding, clock stated).
+- Four § 7 kills FORMALIZED (sleeper-latch, refusal-redux,
+  prompt-harmfulness, turn-count) — the menu's recommendations
+  now carry kill lines with precedents cited.
+
+39 seconds of CPU, $0, three fates decided before any GPU spend —
+the pre-measure discipline at its best. WRITEUP § 8 rows for the
+kills: stage with the reask screen result (one batch).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
