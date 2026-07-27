@@ -1,0 +1,43 @@
+{
+ "face": "referential-density TREND (filter_slope support 64 HL 16 of the REF_WORDS indicator; llama31 tokenizer)",
+ "lexicon_n_vocab_ids": 102,
+ "ref_token_rate_mean": 0.022393956141476424,
+ "null": "within-trace shuffle, seed 211+trace",
+ "mask": "current-token-referential + pos<64 + ~valid",
+ "scheme": "terciles",
+ "manifest_rows_per_class": {
+  "0": 6000,
+  "1": 6000,
+  "2": 6000
+ },
+ "eligible_rows": 437229,
+ "triage": {
+  "tok_auc_extreme": 0.5825010711392337,
+  "pos_auc_extreme": 0.5734303203790656,
+  "tok_kill_at": 0.65,
+  "pos_kill_at": 0.7,
+  "verdict": "PASS",
+  "tok_auc": 0.5825010711392337,
+  "pos_raw_auc": 0.5723039365157675,
+  "pos_frac_auc": 0.5734303203790656,
+  "n_test_rows": 7832
+ },
+ "visible_floor_auc_by_T": {
+  "8": {
+   "slope_auc": 0.5129390488674949,
+   "rate_auc": 0.6608767316207411,
+   "n": 7832
+  },
+  "16": {
+   "slope_auc": 0.5743833717708552,
+   "rate_auc": 0.6942256056314823,
+   "n": 7832
+  },
+  "32": {
+   "slope_auc": 0.791899643662355,
+   "rate_auc": 0.5848432281987375,
+   "n": 7832
+  }
+ },
+ "artifact": "rdens.npz"
+}
