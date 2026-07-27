@@ -8698,6 +8698,62 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 
 ---
 
+## 2026-07-27 ~11:40 London — mac-local: HUNT BUDGET RAISED — up to $200 for the next 10 h (Han directive); gen-4 SCALES UP NOW
+
+Observed HEAD `72f56d33d`. Han, verbatim: "the budget for the
+continuing task hunt should be significantly large -- we don't
+care at all if we have to spend 200USD in the next 10 hours."
+(NB: the two prior entries' stamps ~11:55/~12:05 were written
+~11:10–11:15 — stamp drift in the pre-compact rush; commit order
+is authoritative.)
+
+**Envelope: up to $200 Modal for hunt lanes (mac-a primary +
+mac-b hunt support), window now → ~21:30 London.** Supersedes the
+≤$15 gen-4 line and the daily cap FOR HUNT LANES ONLY;
+`actmix-shared.md` budget section amended this commit. Ledger
+discipline unchanged: line per launch, actuals corrections, I
+review per push. This is permission, not pressure — the prime
+directive stands (a sound verdict, never a win); $0 label kills
+remain first-class outcomes.
+
+**mac-a — gen-4 scaled up:**
+1. Slate widens 3–4 → **6–8 candidate faces** (trailing-functional
+   recipe; the gen-4 seed ideas plus your own; label pre-measures
+   FIRST as always).
+2. Survivors screen on **BOTH substrates from the start** (gpt2/hs7
+   AND gemma2/hs14) — no pick-one economy under this envelope.
+3. Full T-ladder {4,8,16,32} + **shuffle twin on every screen that
+   passes label sanity** — order receipts at screen time, not
+   deferred to a later beat.
+4. Any KEEP with order ≥ 2/3 → **run the third-model leg (llama31)
+   immediately** without waiting for my review beat — panel-grade
+   breadth on fresh faces by tonight is the goal.
+5. Resume the parked §6b screen (partial persisted, resumable).
+6. cnov panel: **STILL 17:00-pick-gated.** Nothing here changes
+   that; gen-4 is parallel breadth, and the panel spend remains one
+   line post-pick.
+
+**mac-b:** evidence-line support on request PLUS an adversarial-
+replication leg on any mac-a KEEP (independent seed, same frozen
+scorer committed before the deciding result); stage a
+REBUTTAL_PACK row for any order-carrying KEEP.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~11:40 London — mac-local: runpod-2 CHASE — GPU 2 idle; RLHF P1 lanes NOT launched
+
+Pod check 11:33 London: GPU 1 = 99 % / 30.7 GB, GPU 0 training
+(`actmix_p1_gpu0.log` advancing, steps 16k–17k), **GPU 2 =
+0 % / 0 MiB.** runpod-1's P1 probing lanes are live; runpod-2's
+RLHF top-ups are not. **runpod-2: launch P1 NOW** per the
+saturation plan — RLHF seed-2 @ T{1,2,5,8,16} + s1 @ T{8,16},
+then the INTERIM 2-seed `fig_rlhf_shuffle_tsweep` for the 17:00
+draft. If blocked on anything, write ONE line in this LOG saying
+what, rather than staying quiet.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 ## 2026-07-27 ~11:50 London — runpod-2: P1 RLHF seed-extension LAUNCHED (directive 059a66239)
 
 Card amendment A1 (in-card seed EXTENSION, § 7, pushed this

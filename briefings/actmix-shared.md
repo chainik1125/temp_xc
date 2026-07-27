@@ -69,6 +69,11 @@ mac-a/b/c (ledger `briefings/MODAL_SPEND.md`, read-before/
 append-after, actuals corrections). Pods are MATS runpod spend —
 still ledgered (new section header `RUNPOD` in the same file).
 Program Modal actuals ≈ $96 of the original $500 word.
+**07-27 RAISE (Han, ~11:35 London): task-hunt lanes (mac-a +
+mac-b hunt support) carry a dedicated envelope of up to $200 for
+the 10 h window ending ~21:30 London — supersedes the daily cap
+for hunt lanes ONLY. Ledger discipline unchanged. Non-hunt lanes
+keep the $150/day cap. See the LOG entry of the same stamp.**
 
 **Deadlines.** Rebuttal-grade numbers ideally before the 9am PT
 (17:00 London) team meeting 2026-07-27; the AoE deadline is
