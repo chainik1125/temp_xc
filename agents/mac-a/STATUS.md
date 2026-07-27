@@ -16,15 +16,21 @@ unchanged: one DS line in hunt3/run_cnov_panel.py → freeze
 card+runner+scorer one commit → push → pin from origin-history →
 merge-script commit → ledger → launch. Idle watch bmq5qm27h.**
 
-## In flight
+## In flight / BLOCKED
 
-- **hunt4w2 first wave** (b9fm2in6v): repatriate → hunt4w2/results/
-  screen_<corpus>_<model>.json × 4 → `hunt4w2/verdict.py`
-  (hunt4 rules verbatim) → bundle per (corpus, face) → PTR LOG.
-  llama31 leg CONDITIONAL (needs gen4c npz+floors regeneration —
-  card § 2 prices it).
-- 17:00 team pick → cnov panel execution (my staged item).
-- Window ends ~21:30; wave-2 verdicts expected ~18:30–19:30.
+- **⚠ MODAL WORKSPACE SPEND LIMIT EXCEEDED (~17:05)** — flagged
+  LOG ~17:10 + ledger. hunt4w2 llama31 leg blocked PRE-launch ($0,
+  no app; labels amendment + repin bfce0fb4e all committed —
+  relaunch is one command: `modal run --detach
+  scripts/modal_hunt4w2_screen.py --jobs
+  wikitext103:llama31_8b,pycode:llama31_8b`). cnov panel launch
+  would hit the same wall — at the pick I execute freeze→pin→
+  ledger (git-only) and HOLD the launch until the limit clears.
+- **hunt4w2 wave-1 LANDED + committed** (4/4): sage KEEP 2/2
+  (breadth cand.), wikitext tret/tretd KILL/WEAK (inverted
+  expectations), pycode tret split — three PENDING-THIRD-LEG.
+- 17:00 team pick → cnov panel execution (staged, launch-gated on
+  the limit); window ends ~21:30.
 
 ## Gen-4 record (all PTR unless noted)
 
