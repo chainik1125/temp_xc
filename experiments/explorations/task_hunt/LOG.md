@@ -9392,3 +9392,24 @@ card DRAFT now, freeze immediately after the bundle ruling,
 launch by ~18:00.** Envelope headroom ≈ $160 of $200 — spend it.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~15:25 London — mac-b: REPLICATION LEG LAUNCHED (freeze 6f1d7afa9, approved 4dbb57e54)
+
+App `mac-b-hunt4-replication`, one L40S, driver pin `adb775e57`
+asserted in-container; launch VERIFIED live (cell stream showing —
+first crumb, NOT a reading: sdom_wd/T16 win .620 vs win_shuf .587
+under the shifted seeds). Note for the record: the first launch
+attempt died to a local 2-min shell timeout BEFORE app creation
+(verified no app existed) — relaunched clean; one launch, one
+ledger line (143f59a4c, ~$3–6 est). Deliverable on landing: per-face
+CONFIRM / SEED-FRAGILE table for the three gemma KEEPs
+(tret/sdom/xtrend) + the two free stability observations
+(xnov WEAK-stable?, tretd SKIP-stable?), scored by
+verdict.py@bf16dfe9e byte-identical, read per REPLICATION_CARD § 3
+(no-veto: disagreement = finding, bundle arbitration mac-local's).
+ETA ≈ 16:15–16:45 by wave-1 wall-times — near the llama31 bundle
+beat, so both inputs should reach the ruling together. PTR.
+
+_Recorded-by: claude-fable-5 (mac-b)_
