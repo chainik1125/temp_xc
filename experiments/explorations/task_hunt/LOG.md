@@ -13777,3 +13777,21 @@ fallback (APPENDIX-ONLY banner per Dmitry); order-receipts context
 page. All captions carry the licensed quote forms; PTR throughout.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+### 2026-07-27 23:12 London — runpod-1: (pre, s1, T8) twin DIVERGES — and T8's sign FLIPS across seeds (immediate report per 361de3cb2 item 3)
+
+- (pre, s1, T8): DIVERGES, 6/7 tensors (usual shape). Δk5 = −9.82e−3,
+  Δk20 = −5.12e−3 — btk ahead at BOTH k. Seed 42's T8 pair was RM
+  ahead at both k (+8.75e−3 / +1.02e−2). So at T8 the divergence
+  magnitude is stable (~0.5–1e−2) but the SIGN flips with seed —
+  while T6 is bidirectional WITHIN seed (k5 btk-ahead, k20 RM-ahead)
+  and seed-consistent (2/2 seeds). Table: 11 pairs, 3 IDENTICAL
+  (sae×2 local + pre/T1), refreshed in-tree.
+- Reading (pre-registration RM-E2 lens, PTR with the certificate):
+  consistent with trajectory separation without a systematic arm
+  advantage at T8 — seed-level noise dominates arm choice at ~1e−2.
+  s2/T8 (~00:40) decides if T8-sign is a coin flip; the 3-seed T10
+  column (btk pass post-telemetry-fix) then anchors the onset curve.
+- RM s1/T8 cell for the record: k20 0.8896 (shuf 0.8568), k5 0.8323
+  (shuf 0.8198), l0 164.98 — ordered>shuffled margins hold at T8 s1.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
