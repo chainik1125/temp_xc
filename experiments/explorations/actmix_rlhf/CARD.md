@@ -193,3 +193,31 @@ disclosed on-figure while s1 cells are in flight; refresh when
 s1_T16 lands), FINAL re-render when seed 2 lands. `analyze.py`
 per-seed table sections extended to seed 2 (explicit whitelist —
 the stray seed-0 smoke rows stay excluded).
+
+**A2 — T{6,10} grid extension (2026-07-27 ~20:10 London; Han
+directive via mac-local eace1b077; in-card amendment, nothing
+result-contingent — the T choice is Han's, stated as such).**
+Trained txc cells T ∈ {6, 10} × seeds {42, 1, 2}, k_pos = 100·T
+(600 / 1000), shuffle in-eval as everywhere, same datasource /
+d_sae / n_steps. Lanes x6=[T6@s42,s1,s2] ‖ x10=[T10@s42,s1,s2]
+(fracs 0.35/0.50 — measured footprints: T6 ≈ 12 GB, T10 ≈ 19 GB).
+Measured-rate est: T6 ≈ 60 min, T10 ≈ 99 min ⇒ ≈ 8 GPU-h, ~5 h
+wall 2-lane. RUNS ONLY AFTER the FINAL 3-seed render AND the A3
+equivalence check (mac-local sequencing). FINAL fig re-renders at
+7 T-points on landing.
+
+**A3 — relu-mix equivalence check (2026-07-27 ~20:10 London;
+mac-local c6e464881: "check first, train only on measured
+divergence").** Before ANY RLHF relu-mix training beyond it: lane
+eq = relu-mix twins of sae_k500 and txc_T5 at seed 42 (plain-arch
+names batchtopk_sae / txc_batchtopk_post, identical shapes /
+n_steps / seed / datasource; cell_ids rlhf_relumix_*). Then
+`rlhf_equivalence.py` (runpod-1's rm_equivalence tensor-compare
+core, row-matching adapted to RLHF rows: pair by arch-twin map +
+seed + overrides; no eval_cfg arm key in this lane's rows) emits
+RLHF_EQUIVALENCE.{md,json}. **Identity (all tensors torch.equal)
+⇒ the queued relu-mix overnight card is CANCELLED** per the R30
+pattern — certificate + the btk-only curve = the both-arms
+deliverable. Divergence ⇒ train relu-mix ONLY on measured-
+divergent configs (scoped card to follow). Est ≈ 1 GPU-h (twins)
++ CPU compare.

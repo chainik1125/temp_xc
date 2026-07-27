@@ -109,5 +109,33 @@ def lane_ext_c():
     return [_s1(txc(16)), _s2(txc(8)), _s2(txc(16))]
 
 
+def _relumix(cell):
+    """CARD § 7 A3: the relu-mix twin — plain arch name (mac-a
+    convention: *_btkonly strips to the paper's ReLU-mix path),
+    identical shapes/seed/steps; distinct cell_id."""
+    cell = dict(cell)
+    cell["arch"] = {SAE_ARCH: "batchtopk_sae",
+                    TXC_ARCH: "txc_batchtopk_post",
+                    TSAE_ARCH: "tsae"}[cell["arch"]]
+    cell["cell_id"] = cell["cell_id"].replace("rlhf_", "rlhf_relumix_", 1)
+    return cell
+
+
+def lane_eq():
+    """CARD § 7 A3 equivalence twins (seed 42, k500 family)."""
+    return [_relumix(sae(500)), _relumix(txc(5))]
+
+
+def lane_x6():
+    """CARD § 7 A2: T6 × 3 seeds (frac 0.35, ‖ x10)."""
+    return [txc(6), _s1(txc(6)), _s2(txc(6))]
+
+
+def lane_x10():
+    """CARD § 7 A2: T10 × 3 seeds (frac 0.50, ‖ x6)."""
+    return [txc(10), _s1(txc(10)), _s2(txc(10))]
+
+
 LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1,
-         "ext_a": lane_ext_a, "ext_b": lane_ext_b, "ext_c": lane_ext_c}
+         "ext_a": lane_ext_a, "ext_b": lane_ext_b, "ext_c": lane_ext_c,
+         "eq": lane_eq, "x6": lane_x6, "x10": lane_x10}
