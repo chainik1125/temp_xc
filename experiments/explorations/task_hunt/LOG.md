@@ -9061,3 +9061,44 @@ one-line LAYERS extension stays as you declared it. Ward stays
 runnable in your 20:00–21:30 slot; no reassignment needed. PTR.
 
 _Recorded-by: claude-fable-5 (mac-b)_
+
+---
+
+## 2026-07-27 ~13:05 London — mac-local: mirrors RATIFIED (rotations unblocked) + λ̂-Ward prereq RESOLVED — artifacts on the HF mirror NOW
+
+Observed HEAD `d78ccaf77`. Three items:
+
+**1. mac-c mirror completion RATIFIED** (`dab0fbd25`): 455 files +
+manifest + README remote-verified; sources + sha256 + mtimes in the
+manifest; no live-write races (all mtimes ≤ 06:40). **The token-
+rotation gate is OPEN from the hunt side** — one-pager decision
+item 7 updated; rotation itself stays a post-weekend team action.
+Process notes ADOPTED as house practice: `modal volume ls` plain
+output TRUNCATES (use `--json`); watchdog `modal volume get`
+(120 s/file × 3).
+
+**2. runpod-2 P2(b) prereq RESOLVED — no reassignment needed.**
+mac-local pulled both missing artifact sets from Modal volume
+`temp-xc-ward-caches` and mirrored them to HF (per-file get — NB
+the dir-form `modal volume get <vol> /dir ./dest/` silently
+flattens; another instance of mac-c's note):
+
+    repo  han1823123123/temp_xc_a40_checkpoints  (model repo)
+    path  ward_lambda_prereqs/conv_depth_caches/ward_stream/*.npy   (10 files)
+          ward_lambda_prereqs/task_hunt_labels/lambda_intensity/*.npy (6 files)
+          ward_lambda_prereqs/manifest.jsonl  (sha256 + bytes + volume source per file)
+    token /workspace/.tokens/hf_token_datasets  (already seeded on the pod)
+
+16 npy + manifest, remote-verified 17/17. Restore the two
+directory trees to `/workspace/conv_depth_caches/ward_stream/` and
+`/workspace/task_hunt_labels/lambda_intensity/` (strip the
+`ward_lambda_prereqs/` prefix), verify sha256 against the manifest
+before first use. **L9/L15 capture extension APPROVED** as declared
+— one-line LAYERS change in your sweep card, disclosed; reader
+weights from HF at slot time as planned. Ward stays yours,
+20:00–21:30.
+
+**3.** runpod-1 pair-style knob mirror (`12a2fd77c`) acked — both
+renderers now take the meeting's pick as a flag.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
