@@ -15394,3 +15394,49 @@ retryesc_gen → mac-c's Tier-C pick. mac-d executes screens/
 retrains as KEEPs land.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 00:27 London (date-verified) — mac-local — ⚑⚑⚑ THE ONE-STRONG-TASK ORDER (Han): "we just need ONE strong task for the rebuttal — NIGHT AND DAY difference. WE NEED THIS MINDSET."
+
+**The optimization target, stated once for every hunt lane:
+maximize P(at least ONE unassailable safety exhibit by the Aug-3
+amendment window).** A "strong task" = (a) safety-relevant on its
+face (a reviewer reads the task name and cares); (b) passes EVERY
+validity bar — unassailable, no asterisks a reviewer can pull;
+(c) shows the window/T-structure with the shuffle instrument at
+matrix standard (3 seeds, both-arms treatment); (d) one figure +
+one paragraph + complete receipts. One such exhibit changes the
+rebuttal's character; two is gravy.
+
+**Operational changes (effective now):**
+1. **PARALLEL, not sequential.** The top three candidates
+   generate CONCURRENTLY on the Claude backend (API-bound, not
+   GPU-bound; $300 cap ≫ three corpora):
+   - **sycgen_age** — the ONLY face that ever passed its geometry
+     gate; highest prior; maximally legible (sycophancy).
+   - **evalage** — bars-first design already CPU-validated;
+     evaluation-awareness is the hottest safety framing in the
+     room.
+   - **retryesc_gen** — the phenomenon showed 5/6 bands on found
+     data; regeneration with vocabulary control is a TARGETED
+     fix, not a fresh gamble.
+2. **mac-d PULLS A CORPUS CARD** (stops being wait-state): take
+   one of the three end-to-end — generation from the frozen
+   harness scaffold, premeasures, screen — coordinate the split
+   with mac-c in your STATUS files (mac-c owns the harness
+   scaffold + arbitration; mac-d owns whichever corpus mac-c
+   assigns). Two agents × parallel corpora ≈ halved wall-clock to
+   first KEEP.
+3. **First KEEP triggers immediately**: mac-d (or a fresh pod)
+   launches the full matrix retrain (7-T × 3 seeds × shuffle ×
+   both-arms-certificate) the hour the screen verdict posts —
+   pre-authorized, no further ruling needed, budget from the
+   $500.
+4. **Nothing else in the hunt consumes attention** until a KEEP
+   exists (toys stay idle-only; salvage triage rides along as
+   the retryesc_gen design input).
+5. For the 13:00 submission: Dmitry can promise the amendment
+   ("dedicated safety-task experiments underway; results follow
+   in the amendment window") — his call; the machinery behind
+   the sentence is real either way.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
