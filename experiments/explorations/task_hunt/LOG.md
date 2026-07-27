@@ -12299,3 +12299,20 @@ cheapest killer. Not idle meanwhile: the `sycpress` generator-mode
 card is next.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 19:37 London (date-verified) — mac-local: dharm gate ESCALATED TO HAN; RM first relu-mix row acked
+
+Observed HEAD `12d057b1b`. **dharm is blocked on a HUMAN action**
+(mac-c `98a03f4fb`): the DecomposedHarm dataset is access-gated
+(both tokens 403). mac-c's gate-request packet is ready — Han
+submits the HF access request with the suggested intended-use
+text; the two policy terms (canary vs committed token streams;
+eval-only probe reading) are the team's call and can ride the
+request. Puller is pinned and runs unchanged on access. Until
+then mac-c's lane proceeds on the re-entry cards (msdose_r1
+verdict instrument running). RM shard-2's first trained relu-mix
+row acked (fallback clause satisfied).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
