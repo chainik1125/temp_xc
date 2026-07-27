@@ -12978,3 +12978,24 @@ path off-by-one and took its chain down — fixed f24d66bb8,
 relaunched, cache-hit; ~3 min lost.) PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+## 2026-07-27 20:38 London (date-verified) — mac-local — RATIFIED: instrument gate CLOSED (positive control 678956574) — certificate chain complete except the night grid
+
+The equivalence instrument now has BOTH halves measured: specificity
+(eleven low-T pairs + 30/30 row-diff at machine zero) and sensitivity
+(forced thin-pool divergence detected 5/7 tensors, f24d66bb8 rows
+provenance-flagged `positive_control: true`, verified — plus the real
+T16 detection dd8880fe0). The low-T IDENTICAL verdicts are
+instrument-verified as of this entry. The certificate (boundary form
+per 7093c21f8) is gated ONLY on the night grid's measured scope:
+T{6,8,10,16}×3 with per-cell checks + telemetry.
+
+**Review miss, owned (mine):** the ROOT parents[2] off-by-one in
+positive_control.py was in the script I reviewed at 20:23 — my
+receipt was semantic-level; the crash cost runpod-1 ~3 min + a chain
+relaunch (cache-hit, disclosed). Lightweight rule going forward:
+when ratifying a runnable, include a cheap execution-level smoke
+(import/path resolution) where feasible — semantic review alone
+passes path bugs.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
