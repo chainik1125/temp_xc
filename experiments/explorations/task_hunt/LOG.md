@@ -10176,3 +10176,48 @@ runpod-a: unchanged (leg → cnov on GO). runpod-2: unchanged
 (drain ~20:45 real → RLHF FINAL render).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~16:25 London — runpod-a: HUNT4W2 BUNDLE VERDICT (all 3 models; mechanical, frozen scorer) — 2 KEEPs, both BREADTH; gen-4 wave-2 CLOSED. ALL PTR.
+
+Third leg landed on-pod (venue amendment 057a4371c, approved
+eeb4ee3c4): both jobs from the bfce0fb4e worktree, 256 cells, 14 min
+wall on GPU 0, actuals ≈ $1 vs $3–8 est (−$5 corr, ledger this
+commit; H100 ≈ 10× the L40S basis, matching runpod-1's note).
+Screen JSONs + verdict.json repatriated from the worktree this
+commit. `hunt4w2/verdict.py` (frozen 22b38d65e, byte-identical at
+the pin), mechanical:
+
+| face | gpt2 / gemma2 / llama31 | bundle | routing |
+|---|---|---|---|
+| **sage** (wt) | KEEP +.105 / KEEP +.093 / KEEP +.087 | **KEEP 3/3** | **BREADTH** — order 0 models (best wd margin +.011); mechanical best arms are T64 but the existential rule ALSO fires at T32 on all three (gains +.075/+.080/+.087 vs floors .417–.423, null widths +.26–.27) — the KEEP stands INSIDE the pre-registered T ≤ 32 claim zone, no run-not-claim tension |
+| **tret_py** | KILL / KEEP +.054 (T32/win_mlp) / KEEP +.090 (T32/actxmean_mlp) | **KEEP 2/3** | **BREADTH** — order 0 (max wd margin +.014); wd gains +.062/+.093; the comparability anchor holds on code |
+| tret_wt | KILL / WEAK +.039 / KEEP +.067 (T32/win_mlp, floor .413 beaten, wd +.062) | **WEAK** (no majority) | numbers-only. For the record: llama's KEEP arm is the program's FIRST in-ladder tret arm (dialogue KEEPs rode T64) — but single-model, and its order margin is +.011 @T32, under the +.03 bar |
+| tretd_wt | KILL / WEAK +.024 / KILL | **KILL 2/3** | dead — both KILLs by tok_within_002: the depth signal is TOKEN-readable (window adds ≤ +.02 over tok on 2/3 models). The scout's priority-1 face (chance-flat visible floor) dies to a trap the label-side floor cannot see; the § 1 starvation fix did work (screened, no SKIP) — it died on the merits |
+
+**The card § 1 sharpened question, answered mechanically:**
+(i) reproduce the KEEP? pycode YES (2/3); wikitext NO (WEAK — the
+3×-event-rate transplant does not carry the dialogue bundle).
+(ii) move INTO the claiming ladder? YES wherever a KEEP fired —
+every wave-2 KEEP arm sits at T ≤ 32 (vs dialogue's T64 arms).
+(iii) add the missing T ≤ 32 order? **NO — order 0 models on all
+four faces (max wd win−shuf +.014 anywhere).** The return/intensity
+family's state generalizes across substrates AT LEVEL, never at
+ORDER — three substrates, one instrument, same signature.
+
+**Wave-2 CLOSED** (with the pre-screen drev $0 kill): 5 scout faces
+→ 4 screened → 2 breadth KEEPs (sage 3/3, tret_py 2/3) + 1 KILL
+(tretd_wt) + 1 WEAK (tret_wt). No order receipts ⇒ NO panel-gate
+candidates and NO draft panel cards (§ 5 rule). gpt2 = the weak
+substrate again (KILL on 3 of its 4 faces; gen-3/gen-4 pattern).
+
+**Hand-offs:** runpod-b — this is your freeze gate (c9f92105d);
+bundle-KEEP legs by your pre-registered target rule = wikitext
+sage {gpt2, gemma2, llama31} + pycode tret {gemma2, llama31}.
+mac-b's § 8 tretd draft-row tail ("bundle pending at press time")
+can now read: ran in wave-2, KILLED 2/3 (token-readable). Envelope
+state: hunt actuals ≈ $21 of $200 (mac-a Modal ≈ $20 + pod ≈ $1).
+NOTHING here is quotable: PENDING TEAM REVIEW end-to-end.
+
+_Recorded-by: claude-fable-5 (runpod-a)_

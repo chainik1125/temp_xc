@@ -180,31 +180,121 @@
       "verdict": "KEEP"
      }
     },
-    "llama31_8b": "MISSING"
+    "llama31_8b": {
+     "tret": {
+      "tok_best": 0.3944,
+      "window_best": 0.4613,
+      "window_best_arm": "T32/win_mlp",
+      "gain": 0.0669,
+      "exists_qualifying_arm": true,
+      "null_win": 0.33488890528678894,
+      "null_ok": true,
+      "floor_at_best_T": 0.41333332657814026,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.6834999918937683,
+       "best": 0.7458333373069763,
+       "best_arm": "T32/actxmean_mlp",
+       "gain": 0.0623,
+       "order_margins": {
+        "T4": 0.0058,
+        "T8": -0.006,
+        "T16": 0.0025,
+        "T32": 0.0112
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "KEEP"
+     },
+     "tretd": {
+      "tok_best": 0.3967,
+      "window_best": 0.4153,
+      "window_best_arm": "T16/actxmean_mlp",
+      "gain": 0.0187,
+      "exists_qualifying_arm": false,
+      "null_win": 0.32955557107925415,
+      "null_ok": true,
+      "floor_at_best_T": 0.3508888781070709,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.6234999895095825,
+       "best": 0.6868333220481873,
+       "best_arm": "T64/actxmean_mlp",
+       "gain": 0.0633,
+       "order_margins": {
+        "T4": -0.0037,
+        "T8": -0.0055,
+        "T16": 0.0068,
+        "T32": 0.0045
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [
+       "tok_within_002"
+      ],
+      "order_pass_wd": false,
+      "verdict": "KILL"
+     },
+     "sage": {
+      "tok_best": 0.5333,
+      "window_best": 0.6204,
+      "window_best_arm": "T64/actxmean_mlp",
+      "gain": 0.0871,
+      "exists_qualifying_arm": true,
+      "null_win": 0.3464444577693939,
+      "null_ok": true,
+      "floor_at_best_T": 0.49311110377311707,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.8188333511352539,
+       "best": 0.8976666331291199,
+       "best_arm": "T64/actxmean_mlp",
+       "gain": 0.0788,
+       "order_margins": {
+        "T4": 0.0027,
+        "T8": -0.0005,
+        "T16": -0.0015,
+        "T32": 0.0003
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "KEEP"
+     }
+    }
    },
    "bundle": {
     "tret": {
      "verdicts": {
       "gpt2": "KILL",
-      "gemma2_2b": "WEAK"
+      "gemma2_2b": "WEAK",
+      "llama31_8b": "KEEP"
      },
-     "bundle_verdict": "PENDING-THIRD-LEG",
+     "bundle_verdict": "WEAK",
      "order_pass_models": 0,
      "table": "\u2014"
     },
     "tretd": {
      "verdicts": {
       "gpt2": "KILL",
-      "gemma2_2b": "WEAK"
+      "gemma2_2b": "WEAK",
+      "llama31_8b": "KILL"
      },
-     "bundle_verdict": "PENDING-THIRD-LEG",
+     "bundle_verdict": "KILL",
      "order_pass_models": 0,
      "table": "\u2014"
     },
     "sage": {
      "verdicts": {
       "gpt2": "KEEP",
-      "gemma2_2b": "KEEP"
+      "gemma2_2b": "KEEP",
+      "llama31_8b": "KEEP"
      },
      "bundle_verdict": "KEEP",
      "order_pass_models": 0,
@@ -276,17 +366,47 @@
       "verdict": "KEEP"
      }
     },
-    "llama31_8b": "MISSING"
+    "llama31_8b": {
+     "tret": {
+      "tok_best": 0.4818,
+      "window_best": 0.572,
+      "window_best_arm": "T32/actxmean_mlp",
+      "gain": 0.0901,
+      "exists_qualifying_arm": true,
+      "null_win": 0.33213773369789124,
+      "null_ok": true,
+      "floor_at_best_T": 0.5043041706085205,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.718999981880188,
+       "best": 0.8121666312217712,
+       "best_arm": "T16/actxmean_mlp",
+       "gain": 0.0932,
+       "order_margins": {
+        "T4": -0.0018,
+        "T8": 0.0057,
+        "T16": 0.0013,
+        "T32": 0.004
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "KEEP"
+     }
+    }
    },
    "bundle": {
     "tret": {
      "verdicts": {
       "gpt2": "KILL",
-      "gemma2_2b": "KEEP"
+      "gemma2_2b": "KEEP",
+      "llama31_8b": "KEEP"
      },
-     "bundle_verdict": "PENDING-THIRD-LEG",
+     "bundle_verdict": "KEEP",
      "order_pass_models": 0,
-     "table": "\u2014"
+     "table": "breadth"
     }
    }
   }
