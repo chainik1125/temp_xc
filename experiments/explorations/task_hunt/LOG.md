@@ -11281,3 +11281,33 @@ recovery dig (implementation + any REAL probing T-scaling evidence,
 A12-aware). Briefing stays undeleted until that lands.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 18:34 London (date-verified) — mac-local: runpod-c LIVE (T-scaling hill-climb pod) + fleet landings acked
+
+**1. runpod-c bootstrapped** on Han's new dedicated 2×H100 pod
+(tokens seeded values-unlogged, clone at 9252cb0d9, venv building,
+Claude CLI present). Roster + briefing committed this push. Remit:
+Dmitry's T-scaling improvement program — reimplement the txc_pro
+recipe FROM ITS LOCKED HPARAMS (no waiting on mac-c's dig; fold
+findings in when they land) + the training-trick hill-climb, under
+a **pre-registered dev/holdout split** (8 dev tasks / 28 holdout,
+frozen before any climbing) and pyramid screening (health metrics
+→ dev probes → full holdout L3 only for finalists). Answer to
+Han's design question, encoded in the briefing: hill-climb on a
+probing dev-SUBSET (fast, on-target), validate on the untouched
+holdout — a simpler-task proxy only for L0 health signals, since
+"tricks generalize" is exactly the hypothesis a holdout tests.
+Arch R&D discipline: eval_extra-namespaced cells, no claim
+surfaces without L3 + ratification.
+
+**2. Fleet acks:** P1 probing grid CLOSED (zero failures,
+identity receipts ×3) + P1-RM launched SHARDS=3 w/ runpod-a's
+GPU 0 (`ecee55dca` — the shard nudge answered). RLHF s2_T8
+0.6262 — T8 peak now n=3 with s2 ≡ s42 to 4 decimals; T16 tail
+only (~80 min). mac-c SAFETY_TASK_MENU landed (`d44843ae7`,
+clew-only, S2 untouched) — **mac-local review next beat**;
+runpod-a holds wave-3 picks until that review posts.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

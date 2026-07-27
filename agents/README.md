@@ -40,6 +40,14 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
 - **`mac-c`** — local Mac agent (spawned 2026-07-26 evening for the
   ACTMIX archaeology). Same clone layout + `.agent_id`; $0-compute
   workstream (`briefings/actmix-mac-c.md`).
+- **`runpod-c`** — the T-SCALING HILL-CLIMB agent, ALONE on a
+  dedicated 2×H100 pod (Han-provisioned 2026-07-27 evening; 52 CPU /
+  503 GB / 1 TB; both GPUs). Mission: make TXC T-scaling improve on
+  sparse probing (txc_pro recipe reimplementation + training-trick
+  hill-climb) under a pre-registered dev/holdout split — arch R&D,
+  no claim surfaces without L3 holdout validation + ratification.
+  Clone `/workspace/agents/runpod-c/temp_xc` + `.agent_id`; tokens
+  `/workspace/.tokens/`; briefing `agents/runpod-c/STATUS.md`.
 - **`runpod-1` / `runpod-2`** — TWO agents sharing ONE 3×H100 pod
   (Han-provisioned 2026-07-26 evening; 84 CPU / 564 GB RAM / 2 TB
   persistent volume) for the paper-task ablations: **runpod-1 =
