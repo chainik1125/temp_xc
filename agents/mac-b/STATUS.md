@@ -43,6 +43,19 @@ SAME frozen scorer committed before the deciding result (pin from
 origin history + _assert_pinned, ledger line per launch); (3) stage
 a REBUTTAL_PACK row for any order-carrying KEEP.**
 
+**~16:35 REPLICATION DELIVERED (4d544ae08, PTR):** tret **CONFIRM**
+(same T64 arm, +.084 vs +.097); xtrend **state-CONFIRM /
+order-NOT-replicated** (+.031→+.004 @T32 — panel-gate input, NEW
+info); sdom **SEED-FRAGILE state / order-ROBUST** (+.059→+.042
+below bar; order_pass both runs) — converges with final bundle
+ab1597c65 (tret KEEP 2/3 breadth, xtrend KEEP 2/3 breadth order-1,
+sdom WEAK w/ 3/3 order) from an independent direction. xnov
+WEAK-stable, tretd SKIP-stable. Actuals ≈ $3 (ledger corr in).
+**Duty extends to WAVE-2 KEEPs** — wave-2 launched 16:00 (mac-a,
+driver 22b38d65e; 4 faces on wikitext-class substrates, within-DOC
+arms). 17:00 pick: staged cnov sequence unchanged (2a702607b) — if
+picked, panel-side support on request.
+
 **~15:05 REPLICATION LEG LAUNCHED (duty fired):** wave-1 gemma KEEPs
 = tret (+.097 T64 arm), sdom (+.059 @T8, order both models), xtrend
 (+.064, order 1 model); gpt2 3W/1K/1S; tretd SKIP-infeasible both;
