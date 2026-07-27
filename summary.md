@@ -91,6 +91,27 @@ rebuttal:
    code-level phenomenon wherever it appears.
    - ![denoising probe](plots/btk_rerun/btk_rerun_denoising_probe.png)
 
+6. **Budget scan (user-requested extension): the biggest untapped knob is
+   the budget RULE, and it is bench-dependent.** Sweeping explicit window
+   budgets (fixed k_win ∈ {4,8,16} vs the paper's k_win = k_pos·T),
+   d_sae ∈ {20,50,100} with matched-capacity composite controls, and pool
+   granularity (~350 cells): a **fixed sparse budget (k_win=4) beats every
+   incumbent — composite included — at matched d_sae on the Coupling
+   bench** (perwin-raw kw4: gauc 0.987 flat from T=2–10 at d50, 0.956–0.985
+   at the paper's d20), and the batch-pooled arm at kw4 finally delivers
+   the originally-hypothesized shape: **monotone T-scaling 0.47 → 0.985,
+   ending above the declining composite**
+   (`plots/btk_rerun/budget_scan_winners.png`). The cross-bench check
+   stops this being a slogan: on Denoising the same recipe wins low-T
+   direction recovery massively (eauc 0.916 vs 0.357 at T=1) but declines
+   with T where the k∝T rule keeps rising — many independent features
+   need a budget that grows with the window, low-rank temporal structure
+   does not. Honest negatives: small selection pools (batch 128, matched
+   tokens) made pooling worse; k_win=16 at d20 is bad; the pooled arm's
+   probe metric collapses on Denoising. Ranked tables:
+   `plots/btk_rerun/budget_scan.md`. (Scan cells: 2 seeds; winner stds
+   ±0.001–0.01 — top up before quoting externally.)
+
 **Verdict for the re-run gate** (pre-registration: *"the PAPER arch's
 T-curves should improve (that is Dmitry's re-run gate: does d(perf)/dT
 improve)"*): **MIXED on recovery metrics; CLEANLY SUPPORTED on the
