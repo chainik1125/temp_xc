@@ -1,0 +1,190 @@
+{
+ "card": "HUNT3_SCREEN_CARD.md \u00a7 4 (mechanical)",
+ "status": "PENDING TEAM REVIEW",
+ "models": {
+  "gpt2": {
+   "cnov": {
+    "tok_best": 0.5344,
+    "window_best": 0.6187,
+    "window_best_arm": "T32/actxmean_mlp",
+    "gain": 0.0842,
+    "exists_qualifying_arm": true,
+    "null_win": 0.3328889012336731,
+    "null_ok": true,
+    "floor_at_best_T": 0.49622222781181335,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.7403333187103271,
+     "best": 0.7958333492279053,
+     "best_arm": "T32/actxmean_mlp",
+     "gain": 0.0555,
+     "order_margins": {
+      "T16": 0.009,
+      "T32": 0.0262
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": false,
+    "verdict": "KEEP"
+   },
+   "nvtrend": {
+    "tok_best": 0.3786,
+    "window_best": 0.4751,
+    "window_best_arm": "T64/actxmean_mlp",
+    "gain": 0.0964,
+    "exists_qualifying_arm": true,
+    "null_win": 0.34276169538497925,
+    "null_ok": true,
+    "floor_at_best_T": 0.38953229784965515,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.5738333463668823,
+     "best": 0.612666666507721,
+     "best_arm": "T16/actxmean_mlp",
+     "gain": 0.0388,
+     "order_margins": {
+      "T16": 0.017,
+      "T32": 0.0148
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": false,
+    "verdict": "KEEP"
+   }
+  },
+  "llama31_8b": {
+   "cnov": {
+    "tok_best": 0.4707,
+    "window_best": 0.5713,
+    "window_best_arm": "T32/actxmean_mlp",
+    "gain": 0.1007,
+    "exists_qualifying_arm": true,
+    "null_win": 0.339555561542511,
+    "null_ok": true,
+    "floor_at_best_T": 0.526888906955719,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.6736666560173035,
+     "best": 0.7749999761581421,
+     "best_arm": "T32/actxmean_mlp",
+     "gain": 0.1013,
+     "order_margins": {
+      "T16": 0.0022,
+      "T32": 0.0307
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": true,
+    "verdict": "KEEP"
+   },
+   "nvtrend": {
+    "tok_best": 0.3965,
+    "window_best": 0.4613,
+    "window_best_arm": "T32/actxmean_mlp",
+    "gain": 0.0648,
+    "exists_qualifying_arm": true,
+    "null_win": 0.3252123296260834,
+    "null_ok": true,
+    "floor_at_best_T": 0.389807790517807,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.5718333125114441,
+     "best": 0.6493332982063293,
+     "best_arm": "T32/actxmean_mlp",
+     "gain": 0.0775,
+     "order_margins": {
+      "T16": 0.0123,
+      "T32": 0.0087
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": false,
+    "verdict": "KEEP"
+   }
+  },
+  "gemma2_2b": {
+   "cnov": {
+    "tok_best": 0.5147,
+    "window_best": 0.6087,
+    "window_best_arm": "T32/actxmean_mlp",
+    "gain": 0.094,
+    "exists_qualifying_arm": true,
+    "null_win": 0.3342222273349762,
+    "null_ok": true,
+    "floor_at_best_T": 0.5068888664245605,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.7183333039283752,
+     "best": 0.7863333225250244,
+     "best_arm": "T32/actxmean_mlp",
+     "gain": 0.068,
+     "order_margins": {
+      "T16": 0.0163,
+      "T32": 0.039
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": true,
+    "verdict": "KEEP"
+   },
+   "nvtrend": {
+    "tok_best": 0.3971,
+    "window_best": 0.4716,
+    "window_best_arm": "T32/actxmean_mlp",
+    "gain": 0.0744,
+    "exists_qualifying_arm": true,
+    "null_win": 0.3453333377838135,
+    "null_ok": true,
+    "floor_at_best_T": 0.3775555491447449,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.5808333158493042,
+     "best": 0.6356666684150696,
+     "best_arm": "T32/actxmean_mlp",
+     "gain": 0.0548,
+     "order_margins": {
+      "T16": 0.0043,
+      "T32": 0.0152
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": false,
+    "verdict": "KEEP"
+   }
+  }
+ },
+ "bundle": {
+  "cnov": {
+   "verdicts": [
+    "KEEP",
+    "KEEP",
+    "KEEP"
+   ],
+   "bundle_verdict": "KEEP",
+   "order_pass_models": 2,
+   "table": "panel-gate candidate"
+  },
+  "nvtrend": {
+   "verdicts": [
+    "KEEP",
+    "KEEP",
+    "KEEP"
+   ],
+   "bundle_verdict": "KEEP",
+   "order_pass_models": 0,
+   "table": "breadth"
+  }
+ }
+}

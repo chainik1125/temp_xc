@@ -1,0 +1,31 @@
+{
+ "cells": {},
+ "meta": {
+  "bundle": "chaz",
+  "target": "",
+  "Ts": [
+   2,
+   4,
+   8,
+   16,
+   32
+  ],
+  "layers": [
+   13,
+   11
+  ],
+  "primary": "top-vs-bottom class",
+  "bundle_stats_labels": null,
+  "bundle_triage": {
+   "tok_auc_extreme": 0.6298160440173642,
+   "pos_auc_extreme": 0.6354423971724009,
+   "tok_kill_at": 0.65,
+   "pos_kill_at": 0.7,
+   "verdict": "PASS",
+   "tok_auc": 0.6298160440173642,
+   "pos_raw_auc": 0.6354423971724009,
+   "pos_frac_auc": 0.6279447455855316,
+   "n_test_rows": 8104
+  }
+ }
+}

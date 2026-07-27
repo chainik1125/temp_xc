@@ -41,11 +41,24 @@ def score_model(c, face):
             v = _acc(c, f"{face}/T{T}/{arm}")
             if v is not None:
                 arms[(T, arm)] = v
-    (bt, ba), bv = max(arms.items(), key=lambda kv: kv[1])
+    # § 4 is EXISTENTIAL ("some matched-class window arm ..."): an arm
+    # KEEP-qualifies iff IT clears gain ≥ +0.05 AND width null ≥ +0.02
+    # AND ITS OWN T's visible floor, simultaneously.
+    qual = {}
+    for (T, arm), v in arms.items():
+        fl = _acc(c, f"{face}/T{T}/visible_evidence_floor")
+        if (v - tok >= 0.05 and null_win is not None
+                and v - null_win >= 0.02 and fl is not None and v > fl):
+            qual[(T, arm)] = v
+    if qual:
+        (bt, ba), bv = max(qual.items(), key=lambda kv: kv[1])
+    else:
+        (bt, ba), bv = max(arms.items(), key=lambda kv: kv[1])
     floor_at_bt = _acc(c, f"{face}/T{bt}/visible_evidence_floor")
     gain = bv - tok
     null_ok = null_win is not None and (bv - null_win) >= 0.02
     floor_ok = floor_at_bt is not None and bv > floor_at_bt
+    exists_qualifying_arm = bool(qual)
 
     wd_tok_c = [v for v in (_acc(c, f"{face}_wd/tok_linear"),
                             _acc(c, f"{face}_wd/tok_mlp")) if v is not None]
@@ -86,6 +99,7 @@ def score_model(c, face):
     return {
         "tok_best": round(tok, 4), "window_best": round(bv, 4),
         "window_best_arm": f"T{bt}/{ba}", "gain": round(gain, 4),
+        "exists_qualifying_arm": exists_qualifying_arm,
         "null_win": null_win, "null_ok": bool(null_ok),
         "floor_at_best_T": floor_at_bt, "floor_ok": bool(floor_ok),
         "wd": wd, "wd_ok": bool(wd_ok),

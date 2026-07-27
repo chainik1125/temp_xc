@@ -76,8 +76,25 @@ def main():
     core = fl.bundle_core(lam, lam_null, mask_rows, valid, trace_idx,
                           win_start, trace_len, ids_grid, seed=SEED)
 
-    md, mp, mc = core["man"]
-    nd, npos, nc = core["man_null"]
+    def _cap_manifest(man, cap=6000, tag=""):
+        """factory_screen probes flat T·d_in windows on ALL manifest
+        rows; the balanced_manifest 20k/class default OOMs a 44 GB L40S
+        at T32 (measured, first launch). Post-triage per-class
+        subsample to the factory-era scale — seeded, disclosed; the
+        triage receipts above are computed on the FULL manifest."""
+        d, p, c = man
+        rng = np.random.default_rng(SEED + 7)
+        keep = []
+        for cls in (0, 1, 2):
+            idx = np.flatnonzero(c == cls)
+            if len(idx) > cap:
+                idx = np.sort(rng.choice(idx, cap, replace=False))
+            keep.append(idx)
+        idx = np.sort(np.concatenate(keep))
+        return d[idx], p[idx], c[idx]
+
+    md, mp, mc = _cap_manifest(core["man"])
+    nd, npos, nc = _cap_manifest(core["man_null"], tag="null")
     out = {
         "lam_sc": lam, "lam_sc_null": lam_null,
         "lam_bin": core["bins"].astype(np.int8),
