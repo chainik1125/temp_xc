@@ -69,3 +69,4 @@ actuals, same discipline as the Modal table.
 | 07-27 ~13:20 | mac-a | HUNT4 gen-4 screen FIRST WAVE (card freeze 35d20e3cb, pin in driver): 5 faces x {gpt2/hs7, gemma2_2b/hs14}, full-ladder shuffle twins, 2x L40S parallel | 2x L40S | ~$12–18 | hunt envelope $200 (c1c5c949e) |
 | 07-27 ~13:50 | mac-a | RDENS screen (gen-4 seed 3; freeze 0045ce40c, ward volume, base/hs13, factory protocol; chaz-clause g_agg = deciding instrument) | 1x L40S | ~$1.5–2.5 | hunt envelope $200 |
 | 07-27 ~14:20 | mac-a | rdens ACTUALS ≈ $1 (single L40S, hs13 leg + image build; hs11 crash post-persist) vs $1.5–2.5 est → −$1 corr. Verdict WEAK (PTR), seed 3 closed | — | −$1 corr | hunt envelope $200 |
+| 07-27 ~14:40 | mac-a | HUNT4 THIRD LEG llama31_8b (card § 2 rule: every face not 2/2-KILL; gemma2 KEEPs on tret/sdom/xtrend force majority resolution) — same pin 35d20e3cb | 1x L40S | ~$6–9 | hunt envelope $200 |
