@@ -14,7 +14,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "PINNED_AT_FREEZE"  # fill from ORIGIN-history rev-parse post-push
+PINNED_COMMIT = "0045ce40c2e98397667a246e23f7c6b10fee2a33"  # rdens freeze, ORIGIN-history rev-parse post-push
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 RES_DIR = "/repo/experiments/explorations/task_hunt/rdens"

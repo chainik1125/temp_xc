@@ -67,3 +67,4 @@ actuals, same discipline as the Modal table.
 - 2026-07-27 runpod-2 EST (new day): RLHF seed-extension A1 — 7 trained txc cells (s1@T{8,16} + s2@T{1,2,5,8,16}), measured solo-rate basis ≈ 9.2 GPU-h ≈ $28, GPU 2 only. Day cap $150 intact.
 | 07-27 ~12:45 | mac-a | § 6b slen gemma-fill RESUME #2 per gen-4 rescale directive c1c5c949e item 5 (Han $200/10h hunt envelope) — mac-b's frozen card b7121a208 UNCHANGED, same pin, partial on Volume resumes; one relaunch | A10G + L40S | ~$2 | hunt envelope $200 |
 | 07-27 ~13:20 | mac-a | HUNT4 gen-4 screen FIRST WAVE (card freeze 35d20e3cb, pin in driver): 5 faces x {gpt2/hs7, gemma2_2b/hs14}, full-ladder shuffle twins, 2x L40S parallel | 2x L40S | ~$12–18 | hunt envelope $200 (c1c5c949e) |
+| 07-27 ~13:50 | mac-a | RDENS screen (gen-4 seed 3; freeze 0045ce40c, ward volume, base/hs13, factory protocol; chaz-clause g_agg = deciding instrument) | 1x L40S | ~$1.5–2.5 | hunt envelope $200 |
