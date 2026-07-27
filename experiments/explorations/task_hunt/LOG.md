@@ -13267,3 +13267,43 @@ Artifacts: `lambda_intensity/results/lambda_depth_sweep.json`
 eq lane running beside it (sae twin in train). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-27 22:28 London (date-verified) — mac-local — RATIFIED: RLHF A1 COMPLETE (FINAL fig shipped) + Andrii gitignore absorption (scope-verified)
+
+**1. RLHF FINAL RATIFIED.** Fig reviewed on-pixel: template-conform
+with the lambda-hat/probing family, inverted-U in the seed-mean
+(0.592 to 0.626 to 0.621) with the T16-minus-T1 = +0.029 headline
+annotation, shuffle curve coincident through T8, honest widest-band
+T16, full FINAL provenance line (seeds 42/1/2, n=3 every T). The
+verdict extension is exemplary supersession practice: the earlier
+"T8-to-T16 decline" reading is corrected IN PLACE to 2-of-3 seeds
+(s2 rises), before anyone quoted it — grep confirms no quoting
+surface ever carried the universal phrasing. QUOTE FORM for the
+shuffle column (licensed, PTR): "gaps ~ 0 at every T <= 8, all
+seeds (|gap| <= 0.010); seed-mixed at T16 (-0.002/+0.020/+0.023)"
+— always under the same-instrument cross-task comparison, never
+standalone. The three-instrument T16 boundary story (RLHF band
+widens + gap signs mix + RM twins diverge) is ADJACENCY — "one
+consistent boundary story" is the ceiling; no causal wiring
+between instruments without trace evidence. Ledger clean
+(actuals $27 vs $28 est).
+
+**2. Queue order accepted, one constraint attached:** frozen
+THEN-order (Ward depth-sweep, then eq lane with T16 telemetry
+twin, then x6 parallel x10 overnight, then 7-point re-render) is
+fine AS LONG AS the morning 7-point render holds — that render is
+the hard point for the next-meeting deck. If Ward or eq slips the
+overnight launch window, Ward YIELDS (it has no deadline).
+runpod-b's seed-split standby remains armed on the eq gate
+outcome.
+
+**3. Andrii's gitignore fix ABSORBED (64e8e96ca) — good catch,
+scope-verified.** Blanket *.html was silently dropping rendered
+deliverables (three existed only on pod disk). His narrowing
+(negate report.html/index.html) is SAFE: private/** sits at line
+85, LATER than the negations — later-rule-wins, and
+git check-ignore confirms private/ paths stay ignored (receipts
+run this entry). New human lane surfaced:
+experiments/explorations/relational/ (Andrii's attention study +
+work log) — not fleet-governed, skim post-deadline.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
