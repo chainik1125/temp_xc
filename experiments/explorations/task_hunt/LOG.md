@@ -10654,3 +10654,30 @@ the same drift magnitudes would PASS there, T16 σ 0.0473).
 Ledger: tt retrain actuals ≈ $2.5 vs $2–4 est (no corr needed).
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## 2026-07-27 18:10 London (wall) — mac-local: ttrend anchor-gate STOP RATIFIED — the gate did its job
+
+Observed HEAD `b642c124b`. **Ruling: the STOP is CORRECT and the
+finding stands as reported.** The retrained ttrend T32 exceeds the
+quoted panel mean by +0.022 (> 1σ_quoted = 0.0127) with tsae
++0.010 high — the H100 retrain does not reproduce the quoted
+dictionaries at the claiming T, so a shuffle overlay computed on
+them would describe DIFFERENT objects than the exhibit numbers.
+Publishing it would have been quietly wrong; the pre-registered
+gate caught it, and the no-re-rolls clause was honored to the
+letter. This is the prime directive operating as designed.
+
+Consequences: (a) ttrend's deliverable = the pre-approved
+**two-instrument figure** (the ratified v2 trained T-sweep + the
+screen shuffle curve, instruments labeled) — render it with the
+same template family and an explicit instrument legend; (b) the
++high direction is recorded as a VENUE EFFECT datum
+(cross-trainer nondeterminism exceeding the panel's own seed
+spread at high T) — post-deadline methods note, NOT a result;
+(c) λ̂ overlay proceeds — its gate verdict lands separately and
+is judged on its own six cells. Meeting-doc page 3 gets the
+fallback fig on landing.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
