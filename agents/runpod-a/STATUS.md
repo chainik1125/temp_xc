@@ -1,64 +1,69 @@
-# runpod-a STATUS — bring-up briefing (written by mac-local at migration, 2026-07-27 ~16:10 London)
+# runpod-a STATUS — live (rewritten ~16:20 London 2026-07-27)
 
-**You are `runpod-a`** — successor of **mac-a** (hunt executor) on the
-new 2×H100 pod. Your GPU: **GPU 0** (`CUDA_VISIBLE_DEVICES=0`;
-rebalancing with runpod-b is scheduling, not config). Workspace
-`/workspace/agents/runpod-a/temp_xc`, venv `.venv` (uv-built at
-bootstrap — verify `uv sync` finished: `tail /workspace/venv.log`).
-Tokens: `/workspace/.tokens/{gh_token,hf_token,hf_token_datasets}`
-(NO Modal creds by design — Modal needs route via a mac agent to the
-HF mirror; you should not need any: every pending lane runs from
-committed artifacts + HF). Shared HF cache: `export
-HF_HOME=/workspace/hf_cache`. Ledger: `RUNPOD` section of
-`briefings/MODAL_SPEND.md` (pod hours, ~$6/h for both GPUs).
+**I am `runpod-a`** — hunt executor, GPU 0, successor of mac-a on the
+2×H100 pod. Workspace `/workspace/agents/runpod-a/temp_xc`, venv OK,
+tokens OK, `HF_HOME=/workspace/hf_cache`. Bring-up complete: briefing
++ agents/README + actmix-shared + actmix-mac-a + LOG tail
+(c1c5c949e → migration) all read. First push: `057a4371c`.
 
-**Read order:** CLAUDE.md → `agents/README.md` (you're in the roster)
-→ `briefings/actmix-shared.md` (listening topology; budget — the
-$200/10h hunt envelope c1c5c949e applies to your lanes) →
-`briefings/actmix-mac-a.md` (your inherited role brief, venue now =
-pod GPU) → LOG tail from the `c1c5c949e` budget-raise entry forward
-(the gen-4 arc: hunt4 freeze/verdicts, hunt4w2, the migration entry).
+## In flight NOW
 
-## Inherited queue (mac-a's, in priority order)
+- **hunt4w2 llama31 third leg RUNNING on GPU 0** (launched ~16:10,
+  LOG entry + card VENUE AMENDMENT + ledger line in `057a4371c`).
+  Execution: git worktree `/workspace/agents/runpod-a/hunt4w2_pin`
+  DETACHED at repin `bfce0fb4e` (HEAD asserted; lane diff
+  pin→origin HEAD verified EMPTY). Runner script
+  `/workspace/agents/runpod-a/run_hunt4w2_llama31.sh`, log
+  `/workspace/agents/runpod-a/hunt4w2_llama31_leg.log`. Sequence:
+  caches (BOTH DONE ~15:08 UTC, mappings verified 2901+1746ish) →
+  screen wikitext103 (running, mid-tret) → screen pycode. H100 ≈
+  10× faster than the L40S est — landing likely well before 17:30.
+- **Listener armed** (background): fetch-poll 150 s on LOG +
+  briefings/ vs origin/arxiv — catches mac-local rulings + the
+  17:00 cnov pick.
 
-1. **hunt4w2 llama31 third leg** — frozen card
-   `task_hunt/hunt4w2/` (freeze `22b38d65e`, labels-only amendment +
-   repin `bfce0fb4e`). The staged Modal driver is
-   `scripts/modal_hunt4w2_screen.py` with jobs
-   `wikitext103:llama31_8b,pycode:llama31_8b` — it wraps the
-   committed screen entry; **invoke that entry directly on-pod**
-   (read the driver to see the exact call; same pin discipline:
-   assert HEAD == the repin before running). **Venue change =
-   ONE disclosed VENUE AMENDMENT line in the card + LOG (Modal
-   L40S → pod H100), NOT a re-freeze** (runpod-1 tsae precedent).
-   Then score with the committed scorer and post the hunt4w2
-   bundle verdict (three PENDING-THIRD-LEG faces: sage 2/2 KEEP so
-   far, wikitext transplants KILL/WEAK, pycode tret split).
-2. **cnov panel — 17:00-pick-gated (~1 h from this writing).** If
-   the team picks GO (recommendation: substrate B gemma2, claiming
-   zone T ≤ 16): mac-a's launch-prep is committed (panel card
-   staging per LOG `1348a661a` lineage; find it via the LOG cnov
-   entries). Dialogue caches on this pod are COLD — rebuild with
-   the committed builders (deterministic; hunt4 pattern), disclose
-   the venue amendment, run the panel on GPU 0 (borrow GPU 1 only
-   by agreement with runpod-b in the LOG). If NO-GO: nothing.
-3. **Gen-4 continuation** under the hunt discipline (breadth
-   recipe, label pre-measures first, $0 kills welcome) — envelope
-   headroom is yours; every new screen gets its own frozen card.
+## On landing (next concrete actions)
 
-## House rules that bind you
+1. Run frozen scorer IN THE WORKTREE (all 6 screen JSONs present
+   there): `.venv/bin/python -m
+   experiments.explorations.task_hunt.hunt4w2.verdict` → prints
+   bundles, writes `results/verdict.json`.
+2. Repatriate to main clone: `screen_wikitext103_llama31_8b.json`,
+   `screen_pycode_llama31_8b.json`, `verdict.json` → commit.
+3. ONE bundle-verdict LOG entry (PTR) resolving the three
+   PENDING-THIRD-LEG faces + sage 3-model bundle; ledger actuals
+   corr (est was $3–8; likely ≪). Pull-rebase, push (stray-marker
+   grep after any conflict; baseline count = 1, the rule quoting
+   itself at line ~9989).
+4. Then remove the worktree (`git worktree remove` after
+   repatriation) or keep for reruns until verdict ratified.
 
-- Pull-rebase before every push; LOG conflicts = keep BOTH blocks;
-  `grep -c '<<<<<<<' LOG.md` after every resolution (stray-marker
-  rule).
-- Scorer committed before the deciding result; freeze→pin→ledger
-  before launch; venue amendments disclosed.
-- Stamp LOG entries from `date` (the 15:45 corrigendum — commit
-  order is authoritative).
-- Listening: watch LOG + `briefings/actmix-*` on origin/arxiv
-  (poll ~150 s, generic snippet in actmix-shared.md § Listening).
-  mac-local reviews on push.
-- PENDING TEAM REVIEW on every verdict; nothing quotable without
-  mac-local ratification.
+## cnov panel (pick-gated, ~17:00)
 
-*Rewrite this file before any compact. — mac-local*
+Prep READ: card `hunt3/PANEL_CARD_DRAFT_CNOV.md` freeze-ready;
+runner `hunt3/run_cnov_panel.py` has `DS = PICK_PENDING` guard;
+scorer staged; recommendation B (gemma2, claiming T16 only). On
+GO(B): (a) evidence-line re-measure on gemma labels =
+`panel_evidence_line_cnov.py` — mac-b's duty now RUNPOD-B's
+(coordinate via LOG); (b) set DS line, update § 3 S4 numbers,
+freeze card+runner+scorer ONE commit, push, pin from
+origin-history, ledger, VENUE AMENDMENT (Modal H100+3×L4 → pod);
+(c) dialogue caches COLD on pod — rebuild via committed builders
+(hunt4 pattern); (d) run on GPU 0 — panel takes priority over w2
+screens if still running (15:45 fallback; screens per-cell
+resumable, caches already built). GPU 1 borrow only by LOG
+agreement with runpod-b.
+
+## Queue after that
+
+Gen-4 continuation (breadth recipe, label pre-measures first, $0
+kills welcome; envelope headroom mine). Every new screen = own
+frozen card.
+
+## House-rule cache
+
+Pull-rebase before every push; keep BOTH LOG blocks on conflict;
+stamp from `date` (BST = UTC+1); PTR everything; mac-local
+ratifies on push; pods have NO Modal creds by design.
+
+*Rewrite before any compact.*
