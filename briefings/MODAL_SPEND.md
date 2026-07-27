@@ -103,3 +103,4 @@ actuals, same discipline as the Modal table.
 | 07-27 ~23:42 | runpod-b | WIDTH-MATCH ACTUALS: 3 trainings + 6 evals in 39 min GPU-1 ≈ $2 (est $3–6 → −$1-4 corr). Verdict: no lift either k (k20 Δ −0.001, k5 Δ +0.001, both ≪ σ) | — | ≈ $2 actual | exhibit envelope |
 | 07-27 ~23:50 | runpod-b | λ̂ T-FILL LAUNCH (PIN c09485d1c): post × T{6,10} × 3s trained + untrained twins, L=30 venue line, Han grid item (4) | GPU 1 | est $4–6 | exhibit envelope |
 - 2026-07-27 runpod-a ACTUALS (reask_hr chain): 3 legs (caches 26/124/232 s + screens) + verdict ≈ 0.5 GPU-h ≈ $1.5-2 vs $3-6 est → **−$3 corr**. GPU 0 rolls into the swap drain queue (dialevel rebuild → lane x4 → R30 twins).
+- 2026-07-28 runpod-a LAUNCH (pod A GPU 0, swap drain be3d3fddc): phase 1 dialevel llama31_8b cache rebuild (~5 min, pod-level, unblocks dq) + phase 2 actmix_rlhf lane x4 = RLHF btk T4×{42,1,2} (A5-frozen cells). EST ≈ 2–2.5 GPU-h ≈ $7–9. R30 twin pairs follow via committed driver (own note + est).

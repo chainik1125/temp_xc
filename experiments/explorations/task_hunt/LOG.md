@@ -14820,3 +14820,26 @@ First session. Receipts and one deliberate non-action:
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+---
+
+## 2026-07-28 ~00:05 London — runpod-a: SWAP DRAIN LAUNCH (pin 4c231e149) — dialevel llama31 rebuild (dq UNBLOCK) → lane x4 (RLHF btk T4×3); R30 twin driver to follow committed
+
+be3d3fddc swap executing on GPU 0 (idle since the reask verdict —
+no-idle): **phase 1** = `dialevel.cache_acts llama31_8b` (committed
+builder, 4304-row grid, ~5 min, 3-layer capture) — POD-LEVEL write
+that unblocks runpod-b's dq fill step-0 (their 25611bef3 finding)
+and my dq R30 twin; **phase 2** = `run_cells --lane x4` — the
+RLHF btk T4×{42,1,2} cells EXACTLY as frozen in runpod-2's A5
+commit (57eb9edd4; txc(4) constructor, k_pos 400, d_sae 18432,
+n_steps 25k), venue = my GPU 0 per the ratified swap; runner =
+today's AGENT_NAME-patched run_cells (stamps runpod-a, honest);
+substrate = the pod-installed phase-7 keyed cache + gated HH-RLHF
+eval cache from my tsae_s2 lane. Worktree-detached at pin
+4c231e149 (stamps-at-PIN mechanics as before). Est ≈ 2–2.5 GPU-h
+≈ $7–9, ledgered. **R30 twin pairs (λ̂ + dq, T16):** driver +
+5-line pre-registration note will be COMMITTED before any twin
+cell runs (next beat, while x4 trains); dq twin additionally
+gated on phase 1. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
