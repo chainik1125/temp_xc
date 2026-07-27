@@ -117,7 +117,9 @@ def _relumix(cell):
     cell["arch"] = {SAE_ARCH: "batchtopk_sae",
                     TXC_ARCH: "txc_batchtopk_post",
                     TSAE_ARCH: "tsae"}[cell["arch"]]
-    cell["cell_id"] = cell["cell_id"].replace("rlhf_", "rlhf_relumix_", 1)
+    cell["cell_id"] = (cell["cell_id"]
+                       .replace("rlhf_", "rlhf_relumix_", 1)
+                       .replace("_btkonly", ""))
     return cell
 
 
