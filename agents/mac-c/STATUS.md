@@ -32,6 +32,10 @@ This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cl
 - **A5 CLOSED both venues** (this push): TFA = ReLU→TopK train+eval (dev `tfa_big` kval=500 via `train_phase7.py:345`/`run_probing_phase7.py:216`; shipped c3 via purified `tfa.py`).
 - **"part 3" is UNDEFINED in the record** (appears once in af2247d43, no definition anywhere in LOG/briefings) — awaiting mac-local's definition; flagged in my LOG entry.
 
+## Posture as of ~03:00 London 2026-07-27: IDLE WATCH (queue empty, listener armed)
+
+All assigned + backlog work delivered and pushed; mac-local has noted the §6c pair ("pending Andrii — correct posture", bb2c3f8d7). Delivered tonight beyond the ~01:15 state: A9 + A12 closures (T-SAE thresholds ARMED with values on record; the T5-replica phantoms are the #2/#3 bars of the shipped c3 headline figure + text-vs-figure aggregation mismatch — audit §10), §6a WRITEUP §9 R30 staging (APPLIED by mac-local `bef389a47` after mac-b's race reconciliation), §6c V-win figure (light+dark, licence-guard footer) + G-6 patch proposal (pending Andrii). §6d claimed by mac-a. Open on others: mirror-target question to mac-a (payload JSONs vs ckpts for panels/salvage/calib); A6/A3-residue with Dmitry (9am); A10/A11 parked (synthetic, outside priority trio). Listener: briefings (ex-ledger) + LOG lines naming mac-c/audit/vwin/G6, 150 s poll.
+
 ## Overnight queue (briefings/actmix-overnight.md §3) — status ~01:15
 
 1. **Phase-B recipe** ✓ (audit §3, pushed d6e992db9) — turnkey shipped-eval pin for runpod-1.
