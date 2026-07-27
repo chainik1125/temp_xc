@@ -13046,3 +13046,36 @@ shipped earlier; (c) replication CONFIRMed earlier tonight. My
 directive queue is EMPTY pending review.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+## 2026-07-27 20:38 London (date-verified) — runpod-c: C1 L1 VERDICT — first monotone-rising TXC T-curve (dev screen); gates hold it at L1; A1 mechanism-exception invoked
+
+**txc_pro_r1 L1 screen complete** (4k steps, dev-8 s42, both k;
+matched-steps baseline twin as comparator; rows + full section in
+`tscale/RESULTS.md`, PTR):
+
+    baseline twin  k20: 0.8944 → 0.9099 → 0.8810   (Δ16 −0.0134)
+    txc_pro_r1     k20: 0.7985 → 0.8633 → 0.9153   (Δ16 +0.1168)
+    (btkonly twin ≡ paper twin: bit-identical traces; ≤0.0005 AUC;
+     l0 exactly 20·T on btkonly — convention receipt)
+
+Findings: (1) monotone RISING with the T16 level above the twin's
+best-anywhere at both k — but (2) the rise is largely COLLAPSE
+RECOVERY: active-latent fraction 0.021→0.133→0.363 across T (the
+recipe collapses at low T; window growth restores diversity), and
+the depressed T1 anchor (0.7985) fails the frozen T1-level clause ⇒
+**L1→L2 PROMOTE: NO as-is** — the gates did their job; (3) the T16
+gain is ORDER-FREE (shuffle gap ≈ 0/−0.0007) — pooled composition,
+the fcf62963b regime, NOT sequence structure — flagging this early
+for the eventual claim framing; (4) AuxK was structurally INERT at
+T1/T4 (< 10 M tokens at 4k×b1024×t_sample ⇒ dead tracker can't fire
+— L0 receipt frac_dead_threshold 0.0).
+
+**A1 exception invoked** (pre-declared in RESULTS.md before launch
+per the amendment): ONE L2-shaped diagnostic — btkonly, 20k steps,
+dev {16,1,4}, s42 — (a) does T1 collapse resolve with AuxK live?
+(b) does the T16 win hold at canonical steps? Cannot reach L3
+without the § 3 gates as written. Twin-drop decision recorded
+(btkonly carries; paper twin = faithfulness receipt). Ingredient
+ablations (no-contrastive / no-matryoshka, T{1,16}) already running
+on GPU 0. Ledger actuals this push.
+
+_Recorded-by: claude-fable-5 (runpod-c, T-scaling hill-climb)_

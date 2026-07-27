@@ -194,3 +194,21 @@ PTR LOG entries at: THIS split freeze, first L2 signal, any L3
 launch/landing. mac-local reviews on push; amendments to this card are
 append-only sections (never edits to frozen text), timestamped, before
 the affected cells run.
+
+## A1. AMENDMENT (2026-07-27 19:58 London, date-verified — appended BEFORE any L2 cell has launched)
+
+**Mechanism-exception L2 (diagnostic lane).** A candidate that FAILS
+the L1→L2 gates may still run ONE L2-shaped diagnostic (20k steps,
+dev-8 only, s42) iff an L0 health artifact shows the 4k-step screen
+STRUCTURALLY disabled a recipe component — the specific trigger
+tonight: at t_sample·b1024·4k steps ≤ 10 M tokens the
+`dead_threshold_tokens` tracker cannot fire, so AuxK revival is inert
+at L1 for txc_pro_r1-family cells (L0 census receipt in the rows:
+`frac_dead_threshold = 0.0` with `frac_latents_active_batch ≈ 0.02`).
+Conditions: (i) the exception + its L0 receipt are stated in
+RESULTS.md BEFORE the diagnostic launches; (ii) the diagnostic's
+result CANNOT promote to L3 unless it passes the L2→L3 gates exactly
+as written in § 3; (iii) one diagnostic per candidate family, not per
+config. Purpose: separate "recipe fails" from "screen regime disabled
+the recipe's anti-collapse machinery" — mechanism attribution, not a
+second bite at the gate.
