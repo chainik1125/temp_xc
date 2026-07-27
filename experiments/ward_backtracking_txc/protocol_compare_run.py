@@ -53,8 +53,16 @@ def kw_rate(t):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--train-key", default="d7b2e24253055f8e")
-    ap.add_argument("--n-prompts", type=int, default=40)
-    ap.add_argument("--n-sel", type=int, default=60)
+    ap.add_argument("--n-prompts", type=int, default=400)
+    ap.add_argument("--batch", type=int, default=16)
+    ap.add_argument("--prompt-len", type=int, default=176,
+                    help="every prompt truncated to exactly this many tokens, so the "
+                         "batch needs no padding and v7's tiling phase is identical "
+                         "across examples")
+    ap.add_argument("--protocols", default="v7,slab",
+                    help="pp is ~5x slower (stride-1 windows) and measured within 1%% "
+                         "of v7 on injected norm, so it is off by default")
+    ap.add_argument("--n-sel", type=int, default=80)
     ap.add_argument("--qs", default="0,1,2,4,8")
     ap.add_argument("--max-new", type=int, default=160)
     ap.add_argument("--prefix-sents", type=int, default=6)
@@ -169,19 +177,52 @@ def main():
 
     state = {"feature_idx": None, "norms": [], "cs": []}
 
-    def generate():
+    # FIXED-LENGTH PROMPTS, so the batch needs no padding at all. Batching is what makes an
+    # adequately powered n feasible -- the first version generated one prompt at a time, which
+    # is 40 x 160 = 6400 sequential forwards of an 8B model per cell for no reason. It also
+    # removes a real confound: the hooks tile blocks from position 0, so ragged left-padding
+    # would shift v7's tiling PHASE per example and write into pad positions. With every
+    # sequence the same length the tiling is identical across the batch.
+    L = a.prompt_len
+    ids = []
+    for it in items:
+        t = tok(it["text"], return_tensors="pt", truncation=True, max_length=L)["input_ids"][0]
+        if t.shape[0] >= L:
+            ids.append(t[:L])
+    if not ids:
+        raise RuntimeError(f"no prompt reached --prompt-len {L} tokens; lower it")
+    ID = torch.stack(ids).to(dev)
+    print(f"[prompts] {ID.shape[0]} of {len(items)} at exactly {L} tokens, "
+          f"batch {a.batch}", flush=True)
+
+    def generate(proto=None, s_abs=0.0):
+        """The hook is rebuilt per chunk: the vendored hooks do `strengths_t.view(Bh,1,1)`,
+        so the strength tensor has to match the batch, and the final chunk is short."""
         outs = []
-        for it in items:
-            enc = tok(it["text"], return_tensors="pt", truncation=True, max_length=768).to(dev)
-            with torch.no_grad():
-                o = model.generate(**enc, max_new_tokens=a.max_new, do_sample=False,
-                                   pad_token_id=tok.pad_token_id)
-            outs.append(tok.decode(o[0][enc["input_ids"].shape[1]:], skip_special_tokens=True))
+        for s in range(0, ID.shape[0], a.batch):
+            chunk = ID[s:s + a.batch]
+            B = chunk.shape[0]
+            handle = None
+            if proto is not None:
+                st = torch.full((B,), s_abs, device=dev)
+                handle = site.register_forward_hook(
+                    build_steering_hook(arch, protocol=proto, T=T, strengths_t=st,
+                                        state=state))
+            try:
+                with torch.no_grad():
+                    o = model.generate(input_ids=chunk,
+                                       attention_mask=torch.ones_like(chunk),
+                                       max_new_tokens=a.max_new, do_sample=False,
+                                       pad_token_id=tok.pad_token_id)
+            finally:
+                if handle is not None:
+                    handle.remove()
+            outs += tok.batch_decode(o[:, L:], skip_special_tokens=True)
         return outs
 
     # ---------- 3. PREFLIGHT: is the instrument alive at all? ----------
     state["feature_idx"] = None
-    base_txt = generate()
+    base_txt = generate(None, 0.0)
     base_kw = float(np.mean([kw_rate(t) for t in base_txt]))
     print(f"[preflight] unsteered keyword rate {base_kw:.5f}  "
           f"mean words {np.mean([len(t.split()) for t in base_txt]):.0f}", flush=True)
@@ -199,17 +240,13 @@ def main():
              "injected_norm_mean": 0.0, "sample": base_txt[0][:400]}]
     # The vendored hooks capture `strengths_t` in their closure, so a hook is built per dose
     # rather than mutating shared state -- one less thing that can go stale between arms.
-    for proto in ("v7", "pp", "slab"):
+    for proto in a.protocols.split(","):
         for q in qs:
             if q == 0:
                 continue
             s_abs = sign * q * p99
-            st = torch.full((1,), s_abs, device=dev)
-            hk = build_steering_hook(arch, protocol=proto, T=T, strengths_t=st, state=state)
             state.update(feature_idx=j, norms=[], cs=[])
-            handle = site.register_forward_hook(hk)
-            txt = generate()
-            handle.remove()
+            txt = generate(proto, s_abs)
             ks = [kw_rate(t) for t in txt]
             rows.append({"protocol": proto, "q": float(q), "s_abs": s_abs,
                          "keyword_rate_mean": float(np.mean(ks)),
