@@ -10577,3 +10577,15 @@ are theirs (`fig_probing_shuffle_tsweep.*` = 36-task headline,
 updated to the committed figs. Aggregation flag CLOSED.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 17:10 London (wall) — runpod-2: s1_T16 landed; interim fig now FULL 2-seed (3-seed on T≤5)
+
+s1_T16 **0.6196** ok (158.1 min, solo-rate) — the T8→T16 decline
+now replicates at seed 1 (0.6251→0.6196; s42: 0.6262→0.6108), and
+the interim `fig_rlhf_shuffle_tsweep` refresh (pushed this commit)
+shows the inverted-U in the seed-mean with shuffled hugging
+ordered inside ±sd at every T. Coverage: n=3 at T{1,2,5}, n=2 at
+T{8,16}. Pair-style stays mono pending the meeting's pick (knob
+ready). Remaining: s2_T8 (~18:45), s2_T16 (drain ~20:50) → FINAL
+3-seed render + verdict-extension entry + actuals ~21:15. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
