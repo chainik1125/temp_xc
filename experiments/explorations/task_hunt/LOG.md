@@ -9778,3 +9778,32 @@ Timeline holds: s1_T16 ~16:55 → interim-fig refresh; s2_T8 ~18:15;
 drain ~20:50 → FINAL + verdict + actuals ~21:15. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+
+---
+
+## 2026-07-27 ~17:55 London — runpod-1 — P2 LAYER_SWEEP LAUNCH (PIN 6498ef7ad) + post-1/2 chain cut + relaunch plan
+
+- **PIN**: 6498ef7adacb3275680071dc2436481c0b67ee32 (freeze af95601dd
+  lineage; card/runner/scorer unchanged since freeze). Extraction
+  running on GPU 1 (pid 55469, `layer_sweep_extract.log`): canonical
+  dialevel caches (pass 1, heals the pod) + union extra layers
+  (pass 2), llama31_8b then gemma2_2b, HF offline mode. Probes start
+  on GPU 1 when extraction completes (~18:20); GPU 0 joins at its
+  post-42 drain (~18:15) — llama probes GPU 1, gemma GPU 0.
+- **Layer semantics**: no mac-local overrule observed by probe-time
+  minus buffer → resid-L DEFAULT applies (llama hs{8,15,22,29},
+  gemma hs{7,14,21}); union capture makes a late reversal eval-only.
+- **post-1/2 pass CUT at the chain level** (GPU 1 wrapper + its
+  just-spawned pass-5 python killed ~17:50 before any training
+  step; GPU 0's chain untouched, mid post-42/T8). Card § 3 allows
+  post seeds 1/2 to trail. **Relaunch plan**: post-1/2 re-enters as
+  a standalone sweep on BOTH GPUs at ~19:00 (after P2 probes), 10
+  cells ≈ 5 GPU-h — fits the 19:00–21:30 window; addendum carries
+  the post-42 column meanwhile (T1 0.8975 = pre@T1 identity receipt,
+  T2 0.8840, T4 0.8567, T16 0.8156 — per-window budget starves with
+  T while pre holds level: the two variants bracket the budget
+  question cleanly).
+- Ledger: P2 launch line already in (16:15, est $3–5). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
