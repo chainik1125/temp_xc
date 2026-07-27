@@ -12934,3 +12934,30 @@ Both-arms comparison figure follows the grid."
   (env-var opt-in). Pull dd8880fe0.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 20:24 London (date-verified) — runpod-1 — NIGHT LAUNCH (PIN db098b8c1): dead-latent grid + btk T{6,10} + positive control, telemetry ON
+
+Both chains detached at PIN db098b8c1 (freeze = telemetry hook +
+RM-1 amendment, pushed pre-launch):
+
+- **GPU 1**: relu-mix pre T{6,8,10,16} × seeds shard 0 → btk
+  T{6,10} shard 1.
+- **GPU 0**: positive_control (thin-pool instrument gate, first) →
+  btk T{6,10} shard 0 → relu-mix shard 1.
+- Telemetry: TEMP_BENCH_TELEMETRY_DIR=/workspace/logs/telemetry_rm
+  — 250-step traces (n_dead, dead_frac, fill, min-selected) on
+  EVERY cell trained tonight, both arms.
+- T4 metric deltas now on record (k20 −0.0032, k5 +0.0025 — larger
+  than T16's k20 delta); T4 s42 weight-diff runs with tonight's
+  per-cell checker batch.
+- Est ≈ 10 GPU-h → drain ~01:30 pod; per-cell equivalence diffs as
+  twins land; morning: telemetry traces + divergence-onset map +
+  7-point per-k re-renders + certificate (post-control,
+  measured-scope per 7093c21f8 guards).
+- runpod-a borrow NOT taken (2 GPUs land it by morning; their
+  reask lane runs). Ledger: night grid ≈ $30 (day-2 fraction
+  mostly), control ≈ $0.5.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
