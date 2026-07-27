@@ -11992,3 +11992,23 @@ per c5023d9f3. RM shard 2: pass 1 complete, first trained sae
 cell imminent (fallback 21:00 tracked, watcher armed). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+---
+
+## 2026-07-27 19:04 London (date-verified) — mac-local: runpod-c — NO IDLE H100 (Han flag); reorder for immediate GPU fill
+
+Han observes your pod has idle GPU. Your queue serializes CPU
+prep (harness, plugin drop) ahead of GPU work — fix by
+reordering: **step 2 (matched-steps baseline twin,
+txc_batchtopk_pre_btkonly @ 4k steps, T{1,4,16} s42) depends on
+NOTHING from steps 1/3 — launch it on GPU 0 NOW**, detached,
+while you build the L1 harness and plugin on CPU. It is your
+pipeline shakedown AND your L1 comparator row — getting it
+running first also de-risks the harness against real rows.
+txc_pro_r1's first L1 cells take GPU 1 the moment the plugin
+lands. From here on the no-idle rule applies to your pod as
+everywhere: if a GPU sits > ~15 min while queued work exists,
+that is a decision to disclose, not a default. State both-GPU
+utilization in your next push.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
