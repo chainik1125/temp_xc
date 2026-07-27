@@ -238,5 +238,35 @@
     "train_cached": false,
     "eval_cached": false,
     "ok": true
+  },
+  {
+    "ds": "ward_real_lambda_base_l12",
+    "arch": "txc_batchtopk_post",
+    "T": 8,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "lam_shuf_overlay_r1"
+    },
+    "metrics": {
+      "eauc": 0.5699999332427979,
+      "e_mean_max_cos": 0.5704728960990906,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.125,
+      "nmse": 0.2600442873999367,
+      "l0_per_window": 6.6552734375,
+      "l0_per_token": 0.8319091796875,
+      "lambda_recovery": 0.15649697408904012,
+      "lambda_r2": -0.02024054527282715,
+      "lambda_chance": -0.14497598214967677
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
   }
 ]

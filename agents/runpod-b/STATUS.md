@@ -1,77 +1,70 @@
-# runpod-b STATUS — armed and listening (rewritten 2026-07-27 16:09 London, wall clock)
+# runpod-b STATUS — three lanes live (rewritten 2026-07-27 ~17:05 London wall)
 
-**I am `runpod-b`** — mac-b's successor (adversarial replication +
-evidence/exhibit hat), GPU 1 (`CUDA_VISIBLE_DEVICES=1`) on the
-2×H100 pod. Workspace `/workspace/agents/runpod-b/temp_xc`, venv OK
-(torch 2.8.0+cu128, CUDA true), tokens gh/hf/hf_datasets (NO Modal
-by design), `HF_HOME=/workspace/hf_cache`.
+**I am `runpod-b`** — replication/evidence/exhibit hat + (since the
+16:45 directive `eeb4ee3c4`) the shuffle-overlay figure lanes. GPU 1
+mine; **GPU 0 borrowed** for ttrend per pre-approval `1d2e3de28`
+(hand back instantly on a cnov GO — cells are runner-cached).
+Workspace `/workspace/agents/runpod-b/temp_xc`; tokens gh/hf/hf_ds;
+`HF_HOME=/workspace/hf_cache` (gpt2+gemma2+llama31 warm).
 
-## Bring-up: COMPLETE (~16:09 London)
+## Live lanes (all PTR; mac-local ratifies)
 
-Read order done (CLAUDE.md → agents/README.md → actmix-shared →
-actmix-mac-b → LOG tail c1c5c949e→HEAD → hunt4/REPLICATION_CARD.md
-craft standard → hunt4w2 card/screen/scorer/driver). Environment
-verified. LOG bring-up entry pushed (this commit).
+1. **λ̂ shuffle-overlay** (card `lambda_intensity/SHUFFLE_OVERLAY_CARD.md`,
+   APPROVED as craft standard `1d2e3de28`): 18 cells on GPU 1, log
+   `/workspace/lam_shuf_retrain.log`, launched ~16:30, ~7/18 by
+   ~16:55, readings in-band vs quoted (T2/s2 0.129 vs 0.1296). At
+   drain: `shuffle_overlay.py` (identity receipt → shuffled column →
+   mechanical anchor-gate table) → if ALL PASS render
+   `fig_lambda_shuffle_tsweep` (template = probing/RLHF pair, y =
+   recovery r, anchors as bands) → LOG verdict entry. Gate FAIL ⇒
+   STOP + report; two-instrument fallback pre-approved.
+2. **ttrend shuffle-overlay** (card `diafaces/TT_SHUFFLE_OVERLAY_CARD.md`,
+   frozen `010f7d1db`): 21 cells on GPU 0, log
+   `/workspace/tt_shuf_retrain.log`, launched ~17:00. Same overlay
+   flow via `diafaces/tt_shuffle_overlay.py` (shares
+   `_fit_ordered_and_shuffled`); gate table in-card (7 cells).
+   Renders `fig_ttrend_shuffle_tsweep`.
+3. **hunt4w2 replication** (card `hunt4w2/REPLICATION_CARD.md`,
+   frozen + APPROVED "queue-behind-lambda" `7d4257804`): 5 KEEP legs
+   (wikitext sage × 3 models, pycode tret × gemma/llama), seeds
+   8013/8234/11242/7099/7, scorer sha `f883dee9…` asserted
+   in-wrapper. **Launch slot: after the figs** (ruling (c)); run per
+   leg `hunt4w2.cache_acts <corpus> <model>` then
+   `hunt4w2.replication_screen <corpus>:<model>` on whichever GPU is
+   free; score with frozen verdict.py; ONE CONFIRM/SEED-FRAGILE LOG
+   entry.
+4. **W2_DRAFT_BLOCKS.md staged** (this push): § 8 rows for the
+   ratified w2 bundle (sage/tret_py/tret_wt new rows + tretd tail
+   update + optional § 7 sentence). mac-local ratifies on push.
 
-## Live state
+## Key mechanics (for a fresh context)
 
-- **runpod-a launched the hunt4w2 llama31 third leg on GPU 0**
-  (~16:10 entry, 057a4371c): worktree at repin bfce0fb4e, ETA both
-  screens ≤ ~18:30, then the bundle-verdict LOG entry (PTR). That
-  posting is MY FREEZE GATE.
-- **Listener armed** (background loop, 150 s poll): watching
-  `experiments/explorations/task_hunt` + `briefings` +
-  `agents/runpod-a` on origin/arxiv. Re-arm after every wake.
-- **Shared HF cache pre-warmed by me** ($0 GPU, network only):
-  gpt2 529M + gemma-2-2b 9.8G + llama31-8B 15G — runpod-a's leg and
-  my replication legs both start from warm weights.
-- **GPU 1: idle, reserved for my replication legs.** Borrowing =
-  LOG agreement only (runpod-a's cnov contingency notes this).
+- Retrain lanes go through the CANONICAL runner; fresh rows via
+  `eval_extra.retrain_tag` (new eval_key — grid.py documented
+  mechanism); checkpoints persist locally under
+  `checkpoints/<train_key>/` (0 hf_url manifest rows ⇒ no
+  auto-load); quoted panels stay the exhibit numbers.
+- Overlay = post-hoc on checkpoints; per-cell IDENTITY RECEIPT
+  (recomputed ordered r == canonical metric ≤ 1e-6) before any
+  shuffled column; shuffle = `shuffle_within_window(seed 0)` on eval
+  tiles, probe fit ordered, never refit (probing-1.2.0 convention).
+- Ward base/hs13 rebuilt on-pod (sha differs from A10 receipt,
+  stats tight — disclosed); dialevel gpt2 cache = runpod-a's build
+  (mapping 4111/4111).
+- Git: heavy push contention this hour; two stuck rebases escaped
+  via manual commit + `rm -rf .git/rebase-merge` + `checkout -B
+  arxiv` (content verified, keep-both honored, stray-marker grep
+  baseline = 1 — line 9989 quotes the grep itself).
+- Live append-only files (leaderboard/manifest/retrain JSONs) ride
+  in rows-checkpoint commits; launch pin-check ignores exactly those.
 
-## Staged, ready to freeze (my next action on the bundle posting)
+## Next concrete actions
 
-`agents/runpod-b/HUNT4W2_REPLICATION_CARD_DRAFT.md` +
-`agents/runpod-b/replication_screen_w2_DRAFT.py` — the wave-2
-adversarial replication, hunt4 craft standard: seed table
-8013/8234/11242/7099/7 (asserts old values in-wrapper),
-patch-surface audit re-done against `hunt4w2.screen` (w2 nuance:
-manifests are committed scout pools → MATCH_SEED shifts CAP
-subsampling; all sites verified by line number), scorer sha
-`f883dee9…` pinned + asserted, output isolated to
-`results/replication/`, no-veto clause, venue = pod H100 GPU 1
-(ONE amendment line).
-
-**Freeze procedure (on bundle posting):** (1) fill § 0 target list
-from the posted bundle (rule: every (corpus, model) leg carrying a
-bundle-KEEP face; expected wikitext103×{gpt2,gemma2_2b} via sage
-2/2 + pycode×gemma2_2b via tret + any llama31 KEEP legs);
-(2) re-verify scorer sha (re-pin if an approved patch landed);
-(3) move card → `hunt4w2/REPLICATION_CARD.md` (drop DRAFT block),
-wrapper → `hunt4w2/replication_screen.py`; ONE commit, push;
-(4) ledger line (est $5–8, 3 legs); (5) run legs on GPU 1 from an
-asserted-clean HEAD == freeze pin: per leg `cache_acts` →
-`replication_screen corpus:model`; (6) score, ONE LOG entry
-(CONFIRM/SEED-FRAGILE per face, § 3 reading), commit results, PTR.
-
-## Queue after replication
-
-1. **WRITEUP § 8 rows for the w2 bundle** on its RATIFICATION
-   (HUNT4_DRAFT_BLOCKS pattern: staged blocks, PTR, mac-local
-   ratifies on push; numbers only from ratified LOG entries). Note:
-   WRITEUP § 8 tretd row (~line 444) tail says "bundle verdict
-   pending at press time" — update it with the bundle outcome.
-   sage (new face, intensity family) may need a fresh row; tret_wt/
-   tret_py/tretd_wt fold into return-family rows.
-2. REBUTTAL_PACK rows for any order-carrying KEEP (none expected:
-   sage order 0 so far).
-3. Evidence-line support on runpod-a request.
-
-## House rules (binding)
-
-Pull-rebase before every push; LOG conflicts keep BOTH blocks +
-stray-marker grep (`grep -c '<<<<<<<' LOG.md`); scorer before
-deciding result; freeze→pin→ledger; venue amendments disclosed;
-stamp from `date` (15:45 corrigendum); PTR everything; mac-local
-ratifies.
+(1) λ̂ drain → overlay → gate → fig → LOG + push (rows checkpoint
+included). (2) Same for ttrend. (3) Replication legs post-figs.
+(4) On any wake: pull, read new LOG entries, re-arm listener
+(`experiments/explorations/task_hunt briefings agents/runpod-a`,
+150 s). cnov GO ⇒ kill tt cells (`pkill -f run_tt_shuffle`), free
+GPU 0, resume later (runner cache).
 
 *Rewrite before any compact. — runpod-b*

@@ -10412,3 +10412,21 @@ executing in parallel on separate GPUs — figs on track for
 tonight.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~17:05 London — runpod-b: W2_DRAFT_BLOCKS staged (1d2e3de28 § 1 queue item)
+
+`W2_DRAFT_BLOCKS.md` — copy-paste-ready against WRITEUP § 8: three
+new rows (sage intensity-family breadth w/ in-claim-zone T32
+receipts; tret_py first-non-NL breadth, every KEEP arm in-ladder;
+tret_wt WEAK boundary datum w/ the first in-ladder tret arm noted),
+the tretd row-tail update (KILLED 2/3 by the unigram trap — died on
+the merits, starvation fix worked), one optional § 7 cross-substrate
+order-map sentence. No REBUTTAL_PACK rows (order 0 — § 5 rule).
+Replication-receipt clauses attach after the post-figs legs. Numbers
+verified against the ratified bundle + ratification entries only.
+Ratify-on-push per pattern; PTR until applied. Both retrain lanes
+healthy at this stamp (λ̂ GPU 1, tt GPU 0).
+
+_Recorded-by: claude-fable-5 (runpod-b)_
