@@ -247,3 +247,15 @@ def test_perwinraw_negatives_survive_per_window():
     _pin_preacts(pw2, bias_pos)
     _pin_preacts(base2, bias_pos)
     assert torch.allclose(pw2.encode(x), base2.encode(x), atol=1e-6)
+
+
+# ── 10. budget-scan knob: explicit k_win overrides the k_pos*T rule ──
+
+def test_explicit_k_win_override():
+    btk = _mk(TXCBaseBTK, k_win=3)
+    assert btk.k_win == 3                        # independent of k_pos*T=8
+    out = btk.train_step(_win_batch(B=8))
+    assert abs(float(out["l0"]) - 3) < 1e-6
+    pw = _mk(TXCBaseBTK, relu_mode="perwin-raw", k_win=3)
+    z = pw.encode(_win_batch(B=4)).squeeze(1)
+    assert int((z != 0).sum(dim=-1)[0]) == 3

@@ -75,6 +75,7 @@ class TXCBaseBTK(TempBenchArch):
         threshold_start_step: int = 1000,
         threshold_beta: float = 0.999,
         relu_mode: str = "btk-only",
+        k_win: int | None = None,
     ):
         nn.Module.__init__(self)
         if relu_mode not in ("btk-only", "relu-mix", "perwin-raw"):
@@ -95,11 +96,15 @@ class TXCBaseBTK(TempBenchArch):
         self._T = T
         self.k_pos = int(k_pos)
         # Paper-arch budget, incl. the toy-bench clip (txc_base.py:65).
-        self.k_win = min(k_pos * T, d_sae)
-        if self.k_win < k_pos * T:
+        # Budget-scan knob: an explicit ``k_win`` hparam overrides the
+        # k_pos*T rule (fixed window budget independent of T); it hashes
+        # into train_key like any hparam.
+        nominal = k_pos * T if k_win is None else int(k_win)
+        self.k_win = min(nominal, d_sae)
+        if self.k_win < nominal:
             import warnings
             warnings.warn(
-                f"TXCBaseBTK: clipped k_win from {k_pos * T} to {d_sae} "
+                f"TXCBaseBTK: clipped k_win from {nominal} to {d_sae} "
                 f"(d_sae={d_sae}, k_pos={k_pos}, T={T})",
                 stacklevel=2,
             )

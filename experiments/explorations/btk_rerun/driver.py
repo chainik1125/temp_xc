@@ -59,6 +59,8 @@ def run_shard(
     seeds=tuple(SEEDS),
     n_steps: int = N_STEPS,
     d_sae: int = 0,
+    k_win: int = 0,
+    batch_size: int = 1024,
     probe: bool = False,
     smoke: bool = False,
     allow_dirty: bool = False,
@@ -75,9 +77,11 @@ def run_shard(
             override["T"] = int(T)
         if d_sae:
             override["d_sae"] = int(d_sae)   # sensitivity wing (de-clips grid)
+        if k_win:
+            override["k_win"] = int(k_win)   # budget scan: fixed window budget
         training_cfg = TrainingConfig(
             n_steps=int(n_steps),
-            batch_size=1024,
+            batch_size=int(batch_size),
             buffer_tokens=2_000_000,
             arch_hparams_override=override,
         )
@@ -121,6 +125,9 @@ def main() -> None:
                    help="override synthetic d_sae (sensitivity wing)")
     p.add_argument("--probe", action="store_true",
                    help="denoising latent-probe add-on (markov bench)")
+    p.add_argument("--k-win", type=int, default=0,
+                   help="budget scan: fixed window budget (overrides k_pos*T)")
+    p.add_argument("--batch-size", type=int, default=1024)
     p.add_argument("--out", type=str, default=None,
                    help="write the shard's rows to this JSON path")
     p.add_argument("--smoke", action="store_true",
@@ -145,7 +152,8 @@ def main() -> None:
     rows = run_shard(
         args.arch, args.datasource, args.T,
         k_pos_grid=tuple(args.k_pos), seeds=tuple(args.seeds),
-        n_steps=args.n_steps, d_sae=args.d_sae, probe=args.probe,
+        n_steps=args.n_steps, d_sae=args.d_sae, k_win=args.k_win,
+        batch_size=args.batch_size, probe=args.probe,
         allow_dirty=args.allow_dirty,
     )
     if args.out:
