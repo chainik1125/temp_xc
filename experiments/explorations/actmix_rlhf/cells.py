@@ -85,4 +85,29 @@ def lane_s1():
              tsae(500), tsae(20)]]
 
 
-LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1}
+def _s2(cell):
+    cell = dict(cell)
+    cell["seed"] = 2
+    cell["cell_id"] += "_s2"
+    return cell
+
+
+def lane_ext_a():
+    """CARD § 7 A1 phase A (frac 0.52, runs ‖ ext_b): seed-1 T8."""
+    return [_s1(txc(8))]
+
+
+def lane_ext_b():
+    """CARD § 7 A1 phase A (frac 0.34, runs ‖ ext_a): seed-2 small Ts."""
+    return [_s2(txc(1)), _s2(txc(2)), _s2(txc(5))]
+
+
+def lane_ext_c():
+    """CARD § 7 A1 phase B (solo, uncapped, after phase A drains):
+    the unpairable big cells — T16 never co-resides with T8. s1_T16
+    first so the full-2-seed interim figure completes earliest."""
+    return [_s1(txc(16)), _s2(txc(8)), _s2(txc(16))]
+
+
+LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1,
+         "ext_a": lane_ext_a, "ext_b": lane_ext_b, "ext_c": lane_ext_c}

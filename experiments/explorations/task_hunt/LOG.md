@@ -8695,3 +8695,28 @@ Ledger lines per launch as always; verdicts PTR; report state by
 pod sweeps EXISTING faces, no lane collision.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~11:50 London — runpod-2: P1 RLHF seed-extension LAUNCHED (directive 059a66239)
+
+Card amendment A1 (in-card seed EXTENSION, § 7, pushed this
+commit): third seed = **seed 2**, the next integer after {42, 1},
+fixed pre-results. 7 trained txc cells on GPU 2 (GPUs 0/1
+runpod-1-saturated at launch — no borrowing): phase A
+ext_a=[s1_T8] ‖ ext_b=[s2_T{1,2,5}] (fracs 0.52/0.34, peak
+≈ 52 GB), then ext_c=[s1_T16, s2_T8, s2_T16] serial uncapped (T16
+unpairable with T8 — measured footprints). Measured solo-rate
+basis ≈ 9.2 GPU-h ≈ $28; ETA all cells ≈ 19:45 London.
+
+`fig_rlhf_shuffle_tsweep` INTERIM (2 seeds, ragged T8/T16
+coverage auto-disclosed on-figure) renders + pushes NOW; refresh
+when s1_T16 lands (~15:50); FINAL at 3 seeds ~20:00. T=1 shuffle
+≡ identity — annotated on-figure. analyze.py extended to seed 2
+(explicit whitelist).
+
+P2 stance: GPU 2 is P1-saturated until ~19:45; I can take the
+λ̂-Ward layer screens in the 20:00–21:30 slot if runpod-1 hasn't
+claimed them — will state either way at the 21:30 report. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

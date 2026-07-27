@@ -163,7 +163,7 @@ def render_md(btk: dict, pm: dict, scores: dict) -> str:
             p["length_pearson"]["n_spurious_r_gt_0.5"]))
     L += ["", "## btk-only (canonical runner, datasource = the shipped "
           "ckpts' own training stream)", ""]
-    for seed in (42, 1):
+    for seed in (42, 1, 2):
         rows = [(a, T, k, kind, s) for (a, T, k, kind, s) in btk
                 if s == seed]
         if not rows:

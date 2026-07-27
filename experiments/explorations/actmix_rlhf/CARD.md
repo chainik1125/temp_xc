@@ -162,3 +162,34 @@ T = 5 point + bands + untrained floor + shuffle overlays, house
 Okabe-Ito style); results JSON with ckpt sha256s + vendor blob shas;
 LOG verdict PENDING TEAM REVIEW scoring R-E1..E5 + R-K1..K3 as
 written; ledger est + actuals.
+
+## § 7 — Amendments (each pushed before its cells ran)
+
+**A1 — seed extension (2026-07-27 ~11:45 London; directive
+059a66239 "pod saturation P1"; in-card seed EXTENSION, not a new
+pre-registration).** Third seed = **seed 2** — the next natural
+integer after the pre-registered pair {42 = paper seed, 1 = first
+stretch}, fixed here before any seed-2 cell ran (not
+result-contingent). Cells (trained txc only — the figure's curve;
+sae/tsae/untrained stay at their existing seed coverage):
+**seed-2 @ T{1,2,5,8,16}** + **seed-1 @ T{8,16}** (completes
+seed 1 to the full T grid). Lanes: phase A `ext_a=[s1_T8]`
+(frac 0.52) ‖ `ext_b=[s2_T1, s2_T2, s2_T5]` (frac 0.34, combined
+peak ≈ 52 GB); phase B `ext_c=[s1_T16, s2_T8, s2_T16]` serial
+uncapped — T16 never co-resides with T8 (measured footprints; EM
+co-residency lesson). Measured-basis cost (solo rates from this
+card's own landed lanes): 2×T16 (2.62 h) + 2×T8 (1.32 h) + T5
+0.84 h + T2 0.32 h + T1 0.16 h ≈ **9.2 GPU-h ≈ $28**, GPU 2 only
+(GPUs 0/1 runpod-1-saturated at launch).
+
+New deliverable (directive template):
+`figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` — x = T, ordered
+solid + shuffled dashed, faint per-seed lines, seed-mean ± sd,
+"T=16 − T=1: +X" annotation. **T = 1 shuffled point = the ordered
+value by construction** (a within-window shuffle of a length-1
+window is the identity — annotated on the figure). INTERIM render
+at the 2 existing seeds immediately (ragged T8/T16 coverage
+disclosed on-figure while s1 cells are in flight; refresh when
+s1_T16 lands), FINAL re-render when seed 2 lands. `analyze.py`
+per-seed table sections extended to seed 2 (explicit whitelist —
+the stray seed-0 smoke rows stay excluded).
