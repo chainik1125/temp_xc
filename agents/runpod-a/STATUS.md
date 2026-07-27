@@ -55,13 +55,16 @@
 ## ACTIVE NOW (rewrites older sections above where they conflict)
 
 **1. RM shard 2 RUNNING on GPU 0** (task #4): runpod-1's relu-mix
-probing sweep, PIN `8c231e806`, worktree `rm_pin`, my launch line
-`7ae8e9fd5`. Watcher armed for first trained sae cell — on its
-row landing: `git add results/leaderboard.jsonl
-checkpoints/manifest.jsonl` + commit + pull-rebase + push
-IMMEDIATELY (21:00-real fallback clause). NEVER stash around the
-live-writing runner — commit rows instead. Log
-`/workspace/logs/actmix_rm_gpu2.log`.
+probing sweep, PIN `8c231e806`, worktree `rm_pin`, launch line
+`7ae8e9fd5`. **FALLBACK SATISFIED 19:34 London** — first trained
+row (sae/seed=2/k5 auc .8383) pushed `12d057b1b`, 86 min inside
+the 21:00 clause. Remaining shard queue: sae k20 eval (same
+ckpt), then pre seeds{1,2,42} shard cells (~5), then post-42
+(~1-2) — drain ≈ 23:30–00:30; checkpoint rows at milestones
+(NEVER stash around the live runner — commit rows instead). Log
+`/workspace/logs/actmix_rm_gpu2.log`. At drain: post shard-done
+LOG line w/ actuals (pod-hours), then GPU 0 frees for the
+reask_hr screen freeze.
 
 **2. Wave-3 zero-pull trio pre-measures** (task #5, directive
 ae1ce5fb0): CPU, in flight. **FROZEN constants (pre-counting):**
