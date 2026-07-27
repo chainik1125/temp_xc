@@ -12507,3 +12507,57 @@ No GPU-needing stage has been reached, so per the key governance **no
 pod has been spun up and none will be until one is**.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+
+---
+
+## 2026-07-27 19:49 London (`date`) — runpod-1 — ⚑ P1-RM FINDING: THE ARMS ARE TRAINING-IDENTICAL (bit-identical checkpoints) — HALT PROPOSAL, mac-local please rule; runpod-a affected
+
+**Finding (proof-grade, two arch families):** the relu-mix (paper
+composition, unsuffixed classes) and btk-only cells train to
+BIT-IDENTICAL weights at matched (arch, seed, T):
+
+- `batchtopk_sae` s42 vs `batchtopk_sae_btkonly` s42: every tensor
+  `torch.equal` (W_enc/W_dec/biases/threshold/EMA buffers);
+  mean_auc equal to machine precision (0.895716958176599 both).
+- `txc_batchtopk_pre` s42/T1 vs btk twin: same — all tensors equal;
+  0.8202/0.8975/l0 20.69 reproduce btk's digits exactly. Only
+  delta anywhere: the `threshold_set` bookkeeping flag (exists in
+  the btk class only). File-sha differs (header), tensors do not.
+
+**Mechanism:** the BatchTopK boundary sits at the top ~0.11% of
+the pooled pre-acts (~+3σ) — the selected values are ALWAYS
+positive, so ReLU-after-select never fires on the training path;
+same seed ⇒ identical trajectories. Under Amendment-1 batches the
+selected FRACTION is T-invariant (k_pos·T · 4096/T = 81920,
+constant) ⇒ equality is expected at EVERY T. (The untrained twins
+DID differ — random weights are off-path, where eval-side gating
+diverges: that is consistent, not contradictory.)
+
+**What this answers (RM-E4 / the meeting's both-arms question):**
+the comparison COLLAPSES, in the strongest possible way — § 5.1
+T-behavior CANNOT be attributed to the ReLU sparsity-path
+composition, because on-path the two compositions are the same
+model. The paper-arm-vs-btk level differences on record (SAE
+0.8831 v1 ckpts vs 0.8993 v2) are TRAINER-GENERATION effects, not
+composition effects. RM-E1 resolves "equal, not below"; RM-E3
+anchor holds trivially; RM-E2's untrained sub-nominal l0 =
+off-path gating, as pre-registered report-class.
+
+**HALT PROPOSAL (ruling requested):** stop the remaining RM
+trained cells after currently-running ones complete (my shards
+0/1 + runpod-a shard 2 — ~8–10 GPU-h across pods still queued).
+Replacement protocol, cheaper and stronger: (a) weight-equality
+check per already-landed cell (mechanical, CPU); (b) ONE
+deliberate high-T confirmation train (pre T16 s42 — in flight on
+my shard now) to verify the T-invariance argument empirically;
+(c) both-arms deliverable = the k20/k5 figs annotated "arms
+coincide — bit-identical training (proof in LOG/RESULTS)" + the
+equivalence table in RESULTS_relu-mix.md. Spend to discovery:
+~4–5 GPU-h — the question is answered more decisively than a full
+grid would have.
+
+runpod-a: hold your shard at the NEXT CELL BOUNDARY if you see
+this before the ruling; your landed cells contribute to (a). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
