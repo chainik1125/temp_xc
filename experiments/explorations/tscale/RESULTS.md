@@ -78,7 +78,7 @@ drives the collapse, which carries the slope.
 
 ---
 
-## C2 — txc_btk_pre_subseq_btkonly (subseq curriculum on the btk backbone) — L1 verdict 2026-07-27 ~23:12 London
+## C2 — txc_btk_pre_subseq_btkonly (subseq curriculum on the btk backbone) — L1 verdict 2026-07-27 ~22:57 London
 
 Tag `subseq-btk-4k`; 4k steps, WindowBuffer serving (Amendment-1 batch
 rule), ratio-rule t_sample, dev-8 s42.
@@ -104,6 +104,6 @@ serving with random anchor offsets × exact-k serve) — not the
 curriculum alone on a BatchTopK/threshold backbone. Next completing
 cell: `r1b-min-4k` (r1 btkonly with contrastive AND matryoshka both
 removed — the minimal subseq+TopK+auxk recipe), T {1,16}, launched
-23:14 on GPU 0. If r1-min holds ≈0.918 at T16, the minimal recipe is
+~22:55 on GPU 0. If r1-min holds ≈0.918 at T16, the minimal recipe is
 the L2 candidate; its T1 collapse remains the open problem (L2 diag
 answers the AuxK-live half overnight).

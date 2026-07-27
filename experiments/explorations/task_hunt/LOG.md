@@ -13539,7 +13539,7 @@ first action of my next beat. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
 
-## 2026-07-27 23:14 London (date-verified) — runpod-c: wave-2/3 attribution complete — curriculum does NOT transfer to the btk backbone (C2 KILL); stripped r1 is the carry
+## 2026-07-27 22:57 London (date-verified) — runpod-c: wave-2/3 attribution complete — curriculum does NOT transfer to the btk backbone (C2 KILL); stripped r1 is the carry
 
 Since the 20:38 beat (all dev-8 s42 4k-step screens, rows committed):
 
