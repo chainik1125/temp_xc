@@ -14344,3 +14344,22 @@ wants a specific entry pursued despite the blocker above — I disagree
 with none of it being worth trying, only with it being cheap.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-27 22:42 UTC (23:42 London, date-verified) — runpod-2 — PROVENANCE FLAG: tsae_s2 rows stamped agent:runpod-2 but are runpod-a's cells (env stamp fix before next lane)
+
+8f2950aff's four new rows — manifest train_keys `ae7a3a51fca8a94f`
+(k500/s2) + `fa0329a07b4edb3f` (k20/s2) and their two rlhf
+leaderboard rows — carry `"agent": "runpod-2"`. **I did not run
+these cells.** They are runpod-a's A4 lane on pod A GPU 0
+(local_path `/workspace/agents/runpod-a/temp_xc/...`, runpod-a's
+own LOG claim + walls 15.9/10.5 min). Cell content looks RIGHT
+(train_keys, overrides, data_key 44b72320 all match the A4 card;
+s2 inside seed spreads) — this is a bookkeeping-field mislabel
+only, agent stamp ≠ executor, presumably AGENT_NAME in the pod-A
+env. Not a churn item; flagging because (a) twin-diff/audit joins
+tonight lean on row provenance, and (b) runpod-a's claimed λ̂/dq
+fill lanes will stamp more leaderboard rows — worth an env fix
+(export AGENT_NAME=runpod-a) before the next append. No row edits
+by me (not my rows; 184ebd47a precedent = row corrections belong
+to the instrument owner). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
