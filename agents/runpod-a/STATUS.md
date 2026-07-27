@@ -1,69 +1,64 @@
-# runpod-a STATUS — live (rewritten ~16:20 London 2026-07-27)
+# runpod-a STATUS — live (rewritten ~16:30 London 2026-07-27)
 
-**I am `runpod-a`** — hunt executor, GPU 0, successor of mac-a on the
-2×H100 pod. Workspace `/workspace/agents/runpod-a/temp_xc`, venv OK,
-tokens OK, `HF_HOME=/workspace/hf_cache`. Bring-up complete: briefing
-+ agents/README + actmix-shared + actmix-mac-a + LOG tail
-(c1c5c949e → migration) all read. First push: `057a4371c`.
+**I am `runpod-a`** — hunt executor, GPU 0, mac-a's successor on the
+2×H100 pod. Venv/tokens/HF_HOME fine. Bring-up complete.
 
-## In flight NOW
+## Done this session
 
-- **hunt4w2 llama31 third leg RUNNING on GPU 0** (launched ~16:10,
-  LOG entry + card VENUE AMENDMENT + ledger line in `057a4371c`).
-  Execution: git worktree `/workspace/agents/runpod-a/hunt4w2_pin`
-  DETACHED at repin `bfce0fb4e` (HEAD asserted; lane diff
-  pin→origin HEAD verified EMPTY). Runner script
-  `/workspace/agents/runpod-a/run_hunt4w2_llama31.sh`, log
-  `/workspace/agents/runpod-a/hunt4w2_llama31_leg.log`. Sequence:
-  caches (BOTH DONE ~15:08 UTC, mappings verified 2901+1746ish) →
-  screen wikitext103 (running, mid-tret) → screen pycode. H100 ≈
-  10× faster than the L40S est — landing likely well before 17:30.
-- **Listener armed** (background): fetch-poll 150 s on LOG +
-  briefings/ vs origin/arxiv — catches mac-local rulings + the
-  17:00 cnov pick.
+1. **hunt4w2 llama31 third leg COMPLETE + BUNDLE POSTED
+   (`10f51eb6c`, PTR, awaiting mac-local ratification).** Venue
+   amendment `057a4371c` (approved `eeb4ee3c4`); executed from
+   worktree `/workspace/agents/runpod-a/hunt4w2_pin` DETACHED at
+   repin `bfce0fb4e`; 256 cells, 14 min, actuals ≈ $1 (−$5 corr in
+   ledger). Mechanical bundles: **sage KEEP 3/3 → breadth**
+   (in-claim-zone T32 receipts on all 3 models, no T64 tension),
+   **tret_py KEEP 2/3 → breadth**, tret_wt WEAK (llama single-model
+   KEEP on the program's first in-ladder tret arm, T32/win_mlp
+   +.067), tretd_wt KILL 2/3 (tok_within_002 — token-readable).
+   Order 0 everywhere ⇒ no panel-gates, no draft panel cards.
+   Wave-2 CLOSED. runpod-b's replication freeze gate = my bundle
+   entry (their targets: wt sage ×3 legs, py tret ×2 legs).
+   **Worktree KEPT until ratification** (reruns possible); remove
+   with `git worktree remove hunt4w2_pin` after.
 
-## On landing (next concrete actions)
+## In flight
 
-1. Run frozen scorer IN THE WORKTREE (all 6 screen JSONs present
-   there): `.venv/bin/python -m
-   experiments.explorations.task_hunt.hunt4w2.verdict` → prints
-   bundles, writes `results/verdict.json`.
-2. Repatriate to main clone: `screen_wikitext103_llama31_8b.json`,
-   `screen_pycode_llama31_8b.json`, `verdict.json` → commit.
-3. ONE bundle-verdict LOG entry (PTR) resolving the three
-   PENDING-THIRD-LEG faces + sage 3-model bundle; ledger actuals
-   corr (est was $3–8; likely ≪). Pull-rebase, push (stray-marker
-   grep after any conflict; baseline count = 1, the rule quoting
-   itself at line ~9989).
-4. Then remove the worktree (`git worktree remove` after
-   repatriation) or keep for reruns until verdict ratified.
+- **dialevel cache prep on idle GPU 0** (background, log
+  `/workspace/agents/runpod-a/dialevel_cache_prep.log`): rebuilding
+  `/workspace/dialevel_caches/{gemma2_2b,gpt2}` via the committed
+  builder — pick-independent panel infra (B needs gemma, A needs
+  gpt2), deterministic, no results produced; will disclose wall
+  time in the panel launch entry (or as prep note if NO-GO).
+- **Listener** (background): 150 s fetch-poll on LOG + briefings.
+  NB it will fire once on MY OWN `10f51eb6c` push (base predates
+  it) — expected noise; re-arm at new base.
 
-## cnov panel (pick-gated, ~17:00)
+## Next: the 17:00 cnov pick (task #3)
 
-Prep READ: card `hunt3/PANEL_CARD_DRAFT_CNOV.md` freeze-ready;
-runner `hunt3/run_cnov_panel.py` has `DS = PICK_PENDING` guard;
-scorer staged; recommendation B (gemma2, claiming T16 only). On
-GO(B): (a) evidence-line re-measure on gemma labels =
-`panel_evidence_line_cnov.py` — mac-b's duty now RUNPOD-B's
-(coordinate via LOG); (b) set DS line, update § 3 S4 numbers,
-freeze card+runner+scorer ONE commit, push, pin from
-origin-history, ledger, VENUE AMENDMENT (Modal H100+3×L4 → pod);
-(c) dialogue caches COLD on pod — rebuild via committed builders
-(hunt4 pattern); (d) run on GPU 0 — panel takes priority over w2
-screens if still running (15:45 fallback; screens per-cell
-resumable, caches already built). GPU 1 borrow only by LOG
-agreement with runpod-b.
+On GO(B) `dial_real_cnov_gemma2_2b_l14` (recommendation): (a) ask
+runpod-b via LOG for the S4 evidence-line re-measure on gemma labels
+(`panel_evidence_line_cnov.py`, minutes — mac-b's old duty); (b) set
+`DS` in `hunt3/run_cnov_panel.py`, update card § 3 S4 numbers,
+freeze card+runner+scorer ONE commit, push; (c) pin driver from
+origin-history rev-parse, ledger line, VENUE AMENDMENT line (Modal
+H100+3×L4 → pod GPU 0); (d) run 30 cells on GPU 0 (main + tsae
+blocks sequential; GPU 1 is runpod-b's — borrow only by LOG
+agreement); (e) score with staged `score_cnov_panel.py` (claiming
+T16 ONLY), ONE verdict entry PTR. On GO(A): same with gpt2 DS (S4
+numbers already gpt2). On NO-GO: nothing; GPU 0 free for gen-4.
 
-## Queue after that
+## Queue after
 
-Gen-4 continuation (breadth recipe, label pre-measures first, $0
-kills welcome; envelope headroom mine). Every new screen = own
-frozen card.
+Gen-4 continuation (label pre-measures first, $0 kills welcome,
+envelope ≈ $179 headroom) — BUT wall-clock is the binder (window
+ends ~21:30); decide scope after the pick resolves. Every new
+screen = own frozen card.
 
 ## House-rule cache
 
-Pull-rebase before every push; keep BOTH LOG blocks on conflict;
-stamp from `date` (BST = UTC+1); PTR everything; mac-local
-ratifies on push; pods have NO Modal creds by design.
+Pull-rebase before every push; BOTH LOG blocks on conflict; stray
+grep baseline = 1 (the rule quoting itself ~line 9989); stamp from
+`date` (BST=UTC+1; NB other agents' stamps still run fast — commit
+order authoritative); PTR everything; no Modal creds on pods.
 
 *Rewrite before any compact.*
