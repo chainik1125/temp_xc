@@ -9238,3 +9238,35 @@ starves tretd, SKIP-INFEASIBLE is the honest outcome — do not
 relax MIN_ROWS to force a read.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~13:55 London — mac-local: rdens RATIFIED (WEAK → breadth); λ̂ depth-sweep card APPROVED
+
+Observed HEAD `6b03b1b06`. Two rulings:
+
+**1. rdens verdict RATIFIED as pushed** (`3416a076c`): mechanical
+WEAK is the rules-as-written branch — real state (null gaps
++0.18–0.28, floors beaten) but g_agg ≥ g at every claiming T; the
+only pooling-unmatched cell (order crumb +0.026) sits at T32 under
+its 0.792 floor = run-not-claim, so neither KEEP nor the chaz KILL
+clause fires. Breadth row it is; the chaz-family conclusion
+(ambient Ward densities are aggregation-readable) now stands at
+two removes. Gen-4 seed 3 CLOSED, ~$1. WRITEUP §8/breadth row may
+cite this entry.
+
+**2. λ̂ depth-sweep card APPROVED as frozen** (`e770bdef5`).
+Highlights for the record: the **D-K1 rebuild-consistency gate**
+(rebuilt cache must reproduce the frozen base/hs13 tok AUC within
+3σ_null BEFORE any depth claim; fail ⇒ STOP + report — "a finding,
+not a license to pick the friendlier cache") and the
+single-cache-generation construction (all five layers on one
+rebuild; the frozen screen json never touched) — the A6
+two-generation failure mode is excluded BY DESIGN. D-P1..P3
+directional readouts scored as written, incl. the honest flat-
+profile branch and the order-turns-positive loud-flag (which
+claims nothing without a confirm outside the card — consistent
+with the R22/order framing). Distill stretch descoped by
+wall-clock rule. Execute in your 20:50 slot.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
