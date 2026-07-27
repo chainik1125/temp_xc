@@ -62,12 +62,18 @@ COMPONENT = "c7"
 # (see configs/datasources.yaml note + agent_back briefing OQ #4).
 DATASOURCE = "llama_3_1_8b_base_l10_ward_nousmirror"
 
-EVAL_PROTOCOL_VERSION = "2.0.0"  # 1.1.0 → 2.0.0: extended magnitude
-# grid ((decision 2026-05-05), commit 9ea13c06). Adds ±{20-90} → 41 mags
-# (vs 25 in v1.x). Earlier protocol versions:
+EVAL_PROTOCOL_VERSION = "1.0.0"  # PINNED BACK for the 300K stacked arm
+# (2026-07-27 stacked-SAE sprint, branch dmitry-stacked-c7-300k):
+# delta_gc peak is a max over the magnitude grid, so a 41-mag (2.0.0)
+# peak is not comparable to the paper's 25-mag peaks — the T-SAE
+# extended row (0.433 @ +32 vs canonical 0.164 @ +7) proves the tail
+# folds in. The paper's printed Fig 4 / Table 2 values are 25-mag
+# protocol 1.0.0 rows (origin/300k-tfa:purified/results/leaderboard.jsonl);
+# this arm must land on the same grid.
+# Earlier protocol versions:
 #   1.0.0: original 25-mag sweep (no shuffle ablation)
 #   1.1.0: 25-mag + within-window shuffle ablation (no extreme mags)
-#   2.0.0: 41-mag extended grid + shuffle ablation (canonical for paper)
+#   2.0.0: 41-mag extended grid + shuffle ablation
 # Each protocol bump → fresh eval_keys; older cells stay in leaderboard
 # for diff. Analysis canonicalises on the latest version per train_key.
 
@@ -337,17 +343,17 @@ def main(*, archs=None, seeds=DEFAULT_SEEDS, build_cache_only: bool = False,
                     arch_name=arch,
                     seed=seed,
                     datasource_name=DATASOURCE,
-                    # (decision 2026-05-04) deadline override: n_steps=20_000
-                    # (schema default 25K) to fit C7 sweep in remaining
-                    # sprint window. Matches agent_nlp's c3+c4 override
-                    # (commit 513a85ea); analysis.py canonical filter
-                    # passes the same explicit cfg.
-                    training_cfg=TrainingConfig(n_steps=20_000),
+                    # (2026-07-27 stacked-SAE sprint) paper-scale override:
+                    # n_steps=300_000 to match the published 300K arms
+                    # (whose checkpoints are lost from git+HF; this arm is
+                    # the scale-matched stacked row for Fig 4 / Table 2,
+                    # judge-drift caveat recorded in the sprint log).
+                    training_cfg=TrainingConfig(n_steps=300_000),
                     eval_cfg={
-                        # v5: extended magnitude grid ((decision 2026-05-05)
-                        # commit 9ea13c06). Use DEFAULT_MAGNITUDE_GRID
-                        # to revert to the v4 25-mag sweep.
-                        "magnitudes": list(EXTENDED_MAGNITUDE_GRID),
+                        # 25-mag canonical grid — matches the printed
+                        # Fig 4 / Table 2 peaks (see EVAL_PROTOCOL_VERSION
+                        # note above).
+                        "magnitudes": list(DEFAULT_MAGNITUDE_GRID),
                         "cut_fraction": 0.25,
                         "pr_auc_S_grid": list(DEFAULT_PR_AUC_S_GRID),
                     },
