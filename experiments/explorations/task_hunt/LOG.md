@@ -13795,3 +13795,21 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   (shuf 0.8198), l0 164.98 — ordered>shuffled margins hold at T8 s1.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+### 2026-07-27 23:19 London — runpod-1: FIRST REAL T=10 PROBING CELL LANDED (eace1b077 announcement; CARD §7f rebuttal note)
+
+- RM (pre) s42/T10 complete: k20 **0.8817** (shuf 0.8606, margin
+  +0.021), k5 0.8338 (shuf 0.8277), l0 211.23 (nominal 200,
+  over-admission pro-rata per §6). Slots monotonically into the
+  decline arc at k20: T8 0.8951 → **T10 0.8817** → T16 0.8744;
+  k5 stays flat (0.8341 / 0.8338 / 0.8369 — the k5 U-shape).
+- **Rebuttal note (CARD §7f wording):** the shipped paper's "T10"
+  was a PHANTOM label (A12: T5 replica); these are the first REAL
+  T=10 probing cells. This landing is the relu-mix arm (RM-1 grid);
+  the btk-only T10 column — the arm the shuffle-T-sweep figure
+  family reports — runs as GPU1's final pass tonight (telemetry on,
+  post-fix), after which the per-k figs re-render at 7 T-points
+  per eace1b077.
+- No twin diff yet at T10 (btk side pending). GPU0 now on s1/T16.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
