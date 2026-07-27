@@ -238,3 +238,34 @@ are runpod-1's instrumented lane; flagged, not silently matched.
 Cost +2.6 GPU-h (eq ≈ 3.6 GPU-h total). Overnight order: Ward
 slot → eq (solo) → x6 ‖ x10 (extensions after the check, per
 sequencing).
+
+**A4 — tsae seed-2 width-triple completion (2026-07-27 ~23:10
+London; directive 98a9ea718 "tsae width-matched re-runs", Dmitry
+via Han; executed by runpod-a on pod A GPU 0 — in-card seed
+extension, A1 precedent).** The directive's STEP-0 provenance pin
+found the RLHF tsae baseline ALREADY width-matched: the shipped
+paper ckpts are d_sae 18432 (groups [3686, 14746]; ckpt sha256
+cbbb189c…/4c1a83c9… for k500/k20, `results/papermatch.json`
+provenance blocks), and every trained btk-only tsae row carries
+the explicit override `{d_sae: 18432, k_pos: 500|20}` (train_keys
+8f4e0b12/7c58d372 s42, 4e1661d9/7e95839d s1; data_key 44b72320) —
+this card overrode the registry default (archs.yaml tsae_btkonly
+16384, per-section override only synthetic) from its freeze. The
+reviewer's underpowered-width premise is a PROBING-section issue
+(runpod-b's lane). Directive triple {1,2,42} minus existing
+coverage {42, 1} ⇒ **lane `tsae_s2` = seed-2 twins of
+tsae_btkonly k500/k20 only** (realized h_size = round(0.2·18432)
+= **3686**, groups [3686, 14746]). NO re-runs of s42/s1 — the
+cache contract keys train_key on {arch, hparams, seed,
+training_cfg, data_key}, so a re-run collides and mints byte-alias
+rows (the exact hazard the 013441cfd exclusion list just closed);
+descope flagged PTR for ratification. No new untrained twins (s42
+floors stand, A1 precedent). Pod-A substrate from committed
+builders only: txcdr-base-data re-pull (14.2 GB),
+`convert_train_cache` (idempotent; config-derived data_key
+44b72320bc3a56e2 = the s42/s1 rows' key), HH-RLHF eval cache via
+`build_cache.py` — **the App B.1 integrity gate must pass or the
+lane STOPS** (rj ≈ 36.23 / ch ≈ 28.57 / p ≈ 9.76e-10). Freeze pin
+includes runpod-1's 3a9744c7f telemetry fix — logging-only (TXC
+base class; tsae class untouched), stated. Est 2 trainings +
+cache build ≈ 1–1.5 GPU-h ≈ $4–7.

@@ -13657,3 +13657,47 @@ On landing: rows table (per-seed mean_auc k∈{5,20} + realized_l0 at 18432,
 exhibit fold-in. RLHF-eq seed-split first call stays armed. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+---
+
+## 2026-07-27 ~23:10 London — runpod-a: tsae width directive STEP-0 VERDICT — RLHF tsae was NEVER at 16384 (width-matched @18432 in BOTH provenance layers); execution descoped to seed-2 completion (CARD § 7 A4, lane tsae_s2, launching)
+
+98a9ea718 RLHF lane, STEP 0 ($0, receipts in committed artifacts):
+"the run there" pinned in both layers —
+
+1. **Shipped paper ckpts (the § 5.4 case-study tsae):**
+   tsae_paper_k500/k20 = TemporalMatryoshkaBatchTopKSAE **d_sae
+   18432**, groups [3686, 14746] (h = 3686 = round(0.2·18432)),
+   ckpt sha256 cbbb189c…/4c1a83c9… — `actmix_rlhf/results/
+   papermatch.json` provenance blocks, zero missing/unexpected
+   keys.
+2. **Canonical btk-only rows (leaderboard):** every trained rlhf
+   tsae_btkonly row carries explicit arch_hparams_override
+   {d_sae: 18432, k_pos: 500|20} — s42 8f4e0b12/7c58d372, s1
+   4e1661d9/7e95839d, + s42 untrained twins 9147e04c/037faff7;
+   all data_key 44b72320bc3a56e2; full metric blocks; NONE on the
+   013441cfd exclusion list (probing-lane keys only).
+
+The archs.yaml receipt (tsae_btkonly default 16384, per-section
+override only synthetic) is true at the REGISTRY level, but the
+actmix_rlhf CARD overrode width per-cell from its freeze — the
+underpowered premise holds for PROBING (runpod-b's recon: P1 rows
+ran registry-default) and NOT for RLHF. No RLHF tsae cell ever
+ran at 16384.
+
+**Execution (not the STOP branch — the baseline exists):** the
+directive triple {1,2,42} @18432 minus existing {42, 1} = **seed 2
+× {k500, k20}**, frozen THIS COMMIT as CARD § 7 A4 + cells.py
+`lane tsae_s2` (h_size 3686 stated). Re-running s42/s1 would mint
+train_key-colliding byte-alias rows (the exact hazard the
+exclusion list just closed) — descoped, flagged here for
+ratification; if the team wants literal 3-seed re-runs anyway,
+say so and I amend. Pod-A substrate rebuilt from committed
+builders only (txcdr-base-data re-pull 14.2 GB → idempotent
+convert, same config-derived data_key → build_cache with the
+**App B.1 integrity gate = hard STOP on miss**). Pin includes
+runpod-1's 3a9744c7f telemetry fix (logging-only, TXC base class,
+tsae untouched — stated). Est ≈ 1–1.5 GPU-h ≈ $4–7, GPU 0,
+ledgered. Results line follows when rows land. PENDING TEAM
+REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_

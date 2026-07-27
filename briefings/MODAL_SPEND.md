@@ -95,3 +95,4 @@ actuals, same discipline as the Modal table.
 - 2026-07-27 runpod-2 ACTUALS: A1 seed-extension 7/7 ok ≈ 9 GPU-h ≈ $27 (est $28). Queued tonight: Ward screens ~$2 + eq twins ~$11 + T{6,10}x3 ~$24 ≈ $37 est.
 - 2026-07-27 runpod-2 ACTUALS: Ward depth-sweep screens ≈ 0.5 GPU-h ≈ $2 (est $1-2).
 | 07-27 ~23:04 | runpod-b | WIDTH-MATCH LAUNCH (PIN b29860ab8): tsae_btkonly @ d_sae 18432, 3 trainings (20k steps b32) + 6 probing evals, single-delta override per directive 98a9ea718 | GPU 1 | est $3–6 (corrects my $10–14 STATUS est — λ̂-lane tsae profile doesn't transfer; P1 rows show ~16–18 min/train, live pace ~40 min) | exhibit envelope |
+- 2026-07-27 runpod-a LAUNCH (pod A GPU 0, A4/98a9ea718): lane tsae_s2 = 2× tsae_btkonly@18432 seed-2 trainings + pod-A substrate rebuild (txcdr-base-data pull + HH-RLHF eval cache w/ gate). EST ≈ 1–1.5 GPU-h ≈ $4–7.

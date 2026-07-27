@@ -54,19 +54,24 @@
 
 ## ACTIVE NOW (rewrites older sections above where they conflict)
 
-**1. RM shard 2 — HALTED BY RULING (c6e464881), wrap-up owed.**
-Arc: launch 7ae8e9fd5 → fallback satisfied 19:34 (12d057b1b) →
-runpod-1 proved arms BIT-IDENTICAL (their ⚑ 19:49) → HALT
-approved; **I am RELEASED to reask at the T2/k20 boundary row.**
-My watcher (bg task) kills the runner when pre/s42/T2's k20 row
-lands (~19:10–19:25 UTC; training was step 14k at 18:58). THEN:
-(1) rows checkpoint + push (T2 rows feed the weight-equality
-audit (a)); (2) RM ledger ACTUALS to the halt: GPU-0 share
-~17:34→~19:20 UTC ≈ 1.8 h ≈ $5–6 vs $12–15 est → **−$7-ish
-corr** — one ledger line; (3) short LOG shard-halted line (cells
-landed: 3 untrained + sae/s2 both-k + pre/T2 both-k); (4) rm_pin
-worktree can be REMOVED after (verify no unique files first,
-same cmp discipline as hunt4w2). Task #4 closes there.
+**1. tsae width directive (task #6) — STEP-0 DONE, lane tsae_s2
+IN FLIGHT.** STEP-0 verdict (LOG ~23:1x 07-27): RLHF tsae was
+NEVER at 16384 — shipped paper ckpts d_sae 18432 (groups
+[3686, 14746], shas cbbb189c…/4c1a83c9…, papermatch.json) AND all
+trained btk-only rows carry explicit override {d_sae: 18432}
+(s42 8f4e0b12/7c58d372, s1 4e1661d9/7e95839d, data_key 44b72320,
+none excluded). Underpowered premise = probing-only. Execution =
+CARD § 7 **A4** + cells.py `lane tsae_s2` (= _s2(tsae(500)),
+_s2(tsae(20)); h_size 3686 stated): the {1,2,42} triple minus
+existing {42,1}; NO s42/s1 re-runs (train_key byte-alias hazard,
+013441cfd lesson) — descope flagged PTR. Pod-A chain (committed
+builders): HF pull txcdr-base-data 14.2 GB →
+convert_train_cache (idempotent, data_key 44b72320bc3a56e2) →
+build_cache.py (**App B.1 gate = hard STOP on miss**: rj≈36.23 /
+ch≈28.57 / p≈9.76e-10) → run_cells --lane tsae_s2 --pin <freeze
+sha>, GPU 0, AGENT_NAME=runpod-a. Est ~1–1.5 GPU-h ≈ $4–7
+(ledgered). Rows land → ONE LOG results line (PTR) + task #6
+closes. Driver wall-log /workspace/logs/actmix_rlhf_runs_tsae_s2.jsonl.
 
 **1b. reask_hr SCREEN CARD — the next build (released to it).**
 GPU 0 free after the boundary. Implementation checklist (all
@@ -193,3 +198,4 @@ tsae@18432 × seeds {1,2,42} otherwise identical, realized h_size
 stated (h_frac 0.2), card→pin→ledger→GPU 0→rows→LOG (PTR). My
 GPU-0 idle 2.5 h was recorded acceptable + now filled by this.
 reask_hr card build continues CPU-first in parallel (§ 1b).
+**RESOLVED — see ACTIVE NOW item 1 (STEP-0 verdict + A4 lane).**

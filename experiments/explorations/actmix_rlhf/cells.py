@@ -139,6 +139,16 @@ def lane_x10():
     return [txc(10), _s1(txc(10)), _s2(txc(10))]
 
 
+def lane_tsae_s2():
+    """CARD § 7 A4 (directive 98a9ea718 width triple, runpod-a):
+    seed-2 twins of the tsae shapes ONLY — s42/s1 already ran
+    @18432 (explicit override since freeze); re-running them would
+    mint train_key-colliding alias rows. No new untrained twins
+    (s42 floors stand, A1 precedent)."""
+    return [_s2(tsae(500)), _s2(tsae(20))]
+
+
 LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1,
          "ext_a": lane_ext_a, "ext_b": lane_ext_b, "ext_c": lane_ext_c,
-         "eq": lane_eq, "x6": lane_x6, "x10": lane_x10}
+         "eq": lane_eq, "x6": lane_x6, "x10": lane_x10,
+         "tsae_s2": lane_tsae_s2}
