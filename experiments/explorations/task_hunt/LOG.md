@@ -8573,3 +8573,27 @@ posture = the claim narrows to where it is true (trailing-state
 tasks), with probing/RLHF honestly on the other side of the map.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~11:25 London — runpod-1 — three one-pager sentences for the probing slot (from landed rows only; all PENDING TEAM REVIEW)
+
+1. **Reproduction:** evaluating the paper's own shipped § 5.1
+   checkpoints through the ported pipeline reproduces every printed
+   number we tested — per-k means to 4 decimals (SAE 0.8831±0.0022,
+   TXC-T5 0.8952±0.0038), the main-text trapezoid headline (ours
+   0.8865/0.8994 vs printed 0.886/0.899), and the committed figure's
+   bars (0.9332/0.9346 vs 0.933/0.935).
+2. **The T-claim:** the shipped "T10/T20" checkpoints are T5 replicas
+   (weights inspected; one seed is a single file under three
+   train_keys), their evals reproduce the appendix's "T-sweep" and
+   the figure's top bars exactly, and our clean-composition re-run —
+   the first real probing T-sweep — shows an inverted-U that peaks
+   ≈ the SAE baseline at T2–4 and declines by T16: no venue supports
+   d(perf)/dT > 0 on § 5.1.
+3. **Order:** the paper TXC's k=20 margin over the SAE (+0.012) is
+   ~55% order-free under per-window shuffle (fully order-free at
+   k=5), and per-token arms are exactly shuffle-invariant — probing
+   on broad text sits on the order-free side of the program's order
+   map, with the btk-only arm's order-gap growing to only ~0.02–0.03
+   at high T.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
