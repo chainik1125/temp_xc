@@ -27,7 +27,7 @@ from safetensors.torch import load_file
 from temp_bench.core.runner import run_experiment
 from temp_bench.core.schemas import TrainingConfig
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 OVERRIDE = {"d_sae": 64, "k_pos": 48}
 PAIR = (("batchtopk_sae", "relu-mix"), ("batchtopk_sae_btkonly", "btk-only"))
 
