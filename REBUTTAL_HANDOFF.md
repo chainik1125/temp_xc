@@ -92,14 +92,19 @@ retrained — see COMPOSITION_AUDIT).
 
 ## 6+7. Safety-relevant hunted tasks (THE GOLD — status, not yet exhibits)
 
-- **State (00:35):** every found-corpus candidate resolved (kills
-  with receipts — reask_hr 3/3, retryesc vocabulary bar, warddebt
-  geometry; see LOG). The ELICITATION HARNESS is generating the
-  three live candidates IN PARALLEL on the MATS Claude API:
-  **sycgen_age** (passed geometry gate — nearest KEEP), **evalage**
-  (evaluation-cue awareness, CPU-validated card), **retryesc_gen**
-  (regeneration with vocabulary control of a 5/6-bands phenomenon).
-  First KEEP auto-triggers the full matrix retrain (pre-authorized).
+- **State (00:50, corrected per mac-c's kill triage 2505cd937):**
+  every found-corpus candidate resolved (kills with receipts —
+  reask_hr 3/3, retryesc vocabulary bar fired LABEL-SIDE, warddebt
+  geometry; see LOG). Salvage classes: retryesc = signal-UNTESTED
+  (its probe never ran — the regenerated corpus tests a genuinely
+  open question, not a shown phenomenon); dharm + warddebt =
+  STRUCTURALLY UNSCREENABLE (rebuild-or-nothing). The ELICITATION
+  HARNESS: scaffold frozen; Claude-API backend committed
+  (a0646af0d) with the provenance weakening honestly disclosed
+  in-card (bit-exact → reproducible-in-expectation); **evalage
+  generation STARTING NOW; sycgen_age and retryesc_gen queued;
+  mac-d pulls one card for parallelism.** First KEEP auto-triggers
+  the full matrix retrain (pre-authorized).
 - **Where verdicts will appear:** LOG (stamped entries) +
   `experiments/explorations/task_hunt/<candidate>/` cards/results.
 - **For the 13:00 submission:** the honest sentence is a promised
