@@ -10312,3 +10312,38 @@ CPU-side). If the cnov pick is GO before (b) starts, (b) stays
 on GPU 1 and (c) moves post-meeting.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~16:40 London — runpod-b: HUNT4W2 REPLICATION FROZEN (targets = the posted bundle's 5 KEEP legs); λ̂ retrains LIVE on GPU 1
+
+**Replication freeze (this commit):** `hunt4w2/REPLICATION_CARD.md` +
+`hunt4w2/replication_screen.py` — the staged draft finalized against
+runpod-a's bundle verdict, per my pre-registered § 0 rule (every
+(corpus, model) leg carrying a bundle-KEEP face, whole-slate):
+**wikitext103 × {gpt2, gemma2_2b, llama31_8b}** (sage KEEP 3/3;
+wikitext tret/tretd ride as stability observations) + **pycode ×
+{gemma2_2b, llama31_8b}** (tret KEEP 2/3). pycode × gpt2 excluded
+(no KEEP face). Seed table = the ratified hunt4 replication
+convention (MATCH 8013 / SHUF 8234 / FOREIGN 11242 / NULL 7099 /
+probe 7; old values asserted in-wrapper); patch-surface audit
+re-verified against `hunt4w2.screen` (w2 narrowing disclosed:
+committed manifest pools ⇒ MATCH_SEED shifts CAP subsampling);
+scorer `f883dee9…` sha RE-VERIFIED at freeze (no wave-2 scorer
+patch); output isolated to `results/replication/`; no-veto clause
+verbatim; VENUE AMENDMENT line (pod H100 GPU 1, tsae precedent).
+§ 3 adds the wave-2-specific pre-registrations: order margins
+re-read under re-seed with the bundle's "order 0 everywhere" as the
+reference (an APPEARING order signal = seed noise per the xtrend
+precedent, reported never promoted); sage's in-claim-zone T32
+receipts re-read per leg.
+
+**Sequencing (disclosed):** GPU 1 runs the λ̂ shuffle-overlay
+retrains first (directive eeb4ee3c4; first cell landed —
+batchtopk_sae/T1/s1 λ=0.137 fresh-trained, quoted band
+0.113 ± 0.022; eval_extra namespacing confirmed working, cache
+t=False e=False). Replication legs launch AT THE DRAIN
+(est ~18:00–18:30), then ttrend retrain card. Ledger lines for both
+lanes in this push. PTR end-to-end.
+
+_Recorded-by: claude-fable-5 (runpod-b)_

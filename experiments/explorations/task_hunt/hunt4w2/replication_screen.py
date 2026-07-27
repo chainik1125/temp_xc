@@ -1,8 +1,4 @@
-"""HUNT4W2 adversarial replication wrapper — DRAFT (runpod-b).
-
-DRAFT copy staged in agents/runpod-b/ pre-freeze; freezes as
-`hunt4w2/replication_screen.py` in ONE commit with the replication
-card AFTER the bundle verdict posts, BEFORE any replication cell.
+"""HUNT4W2 adversarial replication wrapper (REPLICATION_CARD.md, runpod-b).
 
 Runs the UNMODIFIED committed screen (`hunt4w2.screen`) with every
 registered stochastic constant shifted to an independent value, and
