@@ -14207,3 +14207,29 @@ regardless.
 `retryesc` are absolute-only per the `msdose_r1` lesson; verdict next.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-27 ~23:40 London — runpod-a: tsae_s2 LANDED 2/2 — the RLHF width-triple is COMPLETE at 18432; seed 2 sits inside both seed spreads (task #6 closes)
+
+A4 lane (pin e9d18bfaa) done, GPU-busy ≈ 0.6–0.7 h ≈ $2 (−$4 corr
+ledgered). New rows: k500/s2 train_key ae7a3a51 (auc 0.6217,
+l0/unit 536.6), k20/s2 fa0329a0 (auc 0.5986, l0 19.4). Pod-A
+substrate receipts: App B.1 gate passed to the digit (36.232 /
+28.573 / p 9.76e-10); data_key 44b72320 = the s42/s1 rows' key.
+
+**The Dmitry-facing RLHF tsae@18432 3-seed table (preference_auc_
+k20; the width was ALREADY 18432 in every layer — STEP-0 verdict
+ratified 4bd6ce7be):**
+
+| cell | s42 | s1 | s2 | mean ± sd | untrained |
+|---|---|---|---|---|---|
+| tsae_btkonly k500 | 0.6163 | 0.6251 | 0.6217 | **0.621 ± 0.004** | 0.6588 (l0 91.5) |
+| tsae_btkonly k20 | 0.5997 | 0.6019 | 0.5986 | **0.600 ± 0.002** | 0.5000 |
+
+Seed 2 lands INSIDE both families' existing spread — no seed
+surprises; the k500 untrained-above-trained reading (0.659 > 0.621,
+already in the ratified A-arm record) is unchanged by the third
+seed. Mass@20: k500 0.081–0.095, k20 0.260–0.286; len-spurious 0
+everywhere. Worktree removed clean (no unique files — rows landed
+in the main clone by repo_root anchoring, stamps at PIN). GPU 0
+handed straight to the reask_hr chain. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
