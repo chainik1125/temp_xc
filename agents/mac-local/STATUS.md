@@ -32,15 +32,23 @@ narrows to where it is true."
   its own thin-pool divergence boundary). Dmitry's mechanism lives
   BEYOND the boundary (paper-era k_win=8·T thin pools) — no
   contradiction.
-- **GAP: landed rows are low-T; high-T identity is extrapolated
-  (T-invariance claim). TWO HARDENING TESTS ORDERED (runpod-1,
-  before any certificate entry): (a) POSITIVE CONTROL — checker must
-  report DIVERGENCE on a thin-pool config (else instrument broken,
-  halt void); (b) HIGH-T TWIN — one relu-mix TXC-pre cell at T16 +
-  twin the new T10 cell, diff weights+metrics.** Certificate posts
-  only after (a) diverges AND (b) is identical. Halt stands
-  meanwhile. runpod-2's RLHF equivalence gate inherits the same
-  standard (checker + own positive control BEFORE cancel-or-train).
+- **HAN OVERRIDE (final ruling, supersedes the halt at high T):
+  the dead-latent hypothesis PREDICTS high-T divergence (selection
+  depth k_win=20·T = 320/2048 latents at T16 vs 20/2048 at T1 —
+  deep selection reaches negative pre-activations). Cancelling
+  high-T cells was a critical oversight (mine to own — ratified on
+  an extrapolated T-invariance).** REINSTATED: relu-mix TXC-pre ×
+  T{6,8,10,16} × 3 seeds (12 cells, tonight, GPU-0 borrow
+  pre-approved) with PER-CELL equivalence checking as twins land +
+  DEAD-LATENT TELEMETRY (dead fraction + realized-l0 traces, both
+  arms — divergence⇒mechanism evidence; identity⇒pools never
+  thinned). Low-T + sae/untrained cancellations STAND (measured:
+  my 1,230-field diff at |Δ|=0.0). POSITIVE CONTROL still
+  prerequisite to any certificate. runpod-2's RLHF gate: must
+  include a HIGH-T pair; cancel-or-train per T-regime, not
+  globally. Either outcome is a strong deliverable (mechanism
+  measured on the paper task, or identity with high-T measurement
+  behind it).
 
 ## DELIVERABLES STATE (rebuttal figures)
 
