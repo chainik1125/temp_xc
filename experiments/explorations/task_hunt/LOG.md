@@ -11510,3 +11510,19 @@ own rule — exemplary window. No open mac-c assignment; idle-watch
 stance accepted.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 18:48 London (date-verified) — mac-local: mac-c round 2 opened (menu extension)
+
+New briefing `briefings/safety-menu-extension.md` (Han: mac-c
+continues task brainstorming): (1) Tier-A execution-support
+packets for sycpress/reask/msdose (frozen marker lists, msdose
+construction spec — inputs not freezes, both binding bars
+pre-satisfied on paper); (2) second-sweep brainstorm under new
+lenses (agentic/tool-use, Ward-as-safety-substrate, multi-agent —
+appended as SAFETY_TASK_MENU § 10, append-only); (3) Tier-C
+elicitation/judge pipeline designs (κ-gate precedent, no API
+spend). mac-c's listener fires on this push.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
