@@ -10883,3 +10883,47 @@ runpod-b: λ̂ overlay is your sole open lane — gate verdict + fig
 on drain, per your playbook. All PTR.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 18:15 London (wall) — runpod-1 — 6166c0293 §3a EXECUTED: k-inversion formalized + l0 confound RULED OUT — PTR
+
+Dmitry's confound check, from existing rows (TXC-pre btk-only, 3
+seeds, mean ± sd; 36-task CT-excl headline, 38-raw in
+RESULTS_btk-only.md):
+
+    k=5:  T1 0.8500±0.0066 → T2 0.8465 → T4 0.8370±0.0114 (dip)
+          → T8 0.8501 → T16 0.8571±0.0057 (max; +0.0071 over T1)
+          gaps: 0 → +0.0114 → +0.0151 → +0.0085 → +0.0072 (SHRINK)
+          SAE-36 band 0.8559±0.0041 → T16 ties the band (+0.001)
+    k=20: T1 0.9264±0.0013 → 0.9238 → 0.9231 → 0.9150 →
+          T16 0.9033±0.0035 (decline −0.023)
+          gaps: 0 → +0.0136 → +0.0223 → +0.0328 → +0.0263 (GROW)
+          SAE-36 band 0.9262±0.0033 → T1 at band, below from T8
+
+**Realized l0 PER TOKEN across T (the suspected confound):**
+20.86 → 21.00 → 20.71 → 20.71 → 23.78 — FLAT through T8
+(over-admission scales with the window, not the token), +14% at
+T16 only. **Ruled out as the inversion mechanism:** the T16
+per-token capacity bump is IDENTICAL across k (same trained
+models serve both probes), yet k=5 RISES at T16 while k=20 FALLS
+— same serving, opposite k-responses. The inversion is in the
+PROBE, not the serving.
+
+**Mechanism read (one paragraph, PTR):** probe-budget × feature-
+granularity interaction. At k=5 the probe can only spend 5
+features; window mixing concentrates task signal into fewer,
+more selective summary features — and the k=5 high-T gain is
+largely ORDER-FREE (its shuffle gap shrinks to +0.007 at T16),
+i.e. pooled composition information, not sequence structure. At
+k=20 the probe exploits fine per-token structure that window
+serving erodes; its order-gap peaks mid-T (+0.033 @T8) inside
+the declining curve (decline-mitigation framing per guard
+5aa351a4e). Honest sentence stands as mac-local phrased it:
+**T-scaling on probing is probe-budget-dependent — declining at
+k=20, flat-to-mildly-rising at k=5; no monotone window WIN at
+any k** (at the k=5 max, TXC ties the SAE band, +0.001).
+
+§3b (k ∈ {10,40,80} eval-only bracket): ckpt-persistence +
+pricing check next; card-free eval extension if ≤ ~3 GPU-h, else
+priced note first. §3c relu-mix card following tonight.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
