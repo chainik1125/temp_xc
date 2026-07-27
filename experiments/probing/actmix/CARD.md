@@ -225,6 +225,20 @@ per-step exposure matched, optimizer batch-count differs from the
 token arms only in units (disclosed, same as the v1 c3 convention
 question; per-arm internal consistency preserved).
 
+## 7c. AMENDMENT 2 (2026-07-27 ~07:55 London): tsae_btkonly TRAINED cells → post-deadline
+
+Measured 7.8 s/step (≈43 h per 20k-step train): `consumes='sequence'`
+serving materializes (4096, 128, 2304) batches per step so train_step
+can sample one consecutive pair — the v1 pipeline instead served
+pairs via `train_window_size=2`. This is a v2 SERVING mismatch (arch
+compute is fine; flagged to mac-a/the serving owner — candidate fix
+is a pair-serving batch iter, NOT an in-place arch change). ~6.5 h of
+both GPUs were burned before detection (ledger actuals disclose).
+Impact: the btk-only arm's TSAE column tonight = untrained twins
+only; the spec lists TSAE as parenthetical-optional, and the
+paper-match arm's TSAE (trained, shipped ckpts) is complete. tsae
+trained twins queue post-deadline behind the serving fix.
+
 ## 8. Budget (RUNPOD ledger in briefings/MODAL_SPEND.md)
 
 Estimate at assumed pod rate ~$7.5/hr (3×H100; runpod-1's 2-GPU share

@@ -30,7 +30,14 @@ export TEMP_BENCH_ALLOW_DIRTY=1
 export PYTHONUNBUFFERED=1   # nohup logs must stream, not block-buffer
 
 PY=.venv/bin/python
-COMMON_TOKEN="--token-archs batchtopk_sae_btkonly tsae_btkonly"
+# AMENDMENT 2: tsae_btkonly TRAINED cells dropped from tonight's queue —
+# its consumes='sequence' serving moves full 128-token batches per step
+# to sample one pair (measured 7.8 s/step = 43 h/train vs the v1
+# pipeline's train_window_size=2 pair serving; a v2 serving mismatch,
+# NOT an arch defect — flagged to mac-a, fix belongs to the arch/serving
+# owner). TSAE is the spec's parenthetical-optional column; it remains
+# covered by the paper-match arm (complete) + untrained twins.
+COMMON_TOKEN="--token-archs batchtopk_sae_btkonly"
 TXC_PRE="--txc-archs txc_batchtopk_pre_btkonly"
 TXC_POST="--txc-archs txc_batchtopk_post_btkonly"
 TS="--Ts 1 2 4 8 16"
