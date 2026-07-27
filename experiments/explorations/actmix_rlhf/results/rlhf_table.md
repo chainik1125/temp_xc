@@ -47,6 +47,18 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
 | txc_batchtopk_post_btkonly@T1/k100 | 0.5975 | ≡ | — | 0.111 | 108.2 |
 | txc_batchtopk_post_btkonly@T2/k200 | 0.6162 | 0.6185 | -0.0022 | 0.097 | 209.2 |
 | txc_batchtopk_post_btkonly@T5/k500 | 0.6218 | 0.6119 | 0.0099 | 0.073 | 510.0 |
+| txc_batchtopk_post_btkonly@T8/k800 | 0.6251 | 0.6328 | -0.0077 | 0.063 | 822.7 |
+| txc_batchtopk_post_btkonly@T16/k1600 | 0.6196 | 0.5998 | 0.0198 | 0.053 | 1643.5 |
+
+### seed 2
+
+| cell | auc | shuffled | gap | mass@20 | l0/unit |
+|---|---|---|---|---|---|
+| txc_batchtopk_post_btkonly@T1/k100 | 0.6008 | ≡ | — | 0.104 | 108.5 |
+| txc_batchtopk_post_btkonly@T2/k200 | 0.6096 | 0.6085 | 0.0011 | 0.094 | 211.2 |
+| txc_batchtopk_post_btkonly@T5/k500 | 0.6185 | 0.6041 | 0.0143 | 0.073 | 517.0 |
+| txc_batchtopk_post_btkonly@T8/k800 | 0.6262 | 0.6163 | 0.0099 | 0.064 | 825.1 |
+| txc_batchtopk_post_btkonly@T16/k1600 | 0.6317 | 0.6086 | 0.0231 | 0.056 | 1647.5 |
 
 ## Mechanical R-scoring (CARD § 4, as frozen)
 

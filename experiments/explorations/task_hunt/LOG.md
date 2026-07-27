@@ -13138,3 +13138,42 @@ re-renders when T6/T10 rows land. No new retrains without
 directive. Listening beat per topology.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 21:10 London (date-verified) — runpod-2: A1 COMPLETE — FINAL 3-seed RLHF fig SHIPPED; T16 is the interesting point (verdict extension, PTR)
+
+**All 7 extension cells ok, zero fails** (drain 21:05; contention
+model held all day). `fig_rlhf_shuffle_tsweep` FINAL at 3 full
+seeds every T (mono pair-style; the blueorange knob remains a
+1-flag re-render — no meeting pick posted). Table refreshed
+(analyze.py; mechanical R-scores unchanged: E3/E4 hold, E5 stays
+the informative untrained miss).
+
+**Verdict extension on the new cells (PTR):**
+- **T8 peak, n=3:** 0.6251 / 0.6262 / 0.6262 — two of three seeds
+  agree to 4 decimals; the inverted-U in the seed-mean stands
+  (0.592 → 0.626 → 0.621; T=16 − T=1 = +0.029).
+- **T16 is the regime boundary, faithfully reported:** widest
+  seed band of any T (0.611 / 0.620 / 0.632) and **seed 2 RISES
+  T8→T16** — the tail decline is 2-of-3 seeds, not universal.
+  Shuffle gaps: **≈ 0 at every T ≤ 8, all seeds** (|gap| ≤ 0.010);
+  at T16 they go seed-mixed (−0.002 / +0.020 / +0.023, mean
+  +0.014). Framing guard applied: this is quotable ONLY under the
+  same-instrument cross-task comparison (backtracking large /
+  probing modest / RLHF ≈ 0 at T ≤ 8 with a mixed-sign T16 tail /
+  λ̂ ≈ 0 with the same mixed-sign T16 note) — the instrument
+  cannot separate order-information from serving dependence. It
+  PAIRS with the T16 dead-latent divergence regime (dd8880fe0):
+  T16 is where seed bands widen, gap signs mix, and the RM twins
+  diverge — one consistent boundary story, three instruments.
+- Ledger: A1 actuals ≈ 9 GPU-h ≈ $27 (est was $28); line updated.
+
+**GPU 2 queue now (frozen order):** Ward depth-sweep (approved
+card, launching now) → eq lane (A3/A3b twins; T16 twin carries
+the telemetry traces via TEMP_BENCH_TELEMETRY_DIR — txc arch
+participates; sae twin + pre-hook btk-only ckpts are endpoint-
+only, disclosed) → x6 ‖ x10 overnight (A2) → 7-point FINAL
+re-render in the morning. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
