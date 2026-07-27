@@ -1,0 +1,136 @@
+{
+  "train_key": "d7b2e24253055f8e",
+  "arch": "txc_base",
+  "datasource": "llama_3_1_8b_base_l10_ward_nousmirror",
+  "subject": "NousResearch/Meta-Llama-3.1-8B",
+  "layer": 10,
+  "T": 5,
+  "d_sae": 32768,
+  "latent": 12491,
+  "latent_auc": 0.7636594238627512,
+  "latent_fire_rate": 0.13766339869281047,
+  "sign": 1.0,
+  "p99": 1.8493319594860207,
+  "ac_share": 0.30686062574386597,
+  "n_prompts": 40,
+  "prefix_sents": 6,
+  "baseline_keyword_rate": 0.0014746323161244407,
+  "rows": [
+    {
+      "protocol": "none",
+      "q": 0.0,
+      "keyword_rate_mean": 0.0014746323161244407,
+      "keyword_rate_sem": 0.0006491384888492208,
+      "injected_norm_mean": 0.0,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" Now, let's see what we can deduce from these statements. First, let's look at Arden's statement. He says that exactly one of them is a liar. This means that either Arden, Blake, or Casey is a liar, but not all of them. So, we can rule out the possibility that all three of them are truth-tellers. Next, let's look at Blake's statement"
+    },
+    {
+      "protocol": "v7",
+      "q": 1.0,
+      "s_abs": 1.8493319594860207,
+      "keyword_rate_mean": 0.0008999506652154158,
+      "keyword_rate_sem": 0.0004350162185830311,
+      "injected_norm_mean": 9.337055611610413,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" Now, let me try to figure out who is who. First, let's look at Arden's statement. He says that exactly one of them is a liar. But wait, that's impossible! If exactly one of them is a liar, then the other two must be truth-tellers. But that's not what Arden said! So, Arden must be a liar. Now, let's look at Blake's statement. He says"
+    },
+    {
+      "protocol": "v7",
+      "q": 2.0,
+      "s_abs": 3.6986639189720414,
+      "keyword_rate_mean": 0.0008527500767306001,
+      "keyword_rate_sem": 0.0005019892307502435,
+      "injected_norm_mean": 18.812609958648682,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" Now, let me try to figure out who is who. First, let's look at Arden's statement. He says that exactly one of them is a liar. But if he's a liar, then he's not telling the truth, so he's not a liar. So, he must be a truth-teller. Now, let's look at Blake's statement. He says that Arden is lying. But if he's a liar, then he's not tel"
+    },
+    {
+      "protocol": "v7",
+      "q": 4.0,
+      "s_abs": 7.397327837944083,
+      "keyword_rate_mean": 0.0009064807219031993,
+      "keyword_rate_sem": 0.0006332596537559297,
+      "injected_norm_mean": 38.09750175476074,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" So, let me try to figure out who is who. First, let me start with Arden. He says that exactly one of them is a liar. But, if he's a liar, then he's not telling the truth, and he's not a liar. So, he must be a truth-teller. Now, let me move on to Blake. He says that Arden is lying. But, if he's a liar, then he's not telling the truth"
+    },
+    {
+      "protocol": "v7",
+      "q": 8.0,
+      "s_abs": 14.794655675888166,
+      "keyword_rate_mean": 0.0020105498444533874,
+      "keyword_rate_sem": 0.0008918714489422194,
+      "injected_norm_mean": 76.82793960571288,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" So, let me try to figure out who is who. First, let me start with Arden. Arden says: \"Exactly one of us three is a liar. \" So, that means that either Blake or Casey is a liar. But, Blake says: \"Arden is lying. \" So, that means that Blake is a liar. And, Casey says: \"Blake is a liar. \" So, that means that Casey is a liar. So, I think"
+    },
+    {
+      "protocol": "pp",
+      "q": 1.0,
+      "s_abs": 1.8493319594860207,
+      "keyword_rate_mean": 0.0011047529251024216,
+      "keyword_rate_sem": 0.0005574378394947117,
+      "injected_norm_mean": 9.218675303459168,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" Now, let me try to figure out who is who. First, let's look at Arden's statement. He says that exactly one of them is a liar. But wait, that's impossible! If exactly one of them is a liar, then the other two must be truth-tellers. But that's not what Arden said! So, Arden must be a liar. Now, let's look at Blake's statement. He says"
+    },
+    {
+      "protocol": "pp",
+      "q": 2.0,
+      "s_abs": 3.6986639189720414,
+      "keyword_rate_mean": 0.0010356702940264623,
+      "keyword_rate_sem": 0.0005254467149884715,
+      "injected_norm_mean": 18.726902627944945,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" Now, let me try to figure out who is who. First, let's look at Arden's statement. He says that exactly one of them is a liar. But wait, that's impossible! If exactly one of them is a liar, then the other two must be truth-tellers. But that's not what Arden said! So, Arden must be a liar. Now, let's look at Blake's statement. He says"
+    },
+    {
+      "protocol": "pp",
+      "q": 4.0,
+      "s_abs": 7.397327837944083,
+      "keyword_rate_mean": 0.0020221248557970293,
+      "keyword_rate_sem": 0.0007532043179689832,
+      "injected_norm_mean": 38.03592252731323,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" So, let me try to figure out who is who. First, let me start with Arden. Arden says: \"Exactly one of us three is a liar. \" So, this means that either Blake or Casey is a liar, but not both. Now, let me look at Blake's statement: Blake says: \"Arden is lying. \" So, this means that Arden is not a liar, which means that Casey is a liar."
+    },
+    {
+      "protocol": "pp",
+      "q": 8.0,
+      "s_abs": 14.794655675888166,
+      "keyword_rate_mean": 0.001986758729222241,
+      "keyword_rate_sem": 0.0009369526458272734,
+      "injected_norm_mean": 76.79299602508544,
+      "sample": "\": Arden says: \"Exactly one of us three is a liar.\" Blake says: \"Arden is lying.\": Blake says: \"Arden is lying.\" Casey says: \"Blake is a liar.\": Casey says: \"Blake is a liar.\" So, let me try to figure out who is who. First, let me try to figure out who is a liar. Arden says: \"Exactly one of us three is a liar.\" Blake says: \"Arden is lying.\" Casey says: \"Blake is a liar.\" So, let me try to figure o"
+    },
+    {
+      "protocol": "slab",
+      "q": 1.0,
+      "s_abs": 1.8493319594860207,
+      "keyword_rate_mean": 0.001140975574356309,
+      "keyword_rate_sem": 0.0004861418856459461,
+      "injected_norm_mean": 11.219450068473815,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" Now, let me try to figure out who is who. First, let's look at Arden's statement. He says that exactly one of them is a liar. But wait, that's impossible! If exactly one of them is a liar, then the other two must be truth-tellers. But that's not what Arden said! So, Arden must be a liar. Now, let's look at Blake's statement. He says"
+    },
+    {
+      "protocol": "slab",
+      "q": 2.0,
+      "s_abs": 3.6986639189720414,
+      "keyword_rate_mean": 0.0008705563445368679,
+      "keyword_rate_sem": 0.000509250626960298,
+      "injected_norm_mean": 22.60523314476013,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" Okay, so let's start with Arden. He says that exactly one of them is a liar. But that's not possible, because if exactly one of them is a liar, then that means that Arden is a liar, because he's saying that exactly one of them is a liar, and he's one of them. So Arden is a liar. Now, let's move on to Blake. He says that Arden is lyi"
+    },
+    {
+      "protocol": "slab",
+      "q": 4.0,
+      "s_abs": 7.397327837944083,
+      "keyword_rate_mean": 0.0016501120451796996,
+      "keyword_rate_sem": 0.0007258498376882622,
+      "injected_norm_mean": 45.777635955810545,
+      "sample": " \" Blake says: \"Arden is lying. \" Casey says: \"Blake is a liar. \" So, let me try to figure out who is who. First, let me start with Arden. Arden says: \"Exactly one of us three is a liar. \" So, this means that either Arden is a liar, or one of the other two is a liar. But, Blake says: \"Arden is lying. \" So, this means that Blake is a liar, and Arden is a truth-teller. But, Casey says: \"Blake is a l"
+    },
+    {
+      "protocol": "slab",
+      "q": 8.0,
+      "s_abs": 14.794655675888166,
+      "keyword_rate_mean": 0.0026251823143021167,
+      "keyword_rate_sem": 0.0011255366191934252,
+      "injected_norm_mean": 92.31536521911622,
+      "sample": " Blake says: \"Arden is a liar.\" Casey says: \"Blake is a liar.\" So, let me try to figure out who is who. First, I'll start with Arden. He says: \"Exactly one of us three is a liar.\" So, that means that either Blake or Casey is a liar. But, Blake says: \"Arden is a liar.\" So, that means that Blake is a liar. And, Casey says: \"Blake is a liar.\" So, that means that Casey is a liar. So, I think that Arde"
+    }
+  ]
+}
