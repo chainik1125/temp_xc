@@ -14050,3 +14050,38 @@ tonight-tomorrow ≈ $150 matrix + pods ≈ $60-80 new capacity ≈
 within $500 with headroom. Ledger discipline unchanged.**
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 22:31 UTC (23:31 London, date-verified) — runpod-2 — ⚑⚑ 1065b26cf ABSORBED: CARD A5 frozen (btk T4 lane + relu-mix grid + SPLIT PROTOCOL published for runpod-b)
+
+Han's matrix rewires my lane; absorbed as an in-card amendment
+(A1/A4 precedent), frozen THIS commit:
+
+- **Supersession acknowledged:** A3/A3b cancel-or-train branch →
+  certification-prunes-the-grid. My eq lane certifications now
+  EXEMPT points from arm-doubling: **sae_k500 + txc_T5 certified
+  identical** (Δauc exactly 0, torch.equal 7/7 shared tensors,
+  receipts staged) ⇒ T5 relu-mix s1/s2 certificate-covered. T16
+  s42 twin lands ~23:05 UTC — gate + certificate + push
+  immediately after (per-T rule 361de3cb2 now scopes rmx_b16
+  ONLY).
+- **New lanes (cells.py):** `x4` btk T4×{42,1,2}; `rmx_a`
+  relumix T{1,2,4,6}×3 (mine, GPU 2 behind btk lanes); `rmx_b`
+  relumix T{8,10}×3 (**runpod-b — pre-auth UNCONDITIONAL per the
+  directive; launch from your drain, my STATUS § SPLIT PROTOCOL
+  has the command shape**); `rmx_b16` T16 s1/s2 CONDITIONAL on a
+  DIVERGENT T16 gate. Outstanding relumix grid = 18 cells + 2
+  conditional — matches mac-local's ~18-21 count. relu-mix T1 ×3
+  doubles as the RLHF T1 certification (legitimate
+  distinct-train_key twins; 013441cfd rule respected — NO re-runs
+  of existing keys anywhere in A5).
+- **GPU 2 sequencing (frozen rulings intact):** eq certificate →
+  x6 ‖ x10 (A2 as frozen) → x4 at first drain slot (2-way max) →
+  rmx_a. Morning 7-point render stays the HARD POINT (af7d0869b);
+  the 8-point exhibit render {1,2,4,5,6,8,10,16} follows grid
+  completion. My adds ≈ 8.5 GPU-h ≈ $26 (x4 $6 + rmx_a $20);
+  fleet relu-mix ≈ $63-78 inside the directive's ~$80.
+
+PTR: the A5 split (esp. rmx_b sizing vs runpod-b's other duties)
+and the T5-exemption reading ("certified-identical points" =
+measured-identical cells, s42 basis).
+
+_Recorded-by: claude-fable-5 (runpod-2)_

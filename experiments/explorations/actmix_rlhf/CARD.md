@@ -269,3 +269,37 @@ lane STOPS** (rj ≈ 36.23 / ch ≈ 28.57 / p ≈ 9.76e-10). Freeze pin
 includes runpod-1's 3a9744c7f telemetry fix — logging-only (TXC
 base class; tsae class untouched), stated. Est 2 trainings +
 cache build ≈ 1–1.5 GPU-h ≈ $4–7.
+
+**A5 — deliverables-matrix completion: btk T4 + the relu-mix arm
+(2026-07-27 ~22:30 UTC / ~23:30 London; directive 1065b26cf, Han's
+clarified matrix — 7 exhibits × 3 seeds × T{1,2,4,6,8,10,16} ×
+both arms; in-card amendment, A1 precedent).** The matrix
+SUPERSEDES A3's cancel branch and A3b's cancel-or-train
+consequence: the relu-mix RLHF arm is REQUIRED at every grid T
+except certified-identical points — the eq lane's role is now
+certification + telemetry (which points the certificate EXEMPTS
+from arm-doubling), not cancel-vs-train. Certified identical so
+far (s42, torch.equal all shared tensors, Δauc exactly 0):
+**sae_k500 and txc_T5** ⇒ T5 relu-mix s1/s2 are certificate-
+covered (T5 = bonus point above the grid floor anyway); txc_T16
+s42 twin in flight (gate tonight, per-T rule 361de3cb2 stands for
+CONDITIONAL cells only). **New lanes:** `x4` = btk T4 × seeds
+{42,1,2} (grid-floor point; ≈ 2 GPU-h ≈ $6). Relu-mix outstanding
+grid = txc T{1,2,4,6,8,10} × 3 (18 cells) + T16 s1/s2 conditional:
+**split protocol** (runpod-b pre-auth now UNCONDITIONAL per the
+directive) — `rmx_a` = runpod-2, T{1,2,4,6} × 3 (12 cells ≈ 6.5
+GPU-h ≈ $20, GPU 2 behind the btk lanes); `rmx_b` = runpod-b,
+T{8,10} × 3 (6 cells ≈ 8.9 GPU-h ≈ $27, from width-match drain
+~01:00, THEIR pod, this pin); `rmx_b16` = runpod-b CONDITIONAL
+T16 s1/s2 (≈ 5.3 GPU-h ≈ $16) ONLY on a DIVERGENT T16 gate —
+identical ⇒ certificate line covers T16, lane never runs.
+relu-mix T1 ×3 doubles as the RLHF T1 certification (expected
+identical; legitimate distinct-train_key twins per 013441cfd —
+byte-identical ckpts are the RESULT, not aliasing). GPU 2
+sequencing unchanged where frozen: eq certificate → x6 ‖ x10
+(A2 fracs 0.35/0.50; morning 7-point render stays the hard point
+per af7d0869b) → x4 at first drain slot → rmx_a. T4 lands after
+the morning render; the exhibit re-render at the full 8-point
+grid {1,2,4,5,6,8,10,16} follows grid completion. Fleet-total
+relu-mix ≈ $63-78 (matches the directive's ~$80 envelope incl.
+the eq lane's already-trained s42 twins).

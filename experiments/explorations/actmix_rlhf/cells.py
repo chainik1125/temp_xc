@@ -139,6 +139,43 @@ def lane_x10():
     return [txc(10), _s1(txc(10)), _s2(txc(10))]
 
 
+def lane_x4():
+    """CARD § 7 A5 (directive 1065b26cf Han grid): T4 × 3 seeds —
+    the grid-floor point between T2 and T5 (T5 stays as bonus)."""
+    return [txc(4), _s1(txc(4)), _s2(txc(4))]
+
+
+def lane_rmx_a():
+    """CARD § 7 A5 relu-mix arm, runpod-2 share: T{1,2,4,6} × 3
+    seeds, cheap-first. T1 ×3 doubles as the RLHF T1 equivalence
+    certification (expected identical; legitimate twins — relu_mode
+    hashes into train_key, no alias collision per 013441cfd)."""
+    out = []
+    for T in (1, 2, 4, 6):
+        out += [_relumix(txc(T)), _relumix(_s1(txc(T))),
+                _relumix(_s2(txc(T)))]
+    return out
+
+
+def lane_rmx_b():
+    """CARD § 7 A5 relu-mix arm, runpod-b seed-split share
+    (pre-auth UNCONDITIONAL per 1065b26cf; from width-match drain):
+    T{8,10} × 3 seeds."""
+    out = []
+    for T in (8, 10):
+        out += [_relumix(txc(T)), _relumix(_s1(txc(T))),
+                _relumix(_s2(txc(T)))]
+    return out
+
+
+def lane_rmx_b16():
+    """CARD § 7 A5 CONDITIONAL (runpod-b): relu-mix T16 s1/s2 —
+    launch ONLY if the eq-lane T16 gate reads DIVERGENT (s42 twin
+    already trained in lane_eq; identical ⇒ certificate line covers
+    T16 and this lane never runs)."""
+    return [_relumix(_s1(txc(16))), _relumix(_s2(txc(16)))]
+
+
 def lane_tsae_s2():
     """CARD § 7 A4 (directive 98a9ea718 width triple, runpod-a):
     seed-2 twins of the tsae shapes ONLY — s42/s1 already ran
@@ -151,4 +188,6 @@ def lane_tsae_s2():
 LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1,
          "ext_a": lane_ext_a, "ext_b": lane_ext_b, "ext_c": lane_ext_c,
          "eq": lane_eq, "x6": lane_x6, "x10": lane_x10,
-         "tsae_s2": lane_tsae_s2}
+         "tsae_s2": lane_tsae_s2,
+         "x4": lane_x4, "rmx_a": lane_rmx_a, "rmx_b": lane_rmx_b,
+         "rmx_b16": lane_rmx_b16}
