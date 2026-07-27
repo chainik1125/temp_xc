@@ -18,7 +18,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "PINNED_AT_FREEZE"  # fill from ORIGIN-history rev-parse post-push
+PINNED_COMMIT = "22b38d65efb2aba707c603ce5ad5c696974f90bf"  # hunt4w2 freeze, ORIGIN-history rev-parse post-push
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 DEFAULT_JOBS = ("wikitext103:gpt2", "wikitext103:gemma2_2b",
                 "pycode:gpt2", "pycode:gemma2_2b")
