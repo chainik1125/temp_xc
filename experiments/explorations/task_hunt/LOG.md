@@ -9431,3 +9431,28 @@ the slate, 0.70–0.74 near-dup vs tret_py — the WRITEUP § 8 row
 may cite this entry. mac-b replication live, ETA ~16:30, acked.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 ~15:50 London — mac-a: HUNT4 BUNDLE VERDICT (all 3 models; mechanical, frozen scorer) — 2 KEEPs, both BREADTH. PTR.
+
+Third leg landed; `hunt4/verdict.py` final (routing = mac-local's
+pre-stated lookup e39204547, applied verbatim):
+
+| face | gpt2 / gemma2 / llama31 | bundle | routing |
+|---|---|---|---|
+| **tret** | WEAK / KEEP / KEEP (+.097, +.101 — both T64 arms, wd gains +.084/+.117) | **KEEP 2/3** | **BREADTH** — no T ≤ 32 order receipt (max wd margin +.014); the T64-arm-KEEP-routes-breadth clause fires exactly as pre-stated, no special-casing |
+| **xtrend** | WEAK / KEEP / KEEP (+.064 T64-arm, +.067 T16-arm in-ladder) | **KEEP 2/3** | **BREADTH** — order 1 model (gemma +.031 @T32; llama max +.014) < 2-model panel bar |
+| sdom | KILL / KEEP / WEAK | WEAK (no majority) | numbers-only. For the record: wd ORDER margins pass on ALL THREE models (gpt2 +.035/+.055, gemma +.045/+.081, llama +.054/+.072 @T16/T32) — the order signal is consistent while the level signal is fragile/substrate-split; any future sdom design must fix the level first |
+| xnov | WEAK ×3 | WEAK | numbers-only (gains +.036/+.050/+.052, never clears the floor conjunction) |
+| tretd | SKIP ×3 | SKIP-INFEASIBLE | designed-then-infeasible on DailyDialog (test cls-0 starvation, position instrument); the wikitext transplant (labeled .89, 20k/class) is wave-2 priority 1 |
+
+Gen-4 wave-1 CLOSED: 7 designed → 5 screened → **2 breadth KEEPs
+(tret, xtrend)** + 1 label-side kill (xret) + 1 infeasible (tretd)
++ 2 WEAK (xnov, sdom) + rdens WEAK on its own lane. New science on
+record: the return family carries real window-state on 2/3 dialogue
+substrates (tret wd gains to +.117) but the ORDER component at
+T ≤ 32 is absent — matching the breadth routing. mac-b's
+adversarial-replication leg may now target the two KEEPs (its
+frozen card 6f1d7afa9). ACTUALS: wave-1 ≈ $5 + third leg ≈ $3 →
+hunt4 screens ≈ $8 total vs $18–27 est lines (warm caches) —
+ledger corrected. All PTR.
+
+_Recorded-by: claude-fable-5 (mac-a)_
