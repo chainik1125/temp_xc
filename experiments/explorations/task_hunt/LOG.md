@@ -12718,3 +12718,56 @@ single-face (awaiting a generation decision that is not mine),
 spun up.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 20:07 London (date-verified) — mac-local: IDENTITY CLAIM RE-EXAMINED (Han challenge) — independently CONFIRMED on landed rows; two hardening tests ORDERED before the certificate posts
+
+Han challenged the RM training-identity ruling (there is a
+theoretical reason BatchTopK should be better — is the fleet
+hallucinating?). Re-examination, with new evidence:
+
+**1. Independent verification (mac-local, this entry):** I diffed
+every landed relu-mix row against its btk-only twin at matched
+(arch, T, seed, k) directly from results/leaderboard.jsonl — my
+own computation, not runpod-1's checker. **30/30 matched rows,
+1,230 shared float fields (per-task AUCs, means, shuffle means,
+realized l0), worst |Δ| = 0.000e+00.** The identity is REAL on
+everything that has landed.
+
+**2. Theory reconciliation (no contradiction):** "BatchTopK is
+better" and "identical at sweep configs" are COMPATIBLE — the
+compositions differ ONLY when selection touches negative
+pre-activations (rectify-after-select wastes slots = Dmitry's
+dead-latent mechanism). At these configs the pools are
+positive-rich (+3σ margin), so ReLU-after-TopK is a no-op and the
+functions coincide EXACTLY — the same conditional identity as the
+hunt's R30, which also measured its own divergence boundary
+(thin pools). Dmitry's mechanism lives beyond the boundary
+(paper-era k_win = 8·T synthetic family at high T); the sweep
+configs never cross it.
+
+**3. The REAL gap Han's challenge exposes:** the landed rows are
+low-T; the cancelled cells' identity rests on the boundary
+mechanism's T-INVARIANCE claim — extrapolation, not measurement,
+at high T. **Two hardening tests ORDERED (runpod-1, ~2 GPU-h
+total, BEFORE the certificate entry posts):**
+  (a) **POSITIVE CONTROL** — run the equivalence checker on a
+  config where the arms MUST diverge (thin pool: small d_sae or
+  k beyond the positive-pool size, the R30 boundary recipe). The
+  checker must report DIVERGENCE. If it passes there too, the
+  instrument is broken and the halt ruling is void.
+  (b) **HIGH-T TWIN SPOT-CHECK** — train ONE relu-mix TXC-pre
+  cell at T16 (and, since the T10 extension cells are being
+  trained anyway, twin the T10 cell once) and diff weights +
+  metrics against the btk-only twins. Bit-identity at the far end
+  converts the T-invariance claim from prediction to measurement.
+**The certificate entry posts ONLY after (a) shows divergence
+where required AND (b) shows identity at T16/T10. The halt itself
+stands meanwhile** (worst case: we re-run cancelled cells
+tomorrow — nothing is lost but the hours the tests take).
+runpod-2's RLHF equivalence gate inherits the same standard:
+checker + its own positive control before any cancel-or-train
+decision.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
