@@ -89,4 +89,51 @@ Outputs: `labels/wave3_msdose_r1_<tok>.npz` +
 `labels/msdose_r1_premeasure.json` (artifact of record, carries the
 freeze receipt: HEAD sha + clean-tree assertion over the frozen logic).
 
+---
+
+## 7. VERDICT (2026-07-27, appended after the run — freeze sections § 1–6 untouched)
+
+**KILLED under the § 4 bands, $0, no screen.** Run at the freeze commit
+(`1f130f3cd`, receipt in `msdose_r1_premeasure.json`, frozen files
+clean). Bands 2 and 3 missed on **3/3 tokenizers** — the kill rule
+fires as written.
+
+Realised numbers (gpt2 = gemma2 — identical grids, delim len 3, an
+internal-consistency check matching runpod-a's stats; llama31 delim 2):
+
+| quantity | § B sim | realised |
+|---|---|---|
+| FROZEN baseline census | 2/31 strata, 86,568 usable | **5/33, 201,462** (llama31 4/32, 164,003) |
+| r1 pooled ρ | 0.844 | **0.838** ✓ band 1 |
+| r1 census | 10/66, 397,481 | **15/74, 489,452** (llama31 486,669) |
+| realised gain (usable) | ×4.6 claimed | **×2.43** (llama31 ×2.97) |
+
+- **Absolute legs ALL passed**: ρ ≤ 0.87 ✓, strata ≥ 8 ✓ (15),
+  usable ≥ 250k ✓ (489k). The candidate beat its own simulated bound.
+- **Ratio legs ALL failed**: 15 < 4×5 = 20 strata (llama31 15 < 16);
+  489,452 < 3×201,462 = 604,386 (llama31 misses by 1.1%: 486,669 vs
+  492,009).
+- Clean elsewhere: unigram 0.505 [0.493, 0.516]; docmean 0.785 (as
+  disclosed § 4); floors ≤ 0.516; position AUC 0.974 (high pooled AUC
+  pre-stated as expected, not a criterion).
+
+**Why the ratio legs failed — an erratum against § B, not a defence of
+the candidate:** my § B plan-level simulation UNDERSTATED the frozen
+plan's realised usable mass 2.3× (86.6k sim vs 201.5k realised; the
+qualifying-strata count is threshold-sensitive at the ≥ 50 cut, and the
+sim idealised delimiter tokens, truncation at short source docs, and
+the eligibility mask). The ratio legs encoded § B's relative claim;
+that claim was wrong at the baseline, so the legs bound 2.3× tighter
+than intended. Recorded plainly — and NOT used to overturn the frozen
+rule.
+
+**Re-entry path** (anyone's, fresh card only): a third entry could
+pre-register absolute-mass bands — they passed everywhere. **My
+recommendation as author of both msdose entries: don't.** Measured
+twice now, running dose is intrinsically position-like (pooled position
+AUC 0.974 even under the per-doc scale), the realised gain over the
+killed plan is 2.4×, not 4.6×, and § B's honest-limits paragraph
+("may simply not be worth the harness") now has numbers behind it. The
+screen slot is better spent on `dharm`.
+
 _Recorded-by: claude-fable-5 (mac-c)_

@@ -1,0 +1,688 @@
+{
+ "amendment": "msdose_r1 (WAVE3_SECOND_SOURCE.md \u00a7B; dispatch 47040da59); frozen logic msdose_r1_lib + wave3_lib",
+ "freeze_receipt": {
+  "head": "1f130f3cd85f6584b5f973802b07593fca8b75e0",
+  "frozen_files_clean": true,
+  "frozen_files": [
+   "experiments/explorations/task_hunt/labels/msdose_r1_lib.py",
+   "experiments/explorations/task_hunt/labels/build_msdose_r1.py",
+   "experiments/explorations/task_hunt/labels/wave3_lib.py"
+  ]
+ },
+ "preregistered_prediction_simulated": {
+  "rho_pooled": 0.844,
+  "strata": "10/66",
+  "usable_tokens": 397481
+ },
+ "frozen_baseline_census": {
+  "gpt2": {
+   "stratum_width": 128,
+   "min_rows_per_tercile": 50,
+   "tercile_edges_pooled": [
+    6.0,
+    11.0
+   ],
+   "n_strata_any": 33,
+   "n_qualifying": 5,
+   "qualifying_strata": [
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "usable_tokens": 201462,
+   "per_stratum_tercile_counts": {
+    "7": [
+     14524,
+     29602,
+     73
+    ],
+    "8": [
+     7095,
+     33985,
+     730
+    ],
+    "9": [
+     3378,
+     33746,
+     2860
+    ],
+    "10": [
+     790,
+     30963,
+     6751
+    ],
+    "11": [
+     61,
+     24926,
+     11978
+    ]
+   },
+   "rho_pooled": 0.9622261681512868
+  },
+  "gemma2": {
+   "stratum_width": 128,
+   "min_rows_per_tercile": 50,
+   "tercile_edges_pooled": [
+    6.0,
+    11.0
+   ],
+   "n_strata_any": 33,
+   "n_qualifying": 5,
+   "qualifying_strata": [
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "usable_tokens": 201462,
+   "per_stratum_tercile_counts": {
+    "7": [
+     14524,
+     29602,
+     73
+    ],
+    "8": [
+     7095,
+     33985,
+     730
+    ],
+    "9": [
+     3378,
+     33746,
+     2860
+    ],
+    "10": [
+     790,
+     30963,
+     6751
+    ],
+    "11": [
+     61,
+     24926,
+     11978
+    ]
+   },
+   "rho_pooled": 0.9622261681512868
+  },
+  "llama31": {
+   "stratum_width": 128,
+   "min_rows_per_tercile": 50,
+   "tercile_edges_pooled": [
+    6.0,
+    11.0
+   ],
+   "n_strata_any": 32,
+   "n_qualifying": 4,
+   "qualifying_strata": [
+    7,
+    8,
+    9,
+    10
+   ],
+   "usable_tokens": 164003,
+   "per_stratum_tercile_counts": {
+    "7": [
+     14087,
+     29886,
+     89
+    ],
+    "8": [
+     6850,
+     33970,
+     844
+    ],
+    "9": [
+     3259,
+     33472,
+     3147
+    ],
+    "10": [
+     712,
+     30564,
+     7123
+    ]
+   },
+   "rho_pooled": 0.9617241535076387
+  }
+ },
+ "r1": {
+  "gpt2": {
+   "n_docs": 400,
+   "n_tokens": 972425,
+   "delim_ids_len": 3,
+   "dose_position_spearman": {
+    "rho": 0.8381832484759989,
+    "n_rows": 954181
+   },
+   "dose_vs_boundary_age_spearman": {
+    "rho": -0.04850358129693062,
+    "n_rows": 941474
+   },
+   "msdose_r1": {
+    "tercile_edges": {
+     "scheme": "terciles",
+     "edges": [
+      6.0,
+      12.0
+     ]
+    },
+    "unigram_auc": 0.5054272877625176,
+    "unigram_auc_ci": [
+     0.49316594210132975,
+     0.5159108383280909
+    ],
+    "position_auc": 0.9737658845205662,
+    "position_auc_ci": [
+     0.9600638385821477,
+     0.9852787315362563
+    ],
+    "doc_mean_only_auc": 0.7854131921137436,
+    "doc_mean_only_auc_ci": [
+     0.7331966059591987,
+     0.8356437684137588
+    ],
+    "floors": {
+     "in_window_boundary_count": {
+      "T4": 0.5019951682343882,
+      "T8": 0.5039903364687764,
+      "T16": 0.5079806729375529,
+      "T32": 0.5154451235897897,
+      "T64": 0.5157531042621195
+     },
+     "censored_boundary_age": {
+      "T4": 0.4980048317656118,
+      "T8": 0.49600966353122355,
+      "T16": 0.49201932706244716,
+      "T32": 0.48445836695385963,
+      "T64": 0.4814230923142385
+     }
+    }
+   },
+   "strata_census": {
+    "stratum_width": 128,
+    "min_rows_per_tercile": 50,
+    "tercile_edges_pooled": [
+     6.0,
+     12.0
+    ],
+    "n_strata_any": 74,
+    "n_qualifying": 15,
+    "qualifying_strata": [
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "usable_tokens": 489452,
+    "per_stratum_tercile_counts": {
+     "4": [
+      36689,
+      9436,
+      438
+     ],
+     "5": [
+      31224,
+      12531,
+      1419
+     ],
+     "6": [
+      26265,
+      14132,
+      2882
+     ],
+     "7": [
+      21793,
+      15263,
+      3869
+     ],
+     "8": [
+      17893,
+      16415,
+      4733
+     ],
+     "9": [
+      14799,
+      16146,
+      5616
+     ],
+     "10": [
+      12034,
+      15679,
+      6284
+     ],
+     "11": [
+      9898,
+      14235,
+      7794
+     ],
+     "12": [
+      8016,
+      13828,
+      7395
+     ],
+     "13": [
+      6037,
+      14079,
+      7293
+     ],
+     "14": [
+      4945,
+      13345,
+      7516
+     ],
+     "15": [
+      3435,
+      13512,
+      7100
+     ],
+     "16": [
+      2625,
+      12672,
+      7583
+     ],
+     "17": [
+      1515,
+      12052,
+      8377
+     ],
+     "18": [
+      598,
+      11390,
+      8672
+     ]
+    }
+   },
+   "artifact": "wave3_msdose_r1_gpt2.npz"
+  },
+  "gemma2": {
+   "n_docs": 400,
+   "n_tokens": 972425,
+   "delim_ids_len": 3,
+   "dose_position_spearman": {
+    "rho": 0.8381832484759989,
+    "n_rows": 954181
+   },
+   "dose_vs_boundary_age_spearman": {
+    "rho": -0.04850358129693062,
+    "n_rows": 941474
+   },
+   "msdose_r1": {
+    "tercile_edges": {
+     "scheme": "terciles",
+     "edges": [
+      6.0,
+      12.0
+     ]
+    },
+    "unigram_auc": 0.5038978194916792,
+    "unigram_auc_ci": [
+     0.49224397458986313,
+     0.5146181668466977
+    ],
+    "position_auc": 0.9737658845205662,
+    "position_auc_ci": [
+     0.9600638385821477,
+     0.9852787315362563
+    ],
+    "doc_mean_only_auc": 0.7854131921137436,
+    "doc_mean_only_auc_ci": [
+     0.7331966059591987,
+     0.8356437684137588
+    ],
+    "floors": {
+     "in_window_boundary_count": {
+      "T4": 0.5019951682343882,
+      "T8": 0.5039903364687764,
+      "T16": 0.5079806729375529,
+      "T32": 0.5154451235897897,
+      "T64": 0.5157531042621195
+     },
+     "censored_boundary_age": {
+      "T4": 0.4980048317656118,
+      "T8": 0.49600966353122355,
+      "T16": 0.49201932706244716,
+      "T32": 0.48445836695385963,
+      "T64": 0.4814230923142385
+     }
+    }
+   },
+   "strata_census": {
+    "stratum_width": 128,
+    "min_rows_per_tercile": 50,
+    "tercile_edges_pooled": [
+     6.0,
+     12.0
+    ],
+    "n_strata_any": 74,
+    "n_qualifying": 15,
+    "qualifying_strata": [
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "usable_tokens": 489452,
+    "per_stratum_tercile_counts": {
+     "4": [
+      36689,
+      9436,
+      438
+     ],
+     "5": [
+      31224,
+      12531,
+      1419
+     ],
+     "6": [
+      26265,
+      14132,
+      2882
+     ],
+     "7": [
+      21793,
+      15263,
+      3869
+     ],
+     "8": [
+      17893,
+      16415,
+      4733
+     ],
+     "9": [
+      14799,
+      16146,
+      5616
+     ],
+     "10": [
+      12034,
+      15679,
+      6284
+     ],
+     "11": [
+      9898,
+      14235,
+      7794
+     ],
+     "12": [
+      8016,
+      13828,
+      7395
+     ],
+     "13": [
+      6037,
+      14079,
+      7293
+     ],
+     "14": [
+      4945,
+      13345,
+      7516
+     ],
+     "15": [
+      3435,
+      13512,
+      7100
+     ],
+     "16": [
+      2625,
+      12672,
+      7583
+     ],
+     "17": [
+      1515,
+      12052,
+      8377
+     ],
+     "18": [
+      598,
+      11390,
+      8672
+     ]
+    }
+   },
+   "artifact": "wave3_msdose_r1_gemma2.npz"
+  },
+  "llama31": {
+   "n_docs": 400,
+   "n_tokens": 966581,
+   "delim_ids_len": 2,
+   "dose_position_spearman": {
+    "rho": 0.8370291309549359,
+    "n_rows": 948337
+   },
+   "dose_vs_boundary_age_spearman": {
+    "rho": -0.04881856621020876,
+    "n_rows": 935631
+   },
+   "msdose_r1": {
+    "tercile_edges": {
+     "scheme": "terciles",
+     "edges": [
+      6.0,
+      12.0
+     ]
+    },
+    "unigram_auc": 0.5059171796015199,
+    "unigram_auc_ci": [
+     0.49411172072300885,
+     0.5161803557801812
+    ],
+    "position_auc": 0.9732385785987435,
+    "position_auc_ci": [
+     0.9592950942477272,
+     0.9849367164482474
+    ],
+    "doc_mean_only_auc": 0.7855308928440419,
+    "doc_mean_only_auc_ci": [
+     0.7332839834371261,
+     0.8358110152821049
+    ],
+    "floors": {
+     "in_window_boundary_count": {
+      "T4": 0.5020069184018446,
+      "T8": 0.5040138368036894,
+      "T16": 0.5080276736073787,
+      "T32": 0.5155359746168556,
+      "T64": 0.5159048085094315
+     },
+     "censored_boundary_age": {
+      "T4": 0.4979930815981553,
+      "T8": 0.49598616319631067,
+      "T16": 0.4919723263926213,
+      "T32": 0.48436633783617,
+      "T64": 0.4812605135477212
+     }
+    }
+   },
+   "strata_census": {
+    "stratum_width": 128,
+    "min_rows_per_tercile": 50,
+    "tercile_edges_pooled": [
+     6.0,
+     12.0
+    ],
+    "n_strata_any": 74,
+    "n_qualifying": 15,
+    "qualifying_strata": [
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "usable_tokens": 486669,
+    "per_stratum_tercile_counts": {
+     "4": [
+      36433,
+      9543,
+      513
+     ],
+     "5": [
+      30978,
+      12564,
+      1525
+     ],
+     "6": [
+      26049,
+      14052,
+      2989
+     ],
+     "7": [
+      21614,
+      15190,
+      3974
+     ],
+     "8": [
+      17729,
+      16296,
+      4759
+     ],
+     "9": [
+      14650,
+      16051,
+      5631
+     ],
+     "10": [
+      11934,
+      15487,
+      6323
+     ],
+     "11": [
+      9807,
+      14088,
+      7784
+     ],
+     "12": [
+      7910,
+      13792,
+      7304
+     ],
+     "13": [
+      5982,
+      14005,
+      7227
+     ],
+     "14": [
+      4868,
+      13256,
+      7496
+     ],
+     "15": [
+      3399,
+      13448,
+      7018
+     ],
+     "16": [
+      2583,
+      12553,
+      7632
+     ],
+     "17": [
+      1449,
+      11967,
+      8377
+     ],
+     "18": [
+      562,
+      11304,
+      8574
+     ]
+    }
+   },
+   "artifact": "wave3_msdose_r1_llama31.npz"
+  }
+ },
+ "bands": {
+  "gpt2": {
+   "rho_pooled_le_0.87": {
+    "value": 0.8381832484759989,
+    "pass": true
+   },
+   "qualifying_ge_8_and_4x_frozen": {
+    "value": 15,
+    "frozen": 5,
+    "pass": false
+   },
+   "usable_ge_250k_and_3x_frozen": {
+    "value": 489452,
+    "frozen": 201462,
+    "pass": false
+   },
+   "all_pass": false
+  },
+  "gemma2": {
+   "rho_pooled_le_0.87": {
+    "value": 0.8381832484759989,
+    "pass": true
+   },
+   "qualifying_ge_8_and_4x_frozen": {
+    "value": 15,
+    "frozen": 5,
+    "pass": false
+   },
+   "usable_ge_250k_and_3x_frozen": {
+    "value": 489452,
+    "frozen": 201462,
+    "pass": false
+   },
+   "all_pass": false
+  },
+  "llama31": {
+   "rho_pooled_le_0.87": {
+    "value": 0.8370291309549359,
+    "pass": true
+   },
+   "qualifying_ge_8_and_4x_frozen": {
+    "value": 15,
+    "frozen": 4,
+    "pass": false
+   },
+   "usable_ge_250k_and_3x_frozen": {
+    "value": 486669,
+    "frozen": 164003,
+    "pass": false
+   },
+   "all_pass": false
+  }
+ },
+ "verdict_input": {
+  "tokenizers_all_pass": 0,
+  "kill_rule": "any band missed on >= 2 of 3 tokenizers => kill",
+  "killed": true
+ }
+}

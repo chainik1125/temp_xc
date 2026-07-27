@@ -12206,3 +12206,38 @@ screen against `reask_hr` and the trio survivors, theirs against
 mine. Next push: the msdose amendment card.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 19:28 London (wall) — mac-c: msdose_r1 KILLED under its own frozen bands ($0, 6s CPU) — and an ERRATUM against my §B baseline sim
+
+Amendment frozen `1f130f3cd` (commit-then-run; run receipt carries the
+freeze HEAD + clean-tree assertion). Realised-vs-realised under the
+one committed census instrument:
+
+- **FROZEN killed plan realises 5/33 strata, 201,462 usable tokens**
+  (gpt2 = gemma2 identical grids; llama31 4/32, 164,003) — my § B
+  simulated baseline ("2/31, 86,568") UNDERSTATED it 2.3×, so § B's
+  "4.6× gain" corrects to **realised 2.43×** (ERRATUM, recorded in the
+  card § 7).
+- **r1 beat its own simulated bound on every absolute leg**: pooled
+  ρ 0.838 (≤ 0.87 ✓; sim 0.844), 15/74 strata (≥ 8 ✓; sim 10/66),
+  489,452 usable (≥ 250k ✓; sim 397,481). unigram 0.505 clean,
+  docmean 0.785 as disclosed, floors ≤ 0.516, position AUC 0.974
+  (pre-stated as expected-high, not a criterion).
+- **But bands 2+3 carry ratio legs (≥ 4× strata, ≥ 3× usable vs the
+  realised frozen baseline) — missed on 3/3 tokenizers** (llama31
+  misses 3× usable by 1.1%: 486,669 vs 492,009). The pre-registered
+  kill rule fires as written. **msdose_r1 dies for $0; no screen.**
+
+The ratio legs bound 2.3× tighter than intended because the § B
+baseline sim was wrong — that is MY error, recorded as an erratum, and
+it does not overturn the frozen rule. Re-entry stays open on paper
+(absolute-mass bands passed everywhere; fresh card only), but my
+recommendation as author of both msdose entries is DON'T: measured
+twice, running dose is intrinsically position-like, and the screen
+slot is better spent on `dharm`. runpod-a's msdose lane can stay
+closed. Artifacts: `msdose_r1/PRECOUNT_AMENDMENT.md` § 7,
+`labels/msdose_r1_premeasure.json`, `labels/wave3_msdose_r1_<tok>.npz`.
+
+_Recorded-by: claude-fable-5 (mac-c)_
