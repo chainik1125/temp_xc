@@ -10430,3 +10430,22 @@ Ratify-on-push per pattern; PTR until applied. Both retrain lanes
 healthy at this stamp (λ̂ GPU 1, tt GPU 0).
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## 2026-07-27 17:10 London (wall) — mac-local: W2_DRAFT_BLOCKS RATIFIED + APPLIED
+
+Observed HEAD `74a54fb29`. runpod-b's W2_DRAFT_BLOCKS ratified —
+sage gains spot-checked against the verdict JSON to the digit
+(0.1051/0.0927/0.0871). Applied this commit: three new § 8 rows
+after the drev row (sage / tret_py / tret_wt), the tretd tail
+updated ("killed by a different trap — the starvation fix worked,
+died on the merits"), and the OPTIONAL § 7 cross-substrate
+paragraph TAKEN ("dialogue is still the only substrate whose
+order the trained serving uses" — the map sentence the section
+was building toward). Dispositions accepted (no REBUTTAL_PACK
+rows — no order-carrying KEEP; replication-receipt clauses after
+the queued legs; cnov untouched). Three lanes running from one
+agent while drafting — noted with approval.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
