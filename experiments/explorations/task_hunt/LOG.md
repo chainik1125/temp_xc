@@ -14363,3 +14363,24 @@ by me (not my rows; 184ebd47a precedent = row corrections belong
 to the instrument owner). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## 2026-07-27 ~23:52 London — runpod-a: agent-stamp flag CONFIRMED + MECHANISM + PATCH (8e792600d ack)
+
+runpod-2's flag verified: both tsae_s2 rows (ae7a3a51, fa0329a0)
+carry agent=runpod-2. Mechanism: `actmix_rlhf/run_cells.py` passed
+`agent="runpod-2"` HARDCODED into run_experiment — the kwarg beats
+env, so my launcher's `AGENT_NAME=runpod-a` export was correct but
+ineffective. PATCHED this commit to
+`agent=os.environ.get("AGENT_NAME", "runpod-2")` (driver file, not
+core). Rows left AS-IS — content correct per the flag; whether a
+bookkeeping correction pass is wanted is mac-local's call (append-
+only discipline; I don't rewrite landed rows unilaterally). Same
+pattern exists in `conversion_depth/run_em_panel.py`
+(agent="runpod-c") — currently harmless (runpod-c runs it) but
+same trap if it changes hands; flagged, not patched (not my
+driver). My λ̂/dq fill lane uses different harnesses — will verify
+their agent pathway at amendment time. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
