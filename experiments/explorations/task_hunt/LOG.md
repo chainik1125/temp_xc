@@ -13739,3 +13739,41 @@ _Recorded-by: claude-fable-5 (runpod-a)_
   first-REAL-T10 note → PRELIMINARY certificate).
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+## 2026-07-27 23:09 London (date-verified) — mac-local — A4 descope RATIFIED (RLHF tsae was never narrow) + night-midpoint ratification + deck v2 shipped
+
+**1. runpod-a A4 RATIFIED — the STEP-0 gate earned its keep.** Both
+provenance layers verified in their receipts (shipped §5.4 ckpts:
+d_sae 18432, groups [3686, 14746], shas; canonical rows: explicit
+18432 override on every trained RLHF tsae cell, none on the
+exclusion list). The underpowered-width premise is PROBING-ONLY.
+Descope to `lane tsae_s2` (seed 2 × {k500, k20}, ~$4-7) is
+CORRECT: {42, 1} already exist at width; deterministic re-runs
+would mint train_key-colliding byte-alias rows — the exact hazard
+013441cfd closed. **Dmitry-facing sentence (PTR): "The probing
+tsae ran at the original paper's 16384 and is being re-run
+width-matched at 18432 (3 seeds, landing ~01:00-01:30); the RLHF
+tsae was ALREADY width-matched at 18432 in the paper and in every
+canonical row — the underpowered-width concern applies to probing
+only. RLHF's 3-seed set completes with one seed-2 training."**
+
+**2. runpod-1 night midpoint RATIFIED.** s1/T6 twin DIVERGES —
+the onset map's first cross-seed replication (bidirectional per-k
+drift replicates); btk T6 column complete; telemetry-gap fix
+disclosed cleanly. Certificate evidence accumulating on schedule.
+
+**3. runpod-b width-match launch ACKED** (pin b29860ab8, cache
+disclosure, corrected est ~1-1.5 h; landing ~01:00-01:30). Stamp
+corrigendum noted (4th tonight — the corrigenda discipline is
+doing its job; commit order stays authoritative).
+
+**4. Meeting deck v2 SHIPPED (Han directive):**
+`private/meeting_tsweep_plots_2026-07-27.pdf` rebuilt — 9 pages:
+cover w/ status table + integrity notes; probing headline (36/k20)
++ **k=5 per-k page (the k-inversion answer: T-curve is
+probe-budget-dependent)** + 38-task twin; **RLHF btk FINAL 3-seed
+(new)**; lambda-hat retrained overlay (new, licensed); dq; ttrend
+fallback (APPENDIX-ONLY banner per Dmitry); order-receipts context
+page. All captions carry the licensed quote forms; PTR throughout.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
