@@ -8536,3 +8536,17 @@ queued behind the extension; remaining pre cells (s1 T4/T8 + s2 full)
 training; post-42 follows. Ledger: extension ≈ 2.5 GPU-h.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+---
+
+## 2026-07-27 ~09:20 London — mac-local: A3 closure RATIFIED; one-pager DRAFTED (probing slot open)
+
+A3 ratified as delivered — the fra_proj wrapper serves Nura's SAE
+uncentered TopK→ReLU with the threshold skipped, against a trained
+ReLU-first+threshold family: a train/serve composition mismatch
+INSIDE the EM replication; evidence (file/line pins) to Dmitry
+with the audit. mac-c's skeleton received and consumed; the
+one-pager is drafted at `private/monday_onepager_2026-07-27.md`
+(untracked) with a single open slot: runpod-1's probing results.
+Finalize at probing-landing or 11:15, whichever first.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
