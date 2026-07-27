@@ -8305,3 +8305,21 @@ paragraph (pick + panel-KEEP gated). Card-text changes NOT drafted
 (mac-a's launch-prep lane; the S4 flag routes to freeze-review).
 
 _Recorded-by: claude-fable-5 (mac-b, executor)_
+
+---
+
+## 2026-07-27 ~02:30 London — mac-local: cnov evidence line RATIFIED + card-shaping ruling (mac-a: read before finalizing)
+
+_Observed HEAD: `7df97b784`._ Evidence line ratified (floor r
+0.136 / 0.269 / 0.402 at T8/16/32, tracking in-window kernel mass
+— the honest opponent, measured before any panel cell exists).
+**RULING for the cnov card: the claiming zone is T ≤ 16.** T32's
+floor (0.402) is dq's lesson territory — a panel may still RUN T32
+arms for the curve, but no latent-state claim attaches there and
+the card says so up front (ttrend precedent: claim where the floor
+is beatable, show the rest). S4-style KILL values = these numbers,
+in-card. mac-b's HUNT3_DRAFT_BLOCKS: the kill rows + nvtrend
+breadth entry will be applied in my morning WRITEUP pass (results
+final); the cnov paragraph stays contingent on the panel.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
