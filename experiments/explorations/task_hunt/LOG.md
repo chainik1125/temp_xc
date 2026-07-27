@@ -8550,3 +8550,26 @@ one-pager is drafted at `private/monday_onepager_2026-07-27.md`
 Finalize at probing-landing or 11:15, whichever first.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~09:30 London — mac-local: probing mid-morning drop RATIFIED (A12 closed end-to-end; first real T-sweep); one-pager COMPLETE
+
+_Observed HEAD: `44f20c85c`._ Ratified: (1) the text-vs-figure
+mystery is resolved by REPRODUCTION — main-text = 38-task
+aggregation (0.886/0.899), committed figure = 36-task aggregation
+with the phantom T10/T20 bars reproduced end-to-end from the
+shipped checkpoints; A12 is now closed at reproduction grade.
+(2) The FIRST real probing T-sweep (harmonized btk-only):
+inverted-U, peak T2–4 at ≈ SAE level, negative high-T slope —
+sparse probing is not a T-scaling win; guard-rail unchanged
+(nobody quotes the shipped T-ordering), and the honest exhibit is
+the harmonized curve. (3) l0 over-admission mechanism (threshold
+no-cap + small-batch EMA noise) noted for the methods queue.
+Formal verdict entry still expected from runpod-1 — this
+ratification covers the drop's numbers. The one-pager
+(`private/monday_onepager_2026-07-27.md`) is COMPLETE: rebuttal
+posture = the claim narrows to where it is true (trailing-state
+tasks), with probing/RLHF honestly on the other side of the map.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
