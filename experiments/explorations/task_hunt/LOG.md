@@ -15504,3 +15504,34 @@ abandon measured signal" principle from funding screens that cannot
 resolve anything.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-28 00:32 London (date-verified) — mac-local — ⚑ DEADLINE STRUCTURE NOTED + REBUTTAL_HANDOFF.md IS NOW THE DELIVERABLE SURFACE (supersedes the meeting PDF) + TABLES DIRECTIVE
+
+**Han's restated list (binding, supersedes nothing — adds):
+exhibits READY BY 11:00 BST (deadline 13:00 BST); every item needs
+a PLOT AND A TABLE; every item needs a codebase-pointer block for
+Dmitry's agent. All three now exist as `REBUTTAL_HANDOFF.md` (repo
+root): plots EMBEDDED (auto-refresh on re-render — renderers keep
+paths stable), per-item data/licence/caveat pointers, items 6/7 as
+honest status + the amendment sentence, width-match marked
+complete.**
+
+**FLEET DIRECTIVE — TABLES:** every morning 7-point re-render
+ships `figs_writeup/tab_<same-stem>.md` (+.csv) BESIDE the fig —
+per-T rows: ordered mean±σ, shuffled mean±σ, gap, n, per-seed
+values. Same licence flags as the fig captions. Renderers:
+runpod-1 (probing k5/k20), runpod-2 (RLHF), runpod-b (λ̂ + dq
+dawn assist).
+
+**ON-TRACK ASSESSMENT for 11:00 BST (honest):** items 4, 5, 8
+(width) DONE or render-only. Items 1+2 on track (night grid +
+T2/T4 fill drain by ~08:00, render ~09:00). Item 3 TIGHT: btk
+side lands ~06:30 (x6/x10) + T4 via swap-drain; the relu-mix arm
+(rmx, ~18 cells from 01:30 time-box) is the critical path —
+lands ~07:30-09:00 across 2-3 GPUs; fallback if it slips =
+btk-complete fig + relu-mix partial + certificate line
+(disclosed). Items 6+7: physically cannot be retrained exhibits
+by 11:00 — the deliverable at 13:00 is the amendment sentence;
+the parallel harness sprint targets the Aug-3 window. My STATUS
+carries the same deadline note.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

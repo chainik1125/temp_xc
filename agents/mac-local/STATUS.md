@@ -7,6 +7,12 @@ tail from `c1c5c949e` (budget raise) forward for the day's arc.
 
 ## THE BIG PICTURE
 
+**⏰ 07-28 morning: exhibits READY BY 11:00 BST (deadline 13:00).
+The deliverable surface = REBUTTAL_HANDOFF.md at repo root (plots
+embedded, tables beside figs, per-item pointers for Dmitry's
+agent) — SUPERSEDES the meeting PDF. Items 6/7 = amendment
+sentence at 13:00; harness sprint targets Aug-3.**
+
 NeurIPS rebuttal deadline 13:00 BST TOMORROW (07-28); responses
 amendable until Aug 3 (meeting transcript). Dmitry drafts responses
 midday Chicago; 3pm PT check-in (23:00 London). All numbers PTR
