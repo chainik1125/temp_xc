@@ -13079,3 +13079,62 @@ ablations (no-contrastive / no-matryoshka, T{1,16}) already running
 on GPU 0. Ledger actuals this push.
 
 _Recorded-by: claude-fable-5 (runpod-c, T-scaling hill-climb)_
+
+## 2026-07-27 20:44 London (date-verified) — mac-local — TRIPLE RATIFICATION (lambda-hat overlay + runpod-c L1 + Andrii Q5 absorption) + runpod-b standby directive
+
+**1. Lambda-hat overlay RATIFIED, deliverable COMPLETE.** Gate table
+verified 6/6 PASS with two orders of magnitude to spare (worst
+delta 1e-4 vs tol 1.6e-2); fig reviewed on-pixel (template-conform,
+quoted-panel x-marks ON the retrained means, 3-seed disclosure in
+the legend, gate provenance printed on-figure, per-seed traces
+faint, honest wide T16 band). Seed-for-seed venue record noted —
+pairs cleanly with the tt gate FAIL as "the gates measure venue
+effects; they are arch/substrate-dependent". READING LICENSED
+(PTR): lambda-hat window state is ORDER-FREE at every T on the
+RETRAINED instrument (post arm; gaps +0.004..+0.014, per-seed
+signs mixed). Cross-task one-liner licensed: backtracking large /
+probing modest / RLHF ~ 0 / lambda-hat ~ 0 — order signatures are
+task-specific; dialogue remains the only order-carried substrate.
+ARM GUARD: the overlay instrument is the POST arm; pack section-1
+headline is PRE — always arm-label the overlay receipt (edit goes
+in with this push). All three headline figures now SHIPPED
+(probing per-k, RLHF interim to FINAL tonight, lambda-hat).
+
+**2. runpod-c C1 L1 VERDICT RATIFIED — including the hold.** The
+first monotone-rising T-curve in program history (+0.1168 vs
+-0.0134, T16 above twin-best both k) and the gates HELD it — this
+is the system working: the rise is largely collapse-recovery
+(active fraction 0.021 to 0.363), the depressed T1 anchor fails
+the frozen T1-level clause, no L2 promote as-is. A1 exception
+correctly invoked (pre-declared in RESULTS.md). The order-free
+flag on the T16 gain (shuffle gap ~ 0) is exactly right framing
+discipline — any eventual claim is "aggregation capacity rises
+with T", never order-carried. AuxK-inert diagnosis (structural,
+sub-10M tokens at 4k steps) is sound and testable at 20k.
+**ONE REQUIREMENT ADDED (binding for L2): the 20k-step diagnostic
+enters the RM divergence regime — runpod-1 measured T16 arm
+divergence AT 20k steps (dd8880fe0). Per-cell twin equivalence
+check REQUIRED at T16 in L2; expect possible ntsf-signature
+divergence; the telemetry module (env-var opt-in) is available.
+"btkonly carries" stands WITH that per-cell receipt.**
+
+**3. Andrii Q5 cost tables ABSORBED (human push 11cf2b5b0 — no
+ratify/bounce; review + routing).** Two comparability facts now on
+the record for the rebuttal: (a) paper backtracking tsae ran at
+HALF width (16384 vs 32768); (b) paper EM txc_base ran at 32768 /
+k=25 vs baselines 18432 / k=20 (width AND k mismatch). Routed to
+Dmitry for the bbby-Q5 draft (tables + json in
+experiments/explorations/txcwin/). Guard added to pack section 1:
+hunt/overlay tsae is WIDTH-MATCHED by design — a different object
+from the paper's half-width backtracking tsae; never conflate.
+
+**4. runpod-b DIRECTIVE (queue empty, listening).** Standby-warm
+on pod-A GPU 1. FIRST CALL (pre-authorized NOW, no further ruling
+needed): if runpod-2's RLHF equivalence gate fires TRAIN on the
+high-T regime, take the seed-split half of the relu-mix high-T
+cells (coordinate split in your STATUS files; halves the critical-
+path wall clock). SECOND CALL: dawn assist on the 7-point fig
+re-renders when T6/T10 rows land. No new retrains without
+directive. Listening beat per topology.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

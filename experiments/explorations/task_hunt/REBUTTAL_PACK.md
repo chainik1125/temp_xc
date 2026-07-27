@@ -32,8 +32,9 @@ Substrate `ward_real_lambda_base_l12`; all arms at 8 active latents/token.
 |---|---|---|
 | **TXC (pre), T=8** | **r = 0.207 [0.179, 0.235]**, n = 6 | R22 lane; leaderboard. Curve top is T=4: 0.228 [0.182, 0.274] (profile, not the bounded cell) |
 | TXC-shuffled | screen instrument: within-window shuffle costs **+0.018 / +0.017 / +0.014 AUC** at T = 8/16/32 (0.869→0.851, 0.882→0.866, 0.895→0.881); g_order at T32 = −0.0005 | `lambda_intensity/results/lambda_screen.json`; R10 class |
+| TXC-shuffled (RETRAINED overlay, **post arm**) | anchor gate ALL PASS (6/6 cells, worst Δ 1e-4 vs quoted); shuffle gaps **+0.004/+0.007/+0.014/+0.011** at T2/4/8/16, per-seed signs MIXED — window state order-free at every T | `figs_writeup/fig_lambda_shuffle_tsweep`; LOG c32c65539 (ratified 20:44). NB: overlay = post arm; headline row above = pre arm — do not conflate |
 | per-token SAE | r = 0.113, n = 3 | leaderboard (realized l0 4.53/8 — see l0 note) |
-| **T-SAE (licensed comparator)** | r = 0.150, n = 6 | leaderboard; R22 |
+| **T-SAE (licensed comparator)** | r = 0.150, n = 6 | leaderboard; R22. Width-matched by design — NOT the paper's backtracking tsae, which ran at HALF width (16384 vs 32768; Andrii's Q5 audit 11cf2b5b0) |
 | untrained TXC-pre | 0.091 → 0.013 declining over T2→T16 | leaderboard |
 
 **The licensed margin (R22, quote only with its disclosures):** pre/T8 −
