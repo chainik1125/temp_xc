@@ -24,6 +24,35 @@ k_{\mathrm{eff}}(x)
 \leq k_{\mathrm{nom}}.
 \]
 
+### TopK/ReLU ordering does not change the dense code
+
+Although the implementation is written as ReLU after TopK, its dense sparse
+code is the same as applying ReLU before TopK:
+
+\[
+\operatorname{scatter}\!\left(
+  \operatorname{ReLU}(\operatorname{TopK}(a,k))
+\right)
+=
+\operatorname{scatter}\!\left(
+  \operatorname{TopK}(\operatorname{ReLU}(a),k)
+\right).
+\]
+
+If at least \(k\) preactivations are positive, both expressions select the
+same \(k\) positive entries. If fewer than \(k\) are positive, both retain
+every positive entry and fill the remaining selected slots with zeros; the
+choice among tied zero entries does not affect the dense code. Their gradients
+also agree away from measure-zero ties at exactly zero: selected positive
+entries receive the same gradient, while negative entries receive zero through
+ReLU in either ordering.
+
+Consequently, the effective-support underfill measured below is real, but it
+is **not** evidence that rewriting the implementation as
+`TopK(ReLU(pre))` would change training or evaluation. Existing checkpoints
+can be resumed under that mathematically equivalent interpretation without
+mixing scientific protocols.
+
 The frozen full-sweep profile has \(k_{\mathrm{pos}}=20\) and
 \(d_{\mathrm{SAE}}=32{,}768\). None of these budgets is clipped by dictionary
 width:

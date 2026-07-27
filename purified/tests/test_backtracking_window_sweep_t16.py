@@ -618,6 +618,31 @@ def test_effective_l0_reports_topk_relu_underfill():
     assert np.isclose(summary["zero_row_fraction"], 1 / 3)
 
 
+def test_topk_then_relu_matches_topk_of_relu_forward_and_gradient():
+    torch = __import__("torch")
+    generator = torch.Generator().manual_seed(17)
+    pre = torch.randn(11, 37, generator=generator, requires_grad=True)
+    weights = torch.randn(11, 37, generator=generator)
+    k = 13
+
+    values, indices = pre.topk(k, dim=-1)
+    topk_then_relu = torch.zeros_like(pre).scatter(
+        -1, indices, torch.relu(values)
+    )
+
+    reference_pre = pre.detach().clone().requires_grad_(True)
+    positive = torch.relu(reference_pre)
+    values, indices = positive.topk(k, dim=-1)
+    relu_then_topk = torch.zeros_like(reference_pre).scatter(
+        -1, indices, values
+    )
+
+    torch.testing.assert_close(topk_then_relu, relu_then_topk, rtol=0, atol=0)
+    (topk_then_relu * weights).sum().backward()
+    (relu_then_topk * weights).sum().backward()
+    torch.testing.assert_close(pre.grad, reference_pre.grad, rtol=0, atol=0)
+
+
 def test_t16_memory_smoke_uses_real_window_without_checkpoint(tmp_path):
     cache = tmp_path / "acts.npy"
     np.save(
