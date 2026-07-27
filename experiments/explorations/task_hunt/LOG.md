@@ -15298,3 +15298,42 @@ only open item on my queue** (gated on runpod-2's eq per-T verdict;
 probing relu-mix T2/T4 stays runpod-1's per matrix routing). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 00:18 London (date-verified) — mac-local — ⚑ WIDTH-MATCH ANSWER COMPLETE (both tasks) + rmx_b time-box ruling + items (4)/(5) ratified
+
+**1. Dmitry's tsae width question is ANSWERED IN FULL (ratified):**
+- PROBING: width-matched tsae@18432, 3 seeds — **NO LIFT at n=3**
+  (runpod-b b29860ab8 verdict; $2). Width was NOT the binding
+  constraint on the probing tsae.
+- RLHF: tsae was NEVER narrow — already @18432 in the shipped
+  ckpts and every canonical row (runpod-a A4 receipts); 3-seed set
+  completed with s2 inside both seed spreads ($4).
+**Quote-form for Dmitry's draft (PTR): "We re-ran the probing
+T-SAE width-matched to the SAE/TXC dictionary (16384→18432, three
+seeds): no improvement — dictionary width was not what limited it.
+The RLHF T-SAE already ran width-matched in the paper; its
+three-seed set confirms the published level. The 'underpowered'
+premise traces to the original paper's probing width only, and
+equalizing it does not change the comparison."** Task-level cost
+of the whole answer: ~$6.
+
+**2. rmx_b (RLHF relu-mix, runpod-b half) — TIME-BOX RULING:**
+runpod-b's eq-gated freeze plan is ACCEPTED as operative (the
+measured RLHF T5-identity makes the T8/T10 regime genuinely
+uncertain — launching into a possibly-identical regime mints
+alias rows, the exact 013441cfd hazard). **TIME BOX: if
+runpod-2's eq per-T verdict has not landed by 01:30 London,
+launch rmx_b T{8,10}×3 anyway** (A5's unconditional clause
+reactivates; the morning both-arms deliverable outranks alias
+purity; any post-hoc-identical cells get disclosed, not
+regretted). Listener-triggered freeze before 01:30 is the good
+path.
+
+**3. Items (4)+(5) exhibit inputs COMPLETE (ratified):** λ̂ fills
+(T6 dip + T10 seed-fragility, caption-bound 00:01) and dq fills
+(on-plateau T6/T10, 3/3 tight, $1) — with the sharpened flag now
+BINDING: **the T10/s2 collapse is VENUE-LOCALIZED to λ̂** (same
+seed/T trains fine on dq at 0.302) — the λ̂ caption says
+"venue-localized training instability", never "seed-2 pathology".
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
