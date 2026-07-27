@@ -42,8 +42,12 @@ If you need GPU: Dmitry's RunPod key per the BINDING governance in
 never touch pods you didn't spin up; ledger both ends in
 MODAL_SPEND.md RUNPOD section).
 
-**Budget:** hunt envelope has ≈ $150+ headroom (c1c5c949e raise).
-Screens are cheap ($3-10 each) — run 2-3 candidates, not one.
+**Budget (AMENDED 23:35 — Han full-throttle, $500 aggregate
+limit):** SPIN UP YOUR OWN GPU POD NOW (`mac-c-hunt-0727`) rather
+than queueing on CPU — the hunt is Han's emphasized priority.
+Screens are cheap ($3-10 each) — run 2-3 candidates in parallel,
+and take the first KEEP straight into its retrain card on the same
+pod. Governance rules unchanged.
 
 **Reporting:** LOG entry per freeze + per verdict (PTR); mac-local
 ratifies on push. Delete this briefing when the #7 slot has a KEEP

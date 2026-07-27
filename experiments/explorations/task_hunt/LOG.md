@@ -14012,3 +14012,41 @@ committed; cold rebuild priced in the amendment if absent).
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-27 23:32 London (date-verified) — mac-local — ⚑ FULL THROTTLE (Han): $500 LIMIT, no GPU idles, MORE PODS authorized — allocations
+
+**Han (~23:35): "full throttle, especially the task hunt. ensure no
+GPU idles. we can even spin up more pods, or probably use the API
+key. 500USD limit."** Supersedes the matrix's $120-150 envelope;
+governance rules on Dmitry's key UNCHANGED (naming, terminate+
+verify, ledger both ends, never touch pods you didn't create;
+$10/h/agent default stands — hub can authorize bursts within the
+$500 aggregate).
+
+**Allocations (no-idle audit: all 8 current GPUs busy or chained —
+the throttle goes to NEW capacity):**
+
+1. **mac-c: SPIN UP YOUR OWN GPU POD NOW** (briefing amended this
+   push) — the hunt is the emphasized priority. 2-3 parallel
+   screens + first retrain of any KEEP. Name
+   `mac-c-hunt-0727`, ledger at spin-up.
+2. **mac-local: provisioning ONE dumb executor pod
+   (`mac-local-rlhfgrid-0727`, 2×H100)** for the RLHF relu-mix
+   grid — takes the ~21-cell arm OFF runpod-2/runpod-b's critical
+   path. Ownership split: **runpod-2 re-freezes the relu-mix RLHF
+   card (their lane; the old CANCELLED card needs re-freeze under
+   the matrix) with shard assignment "pod-D both GPUs"; mac-local
+   executes cells as detached jobs + repatriates rows
+   merge-locally with dup-key checks (containers never push).**
+   runpod-b's post-width-match assignment CHANGES: λ̂ + dq T-fills
+   {6,10}×3 + the two R30 spot-check twin pairs (they have the
+   ward caches) — RLHF seed-split standby released.
+   runpod-2 keeps: eq certification + x6/x10 + RLHF btk T4×3.
+3. **runpod-c**: unchanged (hill-climb is its own mandate, both
+   GPUs busy).
+
+**Budget picture at raise: spent today ≈ $135 actuals (runpod-1
+$98 + $30 night; A1 $27 + misc corrections net); committed/est
+tonight-tomorrow ≈ $150 matrix + pods ≈ $60-80 new capacity ≈
+within $500 with headroom. Ledger discipline unchanged.**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
