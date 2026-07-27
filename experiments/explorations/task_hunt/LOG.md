@@ -14625,3 +14625,54 @@ GPU-1 window for the split half opens then — matching the matrix's
 protocol via STATUS files as directed.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 23:49 London (date-verified) — mac-local — ⚑ ELICITATION HARNESS BUILD AUTHORIZED NOW (Han full-throttle; my escalate-and-wait was the wrong default) — mac-c re-opened as harness owner
+
+**Correction of my own 23:44 escalation:** under Han's standing
+full-throttle order the harness decision was MINE to make, not to
+queue. Made now. For the record: no task was dropped for want of
+API effort — tonight's kills were measured (receipts in LOG);
+the Tier-C deferral was a correctly-flagged scope boundary, and
+the delay in converting it to a build order is on the hub.
+
+**Why the harness is the highest-EV hunt move, not a workaround:**
+the hunt's kills keep coming from CORPUS GEOMETRY we don't control
+— token-scale event density (dharm 155.6 tok/chain), kernel spans
+vs window (warddebt 154 tok), vocabulary identity leaks (retryesc
+unigram). The menu's own §2 line: with elicitation "we choose the
+event spacing. Costs elicitation, buys clock." A generated corpus
+is DESIGNED to satisfy the binding bars — event spacing tuned to
+T, vocabulary controlled across event/non-event spans, labels
+exact from the script. Elicitation fixes the exact thing that has
+been killing candidates.
+
+**AUTHORIZATION (build starts now):**
+- **Owner: mac-c** (TIERC_PIPELINE_DESIGNS.md §3 is theirs +
+  every geometry lesson). Briefing re-opened this push
+  (`briefings/safety-hunt-continuation.md` — one-line re-open per
+  their close-out).
+- **Generation backend: pod-hosted OPEN-WEIGHTS models from our
+  existing HF caches (llama/gemma/qwen) on mac-c's own pod under
+  the RunPod key** — no external API needed, no new access, and
+  strictly better provenance (model sha + seeds + temperature
+  pinned; exactly reproducible). If mac-c judges an external API
+  materially better for a specific behavior, they flag it with
+  the cost and we get Han/Dmitry a key — but the build does not
+  wait on that.
+- **Scope: minimum viable harness → first TWO corpora:** (1)
+  `sycgen_age` completion (the one face that already PASSED its
+  geometry gate — nearest KEEP); (2) mac-c's pick of the
+  safety-strongest Tier-C entry (sandbag / evalcue class) with
+  bars-first design. Cards frozen before generation; per-token
+  baseline BINDING; "geometry can kill but not clear" stands;
+  full generation provenance in-card.
+- **Budget slice: up to $100 of Han's $500** (pod-hours +
+  generation compute). Ledger both ends.
+- **Evidence-class note for Dmitry (PTR):** corpora are
+  model-generated and disclosed as such; whether a
+  generated-corpus exhibit enters the rebuttal vs the appendix is
+  his call at quote time — building does not presuppose quoting.
+- **mac-d Mission 1 extended:** first KEEP from EITHER reask_hr
+  OR the harness corpora gets the pod-D T-sweep retrain.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
