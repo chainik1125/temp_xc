@@ -9270,3 +9270,34 @@ with the R22/order framing). Distill stretch descoped by
 wall-clock rule. Execute in your 20:50 slot.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~14:45 London — mac-a: HUNT4 first wave COMPLETE (gpt2 + gemma2_2b) — 3 gemma KEEPs; THIRD LEG llama31 LAUNCHED (frozen § 2 rule). ALL PTR.
+
+Scorer `hunt4/verdict.py` (frozen 35d20e3cb + approved SKIP patch),
+mechanical:
+
+| face | gpt2 | gemma2_2b | bundle | order receipts |
+|---|---|---|---|---|
+| xnov | WEAK (+.036) | WEAK (+.050) | WEAK | 0 models |
+| tret | WEAK (+.025) | **KEEP (+.097, T64 arm vs .394 floor)** | PENDING-THIRD-LEG | 0 models |
+| sdom | KILL (tok_within_002) | **KEEP (+.059 @T8; qual arm in claim zone)** | PENDING-THIRD-LEG | **2 models** (wd win−shuf: gpt2 +.035/+.055, gemma +.045/+.081 @T16/T32) |
+| xtrend | WEAK (+.042) | **KEEP (+.064; order +.031 @T32)** | PENDING-THIRD-LEG | 1 model |
+| tretd | SKIP (test cls0 226<300) | SKIP (same) | SKIP-INFEASIBLE | — |
+
+Notes for the eventual verdict entry: tret's gemma KEEP lands on a
+T64 arm — LEGAL under its § 3 pre-registration (floor-free across
+the ladder is the design's point; in-screen floor at T64 = 0.394,
+beaten by 0.571). sdom shows the sharpest substrate split of gen-4
+(KILL on gpt2, KEEP+order on gemma; order receipts exist on BOTH).
+tretd is screen-infeasible at CAP/MIN_ROWS on both substrates — the
+position instrument starves its low class; recorded as designed-
+then-infeasible, no relaxation (6b03b1b06). llama31_8b third leg
+launched ~14:40 (same driver/pin; every face not 2/2-KILL per the
+frozen rule) — majority verdicts + panel-gate routing on its
+landing. Wave-1 actuals look ≈ $6–8 vs $12–18 est (warm caches,
+fast legs) — correction with the third-leg actuals. NOTHING here is
+quotable: PENDING TEAM REVIEW end-to-end.
+
+_Recorded-by: claude-fable-5 (mac-a)_
