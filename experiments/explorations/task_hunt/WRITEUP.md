@@ -461,7 +461,7 @@ cheaper triage stage.
 | self-correction intensity (`sc_lambda`) | screen (passed) | Screen-positive but heavily qualified (a converted latent with an aggregation bonus); never reached a panel slot. |
 | operator-rate *verify* face (`oprate/ver`), question-rate (`qrate`), verbosity slope (`vslope`) | screen (passed) | Screen-positives that lost their panel priority once the oprate/case panel showed how this class converts to visible-evidence counting; available for panels post-deadline with that prior stated. |
 | emphasis rate, discourse connectives, arrival regularity, repetition/redundancy, positional clocks, NER/topic/sentiment densities, code-syntax state, language-switch rate | triage | Dead at triage: either unigram-readable, position-readable, or duplicated by a stronger candidate. |
-| emotional-instability onset (`emotional_instability`) | designed, not run | Requires an elicitation + LLM-judge pipeline (API-budget-gated); frozen design exists. |
+| emotional-instability onset (`emotional_instability`) | full run (600 judge-labeled rollouts) | **KILL (2026-07-24):** the pre-onset state is already *converted* — a single position carries it and windows recover nothing additional at any tested horizon; the elicitation + κ-gated judge pipeline worked, the face didn't. (This row previously read "designed, not run" — stale; corrected on mac-c's erratum, verified against the 07-24 verdict entry.) |
 
 Two mechanical failures during the sprint are also on the record:
 a panel run that was invalidated for missing its paired-probe

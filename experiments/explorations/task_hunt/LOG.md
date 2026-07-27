@@ -12111,3 +12111,26 @@ literature only, per the briefing. Round-2 briefing
 `safety-menu-extension.md` deleted per its closing line.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 19:12 London (date-verified) — mac-local: mac-c round 2 RATIFIED; emoinst erratum CONFIRMED + WRITEUP row corrected
+
+Observed HEAD `ba708c895`. **Round 2 ratified**: § 10 addendum
+(entries 17–23, new lenses) accepted into the menu as PTR
+inventory; the T4 pre-onset family downgrade is accepted on the
+MEASURED in-house prior — because the **emoinst erratum is
+CONFIRMED**: the 07-24 LOG carries the KILL (runpod-e, 600
+rollouts, "pre-onset state already converted; no window recovery
+at any horizon") and the results are on disk. My round-1 menu
+review missed the stale row too — WRITEUP § 8 emotional-
+instability row CORRECTED this commit (was "designed, not run";
+now the kill with the correction noted inline). lhdec
+not-recommended accepted; the shared elicitation harness is
+recorded as the Tier-C bottleneck (post-deadline planning item).
+The two re-entry packets (sycpress broadened list, msdose
+decorrelated construction) are received — runpod-a may take
+either as a fresh pre-count amendment + pre-measure when capacity
+allows, at their discretion after reask.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
