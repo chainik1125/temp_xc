@@ -12335,3 +12335,64 @@ evening stamps drifted despite the corrigendum — commit order
 authoritative; `date` per stamp from here.)
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+## 2026-07-27 19:48 London (wall) — mac-c: `sycgen` geometry pre-measure ($0, before any generation) — best trap numbers in the wave-3 record, but I am DEMOTING my own rate face on the clock bar
+
+`sycpress` re-entry frozen as **`sycgen`** (`51bf6fabc`) and measured.
+The pre-measure runs on the SCAFFOLD ALONE — the faces depend on where
+challenges fall, not on what anyone says — so the design was falsified
+for **$0 before a token of elicitation budget was spent**. `msdose`
+died on geometry only after its corpus existed; generator mode costs
+real money, so the order matters.
+
+**Design note first.** `are_you_sure` is a FIXED 3-turn exchange: one
+challenge, always in the same structural place. Run verbatim, fixing
+`sycpress`'s event mass would have bought a **msdose-class position
+trap with generation money**. The frozen scaffold therefore jitters
+challenge count and positions (4–12 exchanges, p=0.35 each, turn
+lengths from the MEASURED WildChat distribution in the committed grid).
+
+**Geometry results** — 400 convs, 1,076,854 tok, 1,118 challenges
+(2.79/conv), 126.8 tok/msg:
+
+| face | position AUC | doc-mean | strata | usable | ρ(face,pos) |
+|---|---|---|---|---|---|
+| `sycgen_age` | 0.689 | 0.747 | 40/52 | 641,933 | 0.346 |
+| `sycgen_rate` | **0.542** | 0.835 | 45/51 | 573,486 | **−0.020** |
+| reask_hr (survivor) | 0.925–0.946 | 0.818–0.828 | | | |
+| sycpress (killed) | 0.952 | **0.995** | | | |
+
+The jitter worked: `sycgen_rate` is the first wave-3 face where
+position is essentially **not a confound** (ρ −0.020), and both faces
+sit far from the 0.995 identity leakage that killed `sycpress`.
+
+**And I am killing that face anyway.** The § 4 bands test confounds,
+not reach; **"clock stated first" is a separate BINDING bar**
+(`ae1ce5fb0`) and not one I may waive because I like the AUCs.
+Measured: mean inter-challenge distance **964 tokens**; in-window
+fraction 0.00 / 0.00 / 0.79 / 3.27 / **7.86 %** at T = 4/8/16/32/64.
+The rate face's message kernel spans **8 messages ≈ 1,014 tokens** —
+a T ≤ 64 window sees ~0.5 of one message and **cannot compute the
+face**. That is § 2's reach-limited negative, refmark's death mode.
+Its only in-window signal (floor 0.624 at T64) is the "high-rate docs
+have more events anywhere" effect — its doc-mean 0.835 leakage in a
+window costume. **`sycgen_rate` DEMOTED, do not screen.**
+
+**`sycgen_age` CARRIED as the single face.** Here the thin in-window
+mass is the RIGHT shape, not a defect: the age face is well-defined at
+any distance with a floor exact-iff-in-window, so small in-window mass
+means a **weak floor** (measured 0.500/0.500/0.512/0.548/0.617) and a
+real claim zone — the `sage` KEEP shape on this clock.
+
+**This authorises nothing.** Geometry can kill, not clear. The likely
+death is still untested: if post-challenge capitulation language is
+per-token readable, the window adds nothing and this is `emoinst`
+again — so **the per-token baseline runs FIRST on any generated
+corpus**. `sycgen` is the best-conditioned wave-3 candidate on every
+free trap, AND still a constructed-substrate carriage claim behind a
+harness nobody has built. Fund the harness on its own merits (four
+candidates want it), not on these numbers.
+
+Artifacts: `sycgen/PRECOUNT_CARD.md` § 7, `labels/sycgen_lib.py`,
+`labels/build_sycgen_premeasure.py`, `labels/sycgen_premeasure.json`.
+
+_Recorded-by: claude-fable-5 (mac-c)_
