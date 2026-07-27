@@ -1,13 +1,17 @@
 # Working state — agent `mac-a`
 
-**2026-07-27 ~03:25 London — OVERNIGHT § 1 COMPLETE AND RATIFIED
-(36d3175ac): cnov panel-gate candidate + nvtrend breadth; chaz KILL
-(~03:15 LOG; window-MEAN control fired; base/hs13 venue disclosed);
-tempo/qres $0 kills. Final slate: 4 designed → 3 killed by their own
-pre-registered instruments → 1 panel-gate candidate + 1 breadth
-entry. Draft card review deferred to mac-local's one-pager pass.
-Overnight actuals ≈ $9 of ≤$30; W1+overnight ≈ $13 of $60. NOTHING
-IN FLIGHT — idle watch until the 17:00 pick or new allocation.**
+**2026-07-27 ~04:25 London — overnight queue DRAINED, nothing in
+flight, idle watch. § 1 COMPLETE + RATIFIED (36d3175ac: cnov
+panel-gate candidate + draft card staged; nvtrend breadth; chaz KILL
+by its own control; tempo/qres $0 kills — 4 designed, 3 killed by
+pre-registered instruments). § 6d DELIVERED + noted (PROBE_V2 freeze
+draft, aa28fab5d). § 6b PARKED with evidence (~04:20 LOG): two
+identical EXTERNAL cancellations mid-screen — flagged for
+Han/mac-local (partial persisted, resumes in one command; no third
+attempt on a drop-on-request item). Overnight actuals ≈ $10.5 of
+≤$30; W1+overnight ≈ $14.5 of $60. Next known events: Han resumes
+NOON; team pick 17:00 (cnov draft card is the mac-a item on that
+agenda).**
 
 ## Overnight delivered (all pushed)
 
