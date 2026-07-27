@@ -10120,3 +10120,59 @@ GPU 1 idle until freeze; borrowing by LOG agreement per runpod-a's
 cnov contingency. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## 2026-07-27 16:45 London (wall) — mac-local: runpod-a venue amendment APPROVED; NEXT-MEETING FIGURE DIRECTIVE — hunt shuffle-overlay retrains to runpod-b
+
+Observed HEAD `057a4371c`. Two items:
+
+**1. runpod-a's venue amendment APPROVED as pushed** — the
+prescribed pattern exactly (2-line card amendment, ledger line in
+pod-hours, worktree detached at repin `bfce0fb4e` with
+lane-diff-empty verified, cold caches disclosed). First push from
+the new pod, 45 min after provisioning. Run.
+
+**2. Deliverable audit for the next meeting (Han's ask: Aniket-
+template ordered-vs-shuffled T-sweep figs, 3 seeds — probing,
+RLHF, top-3 hunt tasks).** Findings from the record + volumes:
+
+- Probing: DONE (FINAL fig, 3 seeds all T ∈ {1,2,4,8,16}).
+- RLHF: lands tonight on ext_c drain (3 seeds × T{1,2,5,8,16});
+  worst case T16 at n=2, on-figure disclosure.
+- **λ̂ + ttrend: the trained panels (3 seeds × full T) carry NO
+  eval-shuffle twins, and the panel checkpoints were NOT
+  persisted** (ward-caches holds only the 3 topup ckpts;
+  diafaces_panels_v2 holds payloads only). The trained-dictionary
+  shuffle overlay therefore requires **anchor-gated
+  retrain-with-shuffle-eval**.
+- cnov: entirely on the 17:00 pick; a GO panel carries win_shuf
+  in-protocol → its fig falls out of panel data by morning.
+
+**DIRECTIVE — runpod-b (GPU 1, start now): shuffle-overlay
+retrain cards, λ̂ FIRST then ttrend.** One card per task, frozen
+before cells, containing: (a) the retrain grid — claiming arm
+(λ̂: txc_batchtopk_post, T{2,4,8,16}; ttrend: v2 post arm,
+T{2,4,8,16,32}) × seeds {1,2,42} + per-token anchors, committed
+builders/caches, same hyperparams as the quoted panels; (b) an
+**anchor gate, D-K1 pattern**: pre-register a tolerance (≤ the
+quoted panel's own per-cell seed σ, stated before results) —
+retrained ORDERED numbers must reproduce the quoted numbers
+within it, else STOP and report (a finding, not a license); the
+quoted panel numbers stay the exhibit numbers EITHER WAY — the
+retrain contributes ONLY the shuffle overlay; (c) the
+shuffle-eval addition to the hunt eval path (within-window
+shuffle at eval, seed disclosed) — code addition disclosed in the
+card, protocol otherwise byte-inherited; (d) renders to
+`figs_writeup/fig_{lambda,ttrend}_shuffle_tsweep.*`, template
+knob-for-knob with the probing/RLHF pair, instrument labels per
+the labeling rules (recovery r / probe-acc, NOT AUC-alike).
+Est ≈ 1–2 GPU-h (λ̂) + 2–3 GPU-h (ttrend, incl. dialevel cache
+rebuild) — inside the envelope. Fallback if an anchor gate FAILS:
+the two-instrument figure (trained T-sweep + screen shuffle
+curve, instruments labeled) — honest, pre-approved.
+
+runpod-a: unchanged (leg → cnov on GO). runpod-2: unchanged
+(drain ~20:45 real → RLHF FINAL render).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
