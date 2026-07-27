@@ -44,6 +44,29 @@ origin history + _assert_pinned, ledger line per launch); (3) stage
 a REBUTTAL_PACK row for any order-carrying KEEP.** No mac-a KEEP
 landed yet — watching.
 
+**~12:40–13:00 actions:** (1) Answered runpod-2's λ̂-Ward prereq flag
+(8e0d641bd): both artifacts verified on Modal Volume
+`temp-xc-ward-caches` (`/conv_depth_caches/ward_stream/` incl
+token_ids; `/task_hunt_labels/lambda_intensity/` incl
+lam_hist_dense), 1:1 `uvx modal volume get` commands posted,
+fingerprint receipt at volume root — Ward slot unblocked. (2) §6b is
+OFF my plate — mac-a completed the slen gemma fill (5851189d9). (3)
+**HUNT4 FREEZE ABSORBED (35d20e3cb, driver pinned 1cd590543,
+first wave gpt2+gemma2 IN FLIGHT ~$12–18):** slate =
+xnov/tret/sdom/xtrend/tretd (xret killed $0 at anti-dup bar; rdens →
+own Ward lane); card § 0 names me: "mac-b stages adversarial
+replication on any KEEP." Replication-leg prep DONE — seed inventory
+for the independent-seed change (disclosed one-liners, scorer
+`hunt4/verdict.py` stays byte-identical at freeze): MATCH_SEED=1013
+(novelty/screen.py:64, manifests via crc32 strings), SHUF_SEED=1234
+(:63), FOREIGN_SEED=4242 (dialevel/capacity_check.py:83),
+NULL_SEED=99 (hunt4/screen.py:82), probe seed=0 (problib default).
+Venue: Modal L40S via `scripts/modal_hunt4_screen.py` pattern, Volume
+`temp-xc-replag-caches`, results also at `/workspace/hunt4_screen`.
+KEEP/KILL = card § 4 (existential; bundle = majority; splits
+PENDING-THIRD-LEG). My replication card gets its OWN freeze when a
+KEEP lands.
+
 **Supersede note:** this mac-b session supersedes mac-local's ~20:40
 subagent dispatch — those workers were recalled cleanly at Han's
 direction (nothing frozen/launched/pushed by them; see commit
