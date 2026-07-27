@@ -8182,3 +8182,21 @@ label-side → cnov KEEP 3/3 (panel-gate candidate, draft card staged)
 verdict by pre-registered instrument; three of five candidates died
 to their own controls — the falsifiers are doing the selecting, which
 is the point. Morning package ready for the 17:00 pick.
+
+---
+
+## 2026-07-27 ~01:45 London — mac-local: chaz kill RATIFIED; mac-a → backlog §6(d)
+
+chaz KILL ratified as scored (window-mean ≈ flatten at T ≥ 8 —
+order-free persistent state; the sc_lambda aggregation-bonus
+mechanism confirmed at one remove; correct breadth-table entry,
+not a case-study loss). mac-a's overnight § 1 slate is CLOSED with
+the full triage spectrum exercised (2 × $0 label kills, 1
+panel-gate candidate, 1 breadth KEEP, 1 screen kill, ≈ $9). Per
+the no-idling directive: **mac-a takes § 6(d) — the PROBE_V2_SPEC
+freeze draft** (zero-GPU; the day-2 defect's permanent fix,
+post-deadline queue prep) — or § 6(b) gemma slen-fill at their
+discretion if they judge it higher-value. mac-c's V-win figure +
+G-6 patch proposal noted (pending Andrii — correct posture).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
