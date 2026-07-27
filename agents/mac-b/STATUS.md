@@ -1,26 +1,36 @@
 # Working state — agent `mac-b`
 
-**2026-07-26 ~late (ACTMIX phase).** **ACTMIX W2 COMPLETE ($0 of $20
-cap) and RATIFIED by mac-local (9e634bed9, ~21:30 London)** — headline
-accepted at full prominence (kills stand, NO HIGH salvage; screens
-mixing-insensitive verified independently); Stage-3 ruling adopts the
-exposure ranking (λ comparator → tt-r1 floor → R29 legs; dq
-conditional; one-sided hardening clause; $4 gemma rider DEFERRED
-post-deadline). **THEN superseded by mac-a's calib identity
-(btk-only ≡ relu-mix at hunt widths; shortfall = eval threshold
-pruning): Stage-3 CANCELLED by ruling af2247d43, KEEPs certified
-composition-robust BY IDENTITY, exposure ranking discharged; mac-b
-corrigendum § 9 appended to ACTMIX_FORENSICS.md + LOG addendum
-1dd92f0d2 (λ R22 s3/s4 seed-pathology residue preserved; k256@T32
-deep-selection cell = the one genuine-divergence arm).** Deliverable
-`experiments/explorations/task_hunt/ACTMIX_FORENSICS.md`
-+ LOG PTR entry, committed/pushed this session. Now STANDING BY to
-support mac-a's Stage-3 re-runs (cache builds, variance-harness lanes)
-on request, per `briefings/actmix-mac-b.md`. Listening topology
-(actmix-shared § listening): mac-b watches ONLY
-`experiments/explorations/task_hunt/LOG.md` + `briefings/actmix-*`
-on origin/arxiv for mac-local rulings — re-arm the path-filtered
-poller each session.
+**2026-07-27 ~12:15 London (meeting day).** Queue EMPTY, everything
+delivered + ratified; in listener loop. Overnight record: (1)
+**REBUTTAL_PACK.md** RATIFIED 6cc9cc965 — λ̂ + ttrend exhibit tables
+/figs from licensed lanes only (R22/R27/R28-29 caveats verbatim,
+two-instruments format note), three sentences taken into Han's
+one-pager (FINAL for noon, 109a62915); figs via
+`rebuttal_pack_figs.py`. (2) **§ 6a** R30/WRITEUP staging race with
+mac-c reconciled (my Block 3 + merge sentence kept), applied by
+mac-local; DRAFT retired. (3) **cnov evidence line** delivered
+tt-convention verbatim (`hunt3/panel_evidence_line_cnov.py`, floor r
+0.136/0.269/0.402 @T8/16/32 tracking kernel mass) — my S4-at-T32 flag
+adopted: claiming zone ruled T≤16; bars wired into mac-a's staged
+scorer. (4) **HUNT3_DRAFT_BLOCKS.md** staged — still awaiting
+mac-local's morning pass (their open-items list, f20c99c59; may bounce
+edits back to me). mac-local's overnight audit verified mac-b CLEAN
+(pick-gated / externally-pending only).
+
+**Today's directives (~12:00 London):** pod saturation plan 059a66239
+= runpod-1/2 lane (P1 fig top-ups, P2 layer sweeps, P3 transplant) —
+not mine. **Hunt gen-4 (59ad15f38) re-arms my second hat: "mac-b:
+evidence-line support on request, as before"** — mac-a generates 3–4
+new candidate faces, label-side pre-measures first; I answer LOG
+requests for evidence lines (tt-convention: population = finite,
+non-boundary, pos ≥ T; label-side Pearson r vs visible floor). cnov
+panel stays 17:00-pick-gated; if picked+launched, panel-side support
+on request. **User directive ~12:15: posture = ACTIVE SUPPORT, full
+10 h; re-arm listener now + after every wake with WIDENED paths:**
+LOG.md + `briefings/` + `task_hunt/labels/` (mac-a gen-4 label
+pushes) + `task_hunt/hunt3/` (+`hunt4/` preemptive); poll ~150 s;
+watch-state never pushed; § 6 backlog if idle (mine is exhausted —
+refill source = LOG requests, per 1348a661a).
 
 **Supersede note:** this mac-b session supersedes mac-local's ~20:40
 subagent dispatch — those workers were recalled cleanly at Han's
@@ -67,5 +77,6 @@ be755651a). mac-b = this standalone CC instance.
   actuals ≈ $96–103 of the $500 word (see MODAL_SPEND.md).
 - Modal: NOTHING in flight. Post-deadline queue (mac-local gate):
   gemma overnight-card fills from Volume partials (~$4).
-- Deadlines: team meeting 9am PT / 17:00 London 2026-07-27; AoE
-  rebuttal deadline ~36–40 h from briefing time.
+- Deadlines: Han manual control from NOON London 2026-07-27 (now);
+  team meeting 9am PT / 17:00 London today; AoE rebuttal deadline
+  within ~1 day. Pods saturated 12:00→22:00, report ~21:30.
