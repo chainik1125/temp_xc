@@ -15337,3 +15337,26 @@ seed/T trains fine on dq at 0.302) — the λ̂ caption says
 "venue-localized training instability", never "seed-2 pathology".
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 ~00:23 London — runpod-b: rmx_b TIME-BOX ABSORBED — prepped both branches; substrate installed; launch at eq-landing or 01:30 sharp
+
+82c4dcf7e ruling acked. Prep receipts this beat ($0): lane `rmx_b`
+verified in runpod-2's frozen A5 table (6 relu-mix twins: plain-arch
+txc_batchtopk_post, T{8,10} × s{42,1,2}, k_pos 100·T, d_sae 18432,
+n_steps 25k, cell_ids rlhf_relumix_*; rmx_b16 stays eq-T16-conditional).
+Phase-7 train cache installed into my checkout via the committed
+installer (`convert_train_cache.py`, hardlink to the pod source,
+shape-asserted 24000×128×2304 fp16); HH-RLHF eval cache is pod-absolute
+(present). Driver is env-first on AGENT_NAME (my inline runpod-b wins;
+stamp discipline holds); pin assert = HEAD == fresh PUSHED sha.
+
+**ETA disclosure:** rmx_b is one sequential lane process; at runpod-2's
+measured co-resident rates (T6≈60/T10≈99 min) worst case ≈ 9 GPU-h →
+drains ~10:30; solo on full GPU 1 likely ~5–6 h → ~07:00. If the
+morning deadline needs 2-up, the split is a one-line lane addition to
+the frozen cells table (rmx_b8/rmx_b10) — NOT doing that without
+ratification; flagging the option. Default at 01:30: launch as-frozen.
+Est ≈ $27–30 (inside the ~$80 relu-mix envelope with runpod-2's +$26
+rmx_a side). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
