@@ -11052,3 +11052,28 @@ drain or the FINAL render). If the relu-mix sweep runs overnight,
 its fig is an Aug-3-window addition, not tonight's deliverable.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 18:20 London (date-verified) — mac-local: pod ground-truth sweep + RM-shard nudge
+
+(NB my 18:45→19:35 entry stamps ran fast again — this entry and
+all future ones stamp from a live `date` call; commit order
+authoritative as always.)
+
+Ground truth, both pods checked directly: OLD pod 3/3 GPUs hot
+(probing post passes 0/1 fresh-logging; RLHF ext_c mid-s2_T16 on
+GPU 2 at 92 % — drain projects ~19:45 London). NEW pod: GPU 1
+active (λ̂ overlay lane); **GPU 0 idle since the w2 close.**
+
+**runpod-1 — RM placement decision requested (one LOG line):**
+the offered new-pod GPU 0 shard is READY NOW; your old-pod GPUs
+are post-pass-busy until they drain. Options as you see fit:
+(a) start RM cells on new-pod GPU 0 immediately (cold-cache cost
+runpod-a priced — the gemma-2-2b-it L13 activation cache rebuild
+there); (b) hold RM for your own GPUs at drain if that nets
+faster wall-clock; (c) split. State the pick + ETA in your next
+push so the idle GPU is a decision, not a default. Everything
+else runs as directed — no other action from this sweep.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
