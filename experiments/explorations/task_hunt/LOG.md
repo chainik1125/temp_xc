@@ -11311,3 +11311,42 @@ clew-only, S2 untouched) — **mac-local review next beat**;
 runpod-a holds wave-3 picks until that review posts.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~18:35 London — runpod-a: P1-RM SHARD 2 LIVE on GPU 0 (PIN 8c231e806 asserted; substrate-sync actuals disclosed)
+
+Per my accept (e24171aa1) and runpod-1's launch (their 19:00-wall
+entry): **shard 2/3 running on GPU 0 from a worktree DETACHED at
+the RM PIN** — launcher asserts reproduced verbatim pre-launch
+(HEAD == 8c231e806 ✓, PIN ∈ origin/arxiv ancestry ✓, clean tree ✓,
+then TEMP_BENCH_ALLOW_DIRTY=1 per the pool-row convention). Pass
+chain = `launch_relumix.sh run_gpu()` byte-for-byte with
+`--shard-index 2 --shard-count 3`; enumeration receipt: pass-1
+(untrained) total_cells=11 → shard 2 gets 3 (pre T16/T8, post T2
+twins), consistent partition with shards 0/1.
+
+**Substrate-sync actuals (the cold-substrate caveat, priced):**
+HF mirror pull `han1823123123/temp-bench-data` (dataset repo —
+NB the prep_cache docstring's bare repo id resolves as
+repo_type=dataset) → act_cache 14.2 GB + probe_cache 21.0 GB
+(266 files) in **307 s**; `prep_cache` verify+link green (acts
+(24000, 128, 2304) fp16; 38/38 tasks; ag_news spot-check pass).
+Total ask-to-ready ≈ 11 min, zero GPU.
+
+**Venue mechanics disclosed:** shared venv (lane diff PIN→my HEAD
+verified EMPTY over src/ + experiments/probing/ + configs/ +
+uv.lock); `code_version` stamps resolve from run-cwd git toplevel
+= the worktree ⇒ **rows stamp AT THE PIN, clean tree**; results/
+paths resolve via the package root ⇒ rows land in MY main clone's
+`results/leaderboard.jsonl` (union-merge JSONL) — I checkpoint-push
+them at milestones, first one IMMEDIATELY when the first trained
+cell lands (21:00-real fallback clause, e24171aa1). Env:
+AGENT_NAME=runpod-a, CUDA_VISIBLE_DEVICES=0 (no set_agent_env
+stanza exists for this pod's ids — vars exported directly,
+mirroring the runpod-1 stanza; NB the script's `runpod-b` entry is
+the RETIRED A40 agent, a name-collision trap for my sibling).
+Log `/workspace/logs/actmix_rm_gpu2.log`. Ledger line this commit
+(pod-hours share ~$12–15; sweep total stays on runpod-1's line).
+
+_Recorded-by: claude-fable-5 (runpod-a)_
