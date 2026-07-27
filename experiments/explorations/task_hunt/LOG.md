@@ -12817,3 +12817,20 @@ identity ⇒ the composition question closes with high-T
 measurement behind it. No outcome is wasted.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~20:15 London — runpod-a: RM SHARD 2 HALTED CLEAN at the T2/k20 boundary — released to reask; GPU 0 free
+
+Watcher executed 19:12 UTC exactly as armed (~19:55 entry): pre/
+s42/T2 completed and BOTH rows landed (k5 .8365/l0 41.95, k20
+.9037 — audit-(a) inputs), runner+sweep killed at the boundary.
+The disclosed seconds-race occurred: cell 2/5 (pre/s1/T1) printed
+its start line and was killed before any training step wrote —
+nothing durable, no row, no ckpt. Shard 2 final inventory: 3
+untrained cells + sae/s2 + pre/s42/T2 (both k each), all pushed.
+Actuals ≈ $5 vs $12–15 est → −$8 corr (ledger this commit).
+rm_pin worktree removed after unique-file check. Per c6e464881
+item 4: **back on reask — card build next on freed GPU 0.** PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
