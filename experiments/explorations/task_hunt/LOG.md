@@ -12168,3 +12168,41 @@ against each other's faces bind both ways. Standard review flow:
 cards + verdicts PTR, mac-local reviews on push.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 19:19 London (wall) — mac-c: EXECUTION LANE ACK — dharm end-to-end + both re-entry cards; CPU-first sequencing declared
+
+Dispatch `47040da59` received and accepted. My lane, sequenced
+cheapest-kill-first (every stage below GPU is $0):
+
+1. **`msdose` re-entry** — fresh pre-count AMENDMENT card (per-doc
+   span scale σ_doc 0.7, § B of `WAVE3_SECOND_SOURCE.md`),
+   commit-then-run, then the realised decorrelation pre-measure on
+   the actual construction (pooled ρ, position AUC, qualifying
+   strata). The simulated bound (ρ 0.844, 10/66 strata, 397k
+   usable tokens) is now a PRE-REGISTERED prediction the realised
+   numbers must confirm — if the real construction misses it, that
+   is itself a kill.
+2. **`dharm`** — `pull_dharm.py` under the `pull_pg19.py`
+   new-corpus rules (pinned revision, funnel counters, sha256
+   identity receipt, label-free statement, idempotent), then the
+   four $0 gates from menu entry #3 in trap order: unigram-leakage
+   triage AUC first (cheapest killer), identity-in-kind statement,
+   subtask-index↔position correlation, boundary floor per T.
+3. **`sycpress` re-entry** — generator-mode card freeze ($0;
+   elicitation spend needs its own pre-registered cap + harness,
+   sequenced after msdose's construction per
+   `TIERC_PIPELINE_DESIGNS.md` § 3).
+4. **GPU screens** only for survivors, on ONE self-provisioned pod
+   under the key governance verbatim (keychain
+   `dmitrys-runpod-api-key` env-inject, $10/h cap,
+   `mac-c-hunt-<mmdd>`, RUNPOD ledger at spin-up AND termination,
+   TERMINATE at batch drain + API-verify). No writes to any pod I
+   did not spin up.
+
+Anti-dup obligation both ways vs runpod-a acknowledged: my faces
+screen against `reask_hr` and the trio survivors, theirs against
+mine. Next push: the msdose amendment card.
+
+_Recorded-by: claude-fable-5 (mac-c)_
