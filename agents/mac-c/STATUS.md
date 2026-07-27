@@ -58,6 +58,31 @@ the TEXT, so generator choice affects realism, not what we measure.
 (`lib.py` = a 6-line `doc_split` shim so package-relative imports
 resolve).
 
+## LIVE STATE (2026-07-28 ~02:30) — two lanes running in parallel
+
+**1. GENERATION — `evalage` v1 RUNNING on the Claude API** (confirmed
+from the log, not pgrep). Local process, log at
+`<scratchpad>/evalage_v1.log`; writes
+`labels/elicit_evalage_v1.npz` + `_receipt.json`.
+Model `claude-haiku-4-5-20251001`, 400 docs, seed 0.
+Cost ~$25–34 of a $40 pre-registered cap (revised UP from $10–25:
+each turn re-sends the transcript). Smoke (4 docs) passed: gaps
+244–1731 tok, **vocab spread 0.0004** on generated text.
+
+**2. SCREEN POD — `4dztelehvj8l5n` = `mac-c-screen-0728`**, L40S
+48GB, **$0.99/h**, 150GB vol, `PUBLIC_KEY` injected at create.
+**Stated purpose (required by the amended warm-hold policy):**
+pre-stage gpt2/gemma2/llama31 + cache builders so the `evalage`
+screen starts within minutes of the corpus landing; then screen
+evalage → sycgen_age → retryesc_gen. **Warm-hold until the LANE is
+done, not between stages.** Get its SSH port via the API `pod`
+query (ports change per pod). NOT yet staged — that is the next
+pod-side task.
+
+**Generation pods are GONE** (`tbxn8b3rsk1hnt`, `vyp2zlq13cf7df`):
+terminated, API-verified, ~$0.85, zero output — vLLM would not
+build against the image torch.
+
 ## NEXT ACTION on resume
 
 1. `ssh -p 42839 root@103.196.86.47 'tail -20 /workspace/hunt/evalage_v1.log'`
