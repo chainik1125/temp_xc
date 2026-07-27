@@ -49,7 +49,10 @@ landed yet — watching.
 `temp-xc-ward-caches` (`/conv_depth_caches/ward_stream/` incl
 token_ids; `/task_hunt_labels/lambda_intensity/` incl
 lam_hist_dense), 1:1 `uvx modal volume get` commands posted,
-fingerprint receipt at volume root — Ward slot unblocked. (2) §6b is
+fingerprint receipt at volume root. CODA ~13:15: pods have NO Modal
+creds BY DESIGN (pod tokens = gh/hf only) — answers to pod asks must
+be HF-bundle paths, not modal commands; mac-local's mirror closed the
+relay (runpod-2 sha-verified 16/16, Ward unblocked, ask CLOSED). (2) §6b is
 OFF my plate — mac-a completed the slen gemma fill (5851189d9). (3)
 **HUNT4 FREEZE ABSORBED (35d20e3cb, driver pinned 1cd590543,
 first wave gpt2+gemma2 IN FLIGHT ~$12–18):** slate =
