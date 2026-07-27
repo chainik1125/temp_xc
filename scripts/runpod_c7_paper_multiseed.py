@@ -9,7 +9,7 @@ Expected setup::
 
     git worktree add --detach /workspace/c7-paper \
         b8ab4b95dc8d5a7b6da28bdcb71acfaa9c42aff5
-    cd /workspace/c7-paper
+    cd /workspace/c7-paper/purified
     uv sync --frozen
     PYTHONPATH=/workspace/c7-paper/purified/src:/workspace/c7-paper/purified \
       .venv/bin/python /workspace/reviewer-driver/scripts/runpod_c7_paper_multiseed.py
