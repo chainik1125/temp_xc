@@ -12872,3 +12872,65 @@ traces; the s42/T16 pair predates telemetry (endpoint-only,
 disclosed).
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+## 2026-07-27 20:23 London (date-verified) — mac-local — RATIFIED: T16 divergence report (dd8880fe0) — the mechanism finding stands; quote guards attached
+
+**Review receipts (all three pass):**
+1. **No contradiction with my 1,230-field |Δ|=0.0 diff** — the two
+   new leaderboard rows (T16 s42 relu-mix, schema 2.0.0, canonical
+   runner, probing-1.2.0) land IN dd8880fe0; my diff predates them
+   and covered low-T landed rows only. The 11-pair machine-precision
+   identity baseline is what makes 0.0025 a REAL delta — the
+   instrument has demonstrated 0.0 resolution on this exact pipeline.
+2. **Telemetry is plugin-clean**: `src/temp_bench/archs/telemetry.py`
+   opt-in via env var, core untouched, self-describing records.
+   `boundary_min_pre` (smallest selected pre-activation) is the
+   direct observable of the reconciliation theory: > 0 ⇒ compositions
+   coincide; crosses 0 ⇒ must diverge. The theory is now falsifiable
+   per-step, per-cell.
+3. **Positive control** script reviewed: thin-pool d_sae=64/k_pos=48
+   (boundary at top-75% of pooled pre-acts ⇒ rectification fires from
+   step 0), canonical runner, `eval_cfg.positive_control=true`,
+   exit-2-unless-DIVERGENCE. Runs before the grid — correct order.
+
+**The science as of now:** identity through T4 (bit-level, 11 pairs +
+row-level 30/30), divergence at T16 (W_enc maxdiff 0.68, ntsf ≈ full
+token budget, ~40% disjoint survivor sets, ~0.002 AUC at
+d_sae=18432). Boundary lives in (T4, T16]; tonight's T{6,8,10,16}×3
+grid + traces locates the onset. Han's override is vindicated in
+full — the halt would have shipped a false global certificate. Error
+was mine; the record stays.
+
+**QUOTE GUARDS (binding until the 3-seed grid lands):**
+- Nobody quotes "~0.002 AUC" as "composition doesn't matter" — the
+  aggregate cost is width-contingent (measured at d_sae=18432 only);
+  the FINDING is the disjoint survivor sets + alive-vs-never-fired
+  ntsf signature. One seed at T16 so far: rebuttal-usable only as
+  "preliminary, replication overnight".
+- The dead-frac U-shape (0.442→0.414→0.366→0.365→0.574) stays
+  ADJACENCY-ONLY next to the perf inverted-U — no causal claim
+  without trace evidence.
+- The certificate (when it posts) is a BOUNDARY document: identity
+  certified where measured, divergence localized where measured —
+  never a global invariance claim in either direction. Positive
+  control remains prerequisite.
+
+**Draft both-arms licence for Dmitry (PTR, single seed):** "The
+paper's ReLU+TopK composition and the clean BatchTopK are
+training-bit-identical through T=4 (eleven twin pairs, machine
+precision); at T=16 they diverge — same aggregate dead fraction
+(~57%) but ~40% disjoint survivor sets, with ≈0.002 probing-AUC
+consequence at d_sae=18432 (1 seed; 3-seed replication overnight).
+Both-arms comparison figure follows the grid."
+
+**Cross-lane routing:**
+- **runpod-2**: your A3b high-T pair is now EXPECTED to diverge —
+  per-T-regime rule confirmed correct; if T16 diverges on RLHF
+  configs, relu-mix high-T training is IN (budget approved).
+- **runpod-c**: the T16 mass-death datum (57% dead, U-shaped in T)
+  is measured prior evidence for your dead-latent-mitigation
+  candidate — the hill-climb now has a quantified target at the
+  exact T where the paper curve sags. Telemetry module is reusable
+  (env-var opt-in). Pull dd8880fe0.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
