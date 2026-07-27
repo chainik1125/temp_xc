@@ -1,59 +1,51 @@
 # Working state — agent `mac-a`
 
-**2026-07-26 ~23:50 London — ACTMIX W1 LANE CLOSED from my side: all
-deliverables landed and pushed. Stage 1 shipped (btk-only canonical);
-Stage 2 IDENTITY verdict + R30 (ALL PASS; preliminary ratified
-af2247d43, final rode the 20/20 push); Stage 3 cancelled by ruling
-(KEEPs certified composition-robust BY IDENTITY); thin-pool DIAG
-landed with DIVERGENCE as pre-registered (l0 0.696→1.007, rec
-0.2471→0.1805 — identity is substrate, not implementation). mac-a
-ACTMIX spend ≈ $4 of $40. Idle watch — poll origin per listening
-topology (my binding gates: LOG rulings + actmix-* amendments); act
-only on things addressed to mac-a. This lane SUPERSEDED mac-local's
-~20:40 recalled subagent dispatch (nothing was frozen/launched/pushed
-by it).**
+**2026-07-27 ~02:55 London — OVERNIGHT § 1 (task-hunt resumption,
+briefings/actmix-overnight.md): screens DONE, bundle verdict POSTED
+(~02:50 LOG), draft panel card STAGED for the 17:00 pick. One item in
+flight: chaz factory screen (relaunch 3, freeze 81b6d5918, monitored).
+Spend: overnight ≈ $9 (+chaz ~$2 est) of ≤$30; W1+overnight ≈ $13–15
+of $60 cap.**
 
-## Delivered (ACTMIX W1)
+## Overnight delivered (all pushed)
 
-1. **Stage 1** (92db86c41): btk-only variants — 5 registry entries
-   (`*_btkonly`, 1.1.0 / 2.1.0-port), plugin file
-   `src/temp_bench/archs/btk_only.py`, CANONICAL convention LOG note
-   (~21:05; single-source — pods consumed it), threshold_set flag,
-   neg_frac diagnostic, tests/test_btk_only.py, suite 369 green.
-2. **Stage 2 CALIB** (card freeze `97fae183a`, approved 269b7d86c;
-   verdict FINAL ~23:00 entry): **IDENTITY — btk-only ≡ relu-mix at
-   hunt widths (d2048, k8).** 20/20 cells; max |Δrec| 0.0000@4dp (raw
-   ≤ 2.2e-08); l0 EXACTLY equal ×20; slopes +0.0701 both arms; tsae
-   twin predictions landed digit-exact. Mechanism re-attribution:
-   realized-l0 shortfall = eval JumpReLU threshold pruning, NOT
-   selection zero-picks; neg_frac ≡ 0 proven by identity (advisory
-   answered). **R30 direct-added, ALL PASS.** Preliminary RATIFIED
-   (af2247d43); final ratification rides the 20/20 push. Deliverables:
-   calib_score.json + figs/calib_relu_vs_btk.{png,pdf} + R30.
-   Leaderboard +20 rows @97fae183a, 0 dups.
-3. **Stage 3**: CANCELLED as designed by af2247d43 § 2 — hunt KEEPs
-   (R22/R27/R28/R29/tt-P1) composition-robust BY IDENTITY; ~$30
-   released; mac-b appends the forensics corrigendum (their lane).
+1. **4 candidates designed; 2 killed label-side $0** (ratified
+   858c60a70): tempo (Spearman −0.81…−0.83 vs confirmed ttrend =
+   anti-dup), qres (P(lat=1)=0.84 degenerate + "?"-anchor).
+2. **HUNT3 screens 3/3 models** (freeze 32e316bc4, card approved):
+   **cnov KEEP 3/3 → PANEL-GATE CANDIDATE** (order 2/3 @T32;
+   claiming zone T ≤ 32 held exactly as pre-registered; traps
+   survived by design instruments) + **nvtrend KEEP 3/3 → BREADTH**
+   (order 0/3; pooling-matchable aggregation class).
+   Verdicts mechanical: `hunt3/verdict.py` (existential § 4 per
+   ruling bed236f1d; scorer-before-results now house practice).
+3. **Draft panel card** `hunt3/PANEL_CARD_DRAFT_CNOV.md` (NOT frozen;
+   proposes dial_real_cnov_gpt2_l7 datasource reusing the committed
+   face + ttrend-panel constants, fresh seeds {9,10,11}, S1–S5
+   family, est $4–6).
+4. **chaz** (cue-free correction hazard): triage PASS bundle,
+   2 OOM attempts (20k/class → capped 6k post-triage, disclosed),
+   ward-volume venue fix; relaunch in flight ~02:35.
 
-## In flight / next
+## Earlier today (closed)
 
-- Nothing in flight. DIAG landed (freeze 63ac1b208, eval_key
-  3a6f0bbe0f9a0b07, +1 canonical row): rec 0.1805 / l0 257.8 vs twin
-  0.2471 / 178.16 — divergence as pre-registered; close-out LOG note
-  ~23:45. Idle watch only.
+ACTMIX W1: Stage 1 btk-only (canonical), Stage 2 CALIB identity
+verdict + R30 (WRITEUP-applied via §6a package), Stage 3 cancelled
+by af2247d43, thin-pool diag divergence exhibit. ≈$4.
+
+## On chaz landing
+
+Score vs chaz/CARD.md § 3 bars (g ≥ +0.05 ∧ ≥2σ_null ∧ g−g_agg ≥
++0.02 ∧ null-arm clean; base-only venue — distill cache absent on
+ward volume, DISCLOSE) → LOG verdict + ledger actuals → idle watch.
+Early cells showed g ≈ g_agg (aggregation-shaped) at T4–8; T16/32
+decide.
 
 ## Assets / recovery
 
-- Calib: CALIB_CARD.md, run/score/merge/make_fig scripts,
-  results/calib_{score,stage2_*}.json, calib_payloads/, Volume
-  `…:/workspace/diafaces_calib/`, figs/calib_relu_vs_btk.*.
-- btk-only convention: arch file docstring + LOG ~21:05 note +
-  configs/archs.yaml ACTMIX block. Evaluator l0 is sign-agnostic
-  (`z != 0`) — verified.
-- Identity condition (for anyone extending): btk-only ≡ relu-mix iff
-  train selection never exhausts positives AND tracked threshold ≥ 0;
-  divergence regime on this substrate = 8·T arm at T32 (k256/d2048).
-- Modal client: scratchpad `modal-venv/bin/modal`. Ledger last line
-  ~$105 program. Local modal runner may still be attached
-  (harness task b5j39gav2) — payloads already repatriated manually;
-  safe to TaskStop it.
+- hunt3: bundles labels/hunt3_dailydialog_*.npz (floors inside),
+  stats, screens + verdict.json, draft card. chaz: labels/chaz.npz
+  (6k/class), CARD, driver scripts/modal_chaz_screen.py (pin
+  81b6d5918), result → ward volume /chaz_screen.
+- Monitors: chaz launch3 (bijas3sdv), idle watch (bxohms0i4).
+- Ledger last line ~$121 program.
