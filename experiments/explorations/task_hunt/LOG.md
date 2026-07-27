@@ -11350,3 +11350,82 @@ Log `/workspace/logs/actmix_rm_gpu2.log`. Ledger line this commit
 (pod-hours share ~$12–15; sweep total stays on runpod-1's line).
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-27 19:55 London (wall) — mac-c: txc_pro DIG CLOSED — the implementation SURVIVED (don't reimplement it), and it has ZERO real T-scaling evidence
+
+**Time-sensitive for `runpod-c`**, whose briefing (18:34) says
+"reimplement the txc_pro recipe FROM ITS LOCKED HPARAMS (no waiting on
+mac-c's dig)". **Stop and read this first — the reimplementation is
+unnecessary and, done from the yaml alone, would build a different
+architecture.** Deliverables: `TXC_PRO_RECOVERY.md` (provenance report)
+and `docs/recovered/txc_pro_phase5b_subseq_h8.py` (verbatim copy,
+diff-verified against the blob).
+
+**1. It survived.** The 18:45 entry's *"the class file `txc_pro.py` did
+NOT survive purification — only the registry pointer"* is true of the
+working tree and **false of git history**. Full 496-line class:
+
+    git show 5dd7337b2^:purified/src/temp_bench/archs/txc_pro.py
+
+blob `480f3755d…`, sha256 `626066a83…`, removed by `5dd7337b2` ("arxiv:
+remove txc_pro from active registry", Han, 05-31) as a **paper-only
+scope** cut, not because it was broken. It carries `arch_version 2.0.0`
++ `consumes: 'sequence'` — **already ported to framework v2 before
+deletion**. I placed the copy under `docs/` on purpose: `src/` is
+importable library code only, and re-registering an arch is Han's /
+mac-local's call, not mine.
+
+**2. Two hparam corrections — the second is the dangerous one.**
+- **`n_matryoshka: 8` is NOT a functional hparam.** The source marks it
+  `# noqa: ARG002 — phase id, not used`, and its docstring says it is
+  *"**NOT** functionally used as a count of matryoshka levels"*. The real
+  control is **`h_size`, default `d_sae // 5` = 3686**, in an H+full
+  layout. **Building "8 matryoshka levels" from the yaml name yields a
+  different architecture** — this is exactly the failure mode
+  "reimplement from locked hparams" invites.
+- **`k_pos: 20` was missing** from the 18:45 hparam list and is in the
+  locked yaml. Also: `arch_version` disagrees between sources (yaml
+  1.0.0, file 2.0.0 — the file is later).
+
+**3. Sparsity, for the hill-climb.** `k_train = k_pos·t_sample = 100`
+but `k_inference = k_pos·T_max = 200`. The inference side is exactly the
+program-wide convention re-audited at 18:22 (window budget linear in T)
+— **no conflict, no corrective action.** But note the consequence:
+**sweeping `T_max` at fixed `t_sample` holds the TRAIN budget constant
+while scaling the INFERENCE budget linearly**, so the train/inference
+asymmetry widens with T. Hold the ratio or hold `t_sample` — either is
+defensible, but it should be pre-registered, not inherited. Also
+`encode()` **hard-raises** unless `T_input == T_max`: a T-sweep means
+retraining per T, not re-evaluating one checkpoint. And `multi_window`
+(default False) **invalidates train_keys** when flipped.
+
+**4. T-scaling evidence, A12-aware: there is NONE.** Exhaustively —
+(a) the shipped main-text figure has txc_pro as **one bar at 0.931**,
+single T; (b) main.tex's "T-SAE/TXC-pro 0.897–0.899" is that same cell
+under the CT-**included** aggregation (the ≈ +0.03 offset is the
+CT-exclusion shift, `COMPOSITION_AUDIT` § A12); (c) the canonical v2
+leaderboard has **31 txc_pro rows, ALL `experiment: synthetic`**, 3
+seeds, `arch_hparams_override {"k_pos": 1}` (toy), **no T variation**;
+(d) **the A12 phantoms are `txc_base` T10/T20, NOT txc_pro** — it was
+never in that sweep. **So txc_pro inherits no contaminated T prior AND
+no evidence that this recipe scales with T.** "txc_pro was our
+T-scaling architecture" describes an intention, not a measurement.
+For runpod-c that is a clean start, not a loss.
+
+**5. Revival gotchas** (§ 5 of the report): the removal commit also added
+**`DEPRECATED_ARCHS = {"txc_pro"}`** filters to
+`populate_repro_report_{from_leaderboard,multiseed}.py` and a
+`deprecated_archs` filter to `render_paper_figures.py`, dropped it from
+`configs/experiments.yaml` (synthetic/probing/backtracking/rlhf lists)
+and from `run_synthetic_minisweep.sh`. Historical rows were kept for
+audit trail but are **suppressed at render/populate time** — so the 31
+synthetic rows exist and are invisible until those filters are revisited.
+
+Scope: recovered and documented only. No registry, config, or core code
+touched; no compute run; nothing imports `docs/recovered/`.
+
+**Both briefing items are now delivered** (SAFETY_TASK_MENU at
+`d44843ae7`, this dig here), so `briefings/safety-task-research.md` is
+deleted in this push per its own closing line. Menu review by mac-local
+is still pending and I am available for it.
+
+_Recorded-by: claude-fable-5 (mac-c)_
