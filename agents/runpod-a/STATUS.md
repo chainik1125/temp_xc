@@ -54,17 +54,43 @@
 
 ## ACTIVE NOW (rewrites older sections above where they conflict)
 
-**1. RM shard 2 RUNNING on GPU 0** (task #4): runpod-1's relu-mix
-probing sweep, PIN `8c231e806`, worktree `rm_pin`, launch line
-`7ae8e9fd5`. **FALLBACK SATISFIED 19:34 London** — first trained
-row (sae/seed=2/k5 auc .8383) pushed `12d057b1b`, 86 min inside
-the 21:00 clause. Remaining shard queue: sae k20 eval (same
-ckpt), then pre seeds{1,2,42} shard cells (~5), then post-42
-(~1-2) — drain ≈ 23:30–00:30; checkpoint rows at milestones
-(NEVER stash around the live runner — commit rows instead). Log
-`/workspace/logs/actmix_rm_gpu2.log`. At drain: post shard-done
-LOG line w/ actuals (pod-hours), then GPU 0 frees for the
-reask_hr screen freeze.
+**1. RM shard 2 — HALTED BY RULING (c6e464881), wrap-up owed.**
+Arc: launch 7ae8e9fd5 → fallback satisfied 19:34 (12d057b1b) →
+runpod-1 proved arms BIT-IDENTICAL (their ⚑ 19:49) → HALT
+approved; **I am RELEASED to reask at the T2/k20 boundary row.**
+My watcher (bg task) kills the runner when pre/s42/T2's k20 row
+lands (~19:10–19:25 UTC; training was step 14k at 18:58). THEN:
+(1) rows checkpoint + push (T2 rows feed the weight-equality
+audit (a)); (2) RM ledger ACTUALS to the halt: GPU-0 share
+~17:34→~19:20 UTC ≈ 1.8 h ≈ $5–6 vs $12–15 est → **−$7-ish
+corr** — one ledger line; (3) short LOG shard-halted line (cells
+landed: 3 untrained + sae/s2 both-k + pre/T2 both-k); (4) rm_pin
+worktree can be REMOVED after (verify no unique files first,
+same cmp discipline as hunt4w2). Task #4 closes there.
+
+**1b. reask_hr SCREEN CARD — the next build (released to it).**
+GPU 0 free after the boundary. Implementation checklist (all
+record numbers in committed JSONs — reask_gate_census.json,
+reask_hr_premeasure.json, wave3_trio_stats.json):
+- `reask_hr/` subdir (hunt4w2 clone pattern): CARD (hr face
+  primary + pooled labels-only disclosure; census numbers
+  verbatim; clock 119–137 tok/msg; claim zone from per-T
+  censored-age floors; BINDING: position-matched manifests,
+  position-floor arm, wd arms; § 4 = hunt4 rules verbatim;
+  scorer committed IN the freeze) + cache_acts (refmark2k grid →
+  /workspace/reask_hr_caches, ~51k rows ×128, capture per
+  SCREEN_HS; llama ~20 min, gemma ~8, gpt2 ~2 on H100) + screen
+  (hunt4w2/screen.py transplant: faces=(reask_hr,), manifests
+  from wave3_reask_hr_<tok>.npz event arrays via
+  position-stratified balanced classes, elig = assistant tokens,
+  event+boundary masked) + verdict.
+- Freeze card+builders+scorer ONE commit → push → pin → ledger →
+  run 3 models sequentially GPU 0 → mechanical verdict → ONE
+  bundle LOG entry (PTR). WRITEUP § 8 rows for trio kills BATCH
+  with this screen result (mac-local's line).
+- Budget: hunt envelope headroom (envelope ≈ $175); est $3–6
+  pod-hours. Window: tonight fine, or morning — no deadline
+  binds it (the AoE support work is other lanes').
 
 **2. Wave-3 zero-pull trio pre-measures** (task #5, directive
 ae1ce5fb0): CPU, in flight. **FROZEN constants (pre-counting):**
