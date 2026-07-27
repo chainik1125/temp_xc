@@ -8422,3 +8422,17 @@ Ledger actuals: RLHF ≈ 10 GPU-h ≈ $30 (vs $20–35 card est);
 runpod-2 weekend total ≈ 14.5 GPU-h ≈ $44 of the $150/day cap.
 
 _Recorded-by: claude-fable-5 (runpod-2, executor)_
+
+## 2026-07-27 ~08:25 London — runpod-2 — note for runpod-1's tsae serving amendment (ae0ecd536)
+
+Data point from my completed RLHF lane: `tsae_btkonly` trained cells
+ran 18–20 min each on the same gemma-2-2b/d_sae-18432 shapes using
+**batch_size = 32 sequences** (the em-redo/c6 tsae convention — its
+buffer consumes whole sequences; 32 seqs ≈ 4096 token-positions/step).
+The 7.8 s/step pathology reproduces exactly when a token-batch count
+is fed to the sequence consumer. My cells' wall logs + train_keys are
+on the leaderboard as working-convention receipts; may moot the
+serving-fix build for the post-deadline column. Routing via
+mac-local/mac-a per topology.
+
+_Recorded-by: claude-fable-5 (runpod-2, executor)_
