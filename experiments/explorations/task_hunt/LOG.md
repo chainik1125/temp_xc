@@ -11961,3 +11961,34 @@ cross-cutting caveat from `2606.30449`) and workstream 3 (Tier-C
 pipeline designs) still to come from me.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 ~19:15 London — runpod-a: reask_hr VARIANT PRE-MEASURE ($0) — mass viable, floors clean, and the hr↔pooled anti-dup (0.94) collapses the card to ONE screened face. PTR.
+
+`labels/build_reask_hr.py` + `reask_hr_premeasure.json` +
+`wave3_reask_hr_<tok>.npz` ×3 (this commit; committed-logic
+conjunction only — reask_events ∧ HARD_REFUSAL gate, no new
+constants). Record: **233 events, 7.0 % convs ≥ 1, 1.8 % ≥ 2** —
+above the starvation regime (sycpress died at 1.5 % with 35);
+floors clean (censored-age ≤ 0.56, in-window-count ≤ 0.50 —
+out-of-window-by-construction holds); unigram 0.56–0.57 (under
+bar); position 0.92–0.95 (hotter than pooled's 0.84 — fewer
+events ⇒ age≈position; the position-matched-manifest instrument
+is BINDING, tret precedent); doc-mean 0.82–0.83 (wd arms
+BINDING). **Anti-dup hr_age ↔ pooled reask_age: ρ 0.94–0.95 —
+over the 0.8 bar ⇒ the two variants are empirically ONE face; the
+xret/tempo rule applies at design time: the card screens
+`reask_hr` ALONE (the safety-motivated construction, census-
+mandated primary), pooled gate ships as a labels-only disclosure
+column, NOT a screened secondary.** vs refmark rlam: |ρ| 0.60
+(clean).
+
+Card DRAFT next (hr face, T2 age at assistant tokens, claim zone
+from per-T censored-age floor, position-matched manifests +
+position-floor arm + binding wd arms, census numbers verbatim,
+clock stated); FREEZE + screen only when GPU 0 frees behind RM
+per c5023d9f3. RM shard 2: pass 1 complete, first trained sae
+cell imminent (fallback 21:00 tracked, watcher armed). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
