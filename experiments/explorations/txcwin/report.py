@@ -682,6 +682,91 @@ def build():
     a("</ul>")
     a("</section>")
 
+    # ── parameter counts and inference cost ───────────────────────────
+    pc = jload("paper_costs.json")
+    if pc:
+        a('<section class="wide">')
+        a('<div class="eyebrow">Reviewer bbby, question 5</div>')
+        a("<h2>Parameter counts, inference cost, and training cost per architecture</h2>")
+        a("<p>Counted by instantiating each registered class at the paper's own "
+          "hyperparameters, so these cannot drift from the code. FLOPs are "
+          "analytic at 2 per multiply-accumulate, with a sparse decode (the "
+          "honest number: a dense decode would be "
+          "<code>d_sae/k</code> = 900&times; larger and no implementation does "
+          "that). Per-token cost assumes windows <b>tile</b> the sequence, which "
+          "is what the paper's one-code-per-tile evaluation implies; at stride 1 "
+          "a window architecture would cost T&times; more.</p>")
+        if (FIGS / "costs_light.png").exists():
+            a("<figure>" + img("costs")
+              + "<figcaption>Left: parameters. A temporal crosscoder carries T "
+                "encoder and T decoder matrices, so at equal width it has 5&times; "
+                "the parameters of a per-token SAE. Right: inference FLOPs per "
+                "token, which are <i>identical</i> — the window cost is amortised "
+                "over the T tokens it covers.</figcaption></figure>")
+        for sec_name, sec in pc["sections"].items():
+            a(f"<h3>{esc(sec_name)} &mdash; "
+              f"{esc(sec['subject_model'])} "
+              f"(d_model {sec['d_in']}, layer {sec['hookpoint_layer']}, "
+              f"{sec['subject_params']/1e9:.2f}B params)</h3>")
+            a(f"<p style='color:var(--ink2)'>Training: "
+              f"{sec['training']['n_steps']:,} steps &times; "
+              f"{sec['training']['batch_size']:,} = "
+              f"{sec['training']['tokens_seen']/1e6:.1f}M tokens seen. One forward "
+              f"pass of the subject model costs "
+              f"{sec['subject_forward_flops_per_token']/1e9:.1f} GFLOPs per "
+              f"token.</p>")
+            a("<div class='tscroll'><table><thead><tr><th>architecture</th>"
+              "<th>d_sae</th><th>k</th><th>T</th><th>parameters</th>"
+              "<th>% of subject model</th><th>inference FLOPs/token</th>"
+              "<th>% of a subject forward</th><th>training FLOPs</th>"
+              "</tr></thead><tbody>")
+            for arch, e in sec["archs"].items():
+                if "params" not in e:
+                    continue
+                h = e["hparams"]
+                pstr = (f"{e['params']/1e6:.1f}M" if isinstance(e["params"], int)
+                        else esc(e["params"]))
+                hi = " class='hi'" if arch == "txc_base" else ""
+                a(f"<tr{hi}><td class='n'>{esc(arch)}</td>"
+                  f"<td class='n'>{h.get('d_sae')}</td>"
+                  f"<td class='n'>{h.get('k_pos')}</td>"
+                  f"<td class='n'>{h.get('T', 1)}</td>"
+                  f"<td class='n'>{pstr}</td>"
+                  f"<td class='n'>{e.get('params_pct_of_subject')}%</td>"
+                  f"<td class='n'>{e['flops']['per_token_strideT_sparse']/1e6:.1f}M</td>"
+                  f"<td class='n'>{e['inference_pct_of_subject_forward']}%</td>"
+                  f"<td class='n'>"
+                  + (f"{e['training_flops_estimate']/1e15:.1f}P"
+                     if e.get("training_flops_estimate") else "&mdash;")
+                  + "</td></tr>")
+            a("</tbody></table></div>")
+
+        a('<div class="card good"><h3>The short answer</h3>'
+          "<p><b>A temporal crosscoder costs 5&times; the parameters of a "
+          "per-token SAE at equal width, and the same FLOPs per token.</b> The "
+          "parameters go into T separate encoder and decoder matrices; the FLOPs "
+          "are identical because one window pass covers T tokens. MLC is the "
+          "expensive one on both axes &mdash; it reads five layers at a single "
+          "position, so nothing is amortised: 5&times; the parameters <i>and</i> "
+          "5&times; the FLOPs, reaching 8% of a full forward pass of "
+          "gemma-2-2b.</p></div>")
+
+        a('<div class="card bad"><h3>And the reviewer is right about T-SAE '
+          "&mdash; more right than they knew</h3>"
+          "<p>T-SAE is registered at <code>d_sae = 16384</code> while every other "
+          "architecture uses <code>18432</code>: 11% narrower, 75.5M parameters "
+          "against 85.0M on the probing model. But the backtracking section is "
+          "worse. There, <code>topk_sae</code>, <code>batchtopk_sae</code> and "
+          "<code>txc_base</code> all receive a per-section override to "
+          "<code>d_sae = 32768</code> &mdash; and T-SAE has no override, so it "
+          "silently stays at 16384. <b>In the paper's headline backtracking "
+          "comparison T-SAE runs at half the dictionary width and half the "
+          "parameters of the architecture it is being compared against</b> "
+          "(134.2M vs 268.5M), and the mismatch favours the paper's own "
+          "architecture. That needs either a matched re-run or an explicit "
+          "statement in the text; it cannot stay implicit.</p></div>")
+        a("</section>")
+
     # ── why TXC usually loses, and where it should win ────────────────
     a('<section class="wide">')
     a('<div class="eyebrow">The mechanism</div>')
