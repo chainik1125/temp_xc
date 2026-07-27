@@ -24,6 +24,8 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
 | txc_batchtopk_post_btkonly@T1/k100 | 0.5777 | ≡ | — | 0.098 | 108.5 |
 | txc_batchtopk_post_btkonly@T2/k200 | 0.6196 | 0.6107 | 0.0088 | 0.098 | 210.6 |
 | txc_batchtopk_post_btkonly@T5/k500 | 0.6229 | 0.6196 | 0.0033 | 0.071 | 516.6 |
+| txc_batchtopk_post_btkonly@T8/k800 | 0.6262 | 0.6262 | 0.0000 | 0.064 | 831.5 |
+| txc_batchtopk_post_btkonly@T16/k1600 | 0.6108 | 0.6130 | -0.0022 | 0.052 | 1645.9 |
 | batchtopk_sae_btkonly@T1/k100 (untrained) | 0.5899 | ≡ | — | 0.055 | 2.8 |
 | batchtopk_sae_btkonly@T1/k500 (untrained) | 0.6588 | ≡ | — | 0.028 | 91.5 |
 | tsae_btkonly@T1/k20 (untrained) | 0.5000 | ≡ | — | 0.000 | 0.0 |
@@ -31,6 +33,8 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
 | txc_batchtopk_post_btkonly@T1/k100 (untrained) | 0.5998 | ≡ | — | 0.058 | 2.9 |
 | txc_batchtopk_post_btkonly@T2/k200 (untrained) | 0.6125 | 0.6047 | 0.0077 | 0.065 | 13.1 |
 | txc_batchtopk_post_btkonly@T5/k500 (untrained) | 0.6483 | 0.6477 | 0.0006 | 0.045 | 95.4 |
+| txc_batchtopk_post_btkonly@T8/k800 (untrained) | 0.6119 | 0.6251 | -0.0132 | 0.027 | 226.8 |
+| txc_batchtopk_post_btkonly@T16/k1600 (untrained) | 0.6207 | 0.6273 | -0.0066 | 0.015 | 816.6 |
 
 ## Mechanical R-scoring (CARD § 4, as frozen)
 
@@ -79,7 +83,9 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
    "txc_batchtopk_post_btkonly/T1/k100": 0.5997692914819985,
    "txc_batchtopk_post_btkonly/T2/k200": 0.6124612956104668,
    "tsae_btkonly/T1/k500": 0.6587578167688666,
-   "tsae_btkonly/T1/k20": 0.5
+   "tsae_btkonly/T1/k20": 0.5,
+   "txc_batchtopk_post_btkonly/T8/k800": 0.6118936312306478,
+   "txc_batchtopk_post_btkonly/T16/k1600": 0.6206787687450671
   },
   "holds": false,
   "note": "MISS is informative: k500-class untrained twins reach 0.659 > every trained cell \u2014 the currency is carried by sparse random projections; sae/tsae k500 untrained twins coincide exactly (shared init \u2014 coincidence-by-design receipts check)"

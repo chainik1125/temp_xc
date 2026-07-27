@@ -223,6 +223,70 @@
    "shuffled_preference_auc_k20": null,
    "n_valid": 907.0,
    "top20_overlap_frac": 1.0
+  },
+  "txc_batchtopk_post_btkonly|8|800|trained|42": {
+   "eval_key": "43e674b458f381e3",
+   "train_key": "f704e1d00e2a9867",
+   "commit_sha": "dfcfc430a28d6226e0286ff9a0bf0f14fa262109",
+   "preference_auc_k20": 0.6261914880699411,
+   "preference_auc_k50": 0.6206787687450671,
+   "shuffle_gap_auc_k20": 2.4285107158128483e-05,
+   "mass_at_20": 0.06363527476787567,
+   "shuffled_mass_at_20": 0.059800803661346436,
+   "len_n_spurious": 2.0,
+   "len_mean_abs_r": 0.28923644553607075,
+   "l0_per_unit": 831.4632410093798,
+   "shuffled_preference_auc_k20": 0.6261672029627829,
+   "n_valid": 907.0,
+   "top20_overlap_frac": 0.7
+  },
+  "txc_batchtopk_post_btkonly|8|800|untrained|42": {
+   "eval_key": "63157457b10d3367",
+   "train_key": "1f923a968008cc57",
+   "commit_sha": "d32f9f071f4bbaeaf56bcbeb17271b95e2c926df",
+   "preference_auc_k20": 0.6118936312306478,
+   "preference_auc_k50": 0.6339202234229858,
+   "shuffle_gap_auc_k20": -0.013211098293971268,
+   "mass_at_20": 0.02718791738152504,
+   "shuffled_mass_at_20": 0.02831782028079033,
+   "len_n_spurious": 0.0,
+   "len_mean_abs_r": 0.1554215322825463,
+   "l0_per_unit": 226.7666949376517,
+   "shuffled_preference_auc_k20": 0.625104729524619,
+   "n_valid": 907.0,
+   "top20_overlap_frac": 0.55
+  },
+  "txc_batchtopk_post_btkonly|16|1600|untrained|42": {
+   "eval_key": "0b7d7356bb91d078",
+   "train_key": "5d7dcb975ee82c01",
+   "commit_sha": "d32f9f071f4bbaeaf56bcbeb17271b95e2c926df",
+   "preference_auc_k20": 0.6206787687450671,
+   "preference_auc_k50": 0.635019124521887,
+   "shuffle_gap_auc_k20": -0.006587335316617038,
+   "mass_at_20": 0.01483086310327053,
+   "shuffled_mass_at_20": 0.01581300050020218,
+   "len_n_spurious": 0.0,
+   "len_mean_abs_r": 0.23270248955749592,
+   "l0_per_unit": 816.6495322220184,
+   "shuffled_preference_auc_k20": 0.6272661040616841,
+   "n_valid": 907.0,
+   "top20_overlap_frac": 0.45
+  },
+  "txc_batchtopk_post_btkonly|16|1600|trained|42": {
+   "eval_key": "d60b486ba5bf1a76",
+   "train_key": "3d46dfd07b50eac0",
+   "commit_sha": "d32f9f071f4bbaeaf56bcbeb17271b95e2c926df",
+   "preference_auc_k20": 0.6107947301317467,
+   "preference_auc_k50": 0.6239936858721389,
+   "shuffle_gap_auc_k20": -0.0022099447513812542,
+   "mass_at_20": 0.051842279732227325,
+   "shuffled_mass_at_20": 0.04837065190076828,
+   "len_n_spurious": 4.0,
+   "len_mean_abs_r": 0.29152296150044893,
+   "l0_per_unit": 1645.921685579028,
+   "shuffled_preference_auc_k20": 0.6130046748831279,
+   "n_valid": 907.0,
+   "top20_overlap_frac": 0.55
   }
  },
  "scores": {
@@ -269,7 +333,9 @@
     "txc_batchtopk_post_btkonly/T1/k100": 0.5997692914819985,
     "txc_batchtopk_post_btkonly/T2/k200": 0.6124612956104668,
     "tsae_btkonly/T1/k500": 0.6587578167688666,
-    "tsae_btkonly/T1/k20": 0.5
+    "tsae_btkonly/T1/k20": 0.5,
+    "txc_batchtopk_post_btkonly/T8/k800": 0.6118936312306478,
+    "txc_batchtopk_post_btkonly/T16/k1600": 0.6206787687450671
    },
    "holds": false,
    "note": "MISS is informative: k500-class untrained twins reach 0.659 > every trained cell \u2014 the currency is carried by sparse random projections; sae/tsae k500 untrained twins coincide exactly (shared init \u2014 coincidence-by-design receipts check)"
