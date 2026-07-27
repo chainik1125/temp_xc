@@ -11350,6 +11350,53 @@ Log `/workspace/logs/actmix_rm_gpu2.log`. Ledger line this commit
 (pod-hours share ~$12–15; sweep total stays on runpod-1's line).
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+---
+
+## 2026-07-27 18:39 London (date-verified) — mac-local: SAFETY_TASK_MENU REVIEWED — accepted as the wave-3 source; two design bars adopted as BINDING
+
+Observed HEAD `9c3d370cc`. Full review of `d44843ae7`. **Ruling:
+ACCEPTED as the wave-3 source** (research inventory; priors are
+priors — the document itself quotes the wave-2 inversion as the
+reason). Quality noted for the record: clew-only sourcing with the
+S2 key untouched, citation-status honesty (metadata-verified vs
+abstract-level vs [read]), the registry gap REPORTED not patched,
+and the sysage demotion via a $0 corpus-shape count (0 system
+turns in WildChat) — an assumption caught before it cost a week.
+
+**Two menu principles adopted as BINDING review bars for every
+wave-3 safety card (runpod-a: bounce cards on these):**
+1. **Out-of-window-by-construction (§ 1.2):** a safety face whose
+   event indicator is computable from the window's visible tokens
+   inherits refmark's obituary — kill at design review, $0.
+2. **Clock-stated-first (§ 2 corollary):** any card over
+   turn-scale events must state the measured token-per-turn clock
+   and use the T2 age template (or position-strata/constructed
+   corpus) — a T1 rate face over turn-scale events without the
+   clock measurement is refmark again and gets bounced.
+
+**Endorsements:** the four § 7 $0-kill recommendations (formal
+kill lines are runpod-a's at design review — sleeper-latch,
+refusal-redux, prompt-harmfulness, turn-count); the ETHICS NOTE is
+BINDING — no crisis-escalation face without Han's explicit
+sign-off AND a synthetic substrate.
+
+**Wave-3 sequencing (directive to runpod-a):** label-side
+pre-measures for the zero-pull trio (**sycpress, reask, msdose**)
+can start NOW on CPU while RM shard-2 runs — anti-dup vs refmark
+first (the menu's own stated risk), event-mass pre-measure for
+reask (the tretd starvation lesson). **DecomposedHarm (`dharm`)
+is approved as the ONE new corpus pull** when you take it (pg19
+pull rules; the source paper's own sequential-vs-per-prompt
+finding is our window-over-token claim arrived at independently —
+flag it to the paper team as a motivation citation). GPU work
+queues behind RM.
+
+**For Han:** the registry lacks a fetchable URL for Many-shot
+Jailbreaking (mac-c's § 9 note) — one-line fix in Zotero when
+convenient.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 ## 2026-07-27 19:55 London (wall) — mac-c: txc_pro DIG CLOSED — the implementation SURVIVED (don't reimplement it), and it has ZERO real T-scaling evidence
 
 **Time-sensitive for `runpod-c`**, whose briefing (18:34) says
