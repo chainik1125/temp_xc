@@ -8072,3 +8072,41 @@ model lands is adopted as house practice for screens. chaz volume
 mix-up (~$0.2, disclosed) + base-only-cache disclosure noted.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~02:50 London — mac-a — HUNT3 BUNDLE VERDICT (3/3 models): cnov KEEP → PANEL-GATE CANDIDATE (draft card staged); nvtrend KEEP → BREADTH. PENDING TEAM REVIEW.
+
+**PTR: `hunt3/results/verdict.json` (mechanical § 4, existential
+quantifier per ruling bed236f1d) + the 3 screen JSONs +
+`hunt3/PANEL_CARD_DRAFT_CNOV.md` (DRAFT, not frozen — 17:00 pick).**
+
+| face | model | KEEP arm | win vs tok (gain) | floor@T | wd gain | wd order T32 |
+|---|---|---|---|---|---|---|
+| cnov | gpt2 | T32/actx_mlp | 0.619 vs 0.534 (+0.084) | 0.496 | +0.056 | +0.026 |
+| cnov | llama31 | T32/actx_mlp | 0.571 vs 0.471 (+0.101) | 0.527 | +0.101 | **+0.031** |
+| cnov | gemma2 | T32/actx_mlp | 0.609 vs 0.515 (+0.094) | 0.507 | +0.068 | **+0.039** |
+| nvtrend | gpt2 | T64/actx_mlp | 0.475 vs 0.379 (+0.096) | 0.390 | +0.039 | +0.015 |
+| nvtrend | llama31 | T32/actx_mlp | 0.461 vs 0.397 (+0.065) | 0.390 | +0.078 | +0.009 |
+| nvtrend | gemma2 | T32/actx_mlp | 0.472 vs 0.397 (+0.074) | 0.378 | +0.055 | +0.015 |
+
+- **cnov KEEP 3/3, order 2/3 at T32 (llama +0.031, gemma +0.039;
+  gpt2 +0.026 just under the +0.03 bar) → panel-gate candidate** by
+  the frozen routing. The pre-registered claiming zone held exactly:
+  qualifying arms live at T ≤ 32; at T64 the floor (0.63–0.65
+  in-screen) eats the face as the card said it would. Both pre-named
+  traps (position inverted-0.86, doc-mean 0.86) were survived by the
+  instruments built for them (position-matched manifests; BINDING wd
+  arms retain +0.056…+0.101).
+- **nvtrend KEEP 3/3, order 0/3 (margins ≤ +0.017) → BREADTH
+  table** — real window gain (+0.065…+0.096, all controls clear,
+  floor ≈ chance as pre-measured) but pooling-matchable aggregation
+  (actxmean dominates flatten): the class that went 0-for-2 at
+  panels. Numbers to the breadth table; no panel slot proposed.
+- Screen actuals: 3× L40S ≈ $6 (gpt2 fast on cache-hit; llama the
+  long pole ~70 min). chaz: 2 OOM attempts (~$0.5, 20k/class
+  manifests vs the factory screen's L40S memory; disclosed in the
+  builder) → bundle capped 6k/class post-triage, re-frozen
+  81b6d5918, relaunched ~02:35 — verdict follows when it lands.
+
+Morning package for the 17:00 pick: this verdict + the cnov draft
+panel card + the two $0 kills already ratified (858c60a70). Spend:
+overnight ≈ $9 of ≤$30; W1+overnight total ≈ $13 of $60.
