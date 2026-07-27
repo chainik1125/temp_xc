@@ -9499,7 +9499,7 @@ on their landing. Actuals ≈ $3 (single L40S, warm cache; correction
 vs the $3–6 est with the dashboard read). PTR end-to-end.
 
 _Recorded-by: claude-fable-5 (mac-b)_
->>>>>>> 1b1fb0354 (mac-b: replication leg LANDED — tret CONFIRM (same T64 arm, +.084), xtrend state-CONFIRM/order-NOT-replicated (+.031->+.004 @T32, panel-gate input), sdom SEED-FRAGILE-state/order-ROBUST (converges w/ bundle WEAK from independent direction), xnov WEAK-stable, tretd SKIP-stable; JSON + ledger actuals ~$3; PTR)
+
 
 ---
 
@@ -9546,3 +9546,118 @@ the 17:00 draft carries the interim fig if the final misses
 16:45 (on-figure disclosure covers it).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~16:10 London — runpod-1 — ACTMIX P1 FORMAL VERDICT (§ 5.1 sparse probing, both arms) + FINAL fig — PENDING TEAM REVIEW
+
+(Hygiene: removed a stray rebase-marker line `>>>>>>> 1b1fb0354`
+that shipped at the tail of mac-b's 4d544ae08 entry — text intact,
+closer only. FYI mac-b.)
+
+FINAL `figs_writeup/fig_probing_shuffle_tsweep.{png,pdf}` rendered
+at 3 full seeds, all T n=3 (this commit; ~10 min past the 16:00
+gate — mac-local picks FINAL vs approved-interim for the draft;
+pair-style mono, the meeting's blueorange pick is a 1-flag
+re-render). Rows: freeze-lineage from 131ea677f.
+
+**Pre-registered expectations (CARD § 4, quoted verbatim):**
+> under `btk-only` the per-token sae baseline improves MOST ⇒ hunt
+> TXC-vs-sae margins likely shrink; tsae margins move least (6.7/8
+> realized — already our licensed lead comparator); hunt T-slopes may
+> soften (low-T cells recover); the PAPER arch's T-curves should
+> improve (that is Dmitry's re-run gate: does d(perf)/dT improve).
+
+**HEADLINE (level story, per guard 5aa351a4e):** btk-only probing
+shows NO T-scaling win at any T. TXC-pre (k=20, 3 seeds) sits FLAT
+at the SAE anchor through T4 and declines beyond — despite growing
+realized-l0 over-admission (extra eval capacity) at high T:
+
+    T   ordered          shuffled  gap      l0 (nominal 20·T)
+    1   0.8985±0.0020    ≡         0        20.9 (20)
+    2   0.8975±0.0071    0.8897    +0.0077  42.0 (40)
+    4   0.8988±0.0019    0.8792    +0.0196  82.8 (80)
+    8   0.8903±0.0050    0.8601    +0.0303  165.7 (160)
+    16  0.8794±0.0046    0.8566    +0.0228  380.4 (320, +19%)
+    ordered T16 − T1 = −0.0191
+    SAE band 0.8993±0.0032 (n=3, l0 20.5)
+    TSAE 0.8718±0.0008 (n=3, l0 23.2; 7d/b32 serving caveat)
+    untrained twins ~0.70 (s42 band)
+    TXC-post: pass in flight (GPU1 from ~15:40, GPU0 from ~16:07),
+    lands ~17:45–18:15 — companion column follows as an addendum;
+    the exhibit's headline column is pre (card § 3 sequencing).
+
+**Order-gap (quotable ONLY per guard 5aa351a4e):**
+(a) cross-task, same instrument: backtracking large / probing
+    modest (table above: 0 at T1 by construction → +0.030 @T8,
+    +0.023 @T16) / RLHF ≈ 0. One instrument, three tasks, three
+    order signatures.
+(b) decline-mitigation: shuffled declines FASTER than ordered from
+    T4 on — order-sensitivity of the trained serving mitigates the
+    level decline; NOT a win. Never standalone "probing is
+    order-carried" (the eval-shuffle instrument cannot separate
+    order-information from positional-code serving dependence).
+The ~55%-order-free datum (paper-match T5 basis, k20
+margin-over-SAE, b51f3b59f) coexists; basis stated.
+
+**CARD § 4 scoring (each line PENDING TEAM REVIEW):**
+1. "sae improves most" — MET: SAE btk-only 0.8993 vs paper-arm
+   0.8831 = +0.0162, the largest per-token gain in the exhibit.
+2. "TXC-vs-sae margins shrink" — MET, and stronger: margins VANISH.
+   Paper-arm TXC-T5 margin +0.0121 over SAE; btk-only TXC-pre
+   best-T margin −0.0005 (T4) — ≤ 0 at every T.
+3. "tsae margins move least" — NOT MET: tsae_btkonly 0.8718±0.0008
+   vs paper-arm 0.8961 — moves DOWN, 0.0275 below the SAE band.
+   Caveats stated: 7d serving asymmetry (32 pairs/step vs 4096
+   tokens/step), l0 +13–21% over-admission, and the paper-arm
+   column's dup-family history. Read: the licensed-lead framing
+   does not transfer to the v2-trainer arm — flag to the
+   comparator's owner, not a kill.
+4. "paper arch T-curves improve / Dmitry's d(perf)/dT gate" — NOT
+   MET: the only live probing T-sweep is flat-then-declining
+   (d(perf)/dT ≈ 0 through T4, < 0 beyond). A12 stands: the
+   shipped "T10/T20 slope" does not exist (T5 replicas, reproduced
+   to 4 decimals incl. σs).
+5. E1 (shuffle direction) — MET under the guard's framing: TXC-shuf
+   falls below ordered from T2 (sig. from T4); per-token arms
+   exactly invariant (identity exact on all 12 per-token cells, G2
+   clean).
+6. E2 (realized l0 ≡ nominal) — NOT MET literally: every trained
+   pre cell sits +3–5% above nominal (threshold-mode eval, no
+   top-k cap, EMA wobble), amplified to +19% at T16 by A1's
+   smaller window batches; SAE s2 +3.2%; tsae +13–21% (7d/b32).
+   No collapse/explosion — mixing-fingerprint reading clean; G1
+   trips disclosed, not kill-class. The T16 DECLINE lands despite
+   this extra eval capacity — capacity loss cannot explain it.
+7. E3 (T=1 anchor) — MET: |Δ| = 0.0008 vs 3σ_SAE = 0.0096 (k20)
+   PASS; k5 0.0072 vs 0.0101 PASS. T1 3-seed = {0.8972, 0.8975,
+   0.9008}.
+8. E4 (paper arm reproduces) — MET: every printed § 5.1 number to
+   4 decimals incl. σs (Phase B, ratified; A12 closed).
+
+**Gates:** G1 trips = over-admission class only (above); G2 clean;
+G3 clean (untrained < trained everywhere); G4 38/38 tasks every
+cell; G5 PASS both k. RESULTS_btk-only.md + RESULTS_paper-match.md
+regenerated at HEAD (paper-match file's G1 lines are btk-band
+artifacts on paper archs — its gates were assessed in the ratified
+Phase-B entries).
+
+**Coverage honesty:** post-42 in flight (addendum on drain); post
+seeds 1/2 queued behind it (cut decision at addendum time per card
+clause); T=32 not run (post-deadline stretch); k_feats {5, 20}; the
+tsae dup-family caveat applies to the PAPER arm only;
+trapezoid-vs-mean38 both-ways convention where headline variants
+are quoted (recipe reconciliation d6e992db9).
+
+**Ledger:** RUNPOD line this push — day 07-27 actuals to 16:05 ≈
+30–31 GPU-h ≈ $92 (incl. the ~13 GPU-h tsae-pathology sunk,
+disclosed 7c/7d; tsae-b32 co-resident on GPU1 not double-counted;
+idle not attributed) vs est $55–75 + sunk → +~$17 corr; projected
+day close ≈ $110 (post passes + P2 sweep ≈ 5–7 GPU-h) — inside the
+$150 cap.
+
+**Artifacts:** figs_writeup FINAL (3 seeds) + RESULTS_{btk-only,
+paper-match}.md + figs/tsweep_* + verdict verified against
+analysis.py output at 16:08.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_

@@ -382,9 +382,13 @@ def main():
     for k in k_feats:
         md += make_table(cells, args.arm, k, args.Ts)
         make_fig(cells, args.arm, k, args.Ts, HERE / "figs")
-    (HERE / "RESULTS.md").write_text("\n".join(md))
+    # Per-arm results file (a second arm's run must not clobber the
+    # first's tables); RESULTS.md stays the btk-only headline alias.
+    (HERE / f"RESULTS_{args.arm}.md").write_text("\n".join(md))
+    if args.arm == "btk-only":
+        (HERE / "RESULTS.md").write_text("\n".join(md))
     print("\n".join(gates))
-    print(f"[analysis] wrote {HERE/'RESULTS.md'} + figs/")
+    print(f"[analysis] wrote {HERE}/RESULTS_{args.arm}.md + figs/")
 
     if args.writeup:
         make_writeup_fig(cells, 20, args.Ts, args.writeup,
