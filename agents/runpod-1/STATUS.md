@@ -1,57 +1,51 @@
 # Working state — agent `runpod-1`
 
-**2026-07-27 ~16:25 London — P1 DELIVERED: formal verdict 88a955623
-(PTR) + FINAL 3-seed fig inside the extended 16:45 gate. Directive
-059a66239 (saturation to 22:00, report ~21:30). Remaining: post-42
-addendum, P2 layer sweep, post-1/2 relaunch, 21:30 report.**
+**2026-07-27 ~19:10 London (wall) — P1 grid 100% COMPLETE + verdict
+ratified + per-k family shipped; P1-RM (relu-mix arm) RUNNING at PIN
+8c231e806, SHARDS=3 (my GPUs 0/1 + runpod-a GPU 0 shard 2, 21:00-real
+fallback clause armed). Day report ~21:30; RM drain ~23:30–00:30.**
 
-## Delivered today (all pushed)
+## Delivered today (all pushed + ratified unless noted)
 
-- **FINAL fig** figs_writeup/fig_probing_shuffle_tsweep (3 seeds all
-  T; pair-style mono; blueorange = 1-flag re-render if 17:00 meeting
-  picks it).
-- **Formal verdict** (LOG ~16:10 entry): level story = flat at SAE
-  anchor T1–T4 (0.8985/0.8975/0.8988 vs 0.8993), decline to T16
-  (0.8794, T16−T1 −0.019); margins VANISH (best-T −0.0005); order-gap
-  0→+0.030@T8→+0.023@T16 quotable only cross-task/decline-mitigation
-  (guard 5aa351a4e); tsae 0.8718±0.0008 NOT-met w/ 7d caveats;
-  E-scoring 1/2/5/7/8 MET, 3/4/6 NOT MET; G5 PASS both k; G1
-  over-admission disclosed (+3–5%, +19%@T16, tsae +13–21%).
-- **Ledger**: day actuals ≈ $92 (+$17 corr), proj ≈ $110 vs $150 cap.
-- Earlier: INTERIM fig (approved), FREEZES lineage fix (ratified),
-  CARD §7e (ratified), tsae column complete, P2 freeze af95601dd.
+1. FORMAL VERDICT (88a955623, RATIFIED e29500298): no T-win; margins
+   vanish; E-scoring 1/2/5/7/8 MET, 3/4/6 NOT MET; addendum 5df236136
+   (post-42 starvation) RATIFIED c8b11ec19; P1 CLOSE entry ~19:00 wall
+   (final 3-seed post table: 0.8985→0.8163, σ 0.0007 at endpoint,
+   identity receipts ×3).
+2. Figures: per-k family (ccddf01be executed — _k5 U-shape + _k20
+   decline, 36-task headline per 89fd5c292, cross-checked
+   digit-for-digit 72fc41bd2); raw-38 twin; pair-style knob pre-wired
+   (meeting pick pending → 1-flag re-render).
+3. k-inversion formalized + l0 confound RULED OUT (fcf62963b,
+   RATIFIED c4d3eee73 w/ quote licence).
+4. P2 layer sweep COMPLETE + RATIFIED (~$3): trailing-dialogue faces
+   are EARLY-layer (R2 inverted-informative); dialevel caches healed.
+5. tsae column (0.8718±0.0008, NOT-met w/ 7d caveats); Phase B
+   (overnight, ratified).
 
-## Evening schedule (decide live, ~17:15)
+## Live (check first on resume)
 
-1. **GPU1 post-42 drains ~17:15** ({T16,T4} shard): KILL GPU1 chain
-   before its post-1/2 pass starts (kill bash wrapper + python child;
-   NEVER touch GPU 2 pids) → launch P2 extraction on GPU1
-   (`layer_sweep.extract` both models sequential, ~25 min; needs
-   HF_HOME=/workspace/hf_cache env for llama31 from_pretrained).
-2. **GPU0 post-42 drains ~18:00** ({T1,T2,T8} shard): kill chain,
-   then probes sharded: llama sweep on GPU1, gemma on GPU0
-   (`layer_sweep.sweep <model> <hs...>`, resid-L default set:
-   llama 8 15 22 29, gemma 7 14 21 — check LOG first for a
-   mac-local overrule to hs-index; capture union covers both).
-3. ~19:00 screens done → `score_sweep` → commit results + LOG line
-   (PIN af95601dd… actually PIN = HEAD at launch, record it) +
-   ledger actuals.
-4. ~19:00 **relaunch post-1/2** as separate sweep both GPUs
-   (`experiments.probing.actmix.sweep --arm btk-only --txc-archs
-   txc_batchtopk_post_btkonly --seeds 1 2 --shard-index N
-   --shard-count 2`, TEMP_BENCH_ALLOW_DIRTY=1, nohup) — 10 cells ≈
-   5 GPU-h fits the 19:00–21:30 window.
-5. **Post-42 addendum** to the verdict when its column lands (~18:00)
-   + post-1/2 status at the 21:30 report.
-6. **21:30 report** (LOG): P1 close + P2 depth profiles + ledger
-   actuals + STATUS rewrite + push.
+- **P1-RM**: logs /workspace/logs/actmix_rm_gpu{0,1}.log; queue per
+  CARD_RELUMIX.md (untrained-42 → sae 3s → pre 3s → post-42; post-1/2
+  TRAIL). Monitor buo8e0rol armed. runpod-a shard 2 from their clone
+  at the SAME PIN — **fallback: if no shard-2 trained row by 21:00
+  real (PULL FIRST — their rows arrive via origin), relaunch shard-2
+  cells locally (cache-hit-safe)**: same launcher line with
+  `--shard-index 2 --shard-count 3` per pass, one GPU.
+- **§3b k-bracket** (k ∈ {10,40,80} eval-only, pre+sae ckpts
+  manifest-confirmed, ~2.25 GPU-h card-free): run at RM drain or on a
+  freed GPU; per-k fig family auto-extends (renderer loops ks).
+- **21:20 timer** (b0oj5f465 = 21:00 fallback; bw5j7p5qn = report):
+  day report (LOG) + ledger reconcile + this STATUS rewrite + push.
+- **On RM drain**: analysis --arm relu-mix; both-arms fig
+  (CARD_RELUMIX §5 — btk #D55E00 vs relu-mix #0072B2, linestyle =
+  order); RM-E1..E4 scoring PTR (E4 = the both-arms T-claim answer);
+  ledger actuals. Morning OK per ccddf01be §2 precedent.
 
 ## Standing
 
-- Monitors: origin bf369am3s (THE listener), grid biki784bc.
-- λ̂-Ward = runpod-2's (no reassignment; my 19:45 Ward-update
-  deadline passes silently unless my (a) finished early — it won't).
-- Tokens by path only; rotations post-weekend. GPU 2 never mine.
-- Card clause for post-1/2 cut+relaunch: §3 sequencing allows post
-  seeds 1/2 to trail; relaunch is the SAME cells at the same PIN
-  lineage (cache-hit-safe if any partial trained).
+Origin watcher bf369am3s (four-path topology). Timestamps from
+`date` ONLY (corrigendum c8b11ec19 — pod clock may read ~min slow vs
+Macs; commit order authoritative). Tokens by path; GPU 2 never mine;
+Aniket's backtracking read-only. Ledger: day 07-27 ≈ $98 + RM
+pre-midnight fraction (cap $150); RM est $40–45 mostly day-2.
