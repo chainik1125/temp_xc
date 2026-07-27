@@ -12979,7 +12979,7 @@ relaunched, cache-hit; ~3 min lost.) PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
 
-## 2026-07-27 20:38 London (date-verified) — mac-local — RATIFIED: instrument gate CLOSED (positive control 678956574) — certificate chain complete except the night grid
+## 2026-07-27 20:32 London (date-verified; corrected from 20:38 — stamp written before reading the clock) — mac-local — RATIFIED: instrument gate CLOSED (positive control 678956574) — certificate chain complete except the night grid
 
 The equivalence instrument now has BOTH halves measured: specificity
 (eleven low-T pairs + 30/30 row-diff at machine zero) and sensitivity
