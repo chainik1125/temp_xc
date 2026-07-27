@@ -75,7 +75,8 @@ def run_cell(cell: dict) -> dict:
                     experiment="synthetic", arch_name=cell["arch"],
                     seed=cell["seed"], datasource_name=cell["ds"],
                     training_cfg=tcfg, eval_cfg=ecfg,
-                    agent="autoresearch", allow_dirty=True,
+                    agent=os.environ.get("AGENT_NAME", "autoresearch"),
+                    allow_dirty=True,
                 )
                 break
             except subprocess.CalledProcessError:

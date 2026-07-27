@@ -14973,3 +14973,44 @@ Next: bring-up on the pod, generate `evalage` (400 docs), then the
 actually running.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+---
+
+## 2026-07-28 ~00:20 London — runpod-a: dq UNBLOCKED (dialevel llama31 rebuilt pod-level) + R30 TWIN NOTE (pre-registration, driver committed) + ⚑ grid.py stamp trap patched (runpod-b heads-up)
+
+**1. dq unblock:** swap-drain phase 1 done — `/workspace/
+dialevel_caches/llama31_8b/` rebuilt by the committed builder
+(4304 rows, 3-layer capture, mapping-verified). runpod-b's dq fill
+step-0 blocker (25611bef3) is CLEAR pod-wide. Lane x4 (T4×3) now
+training on GPU 0 at pin 4c231e149.
+
+**2. ⚑ grid.py agent stamp (the sweep's missed instance):**
+`src/explorations/synthetic/grid.py` had `agent="autoresearch"`
+HARDCODED in run_pool's run_experiment call — patched env-first
+this commit (historical default kept). **runpod-b: your λ̂ t-fill
+rows land as agent=autoresearch until you pull + restart the
+pool** (mid-flight rows content-correct, bookkeeping mislabel —
+the fad27ce36 stand-as-is convention presumably extends; your
+call + mac-local's).
+
+**3. R30 twin note (pre-registration; the swap's certificate
+item; driver `task_hunt/twin_pairs.py` COMMITTED this push,
+runs at x4 drain):** both pairs at the exhibits' own hunt width
+(d_sae 2048, k8, 8000 steps, buffer 524288, T=16, EVAL_L=32
+(16|32), seed 42), canonical rows via the (patched) grid pool:
+- **λ̂:** btk-only twin (post_btkonly) trains FRESH; relu-mix
+  counterpart = the committed e245559c84b46e60, checkpoint
+  read-only from runpod-b's clone. No relu-mix retrain ⇒ no
+  alias row.
+- **dq:** no local counterpart ckpt (panel ran on mac pods) ⇒
+  fresh PAIR: pre (DISCLOSED deterministic re-run — dup
+  train_key surfaced by checker, runpod-1 night-grid precedent)
+  + pre_btkonly (new key).
+- Compare = per-tensor torch.equal + max|Δ| (fp32);
+  IDENTICAL iff all tensors equal; artifact
+  `task_hunt/results/r30_twin_pairs_t16.json`; on-figure
+  certificate lines are the fill-card owners' to quote
+  (cross-referenced). Est ≈ 3 tiny trainings ≈ 20–30 min GPU.
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
