@@ -1,0 +1,51 @@
+{
+  "status": "complete",
+  "protocol_version": "2026-07-23.2",
+  "code_commit": "6b2cb1e0",
+  "training": {
+    "arch": "txc_base",
+    "windows": [1, 2, 3, 4, 5, 6],
+    "seeds": [1, 2, 42],
+    "d_sae": 32768,
+    "k_pos": 20,
+    "steps": 20000,
+    "batch_size": 1024,
+    "learning_rate": 0.0003,
+    "warmup_steps": 1000
+  },
+  "evaluation": {
+    "metric": "question-grouped sentence-level backtracking detection PR-AUC",
+    "feature_budget": 32,
+    "folds": 5,
+    "shuffle": "deterministic within-window permutation before encoding",
+    "artifact_sha256": "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810"
+  },
+  "cells": [
+    {"T": 1, "seed": 1, "ordered_pr_auc": 0.22335123303665277, "shuffled_pr_auc": 0.22335123303665277, "shuffle_gap": 0.0},
+    {"T": 1, "seed": 2, "ordered_pr_auc": 0.2168228236187324, "shuffled_pr_auc": 0.2168228236187324, "shuffle_gap": 0.0},
+    {"T": 1, "seed": 42, "ordered_pr_auc": 0.23772731983404505, "shuffled_pr_auc": 0.23772731983404505, "shuffle_gap": 0.0},
+    {"T": 2, "seed": 1, "ordered_pr_auc": 0.2272574737425741, "shuffled_pr_auc": 0.22428400911641747, "shuffle_gap": 0.002973464626156669},
+    {"T": 2, "seed": 2, "ordered_pr_auc": 0.23194686150331031, "shuffled_pr_auc": 0.23054547129042965, "shuffle_gap": 0.0014013902128806877},
+    {"T": 2, "seed": 42, "ordered_pr_auc": 0.24297237518482992, "shuffled_pr_auc": 0.23903411964765736, "shuffle_gap": 0.003938255537172581},
+    {"T": 3, "seed": 1, "ordered_pr_auc": 0.23207248247525736, "shuffled_pr_auc": 0.23055717169759263, "shuffle_gap": 0.001515310777664719},
+    {"T": 3, "seed": 2, "ordered_pr_auc": 0.23455578258179582, "shuffled_pr_auc": 0.23250417024362555, "shuffle_gap": 0.0020516123381702557},
+    {"T": 3, "seed": 42, "ordered_pr_auc": 0.2364740013690092, "shuffled_pr_auc": 0.2253620730898629, "shuffle_gap": 0.011111928279146316},
+    {"T": 4, "seed": 1, "ordered_pr_auc": 0.25291116243111506, "shuffled_pr_auc": 0.2387587087340246, "shuffle_gap": 0.014152453697090445},
+    {"T": 4, "seed": 2, "ordered_pr_auc": 0.2569118862893018, "shuffled_pr_auc": 0.2377410709484503, "shuffle_gap": 0.0191708153408515},
+    {"T": 4, "seed": 42, "ordered_pr_auc": 0.24384492794114757, "shuffled_pr_auc": 0.22971109221351674, "shuffle_gap": 0.014133835727630795},
+    {"T": 5, "seed": 1, "ordered_pr_auc": 0.26496205511216864, "shuffled_pr_auc": 0.25019822871267844, "shuffle_gap": 0.014763826399490226},
+    {"T": 5, "seed": 2, "ordered_pr_auc": 0.2652706333968274, "shuffled_pr_auc": 0.25369783806205565, "shuffle_gap": 0.01157279533477169},
+    {"T": 5, "seed": 42, "ordered_pr_auc": 0.2607286469713236, "shuffled_pr_auc": 0.24462110241144205, "shuffle_gap": 0.01610754455988158},
+    {"T": 6, "seed": 1, "ordered_pr_auc": 0.26580001927499586, "shuffled_pr_auc": 0.24829978373763914, "shuffle_gap": 0.017500235537356735},
+    {"T": 6, "seed": 2, "ordered_pr_auc": 0.267650684630443, "shuffled_pr_auc": 0.25511781829070135, "shuffle_gap": 0.012532866339741627},
+    {"T": 6, "seed": 42, "ordered_pr_auc": 0.255365032859511, "shuffled_pr_auc": 0.24218034470744304, "shuffle_gap": 0.013184688152067952}
+  ],
+  "three_seed_aggregation": [
+    {"T": 1, "ordered_mean": 0.225967125, "ordered_sd": 0.010694936, "shuffled_mean": 0.225967125, "shuffled_sd": 0.010694936, "gap_mean": 0.0, "gap_sd": 0.0},
+    {"T": 2, "ordered_mean": 0.234058903, "ordered_sd": 0.008067532, "shuffled_mean": 0.231287867, "shuffled_sd": 0.007403027, "gap_mean": 0.002771037, "gap_sd": 0.001280490},
+    {"T": 3, "ordered_mean": 0.234367422, "ordered_sd": 0.002206797, "shuffled_mean": 0.229474472, "shuffled_sd": 0.003692095, "gap_mean": 0.004892950, "gap_sd": 0.005392464},
+    {"T": 4, "ordered_mean": 0.251222659, "ordered_sd": 0.006695120, "shuffled_mean": 0.235403624, "shuffled_sd": 0.004956065, "gap_mean": 0.015819035, "gap_sd": 0.002902742},
+    {"T": 5, "ordered_mean": 0.263653778, "ordered_sd": 0.002537932, "shuffled_mean": 0.249505723, "shuffled_sd": 0.004577822, "gap_mean": 0.014148055, "gap_sd": 0.002329242},
+    {"T": 6, "ordered_mean": 0.262938579, "ordered_sd": 0.006623835, "shuffled_mean": 0.248532649, "shuffled_sd": 0.006471880, "gap_mean": 0.014405930, "gap_sd": 0.002699493}
+  ]
+}
