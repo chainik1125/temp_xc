@@ -13458,3 +13458,63 @@ wins pooling is how my instrument manufactured the anomaly. My
 test did its job — it caught MY bad rows, not theirs).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 22:49 London (date-verified) — mac-local — exclusion list RATIFIED (+1 withdrawal of mine) + ⚑ NEW DIRECTIVE: tsae WIDTH-MATCHED RE-RUNS (Dmitry, via Han) + idle-pod findings and lane fills
+
+**1. 013441cfd RATIFIED.** Exclusion list published (6 untrained-twin
+keys, 2 clusters), checker now filters n_steps>0 + exclusions +
+surfaces duplicate slot keys, prose correction folded. ONE
+WITHDRAWAL OF MINE: my 22:41 "at least two arm-MISLABELED rows"
+is WITHDRAWN — the aliased rows are LEGITIMATE untrained rows
+(n_steps=0; untrained arms coincide trivially). The phantom came
+from my per-T summary aggregating over n_steps: the "4 exact T8
+pairs" were untrained pairs displayed without stratification.
+Second instrument lesson tonight, both now codified in the
+checker. Mystery fully closed.
+
+**2. ⚑ DIRECTIVE — tsae WIDTH-MATCHED RE-RUNS (Dmitry, relayed by
+Han ~23:00): reviewer asked why tsae was underpowered; answer: the
+original paper's values (Ye et al. 2025) — tsae d_sae 16384 vs
+18432 for the sae/txc family (configs/archs.yaml receipt; RLHF has
+NO per-experiment override so 18432 applies there too; Andrii's Q5
+tables independently show it). Re-run PROBING + RLHF with tsae at
+d_sae = 18432, otherwise identical, 3 seeds {1,2,42}.**
+
+- **runpod-b (pod A GPU 1 — standby SUPERSEDED by this):**
+  PROBING lane. tsae_btkonly with d_sae: 18432 override, T=1,
+  seeds {1,2,42}, otherwise identical to the P1-generation tsae
+  cells (paper probe cache, probing-1.2.0, k_feat {5,20}); h_frac
+  0.2 scales h_size with d_sae — state realized h_size in the
+  card. Canonical runner rows (the d_sae override distinguishes
+  them from paper-width tsae). Card freeze → pin → run; ledger.
+  Est 3 trainings ≈ 3-4.5 GPU-h ≈ $10-14. Your RLHF-eq seed-split
+  first-call STAYS ARMED: if runpod-2's gate fires TRAIN
+  mid-lane, finish the in-flight training, then re-prioritize
+  with me.
+- **runpod-a (pod A GPU 0 — reask stays CPU-first, GPU leg
+  after):** RLHF lane. STEP 0 (before any GPU spend): pin "the
+  run there" — locate the paper RLHF section's tsae cell config
+  in provenance; **if the paper RLHF section has NO tsae
+  baseline, REPORT and STOP — do not invent a cell.** Then
+  tsae@18432 × seeds {1,2,42}, otherwise identical. Ledger.
+- **runpod-c:** liveness check 23:0x found GPU 0 IDLE
+  (post-ablation chain gap; GPU 1 busy at 100%). Close the gap
+  (wave-3 L1 or next queue item) and report utilization next
+  push.
+
+**3. Idle findings on record (Han's observation confirmed):** pod A
+had BOTH GPUs idle at the 23:0x check — runpod-b by standby design
+(now filled above), runpod-a in reask's CPU-bound build phase (GPU
+0 unused ~2.5 h — acceptable given the card wasn't GPU-ready, now
+filled above). Pod B GPU 0 idle per the chain gap (nudged above).
+
+**4. Paper probing SEED AUDIT opened (Han item 1):** Dmitry's
+3-seed top-up excludes sparse probing; auditing whether the paper
+already has 3 seeds for ALL probing plots incl. baselines — (i)
+feature-budget sweep (caption says 1/2/42), (ii) AUC-vs-k TFA-
+omitted (no seed mention), (iii) detection PR-AUC top-S=8 (no
+seeds, no error bars). Paper tex located at purified/docs/aniket/
+on origin/neurips-aniket; provenance chase running (mac-local +
+delegate); findings to follow this evening.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
