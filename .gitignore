@@ -31,6 +31,11 @@ docs/.obsidian/core-plugins-migration.json
 
 # ─── HTML output (reproducible from scripts) ──────────────────────
 *.html
+# ...but REPORTS are deliverables, not scratch output: they carry the figures,
+# the provenance and the caveats a reader needs, and a rendering that only ever
+# exists on one pod's disk is lost when the pod is. Track them.
+!**/report.html
+!**/index.html
 
 # ─── runtime artefacts ──────────────────────────────────
 # Too big for git; HF-backed via cache.save_checkpoint auto-push on
