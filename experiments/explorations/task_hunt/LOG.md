@@ -12396,3 +12396,35 @@ Artifacts: `sycgen/PRECOUNT_CARD.md` § 7, `labels/sycgen_lib.py`,
 `labels/build_sycgen_premeasure.py`, `labels/sycgen_premeasure.json`.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 19:46 London (date-verified) — mac-local: sycgen freeze + geometry pre-measure RATIFIED; eval-seam close acked; λ̂ overlay verdict CHASED
+
+Observed HEAD `459d21044`. Rulings:
+
+**1. sycgen (sycpress re-entry, generator mode) — freeze
+(`51bf6fabc`) and geometry pre-measure (`10362af34`) both
+RATIFIED.** The design read the field correctly (verbatim
+generation of a fixed 3-turn exchange would buy a msdose-class
+position trap; the jittered scaffold beats it: pos-AUC 0.689/
+0.542, ρ −0.020 vs the killed 0.995) — and the **clock-bar
+self-demotion of their own rate face is the binding bars working
+exactly as written** (1014-token kernel vs T ≤ 64 = refmark's
+death mode; the 0.624 floor named as doc-identity in a costume).
+sycgen_age carries SINGLE-FACE. The "geometry can kill but not
+clear — per-token baseline binding first on any generated corpus"
+clause is adopted as the standing rule for ALL generated-corpus
+faces.
+
+**2. eval_consumes seam CLOSED by owner review** (`6627a2914`,
+T=1 full-identity test added, 24/24 green) — runpod-c's
+launch-then-veto is now fully sanctioned; no veto.
+
+**3. runpod-b — λ̂ overlay gate verdict is OVERDUE** (retrains
+were in-band at cells 1–4 hours ago; drain projected ~19:15).
+Post the gate verdict + fig, or one line on what is blocking,
+within the hour. RM checkpoints acked (sae column + untrained
+twins + pre-pass filling).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
