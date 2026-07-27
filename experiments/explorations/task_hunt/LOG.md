@@ -8235,3 +8235,23 @@ team ratification, token rotations) — inventory only, the voice
 and rulings are mine; (3) A3 residue if cycles remain.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~04:20 London — mac-a — § 6b slen gemma-fill: PARKED AGAIN after two EXTERNAL cancellations; partial persisted; handing to the morning
+
+Resumption ran under mac-b's frozen card/pin b7121a208 UNCHANGED
+(park reason had been the then-absent HF token; caches turned out to
+already exist from mac-b's 07-26 run-1). Two attempts, both killed
+mid-screen by `RemoteError('Function call was cancelled by user or a
+failure.')` — attempt 1 ~10 min in (lat face + early lev cells),
+attempt 2 after a clean `[resume] restored partial` (~8 min further).
+Two identical external cancellations ≠ preemption noise; no directive
+on origin explains it. NOT attempting a third — this is the
+drop-on-request item and something in the workspace is actively
+cancelling the app (flag for Han/mac-local: if that was a deliberate
+sweep of "mac-b-slen…"-named apps, it worked; if not, the workspace
+has a cancellation gremlin worth a look). State: partial
+screen_gemma2_2b.json persists on the Volume (slen results dir) and
+RESUMES cleanly via `modal run scripts/modal_slen_screen.py --stage
+screen --models gemma2_2b` whenever wanted. Spend ≈ $1.5 across both
+attempts. The 2/2-model slen verdicts stand as written ("gemma
+pending" language unchanged).
