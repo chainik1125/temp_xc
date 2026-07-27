@@ -14915,3 +14915,61 @@ Lane-by-lane ruling:
   land** (Mission 1 scope now = harness KEEPs exclusively).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-28 01:10 London (wall) — mac-c: ELICITATION HARNESS FROZEN + pod `mac-c-hunt-0728` UP; `evalage` card frozen; generation next
+
+Authorization taken. **Harness core + first corpus card frozen at
+`1a955344c`, BEFORE any generation** (commit-then-run).
+
+**Harness (`labels/elicit_lib.py` + `run_elicit.py`).** Tonight's three
+kill-lessons are wired in as **first-class scaffold parameters, not
+comments**: (1) event spacing is chosen for the clock and the realised
+gap distribution is a receipt; (2) topic is drawn INDEPENDENTLY of the
+event schedule; (3) no sentence-scale kernels — faces are token-scale
+ages over scaffold-inserted events. `vocabulary_control_check` is a
+**STOP condition**: if per-topic event rate spreads, the `retryesc`
+leak is being rebuilt and generation must not be trusted. Turn-major
+batching (all docs advance one turn per step) keeps generation batched
+while staying causally correct within a document.
+
+**Corpus 2 pick: `evalage` — and it is deliberately NOT menu #12 as
+written.** #12 `evalcue` is a T1 marker-RATE face, which my own menu
+called "the single most reliably fatal shape in the § 8 record"; that
+prediction stands for an organic corpus. But every one of those deaths
+is corpus GEOMETRY, which is exactly what the harness controls. So the
+bars-first redesign is a **T2 age face** — tokens since the last
+evaluation cue — with cues spaced ≫ T (kills the visible floor,
+`retryesc`'s 0.500 result), an age face varying within document (kills
+the identity constant), no kernel at all (kills the reach limit), and
+topic ⊥ cue schedule (kills the vocabulary leak). Safety story
+unchanged and current (`2603.03824`, `2507.01786`, `2407.04694`), and
+my menu makes `sandbag` (#15) **strictly downstream of #12**, so this
+is the right entry to run first.
+
+**CPU stub validated the whole pipeline before spending a GPU-second:**
+claim zone **0.0 / 0.0 / 0.8 / 5.5 / 14.7 %** at T = 4/8/16/32/64 — the
+designed target, weak floors at small T with genuine in-window mass at
+large T, a better spread than `retryesc` (flat 0%) or `sycgen` (7.9%).
+Plan-level vocabulary control: cue-rate spread **0.026**, cv **0.048**
+across 16 topics.
+
+**Stated plainly: this buys removal of CONFOUNDS, not a positive.**
+Nothing in the scaffold is tuned to make a window win — the spacing
+removes the floor's advantage, it does not hand the window an answer.
+**The per-token baseline is binding**; if post-cue text is per-token
+readable this dies like `emoinst`.
+
+**Pod (governance-compliant):** `tbxn8b3rsk1hnt` = **`mac-c-hunt-0728`**,
+1× L40S 48GB, **$0.99/h** (cap $10/h), 100GB vol. Ledgered at spin-up
+in `MODAL_SPEND.md` § RUNPOD (`eef2eb513`) with est $2–4; TERMINATE at
+drain + API-verify, actuals line to follow. I own this pod alone and
+have touched no other. Key env-injected from the keychain, never
+printed/filed/argv.
+
+Next: bring-up on the pod, generate `evalage` (400 docs), then the
+`sycgen_age` scaffold as corpus 1. Briefing stays until generation is
+actually running.
+
+_Recorded-by: claude-fable-5 (mac-c)_
