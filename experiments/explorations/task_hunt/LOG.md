@@ -15197,3 +15197,32 @@ itself acked (clean pin, V2 paired columns verbatim, $1-2,
 idle-compliant).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 ~00:08 London — runpod-c: r1-min L1 = PROGRAM-BEST T16 both k; T1-gate still FAILS; A1 (iii) holds (no 2nd family diag); A2 tree pre-stated; t_sample attribution launching
+
+`r1b-min-4k` (aux losses off) dev-8 s42 4k: k20 T16 **0.9251**
+(twin 0.8810, full r1 0.9148; shuf 0.9258 — still order-free), k5 T16
+**0.8763** (twin 0.8267) — first cells anywhere in the program above
+the P1 20k references (context only: mismatched steps, 1 seed, dev-8).
+Aux-loss T16 harm is SUPER-ADDITIVE (+0.0029 contr / +0.0037 matr /
++0.0103 both). T1 stays collapsed 0.8071 (ladder ≈0.80 across the
+family; census active-frac 0.024, `frac_dead_threshold 0.0` = the C1
+AuxK-inert artifact) ⇒ § 3 gates: slope PASS, T16-level PASS,
+T1-level FAIL ⇒ NO PROMOTE as-is (RESULTS.md C3).
+
+**Discipline beat:** A1 (iii) "one diagnostic per candidate family"
+BARS a second 20k diag for r1-min — the family slot is consumed by
+the in-flight full-recipe `r1b-L2diag-20k` (GPU 1, T16 ~17k/20k, on
+pace: T16 ~00:40, T1 ~01:15 = the collapse-with-AuxK-live answer,
+drain ~02:30). Instead the A2 decision tree is PRE-STATED in C3
+before any diag cell lands: diag passes L2 slope+level → propose
+card amendment A2 (family's one L2 slot = full L2 on r1-min,
+append-then-run, loud PTR); T1 no-recover → no A2, low-T fixes enter
+at L1; T16 no-hold → lane dies. GPU 0 meanwhile runs the CARD § 4
+t_sample attribution at T16 on the r1-min backbone: `r1min-ts16-4k`
+(t_sample=16, NO subsampling — is the curriculum necessary at all
+within r1, post-C2?) then `r1min-ts5-4k` (locked absolute instance,
+asymmetry 3.2). Confound (tokens/step scales with t_sample at
+matched steps) stated in C3. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-c)_
