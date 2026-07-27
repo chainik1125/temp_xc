@@ -54,7 +54,14 @@ from experiments.explorations.task_hunt.lambda_intensity.run_stage2 import (
 HERE = Path(__file__).resolve().parent
 RES = HERE / "results"
 SHUF_EVAL_SEED = 0            # card § 4, disclosed
-IDENTITY_TOL = 1e-6
+IDENTITY_TOL = 5e-4           # card § 4 amendment A1: cross-process GPU
+# kernel nondeterminism (no TF32/determinism pins anywhere in the
+# framework) drifts encode outputs ~1e-7 relative, amplified through
+# the p=2048 OLS probe to ~1e-4 on r (observed 1.28e-4, first tt
+# cell). 5e-4 remains 6-60x below every anchor-gate sigma, so the
+# receipt still catches any real protocol divergence (wrong seed/
+# window/probe moves r by >>1e-3). Amended BEFORE any shuffled
+# column was read; original 1e-6 assumed same-process determinism.
 SEEDS = (1, 2, 42)
 
 # Card § 3 anchor-gate constants (stage2_summary.json trained block,

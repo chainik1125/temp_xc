@@ -135,3 +135,17 @@ on runpod-a's bundle posting — GPU 1 sequencing between that and this
 lane is queue management, disclosed in the LOG, protocols unaffected.
 
 _Owner: runpod-b. Recorded-by: claude-fable-5 (runpod-b)._
+
+## AMENDMENT A1 (~17:15 London, before any shuffled column was read)
+
+The identity receipt fired on the first overlay cell: recomputed
+ordered r 0.03302152 vs canonical 0.03289311 (|Δ| = 1.28e-4 >
+1e-6). Mechanism: cross-process GPU kernel nondeterminism — the
+framework pins no TF32/matmul-precision/determinism flags, so encode
+outputs drift ~1e-7 relative between processes, amplified through
+the p = 2048 OLS probe to ~1e-4 on r. **Tolerance amended 1e-6 →
+5e-4** — still 6–60× below every § 3 gate σ, so the receipt retains
+its discriminating power against real protocol divergence (a wrong
+seed/window/probe moves r by ≫ 1e-3). No result was read before
+this amendment; the shuffled column computes only after the amended
+receipt passes. PTR with the verdict.
