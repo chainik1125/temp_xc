@@ -9456,3 +9456,47 @@ hunt4 screens ≈ $8 total vs $18–27 est lines (warm caches) —
 ledger corrected. All PTR.
 
 _Recorded-by: claude-fable-5 (mac-a)_
+
+---
+
+## 2026-07-27 ~16:35 London — mac-b: REPLICATION LEG LANDED — tret CONFIRM, xtrend CONFIRM-state/order-fragile, sdom SEED-FRAGILE-state/order-robust. ALL PTR.
+
+Scored with `verdict.py@bf16dfe9e` byte-identical (asserted
+in-container), read per REPLICATION_CARD § 3; shifted seeds
+MATCH 8013 / SHUF 8234 / FOREIGN 11242 / NULL 7099 / probe 7; JSON at
+`hunt4/results/replication/screen_gemma2_2b.json` (+ Volume
+`/workspace/hunt4_replication/`).
+
+| face | wave-1 gemma | replication gemma | reading |
+|---|---|---|---|
+| tret | KEEP +.0972 (T64 actxmean_mlp) | KEEP +.0838 (SAME arm) | **CONFIRM** — rule re-fires, arm stable, margin −.013; order absent both runs (matches bundle "no T≤32 order") |
+| sdom | KEEP +.0587 (T8) | WEAK +.0422 (no arm clears +.05) | **SEED-FRAGILE state / ORDER ROBUST** — order_pass BOTH runs (wd win−shuf T32 +.081 → +.056, T16 +.045 → +.032) |
+| xtrend | KEEP +.0643 (T64) | KEEP +.0525 (T32) | **CONFIRM state / order NOT replicated** — wave-1 order_pass T32 +.031 → repl +.0035 (fail) |
+| xnov | WEAK +.0496 | WEAK +.0453 | WEAK-stable (free observation) |
+| tretd | SKIP | SKIP | SKIP-stable — MIN_ROWS starves cls0 under the re-drawn manifest too |
+
+Three notes for the bundle record (no-veto clause — these are
+inputs, mac-local arbitrates):
+
+1. **sdom: my leg CONVERGES with the final bundle (ab1597c65)**
+   from an independent direction — the llama31 majority said WEAK
+   across models; the re-seed says the gemma KEEP was fragile
+   WITHIN-substrate (margin mechanism: +.059 → +.042 under
+   manifest/probe re-draws). Its ORDER signal is the robust part —
+   consistent with "WEAK w/ 3/3 order receipts on record."
+2. **xtrend order-fragility is NEW information**: the bundle's
+   "order 1 model" counted gemma wave-1; that one receipt does not
+   survive re-seeding (+.031 → +.004 @T32). Effective order
+   support ≈ 0–1 model — panel-gate routing input, KEEP-breadth
+   status unaffected (state CONFIRMS, arm mobility T64→T32 legal
+   under the existential rule).
+3. **tret is the slate's sturdiest face**: same deciding arm, rule
+   re-fires with margin well clear of the bar. Bundle KEEP-breadth
+   affirmed by replication.
+
+Duty note: replication duty (c1c5c949e) extends to any WAVE-2 KEEPs
+on their landing. Actuals ≈ $3 (single L40S, warm cache; correction
+vs the $3–6 est with the dashboard read). PTR end-to-end.
+
+_Recorded-by: claude-fable-5 (mac-b)_
+>>>>>>> 1b1fb0354 (mac-b: replication leg LANDED — tret CONFIRM (same T64 arm, +.084), xtrend state-CONFIRM/order-NOT-replicated (+.031->+.004 @T32, panel-gate input), sdom SEED-FRAGILE-state/order-ROBUST (converges w/ bundle WEAK from independent direction), xnov WEAK-stable, tretd SKIP-stable; JSON + ledger actuals ~$3; PTR)
