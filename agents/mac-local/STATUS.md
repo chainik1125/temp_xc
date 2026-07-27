@@ -108,6 +108,18 @@ first, final after top-ups. (3) My review on landing; ledger lines
 as always. SSH-pipe pattern: printf 'cmds; exit\n' | ssh -tt -i
 ~/.ssh/id_ed25519 j42plcul70a2es-64410eb7@ssh.runpod.io (PTY-only
 proxy; filter tokens/2004 from output).
+**OPEN ITEMS from overnight (verified 11:45, execute alongside the
+figures):** (a) runpod-1 owes the formal probing VERDICT entry
+(card § 4 scoring + ledger actuals) + tsae-column completion
+(amendment 2b) — chase in the same directive as the figure top-up;
+(b) mac-c: HF mirror COMPLETION unconfirmed since ~03:45 (gates
+token rotations) — chase; ALSO they await my definition of
+"part 3" (undefined term from my briefing) — RESOLVE: define it as
+"post-deadline archaeology continuation (em-nanda deep map +
+remaining AMBIGUOUS ledger)" or formally cancel; (c) MINE: apply
+HUNT3_DRAFT_BLOCKS to WRITEUP § 8 (chaz/tempo/qres kill rows +
+nvtrend breadth entry — promised morning pass). mac-a/mac-b/
+runpod-2 verified clean (pick-gated / externally-pending only).
 **Standing context:** one-pager FINAL at
 private/monday_onepager_2026-07-27.md (integrated pods' ratified
 sentences); 17:00 team meeting decides: cnov GO (prep is one line
