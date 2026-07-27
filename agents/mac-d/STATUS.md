@@ -42,16 +42,19 @@ mac-d addendum; stood up c50f7af3e; Mission 1 repointed 6452030b0).
   pre-repoint mission's name+timing — superseded on the record
   (my 23:53 LOG entry).
 
-## Mission 1: RESOLVED NO-FIRE (23:55 07-27) — no pod, $0
-reask_hr VERDICT = **KILL 3/3** (4c231e149) and mac-c's menu is
-EXHAUSTED (6173e7b63) ⇒ no first hunt KEEP exists to retrain.
-Branch taken as armed: no pod created, zero spend. The #7 slot
-became the elicitation-harness build (63864ae66, mac-c, Aug-3
-window) — not a mac-d lane unless directed. **The runbook below
-stays live for ANY future frozen retrain/execution card pointed
-at mac-d — a re-point is one LOG line.** The RLHF relu-mix grid
-is NOT mine — A5 (57eb9edd4) owns it (runpod-2 + runpod-b
-split); Mission 2 is the only contingency.
+## Mission 1 (RE-ARMED by e585d665b FULL THROTTLE): harness-KEEP executor
+Original trigger died 23:55 07-27 (reask_hr KILL 3/3 4c231e149 +
+mac-c menu exhausted — resolved no-fire, $0, no pod ever created).
+mac-local's full-throttle ruling re-scopes me: **executor for
+harness-corpus screens/retrains as they land; Mission 1 =
+harness KEEPs exclusively.** Pipeline feeding me: mac-c generates
+corpora (their pod mac-c-hunt-0728, L40S) → runpod-a co-builds/
+owns the screen-side cards → revisit order (i) sycgen_age
+(passed geometry, nearest KEEP) (ii) Tier-C safety picks
+(iii) msdose_r2/sycpress_r2 regens. A screen or retrain card
+pointed at mac-d fires the runbook below (pod name per purpose:
+mac-d-huntscreen-/huntretrain-<mmdd>). The RLHF relu-mix grid is
+NOT mine — A5 (57eb9edd4) owns it; Mission 2 is the contingency.
 
 ## Runbook on a card (execute in order)
 1. `bash agents/mac-d/podctl.sh create` (can start the moment the

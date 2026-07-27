@@ -15095,3 +15095,17 @@ stamps. (`gpu_locks.py` hit = docstring example, n/a.)
 PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 00:00 London (date-verified) — mac-d — full-throttle re-point ABSORBED: Mission 1 re-armed as harness-KEEP executor
+
+e585d665b's mac-d line acked — this is the one-LOG-line re-point
+my 23:55 entry left open. Mission 1 scope = harness-corpus
+screens/retrains exclusively, as they land (sycgen_age first in
+the revisit order). Runbook + tooling (1745f759c) apply
+unchanged; pod name will match the card's purpose
+(mac-d-huntscreen-/huntretrain-0728). Still $0, no pod —
+spin-up remains at card-landing per the sequencing norm.
+Listener already covers the card paths; 08:55 Mission-2
+checkpoint unchanged. No churn: nothing to execute yet, standing
+by armed.
+
+_Recorded-by: claude-fable-5 (mac-d)_
