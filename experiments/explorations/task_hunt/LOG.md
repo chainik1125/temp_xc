@@ -10772,3 +10772,88 @@ arm on all three models, margins ±.008)"; tret_py row likewise
 "(same arms, ±.010)". PTR end-to-end.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## 2026-07-27 18:45 London (wall) — mac-local: MEETING OUTCOMES ABSORBED — arm clarification, k-inversion finding, both-arms sweeps directed, safety-task research opened
+
+Transcript read in full (private/transcripts/transcript-2026-07-27.txt).
+Rulings and directives:
+
+**1. ARM CLARIFICATION (corrects a meeting statement — important
+for the response draft).** The probing shuffle T-sweep figs are the
+**BatchTopK-only harmonized arm** (`txc_batchtopk_pre_btkonly`),
+NOT the paper's ReLU+TopK. Both-arms status as of now: btk-only has
+the full T-sweep + shuffle (the figs); the ReLU+TopK paper arm has
+shuffle ONLY as eval-only at the shipped T5 checkpoints (probing
+~55%-order-free margin datum; RLHF 0.610→0.598), and NO relu-mix
+T-sweep exists anywhere (A12: shipped T10/20 = T5 replicas). The
+comparison the meeting asked for ("should have been trying both and
+comparing") is NEW WORK — directed in § 3.
+
+**2. k-DEPENDENCE FINDING (Dmitry's meeting question, answered
+from existing rows — 36-task CT-excl, 3 seeds):** the T-shape
+INVERTS with probe budget k. k=20: 0.9264 → 0.9231 → 0.9033
+(decline). **k=5: 0.8500 → 0.8370 (T4 dip) → 0.8571 (T16 = max,
++0.007 over T1)** — mildly U-shaped/RISING. Shuffle gaps positive
+at every (k, T ≥ 2) on both. The suspected raw-top-k/probe-budget
+interaction is REAL. Honest sentence: "T-scaling on probing is
+probe-budget-dependent — declining at k=20, flat-to-mildly-rising
+at k=5; no monotone window win at any k." runpod-1 formalizes
+(§ 3a).
+
+**3. DIRECTIVES.**
+- **runpod-1:** (a) Dmitry's 1-hour confound check, formalized:
+  per-k curve analysis + realized per-token l0 accounting across T
+  (data exists: k ∈ {5,20} + realized_l0 per row) — report the
+  inversion with seeds/sd + the l0-shift mechanism read, PTR;
+  (b) k-grid EXTENSION eval-only on the persisted grid checkpoints
+  (k ∈ {10, 40, 80} to bracket the inversion) — confirm ckpt
+  persistence + price first; (c) **relu-mix probing T-sweep** —
+  NEW CARD: paper composition (TopK→ReLU per audit § pins),
+  T {1,2,4,8,16} × seeds {1,2,42} × k {5,20} with shuffle twins,
+  same harness arm machinery, est ~10–15 GPU-h across GPUs 0/1
+  after current passes. Deliverable: the BOTH-ARMS comparison fig
+  (btk-only vs relu-mix, ordered+shuffled).
+- **runpod-2:** after the RLHF FINAL (~20:45): **relu-mix RLHF
+  T-sweep** — NEW CARD, paper k500-family composition across
+  T {1,2,5,8,16} × 3 seeds w/ shuffle, GPU 2 overnight. Same
+  both-arms deliverable.
+- **runpod-a:** **cnov panel DEFERRED** — no pick was taken; per
+  the meeting, new-task additions target the Aug-3 amendment
+  window / ICLR, not tomorrow's post. GPU 0: offer to runpod-1's
+  relu-mix sweep via LOG agreement; otherwise continue w2-support
+  + post-deadline gen-4 design stance. **Gen-4 targeting NOTE
+  (binding for wave-3+): candidates must be SAFETY-RELEVANT**
+  (Dmitry: backtracking/refusal/EM class, not toys) — the
+  safety-task menu (below) becomes your wave-3 source.
+- **runpod-b:** unchanged (λ̂ gate verdict + w2 replication still
+  due; ttrend fallback fig already shipped).
+- **mac-c:** NEW BRIEFING `briefings/safety-task-research.md` —
+  wide literature sweep for safety-relevant trailing-state tasks
+  via the `clew` skill (S2 direct as fallback, hygiene rules in
+  the briefing), deliverable = ranked SAFETY_TASK_MENU.md;
+  secondary bounded item = the txc_pro recovery dig.
+
+**4. ttrend REPOSITIONED (Dmitry ruling): appendix, OUT of the
+rebuttal response.** The WRITEUP § 4 material IS the appendix
+draft; REBUTTAL_PACK ttrend rows carry an "appendix-only per the
+07-27 meeting" flag from this entry (no pack edit needed tonight —
+the flag binds quoting). λ̂/backtracking + probing + RLHF +
+seeds/stacked-SAE controls carry the response; Dmitry drafts
+midday Chicago, 3pm PT check-in stands.
+
+**5. txc_pro first-pass archaeology (mac-local, 10 min):** locked
+hparams RECOVERED (`purified/configs/locked_archs.yaml`, registry
+tag `phase5b_subseq_h8`): d_sae 18432, T_max 10, **t_sample 5 =
+subsequence RESAMPLING** (matches Dmitry's "resampled the window
+size" memory) + n_matryoshka 8 + contrastive_shifts [1,2]
+w/ inverse-distance weighting + auxk 0.03125. **The class file
+`txc_pro.py` did NOT survive purification** — only the registry
+pointer. Recovery of the implementation + any REAL T-scaling
+evidence (A12-aware) = mac-c's bounded dig. A dedicated
+T-scaling-improvement pod (Dmitry's "if we have time") is Han's
+provisioning call — the recovered txc_pro recipe would be its
+starting point.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
