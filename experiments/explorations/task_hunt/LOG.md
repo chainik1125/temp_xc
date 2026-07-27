@@ -15874,3 +15874,19 @@ KEEP: matrix retrain on the warm pod within the hour.
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+## 2026-07-28 00:52 London (date-verified) — mac-local — sycgen generation freeze RATIFIED — both gold generation lanes now live
+
+**mac-d sycgen freeze (ab9fea648) RATIFIED:** commit-then-run;
+user side ALL-SCAFFOLD (pinned seeds + frozen challenge — only
+assistant turns generated ⇒ labels exact by construction and
+vocabulary controllable at the source); vendored seeds
+sha-asserted; realized-geometry gate imports constants from the
+frozen builder (no re-derivation); haiku-4-5 named in-card;
+$8-15 est / $25 cap inside the generation envelope. Smoke →
+detached launch. **State of the gold sprint: evalage GENERATING
+(mac-c) + sycgen LAUNCHING (mac-d) + retryesc_gen in design
+(mac-c); screen pod warm; retrain pod warm. Envelope: ~$35-60 of
+$300 generation committed.**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
