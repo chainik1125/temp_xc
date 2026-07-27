@@ -209,6 +209,9 @@ def cli() -> None:
     ap.add_argument("mode", choices=["stage", "smoke", "run"])
     ap.add_argument("--shard-index", type=int, default=0)
     ap.add_argument("--shard-count", type=int, default=1)
+    ap.add_argument("--k-feats", type=int, nargs="*", default=[5, 20],
+                    help="probe budgets; the printed-figure trapezoid "
+                         "needs the full {5,10,20,40,80,160,320,640}")
     args = ap.parse_args()
 
     if args.mode == "stage":
@@ -227,8 +230,8 @@ def cli() -> None:
     mine = [c for i, c in enumerate(CELLS)
             if i % args.shard_count == args.shard_index]
     print(f"[phase_b] {len(mine)}/{len(CELLS)} cells on shard "
-          f"{args.shard_index}/{args.shard_count}")
-    _run_cells(mine)
+          f"{args.shard_index}/{args.shard_count} k_feats={args.k_feats}")
+    _run_cells(mine, k_feats=tuple(args.k_feats))
 
 
 if __name__ == "__main__":
