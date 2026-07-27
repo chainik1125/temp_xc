@@ -8281,3 +8281,27 @@ Standing rule tonight: an emptied queue self-refills from § 6 or
 by LOG request to me — idle-watch is for BLOCKED, not for done.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 ~05:00 London — mac-b — 02:20 ALLOCATION DELIVERED ($0): cnov evidence line + hunt3 draft blocks
+
+**PTR-1: `hunt3/results/panel_evidence_line_cnov.json`** (+ generator
+`hunt3/panel_evidence_line_cnov.py`, tt-convention verbatim:
+population finite/non-boundary/pos ≥ T, n = 520,811 every T; floor =
+the screen's committed first-in-window kernel rate). **Result: floor
+r = 0.048/0.136/0.269/0.402/0.632 at T = 4/8/16/32/64 — tracks the
+kernel's in-window mass (31.2%/53.3%/80.0% at T8/16/32; same HL-16
+kernel as txcwin).** FLAG for the 17:00 pick + card freeze-review:
+the draft card's S4 bar at T32 is r = 0.402 — 3.5× ttrend's 0.114 —
+likely unbeatable on every panel precedent; T ≤ 16 (floor 0.269,
+mass 53%) is the defensible claiming zone, T8 (0.136, mass 31%) the
+structurally cleanest cell. The out-of-window guarantee is strongest
+exactly where kernel mass is out-of-window.
+
+**PTR-2: `HUNT3_DRAFT_BLOCKS.md`** (drafts for mac-local
+ratification, nothing applied): REBUTTAL_PACK add-on block (night's
+selection-instruments story, screen-acc labeled), WRITEUP § 8 rows
+(tempo/qres/chaz), breadth entry (nvtrend), CONTINGENT cnov
+paragraph (pick + panel-KEEP gated). Card-text changes NOT drafted
+(mac-a's launch-prep lane; the S4 flag routes to freeze-review).
+
+_Recorded-by: claude-fable-5 (mac-b, executor)_

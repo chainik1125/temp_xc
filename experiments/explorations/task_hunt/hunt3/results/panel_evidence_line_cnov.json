@@ -1,0 +1,43 @@
+{
+ "face": "cnov",
+ "model": "gpt2",
+ "floor_feature": "first-in-window kernel rate (screen floor, labels floor_rate_T*)",
+ "population": "finite cnov, non-boundary, pos >= T",
+ "per_T": {
+  "4": {
+   "n": 520811,
+   "n_floor_active": 520799,
+   "floor_active_frac": 1.0,
+   "pearson_r": 0.0477,
+   "pearson_r_floor_active_only": 0.0476
+  },
+  "8": {
+   "n": 520811,
+   "n_floor_active": 520797,
+   "floor_active_frac": 1.0,
+   "pearson_r": 0.1362,
+   "pearson_r_floor_active_only": 0.136
+  },
+  "16": {
+   "n": 520811,
+   "n_floor_active": 520811,
+   "floor_active_frac": 1.0,
+   "pearson_r": 0.2692,
+   "pearson_r_floor_active_only": 0.2692
+  },
+  "32": {
+   "n": 520811,
+   "n_floor_active": 520811,
+   "floor_active_frac": 1.0,
+   "pearson_r": 0.4017,
+   "pearson_r_floor_active_only": 0.4017
+  },
+  "64": {
+   "n": 520811,
+   "n_floor_active": 520811,
+   "floor_active_frac": 1.0,
+   "pearson_r": 0.6325,
+   "pearson_r_floor_active_only": 0.6325
+  }
+ }
+}
