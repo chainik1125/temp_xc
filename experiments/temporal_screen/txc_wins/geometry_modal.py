@@ -63,7 +63,8 @@ image = (
 @app.function(gpu="A10G", image=image, timeout=21600)
 def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
              n_grad: int, d_sae: int, k: int, sae_lr: float, sae_steps: int,
-             batch_win: int, seed: int, n_base: int):
+             batch_win: int, seed: int, n_base: int, n_gate: int = 0,
+             gate_alphas: list = ()):
     import sys
     sys.path.insert(0, "/work")
     import random
@@ -116,16 +117,32 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
         hh = cap["h"][0].float()
         return torch.stack([hh[a:b + 1].mean(0) for a, b in ts])
 
-    def logp(text, spans, cont):
-        """Unsteered log-probability: whole document, or the continuation if given."""
-        e, _ = seg_spans(text, spans)
+    def logp(text, spans, cont, W=None, alpha=0.0):
+        """Log-probability of the whole document, or of the continuation if given.
+
+        With `W` supplied the (T, d) write is added at the document's segment token spans
+        at dose `alpha * scale_h`, matching the arms harness's `logits_for` convention
+        exactly so a number here is comparable with a `delta_margin` there.
+        """
+        e, ts_ = seg_spans(text, spans)
         ids = e["input_ids"].to(dev)
         n_doc = ids.shape[1]
         if cont is not None:
             ids = torch.cat([ids, torch.tensor(
                 [tok(cont, add_special_tokens=False)["input_ids"]], device=dev)], 1)
+        hook = None
+        if W is not None:
+            def edit_(_m, _i, out_):
+                h = out_[0] if isinstance(out_, tuple) else out_
+                for t_i, (a_, b_) in enumerate(ts_):
+                    h[:, a_:b_ + 1, :] += (alpha * scale_h
+                                           * W[t_i].to(h.dtype).unsqueeze(0))
+                return (h,) + out_[1:] if isinstance(out_, tuple) else h
+            hook = layers_[L].register_forward_hook(edit_)
         with torch.no_grad():
             lg = model(ids).logits.float().log_softmax(-1)
+        if hook is not None:
+            hook.remove()
         if cont is None:
             return float(lg[0, :-1].gather(-1, ids[0, 1:].unsqueeze(-1)).sum())
         return float(lg[0, n_doc - 1:-1].gather(-1, ids[0, n_doc:].unsqueeze(-1)).sum())
@@ -175,7 +192,7 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
         P_dom = ((A.mean(0) - B.mean(0)) / sd).float()
 
         # ---- Gbar: gradient of the reported margin wrt the write, at zero ----
-        scale = float(torch.cat([A, B]).norm(dim=-1).mean())
+        scale = scale_h = float(torch.cat([A, B]).norm(dim=-1).mean())
         Wg = torch.zeros(T, d, device=dev, dtype=torch.float32, requires_grad=True)
 
         def grad_pass(text, spans, cont, sgn):
@@ -230,6 +247,67 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
                         logp(ta_, spa_, None) - logp(tb_, spb_, None))
         base = np.array(base)
 
+        # ---------------------------- THE SANITY GATE ----------------------------
+        # `broadcast_optimal` is the constant write built from this same Gbar, and it is the
+        # exact maximiser of <W, Gbar> over constant writes, with value sqrt(c)*||Gbar||_F.
+        # `grad_slab` is unit(Gbar), whose inner product is ||Gbar||_F. Both are Frobenius
+        # unit-norm and steered at the same dose, so to FIRST ORDER
+        #
+        #     delta(grad_slab) / delta(broadcast_optimal) = 1 / sqrt(c) >= 1
+        #
+        # necessarily. A cell where the constant write measurably beats the full gradient
+        # write at a small dose is not reporting a surprising fact about broadcasting; it is
+        # reporting that its Gbar does not describe the metric it was differentiated from --
+        # which is what a misaligned pairing produces, because segment t is then a different
+        # object in A and in B and the per-position part of Gbar is document-specific noise.
+        # This ran as a post-hoc check on the arms files and caught the StruQ pairing; it is
+        # computed here so no geometry number is ever reported without it.
+        gate = {"alphas": list(gate_alphas), "n_docs": int(n_gate)}
+        if n_gate and gate_alphas:
+            Gu = Gbar / (Gbar.norm() + 1e-12)
+            gm = Gbar.mean(0)
+            Wb = (gm / (gm.norm() + 1e-12)).unsqueeze(0).expand(T, -1).contiguous()
+            Wb = Wb / (Wb.norm() + 1e-12)
+            gdocs = []
+            rng_gate = random.Random(seed + 3)
+            for _ in range(n_gate):
+                sa, sb, car, c1, c2 = draw(rng_gate)
+                gdocs.append((build(car, sa), build(car, sb), c1, c2))
+
+            def contrast(W, alpha):
+                v = []
+                for (ta_, spa_), (tb_, spb_), c1, c2 in gdocs:
+                    if c1 is None:
+                        v.append(logp(ta_, spa_, None, W, alpha)
+                                 - logp(tb_, spb_, None, W, alpha))
+                    else:
+                        v.append(logp(ta_, spa_, c1, W, alpha)
+                                 - logp(ta_, spa_, c2, W, alpha)
+                                 - (logp(tb_, spb_, c1, W, alpha)
+                                    - logp(tb_, spb_, c2, W, alpha)))
+                return np.array(v)
+
+            g_base = contrast(None, 0.0)
+            deltas = {}
+            for nm, W in (("grad_slab", Gu), ("broadcast_optimal", Wb)):
+                deltas[nm] = {f"{a_:g}": contrast(W, a_) - g_base for a_ in gate_alphas}
+                gate[nm] = {f"{a_:g}": {
+                    "delta_margin": float(deltas[nm][f"{a_:g}"].mean()),
+                    "sem": float(deltas[nm][f"{a_:g}"].std(ddof=1) / np.sqrt(n_gate))}
+                    for a_ in gate_alphas}
+            # Paired, because both arms are measured on the SAME documents.
+            gate["margin"] = {}
+            for a_ in gate_alphas:
+                dd = deltas["grad_slab"][f"{a_:g}"] - deltas["broadcast_optimal"][f"{a_:g}"]
+                gate["margin"][f"{a_:g}"] = {
+                    "grad_minus_broadcast": float(dd.mean()),
+                    "sem": float(dd.std(ddof=1) / np.sqrt(n_gate)),
+                    "passes": bool(dd.mean() >= 0.0)}
+            gate["passes"] = bool(all(gate["margin"][f"{a_:g}"]["passes"]
+                                      for a_ in gate_alphas))
+            gate["passes_at_matched_dose"] = gate["margin"][
+                f"{gate_alphas[0]:g}"]["passes"]
+
         # SHARED-WRITE RETENTION. A dictionary latent is one write reused across documents,
         # so every fixed-write arm is bounded by the MEAN difference slab. If per-document
         # slabs point in different directions the mean cancels and no architecture can serve
@@ -282,6 +360,7 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
                                     / ((U_dom[:, 0:1].T @ P_dom).norm() + 1e-9)).sum()))
 
         row = {"P_dom": s_dom, "Gbar": s_grad, "cos_Pdom_Gbar": cos_slabs,
+               "gate": gate,
                "baseline_mean": float(base.mean()),
                "baseline_sem": float(base.std(ddof=1) / np.sqrt(len(base))),
                "baseline_n": int(len(base)),
@@ -291,6 +370,16 @@ def geometry(tasks: list, model_id: str, layer: int, k_seg: int, n_docs: int,
                "cos_vsae_u1_Gbar": cos_u1_grad, "cos_vsae_u1_Pdom": cos_u1_dom,
                "random_cos_baseline": float(1.0 / (T * d) ** 0.5)}
         out["tasks"][task] = row
+        if n_gate and gate_alphas:
+            for a_ in gate_alphas:
+                m = gate["margin"][f"{a_:g}"]
+                print(f"  GATE a={a_:g}: grad_slab {gate['grad_slab'][f'{a_:g}']['delta_margin']:+.2f} "
+                      f"vs broadcast_optimal "
+                      f"{gate['broadcast_optimal'][f'{a_:g}']['delta_margin']:+.2f}   "
+                      f"paired diff {m['grad_minus_broadcast']:+.2f} "
+                      f"+- {m['sem']:.2f}   "
+                      f"{'PASS' if m['passes'] else 'FAIL'}", flush=True)
+            print(f"  GATE overall: {'PASS' if gate['passes'] else 'FAIL'}", flush=True)
         print(f"  BASELINE unsteered score(A) - score(B): {base.mean():+.3f} "
               f"+- {base.std(ddof=1) / np.sqrt(len(base)):.3f}  (n={len(base)})", flush=True)
         print(f"  retention {retention:.3f}  (noise floor {1.0 / np.sqrt(n_docs):.3f}, "
@@ -318,11 +407,15 @@ def main(tasks: str = "recency", model: str = "Qwen/Qwen2.5-1.5B-Instruct",
          layer: int = -1, k_seg: int = 12, n_docs: int = 200, n_grad: int = 40,
          d_sae: int = 4096, k: int = 8, sae_lr: float = 3e-4, sae_steps: int = 6000,
          batch_win: int = 32, seed: int = 31415, n_base: int = 100,
+         n_gate: int = 0, gate_alphas: str = "0.5,0.25,1.0",
          tag: str = ""):
+    """`gate_alphas` -- the FIRST entry is the matched dose, the one the pass/fail headline
+    is read off; the rest are context on how far the linear regime extends."""
     import json
+    ga = [float(x) for x in gate_alphas.split(",") if x.strip()] if n_gate else []
     r = geometry.remote([t.strip() for t in tasks.split(",")], model, layer, k_seg,
                         n_docs, n_grad, d_sae, k, sae_lr, sae_steps, batch_win, seed,
-                        n_base)
+                        n_base, n_gate, ga)
     outdir = ROOT / "results" / "txc_wins"
     outdir.mkdir(parents=True, exist_ok=True)
     (outdir / f"geometry{tag}.json").write_text(json.dumps(r, indent=2))

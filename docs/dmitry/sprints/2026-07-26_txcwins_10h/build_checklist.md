@@ -51,6 +51,17 @@ reasoning.
    it appeared in a figure script, and it appeared in a red-team pass *of the document describing
    it*. Print `sign(argmax|Δ|)` per arm next to every reported number; if it is not constant across
    arms, signed indexing is silently comparing different things.
+0c. **Verify a multiset match on a key that is actually unique — and check the permutation it
+   implies is a permutation.** A match test can pass on the wrong key while the permutation it
+   implies is nonsense. Measured on the lost-in-the-middle data: **2505 of 2655 items contain
+   duplicate document titles** (several Wikipedia passages from one article), so keying on `title`
+   alone makes `sorted(titles) == sorted(titles)` true in both a correct and a broken construction,
+   while `titles.index(t)` silently matches the wrong document and yields 3–7 cycles at Hamming
+   5–10 instead of the true 1 cycle at Hamming 10. Key on the full content — `(title, text)` gives
+   zero duplicates here — and then **assert the derived index array is a genuine permutation**
+   (`sorted(perm) == range(k)`). Repeated indices are the tell, and they are the only thing that
+   distinguishes the broken version from the correct one. This is the same shape as the borrowed
+   baseline: the test ran, passed, and was measuring a different object.
 1. **Score a contrast, never an absolute.** The metric must be the teacher-forced margin between
    the target and its multiset-matched foil, not accuracy on one member of the pair. Few-shot ICL
    has a published constant intervention — writing a **function vector** — that raises absolute

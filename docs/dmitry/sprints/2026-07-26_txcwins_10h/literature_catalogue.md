@@ -323,6 +323,79 @@ this catalogue, which is why the `c` claim above was weakened after `evidence` w
 | ❌ not defensible | "The method handles temporal structure." |
 | line drawn by | With positions randomised per document the crosscoder retains 10% of its effect while the difference-of-means reference retains 67% — a fixed write still does the job and the crosscoder fails to find it. |
 
+### Registered predictions: the DC-handle analysis tested as a predictor
+
+Written **before any of these screens ran**, which is the only thing that makes it a registration.
+The DC-handle reasoning in this catalogue has been used all night to rank candidates and has never
+been evaluated as a predictor. These six entries have verified public data and a screen that costs
+about two minutes each, so for the first time the ranking can be scored.
+
+**Scoring rule, fixed in advance so it cannot be moved afterwards.** Primary metric is **Kendall τ
+between the predicted ordinal band and the measured gradient `c`**, across however many entries
+land; predicted sign positive. Secondary is per-entry hit/miss against the stated band. It is
+deliberately **not** a threshold rule — `c` was established tonight to have a known inversion
+(`evidence` wins at 0.136) and an ambiguous region near 0.13, so a hit-rate against a cut would be
+scoring the instrument against a property it does not have.
+
+| # | task | predicted band | mechanism the prediction rests on |
+| --- | --- | --- | --- |
+| 1 | Retrieved-document position | **low, 0.03–0.05** | identical documents in both conditions; metric is a difference of differences, so a constant "boost the gold answer" write cancels. The known handles are positional priors over slots, which a constant write cannot express |
+| 2 | Multi-turn escalation | **med-low, 0.05–0.12** | accumulated permissiveness is a broadcastable mode, but against a contrast between two orderings of the *same* turns a constant "comply more" write cancels — **revised from the catalogue's original "medium"**, see below |
+| 6 | Tool-call ordering | **low-med** | fixing a dependency order requires promoting one call early *and* another late, so a constant "prefer call X" write is wrong at the other slot |
+| 3 | LLM-judge position bias | **high, >0.15** | the verdict is a **label token**, so token bias gives a constant write direct grip — the mechanism that made MCQ option order a predicted negative |
+| 4 | Sycophancy | **high** | agreeableness is a broadcastable mode *and* there is no ordering contrast to cancel it, since the stored data has no permutation structure |
+| 5 | Sandbagging attractor | **high, >0.20** | content-invariance measured at `r = 0.9994` is definitionally a constant-in-content quantity |
+
+**Entry 5 carries a scale caveat that changes which claim it supports.** The attractor was measured
+in 7–8B models; everything screened here is Qwen2.5-1.5B L14. Screening it at 1.5B tests whether
+*our* model has the attractor, **not** whether the screen recovers the published finding. Only a
+model in the 7–8B range tests the latter, and the write-up must say which of the two it did.
+
+**What each failure pattern would mean**, stated now rather than rationalised later:
+
+- **Low predictions come out high** → the DC-handle analysis is missing a class of constant handle,
+  and the "contrast metric cancels the mode" argument — which entry 2's revision depends on
+  entirely — is wrong.
+- **High predictions come out low** → the mode arguments are wrong in gradient terms; a
+  broadcastable mode does not produce a large constant-subspace share, and every "X is a mode so
+  expect high `c`" judgement in this catalogue is unsupported.
+- **Misses concentrate on entry 2** → the revision was the error, and the original "medium" was
+  right. Entry 2 is the one prediction produced by the framework correcting its own earlier
+  application, so it carries more weight per observation than the others.
+- **τ is positive but weak (< 0.3)** → the ranking is directionally right and too coarse to select
+  tasks with, which would make the catalogue a filter rather than an instrument.
+
+**The axis this analysis does not model at all: retention.** Flagged after the first screen landed
+and before the rest, so it is registered rather than retrofitted. LitM measures
+`c` = 0.045–0.069 — close to the predicted 0.03–0.05 band — **and shared-write retention at only
+1.8–2.1× its noise floor**, against StruQ's 10–13×. A task can pass both `c` and `r1` and still be
+unsteerable, because those two statistics describe the *mean* optimal write while retention
+describes whether the **per-document** optimal writes agree with each other. Nothing in the
+DC-handle reasoning addresses that: every argument in this catalogue is about what a constant or
+rank-1 write can express **on average**, and none of them notices that a task can have a
+well-shaped average write which no single fixed slab reproduces per document. **So the scoreboard
+should report `c` accuracy and retention separately, and a good τ on `c` paired with uniformly low
+retention would mean the analysis predicts the right thing about the wrong quantity.**
+
+**First result, scored honestly.** LitM predicted "low, 0.03–0.05", measured 0.045–0.069. Ordinally
+correct — it is the low band and nothing else screened lower — but the measured range extends
+above the predicted one, so it is a **hit on rank and a slight under-prediction on magnitude**.
+Recorded as such rather than as a clean hit.
+
+**A refuted side-prediction, recorded because it was mine.** I proposed the Liu et al. U-shape as a
+free external calibration, then weakened it on discovering the first-versus-last asymmetry was not
+verifiable. **Both forms failed.** Measured unsteered gaps at n = 200: `0v9` = +1.21 (z 4.5),
+`0v4` = +1.20 (z 4.8), `4v9` = **+0.01 (z 0.1)**. Positions 4 and 9 do not differ at all — the
+pattern is **primacy, not a U-shape**, and there is no middle trough in this metric. Either a 1.5B
+does not exhibit the published shape, or `logP(gold) − logP(distractor)` is not accuracy and the
+two need not share a positional profile; these are not separable here. **The entry must therefore
+be framed as "a primacy task built from Liu's data", not "Liu's task".** The calibration failed and
+did its job — it caught a task-setup mismatch before any dictionary was trained on it.
+
+**Worth writing up either way.** A negative here is more useful than a negative on any single task:
+it would say that the qualitative screen used to rank twenty behaviours does not predict the
+quantitative one, which bears on every recommendation in this document.
+
 ### Predicted `c` per entry, and the calibration that is now available
 
 Main's request: make the rankings falsifiable rather than editorial by predicting `c` — the
