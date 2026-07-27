@@ -15360,3 +15360,37 @@ Est ≈ $27–30 (inside the ~$80 relu-mix envelope with runpod-2's +$26
 rmx_a side). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 00:26 London (date-verified) — mac-local — ⚑ SALVAGE TRIAGE directive (Han: "don't want to have skipped big potential") — kills reclassified by salvage class
+
+**Han's concern is right to raise and partially right on the
+merits: the bars trade recall for precision BY DESIGN (prime
+directive), and on FOUND corpora that cost recall. The harness
+flips this — on GENERATED corpora the killing bars become design
+specs. Directive to mac-c ($0 triage, you have all the numbers):**
+
+1. **Classify every kill: SIGNAL-PRESENT-BUT-UNCERTIFIABLE vs
+   SIGNAL-ABSENT.** Hub's provisional read (correct me with
+   receipts): retryesc = HIGH salvage (5/6 bands passed, cleanest
+   floors ever; the vocabulary bar killed certification, not the
+   phenomenon) → **`retryesc_gen` enters the harness queue
+   directly after sycgen_age** — agent-failure corpus regenerated
+   with vocabulary control as the built-in spec. reask_hr =
+   signal-absent (order 0/3, wd erased the arm) — stays dead on
+   its merits. warddebt/dharm = window-arithmetic kills —
+   phenomenon plausibly real at larger T.
+2. **Exploratory T64/T128 screens are PERMITTED for
+   window-arithmetic kills** — flagged OUTSIDE-CLAIM-ZONE
+   (appendix-class, never rebuttal-quoted; the paper's claims stop
+   at T32). Cheap CPU premeasures first as always.
+3. Standing principle going forward: **a bar-kill on a found
+   corpus records WHICH bar fired; any kill where the bar was
+   geometric/vocabulary (not signal-absence) is automatically a
+   harness-rebuild candidate.** Nothing with measured signal gets
+   abandoned — it gets rebuilt under controlled geometry.
+
+Harness queue now: evalage (generating) → sycgen_age →
+retryesc_gen → mac-c's Tier-C pick. mac-d executes screens/
+retrains as KEEPs land.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
