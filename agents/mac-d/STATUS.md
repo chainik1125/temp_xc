@@ -1,4 +1,12 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, rewritten 23:5x 07-27)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 00:4x 07-28)
+
+## ⚑ WARM-HELD POD (0da616bca visibility rule — purpose stated here)
+**`mac-d-retrain-0728` = pod `jge1fuj9hqu8et`**, 2×H100 SXM secure,
+$5.98/h, RUNNING since 00:39 07-28 under Han's pre-provisioning
+order (per-agent $10/h WAIVED for hunt lanes; ceilings = $500
+aggregate + $300 generation). **Purpose: first hunt-KEEP matrix
+retrain starts the HOUR the verdict posts.** Terminate when the
+LANE is done, not between stages. Bring-up state: see Mission 1b.
 
 **You are `mac-d`** — a local mac agent whose job is DYNAMIC POD
 EXECUTION under Dmitry's RunPod API key. You spin up pods, run
@@ -42,24 +50,23 @@ mac-d addendum; stood up c50f7af3e; Mission 1 repointed 6452030b0).
   pre-repoint mission's name+timing — superseded on the record
   (my 23:53 LOG entry).
 
-## Mission 1a (CLAIMED 00:35 07-28 per f0ac106e4 item 2): evalage EXECUTION end-to-end
-**Claim (provisional — mac-c owns arbitration; a reassignment line
-swaps me instantly, no churn): mac-d executes `evalage` end-to-end**
-— generation launch under mac-c's frozen card + §9 amendment
-(canonical backend a0646af0d; my parallel uncommitted backend patch
-was DISCARDED on their push — single-source rule), then premeasures
-/receipts, then screen. Rationale: evalage is the ONLY ready card;
-this split frees mac-c for the sycgen_age scaffold (work only they
-can do) — the order's halved-wall-clock intent. Execution
-disclosures: model `claude-haiku-4-5` (card §9 silent on model id —
-executor default, realism-only per §9; one-line overrule), stream
-tokenizer gpt2 (backend default), n-docs/seed = card defaults,
-est $25–45 of the shared $300 generation envelope (GENERATION
-ledger line at launch), corpus npz + receipt COMMITTED as
-artifact-of-record (API corpus is not bit-reproducible, §9).
-Stand-down trigger: mac-c's own launch/ledger line lands first ⇒ I
-take premeasures+screen half instead. First KEEP ⇒ my matrix
-retrain within the hour (pre-authorized, f0ac106e4 item 3).
+## Mission 1a — RESOLVED BY STAND-DOWN (00:40): evalage generation = mac-c's
+Their RUNNING line (a266eeb76) landed during my smoke — my claim's
+pre-stated trigger fired, zero churn. My 2-doc smoke (~$0.02,
+ledgered, artifacts deleted) validated the same canonical backend
+they run. Residual: I support evalage premeasures/screen if asked, and my
+**corpus-card request stands with mac-c's arbitration** (sycgen_age
+or retryesc_gen — I drive generation from this mac the moment a
+card exists; 0da616bca repeats this assignment).
+
+## Mission 1b (ACTIVE NOW): warm-hold bring-up of mac-d-retrain-0728
+Per 0da616bca: repo at current origin pin (re-pin at card), tokens
+(gh + hf×2; NO Modal/Anthropic), substrate caches synced, runner
+smoke-tested against a committed cell. Then HOLD WARM — the first
+KEEP's matrix retrain (7-T × 3 seeds × shuffle × both-arms
+certificate) starts the HOUR the verdict posts (pre-authorized,
+f0ac106e4 item 3). Bring-up state: pod RUNNING (00:39); ssh/tokens/
+bootstrap in flight — next lines update here.
 
 ## Mission 1 (RE-ARMED by e585d665b FULL THROTTLE): harness-KEEP executor
 Original trigger died 23:55 07-27 (reask_hr KILL 3/3 4c231e149 +

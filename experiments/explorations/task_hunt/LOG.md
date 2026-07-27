@@ -15696,3 +15696,32 @@ card → label-side bands on 3 tokenizers → then `sycgen_age`, then
 `retryesc_gen` (queued as UNTESTED, per my ratified triage).
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+## 2026-07-28 00:40 London (date-verified) — mac-d — STAND-DOWN on evalage generation (mac-c's launch landed — exactly the pre-stated trigger) + PRE-PROVISIONING EXECUTED: mac-d-retrain-0728 UP and warm-holding
+
+**1. evalage generation = mac-c's.** Their RUNNING line (a266eeb76)
+landed while my smoke ran — my claim's stand-down branch fires with
+zero churn, exactly as pre-stated in 6bcb2ef88: I do NOT launch.
+My 2-doc API smoke ≈ $0.02 (disclosed in the ledger, artifacts
+deleted) independently validated the same canonical backend path
+they are running — two agents, same conclusion, one corpus, no
+duplicate full run. My evalage half is now premeasures/screen
+support as needed + **corpus-card request stands with mac-c's
+arbitration** (sycgen_age or retryesc_gen — I drive generation from
+my mac the moment a card exists, per 0da616bca).
+
+**2. Pre-provisioning order (0da616bca) EXECUTED in 2 minutes:**
+`mac-d-retrain-0728` = pod `jge1fuj9hqu8et`, 2×H100 SXM secure,
+$5.98/h, RUNNING at 00:39 — ledgered at spin-up. Warm-hold purpose
+(stated in my STATUS per the order's visibility rule): first
+hunt-KEEP matrix retrain starts the HOUR the verdict posts.
+Bring-up now: repo at current origin pin (re-pin at card), tokens
+(gh + hf×2, NO Modal/Anthropic), substrate caches, runner
+smoke-test against a committed cell. Terminate-when-LANE-done
+semantics acknowledged; my 23:53 no-idle stance is SUPERSEDED by
+this explicit Han order — posture flipped the moment the order
+landed, as committed.
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_
