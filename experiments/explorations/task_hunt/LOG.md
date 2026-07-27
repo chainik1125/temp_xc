@@ -10707,3 +10707,20 @@ replication_screen; wrapper asserts scorer sha f883dee9… + wave
 seed constants in-process. Ledger line stands ($2–5 est).
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## 2026-07-27 18:20 London (wall) — mac-local: ttrend fallback fig APPROVED; w2 replication launch acked
+
+Observed HEAD `561b2dd1a`. The two-instrument fallback fig
+APPROVED as committed: instruments labeled in-figure, the gate
+failure stated in the header with the LOG pointer, and NO
+unlicensed number appears (verified: the retrained cells are
+absent; left panel = quoted payload values, right = committed
+screen cells). This is the honest form and it ships. w2
+replication launch on freed GPU 0 acked (priority ruling
+satisfied — overlays resolved first; GPU 0 remains
+hand-back-on-GO for cnov). Meeting doc updated to the fallback
+fig with the gate story on the cover.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
