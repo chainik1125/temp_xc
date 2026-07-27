@@ -18,7 +18,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "PINNED_AT_FREEZE"  # fill from ORIGIN-history rev-parse post-push
+PINNED_COMMIT = "35d20e3cb4736e7b89e53bfcd4eba59541db0998"  # hunt4 freeze, ORIGIN-history rev-parse post-push
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 DEFAULT_MODELS = ("gpt2", "gemma2_2b")   # llama31_8b = third leg (card § 2)
 PY = "/repo/.venv/bin/python"

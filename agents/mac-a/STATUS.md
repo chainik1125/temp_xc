@@ -1,64 +1,56 @@
 # Working state — agent `mac-a`
 
-**2026-07-27 ~05:00 London — cnov panel LAUNCH-PREP COMPLETE
-(1348a661a; ~04:55 LOG): both datasources registered+validated,
-runner/scorer/driver staged (PICK_PENDING guards), card freeze-ready
-with the A/B table + T16-only claiming (ruling f9319e59a) + mac-b's
-S4 bars. At the pick: one DS line → freeze → pin → ledger → launch.
-Earlier overnight: § 1 COMPLETE + RATIFIED (36d3175ac: cnov
-panel-gate candidate + draft card staged; nvtrend breadth; chaz KILL
-by its own control; tempo/qres $0 kills — 4 designed, 3 killed by
-pre-registered instruments). § 6d DELIVERED + noted (PROBE_V2 freeze
-draft, aa28fab5d). § 6b PARKED with evidence (~04:20 LOG): two
-identical EXTERNAL cancellations mid-screen — flagged for
-Han/mac-local (partial persisted, resumes in one command; no third
-attempt on a drop-on-request item). Overnight actuals ≈ $10.5 of
-≤$30; W1+overnight ≈ $14.5 of $60. Next known events: Han resumes
-NOON; team pick 17:00 (cnov draft card is the mac-a item on that
-agenda).**
+**2026-07-27 ~13:25 London — GEN-4 (59ad15f38 + c1c5c949e rescale
+$200/10h): HUNT4 FROZEN 35d20e3cb, first wave LAUNCHING (gpt2 +
+gemma2_2b, 2× L40S, 5 faces, full-ladder shuffle twins). Slate 7
+designed → 5 screened; xret killed $0 (anti-dup 0.809–0.812 vs
+tret); rdens = separate Ward lane (tokens fetched, llama31 tok,
+chaz-style card next, window-MEAN control binding). Third-leg rule:
+llama31_8b immediately for any face not 2/2-KILL, same driver
+`--models llama31_8b`, same pin. § 6b slen gemma fill COMPLETE
+(resume ran clean, result committed 5851189d9 — scoring is mac-b's
+card machinery). cnov panel UNTOUCHED, 17:00-pick-gated: at the
+pick, one DS line in hunt3/run_cnov_panel.py → freeze → pin →
+merge-script commit → ledger → launch (staged per 1348a661a).
+Idle-watch monitor re-armed post-compact (bmq5qm27h). Spend:
+W1+overnight ≈ $14.5; today's hunt lanes on the $200 envelope
+(slen ~$2 + hunt4 wave-1 est $12–18 on ledger).**
 
-## Overnight delivered (all pushed)
+## In flight
 
-1. **4 candidates designed; 2 killed label-side $0** (ratified
-   858c60a70): tempo (Spearman −0.81…−0.83 vs confirmed ttrend =
-   anti-dup), qres (P(lat=1)=0.84 degenerate + "?"-anchor).
-2. **HUNT3 screens 3/3 models** (freeze 32e316bc4, card approved):
-   **cnov KEEP 3/3 → PANEL-GATE CANDIDATE** (order 2/3 @T32;
-   claiming zone T ≤ 32 held exactly as pre-registered; traps
-   survived by design instruments) + **nvtrend KEEP 3/3 → BREADTH**
-   (order 0/3; pooling-matchable aggregation class).
-   Verdicts mechanical: `hunt3/verdict.py` (existential § 4 per
-   ruling bed236f1d; scorer-before-results now house practice).
-3. **Draft panel card** `hunt3/PANEL_CARD_DRAFT_CNOV.md` (NOT frozen;
-   proposes dial_real_cnov_gpt2_l7 datasource reusing the committed
-   face + ttrend-panel constants, fresh seeds {9,10,11}, S1–S5
-   family, est $4–6).
-4. **chaz** (cue-free correction hazard): triage PASS bundle,
-   2 OOM attempts (20k/class → capped 6k post-triage, disclosed),
-   ward-volume venue fix; relaunch in flight ~02:35.
+- **hunt4 first wave** (freeze 35d20e3cb; Volume /workspace/
+  hunt4_screen; repatriate → hunt4/results/screen_{gpt2,gemma2_2b}
+  .json → `hunt4/verdict.py` → PTR LOG + third-leg decision).
+- **rdens build** (labels from scratchpad ward_stream/token_ids.npy
+  + trace_idx.npy — NOT committed raw; build script + card to
+  come; chaz venue notes apply: ward volume, hs13/base only, cap
+  manifests, window-MEAN g_agg is the kill instrument).
+- Known events: 17:00 team pick (cnov panel = my staged item);
+  window ends ~21:30 London.
+
+## Evidence-line pre-registrations (card § 3, for the verdict read)
+
+tret/tretd/xtrend floor-FREE across ladder; xnov/sdom claim zone
+T ≤ 16; traps disclosed: tret/tretd position 0.98, tretd doc-mean
+0.89, xnov doc-mean 0.82 — instruments = position-matched manifests
++ position-floor arm + BINDING wd arms.
 
 ## Earlier today (closed)
 
-ACTMIX W1: Stage 1 btk-only (canonical), Stage 2 CALIB identity
-verdict + R30 (WRITEUP-applied via §6a package), Stage 3 cancelled
-by af2247d43, thin-pool diag divergence exhibit. ≈$4.
-
-## chaz outcome (closed)
-
-KILL by the window-MEAN control: g +0.046…+0.093 real (the cue-free
-persistent state EXISTS — the conversion-removal design worked) but
-g_agg ≥ g at every T ≥ 8 (−0.001/−0.013/−0.025) → order-free
-pooling-readable ambient direction; breadth datapoint, no panel
-case. sc_lambda's "aggregation bonus" confirmed at one remove.
-Venue: base/hs13 only (no distill cache, no hs11 on ward volume —
-disclosed). chaz actuals ≈ $2.5 over 4 attempts (wrong-volume $0.2 +
-2 OOM + success).
+Overnight: § 1 hunt3 (cnov panel-gate + nvtrend breadth, ratified),
+§ 6d PROBE_V2 draft, § 6b parked→now complete, chaz KILL. W1 ACTMIX
+btk-only + R30 identity (Stage 3 cancelled af2247d43). cnov panel
+launch-prep complete (1348a661a): runner/scorer/driver staged,
+PICK_PENDING guards, card freeze-ready.
 
 ## Assets / recovery
 
-- hunt3: bundles labels/hunt3_dailydialog_*.npz (floors inside),
-  stats, screens + verdict.json, draft card. chaz: labels/chaz.npz
-  (6k/class), CARD, driver scripts/modal_chaz_screen.py (pin
-  81b6d5918), result → ward volume /chaz_screen.
-- Monitors: chaz launch3 (bijas3sdv), idle watch (bxohms0i4).
-- Ledger last line ~$121 program.
+- hunt4: labels/hunt4_* (lib, builder, 3 npz w/ fp16 floors, stats),
+  hunt4/{HUNT4_SCREEN_CARD.md,screen.py,verdict.py}, driver
+  scripts/modal_hunt4_screen.py (pin 35d20e3cb).
+- slen: results/screen_gemma2_2b.json committed 5851189d9.
+- ward_stream fetch (scratchpad): token_ids.npy, trace_idx.npy,
+  meta.json (model NousResearch/Meta-Llama-3.1-8B, 4044×128, 300
+  traces).
+- Monitors: idle watch bmq5qm27h (persistent).
+- Ledger: hunt-lane lines under the c1c5c949e $200 envelope.

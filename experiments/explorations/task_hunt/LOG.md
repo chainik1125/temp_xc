@@ -8982,3 +8982,47 @@ drain ~15:40, or earlier if post-1/2 is cut). Ledger line at
 launch. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+---
+
+## 2026-07-27 ~13:20 London — mac-a: HUNT4 FROZEN + LAUNCHING (gen-4, 59ad15f38 scaled by c1c5c949e)
+
+**Freeze 35d20e3cb** (card + labels + floors + screen + scorer in one
+commit, BEFORE any screen cell; driver pinned from origin-history
+rev-parse this entry's commit). Slate: **7 designed → 5 screen**.
+
+Label-side outcomes ($0, builder `labels/build_hunt4.py`, artifact
+`hunt4_stats.json`, 9 tests green):
+- **xret KILLED $0** at the pre-registered 0.8 anti-dup bar:
+  Spearman vs tret 0.809/0.812/0.800 (gpt2/gemma2/llama31) — the
+  speaker-attribution twist does not decorrelate the trailing rate
+  from its parent; tret carries (simpler construction, stated rule).
+- **rdens → own Ward lane** (substrate ≠ this harness): ward_stream
+  token ids fetched (llama31 tokenizer per base/meta.json); builds
+  during this screen's wall-time behind its own chaz-style card +
+  the window-MEAN control that killed chaz. NOT in this freeze.
+- **Screened five**: xnov (adoption, rate 10.5–11.7%), tret
+  (long-return gap>64, 7.7%), sdom (signed dominance, mass-guard
+  NaNs 7.4–7.8%), xtrend (adoption turn-trend), tretd (return depth,
+  labeled 45–46%). All overlaps under bar (max tret~cnov −0.60/−0.64).
+
+Evidence-line pre-registrations (card § 3): **tret / tretd / xtrend
+floor-FREE across the ladder** (floors ≤0.67 / ≤0.58 / ≈chance — the
+gap>64 construction blinds every window, incl. T64); **xnov + sdom
+claim zone T ≤ 16** (floors 0.78/0.80 at T32). Hot traps disclosed
+with instruments: tret/tretd position 0.98 (mechanical),
+tretd doc-mean 0.89, xnov doc-mean 0.82.
+
+Design per the rescale: gpt2/hs7 + gemma2_2b/hs14 FIRST WAVE (2×
+L40S, launching now, est $12–18), **shuffle twins on the full ladder
+{4,8,16,32}** main + wd, llama31_8b third leg immediately for every
+face not 2/2-KILL (same driver `--models llama31_8b`). Scorer
+`hunt4/verdict.py` committed in the freeze. Verdicts will be PTR.
+
+Also this push: **§ 6b slen gemma fill COMPLETE** (resume #2 per
+c1c5c949e item 5 — resumed the Volume partial, ran clean end-to-end,
+no external cancellation this time; screen_gemma2_2b.json
+repatriated + committed 5851189d9; scoring belongs to mac-b's frozen
+card machinery — flagged for its owner). cnov panel: UNTOUCHED,
+17:00-pick-gated.
+
+_Recorded-by: claude-fable-5 (mac-a)_
