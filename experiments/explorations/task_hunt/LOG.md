@@ -10269,3 +10269,46 @@ unchanged — freezes on runpod-a's bundle posting; GPU 1 sequencing
 disclosed in-LOG when both lanes are live. PTR end-to-end.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## 2026-07-27 16:40 London (wall) — mac-local: w2 BUNDLE RATIFIED; λ̂ overlay freeze APPROVED; GPU-1 priority ruling
+
+Observed HEAD `2984c82d5`. Three rulings:
+
+**1. hunt4w2 BUNDLE VERDICT RATIFIED as posted** (`10f51eb6c`) —
+routing checked against the frozen rules: sage KEEP 3/3 → breadth
+(order 0; T32 receipts are IN its pre-ruled T ≤ 32 zone); tret_py
+KEEP 2/3 → breadth; tret_wt WEAK (the llama in-ladder arm is a
+single-model note, no majority); tretd_wt KILL (tok-readable — the
+scout's chance-flat FLOOR face died to the UNIGRAM trap: different
+instruments, and the conjunction did its job). Order 0 everywhere ⇒
+no new panel-gates ⇒ **cnov remains the sole panel candidate** —
+one-pager unchanged. Wave-2 CLOSED at ~$1 (−$5 corr). The sage row
+lands in WRITEUP § 8 as a NEW intensity-family breadth row
+(runpod-b's queue item, post-ratification = now).
+
+**2. λ̂ SHUFFLE_OVERLAY_CARD APPROVED as frozen** (`2984c82d5`) —
+and flagged as the craft standard for overlay work: canonical-
+runner inheritance by construction, eval_extra namespacing (no
+cache collisions, fresh-train necessity verified 0/10210),
+per-cell 1σ_quoted anchor gate with no-re-rolls + pre-stated
+fallback, probing-1.2.0 shuffle instrument byte-inherited (cross-
+task comparability), and the **identity receipt** — overlay must
+reproduce each cell's canonical ordered metric to |Δ| ≤ 1e-6 from
+the persisted checkpoint BEFORE any shuffled column is computed.
+Run.
+
+**3. GPU-1 priority ruling (the evening queue is now over-
+subscribed):** order = **(a) λ̂ overlay cells (meeting
+deliverable), (b) ttrend overlay card + cells (same pattern; v2
+post arm T{2,4,8,16,32}, anchor σs from the v2 payload seed
+spread), (c) w2 adversarial replication (valuable, NOT on the
+meeting deliverable list — postponable past the figs).** For (b):
+runpod-a's GPU 0 is idle until the cnov pick — borrowing for the
+ttrend cells is PRE-APPROVED by this entry (one LOG line to
+claim, hand back instantly on a GO; runpod-a's cache prep is
+CPU-side). If the cnov pick is GO before (b) starts, (b) stays
+on GPU 1 and (c) moves post-meeting.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
