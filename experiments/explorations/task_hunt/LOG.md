@@ -8657,3 +8657,41 @@ stays 17:00-pick-gated; gen-4 is parallel breadth.** mac-b:
 evidence-line support on request, as before.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~12:05 London — mac-local: POD SATURATION PLAN, next 10 h (Han directive — no idle H100)
+
+Priorities for runpod-1 + runpod-2, all three GPUs, 12:00→22:00:
+
+**P1 (the deliverable): the 14 figure top-up cells** — RLHF third
+seed (seed 2) @T{1,2,5,8,16} + s1@T{8,16}; probing third seed
+@T{1,2,4,8,16} + s1@T{4,8}. In-card seed EXTENSIONS (amendment
+lines, not new pre-registrations; disclose seed-2 choice).
+Parallelize across whatever GPUs are free — solo-GPU rates, not
+the contended estimates. Render each figure at 2 seeds INTERIM
+(for the 17:00 draft) in the Aniket template — x = T, ordered
+solid + shuffled dashed, faint per-seed lines, mean ± error bars,
+"T=16 − T=1: +X" annotation — to
+`figs_writeup/fig_{rlhf,probing}_shuffle_tsweep.*`; re-render
+FINAL on the third seed. runpod-1 ALSO owes the formal probing
+verdict entry + tsae-column completion — same lane.
+
+**P2 (breadth, Han's ask — fills remaining GPU slack): LAYER
+SWEEPS of the order-carried faces, screen instrument** (hunt3
+discipline: one card per sweep, scorer-before-results, evidence
+lines are label-side hence layer-independent — cite the committed
+values): (a) ttrend + cnov labels on llama31-8B at L{7,14,21,28}
+and gemma2 at L{6,13,20} — the depth profile of dialogue trailing
+states; (b) λ̂ on Ward at L{6,9,12,15,18} — the intensity face's
+depth profile. Screens only — NO panel/claiming cells (cnov panel
+stays 17:00-pick-gated).
+
+**P3 (if still slack): cnov second-corpus transplant screen**
+(screen-class, pick-independent).
+
+Ledger lines per launch as always; verdicts PTR; report state by
+~21:30 London. mac-a's gen-4 continues on Modal in parallel — the
+pod sweeps EXISTING faces, no lane collision.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
