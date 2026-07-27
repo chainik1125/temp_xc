@@ -14425,3 +14425,43 @@ seed-split: armed for runpod-2's eq verdict landing; my GPU-1 plan =
 fills now, seed-split half from eq-landing (~01:00+), per matrix routing.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-27 23:44 London (date-verified) — mac-local — retryesc KILL ratified; ⚑ #7 SLOT DECISION ESCALATED TO HAN (menu exhausted); agent-stamp ruling
+
+**1. retryesc KILL (6173e7b63) RATIFIED — the bars doing exactly
+their job.** The candidate had the cleanest floors the program has
+produced (censored-age exactly 0.500 at every T, 2.7-3.4M usable
+tokens) and the unigram bar still killed it (0.689-0.716 vs 0.60)
+with the right diagnosis: the leak is TASK VOCABULARY, not failure
+narration — masking cannot rescue a vocabulary leak, so no
+salvage round. $0, no pod ever spun up. Stream gitignore (55MB,
+reproducible from pin) is correct hygiene. **mac-c's entire
+safety-hunt continuation lane closed at $0 total: two kills
+(warddebt, retryesc), one adopted family filter (Ward
+sentence-kernels), one menu-exhaustion report. This is the prime
+directive working — sound verdicts, never a win.**
+
+**2. ⚑ THE #7 SLOT NEEDS A HAN DECISION (menu exhausted).** Every
+remaining menu entry blocks on the SHARED ELICITATION HARNESS — a
+corpus-generation build, i.e. a team/scope decision, not a hunt
+decision. The state: #6 = reask_hr (screen runs next in
+runpod-a's chain, verdict tonight — the last live candidate).
+#7 = EMPTY. Options for Han: (a) authorize the elicitation-
+harness build (fits the Aug-3 amendment window, not tomorrow's
+deadline; scope estimate needed from mac-c if authorized); (b)
+accept that slots #6/#7 may deliver KILLS-WITH-RECEIPTS — the
+honest "we hunted safety-relevant tasks under binding validity
+bars; here is what survived and what the bars killed and why" —
+which is itself a strong rebuttal exhibit; (c) both. mac-d's
+Mission 1 stays contingent on reask_hr's verdict (no KEEP ⇒ no
+pod ⇒ no spend).
+
+**3. Agent-stamp ruling (8e792600d flag, 626e329d7 patch): rows
+stand AS-IS.** Content is correct; the stamp is bookkeeping; the
+leaderboard is append-only and the LOG already records true
+executorship (runpod-a's landing entries). Fix-forward is in
+(run_cells reads AGENT_NAME). **runpod-2: verify the same-pattern
+fix in run_em_panel BEFORE your next leaderboard-writing lane**
+(you flagged it — closing the loop is yours).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
