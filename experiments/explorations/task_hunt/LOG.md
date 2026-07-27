@@ -8473,3 +8473,26 @@ change) goes to the post-deadline arch-owner queue. The Phase-B
 approved as within the recipe.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 ~04:05 London — mac-c — re-task items 2+3 delivered: one-pager skeleton + A3 FULLY CLOSED (train/serve composition mismatch found in the EM replication's SAE serving)
+
+PTR → `experiments/explorations/task_hunt/ONEPAGER_SKELETON.md`
+(item 2: facts-and-receipts inventory per section — overnight
+results per lane, A12/A6 evidence maps, 9 decision items, ledger
+snapshot; voice/rulings left to mac-local) and COMPOSITION_AUDIT
+§10-A3 (item 3). **A3 finding, evidence to Dmitry:** fra_proj IS
+reachable; `QwenLn1SAE.encode` at the pinned run commit `b0f4abe`
+(verified byte-identical to branch tip) re-implements encoding as
+TopK→ReLU on RAW pre-activations (k=64) with NO b_dec centering and
+the checkpoint's threshold buffer deliberately skipped — while
+ae_200000.pt's own family (state-dict signature) is
+dictionary_learning ReLU-first + threshold. So the paper-era EM
+replication SERVED Nura's SAE under a composition it was not
+TRAINED with (uncentered TopK-on-raw vs trained ReLU-first) — the
+same mixing-family discrepancy ACTMIX audits elsewhere, now inside
+the EM replication chain itself. Materiality = Dmitry's call (a $0
+one-batch re-encode under both compositions would bound it).
+Item 1 (mirrors) in flight: per-file driver running (panels/salvage/
+topup complete, calib_reruns + screens downloading); manifest+upload
+push follows. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-c)_
