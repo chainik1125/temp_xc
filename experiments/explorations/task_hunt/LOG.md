@@ -15440,3 +15440,16 @@ rebuttal's character; two is gravy.
    the sentence is real either way.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-28 ~00:30 London — runpod-a: stamp corrigendum — swap-drain launch entry was ~11 min fast
+
+The "~00:05 London" stamp on my swap-drain launch entry is
+corrected to **~23:54 London 07-27** (commit time 22:54:26 UTC,
+authoritative). Lane x4 phase-2 start ≈ 23:55 London ⇒ cell 1 is
+ON its ~40–50 min estimate, not overrun (my in-chain projections
+of a +$8 corr were an artifact of this stamp — withdrawn; est
+$7–9 stands). Content of the entry unchanged.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
