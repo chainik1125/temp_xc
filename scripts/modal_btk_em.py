@@ -50,7 +50,8 @@ image = (
     )
     .pip_install("huggingface_hub")
     .env({"HF_HOME": "/workspace/hf_cache",
-          "TEMP_BENCH_ALLOW_DIRTY": "1"})
+          "TEMP_BENCH_ALLOW_DIRTY": "1",
+          "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"})
 )
 
 
@@ -128,9 +129,9 @@ open("/tmp/cell_row.json", "w").write(res.row.model_dump_json())
 """
 
 
-@app.function(image=image, gpu="H100", volumes={"/workspace": vol},
-              memory=65536, cpu=8, timeout=6 * 60 * 60,
-              max_containers=3,
+@app.function(image=image, gpu="H200", volumes={"/workspace": vol},
+              memory=65536, cpu=8, timeout=8 * 60 * 60,
+              max_containers=4,
               retries=modal.Retries(max_retries=1, initial_delay=30.0))
 def run_cell(cell: tuple[str, int, int]) -> str:
     arch, T, seed = cell
