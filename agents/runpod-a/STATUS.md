@@ -52,6 +52,53 @@
   tret_py § 8 rows applied 0a73061ef (+ replication-receipt
   one-liners offered by runpod-b, mac-local applies).
 
+## ACTIVE NOW (rewrites older sections above where they conflict)
+
+**1. RM shard 2 RUNNING on GPU 0** (task #4): runpod-1's relu-mix
+probing sweep, PIN `8c231e806`, worktree `rm_pin`, my launch line
+`7ae8e9fd5`. Watcher armed for first trained sae cell — on its
+row landing: `git add results/leaderboard.jsonl
+checkpoints/manifest.jsonl` + commit + pull-rebase + push
+IMMEDIATELY (21:00-real fallback clause). NEVER stash around the
+live-writing runner — commit rows instead. Log
+`/workspace/logs/actmix_rm_gpu2.log`.
+
+**2. Wave-3 zero-pull trio pre-measures** (task #5, directive
+ae1ce5fb0): CPU, in flight. **FROZEN constants (pre-counting):**
+- sycpress (labels/sycpress_lib.py): USER-turn substrings,
+  case-insensitive, apostrophes normalized (’´→'), VERBATIM from
+  github.com/meg-tong/sycophancy-eval @
+  `9a1694221e3639887138f61deae344335eca6752` (2310.13548's own
+  intervention templates; README are_you_sure challenge split
+  into its 2 component sentences — disclosed; example.ipynb
+  feedback prefixes): ("are you sure", "i don't think that's
+  right", "i really like", "i really dislike", "i wrote",
+  "i did not write"). Union stream; per-string census disclosed.
+- reask (wave3_lib.py): user u_i s.t. assistant a_{i-1} fires
+  refmark_lib.is_marker_turn VERBATIM ∧ ∃ user u_{i-2} ∧
+  content-word Jaccard(u_i, u_{i-2}) ≥ 0.3 ∧ both sides ≥ 3
+  content words ([a-z0-9']+ minus frozen in-lib stopword list).
+  EVENT-MASS census FIRST (tretd lesson).
+- Faces: sycpress_rate = punctint sentence_lambda HL 2 / support
+  8 msgs (refmark's kernel); sycpress_age + reask_age = gen4c
+  sage_face VERBATIM over event-message FIRST-token flags
+  (support 64). Eligibility = assistant tokens; event+boundary
+  masked.
+- msdose: constructed from committed gen4c_wikitext103_<tok>.npz
+  (no content re-tokenization; delim "\n###\n" tokenized fresh,
+  disclosed): SEED=0, N_DOCS=400, N_EX~randint(4,25), span
+  len~round(clip(lognormal(ln120, 0.6), 40, 400)), dose_so_far =
+  running boundary count. REPORT Spearman(dose, position)
+  pre-screen + boundary-count/censored-age floors T∈{4..64}.
+- Anti-dup FIRST-CLASS: Spearman vs committed refmark2k rlam
+  (same token grid — assert token_ids identical) + trio pairwise;
+  0.8 bar.
+- Sequence: libs+tests COMMIT (freeze) → run → artifacts+stats →
+  LOG pre-measure entry (PTR) incl. my four § 7 formal $0 kills
+  (sleeper-latch, refusal-redux, prompt-harmfulness, turn-count).
+  Card bars binding: out-of-window-by-construction +
+  clock-stated-first.
+
 ## House-rule cache
 
 Pull-rebase before every push; BOTH LOG blocks on conflict; stray
