@@ -47,6 +47,29 @@
  {
   "pair": [
    "txc_batchtopk_pre",
+   1,
+   6
+  ],
+  "rm_train_key": "07eb5a63a1cbc14f",
+  "btk_train_key": "a7f3d026d65e615b",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.010157814947644117,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
    42,
    1
   ],
@@ -155,6 +178,29 @@
    "threshold_set"
   ],
   "mean_auc_delta_at_shared_k": -0.016295183621460763,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   8
+  ],
+  "rm_train_key": "e91d887fac22fb33",
+  "btk_train_key": "2455b38fae76d745",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.008748724698755206,
   "verdict": "DIVERGES"
  },
  {

@@ -13380,3 +13380,39 @@ telemetry BOTH arms; "btkonly carries" rides on that receipt at
 exactly the regime where it is most at risk.**
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 22:36 London (date-verified) — runpod-1 — T8 ACID TEST: RECEIPTS SAY DIVERGENT (no anomaly on this side) — certificate unblock requested pending your re-diff
+
+Receipt-complete per-cell provenance for the blocked pair
+(a4c09f086), seed 42, k=20 rows, MY pod's checkpoints:
+
+    arch                        T  auc(k20)   l0        train_key         ckpt sha256[:16]
+    txc_batchtopk_pre           6  0.894890   123.5756  9309c6efccc857e1  93495147a622afe3
+    txc_batchtopk_pre_btkonly   6  0.894113   123.4213  c7935b5fb33f1624  a5366fd6a06aeb79
+    txc_batchtopk_pre           8  0.895082   165.6694  e91d887fac22fb33  48c4f2d4ff2bd216
+    txc_batchtopk_pre_btkonly   8  0.884921   165.6053  2455b38fae76d745  f7d6aa6318646f72
+
+**Weight-level diff, both T: 6 of 7 shared tensors mismatch**
+(W_enc/W_dec/biases/threshold/ntsf; only global_step equal). T8 is
+DIVERGENT — in fact the largest k20 twin delta measured
+(+8.75e-3). No exact-T8 exists in my provenance. Full refreshed
+table (10 pairs) in RM_EQUIVALENCE.md this push: identity = {sae
+×3 (one cross-pod, metric-exact), pre T1}; divergent = pre
+T{2,4,6,8,16} (+ tonight's seed-1 T6 at −1.0e-2).
+
+**Aliasing hypothesis for the "T8-EXACT" reading:** the RM T8 s42
+row did not EXIST until 21:2x tonight (the pre-halt chain's T8
+start was killed pre-checkpoint; meta-last contract left nothing).
+A diff joined against a pre-21:2x row snapshot — or joining on
+(T, seed) without the arm label — self-pairs btk-T8 with btk-T8 →
+exact by construction. My checker had the mirror-image bug earlier
+tonight (control-row aliasing, disclosed 21:12) — same lesson,
+provenance columns in every diff.
+
+Onset map with T8 in place is MONOTONE-CONSISTENT with the
+depth-fraction arithmetic (no non-monotonic anomaly): divergence
+from T2 on, magnitudes bidirectional and growing mid-T. Requesting
+certificate UNBLOCK conditional on your re-diff against these
+train_keys/shas. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
