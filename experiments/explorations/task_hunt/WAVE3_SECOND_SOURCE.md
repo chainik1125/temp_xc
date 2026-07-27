@@ -248,3 +248,128 @@ right defensive choice either way. Nothing in the freeze's provenance
 claim is unsupported.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+# ADDENDUM — re-entry packets for the two $0 kills
+
+**Added after the 18:57 ratification** (`c5023d9f3`): `sycpress`
+KILL-as-frozen (35 events / 2k convs, doc-mean 0.995), `msdose`
+KILL-as-constructed (dose↔position ρ 0.962, position AUC 1.0). Both
+verdicts left an explicit re-entry path — a broader **pinned** marker
+list for `sycpress` ("mac-c's second-source may propose one"), and for
+`msdose` "a construction redesign with a measured decorrelation bound".
+This section supplies both. **Re-entry is a fresh pre-count amendment +
+pre-measure, never post-hoc widening** — nothing here is tuned against
+the numbers that produced the kills.
+
+Note first that both kills confirmed pre-stated predictions rather than
+surprising anyone: `msdose`'s ρ 0.962 matches the 0.964 I simulated from
+the frozen plan before the pre-measure ran, and `sycpress`'s doc-mean
+0.995 is the identity trap this review named at `refmark` severity. The
+freeze disclosed its own risks honestly; the risks materialised.
+
+## A. `sycpress` — the fix is not a longer lexicon, it is the licensed mode of the source
+
+**Diagnosis.** The kill is usually read as "too few markers". I think
+that is the wrong lesson, and a longer list will not fix it. The six
+frozen strings are, as **both** `sycpress_lib`'s own docstring and § 2
+above state, **generation templates** — the turns an eval harness
+*sends* to a model. They were then deployed as a **detector** over
+organic WildChat user turns. Real users do not speak in eval-harness
+templates, which is exactly why 2,000 conversations yielded 35 events.
+Scaling within template-space cannot close a gap of that size: even a
+5× larger pinned template set lands around 175 events, still far under
+the wd bar.
+
+**And a broader pinned lexicon is not actually available.** I searched
+the registry for a pinnable *organic* disagreement/pushback lexicon
+(`sycophancy benchmark`, `disagreement detection`, `user pushback
+dialogue`, `multi-turn sycophancy`): every hit is an **eval harness or
+generator** — `meg-tong/sycophancy-eval`, `safety-research/petri`,
+`safety-research/bloom`, `safety-research/A3`, `2604.21564` (persuasion-
+based sycophancy measurement) — not a detection word-list. There is no
+published, pinned organic-disagreement lexicon in Han's collection to
+cite. Inventing one is precisely the move the freeze correctly refused,
+and I am not going to propose it under a different name.
+
+**Re-entry proposal: use the protocol as a generator (its licensed
+use), and move `sycpress` from organic-Tier-A to constructed-Tier-B.**
+2310.13548's `are_you_sure` protocol *manufactures* challenge turns:
+model answers → harness issues the challenge → model responds. Run in
+its intended mode it gives, by construction:
+
+- **100 % event density** (every conversation has a challenge at a known
+  turn) instead of 35 events in 2,000 conversations;
+- **exact event positions** — no substring matching, no register
+  ambiguity, no `"i wrote"` false positives;
+- a **clean construct** — challenge-only, so the face measures pushback
+  as `SAFETY_TASK_MENU` § 4 #1 defines it, with the feedback-biasing
+  prefixes dropped rather than pooled (§ 2's naming problem dissolves);
+- **doc-identity control by design** — all conversations share the
+  scaffold, so 0.995-style doc-mean leakage from task-type disappears.
+
+Costs, stated plainly: it needs generation (an elicitation harness, GPU
+or API), so it is **Tier B/C, not Tier A**; and it buys carriage
+evidence on a constructed substrate, not a deployment claim — the same
+caveat § 4 #4 and § 5 #9 already carry. **This is the same move `msdose`
+needs** (constructed corpus, known event structure), and the same move
+`emoinst` already has a frozen card for. If a wave-3 elicitation harness
+gets built for any one of them, all three become cheaper.
+
+**What I do NOT recommend:** widening the substring list with organic
+synonyms ("no", "that's wrong", "actually", "I disagree"). It would
+raise event mass, and it would be a tuned, unsourced lexicon — the
+provenance argument that makes the frozen list defensible would be gone,
+and the doc-mean 0.995 identity problem would very likely survive it
+anyway, since organic disagreement is also conversation-type-correlated.
+
+## B. `msdose` — construction redesign with the measured bound
+
+**The frozen plan's failure, in the terms the re-entry asks for.** Under
+`MSDOSE_SEED = 0`, dose is collinear with position (within-doc ρ 0.990,
+pooled 0.964, position AUC 1.0 as runpod-a measured). Position matching
+is the only rescue, and under the frozen plan it barely leaves a design
+standing — **only 2 of 31 position strata (128-token wide) contain all
+three global dose terciles with ≥ 50 rows**, i.e. 86.6k usable tokens.
+
+**Recommended redesign: a per-document span scale.** Currently every
+document draws exemplar lengths i.i.d. from the *same* lognormal, so
+documents differ only by sampling noise and the dose↔position map is
+nearly shared across the corpus. Draw the scale per document instead:
+
+```python
+mu_doc = rng.normal(np.log(120.0), 0.7)          # NEW: per-doc scale
+lens   = clip(round(exp(rng.normal(mu_doc, 0.6, size=n_ex))), 40, 400)
+```
+
+**Measured decorrelation bound** (construction-plan simulation only — no
+corpus, no activations, no probe; the real position AUC stays runpod-a's
+measurement):
+
+| construction | pooled ρ | dose variance surviving position match | strata with all 3 terciles ≥ 50 rows | usable tokens |
+|---|---|---|---|---|
+| A — frozen (i.i.d. spans) | 0.964 | 10.9 % | **2 / 31** | 86,568 |
+| **B — per-doc scale, σ_doc = 0.7** | **0.844** | **34.4 %** | **10 / 66** | **397,481** |
+| B′ — per-doc scale, σ_doc = 1.0 | 0.820 | — | 10 / 73 | 382,651 |
+| C — random 0–800 tok preamble | 0.941 | 13.9 % | — | — |
+
+**σ_doc = 0.7 is the recommendation**: 4.6× the position-matched usable
+mass for a one-line change, and σ_doc = 1.0 saturates (no further gain,
+more distortion of the exemplar-length distribution). The instinctive
+fix — a random preamble before the first exemplar — barely helps,
+because a constant offset shifts the step function without changing its
+shape.
+
+**Honest limits.** Even at σ_doc = 0.7 the pooled ρ is 0.844 and only 10
+of 66 strata qualify, so the redesign yields a **narrow** position-matched
+design, not a comfortable one: the card must pre-register the qualifying
+strata and report the realised per-stratum tercile counts. Within-doc ρ
+stays ≈ 0.99 under every variant — that is structural, so the
+position-matched cross-document readout remains the *only* admissible
+one no matter which construction is chosen. If a reviewer wants a
+comfortable margin rather than a narrow one, the honest answer is that
+running dose is intrinsically position-like and the candidate may simply
+not be worth the harness.
+
+_Recorded-by: claude-fable-5 (mac-c)_

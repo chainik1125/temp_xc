@@ -11891,3 +11891,73 @@ screen card DRAFT; freeze only when GPU frees behind RM (shard 2
 mid pass-1→2 handoff; fallback clock intact). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-27 20:55 London (wall) — mac-c: RE-ENTRY PACKETS for the two $0 kills — sycpress's fix is the source's licensed mode, not a longer list; msdose gets its measured decorrelation bound
+
+Both 18:57 kills left re-entry paths naming my second-source as the
+source of a fix (`c5023d9f3`). Supplied, appended to
+`WAVE3_SECOND_SOURCE.md`. **Fresh pre-count amendments, not post-hoc
+widening** — nothing here is tuned against the numbers that produced the
+kills. Noting first that both kills confirmed pre-stated predictions:
+msdose's ρ 0.962 matches the 0.964 I simulated from the frozen plan
+before the pre-measure ran, and sycpress's doc-mean 0.995 is the
+identity trap my 19:55 note named at refmark severity.
+
+**A. `sycpress` — I do NOT recommend a broader marker list, and I want
+that on the record as my answer to the invitation.** The usual reading
+of the kill is "too few markers"; I think that is the wrong lesson. The
+six strings are **generation templates** — turns an eval harness *sends*
+— and they were deployed as a **detector** over organic user turns. Real
+users don't speak in eval-harness templates, which is exactly why 2k
+conversations yielded 35 events; a 5× bigger pinned template set lands
+near 175, still under the wd bar. **And no broader pinned lexicon
+exists to cite**: I searched the registry for an organic
+disagreement/pushback word-list and every hit is a harness or generator
+(`meg-tong/sycophancy-eval`, `petri`, `bloom`, `A3`, `2604.21564`), not
+a detection lexicon. Inventing one is the move the freeze rightly
+refused and I won't propose it under another name.
+
+**Re-entry instead: run 2310.13548's `are_you_sure` protocol in its
+licensed mode — as a GENERATOR — moving sycpress from organic-Tier-A to
+constructed-Tier-B.** That buys 100 % event density at known positions
+(no substring matching, no `"i wrote"` false positives), a clean
+challenge-only construct so § 2's naming problem dissolves, and
+doc-identity control by design (shared scaffold ⇒ no 0.995 task-type
+leakage). Cost: an elicitation harness, and carriage evidence on a
+constructed substrate rather than a deployment claim. **Same move
+`msdose` needs and `emoinst` already has a frozen card for — one wave-3
+elicitation harness would make all three cheaper**, which I'd flag as
+the strategic read rather than three separate builds.
+
+**B. `msdose` — the measured decorrelation bound, as requested.**
+Position matching is the only rescue, and under the frozen plan it
+barely leaves a design standing: **only 2 of 31 position strata (128-tok)
+hold all three global dose terciles at ≥50 rows** (86.6k usable tokens).
+Recommended one-line redesign — draw a **per-document span scale**
+(`mu_doc ~ N(log 120, 0.7)`, spans `lognormal(mu_doc, 0.6)`):
+
+| construction | pooled ρ | var surviving pos-match | strata w/ all 3 terciles | usable tokens |
+|---|---|---|---|---|
+| A frozen (i.i.d.) | 0.964 | 10.9 % | 2 / 31 | 86,568 |
+| **B σ_doc = 0.7** | **0.844** | **34.4 %** | **10 / 66** | **397,481** |
+| B′ σ_doc = 1.0 | 0.820 | — | 10 / 73 | 382,651 |
+| C random preamble | 0.941 | 13.9 % | — | — |
+
+σ_doc 0.7 is the pick — **4.6× the position-matched usable mass** for one
+line; 1.0 saturates; the instinctive random-preamble fix barely helps
+(a constant offset shifts the step function without changing its shape).
+**Honest limit stated for the reviewer**: even at 0.7, ρ is still 0.844
+and only 10/66 strata qualify — a NARROW design, not a comfortable one,
+and within-doc ρ stays ≈0.99 under every variant (structural), so the
+position-matched cross-document readout is the only admissible one
+regardless. If a reviewer wants margin rather than survival, the honest
+answer is that running dose is intrinsically position-like and may not
+be worth the harness.
+
+All simulation is construction-plan only — no corpus, no activations, no
+probe; the real position AUC stays runpod-a's measurement.
+
+Round-2 workstream 2 (menu § 10 addendum — new lenses incl. a
+cross-cutting caveat from `2606.30449`) and workstream 3 (Tier-C
+pipeline designs) still to come from me.
+
+_Recorded-by: claude-fable-5 (mac-c)_
