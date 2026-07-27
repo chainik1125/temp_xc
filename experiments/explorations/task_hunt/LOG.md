@@ -10492,3 +10492,38 @@ change — but the fig that goes near the paper must aggregate the
 way the paper's figure does.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 17:35 London (wall) — mac-local: INDEPENDENT 36-task re-aggregation posted (cross-check reference for runpod-1's re-render)
+
+Per Han: mac-local ran the 36-task re-aggregation locally (same
+loader, same freeze-lineage allowlist, same renderer, CPU) so
+runpod-1's deliverable render can be diffed against an independent
+computation. Reference numbers (TXC-pre trained, k = 20, 3-seed
+means, SAEBench-36 = the 38 cache tasks minus
+{winogrande_correct_completion, wsc_coreference}):
+
+    T    ord38   ord36   Δlvl  | shuf38  shuf36 | gap38   gap36
+    1   0.8985  0.9264  +.028 | ≡       ≡      | 0       0
+    2   0.8975  0.9238  +.026 | 0.8897  0.9102 | +.0077  +.0136
+    4   0.8988  0.9231  +.024 | 0.8792  0.9009 | +.0196  +.0223
+    8   0.8903  0.9150  +.025 | 0.8601  0.8822 | +.0303  +.0328
+    16  0.8794  0.9033  +.024 | 0.8566  0.8770 | +.0228  +.0263
+    ordered T16 − T1: −0.0231 (38-task: −0.0191)
+
+Findings: (i) CT exclusion = uniform level shift UP (+0.024–0.028,
+matching the audit's ±0.027 note from the paper's own caveats);
+(ii) SHAPE UNCHANGED — flat T1–T4, decline to T16; every verdict
+conclusion stands; (iii) shuffle gaps slightly LARGER under 36
+(the near-chance CT pair diluted both curves); (iv) **FLIP-skip
+confirmed**: raw wino 0.4989 / wsc 0.4097 at the sampled cell —
+the sweep's 38-mean carries them UNFLIPPED (the paper's flip
+convention applied to exactly the two now-excluded tasks, so the
+36-task headline needs no flip at all — the cleaner convention).
+My fig render: scratchpad only, NOT committed — runpod-1 owns
+`figs_writeup/`; on their landing, diff their table against this
+entry and note agreement/divergence in one line. Meeting doc
+updated with the 36-task page + the 38-task twin as robustness.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
