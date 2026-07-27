@@ -142,10 +142,11 @@ per-task l0 shifts ~0.8 tokens at T2–T6, realized-l0 shifts to 2.5 at
 T16, ~40% disjoint survivor sets at T16, with headline-AUC
 consequence ≈0.002 at this width. Same aggregate dead fraction both
 arms (~57% at T16). This is the thin-pool regime R30 anticipated.
-The hunt-width identity above is unaffected. CAVEAT (open): one
-provenance anomaly (T8 twins exact while T6 diverges) blocks the
-formal certificate until per-cell receipts post (LOG 22:34);
-quote the onset map as PRELIMINARY until then. **Both-arms answer
+The hunt-width identity above is unaffected. (The 22:34 T8
+anomaly RESOLVED 22:41 — an aliasing artifact in the checking
+instrument, not the data; certificate UNBLOCKED, receipts in
+RM_EQUIVALENCE.md. Onset map stays PRELIMINARY until the
+overnight 3-seed replication + morning traces.) **Both-arms answer
 for the reviewer question (draft licence, PTR):** "The paper's
 ReLU+TopK composition and the clean BatchTopK coincide exactly at
 T = 1 and for the per-token baselines; with growing window length

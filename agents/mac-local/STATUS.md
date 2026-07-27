@@ -17,6 +17,19 @@ narrows to where it is true."
 
 ## CRITICAL OPEN THREAD — RM identity investigation (Han challenged)
 
+**[22:41 CURRENT STATE — supersedes the narrative below]:** onset
+map CORRECTED (runpod-1 21:12 mea culpa — selection fraction grows
+linearly with T): identity = sae×3 + pre-T1 ONLY; divergence from
+T2, growing (T6 −1.6e-2 largest so far; T8 k20 +1.02e-2; T16
+survivor-sets 40% disjoint). My independent per-T diff confirmed
+direction; my "T8-exact" counter-finding was MY instrument's
+aliasing artifact (stale snapshot + duplicate/mislabeled
+leaderboard rows — exclusion list assigned to runpod-1; house
+rule: twin diffs join on train_key provenance). CERTIFICATE
+UNBLOCKED (boundary form), PRELIMINARY until overnight 3-seed +
+morning boundary_min_pre traces. Pack §3 carries the corrected
+both-arms licence (22:40 supersession).
+
 - runpod-1 claimed relu-mix ≡ btk-only TRAINING-IDENTICAL at probing
   sweep configs (bit-identical ckpts, 4/4 equivalence pairs) → I
   approved HALT of remaining RM cells as information-free.
