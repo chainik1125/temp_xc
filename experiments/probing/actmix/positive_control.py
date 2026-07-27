@@ -19,6 +19,7 @@ Run: .venv/bin/python -m experiments.probing.actmix.positive_control
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import torch
@@ -45,7 +46,7 @@ def main():
                       "shuffle_seed": 0, "encode_batch_size": 64,
                       "arm": arm, "smoke": False,
                       "positive_control": True},
-            agent="runpod-1",
+            agent=os.environ.get("AGENT_NAME", "runpod-1"),
         )
         tks[arm] = r.row.train_key
         print(f"[control] {arch} ({arm}) train_key={r.row.train_key} "

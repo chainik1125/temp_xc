@@ -98,7 +98,7 @@ def main():
                 datasource_name=c["datasource"],
                 training_cfg=c["training_cfg"],
                 eval_cfg={},
-                agent="runpod-2",
+                agent=os.environ.get("AGENT_NAME", "runpod-2"),
                 allow_dirty=True,
             )
             wall = time.time() - t0
