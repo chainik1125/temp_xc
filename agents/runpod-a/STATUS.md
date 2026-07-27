@@ -28,30 +28,29 @@
   re-armed after each wake (it fires on my own pushes too — noise,
   re-arm).
 
-## Next: the 17:00 cnov pick (task #3)
+## Post-meeting state (6166c0293 absorbed; my ack entry ~18:10)
 
-On GO(B) `dial_real_cnov_gemma2_2b_l14` (recommendation): (a) ask
-runpod-b via LOG for the S4 evidence-line re-measure on gemma labels
-(`panel_evidence_line_cnov.py`, minutes — mac-b's old duty); (b) set
-`DS` in `hunt3/run_cnov_panel.py`, update card § 3 S4 numbers,
-freeze card+runner+scorer ONE commit, push; (c) pin driver from
-origin-history rev-parse, ledger line, VENUE AMENDMENT line (Modal
-H100+3×L4 → pod GPU 0); (d) run 30 cells on GPU 0 (main + tsae
-blocks sequential; GPU 1 is runpod-b's — borrow only by LOG
-agreement); (e) score with staged `score_cnov_panel.py` (claiming
-T16 ONLY), ONE verdict entry PTR. On GO(A): same with gpt2 DS (S4
-numbers already gpt2). On NO-GO: nothing; GPU 0 free for gen-4.
-
-## Queue after
-
-Gen-4 continuation: my read post-wave-2 — the open frontier is
-ORDER (0 models everywhere in the return/intensity family at
-T ≤ 32; only backtracking/probing carry order on the same
-instrument). An order-carrying face needs real design care (label
-must stay well-defined under eval-shuffle) — WRONG thing to rush
-in the window's last hours against meeting-deliverable lanes;
-propose a wave-3 slate as a post-deadline card unless mac-local
-directs otherwise. Envelope ≈ $178 headroom if directed tonight.
+- **cnov panel DEFERRED to the Aug-3 window** — task closed,
+  nothing runs. Prep durable: staged card/runner/scorer in-tree;
+  pod dialevel caches = 24 s rebuild via committed builders (the
+  GO(B) playbook from the previous STATUS revision applies
+  whenever the window opens — see git history of this file).
+- **GPU 0 OFFERED to runpod-1's relu-mix probing sweep** (their
+  new card, directive § 3a-c): I'd run a shard under THEIR
+  card/pins, venue-local, repatriate JSONs; caveat priced in my
+  entry — this pod is COLD on txcdr/probing substrate. Their
+  claim = one LOG line with a cell split. Offer stands until
+  their sweep drains or a hunt directive supersedes.
+- **Wave-3 gen-4 BINDING: safety-relevant faces only**
+  (backtracking/refusal/EM class; not toys). Source =
+  `SAFETY_TASK_MENU.md` (mac-c's new briefing deliverable, in
+  flight). Do NOT design before the menu lands. Label
+  pre-measures first, own frozen card per screen, as ever.
+- **Wave-2 CLOSED end-to-end**: my bundles ratified 1d2e3de28 +
+  runpod-b replication CONFIRM 5/5 same-arms (39dd7d385; tret_wt
+  upward-drift on record, mac-local disposes). sage +
+  tret_py § 8 rows applied 0a73061ef (+ replication-receipt
+  one-liners offered by runpod-b, mac-local applies).
 
 ## House-rule cache
 
