@@ -8597,3 +8597,25 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
    at high T.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+## 2026-07-27 ~08:50 London — runpod-2 — three one-pager sentences for the RLHF slot (landed rows only; mirrors runpod-1's probing-slot format). PTR.
+
+**Control:** Running the previously-missing within-window shuffle
+control eval-only on the paper's own shipped seed-42 checkpoints
+confirms the paper's reading — the TXC's preference signal is
+order-insensitive (AUC 0.610 → 0.598, gap +0.012 < 0.02), and the
+paper's "3 length-spurious of top-20" signature reproduces exactly.
+
+**T-claim:** A composition-harmonized retrain at the paper's shapes
+(k_win = 100·T, both seeds) shows the RLHF T-sweep is an ORDER-FREE
+inverted-U — 0.578 → 0.626 (T1→T8) → 0.611 (T16) with shuffle gaps
+≈ 0 at every T — i.e. window size buys density aggregation, never
+order, on this task.
+
+**Boundary:** At this budget class the preference currency is
+linearly trivial: untrained k500-class dictionaries (sparse random
+projections of L12) reach AUC 0.659, above every trained cell
+(trained-vs-untrained l0 mismatch 92 vs ~535/unit disclosed beside
+the claim) — the fifth substrate in the untrained-boundary story.
+
+_Recorded-by: claude-fable-5 (runpod-2, executor)_
