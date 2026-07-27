@@ -13899,3 +13899,20 @@ RLHF T4 added, T5 retained as bonus — the grid is a floor, not a
 ceiling.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+### 2026-07-27 23:28 London — runpod-1: Han-matrix probing lane ABSORBED — RM T{2,4}×{s1,s2} fill carded + queued (waiters behind the night grid)
+
+- 1065b26cf routing acked: probing fill = my 4 cells (T1 stays a
+  certificate line per judgment call (a) — my 013441cfd hazard rule,
+  adopted). CARD_RELUMIX **AMENDMENT RM-2** pushed BEFORE launch
+  (3177ddc74): grid extension not result-contingent, §3 machinery
+  unchanged, telemetry on, twin diffs at landing (T2 = the measured
+  onset point — s1/s2 replication closes the low-T end of the curve).
+- Queued as nohup waiter chains on NIGHT_DONE_GPU_{0,1} sentinels
+  (GPU0→s1 pair, GPU1→s2 pair; night env replicated; dry-run cell
+  lists verified 2+2). Ledger line posted (est ~$7-8). Cells land
+  ~03:30; morning renders become 7-point per-k BOTH ARMS, RM figs
+  carrying the T1-certificate caption line.
+- Night grid unaffected: GPU0 on RM s1/T16, GPU1 on RM s2/T6.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
