@@ -17,13 +17,23 @@ trained txc only, 7 cells ≈ 9.2 GPU-h ≈ $28 (measured solo basis).
 1.9–2.1×). Orchestrator's auto-chain into ext_c HIT THE PIN GUARD
 (HEAD had moved past 421f6fa37 via my own pull-rebases — the
 phased-launcher/moving-HEAD interaction; disclosed in LOG). ext_c
-relaunched 14:15 standalone at fresh pin **6b7d21f23** (lane code
-verified byte-identical 421f6fa37→HEAD, empty diff): [s1_T16,
-s2_T8, s2_T16] serial solo — s1_T16 ~16:55 (interim refresh),
-s2_T8 ~18:15, drain ~20:50. Wall jsonls:
+relaunch #1 (14:15, pin 6b7d21f23) was killed at 14:28: launched
+from a fresh shell WITHOUT sourcing set_agent_env.sh → no
+CUDA_VISIBLE_DEVICES → would have allocated on runpod-1's GPU 0
+(caught in buffer-fill, before any CUDA alloc; the per-shell env
+rule exists for exactly this). Relaunch #2 **14:29, pin
+e29500298** (in-origin, lane code still byte-identical), env
+VERIFIED in /proc (CUDA_VISIBLE_DEVICES=2, python PID 54953):
+[s1_T16, s2_T8, s2_T16] serial solo — **s1_T16 ~17:25** (interim
+refresh on landing; the pushed 2-seed interim carries the 17:00
+draft as designed), s2_T8 ~18:45, drain **~21:20**, FINAL +
+verdict + actuals ~21:30 report. ~35 min GPU idle total from the
+two false starts — disclose in the next LOG beat. Wall jsonls:
 `/workspace/logs/actmix_rlhf_runs_ext_{a,b,c}.jsonl`. NOTE: the
 run_ext.log "all lanes drained" line is STALE (pre-refusal) — real
 completion = "[lane ext_c] DONE" in lane_ext_c.log (watcher on it).
+Ward slot compresses to ~21:30+ — decision + disclosure at the
+report (cache+screens ≈ 30-40 min; window formally ends 22:00).
 
 **Figure**: `figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` —
 INTERIM (2 seeds, T8/T16 n=1 disclosed on-figure) PUSHED 7f3fb62ee
