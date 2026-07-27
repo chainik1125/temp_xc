@@ -170,7 +170,9 @@ pile up — each fires once on the next push; check
 PTY-only piped-stdin (`-tt`, stty -echo for secrets, grep -av 2004
 filter). Pods: old=j42plcul70a2es-64410eb7, A=0lmrs9lk8apyhm-644121b8,
 B(runpod-c)=l2bp61kg82epel-64411fb1, all @ssh.runpod.io -i
-~/.ssh/id_ed25519.
+~/.ssh/id_ed25519. NB repo path on pod B is
+`/workspace/agents/runpod-c/temp_xc` (NOT /workspace/temp_xc —
+liveness-checked 20:25 07-27, both GPUs busy w/ L1 twins).
 
 ## IMMEDIATE NEXT ACTIONS (post-compact checklist)
 

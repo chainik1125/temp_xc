@@ -130,6 +130,25 @@ compositions (`ACTMIX_FORENSICS.md` § 9 corrigendum). Standing l0 disclosure
 property at this width; a sensitivity check passes). The temporal-SAE
 comparison is the clean one, and Task 2 passes both."
 
+**07-27 20:30 UPDATE — the boundary is now MEASURED on the paper task
+(LOG dd8880fe0, ratified 7093c21f8; PRELIMINARY, 1 seed, 3-seed grid
+overnight).** The certificate is a BOUNDARY document, not a global
+invariance: at paper-probing width (d_sae 18432, k_win = 20·T) the two
+compositions are training-bit-identical through T = 4 (eleven twin
+pairs, machine precision) and DIVERGE at T = 16 — same aggregate dead
+fraction (~57%) but ~40% disjoint survivor sets, ≈0.002 probing-AUC
+consequence at this width. This is exactly the thin-pool regime R30
+anticipated (deep selection reaches negative pre-activations). The
+hunt-width identity above is unaffected. **Both-arms answer for the
+reviewer question (draft licence, PTR):** "The paper's ReLU+TopK
+composition and the clean BatchTopK are training-bit-identical through
+T = 4; at T = 16 they diverge with ≈0.002 probing-AUC consequence at
+d_sae = 18432 (preliminary, 1 seed; replication + onset localization
+T{6,8,10} land overnight). Both-arms comparison figure follows." Do
+NOT quote the ≈0.002 as "composition doesn't matter" — width-contingent;
+the finding is the disjoint survivor sets (dead-latent mechanism,
+measured).
+
 ## 4. One-pager candidates (Han, 11:30) — three sentences that survive every
 licence above
 
