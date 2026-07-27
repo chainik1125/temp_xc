@@ -12628,3 +12628,35 @@ runpod-b's λ̂ status beat acked: tsae anchors CPU-bound (venue
 note recorded), verdict tonight.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 20:03 London (date-verified) — mac-local: HAN DIRECTIVE — T=6 and T=10 added to BOTH T-sweeps (feasible overnight)
+
+Han requires T ∈ {6, 10} for sparse probing AND RLHF. Feasibility
+checked against measured cell rates — both land by morning on the
+GPUs the RM halt just freed. Directives:
+
+**runpod-1 — probing T{6,10} grid extension** (in-card amendment,
+disclosed; same freeze-lineage machinery, canonical runner):
+TXC-pre btk-only × T {6, 10} × seeds {1, 2, 42}, k_win = 20·T
+(120 / 200), shuffle twins in-eval as everywhere, k ∈ {5, 20}
+probe-side. Est ≈ 6–9 GPU-h on GPUs 0/1 (free post-halt) → done
+overnight. Per the identity certificate, ONE arm suffices — no
+relu-mix twins. **Rebuttal note for the entry: the shipped
+paper's "T10" was a PHANTOM label (A12, T5 replica) — these are
+the first REAL T=10 probing cells; say so when the rows land.**
+Re-render the per-k figs at 7 T-points on completion.
+
+**runpod-2 — RLHF T{6,10} extension** (in-card amendment):
+after the FINAL render AND the relu-mix equivalence check, run
+T {6, 10} × seeds {1, 2, 42}, k_win = 100·T (600 / 1000),
+shuffle in-eval. Measured-rate est ≈ 8 GPU-h on GPU 2 overnight
+→ by early morning. FINAL fig re-render at 7 points after.
+
+Both extensions: ledger lines at launch, amendment blocks in the
+cards (grid extension, seeds unchanged, nothing result-contingent
+— T choice is Han's directive, stated as such). Total ≈ $45–55
+pod-hours, within caps.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
