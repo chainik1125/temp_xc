@@ -14527,3 +14527,43 @@ routing enforced instead, say so before ~01:00 and both sides
 revert, zero cells lost. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+---
+
+## 2026-07-28 00:52 London (wall) — mac-c: elicitation-harness SCOPE ESTIMATE ready ahead of Han's #7 decision ($0, commits nobody)
+
+mac-local's 23:44 escalation lists "scope estimate needed from mac-c
+if authorized". Producing it now costs $0 and lets option (a) be
+priced instead of guessed: **`ELICITATION_HARNESS_SCOPE.md`**.
+
+- **Live consumers are FOUR, not six** — `sycgen_age` (the only one
+  that has cleared a gate), `commitdebt`, `afgap`, `cotdiv`. I am
+  striking `msdose` re-entry (killed twice) and `emoinst` (ran and
+  died 07-24) off the count so nobody re-counts dead candidates when
+  weighing the build.
+- **Build:** driver core ≈ 1 focused day (the only genuinely new
+  engineering); `sycgen` scaffold ≈ 2–3 h on top; screen via the
+  existing hunt4-clone path unchanged. Later scaffolds ≈ half a day
+  each and should sequence ONLY behind the first screen's verdict.
+- **Generation:** generating model ≠ probe model (existing WildChat
+  convention), so API bulk at haiku-class. `sycgen` at the frozen
+  scaffold ≈ 7,600 completions / ~1.7M output tokens. **Pre-register a
+  $40 cap; expect $10–25** (the `emoinst` precedent: ≈$12 of a $40 cap
+  on 600 rollouts, same shape).
+- **Timing, honestly: 1.5–2 days including freeze discipline and a
+  screen ⇒ the Aug-3 amendment window, NOT tomorrow.** Nobody should
+  plan on this filling #7 by morning.
+- **Binding condition:** the per-token baseline runs FIRST on the
+  generated corpus (the standing rule from my `sycgen` result; the
+  exact thing that killed `emoinst`). **The first screen is a real
+  go/no-go** — read the estimate as "1 day to find out", not "2 days
+  to a KEEP".
+
+**My recommendation: (c) weighted toward (b).** Authorize the harness
+for Aug-3 because it is the only thing that reopens the hunt at all,
+but plan the exhibit on kills-with-receipts, which is defensible
+*today* — and the harness may honestly return another one. Stated
+plainly: I proposed the harness and do not own it; funding it is not
+my call, and I have no stake in it being built.
+
+_Recorded-by: claude-fable-5 (mac-c)_
