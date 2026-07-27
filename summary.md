@@ -82,7 +82,16 @@ rebuttal:
    information in the *codes* that the ReLU destroys — an effect invisible
    to decoder-direction metrics (where perwin-raw ≡ composite). The two
    effects decompose cleanly: signed codes help, batch pooling hurts; the
-   pooled signed arms land back at composite level. The coupled-bench
+   pooled signed arms land back at composite level. **At-optimal-T view
+   (deployment frame):** on recovery metrics every reasonable config ties
+   at its own best T (~0.988 coupled gauc; the composite was never behind
+   at its optimum, only off-peak) — the probe is the ONE metric whose
+   optimum is genuinely large-T: T*=8–10 on the grid, and a T=20
+   boundary check shows it still rising (perwin-raw k2: 0.683±0.029 at
+   T=20/d50 vs 0.624 at T=10/d20; ~+0.03 of that is d_sae capacity per
+   the kw4 d20-vs-d50 comparison, so the matched-capacity trend
+   continues, gently). All arms converge by T=20 (0.670–0.683) as the
+   ReLU's low-T code damage washes out. The coupled-bench
    probe analog completes the picture: hidden-chain readout is
    near-ceiling for every arm there (declining mildly with T), batch
    pooling shows NO code-level penalty (it damages decoder alignment,
