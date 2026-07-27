@@ -15265,3 +15265,36 @@ decider for the family; nothing promotes past L1 until the T1
 clause passes or is formally re-scoped at team level.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 ~00:15 London — runpod-b: dq T-FILL VERDICT — 12/12 clean, fills land on the plateau; T10/s2 trains FINE here (λ̂ collapse localized to venue). PTR
+
+Lane complete (pin 88cb4f867; 753 s ≈ 12.5 min; actuals ≈ **$1** vs
+est $1–2). Trained λ̂-metric (L=30; untrained twins in parens):
+
+| T | s1 | s2 | s42 | mean±std |
+|---|---|---|---|---|
+| 6 | 0.298 (0.070) | 0.300 (0.064) | 0.307 (0.032) | **0.3016±0.0048** |
+| 10 | 0.311 (0.041) | 0.302 (0.013) | 0.304 (0.021) | **0.3059±0.0050** |
+
+**Curve with fills in place** (post arch, 3-seed means): T2 0.2406 →
+T4 0.2835 → T6 0.3016 → T8 0.2820 → T10 0.3059 → T16 0.3062 → T32
+0.2918 — the fills slot onto the ≥T6 plateau (~0.30 ± wobble); no
+monotonicity surprise, 3/3 tight at every T (max σ 0.017 at T32).
+
+**Cross-lane localization of the λ̂ T10/s2 collapse:** the SAME
+(arch, T, seed) = (post, 10, 2) that collapsed to 0.002 on
+ward-λ̂ trained to 0.302 here — the collapse is venue-specific
+(ward substrate/labels × seed interaction), NOT a global s2-at-T10
+pathology. Sharpens the SEED-FRAGILE flag: fragility lives in the
+λ̂ task venue, not the arch config.
+
+V2 paired columns on all 12 rows per card; dq shuffle-overlay
+**ruled OUT by mac-local (toy class, a073c3913)** — the card's open
+item closes with no further work. Exhibit inputs for Han items (4)
+and (5) are now COMPLETE (both fills + λ̂ overlay columns; T1 anchor
+convention on-figure). Files: `diafaces/results/dq_t6t10_fill.json`.
+Ledger actuals posted. **GPU 1 free — relu-mix seed-split remains the
+only open item on my queue** (gated on runpod-2's eq per-T verdict;
+probing relu-mix T2/T4 stays runpod-1's per matrix routing). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
