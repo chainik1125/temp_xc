@@ -12660,3 +12660,61 @@ cards (grid extension, seeds unchanged, nothing result-contingent
 pod-hours, within caps.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 20:28 London (wall) — mac-c: `dharm` KILLED $0 on all 3 faces × 3 tokenizers — the ONE approved pull dies on DOCUMENT LENGTH; both my pre-registered predictions confirmed; a substrate bar I owe the menu
+
+Han cleared the gate ~20:15. Pull clean (4,641 chains / 33,994
+subtasks, **zero** funnel losses, 2,320 crossings); pre-measure run at
+`9ea8c3b8e`. **Schema amendment was pushed BEFORE the run** — the HF
+README is wrong (column is `decomposition`, encoded **differently per
+modality**; `harm_index` is **1-BASED**; `id` is **not unique**), and
+the split is now **grouped by id with the shipped splits discarded**
+because **764 ids span the shipped train/val/test**. Faces, traps,
+bands and kill rule were untouched by that amendment.
+
+**The clock kills it — reported first, as the binding bar requires:**
+**18.2 tok/subtask, 7.3 subtasks/chain, 155.6 tokens per DOCUMENT**,
+21.2 tokens between boundaries, and **3 position strata in the entire
+corpus**. A trailing-state benchmark needs documents long enough to
+have a trailing state; ~156 tokens is barely two T=64 windows.
+
+| face | unigram | position | doc-mean | why it died |
+|---|---|---|---|---|
+| `dharm_thage` | 0.820 | 0.235 | **0.993** | identity at `sycpress` severity (0.995) |
+| `dharm_dose` | 0.712 | **0.993** | 0.750 | position probe, ρ 0.900 |
+| `dharm_bage` | **0.883** | 0.577 | 0.671 | floor-solved, censored-age floor **1.000 at T ≥ 8** |
+
+**Both pre-registered predictions confirmed** (recorded before access):
+dose dies on position; bage is a boundary detector — at 18-token
+subtasks the boundary is always in-window, so the floor computes the
+face exactly. The § 0 risk landed too: **1,219 of 2,320 crossings
+(52.5%) sit at the FINAL subtask**. And the **unigram gate alone would
+have killed all three** (0.712–0.883 vs the 0.60 bar) — putting the
+cheapest killer first in trap order was right.
+
+**The lesson I owe the menu.** § 8 called `dharm` "the one pull worth
+taking"; the safety story genuinely is the best on the menu, which is
+what made it seductive. **I never checked document length.** Proposed
+standing bar, the clock applied one level up where it was missing:
+*before recommending any corpus pull, measure tokens-per-document
+against the T values we screen — a substrate whose documents are
+shorter than a few windows cannot carry a trailing state, whatever its
+labels say.* My § 8 inventory ranked substrates by availability and
+label quality, never by length. Cost of the gap: one gate request and
+**$0 of compute** — the pre-measure discipline working as designed.
+
+**Gate terms handled conservatively:** the corpus `.gz` carries gated
+prompt text and is **NOT committed** (gitignored, with the reason
+in-file); committed instead are the receipt (funnel/counts/pinned
+revision/first-doc sha256, no prompt text) and the pre-measure JSON
+(canary embedded). The canary-vs-committed-streams ruling is therefore
+**moot for this artifact** — still live for any future gated pull.
+
+**Lane now fully closed:** `msdose_r1` killed, `sycgen` ratified
+single-face (awaiting a generation decision that is not mine),
+`dharm` killed. Three candidates resolved for **$0 total**, no pod ever
+spun up.
+
+_Recorded-by: claude-fable-5 (mac-c)_

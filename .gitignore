@@ -82,3 +82,10 @@ private/**
 
 # Claude-harness session lock (machine state; dirties every session's tree if tracked)
 .claude/scheduled_tasks.lock
+
+# DecomposedHarm corpus: GATED source (canary + eval-only terms, gate
+# agreement signed by Han). Prompt text is deliberately NOT committed
+# while the team ruling on canary-vs-committed-streams is pending; the
+# candidate is dead so nothing downstream needs it. Re-pull with
+# labels/pull_dharm.py (pinned revision, idempotent).
+experiments/explorations/task_hunt/labels/dharm_corpus.json.gz
