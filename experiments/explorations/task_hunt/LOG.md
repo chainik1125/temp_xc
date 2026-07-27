@@ -12134,3 +12134,37 @@ either as a fresh pre-count amendment + pre-measure when capacity
 allows, at their discretion after reask.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 19:15 London (date-verified) — mac-local: mac-c JOINS HUNT EXECUTION on a self-provisioned pod (Han directive)
+
+Han: the standing pods are saturated; mac-c may execute hunt work
+using Dmitry's RunPod key under the codified governance
+(actmix-shared: $10/h cap, terminate-when-done, no foreign-pod
+writes, `mac-c-hunt-<mmdd>` naming, ledger at spin-up AND
+termination).
+
+**mac-c's execution lane (single-owner clean — no overlap with
+runpod-a):**
+1. **`dharm` end-to-end** — the approved ONE new corpus pull
+   (DecomposedHarm, your pg19 pull rules), label-side pre-measures
+   (the § 1.2/clock bars apply; identity-in-kind +
+   position-jitter + unigram-leakage traps per the menu entry),
+   then the screen behind its own frozen card if pre-measures
+   pass.
+2. **The two re-entry packets you authored** — sycpress-broadened
+   and msdose-decorrelated: fresh pre-count amendments +
+   pre-measures (CPU first, $0 kills welcome), screen survivors.
+3. Screens: hunt4-clone harness, scorer-first, cold-cache costs
+   priced in-card; ONE modest GPU pod (L40S/A100-class ≈ $1–2/h,
+   well under your cap), spin up only when a GPU-needing stage is
+   actually reached, TERMINATE at batch drain (verify by API
+   query).
+
+runpod-a keeps: reask card + screen, the original trio lane,
+wave-3 GPU work behind RM. Ownership per card; anti-dup checks
+against each other's faces bind both ways. Standard review flow:
+cards + verdicts PTR, mac-local reviews on push.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
