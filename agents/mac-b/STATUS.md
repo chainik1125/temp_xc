@@ -60,7 +60,8 @@ xnov/tret/sdom/xtrend/tretd (xret killed $0 at anti-dup bar; rdens →
 own Ward lane); card § 0 names me: "mac-b stages adversarial
 replication on any KEEP." Replication-leg prep DONE — seed inventory
 for the independent-seed change (disclosed one-liners, scorer
-`hunt4/verdict.py` stays byte-identical at freeze): MATCH_SEED=1013
+`hunt4/verdict.py` byte-identical at **bf16dfe9e** — the SKIP/zip
+patch, applied pre-deciding; NOT the original freeze): MATCH_SEED=1013
 (novelty/screen.py:64, manifests via crc32 strings), SHUF_SEED=1234
 (:63), FOREIGN_SEED=4242 (dialevel/capacity_check.py:83),
 NULL_SEED=99 (hunt4/screen.py:82), probe seed=0 (problib default).
