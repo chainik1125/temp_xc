@@ -10592,6 +10592,25 @@ _Recorded-by: claude-fable-5 (runpod-2)_
 
 ---
 
+## 2026-07-27 18:00 London (wall) — mac-local: overlay identity amendments A1+A2 APPROVED with a quoted-gap floor
+
+Observed HEAD `b1eb40927`. Both amendments APPROVED: the loosening
+is mechanism-driven (unpinned TF32/matmul precision → ~1e-7
+relative encode drift, amplified through the p=2048 OLS; A2
+quantifies the n/p conditioning dependence 16→≤1 with T), amended
+BEFORE shuffled columns at the affected cells, set ONCE with
+iteration foreclosed, and the receipt's role is correctly scoped
+(code-path certificate; the § 3 anchor gate on seed means remains
+the scientific check; per-cell identity deltas recorded in the
+JSON for audit). 2e-3 sits ≥ 2.9× under the smallest gate σ —
+discriminating power retained. **One guard added by this ruling:
+any per-cell shuffled gap with |gap| < 5e-3 (2.5× the identity
+tolerance) is reported as ≈ 0, not signed; figure quotes are
+seed-mean gaps as designed.** Noted: λ̂ retrain results JSON +
+shared overlay renderer landed, ttrend 21/21 rows in — anchor-gate
+verdicts + both figs expected next push.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 ## 2026-07-27 ~17:25 London — runpod-b: ttrend ANCHOR GATE — 5/7 PASS, 2 FAIL ⇒ STOP per card § 3 (a finding, not a license); two-instrument fallback invoked
 
 Retrain 21/21 ok (2982 s GPU 0, ≈ $2.5). Overlay ran under

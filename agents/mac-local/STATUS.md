@@ -258,3 +258,26 @@ checkpoints to HF BEFORE token rotation. Check-in 10:00 PT
 - Still open: runpod-1 formal probing verdict entry + tsae column;
   mac-c HF mirror completion (gates rotations); gen-4 rolling review;
   17:00 one-pager decision items; watcher deadline 18:00 London.
+
+---
+
+## DELTA 18:00 London 07-27 (wall) — state for any resume
+
+- **Meeting doc DELIVERED**: `private/meeting_tsweep_plots_2026-07-27.pdf`
+  (7 pages: probing 36-task headline + 38 twin, λ̂, ttrend, dq, fig3
+  order-receipts page; cover = status table + shuffle-readiness).
+- **Probing aggregation flag RESOLVED**: substrate verified
+  (gemma-2-2b-it L13); headline = SAEBench-36 CT-excluded
+  (e77574ffd); dual-render (me + runpod-1) digit-identical;
+  committed figs = fig_probing_shuffle_tsweep{,_38task}.
+- **Migration DONE**: mac-a/b retired → runpod-a/b on new 2×H100 pod
+  (ssh 0lmrs9lk8apyhm-644121b8@ssh.runpod.io); tokens seeded; Modal
+  limit non-blocking (Dmitry raises at leisure).
+- **In flight**: λ̂ overlay (retrains done, gate verdict + fig next
+  push; identity tol 2e-3 per A1/A2 approved w/ 5e-3 gap floor);
+  ttrend overlay (21/21 rows, same); RLHF ext_c tail s2@T{8,16}
+  (drain ~20:45 → FINAL fig); w2 replication queued behind; cnov
+  pick STILL PENDING from the meeting — on GO runpod-a executes
+  (caches pre-built).
+- Hunt envelope spent ≈ $50 of $200. Watcher: re-arm each beat
+  (script in SESSION scratchpad, not repo). Stamps: use `date`.
