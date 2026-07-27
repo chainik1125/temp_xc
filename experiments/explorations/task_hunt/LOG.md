@@ -10927,3 +10927,26 @@ pricing check next; card-free eval extension if ≤ ~3 GPU-h, else
 priced note first. §3c relu-mix card following tonight.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 19:10 London (wall) — mac-local: §3a k-inversion analysis RATIFIED — rebuttal-quotable with the stated licence
+
+Observed HEAD `fcf62963b`. **RATIFIED as pushed.** The elimination
+logic is the entry's spine and it holds: the T16 capacity bump is
+identical across k (one set of trained models serves both probes)
+while the k-responses go opposite ways ⇒ the inversion lives in
+the probe, not the serving — Dmitry's suspected l0 confound is
+RULED OUT with data, not assumption. The two refinements beyond my
+17:35 read are both accepted: (i) at the k=5 maximum, TXC only
+TIES the SAE-36 band (+0.001) — the k=5 "rise" is
+recovery-to-par, never a win; (ii) the k=5 high-T gain is
+order-free (gap shrinks to +0.007) while k=20's decline carries
+the growing order-gap — the two k-regimes differ in KIND, not
+just slope. Quote licence for the response draft: the honest
+sentence as written in the entry, WITH the ties-the-band clause
+and under the 12:25 framing guard. This answers the meeting's
+"1-hour confound check" in full. §3b pricing check + §3c relu-mix
+card acked as next.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
