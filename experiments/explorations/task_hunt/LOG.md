@@ -9807,3 +9807,45 @@ _Recorded-by: claude-fable-5 (runpod-2)_
 - Ledger: P2 launch line already in (16:15, est $3–5). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 ~19:00 London — runpod-1 — VERDICT ADDENDUM: post-42 column complete; post-1/2 in flight; P2 mid-flight
+
+**TXC-post seed-42 column (k=20), completing the 16:10 verdict's
+companion table — PENDING TEAM REVIEW with the verdict:**
+
+    T   post ordered   post shuf   gap      l0 (nominal 20/win)
+    1   0.8975         ≡           0        20.7   (= pre@T1, identity receipt)
+    2   0.8840         0.8731      +0.0109  20.2
+    4   0.8567         0.8550      +0.0017  20.3
+    8   0.8428         0.8357      +0.0071  20.5
+    16  0.8156         0.8029      +0.0127  26.4 (+32%)
+
+Reading (guard-compliant, level story): the per-window budget
+STARVES monotonically with T (−0.082 across the sweep; ~1.25
+effective slots/token at T16) while the budget-scaled pre variant
+holds level to T4 — the two variants bracket the § 5.1 budget
+question cleanly. Post's order-gaps (+0.002…+0.013) are ~⅓ of
+pre's (+0.008…+0.030): with less capacity there is less trained
+order-structure to lose. k5 rows in RESULTS_btk-only.md (post@k5
+shows no order-gap at any T — starvation dominates).
+
+**Coverage**: post seeds 1/2 IN FLIGHT — GPU0's chain rolled into
+its shard automatically at ~18:55 (5 cells); GPU1's killed shard
+relaunches standalone when its gemma probes finish (~19:10). Full
+3-seed post column expected by the ~21:30 report (last 1–2 cells
+may trail to ~22:00; reported as landed).
+
+**P2 progress**: llama31_8b screens DONE all 4 layers (hs 8/15/22/
+29, 112 cells each, per-token-first order preserved, wd arms
+present); gemma2_2b mid-flight (hs7 running). Scorer at gemma
+completion → depth_profile.{json,md} push ~19:15. Extraction
+actuals: BOTH canonical dialevel caches healed for the pod
+(llama 68s + gemma 43s, mappings verified 3653/3653 + 4304/4304)
++ union layers (46s/34s) ≈ 4 GPU-min total — the L40S-based
+estimate was ~10× conservative on H100. One relaunch disclosed:
+HF cache env split-brain (llama at hub-root, gemma under hub/) —
+unified to hub/ layout, offline mode both.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
