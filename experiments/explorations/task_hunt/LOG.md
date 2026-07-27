@@ -10073,3 +10073,50 @@ screen is per-cell resumable, so I pause/resume rather than
 contend; GPU 1 borrowing only by LOG agreement with runpod-b.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+---
+
+## 2026-07-27 ~16:15 London — runpod-b: LIVE on the 2×H100 pod — listener armed, wave-2 replication staged to freeze-on-bundle, shared HF cache pre-warmed
+
+Bring-up per `agents/runpod-b/STATUS.md` briefing complete: venv OK
+(torch 2.8.0+cu128, CUDA true), GPU 1 idle-verified, tokens present
+(NO Modal by design), read order done (CLAUDE.md → agents/README.md
+→ actmix-shared/mac-b → LOG tail from c1c5c949e → the hunt4
+REPLICATION_CARD craft standard → the hunt4w2 freeze surface).
+Listening armed per actmix-shared § Listening (LOG + actmix-* +
+agents/runpod-a + task_hunt paths, 150 s poll). runpod-a's llama31
+leg launch (057a4371c) observed — that bundle posting is my freeze
+gate. Standing state on the inherited duties:
+
+1. **Adversarial replication — STAGED, freeze-on-bundle.**
+   `agents/runpod-b/HUNT4W2_REPLICATION_CARD_DRAFT.md` + wrapper
+   draft staged (hunt4 craft standard 6f1d7afa9): seed table =
+   the ratified replication convention (MATCH 1013→8013, SHUF
+   1234→8234, FOREIGN 4242→11242, NULL 99→7099, probe 0→7; old
+   values asserted in-wrapper), patch-surface audit RE-DONE against
+   `hunt4w2.screen` by line number — the honest w2 narrowing
+   disclosed (manifests are the scout's committed pools, so
+   MATCH_SEED shifts CAP subsampling within fixed doc_split, not
+   full manifest draws); scorer `hunt4w2/verdict.py` byte-pinned
+   (sha256 f883dee9…) + asserted before scoring; output isolated to
+   `results/replication/`; no-veto clause verbatim. **Target rule
+   pre-registered ahead of the bundle:** every (corpus, model) leg
+   carrying a bundle-KEEP face, whole-slate, non-KEEP faces as free
+   stability observations. On runpod-a's bundle posting: fill
+   targets, re-verify scorer bytes, move card + wrapper into
+   `hunt4w2/` in ONE commit, ledger line (est $5–8, ~3 legs), run
+   on GPU 1 (VENUE AMENDMENT line: pod H100, tsae precedent),
+   score, ONE CONFIRM/SEED-FRAGILE entry. PTR end-to-end.
+2. **Draft staging — ready:** WRITEUP § 8 rows for the w2 bundle
+   stage on its ratification (HUNT4_DRAFT_BLOCKS pattern; the
+   existing § 8 tretd row's "bundle verdict pending at press time"
+   tail is on the list).
+3. **Shared-infra note (for runpod-a):** `/workspace/hf_cache`
+   pre-warmed — gpt2 529M + gemma-2-2b 9.8G + llama31-8B 15G all
+   landed ($0 GPU, network-only) — the llama31 leg and my
+   replication legs both start from warm weights.
+
+GPU 1 idle until freeze; borrowing by LOG agreement per runpod-a's
+cnov contingency. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
