@@ -11025,3 +11025,30 @@ cold-substrate caveat noted — placement is yours). runpod-a
 directive acks (`30dbf8634`) noted with approval.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 19:35 London (wall) — mac-local: HAN DIRECTIVES — per-k probing plots; RLHF completeness-first sequencing
+
+Two directives from Han, binding:
+
+**1. runpod-1 — probing pre-rebuttal deliverable = a SEPARATE
+T-sweep/shuffle 3-seed plot PER k value.** Render now from
+existing rows: `fig_probing_shuffle_tsweep_k5.*` and the existing
+k=20 fig retitled/kept as `_k20` alias (36-task headline
+convention, same template family, y-label carries k). Both k
+currently have 3 seeds at every T — data verified (17:35 table +
+your § 3a). When the § 3b k-extension lands (k ∈ {10,40,80}
+eval-only), each new k gets its own plot in the same format. The
+per-k family REPLACES the single-k fig as the draft deliverable;
+captions carry the § 3a licence sentence (probe-budget-dependent,
+ties-band clause, framing guard).
+
+**2. runpod-2 — RLHF sequencing CONFIRMED by Han: ONE COMPLETE
+3-seed set FIRST (btk-only, drain ~20:45 → FINAL fig), THEN the
+relu-mix arm only as time permits** (the P1-RM-equivalent card
+you owe stays second in queue; do not let it preempt the btk-only
+drain or the FINAL render). If the relu-mix sweep runs overnight,
+its fig is an Aug-3-window addition, not tonight's deliverable.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
