@@ -6,6 +6,8 @@ Same cell spec as scripts/modal_btk_em.py (canonical em training cfg).
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
 import sys
 
 from temp_bench.core.runner import run_experiment
@@ -26,6 +28,12 @@ def main() -> None:
         eval_cfg={}, agent="dmitry-btk-sprint", allow_dirty=True,
     )
     print("[cell done]", res.eval_key, json.dumps(res.row.metrics), flush=True)
+    output = os.environ.get("TEMP_BENCH_EM_CELL_OUTPUT")
+    if output:
+        destination = Path(output)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(res.row.model_dump_json(indent=2))
+        print(f"[cell result] {destination}", flush=True)
 
 
 if __name__ == "__main__":
