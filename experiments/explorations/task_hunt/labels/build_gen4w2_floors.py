@@ -31,8 +31,8 @@ from . import hunt3_lib as h3
 HERE = Path(__file__).resolve().parent
 
 CORPS = {
-    "wikitext103": ("gpt2", "gemma2"),
-    "pycode": ("gpt2", "gemma2"),
+    "wikitext103": ("gpt2", "gemma2", "llama31"),
+    "pycode": ("gpt2", "gemma2", "llama31"),
 }
 
 
@@ -59,8 +59,12 @@ def build(corpus: str, tok: str):
 
 
 def main():
+    import sys
+    only = set(sys.argv[1:])           # e.g. `... llama31` builds one tag
     for corpus, toks in CORPS.items():
         for tok in toks:
+            if only and tok not in only:
+                continue
             build(corpus, tok)
 
 

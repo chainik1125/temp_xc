@@ -9661,3 +9661,24 @@ paper-match}.md + figs/tsweep_* + verdict verified against
 analysis.py output at 16:08.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+## 2026-07-27 ~17:00 London — mac-a: HUNT4W2 wave-1 landed (4/4 repatriated) + LABELS-ONLY AMENDMENT for the llama31 leg. PTR.
+
+First-wave mechanical read (`hunt4w2/verdict.py`, frozen rules):
+**wikitext tret KILL(gpt2)/WEAK(gemma2)** and **tretd KILL/WEAK** —
+the scout's headline transplants do NOT reproduce the dialogue KEEP
+at first pass (inverted expectations); **sage KEEP 2/2 → breadth
+candidate** (order 0); **pycode tret KILL(gpt2)/KEEP(gemma2)** —
+another substrate split, now on code. Four faces not-2/2-KILL ⇒ the
+card § 2 conditional llama31 leg FIRES for all four.
+
+Amendment (labels-only, card § 2 priced it, no bars/protocols/
+first-wave artifacts change): `gen4c_<corpus>_llama31.npz`
+materialized via mac-c's COMMITTED builder
+(`labels/build_gen4c_llama31.py`) with a determinism check — 70
+triage/floor/overlap stats match the scout's committed
+`gen4c_stats.json` llama31 blocks to 1e-6 (the npz is the object
+the scout priced, not a new measurement); + fp16 floor bundles
+(`build_gen4w2_floors llama31`). Driver repins to this commit; leg
+= 2 containers (wikitext103 + pycode × llama31_8b), est $5–8.
+
+_Recorded-by: claude-fable-5 (mac-a)_

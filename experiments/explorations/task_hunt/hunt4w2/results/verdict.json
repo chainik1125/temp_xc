@@ -1,0 +1,294 @@
+{
+ "card": "HUNT4W2_SCREEN_CARD.md \u00a7 4 (mechanical, hunt4 rules)",
+ "status": "PENDING TEAM REVIEW",
+ "corpora": {
+  "wikitext103": {
+   "models": {
+    "gpt2": {
+     "tret": {
+      "tok_best": 0.4382,
+      "window_best": 0.4569,
+      "window_best_arm": "T8/actxmean_mlp",
+      "gain": 0.0187,
+      "exists_qualifying_arm": false,
+      "null_win": 0.3422222137451172,
+      "null_ok": true,
+      "floor_at_best_T": 0.36311110854148865,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.6671666502952576,
+       "best": 0.7114999890327454,
+       "best_arm": "T32/actxmean_mlp",
+       "gain": 0.0443,
+       "order_margins": {
+        "T4": 0.0073,
+        "T8": 0.0145,
+        "T16": -0.0032,
+        "T32": 0.0097
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [
+       "tok_within_002"
+      ],
+      "order_pass_wd": false,
+      "verdict": "KILL"
+     },
+     "tretd": {
+      "tok_best": 0.4071,
+      "window_best": 0.4069,
+      "window_best_arm": "T32/win_mlp",
+      "gain": -0.0002,
+      "exists_qualifying_arm": false,
+      "null_win": 0.335999995470047,
+      "null_ok": true,
+      "floor_at_best_T": 0.33666667342185974,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.6038333177566528,
+       "best": 0.6448333263397217,
+       "best_arm": "T64/actxmean_mlp",
+       "gain": 0.041,
+       "order_margins": {
+        "T4": -0.0038,
+        "T8": 0.0037,
+        "T16": 0.0115,
+        "T32": 0.01
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [
+       "tok_within_002"
+      ],
+      "order_pass_wd": false,
+      "verdict": "KILL"
+     },
+     "sage": {
+      "tok_best": 0.5176,
+      "window_best": 0.6227,
+      "window_best_arm": "T64/actxmean_mlp",
+      "gain": 0.1051,
+      "exists_qualifying_arm": true,
+      "null_win": 0.3346666693687439,
+      "null_ok": true,
+      "floor_at_best_T": 0.492000013589859,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.7723333239555359,
+       "best": 0.8823333382606506,
+       "best_arm": "T64/actxmean_mlp",
+       "gain": 0.11,
+       "order_margins": {
+        "T4": 0.003,
+        "T8": -0.0005,
+        "T16": 0.011,
+        "T32": 0.0043
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "KEEP"
+     }
+    },
+    "gemma2_2b": {
+     "tret": {
+      "tok_best": 0.4298,
+      "window_best": 0.4689,
+      "window_best_arm": "T32/win_mlp",
+      "gain": 0.0391,
+      "exists_qualifying_arm": false,
+      "null_win": 0.3275555670261383,
+      "null_ok": true,
+      "floor_at_best_T": 0.4082222282886505,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.7098333239555359,
+       "best": 0.7578333020210266,
+       "best_arm": "T16/actxmean_mlp",
+       "gain": 0.048,
+       "order_margins": {
+        "T4": 0.008,
+        "T8": -0.008,
+        "T16": 0.0007,
+        "T32": -0.0035
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "WEAK"
+     },
+     "tretd": {
+      "tok_best": 0.3782,
+      "window_best": 0.4022,
+      "window_best_arm": "T32/win_mlp",
+      "gain": 0.024,
+      "exists_qualifying_arm": false,
+      "null_win": 0.3253333270549774,
+      "null_ok": true,
+      "floor_at_best_T": 0.33533334732055664,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.6241666674613953,
+       "best": 0.6725000143051147,
+       "best_arm": "T64/actxmean_mlp",
+       "gain": 0.0483,
+       "order_margins": {
+        "T4": 0.0097,
+        "T8": -0.0043,
+        "T16": 0.0017,
+        "T32": 0.0035
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "WEAK"
+     },
+     "sage": {
+      "tok_best": 0.5278,
+      "window_best": 0.6204,
+      "window_best_arm": "T64/actxmean_mlp",
+      "gain": 0.0927,
+      "exists_qualifying_arm": true,
+      "null_win": 0.33799999952316284,
+      "null_ok": true,
+      "floor_at_best_T": 0.4902222156524658,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.8219999670982361,
+       "best": 0.8918333053588867,
+       "best_arm": "T64/actxmean_mlp",
+       "gain": 0.0698,
+       "order_margins": {
+        "T4": 0.0,
+        "T8": -0.0045,
+        "T16": 0.0038,
+        "T32": -0.0063
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "KEEP"
+     }
+    },
+    "llama31_8b": "MISSING"
+   },
+   "bundle": {
+    "tret": {
+     "verdicts": {
+      "gpt2": "KILL",
+      "gemma2_2b": "WEAK"
+     },
+     "bundle_verdict": "PENDING-THIRD-LEG",
+     "order_pass_models": 0,
+     "table": "\u2014"
+    },
+    "tretd": {
+     "verdicts": {
+      "gpt2": "KILL",
+      "gemma2_2b": "WEAK"
+     },
+     "bundle_verdict": "PENDING-THIRD-LEG",
+     "order_pass_models": 0,
+     "table": "\u2014"
+    },
+    "sage": {
+     "verdicts": {
+      "gpt2": "KEEP",
+      "gemma2_2b": "KEEP"
+     },
+     "bundle_verdict": "KEEP",
+     "order_pass_models": 0,
+     "table": "breadth"
+    }
+   }
+  },
+  "pycode": {
+   "models": {
+    "gpt2": {
+     "tret": {
+      "tok_best": 0.5398,
+      "window_best": 0.5553,
+      "window_best_arm": "T32/actxmean_mlp",
+      "gain": 0.0156,
+      "exists_qualifying_arm": false,
+      "null_win": 0.30177778005599976,
+      "null_ok": true,
+      "floor_at_best_T": 0.4842222332954407,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.7316666841506958,
+       "best": 0.7854999899864197,
+       "best_arm": "T32/actxmean_mlp",
+       "gain": 0.0538,
+       "order_margins": {
+        "T4": -0.0115,
+        "T8": 0.0002,
+        "T16": 0.0137,
+        "T32": 0.0127
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [
+       "tok_within_002"
+      ],
+      "order_pass_wd": false,
+      "verdict": "KILL"
+     }
+    },
+    "gemma2_2b": {
+     "tret": {
+      "tok_best": 0.4969,
+      "window_best": 0.551,
+      "window_best_arm": "T32/win_mlp",
+      "gain": 0.054,
+      "exists_qualifying_arm": true,
+      "null_win": 0.3271428644657135,
+      "null_ok": true,
+      "floor_at_best_T": 0.5030952095985413,
+      "floor_ok": true,
+      "wd": {
+       "present": true,
+       "tok": 0.7278333306312561,
+       "best": 0.7901666760444641,
+       "best_arm": "T16/actxmean_mlp",
+       "gain": 0.0623,
+       "order_margins": {
+        "T4": -0.0045,
+        "T8": -0.0018,
+        "T16": 0.002,
+        "T32": 0.0082
+       }
+      },
+      "wd_ok": true,
+      "kill_clauses": [],
+      "order_pass_wd": false,
+      "verdict": "KEEP"
+     }
+    },
+    "llama31_8b": "MISSING"
+   },
+   "bundle": {
+    "tret": {
+     "verdicts": {
+      "gpt2": "KILL",
+      "gemma2_2b": "KEEP"
+     },
+     "bundle_verdict": "PENDING-THIRD-LEG",
+     "order_pass_models": 0,
+     "table": "\u2014"
+    }
+   }
+  }
+ }
+}
