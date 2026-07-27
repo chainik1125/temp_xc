@@ -239,6 +239,19 @@ only; the spec lists TSAE as parenthetical-optional, and the
 paper-match arm's TSAE (trained, shipped ckpts) is complete. tsae
 trained twins queue post-deadline behind the serving fix.
 
+## 7d. AMENDMENT 2b (2026-07-27 ~08:05 London): tsae trained cells RESTORED at the em-redo serving convention
+
+runpod-2's LOG data point (36df9ffb6): `consumes='sequence'` cells at
+**batch_size = 32 sequences** (the em-redo convention) run 18–20 min
+on these shapes — the 43 h pathology was the 4096-sequence batch, not
+the arch. tsae_btkonly trained cells re-enter tonight's queue at
+batch=32-seq (3 seeds, ~1 GPU-h, after the Phase-B extension drains).
+Disclosure: the tsae arm's optimizer batch (32 contrastive pairs/step)
+differs from the SAE arm's (4096 tokens/step) — a serving-convention
+asymmetry inherited from the arch's pair-sampling design and the
+em-redo precedent, disclosed in the table caption exactly like
+Amendment 1's units note. n_steps 20k, lr, eval protocol unchanged.
+
 ## 8. Budget (RUNPOD ledger in briefings/MODAL_SPEND.md)
 
 Estimate at assumed pod rate ~$7.5/hr (3×H100; runpod-1's 2-GPU share
