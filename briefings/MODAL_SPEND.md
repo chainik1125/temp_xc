@@ -59,3 +59,4 @@ actuals, same discipline as the Modal table.
 | 07-27 ~01:05 | mac-a | HUNT3 screens (HUNT3_SCREEN_CARD, freeze 32e316bc4): cnov + nvtrend × 3 models — 3× L40S parallel (one model/container), dialevel caches expected cache-hit, detached, results → Volume /workspace/hunt3_screen | L40S ×3 | ~$10 | ~$116 |
 | 07-27 ~01:45 | mac-a | CHAZ screen (chaz/CARD.md, freeze a3dde2c11): factory_screen on the cue-free bundle — 1× L40S, conv_depth caches expected cache-hit, detached, result → Volume /workspace/chaz_screen | L40S ×1 | ~$3 | ~$119 |
 | 07-27 ~02:35 | mac-a | CHAZ relaunch (freeze bump 81b6d5918: 6k/class cap after 2 OOM attempts ~$0.5; ward volume fix earlier) | L40S ×1 | ~$2 | ~$121 |
+| 07-27 ~03:15 | mac-a | chaz COMPLETE base/hs13 (12 cells): KILL by window-MEAN control (g_agg >= g at all T >= 8). ACTUALS ≈ $2.5 across 4 attempts (venue + OOM trail disclosed) vs $5 est lines → −$2.5 corr. Overnight mac-a total ≈ $9 | — | −$2.5 corr | ~$118.5 |

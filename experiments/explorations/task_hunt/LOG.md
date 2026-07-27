@@ -8152,3 +8152,33 @@ NOT applied — flagged for Andrii side-by-side per CROSSRATIFY; team
 ratification required. $0 compute. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-27 ~03:15 London — mac-a — chaz VERDICT: KILL (order-free aggregation; the window-MEAN control did its job). Overnight § 1 slate CLOSED.
+
+**PTR: `chaz/results/chaz_main_screen.json` (base/hs13 complete,
+12 cells).** Venue disclosures: base-only (no distill cache on the
+ward volume) and hs13-only (hs11.npy never cached; the two later
+attempts crashed there AFTER hs13 completed — primary layer per the
+factory protocol). Ops trail: attempt 1 wrong volume (0 cells),
+attempts 2–3 OOM at 20k/class manifests → capped 6k post-triage
+(81b6d5918); total chaz spend ≈ $2.5.
+
+Numbers (real arm, per-token baseline high as triaged): g = flatten −
+tok: T4 +0.046, T8 +0.059, T16 +0.077, T32 +0.093 — the persistent
+correction-hazard state IS present in cue-free windows (conversion
+channel closed by construction, and the signal survives: that part of
+the design WORKED). But **g_agg (window-MEAN) = +0.036/+0.060/+0.090/
++0.118 matches or BEATS flatten at every T ≥ 8** (g − g_agg: −0.001,
+−0.013, −0.025) and shuffle costs ≤ +0.016 — the state is an
+order-free ambient direction that pooling reads at full strength.
+CARD § 3 KILL clause fires ("g_agg ≈ g everywhere"). Null arm clean
+(g ≤ +0.016). Routing: breadth-table datapoint (out-of-window state,
+pooling-readable — the slen/lev class), NO panel case. sc_lambda's
+"aggregation bonus" reading is thereby CONFIRMED at one remove: even
+with conversion structurally impossible, what remains is aggregation.
+
+**Overnight § 1 final slate: 4 designed → tempo/qres killed $0
+label-side → cnov KEEP 3/3 (panel-gate candidate, draft card staged)
+→ nvtrend KEEP 3/3 (breadth) → chaz KILL (order-free class).** Every
+verdict by pre-registered instrument; three of five candidates died
+to their own controls — the falsifiers are doing the selecting, which
+is the point. Morning package ready for the 17:00 pick.
