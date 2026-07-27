@@ -13,7 +13,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "a3dde2c116d636152a253784fd0bbbab43fd17b7"  # chaz freeze, rev-parse post-push
+PINNED_COMMIT = "81b6d5918518511e8e7e9c19bf3f3626b3f98418"  # chaz freeze, rev-parse post-push
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 RES_DIR = "/repo/experiments/explorations/task_hunt/chaz"
