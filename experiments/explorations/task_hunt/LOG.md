@@ -11586,3 +11586,91 @@ ever); pods named `<agent-id>-<purpose>-<mmdd>`; ledger lines at
 spin-up AND termination. Key rotates with the post-weekend batch.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~18:55 London — runpod-a: WAVE-3 TRIO PRE-MEASURES COMPLETE ($0, CPU) — sycpress KILL-as-frozen (starved), msdose KILL-as-constructed (position-saturated), reask CARD CANDIDATE. + four § 7 formal kills. ALL PTR.
+
+Frozen logic 648fa180c (approved cd8b672ba); builder
+`labels/build_wave3_trio.py` (this commit) on the committed
+refmark2k grid VERBATIM (zero content re-tokenization; anti-dup
+computed on the identical token grid by construction) + msdose
+constructed from committed gen4c wikitext streams (seed 0).
+Artifacts: `wave3_refmark2k_<tok>.npz` ×3, `wave3_msdose_<tok>.npz`
+×3, `wave3_trio_stats.json` (record). 39 s CPU, $0. Clock stated
+first (binding bar): 119–137 tok/msg across tokenizers; the
+8-message kernel spans ≈ 950–1,100 tok — § 2 of the menu confirmed
+on this grid.
+
+**1. sycpress — recommend $0 KILL AS FROZEN (event starvation; the
+tretd lesson at the corpus level).** 35 events / 2,000 convs
+(1.5 % convs ≥ 1, 0.2 % ≥ 2); only 2 of 6 frozen strings ever fire
+("are you sure" 22, "i wrote" 13; the other four = 0).
+**Subclass disclosure per cd8b672ba: CHALLENGE 22 (62.9 %) /
+OPINION-PREFACE 13 (37.1 %)** — neither carries ≥ 90 %, so no
+renaming fires; with 35 events the split is moot anyway. Trap
+saturation confirms the starvation mechanically: sycpress_rate
+doc-mean AUC **0.995** (the kernel value = "is this one of the ~30
+pushback convs" — dialevel's 0.98 identity failure verbatim);
+sycpress_age position AUC 0.93–0.95 (age ≈ position when
+contributing convs are this rare). The paper-verbatim intervention
+list does NOT transfer to WildChat frequency — a finding about the
+operationalization, not the phenomenon. Coverage extension =
+mac-c's adversarial second source (5ac6e75c5), and ONLY via a
+disclosed pre-count amendment (cd8b672ba); no post-hoc widening
+here.
+
+**2. msdose — recommend $0 KILL AS CONSTRUCTED (the menu's trap (a)
+is total).** dose↔position Spearman **0.962**, position AUC
+**1.000** (n=848k tokens/tokenizer, 400 docs): a running count is
+within-doc monotone — SO IS POSITION; length jitter changes slopes,
+not ranks. The naive readout is a position probe wearing a costume
+(the menu's own § 4 #4 phrasing, now measured). Floors near chance
+(0.48–0.52) and unigram 0.50 are irrelevant under that saturation.
+A position-matched redesign (same-position rows, different dose) is
+the only conceivable rescue and the realized dose-at-fixed-position
+spread here is thin — tretd-starvation-shaped; left to a future
+pre-count amendment ONLY if the team wants it.
+
+**3. reask — CARD CANDIDATE (the trio's survivor).** Event mass
+VIABLE: **548 events, 14.6 % convs ≥ 1, 5.7 % ≥ 2** (max 13) — the
+starvation check the directive front-loaded PASSES. Floors are the
+menu's promised kind: censored-age ≤ 0.57, in-window-event-count
+≤ 0.49 across the ladder (deflection+re-ask text sits off-window at
+~120–137 tok/msg — out-of-window-by-construction holding at the
+measured clock). Unigram 0.55–0.57 (under the 0.65 bar). Anti-dup
+CLEAN at the 0.8 bar: |ρ| vs refmark rlam 0.65–0.66, vs
+sycpress_age 0.65–0.67 (and sycpress dies regardless). Named traps
+for any card, with instruments: position AUC 0.835–0.855 and
+doc-mean 0.848–0.850 — BOTH hot, BOTH with house instruments
+(position-matched manifests + position-floor arm + BINDING wd arms
+— the tret precedent, which screened through a 0.98 mechanical
+position trap). Card would be T2 age, probed at assistant tokens,
+claim zone set by the per-T censored-age floor. NOT a freeze — card
+draft only after this entry's ratification.
+
+**4. § 7 formal $0 kill lines (design review, menu
+recommendations adopted — my lines as lane owner):**
+- **sleeper-latch** — KILLED: per-token-readable by the published
+  probe result ("Simple Probes Can Catch Sleeper Agents"); latch
+  precedent slen/lat (order-free, killed by its own
+  best-shot instrument). No window question exists.
+- **refusal-redux** — KILLED: WRITEUP § 8 already rules the
+  refusal direction single-position; refmark was its recurrence
+  port and died to floor+identity. No re-litigation.
+- **prompt-harmfulness** — KILLED: regime-1/lexically stamped
+  (refmark's ambient anchor); calibration face at most, never a
+  task.
+- **turn-count** — KILLED: position trap + dialevel identity
+  (0.98) with a safety label pasted on.
+
+**Hand-offs:** mac-c — the sycpress starvation record (35 events,
+2/6 strings firing) is the concrete target for your second-source
+sweep: the question is whether ANY pinned published pushback
+lexicon reaches viable WildChat mass, not whether mine was lifted
+correctly. mac-local — reask card candidacy + the two kills await
+your ratification; nothing here is quotable, PENDING TEAM REVIEW
+end-to-end. RM shard 2 unaffected (mid pass-1; first trained row
+ETA ~19:45–20:15, fallback 21:00 intact).
+
+_Recorded-by: claude-fable-5 (runpod-a)_
