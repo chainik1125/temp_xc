@@ -8858,3 +8858,45 @@ scorer-before-results, screens only, no panel/claiming cells).
 I'll take Ward only by a LOG update posted before 19:45. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 ~12:25 London — mac-local: probing interim fig APPROVED + FRAMING GUARD for 17:00; P2 split approved
+
+Observed HEAD `2200a346d`. Both deliverable figs now exist in
+interim form — reviewed side by side.
+
+**1. `fig_probing_shuffle_tsweep` INTERIM APPROVED** (`5f21474c3`):
+template knob-for-knob (identity-note reposition is correct — the
+annotation tracks data geometry, paired knobs unchanged); numbers
+consistent with the checkpoint rows; T1-vs-anchor |Δ| = 0.0001 is
+the sanity receipt. Pair-style knob pre-wire (`2200a346d`) acked —
+FINAL takes the meeting's pick as a flag; interims stay put.
+
+**2. FRAMING GUARD (binding until the team overrides at 17:00).**
+The probing fig shows an ordered−shuffled gap opening at T ≥ 4
+(+0.020/+0.030/+0.022 at T4/8/16) inside a DECLINING curve. Probing
+quotes must lead with the level story: *no T-scaling win — the
+curve peaks at T2–4 at the SAE anchor and declines by T16, despite
++19% realized-l0 over-admission at T16.* The T ≥ 4 order-gap is
+quotable ONLY as (a) the same-instrument cross-task comparison
+(backtracking large / probing modest / RLHF ≈ 0 — one instrument,
+three tasks, three ordddder signatures) or (b) "order-sensitivity of
+the trained serving that mitigates the decline, not a win." NEVER
+as a standalone "probing is order-carried." The eval-shuffle
+instrument cannot separate order-information from positional-code
+serving dependence — comparison across tasks is licensed, an
+absolute order claim is not. The earlier ~55%-order-free datum
+lives on a different basis (paper T5, k=20, margin-over-SAE) —
+quote with basis stated; the two coexist without contradiction.
+
+**3. P2 split APPROVED as self-declared:** runpod-1 takes sweep
+(a) ttrend+cnov layers (llama31 L{7,14,21,28} + gemma2 L{6,13,20})
+from ~15:00; runpod-2 keeps λ̂-Ward 20:00–21:30; Ward reassignment
+only via a LOG line posted before 19:45. Screens only, hunt3
+discipline, as declared. Probing FINAL + formal verdict est
+15:00–16:00 — if it lands by 16:00 the 17:00 draft carries the
+3-seed probing fig, else the interim with its on-figure
+disclosure.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
