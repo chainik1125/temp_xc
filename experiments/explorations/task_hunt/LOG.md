@@ -15014,3 +15014,48 @@ runs at x4 drain):** both pairs at the exhibits' own hunt width
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-27 ~23:59 London — runpod-b: λ̂ T-FILL VERDICT — T6/T10 landed (12/12, 9 min); T10/s2 TRAINING-COLLAPSE finding (receipt-verified real); overlay gaps stay ≈0. PTR
+
+Lane complete (pin c09485d1c; 12/12 in 541 s + overlay 6/6). Actuals
+≈ **$0.5–1** (est $4–6 — the d2048 cells train at ~46 steps/s on H100;
+the overlay-lane pacing memory did not transfer, again in our favor).
+
+**Trained λ̂ (L=30 venue line as carded; untrained twins in parens):**
+
+| T | s1 | s2 | s42 | mean±std (n=3) |
+|---|---|---|---|---|
+| 6 | 0.152 (0.081) | 0.147 (0.037) | 0.147 (0.047) | **0.1487±0.0029** |
+| 10 | 0.203 (−0.007) | **0.002** (0.030) | 0.196 (0.041) | 0.134±0.114 — see finding |
+
+- **T6 sits BELOW the quoted T4 point** (0.1487 vs 0.1607±0.0160,
+  within ~1σ) — a local flat/dip between T4 and T8 rather than clean
+  monotone rise; venue caveat: fill points are L=30, quoted panel L=32.
+- **T10/s2 TRAINING COLLAPSE (the finding):** λ̂ = 0.002 ≈ untrained
+  floor while s1/s42 sit 0.196–0.203 (exactly on the T8→T16 curve;
+  2-seed view 0.199±0.005). Training telemetry normal (loss ~85–95
+  like siblings, l0t 0.71); the overlay identity receipt recomputed
+  the canonical value to |Δ|=6.7e-10 from the persisted checkpoint —
+  the collapse is REAL (converged training that formed no λ-readable
+  code), not an eval artifact. First seed-collapse in the λ̂ lane
+  (quoted grid was 3/3 stable at every T). No re-rolls per card;
+  reported as measured; SEED-FRAGILE flag on the T10 point for the
+  exhibit — recommend the fig show per-seed markers at T10 rather
+  than a mean bar, caption line stating 1/3 collapse.
+
+**Overlay columns (pre-registered; receipts 6/6 PASS, max |Δ| 1.6e-4
+≪ 2e-3):** gaps ord−shuf: T6 +0.020/+0.003/+0.008, T10
++0.006/+0.009(s2)/+0.008 — the fill points continue the λ̂ ≈ 0
+order-effect line (main-overlay gaps were +0.004..+0.014). Even the
+collapsed s2/T10 cell shows the ≈0 gap shape (+0.009 around zero).
+
+Exhibit inputs now complete for λ̂ on Han's grid: T{2,4,8,16} quoted +
+overlay, T{6,10} fill + overlay (this entry), T1 anchors on-figure.
+Files: `results/stage2_t6t10_ward_real_lambda_base_l12.json`,
+`results/t6t10_overlay.json`. Rows in-board (agent runpod-b). Ledger
+actuals posted. **GPU 1 free — relu-mix seed-split window OPEN**
+(awaiting runpod-2 eq per-T verdict per 23:50 posture; dq fill now
+unblocked by runpod-a's phase-1 rebuild — will step-0 verify the
+llama31 cache next beat and card the dq fill unless mac-local
+re-routes). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
