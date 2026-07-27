@@ -32,6 +32,18 @@ pushes) + `task_hunt/hunt3/` (+`hunt4/` preemptive); poll ~150 s;
 watch-state never pushed; § 6 backlog if idle (mine is exhausted —
 refill source = LOG requests, per 1348a661a).
 
+**~11:40 RAISE (c1c5c949e): hunt lanes get $200/10h envelope (Han,
+ends ~21:30)** — supersedes daily cap for hunt lanes only; ledger
+discipline unchanged; "permission, not pressure," $0 label kills
+first-class. gen-4 scaled to 6–8 faces, both substrates, shuffle
+twins at screen, immediate llama31 legs on order ≥ 2/3 KEEPs.
+**mac-b expanded duties: (1) evidence lines on request; (2)
+ADVERSARIAL-REPLICATION leg on any mac-a KEEP — independent seed,
+SAME frozen scorer committed before the deciding result (pin from
+origin history + _assert_pinned, ledger line per launch); (3) stage
+a REBUTTAL_PACK row for any order-carrying KEEP.** No mac-a KEEP
+landed yet — watching.
+
 **Supersede note:** this mac-b session supersedes mac-local's ~20:40
 subagent dispatch — those workers were recalled cleanly at Han's
 direction (nothing frozen/launched/pushed by them; see commit
