@@ -29,6 +29,19 @@ TWIN = {
     "txc_batchtopk_post": "txc_batchtopk_post_btkonly",
 }
 
+# ALIAS EXCLUSION LIST (assigned 184ebd47a; published in
+# RM_EQUIVALENCE.md). These are UNTRAINED-twin train_keys (n_steps=0)
+# whose byte-equal metric clusters aliased an external trained-row
+# join into a phantom "T8-exact" pair. They are legitimate rows —
+# excluded from ARM-DIFF joins, not from the record. Two clusters of
+# one physical untrained model each:
+#   pre-T8-untrained : 27e5b452ad79957d, 3b99316b93e9bea2, a19178296a960d32
+#   post-T8-untrained: 4cdb346b79c0ecf6, 73da804cf540cd56, 84a423f9dd529c0f
+ALIAS_EXCLUDE = frozenset({
+    "27e5b452ad79957d", "3b99316b93e9bea2", "a19178296a960d32",
+    "4cdb346b79c0ecf6", "73da804cf540cd56", "84a423f9dd529c0f",
+})
+
 
 def _rows():
     out = {}
@@ -40,12 +53,20 @@ def _rows():
                 continue          # control rows are the instrument's, not the grid's
             if not (r.get("training_cfg") or {}).get("n_steps"):
                 continue
+            if r.get("train_key") in ALIAS_EXCLUDE:
+                continue
             arm = ec.get("arm")
             if arm not in ("relu-mix", "btk-only"):
                 continue
             T = (r["training_cfg"].get("arch_hparams_override") or {}).get("T")
             key = (arm, r["arch"], int(r["seed"]), T, int(ec["k_feat"]))
-            out[key] = r      # append order → latest row wins
+            # HOUSE RULE (184ebd47a): surface duplicate keys — silent
+            # last-write-wins pooling is how the T8 phantom was made.
+            if key in out and out[key]["train_key"] != r["train_key"]:
+                print(f"[equiv] DUPLICATE slot {key}: train_keys "
+                      f"{out[key]['train_key']} vs {r['train_key']} "
+                      "(keeping latest; verify provenance)")
+            out[key] = r
     return out
 
 
@@ -115,6 +136,21 @@ def main():
           "(auto: rm_equivalence.py, protocol (a))", "",
           f"{n_id}/{len(pairs)} pairs IDENTICAL (torch.equal on every "
           "shared tensor).", "",
+          "## ALIAS EXCLUSION LIST (184ebd47a assignment — any future "
+          "arm-diff must exclude these train_keys)", "",
+          "Untrained-twin keys (n_steps=0; legitimate rows) whose "
+          "byte-equal clusters aliased an external trained-row join "
+          "into the phantom 'T8-exact' pair. One physical untrained "
+          "model per cluster:", "",
+          "- pre-T8-untrained: `27e5b452ad79957d`, `3b99316b93e9bea2`, "
+          "`a19178296a960d32`",
+          "- post-T8-untrained: `4cdb346b79c0ecf6`, `73da804cf540cd56`, "
+          "`84a423f9dd529c0f`", "",
+          "House rule enforced by this checker: joins filter n_steps>0 "
+          "AND this list, and DUPLICATE slot keys are surfaced, never "
+          "silently pooled. (Prose correction on the 22:36 entry, "
+          "receipts authoritative: +8.75e-3 was T8's k5 delta; k20 = "
+          "+1.02e-2; largest |Δ| overall is T6's −1.63e-2.)", "",
           "| arch | seed | T | tensors | verdict | Δauc | extra keys |",
           "|---|---|---|---|---|---|---|"]
     for p in pairs:
