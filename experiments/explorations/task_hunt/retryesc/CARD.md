@@ -107,3 +107,66 @@ stage. The pod goes up the moment a GPU-needing stage exists; if
 mac-local wants it warm regardless, say so and I will.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 8. VERDICT — LABEL-SIDE KILL, no GPU bought, no slot
+
+Run at freeze `161de7fe8` (receipt in `retryesc_premeasure.json`).
+4,993 events, 18.4% of turns, 1,189 traces.
+
+**Five of six bands pass on all three tokenizers — and the floors are
+the cleanest this program has produced:**
+
+| | gpt2 | gemma2 | llama31 | band |
+|---|---|---|---|---|
+| censored-age floor (all T) | **0.500** | **0.500** | **0.500** | — |
+| in-window event tokens (T64) | 0.454 | 0.458 | 0.448 | — |
+| position AUC | 0.743 | 0.725 | 0.720 | ≤ 0.95 ✓ |
+| doc-mean AUC | 0.865 | 0.875 | 0.879 | ≤ 0.88 ✓ |
+| qualifying strata | 270/497 | 231/457 | 213/388 | ≥ 8 ✓ |
+| usable tokens | **3.38 M** | 2.87 M | 2.69 M | ≥ 250k ✓ |
+| **unigram AUC** | **0.714** | **0.689** | **0.716** | **≤ 0.60 ✗** |
+
+The floor being *exactly* 0.500 at every T is the out-of-window
+construction working perfectly: environment turns masked, gaps at
+median 886 tokens, claim zone 0.00% — the window-visible cheat carries
+literally no information. Position is far better than the surviving
+`reask_hr` (0.925–0.946), and the usable mass is 10× the bar.
+
+**And it dies anyway, on unigram leakage, 0.69–0.72 against a bar of
+0.60 that I set from in-repo precedent (survivors 0.560–0.575).** The
+pre-registered kill rule fires: every band, all three tokenizers, or no
+GPU.
+
+### 8.1 Why — and why masking cannot rescue it
+
+The tokens driving the leak are **not** failure-narration words. They
+are **task vocabulary**: high-age markers `adjusted`, `wave`, `bytes`,
+`setting`; low-age markers `disk`, `interface`, `tab`, `South`, `West`.
+Token identity is predicting **which task**, and task difficulty drives
+failure rate, which drives age. `doc_mean_only_auc` 0.865–0.879 —
+grazing its own bar — is the same phenomenon measured a second way.
+
+This is exactly the trap band 2 named in advance ("task difficulty
+drives failure rate; this is the identity trap to beat"). It was not
+beaten. **Crucially it is not fixable by masking**, which is what a
+narration-driven leak would allow: the leak is carried by ordinary task
+nouns spread through the agent's own reasoning. With 80 tasks and ~15
+traces per task, a within-task contrast is the only in-principle
+escape, and it is thin, unpre-registered, and would be post-hoc surgery
+on a frozen card. I am not proposing it as a rescue.
+
+**Re-entry path, unendorsed and stated for completeness:** a corpus
+with many more tasks (so vocabulary cannot identify difficulty), or a
+pre-registered within-task position-matched readout. Both are fresh
+cards, not amendments.
+
+### 8.2 No pod was spun up
+
+The GPU stage was never reached. The label-side stage cost $0 and ~60
+seconds of CPU, and killed the candidate outright — a pod provisioned
+at the moment the order arrived would have billed through a build and a
+kill without running anything.
+
+_Recorded-by: claude-fable-5 (mac-c)_

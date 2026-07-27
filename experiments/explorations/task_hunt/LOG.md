@@ -14268,3 +14268,79 @@ validate` receipt on completion. Session start remains Han's
 step.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-28 00:35 London (wall) — mac-c: `retryesc` LABEL-SIDE KILL ($0, no pod) — best floors the program has produced, killed by task-identity leaking through vocabulary; and the MENU IS EXHAUSTED of cheap screenable candidates
+
+Run at freeze `161de7fe8`. 4,993 events / 18.4% of turns / 1,189
+traces. **Five of six bands pass on all three tokenizers**, with the
+cleanest floors we have ever measured:
+
+| | gpt2 | gemma2 | llama31 | band |
+|---|---|---|---|---|
+| censored-age floor, EVERY T | **0.500** | **0.500** | **0.500** | — |
+| position AUC | 0.743 | 0.725 | 0.720 | ≤0.95 ✓ |
+| doc-mean | 0.865 | 0.875 | 0.879 | ≤0.88 ✓ |
+| strata | 270/497 | 231/457 | 213/388 | ≥8 ✓ |
+| usable tokens | **3.38 M** | 2.87 M | 2.69 M | ≥250k ✓ |
+| **unigram** | **0.714** | **0.689** | **0.716** | **≤0.60 ✗** |
+
+Floor exactly 0.500 at every T is the out-of-window construction
+working perfectly (env turns masked, median gap 886 tok, claim zone
+0.00%) — the window-visible cheat carries no information at all, and
+position beats the surviving `reask_hr` (0.925–0.946) by a wide margin.
+
+**Killed anyway on unigram leakage.** Pre-registered rule fires: every
+band, all three tokenizers, or no GPU.
+
+**Diagnosis — and why masking cannot rescue it.** The leaking tokens
+are NOT failure-narration words; they are **task vocabulary**
+(high-age: `adjusted`, `wave`, `bytes`, `setting`; low-age: `disk`,
+`interface`, `tab`, `South`, `West`). Token identity predicts WHICH
+TASK; task difficulty drives failure rate, which drives age. `doc_mean`
+0.865–0.879 grazing its own bar is the same phenomenon measured twice.
+A narration-driven leak could be masked away; this one cannot — it
+rides ordinary task nouns through the agent's own reasoning. Re-entry
+would need many more tasks or a pre-registered within-task
+position-matched readout (~15 traces/task here — thin). **Fresh card
+only; I am not proposing it as a rescue.**
+
+**No pod was spun up.** The GPU stage was never reached: $0 and ~60 s
+of CPU killed it. A pod provisioned when the order arrived would have
+billed through a build and a kill without running anything. Key was
+verified read-only only (balance $1,267); I own no pods and touched
+none.
+
+## MENU EXHAUSTED — reporting per the briefing's closing line
+
+Screenable-now candidates are gone. Remaining entries and their
+blockers:
+
+- **Tier A:** `sycpress` KILLED, `msdose` KILLED ×2, `dharm` KILLED,
+  `reask_hr` = runpod-a's (#6 candidate).
+- **Tier B:** `sysage` dead (0 system turns in the pool); `histakes`
+  — its own source paper reports a **single-position** probe works, the
+  `refusal direction` situation the program kills at design review;
+  `rhonset`/`sabprep` T4 pre-onset, downgraded on the measured
+  `emoinst` prior + `2606.30449`; `toolpriv` shares retryesc's
+  substrate family and would inherit the **same task-identity leak**;
+  `afgap` needs elicitation.
+- **Tier C:** `emoinst` KILLED; `lhdec` not-recommended (superseded by
+  `commitdebt`); `evalcue`/`emdrift`/`cotdiv`/`sandbag`/`persuade`/
+  `stego`/`commitdebt`/`instrum` **all need generation**.
+- **Ward:** closed tonight — `warddebt` showed any sentence-kernel face
+  there spans ~154 tokens against T ≤ 32.
+
+**The blocker is uniform and it is not screening: it is the shared
+elicitation harness** (`TIERC_PIPELINE_DESIGNS.md` § 3), which four+
+candidates need and which also unblocks `sycgen_age` — the one face I
+have that passed its geometry gate. **For slot #7 that harness is now
+the critical path, and it is a BUILD decision, not a hunt decision.**
+
+Deleting `briefings/safety-hunt-continuation.md` as its closing line
+instructs (report either way). **Re-opening is one line** if mac-local
+wants a specific entry pursued despite the blocker above — I disagree
+with none of it being worth trying, only with it being cheap.
+
+_Recorded-by: claude-fable-5 (mac-c)_
