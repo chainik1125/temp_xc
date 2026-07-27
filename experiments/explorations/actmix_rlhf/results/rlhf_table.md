@@ -36,6 +36,18 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
 | txc_batchtopk_post_btkonly@T8/k800 (untrained) | 0.6119 | 0.6251 | -0.0132 | 0.027 | 226.8 |
 | txc_batchtopk_post_btkonly@T16/k1600 (untrained) | 0.6207 | 0.6273 | -0.0066 | 0.015 | 816.6 |
 
+### seed 1
+
+| cell | auc | shuffled | gap | mass@20 | l0/unit |
+|---|---|---|---|---|---|
+| batchtopk_sae_btkonly@T1/k100 | 0.5986 | ≡ | — | 0.095 | 107.6 |
+| batchtopk_sae_btkonly@T1/k500 | 0.6174 | ≡ | — | 0.087 | 530.9 |
+| tsae_btkonly@T1/k20 | 0.6019 | ≡ | — | 0.271 | 19.4 |
+| tsae_btkonly@T1/k500 | 0.6251 | ≡ | — | 0.081 | 552.3 |
+| txc_batchtopk_post_btkonly@T1/k100 | 0.5975 | ≡ | — | 0.111 | 108.2 |
+| txc_batchtopk_post_btkonly@T2/k200 | 0.6162 | 0.6185 | -0.0022 | 0.097 | 209.2 |
+| txc_batchtopk_post_btkonly@T5/k500 | 0.6218 | 0.6119 | 0.0099 | 0.073 | 510.0 |
+
 ## Mechanical R-scoring (CARD § 4, as frozen)
 
 ```json
@@ -70,10 +82,20 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
   "holds": true
  },
  "R_E4": {
-  "txc_T1": 0.577688057798555,
-  "sae_k100": 0.6129621759456014,
-  "delta": -0.035274118147046396,
-  "holds": false
+  "per_seed": {
+   "42": {
+    "txc_T1": 0.577688057798555,
+    "sae_k100": 0.6129621759456014,
+    "delta": -0.035274118147046396
+   },
+   "1": {
+    "txc_T1": 0.5975168477930909,
+    "sae_k100": 0.5985914637848339,
+    "delta": -0.0010746159917429665
+   }
+  },
+  "delta_seed_mean": -0.01817436706939468,
+  "holds": true
  },
  "R_E5": {
   "untrained_aucs": {

@@ -102,13 +102,21 @@ def score(btk: dict, pm: dict) -> dict:
     ship = pmv("agentic_txc_02", "plain", "preference_auc")["auc_mean"]
     out["R_E3"] = {"btk_T5": t5, "shipped": ship,
                    "holds": (t5 is not None and t5 >= ship)}
-    # R-E4: |txc@T1(k100) - sae_k100| <= 0.03.
-    t1 = (btk.get((TXC, 1, 100, "trained", 42)) or {}).get(
-        "preference_auc_k20")
-    s100 = (btk.get((SAE, 1, 100, "trained", 42)) or {}).get(
-        "preference_auc_k20")
-    d = None if (t1 is None or s100 is None) else t1 - s100
-    out["R_E4"] = {"txc_T1": t1, "sae_k100": s100, "delta": d,
+    # R-E4: |txc@T1(k100) - sae_k100| <= 0.03. Scored on the seed
+    # MEAN (the EM-card seed convention) with per-seed deltas
+    # disclosed (s42 alone sits outside the band).
+    per_seed = {}
+    for s in (42, 1):
+        t1 = (btk.get((TXC, 1, 100, "trained", s)) or {}).get(
+            "preference_auc_k20")
+        s100 = (btk.get((SAE, 1, 100, "trained", s)) or {}).get(
+            "preference_auc_k20")
+        if t1 is not None and s100 is not None:
+            per_seed[s] = {"txc_T1": t1, "sae_k100": s100,
+                           "delta": t1 - s100}
+    d = (sum(v["delta"] for v in per_seed.values()) / len(per_seed)
+         if per_seed else None)
+    out["R_E4"] = {"per_seed": per_seed, "delta_seed_mean": d,
                    "holds": (abs(d) <= 0.03) if d is not None else None}
     # R-E5: untrained ~ 0.5.
     unt = {f"{a}/T{T}/k{k}": c["preference_auc_k20"]

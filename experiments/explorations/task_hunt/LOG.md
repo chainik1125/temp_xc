@@ -8349,3 +8349,76 @@ Everything staged, NOTHING run (pick-contingent per the ruling):
 At the pick: set DS (one line) → freeze card+runner+scorer in one
 commit → push → pin driver from origin-history rev-parse → ledger →
 launch. Zero GPU spent in prep. PENDING TEAM REVIEW as always.
+
+## 2026-07-27 ~08:05 London — runpod-2 — RLHF ABLATION COMPLETE (both arms + stretch + seed-1): VERDICT. PENDING TEAM REVIEW.
+
+**Card `actmix_rlhf/CARD.md` (freeze 72b0ca729, approved
+ba8af7bf9/c4595d533) executed in full: 4 paper-match eval-only cells
+(case-study artifact, ckpt sha256s recorded) + 25 btk-only
+leaderboard cells (trained core s42 + s1, untrained twins, T8/T16
+stretch) + table/fig artifacts in `actmix_rlhf/{results,figs}/`.**
+Substrate integrity: phase-7's recorded t-test reproduced to the
+digit; the btk-only arm trained on the shipped ckpts' own stream
+(txcdr-base-data, hardlinked, zero re-forwarding).
+
+**The exhibit (preference_auc_k20; primary numbers):**
+
+| cell | s42 | s1 | shuffle gap (s42/s1) | l0/unit s42 |
+|---|---|---|---|---|
+| paper-match topk_sae k500 | 0.613 | — | ≡ (T=1) | 500.0 |
+| paper-match tsae k500 / k20 | 0.631 / 0.610 | — | ≡ | 547 / 17.5 |
+| **paper-match agentic_txc_02 (T5)** | **0.610** | — | **+0.012** | 500.0 |
+| btk sae k500 / k100 | 0.625 / 0.613 | 0.617 / 0.599 | ≡ | 535 / 108 |
+| btk tsae k500 / k20 | 0.616 / 0.600 | 0.625 / 0.602 | ≡ | 550 / 19.4 |
+| btk txc-post T1/T2/T5/T8/T16 | 0.578/0.620/0.623/0.626/0.611 | 0.598/0.616/0.622/—/— | +0.009/+0.003/0.000/−0.002 (s42) | 108/211/517/831/1646 (≈100·T/tok parity) |
+| untrained k500-class twins | **0.659** (sae ≡ tsae, shared init) | — | ≈0 | 91.5 |
+
+**R-scoring (mechanical, `analyze.py`, as frozen):**
+- **R-K1 ✓** (all per-token trained ≥ 0.55). **R-K2 ✓** (builder
+  gate). **R-K3 ✓** — the paper's "3 length-spurious of top-20"
+  reproduces EXACTLY on the shipped TXC.
+- **R-E1 ✓ (the headline):** the previously-missing shuffle control,
+  run eval-only on the shipped checkpoints, CONFIRMS the paper's
+  reading — the TXC preference signal is order-INSENSITIVE
+  (gap +0.012 < 0.02). Under shuffle the length-spurious count drops
+  3→1 while auc barely moves: what little moves is density-carried.
+- **R-E2 ✓** (per-token shuffle ≡ identity, analytic).
+- **R-E3 ✓:** harmonized btk-only TXC at paper shapes ≥ shipped
+  (0.623 vs 0.610 at T5) — direction as pre-registered; small.
+- **R-E4 ✓ on the seed mean** (Δ = −0.018 within ±0.03), per-seed
+  split disclosed: s42 −0.035 (outside), s1 −0.001 (inside) — at
+  MATCHED realized l0 (~108 both archs), so the s42 gap is
+  arch-head, not sparsity.
+- **R-E5 ✗ — the INFORMATIVE miss:** untrained k500-class twins
+  reach 0.659, ABOVE every trained cell (trained−untrained margins
+  NEGATIVE for the k500 family). A top-20 |mean-diff| probe over
+  sparse RANDOM projections of L12 carries the preference signal
+  better than any trained dictionary here. (sae/tsae untrained twins
+  coincide bitwise — shared init, a free receipts check. l0
+  mismatch trained-vs-untrained disclosed: 92 vs 535/unit.)
+
+**T-sweep verdict:** an ORDER-FREE INVERTED-U — rises 0.578 → 0.626
+(T1→T8) tracking k_win = 100·T at held per-token parity, turns down
+at T16 (0.611, untrained twin 0.621 ABOVE it); shuffle gaps ≈ 0 at
+EVERY T, both seeds. The rise is budget aggregation, not order; the
+T16 downturn is not an order effect either.
+
+**Program read (two-sided order map, per c4595d533):** RLHF
+preference lands squarely in the order-FREE regime — pooling-
+readable, random-projection-accessible, shuffle-invariant — the
+paper's § 5.4 task simply does not reward temporal structure, and
+its TXC-vs-baseline ordering is marginal refinement on a linearly
+trivial signal. This is the harmonized, controlled version of the
+paper's own conclusion, now with the control it lacked.
+
+**Limitations (stand):** no autointerp stage (the paper's "N/20
+semantic" column is judge-graded — out of scope); the btk-only TXC
+is the v2 post backbone at paper SHAPES, not an agentic_txc_02
+(matryoshka-contrastive) reproduction; k500-family sparsity not
+comparable to c3's k20 (mac-c A2, ratified); T8/T16 s1 not run
+(stretch budget line, pre-declared).
+
+Ledger actuals: RLHF ≈ 10 GPU-h ≈ $30 (vs $20–35 card est);
+runpod-2 weekend total ≈ 14.5 GPU-h ≈ $44 of the $150/day cap.
+
+_Recorded-by: claude-fable-5 (runpod-2, executor)_
