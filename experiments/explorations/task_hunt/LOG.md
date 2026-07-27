@@ -10589,3 +10589,49 @@ ready). Remaining: s2_T8 (~18:45), s2_T16 (drain ~20:50) → FINAL
 3-seed render + verdict-extension entry + actuals ~21:15. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## 2026-07-27 ~17:25 London — runpod-b: ttrend ANCHOR GATE — 5/7 PASS, 2 FAIL ⇒ STOP per card § 3 (a finding, not a license); two-instrument fallback invoked
+
+Retrain 21/21 ok (2982 s GPU 0, ≈ $2.5). Overlay ran under
+amendments A1/A2 (identity tolerance 1e-6 → 2e-3; cross-process GPU
+kernel nondeterminism, conditioning-quantified, both amendments
+committed BEFORE any shuffled column was read past the firing cell).
+**Mechanical gate table (verbatim):**
+
+    txc_batchtopk_post/T2:  0.0370 vs 0.0363  |Δ|=0.0007  tol 0.0058  PASS
+    txc_batchtopk_post/T4:  0.0471 vs 0.0501  |Δ|=0.0030  tol 0.0087  PASS
+    txc_batchtopk_post/T8:  0.0625 vs 0.0709  |Δ|=0.0084  tol 0.0291  PASS
+    txc_batchtopk_post/T16: 0.1329 vs 0.1421  |Δ|=0.0092  tol 0.0099  PASS
+    txc_batchtopk_post/T32: 0.3185 vs 0.2968  |Δ|=0.0217  tol 0.0127  FAIL (high)
+    batchtopk_sae/T1:       0.0319 vs 0.0320  |Δ|=0.0001  tol 0.0030  PASS
+    tsae/T1:                0.0508 vs 0.0408  |Δ|=0.0100  tol 0.0040  FAIL (high)
+
+**The finding (PTR):** the claiming arm REPRODUCES through T ≤ 16
+(and the sae anchor to 1e-4), but the curve's TOP CELL (T32) lands
++0.022 above the quoted panel — beyond its tight 3-seed σ — and
+tsae lands +0.010 high (2.5σ). Both misses are HIGH-side and both
+sit in known venue-sensitive territory (tsae's trainer is the
+program's repeat offender — the actmix probing exhibit's "moves
+most" arm and the topup's sparsity-realization caveats; T32 is the
+n/p ≤ 1 probe regime where trainer nondeterminism has the most
+room). Read: H100-venue retraining lands slightly better optima on
+exactly these two cell classes; the quoted panel numbers stand
+unchanged as the exhibit numbers, and per the frozen card the
+overlay is NOT licensed for the figure — **no shuffled number from
+this run may be quoted** (they are recorded in
+`diafaces/results/tt_shuffle_overlay.json` for the record, incl.
+per-cell identity values).
+
+**Fallback (pre-approved in eeb4ee3c4/1d2e3de28): the
+two-instrument figure** — the QUOTED v2 panel T-sweep (trained,
+3-seed mean ± sd) + the committed tt SCREEN's win vs win_shuf
+curve, instruments labeled as different. I render it next unless
+mac-local prefers otherwise; λ̂ overlay proceeds independently (its
+grid is in the tsae tail; its gate σs are 3–12× wider than tt's —
+the same drift magnitudes would PASS there, T16 σ 0.0473).
+
+Ledger: tt retrain actuals ≈ $2.5 vs $2–4 est (no corr needed).
+
+_Recorded-by: claude-fable-5 (runpod-b)_
