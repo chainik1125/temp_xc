@@ -12449,3 +12449,61 @@ cells (~10 min), then overlay → identity receipts (A2 tol) → the
 actuals will carry a hold-time disclosure (+corr vs the $5–8 est).
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+## 2026-07-27 19:58 London (wall) — mac-c: `dharm` card + pre-measure FROZEN BEFORE ACCESS EXISTS; primary face changed (harmful_index age, not subtask count); two predictions on record
+
+The corpus is still gated, so I froze the card and the full
+pre-measure **with the data unseen** — the strongest available form of
+freeze-before-counting. On gate open: `pull_dharm` →
+`build_dharm_premeasure` → verdict. **No design work sits in the
+critical path**, and nothing about the bands can be tuned to numbers
+nobody has.
+
+**I am changing dharm's primary face away from what my own menu entry
+proposed.** Menu § 4 #3 offered T3 subtask-count + T2 boundary-age.
+Both are weak: "is this chain building toward harm" (the actual safety
+quantity) is a **document constant** — `dialevel` 0.98 / `sycpress`
+0.995 territory — and "subtasks so far" is a running count monotone in
+within-doc position, **the exact structure that killed `msdose`
+twice today**. The dataset ships **`harmful_index`** (first subtask at
+which the malicious goal becomes achievable), which licenses a face
+neither trap touches:
+
+**`dharm_thage` — tokens since the harmful threshold was crossed.**
+Varies within chain (not identity); the crossing position is jittered
+by the data itself across chains (not position — the property I had to
+engineer synthetically for `sycgen`/`msdose_r1`); and it satisfies the
+**§ 1.2 principle by construction** — whether the threshold has been
+crossed depends on the whole chain's semantics (out-of-window) while
+the distance to it stays in-window. It is also the paper's own
+quantity: accumulated malicious intent past the point of achievability.
+Benign chains give position-matched controls; the harmful/benign
+document label is never the readout.
+
+**Two pre-registered predictions**, from smoke-testing the code path on
+a **synthetic stand-in I generated** (structure only — it carried no
+DecomposedHarm data and was deleted; no artifact of that run survives):
+(1) `dharm_dose` will die on position — the stand-in returned position
+AUC **1.000**, ρ 0.979; (2) `dharm_bage` risks a **floor-solve** — its
+censored-age floor hit **1.000 at T ≥ 16**, because if subtasks are
+shorter than the window then "tokens since last boundary" is exactly
+what the floor computes and the face is a boundary detector. So
+`dharm_bage` lives or dies on `tokens_per_subtask` vs T — which is why
+the **clock is reported before any AUC** (binding bar).
+
+Bands (card § 4) are **absolute only**, calibrated to the § 8 record
+(survivor `reask_hr` pos 0.925–0.946 / doc-mean 0.818–0.828 / unigram
+0.560–0.575): unigram ≤ 0.60, doc-mean ≤ 0.88, position ≤ 0.95,
+≥ 8 strata, ≥ 250k usable, ≥ 300 crossings, ≥ 30 doc rows. A face must
+pass every band on **all three tokenizers**; no survivor ⇒ `dharm`
+dies for $0. The `msdose_r1` lesson is applied: no ratio legs.
+
+Gate terms are embedded (canary in every artifact; eval-only use) and
+remain the team's to ratify. Artifacts: `dharm/PRECOUNT_CARD.md`,
+`labels/build_dharm_premeasure.py`, `labels/pull_dharm.py`.
+
+**Lane state: both re-entry packets EXECUTED** (`msdose_r1` killed,
+`sycgen` geometry-passed on one face), **`dharm` ready-and-blocked**.
+No GPU-needing stage has been reached, so per the key governance **no
+pod has been spun up and none will be until one is**.
+
+_Recorded-by: claude-fable-5 (mac-c)_
