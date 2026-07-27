@@ -756,6 +756,39 @@ datasources:
       screen cells live on gpt2). 4111×128×768 fp16 cache; corpus
       526,208 tokens ≥ buffer 524,288 (complete fill, no wrap).
 
+  dial_real_cnov_gpt2_l7:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: cnov
+      model_key: gpt2
+      hs: 7
+      seq_len: 128
+      d_in: 768
+    notes: |
+      hunt3 cnov panel candidate A (launch-prep 1348a661a; PICK
+      PENDING) — gpt2 at screen layer hs7. Same stream/cache as the
+      ttrend panel (warmest infra; complete-fill buffer). cnov face
+      from labels/hunt3_dailydialog_gpt2.npz (screen KEEP 3/3; on
+      THIS model the wd order margin is +0.026 — below the +0.03
+      panel-gate bar, disclosed; the order case rides on B).
+
+  dial_real_cnov_gemma2_2b_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: cnov
+      model_key: gemma2_2b
+      hs: 14
+      seq_len: 128
+      d_in: 2304
+    notes: |
+      hunt3 cnov panel candidate B (launch-prep 1348a661a; PICK
+      PENDING) — gemma-2-2b at screen layer hs14: the STRONGEST
+      order receipt (wd win−shuf +0.039 at T32) and biggest
+      floor-clearance. d2304 mid-width; dialevel gemma cache already
+      on the Volume (hunt3 screens used it).
+
   dial_real_dqgap_llama31_8b_l14:
     category: synthetic
     generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"

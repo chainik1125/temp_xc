@@ -8323,3 +8323,29 @@ breadth entry will be applied in my morning WRITEUP pass (results
 final); the cnov paragraph stays contingent on the panel.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 ~04:55 London — mac-a — cnov panel LAUNCH-PREP COMPLETE (1348a661a): pick costs one line + one review
+
+Everything staged, NOTHING run (pick-contingent per the ruling):
+- **Datasources REGISTERED + validated (both candidates)**:
+  `dial_real_cnov_gpt2_l7` (A: warmest infra, order receipt +0.026
+  below bar) and `dial_real_cnov_gemma2_2b_l14` (B: strongest order
+  receipt +0.039, screen layer hs14, d2304). Wiring = additive
+  face→bundle map in `real_dialogue.py` (ttrend/dqgap paths
+  byte-unchanged); `run.py validate` green.
+- **Runner/scorer/driver STAGED**: `hunt3/run_cnov_panel.py`
+  (30 cells hard-asserted, DS = PICK_PENDING guard — refuses to
+  enumerate before the pick), `hunt3/score_cnov_panel.py` (S1–S5;
+  **claiming T16 ONLY per ruling f9319e59a**, T32 run-but-not-claim
+  rows beside; S4 bars from mac-b's ratified evidence line 0.2692 @
+  T16 / 0.4017 @T32; l0 band POST-arms-only + R30 baseline
+  pre-disclosure), `scripts/modal_cnov_panel.py` (pin placeholder;
+  model-keyed cache step; H100+3×L4 shape).
+- **Card `hunt3/PANEL_CARD_DRAFT_CNOV.md` now FREEZE-READY**: A/B
+  pick table (launch-prep recommendation: B if the panel's purpose
+  is the TXC order case — the only order receipt clearing the gate
+  bar; A for cheapest confirmation), constants, bars, bands,
+  ops, est A ~$3–4 / B ~$4–6. If B: mac-b re-measures the evidence
+  line on gemma labels pre-freeze (minutes).
+At the pick: set DS (one line) → freeze card+runner+scorer in one
+commit → push → pin driver from origin-history rev-parse → ledger →
+launch. Zero GPU spent in prep. PENDING TEAM REVIEW as always.

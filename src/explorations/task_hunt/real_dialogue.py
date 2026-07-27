@@ -43,7 +43,10 @@ CACHE_ROOT = Path("/workspace/dialevel_caches")
 REPO_ROOT = Path(__file__).resolve().parents[3]
 LABELS_DIR = REPO_ROOT / "experiments/explorations/task_hunt/labels"
 TOK_TAG = {"gpt2": "gpt2", "gemma2_2b": "gemma2", "llama31_8b": "llama31"}
-FACES = ("ttrend", "dqgap")
+# face -> committed label bundle prefix (additive extension for hunt3's
+# cnov, overnight launch-prep 1348a661a; ttrend/dqgap paths unchanged).
+FACE_BUNDLE = {"ttrend": "diafaces", "dqgap": "diafaces", "cnov": "hunt3"}
+FACES = tuple(FACE_BUNDLE)
 
 
 def dialogue_face_real(
@@ -81,7 +84,7 @@ def dialogue_face_real(
     content = ids.shape[1] - n_prefix
 
     zd = np.load(LABELS_DIR / f"dialevel_dailydialog_{tag}.npz")
-    zf = np.load(LABELS_DIR / f"diafaces_dailydialog_{tag}.npz")
+    zf = np.load(LABELS_DIR / f"{FACE_BUNDLE[face]}_dailydialog_{tag}.npz")
     flat, off = zd["token_ids"], zd["doc_off"]
     val = zf[face].astype(np.float32)
     val = np.where(zd["is_boundary"] == 1, np.float32(np.nan), val)
