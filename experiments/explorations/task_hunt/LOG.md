@@ -13836,3 +13836,66 @@ until n=3; if it holds, the honest answer to the reviewer is
 "width was not the binding constraint").
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 23:24 London (date-verified) — mac-local — ⚑⚑ CLARIFIED DELIVERABLES MATRIX (Han, ~23:25) — 7 exhibits × 3 seeds × T{1,2,4,6,8,10,16} × BOTH ARMS; hunt continuation = TOP PRIORITY
+
+**Han's list (binding):** shuffle-ablation T-sweeps for (1) probing
+k=5, (2) probing k=20, (3) RLHF, (4) lambda-hat, (5) dq, (6)+(7)
+TWO MORE HUNTED TASKS — safety-relevant, TBD, "the HUNT MUST
+CONTINUE, incredibly important priority". Each: 3 seeds, T-grid
+{1,2,4,6,8,10,16}, both {ReLU+TopK} (paper-faithful) and
+{BatchTopK} arms.
+
+**GAP ANALYSIS + ROUTING (v2 arms: relu-mix = the ReLU-bearing v2
+composition; the paper's exact txc_base rectify-after-select k8T
+composition is covered by COMPOSITION_AUDIT disclosure, not
+retrained — established framing, one-line disclosure on every
+exhibit):**
+
+- **(1)+(2) PROBING (shared trainings; k5/k20 are eval-time):**
+  btk arm COMPLETE after tonight (T6/T10 landing; T10 s42 already
+  in). relu-mix arm: night grid covers T{6,8,10,16}×3; **NEW: fill
+  T2×{s1,s2} + T4×{s1,s2} (4 cells)**; T1 = certified bit-identical
+  (alias hazard — DOCUMENT via certificate line on-figure, never
+  retrain). → runpod-1 after night grid; then 7-point per-k
+  re-renders BOTH ARMS.
+- **(3) RLHF:** btk T{1,2,5,8,16} done + T{6,10} tonight. **NEW:
+  btk T4×3 (Han's grid; T5 kept as bonus point — superset
+  satisfies "must include")**. relu-mix arm: **Han's directive
+  SUPERSEDES the eq-gate cancel branch — the arm is REQUIRED at
+  every T except certified-identical points (expect T1 only).
+  ~18-21 cells ≈ $70-80.** eq lane's role = certification +
+  telemetry (unchanged value, different consequence). → runpod-2
+  (GPU 2) + runpod-b seed-split (pre-auth now UNCONDITIONAL, from
+  width-match drain ~01:00). Split protocol in STATUS files.
+- **(4) LAMBDA-HAT:** overlay T{2,4,8,16}×3 done both instruments.
+  **NEW: T{6,10}×3 btk cells** (hunt width, cheap). T1 = the
+  sae/tsae anchors ON-FIGURE (T-grid satisfied by anchor
+  convention, stated in caption). Arms: hunt width d_sae 2048 k8 =
+  R30 identity regime (|Δ| ≤ 2.2e-8 measured) — **both-arms
+  satisfied by R30 certificate + ONE fresh spot-check twin pair at
+  T16 (hygiene)**, quoted on-figure; no arm-doubling of the grid.
+  → runpod-b or runpod-a at chain drain.
+- **(5) dq:** verify existing T-set vs the grid, fill missing T ×3,
+  same R30 arm treatment + spot-check pair. → same venue as (4).
+- **(6)+(7) HUNT CONTINUATION (TOP PRIORITY):** reask_hr screen
+  runs tonight (runpod-a chain) — if KEEP, it is candidate #6 and
+  gets the full retrain treatment. **mac-c RE-OPENED NOW**
+  (briefings/safety-hunt-continuation.md this push): screen the
+  next safety candidates off SAFETY_TASK_MENU §10 under the
+  binding bars; Dmitry's RunPod key per governance for compute.
+  Wave-3 rules verbatim; every screen feeds the #6/#7 slots.
+
+**Cost envelope:** RLHF relu-mix ~$80 + probing fill ~$8 + RLHF T4
+~$12 + λ̂/dq fills ~$5-10 + hunt screens ~$10-30 ≈ **$120-150
+total**, within the raised envelope + day caps. **Wall clock:** all
+paper-width cells land by ~morning; hunt screens tonight-tomorrow;
+the Aug-3 amendment window absorbs #6/#7 retrains if screens run
+long.
+
+**Two judgment calls made (flag, not ask):** (a) T1 both-arms =
+certificate line, not alias re-runs (the 013441cfd hazard); (b)
+RLHF T4 added, T5 retained as bonus — the grid is a floor, not a
+ceiling.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
