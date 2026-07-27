@@ -1,7 +1,11 @@
 # Working state — agent `mac-a`
 
-**2026-07-27 ~04:25 London — overnight queue DRAINED, nothing in
-flight, idle watch. § 1 COMPLETE + RATIFIED (36d3175ac: cnov
+**2026-07-27 ~05:00 London — cnov panel LAUNCH-PREP COMPLETE
+(1348a661a; ~04:55 LOG): both datasources registered+validated,
+runner/scorer/driver staged (PICK_PENDING guards), card freeze-ready
+with the A/B table + T16-only claiming (ruling f9319e59a) + mac-b's
+S4 bars. At the pick: one DS line → freeze → pin → ledger → launch.
+Earlier overnight: § 1 COMPLETE + RATIFIED (36d3175ac: cnov
 panel-gate candidate + draft card staged; nvtrend breadth; chaz KILL
 by its own control; tempo/qres $0 kills — 4 designed, 3 killed by
 pre-registered instruments). § 6d DELIVERED + noted (PROBE_V2 freeze
