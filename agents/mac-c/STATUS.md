@@ -2,61 +2,33 @@
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`; read-only archaeology lane, $0 compute)
 **Briefings:** `briefings/actmix-shared.md` → `briefings/actmix-mac-c.md` (ACTMIX W3)
-**Last update:** 2026-07-26 ~21:45 London (first deliverable push)
+**Last update:** 2026-07-27 ~12:45 London (MIRRORS COMPLETE)
 
 ## Supersession note
 
-This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cleanly at Han's direction before anything was frozen/launched/pushed — see be755651a's commit message). mac-c is a standalone CC instance; no state from the recalled agents was reused.
+This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cleanly at Han's direction before anything was frozen/launched/pushed — see be755651a).
 
-## What's done (this push)
+## Current posture (Han's 2026-07-27 dispatch)
 
-- **`experiments/explorations/task_hunt/COMPOSITION_AUDIT.md`** — the W3 deliverable. Pinned per-arm activation compositions for: sparse probing (§3, incl. the T-SAE ReLU→BatchTopK/threshold vs everything-else TopK→ReLU split), backtracking (§5, headline = `aniket-ward-stage-b:a62175ee7`, ported via ATTRIBUTION.md; A4 flags final's contradictory "NOT paper data" branding), RLHF (§6, produced on `han-phase7-agent-c`, byte-identity chain to the paper figs; TXC arm = `agentic_txc_02`), synthetic (§7, REVISED: runs on `origin/final` purified, line-identical ports), EM part 1 (§4, dmitry-em-repl frozen at `de0c8ea8f`, external `fra_proj` code, no TXC arms there).
-- **HF inventory** (§8): 8 repos on han1823123123 (5 model + 3 dataset; briefing's "3 datasets" undercounted). Jackpots: `txcdr-it` = the 12 IT probing ckpts; `temp-bench-models` = 1 283 purified paper-cell ckpts (c6 finance cells confirmed by config sample); `temp-bench-data:runs/` = 430 purified eval artifacts. Token used read-only, never printed; NOTE `temp_xc_a40_checkpoints` (private, created 07-25) is CURRENT stage-2 ops, not paper-era.
-- **Forgotten-branch sweep** (§9): all 43 remotes classified; top recoveries: `em-nanda` (parallel EM steering, 479/480 blobs absent), `aniket-ward-stage-b`, `dmitry-backtracking`, `dmitry-rlhf` (raw separation_scaling), `han-phase6`, `andre-steering`, `300k-tfa` (48 orphaned final-night c1/c2 rows).
-- LOG.md PTR entry appended.
+- **HF mirror: COMPLETE (~12:45)** — was the one open item; confirmation in LOG. Detail: to `han1823123123/temp_xc_a40_checkpoints` — λ̂ tsae trio DONE (`hunt_lambda_tsae_topup_checkpoints/`, manifest+sha256); remaining = dialogue-panel cells, salvage/topup/calib payloads, hunt3 screen bundles + seed payloads + provenance → `hunt_payload_bundles/` prefix (same manifest pattern). **Gates the post-weekend token rotations**; completion confirmation will be pushed to LOG.
+- **"part 3" is DEFINED and ARCHIVED**: post-deadline archaeology continuation, no cycles now (Han, this dispatch — closes the "part 3 undefined" flag from my earlier LOG entry).
+- **AFTER mirrors (mac-local beat review ~12:15): gen-4 corpus scouting** — CPU-only label-side pre-measures for candidate trailing-functional faces on corpora mac-a hasn't touched (candidate events + sparsity/timescale/floor stats, hunt3 evidence-line format), feeding mac-a's slate. I scout labels; mac-a owns screens; **no Modal spend from mac-c**.
+- Support the one-pager/meeting on request.
+- Listener RE-ARMED for 10h (sleep-first loop, briefings/ ex-ledger + LOG lines matching mac-c/audit/vwin/G6/mirror, 150s poll); re-arm after every wake.
 
-## Second push (same evening) — A4 + A6 forensics landed
+## Mirror state: COMPLETE
 
-- **A4 RESOLVED:** shipped c7 numbers = purified locked-arch bs-sweep (TXC-base bs1024 lift +0.541/+83%; TXC-pro PR-AUC 0.242; auto-macros committed 05-06) — NOT Aniket's +1.574. neurips-aniket's harness matches the shipped convention exactly.
-- **A6 NARROWED + integrity flag:** two generations of the c6 7bmed figs. Committed camera-ready = 2 bars (sae_arditi 16.39 vs txc_base **19.20 — TXC wins steering**), exactly reproducible from in-git artifacts; published arXiv = 5 arms (T-SAE +25.9 winner, matches the caption), **producing runs in NO branch**. The camera-ready caption contradicts its own committed figure. Needs mac-local/team ruling: which generation is runpod-2's paper-match target. Disambiguators listed in audit §10-A6.
+`hunt_payload_bundles/` = 455 files + manifest.jsonl (sha256 + source volume:path + volume mtime per file) + README, remote-verified 457/457. Incidents on record (LOG ~12:45): plain `modal volume ls` truncation (10/299 on btk_rerun_v2 — use `--json`); one 3h16m wedged `get` (fixed w/ 120s watchdog). λ̂ trio was already at `hunt_lambda_tsae_topup_checkpoints/`. **Rotations unblocked from my side.** Local staging copy in session scratchpad `mirror_bundles2/`.
 
-## Third push — part-2 ruling executed (config census)
+## Delivered (on record — receipts in LOG + the files themselves)
 
-- Per mac-local's ruling (637cc656d): enumerated ALL 1 283 `temp-bench-models` config.jsons. **A1 CLOSED** — the shipped c3 campaign found (six-arch IT panel, 20K steps × seeds 1/2/42, k_pos=20 defaults, saved 05-04→05-06; + TXC-base T∈{10,20} cells + BASE panel). **A2 closed for c3** (L0=20 real; RLHF stays the k500 exception). **A6 strengthened**: 7B-med datasource holds ONLY the 4 Generation-1 cells — the 5-arm run's ckpts were never uploaded. Shipped c7 locked cells also found (llama L10 nousmirror, seed-42). Census committed: `experiments/explorations/task_hunt/tbm_census.jsonl` (train_key index for pods).
-- Git identity set to `mac-c-agent` per mac-local housekeeping (first two pushes went out under the default identity).
-
-## Post-midnight wakes (2026-07-27)
-
-- **T5-artifact escalation from runpod-1 CONFIRMED in git** (audit §3 ⚠ + A12, third integrity flag; pushed 6c4262df9): shipped c3 "T10/T20" cells are T=5 replicas (fix-commit postmortem `1ed4fde5f` + bit-identical seed-pair leaderboard rows); appendix T-sweep claim unfulfilled; Dmitry's d(perf)/dT gate must not cite the shipped c3 T-sweep.
-- **Scope re-cut by Han's EM FULL STOP** (LOG ~00:15): A3 + A6 residue → Dmitry (annotated in audit §10, no further mac-c cycles). Remaining mac-c scope = A5 + probing/RLHF-relevant + "part 3".
-- **A5 CLOSED both venues** (this push): TFA = ReLU→TopK train+eval (dev `tfa_big` kval=500 via `train_phase7.py:345`/`run_probing_phase7.py:216`; shipped c3 via purified `tfa.py`).
-- **"part 3" is UNDEFINED in the record** (appears once in af2247d43, no definition anywhere in LOG/briefings) — awaiting mac-local's definition; flagged in my LOG entry.
-
-## Posture as of ~03:00 London 2026-07-27: IDLE WATCH (queue empty, listener armed)
-
-All assigned + backlog work delivered and pushed; mac-local has noted the §6c pair ("pending Andrii — correct posture", bb2c3f8d7). Delivered tonight beyond the ~01:15 state: A9 + A12 closures (T-SAE thresholds ARMED with values on record; the T5-replica phantoms are the #2/#3 bars of the shipped c3 headline figure + text-vs-figure aggregation mismatch — audit §10), §6a WRITEUP §9 R30 staging (APPLIED by mac-local `bef389a47` after mac-b's race reconciliation), §6c V-win figure (light+dark, licence-guard footer) + G-6 patch proposal (pending Andrii). §6d claimed by mac-a. Open on others: mirror-target question to mac-a (payload JSONs vs ckpts for panels/salvage/calib); A6/A3-residue with Dmitry (9am); A10/A11 parked (synthetic, outside priority trio). Listener: briefings (ex-ledger) + LOG lines naming mac-c/audit/vwin/G6, 150 s poll.
-
-## Overnight queue (briefings/actmix-overnight.md §3) — status ~01:15
-
-1. **Phase-B recipe** ✓ (audit §3, pushed d6e992db9) — turnkey shipped-eval pin for runpod-1.
-2. **HF mirrors** — PARTIAL: λ̂ tsae top-up trio mirrored to `temp_xc_a40_checkpoints/hunt_lambda_tsae_topup_checkpoints/` (manifest w/ sha256 + training_cfg; source `temp-xc-ward-caches:checkpoints_topup/`). **Open question for mac-a/mac-local: dialogue-panel + salvage/calib cells appear to persist result-payload JSONs only (btk_rerun*/`*_results` volumes), no on-volume checkpoints found — confirm whether ckpts exist elsewhere or the payload JSONs are the mirror target.**
-3. **A2 paragraph** ✓ (audit §10-A2, quotable for the paper team).
-4. **EM archaeology (scope-corrected back in)** ✓ evidence-level: A3 order RESOLVED (Nura SAE = ReLU-first dictionary_learning family; state-dict keys via ranged read; residual = wrapper path, one file in fra_proj); A6 public-artifact search EXHAUSTED (runs/ full inventory + census + snapshot check — Gen-2 is definitively pod-local/private).
-
-## Remaining (low priority, on request)
-
-- A9 threshold-buffer read on txcdr-base/txcdr-it ckpt headers (KB-scale) — probing/RLHF-relevant (tsae arms), so in-scope under the priority test if wanted.
-- A12 disambiguator (c3 headline-fig render inputs on origin/final) — probing-relevant, cheap.
-- §6 backlog items per overnight briefing if the above closes.
+- **COMPOSITION_AUDIT.md** — per-arm paper compositions for all 5 tasks; A1/A2/A4/A5/A9/A12 resolved; **A3 FULLY RESOLVED** incl. the train/serve mismatch finding (fra_proj wrapper serves Nura's SAE uncentered TopK→ReLU, threshold skipped, vs its ReLU-first+threshold training family — evidence to Dmitry); A6 public-search exhausted (→ Dmitry); three paper-integrity flags (c6 caption-vs-figure, c7 double declaration, c3 T5-replica phantoms).
+- `tbm_census.jsonl` (1,283 ckpt configs), Phase-B recipe (runpod-1 in use), A2 k-budget paragraph (ratified), ONEPAGER_SKELETON.md (consumed by mac-local's noon one-pager), V-win figure + G-6 patch proposal (pending Andrii), WRITEUP §9 R30 staging (applied `bef389a47`).
 
 ## Git position
 
-Branch `arxiv`, up to date with origin at dispatch (`fd4cc10f9`); this push adds COMPOSITION_AUDIT.md + this STATUS + LOG PTR only (read-only rule otherwise). Roster row already existed (be755651a) — not duplicated.
-
-## Listening
-
-Per shared briefing: watching `experiments/explorations/task_hunt/LOG.md` + `briefings/actmix-*` for scope amendments (poll ~150 s when active). Pods watch my COMPOSITION_AUDIT.md path — pushes to it are the unblock signal for their paper-match arms.
+Branch `arxiv`, rebased on origin at resume. My pushes touch only: task_hunt/{COMPOSITION_AUDIT.md, LOG.md, tbm_census.jsonl, ONEPAGER_SKELETON.md}, agents/mac-c/, txcwin §6c files. Identity `mac-c-agent`.
 
 ## If resuming from compact
 
-Read COMPOSITION_AUDIT.md §0 + §10 first (verdicts + open ambiguities), then this file. The five subagent forensic reports (EM ×2, backtracking, RLHF+synthetic, branch sweep) live in the session transcript; their substance is fully merged into the audit. Tokens: `~/.tokens/hf_token_datasets` (Han's account) — never print/commit; rotates post-weekend.
+Read this file, then LOG tail. Open item = the mirror pipeline above; check background tasks (driver/listener) with `ps`, check `mirror_bundles2/` counts vs 166, rerun driver v2 (skip-existing) if short, then manifest → upload → LOG + push. Token path only, never the value; rotations happen after mirrors confirm.

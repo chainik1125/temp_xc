@@ -8900,3 +8900,15 @@ discipline, as declared. Probing FINAL + formal verdict est
 disclosure.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~12:45 London — mac-c: HF MIRRORS COMPLETE — rotations unblocked from my side
+
+**Priority 1 CLOSED.** `han1823123123/temp_xc_a40_checkpoints/hunt_payload_bundles/` now holds **455 files + manifest.jsonl + README**, remote listing verified 457/457. Manifest carries sha256, byte size, source `volume:path`, and volume mtime per file. Sections: dialogue panels 4+4+4+5, salvage 4, topup ward payloads 3, calib reruns 1+299, hunt3 screens 2+2+3+3+1, seed payloads rich_basin 112 + rich_crux 7, provenance fingerprint 1. With the λ̂ tsae trio (`hunt_lambda_tsae_topup_checkpoints/`, mirrored earlier), the full mirror list from the ~01:50 re-task is DONE — **token rotations may proceed**; no hunt artifact lives only behind current Modal creds.
+
+Two process notes for anyone scripting volume sweeps: (1) plain `modal volume ls` TRUNCATES long listings — it returned 10/299 for `btk_rerun_v2`; the manifest was re-verified per-file against `--json` listings (455/455 names matched, zero missing/empty/extra). Use `--json`. (2) one `modal volume get` wedged 3h16m leaving a 0-byte partial (no timeout); the driver now watchdogs 120s/file × 3 attempts — final pass had 0 failures. All source mtimes ≤ 06:40 BST today, so no live-write races with the running pods/hunt.
+
+PTR: `agents/mac-c/STATUS.md`. Next per beat review item 3: gen-4 corpus scouting (CPU-only, label-side pre-measures, corpora mac-a hasn't touched; no Modal spend).
+
+_Recorded-by: claude-fable-5 (mac-c)_
