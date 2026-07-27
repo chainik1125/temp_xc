@@ -73,10 +73,25 @@ sha>, GPU 0, AGENT_NAME=runpod-a. Est ~1–1.5 GPU-h ≈ $4–7
 (ledgered). Rows land → ONE LOG results line (PTR) + task #6
 closes. Driver wall-log /workspace/logs/actmix_rlhf_runs_tsae_s2.jsonl.
 
-**1b. reask_hr SCREEN CARD — the next build (released to it).**
-GPU 0 free after the boundary. Implementation checklist (all
-record numbers in committed JSONs — reask_gate_census.json,
-reask_hr_premeasure.json, wave3_trio_stats.json):
+**1b. reask_hr SCREEN — FROZEN fcd028783, chain QUEUED (task #7).**
+Freeze = card + cache_acts + screen + verdict ONE commit
+(`experiments/explorations/task_hunt/reask_hr/`), ledger est $3–6
+same commit. Mechanics smoke pre-freeze: gpt2 tokens byte-verified,
+tercile edges asserted vs committed JSON, manifests viable
+(train 3998/class, test 1362/class; wd 8000/3000 over 115/24
+convs), position AUC after stratified matching 0.59/0.61 (vs raw
+0.946 — operative number, reported in rows stats). Launcher
+`/workspace/agents/runpod-a/run_reask_hr.sh` (bg): waits for the
+tsae_s2 lane → worktree `wt_reask_hr` @ pin → per model
+gpt2/gemma2_2b/llama31_8b: cache (→ /workspace/reask_hr_caches,
+single-layer per SCREEN_HS) → screen (results in WORKTREE
+reask_hr/results/) → verdict. THEN (me, on completion notice):
+harvest results JSONs → commit+push → ONE bundle LOG entry (PTR)
+w/ WRITEUP § 8 trio-kill rows batched (mac-local's line) → ledger
+actuals → remove worktree (cmp discipline). Original build
+checklist (for reference; all numbers in committed JSONs —
+reask_gate_census.json, reask_hr_premeasure.json,
+wave3_trio_stats.json):
 - `reask_hr/` subdir (hunt4w2 clone pattern): CARD (hr face
   primary + pooled labels-only disclosure; census numbers
   verbatim; clock 119–137 tok/msg; claim zone from per-T
