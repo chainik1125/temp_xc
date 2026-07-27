@@ -178,3 +178,49 @@ B(runpod-c)=l2bp61kg82epel-64411fb1, all @ssh.runpod.io -i
 5. 3pm PT (23:00 London) check-in support if Han asks; Dmitry's
    draft may need the quote licences (all in LOG: k-inversion
    sentence, identity certificate pending, framing guards).
+
+## ADDENDUM — final pre-compact audit (gaps caught on double-check)
+
+- **STALE /loop CRON**: a 45-minute recurring cron still fires with
+  the prompt "pull and review mac-a/mac-b progress; amend briefings;
+  watch the spend ledger; at 11:00 PT pivot to the Sunday
+  distillation". mac-a/mac-b are RETIRED and the distillation is
+  long done — treat each firing as "review ALL worker pushes +
+  ledger"; the beat pattern (pull → review → ratify/bounce → re-arm
+  watcher) is the real content. Recreate/retire the cron as needed.
+- **Modal state**: workspace spend limit is STILL TRIPPED —
+  deliberately non-blocking (everything migrated to pods); Dmitry
+  raises at leisure for post-deadline Modal use. Modal actuals
+  ≈ $120; no Modal lanes running or planned.
+- **Integrity/audit flags (COMPOSITION_AUDIT)**: A1–A12 all
+  resolved; A12 (phantom c3 T10/T20 = T5 replicas) CLOSED by
+  reproduction — guard-rail stands: nobody quotes the shipped c3
+  T-ordering, runpod-1's real sweep is the replacement evidence;
+  A6 (c6 two fig generations, no in-git producer for the published
+  5-arm) = WITH DMITRY; A3 (Nura wrapper train/serve mismatch
+  inside the EM replication) = evidence delivered to Dmitry.
+  Framing discipline everywhere: "provenance hole, not accusation."
+- **WRITEUP/REBUTTAL_PACK currency**: WRITEUP.md current through
+  wave-2 + emoinst row correction + §7 items 4/cross-substrate
+  paragraph + R30/§9 certifications; REBUTTAL_PACK has λ̂+ttrend
+  exhibits ratified with licences verbatim — ttrend rows now carry
+  the APPENDIX-ONLY flag (Dmitry ruling, LOG ~18:45 entry § 4);
+  RLHF/probing rebuttal sentences = the ratified three-sentence
+  sets (LOG). One-pager: private/monday_onepager_2026-07-27.md
+  (13 decision items; partially superseded by the evening's
+  transcript rulings — the LOG from the 18:45 meeting-absorption
+  entry forward is authoritative).
+- **mac-c re-entry verdicts UNCONFIRMED**: their "LANE CLOSED"
+  covered dharm; whether the msdose_r1 census verdict and the
+  sycgen generation/pre-measure CONCLUDED is not yet on the record
+  — check their next push/STATUS before assigning new work.
+- **Aniket branch (neurips-aniket)**: pushed today — GUM pronoun
+  distance experiment + frozen-dictionary deletion results/gate +
+  T16 backtracking sweep provenance hardening. Watcher exit-3
+  covers his pushes; his sparsity convention verified matching ours
+  (18:22 audit).
+- **RLHF quote licences** (deep in LOG, for Dmitry's draft):
+  R-E1-lead licence — "the missing shuffle control CONFIRMS the
+  paper's reading (0.610→0.598, gap +0.012)"; T-sweep = order-free
+  inverted-U; untrained k500 0.659 > every trained cell (boundary
+  datum, l0 mismatch disclosed beside it).
