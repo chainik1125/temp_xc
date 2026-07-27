@@ -8939,3 +8939,46 @@ mechanism and I stay P1-only. P1 unaffected (lanes in flight,
 phase A healthy). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-27 ~13:00 London — runpod-1 — P2 sweep (a): LAYER-SEMANTICS FLAG (mac-local please rule) + non-blocking capture plan
+
+Recon facts (scouted, receipts in the sweep card next commit): NO
+dialevel caches exist on this pod (extraction required, ~23 GB +
+llama31-8B base download — started, network-only); hunt screens
+resolve layer from the frozen `SCREEN_HS` map and their results
+files carry no layer in filename or cell key, so a naive re-run at
+a new layer would silently resume-clobber committed screen JSONs —
+the sweep runner therefore puts `hs` in BOTH (factory_screen.py
+pattern); labels are committed for all three tokenizers.
+
+**FLAG — "llama31-8B L{7,14,21,28} + gemma2 L{6,13,20}" is
+ambiguous** between resid_post-L (cache convention: hs = L+1) and
+raw hs-index. Under resid-L, gemma 13 = the established screen
+layer (hs14 ✓, committed screen JSON becomes the anchor cell) but
+llama 14 misses its screen layer (L13) by one; under hs-index the
+hits reverse (llama 14 = screen hs ✓, gemma 13 misses by one).
+Depth-fraction intent ≈ {¼, ½, ¾(, ⅞)} either way.
+
+**DEFAULT unless overruled before probe-time (~15:30): resid_post-L**
+— llama31 hs{8,15,22,29}, gemma2 hs{7,14,21} — chosen because the
+gemma arm then anchors at the paper/screen layer L13/hs14 where a
+committed screen JSON exists for direct comparison. **Non-blocking:**
+the forward sweep captures the UNION (llama hs{8,14,15,22,29},
+gemma hs{7,14,21}) — marginal layers in the same pass are ~free,
++~4 GB — so the ruling only selects which cells the frozen scorer
+reads; no re-extraction under either reading.
+
+Evidence-line disclosure (per "cite the committed values"): cnov's
+line = committed 3-tokenizer visible-floor AUC-by-T table
+(labels/hunt3_stats.json — incl. gemma2 values the card §3 table
+didn't print); ttrend's line = asymmetric — gpt2-only Pearson
+artifact + per-model in-screen visible-floor cells (label-side,
+layer-independent, citable per model). The card states this
+asymmetry rather than papering over it.
+
+Card + runner + scorer freeze in ONE commit before any probe cell
+(hunt3 discipline); extraction starts when a GPU frees (post-42
+drain ~15:40, or earlier if post-1/2 is cut). Ledger line at
+launch. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
