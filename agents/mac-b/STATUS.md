@@ -43,6 +43,15 @@ SAME frozen scorer committed before the deciding result (pin from
 origin history + _assert_pinned, ledger line per launch); (3) stage
 a REBUTTAL_PACK row for any order-carrying KEEP.**
 
+**BLOCKS RATIFIED+APPLIED (a380be1fe)** — all six § 8 rows + the
+optional § 7 item 4 went in verbatim. **Timestamp corrigendum
+(c8b11ec19): afternoon LOG stamps ran 60–75 min fast — my ~15:05/
+~16:35/~17:05 entries are ~14:00/~15:25/~15:55 real; use wall-clock
+labels going forward.** **MODAL LIMIT TRIPPED ~15:25 real:** my leg
+completed pre-trip; future launches (incl. wave-2-KEEP replication
+duty + any cnov panel support) gated on Dmitry raising the workspace
+cap (Han asks at 17:00; 19:30 fallback rule = cnov-if-GO first).
+
 **~17:05 HUNT4_DRAFT_BLOCKS staged (b026e1ffe)** per 28a6aa6a6 § 5:
 § 8 breadth rows tret/xtrend (replication receipts inline), WEAK
 rows xnov/sdom (order datum → § 7 per disposition), tretd
