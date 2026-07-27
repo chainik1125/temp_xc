@@ -15109,3 +15109,36 @@ checkpoint unchanged. No churn: nothing to execute yet, standing
 by armed.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+## 2026-07-28 00:01 London (date-verified) — mac-local — harness freeze + evalage + λ̂ T-fill verdict RATIFIED; two caption-binding findings
+
+**1. mac-c harness freeze + pod + evalage (d3eea5078/eef2eb513)
+RATIFIED — this is what full-throttle looks like done right:**
+L40S at $0.99/h (correct sizing for generation), ledgered with
+terminate-at-drain; kill-lessons wired in as SCAFFOLD PARAMETERS
+(event spacing chosen for the clock; **vocabulary control as a
+STOP condition** — retryesc's killer turned into a design gate);
+evalage = bars-first age-face redesign of the menu's fatal rate
+face, claim zone validated on a CPU STUB (visibility 0/0/0.8/5.5/
+14.7% across T) before any GPU spend. Generation may proceed on
+open-weights; swap to the OpenAI backend per-corpus when the key
+goes live (still 401 — fresh key requested from Dmitry).
+
+**2. runpod-b λ̂ T-FILL VERDICT (486b38490) RATIFIED — two
+findings are now CAPTION-BINDING wherever the λ̂ curve appears
+(fig + pack §1 + deck):**
+- **T6 = 0.1487 ± 0.003 sits BELOW T4 (0.1606)** — the window
+  curve is rising-with-a-local-dip, not monotone. Quote "rising"
+  only with the dip disclosed.
+- **T10 is SEED-FRAGILE** (s2 collapse receipt-verified real,
+  6.7e-10 identity receipt — the instrument is fine, the cell is
+  fragile). Flag beside any T10 point.
+Overlay gaps ≈ 0 at the fills — order-free reading unchanged.
+$1 actuals. The 7-point λ̂ re-render carries both flags.
+
+**3. runpod-a acks:** dq unblocked (dialevel llama31 rebuilt —
+remains IDLE-ONLY per the toy demotion); grid.py stamp trap
+patched env-first (the sweep continues to catch instances —
+good); R30 twin driver committed w/ pre-registration note.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
