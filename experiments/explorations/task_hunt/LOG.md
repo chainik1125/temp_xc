@@ -14384,3 +14384,44 @@ driver). My λ̂/dq fill lane uses different harnesses — will verify
 their agent pathway at amendment time. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-27 ~23:42 London — runpod-b: WIDTH-MATCH VERDICT (n=3) — NO LIFT at either k; width was not the binding constraint. PTR
+
+Lane complete (pin b29860ab8, 6/6 evals, 39 min wall). Width-matched
+tsae_btkonly @ d_sae 18432 vs paper-width 16384, per-seed:
+
+| seed | k5 @18432 | Δ vs paper | k20 @18432 | Δ vs paper | l0 |
+|---|---|---|---|---|---|
+| 42 | 0.8182 | +0.0113 | 0.8708 | −0.0002 | 22.71 |
+| 1  | 0.7996 | −0.0021 | 0.8678 | −0.0047 | 23.54 |
+| 2  | 0.8008 | −0.0064 | 0.8738 | +0.0020 | 23.84 |
+| **mean±std** | **0.8062±0.0104** | **+0.0009** | **0.8708±0.0030** | **−0.0010** | 23.36 |
+
+(paper-width bands: k5 0.8053±0.0031, k20 0.87178±0.0008; stds ddof=1, n=3.)
+
+**Measurement reading (verdict belongs to the exhibit fold-in):** both
+Δ-means are ~10× inside seed σ with mixed per-seed signs — width-matching
+16384→18432 moves NOTHING at either k. s42's k5 +0.011 was seed noise
+(other two seeds −0.002/−0.006). realized_l0 stays in the same 22.7–23.8
+regime (above the G1 band, as at paper width). The pre-framed honest
+answer stands: **width was not the binding constraint** — the exhibit's
+NOT-MET line-3 comparator survives width-matching. Rows carry the
+d_sae-18432 override in-key; seed-0/untrained excluded per card.
+
+**Actuals:** 39 min GPU-1 ≈ **$2** (est $3–6 — under). Ledger updated.
+
+**Matrix pickup (1065b26cf), my venue claims:** (4) λ̂ T{6,10}×3 post-arch
+fill + (5) dq T{6,10}×3 fill (dqgap coverage verified: T{2,4,8,16,32}×3
+complete, exactly T{6,10} missing) — claiming BOTH as runpod-b (runpod-a
+chained until late; my GPU 1 free now). **One venue flag needing
+ratification:** T∈{6,10} do not divide the stage-2 EVAL_L=32 (evaluator
+tiling reshape requires T | L — would crash, the λ̂-side cousin of the
+probing phantom-T10 issue). Resolution I will card: per-cell
+`eval_window_L=30` for the four fill T-points only (6|30 and 10|30; the
+mechanism is already supported per-cell, no evaluator edit, no protocol
+bump; quoted-panel L=32 points untouched; one disclosed caption line).
+λ̂ fill card freezes NEXT BEAT gated on this entry's flag standing
+unobjected; dq card after its substrate-cache step-0 check. (3) relu-mix
+seed-split: armed for runpod-2's eq verdict landing; my GPU-1 plan =
+fills now, seed-split half from eq-landing (~01:00+), per matrix routing.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
