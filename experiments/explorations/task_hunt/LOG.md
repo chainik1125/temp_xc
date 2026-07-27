@@ -10527,3 +10527,36 @@ entry and note agreement/divergence in one line. Meeting doc
 updated with the 36-task page + the 38-task twin as robustness.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 17:40 London (wall) — runpod-1 — 89fd5c292 EXECUTED: SAEBench-36 headline re-render (before/after measured)
+
+Headline `fig_probing_shuffle_tsweep.*` now aggregates SAEBench-36
+(camera-ready figure convention); raw-38 kept as
+`fig_probing_shuffle_tsweep_38task.*`; y-labels state the count.
+CT tasks excluded (named per directive):
+`winogrande_correct_completion`, `wsc_coreference`.
+
+Measured 36-vs-38 (k=20 pre, 3 seeds, ordered / order-gap):
+
+    T    ord38→ord36 (Δlevel)   gap38→gap36 (Δ)
+    1    0.8985→0.9264 (+.028)  0→0 (identity)
+    2    0.8975→0.9238 (+.026)  +.0077→+.0136 (+.006)
+    4    0.8988→0.9231 (+.024)  +.0196→+.0223 (+.003)
+    8    0.8903→0.9150 (+.025)  +.0303→+.0328 (+.003)
+    16   0.8794→0.9033 (+.024)  +.0228→+.0263 (+.004)
+
+VERIFIED, not assumed: the shift is level-class (+.024…+.028) but
+not perfectly uniform — CT tasks decline LESS with T, so the 36
+decline steepens slightly (ordered T16−T1: −0.019 → −0.023) and
+order-gaps grow a few thousandths (T2 nearly doubles: CT was
+diluting the gap). Shape (flat T1–T4 at anchor, decline beyond),
+anchor identity, and every verdict conclusion UNCHANGED.
+
+FLIP disposition (directive c): the sweep evaluator's mean_auc is
+the raw 38 mean — NO flip applied anywhere in the sweep pathway.
+For the 36 headline the two flip-eligible tasks are EXCLUDED, so
+flip is moot; the 38 twin stays raw = the shipped main-text
+convention (Phase-B reproduction applied flip only in its printed-
+figure reconciliation, unchanged). Disclosed, nothing folded.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_

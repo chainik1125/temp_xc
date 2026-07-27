@@ -243,8 +243,26 @@ def make_fig(cells: dict, arm: str, k: int, Ts, outdir: Path):
     plt.close(fig)
 
 
+# The paper's probe suite is 38-task SAEBench+CT; the camera-ready
+# FIGURE headline excludes the two CT tasks (paper-history e77574ffd;
+# ≈ −0.027 uniform level shift when included). Directive 89fd5c292:
+# headline fig = SAEBench-36 CT-excluded, 38-task raw kept as the
+# robustness twin. The evaluator's mean_auc is the raw 38 mean (no
+# FLIP); FLIP is moot for the 36 headline (CT excluded) and the twin
+# stays raw = the main-text convention.
+CT_TASKS = ("winogrande_correct_completion", "wsc_coreference")
+
+
+def _agg_mean(m: dict, prefix: str, exclude=()) -> float | None:
+    p = prefix + "__"
+    vals = [v for kk, v in m.items()
+            if kk.startswith(p) and kk[len(p):] not in exclude]
+    return float(np.mean(vals)) if vals else None
+
+
 def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
-                     pair_style: str = "mono"):
+                     pair_style: str = "mono", exclude=(),
+                     n_tasks_label: str = "38 tasks", suffix: str = ""):
     """Aniket-template shuffle T-sweep (059a66239 P1 deliverable).
 
     Knob-for-knob twin of runpod-2's RLHF renderer (421f6fa37,
@@ -267,8 +285,11 @@ def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
     pts = {}   # (T, seed) -> {"ordered": v, "shuffled": v}
     for (a, u, T, s, kk), m in cells.items():
         if a == TXC_PRE and not u and kk == k and "mean_auc" in m:
-            pts[(T, s)] = {"ordered": m["mean_auc"],
-                           "shuffled": m.get("mean_auc_shuf")}
+            o = _agg_mean(m, "auc", exclude)
+            sh = _agg_mean(m, "auc_shuf", exclude)
+            if sh is None and m.get("shuffle_identity"):
+                sh = o
+            pts[(T, s)] = {"ordered": o, "shuffled": sh}
     if not pts:
         print("[analysis] writeup fig skipped: no TXC-pre rows")
         return
@@ -335,17 +356,18 @@ def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
     ax.set_xticklabels([str(T) for T in Ts_])
     ax.minorticks_off()
     ax.set_xlabel("T (window length)")
-    ax.set_ylabel(f"mean probing AUC (k = {k}, 38 tasks)")
+    ax.set_ylabel(f"mean probing AUC (k = {k}, {n_tasks_label})")
     ax.grid(True, alpha=0.25, lw=0.5)
     ax.legend(frameon=False, fontsize=8, loc="lower right",
               bbox_to_anchor=(1.0, 0.08))
     fig.tight_layout()
     outdir.mkdir(exist_ok=True)
     for ext in ("png", "pdf"):
-        fig.savefig(outdir / f"fig_probing_shuffle_tsweep.{ext}",
+        fig.savefig(outdir / f"fig_probing_shuffle_tsweep{suffix}.{ext}",
                     dpi=300 if ext == "png" else None)
     plt.close(fig)
-    print(f"[analysis] writeup fig ({tag}): seeds {seeds}; coverage {cov}")
+    print(f"[analysis] writeup fig{suffix or ' (headline)'} ({tag}, "
+          f"{n_tasks_label}): seeds {seeds}; coverage {cov}")
 
 
 def main():
@@ -391,8 +413,14 @@ def main():
     print(f"[analysis] wrote {HERE}/RESULTS_{args.arm}.md + figs/")
 
     if args.writeup:
+        # Headline: SAEBench-36 CT-excluded (camera-ready figure
+        # convention, directive 89fd5c292); robustness twin: raw 38.
         make_writeup_fig(cells, 20, args.Ts, args.writeup,
-                         ROOT / "figs_writeup", pair_style=args.pair_style)
+                         ROOT / "figs_writeup", pair_style=args.pair_style,
+                         exclude=CT_TASKS, n_tasks_label="SAEBench-36")
+        make_writeup_fig(cells, 20, args.Ts, args.writeup,
+                         ROOT / "figs_writeup", pair_style=args.pair_style,
+                         n_tasks_label="38 tasks, raw", suffix="_38task")
 
 
 if __name__ == "__main__":
