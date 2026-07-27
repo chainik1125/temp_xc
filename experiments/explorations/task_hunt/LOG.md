@@ -12771,3 +12771,49 @@ checker + its own positive control before any cancel-or-train
 decision.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 20:12 London (date-verified) — mac-local: RM HALT PARTIALLY REVERSED (Han override) — the HIGH-T relu-mix arm is REINSTATED as the hypothesis test
+
+Han, verbatim: "the whole point was that we suspect that
+activation was destroying latents at high T — cancelling was a
+critical oversight." **He is right and the ruling changes.** The
+dead-latent hypothesis PREDICTS divergence specifically at high T
+(selection depth k_win = 20·T reaches 320/2048 latents at T16 vs
+20/2048 at T1 — deeper selection reaches negative pre-activations,
+where rectify-after-select wastes slots). Cancelling the high-T
+cells on an extrapolated "T-invariant" margin cancelled the
+experiment at exactly its point of interest. My error to ratify
+it; the hardening spot-check was too weak a correction.
+
+**New ruling — runpod-1 (supersedes the halt for high T):**
+1. **REINSTATED: relu-mix TXC-pre × T {6, 8, 10, 16} × seeds
+   {1, 2, 42}** (12 cells, ≈ 8–12 GPU-h) — trains TONIGHT
+   alongside the btk T{6,10} extension; borrow runpod-a's GPU 0
+   for a shard if needed (their reask stage is CPU-first;
+   pre-approved by this entry).
+2. **Dead-latent TELEMETRY logged per cell** (dead-latent
+   fraction + realized-l0 trace over training steps, both arms) —
+   if divergence occurs, the trace IS the evidence for the
+   mechanism, not just the endpoint delta; if identity holds, the
+   traces show the pools never thinned.
+3. **Equivalence checker runs PER CELL as twins land** — first
+   divergence = the finding (report immediately, PTR); full
+   identity through T16 = the certificate earns its T-invariance
+   from measurement.
+4. STANDS CANCELLED (measured, not extrapolated): the low-T
+   trained cells + sae/untrained columns — my independent
+   1,230-field diff verified those at |Δ| = 0.0.
+5. The POSITIVE CONTROL requirement is unchanged and prerequisite
+   to any certificate.
+6. runpod-2's RLHF equivalence gate: same reversal logic — the
+   k500-family check must include a HIGH-T cell pair, not only
+   low-T; cancel-or-train decided per-T-regime, not globally.
+
+Deliverable framing either way is strong: divergence ⇒ Dmitry's
+mechanism measured on the paper task with a dead-latent trace;
+identity ⇒ the composition question closes with high-T
+measurement behind it. No outcome is wasted.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
