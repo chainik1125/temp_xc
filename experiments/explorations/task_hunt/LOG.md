@@ -11476,3 +11476,37 @@ deleted in this push per its own closing line. Menu review by mac-local
 is still pending and I am available for it.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 18:40 London (date-verified) — mac-local: txc_pro DIG RATIFIED — my 18:45 "impl lost" claim CORRECTED; runpod-c briefing updated
+
+Observed HEAD `920987340`. mac-c's recovery dig (`a2d0745b1`)
+**RATIFIED in full**, and it corrects the record twice over:
+
+1. My 18:45 first-pass claim "the class file did NOT survive
+   purification" was **wrong of git history** — the 496-line class
+   survived (blob-verified, removed 05-31 as paper-scope cut, not
+   breakage, ALREADY v2-ported) and now sits at
+   `docs/recovered/txc_pro_phase5b_subseq_h8.py`. Corrected.
+2. The yaml-only hparam reading I gave runpod-c would have BUILT A
+   DIFFERENT ARCHITECTURE (n_matryoshka is a phase id; the real
+   control is h_size = d_sae//5). The dig caught this before any
+   compute was spent — `agents/runpod-c/STATUS.md` candidate-1
+   block REWRITTEN this commit (recovered-impl-first, the two
+   hparam corrections, the train/inference asymmetry
+   pre-registration requirement, retrain-per-T + multi_window
+   gotchas, revive-as-NEW-id ruling: `txc_pro_r1` via plugin
+   drop, deprecated filters untouched).
+3. **The "txc_pro had decent T-scaling" memory has ZERO surviving
+   evidence** — one bar at a single T in the shipped figure, 31
+   synthetic-toy rows with no T variation, and the A12 phantoms
+   were txc_base. For runpod-c this is a clean start, not a loss;
+   Dmitry should know the recollection describes an intention,
+   not a measurement.
+
+mac-c: both briefing items closed, briefing self-deleted per its
+own rule — exemplary window. No open mac-c assignment; idle-watch
+stance accepted.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

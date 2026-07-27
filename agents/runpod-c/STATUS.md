@@ -46,16 +46,31 @@ problem is capacity/granularity allocation across the window.
   full T — this is the number that gets reported.
 
 **C. Candidate menu (start here, extend freely):**
-1. **The txc_pro recipe, reimplemented from its locked hparams**
-   (`origin/final-aniket:purified/configs/locked_archs.yaml`,
-   tag `phase5b_subseq_h8` — the class file was LOST in
-   purification; mac-c may recover the original, fold it in when
-   they do, but do NOT wait): d_sae 18432, T_max 10,
-   **t_sample 5 = train on resampled sub-windows** (mixed-T
-   curriculum), n_matryoshka 8, contrastive_shifts [1,2] w/
-   inverse-distance weighting, auxk_alpha 0.03125,
-   dead_threshold 10M tokens. Ablate its components separately —
-   which ingredient carries the T-scaling?
+1. **txc_pro — USE THE RECOVERED IMPLEMENTATION, do NOT
+   reimplement from the yaml** (mac-c's dig `a2d0745b1` +
+   `task_hunt/TXC_PRO_RECOVERY.md` — READ IT FIRST): the full
+   496-line class survived in git and sits verbatim at
+   `docs/recovered/txc_pro_phase5b_subseq_h8.py`, already
+   v2-ported (`arch_version 2.0.0`, `consumes: 'sequence'`).
+   CRITICAL corrections vs the yaml-only reading:
+   `n_matryoshka: 8` is a PHASE ID, not a level count — the real
+   control is `h_size = d_sae // 5` (building "8 matryoshka
+   levels" yields a DIFFERENT architecture); `k_pos = 20`;
+   **k_train = k_pos·t_sample = 100 vs k_inference =
+   k_pos·T_max = 200** — sweeping T_max at fixed t_sample widens
+   the train/inference budget asymmetry with T, so PRE-REGISTER
+   your ratio choice (hold ratio vs hold t_sample) in the split
+   card; `encode()` hard-raises unless T_input == T_max ⇒ a
+   T-sweep RETRAINS per T; `multi_window` flip invalidates
+   train_keys. **Revive as a NEW arch id** (e.g. `txc_pro_r1`,
+   plugin file-drop + YAML per hard rule 3) — do NOT resurrect
+   the deprecated `txc_pro` id or touch the DEPRECATED_ARCHS
+   filters. **Prior status: ZERO real T-scaling evidence exists
+   for this recipe** (A12-aware; the phantoms were txc_base; its
+   31 leaderboard rows are synthetic-toy, no T variation) — treat
+   it as a hypothesis-rich candidate with NO prior, and ablate
+   its components (subseq resampling / contrastive / auxk /
+   H+full layout) separately.
 2. Dead-latent mitigations under BatchTopK: auxk loss, ghost
    grads, dead resampling schedules.
 3. Sparsity scheduling: anneal k during training; per-position k
