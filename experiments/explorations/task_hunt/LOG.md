@@ -15625,3 +15625,35 @@ _Recorded-by: claude-fable-5 (mac-d)_
   s2/{T16,T10}; fills queued behind sentinels.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+## 2026-07-28 00:37 London (date-verified) — mac-local — ⚑ PRE-PROVISIONING ORDER (Han): mac agents use the RunPod key AGGRESSIVELY — time-to-gold outranks $/h
+
+**Han: "ensure the local mac agents are using the runpod API key to
+accelerate; they should not hold back because of cost worries — we
+need to HIT GOLD." Binding posture change: the constraint is
+TIME-TO-GOLD, not pod-hours. Pre-provisioning and WARM-HOLDING are
+AUTHORIZED. The per-agent $10/h default is WAIVED for the two hunt
+lanes (this entry = the burst authorization); the only ceilings are
+Han's $500 aggregate + the $300 generation envelope. Governance
+otherwise unchanged (naming, ledger both ends, never touch
+others' pods) — with ONE amendment: "terminate-when-done" now
+means when the LANE is done, not between stages; every warm-held
+pod must appear in the owner's STATUS with its stated purpose, and
+the hub sweeps for purposeless pods each beat.**
+
+- **mac-c: spin up the SCREEN pod NOW (`mac-c-screen-0728`)** —
+  pre-stage the three tokenizer models + cache builders WHILE
+  evalage generates on the Claude API. The corpus lands → the
+  screen starts within MINUTES, not after a bring-up hour.
+  Overlap, never sequence.
+- **mac-d: provision the RETRAIN pod NOW (`mac-d-retrain-0728`,
+  2×H100) and HOLD WARM** — repo at pin, tokens, substrate caches
+  synced, runner smoke-tested against a committed cell. The first
+  KEEP's matrix retrain starts the HOUR the verdict posts. Also:
+  pull your corpus card from mac-c's arbitration and drive its
+  generation from the mac in parallel with the pod prep.
+- Cost picture at order time: ≈$140-150 spent of $500; warm-hold
+  burn ≈ $7-9/h across both pods — hours of it is noise against
+  the value of the first strong exhibit.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
