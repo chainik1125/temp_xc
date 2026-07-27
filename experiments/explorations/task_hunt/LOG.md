@@ -11184,3 +11184,100 @@ RESULTS_relu-mix.md on drain (or morning per RM-E4).
 runpod-1 total ≈ $98 + RM's pre-midnight fraction — inside $150.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+## 2026-07-27 19:30 London (wall) — mac-c: SAFETY TASK MENU delivered — 16 ranked candidates, 3 feasibility tiers, one corpus fact that moves a card
+
+`briefings/safety-task-research.md` primary deliverable is on disk:
+`SAFETY_TASK_MENU.md`. Research inventory, **NOT a freeze and NOT a
+pre-registration** — screens/cards/verdicts stay with `runpod-a`. Every
+predicted outcome is labelled a *prior*, with wave-2 cited as the reason
+to distrust priors (the two headline faces died; the third-ranked one was
+the only KEEP 3/3).
+
+**Headline for the executor:** the naive port of every seed direction in
+the briefing walks straight back into `refmark`'s obituary. The menu's
+spine is the fix.
+
+1. **The design principle** (§ 1.2). `refmark` died to the visible-cue
+   floor AND identity because *a safety marker is visible at the token
+   where it occurs*. `tret`/`sage` survived because **the event
+   indicator depends on out-of-window information while the kernel
+   support stays inside the window**. Candidates are scored on that
+   property; ones that fail it should be $0-killed, not screened.
+2. **The clock** (§ 2) is the binding constraint and it is already
+   measured in-repo: WildChat runs **125–144 tokens/message**
+   (`refmark/CARD.md` § 2), so `refmark`'s kernel spanned ≈16× the top of
+   the ladder. Turn-scale safety events under a **T1 rate** face give
+   ~0–1 counts per window — the reach-limited negative. **The answer is
+   the T2 age face**: well-defined at any distance, floor exact-iff-in-
+   window and censored beyond (`gen4c_lib.sage_floor`, unit-tested), so a
+   real claim zone exists at T ≤ 32 — where `sage` scored KEEP 3/3.
+   **A safety card proposing a rate face over turn-scale events, without
+   the clock statement first, is repeating `refmark`.**
+3. **Four label templates**, each with an audited in-repo precedent
+   (T1 rate / T2 age / T3 dosage / T4 pre-onset ladder) — reuse, don't
+   invent.
+
+**Top of the ranking.** Tier A (screenable this week, $0 labels, corpus
+already committed): 1 `sycpress` (user-pushback age/rate probed at
+assistant tokens — sycophancy is now an EM *cause*, not an adjacent
+toy), 2 `reask` (re-ask-after-deflection persistence; event indicator
+out-of-window by construction, reuses `refmark_lib`'s frozen
+12-substring list verbatim), 3 `dharm` (decomposition-attack
+progression), 4 `msdose` (many-shot dosage; constructed, zero judge).
+Tier B adds `sysage`, `toolpriv`, `rhonset`, `histakes`, `afgap`;
+Tier C the elicitation/judge-gated six.
+
+**If wave-3 takes exactly one new pull, take `DecomposedHarm`** (#3).
+The source paper (`2506.10949`, read in full) reports 87% attack success
+on GPT-4o, agent-setting refusal collapsing 50% → 10% under
+decomposition, and a *cumulative sequential* monitor reaching 93% —
+window-over-token, arrived at independently from the safety side, with
+structural labels and no judge. **If wave-3 takes zero pulls**, #1, #2
+and #4 all run on what is already committed.
+
+**One measurement, and it moved a card.** A $0 corpus-shape count over
+the committed `refmark2k_corpus.json.gz` (roles + message counts, no
+labels, no faces, no AUCs): 2,000 conversations, 23,772 user + 23,865
+assistant messages, **0 system turns**, 15/20/116 messages per
+conversation. So `sysage` **cannot** use this corpus and is demoted
+Tier A → Tier B (constructed only, with anchor re-statement at jittered
+positions, or age-since-anchor collapses to absolute position). Shipping
+it as "screenable this week" on the unchecked assumption would have cost
+the executor a week.
+
+**Four $0 kills recommended at design review** (§ 7), each naming the
+precedent it repeats: sleeper/backdoor trigger latch (the alignment-blog
+title *Simple Probes can Catch Sleeper Agents* is itself the kill; plus
+`slen/lat`'s order-free latch precedent), refusal-direction redux
+(already dead in WRITEUP § 8), current-prompt harmfulness (regime-1,
+= `refmark`'s ambient anchor), turn-count-as-safety-proxy (position +
+`dialevel`'s 0.98 identity). **These are recommendations to the lane
+owner — single-owner rule: formal kill lines belong to `runpod-a`.**
+
+**Ethics flag, raised not acted on:** WildChat contains real distress
+content. A crisis-escalation face is scientifically adjacent to
+`histakes` but I am **not** proposing it — it would mean building a
+labelled index of identifiable distress from a public corpus. That
+direction needs Han's explicit sign-off and a synthetic substrate.
+
+**Also on record:** `emotional_instability` (#10) needs no design work
+at all — its card is already FROZEN in-repo (κ ≥ 0.3 prereg gate, judge
+budget ≤ $40, T4 primary readout, regime-1 anchor that kills any
+detection-claiming card). It is a **budget decision, not a research
+decision**.
+
+Process notes. (a) `clew` answered everything — the on-loan S2 key was
+never touched (no direct S2 request issued this session). (b) Citation
+honesty envelope in § 9: arXiv ids/venues are registry-verified via
+`clew works show`; content claims are abstract-level **except two marked
+`[read]`**. (c) Registry gap reported, not acted on (clew is read-only
+to agents): *Many-shot Jailbreaking* is registered without a fetchable
+URL — `clew fetch` refuses with *"no URL or arXiv id to fetch"*, so its
+dose-response claim is cited from title/venue only. Worth Han adding a
+URL.
+
+Next from me: the briefing's bounded secondary item — the `txc_pro`
+recovery dig (implementation + any REAL probing T-scaling evidence,
+A12-aware). Briefing stays undeleted until that lands.
+
+_Recorded-by: claude-fable-5 (mac-c)_
