@@ -9849,3 +9849,54 @@ HF cache env split-brain (llama at hub-root, gemma under hub/) —
 unified to hub/ layout, offline mode both.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 ~19:20 London — runpod-1 — P2 SWEEP (a) COMPLETE: depth profiles landed (screens, PTR) — trailing-dialogue faces are EARLY-layer phenomena
+
+All 7 (model, hs) screens done at PIN 6498ef7ad (112 cells each,
+parent instruments verbatim, per-token-first preserved, wd arms
+present everywhere); frozen scorer emitted
+`layer_sweep/results/depth_profile.{json,md}` (14 rows, zero
+missing cells). Receipts first, then the read.
+
+**Instrument receipts (both PASS):**
+- gemma hs14 sweep row vs committed parent screen row: agreement to
+  ±0.004 across all 13 readout arms — the hs-parameterised runner
+  replicates the frozen instrument at its own layer.
+- `vis_floor_T32` bit-identical across hs within every (face,
+  model) — the "evidence lines are label-side hence
+  layer-independent" premise proven in-run (R3 EXACT).
+
+**The read (descriptive, screens issue no KEEP/KILL):**
+- **Depth profiles are EARLY-HEAVY in all 4 (face, model) tables**:
+  tok-linear and actxmean_T32 peak at the shallowest swept layer
+  (llama hs8 = L7; gemma hs7 = L6 ≈ hs14 = L13) and decline
+  monotonically into depth. The frozen screen layer (hs14) was
+  near-optimal for gemma but llama's face information peaks
+  SHALLOWER: hs8 > hs14/hs15 > hs22 ≥ hs29 (e.g. cnov actxmean
+  0.5560 → 0.5184; tt wd 0.7021 → 0.6435).
+- **R-scoring vs card § 4**: R1 NOT met (no peak at/adjacent to the
+  screen layer for llama; gemma flat early-mid) and R2 INVERTED
+  (early layers are the FARTHEST above floors, not the closest) —
+  both miss in the same informative direction: trailing-dialogue
+  state is not accumulated with depth, it is present early and
+  ERODES. R3 exact (above). R4 MET: wd arms track the main arms'
+  profile at every layer — no high-main/collapsed-wd layer, so no
+  depth serves dialogue identity in place of the face. R5 NOT met
+  (ord−shuf largest at the earliest llama layer, +0.041 tt hs8;
+  non-monotone in gemma — no clean mid-depth peak).
+- **Face standing unchanged** (consistent with parents): cnov beats
+  its visible floor only early (gemma hs7 +0.083, llama hs8 +0.029,
+  decaying to ≤ 0 by llama hs22); tt sits below its floor at every
+  layer (−0.03…−0.08). The floors remain the kill instruments;
+  nothing here reopens a pick.
+
+**Ops/actuals**: extraction ≈ 4 GPU-min total (canonical dialevel
+caches healed for the pod, mappings verified; union layers, one
+HF-cache split-brain relaunch disclosed) + probes ≈ 50 GPU-min ≈
+**~$3 vs $3–5 est, no corr** (ledger line stands). post-1/2: GPU0
+chain shard mid-cell-1; GPU1 standalone shard launched ~19:10.
+Depth-profile artifacts + 7 screen JSONs committed this push. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
