@@ -13307,3 +13307,76 @@ experiments/explorations/relational/ (Andrii's attention study +
 work log) — not fleet-governed, skim post-deadline.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 22:34 London (date-verified) — mac-local — ONSET-MAP CORRECTION RATIFIED IN DIRECTION + independent per-T diff (new receipts + one ANOMALY runpod-1 must resolve before the certificate) + runpod-2 depth sweep + runpod-c wave-3 ratifications
+
+**1. runpod-1's 21:12 correction (their mea culpa) RATIFIED IN
+DIRECTION — and I re-ran my own instrument.** Per-T twin diff over
+the leaderboard AS OF NOW (probing, relu-mix vs btk-only,
+positive-control rows excluded; all pairs separate trainings by
+train_key):
+
+    T=1:  6 pairs, 1026 fields, max|Δ| = 0.0        (exact)
+    T=2:  6 pairs, max|Δ| = 7.7e-1  (per-task l0, s42/k5/shuf)
+    T=4:  6 pairs, max|Δ| = 7.6e-1  (per-task l0)
+    T=6:  2 pairs, max|Δ| = 7.6e-1  (per-task l0)
+    T=8:  4 pairs, 684 fields, max|Δ| = 0.0         (exact) ⚑
+    T=16: 6 pairs, max|Δ| = 2.5    (realized_l0_max_task)
+    sae/untrained (no T): 8 pairs, max|Δ| = 0.0     (exact)
+
+CONFIRMS the corrected direction: metric-level divergence exists at
+T{2,4,6,16} in landed rows (per-task l0 deltas ~0.8 tokens; T16 up
+to 2.5) — my earlier "30/30 at |Δ|=0.0" receipt was TRUE OF THE
+THEN-LANDED SET and its scope is now formally narrowed: the
+identity claim holds at metric level for T1 + sae + untrained ONLY.
+(Low-T relu-mix cancellations are MOOT, not wrong — T2/T4 twin
+cells exist; nothing needed reinstating there.)
+
+**⚑ THE ANOMALY (blocking the certificate):** T8 is EXACT across 4
+twin pairs while T6 diverges — inconsistent with monotone
+deepening. Sha forensics (local): the T8-exact pairs face btk
+twins @50be1a4d6 while divergent T2/T4/T16 pairs face btk
+@6498ef7ad — and the SAME rm pin (8c231e806) appears on both exact
+and divergent sides. The onset map cannot separate
+composition-effect from twin-generation/venue effect without
+per-cell provenance. **CERTIFICATE REQUIREMENT (binding): the
+onset table posts receipt-complete per cell — ckpt ids, pod,
+code sha BOTH arms, comparison level (ckpt-bit / weight-tensor /
+metric), and an RNG-stream statement. The T8-vs-T6 contradiction
+is the acid test: if the receipts cannot explain exact-at-T8 next
+to divergent-at-T6, the map conflates twin generation with
+composition and does not post.** Morning traces (boundary_min_pre)
+should settle it mechanistically — a T8 trace whose selection
+boundary never crosses 0 while T6's does would be dispositive
+(and surprising); a generation explanation is the mundane
+alternative. Either way: receipts first.
+
+**2. runpod-2 λ̂ depth sweep RATIFIED.** D-K1 anchor exact, D-P1/P3
+clean, D-P2 MISS faithfully reported on both branches (quasi-flat
+per-token depth profile, no localization) — the miss is the
+result, correctly not massaged. The exploratory depth-monotone
+aggregation gain (+0.037→+0.076, order-g ≤ 0 throughout) is
+correctly labeled non-pre-registered; echo framing
+(same-instrument-family caveat) is within bounds. $2 actuals.
+My earlier Ward-yields constraint is moot (it drained in 0.5
+GPU-h before the constraint landed). Queue proceeds: eq lane
+(T16 telemetry twin) → x6‖x10 overnight → morning re-render.
+
+**3. runpod-c wave-3 plugin + ablations RATIFIED.** The
+decomposition is exemplary: contrastive EXONERATED for collapse
+(active-frac unchanged) and mildly harmful at T16 (nocontr
+0.9177 > 0.9148); matryoshka exonerated (nomatr still collapsed);
+CURRICULUM CARRIES THE EFFECT — and the isolation plugin's
+anchor-coincidence-by-construction (T=1 ≡ parent bit-equal, 7/7
+contract tests incl. slab-gradient-leak) is exactly the right
+answer to the T1-level gate. Within the pre-registered menu
+(curriculum-isolated = menu #4). **SHARPENED REQUIREMENT
+(supersedes my 20:44 item-2 wording): your STATUS twin-redundancy
+rationale ("compositions coincide") is now STALE — coincidence was
+measured at 4k-step screens; the corrected onset map + my table
+above show metric divergence from T2 at 20k steps. The L2/20k
+dev-16 diagnostic cell requires its relu-mix twin (ONE cell) +
+telemetry BOTH arms; "btkonly carries" rides on that receipt at
+exactly the regime where it is most at risk.**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
