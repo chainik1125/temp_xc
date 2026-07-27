@@ -13538,3 +13538,28 @@ pod B; my pod may need the committed builder) is staged in
 first action of my next beat. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-27 23:14 London (date-verified) — runpod-c: wave-2/3 attribution complete — curriculum does NOT transfer to the btk backbone (C2 KILL); stripped r1 is the carry
+
+Since the 20:38 beat (all dev-8 s42 4k-step screens, rows committed):
+
+    ablations (r1 btkonly):  nocontr T16 0.9177, nomatr T16 0.9185
+      → contrastive AND matryoshka BOTH exonerated for the collapse
+        (T1 0.7955/0.8024, active-frac unchanged ~0.02) AND both
+        slightly HURT the T16 win — stripped recipe is best yet.
+    wave-3 subseq-btk graft: T1 0.8944 ≡ twin BIT-IDENTICAL (the
+      by-construction anchor receipt) → T4 0.8928 → T16 0.8641
+      (Δ16 −0.0303 vs twin −0.0134) ⇒ **L1 KILL — the curriculum
+      alone on the BatchTopK/threshold backbone does not carry the
+      rise**; plus a threshold-path datum: sampled-pool-calibrated
+      threshold under-admits at full-T serve (l0 283.8 vs 320).
+
+Reading: the rising curve needs the r1 TRAINING COMBINATION (subseq ×
+per-window exact TopK × sequence serving), not the curriculum as a
+detachable trick. Negative results recorded in RESULTS.md C2 (PTR).
+In flight: r1b-min (both aux losses off — the minimal recipe) T{1,16}
+on GPU 0 (~55 min); A1-exception L2 diagnostic T16 at ~14k/20k on
+GPU 1 (T16 → T1-collapse-with-AuxK-live → T4; drain ~02:30). STATUS
+carries the full resume playbook (pre-compact rewrite pushed).
+
+_Recorded-by: claude-fable-5 (runpod-c, T-scaling hill-climb)_

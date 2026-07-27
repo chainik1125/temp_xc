@@ -63,7 +63,7 @@ production: T1 0.8944 ≡ twin). Its T16 cell decides everything.
 | r1-paper / r1-btkonly | 0.7985 | 0.8633/0.8634 | 0.9153/0.9148 | twins training-identical; collapse T1 (2 % active) |
 | r1b-nocontr | 0.7955 | — | 0.9177 | contrastive exonerated (collapse + win) |
 | r1b-nomatr | 0.8024 | — | **0.9185** | matryoshka exonerated; stripped best |
-| subseq-btk (wave 3) | 0.8944 (≡ twin) | 0.8928 | **eval running** | T1 anchor by construction |
+| subseq-btk (wave 3) | 0.8944 (≡ twin) | 0.8928 | 0.8641 KILL | curriculum does not transfer; threshold under-admit datum |
 
 k5 mirrors the story (r1 T16 0.8610–0.8711 vs twin 0.8267). ALL
 r1-family T16 gains are ORDER-FREE (shuffle gap ≈ 0 or negative) —

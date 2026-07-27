@@ -77,3 +77,33 @@ canonical step count? Its result CANNOT reach L3 without passing the
 drives the collapse, which carries the slope.
 
 ---
+
+## C2 — txc_btk_pre_subseq_btkonly (subseq curriculum on the btk backbone) — L1 verdict 2026-07-27 ~23:12 London
+
+Tag `subseq-btk-4k`; 4k steps, WindowBuffer serving (Amendment-1 batch
+rule), ratio-rule t_sample, dev-8 s42.
+
+| | T1 | T4 | T16 | Δ16 |
+|---|---|---|---|---|
+| k20 | 0.8944 (≡ twin, receipt) | 0.8928 | 0.8641 | **−0.0303** |
+| k5 | 0.7978 | 0.8163 | 0.7815 | −0.0163 |
+
+**Verdict: NO TRANSFER — L1 KILL at 4k.** The curriculum grafted onto
+the BatchTopK backbone declines MORE steeply than the plain baseline
+(twin Δ16 −0.0134). The T=1 bit-identity receipt worked exactly as
+designed (0.8944, l0 13.4 ≡ twin). Additional mechanism datum: T16
+realized l0 283.8 vs 320 nominal — the JumpReLU threshold calibrated
+on the SAMPLED pool (t_sample=8) under-admits at full-T serve; the
+graft pays a real threshold-path cost for the train/serve asymmetry
+that the r1 family (exact per-sample TopK at serve, no threshold)
+never pays.
+
+**Attribution state after C1+C2:** the rising T-curve requires the r1
+TRAINING COMBINATION (subseq × per-sample-window-TopK × sequence
+serving with random anchor offsets × exact-k serve) — not the
+curriculum alone on a BatchTopK/threshold backbone. Next completing
+cell: `r1b-min-4k` (r1 btkonly with contrastive AND matryoshka both
+removed — the minimal subseq+TopK+auxk recipe), T {1,16}, launched
+23:14 on GPU 0. If r1-min holds ≈0.918 at T16, the minimal recipe is
+the L2 candidate; its T1 collapse remains the open problem (L2 diag
+answers the AuxK-live half overnight).
