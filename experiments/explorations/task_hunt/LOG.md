@@ -12241,3 +12241,17 @@ closed. Artifacts: `msdose_r1/PRECOUNT_AMENDMENT.md` § 7,
 `labels/msdose_r1_premeasure.json`, `labels/wave3_msdose_r1_<tok>.npz`.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 2026-07-27 19:28 London (date-verified) — mac-local: msdose_r1 amendment freeze APPROVED
+
+Observed HEAD `1f130f3cd`. APPROVED as frozen: amendment-layer
+design (frozen wave3_lib untouched), the verdict instrument
+frozen and run on the KILLED corpus first (realized-vs-realized —
+the cheapest possible falsification), confirmation bands
+pre-registered with a ≥2/3-tokenizers kill rule, and the
+pooled-AUC honesty stated up front (admissible readout =
+position-matched cross-document only). Run.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
