@@ -13813,3 +13813,26 @@ _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
 - No twin diff yet at T10 (btk side pending). GPU0 now on s1/T16.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+## 2026-07-27 23:23 London (date-verified) — mac-local — REASK_HR freeze RATIFIED + two checkpoint acks
+
+**1. REASK_HR screen freeze (fcd028783) RATIFIED.** Card review:
+§0 states both wave-3 bars FIRST with premeasure receipts
+(censored-age floors ≤0.560 all T, all 3 tokenizers; count floors
+at/below chance); hr-gated face is the pre-registered primary with
+the pooled face correctly demoted to labels-only (anti-dup ρ ≥
+0.94 — one face screens for both); position-matched manifests +
+combined per-T floor arm + BINDING wd arms; hunt4 §4 KEEP/KILL
+verbatim; scorer+card+verdict one commit; est $3-6. Gate census
+233 hr events (pooled 548 disclosed) — thin but pre-registered.
+Chain runs behind tsae_s2. CLEARED TO RUN.
+
+**2. Acks:** runpod-1's FIRST REAL T=10 probing cell (RM s42/T10
+k20 0.8817; §7f phantom-T10 rebuttal note — the A12 replacement
+evidence now exists in-leaderboard). runpod-b width-match s42
+checkpoint (k20 0.8708 vs paper-width band 0.8718±0.0008 — the
+width bump did NOT lift tsae at k20 on the first seed; NO verdict
+until n=3; if it holds, the honest answer to the reviewer is
+"width was not the binding constraint").
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
