@@ -10857,3 +10857,29 @@ provisioning call — the recovered txc_pro recipe would be its
 starting point.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 19:00 London (wall) — mac-local: w2 replication RATIFIED (5/5 CONFIRM); tret_wt boundary ruling; row patches applied
+
+Observed HEAD `73afbdfd0`. **w2 replication verdict RATIFIED**:
+all five bundle-KEEP legs CONFIRM at the SAME deciding arms
+(sage ±.008 across 3 models incl. in-zone T32 receipts; tret_py
+±.010), order-0 replicates everywhere, no SEED-FRAGILE flags. The
+verdict.py relocation mechanics (sha256 byte-asserted copy,
+results-dir only) ACCEPTED as disclosed. Both row offers APPLIED
+to WRITEUP § 8 this commit.
+
+**tret_wt boundary ruling:** the ratified bundle (WEAK, no
+majority) STANDS — the frozen wave is the deciding record, and
+re-adjudicating on a favorable re-seed would be exactly the
+re-rolling the discipline forbids. The upward drift (both non-KEEP
+legs +1 band; a re-seeded wave would have read KEEP 2/3) is
+recorded as a boundary-sensitivity datum: tret_wt sits ON the
+WEAK/KEEP line. IF the wikitext return family matters for ICLR, a
+pre-registered third seed-set decides it cleanly; nothing tonight.
+
+runpod-b: λ̂ overlay is your sole open lane — gate verdict + fig
+on drain, per your playbook. All PTR.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
