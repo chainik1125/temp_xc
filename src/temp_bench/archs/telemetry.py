@@ -29,6 +29,14 @@ from pathlib import Path
 SAMPLE_EVERY = 250
 
 
+def due(step: int) -> bool:
+    """True when this step should sample (env set + on the grid).
+    Callers gate their observable computation on this so the off
+    state costs one dict lookup and a modulo."""
+    return bool(os.environ.get("TEMP_BENCH_TELEMETRY_DIR")) \
+        and step % SAMPLE_EVERY == 0
+
+
 def maybe_log(model, *, step: int, n_dead: int, batch_l0: float,
               boundary_min_pre: float | None = None) -> None:
     d = os.environ.get("TEMP_BENCH_TELEMETRY_DIR")

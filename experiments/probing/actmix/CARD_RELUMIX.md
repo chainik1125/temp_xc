@@ -84,3 +84,33 @@ at measured btk rates) ≈ **$40–45**; day-2 cap $150 fresh
 TEMP_BENCH_ALLOW_DIRTY=1 after PIN assert (pool-row convention);
 rows checkpointed at milestones; PENDING TEAM REVIEW on every
 verdict-class statement.
+
+## AMENDMENT RM-1 (2026-07-27 20:30 London, date-verified): halt → partial reversal → the dead-latent grid (c6e464881, 361de3cb2)
+
+Sequence on record: low-T identity proven (bit-identical ckpts; 30
+rows / 1,230 fields independently verified at |Δ|=0) → halt approved
+→ Han override reinstates HIGH T as the dead-latent hypothesis test.
+This amendment freezes the reinstated design:
+
+- **Cells**: txc_batchtopk_pre (relu-mix) × T {6, 8, 10, 16} ×
+  seeds {1, 2, 42} (T16 s42 = cache-hit on the boundary cell, its
+  pair already DIVERGED — 20:18 report; T4 s42 pair also diverges
+  on realized-l0, so the onset is ≤ T4: the T{6,8,10} cells map the
+  curve upward from there). btk twins for T {6, 10} train under
+  CARD.md § 7f; T {8, 16} btk twins pre-exist (endpoint-only —
+  PREDATE telemetry, disclosed).
+- **Telemetry** (item 2): plugin-side `archs/telemetry.py` — every
+  250 steps: n_dead, dead_frac, per-window fill (batch_l0), and
+  min-selected value (`boundary_min_pre`; negative ⇒ btk selected
+  negatives, sub-nominal fill ⇒ relu-mix wasted slots). Enabled by
+  TEMP_BENCH_TELEMETRY_DIR at launch; off = one dict lookup.
+  Tests 11/11 green post-patch.
+- **Per-cell equivalence** (item 3): rm_equivalence.py runs as
+  twins land; divergences reported immediately (first: 20:18).
+- **Positive control** (item 5): positive_control.py (thin pool
+  d_sae=64, k_pos=48) MUST report DIVERGENCE before any
+  certificate; runs first on the freed GPU.
+- ERRATUM to the 20:18 report: "divergence absent through T4"
+  overstated — weight-identity was MEASURED at sae/T1/T2 only; T4
+  divergence (l0 82.19 vs 82.28) surfaced with tonight's boundary
+  cell. Identity certificate scope = measured cells only.

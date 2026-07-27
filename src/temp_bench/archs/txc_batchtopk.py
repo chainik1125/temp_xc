@@ -41,6 +41,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from temp_bench.archs import telemetry
 from temp_bench.interfaces.architecture import ArchConfig, TempBenchArch
 
 
@@ -242,6 +243,13 @@ class _TXCBatchTopKBase(TempBenchArch):
             self.num_tokens_since_fired[active_feat] = 0
             dead_mask = self.num_tokens_since_fired >= self.dead_threshold_tokens
             n_dead = int(dead_mask.sum().item())
+            if telemetry.due(step):
+                nz = gated[gated != 0]
+                telemetry.maybe_log(
+                    self, step=step, n_dead=n_dead,
+                    batch_l0=float(nz.numel()) / B,
+                    boundary_min_pre=(float(nz.min().item())
+                                      if nz.numel() else 0.0))
 
         # AuxK on dead features, in shared-code space.
         if n_dead > 0:

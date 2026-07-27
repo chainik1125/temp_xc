@@ -53,6 +53,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from temp_bench.archs import telemetry
 from temp_bench.archs.batchtopk_sae import BatchTopKSAE
 from temp_bench.archs.stacked_batchtopk import StackedBatchTopK
 from temp_bench.archs.tsae import TSAEPaper
@@ -386,6 +387,13 @@ class StackedBatchTopKBTKOnly(StackedBatchTopK):
             self.num_tokens_since_fired[did_fire] = 0
             dead = self.num_tokens_since_fired >= self.dead_threshold_tokens
             n_dead = int(dead.sum().item())
+            if telemetry.due(int(self.global_step.item())):
+                nz = z[z != 0]
+                telemetry.maybe_log(
+                    self, step=int(self.global_step.item()), n_dead=n_dead,
+                    batch_l0=float(nz.numel()) / B,
+                    boundary_min_pre=(float(nz.min().item())
+                                      if nz.numel() else 0.0))
 
         # btk-only: AuxK UNCHANGED — revival stays on ReLU'd pre-acts (conv § 4).
         if n_dead > 0:
