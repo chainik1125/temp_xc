@@ -670,8 +670,67 @@ indexing the headline would have inverted in two inits of three. That makes the 
 finding 1 not a one-off blunder but **the same trap, catching the result we kept as well as the one
 we dropped.**
 
+## Post-sprint: the steering protocol writes only the window-average
+
+The largest correction this work has produced, and it is not about a task or a dictionary — it
+is about what the published steering hook writes into the residual stream. Full derivation and
+proofs in [[steering_conventions]] (`docs/dmitry/reviewer_responses/steering_conventions.tex`).
+
+**The paper's default protocol is `txc_flat`.** `temp_bench/case_studies/steering.py` selects
+`protocol="v7"` by default in both `SteeringConfig` and `experiments/c5_steering/run.py`. V7
+tiles the prefix into `T`-blocks, clamps the latent, decodes, and then **averages the
+per-position delta over the window** before writing it to every position in the block. Because
+a crosscoder decodes as `einsum("bs,std->btd", z, W_dec)` with a window-level `z` carrying no
+`t` index, clamping latent `j` gives `delta_t = (s − z_j)·W_dec[j,t,:]`, so V7 writes
+`(s − z_j)·mean_t W_dec[j]` — which is exactly this sprint's `txc_flat`, the arm built as the
+control that *removes* the temporal profile.
+
+Split a slab as `P = 1_T ⊗ P̄ + P̃` with `Σ_t P̃_t = 0`. The DC part is precisely what a
+per-token dictionary can already express, so **`P̃` is the only component on which a crosscoder
+can outperform, and V7 deletes it.** The `pp` fallback is a convolution of the slab with the
+per-window clamp scalar and collapses to the same constant write wherever that scalar is flat.
+
+**Measured on the saved ward checkpoints** (`results/txc_wins/protocol_compare3.json`,
+`experiments/ward_backtracking_txc/`), with V7 and PP copied verbatim from the reference and
+`slab` differing from V7 by one line:
+
+| check | predicted | measured |
+| --- | --- | --- |
+| slab/V7 injected-norm ratio, AC-share 0.497 | `1/√(1−AC)` = 1.409 | **1.409** at all four doses |
+| same, second latent, AC-share 0.307 | 1.410 | **1.406** |
+| PP versus V7 injected norm | equal when the clamp is flat | within **1%** at every dose |
+
+⚠ **What this does *not* establish is that the discarded component buys behaviour.** At matched
+`q`, slab beats V7 at z = +3.77 (q=2) and +2.20 (q=4) and *loses* at z = −2.38 (q=8) — the sign
+flips with dose. Matched `q` is not a matched dose, since slab injects 1.409× more norm at every
+`q`, and neither dose-response is monotone. The comparison worth reporting is V7 at
+`q' = 1.409q`, i.e. matched **injected norm**; it has not been run.
+
+**The related control finding.** `txc_flat` — hence V7 — sits within 4–20% of a *random* constant
+write of the same norm on three of four held-out cells (recency 1.11×, evidence 1.04×,
+demonstration order 1.20×), and separates only on LitM (3.8×). So on most cells the published
+write is not carrying latent-specific information at all. The generation sweep that ships had
+**no random arm**, which is why this was invisible; `random_slab`/`random_broadcast` are now
+mandatory in `gen_arms`. Figure: `plots/2026-07-27_protocols/paper_vs_slab.png`.
+
+⚠ **A baseline arm was mislabelled for the whole sprint.** Every `tsae_*` number above came from
+`temporal_crosscoders.han_tsae.TemporalSAE` — an **attention** architecture (`n_heads=8`,
+`n_attn_layers=1`) that this repo aliases `tsae_paper`. The published temporal SAE
+(arXiv:2511.05541) has no attention: it is a per-token BatchTopK SAE with matryoshka groups, an
+InfoNCE term between consecutive positions, AuxK and threshold inference. The real one is now
+vendored (`tsae_bhalla.py`) and run as a fourth arm on LitM, where it is the **best reader** of
+the four (AUC 0.720–0.787, above the TopK SAE's 0.703–0.782 and the crosscoder's 0.571–0.672)
+while steering no better than the TopK SAE. It runs at **L0 12.62 against everyone else's 8.00**
+because its EMA threshold replaces TopK at inference, so the sparsity match is broken and a
+matched-L0 rerun is owed. The correction changes that arm's numbers; it does not move it across
+the rank argument, since its `W_dec` is `(d_sae, d_in)` and a steered latent still reaches only
+rank 1.
+
 ## Where things live
 
 - Code: `experiments/temporal_screen/txc_wins/` — harness, task designs, Modal runners
-- Results: `results/txc_wins/` (114 files), figures in `plots/2026-07-26_txcwins/`
+- Protocol comparison: `experiments/ward_backtracking_txc/{steering_vendored,protocol_compare_run}.py`
+- Results: `results/txc_wins/` (118 files), figures in `plots/2026-07-26_txcwins/` and
+  `plots/2026-07-27_protocols/`
+- Derivation note: `docs/dmitry/reviewer_responses/steering_conventions.{tex,pdf}`
 - Next experiments, in priority order: `next_ten_hours.md`
