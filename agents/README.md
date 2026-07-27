@@ -22,12 +22,21 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
 
 - **`mac-local`** — local CC session (macOS/darwin, `~/research/projects/temp_xc`,
   Apple-silicon MPS, no CUDA). Prototyping, review, orchestration.
-- **`mac-a` / `mac-b`** — local Mac agents (Claude Code instances). Clones
-  `~/research/projects/agents/<id>/temp_xc` (+ `.agent_id` beside);
-  identity = your directory. GPU via Modal ONLY (shared profile in
-  `~/.modal.toml`; check and append `briefings/MODAL_SPEND.md`
-  before/after every run; $150/day/person cap as of 2026-07-26).
-  Current phase briefings: `actmix-mac-{a,b}.md`.
+- **`runpod-a` / `runpod-b`** — TWO agents sharing the 2×H100 pod
+  (Han-provisioned 2026-07-27 ~16:00 London; 56 cores / 503 GB RAM /
+  1 TB volume) — the successors of `mac-a` / `mac-b` after the Modal
+  workspace spend-limit migration (LOG ~16:10 entry). **runpod-a =
+  hunt executor (mac-a's queue: hunt4w2 llama31 leg, cnov panel on
+  pick, gen-4 continuation), GPU 0**; **runpod-b = adversarial
+  replication + evidence/exhibit hat (mac-b's duties), GPU 1**
+  (rebalancing is scheduling, not frozen config). Per-agent clones
+  `/workspace/agents/<id>/temp_xc` + `.agent_id`; tokens
+  `/workspace/.tokens/` (gh, hf, hf_datasets; NO Modal creds by
+  design — Modal needs route via a mac agent to the HF mirror).
+  The `actmix-mac-{a,b}.md` briefings apply to them mutatis
+  mutandis (venue: pod GPUs instead of Modal; spend → `RUNPOD`
+  section of MODAL_SPEND.md). Existing Modal-frozen cards execute
+  on-pod under a disclosed VENUE AMENDMENT line, not a re-freeze.
 - **`mac-c`** — local Mac agent (spawned 2026-07-26 evening for the
   ACTMIX archaeology). Same clone layout + `.agent_id`; $0-compute
   workstream (`briefings/actmix-mac-c.md`).
@@ -41,8 +50,16 @@ this to continue the *science*? → research STATUS. To pick up a *task*? →
   `actmix-runpod-{1,2}.md`. Ledger: `RUNPOD` section of
   MODAL_SPEND.md.
 
-*(Retired 2026-07-26: `runpod`, `runpod-b`…`runpod-e`, and the interim
-6×A40 pod — all dead/closed; their STATUS records live in git history.
+*(Retired 2026-07-27 ~16:00: **`mac-a` and `mac-b`** — replaced by
+`runpod-a`/`runpod-b` above when the Modal workspace spend limit
+blocked new launches mid-window; every staged item (cards, pins,
+drivers, scorers) was already committed, so the handoff is entirely
+via git — their final stand-down STATUS commits close them out, after
+which their `agents/` dirs are removed. Retired 2026-07-26: `runpod`,
+`runpod-b`…`runpod-e`, and the interim 6×A40 pod — all dead/closed;
+their STATUS records live in git history. NB: the `runpod-b` NAME is
+reused by the live 2×H100 agent above; the 07-26 retiree of the same
+name was an unrelated A40-pod agent.
 Per-pod volumes were independent; anything needed again must be REBUILT
 from the committed builder scripts — every cache builder is committed
 with its artifacts' spec. Cross-pod handoff goes through committed

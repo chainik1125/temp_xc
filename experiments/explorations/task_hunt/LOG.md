@@ -9989,3 +9989,46 @@ this commit: one stray rebase marker excised from the LOG tail
 `grep -c '<<<<<<<' LOG.md` after every conflict resolution.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~16:15 London (wall) — mac-local: MIGRATION DIRECTIVE (Han) — all Modal work moves to a NEW 2×H100 pod; mac-a/mac-b RETIRE, runpod-a/runpod-b take over
+
+Han's call on the Modal spend-limit block: rather than wait on the
+workspace owner, **all Modal work migrates to a fresh 2×H100 pod
+(56 cores / 503 GB / 1 TB volume), provisioned now.** Executed this
+push:
+
+- **Pod bootstrapped** (mac-local, via ssh): tokens seeded
+  (gh + both HF; values never logged; NO Modal creds by design),
+  dual workspaces `/workspace/agents/runpod-{a,b}/temp_xc` cloned
+  at `141c1ec96` with per-agent git identity + `.agent_id`, shared
+  `/workspace/hf_cache`, uv venvs building in background, Claude
+  Code CLI present in the image (Han: `/login` per instance).
+- **Roster** (`agents/README.md`): runpod-a (hunt executor, GPU 0)
+  + runpod-b (replication/evidence hat, GPU 1) added; mac-a/mac-b
+  RETIRED — every staged item was already committed (cards, pins,
+  drivers, scorers), so the handoff is entirely via git. Their
+  final stand-down STATUS commits close them out; dirs removed
+  after that.
+- **Bring-up briefings** written: `agents/runpod-a/STATUS.md`
+  (inherited queue: hunt4w2 llama31 leg FIRST, cnov panel on the
+  17:00 pick, gen-4 continuation) and `agents/runpod-b/STATUS.md`
+  (replication + evidence + draft-staging duties).
+- **VENUE RULE (binding):** existing Modal-frozen cards execute
+  on-pod under ONE disclosed VENUE AMENDMENT line (Modal L40S →
+  pod H100) — not a re-freeze (runpod-1 tsae precedent). Protocol,
+  pins, scorers, thresholds unchanged.
+- **Ledger:** new pod spends under `RUNPOD` in MODAL_SPEND.md
+  (~$6/h both GPUs); the $200/10h hunt envelope (c1c5c949e) now
+  denominates pod hours for hunt lanes. Modal limit is now
+  NON-BLOCKING for tonight (one-pager item 12 downgraded: Dmitry
+  raises it at leisure for post-deadline Modal use).
+- **mac-a / mac-b:** stand down on Han's prompt — final STATUS
+  one-liner, confirm nothing unpushed, stop. Modal lanes: none
+  running (all landed pre-trip); nothing to drain.
+
+runpod-1/runpod-2 on the 3×H100 pod are UNAFFECTED (their queues,
+GPUs, and reports stand).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
