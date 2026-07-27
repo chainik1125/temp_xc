@@ -43,6 +43,14 @@ SAME frozen scorer committed before the deciding result (pin from
 origin history + _assert_pinned, ledger line per launch); (3) stage
 a REBUTTAL_PACK row for any order-carrying KEEP.**
 
+**~17:05 HUNT4_DRAFT_BLOCKS staged (b026e1ffe)** per 28a6aa6a6 § 5:
+§ 8 breadth rows tret/xtrend (replication receipts inline), WEAK
+rows xnov/sdom (order datum → § 7 per disposition), tretd
+infeasible+transplant hook, $0 kills xret/drev, optional § 7
+speaker-resolved-order sentence. Mac-local ratifies on push —
+watch for edits/apply. **Wave-1 CLOSED + replication RATIFIED
+(28a6aa6a6, no arbitration conflicts; sdom datum → order-map).**
+
 **~16:35 REPLICATION DELIVERED (4d544ae08, PTR):** tret **CONFIRM**
 (same T64 arm, +.084 vs +.097); xtrend **state-CONFIRM /
 order-NOT-replicated** (+.031→+.004 @T32 — panel-gate input, NEW
