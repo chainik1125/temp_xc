@@ -8776,3 +8776,49 @@ P2 stance: GPU 2 is P1-saturated until ~19:45; I can take the
 claimed them — will state either way at the 21:30 report. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## 2026-07-27 ~12:15 London — mac-local: beat review — A1 RATIFIED, interim RLHF fig REVIEWED, runpod-1 fixes RATIFIED, mac-c conditional lane
+
+Observed HEAD `9d44d214a`. Three rulings + one directive:
+
+**1. runpod-2 A1 RATIFIED** (freeze `421f6fa37`, launch ~11:50).
+Textbook in-card extension: seed 2 fixed pre-results with stated
+rule (next integer after {42, 1}), measured-footprint phasing, $28
+measured basis, GPU 2 only. Interim `fig_rlhf_shuffle_tsweep`
+REVIEWED against the template: conformant (log2 x, ordered-solid/
+shuffled-dashed, per-seed faints, mean ± sd, T=1 identity note,
+per-T n disclosed) and verdict-consistent — inverted-U, shuffle
+hugging ordered at every T; T8/T16 shuffled ≥ ordered on n=1
+cells is noise and is disclosed as such. **One styling note for
+17:00:** the fig uses the single pair-hue (#D55E00, marker/dash
+distinction) where Aniket's backtracking fig uses blue-vs-orange.
+If the team wants exact sibling styling across the three figs,
+it is a 1-line knob at FINAL render — decide at the meeting, do
+not churn the interim.
+
+**2. runpod-1 fixes RATIFIED** (`f9ce5c1a2`, `425988772`).
+Freeze-lineage allowlist APPROVED: the static sha list rotted
+twice and silently dropped trained rows (under-inclusion — safe
+direction, still a bug); lineage-as-allowlist is justified by the
+PIN-asserted launcher (HEAD == PIN ∈ origin/arxiv ancestry, clean
+tree) + eval_key namespacing against cross-agent admission. § 7e
+no-extension clarification ACCEPTED — probing seeds {1, 2, 42}
+were freeze-time; execution-order-only disclosure is the right
+form. Renderer knob-for-knob alignment to the frozen RLHF
+template acked — the two deliverable figs will read as siblings.
+STILL OWED same lane: the formal probing verdict LOG entry + the
+INTERIM `fig_probing_shuffle_tsweep` push for the 17:00 draft.
+
+**3. mac-c — conditional hunt-support lane (after mirrors).**
+HF mirror bundles remain your PRIORITY 1 (they gate the token
+rotations — confirm completion in this LOG when done). AFTER
+that: gen-4 corpus scouting under the hunt envelope — CPU-only
+label-side pre-measures for candidate trailing-functional faces
+on corpora mac-a hasn't touched (candidate events + their
+sparsity/timescale/floor stats, hunt3 evidence-line format),
+feeding mac-a's slate. You scout labels; mac-a owns screens —
+no Modal spend from mac-c on this lane.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
