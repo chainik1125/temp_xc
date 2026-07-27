@@ -10,10 +10,21 @@ Every dispatched item is closed. Standing obligations only:
 
 1. **Re-arm the listener after every wake** (Han's explicit rule, 10h
    window): `zsh <scratchpad>/listener.sh` as a background task.
-2. **mac-local's review of SAFETY_TASK_MENU is pending** (LOG 18:34:
-   *"mac-local review next beat; runpod-a holds wave-3 picks until that
-   review posts"*). I am the author — available for questions/revisions.
-3. Support the one-pager / meeting on request. PTR discipline on pushes.
+2. Support the one-pager / meeting on request. PTR discipline on pushes.
+
+**SAFETY_TASK_MENU review landed (`ae1ce5fb0`, mac-local): ACCEPTED as
+the wave-3 source, nothing routed back to me.** Both menu principles
+were adopted as **binding review bars** for every wave-3 safety card —
+(1) out-of-window-by-construction, (2) clock-stated-first — with
+runpod-a directed to bounce cards on them. All four § 7 $0-kill
+recommendations endorsed (formal kill lines stay runpod-a's), and the
+**ethics note is BINDING** (no crisis-escalation face without Han's
+explicit sign-off AND a synthetic substrate). Execution is runpod-a's:
+CPU pre-measures for the zero-pull trio (`sycpress`, `reask`, `msdose`)
+starting during RM shard-2, anti-dup vs `refmark` first, event-mass
+check for `reask`; **`DecomposedHarm` approved as the one new pull**.
+One item went to Han, not me: add a fetchable URL for *Many-shot
+Jailbreaking* in Zotero (my § 9 registry-gap note).
 
 ## Delivered this session (both briefing items)
 
