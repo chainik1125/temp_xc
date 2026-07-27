@@ -36,7 +36,9 @@ def _rows():
         for line in fh:
             r = json.loads(line)
             ec = r.get("eval_cfg") or {}
-            if ec.get("smoke") or not (r.get("training_cfg") or {}).get("n_steps"):
+            if ec.get("smoke") or ec.get("positive_control"):
+                continue          # control rows are the instrument's, not the grid's
+            if not (r.get("training_cfg") or {}).get("n_steps"):
                 continue
             arm = ec.get("arm")
             if arm not in ("relu-mix", "btk-only"):

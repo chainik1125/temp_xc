@@ -59,5 +59,125 @@
   ],
   "mean_auc_delta_at_shared_k": 0.0,
   "verdict": "IDENTICAL"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   2
+  ],
+  "rm_train_key": "7ca12f094a793f3b",
+  "btk_train_key": "721773b9cad34b63",
+  "tensors_compared": 0,
+  "per_task_metric_mismatches": [
+   "auc__ag_news_business",
+   "auc__ag_news_scitech",
+   "auc__ag_news_sports",
+   "auc__ag_news_world",
+   "auc__amazon_reviews_cat1",
+   "auc__amazon_reviews_cat2",
+   "auc__amazon_reviews_cat3",
+   "auc__amazon_reviews_cat5",
+   "auc__amazon_reviews_cat6",
+   "auc__amazon_reviews_sentiment_1star",
+   "auc__amazon_reviews_sentiment_5star",
+   "auc__bias_in_bios_set1_prof0",
+   "auc__bias_in_bios_set1_prof1",
+   "auc__bias_in_bios_set1_prof2",
+   "auc__bias_in_bios_set1_prof6",
+   "auc__bias_in_bios_set1_prof9",
+   "auc__bias_in_bios_set2_prof11",
+   "auc__bias_in_bios_set2_prof13",
+   "auc__bias_in_bios_set2_prof14",
+   "auc__bias_in_bios_set2_prof18",
+   "auc__bias_in_bios_set2_prof19",
+   "auc__bias_in_bios_set3_prof20",
+   "auc__bias_in_bios_set3_prof21",
+   "auc__bias_in_bios_set3_prof22",
+   "auc__bias_in_bios_set3_prof25",
+   "auc__bias_in_bios_set3_prof26",
+   "auc__europarl_de",
+   "auc__europarl_es",
+   "auc__europarl_fr",
+   "auc__europarl_nl",
+   "auc__github_code_C",
+   "auc__github_code_HTML",
+   "auc__github_code_Java",
+   "auc__github_code_PHP",
+   "auc__github_code_Python",
+   "auc__winogrande_correct_completion",
+   "auc__wsc_coreference"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0045611285031722515,
+  "verdict": "METRIC-DIVERGES (weights remote)"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   4
+  ],
+  "rm_train_key": "3d683a32363e0503",
+  "btk_train_key": "6052cf964781d2e8",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0015351184086067615,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   6
+  ],
+  "rm_train_key": "9309c6efccc857e1",
+  "btk_train_key": "c7935b5fb33f1624",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.016295183621460763,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   16
+  ],
+  "rm_train_key": "e2f291ad98e54d88",
+  "btk_train_key": "c525ad919ccdc587",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.002456676180041306,
+  "verdict": "DIVERGES"
  }
 ]

@@ -13177,3 +13177,55 @@ only, disclosed) → x6 ‖ x10 overnight (A2) → 7-point FINAL
 re-render in the morning. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## 2026-07-27 21:12 London (date-verified) — runpod-1 — DAY REPORT (059a66239 obligation) + DIVERGENCE-ONSET MAP CORRECTED (my T-invariance arithmetic was wrong)
+
+**Correction first (mea culpa, PTR):** my 19:49 claim that the
+selection fraction is "T-invariant under A1" was arithmetic error —
+batch size cancels, but the WINDOW archs' per-window depth does
+not: fraction = k_pos·T / d_sae = 0.11% (T1) → 0.22% (T2) → …
+→ 1.74% (T16), growing LINEARLY with T. The sae stays at 0.11%
+always. Prediction under the corrected arithmetic: identity exactly
+at T=1 and for sae; divergence from T=2, deepening with T — which
+is EXACTLY what the corrected equivalence table measures:
+
+    sae: IDENTICAL ×3 seeds (incl. one cross-pod, metric-exact)
+    pre T1: IDENTICAL (bit-level) | T2: DIVERGES (cross-pod cell,
+    Δl0 +0.09, Δk20 +3.8e-3; venue caveat nearly excluded by the
+    sae cross-pod cell reproducing EXACTLY) | T4: DIVERGES
+    (weight-level) | T6: DIVERGES (k5 Δ −1.6e-2, k20 Δ +0.8e-3 —
+    bidirectional drift) | T16: DIVERGES (the 20:18 report).
+
+Checker hygiene fix disclosed: positive-control rows were aliasing
+two grid slots in the table (excluded now; the control itself is
+unaffected and PASSED). Dmitry's mechanism, restated with the right
+arithmetic, predicts the whole measured pattern — the composition
+choice is inert exactly where selection is shallow (per-token /
+T=1) and engages progressively with window depth.
+
+**DAY REPORT (runpod-1, 059a66239 + successors):**
+1. P1 CLOSED + RATIFIED: verdict (no T-win, margins vanish, guard
+   framing), 3-seed pre/post/sae/tsae columns, zero failed cells.
+2. Figures shipped: SAEBench-36 headline + raw-38 twin + per-k
+   family (k5 U-shape); dual-render cross-checked digit-for-digit.
+3. k-inversion formalized; l0 confound ruled out (ratified, quote
+   licence).
+4. P2 depth profiles COMPLETE + RATIFIED (~$3): trailing-dialogue
+   faces are early-layer; dialevel caches healed pod-wide.
+5. RM arc: identity discovered (low-T, bit-level) → halt → Han
+   override → divergence measured (T2…T16) + dead-latent census
+   (57% dead both arms at T16, 40% disjoint survivors) + U-shaped
+   dead-frac vs T; instrument gate closed (positive control).
+6. RUNNING overnight (PIN db098b8c1): dead-latent grid T{6,8,10,16}
+   × 3 seeds + btk T{6,10} (first REAL T10 cells — the shipped
+   "T10" was a phantom) + telemetry traces both arms. Morning:
+   traces, onset map at 3 seeds, 7-point per-k re-renders,
+   certificate (measured scope per 7093c21f8 guards).
+7. Ledger: day ≈ $98 booked + night grid ≈ $30 (mostly day-2);
+   caps intact. Eval-dispatch seam owner-reviewed + closed
+   (T=1-identity test added). Stamp discipline: two more of my
+   stamps drifted (+8, −6); date-verified since 20:18.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
