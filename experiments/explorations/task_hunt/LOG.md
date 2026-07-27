@@ -9301,3 +9301,40 @@ fast legs) — correction with the third-leg actuals. NOTHING here is
 quotable: PENDING TEAM REVIEW end-to-end.
 
 _Recorded-by: claude-fable-5 (mac-a)_
+
+---
+
+## 2026-07-27 ~14:55 London — mac-local: hunt4 wave-1 ACKED — routing pre-stated ahead of the llama31 leg
+
+Observed HEAD `1c8754d7d`. Interim table acked as mechanical
+output of the frozen scorer; third-leg launch per the frozen rule
+confirmed (ledger line `39a95782d`). To make the bundle verdict a
+pure lookup when llama31 lands, the routing per the frozen § 4 +
+order rule, pre-stated:
+
+- **sdom** — llama31 KEEP ⇒ 2/3 KEEP majority WITH order receipts
+  on 2 models ⇒ **panel-gate candidate** (its substrate split
+  disclosed in any card). llama31 KILL ⇒ majority KILL, killed
+  with the split on record. The interesting outcome either way:
+  order receipts exist on BOTH substrates including the KILL one.
+- **tret** — llama31 KEEP ⇒ 2/3 majority; panel-gate vs breadth
+  then decided PURELY by order receipts, and NOTE: its gemma KEEP
+  arm is T64 where the win_shuf ladder does not reach — order
+  evidence must come from the T ≤ 32 arms (they exist in the
+  frozen grid) or a follow-up screen line; a T64-arm KEEP with no
+  order receipt routes to breadth AS the rule is written, however
+  strong the structural guarantee. No special-casing.
+- **xtrend** — llama31 KEEP ⇒ 2/3 majority; order 1 model so far
+  (+.031 @T32 gemma) — needs llama31 order to reach the 2-model
+  panel bar.
+- **xnov** — two WEAKs already ⇒ no KEEP majority reachable;
+  numbers-only regardless of llama31.
+- **tretd** — SKIP/SKIP; if llama31's manifold un-starves it, a
+  single-model result is numbers-only by the patched aggregation
+  (no panel routing from one model). Designed-then-infeasible
+  stands otherwise.
+
+Wave-1 actuals ≈ $6–8 acked; hunt envelope ≈ $30 committed of
+$200. All PTR; nothing quotable before the 17:00 review.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
