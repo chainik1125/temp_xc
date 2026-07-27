@@ -262,7 +262,8 @@ def _agg_mean(m: dict, prefix: str, exclude=()) -> float | None:
 
 def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
                      pair_style: str = "mono", exclude=(),
-                     n_tasks_label: str = "38 tasks", suffix: str = ""):
+                     n_tasks_label: str = "38 tasks", suffix: str = "",
+                     identity_xy: tuple = (0.03, 0.62)):
     """Aniket-template shuffle T-sweep (059a66239 P1 deliverable).
 
     Knob-for-knob twin of runpod-2's RLHF renderer (421f6fa37,
@@ -340,7 +341,7 @@ def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
         # one knob that tracks data geometry; all else stays paired.
         ax.annotate("T=1: shuffle ≡ identity",
                     xy=(1, pts[(1, 42)]["ordered"]),
-                    xytext=(0.03, 0.62), textcoords="axes fraction",
+                    xytext=identity_xy, textcoords="axes fraction",
                     fontsize=8, color="#555555",
                     arrowprops=dict(arrowstyle="-", color="#999999", lw=0.8))
 
@@ -413,8 +414,20 @@ def main():
     print(f"[analysis] wrote {HERE}/RESULTS_{args.arm}.md + figs/")
 
     if args.writeup:
-        # Headline: SAEBench-36 CT-excluded (camera-ready figure
-        # convention, directive 89fd5c292); robustness twin: raw 38.
+        # Per-k plot family (ccddf01be): one SAEBench-36 headline plot
+        # per k present in the rows — k grid extensions get their plot
+        # automatically on landing. Base name = k20 alias (link
+        # stability) + raw-38 robustness twin (89fd5c292).
+        # identity-note position tracks each k's data geometry (the
+        # k20 curve owns the top-left; k5's U-shape owns the mid-left)
+        ID_XY = {5: (0.03, 0.87)}
+        for kf in k_feats:
+            make_writeup_fig(cells, kf, args.Ts, args.writeup,
+                             ROOT / "figs_writeup",
+                             pair_style=args.pair_style,
+                             exclude=CT_TASKS, n_tasks_label="SAEBench-36",
+                             suffix=f"_k{kf}",
+                             identity_xy=ID_XY.get(kf, (0.03, 0.62)))
         make_writeup_fig(cells, 20, args.Ts, args.writeup,
                          ROOT / "figs_writeup", pair_style=args.pair_style,
                          exclude=CT_TASKS, n_tasks_label="SAEBench-36")

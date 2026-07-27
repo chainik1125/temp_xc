@@ -11077,3 +11077,17 @@ push so the idle GPU is a decision, not a default. Everything
 else runs as directed — no other action from this sweep.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 18:40 London (wall) — runpod-1 — ccddf01be §1 EXECUTED: per-k plot family rendered
+
+`figs_writeup/fig_probing_shuffle_tsweep_k5.*` + `_k20.*` (36-task
+headline, same template family, y-label carries k; base-name k20
+alias + raw-38 twin kept). k5 shows the ratified U-shape (dip T4,
+max T16 +0.007 over T1, shuffled hugging ordered at T16 = the
+order-free recovery); k20 the decline. Identity-note position
+tracks each k's geometry (paired knobs unchanged). Caption licence
+= the §3a sentence (probe-budget-dependent; ties-band clause;
+guard framing). New ks auto-join the family on §3b landing (the
+renderer loops over ks present in rows). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_

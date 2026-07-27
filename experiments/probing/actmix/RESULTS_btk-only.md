@@ -12,10 +12,14 @@ Verdict discipline: PENDING TEAM REVIEW. Gates (CARD § 5):
 - `FAIL  G1 l0=24.21 outside [19.5,20.5] at tsae_btkonly/T1/s42/k20`
 - `FAIL  G1 l0=21.15 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T1/s1/k5`
 - `FAIL  G1 l0=21.15 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T1/s1/k20`
+- `FAIL  G1 l0=20.72 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T1/s2/k5`
+- `FAIL  G1 l0=20.72 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T1/s2/k20`
 - `FAIL  G1 l0=20.69 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T1/s42/k5`
 - `FAIL  G1 l0=20.69 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T1/s42/k20`
 - `FAIL  G1 l0=26.23 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T16/s1/k5`
 - `FAIL  G1 l0=26.23 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T16/s1/k20`
+- `FAIL  G1 l0=25.80 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T16/s2/k5`
+- `FAIL  G1 l0=25.80 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T16/s2/k20`
 - `FAIL  G1 l0=26.43 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T16/s42/k5`
 - `FAIL  G1 l0=26.43 outside [19.5,20.5] at txc_batchtopk_post_btkonly/T16/s42/k20`
 - `FAIL  G1 l0=21.15 outside [18.0,20.5] at txc_batchtopk_pre_btkonly/T1/s1/k5`
@@ -48,20 +52,20 @@ Verdict discipline: PENDING TEAM REVIEW. Gates (CARD § 5):
 - `FAIL  G1 l0=382.74 outside [288.0,320.5] at txc_batchtopk_pre_btkonly/T16/s2/k20`
 - `FAIL  G1 l0=380.59 outside [288.0,320.5] at txc_batchtopk_pre_btkonly/T16/s42/k5`
 - `FAIL  G1 l0=380.59 outside [288.0,320.5] at txc_batchtopk_pre_btkonly/T16/s42/k20`
-- `PASS   G5 anchor |txc_batchtopk_post_btkonly@T1−SAE|=0.0076 vs 3σ_SAE=0.0101 (k=5)`
 - `PASS   G5 anchor |txc_batchtopk_pre_btkonly@T1−SAE|=0.0072 vs 3σ_SAE=0.0101 (k=5)`
-- `PASS   G5 anchor |txc_batchtopk_post_btkonly@T1−SAE|=0.0001 vs 3σ_SAE=0.0096 (k=20)`
+- `PASS   G5 anchor |txc_batchtopk_post_btkonly@T1−SAE|=0.0072 vs 3σ_SAE=0.0101 (k=5)`
 - `PASS   G5 anchor |txc_batchtopk_pre_btkonly@T1−SAE|=0.0008 vs 3σ_SAE=0.0096 (k=20)`
+- `PASS   G5 anchor |txc_batchtopk_post_btkonly@T1−SAE|=0.0008 vs 3σ_SAE=0.0096 (k=20)`
 
 ### arm `btk-only`, k_feat = 5
 
 | T | TXC-pre | TXC-pre shuf | TXC-post | TXC-post shuf | l0 pre | l0 post |
 |---|---|---|---|---|---|---|
-| 1 | 0.8288 ± 0.0083 (n=3) | 0.8288 ± 0.0083 (n=3) | 0.8284 ± 0.0116 (n=2) | 0.8284 ± 0.0116 (n=2) | 20.8551 ± 0.2559 (n=3) | 20.9209 ± 0.3240 (n=2) |
-| 2 | 0.8266 ± 0.0056 (n=3) | 0.8147 ± 0.0064 (n=3) | 0.8081 ± 0.0047 (n=2) | 0.8080 ± 0.0056 (n=2) | 41.9972 ± 0.1205 (n=3) | 20.3180 ± 0.1113 (n=2) |
+| 1 | 0.8288 ± 0.0083 (n=3) | 0.8288 ± 0.0083 (n=3) | 0.8288 ± 0.0083 (n=3) | 0.8288 ± 0.0083 (n=3) | 20.8551 ± 0.2559 (n=3) | 20.8551 ± 0.2559 (n=3) |
+| 2 | 0.8266 ± 0.0056 (n=3) | 0.8147 ± 0.0064 (n=3) | 0.8086 ± 0.0035 (n=3) | 0.8094 ± 0.0046 (n=3) | 41.9972 ± 0.1205 (n=3) | 20.2884 ± 0.0939 (n=3) |
 | 4 | 0.8178 ± 0.0110 (n=3) | 0.8020 ± 0.0047 (n=3) | 0.8007 ± 0.0021 (n=2) | 0.8030 ± 0.0026 (n=2) | 82.8468 ± 0.6289 (n=3) | 20.2051 ± 0.1627 (n=2) |
 | 8 | 0.8299 ± 0.0107 (n=3) | 0.8229 ± 0.0095 (n=3) | 0.7912 ± 0.0082 (n=2) | 0.7901 ± 0.0086 (n=2) | 165.6570 ± 0.1249 (n=3) | 20.4455 ± 0.0590 (n=2) |
-| 16 | 0.8373 ± 0.0049 (n=3) | 0.8309 ± 0.0081 (n=3) | 0.7669 ± 0.0010 (n=2) | 0.7634 ± 0.0012 (n=2) | 380.4154 ± 2.4132 (n=3) | 26.3272 ± 0.1391 (n=2) |
+| 16 | 0.8373 ± 0.0049 (n=3) | 0.8309 ± 0.0081 (n=3) | 0.7672 ± 0.0009 (n=3) | 0.7634 ± 0.0008 (n=3) | 380.4154 ± 2.4132 (n=3) | 26.1498 ± 0.3225 (n=3) |
 
 | per-token band | AUC (T-invariant) | realized l0 |
 |---|---|---|
@@ -74,11 +78,11 @@ untrained twins (seed 42): BatchTopK SAE (20/tok)@T1: 0.652; T-SAE (20/tok)@T1: 
 
 | T | TXC-pre | TXC-pre shuf | TXC-post | TXC-post shuf | l0 pre | l0 post |
 |---|---|---|---|---|---|---|
-| 1 | 0.8985 ± 0.0020 (n=3) | 0.8985 ± 0.0020 (n=3) | 0.8992 ± 0.0023 (n=2) | 0.8992 ± 0.0023 (n=2) | 20.8551 ± 0.2559 (n=3) | 20.9209 ± 0.3240 (n=2) |
-| 2 | 0.8975 ± 0.0071 (n=3) | 0.8897 ± 0.0082 (n=3) | 0.8822 ± 0.0026 (n=2) | 0.8732 ± 0.0002 (n=2) | 41.9972 ± 0.1205 (n=3) | 20.3180 ± 0.1113 (n=2) |
+| 1 | 0.8985 ± 0.0020 (n=3) | 0.8985 ± 0.0020 (n=3) | 0.8985 ± 0.0020 (n=3) | 0.8985 ± 0.0020 (n=3) | 20.8551 ± 0.2559 (n=3) | 20.8551 ± 0.2559 (n=3) |
+| 2 | 0.8975 ± 0.0071 (n=3) | 0.8897 ± 0.0082 (n=3) | 0.8803 ± 0.0039 (n=3) | 0.8730 ± 0.0003 (n=3) | 41.9972 ± 0.1205 (n=3) | 20.2884 ± 0.0939 (n=3) |
 | 4 | 0.8988 ± 0.0019 (n=3) | 0.8792 ± 0.0015 (n=3) | 0.8624 ± 0.0080 (n=2) | 0.8603 ± 0.0074 (n=2) | 82.8468 ± 0.6289 (n=3) | 20.2051 ± 0.1627 (n=2) |
 | 8 | 0.8903 ± 0.0050 (n=3) | 0.8601 ± 0.0037 (n=3) | 0.8417 ± 0.0016 (n=2) | 0.8363 ± 0.0008 (n=2) | 165.6570 ± 0.1249 (n=3) | 20.4455 ± 0.0590 (n=2) |
-| 16 | 0.8794 ± 0.0046 (n=3) | 0.8566 ± 0.0037 (n=3) | 0.8160 ± 0.0005 (n=2) | 0.8049 ± 0.0027 (n=2) | 380.4154 ± 2.4132 (n=3) | 26.3272 ± 0.1391 (n=2) |
+| 16 | 0.8794 ± 0.0046 (n=3) | 0.8566 ± 0.0037 (n=3) | 0.8163 ± 0.0007 (n=3) | 0.8050 ± 0.0019 (n=3) | 380.4154 ± 2.4132 (n=3) | 26.1498 ± 0.3225 (n=3) |
 
 | per-token band | AUC (T-invariant) | realized l0 |
 |---|---|---|
