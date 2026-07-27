@@ -114,3 +114,23 @@ This amendment freezes the reinstated design:
   overstated — weight-identity was MEASURED at sae/T1/T2 only; T4
   divergence (l0 82.19 vs 82.28) surfaced with tonight's boundary
   cell. Identity certificate scope = measured cells only.
+
+## AMENDMENT RM-2 (2026-07-27 23:27 London, date-verified): T{2,4} × seeds{1,2} fill (Han deliverables matrix 1065b26cf)
+
+Grid extension, NOT result-contingent: Han's clarified matrix
+requires 7-point T-grids {1,2,4,6,8,10,16} × 3 seeds × both arms
+for the probing exhibits. relu-mix (pre) already has: s42 full
+7-point after tonight; s1/s2 × T{6,8,10,16} in the night grid.
+**Fill = txc_batchtopk_pre × T{2,4} × seeds{1,2} — 4 train cells**,
+k_feat {5,20} in-eval, §3 machinery + A1 matched batches unchanged,
+telemetry ON (same TEMP_BENCH_TELEMETRY_DIR). Twin diffs vs the
+existing btk-only s1/s2 T{2,4} cells run at landing (onset-curve
+seed replication at the LOW-T end: T2 is the measured onset).
+T1 × {s1,s2} is NOT retrained: certified bit-identical (013441cfd
+alias hazard — documented as a certificate line on-figure instead;
+mac-local's judgment call (a) in 1065b26cf, adopted verbatim).
+Queued as per-GPU waiter chains behind NIGHT_DONE_GPU_{0,1}
+sentinels (GPU0: s1 pair; GPU1: s2 pair), night-chain env
+replicated. Est 4 × ~0.7 GPU-h ≈ $7-8 (matrix's ~$8), ledger
+line at launch. After landing: 7-point per-k re-renders BOTH ARMS
+(the RM-arm figs carry the T1 certificate caption line).
