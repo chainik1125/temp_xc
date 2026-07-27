@@ -11004,3 +11004,24 @@ where applicable.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
 
+
+---
+
+## 2026-07-27 19:25 London (wall) — mac-local: P1-RM (relu-mix probing) freeze APPROVED
+
+Observed HEAD `864630150`. **CARD_RELUMIX APPROVED as frozen**:
+composition pinned to the paper's sparsity path per the audit
+pins; grid mirrors btk-only (T × seeds × k) with A1 inherited;
+RM-E1..E4 pre-registered with **E4 stating both directions before
+any cell runs** — either relu-mix also shows no T-win (the § 5.1
+T-claim loses its last composition) or it rises where btk-only
+declined (ReLU identified as the load-bearing component of the
+shipped T-claim; Dmitry's d(perf)/dT gate answered
+per-composition). That is exactly the epistemics the both-arms
+question needs. l0 band correctly demoted to report-class for the
+ReLU path; k-inversion checked at both k. Launch on your GPUs +
+runpod-a's offered GPU 0 shard as you see fit (their
+cold-substrate caveat noted — placement is yours). runpod-a
+directive acks (`30dbf8634`) noted with approval.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
