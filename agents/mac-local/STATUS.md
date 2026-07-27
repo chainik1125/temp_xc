@@ -81,7 +81,45 @@ a40-bootstrap (historical, pod gone).
 ## Git: clean, pushed after this rewrite. Suite 333 green local.
 
 
-## ACTMIX FLEET LIVE ~21:15 London 2026-07-26 — 5 workers + hub
+## PRE-COMPACT RESUME POINT ~11:30 London 2026-07-27 — EXECUTE FIRST
+**Han's deliverable (top priority): TWO Aniket-format figures** —
+one for RLHF, one for sparse probing. Spec: x = T (1→16), y = task
+detection metric (RLHF preference_auc; probing AUC), TWO curves =
+Ordered TXC vs Shuffled window, 3 seeds each with error bars +
+faint per-seed lines, annotation "T=16 − T=1: +X" (template:
+Aniket's backtracking AP figure; solid blue squares vs dashed
+orange ×). **Gap analysis DONE (board-scanned 11:25):**
+- RLHF missing: s1@T{8,16} + third seed@T{1,2,5,8,16} = 7 trained
+  cells (~30 contended GPU-h; card timings in actmix_rlhf/CARD §5;
+  T1 shuffle ≡ identity, annotate).
+- Probing missing: s1@T{4,8} + third seed@T{1,2,4,8,16} = 7 cells
+  (cheaper, gemma-2-2b; stray s0@T3 is not ladder-usable).
+**Post-compact orchestration:** (1) LOG directive + brief to
+runpod-1/2: top-up the missing cells using ALL 3 GPUs as lanes
+free (probing lanes were draining; check pod GPU state via the
+ssh-pipe pattern below), SAME frozen cards/conventions (these are
+in-card seed extensions — amendments, not new pre-registrations;
+disclose seed choice for the third seed: use seed 2), then each
+produces its figure in the template format (describe template in
+the brief; figs to figs_writeup/ as fig_rlhf_shuffle_tsweep and
+fig_probing_shuffle_tsweep). (2) A 2-seed interim figure NOW is
+acceptable for the 17:00 draft — tell the pods to render interim
+first, final after top-ups. (3) My review on landing; ledger lines
+as always. SSH-pipe pattern: printf 'cmds; exit\n' | ssh -tt -i
+~/.ssh/id_ed25519 j42plcul70a2es-64410eb7@ssh.runpod.io (PTY-only
+proxy; filter tokens/2004 from output).
+**Standing context:** one-pager FINAL at
+private/monday_onepager_2026-07-27.md (integrated pods' ratified
+sentences); 17:00 team meeting decides: cnov GO (prep is one line
+from launch, gemma2 substrate, T≤16 zone), R22 caveats, RLHF/
+probing verdict ratifications, A6→Dmitry (Gen-2 runs non-public),
+integrity posture (A12 filesystem-grade), token rotations gated on
+mirrors (mac-c completing). Watcher: scratchpad/watch_origin.sh
+(deadline 18:00, exit 0=arxiv, 3=neurips-aniket, 2=deadline);
+cron 44d0aa83 fires :13/:43. All standing discipline + quote
+licences in LOG. Program spend ≈$115 Modal + pod hours; caps fine.
+
+## (superseded) ACTMIX FLEET LIVE ~21:15 London 2026-07-26 — 5 workers + hub
 All five workers launched by Han with briefings received: mac-a
 (relu_mode impl + calibration + KEEP-recheck), mac-b (forensics +
 shortlist), mac-c (archaeology + HF inventory), runpod-1 (probing
