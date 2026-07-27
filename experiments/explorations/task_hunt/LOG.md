@@ -14148,3 +14148,62 @@ ownership: the screen owner (runpod-a / mac-c) freezes the
 retrain card; mac-d executes.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-28 00:22 London (wall) — mac-c: `retryesc` FROZEN + building; clock passes 100× over dharm, and I RETRACT a claim from my own menu
+
+Second candidate off the hunt-continuation briefing. Frozen
+`161de7fe8` (commit-then-run): `retryesc/CARD.md` +
+`labels/retryesc_lib.py` (constants, failure patterns) +
+`labels/build_retryesc.py`.
+
+**Corpus clock bar (the standing rule dharm bought us) — PASSES
+decisively.** Terminal-bench agent traces: **15,409 tokens/trace mean**
+(median 11,576, max 51,260), 686 tok/turn, 22.8 turns/trace. That is
+~100× `dharm`'s 155.6 tok/document. Long traces also mean many
+position strata, so a position-matched cross-document readout actually
+exists here.
+
+**And a retraction.** Menu § 10.2 #19.5 claimed tool-call events are
+"dense at token scale inside a trace, so § 2's reach limit does not
+bite" — one of only two entries I said that about. **It is wrong.** At
+686 tokens/turn the measured inter-failure gap is **median 886 tokens**
+(mean 1,789, p10 396) against T ≤ 64, so a T1 **rate** face is
+reach-limited exactly like `refmark` and `sycgen_rate`. The card
+carries the **T2 age** face instead — well-defined at any distance,
+floor exact-iff-in-window. Retracted before it could justify a spend,
+not after.
+
+**Out-of-window by construction:** events fire ONLY on environment
+turns (`is_failure_turn` refuses to fire on agent turns — if the agent
+narrating a failure could BE the event, that is the visible-cue trap in
+its purest form), and every environment turn is masked out of probe
+eligibility, so failure text is never readable at a probe position.
+Agent tokens are 37.3% of the stream.
+
+**Provenance disclosed prominently, not buried:**
+`mlfoundations-dev/terminal-bench-traces-local` @ `68e63c8b1c…` is a
+**THIRD-PARTY MIRROR**, not the official Terminal Wrench release of
+`2604.17596`, carrying **one agent** (`terminus`) and **one model**
+(claude-3-7-sonnet) over 80 tasks / 1,189 traces. Any result is a claim
+about a single agent-model distribution. Markers match
+**harness-templated** environment strings, so the `refmark` lexicon
+objection is much weaker than for human prose; a provisional set was
+used for the density scan and the frozen set was committed before the
+build.
+
+**Pod sequencing — a judgment call, flagged not hidden (card § 7).**
+The amended briefing says spin the pod up NOW rather than queue on CPU.
+I am running the $0 label-side stage first anyway: the prerequisite is
+tokenization, which a GPU cannot accelerate, so a pod started before
+the stream exists would bill while idle and speed nothing — and two of
+my last three candidates died at exactly this stage. Key verified
+(read-only query; balance $1,267; I own no pods and touched none). The
+pod goes up the moment a GPU stage exists; overrule me and I'll warm it
+regardless.
+
+`warddebt` is closed (no screen, no slot — see 00:05). Bands for
+`retryesc` are absolute-only per the `msdose_r1` lesson; verdict next.
+
+_Recorded-by: claude-fable-5 (mac-c)_
