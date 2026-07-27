@@ -246,71 +246,94 @@ def make_fig(cells: dict, arm: str, k: int, Ts, outdir: Path):
 def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path):
     """Aniket-template shuffle T-sweep (059a66239 P1 deliverable).
 
-    Single panel: x = T at log2 positions with T-labeled ticks, TXC-pre
-    ordered (solid) vs shuffled (dashed) in ONE hue — the entity is the
-    arch, ordered/shuffled is linestyle — faint per-seed traces, mean ±
-    seed-σ error bars, "T=16 − T=1" annotation. Template knobs recorded
-    in the LOG so the RLHF twin (runpod-2) renders identically.
+    Knob-for-knob twin of runpod-2's RLHF renderer (421f6fa37,
+    `actmix_rlhf/render_writeup_fig.py` — first-to-freeze sets the pair
+    template): figsize 5.4x3.7, ONE hue for the TXC family with
+    linestyle carrying the order condition (shuffled = open markers),
+    faint per-seed traces, per-T seed-mean +- sd, log2 x-scale on real T
+    values, "T=16 - T=1" annotation top-left, T=1 shuffle==identity
+    note, ragged seed coverage auto-disclosed bottom-right. In the
+    writeup-pair namespace #D55E00 = "the TXC family" (matches the RLHF
+    fig); actmix-internal figs keep the pre/post hue split.
     """
-    seeds = sorted({s for (a, u, t, s, kk) in cells
-                    if a == TXC_PRE and not u and kk == k})
-    x = np.log2(Ts)
-    hue = "#1f77b4"          # Aniket's template default-blue
-    fig, ax = plt.subplots(figsize=(7.2, 4.8))
+    HUE = "#D55E00"
+    pts = {}   # (T, seed) -> {"ordered": v, "shuffled": v}
+    for (a, u, T, s, kk), m in cells.items():
+        if a == TXC_PRE and not u and kk == k and "mean_auc" in m:
+            pts[(T, s)] = {"ordered": m["mean_auc"],
+                           "shuffled": m.get("mean_auc_shuf")}
+    if not pts:
+        print("[analysis] writeup fig skipped: no TXC-pre rows")
+        return
+    seeds = sorted({s for (_, s) in pts})
 
-    for key, ls in (("mean_auc", "-"), ("mean_auc_shuf", "--")):
-        for s in seeds:      # faint per-seed traces first (underlay)
-            ys = [(np.log2(T), cells[(TXC_PRE, False, T, s, k)][key])
-                  for T in Ts if (TXC_PRE, False, T, s, k) in cells
-                  and key in cells[(TXC_PRE, False, T, s, k)]]
-            if len(ys) > 1:
-                ax.plot(*zip(*ys), color=hue, ls=ls, lw=0.9, alpha=0.25)
+    def mean_sd(field):
+        Ts_ = sorted({T for (T, _) in pts})
+        mu, sd, n = [], [], []
+        for T in Ts_:
+            vals = [v[field] for (t, _), v in pts.items()
+                    if t == T and v[field] is not None]
+            n.append(len(vals))
+            mu.append(float(np.mean(vals)))
+            sd.append(float(np.std(vals, ddof=1)) if len(vals) > 1 else None)
+        return Ts_, mu, sd, n
 
-    stats = {}               # key -> {T: (mean, sd, n)}
-    for key, ls, mk, lbl in (
-            ("mean_auc", "-", "o", "TXC-pre, ordered"),
-            ("mean_auc_shuf", "--", "s", "TXC-pre, shuffled (within-window)")):
-        pts = []
-        for T in Ts:
-            vals = [m[key] for (a, u, t, s, kk), m in cells.items()
-                    if a == TXC_PRE and not u and t == T and kk == k and key in m]
-            if vals:
-                m_, sd, n = agg(vals)
-                stats.setdefault(key, {})[T] = (m_, sd, n)
-                pts.append((np.log2(T), m_, sd))
-        if pts:
-            xs, ys, es = zip(*pts)
-            ax.errorbar(xs, ys, yerr=es, color=hue, ls=ls, marker=mk,
-                        ms=7, lw=2.0, capsize=3, label=lbl)
+    fig, ax = plt.subplots(figsize=(5.4, 3.7))
 
-    lo, hi = min(Ts), max(Ts)
-    ann = []
-    for key, name in (("mean_auc", "ordered"), ("mean_auc_shuf", "shuffled")):
-        st = stats.get(key, {})
-        if lo in st and hi in st:
-            ann.append(f"T={hi} − T={lo}: {st[hi][0] - st[lo][0]:+.3f} ({name})")
-    if ann:
-        ax.text(0.03, 0.04, "\n".join(ann), transform=ax.transAxes,
-                fontsize=9, va="bottom",
-                bbox=dict(boxstyle="round,pad=0.35", fc="white",
-                          ec="0.7", alpha=0.9))
+    for s in seeds:            # faint per-seed lines, both conditions
+        for field, ls in (("ordered", "-"), ("shuffled", "--")):
+            ss = sorted((T, v[field]) for (T, sd_), v in pts.items()
+                        if sd_ == s and v[field] is not None)
+            if len(ss) > 1:
+                ax.plot(*zip(*ss), ls, color=HUE, alpha=0.25, lw=1, zorder=1)
 
-    ax.set_xticks(x)
-    ax.set_xticklabels([str(t) for t in Ts])
-    ax.set_xlabel("T (window size)")
-    ax.set_ylabel("mean ROC AUC (38 tasks)")
-    ax.set_title(f"§5.1 sparse probing — shuffle T-sweep  "
-                 f"(k_feat = {k}, txc-pre btk-only, {tag})")
-    ax.grid(alpha=0.25, lw=0.5)
-    ax.legend(loc="upper right", fontsize=9, framealpha=0.9)
+    for field, ls, mk, mfc, label in (
+            ("ordered", "-", "o", HUE, "ordered"),
+            ("shuffled", "--", "s", "white", "within-window shuffled")):
+        Ts_, mu, sd, n = mean_sd(field)
+        ax.plot(Ts_, mu, ls, color=HUE, lw=2, marker=mk, ms=6,
+                mfc=mfc, mec=HUE, label=label, zorder=3)
+        for T, m_, s_ in zip(Ts_, mu, sd):
+            if s_ is not None:
+                ax.errorbar(T, m_, yerr=s_, color=HUE, capsize=3,
+                            lw=1.2, zorder=2)
+
+    Ts_, mu, _, n = mean_sd("ordered")
+    if 16 in Ts_ and 1 in Ts_:
+        delta = mu[Ts_.index(16)] - mu[Ts_.index(1)]
+        ax.annotate(f"T=16 − T=1: {delta:+.3f}", xy=(0.03, 0.95),
+                    xycoords="axes fraction", ha="left", va="top",
+                    fontsize=9)
+    if (1, 42) in pts:
+        ax.annotate("T=1: shuffle ≡ identity",
+                    xy=(1, pts[(1, 42)]["ordered"]),
+                    xytext=(0.03, 0.83), textcoords="axes fraction",
+                    fontsize=8, color="#555555",
+                    arrowprops=dict(arrowstyle="-", color="#999999", lw=0.8))
+
+    cov = " ".join(f"T{T}:n={c}" for T, c in zip(Ts_, n))
+    tag_note = ("INTERIM — remaining seeds in flight" if tag == "interim"
+                else "FINAL — seeds {42, 1, 2}")
+    ax.annotate(f"{tag_note} · {cov}", xy=(0.99, 0.02),
+                xycoords="axes fraction", ha="right", va="bottom",
+                fontsize=6.5, color="#777777")
+
+    ax.set_xscale("log", base=2)
+    ax.set_xticks(Ts_)
+    ax.set_xticklabels([str(T) for T in Ts_])
+    ax.minorticks_off()
+    ax.set_xlabel("T (window length)")
+    ax.set_ylabel(f"mean probing AUC (k = {k}, 38 tasks)")
+    ax.grid(True, alpha=0.25, lw=0.5)
+    ax.legend(frameon=False, fontsize=8, loc="lower right",
+              bbox_to_anchor=(1.0, 0.08))
     fig.tight_layout()
-    outdir.mkdir(parents=True, exist_ok=True)
+    outdir.mkdir(exist_ok=True)
     for ext in ("png", "pdf"):
         fig.savefig(outdir / f"fig_probing_shuffle_tsweep.{ext}",
-                    dpi=200 if ext == "png" else None)
+                    dpi=300 if ext == "png" else None)
     plt.close(fig)
-    print(f"[analysis] wrote {outdir}/fig_probing_shuffle_tsweep.png|pdf "
-          f"({tag}; seeds {seeds})")
+    print(f"[analysis] writeup fig ({tag}): seeds {seeds}; coverage {cov}")
 
 
 def main():
@@ -345,8 +368,7 @@ def main():
     print(f"[analysis] wrote {HERE/'RESULTS.md'} + figs/")
 
     if args.writeup:
-        tag = ("interim, 2 seeds" if args.writeup == "interim" else "3 seeds")
-        make_writeup_fig(cells, 20, args.Ts, tag, ROOT / "figs_writeup")
+        make_writeup_fig(cells, 20, args.Ts, args.writeup, ROOT / "figs_writeup")
 
 
 if __name__ == "__main__":
