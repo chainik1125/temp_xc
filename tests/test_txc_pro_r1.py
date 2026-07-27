@@ -170,6 +170,76 @@ def test_contrastive_weights_inverse_distance():
     assert m2.loss_weights == (1.0, 1.0)
 
 
+# ── owner requirement (LOG 20:45, runpod-1): T=1 window≡token identity
+#    through the eval_consumes dispatch — dispatch on DECLARED
+#    consumption, never on T ────────────────────────────────────────────
+
+
+def test_eval_consumes_T1_window_token_identity():
+    import numpy as np
+    from temp_bench.evals.probing import _encode_pool
+
+    torch.manual_seed(0)
+    m = _toy(cls=TXCProR1BTKOnly, T_max=1)   # consumes='sequence', eval_consumes='window'
+    m.eval()
+    dev = torch.device("cpu")
+    S = 8
+    X = np.random.default_rng(3).standard_normal((5, S, D_IN)).astype(np.float32)
+    fr = np.array([0, 2, 4, 7, 7], dtype=np.int64)
+
+    # (a) routes via the WINDOW path: the flat path would call
+    # encode((B, S, d_in)) and hard-raise (S != T_max=1) — not crashing
+    # IS the dispatch property.
+    pw, l0w = _encode_pool(m, X, S=S, batch_size=3, device=dev, first_real=fr)
+
+    # (b) equals per-token pooling of the same map: token-consuming view
+    # of the same model, encoding each position independently.
+    class _TokView:
+        consumes = "token"
+        T = 1
+
+        def __init__(self, inner):
+            self.inner = inner
+
+        def eval(self):
+            return self
+
+        def parameters(self):
+            return self.inner.parameters()
+
+        def encode(self, x):            # (B, S, d_in) → (B, S, d_sae)
+            B, S_, d = x.shape
+            z = self.inner.encode(x.reshape(B * S_, 1, d))   # (B*S, 1, d_sae)
+            return z.squeeze(1).reshape(B, S_, -1)
+
+    pt, l0t = _encode_pool(_TokView(m), X, S=S, batch_size=3, device=dev,
+                           first_real=fr)
+    np.testing.assert_allclose(pw, pt, rtol=1e-5)
+    assert abs(l0w - l0t) < 1e-6
+
+    # (c) exact shuffle invariance at T=1 (length-1 window permutation
+    # is the identity).
+    psh, _ = _encode_pool(m, X, S=S, batch_size=3, device=dev, first_real=fr,
+                          shuffle_seed=5)
+    np.testing.assert_array_equal(pw, psh)
+
+
+def test_eval_consumes_T1_probing_eval_identity_flag():
+    """ProbingEval end-to-end at T_max=1: shuffle twin reported equal by
+    construction (shuffle_identity=1), through the smoke task."""
+    from temp_bench.evals.probing import ProbingEval
+    from temp_bench.interfaces.evaluator import EvalSpec
+
+    torch.manual_seed(0)
+    m = _toy(cls=TXCProR1BTKOnly, T_max=1)
+    m.eval()
+    spec = EvalSpec(datasource="unused", data_key="unused", smoke=True,
+                    extra={"k_feat": 2, "S": 8, "encode_batch_size": 32})
+    metrics = ProbingEval().eval(m, spec)
+    assert metrics["shuffle_identity"] == 1.0
+    assert metrics["mean_auc_shuf"] == metrics["mean_auc"]
+
+
 # ── canonical eval path (hermetic smoke, full window dispatch) ────────
 
 
