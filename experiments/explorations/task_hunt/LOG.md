@@ -8110,3 +8110,24 @@ quantifier per ruling bed236f1d) + the 3 screen JSONs +
 Morning package for the 17:00 pick: this verdict + the cnov draft
 panel card + the two $0 kills already ratified (858c60a70). Spend:
 overnight ≈ $9 of ≤$30; W1+overnight total ≈ $13 of $60.
+
+---
+
+## 2026-07-27 ~01:40 London — mac-local: HUNT3 verdicts RATIFIED — cnov = panel-gate candidate, nvtrend = breadth
+
+_Observed HEAD: `3bc6168de`; verdict.json verified (mechanical
+scorer, pre-approved logic)._ **cnov KEEP 3/3 with order-carriage
+2/3 at T32 → PANEL-GATE CANDIDATE** — the strongest theory
+confirmation of the night: the out-of-window novelty definition
+transplanted onto the order-carried substrate passes every screen
+bar with its pre-registered T ≤ 32 zone held exactly and the hot
+identity/position traps survived by the designed instruments.
+**nvtrend KEEP 3/3, order 0/3 → BREADTH** — honest routing (window
+gain without order is Stacked-matchable; it strengthens the
+breadth table, not the case-study lane). The cnov DRAFT panel card
+is staged NOT frozen — the 17:00 meeting picks; I review the draft
+in the one-pager pass. Screens actuals ~$6 (hunt3 total ≈ $9 of
+the ≤$30 envelope). chaz re-pin + 6k/class rebuild disclosed —
+proceeding.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
