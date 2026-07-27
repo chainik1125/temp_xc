@@ -152,6 +152,49 @@ def run_cell(cell: tuple[str, int, int]) -> str:
     return out_vol.read_text()
 
 
+@app.function(image=image, volumes={"/workspace": vol},
+              secrets=[modal.Secret.from_name("hf-token")],
+              cpu=8, memory=16384, timeout=2 * 60 * 60)
+def hf_mirror(dry_run: bool = True) -> str:
+    """Mirror EM artifacts (checkpoints + caches) from the Volume to HF.
+
+    Uses the house `hf-token` Modal secret. dry_run reports the token
+    identity and what would upload, without pushing.
+    """
+    import os
+    from huggingface_hub import HfApi
+    api = HfApi(token=os.environ.get("HF_TOKEN")
+                or os.environ.get("HUGGING_FACE_HUB_TOKEN"))
+    who = api.whoami()
+    name = who.get("name")
+    orgs = [o.get("name") for o in who.get("orgs", [])]
+    print(f"[hf] token identity: {name}; orgs: {orgs}", flush=True)
+    targets = {
+        "/workspace/em_checkpoints": ("temp-bench-models", "model", ""),
+        "/workspace/em_data_cache": ("temp-bench-data", "dataset",
+                                     "em_data_cache"),
+        "/workspace/conv_depth_caches/em_medical":
+            ("temp-bench-data", "dataset", "conv_depth_caches/em_medical"),
+    }
+    report = [f"identity={name} orgs={orgs}"]
+    for src, (repo, rtype, sub) in targets.items():
+        p = Path(src)
+        n_files = sum(1 for f in p.rglob("*") if f.is_file()) if p.exists() else 0
+        size = sum(f.stat().st_size for f in p.rglob("*") if f.is_file())             if p.exists() else 0
+        line = (f"{src}: {n_files} files, {size/1e9:.2f} GB -> "
+                f"{name}/{repo}[{rtype}]/{sub or '.'}")
+        print(("[dry] " if dry_run else "[push] ") + line, flush=True)
+        report.append(line)
+        if not dry_run and n_files:
+            rid = f"{name}/{repo}"
+            api.create_repo(rid, repo_type=rtype, private=True, exist_ok=True)
+            api.upload_folder(folder_path=src, repo_id=rid, repo_type=rtype,
+                              path_in_repo=sub or None,
+                              commit_message="btk-sprint EM artifacts "
+                                             "(dmitry-btk-txc-sprint lane)")
+    return "\n".join(report)
+
+
 def _merge_rows(all_rows, dest: Path):
     seen = set()
     if dest.exists():
@@ -173,7 +216,11 @@ def _merge_rows(all_rows, dest: Path):
 
 
 @app.local_entrypoint()
-def main(stage_only: bool = False, cells: str = "", skip_stage: bool = False):
+def main(stage_only: bool = False, cells: str = "", skip_stage: bool = False,
+         mirror: str = ""):
+    if mirror:
+        print(hf_mirror.remote(dry_run=(mirror != "push")), flush=True)
+        return
     if not skip_stage:
         print("[stage]", stage.remote(), flush=True)
     if stage_only:
