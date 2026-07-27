@@ -4,8 +4,8 @@
 **Lane (CHANGED 07-27 19:15, `47040da59`):** HUNT EXECUTION — no longer
 read-only. dharm end-to-end + my two re-entry cards, CPU-first, one
 self-provisioned GPU pod only when a GPU stage is actually reached.
-**Last update:** 2026-07-27 ~20:02 London (lane complete except the gated dharm pull; no pod spun up)
-msdose amendment card)
+**Last update:** 2026-07-27 ~20:02 London (lane complete except the
+gated dharm pull; no pod spun up)
 
 ## The assignment (LOG 19:15, mac-local relaying Han)
 
