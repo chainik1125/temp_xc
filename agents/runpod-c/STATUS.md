@@ -26,34 +26,23 @@ production: T1 0.8944 ≡ twin). Its T16 cell decides everything.
 
 ## IN FLIGHT RIGHT NOW (check these FIRST on resume)
 
-- **GPU 0, pid 15978** — wave-3 L1 screen `subseq-btk-4k`
-  (`txc_btk_pre_subseq_btkonly`, 4k steps, T order 1→4→16, s42):
-  T1 0.8944 DONE (≡ twin exactly, l0 13.4 ✓), T4 0.8928 DONE (mild
-  dip vs twin 0.9099), **T16 train finished step 3999, EVAL RUNNING**
-  (~lands 23:10 London). Log `/workspace/logs/tscale_l1_subseq.log`.
-  **DECISION on T16:** twin T16 = 0.8810; r1-family ≈ 0.915–0.919.
-  (a) T16 ≥ 0.90 → first FULL L1-gate pass (slope via Δ16 vs twin
-  −0.0134, anchor exact, level clean) → write RESULTS C2 section, LOG
-  PTR, promote to L2 (20k, full dev grid, both k) per CARD § 3.
-  (b) T16 ≈ 0.88–0.90 → partial transfer; compare against nomatr-r1
-  (0.9185) and consider hybrid (subseq-btk with per-sample-TopK
-  train-time selection? or t_sample sweep 4/12 ablation) — record
-  either way. (c) T16 ≤ twin → curriculum did NOT transfer to
-  BatchTopK at 4k; the r1-stripped lineage (nocontr/nomatr) becomes
-  the carry — its L2 next.
+- **GPU 0, pid 19083** — `r1b-min-4k` (`txc_pro_r1_btkonly` with
+  contrastive_alpha=0 + h_size=18432 + contr_prefix=3686 = the
+  MINIMAL subseq+TopK+auxk recipe), T {1, 16}, 4k steps. Launched
+  ~22:55; lands ~23:55 London. Log
+  `/workspace/logs/tscale_l1_r1min.log`. **DECISION:** if T16 holds
+  ≈0.918 (nocontr/nomatr level), r1-min is the L2 candidate proper —
+  its remaining problem is ONLY the T1 collapse (L2 diag answers the
+  AuxK half). If T16 drops, the removed pieces interact — re-attribute.
 - **GPU 1, pid 13644** — A1-exception **L2 diagnostic**
-  `r1b-L2diag-20k` (`txc_pro_r1_btkonly`, 20k steps, T order
-  16→1→4): T16 at step ~12k/20k as of 22:54; T16 lands ~00:40, then
-  T1 (~45 min), T4 (~1 h) → full drain ~02:30–03:00. Log
-  `/workspace/logs/tscale_l2diag.log`. **Questions it answers:**
-  (a) T1 collapse resolved with AuxK live (20.5 M tokens > 10 M
-  threshold)? (b) T16 win holds at canonical steps? Per CARD § A1 its
-  result CANNOT reach L3 without passing the § 3 L2→L3 gates as
-  written.
-- **Background watchers armed** (session-local, will re-invoke):
-  `bkhtpqb3g` fires on wave-3 3rd DONE; `bldz2fiv3` fires on L2diag
-  first DONE. If resuming post-compact without them, just read the
-  two logs + `results/l1_rows.jsonl`.
+  `r1b-L2diag-20k` (full r1 btkonly recipe, 20k steps, T order
+  16→1→4): T16 ~14k/20k at 22:57; lands ~00:40, then T1 (~45 min,
+  THE collapse-with-AuxK-live answer), then T4; drain ~02:30. Log
+  `/workspace/logs/tscale_l2diag.log`. Per CARD § A1 it cannot reach
+  L3 without the § 3 gates as written.
+- **Watcher still armed:** `bldz2fiv3` fires on L2diag first DONE.
+  (Wave-3 watcher consumed — C2 KILL processed and pushed.) If
+  resuming without watchers: read the two logs + l1_rows.jsonl.
 
 ## Verdict + numbers ledger (dev-8 s42, 4k steps unless noted; k20)
 
