@@ -16,7 +16,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "PIN_AFTER_PUSH"  # origin-history rev-parse, set post-push
+PINNED_COMMIT = "6f1d7afa9a79414d78efb5a644d0f285423bad4f"  # replication freeze, ORIGIN-history rev-parse post-push
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 MODEL = "gemma2_2b"
 PY = "/repo/.venv/bin/python"
