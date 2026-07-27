@@ -1,11 +1,13 @@
 # Working state — agent `mac-a`
 
-**2026-07-27 ~02:55 London — OVERNIGHT § 1 (task-hunt resumption,
-briefings/actmix-overnight.md): screens DONE, bundle verdict POSTED
-(~02:50 LOG), draft panel card STAGED for the 17:00 pick. One item in
-flight: chaz factory screen (relaunch 3, freeze 81b6d5918, monitored).
-Spend: overnight ≈ $9 (+chaz ~$2 est) of ≤$30; W1+overnight ≈ $13–15
-of $60 cap.**
+**2026-07-27 ~03:25 London — OVERNIGHT § 1 COMPLETE AND RATIFIED
+(36d3175ac): cnov panel-gate candidate + nvtrend breadth; chaz KILL
+(~03:15 LOG; window-MEAN control fired; base/hs13 venue disclosed);
+tempo/qres $0 kills. Final slate: 4 designed → 3 killed by their own
+pre-registered instruments → 1 panel-gate candidate + 1 breadth
+entry. Draft card review deferred to mac-local's one-pager pass.
+Overnight actuals ≈ $9 of ≤$30; W1+overnight ≈ $13 of $60. NOTHING
+IN FLIGHT — idle watch until the 17:00 pick or new allocation.**
 
 ## Overnight delivered (all pushed)
 
@@ -33,13 +35,16 @@ ACTMIX W1: Stage 1 btk-only (canonical), Stage 2 CALIB identity
 verdict + R30 (WRITEUP-applied via §6a package), Stage 3 cancelled
 by af2247d43, thin-pool diag divergence exhibit. ≈$4.
 
-## On chaz landing
+## chaz outcome (closed)
 
-Score vs chaz/CARD.md § 3 bars (g ≥ +0.05 ∧ ≥2σ_null ∧ g−g_agg ≥
-+0.02 ∧ null-arm clean; base-only venue — distill cache absent on
-ward volume, DISCLOSE) → LOG verdict + ledger actuals → idle watch.
-Early cells showed g ≈ g_agg (aggregation-shaped) at T4–8; T16/32
-decide.
+KILL by the window-MEAN control: g +0.046…+0.093 real (the cue-free
+persistent state EXISTS — the conversion-removal design worked) but
+g_agg ≥ g at every T ≥ 8 (−0.001/−0.013/−0.025) → order-free
+pooling-readable ambient direction; breadth datapoint, no panel
+case. sc_lambda's "aggregation bonus" confirmed at one remove.
+Venue: base/hs13 only (no distill cache, no hs11 on ward volume —
+disclosed). chaz actuals ≈ $2.5 over 4 attempts (wrong-volume $0.2 +
+2 OOM + success).
 
 ## Assets / recovery
 
