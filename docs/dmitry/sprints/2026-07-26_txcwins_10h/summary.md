@@ -489,6 +489,49 @@ elsewhere), exactly where a forged response boundary sits.
 `completion_real` is the cell to run arms on: strong behaviour, `c` in the go region, retention
 6.2× floor.
 
+### The gate inverts on that cell, and the cause is dose — not the pairing
+
+⚠ **`struqpos_completion_real` fails the `grad_slab ≥ broadcast_optimal` sanity gate**, which is
+supposed to be unfailable: the unconstrained optimum cannot lose to a restriction of itself. Two
+causes were proposed and only the second survives.
+
+**A real second defect, which was not the cause.** `completion_real` forges the item's own answer
+into the prompt — that is the attack — and that same answer was the metric's second continuation.
+So `cont2` sat verbatim in the context on **70% of draws** (against 4% for `naive`/`ignore`), at
+median 258 characters from the end in condition A versus 486 in B. The contaminant therefore
+**displaces 3.7× further between conditions than the injected instruction does** (−228 versus −61
+characters), and the metric was largely measuring copy distance on its own contrast string.
+Scoring against a different item's answer takes the leak to **0%**, and costs a lot: the baseline
+falls from **+8.19 to +1.69**, so **79% of the apparent behaviour was the contaminant**. The
+geometry barely moves (`c` 0.084 → 0.086, `r1` 0.910 → 0.909) — the shape statistics were sound
+while the effect size they were attached to was not.
+
+**The registered prediction was mine and it was refuted.** I predicted the leak caused the gate
+failure. The leak-free cell still fails at α = 0.5.
+
+**The actual cause is dose saturation from gradient concentration, and the gate is sound.**
+`u₁(Ḡ)` here is `0.00 0.01 0.01 0.01 0.01 0.03 0.03 0.00 0.04 0.03 0.00 1.00` — the gradient lives
+almost entirely on the final segment. Both arms are normalised to unit **Frobenius** norm, so at
+matched α the concentrated arm places ~`√T` = 3.5× more norm per position and leaves the linear
+regime at roughly 1/3.5 of the dose. Sweeping α down
+(`results/txc_wins/geometrystruqposx_lowdose.json`, `n_gate` = 120):
+
+| α | 0.02 | 0.05 | 0.10 | 0.15 | 0.25 | 0.50 | 1.00 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `grad_slab` | +6.55 | +12.59 | **+17.29** | +16.48 | +6.41 | −5.86 | −3.56 |
+| `broadcast_optimal` | +2.09 | +5.23 | +9.83 | **+11.52** | +4.91 | +0.97 | −0.88 |
+| margin | +4.46 | +7.36 | +7.46 | +4.96 | +1.50 | −6.83 | −2.68 |
+| gate | PASS | PASS | PASS | PASS | PASS | FAIL | FAIL |
+
+A clean saturation curve. **The gate encodes a first-order argument and was being evaluated
+outside the regime where first-order arguments hold.**
+
+**This generalises past StruQ.** A fixed Frobenius dose is *not* a matched dose across arms whose
+writes differ in concentration, so the sprint's default grid `[-2, -1, -0.5, 0.5, 1, 2]` with
+matched dose 0.5 is entirely inside the saturated regime on any concentrated-gradient cell. This
+is the "Frobenius versus injected norm" entry of the methodology list resurfacing **inside the
+gate itself** — a ninth instance of the same pattern.
+
 ### Multi-turn escalation — SafeMTData
 
 Crescendo-style jailbreaks: five turns, none individually harmful, where the extraction happens
