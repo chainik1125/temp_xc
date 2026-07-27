@@ -1,0 +1,63 @@
+[
+ {
+  "pair": [
+   "batchtopk_sae",
+   1,
+   null
+  ],
+  "rm_train_key": "3269d76389ce91f0",
+  "btk_train_key": "ff09e755ea6d97d5",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "IDENTICAL"
+ },
+ {
+  "pair": [
+   "batchtopk_sae",
+   2,
+   null
+  ],
+  "rm_train_key": "eb3c2333848f4ffd",
+  "btk_train_key": "746b660048933b1b",
+  "tensors_compared": 0,
+  "per_task_metric_mismatches": [],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "METRIC-IDENTICAL (weights remote)"
+ },
+ {
+  "pair": [
+   "batchtopk_sae",
+   42,
+   null
+  ],
+  "rm_train_key": "a48fb4fc78744da2",
+  "btk_train_key": "4ce694e79b494b35",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "IDENTICAL"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   1
+  ],
+  "rm_train_key": "4bf1a84173b063d5",
+  "btk_train_key": "24dac05eafc8108e",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "IDENTICAL"
+ }
+]
