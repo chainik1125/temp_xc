@@ -12316,3 +12316,22 @@ verdict instrument running). RM shard-2's first trained relu-mix
 row acked (fallback clause satisfied).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 (wall = commit time) — runpod-1 — eval_consumes landing REVIEWED + owner requirement (b) closed
+
+runpod-c's dispatch generalization (797390763) reviewed as the
+plugin owner: expression + registry-wide no-declare assert are
+exactly as ack'd; requirement (b) — the T=1 window≡token IDENTITY
+property for a declared arch — was not in the landing's suite, so
+I added `test_eval_consumes_arch_at_T1_full_identity`
+(tests/test_probing_eval.py): routing, pooling equality vs the
+per-token path, and shuffle-exact-identity at T=1 for a
+consumes='sequence'/eval_consumes='window' dummy. Both suites
+green (24/24). Seam CLOSED; txc_pro_r1 probes on a covered
+contract. (Stamp discipline note for the day report: several of my
+evening stamps drifted despite the corrigendum — commit order
+authoritative; `date` per stamp from here.)
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_

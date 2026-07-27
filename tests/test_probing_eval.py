@@ -223,6 +223,36 @@ def test_window_arch_at_T1_routes_via_window_path():
     np.testing.assert_array_equal(pw, psh)   # length-1 window shuffle = identity
 
 
+class _EvalConsumesT1(_WindowT1):
+    """Declares consumes='sequence' but eval_consumes='window' — the
+    txc_pro_r1 contract (797390763). The dispatch generalization must
+    route it via the window path with FULL T=1 anchor semantics."""
+
+    consumes = "sequence"
+    eval_consumes = "window"
+
+
+def test_eval_consumes_arch_at_T1_full_identity():
+    """Owner-ack requirement (b) on the eval_consumes landing: for a
+    declared-window arch the T=1 anchor semantics must hold exactly —
+    (a) window routing (no crash on (B,1,d) assert), (b) pooling equal
+    to the per-token path, (c) shuffle exactly the identity. The
+    landing's own tests cover dispatch-expression equivalence; this
+    covers the eval-math property the dispatch exists to serve."""
+    wm, tm = _EvalConsumesT1(), _TokenId()
+    dev = torch.device("cpu")
+    S = 8
+    X = np.random.default_rng(3).standard_normal((5, S, D_IN)).astype(np.float32)
+    fr = np.array([0, 2, 4, 7, 7], dtype=np.int64)
+    pw, l0w = _encode_pool(wm, X, S=S, batch_size=3, device=dev, first_real=fr)
+    pt, l0t = _encode_pool(tm, X, S=S, batch_size=3, device=dev, first_real=fr)
+    np.testing.assert_allclose(pw, pt, rtol=1e-5)
+    assert l0w == pytest.approx(l0t)
+    psh, _ = _encode_pool(wm, X, S=S, batch_size=3, device=dev, first_real=fr,
+                          shuffle_seed=5)
+    np.testing.assert_array_equal(pw, psh)
+
+
 def test_realized_l0_counts_nonzero_units():
     """fired ⇔ z != 0 (btk-only convention): the stub relu's negatives to
     exactly 0, so 3 positive input dims → 3 nonzero latents per token.
