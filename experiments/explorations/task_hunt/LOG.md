@@ -11674,3 +11674,90 @@ end-to-end. RM shard 2 unaffected (mid pass-1; first trained row
 ETA ~19:45–20:15, fallback 21:00 intact).
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-27 20:25 London (wall) — mac-c: WAVE-3 SECOND-SOURCE — msdose fails the menu's own position trap (measured); sycpress/reask need a $0 census before any verdict text
+
+Round-2 workstream 1 delivered per the 18:48 amendment (pivot from BUILD
+to ADVERSARIAL SECOND-SOURCE — runpod-a froze first at `648fa180c`, no
+duplication). Deliverable: `WAVE3_SECOND_SOURCE.md`. **Review, not a
+re-freeze** — every finding resolves into a disclosure or a secondary
+pre-registration, none requires unfreezing a constant, and none blocks
+the CPU pre-measures from starting.
+
+**Overall the freeze is good work** and I want that on the record before
+the findings: pinned published source, verbatim strings, matching
+semantics inherited from `refmark_lib` rather than invented, an explicit
+refusal to extend the list for event rate, and limitations disclosed
+pre-count. **Provenance independently VERIFIED** — I fetched the pinned
+commit's README and all six `sycpress` substrings are confirmed against
+`meg-tong/sycophancy-eval @ 9a16942…`, including the faithful
+two-sentence split of the challenge template.
+
+**1. `msdose` — HIGH, and it corrects my own menu text.** Trap (a)
+demanded the realised count↔position correlation before screening; the
+freeze does not carry one, so I simulated the frozen plan (RNG only, no
+corpus, no labels, no AUCs — runpod-a's lane untouched):
+**within-document Spearman(position, dose) = 0.990**, pooled 0.964,
+and **only 10.9 % of dose variance survives absolute-position matching**.
+Length jitter *cannot* fix the within-doc figure — inside one document
+dose is a monotone step function of position — so **the menu's line that
+within-document variation is "the saving grace" is wrong as written and
+I am correcting it.** The admissible readout is cross-document and
+**position-matched, mandatorily**; the residual is real (at [1024,1536)
+dose still spans 4–17, sd 2.02), so the candidate lives, but a card
+without a position-matched manifest is measuring position. Backed
+recommendation if the construction has not yet run: draw a **per-document
+span scale** (`mu_doc ~ N(log 120, σ_doc)`, spans from
+`lognormal(mu_doc, 0.6)`) — surviving variance 10.9 % → **24.6 %**
+(σ_doc 0.4) → **34.4 %** (σ_doc 0.7) for one extra line. The obvious
+instinct — a random preamble before exemplar 1 — buys almost nothing
+(13.9 %), because a constant offset shifts the step function without
+changing its shape.
+
+**2. `sycpress` — MEDIUM, naming risk.** The 6 frozen strings span two
+constructs with **opposite temporal relations to the probed assistant
+text**: 2 challenge markers (user pushes back *after* an answer) and 4
+feedback-biasing prefixes (user sets a prior *before* one). Pooling is
+defensible and runpod-a names it honestly as a "register", but the menu
+defines this face as *pushback ... the quantity that precedes
+capitulation* = the challenge subset only. **Sharp risk: `"i wrote"`
+dominance** — in organic WildChat that is overwhelmingly task framing
+("I wrote this essay, fix it"), i.e. conversation task-type, i.e. the
+document-identity signal that killed `refmark` at doc-mean 0.966–0.968
+on this same corpus. `pushback_hits()` already implements the census:
+**run it and publish the split before the face is named in any verdict**,
+and pre-register the challenge subset as a disclosed secondary. Also, one
+justification correction: sycpress is out-of-window *in expectation*, not
+*by construction* (at 125–144 tok/message an early-in-turn probe can see
+the preceding user turn at T64) — it is rescued by the T2 age template's
+censored regime, not by event placement. `reask`'s justification *is* by
+construction; the two should not be described in the same words.
+
+**3. `reask` — MEDIUM, two structural notes.** (a) The gate inherits
+`refmark`'s register problem: 6 of the 12 gating substrings are apology /
+persona disclaimer, not refusal ("I'm sorry", "I apologize", "As an
+AI"…), and *"I'm sorry for the confusion, here's the corrected code"* is
+everywhere in WildChat — so the face may be measuring **conversational
+repair**, not refusal persistence, which is the entire safety
+motivation. Census the gating substring; pre-register the
+hard-refusal-gated variant as primary if apologies dominate. (b)
+`REASK_JACCARD = 0.3` imposes an **undisclosed length-ratio gate**: since
+J ≤ min(|A|,|B|)/max(|A|,|B|), J ≥ 0.3 is impossible unless the two
+turns' content-word counts are within 10:3. A terse re-ask against a long
+original can never fire. Plausibly correct behaviour (a true re-issue has
+comparable length), but it is a selection rule the stated rationale
+doesn't mention, and it compounds with the 3-word floor — disclose it and
+report how many triples pass the refusal gate but fail only on Jaccard
+(the `tretd` starvation precedent is the named risk here).
+
+Endorsed explicitly: the no-unsourced-additions rule (if the census comes
+back starved, the principled remedy is **more templates from the same
+pinned source**, never invented synonyms — the moment the list is tuned
+for event rate the provenance argument is gone); `reask`'s genuinely
+by-construction out-of-window justification; verbatim `sage_face` /
+`sage_floor` reuse. One minor: `msdose_doc`'s rejection-sampler fallback
+silently shortens an exemplar — count it in the funnel.
+
+Round-2 workstreams 2 (menu § 10 addendum) and 3 (Tier-C pipeline
+designs) are next from me; briefing stays undeleted until all three land.
+
+_Recorded-by: claude-fable-5 (mac-c)_
