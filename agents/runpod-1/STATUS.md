@@ -1,51 +1,61 @@
 # Working state — agent `runpod-1`
 
-**2026-07-27 ~19:10 London (wall) — P1 grid 100% COMPLETE + verdict
-ratified + per-k family shipped; P1-RM (relu-mix arm) RUNNING at PIN
-8c231e806, SHARDS=3 (my GPUs 0/1 + runpod-a GPU 0 shard 2, 21:00-real
-fallback clause armed). Day report ~21:30; RM drain ~23:30–00:30.**
+**2026-07-27 21:15 London (date-verified) — day report posted (LOG
+21:12). NIGHT GRID RUNNING at PIN db098b8c1: dead-latent RM
+T{6,8,10,16}×3s + btk T{6,10}×3s + telemetry, 2 GPUs, drain ~01:30
+pod. Morning queue below. GPU 2 = runpod-2, never mine.**
 
-## Delivered today (all pushed + ratified unless noted)
+## The RM arc (context for any resume)
 
-1. FORMAL VERDICT (88a955623, RATIFIED e29500298): no T-win; margins
-   vanish; E-scoring 1/2/5/7/8 MET, 3/4/6 NOT MET; addendum 5df236136
-   (post-42 starvation) RATIFIED c8b11ec19; P1 CLOSE entry ~19:00 wall
-   (final 3-seed post table: 0.8985→0.8163, σ 0.0007 at endpoint,
-   identity receipts ×3).
-2. Figures: per-k family (ccddf01be executed — _k5 U-shape + _k20
-   decline, 36-task headline per 89fd5c292, cross-checked
-   digit-for-digit 72fc41bd2); raw-38 twin; pair-style knob pre-wired
-   (meeting pick pending → 1-flag re-render).
-3. k-inversion formalized + l0 confound RULED OUT (fcf62963b,
-   RATIFIED c4d3eee73 w/ quote licence).
-4. P2 layer sweep COMPLETE + RATIFIED (~$3): trailing-dialogue faces
-   are EARLY-layer (R2 inverted-informative); dialevel caches healed.
-5. tsae column (0.8718±0.0008, NOT-met w/ 7d caveats); Phase B
-   (overnight, ratified).
+Identity discovered (low-T bit-identical twins) → halt approved →
+Han override (dead-latent hypothesis needs high T) → divergence
+MEASURED: onset T≥2, deepening with T. CORRECTED mechanism
+arithmetic: per-window selection depth = k_pos·T/d_sae grows
+linearly (0.11%→1.74% T1→T16); sae stays shallow ⇒ sae identical
+×3 seeds (incl. cross-pod exact), pre identical ONLY at T1.
+T16 endpoint: ~57% dead latents BOTH arms, ~40% disjoint survivor
+sets, ~0.002 AUC cost (width-contingent per quote guards
+7093c21f8). Dead-frac vs T is U-shaped (0.44→0.37→0.57).
+Instrument gate closed (positive control DIVERGES at thin pool;
+ratified). Equivalence table: experiments/probing/actmix/
+RM_EQUIVALENCE.md (checker excludes positive_control rows).
 
-## Live (check first on resume)
+## Live overnight
 
-- **P1-RM**: logs /workspace/logs/actmix_rm_gpu{0,1}.log; queue per
-  CARD_RELUMIX.md (untrained-42 → sae 3s → pre 3s → post-42; post-1/2
-  TRAIL). Monitor buo8e0rol armed. runpod-a shard 2 from their clone
-  at the SAME PIN — **fallback: if no shard-2 trained row by 21:00
-  real (PULL FIRST — their rows arrive via origin), relaunch shard-2
-  cells locally (cache-hit-safe)**: same launcher line with
-  `--shard-index 2 --shard-count 3` per pass, one GPU.
-- **§3b k-bracket** (k ∈ {10,40,80} eval-only, pre+sae ckpts
-  manifest-confirmed, ~2.25 GPU-h card-free): run at RM drain or on a
-  freed GPU; per-k fig family auto-extends (renderer loops ks).
-- **21:20 timer** (b0oj5f465 = 21:00 fallback; bw5j7p5qn = report):
-  day report (LOG) + ledger reconcile + this STATUS rewrite + push.
-- **On RM drain**: analysis --arm relu-mix; both-arms fig
-  (CARD_RELUMIX §5 — btk #D55E00 vs relu-mix #0072B2, linestyle =
-  order); RM-E1..E4 scoring PTR (E4 = the both-arms T-claim answer);
-  ledger actuals. Morning OK per ccddf01be §2 precedent.
+- Chains: /workspace/logs/actmix_night_gpu{0,1}.log (monitor
+  bva90ega9). GPU0: control✓ → btk T{6,10} sh0 → RM sh1. GPU1:
+  RM T{6,8,10,16} sh0 → btk sh1. Telemetry:
+  /workspace/logs/telemetry_rm/*.jsonl (250-step traces, both arms).
+- Landed tonight: RM T6 s42 (0.8949 k20; twin diff = bidirectional
+  drift, k5 −1.6e-2 / k20 +0.8e-3); btk T6 s42 (0.8941 — FIRST REAL
+  T6). All cells telemetried except pre-existing T8/T16 btk ckpts +
+  T16-s42 RM (endpoint-only, disclosed).
+
+## Morning queue (in order)
+
+1. Per-cell equivalence diffs as twins complete (rm_equivalence.py;
+   report first divergences immediately — they ARE expected now,
+   the interest is the ONSET CURVE at 3 seeds + T{8,10}).
+2. Telemetry traces: parse telemetry_rm/*.jsonl → dead_frac +
+   boundary_min_pre vs step per (arm, T) — the mechanism evidence
+   (btk arm: min-selected going NEGATIVE marks boundary crossing;
+   RM arm: fill below nominal marks waste).
+3. 7-point per-k fig re-renders (--writeup final; ks auto-detect;
+   T{6,10} rows fold in) + the REAL-T10-vs-phantom rebuttal note
+   (CARD §7f wording) in the landing entry.
+4. Certificate entry (measured scope ONLY, per guards): identity =
+   {sae all, pre T1}; divergence map T2–T16 with per-T deltas;
+   positive+negative control receipts; PTR.
+5. RESULTS_relu-mix.md + RESULTS_btk-only.md refresh (analysis.py
+   both arms); RM ledger actuals + corrections.
+6. STATUS rewrite + push before compact.
 
 ## Standing
 
-Origin watcher bf369am3s (four-path topology). Timestamps from
-`date` ONLY (corrigendum c8b11ec19 — pod clock may read ~min slow vs
-Macs; commit order authoritative). Tokens by path; GPU 2 never mine;
-Aniket's backtracking read-only. Ledger: day 07-27 ≈ $98 + RM
-pre-midnight fraction (cap $150); RM est $40–45 mostly day-2.
+Timestamps: read `date` FIRST, then write the stamp (two drifts
+tonight disclosed in the report). Origin watcher bf369am3s; night
+monitor bva90ega9. LOG conflicts: union-resolve theirs-first +
+stray-marker check (grep '^<<<<<<<|^>>>>>>> [0-9a-f]|^=======$').
+Ledger: day-1 ≈ $98 + night ≈ $30 mostly day-2; caps intact.
+Tokens by path only; rotations post-weekend. Aniket's backtracking
+read-only.
