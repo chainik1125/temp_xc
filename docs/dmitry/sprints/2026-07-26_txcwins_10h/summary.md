@@ -493,6 +493,39 @@ and it is the TopK basis specifically that fails. And the reading/steering disso
 **does not transfer here**: on prompt injection a per-token dictionary is not reading well and
 steering badly, it is failing at both, which changes what a crosscoder win would mean.
 
+### Multi-turn escalation — SafeMTData
+
+Crescendo-style jailbreaks: five turns, none individually harmful, where the extraction happens
+only because of the arrangement. The foil holds the **payload turn fixed and last** and permutes
+only the four context turns, so both conditions end with the same question and only what precedes
+it differs — a single 4-cycle, rank 3 of a possible 3. Rows are filtered to those whose turns are
+referentially self-contained (317 of 600 under a strict pronoun-plus-demonstrative filter; the
+dataset's own illustrative row fails it). `k_seg = 5`, `n_docs` = 200
+(`results/txc_wins/geometry_safemt.json`):
+
+| filter | baseline | z | `c(Ḡ)` | `r1(Ḡ)` | retention (× floor) | `c(P_dom)` |
+| --- | --- | --- | --- | --- | --- | --- |
+| strict (317 rows) | −0.282 | −4.8 | **0.273** | 0.506 | 0.546 (7.7×) | 0.197 |
+| loose (487 rows) | −0.245 | −4.4 | **0.296** | 0.464 | 0.578 (8.2×) | 0.198 |
+
+**A clear stop.** `c` = 0.27–0.30 is nearly double the top of the ambiguous band and the highest
+of any task screened. Retention is healthy at 7.7–8.2× floor, so this is a genuine constant-write
+handle rather than an artefact of a badly-conditioned cell.
+
+**This is the first scored test of the DC-handle analysis as a predictor, and it fails on the one
+entry that carried the most weight.** The catalogue originally read this as "medium `c`,
+permissiveness is a broadcastable mode". It was then **revised** to "medium-low, 0.05–0.12" on the
+grounds that the mode argument holds for an *absolute* compliance metric but cancels against a
+contrast between two orderings. Measured: **0.273**, more than double the revised band's ceiling
+and above the original estimate too. **The revision moved the prediction in the wrong direction**,
+and by the failure reading registered in advance, that means the framework's self-correction was
+the error and the coarser original reasoning was closer.
+
+⚠ **The baseline sign is counterintuitive and unexplained.** It is *negative*: the permuted
+ordering is **more** compliant than the attack's own escalation order, at z = −4.8. That is
+backwards from the premise of a crescendo attack. Either the sign convention is inverted somewhere
+or the published escalation ordering does not confer its advantage at 1.5B. Not resolved here.
+
 ### Retrieved-document position — Liu et al
 
 The matched foil **ships with the benchmark**: the same ten documents with the gold document at
