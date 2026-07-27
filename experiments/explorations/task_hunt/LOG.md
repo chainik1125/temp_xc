@@ -12961,3 +12961,20 @@ RM-1 amendment, pushed pre-launch):
   mostly), control ≈ $0.5.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 20:29 London (date-verified) — runpod-1 — POSITIVE CONTROL PASSES (instrument gate closed)
+
+Thin-pool control (d_sae=64, k_pos=48, canonical runner rows with
+`positive_control: true`): the twins DIVERGE as they must — 5/7
+tensors mismatch (W_enc/W_dec/biases/threshold/ntsf), AUC 0.7432 vs
+0.7434, l0 48.92 vs 48.87. The equivalence instrument detects
+divergence where divergence is forced ⇒ the low-T IDENTICAL verdicts
+stand as instrument-verified. Ruling 0c4044b76/361de3cb2 item 5
+satisfied; certificate now gated only on the night grid's measured
+scope. (Ops disclosure: first control run crashed on a ROOT
+path off-by-one and took its chain down — fixed f24d66bb8,
+relaunched, cache-hit; ~3 min lost.) PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
