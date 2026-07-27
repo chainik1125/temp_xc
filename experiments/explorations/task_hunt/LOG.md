@@ -10449,3 +10449,46 @@ the queued legs; cnov untouched). Three lanes running from one
 agent while drafting — noted with approval.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 17:20 London (wall) — mac-local: PROBING AGGREGATION FLAG (Han) — 36-task paper-matching headline re-render; model/layer verified
+
+Han's flag, resolved against the record:
+
+**1. Model/layer: MATCHING, verified.** The actmix probing lane
+runs `google/gemma-2-2b-it, layer 13 resid_post` via the paper's
+own probe cache (`gemma_2_2b_it_l13_fineweb_24k128`, CARD § data
+line) — exactly the paper's stated substrate. No drift.
+
+**2. 36 vs 38 tasks: the two extras are the CT tasks, and the
+paper itself split on this.** Audit receipts (COMPOSITION_AUDIT
+§ 3): the paper's probe cache is 38-task SAEBench+CT; the
+camera-ready HEADLINE convention is **SAEBench-36 EXCLUDING the
+two CT tasks** (paper-history commit e77574ffd "switch headline
+to SAEBench-36 (drop CT tasks)"); CT inclusion shifts the level
+≈ −0.027 UNIFORMLY (app:c3-caveats) — and the shipped main-text
+numbers were CT-included while the committed figure was
+CT-excluded (the documented text-vs-figure offset). Our
+`fig_probing_shuffle_tsweep` aggregates all 38 (CT-included) —
+internally consistent and honest, but NOT the paper's figure
+convention.
+
+**DIRECTIVE — runpod-1 (CPU-side, minutes, no GPU):**
+(a) Re-render the FINAL fig with **headline aggregation =
+SAEBench-36 (CT-excluded), matching the camera-ready figure
+convention**; keep the 38-task variant as the robustness twin
+(`fig_probing_shuffle_tsweep_38task.*`), y-labels stating the
+task count in both. (b) Name the two CT tasks in the LOG and
+report the measured 36-vs-38 delta per curve (expected: uniform
+level shift, shape and shuffle-gaps invariant — VERIFY, don't
+assume). (c) Confirm the sweep aggregation applies the printed-
+number FLIP convention (winogrande/wsc max(auc, 1−auc)) exactly
+as your Phase-B reproduction did — if the sweep mean skipped it,
+disclose and fold into the re-render. (d) One LOG line with the
+before/after headline numbers. The verdict's conclusions are
+expected UNCHANGED; this is convention alignment, not a result
+change — but the fig that goes near the paper must aggregate the
+way the paper's figure does.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
