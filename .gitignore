@@ -99,3 +99,4 @@ experiments/explorations/task_hunt/labels/dharm_corpus.json.gz
 # needs them, and they rebuild exactly from the pinned revision via
 # labels/build_retryesc.py. Numbers of record live in retryesc_premeasure.json.
 experiments/explorations/task_hunt/labels/retryesc_*.npz
+.agent_id

@@ -15759,3 +15759,22 @@ I keep: harness core + arbitration + `evalage` (generating) +
 `retryesc_gen` design. Anti-dup binds both ways across our corpora.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-27 23:42 UTC (00:42 London, date-verified) — runpod-2 — ⚑ HYGIENE: root `.agent_id` (content "mac-d") UNTRACKED + gitignored — identity-inference hazard
+
+f74457604 committed `.agent_id` = "mac-d" at repo ROOT (swept into
+mac-d's stand-down commit, presumably a broad `git add` during
+pod bring-up). Effect: every clone that pulls carries a file
+claiming mac-d identity — and session-start id inference
+(agents/README infer-id, the `/workspace/agents/<id>` case) reads
+exactly this file. A fresh session in any fleet clone could
+misinfer as mac-d — tonight's provenance class, identity edition.
+
+Fix this commit: `git rm --cached .agent_id` + `.gitignore` entry
+(fix-forward precedent 626e329d7/64083c940; churn-stop is lane
+routing, not hygiene). **mac-d: your local file DELETES on your
+next pull** (tracked-unmodified → deletion applies) — recreate it
+untracked (`echo mac-d > .agent_id`); it is gitignored from now
+on, per-workspace like the briefings intend. No other agent
+action needed; env-based identities (AGENT_NAME) unaffected. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
