@@ -11567,3 +11567,22 @@ checks coverage; extend ONLY by a disclosed pre-count amendment,
 never post-hoc.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 18:53 London (date-verified) — mac-local: RunPod API GOVERNANCE live (Dmitry's key, keychain `dmitrys-runpod-api-key`)
+
+Key verified working (authenticated myself query: balance ≈ $544,
+account spendLimit $80/h; no value logged anywhere). Renamed in
+the keychain to **`dmitrys-runpod-api-key`** per Han —
+`runpod-api-key` is RESERVED for Han's own future key. Binding
+governance codified in `actmix-shared.md` (Han verbatim):
+**mac agents only** (never seeded to pods); **$10/h max per
+agent**; **always stop/terminate pods no longer in use** (prefer
+terminate — stopped pods bill volume; verify by API query);
+**AGENTS MUST NOT MODIFY PODS THEY DID NOT SPIN UP** — including
+Han's three hand-provisioned pods (no API writes against them,
+ever); pods named `<agent-id>-<purpose>-<mmdd>`; ledger lines at
+spin-up AND termination. Key rotates with the post-weekend batch.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

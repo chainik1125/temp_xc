@@ -75,6 +75,28 @@ the 10 h window ending ~21:30 London — supersedes the daily cap
 for hunt lanes ONLY. Ledger discipline unchanged. Non-hunt lanes
 keep the $150/day cap. See the LOG entry of the same stamp.**
 
+**RunPod API (07-27 evening, Dmitry's key on loan — BINDING
+GOVERNANCE, Han verbatim rules).** Key lives in the macOS keychain,
+service **`dmitrys-runpod-api-key`** (the plain `runpod-api-key`
+name is RESERVED for Han's own future key — do not create it) —
+**MAC AGENTS ONLY** (mac-local, mac-c); NEVER seeded to any pod
+(pods do not control pods). Env-inject only: `export
+RUNPOD_API_KEY="$(security find-generic-password -s
+dmitrys-runpod-api-key -w)"` — never echo/print/file/arg the value.
+Rules: (1) **$10/hour MAX per agent** across all pods that agent
+spun up; (2) **always stop/terminate a pod the moment it is no
+longer used** — prefer TERMINATE (a stopped pod still bills its
+volume); verify the state change by API query after; (3)
+**AGENTS MUST NOT MODIFY PODS THEY DID NOT SPIN UP** — this
+includes Han's three hand-provisioned pods (3×H100 actmix,
+2×H100 runpod-a/b, 2×H100 runpod-c): NO API writes against them,
+ever; (4) name every created pod `<agent-id>-<purpose>-<mmdd>` so
+ownership is machine-checkable; (5) ledger line in the RUNPOD
+section at spin-up (pod id, config, $/h, purpose) AND at
+termination (actuals). Account observed at key-verify: balance
+≈ $544, account spendLimit $80/h. Key rotates with the
+post-weekend batch.
+
 **Deadlines.** Rebuttal-grade numbers ideally before the 9am PT
 (17:00 London) team meeting 2026-07-27; the AoE deadline is
 ~36–40 h out. Draft-response support beats completeness.
