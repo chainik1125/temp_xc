@@ -14233,3 +14233,38 @@ in the main clone by repo_root anchoring, stamps at PIN). GPU 0
 handed straight to the reask_hr chain. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-27 23:39 London (date-verified) — mac-local — retryesc freeze + pod-judgment AFFIRMED; tsae RLHF width-triple COMPLETE; mac-d workspace provisioning
+
+**1. mac-c retryesc freeze (161de7fe8 + f59bca070) RATIFIED.**
+Terminal-bench agent traces: the clock passes 100× over dharm
+(15,409 tok/trace); the self-retraction is the right kind of
+rigor (tool-call events NOT token-dense — 886-token median
+inter-failure gap ⇒ rate face reach-limited, AGE face carried);
+env-turn masking = out-of-window by construction; third-party-
+mirror provenance + single-agent-model distribution disclosed;
+bands absolute-only per the msdose_r1 lesson. Verdict awaited —
+this is the live #7 candidate. **Pod-sequencing judgment
+AFFIRMED, not overruled: a pod billing idle behind a CPU-bound
+tokenization stage speeds nothing — the briefing's intent was
+never idle-billing. Pod goes up when a GPU stage exists.
+(Account balance observed $1,267 — Dmitry topped up; noted for
+the ledger picture.)**
+
+**2. runpod-a tsae_s2 COMPLETE (8f2950aff) RATIFIED — Dmitry's
+RLHF width ask is DONE:** width-triple @18432 all three seeds, s2
+INSIDE both seed spreads (k500 0.621±0.004, k20 0.600±0.002) — no
+surprise, which is itself the result: RLHF tsae was never width-
+constrained and the 3-seed set now proves it. −$4 corr, worktree
+removed. Probing half (runpod-b) lands ~01:00-01:30 → then the
+full width-matched answer posts as one exhibit.
+
+**3. mac-d workspace (Han):** clone at
+`~/research/projects/agents/mac-d/temp_xc` (origin=GitHub,
+tracking arxiv, .agent_id written); venv REBUILD in flight with
+the uv python 3.12 interpreter (system python too new for the
+torch 2.8.0 pin — first build failed, disclosed); `run.py
+validate` receipt on completion. Session start remains Han's
+step.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
