@@ -34,13 +34,27 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 
-# Freeze-stamp allowlist (CARD § 0 + flag 10): original freeze + the
-# launcher-fix PIN. Extend ONLY via a committed edit to this list.
-FREEZES = {
-    "131ea677f4570181c757472a4d48ca7d3903006d",
-    "49464795a" ,  # placeholder-prefix — replaced below by full sha check
-    "9befb353fbd43a0e49a574e1bb155350c8d34c7e",
-}
+# Freeze-stamp allowlist (CARD § 0 + flag 10): every commit on the
+# first-parent lineage from the original freeze to HEAD. Rows are only
+# ever produced by PIN-asserted launches (launcher checks HEAD == PIN,
+# PIN ∈ origin/arxiv ancestry, clean tree), and mid-queue checkpoint
+# commits advance HEAD under running cells — so the honest allowlist is
+# the lineage itself. A static sha list rotted twice as relaunch PINs
+# advanced past it (dropping trained rows silently); never again.
+FREEZE_ROOT = "131ea677f4570181c757472a4d48ca7d3903006d"
+_FREEZES: set[str] | None = None
+
+
+def freeze_allowlist() -> set[str]:
+    global _FREEZES
+    if _FREEZES is None:
+        import subprocess
+        out = subprocess.run(
+            ["git", "rev-list", "--first-parent", f"{FREEZE_ROOT}^..HEAD"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout
+        _FREEZES = set(out.split())
+    return _FREEZES
 
 TXC_PRE = "txc_batchtopk_pre_btkonly"
 TXC_POST = "txc_batchtopk_post_btkonly"
@@ -68,8 +82,7 @@ def load_rows(arm: str) -> list[dict]:
                     or ec.get("arm") != arm
                     or ec.get("smoke")):
                 continue
-            sha = r["code_version"]["commit_sha"]
-            if not any(sha.startswith(f) for f in FREEZES):
+            if r["code_version"]["commit_sha"] not in freeze_allowlist():
                 continue
             rows.append(r)
     return rows
@@ -230,13 +243,89 @@ def make_fig(cells: dict, arm: str, k: int, Ts, outdir: Path):
     plt.close(fig)
 
 
+def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path):
+    """Aniket-template shuffle T-sweep (059a66239 P1 deliverable).
+
+    Single panel: x = T at log2 positions with T-labeled ticks, TXC-pre
+    ordered (solid) vs shuffled (dashed) in ONE hue — the entity is the
+    arch, ordered/shuffled is linestyle — faint per-seed traces, mean ±
+    seed-σ error bars, "T=16 − T=1" annotation. Template knobs recorded
+    in the LOG so the RLHF twin (runpod-2) renders identically.
+    """
+    seeds = sorted({s for (a, u, t, s, kk) in cells
+                    if a == TXC_PRE and not u and kk == k})
+    x = np.log2(Ts)
+    hue = "#1f77b4"          # Aniket's template default-blue
+    fig, ax = plt.subplots(figsize=(7.2, 4.8))
+
+    for key, ls in (("mean_auc", "-"), ("mean_auc_shuf", "--")):
+        for s in seeds:      # faint per-seed traces first (underlay)
+            ys = [(np.log2(T), cells[(TXC_PRE, False, T, s, k)][key])
+                  for T in Ts if (TXC_PRE, False, T, s, k) in cells
+                  and key in cells[(TXC_PRE, False, T, s, k)]]
+            if len(ys) > 1:
+                ax.plot(*zip(*ys), color=hue, ls=ls, lw=0.9, alpha=0.25)
+
+    stats = {}               # key -> {T: (mean, sd, n)}
+    for key, ls, mk, lbl in (
+            ("mean_auc", "-", "o", "TXC-pre, ordered"),
+            ("mean_auc_shuf", "--", "s", "TXC-pre, shuffled (within-window)")):
+        pts = []
+        for T in Ts:
+            vals = [m[key] for (a, u, t, s, kk), m in cells.items()
+                    if a == TXC_PRE and not u and t == T and kk == k and key in m]
+            if vals:
+                m_, sd, n = agg(vals)
+                stats.setdefault(key, {})[T] = (m_, sd, n)
+                pts.append((np.log2(T), m_, sd))
+        if pts:
+            xs, ys, es = zip(*pts)
+            ax.errorbar(xs, ys, yerr=es, color=hue, ls=ls, marker=mk,
+                        ms=7, lw=2.0, capsize=3, label=lbl)
+
+    lo, hi = min(Ts), max(Ts)
+    ann = []
+    for key, name in (("mean_auc", "ordered"), ("mean_auc_shuf", "shuffled")):
+        st = stats.get(key, {})
+        if lo in st and hi in st:
+            ann.append(f"T={hi} − T={lo}: {st[hi][0] - st[lo][0]:+.3f} ({name})")
+    if ann:
+        ax.text(0.03, 0.04, "\n".join(ann), transform=ax.transAxes,
+                fontsize=9, va="bottom",
+                bbox=dict(boxstyle="round,pad=0.35", fc="white",
+                          ec="0.7", alpha=0.9))
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([str(t) for t in Ts])
+    ax.set_xlabel("T (window size)")
+    ax.set_ylabel("mean ROC AUC (38 tasks)")
+    ax.set_title(f"§5.1 sparse probing — shuffle T-sweep  "
+                 f"(k_feat = {k}, txc-pre btk-only, {tag})")
+    ax.grid(alpha=0.25, lw=0.5)
+    ax.legend(loc="upper right", fontsize=9, framealpha=0.9)
+    fig.tight_layout()
+    outdir.mkdir(parents=True, exist_ok=True)
+    for ext in ("png", "pdf"):
+        fig.savefig(outdir / f"fig_probing_shuffle_tsweep.{ext}",
+                    dpi=200 if ext == "png" else None)
+    plt.close(fig)
+    print(f"[analysis] wrote {outdir}/fig_probing_shuffle_tsweep.png|pdf "
+          f"({tag}; seeds {seeds})")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arm", default="btk-only")
     ap.add_argument("--Ts", type=int, nargs="*", default=[1, 2, 4, 8, 16])
+    ap.add_argument("--writeup", choices=["interim", "final"],
+                    help="also render figs_writeup/fig_probing_shuffle_tsweep"
+                         " (k=20 headline, Aniket template)")
     args = ap.parse_args()
 
     rows = load_rows(args.arm)
+    # dict insert order = leaderboard append order (flock-serialized), so
+    # duplicate cells — e.g. untrained twins re-run across relaunch PINs —
+    # resolve to the LATEST row per display key. Nothing else dedupes.
     cells = {}
     for r in rows:
         cells[key_of(r)] = r["metrics"]
@@ -254,6 +343,10 @@ def main():
     (HERE / "RESULTS.md").write_text("\n".join(md))
     print("\n".join(gates))
     print(f"[analysis] wrote {HERE/'RESULTS.md'} + figs/")
+
+    if args.writeup:
+        tag = ("interim, 2 seeds" if args.writeup == "interim" else "3 seeds")
+        make_writeup_fig(cells, 20, args.Ts, tag, ROOT / "figs_writeup")
 
 
 if __name__ == "__main__":

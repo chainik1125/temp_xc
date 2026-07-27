@@ -252,6 +252,23 @@ asymmetry inherited from the arch's pair-sampling design and the
 em-redo precedent, disclosed in the table caption exactly like
 Amendment 1's units note. n_steps 20k, lr, eval protocol unchanged.
 
+## 7e. NOTE (2026-07-27 ~11:45 London): saturation-plan P1 "seed top-up" = §3 grid completion, no extension
+
+mac-local's pod-saturation directive (059a66239) lists probing
+"figure top-up" cells — third seed @T{1,2,4,8,16} + s1@T{4,8} — with
+an instruction to record in-card seed-EXTENSION amendments and
+disclose the seed-2 choice. For THIS card no extension exists to
+record: §3 pre-registered seeds {1, 2, 42} at freeze (131ea677f),
+before any cell ran, and the "top-up" cells are exactly the tail of
+that grid already queued in `launch_runpod1.sh`. Seed-2 disclosure:
+seed 2 was in the freeze-time set; it is third only in EXECUTION
+ORDER (§3's fail-fast ordering: 42 first, then 1, then 2) — it was
+not chosen after seeing seeds 42/1 results. Queue unchanged. Also
+per 059a66239: an INTERIM 2-seed render of
+`figs_writeup/fig_probing_shuffle_tsweep.*` (Aniket template) ships
+for the 17:00 draft, re-rendered FINAL when seed 2 lands — analysis
+code addition only, no cell semantics touched.
+
 ## 8. Budget (RUNPOD ledger in briefings/MODAL_SPEND.md)
 
 Estimate at assumed pod rate ~$7.5/hr (3×H100; runpod-1's 2-GPU share
