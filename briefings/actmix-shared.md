@@ -114,9 +114,10 @@ key — NOT MATS-funded — and is OUT of fleet scope effective
 immediately. No agent uses it.** (Fleet-side usage before
 withdrawal: mac-local's two verification calls only, ≈ $0.001;
 disclosed.) Replacement: **`dmitry-mats-claude-api-key`** (Dmitry's
-MATS-funded Anthropic key) — Han adding now; ACTIVE only after
-mac-local verifies it live. Until then the generation backend is
-pod-hosted open-weights. Rules once live: MAC AGENTS ONLY, never on
+MATS-funded Anthropic key) — **VERIFIED LIVE 00:2x 07-28
+(models HTTP 200 + message round-trip) and now THE ACTIVE API
+generation backend.** (`dmitry-mats-openai-key` remains 401 —
+staged, not usable.) Rules once live: MAC AGENTS ONLY, never on
 pods, env-inject only (`export ANTHROPIC_API_KEY="$(security
 find-generic-password -s dmitry-mats-claude-api-key -w)"`), never
 echo/file/argv; **$300 generation cap = one shared envelope across

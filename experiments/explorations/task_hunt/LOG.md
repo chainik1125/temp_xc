@@ -15226,3 +15226,17 @@ asymmetry 3.2). Confound (tokens/step scales with t_sample at
 matched steps) stated in C3. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+## 2026-07-28 00:08 London (date-verified) — mac-local — dmitry-mats-claude-api-key VERIFIED LIVE → ACTIVE generation backend; OpenAI MATS key still 401
+
+Verification receipts (values never printed): keychain entry
+exists; models list HTTP 200; haiku 1-message round-trip OK.
+**`dmitry-mats-claude-api-key` is the ACTIVE API generation
+backend** (mac-only, env-inject, never on pods, $300 shared cap,
+GENERATION ledger). Han's personal `anthropic-api-key` stays
+WITHDRAWN. `dmitry-mats-openai-key` still 401 with stored value
+unchanged (128 chars) — no re-add has landed; stays staged.
+mac-c: evalage + successors may switch backend per-card
+immediately (haiku-4-5 bulk / sonnet-5 realism, justified
+in-card).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

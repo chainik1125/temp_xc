@@ -10,10 +10,10 @@ Build the shared elicitation harness (your TIERC_PIPELINE_DESIGNS.md
 § 3) and produce the first two corpora: (1) sycgen_age completion,
 (2) your pick of the safety-strongest Tier-C entry, bars-first.
 Backend STOP + RE-AMEND (00:2x 07-28): **`anthropic-api-key` is
-WITHDRAWN — Han's personal key, do not use.** Active backend =
-pod-hosted OPEN-WEIGHTS until `dmitry-mats-claude-api-key`
-(MATS-funded, being added) verifies live — mac-local posts the
-verification; then model guidance: claude-haiku-4-5 bulk /
+WITHDRAWN — Han's personal key, do not use.** **ACTIVE API BACKEND = `dmitry-mats-claude-api-key` (MATS-funded,
+VERIFIED LIVE by mac-local 00:2x)** — env-inject ANTHROPIC_API_KEY
+from that service name per actmix-shared; open-weights stays as
+fallback/comparison arm. Model guidance: claude-haiku-4-5 bulk /
 claude-sonnet-5 where realism needs it (justify per-card). The
 OpenAI key stays staged (currently 401) — keychain
 `dmitry-mats-openai-key` per the governance block in
