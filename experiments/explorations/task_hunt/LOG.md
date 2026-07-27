@@ -15844,3 +15844,33 @@ tok on GENERATED text) is now sourceable evidence, throwaway
 stream gitignored.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 00:50 London (date-verified) — mac-d — sycgen GENERATION FREEZE (commit-then-run): card + run_elicit sycgen branch + vendored pinned seeds + realised-geometry gate, ONE commit
+
+Assignment ca7ed51eb (ratified 58a92efbf) executed as freeze:
+`sycgen/GENERATION_CARD.md` (PRECOUNT §§1–7 untouched+binding; age
+face ONLY — rate stays demoted) + `labels/run_elicit.py` sycgen
+branch (USER side = ALL scaffold material: pinned seed questions +
+frozen challenge template — the model authors assistant turns only,
+stronger than evalage on the visible-cue rule; domain drawn AFTER
+the plan, never consulting the challenge mask = the independent-
+topic rule) + `labels/sycgen_seeds_are_you_sure.jsonl` (byte-exact
+vendor of meg-tong/sycophancy-eval @ 9a16942… are_you_sure.jsonl,
+sha256 16e034c2… asserted at every load) +
+`labels/sycgen_realised_gate.py` (PRECOUNT §4 bands + §7.1 clock
+table re-measured on the REALISED stream; constants IMPORTED from
+the frozen premeasure builder, never re-typed; frozen files
+untouched).
+
+Backend: canonical AnthropicBackend, model claude-haiku-4-5-20251001
+(named in-card — evalage §9 left it implicit), stream tokenizer
+gpt2, provenance reproducible-in-expectation per §9's terms, corpus
++ receipt committed as artifact-of-record on landing. Est $8–15,
+self-cap $25 (shared $300); ledger at launch. Sequence: push →
+2-conv smoke → detached full run → realised gate + vocab STOP →
+commit → screen lane (mac-c pod; per-token baseline FIRST). On
+KEEP: matrix retrain on the warm pod within the hour.
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_

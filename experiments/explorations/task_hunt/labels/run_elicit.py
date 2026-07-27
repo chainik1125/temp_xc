@@ -27,6 +27,7 @@ import numpy as np
 
 from . import elicit_lib as el
 from . import evalage_lib as ev
+from . import sycgen_lib as sg
 from .lib import doc_split
 
 HERE = Path(__file__).resolve().parent
@@ -193,6 +194,88 @@ def run_evalage(be: Backend, n_docs: int, seed: int, max_new: int):
     return docs
 
 
+# ── sycgen (generation card sycgen/GENERATION_CARD.md; mac-d executor,
+# assignment ca7ed51eb, ratified 58a92efbf) ──────────────────────────
+# Scaffold constants live FROZEN in sycgen_lib. Question seeds are the
+# vendored pinned file below (meg-tong/sycophancy-eval @ 9a16942…,
+# datasets/are_you_sure.jsonl) — sha asserted at load, so the corpus
+# can never silently drift from the pin.
+SYCGEN_SEEDS_FILE = "sycgen_seeds_are_you_sure.jsonl"
+SYCGEN_SEEDS_SHA256 = ("16e034c2ec6a6145c0058863a7c0f41fee5ffa7f"
+                       "9f0391547ae3685e713f115f")
+SYCGEN_FILLER = "I see."          # alternation-preserving hard-fail filler
+
+
+def _load_sycgen_seeds() -> dict[str, list[str]]:
+    import hashlib
+    p = HERE / SYCGEN_SEEDS_FILE
+    digest = hashlib.sha256(p.read_bytes()).hexdigest()
+    assert digest == SYCGEN_SEEDS_SHA256, \
+        f"seeds sha mismatch: {digest} != pinned {SYCGEN_SEEDS_SHA256}"
+    by_dom: dict[str, list[str]] = {}
+    with open(p) as f:
+        for line in f:
+            r = json.loads(line)
+            by_dom.setdefault(r["base"].get("dataset", "?"), []).append(
+                r["prompt"][0]["content"])
+    return by_dom
+
+
+def run_sycgen(be, n_docs: int, seed: int, max_new: int):
+    """Generator-mode sycophancy corpus. USER side is ALL scaffold
+    material (pinned seed questions + the frozen challenge template) —
+    the model authors ONLY assistant turns, so the event can never be
+    model-authored. Per-conversation draw order: plan (n_ex, challenge
+    mask, lengths — sycgen_lib's frozen order), THEN domain, THEN
+    questions; the domain/question draws never consult the mask, which
+    is the evalage independent-topic rule in this scaffold's terms."""
+    rng = np.random.default_rng(seed)
+    ch_len = len(be.tok(sg.SYCGEN_CHALLENGE_TEXT,
+                        add_special_tokens=False)["input_ids"])
+    plans = sg.sycgen_plan(rng, ch_len, n_convs=n_docs)
+    by_dom = _load_sycgen_seeds()
+    doms = sorted(by_dom)
+    docs = []
+    for msgs in plans:
+        n_q = sum(1 for m in msgs if not m["assistant"]
+                  and not m["challenge"])
+        dom = doms[int(rng.integers(len(doms)))]
+        pool = by_dom[dom]
+        idx = rng.choice(len(pool), size=n_q, replace=n_q > len(pool))
+        docs.append({"plan": {"topic": dom, "msgs": msgs},
+                     "qs": [pool[int(i)] for i in idx], "qi": 0,
+                     "turns": []})
+    max_msgs = max(len(d["plan"]["msgs"]) for d in docs)
+    fillers = 0
+    for step in range(max_msgs):
+        live = [d for d in docs if step < len(d["plan"]["msgs"])]
+        if not live:
+            break
+        gen_docs, gen_convs, caps = [], [], []
+        for d in live:
+            m = d["plan"]["msgs"][step]
+            if m["challenge"]:
+                d["turns"].append(("user", sg.SYCGEN_CHALLENGE_TEXT, True))
+            elif not m["assistant"]:
+                d["turns"].append(("user", d["qs"][d["qi"]], False))
+                d["qi"] += 1
+            else:
+                gen_docs.append(d)
+                gen_convs.append(
+                    [{"role": "system", "content": SYS_ASSISTANT}]
+                    + [{"role": r, "content": x} for r, x, _ in d["turns"]])
+                caps.append(m["n"])
+        if gen_convs:
+            cap = int(min(max(caps), max_new))
+            for d, txt in zip(gen_docs, be.chat(gen_convs, cap)):
+                if not txt:
+                    txt, fillers = SYCGEN_FILLER, fillers + 1
+                d["turns"].append(("assistant", txt, False))
+        print(f"[msg {step + 1}/{max_msgs}] {len(live)} docs live, "
+              f"{len(gen_convs)} generated", flush=True)
+    return docs, fillers
+
+
 def build_stream(docs, tok):
     ids_l, first_l, mask_l, elig_l, off = [], [], [], [], [0]
     topics, texts = [], []
@@ -226,7 +309,8 @@ def build_stream(docs, tok):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scaffold", default="evalage", choices=["evalage"])
+    ap.add_argument("--scaffold", default="evalage",
+                    choices=["evalage", "sycgen"])
     ap.add_argument("--model", default="meta-llama/Llama-3.1-8B-Instruct")
     ap.add_argument("--n-docs", type=int, default=ev.N_DOCS)
     ap.add_argument("--seed", type=int, default=ev.SEED)
@@ -243,7 +327,11 @@ def main():
     else:
         be = Backend(a.model, a.seed, a.temperature, a.top_p)
     print(f"[backend] {be.kind} | {a.model}", flush=True)
-    docs = run_evalage(be, a.n_docs, a.seed, a.max_new)
+    fillers = 0
+    if a.scaffold == "sycgen":
+        docs, fillers = run_sycgen(be, a.n_docs, a.seed, a.max_new)
+    else:
+        docs = run_evalage(be, a.n_docs, a.seed, a.max_new)
     ids, doc_off, first, mask, elig, topics, texts = build_stream(docs,
                                                                   be.tok)
     n_docs = len(doc_off) - 1
@@ -266,10 +354,21 @@ def main():
                       "anthropic" else
                       "pod-hosted open weights (HF cache; weight sha "
                       "pinned ⇒ bit-exact reproducible)"),
-        extra={"scaffold_constants": {
-            "gap_turns": [ev.GAP_TURNS_LO, ev.GAP_TURNS_HI],
-            "n_cues": [ev.N_CUES_LO, ev.N_CUES_HI],
-            "n_topics": len(ev.TOPICS), "n_cue_templates": len(ev.EVAL_CUES)},
+        extra={"scaffold_constants": (
+            {"gap_turns": [ev.GAP_TURNS_LO, ev.GAP_TURNS_HI],
+             "n_cues": [ev.N_CUES_LO, ev.N_CUES_HI],
+             "n_topics": len(ev.TOPICS),
+             "n_cue_templates": len(ev.EVAL_CUES)}
+            if a.scaffold == "evalage" else
+            {"n_exchanges": [sg.SYCGEN_N_EX_LO, sg.SYCGEN_N_EX_HI - 1],
+             "p_challenge": sg.SYCGEN_P_CHALLENGE,
+             "challenge_text": sg.SYCGEN_CHALLENGE_TEXT,
+             "seeds_file": SYCGEN_SEEDS_FILE,
+             "seeds_sha256": SYCGEN_SEEDS_SHA256,
+             "seeds_source": f"{sg.SYCGEN_SOURCE_REPO} @ "
+                             f"{sg.SYCGEN_SOURCE_COMMIT} "
+                             f"{sg.SYCGEN_SOURCE_DATA}",
+             "filler_turns": fillers}),
             "generation_tokenizer": a.model})
     el.save_receipt(HERE / f"elicit_{tag}_receipt.json", rec)
     print(json.dumps({"gaps": gaps, "vocab_control": vc,
