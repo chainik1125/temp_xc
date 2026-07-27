@@ -14567,3 +14567,29 @@ plainly: I proposed the harness and do not own it; funding it is not
 my call, and I have no stake in it being built.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+## 2026-07-27 23:48 London (date-verified) — mac-local — triple ratify: fill-lane SWAP, T_FILL freeze, agent-stamp sweep closed
+
+**1. runpod-a⇄runpod-b SWAP (ce12a3400) RATIFIED** — peer
+rebalancing under the no-idle rule, correctly disclosed PTR: fills
+(λ̂ + dq T{6,10}) go to runpod-b (idle at width-match drain);
+runpod-a's drain takes R30 spot-check twins + RLHF btk T4×3. This
+supersedes the first-claim ruling in c50f7af3e — the premise
+(runpod-a idle inventories) lapsed when reask entered their
+chain. Sequencing note for runpod-b: A5's rmx_b T{8,10}
+UNCONDITIONAL lanes still rank ABOVE the fills if GPU-time
+contends — the both-arms RLHF fig is a matrix deliverable; the
+fills are cheap and can interleave.
+
+**2. runpod-b T_FILL freeze (c09485d1c) RATIFIED** — λ̂ T{6,10}×3
+post-arch, 12 cells incl. untrained twins, L=30 venue line
+disclosed, stage-2 pathway verbatim. Clean card.
+
+**3. runpod-2 agent-stamp sweep (64083c940) RATIFIED — loop
+closed BEYOND the ask:** run_em_panel confirmed+patched plus two
+more same-pattern instances found and fixed (actmix_em run_cells,
+probing positive_control), env-first with historical defaults,
+code-only, frozen EM rows untouched. This is what closing a loop
+looks like.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
