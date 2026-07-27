@@ -22,14 +22,22 @@ RM_EQUIVALENCE.md (checker excludes positive_control rows).
 
 ## Live overnight
 
-- Chains: /workspace/logs/actmix_night_gpu{0,1}.log (monitor
-  bva90ega9). GPU0: control✓ → btk T{6,10} sh0 → RM sh1. GPU1:
-  RM T{6,8,10,16} sh0 → btk sh1. Telemetry:
-  /workspace/logs/telemetry_rm/*.jsonl (250-step traces, both arms).
-- Landed tonight: RM T6 s42 (0.8949 k20; twin diff = bidirectional
-  drift, k5 −1.6e-2 / k20 +0.8e-3); btk T6 s42 (0.8941 — FIRST REAL
-  T6). All cells telemetried except pre-existing T8/T16 btk ckpts +
-  T16-s42 RM (endpoint-only, disclosed).
+- Chains: /workspace/logs/actmix_night_gpu{0,1}.log (fresh persistent
+  monitor armed 23:1x; old bva90ega9 died silently). GPU0: control✓ →
+  btk T6×3s ✓ COMPLETE → RM sh1 T{10,16} (s42/T10 running ~60%).
+  GPU1: RM sh0 T{6,8} (s1/T8 running ~75%, then s2/T6, s2/T8) → btk
+  T10×3s LAST. Revised drain: GPU0 ~01:20, GPU1 ~02:00.
+- Landed tonight: btk T6 column complete (k20 0.8959±0.0037; s42+RM
+  s42/T8 deterministically re-ran, same train_keys). s1/T6 twin
+  DIVERGES 6/7 tensors (2nd seed; bidirectional per-k drift
+  replicates: k5 −1.02e-2 / k20 +2.4e-3) — LOG entry-of-record
+  b3fe4aa76 (measured pre-compact at 013441cfd).
+- TELEMETRY FIX 3a9744c7f: _TXCBatchTopKBTKBase.train_step was
+  missing maybe_log → tonight's 3 btk T6 cells have NO step-traces
+  (endpoint census via ckpt num_tokens_since_fired). btk T10 pass
+  starts post-fix ⇒ fully traced (fresh interpreter per pass). RM
+  traces complete. boundary_min_pre is only informative in the btk
+  arm (RM floor ≥0 by construction — ReLU precedes selection).
 
 ## Morning queue (in order)
 
