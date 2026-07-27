@@ -14867,3 +14867,51 @@ line — nothing spent, section unchanged.
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+## 2026-07-28 23:57 London (date-verified) — mac-local — ⚑⚑ FULL THROTTLE SAFETY HUNT (Han order) + reask_hr KILL ratified (wave-3 CLOSED) + T6 3/3 ack + OpenAI key status
+
+**1. reask_hr KILL (4c231e149) RATIFIED** — 3/3 bundle clean
+(gemma qualifying arm erased by the wd gate, tok_within_002 on
+gpt2, order 0/3), byte-verified harvest, −$3 corr. **Wave-3 is
+CLOSED. Every pre-harness candidate is now resolved — the
+elicitation harness is the ENTIRE pipeline for deliverable slots
+#6 AND #7.**
+
+**2. runpod-1 T6 3/3 (93b80eec0) ACKED** — the refined per-k
+structure (k5: CONSISTENT btk advantage 3/3 seeds; k20: noise) is
+a real datum for the certificate's per-k language. Carry it into
+the morning table.
+
+**3. ⚑⚑ HAN ORDER (verbatim intent): FULL THROTTLE SAFETY TASK
+HUNTING. Any agent doing toy/non-safety HUNT work shifts to
+safety-relevant tasks, including previously-dropped ones.**
+Lane-by-lane ruling:
+- **mac-c: harness build is THE critical path — start generation
+  NOW on the pod-hosted open-weights backend.** OpenAI key status:
+  stored value verified faithful (128 chars, sk-proj prefix, no
+  whitespace — hash/length checks only, value never printed) but
+  the API returns 401 ⇒ bad at source (likely truncated copy or
+  revoked); Han re-adding. Do NOT wait on it — swap backends
+  per-corpus when it goes live.
+- **runpod-a (post-drain): CO-BUILD the pod-side screen pipeline**
+  for generated corpora (cache_acts + screen harness generalized
+  from reask_hr's runners) so corpus v1 screens the MOMENT it
+  lands. This parallelizes the critical path; you own the
+  screen-side cards.
+- **dq (question-marks) = TOY per Dmitry's meeting bar: T-fills
+  are IDLE-ONLY from now** (it stays a matrix exhibit because Han
+  listed it at 23:25; no new effort beyond cheap fills). λ̂ =
+  safety-adjacent (reasoning/backtracking), proceeds unchanged.
+- **Paper/matrix lanes (probing, RLHF, hill-climb, width-match)
+  are NOT hunt lanes — unaffected.**
+- **Revisit-with-harness list (the "prematurely dropped" set, in
+  order): (i) sycgen_age — already PASSED geometry, nearest KEEP;
+  (ii) mac-c's safety-strongest Tier-C picks (sandbag / evalcue /
+  persuade / cotdiv / stego / commitdebt / instrum / emdrift);
+  (iii) harness-REGENERATED re-entries msdose_r2 / sycpress_r2 —
+  NEW candidates with designed geometry (controlled spacing +
+  vocabulary), not resurrections of the measured kills.**
+- **mac-d: executor for harness-corpus screens/retrains as they
+  land** (Mission 1 scope now = harness KEEPs exclusively).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
