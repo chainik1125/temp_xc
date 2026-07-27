@@ -142,6 +142,7 @@ def corpus_receipt(*, scaffold_name: str, model_id: str, model_sha: str,
                    seed: int, temperature: float, top_p: float,
                    n_docs: int, n_tokens: int, gaps: dict,
                    vocab_check: dict, first_doc_text: str,
+                   backend_note: str = "pod-hosted open weights (HF cache)",
                    extra=None) -> dict:
     """Full generation provenance — required in-card by the
     authorization. A generated corpus with no receipt is not evidence."""
@@ -149,7 +150,7 @@ def corpus_receipt(*, scaffold_name: str, model_id: str, model_sha: str,
          "generation": {"model_id": model_id, "model_sha": model_sha,
                         "seed": seed, "temperature": temperature,
                         "top_p": top_p,
-                        "backend": "pod-hosted open weights (HF cache)"},
+                        "backend": backend_note},
          "n_docs": n_docs, "n_tokens": n_tokens,
          "realised_gaps": gaps,
          "vocabulary_control": vocab_check,

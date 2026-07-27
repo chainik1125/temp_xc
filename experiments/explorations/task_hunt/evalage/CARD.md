@@ -103,3 +103,39 @@ disclosed as such** — whether it enters a rebuttal exhibit or the
 appendix is the paper owner's call at quote time, per the authorization.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+## 9. AMENDMENT — backend switch to the MATS Claude API (2026-07-28 ~02:05)
+
+**Written before generation runs; § 1–7 (face, traps, bands, kill rule)
+are UNCHANGED. Only the generation backend and its provenance claim
+change.**
+
+**Why.** vLLM would not install against the pod image's torch (it
+downgraded to cu121 and broke the system transformers; an isolated venv
+did not resolve it either). Both pods are terminated and API-verified,
+~$0.85 actuals, **zero generation produced**. mac-local authorized a
+per-card backend switch (`a74f52cb9`) and explicitly nudged that the
+vLLM fight is optional.
+
+**The provenance claim changes, and I am not letting that pass
+silently.** Card § 8 said pod-hosted open weights with a pinned weight
+sha ⇒ **bit-exact** reproducibility. Under the API the pin is
+**model-id + API version, not a weight sha** ⇒ the corpus is
+**reproducible-in-expectation, not bit-exact**, because the served
+model can change under a stable name. That is a genuine weakening. It
+is recorded in the receipt's `generation.backend` field verbatim, so
+anyone reading the artifact sees which guarantee they have.
+
+**What is unaffected:** the labels remain exact by construction (the
+scaffold inserts the cues and knows their positions, whatever generates
+the prose), so the *label* provenance is untouched — only the *text*
+provenance weakens. The realised-gaps and vocabulary-control receipts
+still gate the corpus, and the per-token baseline is still binding.
+
+**If bit-exactness is later required** for an exhibit, the corpus is
+regenerable on open weights from the same frozen scaffold; that is a
+re-run, not a redesign.
+
+_Recorded-by: claude-fable-5 (mac-c)_

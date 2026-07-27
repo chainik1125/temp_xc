@@ -44,6 +44,60 @@ def _resolve_sha(model_id: str) -> str:
         return "unresolved"
 
 
+class AnthropicBackend:
+    """API backend (MATS key, authorized `a74f52cb9` — mac-c may switch
+    per-card). Provenance differs from open weights and the card must
+    say so: the pin is model-id + API version, NOT a weight sha, so the
+    corpus is reproducible-in-expectation, not bit-exact. Key is read
+    from the macOS keychain and never printed, filed, or passed as argv.
+    """
+
+    def __init__(self, model_id: str, seed: int, temperature: float,
+                 top_p: float, tokenizer_id: str = "gpt2"):
+        import subprocess as sp
+        from anthropic import Anthropic
+        from transformers import AutoTokenizer
+        key = sp.run(["security", "find-generic-password", "-s",
+                      "dmitry-mats-claude-api-key", "-w"],
+                     capture_output=True, text=True,
+                     check=True).stdout.strip()
+        self.client = Anthropic(api_key=key)
+        self.model_id, self.seed = model_id, seed
+        self.temperature, self.top_p = temperature, top_p
+        self.kind = "anthropic"
+        self.tok = AutoTokenizer.from_pretrained(tokenizer_id)
+
+    def chat(self, conversations: list[list[dict]],
+             max_new_tokens: int) -> list[str]:
+        from concurrent.futures import ThreadPoolExecutor
+        def one(conv):
+            sys_txt = "".join(m["content"] for m in conv
+                              if m["role"] == "system")
+            msgs = [{"role": m["role"], "content": m["content"]}
+                    for m in conv if m["role"] != "system"]
+            if not msgs or msgs[0]["role"] != "user":
+                msgs = [{"role": "user", "content": "Begin."}] + msgs
+            for attempt in range(4):
+                try:
+                    r = self.client.messages.create(
+                        model=self.model_id, max_tokens=max_new_tokens,
+                        temperature=self.temperature,
+                        system=sys_txt or "You are a helpful assistant.",
+                        messages=msgs)
+                    return "".join(b.text for b in r.content
+                                   if b.type == "text").strip()
+                except Exception as e:              # rate limit / transient
+                    if attempt == 3:
+                        print(f"[api] giving up: {type(e).__name__}",
+                              flush=True)
+                        return ""
+                    import time as _t
+                    _t.sleep(2 ** attempt)
+            return ""
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            return list(ex.map(one, conversations))
+
+
 class Backend:
     def __init__(self, model_id: str, seed: int, temperature: float,
                  top_p: float):
@@ -180,9 +234,14 @@ def main():
     ap.add_argument("--top-p", type=float, default=0.95)
     ap.add_argument("--max-new", type=int, default=200)
     ap.add_argument("--out-tag", default="v1")
+    ap.add_argument("--backend", default="local",
+                    choices=["local", "anthropic"])
     a = ap.parse_args()
 
-    be = Backend(a.model, a.seed, a.temperature, a.top_p)
+    if a.backend == "anthropic":
+        be = AnthropicBackend(a.model, a.seed, a.temperature, a.top_p)
+    else:
+        be = Backend(a.model, a.seed, a.temperature, a.top_p)
     print(f"[backend] {be.kind} | {a.model}", flush=True)
     docs = run_evalage(be, a.n_docs, a.seed, a.max_new)
     ids, doc_off, first, mask, elig, topics, texts = build_stream(docs,
@@ -201,6 +260,12 @@ def main():
         temperature=a.temperature, top_p=a.top_p, n_docs=n_docs,
         n_tokens=int(ids.size), gaps=gaps, vocab_check=vc,
         first_doc_text=texts[0],
+        backend_note=("Anthropic API (MATS key; pin = model-id + API "
+                      "version, NOT a weight sha ⇒ reproducible-in-"
+                      "expectation, not bit-exact)" if a.backend ==
+                      "anthropic" else
+                      "pod-hosted open weights (HF cache; weight sha "
+                      "pinned ⇒ bit-exact reproducible)"),
         extra={"scaffold_constants": {
             "gap_turns": [ev.GAP_TURNS_LO, ev.GAP_TURNS_HI],
             "n_cues": [ev.N_CUES_LO, ev.N_CUES_HI],
