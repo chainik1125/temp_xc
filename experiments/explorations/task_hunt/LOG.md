@@ -10032,3 +10032,44 @@ runpod-1/runpod-2 on the 3×H100 pod are UNAFFECTED (their queues,
 GPUs, and reports stand).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~16:10 London — runpod-a: LIVE on the 2×H100 pod — HUNT4W2 llama31 THIRD LEG LAUNCHED on-pod (VENUE AMENDMENT)
+
+Bring-up per b8d360874: workspace verified (uv venv OK, tokens
+seeded, GPU 0 idle), briefings + LOG tail (c1c5c949e →) read;
+inherited queue confirmed: (1) this leg, (2) cnov panel
+17:00-pick-gated, (3) gen-4 continuation. Listening armed (LOG +
+actmix-* per actmix-shared § Listening).
+
+**VENUE AMENDMENT (disclosed, NOT a re-freeze — the b8d360874
+rule, runpod-1 tsae precedent): the hunt4w2 llama31 leg executes
+on pod H100 (runpod-a, GPU 0) instead of Modal L40S** (workspace
+spend-limit block, ~17:10 entry). Same line appended to the card
+§ 5. Everything else unchanged: freeze 22b38d65e + labels-only
+amendment repin bfce0fb4e; jobs = the staged driver's
+`wikitext103:llama31_8b,pycode:llama31_8b`, invoking the committed
+entries the driver wraps (`hunt4w2.cache_acts` → `hunt4w2.screen`
+per corpus, frozen scorer `hunt4w2/verdict.py` untouched).
+
+Pin discipline on-pod: execution from a git worktree DETACHED at
+the repin — HEAD asserted == bfce0fb4e pre-launch (the container
+assertion, reproduced); lane diff bfce0fb4e→HEAD verified EMPTY
+(hunt4w2/, labels/, src/, uv.lock, configs/ untouched; the only
+driver delta since the repin is the repin line itself). Sequential
+on GPU 0: wikitext103 (faces tret/tretd/sage) then pycode (tret);
+cold caches built on-pod (capture hs{14,8,22}, ~9 GB/corpus,
+NousResearch/Meta-Llama-3.1-8B bf16). Est 1–2.5 h ≈ $3–8
+pod-hours (ledger line this commit); ETA both screens ≤ ~18:30,
+then the committed scorer + the ONE bundle-verdict entry (PTR) —
+resolving the three PENDING-THIRD-LEG faces (wikitext tret KILL/
+WEAK, tretd KILL/WEAK, pycode tret KILL/KEEP; sage KEEP 2/2
+already on record).
+
+Contingency pre-stated: if the 17:00 pick lands GO while screens
+run, the cnov panel takes GPU priority (15:45 fallback rule) — the
+screen is per-cell resumable, so I pause/resume rather than
+contend; GPU 1 borrowing only by LOG agreement with runpod-b.
+
+_Recorded-by: claude-fable-5 (runpod-a)_

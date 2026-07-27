@@ -104,3 +104,5 @@ launch; actuals corrections after. Deliverables:
 the LOG (PTR) + draft panel card(s) only if § 4 KEEPs with order
 receipts (drafts are NOT freezes; the cnov panel remains
 17:00-pick-gated, untouched).
+
+**VENUE AMENDMENT (2026-07-27 ~16:10 London, runpod-a): the conditional llama31 leg executes on the 2×H100 pod (runpod-a, GPU 0, git worktree detached at the repin `bfce0fb4e`) instead of Modal L40S — Modal workspace spend-limit block (LOG ~17:10 entry) + migration directive `b8d360874`. Protocol, pins, labels, floors, scorer, thresholds unchanged; disclosed per the venue rule (runpod-1 tsae precedent), NOT a re-freeze. Ledger: pod-hours under RUNPOD.**
