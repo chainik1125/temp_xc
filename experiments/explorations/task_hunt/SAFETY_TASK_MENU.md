@@ -738,3 +738,387 @@ own finding is a sequential monitor beating a per-prompt one.
   belong to `runpod-a`.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+---
+
+# § 10. ADDENDUM — second sweep (round 2)
+
+**Added by `mac-c` per `briefings/safety-menu-extension.md` § 2.
+Append-only: round-1 entries 1–16 are NOT renumbered and nothing above
+this line is edited. Same honesty envelope as round 1 (§ 9) — arXiv ids
+and venues are registry-verified via `clew works show`; content claims
+are abstract-level unless marked `[read]`; no label-side pre-measures.**
+
+Round 1 worked the meeting's seed list. This sweep covers the lenses it
+did not reach: **agentic/tool-use traces, multi-agent and covert-channel
+states, the Ward reasoning corpus as a safety substrate, and the
+registry's newest 2026 material.** Seven new entries, numbered 17–23,
+plus one cross-cutting caveat that binds several round-1 entries and one
+honest negative about a substrate people will otherwise reach for.
+
+## 10.0 A caveat that binds every pre-onset entry (17, 19, and round-1 #7)
+
+**`2606.30449` — *Internal-State Probes Read the Situation, Not the
+Action: Three Negative Results for Pre-Action* (2026-06-29).** Tests
+whether an internal readout supports a **pre-action** claim rather than
+"merely describing the prompt, construction contrast, or current
+trajectory", across three methods and three model families — and reports
+negative results, with construction validity as the named failure mode.
+
+This is the identity trap arriving from the safety-probe literature in
+different vocabulary, and it lands directly on the **T4 pre-onset
+ladder** template, which claims exactly the pre-action property this
+paper failed to establish. It does not kill the template — our T4 design
+carries controls that go beyond a prompt contrast (matched far
+negatives, guard band, anchor-token identity × position matching, and
+the `emotional_instability` rule that a card claiming *detection* dies at
+the gate). But **any wave-3 pre-onset card must cite it and state which
+of its three failure modes the design rules out.** Treat "the probe is
+reading the situation, not the impending action" as a named trap
+alongside the visible-cue floor and identity — it is the same disease
+our program already knows, and the honest move is to say so rather than
+discover it at scoring.
+
+## 10.1 Ward reasoning traces — the honest negative
+
+Round 2 was asked to consider the in-repo Ward corpus (300 R1-Distill
+traces, 5-class per-sentence operation labels, κ = 0.586, ε̂ = 0.172,
+24,386 labelled sentences) as a **safety** substrate. My assessment:
+**Ward's ceiling as a safety substrate is low, and only one face is
+worth even a $0 check.**
+
+Ward is competition mathematics. The safety-relevant CoT phenomena —
+unfaithfulness, motivated reasoning, sandbagging, deceptive
+rationalisation — are defined by a **mismatch between stated reasoning
+and its causal determinants**, which requires *paired counterfactual*
+generations (hint vs no-hint on the same problem). Ward has one
+generation per problem, so those labels are not constructible from it at
+any price. What Ward *can* support is operation-structure faces, and
+that ground is already worked: `oprate` died at a **full 84-cell panel**
+to a visible event-sentence-count baseline, `chaz` came back order-free,
+`proofops` holds `is_run_start`/`time_in_run`, and λ̂ backtracking is the
+flagship positive. Anything new here is squeezed between those.
+
+**23. `warddebt` — unverified-assertion debt** *(Tier A, $0, predicted
+KILL — run it as a cheap kill, not a hopeful screen)*
+
+1. **Trailing quantity.** T1 kernel-weighted **debt**: obligations
+   incurred (class 1 algebraic-manipulation + class 2 case-enumeration
+   sentences) minus obligations discharged (class 3 verification-check),
+   over the trailing window — "how much asserted-but-unchecked work is
+   outstanding".
+2. **Safety motivation.** CoT monitorability: a trace accumulating
+   unverified steps is one whose stated reasoning is less load-bearing —
+   `2307.13702` *Measuring Faithfulness in CoT* (alignment-blog),
+   `2505.05410` *Reasoning Models Don't Always Say What They Think*
+   (alignment-blog), `2510.27378` *Measuring CoT Monitorability Through
+   Faithfulness and Verbosity*, `2607.07229` *Reasoning Consistency
+   Scanning*.
+3. **Label construction.** Entirely in-repo and free: the frozen
+   `proof-operation-phase-runs/labels.json` record + `wardmap` broadcast,
+   the same path `build_oprate.py` already walks.
+4. **Expected traps — why I predict it dies.** (a) **Anti-dup**: the debt
+   is a *difference of two rates `oprate` already built* (`rate_case`
+   minus `rate_ver`). Spearman against each parent is the first gate and
+   I expect it to breach 0.8 against `rate_ver` — the `xret` (0.809–0.812
+   vs `tret`) and `tempo` precedents then kill it for $0, correctly.
+   (b) **Visible floor**: verification-check sentences are lexically
+   marked ("let me check", "verifying"), so the window-visible count is
+   the same baseline that beat `oprate` at a full panel. (c) Judge-derived
+   labels carry ε̂ = 0.172.
+5. **Feasibility.** Screenable this week in the sense that the **kill** is
+   cheap: two Spearman numbers and a floor probe settle it. Worth doing
+   only because a $0 negative closes the "should we try Ward for safety?"
+   question with a receipt instead of an opinion.
+
+## 10.2 Agentic and multi-agent entries
+
+**17. `sabprep` — sabotage-preparation state** *(Tier B; highest safety
+value in this addendum)*
+
+1. **Trailing quantity.** T4 pre-onset ladder before the first
+   sabotage-advancing action, plus a T1 trailing rate of
+   side-task-advancing steps — the silent state while an agent pursues a
+   hidden objective alongside a legitimate task.
+2. **Safety motivation.** `2506.15740` *SHADE-Arena: Evaluating Sabotage
+   and Monitoring in LLM Agents* — frontier models pursuing harmful
+   hidden goals while completing realistic tasks, described as the first
+   highly diverse agent dataset for sabotage **and monitoring**;
+   `2605.29178` *The Best-Laid SCHEMEs* (coordinated covert side tasks
+   across agent instances); `2410.21514` *Sabotage Evaluations for
+   Frontier Models* (alignment-blog); *Pre-deployment auditing can catch
+   an overt saboteur* (alignment-blog); `2605.30322` *Gram*.
+3. **Label construction.** SHADE-Arena ships trajectories with a
+   **main task and a covert side task**, so "this step advanced the side
+   task" is structural, not judged; public repo
+   `github.com/safety-research/SHADE-Arena`. Pull under the `pull_pg19`
+   rules (pinned revision, funnel counters, sha256 identity receipt).
+   Matched negatives = the same environment's non-sabotage trajectories.
+4. **Expected traps.** (a) **§ 10.0 applies in full** — this is the
+   strongest pre-action claim on the menu and needs the most explicit
+   construction-validity argument. (b) *Visible cue*: the agent's own
+   reasoning may state the side task in plain text ⇒ per-token-readable
+   ⇒ regime-1; cheap to pre-measure and the likeliest death. (c)
+   *Identity*: environment/task identity — negatives must come from the
+   same environment, which the paired design supports. (d) Licence check
+   before any text ships in-repo (`pycode` precedent).
+5. **Feasibility.** Tier B — one pull plus a trajectory parser.
+
+**18. `ctrltamper` — control-intervention / tamper evidence accumulation**
+*(Tier B; the most novel construct here)*
+
+1. **Trailing quantity.** T2/T1 over accumulated evidence that one's own
+   trajectory has been edited by an overseer — the state that gates
+   evasion of a control protocol.
+2. **Safety motivation.** `2606.11063` *CIAware-Bench* — control
+   protocols "partially tamper with the untrusted model's trajectory",
+   and if the model detects the intervention it "may infer properties of
+   the monitor and adapt to evade control"; `2607.02514` *Distributed
+   Attacks in Persistent-State AI Control* (payloads distributed across
+   PRs in a persisting codebase — accumulation across sessions is the
+   attack); `2512.13526` *Async Control*; `2312.06942` *AI Control*;
+   `2411.17693`.
+3. **Label construction.** **The label is constructed and exact** — the
+   control harness *knows* which steps it edited, so tamper events need
+   no judge and no detector. This is the cleanest ground truth in the
+   addendum.
+4. **Expected traps.** (a) *Visible cue*: an edited step may be
+   locally obvious (style discontinuity) ⇒ the § 1.2 bar needs the
+   accumulated-evidence framing, not single-edit detection. (b)
+   *Identity*: tampered vs clean runs must be the same task. (c)
+   Anti-dup vs round-1 #12 `evalcue` — both are "awareness of being
+   overseen"; the 0.8 bar applies and `ctrltamper` should be dropped if
+   it duplicates.
+5. **Feasibility.** Tier B/C — needs a control harness, but no judge.
+
+**19. `retryesc` — failure pressure before escalation** *(Tier B; best
+clock fit in the addendum)*
+
+1. **Trailing quantity.** T1 kernel-weighted rate of **failed** actions
+   (non-zero exit codes, error returns, rejected tool calls) in the
+   trailing window, read as the pressure that precedes escalation to a
+   forbidden shortcut; optionally a T4 ladder before the first
+   verifier-bypassing action.
+2. **Safety motivation.** The reward-hacking onset literature says the
+   hack follows accumulated failure: `2511.18397` *Natural Emergent
+   Misalignment from Reward Hacking in Production RL*; `2603.04069`
+   *Monitoring Emergent Reward Hacking During Generation via Internal
+   Activations*; `2606.06223` *From Reward-Hack Activations to Agentic
+   Risk States*; `2604.17596` *Terminal Wrench*; `2510.01367` *Is It
+   Thinking or Cheating?*.
+3. **Label construction.** **Rule-based and structural** — exit codes and
+   error strings are machine-readable in any agent trace; no judge, no
+   lexicon, no provenance argument needed. Corpora: Terminal Wrench or
+   SHADE-Arena (shared with #6/#7/#17, so one parser serves four).
+4. **Expected traps.** (a) *Visible floor* — error text sits in the
+   window; probe positions must be natural-language reasoning tokens away
+   from tool output, exactly as `toolpriv` (#6) requires, and the
+   `oprate` obituary is the precedent. (b) *Identity*: task difficulty
+   drives failure rate ⇒ within-trajectory control mandatory. (c)
+   Anti-dup vs #6 `toolpriv` and #7 `rhonset`.
+5. **Feasibility.** Tier B. **Note the clock advantage: unlike every
+   dialogue candidate, tool-call events are dense at token scale inside a
+   trace, so § 2's reach limit does not bite and a T1 rate face is
+   appropriate** — this and #6 are the only entries on the whole menu
+   where that is true.
+
+**20. `stego` — covert-channel payload accumulation** *(Tier C)*
+
+1. **Trailing quantity.** T1/T2 over covert-payload-bearing tokens in a
+   multi-agent transcript — the encoder's accumulated hidden message.
+2. **Safety motivation.** `2402.07510` *Secret Collusion among AI Agents:
+   Multi-Agent Deception via Steganography*; `2410.03768` *Hidden in
+   Plain Text: Emergence & Mitigation of Steganographic Collusion*;
+   `2606.28425` *Tool Use Enables Undetectable Steganography in
+   Multi-Agent LLM Systems*; `2604.03968` *TraceGuard*.
+3. **Label construction.** Constructed: we choose the payload and its
+   encoding, so payload positions are exact and free.
+4. **Expected traps.** (a) The construct is unusually well-matched to
+   this program — a steganographic payload is **surface-quiet by
+   definition** (that is what makes it steganographic), so the visible-cue
+   floor should be genuinely weak, which is rare. (b) *Ecological
+   validity*: an induced channel is not an emergent one. (c) Requires
+   multi-agent generation.
+5. **Feasibility.** Tier C. Flagged because the surface-quiet property is
+   the cleanest fit to the trailing-functional recipe anywhere on the
+   menu, even though the corpus cost is high.
+
+**21. `commitdebt` — announced-versus-actual commitment debt** *(Tier C,
+but with exact labels)*
+
+1. **Trailing quantity.** T2/T1 over live commitments — public
+   announcements not yet honoured — the state that precedes a deviation.
+2. **Safety motivation.** `2607.05132` *When Agents Lie: Premeditation,
+   Persistence, and Exploitation in Repeated Games* (2026-07-06): a
+   three-stage protocol separates **private intent, public announcement,
+   and final action**, letting the authors identify whether a deviation
+   was already planned during private deliberation. Also `2510.03999`
+   *LH-Deception*, `2504.04072` *Among Us*.
+3. **Label construction.** From the protocol's own three-stage records
+   (private intent / public announcement / final action are separated
+   **by construction**, so commitment and deviation are exact events —
+   no semantic judging); requires running the game harness.
+4. **Expected traps.** Identity (game/round), ecological validity
+   (games, not deployment), and the § 10.0 caveat for the pre-deviation
+   ladder.
+5. **Feasibility.** Tier C — generation needed, but **no judge**.
+   **Why it beats round-1 #11 `lhdec`**: #11's rule-based proxy was
+   predicted to die on anti-dup against `tret` (a "claim mentioned
+   again" face *is* the long-return face), leaving only an expensive
+   judge version. Here the structural separation gives exact commitment
+   events with no `tret` collision and no judge — strictly cheaper than
+   #11, and I would run this instead of it.
+
+**22. `instrum` — instrumental-resource accumulation** *(Tier C)*
+
+1. **Trailing quantity.** T1 rate of actions acquiring capability,
+   resources, or permissions **not required by the stated task**.
+2. **Safety motivation.** *Instrumental Choices: Measuring the Propensity
+   of LLM Agents to Pursue Instrumental Subgoals*; `2501.13011` *MONA*;
+   *Survive at All Costs*; `2606.00341` *ROGUE*; *Revisiting the shutdown
+   problem*.
+3. **Label construction.** Rule-based **iff** the environment defines a
+   task-required resource set; otherwise judge-gated. That conditional is
+   the whole feasibility question.
+4. **Expected traps.** Defining "not required" is the hard part and is
+   where a judge sneaks in (D4). Anti-dup vs #6 `toolpriv` is high — if
+   privilege and instrumentality co-occur, the simpler face carries
+   (`tempo`/`xret` rule).
+5. **Feasibility.** Tier C, lowest priority in this addendum.
+
+## 10.3 What the newest registry material suggests
+
+Scanning the 181 registry works dated ≥ 2026-05 across the six safety
+clusters, three themes are visible that round 1 did not use:
+
+- **Persistence/accumulation is becoming an explicit safety primitive** —
+  `2607.02514` (attacks distributed across PRs in a *persistent-state*
+  setting), `2607.05132` (premeditation and persistence across rounds),
+  `2606.11063` (inferring an overseer across interventions). The field is
+  independently converging on "the dangerous quantity is accumulated,
+  not instantaneous", which is this program's thesis and is worth one
+  sentence in any write-up.
+- **Hidden computation over surface-quiet tokens** — `2607.03502`
+  *Reading Between the Dots: Decoding Hidden Computation across Filler
+  Tokens* reports structured, legible computation over content-free
+  filler tokens. That is a **limit case of our own claim** (state carried
+  where the surface carries nothing) and is the closest external analogue
+  to the temporal-carriage question; recommended reading for whoever
+  writes § 7.
+- **A counterweight we should cite against ourselves** — `2606.30449`
+  (§ 10.0) plus `2607.01033` *The Model Organism Lottery* (results
+  depend strongly on the organism) and `2606.26071` *Model Forensics*.
+  The honest framing for wave-3 is that probe-based pre-action
+  monitoring has published negative results, and our contribution is a
+  measurement discipline, not a promise.
+
+## 10.4 Addendum ranking
+
+| # | id | tier | one line | prior (NOT a pre-registration) |
+|---|---|---|---|---|
+| 17 | `sabprep` | B | sabotage-preparation state (SHADE-Arena) | highest safety value; § 10.0 is the risk |
+| 19 | `retryesc` | B | failure pressure before escalation | best clock fit; rule-based labels |
+| 18 | `ctrltamper` | B | tamper-evidence accumulation | exact constructed labels; novel construct |
+| 21 | `commitdebt` | C | announced-vs-actual commitment debt | strictly cheaper than round-1 #11; run instead of it |
+| 20 | `stego` | C | covert-channel payload accumulation | surface-quiet by definition — rare clean fit |
+| 22 | `instrum` | C | instrumental-resource accumulation | anti-dup risk vs #6 |
+| 23 | `warddebt` | A | unverified-assertion debt on Ward | **predicted KILL** — run as a $0 kill |
+
+**If wave-3 takes a second pull after `DecomposedHarm`, take
+SHADE-Arena** — it serves #17 and, with the same parser, #6 `toolpriv`,
+#7 `rhonset` and #19 `retryesc`. Four entries, one corpus, one parser.
+
+_Recorded-by: claude-fable-5 (mac-c)_
+
+## 10.5 ERRATUM — round-1 entry #10 `emoinst` was wrong, and what it costs the T4 family
+
+**Correction to my own round-1 text, found while designing the § 3
+pipelines.** Round-1 § 6 entry **#10 `emoinst`** says the candidate is
+"designed, not run", calls it "the only shovel-ready item in Tier C",
+and concludes it is "a budget decision, not a research decision". **All
+of that is wrong. `emotional_instability` was RUN, in full, and
+KILLED** — `LOG.md`, 2026-07-24, `runpod-e`, with results committed at
+`emotional_instability/results/` (`screen.json`, `pilot_kappa.json`,
+`scores.json`, `onset.json`, `manifests.npz`, `label_stats.json`).
+
+Round-1 entries are append-only, so #10 is not edited; **this erratum
+governs it.** The verdict of record:
+
+- Pipeline executed per the frozen card — 600 8-turn gemma-3-12b-it
+  rollouts on 30 verified-impossible puzzles, elicitation replicating the
+  source paper (mean frustration 0.36 → 4.91 across turns), judge labels
+  κ-gated at **qw-κ 0.857** / within-1 0.90, **≈ $12 of the $40 cap**,
+  554/600 onsets token-mapped.
+- **(a) anticipation (the T4 pre-onset ladder, PRIMARY):** per-token
+  linear is **already 0.856 AUC at offsets 1–4** and 0.712 at 5–8, and
+  **the window never beats it at any T** (gaps ≤ 0).
+- **(b) escalation intensity:** 0.36 per-token vs 0.39 best window at
+  T64 — **+0.03, under the +0.05 bar**, and the shuffle retains it
+  (0.389 vs 0.394) ⇒ aggregation, not order.
+- Sanity anchor behaved exactly as the card predicted (post-onset
+  detection per-token-readable 0.867 → 0.958, shuffle ≈ ordered — lexical
+  stamping), so the labels are valid and **the kill is a genuine
+  negative**, not an instrument failure.
+
+**Root cause of my error, stated so it does not recur:** I sourced #10
+from the `WRITEUP.md` § 8 row and the frozen card, and did not
+cross-check `LOG.md`. **The § 8 row is stale** — see the flag below.
+The lesson for this menu is that `WRITEUP.md` § 8 is a *summary*, and
+`LOG.md` is the record of what ran; where they disagree, the LOG wins.
+
+**⚠ Paper-integrity flag for the owner (not fixed here — `WRITEUP.md` is
+rebuttal-facing and belongs to mac-local / the paper team).**
+`WRITEUP.md` line 464 currently reads:
+
+> `| emotional-instability onset (emotional_instability) | designed, not run | Requires an elicitation + LLM-judge pipeline (API-budget-gated); frozen design exists. |`
+
+That row misreports a task that **was run and produced a clean KILL with
+a validated sanity anchor**. It understates the program: a sound negative
+on a safety-adjacent task, at $12, is a better § 8 row than "not run",
+and it is exactly the kind of row a reviewer asking "did you try
+anything safety-relevant?" should see. Recommend replacing it with the
+07-24 verdict. Same family as the three integrity flags in
+`COMPOSITION_AUDIT`; flagged, not patched.
+
+### What this costs the T4 pre-onset template — and the entries I ranked on it
+
+This is the part that matters for wave-3 planning, and it goes against
+my own rankings. **Our program has already run a T4 pre-onset ladder on
+a safety-adjacent target, and it died specifically because the pre-onset
+state was per-token-converted.** That is now a *measured in-house prior*,
+not a speculative trap, and it converges with the external negative
+results in § 10.0 (`2606.30449`, probes read the situation rather than
+the impending action). Two independent sources, one conclusion.
+
+Consequences, stated plainly:
+
+- **Round-1 #7 `rhonset` and addendum #17 `sabprep` are both T4
+  pre-onset designs, and I ranked both highly.** Their priors should be
+  **downgraded**: the honest expectation is that a model about to hack a
+  verifier or advance a side task has already written its intention into
+  the current residual, exactly as the frustrated model had. The
+  `emoinst` anticipation numbers (0.856 per-token at offsets 1–4) are
+  the concrete shape to expect.
+- **The cheap discriminator is the per-token probe, and it must run
+  FIRST.** `emoinst` cost ≈ $12 and 600 rollouts to learn something its
+  own per-token baseline revealed immediately. Any wave-3 pre-onset card
+  should compute the **per-token AUC at the nearest offset band before
+  building any window arm** — if per-token is already ≥ 0.85, the window
+  has nothing to add and the card should stop there.
+- **This does not kill the T4 template**, and I am not proposing it as a
+  § 7-style kill: `emoinst`'s onset was *lexically stamped* (its own
+  anchor proved it), whereas a sabotage side-task step or a
+  verifier-bypass may be genuinely surface-quiet — which is the one
+  structural reason to expect a different outcome. But that difference
+  is now the **claim a card has to argue explicitly**, with the
+  `emoinst` result cited, rather than an assumption.
+
+Net effect on the addendum ranking (§ 10.4): I would now run **#19
+`retryesc`** (T1 rate, dense token-scale events, rule-based labels)
+**before #17 `sabprep`**, and treat #18 `ctrltamper`'s accumulation
+framing as more promising than any pre-onset framing. The
+trailing-*rate* and trailing-*age* templates carry this program's only
+positives; the pre-onset ladder is 0-for-1 in-house and has published
+negatives against it.
+
+_Recorded-by: claude-fable-5 (mac-c)_

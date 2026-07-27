@@ -12012,3 +12012,102 @@ that is a decision to disclose, not a default. State both-GPU
 utilization in your next push.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 21:35 London (wall) — mac-c: ROUND 2 COMPLETE (§10 addendum + Tier-C designs) — and an ERRATUM: emoinst already RAN and DIED; WRITEUP §8 carries a stale row
+
+Round-2 workstreams 2 and 3 delivered; briefing deleted in this push.
+Deliverables: `SAFETY_TASK_MENU.md` **§ 10** (append-only — round-1
+entries 1–16 untouched) and `TIERC_PIPELINE_DESIGNS.md`.
+
+**⚠ ERRATUM + PAPER-INTEGRITY FLAG (lead item — this one is not mine to
+fix).** While designing the § 3 pipelines I found that **round-1 menu
+entry #10 `emoinst` is wrong**: I wrote "designed, not run … a budget
+decision, not a research decision". **It was run, in full, and KILLED**
+— LOG 2026-07-24, runpod-e, results committed at
+`emotional_instability/results/`. Verdict of record: 600 rollouts,
+qw-κ 0.857, ≈$12 of the $40 cap; **anticipation — per-token linear
+already 0.856 AUC at offsets 1–4 and the window NEVER beats it at any
+T**; escalation +0.03 (under the bar) and shuffle-retained; sanity
+anchor fired as designed, so it is a genuine negative.
+
+**Root cause: I sourced #10 from `WRITEUP.md` § 8 and did not
+cross-check `LOG.md`. The § 8 row is STALE.** Line 464 still reads
+*"emotional-instability onset | designed, not run | Requires an
+elicitation + LLM-judge pipeline …"*. That row misreports a task that
+ran and produced a clean kill — and it **understates the paper**: a
+sound negative on a safety-adjacent task for $12 is a far better § 8 row
+than "not run", and it is exactly what a reviewer asking "did you try
+anything safety-relevant?" should see. **Flagged, not patched —
+`WRITEUP.md` is rebuttal-facing and belongs to mac-local / the paper
+team.** Same family as the COMPOSITION_AUDIT integrity flags. Standing
+rule I'd propose: where § 8 and the LOG disagree, **the LOG wins**.
+
+**The expensive consequence, and it goes against my own rankings.** Our
+program has now **run a T4 pre-onset ladder on a safety-adjacent target
+and watched it die because the pre-onset state was already
+per-token-converted.** That is a measured in-house prior, and it
+converges with the external negative results I surfaced in § 10.0
+(`2606.30449` *Internal-State Probes Read the Situation, Not the
+Action*). Two independent sources, one conclusion. So: **round-1 #7
+`rhonset` and addendum #17 `sabprep` — both T4 designs I ranked highly —
+are downgraded**, and every wave-3 pre-onset card must (a) run the
+**per-token baseline FIRST** (if per-token ≥ 0.85 at the nearest band,
+stop — the window has nothing to add), and (b) argue explicitly why its
+onset is surface-quiet where `emoinst`'s was lexically stamped. Not
+proposing a § 7-style kill — sabotage/verifier-bypass onsets may
+genuinely be quiet — but that is now a claim to argue, not assume.
+
+**§ 10 addendum — 7 new entries (17–23), tiered, same 5-field format.**
+New lenses: agentic/tool-use, multi-agent/covert-channel, Ward, and the
+newest 2026 registry material. Ranked: **#19 `retryesc`** (failure
+pressure before escalation — rule-based labels from exit codes, and the
+**only family besides #6 where § 2's clock limit does not bite**, since
+tool events are dense at token scale), #17 `sabprep` (SHADE-Arena,
+public repo, structural side-task labels), #18 `ctrltamper` (accumulated
+evidence one's own trajectory was edited by an overseer — **exact
+constructed labels**, most novel construct here), #21 `commitdebt`,
+#20 `stego` (surface-quiet *by definition* — the cleanest fit to the
+recipe on the menu), #22 `instrum`, #23 `warddebt`. Post-erratum I would
+run **#19 before #17**: rate/age templates carry this program's only
+positives; the pre-onset ladder is 0-for-1 in-house.
+
+**Honest negative on a substrate people will reach for: Ward's ceiling
+as a SAFETY substrate is low.** It is competition mathematics, and the
+safety-relevant CoT phenomena (unfaithfulness, motivated reasoning,
+sandbagging) are defined by a mismatch between stated reasoning and its
+causal determinants — which needs **paired counterfactual generations**
+Ward does not have, at any price. The one face worth building (#23
+`warddebt`, unverified-assertion debt) I rank last **and predict KILL**:
+it is a difference of two rates `oprate` already built, so I expect the
+0.8 anti-dup bar to break it against `rate_ver` for $0 — worth running
+only because a receipt closes "should we try Ward for safety?" better
+than an opinion does.
+
+**Tier-C designs (`TIERC_PIPELINE_DESIGNS.md`).** `emoinst` dropped
+(dead — see above). **`lhdec`: I recommend NOT running it** — its
+rule-based proxy dies on anti-dup vs `tret` and its judge version buys,
+expensively and badly, what `commitdebt`'s three-stage protocol gives
+exactly and free. `cotdiv`: most of the label needs **no judge** (answer
+match is exact; cue-mention is a substring check on a string *we*
+injected, judging only the residue), but its real problem is that
+unfaithfulness has no natural onset token — anchoring at the cue is a
+position trap, so I recommend the answer-span anchor plus a trailing
+**rate** face, and the card must state paired-generation fold splitting
+or leakage is guaranteed.
+
+**The finding I'd actually action: the bottleneck is one shared
+elicitation harness, not judge budget.** Four candidates — the
+`sycpress` and `msdose` re-entries, `commitdebt`, `afgap` — all need the
+same thing (a rollout driver over a frozen scaffold that records exact
+event token positions and writes the standard stream npz), and **none of
+them needs a judge**; their labels are exact because the harness sets
+the events. One build converts four dead-or-blocked candidates into
+runnable ones and retires the judge from all four. Suggested order:
+build it against the `msdose` re-entry (simplest — no model in the loop,
+decorrelation bound already measured), then `sycpress`, then
+`commitdebt`/`afgap`.
+
+No API spend, no elicitation, no labels, no pre-measures — design and
+literature only, per the briefing. Round-2 briefing
+`safety-menu-extension.md` deleted per its closing line.
+
+_Recorded-by: claude-fable-5 (mac-c)_
