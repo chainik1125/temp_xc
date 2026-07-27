@@ -11793,3 +11793,55 @@ the pre-measure discipline at its best. WRITEUP § 8 rows for the
 kills: stage with the reask screen result (one batch).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-27 18:57 London (date-verified) — runpod-c: LIVE + TSCALE SPLIT FROZEN (CARD 0) — dev/holdout pre-registered before any candidate trains
+
+Bring-up: venv OK (torch 2.8.0+cu128, 2×H100 visible), `run.py
+validate` OK, btk-only contract tests 19/19, substrate synced (HF
+mirror 33 GB in ~2.2 min; act cache (24000,128,2304) + probe cache
+38/38 linked via prep_cache, spot-check passed). Briefing rewrite
+(e444fd3e4) + mac-c's TXC_PRO_RECOVERY absorbed — candidate 1 uses
+the RECOVERED class, revived as a NEW arch id.
+
+**SPLIT FREEZE (`experiments/explorations/tscale/CARD_SPLIT.md`,
+binding):** DEV = 8/36 CT-excl tasks (family-stratified seeded draw,
+rng 20260727, draw 1 under a pre-set power rule Δ16 ≤ −0.010; no
+redraws): ag_news_world, amazon_reviews_cat1+cat2,
+bias_in_bios_set2_prof11 + set3_prof21 + set3_prof26, europarl_en,
+github_code_Java — iterated at s42, T{1,4,16}, k20 ONLY. HOLDOUT =
+remaining 28 tasks × seeds{1,2,42} × full T × both k, finalists only.
+`make_split.py` asserts the draw reproduces from committed P1 rows.
+Dev-8 carries both signature phenomena: pre s42 k20
+0.9135 → 0.9181 → 0.8985 (Δ16 −0.0150; 36-task −0.0259) and the k=5
+rise (0.8417 → 0.8651); SAE dev band 0.9111 ± 0.0042. Pyramid gates
+(L0 health → L1 4k-step dev screen vs MATCHED-STEPS baseline twin →
+L2 20k full-dev-grid → L3 canonical holdout) pre-registered with
+numeric PROMOTE thresholds in the card.
+
+**Candidate-1 pre-registrations (card § 4):** t_sample RATIO rule
+t = max(1, T//2) primary (locked 10→5 is its instance; absolute
+t_sample=5@T16 is an ablation); k_train = k_pos·t_sample, k_serve =
+k_pos·T (constant per-token budget both phases, asymmetry a constant
+×2, not widening); composition twins txc_pro_r1 (faithful TopK→ReLU,
+`paper-match`) + txc_pro_r1_btkonly (signed-value selection, the
+baseline's arm); serving consumes='sequence' at b1024 (v1 c3_b1024
+convention, disclosed vs P1's token-slot rule); multi_window False;
+contiguous sampling (non-contig = phase5b-B2 ablation knob).
+
+**⚑ FLAG for mac-local (veto window = this push): eval-dispatch
+seam.** The recovered class encodes fixed (B,T,d_in) windows at probe
+but ProbingEval 1.2.0 dispatches its window path on
+consumes=='window' (txc_pro has zero v2 probing rows — never
+exercised). Proposed: plugin declares `eval_consumes='window'`;
+`evals/probing.py` dispatch generalizes to
+`getattr(model,'eval_consumes', getattr(model,'consumes','token'))`
+— byte-identical for every existing arch (none defines the attr), no
+eval-math change, no protocol bump, unit-tested for old-path
+equivalence. L1/L2 use a scratch dev-8 harness importing the
+canonical probe primitives; L3 goes through run_experiment.
+
+Next: matched-steps baseline twin (L1 shakedown) → txc_pro_r1 plugin
+drop + composition twin → L1 screen. Ledger line this push. All
+exploration cells eval_extra-namespaced (`explore: tscale`); quoted
+rows untouched. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-c, T-scaling hill-climb)_

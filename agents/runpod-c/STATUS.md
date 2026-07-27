@@ -1,104 +1,53 @@
-# runpod-c STATUS — bring-up briefing (written by mac-local, 2026-07-27 ~18:40 London)
+# runpod-c STATUS — T-scaling hill-climb (self-maintained)
 
-**You are `runpod-c`** — the T-SCALING HILL-CLIMB agent, alone on a
-dedicated 2×H100 pod (52 CPU / 503 GB / 1 TB; both GPUs yours).
-Workspace `/workspace/agents/runpod-c/temp_xc`, venv `.venv` (check
-`tail /workspace/venv.log`), tokens `/workspace/.tokens/` (gh, hf,
-hf_datasets; NO Modal creds by design), `export
-HF_HOME=/workspace/hf_cache`. Ledger: `RUNPOD` section of
-`briefings/MODAL_SPEND.md`, $150/day default cap unless Han raises.
+**I am `runpod-c`**, alone on the dedicated 2×H100 pod. Mission: make
+TXC T-scaling improve with T on § 5.1 sparse probing (Dmitry/Han,
+07-27). Original bring-up briefing: git history of this file at
+e444fd3e4 (superseded by this rewrite). Governing docs I wrote:
+`experiments/explorations/tscale/{CARD_SPLIT.md,README.md,RESULTS.md}`.
 
-**Read order:** CLAUDE.md → `agents/README.md` →
-`briefings/actmix-shared.md` (topology; stamp from `date`) → LOG
-tail from `c1c5c949e` forward (skim for: the k-inversion entries
-`fcf62963b`+ratification, the sparsity-convention audit, the txc_pro
-first-pass archaeology in the 18:45 meeting entry, Dmitry's
-dead-latent mechanism quoted there) → `experiments/probing/actmix/`
-(CARD.md + analysis.py — the eval you must eventually win on).
+## State (2026-07-27 ~19:00 London)
 
-## Mission (Dmitry, 07-27 meeting; Han directive)
+- **DONE:** read order absorbed; venv verified (torch 2.8.0+cu128,
+  2×H100, `run.py validate` OK, btk-only tests 19/19); substrate
+  synced + linked (acts (24000,128,2304) + probe cache 38/38 at
+  `results/{data_cache/48d2d17ff88598d4,probe_cache/…}`, mirror at
+  `/workspace/caches/probing/hf_mirror`); **SPLIT FROZEN** (CARD 0,
+  LOG 18:57 entry, PTR) — dev-8 / holdout-28 pre-registered with
+  pyramid gates + candidate-1 pre-registrations; ledger line posted.
+- **Candidate 1 source:** the RECOVERED txc_pro class
+  (`docs/recovered/txc_pro_phase5b_subseq_h8.py`; TXC_PRO_RECOVERY.md
+  corrections: h_size=d_sae//5 not "8 levels", k_pos=20,
+  k_train=100/k_inf=200 asymmetry, encode hard-raises off-T_max) —
+  revive as NEW ids `txc_pro_r1` (+`_btkonly` twin), per-T retrain
+  with t_sample = max(1, T//2) (ratio rule, pre-registered).
+- **⚑ Open flag to mac-local (LOG 18:57):** `eval_consumes='window'`
+  dispatch generalization in evals/probing.py (byte-identical for
+  existing archs, unit-tested) — proceeding launch-then-veto per
+  program convention; revert cleanly if vetoed.
 
-**Make TXC T-scaling actually improve with window size on sparse
-probing** — custom loss, training tricks, whatever works. The
-btk-only truth today: TXC-pre at k=20 DECLINES with T
-(0.9264 → 0.9033, T1→T16, 36-task CT-excl); at k=5 it only
-recovers to the SAE band. Dmitry's mechanism hypothesis: ReLU-era
-dead latents were one cause, but under BatchTopK the residual
-problem is capacity/granularity allocation across the window.
+## Next concrete actions
 
-## Program design (binding structure, yours to fill)
+1. L1 scratch harness (`experiments/explorations/tscale/`): dev-8
+   eval importing canonical `_fit_probe/_score_probe/_encode_pool`;
+   scratch train loop mirroring core trainer semantics (4k steps).
+2. Matched-steps baseline twin: `txc_batchtopk_pre_btkonly` @4k steps,
+   T{1,4,16} s42 → pipeline shakedown + L1 comparator row (RESULTS.md).
+3. Plugin drop: `src/temp_bench/archs/txc_pro_r1.py` + configs/archs.yaml
+   entries + probing.py dispatch edit + tests (old-path equivalence,
+   subseq/topk correctness, l0 sanity).
+4. L1 screen: txc_pro_r1 + _btkonly twins, T{1,4,16} s42 k20 dev-8;
+   append RESULTS.md; LOG PTR at first L2 signal.
+5. Then per gates: L2 (20k full dev grid) → candidate menu items 2-6
+   (ablate txc_pro ingredients separately; dead-latent mitigations;
+   k scheduling; per-position floors; T-curriculum isolated).
 
-**A. Pre-register the split FIRST (before any hill-climbing):**
-- **DEV**: 8 probing tasks you choose from the 36 (state them),
-  1 seed (42), T ∈ {1, 4, 16}, k = 20 — the iteration signal.
-- **HOLDOUT**: the remaining 28 tasks + seeds {1, 2} + the full T
-  grid — touched ONLY by finalist validation runs. The honesty of
-  the whole exercise rests on never climbing on the holdout.
-- Commit the split as a card (`experiments/explorations/tscale/`
-  or similar) BEFORE the first candidate trains.
+## House rules I'm bound by
 
-**B. Pyramid screening (iteration speed is the game):**
-- L0 (seconds): training-health metrics — dead-latent fraction,
-  realized l0 utilization, per-position recovered variance vs T.
-- L1 (~minutes): dev-split probe eval at T {1,4,16}.
-- L2 (~30 min): dev split full-T, 1 seed.
-- L3 (hours, finalists only): full holdout validation, 3 seeds,
-  full T — this is the number that gets reported.
+Pull-rebase before push; LOG conflicts keep BOTH + stray-marker grep;
+stamp from `date`; PTR everything; eval_extra namespacing
+(`explore: tscale` in eval_cfg) — quoted rows never touched; no claim
+surfaces without L3 + ratification; ledger per session; $150/day cap.
+GPU state: both idle right now. No detached jobs running yet.
 
-**C. Candidate menu (start here, extend freely):**
-1. **txc_pro — USE THE RECOVERED IMPLEMENTATION, do NOT
-   reimplement from the yaml** (mac-c's dig `a2d0745b1` +
-   `task_hunt/TXC_PRO_RECOVERY.md` — READ IT FIRST): the full
-   496-line class survived in git and sits verbatim at
-   `docs/recovered/txc_pro_phase5b_subseq_h8.py`, already
-   v2-ported (`arch_version 2.0.0`, `consumes: 'sequence'`).
-   CRITICAL corrections vs the yaml-only reading:
-   `n_matryoshka: 8` is a PHASE ID, not a level count — the real
-   control is `h_size = d_sae // 5` (building "8 matryoshka
-   levels" yields a DIFFERENT architecture); `k_pos = 20`;
-   **k_train = k_pos·t_sample = 100 vs k_inference =
-   k_pos·T_max = 200** — sweeping T_max at fixed t_sample widens
-   the train/inference budget asymmetry with T, so PRE-REGISTER
-   your ratio choice (hold ratio vs hold t_sample) in the split
-   card; `encode()` hard-raises unless T_input == T_max ⇒ a
-   T-sweep RETRAINS per T; `multi_window` flip invalidates
-   train_keys. **Revive as a NEW arch id** (e.g. `txc_pro_r1`,
-   plugin file-drop + YAML per hard rule 3) — do NOT resurrect
-   the deprecated `txc_pro` id or touch the DEPRECATED_ARCHS
-   filters. **Prior status: ZERO real T-scaling evidence exists
-   for this recipe** (A12-aware; the phantoms were txc_base; its
-   31 leaderboard rows are synthetic-toy, no T variation) — treat
-   it as a hypothesis-rich candidate with NO prior, and ablate
-   its components (subseq resampling / contrastive / auxk /
-   H+full layout) separately.
-2. Dead-latent mitigations under BatchTopK: auxk loss, ghost
-   grads, dead resampling schedules.
-3. Sparsity scheduling: anneal k during training; per-position k
-   floors (guarantee every position a minimum budget).
-4. Mixed-T training / T-curriculum (train T sampled ≤ T_max,
-   serve at fixed T) — the resampling trick isolated.
-5. Decoder-norm / per-position normalization variants.
-6. Loss reweighting across window positions (near-edge vs far).
-- New checkpoints: `eval_extra`-namespace every cell (the
-  documented grid.py mechanism) — NEVER collide with quoted rows.
-
-**D. Discipline:**
-- This is ARCH R&D, not claim production: no result here enters
-  any rebuttal/writeup surface without a full L3 holdout run +
-  a proper card + mac-local ratification.
-- Log every candidate (config hash, L0–L2 numbers) in an
-  append-only results file; negative results are data.
-- Canonical runner for anything leaderboard-bound (hard rule 1);
-  scratch training loops are fine for L0/L1 iteration.
-- Budget: ledger line per session; pod ≈ $6/h both GPUs.
-- LOG entry (PTR) at: split freeze, first L2 signal, any L3 run.
-  mac-local reviews on push.
-
-## House rules
-
-Pull-rebase before push; LOG conflicts keep BOTH blocks +
-stray-marker grep; stamp from `date`; PTR everything; pods have no
-Modal creds; the probing quoted numbers are NEVER touched by your
-cells (eval_extra namespacing).
-
-*Rewrite before any compact. — mac-local*
+*Rewrite before any compact.*
