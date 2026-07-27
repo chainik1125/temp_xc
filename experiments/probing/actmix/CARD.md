@@ -297,3 +297,20 @@ shuffle+sweep on them (protocol 1.2.0 eval over the pinned v1
 composition); no checkpoints ⇒ retrain at the pinned composition on
 this grid. Same gates, same deliverables, arm label `paper-match`.
 Nothing about Phase B is assumed from this card's Phase-A choices.
+
+## 7f. AMENDMENT 3 (2026-07-27 20:10 London, date-verified): T ∈ {6, 10} grid extension (Han directive eace1b077)
+
+Grid extension, NOT result-contingent: Han requires T ∈ {6, 10} in
+both T-sweeps; the T choice is his directive, stated as such.
+Cells: txc_batchtopk_pre_btkonly × T {6, 10} × seeds {1, 2, 42},
+k_win = k_pos·T (120 / 200), k_feat {5, 20}, shuffle twins in-eval
+— §3 machinery unchanged (A1 matched batches: 4096/6=682, 4096/10
+=409 windows/step; both ≥ the 64 floor). One arm only per the
+equivalence certificate (RM halt c6e464881) — no relu-mix twins.
+l0 bands per §6 scaling (nominal 120 / 200; the high-T
+over-admission pattern disclosed at T16 applies pro-rata).
+Launch on the RM-halt-freed GPUs; est 6–9 GPU-h overnight; ledger
+line at launch. On landing: per-k figs re-render at 7 T-points and
+the LOG entry carries the rebuttal note — the shipped paper's
+"T10" was a PHANTOM label (A12: T5 replica); these are the first
+REAL T=10 probing cells.
