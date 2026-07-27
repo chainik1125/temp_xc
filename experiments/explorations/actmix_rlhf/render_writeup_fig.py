@@ -83,7 +83,16 @@ def mean_sd(points, field):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", choices=("interim", "final"), required=True)
+    ap.add_argument("--pair-style", choices=("mono", "blueorange"),
+                    default="mono",
+                    help="mono = single pair-hue (linestyle carries the "
+                         "order condition); blueorange = Aniket "
+                         "backtracking-fig sibling styling (shuffled in "
+                         "house blue #0072B2). Meeting decision — see "
+                         "LOG 36655341a.")
     args = ap.parse_args()
+    shuf_c = TXC if args.pair_style == "mono" else "#0072B2"
+    colors = {"ordered": TXC, "shuffled": shuf_c}
 
     points = load_points()
     if not points:
@@ -95,17 +104,19 @@ def main():
         for field, ls in (("ordered", "-"), ("shuffled", "--")):
             Ts, ys = series(points, seed, field)
             if Ts:
-                ax.plot(Ts, ys, ls, color=TXC, alpha=0.25, lw=1, zorder=1)
+                ax.plot(Ts, ys, ls, color=colors[field], alpha=0.25,
+                        lw=1, zorder=1)
 
     for field, ls, mk, mfc, label in (
-            ("ordered", "-", "o", TXC, "ordered"),
+            ("ordered", "-", "o", None, "ordered"),
             ("shuffled", "--", "s", "white", "within-window shuffled")):
+        c = colors[field]
         Ts, mu, sd, n = mean_sd(points, field)
-        ax.plot(Ts, mu, ls, color=TXC, lw=2, marker=mk, ms=6,
-                mfc=mfc, mec=TXC, label=label, zorder=3)
+        ax.plot(Ts, mu, ls, color=c, lw=2, marker=mk, ms=6,
+                mfc=mfc or c, mec=c, label=label, zorder=3)
         for T, m, s in zip(Ts, mu, sd):
             if s is not None:
-                ax.errorbar(T, m, yerr=s, color=TXC, capsize=3,
+                ax.errorbar(T, m, yerr=s, color=c, capsize=3,
                             lw=1.2, zorder=2)
 
     Ts, mu, _, n = mean_sd(points, "ordered")
