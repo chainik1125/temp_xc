@@ -1,11 +1,10 @@
 # HUNT4W2_SCREEN_CARD — gen-4 wave-2: the return family on scout substrates (wikitext103 + pycode)
 
-**STATUS: DRAFT, PRE-STAGED (directive 4dbb57e54 § 3: "pre-stage the
-card DRAFT now, freeze immediately after the bundle ruling"). DO NOT
-RUN. At the hunt4 bundle ruling (llama31 landing): fill § 1's
-conditioning line, flip STATUS to FROZEN, commit card + harness in
-one commit, pin the driver from ORIGIN-history rev-parse post-push,
-ledger, launch — target ≤ 18:00 London.**
+**STATUS: FROZEN (bundle ruling landed ~15:50: hunt4 tret = KEEP 2/3
+breadth, ab1597c65). Pre-registration; pin in
+`scripts/modal_hunt4w2_screen.py` from ORIGIN-history rev-parse
+post-push, asserted in-container. Pre-stage draft approved
+04a5d2186; drev $0 kill ratified same commit.**
 
 Slate input: mac-c's `GEN4_CORPUS_SCOUT.md` (accepted as facts-only
 input, 4dbb57e54 item 2; label numbers below are the scout's, artifact
@@ -22,11 +21,14 @@ of record `labels/gen4c_stats.json`). Screens/verdicts are mac-a's
 | **tret_py** | pycode | **SCREEN (priority 4)** — cross-substrate comparability anchor (first non-natural-language modality); viable-but-hotter traps (doc-mean 0.74–0.75) |
 | drev | pycode | **KILLED label-side, $0 — mac-a's formal line, endorsing the scout's recommendation**: its visible floor swallows the ladder (0.70 @T4 → 0.84 @T32 — identifier window-novelty is a near-sufficient window statistic for revival rate), on the slate's hottest unigram (0.62–0.65) and doc-mean (0.78–0.80), with a 0.70–0.74 near-dup vs tret_py (thinnest pass of the 0.8 bar in the gen-4 record; xret died at 0.81). Definition→use structure is better captured by tret_py at this kernel. tempo/qres/xret precedent |
 
-**Conditioning on the hunt4 tret bundle (scout § 5 logic) — FILLED AT
-FREEZE:** [PENDING llama31 landing: if DailyDialog tret = KEEP, the
-wikitext pair screens as the immediate substrate-generality
-follow-on; if KILL/WEAK, as the family's second chance on richer
-return structure. Either branch runs the § 1 slate.]
+**Conditioning on the hunt4 tret bundle (scout § 5 logic) — FILLED
+AT FREEZE: DailyDialog tret = KEEP 2/3 (breadth; ab1597c65), so the
+wikitext pair screens as the IMMEDIATE SUBSTRATE-GENERALITY
+follow-on of a live KEEP. The sharpened wave-2 question, stated
+before any cell: hunt4's tret KEEPs ride T64 arms with no T ≤ 32
+order receipt — does the 3×-event-rate substrate (i) reproduce the
+KEEP, (ii) move it INTO the claiming ladder, (iii) add the order
+component the dialogue substrate lacked?**
 
 ## § 2 Design
 
