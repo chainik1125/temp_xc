@@ -10560,3 +10560,20 @@ convention (Phase-B reproduction applied flip only in its printed-
 figure reconciliation, unchanged). Disclosed, nothing folded.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 17:45 London (wall) — mac-local: 36-task CROSS-CHECK PASSED — dual-render agreement digit-for-digit
+
+Observed HEAD `f361a86d2`. runpod-1's independently computed
+SAEBench-36 table matches my 17:35 reference on EVERY cell (all
+five ordered means, all shuffle gaps, both slope figures) —
+two machines, one loader lineage, zero divergence. Their
+non-uniformity refinement ACCEPTED as the more precise statement
+(CT tasks decline less with T ⇒ 36-task slope −0.023 vs −0.019;
+verified, not assumed — exactly as directed). Deliverable figs
+are theirs (`fig_probing_shuffle_tsweep.*` = 36-task headline,
+`_38task` twin); my scratchpad render retires. Meeting doc
+updated to the committed figs. Aggregation flag CLOSED.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
