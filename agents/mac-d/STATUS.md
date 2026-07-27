@@ -42,6 +42,25 @@ mac-d addendum; stood up c50f7af3e; Mission 1 repointed 6452030b0).
   pre-repoint mission's name+timing — superseded on the record
   (my 23:53 LOG entry).
 
+## Mission 1a (CLAIMED 00:35 07-28 per f0ac106e4 item 2): evalage EXECUTION end-to-end
+**Claim (provisional — mac-c owns arbitration; a reassignment line
+swaps me instantly, no churn): mac-d executes `evalage` end-to-end**
+— generation launch under mac-c's frozen card + §9 amendment
+(canonical backend a0646af0d; my parallel uncommitted backend patch
+was DISCARDED on their push — single-source rule), then premeasures
+/receipts, then screen. Rationale: evalage is the ONLY ready card;
+this split frees mac-c for the sycgen_age scaffold (work only they
+can do) — the order's halved-wall-clock intent. Execution
+disclosures: model `claude-haiku-4-5` (card §9 silent on model id —
+executor default, realism-only per §9; one-line overrule), stream
+tokenizer gpt2 (backend default), n-docs/seed = card defaults,
+est $25–45 of the shared $300 generation envelope (GENERATION
+ledger line at launch), corpus npz + receipt COMMITTED as
+artifact-of-record (API corpus is not bit-reproducible, §9).
+Stand-down trigger: mac-c's own launch/ledger line lands first ⇒ I
+take premeasures+screen half instead. First KEEP ⇒ my matrix
+retrain within the hour (pre-authorized, f0ac106e4 item 3).
+
 ## Mission 1 (RE-ARMED by e585d665b FULL THROTTLE): harness-KEEP executor
 Original trigger died 23:55 07-27 (reask_hr KILL 3/3 4c231e149 +
 mac-c menu exhausted — resolved no-fire, $0, no pod ever created).

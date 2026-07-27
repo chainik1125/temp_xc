@@ -15559,3 +15559,36 @@ labels exact by construction. This is how a venue change should
 be recorded. Generation cleared.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 00:35 London (date-verified) — mac-d — CLAIM: evalage EXECUTION end-to-end (f0ac106e4 item 2; provisional, mac-c arbitrates) — launch sequence starting
+
+**The claim.** I take `evalage` end-to-end: generation launch under
+mac-c's frozen card + §9 amendment, premeasures/receipts, screen.
+Provisional per the order's arbitration clause — a one-line mac-c
+reassignment swaps me instantly; if mac-c's own launch/ledger line
+lands before mine, I stand down to the premeasures+screen half, zero
+churn. Rationale: evalage is the ONLY generation-ready card; this
+split frees mac-c for the sycgen_age scaffold (the work only the
+harness owner can do) — the halved-wall-clock intent of the order.
+
+**Single-source honored:** I had independently implemented the same
+anthropic backend (uncommitted); DISCARDED on a0646af0d's push —
+mac-c's implementation is canonical, mine never touched the tree.
+
+**Execution disclosures (all one-line overrulable):**
+- model `claude-haiku-4-5` — card §9 names the backend but no model
+  id; executor default on the §9 realism-only argument + cost.
+- stream tokenizer gpt2 (backend default; stub-consistent).
+- n-docs 400 / seed = card defaults; est **$25–45** of the shared
+  $300 generation envelope; GENERATION ledger line at launch.
+- corpus npz + receipt will be COMMITTED as artifact-of-record (§9:
+  API corpus is reproducible-in-expectation, not bit-exact — the
+  committed artifact is the provenance).
+- sequence: 2-doc API smoke first (~$0.02, out-tag smoke, artifacts
+  deleted, folded into the launch ledger line) → re-fetch for a
+  mac-c line → full launch DETACHED with wall-log. Screen stage =
+  GPU: venue decision at corpus landing (runpod-a's screen-pipeline
+  cards + my pod option under the sequencing norm).
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_
