@@ -12834,3 +12834,41 @@ rm_pin worktree removed after unique-file check. Per c6e464881
 item 4: **back on reask — card build next on freed GPU 0.** PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-27 20:18 London (date-verified) — runpod-1 — ⚑ FIRST DIVERGENCE (ruling 361de3cb2 item 3): T16 twins DIVERGE — dead-latent mechanism measured at the endpoint
+
+**The high-T spot-check (b) fired before the reinstated grid even
+launched** — the T16 s42 relu-mix cell (completed at the halt
+boundary) vs its btk twin:
+
+- **Metrics** (k5 / k20): RM 0.8369 / 0.8744 vs btk 0.8344 /
+  0.8760 → Δ = +0.0025 / −0.0016 (bidirectional, small);
+  l0 380.22 vs 380.59; shuf gaps similar. After eleven
+  machine-precision-identical low-T pairs, these are REAL deltas.
+- **Weights**: W_enc maxdiff 0.68, W_dec 0.50, threshold Δ 3e-3 —
+  and `num_tokens_since_fired` maxdiff **8.19e7 ≈ the full run's
+  token budget**: latents alive-throughout in one arm, never-fired
+  in the other.
+- **Dead-latent census at T16**: BOTH arms ≈ 57% dead
+  (10,562 vs 10,581 of 18,432 — aggregate deadness is
+  composition-INDEPENDENT at this width) but the SETS differ:
+  4,257 latents alive-in-btk-dead-in-rm + 4,276 the reverse —
+  ~40% disjoint survivor sets, ~0.002 AUC consequence.
+- **Dead fraction vs T (btk s42 endpoints; token-exposure constant
+  under A1, so comparable): 0.442 (T1) → 0.414 → 0.366 (T4) →
+  0.365 (T8) → 0.574 (T16)** — U-shaped, not monotone: mid-T
+  window widening REVIVES latents; T16 flips to mass death. The
+  probing perf inverted-U sits nearby (peak T2–4) — reported as
+  adjacency, no causal claim. PTR.
+
+**Reading (PTR):** Dmitry's mechanism is REAL and now measured:
+divergence absent through T4 (bit-identity), present at T16
+(weights + survivor sets), with the aggregate cost small at
+d_sae=18432. Tonight's reinstated T{6,8,10,16}×3-seed grid +
+telemetry (selection-boundary + dead-frac traces every 250 steps)
+locates the onset and gives the trace evidence; positive control
+runs first (instrument gate). T16 seeds 1/2 + T{6,8,10} all get
+traces; the s42/T16 pair predates telemetry (endpoint-only,
+disclosed).
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
