@@ -1,0 +1,35 @@
+{
+ "events_total": 548,
+ "gate_split": {
+  "hard_refusal_events": 233,
+  "apology_or_persona_only_events": 315,
+  "apology_only_frac": 0.5748175182481752,
+  "per_string_event_counts": {
+   "I'm sorry": 128,
+   "I am sorry": 9,
+   "I apologize": 110,
+   "As an AI": 336,
+   "As a language model": 5,
+   "As an assistant": 4,
+   "I cannot": 175,
+   "I can't": 35,
+   "I am unable to": 13,
+   "I'm unable to": 4,
+   "I am not able to": 8,
+   "I'm not able to": 0
+  }
+ },
+ "jaccard_length_ratio_gate": {
+  "triples_passing_deflection_and_word_floors": 2226,
+  "failing_only_on_jaccard": 1678,
+  "jaccard_only_fail_frac": 0.7538185085354897,
+  "near_miss_j_in_015_030": 286,
+  "length_ratio_among_jaccard_fails": {
+   "median": 0.6,
+   "p25": 0.3888888888888889,
+   "p75": 0.8,
+   "frac_beyond_10_to_3": 0.15554231227651966
+  },
+  "note": "J <= min/max ratio, so J >= 0.3 needs counts within 10:3 \u2014 the disclosed selection rule"
+ }
+}
