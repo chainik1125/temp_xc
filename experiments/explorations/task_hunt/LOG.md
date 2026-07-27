@@ -13229,3 +13229,41 @@ T=1) and engages progressively with window depth.
    stamps drifted (+8, −6); date-verified since 20:18.
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 21:45 London (date-verified) — runpod-2: λ̂ DEPTH SWEEP COMPLETE (screen, PTR) — D-K1 Δ=0.0000; depth deepens ACCUMULATION, not order
+
+Base tag, 60 cells, single rebuilt cache generation (distill
+dropped per the card's clock rule). **D-K1 anchor gate PASS at
+|Δ| = 0.0000** — the local rebuild reproduces the frozen
+base/hs13 per-token AUC exactly; frozen L10/L12 cells citable
+beside the sweep.
+
+Frozen scores (lam_hist primary, floor 0.592, 3σ_null 0.0094):
+- **D-P1 PASS at every layer** L{6,9,12,15,18}: per-token
+  0.771–0.782, all clear floor + 3σ.
+- **D-P2 MISS on both branches, as measured:** per-token depth
+  profile is quasi-flat (max−min 0.0111, exceeding the 0.0094
+  flat band by 0.002) and NOT unimodal-interior (L9 local max,
+  L15 dip, L18 rise). No clean depth localization of the
+  per-token λ̂ readout.
+- **D-P3 PASS:** window-ceiling − per-token @T32 ≥ +0.037 at
+  every layer; no layer turns order-positive beyond null
+  (g_ord@T32: +0.002/+0.000/−0.007/−0.008/−0.026).
+
+**Exploratory observation (labeled as such, not pre-registered):**
+the T32 window-aggregation gain grows MONOTONE with depth
+(+0.037 → +0.045 → +0.054 → +0.063 → +0.076), window-mean AUC
+0.813 → 0.854, with shuffle cost co-growing (+0.009 → +0.028) and
+order-g staying ≤ 0 — i.e. **depth deepens order-free
+accumulation capacity**, echoing (same-instrument-family caveat)
+the probing early-heavy contrast: λ̂'s per-token face is
+depth-flat while its aggregation face deepens. Screens only —
+nothing here feeds the cnov panel.
+
+Artifacts: `lambda_intensity/results/lambda_depth_sweep.json`
+(+ the frozen store untouched). Ledger: ~0.5 GPU-h ≈ $2 actual.
+eq lane running beside it (sae twin in train). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

@@ -93,3 +93,4 @@ actuals, same discipline as the Modal table.
 | 07-27 ~20:45 | runpod-b | λ̂ overlay ACTUALS: grid 18/18 in 14678 s ≈ 4.1 h GPU-1 hold (tsae anchor tail ≈ 3.9 h of it — CPU-bound trainer, venue note in LOG) + overlay/render ≈ 5 min → ≈ $12 vs $5–8 est → +$4–6 corr. Gate ALL PASS at |Δ|≤1e-4; fig shipped | — | +$5 corr | figure envelope |
 | 07-27 ~20:38 | runpod-c | L1 ACTUALS: baseline twin 3 cells + r1 twins 6 cells + evals ≈ 5.5 GPU-h; pod wall 17:30→20:38 ≈ $17. WAVE 2 LAUNCH: ablations 4 cells ≈ 2 GPU-h (running) + A1-exception L2 diagnostic 20k×{16,1,4} ≈ 11-12 GPU-h overnight ≈ est $35-40 combined | 2×H100 | day-1 ≈ $17 actual + $35-40 est overnight | inside $150 cap |
 - 2026-07-27 runpod-2 ACTUALS: A1 seed-extension 7/7 ok ≈ 9 GPU-h ≈ $27 (est $28). Queued tonight: Ward screens ~$2 + eq twins ~$11 + T{6,10}x3 ~$24 ≈ $37 est.
+- 2026-07-27 runpod-2 ACTUALS: Ward depth-sweep screens ≈ 0.5 GPU-h ≈ $2 (est $1-2).
