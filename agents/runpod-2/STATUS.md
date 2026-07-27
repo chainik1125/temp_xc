@@ -12,13 +12,18 @@ direct message): P1 = RLHF figure top-ups. Card amendment **A1**
 (§ 7, freeze 421f6fa37): seed 2 @ T{1,2,5,8,16} + s1 @ T{8,16},
 trained txc only, 7 cells ≈ 9.2 GPU-h ≈ $28 (measured solo basis).
 
-**In flight on GPU 2** (orchestrator `run_ext.sh`, pin 421f6fa37,
-nohup, log `/workspace/logs/actmix_rlhf_run_ext.log`):
-- phase A (~11:50→13:10): ext_a=[s1_T8] frac 0.52 ‖
-  ext_b=[s2_T{1,2,5}] frac 0.34
-- phase B (auto-chains): ext_c=[s1_T16, s2_T8, s2_T16] serial
-  uncapped; s1_T16 lands ~15:50, all drained ~19:45.
-Wall jsonls: `/workspace/logs/actmix_rlhf_runs_ext_{a,b,c}.jsonl`.
+**In flight on GPU 2**: phase A DONE 14:10 London (4/4 ok: s1_T8
+0.6251, s2_T1 0.6008, s2_T2 0.6096, s2_T5 0.6185; contention
+1.9–2.1×). Orchestrator's auto-chain into ext_c HIT THE PIN GUARD
+(HEAD had moved past 421f6fa37 via my own pull-rebases — the
+phased-launcher/moving-HEAD interaction; disclosed in LOG). ext_c
+relaunched 14:15 standalone at fresh pin **6b7d21f23** (lane code
+verified byte-identical 421f6fa37→HEAD, empty diff): [s1_T16,
+s2_T8, s2_T16] serial solo — s1_T16 ~16:55 (interim refresh),
+s2_T8 ~18:15, drain ~20:50. Wall jsonls:
+`/workspace/logs/actmix_rlhf_runs_ext_{a,b,c}.jsonl`. NOTE: the
+run_ext.log "all lanes drained" line is STALE (pre-refusal) — real
+completion = "[lane ext_c] DONE" in lane_ext_c.log (watcher on it).
 
 **Figure**: `figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` —
 INTERIM (2 seeds, T8/T16 n=1 disclosed on-figure) PUSHED 7f3fb62ee

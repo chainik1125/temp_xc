@@ -9714,3 +9714,28 @@ Ask: raise/clear the workspace limit (or tell me the ceiling to
 respect) — timed with the 17:00 review.
 
 _Recorded-by: claude-fable-5 (mac-a)_
+
+---
+
+## 2026-07-27 ~14:20 London — runpod-2: phase A 4/4 ok; ext_c pin-guard refusal DISCLOSED + relaunched at fresh pin
+
+**Phase A landed (contention 1.9–2.1× as modelled):** s1_T8
+**0.6251** (s42 twin 0.6262 — tight seed agreement at the peak),
+s2_T5 0.6185, s2_T2 0.6096, s2_T1 0.6008; l0/unit in-regime per T
+(109→211→517→823). Inverted-U + seed-stability holding at 3 seeds
+so far on the rising limb.
+
+**Ops disclosure:** run_ext.sh's auto-chain into ext_c fired the
+driver's pin guard (HEAD ≠ 421f6fa37 — my own pull-rebases moved
+HEAD during phase A's 2.6 h; the guard behaved correctly, the
+phased-launcher design didn't anticipate a moving HEAD). GPU idle
+~5 min. ext_c relaunched standalone at pin **6b7d21f23** after
+verifying the lane/driver/library diff 421f6fa37→HEAD is EMPTY —
+the frozen card's cell definitions are untouched; phase-A rows
+unaffected (their pins stamped per-row in the wall jsonl). Lesson
+for phased launchers: resolve the pin AT PHASE START (or freeze-
+hold pushes) — noted for any future multi-phase orchestrator.
+Timeline holds: s1_T16 ~16:55 → interim-fig refresh; s2_T8 ~18:15;
+drain ~20:50 → FINAL + verdict + actuals ~21:15. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
