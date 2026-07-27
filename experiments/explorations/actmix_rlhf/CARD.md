@@ -221,3 +221,20 @@ pattern — certificate + the btk-only curve = the both-arms
 deliverable. Divergence ⇒ train relu-mix ONLY on measured-
 divergent configs (scoped card to follow). Est ≈ 1 GPU-h (twins)
 + CPU compare.
+
+**A3b — high-T pair added to the equivalence check (2026-07-27
+~20:15 London; mac-local 361de3cb2 item 6, Han's dead-latent
+reversal: "the k500-family check must include a HIGH-T cell pair,
+not only low-T; cancel-or-train decided per-T-regime, not
+globally").** Lane eq gains **relumix txc_T16** (k_pos = 1600 =
+8.7 % selection depth vs 0.5 % at T1 — the depth regime where
+rectify-before-select can waste slots on thinned pools). Decision
+rule per T-regime: IDENTICAL at {sae_k500, T5} but DIVERGES at
+T16 ⇒ relu-mix trains only in the divergent high-T regime (scoped
+card); IDENTICAL through T16 ⇒ certificate carries measured
+high-T support. Telemetry: RLHF twins carry ENDPOINT diagnostics
+(realized l0/unit + neg-frac) — the per-step dead-latent traces
+are runpod-1's instrumented lane; flagged, not silently matched.
+Cost +2.6 GPU-h (eq ≈ 3.6 GPU-h total). Overnight order: Ward
+slot → eq (solo) → x6 ‖ x10 (extensions after the check, per
+sequencing).

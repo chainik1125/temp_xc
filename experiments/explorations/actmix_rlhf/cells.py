@@ -124,8 +124,9 @@ def _relumix(cell):
 
 
 def lane_eq():
-    """CARD § 7 A3 equivalence twins (seed 42, k500 family)."""
-    return [_relumix(sae(500)), _relumix(txc(5))]
+    """CARD § 7 A3 + A3b equivalence twins (seed 42): k500 family
+    + the high-T pair (dead-latent regime, 361de3cb2 item 6)."""
+    return [_relumix(sae(500)), _relumix(txc(5)), _relumix(txc(16))]
 
 
 def lane_x6():
