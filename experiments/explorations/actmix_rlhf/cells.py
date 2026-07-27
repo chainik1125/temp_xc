@@ -68,4 +68,21 @@ def lane_rs():
     return [txc(8), txc(8, n_steps=0), txc(16, n_steps=0), txc(16)]
 
 
-LANES = {"r": lane_r, "rs": lane_rs}
+def _s1(cell):
+    cell = dict(cell)
+    cell["seed"] = 1
+    cell["cell_id"] += "_s1"
+    return cell
+
+
+def lane_s1():
+    """Seed-1 stretch (card § 2: 'seed 1 stretch', run only after
+    everything else): the trained core at seed 1, no untrained
+    twins. Added post-core (2026-07-27 ~04:30) — shapes identical
+    to lane_r's trained cells, seed only."""
+    return [_s1(c) for c in
+            [sae(500), txc(5), txc(1), sae(100), txc(2),
+             tsae(500), tsae(20)]]
+
+
+LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1}
