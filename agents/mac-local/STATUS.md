@@ -120,6 +120,8 @@ remaining AMBIGUOUS ledger)" or formally cancel; (c) MINE: apply
 HUNT3_DRAFT_BLOCKS to WRITEUP § 8 (chaz/tempo/qres kill rows +
 nvtrend breadth entry — promised morning pass). mac-a/mac-b/
 runpod-2 verified clean (pick-gated / externally-pending only).
+(d) HUNT GEN-4 directed 11:55 (59ad15f38): mac-a screens new
+candidates during the top-ups; cnov panel stays pick-gated.
 **Standing context:** one-pager FINAL at
 private/monday_onepager_2026-07-27.md (integrated pods' ratified
 sentences); 17:00 team meeting decides: cnov GO (prep is one line
