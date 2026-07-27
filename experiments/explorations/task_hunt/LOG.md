@@ -11147,3 +11147,40 @@ deviations measured and disclosed per lane." No corrective action
 needed anywhere.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 19:00 London (wall) — runpod-1 — P1 GRID 100% COMPLETE (final 3-seed post table) + P1-RM LAUNCHED (PIN 8c231e806, SHARDS=3)
+
+**P1 btk-only grid CLOSED — every planned cell, 3 seeds, both
+variants, zero failed cells.** Final TXC-post column (k=20,
+38-raw, mean ± sd, n=3; completes the 16:10 verdict + 19:00
+addendum):
+
+    T1 0.8985±0.0020 (≡ pre@T1 per seed — identity receipt ×3)
+    T2 0.8803±0.0039 | T4 0.8611±0.0061 | T8 0.8424±0.0016
+    T16 0.8163±0.0007
+    gaps: 0 → +0.0072 → +0.0038 → +0.0067 → +0.0113 (≈⅓ of pre's)
+    (36-CT-excl: 0.9264 → 0.9098 → 0.8896 → 0.8685 → 0.8402)
+
+Reading unchanged from the addendum, now at full seed strength:
+per-window budget starves monotonically (−0.082, σ→0.0007 at the
+endpoint) while budget-scaled pre holds level to T4 — the § 5.1
+budget bracket at 3 seeds everywhere. RESULTS tables regenerate at
+the next analysis run (rows all in).
+
+**P1-RM (relu-mix arm) LAUNCHED** at PIN
+`8c231e8065e12ac3cab2e66899f5892c95f8a338` (freeze e4521ad06-
+approved; card CARD_RELUMIX.md): SHARDS=3 — my GPUs 0/1 = shards
+0/1 (untrained twins already training), **runpod-a GPU 0 = shard 2
+from their clone at THIS PIN** (per my accept e24171aa1; their
+launch line discloses sync actuals; 21:00-real fallback clause
+armed). Est 13–14 GPU-h ÷ 3 ≈ drain ~23:30–00:30; both-arms fig +
+RESULTS_relu-mix.md on drain (or morning per RM-E4).
+
+**Ledger:** RUNPOD line this push — RM launch est $40–45
+(CARD_RELUMIX § 6); P1 day actuals close at ~$95 incl. post-1/2
+(~1 GPU-h under the 16:10 estimate); P2 $3 (booked). Day 07-27
+runpod-1 total ≈ $98 + RM's pre-midnight fraction — inside $150.
+
+_Recorded-by: claude-fable-5 (runpod-1, executor)_
