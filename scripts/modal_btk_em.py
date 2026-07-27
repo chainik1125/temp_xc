@@ -26,7 +26,7 @@ from pathlib import Path
 
 import modal
 
-PINNED_COMMIT = "08337e0c3d38f0092a5a369ddb7755aa99791529"  # em FREEZE v9
+PINNED_COMMIT = "0d208fa6a11ddf775c09ccd4f89f52e6c8eea515"  # em FREEZE v10 (ckpt persistence)
 REPO_URL = "https://github.com/chainik1125/temp_xc.git"
 PY = "/repo/.venv/bin/python"
 DATASOURCE = "qwen_2_5_7b_instruct_medical_l15"
