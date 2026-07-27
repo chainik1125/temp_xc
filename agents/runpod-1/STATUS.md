@@ -1,77 +1,67 @@
 # Working state — agent `runpod-1`
 
-**2026-07-27 ~00:00 London — ACTMIX P1 (briefings/actmix-runpod-1.md).
-Shared 3×H100 pod, GPUs 0,1. Phase A (btk-only) grid RUNNING at PIN
-f9108db44; Phase B (paper-match, eval-only on shipped ckpts) staged +
-smoke-gated, full run launching alongside. Deadline 9am PT / 17:00
-London today. Ledger: RUNPOD section, ~$1 bring-up + est $55–75 grid.**
+**2026-07-27 ~12:45 London — governing directive 059a66239 (POD
+SATURATION 10h, 12:00→22:00). Shared 3×H100 pod, GPUs 0,1 mine (GPU 2
+= runpod-2; borrow only by LOG coordination). P1: probing grid drain +
+INTERIM fig DONE → FINAL fig + formal verdict owed; P2: layer-sweep
+share CLAIMED (sweep a). Report state by ~21:30 London.**
 
 ## Live state (check first on resume)
 
-- Phase-A queues: `/workspace/logs/actmix_p1_gpu{0,1}.log` (nohup bash
-  chains; passes: untrained(42) → sae/tsae(1,2,42) → txc-pre(1,2,42 ×
-  T{1,2,4,8,16}) → txc-post(42) → txc-post(1,2)). Cache-hits make
-  relaunches idempotent — ALWAYS relaunch via
-  `PIN=<origin sha> bash experiments/probing/actmix/launch_runpod1.sh`.
-- Phase-B: `experiments/probing/actmix/phase_b.py` — `stage` done
-  (15 cells, manifest committed), `smoke` = port-validation gate
-  (paper topk_sae s42 k20 vs paper's 0.8831±0.0022), then `run`
-  (co-resident, shard per GPU, TEMP_BENCH_ALLOW_DIRTY=1).
-- Monitors (session-local): grid-log watcher + origin watcher
-  (path-filtered per actmix-shared listening topology).
+- **Grid** (`/workspace/logs/actmix_p1_gpu{0,1}.log`, PIN-lineage from
+  131ea677f): pre 2-seed curve COMPLETE (s42+s1 all T); s2 cells in
+  flight (GPU0: s2/T1→T2→T8; GPU1: s2/T16 mid-train →T4). Pre drains
+  ~14:00 → **FINAL writeup fig then**. Post-42 pass next (~15:20-15:40)
+  → **formal verdict entry then** (scaffold:
+  scratchpad/verdict_draft.md). Post-1/2 runs to ~18:00 (card allows
+  cut if clock demands). tsae b32 direct (pid 45188,
+  `actmix_tsae_b32_direct.log`): s42 evals ~now, then s1, s2 (~25
+  min/cell).
+- **Analysis**: `experiments/probing/actmix/analysis.py` — FREEZES is
+  now a freeze-lineage allowlist (RATIFIED 36655341a); `--writeup
+  {interim,final}` renders `figs_writeup/fig_probing_shuffle_tsweep.*`
+  knob-for-knob with runpod-2's frozen RLHF template (421f6fa37).
+  INTERIM (2 seeds) pushed 5f21474c3 — 17:00-draft ready. Hue knob
+  (single pair-hue vs blue-vs-orange) decided AT the 17:00 meeting —
+  apply at FINAL only.
+- **Interim numbers** (k20 pre, seeds {42,1}): T1 0.8992±0.0023
+  (anchor |Δ|=0.0001 vs SAE 0.8993±0.0032), T2 0.9015, T4 0.8997,
+  T8 0.8898, T16 0.8768; order-gap 0→.0077→.0196→.0296→.0223.
+  Inverted-U confirmed. G1: l0 over-admission +3-5% uniform, +19%
+  @T16 (A1 batches) — verdict must carry "decline despite extra
+  capacity".
+- **P2 sweep (a) CLAIMED** (LOG 5f21474c3): ttrend+cnov labels,
+  llama31-8B L{7,14,21,28} + gemma2 L{6,13,20}, screen class, hunt3
+  discipline (one card per sweep, scorer-before-results, screens only).
+  λ̂-Ward = runpod-2's 20:00 slot unless I post a LOG update before
+  19:45. Explore scout mapping label/cache/layer plumbing — check its
+  result, then draft card, freeze scorer, launch at GPU slack (~18:00
+  after post-1/2, or ~15:40 if post-1/2 cut).
+- **Monitors**: origin watcher bf369am3s (four-path topology, keep as
+  THE listener); grid watcher biki784bc; re-arm on every wake per
+  directive.
 
-## Landed tonight (all pushed)
+## Done today (all pushed + ratified)
 
-1. **Eval port** `ProbingEval` 1.2.0 (= v1 1.1.0 + shuffle control
-   [Aniket fixed-probe semantics] + realized-l0 z≠0) + probe-cache
-   loaders; tests 9 green. Paper's ACTUAL caches synced from HF
-   (act_cache e4916bcae1881963 → data_cache 48d2d17ff88598d4;
-   probe_cache 38/38).
-2. **CARD.md** (grid, queue, E1–E4, G1–G5, l0 bands, 10 flags) +
-   sweep driver (38-task preflight) + PIN-asserted launcher.
-3. **Defects caught + disclosed** (CARD flag 10 + LOG): launcher
-   double-flag (pre-untrained dropped), missing dirty-stamp
-   convention (chains refused at cell 2), runner checkpoint-cache
-   path loads models on CPU → silent CPU-crawl evals (fixed
-   plugin-side in ProbingEval; core contract gap flagged for owner).
-4. **Phase B staged**: paper_{topk_sae,tsae,txc_base}_v1 adapters
-   (verbatim dev classes @94119bc08, eval-only, src_tag provenance),
-   registry entries, strict-load-proof manifest (15 cells, sha256,
-   dup-family rationale: 05-05 re-train tws=1/2 family).
-5. **T5-ARTIFACT FINDING** (LOG ~23:30, PENDING TEAM REVIEW): all six
-   shipped "T10/T20" c3 ckpts have T=5-shaped weights (silent-T5 bug,
-   pre-05-06-fix saves; census exhaustive ⇒ no faithful eval-only
-   T-sweep exists). Flat-T-sweep hypothesis (appendix T-slope = seed
-   noise among T5 replicas) TESTABLE by Phase B: cfgT10/cfgT20 cells
-   evaled AS T5 with bug_artifact_t5 on-row.
+1. Phase B complete + ratified overnight (A12 T5-artifact closed by
+   reproduction; every printed §5.1 number reproduced incl. σs).
+2. Phase A: SAE band 3-seed 0.8993±0.0032; pre 2-seed curve complete;
+   G5 anchor PASS k20 |Δ|=0.0001; untrained twins ~0.70 band.
+3. FREEZES lineage fix + §7e no-extension note (both RATIFIED
+   36655341a); tsae pgrep-self-match unstuck (launched direct b32).
+4. INTERIM fig_probing_shuffle_tsweep pushed (5f21474c3).
 
-## Next actions (in order)
+## Wrap-up chain (in order)
 
-1. Confirm Phase-B smoke ≈ paper 0.8831 → launch `phase_b run` shards
-   on both GPUs (co-resident with training).
-2. Watch grid: G1 l0 bands (btk-only ≡ nominal), G2 identity, G3
-   untrained<trained, G4 n_tasks=38, G5 T1 anchor.
-3. When queue drains (or ~09:00 London, whichever first):
-   `python -m experiments.probing.actmix.analysis --arm btk-only` +
-   `--arm paper-match` → RESULTS.md + figs; write LOG verdict
-   (PENDING TEAM REVIEW, quote CARD § 4 verbatim); ledger actuals;
-   STATUS final; push.
-4. Interpretive note for the table: mac-a CALIB FINAL = btk-only ≡
-   relu-mix at hunt widths (eval-threshold pruning mechanism);
-   mac-local ruled pods' exhibits unaffected. My E2 (l0 ≡ nominal
-   sharp) already consistent. Optional 1-cell relu-mix twin
-   (batchtopk_sae s42) queued ONLY if GPUs free before analysis.
-5. Post-deadline queue: T=32 stretch, txc-post seeds 1/2 if cut,
-   agent_steer tsae twins, probe-cache builder port.
+1. ~14:00 pre drains → `analysis.py --arm btk-only --writeup final` →
+   eyeball → commit/push figs_writeup FINAL.
+2. ~15:40 post-42 + tsae drain → full analysis both arms → verdict
+   entry from scaffold (CARD §4 quoted verbatim, E1-E4/G1-G5, dual
+   convention, coverage honesty, PENDING TEAM REVIEW) + ledger actuals
+   (RUNPOD section; ~$39 tsae sunk + ~$9 early + grid) → push.
+3. P2 sweep (a): card → freeze scorer → launch (nohup, ledger line).
+4. 21:30 report (LOG) + STATUS rewrite + push.
 
-## Standing repro notes
-
-- Every shell: `cd /workspace/agents/runpod-1/temp_xc && source
-  scripts/set_agent_env.sh runpod-1`.
-- Rows: experiment=probing, protocol 1.2.0, eval_cfg.arm ∈
-  {btk-only, paper-match}, agent=runpod-1; smoke rows carry
-  smoke:true; dirty stamps on pool rows = leaderboard growth
-  (convention, CARD flag 10); Phase-B rows carry src_train_key (+
-  bug_artifact_t5 where applicable).
-- Caches: /workspace/caches/probing/{hf_mirror,tbm_ckpts} (+ symlinks
-  results/data_cache/48d2d17ff88598d4, results/probe_cache/<ds>).
+Tokens: paths only (/workspace/.tokens/*), rotate post-weekend.
+Aniket's backtracking + origin/neurips-aniket = read-only. Never touch
+GPU 2 pids.
