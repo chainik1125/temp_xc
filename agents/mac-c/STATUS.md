@@ -1,34 +1,86 @@
 # mac-c — STATUS
 
-**Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`; read-only archaeology lane, $0 compute)
-**Briefings:** `briefings/actmix-shared.md` → `briefings/actmix-mac-c.md` (ACTMIX W3)
-**Last update:** 2026-07-27 ~14:00 London (mirrors COMPLETE + ratified; gen-4 corpus scout delivered)
+**Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`; read-only archaeology + literature lane, $0 compute)
+**Briefings:** none active — `briefings/safety-task-research.md` DELIVERED and DELETED (`a2d0745b1`)
+**Last update:** 2026-07-27 ~20:00 London (safety menu + txc_pro dig both closed)
 
-## Supersession note
+## Current posture: NO OPEN ASSIGNMENT — watch + review-support
 
-This workstream **supersedes mac-local's ~20:40 subagent dispatch** (recalled cleanly at Han's direction before anything was frozen/launched/pushed — see be755651a).
+Every dispatched item is closed. Standing obligations only:
 
-## Current posture (Han's 2026-07-27 dispatch)
+1. **Re-arm the listener after every wake** (Han's explicit rule, 10h
+   window): `zsh <scratchpad>/listener.sh` as a background task.
+2. **mac-local's review of SAFETY_TASK_MENU is pending** (LOG 18:34:
+   *"mac-local review next beat; runpod-a holds wave-3 picks until that
+   review posts"*). I am the author — available for questions/revisions.
+3. Support the one-pager / meeting on request. PTR discipline on pushes.
 
-- **HF mirror: COMPLETE (~12:45)** — was the one open item; confirmation in LOG. Detail: to `han1823123123/temp_xc_a40_checkpoints` — λ̂ tsae trio DONE (`hunt_lambda_tsae_topup_checkpoints/`, manifest+sha256); remaining = dialogue-panel cells, salvage/topup/calib payloads, hunt3 screen bundles + seed payloads + provenance → `hunt_payload_bundles/` prefix (same manifest pattern). **Gates the post-weekend token rotations**; completion confirmation will be pushed to LOG.
-- **"part 3" is DEFINED and ARCHIVED**: post-deadline archaeology continuation, no cycles now (Han, this dispatch — closes the "part 3 undefined" flag from my earlier LOG entry).
-- **Gen-4 corpus scout (beat review ~12:15 item 3): DELIVERED** — see `experiments/explorations/task_hunt/GEN4_CORPUS_SCOUT.md` (NOT a freeze; facts + evidence lines feeding mac-a's slate). 5 faces on 2 untouched substrates: wikitext103 (tret/tretd transplants + sage section-age) and permissive-licence Python code (tret + drev identifier-revival). Pullers pinned w/ receipts, streams committed for the gpt2+gemma2 first-wave pair (per-doc 1024-token cap so gpt2 can screen), `labels/gen4c_stats.json` = artifact of record, `gen4c_lib.py` under 9 green tests. I scout labels; mac-a owns screens; no Modal spend from mac-c.
-- Support the one-pager/meeting on request.
-- Listener RE-ARMED for 10h (sleep-first loop, briefings/ ex-ledger + LOG lines matching mac-c/audit/vwin/G6/mirror, 150s poll); re-arm after every wake.
+## Delivered this session (both briefing items)
 
-## Mirror state: COMPLETE
+- **`SAFETY_TASK_MENU.md`** (`d44843ae7`) — 16 ranked safety-relevant
+  trailing-state candidates in 3 feasibility tiers, from the 2026-07-27
+  meeting briefing. Research inventory, NOT a freeze. Spine: (a) the
+  design principle that separates `tret`/`sage` (survived) from
+  `refmark` (died) — **the event indicator must depend on out-of-window
+  information while the kernel support stays inside the window**;
+  (b) the clock argument — turn-scale safety events at 125–144
+  tok/message are reach-limited under a rate face, so **the T2 age face
+  (`sage`-class) is the workhorse**; (c) four reusable label templates,
+  each with an audited in-repo precedent. Tier A (runnable on committed
+  data): `sycpress`, `reask`, `dharm`, `msdose`. Recommends
+  `DecomposedHarm` as the one pull worth taking, and 4 candidates for
+  $0 kills at design review. clew-only sourcing; **the on-loan S2 key
+  was never touched**.
+- **`TXC_PRO_RECOVERY.md`** + **`docs/recovered/txc_pro_phase5b_subseq_h8.py`**
+  (`a2d0745b1`) — the dig. **The implementation SURVIVED in git**
+  (`git show 5dd7337b2^:purified/src/temp_bench/archs/txc_pro.py`, blob
+  `480f3755d`, 496 lines, already v2-ported), correcting the "impl lost
+  in purification" reading. Two hparam corrections (`n_matryoshka: 8` is
+  a **phase id, not a level count** — real control is `h_size =
+  d_sae//5 = 3686`; `k_pos: 20` was missing), the train-vs-inference
+  budget asymmetry flagged for any T-sweep, and the A12-aware verdict:
+  **zero real probing T-scaling evidence for txc_pro anywhere** (the
+  phantom T-replicas were `txc_base`, not this arch).
 
-`hunt_payload_bundles/` = 455 files + manifest.jsonl (sha256 + source volume:path + volume mtime per file) + README, remote-verified 457/457. Incidents on record (LOG ~12:45): plain `modal volume ls` truncation (10/299 on btk_rerun_v2 — use `--json`); one 3h16m wedged `get` (fixed w/ 120s watchdog). λ̂ trio was already at `hunt_lambda_tsae_topup_checkpoints/`. **Rotations unblocked from my side.** Local staging copy in session scratchpad `mirror_bundles2/`.
+## Earlier deliverables still live (receipts in LOG + the files)
 
-## Delivered (on record — receipts in LOG + the files themselves)
+- **HF mirrors COMPLETE + RATIFIED** — `hunt_payload_bundles/` = 455
+  files + manifest.jsonl (sha256 + source volume:path + mtime) + README,
+  remote-verified 457/457. **Token rotations unblocked from my side.**
+  Two process notes adopted as house practice: plain `modal volume ls`
+  TRUNCATES (use `--json`); `modal volume get` can wedge indefinitely
+  (120s watchdog, 3 attempts, `--force` after `rm`).
+- **`GEN4_CORPUS_SCOUT.md`** — consumed by wave-2, which closed: `sage`
+  landed in WRITEUP § 8 as a new intensity-family breadth row, `drev`
+  took a $0 kill citing my § 4, `tretd`/`tret_wt` died on the merits.
+- **`COMPOSITION_AUDIT.md`** — the reference record for paper
+  compositions; A12 (the c3 T5-replica phantoms) is the load-bearing
+  finding, cited again by this session's dig. `tbm_census.jsonl` (1,283
+  ckpt configs), ONEPAGER_SKELETON.md, WRITEUP § 9 R30 staging.
 
-- **COMPOSITION_AUDIT.md** — per-arm paper compositions for all 5 tasks; A1/A2/A4/A5/A9/A12 resolved; **A3 FULLY RESOLVED** incl. the train/serve mismatch finding (fra_proj wrapper serves Nura's SAE uncentered TopK→ReLU, threshold skipped, vs its ReLU-first+threshold training family — evidence to Dmitry); A6 public-search exhausted (→ Dmitry); three paper-integrity flags (c6 caption-vs-figure, c7 double declaration, c3 T5-replica phantoms).
-- `tbm_census.jsonl` (1,283 ckpt configs), Phase-B recipe (runpod-1 in use), A2 k-budget paragraph (ratified), ONEPAGER_SKELETON.md (consumed by mac-local's noon one-pager), V-win figure + G-6 patch proposal (pending Andrii), WRITEUP §9 R30 staging (applied `bef389a47`).
+## Security / hygiene constraints (still in force)
+
+Token at `~/.tokens/hf_token_datasets`, S2 key in the macOS keychain —
+**paths only; values NEVER printed, logged, committed, or passed as
+argv**. All tokens rotate after the weekend (team action). `clew` is
+read-only to agents (no `sync`, `register`, `--refresh`). No Modal spend
+from mac-c.
 
 ## Git position
 
-Branch `arxiv`, rebased on origin at resume. My pushes touch only: task_hunt/{COMPOSITION_AUDIT.md, LOG.md, tbm_census.jsonl, ONEPAGER_SKELETON.md}, agents/mac-c/, txcwin §6c files. Identity `mac-c-agent`.
+Branch `arxiv`, pushed through `a2d0745b1`. Identity `mac-c-agent`. My
+pushes touch: `experiments/explorations/task_hunt/*` (my own docs +
+append-only LOG), `docs/recovered/`, `agents/mac-c/`. LOG collisions are
+routine — resolve by **union** (`sed -i '' -e '/^<<<<<<< HEAD$/d' -e
+'/^=======$/d' -e '/^>>>>>>> /d'`, `git add`, `GIT_EDITOR=true git
+rebase --continue`), then verify with `grep -n '^<<<<<<<'` (note: bare
+`grep -c '<<<<<<<'` false-positives on older entries that *quote* marker
+syntax in prose).
 
 ## If resuming from compact
 
-Read this file, then LOG tail. Open item = the mirror pipeline above; check background tasks (driver/listener) with `ps`, check `mirror_bundles2/` counts vs 166, rerun driver v2 (skip-existing) if short, then manifest → upload → LOG + push. Token path only, never the value; rotations happen after mirrors confirm.
+Read this file, then the LOG tail. **No open task** — do not start new
+work without a listener hit or a direct request. On a listener fire:
+read the output file, `git pull --rebase --autostash origin arxiv`, read
+the triggering LOG/briefings content, act only if addressed to mac-c
+(otherwise note-and-hold), and **immediately re-arm the listener**.
