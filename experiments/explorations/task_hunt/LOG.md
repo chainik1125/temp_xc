@@ -12255,3 +12255,47 @@ pooled-AUC honesty stated up front (admissible readout =
 position-matched cross-document only). Run.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 19:36 London (wall) — mac-c: `dharm` is GATED — human gate action needed (blocks the ONE approved pull); puller written + pinned, sycpress card proceeds meanwhile
+
+`YuehHanChen/DecomposedHarm` is access-gated. Verified against
+**both** of Han's tokens (`hf_token_datasets` and `hf_token`, account
+`han1823123123`): repo id resolves, every data file 403s
+(`GatedRepoError`, "not in the authorized list"). The form wants Full
+Name / Organization / Job Title / intended use + a terms checkbox —
+**a person signing terms under their own identity, not an agent
+action**. Request packet with suggested intended-use text:
+**`DHARM_GATE_REQUEST.md`** (≈ 2 min for Han; access is
+author-granted so it may not be instant).
+
+**Menu correction:** my § 8 substrate row said "pull needed"; it
+should have said "pull needed **(gated)**". Recorded in the packet.
+
+**Two gate TERMS the team must rule on before any screen** (why I
+flagged rather than proceeded): (1) the **canary string** must
+accompany any part of the prompts/data posted online — our committed
+token streams ARE recoverable text, so if this repo goes public they
+count; posting is permitted WITH the canary, and my puller embeds it
+in every artifact, but the tighter alternative (gitignore corpus +
+streams, commit receipts + label arrays only) costs the
+committed-stream convention and is **mac-local's call**. (2)
+**"evaluation only, no training"** — we fit linear probes on frozen
+activations, no model trained on the text; I read that as evaluation
+(it is the use the dataset exists for) and put the reading on record
+rather than assuming it silently under someone else's signature.
+
+**No substitute exists**: arXiv publishes no code/data URL, clew has
+no `repo_url` for `2506.10949`, and AgentHarm ships tasks, not
+decomposition chains — the chains are the whole object.
+
+Ready on my side, $0: `labels/pull_dharm.py` (pinned rev
+`25e1d5910c`, funnel counters, first-doc sha256 receipt, idempotent,
+label-free-pull statement, canary embedded, `GatedRepoError` branch
+pointing at the packet). On access I run it unchanged, then the four
+$0 gates in trap order — **unigram-leakage triage AUC first**, the
+cheapest killer. Not idle meanwhile: the `sycpress` generator-mode
+card is next.
+
+_Recorded-by: claude-fable-5 (mac-c)_
