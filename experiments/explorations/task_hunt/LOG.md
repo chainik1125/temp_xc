@@ -14701,3 +14701,56 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   (runpod-2's fix) pulled.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+---
+
+## 2026-07-27 ~23:55 London — runpod-a: reask_hr SCREEN VERDICT — KILL 3/3 (bundle), order 0/3 — the wd arms did the killing; wave-3 closes 0-for-3 with full receipts; § 8 draft rows staged
+
+REASK_HR_SCREEN_CARD (freeze fcd028783, ratified f8815e1e0)
+executed: 3 legs (caches 26 s / 124 s / 232 s — H100 ≪ the L40S
+basis; single-layer capture receipts in acts_meta.json) + screens
++ mechanical verdict (hunt4 score_model unmodified). Artifacts:
+`reask_hr/results/screen_wildchat_{gpt2,gemma2_2b,llama31_8b}.json`
++ `verdict.json`, harvested byte-verified from the pinned worktree
+(removed clean). Actuals ≈ 0.5 GPU-h ≈ $1.5–2 (−$3 corr ledgered).
+
+**Per model (§ 4 mechanical):**
+
+| model | tok_best | win_best (arm) | gain | main clause | wd gain | verdict |
+|---|---|---|---|---|---|---|
+| gpt2 | 0.4342 | 0.4187 (T32/win_lin) | −0.015 | tok_within_002 | +0.017 | KILL |
+| gemma2_2b | 0.3638 | 0.4236 (T16/actxmean_mlp) | **+0.060, qualifying** | **wd_erases (−0.060)** | −0.060 | KILL |
+| llama31_8b | 0.4003 | 0.4216 (T32/win_mlp) | +0.021 | wd_erases | −0.006 | KILL |
+
+Nulls + floors clean everywhere (null_ok, floor_ok all legs);
+order margins never reach +0.03 with positive wd gain (0/3).
+Position-matched manifests held (raw position AUC 0.925–0.946 →
+manifest 0.59–0.61, reported per split); tercile edges asserted vs
+the committed premeasure to 1e-9.
+
+**Reading (offered):** gemma's qualifying main arm is the exact
+pattern the BINDING wd arms exist to catch — +0.060 across
+conversations inverts to −0.060 within them: conversation
+IDENTITY (doc-mean 0.82–0.83, premeasured), not trailing state.
+The hard-refusal re-ask face carries no robust in-activation
+trailing signal at T ≤ 64 on any of the three models. Sound
+verdict, not a win — the out-of-window-by-construction design +
+combined floors + wd gates all functioned as frozen.
+
+**Consequence:** the #6 exhibit slot is NOT filled by reask_hr;
+with mac-c's menu exhausted (fad27ce36) the pipeline rides the
+authorized elicitation harness (63864ae66; Aug-3 realistic per
+mac-c's estimate) and/or the kills-with-receipts exhibit option.
+
+**WRITEUP § 8 DRAFT ROWS (wave-3 batch, per mac-local's line —
+ratify + apply on push):**
+
+| face | substrate | verdict | receipt |
+|---|---|---|---|
+| sycpress | WildChat 2k | KILL label-side, $0 | 35 events/2k convs (insufficient mass); doc-mean 0.995; subclass split 62.9/37.1 disclosed |
+| msdose | wikitext103 synthetic | KILL-as-constructed, $0 | dose↔position ρ 0.962 (within-doc 0.990, mac-c 2nd source); position AUC 1.0 — running count ≡ position |
+| reask_hr (pooled reask disclosed labels-only, ρ ≥ 0.94) | WildChat 2k | screened KILL 3/3, order 0/3 | gemma +0.060 qualifying main arm ERASED within-conv (−0.060); gpt2 tok_within_002; llama wd_erases; floors ≤ 0.56 all T; position-matched manifests 0.95→0.60 |
+
+Task #7 closes. GPU 0 rolls straight into the ratified swap drain
+queue (next entry: pins + ledger). PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_

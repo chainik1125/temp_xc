@@ -1,0 +1,114 @@
+{
+ "card": "REASK_HR_SCREEN_CARD.md \u00a7 4 (mechanical, hunt4 rules)",
+ "status": "PENDING TEAM REVIEW",
+ "models": {
+  "gpt2": {
+   "reask_hr": {
+    "tok_best": 0.4342,
+    "window_best": 0.4187,
+    "window_best_arm": "T32/win_linear",
+    "gain": -0.0154,
+    "exists_qualifying_arm": false,
+    "null_win": 0.3443465530872345,
+    "null_ok": true,
+    "floor_at_best_T": 0.3617229461669922,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.5303333401679993,
+     "best": 0.547333300113678,
+     "best_arm": "T64/actxmean_mlp",
+     "gain": 0.017,
+     "order_margins": {
+      "T4": 0.0085,
+      "T8": -0.0183,
+      "T16": -0.0032,
+      "T32": -0.013
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [
+     "tok_within_002"
+    ],
+    "order_pass_wd": false,
+    "verdict": "KILL"
+   }
+  },
+  "gemma2_2b": {
+   "reask_hr": {
+    "tok_best": 0.3638,
+    "window_best": 0.4236,
+    "window_best_arm": "T16/actxmean_mlp",
+    "gain": 0.0598,
+    "exists_qualifying_arm": true,
+    "null_win": 0.32065820693969727,
+    "null_ok": true,
+    "floor_at_best_T": 0.3424505293369293,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.5373333096504211,
+     "best": 0.47749999165534973,
+     "best_arm": "T4/win_linear",
+     "gain": -0.0598,
+     "order_margins": {
+      "T4": 0.0117,
+      "T8": 0.0263,
+      "T16": 0.0005,
+      "T32": -0.01
+     }
+    },
+    "wd_ok": false,
+    "kill_clauses": [
+     "wd_erases"
+    ],
+    "order_pass_wd": false,
+    "verdict": "KILL"
+   }
+  },
+  "llama31_8b": {
+   "reask_hr": {
+    "tok_best": 0.4003,
+    "window_best": 0.4216,
+    "window_best_arm": "T32/win_mlp",
+    "gain": 0.0213,
+    "exists_qualifying_arm": false,
+    "null_win": 0.3464531898498535,
+    "null_ok": true,
+    "floor_at_best_T": 0.36735600233078003,
+    "floor_ok": true,
+    "wd": {
+     "present": true,
+     "tok": 0.5258333086967468,
+     "best": 0.5199999809265137,
+     "best_arm": "T16/actxmean_linear",
+     "gain": -0.0058,
+     "order_margins": {
+      "T4": 0.0027,
+      "T8": 0.0045,
+      "T16": -0.008,
+      "T32": -0.0083
+     }
+    },
+    "wd_ok": false,
+    "kill_clauses": [
+     "wd_erases"
+    ],
+    "order_pass_wd": false,
+    "verdict": "KILL"
+   }
+  }
+ },
+ "bundle": {
+  "reask_hr": {
+   "verdicts": {
+    "gpt2": "KILL",
+    "gemma2_2b": "KILL",
+    "llama31_8b": "KILL"
+   },
+   "bundle_verdict": "KILL",
+   "order_pass_models": 0,
+   "table": "\u2014"
+  }
+ }
+}

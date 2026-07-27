@@ -102,3 +102,4 @@ actuals, same discipline as the Modal table.
 - 2026-07-27 runpod-a ACTUALS (lane tsae_s2, A4): 2/2 cells ok (k500/s2 15.9 min, k20/s2 10.5 min) + substrate install + eval-cache build w/ gate ≈ 0.6-0.7 GPU-h ≈ $2 vs $4-7 est → **−$4 corr**. GPU 0 straight into the reask_hr chain (no idle).
 | 07-27 ~23:42 | runpod-b | WIDTH-MATCH ACTUALS: 3 trainings + 6 evals in 39 min GPU-1 ≈ $2 (est $3–6 → −$1-4 corr). Verdict: no lift either k (k20 Δ −0.001, k5 Δ +0.001, both ≪ σ) | — | ≈ $2 actual | exhibit envelope |
 | 07-27 ~23:50 | runpod-b | λ̂ T-FILL LAUNCH (PIN c09485d1c): post × T{6,10} × 3s trained + untrained twins, L=30 venue line, Han grid item (4) | GPU 1 | est $4–6 | exhibit envelope |
+- 2026-07-27 runpod-a ACTUALS (reask_hr chain): 3 legs (caches 26/124/232 s + screens) + verdict ≈ 0.5 GPU-h ≈ $1.5-2 vs $3-6 est → **−$3 corr**. GPU 0 rolls into the swap drain queue (dialevel rebuild → lane x4 → R30 twins).
