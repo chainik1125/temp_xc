@@ -2,7 +2,13 @@
 
 ![TXC detection AP across window lengths](txc_window_length.png)
 
-**Additional pre-backtracking context improves TXC detection across three dictionary seeds.** Small points are dictionary seeds, thin lines connect the same seed, and squares with whiskers show mean ± sample SD across seeds. Mean AP rises from T=1 through T=5 and then declines slightly at T=6, while every seed remains above its T=1 endpoint. AP is averaged over five question-grouped outer folds with a fixed 32-feature sparse probe; T=1 uses offset -8 and T=6 uses offsets -13 through -8. This establishes a replicated context-length effect within TXC, not that temporal order causes it or that TXC beats a sufficiently flexible positional SAE.
+**Ordered and shuffled performance are reported separately because a longer window can improve detection without using order.** Small points are dictionary seeds, thin lines connect the same seed, and squares with whiskers show mean ± sample SD across seeds. A rise shared by both curves is consistent with denoising or recovery of an order-invariant/DC-like component; only their separation is evidence that the fixed ordered-trained representation depends on token order.
+
+The single T=1 markers give the submitted-paper S=32 baselines: TopK SAE at 0.229 AP and T-SAE at 0.245 AP. Those values use the seed-42 300K-step dictionaries and average five question-grouped folds; they are shown for context and are not pooled with the 20K-step three-seed window sweep.
+
+![Ordered minus shuffled TXC AP](txc_ordered_minus_shuffled.png)
+
+**Ordered minus shuffled AP isolates the fixed-probe temporal residual.** Positive values mean the intact local trajectory carries signal that is damaged by within-window permutation. The control is still a covariate-shift sensitivity test, so it should be interpreted alongside retrained order-invariant baselines.
 
 ![TXC order-perturbation sensitivity](txc_order_sensitivity.png)
 
@@ -19,7 +25,7 @@
 | 5 | 0.264 ± 0.003 | 0.250 ± 0.005 | 0.219 ± 0.011 | 0.227 ± 0.008 |
 | 6 | 0.256 ± 0.012 | 0.241 ± 0.013 | 0.223 ± 0.006 | 0.231 ± 0.007 |
 
-Entries are mean ± sample SD across the three dictionary seeds. Every method uses a 32-feature question-grouped sparse probe. The shuffled value applies the ordered-trained TXC probe after a deterministic within-window permutation; it is a fixed-probe sensitivity control rather than a retrained shuffled model.
+Entries are mean ± sample SD across 3 dictionary seeds. Every method uses a 32-feature question-grouped sparse probe. The shuffled value applies the ordered-trained TXC probe after a deterministic within-window permutation; it is a fixed-probe sensitivity control rather than a retrained shuffled model.
 
 ## Positional-SAE feature-budget sensitivity
 

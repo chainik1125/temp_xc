@@ -24,9 +24,20 @@ NORD = {
     "blue": "#5E81AC",
     "red": "#BF616A",
     "orange": "#D08770",
+    "purple": "#B48EAD",
 }
 SEEDS = (1, 2, 42)
 WINDOWS = tuple(range(1, 7))
+
+# Submitted-paper backtracking baselines at the same S=32 probe budget used
+# throughout this reviewer-stage curve. These are seed-42 dictionary results,
+# averaged over five question-grouped folds, from paper/figs/c7_pr_auc_table.tex.
+# They are shown for context but are not pooled with the 20K-step three-seed
+# sprint results.
+PAPER_T1_S32_BASELINES = (
+    ("SAE", 0.229, "^", NORD["muted"]),
+    ("T-SAE", 0.245, "D", NORD["purple"]),
+)
 
 # Post-hoc T=6, seed-42 sensitivity result. The raw result was summarized in
 # purified/docs/aniket/neurips-rebuttal/july23-aniket-workplan.md.
@@ -307,6 +318,37 @@ def _plot_window_curve(
         label="Shuffled window",
         seeds=seeds,
     )
+    paper_baseline_values = []
+    if 1 in windows:
+        for label, value, marker, color in PAPER_T1_S32_BASELINES:
+            paper_baseline_values.append(value)
+            ax.scatter(
+                [1.0],
+                [value],
+                s=24,
+                marker=marker,
+                color=color,
+                edgecolors="white",
+                linewidths=0.55,
+                zorder=6,
+            )
+            ax.annotate(
+                f"{label} {value:.3f}",
+                xy=(1.0, value),
+                xytext=(6, 0),
+                textcoords="offset points",
+                ha="left",
+                va="center",
+                color=color,
+                fontsize=6.0,
+                bbox={
+                    "facecolor": "white",
+                    "edgecolor": "none",
+                    "alpha": 0.86,
+                    "pad": 0.8,
+                },
+                zorder=7,
+            )
     ax.set_xlabel("Window length T (tokens)")
     ax.set_ylabel("Backtracking detection AP")
     absolute_values = np.asarray(
@@ -314,7 +356,8 @@ def _plot_window_curve(
             value
             for row in rows
             for value in (row["txc_ordered_ap"], row["txc_shuffle_ap"])
-        ],
+        ]
+        + paper_baseline_values,
         dtype=np.float64,
     )
     ax.set_ylim(
@@ -380,6 +423,10 @@ def _plot_window_curve(
         "endpoint_windows": [windows[0], windows[-1]],
         "paired_endpoint_gain": paired_gains,
         "paired_endpoint_gain_mean": mean_gain,
+        "paper_t1_s32_baselines": {
+            label: value
+            for label, value, _marker, _color in PAPER_T1_S32_BASELINES
+        },
     }
     if windows[0] == 1 and windows[-1] == 6:
         summary.update(
@@ -463,7 +510,11 @@ def _plot_shuffle_gap(
 def _write_seed_metrics(rows: list[dict], output_dir: Path) -> None:
     path = output_dir / "window_sweep_seed_metrics.csv"
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=list(rows[0]),
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -479,7 +530,7 @@ def _write_budget_csv(output_dir: Path) -> None:
         "ci95_high",
     )
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(fields)
         writer.writerows(POSITIONAL_BUDGET_ROWS)
 
@@ -504,6 +555,12 @@ def _write_markdown(
         "by both curves is consistent with denoising or recovery of an "
         "order-invariant/DC-like component; only their separation is evidence "
         "that the fixed ordered-trained representation depends on token order.",
+        "",
+        "The single T=1 markers give the submitted-paper S=32 baselines: "
+        "TopK SAE at 0.229 AP and T-SAE at 0.245 AP. Those values use the "
+        "seed-42 300K-step dictionaries and average five question-grouped "
+        "folds; they are shown for context and are not pooled with the "
+        "20K-step three-seed window sweep.",
         "",
         "![Ordered minus shuffled TXC AP](txc_ordered_minus_shuffled.png)",
         "",

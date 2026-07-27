@@ -696,8 +696,13 @@ def test_publication_plot_accepts_arbitrary_window_grid(tmp_path):
     )
     assert result["n_cells"] == len(windows) * len(seeds)
     assert result["endpoint_windows"] == [1, 16]
+    assert result["paper_t1_s32_baselines"] == {
+        "SAE": 0.229,
+        "T-SAE": 0.245,
+    }
     assert (output / "txc_window_length.png").exists()
     assert (output / "txc_ordered_minus_shuffled.png").exists()
     assert (output / "txc_order_sensitivity.png").exists()
     markdown = (output / "reviewer_figures.md").read_text()
     assert "order-invariant/DC-like component" in markdown
+    assert "submitted-paper S=32 baselines" in markdown
