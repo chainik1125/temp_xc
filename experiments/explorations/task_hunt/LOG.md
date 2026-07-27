@@ -13968,3 +13968,47 @@ Artifacts: `warddebt/CARD.md` § 7, `labels/build_warddebt.py`,
 labels; corpus availability + the tokens-per-trace bar first.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+---
+
+## 2026-07-27 ~23:32 London — runpod-a: deliverables matrix ABSORBED — reask chain = the #6-candidate feeder (running, ratified); CLAIM: (4) λ̂ + (5) dq T-fills at my chain drain; $0 gap inventory posted
+
+1065b26cf routing acked. My lanes tonight:
+
+**(6) feeder:** reask_hr screen chain RUNNING behind tsae_s2
+(freeze fcd028783 ratified f8815e1e0). tsae_s2 midpoint:
+[1/2] k500/s2 landed auc 0.6217, l0/unit 536.6, 15.9 min — k20
+training, lane drains ~23:50; reask legs ≈ 2.5–3 h after ⇒ my
+GPU-0 drain ≈ 02:30–03:30.
+
+**CLAIM (4)+(5) at that drain** (matrix venue "runpod-b or
+runpod-a"; runpod-b's drain is consumed by the RLHF seed-split
+per the same entry — if that changes, first LOG line wins). $0
+inventories, measured from the exhibits' own payloads:
+
+- **(4) λ̂** (`lambda_intensity/results/shuffle_overlay.json` +
+  SHUFFLE_OVERLAY_CARD: d_sae 2048, k8, 8000 steps): existing =
+  post T{2,4,8,16}×{1,2,42} + sae/tsae T1 anchors ×3. **Missing
+  vs the grid: post T{6,10}×3 = 6 trainings** + shuffle evals +
+  overlay/figure refresh. Both-arms = R30 certificate + ONE fresh
+  spot-check twin @T16 (1 btk training + tensor compare), quoted
+  on-figure per the matrix.
+- **(5) dq** (`diafaces/results/panel2_payloads/*`: ds
+  dial_real_dqgap_llama31_8b_l14, same hunt width): existing =
+  pre/post/stacked T{2,4,8,16,32}×{1,2,42} trained+untrained +
+  sae/tsae T1 anchors. **Missing vs the grid: T{6,10} — filling
+  the CLAIMING arm (pre, the panel's KEEP arm) ×3 trained
+  + ×3 untrained floors = 6+6 cells** + spot-check twin @T16 +
+  shuffle evals + payload merge + re-render. (post/stacked
+  T{6,10} NOT filled unless directed — the exhibit's curve is the
+  claiming arm + anchors, λ̂ precedent; flag if the figure wants
+  all families.)
+
+Est combined ≈ 2–3 GPU-h ≈ $5–10 (inside the matrix envelope
+line). Freeze discipline: each fill gets its in-card amendment
+(SHUFFLE_OVERLAY_CARD + a dq panel-card amendment) committed
+BEFORE its cells run; substrate cache presence on pod A verified
+at drain (both substrates are llama31 captures — builders are
+committed; cold rebuild priced in the amendment if absent).
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
