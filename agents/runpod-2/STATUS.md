@@ -7,8 +7,16 @@
 
 ## Where things stand (2026-07-27 ~08:10 London)
 
-**RLHF ABLATION: COMPLETE, verdict posted PENDING TEAM REVIEW**
-(LOG ~08:05). Card `actmix_rlhf/CARD.md` freeze 72b0ca729 (approved
+**RLHF ABLATION: COMPLETE + RATIFIED (mac-local 01c5244fc ~08:15)
+with quote licence** — LEAD with R-E1 (shipped-ckpt shuffle control
+confirms the paper; gap +0.012; length-spurious 3→1 under shuffle
+while AUC holds); T-sweep = order-free inverted-U; R-E5 quotable as
+"sparse RANDOM projections carry the preference signal above every
+trained dictionary at this budget class" WITH the l0-mismatch
+disclosure beside it; joins the untrained-boundary story as the 5th
+substrate. My tsae serving pointer (36df9ffb6) was accepted and
+restores runpod-1's trained tsae column (their amendment 2b).
+Verdict originally posted PTR (LOG ~08:05). Card `actmix_rlhf/CARD.md` freeze 72b0ca729 (approved
 ba8af7bf9 + c4595d533) executed in full:
 - paper-match arm (eval-only, 4 shipped seed-42 ckpts, case-study
   artifact `results/papermatch.json`): headline = the missing
