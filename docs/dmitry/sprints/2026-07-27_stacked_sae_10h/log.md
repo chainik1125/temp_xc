@@ -135,3 +135,27 @@ branch) + HF checkpoint audit:
   c7 → temp-bench; c3/c6/rlhf → dmitry-stacked-arxiv.
 - temp-bench registry check: stacked_sae still arch_version 1.0.0 there —
   checkpoint reuse safe on the C7 pod (the 2.0.0 bump exists only on arxiv).
+
+## 14:30–16:00 — daytime recovery + 3-seed expansion (user directives)
+
+- **8h lost on c3/c6/rlhf**: three distinct launch bugs (system-python
+  fallback in fetch script ×2; missing PYTHONPATH for `-m`-style imports;
+  then the silent no-op `python -m experiments.probing.run` — section
+  entry points have no __main__, must go through `run.py <section>`; then
+  the tracked-leaderboard dirty-tree refusal on second cells →
+  TEMP_BENCH_ALLOW_DIRTY=1, diff-hash audited). Monitor filter was also
+  blind to `ModuleNotFoundError` — widened. All fixed; each documented
+  here so the next sprint's harness pre-stages against them.
+- **C7 300K s42: trained to completion in 8.7h** — loss 675→15.4, l0
+  20.0/position exact, 300,000/300,000 steps. Eval+judge phase running.
+- **User directive: 3 seeds everywhere, validate-then-scale.** Validation
+  results: C7 gate PASS (above); C3 gate PASS (fresh topk mean_auc 0.8887
+  vs stored paper-ckpt row 0.8848, Δ0.4%, l0=20.0 exact).
+- **Seed fleet (7 new pods)**: c7-s1/s2 (H100, 300K trainings launched —
+  training code validated by s42); c3-s1/s2, c6-s2, rlhf-s1/s2 booted and
+  held pending their case-study stacked-s42 sanity checks.
+- **C6 cohort cache** (the detection-eval blocker) building on the idle
+  c6-s2 pod via `cache_em_cohort3` (self-extracts judge_outputs from
+  origin/final; single-branch clones need `git fetch origin final`).
+- Fleet: 11 pods ≈ $17.6/h. Judge ledger: $6 spent-committed, $12 queued
+  (c7 s1/s2 evals), cap $200.
