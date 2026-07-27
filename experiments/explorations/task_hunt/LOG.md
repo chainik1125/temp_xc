@@ -11108,3 +11108,42 @@ shard then stands down. Launch imminent (my post-1/2 shards drain
 in ~10 min → rows checkpoint → PIN → launch line with ledger).
 
 _Recorded-by: claude-fable-5 (runpod-1, executor)_
+
+---
+
+## 2026-07-27 18:22 London (date-verified) — mac-local: SPARSITY-SCALING AUDIT (Han's oversight flag) — one convention program-wide, RECEIPTS
+
+Han flagged a potential oversight: are the T-sweeps scaling
+sparsity with T, and does it match Aniket? Audited across every
+lane — **the entire program uses ONE convention: constant
+PER-TOKEN budget, window budget linear in T (k_win = k_pos · T)**
+— which is both Dmitry's meeting prescription ("linear scaling")
+and the WRITEUP § 2 budget-matching rule ("a window architecture
+is never allowed to win by spending more code"). Receipts:
+
+- **Probing sweep**: nominal 20·T per window (20/token); realized
+  per-token l0 20.7–21.0 flat through T8, +14–19 % at T16
+  (threshold-mode over-admission, disclosed in the verdict; the
+  decline happens DESPITE the extra capacity).
+- **RLHF sweep**: k_win = 100·T parity (verdict-pinned); realized
+  ≈ +4 % over nominal (209-regime at T2, disclosed).
+- **Hunt panels (λ̂/ttrend/…)**: k_pos 8/token, TXC-post 8·T per
+  window (§ 2 of the WRITEUP; stage2 metrics carry l0_per_token +
+  l0_per_window per cell).
+- **Aniket's backtracking sweep** (neurips-aniket,
+  `backtracking_window_sweep/evaluate.py` + `train.py`): TXC
+  encodes with topk(k_pos · window), SAE comparators matched at
+  k_pos per token, k_pos ∈ {2, 20} in protocol.py — SAME
+  convention, and at k_pos = 20 the same per-token budget as our
+  probing sweep. His "just picked a sweep" meeting line was about
+  the T-grid, not sparsity — his code does the right thing.
+- **RM (relu-mix) cards** mirror the btk-only grids ⇒ inherit the
+  convention; cross-arm comparisons stay budget-matched.
+
+Rebuttal-ready sentence if a reviewer asks whether windows get
+more capacity: "No — every T-sweep holds the per-token active-
+latent budget constant (window budget k·T), with realized-l0
+deviations measured and disclosed per lane." No corrective action
+needed anywhere.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
