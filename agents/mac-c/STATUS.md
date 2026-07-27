@@ -4,7 +4,7 @@
 **Lane (CHANGED 07-27 19:15, `47040da59`):** HUNT EXECUTION — no longer
 read-only. dharm end-to-end + my two re-entry cards, CPU-first, one
 self-provisioned GPU pod only when a GPU stage is actually reached.
-**Last update:** 2026-07-27 ~19:20 London (lane ACK pushed; starting
+**Last update:** 2026-07-27 ~20:02 London (lane complete except the gated dharm pull; no pod spun up)
 msdose amendment card)
 
 ## The assignment (LOG 19:15, mac-local relaying Han)
@@ -38,15 +38,50 @@ verify state change by API query after; NEVER write to pods I did
 not spin up (incl. Han's three hand-provisioned pods). Key NEVER
 seeded to any pod. L40S/A100-class ≈ $1–2/h target.
 
-## Progress ledger (update as stages close)
+## Progress ledger — LANE COMPLETE except the gated item
 
-- [x] Lane ACK pushed (LOG 19:19)
-- [ ] msdose: amendment card committed (commit-then-run) → realised
-      pre-measure vs the pre-registered simulated bound (ρ 0.844,
-      10/66 strata, 397,481 usable tokens; miss = kill)
-- [ ] dharm: `pull_dharm.py` + receipt committed → pull → 4 gates
-- [ ] sycpress: generator-mode card frozen ($0)
-- [ ] GPU stage decision (only if survivors exist)
+- [x] Lane ACK (LOG 19:19)
+- [x] **`msdose_r1` — KILLED $0** (`86f5ce0f8`). Freeze approved
+      `04b179c31`. Absolute legs all passed (ρ 0.838, 15/74 strata,
+      489k usable — beat my own sim bound); **ratio legs missed 3/3**
+      because my § B baseline sim understated the frozen plan 2.3×
+      (86.6k sim vs 201.5k realised ⇒ "4.6× gain" is really 2.43×).
+      Erratum recorded; frozen rule not overturned. My recommendation:
+      **no third msdose entry.**
+- [x] **`sycgen` — RATIFIED, single face** (`51bf6fabc` freeze,
+      `10362af34` result; ratified `8a7c722b2`). Jittered scaffold
+      gives the best trap numbers in wave-3 (age pos-AUC 0.689 /
+      doc-mean 0.747; rate ρ(face,pos) −0.020) — **and I demoted my
+      own rate face** on the binding clock bar (8-msg kernel = 1,014
+      tok vs T ≤ 64 = refmark's death mode; its 0.624 floor is
+      doc-identity in a costume). `sycgen_age` carries. mac-local
+      adopted my "geometry can kill but not clear — **per-token
+      baseline binding first on any generated corpus**" as a STANDING
+      RULE for all generated-corpus faces.
+- [x] **`dharm` — card + pre-measure FROZEN BEFORE ACCESS EXISTS**
+      (`d731f3411`). Primary face changed from my own menu entry to
+      **`dharm_thage`** (age since `harmful_index` crossing) — escapes
+      both the doc-identity trap and the msdose position trap, and
+      satisfies § 1.2 by construction. Two predictions pre-registered
+      from a synthetic-stand-in smoke (artifacts deleted, none
+      committed): `dharm_dose` dies on position (stand-in AUC 1.000);
+      `dharm_bage` risks a floor-solve (1.000 at T ≥ 16) ⇒ clock
+      reported before any AUC.
+- [ ] **BLOCKED (not mine): dharm HF gate.** Both Han tokens 403.
+      Packet `DHARM_GATE_REQUEST.md`; escalated to Han (`ff76a1f1f`).
+      On access: `pull_dharm` → `build_dharm_premeasure` → verdict.
+      **No design work in the critical path.**
+- [ ] GPU stage — **NOT REACHED, no pod spun up.** msdose_r1 died;
+      sycgen needs generation (a separate budget decision, not mine);
+      dharm is gated. Per governance, none will be spun up until a
+      GPU-needing stage actually exists.
+
+**Two team decisions pending on my flags:** (1) the dharm gate terms —
+canary vs our committed token streams (posting is permitted *with* the
+canary; the tighter alternative costs the committed-stream
+convention), and the eval-only reading of probe fitting; (2) whether
+the shared elicitation harness gets funded (four candidates want it,
+`TIERC_PIPELINE_DESIGNS.md` § 3).
 
 **Substrate notes:** runpod-a's frozen-plan msdose streams exist
 (`labels/wave3_msdose_{gpt2,gemma2,llama31}.npz`) — those are the
