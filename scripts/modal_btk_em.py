@@ -72,6 +72,18 @@ def _link_data_cache():
         "ln -s /workspace/em_data_cache /repo/results/data_cache")
 
 
+def _link_checkpoints():
+    # Trained EM dictionaries are the expensive artifact — persist them
+    # (and the manifest) on the Volume; cache-hits resume across
+    # containers. Seed the Volume copy from the repo's committed
+    # config.json skeleton once.
+    _sh("mkdir -p /workspace/em_checkpoints")
+    _sh("cp -rn /repo/checkpoints/. /workspace/em_checkpoints/ 2>/dev/null "
+        "|| true")
+    _sh("rm -rf /repo/checkpoints && "
+        "ln -s /workspace/em_checkpoints /repo/checkpoints")
+
+
 @app.function(image=image, gpu="H100", volumes={"/workspace": vol},
               memory=65536, cpu=8, timeout=3 * 60 * 60,
               retries=modal.Retries(max_retries=1, initial_delay=10.0))
@@ -123,12 +135,16 @@ def run_cell(cell: tuple[str, int, int]) -> str:
     arch, T, seed = cell
     _assert_pinned()
     _link_data_cache()
+    _link_checkpoints()
     tag = f"em__{arch}__T{T}__s{seed}"
     out_vol = Path(f"/workspace/btk_rerun_v2/{tag}.json")
     if out_vol.exists():
         print(f"[resume] {tag} already on Volume", flush=True)
         return out_vol.read_text()
-    _sh(f"{PY} - {arch} {T} {seed} <<'EOF'\n{CELL_RUNNER}\nEOF")
+    try:
+        _sh(f"{PY} - {arch} {T} {seed} <<'EOF'\n{CELL_RUNNER}\nEOF")
+    finally:
+        vol.commit()          # checkpoints/manifest persist even on failure
     text = Path("/tmp/cell_row.json").read_text()
     out_vol.parent.mkdir(parents=True, exist_ok=True)
     out_vol.write_text(json.dumps([json.loads(text)]))
