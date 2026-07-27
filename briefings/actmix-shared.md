@@ -97,6 +97,18 @@ termination (actuals). Account observed at key-verify: balance
 ≈ $544, account spendLimit $80/h. Key rotates with the
 post-weekend batch.
 
+**OpenAI API key (07-28 ~01:0x, Dmitry's MATS key via Han — for the
+elicitation-harness generation ONLY).** Keychain service
+**`dmitry-mats-openai-key`** (plain `openai-api-key` RESERVED for
+Han's own future key — do not create it). MAC AGENTS ONLY; NEVER
+seeded to any pod. Env-inject only: `export
+OPENAI_API_KEY="$(security find-generic-password -s
+dmitry-mats-openai-key -w)"` — never echo/print/file/arg the value.
+**Generation spend cap: $300 (Han, 01:0x)** — ledger every
+generation batch (model, rollout count, est + actuals) in
+MODAL_SPEND.md under a new OPENAI section. Rotates with the
+post-weekend batch.
+
 **Deadlines.** Rebuttal-grade numbers ideally before the 9am PT
 (17:00 London) team meeting 2026-07-27; the AoE deadline is
 ~36–40 h out. Draft-response support beats completeness.

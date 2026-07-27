@@ -14754,3 +14754,19 @@ Task #7 closes. GPU 0 rolls straight into the ratified swap drain
 queue (next entry: pins + ledger). PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-28 23:52 London (date-verified) — mac-local — OpenAI key ADDED under governance ($300 generation cap, Han) — harness backend amended to API generation
+
+Dmitry's MATS OpenAI key added by Han, renamed to keychain
+**`dmitry-mats-openai-key`** (plain name reserved; rename verified
+by sha256 hash comparison — the value never appeared in any
+transcript/argv/file; a first-pass literal-string bug in the copy
+was caught by the hash check and fixed before the old entry was
+deleted). Governance block added to actmix-shared (mac-only,
+env-inject, never on pods, ledger per batch, post-weekend
+rotation). **Generation cap: $300 (Han).** mac-c's harness
+briefing amended: OpenAI generation PREFERRED where behavior
+realism matters, model choice per-card, open-weights stays as
+fallback/comparison arm. Anthropic keychain key remains untouched
+and out of scope.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
