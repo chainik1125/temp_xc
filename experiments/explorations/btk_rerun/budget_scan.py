@@ -37,7 +37,7 @@ def _ov(r):
 
 
 def load(leaderboard: Path):
-    incumbents = defaultdict(lambda: defaultdict(list))   # [T][arch] -> gauc
+    incumbents = defaultdict(list)   # (T, name, d_sae, k_pos) -> gauc
     scan = defaultdict(list)                              # config key -> rows
     for line in leaderboard.open():
         try:
@@ -58,9 +58,14 @@ def load(leaderboard: Path):
             continue
         is_scan = ("k_win" in ov or tc.get("batch_size", 1024) != 1024
                    or ov.get("d_sae") not in (None, 20))
-        if not is_scan and r["arch"] in INCUMBENT_ARCHS \
-                and tc.get("n_steps") == 6000:
-            incumbents[T][r["arch"]].append(float(g))
+        paper_rule = ("k_win" not in ov
+                      and tc.get("batch_size", 1024) == 1024
+                      and tc.get("n_steps") == 6000)
+        if paper_rule and r["arch"] in INCUMBENT_ARCHS:
+            dsae_i = ov.get("d_sae", 20)
+            incumbents[(T, INCUMBENT_ARCHS[r["arch"]], dsae_i,
+                        ov.get("k_pos"))].append(float(g))
+        if not is_scan:
             continue
         if is_scan and r["arch"] in SCAN_ARCHS:
             cfg = (SCAN_ARCHS[r["arch"]],
@@ -79,37 +84,27 @@ def main():
     args = p.parse_args()
     inc, scan = load(args.leaderboard)
 
-    # Incumbent best-per-T: exact per-cell means from the headline
-    # summary JSON (bench|arm|k|T), max over k_pos.
+    # Incumbent best-per-(T, d_sae): per-(k_pos) cell means from the
+    # leaderboard, max over k_pos at each (T, name, d_sae).
     inc_best = {}
-    sj = args.out_dir / "btk_rerun_summary.json"
-    cells = json.loads(sj.read_text())["cells"] if sj.exists() else {}
-    for key, md in cells.items():
-        b, arm, kk, tt = key.split("|")
-        if b != BENCH or "gauc" not in md:
-            continue
-        name = {"paper-match": "composite@paper",
-                "perwin-raw": "perwinraw@paper"}.get(arm)
-        if name is None:
-            continue
-        T = int(tt[1:])
-        cur = inc_best.get((T, name))
-        m = md["gauc"]["mean"]
+    for (T, name, dsae_i, _k), vals in inc.items():
+        m = float(np.mean(vals))
+        cur = inc_best.get((T, name, dsae_i))
         if cur is None or m > cur:
-            inc_best[(T, name)] = m
+            inc_best[(T, name, dsae_i)] = m
 
     lines = ["# Budget scan — coupled gauc vs incumbents\n"]
     results = {}
     Ts = sorted({t for (_, t) in scan})
     for T in Ts:
         lines.append(f"\n## T = {T}\n")
-        comp = inc_best.get((T, "composite@paper"))
-        pwin = inc_best.get((T, "perwinraw@paper"))
-        lines.append(f"incumbents: composite@paper = "
-                     f"{comp:.3f} | perwinraw@paper = {pwin:.3f}\n"
-                     if comp and pwin else "(incumbents missing)\n")
-        lines.append("| arm | k_win | d_sae | batch | gauc (mean±std, n) | vs composite | vs perwinraw |")
-        lines.append("|---|---|---|---|---|---|---|")
+        comp = inc_best.get((T, "composite@paper", 20))
+        pwin = inc_best.get((T, "perwinraw@paper", 20))
+        lines.append(f"incumbents (paper d20): composite = "
+                     f"{comp:.3f} | perwinraw = {pwin:.3f}\n"
+                     if comp and pwin else "(d20 incumbents missing)\n")
+        lines.append("| arm | k_win | d_sae | batch | gauc (mean±std, n) | vs comp d20 | vs pwin d20 | vs comp same-d |")
+        lines.append("|---|---|---|---|---|---|---|---|")
         rows_T = sorted(((cfg, vals) for (cfg, t), vals in scan.items()
                          if t == T),
                         key=lambda kv: -np.mean(kv[1]))
@@ -117,13 +112,18 @@ def main():
             m, s, n = float(np.mean(vals)), float(np.std(vals)), len(vals)
             dc = m - comp if comp else float("nan")
             dp = m - pwin if pwin else float("nan")
-            flag = " **BEATS BOTH**" if dc > 0 and dp > 0 else ""
+            comp_d = inc_best.get((T, "composite@paper", ds))
+            dcd = m - comp_d if comp_d is not None else float("nan")
+            flag = (" **BEATS ALL**" if dc > 0 and dp > 0
+                    and (comp_d is None or dcd > 0)
+                    else (" beats-d20" if dc > 0 and dp > 0 else ""))
+            cd_txt = f"{dcd:+.3f}" if comp_d is not None else "—"
             lines.append(f"| {arm} | {kw} | {ds} | {b} | "
-                         f"{m:.3f}±{s:.3f} n={n} | {dc:+.3f} | {dp:+.3f}"
-                         f"{flag} |")
+                         f"{m:.3f}±{s:.3f} n={n} | {dc:+.3f} | {dp:+.3f} | "
+                         f"{cd_txt}{flag} |")
             results[f"T{T}|{arm}|kw{kw}|d{ds}|b{b}"] = {
-                "gauc": m, "std": s, "n": n,
-                "vs_composite": dc, "vs_perwinraw": dp}
+                "gauc": m, "std": s, "n": n, "vs_composite_d20": dc,
+                "vs_perwinraw_d20": dp, "vs_composite_same_d": dcd}
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "budget_scan.md").write_text("\n".join(lines) + "\n")
     (args.out_dir / "budget_scan.json").write_text(
@@ -132,9 +132,13 @@ def main():
                     "scan": results}, indent=1))
     print(f"[budget_scan] {len(scan)} scan configs -> "
           f"{args.out_dir}/budget_scan.md")
+    import math
     beats = [k for k, v in results.items()
-             if v["vs_composite"] > 0 and v["vs_perwinraw"] > 0]
-    print("configs beating BOTH incumbents:", beats if beats else "none")
+             if v["vs_composite_d20"] > 0 and v["vs_perwinraw_d20"] > 0
+             and (math.isnan(v["vs_composite_same_d"])
+                  or v["vs_composite_same_d"] > 0)]
+    print("configs beating d20 incumbents AND same-d composite:",
+          beats if beats else "none")
 
 
 if __name__ == "__main__":
