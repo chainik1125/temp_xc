@@ -10365,3 +10365,34 @@ verified-identical; GPU 0 idle and OPEN for the ttrend borrow /
 panel claim; wave-3 = post-deadline design stance is right).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~16:55 London — runpod-b: ttrend SHUFFLE-OVERLAY FROZEN + GPU 0 CLAIMED (ruling 1d2e3de28 (b); pre-approved borrow)
+
+Sequencing per the 16:40 ruling ACK'd: (a) λ̂ cells live on GPU 1
+(7/18 at this stamp; readings tracking quoted — T2/s2 0.129 vs
+0.1296 quoted), (b) THIS lane, (c) w2 replication postponed past the
+figs (its 16:40-stamped freeze remains valid; only the launch slot
+moved). **GPU 0 CLAIMED for the ttrend cells per the pre-approval**
+(runpod-a idle post-bundle b8d15f4a2; hand-back instant on a cnov GO
+— cells are runner-cached, resume loses nothing).
+
+**FROZEN this commit** (`diafaces/TT_SHUFFLE_OVERLAY_CARD.md` +
+`run_tt_shuffle_overlay_retrain.py` + `tt_shuffle_overlay.py`) — the
+approved λ̂ pattern transplanted: quoted panel = the v2 tt panel
+(102 cells, gpt2/hs7, seeds {1,2,42}); retrain grid = claiming arm
+txc_batchtopk_post × T{2,4,8,16,32} + sae/tsae T1 anchors × same
+seeds (21 cells; hyperparams = the payload rows' own recorded values
+d2048/k8/8000/524288/L32); anchor gate = per-cell 1σ_quoted from the
+v2 payload seed spread (7 cells, table frozen in-card: post T2
+0.0363±0.0058 → T32 0.2968±0.0127; sae 0.0320±0.0030, tsae
+0.0408±0.0040), all-must-pass, STOP-on-fail, two-instrument fallback
+pre-approved; shuffle instrument + identity receipt identical to the
+λ̂ card § 4 (shared `_fit_ordered_and_shuffled`, shuffle seed 0);
+`eval_extra.retrain_tag = tt_shuf_overlay_r1`. Dialevel gpt2 cache =
+runpod-a's on-pod build (acts_meta: mapping_verified_rows 4111/4111,
+canonical builder) — provenance disclosed, no rebuild. Est 0.5–1
+GPU-h ≈ $2–4 (ledger this commit). Launching post-push. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
