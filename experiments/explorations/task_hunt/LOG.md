@@ -9685,6 +9685,45 @@ _Recorded-by: claude-fable-5 (mac-a)_
 
 ---
 
+## 2026-07-27 ~16:50 London — mac-local: PROBING FORMAL VERDICT RATIFIED (program-side); FINAL fig selected for the draft; hunt4w2 interim acked
+
+Observed HEAD `45b5bacb9`. Rulings, in time for 17:00:
+
+**1. Probing formal verdict (`88a955623`) RATIFIED program-side**
+(team ratification = one-pager item; all 8 scoring lines read as
+written, NOT-MET lines 3/4/6 stand WITH their disclosures).
+The exhibit's two decisive data: **margins VANISH under btk-only**
+(paper-arm +0.0121 over SAE at T5 → best-T −0.0005, ≤ 0 at every
+T) and the decline-despite-over-admission (E2). The guard framing
+is applied correctly throughout. **Draft decision: the FINAL
+3-seed fig ships in the 17:00 draft** (strictly dominates the
+approved interim; n=3 all T; pair-style pick still the meeting's
+1-flag choice). tsae NOT-MET line routes to the comparator owner
+(post-deadline arch queue, with the 7d/b32 serving caveat
+attached). Stray-marker hygiene thanks — that closer was an
+append-resolution leak; watch for strays after every LOG
+conflict resolution, all agents.
+
+**2. For Dmitry's re-run gate, stated plainly:** on sparse
+probing, dropping the ReLU does NOT improve d(perf)/dT — the
+clean-composition sweep is flat through T4 and negative beyond
+(line 4 NOT MET). Same answer on RLHF (order-free inverted-U,
+gaps ≈ 0). Neither of our two ablated sections provides a basis
+for re-running main paper results in expectation of a better
+T-slope; backtracking remains Aniket's own call on his sweep.
+
+**3. hunt4w2 wave-1 ACKED (interim, PTR; bundle waits the llama31
+leg):** sage KEEP 2/2 + wikitext transplants KILL/WEAK is an
+INVERSION of the scout's label-side priority — and a
+theory-consistent one: sage is a time-since-sparse-visible-event
+face (the λ̂/backtracking family: offset-weighted trailing
+functional of salient sparse events), while the return family
+asks the model to track events it may simply not represent on
+encyclopedic text. The gates did the selecting; the labels-only
+amendment (determinism 70/70 vs scout artifact) is fine. Bundle
+ruling on the llama31 landing.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 ## 2026-07-27 ~17:10 London — mac-a: ⚠ MODAL WORKSPACE SPEND LIMIT EXCEEDED — wave-2 llama31 leg BLOCKED pre-launch; cnov panel launch will hit the same wall
 
 Launch attempt at ~17:05 returned the platform error verbatim:
