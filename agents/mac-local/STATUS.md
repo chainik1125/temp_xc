@@ -1,283 +1,180 @@
-# Working state — agent `mac-local`
+# mac-local STATUS — COMPREHENSIVE COMPACT SNAPSHOT (2026-07-27 ~21:45 London, date-checked)
 
-**Last rewrite:** 2026-07-26 ~10:50 BST (OVERNIGHT COMPLETE; pivot
-executed). **Resume by reading `briefings/overnight-mac-modal.md`
-FIRST.** Read with `private/rebuttal_plan.md` (untracked).
+**I am mac-local: hub/orchestrator/reviewer.** Wall-clock discipline:
+stamp LOG entries from `date` (two drift corrigenda on record — commit
+order is always authoritative). Post-compact: read THIS file, then LOG
+tail from `c1c5c949e` (budget raise) forward for the day's arc.
 
-## DONE tonight (see LOG 2026-07-26 mac-local entry, commit f07a1f3a5)
-- Queue item 1 COMPLETE: expedited gate-reviews of BOTH panels.
-  oprate NEGATIVE **APPROVED** (artifact-exact). fineweb cross-model
-  verdict **APPROVED with 2 corrections filed** (gpt2 last-digit
-  seed-means; gemma within-doc T2 = 0.067 not 0.047 — monotone-from-T2
-  withdrawn, T4-onward growth + window-over-token contrast stand).
-  RECEIPTS rows all clean — corrections were LOG-narrative only.
-  Flush commit c8ab5fa0 owned by me in the LOG (preservation-flush
-  labeling lesson adopted). Both stage2 briefings retired. Suite
-  green (332+1skip). **Distillation DRAFT already written:**
-  `private/sunday_distillation_2026-07-26.md` — update with overnight
-  landings, deliver by 09:30 PT.
-- Origin watcher running in background (scratchpad/watch_origin.sh):
-  re-invokes me on any push to arxiv or at the 07:00 PT pivot.
-- mac-a / mac-b: NOT YET LAUNCHED at last check (ledger ~$1/$500).
+## THE BIG PICTURE
 
-## STRUCTURE TONIGHT (Han, 2026-07-26 — supersedes the single-executor plan)
-I stay ORCHESTRATOR. Two fresh local agents execute autonomous loops
-in their own clones (~/research/projects/agents/<id>/temp_xc):
-**mac-a** = Modal bring-up + tsae/T1 seed top-up {3,4,5} (bounds R5;
-cap $150; briefings/overnight-mac-a.md). **mac-b** = B8 slen screen →
-refmark → quotedens (cap $100; overnight-mac-b.md). Shared ops doc:
-overnight-mac-modal.md; **shared spend ledger briefings/MODAL_SPEND.md
-($500 hard / $400 soft total)**. Modal smoke PASSED (A10). Roster
-entries mac-a/mac-b added (set_agent_env.sh + agents/README).
+NeurIPS rebuttal deadline 13:00 BST TOMORROW (07-28); responses
+amendable until Aug 3 (meeting transcript). Dmitry drafts responses
+midday Chicago; 3pm PT check-in (23:00 London). All numbers PTR
+(team-ratification pending) unless noted. The paper story: probing +
+RLHF land honestly order-free/no-T-win with the controls the paper
+lacked; λ̂/backtracking + dialogue carry the positive side; "the claim
+narrows to where it is true."
 
-## MY OVERNIGHT QUEUE (orchestrator; item 1 DONE, distillation drafted early)
-1. Expedited gate-reviews of the two completed panels (oprate
-   NEGATIVE; fineweb gemma/gpt2/llama) — no compute; mark "expedited
-   — full depth at team review". Do FIRST.
-2. Rolling review loop: pull → review a/b pushes → amend their
-   briefings if needed → watch the ledger. (Ask Han to run
-   `/loop 45m` on me if unattended review cadence is wanted.)
-3. Ratify RECEIPTS updates the agents PROPOSE (they never edit
-   RECEIPTS themselves tonight).
-4. Panel-approval gate: a B8 panel tonight needs MY written LOG
-   approval (conditions in the shared doc).
-5. **HARD PIVOT 07:00 PT: Sunday distillation** (contents in the
-   shared doc §; quote ONLY via RECEIPTS.md; draft in private/;
-   deliver by 09:30 PT).
+## CRITICAL OPEN THREAD — RM identity investigation (Han challenged)
 
-## STATE OF THE PROGRAM (for the distillation)
-- **ONE confirmed case study**: λ̂ backtracking (v1 numbers; rise
-  p=0.0093; pre/T8 n=6 CI [0.179,0.235]; **pre-vs-T-SAE NOT bounded**
-  — R5; item 2 tonight tries to fix exactly this).
-- **oprate: COMPLETE 84/84, NEGATIVE** (pre-registered branch;
-  RECORD §3d) — case study #2 dead on sound grounds. UNREVIEWED.
-- **fineweb punctint-q: COMPLETE** — gemma NO-RULE-FIRES (K2 fails on
-  v1), gpt2 WEAK (T4 bounded), llama NEGATIVE; paired-v2
-  bounded-positive story = 3rd receipted v1-conservatism instance,
-  2nd corpus. §10 re-quote reconciled the nonlinear-vs-linear tension
-  (win_mean dilution artifact). UNREVIEWED.
-- METHODS DECISION taken: **v1 canonical**; v2 reported never claimed;
-  PROBE_V2_SPEC (with §0 lower-bound limitation) = post-deadline
-  freeze candidate.
-- **RECEIPTS.md = quote source of record** (24 claims ALL PASS;
-  R5/R10 negative-space; extend + `receipts_check` for any new claim).
-- Checkpoints of both panels mirrored:
-  `han1823123123/temp_xc_a40_checkpoints` (private) — see
-  checkpoints/HF_MIRROR.md; eval-only plans verify weights FIRST.
-- Kill/negative table + amended order finding (never "anywhere";
-  dialevel counterexample; recency hypothesis → B8 tests it).
-- PAUSED (post-deadline): em-redo review, factory, v2 adoption,
-  estimator-attenuation check.
+- runpod-1 claimed relu-mix ≡ btk-only TRAINING-IDENTICAL at probing
+  sweep configs (bit-identical ckpts, 4/4 equivalence pairs) → I
+  approved HALT of remaining RM cells as information-free.
+- Han challenged (theoretical prior: BatchTopK should differ —
+  Dmitry's dead-latent mechanism). MY INDEPENDENT CHECK (local, over
+  results/leaderboard.jsonl): 30/30 landed relu-mix rows vs btk-only
+  twins, **1,230 shared float fields, worst |Δ| = 0.000e+00** —
+  identity REAL on landed rows.
+- Theory reconciliation (in LOG): compositions differ ONLY when TopK
+  selects negative pre-activations (rectify-after-select wastes
+  slots). Positive-rich pools (+3σ margin) ⇒ ReLU-after-TopK is a
+  no-op ⇒ exact identity. Same pattern as hunt's R30 (which measured
+  its own thin-pool divergence boundary). Dmitry's mechanism lives
+  BEYOND the boundary (paper-era k_win=8·T thin pools) — no
+  contradiction.
+- **GAP: landed rows are low-T; high-T identity is extrapolated
+  (T-invariance claim). TWO HARDENING TESTS ORDERED (runpod-1,
+  before any certificate entry): (a) POSITIVE CONTROL — checker must
+  report DIVERGENCE on a thin-pool config (else instrument broken,
+  halt void); (b) HIGH-T TWIN — one relu-mix TXC-pre cell at T16 +
+  twin the new T10 cell, diff weights+metrics.** Certificate posts
+  only after (a) diverges AND (b) is identical. Halt stands
+  meanwhile. runpod-2's RLHF equivalence gate inherits the same
+  standard (checker + own positive control BEFORE cancel-or-train).
 
-## Discipline reminders for the executor window
-Commit-then-run (freeze + push BEFORE first cell; pin containers to
-the freeze commit). Containers never push git — repatriate results,
-merge locally with dup-key check. LOG lines as `mac-local (executor)`;
-every overnight verdict = PENDING TEAM REVIEW. Self-review hazard is
-named in the briefing — pre-registration is the compensation.
-Briefings live: overnight-mac-modal (mine), em-redo (paused),
-a40-bootstrap (historical, pod gone).
+## DELIVERABLES STATE (rebuttal figures)
 
-## Git: clean, pushed after this rewrite. Suite 333 green local.
+- **Probing**: FINAL figs committed — per-k family (k5, k20),
+  SAEBench-36 headline (CT pair winogrande/wsc excluded per
+  camera-ready convention e77574ffd) + 38-task robustness twins.
+  Dual-rendered (me + runpod-1) digit-identical. k-INVERSION
+  finding ratified: k=20 declines with T; k=5 U-shaped, T16 ties
+  SAE band (+0.001), l0 confound RULED OUT (cross-k identity of
+  serving). Quote licence: "probe-budget-dependent, no monotone
+  window win at any k" + framing guard (12:25: level story leads;
+  order-gap = cross-task comparison or decline-mitigation ONLY).
+- **RLHF**: btk-only 3-seed set: T{1,2,5} n=3, T8 n=3 (s2≡s42 to 4
+  decimals), **s2_T16 the last cell, ETA ~21:00-21:15 London → FINAL
+  3-seed fig render by runpod-2**. Interim 2-seed fig committed.
+- **T6+T10 EXTENSIONS DIRECTED (Han)**: probing T{6,10}×3 seeds on
+  freed GPUs 0/1 overnight (k_win=20·T; REAL T10 vs the paper's
+  PHANTOM T10 label — A12 rebuttal note); RLHF T{6,10}×3 on GPU 2
+  after FINAL + equivalence gate (k_win=100·T). 7-point fig
+  re-renders on landing.
+- **λ̂ (backtracking intensity)**: shuffle-overlay retrain PASSED
+  anchor gates cells-so-far in-band; tsae anchor cells CPU-bound
+  (venue note), drain imminent, **verdict + fig TONIGHT** (chased,
+  answered). Identity tol 2e-3 (A1/A2 amendments approved,
+  mechanism-quantified) + my 5e-3 quoted-gap floor.
+- **ttrend**: overlay UNLICENSED (anchor gate FIRED: retrained T32
+  +0.022 > 1σ_quoted — different objects; STOP honored, no
+  re-rolls). Deliverable = committed two-instrument fallback fig
+  (quoted trained T-sweep + screen shuffle curve, labels on-figure).
+  Venue-effect datum recorded. **Dmitry ruling: ttrend = appendix,
+  OUT of rebuttal.**
+- **dq**: fig2 exists (3 seeds); passed-then-demoted framing; Dmitry
+  ok'd for within-SAE rebuttal use.
+- **Meeting deck**: private/meeting_tsweep_plots_2026-07-27.pdf
+  (7 pages, served the 17:00 meeting; superseded for next meeting by
+  the per-k + 7-point renders when they land).
+- **Sparsity convention AUDITED program-wide** (Han's oversight
+  flag): ONE convention everywhere incl. Aniket's sweep — constant
+  per-token budget, k_win = k_pos·T. Receipts in LOG (18:22-entry).
+  Rebuttal sentence ready if asked.
 
+## FLEET ROSTER + LANE STATE
 
-## PRE-COMPACT RESUME POINT ~11:30 London 2026-07-27 — EXECUTE FIRST
-**Han's deliverable (top priority): TWO Aniket-format figures** —
-one for RLHF, one for sparse probing. Spec: x = T (1→16), y = task
-detection metric (RLHF preference_auc; probing AUC), TWO curves =
-Ordered TXC vs Shuffled window, 3 seeds each with error bars +
-faint per-seed lines, annotation "T=16 − T=1: +X" (template:
-Aniket's backtracking AP figure; solid blue squares vs dashed
-orange ×). **Gap analysis DONE (board-scanned 11:25):**
-- RLHF missing: s1@T{8,16} + third seed@T{1,2,5,8,16} = 7 trained
-  cells (~30 contended GPU-h; card timings in actmix_rlhf/CARD §5;
-  T1 shuffle ≡ identity, annotate).
-- Probing missing: s1@T{4,8} + third seed@T{1,2,4,8,16} = 7 cells
-  (cheaper, gemma-2-2b; stray s0@T3 is not ladder-usable).
-**Post-compact orchestration:** (1) LOG directive + brief to
-runpod-1/2: top-up the missing cells using ALL 3 GPUs as lanes
-free (probing lanes were draining; check pod GPU state via the
-ssh-pipe pattern below), SAME frozen cards/conventions (these are
-in-card seed extensions — amendments, not new pre-registrations;
-disclose seed choice for the third seed: use seed 2), then each
-produces its figure in the template format (describe template in
-the brief; figs to figs_writeup/ as fig_rlhf_shuffle_tsweep and
-fig_probing_shuffle_tsweep). (2) A 2-seed interim figure NOW is
-acceptable for the 17:00 draft — tell the pods to render interim
-first, final after top-ups. (3) My review on landing; ledger lines
-as always. SSH-pipe pattern: printf 'cmds; exit\n' | ssh -tt -i
-~/.ssh/id_ed25519 j42plcul70a2es-64410eb7@ssh.runpod.io (PTY-only
-proxy; filter tokens/2004 from output).
-**OPEN ITEMS from overnight (verified 11:45, execute alongside the
-figures):** (a) runpod-1 owes the formal probing VERDICT entry
-(card § 4 scoring + ledger actuals) + tsae-column completion
-(amendment 2b) — chase in the same directive as the figure top-up;
-(b) mac-c: HF mirror COMPLETION unconfirmed since ~03:45 (gates
-token rotations) — chase; ALSO they await my definition of
-"part 3" (undefined term from my briefing) — RESOLVE: define it as
-"post-deadline archaeology continuation (em-nanda deep map +
-remaining AMBIGUOUS ledger)" or formally cancel; (c) MINE: apply
-HUNT3_DRAFT_BLOCKS to WRITEUP § 8 (chaz/tempo/qres kill rows +
-nvtrend breadth entry — promised morning pass). mac-a/mac-b/
-runpod-2 verified clean (pick-gated / externally-pending only).
-(d) HUNT GEN-4 directed 11:55 (59ad15f38): mac-a screens new
-candidates during the top-ups; cnov panel stays pick-gated.
-**Standing context:** one-pager FINAL at
-private/monday_onepager_2026-07-27.md (integrated pods' ratified
-sentences); 17:00 team meeting decides: cnov GO (prep is one line
-from launch, gemma2 substrate, T≤16 zone), R22 caveats, RLHF/
-probing verdict ratifications, A6→Dmitry (Gen-2 runs non-public),
-integrity posture (A12 filesystem-grade), token rotations gated on
-mirrors (mac-c completing). Watcher: scratchpad/watch_origin.sh
-(deadline 18:00, exit 0=arxiv, 3=neurips-aniket, 2=deadline);
-cron 44d0aa83 fires :13/:43. All standing discipline + quote
-licences in LOG. Program spend ≈$115 Modal + pod hours; caps fine.
+- **runpod-1** (3×H100 pod, GPUs 0/1): P1 grid CLOSED (zero fails);
+  RM HALTED (identity); owes: hardening tests (a)+(b) → identity
+  CERTIFICATE entry; T{6,10} probing extension; per-k fig re-render
+  at 7 points. eval_consumes seam owner-review CLOSED (T=1 test).
+- **runpod-2** (same pod, GPU 2): s2_T16 draining → RLHF FINAL fig;
+  then RLHF equivalence check (with positive control) → relu-mix
+  card CANCELLED if identical, else train; then T{6,10} RLHF
+  extension overnight.
+- **runpod-a** (2×H100 pod A, GPU 0): released from RM hold →
+  **reask screen card** (the wave-3 survivor: 548 events, floors
+  ≤.57, anti-dup clean) — freeze+run when GPU frees; then re-entry
+  packets optional. Wave-1/2 hunt CLOSED (tret/xtrend/sage/tret_py
+  breadth w/ replication receipts; cnov panel DEFERRED to Aug-3
+  window, prep durable).
+- **runpod-b** (pod A, GPU 1): λ̂ overlay drain → gate verdict + fig
+  TONIGHT (sole open lane); then W2 replication receipts row
+  updates staged.
+- **runpod-c** (2×H100 pod B, dedicated): T-SCALING HILL-CLIMB.
+  CARD 0 split frozen (dev-8/holdout-28, pyramid gates); candidate
+  1 = RECOVERED txc_pro (docs/recovered/txc_pro_phase5b_subseq_h8.py
+  — NOT from yaml: h_size=d_sae//5, k_pos=20, k_train100/k_inf200
+  asymmetry pre-registered, revive as NEW id txc_pro_r1);
+  **ZERO real T-scaling evidence exists for txc_pro** (A12-aware
+  dig) — no prior. No-idle directive: baseline twin on GPU 0 NOW,
+  txc_pro_r1 L1 on GPU 1 when plugin lands; owes utilization
+  report. Their eval-dispatch seam CLOSED (25/25 tests).
+- **mac-c** (mac, CPU + Dmitry's RunPod key): LANE CLOSED $0 —
+  dharm KILLED (155.6 tok/chain, 3 position strata — corpus fails
+  the clock bar; predictions confirmed; schema leak disclosed
+  pre-run); msdose_r1 verdict instrument frozen (realized-vs-
+  realized, pre-registered kill bands); sycgen frozen (age face
+  single-carry after clock-bar self-demotion of the rate face;
+  "geometry can kill but not clear" = standing rule for generated
+  corpora). SAFETY_TASK_MENU (16 + §10's 7 entries) = wave-3
+  source; emoinst WRITEUP row corrected (ran-and-KILLED 07-24).
+  Available for next assignment.
+- Retired: mac-a/mac-b (→ runpod-a/b, dirs removed).
 
-## (superseded) ACTMIX FLEET LIVE ~21:15 London 2026-07-26 — 5 workers + hub
-All five workers launched by Han with briefings received: mac-a
-(relu_mode impl + calibration + KEEP-recheck), mac-b (forensics +
-shortlist), mac-c (archaeology + HF inventory), runpod-1 (probing
-ablations, GPUs 0,1), runpod-2 (EM ablations, GPU 2). Pod
-acceptance GREEN (separate venvs import OK, pinning 2/1, git
-identities set; tokens seeded incl. hf_token_datasets; Anthropic
-key deliberately NOT on pod — subscription login). Listening
-topology in actmix-shared (hub-and-spoke; pods watch mac-a's
-convention + mac-c's audit + my rulings). MY watch: hub watcher
-(arxiv + neurips-aniket, deadline 09:00 London) + 30-min cron.
-MY queue: freeze-review every card pre-results as it lands;
-ratify mac-a calibration (Dmitry's re-run gate) + mac-c audit
-(pods' Phase-B unblock) + mac-b shortlist (re-run gating);
-rolling ledger watch ($150/day/person); assemble the 9am-PT
-one-pager (composition audit + calibration read + ablation state)
-by ~16:00 London 2026-07-27. Expected first landings: mac-a
-convention note (~1h), mac-c partials (~2h), mac-b forensics
-(~1-2h), pod cards + cache-build ledger lines.
+## SECURITY / KEYS / GOVERNANCE
 
-## (superseded) ACTMIX PHASE (Han, ~20:15 London 2026-07-26)
-Post-meeting pivot. Activation-mixing finding on record (LOG
-~20:25): txc_base TopK→ReLU k=8T (paper d(perf)/dT biased down);
-v2 backbone ReLU→BatchTopK (sae 4.4/8 most handicapped, hunt
-margins flattered — guarded by our l0 notes). Allocation:
-mac-a = relu_mode impl + ttrend calibration (Dmitry's re-run gate,
-want before 9am PT) + KEEP survives-the-fix; mac-b = forensics +
-salvage shortlist (ACTMIX_FORENSICS.md); mac-c NEW (clone created,
-~/research/projects/agents/mac-c/temp_xc) = branch archaeology
-(paper = han-phase7-unification / dmitry-em-repl /
-aniket-runpod-ward-stage-a) + HF inventory han1823123123 (3
-paper-era datasets; token ~/.tokens/hf_token_datasets, 600,
-verified; NEVER in git; rotate post-weekend) →
-COMPOSITION_AUDIT.md; runpod-1 = probing, runpod-2 = EM (H100s,
-Han spinning up — briefings pushed, WAITING on pod access from
-Han; Phase A btk-only immediately, Phase B paper-match blocked on
-mac-c). Backtracking = Aniket 100%, hands off. Arm labels
-relu-mix/btk-only/paper-match mandatory. $150/day/person cap.
-MY queue: dispatch mac-c; confirm mac-a/b pickup (liveness rule);
-freeze-review calib + forensics + audit; pod driving once access
-arrives; 9am PT one-pager (composition audit + calibration read).
+- HF tokens: ~/.tokens/{hf_token,hf_token_datasets}; pods have
+  /workspace/.tokens/ (gh, hf×2; NO Modal, NO Anthropic-API — Max
+  /login per pod session).
+- **Dmitry's RunPod key: keychain `dmitrys-runpod-api-key`**
+  (plain `runpod-api-key` RESERVED for Han's future key). Verified
+  live (balance ≈ $544, acct limit $80/h). GOVERNANCE (binding, in
+  actmix-shared): mac agents only; $10/h/agent; terminate-when-done
+  + API-verify; NO writes to pods you didn't spin up (incl. Han's 3
+  hand-provisioned); name `<agent>-<purpose>-<mmdd>`; ledger both
+  ends. S2 key: keychain `s2-api-key`, hygiene per briefing (mac-c
+  never used it — clew sufficed). ALL tokens rotate post-weekend.
+- dharm HF gate: mac-c's request packet went to Han; access may
+  have landed (their kill ran) — moot now the corpus is dead.
 
-## (superseded) SALVAGE CLOSED ~19:15 London 2026-07-26 — BOTH DELIVERED
-**ttrend TXC-post = KEEP T{16,32}** (R28+R29 ratified by me, team
-pending; pooling-free L1 lane carries; fig4 in WRITEUP §4).
-**Novelty cross-ratified** (CROSSRATIFY.md FINAL, doubly pending;
-gate gap closed favorably; 3 flags for Andrii: T-pin, pooled-audit
-defect, position-triage contradiction). dq = Task 3
-passed-then-demoted. WRITEUP restructured 15907d434 (9 sections).
-Sprint actuals ≈$10; program ≈$96 actuals of $500. REMAINING QUEUE:
-team ratifications (R22 caveats, R28/R29, quote licences, novelty
-handoff to Andrii); HF checkpoint mirrors BEFORE token rotation;
-token rotations post-weekend; post-deadline items (em-redo,
-PROBE_V2_SPEC freeze, factory r4, rate_ver, gemma slen-fill).
-Salvage briefings deletable per briefings/README convention once
-team ratifies (kept until then as the sprint's terms of reference).
+## HOUSE RULES (living)
 
-## (superseded) SALVAGE PHASE (Han, ~16:30 London 2026-07-26)
-dq DEMOTED (surface-reading fragility at T≥16) to order-mechanism
-support; salvage briefed: mac-a = ttrend POST fresh-seed panel
-(salvage-mac-a.md), mac-b = txcwin novelty cross-ratification
-(salvage-mac-b.md), shared = salvage-shared.md. Budget fine < $500
-total (spent ≈ $87).
+Pull-rebase before push; LOG conflicts keep BOTH blocks
+(python re.subn recipe), stray-marker grep after EVERY resolution
+(baseline count 1 = the rule quoting itself); scorer-committed-
+before-deciding-result; freeze→pin→ledger; venue amendments = one
+disclosed line; eval_extra namespacing for non-canonical cells;
+PTR everything, mac-local ratifies on push; binding wave-3 bars:
+out-of-window-by-construction + clock-stated-first; generated
+corpora: per-token baseline binding, geometry can kill not clear;
+identity-claim standard: independent verification + positive
+control + far-end spot-check (this window's addition).
 
-**EXECUTION MODE (corrected ~16:55): the PRIOR STANDALONE worker
-sessions are LIVE and own their lanes.** My ~16:36 dispatch of
-fresh executor subagents was a near-miss on a false dead-session
-premise — both stood down $0/untouched (BOTH confirmed; mac-b's
-second-eyes pre-flight yielded the report.py pooled-pseudo-cell
-audit finding, now in LOG). Adopted rule in LOG: a quiet clone is
-UNKNOWN, not dead — positively check for a live session before
-re-dispatching. W1 in flight (freeze 50af78f12, Modal app launched
-~16:38, est ~$10); W2 GAP-A landed (2e163e126), GAP-B rawgate
-launched (ledger 789b4f10d, est ~$4). Program est ≈ $101 of $500.
+## WATCHER / OPS
 
-DONE 16:35–16:55: WRITEUP demotion edit pushed 9b6199be5 (title,
-§1, §4 'passed-then-demoted' + objection, §5 note); distillation
-§9 EVENING ADDENDUM (demotion, salvage state, revised decision
-items incl. bless-the-salvage-bars-tonight); BOTH freeze-reviews
-APPROVED in LOG (W1 k-resolution RATIFIED — my briefing's k=8·T
-was the error, primary claiming = k_pos 8 panel-identical; W2
-approved with the audit's 8B/T-pin flag); GAP-A RULING in LOG
-(8B is band 2 by the card's letter via oracle-position V-all;
-surface-quiet survives only in decomposed form + position-residual
-instrument caveat; V-win joint fit + T16 nuance required in memo).
+Hub watcher: SESSION scratchpad `scratchpad/watch_origin.sh`
+(NOT repo scratchpad); exit 0=arxiv push, 3=neurips-aniket push,
+2=deadline (now set 2026-07-28 12:59). Re-arm via run_in_background
+after EVERY beat (never inline `&`). Multiple stale instances can
+pile up — each fires once on the next push; check
+`git log HEAD..origin/arxiv`, empty = own-push echo. Pod ssh =
+PTY-only piped-stdin (`-tt`, stty -echo for secrets, grep -av 2004
+filter). Pods: old=j42plcul70a2es-64410eb7, A=0lmrs9lk8apyhm-644121b8,
+B(runpod-c)=l2bp61kg82epel-64411fb1, all @ssh.runpod.io -i
+~/.ssh/id_ed25519.
 
-MY queue: (1) freeze-review both salvage cards PRE-RESULTS the
-moment freeze commits land (watcher fires on push); (2) rolling
-review + ratification of salvage verdicts/receipts; (3) WRITEUP +
-distillation salvage-outcome updates (possible ttrend/novelty
-replacement §4 + fig4 integration); (4) 18:00 London check-in
-decisions: R22 caveats first, verdict ratifications, quote
-licences (dq licence now order-mechanism-scoped), salvage-bar
-blessing, HF checkpoint mirrors before token rotation.
-Watcher: scratchpad/watch_origin.sh RUNNING; re-arm after each
-firing. /loop cron 44d0aa83 active (13,43 * * * *).
+## IMMEDIATE NEXT ACTIONS (post-compact checklist)
 
-## PIVOT EXECUTED 2026-07-26 ~11:00 London — DISTILLATION FINAL
-Overnight wave COMPLETE and fully reviewed: R22 (tsae bound, 2
-caveats for team), R20/R21 (slen KEEPs + ladder collapse), R23
-(refmark kill), R24 (quotedens KEEP, T≤32). RECEIPTS 28 claims ALL
-PASS at close; suite 332+1skip green; ledger ACTUALS ~$33/$500;
-both agents idle, queue-complete. **DELIVERABLE:
-`private/sunday_distillation_2026-07-26.md` (FINAL)** — agenda item
-1 = R22 caveat ratification; item 6 = mirror the 3 Volume
-checkpoints to HF BEFORE token rotation. Check-in 10:00 PT
-(18:00 London).
-
----
-
-## DELTA ~11:45 London 07-27 (post-compact, supplements the ~11:30 resume block)
-
-- **Han raised the hunt budget: up to $200 Modal for hunt lanes over
-  the 10 h window → ~21:30 London** (LOG + actmix-shared amended,
-  commit 685a2a006). Gen-4 scaled: 6–8 faces, both substrates,
-  T{4,8,16,32}, shuffle twins at screen, immediate llama31 leg on
-  order-KEEPs, §6b resume. cnov panel still 17:00-pick-gated.
-- Pod verified 11:33: GPUs 0/1 hot (runpod-1 P1 probing lanes,
-  steps advancing); **GPU 2 idle → runpod-2 chased via LOG** (launch
-  RLHF P1 + interim 2-seed fig for 17:00; one-line-if-blocked rule).
-- WRITEUP §8: hunt3 rows APPLIED this commit (nvtrend breadth +
-  tempo/qres/chaz kills) — open item (c) CLOSED.
-- Still open: runpod-1 formal probing verdict entry + tsae column;
-  mac-c HF mirror completion (gates rotations); gen-4 rolling review;
-  17:00 one-pager decision items; watcher deadline 18:00 London.
-
----
-
-## DELTA 18:00 London 07-27 (wall) — state for any resume
-
-- **Meeting doc DELIVERED**: `private/meeting_tsweep_plots_2026-07-27.pdf`
-  (7 pages: probing 36-task headline + 38 twin, λ̂, ttrend, dq, fig3
-  order-receipts page; cover = status table + shuffle-readiness).
-- **Probing aggregation flag RESOLVED**: substrate verified
-  (gemma-2-2b-it L13); headline = SAEBench-36 CT-excluded
-  (e77574ffd); dual-render (me + runpod-1) digit-identical;
-  committed figs = fig_probing_shuffle_tsweep{,_38task}.
-- **Migration DONE**: mac-a/b retired → runpod-a/b on new 2×H100 pod
-  (ssh 0lmrs9lk8apyhm-644121b8@ssh.runpod.io); tokens seeded; Modal
-  limit non-blocking (Dmitry raises at leisure).
-- **In flight**: λ̂ overlay (retrains done, gate verdict + fig next
-  push; identity tol 2e-3 per A1/A2 approved w/ 5e-3 gap floor);
-  ttrend overlay (21/21 rows, same); RLHF ext_c tail s2@T{8,16}
-  (drain ~20:45 → FINAL fig); w2 replication queued behind; cnov
-  pick STILL PENDING from the meeting — on GO runpod-a executes
-  (caches pre-built).
-- Hunt envelope spent ≈ $50 of $200. Watcher: re-arm each beat
-  (script in SESSION scratchpad, not repo). Stamps: use `date`.
+1. Watch for: runpod-1 hardening tests (a)/(b) results → rule on
+   the certificate; runpod-2 RLHF FINAL fig + equivalence-gate
+   result; runpod-b λ̂ verdict + fig; runpod-c utilization report +
+   L1 first signals; runpod-a reask card freeze.
+2. Review-on-push everything; ratify or bounce.
+3. Rolling: T6/T10 rows land overnight → 7-point fig re-renders →
+   next-meeting deck refresh.
+4. Ledger sweep + pod-idle checks each beat; hunt envelope ≈$60
+   spent of $200; pods within caps.
+5. 3pm PT (23:00 London) check-in support if Han asks; Dmitry's
+   draft may need the quote licences (all in LOG: k-inversion
+   sentence, identity certificate pending, framing guards).
