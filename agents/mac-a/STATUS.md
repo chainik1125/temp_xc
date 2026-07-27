@@ -1,61 +1,46 @@
 # Working state — agent `mac-a`
 
-**2026-07-27 ~13:25 London — GEN-4 (59ad15f38 + c1c5c949e rescale
-$200/10h): HUNT4 FROZEN 35d20e3cb, first wave LAUNCHING (gpt2 +
-gemma2_2b, 2× L40S, 5 faces, full-ladder shuffle twins). Slate 7
-designed → 5 screened; xret killed $0 (anti-dup 0.809–0.812 vs
-tret); rdens = separate Ward lane (tokens fetched, llama31 tok,
-chaz-style card next, window-MEAN control binding). Third-leg rule:
-llama31_8b immediately for any face not 2/2-KILL, same driver
-`--models llama31_8b`, same pin. § 6b slen gemma fill COMPLETE
-(resume ran clean, result committed 5851189d9 — scoring is mac-b's
-card machinery). cnov panel UNTOUCHED, 17:00-pick-gated: at the
-pick, one DS line in hunt3/run_cnov_panel.py → freeze → pin →
-merge-script commit → ledger → launch (staged per 1348a661a).
-Idle-watch monitor re-armed post-compact (bmq5qm27h). Spend:
-W1+overnight ≈ $14.5; today's hunt lanes on the $200 envelope
-(slen ~$2 + hunt4 wave-1 est $12–18 on ledger).**
+**2026-07-27 ~16:05 London — GEN-4 WAVE-1 CLOSED (bundle verdict
+ab1597c65, PTR): tret KEEP 2/3 → BREADTH (T64 arms, wd to +.117, no
+T ≤ 32 order — e39204547 routing verbatim), xtrend KEEP 2/3 →
+BREADTH (order 1 model), sdom WEAK w/ 3/3 order receipts on record,
+xnov WEAK, tretd SKIP-infeasible; rdens WEAK ratified (seed 3
+closed); actuals ≈ $8 hunt4 + $1 rdens. **WAVE-2 LAUNCHED ~16:00**
+(freeze 22b38d65e, pin in driver; 4× L40S: wikitext103 + pycode ×
+gpt2 + gemma2_2b; sharpened question pre-stated in card § 1:
+reproduce the tret KEEP / move it into the claiming ladder / add
+the missing order component; est $14–22; monitor b9fm2in6v). mac-b
+replication leg live on my 2 KEEPs (their freeze 6f1d7afa9, ETA
+~16:30). cnov panel UNTOUCHED, 17:00-pick-gated — staged sequence
+unchanged: one DS line in hunt3/run_cnov_panel.py → freeze
+card+runner+scorer one commit → push → pin from origin-history →
+merge-script commit → ledger → launch. Idle watch bmq5qm27h.**
 
 ## In flight
 
-- **hunt4 first wave** (freeze 35d20e3cb; APPROVED 21bcbfbb5):
-  gpt2 leg DONE + repatriated (~14:05) — INTERIM scorer read (PTR,
-  not quotable): xnov/tret/xtrend WEAK (gains .025–.042 < .05;
-  xnov floor-blocked at best T), sdom KILL (tok_within_002; wd
-  order margins largest of slate, moot on KILL), **tretd SKIP —
-  test class-0 starved 226 < 300 (the position instrument biting;
-  scorer patched with SKIP handling pre-completion)**. gemma2_2b
-  still running → bundle verdicts + third-leg rule (every face not
-  2/2-KILL) fire when it lands.
-- **rdens screen** (freeze 0045ce40c, APPROVED; launched ~13:55,
-  image building; mechanical scorer rdens/verdict.py committed
-  BEFORE results).
-- Known events: 17:00 team pick (cnov panel = my staged item);
-  window ends ~21:30 London.
+- **hunt4w2 first wave** (b9fm2in6v): repatriate → hunt4w2/results/
+  screen_<corpus>_<model>.json × 4 → `hunt4w2/verdict.py`
+  (hunt4 rules verbatim) → bundle per (corpus, face) → PTR LOG.
+  llama31 leg CONDITIONAL (needs gen4c npz+floors regeneration —
+  card § 2 prices it).
+- 17:00 team pick → cnov panel execution (my staged item).
+- Window ends ~21:30; wave-2 verdicts expected ~18:30–19:30.
 
-## Evidence-line pre-registrations (card § 3, for the verdict read)
+## Gen-4 record (all PTR unless noted)
 
-tret/tretd/xtrend floor-FREE across ladder; xnov/sdom claim zone
-T ≤ 16; traps disclosed: tret/tretd position 0.98, tretd doc-mean
-0.89, xnov doc-mean 0.82 — instruments = position-matched manifests
-+ position-floor arm + BINDING wd arms.
-
-## Earlier today (closed)
-
-Overnight: § 1 hunt3 (cnov panel-gate + nvtrend breadth, ratified),
-§ 6d PROBE_V2 draft, § 6b parked→now complete, chaz KILL. W1 ACTMIX
-btk-only + R30 identity (Stage 3 cancelled af2247d43). cnov panel
-launch-prep complete (1348a661a): runner/scorer/driver staged,
-PICK_PENDING guards, card freeze-ready.
+Wave-1: 7 designed → 5 screened → 2 breadth KEEPs (tret, xtrend);
+xret $0 kill (anti-dup 0.81); tretd infeasible (position
+instrument); sdom order-consistent/level-fragile datum; rdens WEAK
+(g_agg, ratified). Wave-2 slate: tretd_wt (P1, chance-flat floor)
+> tret_wt > sage > tret_py; drev $0 kill RATIFIED (04a5d2186).
 
 ## Assets / recovery
 
-- hunt4: labels/hunt4_* (lib, builder, 3 npz w/ fp16 floors, stats),
-  hunt4/{HUNT4_SCREEN_CARD.md,screen.py,verdict.py}, driver
-  scripts/modal_hunt4_screen.py (pin 35d20e3cb).
-- slen: results/screen_gemma2_2b.json committed 5851189d9.
-- ward_stream fetch (scratchpad): token_ids.npy, trace_idx.npy,
-  meta.json (model NousResearch/Meta-Llama-3.1-8B, 4044×128, 300
-  traces).
-- Monitors: idle watch bmq5qm27h (persistent).
-- Ledger: hunt-lane lines under the c1c5c949e $200 envelope.
+- hunt4: freeze 35d20e3cb; results + verdict.json committed.
+- hunt4w2: freeze 22b38d65e; labels = mac-c gen4c npz + my
+  gen4w2_floors npz; harness hunt4w2/{cache_acts,screen,verdict}.py;
+  driver scripts/modal_hunt4w2_screen.py; Volume dir
+  /workspace/hunt4w2_screen (replag volume).
+- rdens: freeze 0045ce40c; verdict committed.
+- Ledger: hunt-lane spend ≈ $12 actual so far of $200 (est lines
+  outstanding: wave-2 $14–22).
