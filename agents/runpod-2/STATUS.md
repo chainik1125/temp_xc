@@ -5,62 +5,60 @@
 `/workspace/agents/runpod-2/temp_xc`, own venv (peft + einops added
 — not in pyproject).
 
-## Where things stand (2026-07-27 ~08:10 London)
+## ACTIVE (2026-07-27 ~12:00 London) — P1 seed extension RUNNING
 
-**RLHF ABLATION: COMPLETE + RATIFIED (mac-local 01c5244fc ~08:15)
-with quote licence** — LEAD with R-E1 (shipped-ckpt shuffle control
-confirms the paper; gap +0.012; length-spurious 3→1 under shuffle
-while AUC holds); T-sweep = order-free inverted-U; R-E5 quotable as
-"sparse RANDOM projections carry the preference signal above every
-trained dictionary at this budget class" WITH the l0-mismatch
-disclosure beside it; joins the untrained-boundary story as the 5th
-substrate. My tsae serving pointer (36df9ffb6) was accepted and
-restores runpod-1's trained tsae column (their amendment 2b).
-Verdict originally posted PTR (LOG ~08:05). Card `actmix_rlhf/CARD.md` freeze 72b0ca729 (approved
-ba8af7bf9 + c4595d533) executed in full:
-- paper-match arm (eval-only, 4 shipped seed-42 ckpts, case-study
-  artifact `results/papermatch.json`): headline = the missing
-  shuffle control CONFIRMS the paper's reading (agentic gap +0.012;
-  3-length-spurious reproduced exactly). Provisionally ratified
-  c4595d533; FINAL ratification rides the full verdict.
-- btk-only arm (canonical runner, 25 leaderboard cells): T-sweep =
-  order-free inverted-U (0.578→0.626→0.611, gaps ≈ 0 every T, both
-  seeds, 100·T/tok parity held). R-K1..3 ✓, R-E1..E4 ✓ (E4 on seed
-  mean, per-seed split disclosed), R-E5 informative MISS: untrained
-  k500 twins 0.659 > every trained cell (random projections carry
-  the currency).
-- Artifacts: `actmix_rlhf/{results/{papermatch,rlhf_table}.{json,md},
-  figs/rlhf_tsweep.*}`; analysis = `analyze.py` (mechanical),
-  `render_figs.py`. Ledger actuals ≈ $30.
+Governing directive: **059a66239 pod-saturation plan** (+ Han's
+direct message): P1 = RLHF figure top-ups. Card amendment **A1**
+(§ 7, freeze 421f6fa37): seed 2 @ T{1,2,5,8,16} + s1 @ T{8,16},
+trained txc only, 7 cells ≈ 9.2 GPU-h ≈ $28 (measured solo basis).
 
-**EM: closed** under Han's full stop (dca32ce6b) at ~00:30 — 3
-landed cells NON-QUOTABLE-pending-Dmitry, close-out LOG entry +
-handover preserved (caches/ckpts/wall-logs on volume; threshold-
-transfer flag acked by mac-a in their HUNT3 note). Nothing EM
-relaunches from this fleet.
+**In flight on GPU 2** (orchestrator `run_ext.sh`, pin 421f6fa37,
+nohup, log `/workspace/logs/actmix_rlhf_run_ext.log`):
+- phase A (~11:50→13:10): ext_a=[s1_T8] frac 0.52 ‖
+  ext_b=[s2_T{1,2,5}] frac 0.34
+- phase B (auto-chains): ext_c=[s1_T16, s2_T8, s2_T16] serial
+  uncapped; s1_T16 lands ~15:50, all drained ~19:45.
+Wall jsonls: `/workspace/logs/actmix_rlhf_runs_ext_{a,b,c}.jsonl`.
 
-**GPU 2: IDLE** as of ~08:05 (all lanes drained ok: r 14/14,
-rs 4/4, s1 7/7; zero FAILs post-relaunch). No further runs planned
-by me — standing priority test (task hunt / RLHF / sparse probing)
-satisfied on my side; awaiting team-review outcomes + the 9am PT
-meeting.
+**Figure**: `figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` —
+INTERIM (2 seeds, T8/T16 n=1 disclosed on-figure) PUSHED 7f3fb62ee
+(~11:55, in time for the 17:00 draft). Renderer =
+`actmix_rlhf/render_writeup_fig.py --tag {interim,final}`.
+Refresh interim when s1_T16 lands; **FINAL --tag final** when all
+7 land, + `analyze.py` table refresh (seed-2 whitelist already
+patched) + LOG verdict-extension entry PTR + ledger actuals +
+**report state by ~21:30 London**.
 
-## Standing watchers (session-local; re-arm on wake)
+**Watchers live (session-local; re-arm on wake/resume):**
+- attention: FAIL in ext lane logs OR s1_T16 line in ext_c jsonl
+  → refresh interim render + push
+- completion: "all lanes drained" in run_ext.log → FINAL sequence
+- origin listener: 150 s poll (archs/, LOG, COMPOSITION_AUDIT,
+  briefings/, archs.yaml) — re-arm after EVERY wake, full 10 h.
 
-- origin listener (archs/, task_hunt LOG, COMPOSITION_AUDIT,
-  briefings/) — poll 150 s.
-- No lane monitors active (nothing running).
+**P2 stance** (in LOG): GPU 2 P1-saturated until ~19:45; can take
+λ̂-Ward layer screens 20:00–21:30 if runpod-1 hasn't claimed them
+— state either way at the 21:30 report. cnov panel pick-gated —
+screens only, NO panel cells.
+
+## Closed earlier (context)
+
+RLHF core: RATIFIED with quote licence (mac-local 01c5244fc) —
+R-E1 shipped-ckpt shuffle control confirms the paper; order-free
+inverted-U (peak T8); R-E5 untrained 0.659 > all trained. EM:
+closed under Han's full stop (dca32ce6b), 3 cells
+NON-QUOTABLE-pending-Dmitry, nothing EM relaunches. Paper-match
+eval-only arm: `actmix_rlhf/results/papermatch.json`.
 
 ## Ledger
 
-RUNPOD section in briefings/MODAL_SPEND.md — runpod-2 weekend
-actuals ≈ 14.5 GPU-h ≈ $44 (EM ~$13.5 + RLHF ~$30) of $150/day cap.
+`briefings/MODAL_SPEND.md` RUNPOD: weekend actuals ≈ $44; today
+est line for A1 ≈ $28 (reconcile to actuals at close). $150/day
+cap intact.
 
 ## If resuming after compact
 
-Read this file + the LOG tail (my ~08:05 verdict + any team
-ratifications after it). Possible follow-ups the team may ask for:
-seed-1 T8/T16 (pre-declared stretch, ~4 GPU-h), autointerp stage
-(needs API budget), s1 panels in the figure, REBUTTAL_PACK-format
-rows (mac-b's d9df9d0c9 format) for the one-pager. Tokens rotate
-post-weekend — nothing token-valued is in git.
+Read this file, check the three watchers (re-arm any that died),
+`tail /workspace/logs/actmix_rlhf_lane_ext_*.log`, then the LOG
+tail. The FINAL sequence above is the standing next action. Tokens
+rotate post-weekend — nothing token-valued in git.
