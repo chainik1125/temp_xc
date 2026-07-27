@@ -15453,3 +15453,54 @@ of a +$8 corr were an artifact of this stamp — withdrawn; est
 $7–9 stands). Content of the entry unchanged.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+---
+
+## 2026-07-28 01:55 London (wall) — mac-c: KILL TRIAGE delivered ($0) — three corrections to the provisional read, incl. `evalage` is NOT generating
+
+`KILL_TRIAGE.md`. Every number is an existing receipt; nothing re-run.
+
+**Correction 0 — the queue line says "evalage (generating)". It is
+NOT.** Zero generation produced: vLLM would not install against the pod
+image's torch; both pods TERMINATED and API-verified, ~$0.85 actuals
+(`f49a7e506`), rather than bill while debugging. Cards frozen +
+ratified; backend switches to the MATS Claude API. Queue position
+unchanged — state corrected.
+
+**Correction 1 — `retryesc` is signal-UNTESTED, not signal-present.**
+I own those numbers: **all 5/6 passing bands are LABEL-SIDE**, and no
+probe ever ran (the GPU stage was never reached). What is established
+is an exceptionally well-conditioned *label* (censored-age floor
+**0.500** at every T, position 0.720–0.743, 2.7–3.4 M usable tokens,
+4,993 events) with a vocabulary leak that generation designs out.
+**Rebuild it — queue position right — but `retryesc_gen` enters as an
+UNTESTED candidate, not a rescued positive.** Logged so nobody later
+quotes "retryesc had signal".
+
+**Correction 2 — `dharm` cannot be screened at larger T at all.** Its
+documents are **155.6 tokens** with **3 position strata corpus-wide**;
+T64 is 40% of a document. A larger-T screen is not expensive, it is
+*undefined*. Rebuild-only. (Its doc-mean 0.993 / unigram 0.820 are
+content leaks, not pure geometry.)
+
+**Correction 3 — `warddebt` is squeezed from BOTH sides; I advise
+against the T64/T128 spend.** Kernel ≈154 tok: at T ≤ 32 the window
+cannot compute the face (discharge invisible, ρ(net, incurred-only) =
+**1.000000**); at T ≳ 154 the window contains the whole kernel so the
+**floor solves it** — exactly how `oprate` died at 84 cells. No T is
+both computable and non-trivial.
+
+**Classification:** certification-kills (rebuild) = `retryesc`,
+`sycpress`(=`sycgen`, queued); signal-absent (stay dead) = `emoinst`
+(per-token 0.856 won), `reask_hr` (order 0/3, runpod-a's receipts);
+structurally unscreenable = `dharm`, `warddebt`; `msdose` geometric but
+structural (within-doc ρ≈0.99 under every construction) ⇒ low priority.
+
+**I propose a THIRD class the directive did not name:
+STRUCTURALLY UNSCREENABLE** — no T exists where the face is both
+computable and non-trivial. Rebuild-or-nothing, never
+exploratory-screen candidates. That is what keeps the (correct) "don't
+abandon measured signal" principle from funding screens that cannot
+resolve anything.
+
+_Recorded-by: claude-fable-5 (mac-c)_
