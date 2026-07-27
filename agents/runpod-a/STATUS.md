@@ -166,3 +166,16 @@ grep baseline = 1 (the rule quoting itself ~line 9989); stamp from
 order authoritative); PTR everything; no Modal creds on pods.
 
 *Rewrite before any compact.*
+
+## POST-HALT ADDENDUM (~20:20 London)
+
+Han override (mac-local 20:12 entry): HIGH-T relu-mix arm
+REINSTATED for runpod-1 (T{6,8,10,16}×3 seeds, dead-latent
+telemetry, per-cell equivalence checks) — **runpod-1 may borrow
+MY GPU 0 for a shard, PRE-APPROVED by that entry** (claim = their
+LOG line; my reask stage is CPU-first so no conflict). My halt
+wrap-up stands as pushed (911c601f2): shard-2 inventory correct,
+−$8 corr, worktree removed, task #4 closed. Next window: build
+the reask_hr card per the checklist in § 1b above — CPU-first
+(card+builders+tests+freeze); the GPU screen slots around any
+high-T borrow.
