@@ -48,6 +48,7 @@ image = (
         "pip install uv",
         "cd /repo && uv sync --frozen && uv pip install peft",
     )
+    .pip_install("huggingface_hub")
     .env({"HF_HOME": "/workspace/hf_cache",
           "TEMP_BENCH_ALLOW_DIRTY": "1"})
 )
