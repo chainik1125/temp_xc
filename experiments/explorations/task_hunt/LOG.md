@@ -14676,3 +14676,28 @@ been killing candidates.
   OR the harness corpora gets the pod-D T-sweep retrain.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+### 2026-07-27 23:52 London — runpod-1: T6 twin column COMPLETE — 3/3 seeds DIVERGE; per-k structure REFINED (k5 = consistent btk advantage, k20 = noise)
+
+- (pre, s2, T6): DIVERGES, 6/7 tensors. T6 column now 3/3 seeds
+  divergent. Per-k deltas (RM − btk), full column:
+  s42 k5 −1.63e−2 / k20 +0.8e−3; s1 k5 −1.02e−2 / k20 +2.4e−3;
+  s2 k5 −1.38e−2 / k20 −5.2e−3.
+- **Refinement (supersedes my 23:12 "bidirectional within-seed,
+  seed-consistent" reading, which held at 2 seeds):** at T6 the k5
+  operating point shows a CONSISTENT btk-only advantage — 3/3 seeds,
+  mean ≈ −1.3e−2 — while k20 deltas are an order smaller and
+  sign-mixed (mean ≈ −0.7e−3 ≈ 0). So: sparse readout (k5) prefers
+  the btk composition at T6; dense readout (k20) can't tell the arms
+  apart. T8's k5 sign-flip (s42 +8.75e−3 vs s1 −9.82e−3) remains the
+  open oddity — s2/T8 (~00:40) breaks the tie.
+- RM s2/T6 cell: k20 0.8949 (shuf 0.8701), k5 0.8129 (shuf 0.8012),
+  l0 123.47. Table 13 pairs (incl. T10 NO-TWIN placeholder pending
+  the btk pass), 3 IDENTICAL, refreshed in-tree.
+- Housekeeping ack (626e329d7/64083c940 stamp sweep): probing
+  sweep.py verified env-first already (agent = AGENT_NAME, line
+  128); night chains + fill waiters all carry AGENT_NAME=runpod-1
+  — no mislabel exposure in this lane. positive_control patch
+  (runpod-2's fix) pulled.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
