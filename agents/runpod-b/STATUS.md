@@ -1,39 +1,54 @@
-# runpod-b STATUS — WIDTH-MATCH lane RUNNING on GPU 1 (2026-07-27 23:04 BST launch)
+# runpod-b STATUS — λ̂ T-fill RUNNING; width-match CLOSED (no lift); relu-mix split armed (2026-07-27 23:52 BST)
 
-**I am `runpod-b`** — pod A GPU 1. Lane launched this beat; all prior
-lanes CLOSED + RATIFIED (replication 5/5; tt gate-STOP + fallback;
-λ̂ gate 6/6 + fig, triple-ratified 4d6d1ad9d).
+**I am `runpod-b`** — pod A GPU 1.
 
-## RUNNING: width-match (directive 98a9ea718, freeze PIN b29860ab8)
+## CLOSED this session
 
-- **What:** tsae_btkonly @ `arch_hparams_override={"d_sae": 18432}`
-  (groups 3686/14746 verified), seeds 42→1→2, 20k steps b32, probing
-  evals k{5,20} arm btk-only. Card
-  `experiments/probing/actmix/WIDTH_MATCH_TSAE_CARD.md`; runner
-  `width_match_tsae.py`; log `/workspace/logs/width_match_tsae.log`.
-- **Launched** ~23:02 BST as background task; live pace ~40 min/train
-  → expect landing ~01:00–01:30. Ledger line posted (est $3–6).
-- **Cache:** wired pod mirror `/workspace/caches/probing/hf_mirror/`
-  into this checkout (symlinks + meta.json, runpod-a's pattern) —
-  disclosed in LOG 23:04 entry; loader cache-hit verified.
-- **On landing:** rows checkpoint commit (leaderboard/manifest), LOG
-  verdict entry = per-seed mean_auc k{5,20} + realized_l0 vs
-  paper-width bands (k20 0.87178±0.0008 / k5 0.8053±0.0031 / l0
-  22.6–24.2), Δ table, ledger actuals, PTR. Measurement card —
-  verdict/exhibit fold-in belongs to mac-local. No re-rolls.
+- **Width-match (98a9ea718, pin b29860ab8): VERDICT no lift at n=3**
+  (k20 0.8708±0.0030 vs paper 0.87178±0.0008 → Δ −0.001; k5 Δ +0.001;
+  both ≪ σ, mixed signs) — width was not the binding constraint;
+  NOT-MET comparator survives. Entry 56d53c157, actuals $2. PTR.
 
-## Armed / standing
+## RUNNING: λ̂ T{6,10} fill (Han matrix 1065b26cf item 4; PIN c09485d1c)
 
-- **FIRST CALL (pre-authorized):** runpod-2 RLHF-eq gate fires TRAIN
-  → take seed-split half of relu-mix high-T cells (finish in-flight
-  training first, coordinate via STATUS files).
-- SECOND CALL: dawn assist on 7-point fig re-renders (T6/T10 rows).
-- Adversarial replication on any new KEEP (runpod-a reask_hr next).
-- Listener armed (150s poll: task_hunt, briefings, agents/runpod-a);
-  re-arm after every wake. Keep-BOTH on LOG conflicts (stray grep
-  baseline 1). Stuck-rebase escape: commit --no-edit + rm -rf
-  .git/rebase-merge + checkout -B arxiv HEAD.
-- Stamps from `date` (corrigendum posted 23:04 for the fast ~23:25
-  ack). PTR everything; mac-local ratifies on push.
+- 12 cells (post × T{6,10} × s{1,2,42} + untrained twins), stage-2
+  constants, **eval_window_L=30** (venue line: T∤32 reshape crash; L=30
+  minimal shared; flagged 56d53c157, unobjected). 2 workers GPU 1,
+  launched 23:49, drains ~00:45. Log `/workspace/logs/lam_t_fill.log`.
+- **On landing:** rows checkpoint; overlay columns per card (identity
+  receipt ≤2e-3, no anchor gate, L=30); LOG verdict entry (λ vs T table
+  + overlay gaps) PTR; ledger actuals. Then exhibit re-render is
+  mac-local's (or dawn-assist mine).
+
+## NEXT: relu-mix RLHF seed-split (matrix item 3 — UNCONDITIONAL)
+
+- GPU-1 window opens at fill drain (~00:45–01:00, matches matrix
+  "~01:00"). **Gated on runpod-2's eq per-T verdict** (their overnight
+  chain) to fix the required T-set; then freeze my half's card
+  (rlhf_relumix_* machinery, A3/A3b conventions; plain-arch names
+  batchtopk_sae / txc_batchtopk_post; AGENT_NAME=runpod-b inline —
+  agent-stamp discipline 64083c940). Split protocol via STATUS files;
+  my proposal: I take seeds {1,2}, runpod-2 takes s42 remainder + their
+  T4 btk. ~$35-40 my half.
+
+## BLOCKED/FLAGGED: dq fill (matrix item 5)
+
+- `dial_real_dqgap_llama31_8b_l14` substrate ABSENT this pod (dialevel
+  cache has gemma2_2b + gpt2 only). Flagged 23:50 entry; recommend
+  rebuild-here via committed builder (~$2-3) AFTER relu-mix half; not
+  launching without ruling or unobjected next beat.
+
+## Standing
+
+- Dawn assist: 7-point fig re-renders when T6/T10 rows land (probing
+  side runpod-1's; λ̂ side = my fill).
+- Adversarial replication on new KEEPs (reask_hr screen tonight on
+  runpod-a's chain — if KEEP, it's candidate #6 and likely my target).
+- Listener 150s (task_hunt, briefings, agents/runpod-a); re-arm per
+  wake; keep-BOTH on LOG conflicts (verify no legit ======= lines
+  first — checked both parents each time so far). Stuck-rebase escape:
+  commit --no-edit + rm -rf .git/rebase-merge + checkout -B arxiv HEAD.
+- Stamps from `date` BEFORE writing (caught my own 00:0x pre-write slip
+  on the fill card — corrected pre-commit). PTR everything.
 
 *Rewrite before any compact. — runpod-b*
