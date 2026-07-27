@@ -1,66 +1,125 @@
-# runpod-c STATUS — T-scaling hill-climb (self-maintained)
+# runpod-c STATUS — T-scaling hill-climb (PRE-COMPACT REWRITE, 2026-07-27 22:56 London)
 
-**I am `runpod-c`**, alone on the dedicated 2×H100 pod. Mission: make
-TXC T-scaling improve with T on § 5.1 sparse probing. Governing docs:
-`experiments/explorations/tscale/{CARD_SPLIT.md,README.md,RESULTS.md}`.
+**I am `runpod-c`**, alone on a dedicated 2×H100 pod (both GPUs mine),
+workspace `/workspace/agents/runpod-c/temp_xc`, venv `.venv` (healthy),
+data substrate synced+linked (acts + 38/38 probe cache; mirror at
+`/workspace/caches/probing/hf_mirror`). Mission (Dmitry/Han 07-27):
+make TXC T-scaling actually improve with T on § 5.1 sparse probing,
+under the FROZEN dev/holdout discipline. Governing docs (all mine, all
+committed): `experiments/explorations/tscale/{CARD_SPLIT.md,README.md,
+RESULTS.md,make_split.py,l1_lib.py,run_l1.py,analyze_l1.py}`.
 
-## State (2026-07-27 ~19:58 London)
+## The one-paragraph story so far
 
-- **Split FROZEN + pushed** (CARD 0, LOG 18:57; f59bb1656 lineage).
-- **Plugin landed:** `txc_pro_r1` + `_btkonly` twins (recovered impl,
-  ratio-rule t_sample, T alias) + probing.py `eval_consumes` dispatch
-  — **owner-endorsed (runpod-1 20:45 LOG) and mac-local-closed
-  (19:46 LOG, "fully sanctioned; no veto")**; owner-required T=1
-  identity tests added (25/25 green; runpod-1 added their own twin
-  test too, 6627a2914).
-- **L1 screens (4k steps, dev-8 s42 k20; rows in
-  tscale/results/l1_rows.jsonl):**
-  - baseline twin `txc_batchtopk_pre_btkonly`: T1 0.8944 (l0 13.4 —
-    threshold-lag under-admission at 4k) / T4 0.9099 / T16 0.8810;
-    twin Δ16 = −0.0134 (signal alive at 4k).
-  - `txc_pro_r1` (paper) vs `_btkonly`: **training-identical at T1
-    (bit-identical traces), near-identical at T4 (Δ0.0001)** — mirrors
-    runpod-1's P1-RM arm-identity finding (d4645c242). T1 0.7985
-    (both), T4 0.8633/0.8634. **RISING slope (+0.065 T1→T4) but level
-    ~0.10 below baseline; L0 census: activation COLLAPSE at T1 (2%
-    of latents active in a full batch) + AuxK structurally INERT at
-    4k×b1024×t_sample=1 (4.1M tokens < 10M dead threshold).**
-  - T16 twins mid-train (step ~400/4000, still bit-identical); land
-    ~20:15–20:25 London. IN FLIGHT on both GPUs (pids 8424/8425,
-    logs /workspace/logs/tscale_l1_r1{p,b}.log).
-- **Serving note (disclosed in plugin commit):** scratch
-  `_FastSequenceServer` = GPU-resident, rng-identical twin of the
-  canonical SequenceBuffer refill (that path is ~1 s/step data-bound;
-  mine is compute-bound). Bitwise-same batches.
-- Fleet suite green except ONE PRE-EXISTING failure
-  (test_stage2_variance_panels::test_legacy_default_reproduces_committed_receipts
-  — fails with my changes stashed too; not mine).
+The recovered txc_pro recipe (revived as `txc_pro_r1*`) produced the
+program's FIRST monotone-rising TXC T-curve on the dev-8 (k20: 0.7985
+→ 0.8633 → 0.9153 at 4k steps vs baseline twin 0.8944 → 0.9099 →
+0.8810) but fails the frozen T1-level gate — its low-T cells suffer
+ACTIVATION COLLAPSE (2 % of latents active; census in rows). Ablations
+then EXONERATED contrastive AND matryoshka for both the collapse and
+the T16 win — stripped variants score BETTER at T16 (nocontr 0.9177,
+nomatr 0.9185) — so the SUBSEQ CURRICULUM ALONE carries the effect.
+Wave-3 grafts that curriculum onto the healthy BatchTopK backbone
+(`txc_btk_pre_subseq_btkonly`), whose T=1 cell is bit-identical to the
+baseline by construction (anchor gate passes trivially; CONFIRMED in
+production: T1 0.8944 ≡ twin). Its T16 cell decides everything.
 
-## Next concrete actions
+## IN FLIGHT RIGHT NOW (check these FIRST on resume)
 
-1. On T16 landing: `analyze_l1` verdict vs frozen gates → RESULTS.md
-   candidate-1 section + LOG PTR (first L2 signal beat) + ledger
-   actuals; commit rows.
-2. Twin redundancy decision (record in RESULTS): compositions
-   coincide ⇒ carry `_btkonly` only going forward (baseline's arm),
-   halving candidate cost.
-3. Next wave (pre-staged, launch after verdict): component ablations
-   via `--extra-hparams` — (a) `contrastive_alpha=0`, (b)
-   `h_size=18432` (matryoshka off) — collapse-culprit attribution ×
-   slope attribution, T{1,4,16} btkonly, 4k steps.
-4. Then: subseq-trick-isolated on the btk backbone (candidate menu
-   #4) — likely the money candidate if r1's slope is real (baseline
-   level + curriculum slope); needs a small plugin variant of
-   txc_batchtopk_pre_btkonly with t_sample masking.
-5. L2 (20k) only for gate-passers or explicitly-reasoned exceptions
-   (AuxK inertness at 4k is a known screen artifact — noted).
+- **GPU 0, pid 15978** — wave-3 L1 screen `subseq-btk-4k`
+  (`txc_btk_pre_subseq_btkonly`, 4k steps, T order 1→4→16, s42):
+  T1 0.8944 DONE (≡ twin exactly, l0 13.4 ✓), T4 0.8928 DONE (mild
+  dip vs twin 0.9099), **T16 train finished step 3999, EVAL RUNNING**
+  (~lands 23:10 London). Log `/workspace/logs/tscale_l1_subseq.log`.
+  **DECISION on T16:** twin T16 = 0.8810; r1-family ≈ 0.915–0.919.
+  (a) T16 ≥ 0.90 → first FULL L1-gate pass (slope via Δ16 vs twin
+  −0.0134, anchor exact, level clean) → write RESULTS C2 section, LOG
+  PTR, promote to L2 (20k, full dev grid, both k) per CARD § 3.
+  (b) T16 ≈ 0.88–0.90 → partial transfer; compare against nomatr-r1
+  (0.9185) and consider hybrid (subseq-btk with per-sample-TopK
+  train-time selection? or t_sample sweep 4/12 ablation) — record
+  either way. (c) T16 ≤ twin → curriculum did NOT transfer to
+  BatchTopK at 4k; the r1-stripped lineage (nocontr/nomatr) becomes
+  the carry — its L2 next.
+- **GPU 1, pid 13644** — A1-exception **L2 diagnostic**
+  `r1b-L2diag-20k` (`txc_pro_r1_btkonly`, 20k steps, T order
+  16→1→4): T16 at step ~12k/20k as of 22:54; T16 lands ~00:40, then
+  T1 (~45 min), T4 (~1 h) → full drain ~02:30–03:00. Log
+  `/workspace/logs/tscale_l2diag.log`. **Questions it answers:**
+  (a) T1 collapse resolved with AuxK live (20.5 M tokens > 10 M
+  threshold)? (b) T16 win holds at canonical steps? Per CARD § A1 its
+  result CANNOT reach L3 without passing the § 3 L2→L3 gates as
+  written.
+- **Background watchers armed** (session-local, will re-invoke):
+  `bkhtpqb3g` fires on wave-3 3rd DONE; `bldz2fiv3` fires on L2diag
+  first DONE. If resuming post-compact without them, just read the
+  two logs + `results/l1_rows.jsonl`.
 
-## House rules I'm bound by
+## Verdict + numbers ledger (dev-8 s42, 4k steps unless noted; k20)
 
-Pull-rebase (--autostash; l1_rows grows under running screens) before
-push; LOG conflicts keep BOTH + stray-marker grep; stamp from `date`;
-PTR everything; eval_extra namespacing for anything canonical; quoted
-rows untouched; no claim without L3 + ratification; ledger per
-session; $150/day cap.
+| arch/tag | T1 | T4 | T16 | note |
+|---|---|---|---|---|
+| baseline twin (pre_btkonly) | 0.8944 | 0.9099 | 0.8810 | l0 13.4/73/371 (threshold-lag at 4k) |
+| r1-paper / r1-btkonly | 0.7985 | 0.8633/0.8634 | 0.9153/0.9148 | twins training-identical; collapse T1 (2 % active) |
+| r1b-nocontr | 0.7955 | — | 0.9177 | contrastive exonerated (collapse + win) |
+| r1b-nomatr | 0.8024 | — | **0.9185** | matryoshka exonerated; stripped best |
+| subseq-btk (wave 3) | 0.8944 (≡ twin) | 0.8928 | **eval running** | T1 anchor by construction |
 
-*Rewrite before any compact.*
+k5 mirrors the story (r1 T16 0.8610–0.8711 vs twin 0.8267). ALL
+r1-family T16 gains are ORDER-FREE (shuffle gap ≈ 0 or negative) —
+pooled composition, NOT sequence structure — binding caveat for any
+eventual claim framing (fcf62963b regime). P1 20k-step baselines +
+SAE bands: CARD_SPLIT § 2.
+
+## Process state
+
+- **Frozen + pushed:** CARD 0 split (dev-8 listed in card;
+  holdout-28 untouched), pyramid gates, candidate-1 pre-regs, A1
+  amendment (mechanism-exception L2, invoked for r1 with L0 receipt
+  `frac_dead_threshold 0.0`).
+- **C1 verdict:** slope PASS / T1-level FAIL → NO PROMOTE as-is
+  (RESULTS.md C1 section + LOG 20:38 entry). Twin-drop decision:
+  btkonly carries; paper twin = faithfulness receipt.
+- **Plugins landed (all tested):** `txc_pro_r1(_btkonly)` (16+2
+  tests), probing.py `eval_consumes` dispatch (owner-endorsed
+  runpod-1 LOG 20:45; mac-local "fully sanctioned, no veto" 19:46;
+  T=1 identity tests added both lineages), `txc_btk_pre_subseq_btkonly`
+  (7/7 incl. bit-equal parent degeneration + slab-grad-leak).
+- **Known non-mine failure:** tests/test_stage2_variance_panels.py::
+  test_legacy_default_reproduces_committed_receipts fails PRE-EXISTING
+  (fails with my work stashed; disclosed in plugin commit).
+- **L1 harness notes:** `_FastSequenceServer` = rng-identical
+  GPU-resident twin of canonical sequence serving (disclosed; only
+  for consumes='sequence' scratch cells). 4k-screen caveats on
+  record: threshold-lag l0 (~13/20 at T1) and AuxK inert < 10 M
+  tokens (the A1 basis). Scratch rows: tscale/results/l1_rows.jsonl
+  (committed; ckpts gitignored under results/ckpts/).
+- **Ledger:** day-1 actuals ≈ $17 + overnight est $35–40 (posted
+  20:38 line). Cap $150 fine.
+- **Git:** clean at last push (wave-3 plugin commit); pull-rebase
+  --autostash before every push (l1_rows grows under running
+  screens); LOG conflicts = keep BOTH + delete marker lines (done 4×
+  tonight); cite subject lines not SHAs.
+
+## Next actions queue (in order)
+
+1. Process wave-3 T16 (decision tree above) → RESULTS.md C2 section
+   + LOG PTR + push. Include the T4-dip datum (0.8928 < T1) honestly.
+2. Process L2 diagnostic as cells land (T16 ~00:40, then T1 —
+   the collapse-with-auxk-live answer — then T4) → RESULTS C1
+   addendum + LOG. If r1@20k T16 ≥ its 4k level AND T1 recovers
+   toward twin: the stripped-r1 (subseq-only per-sample-TopK) at 20k
+   becomes an L2 candidate proper.
+3. Whichever lane passes its gates first → L2 full (20k, dev
+   {1,2,4,8,16}, both k) → then L3 holdout (canonical runner,
+   eval_extra `explore: tscale`, seeds {1,2,42}) ONLY via CARD § 3
+   gates + fresh LOG PTR + mac-local ratification. L3 must ALSO go
+   through the canonical ProbingEval (already compatible: subseq-btk
+   consumes='window' natively; r1 via the sanctioned eval_consumes).
+4. Menu items not yet touched: t_sample-ratio ablation (5 vs 8 @T16),
+   multi_window exposure fix, k-anneal, per-position k floors,
+   position-loss reweighting. Log negatives in RESULTS.
+5. Ledger actuals at session close; STATUS rewrite before next
+   compact.
+
+*Rewrite before any compact. — runpod-c*
