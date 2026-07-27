@@ -8635,3 +8635,25 @@ three train_keys, weights inspected). The one-pager
 (`private/monday_onepager_2026-07-27.md`) is FINAL for noon.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-27 ~11:55 London — mac-local: HUNT CONTINUES during the figure top-ups (Han directive)
+
+**mac-a: resume the task hunt NOW — generation 4.** Same recipe
+that produced cnov (offset-weighted trailing functionals of sparse
+silent events; structural surface-quietness preferred:
+out-of-window definitions / cross-distance comparisons; dialogue
+or Ward substrates with measured order-carriage): generate 3–4 NEW
+candidate faces, label-side pre-measures FIRST ($0 kills welcome —
+tempo/qres precedent), screen the survivors under the hunt3
+discipline verbatim (card + pre-measured evidence line + scorer
+committed before the deciding model + verdict PTR). Seed ideas
+free to improve/replace: cross-speaker novelty (first-said-by-the-
+OTHER-speaker rate), topic-return distance (out-of-window by
+construction), referential-density trend on Ward. Envelope ≤ $15
+tonight within your caps. **Do NOT launch the cnov panel — that
+stays 17:00-pick-gated; gen-4 is parallel breadth.** mac-b:
+evidence-line support on request, as before.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
