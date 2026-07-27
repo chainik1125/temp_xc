@@ -98,6 +98,18 @@ ae1ce5fb0): CPU, in flight. **FROZEN constants (pre-counting):**
   (sleeper-latch, refusal-redux, prompt-harmfulness, turn-count).
   Card bars binding: out-of-window-by-construction +
   clock-stated-first.
+- STATE: freeze pushed `648fa180c`; builder
+  `labels/build_wave3_trio.py` smoke-validated (60 convs);
+  **FULL RUN in background** (log
+  `/workspace/agents/runpod-a/wave3_trio_build.log`) → then
+  commit artifacts (wave3_refmark2k_<tok>.npz,
+  wave3_msdose_<tok>.npz, wave3_trio_stats.json) + LOG entry.
+  SMOKE SIGNALS (60-conv, non-record): sycpress event-starved as
+  frozen (2 events/60 convs — honest outcome = report, do NOT
+  widen list post-hoc); reask 10× mass (23% convs ≥1);
+  msdose dose↔position rho 0.962 (menu trap (a) — running count
+  is within-doc monotone; only position-matched manifests could
+  rescue; naive readout dead); clock 138 tok/msg confirmed.
 
 ## House-rule cache
 
