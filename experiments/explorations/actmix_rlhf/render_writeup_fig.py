@@ -114,11 +114,9 @@ def main():
         ax.annotate(f"T=16 − T=1: {delta:+.3f}", xy=(0.03, 0.95),
                     xycoords="axes fraction", ha="left", va="top",
                     fontsize=9)
-    ax.annotate("T=1: shuffle ≡ identity",
-                xy=(1, points[(1, 42)]["ordered"]),
-                xytext=(0.03, 0.83), textcoords="axes fraction",
-                fontsize=8, color="#555555",
-                arrowprops=dict(arrowstyle="-", color="#999999", lw=0.8))
+    ax.annotate("T=1: shuffle ≡ identity (by construction)",
+                xy=(0.03, 0.88), xycoords="axes fraction",
+                ha="left", va="top", fontsize=8, color="#555555")
 
     cov = " ".join(f"T{T}:n={k}" for T, k in zip(Ts, n))
     tag_note = ("INTERIM — remaining seeds in flight" if args.tag == "interim"
