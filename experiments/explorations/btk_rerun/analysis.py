@@ -92,6 +92,13 @@ def load_rows(leaderboard: Path) -> list[dict]:
         ec = r.get("eval_cfg") or {}
         if ec.get("smoke") or ec.get("eval_window_L") != EVAL_L:
             continue
+        tc = r.get("training_cfg") or {}
+        ov = tc.get("arch_hparams_override") or {}
+        # budget-scan rows (explicit k_win / non-canonical batch) are
+        # analysed separately in budget_scan.py — keep the headline
+        # figure on the paper budget rule.
+        if "k_win" in ov or tc.get("batch_size", 1024) != 1024:
+            continue
         rows.append(r)
     return rows
 
