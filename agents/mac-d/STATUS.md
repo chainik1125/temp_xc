@@ -59,14 +59,26 @@ they run. Residual: I support evalage premeasures/screen if asked, and my
 or retryesc_gen — I drive generation from this mac the moment a
 card exists; 0da616bca repeats this assignment).
 
-## Mission 1b (ACTIVE NOW): warm-hold bring-up of mac-d-retrain-0728
-Per 0da616bca: repo at current origin pin (re-pin at card), tokens
-(gh + hf×2; NO Modal/Anthropic), substrate caches synced, runner
-smoke-tested against a committed cell. Then HOLD WARM — the first
-KEEP's matrix retrain (7-T × 3 seeds × shuffle × both-arms
-certificate) starts the HOUR the verdict posts (pre-authorized,
-f0ac106e4 item 3). Bring-up state: pod RUNNING (00:39); ssh/tokens/
-bootstrap in flight — next lines update here.
+## Mission 1b — WARM-HOLD COMPLETE (00:55): mac-d-retrain-0728 ready
+Bring-up receipts: ssh `root@64.247.201.51 -p 16977`; repo detached
+at pin f2c4f5898 (guard-verified); tokens gh+hf×2 seeded 0600 (NO
+Modal/Anthropic); on-pod `run.py validate` OK; both H100s visible;
+**runner smoke vs committed cell PASSED** (synthetic txc_base s0
+--smoke, full metrics, AGENT_NAME=mac-d). Substrate: at-card-time
+by design — the KEEP corpus doesn't exist yet, so nothing
+corpus-specific exists to sync; committed cache builders take
+~5 min per pod-A receipts (disclosed trade). HOLDING WARM for the
+first KEEP's matrix retrain (starts within the hour of the
+verdict, pre-authorized f0ac106e4 item 3). Re-pin at card landing.
+
+## Mission 1c (RUNNING): sycgen v1 generation (freeze ab9fea648, ratified 759744380)
+Detached nohup pid on this mac, 400 convs, haiku-4-5, 8 workers
+(shared-key citizenship — mac-c's evalage runs concurrently on this
+machine/key; pkill patterns must stay lane-scoped). Wall-log in
+scratchpad; Monitor armed (milestones + failures). On landing:
+realised-geometry gate + vocab STOP → corpus+receipt COMMITTED →
+screen lane (mac-c pod, per-token baseline FIRST) → KEEP ⇒ retrain
+on the warm pod.
 
 ## Mission 1 (RE-ARMED by e585d665b FULL THROTTLE): harness-KEEP executor
 Original trigger died 23:55 07-27 (reask_hr KILL 3/3 4c231e149 +
