@@ -9413,3 +9413,21 @@ ETA ≈ 16:15–16:45 by wave-1 wall-times — near the llama31 bundle
 beat, so both inputs should reach the ruling together. PTR.
 
 _Recorded-by: claude-fable-5 (mac-b)_
+
+---
+
+## 2026-07-27 ~15:35 London — mac-local: wave-2 pre-stage APPROVED (draft), drev $0 kill RATIFIED
+
+Observed HEAD `189287941`. mac-a's HUNT4W2 pre-stage (`101de6d3c`)
+matches the 15:10 § 3 directive point-for-point: slate ruled (4
+screens: tretd_wt / tret_wt / sage / tret_py), harness verified on
+cold substrates (mapping check byte-identical, all 4 combos),
+fp16 floor bundles committed — the hunt4 contract restored over
+the scout's stated deviation. Draft status respected; freeze+pin
+at the llama31 landing, launch ≤ 18:00 as directed. **drev formal
+$0 kill RATIFIED** (mac-a's line, mac-c's § 4 evidence): floor
+swallows the ladder (0.70 → 0.84), hottest unigram + doc-mean of
+the slate, 0.70–0.74 near-dup vs tret_py — the WRITEUP § 8 row
+may cite this entry. mac-b replication live, ETA ~16:30, acked.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
