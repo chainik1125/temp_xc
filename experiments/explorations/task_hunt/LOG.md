@@ -14122,3 +14122,29 @@ sizes — prune the family from the menu before any spend.**
 Pipeline continues per the amended briefing (pod encouraged).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-27 23:35 London (date-verified) — mac-local — A5 FREEZE RATIFIED AS-IS (churn stop) + mac-d Mission 1 REPOINTED to hunt-retrain execution
+
+**A5 (57eb9edd4) RATIFIED as frozen — it supersedes my racing
+pod-D shard instruction (frozen cards beat in-flight directives
+when compatible, and this one is):** runpod-2 rmx_a T{1,2,4,6}×3
++ btk x4 + eq + x6/x10; runpod-b rmx_b T{8,10}×3 UNCONDITIONAL +
+rmx_b16 gate-conditional; T5 exempt via MEASURED RLHF identity
+(eq lane receipt, PTR — note the RLHF boundary differs from
+probing's, k-regime dependent); af7d0869b morning hard point
+preserved; +$26. My c50f7af3e runpod-b items amend to: rmx_b
+lanes FIRST, R30 spot-check pairs at drain (btk-T4-to-runpod-b is
+DEAD — runpod-2's x4 lane owns it). **No further re-routing of
+these lanes tonight — three reroutes in 20 min under racing
+pushes is the failure mode, not the throughput.**
+
+**mac-d Mission 1 REPOINTED (STATUS patched this push): execute
+the T-sweep RETRAIN of the first hunt KEEP** — reask_hr's verdict
+lands tonight (runpod-a chain); if KEEP, pod-D runs its full
+7-T × 3-seed × shuffle grid (the #6 exhibit — the hunt is Han's
+emphasized priority and this is its longest pole). Mission 2 =
+relu-mix relief shard ONLY if A5 slips past ~09:00. Card
+ownership: the screen owner (runpod-a / mac-c) freezes the
+retrain card; mac-d executes.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

@@ -13,11 +13,15 @@ mac-d addendum entry).
 **RunPod API governance block (BINDING)** and house rules.
 3. LOG tail from d8609e360 forward.
 
-## Mission 1 (NOW): RLHF relu-mix grid, pod-D
-- **WAIT for runpod-2's re-frozen relu-mix RLHF card** (they own
-  the card; watch LOG/`experiments/rlhf/` for the pin — expected
-  within hours; shard "pod-D both GPUs", ~18-21 cells ≈ T{2,4,5,
-  6,8,10,16}×{s42,s1,s2} minus certified-identical points).
+## Mission 1 (NOW): first hunt-KEEP T-sweep retrain, pod-D
+- **WAIT for the first hunt KEEP verdict + its frozen retrain
+  card** (reask_hr verdict tonight from runpod-a's chain; or
+  mac-c's first KEEP). The screen owner freezes the retrain card
+  (7-T grid {1,2,4,6,8,10,16} × 3 seeds × shuffle instrument);
+  you execute it on `mac-d-huntretrain-0727` (2×H100). The RLHF
+  relu-mix grid is NOT yours — A5 (57eb9edd4) owns it
+  (runpod-2 + runpod-b split). Mission 2 below is the only
+  relu-mix contingency.
 - Meanwhile: SPIN UP `mac-d-rlhfgrid-0727` (2×H100, secure cloud):
   env-inject the key (`export RUNPOD_API_KEY="$(security
   find-generic-password -s dmitrys-runpod-api-key -w)"` — never
@@ -36,9 +40,9 @@ mac-d addendum entry).
   by API query) → ledger actuals.
 
 ## Mission 2 (overflow, only after Mission 1 is launched):
-second executor pod for hunt-retrain cards if mac-c/runpod-a KEEP
-candidates need T-sweep retrains (their owners freeze the cards;
-you execute). Same lifecycle.
+relu-mix RELIEF SHARD only if the A5 split is slipping past
+~09:00 London (check LOG + row landings; coordinate with runpod-2
+before spinning up). Same lifecycle.
 
 ## Rules you are bound by
 Pull-rebase before push; LOG conflicts keep BOTH + stray-marker
