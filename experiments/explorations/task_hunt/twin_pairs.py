@@ -111,14 +111,22 @@ def _compare(path_a: Path, path_b: Path):
             )[:8])}
 
 
-def main():
+def main(only=None):
+    # ONE run_pool call per process (the grid machinery forks workers;
+    # a second pool in the same process wedged on an inherited lock —
+    # observed futex_wait deadlock, 2026-07-28). Select pairs via argv
+    # and MERGE into the existing results JSON across invocations.
     since = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 60))
-    out = {"card_note": "LOG twin note (committed with this driver)",
-           "config": {"d_sae": D_SAE, "k_pos": 8, "n_steps": N_STEPS,
-                      "buffer_tokens": BUFFER, "T": 16, "eval_L": EVAL_L,
-                      "seed": SEED},
-           "pairs": {}}
+    dst = HERE / "results" / "r30_twin_pairs_t16.json"
+    out = (json.loads(dst.read_text()) if dst.exists() else
+           {"card_note": "LOG twin note (committed with this driver)",
+            "config": {"d_sae": D_SAE, "k_pos": 8, "n_steps": N_STEPS,
+                       "buffer_tokens": BUFFER, "T": 16, "eval_L": EVAL_L,
+                       "seed": SEED},
+            "pairs": {}})
     for name, spec in PAIRS.items():
+        if only and name not in only:
+            continue
         cells = _cells(spec["ds"], spec["train"])
         res = grid.run_pool(
             cells, HERE / "results" / f"r30_twin_{name}_t16_pool.json",
@@ -144,11 +152,10 @@ def main():
         print(f"[{name}] identical={cmp_res['identical']} "
               f"max|Δ|={cmp_res['max_abs_delta']:.3e} "
               f"({cmp_res['n_equal']}/{cmp_res['n_tensors']})", flush=True)
-    dst = HERE / "results" / "r30_twin_pairs_t16.json"
     dst.parent.mkdir(exist_ok=True)
     dst.write_text(json.dumps(out, indent=1))
     print(f"-> {dst}")
 
 
 if __name__ == "__main__":
-    main()
+    main(only=set(sys.argv[1:]) or None)
