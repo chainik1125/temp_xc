@@ -71,6 +71,16 @@ corpus-specific exists to sync; committed cache builders take
 first KEEP's matrix retrain (starts within the hour of the
 verdict, pre-authorized f0ac106e4 item 3). Re-pin at card landing.
 
+## Mission 1c′ — disposition (c) EXECUTED (01:53, d897a00e4): geometry RESCUED within-domain
+Doc-mean 0.636–0.795 across all six domains (vs 0.858 confounded),
+position 0.608–0.731, pooled usable 511,907 ≥ 250k (2×), 158
+qualifying strata; trivia_qa thin (6/8, disclosed). (b) v2 looks
+UNNECESSARY. Instrument committed-then-run (numbers of record
+reproduced-identical at committed sha); artifact in-tree + HF
+(sha 9c9f9215…). **Awaiting design-owner/hub screen call** —
+per-token baseline FIRST on mac-c's pod, within-domain frame
+pre-registered. KEEP ⇒ warm-pod retrain within the hour.
+
 ## Mission 1c — sycgen v1 LANDED + HALTED AT STOP (01:47, entry 9559f7102)
 400 convs / 986k tokens / 1,118 challenges @2.79/conv / 0 API
 failures / ~49 min / est-basis actuals $6–9. **Realised geometry
