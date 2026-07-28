@@ -29600,3 +29600,66 @@ it honestly needs its own card, its own freeze, and an explicit
 as a WEAK either way — same as `evalage`, same hand.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 16:08 London (date-verified 15:08 UTC) — mac-local (hub): ⚑⚑ **ITEM 7 RESOLVED — `retryesc_gen` WEAK 3/3. RATIFIED, and written into the HANDOFF as a diagnosed negative.**
+
+### 1. Ratified
+
+Gain bar **CLEARED on every leg (+0.063…+0.069)** — windowed probes
+genuinely beat per-token on this task. **The FLOOR clause killed it on
+every leg:** a ground-truth-derived visible-evidence baseline matches
+the gain, so the task **detects** but does not **discriminate**.
+**WEAK 3/3. No gold task for item 7.**
+
+**mac-c built, validated and screened a safety-relevant task end to end
+in about two and a half hours**, from a standing start, on the lane
+whose predecessor died of a vocabulary confound — and then reported the
+verdict against itself without being asked. That is the whole program
+working.
+
+### 2. The diagnosis is the valuable part, and it is honest about the cause
+
+The corpus came out **denser than aimed** — `floor_excess` **0.261
+measured vs 0.185 targeted** — and the floor climbs with density.
+**Cause: the aiming instrument was biased low.** `claim_zone` is a
+**LOWER BOUND** on `floor_excess`, not the floor, and the under-read
+**scales with T/e1** (evalage 0.15 → −0.002; retryesc_gen 0.53 →
+**+0.076**).
+
+**mac-c corrected that guidance in-repo the same beat** — *"before it
+misleads anyone else."* Note what that means: at 15:0x they told the
+fleet `claim_zone` **was** `floor_excess` (validated K = 0.96 on
+evalage), I recorded it as a validated design instrument, and it was
+**right at low T/e1 and wrong at high**. Catching the boundary of your
+own tool *after it has cost you a KEEP*, and publishing the correction
+immediately, is the behaviour that keeps the next candidate from
+inheriting the bug.
+
+### 3. What survives, and it is more than the verdict
+
+- **Screen gain tracks in-window event mass** (face-level ρ **+0.88**).
+- **`floor_excess ≡ P(event inside the T-window)` exactly** (worst err
+  2e-6).
+⇒ **Target density is a design parameter you can aim at BEFORE
+generating.** The thesis is confirmed; only the **aim** was off, and
+the estimator is now corrected. **That is reusable by the next
+candidate and by the amendment window.**
+
+### 4. HANDOFF updated — item 7 now reads as a measured negative
+
+I have written the item-7 block myself (`## 6+7`), announcing it here
+rather than after: **mac-c's lane is CLOSED and they are writing
+STATUS, not the HANDOFF**, so there is no concurrent-owner risk of the
+kind that produced the § 3 marker incident an hour ago.
+
+It states: corpus + 21/21 label-side bands, WEAK 3/3 with gain cleared
+and floor clause firing, the density/estimator diagnosis, the reusable
+result, and **a ready-to-use sentence for Dmitry** if a reviewer asks.
+
+**Deliverables now: items 1–6 delivered, item 7 delivered AS A
+NEGATIVE.** Under *a sound verdict, never a win*, "we built it, it
+passed every validity gate, it failed its KEEP bar on the floor clause,
+here is why and here is the fixed estimator" **is a stronger item 7
+than silence** — and materially stronger than a task with a leak in it.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

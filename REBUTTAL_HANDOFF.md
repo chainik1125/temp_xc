@@ -426,11 +426,44 @@ panel — directly comparable to the btk figs above):**
   running, exhibit expected before the deadline" — with the exhibit
   itself landing by ~05:00 if the retrain drains on schedule
   (renderer pre-written + fixture-tested, 1618b5a7a).
-  Item 7: the honest sentence is the amendment-window one — "a
-  second safety-relevant candidate (retry-escalation) is in the
-  generation pipeline; results follow within the amendment window
-  (Aug 3)" (evalage's WEAK is disclosed-not-hidden if asked:
-  screens ran, KEEP bar not met by 0.004–0.019).
+  Item 7: **RESOLVED 16:0x 07-28 — see the block below. It is a
+  measured negative, not an open question.**
+
+- **⚑⚑ ITEM 7 = CLOSED, WEAK 3/3 (`retryesc_gen`, screen verdict
+  16:0x 07-28).** The final candidate was generated, validated and
+  screened end-to-end today. **No gold task. The honest deliverable
+  is the negative, and it is a diagnosed one:**
+  - **Corpus:** 300 docs / 946,546 tok / 2,809 events, **21/21
+    label-side bands PASS at full-run bars** (7 bands × 3 tokenizer
+    legs) — no vocabulary shortcut, right density, enough strata.
+    The candidate genuinely earned its screen.
+  - **Screen: WEAK 3/3.** The **gain bar CLEARED on every leg
+    (+0.063…+0.069)** — windowed probes really do beat per-token
+    here. **The FLOOR clause killed it on every leg:** a
+    ground-truth-derived visible-evidence baseline does as well, so
+    the task does not *discriminate*, whatever it detects.
+  - **Diagnosed cause, not a shrug:** the corpus came out **denser
+    than aimed** — `floor_excess` 0.261 measured against 0.185
+    targeted — and the floor climbs with density. **The aiming
+    instrument was biased low:** `claim_zone` is a **LOWER BOUND**
+    on `floor_excess`, not the floor, and the under-read scales with
+    T/e1 (evalage 0.15 → −0.002; retryesc_gen 0.53 → **+0.076**).
+    Guidance corrected in-repo the same beat, before it could
+    mislead the next candidate.
+  - **Reusable result that outlives the verdict:** screen gain
+    **tracks in-window event mass** (face-level ρ +0.88), and
+    `floor_excess ≡ P(event inside the T-window)` **exactly** (worst
+    err 2e-6) — so target density is a **design parameter you can
+    aim at before generating**, not a property you discover after
+    paying. That thesis was confirmed; only the *aim* was off.
+  - **What to say if asked:** *"We built a second safety-relevant
+    task end-to-end, it passed every validity gate, and it failed
+    its KEEP bar on the floor clause — the windowed gain was real
+    (+0.06) but a trivial baseline matched it. We diagnosed why
+    (corpus density overshoot from a biased estimator), fixed the
+    estimator, and are not reporting it as a win."* Under the
+    program's prime directive — **a sound verdict, never a win** —
+    that is the deliverable.
 
 ## 8. tsae width-match (additional item) — COMPLETE ✓
 
