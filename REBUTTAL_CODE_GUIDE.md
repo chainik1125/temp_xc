@@ -98,13 +98,17 @@ check sections, not just the table**: *Arch-vs-stamp cross-check* and
 *Substrate-pin check* (the latter names cells that sit on the wrong
 substrate and must not be quoted).
 
-**State at 18:0x** (supersedes the 07:20 stamp this section carried):
-probing paper-faithful **COMPLETE 21/21**; probing btk-only
-**COMPLETE** 7 T × 3 seeds; sycgen retrain rows on-board; RLHF
-paper-faithful **COMPLETE 15/15**. **The one remaining gap is RLHF
-btk T10** (seed 42 only, two cells draining) — T6 closed at 3/3, and
-the pf-priority deferral that held T{6,10} back has lapsed with the
-pf grid.
+**State at 01:0x 07-29** (supersedes the 07:20 and 18:0x stamps this
+section carried): probing paper-faithful **COMPLETE 21/21**; probing
+btk-only **COMPLETE** 7 T × 3 seeds; RLHF paper-faithful **COMPLETE
+15/15**; **RLHF btk now UNIFORM 3 seeds at all 8 T** — the T10 gap that
+was the last ragged column has closed, and the btk figure was
+re-rendered accordingly (`ff242b78` → `8d75ff3a`, only the T10 column
+moved, proven by per-T series diff). **sycgen carries an additional 15
+cells under tag `sycgen_keep_r1_rebuilt`** for the item-6 budget
+frontier — trained on a REBUILT activation cache, deliberately NOT
+pod-D's originals. **No coverage gaps remain in the delivered
+matrix.**
 
 ## 2. Sparse probing — code, data, results
 
@@ -247,15 +251,23 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 22:5x — **the set turns over fast; re-query, do not trust this list**)
+### Pods now (API-verified 01:0x 07-29 — **the set turns over fast; re-query, do not trust this list**)
 
-**5 RUNNING, $9.58/h total — only ONE is an agent lane.**
+**5 RUNNING, $12.40/h — and NOT ONE is an agent lane. Agent spend is $0/h.**
 
-    mac-d-item6-0728               $2.99/h  agent lane (item-6 frontier)
+    mats-lenctl-h100               $2.99/h  ⚑ not an agent lane
+    stacked-em-steer               $2.99/h  ⚑ not an agent lane
     reviewer-btk-tsae-300k         $2.99/h  ⚑ not an agent lane
     reviewer-headline-multiseed    $2.99/h  ⚑ not an agent lane
     tsae-paper-widthmatch-probing  $0.44/h  ⚑ not an agent lane
-    aah-cluster-dmrg               $0.17/h  ⚑ unrelated to this project
+
+**All agent pods are terminated and API-verified gone** (mac-d's
+`mac-d-item6-0728` closed with the item-6 ledger; actuals $8.6 vs $6
+estimated, overrun attributed to 3 OOM launches + 70 min of `tsae`
+cells item 6 never needed). **The entire $12.40/h is hand-provisioned
+and bills outside the agent cap** — the set has now turned over three
+times in one evening, which is why this list is a snapshot and the API
+is the authority.
 
 **$6.59/h is outside the agent fleet.** The composition **changed
 between 18:0x and 22:5x**: `mats-gap-code-h100` and
@@ -353,6 +365,23 @@ Per-item exhibit blocks live in `REBUTTAL_HANDOFF.md` §4–§7; code:
   screen.py/screen_grids.py, run_retrain.py, shuffle_overlay.py,
   results/); datasource plugin `sycgen_real_age_llama31_8b_l14`;
   rows are on the canonical leaderboard (regenerate the census).
+  **⚑ AND the budget frontier (added 01:0x 07-29, after the exhibit was
+  challenged):** the original claim compared a *windowed* TXC against a
+  *per-token* SAE, which establishes nothing about architecture. The
+  proper comparison now exists — `frontier.py` (pooled/stacked SAE as
+  post-hoc window wrappers on the frozen T=1 SAE, k swept),
+  `report_frontier.py` (three-state verdict), `run_item6_cells.py`, and
+  the hub's independent `scripts/verify_frontier_verdict.py`.
+  Deliverable: **`figs_writeup/tab_sycgen_budget_matched.md`**
+  (`scripts/gen_sycgen_budget_table.py`). **Verdict vs pooled: above
+  3/4 T, indistinguishable 1/4, never below; pooled saturates and never
+  reaches TXC at up to 4.06× its budget.** Stacked's 4/4 is NOT counted
+  (probe-capacity overfitting: 32768 features vs 1024 windows).
+  **Budget axis is measured `l0_per_window` — never the derived
+  per-token axis, which manufactures a false "better for less" trend.**
+  **The harness is section-agnostic on purpose**: probing/backtracking
+  pool per-token archs via the *protocol*, so they are not exposed, but
+  no *stacked* arm exists outside `synthetic` and that gap is real.
 - **item 7 — CLOSED, WEAK 3/3 (`retryesc_gen`, 16:0x 07-28).** The
   final candidate was generated, validated and screened end to end:
   **21/21 label-side bands PASS**, the **gain bar cleared on every
