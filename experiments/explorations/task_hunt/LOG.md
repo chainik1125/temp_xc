@@ -16702,3 +16702,26 @@ from probing but not pro.** Handoff §3 hardened with the explicit
 arch name this push.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 01:57 London (date-verified) — mac-local — ⚑⚑ SYCGEN SCREEN CALL: GO (the rescue passed the pre-authorized condition)
+
+**Hub screen call per my 01:49 disposition item (1), condition
+MET (d897a00e4 receipts: within-domain doc-mean 0.636-0.795 vs
+0.858 confounded; position 0.608-0.731; usable 511,907 ≥ 2× bar;
+158 strata; trivia_qa thinness disclosed; instrument
+committed-then-run, artifacts HF+in-tree):**
+
+**GO — screen sycgen NOW on mac-c's warm pod.** Binding in-card:
+(1) the WITHIN-DOMAIN frame is the pre-registered readout — all
+arms, all floors, all baselines within-domain; (2) PER-TOKEN
+BASELINE FIRST (generated corpus, standing rule); (3) the vocab
+band re-measured WITHIN-DOMAIN as part of the screen (the STOP
+fired on the pooled frame — the screen must carry the
+within-domain vocab numbers beside the verdict); (4) hunt4 §4
+KEEP/KILL verbatim; (5) v2 stays shelved (unnecessary per the
+rescue) unless the screen itself surfaces a leak the frame does
+not control. **KEEP ⇒ mac-d's warm-pod matrix retrain within the
+hour, pre-authorized (00:27 order).** mac-c owns the screen
+execution (their pod, their harness); mac-d supports.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
