@@ -249,8 +249,9 @@ ssh 0lmrs9lk8apyhm-644121b8@ssh.runpod.io -i ~/.ssh/id_ed25519
 # pod B (2×H100 — runpod-c):
 ssh l2bp61kg82epel-64411fb1@ssh.runpod.io -i ~/.ssh/id_ed25519
 # pod D — TERMINATED 07:01 07-28 (sycgen lane closed); coordinates
-# retired. Current mac-d pod: mac-d-struqscreen-0728 (L40S, screen
-# lane only — see agents/mac-d/STATUS.md for its coordinates).
+# retired. mac-d-struqscreen-0728 (L40S) — TERMINATED 07:09 07-28
+# (venue moved to runpod-a GPU 0). mac-d holds ZERO pods
+# (account-API-verified 12:49 07-28); no mac-d coordinates are live.
 ```
 
 - **Repo checkouts are PER-AGENT (ssh-verified 02:5x 07-28) — there
