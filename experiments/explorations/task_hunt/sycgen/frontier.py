@@ -45,6 +45,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import torch
 
@@ -70,6 +71,20 @@ class WindowWrapper(torch.nn.Module):
         super().__init__()
         self.sae, self.T, self.mode, self.k_tok = sae, T, mode, k_tok
         self._l0 = []
+        # `synthetic_recovery._arch_T` (line 75) reads `model.config.T`
+        # to decide how to tile, so a wrapper without `.config` dies in
+        # `_check_tileable` before a single window is encoded.
+        # ⚑ T here MUST be the WINDOW T, not the wrapped SAE's 1: this
+        # object PRESENTS as a T-window encoder (that is the whole
+        # point), and `encode` is handed `(B, T, d_in)`. Reporting 1
+        # would make the evaluator tile per token and silently score a
+        # different experiment than the one being claimed.
+        base = getattr(sae, "config", None)
+        self.config = SimpleNamespace(
+            T=T,
+            d_in=getattr(base, "d_in", None),
+            d_sae=getattr(base, "d_sae", None),
+        )
 
     def encode(self, tiles: torch.Tensor) -> torch.Tensor:
         B, T, d_in = tiles.shape
@@ -121,6 +136,11 @@ class MeasuredArm(torch.nn.Module):
     def __init__(self, inner):
         super().__init__()
         self.inner, self.T, self._l0 = inner, inner.T, []
+        # Same `_arch_T` requirement as WindowWrapper. Forward the real
+        # arch's config untouched so TXC is tiled exactly as it is on
+        # the canonical path — this shim must change measurement only,
+        # never the experiment.
+        self.config = getattr(inner, "config", SimpleNamespace(T=inner.T))
 
     def encode(self, tiles: torch.Tensor) -> torch.Tensor:
         z = self.inner.encode(tiles)
