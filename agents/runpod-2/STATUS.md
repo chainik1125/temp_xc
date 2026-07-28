@@ -4,6 +4,23 @@
 (`source scripts/set_agent_env.sh runpod-2` EVERY shell). Clone
 `/workspace/agents/runpod-2/temp_xc`, own venv (peft + einops).
 
+## SPRINT ACK (03f533cc3; posted 01:30 UTC / 02:30 London, wall-verified)
+
+**agentic_txc_02 port STARTED CPU-side (recon in progress —
+upstream chain extracted from 94119bc08, audit §6 facts pinned:
+MatryoshkaTXCDRContrastiveMultiscale, k_win=100·T, scales 3,
+γ=0.5).** ETA: plugin + contract tests + CARD (w/ port-cost flag)
+frozen by **~04:00-04:30 UTC**. GPU untouched before the card —
+x6/x10 keep GPU 2 until drain (~08:00-08:30 UTC, protected btk
+exhibits; 11:00 renders unaffected). Honest grid-cost note for
+the card: 21 cells (T{1,2,4,6,8,10,16}×3, T5 = archived anchor)
+at v2-walls × contrastive-heaviness ≈ 30-37 GPU-h ≈ $90-110 —
+ABOVE the $60-90 est; card will include a PILOT CELL (T2/s42,
+~30 min) to measure the heaviness factor before committing the
+full grid, plus shardable lane definitions so free pod-A GPUs can
+take T-shards after probing (shard split = card author's, per the
+map).
+
 ## State (2026-07-28 ~00:12 UTC / ~01:12 London, wall-verified)
 
 **CERTIFICATE SHIPPED + RATIFIED (89370c68a; refutation praised as pre-registration working):** RLHF equivalence 3/3
