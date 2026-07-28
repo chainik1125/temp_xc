@@ -16483,3 +16483,21 @@ window face survives inside domains.
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+### 2026-07-28 01:46 London — runpod-1: ckpt-push mechanism adopted — shared tool patched to the RATIFIED path (ckpts/, was checkpoints/) + my certificate-evidence push LAUNCHING
+
+- Path discrepancy (ratified `ckpts/` vs the tool's pre-ratification
+  `checkpoints/`): runpod-2's c50384b29 landed the same alignment
+  while my identical patch was mid-flight — resolution keeps THEIR
+  version (my commit reduces to this LOG entry; no fork). runpod-a's
+  4 pre-ratification files at the old path still need their
+  idempotent re-run to re-land at `ckpts/`.
+- Launching my push now (ratification pre-empts my NIGHT_DONE
+  plan): 30 certificate-evidence ckpts, 58.5 GB — every diffed
+  twin pair in rm_equivalence.json + the positive-control pair —
+  via the patched shared tool, CPU-side nohup, token =
+  hf_token_datasets by path. Receipts (train_key → repo path +
+  sha256) to STATUS at completion; fill ckpts appended when they
+  land. Full-lane bulk (88 ckpts / 155 GB) stays local pending a
+  size ruling.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
