@@ -27694,3 +27694,67 @@ now *unblocked* but remains *unproven*; the first CELL-OK gets its
 numbers eyeballed before the other 17 are trusted.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 14:55 London (date-verified at write) — mac-d: ⚑⚑⚑ EVAL PATH PROVEN — first real pf numbers are on the board. T2 auc 0.6119 / shuf 0.6019. Step time **0.074 s/step vs the H100's 1.49 — 20×**, beating the hub's own prediction.
+
+**The gap I flagged this morning as unproven is now closed with a
+number, not an argument.**
+
+    T=2 s=1   preference_auc_k20 = 0.6118511
+              shuffled           = 0.6019246      gap +0.0099
+              wall 592 s / 8000 steps = 0.074 s/step
+
+`auc=None` in my earlier `CELL-OK` lines was **my driver's extraction
+bug**, not a missing eval — `run_experiment`'s return shape differs
+from what I assumed. The leaderboard row has the real values. Fixing
+the driver print; the rows were never affected.
+
+**Step time — the measurement everyone was waiting on, from the
+production path on the card:**
+
+| cell | wall | s/step |
+|---|---|---|
+| T2 s1 | 592 s | **0.074** |
+| T4 s42 | 1208 s | **0.151** |
+| T6 s42 | 1196 s | **0.150** |
+
+Against runpod-2's measured **1.49–1.55 s/step at T2 on an H100**, this
+is **~20×**. The hub predicted 0.1–0.35 s/step and asked to be refuted
+out loud if wrong: **it is beaten — T2 lands at 0.074, below the
+optimistic end of the band.** And T6 ≈ T4 rather than 2× it, so the
+"extrapolate ~40/60/90 min for T6/8/10" projection is pessimistic too;
+real T8/T10 walls follow shortly and I will not extrapolate them.
+
+**The eval gap, owned.** Every pod got the *training* substrate and
+none got the *eval* substrate — `cached_hh_rlhf` was never built, so
+T2/s42 trained all 8000 steps cleanly (loss 110254 → 8117) and then
+died in `evaluator.eval`. **This is precisely the failure I flagged at
+13:55 as "the eval path remains unproven… it is where fp64/unsupported
+-op failures would surface, so the first real cell is what tests it"
+— and it fired exactly there.** Flagging it did not prevent it; I
+should have *built* the eval cache when I said that, not merely noted
+the risk. **Nothing lost:** the runner cache-hits on `train_key`, so
+the redo is an eval, not a retrain. HH cache now on 5/6 pods (2253 MB
+each); rerun watchers armed fleet-wide that wait for the cache, wait
+for the in-flight drive to clear, then re-run — idempotency fills only
+the gaps.
+
+**Pod-1 replaced, per Han ("if a pod is faulty can always close it and
+open new one").** The original T1 pod was **stalled, not slow** — the
+hub's byte-exact `du -sb` showed zero movement, and my own p2p copy
+attempt also produced nothing on that host. Terminated
+`aqil2dkyikg3ze`, spun `8y6mv20l72ghqk`; the replacement bootstrapped
+and pulled 7.7 GB in the time the dead one moved zero. **Killing beat
+debugging** — I had spent ~10 min on key-exchange plumbing for a p2p
+copy that a $2.99/h respin made unnecessary.
+
+**ACK the load-imbalance flag** (f80742155): one-T-per-pod with
+sequential seeds does make wall ≈ 3× the slowest cell while the T2 pod
+idles. Seeds within a T are independent, so the fix is real. **I am not
+re-shuffling mid-flight** while cells are landing and the rerun
+watchers are armed — the next reassignment happens when a pod reports
+`DRIVE-DONE`, at which point it takes unclaimed cells rather than
+idling. Stated so nobody waits on a rebalance that is deliberately
+deferred by one cycle.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
