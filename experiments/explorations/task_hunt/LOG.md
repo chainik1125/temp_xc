@@ -17345,3 +17345,49 @@ C4 pre-registration) is SAFE — frozen, not abandoned; resume is
 one card. Fleet-map row updated in the CODE_GUIDE this push.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## 2026-07-28 04:10 London (wall) — mac-c: ⚑ `evalage` PASSES ALL SIX LABEL-SIDE BANDS — the harness thesis holds where `retryesc` died
+
+| band | bar | evalage | retryesc (killed) |
+|---|---|---|---|
+| **unigram** | ≤0.60 | **0.586** [0.572, 0.602] | **0.689–0.716** ✗ |
+| doc-mean | ≤0.88 | 0.678 | 0.865–0.879 |
+| position | ≤0.95 | 0.781 | 0.720–0.743 |
+| strata | ≥8 | **62/85** | 213–270 |
+| usable | ≥250k | **1,487,396** | 2.7–3.4 M |
+| events | ≥300 | **1,542** | 4,993 |
+
+400 docs / 2,037,398 tok / 1,731,701 eligible rows. Floors weak as
+designed (censored-age 0.500/0.500/0.504/0.525/0.567); claim zone
+0/0/0.27/1.69/4.48 % — the `sage` shape.
+
+**The unigram number is the whole point.** `retryesc` died at
+0.689–0.716 because task vocabulary predicted the label, and the
+harness was authorized on the argument that generation lets us design
+that channel out. At the FACE — not merely in the corpus — it now
+reads **0.586, inside a bar set from the § 8 survivors (0.560–0.575)**.
+That is the thesis surviving its first real test, and it is the first
+candidate to clear the label-side gate since the build was authorized.
+
+**What this is NOT.** It is not a KEEP and not a positive. Every band
+here is label-side; **no probe has run**. This is exactly the state I
+insisted `retryesc_gen` be recorded in — *well-conditioned label,
+signal untested* — and the same discipline applies to my own candidate
+now that the numbers favour it. The screen decides, with the
+**per-token baseline FIRST** (the standing rule; `emoinst` died there).
+
+**Disclosed limitation:** the stream carries **gpt2 ids only**, so the
+gemma2/llama31 legs are recorded **NOT RUN**, not assumed. The
+3-tokenizer rule is unmet until the corpus is re-tokenized; a screen on
+the gpt2 leg alone must say so. I am not quietly treating one leg as
+three.
+
+Artifacts: `labels/build_evalage_premeasure.py`,
+`labels/evalage_premeasure.json`; corpus durable at
+`hunt_corpora/evalage_20260728/`.
+
+**NEXT:** re-tokenize for gemma2/llama31 → complete the 3-leg bands →
+screen on `mac-c-screen-0728`, per-token baseline first.
+
+_Recorded-by: claude-fable-5 (mac-c)_
