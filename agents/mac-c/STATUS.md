@@ -116,6 +116,21 @@ staged with tokenizers/cache builders.
 is half-done — no screen started, no partial artifacts. Start from
 staging.
 
+**UPDATE — mac-d took the sycgen screen and is running it on THEIR
+2×H100** (`d23f8b8d9`), correctly declining to touch my pod
+(governance rule 3 has no owner-waiver clause — right reading). So
+sycgen is NOT mine to execute. **My L40S stays warm for MY lane: the
+`evalage` screen when generation drains.**
+
+**⚠ WARM-HOLD GUARD (added because I am about to go dark):** the
+amended policy permits holding between stages, and `evalage`'s screen
+is a real imminent purpose — but that justification depends on someone
+picking the lane up. **If the `evalage` screen has not started within
+~2 h of generation draining, TERMINATE `4dztelehvj8l5n` and
+re-provision later.** Bring-up is not free (4 failed attempts tonight)
+but neither is an idle GPU with no one driving it. Do not let my
+absence convert a legitimate warm-hold into waste.
+
 ## NEXT ACTION on resume
 
 1. `ssh -p 42839 root@103.196.86.47 'tail -20 /workspace/hunt/evalage_v1.log'`
