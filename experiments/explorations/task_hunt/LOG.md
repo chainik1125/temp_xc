@@ -28173,3 +28173,76 @@ figure; caught by the byte-identical check, scoped, re-verified
 `sha256 c1998b48…` unchanged. The btk deliverable has not moved.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 15:07 London (date-verified 14:07 UTC) — mac-local (hub): **BOTH RATIFIED — the pf figure exists and item 7's candidate SURVIVED its own killer.** Figure embedded in the HANDOFF. Two reviewer qualifications.
+
+### 1. mac-d — first pf RLHF figure: RATIFIED, embedded
+
+`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` verified on disk
+(202 KB / 42 KB, 15:06) and **now embedded in `REBUTTAL_HANDOFF.md`
+§ 3** in the slot I opened at 14:2x, with the table, both reads and the
+caveat. **Han's "one missing plot" has a first version.**
+
+**`l0 = 100·T` exactly at every T (200/400/600/800/1000)** is the
+strongest line in that entry and deserves calling out: it is an
+*independent* confirmation that the port is running the paper's window
+budget cell-for-cell, not a number that merely looks plausible.
+
+**Reviewer qualification — I ran the arithmetic mac-d's caveat implies
+but did not state:**
+
+    anchors s42/s1/s2 = 0.6096 / 0.6240 / 0.6031  ->  seed scatter 0.0209
+    largest shuffle gap                            ->            0.0110
+    ratio                                                          0.53x
+
+**Every gap is inside the anchors' own seed-to-seed scatter — the
+largest is barely half of it.** So the binding form is *"no order
+effect detectable below the seed noise floor at n=1"*, **not** "no
+order effect". mac-d's caveat says this; I am pinning the number so the
+caption cannot drift. Wave 2/3 license anything stronger.
+
+**⚑ One fix worth doing now: the curve is seed-MIXED** (T2 = seed 1,
+the rest seed 42) because T2/s42 died in the pre-cache eval. That cell
+**cache-hits on `train_key`** — re-running it is **eval-only, ~1
+minute** — and it makes the wave-1 curve seed-pure. **mac-d: do that
+before the next render.**
+
+### 2. mac-c — discriminator RESOLVED 4/4: RATIFIED, and this is how it should go
+
+    quantity        pair 5    pair 25    predicted
+    unigram_auc     0.6723 -> 0.5416     fall below 0.60   [CI 0.529-0.556]
+    floor_excess    0.3865 -> 0.1966     fall toward 0.185
+    position_auc    0.7983 -> 0.6331     fall
+    face~position   0.5070 -> 0.1765     fall
+
+**4/4, none marginal, and `unigram`'s entire CI sits below the bar.**
+The truncation story was written down *before* it could be resolved,
+with an unconditional kill rule attached, and then it **survived
+contact with the deeper measurement**. That is worth more than a
+candidate that never failed: the pass is credible *because* the
+falsifier was posted first.
+
+**My 15:0x conjunctive amendment is satisfied in full** — `unigram`
+0.5416 ✅ **and** `floor_excess` 0.1966 ∈ [0.15, 0.25] ✅ **and**
+strata 17/20 ≥ 8 ✅ — plus `doc_mean_only`, `position`, tokens and
+events. **Seven of seven at FULL-run bars, mid-generation.**
+
+And the $0 dry run predicted the real corpus density to **within
+0.012** (0.185 vs 0.1966). **The "design a face to sit in the band"
+method is now validated end to end**, which is a reusable result
+independent of what this task turns out to be.
+
+### 3. ⚑ Reviewer qualification that matters for the deliverable
+
+**Seven bands passing is a VALID TASK, not a GOLD one.** Every one of
+those bands is a *label-side validity gate* — no vocabulary shortcut,
+right density, enough strata. **The screen has not run.** Nobody has
+yet measured whether a TXC beats an SAE on this task.
+
+**So item 7 currently has: a candidate that cleared the bar that killed
+its predecessor. It does not yet have a result.** Gold-visibility
+arms only at a KEEP on the screen — I will not put this in the HANDOFF
+as a delivered item before then, and I would rather say so now than
+have anyone read "7/7 pass" as item 7 being done.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

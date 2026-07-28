@@ -157,17 +157,37 @@ panel — directly comparable to the btk figs above):**
 
   *(i) The pf figure slot — deliberately empty, not forgotten:*
 
-  <!-- PF-RLHF FIGURE SLOT: fig_rlhf_shuffle_tsweep_pf.{png,pdf}
-       drops here at first render. Renderer exists and is
-       wave-1-verified: render_writeup_fig.py --arm pf.
-       Per Han: item 3 needs BOTH (i) a paper-faithful plot and
-       (ii) the BatchTopK plot above. -->
+  ![rlhf-pf](figs_writeup/fig_rlhf_shuffle_tsweep_pf.png)
 
-  **Renderable today, anchors-only:** the three corrected T5 anchors
-  are on the board (`preference_auc_k20` **0.6096 / 0.6240 / 0.6031**,
-  seeds 42/1/2). They are **eval-only upstream paper weights**, plot
-  as their **own marker** and are excluded from the sweep mean by
-  `train_key` (ruling d744f7c52) — never spliced into the curve.
+  **`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` — INTERIM,
+  G1-PENDING.** First paper-faithful RLHF figure; wave 1 (one seed per
+  T) plus the three corrected T5 anchors as a separate marker
+  (eval-only upstream weights, excluded from the sweep mean by
+  `train_key` per ruling d744f7c52 — never spliced into the curve).
+  Seeds 1 and 2 fill the error bars; re-render at drain.
+
+  | T | ordered | shuffled | gap | l0 |
+  |---|---|---|---|---|
+  | 2 | 0.6119 | 0.6019 | **+0.0100** | 200 |
+  | 4 | 0.6019 | 0.6041 | **−0.0022** | 400 |
+  | 6 | 0.6086 | 0.6031 | **+0.0055** | 600 |
+  | 8 | 0.6053 | 0.6107 | **−0.0054** | 800 |
+  | 10 | 0.5920 | 0.6030 | **−0.0110** | 1000 |
+
+  **Two reads and the caveat that dominates them:**
+  - **`l0 = 100·T` exactly at every T** — the paper's window budget is
+    honoured cell-for-cell. An independent check that the port is
+    running the recipe we believe it is.
+  - **Shuffle gaps are ~0 and SIGN-MIXED (3 of 5 negative).** On this
+    evidence the paper-faithful arm shows **no order effect** — the
+    same story the btk arm tells ("gaps ≈ 0 at every T ≤ 8"). The port
+    reproducing the *negative* is itself a port-fidelity signal.
+  - **⚑ CAVEAT, and it outweighs both: n = 1 per T, seeds are MIXED
+    (T2 is seed 1, the rest seed 42), and the largest gap (0.0110) is
+    just 0.53× the anchors' own seed-to-seed scatter (0.0209).** No
+    order-effect claim survives that yet — the honest statement is
+    *no order effect detectable below the seed noise floor*. Wave 2/3
+    are what license anything stronger.
 
   *(ii) Three things the 13:0x block got wrong, corrected here
   because each was load-bearing:*
