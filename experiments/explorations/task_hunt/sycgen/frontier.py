@@ -16,10 +16,15 @@ transforms of the per-token (T=1) SAE.
 ⚑ CORRECTED 2026-07-28 22:4x. This docstring used to read "need NO
 training: ... the ALREADY-TRAINED per-token SAE", and that assumption
 was FALSE and nearly cost the whole retrain. The sycgen SAE anchor
-weights do not exist anywhere — pod-D was released and the 07-25 HF
-mirror covers only the stage2 panels — while the manifest still lists
-their train_keys, and `runner.py:141-150` reports `train_cached=True`
-off a leaderboard hit WITHOUT ever checking that a checkpoint exists.
+weights are UNREACHABLE, not absent: they are mirrored on HF under
+`ckpts/<train_key>/`, but `checkpoint_exists()` tests only the local
+`checkpoints/<train_key>/model.safetensors` and `hf_url` has no
+writer, so every local check reports False. Meanwhile
+`runner.py:141-150` reports `train_cached=True` off a leaderboard hit
+WITHOUT ever checking that a checkpoint exists.
+(An earlier version of this note said the weights "do not exist
+anywhere" — false, and it was a claim I had already retracted before
+writing it here. Corrected 2026-07-29 00:2x.)
 `checkpoints/HF_MIRROR.md` states the rule I had broken: *any plan
 described as "eval-only" must verify weight existence FIRST.*
 `_key_from_manifest` now enforces it in code.

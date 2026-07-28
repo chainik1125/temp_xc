@@ -45,8 +45,12 @@ n=3, crude threshold, one substrate. Pod terminated, ledger closed.
 
 §1 says the arms are *"EVAL-ONLY. Do not retrain an SAE."* **That is
 false and it nearly cost the whole run.** The sycgen SAE anchor
-weights did not exist on either box: pod-D was released and the 07-25
-HF mirror covers only the stage2 panels. Worse, `runner.py:141-150`
+weights were UNREACHABLE, not absent — mirrored on HF under
+`ckpts/<train_key>/`, but `checkpoint_exists()` tests only the local
+`checkpoints/<train_key>/model.safetensors` and `hf_url` has no writer,
+so both boxes reported 0. (This block previously said they "did not
+exist on either box" — FALSE, and a claim I had already retracted
+before writing it here; fixed 2026-07-29 00:2x.) Worse, `runner.py:141-150`
 returns `train_cached=True` as a hardcoded literal on a leaderboard
 hit **without ever calling `checkpoint_exists`**, so the cells logged
 `(cache t=True e=True)` while writing no weights. I had to retrain all

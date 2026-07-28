@@ -14,10 +14,13 @@ Why this exists instead of `run_retrain 3 1`:
    `train_cached=True` off a leaderboard hit **without ever checking
    `checkpoint_exists`** — so those cells short-circuit forever, log
    `(cache t=True e=True)`, and write no weights. The sycgen SAE
-   weights do not exist anywhere (pod: 0 `model.safetensors`; this mac:
-   0 for these keys; the 07-25 HF mirror covers only the stage2
-   panels). Without them `frontier.py` loses the pooled AND stacked
-   arms — 2 of its 3.
+   weights are UNREACHABLE, not absent — mirrored on HF under
+   `ckpts/<train_key>/`, but `checkpoint_exists()` tests only the local
+   `checkpoints/<train_key>/model.safetensors` and `hf_url` has no
+   writer, so both boxes reported 0. Without a LOCAL copy
+   `frontier.py` loses the pooled AND stacked arms — 2 of its 3.
+   (Earlier text here claimed they "do not exist anywhere" — false,
+   and already retracted by me before it was written. Fixed 00:2x.)
 
    `train_key` hashes `training_cfg` + arch + `data_key` + section and
    **not** `eval_cfg`, so a fresh `retrain_tag` mints a new `eval_key`
