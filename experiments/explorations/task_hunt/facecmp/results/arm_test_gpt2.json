@@ -1,0 +1,223 @@
+{
+ "meta": {
+  "substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
+  "model": "gpt2",
+  "screen_hs": 7,
+  "face": "cum_rate_H512",
+  "H": 512,
+  "status": "FEASIBILITY PROBE, not a hunt4 verdict",
+  "ax_ts": [
+   16,
+   32,
+   64
+  ],
+  "rows": {
+   "face": "cum_rate_H512",
+   "H": 512,
+   "n_docs": 300,
+   "tercile_edges": [
+    1.0,
+    2.0
+   ],
+   "n_elig": 277361,
+   "bin_counts": {
+    "0": 145974,
+    "1": 81145,
+    "2": 50242
+   },
+   "cum_rate_H512/train": {
+    "rows_per_class_total": {
+     "0": 3998,
+     "1": 3998,
+     "2": 3998
+    },
+    "ok": true
+   },
+   "cum_rate_H512/test": {
+    "rows_per_class_total": {
+     "0": 1499,
+     "1": 1499,
+     "2": 1499
+    },
+    "ok": true
+   }
+  }
+ },
+ "cells": {
+  "cum_rate_H512/tok_linear": {
+   "acc_test": 0.34778741002082825,
+   "per_class": [
+    0.3355570435523987,
+    0.31154102087020874,
+    0.3962641656398773
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.1
+  },
+  "cum_rate_H512/tok_mlp": {
+   "acc_test": 0.3504558503627777,
+   "per_class": [
+    0.35557037591934204,
+    0.33222147822380066,
+    0.3635757267475128
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 5.1
+  },
+  "cum_rate_H512/position_floor": {
+   "acc_test": 0.3317767381668091,
+   "per_class": [
+    0.21547698974609375,
+    0.16944630444049835,
+    0.6104069352149963
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.1
+  },
+  "cum_rate_H512/T16/visible_evidence_floor": {
+   "acc_test": 0.3867022395133972,
+   "per_class": [
+    0.06337558478116989,
+    0.9239493012428284,
+    0.17278185486793518
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.1
+  },
+  "cum_rate_H512/T16/actxmean_linear": {
+   "acc_test": 0.3444518446922302,
+   "per_class": [
+    0.35757172107696533,
+    0.2888592481613159,
+    0.3869246244430542
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.5
+  },
+  "cum_rate_H512/T16/actxmean_mlp": {
+   "acc_test": 0.3451189696788788,
+   "per_class": [
+    0.36090728640556335,
+    0.3368912637233734,
+    0.3375583589076996
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 9.0
+  },
+  "cum_rate_H512/T32/visible_evidence_floor": {
+   "acc_test": 0.4171670079231262,
+   "per_class": [
+    0.9359573125839233,
+    0.01667778566479683,
+    0.2988659143447876
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.1
+  },
+  "cum_rate_H512/T32/actxmean_linear": {
+   "acc_test": 0.35134533047676086,
+   "per_class": [
+    0.33622413873672485,
+    0.3202134668827057,
+    0.39759838581085205
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.5
+  },
+  "cum_rate_H512/T32/actxmean_mlp": {
+   "acc_test": 0.3529019355773926,
+   "per_class": [
+    0.3922615051269531,
+    0.3235490322113037,
+    0.3428952693939209
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 9.0
+  },
+  "cum_rate_H512/T32/actxmean_foreign_linear": {
+   "acc_test": 0.3580164611339569,
+   "per_class": [
+    0.3488992750644684,
+    0.33622413873672485,
+    0.3889259397983551
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "cum_rate_H512/T64/visible_evidence_floor": {
+   "acc_test": 0.4678674638271332,
+   "per_class": [
+    0.8925950527191162,
+    0.028685791417956352,
+    0.482321560382843
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "cum_rate_H512/T64/actxmean_linear": {
+   "acc_test": 0.3393373489379883,
+   "per_class": [
+    0.36891260743141174,
+    0.2908605635166168,
+    0.3582388162612915
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.6
+  },
+  "cum_rate_H512/T64/actxmean_mlp": {
+   "acc_test": 0.3433400094509125,
+   "per_class": [
+    0.40160107612609863,
+    0.2968645691871643,
+    0.3315543830394745
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 9.2
+  },
+  "cum_rate_H512/T64/actxmean_foreign_linear": {
+   "acc_test": 0.34978875517845154,
+   "per_class": [
+    0.33622413873672485,
+    0.3448965847492218,
+    0.3682454824447632
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "cum_rate_H512/T32/label_null": {
+   "acc_test": 0.34022682905197144,
+   "per_class": [
+    0.310206800699234,
+    0.3529019355773926,
+    0.35757172107696533
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.7
+  }
+ },
+ "summary": {
+  "tok": 0.3504558503627777,
+  "best_window": 0.3529019355773926,
+  "best_T": 32,
+  "gain_vs_tok": 0.002446085214614868,
+  "floor_at_bestT": 0.4171670079231262,
+  "beats_floor": false,
+  "position_floor": 0.3317767381668091,
+  "gain_bar_0.05_cleared": false
+ }
+}

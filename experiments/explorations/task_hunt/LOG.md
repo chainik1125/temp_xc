@@ -30707,3 +30707,92 @@ finding: the floor's window is T+w, so a 5-token event turn instead of
 $0 spent tonight; **0 mac-c pods**; no generation money committed.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 19:34 BST — mac-c: CUMULATIVE face ARM is at CHANCE. Direction dead, $0 spent, ~$21 generation saved
+
+Follow-through on the 19:26 sweep. I said the next candidate should be a
+cumulative face because both its bars are lower. **I tested the arm
+before designing the corpus, and the arm is not there.** Reporting
+against my own thesis from 90 minutes ago.
+
+### The result
+
+Same corpus (`retryesc_gen`, already in git), same activations, same code
+path, same bars — **only the label changes**:
+
+| face | tok | best window | **gain** | foreign null | floor @ bestT |
+|---|---|---|---|---|---|
+| **RECENCY age** (positive control) | 0.3781 | 0.4377 (T64) | **+0.0596** | 0.3643 | 0.5859 |
+| **CUMULATIVE `rate_H512`** | 0.3505 | 0.3529 (T32) | **+0.0024** | **0.3580** | 0.4172 |
+
+**The foreign-context null BEATS the real arm** (0.3580 > 0.3529). A
+window of activations from a *different document* does as well as the
+true one. `label_null` 0.3402, `position_floor` 0.3318 — every
+cumulative number is within ~0.02 of chance. This is absence of signal,
+not weak signal.
+
+### The positive control is the load-bearing part
+
+On the **identical local MPS cache and identical code**, the recency
+label reproduces the pod: **0.3781 → 0.4377 (+0.0596)** vs the pod's
+**0.3669 → 0.4314 (+0.0645)**, foreign null collapsing to 0.3643 as it
+should. Cache, manifest, transplant and pipeline all verified working.
+**So the negative is about the LABEL, not my instrumentation** — the one
+alternative explanation a bare negative could not rule out, and the
+reason I ran the control before writing this.
+
+### Pre-registration audit
+
+| predicted (frozen `cb8ba2d38`) | outcome |
+|---|---|
+| position floor ≈ chance | ✅ 0.3318 (−0.0016) |
+| visible floor T64 ≈ +0.13 | ✅ 0.4679 (+0.1345) vs +0.1331 label-side |
+| **arm clears: ~35–40 %** | ❌ **+0.0024 against a +0.05 bar — never left chance** |
+
+**2/2 on the bars I could compute in advance; 0/1 on the one I could
+not.** I called the arm "genuinely uncertain" and put a number on it
+anyway so it could be scored. It was wrong, and not narrowly.
+
+### ⚑ What this does to my own 19:26 argument
+
+**It refutes the reasoning, not just the face.** I argued the cumulative
+face escapes the `retryesc_gen` scissors because both bars are lower —
+and **both bars ARE lower** (visible floor +0.13 vs +0.26; position floor
+0.000 vs +0.039). **Lowering the bar bought nothing, because the arm fell
+further than the bar did.** Bar-first design is only as good as the
+assumption that the arm survives the change. That assumption is now
+measured, and it failed. I would rather have this on record than the
+tidy version where the sweep led somewhere.
+
+### What is NOT established — stated so nobody upgrades this
+
+- **NOT "cumulative safety states are unreadable".** Tercile edges are
+  **1.0 / 2.0**, so the task is literally *"≤1 vs exactly 2 vs ≥3 events
+  in 512 tokens"* — **precise small-integer counting**, a known weak
+  spot, and not the same as a graded accumulator ("how much pressure am
+  I under"). A smooth cumulative face on a purpose-built corpus is
+  untested.
+- **NOT a hunt4 KILL.** Per the asymmetry I froze *before* the result:
+  `retryesc_gen` was built for a recency face with a roughly constant
+  per-doc rate, so this face is coarse and tied here. A failure on a
+  borrowed corpus is a feasibility negative and is reported as the weaker
+  thing it is.
+
+### Cost, and the transferable bit
+
+**$0. No pod, no generation.** gpt2 (124M) cached on local **MPS** in
+**50 s** — 7241 rows — and every bar is either ground-truth-derived or a
+2-feature probe. **0 mac-c pods.**
+
+**The lesson worth keeping: a cheap ARM test on a BORROWED corpus should
+come before generation money.** The $0 bar-side work made this direction
+look strong on both bars; only the arm test showed it was empty. That is
+now a one-command pattern — `facecmp/arm_test.py` + a local MPS cache —
+and it cost ~$21 less than finding out after generating.
+
+**Item 7 still has no KEEP**, and I have now closed two directions with
+receipts rather than one with a story.
+
+_Recorded-by: claude-opus-5 (mac-c)_

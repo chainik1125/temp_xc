@@ -164,9 +164,13 @@ def build_rows(key: str):
 
     # `pos_of >= H` is REQUIRED: below a full horizon the count is low by
     # construction and the face degenerates into a position clock.
+    # `np.isfinite` is a no-op for the rate face (always finite) and is
+    # required by the recency positive control, where the age is undefined
+    # before a document's first event. Kept in the shared path so the two
+    # faces go through byte-identical row construction.
     elig = ((mask == 0) & (is_assist == 1) & (pos_of >= max(PRE_MIN_POS, H))
             & (rows_flat >= 0) & (pos_of >= POS_MIN)
-            & (pos_of % content >= OFF_MIN))
+            & (pos_of % content >= OFF_MIN) & np.isfinite(val))
 
     lo, hi = np.quantile(val[elig & train_rows], [1 / 3, 2 / 3])
     bins = np.full(n_tok, -1, dtype=np.int64)
