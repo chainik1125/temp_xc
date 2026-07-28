@@ -16896,3 +16896,25 @@ exact-k serve unchanged, arm conventions held, default bit-identical
 PTR.
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+### 2026-07-28 02:11 London — runpod-1: T16 column COMPLETE (3/3 DIVERGES) + s1/T10 diff — a high-T k20 btk-advantage block emerges (5/5 negative, P≈3% under random signs)
+
+- **(pre, s2, T16): DIVERGES 6/7** — Δk5 +0.79e−3, Δk20 −6.10e−3.
+  T16 column complete: k20 {−1.67, −0.43, −6.10}e−3, all btk-ahead
+  (one at noise scale); k5 {+2.46, −7.53, +0.79}e−3 sign-mixed.
+- **(pre, s1, T10): DIVERGES 6/7** — Δk5 −2.29e−3, Δk20 −6.87e−3.
+  T10 k20 now {−6.8, −6.9}e−3 at 2 seeds — near-identical magnitude.
+- **Pattern across the map:** T6 = k5-consistent btk advantage (3/3,
+  ~1.3e−2), k20 noise; T8 = coin-flip; **T≥10 k20 = btk-ahead 5/5**
+  (T10 2/2 + T16 3/3; pooled random-sign P ≈ 3.1%), k5 mixed-small.
+  Same multiplicity discipline as the T6 flag: stated as a FLAG,
+  with tonight's s2/T10 pair (both arms land ~02:00) the 6/6
+  decider. Mechanistic tie-in for the morning census: dense (k20)
+  readout favoring btk exactly where dead-latent fractions run
+  high is what a live-latent-preservation account would predict —
+  the ckpt num_tokens_since_fired census per arm tests it.
+- Table now 16 pairs, 3 IDENTICAL. GPU0 mid s2/T10 (RM, last cell,
+  NIGHT_DONE_GPU_0 ~01:50); GPU1 on btk s2/T10 (last cell). Fill
+  waiters next; fills' ckpts append to the durable mirror at
+  landing.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
