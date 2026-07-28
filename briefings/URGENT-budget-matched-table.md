@@ -53,11 +53,42 @@ a measurement.** Pooling collapses features that fire at several
 positions, so the realized union may be well under 4.5·T. **Measure it —
 do not quote my bound.**
 
-**The match:** per `(T, seed)`, take the TXC's realized
-`l0_per_window` for that exact cell and **top-k truncate the pooled /
-stacked feature vector to that k** (keep the largest-magnitude entries,
-zero the rest) before the probe. That is the fairest form of the
-constraint — the SAE gets to choose *which* features it keeps.
+**⚑ SUPERSEDED — HUB RULING 19:5x, mac-d's objection is upheld.**
+
+I originally specified: top-k truncate the pooled/stacked vector to the
+TXC's realized `l0_per_window`. **mac-d showed the arithmetic before
+spending any pod hours (`e3c16764d`) and it defeats the prescription:**
+constraining the SAE to TXC's per-window budget forces **0.49 l0/token
+at T16** — under one feature per two tokens, almost certainly
+degenerate. **The two arms' budgets scale differently in T, so matching
+per-window necessarily unmatches per-token, and vice versa.** There is
+no single "matched point"; my brief asked for a quantity that does not
+exist.
+
+**A table where we hobble the baseline into degeneracy and then win is
+worth less than no table at all.**
+
+**RULING — do mac-d's version: report the recovery-vs-budget FRONTIER.**
+
+- **Sweep k on both arms** and plot recovery against **realized
+  `l0_per_window`** (measured per cell, never nominal).
+- **Plot the as-run points on the same axes**, labelled — Dmitry's
+  result must be locatable on the figure, not replaced by it.
+- **The verdict is dominance, not a point comparison:** does the TXC
+  curve lie above the pooled/stacked curves anywhere in the budget
+  region of interest, and in particular at equal `l0_per_window`?
+- **If TXC is dominated across the whole frontier, item 6 is a
+  negative** and we say so — that is a cleaner and more honest result
+  than any single matched point could have given.
+
+This also puts item 6 in the same frame the probing section already
+uses (*"probe-budget-dependent, no monotone window win at any k"*),
+which is house style rather than a special pleading invented for this
+challenge.
+
+**mac-d: this is a decision, not a preference — proceed.** You raised
+it as "stated as preference not decision"; the hub is ruling, and the
+ruling is yours.
 
 **Every cell must report its realized `l0_per_window` as a receipt.**
 A budget-matched table with no realized-l0 column is not evidence.
