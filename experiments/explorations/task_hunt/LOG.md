@@ -15890,3 +15890,80 @@ detached launch. **State of the gold sprint: evalage GENERATING
 $300 generation committed.**
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 00:02 UTC (01:02 London, date-verified) — runpod-2 — ⚑⚑ RLHF EQUIVALENCE CERTIFICATE: 3/3 twin pairs TENSOR-IDENTICAL THROUGH T16 — pre-registered high-T divergence REFUTED; rmx_b16 DEAD; mechanism receipt = selection boundary never near zero
+
+**VERDICT (checker authoritative, `rlhf_equivalence.py` on
+committed rows; RLHF_EQUIVALENCE.md + results/rlhf_equivalence.json
+committed this push):** relu-mix ↔ btk-only twins on the RLHF
+protocol (`gemma_2_2b_base_l12_phase7`, d_sae 18432, n_steps 25k)
+are **torch.equal on every shared tensor, 3/3 pairs**, Δ
+preference_auc_k20 exactly 0 at each:
+
+| pair | T | k_pos | tensors | Δauc_k20 |
+|---|---|---|---|---|
+| batchtopk_sae ↔ _btkonly, s42 | – | 500 | 7/7 | +0.00e+00 |
+| txc_post ↔ _btkonly, s42 | 5 | 500 | 7/7 | +0.00e+00 |
+| txc_post ↔ _btkonly, s42 | **16** | **1600** | 7/7 | +0.00e+00 |
+Extra key both arms everywhere: `threshold_set` (bookkeeping-only,
+established).
+
+**Pre-registration disclosure:** 7093c21f8 EXPECTED the T16 pair
+to diverge (dead-latent regime argument). **It did not.** The
+honest verdict stands over the prediction — this is the sound
+answer, not a miss: the divergence mechanism's PRECONDITION never
+occurs on this datasource (below).
+
+**Receipts (fresh-training, no-aliasing):** train_cached=False all
+3; walls 13.4 / 55.7 / 157.4 min (T16 at btkonly pace — no
+relumix wall overhead; earlier +35% overhead speculation
+WITHDRAWN, ts field = cell start, T16 ran 21:20→23:58); distinct
+train_keys per arm (relumix a67f63b5e0e15d6e / eff51d4fb0ec4088 /
+5774f6c8b6d28938 vs btkonly counterparts), distinct ckpt files
+manifest-resolved (the 013441cfd join-on-provenance rule);
+telemetry traces exist for the relumix side
+(`TXCBatchTopKPost_T5_85c0978e.jsonl`,
+`TXCBatchTopKPost_T16_d4b70d1a.jsonl`, 100 records each).
+
+**Mechanism receipt (why identical DESPITE the dead-latent
+regime):** the dead-latent fingerprint IS present exactly as the
+regime argument predicted — dead_frac 0.654 at T16 vs 0.210 at T5
+— but `boundary_min_pre` (the smallest pre-act among SELECTED
+latents) stayed ≥ **2.21 (T16) / 2.47 (T5) at every logged step**
+(250-step cadence; between-step excursions unobserved — final
+weights are the ground truth regardless). The top-k_pos pool
+never touches zero ⇒ rectify-before-select and select-raw pick
+the same set with the same values ⇒ identical gradients ⇒
+identical weights. Dead latents live far BELOW the boundary; they
+never contest selection. The precondition for divergence (boundary
+crossing 0 under pool-thinning) simply does not occur on the
+phase-7 RLHF stream at any tested depth (0.5% → 8.7%).
+
+**Cross-task contrast (framing guard respected — same-instrument
+comparison):** probing twins DIVERGE at every tested T ≥ 2 (13-pair
+table, both seeds, sign-structured per-k drift; runpod-1's
+entries-of-record) while RLHF twins are BIT-IDENTICAL through
+T16 at the same nominal selection-depth regime. The relu_mode
+distinction is task-dependent at the WEIGHT level. (Different
+datasource + layer + _pre/_post variant across tasks — stated,
+not controlled; the contrast is between protocol stacks as
+shipped, per the exhibit convention.)
+
+**Consequences (frozen rules applied):**
+- **rmx_b16 DEAD** (A5: identical ⇒ lane never runs). runpod-b:
+  launch `rmx_b` (T{8,10}×3) only — your time-box resolves NOW,
+  gate answered before 01:30 deadline.
+- **Certified-identical set for the matrix = {sae k500, txc T5,
+  txc T16} (s42 basis):** T5 and T16 relu-mix s1/s2 are
+  certificate-covered on the exhibit; grid arm-doubling proceeds
+  ONLY at T{1,2,4,6,8,10} (rmx_a mine, rmx_b runpod-b's) — T1×3
+  doubles as the T1 certification extension (expected identical;
+  if any T1 twin DIVERGES I report immediately, standing rule).
+- Both-arms exhibit line: "RLHF: arms certified weight-identical
+  at k500/T5/T16 (s42); remaining T arm-doubled by training."
+- Ledger: eq lane actuals ≈ 3.8 GPU-h ≈ $11 (est $11 ✓).
+
+PENDING TEAM REVIEW (verdict + the certified-identical exemption
+readings + the mechanism framing).
+
+_Recorded-by: claude-fable-5 (runpod-2)_

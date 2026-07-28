@@ -1,89 +1,52 @@
 # runpod-2 — working state
 
 **Am:** executor on the ACTMIX shared 3×H100 pod, GPU 2 only
-(`source scripts/set_agent_env.sh runpod-2` EVERY shell — the
-14:28 relaunch mistake is why). Clone
+(`source scripts/set_agent_env.sh runpod-2` EVERY shell). Clone
 `/workspace/agents/runpod-2/temp_xc`, own venv (peft + einops).
 
-## State (2026-07-27 ~22:30 UTC / ~23:30 London, wall-verified)
+## State (2026-07-28 ~00:05 UTC / ~01:05 London, wall-verified)
 
-**Shipped today:** A1 FINAL RATIFIED (af7d0869b) — 3-seed fig +
-table + verdict extension. Ward depth-sweep verdict posted PTR
-(0811644b1). Eq lane 2/3 CERTIFIED IDENTICAL (sae_k500 + txc_T5:
-torch.equal all shared tensors, Δauc exactly 0, provenance
-receipts staged — train_cached=False, walls 13.4/55.7 min,
-distinct train_keys a67f63b5e0e15d6e/eff51d4fb0ec4088).
+**CERTIFICATE SHIPPED (this push):** RLHF equivalence 3/3
+TENSOR-IDENTICAL through T16 (k500/T5/T16, s42; Δauc exactly 0
+each; receipts + mechanism: boundary_min_pre ≥ 2.21 every logged
+step — relu inert by margin; dead_frac 0.654 at T16 present but
+non-contesting). Pre-registered T16 divergence (7093c21f8)
+REFUTED — disclosed. **rmx_b16 DEAD. runpod-b launches rmx_b
+only.** RLHF_EQUIVALENCE.{md,json} committed. Eq actuals $11.
 
-**RUNNING on GPU 2:** eq lane cell 3/3 — relumix txc_T16 s42
-(EXPECTED divergent, 7093c21f8), solo since ~20:24 UTC, lands
-~23:05 UTC. PID 76437, 36.9 GB. Log quiet = nohup block buffer
-(flushes on exit; verified alive via /proc + nvidia-smi).
+**Queue (frozen order, GPU 2):**
+1. **NOW: launch x6 ‖ x10** (A2 frozen: T{6,10}×3 btk, fracs
+   0.35/0.50) at fresh pushed pin via rev-parse. ~8 GPU-h
+   co-resident → drains ~08:00-08:30 UTC. Arm DONE watchers.
+2. **rmx_a behind them** (A5: relumix T{1,2,4,6}×3, cheap-first;
+   T4-btk is runpod-a's per ratified swap be3d3fddc — landing on
+   their pod, s42 already in at 0.6185). ≈ 6.5 GPU-h.
+3. **Morning: 7-point FINAL fig re-render** {1,2,5,6,8,10,16} +
+   table + beat = HARD POINT (af7d0869b). 8-point exhibit render
+   {1,2,4,5,6,8,10,16} when T4×3 + relumix grid complete.
+4. Ledger actuals per lane; STATUS + listener re-arm every wake.
 
-**⚑⚑ NEW GOVERNING DIRECTIVE: 1065b26cf (Han's deliverables
-matrix).** Relu-mix RLHF arm REQUIRED at every grid T except
-certified-identical points — A3/A3b cancel branch SUPERSEDED (eq
-lane = certification+telemetry, unchanged value, different
-consequence). btk T4×3 added (grid floor; T5 stays bonus).
-**CARD § 7 A5 frozen this commit** — lanes x4 / rmx_a / rmx_b /
-rmx_b16 in cells.py.
+**Fleet refs:** runpod-b = rmx_b T{8,10}×3 (their pod, unblocked
+by the certificate; by-T split per A5 — NOT by-seed). runpod-a =
+x4 lane (T4 btk ×3, s42 landed) + R30 twins. Morning render
+consumes: my A1 rows + x6/x10 + runpod-a's x4 (T4 excluded from
+the 7-point hard render; enters at 8-point).
 
-## SPLIT PROTOCOL (runpod-b: read this at width-match drain)
+## Watchers
 
-Pre-auth UNCONDITIONAL per 1065b26cf. Pin = the commit adding
-CARD A5 (contains lanes; resolve via rev-parse on YOUR clone
-after pull). Run from YOUR pod/GPU with YOUR env sourcing:
-
-- **rmx_b = yours:** relumix txc T{8,10} × seeds {42,1,2} —
-  6 cells ≈ 8.9 GPU-h solo ≈ $27. Launch any time from your
-  drain; no dependency on my lanes.
-  `nohup .venv/bin/python -m experiments.explorations.actmix_rlhf.run_cells --lane rmx_b --pin $(git rev-parse HEAD) ...`
-- **rmx_b16 = yours, CONDITIONAL:** relumix txc T16 s1/s2 —
-  launch ONLY after my T16 gate posts DIVERGENT (LOG certificate
-  entry, ~00:00 London). Identical ⇒ never runs (certificate line
-  covers T16). ≈ 5.3 GPU-h ≈ $16.
-- **rmx_a = mine:** T{1,2,4,6} × 3 on GPU 2 behind btk lanes.
-- Contention math is per-GPU — your pod, your rates. Ledger your
-  own est/actuals lines.
-
-## THEN (frozen order, GPU 2)
-
-1. **T16 lands (~23:05 UTC)** → commit leaderboard/manifest rows
-   → `.venv/bin/python -m experiments.explorations.actmix_rlhf.rlhf_equivalence`
-   → certificate LOG entry w/ receipts (train_keys, wall_s,
-   train_cached=False, telemetry trace files, distinct-ckpt
-   no-aliasing). Consequence per A5: DIVERGENT T16 ⇒ rmx_b16
-   armed for runpod-b (report IMMEDIATELY per 361de3cb2);
-   IDENTICAL ⇒ certificate line, rmx_b16 dead. Push FAST —
-   runpod-b reads the gate at their ~01:00 drain.
-2. **Launch x6 ‖ x10** (A2 frozen: fracs 0.35/0.50) at fresh
-   pushed pin via rev-parse. ~8 GPU-h co-resident → drains
-   ~07:00-07:30 UTC.
-3. **x4 at first drain slot** (x6 drains first ~05:30 UTC → x4
-   co-resides with x10 tail, 2-way max — never 3-way, untested
-   contention). ~2 GPU-h.
-4. **rmx_a behind the btk lanes** (T{1,2,4,6}×3, cheap-first
-   order per cells.py). ≈ 6.5 GPU-h.
-5. **Morning: 7-point FINAL fig re-render** {1,2,5,6,8,10,16} +
-   table + beat = the HARD POINT (af7d0869b — unchanged by A5).
-   8-point exhibit re-render later when T4×3 + relumix grid land.
-6. Ledger actuals per lane; STATUS + listener re-arm every wake.
-
-## Watchers live
-
-Origin listener (150 s; re-arm EVERY wake); eq DONE/FAIL
-b296ty8ip (240 s). Arm per-lane DONE watchers at each launch.
+Origin listener 150s — re-arm EVERY wake. Per-lane DONE watchers
+armed at each launch (grep '\[lane <name>\] DONE' or FAIL).
 
 ## Ledger
 
-MODAL_SPEND RUNPOD: yesterday ≈ $44; today A1 $27 + Ward $2
-actuals; est queued: eq ~$11 + x6/x10 ~$24 + x4 ~$6 + rmx_a ~$20.
-Day caps intact ($150/day).
+Yesterday ≈ $44; today (07-27) A1 $27 + Ward $2 + eq $11 actuals
+≈ $40; queued est: x6/x10 ~$24 + rmx_a ~$20. Caps intact.
 
 ## If resuming after compact
 
-Read this file + LOG tail from my 21:45 entry + CARD § 7 A5.
-Check lanes: `tail /workspace/logs/actmix_rlhf_lane_*.log` + jsonl
-`actmix_rlhf_runs_*.jsonl`; `nvidia-smi` for GPU 2 occupancy.
-Execute the THEN list in order. Checker:
-`.venv/bin/python -m experiments.explorations.actmix_rlhf.rlhf_equivalence`.
-Renderer: `... .render_writeup_fig --tag final` (mono default).
+Read this + LOG tail from the 00:02 certificate entry + CARD § 7
+A5. Lanes: `tail /workspace/logs/actmix_rlhf_lane_*.log`, jsonl
+`actmix_rlhf_runs_*.jsonl`, `nvidia-smi` GPU 2. Execute queue in
+order. Renderer: `.venv/bin/python -m
+experiments.explorations.actmix_rlhf.render_writeup_fig --tag
+final` (mono). Checker: `…actmix_rlhf.rlhf_equivalence`.

@@ -1,0 +1,47 @@
+[
+ {
+  "arch": "batchtopk_sae",
+  "seed": 42,
+  "T": null,
+  "k_pos": 500,
+  "relumix_train_key": "a67f63b5e0e15d6e",
+  "btk_train_key": "f1f586849f07efcb",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "pref_auc_k20_delta": 0.0,
+  "verdict": "IDENTICAL"
+ },
+ {
+  "arch": "txc_batchtopk_post",
+  "seed": 42,
+  "T": 16,
+  "k_pos": 1600,
+  "relumix_train_key": "5774f6c8b6d28938",
+  "btk_train_key": "3d46dfd07b50eac0",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "pref_auc_k20_delta": 0.0,
+  "verdict": "IDENTICAL"
+ },
+ {
+  "arch": "txc_batchtopk_post",
+  "seed": 42,
+  "T": 5,
+  "k_pos": 500,
+  "relumix_train_key": "eff51d4fb0ec4088",
+  "btk_train_key": "25f7c9471f052b96",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "pref_auc_k20_delta": 0.0,
+  "verdict": "IDENTICAL"
+ }
+]
