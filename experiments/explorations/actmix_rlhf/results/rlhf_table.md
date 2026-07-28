@@ -17,14 +17,19 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
 
 | cell | auc | shuffled | gap | mass@20 | l0/unit |
 |---|---|---|---|---|---|
+| batchtopk_sae@T1/k500 | 0.6250 | ≡ | — | 0.087 | 535.3 |
 | batchtopk_sae_btkonly@T1/k100 | 0.6130 | ≡ | — | 0.108 | 108.3 |
 | batchtopk_sae_btkonly@T1/k500 | 0.6250 | ≡ | — | 0.087 | 535.3 |
 | tsae_btkonly@T1/k20 | 0.5997 | ≡ | — | 0.286 | 19.4 |
 | tsae_btkonly@T1/k500 | 0.6163 | ≡ | — | 0.095 | 549.6 |
+| txc_batchtopk_post@T5/k500 | 0.6229 | 0.6196 | 0.0033 | 0.071 | 516.6 |
+| txc_batchtopk_post@T16/k1600 | 0.6108 | 0.6130 | -0.0022 | 0.052 | 1645.9 |
 | txc_batchtopk_post_btkonly@T1/k100 | 0.5777 | ≡ | — | 0.098 | 108.5 |
 | txc_batchtopk_post_btkonly@T2/k200 | 0.6196 | 0.6107 | 0.0088 | 0.098 | 210.6 |
 | txc_batchtopk_post_btkonly@T5/k500 | 0.6229 | 0.6196 | 0.0033 | 0.071 | 516.6 |
+| txc_batchtopk_post_btkonly@T6/k600 | 0.6350 | 0.6328 | 0.0022 | 0.070 | 617.3 |
 | txc_batchtopk_post_btkonly@T8/k800 | 0.6262 | 0.6262 | 0.0000 | 0.064 | 831.5 |
+| txc_batchtopk_post_btkonly@T10/k1000 | 0.6218 | 0.6207 | 0.0011 | 0.057 | 1041.4 |
 | txc_batchtopk_post_btkonly@T16/k1600 | 0.6108 | 0.6130 | -0.0022 | 0.052 | 1645.9 |
 | batchtopk_sae_btkonly@T1/k100 (untrained) | 0.5899 | ≡ | — | 0.055 | 2.8 |
 | batchtopk_sae_btkonly@T1/k500 (untrained) | 0.6588 | ≡ | — | 0.028 | 91.5 |
@@ -47,6 +52,7 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
 | txc_batchtopk_post_btkonly@T1/k100 | 0.5975 | ≡ | — | 0.111 | 108.2 |
 | txc_batchtopk_post_btkonly@T2/k200 | 0.6162 | 0.6185 | -0.0022 | 0.097 | 209.2 |
 | txc_batchtopk_post_btkonly@T5/k500 | 0.6218 | 0.6119 | 0.0099 | 0.073 | 510.0 |
+| txc_batchtopk_post_btkonly@T6/k600 | 0.6328 | 0.6317 | 0.0011 | 0.071 | 615.8 |
 | txc_batchtopk_post_btkonly@T8/k800 | 0.6251 | 0.6328 | -0.0077 | 0.063 | 822.7 |
 | txc_batchtopk_post_btkonly@T16/k1600 | 0.6196 | 0.5998 | 0.0198 | 0.053 | 1643.5 |
 
@@ -54,6 +60,8 @@ Protocol: preference_auc_k20 primary (5-fold CV, top-20 signed |mean_rejected �
 
 | cell | auc | shuffled | gap | mass@20 | l0/unit |
 |---|---|---|---|---|---|
+| tsae_btkonly@T1/k20 | 0.5986 | ≡ | — | 0.260 | 19.4 |
+| tsae_btkonly@T1/k500 | 0.6217 | ≡ | — | 0.093 | 536.6 |
 | txc_batchtopk_post_btkonly@T1/k100 | 0.6008 | ≡ | — | 0.104 | 108.5 |
 | txc_batchtopk_post_btkonly@T2/k200 | 0.6096 | 0.6085 | 0.0011 | 0.094 | 211.2 |
 | txc_batchtopk_post_btkonly@T5/k500 | 0.6185 | 0.6041 | 0.0143 | 0.073 | 517.0 |

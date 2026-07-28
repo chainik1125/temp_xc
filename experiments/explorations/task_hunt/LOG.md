@@ -21082,3 +21082,33 @@ _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
   pin; table + LOG beat ride the render commit.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## [2026-07-28 09:50 London] runpod-2: ⚑⚑ 10:15 CHECKPOINT RENDER SHIPPED EARLY (deliverable of record) — btk RLHF fig + table live; GOLD-VISIBILITY flag for hub embed
+
+Item-3 deliverable of record, shipped 25 min ahead (the btk landed
+set cannot change before 10:15 — no btk cells running):
+
+- **fig_rlhf_shuffle_tsweep.{png,pdf}** `--tag checkpoint`:
+  21 points, coverage auto-note T1:n=3 T2:n=3 T4:n=3 T5:n=3
+  **T6:n=2 T8:n=3 T10:n=1** T16:n=3; corner caption verbatim
+  "CHECKPOINT (deliverable of record) — T6/T10 deferred for
+  paper-faithful priority; final sweep supersedes in the
+  amendment window"; T=16−T=1 = **+0.029**; T6 peak 0.634
+  (ordered mean); BINDING agentic_txc_02 arch-disclosure footnote
+  auto-carried; ordered-solid/shuffled-dashed mono pair-style,
+  per-seed faints. Layout: caption wrapped 2-line + white backing
+  (tight-layout overflow fixed this commit; render eyeballed).
+- **rlhf_table.{json,md}** regenerated via analyze: R_E3 holds,
+  R_E4 holds, R_E5 (untrained ≈ 0.5) FALSE — as previously
+  recorded (untrained twins sit above 0.5 on this metric; the
+  caveat rides the table; untrained rows are NOT in the fig).
+- Supersede branch stays armed: any btk amendment lands ⇒ same
+  paths re-render, LOG note.
+- **Gold-visibility (0a2a203e8): flagging this beat for the
+  HANDOFF item-3 embed.**
+- Pilot: 4h40m, 99% CPU, alive; G1 pending. Render was CPU-side,
+  pilot untouched.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

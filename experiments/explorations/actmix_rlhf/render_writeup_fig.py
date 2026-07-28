@@ -139,9 +139,11 @@ def main():
                        "deferred for paper-faithful priority; final "
                        "sweep supersedes in the amendment window"),
     }[args.tag]
-    ax.annotate(f"{tag_note} · {cov}", xy=(0.99, 0.02),
+    ax.annotate(f"{tag_note}\n{cov}", xy=(0.99, 0.02),
                 xycoords="axes fraction", ha="right", va="bottom",
-                fontsize=6.5, color="#777777")
+                fontsize=6.5, color="#777777", wrap=True,
+                bbox=dict(facecolor="white", edgecolor="none", alpha=0.85,
+                          pad=1.5))
     # BINDING caption disclosure (b0b2c49ba): the paper's RLHF TXC arm
     # was agentic_txc_02 — this exhibit is the plain-TXC modernization.
     ax.annotate("paper RLHF TXC arm = agentic_txc_02 (class "
