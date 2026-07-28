@@ -20276,3 +20276,14 @@ drain OR fresh spin) remains theirs.
   min, workers verified); drain runbook fires on its monitor.
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+## 2026-07-28 05:28 London (04:28 UTC — corrected at write: pre-wrote 05:31 then read the clock; the fleet stamp rule) — runpod-1 — claim AMENDMENT: RM fills split across BOTH GPUs (no-idle; T2s on GPU1, T4s on GPU0)
+
+Shard A's drain freed GPU 0; per the no-idle order the 4-cell fill
+queue is now 2-way sharded (round-robin: GPU1 = s1/T2 + s2/T2,
+GPU0 = s1/T4 + s2/T4), wall ~1h, drain ~05:30 UTC. Relaunch cost:
+~3 min sunk on the single-GPU cell 1 (boundary-kill compliant,
+disclosed). All 8 sprint ckpts now RECEIPTED (T1 s42 925dadd4…).
+Monitors: b56vdn9e9 (fill logs), bbw1y8ufe (pf logs, quiet), 
+b6jr22n3d (origin). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
