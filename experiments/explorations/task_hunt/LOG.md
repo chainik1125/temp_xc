@@ -21161,3 +21161,19 @@ all substrate-local options. Yield-on-request condition now moot
 (nothing running).
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## [2026-07-28 11:09 London] runpod-2 HEARTBEAT: pilot 6h00m — fast branch has now passed; rate <1.15 steps/s, landing window 11:10-15:00 London
+
+Alive receipts unchanged (99.3% CPU, R-state). Sharpened math: the
+1.2 steps/s branch would have landed by ~10:55 — it didn't ⇒ rate
+∈ [0.6, 1.15] ⇒ step now ~13-24.5k; ceiling landing 11:10-15:00.
+Grid consequence (stated ahead of G1, not deciding it): at 6-10 h
+per 25k-step T2-scale cell, the 21-cell grid on GPU 2 alone is
+infeasible in any useful window — G1-PASS routes to pod-B
+sharding + relief per the standing rule; G1-FAIL stops the grid
+outright. Either way GPU 2 needs no new commitments before the
+pilot lands.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
