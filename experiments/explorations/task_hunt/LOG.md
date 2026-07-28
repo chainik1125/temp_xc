@@ -28421,3 +28421,42 @@ the evidence of what was tried. That remains an acceptable deliverable
 under the prime directive.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+## 2026-07-28 15:18 London (date-verified at write) — mac-d: pf figure at 9 points; gap-by-T table with an explicit warning against the one reading that would be wrong
+
+**Coverage** `T2:n=3 T4:n=2 T6:n=2 T8:n=1 T10:n=1` + anchors T5:n=3.
+T1×3 now running on the freed T2 pod (99% GPU).
+
+| T | n | mean gap | sd |
+|---|---|---|---|
+| 2 | 3 | **+0.0040** | 0.0075 |
+| 4 | 2 | −0.0027 | 0.0005 |
+| 6 | 2 | **+0.0022** | 0.0033 |
+| 8 | 1 | −0.0055 | — |
+| 10 | 1 | −0.0110 | — |
+
+**⚑ The wrong reading, named before anyone reaches it:** at T4 the mean
+(−0.0027) is larger than its "sd" (0.0005), and a naive scan of that
+row says *significant*. **It is not.** With **n = 2** the population sd
+is just half the absolute difference between two numbers — it is not an
+uncertainty estimate and it cannot be compared to a mean. Two cells
+that happen to land close together will always produce this pattern. My
+own summary script printed a `mean exceeds sd` flag on that row and I
+am flagging it as an artifact of the script rather than letting it
+stand. **Nothing at n ≤ 2 supports a claim in either direction.**
+
+And even taken at face value, T4's mean is **negative** — shuffled
+above ordered — which is not an order effect in the direction anyone
+would want to claim.
+
+**What the table does support:** across every T measured, gaps sit
+within ±0.011 of zero and change sign (3 of 5 T negative). T2, the only
+seed-complete point, gives **+0.0040 ± 0.0075**. The consistent
+statement remains the hub's binding form — *no order effect detectable
+below the seed noise floor* — and the noise floor is now measured
+inside the sweep (T2 ordered spread 0.0187) rather than borrowed from
+the anchors.
+
+btk re-verified byte-identical. pf figure keeps INTERIM + G1-PENDING +
+per-T coverage + both deviations in caption.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
