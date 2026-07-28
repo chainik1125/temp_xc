@@ -94,23 +94,49 @@ not answer the representational question at all (out-of-context classes
 are absent from the input for *any* model); caught on reading the output
 and re-run at 512.
 
-## ⚑ THE SYNTHESIS — hand this over first
+## ⚑ THE SYNTHESIS — hand this over first (revised 20:43)
 
-**Floor horizon = `T + w` ≈ 89 tokens** at the screened setting.
-**Model readable horizon ≈ 100 tokens** — both gpt2 scales, both context
-lengths, per-class collapsing to ~0.39–0.43 beyond it. **These are the
-same number.** The arm's entire structural opportunity is the band
-`(T+w, readable_horizon)` = **(89, 100), a factor of 1.12.** That one
-fact predicts the scissors, ρ +0.871, 0/6 beating their floor, and
-`arm − floor` falling monotonically with T (T16 −0.017, T32 −0.077,
-T64 −0.148; T4 +0.025 is the only positive on record).
+**Full matrix, as-screened recency face, `facecmp/results/scale/`:**
 
-**Untested inference:** shrink the FLOOR's horizon rather than chase the
-model's — **T=16 with narrow events (w≈4)** gives ~20 vs ~100, a factor
-of **5**. `retryesc_gen` violated all three (T=64, w=25, terciles
-121/286 — the label's whole range outside the readable horizon). **Not
-frozen into a card**: the last two bar-side designs did not carry the
-arm.
+| model | @128 gain | @512 gain | class-2 per_class @128→@512 |
+|---|---|---|---|
+| gpt2-small 124M | +0.0596 | +0.0928 | 0.403 → 0.416 |
+| gpt2-medium 355M | +0.0389 | +0.0754 | 0.368 → 0.431 |
+| **gemma2_2b 2.6B** | +0.0567 | **+0.1088** | **0.399 → 0.493** |
+
+**CONTEXT AND SCALE MULTIPLY.** At 128 tokens a 21× model buys nothing;
+at 512 it buys the best result on record. **gpt2 barely uses 4× more
+context; gemma2 uses it substantially** — a capability difference the
+apparatus was hiding completely. My earlier "readable horizon ≈ 100
+tokens, same as the floor's" was **measured on gpt2 and does NOT
+generalise**: the readable horizon is a **model × context product**, not
+a constant.
+
+**The floor has never moved — 4 model×context combos** (gpt2
+0.5859/0.5932, gemma2 0.6048/0.6081). Pre-registered every time. It
+depends only on `T + w` and is **purely ours to set.**
+
+**Three levers; the evidence says all three are needed:**
+1. **Context** `SEQ_LEN` 128 → 512 (alone: +0.0596 → +0.0928)
+2. **Model** 124M → 2.6B (**alone: nothing**; with (1): → **+0.1088**)
+3. **Shrink the floor** `T + w` — **UNTESTED, and now the binding one**
+
+**Every candidate screened so far violated (1) and (3).**
+
+**Still not a KEEP:** `arm − floor` = **−0.117**, up from −0.178, **with
+zero corpus change.** Closing the rest is lever 3: `w` 25 → narrow
+events, `T` 64 → 16, label range inside the readable band.
+`retryesc_gen` was T=64, w=25, terciles 121/286 — **wrong on all three.**
+
+**NOT frozen into a card**: lever 3 is untested and the last two
+bar-side designs did not carry the arm. **Cheap next step: re-label an
+existing corpus at T=16 and measure `arm − floor` before generating
+anything.**
+
+⚠ **Process lesson:** I tested two variables one at a time, got a null
+from each, and twice wrote a conclusion off a single-variable null.
+**Both were interaction effects.** When a factor is pinned by another
+factor's ceiling, varying it alone measures the ceiling, not the factor.
 
 ## Next actions, in order
 
