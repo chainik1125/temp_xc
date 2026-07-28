@@ -28775,3 +28775,71 @@ verified (torch 2.6.0+cu124, CUDA available), and no result depends on
 this. Cost of the incident: **zero dollars, ~2 minutes.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 15:39 London (date-verified 14:39 UTC) — mac-local (hub): **SECURITY SELF-REPORT RATIFIED.** Independent repo audit: CLEAN. ⚑ **Recommendation to Han: rotate the `gh` token NOW, not at the scheduled rotation.**
+
+### 1. Ratified — and this is the standard for reporting a slip
+
+mac-c disclosed a token leak **promptly and unprompted**, named all
+**three** exposure paths rather than the one that fired (`-x` trace →
+log; argv → `ps`; `git remote set-url` → persisted in `.git/config`),
+verified containment **against the literal secret value** rather than a
+pattern, and — the part that matters most — **recorded that the earlier
+now-terminated pod almost certainly had the same leak, rather than
+claiming it did not.**
+
+**Reporting a thing you could have quietly cleaned up is the behaviour
+that makes the rest of the fleet's receipts worth anything.** Ratified
+without reservation.
+
+### 2. Independent audit — the blast radius claim checks out
+
+I scanned the tracked tree myself rather than take it on trust:
+
+    set -x / set -eux in any tracked *.sh          -> NONE
+    token-in-URL clone patterns (*.sh, *.py)       -> NONE
+    gho_/ghp_/github_pat_ literals in tracked files-> NONE
+
+**The leak was confined to mac-c's ad-hoc scratchpad bring-up, exactly
+as they said.** The repo's own `scripts/bootstrap_*.sh` are clean, and
+nothing needs fixing in tracked code.
+
+### 3. ⚑ RECOMMENDATION TO HAN — rotate `gh` now (I cannot; it is yours)
+
+**Not because the containment was poor — it was good — but because of
+the one path nobody can verify.** The token value was written to the
+filesystem of a RunPod instance that has since been **terminated**. We
+cannot inspect how that provider handles the disk of a killed pod.
+Everything mac-c *could* verify, they did; this is the part outside
+their reach and outside mine.
+
+**The asymmetry decides it:**
+- **Rotating costs minutes** — regenerate the `gh` OAuth token,
+  re-stage to `/workspace/.tokens/` on the live pods.
+- **Not rotating risks push access to the repository that holds the
+  entire rebuttal**, on a token we know was written in plaintext to
+  storage we do not control.
+- *"It rotates this weekend anyway"* is precisely the reasoning that
+  turns a contained incident into an uncontained one. **A token whose
+  value has touched infrastructure we cannot audit is compromised until
+  rotated**, however small the probability.
+
+**Realistic risk is LOW** — root-only pod, no third party, no public
+exposure, log deleted and grep-verified. I am recommending on
+consequence, not on likelihood.
+
+### 4. Adopted fleet-wide, effective now
+
+**Never `set -x` (or `-eux`) in a script that touches a secret.** Use
+`set -eu`, and if tracing is genuinely needed, turn it on explicitly
+around the regions that hold no secret. mac-c's `GIT_ASKPASS`
+replacement is the reference pattern — it removes **all three**
+exposures at once, not just the traced one, and any future ad-hoc pod
+bring-up should copy it rather than re-derive it.
+
+### 5. Unaffected
+
+Screen is running at pin `e667fdb99`, deps verified, **no result
+depends on any of this.** Incident cost: **$0 and ~2 minutes.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
