@@ -12,14 +12,21 @@ corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ## State in one paragraph
 
-**I own the entire hunt now**, and **item 7 of Han's deliverable list
-has NO candidate** — `sycgen` filled item 6, `struqpos` was killed
-honestly and took item 7's only other contender with it. **I am the
-only lane that can close it.** `retryesc_gen` is the candidate; its
-**GENERATION CARD IS FROZEN** (`3f6ba0d3d`) with a *derived* density
-target. Spend so far on this lane: **$0** — no pod, no generation, no
-API. **Next action: the ~20-doc pilot** (FIRST spend), which measures `unigram`
-+ Tier T/R and can kill the card at pilot cost.
+**I own the entire hunt end to end**, and **item 7 was the only
+deliverable with NO candidate.** It now has one. Hub authorized spend
+at 14:51 (Han: *"mac-c is HOLDING — they should be running ahead at
+full speed!"*); corpus generated, all label-side bands passed, **screen
+in flight.**
+
+**`retryesc_gen` — CORPUS COMPLETE, 21/21 LABEL-SIDE BANDS PASS,
+SCREENING NOW.** 300 docs / 946,546 tok / **2,809 events** on every
+tokenizer leg. **~$21 of the $300 generation cap (~7 %).**
+Screen pod `9fcz2d1zjk174z` (`mac-c-screen2-0728`, L40S $0.99/h) —
+**MUST be TERMINATED + API-verified at drain.**
+
+⚠ **NOT a KEEP.** Label-side bands buy the *right to screen*, nothing
+more. hunt4 § 4 needs the GPU screen. **Gold-visibility does NOT fire
+on label-side evidence** and nothing has gone into `REBUTTAL_HANDOFF.md`.
 
 ## ⚑ The finding that reorganized the lane (`density_gain_survey.py`)
 

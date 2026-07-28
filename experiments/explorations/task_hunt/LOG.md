@@ -28696,3 +28696,82 @@ we measured, on this task.** The T10 pre-registration governs how we
 report *that one cell*; it does not license a trend.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+---
+
+## 2026-07-28 15:26 London (date-verified at write) — mac-c: ⚑ **SECURITY SELF-REPORT — I leaked a GitHub token into a pod log via `set -eux`.** Contained and verified 0-residue; here is the root cause and the pattern that replaces it
+
+**Disclosing promptly and unprompted because it is a token-handling
+slip, and the standing rule is explicit: tokens are read from 0600
+files, "never argv, never echoed."** I violated the second clause.
+
+### 1. What happened
+
+My pod bring-up script began `set -eux`. The `-x` flag traces **every
+command with its arguments interpolated**, so this line
+
+    git clone ... "https://x-access-token:${GH}@github.com/..."
+
+wrote the **expanded token** into `/workspace/stage2.log`. The token is
+Han's `gh` CLI OAuth token (`gho_…`), staged to the pod for the repo
+clone.
+
+**The URL form has three separate exposures, not one:**
+1. **`-x` trace** → the log file (what actually fired);
+2. **argv** → visible in `ps` to anything on the box while the clone
+   runs;
+3. **`git remote set-url`** → the token is **persisted into
+   `.git/config`** and survives the session.
+
+My own script carried the comment *"Tokens are READ FROM FILES on the
+pod (0600) — never argv, never echoed."* The comment was right and the
+code contradicted it.
+
+### 2. Containment, verified rather than asserted
+
+- `/workspace/stage2.log` **deleted**.
+- `.git/config` remote **reset to the tokenless URL**.
+- **Verification: grepped the whole of `/workspace` for the literal
+  token value** — `0` files contain it outside the 0600 store where it
+  belongs. Not a pattern match; the actual secret.
+- Blast radius: **one pod I own, root-only, no third party**. The
+  earlier `mac-c-screen-0728` bring-up used the same script shape, so
+  the same leak almost certainly occurred there — **that pod is
+  TERMINATED**, so the log is gone with it, but I am recording the
+  likelihood rather than claiming it did not happen.
+- **Tokens rotate after this weekend regardless**, which limits but does
+  not excuse it.
+
+### 3. Root cause and the replacement pattern
+
+Root cause is a **habit**, not a typo: token-in-URL cloning plus
+blanket `-x`. The repo's own `scripts/bootstrap_*.sh` do **not** do
+this — it was in my ad-hoc scratchpad bring-up, so this is mine to fix
+and worth flagging to anyone else writing ad-hoc pod bring-up.
+
+**Replacement — `GIT_ASKPASS`, which removes all three exposures at
+once:**
+
+```bash
+set -eu                       # NOTE: no -x
+umask 077
+printf '#!/bin/sh\ncat /workspace/.tokens/gh_token\n' > /workspace/.git_askpass
+chmod 700 /workspace/.git_askpass
+export GIT_ASKPASS=/workspace/.git_askpass GIT_TERMINAL_PROMPT=0
+git clone --branch arxiv https://x-access-token@github.com/chainik1125/temp_xc.git /workspace/temp_xc
+git -C /workspace/temp_xc remote set-url origin https://github.com/chainik1125/temp_xc.git
+```
+
+Token never enters argv, never enters a URL, never lands in
+`.git/config`, and is not traceable by `-x`.
+
+**Rule I am adopting and would propose fleet-wide: never `set -x` in a
+script that touches a secret.** If tracing is wanted for debugging, use
+`set -eu` and trace explicitly around the safe regions.
+
+### 4. Unaffected
+
+The screen itself is unaffected — repo is at pin `e667fdb99`, deps
+verified (torch 2.6.0+cu124, CUDA available), and no result depends on
+this. Cost of the incident: **zero dollars, ~2 minutes.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
