@@ -18234,3 +18234,47 @@ Ratification of sycgen KEEP (fab7c861f § 4) acknowledged — the
 retrain premise is now hub-confirmed. PTR on these doc edits.
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+## 2026-07-28 03:09 London (date-verified) — mac-local: ⚑ TASK #11 CLOSED — "paper RLHF TXC = agentic_txc_02" INDEPENDENTLY VERIFIED (5 legs, receipts all local)
+
+Ordered by Han pre-compact. Re-derived WITHOUT leaning on the
+audit's own chain:
+
+1. **Runner source** — fcf9b573b
+   `experiments/phase7_unification/case_studies/_paths.py:30`:
+   `STAGE_1_ARCHS = (topk_sae, tsae_paper_k500, tsae_paper_k20,
+   agentic_txc_02)` — the stage-1 TXC arm by source;
+   `decompose_hh_rlhf.py` defaults `--archs` to exactly this tuple.
+2. **Byte-identity** — the agentic `top_features.json` blob
+   `12a873891a84fedf53cef0fa6858bf18ab198893` is IDENTICAL at
+   8220124e2 (dev cherry-pick,
+   `experiments/phase7_unification/results/case_studies/hh_rlhf/`)
+   and 284a8bf5e (release renderer source,
+   `purified/results/case_studies/hh_rlhf/`); all four arm blobs
+   pairwise identical dev↔release (e4d155fa…, c110c61e…,
+   21456aed… for topk_sae / tsae_k20 / tsae_k500).
+3. **Self-declared class** — the pinned blob's own header:
+   `{arch_id: agentic_txc_02, src_class:
+   MatryoshkaTXCDRContrastiveMultiscale, top_k: 20}` — the shipped
+   artifact names its class itself.
+4. **Encode path** — fcf9b573b
+   `src/architectures/matryoshka_txcdr.py` `encode`:
+   `einsum("btd,tds->bs") → topk(k) → scatter_(F.relu(vals))` =
+   **TopK→ReLU per-window**, exactly as disclosed under every RLHF
+   fig.
+5. **Durability** — HF `txcdr-base` (295 files) holds
+   `ckpts/agentic_txc_02__seed{1,2,42}.pt` + training_logs; seed42
+   = the shipped table's arm.
+
+⇒ **The RLHF caption disclosure STANDS — upgraded from
+audit-pinned to independently verified.** Hparam detail (T=5,
+k_win=500, shifts [1,2,3]) remains audit+paper-appendix-sourced —
+not load-bearing beyond class/arm identity. Codex's txc-pro
+concern is now closed on both prongs: the rebuttal exhibits are
+NOT txc_pro (01:55 refutation) AND the paper's RLHF arm identity
+is receipt-verified. CODE_GUIDE §1 provenance-status line updated
+this push.
+
+Ops note: origin-watcher found dead at 03:09 (compact casualty) —
+re-armed, single instance per house rule.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

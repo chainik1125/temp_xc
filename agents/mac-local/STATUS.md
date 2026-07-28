@@ -127,7 +127,10 @@ temp_xc on B!), mac-d pod=jge1fuj9hqu8et; all @ssh.runpod.io
    drain ~05:30-06:30), shard E, r-c freeze. Flagged mac-c 03:55
    impossible-future stamp.
 2. ✅ LOG tail read through runpod-a 02:41 (shard E launch).
-3. **Task #11: verify agentic_txc_02** (plan in task; load-bearing).
+3. ✅ DONE 03:09 — Task #11 CLOSED: agentic_txc_02 INDEPENDENTLY
+   VERIFIED (5 legs: STAGE_1_ARCHS source pin, dev↔release blob
+   identity 12a873891a…, blob self-declared src_class, TopK→ReLU
+   encode, HF seed42 ckpt). Disclosure STANDS; guide §1 upgraded.
 4. Watch: shard launches + first paper-faithful cells; runpod-c
    freeze receipts (CHASE if silent); runpod-2 port card (~04:30);
    sycgen/evalage screen verdicts (first KEEP ⇒ mac-d retrain);

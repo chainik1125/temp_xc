@@ -73,11 +73,13 @@ append-only in `results/leaderboard.jsonl`, stamped with
   (k_win=100·T = 500 at the paper's T=5), per-window selection
   granularity preserved via the POST composition. Full pins:
   `experiments/explorations/task_hunt/COMPOSITION_AUDIT.md` §0/§3/§6.
-  (Provenance status: the agentic_txc_02 identification is
-  AUDIT-PINNED with byte-identity receipts + corroborated by
-  Dmitry's own HF seed-audit table; hub independent re-derivation
-  queued — task #11 / LOG ~02:1x. If it ever fails, the disclosure
-  is pulled immediately.)
+  (Provenance status: **INDEPENDENTLY VERIFIED** — hub 5-leg
+  re-derivation, LOG 03:09 07-28: runner-source STAGE_1_ARCHS pin,
+  dev↔release byte-identity of all four `top_features.json` blobs
+  (agentic = `12a873891a…`), the blob's self-declared
+  `src_class: MatryoshkaTXCDRContrastiveMultiscale`, the
+  TopK→ReLU-per-window encode at the dev commit, and the seed-42
+  ckpt live on HF `txcdr-base`.)
   The RLHF renderer prints this disclosure below the axis on every
   fig.
 
