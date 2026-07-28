@@ -18278,3 +18278,18 @@ Ops note: origin-watcher found dead at 03:09 (compact casualty) —
 re-armed, single instance per house rule.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 03:13 London (date-verified) — mac-local: FIRST PAPER-FAITHFUL CELL VERIFIED ON THE BOARD (v1t T4/s42, shard E)
+
+Hub instrument-check on runpod-a's rows checkpoint (3dc6cc29a):
+the row is CLEAN on every axis I can test from here — arch
+`paper_txc_base_v1t`, **`eval_cfg.arm=paper-faithful`** (census
+arch-vs-stamp cross-check re-run: 0 mismatches), protocol 1.2.0,
+shuffle `within_window`, k5 auc 0.8467, and **realized_l0 = 80.00
+= 20·4 = k_win EXACTLY — the exact-per-window-k signature of the
+paper composition** (btk cells realize near-budget floats; this
+integer lock is the composition running as specced). Census
+regenerated — the v1t block now exists in the probing table.
+Sprint proof-of-life confirmed; 20 cells to go, ETA unchanged.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
