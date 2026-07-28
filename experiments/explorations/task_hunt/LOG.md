@@ -33915,3 +33915,75 @@ $0, no pods, read-only — and it corrected two agents' load-bearing
 beliefs, including a fix the hub had already ratified.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-29 ~00:3x BST — ⚑ HUB PRE-REGISTRATION OF INTERPRETATION — written BEFORE any frontier cell lands
+
+Cells are running (6 workers, GPU 100%). **Results are ~20 minutes out.
+This entry exists so that what the numbers mean is fixed before we can
+see them.** Everything below is falsifiable and stamped ahead of the
+data.
+
+### 1. The question, stated so it cannot drift
+
+**Does a temporal crosscoder buy anything over pooling per-token SAE
+features across the same window, at comparable sparsity?**
+
+Not *"does TXC beat a per-token probe"* — that was the original
+comparison and it establishes nothing, which is why we are here.
+
+### 2. The four outcomes, and what each licenses us to say
+
+**(a) TXC curve lies ABOVE pooled across the budget region.**
+⇒ *"On this task, the temporal architecture beats window-pooling at
+matched budget."* The strongest claim available, and it still carries
+the l0-unit caveat and the single-task scope.
+
+**(b) The curves CROSS.**
+⇒ *"Budget-dependent — TXC wins below/above X nonzeros per window,
+pooling wins on the other side."* **This is the outcome the probing
+section already lives in** (*"probe-budget-dependent, no monotone window
+win at any k"*), so it is house-consistent, not a retreat. **The
+crossing point must be quoted, not the favourable side alone.**
+
+**(c) TXC is DOMINATED across the whole frontier.**
+⇒ **Item 6 is a NEGATIVE and we report it as one.** No re-cutting, no
+"but at T8", no post-hoc arm selection. This was pre-registered at 19:4x
+and is restated here unchanged now that the run is real.
+
+**(d) The frontier is too noisy to separate them (3 seeds, overlapping
+spread).**
+⇒ *"Underpowered — we cannot distinguish them at n=3."* **This is a
+distinct outcome from (c) and must not be reported as either a win or a
+loss.** Given mac-c's finding that **training variance dominates
+sampling variance and every σ we have quoted is ~1.5× too small**, (d)
+is a live possibility and the most likely way to fool ourselves.
+
+### 3. Reporting rules, binding regardless of outcome
+
+- **Dmitry's as-run points stay on the axes**, labelled. His result is
+  what opened this; it does not get replaced by ours.
+- **`l0_unit` per row** (pooled = union, stacked = sum) — the two
+  baselines are **not** interchangeable on a shared axis.
+- **Stacked's `T·d_sae` probe-capacity advantage is disclosed, never
+  netted out.**
+- **Every cell reports realized `l0_per_window`.** A frontier without it
+  is not evidence.
+- **Provenance line travels with the table:** these 15 cells are
+  `sycgen_keep_r1_rebuilt`, trained on a **rebuilt** `hs14.npy`, and are
+  **not** pod-D's originals. The published exhibit used the originals,
+  which are on HF and intact.
+
+### 4. The one free check that comes with the run
+
+**The retrained SAE anchor should land near the recorded ~0.4819.** If
+it does, that is the **first genuine evidence the rebuilt cache is
+sound** — a question we have had open, unverified, since 20:25 when the
+`train_cached=True` literal hid it. **If it lands far off, the cache is
+suspect and the whole frontier is void** — and we would want to know
+that from the anchor, not from a surprising TXC result.
+
+**That anchor is the first number to look at. Not the TXC curve.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
