@@ -122,6 +122,7 @@ class TXCProR1(TempBenchArch):
         relu_mode: str | None = None,          # r1: arm assert (hashes into keys)
         k_anneal_mult: float = 1.0,            # r1-c4: >1 widens k_train early
         k_anneal_steps: int = 0,               # r1-c4: linear wide→nominal over N steps
+        train_select: str = "row",             # r1-c5: "batch" = pooled B·k admission
     ):
         super().__init__()
         # r1: resolve the T alias (grid override convention).
@@ -162,6 +163,14 @@ class TXCProR1(TempBenchArch):
                 f"{k_anneal_mult}, {k_anneal_steps}."
             )
         self._anneal_step = 0
+        # r1-c5: training-time admission rule. "row" (default) = per-sample
+        # TopK (pre-C5 behavior, bit-identical). "batch" = BatchTopK-style
+        # pooled B·k budget — rows compete each step, sustained diversity
+        # pressure against across-row latent concentration (C1-D/C4
+        # mechanism). Serve path is per-row exact-k in BOTH modes.
+        if train_select not in ("row", "batch"):
+            raise ValueError(f"train_select must be 'row' or 'batch'; got {train_select!r}.")
+        self.train_select = train_select
         self.shifts = tuple(int(s) for s in contrastive_shifts)
         self.contrastive_alpha = float(contrastive_alpha)
         if contrastive_inverse_distance_weight:
@@ -232,6 +241,23 @@ class TXCProR1(TempBenchArch):
         z = torch.zeros_like(pre)
         z.scatter_(1, idx, F.relu(vals))
         return z
+
+    def _sparsify_batch_pool(self, pre: torch.Tensor, k_per_row: int) -> torch.Tensor:
+        """r1-c5: pooled admission — top B·k entries of the whole (B, d_sae)
+        batch by value (rows compete; per-row counts vary, total is exact).
+        Paper arm: ReLU on survivors, matching _sparsify's composition."""
+        flat = pre.reshape(-1)
+        kb = min(k_per_row * pre.shape[0], flat.numel())
+        vals, idx = flat.topk(kb)
+        z = torch.zeros_like(flat)
+        z.scatter_(0, idx, F.relu(vals))
+        return z.view_as(pre)
+
+    def _train_sparsify(self, pre: torch.Tensor, k: int) -> torch.Tensor:
+        """r1-c5: training-time admission dispatch (serve never routes here)."""
+        if self.train_select == "batch":
+            return self._sparsify_batch_pool(pre, k)
+        return self._sparsify(pre, k)
 
     def _fired_mask(self, z: torch.Tensor) -> torch.Tensor:
         """Faithful composition: fired ⇔ z > 0 (post-ReLU convention)."""
@@ -383,14 +409,14 @@ class TXCProR1(TempBenchArch):
         pre_a = self._pre_activation_sampled(x_anchor, sample_idx)
         k_now = self._k_train_now()            # r1-c4: annealed admission
         self._anneal_step += 1
-        z_anchor = self._sparsify(pre_a, k_now)
+        z_anchor = self._train_sparsify(pre_a, k_now)   # r1-c5: admission dispatch
 
         l_recon, l_h = self._recon_sampled_matryoshka(x_anchor, z_anchor, sample_idx)
 
         l_contr = torch.zeros((), device=x.device, dtype=x.dtype)
         for k_idx, x_pos in enumerate(x_positives):
             pre_p = self._pre_activation_sampled(x_pos, sample_idx)
-            z_pos = self._sparsify(pre_p, k_now)   # r1-c4: same admission as anchor
+            z_pos = self._train_sparsify(pre_p, k_now)   # r1-c4/c5: same admission as anchor
             l_recon_p, _ = self._recon_sampled_matryoshka(x_pos, z_pos, sample_idx)
             l_recon = l_recon + l_recon_p
             if self.contrastive_alpha > 0.0:
@@ -499,6 +525,16 @@ class TXCProR1BTKOnly(TXCProR1):
         z = torch.zeros_like(pre)
         z.scatter_(1, idx, vals)                 # btk-only: no ReLU on survivors
         return z
+
+    def _sparsify_batch_pool(self, pre: torch.Tensor, k_per_row: int) -> torch.Tensor:
+        """r1-c5 btk-only arm: pooled B·k selection over RAW signed values,
+        survivors pass through SIGNED (mac-a convention held)."""
+        flat = pre.reshape(-1)
+        kb = min(k_per_row * pre.shape[0], flat.numel())
+        vals, idx = flat.topk(kb)                # btk-only: signed-value selection
+        z = torch.zeros_like(flat)
+        z.scatter_(0, idx, vals)                 # btk-only: no ReLU on survivors
+        return z.view_as(pre)
 
     def _fired_mask(self, z: torch.Tensor) -> torch.Tensor:
         return (z != 0).any(dim=0)               # btk-only: negative firing is alive

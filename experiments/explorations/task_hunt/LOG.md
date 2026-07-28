@@ -16871,3 +16871,28 @@ warming for their lanes. ONE-COMMIT freeze:
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+## 2026-07-28 ~02:14 London — runpod-c: diag CLOSED (20k curve monotone rising); ratio rule VALIDATED by interior max (tokens-confound killed); C4 anneal T1 dose–response FAIL → C5 batch-pool admission pre-registered + launching
+
+Four results, one push (RESULTS C1-D-completion / C3-addendum /
+C4-interim / C5-prereg): **(1)** diag T4 @20k = 0.9103 → full-recipe
+20k curve **0.8974 → 0.9103 → 0.9171, monotone rising** (P1 declines);
+A2 verdict unchanged (T1 floor + k5@T16). C1 lane closed. **(2)**
+t_sample attribution at T16 on r1-min: **interior max at the ratio
+rule** — t5 0.9167 / t8 0.9251 / t16 0.9149 (same shape k5; active-
+frac peaks at t8 0.41). Ratio-rule pre-reg VALIDATED; the tokens/step
+confound is DEAD (monotone-in-t prediction contradicted). Curriculum
+carries +0.010; per-sample-window TopK + sequence serving carry +0.034
+over twin. **(3)** C4 k-anneal T1 = 0.8171: doubled trained diversity
+(active 0.024→0.054) bought exactly +0.010 — clean dose–response,
+insufficient level; transient exposure decays ⇒ H-fail-T1 as
+pre-stated. Program-level read: THREE independent contexts now show
+trained-dictionary diversity tracking probe AUC (T-grid census, T1
+anneal dose, t_sample interior max). **(4)** C5 pre-registered BEFORE
+launch: `train_select=batch` — pooled B·k training admission
+(sustained competition = the twin's healthy T1 dynamic) with per-row
+exact-k serve unchanged, arm conventions held, default bit-identical
+(29/29 tests). Launching T{1,16} on GPU 0 now; C4 T16 lands ~02:50.
+PTR.
+
+_Recorded-by: claude-fable-5 (runpod-c)_

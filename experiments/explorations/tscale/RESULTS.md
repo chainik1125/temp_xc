@@ -9,9 +9,11 @@ stay on the record.
 
 | id | candidate | level reached | dev Δ16 (best) | verdict |
 |---|---|---|---|---|
-| C1 | txc_pro_r1 (+_btkonly twin) | L1 + A1 diag (T{16,1} done, T4 in flight) | **+0.1168** (base −0.0134) | slope PASS ×, T1-level FAIL → NO PROMOTE as-is; diag: mechanism CONFIRMED-partial (T1 0.7985→0.8974 w/ AuxK live), first rising k20 curve at 20k (Δ16 +0.0197), but T1 floor + k5-preservation both FAIL ⇒ **A2 NOT triggered** |
+| C1 | txc_pro_r1 (+_btkonly twin) | L1 + A1 diag COMPLETE | **+0.1168** (base −0.0134) | slope PASS ×, T1-level FAIL → NO PROMOTE as-is; diag: mechanism CONFIRMED-partial (T1 0.7985→0.8974 w/ AuxK live), 20k curve MONOTONE RISING (0.8974→0.9103→0.9171), but T1 floor + k5-preservation both FAIL ⇒ **A2 NOT triggered** |
 | C2 | txc_btk_pre_subseq_btkonly | L1 | −0.0303 | KILL — curriculum alone does not transfer; threshold under-admit datum |
-| C3 | r1-min (r1_btkonly, aux losses off) | L1 | **+0.1180** | slope PASS, T16 PASS (program-best both k), T1-level FAIL → NO PROMOTE as-is; A1 (iii) bars a 2nd family diag; A2 tree pre-stated |
+| C3 | r1-min (r1_btkonly, aux losses off) | L1 (+ts attribution) | **+0.1180** | slope PASS, T16 PASS (program-best both k), T1-level FAIL → NO PROMOTE as-is; ts sweep: INTERIOR MAX at ratio rule (t8), tokens-confound killed |
+| C4 | r1-min + k_train anneal (8×/2000) | L1 interim (T16 in flight) | — | T1 0.8171: +0.010 via doubled diversity (dose–response) but FAILS floor — transient exposure decays ⇒ H-fail-T1; needs sustained pressure |
+| C5 | r1-min + train_select=batch | PRE-REGISTERED | — | sustained pool pressure (twin's healthy T1 dynamic in the r1 frame); § 3 gates as written; launching |
 
 *(index updated as sections land below)*
 
@@ -296,3 +298,93 @@ keeps ≈ 0.925 → first full-gate L1 PASS of the program → L2 proper.
 exposure (points to batch-diverse selection at small T as C5).
 (H-fail-T16) wide early admission degrades the T16 win → the anneal
 trades the win for the floor — record and reassess.
+
+---
+
+## C1-D completion — diag T4 cell — 2026-07-28 ~02:10 London
+
+T4 @ 20k (cfg c29ea51f2aaaa3c4): k20 **0.9103** (shuf 0.9078, order
+gap +0.0025 — consistent with the 20k order-positive signal), k5
+0.8472; census active 0.221 / dead 0.365; budgets exact (train 40,
+serve 80). **The full-recipe 20k curve is MONOTONE RISING: 0.8974 →
+0.9103 → 0.9171** (P1: 0.9135 → 0.9181 → 0.8985). Interior-dip check
+vs P1: T4 −0.0078 (inside the 0.010 band). k5 curve 0.7555 → 0.8472 →
+0.8487 (T4 above P1's 0.8434; T16 below 0.8651 — the C1-D finding-3
+regression). No verdict change: A2 remains NOT triggered (T1 level +
+k5@T16). C1 lane closed at diagnostic; family continues via C4/C5.
+
+---
+
+## C3 addendum — t_sample attribution at T16 (`r1min-ts16-4k` / `r1min-ts5-4k`) — 2026-07-28 ~02:10 London
+
+r1-min backbone, T16, 4k, dev-8 s42 (hashes ae40dc52ad72d3e8 /
+040b9f18e5d919ae):
+
+| t_sample (asym k_serve/k_train) | k20 | k5 | active_frac |
+|---|---|---|---|
+| 5 (3.2×) | 0.9167 | 0.8652 | 0.223 |
+| **8 = ratio rule (2×)** | **0.9251** | **0.8763** | **0.407** |
+| 16 = no subsample (1×) | 0.9149 | 0.8664 | 0.233 |
+
+1. **INTERIOR MAXIMUM at the ratio rule** (both k) — the CARD § 4
+   pre-registration is validated; both extremes lose ≈ 0.008–0.010.
+   Mirrors phase5b's own t-sweep (t = T_max/2 optimal at T_max 10).
+2. **The tokens/step confound is DEAD as an explanation:** scored
+   tokens/step rise monotonically with t_sample (5.1k / 8.2k / 16.4k)
+   — a data-volume story predicts monotone gains in t; the observed
+   interior max contradicts it. The subseq curriculum's contribution
+   (+0.010 over full-window at MATCHED steps, with FEWER tokens) is
+   real.
+3. **Dictionary diversity tracks probe quality a third time**
+   (active-frac 0.22 / 0.41 / 0.23 aligns with AUC ordering) — same
+   direction as the C4 T1 dose-response and the T-grid census. The
+   family's operative variable is looking like TRAINED DICTIONARY
+   DIVERSITY, however induced.
+4. Curriculum-necessity read (ts16 vs ts8): subsampling carries
+   +0.0102 of the win; the remaining +0.034 over the twin comes from
+   per-sample-window TopK + sequence serving (ts16 0.9149 ≈ full
+   recipe 0.9148, coincidentally).
+
+---
+
+## C4 interim — k_train anneal T1 datum — 2026-07-28 ~02:10 London (T16 cell in flight)
+
+T1 (cfg 37b53d95ea3d0289): k20 **0.8171** (r1-min 0.8071; twin floor
+0.8844), l0 serve 20.0 exact. Census: active_frac **0.0542** vs
+r1-min's 0.0237 — the anneal DOUBLED trained diversity and bought
++0.0100 AUC (clean dose–response), but the effect decays after the
+anneal ends (2000 nominal steps re-concentrate). **H-fail-T1
+CONFIRMED pending T16: transient wide admission is insufficient — the
+mechanism needs SUSTAINED pressure.** T1 gate: FAIL (0.8171 <
+0.8844). T16 cell lands ~02:50; C4 verdict line then.
+
+---
+
+## C5 — train-time batch-pool admission on r1-min (`c5-batchsel-4k`) — PRE-REGISTRATION 2026-07-28 ~02:12 London (before launch)
+
+**Design (the C4-H-fail arrow, pre-stated in C4's hypotheses):**
+`train_select="batch"` — training admission becomes a pooled B·k_train
+budget over the whole (B, d_sae) batch (BatchTopK-style: rows COMPETE
+each step; per-row counts vary, total is exact) — the baseline twin's
+proven-healthy T1 dynamic, imported into the r1 frame as SUSTAINED
+diversity pressure. Serve path per-row exact-k UNCHANGED in both
+modes. Arm conventions held: btk-only arm selects by RAW SIGNED value
+and passes survivors through signed; paper arm selects then ReLUs.
+Implemented as `# r1-c5:` tagged deviations in `txc_pro_r1.py`;
+default `"row"` is bit-identical pre-C5 (tested; 29/29 suite).
+Anneal OFF in C5 — one variable at a time.
+
+**Pre-registered cells:** T {1, 16}, 4k steps, dev-8 s42, both k,
+r1-min backbone (contrastive_alpha=0, h_size=18432, contr_prefix=3686,
+train_select=batch), tag `c5-batchsel-4k`, T1 first. Launch: GPU 0 on
+this commit.
+
+**Gates: § 3 L1→L2 as written, no exceptions** (T1 ≥ 0.8844,
+T16 ≥ 0.8810, slope; k5@T16 reported). Hypotheses: (H-pass) sustained
+pool pressure holds T1 diversity → T1 clears the floor; T16 keeps
+≥ ≈ 0.92 → first full-gate L1 PASS. (H-fail-T16) the pooled budget
+destroys the per-sample-window-TopK win at T16 (echoing C2's
+batch-pool component) → selection rule must differ by T — record as a
+structural finding. (H-fail-T1) even sustained pressure leaves T1
+≈ 0.82 → concentration is not admission-driven at T1; re-examine
+(single-position encoder slab? b_enc bias?) before C6.

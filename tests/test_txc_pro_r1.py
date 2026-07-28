@@ -319,3 +319,71 @@ def test_k_anneal_rejects_bad_values():
         _toy(TXCProR1BTKOnly, T_max=4, k_anneal_mult=0.5)
     with pytest.raises(ValueError):
         _toy(TXCProR1BTKOnly, T_max=4, k_anneal_steps=-1)
+
+
+# ── r1-c5: train-time batch-pool admission ──────────────────────────
+
+
+def test_train_select_default_row_bit_identity():
+    """Default train_select='row' must be bit-identical to the pre-C5 arch."""
+    torch.manual_seed(5)
+    a = _toy(TXCProR1BTKOnly, T_max=4)
+    torch.manual_seed(5)
+    b = _toy(TXCProR1BTKOnly, T_max=4, train_select="row")
+    x = torch.randn(6, 8, D_IN)
+    torch.manual_seed(1)
+    la, _ = a.train_step(x.clone())
+    torch.manual_seed(1)
+    lb, _ = b.train_step(x.clone())
+    assert torch.equal(la, lb)
+
+
+def test_batch_pool_exact_total_budget_and_row_variance():
+    m = _toy(TXCProR1BTKOnly, T_max=4, train_select="batch")
+    pre = torch.zeros(2, D_SAE)
+    pre[0] = torch.arange(D_SAE).float() + 100.0   # row 0 dominates the pool
+    pre[1] = torch.arange(D_SAE).float() * 0.01
+    z = m._sparsify_batch_pool(pre, 4)             # pooled budget = 2·4 = 8
+    counts = (z != 0).sum(dim=-1)
+    assert int(counts.sum()) == 8                  # exact total (btk signed)
+    assert counts.tolist() == [8, 0]               # rows COMPETE — counts vary
+
+
+def test_batch_pool_arm_composition_contrast():
+    """Paper arm zeroes pooled negative survivors; btk arm passes them signed."""
+    pre = torch.full((2, D_SAE), -1.0)
+    pre[0, :5] = torch.tensor([10.0, 11.0, 12.0, 13.0, 14.0])
+    for i in range(D_SAE):
+        pre[1, i] = -0.01 * (i + 1)                # least-negative candidates
+    paper = _toy(TXCProR1, T_max=4, train_select="batch")
+    btk = _toy(TXCProR1BTKOnly, T_max=4, train_select="batch")
+    z_p = paper._sparsify_batch_pool(pre.clone(), 4)   # kb=8 > 5 positives
+    z_b = btk._sparsify_batch_pool(pre.clone(), 4)
+    assert int((z_p != 0).sum()) == 5              # ReLU killed 3 negatives
+    assert int((z_b != 0).sum()) == 8              # signed pass-through keeps 8
+    assert float(z_b.min()) < 0
+
+
+def test_batch_pool_serve_path_untouched():
+    m = _toy(TXCProR1BTKOnly, T_max=4, train_select="batch")
+    m.eval()
+    x = torch.randn(5, 4, D_IN)
+    with torch.no_grad():
+        z = m.encode(x)
+    per_row = (z != 0).sum(dim=-1).float()
+    assert torch.all(per_row == m.k_inference)     # per-row EXACT k at serve
+
+
+def test_batch_pool_train_step_runs_and_keeps_mean_budget():
+    m = _toy(TXCProR1BTKOnly, T_max=4, train_select="batch")
+    m.train()
+    x = torch.randn(6, 8, D_IN)
+    loss, info = m.train_step(x)
+    loss.backward()
+    assert torch.isfinite(loss)
+    assert float(info["l0"]) == pytest.approx(m.k_train)  # B·k/B mean budget
+
+
+def test_train_select_rejects_bad_value():
+    with pytest.raises(ValueError):
+        _toy(TXCProR1BTKOnly, T_max=4, train_select="pooled")
