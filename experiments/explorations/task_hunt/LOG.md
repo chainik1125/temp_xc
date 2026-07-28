@@ -18724,3 +18724,30 @@ directional: vs btk s42 twins, T10 = +7.2e−3 (k5) / −6.9e−3
 shards on cell 2/3. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+---
+
+## [2026-07-28 03:40 London] mac-d: PARTIAL EXHIBIT v1 PUSHED (order 03:25 items 2–4 discharged) — fig+summary+24 rows live; HANDOFF item-6 embedded; manifest merge BLOCKED (336 fleet-wide conflicts, deferred to owners)
+
+- `figs_writeup/fig_sycgen_shuffle_tsweep.{png,pdf}` v1: per-token
+  anchor band (batchtopk r≈0.482±sd) + full 18/18 untrained-twin
+  sweep + PARTIAL watermark & coverage note (3/18 trained · 0/18
+  overlay at 03:38). Renderer is now partial-tolerant (ordered layer
+  from canonical rows; overlay optional → "PENDING"; supp-json
+  ingest + cache-echo dedupe; re-render at each landed trio, same
+  paths supersede). Summary json strict-JSON with
+  partial/coverage fields.
+- 24 `sycgen_keep_r1` leaderboard rows repatriated + pushed
+  (leaderboard merge clean; 3 early supp-cell rows included).
+- **Manifest merge REFUSED and DEFERRED**: 336 same-train_key
+  different-content conflicts pod↔local in `checkpoints/manifest.jsonl`
+  — fleet-wide divergence (mirror-status rewrites vs the pod's
+  as-launched copy), NOT sycgen-specific; row corrections belong to
+  the instrument owners (184ebd47a precedent). sycgen ckpt manifest
+  rows ride at the HF-push step instead. Hub: flagging for the
+  morning owner pass.
+- Both GPUs working: GPU-0 supp pool (T{8,16}×3) live at 95% util —
+  first cells already rowed; GPU-1 tsae trio still CPU-grinding
+  (04:05 bound stands, ~84 min in flight at this stamp).
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_

@@ -157,6 +157,13 @@ carries the row-level label.
   0.616/0.641/0.652 (T64/actxmean_mlp), order-0, wd passes
   (LOG 02:28, `task_hunt/sycgen/results/*.json`).
 
+![sycgen T-sweep (partial renders refresh in place)](figs_writeup/fig_sycgen_shuffle_tsweep.png)
+
+  *(Fig above is LIVE-refreshing: first PARTIAL render landed 03:40
+  — 3/18 trained (per-token anchor band + full untrained-twin
+  control); TXC sweep points + shuffle overlay appear as cells land;
+  the in-figure coverage note is authoritative.)*
+
   **What sycgen is, intuitively (for Dmitry — read this first).**
   Multi-turn Q&A conversations built on the *"are you sure?"*
   sycophancy paradigm (question seeds byte-pinned to
