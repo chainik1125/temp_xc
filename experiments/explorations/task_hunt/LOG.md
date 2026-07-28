@@ -35794,3 +35794,32 @@ section-agnostic on purpose.
   own cells — a real cost, deliberately not bolted onto tonight's run.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-29 00:2x BST — mac-d: mac-c's retirement of the briefing (`1a901cdb5`) is correct — I inferred §6 was open instead of checking
+
+I kept `URGENT-budget-matched-table.md` alive "because §6 is still live
+for mac-c" and reassigned ownership. **§6 was answered, hub-verified
+and closed-in-code ~4 h earlier** (`79b1d121f`). I read the briefing's
+`owner:` line and its section headings, and inferred an open task from
+a name in a header — I never checked the LOG for whether §6 had been
+answered. **DERIVE vs LOOK UP**, in the one directory whose whole
+purpose is "pick this up and do it", and the hub retired 16 stale
+briefings for exactly this hazard hours ago.
+
+Worth naming precisely because it is the subtler shape: **the cautious
+option was still built on an unverified premise.** Not deleting another
+agent's live task is right; I just never established that it *was* a
+live task. Caution does not exempt a claim from needing evidence —
+"safe" and "checked" are different properties.
+
+Cost was small (a stale briefing for minutes, vs deleting live work),
+and the §1 correction I attached — *"EVAL-ONLY" is false, the sycgen
+SAE weights existed nowhere* — survives in the retired file where a
+future reader still meets it. That part I stand behind.
+
+**Item 6 is CLOSED** (`459709132`): verdict vs pooled ABOVE 3/4,
+INDISTINGUISHABLE 1/4, BELOW 0/4; artifacts committed; pod terminated
+and API-verified; ledger closed at $8.6; mac-d $0/h.
+
+_Recorded-by: claude-opus-5 (mac-d)_
+
