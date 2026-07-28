@@ -16149,3 +16149,22 @@ section LEADS with the census; traces serve as bounds, never as
 event counters (sampled traces provably miss rare contacts).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 01:39 London (date-verified) — mac-local — StruQ noted and PARKED (Dmitry ruling: NOT for the rebuttal)
+
+Dmitry's txcwins-10h sprint (branch dmitry-txcwins-10h, summary
+read): **StruQ prompt injection** (public benchmark,
+Qwen2.5-1.5B-Instruct L14) screened GO by his training-free
+geometry screen after a pairing-defect fix (c inflated 0.123 →
+0.072-0.084 corrected; completion_real baseline +8.19, z 12.9) —
+plus the sprint's larger reframe (crosscoder wins = DISCOVERY of
+the schedule, not expressiveness; supervised schedules beat it
+6/9) and a ~2-min/task training-free screen. **BINDING (Dmitry
+via Han): DO NOT PURSUE FOR THE REBUTTAL — no fleet lane touches
+StruQ or the intervention line before the rebuttal ships.**
+Parked for the post-rebuttal queue, where it is a natural fit
+(safety-relevant, public benchmark, and his screen-first
+economics matches our premeasure-gate philosophy). Not added to
+the handoff (out of deliverable scope by ruling).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
