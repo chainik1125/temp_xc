@@ -93,6 +93,34 @@ class WindowWrapper(torch.nn.Module):
         return sum(self._l0) / max(1, len(self._l0))
 
 
+class MeasuredArm(torch.nn.Module):
+    """Wrap a native window arch (TXC) only to MEASURE its realized budget.
+
+    Without this the frontier has no x-coordinate for TXC and cannot be
+    plotted at all — the arms would share a y-axis and nothing else.
+    `encode` is passed through untouched, so TXC's numbers are unchanged.
+
+    Unit: nonzeros in the tile code (d_sae), which is the SAME convention
+    as the pooled arm's union — one slot per feature. Stacked is the odd
+    one out (T*d_sae slots ⇒ sum), and is labelled as such in the output.
+    NB probing.py reports realized_l0 PER TOKEN; this file is PER WINDOW.
+    Do not compare the two numbers across files.
+    """
+
+    def __init__(self, inner):
+        super().__init__()
+        self.inner, self.T, self._l0 = inner, inner.T, []
+
+    def encode(self, tiles: torch.Tensor) -> torch.Tensor:
+        z = self.inner.encode(tiles)
+        self._l0.append(float((z.abs() > 0).sum(-1).float().mean()))
+        return z
+
+    @property
+    def realized_l0_per_window(self) -> float:
+        return sum(self._l0) / max(1, len(self._l0))
+
+
 def _key_from_manifest(arch_name: str, T: int, seed: int) -> str | None:
     """Look the train_key UP; never re-derive it.
 
@@ -155,13 +183,17 @@ def main():
         for seed in SEEDS:
             # --- TXC (the claim arm), scored by the same probe ---
             try:
-                txc, tk = _load("txc_batchtopk_post_btkonly", T, seed, ds_spec)
+                txc_raw, tk = _load("txc_batchtopk_post_btkonly", T, seed, ds_spec)
+                txc = MeasuredArm(txc_raw)
                 m = _train_lambda_probe(txc, x, lam, L=EVAL_L,
                                         n_windows=N_WINDOWS, seed=seed)
                 rows.append({"arm": "txc", "T": T, "seed": seed, "k_tok": None,
                              "recovery": m["lambda_recovery"],
-                             "chance": m["lambda_chance"], "train_key": tk})
-                print(f"  txc      T{T} s{seed} r={m['lambda_recovery']:.4f}", flush=True)
+                             "chance": m["lambda_chance"], "train_key": tk,
+                             "realized_l0_per_window": txc.realized_l0_per_window,
+                             "l0_unit": "nonzeros_in_tile_code"})
+                print(f"  txc      T{T} s{seed} r={m['lambda_recovery']:.4f} "
+                      f"l0/win={txc.realized_l0_per_window:.2f}", flush=True)
             except Exception as e:
                 print(f"  txc      T{T} s{seed} SKIP {type(e).__name__}: {str(e)[:90]}", flush=True)
 
@@ -180,7 +212,9 @@ def main():
                                  "recovery": m["lambda_recovery"],
                                  "chance": m["lambda_chance"],
                                  "realized_l0_per_window": w.realized_l0_per_window,
-                                 "sae_train_key": sae_tk})
+                                 "sae_train_key": sae_tk,
+                                 "l0_unit": ("union_over_positions" if mode == "pooled"
+                                             else "sum_over_positions")})
                     print(f"  {mode:8s} T{T} s{seed} k={k:<3} "
                           f"r={m['lambda_recovery']:.4f} "
                           f"l0/win={w.realized_l0_per_window:.2f}", flush=True)
