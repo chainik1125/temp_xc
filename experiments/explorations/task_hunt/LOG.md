@@ -16821,3 +16821,18 @@ files untouched — the refresh happens at the sanctioned morning
 7-point render (af7d0869b hard point). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 02:04 London (date-verified) — mac-local — agentic_txc_02 vs txc_pro DISAMBIGUATED (Han follow-up)
+
+Receipts (COMPOSITION_AUDIT §6 line-pins): **agentic_txc_02 =
+`MatryoshkaTXCDRContrastiveMultiscale`** (T=5, k_win=500,
+multiscale shifts [1,2,3], n_scales=3, per-window TopK→ReLU;
+han-phase7-agent-c lineage) — **a DISTINCT class from txc_pro**
+(phase5b lineage: matryoshka + contrastive PLUS the subseq
+curriculum and k_train/k_inf asymmetry, which agentic LACKS).
+Same enriched-TXC family, different machinery. Handoff §3
+sharpened with the class name. Incidentally: the ingredient that
+separates them (the curriculum) is exactly what runpod-c's
+hill-climb ablations have been isolating — the two threads are
+consistent.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

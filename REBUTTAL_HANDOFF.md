@@ -54,8 +54,12 @@ retrained — see COMPOSITION_AUDIT).
   `txc_batchtopk_post_btkonly` — the plain windowed BatchTopK
   crosscoder (POST composition; probing uses PRE). It is NOT
   txc_pro (refutation receipts: LOG ~01:55). BINDING DISCLOSURE
-  (LOG ~02:0x): the PAPER's RLHF TXC arm was `agentic_txc_02`
-  (matryoshka-contrastive, per-window TopK→ReLU, k_win=500) — the
+  (LOG ~02:0x): the PAPER's RLHF TXC arm was `agentic_txc_02` = class
+  `MatryoshkaTXCDRContrastiveMultiscale` (matryoshka+contrastive,
+  multiscale shifts [1,2,3], per-window TopK→ReLU, k_win=500;
+  COMPOSITION_AUDIT §6). It is a DISTINCT class from txc_pro —
+  same enriched family, but NO subseq curriculum / k-asymmetry
+  (txc_pro's defining features) — the
   exhibit is the plain-TXC modernization at the paper's window
   budget (k_win=100·T = 500 at the paper's T=5; per-window
   selection granularity preserved via the POST composition).
