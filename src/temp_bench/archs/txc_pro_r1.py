@@ -120,6 +120,8 @@ class TXCProR1(TempBenchArch):
         decoder_grad_orthogonalize: bool = True,  # noqa: ARG002 — always True
         h_size: int | None = None,             # matryoshka prefix; None → d_sae//5
         relu_mode: str | None = None,          # r1: arm assert (hashes into keys)
+        k_anneal_mult: float = 1.0,            # r1-c4: >1 widens k_train early
+        k_anneal_steps: int = 0,               # r1-c4: linear wide→nominal over N steps
     ):
         super().__init__()
         # r1: resolve the T alias (grid override convention).
@@ -147,6 +149,19 @@ class TXCProR1(TempBenchArch):
         # Clip at d_sae for toy benches where k_pos * T can exceed dict size.
         self.k_train = min(k_pos * t_sample, d_sae)
         self.k_inference = min(k_pos * T_max, d_sae)
+        # r1-c4: k_train anneal (C4 low-T fix — wide early admission spreads
+        # gradient across the dictionary to fight across-row latent
+        # concentration; defaults are OFF = pre-C4 behavior, bit-identical).
+        # Progress is a plain attr, NOT persisted: scratch L1 screens never
+        # resume mid-training, and state_dict/ckpt compat stays untouched.
+        self.k_anneal_mult = float(k_anneal_mult)
+        self.k_anneal_steps = int(k_anneal_steps)
+        if self.k_anneal_mult < 1.0 or self.k_anneal_steps < 0:
+            raise ValueError(
+                f"k_anneal_mult must be ≥ 1 and k_anneal_steps ≥ 0; got "
+                f"{k_anneal_mult}, {k_anneal_steps}."
+            )
+        self._anneal_step = 0
         self.shifts = tuple(int(s) for s in contrastive_shifts)
         self.contrastive_alpha = float(contrastive_alpha)
         if contrastive_inverse_distance_weight:
@@ -197,6 +212,19 @@ class TXCProR1(TempBenchArch):
         self.W_dec.register_post_accumulate_grad_hook(self._project_dec_grad)
 
     # ── Sparsify seam (r1: the ONLY composition-dependent code path) ──
+
+    def _k_train_now(self) -> int:
+        """r1-c4: annealed training admission — linear from mult·k_train
+        down to k_train over k_anneal_steps train_step calls, then constant.
+        The serve path (k_inference) is never touched."""
+        if self.k_anneal_mult <= 1.0 or self.k_anneal_steps <= 0:
+            return self.k_train
+        s = self._anneal_step
+        if s >= self.k_anneal_steps:
+            return self.k_train
+        frac = 1.0 - s / self.k_anneal_steps
+        k = round(self.k_train * (1.0 + (self.k_anneal_mult - 1.0) * frac))
+        return min(max(int(k), self.k_train), self._d_sae)
 
     def _sparsify(self, pre: torch.Tensor, k: int) -> torch.Tensor:
         """Faithful composition: TopK by value, then ReLU on survivors."""
@@ -353,14 +381,16 @@ class TXCProR1(TempBenchArch):
         )
 
         pre_a = self._pre_activation_sampled(x_anchor, sample_idx)
-        z_anchor = self._sparsify(pre_a, self.k_train)
+        k_now = self._k_train_now()            # r1-c4: annealed admission
+        self._anneal_step += 1
+        z_anchor = self._sparsify(pre_a, k_now)
 
         l_recon, l_h = self._recon_sampled_matryoshka(x_anchor, z_anchor, sample_idx)
 
         l_contr = torch.zeros((), device=x.device, dtype=x.dtype)
         for k_idx, x_pos in enumerate(x_positives):
             pre_p = self._pre_activation_sampled(x_pos, sample_idx)
-            z_pos = self._sparsify(pre_p, self.k_train)
+            z_pos = self._sparsify(pre_p, k_now)   # r1-c4: same admission as anchor
             l_recon_p, _ = self._recon_sampled_matryoshka(x_pos, z_pos, sample_idx)
             l_recon = l_recon + l_recon_p
             if self.contrastive_alpha > 0.0:

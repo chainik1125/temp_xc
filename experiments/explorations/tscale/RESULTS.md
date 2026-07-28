@@ -253,3 +253,46 @@ address it. (iii) C4 must track k5@T16 alongside T1 (finding 3
 failure mode). Decision on the specific C4 design waits for the
 ts16/ts5 attribution cells (in flight) — whether the curriculum is
 even necessary shapes the search space.
+
+---
+
+## C4 — k_train anneal on r1-min (`c4-kanneal-4k`) — PRE-REGISTRATION 2026-07-28 ~01:30 London (before launch)
+
+**Design (menu item "sparsity scheduling"; mechanism-targeted per
+C1-D):** anneal the TRAINING admission width linearly from
+`k_anneal_mult · k_train` down to `k_train` over `k_anneal_steps`
+steps, then constant; serve path (exact k_serve = k_pos·T) untouched.
+Implemented as `# r1-c4:` tagged deviations in `txc_pro_r1.py`
+(defaults OFF = bit-identical pre-C4 behavior, tested; anneal progress
+is a plain attr — scratch screens never resume, state_dict/ckpt compat
+untouched; knobs flow via arch_hparams_override and hash into
+config_hash).
+
+**Mechanism target:** C1-D showed the T1 problem is ACROSS-ROW latent
+concentration (k_train=20 drawn from ONE position per row → the same
+high-bias latents win every row → 2 % active at 4k), and that healthy
+diversity appears exactly where per-row admission is wide (T16 trains
+at k_train=160 → 36–42 % active). The anneal gives EVERY T that wide
+early exposure (spread gradient → diverse dictionary) without touching
+the serve budget and WITHOUT AuxK (structurally inert at the 4k
+screen — C4's fix must act from step 0, per C1-D constraint (i)).
+
+**Pre-registered point (ONE, no sweep before signal):**
+`k_anneal_mult = 8` — mirrors the 8× admission ratio that separates
+healthy T16 (k_train 160) from collapsed T1 (k_train 20);
+`k_anneal_steps = 2000` — half the L1 screen, leaving 2000 steps at
+the nominal budget before eval. Cells: T {1, 16}, 4k steps, dev-8
+s42, both k, r1-min backbone (contrastive_alpha=0, h_size=18432,
+contr_prefix=3686), tag `c4-kanneal-4k`. Launch: on next GPU drain.
+
+**Gates: § 3 L1→L2 as written, no exceptions** — T1 ≥ 0.8844,
+T16 ≥ 0.8810, slope vs twin. Also REPORT k5@T16 (the 20k regression
+mode from C1-D finding 3 is an L2 concern, but a 4k k5 collapse would
+be an early kill signal). Hypotheses on record: (H-pass) anneal
+restores T1 dictionary diversity → T1 clears the floor while T16
+keeps ≈ 0.925 → first full-gate L1 PASS of the program → L2 proper.
+(H-fail-T1) concentration re-forms after the anneal ends → T1 stays
+≈ 0.81 → the fix needs sustained pressure, not initialization-time
+exposure (points to batch-diverse selection at small T as C5).
+(H-fail-T16) wide early admission degrades the T16 win → the anneal
+trades the win for the floor — record and reassess.

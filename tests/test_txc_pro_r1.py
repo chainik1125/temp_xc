@@ -259,3 +259,63 @@ def test_probing_eval_smoke_window_dispatch(cls):
     assert "mean_auc_shuf" in metrics          # T=3 → real shuffle twin
     if cls is TXCProR1BTKOnly:
         assert abs(metrics["realized_l0"] - m.k_inference) < 1e-6
+
+
+# ── r1-c4: k_train anneal (C4 low-T-fix lane) ───────────────────────
+
+
+def test_k_anneal_default_off_bit_identity():
+    """Defaults (mult=1, steps=0) must be bit-identical to the pre-C4 arch."""
+    torch.manual_seed(3)
+    a = _toy(TXCProR1BTKOnly, T_max=4)
+    torch.manual_seed(3)
+    b = _toy(TXCProR1BTKOnly, T_max=4, k_anneal_mult=1.0, k_anneal_steps=0)
+    x = torch.randn(6, 8, D_IN)
+    torch.manual_seed(0)
+    la, _ = a.train_step(x.clone())
+    torch.manual_seed(0)
+    lb, _ = b.train_step(x.clone())
+    assert torch.equal(la, lb)
+
+
+def test_k_anneal_schedule_endpoints_monotone_and_clip():
+    m = _toy(TXCProR1BTKOnly, T_max=4, k_anneal_mult=8.0, k_anneal_steps=100)
+    assert m.k_train == 4
+    ks = []
+    for s in range(0, 130, 10):
+        m._anneal_step = s
+        ks.append(m._k_train_now())
+    assert ks[0] == 32                      # mult·k_train at step 0
+    assert ks[-1] == m.k_train              # nominal after anneal ends
+    assert all(k1 >= k2 for k1, k2 in zip(ks, ks[1:]))
+    big = _toy(TXCProR1BTKOnly, T_max=4, k_anneal_mult=100.0, k_anneal_steps=10)
+    big._anneal_step = 0
+    assert big._k_train_now() == D_SAE      # clipped at dict size
+
+
+def test_k_anneal_widens_train_l0_then_returns_to_budget():
+    m = _toy(TXCProR1BTKOnly, T_max=4, k_anneal_mult=8.0, k_anneal_steps=2)
+    m.train()
+    x = torch.randn(6, 8, D_IN)
+    _, info0 = m.train_step(x)
+    assert float(info0["l0"]) > m.k_train          # wide admission early
+    m.train_step(x)
+    _, info2 = m.train_step(x)                     # _anneal_step ≥ steps
+    assert float(info2["l0"]) <= m.k_train + 1e-6  # back to nominal budget
+
+
+def test_k_anneal_serve_path_untouched():
+    m = _toy(TXCProR1BTKOnly, T_max=4, k_anneal_mult=8.0, k_anneal_steps=100)
+    m.eval()
+    x = torch.randn(5, 4, D_IN)
+    with torch.no_grad():
+        z = m.encode(x)
+    l0 = (z != 0).sum(dim=-1).float().mean().item()
+    assert l0 == pytest.approx(m.k_inference)
+
+
+def test_k_anneal_rejects_bad_values():
+    with pytest.raises(ValueError):
+        _toy(TXCProR1BTKOnly, T_max=4, k_anneal_mult=0.5)
+    with pytest.raises(ValueError):
+        _toy(TXCProR1BTKOnly, T_max=4, k_anneal_steps=-1)
