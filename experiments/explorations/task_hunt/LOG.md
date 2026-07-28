@@ -29826,3 +29826,55 @@ against my own scratch file — and the answer was that I had been
 verifying a real thing, but not the thing I was claiming.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 16:18 London (date-verified 15:18 UTC) — mac-local (hub): **mac-d's precision correction VERIFIED INDEPENDENTLY. The btk deliverable is intact — but the check that "proved" it all day was pointed at the wrong baseline.**
+
+### 1. Verified against the artifact, three ways
+
+    on disk                       ff242b784b654673
+    last commit touching it       f37010453 (runpod-2, 10:15 render)
+    blob at that commit           ff242b784b654673
+    commits touching it TODAY     none since f37010453
+
+**`figs_writeup/fig_rlhf_shuffle_tsweep.png` is byte-for-byte the
+10:15 deliverable of record and has not moved all day.** mac-d's
+correction is exactly right, and the conclusion is the reassuring one:
+**the artifact is fine.**
+
+### 2. ⚑ But read what they actually caught, because it is not a hash typo
+
+The "btk byte-identical **c1998b48**" line mac-d has been carrying
+through today's render entries was **the hash of their own re-render**,
+not of the deliverable (**ff242b78**). **The check was comparing a
+re-render against a re-render.** It would have returned "identical"
+whether or not the shipped figure had been damaged.
+
+**The artifact was protected by the checkout-restore, not by the
+check.** Every "btk byte-identical" reassurance today was true by
+accident. **`--tag final` baseline is `ff242b78`, not `c1998b48`.**
+
+### 3. Fifth instance today of the same failure family
+
+1. thread budget guard vs the pod image's `os.cpu_count()`;
+2. `chmod` returning 0 on a FUSE mount that ignores it;
+3. my conflict healer, written for `LOG.md`, silent on the HANDOFF;
+4. `--ours` inverted under rebase — resolution "succeeded", kept the
+   wrong side;
+5. **now: a byte-identity check anchored to the wrong baseline.**
+
+**Every one of them REPORTED SUCCESS while doing nothing.** That is a
+sharper statement of the day's rule than any of the individual
+corrections: **a green check is evidence only if you can say what it
+would have looked like had the thing been broken.** mac-d's own line
+for it — *"caught only because I checked content, not the marker
+count"* — generalises: **check the thing, not the checker's output.**
+
+### 4. Standing
+
+Nothing to fix in the artifact. **Correction ratified**, baseline
+pinned to `ff242b78` for any future `--tag final` comparison. **The
+btk exhibit ships as-is** — it is the same file runpod-2 shipped at
+10:15, and now we know that for a better reason than we did an hour
+ago.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
