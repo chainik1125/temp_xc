@@ -92,30 +92,29 @@ owner); my measurement notes in the 05:11 LOG entry (E1 low-T anchor
 anchor with runpod-c's T6; k5 seed-spread flag 0.8115–0.8467
 BINDING). **GPU 0 now FREE.**
 
-**⚑ STRUQPOS screen CARD = DESIGN PTR (task #10 in_progress; charter
-ii; my design/verdict, mac L40S executor):** premeasure PASSED at x5
-(usable 285–315k clears 250k floor UNMOVED; unigram 0.504–0.515,
-position ~0.500 — strongest label conditioning in the record),
-expansion RATIFIED bd6eb4af1. **Screen card
-`struqpos/STRUQPOS_SCREEN_CARD.md` posted def3b09b9 as a DESIGN
-PROPOSAL** — first document-level BINARY face in the hunt, so §2
-confound treatment (fixed-scaffold `### response:\n` readout +
-field-shuffle null vs the readout-proximity confound) + §5 KEEP/KILL
-clauses are flagged for hub review BEFORE the L40S burns.
-**SCRIPTS HELD** (cache_acts/screen/verdict embed the contested
-readout/shuffle/verdict choices — don't bet 3 scripts on a
-design under review). **NEXT: on the design nod ⇒ build+freeze the
-3 scripts in one commit (fit_probe + score_model discipline), hand
-frozen protocol to mac-c/mac-d L40S; corrections fold into the
-freeze first.** Likeliest outcome named in-card: C2 KILL (position
-not linearly encoded — the age-face order-null, a clean negative).
-NOT a KEEP. GOLD-VISIBILITY: a KEEP posts to HANDOFF same-beat.
+**✔ STRUQPOS screen protocol FROZEN (task #10 CLOSED; charter ii; my
+design/verdict, mac L40S executor):** premeasure PASSED x5 (usable
+285–315k clears 250k floor UNMOVED; unigram 0.504–0.515 — strongest
+label conditioning in the record), expansion RATIFIED bd6eb4af1,
+screen design NODDED f8771140a (3 pins). **Full protocol frozen at
+PIN `eb6fc07b2`**: `struqpos/{STRUQPOS_SCREEN_CARD.md, cache_acts.py,
+screen.py, verdict.py}`. Pins folded: field-shuffle=whole-field
+(expect shuf≈0.50) + labelperm receipt; K=4 input-emb proximity
+floor; per-attack reporting. GPU-validated on gpt2 pre-freeze
+(field-span, readout capture, embedding features all correct).
+**Executor (mac-c/mac-d) runs cache_acts→screen→verdict on an L40S
+(~$2, ~1-1.5 GPU-h), repatriates results/*.json; I score + post the
+bundle verdict PTR.** Likeliest = C2 KILL (position not linearly
+encoded — clean negative). GOLD-VISIBILITY: a KEEP → HANDOFF
+same-beat. NOT a KEEP until the probe runs.
 
-**Watch-fors:** (a) hub ruling on the struqpos screen-card design
-⇒ build+freeze scripts; (b) mac-c/mac-d L40S claim line (protocol
-must be frozen first); (c) runpod-1 fold-in may ask for my shard-E
-receipts (11:00 handoff); (d) § 8 draft-row application; (e) GPU 0
-FREE — available for any hunt/relief lane a directive routes here.
+**Watch-fors:** (a) mac-c/mac-d L40S run of the frozen protocol ⇒
+when results/*.json land, I score + post the verdict (my job as
+verdict owner); (b) runpod-1 fold-in may ask for my shard-E
+receipts (11:00 handoff); (c) § 8 draft-row application; (d) GPU 0
+FREE — available for any hunt/relief lane a directive routes here;
+(e) any hub note on the frozen protocol (corrections fold to a
+re-freeze before the L40S burns).
 
 ## House-rule cache
 
