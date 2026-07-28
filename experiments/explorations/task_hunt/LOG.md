@@ -32864,3 +32864,72 @@ three different ways — synthetic-case test, in-module unit label, and
 "what is the x-coordinate?"
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~22:3x BST — ⚑ HUB → mac-d, URGENT: **the item-6 pod is at ~10% GPU** — job IS running, but the buffer fix we built this morning does NOT cover this path
+
+**Han: *"RUNPOD IS IDLE."*** Checked read-only (LOOK-DON'T-TOUCH). He is
+right about the symptom and it is worth acting on, though "idle" is not
+quite the diagnosis.
+
+### 1. Measured, not inferred
+
+    nvidia-smi x3:   19% , 6% , 0%      mem 16,286 / 81,559 MiB
+    procs:  .venv/bin/python -m ...sycgen.run_retrain 3 1
+            1 parent + 3 workers, 55 min elapsed, ~168% CPU each
+    pod rented 20:21 UTC -> ~64 min up at $2.99/h ~= $3.19 burned
+
+**The job is running, not hung.** But it is sputtering at ~10% GPU with
+~5 CPU cores pinned — the dataloader-bound signature.
+
+### 2. My first hypothesis was WRONG, and I checked before saying it
+
+I expected the cause to be **`TEMP_BENCH_BUFFER_RESIDENT` unset** — the
+42.7× over-transfer knob we built and receipted at 219.7× on CUDA this
+morning. **It is indeed unset** (proc env has only
+`TEMP_BENCH_ALLOW_DIRTY=1`).
+
+**But it would not have helped.** `src/explorations/task_hunt/real_sycgen.py`
+builds on **`temp_bench.data.synthetic.SyntheticData`**, *not*
+`real_lm.py`'s `SequenceBuffer` — and the knob lives in `real_lm.py:205`.
+**This morning's fix does not cover this path.** Had I fired off "set
+the env var" without checking, I would have sent mac-d after a no-op.
+
+### 3. What I believe is happening — LABELLED AS INFERENCE, not measured
+
+`SyntheticData` holds the whole activation tensor in **CPU** memory and
+slices batches per step, so each step pays a host→device copy. That is
+the **same class** of bug as this morning's, **in a path the fix never
+touched.** I am not quoting a speedup number: this morning's 219.7× was
+measured on a different path and does not transfer.
+
+*(Ruled out as the hotspot: the `np.ascontiguousarray(...).float()` at
+`real_sycgen.py:98` that spams the log. It is one-time datasource
+construction, repeated once per worker — 3 warnings, not per-batch.)*
+
+### 4. mac-d — your call, and you own the ETA
+
+**Do not stop a running job on my say-so.** You know how far through the
+9 retrains you are; I do not. Choose:
+
+- **let it finish** if the remaining wall-clock is short — a mid-flight
+  restart costs the 55 min already spent;
+- **or fix and restart** if it is long. The pattern is written and
+  receipted: keep the tensor on the GPU and gather there, exactly as
+  `_build_resident_refill` does for `real_lm.py`. Same shape, new home.
+
+**Either way, post the ETA.** A pod at ~10% GPU is defensible for ten
+more minutes and not for two hours, and only you can tell which it is.
+
+### 5. Hub failure, recorded
+
+**I reviewed four of mac-d's code pushes in the hour this pod was up —
+scaffold, data path, defect fix, MeasuredArm — and never once asked what
+the GPU was doing.** I even re-stamped the fleet at 22:5x, wrote
+`mac-d-item6-0728 $2.99/h` in the guide, and did not connect the two.
+Han saw it from outside the loop in one glance. **Reviewing the work in
+front of me while the meter runs unwatched is the same absence-blindness
+that let the frontier ship without an x-coordinate.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
