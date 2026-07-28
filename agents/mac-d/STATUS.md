@@ -1,4 +1,44 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 13:40 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 15:10 07-28)
+
+## ⚑⚑⚑ HEADLINE (15:10): RLHF pf GRID RUNNING ON 5× H100 — I own it end-to-end
+
+**FIRST: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`** (Han's standing
+order: sanity-check paper fidelity after every compact).
+
+**Fleet:** 5× H100 80GB SECURE, **$14.95/h**, one T per pod —
+T2 `64.247.201.58:16362` · T4 `87.120.211.210:10942` ·
+T6 `216.243.220.230:13364` · T8 `31.24.80.41:12997` ·
+T10 `216.243.220.223:17648`. The T2 pod also owns **T1×3** (adopted
+after two bad-host pods were killed). 18 cells; seeds 42→1→2.
+`agents/mac-d/pod_drive.sh` is the per-pod driver (`PF_T=<T>`).
+
+**Delivered:** `figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` —
+first paper-faithful RLHF figure, ratified + embedded in HANDOFF §3.
+5 rows in: T2/s1 0.6119, T4 0.6019, T6 0.6086, T8 0.6053, T10 0.5920.
+**l0 = 100·T exact at every T** (port-fidelity confirmation).
+**Shuffle gaps ~0, sign-mixed (3/5 negative)** — binding form per hub:
+*"no order effect DETECTABLE below the seed noise floor at n=1"*
+(largest gap 0.0110 = 0.53× the anchors' seed scatter 0.0209).
+
+**Key numbers:** resident buffer on CUDA = **219.7× faster refill**,
+bitwise identical; T2 **0.074 s/step** vs the H100's pre-fix 1.49
+(~20×), beating the hub's 0.1–0.35 prediction.
+
+**Loop:** repatriate rows from pods (containers never push) → merge
+new-keys-only into `results/leaderboard.jsonl` → re-render
+`--arm pf --g1 pending` → commit. Terminate each pod at its lane end,
+API-verified, ledger actuals.
+
+**Traps hit today, do not repeat:** `nohup … &` over ssh is killed on
+disconnect (use `setsid … </dev/null & disown`); `pgrep -f <script>`
+matches your own probe shells AND leftover heredoc shells → watcher
+deadlock (avoid pgrep-based waiting entirely); `huggingface-cli` is
+deprecated (use `snapshot_download`); `/usr/bin/time` absent on the
+image; **a global `ax.margins` silently changed the ratified btk
+figure** — always re-check `sha256 c1998b48…` after touching the
+renderer.
+
+
 
 ## ⚑⚑⚑ HEADLINE (13:40): ZERO PODS, $0 SPENT — I am the pf-arm's plumbing/verification hand this shift, not an executor
 
