@@ -32298,3 +32298,82 @@ recurring failure named in four words, and it is the third time today an
 agent has caught it in their own work rather than someone else's.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 21:45 BST — mac-c CLAIM-READ (authorized, $0): ⚑ **the exposure is essentially CONFINED TO ITEM 6.** And this REFINES my own §6 answer — I raised the alarm one level too high
+
+Hub authorized the $0 claim-read. **The answer materially de-escalates
+what I reported at 21:18**, and the correction is mine to make.
+
+### 1. ⚑ What I got right, and what I framed wrong
+
+**Right (unchanged):** no windowed SAE **arch** exists in probing / RLHF
+/ EM. `tsae_btkonly` raises `ValueError` at T≠1; no `stacked_*` rows
+exist outside synthetic.
+
+**Wrong in its implication:** I wrote *"every SAE baseline is per-token
+and TXC is the only arm with window access."* True of the **architecture**
+— **false of the comparison.** The pooling is supplied by the
+**protocol**, not the arch:
+
+> `appendix.tex:121` (probing): *"**Per-token architectures encode the
+> full $(N,S,d_{in})$ tensor and mean-pool over the token axis**"* …
+> window archs slide a width-T window and *"mean-pool over the window
+> axis"*. **"The output is a single $(d_{\mathrm{SAE}})$ feature vector
+> per prompt for every architecture."**
+
+**That IS the pooled-SAE baseline** — encode per token, mean-pool feature
+vectors over positions, which is exactly Dmitry's `pooled SAE`
+construction. **Probing has been running it all along**, and over
+$S=32$ tokens — a *wider* span than any window arm gets. Same story in
+backtracking (`appendix.tex:497`): *"max-pool absolute feature
+activations over positions"*, applied to every architecture.
+
+**I checked the arch registry and stopped there. The registry was the
+wrong place to answer a question about what the comparison does.**
+
+### 2. Section-by-section, against what each actually asserts
+
+| section | claim direction | pooled baseline present? | exposed? |
+|---|---|---|---|
+| **probing** | TXC ahead of TopK SAE | ✅ mean-pool over token axis, all archs, matched per-token $L_0$=20 + matched $k_{\text{feats}}$ | **NO** |
+| **backtracking** | TXC-base best inducement, TXC-pro best detection | ✅ max-pool over positions, all archs | **NO** (detection); inducement is a *steering* comparison, where a per-token feature is a legitimate comparator |
+| **EM** | **"T-SAE performs best on both axes, while TXC variants underperform"** | — | **NO — already NEGATIVE for TXC** |
+| **RLHF** | **"The result is a negative case for TXC"**, TXC worst at 7/20 semantic | — | **NO — already NEGATIVE for TXC** |
+| **item 6 (`sycgen`)** | clean TXC win vs per-token-only comparators | ❌ | ⛔ **YES** |
+
+**The EM/RLHF logic is the decisive one and it is one-directional:**
+those sections report TXC **losing**. Adding a *stronger* baseline can
+only make TXC look worse — **it cannot overturn a negative in TXC's
+favour.** There is no way for the missing-baseline objection to damage a
+result that already goes against us.
+
+### 3. The one real residual gap, stated precisely
+
+**Pooled ≠ stacked.** Probing/backtracking supply *pooling*;
+**concatenation is absent everywhere outside synthetic** (`grep concat`
+over the appendix: no hits). In Dmitry's table stacked ran level with
+pooled (.506/.544/.565/.619 vs .506/.537/.563/.633), so this is a
+completeness gap rather than a threat — **and it is one arm on one axis,
+not three exposed sections.**
+
+### 4. Sizing, which is what was asked
+
+**Do not re-plan three sections.** The item-6 table remains urgent and
+mac-d's harness remains the right build. **Making it section-agnostic is
+still correct** — but as cheap insurance for the *stacked* completeness
+arm, **not because probing/RLHF/EM are at risk.**
+
+⚠ **Caveat on my own read:** I read the claims and the protocol
+appendices, **not the analysis code for each section.** If any section's
+code deviates from its appendix — e.g. a per-token arch that is *not*
+actually pooled before probing — that flips the section back into
+exposure. **`appendix.tex:121` is unambiguous for probing and I would be
+surprised, but I have not verified it in code**, and that verification
+is the natural next $0 step if the hub wants certainty rather than my
+reading.
+
+**$0. 0 mac-c pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
