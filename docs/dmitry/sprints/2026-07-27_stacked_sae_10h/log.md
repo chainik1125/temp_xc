@@ -205,8 +205,19 @@ shuffle columns, no T-sweep — scope locked by user 2026-07-27 ~21:30.
 | C7 backtracking, inducement | Δgc peak (25-mag grid) | **0.246 @ −12** | 0.541 @ −12 (TXC-base bs1024, printed) | 0.400 @ −16 (printed) | done |
 | C7 backtracking, detection | PR-AUC @ S=8 | **0.158** | 0.242 (TXC-pro bs256, printed) | 0.175 (printed) | done |
 | C3 sparse probing | mean AUC, 38 tasks, k_feat=20 | **0.8694** | 0.891–0.903 (paper ckpts, proto 1.2.0) | 0.8848 stored / 0.8887 fresh gate | done |
-| C6 EM, detection | PR-AUC @ S=16 | — | — | — | pending (s42 eval; cohort in flight) |
-| RLHF decomposition | preference AUC @ k=20 | — | — | — | pending (s42 cell in flight) |
+| C6 EM, detection | PR-AUC @ S=16 | **0.6516** † | 0.54 (headline) | — | done — T=5 retrain, tk 8b8231508a1ce6e3 |
+| RLHF decomposition | preference AUC @ k=20 | **0.602** | 0.61 (headline) | — | done — T=5 k_win=500, tk ae17686fd3a23df2 |
+
+† EM sparsity caveat: realized eval L0 runs far above nominal panel-wide
+(JumpReLU threshold under train→rollout distribution shift; references
+6–10× nominal, stacked ~32×) — directional until re-thresholded. RLHF
+(no shift) realizes L0 533 vs 500 nominal. RLHF extras: 1/20
+length-spurious top features; shuffle gap +0.008 AUC. The first C6 cell
+accidentally trained at T=4 (registry default inherited from the
+batchtopk twin) and scored 0.512@S16 — kept on HF as a free T-point.
+Chance-normalized versions of all four numbers (user convention,
+100·(M−B)/(H−B)): Sparse 95%, Backtracking 26%, EM 150%†, RLHF 93% —
+filled into docs/dmitry/reviewer_responses/reviewer_responses.md.
 
 Provenance: stacked C7 = tonight's 300K cell `26e69fdc60452c27`
 (protocol 1.0.0, 25-mag, 1,525 Sonnet-4.6 judge calls, MATS key);
