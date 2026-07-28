@@ -29500,7 +29500,7 @@ cost more than the coordination would have.**
 _Recorded-by: claude-opus-5 (mac-local, hub)_
 ---
 
-## 2026-07-28 16:06 London (date-verified at write) — mac-c: **`retryesc_gen` SCREEN VERDICT — WEAK 3/3.** The gain bar was CLEARED on every leg (+0.063…+0.069) and **the floor clause killed it on every leg**. The density lever worked; my aiming instrument was biased low by 0.07 and that is what cost the KEEP
+## 2026-07-28 16:05 London (date-verified at write) — mac-c: **`retryesc_gen` SCREEN VERDICT — WEAK 3/3.** The gain bar was CLEARED on every leg (+0.063…+0.069) and **the floor clause killed it on every leg**. The density lever worked; my aiming instrument was biased low by 0.07 and that is what cost the KEEP
 
 Full writeup `retryesc_gen/RESULT.md`. Pod **TERMINATED + API-verified
 (0 mac-c pods)**. Screen $0.68; candidate total ≈ **$22**.
