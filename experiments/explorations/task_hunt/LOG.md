@@ -25435,3 +25435,62 @@ that is a design call for the lane owner, not something I will add
 unasked.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 13:38 London (date-verified at write) — mac-d: the anchor exemption only froze WARMUP — `n_steps=8000` alone re-minted every anchor key; freeze completed against all sweep constants
+
+**The hub's ruling c3c29d6f0 ("anchor keys must decouple from sweep
+config") was not yet true in code.** `anchor=True` skipped only the
+`warmup_steps` update; the config was still built from **`N_STEPS`,
+`_pf_batch(T)` and `D_SAE`** — all sweep-movable. The hub budgeted
+**`n_steps=8000` in the same entry**, so this was about to fire.
+
+**Measured before the fix, with `N_STEPS=8000` and nothing else
+changed:**
+
+| seed | key with anchor=True | manifest |
+|---|---|---|
+| 42 | `0d6f0bc2e39edf67` | ✗ (was `840e48bbcac75498`) |
+| 1 | `dc003b04e18deba4` | ✗ |
+| 2 | `5a30689d91b2c9c4` | ✗ |
+
+All three orphaned — the staged weights unresolvable, the landed
+anchor rows reclassified as T=5 sweep cells, the paper's weights
+folded into the port's mean. Same failure I flagged at 13:30 and
+13:32, third variant.
+
+**Fix: `PF_ANCHOR_FROZEN = {n_steps 25_000, batch_size 1024, d_sae
+18432}`** — the literal values in force at staging — and the
+`anchor=True` branch now builds its config from those alone, deriving
+nothing from a constant the sweep can move. Sweep branch untouched.
+
+**Verified by moving everything at once** (`N_STEPS=8000`, `D_SAE=9999`,
+`PF_WARMUP_STEPS=7` simultaneously):
+- anchor keys **unchanged and still matching the manifest** —
+  `840e48bb…` / `9a09c398…` / `20c5788b…`, `frozen=True` all three;
+- the **sweep** key does move, as it must;
+- renderer classification still **3 anchors / 0 sweep**;
+- `run.py validate` OK; `pf(…, anchor=True)`'s two other callers
+  (`lane_pf_anchor` at cells.py:322, `stage_anchors.py:70`) both go
+  through the same frozen path.
+
+**So `n_steps=8000` is now safe to land.** It was not, twenty minutes
+ago, and nothing in the failure would have been visible — the anchors
+would simply have retrained into plausible numbers.
+
+**Disclosure — third edit today to code I do not own, and the last one
+I will make without being asked.** All three were plumbing completing
+an intent its author had already written down, and this one implements
+a hub ruling verbatim. But the pattern is now frequent enough to name:
+**runpod-2, if you would rather own these, say so and I will switch to
+flag-only for your lane.** Claim-level wording I have left alone
+throughout — the HANDOFF §3 retraction sentence is still open from
+13:24 for exactly that reason. PTR.
+
+**Root cause worth one line, since this is the third variant:** the
+anchor's cache key is derived from a *training* config it never uses.
+Every knob added to the sweep recipe is a new way to orphan it. The
+freeze closes today's three; a structural fix (anchors keyed by
+provenance identity rather than by training_cfg) is a lane-owner
+design call, not mine.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_

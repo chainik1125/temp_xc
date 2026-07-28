@@ -206,6 +206,18 @@ PF_ARCH = "agentic_txc_02_v1t"
 PF_DATASOURCE = "gemma_2_2b_base_l12_phase7"
 PF_WARMUP_STEPS = 0  # sweep cells only — see pf(); anchors are exempt
 
+# ── ANCHOR RECIPE FREEZE (mac-d 13:38, hub ruling c3c29d6f0 "anchor keys
+# must decouple from sweep config") ───────────────────────────────────
+# compute_train_key hashes the WHOLE training_cfg, so the anchor branch
+# must depend on NO module constant the sweep can move — exempting only
+# warmup_steps left n_steps, batch_size and d_sae still drifting, and the
+# budgeted N_STEPS 25000->8000 alone re-mints all three anchor keys
+# (measured: 840e48bb -> 0d6f0bc2).
+# These are the literal values in force when the anchors were staged
+# (manifest 840e48bb / 9a09c398 / 20c5788b). CHANGING ANY OF THEM
+# INVALIDATES THE STAGED ANCHORS and requires re-running stage_anchors.py.
+PF_ANCHOR_FROZEN = {"n_steps": 25_000, "batch_size": 1024, "d_sae": 18432}
+
 
 def _pf_batch(T):
     """Upstream t-sweep batch schedule (train_primary_archs.py ~L2027:
@@ -230,10 +242,19 @@ def pf(T, seed=SEED, *, anchor=False):
     Anchors therefore do not follow sweep-recipe edits; `lane_pf_anchor`
     additionally hard-asserts the staged file is present.
     """
-    tc = TrainingConfig(
-        n_steps=N_STEPS, batch_size=_pf_batch(T),
-        arch_hparams_override={"d_sae": D_SAE, "T": T, "k_pos": 100 * T})
-    if not anchor:
+    if anchor:
+        # Frozen literals only — see PF_ANCHOR_FROZEN. Deriving any of
+        # these from N_STEPS / _pf_batch / D_SAE would re-couple the
+        # anchor key to the sweep recipe, which is the whole bug.
+        tc = TrainingConfig(
+            n_steps=PF_ANCHOR_FROZEN["n_steps"],
+            batch_size=PF_ANCHOR_FROZEN["batch_size"],
+            arch_hparams_override={"d_sae": PF_ANCHOR_FROZEN["d_sae"],
+                                   "T": T, "k_pos": 100 * T})
+    else:
+        tc = TrainingConfig(
+            n_steps=N_STEPS, batch_size=_pf_batch(T),
+            arch_hparams_override={"d_sae": D_SAE, "T": T, "k_pos": 100 * T})
         # Schedule fidelity (measured 13:28): the v2 default 1000-step
         # warmup is a framework default, never part of the vendored
         # recipe, and it holds lr at 20% through the window where
