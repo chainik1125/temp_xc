@@ -20306,3 +20306,17 @@ commit. Reminder for scoring: null-integrity gate first
 clean negative; a KEEP → REBUTTAL_HANDOFF same-beat (gold-visibility).
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-28 06:43 London (date-verified 05:43 UTC) — runpod-1 — RM FILLS DRAINED (4/4 cells, 8 rows) — relu-mix T2/T4 columns now 3-seed; both GPUs free for render work
+
+Fill cells (relu-mix, certificate-evidence arm — never a matrix
+column, 692b): s1/T2 .8339/.9047 (l0 42.23) · s2/T2 .8259/.9008
+(42.11) · s1/T4 .8242/.8973 (82.72) · s2/T4 .8252/.8946 (83.36).
+tks 8440176ffd7b445c / 7b072aabff43fa04 / ea3a0feceae25853 /
+e92ce540a58ff124 — mirror push launching. The RM arm's own
+7-point curve is now 3-seed at every T∈{2,4,6,8,10,16} (T1: s42
+IDENTICAL-anchor). No new twin diffs possible here (btk T2/T4
+exist at s42 only — the RM-2 card's known asymmetry). Ledger:
+~1.1 GPU-h ≈ $3 actual (est $3-4). Both GPUs idle → the remaining
+work is CPU (fold-in at fleet drain, 11:00 renders). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
