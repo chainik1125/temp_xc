@@ -15,12 +15,17 @@ first). Durability: 32/32 twin ckpts receipted on ratified mirror
 (incl. night T10/T16 additions; ckpt_push.log). Fleet: C/D at
 runpod-c, E at runpod-a, runpod-b overflow-only. Hub ETA
 06:30-07:30. GPU 2 = runpod-2, never mine.
-NEXT: shard cells land → rows commits + per-cell HF pushes; at
-drain: (a) RM fills s1/s2×T{2,4} in idle windows ≥10 min
-(PRE-AUTHORIZED, no-idle sweep 72cca1bdf), (b) E1-E3 scoring per
-card §9 + ledger actuals, (c) pf-alongside-btk 7-point renders
-(charter iii; analysis.py pre-staged, pollution-fixed 5a699a5d4),
-(d) 11:00 PROTECTED btk renders, (e) certificate → final.
+MILESTONE 06:11 UTC: SPRINT DELIVERED — shards A+B drained (8/8,
+$14-15), RM fills drained (4/4, $3), 12/12 ckpts receipted, grid
+21/21 (pod-B rows repatriated by hub), **card §9 SCORED: E1
+CONFIRMED (monotone onset T6-T8) · E2 NOT CONFIRMED (null — pf ≡
+btk at matched budget) · E3 PASS (anchors interpolate)** —
+5075d098e awaiting ratification. pf renders live in-tree.
+REMAINING: (a) 11:00 London PROTECTED btk 7-point renders
+(--writeup final; analysis.py pollution-fixed 5a699a5d4 — bands
+verified canonical); (b) certificate PRELIMINARY→final (fold: E-
+scores, telemetry bounds, fills, runpod-b RLHF T8-trio identity);
+(c) manifest owner pass (morning, 7af84fb80); (d) STATUS rewrite.
 Monitors (this session): bbw1y8ufe (pf shards A/B logs),
 b6jr22n3d (origin poller).**
 
