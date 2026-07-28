@@ -42,6 +42,23 @@ append-only in `results/leaderboard.jsonl`, stamped with
   (binding): sweep columns = "TXC (v2, relu-mix/btk-only)"; paper
   composition = a separate "paper base (archived, T=5)" anchor row;
   never conflate.**
+
+  **The three compositions, exactly** (p_t = W_enc,t x_t + b_enc;
+  k_win = k_pos·T; B = batch):
+  - paper base: `z = ReLU( TopK_{k_win}( Σ_t p_t ) )` — exact
+    per-window k, rectify AFTER selection.
+  - v2 post (relu-mix): `z = BatchTopK_{k_win·B}( ReLU( Σ_t p_t ) )`
+    — select-after-sum like the paper, but ReLU BEFORE selection +
+    batch-level expected budget. btk-only twin: no ReLU (signed
+    selection). Eval uses the EMA-threshold gate.
+  - v2 pre (relu-mix): `z = Σ_t [ BatchTopK_{k_win·B}( ReLU(p) ) ]_t`
+    — selection at (position, latent) granularity BEFORE pooling;
+    the window code sums surviving per-position contributions.
+    btk-only twin: no ReLU.
+  Consequences are MEASURED, not assumed: relu-mix↔btk-only =
+  bit-identical at T1 / ~1e-2 divergence from T2 (probing) / exact
+  identity through T16 (RLHF certificate); realized-l0 receipts
+  quantify the budget-convention difference.
   The paper's RLHF TXC was **`agentic_txc_02` =
   `MatryoshkaTXCDRContrastiveMultiscale`** (matryoshka+contrastive,
   multiscale shifts, per-window TopK→ReLU, k_win=500) — a DISTINCT
