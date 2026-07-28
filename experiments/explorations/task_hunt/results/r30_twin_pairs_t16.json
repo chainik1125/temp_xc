@@ -1,0 +1,46 @@
+{
+ "card_note": "LOG twin note (committed with this driver)",
+ "config": {
+  "d_sae": 2048,
+  "k_pos": 8,
+  "n_steps": 8000,
+  "buffer_tokens": 524288,
+  "T": 16,
+  "eval_L": 32,
+  "seed": 42
+ },
+ "pairs": {
+  "lambda": {
+   "ok": true,
+   "relu_mix_key": "e245559c84b46e60",
+   "relu_mix_source": "runpod-b clone (read-only)",
+   "btk_key": "6bc6199046a57e48",
+   "n_tensors": 8,
+   "n_equal": 7,
+   "identical": false,
+   "max_abs_delta": 0.0,
+   "diverging": {
+    "threshold_set": "MISSING/SHAPE"
+   }
+  },
+  "dq": {
+   "ok": true,
+   "relu_mix_key": "74c060b0791223e2",
+   "relu_mix_source": "fresh deterministic re-run (disclosed)",
+   "btk_key": "87104deecad5165f",
+   "n_tensors": 8,
+   "n_equal": 1,
+   "identical": false,
+   "max_abs_delta": 8118272.0,
+   "diverging": {
+    "threshold_set": "MISSING/SHAPE",
+    "num_tokens_since_fired": 8118272.0,
+    "W_enc": 0.35152456164360046,
+    "W_dec": 0.24838577210903168,
+    "b_enc": 0.03468194603919983,
+    "b_dec": 0.020231664180755615,
+    "threshold": 0.0015910565853118896
+   }
+  }
+ }
+}

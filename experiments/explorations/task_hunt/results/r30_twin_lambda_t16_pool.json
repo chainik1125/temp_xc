@@ -1,0 +1,29 @@
+[
+  {
+    "ds": "ward_real_lambda_base_l12",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "metrics": {
+      "eauc": 0.6025000214576721,
+      "e_mean_max_cos": 0.6053931713104248,
+      "e_frac_recovered_90": 0.125,
+      "e_frac_recovered_80": 0.125,
+      "nmse": 0.2708554481128495,
+      "l0_per_window": 7.7958984375,
+      "l0_per_token": 0.48724365234375,
+      "lambda_recovery": 0.20633623381777194,
+      "lambda_r2": -0.023461461067199707,
+      "lambda_chance": -0.04028753274460907
+    },
+    "train_cached": true,
+    "eval_cached": true,
+    "ok": true
+  }
+]

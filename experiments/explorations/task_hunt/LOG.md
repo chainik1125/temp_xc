@@ -16968,3 +16968,61 @@ paper anchor + disclosures; whether to add the paper-composition
 sweep is a scope call, not a correction.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## 2026-07-28 ~02:55 London — runpod-a: SWAP COMPLETE (task #8) — T4 triple landed; λ̂ twin IDENTICAL; ⚑ dq twin DIVERGES (R30 certificate is VENUE-SCOPED, receipt) — ONE wrap, PTR
+
+be3d3fddc swap executed end-to-end on GPU 0; actuals ≈ 2.3 GPU-h
+≈ $7 (est $7–9, ledgered).
+
+**1. RLHF btk T4×3 (lane x4, A5-frozen cells, pin 4c231e149):**
+
+| cell | auc (pref_auc_k20) | l0/unit | wall |
+|---|---|---|---|
+| T4/s42 `4e65508d` | 0.6185 | 410.1 | 41.4 min |
+| T4/s1 `b44d60d4` | 0.6108 | 409.4 | 39.3 min |
+| T4/s2 `8a306974` | 0.6295 | 412.7 | 40.0 min |
+
+Mean **0.620 ± 0.009** — Han's grid T4 point filled for the item-3
+btk curve (7-point render is runpod-2's).
+
+**2. R30 spot-check twin pairs (T16, hunt width d2048/k8/8000
+steps, seed 42; driver + note pre-committed; artifacts
+`task_hunt/results/r30_twin_{pairs,lambda,dq}_t16*.json`):**
+
+- **λ̂ (ward_real_lambda_base_l12): IDENTICAL** — 7/7 shared
+  tensors torch.equal, max|Δ| = 0.0 (btk twin `6bc61990` vs
+  runpod-b's committed `e245559c`, checkpoint read-only from
+  their clone). `threshold_set` = structural extra key of one
+  arch variant — the RM_EQUIVALENCE precedent's exact extra-keys
+  note, not divergence. Item-4 certificate line carries: fresh
+  hygiene twin CONFIRMS the R30 identity regime on this venue.
+- **⚑ dq (dial_real_dqgap_llama31_8b_l14): DIVERGES** — W_enc
+  |Δ|max 0.352, W_dec 0.248, b_enc 0.035, threshold 1.6e-3,
+  fired-census Δ 8.1M tokens; metric delta eauc 0.5425 (relu-mix
+  `74c060b0`, DISCLOSED deterministic re-run — dup train_key
+  count 2, checker-surfaced) vs 0.5575 (btk `87104dee`), +0.015.
+  ReLU binds on-path on this substrate at k8 — **the R30 identity
+  certificate does NOT blanket-transfer across venues.** Now
+  measured: identity holds on Ward/λ̂ (fresh receipt) and
+  RLHF@18432 (runpod-2's certificate); FAILS on dqgap/llama31.
+  Item-5 caption fork for mac-local: (a) divergence-disclosure
+  line (cheap; consistent with the toy-class demotion — the
+  screen-instrument columns stay as ruled), or (b) measure the
+  relu-mix column where it now provably differs. Not my call —
+  receipts committed either way.
+
+**3. Ops disclosures:** twin driver hit a futex wedge on the 2nd
+in-process run_pool (forked worker inherited a held lock) —
+TaskStop'd, fix-forward = one-pool-per-process + argv selection +
+JSON merge (plus two small driver bugs fixed same arc: missing
+sys import, since-window excluding cache-hit rows; all commits on
+origin). ~35 min GPU idle during the wedge — disclosed. Twin runs
+at wt pins 027838b83 → d23f8b8d9 (worktrees removed clean,
+harvests cmp-verified).
+
+**4. Durability:** 8/8 lane ckpts on the ratified mirror
+(`ckpts/<key>/`) with sha receipts (5 in my ~01:45 entry + twins
+9322751…/0505877…/1e604c0…). Task #8 CLOSED. PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
