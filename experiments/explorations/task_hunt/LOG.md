@@ -31514,3 +31514,91 @@ retrain's key-derivation before GPU hours are spent, say so. Otherwise
 I stay out of the lane.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+---
+
+## 2026-07-28 ~19:2x BST — ⛔ **ITEM 6 CHALLENGED AND THE CHALLENGE LANDS** — Dmitry's agent ran the windowed-SAE baseline we never ran; TXC loses at every T. Claim pulled pending a budget-matched head-to-head
+
+**Han, urgent: Dmitry's Claude reports TXC losing to pooled and stacked
+SAE on sycgen.** Checked against our own artifacts immediately. **The
+criticism is correct.**
+
+    T        TXC          pooled SAE     stacked SAE
+    2    .501 ± .015     .506 ± .009    .506 ± .009
+    4    .529 ± .011     .537 ± .006    .544 ± .002
+    8    .543 ± .007     .563 ± .022    .565 ± .028
+    16   .600 ± .010    **.633 ± .006** .619 ± .003
+
+### 1. It is not a measurement dispute — their TXC column is OUR column
+
+Ours (`sycgen_tsweep_summary.json`, ordered): **.498 / .524 / .541 /
+.592** against their **.501 / .529 / .543 / .600**. Same numbers. **What
+is new is the two baselines, and we did not run either.**
+
+### 2. Verified: the sycgen retrain ran THREE archs, and the SAE only at T=1
+
+    txc_batchtopk_post_btkonly   T{2,4,8,16}  trained   <- the claim arm
+    batchtopk_sae_btkonly        T=1 ONLY     trained   <- 0.4819 anchor
+    tsae_btkonly                 T=1          UNTRAINED only
+
+**There is no SAE at T>1 anywhere in the sycgen results.** Our entire
+SAE comparator is a **per-token** SAE. **A windowed model beating a
+non-windowed one on a windowed task establishes nothing about the
+architecture** — and that is the only comparison we made.
+
+This is the missing null the ambience principle *predicts* you must
+beat: a pooled SAE is the uniform-kernel degenerate case of "learnable
+kernel estimator". We wrote the principle down and then did not test
+against its own null.
+
+### 3. The one unsettled thing — the comparison is ~9× off in budget
+
+Measured `l0_per_window` from our retrain rows:
+
+    TXC:  T2 5.53-5.98   T4 6.27-6.54   T8 6.73-7.25   T16 7.81-7.83
+    SAE anchor: 4.37-4.75 l0/token  =>  pooled over T=16  ~= 72/window
+
+**TXC gets ~7.8 active features per window at T16; a pooled SAE at the
+anchor's rate gets ~72 — about 9×.** Stacked additionally gives the
+probe **T× the input dimension** (16× at T16), a capacity confound on
+top of the budget one.
+
+**This does NOT rescue the claim and must not be used as one.** It is
+our own disclosed caveat — *"NOT budget-matched: TXC realizes 0.49–2.85
+l0/token vs the SAE anchor's ~4.5"* — landing on the headline instead of
+in a footnote. We flagged it ourselves, so we do not now get to deploy
+it as a gotcha. It means the comparison **as run** is uninformative
+about the architecture in *either* direction.
+
+### 4. Action taken
+
+`REBUTTAL_HANDOFF.md` §6 now carries a **⛔ DO NOT QUOTE AS AN
+ARCHITECTURE WIN** block with the challenge table in it. Item 6 is
+quotable **only** as *"a per-token-silent safety task on which windowed
+probes read state that per-token probes cannot"* — never as TXC beating
+an SAE.
+
+### 5. The decisive experiment — pre-registered here, before it runs
+
+**sycgen, T{2,4,8,16} × 3 seeds, three arms at MATCHED
+`l0_per_window`:** TXC, pooled SAE, stacked SAE. Match the budget by
+constraining the SAE arms, not by inflating TXC. Report `l0_per_window`
+per cell as a receipt.
+
+**Pre-registration: if TXC still loses at matched budget, item 6 is a
+NEGATIVE and we report it as one.** Under the prime directive — *a
+sound verdict, never a win* — a gold task that dissolves under the
+right baseline is exactly the kind of thing this program exists to
+catch, and it is better that Dmitry's agent caught it before submission
+than a reviewer after.
+
+### 6. Open question I am NOT asserting either way
+
+The **probing and RLHF** exhibits do carry `tsae_btkonly` (T-SAE, a
+windowed baseline), so they are better defended than sycgen — but **I
+have not verified that the probing T-SAE actually runs at T>1 with a
+matched budget**, and I am not claiming it does. Someone should check
+that before assuming the paper sections are safe from the same
+objection.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

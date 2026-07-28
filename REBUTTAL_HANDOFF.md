@@ -334,6 +334,44 @@ panel — directly comparable to the btk figs above):**
 
 ## 6+7. Safety-relevant hunted tasks (THE GOLD)
 
+> ## ⛔ ITEM 6 — DO NOT QUOTE AS AN ARCHITECTURE WIN (challenge open, 19:2x 07-28)
+>
+> **Dmitry's agent ran the baseline we never ran, and TXC loses to it at
+> every T:**
+>
+> | T | TXC | pooled SAE | stacked SAE |
+> |---|---|---|---|
+> | 2 | .501 ± .015 | .506 ± .009 | .506 ± .009 |
+> | 4 | .529 ± .011 | .537 ± .006 | .544 ± .002 |
+> | 8 | .543 ± .007 | .563 ± .022 | .565 ± .028 |
+> | 16 | .600 ± .010 | **.633 ± .006** | .619 ± .003 |
+>
+> **This is not a measurement dispute — their TXC column IS our column**
+> (ours: .498 / .524 / .541 / .592). **It is a missing-baseline
+> dispute, and we are the ones who were missing it.** Verified against
+> our own artifacts: the sycgen retrain ran exactly three archs, and
+> **the only SAE comparator is `batchtopk_sae_btkonly` at T=1** (0.4819)
+> — a *per-token* SAE. **We never ran an SAE that gets to use the
+> window.** A windowed model beating a non-windowed one on a windowed
+> task establishes nothing about the architecture.
+>
+> **The one thing that is not settled: the comparison is not
+> budget-matched, and not by a little.** Measured `l0_per_window`:
+> TXC = **5.5 (T2) → 7.8 (T16)**. A pooled SAE at the anchor's ~4.5
+> l0/token spends ≈ **4.5 × T ≈ 72 at T16** — roughly **9× the active
+> features per window**. Stacked additionally hands the probe **T×
+> the input dimension**. This is our own disclosed caveat (*"NOT
+> budget-matched — TXC realizes 0.49–2.85 l0/token vs the SAE anchor's
+> ~4.5"*) landing on the headline instead of in a footnote.
+>
+> **Status: the claim as written in this section is NOT supported
+> against the right null.** Quote item 6 only as *"a per-token-silent
+> safety task on which windowed probes read state that per-token probes
+> cannot"* — never as TXC beating an SAE. **Resolution:** budget-matched
+> head-to-head, T{2,4,8,16} × 3 seeds, TXC vs pooled vs stacked at
+> **matched `l0_per_window`**. Pre-registered: **if TXC still loses at
+> matched budget, item 6 is a negative and we report it as one.**
+
 **⚑ SECTION STATUS, restamped 18:0x 07-28 — read this before the
 overnight prose below, which is written in the future tense and has
 been overtaken:** **item 6 (sycgen) is a DELIVERED EXHIBIT** — fig and
