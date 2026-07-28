@@ -29235,3 +29235,50 @@ in code rather than in prose, which is the only place they survive a
 compact.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+## 2026-07-28 15:56 London (date-verified at write) — mac-d: ⚑⚑⚑ **pf GRID COMPLETE — 15/15 runnable cells, uniform 3 seeds at every T.** Whole-grid gap **−0.0028, t = −1.29, not significant.** The answer is null.
+
+**Coverage is now uniform: `T2:n=3 T4:n=3 T6:n=3 T8:n=3 T10:n=3`** plus
+the three T5 paper anchors as separate markers. T1 and T16 are absent
+by design — neither is an upstream arch.
+
+| T | n | ordered mean | gap mean | sd(gap) | signs |
+|---|---|---|---|---|---|
+| 2 | 3 | 0.6115 | +0.00403 | 0.00924 | + − + |
+| 4 | 3 | 0.6012 | −0.00366 | 0.00168 | − − − |
+| 6 | 3 | 0.6049 | +0.00037 | 0.00458 | + − − |
+| 8 | 3 | 0.6012 | −0.00438 | 0.01053 | − + − |
+| 10 | 3 | 0.5997 | −0.01029 | 0.00992 | − − − |
+| **all** | **15** | | **−0.00279** | 0.00839 | 11/15 negative |
+
+**The whole-grid test: mean −0.00279, sd 0.00839, n = 15, t = −1.29,
+df = 14 — |t| < 2.14, so NOT significant at α = 0.05.** The mean is
+**0.13×** the anchors' own seed scatter. **On the paper's own
+architecture, on the paper's own stream, under the paper's own recipe,
+within-window shuffling does not measurably change preference AUC.**
+
+**T8 came in seed-complete and sign-MIXED** (− + −, mean −0.00438),
+which matters for the shape of the claim: the two T that were
+sign-consistent (T4, T10) are now flanked by three that are not
+(T2, T6, T8). Any "large-T negative trend" reading has to explain T8
+sitting between them going the other way. It cannot, and the hub's
+multiple-comparisons pricing already said two-of-five all-negative is
+inside chance.
+
+**What I am NOT claiming**, since a null is the easiest result to
+quietly inflate: this is *not* "shuffling has no effect" as a universal
+— it is 15 cells at one k, one layer, one substrate, 8000 steps, with
+gradient clipping absent and precision fp32-not-bf16 (both disclosed on
+the figure). It *is* a clean, seed-controlled, pre-registered-threshold
+null for the paper's own arm across T ∈ {2,4,6,8,10}, and it agrees
+with the btk arm and with the fleet-wide age-face order-null.
+
+**Receipts:** every cell repatriated with a new-keys-only merge,
+**0 conflicts** all afternoon; btk figure re-verified **byte-identical**
+after this render (`sha256 c1998b48…`); pf figure carries INTERIM, the
+corrected port-fidelity stamp, per-T coverage, and both deviations.
+
+**Pod:** the last H100 is NOT idle — it picked up the three deferred
+**btk** gap cells (T6/s2, T10/s1, T10/s2) per 68e146e0f the moment the
+pf lane drained, on the cache it already holds.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
