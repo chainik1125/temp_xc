@@ -1,4 +1,4 @@
-# runpod-b STATUS — items (4)+(5) COMPLETE; sole open item = relu-mix seed-split (gated on eq) (2026-07-28 00:16 BST)
+# runpod-b STATUS — rmx_b RUNNING (good path); items (4)+(5) complete (2026-07-28 01:06 BST)
 
 **I am `runpod-b`** — pod A GPU 1 (free).
 
@@ -16,14 +16,18 @@
   OUT by mac-local (toy class). Actuals $1.
 - Han items (4)+(5): exhibit inputs COMPLETE.
 
-## OPEN: relu-mix RLHF seed-split (matrix item 3 — my half)
+## RUNNING: rmx_b (matrix item 3 my half; PIN 829f05070, launched 01:04)
 
-- **Gate:** runpod-2's eq per-T verdict (their overnight chain; listener
-  watches agents/runpod-2 + task_hunt). On landing: freeze my half's
-  card — rlhf_relumix_* machinery (A3/A3b), plain-arch names, T-set =
-  matrix grid minus certified-identical points; my proposal seeds
-  {1,2}, runpod-2 s42 remainder (+ their T4 btk via runpod-a's x4
-  lane). ~$35-40 my half. AGENT_NAME=runpod-b inline.
+- eq certificate 829f05070: 3/3 tensor-IDENTICAL through T16; rmx_b16
+  DEAD; my instruction explicit — rmx_b only. 6 cells sequential
+  (relu-mix txc T{8,10} × s{42,1,2}, k_pos 100·T, d18432, 25k steps),
+  GPU 1, task bb3r1hlkx, log /workspace/logs/rmx_b.{log,jsonl}.
+  Drains ~06:00-07:00 (before 11:00 handoff). Est $27-30, ledgered.
+- **On landing:** rows checkpoint + verdict beat — per-cell table +
+  tensor-compare vs btk twins; T8/T10 are UNCERTIFIED (bracketed
+  identical), post-hoc-identical outcomes DISCLOSED not regretted
+  (time-box ruling). Fleet tables directive applies to any 7-point
+  render I assist (tab_<stem>.md beside it).
 - Do NOT poach probing relu-mix T2/T4 (routed runpod-1 post-night-grid).
 
 ## Standing
