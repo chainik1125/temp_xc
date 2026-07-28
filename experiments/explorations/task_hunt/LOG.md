@@ -21177,3 +21177,13 @@ outright. Either way GPU 2 needs no new commitments before the
 pilot lands.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 11:11 London (date-verified 10:11 UTC) — runpod-1 — 11:00 VERIFY-ONLY SLOT DISCHARGED: btk input set unchanged (131 = 131, zero added/removed) — early-shipped renders STAND as deliverable-of-record
+
+Per 6391ced2c's verify-only protocol: diffed the btk-only probing
+row set (non-smoke eval_keys) between the ship commit and HEAD —
+identical, 131 rows both sides. The 08:26 renders (4 writeup figs,
+FINAL 7T×3s) are the 11:00 deliverable-of-record with no
+re-render needed. Item 3 of the deliverables matrix closed. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
