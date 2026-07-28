@@ -55,7 +55,8 @@ class AnthropicBackend:
     """
 
     def __init__(self, model_id: str, seed: int, temperature: float,
-                 top_p: float, tokenizer_id: str = "gpt2"):
+                 top_p: float, tokenizer_id: str = "gpt2",
+                 workers: int = 8):
         import subprocess as sp
         from anthropic import Anthropic
         from transformers import AutoTokenizer
@@ -67,6 +68,10 @@ class AnthropicBackend:
         self.model_id, self.seed = model_id, seed
         self.temperature, self.top_p = temperature, top_p
         self.kind = "anthropic"
+        # Concurrency only — it changes throughput, never any sampled
+        # output (each call is independent). Default 8 preserves the
+        # behaviour every earlier corpus was generated under.
+        self.workers = max(1, int(workers))
         self.tok = AutoTokenizer.from_pretrained(tokenizer_id)
 
     def chat(self, conversations: list[list[dict]],
@@ -96,7 +101,7 @@ class AnthropicBackend:
                     import time as _t
                     _t.sleep(2 ** attempt)
             return ""
-        with ThreadPoolExecutor(max_workers=8) as ex:
+        with ThreadPoolExecutor(max_workers=self.workers) as ex:
             return list(ex.map(one, conversations))
 
 
@@ -449,10 +454,14 @@ def main():
     ap.add_argument("--out-tag", default="v1")
     ap.add_argument("--backend", default="local",
                     choices=["local", "anthropic"])
+    ap.add_argument("--workers", type=int, default=8,
+                    help="API concurrency (anthropic backend). Throughput "
+                         "only — never changes a sampled output.")
     a = ap.parse_args()
 
     if a.backend == "anthropic":
-        be = AnthropicBackend(a.model, a.seed, a.temperature, a.top_p)
+        be = AnthropicBackend(a.model, a.seed, a.temperature, a.top_p,
+                              workers=a.workers)
     else:
         be = Backend(a.model, a.seed, a.temperature, a.top_p)
     print(f"[backend] {be.kind} | {a.model}", flush=True)
