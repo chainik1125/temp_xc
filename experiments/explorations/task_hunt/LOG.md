@@ -28894,3 +28894,76 @@ network-attached infrastructure, and I believed a protection was in
 place that was not. That last part is the real defect.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 15:42 London (date-verified 14:42 UTC) — mac-local (hub): ⚑⚑⚑ **ESCALATION — `chmod` is a SILENT NO-OP on the pod volume, so EVERY token we ever staged to a pod sat at 666, not 0600.** My rotation recommendation widens from one token to three.
+
+### 1. mac-d's finding is bigger than the incident that prompted it
+
+They audited after mac-c's self-report, found **their own logs clean
+(0/33 files)** — and then found the thing nobody was looking for:
+
+> **`chmod` is a SILENT NO-OP on the RunPod MooseFS FUSE volume.**
+> Staged tokens sat at **666**.
+
+**This is the worst shape a security defect can take.** The code was
+correct, `chmod 600` returned success, and the file was
+world-readable anyway. Every agent that staged a secret to
+`/workspace/.tokens/` — **all of us, all day, and on the three pods Han
+terminated at 13:35** — believed in a protection that was never
+applied. **Nothing would ever have surfaced this except somebody
+reading the mode back.**
+
+mac-d shredded the tokens on all four live pods after confirming the
+caches were local first — correct order.
+
+### 2. ⚑ REVISED RECOMMENDATION TO HAN — rotate THREE tokens, not one
+
+At 15:3x I recommended rotating `gh` because its value had touched a
+terminated pod's disk. **That reasoning now applies to every secret
+ever written to `/workspace`, because none of them had the permissions
+we thought.**
+
+**ROTATE (pod-staged, therefore 666-exposed):**
+- **`gh`** OAuth token — the original leak *and* mode-exposed.
+- **`hf_token`** and **`hf_token_datasets`** — staged to
+  `/workspace/.tokens/` on pods for the cache pulls and ckpt pushes.
+
+**DO NOT need rotation (mac-only, never seeded to a pod — standing rule
+held):**
+- `dmitrys-runpod-api-key` — mac agents only.
+- `dmitry-mats-claude-api-key` — MATS generation backend, mac-only.
+- `s2-api-key`, `anthropic-api-key` (withdrawn from fleet use).
+
+**The rule that never seeds API keys to pods is what keeps this list at
+three instead of six.** It was written down before today and it paid
+for itself this afternoon.
+
+### 3. On the actual risk, stated honestly rather than dramatically
+
+**666 on a single-tenant root-only pod is not, by itself, a breach** —
+practically the same audience as 600 when you are the only user. **The
+part I cannot bound is the storage layer:** MooseFS is a *network*
+filesystem, and I do not know RunPod's tenancy model beneath it. That
+is precisely the unverifiable path that drove the first recommendation,
+now multiplied across every pod we have run today and every token we
+put on them.
+
+**Position: treat any token staged to a pod as exposed, and rotate.**
+Not because a breach is likely — I have no evidence of one — but
+because *we can no longer say what its permissions were*, and that is
+the condition under which you rotate rather than reason.
+
+### 4. Binding, fleet-wide, effective now
+
+**`chmod` on a FUSE/network mount must be VERIFIED BY READING THE MODE
+BACK, never trusted from its exit code.** Any script staging a secret
+to `/workspace` asserts `stat -c %a` equals what it set, and **fails
+loudly** if not — the same shape as every other guard adopted today
+(packing guard, anchor-resolution assert, teardown row-check).
+
+This is the second time today a **silent** success has been the
+dangerous one: `chmod` returning 0 while doing nothing, and backgrounded
+fetches dying on ssh-detach with empty logs. **Absence of an error is
+not evidence of an effect.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
