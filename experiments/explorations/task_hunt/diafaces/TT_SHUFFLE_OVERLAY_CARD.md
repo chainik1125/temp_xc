@@ -127,3 +127,53 @@ ANCHOR GATE on 3-seed means remains the scientific consistency
 check; this receipt certifies the code path only. 13 cells had
 passed at 5e-4 before the fire; identity values are recorded
 per-cell in the output JSON either way. PTR with the verdict.
+
+## AMENDMENT A3 (mac-c, 2026-07-29 00:5x BST) — the apparatus shuffles fewer rows than it looks, and the shortfall is T-dependent
+
+Carried here from the sycgen shuffle lane, where this was finding **A4**
+of my pre-registration audit (hub ruling `29bc6a95d`, adopted). It is a
+property of **`shuffle_within_window` itself**, so it applies to every
+card that uses the instrument — including this one. **No number in this
+card changes and no cell is void.** This is disclosure.
+
+`shuffle_within_window` runs at its `per_row=True` default, drawing an
+independent `randperm(T)` for every row. A uniform draw **is the
+identity with probability `1/T!`**, so the fraction of rows the
+"shuffled" condition actually permutes is `1 − 1/T!`:
+
+    T= 2   0.500      <- HALF the shuffled rows are still ordered
+    T= 4   0.958
+    T= 8   0.999975
+    T=16   1.000
+    T=32   1.000
+
+(Theory; measured on the real helper at B=512 as 0.5234 / 0.9512 /
+1.0000 / 1.0000, inside binomial noise at that n. T=1's
+`shuffle_identity = 1` was already annotated in § 4 — this is the same
+phenomenon at T=2, partial rather than total, and it was not.)
+
+**What is NOT affected.** The shuffle is applied only to the eval tiles
+of the *shuffled* column. **The quoted ordered T-sweep never sees it**,
+so the headline curve is untouched. And within any single T the
+attenuation is common-mode across seeds and arms, so **every fixed-T
+comparison in this card stands exactly as recorded**, including the § 3
+anchor gate.
+
+**What is affected: the ordered−shuffled GAP read ACROSS T.** Part of
+any apparent "the gap grows with T" is `1 − 1/T!` from the apparatus
+rather than from the model. Same species as the divide-by-`T` per-token
+artifact retracted earlier the same night.
+
+**Measured magnitude here** (mean gap ± seed SD, n=3): T2 +0.0197
+±0.0136, T4 +0.0240, T8 +0.0128, T16 +0.0535 ±0.0308, T32 +0.1294
+±0.0233. **The T=2 attenuation is smaller than the seed noise**, so this
+is a disclosure obligation and not a correction.
+
+**Scope, stated precisely.** § 5 records that the figure **claims
+nothing** — it overlays the instrument, it does not assert a trend. So
+**no delivered claim of this card rests on the cross-T gap.** The
+disclosure exists because a reader shown gap-vs-T will infer a trend
+whether or not the text asserts one, and at T=2 part of that trend is
+the apparatus. **If a cross-T gap statement is ever made from this
+figure, it must either cite a non-identity-redraw column or carry this
+note.**

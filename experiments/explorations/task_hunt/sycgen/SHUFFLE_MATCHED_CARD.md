@@ -263,11 +263,22 @@ whatever re-runs it triggers.
 **FIX — gate the identity-row COUNT against a two-sided binomial band,
 uniform across T:**
 
-    T    E[count]   binom SD   ACCEPT (4 SD / P<1e-4)
-    2    8192       64.00      7936 .. 8448
-    4    341.3      18.09      269  .. 414
-    8    0.1016     0.32       0    .. 3
-    16   ~0         0.00       0    .. 0      (any identity row IS a bug)
+    T    E[count]   ACCEPT (exact binomial tail, P<1e-4 each side)
+    2    8192       7936 .. 8448
+    4    341.3      268  .. 414
+    8    0.1016     0    .. 3
+    16   ~0         0    .. 0      (any identity row IS a bug)
+
+⚑ **One construction at every T — an exact tail probability, NOT a
+σ-multiple.** My first table labelled these "4 SD / P<1e-4", which is two
+different constructions wearing one header, and a σ band is meaningless
+once `λ ~ 0.1` (T=8) or `1e-10` (T=16). The hub hit the same rock
+verifying this and said so (`33a5c72d8`): `E ± 4σ` gives **0..2 at T=8
+and 0..1 at T=16**, both wrong. Numbers above match the hub's BINDING
+values; T=4's lower bound is **268**, floored rather than rounded, so
+the band errs toward *accepting* — the right direction when the failure
+being designed against is a spurious VOID. **Print observed count, band,
+and `n` per cell.**
 
 **⚠ Correction to my own first pass, before it reaches anyone's code:**
 I initially computed these bands from a *Poisson* tail. Poisson is only

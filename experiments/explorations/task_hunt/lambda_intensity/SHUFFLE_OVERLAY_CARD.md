@@ -165,3 +165,51 @@ ANCHOR GATE on 3-seed means remains the scientific consistency
 check; this receipt certifies the code path only. 13 cells had
 passed at 5e-4 before the fire; identity values are recorded
 per-cell in the output JSON either way. PTR with the verdict.
+
+## AMENDMENT A3 (mac-c, 2026-07-29 00:5x BST) — the apparatus shuffles fewer rows than it looks, and the shortfall is T-dependent
+
+Carried here from the sycgen shuffle lane, where this was finding **A4**
+of my pre-registration audit (hub ruling `29bc6a95d`, adopted; blast
+radius `ef972e34a`). It is a property of **`shuffle_within_window`
+itself**, so it reaches every card using the instrument — this one
+included. **No number in this card changes and no cell is void.** This
+is disclosure.
+
+The helper runs at its `per_row=True` default, drawing an independent
+`randperm(T)` per row. **A uniform draw is the identity with probability
+`1/T!`**, so the fraction of rows the "shuffled" condition actually
+permutes is `1 − 1/T!`:
+
+    T= 2   0.500      <- HALF the shuffled rows are still ordered
+    T= 4   0.958
+    T= 8   0.999975
+    T=16   1.000
+
+(Theory; measured on the real helper at B=512 as 0.5234 / 0.9512 /
+1.0000 / 1.0000, inside binomial noise at that n. § 4's T1
+`shuffle_identity` annotation is the same phenomenon in its total form —
+the T=2 partial case was not annotated.)
+
+**What is NOT affected.** The shuffle touches only the eval tiles of the
+*shuffled* column, so **the quoted T-sweep — the ordered curve — never
+sees it and is untouched.** § 5 is explicit that the figure "claims
+nothing; it overlays the shuffle instrument on the quoted T-sweep", and
+that quoted sweep is exactly the part this cannot reach. Within any
+single T the attenuation is common-mode across seeds, so **every fixed-T
+comparison stands as recorded**, § 3 anchor gate included.
+
+**What is affected: the ordered−shuffled GAP read ACROSS T.** Part of
+any apparent "gap grows with T" is `1 − 1/T!` from the apparatus rather
+than the model — the same species as the divide-by-`T` per-token
+artifact retracted the same night.
+
+**Measured magnitude here** (mean gap ± seed SD, n=3): T2 +0.0043
+±0.0051, T4 +0.0069, T8 +0.0139 ±0.0200, T16 +0.0114 ±0.0252.
+
+⚑ **A second and larger caveat, found while measuring the first.** In
+this overlay the **seed SD equals or exceeds the mean gap at every T** —
+so the cross-T gap pattern here **is not statistically resolved at n=3
+at all**, independently of the shuffle artifact. That is the stronger
+reason not to read a trend off this figure, and it would have been worth
+disclosing even if `1 − 1/T!` did not exist. Better stated by us than
+found by a reviewer.
