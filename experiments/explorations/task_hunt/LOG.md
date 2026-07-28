@@ -27834,3 +27834,86 @@ prove — the T6/T8/T10 ≈ 40/60/90 min extrapolation in my 14:5x entry.
 T10 ≫ T2, which is now measured at both ends.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+---
+
+## 2026-07-28 14:57 London (date-verified at write) — mac-c: ⚑ **`retryesc_gen` FIRST SLICE FAILS THE VOCABULARY BAR — `unigram` 0.6723 vs 0.60.** Generation continues; here is the pre-registered discriminator, posted BEFORE the deeper measurement can resolve it
+
+Hub GO at 14:51 executed within 2 minutes: ledgered, launched **300
+docs** on the MATS key (est **~$21** of the $300 cap, **no pod**), and
+built the slice-off-checkpoint mechanism the "chain it, don't gate it"
+order needs. Generation is **live at pair 8/46** while I write this.
+
+### 1. The failing number, first and plainly
+
+Slice off the live checkpoint at pair 5 — 300 docs, 146,589 tok, 314
+events, 95,957 eligible rows:
+
+| band | value | bar | |
+|---|---|---|---|
+| **`unigram_auc`** | **0.6723** [0.6425, 0.7073] | ≤ 0.60 | **FAIL** |
+| `doc_mean_only_auc` | 0.7878 | ≤ 0.88 | pass |
+| `position_auc` | 0.7983 | ≤ 0.95 | pass |
+| **`floor_excess`** | **0.3865** | [0.15, 0.25] | **FAIL** |
+| qualifying strata | **2/4** | ≥ 4 (pilot) | **FAIL** |
+
+**0.6723 is the same failure mode, at nearly the same magnitude, that
+killed the organic `retryesc` (0.689–0.716).** That is the outcome I
+pre-registered as the dominant risk (§ 7, ~65–75 % to clear), and it
+has not cleared on this evidence.
+
+### 2. ⚑ But the slice is a biased instrument, and it says so itself
+
+I built `slice_from_ckpt.py` twenty minutes ago under the chain-don't-
+gate order. It truncates every document to **5 turn-pairs**. The corpus
+in flight has **30–46**. Two of the slice's own numbers prove the
+truncation is not benign:
+
+- **`floor_excess` 0.3865 against the structural prediction 0.1850** —
+  the slice is **2.1× denser** than the corpus will be, because short
+  documents put nearly every position within T = 64 of an event.
+- **2/4 strata** against a full-run bar of 8 — documents too short to
+  carry position strata at all.
+
+**The mechanism that contaminates `unigram` specifically:** in a 5-pair
+document no event can occur until ≥ 2 strategies have been tried, so
+finite-age rows pile up at the *end* of every document. **Age collapses
+onto position** — face~position Spearman **0.507**, and `position_auc`
+0.7983 — and position governs how much of the (masked) task statement
+the assistant has echoed back. So the slice's "vocabulary leak" is
+partly *age ≈ position ≈ task-echo*, which is an artefact of my
+truncation, **not** the task-difficulty leakage that killed `retryesc`.
+
+### 3. The discriminator, pre-registered NOW so it cannot be fudged later
+
+**If the failure is truncation-driven**, then as document depth grows:
+`floor_excess` → ≈ 0.185, `position_auc` falls, face~position ρ falls,
+**and `unigram` falls below 0.60.**
+
+**If the leak is real**, `unigram` **stays ≥ 0.60 at full depth** — and
+the extra depth will make it *worse*, not better, because more task
+prose accumulates.
+
+**BINDING DECISION RULE: at drain, on the full corpus, `unigram_auc` ≥
+0.60 ⇒ `retryesc_gen` is KILLED label-side.** Same ruler that killed
+the organic version, **no rescue, no within-task re-cut, no widened
+band.** I am not waiving the bar — I am refusing to *apply* it with an
+instrument that is provably measuring something else.
+
+### 4. Why generation keeps running rather than being killed now
+
+The card's abort rule is "a pilot outside the band is a NO-GO to
+report". **The card's pilot is ~20 COMPLETE documents; this is 300
+documents truncated to 5 pairs** — they differ in exactly the dimension
+that drives the failing band. Killing on it would spend the same money
+and buy a verdict from a broken instrument.
+
+The run is **already ~20 % through and costs ~$21 total**; the honest
+and the cheap course agree. Re-measure at **pair ~25** and at **drain**.
+
+⚠ **I want this on record as the risk it is:** I have an incentive here
+to prefer the truncation story, and the failing number is my
+pre-registered most-likely killer arriving exactly on schedule. That is
+why the discriminator above is written down *before* the deeper
+measurement, with the kill rule stated in advance and unconditional.
+
+_Recorded-by: claude-opus-5 (mac-c)_

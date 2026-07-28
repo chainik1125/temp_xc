@@ -1,0 +1,90 @@
+{
+ "from_checkpoint_at_pair": 5,
+ "n_docs": 300,
+ "docs_dropped_too_short": 0,
+ "n_tokens": 146589,
+ "n_events": 314,
+ "gaps": {
+  "n_gaps": 104,
+  "mean": 127.08653846153847,
+  "median": 95.0,
+  "p10": 67.3,
+  "p90": 204.8,
+  "min": 45.0,
+  "max": 301.0
+ },
+ "vocabulary_control": {
+  "per_topic_event_rate": {
+   "the PDF renderer omits embedded fonts on the second page onward": 0.0028242252498239086,
+   "the archive extractor mishandles symlinks that point outside the root": 0.0025466399466038533,
+   "the audio transcoder desynchronises video by a few frames": 0.0010738132910458394,
+   "the cache warmer evicts entries it has just written": 0.002919032205747025,
+   "the geocoder returns coordinates swapped in the southern hemisphere": 0.002402062881953169,
+   "the image thumbnailer emits corrupted output for CMYK inputs": 0.002869395479944018,
+   "the log shipper truncates messages longer than a few kilobytes": 0.001925323044106263,
+   "the metrics collector reports a counter that decreases over time": 0.0020548595872782157,
+   "the migration script leaves two rows with duplicate primary keys": 0.0023122499758293368,
+   "the nightly export job writes an empty CSV on the first of the month": 0.002322003718959165,
+   "the rate limiter admits bursts that exceed the configured ceiling": 0.0014510294468081332,
+   "the retry wrapper multiplies its backoff instead of adding to it": 0.0020856028820522192,
+   "the search index misses documents whose titles contain diacritics": 0.0020149787310641426,
+   "the spreadsheet importer misreads dates in day-first locales": 0.002196519489039207,
+   "the websocket client drops its connection after roughly ten minutes": 0.0017465110307789094,
+   "unit tests pass locally but fail in the container with a locale error": 0.002274132362072658
+  },
+  "spread_max_minus_min": 0.0018452189147011857,
+  "cv": 0.22047083880048152,
+  "legs": {
+   "events_per_conv": {
+    "per_topic": {
+     "the PDF renderer omits embedded fonts on the second page onward": 1.35,
+     "the archive extractor mishandles symlinks that point outside the root": 1.1666666666666667,
+     "the audio transcoder desynchronises video by a few frames": 0.55,
+     "the cache warmer evicts entries it has just written": 1.3181818181818181,
+     "the geocoder returns coordinates swapped in the southern hemisphere": 1.1818181818181819,
+     "the image thumbnailer emits corrupted output for CMYK inputs": 1.3157894736842106,
+     "the log shipper truncates messages longer than a few kilobytes": 0.9523809523809523,
+     "the metrics collector reports a counter that decreases over time": 1.0434782608695652,
+     "the migration script leaves two rows with duplicate primary keys": 1.125,
+     "the nightly export job writes an empty CSV on the first of the month": 1.0526315789473684,
+     "the rate limiter admits bursts that exceed the configured ceiling": 0.6842105263157895,
+     "the retry wrapper multiplies its backoff instead of adding to it": 1.0,
+     "the search index misses documents whose titles contain diacritics": 1.0,
+     "the spreadsheet importer misreads dates in day-first locales": 1.1111111111111112,
+     "the websocket client drops its connection after roughly ten minutes": 0.8571428571428571,
+     "unit tests pass locally but fail in the container with a locale error": 1.1363636363636365
+    },
+    "spread_max_minus_min": 0.8,
+    "cv": 0.20090780237877404
+   },
+   "tokens_per_conv": {
+    "per_topic": {
+     "the PDF renderer omits embedded fonts on the second page onward": 489.55,
+     "the archive extractor mishandles symlinks that point outside the root": 456.44444444444446,
+     "the audio transcoder desynchronises video by a few frames": 510.55,
+     "the cache warmer evicts entries it has just written": 463.54545454545456,
+     "the geocoder returns coordinates swapped in the southern hemisphere": 494.09090909090907,
+     "the image thumbnailer emits corrupted output for CMYK inputs": 472.3157894736842,
+     "the log shipper truncates messages longer than a few kilobytes": 504.1904761904762,
+     "the metrics collector reports a counter that decreases over time": 511.60869565217394,
+     "the migration script leaves two rows with duplicate primary keys": 501.25,
+     "the nightly export job writes an empty CSV on the first of the month": 470.7368421052632,
+     "the rate limiter admits bursts that exceed the configured ceiling": 474.1578947368421,
+     "the retry wrapper multiplies its backoff instead of adding to it": 482.6521739130435,
+     "the search index misses documents whose titles contain diacritics": 485.70588235294116,
+     "the spreadsheet importer misreads dates in day-first locales": 502.0,
+     "the websocket client drops its connection after roughly ten minutes": 497.2857142857143,
+     "unit tests pass locally but fail in the container with a locale error": 505.3181818181818
+    },
+    "spread_max_minus_min": 55.16425120772948,
+    "cv": 0.03422004658716072
+   }
+  },
+  "worst_leg": "events_per_conv",
+  "worst_leg_cv": 0.20090780237877404,
+  "cv_bar_proposed": 0.35,
+  "stop": false,
+  "note": "TWO LEGS: events/conv = topic predicts the event SCHEDULE; tokens/conv = topic predicts conversation LENGTH (the channel that fired on sycgen). Either one large => the retryesc vocabulary leak is being rebuilt; fix the scaffold, do not proceed. The events-per-TOKEN keys are the legacy ratio, kept for comparability \u2014 do not read them alone."
+ },
+ "note": "EARLY EVIDENCE off a live checkpoint, not the verdict; full corpus is re-scored at drain."
+}
