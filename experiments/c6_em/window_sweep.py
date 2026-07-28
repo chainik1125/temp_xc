@@ -161,6 +161,22 @@ def _window_cohort(T: int) -> tuple[torch.Tensor, np.ndarray, np.ndarray, int]:
     )
 
 
+def _paper_shuffle(windows: torch.Tensor, T: int) -> torch.Tensor:
+    """Exact protocol-3 shuffle: one ``randperm`` call per window.
+
+    This intentionally does not use ``argsort(rand(...))``. Although both
+    produce random permutations, they do not produce the same deterministic
+    seed-42 control as the published paper implementation.
+    """
+    generator = torch.Generator(device="cpu").manual_seed(PROBE_SEED)
+    permutations = torch.stack(
+        [torch.randperm(T, generator=generator) for _ in range(len(windows))],
+        dim=0,
+    )
+    batch = torch.arange(len(windows)).unsqueeze(1).expand(-1, T)
+    return windows[batch, permutations].contiguous()
+
+
 def evaluate_state(
     *,
     T: int,
@@ -185,10 +201,7 @@ def evaluate_state(
     if T == 1:
         shuffled = ordered
     else:
-        generator = torch.Generator().manual_seed(PROBE_SEED)
-        perms = torch.argsort(torch.rand(len(windows), T, generator=generator), dim=1)
-        index = perms.unsqueeze(-1).expand(-1, -1, windows.shape[-1])
-        shuffled_windows = torch.gather(windows, 1, index)
+        shuffled_windows = _paper_shuffle(windows, T)
         shuffled = _probe(_encode(model, shuffled_windows), labels, groups)
     for S, value in shuffled.items():
         metrics[f"pr_auc_shuffled_S{S}"] = value

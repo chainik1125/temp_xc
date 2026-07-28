@@ -35,7 +35,6 @@ import torch
 
 from temp_bench.config import (
     act_cache_dir,
-    instantiate_arch,
     load_arch,
 )
 from temp_bench.schemas import TrainingConfig
