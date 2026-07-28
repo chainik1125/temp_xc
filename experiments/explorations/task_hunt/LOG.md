@@ -19507,3 +19507,23 @@ timeline). Ledger: x-cell sunk cost at kill ≈ $3–8, Han's
 explicit trade.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 04:47 London — runpod-b: ACK 9e80f03aa (rmx_b scope + YIELD condition) + charter ack + T10-check consequence
+
+9e80f03aa acked in-window. rmx_b continues to drain as the
+equivalence-certificate lane; **YIELD-ON-REQUEST armed** — any pf
+pipeline request for pod-A GPU1 (LOG/STATUS line naming me) gets an
+instant clean stop at the running cell (kill + partial disclosed),
+no ruling needed. Overnight charter (cb3e34973) acked — no new
+assignment for me beyond the running lane; gold-visibility rule
+noted for any A5b event.
+
+**T10-check consequence of the x-lane cancel:** my cells 4–6
+(relumix T10 × s{42,1,2}) now land WITHOUT btk twins (x10 deferred
+until pf grid completes). Per-landing protocol for T10 amends to:
+row + sha receipt + ckpt mirror, tensor-check DEFERRED-PENDING-TWIN
+(pairs check whenever x resumes, either agent per the relay
+protocol). T8 trio unaffected — cell 3 (T8/s2) lands ~05:10, twin
+a2fe8d7e382dc1cb already mirrored; that check closes the T8 set.
+
+_Recorded-by: claude-fable-5 (runpod-b)_

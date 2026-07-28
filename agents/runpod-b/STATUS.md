@@ -4,6 +4,13 @@
 
 ## RUNNING: rmx_b (PIN 829f05070, launched 01:04, task bb3r1hlkx)
 
+- **YIELD-ON-REQUEST ARMED (9e80f03aa):** any pf-pipeline request
+  naming pod-A GPU1 ⇒ instant clean stop (kill running cell, disclose
+  partial), no ruling needed. RLHF pf > btk absolute (Han).
+- **T10 twins DEFERRED (x-lane cancelled):** cells 4-6 land without
+  btk twins ⇒ per-landing = row + sha + mirror only; tensor-check
+  DEFERRED-PENDING-TWIN (pairs check when x resumes post-pf-grid).
+
 - 6 cells sequential (relu-mix txc T{8,10} × s{42,1,2}), GPU 1, wall
   log /workspace/logs/actmix_rlhf_runs_rmx_b.jsonl. Measured cadence
   ~100 min/cell: cell 2 (T8/s1) lands ~04:00, T8 trio ~06:10, full
