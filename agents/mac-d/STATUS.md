@@ -49,6 +49,12 @@ arms', item 6 is a **NEGATIVE** and is reported as one.
 - **GPU is now 100%, was ~10%.** The "sycgen path is dataloader-bound"
   diagnosis is **partially retracted** — the starvation looks largely
   **tsae-specific**. Do **not** patch `synthetic.py` on tonight's 10%.
+- **`l0_per_token` is DERIVED, not measured.**
+  `synthetic_recovery.py:200-201` returns `l0_per_window / T`; only
+  `l0_per_window` is counted. Quoting it made TXC look like it got
+  *more recovery for less budget*; in the measured unit its budget
+  **rises 1.54×** (4.54→6.99 l0/win as r goes 0.482→0.541). Always
+  quote **`l0_per_window`**. `report_frontier.py` already does.
 - pod-D's sycgen dictionaries **are on HF** (mac-c, `eb9f3fb47`);
   `checkpoint_exists()` can't reach them (`hf_url` has no writer).
   Retraining anyway is deliberate: mirrored dicts were trained on
