@@ -24,6 +24,8 @@ append-only in `results/leaderboard.jsonl`, stamped with
 |---|---|---|
 | probing TXC | `txc_batchtopk_pre` / `txc_batchtopk_pre_btkonly` | `TXCBatchTopKPre` (`src/temp_bench/archs/txc_batchtopk.py:296`) / `TXCBatchTopKPreBTKOnly` (`src/temp_bench/archs/btk_only.py:194`) |
 | RLHF TXC | `txc_batchtopk_post_btkonly` | `TXCBatchTopKPostBTKOnly` (`btk_only.py:208`) |
+| **probing paper-faithful (the sprint)** | `paper_txc_base_v1t` | `PaperTXCBaseV1T` (`src/temp_bench/archs/paper_v1t.py:181`) — vendored 94119bc08 training stack VERBATIM + thin v2 wrapper; arm `paper-faithful`; card `experiments/probing/actmix/CARD_PAPER_FAITHFUL.md` (21 cells RUNNING across 4-5 GPUs, ETA ~06:30–07:30) |
+| RLHF paper-faithful | agentic_txc_02 trainable port | runpod-2 building; card ETA ~04:30 (vendor pattern, `experiments/explorations/actmix_rlhf/vendor/`) — cells land after |
 | baselines | `batchtopk_sae(_btkonly)`, `tsae_btkonly` | same two files; the T-SAE class legitimately carries matryoshka+contrastive (Ye et al.'s design) |
 
 - **Arm labels** (`eval_cfg.arm`): `btk-only` = BatchTopK with NO ReLU
@@ -38,10 +40,14 @@ append-only in `results/leaderboard.jsonl`, stamped with
   sum-then-BatchTopK (batch budget). The paper-EXACT composition is
   served by the eval-only adapter `paper_txc_base_v1`
   (`src/temp_bench/archs/paper_v1.py:255`, upstream 94119bc08) over
-  the ARCHIVED ckpts — T=5 × 3 seeds ONLY. **TABLE-LABELING RULE
-  (binding): sweep columns = "TXC (v2, relu-mix/btk-only)"; paper
-  composition = a separate "paper base (archived, T=5)" anchor row;
-  never conflate.**
+  the ARCHIVED ckpts — T=5 × 3 seeds ONLY. The paper composition is
+  ALSO now TRAINABLE at every T via `paper_txc_base_v1t` (the sprint).
+  **TABLE-LABELING RULE (binding, amended 02:58 07-28): matrix columns
+  are "{ReLU+TopK} paper-faithful" (= `paper_txc_base_v1t` cells, arm
+  `paper-faithful`) and "{BatchTopK}" (= `*_btkonly` cells, NO ReLU);
+  the archived-T5 paper ckpts stay a separate "paper base (archived,
+  T=5)" anchor row; relu-mix cells are certificate evidence ONLY and
+  never appear as a matrix column; never conflate any of the four.**
 
   **The three compositions, exactly** (p_t = W_enc,t x_t + b_enc;
   k_win = k_pos·T; B = batch):
@@ -75,10 +81,29 @@ append-only in `results/leaderboard.jsonl`, stamped with
   The RLHF renderer prints this disclosure below the axis on every
   fig.
 
+## 1b. THE CELL CENSUS — every cell we have results for, by arm
+
+**`REBUTTAL_CELL_CENSUS.md` (repo root) lists every leaderboard cell
+in rebuttal scope** — one line per (arch, datasource, T): trained
+seeds, untrained-twin seeds, k budgets, shuffle coverage, row counts —
+each labeled **{ReLU+TopK} PAPER-FAITHFUL** vs **{BatchTopK}
+(btk-only, NO ReLU)** vs **relu-mix (the MISINTERPRETED
+"{ReLU+TopK} paper-faithful" arm — certificate evidence only)**, plus
+the hunted-task cells that live outside the leaderboard. It is
+generated, not hand-written: refresh with
+`.venv/bin/python scripts/cell_census.py --write` — cells are landing
+all night (paper-faithful sprint, sycgen retrain), so regenerate
+before quoting coverage. Known in-flight gaps at 02:58: probing
+btk-only T10/seed2 (old-pod GPU 1), RLHF btk-only T{6,10} (old-pod
+GPU 2), ALL `paper_txc_base_v1t` cells (sprint, ETA ~06:30–07:30),
+sycgen retrain rows (~05:30–06:30).
+
 ## 2. Sparse probing — code, data, results
 
 - **Experiment dir:** `experiments/probing/actmix/` — start with
-  `CARD.md` (the frozen sweep card), `CARD_RELUMIX.md` (the relu-mix
+  `CARD.md` (the frozen sweep card), `CARD_PAPER_FAITHFUL.md` (the
+  paper-faithful sprint card, PIN d9235755b — plugin contract tests,
+  21-cell grid, 5-GPU shard split), `CARD_RELUMIX.md` (the relu-mix
   arm grid), `sweep.py` (cell launcher), `analysis.py` (aggregation +
   `make_writeup_fig` renderer), `prep_cache.py` (substrate).
 - **Substrate:** gemma-2-2b-it L13 resid_post, the paper's probe
@@ -120,10 +145,17 @@ append-only in `results/leaderboard.jsonl`, stamped with
   `hf_durability_push.py` (ckpt mirroring).
 - **Substrate:** Anthropic/hh-rlhf preference pairs, gemma-2-2b BASE
   L12 residuals (the paper's exact cache), preference ROC-AUC probe;
-  `eval_cfg.k_feat` ∈ {100→k20-style, 500}; k_win = 100·T.
-- **Row filter:** `experiment=rlhf`, arch `txc_batchtopk_post_btkonly`
+  k_win = 100·T.
+- **Row filter:** `experiment=rlhf`, `datasource=
+  gemma_2_2b_base_l12_phase7`, arch `txc_batchtopk_post_btkonly`
   (+ baselines), T ∈ {1,2,4,5,6,8,10,16} (T5 = the paper's operating
-  point, kept as bonus), seeds {1,2,42}, same shuffle semantics.
+  point, kept as bonus), seeds {1,2,42}. NOTE the evaluator is
+  `rlhf 2.0.0` and its rows carry an EMPTY `eval_cfg` — probe budgets
+  are metric-name-encoded (`metrics.preference_auc_k20` / `_k50`) and
+  the shuffle twins are in-row (`metrics.shuffled_*`,
+  `metrics.shuffle_gap_auc_k20`); there is no `eval_cfg.k_feat` /
+  `eval_cfg.shuffle` on RLHF rows (that is probing-1.2.x semantics).
+  T=1 rows legitimately omit `shuffled_*` (shuffle ≡ identity).
 - **Fig/table:** `figs_writeup/fig_rlhf_shuffle_tsweep.*` +
   `tab_rlhf_shuffle_tsweep.md` (morning 7-point render). Licences:
   order-free inverted-U, T8 peak; shuffle gaps ≈ 0 at T ≤ 8, seed-
@@ -139,7 +171,7 @@ append-only in `results/leaderboard.jsonl`, stamped with
 - **Durable mirror:** HF dataset `han1823123123/temp-bench-data`,
   path `ckpts/<train_key>/model.safetensors` (LFS sha256 = receipt).
   Lookup: leaderboard row → `train_key` → that path. Uploader:
-  `push_ckpts_hf.py` (repo root) / `hf_durability_push.py` (RLHF).
+  `scripts/push_ckpts_hf.py` / `hf_durability_push.py` (RLHF).
 - **Mirrored now:** all 26 trained RLHF ckpts; 30 probing
   certificate-evidence ckpts (twin pairs across the 7-T grid, sae
   pair, positive control; spot-check MATCH). Remainder mirrors in
@@ -149,7 +181,7 @@ append-only in `results/leaderboard.jsonl`, stamped with
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — what is running on every pod (snapshot 02:40 BST 07-28; sprint LAUNCHED)
+## 5. FLEET MAP — what is running on every pod (snapshot 02:58 BST 07-28; sprint shards RUNNING)
 
 This section dates fast. **Live sources: `agents/<id>/STATUS.md`
 (each agent self-maintains its own) + the LOG tail** — trust those
@@ -157,14 +189,14 @@ over this snapshot if they disagree.
 
 | pod | agents | GPU | running NOW | next |
 |---|---|---|---|---|
-| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0 | **paper-faithful probing shard (CARD d9235755b pinned+ratified 02:39; arch `paper_txc_base_v1t`, arm `paper-faithful`)** | drain → renders |
-| | | 1 | night-grid tail | probing shard at drain |
-| | | 2 | x6 ‖ x10 (btk T{6,10}; **YIELDS to the RLHF paper-faithful grid on contention — Han priority**) | RLHF paper-faithful grid (agentic port card ~04:30) |
-| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | **paper-faithful probing shard (preflight PASS, zero-sync)** | — |
-| | | 1 | rmx_b (eq-extension cells 2-6, mid-run) | probing shard at drain |
-| **pod B** (2×H100) | runpod-c alone | 0+1 | hill-climb FREEZE in progress (clean-halt + resume playbook + HF ckpt push) | BOTH GPUs → probing paper-faithful shards (substrate on-pod, zero sync) |
-| **mac-c-screen-0728** (L40S) | mac-c | — | warm-held (stated purpose) | sycgen within-domain screen (per-token baseline first), then evalage screen at generation drain |
-| **mac-d-retrain-0728** (2×H100) | mac-d | — | warm-held EXCLUSIVELY for the first hunt-KEEP matrix retrain (Han ruling: not a paper-faithful executor) | 7-T×3-seed×shuffle retrain the hour a KEEP posts |
+| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0 | **paper-faithful probing shard A RUNNING since 01:39 UTC** (T16×3 → T1/s42; card d9235755b, arch `paper_txc_base_v1t`) | drain → 11:00 renders |
+| | | 1 | night-grid tail (btk s2/T10 — the last btk probing cell) | **shard B (T10×3 → T1/s1) armed at drain** |
+| | | 2 | x6 ‖ x10 (btk RLHF T{6,10}; **YIELDS to the RLHF paper-faithful grid on contention — Han priority**) | RLHF paper-faithful grid (agentic port card ~04:30) |
+| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | **paper-faithful probing shard E RUNNING since 02:41** (T4×3 → T2×{1,2}; est done ~06:20) | — |
+| | | 1 | rmx_b (eq-extension cells 2–6; cell 2 lands ~04:00) | overflow only post-drain (~11:30; boundary offer CLOSED) |
+| **pod B** (2×H100) | runpod-c alone | 0+1 | **FROZEN hill-climb draining in-flight C4/C5-T16 (~02:50 / ~03:15)**; resume playbook in `tscale/RESULTS.md` §FREEZE; ckpt mirror to HF in background | **shards C (T8×3→T1/s2) + D (T6×3→T2/s42) at drain** — substrate on-pod, zero sync |
+| **mac-c-screen-0728** (L40S) | mac-c | — | warm-held (stated purpose) | evalage screen once the 3-tokenizer re-tokenization transplant (mac-d's `screen_grids.py`) verifies |
+| **mac-d-retrain-0728** (2×H100) | mac-d | 0+1 | **sycgen 48-cell matrix retrain RUNNING** (first hunt KEEP 3/3 at 02:28 → retrain within the hour, as pre-authorized; card 74d260321, drain ~05:30–06:30) | shuffle overlay → repatriate rows → HF ckpts → T-sweep figure → TERMINATE pod |
 
 **Priority order (Han, 02:38): paper-faithful sweeps outrank ALL
 btk GPU work; hunted tasks need either arm only; relu-mix is
@@ -175,9 +207,10 @@ pipeline (7-point per-k probing figs+tables + the onset-map
 certificate with traces); runpod-2 = `agentic_txc_02` port
 (vendor pattern) + RLHF 7-point render + rmx cross-pod sha
 checks; runpod-a = StruQ premeasures ($0, our bars); mac-c (local
-mac) = evalage generation via the Claude API + harness ownership +
-retryesc_gen design; mac-d (local mac) = sycgen screen support +
-next corpus card; mac-local = hub (review/ratify only, no
+mac) = evalage corpus COMPLETE (2.04M tokens, both card gates pass,
+HF-pushed) → re-tokenization transplant + screens + retryesc_gen
+design; mac-d (local mac) = sycgen retrain owner (watchers armed) +
+overlay/figure at drain; mac-local = hub (review/ratify only, no
 compute).
 
 **Where outputs land:** canonical rows → `results/leaderboard.jsonl`;
@@ -185,6 +218,38 @@ hill-climb scratch → `experiments/explorations/tscale/RESULTS.md`;
 hunt corpora → HF `temp-bench-data/hunt_corpora/`; checkpoints →
 HF `temp-bench-data/ckpts/<train_key>/`; figures/tables →
 `figs_writeup/`; verdicts/licences → the LOG.
+
+## 5a. SSH access to the pods
+
+```
+# old pod (3×H100 — runpod-1, runpod-2):
+ssh j42plcul70a2es-64410eb7@ssh.runpod.io -i ~/.ssh/id_ed25519
+# pod A (2×H100 — runpod-a, runpod-b):
+ssh 0lmrs9lk8apyhm-644121b8@ssh.runpod.io -i ~/.ssh/id_ed25519
+# pod B (2×H100 — runpod-c):
+ssh l2bp61kg82epel-64411fb1@ssh.runpod.io -i ~/.ssh/id_ed25519
+```
+
+- **Repo checkouts are PER-AGENT (ssh-verified 02:5x 07-28) — there
+  is no `/workspace/temp_xc` on any pod:** old pod →
+  `/workspace/agents/runpod-1/temp_xc` + `/workspace/agents/runpod-2/
+  temp_xc`; pod A → `/workspace/agents/runpod-a/temp_xc` +
+  `/workspace/agents/runpod-b/temp_xc`; pod B →
+  `/workspace/agents/runpod-c/temp_xc`. The leaderboard/results in
+  each checkout are the same append-only stream (agents push/pull
+  through origin); the branch-of-record is `arxiv` on origin — read
+  results there first, ssh only when you need live logs.
+- **Scripted (non-interactive) use:** the RunPod ssh proxy forces a
+  PTY — pipe your command list over stdin
+  (`printf 'cmd; exit\n' | ssh -tt <host> -i ~/.ssh/id_ed25519`) and
+  strip bracketed-paste noise from the output (`| grep -av 2004`).
+- **LOOK, DON'T TOUCH (house rule: never modify a pod you did not
+  spin up):** every GPU is running deadline lanes — `nvidia-smi`,
+  `tail -f /workspace/logs/*.log`, and reading result files are
+  fine; do NOT kill/launch/modify anything. Coordinate through the
+  LOG instead.
+- Pod-local HF/GH tokens live at `/workspace/.tokens/` (never in
+  git); training logs at `/workspace/logs/`.
 
 ## 5b. Standing caveats an agent must not trip over
 
@@ -199,3 +264,27 @@ HF `temp-bench-data/ckpts/<train_key>/`; figures/tables →
   (train_key-level), never band summaries; exclude the alias list.
 - `eval_cfg.positive_control=true` rows are instrument-gate cells,
   not sweep cells — filter them out of aggregations.
+
+## 6. Hunted-task exhibits (deliverable items 4–7) — where to look
+
+Per-item exhibit blocks live in `REBUTTAL_HANDOFF.md` §4–§7; code:
+
+- **item 4, λ̂ backtracking-intensity (COMPLETE):**
+  `experiments/explorations/task_hunt/sc_lambda/` (CARD.md,
+  results/); fig `figs_writeup/fig_lambda_shuffle_tsweep.*`.
+- **item 5, dq question-marks (COMPLETE, TOY-class disclosed):**
+  `experiments/explorations/task_hunt/diafaces/` (DQ_T_FILL_CARD.md,
+  results/); exhibit set per HANDOFF §5.
+- **item 6, sycgen sycophancy-adjacent (IN FLIGHT — first hunt KEEP
+  3/3, LOG 02:28):** `experiments/explorations/task_hunt/sycgen/`
+  (GENERATION_CARD.md, SCREEN_CARD.md, RETRAIN_CARD.md,
+  screen.py/screen_grids.py, run_retrain.py, shuffle_overlay.py,
+  results/); datasource plugin `sycgen_real_age_llama31_8b_l14`;
+  retrain rows land on the canonical leaderboard ~05:30–06:30
+  (regenerate the census).
+- **item 7, evalage (candidate — corpus complete, screens pending):**
+  `experiments/explorations/task_hunt/evalage/`; corpus on HF
+  `temp-bench-data/hunt_corpora/` with sha receipts.
+- The hunted-task shuffle-overlay results are eval_extra-namespaced
+  JSONs in each dir's `results/` (NOT leaderboard rows) — see the
+  census §"Hunted-task cells outside the leaderboard".

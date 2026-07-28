@@ -9986,8 +9986,7 @@ sdom disposition). Block 5 dispositions accepted (rdens row =
 lane owner's option; wave-2 + cnov rows wait their gates). Also
 this commit: one stray rebase marker excised from the LOG tail
 (the b026e1ffe append resolution) — the hygiene rule stands, check
-`grep -c '<<<<<<<' LOG.md` after every conflict resolution.
-
+`grep -c '
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
 
 ---
@@ -17695,6 +17694,7 @@ runpod-1's fold-in as card owner; my shard posts rows + receipts.
 PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
 ## 2026-07-28 02:48 London (date-verified) — runpod-c — SHARD D LAUNCHED at pin; C4 CLOSED (T16-neutral, KILL as T1 fix)
 
 - **Shard D RUNNING** (GPU 1, pid 25696): `--Ts 6 --seeds 42 1 2`
@@ -17994,3 +17994,97 @@ additions UPLOADED incl. btk s2/T10), final 4 uploads in flight,
 receipts land in ckpt_push.log. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+## 2026-07-28 03:01 London (date-verified) — mac-local: POST-COMPACT BUNDLE — code-guide sanity-check PASS + Han's two new orders executed (SSH block, CELL CENSUS) + ratifications + one stamp flag
+
+**1. CODE_GUIDE sanity-check (Han pre-compact order) — PASS with
+fixes.** Every pin verified against the tree: arch ids incl.
+`paper_txc_base_v1t` (archs.yaml:588), class pins
+`txc_batchtopk.py:296/:309`, `btk_only.py:194/:208`,
+`paper_v1.py:255` (`PaperTXCBaseV1`), `paper_v1t.py:181`
+(`PaperTXCBaseV1T`), both experiment-dir listings, COMPOSITION_AUDIT,
+`checkpoints/manifest.jsonl`, figs. **Stale items FIXED:** (a)
+uploader path is `scripts/push_ckpts_hf.py`, not repo root; (b) §3
+k-semantics were WRONG — RLHF rows (evaluator `rlhf 2.0.0`) carry an
+EMPTY `eval_cfg`; probe budgets are metric-name-encoded
+(`preference_auc_k20/_k50` — not k100/k500) with in-row `shuffled_*`
+twins; guide now states this; (c) fleet map re-stamped 02:58 to
+running-state (shards A+E RUNNING, B armed, C/D at pod-B drain,
+mac-d retrain, mac-c evalage-corpus-complete). §1 table gains the
+v1t sprint row + RLHF-port pending row; TABLE-LABELING RULE amended
+(02:58): matrix columns = "{ReLU+TopK} paper-faithful" (v1t) +
+"{BatchTopK}" (btk-only); archived-T5 stays an anchor row; relu-mix
+never a column.
+
+**2. Han order: SSH instructions → CODE_GUIDE §5a.** The three pod
+ssh commands verbatim + scripted-use pattern (PTY piped-stdin,
+`grep -av 2004`) + LOOK-DON'T-TOUCH clause (house rule extended to
+Dmitry's agents: read logs/results freely, never kill/launch). **SSH-
+VERIFIED finding: NO pod has `/workspace/temp_xc` — checkouts are
+per-agent** (`/workspace/agents/{runpod-1,runpod-2}/temp_xc` on old
+pod; `{runpod-a,runpod-b}` on A; `runpod-c` on B). Published paths
+are ssh-receipts, not assumptions. (CLAUDE.md's single-clone pod
+note is stale for the fleet era — post-rebuttal cleanup item, NOT
+touched tonight.)
+
+**3. Han order (02:5x): "list every single cell + which arm" → NEW
+`REBUTTAL_CELL_CENSUS.md` + generator `scripts/cell_census.py`.**
+Census of all 9,895 leaderboard rows → 387 rebuttal-scope
+(probing 312 / rlhf 44 / em 31; synthetic excluded per-cell, counted
+in header). One line per (arch, datasource, T): trained seeds,
+untrained-twin seeds (alias/certificate cells), k budgets, shuffle
+coverage, smoke/positive-control tags, d_sae overrides. Every line
+arm-labeled per the binding taxonomy: {ReLU+TopK} PAPER-FAITHFUL
+(v1t + archived anchors) / {BatchTopK} btk-only (NO ReLU) /
+**relu-mix = the MISINTERPRETED "{ReLU+TopK} paper-faithful" arm —
+certificate evidence ONLY** (Han's framing, verbatim intent).
+Arch-derived arm vs stamped `eval_cfg.arm` cross-check: **0
+mismatches / 387 rows.** Hunted-task non-leaderboard cells get their
+own section (sc_lambda, diafaces/dq, sycgen-landing-tonight,
+evalage). Known gaps stated in guide §1b: probing btk T10/s2
+(in-flight GPU 1), RLHF btk T{6,10} (x6/x10), all v1t cells
+(sprint), sycgen rows (~05:30–06:30). Regen command in both docs —
+REGENERATE BEFORE QUOTING COVERAGE; the file dates by the hour
+tonight.
+
+**4. RATIFICATIONS (review-on-push):**
+- **sycgen KEEP 3/3 (mac-d 02:28) RATIFIED** — hunt4 §4 bundle
+  applied mechanically (3/3 legs, zero kill clauses, order-0,
+  per-token ≈ chance 0.501–0.530 vs window 0.616–0.652, wd passes,
+  condition-3 within-domain receipts in json). THE FIRST HUNT KEEP —
+  item 6 has a task. Retrain launch legitimate (pre-authorized
+  retrain-on-KEEP; both-GPU use correct under Han's hunt-exclusive
+  reversal ee16ea041 — the 02:28 entry's "one GPU reserved for
+  paper-faithful" line is SUPERSEDED by that ruling; noting so the
+  record is unambiguous). Card 74d260321 accepted at freeze; drain
+  ~05:30–06:30; overlay + Aniket-template figure at drain.
+- **runpod-a shard E launch (02:41) RATIFIED** — PIN asserted,
+  dry-run queue==card receipt committed, anchoring note (editable
+  install from main clone) accepted, ledger posted ($9–12).
+- **runpod-c freeze-and-join ACK RATIFIED** — freeze receipts
+  arrived unprompted (no chase); C6 preserved as resume point,
+  in-flight C4/C5-T16 kept under minutes-from-done, ckpt mirror
+  running, shards C/D claimed at drain. Hill-climb actuals ≈$16 vs
+  $35–40 est (under, frozen early) — ledger noted.
+- runpod-b offer-CLOSED (moot under 5-GPU split) absorbed; rmx_b
+  runs to completion, overflow-only after.
+**HANDOFF refreshed:** item 6 = sycgen IN FLIGHT with the
+quotable-now sentence (exhibit expected pre-11:00 if drain holds;
+fallback amendment); item 7 = evalage candidate (corpus complete,
+6/6 label-side, NOT-a-KEEP discipline); census cross-linked in the
+header.
+
+**5. FLAG — stamp corrigendum requested (mac-c):** the evalage-
+corpus-complete entry is stamped "03:55 London (wall)" but arrived
+in my 02:46 pull — impossible-future stamp (fourth stamp incident
+tonight). Content unaffected (corpus receipts stand; gates PASS
+reviewed). mac-c: post a one-line corrigendum with the true wall
+time on next push. runpod-1's pre-existing stage2 variance-panel
+test failure logged as a panel-lane item — NOT sprint-blocking, not
+tonight's problem.
+
+Next from me: task #11 (independent agentic_txc_02 verification —
+load-bearing on every RLHF caption), then sprint watches (first v1t
+cells, port card ~04:30, rmx_b cell 2 ~04:00, sycgen drain) and the
+11:00 readiness call.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

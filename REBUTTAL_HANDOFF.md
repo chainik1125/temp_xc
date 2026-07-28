@@ -2,8 +2,13 @@
 
 **Code-reader's companion: `REBUTTAL_CODE_GUIDE.md`** (same directory) —
 which code produced the probing/RLHF shuffle ablations, class-level
-arch pins, shuffle-instrument semantics, checkpoint locations, and
-the caveats an agent must not trip over.
+arch pins, shuffle-instrument semantics, checkpoint locations, pod
+SSH access, and the caveats an agent must not trip over.
+**Cell inventory: `REBUTTAL_CELL_CENSUS.md`** (same directory) — every
+cell we have results for, labeled {ReLU+TopK} paper-faithful vs
+{BatchTopK} btk-only vs relu-mix (the misinterpreted arm); regenerate
+with `.venv/bin/python scripts/cell_census.py --write` (cells are
+landing all night).
 
 **Deadline: rebuttal 13:00 BST 2026-07-28; exhibits READY BY 11:00 BST**
 (Han's list, LOG ~00:35 entry). **THIS DOCUMENT SUPERSEDES the
@@ -144,26 +149,40 @@ carries the row-level label.
 
 ## 6+7. Safety-relevant hunted tasks (THE GOLD — status, not yet exhibits)
 
-- **State (00:50, corrected per mac-c's kill triage 2505cd937):**
-  every found-corpus candidate resolved (kills with receipts —
-  reask_hr 3/3, retryesc vocabulary bar fired LABEL-SIDE, warddebt
-  geometry; see LOG). Salvage classes: retryesc = signal-UNTESTED
-  (its probe never ran — the regenerated corpus tests a genuinely
-  open question, not a shown phenomenon); dharm + warddebt =
-  STRUCTURALLY UNSCREENABLE (rebuild-or-nothing). The ELICITATION
-  HARNESS: scaffold frozen; Claude-API backend committed
-  (a0646af0d) with the provenance weakening honestly disclosed
-  in-card (bit-exact → reproducible-in-expectation); **evalage
-  generation STARTING NOW; sycgen_age and retryesc_gen queued;
-  mac-d pulls one card for parallelism.** First KEEP auto-triggers
-  the full matrix retrain (pre-authorized).
-- **Where verdicts will appear:** LOG (stamped entries) +
+- **⚑ ITEM 6 = SYCGEN, IN FLIGHT (state 02:58 07-28): the hunt
+  found its first KEEP.** `sycgen` (sycophancy-adjacent age-flattery
+  register, generated corpus under the elicitation harness) passed
+  the screen bundle **KEEP 3/3** — gpt2/gemma2_2b/llama31_8b, zero
+  kill clauses, per-token best 0.501/0.529/0.530 ≈ chance vs window
+  best 0.616/0.641/0.652 (T64/actxmean_mlp), order-0, wd passes
+  (LOG 02:28, `task_hunt/sycgen/results/*.json`). The pre-authorized
+  **48-cell matrix retrain is RUNNING** on mac-d's 2×H100 (7-T
+  {1,2,4,6,8,10,16} × seeds {42,1,2} × shuffle overlay, btk-only arm
+  — either-arm rule; card 74d260321), **drain ~05:30–06:30 → overlay
+  → fig+table in `figs_writeup/` before 11:00 if the schedule
+  holds** (fallback: amendment window). Rows land on the canonical
+  leaderboard under `datasource=sycgen_real_age_llama31_8b_l14`.
+- **Item 7 = evalage, CANDIDATE (screens pending):** corpus v1
+  COMPLETE (400 docs / 2.04M tokens, claude-haiku, both card gates
+  pass, HF-pushed w/ sha receipts) + **6/6 label-side bands PASSED**
+  (unigram 0.586 vs the 0.60 bar that killed retryesc) — NOT a KEEP
+  until the probe-side screen runs (3-tokenizer re-tokenization via
+  mac-d's `screen_grids.py` transplant, then screens on mac-c's
+  L40S). Earlier context: every found-corpus candidate resolved
+  (kills with receipts — reask_hr, retryesc label-side, warddebt
+  geometry; retryesc = signal-UNTESTED, regenerating as
+  retryesc_gen; dharm/warddebt = STRUCTURALLY UNSCREENABLE); the
+  elicitation harness (Claude-API backend, provenance weakening
+  disclosed in-card) is what produced sycgen + evalage. StruQ runs
+  $0 premeasures under our bars (runpod-a) as the 4th candidate.
+- **Where verdicts appear:** LOG (stamped entries) +
   `experiments/explorations/task_hunt/<candidate>/` cards/results.
-- **For the 13:00 submission:** the honest sentence is a promised
-  amendment — "dedicated safety-task experiments are running;
-  results follow within the amendment window (Aug 3)." Exhibits
-  land in that window, not by 11:00 (a screen KEEP + 7-T × 3-seed ×
-  both-arms retrain is >12 h of pipeline from a standing start).
+- **For the 13:00 submission:** item 6 is quotable NOW as "first
+  dedicated safety-relevant task passed all screens; full T-sweep
+  running, exhibit expected before the deadline" — with the exhibit
+  itself landing by ~07:00–08:00 if the retrain drains on schedule.
+  Item 7 + further candidates: "results follow within the amendment
+  window (Aug 3)."
 
 ## 8. tsae width-match (additional item) — COMPLETE ✓
 

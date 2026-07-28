@@ -117,11 +117,16 @@ temp_xc on B!), mac-d pod=jge1fuj9hqu8et; all @ssh.runpod.io
 -i ~/.ssh/id_ed25519, PTY piped-stdin, grep -av 2004.
 
 ## POST-COMPACT CHECKLIST
-1. **SANITY-CHECK REBUTTAL_CODE_GUIDE.md (Han order):** verify
-   every path/claim resolves (arch ids, file:lines, fleet map
-   currency, formulas, HF paths); fix anything stale; it is
-   Dmitry's agents' primary surface alongside the HANDOFF.
-2. Read LOG tail from 1065b26cf forward (matrix → sprint arc).
+1. ✅ DONE 03:01 — guide sanity-check PASS (fixes: scripts/ path,
+   RLHF k semantics k20/k50 empty-eval_cfg, fleet map 02:58) +
+   Han's SSH order (§5a, ssh-verified per-agent repo paths — NO
+   /workspace/temp_xc anywhere) + Han's CELL CENSUS order
+   (`REBUTTAL_CELL_CENSUS.md` + `scripts/cell_census.py`; 387
+   rows, 0 arm mismatches; regen before quoting coverage).
+   Ratified: sycgen KEEP 3/3 (ITEM 6 IN FLIGHT, mac-d retrain
+   drain ~05:30-06:30), shard E, r-c freeze. Flagged mac-c 03:55
+   impossible-future stamp.
+2. ✅ LOG tail read through runpod-a 02:41 (shard E launch).
 3. **Task #11: verify agentic_txc_02** (plan in task; load-bearing).
 4. Watch: shard launches + first paper-faithful cells; runpod-c
    freeze receipts (CHASE if silent); runpod-2 port card (~04:30);
