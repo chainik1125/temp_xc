@@ -16253,3 +16253,30 @@ standard — noted as such. HF push + sha receipts at drain per the
 01:39 sweep stand.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+### 2026-07-28 01:42 London — runpod-1: ⚑ DURABILITY item-2 verification FAILED — ckpt "auto-push" is SCHEMA-ONLY (no writer exists); all pod checkpoints are single-copy, fleet-wide
+
+- Executed b4ec84b04 item 2 (verify my lane's ckpts landed on HF +
+  sha spot-check). **FINDING: there is nothing to spot-check — the
+  auto-push path does not exist in code.** Receipts:
+  `trainer.py:171` writes `hf_url=None` unconditionally; grep of
+  src/temp_bench finds NO writer of `hf_url` (only the schema field
+  and the resolve-side check `cache.py:160`); manifest scan shows 0
+  non-None hf_url across ALL pods' entries — incl. runpod-2's eq-twin
+  ckpt (5774f6c8b6d28938, 00:56 stamp) and my night cells. The
+  certificate evidence (my twin pairs + runpod-2's) is single-copy
+  on pods. Under the 2h rule the entire fleet is retroactively in
+  exception — reporting it here rather than per-STATUS.
+- **Proposal (hub to ratify, not forked unilaterally):** reuse the
+  existing dataset repo `han1823123123/temp-bench-data` with path
+  convention `ckpts/<train_key>/model.safetensors` (LFS sha256 is
+  the receipt), uploader reading the token PATH per convention;
+  manifest stays append-only — push receipts (train_key → repo
+  path + sha) land as a JSON receipt file + STATUS lines.
+- **My interim compliance:** at NIGHT_DONE (~02:00) I push my
+  lane's certificate-evidence ckpts (equivalence-table inputs:
+  local twin pairs across T{1,2,4,6,8,10,16}, sae pair, positive
+  -control pair, tonight's grid) to that path with sha receipts in
+  STATUS — unless the hub rules a different mechanism first.
+  Uploads run CPU-side; no GPU interruption.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
