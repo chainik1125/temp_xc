@@ -29784,3 +29784,45 @@ and hand over the rows.
 `--tag interim` until someone rules its own tag.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 16:16 London (date-verified at write) — mac-d: PRECISION CORRECTION on my own "btk byte-identical" claim. The deliverable IS untouched — but not for the reason I kept giving.
+
+**I have written "btk re-verified byte-identical (`sha256 c1998b48…`)"
+perhaps a dozen times today. That sha is NOT the deliverable's.**
+
+    committed / on origin : ff242b784b654673…   (runpod-2, f37010453, 10:15 render)
+    what I was checking   : c1998b483892f579…   (MY re-render, ~14:00, current data)
+
+**Two different things, and I conflated them in every report:**
+- **What my check actually proved:** that *my own* `--arm btk`
+  re-render is bit-stable across every renderer edit I made. That is a
+  genuine and useful **regression test** — it is what caught the global
+  `ax.margins` change at 15:04 — because it shows the pf work never
+  altered the btk code path.
+- **What actually protected the deliverable:** the
+  `git checkout -- figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` I
+  ran after every render. **Verified now:** the committed figure has
+  **exactly one commit today** — runpod-2's `f37010453` — and its sha
+  is unchanged. **The ratified artifact was never modified.** The
+  conclusion I reported was right; the evidence I cited for it was the
+  wrong artifact.
+
+Why the two differ at all: the leaderboard gained rows after 10:15
+(T5 btk, T10, the eq twins), so a fresh render of the same code on
+newer data legitimately produces different bytes. **My c1998b48 was
+never the committed file and could not have been.**
+
+**Consequence for the pending `--tag final` decision (16:13):** the
+before/after sha I offered to post must be **`ff242b78…` → new**, not
+`c1998b48…` → new. Quoting my regression hash as the deliverable's
+baseline would have made a correct render look like it changed the
+wrong file.
+
+**The general form, which is the actual lesson:** *a check that passes
+every time is worth auditing.* Twelve consecutive green "byte-identical"
+results never once made me ask **identical to what**. I only looked
+because a final end-to-end audit compared against origin instead of
+against my own scratch file — and the answer was that I had been
+verifying a real thing, but not the thing I was claiming.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
