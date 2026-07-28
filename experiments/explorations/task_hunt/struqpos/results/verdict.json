@@ -1,0 +1,54 @@
+{
+ "face": "struqpos",
+ "bundle_verdict": "KILL",
+ "n_keep": 0,
+ "n_scored": 3,
+ "any_C1": true,
+ "legs": {
+  "gpt2": {
+   "leg": "gpt2",
+   "verdict": "KILL",
+   "tok": 0.7121024242048484,
+   "ctx": 0.9993722487444975,
+   "shuf": 0.5374403248806497,
+   "local_floor": 1.0,
+   "gain": 0.2873,
+   "order_carried": 0.4619,
+   "shuf_labelperm": 0.4943579887159774,
+   "null_ok": true,
+   "kill_clauses": [
+    "C1"
+   ]
+  },
+  "gemma2_2b": {
+   "leg": "gemma2_2b",
+   "verdict": "KILL",
+   "tok": 0.6597039600153787,
+   "ctx": 0.9986274509803922,
+   "shuf": 0.5175470972702807,
+   "local_floor": 1.0,
+   "gain": 0.3389,
+   "order_carried": 0.4811,
+   "shuf_labelperm": 0.5046212995001922,
+   "null_ok": true,
+   "kill_clauses": [
+    "C1"
+   ]
+  },
+  "llama31_8b": {
+   "leg": "llama31_8b",
+   "verdict": "KILL",
+   "tok": 0.909761630142253,
+   "ctx": 0.9993156478277585,
+   "shuf": 0.7962091503267974,
+   "local_floor": 1.0,
+   "gain": 0.0896,
+   "order_carried": 0.2031,
+   "shuf_labelperm": 0.5078815840061515,
+   "null_ok": true,
+   "kill_clauses": [
+    "C1"
+   ]
+  }
+ }
+}

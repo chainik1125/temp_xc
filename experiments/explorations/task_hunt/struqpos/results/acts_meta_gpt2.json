@@ -1,0 +1,12 @@
+{
+  "leg": "gpt2",
+  "model_id": "openai-community/gpt2",
+  "screen_hs": 7,
+  "n_docs": 2036,
+  "d_model": 768,
+  "local_k": 4,
+  "boundary_slop_docs": 0,
+  "max_ctx": 1024,
+  "pairs_over_ctx_skipped": 2,
+  "wall_seconds": 5.1
+}

@@ -1,0 +1,12 @@
+{
+  "leg": "gemma2_2b",
+  "model_id": "google/gemma-2-2b",
+  "screen_hs": 14,
+  "n_docs": 2040,
+  "d_model": 2304,
+  "local_k": 4,
+  "boundary_slop_docs": 0,
+  "max_ctx": 8192,
+  "pairs_over_ctx_skipped": 0,
+  "wall_seconds": 19.1
+}

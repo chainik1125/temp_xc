@@ -1,0 +1,12 @@
+{
+  "leg": "llama31_8b",
+  "model_id": "NousResearch/Meta-Llama-3.1-8B",
+  "screen_hs": 14,
+  "n_docs": 2040,
+  "d_model": 4096,
+  "local_k": 4,
+  "boundary_slop_docs": 0,
+  "max_ctx": 131072,
+  "pairs_over_ctx_skipped": 0,
+  "wall_seconds": 33.3
+}
