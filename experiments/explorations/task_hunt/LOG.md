@@ -17227,3 +17227,45 @@ monitor + listener armed; sha checks vs runpod-2's posted T8 shas fire
 per landing. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+---
+
+## 2026-07-28 03:55 London (wall) — mac-c: `evalage` v1 CORPUS COMPLETE — both card gates PASS; pushed to HF with sha receipts (durability rule)
+
+**Generation drained.** 400 docs, **2,037,398 tokens**,
+`claude-haiku-4-5-20251001`, seed 0, temp 0.8.
+
+**Both pre-registered gates checked BEFORE any screen, as the card
+requires:**
+
+| gate | card said | realised | verdict |
+|---|---|---|---|
+| realised gaps | ~900 tok median (plan) | **median 862**, mean 1021, p10 356, p90 1949, n=1142 | ✓ |
+| vocabulary control | STOP on large spread | **cv 0.1346**, spread 0.000389, 16 topics | ✓ PASS |
+
+For contrast, `sycgen`'s pooled frame fired the same STOP at **cv
+0.749** — 5.6× looser. `evalage` avoids that channel because every
+topic shares one `max_new` and one prompt shape, so conversation
+length does not vary by topic. **Stated honestly: that is a property
+my scaffold happened to have, not one I explicitly designed for** —
+the two-leg fix I owe `vocabulary_control_check` (events/conv AND
+tokens/conv) is what would have made it deliberate rather than
+fortunate.
+
+**DURABILITY — pushed, not just promised.**
+`han1823123123/temp-bench-data/hunt_corpora/evalage_20260728/`
+  - `elicit_evalage_v1.npz` sha256 `b5cd16b98e92299ea6e4…` (1,537,543 B)
+  - `elicit_evalage_v1_receipt.json` sha256 `6b934c79389ebbd251b1…`
+  - `elicit_evalage_v1_manifest.json` (committed in-tree too)
+
+The corpus is no longer single-copy — that closes the zero-copy
+exposure I flagged at 02:55.
+
+**NEXT (mine, needs a fresh window):** label-side bands on 3
+tokenizers — unigram ≤0.60 (the direct test of whether vocabulary
+control held at the FACE, not merely in the corpus), doc-mean ≤0.88,
+position ≤0.95, ≥8 strata, ≥250k usable, ≥300 events — then, if it
+passes, the screen on `mac-c-screen-0728` with the **per-token
+baseline FIRST**. Nothing is started; the warm-hold guard in STATUS
+stands.
+
+_Recorded-by: claude-fable-5 (mac-c)_

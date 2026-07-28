@@ -1,0 +1,60 @@
+{
+ "scaffold": "evalage",
+ "generation": {
+  "model_id": "claude-haiku-4-5-20251001",
+  "model_sha": "unresolved",
+  "seed": 0,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "backend": "Anthropic API (MATS key; pin = model-id + API version, NOT a weight sha \u21d2 reproducible-in-expectation, not bit-exact)"
+ },
+ "n_docs": 400,
+ "n_tokens": 2037398,
+ "realised_gaps": {
+  "n_gaps": 1142,
+  "mean": 1021.0175131348511,
+  "median": 862.0,
+  "p10": 356.20000000000005,
+  "p90": 1948.7000000000003,
+  "min": 103.0,
+  "max": 2660.0
+ },
+ "vocabulary_control": {
+  "per_topic_event_rate": {
+   "basics of bread baking": 0.0008663666707881672,
+   "basics of watercolour painting": 0.0007485980508436296,
+   "caring for houseplants": 0.000741013849869512,
+   "choosing a bicycle for commuting": 0.0008785620702637131,
+   "how compasses work": 0.0007234307666180817,
+   "how rainbows form": 0.0007585934967810796,
+   "how tides work": 0.0007697740457227713,
+   "how to fold origami cranes": 0.0008120782824608117,
+   "how to read a train timetable": 0.0008199072827237191,
+   "organising a small library": 0.000710707313087071,
+   "planning a coastal walk": 0.0010847194575490417,
+   "planning a vegetable garden": 0.0010162500157772168,
+   "the history of paper making": 0.0007609470041545135,
+   "the invention of the printing press": 0.0007025381794564376,
+   "the rules of chess endgames": 0.0006955441362707838,
+   "why leaves change colour": 0.0007438164275470683
+  },
+  "spread_max_minus_min": 0.00038917532127825786,
+  "cv": 0.13463055143782554,
+  "note": "large spread => topic predicts event status => the retryesc vocabulary leak is being rebuilt; fix the scaffold, do not proceed"
+ },
+ "first_doc_sha256": "a901848e40d107825bdca7ff4d7331b37c0d57ba799c709204019dac17c4a58a",
+ "model_generated_disclosure": "corpus is MODEL-GENERATED; whether it enters a rebuttal exhibit or the appendix is the paper owner's call at quote time (authorization note, PTR)",
+ "scaffold_constants": {
+  "gap_turns": [
+   2,
+   12
+  ],
+  "n_cues": [
+   2,
+   6
+  ],
+  "n_topics": 16,
+  "n_cue_templates": 5
+ },
+ "generation_tokenizer": "claude-haiku-4-5-20251001"
+}
