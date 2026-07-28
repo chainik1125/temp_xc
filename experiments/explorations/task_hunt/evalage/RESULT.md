@@ -83,9 +83,24 @@ label-side face/position Spearman of **0.4226**. The balanced manifest
 stratifies on position by construction, so the correlation visible in
 the labels never reaches the probe. The apparatus did its job.
 
-**4. Capacity (own window − foreign window) rises with T**: gpt2 +0.018
-→ +0.056, gemma2 +0.022 → +0.055, llama31 +0.020 → +0.031 across
-T = 4…64.
+**4. Capacity (own window − foreign window) across T = 4…64:**
+
+| leg | T4 | T8 | T16 | T32 | T64 |
+|---|---|---|---|---|---|
+| gpt2 | +0.018 | +0.028 | +0.025 | +0.032 | **+0.056** |
+| gemma2_2b | +0.022 | +0.020 | +0.026 | +0.045 | **+0.055** |
+| llama31_8b | +0.020 | +0.008 | +0.023 | **+0.035** | +0.031 |
+
+⚠ **This table does NOT support a larger-T follow-up, and I checked
+specifically because it looks like it might.** Capacity rises to the
+ceiling on gpt2 and gemma2 — but **llama31 turns over at T64** (+0.031,
+below its own T32 of +0.035). Two legs rising and one falling is
+ambiguous, not evidence that more window would help. Anyone reading this
+table as "the effect was still climbing when the apparatus ran out"
+should stop at the llama31 row. Raising `SEQ_LEN` past 128 would also
+change the chunk geometry every other candidate in this program was
+screened under, so it is a hub decision about comparability, not a knob
+I would turn on evidence this thin.
 
 ⚠ **Read that carefully rather than favourably.** The window beats a
 *foreign* window by more (+0.056) than it beats the *anchor token*
