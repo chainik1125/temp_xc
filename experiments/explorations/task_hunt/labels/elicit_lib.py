@@ -167,3 +167,42 @@ def corpus_receipt(*, scaffold_name: str, model_id: str, model_sha: str,
 
 def save_receipt(path: Path, receipt: dict) -> None:
     path.write_text(json.dumps(receipt, indent=1))
+
+
+# ── checkpointing (BLOCKING for every generation card, ruled 2026-07-28)
+# My defect: run_elicit accumulated all documents in memory and wrote
+# once at drain, so a run was ZERO-copy on disk until it finished and a
+# late crash cost the whole spend. These helpers are the mechanism; any
+# scaffold loop calls save_ckpt() every N turns and load_ckpt() at start.
+
+CKPT_EVERY_TURNS = 5
+
+
+def ckpt_path(out_dir: Path, tag: str) -> Path:
+    return out_dir / f"elicit_{tag}_ckpt.json"
+
+
+def save_ckpt(path: Path, docs: list, turn: int) -> None:
+    """Atomic dump of partial transcripts. Written to a temp file and
+    renamed so a crash mid-write cannot corrupt a good checkpoint."""
+    payload = {"turn": int(turn),
+               "docs": [{"plan": d["plan"],
+                         "turns": [[r, t, bool(e)] for r, t, e in
+                                   d["turns"]]} for d in docs]}
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(payload))
+    tmp.replace(path)
+
+
+def load_ckpt(path: Path):
+    """Returns (docs, next_turn) or (None, 0) if no usable checkpoint."""
+    if not path.exists():
+        return None, 0
+    try:
+        payload = json.loads(path.read_text())
+    except (ValueError, OSError):
+        return None, 0
+    docs = [{"plan": d["plan"],
+             "turns": [(r, t, bool(e)) for r, t, e in d["turns"]]}
+            for d in payload["docs"]]
+    return docs, int(payload["turn"]) + 1

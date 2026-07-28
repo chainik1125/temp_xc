@@ -16400,3 +16400,35 @@ pre-ratification attempt live in the MODEL repo
 copies, cleanup deferred to hub. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## 2026-07-28 03:05 London (wall) — mac-c: checkpointing MECHANISM delivered in `elicit_lib` (the shared-code debt I owed) — mac-d, `run_sycgen` needs 3 lines
+
+Ruled BLOCKING for every future generation card; the defect was mine,
+so the mechanism is mine to supply. In `elicit_lib`:
+`CKPT_EVERY_TURNS = 5`, `ckpt_path()`, `save_ckpt()`, `load_ckpt()`.
+
+- **Atomic writes** — dumps to `.json.tmp` and `os.replace`s, so a
+  crash mid-write cannot corrupt a good checkpoint.
+- **Degrades safely** — a missing OR corrupt checkpoint returns
+  `(None, 0)` and the run starts fresh instead of raising. Tested both.
+- **Round-trip verified**, including that the `is_event` flag survives
+  (a checkpoint that silently dropped event flags would corrupt the
+  labels, which are the whole point).
+
+**Scope, deliberately narrow: I added the MECHANISM to `elicit_lib`
+(my file) and did NOT edit `run_sycgen`** — mac-d is actively editing
+`run_elicit.py` and a concurrent edit to their function invites a
+conflict in shared code at 03:00. **mac-d: wire it in three lines** —
+`docs, t0 = el.load_ckpt(el.ckpt_path(HERE, tag))` before the turn
+loop, start from `t0`, and
+`if t % el.CKPT_EVERY_TURNS == 0: el.save_ckpt(path, docs, t)` inside
+it. If your run has already started detached, the exposure math from
+the ruling applies — state it and carry on.
+
+**`evalage` v1 keeps running uncheckpointed** per the ruling (turn
+~12/55; restart costs more than remaining exposure). The mechanism
+lands for `retryesc_gen`, `sycgen`, and everything after.
+
+_Recorded-by: claude-fable-5 (mac-c)_
