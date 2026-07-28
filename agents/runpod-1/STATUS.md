@@ -1,10 +1,23 @@
 # Working state — agent `runpod-1`
 
-**2026-07-28 02:41 London (date-verified) — PAPER-FAITHFUL SPRINT: card PINNED
-d9235755b, shard A RUNNING (GPU0, T16x3→T1s42 since 01:39 UTC),
-shard B armed behind NIGHT_DONE_GPU_1 (btk s2/T10 finishing ~02:05
-= the 6/6 k20-block decider; diff at landing). GPU 2 = runpod-2,
-never mine.**
+**2026-07-28 ~03:00 London (pre-compact refresh) — PAPER-FAITHFUL
+SPRINT: card PINNED d9235755b + RATIFIED 16d26642c (launch-all;
+priority restatement 51aaec049 = paper-faithful FIRST fleet-wide).
+Shard A RUNNING (GPU0, T16x3→T1s42 since 01:39 UTC, log
+pf_shard_A.log); shard B armed behind NIGHT_DONE_GPU_1 (btk s2/T10
+finishing = the 6/6 k20-block decider — at landing: rm_equivalence
+diff + report, then shard B auto-launches, pid 97759 waiter).
+Fleet shards: D LAUNCHED (runpod-c GPU1, 9338aa8e3), E LAUNCHED
+(runpod-a, 43706cc45), C at runpod-c's C5-T16 drain ~03:20,
+runpod-b overflow-only (offer closed 51dc82ef6). runpod-2's RLHF
+pf lane frozen 0c9605f1f (theirs). Hub ETA 06:30-07:30.
+GPU 2 = runpod-2, never mine.
+POST-COMPACT FIRST MOVES: (1) check pf_shard_{A,B}.log +
+actmix_night_gpu1.log tails; (2) if btk s2/T10 landed un-diffed →
+rm_equivalence.py + LOG the 6/6 verdict; (3) commit rows batches;
+(4) heartbeat re-arm if none pending (one was set for 02:12 UTC);
+(5) monitors: bwhegmrtw (pf+night logs), b2w6y6nnq (origin) —
+re-arm any that died with the session.**
 
 ## Sprint (task #12, commission 4ce0369de/606e4587d)
 
