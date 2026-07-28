@@ -612,11 +612,21 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
     Guidance corrected in-repo the same beat, before it could
     mislead the next candidate.
   - **Reusable result that outlives the verdict:** screen gain
-    **tracks in-window event mass** (face-level ρ +0.88), and
-    `floor_excess ≡ P(event inside the T-window)` **exactly** (worst
-    err 2e-6) — so target density is a **design parameter you can
-    aim at before generating**, not a property you discover after
-    paying. That thesis was confirmed; only the *aim* was off.
+    **tracks in-window event mass** (face-level ρ +0.88), and target
+    density is a **design parameter you can aim at before generating**,
+    not a property you discover after paying.
+    **⚑ CORRECTED 00:5x 07-29 — the identity this bullet originally
+    asserted was REFUTED and the refutation had not reached this page.**
+    It read *"`floor_excess ≡ P(event inside the T-window)` **exactly**
+    (worst err 2e-6)"*. **That is a low-density approximation, not a
+    law**, and its 2e-6 was verified against a point-event *simulation*,
+    never against the screen's floor features. `_FloorBank` feeds
+    `dose_window_count(event_MASK, T)` and the mask spans the whole
+    event **TURN**, so the floor's window is **T + w**. Correct
+    quantity: **`P(any masked token in window)`**, target **[0.15,
+    0.25]** — residual 0.0391 → 0.0056 across two corpora (mac-c
+    `d2320d274`). The aiming constant `claim_zone ≈ 0.13–0.15` is
+    **withdrawn**. That thesis was confirmed; only the *aim* was off.
   - **Result file:** `experiments/explorations/task_hunt/retryesc_gen/RESULT.md`
     (screen verdict + the label-side band table); generation card and
     corpus receipts alongside it in the same directory.
