@@ -1,6 +1,64 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 15:10 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 22:5x 07-28)
 
-## ⚑⚑⚑ HEADLINE (20:00): **DONE. BOTH ARMS COMPLETE. ZERO PODS. $0/h.**
+## ⚑⚑⚑ HEADLINE (22:5x): **ITEM 6 IS LIVE. ONE POD RUNNING. Everything below the next section is FINISHED work — do not re-do it.**
+
+**After any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
+(Han's standing order.)
+
+### RIGHT NOW — item-6 budget-matched frontier (briefing `URGENT-budget-matched-table.md`, ⛔ TOP)
+
+**Pod `mac-d-item6-0728` = `davlc92a80erp3`**, 1×H100 $2.99/h,
+`ssh -p 12721 root@103.207.149.172`. Spend so far ~$5; self-cap $25.
+
+**Running:** 15 cells, **6 workers**, tag **`sycgen_keep_r1_rebuilt`**,
+log `/workspace/item6_cells.log`, launcher
+`…sycgen.run_item6_cells 6` (`OMP_NUM_THREADS=2`). Cells = 3
+`batchtopk_sae_btkonly` T=1 + 12 `txc_batchtopk_post_btkonly`
+T{2,4,8,16} × seeds{1,2,42} — **exactly what `frontier.py` loads**.
+`tsae_btkonly` deliberately EXCLUDED (frontier never loads it; 70 min
+was burned on it before I noticed).
+
+**NEXT ACTION when `done=15`:**
+1. `ssh …` → `cd /workspace/temp_xc && TEMP_BENCH_ALLOW_DIRTY=1
+   .venv/bin/python -m experiments.explorations.task_hunt.sycgen.frontier`
+   (**must run on the pod** — the activation cache lives there).
+2. Repatriate `…/sycgen/results/frontier.json` + new leaderboard rows
+   (dup-key check; containers never push).
+3. Report table: recovery vs budget, **as-run beside swept**, every
+   cell's realized `l0_per_window`.
+4. `bash agents/mac-d/teardown_pod.sh davlc92a80erp3 …` then close the
+   ledger with actuals.
+
+**PRE-REGISTERED:** if TXC's frontier does not sit **above** the SAE
+arms', item 6 is a **NEGATIVE** and is reported as one.
+
+### Traps found tonight — do not re-learn these
+
+- **`cache t=True e=True` ≠ weights exist.** `runner.py:141-150`
+  returns `train_cached=True` as a **hardcoded literal** on a
+  leaderboard hit and never reaches line 153's `checkpoint_exists`.
+  This voided my "rebuilt activation cache verified sound" claim — the
+  anchors' r=0.487/0.470/0.489 were **leaderboard reads**; the eval
+  never opened `hs14.npy`. The cache is **UNVERIFIED**; the retrained
+  SAE anchor landing near ~0.4819 will be the first real check.
+- **`free`/`nproc` report the HOST.** cgroup: **23.8 CPUs**,
+  **233.8 GiB**. 12 workers and 9 workers both **OOM-killed**
+  (`memory.events` `oom_kill` 0→2→3); 6 is stable at 63%. Size on the
+  **concurrent load peak** (24.5 GB/worker), not steady-state RSS.
+  `BrokenProcessPool` = OOM until proven otherwise.
+- **GPU is now 100%, was ~10%.** The "sycgen path is dataloader-bound"
+  diagnosis is **partially retracted** — the starvation looks largely
+  **tsae-specific**. Do **not** patch `synthetic.py` on tonight's 10%.
+- pod-D's sycgen dictionaries **are on HF** (mac-c, `eb9f3fb47`);
+  `checkpoint_exists()` can't reach them (`hf_url` has no writer).
+  Retraining anyway is deliberate: mirrored dicts were trained on
+  pod-D's **original** cache, item 6 runs on the **rebuilt** one.
+
+---
+
+## Earlier today (COMPLETE — historical)
+
+## ⚑⚑⚑ (20:00): **BOTH RLHF ARMS COMPLETE. ZERO PODS. $0/h.**
 
 **After any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
 (Han's standing order — it caught two real defects today).

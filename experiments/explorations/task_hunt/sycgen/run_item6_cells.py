@@ -68,8 +68,19 @@ def main():
     print(f"[item6] {len(cs)} cells, {workers} workers, tag={TAG}", flush=True)
     for c in cs:
         print(f"   {c['arch']:32s} T={c['T']:<3} s={c['seed']}", flush=True)
+    # max_tasks_per_child=1 is REQUIRED here, and `run_pool`'s own
+    # docstring says why: `data.synthetic._SYNTHETIC_CACHE` caches one
+    # materialization per (ds, seed) PER PROCESS, so a long-lived worker
+    # crossing seeds accumulates ~3x the datasource RAM and gets
+    # OOM-killed — "SIGKILL invisible to dmesg -> BrokenProcessPool",
+    # which is exactly the failure I hit three times tonight while
+    # blaming worker COUNT. 12 and 9 workers died on the concurrent load
+    # peak; 6 workers then died *after 6 cells had landed*, because the
+    # survivors picked up second cells and accumulated. Worker count was
+    # never the whole story. The prescribed trade is ~a minute of
+    # re-materialization per cell for a FLAT per-worker RAM ceiling.
     grid.run_pool(cs, out, max_workers=workers, describe=RR._describe,
-                  tag="item6")
+                  tag="item6", max_tasks_per_child=1)
 
 
 if __name__ == "__main__":
