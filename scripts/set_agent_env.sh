@@ -97,6 +97,28 @@ case "$agent" in
         export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
         ;;
 
+    # ── Pod A: 2× H100 pod (2026-07-28; runpod-a GPU 0 + runpod-b GPU 1
+    #    in per-agent clones /workspace/agents/<id>/temp_xc) ───────────
+    #
+    #    ⚑ CPU QUOTA, not core count. `nproc` reports 224 (host) but
+    #    /sys/fs/cgroup/cpu.max = 4760000/100000 = **47.6 cores**, and
+    #    sched_getaffinity is unmasked at 224 — so the cgroup THROTTLES
+    #    rather than masks, and torch's auto-sizing is blind to it
+    #    (torch.get_num_threads() = 112 by default = 2.4x oversubscribed).
+    #    Every lane launched here MUST bound its own threads. When N
+    #    lanes share the pod, override downward: OMP_NUM_THREADS
+    #    ~ floor(47.6 / N). Measured by runpod-b 12:46 (0bed01849):
+    #    naive 2-lane co-tenancy at defaults is 0.75x ONE lane;
+    #    thread-partitioned it is 1.59x.
+    runpod-a)
+        export CUDA_VISIBLE_DEVICES=0
+        export AGENT_NAME=runpod-a
+        export TEMP_BENCH_POD_MODE=ephemeral
+        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-24}"
+        export MKL_NUM_THREADS="${MKL_NUM_THREADS:-24}"
+        ;;
+
     # ── Local Mac autoresearch agents (Modal for GPU — no CUDA
     #    pinning; clones ~/research/projects/agents/<id>/) ─
     mac-a)
