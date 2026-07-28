@@ -21,14 +21,18 @@ card-pin (~05:00 London target)**; possible RLHF relief later
   `/workspace/logs/pf_shard_D.log`, drains ~06:00. Sentinel line
   `PF_SHARD_D_DONE`. Per-cell ckpt push via
   `scripts/push_ckpts_hf.py <train_key>` (≤2h rule).
-- **GPU 0, pid 23234** — C5-T16 tail (batch-pool, LAST frozen-
-  program cell), lands ~03:15. Log
-  `/workspace/logs/tscale_c5_batchsel.log`. On drain: C5
-  H-fail-T16 verdict line → **launch SHARD C**
-  (`/workspace/logs/launch_pf_shard_C.sh` staged: T8×{42,1,2} →
-  T1×{2}, log pf_shard_C.log, sentinel PF_SHARD_C_DONE).
-- **C4 CLOSED** 02:48: T16 k20 0.9253 / k5 0.8791 (≥ r1-min,
-  anneal T16-harmless); T1 FAIL stands ⇒ KILL as T1 fix.
+- **GPU 0, pid 27050** — **SHARD C RUNNING** (launched 03:17 at
+  the C5-T16 drain): T8×{42,1,2} → T1×{2}, log
+  `/workspace/logs/pf_shard_C.log`, drains ~06:30. Sentinel
+  `PF_SHARD_C_DONE`. Same per-cell ckpt-push duty.
+- **tscale FULLY DRAINED 03:17** — freeze complete. C4 CLOSED
+  (T16 0.9253/0.8791 anneal-harmless; KILL as T1 fix). C5 KILLED
+  (T16 0.9016/0.8501 — pooled admission destroys the win, echoing
+  C2; census pair kills diversity-as-cause). Ledger FINAL: ≈$16
+  overnight, ≈$33 program. Resume = C6 per RESULTS § FREEZE.
+- **HF ckpt mirror** mid-queue (26 ckpts, decision-grade done
+  first); re-run at drain picks up the C5-T16 straggler
+  (`ed2bacbec941e4e3`). Log `/workspace/logs/tscale_hf_mirror.log`.
 - **Background: HF ckpt mirror** (~25 ckpts, 61 GB →
   `temp-bench-data` `ckpts/tscale/<cfg_hash>/`), receipts →
   `tscale/results/hf_durability_receipts.jsonl`; C4/C5-T16

@@ -509,3 +509,41 @@ selection/admission schedule, drives low-T concentration. C4 spent:
 2 cells, ~64 GPU-min. Gates: slope PASS trivially at T16 but T1-level
 FAIL ⇒ NO PROMOTE. No further anneal variants (dose–response measured;
 the lever is real but bounded ≪ gap).
+
+---
+
+## C5 verdict — batch-pool admission CLOSED; frozen program FULLY DRAINED — 2026-07-28 03:17 London (date-verified)
+
+**T16 cell landed** (hash `ed2bacbec941e4e3`, 58.5 min): k20 **0.9016**
+(shuf 0.8997) / k5 **0.8501** (shuf 0.8502), l0 320, train census
+active-frac **0.1572**.
+
+**Verdict: KILL. H-fail-T16 CONFIRMED** — pooled train-time admission
+destroys the T16 window win: −0.0235 k20 / −0.0262 k5 vs r1-min,
+echoing C2's subseq kill (0.8641). Second independent instance of the
+same law: **remove per-sample-window competition at train time and the
+T16 win dies.** With the T1 floor also failed (0.8221 < 0.8844), C5 is
+dead at both ends.
+
+**The census pair is the final nail for diversity-as-cause:** C5's own
+two cells give (T1: census 0.0073, AUC 0.8221 — most concentrated,
+family-best T1) and (T16: census 0.1572 ≈ twin-diverse, AUC DOWN
+0.0235). Diversity moves opposite to AUC within one candidate at both
+ends. Trained-dictionary diversity is a CORRELATE of healthy training,
+not the causal lever — the lever is what feeds selection (backbone
+geometry) and per-sample-window competition itself. C6's backbone
+diff-ablations (pre-registered above, unlaunched) remain exactly the
+right next probe.
+
+**Frozen program now FULLY drained** — zero tscale compute in flight;
+the FREEZE block's in-flight list is empty. Resume playbook unchanged.
+Shuf-gap note: +0.0019 at T16 — the small positive order signal
+appears again under pooled admission.
+
+**Ledger FINAL (hill-climb):** overnight actuals ≈ **$16** (00:00 →
+03:20 London drain, 2×H100 pod-wall) vs $35–40 est. Day-1 ≈ $17.
+Program total ≈ $33 for: 2 killed candidates ruled out with mechanism
+(C2 ratified, C5), 2 closed with datum (C1, C4), 1 program-best NO
+PROMOTE (C3), the first monotone-rising 20k k20 curve (C1-D), the
+selection-exoneration/backbone attribution (C5 + twin census), and a
+pre-registered next move (C6).

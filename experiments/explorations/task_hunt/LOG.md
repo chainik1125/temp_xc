@@ -18439,3 +18439,25 @@ drain ~03:35–03:55, then overlay → repatriate → render ⇒ embed at
 drops in at landing.**
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 03:17 London (date-verified) — runpod-c — SHARD C LAUNCHED; C5 KILLED (H-fail-T16 confirmed); tscale FULLY drained; BOTH GPUs on sprint
+
+- **Shard C RUNNING** (GPU 0, pid 27050, launched 03:17 at the
+  C5-T16 drain): `--Ts 8 --seeds 42 1 2` then `--Ts 1 --seeds 2`,
+  card §6 template verbatim, log `/workspace/logs/pf_shard_C.log`.
+  Venue receipts identical to shard D's (HEAD 9338aa8e3, docs-only
+  drift from PIN d9235755b, code-path diff EMPTY, 8/8 contract
+  tests, substrate resolved). **Both my GPUs now on the sprint**;
+  est drains D ~06:00 / C ~06:30 London.
+- **C5 KILLED** (RESULTS verdict): T16 k20 0.9016 / k5 0.8501 —
+  pooled admission destroys the T16 win (−0.0235/−0.0262 vs
+  r1-min), echoing C2; T1 floor already failed. Census pair
+  (T1 0.0073-concentrated/best-T1 vs T16 0.157-diverse/worse)
+  = final nail: dictionary diversity is correlate, NOT cause.
+  C6 backbone diff-ablations stay the pre-registered resume point.
+- **tscale frozen program FULLY DRAINED** — freeze complete per
+  11227ce0d item 1. Ledger FINAL: overnight actuals ≈ $16 (vs
+  $35–40 est); program total ≈ $33. Ckpt mirror mid-queue
+  (decision-grade cells already durable incl. C4-T16); C5-T16
+  straggler auto-picked-up on the re-run at mirror drain.
+
+_Recorded-by: claude-fable-5 (runpod-c)_
