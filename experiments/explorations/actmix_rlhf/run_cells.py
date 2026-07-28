@@ -21,7 +21,15 @@ import traceback
 from pathlib import Path
 
 os.environ.setdefault("TEMP_BENCH_ALLOW_DIRTY", "1")
-os.environ.setdefault("AGENT_NAME", "runpod-2")
+# Provenance trap (flagged by runpod-a): a bare `setdefault(... "runpod-2")`
+# silently stamps every OTHER agent's rows as mine. An explicit AGENT_NAME
+# still wins; when it is unset, infer the id from this checkout's path
+# (/workspace/agents/<id>/...) so each clone self-identifies.
+if not os.environ.get("AGENT_NAME"):
+    _parts = Path(__file__).resolve().parts
+    _inferred = (_parts[_parts.index("agents") + 1]
+                 if "agents" in _parts[:-1] else None)
+    os.environ["AGENT_NAME"] = _inferred or "runpod-2"
 
 _frac = os.environ.get("TEMP_BENCH_GPU_FRACTION")
 if _frac:

@@ -34,10 +34,12 @@ D_IN = 2304
 
 
 def main():
-    ds = load_datasource("gemma_2_2b_it_l13_fineweb_24k128")
-    data_key = compute_data_key(ds)
+    # Read the stream from the CELL, never a literal: a hardcoded
+    # datasource here silently survived the base-l12 substrate correction
+    # and re-minted the anchors under stale l13-IT train_keys.
     prov = {}
     for seed in (42, 1, 2):
+        data_key = compute_data_key(load_datasource(pf(5, seed)["datasource"]))
         src = ANCHOR_DIR / f"agentic_txc_02__seed{seed}.pt"
         raw = src.read_bytes()
         sha = hashlib.sha256(raw).hexdigest()

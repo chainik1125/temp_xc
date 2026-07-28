@@ -1,27 +1,27 @@
 {
-  "5484f93fa58db5c1": {
+  "840e48bbcac75498": {
     "seed": 42,
     "upstream_file": "txcdr-base:ckpts/agentic_txc_02__seed42.pt",
     "upstream_sha256": "d53e0d20bec5147c20cd06278f64318b0d1818df654c32b67032552f7b86adb0",
-    "staged_path": "/workspace/agents/runpod-2/temp_xc/checkpoints/5484f93fa58db5c1/model.safetensors",
+    "staged_path": "/workspace/agents/runpod-2/temp_xc/checkpoints/840e48bbcac75498/model.safetensors",
     "staged_sha256": "83191237592bb46ec7b117c96f4c7318e939064923b02a12fad4b0fa919433f8",
     "upstream_final_step": 4200,
     "note": "paper T=5 anchor weights; eval-only, never retrained (alias rule)"
   },
-  "288325a7372cb0b9": {
+  "9a09c398f38b7524": {
     "seed": 1,
     "upstream_file": "txcdr-base:ckpts/agentic_txc_02__seed1.pt",
     "upstream_sha256": "c7fb75f72778bd4cae34c730eb76c09eced553ef400308ac4101dabe7d99e46d",
-    "staged_path": "/workspace/agents/runpod-2/temp_xc/checkpoints/288325a7372cb0b9/model.safetensors",
+    "staged_path": "/workspace/agents/runpod-2/temp_xc/checkpoints/9a09c398f38b7524/model.safetensors",
     "staged_sha256": "23a264a81eceba213b12b9164fa9df148d045ecb79f056b0d16c29012e32088f",
     "upstream_final_step": 4600,
     "note": "paper T=5 anchor weights; eval-only, never retrained (alias rule)"
   },
-  "cea47fe13d6181cb": {
+  "20c5788b8c49cd68": {
     "seed": 2,
     "upstream_file": "txcdr-base:ckpts/agentic_txc_02__seed2.pt",
     "upstream_sha256": "7123bac73bc9310edfb1ddb8d2e376e6aba2cf58f269c5d67a9b128814b40623",
-    "staged_path": "/workspace/agents/runpod-2/temp_xc/checkpoints/cea47fe13d6181cb/model.safetensors",
+    "staged_path": "/workspace/agents/runpod-2/temp_xc/checkpoints/20c5788b8c49cd68/model.safetensors",
     "staged_sha256": "1bcb988fb15a6f74aa5785df5cdaaddb5714a4b3e35aad8d7ed3e9dee4974f57",
     "upstream_final_step": 5200,
     "note": "paper T=5 anchor weights; eval-only, never retrained (alias rule)"
