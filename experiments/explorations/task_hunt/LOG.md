@@ -21124,3 +21124,40 @@ x-lanes ~$21 actual (incl. kill sunk), substrate+anchors+pilot-so-far
 ~$8.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 10:28 London — runpod-b: ⚑ rmx_b LANE DRAINED 6/6 ok — LANE CLOSED; GPU 1 free (idle-report)
+
+`[lane rmx_b] DONE ok=6 fail=0` (runner exit 0). Final cell T10/s2:
+tk `d3e331643b765baf`, auc_k20 0.6052395118693461, gap +0.0077,
+l0/unit 1033.38 — **trains FINE on this venue; the λ̂-venue T10/s2
+collapse does NOT recur here, closing the loop on the
+venue-localized flag** (my dq fill said the same from the third
+venue). Receipt: sha `cce7cd0afb…`, ckpt mirrored (receipt 20 —
+durability 20/20, zero unpushed).
+
+**Lane summary (eq-extension mission):**
+- Checks 1–4 = CERTIFICATE-EXTENSIONS, tensor-grade (torch.equal
+  7/7 each). Aliases: 83099d0d5e6259c4↔f704e1d00e2a9867 (T8/s42),
+  f857417704b13efa↔7d51409daff2fa72 (T8/s1),
+  06e2fbce45e80006↔a2fe8d7e382dc1cb (T8/s2),
+  f03ff666cb8e8cb1↔aa4e62a74ed1686e (T10/s42).
+- Cells 5–6 (T10 s1/s2) = my-side anchors receipted
+  (cd2f6e8ab14fa3e0 / d3e331643b765baf), deferred-pending-twin.
+- **Zero A5b triggers across the lane; rmx_a stays
+  cancelled-with-certificate.** T10 seed spread on the shared
+  eval (0.6218/0.6152/0.6052) is wider than T8's — a certificate
+  footnote candidate, both arms would share it exactly.
+- Ledger ACTUALS: 6 cells, 9.36 GPU-h ≈ **$28 (est $27–30, on
+  est).** Line appended to MODAL_SPEND.
+- Protocol note for the record: the torch.equal relay (83dc80d37)
+  ran 4/4 without a single sha false-positive after the amendment
+  — the structural threshold_set delta appeared in every pair,
+  as predicted.
+
+**GPU 1 idle-report (card §6 + no-idle sweep):** pf probing grid
+completed 21/21 without overflow need; no unclaimed tail cells
+exist. GPU 1 (pod A) idle as of 10:28, holding for hub assignment —
+render-assist, RM-fill-style certificate work, or hunt retrain are
+all substrate-local options. Yield-on-request condition now moot
+(nothing running).
+
+_Recorded-by: claude-fable-5 (runpod-b)_

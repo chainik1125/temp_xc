@@ -1,92 +1,45 @@
-# runpod-b STATUS — rmx_b cell 6/6 (FINAL) training; checks 1-4 all cert-extensions; cell 5 receipted (2026-07-28 08:43 BST)
+# runpod-b STATUS — rmx_b LANE CLOSED 6/6; GPU 1 IDLE awaiting hub assignment (2026-07-28 10:28 BST)
 
-**I am `runpod-b`** — pod A GPU 1.
+**I am `runpod-b`** — pod A GPU 1 (IDLE, idle-report posted 10:28).
 
-## RUNNING: rmx_b (PIN 829f05070, launched 01:04, task bb3r1hlkx)
+## CLOSED: rmx_b (PIN 829f05070, launched 01:04, drained 10:28)
 
-- **YIELD-ON-REQUEST ARMED (9e80f03aa):** any pf-pipeline request
-  naming pod-A GPU1 ⇒ instant clean stop (kill running cell, disclose
-  partial), no ruling needed. RLHF pf > btk absolute (Han).
-- **CHECK 4 COMPLETE (07:57): T10/s42 = CERTIFICATE-EXTENSION** —
-  twin sha matched posted table, torch.equal 7/7. Alias
-  f03ff666cb8e8cb1↔aa4e62a74ed1686e. **4/4 checks = extensions,
-  zero A5b.** Cell 5 (T10/s1) receipted 08:43: tk cd2f6e8ab14fa3e0
-  sha dd7cd4d3f8… mirrored (receipt 19), deferred-pending-twin.
-  Cell 6 (T10/s2, FINAL) lands ~10:30 ⇒ same receipt shape, then
-  DRAIN: ledger actuals + lane-close entry + GPU 1 free (card §6
-  overflow check — pf grid complete, so likely idle-report to hub).
+- **6/6 ok, zero A5b triggers, rmx_a stays cancelled-with-certificate.**
+- Checks 1–4 = tensor-grade CERTIFICATE-EXTENSIONS (torch.equal 7/7
+  each; the approved relay 83dc80d37 ran 4/4 clean). Aliases:
+  83099d0d5e6259c4↔f704e1d00e2a9867, f857417704b13efa↔7d51409daff2fa72,
+  06e2fbce45e80006↔a2fe8d7e382dc1cb, f03ff666cb8e8cb1↔aa4e62a74ed1686e.
+- Cells 5–6 (T10 s1/s2) = my-side anchors, DEFERRED-PENDING-TWIN
+  (tks cd2f6e8ab14fa3e0 / d3e331643b765baf); pair whenever x-lane
+  resumes post-pf-grid — protocol: mirror-relay torch.equal, either
+  agent may run it.
+- T10/s2 trained FINE here (0.6052) ⇒ λ̂ collapse venue-localization
+  CLOSED from all three venues. T10 seed spread (0.6218/0.6152/0.6052)
+  wider than T8 — certificate footnote candidate, shared by both arms.
+- Ledger actuals $28 (est $27–30). Durability 20/20 receipts in
+  `agents/runpod-b/hf_ckpt_receipts.json`.
+- RM_CERTIFICATE cites my aliases (v1.0 + c76923880 + fcd744e1f).
 
-- 6 cells sequential (relu-mix txc T{8,10} × s{42,1,2}), GPU 1, wall
-  log /workspace/logs/actmix_rlhf_runs_rmx_b.jsonl. Measured cadence
-  ~100 min/cell: cell 2 (T8/s1) lands ~04:00, T8 trio ~06:10, full
-  drain ~11:30. Est $27-30, ledgered.
-- **T8 TRIO CLOSED: 3/3 CERTIFICATE-EXTENSIONS** (all: board metrics
-  bit-identical every digit; sha mismatch structural; torch.equal
-  7/7). Alias pairs: 83099d0d5e6259c4↔f704e1d00e2a9867 (s42),
-  f857417704b13efa↔7d51409daff2fa72 (s1),
-  06e2fbce45e80006↔a2fe8d7e382dc1cb (s2). Per-seed gaps
-  (−0.0000/−0.0077/+0.0099) shared exactly by both arms. Zero A5b
-  triggers. Cadence ~85 min/cell ⇒ cell 4 ~06:40, drain ~09:30.
-- **torch.equal relay amendment APPROVED (83dc80d37)**: cross-arm
-  checks compare TENSORS; sha-equal sufficient, not necessary.
-- **Per landing (cells 2–6):** sha256 my ckpt → mirror-relay
-  torch.equal vs btk twin → LOG receipt (equal ⇒ cert-extension +
-  alias flag; ANY divergence ⇒ A5b AUTO-RE-OPEN, report immediately +
-  magnitude table) → push ckpt via scripts/push_ckpts_hf.py → rows
-  checkpoint. T8 twin tks: s1 7d51409daff2fa72, s2 a2fe8d7e382dc1cb
-  (mirrored under ckpts/<tk>/). T10 trio shas post ~08:00 (runpod-2
-  x10 drain); T10 checks then.
-- Monitor beom9lc2s fires per completed cell (wall-log tail).
-- Do NOT poach probing relu-mix T2/T4 (routed runpod-1).
+## Earlier closed tonight (all ratified)
 
-## AT DRAIN: paper-faithful OVERFLOW ONLY (card d9235755b §6)
-
-- CARD_PAPER_FAITHFUL ratified 16d26642c: 21 cells over 5 GPUs
-  (runpod-1 A/B, runpod-c C/D, runpod-a E), ETA 06:30-07:30 —
-  **"runpod-b GPU1 joins post-rmx_b (~11:30) as overflow only."**
-- My T8-boundary offer CLOSED as moot (02:40 entry). rmx_b runs to
-  completion. At drain: check for unclaimed tail cells under the
-  rebalance rule (claim in LOG BEFORE launching); likely none.
-
-## CLOSED tonight (all PTR'd + ratified)
-
-- **Width-match** (b29860ab8): NO LIFT n=3 — width not binding. $2.
-- **λ̂ T{6,10} fill** (c09485d1c): T6 0.1487±0.003 dip, T10 2-seed
-  0.199±0.005 + T10/s2 TRAINING-COLLAPSE (receipt-verified real at
-  6.7e-10). $1.
-- **dq T{6,10} fill** (88cb4f867): T6 0.3016 / T10 0.3059 on-plateau
-  3/3 tight; T10/s2 trains FINE here ⇒ collapse VENUE-LOCALIZED to
-  λ̂ (binding caption phrasing). $1.
-- Han items (4)+(5) exhibit inputs COMPLETE.
-
-## Durability (b4ec84b04 — COMPLIANT)
-
-- 16/16 ckpts mirrored (15 closed-lane + rmx_b cell 1) on
-  `han1823123123/temp-bench-data/ckpts/` via fleet script; shas in
-  `agents/runpod-b/hf_ckpt_receipts.json` + LOG receipts. Remaining
-  rmx_b ckpts push per landing.
+- Width-match NO LIFT n=3 ($2); λ̂ T{6,10} fill w/ T10/s2 collapse
+  finding ($1); dq T{6,10} fill w/ venue-localization ($1).
+- Manifest owner pass 19/19 as-launched (13f582e3a), vote
+  receipts-external. Roll-call answered 07:01.
 
 ## Standing
 
-- **Manifest owner pass DONE (08:29, 13f582e3a): 19/19 as-launched,
-  zero rewrites; voted receipts-external.** Hub owns the convention
-  ruling.
-- 15-min ack discipline on sprint comms (03f533cc3, reaffirmed
-  ee16ea041). Dawn assist: 7-point fig re-renders w/ fleet tables
-  directive (tab_<stem>.md beside every render).
-- sycgen retrain-on-KEEP = mac-d's warm-hold (ee16ea041), not mine.
-- Listener 150s (task_hunt, briefings, agents/runpod-a,
-  agents/runpod-2); re-arm per wake. Keep-BOTH on LOG conflicts AFTER
-  verifying both parents have 0 legit ======= lines. Rows checkpoint
-  before any pull while lane runs.
-- **HOUSE RULE (660c50488, adopted 04:19): explicit paths in every
-  commit — no `git add -A` while canonical jsonls are live; manual
-  conflict handling on canonical files (keep-BOTH flow qualifies).**
-  My rows-checkpoint path set: results/leaderboard.jsonl,
-  checkpoints/manifest.jsonl, agents/runpod-b/*, task_hunt/LOG.md,
-  briefings/MODAL_SPEND.md.
+- **AWAITING: hub assignment for GPU 1** (idle-report in the 10:28
+  lane-close entry; substrate-local options listed). No unclaimed pf
+  tails exist; pf grid complete 21/21.
+- 15-min ack discipline; gold-visibility rule (any KEEP/gold →
+  HANDOFF same-beat); explicit-path commits (no add -A); keep-BOTH
+  LOG conflicts after 0-legit-======= parent check; stamps only from
+  already-printed `date` output; PTR everything.
+- Listener 150s armed each wake (task_hunt, briefings, agents/*).
+  Deferred-pair duty: if runpod-2 posts btk T10 s1/s2 twins, run the
+  relay on my anchors (see lane summary aliases).
 - Stuck-rebase escape: commit --no-edit + rm -rf .git/rebase-merge +
-  checkout -B arxiv HEAD. Stamps from `date` BEFORE writing. PTR
-  everything; launches pin-asserted clean-tree; AGENT_NAME inline.
+  checkout -B arxiv HEAD. AGENT_NAME=runpod-b inline on any launch.
 
 *Rewrite before any compact. — runpod-b*
