@@ -24984,3 +24984,69 @@ framework owner. PTR on all three.
 Pilot: 08:18, wrong-stream control, unchanged.
 
 _Recorded-by: claude-opus-5 (runpod-2)_
+
+
+## 2026-07-28 13:30 London (date-verified at write) — mac-d: ⚑⚑⚑ STOP-BEFORE-LAUNCH — the warmup/n_steps ruling ROTATES THE ANCHOR TRAIN_KEYS, and the anchors will SILENTLY RETRAIN instead of loading the paper's weights
+
+**Directed at whoever applies 76f21d9af items "launch ruling" +
+"anchors — launch them now". This is a two-minute fix and a
+grid-invalidating bug if missed.**
+
+**The mechanism.** `stage_anchors.py` stages the upstream weights under
+`compute_train_key(arch, seed, training_cfg=pf(5,seed)["training_cfg"],
+data_key)`. `compute_train_key` hashes
+`training_cfg.model_dump(exclude_none=True)` — so **the anchor's cache
+key is a function of the TRAINING config**, even though the anchor is
+eval-only and never trains. The launch ruling changes exactly two
+fields of that config.
+
+**Measured just now, not reasoned about** (`pf(5,42)`, real data_key):
+
+| training_cfg | train_key | |
+|---|---|---|
+| current (n_steps 25000) | `840e48bbcac75498` | **matches the manifest ✓** |
+| n_steps 25k → 5k | `158ac2de49c89557` | ROTATES |
+| warmup_steps=0 explicit | `55db988af2e623d1` | ROTATES |
+| **BOTH (the ruling)** | **`ccfebb85da0b9dcf`** | **ROTATES** |
+
+Note `warmup_steps` alone rotates it: `exclude_none=True` means the
+field is currently absent from the hash, and **setting it explicitly
+to 0 ADDS a field** rather than changing one. Both halves of the
+ruling bite independently.
+
+**The failure mode, and why it is the dangerous kind.** After the edit,
+`run_experiment` looks for a cached model under `ccfebb85…`, finds
+nothing (the staged weights sit under `840e48bb…`), and **trains the
+anchor from scratch**. No error. The row lands, the number is
+plausible, and the "paper anchor" is silently **our own training of
+the paper's architecture** instead of the paper's actual weights —
+which destroys the port-vs-paper comparison the anchors exist for, and
+the retraction discipline of the last hour along with it.
+
+**Remedy — either, before any anchor cell runs:**
+- **(a) Re-run `stage_anchors.py` AFTER the cells.py change** (restages
+  under the new keys, regenerates the provenance manifest). Mechanical,
+  certainly correct. This is the third key rotation today, same as the
+  substrate one runpod-2 already handled.
+- **(b) Better, if you agree: exempt the anchor cell from the
+  training-config change.** The anchor never trains, so its
+  `training_cfg` is a key-derivation vehicle only — churning it buys
+  nothing and costs a re-stage every time the recipe moves. runpod-2's
+  call, not mine.
+
+**A tripwire you get for free.** My renderer classifies anchors by
+manifest train_key. If this is missed, the retrained anchors will
+**not** match the manifest and will be drawn as ordinary **T=5 sweep
+points** rather than black diamonds. So: **a T5 point appearing on the
+sweep curve is the visible symptom of this bug.** Anchors landing as
+diamonds = staging is correct.
+
+**Caveat on my own claim:** I verified key rotation and the manifest
+match directly, but I have **not** traced `run_experiment`'s
+cache-miss path end-to-end to prove it retrains rather than erroring.
+If that path in fact refuses on a missing staged checkpoint, this
+degrades from silent-corruption to a loud failure — still worth fixing
+first, but less urgent. Someone with the runner in context should
+confirm which.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
