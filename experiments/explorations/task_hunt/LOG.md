@@ -27499,3 +27499,73 @@ seconds of work and it inverts the conclusion from "slow, wait" to
 "hung, act".
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 14:49 London (date-verified 13:49 UTC) — mac-local (hub): ⚑⚑ **THE EVAL GAP FIRED — exactly as flagged at 14:1x. Training is perfect; the first cell died in `evaluator.eval`.** Nothing lost. My step-time prediction was WRONG, on the fast side.
+
+### 1. What happened, from pod `p478c8uyllvkzz`'s own `drive.log`
+
+**T=2 seed=42 trained all 8 000 steps cleanly** — then:
+
+    [train] step=    0  loss=110253.72
+    [train] step=  400  loss= 13573.81
+    ...
+    [train] step= 7999  loss=  8117.14
+    Traceback … runner.py:182  metrics = evaluator.eval(model, spec)
+      evals/rlhf.py:209  FileNotFoundError:
+      HH-RLHF cache missing at /workspace/caches/rlhf/cached_hh_rlhf;
+      run experiments.explorations.actmix_rlhf.build_cache first.
+    CELL-FAIL T=2 s=42 rc=1
+
+**This is the risk I named at 14:1x verbatim:** *"the eval path on
+CUDA-with-residency remains unproven… a bad eval surfaces AFTER the
+training hours are spent."* It did. The pods got the **training**
+substrate (`resid_L12.npy`) and never got the **eval** substrate
+(`cached_hh_rlhf`) — two different caches, and only one was in the
+bootstrap.
+
+### 2. ⚑ Nothing is lost — verified, not assumed
+
+    /workspace/temp_xc/checkpoints/9ca6a3b4ebc4b302   [created 13:43Z]
+
+`runner.py:153` gates on `checkpoint_exists(train_key)` and
+`_load_checkpoint`s on a hit, so **re-running a failed cell skips
+training entirely and goes straight to eval.** The cost of this miss is
+**re-eval minutes, not re-train hours.** mac-d is already building the
+cache (`build_cache` live at 27% CPU, splits generating).
+
+**⚑ It must land on ALL SIX pods, not just `-2`.** Every pod is
+marching through its seed sequence right now and will fail identically
+at eval; each failure is cheap **only because the checkpoint survives**.
+
+### 3. ⚑ My step-time prediction was WRONG — on the fast side
+
+T=2 s42: training started **13:34:18Z**, checkpoint written **13:43Z**
+⇒ ~530 s for 8 000 steps ⇒ **≈0.066 s/step**.
+
+**I predicted 0.1–0.35 s/step. The measurement is ~1.5× below my
+band.** mac-d called it 0.08–0.10 and were closer, but also high.
+Recording it as a miss rather than "roughly right": **the honest
+statement is that everyone underestimated this fix, twice — first its
+size (2.4× → 7.2× → 16× → 220×), then its effect on the cell wall.**
+
+**Consequence, and it is large:** at ~0.066 s/step a cell is **~9
+minutes**, not 1–3 hours. 18 cells over 6 pods ⇒ **3 seeds sequential ≈
+30 minutes of GPU**, not an evening. The grid cost falls to **~$10–15
+total**. The $250 cap is now irrelevant; **the binding constraint is
+eval, not training.**
+
+### 4. The schedule fix is visibly working
+
+Upstream dropped 91 888 → 13 163 by step 200. **We now drop 110 254 →
+13 574 by step 400** — the same shape, on the correct stream, with
+`warmup_steps=0`. Against the old 1000-step warmup this is the
+difference the 13:26 source recovery predicted. **The convergence
+anomaly that started this whole thread is closed by measurement.**
+
+### 5. Standing
+
+First cell to produce **real metrics** still gets eyeballed before the
+other 17 are trusted — that check has not happened yet; the eval path
+remains unproven end-to-end, only better-understood.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
