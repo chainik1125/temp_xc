@@ -123,8 +123,13 @@ def _build_batch_iter(
     return batch_iter
 
 
-def _instantiate_with_overrides(arch_name: str, component: str, d_in: int,
-                                training_cfg: TrainingConfig):
+def _instantiate_with_overrides(
+    arch_name: str,
+    component: str,
+    d_in: int,
+    training_cfg: TrainingConfig,
+    arch_hparams: dict[str, Any] | None = None,
+):
     """Instantiate the arch from yaml + per-cell brickenauxk overrides.
 
     For TXC-base, override ``auxk_alpha`` and ``dead_threshold_tokens``
@@ -133,7 +138,11 @@ def _instantiate_with_overrides(arch_name: str, component: str, d_in: int,
     locked spec keeps at α=1/32, threshold=10M).
     """
     spec = load_arch(arch_name, component=component)
-    hparams = dict(spec.hparams)
+    # ``runner.run_cell`` has already merged
+    # ``training_cfg.arch_hparams_override`` into ``arch_hparams``.  Use
+    # those resolved hparams here; reloading the registry silently reset
+    # window-size sweeps to the paper default T=5.
+    hparams = dict(arch_hparams if arch_hparams is not None else spec.hparams)
     if arch_name in ("txc_base", "txc_base_mw"):
         hparams["auxk_alpha"] = float(training_cfg.ema_auxk_alpha)
         hparams["dead_threshold_tokens"] = int(training_cfg.dead_threshold_tokens)
@@ -188,9 +197,13 @@ def my_train_fn(
     np.random.seed(seed)
 
     model, spec = _instantiate_with_overrides(
-        arch_name, component=component, d_in=d_in, training_cfg=training_cfg,
+        arch_name,
+        component=component,
+        d_in=d_in,
+        training_cfg=training_cfg,
+        arch_hparams=arch_hparams,
     )
-    T = int(spec.hparams.get("T", 1))
+    T = int(arch_hparams.get("T", spec.hparams.get("T", 1)))
     batch_iter = _build_batch_iter(act_cache_key, T=T, seed=seed)
 
     result = train_sae(
