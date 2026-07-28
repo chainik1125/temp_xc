@@ -149,7 +149,7 @@ append-only in `results/leaderboard.jsonl`, stamped with
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — what is running on every pod (snapshot 02:35 BST 07-28)
+## 5. FLEET MAP — what is running on every pod (snapshot 02:40 BST 07-28; sprint LAUNCHED)
 
 This section dates fast. **Live sources: `agents/<id>/STATUS.md`
 (each agent self-maintains its own) + the LOG tail** — trust those
@@ -157,17 +157,20 @@ over this snapshot if they disagree.
 
 | pod | agents | GPU | running NOW | next |
 |---|---|---|---|---|
-| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0 | FREE — reserved | paper-faithful probing cells at plugin-freeze |
-| | | 1 | night-grid tail (last equivalence/btk cells) | probing shard at drain |
-| | | 2 | x6 ‖ x10 co-resident (RLHF btk T{6,10}×3; drains ~08:00-08:30) | RLHF paper-faithful grid (agentic port) |
-| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | FREE — armed | probing shard 1 at plugin-freeze |
-| | | 1 | rmx_b (relu-mix T{8,10} eq-extension cells, mid-run) | probing shard at drain; then dawn render assist |
-| **pod B** (2×H100) | runpod-c alone | 0+1 | hill-climb FROZEN (Han ~02:4x; clean-halt + resume playbook in `tscale/RESULTS.md`) | BOTH GPUs → probing paper-faithful shards at card-pin (substrate already on-pod); possible RLHF relief later |
+| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0 | **paper-faithful probing shard (CARD d9235755b pinned+ratified 02:39; arch `paper_txc_base_v1t`, arm `paper-faithful`)** | drain → renders |
+| | | 1 | night-grid tail | probing shard at drain |
+| | | 2 | x6 ‖ x10 (btk T{6,10}; **YIELDS to the RLHF paper-faithful grid on contention — Han priority**) | RLHF paper-faithful grid (agentic port card ~04:30) |
+| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | **paper-faithful probing shard (preflight PASS, zero-sync)** | — |
+| | | 1 | rmx_b (eq-extension cells 2-6, mid-run) | probing shard at drain |
+| **pod B** (2×H100) | runpod-c alone | 0+1 | hill-climb FREEZE in progress (clean-halt + resume playbook + HF ckpt push) | BOTH GPUs → probing paper-faithful shards (substrate on-pod, zero sync) |
 | **mac-c-screen-0728** (L40S) | mac-c | — | warm-held (stated purpose) | sycgen within-domain screen (per-token baseline first), then evalage screen at generation drain |
 | **mac-d-retrain-0728** (2×H100) | mac-d | — | warm-held EXCLUSIVELY for the first hunt-KEEP matrix retrain (Han ruling: not a paper-faithful executor) | 7-T×3-seed×shuffle retrain the hour a KEEP posts |
 
-**CPU-side work in flight:** runpod-1 = paper-faithful trainable
-plugin + card (target ≤05:00) AND the protected 11:00 render
+**Priority order (Han, 02:38): paper-faithful sweeps outrank ALL
+btk GPU work; hunted tasks need either arm only; relu-mix is
+certificate evidence, never a matrix column.**
+
+**CPU-side work in flight:** runpod-1 = 11:00 render
 pipeline (7-point per-k probing figs+tables + the onset-map
 certificate with traces); runpod-2 = `agentic_txc_02` port
 (vendor pattern) + RLHF 7-point render + rmx cross-pod sha
