@@ -92,24 +92,30 @@ owner); my measurement notes in the 05:11 LOG entry (E1 low-T anchor
 anchor with runpod-c's T6; k5 seed-spread flag 0.8115–0.8467
 BINDING). **GPU 0 now FREE.**
 
-**⚑ STRUQPOS = feasible screen-ready candidate (charter ii; my
-design/verdict, mac executor):** premeasure PASSED at x5 breadth
+**⚑ STRUQPOS screen CARD = DESIGN PTR (task #10 in_progress; charter
+ii; my design/verdict, mac L40S executor):** premeasure PASSED at x5
 (usable 285–315k clears 250k floor UNMOVED; unigram 0.504–0.515,
-position ~0.500, 2040/2040 lossless — strongest label conditioning
-in the record). Expansion card `85191fcd5` frozen + RATIFIED
-(bd6eb4af1). **GPU screen greenlit; VENUE = a mac-spun L40S
-(mac-c/mac-d — pod agents can't spin pods); I remain design/verdict
-owner, they execute my frozen protocol** (sycgen handoff pattern).
-**MY NEXT DELIVERABLE: build + freeze the struqpos SCREEN PROTOCOL**
-(SCREEN_CARD + cache_acts + screen + verdict, reask_hr transplant)
-so the mac executor can run it — CPU-side, in flight now. NOT a KEEP
-(no probe yet). GOLD-VISIBILITY: a KEEP posts to HANDOFF same-beat.
+position ~0.500 — strongest label conditioning in the record),
+expansion RATIFIED bd6eb4af1. **Screen card
+`struqpos/STRUQPOS_SCREEN_CARD.md` posted def3b09b9 as a DESIGN
+PROPOSAL** — first document-level BINARY face in the hunt, so §2
+confound treatment (fixed-scaffold `### response:\n` readout +
+field-shuffle null vs the readout-proximity confound) + §5 KEEP/KILL
+clauses are flagged for hub review BEFORE the L40S burns.
+**SCRIPTS HELD** (cache_acts/screen/verdict embed the contested
+readout/shuffle/verdict choices — don't bet 3 scripts on a
+design under review). **NEXT: on the design nod ⇒ build+freeze the
+3 scripts in one commit (fit_probe + score_model discipline), hand
+frozen protocol to mac-c/mac-d L40S; corrections fold into the
+freeze first.** Likeliest outcome named in-card: C2 KILL (position
+not linearly encoded — the age-face order-null, a clean negative).
+NOT a KEEP. GOLD-VISIBILITY: a KEEP posts to HANDOFF same-beat.
 
-**Watch-fors:** (a) mac-c/mac-d L40S claim line for the struqpos
-screen ⇒ ensure my frozen protocol is landed first; (b) runpod-1
-fold-in may ask for my shard-E receipts (11:00 handoff);
-(c) § 8 draft-row application; (d) GPU 0 free — available for any
-new hunt/relief lane a directive routes here.
+**Watch-fors:** (a) hub ruling on the struqpos screen-card design
+⇒ build+freeze scripts; (b) mac-c/mac-d L40S claim line (protocol
+must be frozen first); (c) runpod-1 fold-in may ask for my shard-E
+receipts (11:00 handoff); (d) § 8 draft-row application; (e) GPU 0
+FREE — available for any hunt/relief lane a directive routes here.
 
 ## House-rule cache
 
