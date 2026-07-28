@@ -323,3 +323,104 @@ hygiene — training cells predicted byte-identical mints alias
 rows (013441cfd class); the program does not buy predicted
 aliases at $20. Effect: −$20 / −6.5 GPU-h est returned; GPU 2
 freed after x6/x10 for the af7d0869b hard-point render. PTR.
+
+## § 8 — PAPER-FAITHFUL ARM: agentic_txc_02 port + T-sweep (frozen 2026-07-28 ~01:46 UTC / ~02:46 London; commission 4ce0369de + sprint 606e4587d; arm mapping 692b1: {ReLU+TopK} = THIS, relu-mix = certificate evidence only)
+
+**Port (landed this commit, CPU-side per the sprint):**
+`src/temp_bench/archs/agentic_txc02.py` — the paper's RLHF TXC arm
+`agentic_txc_02` = `MatryoshkaTXCDRContrastiveMultiscale`, vendored
+VERBATIM from `han-phase7-unification@94119bc08` (class + full
+ancestry inlined, upstream param names kept ⇒ archived anchors load
+directly; the only `# v2-adapter:` line is the upstream's own
+t-sweep rule n_contr_scales = min(3, T)). Registry id
+`agentic_txc_02_v1t`, consumes=sequence (tsae precedent). The
+recorded paper TRAINING procedure is reproduced: shift-1
+adjacent-window pairs (one uniform offset per sequence — same
+(seq, off) support as upstream `make_pair_window_gen_gpu`),
+multiscale InfoNCE (scales min(3,T), γ=0.5, α=1.0), per-step
+decoder unit-norm, and the PLATEAU EARLY-STOP mirrored in-plugin
+(log every 200, window 5, threshold 0.02, min 3000 — upstream
+anchors converged at 4200/4600/5200 steps): post-plateau
+train_step returns a zero-graph loss so grads stay None and Adam
+is a true no-op — weights freeze at the plateau point under the
+fixed-step outer loop. Contract tests: `tests/test_agentic_txc02.py`
+(11 passing: exact-k/ReLU receipt, T=1 degeneration vs manual,
+matryoshka prefix-nesting, multiscale γ-weights vs hand
+computation, shift-1 pair adjacency, plateau freeze incl.
+Adam-no-op proof, min-steps gate, anchor state-dict compat,
+decoder norm, contract shapes). Suite otherwise green (the one
+failure, test_stage2_variance_panels legacy receipts, pre-exists
+on the clean tree — λ̂-lane's, flagged).
+
+**Port-cost flag (required in-card before GPU):** port + tests +
+card ≈ 1.7 h CPU, $0 GPU spent. Grid cost is PLATEAU-DEPENDENT:
+upstream cells converged at ~4-6k of 25k steps ⇒ expected
+per-cell wall ≈ 0.2-0.25 × fixed-25k wall × contrastive-heaviness
+(unmeasured on H100). **Bounds: ≈ $25-45 expected / ≈ $105
+worst-case (no plateau anywhere)** vs the $60-90 directive est.
+The PILOT CELL resolves this before the grid commits.
+
+**Data (anchor-forced):** datasource
+`gemma_2_2b_it_l13_fineweb_24k128` (data_key 48d2d17ff88598d4) —
+the PAPER's training stream. NOT phase7-l12: the T5 anchors are
+l13-IT-trained, and "T5 = archived anchor, never retrained"
+(directive) forces the whole curve onto the anchor's stream.
+Cache absent on this pod → REBUILD at x-drain via the committed
+`build_activation_cache` (config-keyed, deterministic spec).
+Eval: v2 RLHF evaluator (protocol 2.0.0, preference_auc_k20,
+within_window shuffle seed 0 — instrument IDENTICAL to the btk
+exhibit per the directive) over a NEW hh-rlhf eval cache at
+l13-IT (same builder as the l12 cache; fresh App-B.1-style
+integrity stats recorded at build).
+
+**Anchors:** `txcdr-base:ckpts/agentic_txc_02__seed{42,1,2}.pt`
+staged (sha256 receipts in `/workspace/logs/pf_staging.log`; SEED
+COVERAGE IS 3/3 — the T5 point lands with full seed band).
+`stage_anchors.py` (this commit) writes them under the pf_anchor
+cells' canonical train_keys (phase_b provenance-manifest
+precedent; side manifest `results/pf_anchor_provenance.json` maps
+train_key → upstream file + sha + final_step). Rows from these
+keys are paper-weight EVALS, never trainings — disclosed on the
+exhibit.
+
+**Grid (cells.py this commit):** T{1,2,4,6,8,10,16} × seeds
+{42,1,2} = 21 trained cells + 3 anchor evals. Batch schedule =
+the upstream t-sweep's recorded procedure: 1024 (T<10), 512
+(T10), 256 (T16). k_pos = k_win = 100·T. Lanes: `pf_pilot`
+(T2/s42 — THE GATE), `pf_lo` T{1,2,4}×3, `pf_mid` T{6,8}×3,
+`pf_hi` T{10,16}×3, `pf_anchor` (3 evals). Lanes are SHARDABLE:
+any free pod GPU may take pf_mid/pf_hi at this pin (AGENT_NAME
+env-stamped; coordinate via STATUS).
+
+**Fidelity gates (pass before the grid):**
+- **G1 pilot-vs-log:** pf_pilot (T2/s42) loss trace vs upstream
+  `agentic_txc_02_t2__seed42.json` (same recipe, same T, seed,
+  d_sae; different stream — theirs anchor-buf, ours the canonical
+  l13 cache, SAME underlying spec): converged=true, final_step
+  within [3000, 25000], plateau_last < 0.02, l0 ≈ k_win·(0.95-1.0)
+  band (their t2: 5800 steps, l0 ≈ 197/200). Divergence beyond
+  bands ⇒ STOP, report, no grid.
+- **G2 anchor-eval:** pf_anchor rows' preference_auc_k20 must
+  place the paper's TXC arm plausibly vs the paper's own RLHF
+  table ordering (TXC below tsae-k20's semantic lead, per the
+  audit's Stage-1 headline). Gross misplacement ⇒ eval-cache or
+  port bug — STOP.
+- **G3 exact-k receipt:** every trained cell logs l0 ≤ k_win with
+  the ReLU-zeroing gap (l0 < k_win strictly) — the paper-era
+  mixing fingerprint the plain-btk arm does NOT have.
+
+**Sequencing (GPU 2, after x6/x10 drain ~08:00-08:30 UTC):**
+(1) l13 activation-cache build (~40-60 min incl. IT model load,
+model pre-staged); (2) hh-rlhf@l13 eval cache (~25 min);
+(3) stage_anchors + pf_anchor evals (~15 min) → G2;
+(4) pf_pilot → G1; (5) grid: pf_lo ‖ pf_mid co-resident, pf_hi
+after (or sharded to free pod-A GPUs at this pin). Expected grid
+wall on GPU 2 alone ≈ 8-14 h (plateau-dependent); Day-1 evening
+landing per the sprint's honesty note. **11:00 btk renders are
+UNAFFECTED** (independent lane, GPU 2 work is btk-only until
+x-drain). Ledger: substrate ~$4 + pilot ~$2 + grid per pilot
+measurement — est/actuals lines per launch.
+
+PENDING TEAM REVIEW: the l13-stream reading (anchor-forced), the
+anchor staging pattern (phase_b precedent), the plateau-mirror
+freeze semantics, G1-G3 gates, batch-schedule mirroring.

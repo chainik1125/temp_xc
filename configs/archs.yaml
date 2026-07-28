@@ -596,6 +596,17 @@ archs:
       T: 5
     notes: "Paper-faithful TRAINABLE TXC-base (sprint 4ce0369de): vendored upstream class incl. training/anti-dead stack verbatim (per-sample TopK_k_win→ReLU, AuxK-on-dead bias-free decode, unit-norm + grad-parallel projection, geometric-median b_dec init). T via arch_hparams_override; archived T5 anchors stay on paper_txc_base_v1 (alias rule — never retrain)."
 
+  agentic_txc_02_v1t:
+    class_path: temp_bench.archs.agentic_txc02:AgenticTXC02
+    arch_version: "upstream-94119bc08-trainable-1.0.0"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/matryoshka_txcdr_contrastive_multiscale.py (+ matryoshka_txcdr{,_contrastive}.py ancestry, vendored verbatim)"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 500
+    notes: "Paper RLHF TXC arm (agentic_txc_02 = MatryoshkaTXCDRContrastiveMultiscale) TRAINABLE port: adjacent-pair InfoNCE (scales 3, gamma 0.5, alpha 1.0), TopK→ReLU per-window k_win=k_pos (pass k_pos=100·T), in-plugin plateau early-stop mirroring the recorded paper procedure. consumes=sequence."
+
   # ── tscale exploration revivals (runpod-c; CARD_SPLIT.md § 4) ──────
 
   txc_pro_r1:

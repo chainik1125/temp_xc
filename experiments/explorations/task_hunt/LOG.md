@@ -17718,3 +17718,39 @@ _Recorded-by: claude-fable-5 (runpod-a)_
   (runpod-c line; posts actuals at drain).
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+
+## 2026-07-28 01:48 UTC (02:48 London, date-verified) — runpod-2 — ⚑ PAPER-FAITHFUL PORT FROZEN (CARD § 8): agentic_txc_02_v1t plugin + 11 contract tests + grid lanes + anchor staging — ahead of the 04:00-04:30 ETA
+
+Sprint item 4 (606e4587d) delivered CPU-side while x6/x10 train:
+
+- **Plugin** `agentic_txc_02_v1t` (vendored verbatim from
+  94119bc08 w/ ancestry inlined, upstream param names ⇒ anchors
+  load directly): recorded paper procedure incl. shift-1 pair
+  InfoNCE (scales min(3,T) — the upstream's OWN t-sweep rule,
+  found in their runner), γ=0.5, α=1.0, batch schedule
+  1024/512/256 per their recorded T≥10 accommodation, and the
+  plateau early-stop MIRRORED IN-PLUGIN (post-plateau zero-graph
+  loss ⇒ grads None ⇒ Adam true no-op; proven in tests).
+- **Recon finds worth flagging:** (a) upstream ALREADY t-swept
+  this recipe (T{2,3,6,7,8} s42 logs at the pin — weights not
+  archived, logs become my G1 fidelity reference); (b) **T5
+  anchors exist at ALL THREE SEEDS** in txcdr-base (staged, sha
+  receipts) — the anchor point lands with a full seed band, not
+  s42-only; (c) plateau-realized budgets (4-6k steps) cut the
+  expected grid cost to ≈ $25-45 ($105 no-plateau worst case) vs
+  the $60-90 est — pilot cell resolves before the grid commits.
+- **Anchor-forced data reading (PTR):** T5-never-retrained forces
+  the curve onto the paper's l13-IT stream (not phase7-l12);
+  fresh l13 hh-rlhf eval cache built at x-drain w/ recorded
+  integrity stats; v2 shuffle instrument unchanged.
+- **Gates G1-G3 in-card** (pilot-vs-upstream-log, anchor-eval
+  placement, exact-k/ReLU fingerprint); grid lanes pf_lo/mid/hi
+  SHARDABLE at this pin for free pod GPUs.
+- Suite: my 11 tests pass; 294 others pass; the ONE failure
+  (test_stage2_variance_panels legacy receipts) PRE-EXISTS on the
+  clean tree — λ̂ lane's, not mine, flagged here.
+
+Sequencing at x-drain (~08:00): substrate (~1.5 h GPU) → G2/G1
+gates → grid. 11:00 btk renders unaffected. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

@@ -191,3 +191,69 @@ LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1,
          "tsae_s2": lane_tsae_s2,
          "x4": lane_x4, "rmx_a": lane_rmx_a, "rmx_b": lane_rmx_b,
          "rmx_b16": lane_rmx_b16}
+
+
+# ── CARD § 8: paper-faithful arm (agentic_txc_02_v1t) ──────────────────
+
+PF_ARCH = "agentic_txc_02_v1t"
+PF_DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"  # the paper stream
+
+
+def _pf_batch(T):
+    """Upstream t-sweep batch schedule (train_primary_archs.py ~L2027:
+    A40 OOM accommodation, part of the recorded procedure): 1024 below
+    T10, 512 at T10-14, 256 at T>=15."""
+    if T >= 15:
+        return 256
+    if T >= 10:
+        return 512
+    return 1024
+
+
+def pf(T, seed=SEED):
+    cell = {
+        "cell_id": f"rlhf_pf_agentic02_T{T}" + ("" if seed == SEED else f"_s{seed}"),
+        "arch": PF_ARCH,
+        "seed": seed,
+        "datasource": PF_DATASOURCE,
+        "training_cfg": TrainingConfig(
+            n_steps=N_STEPS, batch_size=_pf_batch(T),
+            arch_hparams_override={"d_sae": D_SAE, "T": T, "k_pos": 100 * T}),
+    }
+    return cell
+
+
+def lane_pf_pilot():
+    """CARD § 8: the port-fidelity gate cell — T2/s42, compared against
+    upstream training log agentic_txc_02_t2__seed42.json before the
+    grid commits."""
+    return [pf(2)]
+
+
+def lane_pf_lo():
+    """CARD § 8: T{1,2,4} × 3 seeds (T2/s42 = cache-hit after pilot)."""
+    return [pf(T, s) for T in (1, 2, 4) for s in (42, 1, 2)]
+
+
+def lane_pf_mid():
+    """CARD § 8: T{6,8} × 3 seeds."""
+    return [pf(T, s) for T in (6, 8) for s in (42, 1, 2)]
+
+
+def lane_pf_hi():
+    """CARD § 8: T{10,16} × 3 seeds (batch 512/256 per upstream)."""
+    return [pf(T, s) for T in (10, 16) for s in (42, 1, 2)]
+
+
+def lane_pf_anchor():
+    """CARD § 8: T5 anchor evals × 3 seeds — ckpts staged from
+    txcdr-base (stage_anchors.py, phase_b provenance-manifest
+    precedent), NEVER trained here (alias rule)."""
+    return [pf(5, s) for s in (42, 1, 2)]
+
+
+LANES.update({
+    "pf_pilot": lane_pf_pilot, "pf_lo": lane_pf_lo,
+    "pf_mid": lane_pf_mid, "pf_hi": lane_pf_hi,
+    "pf_anchor": lane_pf_anchor,
+})
