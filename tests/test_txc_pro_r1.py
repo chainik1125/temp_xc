@@ -387,3 +387,56 @@ def test_batch_pool_train_step_runs_and_keeps_mean_budget():
 def test_train_select_rejects_bad_value():
     with pytest.raises(ValueError):
         _toy(TXCProR1BTKOnly, T_max=4, train_select="pooled")
+
+
+# ── r1-c6: anchor-only recon toggle ─────────────────────────────────
+
+
+def test_recon_shifts_default_on_bit_identity():
+    torch.manual_seed(9)
+    a = _toy(TXCProR1BTKOnly, T_max=4)
+    torch.manual_seed(9)
+    b = _toy(TXCProR1BTKOnly, T_max=4, recon_shifts=True)
+    x = torch.randn(6, 8, D_IN)
+    torch.manual_seed(2)
+    la, _ = a.train_step(x.clone())
+    torch.manual_seed(2)
+    lb, _ = b.train_step(x.clone())
+    assert torch.equal(la, lb)
+
+
+def test_recon_shifts_off_ignores_shift_exclusive_positions():
+    """alpha=0 + recon_shifts=0 → loss depends ONLY on anchor windows."""
+    def mk():
+        torch.manual_seed(11)
+        return _toy(TXCProR1BTKOnly, T_max=4, contrastive_alpha=0.0,
+                    recon_shifts=0)
+    x1 = torch.randn(6, 6, D_IN)          # seq_len == min_seq → offsets all 0
+    x2 = x1.clone()
+    x2[:, 4:6, :] += 10.0                 # shift-exclusive positions only
+    m1, m2 = mk(), mk()
+    torch.manual_seed(3)
+    l1, _ = m1.train_step(x1)
+    torch.manual_seed(3)
+    l2, _ = m2.train_step(x2)
+    assert torch.equal(l1, l2)            # anchor-only objective is blind to them
+    # sanity: the DEFAULT objective is NOT blind to the same perturbation
+    def mk_full():
+        torch.manual_seed(11)
+        return _toy(TXCProR1BTKOnly, T_max=4, contrastive_alpha=0.0)
+    f1, f2 = mk_full(), mk_full()
+    torch.manual_seed(3)
+    lf1, _ = f1.train_step(x1.clone())
+    torch.manual_seed(3)
+    lf2, _ = f2.train_step(x2.clone())
+    assert not torch.equal(lf1, lf2)
+
+
+def test_recon_shifts_off_still_trains():
+    m = _toy(TXCProR1BTKOnly, T_max=4, contrastive_alpha=0.0, recon_shifts=0)
+    m.train()
+    x = torch.randn(6, 8, D_IN)
+    loss, info = m.train_step(x)
+    loss.backward()
+    assert torch.isfinite(loss) and m.W_enc.grad is not None
+    assert float(info["l0"]) <= m.k_train + 1e-6

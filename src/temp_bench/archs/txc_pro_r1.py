@@ -123,6 +123,7 @@ class TXCProR1(TempBenchArch):
         k_anneal_mult: float = 1.0,            # r1-c4: >1 widens k_train early
         k_anneal_steps: int = 0,               # r1-c4: linear wide→nominal over N steps
         train_select: str = "row",             # r1-c5: "batch" = pooled B·k admission
+        recon_shifts: bool | int = True,       # r1-c6: 0 = anchor-only recon
     ):
         super().__init__()
         # r1: resolve the T alias (grid override convention).
@@ -171,6 +172,12 @@ class TXCProR1(TempBenchArch):
         if train_select not in ("row", "batch"):
             raise ValueError(f"train_select must be 'row' or 'batch'; got {train_select!r}.")
         self.train_select = train_select
+        # r1-c6: shift-window reconstruction toggle. The recovered recipe
+        # sums recon over anchor + all shift windows (3 terms at shifts
+        # (1,2) — 3× the twin's per-step recon gradient scale, a C6
+        # concentration suspect). 0/False = anchor-only recon; the shift
+        # windows are still encoded when contrastive_alpha > 0.
+        self.recon_shifts = bool(recon_shifts)
         self.shifts = tuple(int(s) for s in contrastive_shifts)
         self.contrastive_alpha = float(contrastive_alpha)
         if contrastive_inverse_distance_weight:
@@ -415,10 +422,13 @@ class TXCProR1(TempBenchArch):
 
         l_contr = torch.zeros((), device=x.device, dtype=x.dtype)
         for k_idx, x_pos in enumerate(x_positives):
+            if not self.recon_shifts and self.contrastive_alpha <= 0.0:
+                break                              # r1-c6: shift windows fully unused
             pre_p = self._pre_activation_sampled(x_pos, sample_idx)
             z_pos = self._train_sparsify(pre_p, k_now)   # r1-c4/c5: same admission as anchor
-            l_recon_p, _ = self._recon_sampled_matryoshka(x_pos, z_pos, sample_idx)
-            l_recon = l_recon + l_recon_p
+            if self.recon_shifts:                  # r1-c6: anchor-only recon option
+                l_recon_p, _ = self._recon_sampled_matryoshka(x_pos, z_pos, sample_idx)
+                l_recon = l_recon + l_recon_p
             if self.contrastive_alpha > 0.0:
                 w_s = self.loss_weights[k_idx]
                 l_contr = l_contr + w_s * _info_nce(

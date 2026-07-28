@@ -388,3 +388,53 @@ batch-pool component) → selection rule must differ by T — record as a
 structural finding. (H-fail-T1) even sustained pressure leaves T1
 ≈ 0.82 → concentration is not admission-driven at T1; re-examine
 (single-position encoder slab? b_enc bias?) before C6.
+
+---
+
+## C5 interim — batch-pool T1 datum + TWIN CENSUS — 2026-07-28 ~02:45 London (C5 T16 in flight)
+
+C5 T1 (cfg cfdac03dcaa38b97): k20 **0.8221** — best collapsed-family
+T1 yet still FAILS the floor (0.8844). **Census surprise:**
+`frac_latents_active_batch` = **0.0073** — the MOST concentrated
+dictionary in the program (r1-min 0.024, C4 0.054) at the best
+r1-family T1 score. Diversity is NON-MONOTONE with AUC within the r1
+family at T1 — the earlier three-context correlation gets this caveat
+on the record.
+
+**Twin census (measurement, this session):** the baseline twin's T1
+ckpt (83a57e4412200a37) under its TRAIN-path selection on a matched
+1024-row batch: `active_frac = 0.1276`, top-20 latents carry 11.4 %
+of fired slots, 676 latents cover 50 %, l0/window 20.0 exact. So the
+twin IS ~5–17× more diverse than every r1-family T1 — but C5 shows
+the SAME pooled selection rule yields 0.128 active on the twin
+backbone and 0.0073 on r1's. **The selection rule is exonerated; the
+BACKBONE (what feeds selection) drives concentration.** Remaining
+diff list at T1: (a) geometric-median b_dec centering (r1 yes / twin
+no), (b) shift-window reconstruction (r1 sums recon over anchor + 2
+shifted windows = 3× per-step recon gradient scale; twin has one
+window), (c) sequence serving with random anchor offsets. C5's
+H-fail-T1 branch is CONFIRMED at T1 (sustained pool pressure does not
+heal it); its T16 cell still decides H-fail-T16 (~03:30).
+
+---
+
+## C6 — backbone diff-ablations at T1 (`c6-nobdec-4k` / `c6-noshiftrecon-4k`) — PRE-REGISTRATION 2026-07-28 ~02:45 London (before launch)
+
+**Design:** isolate the two cheap suspects from the C5 diff list on
+the r1-min backbone, T1-ONLY screens (6 min each; T16 follow-up ONLY
+for a cell that moves T1 materially): (a) `bdec_geom_median_init=0`
+(existing hparam; passed as int 0 — the string "false" would be
+truthy) — kills the geometric-median centering diff; (b)
+`recon_shifts=0` (new `# r1-c6:` tagged knob in txc_pro_r1.py,
+default-on bit-identical, tested 32/32 incl. a shift-exclusive
+blindness check) — anchor-only reconstruction, killing the 3×
+recon-gradient-scale diff. Cells: T1, 4k, dev-8 s42, both k, r1-min
+backbone, tags above, GPU 1 on C4-T16 drain. Serving diff (c) is not
+cheaply isolable (consumes='sequence' is structural) — deferred.
+
+**Read rules:** T1 ≥ 0.8844 (gate floor) on either cell → that diff
+IS the collapse driver → T16 confirmation cell immediately (the win
+must survive the removal). Material move (≥ +0.03 over r1-min's
+0.8071) short of the floor → partial driver; combine both knobs in a
+follow-up cell. Both flat → the driver is the serving/init residue —
+re-think before spending more (C7 would need the serving isolation).
