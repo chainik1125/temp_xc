@@ -68,6 +68,12 @@
   agents/runpod-2); re-arm per wake. Keep-BOTH on LOG conflicts AFTER
   verifying both parents have 0 legit ======= lines. Rows checkpoint
   before any pull while lane runs.
+- **HOUSE RULE (660c50488, adopted 04:19): explicit paths in every
+  commit — no `git add -A` while canonical jsonls are live; manual
+  conflict handling on canonical files (keep-BOTH flow qualifies).**
+  My rows-checkpoint path set: results/leaderboard.jsonl,
+  checkpoints/manifest.jsonl, agents/runpod-b/*, task_hunt/LOG.md,
+  briefings/MODAL_SPEND.md.
 - Stuck-rebase escape: commit --no-edit + rm -rf .git/rebase-merge +
   checkout -B arxiv HEAD. Stamps from `date` BEFORE writing. PTR
   everything; launches pin-asserted clean-tree; AGENT_NAME inline.
