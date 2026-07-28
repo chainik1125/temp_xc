@@ -34,6 +34,32 @@ rho is plausibly high, which makes evalage's shortfall **larger** than
 why this script measures rho from the actual predictions instead of
 assuming it.
 
+⚑ CORRECTION (mac-c, 2026-07-29 00:3x) — **THE PARAGRAPH DIRECTLY ABOVE
+IS WRONG, AND THIS SCRIPT'S OWN OUTPUT IS WHAT REFUTED IT.** Left in
+place rather than deleted, because the reasoning is a trap worth seeing.
+
+Measured rho, from the predictions this file saves:
+
+    T8  rho = 0.518     T16 rho = 0.534     T64 rho = 0.383
+
+**Moderate, not high.** The hub's illustrative rho=0.5 was well
+calibrated; my objection to it was **backwards**. And the direction
+matters: lower rho means a SMALLER shortfall in sigma units, so the
+correct adjustment **HELPS the rescue case**, the opposite of what I
+wrote. `evalage`'s best leg misses by ~0.33 sigma, not 0.54.
+
+Why the argument felt right and was not: "same labels, same rows,
+related features" bounds how much the two arms can DISAGREE, not how
+correlated their ERRORS are. The window arm's extra information changes
+which rows it gets wrong, which is precisely what decorrelates the error
+vectors — and the more the window helps, the LOWER rho goes. T64 has the
+largest gain (+0.1182) and the lowest rho (0.383); that is not a
+coincidence, it is the mechanism.
+
+**Do not cite the paragraph above as a reason against the rescue.** It
+is retained only so the next reader sees the plausible-but-wrong version
+next to the measurement that killed it.
+
 ## Method
 
 For each cell, refit at N seeds keeping per-example predictions, then:

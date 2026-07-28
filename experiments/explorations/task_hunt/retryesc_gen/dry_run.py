@@ -107,8 +107,18 @@ def main() -> None:
           + "  ".join(f"T{t}={cz['frac_in_window'][f'T{t}']:.4f}'"[:-1]
                       for t in TS))
     verdict = "IN BAND" if lo_b <= f64 <= hi_b else "OUT OF BAND"
+    # ⛔ SUPERSEDED PREDICTOR (mac-c 2026-07-29 00:3x): `floor_excess = f`
+    # is a LOW-DENSITY APPROXIMATION, refuted at d2320d274. The floor's
+    # second feature is fed `event_mask`, so its horizon is T + w, not T,
+    # and the right quantity is P(any masked turn-token in window). On
+    # THIS corpus (w=25) the old form under-predicts by ~0.075 — it says
+    # 0.185 where the measured floor_excess is 0.261. The band verdict
+    # printed below is therefore computed on the wrong statistic; kept so
+    # the historical run is reproducible, NOT to be aimed with.
+    # Use floor_predictor_test.py.
     print(f"\n  => predicted floor_excess = f(T64) = {f64:.4f}   "
-          f"band [{lo_b}, {hi_b}]   **{verdict}**")
+          f"band [{lo_b}, {hi_b}]   **{verdict}**   "
+          f"[⛔ SUPERSEDED STATISTIC — see note above]")
 
     # Write the stream so the premeasure path can be smoke-tested at $0.
     # ⚠ STUB PROSE: every assistant turn is near-identical filler, so any

@@ -1,5 +1,32 @@
 """Receipt for GENERATION_CARD.md s2 — `floor_excess` == in-window fraction.
 
+⛔⛔ SUPERSEDED (mac-c, 2026-07-29 00:3x). **THE IDENTITY THIS WHOLE FILE
+VALIDATES IS A LOW-DENSITY APPROXIMATION, NOT A LAW.** Refuted by
+measurement at `d2320d274`; do not aim a corpus with it.
+
+`floor_excess = f = P(event_first inside the T-window)` ignores the
+second feature the floor actually gets. `dose_window_count` is fed
+`event_mask`, so the floor sees **any masked EVENT-TURN token** in the
+window, not just the event's first token — its effective horizon is
+**`T + w`**, where `w` is the masked turn width. The corrected law is
+`floor_excess ~ P(any masked turn-token in the T+w window)`.
+
+Measured on 6 legs / 2 corpora (`floor_predictor_test.py`):
+
+    OLD (f)  mean |resid| 0.0391  max 0.0756
+    NEW      mean |resid| 0.0056  max 0.0075     <- 86% error reduction
+
+The gap is small at low density, which is why the identity survived
+review: on `evalage` (w=13) the old form is off by ~0.005, on
+`retryesc_gen` (w=25) by ~0.075. **A receipt validated on the sparse
+corpus and applied to the dense one is exactly how this got through.**
+
+The simulation below is still correct ABOUT ITS OWN MODEL — it assumes
+the only in-window signal is the event's first token. That assumption is
+the error. Kept as the record of a superseded aiming rule, with the
+`T <= e1` correction it originally caught still intact and still valid.
+**Use `floor_predictor_test.py` to aim anything.**
+
 The card's density target rests on one identity: for a balanced 3-class
 AGE face whose `visible_evidence_floor` is fit on
 `(censored_age, in_window_event_count)`, the floor's excess over chance
