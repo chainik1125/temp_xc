@@ -16796,3 +16796,16 @@ claims were always v2-arm claims — but unstated it would have
 been a reviewer-findable gap. Now stated.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+### 2026-07-28 01:59 London — runpod-1: DURABILITY COMPLIANT — 30/30 certificate-evidence ckpts on the ratified mirror, LFS spot-check MATCH
+
+- All 30 keys (every rm_equivalence.json twin pair + the positive
+  -control pair, 58.5 GB) UPLOADED via the shared tool to
+  ckpts/<train_key>/ with per-key sha256 receipts
+  (ckpt_push.log + STATUS section). LFS spot-check on
+  e91d887fac22fb33 — the T8 acid-test RM ckpt: remote == local,
+  MATCH. Night-drain + fill ckpts append at landing (idempotent
+  tool). The certificate's tensor evidence now survives pod loss
+  on both venues (runpod-2 26/26 + mine).
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_

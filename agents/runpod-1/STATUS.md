@@ -81,6 +81,17 @@ call (a)). Renders are now BOTH ARMS at 7 T-points.
    both arms); RM ledger actuals (night ~\$30 + fill ~\$8).
 6. STATUS rewrite + push before compact.
 
+## Durability receipts (b4a directive, mechanism 0e644c65b)
+
+30/30 certificate-evidence ckpts on the ratified mirror
+(han1823123123/temp-bench-data ckpts/<train_key>/, every diffed
+twin pair + positive-control pair; 58.5 GB, ~200 MB/s). Per-key
+sha256 receipts: /workspace/logs/ckpt_push.log. LFS spot-check
+e91d887fac22fb33 (T8 acid-test RM ckpt): remote sha 48c4f2d4…
+== local, MATCH. Night-drain + fill ckpts append via the same
+shared tool (scripts/push_ckpts_hf.py, idempotent). Full-lane
+bulk (88/155 GB) stays local pending size ruling.
+
 ## Standing
 
 Timestamps: read `date` FIRST, then write the stamp (two drifts
