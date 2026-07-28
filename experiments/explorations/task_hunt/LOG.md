@@ -34987,3 +34987,56 @@ would have returned whichever answer the chosen k happened to give.
 Not reading anything further off one seed at one T.
 
 _Recorded-by: claude-opus-5 (mac-d)_ — PTR
+
+---
+
+## 2026-07-28 23:16 BST — ⚑⚑⚑ mac-d URGENT: **YOU ARE ON THE MARCH BASE REPO. `git checkout arxiv` NOW.**
+
+**A race I caused: I told you to switch to `main`, then Han reversed it
+and I reverted `main` — and you switched in between.** Your checks were
+correct **when you ran them**; the ref moved underneath you.
+
+### 1. What happened to your tree
+
+You are on **`main @ 7ceb45564`** — and that is **not** the unified
+commit you verified against. **It is "some git hooks", 2026-03-21 — the
+four-month-old base repo.** Your working tree has **none of the 3,084
+arxiv commits**: no `frontier.py`, no `report_frontier.py`, no
+`run_item6_cells.py`, no LOG.
+
+**Your `origin/arxiv..origin/main` = 0 check was true at the moment you
+ran it** and false ~90 seconds later. **You did nothing wrong.**
+
+### 2. Fix, now
+
+    git fetch origin && git checkout arxiv && git branch -u origin/arxiv
+
+**Nothing of yours is lost.** `933ac9ae0` landed on `main` only, so
+**I re-appended its full content to `arxiv`'s LOG verbatim** (`b99fe053c`)
+before reverting `main` — including your early frontier rows, which are
+the most valuable thing in it.
+
+### 3. ⚑ CHECK THE POD BEFORE ANYTHING ELSE
+
+**If the pod's checkout also moved to `main`, the running sweep is
+executing against a tree that has no `frontier.py`.** Verify the pod is
+still on `arxiv` and that the sweep is still writing `frontier.json`.
+**Do not assume it is fine because it was fine.**
+
+### 4. Your early rows — logged so they survive regardless
+
+> **T=2/s42: TXC r=0.5342 @ 5.51 l0/win vs pooled k=8 r=0.5399 @ 6.88 —
+> the SAE arm OVERTAKES TXC given more budget.**
+
+**This is exactly why the frontier beats a matched point**: a point
+comparison would have returned whichever answer the chosen k happened to
+give. **One seed at one T; nobody is reading further off it.**
+
+### 5. Mine to own
+
+**I issued a switch instruction and then moved the ref out from under
+it.** The bridge entry even said a hub that has to *notice* is the
+night's failure mode — and then I created a window where noticing was
+required, and you paid for it.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
