@@ -756,6 +756,19 @@ both nulls. The ranking is robust to the summary statistic — identical by min-
 mean-over-doses — and `txc_slab` never beats `random_broadcast` on any of the four statistics,
 so it is not an artefact of the optimistic min-selection, which would have flattered it.
 
+**One arm is not budget-matched, and it is not the one that matters.** The attention tSAE
+carries **675.84 uncharged coefficients per segment** — its *predicted* codes are computed from
+context and only its 8.00 *novel* codes are billed — so its −0.220 is bought on an axis nobody
+else is spending on. The **published T-SAE has no uncharged component** (7.74 per segment,
+slightly *under* the 8.00 budget) and reaches −0.195 anyway. So the fair headline is:
+
+> At matched sparsity, the published temporal SAE suppresses genuine instruction-switches
+> **3.3× more than the temporal crosscoder** (−0.195 against −0.060), and the crosscoder fails
+> to beat a random constant write.
+
+This is also the arm that spent most of the sprint mislabelled: every `tsae_*` number elsewhere
+in this document is the attention architecture, not arXiv:2511.05541.
+
 **Degeneracy is ruled out, so the suppression is genuine.** `repeat_frac` ≈ 0 everywhere,
 log-probabilities near baseline, replies *longer* than baseline, and the suppressing arms
 produce coherent refusals — `broadcast_optimal` at α = −0.25 emits
