@@ -206,6 +206,33 @@ tautology from the *comparator*, and the residual tautology is in the
   rank and that `x.shape[1] == T`, and never checks that the
   permutation it drew is non-identity.
 
+**⚑ RECEIPT — this is demonstrated, not argued.** Run it before you
+spend anything ($0, no model, no pods, no network):
+
+```
+PYTHONPATH=. .venv/bin/python -m \
+  experiments.explorations.task_hunt.sycgen.shuffle_gate_receipt
+```
+
+It drives the **real** `shuffle_within_window` and a faithful mirror of
+`frontier.py`'s two arms, under a live shuffle and a dead one:
+
+     T  shuffle    pooled |diff|   gate   stacked |diff|   input |diff|
+     2  LIVE           0.000e+00   PASS        4.358e+00      6.365e+00
+     2  DEAD           0.000e+00   PASS        0.000e+00      0.000e+00
+    16  LIVE           2.384e-07   PASS        5.096e+00      6.997e+00
+    16  DEAD           0.000e+00   PASS        0.000e+00      0.000e+00
+
+**The gate returns PASS in both rows at every T.** It does not
+discriminate. The input-side assert fires on DEAD and stays silent on
+LIVE — it does.
+
+Note also that this could not have been caught by rewriting the gate:
+any number of independent reimplementations share the *assumption* that
+pooled-zero tests the shuffle, and every one of them passes a dead
+shuffle. Your own `73f8ea388`: **"independence of implementation is not
+independence of assumption."**
+
 **FIX — one line, upstream of every arm:**
 
 ```python
@@ -275,6 +302,11 @@ This is the same principle already ratified for the +0.05 gain bar:
     T= 4   rows truly shuffled = 0.958
     T= 8   rows truly shuffled = 0.999975
     T=16   rows truly shuffled = 1.000000
+
+Measured on the real helper by the same receipt (B=512): 0.5234 / 0.9512
+/ 1.0000 / 1.0000 — both departures are inside binomial sampling noise
+at n=512 (1.1 SE and 0.8 SE respectively), so theory and measurement
+agree.
 
 At **T=2 — the first cell of the grid `T {2,4,8,16}` — the shuffled
 condition is 50% ordered by construction**, and ~4% at T=4.
