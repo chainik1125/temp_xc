@@ -175,12 +175,36 @@ mechanism-vs-metric split from the opposite regime:
   falling) — the composition the paper shipped is the composition
   this certificate measured.
 
+### 7a. Panel convention (BINDING pin, LOG a9a7de92f)
+
+**Every AUC in this certificate is the 38-task panel** — the
+paper's convention (`mean_auc` as evaluated, no exclusions), the
+same panel the published "TXC-base at 0.899–0.902" reading uses.
+The `figs_writeup/` twins (incl. `fig_probing_shuffle_tsweep_pf_
+k{5,20}`) plot **SAEBench-36** (CT pair excluded) and sit ~0.03
+higher on the SAME checkpoints. Cross-quoting the two panels
+manufactures a phantom gain; do not.
+
+Measured on this arm (42 cells, both panels from the same rows):
+the offset is **+0.0221 at k5** (range +0.0201…+0.0230) and
+**+0.0266 at k20** (range +0.0250…+0.0287) — independently
+reproducing the hub's anchor pair (0.8975 → 0.9248 = +0.0273 at
+k20). **The offset is near-T-invariant**: it is a level shift, so
+every verdict here — E1 (zero-picks census), E2 (pf−btk at matched
+panel), E3 (interpolation), and the §3 Δauc map — is
+panel-invariant. The pin governs how numbers are QUOTED, not what
+they mean.
+
 ## 8. Scope & pointers
 
 - relu-mix remains certificate evidence ONLY (arm mapping 692b) —
   never a matrix column.
 - 11:00 protected btk renders are exhibit-side and cite this
   certificate; they do not gate it.
+- Panel convention is BINDING and self-declared at both ends: §7a
+  here, and a header line the renderer now emits into every
+  auto-generated `RESULTS_*.md` (analysis.py) — so neither a table
+  nor a fig can be read without its panel.
 - PTR: every number above re-derives from `results/leaderboard.jsonl`
   + `rm_equivalence.json` + the trace files; no hand-carried values.
 
