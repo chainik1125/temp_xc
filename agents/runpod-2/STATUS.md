@@ -130,6 +130,16 @@ exhibit); § 8 l13-stream reading + anchor staging + plateau
 mirror + G1-G3; stage2_variance_panels legacy test failure =
 PRE-EXISTING, λ̂ lane's (flagged 01:48 LOG).
 
+## Queued: morning manifest owner pass
+
+mac-d flag 7af84fb80: 336 same-train_key content conflicts
+pod↔local in checkpoints/manifest.jsonl (mirror-status rewrites
+vs as-launched) — hub-coordinated owner pass in the morning;
+runpod-1 queued too (8d74622e1). I attend as RLHF-ckpt owner.
+My live manifest lines are APPEND-ONLY new train_keys
+(stash-protected around pulls) — commit only my appends at
+drain, keep-both on collision, NO unilateral conflict fixes.
+
 ## If resuming after compact
 
 Read this + LOG tail from my 01:48 entry + CARD § 8. Check:
