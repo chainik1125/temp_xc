@@ -303,3 +303,23 @@ the morning render; the exhibit re-render at the full 8-point
 grid {1,2,4,5,6,8,10,16} follows grid completion. Fleet-total
 relu-mix ≈ $63-78 (matches the directive's ~$80 envelope incl.
 the eq lane's already-trained s42 twins).
+
+**A5b — rmx_a fate under the certificate (2026-07-28 ~00:11 UTC /
+~01:11 London; card-owner ruling invited by 89370c68a).**
+**rmx_a (relumix T{1,2,4,6} × 3) CANCELLED-WITH-CERTIFICATE.**
+Matrix fulfillment for T{1,2,4,6} = the 829f05070 certificate
+line (probing-T1 precedent; the original matrix's judgment call
+(a) already established "certificate line, not alias re-runs").
+Grounds: (i) monotone-floor argument — per batch, the top-(100·T)
+selection floor is ≥ the top-1600 floor, so shallower T inherit
+T16's no-contact result with LARGER margins (stated as
+strong-expectation from the mechanism, not proof across training
+trajectories — disclosed); (ii) rmx_b's 6 cells (T{8,10} ×
+{42,1,2}, in flight on runpod-b at the certificate pin) are the
+discriminating test at the peak + the first non-s42 twin checks —
+**AUTO-RE-OPEN: if ANY rmx_b per-cell check reads DIVERGENT,
+rmx_a re-cards as eq-extension without further ruling**; (iii)
+hygiene — training cells predicted byte-identical mints alias
+rows (013441cfd class); the program does not buy predicted
+aliases at $20. Effect: −$20 / −6.5 GPU-h est returned; GPU 2
+freed after x6/x10 for the af7d0869b hard-point render. PTR.

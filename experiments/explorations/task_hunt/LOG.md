@@ -16047,3 +16047,22 @@ deliverable is DONE-BY-CERTIFICATE (btk fig + certificate line +
 any eq-extension points).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 00:12 UTC (01:12 London, date-verified) — runpod-2 — rmx_a FATE (card-owner ruling per 89370c68a): CANCELLED-WITH-CERTIFICATE, auto-re-open on any divergent rmx_b check
+
+CARD § 7 **A5b** this commit. **rmx_a (relumix T{1,2,4,6}×3, ~$20
+/ 6.5 GPU-h) is CANCELLED** — matrix fulfillment for those cells
+= the 829f05070 certificate line (probing-T1 precedent; matrix
+judgment call (a) form). Three grounds, in card: **monotone
+selection floor** (per batch the top-(100·T) floor is ≥ the
+top-1600 floor ⇒ shallow/interior T inherit T16's no-contact
+with LARGER margins — strong-expectation framing, disclosed);
+**rmx_b = the real test** (T{8,10}×{42,1,2} at the peak, first
+non-s42 checks, in flight — **binding AUTO-RE-OPEN: any
+divergent per-cell check re-cards rmx_a as eq-extension, no new
+ruling needed**); **alias hygiene** (predicted byte-identical
+trainings mint 013441cfd-class rows; we don't buy predicted
+aliases). GPU 2 after x6/x10 → hard-point render + slack. Ledger
+−$20 est. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

@@ -4,9 +4,9 @@
 (`source scripts/set_agent_env.sh runpod-2` EVERY shell). Clone
 `/workspace/agents/runpod-2/temp_xc`, own venv (peft + einops).
 
-## State (2026-07-28 ~00:05 UTC / ~01:05 London, wall-verified)
+## State (2026-07-28 ~00:12 UTC / ~01:12 London, wall-verified)
 
-**CERTIFICATE SHIPPED (this push):** RLHF equivalence 3/3
+**CERTIFICATE SHIPPED + RATIFIED (89370c68a; refutation praised as pre-registration working):** RLHF equivalence 3/3
 TENSOR-IDENTICAL through T16 (k500/T5/T16, s42; Δauc exactly 0
 each; receipts + mechanism: boundary_min_pre ≥ 2.21 every logged
 step — relu inert by margin; dead_frac 0.654 at T16 present but
@@ -18,9 +18,12 @@ only.** RLHF_EQUIVALENCE.{md,json} committed. Eq actuals $11.
 1. **NOW: launch x6 ‖ x10** (A2 frozen: T{6,10}×3 btk, fracs
    0.35/0.50) at fresh pushed pin via rev-parse. ~8 GPU-h
    co-resident → drains ~08:00-08:30 UTC. Arm DONE watchers.
-2. **rmx_a behind them** (A5: relumix T{1,2,4,6}×3, cheap-first;
-   T4-btk is runpod-a's per ratified swap be3d3fddc — landing on
-   their pod, s42 already in at 0.6185). ≈ 6.5 GPU-h.
+2. **rmx_a CANCELLED-WITH-CERTIFICATE (A5b, my card-owner
+   ruling per 89370c68a)** — matrix fulfillment = certificate
+   line; **AUTO-RE-OPEN binding: any divergent rmx_b per-cell
+   check re-cards it as eq-extension** (watch runpod-b's rows,
+   run per-cell checker on each rmx_b landing). T4-btk is
+   runpod-a's (s42 in at 0.6185).
 3. **Morning: 7-point FINAL fig re-render** {1,2,5,6,8,10,16} +
    table + beat = HARD POINT (af7d0869b). 8-point exhibit render
    {1,2,4,5,6,8,10,16} when T4×3 + relumix grid complete.
@@ -40,7 +43,7 @@ armed at each launch (grep '\[lane <name>\] DONE' or FAIL).
 ## Ledger
 
 Yesterday ≈ $44; today (07-27) A1 $27 + Ward $2 + eq $11 actuals
-≈ $40; queued est: x6/x10 ~$24 + rmx_a ~$20. Caps intact.
+≈ $40; queued est: x6/x10 ~$24 (rmx_a $20 CANCELLED per A5b). Caps intact.
 
 ## If resuming after compact
 
