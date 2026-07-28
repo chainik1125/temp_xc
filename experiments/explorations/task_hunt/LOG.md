@@ -30334,3 +30334,80 @@ too. The guard failing on its own warning text is how the granularity
 bug surfaced — which is an argument for guards that can fail.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~18:2x BST — mac-local HUB: hunt RE-AIMED at safety-relevant gold, with a **new candidate source** — Han's clew registry replaces introspection as the sampling distribution
+
+**Han: *"mac-c must continue on the task-hunt, again the OBJECTIVE IS
+SAFETY RELEVANT GOLD TASKS."*** Brief issued:
+`briefings/hunt-safety-gold-clew.md`.
+
+### 1. Why the source change is the substantive part
+
+Three candidates have been sourced by introspection — `reask_hr`,
+`evalage`, `retryesc_gen` — and all three resolved WEAK or KILL. **That
+is a sampling problem, not bad luck.** Candidates were invented from
+one head, and a head has a distribution. Han has supplied a different
+one: **~1083 curated safety/interp works** (956 arXiv/S2, 77
+alignment-blog, 50 transformer-circuits). The brief's whole purpose is
+to make mac-c sample from *that*.
+
+### 2. clew VERIFIED WORKING before it was handed on
+
+I do not hand another agent a dependency I have not run. `clew stats`
+under `CLEW_AGENT=mac-local CLEW_READONLY=1`: **1083 works, 994 papers,
+986 S2 vectors, citegraph coverage 881/994 bibliographies + 126/127
+venue pages, last sync 2026-07-25.** Two semantic probes returned
+directly on-target material — *State over Tokens*, *Stateless Yet Not
+Forgetful: Implicit Memory as a Hidden Channel*, *Neural Chameleons*,
+*Latent Introspection*, *Steering Awareness*, *Model-Internals
+Classifiers* (the last is alignment-blog — **S2 cannot see it**, which
+is exactly clew's differentiator).
+
+**One gotcha found and passed on:** `--json` output carries progress-bar
++ adapter noise on stderr and a `note:` line before the JSON. My first
+parse crashed on it. The brief carries the fix (`raw[raw.index('{'):]`)
+so mac-c does not lose the same ten minutes.
+
+### 3. What the brief pins that previous hunt briefs did not
+
+- **"Gold" defined operationally, three conjuncts:** safety-meaningful
+  state **AND** per-token-silent **AND** a trailing functional of sparse
+  events. Not "a task about a safety topic". `sycgen` is the shape.
+- **The floor clause is the binding bar, not gain.** `retryesc_gen`
+  *cleared* gain 3/3 (+0.063…+0.069) and died on the floor 3/3. A task
+  can detect and still not discriminate.
+- **Aim density before generating.** `floor_excess ≡ P(event in window)`
+  exactly (err 2e-6) makes density a *design parameter*; `claim_zone`
+  under-reads it by up to +0.076 and the whole 0.185→0.261 overshoot
+  was that bias. Correct for it or overshoot again.
+- **Attempt caps are per face-family** — `retryesc_gen`'s family is
+  closed at 2/2; a new family starts fresh.
+- **Acceptance gate admits a reasoned negative on the SOURCE** ("swept
+  these clusters, here is why nothing generatable"), with queries listed
+  so it reproduces. **Silence is not acceptable; a WEAK verdict is.**
+
+### 4. S2 key hygiene restated in-brief
+
+Env-only from the keychain, **never as a command-line argument**
+(process listings leak args), never echoed or written to any file, no
+`set -x`. **1 req/s CUMULATIVE including Han's own syncs** — batch
+endpoint over per-paper loops, ≥1.1 s spacing, cap retries at ~3 and
+fail loudly, and do not run S2 alongside a `clew sync`.
+
+### 5. ⚑ mac-c may not be able to receive this
+
+**Evidence, stated as evidence and not as a verdict:** mac-c's session
+process is **alive** (pid 46279, up 1d21h), but its worktree has had
+**zero file modifications in 130 minutes**, no push in **118 minutes**,
+and no answer to the 17:4x liveness request. Three independent
+indicators, all consistent with **idle at a turn boundary** rather than
+crashed or working.
+
+**If that reading is right, no push of mine will start it** — a briefing
+on origin is not an interrupt. Flagged to Han: mac-c may need a turn.
+I have twice today read a working interval as a stall, so I am
+reporting the indicators rather than declaring the state.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
