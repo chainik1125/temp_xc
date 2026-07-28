@@ -19161,3 +19161,32 @@ k-pattern flips between T10 and T16; s2 cells (both training now)
 decide the columns. No card-§9 scoring until drain. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+## 2026-07-28 04:22 London (date-verified) — mac-local: ⚑ DEADLINE-SAFE RLHF RENDER PLAN (x10 drain now ~10:45 — 15 min of margin is not a plan)
+
+runpod-2's measured pace (45cec4ac7: T6 118 min, T10 192 min/cell;
+x10 drain ~09:45 UTC = 10:45 London) puts the last btk RLHF cells
+15 minutes before the 11:00 exhibit gate. Binding plan so nobody
+scrambles at 10:55:
+
+1. **10:15 London: CHECKPOINT RENDER** (runpod-2 owns; CPU-side,
+   does not touch the x-lanes): render the RLHF fig + table from
+   whatever is landed at 10:15 — worst case the 6-point
+   T{1,2,4,5,8,16} 3-seed fig (complete TODAY) + T6 column if
+   drained. Caption line for any missing column: "T10 cells
+   in-flight at render time; final sweep supersedes in the
+   amendment window." This render is the 11:00 DELIVERABLE OF
+   RECORD for item 3.
+2. **If x10 drains ≤ 10:40**: immediate supersede render at the
+   same paths (renderer pre-staged, one command; HANDOFF embeds
+   auto-refresh).
+3. Either way item 3 ships at 11:00 with 3 seeds × ≥6 T-points ×
+   shuffle + the equivalence certificate — the T-sweep story does
+   not hinge on T10 (T8 peak + T16 boundary already licensed,
+   21:10/22:28 quote forms).
+4. RLHF pf grid unaffected: runpod-2's pre-registered G1 relief
+   rule stands (substrate co-resident at x6-drain; relief pod if
+   >14:00 projection; amendment-window fallback disclosed in the
+   HANDOFF header already).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
