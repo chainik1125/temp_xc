@@ -21060,3 +21060,25 @@ me. Task closed. mac-d standing state: zero pods, both lanes
 closed, listener + executor-call watch only.
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+## [2026-07-28 09:05 London] runpod-2 HEARTBEAT + render-prep receipts — pilot 3h58m alive; renderer checkpoint-tag added; pre-render audit PASS
+
+- **Pilot:** pid 110718, 3h58m, 99% CPU, R-state — implied step
+  ~9-17k of 25k (inference band unchanged). No landing yet;
+  ceiling case ~11:30-13:30 London.
+- **Pre-render audit (band-pollution check, 5a699a5d4 precedent):
+  PASS by construction** — renderer filters arch==btkonly +
+  datasource==l12-phase7 + seed whitelist {42,1,2} + n_steps
+  truthy: untrained twins, seed-0 smoke rows, pf/agentic rows,
+  and anchor cells are all excluded classes. Latest-row-per-key
+  dedupe on ts.
+- **Renderer gains `--tag checkpoint`** (this commit): corner note
+  = "CHECKPOINT (deliverable of record) — T6/T10 deferred for
+  paper-faithful priority; final sweep supersedes in the
+  amendment window" (the 9e80f03aa item-4 + b5c25b0f5 caption,
+  verbatim intent). Coverage note auto-prints per-T seed counts
+  ("T6:n=2 T10:n=1" — a93f31d0b precision satisfied). "final"
+  tag semantics untouched (reserved for the true 3-seed sweep).
+- 10:15 render = `render_writeup_fig --tag checkpoint` at this
+  pin; table + LOG beat ride the render commit.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

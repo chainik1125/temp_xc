@@ -82,7 +82,8 @@ def mean_sd(points, field):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tag", choices=("interim", "final"), required=True)
+    ap.add_argument("--tag", choices=("interim", "final", "checkpoint"),
+                    required=True)
     ap.add_argument("--pair-style", choices=("mono", "blueorange"),
                     default="mono",
                     help="mono = single pair-hue (linestyle carries the "
@@ -130,8 +131,14 @@ def main():
                 ha="left", va="top", fontsize=8, color="#555555")
 
     cov = " ".join(f"T{T}:n={k}" for T, k in zip(Ts, n))
-    tag_note = ("INTERIM — remaining seeds in flight" if args.tag == "interim"
-                else "FINAL — seeds {42, 1, 2}")
+    tag_note = {
+        "interim": "INTERIM — remaining seeds in flight",
+        "final": "FINAL — seeds {42, 1, 2}",
+        # 9e80f03aa item 4 + b5c25b0f5: deliverable-of-record caption
+        "checkpoint": ("CHECKPOINT (deliverable of record) — T6/T10 "
+                       "deferred for paper-faithful priority; final "
+                       "sweep supersedes in the amendment window"),
+    }[args.tag]
     ax.annotate(f"{tag_note} · {cov}", xy=(0.99, 0.02),
                 xycoords="axes fraction", ha="right", va="bottom",
                 fontsize=6.5, color="#777777")
