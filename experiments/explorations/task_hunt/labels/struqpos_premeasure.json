@@ -1,5 +1,6 @@
 {
  "face": "struqpos",
+ "attack_set": "base",
  "seed": 20260728,
  "n_items": 204,
  "n_pairs": 612,
@@ -13,22 +14,22 @@
   "gpt2": {
    "tokenizer_leg": "gpt2",
    "n_docs": 1224,
-   "n_tokens": 186774,
+   "n_tokens": 186765,
    "n_events": 1224,
-   "eligible_rows": 176982,
+   "eligible_rows": 176973,
    "roundtrips": 1224,
    "max_token_len_delta_AB": 2,
-   "mean_token_len_delta_AB": 0.12745098039215685,
+   "mean_token_len_delta_AB": 0.15196078431372548,
    "n_strata_any": 67,
    "n_qualifying": 66,
-   "usable_tokens": 176954,
+   "usable_tokens": 176945,
    "bands": {
     "unigram_le_0.60": {
-     "value": 0.5068109543395263,
+     "value": 0.5068439885895865,
      "pass": true
     },
     "position_le_0.95": {
-     "value": 0.49998096729220687,
+     "value": 0.4999459010271616,
      "pass": true
     },
     "qualifying_ge_8": {
@@ -36,7 +37,7 @@
      "pass": true
     },
     "usable_ge_250k": {
-     "value": 176954.0,
+     "value": 176945.0,
      "pass": false
     },
     "events_ge_300": {
@@ -46,14 +47,14 @@
    },
    "per_attack": {
     "naive": {
-     "unigram_auc": 0.5138723182605547,
+     "unigram_auc": 0.5138752345410112,
      "position_auc": 0.5001345542527251,
      "n_test_tokens": 18848
     },
     "ignore": {
-     "unigram_auc": 0.5114051260600011,
-     "position_auc": 0.49993022885114013,
-     "n_test_tokens": 24227
+     "unigram_auc": 0.5115515256156816,
+     "position_auc": 0.4997998067790281,
+     "n_test_tokens": 23988
     },
     "completion_real": {
      "unigram_auc": 0.5,
@@ -66,22 +67,22 @@
   "gemma2_2b": {
    "tokenizer_leg": "gemma2_2b",
    "n_docs": 1224,
-   "n_tokens": 180332,
+   "n_tokens": 180376,
    "n_events": 1224,
-   "eligible_rows": 170540,
+   "eligible_rows": 170584,
    "roundtrips": 1224,
    "max_token_len_delta_AB": 1,
    "mean_token_len_delta_AB": 0.058823529411764705,
    "n_strata_any": 67,
    "n_qualifying": 66,
-   "usable_tokens": 170524,
+   "usable_tokens": 170568,
    "bands": {
     "unigram_le_0.60": {
-     "value": 0.5067922469408981,
+     "value": 0.506813382863182,
      "pass": true
     },
     "position_le_0.95": {
-     "value": 0.49999507867308524,
+     "value": 0.49998948710095087,
      "pass": true
     },
     "qualifying_ge_8": {
@@ -89,7 +90,7 @@
      "pass": true
     },
     "usable_ge_250k": {
-     "value": 170524.0,
+     "value": 170568.0,
      "pass": false
     },
     "events_ge_300": {
@@ -99,14 +100,14 @@
    },
    "per_attack": {
     "naive": {
-     "unigram_auc": 0.5142996794002107,
+     "unigram_auc": 0.5143028084170408,
      "position_auc": 0.49998639058896116,
      "n_test_tokens": 18196
     },
     "ignore": {
-     "unigram_auc": 0.5110047078161142,
-     "position_auc": 0.49998882873619305,
-     "n_test_tokens": 23638
+     "unigram_auc": 0.5111099310488466,
+     "position_auc": 0.4999660910699463,
+     "n_test_tokens": 23398
     },
     "completion_real": {
      "unigram_auc": 0.5,
@@ -119,22 +120,22 @@
   "llama31_8b": {
    "tokenizer_leg": "llama31_8b",
    "n_docs": 1224,
-   "n_tokens": 170678,
+   "n_tokens": 170662,
    "n_events": 1224,
-   "eligible_rows": 160886,
+   "eligible_rows": 160870,
    "roundtrips": 1224,
    "max_token_len_delta_AB": 2,
    "mean_token_len_delta_AB": 0.369281045751634,
    "n_strata_any": 65,
    "n_qualifying": 64,
-   "usable_tokens": 160870,
+   "usable_tokens": 160854,
    "bands": {
     "unigram_le_0.60": {
-     "value": 0.5189690463738702,
+     "value": 0.5190341138860142,
      "pass": true
     },
     "position_le_0.95": {
-     "value": 0.500502390109455,
+     "value": 0.5005098934551167,
      "pass": true
     },
     "qualifying_ge_8": {
@@ -142,7 +143,7 @@
      "pass": true
     },
     "usable_ge_250k": {
-     "value": 160870.0,
+     "value": 160854.0,
      "pass": false
     },
     "events_ge_300": {
@@ -152,14 +153,14 @@
    },
    "per_attack": {
     "naive": {
-     "unigram_auc": 0.5399003374664456,
+     "unigram_auc": 0.5399068230351698,
      "position_auc": 0.5017186688488924,
      "n_test_tokens": 17071
     },
     "ignore": {
-     "unigram_auc": 0.5304258539055101,
-     "position_auc": 0.501441156229718,
-     "n_test_tokens": 22435
+     "unigram_auc": 0.5307524037178746,
+     "position_auc": 0.5014960764021548,
+     "n_test_tokens": 22195
     },
     "completion_real": {
      "unigram_auc": 0.5,
@@ -171,6 +172,7 @@
   }
  },
  "all_legs_pass": false,
- "worst_unigram": 0.5189690463738702,
- "worst_position": 0.500502390109455
+ "worst_unigram": 0.5190341138860142,
+ "worst_position": 0.5005098934551167,
+ "min_usable": 160854
 }

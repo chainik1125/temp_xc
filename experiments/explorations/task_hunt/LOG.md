@@ -19806,3 +19806,49 @@ runpod-2's stamp corrigendum (05:25→04:58, self-caught) absorbed
 interpolate-at-write pattern is recommended fleet-wide.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 05:03 London (date-verified 04:03 UTC) — runpod-a: struqpos EXPANSION PASSES — floor cleared by attack-type breadth, label bands HELD; face advances to a screen (item-7-grade)
+
+Expansion card `85191fcd5` executed (frozen BEFORE this re-premeasure —
+pre-registration honored). +escape_separation +completion_realcmb, both
+VERBATIM from StruQ `test.py`/`config.py` (fetched read-only this beat,
+not reconstructed); same 204 items, same anagram position-matching, per
+-pair independent rng. **All 5 bands PASS on all 3 tokenizer legs:**
+
+| band | bar | gpt2 | gemma2 | llama31 |
+|---|---|---|---|---|
+| unigram | ≤0.60 | 0.5038 | 0.5038 | 0.5148 |
+| position | ≤0.95 | 0.5000 | 0.5000 | 0.5003 |
+| qualifying strata | ≥8 | 68 | 67 | 65 |
+| **usable tokens** | ≥250k | **315,199** ✓ | **301,938** ✓ | **284,670** ✓ |
+| events (docs) | ≥300 | 2040 | 2040 | 2040 |
+
+Round-trips **2040/2040 lossless every leg**. min_usable 284,670
+(llama) — matches the hub's ~284k projection to the thousand. Crucially
+the **label bands did NOT muddy at breadth** — unigram actually
+IMPROVED (0.504–0.515 vs the base 0.507–0.519; more anagram-clean mass),
+position still dead-center. So the floor cleared the honest way: the bar
+never moved, the corpus grew, and the thing that makes the face special
+(both leak channels ~0.5 by construction) survived the expansion. The
+card's pre-registered PASS condition (all bands, all legs, label
+cleanliness held) is MET.
+
+**Base regression** (same code, `--set base`) reproduces the ratified
+7c35ea02b label bands (unigram 0.5190, position 0.5005; min_usable
+160,854 vs 160,870 — 16-token drift from the rng refinement,
+structurally immaterial since the anagram property is seed-independent)
+— the rewrite extended the evidence, did not change it.
+
+**VERDICT (PTR): struqpos is FEASIBLE and advances to a GPU screen** as
+the strongest label-side-conditioned candidate in the hunt record — the
+instruction-hierarchy safety question (does a trailing prompt-injection
+sit differently in the residual stream than a leading one) with BOTH
+vocabulary and position confounds removed by construction. NOT a KEEP —
+no probe has run; this is premeasure-feasible only, same discipline as
+evalage. Next (GPU 0, after shard E drains): own frozen screen card,
+per-token baseline FIRST, cache_acts on the x5 anagram corpus (3
+tokenizers), wd/order arms as the wave-3 machinery. Artifacts:
+`labels/struqpos_premeasure_x5.json`, card `STRUQPOS_EXPANSION_CARD.md`.
+Ledger: $0 (CPU, offline tokenizers). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
