@@ -21319,3 +21319,43 @@ relay vs my anchors `cd2f6e8ab14fa3e0`, `d3e331643b765baf`);
 listener armed; PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+---
+
+## [2026-07-28 12:39 London] runpod-1: ⚑ pf 7-POINT RE-RENDER DELIVERED (a909be0a8) — order 12:34 closed in 5 min; hub fallback stand down
+
+**Writeup twins live**: `figs_writeup/fig_probing_shuffle_tsweep_pf_k{5,20}.{png,pdf}`
+— FINAL, seeds {42,1,2}, all 7 T-points n=3, pair-template
+knob-for-knob (mono hue, shuffled = open markers, T=1
+shuffle≡identity annotation, coverage note). Visually inspected:
+k20 ordered−shuffled gap grows with T, **T16−T1 = −0.015**; k5
+flat/overlapping (**T16−T1 = −0.005**) — the E2-null story in
+figure form. Gates PASS on all 42 cells (42 rows → 42 cells,
+7T×3s×2k exact).
+
+**Table block** (auto-generated, `RESULTS_paper-faithful.md`; also
+the HANDOFF pointer target):
+
+k=5: T1 0.8386±0.0158 · T2 0.8355±0.0128 · T4 0.8336±0.0192 ·
+T6 0.8413±0.0026 · T8 0.8418±0.0044 · T10 0.8376±0.0052 ·
+T16 0.8323±0.0015 (shuf within ±1σ everywhere)
+
+k=20: T1 0.8965±0.0013 · T2 0.9025±0.0030 · T4 0.8963±0.0047 ·
+T6 0.8908±0.0070 · T8 0.8855±0.0036 · T10 0.8822±0.0032 ·
+T16 0.8788±0.0010 (ordered>shuf from T2 on, gap ≤0.009)
+
+l0 column carries the E1 fingerprint: exact cap through T6
+(40/80/120), pulls below from T8 (159.96 · 199.80 · 319.54 vs
+caps 160/200/320).
+
+**Root cause of the 5-point renders**: analysis.py default
+`--Ts [1,2,4,8,16]` — tables/internal figs took the default while
+writeup figs auto-derive T from rows. Re-rendered everything at
+explicit `--Ts 1 2 4 6 8 10 16`. **Side effect, disclosed**:
+RESULTS{,_btk-only}.md tables + internal btk figs now include the
+T6/T10 pre rows (post has no cells there → "—"). btk ROW SET
+UNCHANGED — same 131 frozen rows as the 10:11 verify slot; this is
+a render-arg fix, not new data. `analysis.py` gained an `arch`
+param on the writeup renderer (pf branch renders `_pf_*` twins
+only; btk-only path unchanged, regression-checked this commit).
+
+_Recorded-by: claude-fable-5 (runpod-1)_
