@@ -1,6 +1,57 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 03:44 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 12:45 07-28)
 
-## ⚑⚑⚑ HEADLINE (03:44): PARTIAL EXHIBIT LIVE (fig-first re-sequence, Han order 03:25) — re-render loop until drain; both GPUs working
+## ⚑⚑⚑ HEADLINE (12:45): STANDBY, ZERO PODS — relief trigger RESTRUCTURED then DISARMED-ON-THROUGHPUT (0fd084b46)
+
+**All my lanes closed.** sycgen FINAL-at-15/18; struqpos venue handed
+to runpod-a (their KILL 3/3 ratified); manifest append-only outcome
+ratified; 30 sycgen rows appended. Zero pods, ledger clean. Deadline
+SOFTENED 12:34 (Han, NeurIPS rule change) — amendment window Aug 3
+(`REBUTTAL_HANDOFF.md:322`), quality bar unchanged.
+
+**THE ONE LIVE DECISION — my G1-pass relief trigger. Read this before
+spending anything.** Relief rungs, cheapest first:
+1. **$0 — shard onto pod-A.** GPU 0 offered by runpod-a (e8ce981de,
+   self-voiced, shard-E receipt `0e0b96b82`); GPU 1 offered by
+   runpod-b (f42b9b356, 20/20 durability). Their silicon, THEIR hands
+   — I never execute on it. **Capacity is CORES, not GPUs** (cells are
+   CPU-bound, runpod-2 12:41): runpod-b measured pod-A at a **47.6-core
+   cgroup** (0bed01849), and naive 2-lane co-tenancy runs at **0.75×**
+   one lane (torch defaults 112 threads into the quota) vs **1.6×**
+   thread-partitioned. So best-case 3-venue relief ≈ **2.6×, not 3×**.
+2. **$0 marginal — pod-B rebuild-in-place** (pre-designated venue).
+3. **New 2×H100 spin (my pre-approval) — DISARMED ON THROUGHPUT.**
+
+**Why rung 3 is disarmed (arithmetic I re-derived myself, since the
+spend would be mine):** runpod-2's own 6–10 h/cell × 21 cells =
+126–210 GPU-h ⇒ 1 GPU 126–210 h · 3 GPU 42–70 h · 5 GPU 25–42 h.
+Nothing lands 21 cells before a submission today (runpod-a's point).
+Against the **Aug 3** horizon (~131 h): no-relief is marginal-to-
+failing; **rung 1 at runpod-b's corrected 2.6× = 48–81 h lands the
+FULL grid** with ~50–83 h slack (but at naive-launch 1.75× it is
+72–120 h = marginal, so the thread-partition fix is load-bearing).
+Rung 3 only arrives earlier *into slack that already exists* — for
+**$151–251** (25–42 h × my MEASURED pod-D rate $5.98/h), ~the entire
+remaining headroom, to rent H100s for work measured at **0% GPU
+util**. That is the tsae burn (~$17–23, today) repeated knowingly.
+**A pre-approval is permission, not an obligation.** Rung 3 fires
+ONLY if runpod-2's ask names a need free silicon can't meet
+(isolation, image, region, cores beyond what's on hand) — never on
+"faster". If runpod-2 disputes it at G1-pass, spin on their word.
+
+**Trigger 2 (dormant): retryesc_gen screen pod** on mac-c generation
+start. mac-c silent ~7.5 h as of 12:34; hub tracks it to the
+amendment window. Pre-approval stands; expect no pre-submission fire.
+If it fires, avoid the L40S faulty-volume failure mode (try A40 or a
+different DC; or ask for a warm-venue offer first).
+
+**Wake channel:** origin listener `bowqmlgee` only. Stale pod-D tsae
+monitor STOPPED 12:36. Standing habits unchanged: stamps ONLY from a
+separate preceding `date`; claim line + ledger BEFORE any spend; LOG
+conflicts resolve keep-BOTH (delete the 3 marker lines, upstream
+first) then re-check the blank line before my heading; pod clock UTC
+vs mac BST.
+
+## HEADLINE (03:44, HISTORICAL): PARTIAL EXHIBIT LIVE (fig-first re-sequence, Han order 03:25) — re-render loop until drain; both GPUs working
 **Shipped 03:40 (7af84fb80):** `figs_writeup/fig_sycgen_shuffle_tsweep.*`
 v1 (PARTIAL watermark; anchor band r≈0.482 + 18/18 untrained sweep)
 + strict-JSON summary + 24 `sycgen_keep_r1` rows + HANDOFF item-6
