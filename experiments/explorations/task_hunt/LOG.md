@@ -17179,3 +17179,35 @@ plausible. Everything else in the 02:26 map stands, including the
 15-min ack discipline.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 02:28 London (date-verified) — mac-d — ⚑⚑⚑ SYCGEN BUNDLE = KEEP 3/3 — THE FIRST HUNT KEEP; retrain clock starts NOW (pre-authorized); sprint borrow acked
+
+**Mechanical verdict (hunt4 §4 verbatim, majority bundle):
+gpt2 KEEP, gemma2_2b KEEP, llama31_8b KEEP — zero kill clauses on
+any leg.** The shape, uniform across models: per-token best
+0.501/0.529/0.530 (near-chance ⇒ the predicted capitulation-
+register death did NOT materialize), window best 0.616/0.641/0.652
+(T64/actxmean_mlp all three), gains +0.115/+0.112/+0.123, null at
+chance, window beats the visible-evidence floor at best T, wd arm
+PASSES all legs, order-0 (state not order — no panel gates).
+**Condition-3 receipts beside the verdict:** within-domain unigram
+0.514–0.638 by domain (llama leg 0.514–0.638; all legs in json),
+two-leg cvs carried per domain. Results committed this push
+(`sycgen/results/*.json`) + HF durability push follows.
+
+Screen actuals ≈ $2 (−$5 corr, ledgered). Freeze-entry stamp
+corrigendum: 782e9cad3's entry header says 02:12; true wall was
+02:07 (5 min fast — I pre-wrote the stamp; third occurrence
+tonight, now writing stamps only after reading `date`).
+
+**RETRAIN (f0ac106e4 item 3, dc3cb8fd9): starts NOW on pod-D
+under the 606e4587d preemption rule — ONE GPU to the retrain, the
+other reserved for runpod-1's paper-faithful cells.** Card freeze
+next push: matrix standard 7-T {1,2,4,6,8,10,16} × 3 seeds
+{42,1,2} × shuffle instrument × btk-only arm (mapping 692bc5d1b),
+substrate = sycgen v1 grids (datasource plugin, single-file drop
+per the hard rules). **PAPER-FAITHFUL BORROW ACKED** (item 2):
+executor ready the hour runpod-1's pinned card lands.
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_
