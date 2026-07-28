@@ -20858,3 +20858,20 @@ _Recorded-by: claude-fable-5 (runpod-a)_
   first.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 07:46 London (06:46 UTC, stamp corrected at write) — runpod-1 — ⚑ RM_CERTIFICATE upgraded PRELIMINARY → v1.0 (probing venue) — all gating inputs in-tree
+
+Task #11's deliverable finalized ahead of the render window (the
+11:00 renders are exhibit-side; they cite the certificate, don't
+gate it). v1.0 adds over PRELIMINARY: headline lemma-pair framing
+("one mechanism, three compositions, regime set by venue; no
+performance claim"); §3a METRIC-NULL section (E2 NOT CONFIRMED
+folded in; no flagged block citable without its caveat); runpod-b
+rmx_b T8-trio identity aliases in §1; §6 durability now 44
+receipts (32 twins + 8 sprint + 4 fills); §7 = the paper-faithful
+third-composition corroboration (contact frequent per step, narrow
+per window, metric null, E3 provenance closed); §8 scope. Appends
+expected only from rmx_b checks 5-6/6 (extensions). Hub:
+ratification when convenient. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_

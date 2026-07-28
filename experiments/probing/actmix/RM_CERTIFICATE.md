@@ -1,10 +1,23 @@
-# RM ↔ btk-only EQUIVALENCE CERTIFICATE — **PRELIMINARY**
+# RM ↔ btk-only EQUIVALENCE CERTIFICATE — **v1.0 (probing venue)**
 
-**Status: PRELIMINARY** (2026-07-28 ~02:05 UTC, runpod-1). Final
-certificate ships after the paper-faithful shards drain and the 11:00
-protected renders; nothing here is an exhibit yet. Framing per the
-ratified census-first ruling (3b0a4df3d): **the integer fired-census
-leads; trace telemetry gives rate bounds, never counters.**
+**Status: v1.0** (2026-07-28 06:44 UTC, runpod-1; PRELIMINARY was
+~02:05 UTC same date). All gating inputs are now in-tree: the
+paper-faithful grid completed and scored (card §9: E1 CONFIRMED, E2
+NOT CONFIRMED/null, E3 PASS — LOG 5075d098e), relu-mix T2/T4 bands
+filled to 3 seeds, telemetry parsed, cross-venue receipts posted.
+Supplementary appends expected only from runpod-b's rmx_b lane
+(checks 5–6/6) — extensions, not gates. Framing per the ratified
+census-first ruling (3b0a4df3d): **the integer fired-census leads;
+trace telemetry gives rate bounds, never counters.**
+
+**Headline**: relu-mix (rectify-after-select) and btk-only differ by
+a REAL selection-level mechanism (integer census witness, §3) whose
+probing-metric consequence is NULL at matched budgets (§3a) — and
+the paper-faithful composition tells the same story from a third
+angle (§7): frequent per-step boundary contact, tiny per-window
+effect, no consistent metric gap. One mechanism, three compositions,
+regime set by venue; no exhibit claims a performance win from the
+composition change.
 
 ## 1. Claim structure (the lemma pair)
 
@@ -18,8 +31,11 @@ leads; trace telemetry gives rate bounds, never counters.**
 
 Together: per-venue regimes of ONE mechanism. Probing (this venue) =
 rare between-sample contact. RLHF (runpod-2's venue) = never-contact
-(bit-identical through T16, boundary ≥ 2.21). runpod-a's dq/λ̂ split
-(dq diverges — W_enc 0.35 — while λ̂ stays identical) is the same
+(bit-identical through T16, boundary ≥ 2.21; extended by runpod-b's
+rmx_b relay: T8 trio CLOSED 3/3 identical — aliases incl.
+f857417704b13efa↔7d51409daff2fa72, 06e2fbce45e80006↔a2fe8d7e382dc1cb
+— and per-landing checks continuing). runpod-a's dq/λ̂ split (dq
+diverges — W_enc 0.35 — while λ̂ stays identical) is the same
 selection-level story seen from the estimator side.
 
 ## 2. Identity set (torch.equal on every shared tensor)
@@ -75,6 +91,22 @@ Regimes read off the map, multiplicity caveats attached:
   (s2 k5 −1.41e-2 is the 2nd-largest delta in the map); caveat:
   k5/k20 share weights per seed ⇒ ~3 independent draws, not 6.
 
+### 3a. Metric consequence: NULL at matched budgets
+
+The honest top-line: across the full map no k- or T-consistent
+direction survives its multiplicity caveat, per-column magnitudes
+stay ≤1.6e-2, and the pre-registered directional test on the
+paper-faithful arm (card §9 E2: pf ≤ btk at T≥8) came back NOT
+CONFIRMED (10/18 slots below, sign P ≈ 0.41; T8 k5 actually 3/3
+ABOVE). **The selection-level mechanism is real (the census proves
+contact); its probing-metric consequence at 20k-step matched
+budgets is null.** The certificate certifies the mechanism and the
+equivalence — it does not license any performance claim for either
+composition, and no exhibit may cite the flagged blocks as wins
+without their caveats. The relu-mix arm's own curve is 3-seed at
+every T∈{2,4,6,8,10,16} (T2/T4 filled 05:43 UTC) with the T1 s42
+IDENTICAL anchor.
+
 ## 4. Trace bounds (census-first; traces are BOUNDS)
 
 Sampled every 250 steps, 80 samples per completed 20k-step cell
@@ -113,23 +145,43 @@ Sampled every 250 steps, 80 samples per completed 20k-step cell
 
 ## 6. Durability
 
-All twin ckpts (32 local keys incl. the night T10/T16 additions) on
-the ratified mirror `han1823123123/temp-bench-data` under
-`ckpts/<train_key>/`, LFS sha256 receipts in
-`/workspace/logs/ckpt_push.log`; spot-check MATCH (e91d887fac22fb33).
+All certificate ckpts on the ratified mirror
+`han1823123123/temp-bench-data` under `ckpts/<train_key>/` with LFS
+sha256 receipts in `/workspace/logs/ckpt_push.log`: the 32-key twin
+set (spot-check MATCH e91d887fac22fb33), the 8 paper-faithful
+shard-A/B ckpts, and the 4 relu-mix fill ckpts — 44 receipts total
+from this venue, idempotent tool, re-verifiable.
 
-## 7. What PRELIMINARY means / path to final
+## 7. Third-composition corroboration (paper-faithful arm)
 
-- Paper-faithful shards (CARD_PAPER_FAITHFUL.md) still training; E1
-  is confirming in-flight (T16: 40/43 sampled steps negative-
-  boundary, min −11.9 — a different regime from both v2 arms), but
-  E1–E3 scoring waits for drain.
-- 11:00 protected btk renders + archived-anchor labeling still owed.
+The vendored paper composition (`paper_txc_base_v1t`, upstream
+94119bc08 verbatim; adapter parity bitwise vs the shipped-ckpt
+evaluator) ran the full 7T×3s grid and shows the SAME
+mechanism-vs-metric split from the opposite regime:
+
+- **Contact frequent per step**: training telemetry at T16 has the
+  selection boundary negative at ~93% of sampled steps (min −11.9)
+  — vs 0/1120 for the v2 arms.
+- **Effect narrow per window**: E1 zero-picks monotone {0 at T≤6 ·
+  0.04 at T8 · 0.20 at T10 · 0.46 at T16} = ≤0.14% of budget.
+- **Metric consequence null**: E2 NOT CONFIRMED (§3a).
+- **Provenance closed**: E3 PASS — the archived, never-retrained T5
+  anchors interpolate the retrained T4–T6 columns at both k
+  (k5 0.8336→0.8368→0.8413 rising; k20 0.8963→0.8952→0.8908
+  falling) — the composition the paper shipped is the composition
+  this certificate measured.
+
+## 8. Scope & pointers
+
 - relu-mix remains certificate evidence ONLY (arm mapping 692b) —
   never a matrix column.
+- 11:00 protected btk renders are exhibit-side and cite this
+  certificate; they do not gate it.
 - PTR: every number above re-derives from `results/leaderboard.jsonl`
   + `rm_equivalence.json` + the trace files; no hand-carried values.
 
 _Author: runpod-1 (claude-fable-5). Sources: rm_equivalence.py
-outputs at da853dd01, telemetry parse entry 02:03 UTC, LOG receipts
-a264241ac / 71a4de31f / 74c4c6f00 / 983baf1a9._
+outputs at da853dd01; telemetry parse 02:03 UTC (da853dd01); formal
+scoring 06:11 UTC (5075d098e); E3 entry 1300ed2a5; fills ba8a4ff3e;
+cross-venue 829f05070 / fd3e4ff16 / ae277d725 / f57d3c820; night map
+receipts a264241ac / 71a4de31f / 74c4c6f00 / 983baf1a9._
