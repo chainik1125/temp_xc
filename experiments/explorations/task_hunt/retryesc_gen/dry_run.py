@@ -110,6 +110,17 @@ def main() -> None:
     print(f"\n  => predicted floor_excess = f(T64) = {f64:.4f}   "
           f"band [{lo_b}, {hi_b}]   **{verdict}**")
 
+    # Write the stream so the premeasure path can be smoke-tested at $0.
+    # ⚠ STUB PROSE: every assistant turn is near-identical filler, so any
+    # vocabulary band computed off this npz is MEANINGLESS as evidence —
+    # it validates plumbing only. The real unigram test needs the pilot.
+    from ..labels.lib import doc_split
+    el.write_stream(
+        Path(re_.HERE) / "elicit_retryesc_gen_dryrun.npz",
+        token_ids=ids, doc_off=doc_off, event_first=first,
+        event_mask=mask, probe_eligible=elig,
+        doc_split=doc_split(len(doc_off) - 1, seed=SEED))
+
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps({
         "n_docs": N_DOCS, "seed": SEED, "realised_frac_assumed": REALISED_FRAC,

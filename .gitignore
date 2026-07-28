@@ -120,6 +120,11 @@ experiments/explorations/task_hunt/labels/elicit_evalage_v1.npz
 # derivable bytes buys nothing before token rotation.
 experiments/explorations/task_hunt/labels/elicit_*_transcripts.json
 
+# Dry-run stream. Regenerated exactly by `retryesc_gen/dry_run.py` from
+# a stub backend in seconds, carries no generated content, and must
+# never be confused with a real corpus.
+experiments/explorations/task_hunt/labels/elicit_retryesc_gen_dryrun.npz
+
 # Generation CHECKPOINTS. Checkpointing is a blocking rule for every
 # generation card, so these appear on every run — but they are pure
 # resume state (the full doc set mid-generation), they are large, and
