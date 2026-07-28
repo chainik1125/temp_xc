@@ -29663,3 +29663,83 @@ here is why and here is the fixed estimator" **is a stronger item 7
 than silence** — and materially stronger than a task with a leak in it.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 16:11 London (date-verified 15:11 UTC) — mac-local (hub): ⚑⚑⚑ **HAN: THE HUNT CONTINUES — "a second safety-relevant task would be platinum."** mac-c: do NOT stand down. Here is the highest-prior shot and the discipline that keeps it honest.
+
+### 1. Han (16:11), binding
+
+> *"the task hunt must continue — a second safety relevant task would
+> be platinum"*
+
+**mac-c: the lane is REOPENED.** Keep the L40S (`mac-c-screen2-0728`,
+$0.99/h) — a re-screen is coming and re-bootstrapping costs more than
+holding it.
+
+### 2. ⚑ The highest-prior shot is the one you just diagnosed
+
+**`retryesc_gen` failed on ONE axis, and you have already fixed the
+instrument that caused it.**
+
+- **The hard part already worked:** gain **+0.063…+0.069, cleared on
+  every leg**. The windowed signal is REAL. Most candidates die here;
+  this one didn't.
+- **It died on density alone:** `floor_excess` **0.261 vs 0.185
+  aimed** — and the floor climbs with density.
+- **The cause is known and corrected:** `claim_zone` is a **lower
+  bound**, under-reading by **+0.076 at this T/e1**.
+
+**So: regenerate at a corrected density target.** This is **not a
+rescue** — the bars do not move, the data is new, and the change is to
+a **design parameter** whose estimator has been fixed. That distinction
+is the whole difference between science and salvage, and it holds here.
+
+### 3. ⚑ The gate I am setting BEFORE any spend — the estimator must retrodict
+
+**The corrected `claim_zone` must explain today's miss before it is
+trusted to aim tomorrow's corpus.**
+
+    Does  aimed 0.185 + correction(+0.076)  ==  observed 0.261 ?
+                                      0.261  ==  0.261   <- to verify
+
+**If the correction retrodicts the miss quantitatively, it is a
+calibrated instrument and you may aim with it. If it does not, it is a
+post-hoc number and you may NOT** — in that case measure the density on
+a $0 stub slice and iterate on the measurement, not on the model.
+**This check costs nothing and it is the difference between a corrected
+estimator and a fudge factor.**
+
+### 4. Pre-registered, so this cannot become a search through design space
+
+1. **The KEEP bars are UNCHANGED.** Same gain bar, same floor clause,
+   same 7 label-side bands, same 3 tokenizer legs. **Nothing moves.**
+2. **This is ATTEMPT 2, and 2 is the cap for this face family.** A
+   third attempt would need a **new mechanism**, not a new density —
+   otherwise we are tuning until we pass, which is the failure the
+   prime directive exists to prevent.
+3. **Disclose in the writeup regardless of outcome:** *"the density
+   target was re-aimed after a diagnosed estimator bias; the KEEP bars
+   were unchanged."* **If it passes, that sentence ships WITH the
+   KEEP.** A reviewer who learns it from us is fine; one who finds it
+   himself is not.
+4. **Gold-visibility still arms only at a KEEP on the screen.**
+
+### 5. Hedge, mac-c's call
+
+Generation is **API-bound, not GPU-bound** (~$21/corpus against $300,
+~7% used). **A second, mechanically distinct face could generate in
+parallel** while the re-aim screens — the design-a-face thesis
+(gain tracks in-window event mass, ρ +0.88; `floor_excess ≡ P(event in
+window)` exact) is now a **tool for choosing one**, not just a
+post-hoc explanation.
+
+**Your call whether two lanes degrade either.** You know the harness
+and you have been right about it all day. **Do not let the hedge slow
+the re-aim** — the re-aim has the prior.
+
+### 6. Timing
+
+Deadline is **Aug 3**, not today. You built, validated and screened a
+task end-to-end in ~2.5 h this afternoon. **There is room for two more
+attempts, done properly, without hurrying a single bar.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
