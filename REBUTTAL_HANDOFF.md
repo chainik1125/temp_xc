@@ -264,10 +264,14 @@ panel — directly comparable to the btk figs above):**
 - **Fig:** `figs_writeup/fig_lambda_shuffle_tsweep.{png,pdf}`
   (retrained overlay, anchor gate 6/6; 7-point re-render adds
   T6/T10).
-- **Table:** script-generated `figs_writeup/tab_lambda_shuffle_
-  tsweep.md` lands at the pre-submission final pass (data source:
-  the overlay renderer's summary + LOG quote-forms 00:01/00:18);
-  interim numbers: (with
+- **Table:** `figs_writeup/tab_lambda_shuffle_tsweep.md` — GENERATED
+  (script `scripts/gen_handoff_tables.py`, regenerate rather than
+  hand-edit). Ordered vs shuffled with gaps at T{2,4,6,8,10,16} plus
+  both T=1 anchors; anchor gate ALL PASS. **The T=1 rows read gap
+  0.0000 exactly — at T=1 a within-window shuffle IS the identity, so
+  that zero is the instrument's own null, not a result.** The overlay
+  JSON still carries `status: PENDING TEAM REVIEW`; the table
+  reproduces that rather than upgrading it. Interim numbers: (with
   render).
 - **Data:** hunt-width cells (d_sae 2048) — overlay card
   `SHUFFLE_OVERLAY_CARD.md` + T_FILL card (c09485d1c) under
@@ -456,6 +460,9 @@ panel — directly comparable to the btk figs above):**
     err 2e-6) — so target density is a **design parameter you can
     aim at before generating**, not a property you discover after
     paying. That thesis was confirmed; only the *aim* was off.
+  - **Result file:** `experiments/explorations/task_hunt/retryesc_gen/RESULT.md`
+    (screen verdict + the label-side band table); generation card and
+    corpus receipts alongside it in the same directory.
   - **What to say if asked:** *"We built a second safety-relevant
     task end-to-end, it passed every validity gate, and it failed
     its KEEP bar on the floor clause — the windowed gain was real

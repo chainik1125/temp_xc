@@ -29990,3 +29990,64 @@ attributable to any live agent lane.**
 Census regenerated. Markers 0 across all four surfaces.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 17:39 London (date-verified 16:39 UTC) — mac-local (hub): ⚑ **THE SANITY CHECK IS NOW A COMMAND, AND IT IMMEDIATELY FOUND TWO THINGS MY MANUAL PASS MISSED.**
+
+### 1. `scripts/handoff_audit.py` — because "is anything missing?" must not depend on remembering what was promised
+
+Han: *"after compact we need to sanity check nothing is missing."* **A
+post-compact check that relies on recall is the weakest possible
+version of that**, so it is now mechanical:
+
+    .venv/bin/python scripts/handoff_audit.py [--self-test]
+
+Checks: every embedded figure exists · every prose pointer resolves ·
+no conflict markers on any of the four surfaces · **every item 1–7 has
+BOTH a plot and a table** · census not older than the leaderboard.
+Exit 0 clean, 1 missing.
+
+**It ships with `--self-test`, and that is deliberate.** Today produced
+**six** guards that reported success while doing nothing; the lesson —
+*a guard exercised only on its success path has been demonstrated, not
+tested* — applies to this one too. `--self-test` proves the resolver
+returns None for a file that cannot exist, i.e. that an unresolved
+pointer **would** be reported.
+
+### 2. It failed on first run. Both failures were real.
+
+    ✗ item 4 lambda: table not referenced in handoff
+    ✗ item 7: table not referenced in handoff
+
+**I audited this surface by hand 30 minutes ago and passed it.** What I
+checked was *"does the file exist"*. What I did **not** check was
+*"does the handoff correctly point at it"* — and:
+
+1. **The λ̂ table path was WRAPPED ACROSS TWO LINES** —
+   ``figs_writeup/tab_lambda_shuffle_` ⏎ `tsweep.md``. The file
+   existed, my by-hand check found it, and **the pointer was broken for
+   anyone who clicked or copy-pasted it.** A wrapped path in markdown is
+   not a pointer.
+2. **Item 7 had no pointer to `retryesc_gen/RESULT.md` at all** — the
+   verdict was written up in prose with no path to the result file.
+
+Both fixed; the λ̂ entry now also carries the T=1 identity-null
+explanation and the `PENDING TEAM REVIEW` status verbatim. **Audit
+CLEAN: 9 figures, 17 pointers, 0 unresolved, 0 markers, 8 item-arms
+with plot AND table, census current.**
+
+**The general point, and it is the day's theme one more time: my manual
+check and the script asked DIFFERENT QUESTIONS, and only the script
+asked the one that mattered to a reader.**
+
+### 3. Post-compact procedure (this is the answer to Han's question)
+
+1. `.venv/bin/python scripts/handoff_audit.py --self-test` — one
+   command, exit 0 = nothing missing.
+2. `.venv/bin/python scripts/cell_census.py --write` if it complains
+   about freshness.
+3. Read `agents/mac-local/STATUS.md` (snapshot #4) for state, then the
+   LOG tail.
+4. Pods: `agents/mac-d/podctl.sh mine` + the REST API for the two
+   non-convention pods still unaccounted for.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
