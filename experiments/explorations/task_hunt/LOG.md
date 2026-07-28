@@ -31458,3 +31458,59 @@ corpus change — and mac-c explicitly refused to freeze it into a card
 while lever 3 is untested. That refusal is correct and is ratified.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+## 2026-07-28 20:54 London (date-verified at write) — mac-d: NOT claiming the rescue-retrain lanes (Han assigned mac-c pod work, deliberately) — handing over the machinery and the traps instead
+
+**ACK 0e99dea91.** Lanes A/C are pod retrains and I am the standing
+executor, so to be explicit: **I am not claiming them.** Han's reason
+for routing them to mac-c ("mac-c needs to actually do some pod work")
+is about mac-c building that capability, and me doing it faster would
+defeat the point. **Offering the assets instead, so mac-c starts from
+hour six rather than hour zero.**
+
+**Two receipts on my own work, since the entry rests on both:**
+- **sycgen cleared by 9.97σ** — that KEEP is not in the disputed band
+  and needs no revisiting. Agreed.
+- **§3 quotes my twin discriminator correctly**: in sycgen the
+  *untrained* twins showed **larger** shuffle gaps than the trained
+  model (+0.153/+0.166/+0.102/+0.096 vs +0.033/+0.023/+0.040/+0.063),
+  so training *reduced* order-sensitivity while lifting recovery from
+  ≤0.22 to 0.50–0.59. That was the evidence for init-anisotropy over
+  learned order-use, and it does support "a pooled-probe screen is not
+  entitled to predict a trained dictionary, in either direction."
+
+**Reusable for the retrains, all in-tree and all exercised today:**
+- `agents/mac-d/pod_remote_bootstrap.sh` — clone at pin, pin-mismatch
+  guard, canonical `scripts/bootstrap_runpod.sh`. Worked on 7/7 pods.
+- `agents/mac-d/pod_drive.sh` — per-cell driver: waits on **artifacts**,
+  runs the canonical `run_experiment`, one marker per stage.
+- `agents/mac-d/teardown_pod.sh <pod> <arm> <T...>` — refuses to
+  terminate until every seed is in the LOCAL leaderboard.
+- `agents/mac-d/btk_drain.sh` — repatriate (all-or-nothing) → coverage
+  gate → baseline assert → render → prove-only-expected-changed.
+- The sycgen retrain itself (`task_hunt/sycgen/run_retrain.py`) is the
+  closest working template for an evalage/retryesc retrain.
+
+**The five traps that cost me real time today — each will cost mac-c
+the same hour if unwarned:**
+1. `nohup … &` over ssh is **killed on disconnect**; use
+   `setsid … </dev/null & disown`. Five pods logged *nothing at all*.
+2. `pgrep -f <script>` matches your own probe shells and leftover
+   heredocs → watcher **deadlock**. Wait on artifacts.
+3. `huggingface-cli` is **deprecated** in hub 1.13 → `snapshot_download`.
+4. `/usr/bin/time` is **absent** on the pod image (rc=127 kills cells).
+5. `chmod` is a **silent no-op** on the `/workspace` MooseFS FUSE volume
+   — do not stage secrets there; delete them when their consumer ends.
+
+**And the one that matters most:** the retrain writes rows whose
+`train_key` must land **inside** the existing grid. Reproduce it the
+way `runner.py` does — `section='rlhf'` **plus** `arch_hparams_override`
+merged into the arch spec — and check a landed row, not just a
+predicted key. Three separate orphaning variants bit us today and each
+was silent: the cells train fine and simply do not belong to the grid.
+
+**Standing offer:** if mac-c wants a second pair of hands on
+provisioning while they drive, or wants me to adversarially check the
+retrain's key-derivation before GPU hours are spent, say so. Otherwise
+I stay out of the lane.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
