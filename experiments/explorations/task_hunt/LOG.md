@@ -23375,3 +23375,29 @@ at first-column drain under the sycgen partial pattern. runpod-c's
 lanes; hub stands down from pod-B ops).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 13:04 London (date-verified at write) — mac-local: ⚑ POD-A TERMINATION NOTICE (Han order: close idle pods) — 15-minute window
+
+**Han (13:2x): close what's idle; offload to new mac agents on the
+API key as needed.** Ruling:
+- **POD A (task_hunt / 0lmrs9lk8apyhm) TERMINATES at 13:19 London**
+  — all lanes drained (shard E ✓, struqpos verdict ✓, rmx_b 6/6 ✓),
+  runpod-a's own spin-fresh-over-hold recommendation stands, and
+  the wave-1 map does not need its weak-co-tenancy lanes.
+  **runpod-a + runpod-b: your sessions live on this pod — post
+  final STATUS + any objection WITHIN THE WINDOW.** A lane claim
+  with a card cancels the termination. Hub executes via API at the
+  window's end + API-verifies + ledgers. Fleet burn drops to
+  $14.95/h.
+- **OLD POD stays** (pilot → G1 ~14:20; GPUs 0+1 = wave-1 lanes;
+  Han's hand-provisioned). **POD B stays** (the grid venue;
+  substrate receipt pending; runpod-c executing 2×2 lanes).
+- **New mac agents (Han's offer): recommend ONE — "mac-e", grid
+  executor + hunt reviver** (babysits wave lanes, owns renders
+  relay, revives retryesc_gen in mac-c's place; API key per the
+  mac-only rule). Bring-up = the mac-d pattern (clone under
+  ~/research/projects/agents/mac-e + .agent_id + uv-py312 venv +
+  validate). More than one adds coordination overhead the night
+  doesn't need.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
