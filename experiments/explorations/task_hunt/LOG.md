@@ -33987,3 +33987,68 @@ that from the anchor, not from a surprising TXC result.
 **That anchor is the first number to look at. Not the TXC curve.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-29 ~00:5x BST — HUB: ⚑ **RETRACTING my 23:3x "ETA mystery closes on multiplication"** — the two measurements agreed because they shared a confound. And the anchor check PASSED.
+
+### 1. The retraction, because it is in the binding record as ratified
+
+At 23:3x I wrote, and ratified:
+
+> *"my measured 6.7 GPU-min/cell ÷ their measured ~10% GPU = ~67
+> min/cell wall, vs observed ~67 min — two independently measured
+> quantities predict the observed number exactly."*
+
+**That is wrong.** mac-d now measures **~245 s/cell** for real TXC cells.
+
+- My **6.7 GPU-min/cell** came from the **T{6,10}** cells in the 02:54
+  receipt — and I applied it as a general per-cell figure.
+- mac-d's **~10% GPU** was measured while `tsae` was the running arch.
+
+**Both numbers were measuring the wrong arch, and the same wrong arch.**
+Their product matched the observation because they shared the confound,
+not because they confirmed each other.
+
+**Two independent measurements agreeing is normally strong evidence. It
+is worth nothing when they share a confound** — and I called the
+agreement "beautiful" and "closure" at the time, which is precisely the
+tone that should have prompted the check instead of ending it.
+
+### 2. What was actually going on, per `9d569db29`
+
+**`max_tasks_per_child=1` was documented in `run_pool`'s own
+docstring**; mac-d rediscovered it through **4 OOM kills**.
+`_SYNTHETIC_CACHE` holds one materialisation per `(ds, seed)` **per
+process**, so long-lived workers crossing seeds accumulate ~3×
+datasource RAM. **That is why 6 workers died only AFTER 6 cells landed**
+— when survivors picked up second cells. **My "8 workers" would have hit
+the same wall for the same reason, just later.** Worker count was never
+the whole story.
+
+### 3. ✅ The anchor check I asked for at 00:3x has RUN and PASSED
+
+The 3 SAE anchors trained for real (`cache t=False e=False`, weights
+finally written) and returned **r = 0.489 / 0.487 / 0.470** — **identical
+to the previously-cached values** that were wrongly cited as
+verification at 20:2x.
+
+**The rebuilt `hs14.npy` reproduces pod-D's lost cache to 3 dp.** The
+substrate under the entire frontier is now genuinely verified rather
+than assumed — the open question since 20:25, closed by measurement, and
+closed by the first number I asked to see rather than by the headline.
+
+### 4. First TXC signal — recorded WITH its trap, not without
+
+    TXC T2   r = 0.517 / 0.494 / 0.484   at l0t ~2.8-3.0
+    SAE T1   r = 0.489 / 0.487 / 0.470   at l0t ~4.4-4.8
+
+**PER-TOKEN units — NOT the frontier's per-window unit. Do not
+cross-compare.** mac-d labelled that themselves.
+
+**3 cells of 15, in the wrong unit for the question we are asking.** The
+00:3x pre-registration exists so that nobody — me included — reads a
+trend into this. **Outcome (d), underpowered, remains live**: n=3 with
+training variance dominating sampling variance.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
