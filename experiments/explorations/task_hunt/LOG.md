@@ -34791,3 +34791,72 @@ redundant second opinion, which is fine.** Two independent
 implementations disagreeing would itself be worth knowing.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 23:12 BST — ⚑⚑ FLEET: **WORK ON `main` FROM NOW ON.** `main` == `arxiv` == `5584deab0`, no history rewritten
+
+**Han: *"rebase arxiv on top of main, then have all agents just work on
+main."*** Done — **by merge, not rebase**, and here is why that matters.
+
+### 1. What I did NOT do, and why
+
+`arxiv` was **+3077**; `main` was **+1** (`7ceb45564 "some git hooks"`,
+**2026-03-21**). A literal rebase replays 3077 commits with **new SHAs**.
+**10,004 leaderboard rows carry `code_version.commit_sha` across 212
+distinct SHAs** — hard rule 2 exists so every result traces to the code
+that produced it, and after a rebase those SHAs resolve to nothing.
+
+**It would also have force-pushed over two agents mid-run**, with mac-d
+12/15 through the item-6 frontier. **Han chose the merge.**
+
+### 2. What I did
+
+    git merge origin/main        # the 1 hooks commit
+    git push origin arxiv
+    git push origin arxiv:main   # fast-forward
+
+**Conflicts resolved:** `CLAUDE.md` + `README.md` keep **arxiv's**
+versions (main's are March originals; arxiv's carry the current v2 hard
+rules); `docs/dmitry/dmitry_about_me.md` and
+`docs/shared/{manifesto,onboarding_doc}.md` stay **deleted** (arxiv
+removed them deliberately); **main's actual substance —
+`.githooks/pre-commit` — is now in.** Audit CLEAN after.
+
+### 3. ⚑ ACTION FOR mac-c AND mac-d
+
+**Switch to `main`. Nothing was rewritten, so this is a plain
+checkout** — your local `arxiv` is still valid and its commits are all
+reachable:
+
+    git fetch origin && git checkout main && git branch -u origin/main
+
+**`arxiv` still exists and still points at the same commit.** Push to
+`main` from now on. **mac-d: the pod's checkout is untouched and the
+running job is unaffected** — do not restart anything for this.
+
+### 4. ⚑ A PRE-EXISTING PROVENANCE HOLE, surfaced by the SHA check (NOT caused by the merge)
+
+Verifying that SHAs survived, I found **56 of 212 distinct
+`commit_sha`s do not resolve in this clone**, covering **5,175 of
+10,004 rows (51.7%)**. **A merge cannot remove commits and the pre-merge
+HEAD is still reachable — this predates tonight.**
+
+**Scoped, because 51.7% is alarming and misleading:**
+
+    synthetic / agent=autoresearch   5,146 rows   (5,101 of them dirty=True)
+    em        / runpod-c                21 rows
+    rlhf      / runpod-2                 8 rows
+    probing                              0 rows
+
+**The rebuttal's headline sections are essentially untouched — 29 rows
+total.** The bulk is the `autoresearch` synthetic program, and **5,101
+of those were already stamped `dirty=True`**, meaning the tree never
+matched the commit and the SHA alone was never sufficient for them
+anyway.
+
+**Most likely cause: commits made on pods and never pushed** — the row
+was repatriated, the commit died with the container. **Worth a proper
+look, but NOT tonight and NOT before the frontier lands.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
