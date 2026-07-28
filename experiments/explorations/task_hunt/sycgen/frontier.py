@@ -66,11 +66,24 @@ class WindowWrapper(torch.nn.Module):
         if self.k_tok is not None and self.k_tok < z.shape[-1]:
             kth = z.abs().topk(self.k_tok, dim=-1).values[..., -1:]
             z = z * (z.abs() >= kth)
-        # realized budget = distinct active features per WINDOW. Measured as
-        # the union across positions, never T x per-token: pooling collapses
-        # a feature firing at several positions, which is exactly the
-        # assumption the hub retracted at 19:4x.
-        self._l0.append(float((z.abs() > 0).any(dim=1).sum(-1).float().mean()))
+        # Realized budget per WINDOW — MEASURED, never assumed (the
+        # "T x per-token" figure was an upper bound and was retracted).
+        # ⚑ The correct budget differs by mode (hub review 0b1025abc):
+        #   pooled  -> UNION over positions. The pooled vector has one slot
+        #              per feature, so a feature firing at 3 positions really
+        #              does collapse into one dimension.
+        #   stacked -> SUM over positions. The stacked code has T*d_sae slots,
+        #              so that same feature occupies THREE distinct input
+        #              dimensions and must be counted three times.
+        # Using the union for stacked understates its budget, which would plot
+        # it further LEFT than it belongs — flattering the baseline. That is
+        # conservative against TXC, so it could not manufacture a negative,
+        # but it would contaminate a positive. Fixed before the sweep ran.
+        nz = z.abs() > 0
+        if self.mode == "pooled":
+            self._l0.append(float(nz.any(dim=1).sum(-1).float().mean()))
+        else:
+            self._l0.append(float(nz.sum(dim=(1, 2)).float().mean()))
         if self.mode == "pooled":
             return z.mean(dim=1)
         return z.reshape(B, T * z.shape[-1])
@@ -80,17 +93,46 @@ class WindowWrapper(torch.nn.Module):
         return sum(self._l0) / max(1, len(self._l0))
 
 
+def _key_from_manifest(arch_name: str, T: int, seed: int) -> str | None:
+    """Look the train_key UP; never re-derive it.
+
+    Re-deriving needs the exact training_cfg the run used, and guessing it
+    produced a key for a checkpoint that does not exist (twice today — the
+    btk false alarm this morning, and my first cut of this function).
+    `checkpoints/manifest.jsonl` records what was actually written.
+    """
+    import json
+    mf = Path(__file__).resolve().parents[4] / "checkpoints" / "manifest.jsonl"
+    if not mf.exists():
+        return None
+    for line in mf.read_text().splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r.get("arch") != arch_name or int(r.get("seed", -1)) != seed:
+            continue
+        if "sycgen" not in str(r.get("datasource", "")):
+            continue
+        tc = r.get("training_cfg") or {}
+        if (tc.get("n_steps") or 0) <= 0:
+            continue                      # untrained twin
+        ov = tc.get("arch_hparams_override") or {}
+        if int(ov.get("T", r.get("T", -1)) or -1) != T:
+            continue
+        return r.get("train_key")
+    return None
+
+
 def _load(arch_name: str, T: int, seed: int, ds_spec):
-    from temp_bench.core.config import compute_data_key, compute_train_key, load_arch
+    from temp_bench.core.config import load_arch
     from temp_bench.core.runner import _load_checkpoint
+    tk = _key_from_manifest(arch_name, T, seed)
+    if tk is None:
+        raise FileNotFoundError(
+            f"no manifest train_key for {arch_name} T={T} seed={seed}")
     spec = load_arch(arch_name)
-    ov = {"d_sae": 2048, "T": T, "k_pos": 8}
-    spec = spec.model_copy(update={"hparams": {**spec.hparams, **ov}})
-    tk = compute_train_key(
-        arch=spec, seed=seed,
-        training_cfg={"n_steps": 8000, "buffer_tokens": 524288,
-                      "arch_hparams_override": ov},
-        data_key=compute_data_key(ds_spec))
+    spec = spec.model_copy(update={
+        "hparams": {**spec.hparams, "d_sae": 2048, "T": T, "k_pos": 8}})
     return _load_checkpoint(spec, tk, ds_spec), tk
 
 
