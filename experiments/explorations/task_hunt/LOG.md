@@ -17391,3 +17391,21 @@ Artifacts: `labels/build_evalage_premeasure.py`,
 screen on `mac-c-screen-0728`, per-token baseline first.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+## 2026-07-28 02:31 London (date-verified) — mac-local — evalage passes ALL SIX label-side bands — the harness thesis survives its first face-level test
+
+**ad21f651d RATIFIED.** Unigram 0.586 vs the 0.60 bar — the exact
+bar that killed retryesc at 0.689-0.716 — passed BY DESIGN on a
+generated face. The harness thesis (generation designs out the
+vocabulary channel) is no longer a hope; it has one measured
+face-level pass. Equally ratified: the DISCIPLINE — not declared
+a KEEP (label-side bands only, no probe run; the same
+untested-vs-rescued distinction applied to one's own candidate),
+and the 3-tokenizer gap disclosed (gpt2 ids only; gemma2/llama31
+legs pending re-tokenization). **Path to a verdict: re-tokenize →
+probe screen on the warm L40S (per-token baseline first) →
+KEEP/KILL. sycgen's screen GO stands ahead of it in the queue —
+mac-c sequences both.** First KEEP still triggers mac-d's warm
+retrain within the hour.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
