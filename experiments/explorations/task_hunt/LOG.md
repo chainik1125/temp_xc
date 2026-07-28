@@ -16764,3 +16764,35 @@ waiting on me.
 also in STATUS.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-28 02:00 London (date-verified) — mac-local — ⚑ RLHF ARCH ANSWER COMPLETED (the pro-claim's real kernel, inverted): the PAPER's RLHF TXC was agentic_txc_02 (matryoshka-contrastive) — our exhibit is the plain-TXC modernization; DISCLOSURE now binding on exhibit 3
+
+**Han pressed the right thread.** Receipts (COMPOSITION_AUDIT §0,
+corroborated by Dmitry's own HF seed-audit table "HH-RLHF |
+agentic_txc_02, T=5"): **the paper's RLHF TXC arm =
+`agentic_txc_02` — matryoshka-contrastive, TopK→ReLU selection
+PER-WINDOW at k_win=500.** The paper runner's default (txc_base)
+is not what the shipped RLHF numbers used.
+
+**So the full answer to Dmitry's agent:** (1) OUR shuffle-ablation
+exhibits ran plain TXC — probing pre, RLHF post, zero pro
+machinery (01:55 receipts stand). (2) BUT the PAPER's RLHF arm was
+pro-FAMILY (matryoshka+contrastive). Our exhibit 3 is therefore
+the plain-TXC MODERNIZATION of an arm that was architecturally
+richer in the paper — comparability to the paper's RLHF TXC runs
+through the budget convention (k_win=100·T; at the paper's T=5
+that is exactly the paper's k_win=500) and the per-window
+selection granularity (the POST composition choice matches the
+paper's per-window selection — deliberate, not drift). (3)
+Probing is UNAFFECTED: the paper's probing TXC (txc_base) is
+plain; ours is plain.
+
+**BINDING DISCLOSURE (handoff §3 + every RLHF caption):** "The
+paper's RLHF TXC arm (agentic_txc_02) carried matryoshka +
+contrastive components; the v2 exhibit uses the plain windowed
+BatchTopK crosscoder at the paper's window budget (k_win=100·T =
+500 at the paper's T=5). T-sweep and shuffle conclusions are
+statements about the plain arm." NOT disastrous — the exhibit's
+claims were always v2-arm claims — but unstated it would have
+been a reviewer-findable gap. Now stated.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

@@ -50,11 +50,17 @@ retrained — see COMPOSITION_AUDIT).
 - **Fig:** `figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` (FINAL
   3-seed; 7-point re-render lands ~morning, same path).
 - **Table:** `figs_writeup/tab_rlhf_shuffle_tsweep.md` (with render).
-- **ARCH (explicit, anti-confusion): the RLHF TXC is
+- **ARCH (explicit, anti-confusion): the RLHF TXC exhibit arch is
   `txc_batchtopk_post_btkonly` — the plain windowed BatchTopK
   crosscoder (POST composition; probing uses PRE). It is NOT
-  txc_pro — no matryoshka/contrastive/subseq anywhere in these
-  classes (refutation receipts: LOG ~01:55 entry).**
+  txc_pro (refutation receipts: LOG ~01:55). BINDING DISCLOSURE
+  (LOG ~02:0x): the PAPER's RLHF TXC arm was `agentic_txc_02`
+  (matryoshka-contrastive, per-window TopK→ReLU, k_win=500) — the
+  exhibit is the plain-TXC modernization at the paper's window
+  budget (k_win=100·T = 500 at the paper's T=5; per-window
+  selection granularity preserved via the POST composition).
+  T-sweep/shuffle conclusions are statements about the plain arm.
+  Every RLHF caption carries this.**
 - **Data:** `experiment=rlhf` rows, btk arm complete at T{1,2,5,8,16}
   + T{4,6,10} landing overnight (x4 via runpod-a swap-drain; x6/x10
   drain ~06:30). **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins
