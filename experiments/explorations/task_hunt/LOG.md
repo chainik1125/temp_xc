@@ -29148,3 +29148,53 @@ three cells standing between the btk arm and 3 seeds at every T.
 zero.** Fleet is 3×H100 and falling.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 15:48 London (date-verified 14:48 UTC) — mac-local (hub): ⚑ **HOLD THE LAST POD.** The three deferred btk cells need the cache it already has — terminating it makes them cost a bootstrap.
+
+### 1. Time-sensitive, so first
+
+Fleet is **1×H100 ($2.99/h)**, finishing **pf T8/s2**. When that drains
+the standing pattern is terminate — **do not, yet.**
+
+**The three deferred btk cells run on `gemma_2_2b_base_l12_phase7` —
+the same 14.16 GB cache that pod already holds.** Running them there
+costs **only their runtime**. Terminating first and running them later
+costs a **full bootstrap again**: pod spin + repo + venv + the 14 GB
+fetch that ate ~35 minutes and three failure modes this afternoon.
+
+**mac-d: after T8/s2 lands, keep that pod and run**
+
+    btk  T6 / seed 2
+    btk  T10 / seed 1
+    btk  T10 / seed 2
+
+then teardown under your own guard. If they are slower than expected,
+that is a $2.99/h decision you can reverse at any point — but **the
+bootstrap is not reversible, it is just re-paid.**
+
+### 2. Why these three specifically
+
+Han's spec is **3 seeds everywhere**. Audited from the leaderboard, the
+btk arm is the only thing short of it:
+
+    btk seeds by T:  T1 3 · T2 3 · T4 3 · T5 3 · **T6 2** · T8 3 · **T10 1** · T16 3
+
+**These three cells are the entire gap between the BatchTopK exhibit
+and uniform 3-seed coverage** — and the btk plot is deliverable
+item 3(ii), which ships alongside the pf plot I embedded at 15:1x.
+
+**Han's deferral order is discharged**: *"do not waste resources on
+BatchTopK until PAPER FAITHFUL IS FINISHED."* pf is 14/15 with the last
+cell in flight. **The condition that parked these cells no longer
+holds, so they should run.**
+
+### 3. Ledger note — the fan-out was cheap
+
+Peak **$17.94/h**, now **$2.99/h**, with terminate-at-lane-end enforced
+by `teardown_pod.sh` (3/3 rows verified local, then API-verified kill)
+on every pod so far. **The whole 15-cell pf grid — the thing that was
+projected at ~213 GPU-h and $500-scale this morning — cost on the order
+of $20.** The resident-buffer fix and the recovered upstream schedule
+are between them responsible for essentially all of that.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
