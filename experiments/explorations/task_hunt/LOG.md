@@ -28047,3 +28047,80 @@ renderer is wave-1-verified; render the s42 curve as soon as the rows
 land and drop it into the HANDOFF slot I opened at 14:2x.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+---
+
+## 2026-07-28 15:05 London (date-verified at write) — mac-c: ⚑⚑ **DISCRIMINATOR RESOLVED — all four pre-registered predictions came true, and `retryesc_gen` CLEARS THE BAR THAT KILLED `retryesc`.** `unigram` 0.6723 → **0.5416**, whole CI below 0.60. All seven bands pass at **FULL-run** bars, mid-generation
+
+The 14:57 slice failed the vocabulary bar and I called it as
+truncation-driven, wrote the discriminator down before it could be
+resolved, and stated an unconditional kill rule. **The deeper slice
+(pair 25, 5× the depth) resolves it.**
+
+### 1. Scorecard — predictions were posted at 14:57, measured at 15:03
+
+| quantity | pair 5 | **pair 25** | I predicted | |
+|---|---|---|---|---|
+| **`unigram_auc`** | 0.6723 | **0.5416** [0.529, 0.556] | fall below 0.60 | ✅ |
+| **`floor_excess`** | 0.3865 | **0.1966** | fall toward **0.185** | ✅ |
+| `position_auc` | 0.7983 | **0.6331** | fall | ✅ |
+| face~position ρ | 0.5070 | **0.1765** | fall | ✅ |
+
+**4/4, and not marginally.** `unigram`'s *entire* confidence interval
+sits below the bar. `floor_excess` landed at **0.1966 against the
+stub-based structural prediction of 0.1850** — the $0 dry run predicted
+the real corpus's density to within **0.012**.
+
+### 2. ⚑ All seven bands pass at FULL-run bars — mid-generation
+
+Not the pilot-scaled ones. At pair 25 of 46, with generation still
+running:
+
+| band | value | full-run bar | |
+|---|---|---|---|
+| `unigram_auc` | **0.5416** | ≤ 0.60 | ✅ |
+| `doc_mean_only_auc` | 0.7074 | ≤ 0.88 | ✅ |
+| `position_auc` | 0.6331 | ≤ 0.95 | ✅ |
+| **`floor_excess`** | **0.1966** | **[0.15, 0.25]** | ✅ |
+| qualifying strata | **17/20** | ≥ 8 | ✅ |
+| usable tokens | **336,991** | ≥ 250,000 | ✅ |
+| events | **1,860** | ≥ 300 | ✅ |
+
+Corpus at this checkpoint: 300 docs, 635,867 tok, 347,450 eligible
+rows, gap median 198, vocabulary-control worst-leg cv **0.0622**
+(bar 0.35).
+
+### 3. What this establishes — and what it does NOT
+
+**Establishes:** the structural vocabulary fix **worked**. `retryesc`
+died at `unigram` 0.689–0.716 because task difficulty genuinely drove
+failure rate and no masking could separate them. Drawing the outcome
+schedule **before** the task, and sharing one strategy pool across all
+16 tasks, moves it to **0.5416 — near chance**. Difficulty is
+*assigned*, not intrinsic, and the label-side evidence now says so.
+**The candidate has cleared the exact ruler that killed its
+predecessor, on the same measurement, computed by the same helpers.**
+
+**Does NOT establish a KEEP.** These are **label-side** bands — they
+buy the *right to screen*, nothing more. The hunt4 § 4 KEEP rule (gain
+≥ +0.05 ∧ width-null ≥ +0.02 ∧ own-T floor ∧ `wd_ok`) needs a GPU
+screen that has not run. **Gold-visibility does NOT fire yet**; I will
+not put this in `REBUTTAL_HANDOFF.md` on label-side evidence, and the
+rule is explicitly conditioned on clearing the KEEP rule.
+
+⚠ **The honest caveat on my own call:** I had an incentive to prefer
+the truncation story and I said so at 14:57. The reason that is not
+what happened is that the discriminator was **four directional
+predictions written down in advance**, and a single motivated
+explanation does not get four independent numbers right — including one
+($f$ → 0.185, observed 0.1966) that came from a **stub simulation run
+before any generation**.
+
+### 4. Next
+
+Generation drains at pair 46 (~15:12). Then: full-corpus premeasure on
+the complete stream, corpus receipt + HF durability, and the **3-leg
+tokenizer rule** (the card's "all three tokenizers" binds the full run,
+not the slice). Then the screen — venue TBD, ~$1/h L40S under the
+standing waiver.
+
+_Recorded-by: claude-opus-5 (mac-c)_

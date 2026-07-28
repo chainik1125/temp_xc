@@ -1,173 +1,263 @@
 {
  "card": "retryesc_gen/GENERATION_CARD.md \u00a7 5",
- "pilot": true,
+ "pilot": false,
  "legs": {
   "retryesc_gen_slice": {
    "tokenizer_leg": "slice",
    "n_docs": 300,
-   "n_tokens": 146589,
-   "events": 314,
-   "eligible_rows": 23232,
+   "n_tokens": 635867,
+   "events": 1860,
+   "eligible_rows": 347450,
    "tercile_edges": {
     "scheme": "terciles",
     "edges": [
-     5.882643222808838,
-     6.977280139923096
+     6.820178985595703,
+     8.087462425231934
     ]
    },
    "claim_zone": {
-    "n_rows": 23232,
-    "mean": 102.10098266601562,
-    "median": 80.0,
+    "n_rows": 347450,
+    "mean": 248.426513671875,
+    "median": 176.0,
     "frac_in_window": {
      "T4": 0.0,
      "T8": 0.0,
      "T16": 0.0,
-     "T32": 0.08010502754820936,
-     "T64": 0.3865358126721763
+     "T32": 0.04064181896675781,
+     "T64": 0.1966268527845733
     }
    },
-   "floor_excess_T64": 0.3865358126721763,
+   "floor_excess_T64": 0.1966268527845733,
    "face_position_spearman": {
-    "rho": 0.5070241685934386,
-    "n_rows": 23232
+    "rho": 0.17652128539188727,
+    "n_rows": 347450
    },
-   "unigram_auc": 0.6722603411835749,
+   "unigram_auc": 0.5416250941610052,
    "unigram_auc_ci": [
-    0.6424840653735889,
-    0.7073386761296969
+    0.5285467133827733,
+    0.5559246937891774
    ],
-   "position_auc": 0.7983314462560387,
+   "position_auc": 0.633108940970786,
    "position_auc_ci": [
-    0.7136804597964582,
-    0.8743931487653053
+    0.5811936563308189,
+    0.682162480721328
    ],
-   "doc_mean_only_auc": 0.7877640021135266,
+   "doc_mean_only_auc": 0.707420912512958,
    "doc_mean_only_auc_ci": [
-    0.7200425910334023,
-    0.841548270425318
+    0.6722933813478322,
+    0.734190383393314
    ],
    "floors": {
     "censored_age": {
      "T4": 0.5,
      "T8": 0.5,
      "T16": 0.5,
-     "T32": 0.6227213541666666,
-     "T64": 1.0
+     "T32": 0.5615501860402564,
+     "T64": 0.7928452951988165
     },
     "in_window_event_tokens": {
-     "T4": 0.4401041666666667,
-     "T8": 0.3802083333333333,
-     "T16": 0.2604166666666667,
-     "T32": 0.032552083333333336,
-     "T64": 0.0
+     "T4": 0.46933697942349933,
+     "T8": 0.4386739588469987,
+     "T16": 0.3773927466714484,
+     "T32": 0.26020979961447077,
+     "T64": 0.06800555879320393
     }
    },
    "strata_census": {
     "stratum_width": 128,
     "min_rows_per_tercile": 50,
     "tercile_edges_pooled": [
-     5.882643222808838,
-     6.98868465423584
+     6.845489978790283,
+     8.098031997680664
     ],
-    "n_strata_any": 4,
-    "n_qualifying": 2,
+    "n_strata_any": 20,
+    "n_qualifying": 17,
     "qualifying_strata": [
-     2,
-     3
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19
     ],
-    "usable_tokens": 21813,
+    "usable_tokens": 336991,
     "per_stratum_tercile_counts": {
-     "2": [
-      4720,
-      3677,
-      1359
-     ],
      "3": [
-      2485,
-      3706,
-      5866
+      7458,
+      7997,
+      268
+     ],
+     "4": [
+      8701,
+      7333,
+      3719
+     ],
+     "5": [
+      7900,
+      9225,
+      5526
+     ],
+     "6": [
+      6476,
+      9214,
+      8095
+     ],
+     "7": [
+      7378,
+      7634,
+      9284
+     ],
+     "8": [
+      7757,
+      7781,
+      9969
+     ],
+     "9": [
+      7869,
+      8024,
+      9919
+     ],
+     "10": [
+      8117,
+      7618,
+      10459
+     ],
+     "11": [
+      8025,
+      8650,
+      9512
+     ],
+     "12": [
+      7459,
+      8870,
+      9413
+     ],
+     "13": [
+      7506,
+      7812,
+      8748
+     ],
+     "14": [
+      6803,
+      6993,
+      8117
+     ],
+     "15": [
+      4901,
+      6086,
+      7645
+     ],
+     "16": [
+      4715,
+      4718,
+      6846
+     ],
+     "17": [
+      3829,
+      3655,
+      4846
+     ],
+     "18": [
+      1996,
+      2253,
+      2551
+     ],
+     "19": [
+      479,
+      364,
+      478
      ]
     }
    },
    "bands": {
     "unigram_le_0.60": {
-     "value": 0.6722603411835749,
-     "pass": false
+     "value": 0.5416250941610052,
+     "pass": true
     },
     "doc_mean_le_0.88": {
-     "value": 0.7877640021135266,
+     "value": 0.707420912512958,
      "pass": true
     },
     "position_le_0.95": {
-     "value": 0.7983314462560387,
+     "value": 0.633108940970786,
      "pass": true
     },
     "floor_excess_in_band": {
-     "value": 0.3865358126721763,
-     "pass": false
-    },
-    "qualifying_ge_4": {
-     "value": 2.0,
-     "pass": false
-    },
-    "usable_ge_20000": {
-     "value": 21813.0,
+     "value": 0.1966268527845733,
      "pass": true
     },
-    "events_ge_60": {
-     "value": 314.0,
+    "qualifying_ge_8": {
+     "value": 17.0,
+     "pass": true
+    },
+    "usable_ge_250000": {
+     "value": 336991.0,
+     "pass": true
+    },
+    "events_ge_300": {
+     "value": 1860.0,
      "pass": true
     }
    },
-   "mass_bands_pilot_scaled": true,
-   "all_pass": false
+   "mass_bands_pilot_scaled": false,
+   "all_pass": true
   }
  },
  "worst_per_band": {
   "unigram_le_0.60": {
-   "pass_all_legs": false,
+   "pass_all_legs": true,
    "values": [
-    0.6722603411835749
+    0.5416250941610052
    ]
   },
   "doc_mean_le_0.88": {
    "pass_all_legs": true,
    "values": [
-    0.7877640021135266
+    0.707420912512958
    ]
   },
   "position_le_0.95": {
    "pass_all_legs": true,
    "values": [
-    0.7983314462560387
+    0.633108940970786
    ]
   },
   "floor_excess_in_band": {
-   "pass_all_legs": false,
-   "values": [
-    0.3865358126721763
-   ]
-  },
-  "qualifying_ge_4": {
-   "pass_all_legs": false,
-   "values": [
-    2.0
-   ]
-  },
-  "usable_ge_20000": {
    "pass_all_legs": true,
    "values": [
-    21813.0
+    0.1966268527845733
    ]
   },
-  "events_ge_60": {
+  "qualifying_ge_8": {
    "pass_all_legs": true,
    "values": [
-    314.0
+    17.0
+   ]
+  },
+  "usable_ge_250000": {
+   "pass_all_legs": true,
+   "values": [
+    336991.0
+   ]
+  },
+  "events_ge_300": {
+   "pass_all_legs": true,
+   "values": [
+    1860.0
    ]
   }
  },
- "all_pass": false,
+ "all_pass": true,
  "EVIDENCE": "generated prose"
 }
