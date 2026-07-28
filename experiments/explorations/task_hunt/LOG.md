@@ -32021,3 +32021,96 @@ the blocker was only ever whether the *SAE* survived, and it did.
 both budget conditions, and the pre-registered verdict either way.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+---
+
+## 2026-07-28 21:18 BST — mac-c ANSWER to §6: ⚑ **NO.** `tsae_btkonly` CANNOT run at T>1 — it raises `ValueError`. And probing/RLHF/EM have no stacked arm either. **The objection lands on the headline sections.**
+
+Answering the hub's §6 question plainly, as asked. **The answer is the
+bad one.** $0, ~7 minutes, three independent confirmations.
+
+### 1. T-SAE is per-token BY CONSTRUCTION, not by configuration
+
+`src/temp_bench/archs/tsae.py:113` — this is a deliberate hard guard, not
+an oversight:
+
+```
+# T-SAE is per-token at inference: T must be 1. We accept the `T`
+# kwarg only so the unified sweep can pass T uniformly across archs
+# (window archs take T>1); a non-1 value is rejected rather than
+# silently ignored.
+if int(T) != 1:
+    raise ValueError(f"T-SAE is per-token; T must be 1, got {T}.")
+```
+
+**Verified by instantiation, not by reading:**
+
+    tsae_btkonly              T=1  -> BUILT (config.T=1)
+    tsae_btkonly              T=2  -> ValueError: T-SAE is per-token
+    tsae_btkonly              T=4  -> ValueError
+    tsae_btkonly              T=16 -> ValueError
+    stacked_batchtopk_btkonly T=4  -> BUILT (config.T=4)
+
+This is **faithful to Ye et al. 2025** — T-SAE's temporal part is a
+*training-time* contrastive construct over consecutive-token pairs, not
+an inference-time window. So the arch is correct; it is simply **not a
+windowed comparator and never could be.**
+
+### 2. And there is no windowed SAE in those sections at all
+
+Archs actually present in `results/leaderboard.jsonl`, by section:
+
+| section | has a windowed SAE baseline? | SAE-family arms present |
+|---|---|---|
+| **probing** | ❌ **NO** | `batchtopk_sae{,_btkonly}`, `tsae{,_btkonly}`, `paper_topk_sae_v1`, `paper_tsae_v1` — **all per-token** |
+| **rlhf** | ❌ **NO** | `batchtopk_sae{,_btkonly}`, `tsae_btkonly` — **all per-token** |
+| **em** | ❌ **NO** | `batchtopk_sae{,_btkonly}`, `tsae{,_btkonly}` — **all per-token** |
+| synthetic | ✅ yes | `stacked_sae` (62), `stacked_batchtopk` (**1467**) |
+
+**In probing, RLHF and EM, every SAE baseline is per-token and TXC is the
+only arm with window access.** That is structurally the same situation as
+item 6 — and it is the situation the hub feared.
+
+Confirmed at the cell definitions too: `actmix_rlhf/cells.py` `txc(T)`
+passes `{"T": T}` explicitly while `tsae(k)` and `sae(k)` pass **no T**;
+`actmix_em/cells.py` `tsae_cell` likewise. `tsae_btkonly` carries no `T`
+key in `configs/archs.yaml`, so it takes the class default `T=1`.
+
+### 3. What I am NOT claiming
+
+**The structural gap is a fact; whether it invalidates a given exhibit is
+a separate read I have not done.** The hub notes the probing section
+already frames results as probe-budget-dependent with *no monotone window
+win at any k* — if that is how the claim is stated, probing may be
+substantially inoculated, because it is not asserting the thing the
+missing baseline would refute. **RLHF and EM need the same read before
+anyone panics or relaxes.** I am reporting the exposure, not a verdict on
+each section.
+
+### 4. ⚑ The good news, and it is real: the fix already exists in-repo
+
+**`stacked_batchtopk_btkonly` is registered, builds at T=4, and has 1467
+rows in synthetic.** The windowed-SAE baseline is not something we would
+have to invent under time pressure — it is a battle-tested arch that was
+simply never run in probing/RLHF/EM. Same for the pooled arm, which per
+§1 of the brief is an eval-only post-hoc transform of the already-trained
+T=1 SAE.
+
+**So the remediation is the same encode-and-probe shape mac-d is already
+building for item 6** — which means the item-6 harness, once written,
+extends to the paper sections rather than being thrown away.
+
+### 5. Recommendation
+
+1. **Tell Han now.** He is planning around the item-6 table; this changes
+   its scope from one exhibit to potentially three.
+2. **Read what probing/RLHF/EM actually claim** before sizing the work —
+   that determines whether this is "add a baseline for completeness" or
+   "a headline is unsupported". I can do that read next; it is $0.
+3. **Build mac-d's frontier harness so it is section-agnostic**, since it
+   will very likely be needed for more than `sycgen`.
+
+**$0. 0 mac-c pods.** Geometry lane untouched and still parked as
+reported at 21:06.
+
+_Recorded-by: claude-opus-5 (mac-c)_
