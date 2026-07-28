@@ -31602,3 +31602,116 @@ that before assuming the paper sections are safe from the same
 objection.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 21:06 BST — mac-c: LANE B + LEVER 3 both land. ⚑ TRAINING variance DOMINATES sampling variance — every σ in the hub's table is ~1.5× too small. And I was wrong about ρ
+
+Both $0, both frozen before running. **Two of my own claims are corrected
+below by measurement, one of them from 40 minutes ago.**
+
+### 1. ⚑ Lane B — the screen's real error bar (5 seeds + paired bootstrap)
+
+Replication guard passed exactly (`fit_probe 0.377170 == mine 0.377170`),
+so these numbers are the screen's own probe, not a lookalike.
+
+| cell | gain | SE sampling | **SD across seeds** | **TOTAL SE** | ρ measured |
+|---|---|---|---|---|---|
+| T8 | +0.0130 | 0.0052 | **0.0203** | **0.0209** | 0.518 |
+| T16 | +0.0283 | 0.0059 | **0.0105** | **0.0120** | 0.534 |
+| T64 | +0.1182 | 0.0067 | **0.0103** | **0.0123** | 0.383 |
+
+**Seed variance is 1.5×–3.9× LARGER than sampling variance.** The hub
+estimated the gain's SE at 0.007–0.010 from sampling alone; **the real
+total is ≈ 0.012**, and at T8 it is **0.021**. Raw accuracies swing up to
+**0.054 across seeds at T8** on identical data.
+
+**Consequences:**
+
+- **Every σ in the hub's § 1 table is ~1.5× too generous.** `evalage`
+  gemma's shortfall is **0.33 σ**, not 0.54 σ. **The rescue case is
+  STRONGER than the brief argued**, on the brief's own logic.
+- **`sycgen` survives easily** — ~9 σ becomes ~5 σ. The one KEEP is not
+  in question.
+- **3 seeds is the minimum for any future screen cell**, and per-example
+  predictions must be saved. Confirmed at source why: `fit_probe(...,
+  seed: int = 0)` and its return dict has no predictions, so the record's
+  paired SEs are genuinely unrecoverable — the hub read that right.
+
+**⚠ And I was wrong about ρ.** At 20:5x I argued the hub's illustrative
+ρ=0.5 was probably too low, that ρ should be 0.7–0.9, and that this "cuts
+against the rescue case". **Measured ρ = 0.383 / 0.518 / 0.534.** The
+hub's 0.5 was well chosen and my objection was backwards — the correct
+adjustment goes the *other* way and helps `evalage`. I measured it
+instead of leaving it as an assertion, which is the only reason this is a
+correction and not a contaminated record.
+
+### 2. Lever 3, T half — measured, and it does NOT close the gap
+
+Best configuration available (gemma2_2b @ 512), 0/5 KEEP-shaped:
+
+| T | arm−floor | gain−0.05 | min(both) |
+|---|---|---|---|
+| 4 | **+0.0360** | −0.0400 | −0.0400 |
+| 8 | **+0.0267** | −0.0291 | −0.0291 |
+| 16 | −0.0107 | −0.0249 | −0.0249 |
+| 32 | −0.0599 | **+0.0010** | −0.0599 |
+| 64 | −0.1175 | **+0.0588** | −0.1175 |
+
+### 3. Lever 3, w half — counterfactual, and the answer is NO-GO
+
+Refit the floor under narrowed event turns, **arm held fixed** (biased in
+favour of spending). 30 cells:
+
+| w | T=16 arm−floor | T=32 arm−floor | T=64 arm−floor |
+|---|---|---|---|
+| 25 (actual) | −0.0107 | −0.0599 | −0.1175 |
+| 8 | +0.0681 | **+0.0154** | −0.0754 |
+| 4 | **+0.0737** | +0.0363 | −0.0625 |
+| 1 | **+0.0737** | +0.0496 | −0.0463 |
+
+**4/30 cells come out KEEP-shaped — all at T=32 — and every one of them
+has a gain margin of +0.0010.** Against the total SE measured in § 1,
+that is **0.08 σ**. It is a coin flip, obtained under an assumption
+chosen to flatter it.
+
+**⇒ Generating a narrow-event corpus is NOT justified. Clean $0 no-go**,
+and exactly the call the $21 was at risk of being argued into. **Note
+this is the failure mode the old single-seed screen would have gotten
+wrong in the OTHER direction** — it would have reported a KEEP at
+w=4/T=32 with no error bar at all.
+
+### 4. ⚑ Why w cannot rescue large T — the floor has an irreducible part
+
+Even at **w=1**, T=64 stays negative (−0.0463). The floor has **two**
+features and only one depends on w: `dose_window_count(mask, T)` reaches
+to T+w and is removable, but **`sage_floor` gives the EXACT age whenever
+the event is inside T** and is untouched by narrowing. At T=64 that alone
+scores 0.5369 against the arm's 0.4907.
+
+Conversely at T=16 with w≤4 the floor collapses to **exactly chance
+(0.3333)** and arm−floor reaches **+0.0737, the best separation on
+record** — but gain is only +0.0251.
+
+**So the constraint is now located precisely:** the floor's w-part is
+ours to delete; its censored-age part grows with T; and the arm's gain
+also needs T. **A KEEP requires the tercile edges to sit well ABOVE T**
+so `sage_floor` saturates, while T stays large enough to aggregate. On
+this corpus (edges 109/262) T=32 is the only cell where those overlap,
+and it overlaps by 0.08 σ.
+
+### 5. Recommendation
+
+1. **Fix the screen instrument first — it is cheap and it changes past
+   verdicts.** 3+ seeds per cell, save per-example predictions, report
+   total SE. **Do not move the +0.05 bar**; report that the bar is now
+   ±0.012 and let the hub/Han rule.
+2. **Do NOT fund a narrow-event corpus.** 0.08 σ, optimistically biased.
+3. **`evalage` retrain is better justified than the brief argued (0.33 σ,
+   not 0.54 σ)** — and at corrected geometry it is real pod work.
+   `llama31_8b` and SEQ_LEN 1024 are the cells that genuinely need a GPU;
+   gemma2×512 is already done locally at $0.
+
+**$0 so far. 0 mac-c pods.** No generation money committed.
+
+_Recorded-by: claude-opus-5 (mac-c)_
