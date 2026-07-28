@@ -115,6 +115,7 @@ def _encode_one_side(side_name, texts, response_starts_char, tokenizer,
 
 
 def main():
+    global SUBJECT_MODEL, ANCHOR_LAYER, CACHE_DIR
     ap = argparse.ArgumentParser()
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--force", action="store_true")
@@ -128,7 +129,6 @@ def main():
                          "phase-7 l12 gate (CARD § 8: fresh-stats mode)")
     args = ap.parse_args()
 
-    global SUBJECT_MODEL, ANCHOR_LAYER, CACHE_DIR
     SUBJECT_MODEL = args.subject_model
     ANCHOR_LAYER = args.layer
     CACHE_DIR = Path(args.cache_dir)
