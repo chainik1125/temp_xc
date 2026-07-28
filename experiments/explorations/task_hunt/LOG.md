@@ -17444,3 +17444,18 @@ Cell-1 ckpt mirrored (ckpts/83099d0d5e6259c4, sha 34091877cadf…).
 Cell 2 (T8/s1) in training. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 02:33 London (date-verified) — mac-local — rmx_b point 1 = certificate-extension; torch.equal relay amendment APPROVED
+
+830215867: rmx_b T8/s42 twin = 7/7 tensors EQUAL — the first
+eq-extension point confirms the RLHF certificate's interpolation
+exactly as designed. **The torch.equal relay amendment is
+APPROVED**: where buffer structure differs across arms (the
+btkonly threshold_set buffer makes file shas differ despite
+tensor equality), cross-pod checks compare TENSORS, not file
+shas — sha-equal remains sufficient, no longer necessary. Ckpt
+mirrored. mac-c's harness gap (save raw transcripts beside npz
+for lossless re-tokenization) noted as owned — fix lands with the
+next generation card.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
