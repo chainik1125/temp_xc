@@ -52,165 +52,50 @@
   tret_py § 8 rows applied 0a73061ef (+ replication-receipt
   one-liners offered by runpod-b, mac-local applies).
 
-## ACTIVE NOW (rewrites older sections above where they conflict)
+## ACTIVE NOW (rewritten 2026-07-28 ~03:05 London — night queue COMPLETE)
 
-**1. tsae width directive (task #6) — STEP-0 DONE, lane tsae_s2
-IN FLIGHT.** STEP-0 verdict (LOG ~23:1x 07-27): RLHF tsae was
-NEVER at 16384 — shipped paper ckpts d_sae 18432 (groups
-[3686, 14746], shas cbbb189c…/4c1a83c9…, papermatch.json) AND all
-trained btk-only rows carry explicit override {d_sae: 18432}
-(s42 8f4e0b12/7c58d372, s1 4e1661d9/7e95839d, data_key 44b72320,
-none excluded). Underpowered premise = probing-only. Execution =
-CARD § 7 **A4** + cells.py `lane tsae_s2` (= _s2(tsae(500)),
-_s2(tsae(20)); h_size 3686 stated): the {1,2,42} triple minus
-existing {42,1}; NO s42/s1 re-runs (train_key byte-alias hazard,
-013441cfd lesson) — descope flagged PTR. Pod-A chain (committed
-builders): HF pull txcdr-base-data 14.2 GB →
-convert_train_cache (idempotent, data_key 44b72320bc3a56e2) →
-build_cache.py (**App B.1 gate = hard STOP on miss**: rj≈36.23 /
-ch≈28.57 / p≈9.76e-10) → run_cells --lane tsae_s2 --pin <freeze
-sha>, GPU 0, AGENT_NAME=runpod-a. Est ~1–1.5 GPU-h ≈ $4–7
-(ledgered). Rows land → ONE LOG results line (PTR) + task #6
-closes. Driver wall-log /workspace/logs/actmix_rlhf_runs_tsae_s2.jsonl.
+**All three of tonight's tasks are CLOSED, wrapped, ratified-or-PTR:**
 
-**1b. reask_hr SCREEN — FROZEN fcd028783, chain QUEUED (task #7).**
-Freeze = card + cache_acts + screen + verdict ONE commit
-(`experiments/explorations/task_hunt/reask_hr/`), ledger est $3–6
-same commit. Mechanics smoke pre-freeze: gpt2 tokens byte-verified,
-tercile edges asserted vs committed JSON, manifests viable
-(train 3998/class, test 1362/class; wd 8000/3000 over 115/24
-convs), position AUC after stratified matching 0.59/0.61 (vs raw
-0.946 — operative number, reported in rows stats). Launcher
-`/workspace/agents/runpod-a/run_reask_hr.sh` (bg): waits for the
-tsae_s2 lane → worktree `wt_reask_hr` @ pin → per model
-gpt2/gemma2_2b/llama31_8b: cache (→ /workspace/reask_hr_caches,
-single-layer per SCREEN_HS) → screen (results in WORKTREE
-reask_hr/results/) → verdict. THEN (me, on completion notice):
-harvest results JSONs → commit+push → ONE bundle LOG entry (PTR)
-w/ WRITEUP § 8 trio-kill rows batched (mac-local's line) → ledger
-actuals → remove worktree (cmp discipline). Original build
-checklist (for reference; all numbers in committed JSONs —
-reask_gate_census.json, reask_hr_premeasure.json,
-wave3_trio_stats.json):
-- `reask_hr/` subdir (hunt4w2 clone pattern): CARD (hr face
-  primary + pooled labels-only disclosure; census numbers
-  verbatim; clock 119–137 tok/msg; claim zone from per-T
-  censored-age floors; BINDING: position-matched manifests,
-  position-floor arm, wd arms; § 4 = hunt4 rules verbatim;
-  scorer committed IN the freeze) + cache_acts (refmark2k grid →
-  /workspace/reask_hr_caches, ~51k rows ×128, capture per
-  SCREEN_HS; llama ~20 min, gemma ~8, gpt2 ~2 on H100) + screen
-  (hunt4w2/screen.py transplant: faces=(reask_hr,), manifests
-  from wave3_reask_hr_<tok>.npz event arrays via
-  position-stratified balanced classes, elig = assistant tokens,
-  event+boundary masked) + verdict.
-- Freeze card+builders+scorer ONE commit → push → pin → ledger →
-  run 3 models sequentially GPU 0 → mechanical verdict → ONE
-  bundle LOG entry (PTR). WRITEUP § 8 rows for trio kills BATCH
-  with this screen result (mac-local's line).
-- Budget: hunt envelope headroom (envelope ≈ $175); est $3–6
-  pod-hours. Window: tonight fine, or morning — no deadline
-  binds it (the AoE support work is other lanes').
+1. **tsae width directive (#6)** — STEP-0 verdict (RLHF never at
+   16384) RATIFIED 4bd6ce7be; lane tsae_s2 landed 2/2; 3-seed table
+   k500 0.621±0.004 / k20 0.600±0.002 posted; actuals $2 (−$4 corr).
+2. **reask_hr screen (#7)** — freeze fcd028783 ratified f8815e1e0;
+   KILL 3/3 bundle (gemma qualifying arm ERASED by wd; order 0/3);
+   wave-3 closes 0-for-3; § 8 draft rows staged in my ~23:55 entry
+   (mac-local applies); salvage triage ruled reask_hr stays dead on
+   its merits; actuals ~$1.5-2 (−$3 corr).
+3. **a⇄b swap (#8, be3d3fddc)** — lane x4 T4 triple 0.620±0.009
+   (feeds runpod-2's item-3 render); λ̂ R30 twin IDENTICAL (7/7,
+   |Δ|=0.0, threshold_set structural); **⚑ dq twin DIVERGES (W_enc
+   0.352, eauc +0.015) ⇒ R30 certificate venue-scoped** — item-5
+   caption fork is mac-local's call (my ~02:55 wrap, PTR); actuals
+   $7. Twin driver fix-forwards on origin (one-pool-per-process +
+   sys import + since-window).
 
-**2. Wave-3 zero-pull trio pre-measures** (task #5, directive
-ae1ce5fb0): CPU, in flight. **FROZEN constants (pre-counting):**
-- sycpress (labels/sycpress_lib.py): USER-turn substrings,
-  case-insensitive, apostrophes normalized (’´→'), VERBATIM from
-  github.com/meg-tong/sycophancy-eval @
-  `9a1694221e3639887138f61deae344335eca6752` (2310.13548's own
-  intervention templates; README are_you_sure challenge split
-  into its 2 component sentences — disclosed; example.ipynb
-  feedback prefixes): ("are you sure", "i don't think that's
-  right", "i really like", "i really dislike", "i wrote",
-  "i did not write"). Union stream; per-string census disclosed.
-- reask (wave3_lib.py): user u_i s.t. assistant a_{i-1} fires
-  refmark_lib.is_marker_turn VERBATIM ∧ ∃ user u_{i-2} ∧
-  content-word Jaccard(u_i, u_{i-2}) ≥ 0.3 ∧ both sides ≥ 3
-  content words ([a-z0-9']+ minus frozen in-lib stopword list).
-  EVENT-MASS census FIRST (tretd lesson).
-- Faces: sycpress_rate = punctint sentence_lambda HL 2 / support
-  8 msgs (refmark's kernel); sycpress_age + reask_age = gen4c
-  sage_face VERBATIM over event-message FIRST-token flags
-  (support 64). Eligibility = assistant tokens; event+boundary
-  masked.
-- msdose: constructed from committed gen4c_wikitext103_<tok>.npz
-  (no content re-tokenization; delim "\n###\n" tokenized fresh,
-  disclosed): SEED=0, N_DOCS=400, N_EX~randint(4,25), span
-  len~round(clip(lognormal(ln120, 0.6), 40, 400)), dose_so_far =
-  running boundary count. REPORT Spearman(dose, position)
-  pre-screen + boundary-count/censored-age floors T∈{4..64}.
-- Anti-dup FIRST-CLASS: Spearman vs committed refmark2k rlam
-  (same token grid — assert token_ids identical) + trio pairwise;
-  0.8 bar.
-- Sequence: libs+tests COMMIT (freeze) → run → artifacts+stats →
-  LOG pre-measure entry (PTR) incl. my four § 7 formal $0 kills
-  (sleeper-latch, refusal-redux, prompt-harmfulness, turn-count).
-  Card bars binding: out-of-window-by-construction +
-  clock-stated-first.
-- **PRE-MEASURES DONE + RATIFIED (c5023d9f3):** sycpress
-  KILL-as-frozen (35 events/2k convs, docmean .995; subclass
-  62.9/37.1 disclosed), msdose KILL-as-constructed (dose↔pos
-  .962, pos AUC 1.0), **reask = CARD CANDIDATE** (548 events,
-  floors ≤.57, anti-dup clean). Four § 7 kills formalized.
-  Artifacts + entries: `a1f94e679`. mac-c second-source (their
-  20:25 entry) absorbed; their re-entry paths (msdose per-doc
-  span scale σ_doc; sycpress broader pinned list) are FUTURE
-  pre-count amendments, not mine tonight.
-- **REASK GATE CENSUS DONE (my ~19:05 entry, PTR):**
-  apology-only 57.5 % ⇒ **`reask_hr` (hard-refusal-gated, 233
-  events) pre-registers as PRIMARY**; pooled gate = disclosed
-  secondary. Jaccard gate = 75.4 % of selection, only 15.6 %
-  length-ratio-bound (median ratio .60) — selection is content
-  divergence, disclosed w/ numbers. Instrument
-  `labels/census_reask_gate.py` + `reask_gate_census.json`
-  committed.
-- **NEXT (in order):** (1) `reask_hr` variant pre-measure, $0 —
-  extend build_wave3_trio machinery to the hr event stream (gate
-  = HARD_REFUSAL subset per census_reask_gate.HARD_REFUSAL):
-  event mass/floors/traps/anti-dup vs pooled reask + refmark.
-  (2) REASK screen card DRAFT (hr primary + pooled secondary;
-  T2 age probed at assistant tokens; claim zone from per-T
-  censored-age floor; position-matched manifests + position-floor
-  arm + BINDING wd arms — tret precedent; clock 119–137 tok/msg
-  stated; census numbers verbatim; both binding menu bars).
-  (3) FREEZE + screen ONLY when GPU 0 frees behind RM
-  (c5023d9f3: "when GPU frees behind RM"; scorer committed with
-  freeze). WRITEUP § 8 rows for trio kills batch with the reask
-  screen result (mac-local's line).
+**Standing state:** GPU 0 FREE (runpod-b's rmx_b owns GPU 1, drain
+~11:30). No runpod-a lanes in flight. Durability COMPLIANT: 8/8
+lane ckpts on the ratified mirror `ckpts/<key>/` w/ sha receipts
+(LOG ~01:45 + ~02:55 entries); `scripts/push_ckpts_hf.py` is the
+fleet uploader (auto-push path does NOT exist in the trainer —
+my flag, acked by mac-local, rows stand as-is). Agent-stamp
+patches: run_cells + grid.py env-first (mine), others swept by
+runpod-2. Listener re-armed each beat (150 s fetch-poll LOG +
+briefings/).
+
+**Watch-fors:** (a) mac-local's dq caption-fork ruling — if (b)
+"measure the relu-mix column", that lane would land here (GPU 0
+free); (b) § 8 draft-row application; (c) any 11:00 BST handoff
+support asks (my T4 rows + twin receipts feed items 3/4/5).
 
 ## House-rule cache
 
 Pull-rebase before every push; BOTH LOG blocks on conflict; stray
-grep baseline = 1 (the rule quoting itself ~line 9989); stamp from
-`date` (BST=UTC+1; NB other agents' stamps still run fast — commit
-order authoritative); PTR everything; no Modal creds on pods.
+grep baseline = 1 (the rule quoting itself); stamp from `date`
+(BST=UTC+1) and VERIFY against commit time (two corrigenda tonight
+— stamp-drift is the house failure mode); PTR everything; NEVER
+stash around a live-writing runner (commit rows checkpoints); one
+run_pool per process (futex-wedge lesson); worktree-detach at pin
+for every GPU lane, cmp-verify harvests before --force removal;
+token PATHS only, no Modal creds on pods.
 
 *Rewrite before any compact.*
-
-## POST-HALT ADDENDUM (~20:20 London)
-
-Han override (mac-local 20:12 entry): HIGH-T relu-mix arm
-REINSTATED for runpod-1 (T{6,8,10,16}×3 seeds, dead-latent
-telemetry, per-cell equivalence checks) — **runpod-1 may borrow
-MY GPU 0 for a shard, PRE-APPROVED by that entry** (claim = their
-LOG line; my reask stage is CPU-first so no conflict). My halt
-wrap-up stands as pushed (911c601f2): shard-2 inventory correct,
-−$8 corr, worktree removed, task #4 closed. Next window: build
-the reask_hr card per the checklist in § 1b above — CPU-first
-(card+builders+tests+freeze); the GPU screen slots around any
-high-T borrow.
-
-## DIRECTIVE 98a9ea718 (~22:49 entry) — RLHF tsae@18432 (task #6)
-
-Dmitry-via-Han: tsae was width-mismatched (16384 vs family 18432;
-configs/archs.yaml receipt; RLHF has no per-experiment override).
-MY LANE = RLHF side (runpod-b takes probing side on GPU 1):
-**STEP 0 before ANY GPU spend: pin the paper RLHF section's tsae
-cell config from provenance (actmix_rlhf/CARD.md paper-match
-cells + experiments/rlhf configs). If the paper RLHF section has
-NO tsae baseline → REPORT AND STOP, do not invent a cell.** Else
-tsae@18432 × seeds {1,2,42} otherwise identical, realized h_size
-stated (h_frac 0.2), card→pin→ledger→GPU 0→rows→LOG (PTR). My
-GPU-0 idle 2.5 h was recorded acceptable + now filled by this.
-reask_hr card build continues CPU-first in parallel (§ 1b).
-**RESOLVED — see ACTIVE NOW item 1 (STEP-0 verdict + A4 lane).**
