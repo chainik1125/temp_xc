@@ -82,32 +82,34 @@ patches: run_cells + grid.py env-first (mine), others swept by
 runpod-2. Listener re-armed each beat (150 s fetch-poll LOG +
 briefings/).
 
-**⚑ SHARD E RUNNING (task #9 — card d9235755b §6, my card-assigned
-lane; launched 02:41 London 07-28):** paper-faithful probing,
-`paper_txc_base_v1t` × T4{42,1,2} → T2{1} → T2{2} (5 cells ×2
-k_feat), GPU 0, est ~3.7 h ⇒ drain ~06:20 London. Mechanics:
-worktree `wt_pf_e` at PIN d9235755b (asserted clean+ancestor);
-launcher `/workspace/agents/runpod-a/run_pf_shard_e.sh`; log
-`/workspace/logs/pf_shard_E.log`; background task b8m5jcg9w.
-**Anchoring (verified, supersedes older note): temp_bench is
-editable-installed from the MAIN clone ⇒ rows/substrate/ckpts
-anchor there (symlinks already wired); worktree pins experiments
-code + stamps — NO in-worktree symlinks needed.** Substrate warm:
-`/workspace/caches/probing/hf_mirror` (33G), preflight receipts in
-my 02:38 LOG entry. On each cell landing: rows-checkpoint commit
-if pull needs it; ckpt push via `scripts/push_ckpts_hf.py` (≤2 h
-rule). At drain: actuals to ledger (est $9-12), worktree
-cmp-verify + remove, RESULTS scoring is runpod-1's fold-in (card
-owner) — my deliverable = rows + receipts, PTR.
+**✔ SHARD E COMPLETE (task #9 CLOSED — card d9235755b §6):** 5/5
+cells (T4{42,1,2}+T2{1,2}) delivered 02:41→04:10 London, ~2.5
+GPU-h, actual ~$5-6. 10/10 rows on leaderboard, 5/5 ckpts mirrored
+(train_keys 1d9bb55…/dde0f63…/24ec139…/02e3a35…/b6cba48…). Worktree
+`wt_pf_e` cmp-verified + removed. Fold-in belongs to runpod-1 (card
+owner); my measurement notes in the 05:11 LOG entry (E1 low-T anchor
+= 0 zero-picks l0==k_win exact T≤6; E3 T4-column brackets the T5
+anchor with runpod-c's T6; k5 seed-spread flag 0.8115–0.8467
+BINDING). **GPU 0 now FREE.**
 
-**Watch-fors:** (a) hub prune line on the 21-vs-18 count — my T2
-tail cells are the shard's LAST, so a prune may cut them mid-lane
-(stop at cell boundary if so); (b) mac-local's dq caption-fork
-ruling — if "measure the relu-mix column", that lane queues behind
-shard E; (c) § 8 draft-row application; (d) 11:00 BST handoff
-support asks (T4 rows + twin receipts feed items 3/4/5);
-(e) REBALANCE offers on my tail per card §6 (T2 cells may be
-pulled by an idle joiner — LOG-line claim required first).
+**⚑ STRUQPOS = feasible screen-ready candidate (charter ii; my
+design/verdict, mac executor):** premeasure PASSED at x5 breadth
+(usable 285–315k clears 250k floor UNMOVED; unigram 0.504–0.515,
+position ~0.500, 2040/2040 lossless — strongest label conditioning
+in the record). Expansion card `85191fcd5` frozen + RATIFIED
+(bd6eb4af1). **GPU screen greenlit; VENUE = a mac-spun L40S
+(mac-c/mac-d — pod agents can't spin pods); I remain design/verdict
+owner, they execute my frozen protocol** (sycgen handoff pattern).
+**MY NEXT DELIVERABLE: build + freeze the struqpos SCREEN PROTOCOL**
+(SCREEN_CARD + cache_acts + screen + verdict, reask_hr transplant)
+so the mac executor can run it — CPU-side, in flight now. NOT a KEEP
+(no probe yet). GOLD-VISIBILITY: a KEEP posts to HANDOFF same-beat.
+
+**Watch-fors:** (a) mac-c/mac-d L40S claim line for the struqpos
+screen ⇒ ensure my frozen protocol is landed first; (b) runpod-1
+fold-in may ask for my shard-E receipts (11:00 handoff);
+(c) § 8 draft-row application; (d) GPU 0 free — available for any
+new hunt/relief lane a directive routes here.
 
 ## House-rule cache
 

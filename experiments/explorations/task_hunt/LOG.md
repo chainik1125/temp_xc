@@ -20007,3 +20007,47 @@ _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
   expected ~05:15–05:30. Not a stall; no chase.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 05:11 London (date-verified 04:11 UTC) — runpod-a: SHARD E COMPLETE 5/5 — full v1t T4+T2 columns, all ckpts mirrored, worktree torn down, GPU 0 FREE
+
+Card d9235755b §6 shard E delivered end-to-end. Launched 02:41,
+complete 04:10 London — **2h29m wall on GPU 0 (~2.5 GPU-h)**.
+
+**Full cell table (paper_txc_base_v1t, arm paper-faithful, agent=runpod-a):**
+
+| cell | k5 auc (shuf) | k20 auc (shuf) | l0 | train_key |
+|---|---|---|---|---|
+| T4/s42 | 0.8467 (0.8482) | 0.8971 (0.8916) | 80.00 | 1d9bb557c767a5a4 |
+| T4/s1 | 0.8115 (0.8113) | 0.8912 (0.8825) | 80.00 | dde0f639fdaaddb4 |
+| T4/s2 | 0.8424 (0.8443) | 0.9006 (0.9026) | 80.00 | 24ec139fd08b174e |
+| T2/s1 | 0.8220 (0.8189) | 0.8992 (0.8970) | 40.00 | 02e3a3563d88859a |
+| T2/s2 | 0.8474 (0.8441) | 0.9034 (0.8999) | 40.00 | b6cba482edeb66a7 |
+
+**Receipts:** 10/10 rows on the canonical leaderboard (verified: 5
+cells × 2 k, agent=runpod-a, distinct train_keys 5/5). 5/5 ckpts on
+the ratified mirror `ckpts/<train_key>/` w/ sha256 (205eb4fe…,
+dde0→2a21a47c…, 24ec→77f70c3a…, 02e3→7d252fb6…, b6cb→15e48d72…).
+Worktree `wt_pf_e` cmp-verified (0 unique rows — runner anchored to
+main clone via repo_root; worktree leaderboard unmodified since pin)
+then `git worktree remove --force`. GPU 0 now FREE.
+
+**Measurement notes for runpod-1's fold-in (card owner; scoring is
+theirs):**
+- **E1 (zero-picks grow with T): my low-T anchor = 0 zero-picks.**
+  l0 == k_win EXACTLY on all 5 cells (T4→80.00, T2→40.00). With the
+  fleet's higher-T cells this closes the monotone onset curve:
+  T2/T4 exact → T6 exact (runpod-c) → onset T6–T8 → T10 0.16–0.26 →
+  T16 0.41–0.55. The E1 fingerprint is absent at T≤6 by measurement,
+  not assumption.
+- **E3 (T5-anchor interpolation): T4 column done (this shard) + T6
+  column (runpod-c) bracket the archived T5 anchor** — the two-sided
+  interpolation check per card §9 E3 is now measurable.
+- **k5 seed-spread flag (BINDING, restated): T4 k5 0.8115–0.8467**
+  (s1 low); k20 tight 0.8912–0.9034 across all 5. Any k5-based band
+  quote must carry the spread. Shuffle within ±0.009 of ordered at
+  every cell (order-insensitive at T≤4, both k).
+
+**Ledger:** shard E actual ~2.5 GPU-h ≈ **$5–6** (est was $9–12;
+−$4 to −$6 corr). MODAL_SPEND updated this push. Task #9 CLOSED. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
