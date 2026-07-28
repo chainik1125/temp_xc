@@ -24887,3 +24887,100 @@ de-hardcode — the trap is now shut at both layers (driver default and
 launcher hardcode) rather than one.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 13:28 London (date-verified 12:28 UTC) — runpod-2: ⚑⚑ THREE RESULTS — corrected anchors LANDED; **warmup=0 closes most of the schedule gap (3.63× → 1.30×)**; and ⚑ the plateau mirror saves almost NO wall time, which is why cells cost 10 h instead of the card's 2-3 h
+
+**1. Corrected T5 anchors LANDED on base-l12** (`--lane pf_anchor`, pin
+2b80c6eaf5d1, 3/3 OK, eval-only, G2 `cache_expect` enforcing
+gemma-2-2b/layer 12):
+
+| seed | train_key | preference_auc_k20 | l0 |
+|---|---|---|---|
+| 42 | 840e48bbcac75498 | **0.6096472588185295** | 500.0 |
+| 1 | 9a09c398f38b7524 | **0.6239997571489283** | 500.0 |
+| 2 | 20c5788b8c49cd68 | **0.6030538522251229** | 500.0 |
+
+These **replace** the retracted 0.6119/0.6185/0.6042. Distinct
+train_keys AND distinct eval_keys from the l13-IT rows, so the two
+generations cannot be conflated in the leaderboard.
+
+**2. ⚑ I have to correct my own G2 incident call from 05:0x, and it is
+not a small correction.** The s42 value above —
+`0.6096472588185295` — is **bit-identical to the value I declared a
+wrong-substrate artefact this morning** and snipped. Reproduced now on
+the substrate I have since proven correct. So: **that run was on the
+RIGHT cache. My "fix" hard-guarded the arm onto the WRONG one**, and
+the l13-IT substrate build, the pilot, and ~8 h of GPU 2 all descend
+from that misdiagnosis. Owned, on the record.
+The 16-digit agreement with papermatch that triggered the alarm is, on
+this evidence, most likely **not** an aliasing bug at all but the
+expected result of papermatch evaluating **the same paper weights on
+the same cache** — same weights + same cache + same evaluator = same
+number, to every digit. I still want that confirmed by someone else
+(what exactly did papermatch load?), because I have now been wrong
+about this once in each direction and I am the worst-placed person to
+close it. The one thing the episode does leave standing is a real
+lesson: **the App-B.1 integrity gate cannot detect a wrong substrate**
+— both caches record byte-identical integrity stats (rejected 36.232 /
+chosen 28.573 / p 9.76e-10) because that gate measures the *dataset*,
+not the activations. It green-lit l13-IT exactly as it would anything.
+
+**3. ⚑ `warmup=0` closes most of the schedule gap.** Same config,
+warmup the only change:
+
+| step | warmup=1000 | **warmup=0** | upstream |
+|---|---|---|---|
+| 0 | 88 064.68 (×0.958) | 88 064.68 (×0.958) | 91 888.16 |
+| 200 | 47 737.41 (×3.63) | **17 122.42 (×1.301)** | 13 163.20 |
+| 400 | 22 903.56 (×2.06) | **14 657.65 (×1.316)** | 11 136.78 |
+
+With warmup the ratio is large and *moving* (3.63 → 2.06 — a different
+trajectory). Without it the ratio is **small and flat (1.301 → 1.316)**
+— same convergence dynamics, a constant ~30% offset that is plausibly
+just an lr difference we cannot yet resolve (upstream's lr is still
+unrecorded). **Recommendation for wave-1: launch pf cells with
+`warmup_steps=0`.** The v2 default 1000-step warmup is a framework
+default that was never part of the vendored recipe, and against runs
+upstream converged in 3 800 steps it distorts precisely the window
+where the learning happens.
+
+**4. ⚑⚑ And the finding with the biggest planning consequence: our
+plateau mirror does NOT save wall time.** Upstream's plateau rule
+*stopped the run*. Ours freezes the weights but the **fixed 25 k outer
+loop keeps going** — and critically, `trainer.py` calls
+`batch_iter(batch_size)` **before** `train_step`, so every post-plateau
+step still pays the full **~1.48 s feed**, which is 95% of a step. The
+arch's early-return skips only `_sample_pairs`/`_pair_loss`.
+
+So if a cell plateaus at ~5 000 of 25 000, it then spins **20 000 more
+steps × 1.48 s ≈ 8.2 h** producing nothing, out of a ~10.7 h cell.
+**That is ~77% of every cell's cost spent after the weights have
+frozen** — and it is exactly why our cells cost ~10.7 h while CARD § 8
+budgeted "≈ 0.2-0.25 × fixed-25k wall". The card's cost model assumed
+upstream's *stopping* semantics; our port implemented *freezing*
+semantics. Across the 21-cell grid that is on the order of **~165 of
+the ~213 GPU-h**.
+
+**I am NOT fixing this myself: the fix is a `break` on `converged` in
+`temp_bench/core/trainer.py`, and hard rule 3 forbids me editing
+`core/`.** Flagging it for whoever owns the framework, with the
+measurement attached. A legitimate non-core alternative, if the owner
+prefers: lower `n_steps` in the pf cells' `TrainingConfig` (it hashes
+into train_key, so it is honestly a different cell, not a silent
+truncation) — but that trades a guarantee for a guess about where
+plateau lands, so the trainer `break` is the right fix.
+**Conditional:** this only pays off if the plateau actually fires,
+which our 400-step trace cannot yet confirm — it is suggestive
+(matching dynamics at warmup=0), not proven. Someone running a cell to
+~6 k with warmup=0 settles it.
+
+**Net for wave-1, if the hub wants my one-line recommendation:** launch
+on base-l12 **with `warmup_steps=0`**, and treat the trainer-break as a
+fast follow that could cut the grid by ~4×. Substrate was the
+disqualifying error and it is fixed; warmup is a fidelity error and is
+cheap to fix now; the loop-spin is a cost error that needs the
+framework owner. PTR on all three.
+
+Pilot: 08:18, wrong-stream control, unchanged.
+
+_Recorded-by: claude-opus-5 (runpod-2)_
