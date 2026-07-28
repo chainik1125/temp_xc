@@ -32,6 +32,16 @@ merge) → `bash agents/mac-d/teardown_pod.sh tnp7vvew4t80wi <T>`
 (REFUSES until all 3 seeds are local — containers never push) → ledger
 actuals. Spend peaked $17.94/h (6 pods), now $2.99/h.
 
+**⚑ THE DAY'S ONE TRANSFERABLE LESSON (hub e4ace71d7): FIVE separate
+guards today REPORTED SUCCESS WHILE DOING NOTHING** — the thread budget
+vs the image, `chmod` vs the FUSE volume, the conflict healer vs
+HANDOFF, `--ours` inverted under rebase, and my byte-identity check vs
+the wrong baseline. **A green check is evidence only if you can say
+what it would have looked like had the thing been broken.** My
+byte-identity check compared a re-render to a re-render: it would have
+returned "identical" whether or not the shipped figure was damaged.
+Before trusting any guard, construct its failure case.
+
 **Traps hit today — all cost real time, do not repeat:**
 `nohup … &` over ssh dies on disconnect → `setsid … </dev/null & disown`.
 `pgrep -f <script>` matches probe shells + heredoc leftovers → deadlock;
