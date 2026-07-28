@@ -27569,3 +27569,66 @@ other 17 are trusted — that check has not happened yet; the eval path
 remains unproven end-to-end, only better-understood.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 14:51 London (date-verified 13:51 UTC) — mac-local (hub): ⚑⚑ **mac-c: GO. Spend authorized, and do NOT stop at the pilot.** Han: *"mac-c is HOLDING — they should be running ahead at full speed!"*
+
+### 1. Authorization, so there is nothing left to wait for
+
+**Spend on `retryesc_gen` is AUTHORIZED now** — pilot and full
+generation both, under the standing $300 generation cap on
+`dmitry-mats-claude-api-key`, ledger both ends. **You do not need
+another hub beat between stages.** A ~20-doc pilot is rounding error
+against that cap; the thing that is actually expensive today is the
+**clock**, and item 7 is the only deliverable with **no candidate at
+all**.
+
+### 2. ⚑ The specific change: chain it, don't gate it
+
+Your card treats the pilot as a **gate** before generation. **By your
+own finding it does not need to be one.** You established that
+
+    elicit_lib.claim_zone(...)["frac_in_window"]["T64"]  ==  floor_excess
+    validated on evalage: predicted 0.0470 vs measured +0.0451, K = 0.96
+
+so the **density check is $0, label-side, and already done** — the dry
+run measured **f = 0.1850**, mid-band, after you fixed turn length. The
+pilot's remaining job is **elicitation quality**, not density.
+
+**So: generate the full corpus, and treat the first ~20 docs as the
+pilot slice.** Keep every pre-registered abort condition — if the slice
+fails them, kill the run and you have spent pilot money. If it passes,
+you are already generating instead of waiting for a hub round-trip.
+**Same soundness, no serialization.**
+
+### 3. This is the day's standing anti-pattern, third occurrence
+
+- provisioning serialized behind **sizing** (14:1x),
+- bootstrap serialized behind the **cache fetch** (14:3x),
+- generation serialized behind the **pilot** (now).
+
+Each time the gate was real but **independent** of the thing it was
+blocking, and each time the fix was to run them concurrently with an
+abort condition rather than in sequence. **I set the first one myself,
+so this is a fleet habit and not a criticism of any lane.** Name it and
+stop paying it.
+
+### 4. What is NOT relaxed
+
+The **prime directive stands: a sound verdict, never a win.** Bars do
+not move mid-candidate; the pre-registered abort conditions are
+exactly what make § 2 safe. Your four retractions today — all caught
+**before** spend, three of them on the same quantity — are why I am
+comfortable removing the gate rather than adding one. **Speed here is
+bought with your own rigour, not against it.**
+
+### 5. Recording the finding, because it is the strongest thing in the lane
+
+`floor_excess ≡ f ≡ P(event inside the T-window)`, exact to 2e-6, and
+**measurable at $0 before generating.** That converts item 7 from
+*hunt for a face that happens to work* into **design a face to sit in
+the band** — with `sycgen_age` at +0.210/+0.117 (gold) as the
+existence proof and +0.15…+0.25 as the target. **⚑ Gold-visibility
+binds: the moment `retryesc_gen` clears its KEEP rule, it goes into
+`REBUTTAL_HANDOFF.md` the same beat.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
