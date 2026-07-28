@@ -3,11 +3,11 @@
  "status": "PENDING TEAM REVIEW",
  "partial": true,
  "coverage": {
-  "trained": 6,
+  "trained": 9,
   "overlay": 0,
   "untrained": 18,
   "of_each": 18,
-  "rendered_at": "03:44 28-07"
+  "rendered_at": "03:46 28-07"
  },
  "x_axis": [
   1,
@@ -17,7 +17,8 @@
   16
  ],
  "ordered": {
-  "T8": 0.5412857236706178
+  "T8": 0.5412857236706178,
+  "T16": 0.5922063581117277
  },
  "shuffled": {},
  "untrained": {
@@ -32,7 +33,7 @@
   "batchtopk_sae_btkonly": 0.4819060583846584
  },
  "l0_range_claiming_arm": {
-  "min": 0.8732808430989584,
+  "min": 0.48870849609375,
   "max": 0.8732808430989584
  },
  "budget_matched": false,

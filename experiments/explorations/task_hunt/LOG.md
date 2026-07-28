@@ -18786,3 +18786,43 @@ _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
   owner.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 03:47 London (date-verified) — mac-local: ⚑⚑ SYCGEN T16 ON THE FIG (0.5922, rising from T8's 0.5413) + ORDER: extend supp pool to T{1,2,4} NOW (GPU 0 idle) + Han pod pre-approvals channeled
+
+**Exhibit state (pushed this commit): TXC ordered T8=0.5413,
+T16=0.5922 (n=3 each, tight faints) — recovery RISES with T, both
+points above the per-token SAE anchor 0.4819; untrained twins
+0.09–0.22. Coverage 9/18 trained.** Supp json re-fetched read-only
+(6/6 ok); renderer verbatim; l0 legend now 0.49–0.87 NOT
+budget-matched (disclosure travels).
+
+**mac-d — ORDER (Han: "anything to get the exhibit faster"):**
+1. **GPU 0 is IDLE as of 03:46 (probe receipt) — the supp pool
+   drained its T{8,16} brief. EXTEND it to the remaining
+   T{1,2,4} × {42,1,2} = 9 quick cells NOW.** ~3 workers × ~4
+   min/cell ⇒ all 15 TXC trained cells done ~04:05.
+2. tsae trio: the 04:05 bound STANDS — render does NOT wait for
+   tsae; their anchor joins a superseding render.
+3. At TXC-complete: overlay → full render → push (fig-first). Full
+   TXC curve + overlay plausibly **~04:15–04:25**.
+**NO NEW POD for this lane** — remaining work ≈ 25 min on warm
+GPUs; a clone pod = 10-15 min provision + multi-GB cache sync and
+arrives after the work is done. Receipted math, not cost-shyness.
+
+**Han's pod authorization CHANNELED where it genuinely buys time
+(standing pre-approvals, no further ask needed):**
+- **mac-d MAY spin ONE clone pod immediately IF the supp/GPU-0
+  lane stalls again** (any 10-min zero-progress window) — clone +
+  cache sync in parallel with debugging, first-ready wins.
+- **retryesc_gen screen venue: pre-provision a cheap L40S/A40 when
+  mac-c's corpus generation starts** (not at gates-pass — warm at
+  the screen the minute gates clear).
+- **RLHF paper-faithful grid relief: at runpod-2's card (~04:30),
+  if the grid wants more than old-pod GPU 2, a 2×H100 relief pod
+  is PRE-APPROVED** — this is the top-priority deliverable's arm;
+  spin-up + phase7-cache sync math DOES pay there (multi-hour
+  grid).
+Ledger guard: $500 aggregate (~$200 spent + tonight's commitments;
+headroom ≈ $250) — each spin posts its own line.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

@@ -88,5 +88,95 @@
     "train_cached": false,
     "eval_cached": false,
     "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.5724999904632568,
+      "e_mean_max_cos": 0.5720468163490295,
+      "e_frac_recovered_90": 0.125,
+      "e_frac_recovered_80": 0.125,
+      "nmse": 0.3066315950780403,
+      "l0_per_window": 7.80859375,
+      "l0_per_token": 0.488037109375,
+      "lambda_recovery": 0.6007858558998833,
+      "lambda_r2": 0.34226351976394653,
+      "lambda_chance": 0.0318785873121062
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.5925000309944153,
+      "e_mean_max_cos": 0.5943155288696289,
+      "e_frac_recovered_90": 0.125,
+      "e_frac_recovered_80": 0.125,
+      "nmse": 0.3085501446878517,
+      "l0_per_window": 7.826171875,
+      "l0_per_token": 0.4891357421875,
+      "lambda_recovery": 0.58816134872312,
+      "lambda_r2": 0.328529417514801,
+      "lambda_chance": 0.04700764509564293
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.5849999785423279,
+      "e_mean_max_cos": 0.5864682197570801,
+      "e_frac_recovered_90": 0.125,
+      "e_frac_recovered_80": 0.125,
+      "nmse": 0.30816044796841413,
+      "l0_per_window": 7.8232421875,
+      "l0_per_token": 0.48895263671875,
+      "lambda_recovery": 0.5876718697121799,
+      "lambda_r2": 0.3346095681190491,
+      "lambda_chance": 0.06314790601014712
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
   }
 ]
