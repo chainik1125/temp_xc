@@ -35,10 +35,15 @@ ckpts mirror in priority order, pod-local meanwhile at
 `temp-bench-models` per COMPOSITION_AUDIT. **MATRIX ARM MAPPING (Han-pinned ~02:3x):** {BatchTopK} =
 `btk-only` (NO ReLU, signed selection — the delivered sweep arm);
 {ReLU+TopK} = the PAPER-FAITHFUL composition
-ReLU(TopK_{k_pos·T}(Σ)) — commissioned, lands Aug 1-2 (until then:
-archived T=5 anchors). `relu-mix` (ReLU-before-BatchTopK) is
-NEITHER matrix arm — certificate evidence only. `eval_cfg.arm`
-carries the row-level label.
+ReLU(TopK_{k_pos·T}(Σ)) — **probing arm LANDING THIS MORNING**
+(`paper_txc_base_v1t` sprint: 21 cells across 5 GPUs, first cells
+on the board 03:1x, ETA ~06:30–07:30); RLHF arm = the agentic_txc_02
+trainable port (runpod-2 card ~04:30; same-day target with a
+pre-approved relief pod, amendment-window fallback). Until those
+landings the archived T=5 anchors carry the paper composition.
+`relu-mix` (ReLU-before-BatchTopK) is NEITHER matrix arm —
+certificate evidence only. `eval_cfg.arm` carries the row-level
+label.
 
 ---
 
