@@ -52,8 +52,12 @@ retrained — see COMPOSITION_AUDIT).
 - **Table:** `figs_writeup/tab_rlhf_shuffle_tsweep.md` (with render).
 - **Data:** `experiment=rlhf` rows, btk arm complete at T{1,2,5,8,16}
   + T{4,6,10} landing overnight (x4 via runpod-a swap-drain; x6/x10
-  drain ~06:30); relu-mix arm = rmx_a/rmx_b lanes (A5 card
-  57eb9edd4; T5 EXEMPT via measured identity).
+  drain ~06:30). **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins
+  are tensor-IDENTICAL through T16 (829f05070: Δauc exactly 0,
+  boundary_min_pre ≥ 2.21, no negative-pre-activation contact at
+  RLHF's k-regime). The btk fig + the certificate line IS the
+  both-arms deliverable; rmx_b T{8,10} cells run as eq-extension
+  measurement points (per-cell checks).**
 - **Licences (LOG):** 21:10 verdict extension (T8 peak n=3; T16
   regime boundary, decline 2-of-3 seeds; shuffle quote form "gaps ≈ 0
   at every T ≤ 8, seed-mixed at T16"); R-E1 lead licence.
@@ -136,5 +140,9 @@ retrained — see COMPOSITION_AUDIT).
   train_keys). Morning: 3-seed onset map + boundary_min_pre traces +
   certificate (PRELIMINARY until then). Pack §3 carries the
   redrafted both-arms licence.
-- **RLHF regime differs:** T5 measured IDENTICAL (boundary is
-  k-regime-dependent) — quote per-task, never cross-task.
+- **RLHF regime differs — now FULLY CERTIFIED:** twins
+  tensor-identical through T16 (829f05070; pre-registered
+  divergence refuted and disclosed). Unified mechanism frame:
+  rare between-sample boundary contact (probing) vs no contact
+  (RLHF) — one mechanism, two measured regimes. Quote per-task,
+  never cross-task.

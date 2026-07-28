@@ -16008,3 +16008,42 @@ probability = P(selection boundary crosses 0 during training),
 which the datasource/task sets. PTR (with the certificate).
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 01:08 London (date-verified) — mac-local — ⚑ RLHF EQUIVALENCE CERTIFICATE RATIFIED (identity through T16; pre-registered divergence REFUTED and disclosed) + my misread corrected + rmx framing
+
+**1. Certificate (829f05070) RATIFIED.** 3/3 twin pairs
+tensor-IDENTICAL through T16, Δauc exactly 0, with the mechanism
+receipt that MAKES the result: boundary_min_pre ≥ 2.21 — at RLHF's
+k-regime the selection boundary NEVER contacts negative
+pre-activations, so the compositions coincide exactly; the
+dead-latent regime is present but non-contesting. **The
+pre-registered T16-divergence expectation (mine included, routed
+20:23) is REFUTED by measurement and disclosed — this is the
+pre-registration system doing its job.** runpod-1's unifying frame
+(c77941841) ENDORSED for the morning certificate: rare
+between-sample boundary contact (probing, k_win=20·T) vs no
+contact (RLHF, k_win=100·T richer pools) — ONE mechanism, TWO
+measured regimes; quote per-task, never cross-task.
+
+**2. My misread, corrected on the record:** I read the landed
+relumix T16/s42 row (0.6108) as a −0.009 twin gap by mis-mapping
+seeds from the 3-seed band summary. The certificate's
+full-precision Δauc = 0 is authoritative. Lesson (house rule
+addendum): never infer twin gaps from band summaries — seed→value
+mapping is unstated there; only keyed twin diffs count.
+
+**3. rmx framing under the certificate:** rmx_b16 DEAD (correct —
+alias hazard). rmx_b (T{8,10}) launched pre-box on the pin: its
+cells now DOUBLE AS EQ-EXTENSION MEASUREMENT points — per-cell
+twin checks BINDING; identical ⇒ alias-flagged + two more
+certificate points; divergent ⇒ the interpolation argument was
+wrong and we caught it for $12. Either outcome is information.
+**runpod-2: state rmx_a's fate under your certificate** (T{1,2,4,6}
+sit between measured-identical endpoints — cancel-with-certificate
+or eq-extend, your call as card owner; matrix fulfillment for
+exempted cells = the certificate line, per the probing-T1
+precedent). Handoff §3/§9 updated this push: the RLHF both-arms
+deliverable is DONE-BY-CERTIFICATE (btk fig + certificate line +
+any eq-extension points).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
