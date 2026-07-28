@@ -19038,3 +19038,41 @@ sycgen_twin_overlay.json`, this push). Seed-mean gaps, txc arm:
   in the json). Final render + bundle at tsae drain. PTR.
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+## 2026-07-28 04:05 London (date-verified) — runpod-c — shards C+D first cells LANDED + DURABLE; E1 fingerprint direction visible
+
+- **Shard D cell 1** `paper_txc_base_v1t/T6/s42`: k20 0.8987 (shuf
+  0.8891) / k5 0.8439 (shuf 0.8444), realized l0 **120.00 = k_win
+  exactly** (no zero-picks at T6). Ckpt `1293ad06ee140c93` PUSHED
+  (sha 250e62c5d44af64c…). Cell 2 (T6/s1) training.
+- **Shard C cell 1** `paper_txc_base_v1t/T8/s42`: k20 0.8821 (shuf
+  0.8805) / k5 0.8370 (shuf 0.8387), realized l0 **159.94 < 160 =
+  k_win** — the zero-pick mixing fingerprint APPEARS at T8, absent
+  at T6 (E1's direction, noted for the card owner's scoring; no
+  E2/E3 reads from me). Ckpt `e834fb42ae596ba1` PUSHED (sha
+  8ffb6425756fa441…). Cell 2 (T8/s1) training.
+- Pace ~40-45 min/cell ⇒ drains ~06:00 (D) / ~06:30 (C) London,
+  on card est. Per-cell durability holding (≤2h rule).
+- tscale durability closed earlier this hour: 27/27 lane ckpts
+  mirrored, LFS-sha receipts in-tree (freeze item 1 discharged).
+
+_Recorded-by: claude-fable-5 (runpod-c)_
+## 2026-07-28 04:11 London (date-verified) — runpod-c — shard D cell 2 landed + git-incident disclosure (zero data loss, union-verified)
+
+- **Shard D cell 2** `paper_txc_base_v1t/T6/s1`: k20 0.8881 (shuf
+  0.8841) / k5 0.8387 (shuf 0.8374), l0 120.00 = k_win exact again.
+  T6 k20 so far: s42 0.8987 / s1 0.8881. Cell 3 (T6/s2) training;
+  ckpt push next.
+- **Incident (disclosed):** a `pull --rebase` race while both
+  shards append to `results/leaderboard.jsonl` +
+  `checkpoints/manifest.jsonl` produced a duplicated-pick rebase
+  that (a) dropped my 04:05 receipts commit and (b) raced ONE
+  canonical leaderboard row (T6/s1 k20, eval_key d07abe606274a2af)
+  out of the file via the stash/O_APPEND offset. **Repair:** every
+  live file backed up BEFORE surgery; beat re-appended from the
+  dangling commit; row restored verbatim; union re-verified against
+  ALL backups — **zero rows missing**. Process fix adopted: no
+  blind `add -A`/retry-loop rebases while canonical files are
+  live — explicit-path commits + single-attempt pull with manual
+  conflict handling from here.
+
+_Recorded-by: claude-fable-5 (runpod-c)_
