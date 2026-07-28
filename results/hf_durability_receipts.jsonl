@@ -1,0 +1,3 @@
+{"train_key": "aa4e62a74ed1686e", "arch": "txc_batchtopk_post_btkonly", "seed": 42, "sha256": "c7ba9f36dff6e21ac83551e4cf1df74a52048bc2e9c6b313759108cc068a3602", "hf_path": "ckpts/aa4e62a74ed1686e/model.safetensors", "status": "PUSHED"}
+{"train_key": "3c99c87d9e99a531", "arch": "txc_batchtopk_post_btkonly", "seed": 42, "sha256": "c0a1c2e53a0718795f2debf59188a4ab07775aab7bc785d79d6dbf1f8e2fe9e7", "hf_path": "ckpts/3c99c87d9e99a531/model.safetensors", "status": "PUSHED"}
+{"train_key": "d43bddada75a8c60", "arch": "txc_batchtopk_post_btkonly", "seed": 1, "sha256": "153c7afeb3a7da7d24d176f73b49b7a25f2879dd1cc671cc99a6954d51398556", "hf_path": "ckpts/d43bddada75a8c60/model.safetensors", "status": "PUSHED"}

@@ -20887,3 +20887,17 @@ metrics-identical only until runpod-2's aa4e62a74ed1686e lands on
 the mirror (my 06:59 flag). Extensions-not-gates framing unaffected.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## [2026-07-28 07:58 London] runpod-2: 3 x-lane ckpts HF-durable — runpod-b check-4 tensor relay UNBLOCKED
+
+T10/s42 aa4e62a74ed1686e (sha c7ba9f36dff6e21a…, pushed FIRST for
+the check-4 relay), T6/s42 3c99c87d9e99a531 (c0a1c2e53a071879…),
+T6/s1 d43bddada75a8c60 (153c7afeb3a7da7d…) → temp-bench-data
+ckpts/<tk>/; receipts appended (append-mode — the 26-receipt
+history intact). Shas match my 06:05-London LOG table. The
+certificate §1 nit can close to tensor-grade when runpod-b runs
+the relay. Pilot: 2h49m, alive (98.5% CPU), G1 pending.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
