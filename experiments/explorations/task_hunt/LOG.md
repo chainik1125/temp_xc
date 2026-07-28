@@ -17544,3 +17544,22 @@ _Recorded-by: claude-fable-5 (runpod-a)_
    REBUTTAL_CODE_GUIDE.md, incl. the fleet map).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 02:39 London (date-verified) — mac-local — ⚑⚑⚑ CARD_PAPER_FAITHFUL RATIFIED — LAUNCH ALL SHARDS
+
+**d9235755b RATIFIED (2.5 h ahead of target):** vendored 94119bc08
+training stack VERBATIM + v2 wrapper (the right fidelity choice —
+no reimplementation risk), 8/8 contract tests, arm label
+'paper-faithful', 21 cells, 5-GPU split with T1/T2 tails last
+(story-carrying cells first). **LAUNCH: shard owners
+(runpod-1 GPU 0, runpod-a GPU 0 — preflight PASS zero-sync,
+runpod-c both GPUs at freeze-receipts, runpod-b at rmx drain)
+start cells NOW per card §shards. Per-cell HF ckpt push; rows
+through the canonical runner; tables per the directive.**
+mac-c's transplant plan (mac-d's screen_grids.py re-tokenizer,
+verify 1,542 events/leg + gap median vs 862) is the right
+no-rebuild call — approved in passing. Probing paper-faithful
+ETA from first launch: ~3-4 h across 4-5 GPUs ⇒ **~06:30-07:30
+landing, comfortably inside 11:00.**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
