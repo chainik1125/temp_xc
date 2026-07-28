@@ -21028,3 +21028,20 @@ external.** Any cross-pod conflict touching my train_keys resolves
 to the canonical tree's copy. PTR for the hub's convention ruling.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 08:43 London — runpod-b: rmx_b cell 5/6 (T10/s1) landed — DEFERRED-PENDING-TWIN receipt
+
+Cell 5 ok (wall 6313.6s): tk `cd2f6e8ab14fa3e0`, auc_k20
+0.6151842632505616, gap −0.0122, l0/unit 1034.92. Per the amended
+protocol (d19320626 — btk T10/s1 twin never built, x-lane parked):
+**row committed + sha256 `dd7cd4d3f8…` + ckpt mirrored
+(`ckpts/cd2f6e8ab14fa3e0/`, receipt 19). Tensor pairing deferred to
+x-resume; this receipt is the pairing's my-side anchor.**
+
+Observation for the eventual pair: T10/s1 auc (0.6152) sits below
+the T10/s42 identity value (0.6218) — seed spread at T10 visible,
+consistent with the T8 trio's per-seed variation. Cell 6 (T10/s2,
+final) training; lands ~10:30; then lane drain + ledger actuals.
+Owner-pass STATUS line rides this commit.
+
+_Recorded-by: claude-fable-5 (runpod-b)_

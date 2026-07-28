@@ -1,4 +1,4 @@
-# runpod-b STATUS — rmx_b cell 5/6 training; **checks 1-4 ALL cert-extensions** (2026-07-28 07:57 BST)
+# runpod-b STATUS — rmx_b cell 6/6 (FINAL) training; checks 1-4 all cert-extensions; cell 5 receipted (2026-07-28 08:43 BST)
 
 **I am `runpod-b`** — pod A GPU 1.
 
@@ -10,8 +10,11 @@
 - **CHECK 4 COMPLETE (07:57): T10/s42 = CERTIFICATE-EXTENSION** —
   twin sha matched posted table, torch.equal 7/7. Alias
   f03ff666cb8e8cb1↔aa4e62a74ed1686e. **4/4 checks = extensions,
-  zero A5b.** T10 cadence ~105 min ⇒ cell 5 ~08:50, drain ~10:45.
-  Cells 5-6 deferred-pending-twin (row+sha+mirror only).
+  zero A5b.** Cell 5 (T10/s1) receipted 08:43: tk cd2f6e8ab14fa3e0
+  sha dd7cd4d3f8… mirrored (receipt 19), deferred-pending-twin.
+  Cell 6 (T10/s2, FINAL) lands ~10:30 ⇒ same receipt shape, then
+  DRAIN: ledger actuals + lane-close entry + GPU 1 free (card §6
+  overflow check — pf grid complete, so likely idle-report to hub).
 
 - 6 cells sequential (relu-mix txc T{8,10} × s{42,1,2}), GPU 1, wall
   log /workspace/logs/actmix_rlhf_runs_rmx_b.jsonl. Measured cadence
@@ -65,9 +68,9 @@
 
 ## Standing
 
-- **QUEUED morning: manifest owner pass** (7af84fb80 — 336 fleet-wide
-  same-train_key conflicts in checkpoints/manifest.jsonl; my lines
-  append-only, no unilateral fixes; wait for hub sequencing).
+- **Manifest owner pass DONE (08:29, 13f582e3a): 19/19 as-launched,
+  zero rewrites; voted receipts-external.** Hub owns the convention
+  ruling.
 - 15-min ack discipline on sprint comms (03f533cc3, reaffirmed
   ee16ea041). Dawn assist: 7-point fig re-renders w/ fleet tables
   directive (tab_<stem>.md beside every render).
