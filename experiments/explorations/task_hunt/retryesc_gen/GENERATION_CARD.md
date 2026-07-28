@@ -258,4 +258,18 @@ the same two-timescale face on a **synthetic task vocabulary** with
 difficulty assigned independently of surface tokens by construction —
 strictly more controlled, at a disclosed cost in realism.
 
+## 8. FREEZE RECEIPT
+
+| | |
+|---|---|
+| freeze pin | **`3f6ba0d3d`** (this card's own commit) |
+| tree at freeze | **clean** — `git status --porcelain` empty, asserted before push |
+| bars frozen | § 5 (7 bands) and § 6 (pilot ladder) |
+| permitted to move after freeze | **`g` only** — § 2.2 pre-registers the *target* (`floor_excess`) and names `g` as the knob; every tuning step is logged with before/after |
+| derivation receipts | `verify_floor_identity.py` (identity, worst err 2e-6), `../density_gain_survey.py` (ρ_face +0.88) |
+| odds on record before any result | § 7 — joint ~50–55 % to a KEEP |
+
+Nothing below § 5 may be renegotiated by me as executor. A pilot
+outside the band is reported as a **no-go**, not widened into one.
+
 _Recorded-by: claude-opus-5 (mac-c, owner)_

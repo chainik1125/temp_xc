@@ -26808,3 +26808,104 @@ That is the pre-register→observe→discriminate loop working as
 designed, and it is the only lane that can still close **item 7**.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+---
+
+## 2026-07-28 14:16 London (date-verified at write) — mac-c: `retryesc_gen` **GENERATION CARD FROZEN** (`3f6ba0d3d`) — the density target is DERIVED, not guessed; and I got its upper edge WRONG and the simulation caught it before freeze
+
+Second beat of `hunt-mac-c-takeover.md`. Still **$0** — no generation,
+no pod, no API spend. Card: `retryesc_gen/GENERATION_CARD.md`.
+
+### 1. The target is derived
+
+`visible_evidence_floor` is fit on exactly `(censored_age,
+in_window_event_count)`. For a balanced 3-class age face that gives
+`floor_acc = f + 1/3`, so
+
+> **`floor_excess` ≡ `f` ≡ P(event inside the T-window).**
+
+`verify_floor_identity.py` confirms it **exactly** — worst error
+**2e-6** across mean gaps 64…2000. So the 14:07 correlation
+(ρ_face +0.88) is not an empirical curiosity: the x-axis is a
+*measurable design parameter of the corpus*, and I can aim at it before
+generating rather than discover it after.
+
+Pre-registered: **`floor_excess` ∈ [+0.15, +0.25]**, two-sided.
+
+### 2. ⚑ I had the upper edge wrong, and I am recording it
+
+The card's first draft argued the identity holds only while `T ≤ e1`
+and that a pure age face is therefore **"capped near 1/3"**. **Both
+false.** The floor knows the *exact* age whenever the event is
+in-window, so it classifies those rows correctly *whatever class they
+fall in* — the identity survives to `f = 2/3`. The simulation caught
+it; I had already written the wrong version into the card.
+
+**This mattered.** The false version said the floor "cannot run away",
+which would have licensed a much denser corpus as safe. The true
+mechanism is the opposite and is a stronger reason to respect the band:
+**the floor is computed from GROUND TRUTH and climbs toward 1.0 with
+density, while the window arm only ever reads activations.** Density
+does not blunt the floor — **it hands the floor a bar the arm cannot
+reach.** That is why 3 of 5 record cells above +0.25 lose to their own
+floor (`qd` margin **−0.034**).
+
+Recorded in the card and in the script's docstring rather than quietly
+fixed. Age faces all sitting below 1/3 in our record is a fact about
+those corpora's gaps, **not** a structural guarantee.
+
+### 3. The gap, quoted as a bracket
+
+| target `f` | naive `g` | `evalage`-calibrated `g` |
+|---|---|---|
+| 0.25 | 223 | 125 |
+| **0.20** | **286** | **166** |
+| 0.15 | 393 | 232 |
+
+The calibration `K = 0.63` (probe eligibility excludes environment
+turns, so positions nearest an event drop out of `f`) rests on **one
+point** — `evalage`. So the two routes are a **bracket, not an
+average**; planning centre `g ≈ 170–290` tok, 3–5× denser than organic
+`retryesc`'s 886. **The bar is written on the measured quantity; `g` is
+the only thing permitted to move after freeze, and every tuning step is
+logged.**
+
+### 4. The realism cost, disclosed up front
+
+At `g ≈ 230` with short turn-pairs a repeat-failure lands every ~2
+turn-pairs — **a more pathological agent than a real trace.** Direct
+consequence of the density target, so: density is bought with the
+**token clock** (60–120 tok turns vs organic 686) rather than by making
+the agent fail more; the cost is disclosed on any exhibit; and it does
+**not** touch validity, because § 3's construction rule (**failure text
+drawn independently of repeat-status, so a repeat and a first-time
+failure are textually indistinguishable**) holds at any event rate.
+Density threatens the *floor bar*, which band 4 caps — not the confound
+structure.
+
+**If honouring the band forces an implausible generator, that is a
+no-go I report, not a band I widen.**
+
+### 5. The bar that actually killed `retryesc`, fixed structurally
+
+`unigram` 0.689–0.716 vs 0.60, driven by **task difficulty genuinely
+causing failure rate**. Fix: the **failure schedule is drawn FIRST,
+independently of the task**; difficulty is *assigned*, not intrinsic, so
+the same task appears under easy and hard schedules and vocabulary
+carries no information about age. `unigram ⊥ label` becomes a generator
+property rather than a band to squeak past — still gated at § 5 band 1,
+and still the risk I rate highest (§ 7: leak ~65–75 %, magnitude
+~70–75 %, joint **~50–55 %**, all on record before the result).
+
+### 6. Two faces pre-registered NOW
+
+`retryesc_age` **primary** (carries the KEEP claim; the age family is
+the gold's family), `retryesc_rate` **secondary** (the only route to
+the Q3 order table). Both reported whatever they show; the secondary
+cannot be promoted to the headline if the primary disappoints. Declared
+before any data precisely so it cannot become a post-hoc pivot.
+
+**Next: the pilot (~20 docs).** It measures `floor_excess` + Tier T/R
+and can kill the card at pilot cost. No full generation until it lands
+in band **and** clears band 1.
+
+_Recorded-by: claude-opus-5 (mac-c)_

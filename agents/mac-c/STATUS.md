@@ -1,8 +1,9 @@
 # mac-c — STATUS
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
-**Lane:** ELICITATION HARNESS OWNER + hunt candidate screening
-**Last update:** 2026-07-28 03:15 BST (read from `date` — see stamp
+**Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (Han 13:56, briefing
+`hunt-mac-c-takeover.md`) — was: elicitation harness + screening
+**Last update:** 2026-07-28 14:16 BST (read from `date` — see stamp
 corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ---
@@ -11,13 +12,67 @@ corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ## State in one paragraph
 
-**The `evalage` lane is CLOSED.** Both blockers cleared, the screen ran,
-and the bundle verdict is **WEAK (3/3 legs, 0 KEEP, 0 KILL)** — full
-writeup in `evalage/RESULT.md`. **No KEEP ⇒ mac-d's pre-authorized
-matrix retrain does NOT trigger.** My pod is **TERMINATED and
-API-verified (0 mac-c pods remaining)**. Both harness fixes I owed are
-**discharged as code**. `sycgen` is mac-d's to screen on their pod.
-**`retryesc_gen` is the only thing left in my queue and is not started.**
+**I own the entire hunt now**, and **item 7 of Han's deliverable list
+has NO candidate** — `sycgen` filled item 6, `struqpos` was killed
+honestly and took item 7's only other contender with it. **I am the
+only lane that can close it.** `retryesc_gen` is the candidate; its
+**GENERATION CARD IS FROZEN** (`3f6ba0d3d`) with a *derived* density
+target. Spend so far on this lane: **$0** — no pod, no generation, no
+API. **Next action: the ~20-doc pilot**, which measures `floor_excess`
++ Tier T/R and can kill the card at pilot cost.
+
+## ⚑ The finding that reorganized the lane (`density_gain_survey.py`)
+
+**Screen gain tracks IN-WINDOW EVENT MASS.** Recomputed $0 from 150
+face×model cells / 48 committed screen artifacts (49 cells, 15 faces
+carry a floor): Pearson **+0.699** cell-level, **+0.820 face-level**
+(Spearman +0.696 / **+0.882**).
+
+And it is **derivable, not just empirical**: `visible_evidence_floor`
+is fit on exactly `(censored_age, in_window_event_count)`, so for a
+balanced 3-class age face **`floor_excess` ≡ `f` ≡ P(event inside the
+T-window)** — verified exact (worst err **2e-6**) in
+`retryesc_gen/verify_floor_identity.py`. The x-axis is a **design
+parameter I can aim at before generating.**
+
+| face | floor-excess | gain | verdict |
+|---|---|---|---|
+| `sycgen_age` | **+0.210** | **+0.117** | **KEEP** (gold) |
+| `evalage_age` | +0.045 | +0.039 | WEAK |
+| `reask_hr` | +0.034 | +0.018 | KILL |
+
+Band is **two-sided**: every face in +0.15…+0.25 cleared every cell
+(4/4); 1 of 11 outside did. Above +0.25, 3/5 cells **lose to their own
+floor** (`qd` margin −0.034). ⚠ Band edges are **POST HOC** — the
+correlation is the evidence, the bands are a design target.
+
+## Two retractions of my own, both material
+
+1. **The age-face objection (withdrawn 14:07).** I said no age face
+   passes the order ladder (0/9, true) and inferred `retryesc_gen`
+   shouldn't be an age face (**false**). `sycgen_age` **is** an age
+   face, `order_pass_wd` **False**, and it is the **gold** at +0.115.
+   Order is **Q3 table-routing, NOT in the hunt4 § 4 KEEP rule.** The
+   hub had already folded my argument into the overnight map — the
+   retraction is what to act on. **Right lever: sparse vs dense, not
+   age vs rate.**
+2. **"Capped near 1/3" (wrong, caught by simulation pre-freeze).** I
+   wrote that the identity holds only while `T ≤ e1`. It survives to
+   `f = 2/3`. The false version said the floor "cannot run away" and
+   would have licensed a **much denser corpus as safe**. Truth is the
+   opposite: **the floor is computed from GROUND TRUTH and climbs
+   toward 1.0, while the arm only reads activations — density hands the
+   floor a bar the arm cannot reach.**
+
+## `evalage` — CLOSED (WEAK), and now explained
+
+Verdict `305fada43`, writeup `evalage/RESULT.md`: gains +0.040 /
++0.046 / +0.031 against a +0.05 bar; null + floor clean on every leg.
+**The mechanism I could not give at the time is the corpus clock:**
+terciles at ages **429 / 1021** = 6.7× the T=64 ceiling ⇒ floor-excess
++0.045 ⇒ dead band predicts +0.032, it scored **+0.039 — on the
+curve.** I had the gap median 862 in my own receipts and never
+connected it. Disposition unchanged: **no more GPU on `evalage`.**
 
 ## The verdict (`305fada43`)
 
@@ -38,9 +93,10 @@ cleared on every leg; **the +0.05 was not**, missing by 0.004–0.019.
   positive on **all three** legs. It is not dying of that confound; it is
   just a small effect.
 * **NO order information anywhere.** `actxmean` beats ordered-window on
-  all legs; win−shuf ≈0 or negative; `order_pass_wd` False 3/3. For a
-  temporal-structure program, a face that cannot beat its own shuffle is
-  not evidence of ordered structure even if it had cleared the bar.
+  all legs; win−shuf ≈0 or negative; `order_pass_wd` False 3/3.
+  ⚠ **Read with retraction 1 above** — this is a real negative about
+  *ordered* structure and about **table routing**, and I wrongly let it
+  imply the candidate family couldn't be gold.
 
 `position_floor` at chance 3/3 (0.330/0.322/0.336) despite label-side
 Spearman 0.4226 — the balanced manifest controls position by construction.
@@ -50,11 +106,23 @@ specified.** The obvious knob (larger T) is barred by the apparatus
 (`gather_win` needs anchor ≥ T−1, `OFF_MIN`=63 in 128-tok chunks), not by
 a choice. Any follow-up is a NEW card with its own freeze.
 
-⚠ **Do not repeat this excuse:** I nearly published "windows too short
-to reach terciles at ages 429/1021" and killed it myself — every age
-face here has separation ≫ 64 (`reask_hr` 1021, `sycgen_age` 408,
-`retryesc` 2120), so separation ≫ T is the *intended* regime for a
-trailing functional.
+## ⚠ Two claims that sound alike — do NOT conflate them
+
+I killed a "windows too short to REACH terciles at 429/1021" excuse
+before publishing, and I was right to. The density finding is **not**
+that excuse coming back. Keep these apart:
+
+| | claim | status |
+|---|---|---|
+| **REACH** | separation ≫ T means the face is unreachable / uncomputable | ❌ **still wrong.** A T2 age face is well-defined at any distance; the window reads accumulated state, not the event. `sycgen_age`'s median low edge is **180 > 64** and it is the **gold** |
+| **DENSITY** | the fraction `f` of probe rows with an event *inside* the window predicts gain **magnitude** | ✅ the finding — ρ_face +0.88, and `floor_excess ≡ f` exactly |
+
+The lever is the **mean inter-event gap `g`**, not tercile separation
+(the edges are a *consequence* of `g`). Back-solved: `sycgen` **g ≈
+271**, `evalage` **g ≈ 862**, organic `retryesc` **g = 886**. So my
+old instinct that "the clock matters here" was right; I reached for
+*reach* when the right variable was *density*, and I should have
+pursued it then.
 
 ## Owed fixes: BOTH DISCHARGED (`aa95c4eb1`)
 
@@ -68,17 +136,53 @@ trailing functional.
    RATIFIED** — calibrated only on sycgen 0.749 (fail) vs evalage 0.1346
    (pass). Someone should confirm or move it.
 
-Still standing: **checkpointing is BLOCKING for every generation card**;
-mechanism exists in `elicit_lib`, `run_evalage`/`run_sycgen` still need
-the 3-line wiring.
+Checkpointing: wired into `run_evalage` (`720234442`).
+**`run_sycgen` still lacks the 3-line wiring** — the rule is standing
+and blocking for every generation card, so wire it before any
+`retryesc_gen` generation reuses that path.
 
 ## Queue
 
-1. **`retryesc_gen`** — mine, design NOT started. Enters **UNTESTED, not
-   rescued** (all its passing bands were label-side, no probe ran) and is
-   checkpointing-blocked. No corpus, so no pod is needed yet.
-2. `sycgen` — mac-d executing on THEIR pod; I sequence, they run.
-3. `evalage` — CLOSED (WEAK). Nothing further unless a new card is cut.
+1. **`retryesc_gen` — CARD FROZEN `3f6ba0d3d`, next action = the
+   ~20-doc PILOT.** Enters **UNTESTED, not rescued** (every passing
+   band was label-side; no probe ever ran). Design in
+   `retryesc_gen/GENERATION_CARD.md`:
+   * face = **repeat-failure escalation**, § 1.2-shaped two-timescale
+     — indicator needs out-of-window memory (*is this a repeat?*),
+     kernel support inside T.
+   * **construction rule that makes density safe (binding):** failure
+     text is drawn from a fixed pool **independent of repeat-status**,
+     so a repeat and a first-time failure are textually
+     indistinguishable. If the generator ever makes repeats
+     distinctive, the candidate is dead.
+   * **vocabulary fix is structural:** failure schedule drawn FIRST,
+     independent of task ⇒ difficulty *assigned*, not intrinsic. This
+     is the bar `retryesc` actually died on (0.69–0.72 vs 0.60).
+   * target **`floor_excess` ∈ [+0.15,+0.25]**; `g` is the only knob
+     permitted to move post-freeze, planning centre **170–290 tok**.
+   * odds on record **before** the result: magnitude ~70–75 %, leak
+     gate ~65–75 % (**the dominant risk**), **joint ~50–55 %**.
+   * **A pilot outside the band is a NO-GO I report, not a band I
+     widen.**
+2. `sycgen` — **DELIVERED** (item 6, FINAL 15/18 at handover).
+   Maintenance only; do not reopen.
+3. `struqpos` — closed, KILLED SOUND 3/3. Salvage = amendment-window
+   only. Triage row applied to `KILL_TRIAGE.md` (runpod-a's wording).
+4. `evalage` — CLOSED (WEAK). Nothing further unless a new card is cut.
+
+## Standing rules that bind this lane (from the takeover briefing)
+
+* **Prime directive: a sound verdict, never a win.** A second honest
+  KILL is a fine outcome; a soft-pedalled KEEP is not.
+* **⚑ GOLD-VISIBILITY (Han, standing, asked twice):** if a gold task is
+  found it goes into `REBUTTAL_HANDOFF.md` **the same beat**, not at
+  the next tidy-up.
+* Generation on `dmitry-mats-claude-api-key`, **$300 cap**, ledger both
+  ends, **mac-only — never seeded to a pod**.
+* **Hardware:** mac-c and mac-d are both sessions on **one MacBook**
+  (M5 Pro, 18 cores, 48 GB unified). The RLHF grid moved to a pod so
+  the laptop is effectively mine — but it is still **one 48 GB
+  machine**, and GPU-hour budgets go through the hub.
 
 ## Corrections I posted this stretch (both mine, both material)
 
