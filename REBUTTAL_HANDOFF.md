@@ -380,9 +380,33 @@ panel — directly comparable to the btk figs above):**
 
 ## 6+7. Safety-relevant hunted tasks (THE GOLD)
 
-> ## ⛔ ITEM 6 — DO NOT QUOTE AS AN ARCHITECTURE WIN (challenge open, 19:2x 07-28)
+> ## ✅ ITEM 6 — CHALLENGE ANSWERED, claim RESTORED but NARROWED (resolved 00:2x 07-29)
 >
-> **Dmitry's agent ran the baseline we never ran, and TXC loses to it at
+> **The missing baseline has now been run properly. Table:
+> `figs_writeup/tab_sycgen_budget_matched.md`** (script-generated,
+> `scripts/gen_sycgen_budget_table.py`).
+>
+> **Verdict — POSITIVE, QUALIFIED.** Against **pooled SAE** at
+> matched-or-better measured `l0_per_window`: **above 3/4 T,
+> INDISTINGUISHABLE 1/4 (T=4), never below.** And it is not a
+> budget-cutoff artifact — **pooled SATURATES, and its ceiling at ANY
+> swept budget never reaches TXC**, at up to **4.06× TXC's budget**.
+>
+> **⚑ Stacked's 4/4 is REFUSED, not counted:** `T·d_sae = 32768` features
+> against `N_WINDOWS = 1024` is underdetermined, so its collapse is
+> **probe-capacity overfitting, not architecture**. The honest
+> comparison is **TXC vs pooled**.
+>
+> **Quote it with these limits or not at all:** n=3; the threshold is
+> **crude and NOT a significance test**; **T=2 is thin** (Δ/spread 1.16,
+> flagged before the data existed); one task, one substrate, one layer;
+> all budgets **measured per-window**, never the derived per-token axis.
+> Cells are `sycgen_keep_r1_rebuilt` on a **rebuilt** cache — verified
+> against the originals to 3 dp — not pod-D's originals.
+>
+> *The superseded challenge, kept because it is why this exists:*
+>
+> **Dmitry's agent ran the baseline we never ran, and TXC lost to it at
 > every T:**
 >
 > | T | TXC | pooled SAE | stacked SAE |

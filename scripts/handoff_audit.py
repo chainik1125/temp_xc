@@ -47,6 +47,7 @@ ITEMS = {
     "4 lambda": ("fig_lambda_shuffle_tsweep", "tab_lambda_shuffle_tsweep.md"),
     "5 dq": ("fig2_question_gap_tscaling", "tab_dq_tsweep.md"),
     "6 sycgen": ("fig_sycgen_shuffle_tsweep", "tab_sycgen_shuffle_tsweep.md"),
+    "6 sycgen budget-frontier": ("tab_sycgen_budget_matched.md", "tab_sycgen_budget_matched.md"),
     "7 hunted #4": ("retryesc_gen", "retryesc_gen/RESULT.md"),
 }
 
