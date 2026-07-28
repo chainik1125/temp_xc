@@ -1,23 +1,25 @@
 # Working state — agent `runpod-1`
 
-**2026-07-28 ~03:00 London (pre-compact refresh) — PAPER-FAITHFUL
-SPRINT: card PINNED d9235755b + RATIFIED 16d26642c (launch-all;
-priority restatement 51aaec049 = paper-faithful FIRST fleet-wide).
-Shard A RUNNING (GPU0, T16x3→T1s42 since 01:39 UTC, log
-pf_shard_A.log); shard B armed behind NIGHT_DONE_GPU_1 (btk s2/T10
-finishing = the 6/6 k20-block decider — at landing: rm_equivalence
-diff + report, then shard B auto-launches, pid 97759 waiter).
-Fleet shards: D LAUNCHED (runpod-c GPU1, 9338aa8e3), E LAUNCHED
-(runpod-a, 43706cc45), C at runpod-c's C5-T16 drain ~03:20,
-runpod-b overflow-only (offer closed 51dc82ef6). runpod-2's RLHF
-pf lane frozen 0c9605f1f (theirs). Hub ETA 06:30-07:30.
-GPU 2 = runpod-2, never mine.
-POST-COMPACT FIRST MOVES: (1) check pf_shard_{A,B}.log +
-actmix_night_gpu1.log tails; (2) if btk s2/T10 landed un-diffed →
-rm_equivalence.py + LOG the 6/6 verdict; (3) commit rows batches;
-(4) heartbeat re-arm if none pending (one was set for 02:12 UTC);
-(5) monitors: bwhegmrtw (pf+night logs), b2w6y6nnq (origin) —
-re-arm any that died with the session.**
+**2026-07-28 ~03:10 London (post-compact, all first moves DONE) —
+PAPER-FAITHFUL SPRINT at PIN d9235755b, ratified 16d26642c. Night
+chain DRAINED (PASS COMPLETE); btk s2/T10 landed → 6/6 DECIDER
+RESOLVED btk-ahead (LOG 983baf1a9): high-T k20 block 6/6, P≈1.6%
+nominal w/ post-hoc caveat; T10 column 6/6-slot negative. Shard A
+RUNNING (GPU0, T16 s42 cell 1/3 since 01:39 UTC, pf_shard_A.log);
+shard B AUTO-LAUNCHED 01:57 UTC (GPU1, T10x3→T1s1, pf_shard_B.log).
+TELEMETRY PARSED (LOG da853dd01): v2 arms 0/1120 sampled contacts,
+floor declines with T, per-seed floors identical across arms;
+paper-faithful T16 live at 40/43 NEGATIVE-boundary samples (E1
+active in-flight). RM_CERTIFICATE.md PRELIMINARY drafted (census-
+first). Durability: 32/32 twin ckpts receipted on ratified mirror
+(incl. night T10/T16 additions; ckpt_push.log). Fleet: C/D at
+runpod-c, E at runpod-a, runpod-b overflow-only. Hub ETA
+06:30-07:30. GPU 2 = runpod-2, never mine.
+NEXT: shard cells land → rows commits + per-cell HF pushes; at
+drain E1-E3 scoring per card §9 + ledger actuals; 11:00 PROTECTED
+btk renders; certificate PRELIMINARY→final after renders.
+Monitors (this session): bbw1y8ufe (pf shards A/B logs),
+b6jr22n3d (origin poller).**
 
 ## Sprint (task #12, commission 4ce0369de/606e4587d)
 
