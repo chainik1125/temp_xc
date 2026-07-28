@@ -40,8 +40,26 @@ $0/h. All four mac-c hunt lanes un-parked behind lever 3.**
 | agent | state | lane |
 |---|---|---|
 | **mac-local** (me) | hub | rulings, LOG, handoff surfaces |
-| **mac-d** | **ACTIVE, 1 pod** | item-6 frontier: rebuild lost sycgen cache + 9 TXC retrains + pooled/stacked + k-sweep. Pre-spend ~$6, self-cap $25 |
-| **mac-c** | **ACTIVE, 0 pods, $0** | AUTHORIZED next: the $0 per-section claim-read. Geometry lane parked behind it |
+| **mac-d** | **0 pods, $0/h** | ⚑ **TOP: `briefings/sycgen-shuffle-sparsity-matched.md`** — issued 00:34, **NOT YET CLAIMED.** Up to 20×H100 authorized (~$60/h; authorized ≠ free, pre-spend estimate first) |
+| **mac-c** | **0 pods, $0** | lever-3 rescue (`a027b7caa`, P1/P2/P3 held, P5 fired) + delivered the shuffle-brief pre-reg audit |
+
+### ⚑ THE ONE LANE IN FLIGHT — sycgen shuffle ablation, sparsity-matched
+
+Han (00:3x): *"we NEED sycgen proper shuffle ablation with matched
+sparsity."* Brief issued; **mac-c's pre-registration audit found 4
+defects + a stamp error, all ADOPTED by hub ruling `29bc6a95d`.** The
+lane is **cleared to run but unclaimed** — fleet idle at $0/h, so
+nothing burns while it waits.
+
+**Before any cell runs, in this order:** (1) **A1** — the one-line
+input-side `assert (tiles_sh - tiles_ev).abs().max() > 0`; the
+pooled-zero gate tests *pooled*, not the shuffle, and a no-op shuffle
+would pass it and read as (b), the outcome the brief pre-commits to
+publishing. (2) **A2/A3** decision rules into the card: twin is a
+**gate on (a)**; (a) needs TXC>stacked in **all 3 seeds** AND mean
+margin > across-seed SD. (3) **A4** redraw from the `T!−1`
+non-identity permutations. (4) **§2b** bracket both sides of TXC's
+budget — the same coarse-grid trap that produced the 3/4 error.
 
 **⚑ 3 unattributed non-convention pods ($3.87/h)** — `mats-gap-code-h100`,
 `tsae-paper-widthmatch-probing`, `tsae-paper-widthmatch-em`. **Never
