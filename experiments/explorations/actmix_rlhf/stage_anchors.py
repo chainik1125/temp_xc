@@ -61,7 +61,13 @@ def main():
         m.global_step.fill_(UPSTREAM_FINAL_STEP[seed])
         m.converged_step.fill_(UPSTREAM_FINAL_STEP[seed])
 
-        cell = pf(5, seed)
+        # anchor=True is REQUIRED here: it freezes training_cfg at the
+        # staging-time recipe. Without it this stages under the current
+        # SWEEP recipe, minting keys that do not match the anchor rows
+        # already on the leaderboard — orphaning them so they re-classify
+        # as ordinary T=5 sweep cells and fold the paper's weights into
+        # the port's mean (mac-d, LOG 13:32/13:35).
+        cell = pf(5, seed, anchor=True)
         tk = compute_train_key(
             arch=cell["arch"], seed=seed,
             training_cfg=cell["training_cfg"], data_key=data_key,
