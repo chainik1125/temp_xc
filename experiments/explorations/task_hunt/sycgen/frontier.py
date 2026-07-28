@@ -10,8 +10,19 @@ tokens get no feature at all), and because the arms' budgets scale
 differently in T, matching per-window necessarily unmatches per-token.
 There is no single matched point to specify.
 
-The new arms need NO training: pooled/stacked are post-hoc transforms of
-the ALREADY-TRAINED per-token (T=1) SAE.
+The new arms need no NEW ARCHITECTURE: pooled/stacked are post-hoc
+transforms of the per-token (T=1) SAE.
+
+⚑ CORRECTED 2026-07-28 22:4x. This docstring used to read "need NO
+training: ... the ALREADY-TRAINED per-token SAE", and that assumption
+was FALSE and nearly cost the whole retrain. The sycgen SAE anchor
+weights do not exist anywhere — pod-D was released and the 07-25 HF
+mirror covers only the stage2 panels — while the manifest still lists
+their train_keys, and `runner.py:141-150` reports `train_cached=True`
+off a leaderboard hit WITHOUT ever checking that a checkpoint exists.
+`checkpoints/HF_MIRROR.md` states the rule I had broken: *any plan
+described as "eval-only" must verify weight existence FIRST.*
+`_key_from_manifest` now enforces it in code.
 
     pooled  : encode each of the T tokens -> mean over the window -> d_sae
     stacked : encode each of the T tokens -> concatenate          -> T*d_sae
@@ -122,17 +133,35 @@ class MeasuredArm(torch.nn.Module):
 
 
 def _key_from_manifest(arch_name: str, T: int, seed: int) -> str | None:
-    """Look the train_key UP; never re-derive it.
+    """Look the train_key UP; never re-derive it — AND verify the weights exist.
 
     Re-deriving needs the exact training_cfg the run used, and guessing it
     produced a key for a checkpoint that does not exist (twice today — the
     btk false alarm this morning, and my first cut of this function).
     `checkpoints/manifest.jsonl` records what was actually written.
+
+    ⚑ But the manifest records what was written *once*, not what still
+    exists: the 07-25 force majeure and pod-D's release both left manifest
+    entries whose weights are gone. And a forced retrain (new eval tag,
+    same train_key) appends a SECOND entry for the same cell — so
+    "return the first match" can hand back a weightless key while a good
+    one sits further down the file — and THAT one is the silent one: it
+    fails as "checkpoint missing" for a cell whose weights are actually
+    present, sending the reader off to retrain something that exists.
+    (A wholly-missing checkpoint does raise on its own, just with a
+    message that does not say the manifest is stale.)
+    So: collect every candidate, return one whose `model.safetensors` is
+    ON DISK, and if none is, say exactly that. This is
+    `HF_MIRROR.md`'s standing rule ("verify weight existence FIRST")
+    applied in code rather than trusted to memory — I broke it once today
+    by assuming these very anchors existed.
     """
     import json
+    from temp_bench.core.config import checkpoint_dir
     mf = Path(__file__).resolve().parents[4] / "checkpoints" / "manifest.jsonl"
     if not mf.exists():
         return None
+    cands: list[str] = []
     for line in mf.read_text().splitlines():
         if not line.strip():
             continue
@@ -147,7 +176,19 @@ def _key_from_manifest(arch_name: str, T: int, seed: int) -> str | None:
         ov = tc.get("arch_hparams_override") or {}
         if int(ov.get("T", r.get("T", -1)) or -1) != T:
             continue
-        return r.get("train_key")
+        k = r.get("train_key")
+        if k and k not in cands:
+            cands.append(k)
+    live = [k for k in cands
+            if (checkpoint_dir(k) / "model.safetensors").exists()]
+    if live:
+        return live[-1]                   # newest surviving weights
+    if cands:
+        raise FileNotFoundError(
+            f"{arch_name} T={T} seed={seed}: {len(cands)} train_key(s) in "
+            f"the manifest, NONE with model.safetensors on disk "
+            f"({', '.join(cands)}). The manifest records weights that no "
+            f"longer exist — retrain this cell, do not 'eval-only' it.")
     return None
 
 
