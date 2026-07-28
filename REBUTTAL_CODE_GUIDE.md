@@ -198,7 +198,7 @@ over this snapshot if they disagree.
 | **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | **paper-faithful probing shard E RUNNING since 02:41** (T4×3 → T2×{1,2}; est done ~06:20) | — |
 | | | 1 | rmx_b (eq-extension cells 2–6; cell 2 lands ~04:00) | overflow only post-drain (~11:30; boundary offer CLOSED) |
 | **pod B** (2×H100) | runpod-c alone | 0+1 | **FROZEN hill-climb draining in-flight C4/C5-T16 (~02:50 / ~03:15)**; resume playbook in `tscale/RESULTS.md` §FREEZE; ckpt mirror to HF in background | **shards C (T8×3→T1/s2) + D (T6×3→T2/s42) at drain** — substrate on-pod, zero sync |
-| **mac-c-screen-0728** (L40S) | mac-c | — | warm-held (stated purpose) | evalage screen once the 3-tokenizer re-tokenization transplant (mac-d's `screen_grids.py`) verifies |
+| **mac-c-screen-0728** (L40S) | mac-c | — | **TERMINATED 03:14 (API-verified)** — evalage screen ran and returned WEAK 3/3 (no retrain); lane closed on-budget | mac-c continues CPU-side: retryesc_gen design/generation |
 | **mac-d-retrain-0728** (2×H100) | mac-d | 0+1 | **sycgen matrix retrain RUNNING — 36 cells, T{1,2,4,8,16} ≡ the λ̂ exhibit axis** (card 74d260321 + §5 amendment: T{6,10} can't tile eval L=32, receipts kept); shard0 DONE, shard1 ETA ~03:35–03:55 | shuffle overlay → repatriate rows → HF ckpts → T-sweep figure (~04:30) → TERMINATE pod |
 
 **Priority order (Han, 02:38): paper-faithful sweeps outrank ALL
@@ -290,9 +290,12 @@ Per-item exhibit blocks live in `REBUTTAL_HANDOFF.md` §4–§7; code:
   results/); datasource plugin `sycgen_real_age_llama31_8b_l14`;
   retrain rows land on the canonical leaderboard ~05:30–06:30
   (regenerate the census).
-- **item 7, evalage (candidate — corpus complete, screens pending):**
-  `experiments/explorations/task_hunt/evalage/`; corpus on HF
-  `temp-bench-data/hunt_corpora/` with sha receipts.
+- **item 7 — OPEN. evalage resolved WEAK** (0 KEEP / 0 KILL, gains
+  below the +0.05 bar, no order signal; LOG 03:14):
+  `experiments/explorations/task_hunt/evalage/` (RESULT.md is the
+  full verdict); corpus on HF `temp-bench-data/hunt_corpora/` with
+  sha receipts. Pathway now: `task_hunt/retryesc/` (retryesc_gen
+  regeneration) + StruQ premeasures (runpod-a).
 - The hunted-task shuffle-overlay results are eval_extra-namespaced
   JSONs in each dir's `results/` (NOT leaderboard rows) — see the
   census §"Hunted-task cells outside the leaderboard".

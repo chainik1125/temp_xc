@@ -18388,3 +18388,54 @@ warm-hold only pays if staging happens DURING the wait; mine ran serially
 after the corpus landed, so it bought nothing.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 03:17 London (date-verified) — mac-local: evalage WEAK verdict RATIFIED as-is; item-7 pathway reset to retryesc_gen; surfaces updated
+
+**RATIFIED — mac-c's evalage SCREEN VERDICT (03:14): WEAK, 3/3
+legs, 0 KEEP / 0 KILL.** Review notes: scored by the unmodified
+`hunt4.verdict.score_model` at the frozen pin 163492bc7; the +0.05
+KEEP bar applied exactly as frozen (misses 0.004–0.019 — reported
+as WEAK, not narrated toward a KEEP, per the card's own promise);
+pre-registration audit discloses its two wrong calls; the
+T-ceiling excuse was raised AND killed by the author before
+publication (separation ≫ T is the intended trailing-functional
+regime — correct). The substantive negative is stated with the
+right weight: **no order information anywhere** (unordered-mean
+best on all legs, win−shuf ≈0/negative, order_pass false 3/3) — a
+candidate that cannot beat its own shuffle is not evidence for a
+temporal-structure program even at a met gain bar. **Disposition
+ENDORSED: no further GPU on evalage as specified; any revisit is a
+NEW card with its own freeze + pre-registration.** The no-retrain
+instruction to mac-d is correct under f0ac106e4 item 3
+(retrain-on-KEEP only).
+
+**Carry-forward science (quotable in the harness-thesis line):**
+the harness changed the FAILURE MODE — organic-corpus reask_hr
+(same face family) died position-confounded with sign-flipping
+within-conversation gains; evalage survives its within-conversation
+control on all three legs (+0.037/+0.041/+0.059) and dies only of
+effect size. Generation is doing exactly what it was built to do:
+kill confounds, expose true magnitude.
+
+**ITEM-7 PATHWAY (reset):** `retryesc_gen` is now the shot —
+mac-c CPU-side generation under the Claude-API backend ($300 cap
+ledger applies); StruQ $0 premeasures continue at runpod-a.
+**Screen-venue coordination note: if the retryesc_gen corpus +
+gates are ready before mac-d's pod-D termination checkpoint
+(lane-done after the sycgen drain), the screen may CLAIM pod-D by
+LOG entry (warm, tokens+caches in place); otherwise spin a fresh
+L40S (~$1/h) under the standing waiver.** mac-c pod termination
+API-verified — warm-hold discharged on-budget, ledger clean.
+
+**Surfaces updated this push:** HANDOFF item 7 (OPEN; WEAK
+disclosed-not-hidden quote-form for 13:00), CODE_GUIDE §5 (mac-c
+row terminated) + §6 (item 7 pathway), census evalage line + regen.
+
+**Answer-of-record (Han, 03:1x, "is sycgen ready to be added to
+the HANDOFF with its plot?"): NOT YET — 0 retrain rows repatriated,
+no fig rendered (verified on-disk 03:16); shard1 still running,
+drain ~03:35–03:55, then overlay → repatriate → render ⇒ embed at
+~04:30–05:00. The HANDOFF item-6 slot is pre-written; the plot
+drops in at landing.**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

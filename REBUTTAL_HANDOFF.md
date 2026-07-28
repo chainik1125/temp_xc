@@ -171,19 +171,26 @@ carries the row-level label.
   canonical leaderboard under
   `datasource=sycgen_real_age_llama31_8b_l14`,
   `eval_cfg.retrain_tag=sycgen_keep_r1`.
-- **Item 7 = evalage, CANDIDATE (screens pending):** corpus v1
-  COMPLETE (400 docs / 2.04M tokens, claude-haiku, both card gates
-  pass, HF-pushed w/ sha receipts) + **6/6 label-side bands PASSED**
-  (unigram 0.586 vs the 0.60 bar that killed retryesc) — NOT a KEEP
-  until the probe-side screen runs (3-tokenizer re-tokenization via
-  mac-d's `screen_grids.py` transplant, then screens on mac-c's
-  L40S). Earlier context: every found-corpus candidate resolved
-  (kills with receipts — reask_hr, retryesc label-side, warddebt
-  geometry; retryesc = signal-UNTESTED, regenerating as
-  retryesc_gen; dharm/warddebt = STRUCTURALLY UNSCREENABLE); the
-  elicitation harness (Claude-API backend, provenance weakening
-  disclosed in-card) is what produced sycgen + evalage. StruQ runs
-  $0 premeasures under our bars (runpod-a) as the 4th candidate.
+- **Item 7 = OPEN — evalage resolved WEAK (03:14; screen verdict,
+  LOG + `task_hunt/evalage/RESULT.md`):** 3/3 legs WEAK, 0 KEEP /
+  0 KILL — no kill clause fired, but gains +0.031/+0.046/+0.041
+  fell short of the +0.05 KEEP bar, and there is NO order signal
+  (unordered-mean arm best on all legs, window−shuffle ≈ 0 or
+  negative, order-pass false 3/3) — not a table candidate for a
+  temporal-structure program; no retrain, no further GPU as
+  specified. Science worth quoting: the harness CHANGED THE FAILURE
+  MODE — the same face family as organic-corpus `reask_hr` (killed
+  3/3 with position-confounded, sign-flipping gains) survives its
+  within-conversation control on every leg here (+0.037/+0.041/
+  +0.059); the effect is real but small. **Item-7 pathway now:
+  `retryesc_gen`** (retry-escalation regenerated under the harness —
+  the probe-side question is genuinely untested) **+ StruQ $0
+  premeasures (runpod-a)**. Earlier context: every found-corpus
+  candidate resolved (kills with receipts — reask_hr, retryesc
+  label-side, warddebt geometry; dharm/warddebt = STRUCTURALLY
+  UNSCREENABLE); the elicitation harness (Claude-API backend,
+  provenance weakening disclosed in-card) produced sycgen (KEEP) +
+  evalage (WEAK, cleanly diagnosed).
 - **Where verdicts appear:** LOG (stamped entries) +
   `experiments/explorations/task_hunt/<candidate>/` cards/results.
 - **For the 13:00 submission:** item 6 is quotable NOW as "first
@@ -191,8 +198,11 @@ carries the row-level label.
   running, exhibit expected before the deadline" — with the exhibit
   itself landing by ~05:00 if the retrain drains on schedule
   (renderer pre-written + fixture-tested, 1618b5a7a).
-  Item 7 + further candidates: "results follow within the amendment
-  window (Aug 3)."
+  Item 7: the honest sentence is the amendment-window one — "a
+  second safety-relevant candidate (retry-escalation) is in the
+  generation pipeline; results follow within the amendment window
+  (Aug 3)" (evalage's WEAK is disclosed-not-hidden if asked:
+  screens ran, KEEP bar not met by 0.004–0.019).
 
 ## 8. tsae width-match (additional item) — COMPLETE ✓
 

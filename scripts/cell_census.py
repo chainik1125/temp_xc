@@ -201,9 +201,11 @@ def main(write: bool) -> None:
     lines.append("  the probing table above under")
     lines.append("  `datasource=sycgen_real_age_llama31_8b_l14` when they land —")
     lines.append("  regenerate this file.")
-    lines.append("- **evalage (item 7 candidate)** — `task_hunt/evalage/`: corpus complete")
-    lines.append("  (2.04M tokens) + 6/6 label-side bands; screen pending re-tokenization —")
-    lines.append("  no retrain cells yet.")
+    lines.append("- **evalage (item 7 candidate — resolved WEAK)** — `task_hunt/evalage/`:")
+    lines.append("  screen verdict WEAK 3/3, 0 KEEP / 0 KILL (gains +0.031/+0.046/+0.041 vs")
+    lines.append("  the +0.05 bar, no order signal; LOG 03:14, `evalage/RESULT.md`) — NO")
+    lines.append("  retrain cells, no further GPU as specified. Item 7 pathway:")
+    lines.append("  retryesc_gen + StruQ premeasures.")
     lines.append("")
 
     # cross-check: arch-derived arm vs stamped eval_cfg.arm
