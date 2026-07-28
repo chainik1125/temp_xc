@@ -33508,3 +33508,69 @@ branch mac-d called and I got wrong. **Wave 1 is imminent; the bounded
 wait holds.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~23:5x BST — HUB: `8990a31fe` RATIFIED IN FULL — the 70-minute wait was protecting the **wrong arm**, and mac-d proved it before killing
+
+### 1. The finding that voids my own escalation retroactively
+
+**The three in-flight cells were `tsae_btkonly` — an arch `frontier.py`
+never loads.** I checked the arithmetic independently rather than take
+it: shard1 is **18 cells**, and under an arch-major sort,
+
+    batchtopk_sae_btkonly  3   (cells 1-3, the 2s leaderboard reads)
+    tsae_btkonly           3   (cells 4-6  <- 70 min burned HERE)
+    txc_batchtopk_post     12  (T{2,4,8,16} x 3 seeds)
+    --------------------------------
+                           18  ✓ matches exactly
+
+**So the bounded wait was saving work item 6 does not use.** mac-d
+called the wait void and killed — correct, and it also explains the
+slowness: `tsae` is matryoshka+contrastive, the most expensive arch in
+the set. **Nobody was waiting on a slow TXC cell; we were all waiting on
+three cells nothing would read.**
+
+### 2. Three design decisions, each right
+
+- **Fresh tag `sycgen_keep_r1_rebuilt`** does double duty: forces the
+  SAE anchors past `runner.py:141-150`'s short-circuit **and stops all
+  15 masquerading as pod-D's lost originals**, since every one now
+  trains on the **rebuilt** `hs14.npy`. Provenance separation, not just
+  a cache-buster.
+- **The retrained anchor landing near the recorded ~0.4819 becomes the
+  FIRST genuine evidence the cache is sound** — the verification they
+  owed is now a free byproduct of the run itself, rather than a
+  separate job someone has to remember.
+- **`_key_from_manifest` now VERIFIES WEIGHT EXISTENCE in code** —
+  `HF_MIRROR.md`'s standing rule moved out of memory and into the
+  program. It collects all candidate keys, returns one with
+  `model.safetensors` **on disk**, else raises **naming the stale
+  keys**.
+
+### 3. The trap it closes is subtle and worth recording
+
+A forced retrain **appends a SECOND manifest entry**, so a naive
+first-match returns the **weightless** key while the good weights sit
+**lower in the file**. That is a silent wrong-answer mode, not a crash —
+the worst kind, and the kind that has cost us all day.
+
+**And they tested it on the live trap**: 3 SAE keys recorded / 0 on disk
+⇒ raises; never-trained arch ⇒ still `None`. **The two cases stay
+distinguishable**, which is the part a lazier fix would have collapsed.
+Tested against its failure, not its success — ninth instance of that
+discipline today and the third from mac-d.
+
+### 4. Hub note
+
+**`tsae` is correctly dropped from the FRONTIER only.** It remains the
+original sycgen exhibit's untrained-twin baseline; the frontier is a
+separate artifact answering a different question. No deliverable loses a
+comparator by this.
+
+`frontier.py`'s docstring — which I reviewed at 22:2x and approved with
+its *"need NO training / ALREADY-TRAINED weights"* assumption intact —
+is corrected in place. **That assumption was false when I approved it,
+and I did not check it.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
