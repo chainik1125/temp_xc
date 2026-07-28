@@ -759,19 +759,42 @@ rate at its best dose — **lower suppresses more** — against a baseline of 0.
 mean sits within ±0.035 of the null's +0.145, and none clears it on more than 2 of 3 seeds.
 Only the supervised gradient-derived write separates, and it does so by 3× on every seed.
 
-⚠ **2. The architecture ranking is not seed-stable, and this is Reviewer 1's objection made
-quantitative.** The seed-invariant arms reproduce *exactly* — both nulls and both supervised
-arms are identical to three decimals across all three seeds, so the pipeline is deterministic
-apart from dictionary initialisation. Yet `txc_slab` ranges 0.850 / 0.580 / 0.810 and
-`sae_broadcast` 0.870 / 0.600 / 0.875. From seed 0 you would report *"the published T-SAE
-suppresses 3.3× more than the crosscoder"*; from seed 1, *"the crosscoder suppresses 2.5× more
-than the published T-SAE"*. Both are single-seed artefacts of one lucky draw.
+⚠ **2. The instability is in the METRIC, not in the dictionaries.** The ranking by genuine-event
+count is not seed-stable — `txc_slab` ranges 0.850 / 0.580 / 0.810, so from seed 0 you would
+report *"the published T-SAE suppresses 3.3× more than the crosscoder"* and from seed 1 *"the
+crosscoder suppresses 2.5× more than the published T-SAE"*. But the cause is **not** that the
+seeds learn different-quality latents. On the teacher-forced margin the same dictionaries are
+consistent:
 
-**3. The published T-SAE is the most consistent learned arm** (sd 0.033 against the
-crosscoder's 0.146 and the SAE's 0.157) and the only one to beat the null on a majority of
-seeds. Its mean ties the crosscoder's, but the crosscoder gets there through a single outlying
-seed and is *worse than the null* on the other two. Consistency is the axis on which the
-architectures actually differ here — not mean effect.
+| arm | margin, 3 seeds | CV | event suppression, 3 seeds | CV |
+| --- | --- | --- | --- | --- |
+| `txc_slab` | 2.43 / 3.22 / 2.26 | **0.19** | 0.060 / 0.330 / 0.100 | **0.89** |
+| `sae_broadcast` | 2.23 / 1.16 / 1.48 | 0.34 | 0.040 / 0.310 / 0.035 | **1.23** |
+| `random_broadcast` | 0.76 / 0.76 / 0.76 | 0.00 | 0.145 / 0.145 / 0.145 | 0.00 |
+
+The two metrics agree in expectation — **r = +0.909** across arms — and on the margin the
+crosscoder beats the best null by 3.5× here, mid-pack against recency (2.5×), evidence (1.1×)
+and LitM (5.9×). What the event count adds is not signal but noise, of a specific kind. It is a
+**binary rate against a 0.910 ceiling**, so it compresses: `broadcast_optimal` carries 7× the
+crosscoder's margin (18.78 against 2.63) yet only 2.6× its event suppression, and a 3.5× margin
+advantage over the null compresses to 1.12× in events. And the residual variation is not
+sampling noise — binomial at n = 200, p ≈ 0.8 gives se ≈ 0.028 against an observed swing of
+0.27, an order of magnitude larger. It is **threshold noise**: on seed 1 the crosscoder's
+dose-response crossed a tipping point at α = −0.25 and compliance collapsed to 0.580; on the
+other two seeds it never crossed.
+
+**This still supports Reviewer 1 — a single-seed genuine-event count is a lottery — but the fix
+is not simply more seeds.** The readout needs headroom (a behaviour whose baseline is not
+already at 0.91) or a dose grid dense enough to locate the tipping point. Averaging a saturating
+binary readout over seeds converges slowly and to a quantity that still compresses real
+differences.
+
+**3. The published T-SAE is the most consistent learned arm on the event readout** (sd 0.033
+against the crosscoder's 0.146 and the SAE's 0.157) and the only one to beat the null on a
+majority of seeds. Note this is consistency *of the readout*, not of the dictionary: on the
+margin the ordering of stability reverses, with `tsaep_broadcast` the least stable arm
+(CV 0.62 against the crosscoder's 0.19). The two views disagree about which architecture is
+reliable, which is itself a reason to report both rather than either alone.
 
 **And the paper's own write is the weakest thing measured.** `txc_flat` — V7 up to a scalar —
 suppresses +0.052, below both nulls, on **0 of 3** seeds. Whatever the crosscoder's latent
