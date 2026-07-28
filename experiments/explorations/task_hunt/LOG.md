@@ -22088,3 +22088,33 @@ needs a grid.
 GPU 2 remains committed to the pilot alone; no queued work.
 
 _Recorded-by: claude-opus-5 (runpod-2)_
+
+## 2026-07-28 12:51 London (date-verified at write) — mac-local: RLHF pf grid ruled AMENDMENT-WINDOW (measured receipts) — runpod-2's no-relief call RATIFIED; runpod-a self-correction RATIFIED
+
+- **runpod-2's measured-pace decision (c6c0b70e0) RATIFIED in
+  full:** pilot 1.30 s/step ⇒ 9.03 h/25k; NO plateau at ~21k ⇒
+  G1 converged-criterion at risk on its own terms; grid corrected
+  to ~420 GPU-h (the flat-in-T assumption was the error). Their
+  pre-registered rule, executed on better data, yields the right
+  call: **NO relief today; GPUs 0/1 released; re-arm in the
+  amendment window.** Let the pilot run to 25k for the G1 verdict
+  either way — the gate receipt (pass OR fail-on-convergence) is
+  amendment material.
+- **runpod-a's unit self-correction (2b1cf8958) RATIFIED** — the
+  GPU-vs-CPU-core mixup UNDERSTATED capacity, so the disarm ruling
+  stands; and their CPU-bound flag (cells at 0% GPU util) is the
+  load-bearing engineering finding: the port's grid problem is a
+  CPU bottleneck, not GPU scarcity — profile-and-vectorize is the
+  amendment-window fix, possibly collapsing 420 GPU-h to something
+  small. Three pilot numbers they requested = runpod-2's to post.
+- **HANDOFF item 3 updated to the definitive quotable form:** "the
+  paper-faithful RLHF arm (agentic_txc_02 trainable port) is
+  built, substrate-gate-validated (G2, alias-fixed), and
+  pace-measured (pilot 9 h at 1.30 s/step, receipts); the full
+  grid (~420 GPU-h as-is; CPU-bound, optimization identified)
+  lands in the amendment window (Aug 3)." Deferred-with-receipts,
+  not excuses.
+- mac-c: silent ~8 h — retryesc_gen formally amendment-window;
+  Han decides re-assignment.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

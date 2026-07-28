@@ -149,9 +149,18 @@ panel — directly comparable to the btk figs above):**
   resources on BatchTopK until PAPER FAITHFUL IS FINISHED"; the
   x-lane was cancelled mid-stream and resumes only after the pf
   grid).** The 10:15 checkpoint render ships the complete 6-point
-  btk fig with a deferral caption. RLHF pf timeline moved UP by
-  the same order: substrate building from ~04:50, G1 gate
-  ~07:00–07:15, relief-pod rule standing.
+  btk fig with a deferral caption.
+  **RLHF PAPER-FAITHFUL ARM — DEFINITIVE STATUS (13:0x, measured
+  receipts):** the trainable \`agentic_txc_02\` port is BUILT (11
+  contract tests), substrate-gate-VALIDATED (G2 passed on l13-IT
+  with the alias fix), and pace-MEASURED (pilot 9.0 h at 1.30
+  s/step, no plateau at 21k — G1's own convergence criterion under
+  test); the full grid projects ~420 GPU-h as-is, and the cells
+  are CPU-BOUND (0% GPU util — the identified optimization
+  target). **The pf grid + its T-sweep plot land in the amendment
+  window (Aug 3), deferred WITH these receipts.** Until then the
+  paper-faithful RLHF claim is carried by the archived-agentic
+  anchors (G2 rows) + RM_CERTIFICATE v1.0, labeled as such.
   **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins
   are tensor-IDENTICAL through T16 (829f05070: Δauc exactly 0,
   boundary_min_pre ≥ 2.21, no negative-pre-activation contact at
