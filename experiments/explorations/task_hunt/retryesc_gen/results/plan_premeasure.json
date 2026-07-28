@@ -1,0 +1,72 @@
+{
+ "n_docs": 400,
+ "seed": 0,
+ "p_repeat": 0.26,
+ "assumed_realised_frac": 0.8,
+ "event_rate": 0.249,
+ "pairs_per_event": 4.02,
+ "gates": {
+  "1_clock": {
+   "projected_gap_median": 377.7,
+   "target": 385,
+   "range": [
+    297,
+    499
+   ],
+   "pass": true
+  },
+  "2_vocabulary": {
+   "event_rate_cv_across_tasks": 0.0567,
+   "spread": 0.0436,
+   "bar_proposed": 0.35,
+   "pass": true
+  },
+  "3_position": {
+   "frac_docs_exhausting_pool": 0.0,
+   "pool_size": 24,
+   "event_rate_rise_first_to_last_third": 0.0165,
+   "pass": true
+  },
+  "4_corpus_clock": {
+   "projected_tok_per_doc": 3527,
+   "dharm_fatal": 155.6,
+   "multiple_of_fatal": 22.7,
+   "pass": true
+  }
+ },
+ "all_pass": true,
+ "schedule_independence": {
+  "n_tasks": 16,
+  "per_task_event_rate": {
+   "the cache warmer evicts entries it has just written": 0.2625364483998827,
+   "the retry wrapper multiplies its backoff instead of adding to it": 0.2312454190760195,
+   "the archive extractor mishandles symlinks that point outside the root": 0.22921760465159943,
+   "the rate limiter admits bursts that exceed the configured ceiling": 0.22799142693979135,
+   "the metrics collector reports a counter that decreases over time": 0.25756458377097247,
+   "the log shipper truncates messages longer than a few kilobytes": 0.2590520830536368,
+   "the search index misses documents whose titles contain diacritics": 0.2550738970011347,
+   "the audio transcoder desynchronises video by a few frames": 0.25635259722848236,
+   "the PDF renderer omits embedded fonts on the second page onward": 0.25524409690655664,
+   "the websocket client drops its connection after roughly ten minutes": 0.24983110504089917,
+   "the nightly export job writes an empty CSV on the first of the month": 0.22674399170254506,
+   "unit tests pass locally but fail in the container with a locale error": 0.2703619967456536,
+   "the image thumbnailer emits corrupted output for CMYK inputs": 0.23318991251584803,
+   "the migration script leaves two rows with duplicate primary keys": 0.2607521629129617,
+   "the spreadsheet importer misreads dates in day-first locales": 0.263028935459878,
+   "the geocoder returns coordinates swapped in the southern hemisphere": 0.24512909631386653
+  },
+  "mean": 0.248957209857483,
+  "spread_max_minus_min": 0.04361800504310853,
+  "cv": 0.056696168128294124,
+  "cv_bar_proposed": 0.35,
+  "stop": false
+ },
+ "exhaustion": {
+  "frac_docs_exhausting_pool": 0.0,
+  "pool_size": 24,
+  "event_rate_first_third": 0.2349429736929737,
+  "event_rate_last_third": 0.25144064269064265,
+  "rise": 0.01649766899766894,
+  "note": "some rise is structural (attempt 1 cannot be a repeat); the screen's balanced manifest stratifies on position, and position_auc is band 3 (<= 0.95)"
+ }
+}

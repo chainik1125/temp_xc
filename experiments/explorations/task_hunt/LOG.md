@@ -27046,3 +27046,78 @@ generation spend rather than after is the whole point of the freeze
 discipline. **Ratified.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 14:26 London (date-verified at write) — mac-c: `retryesc_gen` scaffold built + **ALL FOUR PLAN-TIME GATES PASS at $0** — and the plan-time pass caught a **position confound** that would have been invisible until screen
+
+Third beat of `hunt-mac-c-takeover.md`: premeasure before generating,
+report go/no-go with receipts. **Still $0 — no API call has been made.**
+Artifacts: `labels/retryesc_gen_lib.py`,
+`retryesc_gen/plan_premeasure.py`, `results/plan_premeasure.json`.
+
+### 1. Gate results (400 docs, seed 0, `P_REPEAT` = 0.26)
+
+| gate | measured | bar | |
+|---|---|---|---|
+| **1 clock** | projected gap median **378 tok** | target 385, range 297–499 | ✅ |
+| **2 vocabulary** | event-rate cv across tasks **0.0567** | ≤ 0.35 (proposed) | ✅ |
+| **3 position** | pool exhaustion **0.0 %** of docs | < 5 % | ✅ |
+| **4 corpus clock** | **3,527 tok/doc** | > 10× `dharm`'s fatal 155.6 (**22.7×**) | ✅ |
+
+Event rate 0.249 — one event every **4.02 turn-pairs**.
+
+### 2. ⚑ The position confound I caught at plan time
+
+My first pool had **10 strategies** against ~15.6 expected fresh draws
+per episode, so **the pool exhausted mid-episode** — and once it does,
+*every subsequent failure is necessarily a repeat*. That makes
+event-status a **function of position**, which is the confound that
+killed `reask_hr` (wd gains +0.017 / **−0.060** / **−0.006**, its window
+arm erased and reversed by the within-document frame).
+
+It would not have shown up until the screen, after generation money was
+spent. **Pool widened to 24** ⇒ exhaustion **0.0 %**, and the event-rate
+rise from first to last third of an episode is **+0.0165** — near flat.
+
+Some rise is **structural and cannot be removed**: attempt 1 can never
+be a repeat. That residual is handled by the apparatus, not by me — the
+screen's balanced manifest stratifies on position by construction
+(`evalage` carried label-side position Spearman 0.4226 and still landed
+`position_floor` at chance on all three legs), and `position_auc` ≤ 0.95
+is band 3. **Reported, not assumed away.**
+
+### 3. What gate 2 actually buys
+
+`retryesc` died because **task difficulty genuinely drove failure
+rate**, so ordinary task nouns predicted event age — unmaskable. Here
+`plan_schedule()` **cannot see the task**: the outcome schedule is
+drawn first, the task second, and the task draw never consults the
+schedule. Strategies come from a **global pool shared by all 16 tasks**,
+so strategy tokens carry no task identity either.
+
+Result: event rate **0.4117 ± spread 0.0436** across tasks, cv 0.0567.
+Difficulty is *assigned*, not intrinsic. **This is a structural
+property of the generator, not a band it squeaked past** — which is the
+whole reason to rebuild rather than re-screen.
+
+### 4. Honest limits of a plan-time pass
+
+- **Gate 1 rests on an assumption**: realised assistant length ≈ 0.8×
+  the sampled cap. **Not verified here.** The pilot measures
+  `claim_zone` directly (§ 2.2a: that *is* `floor_excess`, K = 0.96 on
+  real data) and re-tunes `P_REPEAT`, which is the one knob the freeze
+  permits to move.
+- **Gate 2 is a plan-side check on the *schedule*.** It does not prove
+  the *generated text* is vocabulary-clean — the model could still
+  correlate its prose with the schedule. That is band 1 (`unigram_auc`
+  ≤ 0.60) at pilot, and it remains the risk I rate highest (§ 7:
+  ~65–75 %).
+- `P_REPEAT` = 0.26 came from a $0 scan (0.33 → gap 301, 0.28 → 351,
+  0.24 → 412, 0.20 → 485), logged per the freeze rule.
+
+**GO to pilot** (~20 docs). A pilot outside the band re-tunes `P_REPEAT`
+once; if it cannot be brought into band without breaking § 3's
+construction rule, that is a **no-go I report**.
+
+_Recorded-by: claude-opus-5 (mac-c)_
