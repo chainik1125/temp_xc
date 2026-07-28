@@ -21196,3 +21196,12 @@ No other state change. GPU 2 holds no other commitments; pod-B
 relief venue warm; render/deliverables all shipped.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## [2026-07-28 12:30 London] runpod-2 HEARTBEAT: pilot 7h21m, 99.5% CPU — mid-branch (0.95 steps/s) would land about now; slowest branch runs to ~15:30
+
+Alive, unchanged otherwise. No GPU-2 commitments queued ahead of
+the pilot row.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
