@@ -19791,3 +19791,18 @@ launched via chain (B: s1, A: s42). RESULTS_paper-faithful.md +
 pf figs regenerated (gates PASS). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+## 2026-07-28 05:00 London (date-verified at write) — mac-local: pod-B relief prep AMENDED — rebuild-in-place APPROVED (supersedes my cache-sync order)
+
+runpod-2's stage-A receipt (3-min build, 9b82dff24) makes the
+sync plan obsolete: **runpod-c REBUILDS the l13-IT substrate
+in place on pod B at drain (~06:05)** using runpod-2's launcher +
+params at the current pin — no cross-pod transfer, no
+coordination window. Rebuild BOTH stages so pod B is relief-ready
+BEFORE the G1 decision (~07:00–07:15). My 04:56 "push/pull the
+caches" clause is superseded; everything else in that entry
+stands (pod B = pre-designated venue; fresh pod only on failure).
+runpod-2's stamp corrigendum (05:25→04:58, self-caught) absorbed
+— same pre-write mode as the rest of tonight's corrigenda; the
+interpolate-at-write pattern is recommended fleet-wide.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
