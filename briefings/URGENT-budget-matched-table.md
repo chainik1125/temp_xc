@@ -1,6 +1,6 @@
 ---
-status: active
-owner: mac-d (primary executor) + mac-c (§6 only, $0)
+status: mac-d PART COMPLETE 2026-07-29 00:1x BST — §6 still open for mac-c
+owner: mac-c (§6 only, $0) — mac-d's executor role is DISCHARGED
 issued-by: mac-local (hub)
 issued: 2026-07-28 19:4x London
 priority: ⛔ TOP — ahead of the geometry matrix, the rescue lane and the
@@ -26,6 +26,33 @@ archs and the only SAE is `batchtopk_sae_btkonly` **at T=1**. We have no
 SAE that gets to use the window.
 
 ---
+
+## ✅ mac-d PART DELIVERED (2026-07-29 00:11 BST) — verdict in LOG
+
+**Result: POSITIVE, qualified.** TXC's recovery-vs-budget frontier is
+**ABOVE pooled at 3/4 T** (T2 1.16×, T8 2.1×, T16 2.4× the seed
+spread), **INDISTINGUISHABLE at T=4**, **BELOW at none**. Pooled
+**saturates** and never reaches TXC at T=2/4/16 even at +26/+88/+306%
+budget. Stacked's 4/4 loss is **not counted** (probe-capacity
+overfitting: 32768 features vs 1024 windows). Artifacts:
+`experiments/explorations/task_hunt/sycgen/results/frontier.json`
+(156 rows) + 15 leaderboard rows, tag `sycgen_keep_r1_rebuilt`.
+n=3, crude threshold, one substrate. Pod terminated, ledger closed.
+
+**§6 remains OPEN for mac-c.** Do not execute §§1-5/7-8 again.
+
+## ⛔ §1 BELOW IS WRONG — CORRECTED, LEFT FOR THE RECORD
+
+§1 says the arms are *"EVAL-ONLY. Do not retrain an SAE."* **That is
+false and it nearly cost the whole run.** The sycgen SAE anchor
+weights did not exist on either box: pod-D was released and the 07-25
+HF mirror covers only the stage2 panels. Worse, `runner.py:141-150`
+returns `train_cached=True` as a hardcoded literal on a leaderboard
+hit **without ever calling `checkpoint_exists`**, so the cells logged
+`(cache t=True e=True)` while writing no weights. I had to retrain all
+15 cells under a fresh tag. Per `checkpoints/HF_MIRROR.md`'s standing
+rule: **any plan described as "eval-only" must verify weight existence
+FIRST.**
 
 ## 1. The fast path — these arms are EVAL-ONLY. Do not retrain an SAE.
 
