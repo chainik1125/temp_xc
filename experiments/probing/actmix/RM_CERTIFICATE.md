@@ -34,9 +34,11 @@ rare between-sample contact. RLHF (runpod-2's venue) = never-contact
 (bit-identical through T16, boundary ≥ 2.21; extended by runpod-b's
 rmx_b relay: T8 trio CLOSED 3/3 identical — aliases incl.
 f857417704b13efa↔7d51409daff2fa72, 06e2fbce45e80006↔a2fe8d7e382dc1cb
-— checks continuing; check 4 T10/s42 CLOSED tensor-grade 7/7 via
-the unblocked mirror relay, alias f03ff666cb8e8cb1↔aa4e62a74ed1686e;
-checks 5–6/6 remain as extensions). runpod-a's dq/λ̂ split (dq
+— lane DRAINED 6/6 with zero re-opens: tensor-grade identity at the
+full T8 trio + T10/s42 (aliases incl. f03ff666cb8e8cb1↔
+aa4e62a74ed1686e); T10 s1/s2 are mirrored anchors DEFERRED pending
+their btk twins, which Han's GPU-2 flip deferred — an availability
+gap in the extension, not a counter-signal to the claim). runpod-a's dq/λ̂ split (dq
 diverges — W_enc 0.35 — while λ̂ stays identical) is the same
 selection-level story seen from the estimator side.
 
