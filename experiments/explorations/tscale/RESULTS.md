@@ -256,7 +256,7 @@ even necessary shapes the search space.
 
 ---
 
-## C4 — k_train anneal on r1-min (`c4-kanneal-4k`) — PRE-REGISTRATION 2026-07-28 ~01:30 London (before launch)
+## C4 — k_train anneal on r1-min (`c4-kanneal-4k`) — PRE-REGISTRATION 2026-07-28 ~01:15 London (before launch)
 
 **Design (menu item "sparsity scheduling"; mechanism-targeted per
 C1-D):** anneal the TRAINING admission width linearly from
