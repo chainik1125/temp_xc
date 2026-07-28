@@ -17088,3 +17088,42 @@ Fleet: no lane changes needed for the btk side (it is the built
 arm); the paper-faithful lanes proceed as commissioned.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 02:25 London (date-verified) — mac-local — ⚑⚑⚑ PAPER-FAITHFUL SPRINT (Han): probing + RLHF {ReLU+TopK} sweeps are THE priority — reallocation
+
+**Han: focus on getting {ReLU+TopK} paper-faithful results out;
+priority SPARSE PROBING and RLHF. Timeline compresses from
+Aug-1-2 to AS-FAST-AS-PHYSICS. The 11:00 btk renders stay
+protected (they are the submission exhibits). Reallocation:**
+
+1. **runpod-1 — probing paper-faithful plugin NOW (CPU-side,
+   parallel to GPU drains):** trainable variant over the vendored
+   94119bc08 class behind paper_txc_base_v1; card + contract
+   tests (T=1 degeneration, exact-k receipt, l0==k_win check);
+   **the RM-2 T2/T4 relu-mix fill is DEMOTED to idle-only**
+   (relu-mix is certificate-evidence only per the arm mapping —
+   the certificate is already strong). GPUs run paper-faithful
+   cells the moment the plugin lands. 7-point btk renders + tables
+   + certificate stay ON SCHEDULE (CPU render work).
+2. **mac-d pod BORROWED as paper-faithful executor** (their
+   charter: execute frozen cards): the warm 2×H100 runs
+   runpod-1's pinned probing cells as detached jobs the hour the
+   card lands. **Preemption rule: a hunt KEEP (sycgen screen)
+   reclaims ONE GPU immediately for the retrain; the sweep keeps
+   the other.**
+3. **runpod-a + runpod-b at drain: paper-faithful probing shards**
+   (pod-A GPUs) — coordinate the shard split in STATUS files;
+   rmx_b finishes (mid-run, cheap, certificate value) then the
+   GPU flips.
+4. **runpod-2 — RLHF agentic_txc_02 port NOW (CPU-side, parallel
+   to x6/x10 drain ~08:00-08:30):** vendor
+   MatryoshkaTXCDRContrastiveMultiscale per the paper_v1 pattern,
+   card + tests; GPU 2 runs the RLHF paper-faithful grid at
+   x-drain. Port-cost flag in-card before launch stands.
+5. **Feasibility honestly:** probing plugin by ~05:00 ⇒ 18 cells
+   across 4-6 GPUs ≈ 4-6 h ⇒ **probing paper-faithful sweep
+   plausibly lands LATE MORNING** (same-day amendment); RLHF port
+   is heavier ⇒ grid this evening ⇒ Day-1 amendment. Est
+   ≈ $110-160 both lanes; ≈ $180-200 of the $500 spent so far.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
