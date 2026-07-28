@@ -14,11 +14,23 @@ as "ready"; verify artifacts on disk. Disclosed in the 12:57 LOG beat.
 
 ## IN FLIGHT RIGHT NOW
 
-- **GPU 0 — RLHF l13-IT substrate stage B REBUILDING** (relaunched
-  12:55). Log `/workspace/logs/pf_substrate_stageB_runpodc.log`.
-  Target `/workspace/caches/rlhf/cached_hh_rlhf_l13it`. **Until this
-  lands, pod B is NOT G1-ready — say so if asked.**
-- **GPU 1 — idle, offered into rung-1 relief.**
+- **NOTHING RUNNING. Both GPUs idle, held deliberately.**
+- **BLOCKED ON A RULING (see below): who executes pod-B lanes.** Han
+  directive `4e04ae0e3` item 2 says "pod B = hub executes (worktree
+  pattern)" — written when I was believed down. I am up. I will not
+  share an unowned pod with a second executor; I launch nothing until
+  the hub or runpod-2 names ONE executor. Posted 13:02.
+- **Awaiting runpod-2's shard map** (wave 1 = s42 across all seven T,
+  seed-column-first per item 3).
+
+## ✅ RLHF l13-IT substrate — DONE 13:01, receipted
+
+    /workspace/caches/rlhf/cached_hh_rlhf_l13it/
+      chosen.npz  1,181,193,532 B · rejected.npz  1,181,193,532 B · meta.json
+    t-test: rejected 36.232 (paper 36.23) · chosen 28.573 (paper 28.57)
+            p = 9.76e-10 (paper 1e-09) · l12 reference match = True
+
+**Pod B IS G1-ready.** Fresh build reproduces the paper's own t-stats.
 
 ## ⚑ The two substrate bugs I found (fixed; see 12:57 beat)
 
@@ -73,7 +85,14 @@ Replicated runpod-b's protocol on pod B (same GEMM shape, 6 iters):
 | 1 lane @default | 2210 | 1.00x | 1.00x |
 | 1 lane @quota | 3051 | 1.38x | 1.18x |
 | 2 lanes naive | 4029 | **1.82x** | **0.75x** |
-| 2 lanes partitioned | 4681 | 2.12x | 1.59x |
+| 2 lanes @22 | 4681 | 2.12x | 1.59x |
+| 3 lanes @14 | 5800 | 2.62x | — |
+| **4 lanes @11** | **5933** | **2.68x** | 1.64x |
+
+**Launch recipe for pod B: 4 lanes, `OMP_NUM_THREADS=11` +
+`MKL_NUM_THREADS=11` per lane.** Pod B 4-lane aggregate 5933 vs pod A
+4510 (~1.3x). GPU memory not binding (2 idle H100s) so
+`TEMP_BENCH_GPU_FRACTION` co-residency is free here; CPU is the budget.
 
 **The cgroup trap generalises (platform property); the collapse does
 NOT** — naive 2-lane costs ~10% per lane here vs 260% on pod A.
