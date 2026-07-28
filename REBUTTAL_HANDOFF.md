@@ -198,22 +198,28 @@ label.
   anchors and untrained-twin controls — same template as the
   probing/RLHF figures.
 
-  **RESULT (full TXC sweep, 03:5x — supersedes the pre-registered
-  expectation):** ordered recovery rises 0.498 → 0.592 (T2→T16)
-  over the per-token anchor 0.482, untrained twins 0.08–0.22 — AND
-  **the ordered−shuffled gap is POSITIVE in 12/12 trained cells**
-  (seed-mean +0.02–+0.06, largest at T16; per-seed T16 range
-  +0.03–+0.08; seed-mean not monotone — T4 dip). **Disclosure: we
-  pre-registered ordered ≈ shuffled** (age faces showed no order
-  signal in pooled raw-activation probes, 0/9 order-ladder record)
-  **and the data contradicted us in the interesting direction** —
-  the trained dictionary's recovery uses within-window order that
-  pooled probes could not see. Quote only the measurement, not a
-  mechanism: instrument receipts clean (recompute identity ≤ 2e-4,
-  identity-violations 0), mechanism check (untrained-twin overlay)
-  queued. l0 disclosure: NOT budget-matched (TXC realizes
-  0.49–2.85 l0/token vs the SAE anchor's ~4.5 — sparser and above
-  it; comparability flag travels on the legend).
+  **RESULT (full TXC sweep + twin control, 04:1x — final quote-form):**
+  ordered recovery rises **0.498 → 0.592** (T2→T16) over the
+  per-token anchor **0.482**, untrained twins ≤ 0.22. The
+  ordered−shuffled gap is positive in 12/12 trained cells
+  (seed-mean +0.02–+0.06), **but the untrained-twin control shows
+  LARGER gaps at every T** (+0.10–+0.17; normalized ~0.5–0.9 vs
+  trained ~0.04–0.11): the gap reflects the windowed encoder's
+  architectural position-sensitivity, **which training REDUCES at
+  every T** while lifting recovery from ≤0.22 to 0.50–0.59 — NOT
+  learned order-use. **The claim is the level story** (windowed TXC
+  recovery rising with T over per-token anchors, on a task whose
+  per-token probes sit at chance); the shuffle columns are the
+  honest architectural control, consistent with the record-wide
+  age-face order-null once that control is applied. Full
+  validity-gate loop ran same-night: pre-registered ordered≈shuffled
+  → observed positive gaps (flagged, never quoted as mechanism) →
+  twin discriminator → resolved as init-anisotropy; every step
+  receipted in the LOG (03:59 → 04:08 entries; instrument
+  recompute-identity ≤ 2e-4 throughout). l0 disclosure: NOT
+  budget-matched (TXC realizes 0.49–2.85 l0/token vs the SAE
+  anchor's ~4.5 — sparser and above it; flag travels on the
+  legend).
 
   **How to check progress (self-serve, ~2 h from now):**
   ```
