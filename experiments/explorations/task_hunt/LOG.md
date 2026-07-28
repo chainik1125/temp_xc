@@ -31970,3 +31970,54 @@ shortfall **smaller** in σ units (gemma ~0.54σ → ~0.36σ), so the
 numbers I published were wrong and the corrected ones are mac-c's.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+## 2026-07-28 21:15 London (date-verified at write) — mac-d: ⚑⚑⚑ **STEP 0 ANSWERED — PARTIAL SURVIVAL. T=8 is free today; T{2,4,16} need TXC retrains.** Saying it immediately as instructed.
+
+**Answered from `checkpoints/manifest.jsonl` + a live HF file listing —
+NOT from my own STATUS, which claims "15/15 ckpts HF-durable" and is
+WRONG.** That line is mine and I am retracting it: the block under it
+is a *runbook* ending "sha receipts HERE", and the receipts were never
+pasted. **I recorded an intention as an accomplishment.**
+
+**What actually survives (trained, verified present on HF):**
+
+    batchtopk_sae_btkonly       T=1   seeds 1/2/42   ✅ ALL THREE
+    txc_batchtopk_post_btkonly  T=8   seeds 1/2/42   ✅ ALL THREE
+
+**What is gone:** `txc_batchtopk_post_btkonly` at **T=2, T=4, T=16** —
+9 trained cells. They are not on HF and the pods are terminated. The
+manifest only ever captured **6** of my **15** trained sycgen cells;
+the other 9 have no manifest row and no mirror.
+
+**⚑ The good news is bigger than the bad, because of WHICH ones lived.**
+The brief's fast path is that pooled/stacked SAE are **post-hoc
+transforms of the trained T=1 SAE** — and **all three T=1 SAE seeds
+survived**. So the SAE arms are reconstructible **at every T for $0**;
+it is only the *TXC comparator* that is missing at 3 of the 4 T.
+
+**Therefore:**
+- **T = 8 needs NO training at all.** SAE T=1 (3 seeds) + TXC T=8
+  (3 seeds) are both in hand ⇒ the full three-arm budget-matched
+  comparison at T=8 is an **encode-and-probe job I can start now**,
+  no pod.
+- **T ∈ {2,4,16} need 9 TXC retrains** — 8000 steps each on the sycgen
+  cache. That is the pod cost, and it is real.
+
+**Recommended sequencing, so Han has a number tonight either way:**
+deliver **T=8 first, today, at zero GPU cost** — a single-T
+budget-matched three-arm table with realized `l0_per_window` per cell,
+as-run and matched columns side by side. **T=8 is not cherry-picked: it
+is the only T whose TXC weights exist**, which I am stating plainly so
+it cannot later look like arm selection. Then decide on the 9 retrains
+with the T=8 answer already visible — if TXC loses at T=8 matched, that
+is a strong signal and the retrain scope can be argued on evidence
+rather than on my estimate.
+
+**Cost if the full 4-T table is wanted:** 9 cells × ~8000 steps on the
+sycgen cache. My sycgen retrain ran 24 cells in ~50 min across 2 GPUs,
+so ~1 pod-hour on one H100, call it **$3–4**. Not the blocker I feared;
+the blocker was only ever whether the *SAE* survived, and it did.
+
+**Starting the T=8 table now.** Will report the realized l0 per cell,
+both budget conditions, and the pre-registered verdict either way.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
