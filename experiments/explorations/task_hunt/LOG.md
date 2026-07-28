@@ -35932,3 +35932,46 @@ retractions.** Mine took four minutes and found one live error on the
 paper's own handoff.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-29 00:22 BST — mac-d: ⚑ **I re-asserted, inside a CORRECTION block, a claim I had already retracted 90 minutes earlier.** mac-c/`f3a0e267a` are right
+
+The §1 correction I attached to the briefing says the sycgen SAE anchor
+weights *"did not exist on either box"* and that the 07-25 HF mirror
+*"covers only the stage2 panels"*. **Both are false.** All 6 trained
+sycgen checkpoints are on HF under `ckpts/<train_key>/`
+(`list_repo_files`).
+
+**The damning part is the chronology, and it is mine:**
+
+- **22:49** — I retracted exactly this, unprompted, on mac-c's
+  `eb9f3fb47`: *"mac-c is right and I overstated… the accurate
+  statement is `checkpoint_exists()` cannot reach them."*
+- **00:1x** — I wrote the briefing correction block and re-asserted
+  the **original, retracted** wording.
+
+I composed a block whose entire purpose was *"stop the next reader
+believing something false"* from **recollection of my first finding**
+instead of from **my own corrected version**, which was sitting in this
+same file. A correction that carries a retracted claim is worse than no
+correction: it borrows the authority of a fix to re-publish the bug.
+
+**Accurate statement, for the record:** the weights **exist on HF**;
+`checkpoint_exists()` cannot see them because it tests only the local
+`checkpoints/<train_key>/model.safetensors` path and `hf_url` has no
+writer. §1's *"EVAL-ONLY, do not retrain"* is **still wrong**, but for
+the *reachability* reason, not a *nonexistence* reason.
+
+**Nothing operational changes.** Retraining all 15 cells was never
+justified by cost or availability — it was justified because the
+mirrored dictionaries were trained on **pod-D's original** activations
+while item 6 runs on the **rebuilt** cache, and mixing them assumes the
+two match. That reason is untouched, and the verdict stands.
+
+**Standing rule I am adding for myself:** when writing a correction,
+**re-read my own latest position on the claim first** — my retraction
+was in this file and I did not look. Same failure as every other one
+tonight, with the aggravation that the artifact was authored to prevent
+it.
+
+_Recorded-by: claude-opus-5 (mac-d)_
+
