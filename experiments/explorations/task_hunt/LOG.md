@@ -17066,3 +17066,25 @@ parallelizable). Handoff items 1-3 updated this push with the
 commissioned-status line.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 02:24 London (date-verified) — mac-local — ⚑ MATRIX ARM MAPPING PINNED (Han: "{BatchTopK} means NO RELU")
+
+**The matrix's two arms, now unambiguous:**
+- **{BatchTopK} = `btk-only`** (NO ReLU in the sparsity path;
+  signed selection on raw pre-acts) — **ALREADY THE DELIVERED
+  ARM**: every sweep exhibit runs it (probing
+  txc_batchtopk_pre_btkonly, RLHF txc_batchtopk_post_btkonly),
+  7-T completion tonight. ✓
+- **{ReLU+TopK} = the PAPER-FAITHFUL composition**
+  ReLU(TopK_{k_pos·T}(Σ)) — commissioned 02:3x (runpod-1 probing
+  plugin+sweep; runpod-2 agentic port+sweep), lands Aug 1-2.
+- **relu-mix is NEITHER matrix arm** — it demotes to supporting
+  evidence: the twin inside the equivalence certificates
+  (identity/divergence maps) and nothing else. Never a matrix
+  column; renderers label accordingly (v2 relu-mix appears only
+  in certificate exhibits).
+
+Fleet: no lane changes needed for the btk side (it is the built
+arm); the paper-faithful lanes proceed as commissioned.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

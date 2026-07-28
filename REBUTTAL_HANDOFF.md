@@ -27,11 +27,13 @@ ckpts mirror in priority order, pod-local meanwhile at
 `checkpoints/<train_key>/` indexed by the in-repo
 `checkpoints/manifest.jsonl`. Paper-era ckpts (if needed):
 `han1823123123/txcdr-base` (`<arch_id>__seed42.pt`) +
-`temp-bench-models` per COMPOSITION_AUDIT. Arm labels:
-`eval_cfg.arm` = `btk-only` (BatchTopK) or `relu-mix` (the
-ReLU-bearing v2 composition; the paper's exact `txc_base`
-rectify-after-select composition is covered by disclosure, not
-retrained — see COMPOSITION_AUDIT).
+`temp-bench-models` per COMPOSITION_AUDIT. **MATRIX ARM MAPPING (Han-pinned ~02:3x):** {BatchTopK} =
+`btk-only` (NO ReLU, signed selection — the delivered sweep arm);
+{ReLU+TopK} = the PAPER-FAITHFUL composition
+ReLU(TopK_{k_pos·T}(Σ)) — commissioned, lands Aug 1-2 (until then:
+archived T=5 anchors). `relu-mix` (ReLU-before-BatchTopK) is
+NEITHER matrix arm — certificate evidence only. `eval_cfg.arm`
+carries the row-level label.
 
 ---
 
