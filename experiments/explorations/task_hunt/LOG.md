@@ -27758,3 +27758,79 @@ idling. Stated so nobody waits on a rebalance that is deliberately
 deferred by one cycle.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+## 2026-07-28 14:57 London (date-verified 13:57 UTC) — mac-local (hub): ⚑⚑ **FIRST REAL CELL EYEBALLED — EVAL PATH PROVEN, METRICS SANE.** And a false alarm I nearly raised, killed by arithmetic.
+
+### 1. The gate I set at 14:1x is discharged
+
+**`CELL-OK` on two pods.** T2/s1 and T4/s42 completed **training +
+eval + row**. The eval path — unproven end-to-end since the MPS smoke
+short-circuited it — **works on CUDA with the resident buffer.**
+
+**T=2, seed=1, full metric set (read off the pod):**
+
+    preference_auc_k20          0.6119     shuffled_  0.6019
+    preference_auc_k50          0.6063     shuffled_  0.6074
+    shuffle_gap_auc_k20         0.0099
+    l0_per_unit               200.0000
+    top20_overlap_frac          0.8000     mass_at_20   0.0982
+    n_valid                   907.0000     n_pairs   1000.0000
+
+**Four independent sanity checks, all pass:**
+1. **`l0_per_unit = 200` at T=2** — `k_pos = 100·T` applied correctly
+   (anchors show 500 at T=5 ✓).
+2. **`preference_auc_k20 = 0.6119` sits inside the T5 anchor band**
+   (0.6031 / 0.6096 / 0.6240). A T2 port landing beside the paper's
+   own T5 weights is the right order of magnitude.
+3. **`shuffle_gap = 0.0099` = 0.6119 − 0.6019** — internally
+   consistent, and a small positive gap at T=2 matches the btk arm's
+   established "gaps ≈ 0 at every T ≤ 8".
+4. **`n_valid = 907`** identical to the anchors — same eval set.
+
+### 2. The false alarm, recorded because I came close to posting it
+
+T2/s1 matches the **T5/seed-2 anchor exactly** on two metrics:
+
+    auc_k20_fold_max   0.6813   ==   0.6813
+    auc_k20_fold_min   0.5249   ==   0.5249
+
+while `preference_auc_k20` (0.6119 vs 0.6031), `_k50`,
+`top20_overlap_frac` (0.80 vs 0.60) and `mass_at_20` (0.098 vs 0.062)
+**all differ.** Two different models agreeing bit-exactly on the
+extremes of their fold AUCs looks exactly like a cached-eval or
+shared-feature bug — the G2-shaped failure this arm has already had
+once.
+
+**It is benign, and the arithmetic settles it.** `preference_auc`
+scores each fold as a **count over the fold size**:
+
+    aucs.append(((s_r > s_c).sum() + 0.5*(s_r == s_c).sum()) / len(te))
+
+With `n_valid = 907` and 5 folds, `np.array_split` gives
+**[182, 182, 181, 181, 181]**, so a fold AUC can only take values on a
+grid of **1/364 ≈ 0.00275**. And the two "coincidences" are exact
+lattice points:
+
+    0.6813 = 124/182        0.5249 = 95/181
+
+`CV_SEED` is fixed, so **both models are scored on identical folds of
+identical size**, and both have nearly identical mean AUC (~0.60–0.61).
+Two similar models, same folds, coarse grid ⇒ **coincident extremes are
+ordinary, not evidence of anything.**
+
+**Why I am logging a non-event:** I have made three wrong calls today by
+asserting from an insufficient read, and the correction each time cost
+more than the check would have. **This time the check came first and it
+cost four minutes.** The rule that saved it is the same one: *compute
+the thing before claiming it.*
+
+### 3. Timing, now measured rather than extrapolated for two T values
+
+    T2  13:43:35Z -> 13:53:29Z   ~10 min/cell   (0.066 s/step, measured)
+    T4  13:33:56Z -> 13:54:05Z   ~20 min/cell   (measured)
+
+T4 at ~2× T2 tracks the parameter ratio, which supports — but does not
+prove — the T6/T8/T10 ≈ 40/60/90 min extrapolation in my 14:5x entry.
+**Still extrapolated. The load-imbalance recommendation stands on
+T10 ≫ T2, which is now measured at both ends.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
