@@ -159,3 +159,37 @@ branch) + HF checkpoint audit:
   origin/final; single-branch clones need `git fetch origin final`).
 - Fleet: 11 pods ≈ $17.6/h. Judge ledger: $6 spent-committed, $12 queued
   (c7 s1/s2 evals), cap $200.
+
+## 17:00–21:00 — first paper-scale stacked results land; scope cut to seed 42
+
+- **Judge poisoning incident**: pod env vars don't reach SSH sessions →
+  bootstrap silently wrote no token files → the first C7 judge pass ran
+  keyless-then-broke: default ANTHROPIC_API_KEY has **no credit balance**,
+  all 1,525 calls 400'd (unbilled), judge wrote −1 sentinels, Δgc collapsed
+  to a fake 0.0@0.0. Detection metrics unaffected (no judge). Caught by
+  reviewing the "done" result before trusting it. MATS key verified live
+  and pushed to all pods; poisoned judge_outputs archived; re-judge clean.
+- **C7 stacked s42 @ 300K (train_key 26e69fdc60452c27, proto 1.0.0,
+  25-mag)**: Δgc peak **0.246 @ m=−12** (same peak magnitude as TXC-base),
+  detection PR-AUC S1..S32 = 0.152/0.152/0.150/0.158/0.179/0.207.
+  Against the printed panel: TXC-base 0.541@−12 > TopK 0.400 > TXC-pro-256
+  0.377 > **stacked 0.246 ≈ MLC 0.246** > T-SAE 0.164. Weight sharing
+  beats aggregation-alone 2.2× on inducement at paper scale. Note scale
+  flip: at 20K stacked (0.328) beat TopK (0.230); at 300K TopK (0.400)
+  overtakes stacked (0.246).
+- **C3 stacked s42 (locked protocol)**: mean_auc **0.8694** (std 0.138)
+  vs fresh-gate TopK 0.8887 / stored paper TopK 0.8848. realized L0 99.8
+  per window (=20/token matched). Shuffle control −0.046 AUC → the pooled
+  window code is order-sensitive. Stacked does not rescue static probing.
+- **User scope decision: seed 42 only.** c7-s1/s2 pods (mid-training)
+  torn down along with all remaining seed pods. c6 s1 checkpoint had
+  already auto-completed pre-directive — kept on disk, zero-cost to eval
+  later if wanted.
+- Two more env bugs fixed on the long tail: missing `peft` for the cohort
+  rebuild (uv pip install); gated `google/gemma-2-2b` needs HF_TOKEN
+  exported in-session for the RLHF cache build.
+- **Harvest**: private HF repo `dmanningcoe/stacked-sae-rebuttal-2026-07`;
+  c7 + c3 artifacts (new leaderboard rows, trainlogs, judge_outputs,
+  checkpoints) uploading; c6/rlhf harvest on completion.
+- Remaining in flight: C6 cohort rebuild → s42 detection eval (zero API);
+  RLHF s42 chain. Fleet down to 5 pods, $9.85/h, dropping as work lands.
