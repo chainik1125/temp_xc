@@ -158,13 +158,31 @@ class Backend:
         return res
 
 
-def run_evalage(be: Backend, n_docs: int, seed: int, max_new: int):
+def run_evalage(be: Backend, n_docs: int, seed: int, max_new: int,
+                tag: str = "evalage_v1"):
     rng = np.random.default_rng(seed)
     plans = ev.evalage_plan(rng, n_docs)
     # turn-major: each doc keeps its own transcript of (role, text, is_event)
     docs = [{"plan": p, "turns": []} for p in plans]
     max_turns = max(p["n_turns"] for p in plans)
-    for t in range(max_turns):
+    # ── checkpointing (BLOCKING for every generation card, ruled) ──────
+    # Resume caveat, stated rather than hidden: this scaffold consumes
+    # `rng` INSIDE the loop (cue_text), so a resumed run is valid but not
+    # bit-identical to an uninterrupted one — the cue template drawn at a
+    # given turn can differ. Labels are unaffected (the scaffold knows
+    # every cue POSITION regardless of which template lands). The
+    # retryesc_gen scaffold draws all per-turn choices from the plan up
+    # front precisely so its resume IS exact.
+    ck = el.ckpt_path(HERE, tag)
+    resumed, t_start = el.load_ckpt(ck)
+    if resumed is not None and len(resumed) == len(docs):
+        docs = resumed
+        print(f"[ckpt] resumed {tag} at turn {t_start} "
+              f"({sum(len(d['turns']) for d in docs)} turns on disk)",
+              flush=True)
+    else:
+        t_start = 0
+    for t in range(t_start, max_turns):
         live = [d for d in docs if t < d["plan"]["n_turns"]]
         if not live:
             break
@@ -191,6 +209,10 @@ def run_evalage(be: Backend, n_docs: int, seed: int, max_new: int):
             d["turns"].append(("assistant", txt, False))
         print(f"[turn {t + 1}/{max_turns}] {len(live)} docs live",
               flush=True)
+        if (t + 1) % el.CKPT_EVERY_TURNS == 0:
+            el.save_ckpt(ck, docs, t)
+            print(f"[ckpt] {tag} @ turn {t}", flush=True)
+    el.save_ckpt(ck, docs, max_turns)
     return docs
 
 
@@ -328,15 +350,15 @@ def main():
         be = Backend(a.model, a.seed, a.temperature, a.top_p)
     print(f"[backend] {be.kind} | {a.model}", flush=True)
     fillers = 0
+    tag = f"{a.scaffold}_{a.out_tag}"
     if a.scaffold == "sycgen":
         docs, fillers = run_sycgen(be, a.n_docs, a.seed, a.max_new)
     else:
-        docs = run_evalage(be, a.n_docs, a.seed, a.max_new)
+        docs = run_evalage(be, a.n_docs, a.seed, a.max_new, tag=tag)
     ids, doc_off, first, mask, elig, topics, texts = build_stream(docs,
                                                                   be.tok)
     n_docs = len(doc_off) - 1
     split = doc_split(n_docs, seed=a.seed)
-    tag = f"{a.scaffold}_{a.out_tag}"
     el.write_stream(HERE / f"elicit_{tag}.npz", token_ids=ids,
                     doc_off=doc_off, event_first=first, event_mask=mask,
                     probe_eligible=elig, doc_split=split)
