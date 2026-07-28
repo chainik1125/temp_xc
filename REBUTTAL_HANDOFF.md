@@ -55,6 +55,11 @@ retrained — see COMPOSITION_AUDIT).
   ∈ {5,20}, `eval_cfg.shuffle` ∈ {none, within_window}, seeds
   {1,2,42}. Datasource `gemma_2_2b_it_l13_fineweb_24k128` (paper
   probe cache; gemma-2-2b-it L13).
+- **LABELING RULE (binding, Codex-prompted):** the T-sweep arms are
+  v2 compositions — label "TXC (v2, relu-mix/btk-only)", never
+  "paper base"; the paper-exact composition appears only as the
+  archived T=5 anchor (arch `paper_txc_base_v1`, 3 seeds). See
+  CODE_GUIDE §1 + LOG ~02:2x.
 - **Renderer:** runpod-1's analyze/make_writeup_fig pathway
   (`experiments/probing/actmix/` — see their morning render commit).
 - **Licences (LOG stamps):** k-inversion quote licence (07-27 ~12:2x +

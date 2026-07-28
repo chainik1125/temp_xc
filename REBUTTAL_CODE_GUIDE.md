@@ -32,7 +32,16 @@ append-only in `results/leaderboard.jsonl`, stamped with
   (no matryoshka/contrastive/subseq anywhere in these classes; LOG
   ~01:55 refutation receipts).
 - **Paper-arch relation** (binding disclosures): the paper's probing
-  TXC (`txc_base`) is plain — our probing exhibit matches its family.
+  TXC (`txc_base`) is plain family but composition-distinct from BOTH
+  v2 arms: paper = ReLU(TopK_{k_pos·T}(Σ_t preact)) per-window
+  exact-k; v2 pre = per-position select-then-sum; v2 post =
+  sum-then-BatchTopK (batch budget). The paper-EXACT composition is
+  served by the eval-only adapter `paper_txc_base_v1`
+  (`src/temp_bench/archs/paper_v1.py:255`, upstream 94119bc08) over
+  the ARCHIVED ckpts — T=5 × 3 seeds ONLY. **TABLE-LABELING RULE
+  (binding): sweep columns = "TXC (v2, relu-mix/btk-only)"; paper
+  composition = a separate "paper base (archived, T=5)" anchor row;
+  never conflate.**
   The paper's RLHF TXC was **`agentic_txc_02` =
   `MatryoshkaTXCDRContrastiveMultiscale`** (matryoshka+contrastive,
   multiscale shifts, per-window TopK→ReLU, k_win=500) — a DISTINCT

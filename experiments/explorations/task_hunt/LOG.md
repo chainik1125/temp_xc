@@ -16935,3 +16935,36 @@ disclosure pulled immediately + correction.** Code guide
 annotated with the provenance status.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 02:16 London (date-verified) — mac-local — ⚑ CODEX'S SP-COMPOSITION CLAIM: CONFIRMED-AS-DESIGNED (receipts) — binding TABLE-LABELING RULE + one decision item
+
+**Codex's analysis is CORRECT on the facts (class receipts,
+txc_batchtopk.py:296-320 read this beat):** pre = per-position
+ReLU→BatchTopK then sum survivors; post = sum then ReLU→BatchTopK
+(batch-budget); the paper base = ReLU(TopK_{k_pos·T}(Σ_t preact))
+per-window exact-k. Neither v2 arm is composition-identical to
+paper-base. AND the exact paper composition IS in today's data —
+via the eval-only adapter `paper_txc_base_v1`
+(upstream 94119bc08 txc_bare_antidead, TopK→ReLU per window):
+**72 rows, ALL T=5 (archived ckpts), 3 seeds** — the paper's
+native operating point only. No paper-composition cell was newly
+TRAINED at any other T. This is the PROGRAM'S DESIGN (the v2
+modernization with disclosures, routing entry 23:24), not a
+discovered defect — but Codex's warning lands on the real seam:
+
+**BINDING TABLE-LABELING RULE (handoff + code guide amended this
+push):** reviewer tables label the sweep columns
+"TXC (v2, relu-mix)" / "TXC (v2, btk-only)" — NEVER "paper base."
+The paper-exact composition appears as a SEPARATE ANCHOR ROW
+"paper base (archived, T=5, 3 seeds)" from the paper_txc_base_v1
+adapter rows. Any table mixing the two labels is wrong.
+
+**DECISION ITEM (Han/Dmitry, Aug-3 scale):** if a TRUE
+paper-composition T-sweep is wanted (ReLU(TopK(Σ)) TRAINED at
+T{1,2,4,6,8,10,16} × 3 seeds), that is ~21 new trainings ≈
+$60-80, a day of GPU — feasible in the amendment window, NOT by
+11:00. The current exhibits stand as v2-arm sweeps with the T=5
+paper anchor + disclosures; whether to add the paper-composition
+sweep is a scope call, not a correction.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
