@@ -35431,3 +35431,91 @@ were broken, in the same breath as quoting it.
 **Item 6 unaffected:** sweep **46/156**, pod steady, ETA ~23:55.
 
 _Recorded-by: claude-opus-5 (mac-d)_ — PTR
+
+## 2026-07-29 00:11 BST — mac-d: ⛔ **ITEM 6 VERDICT — POSITIVE, QUALIFIED.** TXC's frontier sits above pooled at 3/4 T, indistinguishable at 1/4, **below at none**. Pod TERMINATED, $0/h
+
+Answering the pre-registered question (`aa0272633`/`567d6818e`) and not
+a looser one: *does a temporal crosscoder buy anything over pooling
+per-token SAE features across the same window at comparable sparsity?*
+
+### 1. The verdict (three states, `report_frontier.py`)
+
+Frontier rule: best SAE recovery at budget ≤ TXC's; **all budgets
+`l0_per_window`, MEASURED** (never the derived `l0_per_token` I was
+rightly pulled up on at 23:04).
+
+| T | TXC r @ l0/win | pooled best @≤budget | Δ vs max sd | state |
+|---|---|---|---|---|
+| 2 | 0.4989±0.0259 @ 5.66 | k=2 0.4626 @ 3.51 | +0.0363 / 0.0313 | **ABOVE** (1.16×, thin) |
+| 4 | 0.5227±0.0330 @ 6.35 | k=2 0.4871 @ 6.26 | +0.0356 / 0.0360 | **INDISTINGUISHABLE** |
+| 8 | 0.5365±0.0362 @ 6.94 | k=1 0.4612 @ 6.40 | +0.0752 / 0.0362 | **ABOVE** (2.1×) |
+| 16 | 0.5771±0.0317 @ 7.82 | k=1 0.4863 @ 11.22¹ | +0.0908 / 0.0372 | **ABOVE** (2.4×) |
+
+¹ no pooled point is as cheap as TXC — pooled has **1.43× more**
+budget and still scores lower.
+
+**vs pooled: ABOVE 3/4, INDISTINGUISHABLE 1/4, BELOW 0/4.**
+
+### 2. The stronger finding the rule alone hides: **pooled SATURATES**
+
+I ran a bracketing check specifically to see whether "ABOVE" was an
+artifact of the hard budget cutoff excluding a slightly-costlier point
+that would have won. **It is not** — and the check found something
+better. Pooled recovery is flat from k=8 to k=32; its ceiling at *any*
+budget in the sweep:
+
+| T | TXC | pooled CEILING (extra budget) | reaches TXC? |
+|---|---|---|---|
+| 2 | 0.4989 | 0.4953 (+26%) | **no** |
+| 4 | 0.5227 | 0.5144 (+88%) | **no** |
+| 8 | 0.5365 | 0.5362 (+186%) | ties, at **2.9×** the budget |
+| 16 | 0.5771 | 0.5455 (+306%) | **no** |
+
+At three of four T, **spending 1.9–4.1× TXC's budget on the pooled SAE
+never reaches TXC's recovery.** At T=8 it ties only by spending 2.9×.
+No excluded over-budget point flips any verdict — checked explicitly,
+which is the check I would otherwise have been asked for later.
+
+### 3. ⚑ The stacked arm is UNINFORMATIVE at T≥8 — and this cuts against me
+
+Stacked collapses: r=**0.1492** (T=8), **0.3142** (T=16) vs TXC's 0.54
+/ 0.58. It formally loses 4/4, and **I am not counting that as
+evidence.** Stacked's probe input is `T·d_sae` = **32768 features at
+T=16 against N_WINDOWS=1024 training windows** — badly
+underdetermined, so its collapse is an **overfitting artifact of probe
+capacity**, not a statement about architecture.
+
+I pre-registered this caveat in the direction where it would *flatter*
+stacked ("a stacked win is partly a probe-capacity win"). It landed in
+the opposite direction, and it must be applied with the same force:
+**the honest comparison for item 6 is TXC vs POOLED**, and I report
+that as 3/4 ABOVE, not the headline-friendlier 4/4-vs-stacked.
+
+### 4. Limits — stated with the result, not after being asked
+
+- **n=3.** The threshold (|Δ| vs max seed sd) is **crude and not a
+  significance test**; n=3 does not support one, and mac-c's
+  1.83–3.99× inflation must **not** be imported onto these cells.
+- **T=2's ABOVE is thin** (1.16× the spread) — the hub flagged exactly
+  this pre-data (`f2667634f`). Treat T=8/T=16 as the load-bearing
+  results.
+- **One substrate, one layer** (`sycgen_real_age_llama31_8b_l14`, l14).
+- Every cell trained on the **rebuilt** `hs14.npy`, which is verified
+  reproducing pod-D's originals to 3 dp — internally consistent by
+  construction, since all 15 cells share one cache.
+
+### 5. Close-out
+
+Pod `davlc92a80erp3` **TERMINATED, `DELETE 204`, API-verified GONE;
+mac-d $0/h.** Gate before the kill: 15/15 leaderboard rows local **and**
+156/156 frontier rows local, both asserted, refusing otherwise.
+**~2.9 h × $2.99 ≈ $8.6** vs est ~$6, self-cap $25 — overrun is the
+three OOM-killed launches and 70 min spent on `tsae` cells item 6 never
+needed. Checkpoints deliberately **not** mirrored: the cache rebuilds in
+37 s and the 15 cells in ~20 min ≈ $1, so regeneration beats an upload.
+
+Verdict is **PTR**. `frontier.json` (156 rows) + 15 leaderboard rows
+committed; cross-check against the hub's independent
+`scripts/verify_frontier_verdict.py` invited before anything ships.
+
+_Recorded-by: claude-opus-5 (mac-d)_ — PTR
