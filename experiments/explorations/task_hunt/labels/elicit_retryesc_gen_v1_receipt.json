@@ -1,0 +1,122 @@
+{
+ "scaffold": "retryesc_gen",
+ "generation": {
+  "model_id": "claude-haiku-4-5-20251001",
+  "model_sha": "api-versioned (no weight sha)",
+  "seed": 0,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "backend": "Anthropic API (MATS key; pin = model-id + API version, NOT a weight sha => reproducible-in-expectation, not bit-exact)"
+ },
+ "n_docs": 300,
+ "n_tokens": 946546,
+ "realised_gaps": {
+  "n_gaps": 2509,
+  "mean": 291.19170984455957,
+  "median": 202.0,
+  "p10": 78.0,
+  "p90": 605.2000000000003,
+  "min": 38.0,
+  "max": 2374.0
+ },
+ "vocabulary_control": {
+  "per_topic_event_rate": {
+   "the PDF renderer omits embedded fonts on the second page onward": 0.003104386354511683,
+   "the archive extractor mishandles symlinks that point outside the root": 0.0030271788634567633,
+   "the audio transcoder desynchronises video by a few frames": 0.002849104251484478,
+   "the cache warmer evicts entries it has just written": 0.003394304332343167,
+   "the geocoder returns coordinates swapped in the southern hemisphere": 0.002811976148630695,
+   "the image thumbnailer emits corrupted output for CMYK inputs": 0.003187393279601353,
+   "the log shipper truncates messages longer than a few kilobytes": 0.0031505709377030113,
+   "the metrics collector reports a counter that decreases over time": 0.002924310796119209,
+   "the migration script leaves two rows with duplicate primary keys": 0.0029802366770905094,
+   "the nightly export job writes an empty CSV on the first of the month": 0.0029812302555989453,
+   "the rate limiter admits bursts that exceed the configured ceiling": 0.0029543259555923195,
+   "the retry wrapper multiplies its backoff instead of adding to it": 0.0027909304008840925,
+   "the search index misses documents whose titles contain diacritics": 0.003104682004766842,
+   "the spreadsheet importer misreads dates in day-first locales": 0.0032372791155651395,
+   "the websocket client drops its connection after roughly ten minutes": 0.002797639098831217,
+   "unit tests pass locally but fail in the container with a locale error": 0.0030646974760665194
+  },
+  "spread_max_minus_min": 0.0006033739314590747,
+  "cv": 0.05483872662260354,
+  "legs": {
+   "events_per_conv": {
+    "per_topic": {
+     "the PDF renderer omits embedded fonts on the second page onward": 9.85,
+     "the archive extractor mishandles symlinks that point outside the root": 8.055555555555555,
+     "the audio transcoder desynchronises video by a few frames": 9.05,
+     "the cache warmer evicts entries it has just written": 9.727272727272727,
+     "the geocoder returns coordinates swapped in the southern hemisphere": 9.454545454545455,
+     "the image thumbnailer emits corrupted output for CMYK inputs": 9.578947368421053,
+     "the log shipper truncates messages longer than a few kilobytes": 10.095238095238095,
+     "the metrics collector reports a counter that decreases over time": 9.391304347826088,
+     "the migration script leaves two rows with duplicate primary keys": 10.4375,
+     "the nightly export job writes an empty CSV on the first of the month": 9.105263157894736,
+     "the rate limiter admits bursts that exceed the configured ceiling": 9.368421052631579,
+     "the retry wrapper multiplies its backoff instead of adding to it": 8.347826086956522,
+     "the search index misses documents whose titles contain diacritics": 9.411764705882353,
+     "the spreadsheet importer misreads dates in day-first locales": 9.88888888888889,
+     "the websocket client drops its connection after roughly ten minutes": 8.80952380952381,
+     "unit tests pass locally but fail in the container with a locale error": 9.727272727272727
+    },
+    "spread_max_minus_min": 2.3819444444444446,
+    "cv": 0.0636709449866825
+   },
+   "tokens_per_conv": {
+    "per_topic": {
+     "the PDF renderer omits embedded fonts on the second page onward": 3185.45,
+     "the archive extractor mishandles symlinks that point outside the root": 2705.8333333333335,
+     "the audio transcoder desynchronises video by a few frames": 3211.9,
+     "the cache warmer evicts entries it has just written": 2931.3636363636365,
+     "the geocoder returns coordinates swapped in the southern hemisphere": 3356.818181818182,
+     "the image thumbnailer emits corrupted output for CMYK inputs": 3058.9473684210525,
+     "the log shipper truncates messages longer than a few kilobytes": 3273.095238095238,
+     "the metrics collector reports a counter that decreases over time": 3260.1739130434785,
+     "the migration script leaves two rows with duplicate primary keys": 3526.5,
+     "the nightly export job writes an empty CSV on the first of the month": 3118.4736842105262,
+     "the rate limiter admits bursts that exceed the configured ceiling": 3275.0526315789475,
+     "the retry wrapper multiplies its backoff instead of adding to it": 3002.782608695652,
+     "the search index misses documents whose titles contain diacritics": 3035.4117647058824,
+     "the spreadsheet importer misreads dates in day-first locales": 3103.3333333333335,
+     "the websocket client drops its connection after roughly ten minutes": 3294.0476190476193,
+     "unit tests pass locally but fail in the container with a locale error": 3225.818181818182
+    },
+    "spread_max_minus_min": 820.6666666666665,
+    "cv": 0.05859681469302821
+   }
+  },
+  "worst_leg": "events_per_conv",
+  "worst_leg_cv": 0.0636709449866825,
+  "cv_bar_proposed": 0.35,
+  "stop": false,
+  "note": "TWO LEGS: events/conv = topic predicts the event SCHEDULE; tokens/conv = topic predicts conversation LENGTH (the channel that fired on sycgen). Either one large => the retryesc vocabulary leak is being rebuilt; fix the scaffold, do not proceed. The events-per-TOKEN keys are the legacy ratio, kept for comparability \u2014 do not read them alone."
+ },
+ "first_doc_sha256": "fcb8e2fb0dda7173b67a102363993a9abac9462ff7e1f519aea0f0ba4a721c3b",
+ "model_generated_disclosure": "corpus is MODEL-GENERATED; whether it enters a rebuttal exhibit or the appendix is the paper owner's call at quote time (authorization note, PTR)",
+ "scaffold_constants": {
+  "p_repeat": 0.26,
+  "p_fail_new": 0.34,
+  "pairs_per_doc": [
+   30,
+   46
+  ],
+  "len_band": [
+   35,
+   70
+  ],
+  "n_strategies": 24,
+  "n_tasks": 16,
+  "n_failure_texts": 6,
+  "n_success_texts": 3,
+  "floor_excess_band": [
+   0.15,
+   0.25
+  ],
+  "construction_rule": "environment failure text drawn INDEPENDENTLY of repeat-status at plan time (card \u00a7 3)",
+  "vocabulary_rule": "outcome schedule drawn BEFORE the task and never consulting it (card \u00a7 4)"
+ },
+ "generation_tokenizer": "gpt2",
+ "card": "retryesc_gen/GENERATION_CARD.md freeze 3f6ba0d3d",
+ "receipt_rebuilt": "generation completed; receipt crashed on a stale constant name (TARGET_GAP_MEDIAN) and was rebuilt from the npz + transcripts. No token regenerated, no spend repeated."
+}

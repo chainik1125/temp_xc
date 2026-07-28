@@ -511,9 +511,9 @@ def main():
              "n_tasks": len(rg.TASKS),
              "n_failure_texts": len(rg.FAILURE_TEXTS),
              "n_success_texts": len(rg.SUCCESS_TEXTS),
-             "target_gap_median": rg.TARGET_GAP_MEDIAN,
-             "gap_range": list(rg.GAP_RANGE),
+             "len_band": [rg.LEN_LO, rg.LEN_HI],
              "floor_excess_band": list(rg.FLOOR_EXCESS_BAND),
+             "gap_median_superseded": rg.GAP_MEDIAN_SUPERSEDED,
              "filler_turns": fillers,
              "construction_rule": (
                  "environment failure text drawn INDEPENDENTLY of "

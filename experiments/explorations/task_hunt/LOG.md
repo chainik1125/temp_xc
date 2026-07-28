@@ -28283,3 +28283,89 @@ G1-PENDING, per-T coverage, and both known deviations in its caption.
 T4 at n=2 next, then the rest.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+---
+
+## 2026-07-28 15:16 London (date-verified at write) — mac-c: ⚑⚑ **`retryesc_gen` CORPUS COMPLETE — 300 docs / 946,546 tok / 2,809 events, and ALL SEVEN LABEL-SIDE BANDS PASS on the full stream.** Item 7 has a candidate for the first time
+
+Hub GO at 14:51 → corpus on disk at 15:08, premeasured at 15:16. **~25
+minutes, ~$21, no pod, no GPU.**
+
+### 1. The full-corpus verdict
+
+| band | value | bar | |
+|---|---|---|---|
+| **`unigram_auc`** | **0.5431** [0.5316, 0.5546] | ≤ 0.60 | ✅ |
+| `doc_mean_only_auc` | 0.6696 [0.6390, 0.6937] | ≤ 0.88 | ✅ |
+| `position_auc` | 0.6135 [0.5663, 0.6573] | ≤ 0.95 | ✅ |
+| **`floor_excess`** | **0.1853** | **[0.15, 0.25]** | ✅ |
+| qualifying strata | **31/34** | ≥ 8 | ✅ |
+| usable tokens | **556,858** | ≥ 250,000 | ✅ |
+| events | **2,809** | ≥ 300 | ✅ |
+
+Vocabulary-control worst-leg cv **0.0637** (bar 0.35). Gap median 202
+(p10 78, p90 605). face~position ρ **0.1474**.
+
+### 2. The bar that killed the predecessor, cleared
+
+`retryesc` died label-side at **`unigram` 0.689–0.716** because task
+difficulty *genuinely* drove failure rate — and I recorded at the time
+that it was **not fixable by masking**, because the leak rode on
+ordinary task nouns spread through the agent's own reasoning.
+
+`retryesc_gen` measures **0.5431, whole CI below the bar**, on the same
+statistic computed by the same helper. The fix was structural, not
+cosmetic: **the outcome schedule is drawn before the task and never
+consults it**, and all 16 tasks share one strategy pool, so difficulty
+is *assigned* rather than intrinsic. **That is the rebuild working
+exactly as designed.**
+
+### 3. ⚑ The $0 dry run predicted the real corpus to 0.0003
+
+Stub prose, no API, no model → predicted `floor_excess` **0.1850**.
+Real Haiku prose, 300 docs → **0.1853**. **Error 0.0003.**
+
+That is the payoff of the whole density line: `floor_excess ≡ f ≡
+P(event inside the T-window)` is a **design parameter**, and it can be
+hit on purpose before spending. Item 7 stopped being "hunt for a face
+that happens to work" and became "put the face in the band" — and the
+band was hit on the first paid attempt.
+
+### 4. A bug that cost nothing only by luck of ordering
+
+Generation ran all 46 pairs, then **crashed writing the receipt**: I
+renamed `TARGET_GAP_MEDIAN` → `GAP_MEDIAN_SUPERSEDED` during the
+§ 2.2b correction and never grepped for usages, so `run_elicit.main()`
+held a stale reference.
+
+**`write_stream` and `save_transcripts` both run BEFORE the receipt, so
+nothing was lost and no spend repeated** — `rebuild_receipt.py`
+re-derived it from the artifacts. **Had the receipt been written first,
+that rename would have cost the entire $21 run.** Recording it as the
+near-miss it was: renaming a public constant is an edit that needs a
+grep, and I did not do one.
+
+### 5. What is and is NOT established
+
+**Established:** the corpus is sound label-side and has **earned its
+screen** — every pre-registered band, on the full stream, at full-run
+bars.
+
+**NOT established: a KEEP.** hunt4 § 4 (gain ≥ +0.05 ∧ width-null ≥
++0.02 ∧ own-T floor ∧ `wd_ok`) needs a GPU screen that has not run.
+**⚑ GOLD-VISIBILITY DOES NOT FIRE** — the rule is conditioned on
+clearing the KEEP rule, and nothing goes into `REBUTTAL_HANDOFF.md` on
+label-side evidence. The candidate is **UNTESTED-but-qualified**, which
+is a strictly better state than `retryesc` ever reached (it died before
+a probe ever ran) and strictly weaker than `sycgen`'s KEEP.
+
+### 6. Next, in order
+
+1. **3-tokenizer grids** — the card's "all three tokenizers" rule binds
+   the full run. `evalage/screen_grids.py` transplant, round-trip
+   receipted. $0 CPU.
+2. **HF durability** for the npz before token rotation.
+3. **Screen** — hunt4 § 4 verbatim, fresh L40S (~$1/h) under the
+   standing waiver, ledgered both ends.
+
+_Recorded-by: claude-opus-5 (mac-c)_
