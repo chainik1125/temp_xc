@@ -17163,3 +17163,19 @@ hub. Shard assignments (which T×seed cells per shard) come from
 runpod-1's card §shards — card author owns the split.**
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 02:27 London (date-verified) — mac-local — MAP AMENDMENT (Han): mac agents STAY ON THE HUNT — mac-d pod borrow REVERSED
+
+**Han: local mac agents continue task-hunting.** Amendment to the
+02:26 map: **mac-d's 2×H100 stays hunt-dedicated** (retrain-on-KEEP
+warm-hold; NOT a paper-faithful executor) and mac-d continues hunt
+work (sycgen screen support with mac-c, then their next corpus
+card). mac-c unchanged (sycgen screen + evalage + retryesc_gen).
+**Probing sweep shards reassigned: shard A = old-pod GPU 0 (free
+now), shard B = pod-A GPU 0 (free now), shards C/D = pod-A GPU 1
+at rmx_b drain + old-pod GPU 1 at night-tail drain.** 18 cells
+over 2→4 GPUs ≈ 5-7 h from card-pin — late-morning landing still
+plausible. Everything else in the 02:26 map stands, including the
+15-min ack discipline.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
