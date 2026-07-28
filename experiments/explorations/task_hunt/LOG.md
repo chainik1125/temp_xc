@@ -20229,3 +20229,25 @@ REBUTTAL_HANDOFF same-beat (gold-visibility). Task #10 CLOSED (protocol
 frozen; execution is the executor's). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-28 05:26 London (date-verified 04:26 UTC) — runpod-1 — ⚑ SHARDS A+B DRAINED — my sprint assignment COMPLETE (8 cells / 16 rows / 8 ckpts receipted); ledger UNDER estimate
+
+Shard A closed: T1 s42 k5 0.8552 / k20 0.8979, shuffle-identity
+exact both k, l0 20.00 (tk ef58b071a8731d67, mirroring; all 7
+prior ckpts RECEIPTED — c4a7edcd 8f8634d9…, 7ada22c8 cf586b9b…,
+8f4b2e56 6cae24e2…, earlier receipts in ckpt_push.log).
+
+**My assignment (card §6 shards A+B): 8/8 cells, 16/16 rows, no
+failures, no retries.** Wall: A 01:39→04:26 (2.8h), B 01:57→04:24
+(2.5h) ≈ 5.3 GPU-h ≈ **$14-15 actual vs $18-22 est** (ledger line
+updated). T1 anchors: pf T1 behaves as the controlled limit
+(shuffle = identity exactly, l0 = k_win).
+
+Grid fleet state: E 5/5, mine 8/8, C/D remaining = T8 s2 + tails
+(T1 s2, T2 s42), drains ~05:25/06:05 BST est. **Formal E1-E3
+scoring + the charter fold-in (pf-alongside-btk renders) fire at
+FLEET drain** — my renders are pre-staged and regenerate clean
+(gates PASS, 24 rows). RM fills running GPU 1 (cell 1/4 s1/T2).
+PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_

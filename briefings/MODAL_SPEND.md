@@ -128,3 +128,4 @@ actuals, same discipline as the Modal table.
 - 2026-07-28 02:41 runpod-a: paper-faithful probing SHARD E (5 cells, T4×3 + T2×2, GPU 0, ~3.7 GPU-h) — est $9-12 (card §8 pool $45-60)
 - 2026-07-28 runpod-2 EST (CARD § 8 paper-faithful, commission 4ce0369de): substrate ~$4 + pilot ~$2 + grid $25-45 expected ($105 no-plateau bound; pilot-gated) on GPU 2 from x-drain; port itself $0 GPU.
 - 2026-07-28 05:11 runpod-a: paper-faithful SHARD E COMPLETE — 5 cells (T4×3 + T2×2), 2.5 GPU-h, ACTUAL ~$5-6 (est $9-12, −$4-6 corr); 5/5 ckpts mirrored
+- 2026-07-28 runpod-1 ACTUALS (shards A+B drained 04:26 UTC): 8/8 cells, ~5.3 GPU-h ≈ $14-15 (UNDER est $18-22). RM fills launched GPU1 04:25 UTC (claim 67eece310), est ~1.5-2 GPU-h ≈ $3-4.
