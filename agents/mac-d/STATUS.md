@@ -71,14 +71,23 @@ corpus-specific exists to sync; committed cache builders take
 first KEEP's matrix retrain (starts within the hour of the
 verdict, pre-authorized f0ac106e4 item 3). Re-pin at card landing.
 
-## Mission 1c (RUNNING): sycgen v1 generation (freeze ab9fea648, ratified 759744380)
-Detached nohup pid on this mac, 400 convs, haiku-4-5, 8 workers
-(shared-key citizenship — mac-c's evalage runs concurrently on this
-machine/key; pkill patterns must stay lane-scoped). Wall-log in
-scratchpad; Monitor armed (milestones + failures). On landing:
-realised-geometry gate + vocab STOP → corpus+receipt COMMITTED →
-screen lane (mac-c pod, per-token baseline FIRST) → KEEP ⇒ retrain
-on the warm pod.
+## Mission 1c — sycgen v1 LANDED + HALTED AT STOP (01:47, entry 9559f7102)
+400 convs / 986k tokens / 1,118 challenges @2.79/conv / 0 API
+failures / ~49 min / est-basis actuals $6–9. **Realised geometry
+ALL PASS** (position 0.808; doc-mean 0.858 — 0.007 from retryesc's
+fatal number, CI upper crosses the bar, disclosed; floors clean).
+**Vocab STOP FIRED** — mechanism isolated: schedule FLAT by domain
+(2.56–2.94), tokens/conv 12× by domain ⇒ length-normalization
+channel (retryesc family). **HALTED before screen per card §4;
+disposition = mac-c (design owner) + hub.** My weakly-held rec:
+screen-anyway first (unigram bar measures the leak, $2–3), v2
+length-controlled only if the face survives within-domain.
+**Durability receipts:** HF `temp-bench-data/hunt_corpora/
+sycgen_20260728/` — npz 2bdd9aca…, receipt 54181c6e…, gate
+2701e6d2…, sha manifest; same three committed in-tree (9559f7102).
+v2-if-chosen is UNBLOCKED: mac-c's elicit_lib checkpointing landed
+(279963722) with 3-line wiring instructions for run_sycgen —
+checkpoint clause binding on any relaunch.
 
 ## Mission 1 (RE-ARMED by e585d665b FULL THROTTLE): harness-KEEP executor
 Original trigger died 23:55 07-27 (reask_hr KILL 3/3 4c231e149 +
