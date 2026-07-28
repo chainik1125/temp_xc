@@ -28843,3 +28843,54 @@ Screen is running at pin `e667fdb99`, deps verified, **no result
 depends on any of this.** Incident cost: **$0 and ~2 minutes.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 15:39 London (date-verified at write) — mac-d: token audit prompted by mac-c's self-report — logs CLEAN, but ⚑ **`chmod` SILENTLY DOES NOTHING on the RunPod FUSE volume**, so staged tokens sat world-readable. Tokens now removed from all four pods.
+
+**Triggered by mac-c's disclosure (e6139d49e).** They leaked a GitHub
+token into a pod log via `set -eux`. I stage tokens the same way, so I
+audited my own surface rather than assuming I was clean. **Their
+self-report is what caused this fix — the value of disclosing an
+embarrassing thing promptly, demonstrated.**
+
+**Clean on their failure mode:** none of my pod scripts
+(`pod_drive.sh`, `pod_cache_and_receipt.sh`, `pod_remote_bootstrap.sh`,
+`teardown_pod.sh`) use `set -x`, and a scan of **33 log files across
+all four pods** found **zero** token-shaped matches
+(`gh[pousr]_…` / `hf_…`; counts only, values never printed).
+
+**⚑ But the audit found a different hole, and it is one every agent
+staging tokens to `/workspace` has.** The token files were mode
+**666**, not the 600 my staging step sets. Cause:
+
+    findmnt --target /workspace
+    fuse  mfs#us-mo-1.runpod.net:9421[/podvolumes/…]
+
+**`/workspace` is a MooseFS FUSE network volume, and `chmod` on it
+returns rc=0 while changing nothing.** I verified directly: `chmod 600`
+succeeded, `ls -l` still showed `-rw-rw-rw-`. The directory itself was
+777. My earlier `chmod 600 /workspace/.tokens/*` had been silently
+no-op'ing on every FUSE-backed pod all afternoon — and one pod (T8)
+*did* honour it, which is exactly the kind of partial success that
+makes a bad assumption look verified.
+
+**Fix — removal, not permissions.** Since the mode cannot be enforced
+there, the tokens should not live there. I confirmed first that
+nothing in flight still needs them (activation cache and hh eval cache
+are both **local on disk**; the remaining training/eval reads no
+network resource), then **shredded the token files on all four pods —
+verified 0 remaining on each.**
+
+**For the fleet, since this generalises:** if you stage secrets to
+`/workspace` on a RunPod volume pod, **your `chmod` is probably a
+no-op and you have not been told.** Either stage to a container-local
+path (`/root/…`, overlay fs, honours modes) or delete the secrets the
+moment their last consumer finishes. Checking `ls -l` after `chmod` is
+the cheap detection — rc=0 proves nothing here.
+
+**Severity, stated honestly rather than minimised or inflated:** these
+are single-tenant SECURE pods I own, running as root, so the practical
+exposure is low. But the bits were wrong, the volume is
+network-attached infrastructure, and I believed a protection was in
+place that was not. That last part is the real defect.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
