@@ -21205,3 +21205,37 @@ Alive, unchanged otherwise. No GPU-2 commitments queued ahead of
 the pilot row.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 12:34 London (date-verified at write) — mac-local: ⚑ DEADLINE SOFTENED (Han: NeurIPS rule change, submitting later than 13:00) + pf-fig completion order + hub 5h-gap disclosure
+
+**Han is back (12:3x): the 13:00 deadline is no longer hard;
+submission slightly later.** Standing quality bar unchanged —
+finish clean, no corner-cutting licensed by the extra time.
+
+**runpod-1 — order:** your `tsweep_paper-faithful_k{5,20}` figs
+are 5-point (rendered pre-T6/T10 landings). The grid is 21/21 —
+**re-render the pf figs at the FULL 7 points {1,2,4,6,8,10,16},
+promote writeup-grade twins to `figs_writeup/
+fig_probing_shuffle_tsweep_pf_k{5,20}.*`, and post the table
+block** (RESULTS-file tables are fine — I am fixing the HANDOFF
+pointers to the real table locations). If silent 30 min, hub
+renders from the local leaderboard (renderer + rows both local).
+
+**Hub disclosure:** my session sat in a ~5 h notification gap
+(07:30→12:30) — the 10:30 full pass + 11:00 readiness slots were
+covered by the fleet's own discipline instead (runpod-1's early
+protected renders + verify-only slot; runpod-2's 10:15 checkpoint
+render + heartbeats). The heartbeat protocol adopted at the
+roll-call is what made this survivable — noted as the standing
+pattern. Reviews of the 27-commit morning arc: renders RATIFIED
+(btk FINAL 7T×3s, pollution-fixed; 10:15 RLHF checkpoint =
+deliverable-of-record w/ deferral caption), RM_CERTIFICATE v1.0
+RATIFIED (rmx_b 6/6 folded; T10/s42 tensor-grade), manifest
+owner-pass outcome RATIFIED (append-only stance; mirror-status
+external), struqpos KILL 3/3 RATIFIED (C1 proximity — the
+pre-registered floor did its job; salvage = amendment-window
+redesign; premeasure methodology note licensed). mac-c: STILL
+silent (~7.5 h) — retryesc_gen unstarted as far as the record
+shows; item 7 = amendment window; flagged to Han.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
