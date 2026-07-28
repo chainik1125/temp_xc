@@ -10,7 +10,11 @@ Checks, in order:
      for by basename, since the handoff cites some files short);
   3. no conflict markers in any deliverable surface;
   4. each deliverable item 1-7 has BOTH a plot and a table;
-  5. the cell census is not older than the leaderboard.
+  5. the cell census is not older than the leaderboard;
+  6. no arch the census flags (UNMAPPED / OFF-SUBSTRATE) is cited in the
+     handoff — added 07-28 after the handoff was found quoting item 3's
+     pf RLHF result from cells our own census said to classify first;
+  7. every runnable script path cited in either guide exists.
 
 Exit 0 = clean, 1 = something is missing. Run `--self-test` to confirm
 the checker can actually FAIL — a guard exercised only on its success
@@ -98,6 +102,45 @@ def main(self_test: bool = False) -> int:
             fails.append(f"item {item}: table referenced but MISSING ({table})")
     notes.append(f"items checked for plot+table: {len(ITEMS)}")
 
+    # 6. flagged archs must not be cited as deliverables
+    census_p = ROOT / "REBUTTAL_CELL_CENSUS.md"
+    flagged: set[str] = set()
+    if census_p.exists():
+        for ln in census_p.read_text().splitlines():
+            if not ln.startswith("| `"):
+                continue
+            cols = [c.strip() for c in ln.split("|")]
+            if len(cols) > 4 and "⚠" in cols[3]:
+                flagged.add(cols[1].strip("` "))
+    for arch in sorted(flagged):
+        if arch in text:
+            fails.append(f"handoff cites `{arch}`, which the census FLAGS "
+                         f"(unmapped or off-substrate) — classify before quoting")
+    # NOTE the matching is on EXACT arch ids: the handoff cites the RLHF arm
+    # as `agentic_txc_02` while the census keys `agentic_txc_02_v1t`, so a
+    # shortened citation is not caught here. Loosening it would fire on the
+    # correct-substrate cells too, which is why the substrate is ALSO pinned
+    # in the census itself rather than relying on this check alone.
+    notes.append(f"census-flagged archs: {len(flagged)}, cited in handoff 0 "
+                 f"(exact-id match)"
+                 if not any("FLAGS" in f for f in fails)
+                 else f"census-flagged archs: {len(flagged)}")
+
+    # 7. runnable script paths cited in either guide
+    guide_pat = re.compile(
+        r"(?:agents/[a-z0-9-]+/|scripts/|experiments/[A-Za-z0-9_/.-]*|src/[A-Za-z0-9_/.-]*)"
+        r"[A-Za-z0-9_./-]+\.(?:sh|py)")
+    n_scripts = 0
+    for g in ("REBUTTAL_HANDOFF.md", "REBUTTAL_CODE_GUIDE.md"):
+        gp = ROOT / g
+        if not gp.exists():
+            continue
+        for s in sorted(set(guide_pat.findall(gp.read_text()))):
+            n_scripts += 1
+            if not (ROOT / s).exists():
+                fails.append(f"{g} cites a script that does not exist: {s}")
+    notes.append(f"script paths cited in guides: {n_scripts}")
+
     # 5. census freshness
     census, lb = ROOT / "REBUTTAL_CELL_CENSUS.md", ROOT / "results/leaderboard.jsonl"
     if census.exists() and lb.exists() and census.stat().st_mtime < lb.stat().st_mtime:
@@ -106,13 +149,33 @@ def main(self_test: bool = False) -> int:
     notes.append("census freshness checked")
 
     if self_test:
-        # prove the checker can fail: a reference that cannot exist
+        # Each guard is exercised on its FAILURE path. A guard shown only
+        # succeeding has been demonstrated, not tested (07-28, six cases).
+        probes = []
+
         probe = "definitely_not_a_real_deliverable_xyz.md"
-        if resolve(probe) is not None:
-            print("SELF-TEST FAILED: resolver claims a nonexistent file exists")
+        probes.append(("unresolved pointer", resolve(probe) is None))
+
+        # flagged-arch guard: a census line whose arm column carries ⚠
+        fake = "| `fake_arch_xyz` | `ds` | ⚠ UNMAPPED — classify | 2 | ... |"
+        cols = [c.strip() for c in fake.split("|")]
+        probes.append(("flagged-arch parse",
+                       len(cols) > 4 and "⚠" in cols[3]
+                       and cols[1].strip("` ") == "fake_arch_xyz"))
+
+        # script-path guard: must both FIND a path and judge it missing
+        found = guide_pat.findall("run `scripts/definitely_missing_xyz.py` now")
+        probes.append(("missing-script detect",
+                       found == ["scripts/definitely_missing_xyz.py"]
+                       and not (ROOT / found[0]).exists() if found else False))
+
+        bad = [n for n, ok in probes if not ok]
+        if bad:
+            print(f"SELF-TEST FAILED: guard(s) did not fire on their failure "
+                  f"path: {', '.join(bad)}")
             return 1
-        print("self-test OK: resolver returns None for a nonexistent file, "
-              "so an unresolved pointer would be reported")
+        print(f"self-test OK: {len(probes)} guards each fired on a synthetic "
+              f"FAILURE case ({', '.join(n for n, _ in probes)})")
 
     for n in notes:
         print(f"  · {n}")

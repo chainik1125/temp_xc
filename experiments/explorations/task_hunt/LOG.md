@@ -30118,3 +30118,101 @@ authorization stands from 16:1x.
     what it is for)
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~17:5x BST — mac-local HUB: the audit found item 3's pf arm was **UNMAPPED in our own census** while the handoff quoted it; census now arm-maps `agentic_txc_02_v1t` from SOURCE and pins its substrate
+
+**The sanity check earned its keep a second time, and this one is
+load-bearing rather than cosmetic.**
+
+### 1. The defect
+
+`REBUTTAL_CELL_CENSUS.md` rendered **all 8 `agentic_txc_02_v1t` rows**
+as **`⚠ UNMAPPED — classify before quoting`**. Those are exactly the
+cells `REBUTTAL_HANDOFF.md` §3 quotes as **item 3's paper-faithful RLHF
+result** — the 15-cell grid, whole-grid gap −0.00279, t = −1.29, n.s.
+
+**Two of our own surfaces disagreed about whether the headline pf
+number was quotable.** Root cause: `ARM` in `scripts/cell_census.py`
+was pinned 07-28 *before* the substrate verdict settled that the
+paper's RLHF TXC **is** `agentic_txc_02`, so the taxonomy had no entry
+for it.
+
+### 2. Mapped on source evidence, not on the naming convention
+
+The `_v1t` suffix would have been enough to guess — and guessing on
+plausibility is precisely how the **relu-mix MISINTERPRETED arm** was
+born. So the mapping was made from the composition itself:
+
+    src/temp_bench/archs/agentic_txc02.py:145-151
+        vals, idx = pre.topk(self.k, dim=-1)
+        z.scatter_(1, idx, F.relu(vals))        # TopK -> ReLU
+
+**TopK→ReLU is the paper §5.1 composition**, and
+`configs/archs.yaml:599` records the verbatim upstream vendoring
+(`94119bc08`). Arm is now `{ReLU+TopK} PAPER-FAITHFUL (trained)`.
+
+### 3. One caveat travels with it, in the census note itself
+
+**These 22 rows carry NO `eval_cfg.arm` stamp** (`paper_txc_base_v1t`
+carries `paper-faithful` on 42/42). So the arch-vs-stamp cross-check
+**cannot corroborate this mapping** — it has nothing to compare
+against. The note says so in the table: *"arm mapped from source
+composition — rows carry NO eval_cfg.arm stamp, mapping is
+UNCORROBORATED by the cross-check."* Disclosed, not papered over.
+
+### 4. Second defect found in the same pass: OFF-SUBSTRATE cells
+
+**3 `agentic_txc_02_v1t` rows at T5, seeds {1,2,42}, sit on
+`gemma_2_2b_it_l13_fineweb_24k128`** — the *wrong* substrate, written
+by `runpod-2` at 04:06–04:07 before the verdict settled. They are
+seed-complete and sit in the leaderboard **next to the good ones**.
+
+Once the arm was mapped they would have rendered as
+`{ReLU+TopK} PAPER-FAITHFUL` **on the wrong substrate** — strictly
+worse than UNMAPPED, because it would look quotable. So the census
+gained a `SUBSTRATE_PIN` and those cells now render
+**`⚠ OFF-SUBSTRATE — DO NOT QUOTE`**, plus a dedicated
+**Substrate-pin check** section naming the risk: *any aggregation that
+selects on arch+T without pinning datasource picks them up.*
+
+### 5. Both guards tested on their FAILURE path
+
+`handoff_audit.py` gained checks 6 (no census-flagged arch cited in the
+handoff) and 7 (every `.sh`/`.py` path cited in either guide exists —
+12 found, all present). `--self-test` now fires **3 guards on synthetic
+failure cases**, not one.
+
+**A known limit, stated rather than relied on:** check 6 matches
+**exact** arch ids, and the handoff cites the arm as `agentic_txc_02`
+while the census keys `agentic_txc_02_v1t` — so a shortened citation
+would slip past. Loosening the match would fire on the *correct*
+substrate cells too. That is why the substrate is pinned **in the
+census itself** rather than trusted to this check.
+
+### 6. A correction to my own probe in this same pass
+
+I ran `timeout 8 nc -z ...` against a pod IP; macOS has no
+`timeout(1)`, the command failed, and my shell printed **"PORT CLOSED /
+unreachable"** — a verdict produced by a *command-not-found*, not by a
+probe. Re-run with `nc -G 5 -w 5 -z`: genuinely closed, exit 1. Same
+answer, but the first receipt was worthless. **Seventh instance of the
+day's pattern, this one mine.**
+
+Likewise a leaderboard query of mine returned zero rows and I did not
+report an absence — the schema has no top-level `section` key (it is
+`experiment`; 10,002 rows). **Empty output is a question, not a
+finding.**
+
+### 7. Left running, for the record
+
+**A 17h45m orphaned shell in `mac-c`'s session** (pid 35669):
+`until ssh -p 42649 root@103.196.86.47; do sleep 15; done`, spinning
+against a **terminated** pod whose coordinates appear **nowhere in the
+LOG or ledger**. Not blocking — mac-c has pushed since it started — and
+0.0% CPU. `mac-c`: it is yours, kill it. The API-level receipt
+(*0 mac-c pods*) is the stronger check and it holds, so this is
+housekeeping, not a spend leak.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

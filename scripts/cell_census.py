@@ -33,6 +33,13 @@ SCOPE = ("probing", "rlhf", "em")
 # certificate evidence only, never a matrix column).
 ARM = {
     "paper_txc_base_v1t": ("{ReLU+TopK} PAPER-FAITHFUL (trained)", "the sprint arm — paper §5.1 composition, trainable"),
+    # Mapped 07-28 on SOURCE evidence, not on the _v1t naming convention:
+    # agentic_txc02.py:145-151 is topk(k_win) -> scatter(F.relu(vals)), i.e.
+    # TopK->ReLU = the paper composition; configs/archs.yaml:599 records the
+    # verbatim upstream vendoring (94119bc08). Caveat in the note: unlike
+    # every other paper-faithful cell, these rows carry NO eval_cfg.arm
+    # stamp, so the cross-check below cannot corroborate this mapping.
+    "agentic_txc_02_v1t": ("{ReLU+TopK} PAPER-FAITHFUL (trained)", "the paper's RLHF arm (agentic_txc_02) trainable port; arm mapped from source composition — rows carry NO eval_cfg.arm stamp, mapping is UNCORROBORATED by the cross-check"),
     "paper_txc_base_v1": ("paper-faithful ANCHOR (eval-only)", "archived paper ckpts, T=5 only"),
     "paper_topk_sae_v1": ("paper-faithful ANCHOR (eval-only)", "archived paper SAE baseline, T=5 only"),
     "paper_tsae_v1": ("paper-faithful ANCHOR (eval-only)", "archived paper T-SAE baseline, T=5 only"),
@@ -45,6 +52,14 @@ ARM = {
     "batchtopk_sae": ("relu-mix BASELINE", "ReLU-bearing v2 SAE baseline"),
     "tsae": ("relu-mix BASELINE", "ReLU-bearing v2 T-SAE baseline"),
     "txc_base": ("paper-era plain TXC", "legacy arch id (em section)"),
+}
+
+# arch -> the ONE datasource its cells may be quoted from. Exists because
+# the RLHF substrate confusion (IT-l13 vs BASE-l12) cost hours on 07-28 and
+# left quotable-looking rows on the wrong substrate: an arm label alone
+# would render those as PAPER-FAITHFUL and invite exactly the mistake.
+SUBSTRATE_PIN = {
+    "agentic_txc_02_v1t": "gemma_2_2b_base_l12_phase7",
 }
 
 
@@ -159,6 +174,10 @@ def main(write: bool) -> None:
             return (str(dsrc), arm, str(arch), (0, t) if isinstance(t, int) else (1, 0))
         for (_, dsrc, arch, t), g in sorted(exp_groups.items(), key=sort_key):
             arm, note = ARM.get(arch, ("⚠ UNMAPPED — classify before quoting", ""))
+            pin = SUBSTRATE_PIN.get(arch)
+            if pin is not None and dsrc != pin:
+                arm = "⚠ OFF-SUBSTRATE — DO NOT QUOTE"
+                note = f"{arch} is pinned to `{pin}`; these cells are on the wrong substrate"
             extras = []
             if g["n_smoke"]:
                 extras.append(f"{g['n_smoke']} smoke")
@@ -221,6 +240,25 @@ def main(write: bool) -> None:
             )
             if not ok:
                 mismatches.append(f"- `{exp}`/`{arch}`/T={t}: arch-derived arm “{arm}” vs stamped `eval_cfg.arm={stamped}`")
+    # cross-check: cells sitting on a substrate their arch is not pinned to
+    offsub = []
+    for (exp, dsrc, arch, t), g in groups.items():
+        pin = SUBSTRATE_PIN.get(arch)
+        if pin is not None and dsrc != pin:
+            offsub.append(
+                f"- `{exp}`/`{arch}`/T={t}: {g['n_rows']} row(s) on `{dsrc}`, "
+                f"pinned to `{pin}` — **do not quote**")
+    lines.append("## Substrate-pin check")
+    lines.append("")
+    if offsub:
+        lines.append("**OFF-SUBSTRATE CELLS PRESENT** — they sit in the leaderboard next")
+        lines.append("to the good ones and would be picked up by any aggregation that")
+        lines.append("selects on arch+T without pinning datasource:")
+        lines.extend(sorted(set(offsub)))
+    else:
+        lines.append("No off-substrate cells for any pinned arch.")
+    lines.append("")
+
     lines.append("## Arch-vs-stamp cross-check")
     lines.append("")
     if mismatches:
