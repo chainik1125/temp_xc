@@ -228,7 +228,7 @@ matrix.**
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — snapshot **18:0x BST 07-28, API-verified**
+## 5. FLEET MAP — snapshot **01:0x BST 07-29, API-verified**
 
 This section dates fast. **Live sources: `agents/<id>/STATUS.md` + the
 LOG tail** — trust those over this snapshot if they disagree.

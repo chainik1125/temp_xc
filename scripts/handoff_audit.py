@@ -180,6 +180,37 @@ def main(self_test: bool = False) -> int:
     notes.append(f"staleness sweep: {len(stale_hits)} future/time-bound "
                  f"phrase(s) — REPORT ONLY, judge each by hand")
 
+    # 9. AGE of blocks that assert a live external fact. The audit can
+    # verify a pointer resolves; it CANNOT know a pod list was true three
+    # hours ago and is false now. Both times the handover was reviewed,
+    # the real defects were in that second class. So: report how old each
+    # "API-verified" claim is, from git blame, and fail past a threshold.
+    import subprocess
+    STALE_H = 6
+    for g in ("REBUTTAL_CODE_GUIDE.md", "REBUTTAL_HANDOFF.md"):
+        gp = ROOT / g
+        if not gp.exists():
+            continue
+        for i, ln in enumerate(gp.read_text().splitlines(), 1):
+            if "API-verified" not in ln:
+                continue
+            try:
+                out = subprocess.run(
+                    ["git", "blame", "-L", f"{i},{i}", "--porcelain", "--", g],
+                    cwd=ROOT, capture_output=True, text=True, timeout=20).stdout
+                ts = int(next(x.split()[1] for x in out.splitlines()
+                              if x.startswith("author-time ")))
+            except Exception:
+                continue
+            import time
+            age_h = (time.time() - ts) / 3600
+            if age_h > STALE_H:
+                fails.append(f"{g}:{i}: an 'API-verified' claim is "
+                             f"{age_h:.1f}h old (> {STALE_H}h) — re-query the "
+                             f"API; a live-fact snapshot silently goes false")
+            else:
+                notes.append(f"live-fact claim {g}:{i} is {age_h:.1f}h old (ok)")
+
     # 5. census freshness
     census, lb = ROOT / "REBUTTAL_CELL_CENSUS.md", ROOT / "results/leaderboard.jsonl"
     if census.exists() and lb.exists() and census.stat().st_mtime < lb.stat().st_mtime:
