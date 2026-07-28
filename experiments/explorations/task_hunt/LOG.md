@@ -25946,3 +25946,72 @@ third copy** (HF + pod + here). But **no grid cell runs on the
 laptop.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 13:56 London (date-verified 12:56 UTC) — mac-local (hub): **mac-c TAKES THE HUNT END TO END** (Han) + ⚑⚑ the feed bug is now quantified to 0.5%: we transfer **1 152 MiB/step to use 27**
+
+### 1. Han (13:56): *"mac-c is idle … they should also take over the task hunt stuff that mac-d was owning before mac-d switched over to the RLHF scramble."*
+
+Briefing posted: **`briefings/hunt-mac-c-takeover.md`** (status active,
+owner mac-c). Inheritance: `sycgen` **delivered** (item 6, maintenance
+only), `struqpos` **killed sound** (closed), and `retryesc_gen` —
+which mac-d held only as a *dormant trigger* on mac-c's generation —
+now **mac-c's end to end**.
+
+**The gap this exposes, stated plainly for Han: item 7 ("hunted safety
+task #4") has NO candidate.** sycgen took item 6; struqpos was killed
+honestly and took item 7's only contender with it. mac-c is now the
+only lane that can close item 7, and `retryesc_gen` has never been
+started. Gold-visibility binds: a gold task goes into the HANDOFF the
+same beat it is found.
+
+**Hardware note carried into the briefing:** Han confirms mac-c and
+mac-d are both sessions on **one MacBook** (M5 Pro / 48 GB). With the
+RLHF grid moving to a pod, the laptop is effectively mac-c's — but it
+is still one machine, and GPU-hour asks come through the hub.
+
+### 2. ⚑⚑ The feed bug, now quantified — and it matches runpod-2's measurement to 0.5%
+
+I found the mechanism. `AgenticTXC02.consumes = "sequence"`, so the pf
+cells run through `SequenceBuffer`, whose refill hands back **whole
+128-token sequences**:
+
+    refill(n) -> acts[idx]  ->  (n, 128, 2304) float32   [host]
+    SequenceBuffer.__call__ -> batch.to(device, float32)  [PCIe, every step]
+
+…and then `AgenticTXC02._sample_pairs` **slices out T+1 positions per
+sequence and discards the other ~127.**
+
+| per step, batch 1024 | bytes |
+|---|---|
+| **transferred** | 1024 x 128 x 2304 x 4 = **1 152 MiB** |
+| **used at T=2** | 1024 x 3 x 2304 x 4 = **27 MiB** |
+| over-transfer | **42.7x** (21.3x at T5, 7.5x at T16) |
+
+**Cross-check against runpod-2's instrument:** 1 152 MiB at 95% of a
+1.49 s step = **814 MiB/s**. They measured **818**. The "feed
+bandwidth" was never a bus property — **it is the volume of our
+over-transfer divided by however long it took.** It also explains the
+one genuinely strange thing in their cost model: the cost is
+**T-independent** because the transfer is 1024x128x2304 *regardless of
+T*. Every mystery in that table falls out of this one line.
+
+And 818 MiB/s across a link good for ~25 GB/s is **~3% of bus** — so
+it was not bandwidth-bound either; the cost is the host-side gather +
+fp32 conversion of pageable memory. **Two independent multipliers, one
+cause.**
+
+The port's own docstring records the deviation and calls it benign:
+*"The only difference is batching: upstream sampled (seq, off) pairs
+from a preloaded (N, L, d) buffer; here `consumes='sequence'` (tsae
+precedent)."* It is not benign. It is the whole cost model.
+
+**Fix (hub is implementing, mac-d runs the grid):** keep
+`consumes="sequence"` and the exact sampling semantics — same
+`np.random.default_rng(seed).integers` index stream — but hold the
+cache **resident on device as fp16** and gather there, behind
+`TEMP_BENCH_BUFFER_RESIDENT=1`, default OFF. Because fp16→fp32 is an
+exact widening and the index stream is unchanged, resident and
+host-fed batches must be **bitwise identical** — that is the receipt,
+and I will post it or abandon the change.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
