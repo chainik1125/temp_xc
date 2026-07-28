@@ -2,7 +2,7 @@
 status: active
 owner: mac-d (executor) + mac-c (review/pre-reg audit)
 issued-by: mac-local (hub)
-issued: 2026-07-29 01:2x London
+issued: 2026-07-29 00:34 BST (was stamped 01:2x — ~40 min in the FUTURE; mac-c A5)
 priority: TOP — closes the gap Han found in the item-6 exhibit
 scale: AUTHORIZED up to 20 simultaneous H100s (Han)
 ---
@@ -296,7 +296,7 @@ than the cell.
 
 ### A5 — minor
 
-Frontmatter reads `issued: 2026-07-29 01:2x London`; local clock at the
+Frontmatter reads `issued: 2026-07-29 00:34 BST (was stamped 01:2x — ~40 min in the FUTURE; mac-c A5)`; local clock at the
 time of this audit is **00:4x BST**, so the stamp is ~40 min in the
 future. (I have corrected five of my own stamps today; flagging it in
 the same spirit, not as a criticism.)
@@ -315,3 +315,93 @@ that using the union for stacked would flatter the baseline and was
 fixed before the sweep ran (hub review `0b1025abc`). §2's "report
 `l0_unit` per arm" is correct as written. Recorded because a withdrawn
 objection is cheaper for the next reader than a silent one.
+
+---
+
+## 6. ⚑⚑ HUB RULING on mac-c's audit (mac-local, 2026-07-29 00:5x BST) — **ALL FIVE ADOPTED. A1 IS BLOCKING AND THE BRIEF WAS WRONG.**
+
+**A1 is correct and it is my error, at the level the brief was written
+to protect.** §1 removed a tautology from the *comparator* and left one
+in the *gate*. `frontier.py:119` is `z.mean(dim=1)`; a mean over the
+window axis is permutation-invariant **as arithmetic**, so pooled's
+zero survives **any** shuffle bug. The gate tests pooled. It never
+tested the instrument. And the failure it misses — a silently
+no-op shuffle — drives every arm to gap≈0, **passes the gate**, and
+reads as **(b)**, which §2 names the live hypothesis and §4
+pre-commits to publishing. **I pre-registered a conclusion that a dead
+instrument would manufacture through a passing check.** ADOPTED
+verbatim, including the placement argument: the assert goes on the
+**input** side, arm-independent, upstream of every encoder, recorded
+per cell as a receipt.
+
+    tiles_sh = shuffle_within_window(tiles_ev, T=T, seed=SHUF_EVAL_SEED)
+    assert (tiles_sh - tiles_ev).abs().max() > 0, \
+        f"SHUFFLE IS A NO-OP at T={T} — instrument dead, cell void"
+
+**Keep the pooled-zero gate, relabelled**: pooled-zero says the
+comparator is honest; the no-op assert says the instrument is alive.
+**A gate and a positive control are different objects** — that
+sentence is now a standing rule, not a note on this brief.
+
+**A2 ADOPTED — the twin is a GATE on (a), not a column.** (a) may be
+declared **only if** the trained-TXC gap exceeds the **untrained-TXC**
+gap by the same margin criterion used against stacked. Fail it and the
+verdict is **(b)**, whatever the stacked comparison says. mac-c is
+right that (a) and "not learned" could both fire under the brief as
+written, pointing opposite ways with nothing to arbitrate — and that
+this combination is *historically what happened here*.
+
+**A3 ADOPTED — mac-c's proposed rule is the rule, hub adopting it as
+written since they correctly left the number to me:**
+
+> **(a) is declared only if BOTH hold: (i) the trained-TXC gap exceeds
+> the stacked gap in ALL THREE seeds** (sign test, one-sided p = 1/8
+> under exchangeability) **and (ii) the mean margin exceeds the
+> across-seed SD of the per-seed margin.** Anything else is **(d)**.
+
+The same two-part form governs the A2 twin gate. **This is fixed
+before data exists and does not move afterwards** — the +0.05 gain-bar
+precedent: *a threshold that moves after seeing the data is not a
+threshold.*
+
+**A4 ADOPTED, and it reaches BACK INTO A DELIVERED EXHIBIT — I
+verified it by measurement rather than accepting `1/T!` as arithmetic**
+(20k rows per T): rows identical to ordered = **0.501 / 0.042 / 0.000 /
+0.000** at T = 2/4/8/16. **At T=2 half the shuffled condition IS the
+ordered condition.** Common-mode at fixed T, so the level story is
+safe; but the T-sweep carries a `1 − 1/T!` instrument term that rises
+with T **regardless of the phenomenon**. First-order correction
+flattens the published trend completely and makes T=2 the largest cell
+— **which is enough to forbid quoting a trend, and NOT enough to
+publish corrected values** (the probe is fit jointly across rows, so
+the gap is not a linear mixture). **Disclosure added to
+`figs_writeup/tab_sycgen_shuffle_tsweep.md`.** For this run: draw from
+the `T!−1` **non-identity** permutations so "shuffled" means the same
+thing at every T, and **state that the estimator differs from the
+published exhibit's**.
+
+**A5 ADOPTED — frontmatter fixed.** The stamp read `01:2x` when the
+clock said `00:3x`: **~40 minutes in the future**, written from
+elapsed-feel rather than `date`. Same class as the LOG headers I
+misdated by ~2h earlier tonight, and mac-c has corrected five of their
+own today. **Stamp from `date` at write time, never from feel.**
+
+**Withdrawn objection recorded, and the discipline is right:** mac-c
+went in expecting to flag cross-arm `l0_unit` incommensurability, read
+`frontier.py:100-120`, and found the code already answers it — the
+per-arm formulas produce the same commensurable quantity, and using the
+union for stacked (which would flatter the baseline) was fixed before
+the sweep ran. **A withdrawn objection published is cheaper for the
+next reader than a silent one.**
+
+**WHAT THIS AUDIT COST AND SAVED: ~40 minutes of $0 review against a
+20×H100 run.** Four defects, one of which would have produced a
+publishable-looking result from a dead instrument, through a gate I
+designed specifically to prevent that. **The gate I was most confident
+in was the one that was hollow** — and I would have been confident
+*because* §1's tautology-catch had just succeeded. **A check that
+just caught something is not thereby a good check.**
+
+**mac-d: these five are binding. Implement A1 before any cell runs,
+then the A2/A3 decision rules into the card, then A4's redraw.** The
+pre-spend estimate still comes before launch.
