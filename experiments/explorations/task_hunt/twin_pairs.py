@@ -32,7 +32,6 @@ from __future__ import annotations
 
 import json
 import sys
-import time
 from pathlib import Path
 
 import torch
@@ -73,15 +72,16 @@ def _cells(ds, archs):
     return cells
 
 
-def _keys_from_leaderboard(ds, since_ts):
-    """train_key per arch from the canonical rows written by this run —
-    the authoritative source, no re-derivation."""
+def _keys_from_leaderboard(ds):
+    """train_key per arch from the canonical rows — the authoritative
+    source, no re-derivation. No timestamp filter: the (ds, arch, seed,
+    n_steps, override) tuple is unique per twin cell; on cache-hit
+    reruns the original row is the match (latest wins if several)."""
     out = {}
     with open(repo_root() / "results" / "leaderboard.jsonl") as f:
         for line in f:
             r = json.loads(line)
             if (r.get("datasource") == ds and r.get("seed") == SEED
-                    and r.get("ts", "") >= since_ts
                     and (r.get("training_cfg") or {}).get("n_steps") == N_STEPS):
                 ov = (r["training_cfg"].get("arch_hparams_override") or {})
                 if ov.get("d_sae") == D_SAE and ov.get("T") == 16:
@@ -117,7 +117,6 @@ def main(only=None):
     # a second pool in the same process wedged on an inherited lock —
     # observed futex_wait deadlock, 2026-07-28). Select pairs via argv
     # and MERGE into the existing results JSON across invocations.
-    since = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 60))
     dst = HERE / "results" / "r30_twin_pairs_t16.json"
     out = (json.loads(dst.read_text()) if dst.exists() else
            {"card_note": "LOG twin note (committed with this driver)",
@@ -136,7 +135,7 @@ def main(only=None):
         if fails:
             out["pairs"][name] = {"ok": False, "fails": len(fails)}
             continue
-        keys = _keys_from_leaderboard(spec["ds"], since)
+        keys = _keys_from_leaderboard(spec["ds"])
         btk_key = keys.get(spec["btk_arch"])
         kind, ref = spec["counterpart"]
         ref_key = keys.get(ref) if kind == "local" else ref
