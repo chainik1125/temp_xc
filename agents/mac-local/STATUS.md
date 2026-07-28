@@ -38,16 +38,30 @@ off: the 13:00 BST window closed; **responses amendable to Aug 3**.
 touched** (house rule). **Han's call, still pending.** Also pending:
 3-token rotation (`gh`, `hf_token`, `hf_token_datasets`).
 
-## In flight
+## In flight (updated ~00:4x — the 20:00–00:30 chain is below)
 
-1. **mac-d — the frontier table.** T=8 row needs **no GPU** (the T=1 SAE
-   survived on HF ⇒ pooled/stacked are eval-only) and started at once.
-   T{2,4,16} need 9 retrains (~$3–4): **those TXC ckpts and the entire
-   sycgen activations cache were LOST with pod-D**, never mirrored.
-2. **mac-c — the $0 claim-read.** What do probing/RLHF/EM *actually
-   assert*? Probing already says *"probe-budget-dependent, no monotone
-   window win at any k"* and may be substantially inoculated. **RLHF and
-   EM unread.** Size before anyone spends.
+1. **mac-d — the frontier, RUNNING.** 15 cells (3 SAE T1 + 12 TXC
+   T{2,4,8,16}) under fresh tag `sycgen_keep_r1_rebuilt`, **6 workers,
+   GPU 100%**, ~20 min out. Getting here took four separate blockers,
+   all found by measurement:
+   - **SAE anchor weights never existed locally** — masked by
+     `runner.py:141-150` returning `train_cached=True` as a **literal**;
+     `cache t=True` means "eval_key has a row", NOT "weights exist".
+   - **The original 70-min burn was on `tsae` cells** the frontier never
+     loads (arch-major sort: 3 sae + 3 tsae + 12 txc = 18 ✓).
+   - **The 12-worker relaunch OOM-killed** — cgroup `memory.max` 233.8
+     GiB vs `free`'s host 2015 GB. **Real cost is 24.5 GiB/worker** (a
+     *concurrent load peak*: fp16 source + fp32 copy held together), so
+     the ceiling is 9.5. 6 is stable.
+   - **pod-D's originals are NOT lost** — all 6 on HF;
+     `checkpoint_exists()` simply cannot see them.
+2. **mac-c — geometry lane**, plus the durability audit that produced
+   the HF finding. Claim-read DONE: **exposure confined to item 6**
+   (probing/backtracking pool via the *protocol*; EM/RLHF already report
+   TXC negatives, and a stronger baseline cannot rescue a negative).
+3. **⚑ Pre-registration of interpretation is POSTED** (LOG ~00:3x) —
+   four outcomes fixed before the numbers exist, incl. **underpowered as
+   a distinct outcome from a loss.** Read it before reading results.
 
 ## Standing rulings (do not relitigate)
 
@@ -62,6 +76,20 @@ touched** (house rule). **Han's call, still pending.** Also pending:
 - **Accuracy outranks immutability for a deliverable** (btk re-render;
   mac-d executed `ff242b78` → `8d75ff3a`, only the T10 column moved,
   proven by per-T series diff).
+- **⚑ `checkpoint_exists()` answers "on THIS BOX", never "anywhere".**
+  I ratified "call it explicitly" at 23:3x and mac-c refuted it: it
+  returns **False for all 344 HF-mirrored keys**, because `cache.py:148`'s
+  hf_url branch is **dead code by construction** (`trainer.py:171` writes
+  `hf_url=None` and is the only writer). `cache=True ⇒ weights exist` and
+  `exists()=False ⇒ weights gone` are the **same bug in mirror image**:
+  nothing is the authority on weight existence. **Revisit after item 6,
+  not during.**
+- **Read `cpu.max` and `memory.max`, NEVER `nproc`/`free`.** A container
+  reports host resources. This cost us cores in the morning and bytes at
+  midnight.
+- **The anchor is the first number to read, not the headline curve** —
+  a retrained anchor near its recorded value is what certifies the
+  substrate underneath everything else.
 
 ## Quote-form guards now live in the handoff
 
@@ -109,6 +137,22 @@ stop-and-resolve-by-hand.
 13. **Specified a budget-match that does not exist**; mac-d's arithmetic
     killed it before it cost pod hours.
 14. **Let the origin monitor die and did not notice for hours.**
+15. **Called a job "STUCK" and escalated to Han for a takeover** on
+    evidence that could not distinguish slow from hung — my own `/proc`
+    read said "computing, not blocked" and I put the wrong word on it.
+16. **"~8 min/cell" quoted as a budget** — derived from someone else's
+    cost estimate, never measured.
+17. **Read the pod's UTC clock as BST** and announced a deadline had
+    passed when it had not.
+18. **Reported "6 workers" from a `pgrep -fc`** that was counting my own
+    ssh command.
+19. **Framed the 3 × 15.2 GB duplication as a SPEED problem.** It was a
+    SCALE-CEILING problem — right measurement, wrong consequence.
+20. **Asserted "the sycgen data path is dataloader-bound"** and built a
+    patch recommendation on it. GPU went 10% → 100% on an arch change;
+    we were measuring `tsae`, not the data path.
+21. **Ratified "call `checkpoint_exists` explicitly"** as the fix to a
+    bug whose mirror image it is.
 
 **The pattern in 9–14: I state derived quantities with the confidence of
 measured ones.** The fixes the fleet converged on independently, and
