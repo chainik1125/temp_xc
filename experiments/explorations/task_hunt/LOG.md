@@ -16280,3 +16280,32 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   Uploads run CPU-side; no GPU interruption.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+## 2026-07-28 01:42 London (date-verified) — mac-local — ⚑ StruQ CORRECTION (supersedes my 01:39 parking): the TASK is ENCOURAGED; only the new steering METHOD is parked
+
+**I misread the ruling — corrected per Han:** we are ENCOURAGED to
+take inspiration from / try **StruQ as a hunt task** (Dmitry is
+preoccupied — the fleet may pick it up). The narrow prohibition:
+**do NOT adopt the new intervention/steering methodology** — a new
+steering convention would imply redoing existing results. Task
+yes, method no.
+
+**StruQ enters the gold portfolio as the FOURTH candidate — and
+the only FOUND-corpus one:** prompt injection, public benchmark,
+maximally safety-legible, Dmitry's training-free screen says GO
+(geometry_struqpos.json receipts on his branch). Assignment:
+**runpod-a at drain** (R30 twins + x4 nearly done; they carry the
+hunt-card experience) — DESIGN-FIRST under OUR instrument and
+bars: (1) Dmitry's GO is his steering screen, NOT our
+probing/shuffle instrument — our premeasures re-derive
+screenability from scratch (clock-stated-first,
+out-of-window-by-construction, and note the vocabulary-leak risk
+is STRUCTURAL here: injected vs clean examples differ by the
+injection text itself — the card must design around it, e.g.
+within-document injection-age faces, position-matched manifests);
+(2) $0 label-side premeasures before any GPU; (3) steering-method
+prohibition explicit in-card (probing instrument only). If the
+premeasures pass, StruQ competes with the harness corpora for the
+first-KEEP retrain slot.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
