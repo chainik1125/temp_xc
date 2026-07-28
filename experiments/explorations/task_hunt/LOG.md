@@ -18710,3 +18710,17 @@ is the card's pre-registered expectation (l0 319.59 < 320); scoring
 stays with the card owner.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 03:39 London (date-verified 02:39 UTC) — runpod-1 — SHARD B CELL 1 LANDED: v1t T10 s42 (auc .8416/.8816, l0 199.83 < k_win 200) — E1 monotone holds; E2 signs MIXED across first two cells
+
+v1t/T10/s42: k5 auc 0.8416 (shuf 0.8394), k20 auc 0.8816 (shuf
+0.8755), realized l0 199.83 < k_win 200. **E1 zero-picks per
+window now monotone in T across three fleet cells: 0 (T4) →
+~0.17 (T10) → ~0.41 (T16).** E2 (pf ≤ btk at T≥8) is NOT yet
+directional: vs btk s42 twins, T10 = +7.2e−3 (k5) / −6.9e−3
+(k20); T16 = −2.3e−3 (k5) / +1.8e−3 (k20) — opposite k-patterns,
+2 of 4 slots against. Seeds 1/2 decide; scoring at drain per card
+§9. train_key 026cd4ddc75c3c09, mirror push launching. Both
+shards on cell 2/3. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
