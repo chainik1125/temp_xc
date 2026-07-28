@@ -43,23 +43,43 @@ $0/h. All four mac-c hunt lanes un-parked behind lever 3.**
 | **mac-d** | **0 pods, $0/h** | ⚑ **TOP: `briefings/sycgen-shuffle-sparsity-matched.md`** — issued 00:34, **NOT YET CLAIMED.** Up to 20×H100 authorized (~$60/h; authorized ≠ free, pre-spend estimate first) |
 | **mac-c** | **0 pods, $0** | lever-3 rescue (`a027b7caa`, P1/P2/P3 held, P5 fired) + delivered the shuffle-brief pre-reg audit |
 
-### ⚑ THE ONE LANE IN FLIGHT — sycgen shuffle ablation, sparsity-matched
+### ⚑ THE ONE LANE IN FLIGHT — sycgen shuffle ablation, sparsity-matched (01:2x)
 
 Han (00:3x): *"we NEED sycgen proper shuffle ablation with matched
-sparsity."* Brief issued; **mac-c's pre-registration audit found 4
-defects + a stamp error, all ADOPTED by hub ruling `29bc6a95d`.** The
-lane is **cleared to run but unclaimed** — fleet idle at $0/h, so
-nothing burns while it waits.
+sparsity."* **CLAIMED BY mac-d, card frozen before any cell ran**
+(`SHUFFLE_MATCHED_CARD.md`, `62fd1536d` + `ab415af18`). **mac-d
+corrected the scale down from my 20×H100 authorization to 1 GPU** and
+verified weight existence first (0/15 train_keys on HF, 5 repos,
+positive control firing) — so it is a retrain, sized to the work.
 
-**Before any cell runs, in this order:** (1) **A1** — the one-line
-input-side `assert (tiles_sh - tiles_ev).abs().max() > 0`; the
-pooled-zero gate tests *pooled*, not the shuffle, and a no-op shuffle
-would pass it and read as (b), the outcome the brief pre-commits to
-publishing. (2) **A2/A3** decision rules into the card: twin is a
-**gate on (a)**; (a) needs TXC>stacked in **all 3 seeds** AND mean
-margin > across-seed SD. (3) **A4** redraw from the `T!−1`
-non-identity permutations. (4) **§2b** bracket both sides of TXC's
-budget — the same coarse-grid trap that produced the 3/4 error.
+**Review loop closed through three rounds, all $0:**
+
+1. **mac-c audit** (A1–A5) → hub adopted all (`29bc6a95d`). **A1 was
+   mine and blocking**: the pooled-zero gate tests *pooled*, not the
+   shuffle; a no-op shuffle passes it and reads as **(b)**, the
+   pre-committed headline. mac-c then made it an executable receipt —
+   the gate returns PASS on a dead shuffle at every T.
+2. **mac-d strengthened A1** past the minimal assert: gate the measured
+   shuffled-row fraction against the predicted `1 − 1/T!`, catching
+   partial application and wrong-axis permutation.
+3. **mac-c reviewed the strengthening** — it converts a deterministic
+   check into a statistical one, and **at T=8 an equality gate
+   spuriously VOIDS 9.66% of HEALTHY runs.** Exact mirror of A1: A1
+   could not fire when it should; its fix fires when it should not.
+
+**BINDING BANDS (hub `33a5c72d8`, independently re-derived):**
+`Binomial(n, 1/T!)`, `n = n_windows·(L//T)` — **T=2 7936..8448 · T=4
+268..414 · T=8 0..3 · T=16 0..0.** Print observed count, band, and `n`
+per cell. *(My own E±4σ construction was WRONG at T=8/16 — a σ band is
+meaningless at λ≈0.1; use tail probability. mac-c's numbers stand.)*
+
+**Standing lesson: state the false-pass AND false-fail rate of any gate
+before it guards a run.**
+
+**Also binding:** §7 withdraws my §2b "refine the k grid" guidance —
+**the grid is already tight (1.4–7.7% at T=2/4/8; T=16's k=1 floor is
+structurally unreachable). Add no k cells; spend on SEEDS (n=3→5),
+since outcome (d) is still unsized.**
 
 **⚑ 3 unattributed non-convention pods ($3.87/h)** — `mats-gap-code-h100`,
 `tsae-paper-widthmatch-probing`, `tsae-paper-widthmatch-em`. **Never
