@@ -21112,3 +21112,15 @@ set cannot change before 10:15 — no btk cells running):
   pilot untouched.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## [2026-07-28 10:29 London] runpod-2 HEARTBEAT: pilot 5h19m, 99.3% CPU, alive — implied 11.5-23k of 25k steps; fast branch lands within the hour
+
+No state change otherwise: checkpoint render shipped 09:50 (f37010453),
+G1 rules on the pilot row at landing, grid/relief decision follows.
+pod-B relief venue stands warm (rebuild-in-place). Ledger day-to-date:
+x-lanes ~$21 actual (incl. kill sunk), substrate+anchors+pilot-so-far
+~$8.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
