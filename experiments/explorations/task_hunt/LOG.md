@@ -34610,3 +34610,65 @@ so it is worth the ten minutes. Everything else in the file I would ship
 as-is.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 23:05 BST — HUB: `c1a9f98ad` RATIFIED — **the "free lunch" shape is an artifact of dividing by T, and I published it twice**
+
+### 1. The artifact
+
+**`l0_per_token` is NOT measured.** `synthetic_recovery.py:201` returns
+`float(l0_per_window / T)`; only `l0_per_window` is counted from the
+codes (`total_nnz / total_tiles`, lines 197–199). **Multiply back:**
+
+    SAE  T1   4.54 /win   r=0.482
+    TXC  T2   5.70 /win   r=0.498
+    TXC  T4   6.40 /win   r=0.524
+    TXC  T8   6.96 /win   r=0.541
+
+**Per-token axis:** budget falls **5.2×** while recovery rises — the
+free-lunch shape.
+**Per-window axis (the verdict unit):** budget **RISES 1.53×** while
+recovery rises — **the ordinary direction. No anomaly.**
+
+**What it actually says: at T8, TXC spends ~53% MORE budget than the SAE
+anchor to reach 0.541 vs 0.482.** Not evidence for TXC — a point **not
+yet compared at matched cost**, which is precisely what
+`report_frontier.py`'s *"best SAE recovery at budget ≤ TXC's"* rule
+exists to do. **Read on the right axis, these 12 cells contain NO
+VERDICT.**
+
+**And on the per-window axis, 12/15 cells show more budget buying more
+recovery — which is the NULL shape.**
+
+### 2. I published the seductive form, twice, to Han
+
+I reported *"TXC slightly ahead at LOWER per-token sparsity"* — **that
+is the artifact, stated in its most persuasive form.** I attached the
+correct caveat both times (*"per-token units, wrong unit for the
+question, do not cross-compare"*). **The caveat was right and the number
+travelled anyway.**
+
+mac-c names the mechanism exactly: **"the label sits next to the number
+and the number travels alone"** — and *"it survives a caveat the way
+`train_cached=True` survived a docstring tonight."*
+
+**A qualifier is not a control.** That is the same lesson mac-d wrote at
+22:0x — *"a JSON caveat is not a control"* — arriving a third time, now
+against my own prose.
+
+### 3. Why the axis choice is not a presentation detail
+
+Per the evaluator docstring (lines 178–180): **hold `l0_per_token`
+fixed ⇒ per-position matched; hold `l0_per_window` fixed ⇒ per-window
+matched.** **They are two different experiments.** Quoting a trend
+across T on the per-token axis **silently switches which experiment is
+being reported** — without anyone intending it.
+
+### 4. Status of the outcomes
+
+**Unchanged and all four open.** (a)–(d) live, the k-sweep has not run,
+and the per-window shape so far is the null one. **mac-c explicitly
+claims no outcome**, and neither do I.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
