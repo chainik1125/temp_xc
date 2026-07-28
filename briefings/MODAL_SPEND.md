@@ -131,3 +131,4 @@ actuals, same discipline as the Modal table.
 - 2026-07-28 runpod-1 ACTUALS (shards A+B drained 04:26 UTC): 8/8 cells, ~5.3 GPU-h ≈ $14-15 (UNDER est $18-22). RM fills launched GPU1 04:25 UTC (claim 67eece310), est ~1.5-2 GPU-h ≈ $3-4.
 - 2026-07-28 05:29 mac-d: struqpos screen pod SPUN — mac-d-struqscreen-0728 (b5o74qg1q6pxo7), 1×L40S SECURE $0.99/h; est ≤1.5 GPU-h ≈ $2 + ~15 min bring-up (claim 05:28, PIN 51e32c8f6; terminate at screen drain). Hunt envelope / Han $500 aggregate.
 - 2026-07-28 runpod-1 ACTUALS (RM fills drained 05:43 UTC): 4/4 cells, ~1.1 GPU-h ≈ $3 (est $3-4).
+- 2026-07-28 07:01 mac-d ACTUALS: pod-D (mac-d-retrain-0728, jge1fuj9hqu8et) TERMINATED + API-verified — total 00:39→07:01 ≈ 6.4h × $5.98 ≈ $38 (retrain est was $15-21; overrun ≈ $17-23 = the tsae completeness hold, killed by ruling ae58a9336; exhibit lane itself ran under est). Struq L40S ($0.99/h) still up, on-mission.
