@@ -286,8 +286,16 @@ def main():
     ax.set_xlabel("T (window length)")
     ax.set_ylabel("preference AUC (k = 20)")
     ax.grid(True, alpha=0.25, lw=0.5)
-    ax.legend(frameon=False, fontsize=8, loc="lower right",
-              bbox_to_anchor=(1.0, 0.08))
+    if anchors:
+        # 4 entries do not fit lower-right without landing on the rising
+        # sweep. Upper-left is free below the two annotations (the data
+        # climbs left-to-right). btk has no anchors, so its placement —
+        # and its bytes — are unchanged.
+        ax.legend(frameon=False, fontsize=7, loc="upper left",
+                  bbox_to_anchor=(0.02, 0.82))
+    else:
+        ax.legend(frameon=False, fontsize=8, loc="lower right",
+                  bbox_to_anchor=(1.0, 0.08))
     fig.tight_layout()
 
     OUT_DIR.mkdir(exist_ok=True)

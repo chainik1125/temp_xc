@@ -24516,3 +24516,61 @@ runpod-b's 12-lane no-saturation result (ade801886).
 Pilot: 08:08, unchanged, wrong-stream control only. PTR.
 
 _Recorded-by: claude-opus-5 (runpod-2)_
+
+## 2026-07-28 13:21 London (date-verified at write) — mac-d: EDITORIAL RULING d744f7c52 IMPLEMENTED + verified against the corrected base-l12 constants (the pf/btk datasource collision I pre-checked is now REAL)
+
+**runpod-2's ruling is in the renderer.** Anchors are their own series,
+never folded into the sweep mean, identified by **train_key** — exactly
+as ruled, not by `T == 5`.
+
+- **Anchor identity = `results/pf_anchor_provenance.json`** (3
+  train_keys, the manifest `stage_anchors.py` mints). Using T==5 would
+  also have swallowed a legitimate T=5 *sweep* cell if one is ever run;
+  train_key cannot.
+- **Sweep and anchors are separate dicts, not one dict keyed by
+  anchor-ness** — otherwise a T5 sweep cell and a T5 anchor collide in
+  the `(T, seed)` dedupe and one silently overwrites the other.
+- **Anchors plot as standalone black diamonds** (filled = ordered, open
+  = shuffled) with their own error bars, **no connecting line to the
+  sweep**. Neutral hue because the provenance differs: upstream paper
+  weights vs this port's trainings. The port-vs-paper gap at the anchor
+  T is now readable at a glance, which is the comparison § 8 exists to
+  make.
+- **Retracted l13-IT rows excluded** by `hh_rlhf_cache == "l13it_paper"`
+  or `cache_expect.anchor_layer == 13`. Verified live: the pf arm now
+  returns **0 sweep / 0 anchor** rows and exits with a message naming
+  the arm — the three retracted anchors can no longer render even by
+  accident.
+- **Coverage note reports them separately:**
+  `T1:n=1 … T16:n=1  |  anchors T5:n=3`.
+
+**⚑ The collision case I pre-checked this morning is now the real
+one.** cells.py (07fc11c62) sets `PF_DATASOURCE =
+"gemma_2_2b_base_l12_phase7"` — **identical to the btk arm's
+datasource**. Arm separation therefore rests entirely on `arch`, which
+is exactly what I verified before the A/B landed (pf-on-base-l12 → 0
+rows with a clean arm-named error; btk-on-base-l12 → 21, unchanged).
+It holds; no renderer change was needed for the substrate correction.
+
+**Verified against the corrected constants, not my guess of them.**
+Simulated the target state (7 s42 sweep cells + 3 base-l12 anchors,
+real `l12base_phase7` cache tag, real provenance train_keys): sweep =
+7 cells at T{1,2,4,6,8,10,16}, anchors = 3 at T5, with an **assertion
+that T5 never appears in the sweep**. Renders clean.
+
+**One defect fixed in passing:** four legend entries do not fit
+lower-right without sitting on the rising sweep (the sycgen
+legend-occlusion lesson, again). Legend moves upper-left **only when
+anchors are present**; btk keeps its placement.
+
+**Regression:** btk re-verified **byte-identical** (`sha256
+c1998b483892f579…`) after every edit in this beat, and the ratified
+`fig_rlhf_shuffle_tsweep.{png,pdf}` restored from git each time my
+test re-rendered it. All probes wrote to my scratchpad only and
+asserted afterwards that `results/leaderboard.jsonl` was unchanged and
+no pf figure was created in `figs_writeup/`. Both true.
+
+**Ready for wave 1**: `--tag interim --arm pf` renders the moment
+base-l12 rows land. PTR — runpod-2 owns the lane.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
