@@ -34,21 +34,22 @@ shuf gap flips POSITIVE (+0.0032) — first order-sensitive r1 signal.
 
 ## IN FLIGHT RIGHT NOW (check these FIRST on resume)
 
-- **GPU 1, pid 13644** — diag T4 interior cell only (T{16,1} DONE and
-  recorded in C1-D; T4 cannot change the A2-NO verdict — it fills the
-  20k interior curve). Lands ~01:35, then the diag DRAINS and GPU 1
-  FREES. Log `/workspace/logs/tscale_l2diag.log`. Watcher `bep02rmwy`
-  fires on pid exit.
-- **GPU 0, pid 20672** — t_sample attribution chain (L1, 4k, T16,
-  r1-min backbone): `r1min-ts16-4k` (t_sample=16 = NO subsampling; if
-  ≈ 0.9251 the win is per-sample-window-TopK + sequence serving, NOT
-  the curriculum) lands ~01:15, then `r1min-ts5-4k` (locked absolute
-  instance, asymmetry 3.2) ~02:15. Log
-  `/workspace/logs/tscale_l1_tsample.log`. Watcher `bzauur1hp` fires
-  on first DONE. Confound on record in C3: tokens/step scales with
-  t_sample at matched steps.
+- **GPU 0, pid 23234** — **C5** `c5-batchsel-4k` (r1-min +
+  train_select=batch: SUSTAINED pooled-admission pressure — the C4
+  arrow), T1 then T16; T1 lands ~02:25, T16 ~03:30. Log
+  `/workspace/logs/tscale_c5_batchsel.log`, watcher `b2bfxb1fd` on
+  first DONE. § 3 gates as written: T1 ≥ 0.8844 is THE number; then
+  T16 must hold ≈ 0.92 (H-fail-T16 = pooled budget kills the window
+  win, echoing C2).
+- **GPU 1, pid 22305** — **C4 T16 cell** (k-anneal; T1 already
+  recorded 0.8171 = dose–response FAIL). Lands ~02:50 → C4 verdict
+  line (did the anneal at least not hurt T16?). Log
+  `/workspace/logs/tscale_c4_kanneal.log`, watcher `bxsnvg3cd` on
+  second DONE.
+- DONE tonight: diag CLOSED (20k monotone rising, A2 NO), ts
+  attribution (interior max at ratio rule, tokens-confound dead).
 - If resuming without watchers: read the two logs + tscale/results/
-  l1_rows.jsonl tails.
+  l1_rows.jsonl tails; RESULTS.md index table is current.
 
 ## Verdict + numbers ledger (dev-8 s42, 4k steps unless noted; k20)
 
