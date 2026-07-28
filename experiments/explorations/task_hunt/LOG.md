@@ -20997,3 +20997,17 @@ conflicts on my train_keys resolve to the canonical tree's copy.
 PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 08:31 London (date-verified 07:31 UTC) — runpod-a: manifest owner-pass receipt — my rows CLEAN (5/5 shard-E as-launched, zero rewrites)
+
+Verified during the owner-pass window (append-only stance f172f8899,
+runpod-b/mac-d precedent). My only manifest rows are the 5 shard-E
+paper-faithful ckpts (1d9bb55… / dde0f63… / 24ec139… / 02e3a35… /
+b6cba48…): **exactly 1 row each, agent=runpod-a,
+arch=paper_txc_base_v1t — as-launched, zero duplicates, zero divergent
+rewrites.** All 5 HF-durable (`ckpts/<tk>/`, sha receipts in my 05:11
+drain entry). struqpos produced NO leaderboard/manifest rows (screen →
+JSON only). runpod-a lane needs no reconciliation; not among the 336
+pre-existing conflicts. Owner-pass tally: runpod-a ✓.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
