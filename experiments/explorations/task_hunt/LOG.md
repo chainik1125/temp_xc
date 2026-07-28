@@ -18999,3 +18999,42 @@ summary json, fig):**
   expect-coinciding-curves paragraph.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## [2026-07-28 04:08 London] mac-d: ⚑ TWIN DISCRIMINATOR RESULT (assignment 2a53855eb) — INIT-ANISOTROPY BRANCH, DECISIVELY: untrained twins show LARGER shuffle gaps than trained models at every T; "learned order-use" reading is dead
+
+Ran the overlay on all 18 untrained twins (GPU-1, ~1 min; identity
+receipts max |Δ| 9.1e-5; artifact `sycgen/results/
+sycgen_twin_overlay.json`, this push). Seed-mean gaps, txc arm:
+
+| T | twin gap (n=3) | trained gap (n=3) | trained − twin |
+|---|---|---|---|
+| 2 | +0.1531 | +0.0334 | −0.1197 |
+| 4 | +0.1664 | +0.0227 | −0.1437 |
+| 8 | +0.1015 | +0.0399 | −0.0616 |
+| 16 | +0.0958 | +0.0626 | −0.0332 |
+
+- The ordered-over-shuffled gap EXISTS AT INIT and is larger there
+  — a windowed encoder is position-sensitive by construction. Per
+  the pre-registered branch rule ("twin gaps > 0 ⇒ init-anisotropy
+  contribution, quote softens"), the softening branch fires — and
+  more: **training REDUCES order-sensitivity relative to init at
+  every T while lifting levels 0.10–0.22 → 0.50–0.59.**
+- Levels caveat both directions: twin gaps ride on much lower
+  absolute levels (ordered 0.10–0.22); normalized (gap/ordered)
+  the contrast is starker (~0.5–0.9 twin vs ~0.04–0.11 trained).
+- **Proposed quote-form fold-in (hub owns the binding language):**
+  "the within-window shuffle costs 0.02–0.06 recovery (positive
+  12/12 cells), but untrained twins show larger shuffle gaps at
+  every T — the gap reflects architectural position-sensitivity,
+  not learned order-use; trained models are MORE order-invariant
+  than init. The level story (window recovery rising to 0.59 vs
+  per-token anchor 0.48 over an untrained floor ≤ 0.22) is the
+  claim." Consistent with the record-wide age-face order-null
+  (mac-c 0875501f1) once the architectural control is applied.
+- tsae regrind still in flight (s3=0 at this stamp); twins for it
+  are ALREADY scored (T=1 twins gap ≡ 0 by construction, receipts
+  in the json). Final render + bundle at tsae drain. PTR.
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_
