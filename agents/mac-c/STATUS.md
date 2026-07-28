@@ -1,207 +1,147 @@
 # mac-c — STATUS
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
-**Lane:** ELICITATION HARNESS OWNER (authorized `63864ae66`, 2026-07-28)
-**Last update:** 2026-07-28 ~01:35 London
+**Lane:** ELICITATION HARNESS OWNER + hunt candidate screening
+**Last update:** 2026-07-28 ~04:20 London — **rewritten for compact**
 
-## Current task: harness build — cards FROZEN + RATIFIED, generation NOT yet running
+---
 
-**Frozen & pushed `1a955344c`; RATIFIED by mac-local** ("what
-full-throttle looks like done right"; vocabulary control as a STOP
-condition singled out; CPU-stub claim-zone validation before GPU spend):
+# RESUME HERE (post-compact)
 
-- `labels/elicit_lib.py` — harness core. Tonight's three kill-lessons
-  are **scaffold parameters, not comments**: event spacing chosen for
-  the clock (`realised_gaps` receipt), topic drawn independently of the
-  event schedule, no sentence-scale kernels.
-  **`vocabulary_control_check` is a STOP condition** — spread ⇒ the
-  `retryesc` leak is being rebuilt ⇒ do not trust the corpus.
-- `labels/evalage_lib.py` + `evalage/CARD.md` — corpus 2 pick.
-  **Deliberately NOT menu #12** (a marker-RATE face I predicted dies);
-  bars-first **T2 age** redesign. CPU stub: claim zone
-  **0/0/0.8/5.5/14.7 %** at T=4/8/16/32/64; plan vocab cv **0.048**.
-- `labels/run_elicit.py` — turn-major batched runner (all docs advance
-  one turn per step; causally correct within a document).
+## State in one paragraph
 
-## Pod + spend (governance-compliant)
+The elicitation harness is built, ratified, and has produced its first
+corpus. **`evalage` (my bars-first redesign of menu #12) passed ALL SIX
+label-side bands** — the first candidate to clear that gate since the
+harness was authorized. It is **NOT a KEEP**: every band is label-side
+and **no probe has run**. Two blockers stand between it and a screen
+(below). `sycgen` is being screened by mac-d on their own pod (not
+mine). `retryesc_gen` is mine to design and not started.
 
-**`vyp2zlq13cf7df` = `mac-c-hunt-0728`**, L40S 48GB, **$0.99/h**.
-SSH `root@103.196.86.47 -p 42839` (key `~/.ssh/id_ed25519`).
-Ledgered at spin-up AND the correction in `MODAL_SPEND.md § RUNPOD`.
-**Spend so far ≈ $0.5 of the ≤$100 slice.** I own this pod alone and
-have touched no other. Key: keychain `dmitrys-runpod-api-key`,
-env-inject only, never printed/filed/argv.
+## The evalage result (`ad21f651d`)
 
-**Backend = pod-hosted OPEN WEIGHTS** (`Qwen/Qwen2.5-7B-Instruct`).
-The Anthropic personal key was withdrawn (`a073c3913`); my choice was
-already open-weights and is unchanged — pinned weights give exactly
-reproducible provenance, and the probe target is our own models reading
-the TEXT, so generator choice affects realism, not what we measure.
+| band | bar | evalage | retryesc (KILLED) |
+|---|---|---|---|
+| **unigram** | ≤0.60 | **0.586** [0.572,0.602] | 0.689–0.716 ✗ |
+| doc-mean | ≤0.88 | 0.678 | 0.865–0.879 |
+| position | ≤0.95 | 0.781 | 0.720–0.743 |
+| strata | ≥8 | 62/85 | 213–270 |
+| usable | ≥250k | 1,487,396 | 2.7–3.4M |
+| events | ≥300 | 1,542 | 4,993 |
 
-## Bring-up: 4 attempts, all POD-ENVIRONMENT mechanics (design untouched)
+400 docs / 2,037,398 tok / 1,731,701 eligible rows. Floors weak as
+designed (censored-age 0.500/0.500/0.504/0.525/0.567); claim zone
+0/0/0.27/1.69/4.48% at T=4..64 (the `sage` shape). Corpus receipt:
+realised gap median **862** (card predicted ~900), vocabulary control
+**cv 0.1346** (`sycgen` failed the same STOP at 0.749).
 
-1. First pod had no `PUBLIC_KEY` env ⇒ sshd refused ⇒ **terminated at
-   ~3 min ≈ $0.05**, recreated with the key. Ledgered as waste, not
-   absorbed.
-2. `pgrep -f run_elicit` **false positive** (matched my own SSH command
-   string) — nearly reported a launch that never happened. **Verify
-   from the LOG FILE, never a process-name match.**
-3. zsh does not word-split `$S 'cmd'` ⇒ staging was a silent no-op.
-   Fixed with a shell function.
-4. `pip install vllm==0.6.3.post1` **downgraded torch to cu121 and
-   broke the system transformers** (`DTensor` ImportError). Fix in
-   flight: isolated venv at `/workspace/hunt/venv` so vLLM pulls its
-   own matched torch; system image left alone.
+**Why it matters:** `retryesc` died because task vocabulary predicted
+the label; the harness was authorized on the argument that generation
+designs that channel out. 0.586 is that argument holding **at the
+face**, not merely in the corpus.
 
-**Staged on pod (committed files verbatim, no retyping):**
-`/workspace/hunt/pkg/{__init__,elicit_lib,evalage_lib,run_elicit,lib}.py`
-(`lib.py` = a 6-line `doc_split` shim so package-relative imports
-resolve).
+## BLOCKER 1 — only the gpt2 leg exists (3-tokenizer rule UNMET)
 
-## LIVE STATE (2026-07-28 ~02:30) — two lanes running in parallel
+The stream carries gpt2 ids only. gemma2/llama31 are recorded
+**NOT RUN**, not assumed. To complete: the `.npz` stores ids +
+`event_mask` + `probe_eligible`, so turn boundaries are recoverable as
+contiguous runs of those flags — segment by run → `gpt2.decode` →
+re-encode per tokenizer → rebuild the three flag arrays.
+**Verify before trusting: event count must equal 1,542 on every leg and
+realised gaps must stay near median 862.** An error silently moves
+event positions and destroys the exact-labels property that is the
+entire point of the harness. Do it carefully or not at all.
 
-**1. GENERATION — `evalage` v1 RUNNING on the Claude API** (confirmed
-from the log, not pgrep). Local process, log at
-`<scratchpad>/evalage_v1.log`; writes
-`labels/elicit_evalage_v1.npz` + `_receipt.json`.
-Model `claude-haiku-4-5-20251001`, 400 docs, seed 0.
-Cost ~$25–34 of a $40 pre-registered cap (revised UP from $10–25:
-each turn re-sends the transcript). Smoke (4 docs) passed: gaps
-244–1731 tok, **vocab spread 0.0004** on generated text.
+## BLOCKER 2 — the screen itself
 
-**2. SCREEN POD — `4dztelehvj8l5n` = `mac-c-screen-0728`**, L40S
-48GB, **$0.99/h**, 150GB vol, `PUBLIC_KEY` injected at create.
-**Stated purpose (required by the amended warm-hold policy):**
-pre-stage gpt2/gemma2/llama31 + cache builders so the `evalage`
-screen starts within minutes of the corpus landing; then screen
-evalage → sycgen_age → retryesc_gen. **Warm-hold until the LANE is
-done, not between stages.** Get its SSH port via the API `pod`
-query (ports change per pod). NOT yet staged — that is the next
-pod-side task.
+On `mac-c-screen-0728` (below), **per-token baseline FIRST** (standing
+rule; `emoinst` died exactly there), hunt4 §4 KEEP/KILL verbatim.
+A KEEP triggers mac-d's warm-pod matrix retrain within the hour
+(pre-authorized).
 
-**Generation pods are GONE** (`tbxn8b3rsk1hnt`, `vyp2zlq13cf7df`):
-terminated, API-verified, ~$0.85, zero output — vLLM would not
-build against the image torch.
+## Pod
 
-## ⚑⚑ `evalage` PASSED ALL SIX LABEL-SIDE BANDS (04:10, `ad21f651d`)
+**`4dztelehvj8l5n` = `mac-c-screen-0728`**, L40S 48GB, **$0.99/h**,
+150GB vol, `PUBLIC_KEY` injected at create.
+SSH was `root@202.181.159.234 -p 10751` — **ports change on restart,
+re-query the API**. NOT staged yet (no tokenizers/cache builders).
+**⚠ WARM-HOLD GUARD: if the evalage screen has not started by ~06:00
+London, TERMINATE it and re-provision later.** My absence must not turn
+a legitimate warm-hold into an idle GPU.
 
-**unigram 0.586** (bar 0.60; `retryesc` died at 0.689–0.716) — the
-harness thesis holding AT THE FACE. doc-mean 0.678, position 0.781,
-62/85 strata, 1,487,396 usable, 1,542 events. Floors weak as designed
-(censored-age 0.500→0.567), claim zone 0/0/0.27/1.69/4.48 %.
-**NOT a KEEP — all label-side, no probe run.** Corpus durable at
-`hunt_corpora/evalage_20260728/`.
+Key: keychain `dmitrys-runpod-api-key`, env-inject only, never
+printed/filed/argv. $10/h cap. Never touch pods I did not spin up.
 
-### Blocker before the evalage screen: only the gpt2 leg exists
+## Two fixes I OWE (both flagged publicly, neither started)
 
-The 3-tokenizer rule is **unmet** — the stream carries gpt2 ids only;
-gemma2/llama31 are recorded NOT RUN, not assumed.
+1. **`run_elicit` must save raw transcripts** (JSON) beside the `.npz`
+   so re-tokenization is lossless instead of reconstructed. This is
+   what created Blocker 1.
+2. **`vocabulary_control_check` must report BOTH legs** —
+   events/conversation AND tokens/conversation — so the length channel
+   that killed `sycgen` is caught at PLAN time. `evalage` passed that
+   channel by luck (uniform `max_new`), not by design; I said so in the
+   LOG and it stays said.
 
-**How to complete it (approach, not yet started):** the `.npz` stores
-ids + `event_mask` + `probe_eligible`, so turn boundaries are
-recoverable as contiguous runs of those two flags. Segment by run →
-`gpt2.decode` each segment → re-encode with gemma2/llama31 →
-rebuild `event_first`/`event_mask`/`probe_eligible` per tokenizer.
-**Verify before trusting:** event count must equal 1,542 on every leg,
-and realised gaps must stay near median 862. An error here silently
-moves event positions, which destroys the exact-labels property that
-is the entire point of the harness — do it carefully or not at all.
+Also standing: **checkpointing is BLOCKING for every generation card**
+(ruled). Mechanism exists in `elicit_lib` (`save_ckpt`/`load_ckpt`,
+atomic, degrades safely, round-trip tested); `run_evalage`/`run_sycgen`
+still need the 3-line wiring.
 
-**⚠ HARNESS GAP I OWN (fix before the next corpus):** `run_elicit`
-writes only the tokenized stream, not the raw transcripts. Saving
-`turns` as JSON beside the `.npz` would make re-tokenization trivial
-and lossless instead of a reconstruction. Add it alongside the
-checkpoint clause.
+## Queue
 
-## ⚑ SCREEN `sycgen` — TAKEN BY mac-d on their pod (not mine to execute)
+1. evalage: finish 3 legs → screen (mine)
+2. sycgen: mac-d executing on THEIR pod — I sequence, they run
+3. `retryesc_gen`: mine, design not started; enters **UNTESTED, not
+   rescued** (all its passing bands were label-side, no probe ran) and
+   is checkpointing-blocked
 
-Order `dc3cb8fd9`. My (c) disposition worked — mac-d's within-domain
-analysis RESCUED sycgen without regeneration (within-domain doc-mean
-**0.636–0.795** vs 0.858 pooled/confounded; position 0.608–0.731;
-**511,907 usable tokens** ≥ 2× bar; 158 strata; trivia_qa thinness
-disclosed). **v2 stays shelved.**
+---
 
-**SCREEN POD IS WARM AND WAITING:** `4dztelehvj8l5n` =
-`mac-c-screen-0728`, L40S, $0.99/h,
-**ssh `root@202.181.159.234 -p 10751`** (ports change on restart —
-re-query the API if refused). Uptime ~80 min at handoff. NOT yet
-staged with tokenizers/cache builders.
+# Reference
 
-**FIVE BINDING IN-CARD CONDITIONS (verbatim from the order):**
-1. **WITHIN-DOMAIN frame is the pre-registered readout** — all arms,
-   all floors, all baselines within-domain.
-2. **PER-TOKEN BASELINE FIRST** (generated corpus, standing rule —
-   this is what killed `emoinst`).
-3. **Vocab band re-measured WITHIN-DOMAIN as part of the screen** —
-   the STOP fired on the pooled frame, so the screen must carry the
-   within-domain vocab numbers BESIDE the verdict.
-4. **hunt4 § 4 KEEP/KILL verbatim.**
-5. v2 shelved unless the screen surfaces a leak the frame does not
-   control.
+## Artifacts (all committed + pushed)
 
-**KEEP ⇒ mac-d's warm-pod matrix retrain within the hour
-(pre-authorized).** mac-d supports; execution is mine.
+Harness: `labels/elicit_lib.py`, `labels/run_elicit.py`.
+evalage: `evalage/CARD.md` (§9 = backend/provenance amendment),
+`labels/evalage_lib.py`, `labels/build_evalage_premeasure.py`,
+`labels/evalage_premeasure.json`.
+Corpus **durable on HF**:
+`han1823123123/temp-bench-data/hunt_corpora/evalage_20260728/`
+(npz sha256 `b5cd16b98e92299ea6e4…`, manifest committed in-tree;
+the `.npz` is gitignored — do not re-add it).
 
-**Handoff note:** I ran out of context before staging the pod. Nothing
-is half-done — no screen started, no partial artifacts. Start from
-staging.
+## Provenance caveat that must travel with any evalage quote
 
-**UPDATE — mac-d took the sycgen screen and is running it on THEIR
-2×H100** (`d23f8b8d9`), correctly declining to touch my pod
-(governance rule 3 has no owner-waiver clause — right reading). So
-sycgen is NOT mine to execute. **My L40S stays warm for MY lane: the
-`evalage` screen when generation drains.**
+Generated by `claude-haiku-4-5-20251001` (seed 0, temp 0.8) via the
+MATS key. The pin is **model-id + API version, not a weight sha** ⇒
+**reproducible-in-expectation, not bit-exact**. Labels are unaffected
+(the scaffold knows every cue position). Regenerable on open weights
+from the same frozen scaffold if bit-exactness is ever required.
 
-**⚠ WARM-HOLD GUARD (added because I am about to go dark):** the
-amended policy permits holding between stages, and `evalage`'s screen
-is a real imminent purpose — but that justification depends on someone
-picking the lane up. **If the `evalage` screen has not started within
-~2 h of generation draining, TERMINATE `4dztelehvj8l5n` and
-re-provision later.** Bring-up is not free (4 failed attempts tonight)
-but neither is an idle GPU with no one driving it. Do not let my
-absence convert a legitimate warm-hold into waste.
+## Closed this session (all ratified)
 
-## NEXT ACTION on resume
+`msdose_r1` KILLED; `sycgen` geometry-passed after my own clock-bar
+self-demotion; `dharm` KILLED on document length (155.6 tok/chain);
+`warddebt` no-screen (Ward sentence-kernels unreachable at our T);
+`retryesc` KILLED (task-vocabulary leak); menu-exhaustion report;
+harness scope estimate; kill triage (3 corrections accepted, incl. the
+new **structurally-unscreenable** class); corpus-split arbitration;
+checkpointing mechanism; `sycgen` disposition as design owner (the (c)
+within-domain call rescued it for $0 and shelved v2).
 
-1. `ssh -p 42839 root@103.196.86.47 'tail -20 /workspace/hunt/evalage_v1.log'`
-   — confirm generation from the LOG, not `pgrep`.
-2. If not running: `cd /workspace/hunt && HF_HOME=/workspace/hf nohup
-   ./venv/bin/python -m pkg.run_elicit --scaffold evalage --model
-   Qwen/Qwen2.5-7B-Instruct --n-docs 400 --out-tag v1 >
-   evalage_v1.log 2>&1 &`
-3. On drain: scp back `elicit_evalage_v1.npz` +
-   `elicit_evalage_v1_receipt.json`; **check `vocabulary_control` and
-   `realised_gaps` against the card BEFORE any screen**; then the
-   label-side bands (unigram ≤0.60, doc-mean ≤0.88, position ≤0.95,
-   ≥8 strata, ≥250k usable, ≥300 events) on all 3 tokenizers.
-4. **TERMINATE the pod at drain + API-verify**, actuals line to
-   `MODAL_SPEND.md`.
-5. Then corpus 1: `sycgen_age` scaffold (constants already frozen in
-   `sycgen_lib`; needs `are_you_sure.jsonl` seeds from the pinned
-   `meg-tong/sycophancy-eval` repo).
-6. **Delete `briefings/safety-hunt-continuation.md`** once generation
-   is confirmed running (its closing line).
+## Spend
 
-## Standing rules on this build
-
-Per-token baseline **binding** on every generated corpus; "geometry can
-kill but not clear"; bands **absolute only** (`msdose_r1` lesson);
-cards frozen before generation; full generation provenance in-receipt;
-corpus is **model-generated and disclosed as such** (exhibit-vs-appendix
-is the paper owner's call).
-
-## Closed earlier (all $0, all ratified)
-
-Round 1–2 (menu, txc_pro dig, second-source, re-entry packets, Tier-C
-designs). Execution lane: `msdose_r1` KILLED, `sycgen` ratified
-single-face after my own clock-bar self-demotion, `dharm` KILLED on
-document length (155.6 tok/chain). Hunt continuation: `warddebt`
-no-screen (Ward sentence-kernels unreachable at our T), `retryesc`
-KILLED (task-vocabulary leak), menu-exhaustion report → this build.
+~$0.85 sunk on two generation pods that produced nothing (vLLM would
+not build against the image torch; terminated + API-verified).
+evalage generation inside its $40 cap. Screen pod ~$1/h since ~02:25.
 
 ## Git / hygiene
 
-Branch `arxiv`, identity `mac-c-agent`. LOG collisions: union resolve
-(`sed -i '' -e '/^<<<<<<< HEAD$/d' -e '/^=======$/d' -e '/^>>>>>>> /d'`,
-`git add`, `GIT_EDITOR=true git rebase --continue`), verify anchored
-`grep -n '^<<<<<<<'`. Listener: re-arm after EVERY wake.
+Branch `arxiv`, identity `mac-c-agent`. LOG collisions are routine —
+union resolve (`sed -i '' -e '/^<<<<<<< HEAD$/d' -e '/^=======$/d' -e
+'/^>>>>>>> /d'`, `git add`, `GIT_EDITOR=true git rebase --continue`),
+verify with anchored `grep -n '^<<<<<<<'`.
+**Listener: re-arm after EVERY wake** —
+`zsh <scratchpad>/listener.sh` as a background task. On fire: read the
+output file, fetch+rebase, act only if addressed to mac-c, re-arm.
