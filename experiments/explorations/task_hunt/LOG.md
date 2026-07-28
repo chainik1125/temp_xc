@@ -26393,3 +26393,72 @@ anchor freeze, the renderer smoke filter, and the pod claim. None of
 them depended on the orphaning claim.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 14:08 London (date-verified 13:08 UTC) — mac-local (hub): **CORRECTION to my own urgent entry (I said "~20 minutes"; it was ~3)** + ⚑⚑⚑ **HAN: FAN OUT. The one-pod cap is RESCINDED — spin NINE.**
+
+### 1. Correction first, because I was unfair to mac-d in the binding record
+
+My previous entry (`aef57a7cd`) said mac-d had held a pod claim for
+"~20 minutes with no machine". **Wrong.** mac-d claimed at 14:02
+(`e0ebd0d28`); I wrote that at ~14:05. **It was about three minutes.**
+The timestamp itself was `date`-derived and correct — **the arithmetic
+in the prose was mine and it was wrong**, and it turned a normal
+provisioning interval into an accusation.
+
+**Withdrawn, with apologies to mac-d.** The § 2 directive below stands
+on Han's instruction, not on any failure of theirs. (Same class of slip
+as my three timing misquotes today: I keep asserting numbers I have not
+actually computed. The clock is not exempt from the rule I adopted at
+14:0x — **derive it, don't estimate it**.)
+
+**Also noting mac-d's own retraction (`07df34d64`), which landed
+independently of mine:** they killed the btk-orphaning flag themselves
+at 26/26 and named three of their own errors, with the right lesson —
+*"total-failure readings indict the instrument first."* That is the
+standard. Two independent retractions of the same false alarm inside
+ten minutes is the review loop working.
+
+### 2. ⚑⚑⚑ Han (14:08): *"an agent can LITERALLY SPIN UP 10 runpods at will"*
+
+**He is right and my "ONE pod, ONE owner" rule was an over-correction.
+It is RESCINDED.**
+
+What made this morning chaotic was **resident agents coordinating over
+shared machines** — stale directives, liveness ambiguity, "who owns
+pod B". **None of that is a property of machine count.** One agent
+driving ten pods through `podctl.sh` has *zero* coordination surface:
+one owner, one key, one script, terminate-at-cell-end. I took the
+lesson "fewer agents" and wrongly also applied it to "fewer GPUs",
+which turned the hub into the bottleneck it was supposed to remove.
+
+### 3. The fan-out, concrete — mac-d executes NOW
+
+**Grid:** T{1,2,4,6,8,10} x seeds{42,1,2} = **18 cells**. T16 stays out
+even with residency (69.3 + 14.2 GiB buffer = **83 GiB > 80**), and it
+is still not an upstream cell.
+
+**Shape: one cell per GPU, no co-tenancy.** `podctl.sh create` gives
+**2xH100 80GB SXM**, so **9 pods x 2 cells = 18 cells in ONE WAVE.**
+Refusing co-tenancy is deliberate — packing is what produced today's
+OOM archaeology, and at these prices the second lane is not worth the
+risk.
+
+**Per-GPU budget with `TEMP_BENCH_BUFFER_RESIDENT=1`** (model + the
+14.2 GiB resident buffer): T1 17 · T2 19 · T4 24 · T6 32 · T8 42 ·
+T10 53 GiB. **All single-lane-safe on an 80 GB card.**
+
+**Cost, stated up front:** ~9 x 2xH100 secure ≈ **$45/h**; at ~1–3 h
+per cell that is **~$50–150 for the entire grid**, against the $500
+aggregate cap and $0 currently burning. **Terminate each pod at cell
+end, ledger both ends.** If nine is not available, take what is and
+run the rest as wave 2 — **do not serialise waiting for a full set.**
+
+**mac-d owns all nine.** Single owner is the part of the old rule that
+survives; the cap on *count* is gone.
+
+### 4. Still true at this stamp: ZERO GPUs live (API-verified)
+
+The fix is on origin, receipted at ~16x on the refill, and it is
+sitting idle. **Everything needed to start exists. Start.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
