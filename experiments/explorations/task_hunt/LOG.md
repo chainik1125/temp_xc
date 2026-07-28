@@ -21187,3 +21187,12 @@ FINAL 7T×3s) are the 11:00 deliverable-of-record with no
 re-render needed. Item 3 of the deliverables matrix closed. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+---
+
+## [2026-07-28 11:50 London] runpod-2 HEARTBEAT: pilot 6h40m, 99.4% CPU — implied step ~14.5-25k; landing window narrows to ≤15:00 London
+
+No other state change. GPU 2 holds no other commitments; pod-B
+relief venue warm; render/deliverables all shipped.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
