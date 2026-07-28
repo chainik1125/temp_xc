@@ -36401,3 +36401,121 @@ be void under A1. Both are pre-spend.
 Cost: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-29 00:4x — mac-d: SHUFFLE LANE SCOPED BEFORE SPENDING. The 20×H100 authorization is ~15× more than this experiment can use, and I nearly published a false "weights are gone" for the second time in one night
+
+**Briefing `sycgen-shuffle-sparsity-matched.md` accepted (owner mac-d
+executor).** Nothing launched yet — this entry is the pre-spend
+estimate the brief requires, plus two facts that change the decision.
+
+### 1. ⚑ ALL 15 CHECKPOINTS EXIST — and my first search said 0 of 15
+
+The brief says *verify weight existence FIRST*, so I did, and the check
+**nearly produced the exact false claim mac-c corrected me on four
+hours ago.**
+
+I intersected the 15 item-6 `train_key`s against every HF **model**
+repo under the account — 5 repos, **1506** `train_key` dirs, with a
+positive control that fired (a known-mirrored key resolved). Result:
+**0 of 15.** Local disk agreed: 15 leaderboard rows under
+`sycgen_keep_r1_rebuilt`, **0** `model.safetensors`. The manifest's 6
+matching entries are from the ORIGINAL pod-D run
+(`ts 2026-07-28T01:40`, `local_path /workspace/...`, `hf_url: null`),
+and **0 manifest entries exist after 2026-07-28T20:00Z** — tonight's
+rebuilt run registered nothing before its pod died.
+
+Every one of those checks was individually correct and the conclusion
+was still wrong. **The mirror is not in a model repo.** It is the
+**dataset** repo `han1823123123/temp-bench-data`, prefix
+`ckpts/<train_key>/model.safetensors` — 135 key dirs.
+
+    ckpts/ intersection: FOUND 15 of 15   (3 SAE + 12 TXC)   MISSING 0
+
+**mac-c was right and I was one command from re-asserting a retracted
+claim in a second lane.** What caught it was not care — it was
+**sweeping path SHAPES I had not assumed** (`sycgen`, `btkonly`,
+`ckpts/`, `hs14`) across *both* repo types. A search scoped to where I
+expected the answer returns a confident zero. **`repo_type` is part of
+the search space, not a constant.** This is instance 9 of a guard
+reporting success while doing nothing — here, "0 hits, method verified"
+where the method was verified on the wrong half of the corpus.
+
+⇒ **No retraining. The trained arms are a ~1 GB download.**
+
+### 2. What DOESN'T exist: the activation cache. That is the whole cost
+
+`sycgen_real_age_llama31_8b_l14` resolves to
+`real_sycgen.py:79-84` → `/workspace/sycgen_caches/llama31_8b/hs14.npy`
+— a hardcoded pod path, **no HF fallback, not mirrored** (searched:
+`hs14` → 0, `caches` → 0, `tokens.npz` → 0). Pod-local, pod terminated.
+
+Rebuild cost, measured off the committed grid
+(`grids/elicit_sycgen_screen_llama31.npz`, 943,574 tokens / 400 docs):
+
+    rows N = 7239   x 128 seq  x 4096 d_in
+    forward pass    = 926,592 tokens through llama-3.1-8B
+    hs14.npy fp16   = 7.59 GB
+
+### 3. PRE-SPEND ESTIMATE: 1 GPU, ~1.5-2 h, ~$4-6 — not 20×H100/$60/h
+
+**There is no training in this lane.** The 15 checkpoints exist; the
+untrained twins are random init; the arms are post-hoc transforms and
+the sweep is encode-and-probe. The only heavy step is **one forward
+pass of an 8B model**, which produces **a single shared artifact** —
+it does not shard usefully across 20 pods, each of which would
+re-download 16 GB of weights to rebuild the same 7.59 GB file.
+
+    1x A100/H100          ~$2-3/h
+    model dl + cache build  ~20-30 min
+    ckpt dl (15, ~1 GB)      ~2 min
+    encode-and-probe sweep  ~30-60 min
+    ---------------------------------
+    TOTAL                 ~$4-6
+
+**$60/h was authorized, not requested.** I am spending ~8% of it
+because that is what the experiment costs. Flagging explicitly so the
+gap between the authorization and the burn is a recorded decision and
+not something a later reader has to reconstruct.
+
+**I will also mirror the rebuilt cache to HF** (`ckpts/`-style, under
+the data repo). Its absence is precisely why tonight's item-6 run had
+to retrain 15 cells; leaving it pod-local again would re-buy the same
+loss a third time.
+
+### 4. One design decision I am flagging rather than burying
+
+The existing exhibit (`shuffle_overlay.py:97`) uses a **FIXED probe** —
+fit on ordered train, score the *same* probe on shuffled eval, never
+refit (`SHUF_EVAL_SEED = 0`, `shuffle_within_window`). I inherit it
+verbatim, because the brief's whole purpose is to make the two sycgen
+exhibits **cross**, and a second instrument would not cross anything.
+
+But it is worth stating what a fixed probe measures for **stacked**
+specifically: shuffling moves a token's features to a different
+`p*d_sae+f` slot, so the fixed probe breaks partly from **slot
+scrambling**. One can argue that IS the order-sensitivity under test
+(stacked genuinely encodes position, and destroying it genuinely breaks
+the readout) — that is why it stays primary. But it conflates "the code
+moved" with "the information is gone," and it inflates the baseline
+**against** TXC's claim.
+
+⇒ Pre-registering a **secondary refit-probe column** (fit on shuffled,
+score on shuffled) as the disambiguator for outcome **(b)**. Marked
+secondary in the card before any number exists, so it cannot be
+promoted after the fact if the primary disappoints.
+
+### 5. Second free instrument check, available because of §4
+
+Pooled's l0 (union over positions) and stacked's (sum over positions)
+are both **symmetric functions of position** ⇒ realized budget should
+be **permutation-invariant** for both SAE arms. That is a prediction,
+so it gets **measured, not asserted**, alongside pooled's zero-gap
+gate. TXC's l0 may legitimately move under shuffle; matched budget is
+therefore defined on the **ORDERED** operating point, with the shuffled
+l0 reported beside it.
+
+Card next, committed before any cell runs. No pods up; $0/h.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
