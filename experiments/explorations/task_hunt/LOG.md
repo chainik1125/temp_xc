@@ -29498,3 +29498,105 @@ than writing a competing one while they wrote theirs. **The recovery
 cost more than the coordination would have.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+---
+
+## 2026-07-28 16:06 London (date-verified at write) — mac-c: **`retryesc_gen` SCREEN VERDICT — WEAK 3/3.** The gain bar was CLEARED on every leg (+0.063…+0.069) and **the floor clause killed it on every leg**. The density lever worked; my aiming instrument was biased low by 0.07 and that is what cost the KEEP
+
+Full writeup `retryesc_gen/RESULT.md`. Pod **TERMINATED + API-verified
+(0 mac-c pods)**. Screen $0.68; candidate total ≈ **$22**.
+
+### 1. Verdict
+
+| leg | tok | window | **gain** | floor@bestT | wd gain | verdict |
+|---|---|---|---|---|---|---|
+| gpt2 | 0.3669 | 0.4314 | **+0.0645** | 0.5942 ✗ | +0.0540 | WEAK |
+| gemma2_2b | 0.3734 | 0.4424 | **+0.0690** | 0.6083 ✗ | +0.0857 | WEAK |
+| llama31_8b | 0.3910 | 0.4539 | **+0.0630** | 0.6219 ✗ | +0.0793 | WEAK |
+
+Gain, null and `wd_ok` passed on all three. **`floor_ok` False 3/3.**
+No kill clause fired.
+
+### 2. A scissors, identical on all three legs
+
+| gpt2 | T4 | T8 | T16 | T32 | T64 |
+|---|---|---|---|---|---|
+| gain | +0.012 | −0.001 | +0.003 | +0.022 | **+0.065** |
+| arm − floor | **+0.025** | −0.008 | −0.041 | −0.092 | **−0.163** |
+
+**Where the window becomes useful, the visible cue has already outrun
+it.** Small T: arm beats floor, no gain. Large T: real gain, loses to
+floor by 0.16. They never coincide — which is why it is WEAK and not
+KILL (clause 3 needs *all* arms below their floors; T4/T8 are above).
+
+### 3. Pre-registration audit — 4/4 directionally right, one severity wrong
+
+| predicted (before any GPU) | outcome |
+|---|---|
+| density in band ⇒ **gain clears +0.05** | ✅ **+0.065 / +0.069 / +0.063** |
+| ⚠ floor is the live risk, llama31 the leg to watch | ✅ direction, ❌ **severity — I predicted a split; all three failed** |
+| `wd` must not erase the arm | ✅ +0.054 / +0.086 / +0.079, `wd_ok` 3/3 |
+| age face fails the order ladder | ✅ False 3/3 — age faces now **0/12** |
+
+### 4. ⚑ The density thesis is CONFIRMED as a design instrument
+
+Same face family, same helpers, same bars — only the clock changed:
+
+| | `evalage` (f = 0.045) | **`retryesc_gen` (f = 0.185)** |
+|---|---|---|
+| gain | +0.040 / +0.046 / +0.031 | **+0.065 / +0.069 / +0.063** |
+| wd gain | +0.037 / +0.041 / +0.059 | **+0.054 / +0.086 / +0.079** |
+
+**Raising in-window event mass moved the gain from below the bar to
+above it on every leg, exactly as predicted in advance.** That is the
+strongest thing in this lane and it survives the WEAK.
+
+### 5. ⚑ And my aiming instrument was biased LOW — this is what cost the KEEP
+
+| leg | `f` I aimed with | **measured `floor_excess`** | under-read |
+|---|---|---|---|
+| gpt2 | 0.1853 | **0.2608** | **−0.076** |
+| gemma2_2b | 0.2064 | **0.2750** | −0.069 |
+| llama31_8b | 0.2230 | **0.2886** | −0.066 |
+
+**All three landed ABOVE the +0.25 upper edge** — the region I had
+myself recorded as where cells lose to their own floor. **I believed I
+was mid-band at 0.185; I was over the edge at 0.261.** The band was
+right; the instrument was not.
+
+**Leading explanation, flagged as hypothesis not mechanism:**
+`claim_zone` measures `f` on the **raw eligible population**; the floor
+is fit on the **class-balanced manifest**, which oversamples the low-age
+class to 1/3. Predicts bias scaling with `T/e1` — `evalage` 64/429 =
+0.15 (bias negligible, K = 0.96 measured), `retryesc_gen` 64/120 = 0.53
+(bias −0.07 measured). **Consistent with both points and needs a direct
+test** (recompute `f` on manifest rows) before anyone relies on it.
+**The correction itself is not hypothetical:** `f` under-reads the
+screen's floor whenever the low tercile edge is near T.
+
+⚠ **Fourth error in one family in one day** — "capped at 1/3", `K =
+0.63`, the uniform-position gap map, and now this. The first three cost
+nothing because the bar was written on a measured quantity. **This one
+cost the KEEP**, because I measured the right concept on the wrong
+population.
+
+### 6. Disposition, and a temptation I am naming rather than acting on
+
+**Item 7 still has no KEEP.** The obvious move is to **aim lower** —
+measured `floor_excess` ~0.15–0.20 ⇒ `claim_zone f` ≈ 0.08–0.13 ⇒ a
+longer gap. Regeneration ≈ $21, screen ≈ $1.
+
+**For:** the band was pre-registered before any of this, the curve rests
+on 15 independent faces, and the bias is now *measured*. A calibrated
+re-aim, not a fish.
+
+**Against, and I am not soft-pedalling it:** I have taken my one
+pre-registered shot and missed high. **A second attempt is a second
+draw on the same corpus family, and if I re-tune until something
+clears, the eventual pass means much less than it looks like.** Doing
+it honestly needs its own card, its own freeze, and an explicit
+"attempt 2 of a tuned parameter" label.
+
+**Hub decision, not mine to take unilaterally.** The WEAK is recorded
+as a WEAK either way — same as `evalage`, same hand.
+
+_Recorded-by: claude-opus-5 (mac-c)_

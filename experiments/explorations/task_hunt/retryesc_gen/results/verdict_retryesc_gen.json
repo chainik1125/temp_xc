@@ -1,0 +1,212 @@
+{
+ "card": "retryesc_gen/SCREEN_CARD.md \u00a7 3.5 (mechanical, hunt4 rules)",
+ "status": "PENDING TEAM REVIEW",
+ "frame": "GLOBAL terciles (card \u00a7 3.1)",
+ "models": {
+  "gpt2": {
+   "retryesc_age": {
+    "tok_best": 0.3669,
+    "window_best": 0.4314,
+    "window_best_arm": "T64/actxmean_linear",
+    "gain": 0.0645,
+    "exists_qualifying_arm": false,
+    "null_win": 0.3351123034954071,
+    "null_ok": true,
+    "floor_at_best_T": 0.5941739082336426,
+    "floor_ok": false,
+    "wd": {
+     "present": true,
+     "tok": 0.5711666345596313,
+     "best": 0.625166654586792,
+     "best_arm": "T64/actxmean_mlp",
+     "gain": 0.054,
+     "order_margins": {
+      "T4": 0.0018,
+      "T8": 0.009,
+      "T16": -0.0042,
+      "T32": 0.0108
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": false,
+    "verdict": "WEAK"
+   }
+  },
+  "gemma2_2b": {
+   "retryesc_age": {
+    "tok_best": 0.3734,
+    "window_best": 0.4424,
+    "window_best_arm": "T64/actxmean_mlp",
+    "gain": 0.069,
+    "exists_qualifying_arm": false,
+    "null_win": 0.34602537751197815,
+    "null_ok": true,
+    "floor_at_best_T": 0.6083277463912964,
+    "floor_ok": false,
+    "wd": {
+     "present": true,
+     "tok": 0.5706666707992554,
+     "best": 0.656333327293396,
+     "best_arm": "T64/actxmean_mlp",
+     "gain": 0.0857,
+     "order_margins": {
+      "T4": -0.0043,
+      "T8": -0.0018,
+      "T16": 0.0077,
+      "T32": 0.0
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": false,
+    "verdict": "WEAK"
+   }
+  },
+  "llama31_8b": {
+   "retryesc_age": {
+    "tok_best": 0.391,
+    "window_best": 0.4539,
+    "window_best_arm": "T64/actxmean_mlp",
+    "gain": 0.063,
+    "exists_qualifying_arm": false,
+    "null_win": 0.34178903698921204,
+    "null_ok": true,
+    "floor_at_best_T": 0.6219403743743896,
+    "floor_ok": false,
+    "wd": {
+     "present": true,
+     "tok": 0.5789999961853027,
+     "best": 0.6583333015441895,
+     "best_arm": "T64/actxmean_mlp",
+     "gain": 0.0793,
+     "order_margins": {
+      "T4": -0.0087,
+      "T8": -0.0095,
+      "T16": 0.0072,
+      "T32": 0.0083
+     }
+    },
+    "wd_ok": true,
+    "kill_clauses": [],
+    "order_pass_wd": false,
+    "verdict": "WEAK"
+   }
+  }
+ },
+ "vocab_beside_verdict": {
+  "gpt2": {
+   "n_topics": 16,
+   "n_topics_scored": 16,
+   "n_topics_thin": 0,
+   "worst_topic_unigram_auc": {
+    "topic": "3",
+    "auc": 0.5747525502888279
+   },
+   "median_topic_unigram_auc": 0.530049388954525,
+   "events_per_conv_cv": {
+    "max": 0.3717568089490763,
+    "median": 0.29383735077569584
+   },
+   "tokens_per_conv_cv": {
+    "max": 0.2369455988173727,
+    "median": 0.1709572724558691
+   },
+   "two_leg_note": "both legs reported on purpose \u2014 my vocabulary_control_check collapsed them into events-per-token, so evalage passed the LENGTH channel by luck (uniform max_new), not by design"
+  },
+  "gemma2_2b": {
+   "n_topics": 16,
+   "n_topics_scored": 16,
+   "n_topics_thin": 0,
+   "worst_topic_unigram_auc": {
+    "topic": "11",
+    "auc": 0.6010085859250005
+   },
+   "median_topic_unigram_auc": 0.5303218726312182,
+   "events_per_conv_cv": {
+    "max": 0.3717568089490763,
+    "median": 0.29383735077569584
+   },
+   "tokens_per_conv_cv": {
+    "max": 0.2357814974662203,
+    "median": 0.1760582331526258
+   },
+   "two_leg_note": "both legs reported on purpose \u2014 my vocabulary_control_check collapsed them into events-per-token, so evalage passed the LENGTH channel by luck (uniform max_new), not by design"
+  },
+  "llama31_8b": {
+   "n_topics": 16,
+   "n_topics_scored": 16,
+   "n_topics_thin": 0,
+   "worst_topic_unigram_auc": {
+    "topic": "11",
+    "auc": 0.5943537488461662
+   },
+   "median_topic_unigram_auc": 0.5350171406063131,
+   "events_per_conv_cv": {
+    "max": 0.3717568089490763,
+    "median": 0.29383735077569584
+   },
+   "tokens_per_conv_cv": {
+    "max": 0.24071766056007676,
+    "median": 0.16514269308491
+   },
+   "two_leg_note": "both legs reported on purpose \u2014 my vocabulary_control_check collapsed them into events-per-token, so evalage passed the LENGTH channel by luck (uniform max_new), not by design"
+  }
+ },
+ "frames": {
+  "gpt2": {
+   "tercile_edges": [
+    6.918863296508789,
+    8.16490650177002
+   ],
+   "edges_match_premeasure": true,
+   "position_floor": 0.3273293375968933,
+   "wd_rows": {
+    "ok": true,
+    "n_per_class": 3000,
+    "n_docs": 60
+   }
+  },
+  "gemma2_2b": {
+   "tercile_edges": [
+    6.7944159507751465,
+    8.044394493103027
+   ],
+   "edges_match_premeasure": true,
+   "position_floor": 0.3373413383960724,
+   "wd_rows": {
+    "ok": true,
+    "n_per_class": 3000,
+    "n_docs": 60
+   }
+  },
+  "llama31_8b": {
+   "tercile_edges": [
+    6.700439929962158,
+    7.948367118835449
+   ],
+   "edges_match_premeasure": true,
+   "position_floor": 0.33222073316574097,
+   "wd_rows": {
+    "ok": true,
+    "n_per_class": 3000,
+    "n_docs": 60
+   }
+  }
+ },
+ "bundle": {
+  "verdicts": {
+   "gpt2": "WEAK",
+   "gemma2_2b": "WEAK",
+   "llama31_8b": "WEAK"
+  },
+  "bundle": "WEAK",
+  "keep": 0,
+  "kill": 0,
+  "models_present": [
+   "gpt2",
+   "gemma2_2b",
+   "llama31_8b"
+  ]
+ }
+}
