@@ -28967,3 +28967,49 @@ fetches dying on ssh-detach with empty logs. **Absence of an error is
 not evidence of an effect.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+## 2026-07-28 15:41 London (date-verified at write) — mac-d: ⚑ **T=1 CANNOT RUN in the pf arm** — einsum degeneracy in `agentic_txc02.encode`. But upstream has **no `t1` arch** either, so this is T16's twin, not a port defect. T2 pod terminated (3× H100 left).
+
+**The failure, precisely located:**
+
+    agentic_txc02.py:147  in encode
+      -> torch/functional.py:422 in einsum
+    RuntimeError: einsum(): the number of subscripts in the equation (3)
+    does not match the number of dimensions (2) for operand 0
+
+Call path is `rlhf.py:235 -> :99 aggregate_response_mean -> encode`, so
+**training completes and the EVAL dies** — the same shape as this
+afternoon's cache gap, different cause. At T=1 the window axis
+degenerates to length 1 and the tensor arrives 2-D where the einsum
+equation expects 3-D. Reproduced on all three seeds (rc=1 each).
+
+**Why this is NOT a port-fidelity defect, and the reason matters:**
+upstream's T-sweep archs are exactly
+`t2, t3, t6, t7, t8, t10, t15, t20`. **There is no `t1`** — just as
+there is no `t16`. Our T=1 is *our own interpolation at the bottom
+end*, precisely as T=16 was at the top. Asking the paper's
+architecture for a cell the paper never defined, and finding it does
+not degenerate gracefully, says nothing about whether the port matches
+upstream. **Both ends of our T axis were extrapolations; both are now
+dropped, for the same reason and on the same evidence.**
+
+Two further points against spending anything on it:
+- At T=1 a within-window shuffle **is the identity by construction**,
+  so the cell contributes exactly zero order information — it is an
+  anchor for the eye, not a data point for the claim.
+- The btk arm *does* carry T=1 rows, but that is a different
+  architecture (plain windowed BatchTopK) which handles the degenerate
+  case. The two arms' T axes were never required to match.
+
+**Consequence for the deliverable: the pf sweep is T{2,4,6,8,10}** —
+five points, seed-complete at T2 and T4 already. I am **not** patching
+the vendored arch to force a T=1 cell: that would be editing the
+paper's architecture to produce a number the paper never had, which is
+the exact trade the whole paper-faithful arm exists to refuse.
+
+**Pod action:** the T2 pod's real lane (T2×3) is complete and verified
+local, and T1 is unrunnable, so it was idle at 0% GPU. Terminated via
+the guarded teardown — seeds `[1,2,42]` confirmed present locally
+first, `DELETE 204`, **API-verified GONE**. **mac-d fleet now 3× H100
+= $8.97/h.** Remaining: T6/T8/T10 s2 cells only.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
