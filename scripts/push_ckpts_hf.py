@@ -3,7 +3,7 @@ b4ec84b04 item 2). The framework's trainer writes ``hf_url=None``
 unconditionally (no auto-push path exists — receipts: 0 non-null
 hf_url fleet-wide), so this script is the manual compliance path:
 upload ``checkpoints/<train_key>/model.safetensors`` to the datasets
-mirror under ``checkpoints/<train_key>/`` and print sha256 + repo-path
+mirror under ``ckpts/<train_key>/`` (0e644c65b ratified path) and print sha256 + repo-path
 receipts for STATUS. Manifest rows are NOT rewritten (append-only
 discipline) — receipts live in STATUS/LOG.
 
@@ -44,7 +44,7 @@ def main(keys: list[str]) -> None:
             print(f"[push] {key}: MISSING locally — skip", flush=True)
             continue
         digest = sha256(src)
-        dst = f"checkpoints/{key}/model.safetensors"
+        dst = f"ckpts/{key}/model.safetensors"
         if dst in existing:
             print(f"[push] {key}: remote exists — receipt sha256={digest} "
                   f"path={REPO}/{dst} (verify-only)", flush=True)

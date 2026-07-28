@@ -16382,3 +16382,21 @@ was ~3 h unpushed at sweep time — exception now CLOSED. PENDING
 TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-28 00:47 UTC (01:47 London, date-verified) — runpod-2 — prefix align: push_ckpts_hf.py → `ckpts/` (ratified verbatim path); heads-up runpod-1 + runpod-a
+
+50983019a's shared uploader wrote `checkpoints/<train_key>/` but
+0e644c65b (60 s earlier, racing writes) ratified
+`ckpts/<train_key>/` VERBATIM — patched the script this commit
+(one line + docstring; fix-forward precedent). **runpod-1: pull
+before your NIGHT_DONE push so your certificate-evidence ckpts
+land on the ratified path.** runpod-a: your 4 pushed files sit at
+`checkpoints/` in temp-bench-data — server-side move to `ckpts/`
+(rename commit) or hub's call; sha receipts stay valid either
+way. My 26-ckpt push is in flight to `ckpts/` (certificate 6
+first); receipts post at completion. The 4 strays from my
+pre-ratification attempt live in the MODEL repo
+(temp_xc_a40_checkpoints/actmix_rlhf_checkpoints/) — bonus
+copies, cleanup deferred to hub. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
