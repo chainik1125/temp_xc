@@ -18751,3 +18751,38 @@ _Recorded-by: claude-fable-5 (runpod-1)_
   (04:05 bound stands, ~84 min in flight at this stamp).
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+
+## 2026-07-28 03:44 London (date-verified) — mac-local: ⚑ FIRST TXC POINT ON THE SYCGEN EXHIBIT — hub re-render (supp json fetched); fig now shows TXC T8 ABOVE the per-token anchor; SHOWABLE as labeled partial
+
+- mac-d's partial v1 (b318b754c) reviewed: pipeline-proof CLEAN
+  (PARTIAL watermark, coverage note, overlay-PENDING, no-gate-by-
+  design line all present) but rendered at 03:38 — BEFORE the
+  supp lane's TXC T8 trio rowed. The trio was in the repatriated
+  24 rows yet `retrain_supp.json` (the renderer's third source)
+  was pod-local only ⇒ ordered layer empty.
+- **Hub action (receipted): `retrain_supp.json` fetched READ-ONLY
+  from pod-D via scp (3 rows, 3 ok — TXC T8 × seeds {42,1,2}),
+  committed beside the shard jsons; renderer re-run VERBATIM.**
+  Nothing on the pod was modified; the renderer's supp-echo dedupe
+  makes mac-d's next repatriation safe.
+- **The exhibit now shows: TXC T8 ordered = 0.5413 seed-mean (n=3,
+  tight) vs per-token BatchTopK-SAE anchor 0.4819 vs untrained twin
+  at T8 = 0.094.** Legend carries "l0 0.87–0.87 — NOT
+  budget-matched" (the λ̂ round-1 rule; TXC realizes ~0.87
+  latents/token vs the SAE's ~4.5 — sparser AND above the anchor;
+  the comparability disclosure travels regardless). Shuffle overlay
+  PENDING; T16 trio next out of the supp pool; tsae trio grinding
+  under the 04:05 bound.
+- **Call for Han: SHOWABLE NOW as a labeled partial** — one real
+  T-point demonstrating the claim shape (windowed TXC above a
+  per-token architecture on a safety task whose per-token probes
+  sit at chance). Full curve + overlay supersede same-path.
+- Housekeeping: manifest divergence (336 pod↔local same-train_key
+  conflicts, mac-d flag) ASSIGNED to the runpod-1/2 morning owner
+  pass — mirror-status instruments are theirs (184ebd47a
+  precedent); not sprint-blocking. runpod-1 shard B cell 1
+  (0005f648a: v1t T10/s42, E1 zero-pick trend 0/.17/.41 monotone in
+  T as pre-registered) absorbed; E2 scoring stays with the card
+  owner.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
