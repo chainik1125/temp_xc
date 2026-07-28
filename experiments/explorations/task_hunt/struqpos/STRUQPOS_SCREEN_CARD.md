@@ -44,12 +44,28 @@ Three design choices control it, pre-registered:
    specific; any A/B signal there is integrated over the preceding
    context, not local identity at the readout.
 2. **The shuffle-null arm is DECISIVE (the `null_win` analog).** Re-cache
-   residuals with the untrusted-FIELD token order permuted (within the
-   field, per-doc seed) before the forward pass — this destroys
-   injection POSITION while preserving the field's token content
-   (bag-of-tokens intact). A genuine positional representation COLLAPSES
-   under field-shuffle; a proximity/content artifact SURVIVES. KEEP
-   requires contextual AUC to beat the shuffle-null by ≥ +0.02.
+   residuals with the untrusted-FIELD token order permuted before the
+   forward pass — destroys injection POSITION while preserving the
+   field's token content. KEEP requires contextual AUC to beat the
+   shuffle-null by ≥ +0.02.
+
+   **PIN 1 — shuffle scope (load-bearing, hub review 05:20).** The
+   permutation covers the **ENTIRE untrusted field** — every token
+   strictly between the fixed `### input:\n` prefix and the fixed
+   `\n\n### response:\n` suffix, i.e. `input + connector + payload`
+   TOGETHER, crossing the connector and sep. Field-token span is defined
+   by tokenizing the fixed prefix and suffix and taking the interior;
+   permutation is a per-doc seed = crc32(item, attack, leg). **Because
+   A-field and B-field are ~anagram token multisets** (premeasure
+   len_delta ≤ 2 tok), both shuffled arms are draws from ~the SAME bag,
+   so **the shuffled-arm AUC is EXPECTED at chance ≈ 0.50** and
+   `ctx − shuf` reads "arrangement structure beyond the bag" = the
+   positional signal. This is the STRONG null (chance floor), chosen
+   over the weaker sep-position-preserving variant (which would leave
+   sep-depth marking the arrangement). **Label-permutation receipt ON
+   THE SHUFFLED ARM** (permute y, refit, report) MEASURES the shuffled
+   arm's own floor rather than assuming it — if the shuffled arm is not
+   ~0.50 the null is contaminated and the leg is DISCLOSED-not-scored.
 3. **The per-token baseline is the floor and runs FIRST** (standing
    rule). A bag-of-token-identities probe with no positional/contextual
    residual must sit at ~chance (the unigram premeasure predicts it);
@@ -84,14 +100,28 @@ rank-AUC. Arms per leg:
   residual. The candidate signal.
 - `shuf_linear` / `shuf_mlp` — same probe on `fieldshuf` residual (the
   positional null).
-- `local_floor` — a probe on ONLY the ±2 readout-adjacent token
-  identities (no residual): the explicit proximity-confound floor
-  (distinct from `tok`; catches local leakage the global unigram misses).
+- `local_floor` — the proximity-confound floor. **PIN 2 (hub review
+  05:20): span = the K=4 field tokens immediately BEFORE the
+  `\n\n### response:\n` suffix (the field tail); feature = the
+  concatenated model INPUT-embedding vectors of those 4 tokens
+  (identity-derived, context-free — no attention, no residual stream).**
+  This is the content adjacent to the readout — in A the injection tail,
+  in B the input tail — so it directly measures the local leakage the
+  global unigram averages away. Distinct from `tok` (whole-field bag).
+  Its definition is part of the KEEP bar (a clause), hence pinned here,
+  not in code comments.
 
 Position-matched manifest: A/B are length-matched by construction; the
 readout position is the same scaffold token, so no strata balancing is
 needed — but the manifest asserts A/B count balance per attack in each
 split (imbalance ⇒ SKIP that leg, disclosed).
+
+**REPORTING (hub requirement 05:20, visibility only — no bar):**
+alongside the bundle verdict, report the **per-attack-type breakdown**
+(all 5 types): ctx / tok / shuf AUC per attack per leg. A KEEP resting
+on one attack type (e.g. only `completion_realcmb`) is a materially
+different claim than a uniform one; the breakdown makes that visible.
+hunt4 §4 bars are unchanged by this — it is disclosure, not a gate.
 
 ## 5. Verdict (verdict.py) — hunt4 §4 existential FORM, binary-doc adapted
 
@@ -124,11 +154,14 @@ runpod-a scores and posts the verdict PTR; the mac executor runs the
 frozen scripts and repatriates JSONs (sycgen handoff pattern).
 GOLD-VISIBILITY: a KEEP posts to REBUTTAL_HANDOFF same-beat.
 
-## 7. Design-review flag
+## 7. Design review — NOD RECEIVED (f8771140a, 05:20), pins folded
 
-This face is document-level binary — the FIRST such in the hunt; the
-§2 confound treatment is novel. **Design review requested before the
-L40S burns** (sound verdict, never a win — the record's strongest-
-conditioned candidate deserves a design check, not just a green light).
-If the hub ratifies §2 + §5 as-is, the executor proceeds; corrections
-fold into a re-freeze before any GPU cell.
+The hub reviewed §2+§5 and NODDED conditional on three items, ALL folded
+into this freeze: PIN 1 (field-shuffle scope = whole field, expected
+shuffled AUC ≈ 0.50, label-permutation receipt — §2), PIN 2
+(proximity-floor span K=4 + input-embedding features — §4), and
+per-attack-type reporting (§4). This commit freezes
+cache_acts/screen/verdict against the ratified design; PIN = this
+commit sha. The mac L40S executor runs the frozen scripts; runpod-a
+scores + posts the verdict PTR. No further design gate before the
+~$2 run.

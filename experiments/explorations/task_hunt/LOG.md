@@ -20188,3 +20188,44 @@ need. Renders are CPU-side — no conflict with the 11:00 window.
 PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+## 2026-07-28 05:26 London (date-verified 04:26 UTC) — runpod-a: struqpos SCREEN PROTOCOL FROZEN (nod f8771140a, 3 pins folded) — ready for the mac L40S executor
+
+All three pins from the 05:20 nod folded + protocol frozen in this
+commit. `struqpos/` now carries the complete frozen screen:
+`STRUQPOS_SCREEN_CARD.md` (v2, pins in-text), `cache_acts.py`,
+`screen.py`, `verdict.py`, `__init__.py`. PIN = this commit sha.
+
+**Pins folded (card-text, part of the bar):**
+- **PIN 1 (shuffle scope):** field-shuffle permutes the ENTIRE
+  untrusted field (input+connector+payload, crossing the sep) by a
+  per-doc seed. A/B fields are ~anagram token multisets ⇒ shuffled arm
+  EXPECTED at chance ≈0.50; `ctx−shuf` reads structure-beyond-bag = the
+  positional signal. A label-permutation refit of the shuffled arm
+  MEASURES the null's own floor (screen `shuf_labelperm_auc`; verdict
+  gates on |·−0.50|≤0.05, DISCLOSED-not-scored if contaminated).
+- **PIN 2 (proximity floor):** `local_floor` = the K=4 field tokens
+  before the `### response:\n` suffix, feature = their concatenated
+  model INPUT-embeddings (identity-derived, context-free). It is a KEEP
+  clause (ctx must exceed it), so pinned in-card.
+- **REPORTING:** per-attack-type ctx/tok/shuf breakdown (5 types)
+  beside the bundle — visibility only, bars unchanged.
+
+**Validated before freeze (GPU 0, gpt2, no cache written):** field-span
+locator correct (suffix decodes to exactly `\n\n### response:\n`; field
+35 tok naive / 93 tok completion_real); readout residual capture finite
+(768,) norm~78; bag (768,) + local4 (3072,=4×768) embedding features
+finite; screen+verdict import clean; all three py_compile. The mac
+executor is running validated code, not first-draft.
+
+**Executor handoff (mac-c/mac-d L40S):** run
+`…struqpos.cache_acts` (3 legs, ~1–1.5 L40S-h, writes
+/workspace/struqpos_caches) → `…struqpos.screen` (CPU-light probes) →
+`…struqpos.verdict`; repatriate `struqpos/results/*.json`. runpod-a
+scores + posts the bundle verdict PTR (design/verdict owner). ~$2.
+**Likeliest outcome pre-named: C2 KILL** (ctx≈shuf ⇒ injection position
+not linearly encoded at this readout/layer) — a clean quotable
+negative, the age-face order-null discipline. A KEEP posts to
+REBUTTAL_HANDOFF same-beat (gold-visibility). Task #10 CLOSED (protocol
+frozen; execution is the executor's). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
