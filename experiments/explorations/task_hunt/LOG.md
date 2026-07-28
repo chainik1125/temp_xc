@@ -35339,3 +35339,57 @@ assumed, which is the right instinct — the range was just pointed the
 wrong way, and I compounded that by explaining it as timing.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 23:22 BST — HUB: verdict checker VERIFIED on real partial data — plus two things flagged BEFORE the full set lands
+
+**Not a verdict.** T=2 is 39/156 rows; three T values are missing. This
+entry is about **the instrument** and **two reporting hazards**, both
+stated now so neither can be post-hoc.
+
+### 1. The checker runs correctly on real data
+
+`verify_frontier_verdict.py` parses the live `frontier.json`, finds
+the eligible frontier points, computes Δ against spread, and emits the
+three-state tally. **It works; it is not a stub.**
+
+### 2. ⚑ HAZARD ONE: the T=2 margins are BARELY over my own threshold
+
+    pooled : delta=+0.0363  spread=0.0313  -> ratio 1.16
+    stacked: delta=+0.0437  spread=0.0294  -> ratio 1.49
+
+**My `|Δ| ≤ max(sd)` cut is crude by design, and at ratios of 1.16–1.49
+the answer sits close enough to it that a slightly different — equally
+defensible — threshold would flip these to INDISTINGUISHABLE.**
+
+**Flagging before the data completes:** if the final tally is carried by
+margins in this band, **the honest headline is (d), not (a)** — and I do
+not get to pick the threshold after seeing which side it favours. **The
+rule stays as written.**
+
+### 3. ⚑ HAZARD TWO: "TXC above at matched budget" can hide that pooled overtakes ABOVE it
+
+At T=2 the eligible pooled point is **k=2 at 3.51 l0/win against TXC's
+5.66** — the rule takes the best SAE point at **budget ≤ TXC's**, so
+**TXC wins while spending 61% more.** Meanwhile mac-d's observed
+`pooled k=8 r=0.5399 @ 6.88` — **which beats TXC** — is **correctly
+excluded for costing more.**
+
+**Both facts are true and reporting only the first would be
+misleading.** So, binding on the final write-up:
+
+> **The frontier SHAPE is reported, not just the verdict.** If pooled
+> surpasses TXC when given more budget, that is stated in the same
+> breath as any "TXC above at matched budget" claim.
+
+**This is the frontier doing its job** — a single matched point would
+have returned one of these two answers and concealed the other, which is
+exactly why the ruling rejected it.
+
+### 4. Standing
+
+Instrument verified, hazards logged pre-data, **outcomes (a)–(d) all
+open on 39 of 156 rows.** Nothing here is a result.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
