@@ -20941,3 +20941,27 @@ Landed btk set for the fig: T{1,2,4,5,8,16} full trios + T6 2/3 +
 T10 1/3 with the deferral caption per 9e80f03aa item 4.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 08:26 London (date-verified 07:26 UTC) — runpod-1 — ⚑⚑ 11:00 PROTECTED DELIVERABLE SHIPPED EARLY (deadline-safe): btk 7-point FINAL renders, full 3-seed coverage all four figs
+
+The btk-only arm's rows are complete and frozen (7T×3s, nothing in
+flight), so the 11:00 render is shipped NOW as deliverable-of-
+record per the fleet's deadline-safe pattern; the 11:00 slot
+becomes verify-only (re-render fires only if any input changes —
+none can).
+
+Shipped (`--writeup final`, post pollution-fix 5a699a5d4 so the
+bands are verified canonical):
+- `figs_writeup/fig_probing_shuffle_tsweep.{png,pdf}` (headline,
+  k20 SAEBench-36) + `_k5` — ordered vs within-window shuffled,
+  T=1 shuffle≡identity annotated, seed faints, coverage stamp
+  FINAL seeds {42,1,2} T{1,2,4,6,8,10,16} n=3 each.
+- `_38task` twin (38 tasks, raw) — same coverage.
+- Ordered−shuffled gap grows with T (order carries information);
+  ordered T16−T1 = −0.023 (both curves decline with T; the gap,
+  not the level, is the claim). No archived-anchor rows in these
+  btk-arm figs (labeling rule 8fefb409d n/a here; it binds the pf
+  figs, already labeled). RESULTS.md + RESULTS_btk-only.md
+  refreshed from the same run. Morning-queue items now ALL
+  delivered except the manifest owner pass + STATUS rewrite. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_

@@ -20,10 +20,10 @@ Verdict discipline: PENDING TEAM REVIEW. Gates (CARD § 5):
 - `FAIL  G1 l0=382.74 outside [288.0,352.0] at txc_batchtopk_pre_btkonly/T16/s2/k20`
 - `FAIL  G1 l0=380.59 outside [288.0,352.0] at txc_batchtopk_pre_btkonly/T16/s42/k5`
 - `FAIL  G1 l0=380.59 outside [288.0,352.0] at txc_batchtopk_pre_btkonly/T16/s42/k20`
-- `PASS   G5 anchor |txc_batchtopk_pre_btkonly@T1−SAE|=0.0072 vs 3σ_SAE=0.0101 (k=5)`
 - `PASS   G5 anchor |txc_batchtopk_post_btkonly@T1−SAE|=0.0072 vs 3σ_SAE=0.0101 (k=5)`
-- `PASS   G5 anchor |txc_batchtopk_pre_btkonly@T1−SAE|=0.0008 vs 3σ_SAE=0.0096 (k=20)`
+- `PASS   G5 anchor |txc_batchtopk_pre_btkonly@T1−SAE|=0.0072 vs 3σ_SAE=0.0101 (k=5)`
 - `PASS   G5 anchor |txc_batchtopk_post_btkonly@T1−SAE|=0.0008 vs 3σ_SAE=0.0096 (k=20)`
+- `PASS   G5 anchor |txc_batchtopk_pre_btkonly@T1−SAE|=0.0008 vs 3σ_SAE=0.0096 (k=20)`
 
 ### arm `btk-only`, k_feat = 5
 
