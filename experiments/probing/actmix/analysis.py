@@ -291,7 +291,7 @@ def _agg_mean(m: dict, prefix: str, exclude=()) -> float | None:
 def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
                      pair_style: str = "mono", exclude=(),
                      n_tasks_label: str = "38 tasks", suffix: str = "",
-                     identity_xy: tuple = (0.03, 0.62)):
+                     identity_xy: tuple = (0.03, 0.62), arch: str = TXC_PRE):
     """Aniket-template shuffle T-sweep (059a66239 P1 deliverable).
 
     Knob-for-knob twin of runpod-2's RLHF renderer (421f6fa37,
@@ -313,14 +313,14 @@ def make_writeup_fig(cells: dict, k: int, Ts, tag: str, outdir: Path,
               "shuffled": HUE if pair_style == "mono" else "#0072B2"}
     pts = {}   # (T, seed) -> {"ordered": v, "shuffled": v}
     for (a, u, T, s, kk), m in cells.items():
-        if a == TXC_PRE and not u and kk == k and "mean_auc" in m:
+        if a == arch and not u and kk == k and "mean_auc" in m:
             o = _agg_mean(m, "auc", exclude)
             sh = _agg_mean(m, "auc_shuf", exclude)
             if sh is None and m.get("shuffle_identity"):
                 sh = o
             pts[(T, s)] = {"ordered": o, "shuffled": sh}
     if not pts:
-        print("[analysis] writeup fig skipped: no TXC-pre rows")
+        print(f"[analysis] writeup fig skipped: no {SHORT.get(arch, arch)} rows")
         return
     seeds = sorted({s for (_, s) in pts})
 
@@ -441,7 +441,20 @@ def main():
     print("\n".join(gates))
     print(f"[analysis] wrote {HERE}/RESULTS_{args.arm}.md + figs/")
 
-    if args.writeup:
+    if args.writeup and args.arm == "paper-faithful":
+        # Paper-faithful writeup twins (hub order 12:34 London, LOG
+        # 7a7ee52c8): same pair template, arch = paper_txc_base_v1t,
+        # `_pf` namespace so the btk figs are never clobbered.
+        ID_XY = {5: (0.03, 0.87)}
+        for kf in k_feats:
+            make_writeup_fig(cells, kf, args.Ts, args.writeup,
+                             ROOT / "figs_writeup",
+                             pair_style=args.pair_style,
+                             exclude=CT_TASKS, n_tasks_label="SAEBench-36",
+                             suffix=f"_pf_k{kf}",
+                             identity_xy=ID_XY.get(kf, (0.03, 0.62)),
+                             arch=PAPER_V1T)
+    elif args.writeup:
         # Per-k plot family (ccddf01be): one SAEBench-36 headline plot
         # per k present in the rows — k grid extensions get their plot
         # automatically on landing. Base name = k20 alias (link
