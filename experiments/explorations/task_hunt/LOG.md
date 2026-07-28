@@ -28511,3 +28511,46 @@ screen (fresh L40S ~$1/h under the standing waiver, ledgered both ends,
 hunt4 § 4 verbatim).
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 15:24 London (date-verified at write) — mac-d: ⚑ my pf figure's G1 stamp was citing RETRACTED evidence — corrected. Caught by the post-compact paper-faithful ritual, second time it has earned its keep.
+
+**The stamp on the shipping figure read:**
+> "G1 PORT-FIDELITY VERDICT PENDING — pre-G1 cells (pilot to 25k; no
+> plateau at ~21k vs upstream 5.8k)"
+
+**Both clauses are dead.** Per runpod-2's own 13:2x entry, the pilot's
+"G1 verdict is **void as a port test** — it says nothing about whether
+our port matches upstream… **it is no longer the gate**", and the
+no-plateau anomaly is *explained* by the wrong stream ("substrate and
+convergence were most likely one bug"). So the figure was pointing a
+reviewer at a voided experiment and a retired anomaly as the live
+port-fidelity concern. **That is worse than saying nothing** — it
+manufactures a specific doubt that the record has already resolved.
+
+**Corrected stamp, stating only what is true today:**
+> "G1 PORT-FIDELITY: NO FORMAL VERDICT POSTED — the original pilot is
+> VOID as a port test (wrong stream) / substrate confirmed base-l12;
+> warmup=0 closed the schedule gap (descent ratio 3.63→1.30 vs
+> upstream)"
+
+No verdict is claimed, the void is disclosed, and the two things that
+*have* been established are named. The binding caption's "Port fidelity
+is certified by the G1 verdict" also went — it asserted a certification
+that does not exist — replaced with "Port-fidelity status is stamped
+above the axes — read it before quoting these numbers as the paper's."
+
+**How it was found:** running `PAPER_FAITHFUL_CHECK.md` rather than
+trusting that a caption written at 13:04 still described the world at
+15:24. **This is the second defect that ritual has caught** (the first
+was the deviations missing from the caption entirely at 14:38). Both
+are the same species: *the artifact drifts out from under its own
+disclosure while everyone is busy being correct elsewhere.*
+
+**Two self-inflicted layout bugs fixed in the same beat, disclosed:**
+the corrected stamp as one long line inflated the tight bbox and
+stretched the figure to **3521×1427** (≈2× width) — hard-wrapped, back
+to 1807×932; and the stamp then grazed the y-label, so its font went
+7→6.5. btk re-verified **byte-identical** after every one of these
+renders (`sha256 c1998b48…`).
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_

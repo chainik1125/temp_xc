@@ -245,15 +245,24 @@ def main():
         # disclosure, and the bottom-right corner already carries the
         # legend and coverage.
         g1_note, g1_col = {
-            "pending": ("G1 PORT-FIDELITY VERDICT PENDING — pre-G1 cells "
-                        "(pilot to 25k; no plateau at ~21k vs upstream 5.8k)",
+            # NB the original pilot is VOID as a port test — it ran on the
+            # l13-IT stream, and its no-plateau anomaly is explained by
+            # that, not by a port defect. Citing it as the open concern
+            # (as this stamp used to) points a reader at retracted
+            # evidence. The gate moved to the corrected A/B instrument.
+            # Hard-wrapped: a single long line inflates the tight bbox and
+            # stretches the whole figure to ~2x width.
+            "pending": ("G1 PORT-FIDELITY: NO FORMAL VERDICT POSTED — the "
+                        "original pilot is VOID as a port test (wrong stream)\n"
+                        "substrate confirmed base-l12; warmup=0 closed the "
+                        "schedule gap (descent ratio 3.63→1.30 vs upstream)",
                         "#B00000"),
             "passed": ("G1 port-fidelity verdict: PASSED", "#555555"),
             "failed": ("G1 PORT-FIDELITY VERDICT FAILED — points DISCLOSED, "
                        "NOT certified", "#B00000"),
         }[args.g1]
         ax.annotate(g1_note, xy=(0.5, 1.02), xycoords="axes fraction",
-                    ha="center", va="bottom", fontsize=7, color=g1_col,
+                    ha="center", va="bottom", fontsize=6.5, color=g1_col,
                     weight="bold")
     ax.annotate(f"{tag_note}\n{cov}", xy=(0.99, 0.02),
                 xycoords="axes fraction", ha="right", va="bottom",
@@ -282,8 +291,9 @@ def main():
                    "ported to this harness, on the paper stream "
                    f"({PF_DATASOURCE}). Conclusions here are statements about "
                    "the PAPER arm itself, not the plain-TXC modernization "
-                   "(that is the companion figure). Port fidelity is certified "
-                   "by the G1 verdict — see the coverage note for its state. "
+                   "(that is the companion figure). Port-fidelity status is "
+                   "stamped above the axes — read it before quoting these "
+                   "numbers as the paper's. "
                    "KNOWN DEVIATIONS from the upstream recipe, disclosed not "
                    "patched: (i) upstream clips gradients at 1.0; this harness "
                    "applies NO gradient clipping. (ii) rows record "
