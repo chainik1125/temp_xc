@@ -16,8 +16,11 @@ first). Durability: 32/32 twin ckpts receipted on ratified mirror
 runpod-c, E at runpod-a, runpod-b overflow-only. Hub ETA
 06:30-07:30. GPU 2 = runpod-2, never mine.
 NEXT: shard cells land → rows commits + per-cell HF pushes; at
-drain E1-E3 scoring per card §9 + ledger actuals; 11:00 PROTECTED
-btk renders; certificate PRELIMINARY→final after renders.
+drain: (a) RM fills s1/s2×T{2,4} in idle windows ≥10 min
+(PRE-AUTHORIZED, no-idle sweep 72cca1bdf), (b) E1-E3 scoring per
+card §9 + ledger actuals, (c) pf-alongside-btk 7-point renders
+(charter iii; analysis.py pre-staged, pollution-fixed 5a699a5d4),
+(d) 11:00 PROTECTED btk renders, (e) certificate → final.
 Monitors (this session): bbw1y8ufe (pf shards A/B logs),
 b6jr22n3d (origin poller).**
 
