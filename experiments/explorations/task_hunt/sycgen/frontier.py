@@ -19,11 +19,14 @@ the ALREADY-TRAINED per-token (T=1) SAE.
 ⚑ Feature-dimension asymmetry, disclosed rather than hidden: the
 evaluator's tile code for TXC is `d_sae`. Pooled matches that exactly.
 **Stacked gets T*d_sae — T times the probe input** — so a stacked win is
-partly a probe-capacity win. Reported, never netted out.
+partly a probe-capacity win, not purely an architecture one. Reported
+alongside, never netted out.
 
-Scoring reuses `lambda_recovery`'s own tiling and probe verbatim, so the
-new arms are scored by the SAME instrument as TXC. Anything else would
-not be a comparison.
+Scoring reuses `lambda_recovery._train_lambda_probe` verbatim, so every
+arm is scored by the SAME instrument as TXC. Anything else would not be
+a comparison — which is the whole reason the original claim failed.
+
+Runs where the activation cache lives (the pod).
 
     .venv/bin/python -m experiments.explorations.task_hunt.sycgen.frontier
 """
@@ -32,57 +35,116 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import numpy as np
 import torch
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "results" / "frontier.json"
 
+TS = (2, 4, 8, 16)
+SEEDS = (42, 1, 2)
+K_SWEEP = (1, 2, 4, 8, 16, 32)      # per-token budget for the SAE arms
+EVAL_L = 32
+N_WINDOWS = 1024
 
-class _WindowWrapper(torch.nn.Module):
+
+class WindowWrapper(torch.nn.Module):
     """Present a per-token SAE as a window encoder the evaluator can score.
 
-    `encode(tiles)` receives `(B, T, d_in)` and must return the tile code.
-    We run the frozen per-token SAE on every position, optionally truncate
-    each position's code to its top-`k_tok` entries by magnitude (the SAE
-    chooses which features it keeps — we only constrain how many), then
-    pool or stack across the window.
+    `encode(tiles)` receives `(B, T, d_in)` and returns the tile code, which
+    is exactly the contract TXC satisfies — so the evaluator cannot tell the
+    arms apart and scores them identically.
     """
 
-    def __init__(self, sae, mode: str, k_tok: int | None):
+    def __init__(self, sae, T: int, mode: str, k_tok: int | None):
         super().__init__()
-        self.sae, self.mode, self.k_tok = sae, mode, k_tok
-        self.realized_l0 = []          # per-call l0 per WINDOW, for the receipt
+        self.sae, self.T, self.mode, self.k_tok = sae, T, mode, k_tok
+        self._l0 = []
 
     def encode(self, tiles: torch.Tensor) -> torch.Tensor:
         B, T, d_in = tiles.shape
-        z = self.sae.encode(tiles.reshape(B * T, 1, d_in))
-        z = z.reshape(B, T, -1)
+        z = self.sae.encode(tiles.reshape(B * T, 1, d_in)).reshape(B, T, -1)
         if self.k_tok is not None and self.k_tok < z.shape[-1]:
             kth = z.abs().topk(self.k_tok, dim=-1).values[..., -1:]
             z = z * (z.abs() >= kth)
-        # realized budget: distinct active features per WINDOW (pooling
-        # collapses a feature firing at several positions — measure the
-        # union, never assume T x per-token, which is the upper bound the
-        # hub retracted).
-        active_union = (z.abs() > 0).any(dim=1).sum(dim=-1).float()
-        self.realized_l0.append(float(active_union.mean()))
+        # realized budget = distinct active features per WINDOW. Measured as
+        # the union across positions, never T x per-token: pooling collapses
+        # a feature firing at several positions, which is exactly the
+        # assumption the hub retracted at 19:4x.
+        self._l0.append(float((z.abs() > 0).any(dim=1).sum(-1).float().mean()))
         if self.mode == "pooled":
-            return z.mean(dim=1)                    # (B, d_sae)
-        return z.reshape(B, T * z.shape[-1])        # (B, T*d_sae)
+            return z.mean(dim=1)
+        return z.reshape(B, T * z.shape[-1])
+
+    @property
+    def realized_l0_per_window(self) -> float:
+        return sum(self._l0) / max(1, len(self._l0))
+
+
+def _load(arch_name: str, T: int, seed: int, ds_spec):
+    from temp_bench.core.config import compute_data_key, compute_train_key, load_arch
+    from temp_bench.core.runner import _load_checkpoint
+    spec = load_arch(arch_name)
+    ov = {"d_sae": 2048, "T": T, "k_pos": 8}
+    spec = spec.model_copy(update={"hparams": {**spec.hparams, **ov}})
+    tk = compute_train_key(
+        arch=spec, seed=seed,
+        training_cfg={"n_steps": 8000, "buffer_tokens": 524288,
+                      "arch_hparams_override": ov},
+        data_key=compute_data_key(ds_spec))
+    return _load_checkpoint(spec, tk, ds_spec), tk
 
 
 def main():
-    from temp_bench.core.config import (compute_data_key, data_cache_dir,
-                                        load_arch, load_datasource)
-    from temp_bench.evals import lambda_recovery as LR
+    from temp_bench.core.config import load_datasource
+    from temp_bench.evals.lambda_recovery import _train_lambda_probe
+    from temp_bench.data.synthetic import materialise
     import experiments.explorations.task_hunt.sycgen.run_retrain as RR
 
-    ds = load_datasource(RR.DS)
-    print(f"[frontier] datasource {RR.DS}  data_key {compute_data_key(ds)}")
-    print("[frontier] NOTE: pooled matches TXC's tile-code dim (d_sae);")
-    print("[frontier]       stacked gets T*d_sae — disclosed, not netted out.")
-    print("[frontier] scaffold in place; wiring the k-sweep next.")
+    ds_spec = load_datasource(RR.DS)
+    data = materialise(ds_spec, seed=0)
+    lam = data.extra["lambda_labels"]
+    if not torch.is_tensor(lam):
+        lam = torch.as_tensor(lam)
+    x, lam = data.x, lam.float()
+    print(f"[frontier] x={tuple(x.shape)} lam={tuple(lam.shape)}", flush=True)
+
+    rows = []
+    for T in TS:
+        for seed in SEEDS:
+            # --- TXC (the claim arm), scored by the same probe ---
+            try:
+                txc, tk = _load("txc_batchtopk_post_btkonly", T, seed, ds_spec)
+                m = _train_lambda_probe(txc, x, lam, L=EVAL_L,
+                                        n_windows=N_WINDOWS, seed=seed)
+                rows.append({"arm": "txc", "T": T, "seed": seed, "k_tok": None,
+                             "recovery": m["lambda_recovery"],
+                             "chance": m["lambda_chance"], "train_key": tk})
+                print(f"  txc      T{T} s{seed} r={m['lambda_recovery']:.4f}", flush=True)
+            except Exception as e:
+                print(f"  txc      T{T} s{seed} SKIP {type(e).__name__}: {str(e)[:90]}", flush=True)
+
+            # --- pooled / stacked SAE, swept over per-token budget ---
+            try:
+                sae, sae_tk = _load("batchtopk_sae_btkonly", 1, seed, ds_spec)
+            except Exception as e:
+                print(f"  sae      s{seed} LOAD FAIL {type(e).__name__}", flush=True)
+                continue
+            for mode in ("pooled", "stacked"):
+                for k in K_SWEEP:
+                    w = WindowWrapper(sae, T, mode, k)
+                    m = _train_lambda_probe(w, x, lam, L=EVAL_L,
+                                            n_windows=N_WINDOWS, seed=seed)
+                    rows.append({"arm": mode, "T": T, "seed": seed, "k_tok": k,
+                                 "recovery": m["lambda_recovery"],
+                                 "chance": m["lambda_chance"],
+                                 "realized_l0_per_window": w.realized_l0_per_window,
+                                 "sae_train_key": sae_tk})
+                    print(f"  {mode:8s} T{T} s{seed} k={k:<3} "
+                          f"r={m['lambda_recovery']:.4f} "
+                          f"l0/win={w.realized_l0_per_window:.2f}", flush=True)
+            OUT.parent.mkdir(parents=True, exist_ok=True)
+            OUT.write_text(json.dumps(rows, indent=1))
+    print(f"[frontier] wrote {len(rows)} rows -> {OUT}")
 
 
 if __name__ == "__main__":
