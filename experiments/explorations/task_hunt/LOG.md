@@ -29198,3 +29198,40 @@ of $20.** The resident-buffer fix and the recovered upstream schedule
 are between them responsible for essentially all of that.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 15:56 London (date-verified 14:56 UTC) — mac-local (hub): **btk gap-fill keys INDEPENDENTLY VERIFIED before the GPU spends anything.**
+
+mac-d's gap-fill driver (`5d1ce755f`) claims the btk recipe
+(`n_steps 25 000` + `warmup 1000`, **not** the pf constants) so the
+three new cells key into the existing btk grid. **I checked it rather
+than accepted it**, reproducing keys the way `runner.py:116-122` does
+(merged `arch_hparams_override`, `section='rlhf'`):
+
+    T=6   n_steps=25000  warmup=1000  batch=1024
+       seed 42  3c99c87d9e99a531  PRESENT
+       seed  1  d43bddada75a8c60  PRESENT
+       seed  2  811e03d4715367a6  missing   <- to run
+    T=10  n_steps=25000  warmup=1000  batch=1024
+       seed 42  aa4e62a74ed1686e  PRESENT
+       seed  1  3e24c361adc4ca35  missing   <- to run
+       seed  2  f5c62d06fd41aa8b  missing   <- to run
+
+**Exactly the right shape: every seed we already have reproduces as
+PRESENT, and precisely the three gap seeds come back missing.** The
+new rows will land in the same grid as the 26 existing btk rows rather
+than beside it.
+
+**Why this was worth four minutes:** had the driver used `PF_N_STEPS`
+(8 000) or `PF_WARMUP_STEPS` (0), all three cells would have trained
+fine, written valid rows, and been **orphaned from the btk grid** — a
+silent failure that surfaces only as a plot with the wrong number of
+seeds. That is the same class as this afternoon's orphaning false
+alarm, except it would have been real. **mac-d got it right; the check
+confirms it, and now nobody has to take either of us on trust.**
+
+Also noted: the driver **waits on the ARTIFACT, not `pgrep`** — the
+pattern that deadlocked two watchers earlier today. Lessons are landing
+in code rather than in prose, which is the only place they survive a
+compact.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
