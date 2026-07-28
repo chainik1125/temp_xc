@@ -29878,3 +29878,59 @@ btk exhibit ships as-is** — it is the same file runpod-2 shipped at
 ago.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 16:27 London (date-verified 15:27 UTC) — mac-local (hub): ⚑⚑ **THE SIXTH ONE WAS INSIDE THE GUARD ITSELF — and it names the through-line of every failure today: SILENT DEFAULTS.**
+
+### 1. Verified in the script, not taken on trust
+
+`agents/mac-d/teardown_pod.sh` v1 **hardcoded the pf arm**. On the last
+pod — the one now running **btk** gap cells — it would have read the
+**pf T8** rows, concluded *"seeds local OK, ALLOW"*, and **destroyed
+three unrepatriated btk cells (~3 GPU-h).** The guard I ratified an
+hour ago as *"the rule enforced by the tool, not the operator"* would
+have destroyed **exactly the work it was written to protect**, on the
+very next pod it ran against.
+
+Fix confirmed in-file: `ARM="${2:?usage…}"` — **required, not
+defaulted**; unknown arm rejected; and rows lacking `metrics.T`
+skipped rather than crashing. Their own comment is the right epitaph:
+*"a wrong-arm check is worse than no check."*
+
+**And the part that matters most: they tested it against its FAILURE
+case** (btk incomplete → REFUSE), not just its success case. **A guard
+exercised only on the path where it passes has not been tested at all**
+— it has been *demonstrated*.
+
+### 2. ⚑ Six instances, one mechanism: a DEFAULT quietly supplied the wrong answer
+
+    1. thread budget      torch autosized from os.cpu_count() (208) not the cgroup quota (48)
+    2. chmod on FUSE      returned 0, mode stayed 666
+    3. conflict healer    written for LOG.md, silently skipped the HANDOFF
+    4. git --ours         means the OTHER side under rebase
+    5. byte-identity      anchored to a re-render, not the deliverable
+    6. teardown guard     arm DEFAULTED to pf while the pod ran btk
+
+**Every one reported success. Every one had a default — of a value, a
+scope, or a meaning — standing in for something nobody stated
+explicitly.** That is also true of the two biggest science defects
+today: `warmup_steps=1000` and `n_steps=25000` were **framework
+defaults** silently substituting for a paper recipe nobody had
+vendored, and `precision: bf16` is a **declared default the code never
+honours**.
+
+**The synthesis, and it is the most transferable thing this fleet
+produced today:**
+
+> **A default is an unstated assumption that reports success.** Where
+> correctness depends on a value, that value must be **required**, and
+> the check that verifies it must be **exercised on its failure path**.
+
+### 3. Standing
+
+Nothing was lost — mac-d caught it **before** the teardown ran. The
+three btk cells are intact on the surviving pod. **Ratified**, and
+§ 2 goes into the CODE_GUIDE's standing-caveats section at the next
+re-stamp rather than living only here, because it is the one lesson
+today that generalises past this rebuttal.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
