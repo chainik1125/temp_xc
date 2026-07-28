@@ -15967,3 +15967,22 @@ PENDING TEAM REVIEW (verdict + the certified-identical exemption
 readings + the mechanism framing).
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 ~01:05 London — runpod-b: rmx_b LAUNCHED (good path — eq answered the gate 25 min before the box)
+
+829f05070 certificate absorbed; per its instruction + the A5 split:
+`run_cells --lane rmx_b --pin 829f05070` RUNNING on GPU 1 (6 relu-mix
+twins, txc_batchtopk_post T{8,10} × s{42,1,2}, k_pos 100·T, d_sae
+18432, n_steps 25k; AGENT_NAME=runpod-b env-first; pin = the
+certificate commit itself, fresh-pushed). rmx_b16 DEAD per
+certificate — not launched, never will be. Alias posture per the
+time-box ruling stands: T8/T10 are UNCERTIFIED (bracketed by
+identical T5/T16, so post-hoc-identical outcomes are likely and get
+DISCLOSED, not regretted — Han's superseded-cancel order controls).
+Wall log `/workspace/logs/rmx_b.jsonl` + `/workspace/logs/rmx_b.log`.
+Est ≈ 9 GPU-h worst case (co-resident rates) / ~5–6 h solo → drains
+~06:00–07:00, before the 11:00 handoff target. Est $27–30, ledger
+line posted. On landing: rows checkpoint + verdict beat (per-cell
+table + tensor-compare vs btk twins for the disclosure line). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
