@@ -43,14 +43,19 @@ face**, not merely in the corpus.
 ## BLOCKER 1 — only the gpt2 leg exists (3-tokenizer rule UNMET)
 
 The stream carries gpt2 ids only. gemma2/llama31 are recorded
-**NOT RUN**, not assumed. To complete: the `.npz` stores ids +
-`event_mask` + `probe_eligible`, so turn boundaries are recoverable as
-contiguous runs of those flags — segment by run → `gpt2.decode` →
-re-encode per tokenizer → rebuild the three flag arrays.
-**Verify before trusting: event count must equal 1,542 on every leg and
-realised gaps must stay near median 862.** An error silently moves
-event positions and destroys the exact-labels property that is the
-entire point of the harness. Do it carefully or not at all.
+**NOT RUN**, not assumed.
+
+**✅ DO NOT REBUILD THIS — mac-d already wrote it and invited
+transplant** (their LOG note on `ad21f651d`):
+**`sycgen/screen_grids.py`** decodes turn-runs from a gpt2-ids stream
+**with a hard round-trip receipt** and re-tokenizes per model — that is
+its §1 design. Transplant it rather than reimplementing; the round-trip
+receipt is exactly the verification this needs.
+
+**Still verify against MY corpus after transplanting:** event count must
+equal **1,542** on every leg and realised gaps must stay near median
+**862**. An error silently moves event positions and destroys the
+exact-labels property that is the entire point of the harness.
 
 ## BLOCKER 2 — the screen itself
 
