@@ -219,6 +219,15 @@ def pf(T, seed=SEED):
         "training_cfg": TrainingConfig(
             n_steps=N_STEPS, batch_size=_pf_batch(T),
             arch_hparams_override={"d_sae": D_SAE, "T": T, "k_pos": 100 * T}),
+        # § 8: eval substrate is CELL IDENTITY — the tag hashes into
+        # eval_key (G2 incident: env-only cache resolution aliased
+        # l12-BASE rows as l13-IT cells); expect-check hard-fails on a
+        # wrong-substrate cache before any metric is computed.
+        "eval_cfg": {
+            "hh_rlhf_cache": "l13it_paper",
+            "cache_expect": {"subject_model": "google/gemma-2-2b-it",
+                             "anchor_layer": 13},
+        },
     }
     return cell
 

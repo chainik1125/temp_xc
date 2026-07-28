@@ -38,6 +38,7 @@ Smoke mode returns ``{"smoke_ok": 1.0}`` without touching the cache.
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -48,6 +49,14 @@ from temp_bench.interfaces.architecture import TempBenchArch
 from temp_bench.interfaces.evaluator import EvalSpec, Evaluator
 
 DEFAULT_CACHE_DIR = "/workspace/caches/rlhf/cached_hh_rlhf"
+
+# Named eval substrates (tag → cache dir). Tags — not paths — hash into
+# eval_key via eval_cfg, so keys stay stable across pods while rows on
+# different substrates stay distinct. Register new caches here.
+HH_RLHF_CACHE_REGISTRY = {
+    "l12base_phase7": DEFAULT_CACHE_DIR,
+    "l13it_paper": "/workspace/caches/rlhf/cached_hh_rlhf_l13it",
+}
 SHUFFLE_SEED = 42
 K_PRIMARY = 20
 N_FOLDS = 5
@@ -180,12 +189,35 @@ class RLHFEval(Evaluator):
         if spec.smoke:
             return {"smoke_ok": 1.0}
 
-        cache = Path(os.environ.get("TEMP_BENCH_HH_RLHF_DIR",
-                                    DEFAULT_CACHE_DIR))
+        # Cache selection is part of the CELL IDENTITY: an eval_cfg
+        # "hh_rlhf_cache" tag hashes into eval_key, so rows on different
+        # substrates can never alias (G2 incident 2026-07-28: env-only
+        # resolution let l12-BASE rows masquerade as l13-IT cells).
+        # No tag (empty eval_cfg) preserves the historical env/default
+        # path bit-for-bit — old rows and keys are untouched.
+        tag = (spec.extra or {}).get("hh_rlhf_cache")
+        if tag is not None:
+            if tag not in HH_RLHF_CACHE_REGISTRY:
+                raise KeyError(
+                    f"unknown hh_rlhf_cache tag {tag!r}; known: "
+                    f"{sorted(HH_RLHF_CACHE_REGISTRY)}")
+            cache = Path(HH_RLHF_CACHE_REGISTRY[tag])
+        else:
+            cache = Path(os.environ.get("TEMP_BENCH_HH_RLHF_DIR",
+                                        DEFAULT_CACHE_DIR))
         if not (cache / "chosen.npz").exists():
             raise FileNotFoundError(
                 f"HH-RLHF cache missing at {cache}; run "
                 "experiments.explorations.actmix_rlhf.build_cache first.")
+        expect = (spec.extra or {}).get("cache_expect")
+        if expect:
+            meta = json.loads((cache / "meta.json").read_text())
+            for k, want in expect.items():
+                got = meta.get(k)
+                if got != want:
+                    raise ValueError(
+                        f"hh-rlhf cache mismatch at {cache}: meta[{k!r}] = "
+                        f"{got!r}, cell expects {want!r} — wrong substrate.")
         chosen = np.load(cache / "chosen.npz")
         rejected = np.load(cache / "rejected.npz")
         c_acts, r_acts = chosen["acts"], rejected["acts"]

@@ -76,7 +76,7 @@ def main():
                 arch_name=c["arch"], seed=c["seed"],
                 datasource_name=c["datasource"],
                 training_cfg=c["training_cfg"],
-                eval_cfg={},
+                eval_cfg=c.get("eval_cfg", {}),
                 agent=os.environ.get("AGENT_NAME", "runpod-2"),
                 allow_dirty=True,
             )

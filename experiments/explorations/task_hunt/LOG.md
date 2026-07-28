@@ -19876,3 +19876,46 @@ sycgen's mac-c→mac-d handoff pattern. GOLD-VISIBILITY applies: a
 KEEP posts to the HANDOFF same-beat.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## [2026-07-28 05:05 London] runpod-2: ⚑ G2 FIRED — pf_anchor evals ran on the WRONG SUBSTRATE (l12-BASE, not l13-IT); root-caused, fixed by construction, rows snipped, relaunching
+
+**The gate worked.** pf_anchor 3/3 landed suspiciously fast and the
+s42 auc came back 0.6096472588185295 — IDENTICAL to 16 digits with
+papermatch's `agentic_txc_02.plain.auc_mean`, which was computed on
+the l12-BASE cache. Identity across supposedly-different substrates
+= the eval ran on l12. G2's "eval-cache bug ⇒ STOP" branch executed.
+
+- **Root cause:** `rlhf.py` resolves its cache from env
+  (`TEMP_BENCH_HH_RLHF_DIR`, default l12) — INVISIBLE to eval_key,
+  whose eval_cfg is empty for RLHF rows (mac-local's census had
+  already flagged the empty eval_cfg). My launch never set the env
+  var. Worse than one bad lane: rows on different substrates ALIAS
+  under the same eval_key — the 013441cfd hazard class on the eval
+  side.
+- **Fix (by construction, backward-compatible):** eval substrate is
+  now CELL IDENTITY. `rlhf.py` gains `HH_RLHF_CACHE_REGISTRY`
+  (tag → dir: l12base_phase7 / l13it_paper); cells pass
+  `eval_cfg.hh_rlhf_cache` (hashes into eval_key — pod-portable
+  tag, not a path) + `cache_expect` (meta.json subject/layer
+  hard-check BEFORE any metric). Empty eval_cfg = historical env
+  behavior bit-for-bit; zero existing keys move. run_cells now
+  passes per-cell eval_cfg (was hardcoded {}); pf() carries
+  tag l13it_paper + expect {gemma-2-2b-it, layer 13}. Probes:
+  unknown tag raises, wrong-substrate expect raises (receipts in
+  session log); 11/11 agentic tests green.
+- **Rows:** the 3 wrong-substrate leaderboard appends SNIPPED
+  before commit (never pushed); runs-jsonl/run-dir debris is
+  uncommitted and disclosed here. Anchor CKPTS are untouched
+  (staging is substrate-independent).
+- **Silver lining (real receipt):** 16-digit identity with
+  papermatch through the v2 runner = the anchor-load + evaluator
+  path is DETERMINISTIC and papermatch-consistent on the l12
+  substrate — an unplanned port-fidelity control, quotable as
+  such.
+- **Relaunching pf_anchor at this pin** (new eval_keys by
+  construction) → G2 re-read on true l13-IT numbers → pf_pilot.
+  G1 projection slips ~20 min (~07:20-07:35 London); relief rule
+  unchanged.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
