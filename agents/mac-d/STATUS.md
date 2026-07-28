@@ -20,6 +20,14 @@ arm exists to refuse.
 **HANDOFF §3 is RULED DONE by the hub (0404cd942) — do not edit it
 today without a data change.**
 
+**⚑ btk `--tag final` IS GATED ON THE GAP CELLS.** Rendering it early
+produces a figure whose caption says "FINAL — seeds {42,1,2}" while its
+own coverage note still reads `T6:n=2 T10:n=1` — the tag asserts
+completeness the data lacks, and the two contradict each other in
+print. Baseline for the before/after sha is **`ff242b78`** (the
+committed deliverable), NOT `c1998b48` (my re-render). Preview verified
+in scratchpad; deliverable restored untouched.
+
 **IN FLIGHT — last pod** `tnp7vvew4t80wi` / `mac-d-rlhfpf-0728-5`,
 `ssh -p 12997 root@31.24.80.41`, $2.99/h. Running the 3 deferred **btk**
 gap cells (T6/s2, T10/s1, T10/s2) per hub 68e146e0f — same cache, so no
@@ -28,8 +36,11 @@ re-bootstrap. Watcher armed on `BTK-GAP-DONE` in `/workspace/btk.log`.
 rows orphan from the 26 existing btk rows.
 
 **THEN (my remaining duties):** repatriate btk rows (new-keys-only
-merge) → `bash agents/mac-d/teardown_pod.sh tnp7vvew4t80wi <T>`
-(REFUSES until all 3 seeds are local — containers never push) → ledger
+merge) → `bash agents/mac-d/teardown_pod.sh tnp7vvew4t80wi btk 6 10`
+**ARM IS REQUIRED** (`pf`|`btk`) — v1 hardcoded pf and on this pod
+would have read pf T8 rows, said ALLOW, and destroyed the 3
+unrepatriated btk cells. Guard REFUSES until all 3 seeds of every
+listed T are local, for that arm — containers never push. → ledger
 actuals. Spend peaked $17.94/h (6 pods), now $2.99/h.
 
 **⚑ THE DAY'S ONE TRANSFERABLE LESSON (hub e4ace71d7): FIVE separate
