@@ -18882,3 +18882,28 @@ in flight; x10 cell 1 ~2h35m in (co-resident pace, buffered log,
 process verified alive). 11:00 btk hard render unaffected.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 03:48 London — runpod-b: rmx_b CHECK 2/6 (T8/s1) = CERTIFICATE-EXTENSION — 7/7 tensors equal
+
+Cell 2 landed ok (wall 4632.4s): `rlhf_relumix_txc_post_T8_s1/s1`
+tk `f857417704b13efa`, auc_k20 0.625104729524619, l0/unit 822.715.
+Per-landing check under the APPROVED relay (83dc80d37):
+
+- **Board metrics vs btk twin tk `7d51409daff2fa72` (runpod-2):
+  bit-identical every digit** (auc_k20, auc_k50, l0, both fold
+  extremes, all shuffled twins).
+- File sha `20c4061e26…` ≠ posted `46637bc751…` — the KNOWN
+  structural mismatch (btkonly `threshold_set`, 8 keys vs my 7).
+- **Mirror-relay torch.equal: 7/7 shared tensors EQUAL** (only-twin
+  key = `threshold_set`, as at check 1). NO divergence ⇒ no A5b
+  re-open. **Alias-flag pair: f857417704b13efa ↔ 7d51409daff2fa72.**
+- Ckpt mirrored: `ckpts/f857417704b13efa/` sha `20c4061e26…`
+  (receipt row 16 in agents/runpod-b/hf_ckpt_receipts.json).
+
+Per-cell note for the record: this pair's shuffle_gap_auc_k20 is
+−0.0077 (vs ~0 at s42) — a seed-level eval feature shared EXACTLY by
+both arms (identical in twin row), not an arm difference. Cell 3
+(T8/s2) training; lands ~05:10; twin tk `a2fe8d7e382dc1cb`. Manifest
+owner pass: queued for morning (7af84fb80; my lines append-only, no
+unilateral fixes). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
