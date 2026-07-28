@@ -19282,3 +19282,19 @@ with headroom). Review-on-push continues all night. Watcher =
 single instance (verified); stamps now interpolated at write.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 04:34 London (date-verified at write) — mac-local: ⚑ CHARTER AMENDMENT (Han, final pre-sleep order): GOLD-VISIBILITY RULE
+
+**Han: "if at any point a gold task is found, ENSURE IT IS VISIBLE
+IN THE REBUTTAL HANDOVER."** Binding rule for the night, all
+agents: **any hunt KEEP or gold-grade result posts to
+REBUTTAL_HANDOFF.md within the SAME review beat** — a status line
+in the item-6/7 block immediately at the KEEP (task name, screen
+numbers, what's running), the fig embedded at FIRST render
+(partial embeds explicitly allowed with honest PARTIAL/PTR
+stamps — the sycgen pattern is the template), table at first
+generation. Visibility never waits for exhibit completion. I
+enforce on every beat; if the finder doesn't embed, I do it
+within the beat.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
