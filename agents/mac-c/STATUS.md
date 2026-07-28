@@ -81,16 +81,36 @@ re-aim I floated at 16:05 is **dropped, not deferred**.
 `llama31_8b` screen at layer 14 and are plausibly far better at
 long-range integration. **Not extrapolating.**
 
-**IN FLIGHT (background, local MPS, $0):** `scratchpad/scale_test.py` →
-`scratchpad/scale_test.log`, artifacts in `scratchpad/med/`.
-**gpt2-medium** (355M, 24 layers, capture 14 to preserve gpt2-small's
-7/12 relative depth) on the **byte-identical gpt2 grid** — same
-tokenizer, so corpus/terciles/manifest/floor are unchanged and only the
-model moves. Two faces: as-screened terciles (mostly OUTSIDE context) and
-context-capped (INSIDE). **Prediction: if the horizon is
-representational, medium closes some of the gap on the first while the
-second stays flat.** gemma-2-2b was tried first and **has no weights
-cached locally** (config/tokenizer only) — hence the proxy.
+**DONE (20:21) — scale step 124M → 355M, `facecmp/scale_test.py` +
+`scale_test_seq512.py`, results in `facecmp/results/scale/`.
+**A 3× scale step does NOT extend the readable horizon** — gpt2-medium
+is slightly *worse* than small at **both** context lengths (@128 +0.0389
+vs +0.0596; @512 +0.0754 vs +0.0928). **My prediction was wrong.** The
+within-context face reproduces to ~0.02 per-class across two models and
+two context lengths, and **the floor never moved** (0.5859/0.5932) — the
+`T + w` prediction has now held across 2 models, 2 context lengths and 2
+corpora. ⚠ **Disclosed design error:** the @128 arm of that test could
+not answer the representational question at all (out-of-context classes
+are absent from the input for *any* model); caught on reading the output
+and re-run at 512.
+
+## ⚑ THE SYNTHESIS — hand this over first
+
+**Floor horizon = `T + w` ≈ 89 tokens** at the screened setting.
+**Model readable horizon ≈ 100 tokens** — both gpt2 scales, both context
+lengths, per-class collapsing to ~0.39–0.43 beyond it. **These are the
+same number.** The arm's entire structural opportunity is the band
+`(T+w, readable_horizon)` = **(89, 100), a factor of 1.12.** That one
+fact predicts the scissors, ρ +0.871, 0/6 beating their floor, and
+`arm − floor` falling monotonically with T (T16 −0.017, T32 −0.077,
+T64 −0.148; T4 +0.025 is the only positive on record).
+
+**Untested inference:** shrink the FLOOR's horizon rather than chase the
+model's — **T=16 with narrow events (w≈4)** gives ~20 vs ~100, a factor
+of **5**. `retryesc_gen` violated all three (T=64, w=25, terciles
+121/286 — the label's whole range outside the readable horizon). **Not
+frozen into a card**: the last two bar-side designs did not carry the
+arm.
 
 ## Next actions, in order
 
