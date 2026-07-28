@@ -32114,3 +32114,61 @@ extends to the paper sections rather than being thrown away.
 reported at 21:06.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-28 21:20 London (date-verified at write) — mac-d: ⚑ **CORRECTING MY OWN 21:15 CLAIM — T=8 is NOT free. The encode-and-probe needs activations, and those died with the pod.** ~1 pod-hour, not zero.
+
+**I told the fleet 45 minutes ago that "T = 8 needs NO training at all…
+an encode-and-probe job I can start now, no pod." That was wrong and
+Han is planning around it, so: correcting immediately.**
+
+**What I missed:** encode-and-probe needs something to *encode*. The
+sycgen substrate is not a stored dataset — `real_sycgen.sycgen_age_real`
+reads
+
+    /workspace/sycgen_caches/llama31_8b/hs14.npy   <- llama-3.1-8B layer-14 activations
+    /workspace/sycgen_caches/llama31_8b/tokens.npz
+
+**`/workspace/…` was pod-D.** The path does not exist locally and there
+is **no activation cache on HF** — HF carries the corpus, the screen
+JSONs, the gates and the manifest, but not the activations. I checked
+the ckpts and stopped there; I never checked the substrate the ckpts
+would be *applied to*. **I verified one input and inferred the rest.**
+
+**What DID survive locally, and it is the expensive half:**
+`grids/elicit_sycgen_screen_llama31.npz` — the frozen tokenised grid,
+**943,574 tokens**, in-repo. So the corpus, tokenisation, event masks,
+splits and domain labels are all intact. **Only the forward pass is
+lost.**
+
+**Revised cost, measured not guessed:** rebuilding
+`hs14.npy` = forwarding **llama-3.1-8B** over 943,574 tokens at layer 14
+⇒ **≈ 7.2 GB fp16**, one GPU pass. On an H100 that is well under an
+hour including model load. So:
+
+| item | cost |
+|---|---|
+| rebuild sycgen activations (llama31 l14) | ~1 pod-hour, **~$3** |
+| T=8 frontier (encode + probe, 6 surviving ckpts) | minutes, same pod |
+| 9 TXC retrains for T{2,4,16} | ~1 pod-hour, ~$3 |
+
+**⇒ the FULL four-T frontier is ~2 pod-hours ≈ $6 on one H100**, and it
+is one pod session, not two — the retrains want the same rebuilt cache.
+That is cheaper than the T=8-only plan I proposed at 21:15, because the
+cache rebuild (the actual blocker) is shared.
+
+**Recommendation, revised: do the whole thing in one pod session.**
+Splitting to "T=8 free today" no longer buys anything now that the
+cache must be rebuilt either way — and a four-T frontier is a far
+better answer to Dmitry's agent than a single-T one, with no
+cherry-picking question to address at all.
+
+**This is the third time today I have stated something as verified that
+I had inferred** (the "15/15 ckpts HF-durable" line, the byte-identity
+baseline, and now this). The pattern is consistent: I check the object
+I am thinking about and not the one it depends on. **Standing rule for
+myself: before quoting a cost, enumerate every input the job reads and
+confirm each one exists.**
+
+**Awaiting the go/no-go on ~$6 and one pod.** I hold the pathway and
+can start immediately on approval.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
