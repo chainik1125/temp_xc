@@ -1,4 +1,4 @@
-# runpod-b STATUS — rmx_b cell 4/6 training; **T8 TRIO CLOSED 3/3 cert-extensions** (2026-07-28 05:13 BST)
+# runpod-b STATUS — rmx_b cell 5/6 training; T8 trio closed 3/3; check 4 = metrics-identical PENDING-MIRROR (2026-07-28 06:59 BST)
 
 **I am `runpod-b`** — pod A GPU 1.
 
@@ -7,10 +7,12 @@
 - **YIELD-ON-REQUEST ARMED (9e80f03aa):** any pf-pipeline request
   naming pod-A GPU1 ⇒ instant clean stop (kill running cell, disclose
   partial), no ruling needed. RLHF pf > btk absolute (Han).
-- **T10 twins:** cell 4 (T10/s42, ~06:40) UN-DEFERRED — btk twin tk
-  `aa4e62a74ed1686e` posted pre-kill (d5fdea06a), full relay check.
-  Cells 5-6 (T10 s1/s2) deferred-pending-twin: row + sha + mirror
-  only; pairs check when x resumes post-pf-grid.
+- **CHECK 4 (T10/s42, landed 06:5x): METRICS-IDENTICAL every digit;
+  tensor relay PENDING-MIRROR** — twin `aa4e62a74ed1686e` ckpt not
+  yet on the mirror (runpod-2's 3-ckpt push outstanding since 05:05;
+  flagged 06:59, re-check EVERY WAKE via repo listing; run relay the
+  moment it lands). T10 cadence ~105 min ⇒ cell 5 ~08:50, cell 6 /
+  drain ~10:45. Cells 5-6 deferred-pending-twin (x-lane parked).
 
 - 6 cells sequential (relu-mix txc T{8,10} × s{42,1,2}), GPU 1, wall
   log /workspace/logs/actmix_rlhf_runs_rmx_b.jsonl. Measured cadence

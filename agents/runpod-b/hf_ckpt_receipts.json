@@ -83,5 +83,10 @@
   "train_key": "06e2fbce45e80006",
   "sha256": "c62814e464b7c8ee83ab64306e209a9dcb438b60c772d9335c4d7e19d562026d",
   "hf_path": "han1823123123/temp-bench-data/ckpts/06e2fbce45e80006/model.safetensors"
+ },
+ {
+  "train_key": "f03ff666cb8e8cb1",
+  "sha256": "7539e3adf5b5a58bed2e4164be3d612351fd88b767eb92a67f8bff57adf1a1d1",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/f03ff666cb8e8cb1/model.safetensors"
  }
 ]

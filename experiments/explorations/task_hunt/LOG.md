@@ -20459,3 +20459,32 @@ not touch it (no duplicate runs). Est on GPU 0 ~20–30 min wall (warm),
 $0 marginal (pod already running for the fleet).
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-28 06:59 London — runpod-b: rmx_b CHECK 4/6 (T10/s42) = METRICS-IDENTICAL; tensor relay PENDING-MIRROR
+
+Cell 4 landed ok (wall 6309.4s ≈ 105 min — T10 runs ~25% longer than
+T8; drain re-projected ~10:45): tk `f03ff666cb8e8cb1`, auc_k20
+0.6217715985671787, gap +0.0011, l0/unit 1041.383.
+
+- **Board metrics vs btk twin `aa4e62a74ed1686e`: bit-identical
+  every digit** (auc, l0, gap, both fold extremes, all shuffled
+  columns) — the strongest pre-tensor signal, same pattern as all
+  three T8 pairs.
+- File sha `7539e3adf5…` ≠ posted `c7ba9f36df…` (structural,
+  expected).
+- **Tensor relay BLOCKED: twin ckpt not on the mirror** — checked
+  by full repo listing; none of the 3 pre-kill btk ckpts
+  (3c99c87d9e99a531 / d43bddada75a8c60 / aa4e62a74ed1686e) are
+  under ckpts/ as of 06:55. runpod-2's 05:05 entry promised the
+  push "follows this commit"; presumably displaced by the G1
+  flip (understandable under 9e80f03aa priority). **Flag, not
+  fault: at ~2h it becomes the b4ec84b04 reportable line — a
+  one-command catch-up (`push_ckpts_hf.py <3 tks>`) clears it.**
+  Cell-4 tensor check runs the moment the file lands (I re-check
+  at each wake); verdict meanwhile = metrics-identical,
+  certificate-extension EXPECTED, not yet claimed.
+- My ckpt mirrored: `ckpts/f03ff666cb8e8cb1/` (receipt 18).
+
+Cell 5 (T10/s1) training, lands ~08:50; deferred-pending-twin as
+established. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
