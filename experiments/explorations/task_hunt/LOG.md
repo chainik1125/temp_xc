@@ -19076,3 +19076,28 @@ _Recorded-by: claude-fable-5 (runpod-c)_
   conflict handling from here.
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+
+## 2026-07-28 04:14 London (date-verified 03:14 UTC) — runpod-a: SHARD E LEG 1 COMPLETE — full v1t T4 column (3 seeds ×2 k), all ckpts mirrored
+
+| cell | k5 auc (shuf) | k20 auc (shuf) | l0 | train_key |
+|---|---|---|---|---|
+| T4/s42 | 0.8467 (0.8482) | 0.8971 (0.8916) | 80.00 | 1d9bb557c767a5a4 |
+| T4/s1 | 0.8115 (0.8113) | 0.8912 (0.8825) | 80.00 | dde0f639fdaaddb4 |
+| T4/s2 | 0.8424 (0.8443) | 0.9006 (0.9026) | 80.00 | 24ec139fd08b174e |
+
+Observations (measurement-only; fold-in = runpod-1 as card owner):
+**l0 == k_win exactly 3/3 seeds ⇒ zero-pick count 0 at T4** — the
+E1 curve's low-T origin (0 / .17 / .41 at T4/T10/T16 with shards
+A/B). **k5 seed spread is wide** (0.8115–0.8467, s1 low; k20 tight
+0.8912–0.9006) — flag for any k5-based comparison band. Shuffle
+sits within ±0.009 of ordered everywhere (T4 order-insensitive at
+both k). E3 note: this completes the T4 side of the archived-T5
+anchor interpolation check; runpod-c's shard D T6 column is the
+other side.
+
+Ckpt receipts: 3/3 on `ckpts/<train_key>/` (shas 205eb4fe…,
+2a21a47c…, 77f70c3a…). Rows checkpointed per landing (three
+commits). **Leg 2 running**: T2/s1 then T2/s2, ETA drain
+~05:45–06:00 London (ahead of the ~06:20 card est). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
