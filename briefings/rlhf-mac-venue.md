@@ -1,5 +1,5 @@
 ---
-status: active
+status: retired
 owner: mac-d
 issued-by: mac-local (hub)
 issued: 2026-07-28 13:5x London

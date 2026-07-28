@@ -25855,3 +25855,94 @@ our port's 69.3 GiB at T16 contradicts upstream's 48 GB A40
 accommodation. We may be chasing a cell the paper never ran.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 13:52 London (date-verified 12:52 UTC) — mac-local (hub): ⚑⚑⚑ **THE "FEED-BOUND" COST IS A PORT BUG, NOT A HARDWARE PROPERTY.** Upstream keeps the buffer ON THE GPU and gathers there; we ship every batch across the bus. Han is right — back to a pod, laptop plan RETIRED.
+
+### 0. Han (13:52)
+
+> "both mac local agents are on this machine … why not spin up a runpod
+> with lots of CPU cores? it's ridiculous we are resorting to running
+> this on my laptop"
+
+**Both points sustained.** The fleet is **one 48 GB laptop** with the
+gold hunt contending for it — that is not a venue for a 21-cell grid.
+And my laptop plan came from reading "local mac agents own RLHF" as a
+*venue* constraint when it was an *anti-chaos* one. Mine to own.
+`briefings/rlhf-mac-venue.md` is **RETIRED** (superseded by this entry).
+
+### 1. ⚑⚑⚑ The finding Han's question flushed out — verified on both sides, from source
+
+**Upstream never pays a feed.** `_preload_single` loads the cache
+**fp16** and does `.to(device)` — the whole buffer lives **on the
+GPU** — and `make_pair_window_gen_gpu` gathers **on the GPU**
+(`torch.randint(..., device=buf.device)`, `buf[seq, pos]`), casting
+`.float()` afterwards on the small batch only. **Zero host→device
+transfer per step.** Their own comment sizes the one-time load:
+*"3.5 GB fp16 from disk to GPU is <15 s"*.
+
+**Our port pays it every single step.** All three buffer classes are
+host-resident and transfer per batch:
+
+    SequenceBuffer.__call__ -> batch.to(self.device, dtype=torch.float32)
+    WindowBuffer.__call__   -> batch.to(self.device, dtype=torch.float32)
+      (gather indices built with torch.Generator(device="cpu"))
+
+**So runpod-2's "818 MiB/s = 95% of wall, feed-bound, T-independent" is
+real as a measurement and wrong as a diagnosis.** It is not a property
+of the workload or of RunPod's hardware. It is our port re-implementing
+a GPU-resident design as a host-fed one. **We rented H100s and used
+them as a place to receive data.**
+
+This also retires my own "the Mac wins because unified memory has no
+bus" story. The Mac did not beat the H100; **the H100 was crippled and
+the Mac happened to be immune to the specific way it was crippled.**
+
+### 2. Han's CPU-cores instinct — right target, better fix
+
+More cores *would* have helped, because the cost sits on the
+host-side gather + copy (and the pods additionally ran the
+oversubscription trap: ~44–48 CPU quota against `torch` autosizing to
+208–224 threads). But the correct fix is not to buy cores to do the
+work faster — it is to **stop doing the work at all**, as upstream
+doesn't. With the buffer resident, core count stops mattering.
+
+### 3. ⚑ THE PLAN — one pod, single owner, buffer resident. mac-d executes.
+
+1. **Spin ONE pod** — mac-d owns it end-to-end (provision → run →
+   terminate). No resident pod agent; that was the chaos Han killed.
+   80 GB card. Ledger both ends, terminate at lane end.
+2. **GPU-resident buffer, opt-in by ENV — `TEMP_BENCH_BUFFER_RESIDENT=1`.**
+   Not a `TrainingConfig` field: that hashes into `train_key` and
+   would rotate **every** key in the leaderboard. Env knobs do not
+   (established precedent: `TEMP_BENCH_GPU_FRACTION`). `data/` is not
+   `core/`, so rule 3 is not engaged; default OFF means no existing
+   pathway changes.
+3. **Equivalence receipt before any grid hour.** The CPU generator
+   produces the same index sequence either way, and fp16→fp32 is
+   exact, so resident and host-fed batches must be **bitwise
+   identical**. Prove it (`torch.equal` over N batches) and post it.
+   If they are not identical, stop and say so.
+4. **Re-measure, then size the grid.** Expected: step time collapses
+   toward the compute-only floor runpod-2 measured at **2–21% of wall**.
+   Do not quote a speedup until it is measured.
+5. **T10 is back in scope** — 14 GB resident buffer + T10's 39 GiB fits
+   an 80 GB card. **T16 still does not** (69.3 + 14 = 83 GiB), and
+   § 7 of the retired briefing stands: upstream has **no `t16`** arch,
+   so it is our interpolation, not a paper cell.
+
+**Still binding from earlier rulings:** `PF_N_STEPS = 8_000` as a
+SEPARATE constant (never touch shared `N_STEPS` — it orphans the btk
+grid); anchors stay frozen; `warmup_steps=0` on sweep cells only;
+grad_clip and declarative-`precision` disclosed, not patched.
+
+**mac-c is unaffected — gold hunt continues on this machine.**
+
+### 4. What this says about the MPS work
+
+Not wasted, and not load-bearing either. The rule-3 `mps` branch
+(`503f726f1`) stays useful for local prototyping and Han can still
+veto it. The recovered 14 GB cache on this Mac is now a **durable
+third copy** (HF + pod + here). But **no grid cell runs on the
+laptop.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
