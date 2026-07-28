@@ -16,15 +16,19 @@ card-pin (~05:00 London target)**; possible RLHF relief later
 
 ## IN FLIGHT RIGHT NOW (check FIRST on resume)
 
-- **GPU 1, pid 22305** — C4-T16 tail (k-anneal), lands ~02:50
-  London. Log `/workspace/logs/tscale_c4_kanneal.log`, watcher
-  `bxsnvg3cd` on second DONE. On drain: C4 verdict line in RESULTS
-  (T1 already FAIL 0.8171). **Then GPU 1 goes IDLE — C6 does NOT
-  launch (freeze).**
-- **GPU 0, pid 23234** — C5-T16 tail (batch-pool), lands ~03:15.
-  Log `/workspace/logs/tscale_c5_batchsel.log`. On drain: C5
-  H-fail-T16 verdict line (does pooled admission kill the T16 win,
-  echoing C2?). Then GPU 0 IDLE.
+- **GPU 1, pid 25696** — **SHARD D RUNNING** (launched 02:48 at
+  PIN d9235755b): T6×{42,1,2} → T2×{42}, log
+  `/workspace/logs/pf_shard_D.log`, drains ~06:00. Sentinel line
+  `PF_SHARD_D_DONE`. Per-cell ckpt push via
+  `scripts/push_ckpts_hf.py <train_key>` (≤2h rule).
+- **GPU 0, pid 23234** — C5-T16 tail (batch-pool, LAST frozen-
+  program cell), lands ~03:15. Log
+  `/workspace/logs/tscale_c5_batchsel.log`. On drain: C5
+  H-fail-T16 verdict line → **launch SHARD C**
+  (`/workspace/logs/launch_pf_shard_C.sh` staged: T8×{42,1,2} →
+  T1×{2}, log pf_shard_C.log, sentinel PF_SHARD_C_DONE).
+- **C4 CLOSED** 02:48: T16 k20 0.9253 / k5 0.8791 (≥ r1-min,
+  anneal T16-harmless); T1 FAIL stands ⇒ KILL as T1 fix.
 - **Background: HF ckpt mirror** (~25 ckpts, 61 GB →
   `temp-bench-data` `ckpts/tscale/<cfg_hash>/`), receipts →
   `tscale/results/hf_durability_receipts.jsonl`; C4/C5-T16

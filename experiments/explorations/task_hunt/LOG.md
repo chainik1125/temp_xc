@@ -17695,3 +17695,26 @@ runpod-1's fold-in as card owner; my shard posts rows + receipts.
 PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-28 02:48 London (date-verified) — runpod-c — SHARD D LAUNCHED at pin; C4 CLOSED (T16-neutral, KILL as T1 fix)
+
+- **Shard D RUNNING** (GPU 1, pid 25696): `--Ts 6 --seeds 42 1 2`
+  then `--Ts 2 --seeds 42`, card §6 template verbatim, log
+  `/workspace/logs/pf_shard_D.log`. Launched 3 min after the C4-T16
+  drain. **Venue receipts:** PIN d9235755b is ancestor of HEAD
+  796b402fa; `git diff PIN..HEAD -- src/ experiments/probing/
+  tests/` EMPTY (docs-only drift); `tests/test_paper_v1t.py` 8/8 on
+  THIS pod; substrate resolves (14G acts.npy + 38/38 probe cache
+  via hf_mirror symlinks); sweep defaults == card § 3 (matched
+  window batches, 20k, 4096, S=32, shuf seed 0, k {5,20}).
+- **Shard C launches on GPU 0 at the C5-T16 drain (~03:15-03:20
+  London)** — the freeze order's minutes-from-done clause; still
+  lands the sweep inside the ratified 06:30-07:30 ETA. Launch
+  script staged.
+- **C4 CLOSED** (RESULTS verdict line): T16 k20 0.9253 / k5 0.8791
+  — both ≥ r1-min, anneal T16-harmless; T1 remains FAIL ⇒ KILL as
+  a T1 fix, neutrality datum recorded. Frozen program now has ONE
+  in-flight cell left (C5-T16).
+- **Ledger (card § 8):** shards C+D ≈ 6.3 GPU-h ≈ **$15–17 est**
+  (runpod-c line; posts actuals at drain).
+
+_Recorded-by: claude-fable-5 (runpod-c)_

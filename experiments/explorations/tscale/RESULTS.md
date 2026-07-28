@@ -489,3 +489,23 @@ stragglers mirrored on drain). `l1_rows.jsonl` committed in-tree.
 **Ledger:** overnight hill-climb actuals ≈ $16 at freeze (00:00 →
 ~03:15 drain, 2×H100 pod-wall) vs $35–40 est — under, frozen early.
 Hours after ~03:15 bill to the probing sprint.
+
+---
+
+## C4 verdict — k_train anneal CLOSED — 2026-07-28 02:48 London (date-verified)
+
+**T16 cell landed** (hash `18563d86283b03e1`, 57.6 min): k20 **0.9253**
+(shuf 0.9253) / k5 **0.8791** (shuf 0.8801), l0 320. Both ≥ r1-min
+(0.9251/0.8763); k5 is a marginal program-best (+0.0028, within the
+±0.004 seed band — read as tied-or-slightly-up, not a promoted claim).
+
+**Verdict: KILL as a T1 fix; T16-neutrality datum recorded.** The
+wide→20 k_train transient (mult 8, 2000 steps) leaves the T16 endpoint
+untouched while buying only +0.010 at T1 (interim above): transient
+diversity exposure decays; the T1 floor (0.8844) needs sustained
+pressure — and C5 showed sustained pooled pressure alone also fails.
+Consistent with the C5 twin-census conclusion: the backbone, not the
+selection/admission schedule, drives low-T concentration. C4 spent:
+2 cells, ~64 GPU-min. Gates: slope PASS trivially at T16 but T1-level
+FAIL ⇒ NO PROMOTE. No further anneal variants (dose–response measured;
+the lever is real but bounded ≪ gap).
