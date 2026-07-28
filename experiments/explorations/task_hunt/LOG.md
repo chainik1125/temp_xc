@@ -32988,3 +32988,69 @@ verification corrected me.** Labelling is not a substitute for checking
 — it is a promise to go and check.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~22:5x BST — ⚑⚑ HUB ESCALATION: the item-6 job has written **NO log line in 59 minutes** while burning CPU. mac-d silent ~55 min. **Han's decision needed.**
+
+Han flagged the pod. It is worse than under-utilised.
+
+### 1. Measured on the pod, read-only
+
+    pod clock          21:29:42 UTC
+    item6.log mtime    20:30:08 UTC   -> 59.5 MINUTES OF SILENCE
+    workers 1353/4/5   state R (running), wchan 0 (NOT blocked in kernel)
+    CPU ticks over 8s  +1343 / +1294 / +1321  -> ~168% each, ACCUMULATING
+    GPU                19% / 6% / 0% sampled, 16.2 / 81.5 GiB held
+    files written in /workspace in last 20 min:  NONE
+
+**They are not deadlocked and not blocked on I/O — they are genuinely
+computing, in userspace, and have been for an hour with nothing to
+show.**
+
+### 2. Where it stopped, exactly
+
+    [sycgen_keep_r1/shard0] DONE 18/18 ok in 4s          <- untrained twins, instant
+    --- CORRECTION: shard 0 was all UNTRAINED twins; running shard 1 ---
+    [sycgen_keep_r1/shard1] 18 cells, max_workers=3
+    [1/18  2s] batchtopk_sae_btkonly/T1/s42/trained  r=0.487
+    [2/18  2s] batchtopk_sae_btkonly/T1/s2/trained   r=0.470
+    [3/18  2s] batchtopk_sae_btkonly/T1/s1/trained   r=0.489
+    <-- 59 minutes of nothing. Cell 4/18 never logged. -->
+
+Cells 1–3 are the **SAE T=1** cells: 2 s each, `cache t=True e=True`.
+**Cell 4 is the first TXC cell.** Against mac-d's own estimate (~$3–4
+for 9 retrains ⇒ **~8 min/cell**), we are **~7× past** the budget for a
+single cell with no output.
+
+### 3. Hypothesis — LABELLED, not measured, and I am not acting on it
+
+Cells 1–3 hit a warm cache. **A different T is a different cache key**,
+so cell 4 may be materialising a fresh datasource — and per the 22:4x
+finding, `_SYNTHETIC_CACHE` is **per process**, so all three workers
+would do that expensive CPU construction (incl. `torch.pca_lowrank`)
+**independently**. That would fit 3 × 168% CPU with an idle GPU exactly.
+**Plausible, unverified — do not spend on it without checking.**
+
+### 4. What I am NOT doing
+
+**I am not touching mac-d's pod.** House rule: never modify a pod you
+did not spin up; hub takeover requires a LOG notice **and** Han's
+priority order. Killing it could destroy in-flight work I cannot see,
+and I have been wrong about exactly this class of judgement twice today.
+
+### 5. ⚑ Han — the decision is yours, and here it is in one line
+
+**~$3.70 burned, ~$2.99/h continuing, 59 minutes of no observable
+progress, and mac-d has not posted in ~55 minutes.**
+
+- **Authorize a hub takeover** and I will get a py-spy/stack dump off
+  the workers before anything is killed (so the stall is diagnosed, not
+  merely ended), then stop and restart with the fix; **or**
+- **hold** if you want mac-d to answer first.
+
+**mac-d: if you are alive, one line — is cell 4 expected to take this
+long, or is it stuck?** You are the only one who knows what that cell
+should cost.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
