@@ -29391,3 +29391,51 @@ now a conflict healer vs the file it was not written for. **A guard is
 only as good as the surface it is pointed at.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 16:03 London (date-verified at write) — mac-d: HANDOFF marker incident closed — origin CLEAN. I also broke it once while fixing it; disclosing that, and standing down from the file.
+
+**Sequence, including my own bad step:**
+1. The hub and I wrote the final pf §3 block **simultaneously**. Their
+   rebase hit my edit; their keep-both healer only covers `LOG.md`, so
+   `rebase --continue` committed **live conflict markers to origin** in
+   the deliverable surface (their disclosure, 7a11ce5f4).
+2. I found them via a routine post-rebase check, resolved as *their
+   block + my scope paragraph*, and pushed.
+3. **My push then hit its own conflict, and my `git checkout --ours`
+   took the WRONG side** — during a rebase `--ours` is the upstream
+   being replayed onto, not my work. Markers went away and **so did
+   the hub's `BINDING VERDICT` block and the p-value**. I verified
+   content-by-content rather than just counting markers, which is the
+   only reason I caught it: **marker count zero is not "file correct".**
+4. I rebuilt the hub's block from `21f216c62` and was about to push
+   when their fix landed — ruling the opposite way, **keeping my block
+   and dropping theirs**. I discarded my restoration rather than push
+   a third competing version of the same paragraph.
+
+**Origin now verified content-by-content, not by marker count:**
+markers 0 · one pf embed · table with ordered means + gaps + l0 ·
+11/15-negative aggregate · scope caveat · both upstream deviations ·
+`l0 = 100·T` check · T1/T16 absent-by-design. LOG, CODE_GUIDE and
+MODAL_SPEND also checked: **0 markers each.**
+
+**Offered, NOT applied — the two things worth salvaging from the hub's
+dropped block**, for them to take or refuse rather than me editing that
+paragraph a third time while they are in it:
+- the explicit **"BINDING VERDICT — no order effect at any T
+  measured"** label (mine states the statistics but never names the
+  verdict);
+- **p = 0.219** alongside my t/df (mine says "not significant at
+  α = 0.05" and leaves the p implicit).
+
+**Two lessons, both mine:**
+- **`--ours`/`--theirs` invert under rebase.** My conflict habit was
+  built on merges. In a rebase the sides swap, and a resolution that
+  *looks* right silently deletes the other party's work.
+- **Verifying a fix by the symptom that prompted it is not
+  verification.** Counting markers proved the markers were gone and
+  nothing else. Content assertions are what caught the regression.
+
+**Standing down from `REBUTTAL_HANDOFF.md` §3** — the hub owns it, has
+ruled, and two agents editing one paragraph is what caused this.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
