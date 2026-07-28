@@ -352,21 +352,50 @@ columns are checked by different arguments on purpose.
     arms   {txc, pooled, stacked}
     order  {ordered, shuffled}
     draw   {plain, nonidentity-redraw}          [AMD 4c]
-    k      {1,2,3,4,6,8,11,12,16,22,24,32,44,48} [AMD 2b — widened]
+    k      {1, 2, 4, 8, 16, 32}       [AMD2 — item 6's grid, UNCHANGED]
     weights{trained, untrained-twin}
 
-**[AMD] `k` widened from item 6's `(1,2,4,8,16,32)`.** That grid's
-consecutive points differ by 40–75%, which is exactly what let a
-single-sided rule call a 38%-cheaper baseline "matched". The added
-points are chosen to **straddle TXC's measured budget tightly** at
-every T. Cost is negligible here — the SAE arms are post-hoc
-transforms, so a k-point is one encode plus one probe fit, with no
-training anywhere in this lane.
+**[AMD2 00:55 — the k widening is REVERTED, and the reversion is a
+measurement.]** I widened `k` to 14 points when brief §2b said *"add
+intermediate k where the grid straddles TXC's budget"*. The hub then
+**measured the grid** (`scripts/plan_bracket_grid.py`, $0, straight off
+`frontier.json`) and **withdrew that guidance**: the nearest existing
+pooled point is already within **1.4–7.7%** of TXC's budget at
+T=2/4/8, and at T=16 pooled's `k=1` **floor** already costs **1.43×**
+TXC, so refinement is not merely unnecessary there — it is impossible.
 
-**The k grid is a BRACKETING instrument, not a result.** Only the two
-points adjacent to TXC's budget (and the interpolation between them)
-enter the verdict; the rest establish monotonicity, which §2b requires
-as a printed precondition rather than an assumption.
+**Item 6's bias was SELECTION, not COVERAGE.** The near-matched point
+already existed; the single-sided rule passed over it. Adding k-points
+would have treated a selection bug as a sampling gap and produced a
+denser grid with the same defect.
+
+⇒ **The §2b bracket rule stays fully in force. Only the "sweep finer"
+remedy is withdrawn.** The marginal pod-minute goes to **seeds**
+instead (§5b), because **outcome (d) is still unsized at n=3** — which
+is the binding uncertainty, not bracket width.
+
+## 5b. [AMD2] Seeds — n=3 primary, n=5 as a pre-declared extension
+
+The hub's prescription is *spend on seeds, not on a sixth k*. Adopted,
+with an honest constraint stated up front: **seeds {1,2,42} are the
+only ones with checkpoints.** Seeds 3 and 4 do not exist and would have
+to be **trained** — which is the one thing this lane otherwise avoids.
+
+**Sequencing, fixed now so the n choice cannot be made after seeing
+which n is kinder to the claim:**
+
+- **PRIMARY = n=3** on the existing checkpoints. This is the deliverable
+  and it is what the verdict is computed on if anything downstream fails.
+- **EXTENSION = n=5.** Seeds 3 and 4 (10 cells: 8 TXC + 2 SAE) train on
+  the same pod, which is already up and otherwise idle during the probe
+  sweep. **If they land, the verdict is RECOMPUTED at n=5 and BOTH are
+  reported.** If they do not, n=3 stands and the shortfall is stated.
+- **The n=5 rule is the n=3 rule with the sign test widened to 5/5.**
+  Written now, so a 4/5 result cannot be relabelled "essentially
+  unanimous" later.
+- Extra seeds are trained under a **distinct tag** and disclosed as
+  **later-trained than the original three** — same rebuilt-cache
+  provenance (§7), one more generation removed from pod-D's originals.
 
 Trained arms load the 15 existing checkpoints. **No training in this
 lane.**
