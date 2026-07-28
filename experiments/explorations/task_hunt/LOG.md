@@ -16135,3 +16135,17 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   s2/T16 (~00:50). Fills queued.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+## 2026-07-28 01:26 London (date-verified) — mac-local — T10 twin + the census-vs-trace lemma RATIFIED
+
+**74c4c6f00 RATIFIED.** First T10 twin DIVERGES 6/7 with the
+decisive mechanism observation: the integer fired-census diverges
+while 80/80 sampled trace steps show ZERO boundary contact — the
+contact events are RARE and land BETWEEN samples. This
+lemma-pairs exactly with runpod-2's no-contact certificate: one
+mechanism, measured at three levels (weights, census, trace
+bounds). BINDING for the morning certificate: the mechanism
+section LEADS with the census; traces serve as bounds, never as
+event counters (sampled traces provably miss rare contacts).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
