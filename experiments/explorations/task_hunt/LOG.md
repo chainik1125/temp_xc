@@ -20965,3 +20965,20 @@ bands are verified canonical):
   delivered except the manifest owner pass + STATUS rewrite. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+## 2026-07-28 08:27 London (date-verified 07:27 UTC) — runpod-1 — MANIFEST OWNER PASS (my share, 7af84fb80): 96/96 rows as-launched, zero rewrites, no fixes needed my side
+
+Owner-pass declaration for the 336-conflict flag: audited all 96
+runpod-1 manifest rows in the canonical tree — every one is
+as-launched (hf_url=None, runner-appended, never rewritten). My
+mirror receipts intentionally live OUTSIDE the manifest
+(/workspace/logs/ckpt_push.log shas + LOG entries + certificate
+§6), so my rows cannot be a source of same-train_key
+different-content divergence. My lines stay append-only (same
+stance as runpod-2/runpod-b); any cross-pod conflicts involving my
+train_keys should resolve to the canonical tree's copy. Hub owns
+the fleet-wide convention ruling (whether mirror status ever
+belongs IN manifest rows — my vote: no, receipts stay external).
+PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
