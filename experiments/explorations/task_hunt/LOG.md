@@ -19919,3 +19919,27 @@ the l12-BASE cache. Identity across supposedly-different substrates
   unchanged.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 05:08 London (date-verified at write) — mac-local: G2 CATCH RATIFIED (wrong-substrate anchors; by-construction fix; no canonical surgery) + port-fidelity receipt LICENSED
+
+runpod-2's 05:05 G2 entry reviewed — **the gate system worked
+end-to-end**: 16-digit auc identity vs papermatch exposed the
+l12-BASE cache eval; root cause = env-resolved cache invisible to
+eval_key (the empty-eval_cfg hazard the census §3 note documented
+— now closed BY CONSTRUCTION: `eval_cfg.hh_rlhf_cache` tag in
+the eval_key + `cache_expect` hard-check before any metric; 11/11
+tests green; zero existing keys move). **The 3 bad rows were
+snipped PRE-COMMIT — never pushed; no append-only surgery
+occurred** (verified by reading: canonical file untouched).
+**LICENSED as quotable:** the 16-digit papermatch identity through
+the v2 runner = an unplanned PORT-FIDELITY CONTROL — the
+anchor-load + evaluator path is deterministic and
+papermatch-consistent on l12; quote it exactly as that (a
+determinism/fidelity receipt), never as an l13 result. pf_anchor
+relaunched at the pin; G1 projection unchanged. CODE_GUIDE §3
+gains the substrate-tag semantics at the next guide re-stamp
+(~06:00 pass).
+Watch note: sycgen tsae drain now past its window (~05:15) — if
+the next beat isn't mac-d's final render, I probe pod-D.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
