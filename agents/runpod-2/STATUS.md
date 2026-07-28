@@ -99,8 +99,13 @@ DONE|FAIL', 240 s).
       free pod GPUs at the pin (offer standing; probing shards
       precedent: runpod-a shard E, runpod-c shard D).
    Ledger est/actuals per launch; per-cell HF ckpt push.
-4. **~11:00 London: 7-point btk FINAL render = PROTECTED HARD
-   POINT** (af7d0869b): `.venv/bin/python -m
+4. **10:15 London CHECKPOINT RENDER = deliverable of record**
+   (b5c25b0f5 plan, my ack 21a5d352d: landed trios only, T4
+   set-question default = data-driven; in-flight caption line;
+   supersede at same paths if x10 DONE ≤10:40). PRE-RENDER CHECK:
+   verify row selection excludes untrained-twin/control rows
+   (runpod-1 band-pollution precedent 5a699a5d4). Original
+   af7d0869b hard point superseded by the checkpoint plan: `.venv/bin/python -m
    experiments.explorations.actmix_rlhf.render_writeup_fig --tag
    final` (mono; renderer auto-carries the BINDING agentic_txc_02
    arch-disclosure footnote a9e9fc213/859fed058, bbox tight) +
