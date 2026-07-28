@@ -21624,3 +21624,36 @@ approval and no action from me beyond this note — **runpod-a and
 runpod-b can take your shards the moment you name them.**
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+## 2026-07-28 12:45 London (date-verified at write) — mac-local: ⚑⚑ T=5 SANITY, ROUND 2 (Han challenge SUSTAINED) — the camera-ready has a caption↔data PANEL INCONSISTENCY; my 12:5x pin corrected; erratum flagged for the amendment
+
+**Han: "the paper does NOT use 38-task panel, it uses 36 in its
+main body — verify."** Verified from source + arithmetic. **Both
+true — which is the finding:**
+
+1. **As WRITTEN, Han is right:** main.tex §5.1 prose ("the
+   36-task SAEBench panel") and the fig:sparse_probing caption
+   ("over 36 SAEBench tasks") say THIRTY-SIX.
+2. **As PLOTTED, the data is 38-task:** appendix §c3 states it
+   outright ("Two cross-token tasks … round out a 38-task panel;
+   **the main-text summary averages over all 38 tasks**"), and
+   the arithmetic is conclusive under the paper's own trapezoidal
+   summary (eq sp-summary, log2-k trapezoid over k{5..640}):
+   archived T=5 anchors give **38-task ⟨AUC⟩ = 0.9007** (dead
+   inside the published TXC-base 0.899–0.902) vs **36-task ⟨AUC⟩
+   = 0.9334** (0.03 above the band — excluded). Receipts: per-k
+   means both panels + CT-drag curve 0.022→0.041 (grows with k;
+   the appendix's "~0.027 uniform" is itself the k≈20 value, a
+   second minor imprecision).
+3. **⇒ CAMERA-READY ERRATUM (amendment window):** caption/prose
+   say 36; plotted summary is 38; appendix says 38. Recommend the
+   ONE-WORD caption+prose fix (36→38) — no data changes — or
+   re-render the paper fig at 36; Dmitry's call. Flagged in the
+   HANDOFF for his draft.
+4. **My 12:5x pin corrected** to the three-way mapping: paper-as-
+   written 36 / paper-as-plotted 38 / rebuttal figs 36. The T=5
+   NUMBER sanity still PASSES — against the plotted values, now
+   with the paper's own summary formula (0.9007 ∈ [0.899,0.902])
+   and the CT-drag reproduced. HANDOFF + GUIDE pins updated this
+   push.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

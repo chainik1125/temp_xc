@@ -65,15 +65,23 @@ label.
   pf re-render); archived-anchor comparison →
   `RESULTS_paper-match.md`. (The earlier `figs_writeup/tab_*.md`
   paths were never created — pointers corrected 12:4x.)
-- **⚑ PANEL-CONVENTION MAPPING (binding, 12:5x — read before
-  comparing to the paper):** the paper's fig:sparse_probing
-  headline is the **38-task panel mean** ("TXC-base at
-  0.899–0.902"); these rebuttal figs use **SAEBench-36** (CT pair
-  excluded). The SAME archived T=5 paper ckpts read **0.8975 ±
-  0.0039 (38-task — matches the paper within seed spread; T=5
-  sanity PASS, LOG 12:5x)** vs **0.9248 ± 0.0033 (36-task — the
-  rebuttal convention)**. Never cross-quote the two panels; the
-  ~+0.03 offset is the panel, not a result.
+- **⚑ PANEL-CONVENTION MAPPING + CAMERA-READY ERRATUM (binding,
+  13:1x — read before comparing anything to the paper):** the
+  paper's main text + fig:sparse_probing caption SAY "36-task
+  panel", but the PLOTTED summary is arithmetically the
+  **38-task** aggregation — the paper's own appendix §c3 states
+  "the main-text summary averages over all 38 tasks", and under
+  the paper's own trapezoidal summary the archived T=5 ckpts give
+  **0.9007 on 38 tasks (dead inside the published TXC-base
+  0.899–0.902)** vs **0.9334 on 36 tasks (excluded)**. **⇒ the
+  camera-ready caption/prose have a 36↔38 inconsistency —
+  recommend the one-word caption fix (36→38) in the amendment (no
+  data changes); Dmitry's call.** The rebuttal figs use
+  SAEBench-36 (the same ckpts read k20 = 0.9248 ± 0.0033 there vs
+  0.8975 ± 0.0039 on 38). Never cross-quote panels: a ~+0.03
+  offset between our figs and the paper's plotted values is the
+  panel definition, not a result. T=5 number sanity: PASS against
+  the plotted values (LOG 12:5x + 13:1x receipts).
 - **Data:** leaderboard rows: `experiment=probing`,
   `arch=txc_batchtopk_pre_btkonly` (btk arm) /
   `txc_batchtopk_pre` (relu-mix arm),
