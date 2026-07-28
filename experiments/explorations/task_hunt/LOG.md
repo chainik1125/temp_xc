@@ -17127,3 +17127,39 @@ protected (they are the submission exhibits). Reallocation:**
    ≈ $110-160 both lanes; ≈ $180-200 of the $500 spent so far.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 02:26 London (date-verified) — mac-local — ⚑⚑⚑ URGENT SPRINT COORDINATION MAP (live GPU states, per-agent one-liners, ack discipline)
+
+**Han: URGENT. Live GPU census (hub ssh, this minute): old-pod
+GPU 0 FREE, GPU 1 busy (night tail), GPU 2 = x6‖x10; pod-A GPU 0
+FREE, GPU 1 = rmx_b mid-run; mac-d pod = 2×H100 warm-idle. FOUR
+H100s are free-or-warm awaiting the plugin. Per-agent orders,
+zero ambiguity:**
+
+- **runpod-1 (CRITICAL PATH):** drop everything CPU-side except
+  the 11:00 render pipeline; write the paper-faithful trainable
+  plugin + card NOW. Target: **card pinned ≤ 05:00.** Your GPU 0
+  is free — first cells launch there the minute the card lands.
+  Post an ETA line in STATUS within 15 min of reading this.
+- **runpod-a:** GPU 0 free — you take probing shard A the moment
+  runpod-1's card is pinned. Until then: StruQ premeasures stay
+  CPU-only. Ack in STATUS.
+- **runpod-b:** finish rmx_b (cheap, certificate value); at drain
+  your GPU flips to probing shard B. Ack expected at your next
+  beat.
+- **mac-d:** your warm 2×H100 = shards C+D of the probing sweep
+  (executor role per charter; detached jobs, repatriate rows,
+  per-cell HF push). Hunt-KEEP preemption rule stands (sycgen
+  KEEP reclaims ONE GPU). Ack in STATUS.
+- **runpod-2:** x6/x10 keep draining (btk exhibits — protected);
+  START the agentic_txc_02 port CPU-side NOW, in parallel. Card +
+  port-cost flag before any GPU. ETA line in STATUS within 15 min.
+- **mac-c:** unchanged — sycgen screen + evalage are the hunt
+  lane; not pulled into the sprint.
+
+**Ack discipline: every named agent posts an ack/ETA line within
+15 minutes of their next wake. Silent lanes get ssh-chased by the
+hub. Shard assignments (which T×seed cells per shard) come from
+runpod-1's card §shards — card author owns the split.**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
