@@ -1,0 +1,178 @@
+{
+ "meta": {
+  "substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
+  "model": "gpt2",
+  "screen_hs": 14,
+  "face": "MED512_RECENCY_asscreened",
+  "H": 64,
+  "status": "FEASIBILITY PROBE, not a hunt4 verdict",
+  "ax_ts": [
+   32,
+   64
+  ],
+  "rows": {
+   "face": "MED512_RECENCY_asscreened",
+   "H": 64,
+   "n_docs": 300,
+   "tercile_edges": [
+    6.89481782913208,
+    8.149746894836426
+   ],
+   "n_elig": 450021,
+   "bin_counts": {
+    "0": 147043,
+    "1": 150851,
+    "2": 152127
+   },
+   "MED512_RECENCY_asscreened/train": {
+    "rows_per_class_total": {
+     "0": 3998,
+     "1": 3998,
+     "2": 3998
+    },
+    "ok": true
+   },
+   "MED512_RECENCY_asscreened/test": {
+    "rows_per_class_total": {
+     "0": 1498,
+     "1": 1498,
+     "2": 1498
+    },
+    "ok": true
+   }
+  }
+ },
+ "cells": {
+  "MED512_RECENCY_asscreened/tok_linear": {
+   "acc_test": 0.3589230179786682,
+   "per_class": [
+    0.38451269268989563,
+    0.30507344007492065,
+    0.38718292117118835
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.2
+  },
+  "MED512_RECENCY_asscreened/tok_mlp": {
+   "acc_test": 0.3627058267593384,
+   "per_class": [
+    0.3818424642086029,
+    0.3437917232513428,
+    0.36248332262039185
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 6.8
+  },
+  "MED512_RECENCY_asscreened/position_floor": {
+   "acc_test": 0.3093012869358063,
+   "per_class": [
+    0.2743658125400543,
+    0.34045395255088806,
+    0.31308412551879883
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "MED512_RECENCY_asscreened/T32/visible_evidence_floor": {
+   "acc_test": 0.47663551568984985,
+   "per_class": [
+    0.42990654706954956,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "MED512_RECENCY_asscreened/T32/actxmean_linear": {
+   "acc_test": 0.41744548082351685,
+   "per_class": [
+    0.4566088020801544,
+    0.38451269268989563,
+    0.4112149477005005
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 2.0
+  },
+  "MED512_RECENCY_asscreened/T32/actxmean_mlp": {
+   "acc_test": 0.41255006194114685,
+   "per_class": [
+    0.450600802898407,
+    0.3885180354118347,
+    0.39853137731552124
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 12.1
+  },
+  "MED512_RECENCY_asscreened/T64/visible_evidence_floor": {
+   "acc_test": 0.593235433101654,
+   "per_class": [
+    0.7797062993049622,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "MED512_RECENCY_asscreened/T64/actxmean_linear": {
+   "acc_test": 0.43813973665237427,
+   "per_class": [
+    0.49399200081825256,
+    0.3891855776309967,
+    0.4312416613101959
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 2.1
+  },
+  "MED512_RECENCY_asscreened/T64/actxmean_mlp": {
+   "acc_test": 0.3578104078769684,
+   "per_class": [
+    0.10814419388771057,
+    0.6121495366096497,
+    0.3531375229358673
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 12.0
+  },
+  "MED512_RECENCY_asscreened/T64/actxmean_foreign_linear": {
+   "acc_test": 0.36248332262039185,
+   "per_class": [
+    0.386515349149704,
+    0.3110814392566681,
+    0.3898531496524811
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 2.1
+  },
+  "MED512_RECENCY_asscreened/T32/label_null": {
+   "acc_test": 0.3333333432674408,
+   "per_class": [
+    0.3684913218021393,
+    0.3324432671070099,
+    0.29906541109085083
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 2.3
+  }
+ },
+ "summary": {
+  "tok": 0.3627058267593384,
+  "best_window": 0.43813973665237427,
+  "best_T": 64,
+  "gain_vs_tok": 0.07543390989303589,
+  "floor_at_bestT": 0.593235433101654,
+  "beats_floor": false,
+  "position_floor": 0.3093012869358063,
+  "gain_bar_0.05_cleared": true
+ }
+}

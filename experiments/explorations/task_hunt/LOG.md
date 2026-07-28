@@ -31013,3 +31013,114 @@ rows where 15 are right. A leaderboard-level `retracted` flag would
 retire that whole class; N copies of two constants will not.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+---
+
+## 2026-07-28 20:21 BST — mac-c: scale does NOT extend the horizon (3× step, both context lengths). ⚑ The floor's horizon and the model's readable horizon are THE SAME NUMBER — that is the whole problem
+
+Follow-through on the caveat I attached to the 20:09 entry. **First, a
+design error of mine, because it changes how the first table should be
+read.**
+
+### 0. ⚠ My scale test could not answer the question I posed it
+
+I ran `gpt2-medium` at **SEQ_LEN=128** and framed it as testing whether
+the *representational* ceiling is a gpt2 fact. **It cannot be.** At 128
+tokens of context the out-of-context tercile classes are **absent from
+the input for any model whatsoever** — so "medium ≈ small" there is what
+the *apparatus* ceiling predicts regardless of representation. It is a
+model-independence check on ceiling 1, not information about ceiling 2.
+I caught it on reading the output and re-ran at 512, where the
+information is actually present. **The @128 row is reported as the
+weaker thing it is.**
+
+### 1. Scale step: 124M → 355M (identical gpt2 tokenizer, so grid, terciles, manifest and floor are byte-identical; capture layer 14/24 preserves small's 7/12 relative depth)
+
+**As-screened face** (terciles ≈ ages 121/286):
+
+| context | model | tok | T64 arm | **gain** | per_class | floor |
+|---|---|---|---|---|---|---|
+| 128 | small | 0.3781 | 0.4377 | +0.0596 | [0.516, 0.394, 0.403] | 0.5859 |
+| 128 | medium | 0.3743 | 0.4132 | +0.0389 | [0.475, 0.397, 0.368] | 0.5859 |
+| **512** | **small** | 0.3585 | **0.4513** | **+0.0928** | [0.492, 0.433, 0.416] | 0.5932 |
+| **512** | **medium** | 0.3627 | **0.4381** | **+0.0754** | [0.494, 0.389, 0.431] | 0.5932 |
+
+**A 3× scale step does not extend the readable horizon — medium is
+slightly WORSE than small, at BOTH context lengths.** My prediction
+("medium closes some of the gap") was wrong.
+
+**Within-context face** (terciles ≈ ages 46/72) — reproducibility, and
+it is excellent:
+
+| | tok | T64 arm | gain | per_class |
+|---|---|---|---|---|
+| small @128 | 0.7138 | 0.8845 | +0.1707 | [0.845, 0.873, 0.839] |
+| medium @128 | 0.7259 | 0.8798 | +0.1540 | [0.852, 0.883, 0.838] |
+| medium @512 | 0.6978 | 0.8754 | +0.1776 | [0.832, 0.864, 0.841] |
+
+**Per-class agrees to ~0.02 across two models and two context lengths.**
+The readable regime is robust and reproducible; only the *unreadable*
+regime is fragile, and it is fragile in the direction of "not there".
+
+**The floor never moved with model or context (0.5859 / 0.5932) — as
+pre-registered, since it depends only on `T + w`.** That prediction has
+now held across two models, two context lengths and two corpora.
+
+### 2. ⚑ The synthesis — why this benchmark is so hard to pass
+
+Two horizons, both now measured:
+
+- **The floor's horizon is `T + w`.** At the screened setting
+  (T=64, w=25) that is **≈ 89 tokens**.
+- **The model's readable horizon is ≈ 100 tokens** — gpt2-small *and*
+  gpt2-medium, at 128 *and* 512 context. Beyond it, per-class collapses
+  to ~0.39–0.43 whatever you do.
+
+**Those are the same number.** The benchmark asks the windowed arm to
+beat a baseline that sees essentially the same slice of the past it can
+read. The arm's entire structural opportunity is the band
+`(T + w, readable_horizon)` = **(89, 100) — a factor of 1.12.**
+
+That single fact predicts everything measured today: the `retryesc_gen`
+scissors, the gain↔floor coupling (ρ **+0.871**), **0/6** faces beating
+their floor, and the way `arm − floor` degrades monotonically as T
+grows —
+
+    T16  -0.0167     T32  -0.0774     T64  -0.1482
+    (and T4 was +0.025 in retryesc_gen — the ONLY positive on record)
+
+**The arm does best against the floor at SMALL T, and best on gain at
+LARGE T. There is no T where both hold.** That is the scissors, and it
+is geometry, not task choice.
+
+### 3. What follows — an inference, clearly labelled as untested
+
+The band widens if you **shrink the floor's horizon** rather than chase
+the model's. `T + w` is fully under our control: at **T=16 with narrow
+events (w≈4)** the floor sees ~20 tokens while the model still reads
+~100 — **a factor of 5 instead of 1.12.** So: **small T, narrow event
+spans, and a label whose dynamic range sits inside (T+w, ~100).**
+`retryesc_gen` violated all three — T=64, w=25, terciles at 121/286,
+i.e. **the label's entire range was outside the readable horizon.**
+
+**This is a prediction, not a result.** It follows from measured
+quantities but has not itself been run, and I am not freezing a card on
+it tonight — the last two times I designed from a bar-side argument
+(19:26 cumulative faces) the arm did not follow.
+
+### 4. Scope, honestly
+
+**Both models are gpt2-family and small.** `gemma2_2b` and
+`llama31_8b` are the program's real legs and **remain untested** —
+gemma-2-2b has no weights cached locally (config/tokenizer only), so it
+needs a download or a pod. **A 3× step showing nothing does not prove a
+20×/65× step shows nothing**, and if the readable horizon scales
+strongly with model size the (T+w, horizon) band opens up on its own.
+**That measurement is the single highest-value next experiment** and it
+is what I would spend a pod on.
+
+**$0 all night. 0 mac-c pods. Item 7 still has no KEEP** — but the
+reason has moved from "we keep choosing bad tasks" to a measured
+geometric constraint, and that is a more useful thing to hand over.
+
+_Recorded-by: claude-opus-5 (mac-c)_
