@@ -25,7 +25,18 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from experiments.explorations.actmix_rlhf.cells import (  # noqa: E402
-    DATASOURCE, TXC_ARCH)
+    DATASOURCE, PF_ARCH, PF_DATASOURCE, TXC_ARCH)
+
+# CARD § 8 paper-faithful arm renders through the SAME machinery; only
+# the (arch, datasource) selector and the binding caption differ. The
+# btk path is unchanged — `--arm btk` is the default and reproduces the
+# previous output byte-for-byte.
+ARMS = {
+    "btk": {"arch": TXC_ARCH, "datasource": DATASOURCE,
+            "stem": "fig_rlhf_shuffle_tsweep"},
+    "pf": {"arch": PF_ARCH, "datasource": PF_DATASOURCE,
+           "stem": "fig_rlhf_shuffle_tsweep_pf"},
+}
 
 ROOT = Path(__file__).resolve().parents[3]
 LEADERBOARD = ROOT / "results" / "leaderboard.jsonl"
@@ -35,16 +46,22 @@ TXC = "#D55E00"  # house Okabe-Ito; hue follows the entity, linestyle
                  # carries the order condition (CVD-safe split)
 
 
-def load_points():
-    """(T, seed) -> {ordered, shuffled} from the latest matching row."""
+def load_points(arch=TXC_ARCH, datasource=DATASOURCE):
+    """(T, seed) -> {ordered, shuffled} from the latest matching row.
+
+    `arch`/`datasource` select the arm. They are a REQUIRED pair: the
+    two arms share metric names (`preference_auc_k20`), so filtering on
+    only one of them would silently mix the plain-TXC and
+    paper-faithful arms into one figure.
+    """
     best = {}
     for line in LEADERBOARD.read_text().splitlines():
         if not line.strip():
             continue
         r = json.loads(line)
         if (r.get("evaluator_name") != "rlhf"
-                or r.get("arch") != TXC_ARCH
-                or r.get("datasource") != DATASOURCE
+                or r.get("arch") != arch
+                or r.get("datasource") != datasource
                 or int(r.get("seed", -1)) not in SEEDS):
             continue
         if not (r.get("training_cfg") or {}).get("n_steps"):
@@ -84,6 +101,17 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", choices=("interim", "final", "checkpoint"),
                     required=True)
+    ap.add_argument("--arm", choices=tuple(ARMS), default="btk",
+                    help="btk = plain-TXC modernization (default, "
+                         "unchanged); pf = CARD § 8 paper-faithful arm "
+                         "(agentic_txc_02_v1t on the paper stream).")
+    ap.add_argument("--g1", choices=("pending", "passed", "failed"),
+                    default="pending",
+                    help="pf only: port-fidelity verdict state. Default "
+                         "'pending' stamps the caveat required by hub "
+                         "ruling 4e04ae0e3 item 4 — wave-1 cells launch "
+                         "with G1 unresolved and the verdict must travel "
+                         "with every figure until it lands.")
     ap.add_argument("--pair-style", choices=("mono", "blueorange"),
                     default="mono",
                     help="mono = single pair-hue (linestyle carries the "
@@ -95,9 +123,12 @@ def main():
     shuf_c = TXC if args.pair_style == "mono" else "#0072B2"
     colors = {"ordered": TXC, "shuffled": shuf_c}
 
-    points = load_points()
+    arm = ARMS[args.arm]
+    points = load_points(arm["arch"], arm["datasource"])
     if not points:
-        raise SystemExit("no matching leaderboard rows")
+        raise SystemExit(
+            f"no matching leaderboard rows for arm={args.arm} "
+            f"(arch={arm['arch']}, datasource={arm['datasource']})")
 
     fig, ax = plt.subplots(figsize=(5.4, 3.7))
 
@@ -126,9 +157,10 @@ def main():
         ax.annotate(f"T=16 − T=1: {delta:+.3f}", xy=(0.03, 0.95),
                     xycoords="axes fraction", ha="left", va="top",
                     fontsize=9)
-    ax.annotate("T=1: shuffle ≡ identity (by construction)",
-                xy=(0.03, 0.88), xycoords="axes fraction",
-                ha="left", va="top", fontsize=8, color="#555555")
+    if 1 in Ts:  # never assert it for a point that is not on the plot
+        ax.annotate("T=1: shuffle ≡ identity (by construction)",
+                    xy=(0.03, 0.88), xycoords="axes fraction",
+                    ha="left", va="top", fontsize=8, color="#555555")
 
     cov = " ".join(f"T{T}:n={k}" for T, k in zip(Ts, n))
     tag_note = {
@@ -139,6 +171,24 @@ def main():
                        "deferred for paper-faithful priority; final "
                        "sweep supersedes in the amendment window"),
     }[args.tag]
+    if args.arm == "pf":
+        # Hub ruling 4e04ae0e3 item 4: wave-1 cells launch with G1
+        # unresolved and the verdict travels with every figure until it
+        # lands. Stamped TOP-CENTRE, not appended to the bottom-right
+        # note — a gate caveat that a reader can miss is not a
+        # disclosure, and the bottom-right corner already carries the
+        # legend and coverage.
+        g1_note, g1_col = {
+            "pending": ("G1 PORT-FIDELITY VERDICT PENDING — pre-G1 cells "
+                        "(pilot to 25k; no plateau at ~21k vs upstream 5.8k)",
+                        "#B00000"),
+            "passed": ("G1 port-fidelity verdict: PASSED", "#555555"),
+            "failed": ("G1 PORT-FIDELITY VERDICT FAILED — points DISCLOSED, "
+                       "NOT certified", "#B00000"),
+        }[args.g1]
+        ax.annotate(g1_note, xy=(0.5, 1.02), xycoords="axes fraction",
+                    ha="center", va="bottom", fontsize=7, color=g1_col,
+                    weight="bold")
     ax.annotate(f"{tag_note}\n{cov}", xy=(0.99, 0.02),
                 xycoords="axes fraction", ha="right", va="bottom",
                 fontsize=6.5, color="#777777", wrap=True,
@@ -146,13 +196,25 @@ def main():
                           pad=1.5))
     # BINDING caption disclosure (b0b2c49ba): the paper's RLHF TXC arm
     # was agentic_txc_02 — this exhibit is the plain-TXC modernization.
-    ax.annotate("paper RLHF TXC arm = agentic_txc_02 (class "
-                "MatryoshkaTXCDRContrastiveMultiscale: matryoshka+contrastive, "
-                "multiscale [1,2,3], per-window TopK→ReLU, k_win=500; distinct "
-                "from txc_pro); exhibit = plain-TXC modernization at paper "
-                "window budget (k_win=100·T; POST composition preserves "
-                "per-window granularity). T-sweep/shuffle conclusions are "
-                "statements about the plain arm.",
+    # The pf arm IS that architecture, so the btk disclaimer would be
+    # actively FALSE on the pf figure; each arm carries its own.
+    if args.arm == "btk":
+        binding = ("paper RLHF TXC arm = agentic_txc_02 (class "
+                   "MatryoshkaTXCDRContrastiveMultiscale: matryoshka+contrastive, "
+                   "multiscale [1,2,3], per-window TopK→ReLU, k_win=500; distinct "
+                   "from txc_pro); exhibit = plain-TXC modernization at paper "
+                   "window budget (k_win=100·T; POST composition preserves "
+                   "per-window granularity). T-sweep/shuffle conclusions are "
+                   "statements about the plain arm.")
+    else:
+        binding = ("paper-faithful arm: agentic_txc_02_v1t = the paper's own "
+                   "RLHF TXC architecture (MatryoshkaTXCDRContrastiveMultiscale) "
+                   "ported to this harness, on the paper stream "
+                   f"({PF_DATASOURCE}). Conclusions here are statements about "
+                   "the PAPER arm itself, not the plain-TXC modernization "
+                   "(that is the companion figure). Port fidelity is certified "
+                   "by the G1 verdict — see the coverage note for its state.")
+    ax.annotate(binding,
                 xy=(0.5, -0.16), xycoords="axes fraction", ha="center",
                 va="top", fontsize=6, color="#555555", wrap=True)
 
@@ -169,11 +231,11 @@ def main():
 
     OUT_DIR.mkdir(exist_ok=True)
     for ext in ("png", "pdf"):
-        fig.savefig(OUT_DIR / f"fig_rlhf_shuffle_tsweep.{ext}",
+        fig.savefig(OUT_DIR / f"{arm['stem']}.{ext}",
                     dpi=300 if ext == "png" else None,
                     bbox_inches="tight")
-    print(f"[render_writeup_fig] {args.tag}: {len(points)} points; "
-          f"coverage {cov}")
+    print(f"[render_writeup_fig] arm={args.arm} {args.tag}: "
+          f"{len(points)} points -> {arm['stem']}; coverage {cov}")
 
 
 if __name__ == "__main__":
