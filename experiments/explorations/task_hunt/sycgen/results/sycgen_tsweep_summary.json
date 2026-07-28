@@ -1,0 +1,35 @@
+{
+ "card": "sycgen/RETRAIN_CARD.md \u00a7\u00a7 4\u20135",
+ "status": "PENDING TEAM REVIEW",
+ "partial": true,
+ "coverage": {
+  "trained": 3,
+  "overlay": 0,
+  "untrained": 18,
+  "of_each": 18,
+  "rendered_at": "03:38 28-07"
+ },
+ "x_axis": [
+  1,
+  2,
+  4,
+  8,
+  16
+ ],
+ "ordered": {},
+ "shuffled": {},
+ "untrained": {
+  "batchtopk_sae_btkonly/T1": 0.226736703655724,
+  "tsae_btkonly/T1": 0.226736703655724,
+  "txc_batchtopk_post_btkonly/T2": 0.21788595754989437,
+  "txc_batchtopk_post_btkonly/T4": 0.17437787630125093,
+  "txc_batchtopk_post_btkonly/T8": 0.09423124081808969,
+  "txc_batchtopk_post_btkonly/T16": 0.07501466797807578
+ },
+ "anchors": {
+  "batchtopk_sae_btkonly": 0.4819060583846584
+ },
+ "l0_range_claiming_arm": null,
+ "budget_matched": null,
+ "match_rule": "min cell-mean realized l0 >= k_pos/2 = 4.0"
+}

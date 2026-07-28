@@ -1,0 +1,92 @@
+[
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "batchtopk_sae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.4424999952316284,
+      "e_mean_max_cos": 0.4401549696922302,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.23704347795549333,
+      "l0_per_window": 4.490478515625,
+      "l0_per_token": 4.490478515625,
+      "lambda_recovery": 0.470249585988856,
+      "lambda_r2": 0.20911961793899536,
+      "lambda_chance": -0.04705568628232294
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "batchtopk_sae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.45250004529953003,
+      "e_mean_max_cos": 0.4490232765674591,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.23673803097471285,
+      "l0_per_window": 4.3717041015625,
+      "l0_per_token": 4.3717041015625,
+      "lambda_recovery": 0.486955062370643,
+      "lambda_r2": 0.22627270221710205,
+      "lambda_chance": -0.00983396501678324
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "batchtopk_sae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 8000,
+    "kind": "trained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.4325000047683716,
+      "e_mean_max_cos": 0.43312352895736694,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.23489642701893224,
+      "l0_per_window": 4.749298095703125,
+      "l0_per_token": 4.749298095703125,
+      "lambda_recovery": 0.4885135267944762,
+      "lambda_r2": 0.22860503196716309,
+      "lambda_chance": -0.04471793070406688
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  }
+]
