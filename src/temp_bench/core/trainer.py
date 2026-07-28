@@ -189,6 +189,11 @@ def _data_key_from_spec(data_spec: DataSourceSpec) -> str:
 def _select_device() -> str:
     if torch.cuda.is_available():
         return "cuda"
+    # Apple silicon. CUDA still wins wherever it exists, so this cannot
+    # change the device any existing pathway selects; it only replaces the
+    # CPU fallback on Macs, which is otherwise ~50x slower.
+    if torch.backends.mps.is_available():
+        return "mps"
     return "cpu"
 
 

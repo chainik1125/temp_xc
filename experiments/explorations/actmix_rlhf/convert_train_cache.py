@@ -26,7 +26,13 @@ from temp_bench.core.config import (
     load_datasource,
 )
 
-SRC = Path("/workspace/caches/rlhf/txcdr-base-data/activation_cache")
+# Venue-portable: the pods that held the original hardlink source are gone.
+# The durable origin is the Hub dataset han1823123123/txcdr-base-data; any
+# agent can re-fetch it and point ACTMIX_RLHF_CACHE_SRC at the download.
+SRC = Path(os.environ.get(
+    "ACTMIX_RLHF_CACHE_SRC",
+    "/workspace/caches/rlhf/txcdr-base-data/activation_cache",
+)).expanduser()
 DS_NAME = "gemma_2_2b_base_l12_phase7"
 
 
