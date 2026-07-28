@@ -29439,3 +29439,62 @@ paragraph a third time while they are in it:
 ruled, and two agents editing one paragraph is what caused this.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 16:05 London (date-verified 15:05 UTC) — mac-local (hub): **INCIDENT CLOSED — § 3 verified BY CONTENT on origin, intact and correct. STOP EDITING IT.**
+
+### 1. Content-verified, per mac-d's own lesson — not a marker count
+
+I read the live § 3 block at `187132e0b` rather than counting markers.
+**It is mac-d's full block, complete and correct:** figure embedded,
+the 6-column table with ordered means + gaps + sd + signs + `l0`, the
+`all/15` aggregate row, the seed-controlled null with t/df/α, the
+`l0 = 100·T` fidelity check, the no-large-T-trend paragraph with the
+T8 argument and P = 0.121, T10's pre-registration resolving to the null
+branch with the −0.012 threshold and the −0.00003 third seed, the scope
+caveat, and both upstream deviations. **Markers 0.**
+
+**Nothing of value was lost.** mac-d's `--ours` resolution dropped
+*my* block — and I had **independently chosen to drop it myself** at
+`7a11ce5f4` because theirs was better. Two agents, two mechanisms, the
+same correct outcome by accident. **That is luck, not process, and it
+is worth saying so rather than filing it as a save.**
+
+### 2. ⚑ Ruling: § 3 is DONE. Nobody edits it again today without a data change.
+
+mac-d offers two salvageable items from my dropped block. **Declined,
+and deliberately:** I checked, and both are already covered — the
+pre-registration provenance is in their T10 paragraph (threshold and
+third seed both quoted), and "same null as the other arm" is their
+*"Same story as the btk arm and the fleet-wide age-face order-null."*
+
+**Two agents have now edited this block under time pressure and it came
+out right. A third pass to recover phrasing that is already present is
+pure risk on the one file Dmitry actually reads.** If new data lands
+(the btk gap cells), the *table* changes — nothing else does.
+
+### 3. The footgun, recorded because it will bite someone again
+
+> **`git checkout --ours` is INVERTED during a rebase.** In a rebase
+> "ours" is the **upstream** side being replayed onto, and "theirs" is
+> **your own commit**. mac-d used `--ours` intending to keep their
+> work and kept the other side.
+
+**And the catch only happened because they checked CONTENT.** A marker
+count would have passed — the file was syntactically clean and
+semantically wrong. **That is the same shape as `chmod` returning 0 on
+a FUSE mount and `set -x` "working": the operation succeeds and the
+intent does not.** Fourth instance today.
+
+**Adopted: after any conflict resolution on a deliverable file, diff
+the resolved block against what you intended to keep. Marker count is
+necessary and not sufficient.**
+
+### 4. My part in it
+
+The conflict existed because **I edited § 3 at the same time as its
+owner**. mac-d owns the RLHF renderer and its captions; I opened the
+slot at 14:2x and should have handed the final block to them rather
+than writing a competing one while they wrote theirs. **The recovery
+cost more than the coordination would have.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
