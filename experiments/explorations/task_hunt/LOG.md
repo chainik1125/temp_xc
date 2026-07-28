@@ -31371,3 +31371,90 @@ noise, outcome X — and never quoted as having passed the screen.
 task would be a bonus.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~19:0x BST — mac-local HUB: **mac-c's overnight work supersedes my own rescue brief, and refutes a claim I put in BOTH briefs** — ratified, lanes reordered
+
+### 1. Ratification, and the correction I owe
+
+`b8cfc692d` / `4a10c6b25` / `e1dfe21a1` / `b6d3c7212` / `d2320d274`
+**RATIFIED.** mac-c found a better answer to Han's *"we might have been
+prematurely discarding high potential tasks"* than the per-candidate
+rescue I had just written, and found it for **$0 on local MPS, 0 pods**.
+
+**First, my error.** Both briefs I issued today assert
+*"`floor_excess ≡ P(event inside the T-window)` — exactly, worst error
+2e-6"*. **mac-c refuted it (`d2320d274`): it is a low-density
+approximation, not a law**, and the 2e-6 was verified against a
+point-event **simulation**, never against the screen's actual floor
+features. `_FloorBank` feeds `dose_window_count(event_MASK, T)` and the
+mask spans the whole event **TURN**, so the floor's window is **T + w**.
+Correct quantity `P(any masked token in window)`: mean |resid|
+0.0391 → 0.0056 over 2 corpora at densities 0.048–0.289, erring HIGH —
+the conservative direction. The `claim_zone ≈ 0.13–0.15` aiming constant
+is **withdrawn**. **Both briefs amended in place.** I propagated a
+receipt without checking what it had been verified against; mac-c
+caught it inside the hour.
+
+### 2. Why their finding outranks my rescue lane
+
+**The bottleneck is apparatus geometry, not task choice.**
+`chunk_stream` builds independent 128-token sequences, so with
+`OFF_MIN=63` every probed token saw 64–128 tokens of context — while
+the recency terciles sit at ages **121 / 286**. Classes 1 and 2 were
+both *"no event in my context"*. **The arm was never weak; it was asked
+about tokens the model never saw.** Re-terciling inside the visible
+context nearly triples gain (+0.0596 → +0.1707).
+
+And context × scale **multiply**:
+
+    gpt2-small  @128 +0.0596   @512 +0.0928
+    gpt2-medium @128 +0.0389   @512 +0.0754
+    gemma2_2b   @128 +0.0567   @512 +0.1088   <- best on record
+
+**At 128 tokens a 21× model buys nothing; at 512 it buys the best
+result on record.** Floor unmoved across all four combos, pre-registered
+every time — it depends only on T+w and is **ours to set**.
+
+**⇒ "Every candidate screened so far violated levers 1 and 3."** That is
+a systematic under-measurement of the entire hunt — bigger, cheaper and
+more general than rescuing one candidate.
+
+### 3. Consequence for my brief: retraining `evalage` now would measure the ceiling
+
+mac-c's own process lesson applies directly to what I wrote: *when a
+factor is pinned by another factor's ceiling, varying it alone measures
+the ceiling, not the factor.* **Retraining `evalage` at `SEQ_LEN=128`
+would answer the wrong question.** Lanes reordered in
+`hunt-rescue-retrain-mac-c.md`:
+
+- **A′ PRIORITY — the three-lever matrix, and THIS is the pod work.**
+  Lever 3 (shrink T+w: w 25 → narrow, T 64 → 16, label range inside the
+  readable band) is **untested and now binding**; levers 1–2 want a real
+  GPU (`gemma2_2b`/`llama31_8b` × SEQ_LEN {512,1024} × corrected
+  terciles). Cheap first step is mac-c's own: **re-label an existing
+  corpus at T=16 and measure arm−floor before generating anything.**
+- **B unchanged — the screen still has NO error bars** (§ 18:4x entry).
+  Geometry and uncertainty are independent defects; fixing one does not
+  fix the other.
+- **A demoted** — retrain `evalage` only after geometry is corrected,
+  and then at the corrected geometry.
+- **C dropped** — `retryesc_gen` "was wrong on all three levers", so at
+  the old geometry it is a worthless calibration point.
+
+### 4. What deserves saying about how this was found
+
+mac-c **corrected itself twice in public inside two hours** — first
+"scale does not extend the horizon" (`4a10c6b25`), then "context and
+scale MULTIPLY, unqualified that was WRONG" (`e1dfe21a1`) — and named
+the methodological cause: *two variables tested one at a time, a null
+from each, a conclusion written off a single-variable null, when both
+were interaction effects.* That is the failure mode the whole fleet has
+been prone to today, stated more precisely than I had managed.
+
+**Still not a KEEP** — arm−floor −0.117, improved from −0.178 with zero
+corpus change — and mac-c explicitly refused to freeze it into a card
+while lever 3 is untested. That refusal is correct and is ratified.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

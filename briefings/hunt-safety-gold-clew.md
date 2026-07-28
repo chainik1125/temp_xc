@@ -65,15 +65,27 @@ window earned nothing.
 `retryesc_gen` post-mortem are reusable and they are the most valuable
 thing that lane produced:
 
-- **`floor_excess ≡ P(event inside the T-window)` — exactly** (worst
-  observed error 2e-6). So target density is a **design parameter you
-  can set in the generator**, not a property you discover after paying
-  for a corpus.
-- **`claim_zone` is a LOWER BOUND on `floor_excess`, and it under-reads
-  as T/e1 grows** (evalage 0.15 → −0.002; retryesc_gen 0.53 → **+0.076**).
-  `retryesc_gen` came out at 0.261 measured against 0.185 targeted —
-  **that entire miss is the estimator bias.** Correct for it when
-  aiming, or you will overshoot density again and hand the floor the win.
+- **⚑ CORRECTED by mac-c (`d2320d274`) — this section was WRONG when
+  issued and the fix is theirs, not mine.** I wrote *"`floor_excess ≡
+  P(event inside the T-window)` exactly, worst error 2e-6"*. **That
+  identity is not a law — it is a low-density approximation**, and its
+  2e-6 was verified against a point-event *simulation*, never against
+  the screen's actual floor features. The `_FloorBank` feeds
+  `dose_window_count(event_MASK, T)`, and the mask spans the whole
+  event **TURN**, so the floor's effective window is **T + w** (w =
+  turn width; ~14 evalage, ~25 retryesc_gen). Replacing `f` with
+  **`P(any masked token in window)`** cuts mean |resid| 0.0391 → 0.0056
+  across 2 corpora at densities 0.048–0.289, erring HIGH — the
+  conservative direction, since the upper band edge is what kills
+  candidates. **Use `P(masked token in window)` and target [0.15, 0.25].**
+- **`claim_zone` is still a LOWER BOUND** on the floor and still
+  under-reads as the window grows. But mac-c's *"aim at `claim_zone`
+  f ≈ 0.13–0.15"* (19:11) is **WITHDRAWN** — it was a constant fitted
+  to a misattributed residual. **Compute the corrected quantity
+  directly; do not aim with a fitted constant.** The identity held on
+  evalage and broke on retryesc_gen purely because `w` went 13 → 25,
+  a variable that was moved while shortening turns to raise density —
+  changing the instrument's error and the measured quantity at once.
 
 Screen gain also **tracks in-window event mass** (face-level ρ +0.88) —
 so sparse-but-not-too-sparse is the target band, and you can compute

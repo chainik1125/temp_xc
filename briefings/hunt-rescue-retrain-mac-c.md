@@ -17,6 +17,71 @@ plan anything: it changes what the previous verdicts mean.**
 
 ---
 
+## ⚑ AMENDMENT 19:0x — mac-c's overnight work lands BETWEEN this brief being written and pushed, and it reorders it
+
+This brief was drafted before I read `b8cfc692d` / `e1dfe21a1` /
+`b6d3c7212`. **mac-c has independently found a stronger and more general
+answer to Han's question than the per-candidate rescue below, and it
+changes what the pod work should be.**
+
+**Their finding, which I am adopting over my Lane A ordering:** the
+bottleneck is **apparatus geometry, not task choice.** `chunk_stream`
+builds independent 128-token sequences, so with `OFF_MIN=63` every
+probed token saw only 64–128 tokens of context — while the recency
+terciles sit at ages **121 / 286**. Classes 1 and 2 were both *"no
+event in my context"*. **The arm was never weak; it was asked about
+tokens the model never saw.** Re-terciling inside the visible context
+nearly triples gain (+0.0596 → +0.1707).
+
+And context × scale **multiply**: `gpt2 @128 +0.0596`, `gpt2 @512
++0.0928`, `gemma2_2b @128 +0.0567` (21× model buys *nothing* at 128),
+**`gemma2_2b @512 +0.1088` — best on record.** Floor unmoved across all
+four combos, exactly as pre-registered, because it depends only on T+w
+and is **ours to set**.
+
+**⇒ "Every candidate screened so far violated levers 1 and 3"** (context,
+and the floor's T+w). That is a *systematic under-measurement of the
+whole hunt*, which is a bigger and cheaper finding than rescuing one
+candidate — and it means **retraining `evalage` at the OLD geometry
+would re-measure the ceiling, not the task.** mac-c's own process
+lesson applies to my brief: *when a factor is pinned by another
+factor's ceiling, varying it alone measures the ceiling.*
+
+**Reordered lanes — this supersedes § 2 below:**
+
+- **A′ (new priority, and this is the pod work Han asked for): the
+  three-lever matrix at scale.** Lever 3 (shrink T+w: `w` 25 → narrow,
+  `T` 64 → 16, label range inside the readable band) is **untested and
+  now binding**, and levers 1–2 want a real GPU: `gemma2_2b` and
+  `llama31_8b` × `SEQ_LEN` {512, 1024} × corrected terciles. Everything
+  so far ran on local MPS at $0 — this is exactly the measurement a pod
+  is for. Start with mac-c's own cheap step (**re-label an existing
+  corpus at T=16 and measure arm−floor before generating anything**),
+  then take the surviving cell to a pod.
+- **B (unchanged, still valid and independent): give the screen an
+  error bar.** § 1's finding stands on its own — there are no CIs
+  anywhere, and `evalage` was rejected at ~0.5 σ. Geometry and
+  uncertainty are separate defects.
+- **A (demoted): retrain `evalage` for real** — only *after* the
+  geometry is corrected, and then at the corrected geometry. Retraining
+  it at `SEQ_LEN=128` would answer the wrong question.
+- **C (dropped): `retryesc_gen` as a predicted negative.** mac-c reports
+  it *"was wrong on all three levers"*, so at the old geometry it is a
+  worthless calibration point. Reinstate only if a corrected-geometry
+  re-screen puts it back in contention.
+
+**Also correcting my own § 2 below:** it repeats the
+`floor_excess ≡ P(event in T-window)` identity. **mac-c refuted that
+(`d2320d274`)** — it is a low-density approximation, the floor's real
+window is **T + w**, and the correct quantity is
+**`P(any masked TURN token in window)`**, targeted to [0.15, 0.25].
+The `claim_zone ≈ 0.13–0.15` aiming constant is **withdrawn**.
+
+*Everything below is kept as written, with § 2's lane order superseded
+by the above and its floor identity corrected here.*
+
+---
+
 ## 1. The finding: the screen compares single-seed point estimates to a hard threshold
 
 I opened the saved screen artifacts. **Every cell is one number.**
