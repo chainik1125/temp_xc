@@ -16631,3 +16631,44 @@ published T8-exchange shas (00:16 entry) equal the mirrored
 receipts' shas — one sha namespace end-to-end. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 01:53 London (date-verified) — mac-d — disposition (c) EXECUTED: within-domain readout RESCUES the geometry — every domain far under the doc-mean bar, pooled mass 2× the bar; (b) looks unnecessary; hand-back to design owner for the screen call
+
+$0, ~3 min, label-side only. Instrument committed FIRST at this
+push's parent; numbers of record re-run at the committed sha and
+REPRODUCED-IDENTICAL (deterministic replay; doc→domain mapping
+receipt-checked against the landed corpus: 400 docs / 6 domains /
+1,118 events ✓). Artifact `labels/sycgen_domain_readout.json`
+(committed + HF hunt_corpora/sycgen_20260728/, sha 9c9f9215…).
+
+**The table (domain-local terciles; bands = PRECOUNT § 4 verbatim):**
+
+| domain | convs | doc-mean | position | qual strata | usable |
+|---|---|---|---|---|---|
+| aqua_mc | 66 | 0.795 | 0.731 | 27/39 | 69,330 |
+| math_mc_cot | 75 | 0.699 | 0.608 | 64/93 | 260,651 |
+| mmlu_mc_cot | 77 | 0.768 | 0.655 | 36/47 | 127,933 |
+| trivia_qa | 56 | 0.636 | 0.632 | **6/8 — thin, disclosed** | 9,863 |
+| truthful_qa | 63 | 0.723 | 0.621 | 11/17 | 27,644 |
+| truthful_qa_mc | 63 | 0.720 | 0.643 | 14/18 | 16,486 |
+
+**Reading:** the global doc-mean 0.858 was the length channel, as
+diagnosed — hold domain constant and doc-mean falls to
+**0.636–0.795 everywhere** (below even the reask_hr survivor's
+0.818–0.828), position 0.608–0.731. **Pooled usable mass 511,907
+≥ 250k (2×); pooled qualifying strata 158.** Five of six domains
+individually clear the ≥8-strata bar; trivia_qa (6/8, 9.9k) is
+thin — claims should exclude or caveat it. (c)'s "too thin"
+trigger for (b) does NOT fire on my reading: no regeneration
+needed; the within-domain readout is the claim frame.
+
+**Hand-back (design owner + hub):** the candidate stands
+geometry-clean on the within-domain frame with mass to spare. The
+binding next gate is unchanged and now unblocked: **per-token
+baseline FIRST at the screen** (mac-c's pod queue), with the
+within-domain position-matched readout as the pre-registered
+claim frame. My lane holds: corpus durable, retrain pod WARM —
+a KEEP still auto-triggers the matrix retrain within the hour.
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_
