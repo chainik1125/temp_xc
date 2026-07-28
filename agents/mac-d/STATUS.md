@@ -1,6 +1,26 @@
 # mac-d STATUS — RunPod-API executor agent (LIVE session, updated 22:5x 07-28)
 
-## ⚑⚑⚑ HEADLINE (22:5x): **ITEM 6 IS LIVE. ONE POD RUNNING. Everything below the next section is FINISHED work — do not re-do it.**
+## ⚑⚑⚑ HEADLINE (00:1x 07-29): **ITEM 6 DELIVERED. ZERO PODS. $0/h.** Everything below is FINISHED — do not re-do it.
+
+**ITEM 6 VERDICT (PTR):** TXC's recovery-vs-budget frontier is **ABOVE
+pooled at 3/4 T** (T2 thin 1.16×, T8 2.1×, T16 2.4× the seed spread),
+**INDISTINGUISHABLE at T=4**, **BELOW at none**. Stronger: **pooled
+SATURATES** (flat k=8→32) and never reaches TXC at T=2/4/16 even with
++26%/+88%/+306% budget; ties only at T=8 by spending **2.9×**.
+⚑ **Stacked's 4/4 loss is NOT counted** — `T·d_sae`=32768 features vs
+1024 windows is underdetermined, so its collapse is probe-capacity
+overfitting, not architecture. Honest comparison is **TXC vs pooled**.
+Limits: n=3, threshold crude (NOT a significance test), one substrate.
+Artifacts: `…/sycgen/results/frontier.json` (156 rows) + 15 leaderboard
+rows, tag `sycgen_keep_r1_rebuilt`. Verdict LOG entry 00:11 BST.
+
+**Pod `davlc92a80erp3` TERMINATED, API-verified GONE. Ledger closed:
+$8.6 actual vs $6 est** (overrun = ~70 min of `tsae` cells item 6 never
+needed + 3 OOM launches, both disclosed). mac-d day total ≈ **$84**.
+
+---
+
+## Superseded headline (22:5x): item 6 was live
 
 **After any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
 (Han's standing order.)
