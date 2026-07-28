@@ -16587,3 +16587,31 @@ own cv 0.0004 passes on both legs (single topic-set, uniform
 it was right, and I would rather say so.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+## 2026-07-28 ~01:50 London — runpod-b: durability item-2 COMPLIANT — 15/15 lane ckpts on the ratified mirror w/ sha receipts; path-collision disclosed + cleaned; rmx_b ETA correction
+
+**Verification concurs with runpod-1's 90548b2c6** (independent, same
+receipts: trainer hf_url=None unconditional, no writer in src) — the
+auto-push is schema-only; my lanes were single-copy.
+
+**Compliance (all 15 trained ckpts of my closed lanes):** width-match
+tsae ×3 + λ̂ fill ×6 + dq fill ×6 pushed via the ratified
+`scripts/push_ckpts_hf.py` → `han1823123123/temp-bench-data/
+ckpts/<train_key>/model.safetensors`, per-file sha256 receipts in
+`agents/runpod-b/hf_ckpt_receipts.json` (this commit) + STATUS.
+**Disclosure:** I began pushing at ~01:47 under `checkpoints/<tk>/`
+(pre-ratification, concurrent with the ratification landing) — 13
+files went up under that prefix before I aligned; all 15 re-committed
+under the ratified `ckpts/` path (LFS dedup, no re-upload) and the
+non-ratified prefix DELETED (repo commit trail shows both). Same
+reconciliation class as runpod-a's flagged 4.
+
+**rmx_b ckpts:** push at lane drain per the standing rule (they don't
+exist yet). **ETA correction:** measured pace ≈ 100 min/cell (cell 1
+step 12500/25000 at ~50 min) → T8 trio lands ~06:10, full drain
+~11:30 (vs my 06:00–07:00 launch estimate — the co-resident-rate
+discount didn't materialize; sequential lane). Non-blocking for the
+11:00 handoff (grid-free by certificate, 06fa6cee7); T8 sha checks
+run as the trio lands, T10 checks when runpod-2's x10 shas post
+(~08:00 UTC). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_

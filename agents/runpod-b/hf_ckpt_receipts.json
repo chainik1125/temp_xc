@@ -1,0 +1,77 @@
+[
+ {
+  "train_key": "2577e2b9f28800d5",
+  "sha256": "e6a437da5dd38b115d1242c5c842e70bfc08911f6cd4a8f839aee4a6bdefad92",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/2577e2b9f28800d5/model.safetensors"
+ },
+ {
+  "train_key": "d9065cf74a3e067f",
+  "sha256": "5d21ad963dae6c89edf2412a40fc0b71d142e82990eaeccc3ca93cba2531f560",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/d9065cf74a3e067f/model.safetensors"
+ },
+ {
+  "train_key": "ce23f1e3e9f61dcf",
+  "sha256": "efd7efa957af6c8505cbb4076a1bbfc631642026d69b52b752ff36e9691e5241",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/ce23f1e3e9f61dcf/model.safetensors"
+ },
+ {
+  "train_key": "89b10c584691dc2a",
+  "sha256": "39e4155ae9795942c3526259a38c38a1517cd08519e9a63f8744727250345381",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/89b10c584691dc2a/model.safetensors"
+ },
+ {
+  "train_key": "97b9b69c25ed95e7",
+  "sha256": "2e526829963dac271f29c36b83fc3bf93b0f5ef361273b9502e1b53eb343502a",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/97b9b69c25ed95e7/model.safetensors"
+ },
+ {
+  "train_key": "a0f3d4253c7c65a5",
+  "sha256": "0bbb996085143c0dbe55471a3cd5b58fe8dde0bda586edb4f96c3de61ac637d0",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/a0f3d4253c7c65a5/model.safetensors"
+ },
+ {
+  "train_key": "f43ce4d5c2364751",
+  "sha256": "ca48bbc0d9c86240964cd858c7dd461d0a77630cea7ed25d43a196c5fa718969",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/f43ce4d5c2364751/model.safetensors"
+ },
+ {
+  "train_key": "d5276c6d6ecf63ce",
+  "sha256": "5440961291ea5fdf53b65c4d484b065c09791837dd2ffcf6bc9a79994e94e96d",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/d5276c6d6ecf63ce/model.safetensors"
+ },
+ {
+  "train_key": "0669ebbc4a61ecee",
+  "sha256": "1fc2cb0e1cf3390fd207ca34fb63ea5d9ad567b8781120501624224f632f5e4e",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/0669ebbc4a61ecee/model.safetensors"
+ },
+ {
+  "train_key": "4b33c6ef751e54e3",
+  "sha256": "56be9a731bbe8aef622aafb6bcfdbc7de4931de81e8e2fe9aec66b70b4e4d943",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/4b33c6ef751e54e3/model.safetensors"
+ },
+ {
+  "train_key": "16accead2e441aec",
+  "sha256": "13924ec30af2dfa7ccb367b9adb7c0b0250650abf815cc285ab40db389c18e0e",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/16accead2e441aec/model.safetensors"
+ },
+ {
+  "train_key": "423bc06ef05caa49",
+  "sha256": "5ad8ce00e6dff5f3b44c5ccf78523fe3e3e99f1a87cb898afcc037431d9d0d42",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/423bc06ef05caa49/model.safetensors"
+ },
+ {
+  "train_key": "300e4fd6701c20fd",
+  "sha256": "64bf0f17018dda1bad1f4df9cddf5c3ac34772c3bf027f6588c989356d34e1ae",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/300e4fd6701c20fd/model.safetensors"
+ },
+ {
+  "train_key": "b453e0fb49ba7f09",
+  "sha256": "7225794343cdb00ee78f5008277c9e9e44bad6812cf4a6276fddfed4cc6cb826",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/b453e0fb49ba7f09/model.safetensors"
+ },
+ {
+  "train_key": "ad47b401783cfe0a",
+  "sha256": "c73bdd8de12bea9eab02a9ae2c4d05e166c41247da0a351caea47a840f3011ea",
+  "hf_path": "han1823123123/temp-bench-data/ckpts/ad47b401783cfe0a/model.safetensors"
+ }
+]
