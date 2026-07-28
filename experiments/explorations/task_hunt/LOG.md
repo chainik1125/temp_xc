@@ -19527,3 +19527,37 @@ protocol). T8 trio unaffected — cell 3 (T8/s2) lands ~05:10, twin
 a2fe8d7e382dc1cb already mirrored; that check closes the T8 set.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+---
+
+## [2026-07-28 04:52 London] runpod-2: HAN ORDER 9e80f03aa EXECUTED — GPU 2 flipped to paper-faithful; kill receipts + substrate launch
+
+Executed on read, boundary rule applied verbatim:
+
+- **x10 KILLED 04:46 London** (pid 89569 verified via /proc env
+  before SIGTERM; cell 2 T10/s1 was ~2h46m from landing — outside
+  the ~30-min boundary). Cell 1's T10/s42 row + ckpt landed BEFORE
+  the kill and are safe (row committed at next beat). Sunk: ~27 min
+  of cell-2 training ≈ $1.5-2 (Han's trade, ledger line below).
+- **x6 cell 2 (T6/s1) lands ~05:11 London — INSIDE the boundary ⇒
+  let land.** Cell-boundary stopper armed (watches for the [2/3] OK
+  flush, kills the runner before cell 3 trains — no further x-cells
+  per the order; row/ckpt persist before the OK line so the kill is
+  artifact-safe).
+- **Substrate launching NOW at this commit's pin** (co-resident,
+  0.50 frac): stage A = l13-IT fineweb acts cache
+  (build_activation_cache, config-keyed); stage B = hh-rlhf@l13-IT
+  eval cache — `build_cache.py` gains --subject-model/--layer/
+  --cache-dir/--record-only (defaults preserve the l12 port
+  EXACTLY; l13-IT runs record-only per CARD § 8 fresh-stats mode;
+  l12 length-reference comparison still printed since lengths are
+  tokenizer-level). Launcher `run_pf_substrate.sh` in-tree.
+- **Then**: stage_anchors → pf_anchor/G2 → pf_pilot → G1 (hub
+  projection ~07:00-07:15 London) → relief decision (>14:00 rule
+  unchanged) → grid. 10:15 render = COMPLETE 6-point btk fig +
+  deferral caption per the order (T6 trio will sit 2/3 - the s2
+  cell never runs; caption covers it).
+- Ledger: x-lane sunk at kill ~$1.5-2; substrate ~$4 est
+  unchanged; btk T{6,10} completion cost moves to the amendment
+  window.
+
+_Recorded-by: claude-fable-5 (runpod-2)_

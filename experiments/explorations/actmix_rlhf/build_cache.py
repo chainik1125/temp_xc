@@ -118,7 +118,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--force", action="store_true")
+    # § 8 paper-faithful variant (l13-IT): same recipe, subject/layer/dir
+    # swapped; defaults preserve the l12-BASE port behavior exactly.
+    ap.add_argument("--subject-model", default=SUBJECT_MODEL)
+    ap.add_argument("--layer", type=int, default=ANCHOR_LAYER)
+    ap.add_argument("--cache-dir", default=str(CACHE_DIR))
+    ap.add_argument("--record-only", action="store_true",
+                    help="record integrity stats instead of asserting the "
+                         "phase-7 l12 gate (CARD § 8: fresh-stats mode)")
     args = ap.parse_args()
+
+    global SUBJECT_MODEL, ANCHOR_LAYER, CACHE_DIR
+    SUBJECT_MODEL = args.subject_model
+    ANCHOR_LAYER = args.layer
+    CACHE_DIR = Path(args.cache_dir)
 
     chosen_path = CACHE_DIR / "chosen.npz"
     rejected_path = CACHE_DIR / "rejected.npz"
@@ -178,10 +191,13 @@ def main():
           f"p={p_val:.2e} (paper {PAPER_TTEST['p']:.0e})", flush=True)
     ok = (abs(rj.mean() - PAPER_TTEST["rejected_mean"]) < 0.05
           and abs(ch.mean() - PAPER_TTEST["chosen_mean"]) < 0.05)
-    if not ok:
+    if not ok and not args.record_only:
         raise RuntimeError(
             "HH-RLHF cache FAILED the paper App B.1 integrity gate — "
             "substrate does not reproduce; do not proceed.")
+    if args.record_only:
+        print(f"record-only mode: l12 reference match = {ok} "
+              "(stats recorded, gate not asserted)", flush=True)
 
     np.savez(chosen_path, **chosen)
     np.savez(rejected_path, **rejected)
@@ -193,7 +209,9 @@ def main():
         "integrity_gate": {"rejected_mean": float(rj.mean()),
                            "chosen_mean": float(ch.mean()),
                            "t": float(t_stat), "p": float(p_val),
-                           "paper": PAPER_TTEST, "pass": True},
+                           "paper": PAPER_TTEST, "pass": bool(ok),
+                           "mode": ("record-only" if args.record_only
+                                    else "asserted")},
         "port_of": "han-phase7-agent-c@023d52c24 build_hh_rlhf_cache.py",
     }, indent=2))
     print(f"DONE -> {CACHE_DIR}")
