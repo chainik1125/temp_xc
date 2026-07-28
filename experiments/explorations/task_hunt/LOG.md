@@ -21383,3 +21383,42 @@ headroom on Han's aggregate; a $0 relief keeps all of it for the
 amendment window.
 
 _Recorded-by: claude-fable-5 (mac-d, RunPod-API executor)_
+## 2026-07-28 12:40 London (date-verified at write) — mac-local: ⚑ T=5 PAPER-NUMBER SANITY (Han order) — PASS, with one new BINDING panel-convention pin
+
+**Han (12:5x): "sanity check that the T=5 (I believe txc was done
+at T=5 in the paper, double check) matches the numbers in the
+paper."** Executed from the paper SOURCE (in-tree `paper/`):
+
+1. **T=5 CONFIRMED, both sections, from the tex itself:** probing
+   = "TXC-base ($T = 5$, $k_{pos} = 20$)" at d_sae 18,432,
+   n_steps 20k, matched per-token L0=20 (appendix c3-archs; the
+   probe protocol there — S=32 reslice, stride-1 windows,
+   train-only top-k selection, L1 LogisticRegression, ROC-AUC,
+   panel mean over 3 seeds — is the direct ancestor of our
+   probing-1.2.0 evaluator). RLHF = "TXC at $T=5$,
+   $k_{win}=500$" (appendix rlhf section; consistent w/ the
+   audit + the 03:09 independent verification).
+2. **Probing numbers MATCH the paper:** published reading
+   (main.tex:1154, fig:sparse_probing): **"TXC-base at
+   0.899–0.902"** (38-task panel mean). Our archived-ckpt T5
+   anchors through the v2 evaluator, k=20, same 38-task panel:
+   **0.8975 ± 0.0039** (9 rows = 3 train-seeds × 3 probe-fit
+   replicates; replicate spread 0.891–0.903 within one ckpt) —
+   inside seed+probe spread of the published band. **Chain to the
+   trained arm:** E3 PASSED this morning (archived T5 anchors
+   interpolate retrained v1t T4/T6 within seed spread, both k) ⇒
+   paper PDF ↔ archived ckpts ↔ trained paper-faithful arm are
+   mutually consistent. **SANITY: PASS.**
+3. **⚑ NEW BINDING PIN — PANEL-CONVENTION MAPPING:** the paper's
+   headline is the **38-task mean**; the rebuttal figs use
+   **SAEBench-36** (CT pair excluded). The SAME anchor ckpts read
+   0.8975 (38-task) vs **0.9248 ± 0.0033 (36-task)**. Anyone
+   comparing a rebuttal fig (~0.92x) to the paper's 0.899 sees a
+   phantom +0.03 unless told. HANDOFF + CODE_GUIDE gain the
+   mapping line this push; never cross-quote panels.
+4. **RLHF T=5 sanity = exact-grade by construction:** papermatch
+   byte-identity (shipped table blobs identical dev↔release) +
+   the 16-digit eval-determinism receipt (05:05) + G2 ordering
+   gate on l13-IT. No further check needed.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

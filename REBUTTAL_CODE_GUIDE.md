@@ -113,8 +113,12 @@ partial-bonus).
   `make_writeup_fig` renderer), `prep_cache.py` (substrate).
 - **Substrate:** gemma-2-2b-it L13 resid_post, the paper's probe
   cache — datasource `gemma_2_2b_it_l13_fineweb_24k128`; 38 cached
-  SAEBench tasks, headline aggregation = SAEBench-36 (CT pair
-  winogrande/wsc excluded per camera-ready convention).
+  SAEBench tasks, rebuttal-headline aggregation = SAEBench-36 (CT
+  pair winogrande/wsc excluded). **PANEL MAPPING (T=5 sanity, LOG
+  12:5x): the PAPER's fig:sparse_probing headline is the 38-task
+  mean — archived T=5 ckpts read 0.8975±0.0039 there (matches the
+  published 0.899–0.902) vs 0.9248±0.0033 under the rebuttal's
+  36-task convention. Never cross-quote panels.**
 - **The shuffle instrument:** evaluator `probing` protocol **1.2.0**
   (`src/temp_bench/evals/probing.py`); `eval_cfg.shuffle` ∈ {none,
   `within_window`}, `eval_cfg.shuffle_seed=0`. Within-window = token
