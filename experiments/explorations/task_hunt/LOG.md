@@ -24694,3 +24694,156 @@ not adding an `![...]` to a figure that does not exist. Both go in
 together at wave-1 drain.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+## 2026-07-28 13:26 London (date-verified 12:26 UTC) — mac-local (hub): ⚑⚑⚑ **UPSTREAM TRAINING CONTRACT RECOVERED FROM SOURCE** — runpod-2's second gap is CLOSED without an experiment; plus **RULING: runpod-c is sole pod-B executor** (2 idle H100s unblocked) and the **wave-1 launch decision**
+
+### 1. RULING — pod-B execution: **runpod-c, sole executor. Hub stands down formally.**
+
+runpod-c (13:02) is correct to refuse a two-executor pod and correct
+that Han directive `4e04ae0e3` item 2 ("pod B = hub executes") was
+written at 07:10 when the fleet believed runpod-c down. **That premise
+expired at 12:38 when runpod-c came back.** runpod-c owns pod B end to
+end: l12 cache install, lane sizing, smokes, launches, drains. The hub
+executes nothing on pod B. **Launch on my ruling — do not wait for
+runpod-2 to re-name you.** Two H100s have been idle 20+ min on this
+question; that is on me for not ruling sooner.
+
+### 2. ⚑⚑⚑ The upstream lr/warmup/stopping settings — **recovered, from source, at the pinned sha**
+
+runpod-2 (13:17) asked "to whoever has repo access" for
+`han-phase7-unification@94119bc08:.../train_primary_archs.py`. **The
+hub has repo access and that commit is in this clone.** File is
+`experiments/phase5_downstream_utility/train_primary_archs.py`.
+Verbatim:
+
+```python
+@dataclass
+class TrainCfg:
+    lr: float = 3e-4
+    batch_size: int = 1024
+    max_steps: int = 25_000
+    log_every: int = 200
+    grad_clip: float = 1.0
+    plateau_threshold: float = 0.02
+    min_steps: int = 3_000
+    seed: int = 42
+
+opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)   # <- NO scheduler
+...
+    loss.backward()
+    nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+    opt.step()
+    if step % cfg.log_every == 0 or step == cfg.max_steps - 1:
+        plateau_val = compute_plateau(losses, window=5)
+        if plateau_val is not None and plateau_val < cfg.plateau_threshold \
+                and step >= cfg.min_steps:
+            converged = True; break
+
+def compute_plateau(losses, window=5):
+    if len(losses) < 2 * window: return None
+    recent = sum(losses[-window:]) / window
+    prior  = sum(losses[-2*window:-window]) / window
+    if prior == 0: return None
+    return (prior - recent) / abs(prior)
+```
+
+**runpod-2's prime suspect is CONFIRMED, and by a stronger instrument
+than the running experiment: upstream has NO WARMUP AND NO SCHEDULER
+AT ALL.** Constant Adam at 3e-4 from step 0. Our port inherits v2
+`TrainingConfig.warmup_steps = 1000` and `core/trainer.py:111-113`
+builds a LambdaLR from it — effective lr 20% at step 200, exactly the
+window where upstream does 86% of its descent. That is the whole
+second gap, and it is a **defaults-inheritance bug, not a modelling
+choice**.
+
+**The stopping rule is also now exact, and it is the throughput
+prize.** Upstream never ran a fixed band: it stops when the 5-point
+trailing mean of the 200-step-cadence loss improves <2% versus the
+prior 5 points, floor 3 000 steps, ceiling 25 000. That is precisely
+why the upstream logs stop at 3 800 (T5) and 5 800 (t2) while we
+budget 25 000 — **we were never asked to run 25 000 steps; we
+inherited the ceiling and mistook it for the contract.**
+
+### 3. Diff vs our port, classified by hard-rule cleanliness
+
+| axis | upstream | ours | fix | hard rule |
+|---|---|---|---|---|
+| warmup | **none** | LambdaLR 1000 | `warmup_steps=0` in `cells.py` | ✅ config-only |
+| lr | 3e-4 const | 3e-4 + ramp | falls out of the above | ✅ |
+| stop | plateau 2%/w5, min 3k | fixed 25k | set `n_steps` from measured plateau-fire + margin | ✅ config-only |
+| grad_clip | **1.0 every step** | **absent** (`core/trainer.py`) | core-only ⇒ **DISCLOSE, do not patch** | ⚠ rule 3 |
+
+**Adaptive early-stop cannot be implemented without editing
+`core/trainer.py` (hard rule 3), so we do not.** We get the same
+throughput config-only: read where upstream's rule *would* fire on our
+stream from the warmup-0 probe (it logs at 200-step cadence — apply
+`compute_plateau` offline), then set `n_steps` to that + margin for
+the grid. Deviation from adaptive-stop is then a *bounded, disclosed,
+more-generous* budget, which is the safe direction.
+
+**grad_clip 1.0 is a real fidelity gap we are choosing not to close**
+— patching it means editing core. Disclosed here and it goes in the
+caption/CARD, not silently. If it ever binds, the constant-lr trace
+will show it; runpod-2 should watch for loss spikes in the probe.
+
+### 4. ⚑ LAUNCH RULING (this is the hub's call, as runpod-2 asked)
+
+**Wave-1 launches with `warmup_steps=0` and a plateau-derived
+`n_steps`. Not with the inherited 1000/25 000.**
+
+I am overriding runpod-2's "launch now, fold the fix into wave 2" —
+and the reason is that the fix is no longer a *fidelity refinement*
+trading against time. It is **both** axes at once:
+
+- **Fidelity**: this arm exists to be PAPER-FAITHFUL (Han's stated
+  priority, above btk). Shipping 21 cells on a schedule we now know
+  from source is not the paper's would hand the reviewer the exact
+  objection the arm was built to retire.
+- **Throughput** (this is the decisive half): the same one-line change
+  plus a plateau-derived budget takes a cell from **25 000 steps to
+  ~4–6 000**. At 1.49 s/step that is **~10.3 h → ~1.7–2.5 h per cell**
+  and the grid from ~213 GPU-h to **~40–60 GPU-h**. ORDER #1 is *max
+  throughput* — this IS the max-throughput move. Launching now to save
+  15 minutes would spend ~150 GPU-h to do it.
+
+**The hold is ≤ the probe's own landing (~13:27), and it is not an
+idle hold** — everything schedule-independent runs during it:
+runpod-c's pod-B l12 install + smoke, the T16 single-tenant claim on
+old-pod GPU 0, per-lane OMP budgets. Nothing serialises behind the
+probe except the `n_steps` number itself.
+
+**runpod-2, the sequence:**
+1. When the warmup-0 probe lands, report the trace vs upstream's
+   200/400 checkpoints (does 88 065 → ~13 k by step 200 now?).
+2. Apply `compute_plateau(window=5, thresh=0.02, min 3 000)` to that
+   probe's logged losses; report the step where it fires.
+3. Push `cells.py` with `warmup_steps=0` + `n_steps` = that + margin.
+4. G1, then wave-1 fires on the 31930ad8c map.
+
+If the probe shows warmup-0 does **not** track upstream, say so and we
+launch on 25 000 with warmup 0 anyway (fidelity half stands alone) —
+but then the convergence story is still open and I want to know before
+we spend the grid.
+
+### 5. Anchors — unblocked independently, launch them now
+
+The three T5 anchors are **eval-only** (upstream weights, never
+retrained), so **no part of this schedule question touches them.**
+They are retracted solely for having been evaluated against the l13-IT
+cache. Re-running them on `l12base_phase7` is minutes of eval and
+restores the figure's validation landmark under runpod-2's own 13:14
+editorial ruling (separate marker, excluded by `train_key`, never
+spliced into the sweep mean). **Whoever has a free slot: do it now** —
+it is the cheapest renderable pf point we have and it is currently the
+*only* thing standing between us and a pf RLHF figure with something
+on it.
+
+### 6. Idle ledger
+
+At this stamp: old-pod GPU 0/1 free, pod-B GPU 0/1 free (blocked on §1,
+now unblocked), runpod-2's GPU 2 carrying the probe + the void pilot.
+**Kill the pilot** — it is a wrong-stream control that has served its
+purpose and it is holding memory on the one busy card. Burn is
+$14.95/h across two pods; that is ~5 idle H100s at this moment and
+the §1 ruling plus §4 sequence are what convert it into work.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
