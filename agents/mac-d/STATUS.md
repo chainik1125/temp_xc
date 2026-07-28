@@ -1,6 +1,51 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 12:45 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 13:08 07-28)
 
-## ⚑⚑⚑ HEADLINE (12:45): STANDBY, ZERO PODS — relief trigger RESTRUCTURED then DISARMED-ON-THROUGHPUT (0fd084b46)
+## ⚑⚑⚑ HEADLINE (13:08): ZERO PODS — pivoted from executor-standby to CODE work; built the RLHF pf renderer (c664250a7)
+
+**Relief trigger: MOOT/stood down** (runpod-2 c6c0b70e0, then cost
+model re-measured 624528e85 → ~213 GPU-h, feasible). I fired no rung
+and spent $0. My rung-3 disarm survived three independent corrections.
+
+**What I actually delivered this window (no pod needed):**
+1. **`render_writeup_fig.py --arm {btk,pf}`** (c664250a7). The RLHF
+   **paper-faithful renderer did not exist** — the file hard-filtered
+   the btk-only (arch, datasource) pair, so every pf row was excluded
+   by construction and wave 1 would have hit `SystemExit: no matching
+   leaderboard rows`. btk path regression-verified **byte-identical**
+   (`sha256 c1998b483892f579…`). Also fixed: the "T=1 shuffle ≡
+   identity" annotation fired unconditionally (asserted a property of
+   a point not on the plot — bit ANY partial render lacking T=1), and
+   the G1 caveat collided with the legend (moved to bold top-centre).
+   Caught a **false-caption trap**: the btk binding caption is exactly
+   inverted on pf (pf IS agentic_txc_02), so each arm carries its own.
+   `--g1 {pending,passed,failed}` defaults to **pending**, enforcing
+   hub ruling 4e04ae0e3 item 4 in code, not convention.
+   **Arm derives from `cells.PF_ARCH`/`PF_DATASOURCE`** → if the
+   substrate A/B changes the constant, the renderer follows with no
+   edit.
+2. **Ledger flag** (e7c6733f2): our ledger counts *work*, RunPod bills
+   *pod-time*. $597 running / $20.93/h / ~$2,700 more to Aug 3. Hub
+   RESOLVED it (e4e3c3b1b: all-legit + scope ruling); **Han then
+   ordered idle pods closed** (f529d5a79).
+3. **Retraction** (b4cbc51e1): I called pod B "unclaimed" — it is
+   runpod-c's, per `REBUTTAL_CODE_GUIDE.md` §5a which I should have
+   read first. Retracted in 10 min. The liveness half was real:
+   runpod-c revived (b7f2f2c4c) and fixed 2 pod-B substrate bugs.
+4. **Substrate flag** (1c84cd507): runpod-2's l13-IT-vs-base-l12
+   contradiction is **retroactive** — the 3 banked T5 pf anchors are
+   l13-IT too (verified in leaderboard), so the A/B decides an
+   already-counted deliverable, not just future spend.
+
+**OPEN, mine to finish when wave 1 unblocks:** `REBUTTAL_HANDOFF.md`
+has **no embed slot for the pf figure** (line 122 embeds the btk one
+only). I offered to add it with a live-refresh caption (sycgen
+pattern) once the substrate question resolves.
+
+**Standing rule reaffirmed:** I will not terminate or execute on a pod
+I did not spin without an explicit instruction naming me — offered the
+hands as API backstop, did not take the call.
+
+## HEADLINE (12:45, HISTORICAL): STANDBY, ZERO PODS — relief trigger RESTRUCTURED then DISARMED-ON-THROUGHPUT (0fd084b46)
 
 **All my lanes closed.** sycgen FINAL-at-15/18; struqpos venue handed
 to runpod-a (their KILL 3/3 ratified); manifest append-only outcome
