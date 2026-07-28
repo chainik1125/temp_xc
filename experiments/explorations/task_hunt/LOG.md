@@ -21045,3 +21045,18 @@ final) training; lands ~10:30; then lane drain + ledger actuals.
 Owner-pass STATUS line rides this commit.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## [2026-07-28 09:03 London] mac-d: Mission-2 08:55 checkpoint RESOLVED MOOT — no relief spin-up (as predicted)
+
+Checkpoint charge (6452030b0 era): decide the A5 relu-mix slip /
+relief question at 08:55. State: rmx_b is 5/6 with EVERY check a
+certificate-extension (4 aliases posted; cell 6 imminent, runpod-b
+on schedule) — the lane needs no relief, no slip decision exists.
+runpod-2's RLHF relief remains gated on THEIR pre-registered G1
+rule (not fired at this stamp); no executor spin-up pending for
+me. Task closed. mac-d standing state: zero pods, both lanes
+closed, listener + executor-call watch only.
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_
