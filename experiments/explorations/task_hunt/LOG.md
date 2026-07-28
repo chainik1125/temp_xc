@@ -31197,3 +31197,98 @@ it. **"Use a bigger model" is not a fix at the current geometry**, across
 needed.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 20:43 BST — mac-c: ⚑ CORRECTION to my 20:35 entry. Context and scale MULTIPLY — neither works alone, which is why testing them one at a time made each look useless
+
+**I was wrong 15 minutes ago and the corrected run says so.** At 20:35 I
+wrote that a 21× bigger model "is not a fix at the current geometry."
+Scoped to SEQ_LEN=128 that stands. As an unqualified claim it is
+**wrong**, and the qualifier is the whole finding.
+
+### 1. The full matrix — as-screened recency face
+
+| model | @128 gain | @128 per_class | @512 gain | @512 per_class |
+|---|---|---|---|---|
+| gpt2-small 124M | +0.0596 | [0.516, 0.394, 0.403] | +0.0928 | [0.492, 0.433, 0.416] |
+| gpt2-medium 355M | +0.0389 | [0.475, 0.397, 0.368] | +0.0754 | [0.494, 0.389, 0.431] |
+| **gemma2_2b 2.6B** | +0.0567 | [0.483, 0.397, 0.399] | **+0.1088** | **[0.524, 0.381, 0.493]** |
+
+**At 128 tokens a 21× model buys NOTHING** (+0.0567 vs +0.0596).
+**At 512 it buys the best result on record** (+0.1088 — higher than any
+model at any context tonight).
+
+**The class that moved is the one that had to.** Class 2 is the
+longest-range class (ages > 262 tokens):
+
+    gemma2_2b   0.399 -> 0.493   (+0.094)
+    gpt2-small  0.403 -> 0.416   (+0.013)
+
+**gpt2 barely uses 4× more context; gemma2 uses it substantially.** That
+is a capability difference the apparatus had been hiding completely.
+
+### 2. ⚑ The floor still has not moved — 4 model×context combinations now
+
+| | @128 | @512 |
+|---|---|---|
+| gpt2 | 0.5859 | 0.5932 |
+| gemma2_2b | 0.6048 | 0.6081 |
+
+**Pre-registered every time, held every time.** The floor depends only on
+`T + w` — not on the model, not on the context length. It is the one
+quantity in this benchmark that is purely ours to set.
+
+### 3. The corrected synthesis
+
+My 20:21 claim was that floor horizon (~89) and readable horizon (~100)
+are "the same number". **That was measured on gpt2 and it does not
+generalise.** The honest version:
+
+- **Floor horizon = `T + w` ≈ 89.** Fixed by our design choices alone.
+- **Readable horizon is a MODEL × CONTEXT product**, not a constant.
+  gpt2 ≈ 100 tokens regardless. gemma2_2b ≈ 100 at 128 context, but
+  substantially beyond 262 at 512 context.
+
+So the band `(T+w, readable_horizon)` is **not** immovably tiny. It was
+tiny **because we were measuring at 128 tokens on the smallest leg**,
+which pins the readable horizon at the apparatus limit no matter what
+model is loaded.
+
+**Three levers, and the evidence says you need all three:**
+
+1. **Context** — `SEQ_LEN` 128 → 512. Alone: gpt2 +0.0596 → +0.0928.
+2. **Model** — 124M → 2.6B. **Alone: nothing** (+0.0596 → +0.0567).
+   **With (1): +0.0928 → +0.1088.**
+3. **Shrink the floor** — `T + w`. **Untested**, and now the binding one.
+
+**Every candidate the program has screened violated (1) and (3).**
+
+### 4. What still is not a KEEP, and by how much
+
+`arm − floor` on the best cell: **0.4907 − 0.6081 = −0.117**, improved
+from **−0.178** at gemma2@128. **The gap closed by 0.061 from context +
+scale alone, with zero change to the corpus.** Closing the remaining
+0.117 is lever (3): `w` = 25 → narrow events, `T` = 64 → 16, and a label
+whose range sits inside the readable band. `retryesc_gen` had T=64,
+w=25, terciles at 121/286 — **wrong on all three.**
+
+**That is the first evidence-backed spec for a next candidate the hunt
+has had.** I am still not freezing it into a card tonight: lever 3 is
+untested, and the last two times I designed from a bar-side argument the
+arm did not follow. **The cheap next step is to test lever 3 the same
+way — re-label an existing corpus at T=16 and measure `arm − floor`
+before anyone generates anything.**
+
+### 5. Cost and process note
+
+**$0. 0 mac-c pods.** The whole matrix — 3 models × 2 context lengths ×
+2 faces — ran on local MPS.
+
+**Process lesson worth keeping:** I tested two variables one at a time,
+got a null from each, and twice wrote a conclusion off a single-variable
+null. **Both nulls were interaction effects.** When a factor is pinned by
+another factor's ceiling, varying it alone measures the ceiling, not the
+factor.
+
+_Recorded-by: claude-opus-5 (mac-c)_
