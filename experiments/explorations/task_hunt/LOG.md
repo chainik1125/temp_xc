@@ -19420,3 +19420,53 @@ banned pattern) was caught and killed within the beat;
 single-instance verified since.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 04:40 London (date-verified 03:40 UTC) — runpod-a: CHARTER ACK (cb3e34973) + StruQ premeasure recon COMPLETE — design direction fixed, $0 CPU-only
+
+**Charter (iii) — my lane:** shard E leg 2 in flight (T2/s1
+training, T2/s2 queued; drain ETA ~05:45–06:00 London holds). Leg 1
+receipts + T4 column posted 04:14. Priority unchanged.
+
+**Charter (ii) — StruQ premeasures (my assignment, 01:42 entry;
+"$0 premeasures continue at runpod-a" per the item-7 reset):**
+recon done this beat, read-only from `origin/dmitry-txcwins-10h`:
+corpus `struq_data/davinci_003_outputs.json` (805 items, 208 with
+non-empty input = the StruQ-attacked subset; alpaca-farm davinci
+-003), `designs_struq.py` (his defect notice + struqpos repair),
+`geometrystruqposx_gate.json` receipts. Nothing adopted from his
+steering screen — read for corpus mechanics only.
+
+**Design direction (design-first, stated before any build):**
+1. **Corpus construction adopts his `struqpos` position-contrast
+   SHAPE** (not his instrument): injection present in BOTH
+   conditions, only its POSITION in the untrusted field moves
+   (A = data+sep+payload, B = payload+sep+data). A/B are character
+   -level anagrams ⇒ **the structural vocabulary leak the
+   assignment flagged is ZERO BY CONSTRUCTION** — first candidate
+   face with that property; the label is an ORDER/arrangement
+   property, not a content property.
+2. **Face = binary injection-position** (last-vs-first), probed at
+   position-matched manifests (pos_strata + stratified balanced,
+   attack-type-stratified across {naive, ignore, completion_real}).
+   NOT an age face — the 0/9 age-face order-null precedent is the
+   known grave; this face is the instruction-hierarchy question
+   (does a trailing injection read differently from a leading one
+   in the residual stream), which is order-carried BY DESIGN.
+3. His two defects, priced into OUR design: segmentation
+   misalignment (his struq_* v1) — n/a to us (we tokenize raw
+   text, no segment cuts); completion_real cont2 contamination —
+   n/a to our probe (no teacher-forced continuation), recorded so
+   nobody re-imports his metric.
+4. **$0 label-side premeasure next**: build_struq_premeasure.py
+   (3-tokenizer: gpt2/gemma2/llama31 from raw text — no
+   reconstruction gap), six bands with expected shapes stated
+   pre-run: unigram ~0.5 BY CONSTRUCTION (verify empirically —
+   the two join seams are the only lexical delta), position band
+   clean by matched-length design, usable/events counted from 208
+   ×3 attacks ×2 arrangements. Bands PASS ⇒ own frozen card
+   (steering-method prohibition explicit per the 01:42 ruling)
+   BEFORE any GPU cell; screen competes for the next retrain slot.
+
+CPU-only until the card; GPU 0 stays on shard E. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
