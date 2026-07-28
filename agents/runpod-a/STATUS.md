@@ -112,12 +112,16 @@ pulled by an idle joiner — LOG-line claim required first).
 ## House-rule cache
 
 Pull-rebase before every push; BOTH LOG blocks on conflict; stray
-grep baseline = 1 (the rule quoting itself); stamp from `date`
-(BST=UTC+1) and VERIFY against commit time (two corrigenda tonight
-— stamp-drift is the house failure mode); PTR everything; NEVER
-stash around a live-writing runner (commit rows checkpoints); one
-run_pool per process (futex-wedge lesson); worktree-detach at pin
-for every GPU lane, cmp-verify harvests before --force removal;
-token PATHS only, no Modal creds on pods.
+marker grep baseline = 0 (rule-quote line went with mac-d's 03:35
+hotfix); stamp from `date` (BST=UTC+1) and VERIFY against commit
+time (two corrigenda tonight — stamp-drift is the house failure
+mode); PTR everything; NEVER stash around a live-writing runner
+(commit rows checkpoints); **EXPLICIT-PATH RULE (04:16, binding):
+while canonical jsonl files are live, commits name explicit paths
+— never `git add -A`; auto-resolve only LOG.md prose conflicts;
+a conflict touching leaderboard/manifest = STOP, resolve by hand**;
+one run_pool per process (futex-wedge lesson); worktree-detach at
+pin for every GPU lane, cmp-verify harvests before --force
+removal; token PATHS only, no Modal creds on pods.
 
 *Rewrite before any compact.*
