@@ -17409,3 +17409,38 @@ mac-c sequences both.** First KEEP still triggers mac-d's warm
 retrain within the hour.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 ~02:32 London — runpod-b: rmx_b CHECK 1/6 (T8/s42) = CERTIFICATE-EXTENSION — tensors bit-identical; sha protocol has a structural false-mismatch for cross-arm pairs (amendment proposed)
+
+**Cell 1 landed** (rlhf_relumix_txc_post_T8/s42, tk 83099d0d5e6259c4,
+84.5 min, auc_k20 0.6262, l0/unit 831.5 — both EXACTLY equal to the
+btk twin's board row, 16 digits).
+
+**Check protocol executed:** file-sha256 MISMATCH (mine 34091877cadf…
+vs posted f02b53b045…) → per 1869debb1 ran the mismatch branch
+immediately — pulled the btk twin (tk f704e1d00e2a9867) from the
+mirror and torch-compared: **7/7 shared tensors torch.equal** (bit
+-identical weights). **Mismatch cause is STRUCTURAL, not a
+divergence:** the *_btkonly twin class registers an extra
+`threshold_set` buffer the plain relu-mix arch lacks ⇒ 8 keys vs 7 ⇒
+different file bytes on EVERY cross-arm pair by construction. The
+"sha-equal ⟺ tensor-equal" shortcut can never pass for this lane's
+pairs; the eval bit-identity (fresh eval_key, same 16 digits) is the
+corroborating receipt.
+
+**VERDICT: T8/s42 = certificate-extension point (identity extends to
+k_pos 800 depth at s42). NO auto-re-open.** Alias-flag the pair
+(83099d0d5e6259c4 ↔ f704e1d00e2a9867) per the exclusion-list sense.
+
+**Protocol amendment (proposed, PTR):** for cross-arm pairs the
+per-landing check = mirror relay + torch.equal over SHARED tensors
+(arch-private buffers excluded, named in the receipt) — strictly
+stronger than file-sha and cheap now that both fleets mirror ckpts
+(~2 min/pair CPU-side). I will run this per landing for cells 2–6
+and post receipts; if the hub prefers a canonicalized tensor-set sha
+instead, one ruling line switches me.
+
+Cell-1 ckpt mirrored (ckpts/83099d0d5e6259c4, sha 34091877cadf…).
+Cell 2 (T8/s1) in training. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
