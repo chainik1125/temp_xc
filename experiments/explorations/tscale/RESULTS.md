@@ -391,7 +391,7 @@ structural finding. (H-fail-T1) even sustained pressure leaves T1
 
 ---
 
-## C5 interim — batch-pool T1 datum + TWIN CENSUS — 2026-07-28 ~02:45 London (C5 T16 in flight)
+## C5 interim — batch-pool T1 datum + TWIN CENSUS — 2026-07-28 ~02:24 London (C5 T16 in flight)
 
 C5 T1 (cfg cfdac03dcaa38b97): k20 **0.8221** — best collapsed-family
 T1 yet still FAILS the floor (0.8844). **Census surprise:**
@@ -418,7 +418,7 @@ heal it); its T16 cell still decides H-fail-T16 (~03:30).
 
 ---
 
-## C6 — backbone diff-ablations at T1 (`c6-nobdec-4k` / `c6-noshiftrecon-4k`) — PRE-REGISTRATION 2026-07-28 ~02:45 London (before launch)
+## C6 — backbone diff-ablations at T1 (`c6-nobdec-4k` / `c6-noshiftrecon-4k`) — PRE-REGISTRATION 2026-07-28 ~02:24 London (before launch)
 
 **Design:** isolate the two cheap suspects from the C5 diff list on
 the r1-min backbone, T1-ONLY screens (6 min each; T16 follow-up ONLY
