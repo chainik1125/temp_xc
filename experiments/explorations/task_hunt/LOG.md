@@ -31292,3 +31292,82 @@ another factor's ceiling, varying it alone measures the ceiling, not the
 factor.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-28 ~18:4x BST — mac-local HUB: **the screen has NO uncertainty quantification** — `evalage` was rejected on a difference of ~0.5σ, and the KEEP bar has only ever been exercised at ~9σ
+
+**Han: *"mac-c needs to actually do some pod work — we might have been
+prematurely discarding high potential tasks."*** He is right. Brief:
+`briefings/hunt-rescue-retrain-mac-c.md`, which takes precedence over
+the clew sourcing brief (pods first; literature is $0 and interleaves).
+
+### 1. What the screen artifacts actually contain
+
+Every cell in every screen JSON is **one number**:
+
+    /cells/<face>/<T>/<arm>/acc_test   n_train   n_test   wall_s
+
+**No `seed`, no CI, no bootstrap, no `std` — anywhere.** And per-example
+predictions are not saved, so the paired SE **cannot be recovered
+retroactively**. We have been comparing single-seed point estimates to a
+hard `gain ≥ +0.05` and treating the comparison as a verdict.
+
+### 2. The margins, in units of the noise we never computed
+
+At `n_test = 4497`, SE on one accuracy near 0.43 ≈ 0.0074, so SE on the
+paired gain ≈ 0.007–0.010.
+
+| candidate | leg | gain | vs bar | ≈σ |
+|---|---|---|---|---|
+| `evalage` | gemma2_2b | +0.0460 | **−0.0040** | **0.54 under** |
+| `evalage` | gpt2 | +0.0400 | −0.0100 | 1.36 under |
+| `evalage` | llama31_8b | +0.0307 | −0.0193 | 2.63 under |
+| `retryesc_gen` | gemma2_2b | +0.0690 | +0.0190 | 2.60 **over** |
+| `sycgen` | llama31_8b | +0.1225 | +0.0725 | **9.97 over** |
+
+**`evalage`'s best leg missed by about half a standard error.** And our
+only KEEP cleared by ~9σ — so **the bar has only ever been exercised
+where the answer was obvious. No candidate between +0.03 and +0.11 has
+ever been retrained**, and both near-misses live in that untested band.
+The constant is hardcoded at `hunt3/verdict.py:50` and
+`hunt4/verdict.py:63`; it was set by fiat, never calibrated.
+
+### 3. The deeper problem: the screen proxies a different instrument
+
+The screen's window arm is a **mean-pooled probe over raw activations**
+(`actxmean_mlp`). The deliverable is a **trained sparse TXC dictionary**.
+We already know these diverge — in `sycgen` the **untrained twin showed
+LARGER shuffle gaps than the trained model**; training *reduced* the
+order gap while lifting recovery from ≤0.22 to 0.50–0.59. A pooled-probe
+screen is not entitled to predict what a trained dictionary does, in
+either direction.
+
+### 4. Lanes issued
+
+- **A (priority): retrain `evalage` for real.** It cleared the width
+  null, its visible floor and the within-conversation control on **every
+  leg**; **no kill clause fired**; it failed one hardcoded threshold by
+  ~0.5σ. On llama31 its **`wd` gain +0.0588 clears +0.05** — the KEEP
+  rule reads the global gain, which is a rule choice, not a fact.
+- **B: give the screen an error bar** — 3 seeds + bootstrap CI + save
+  per-example predictions. **The +0.05 bar must NOT be moved silently**;
+  a threshold that moves after seeing the data is not a threshold.
+- **C: retrain `retryesc_gen` as a PREDICTED NEGATIVE.** Deliberately
+  included: re-running only the candidates we hope to rescue is fishing;
+  running one we predict the screen got *right* is what makes this a
+  calibration. I expect it stays dead structurally — at its best-gain T
+  the visible floor is **0.594–0.622 against a window arm of
+  0.431–0.454**, beating it by ~0.16. That is the scissors, not a
+  marginal miss.
+
+### 5. The guard rail, stated plainly
+
+**This is a re-examination of our own gate, not a hunt for a KEEP we
+have already decided we want.** If `evalage` retrains into a null, that
+is a finding *about our screen* and it goes in the record with the same
+prominence a rescue would get. Any rescued candidate is disclosed as
+rescued — screen WEAK, retrained anyway because the miss was inside the
+noise, outcome X — and never quoted as having passed the screen.
+
+**The actual deliverable of this lane is a calibrated gate.** A rescued
+task would be a bonus.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
