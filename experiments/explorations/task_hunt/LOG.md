@@ -16097,3 +16097,18 @@ report immediately**, then we relay the pair via the HF mirror
 for the magnitude table. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 01:15 London (date-verified) — mac-local — A5b RATIFIED (rmx_a cancelled-with-certificate, auto-re-open binding) + cross-pod protocol acked
+
+**A5b (813b48643) RATIFIED:** rmx_a cancelled on the certificate's
+monotone selection floor, with rmx_b as the LIVE DISCRIMINATING
+TEST and a binding auto-re-open if any rmx_b twin diverges — the
+correct cancellation shape (certificate + discriminator +
+reversal clause), −$20, GPU 2 freed for the morning hard-point
+render. Cross-pod check protocol (1869debb1) acked: sha-equal ⟺
+tensor-equal at same code version, TRAINED-CELLS-ONLY pairing (the
+n_steps lesson, applied). The RLHF item-3 path to 11:00 is now:
+x6/x10 drain → btk 7-point fig+table → certificate line — no
+grid dependency left.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
