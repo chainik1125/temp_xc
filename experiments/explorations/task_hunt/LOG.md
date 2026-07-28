@@ -16432,3 +16432,54 @@ the ruling applies — state it and carry on.
 lands for `retryesc_gen`, `sycgen`, and everything after.
 
 _Recorded-by: claude-fable-5 (mac-c)_
+
+## 2026-07-28 01:47 London (date-verified) — mac-d — sycgen v1 LANDED: realised geometry ALL PASS, but the vocab STOP FIRES — mechanism isolated (length-normalization, schedule clean) — HALTED before screen per the card, disposition to design owner
+
+**Corpus landed** (freeze ab9fea648): 400 convs, 986,159 stream
+tokens (gpt2), 1,118 challenges @ 2.79/conv, 0 API failures, 0
+filler turns. Wall 00:56→01:45 ≈ 49 min at 8 workers. Est-basis
+actuals ≈ **$6–9** vs $8–15 est (API console has truth; script
+does not meter usage — disclosed). **Durability receipts (b4ec84b04
+item 1):** `temp-bench-data/hunt_corpora/sycgen_20260728/`
+{elicit_sycgen_v1.npz 2bdd9aca…, receipt 54181c6e…,
+realised_gate 2701e6d2…, sha256_manifest} + all three committed
+in-tree this push (artifact-of-record per card §3).
+
+**Gate 1 — realised geometry (sycgen_realised_gate.json): ALL SIX
+BANDS PASS.** position 0.808 [0.756, 0.868] ≤0.95 ✓; doc-mean
+**0.858** [0.805, **0.906**] ≤0.88 ✓ *but the CI upper crosses the
+bar and the point sits 0.007 from retryesc's fatal 0.865 —
+disclosed, not buried*; strata/usable/event-mass all pass;
+censored-age floors 0.500/0.500/0.514/0.559/0.643 at T=4..64 (the
+sage KEEP shape); realised gaps median 442 (plan predicted ~450 ✓).
+
+**Gate 2 — vocabulary control: the STOP CONDITION FIRES** (cv
+0.749, spread 0.0052 — vs evalage's 0.0004). **Mechanism isolated
+before anyone asks:** challenges-per-CONVERSATION by domain is
+FLAT (2.56–2.94 around 2.79 ⇒ the schedule NEVER consulted the
+domain — the independence construction held), but tokens/conv
+varies **12×** by domain (trivia_qa 492 → math_mc_cot 5,880;
+haiku's chain-of-thought math answers vs one-line trivia), so
+per-TOKEN challenge density varies 12× through the denominator.
+Domain vocabulary → conversation length scale → age scale: the
+retryesc leak FAMILY through a channel the PRECOUNT never
+considered (it had no lengths to measure). The elevated doc-mean
+is this same channel measured on the face.
+
+**Action per card §4: STOPPED.** The corpus does NOT advance to
+the screen on my authority; the card's STOP language is "do not
+trust the corpus, stop and report." Disposition options I see
+(design owner mac-c + hub decide, not me): (a) screen anyway —
+the unigram bar measures the leak directly, $2–3, kills-with-
+receipts; (b) v2 with length-controlled generation (per-domain
+max_tokens equalization is one knob) — BLOCKED behind the
+checkpoint clause (c790ddf1b) which I have adopted as binding;
+(c) within-domain position-matched readout amendment. My
+recommendation, weakly held: (a) first — it is cheap, and if
+per-token/unigram reads the domain register the candidate dies
+with receipts exactly as retryesc did; (b) only if (a) shows the
+window face survives inside domains.
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_
