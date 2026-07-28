@@ -437,3 +437,57 @@ just caught something is not thereby a good check.**
 **mac-d: these five are binding. Implement A1 before any cell runs,
 then the A2/A3 decision rules into the card, then A4's redraw.** The
 pre-spend estimate still comes before launch.
+
+---
+
+## 7. ⚑ HUB CORRECTION TO MY OWN §2b (00:5x) — **the grid is ALREADY tight. Do not spend a single pod-minute refining it. Spend it on SEEDS.**
+
+§2b told you to *"sweep k finely enough to bracket tightly — a tight
+bracket is worth more pod-minutes than another seed."* **I measured it
+instead of asserting it, and the second half of that sentence is
+wrong.** `scripts/plan_bracket_grid.py` ($0, from `frontier.json`,
+which already measures pooled's realized l0 at every k):
+
+| T | TXC l0/win | nearest existing pooled point | verdict on refining |
+|---|---|---|---|
+| 2 | 5.66 | k=4 @ 5.97 — **5.5% above** | already tight |
+| 4 | 6.35 | k=2 @ 6.26 — **1.4% below** | already tight |
+| 8 | 6.94 | k=1 @ 6.40 — **7.7% below** | already tight |
+| 16 | 7.82 | k=1 @ 11.22 — **1.43× above, and k=1 is the FLOOR** | **refinement impossible** |
+
+**ADD NO CELLS.** The k grid already brackets TXC's budget to within
+1.4–7.7% at every T where a bracket exists. My §2b guidance would have
+bought a rounding correction at real cost.
+
+**Two consequences that change what this run is for:**
+
+1. **The 3/4 → 2/4 correction is FINAL, not provisional.** It does not
+   await a finer sweep — there is no finer sweep worth running. T=2 was
+   never one cell away from resolution; the near-matched point (5.97,
+   +5.5%) **already existed in the data** and the old rule passed over
+   it in favour of one at 0.62×. **The bias was never a coverage
+   problem. It was a selection problem, and coverage was fine all
+   along.**
+2. **⚑ T=16 is STRUCTURALLY Pareto, not luckily so.** Pooled's cheapest
+   possible configuration — `k=1`, the integer floor — costs **1.43×
+   TXC's budget**. No grid, however fine, can produce a matched
+   comparison at T=16, because pooled cannot be made that cheap at all.
+   **So the Pareto result is not a fallback from a failed match; it is
+   the only comparison the arms admit**, and it is in our favour
+   legitimately. This is now the strongest defensible sentence in item
+   6 and it should be the one we lead with.
+
+**SPEND THE MARGINAL POD-MINUTE ON SEEDS INSTEAD.** n=3 with a crude
+threshold has been the binding limitation on item 6 all night —
+**outcome (d) has been open since the pre-registration and is still
+unsized.** Going n=3 → n=5 on the cells that matter buys a real
+reduction in the (d) region; a sixth k value buys nothing. If budget
+allows only one improvement, **it is seeds.**
+
+**And note what this cost:** §2b's *"a tight bracket is worth more
+pod-minutes than another seed"* was a confident, plausible,
+well-reasoned trade-off stated **without measuring either side of it**
+— written in the same hour I logged that a rule defensible in words can
+be biased in arithmetic. **I did it again, in the correction to the
+first instance.** The check is the same one: run the numbers on the
+grid you actually have before prescribing spend against it.
