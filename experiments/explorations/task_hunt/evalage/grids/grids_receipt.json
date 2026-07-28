@@ -1,0 +1,73 @@
+{
+ "stream": "elicit_evalage_v1.npz",
+ "n_docs": 400,
+ "events_expected": 1542,
+ "topics": [
+  "basics of bread baking",
+  "basics of watercolour painting",
+  "caring for houseplants",
+  "choosing a bicycle for commuting",
+  "how compasses work",
+  "how rainbows form",
+  "how tides work",
+  "how to fold origami cranes",
+  "how to read a train timetable",
+  "organising a small library",
+  "planning a coastal walk",
+  "planning a vegetable garden",
+  "the history of paper making",
+  "the invention of the printing press",
+  "the rules of chess endgames",
+  "why leaves change colour"
+ ],
+ "transplanted_from": "sycgen/screen_grids.py (mac-d)",
+ "roundtrip": "every decoded run re-encoded == original ids",
+ "per_tag": {
+  "gpt2": {
+   "tokenizer": "openai-community/gpt2",
+   "n_tokens": 2037398,
+   "events": 1542,
+   "realised_gaps": {
+    "n_gaps": 1142,
+    "mean": 1021.0175131348511,
+    "median": 862.0,
+    "p10": 356.20000000000005,
+    "p90": 1948.7000000000003,
+    "min": 103.0,
+    "max": 2660.0
+   },
+   "file": "elicit_evalage_screen_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_tokens": 1926859,
+   "events": 1542,
+   "realised_gaps": {
+    "n_gaps": 1142,
+    "mean": 967.0884413309982,
+    "median": 832.0,
+    "p10": 348.20000000000005,
+    "p90": 1843.2000000000007,
+    "min": 108.0,
+    "max": 2511.0
+   },
+   "file": "elicit_evalage_screen_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_tokens": 1899699,
+   "events": 1542,
+   "realised_gaps": {
+    "n_gaps": 1142,
+    "mean": 951.8669001751314,
+    "median": 807.5,
+    "p10": 334.40000000000003,
+    "p90": 1810.7000000000012,
+    "min": 98.0,
+    "max": 2422.0
+   },
+   "file": "elicit_evalage_screen_llama31.npz"
+  }
+ },
+ "runs_roundtripped": 22412
+}
