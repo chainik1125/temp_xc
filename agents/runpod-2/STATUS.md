@@ -1,85 +1,141 @@
-# runpod-2 — working state
+# runpod-2 — working state (PRE-COMPACT REWRITE 2026-07-28 ~01:57 UTC / ~02:57 London)
 
-**Am:** executor on the ACTMIX shared 3×H100 pod, GPU 2 only
-(`source scripts/set_agent_env.sh runpod-2` EVERY shell). Clone
-`/workspace/agents/runpod-2/temp_xc`, own venv (peft + einops).
+**Am:** executor on the ACTMIX shared 3×H100 pod, GPU 2 ONLY
+(`source scripts/set_agent_env.sh runpod-2` EVERY shell — unsourced
+relaunch once nearly allocated on runpod-1's GPU 0). Clone
+`/workspace/agents/runpod-2/temp_xc`, own venv. Autonomous loop:
+git pull → read LOG tail → act → push (pull-rebase, keep-both LOG
+resolver, push checked by EXIT CODE not grep — '! [rejected]'
+contains 'arxiv -> arxiv'). Re-arm origin listener (150 s bash
+fetch loop, run_in_background=true — NEVER disown, untracked
+listeners can't wake me) after EVERY wake. Stamps: run `date`
+FIRST, then write (repeated slips). Beware `&` precedence in
+compound launches — one command per launch, verify child env via
+/proc/<pid>/environ.
 
-## SPRINT ACK (03f533cc3; posted 01:30 UTC / 02:30 London, wall-verified)
+## DELIVERED tonight (all ratified unless PTR-marked)
 
-**PORT FROZEN + PUSHED (0c9605f1f, ~01:52 UTC — 2.5 h ahead of
-ETA):** plugin agentic_txc_02_v1t (vendored 94119bc08, plateau
-mirror, min(3,T) scales, upstream batch schedule 1024/512/256) +
-11 contract tests green + CARD § 8 (gates G1-G3, port-cost flag,
-est $31-51 expected / $105 worst) + pf lanes
-pilot/lo/mid/hi/anchor (SHARDABLE at this pin) + 3-seed T5 anchor
-staging script. Substrate pre-staged: gemma-2-2b-IT downloaded,
-3 anchors sha-verified. **At x-drain (~08:00-08:30): l13
-activation cache build (~50 min) → hh-rlhf@l13 eval cache
-(~25 min) → stage_anchors + pf_anchor evals → G2 → pf_pilot →
-G1 → grid (pf_lo ‖ pf_mid, pf_hi after or sharded).** 11:00 btk
-renders unaffected (independent). Free pod GPUs may take
-pf_mid/pf_hi at pin ≥ 0c9605f1f — coordinate via STATUS.
+1. **RLHF equivalence certificate 829f05070 (RATIFIED 89370c68a):**
+   3/3 twins tensor-IDENTICAL through T16 (sae k500 / txc T5 / txc
+   T16, s42; Δauc exactly 0; torch.equal all 7 shared tensors each;
+   extra key threshold_set bookkeeping-only). Pre-registered T16
+   divergence REFUTED + disclosed. Mechanism: boundary_min_pre ≥
+   2.21/2.47 every logged step; dead_frac 0.654@T16 present but
+   non-contesting; bit-identity RETRO-PROVES zero boundary contact
+   at ALL 25k steps (addendum fd3e4ff16, lemma-pair w/ runpod-1's
+   census divergence: identity ⇒ no contact ever; divergence ⇒
+   rare contact — one mechanism, two venues; quote PER-TASK only).
+   RLHF_EQUIVALENCE.{md,json} committed; receipts complete.
+2. **A5b (RATIFIED 06fa6cee7): rmx_a CANCELLED-WITH-CERTIFICATE**
+   (monotone selection floor + alias hygiene). **AUTO-RE-OPEN
+   binding: any DIVERGENT rmx_b per-cell check re-cards rmx_a.**
+3. **Cross-pod sha protocol (acked):** twin checks = file sha256
+   (sha-equal ⟺ tensor-equal at same code version); my btkonly T8
+   trio shas posted in LOG 00:16 entry; **T10 trio DUE at x10
+   drain** (compute + post). runpod-b posts rmx_b relumix shas per
+   landing (their pace ~100 min/cell, drain ~10:30 UTC);
+   MISMATCH ⇒ auto-re-open + immediate report.
+4. **Durability COMPLIANT (eb143b62a):** 26/26 trained RLHF ckpts
+   on `temp-bench-data/ckpts/<train_key>/` (ratified path), T16
+   spot-check HF-LFS sha MATCH; receipts in
+   `actmix_rlhf/results/hf_durability_receipts.jsonl`; uploader
+   `actmix_rlhf/hf_durability_push.py`. **x6/x10 + pf ckpts push
+   at lane completion (standing cadence rule).**
+5. **⚑ PAPER-FAITHFUL FREEZE 0c9605f1f (CARD § 8; sprint
+   4ce0369de/606e4587d; PTR):** plugin `agentic_txc_02_v1t`
+   (src/temp_bench/archs/agentic_txc02.py — vendored 94119bc08
+   verbatim, upstream param names, min(3,T) scales, batch
+   1024/512(T10)/256(T16), in-plugin plateau mirror: post-plateau
+   zero-graph loss ⇒ Adam no-op, proven in tests). 11 contract
+   tests green (tests/test_agentic_txc02.py). Lanes in cells.py:
+   pf_pilot (T2/s42 gate) / pf_lo T{1,2,4}×3 / pf_mid T{6,8}×3 /
+   pf_hi T{10,16}×3 / pf_anchor (T5 evals ×3 seeds). Anchors =
+   txcdr-base agentic_txc_02__seed{42,1,2}.pt — ALL 3 SEEDS,
+   staged at /workspace/caches/rlhf/agentic_anchors/, sha receipts
+   in /workspace/logs/pf_staging.log; stage_anchors.py mints their
+   v2 train_keys + provenance side-manifest (phase_b precedent).
+   gemma-2-2b-IT pre-downloaded. Datasource = PAPER stream
+   gemma_2_2b_it_l13_fineweb_24k128 (data_key 48d2d17ff88598d4,
+   ANCHOR-FORCED — not phase7-l12); cache ABSENT here → rebuild at
+   x-drain. Gates in card: G1 pilot-vs-upstream-log
+   (agentic_txc_02_t2__seed42.json: 5800 steps, l0≈197/200), G2
+   anchor-eval placement, G3 l0<k_win ReLU fingerprint. Est
+   $31-51 expected / $105 no-plateau bound.
 
-## State (2026-07-28 ~00:12 UTC / ~01:12 London, wall-verified)
+## RUNNING NOW (GPU 2)
 
-**CERTIFICATE SHIPPED + RATIFIED (89370c68a; refutation praised as pre-registration working):** RLHF equivalence 3/3
-TENSOR-IDENTICAL through T16 (k500/T5/T16, s42; Δauc exactly 0
-each; receipts + mechanism: boundary_min_pre ≥ 2.21 every logged
-step — relu inert by margin; dead_frac 0.654 at T16 present but
-non-contesting). Pre-registered T16 divergence (7093c21f8)
-REFUTED — disclosed. **rmx_b16 DEAD. runpod-b launches rmx_b
-only.** RLHF_EQUIVALENCE.{md,json} committed. Eq actuals $11.
+x6 ‖ x10 (btk T{6,10}×3, A2, pin 829f05070, fracs 0.35/0.50,
+launched ~00:15 UTC): logs
+/workspace/logs/actmix_rlhf_lane_x{6,10}.log (nohup buffered —
+flush on cell/exit; check runs jsonl + nvidia-smi, silence ≠
+stall), jsonl actmix_rlhf_runs_x{6,10}.jsonl. Drain ~08:00-08:30
+UTC. Watchers: x6 bhqw8y3zk / x10 b4mz7sims (grep '[lane xN]
+DONE|FAIL', 240 s). Origin listener bblevw5tz (150 s).
 
-**Queue (frozen order, GPU 2):**
-1. **NOW: launch x6 ‖ x10** (A2 frozen: T{6,10}×3 btk, fracs
-   0.35/0.50) at fresh pushed pin via rev-parse. ~8 GPU-h
-   co-resident → drains ~08:00-08:30 UTC. Arm DONE watchers.
-2. **rmx_a CANCELLED-WITH-CERTIFICATE (A5b, my card-owner
-   ruling per 89370c68a)** — matrix fulfillment = certificate
-   line; **AUTO-RE-OPEN binding: any divergent rmx_b per-cell
-   check re-cards it as eq-extension** (watch runpod-b's rows,
-   run per-cell checker on each rmx_b landing). T4-btk is
-   runpod-a's (s42 in at 0.6185).
-3. **Morning: 7-point FINAL fig re-render** {1,2,5,6,8,10,16} +
-   table + beat = HARD POINT (af7d0869b). 8-point exhibit render
-   {1,2,4,5,6,8,10,16} when T4×3 + relumix grid complete.
-4. Ledger actuals per lane; STATUS + listener re-arm every wake.
+## THEN (frozen order)
 
-**Fleet refs:** runpod-b = rmx_b T{8,10}×3 (their pod, unblocked
-by the certificate; by-T split per A5 — NOT by-seed). runpod-a =
-x4 lane (T4 btk ×3, s42 landed) + R30 twins. Morning render
-consumes: my A1 rows + x6/x10 + runpod-a's x4 (T4 excluded from
-the 7-point hard render; enters at 8-point).
+1. **x6 drains (~05:30-06:30):** commit rows; x10 continues.
+2. **x10 drains (~08:00-08:30):** commit rows → **btkonly T10 trio
+   sha256 post** (LOG, trained-only n_steps=25000, pair by
+   train_key) → HF-push x6/x10 ckpts (durability cadence) →
+   ledger actuals (~$24 est).
+3. **Paper-faithful sequence on GPU 2** (CARD § 8, sourced shell,
+   pins via rev-parse ≥ 0c9605f1f):
+   a. l13 activation cache build (~50 min GPU;
+      build_activation_cache for gemma_2_2b_it_l13_fineweb_24k128).
+   b. hh-rlhf@l13-IT eval cache (~25 min; same builder family as
+      /workspace/caches/rlhf/cached_hh_rlhf which is l12-BASE —
+      record fresh integrity stats).
+   c. `.venv/bin/python -m experiments.explorations.actmix_rlhf.stage_anchors`
+      → pf_anchor lane (3 evals) → **G2 gate**.
+   d. pf_pilot (T2/s42) → **G1 gate** (STOP+report on fail).
+   e. Grid: pf_lo ‖ pf_mid co-resident; pf_hi after OR sharded to
+      free pod GPUs at the pin (offer standing; probing shards
+      precedent: runpod-a shard E, runpod-c shard D).
+   Ledger est/actuals per launch; per-cell HF ckpt push.
+4. **~11:00 London: 7-point btk FINAL render = PROTECTED HARD
+   POINT** (af7d0869b): `.venv/bin/python -m
+   experiments.explorations.actmix_rlhf.render_writeup_fig --tag
+   final` (mono; renderer auto-carries the BINDING agentic_txc_02
+   arch-disclosure footnote a9e9fc213/859fed058, bbox tight) +
+   table + LOG beat. T4 btk (runpod-a's x4, DONE:
+   0.6185/0.6108/0.6295) is NOT in the 7-point hard render;
+   8-point exhibit render {1,2,4,5,6,8,10,16} follows grid
+   completion. v2 columns NEVER labeled "paper base" (8fefb409d).
+5. **rmx_b sha checks as runpod-b posts** (equal ⇒ certificate
+   extension; unequal ⇒ AUTO-RE-OPEN, report immediately).
 
-## Durability (b4ec84b04 item 2 — COMPLIANT)
+## Fleet refs (for reading wakes)
 
-**26/26 trained RLHF ckpts mirrored** to the ratified path
-(`temp-bench-data/ckpts/<train_key>/`), certificate-evidence 6
-first. **Spot-check receipt: T16 twin 5774f6c8b6d28938 HF-LFS
-sha256 == local sha256 (2d6a3289810f144a…) — MATCH.** Receipts:
-`experiments/explorations/actmix_rlhf/results/hf_durability_receipts.jsonl`
-(train_key + sha256 + hf_path × 26). Auto-push finding: hf_url is
-schema-only on this branch (confirmed independently by runpod-1/a).
-x6/x10 + any future lane ckpts push at lane completion (cadence
-rule). 4 pre-ratification strays in the model repo
-(temp_xc_a40_checkpoints/actmix_rlhf_checkpoints/) — bonus
-copies, hub may clean.
-
-## Watchers
-
-Origin listener 150s — re-arm EVERY wake. Per-lane DONE watchers
-armed at each launch (grep '\[lane <name>\] DONE' or FAIL).
+Paper-faithful probing = runpod-1's card d9235755b, shards on
+runpod-a (E) + runpod-c (D). rmx_b = runpod-b GPU 1 (launched
+00:05 pin 829f05070). Hunt = mac-c/mac-d (sycgen screen frozen,
+evalage generating; NOT my lane). EM frozen (NOTHING relaunches).
+Backtracking = Aniket-only. Framing guard on shuffle quotes;
+T16 = 3-instrument adjacency ceiling. Churn-stop etiquette:
+frozen cards beat racing directives; 15-min ack discipline when
+the hub maps name me.
 
 ## Ledger
 
-Yesterday ≈ $44; today (07-27) A1 $27 + Ward $2 + eq $11 actuals
-≈ $40; queued est: x6/x10 ~$24 (rmx_a $20 CANCELLED per A5b). Caps intact.
+07-27 actuals ≈ $40 (A1 $27 + Ward $2 + eq $11). 07-28 queued:
+x6/x10 ~$24 + pf substrate ~$4 + pilot ~$2 + grid $25-45
+(pilot-gated). Caps intact ($150/day). Tokens at
+/workspace/.tokens/* — values NEVER in git/logs.
+
+## PTR open items
+
+Certificate exemption readings (T5/T16 certificate-covered on
+exhibit); § 8 l13-stream reading + anchor staging + plateau
+mirror + G1-G3; stage2_variance_panels legacy test failure =
+PRE-EXISTING, λ̂ lane's (flagged 01:48 LOG).
 
 ## If resuming after compact
 
-Read this + LOG tail from the 00:02 certificate entry + CARD § 7
-A5. Lanes: `tail /workspace/logs/actmix_rlhf_lane_*.log`, jsonl
-`actmix_rlhf_runs_*.jsonl`, `nvidia-smi` GPU 2. Execute queue in
-order. Renderer: `.venv/bin/python -m
-experiments.explorations.actmix_rlhf.render_writeup_fig --tag
-final` (mono). Checker: `…actmix_rlhf.rlhf_equivalence`.
+Read this + LOG tail from my 01:48 entry + CARD § 8. Check:
+`nvidia-smi` (GPU 2 = x6/x10 or free), `tail -n3
+/workspace/logs/actmix_rlhf_lane_x{6,10}.log`, `tail -n2
+/workspace/logs/actmix_rlhf_runs_x{6,10}.jsonl`, `git log
+--oneline -5` + pull. Execute THEN list in order. Background
+tasks notify by ID — match against Watchers above; re-arm the
+listener after every wake.
