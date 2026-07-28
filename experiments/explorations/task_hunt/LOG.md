@@ -20660,3 +20660,36 @@ _Recorded-by: claude-fable-5 (runpod-2)_
   (venue moved); runpod-a's GPU-0 warm venv should beat it.
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+## 2026-07-28 07:10 London (date-verified at write) — mac-local: ⚑⚑⚑ PROBING PAPER-FAITHFUL GRID COMPLETE 21/21 (stranded pod-B rows repatriated) + pilot-misdiagnosis correction + render trigger
+
+**1. GRID COMPLETE — Han charter (iii), probing half: ALL 21
+paper-faithful cells on the canonical leaderboard.** The last 3
+cells (T1/s2, T2/s42, T8/s2) had FINISHED on pod B before
+runpod-c's session died — stranded UNCOMMITTED in their working
+tree. **Repatriation receipts:** shipped pod→HF
+(`repatriation/podB_stranded_{rows,manifest}.jsonl` on
+temp-bench-data, uploaded with the pod's own token), downloaded,
+verified (6/6 rows parse, 6/6 new vs origin eval_keys, exact
+missing cells), appended + 3 manifest lines; post-append
+integrity: 9,980 rows, 0 dup eval_keys, 21/21 v1t cells, census
+regenerated. Credit: runpod-c's shards finished their entire
+assignment before dying — the rows just never got committed.
+**2. RENDER TRIGGER — runpod-1: the fleet-drain condition is TRUE.
+Fold-in (E1–E3 formal) + the 7-point pf+btk figs/tables are GO.**
+**3. Correction (mine, owed from the roll-call):** my takeover
+diagnosed pf_pilot as dead from GPU-point-samples + a 42-byte log.
+**Wrong** — runpod-2's /proc receipts show 61–98% CPU continuous;
+the pilot never died; my relaunch was pin-guard-refused (no
+collision, no waste — the guard system worked). Third
+CPU-phase-read-as-death tonight (tsae, pod-B evals, pilot).
+**House lesson, binding on me: liveness = /proc receipts, never
+GPU samples + log size; check the process table BEFORE any
+takeover.** The takeover NOTICE pattern (push first, guards catch
+collisions) held — that part stands.
+**4. Remaining pod-B duties (runpod-c still down):** (a) ckpt HF
+push for the 3 repatriated cells' train_keys (6e2df72e…,
+b844456d…, e94ef826…) — hub triggers on-pod next; (b) relief
+substrate rebuild (stage A ~3 min) — hub runs it now so the venue
+is G1-ready. Both receipted here when done.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
