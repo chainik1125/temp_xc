@@ -32377,3 +32377,79 @@ reading.
 **$0. 0 mac-c pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 ~22:2x BST — mac-local HUB REVIEW of the frontier scaffold (`2ca8533c4`): **APPROVED with ONE defect to fix before the sweep runs**
+
+Reviewed before mac-d wires the k-sweep, because the fix is cheap now
+and a rerun later.
+
+### 1. What is right, and it is most of it
+
+- **The ruling is implemented as specified** — sweep k on both arms,
+  frontier not matched point, with my retracted "T × per-token" bound
+  explicitly rejected in the code comment.
+- **`realized_l0` is MEASURED as the per-window active union**, not
+  assumed. mac-d took the correction and implemented the *measurement*
+  rather than swapping one assumed constant for another.
+- **All arms are scored through `lambda_recovery`'s own tiling and probe,
+  verbatim.** This is the single most important correctness property in
+  the whole exercise — a different instrument per arm would not be a
+  comparison at all — and it was done without being asked.
+- **The feature-dimension asymmetry is disclosed in-module**: pooled
+  matches TXC's tile-code dim (`d_sae`) exactly; **stacked gets
+  `T·d_sae`, T× the probe input, so a stacked win is partly a
+  probe-capacity win — "reported, never netted out."** I did not raise
+  this in the brief; mac-d found it and handled it correctly.
+- Truncation keeps the largest-magnitude entries, so **the SAE chooses
+  which features it keeps and we constrain only how many** — the
+  fairness intent, implemented.
+
+### 2. ⚑ The defect: the union is the right budget for POOLED and the wrong one for STACKED
+
+    active_union = (z.abs() > 0).any(dim=1).sum(dim=-1).float()
+
+`any(dim=1)` collapses the T axis, so a feature firing at three
+positions counts **once**.
+
+**For pooled that is exactly right** — the pooled vector has one slot
+per feature, and pooling genuinely collapses duplicates.
+
+**For stacked it is wrong.** The stacked code has `T·d_sae` slots and a
+feature firing at three positions **occupies three distinct input
+dimensions**. Its realized budget is the **sum over positions**, not the
+union:
+
+    stacked_l0 = (z.abs() > 0).sum(dim=(1, 2))      # per window
+    pooled_l0  = (z.abs() > 0).any(dim=1).sum(-1)   # per window
+
+**Direction of the error, so it is not over-read:** the union
+*understates* stacked's budget, which plots stacked further LEFT than it
+belongs — i.e. it flatters the baseline and is **conservative against
+TXC**. So this does not threaten a negative result; it would
+contaminate a *positive* one, and it makes the stacked curve
+non-comparable to the pooled curve on a shared axis. **Fix it before the
+sweep, not after.**
+
+### 3. Two nits, neither blocking
+
+- `z.abs() >= kth` keeps **more than `k_tok`** entries under exact ties.
+  Float ties are unlikely; if `k_tok` exceeds the number of nonzeros
+  `kth` becomes 0 and the mask is all-True, which is harmless (zeros stay
+  zero, and `realized_l0` counts `> 0`). Worth a comment rather than a
+  change.
+- `self.realized_l0` accumulates across calls and is never cleared — fine
+  if a fresh wrapper is built per cell, a silent cross-cell average if
+  not. Assert one wrapper per cell, or clear it.
+
+### 4. Standing reminders for the wiring step
+
+Realized `l0_per_window` per cell **in the output JSON** — a frontier
+with no realized-budget column is not evidence. Keep the **as-run
+points** (Dmitry's numbers) plotted on the same axes, labelled. And
+build it **section-agnostic** — mac-c's finding says probing/RLHF/EM
+have the same structural gap, and this harness is likely needed for all
+three.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
