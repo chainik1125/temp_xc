@@ -19607,3 +19607,71 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   § 3 (runpod-2 coordinates) or idle to sweep-end.
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+
+## 2026-07-28 04:53 London (date-verified 03:53 UTC) — runpod-a: StruQ premeasure DONE — BEST label-side conditioning in the record, but FAILS the usable-mass floor (infeasible at corpus size)
+
+Charter (ii) $0 CPU deliverable. Face = **struqpos** (position-matched
+injection contrast, the defect-free design; the length-mismatched
+`struq_*` variant Dmitry's own notice says "should not be screened on"
+is NOT used). A = PROMPT(instr, input+sep+payload) injection LAST,
+B = PROMPT(instr, payload+sep+input) injection FIRST — character-level
+ANAGRAMS. 204 usable items × 3 attacks {naive, ignore, completion_real}
+× 2 arrangements = 1224 docs. Artifacts frozen this commit:
+`labels/build_struqpos_premeasure.py` (self-contained; corpus mechanics
+re-derived from StruQ source, NOT imported from Dmitry's branch),
+`labels/struqpos_premeasure.json`, `labels/struq_data/…` (corpus,
+read-only from origin/dmitry-txcwins-10h).
+
+**Bands, 3 tokenizer legs (gpt2 / gemma2_2b / llama31_8b):**
+
+| band | bar | gpt2 | gemma2 | llama31 |
+|---|---|---|---|---|
+| **unigram** | ≤0.60 | **0.5068** | **0.5068** | **0.5190** |
+| **position** | ≤0.95 | **0.5000** | **0.5000** | **0.5005** |
+| qualifying strata | ≥8 | 66 | 66 | 64 |
+| **usable tokens** | ≥250k | **176,954** ✗ | **170,524** ✗ | **160,870** ✗ |
+| events (docs) | ≥300 | 1224 | 1224 | 1224 |
+
+Round-trips **1224/1224 lossless every leg** (tokenize→detokenize ==
+source; no reconstruction gap — the 3-tokenizer rule met from raw
+text). A/B token-length delta max **1–2 tokens** (anagram survives
+tokenization near-exactly).
+
+**What this is.** The **cleanest label-side conditioning of any hunt
+face to date.** unigram 0.507–0.519 vs the 0.60 bar that KILLED
+retryesc at 0.689–0.716; position 0.500–0.5005 — dead center. The
+anagram construction designs out BOTH channels that buried prior
+candidates: token identity AND absolute position carry ~zero arrangement
+info by construction. `completion_real` reads **exactly 0.5000** unigram
+on all three legs (its forged-answer payload is identical content in
+both arms ⇒ token identity perfectly uninformative); naive/ignore carry
+only a 0.51–0.54 seam whisper. This is the instruction-hierarchy
+question (does a trailing injection sit differently in the residual
+stream than a leading one) posed with the confounds removed BY DESIGN,
+not rescued after the fact.
+
+**Why it does NOT advance as-is.** `usable_ge_250k` FAILS on all three
+legs (161–177k vs 250k). StruQ attacks only 208 input-bearing items and
+the prompts are SHORT (~150 tok), so the clean corpus caps at ~180k
+tokens. This is the **xnov/sdom infeasibility shape**: immaculate label,
+insufficient mass. No probe run (discipline: label-side only, not a
+KEEP — the evalage/reask_hr rule applied to my own candidate).
+
+**PTR — two hub calibration questions (I do NOT move the bar myself;
+the prime directive is a sound verdict, not a win):**
+1. The 250k usable-token floor was set for **token-level continuous age
+   faces** (each token a probe row carrying a continuous label). This is
+   a **document-level BINARY** face; 170k balanced rows (~85k/class) is a
+   large probe set. Is 250k the right floor for this face class, or is
+   the floor mis-transferred? A ruling, not my adjustment.
+2. If the floor stands: corpus-expansion paths exist but each is a
+   DESIGN change needing a card — more StruQ attack types (beyond the 3
+   Dmitry screened), or injecting into the 597 no-input items (weaker
+   attack, different semantics). I will NOT expand unilaterally.
+
+My read: this is a WEAK-infeasible premeasure on current corpus —
+strongest-conditioned face in the record, shelved on mass unless the
+floor question resolves in its favour or a carded corpus expansion is
+authorized. GPU 0 stays on shard E (leg 2 final cell training). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_

@@ -1,0 +1,176 @@
+{
+ "face": "struqpos",
+ "seed": 20260728,
+ "n_items": 204,
+ "n_pairs": 612,
+ "attacks": [
+  "naive",
+  "ignore",
+  "completion_real"
+ ],
+ "provenance": "corpus origin/dmitry-txcwins-10h struq_data; mechanics re-derived from StruQ source, not imported",
+ "legs": {
+  "gpt2": {
+   "tokenizer_leg": "gpt2",
+   "n_docs": 1224,
+   "n_tokens": 186774,
+   "n_events": 1224,
+   "eligible_rows": 176982,
+   "roundtrips": 1224,
+   "max_token_len_delta_AB": 2,
+   "mean_token_len_delta_AB": 0.12745098039215685,
+   "n_strata_any": 67,
+   "n_qualifying": 66,
+   "usable_tokens": 176954,
+   "bands": {
+    "unigram_le_0.60": {
+     "value": 0.5068109543395263,
+     "pass": true
+    },
+    "position_le_0.95": {
+     "value": 0.49998096729220687,
+     "pass": true
+    },
+    "qualifying_ge_8": {
+     "value": 66.0,
+     "pass": true
+    },
+    "usable_ge_250k": {
+     "value": 176954.0,
+     "pass": false
+    },
+    "events_ge_300": {
+     "value": 1224.0,
+     "pass": true
+    }
+   },
+   "per_attack": {
+    "naive": {
+     "unigram_auc": 0.5138723182605547,
+     "position_auc": 0.5001345542527251,
+     "n_test_tokens": 18848
+    },
+    "ignore": {
+     "unigram_auc": 0.5114051260600011,
+     "position_auc": 0.49993022885114013,
+     "n_test_tokens": 24227
+    },
+    "completion_real": {
+     "unigram_auc": 0.5,
+     "position_auc": 0.5,
+     "n_test_tokens": 35906
+    }
+   },
+   "all_pass": false
+  },
+  "gemma2_2b": {
+   "tokenizer_leg": "gemma2_2b",
+   "n_docs": 1224,
+   "n_tokens": 180332,
+   "n_events": 1224,
+   "eligible_rows": 170540,
+   "roundtrips": 1224,
+   "max_token_len_delta_AB": 1,
+   "mean_token_len_delta_AB": 0.058823529411764705,
+   "n_strata_any": 67,
+   "n_qualifying": 66,
+   "usable_tokens": 170524,
+   "bands": {
+    "unigram_le_0.60": {
+     "value": 0.5067922469408981,
+     "pass": true
+    },
+    "position_le_0.95": {
+     "value": 0.49999507867308524,
+     "pass": true
+    },
+    "qualifying_ge_8": {
+     "value": 66.0,
+     "pass": true
+    },
+    "usable_ge_250k": {
+     "value": 170524.0,
+     "pass": false
+    },
+    "events_ge_300": {
+     "value": 1224.0,
+     "pass": true
+    }
+   },
+   "per_attack": {
+    "naive": {
+     "unigram_auc": 0.5142996794002107,
+     "position_auc": 0.49998639058896116,
+     "n_test_tokens": 18196
+    },
+    "ignore": {
+     "unigram_auc": 0.5110047078161142,
+     "position_auc": 0.49998882873619305,
+     "n_test_tokens": 23638
+    },
+    "completion_real": {
+     "unigram_auc": 0.5,
+     "position_auc": 0.5,
+     "n_test_tokens": 34840
+    }
+   },
+   "all_pass": false
+  },
+  "llama31_8b": {
+   "tokenizer_leg": "llama31_8b",
+   "n_docs": 1224,
+   "n_tokens": 170678,
+   "n_events": 1224,
+   "eligible_rows": 160886,
+   "roundtrips": 1224,
+   "max_token_len_delta_AB": 2,
+   "mean_token_len_delta_AB": 0.369281045751634,
+   "n_strata_any": 65,
+   "n_qualifying": 64,
+   "usable_tokens": 160870,
+   "bands": {
+    "unigram_le_0.60": {
+     "value": 0.5189690463738702,
+     "pass": true
+    },
+    "position_le_0.95": {
+     "value": 0.500502390109455,
+     "pass": true
+    },
+    "qualifying_ge_8": {
+     "value": 64.0,
+     "pass": true
+    },
+    "usable_ge_250k": {
+     "value": 160870.0,
+     "pass": false
+    },
+    "events_ge_300": {
+     "value": 1224.0,
+     "pass": true
+    }
+   },
+   "per_attack": {
+    "naive": {
+     "unigram_auc": 0.5399003374664456,
+     "position_auc": 0.5017186688488924,
+     "n_test_tokens": 17071
+    },
+    "ignore": {
+     "unigram_auc": 0.5304258539055101,
+     "position_auc": 0.501441156229718,
+     "n_test_tokens": 22435
+    },
+    "completion_real": {
+     "unigram_auc": 0.5,
+     "position_auc": 0.5,
+     "n_test_tokens": 32474
+    }
+   },
+   "all_pass": false
+  }
+ },
+ "all_legs_pass": false,
+ "worst_unigram": 0.5189690463738702,
+ "worst_position": 0.500502390109455
+}
