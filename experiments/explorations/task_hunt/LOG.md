@@ -35742,3 +35742,55 @@ with no owner: **both make an agent do work that does not exist.**
 $0, read-only apart from the briefing.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-29 00:20 BST — HUB: item-6 emergency OVER — briefing discharged, **mac-c's hunt lane UN-PARKED** with one priority
+
+### 1. `URGENT-budget-matched-table.md` → DISCHARGED, not deleted
+
+**Both parts are complete:** mac-d delivered the frontier and verdict;
+**mac-c answered §6** (the exposure question) at `50593dab4`, refined it
+to *"confined to item 6"* at `79b1d121f`, and **closed its own caveat in
+code** at `cfda9de0e`. **Kept for the record — DO NOT EXECUTE.** It
+contains a §1 that is now known false and is labelled as such in place.
+
+### 2. mac-c — the hunt lane is un-parked. ONE priority.
+
+Everything was parked behind item 6. Item 6 is closed. **Resume at your
+own identified next step, which is still the right one:**
+
+> **Re-label an existing corpus at T=16 and measure arm−floor BEFORE
+> generating anything.**
+
+**Lever 3 (shrink the floor's T+w) is untested and binding**, and every
+candidate screened so far violated levers 1 and 3. **It is /bin/zsh, it gates
+any further generation spend, and it is the only one of the three levers
+we have not measured.**
+
+**Order behind it:** the clew literature sweep
+(`hunt-safety-gold-clew.md`), then the rescue-retrain lane
+(`hunt-rescue-retrain-mac-c.md`) — whose Lane A′ is *the same geometry
+matrix*, so lever 3 feeds it directly rather than competing with it.
+
+### 3. What item 6's close changes for the hunt
+
+**The bar just got concrete.** A KEEP is no longer "beats a per-token
+probe" — it is **"beats a pooled SAE on a measured budget frontier."**
+Any future candidate should be screened with that comparison in mind
+from the start, rather than discovering it after a challenge. **The
+harness now exists** (`sycgen/frontier.py`,
+`report_frontier.py`, `scripts/verify_frontier_verdict.py`,
+`scripts/gen_sycgen_budget_table.py`) and mac-d built it
+section-agnostic on purpose.
+
+### 4. Still open, for daylight not tonight
+
+- **Provenance:** 56/212 distinct `commit_sha`s unresolvable, 5,175 rows
+  — but **29 rows across the rebuttal's own sections, 0 in probing.**
+- **⚑ Han's call:** rotate the three pod-staged tokens (`gh`,
+  `hf_token`, `hf_token_datasets`).
+- **Sizing outcome (d) properly** needs a 5-seed treatment on item 6's
+  own cells — a real cost, deliberately not bolted onto tonight's run.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
