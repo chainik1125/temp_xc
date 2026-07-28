@@ -736,40 +736,46 @@ input, so a substring metric systematically rewards whichever arm damages the mo
 **0.910**, held-out baseline z = 4.3. With the rate that high there is no room to *induce*, so
 the informative direction is **suppression** — steering that makes the model stop obeying.
 
-**Result: the architecture ranking is not stable across dictionary seeds.** Judged with
-`gpt-4o`; a cheap `comply_lead` proxy was validated against the judge on a stratified sample
-(91.9% and 97.3% agreement on the two seeds) and carried the full n, with that decision
-recorded in each output. Suppression below is baseline minus the arm's best rate over the dose
-grid; higher suppresses more.
+**Result, three dictionary seeds.** Judged with `gpt-4o`; a cheap `comply_lead` proxy was
+validated against the judge on a stratified sample per seed (91.9%, 97.3%, 97.3% agreement) and
+carried the full n, with that decision recorded in each output. The table is each arm's steered
+rate at its best dose — **lower suppresses more** — against a baseline of 0.910.
 
-| arm | seed 0 | seed 1 | kind |
-| --- | --- | --- | --- |
-| `broadcast_optimal` | +0.415 | +0.420 | supervised |
-| `dom_slab` | +0.015 | +0.015 | supervised |
-| `random_broadcast` | +0.145 | +0.145 | **null** |
-| `random_slab` | +0.070 | +0.070 | **null** |
-| `txc_slab` | +0.060 | **+0.330** | learned |
-| `sae_broadcast` | +0.040 | **+0.310** | learned |
-| `tsae_broadcast` | +0.220 | +0.075 | learned |
-| `tsaep_broadcast` | +0.195 | +0.130 | learned |
-| `txc_flat` | +0.040 | +0.055 | learned |
+| arm | s0 | s1 | s2 | mean suppression | sd | beats best null |
+| --- | --- | --- | --- | --- | --- | --- |
+| `broadcast_optimal` — *supervised* | 0.495 | 0.490 | 0.495 | **+0.417** | 0.003 | **3/3** |
+| `txc_slab` | 0.850 | 0.580 | 0.810 | +0.163 | **0.146** | 1/3 |
+| `tsaep_broadcast` — published T-SAE | 0.715 | 0.780 | 0.750 | +0.162 | **0.033** | 2/3 |
+| **`random_broadcast` — NULL** | 0.765 | 0.765 | 0.765 | **+0.145** | 0.000 | — |
+| `tsae_broadcast` — attention tSAE | 0.690 | 0.835 | 0.795 | +0.137 | 0.075 | 1/3 |
+| `sae_broadcast` — TopK SAE | 0.870 | 0.600 | 0.875 | +0.128 | **0.157** | 1/3 |
+| `random_slab` — NULL | 0.840 | 0.840 | 0.840 | +0.070 | 0.000 | — |
+| `txc_flat` — *the paper's v7 write* | 0.870 | 0.855 | 0.850 | +0.052 | 0.010 | **0/3** |
+| `dom_slab` — *supervised* | 0.895 | 0.895 | 0.895 | +0.015 | 0.000 | — |
 
-**The seed-invariant arms are bit-identical across seeds** — the two nulls and both supervised
-arms reproduce to three decimals, confirming the pipeline is deterministic apart from
-dictionary initialisation. **Every learned arm swings, and the ordering reshuffles completely:**
+**Three findings, in order of how much they transfer.**
 
-```text
-seed 0:  broadcast_optimal > tsae > tsaep > random_bcast > random_slab > txc  > sae
-seed 1:  broadcast_optimal > txc  > sae   > random_bcast > tsaep       > tsae > random_slab
-```
+⚠ **1. No learned dictionary arm reliably beats a random constant write.** Every learned arm's
+mean sits within ±0.035 of the null's +0.145, and none clears it on more than 2 of 3 seeds.
+Only the supervised gradient-derived write separates, and it does so by 3× on every seed.
 
-⚠ **From one seed you could report either "the published T-SAE suppresses 3.3× more than the
-crosscoder" (seed 0) or "the crosscoder suppresses 2.5× more than the published T-SAE" (seed 1).**
-The crosscoder moves 5.5× between seeds, the TopK SAE 7.8×, and both cross the null in opposite
-directions. **This is Reviewer 1's single-seed objection, demonstrated quantitatively on a real
-benchmark rather than argued.** It is the most transferable thing this cell produced, and it
-applies to every architecture comparison in this document that rests on one dictionary
-initialisation.
+⚠ **2. The architecture ranking is not seed-stable, and this is Reviewer 1's objection made
+quantitative.** The seed-invariant arms reproduce *exactly* — both nulls and both supervised
+arms are identical to three decimals across all three seeds, so the pipeline is deterministic
+apart from dictionary initialisation. Yet `txc_slab` ranges 0.850 / 0.580 / 0.810 and
+`sae_broadcast` 0.870 / 0.600 / 0.875. From seed 0 you would report *"the published T-SAE
+suppresses 3.3× more than the crosscoder"*; from seed 1, *"the crosscoder suppresses 2.5× more
+than the published T-SAE"*. Both are single-seed artefacts of one lucky draw.
+
+**3. The published T-SAE is the most consistent learned arm** (sd 0.033 against the
+crosscoder's 0.146 and the SAE's 0.157) and the only one to beat the null on a majority of
+seeds. Its mean ties the crosscoder's, but the crosscoder gets there through a single outlying
+seed and is *worse than the null* on the other two. Consistency is the axis on which the
+architectures actually differ here — not mean effect.
+
+**And the paper's own write is the weakest thing measured.** `txc_flat` — V7 up to a scalar —
+suppresses +0.052, below both nulls, on **0 of 3** seeds. Whatever the crosscoder's latent
+encodes about this task, averaging it over the window destroys it.
 
 **A budget caveat that survives the instability.** The attention tSAE carries **675.84
 uncharged coefficients per segment** — its *predicted* codes are computed from context and only
@@ -778,9 +784,9 @@ spending on. The published T-SAE has no uncharged component (7.74 per segment, s
 the 8.00 budget). This is also the arm that spent most of the sprint mislabelled: every other
 `tsae_*` number in this document is the attention architecture, not arXiv:2511.05541.
 
-**What is stable, across both seeds:** the supervised best-constant-write suppresses ~0.42,
-roughly 3× the best null and well beyond any learned arm's average; and `txc_flat` — the
-paper's v7 write — stays at +0.04–0.06, at or below the null both times.
+**What is stable, across all three seeds:** the supervised best-constant-write suppresses ~0.42,
+roughly 3× the best null and beyond every learned arm’s mean; and `txc_flat` — the
+paper’s v7 write — stays at +0.05, below both nulls on every seed.
 
 **Degeneracy is ruled out, so the suppression is genuine.** `repeat_frac` ≈ 0 everywhere,
 log-probabilities near baseline, replies *longer* than baseline, and the suppressing arms
