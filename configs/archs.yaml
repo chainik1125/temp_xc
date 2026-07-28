@@ -183,13 +183,14 @@ archs:
     category: stacked_sae
     hparams:
       d_sae: 18432
-      T: 4
+      T: 5
       k_pos: 20
       auxk_alpha: 0.03125
       relu_mode: btk-only
     per_section_hparams:
       synthetic: { d_sae: 20 }
-      em: { d_sae: 32768, k_pos: 25 }
+      em: { d_sae: 32768, k_pos: 25, T: 5 }
+      rlhf: { d_sae: 18432, k_pos: 100, T: 5 }
     notes: >-
       stacked_batchtopk_btkonly emitting one max-|act|-pooled code per
       window (sign preserved) for the ACTMIX campaign cell tables.
