@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-28 22:52 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 00:32 BST (stamped from `date` at write time)
 
 ---
 
@@ -36,6 +36,126 @@ Artifacts: `checkpoints/durability_audit.json`,
 
 **Posture:** 0 mac-c pods, $0 all session, listener armed, nothing owed.
 Three lanes still parked behind item 6 per hub ruling.
+
+---
+
+# ⚑⚑ RESUME HERE FIRST — WRITTEN FOR A POST-COMPACT ME (00:32, pre-compact handoff)
+
+## 0. Non-negotiables, in order
+
+1. **RE-ARM THE LISTENER.** It is ONE-SHOT: it exits on hit. I have
+   broken this once and the user caught it ("YOUR MONTIRO IS DOWN").
+   **After every fire, immediately:**
+   `zsh /private/tmp/claude-501/-Users-octo-research-projects-agents-mac-c-temp-xc/660a6cf4-2ce0-4db9-8201-37e38db3e1bf/listener.sh`
+   (background). NOTE the path — it now lives at the **session root**, not
+   `scratchpad/`, and watches **BOTH `main` and `arxiv`**.
+2. **BRANCH = `arxiv`.** Do NOT switch to `main`. `main` is FROZEN at
+   `7ceb45564` (March scaffold, 36 files) by Han's reversal. I checked
+   out `main` at 23:17 and my tree became a 36-file repo. Verify any
+   branch move with **`git log --oneline <target>..<source> | wc -l`
+   MUST be 0 AND `git rev-parse <target> <source>` MUST match** — the
+   reverse range (`arxiv..main`) returns 0 in BOTH the success and
+   disaster cases and cannot detect this.
+3. **0 mac-c pods, $0 spent all session.** Keep it that way unless a
+   measurement genuinely needs a GPU.
+4. **LOG.md union conflicts on every push.** Recipe:
+   `sed -i '' -e '/^<<<<<<< HEAD$/d' -e '/^=======$/d' -e '/^>>>>>>> /d'`,
+   `git add`, `GIT_EDITOR=true git rebase --continue`, verify markers=0.
+5. **Stamp from `date` at write time.** I have corrected my own stamp
+   FIVE times today.
+
+## 1. ⏳ IN FLIGHT RIGHT NOW — a job is running, do not restart it
+
+**Local MPS cache of `evalage` activations, gemma2_2b layer 14,
+SEQ_LEN=512.** Task `bxfp10te4`, log
+`<scratch>/cache_evalage_512.log`, at 2016/3579 rows @00:32, **ETA
+~5min**, writing `<scratch>/cache_evalage_512/gemma2_2b/hs14.npy`
+(~9GB) + `tokens.npz` + `acts_meta.json`. Script:
+`<scratch>/cache_evalage_512.py`. **$0, no pod.**
+
+**THE MOMENT IT FINISHES, run this — it is the whole point:**
+
+    cd $(git rev-parse --show-toplevel)
+    FACECMP_CACHE_ROOT=<scratch>/cache_evalage_512 \
+    PYTHONPATH=. .venv/bin/python -m \
+      experiments.explorations.task_hunt.facecmp.lever3_evalage
+
+Check the log tail says `done <N> rows` and the degenerate-assert passed
+before trusting it.
+
+## 2. Why this run exists (the hub's priority, and why it is NOT a repeat)
+
+Hub un-parked my hunt lane (00:20) with ONE priority: *"re-label an
+existing corpus at T=16 and measure arm−floor BEFORE generating
+anything."* **I already ran that** (`bf7aa3b5f`): T{4,8,16,32,64},
+gemma2_2b@512, **0/5 KEEP-shaped**, best T16 at −0.0249.
+
+**The gap is the CORPUS, not the T.** That sweep was `retryesc_gen`
+where **w=25**, so at T=16 the floor still sees T+w=41. **`evalage` has
+w=13** → horizon **29**. That is lever 3's `w` half applied **for free
+to a corpus we already own**. My earlier "do not fund a narrow-event
+corpus" verdict was about **generating** one; it does not apply here.
+`evalage` is also the rescue candidate (cleared width-null, its floor,
+and the within-conversation control on every leg; failed only the
+hardcoded `gain>=0.05` by ~0.33σ).
+
+**Pre-registrations P1–P5 are FROZEN at `2728d6229`, committed BEFORE
+the numbers.** Read `lever3_evalage.py`'s docstring and honour them:
+- **P1** evalage floor much lower at every T — **with a falsifier
+  against me**: if it is NOT, my corrected floor law is wrong and I
+  report that.
+- **P3** the binding constraint should FLIP floor-bound → gain-bound.
+- **P5** ⚑ **if a cell clears BOTH bars it is a RESCUE and is disclosed
+  as one** — screen verdict WEAK, re-measured because the miss was
+  inside the noise and the geometry was wrong. **Never quote it as
+  though it passed the original screen.** This is the first corpus with
+  a real chance at both bars, which is exactly when the temptation to
+  launder a rescue into a pass appears.
+
+The script scores P1/P2/P3 automatically against the frozen retryesc
+run and prints HELD / NOT HELD. **Report whichever way it falls.**
+
+## 3. Delivered tonight (all $0, all ratified — do not redo)
+
+- **Checkpoint durability audit** (`eb9f3fb47`): `checkpoint_exists()`'s
+  `hf_url` branch is DEAD CODE — `trainer.py:171` writes `None` as the
+  only writer, 0/10,400 manifest rows carry one. **344 of 9,631
+  train_keys are on HF and all report absent.** pod-D's sycgen
+  dictionaries are NOT lost. Artifacts:
+  `checkpoints/durability_audit.json`,
+  `experiments/explorations/task_hunt/ckpt_durability_audit.py`.
+- **σ correction** (`575958b0d`): the pre-registration quoted my
+  variance work at 1.5×; correct factor is **1.83–3.99×** (`sqrt(1+r²)`,
+  not the variance ratio). Hub amended in place, pre-data.
+- **Estimator scope bound** (`72cf1334f`): my σ figure does NOT apply to
+  the anchor check — `lambda_recovery` uses **closed-form sklearn OLS**,
+  not Adam. Protected a sound verification from my own finding.
+- **Divide-by-T artifact** (`c1a9f98ad`): `l0_per_token` is
+  `l0_per_window / T` (`synthetic_recovery.py:201`), so "recovery up as
+  budget falls" inverts on the verdict axis. mac-d withdrew the trend.
+- **Branch alarm** (`dcdf9dac3`) + **check-invariance** (`851d73f85`).
+- **Briefing retired** (`1a901cdb5`): `URGENT-budget-matched-table.md`,
+  nothing was open; §6 was discharged 4h earlier.
+- **Self-sweep** (`6f4c7bf45`): found THREE of my own retracted claims
+  still asserted in docstrings — `lane_b_errorbar.py` (ρ "cuts against
+  the rescue" — refuted by that script's OWN output, ρ=0.383–0.534, and
+  the correction HELPS evalage), `verify_floor_identity.py` (the
+  identity is a low-density approximation), `dry_run.py:110`. All
+  corrected in place. **Run positive controls FIRST in any such sweep**
+  — mac-d's ran dead and looked clean on zsh word-splitting.
+
+## 4. Lanes — ALL FOUR UNBLOCKED (item 6 shipped)
+
+Order set by the hub at 00:20: **(1) lever 3 = §1 above**, then the
+`clew` literature sweep (`hunt-safety-gold-clew.md`), then the
+rescue-retrain lane (`hunt-rescue-retrain-mac-c.md`, whose Lane A′ IS
+the same geometry matrix — `llama31_8b` and SEQ_LEN 1024 are the cells
+that genuinely need a GPU), plus standing `hunt-mac-c-takeover.md`.
+
+**⚑ The KEEP bar has MOVED, per item 6's close:** a KEEP is no longer
+"beats a per-token probe" but **"beats a pooled SAE on a measured budget
+frontier"**. Screen future candidates with that comparison from the
+start; mac-d built the harness section-agnostic on purpose.
 
 ---
 
