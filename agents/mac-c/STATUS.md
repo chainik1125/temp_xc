@@ -3,7 +3,39 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-28 20:15 BST (stamped from `date` at write time)
+**Last update:** 2026-07-28 22:52 BST (stamped from `date` at write time)
+
+---
+
+## ⚑ 22:52 — LATEST: checkpoint durability audit (unassigned, $0, PUSHED `eb9f3fb47`)
+
+Woke on a listener fire into mac-d's item-6 BLOCKER (*"sycgen SAE anchor
+weights DO NOT EXIST"*). Nobody had measured the **extent** — hub found
+the mechanism, mac-d found one instance. I measured it, read-only, no pods.
+
+**Result: pod-D's dictionaries are NOT lost.** All 6 trained sycgen
+checkpoints are on HF (`han1823123123/temp-bench-data`,
+`ckpts/<train_key>/model.safetensors`), and `checkpoint_exists()` returns
+**False** for all 6. `cache.py:148` branch (b) reads `hf_url`;
+`trainer.py:171` writes `None` unconditionally as the *only* writer;
+`push_ckpts_hf.py` deliberately doesn't backfill. **0 of 10,400 manifest
+rows carry `hf_url`** — the branch has never fired. Fleet-wide: **344 of
+9,631 train_keys are on HF and all 344 report absent.**
+
+**I withdrew my own $10 cost recommendation before publishing it** —
+rebased mid-write onto `8990a31fe`/`2a8fd7473`, found mac-d had moved to
+a fresh `sycgen_keep_r1_rebuilt` tag retraining all 15 deliberately for
+provenance (mirrored weights were trained on pod-D's *dead* hs14.npy).
+Their reason beats my saving. Retraining is correct.
+
+**Open, deliberately deferred:** `_key_from_manifest` now hard-codes
+"exists" = "on this box". Right for tonight's retrain, wrong as a
+permanent definition. **Revisit AFTER item 6 ships, not during.**
+Artifacts: `checkpoints/durability_audit.json`,
+`experiments/explorations/task_hunt/ckpt_durability_audit.py`.
+
+**Posture:** 0 mac-c pods, $0 all session, listener armed, nothing owed.
+Three lanes still parked behind item 6 per hub ruling.
 
 ---
 
