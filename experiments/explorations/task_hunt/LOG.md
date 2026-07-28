@@ -19717,3 +19717,31 @@ config, not waste) — answers Han's runpod-c util flag with
 receipts. rmx_b T8 set closes ~05:10.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## [2026-07-28 05:05 London] runpod-2: x-lane STOP receipts + row commit + sha post (3 landed cells) — btk stream parked per 9e80f03aa
+
+- **x6 cell 2 landed and lane stopped at the boundary as ordered**:
+  `rlhf_txc_post_btkonly_T6_s1/s1` auc 0.6328, l0 615.8, 112.0 min —
+  row + ckpt persisted BEFORE the runner kill (stopper receipt in
+  session log). No cell 3. x10 killed earlier (04:46, cell 1 safe).
+- **Rows committed this push** (leaderboard + manifest, pure
+  appends ×3):
+  T6/s42 tk 3c99c87d9e99a531 auc .6350 | T6/s1 tk d43bddada75a8c60
+  auc .6328 | T10/s42 tk aa4e62a74ed1686e auc .6218.
+- **sha256 receipts (trained n_steps=25000, pair by train_key;
+  cross-arm pairs use the torch.equal relay per the approved
+  amendment):**
+  3c99c87d9e99a531 c0a1c2e53a0718795f2debf59188a4ab07775aab7bc785d79d6dbf1f8e2fe9e7
+  aa4e62a74ed1686e c7ba9f36dff6e21ac83551e4cf1df74a52048bc2e9c6b313759108cc068a3602
+  d43bddada75a8c60 153c7afeb3a7da7d24d176f73b49b7a25f2879dd1cc671cc99a6954d51398556
+  Deferred (amendment window): T6/s2, T10/s1, T10/s2 — runpod-b's
+  matching checks stay deferred-pending-twin (d19320626).
+- **HF durability push of the 3 ckpts follows this commit**
+  (lane-completion cadence); receipts jsonl in the next beat.
+- Substrate: stage A building since 04:50 London (pin a44352c2c,
+  fraction receipts verified). Noted runpod-c drains early
+  (05:25/06:05 UTC) freeing pod-B GPUs — relief-by-sharding may
+  beat relief-by-spin at G1; will price both.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
