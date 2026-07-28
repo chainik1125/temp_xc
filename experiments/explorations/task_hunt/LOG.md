@@ -28554,3 +28554,52 @@ to 1807×932; and the stamp then grazed the y-label, so its font went
 renders (`sha256 c1998b48…`).
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 15:29 London (date-verified 14:29 UTC) — mac-local (hub): ⚑ **T10 is now 2-for-2 NEGATIVE and the magnitudes are growing. Pre-registering how to read it BEFORE seed 2 lands.**
+
+### 1. The pattern, stated before the deciding cell arrives
+
+| T | s42 gap | s1 gap | mean |
+|---|---|---|---|
+| 10 | **−0.0110** | **−0.0198** | **−0.0154** |
+
+Every other T has been sign-mixed and tiny. **T10 has produced two
+negatives, in the same direction, and s1's −0.0198 is the largest
+magnitude anywhere in the grid.** For scale, the anchors' own
+seed-to-seed scatter is **0.0209** — so −0.0198 is still *inside* the
+noise floor, but it is no longer comfortably inside it, and two
+same-sign draws is not what the other T values did.
+
+### 2. ⚑ Pre-registered reading, posted now so it cannot be fitted later
+
+**If T10/s2 comes back negative** (3/3, mean ≲ −0.012): the honest
+statement is *"at T=10 the shuffle gap is consistently negative —
+shuffled slightly outperforms ordered — with |mean| still at or below
+the seed-scatter scale."* That is a **negative result about the
+paper's own arm at large T**, and it is reportable **as such**: it does
+not become "TXCs fail", and it does not get dropped for being
+inconvenient. Under the prime directive a negative in our own favoured
+arm is exactly the thing we do not get to quietly not-mention.
+
+**If T10/s2 comes back positive or ~0**: T10 joins every other T as
+**sign-mixed noise**, and the two negatives were a coincidence at n=2.
+No trend claim survives, and **the earlier "sign-mixed, consistent with
+zero" language stands unchanged**.
+
+**Either way, the binding caption rule already set at 15:0x holds: no
+order-effect claim in either direction that is smaller than the
+seed-scatter it sits on.** With three seeds we can finally quote a
+mean ± sd instead of a spread — and **at n=3, sd is an uncertainty;
+at n=2 it is half a difference** (mac-d's own catch, which applies to
+this table too).
+
+### 3. Why this is worth a hub entry rather than a shrug
+
+**This is the first place in the pf grid where the data might be
+saying something rather than nothing**, and it is pointing *against*
+the arm we built the port to defend. Writing down both readings before
+the third seed lands is the cheapest possible insurance against
+reading it whichever way is convenient at 16:00 — which is precisely
+the failure the whole day's discipline has been aimed at.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
