@@ -29934,3 +29934,59 @@ re-stamp rather than living only here, because it is the one lesson
 today that generalises past this rebuttal.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 17:35 London (date-verified 16:35 UTC) — mac-local (hub): **FULL HANDOFF AUDIT + the two promised tables GENERATED.** Han asked: anything running, is the handover complete.
+
+### 1. Audit — every pointer in `REBUTTAL_HANDOFF.md` resolved against disk
+
+**All 9 embedded figures exist.** All prose pointers resolve (three that
+looked missing were shorthand — `RESULTS_paper-match.md`,
+`SHUFFLE_OVERLAY_CARD.md`, `evalage/RESULT.md` — real files at their
+full paths).
+
+**Two genuine gaps, and they were the same one:** Han's spec is *"a plot
+AND a table for each"*, and items **4 (λ̂)** and **5 (dq)** carried
+*"script-generated … lands at the pre-submission final pass"* since the
+overnight pass. **The script did not exist.** It does now:
+`scripts/gen_handoff_tables.py`, built from committed result JSONs so
+both tables regenerate deterministically and carry their own source
+list.
+
+**`figs_writeup/tab_dq_tsweep.md`** — 8 T values (1,2,4,6,8,10,16,32),
+trained vs untrained twin, `lambda_recovery_v2`, mean ± sd. The gap
+grows monotonically **+0.1032 → +0.2754**; TOY-class caveat travels in
+the table itself.
+
+**`figs_writeup/tab_lambda_shuffle_tsweep.md`** — ordered vs shuffled
+with gaps at T{2,4,6,8,10,16} plus both T=1 anchors, anchor gate ALL
+PASS. **The T1 rows read gap = 0.0000 exactly, and the table says why:**
+at T=1 a within-window shuffle *is* the identity, so that zero is the
+instrument's own null, not a result. **T10's sd (0.1142) is ~8× the
+others** — the seed-fragility the figure's caveat describes, visible in
+the numbers rather than only asserted.
+
+**One thing I did NOT do:** the λ̂ overlay JSON still reads
+`status: PENDING TEAM REVIEW`. I have reproduced it faithfully in the
+table rather than quietly upgrading it — **that stays Dmitry's call.**
+
+### 2. ⚑ Still running: THREE pods, $6.42/h — and TWO are not ours
+
+    mac-d-rlhfpf-0728-5            $2.99/h   ours — btk gap cells, working
+    mats-gap-code-h100             $2.99/h   ⚑ NOT an agent-convention name
+    tsae-paper-widthmatch-probing  $0.44/h   ⚑ NOT an agent-convention name
+
+**House rule holds — I have not touched either.** But flagging both,
+because `tsae-paper-widthmatch-probing` names a deliverable that is
+**already complete** (tsae width-match, item 8, marked done), which is
+the shape of a pod left running after its lane closed. **Han: these are
+either your hand-provisioned pods — outside the agent envelope per the
+13:0x scope ruling — or forgotten. $3.43/h of the $6.42 is not
+attributable to any live agent lane.**
+
+### 3. Deliverable surface state
+
+**Items 1–7: every one has a plot AND a table.** Item 7's "table" is
+`retryesc_gen/RESULT.md` plus the negative's write-up in § 6+7.
+Census regenerated. Markers 0 across all four surfaces.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
