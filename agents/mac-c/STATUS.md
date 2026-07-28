@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (Han 13:56, briefing
 `hunt-mac-c-takeover.md`) — was: elicitation harness + screening
-**Last update:** 2026-07-28 14:16 BST (read from `date` — see stamp
+**Last update:** 2026-07-28 14:29 BST (read from `date` — see stamp
 corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ---
@@ -46,7 +46,14 @@ Band is **two-sided**: every face in +0.15…+0.25 cleared every cell
 floor** (`qd` margin −0.034). ⚠ Band edges are **POST HOC** — the
 correlation is the evidence, the bands are a design target.
 
-## Two retractions of my own, both material
+## ⚑ `claim_zone` MEASURES `f` DIRECTLY — use it, do not simulate
+
+`elicit_lib.claim_zone(...)["frac_in_window"]["T64"]` **is**
+`floor_excess`. Validated on `evalage`: predicted 0.0470 vs **measured
++0.0451**, **K = 0.96**. So the pilot's density gate is **$0,
+label-side, no GPU**.
+
+## Three retractions of my own, all material
 
 1. **The age-face objection (withdrawn 14:07).** I said no age face
    passes the order ladder (0/9, true) and inferred `retryesc_gen`
@@ -63,6 +70,20 @@ correlation is the evidence, the bands are a design target.
    opposite: **the floor is computed from GROUND TRUTH and climbs
    toward 1.0, while the arm only reads activations — density hands the
    floor a bar the arm cannot reach.**
+3. **`K = 0.63` (wrong, corrected 15 min after freezing the card).**
+   I compared the measured `floor_excess` against an `f` **simulated
+   from exponential gaps** when `evalage`'s gaps are **log-uniform**,
+   then **gave the 1.6× artefact a mechanism** ("eligibility drops
+   positions nearest an event") and wrote it into a frozen card as
+   "structural, not a fudge". Real `K = 0.96`. **Material:** both my
+   planning routes were too dense — the one labelled "calibrated"
+   implied `f ≈ 0.36`, deep in the lose-to-your-own-floor zone.
+
+**Standing lesson from 2 and 3, my two modeling slips today:** when a
+simulation and a measurement disagree, **check whether the measurement
+already exists in the harness before inventing a mechanism for the
+gap.** Both were caught by going to a ground-truth computation instead
+of reasoning forward from an assumption.
 
 ## `evalage` — CLOSED (WEAK), and now explained
 
@@ -143,10 +164,34 @@ and blocking for every generation card, so wire it before any
 
 ## Queue
 
-1. **`retryesc_gen` — CARD FROZEN `3f6ba0d3d`, next action = the
-   ~20-doc PILOT.** Enters **UNTESTED, not rescued** (every passing
-   band was label-side; no probe ever ran). Design in
-   `retryesc_gen/GENERATION_CARD.md`:
+1. **`retryesc_gen` — CARD FROZEN `3f6ba0d3d`; scaffold BUILT; ALL 4
+   PLAN-TIME GATES PASS at $0. Next action = the ~20-doc PILOT (first
+   API spend).** Enters **UNTESTED, not rescued** (every passing band
+   was label-side; no probe ever ran).
+
+   **Plan-time gates** (`retryesc_gen/plan_premeasure.py`,
+   `results/plan_premeasure.json`; 400 docs, seed 0, `P_REPEAT`=0.26):
+
+   | gate | measured | bar | |
+   |---|---|---|---|
+   | clock | gap median **378 tok** | 297–499 | ✅ |
+   | vocabulary | task cv **0.0567** | ≤0.35 | ✅ |
+   | position | pool exhaustion **0.0 %** | <5 % | ✅ |
+   | corpus clock | **3,527 tok/doc** | 22.7× `dharm` fatal | ✅ |
+
+   ⚠ **Caught at plan time: a POSITION CONFOUND.** A 10-strategy pool
+   **exhausted mid-episode**, after which every failure is *forced* to
+   be a repeat ⇒ event-status becomes a function of position — the
+   `reask_hr` killer. **Pool widened to 24** ⇒ exhaustion 0.0 %, rise
+   +0.0165. Residual rise is structural (attempt 1 can't be a repeat)
+   and is left to the balanced manifest + band 3.
+
+   ⚠ **What the plan-time pass does NOT prove:** gate 1 assumes
+   realised length ≈0.8× cap (**pilot verifies via `claim_zone`**);
+   gate 2 checks the **schedule**, not the generated prose — `unigram`
+   ≤0.60 at pilot is still the risk I rate highest.
+
+   Design in `retryesc_gen/GENERATION_CARD.md`:
    * face = **repeat-failure escalation**, § 1.2-shaped two-timescale
      — indicator needs out-of-window memory (*is this a repeat?*),
      kernel support inside T.
@@ -158,8 +203,9 @@ and blocking for every generation card, so wire it before any
    * **vocabulary fix is structural:** failure schedule drawn FIRST,
      independent of task ⇒ difficulty *assigned*, not intrinsic. This
      is the bar `retryesc` actually died on (0.69–0.72 vs 0.60).
-   * target **`floor_excess` ∈ [+0.15,+0.25]**; `g` is the only knob
-     permitted to move post-freeze, planning centre **170–290 tok**.
+   * target **`floor_excess` ∈ [+0.15,+0.25]**; **`P_REPEAT` (=`g`) is
+     the only knob permitted to move post-freeze**, corrected planning
+     centre **385 tok, range 297–499** (§ 2.2a — see corrigendum below).
    * odds on record **before** the result: magnitude ~70–75 %, leak
      gate ~65–75 % (**the dominant risk**), **joint ~50–55 %**.
    * **A pilot outside the band is a NO-GO I report, not a band I
