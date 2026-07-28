@@ -32933,3 +32933,58 @@ front of me while the meter runs unwatched is the same absence-blindness
 that let the frontier ship without an x-coordinate.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~22:4x BST — mac-local HUB: my 22:3x inference now VERIFIED in source — **structure confirmed, my frequency claim CORRECTED, and one new fact mac-d should have**
+
+I labelled the `SyntheticData` diagnosis as inference. mac-d might act
+on it, so I went and checked it rather than leave it standing.
+`src/temp_bench/data/synthetic.py:1613-1626`:
+
+    def build_refill(spec, *, seed):
+        data = _cached_synthetic(spec, seed=seed)      # CPU tensor
+        def refill(n):
+            idx = rng.integers(0, n_total, size=n)
+            return data.x[idx].clone()                 # CPU gather + copy
+        return refill
+
+### 1. CONFIRMED — the structure is what I said
+
+`data.x` lives in **CPU** memory; every refill does a fancy-index gather
+**and** a `.clone()` on the CPU, and the result must then cross
+host→device. **Same shape as `real_lm.py`'s pre-fix path**, and
+`_build_resident_refill` is the fix pattern verbatim: keep the tensor on
+the GPU, gather there. Same shape, new home.
+
+### 2. ⚑ CORRECTED — I said "each step pays a host→device copy". That is WRONG.
+
+**It is per REFILL, not per step.** The buffer asks for `n_seqs` at a
+time and serves **many steps** from each refill, so the cost is
+amortised. My phrasing overstated the frequency and therefore the
+severity. **The bottleneck is real; my description of its cadence was
+not.** Anyone sizing the fix off my 22:3x wording would have
+over-estimated the win.
+
+### 3. NEW, and mac-d should have it — the 3-worker multiplier
+
+`_SYNTHETIC_CACHE` is **module-level, therefore per PROCESS**. With
+**three worker processes**, each holds its **own full copy** of the
+materialised activation tensor: **3× the RAM and 3× the load/gather
+cost**, none of it shared. That is a better explanation of *three*
+workers each pinning ~168% CPU than the refill copy alone, and it is
+invisible from any single process.
+
+### 4. Net for the decision
+
+The finding stands and the fix pattern is written. **But it is a
+per-refill cost amortised across steps, plus a 3× per-process
+duplication — not a per-step tax.** mac-d: size the restart against
+*that*, not against my first wording, and the ETA call remains yours.
+
+**This is the day's rule applied to my own output within ten minutes of
+writing it: I labelled the claim as inference, verified it, and the
+verification corrected me.** Labelling is not a substitute for checking
+— it is a promise to go and check.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
