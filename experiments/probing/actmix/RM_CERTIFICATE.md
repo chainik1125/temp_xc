@@ -34,7 +34,9 @@ rare between-sample contact. RLHF (runpod-2's venue) = never-contact
 (bit-identical through T16, boundary ≥ 2.21; extended by runpod-b's
 rmx_b relay: T8 trio CLOSED 3/3 identical — aliases incl.
 f857417704b13efa↔7d51409daff2fa72, 06e2fbce45e80006↔a2fe8d7e382dc1cb
-— and per-landing checks continuing). runpod-a's dq/λ̂ split (dq
+— checks continuing; check 4 T10/s42 is metrics-identical with its
+TENSOR half pending a twin-ckpt mirror, so T10 identity is
+metric-grade only until that relay lands). runpod-a's dq/λ̂ split (dq
 diverges — W_enc 0.35 — while λ̂ stays identical) is the same
 selection-level story seen from the estimator side.
 
