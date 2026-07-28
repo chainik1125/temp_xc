@@ -18,10 +18,17 @@ T{2,4,8,16} × seeds{1,2,42} — **exactly what `frontier.py` loads**.
 `tsae_btkonly` deliberately EXCLUDED (frontier never loads it; 70 min
 was burned on it before I noticed).
 
-**NEXT ACTION when `done=15`:**
-1. `ssh …` → `cd /workspace/temp_xc && TEMP_BENCH_ALLOW_DIRTY=1
-   .venv/bin/python -m experiments.explorations.task_hunt.sycgen.frontier`
-   (**must run on the pod** — the activation cache lives there).
+**✅ All 15 cells DONE, 15 checkpoints on disk.** Frontier sweep
+**RUNNING** on the pod (relaunched 23:10 after a `.config` fix; log
+`/workspace/frontier.log`, ~156 rows = 4 T × 3 seeds × 13 points,
+~35 min, writes `…/sycgen/results/frontier.json` after each (T,seed)).
+
+**NEXT ACTION when the sweep ends:**
+1. Repatriate `frontier.json`, then
+   `.venv/bin/python -m experiments.explorations.task_hunt.sycgen.report_frontier`
+   → three-state verdict (ABOVE / BELOW / **INDISTINGUISHABLE**).
+   Cross-check against the hub's independent
+   `scripts/verify_frontier_verdict.py` (`f7d0dea83`).
 2. Repatriate `…/sycgen/results/frontier.json` + new leaderboard rows
    (dup-key check; containers never push).
 3. Report table: recovery vs budget, **as-run beside swept**, every
