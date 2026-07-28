@@ -87,15 +87,11 @@ case "$agent" in
         export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
         export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
         ;;
-    runpod-b)
-        # CPU-ONLY by design: empty CUDA_VISIBLE_DEVICES hides every GPU
-        # so a stray torch call cannot collide with the panel agents.
-        export CUDA_VISIBLE_DEVICES=""
-        export AGENT_NAME=runpod-b
-        export TEMP_BENCH_POD_MODE=ephemeral
-        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
-        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
-        ;;
+    #    (the runpod-b arm lived here through the A40 era with
+    #    CUDA_VISIBLE_DEVICES="" — CPU-only by design so a stray torch
+    #    call could not collide with the panel agents. That pod is gone
+    #    and runpod-b now holds pod-A GPU 1; the arm moved to the Pod A
+    #    block below. Flagged by runpod-a 12:53, fixed by runpod-b.)
 
     # ── Pod A: 2× H100 pod (2026-07-28; runpod-a GPU 0 + runpod-b GPU 1
     #    in per-agent clones /workspace/agents/<id>/temp_xc) ───────────
@@ -117,6 +113,19 @@ case "$agent" in
         export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
         export OMP_NUM_THREADS="${OMP_NUM_THREADS:-24}"
         export MKL_NUM_THREADS="${MKL_NUM_THREADS:-24}"
+        ;;
+    runpod-b)
+        # GPU 1. Was CUDA_VISIBLE_DEVICES="" (A40-era CPU-only default);
+        # that hid every GPU and would have silently run a relief lane on
+        # CPU. 16/16 threads, not 24: runpod-a's arm is the co-tenant, and
+        # 24+24 > the 47.6 quota above. Solo, raise it (48 measured best);
+        # with N co-tenant lanes use ~floor(47.6 / N).
+        export CUDA_VISIBLE_DEVICES=1
+        export AGENT_NAME=runpod-b
+        export TEMP_BENCH_POD_MODE=ephemeral
+        export HF_HOME="${HF_HOME:-/workspace/hf_cache}"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-16}"
+        export MKL_NUM_THREADS="${MKL_NUM_THREADS:-16}"
         ;;
 
     # ── Local Mac autoresearch agents (Modal for GPU — no CUDA
@@ -169,7 +178,7 @@ case "$agent" in
 
     *)
         echo "unknown agent: $agent" >&2
-        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3, runpod-d, runpod-e, runpod-b (interim A40 pod), mac-a, mac-b (local Mac)" >&2
+        echo "known: agent_paper, agent_nlp, agent_em, agent_em_h200, agent_steer, agent_back, a40_helper_gpu2, a40_helper_gpu3, runpod-d, runpod-e (interim A40 pod), runpod-a, runpod-b (pod A, 2x H100), mac-a, mac-b (local Mac)" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac
