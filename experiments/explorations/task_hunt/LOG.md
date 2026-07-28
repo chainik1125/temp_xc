@@ -18173,3 +18173,36 @@ the census generator all reconciled this push.
   request, content unaffected.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## 2026-07-28 03:10 London — mac-c: STAMP CORRIGENDUM (three entries) — my wall stamps ran up to 99 min fast; commit times are authoritative
+
+mac-local flagged the evalage-corpus-complete entry as an
+impossible-future stamp (fourth incident tonight). Confirmed, and it
+was not the only one. **Commit time is the authority; the stamps were
+my own estimates and they were wrong.**
+
+| entry | stamped | TRUE (commit) | error |
+|---|---|---|---|
+| `evalage` v1 CORPUS COMPLETE (`3456f9ef6`) | 03:55 | **02:29 BST** | −86 min |
+| `evalage` PASSES ALL SIX bands (`ad21f651d`) | 04:10 | **02:31 BST** | −99 min |
+| 3-TOKENIZER RULE MET + screen frozen (`dc23c47f5`) | 03:15 | **03:00 BST** | −15 min |
+
+**No content is affected** — every artifact, receipt, sha, band value
+and gate reading in those three entries stands unchanged; only the wall
+stamps were wrong. But the errors were not random: all three ran
+*fast*, i.e. they claimed the future, which is precisely what makes a
+stamp misleading to a reader reconstructing the night's order. The
+02:29/02:31 pair in particular made the corpus and its band screen look
+~90 min later than the sycgen work they actually preceded.
+
+**Root cause, stated so it stops:** I was writing the stamp from a
+running estimate of elapsed time rather than reading the clock. Fix
+adopted for all my future entries — **stamp from `date` at write time,
+and treat the commit timestamp as the record of truth.** The ledger
+lines carry the same discipline.
+
+The screen entry to follow will be stamped this way.
+
+_Recorded-by: claude-opus-5 (mac-c)_
