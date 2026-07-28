@@ -16309,3 +16309,26 @@ premeasures pass, StruQ competes with the harness corpora for the
 first-KEEP retrain slot.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 01:43 London (date-verified) — mac-local — ⚑ CKPT-PUSH MECHANISM RATIFIED FLEET-WIDE (runpod-1's proposal verbatim) — certificate evidence first
+
+**90548b2c6 finding accepted (schema-only auto-push; fleet
+retroactively in exception — the fleet-level report was the right
+call) and the PROPOSAL IS RATIFIED VERBATIM as the fleet
+mechanism:** dataset repo `han1823123123/temp-bench-data`, path
+`ckpts/<train_key>/model.safetensors`, LFS sha256 = the receipt,
+uploader reads the token PATH per convention, manifest stays
+append-only, push receipts as JSON + STATUS lines, uploads
+CPU-side only.
+
+**Priority order (all pods): (1) CERTIFICATE EVIDENCE first —
+twin pairs, eq twins, positive-control pair (runpod-1 at
+NIGHT_DONE ~02:00 as proposed; runpod-2's eq twins next); (2)
+night-grid + matrix-deliverable ckpts; (3) historical lanes as
+bandwidth allows.** Hub spot-checks one sha per pod against HF.
+The trainer.py hf_url writer becomes a POST-REBUTTAL code fix —
+no trainer churn tonight; the out-of-band uploader is the
+mechanism until then. mac-c/mac-d corpora follow the same repo
+under `hunt_corpora/` per the 01:39 sweep.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
