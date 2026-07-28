@@ -95,14 +95,6 @@ def main(leg: str):
     hs = SCREEN_HS[leg]
 
     items, pairs = build_pairs(ATTACKS_X5)
-    print(f"[cache_acts:{leg}] {len(pairs)} pairs / {len(pairs)*2} docs; "
-          f"screen hs{hs}", flush=True)
-
-    # flatten to docs: (pair_idx, arm) with A=1/B=0
-    docs = []
-    for pi, pr in enumerate(pairs):
-        docs.append((pi, "A", 1, pr["A"]))
-        docs.append((pi, "B", 0, pr["B"]))
 
     model_id = cfg["hf"]
     print(f"[cache_acts:{leg}] loading {model_id}", flush=True)
@@ -110,6 +102,25 @@ def main(leg: str):
         model_id, torch_dtype=torch.bfloat16, device_map="cuda").eval()
     d = int(model.config.hidden_size)
     emb = model.get_input_embeddings()
+
+    # ERRATUM (fix-forward on the freeze, disclosed): a few long
+    # completion_real/_realcmb docs exceed a model's context (gpt2 n_positions
+    # =1024) ⇒ out-of-range position ⇒ CUDA device-side assert. Skip any PAIR
+    # whose A or B (with BOS) exceeds max_ctx for THIS leg — A/B skip together
+    # (len_delta ≤2) so class balance is preserved; count disclosed in meta.
+    max_ctx = int(getattr(model.config, "max_position_embeddings",
+                          getattr(model.config, "n_positions", 100000)))
+    def _len(txt):
+        return len(bos) + len(tok(txt, add_special_tokens=False)["input_ids"])
+    docs, over = [], 0
+    for pi, pr in enumerate(pairs):
+        if max(_len(pr["A"]), _len(pr["B"])) > max_ctx:
+            over += 1
+            continue
+        docs.append((pi, "A", 1, pr["A"]))
+        docs.append((pi, "B", 0, pr["B"]))
+    print(f"[cache_acts:{leg}] {len(pairs)} pairs; {over} over max_ctx={max_ctx} "
+          f"skipped ⇒ {len(docs)} docs; screen hs{hs}", flush=True)
 
     N = len(docs)
     res_ord = np.zeros((N, d), np.float16)
@@ -188,6 +199,7 @@ def main(leg: str):
     (CACHE_ROOT / f"acts_meta_{leg}.json").write_text(json.dumps({
         "leg": leg, "model_id": model_id, "screen_hs": hs, "n_docs": N,
         "d_model": d, "local_k": LOCAL_K, "boundary_slop_docs": int(slop),
+        "max_ctx": int(max_ctx), "pairs_over_ctx_skipped": int(over),
         "wall_seconds": round(time.time() - t0, 1)}, indent=2))
     print(f"[cache_acts:{leg}] DONE {N} docs in {time.time()-t0:.0f}s -> {out}",
           flush=True)

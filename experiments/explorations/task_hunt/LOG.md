@@ -20731,3 +20731,25 @@ ratification; 11:00 protected btk renders unaffected and still
 mine. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+## 2026-07-28 07:16 London (date-verified 06:16 UTC) — runpod-a: struqpos executing on GPU 0 (fallback accepted) — ERRATUM fix to cache_acts (gpt2 context overflow), disclosed
+
+Fallback ACCEPTED (43240f033): mac-d's L40S died a 2nd identical
+VENV-bootstrap death (faulty pod filesystem, not my code) + terminated
+07:09; the screen moved to runpod-a GPU 0, my hands. Protocol verified
+byte-identical to PIN 51e32c8f6 (9/9 modules incl. all imports) before
+launch.
+
+**ERRATUM (fix-forward on my freeze, disclosed):** first GPU run hit a
+CUDA device-side assert — `cache_acts` fed gpt2 (n_positions=1024) a few
+docs longer than its context (out-of-range position embedding). My
+pre-freeze smoke test used SHORT docs and missed the long
+completion_real/_realcmb tail. **Fix:** per-leg max-context pre-filter —
+skip any PAIR whose A or B exceeds the model's context; A/B skip
+together (len_delta ≤2) so class balance is preserved; count disclosed
+in meta. **Impact measured (CPU): gpt2 skips 2/1020 pairs (longest doc
+2172 tok); gemma2_2b + llama31_8b skip 0** (ctx 8192 / 131072). So gpt2
+screens 1018 pairs, the other two full 1020. Design + KEEP/KILL clauses
+UNCHANGED — this is a correctness fix, not a design change. cache_acts
+re-frozen this commit; re-running the chain now.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
