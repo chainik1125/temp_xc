@@ -7,6 +7,15 @@ every claim below predates its number. Owner mac-d (executor), mac-c
 
 Prime directive unchanged: **a sound verdict, never a win.**
 
+> **AMENDED 2026-07-29 00:46 BST — still BEFORE any cell ran ($0 spent,
+> 0 pods, no cache built).** Absorbs the hub's comparator correction
+> (`73f8ea388`, brief §2b) and **all four findings of mac-c's
+> pre-registration audit** (`a027b7caa`, brief §5), one of which (A1)
+> was **blocking**. Amending a pre-registration is only legitimate
+> while no number exists; that is the case here, and the git history is
+> the receipt. Every amendment is marked **[AMD]** in place and nothing
+> original was rewritten or deleted.
+
 ---
 
 ## 0. Why this lane exists
@@ -74,13 +83,72 @@ significance test at n=3**.
     delta  >  noise             -> (a) TXC ABOVE
     delta  < -noise             -> (c) TXC BELOW
 
+**[AMD — mac-c A3]** The rule above is a magnitude test only, so
+(a)-vs-(d) could still be settled post-hoc by a single lucky seed.
+**(a) now requires BOTH conditions, fixed pre-data:**
+
+    (i)  SIGN AGREEMENT — delta > 0 in ALL 3 seeds, per-seed
+         (a 3/3 sign test; 2/3 is NOT (a))
+    (ii) MARGIN        — |delta| > across-seed SD, as above
+
+**Either condition failing ⇒ (d).** Same principle as the `+0.05` bar
+elsewhere: the threshold is a number written before the data, not a
+judgement made after it.
+
 **If (b)/(d) fires, that is the result and it is published as one.**
+
+## 2b. [AMD] Matched budget = BRACKET, never single-sided (hub §2b)
+
+**Binding, and it already moved a shipped verdict.** The item-6 table
+selected pooled's comparator as *the best point with `l0 ≤ TXC's l0`* —
+defensible in words, biased in arithmetic: k is swept on a coarse grid
+whose consecutive points differ **40–75%**, so no point lands at TXC's
+budget and the rule silently picked a **much cheaper** baseline. At T=2
+it compared TXC @ 5.66 against pooled @ 3.51 — **38% less budget** —
+and returned a win. **Item 6's headline moved from above 3/4 to above
+2/4.** That verdict was mine to produce; the rule was the hub's; it
+survived a ratification and a two-implementation cross-check, because
+**two implementations of one premise is one check wearing two coats.**
+
+**This lane is bound by the corrected rule, and it applies to the GAP
+exactly as it applies to the level:**
+
+- **Bracket both sides.** Report the best point **below** and the
+  cheapest point **above** TXC's measured budget, and **interpolate to
+  TXC's exact `l0`** (primary). Monotonicity of the arm in budget is a
+  **precondition, printed as a receipt** — not assumed.
+- **Sweep k finely enough to bracket tightly.** **[AMD]** `K_SWEEP` is
+  therefore widened from item 6's `(1,2,4,8,16,32)` to include
+  intermediate points — *a tight bracket is worth more pod-minutes than
+  another seed*, and here it is nearly free (encode-and-probe, no
+  training).
+- **State the bracket width** in the results table.
+- **If the two ends disagree, that IS the finding — report it, do not
+  pick.**
+- **Standing check before any comparator verdict ships:** print the
+  **budget ratio** of the selected comparator to TXC. **If it is not
+  ≈1.0, the word "matched" is not earned.**
 
 ## 3. Binding controls
 
 - **Untrained twins are MANDATORY, not optional.** They are what killed
   the original claim. **A trained-only gap is not evidence.** Every arm
   gets a random-init twin at the same (T, seed).
+
+  **[AMD — mac-c A2] The twin is a GATE ON (a), with its own rule
+  fixed pre-data.** As originally written, (a)–(d) were defined only on
+  *trained* TXC vs *trained* stacked, so "(a) fired" and "untrained ≥
+  trained" could **both** be true and point opposite ways — leaving the
+  conflict to be settled after seeing the numbers. Binding instead:
+
+      (a) requires, IN ADDITION to 2(i) and 2(ii):
+          gap_txc_TRAINED > gap_txc_UNTRAINED   in all 3 seeds
+
+  **If the untrained twin's gap matches or exceeds the trained model's,
+  the result is (b) — architectural, not learned — regardless of how
+  TXC compares to stacked.** This is not a new hypothesis; it is
+  exactly how sycgen's original shuffle claim died, and the rule is
+  written here so that outcome cannot be re-narrated as a win.
 - **Pooled's zero is the gate.** Checked before any verdict is computed.
 - **Sparsity matched on MEASURED `realized_l0_per_window`** — never
   nominal k, never the derived per-token axis. (The per-token axis is
@@ -121,14 +189,112 @@ for outcome (b)**. Declared before any number exists specifically so it
 disappoints. If primary and secondary disagree, **both are reported**
 and the disagreement is the finding.
 
+## 4b. [AMD — mac-c A1, BLOCKING] The pooled-zero gate could not fail
+
+**Accepted in full.** §1's gate is `pooled gap == 0`, and
+`frontier.py:119` is `z.mean(dim=1)` — a mean over the window axis is
+permutation-invariant **arithmetically**. So **pooled's zero survives
+any bug in the shuffle whatsoever.** The only defect that could ever
+fire this gate is one making the pooled arm position-*sensitive* — a
+bug in the comparator, not in the instrument it was written to check.
+
+**And the failure it misses manufactures the pre-committed headline:**
+if the shuffle silently no-ops, then pooled = 0 (**gate passes**),
+stacked = 0, TXC = 0 ⇒ every gap is zero ⇒ reads as **(b)**, which §2
+names the LIVE hypothesis and §8 pre-commits to publishing. **The one
+unchecked failure is the one that yields the promised answer through a
+passing gate.** Same shape as the tautology §1 removed from the
+comparator, one level up — this one was in the gate itself.
+
+Verified at source by mac-c, not assumed: a repo-wide grep for any
+assert that `tiles_sh` differs from `tiles_ev` returns **empty**;
+`shuffle_overlay.py`'s `IDENTITY_TOL` is a **replication** guard on
+`|canonical_r − recomputed_r|`, a different object; and
+`shuffle_within_window` validates rank and `x.shape[1] == T` and
+**never** that the drawn permutation is non-identity.
+
+**BINDING FIX — on the INPUT side, arm-independent, pre-encoder**, so
+it cannot be confused with a result:
+
+    assert (tiles_sh - tiles_ev).abs().max() > 0
+
+**STRENGTHENED BEYOND THE MINIMUM.** "Something changed" is a weak
+predicate — it passes if one row of thousands moved. The apparatus has
+an *exactly predicted* value (§4c), so the gate checks against **that
+number** instead:
+
+    measured_shuffled_row_fraction  ==  1 - 1/T!   (binomial tol)
+
+That is a **positive control with a predicted value**, not a
+nonzero-check: it fires on a total no-op (0.00), on a partial
+application, and on a wrong-axis permutation, none of which the
+minimal assert distinguishes. **A gate and a positive control are
+different objects** — tonight has already produced two checks whose
+failure looked exactly like success, and this file must not add a
+third.
+
+## 4c. [AMD — mac-c A4] The apparatus shuffles fewer rows than it looks
+
+`shuffle_within_window(per_row=True)` draws `torch.randperm(T)`
+independently per row, so **a row draws the identity permutation with
+probability `1/T!`** and is silently *not shuffled*:
+
+    T = 2  -> 1/2   = 50.0% of rows UNSHUFFLED   (rows truly shuffled 0.500)
+    T = 4  -> 1/24  =  4.2%                                        0.958
+    T = 8  -> 1/40320                                             ~1.000
+    T = 16 -> negligible                                          ~1.000
+
+**Common-mode across arms, so the TXC-vs-stacked contrast at FIXED T is
+safe** — that is the primary claim and it survives. But **any "the gap
+grows with T" reading inherits `1 − 1/T!` from the apparatus**, which
+is the same species of defect as the divide-by-`T` per-token artifact
+retracted earlier tonight: a monotone-in-`T` factor contributed by the
+instrument and read as a property of the model.
+
+**BINDING:** both of mac-c's sanctioned fixes are run, because the
+marginal cost is one extra encode per cell and the disagreement between
+them is itself informative:
+
+- **PRIMARY — plain draw**, `shuffle_within_window` verbatim
+  (`seed=SHUF_EVAL_SEED=0`). Keeps the instrument commensurable with
+  the existing `fig_sycgen_shuffle_tsweep` exhibit, which is the whole
+  reason this lane exists.
+- **ARTIFACT CONTROL — non-identity redraw**, rejecting and redrawing
+  any row that draws the identity, so the shuffled fraction is 1.000
+  at every T and the `1 − 1/T!` factor is removed by construction.
+- **Cross-T statements may cite ONLY the redraw column.** The plain
+  column is reported at every T but is **disclosed as carrying
+  `1 − 1/T!`**, and at T=2 that means half its rows are unshuffled.
+- **If the two draws disagree, that is reported, not resolved by
+  choosing** — same discipline as the §2b bracket.
+
+⚑ **The redraw column's shuffled fraction is 1.000 BY CONSTRUCTION and
+is therefore NOT evidence that the shuffle works.** For that column the
+§4b gate must instead assert the *plain* draw's predicted rate; the two
+columns are checked by different arguments on purpose.
+
 ## 5. Grid
 
     T      {2, 4, 8, 16}
     seeds  {1, 2, 42}
     arms   {txc, pooled, stacked}
     order  {ordered, shuffled}
-    k      {1, 2, 4, 8, 16, 32}      (SAE arms only; TXC's k is trained)
+    draw   {plain, nonidentity-redraw}          [AMD 4c]
+    k      {1,2,3,4,6,8,11,12,16,22,24,32,44,48} [AMD 2b — widened]
     weights{trained, untrained-twin}
+
+**[AMD] `k` widened from item 6's `(1,2,4,8,16,32)`.** That grid's
+consecutive points differ by 40–75%, which is exactly what let a
+single-sided rule call a 38%-cheaper baseline "matched". The added
+points are chosen to **straddle TXC's measured budget tightly** at
+every T. Cost is negligible here — the SAE arms are post-hoc
+transforms, so a k-point is one encode plus one probe fit, with no
+training anywhere in this lane.
+
+**The k grid is a BRACKETING instrument, not a result.** Only the two
+points adjacent to TXC's budget (and the interpolation between them)
+enter the verdict; the rest establish monotonicity, which §2b requires
+as a printed precondition rather than an assumption.
 
 Trained arms load the 15 existing checkpoints. **No training in this
 lane.**
