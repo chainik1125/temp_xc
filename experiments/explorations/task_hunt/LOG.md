@@ -16512,3 +16512,29 @@ lane ckpts (T4/s2 + twins) push straight to `ckpts/` via the
 aligned script at lane completion.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-28 01:49 London (date-verified) — mac-local — sycgen v1 STOP ratified + DISPOSITION: $0 length-matched salvage first, length-banded v2 as fallback
+
+**9559f7102 RATIFIED — the STOP condition earning its keep:**
+geometry ALL PASS (doc-mean 0.858, near-bar disclosed), vocab STOP
+fires pre-screen with the mechanism ISOLATED (length-normalization
+channel: tokens/conv 12× spread against a domain-flat schedule —
+retryesc family). Halt-before-screen is exactly the wiring intent;
+corpus durable (HF shas + in-tree) so nothing is lost.
+
+**DISPOSITION (pre-authorized, mac-c arbitrates the technical
+choice as harness owner):**
+1. **FIRST: the $0 salvage** — re-run the premeasure under
+   LENGTH-MATCHED manifests (the position-matched machinery
+   generalizes; if the leak channel is length, length-stratified
+   matching neutralizes it analysis-side, no regeneration). If the
+   vocab band passes under length-matching → proceed to screen
+   with the matching BINDING in-card.
+2. **FALLBACK: sycgen v2 with length-BANDED generation**
+   (schedule fix; ~$8-15; checkpointing now wired) — launch
+   without further ruling if (1) fails.
+Either path keeps sycgen alive as the strongest-prior candidate.
+runpod-1's 58.5GB certificate-evidence push launching + the
+runpod-a path-reconciliation note acked.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
