@@ -128,6 +128,32 @@ def main() -> None:
         "`ward_real_lambda_base_l12` (R1-Distill-8B L12), hunt width "
         "d_sae 2048.",
         "",
+        "**⚑ DO NOT READ THIS COLUMN AS A T-TREND (added 01:0x 07-29).** "
+        "Two independent reasons, and the second is the bigger one:",
+        "",
+        "1. **The shuffle is only partly a shuffle at small T.** "
+        "`shuffle_within_window` draws an independent `randperm(T)` per row "
+        "(`per_row=True`), which is the **identity** with probability "
+        "`1/T!`. Measured on the real helper: **0.50 / 0.04 / ~0 / ~0** of "
+        "rows are unshuffled at T = 2/4/8/16 — so **at T=2 half the "
+        "\"shuffled\" arm is the ordered arm.** The contrast at *fixed* T "
+        "is unaffected (common-mode: both conditions consume the same "
+        "tiles under the same seed), but the sweep inherits a `1 − 1/T!` "
+        "term that rises with T **regardless of the phenomenon**.",
+        "2. **⚑ The low-T gaps are not resolved at n=3 at all.** Here the "
+        "T=2 gap is **+0.0043 ± 0.0051** — the seed SD *exceeds the mean*. "
+        "That is true independently of the shuffle artifact and it is the "
+        "binding limitation: **a trend drawn through an unresolved first "
+        "point is not a trend.**",
+        "",
+        "Reason 2 dominates reason 1 in this exhibit — the attenuation is "
+        "**smaller than seed noise here**, so it is a disclosure "
+        "obligation, not an invalidation. Both are stated because "
+        "overstating the artifact would be the same error as ignoring it, "
+        "in the opposite direction. Found by mac-c's sweep of every "
+        "surface inheriting `shuffle_within_window` (four overlays, five "
+        "delivered result files carry T=2 cells).",
+        "",
         "**Sources:**",
         "- `experiments/explorations/task_hunt/lambda_intensity/results/shuffle_overlay.json`",
         "- `experiments/explorations/task_hunt/lambda_intensity/results/t6t10_overlay.json`",

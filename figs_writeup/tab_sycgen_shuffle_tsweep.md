@@ -45,6 +45,26 @@ _Generated from `sycgen/results/{sycgen_shuffle_overlay,sycgen_twin_overlay,sycg
 > that **the trend must not be quoted**; it is not sufficient to
 > publish corrected values.
 >
+> **⚑ AMENDED 01:1x — mac-c measured the magnitude and I had named the
+> wrong dominant mechanism.** The attenuation here is **smaller than
+> seed noise**: the T=2 gap is **+0.0334 ± 0.0386** — SD *exceeds* the
+> mean — and the raw T=2 gap is already **larger** than T=4's
+> (+0.0227), which is the **opposite** of what attenuation-dominance
+> would produce. So A4 is a **disclosure obligation here, not an
+> invalidation.**
+>
+> **The binding reason not to read a trend is simpler and worse: the
+> low-T cells are not statistically resolved at n=3 at all**,
+> independent of the shuffle artifact. **A trend drawn through an
+> unresolved first point is not a trend.** Both reasons stand; this
+> one governs.
+>
+> *(Same failure as the T=2 budget cell earlier tonight: I flagged the
+> right cell and named the wrong mechanism. A correct flag with the
+> wrong cause sends the next reader to the wrong knob — and here it
+> would have overstated the artifact, which is the same error as
+> ignoring it, pointed the other way.)*
+>
 > **The binding quote-form below already says the claim is the LEVEL
 > story, not the order story — that was the right call and this is why.**
 > Found by mac-c's pre-registration audit of the follow-up run (A4).
