@@ -374,9 +374,23 @@ Per-item exhibit blocks live in `REBUTTAL_HANDOFF.md` §4–§7; code:
   the hub's independent `scripts/verify_frontier_verdict.py`.
   Deliverable: **`figs_writeup/tab_sycgen_budget_matched.md`**
   (`scripts/gen_sycgen_budget_table.py`). **Verdict vs pooled: above
-  3/4 T, indistinguishable 1/4, never below; pooled saturates and never
-  reaches TXC at up to 4.06× its budget.** Stacked's 4/4 is NOT counted
+  2/4 T (T=8, T=16), INDISTINGUISHABLE 2/4 (T=2, T=4), never below;
+  pooled saturates and never reaches TXC at up to 4.06× its budget.**
+  **⚑ Restated 01:0x 07-29 — this said "above 3/4" and that was
+  biased.** The generator picked pooled's best point at `l0 ≤ TXC's
+  l0`; k is swept on a coarse grid, so at T=2 that compared TXC @ 5.66
+  against pooled @ 3.51 — **38% less budget** — while the point 5%
+  *above* TXC's budget was indistinguishable. The script now brackets
+  TXC's budget and interpolates, printing all three rules (A strict /
+  B bracket / C interpolated, C primary) so the change is auditable.
+  **T=16 is the strong cell**: pooled cannot operate that cheaply at
+  all, so TXC wins on both axes (Pareto). Stacked's 4/4 is NOT counted
   (probe-capacity overfitting: 32768 features vs 1024 windows).
+  **⚑ No shuffle dimension in this table** — `frontier.json` has no
+  shuffle key; the sparsity-matched shuffle ablation is a separate run,
+  and there **pooled's gap is zero by construction** (mean-pooling is
+  permutation-invariant), so pooled is an instrument check and
+  **stacked** is the baseline.
   **Budget axis is measured `l0_per_window` — never the derived
   per-token axis, which manufactures a false "better for less" trend.**
   **The harness is section-agnostic on purpose**: probing/backtracking

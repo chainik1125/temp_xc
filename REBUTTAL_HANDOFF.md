@@ -84,8 +84,11 @@ label.
 >   stronger baseline can only make TXC look worse, so it cannot
 >   overturn a negative in TXC's favour.** Not exposed in any direction
 >   that matters.
-> - **Item 6 (§6)** — a clean TXC win against per-token-only
->   comparators. **The only exposed exhibit.**
+> - **Item 6 (§6)** — **NOT a clean win; narrowed twice.** Against
+>   per-token-only comparators it wins, but that comparison establishes
+>   nothing about the architecture. Against a **windowed pooled SAE at
+>   matched budget it is above 2/4 T and indistinguishable 2/4**
+>   (§6 for the full statement). **The only exposed exhibit.**
 >
 > **Residual gap, stated precisely: pooled ≠ stacked.** Concatenation is
 > absent outside `synthetic` (`grep concat` over the paper sources: **no
@@ -386,11 +389,38 @@ panel — directly comparable to the btk figs above):**
 > `figs_writeup/tab_sycgen_budget_matched.md`** (script-generated,
 > `scripts/gen_sycgen_budget_table.py`).
 >
-> **Verdict — POSITIVE, QUALIFIED.** Against **pooled SAE** at
-> matched-or-better measured `l0_per_window`: **above 3/4 T,
-> INDISTINGUISHABLE 1/4 (T=4), never below.** And it is not a
-> budget-cutoff artifact — **pooled SATURATES, and its ceiling at ANY
-> swept budget never reaches TXC**, at up to **4.06× TXC's budget**.
+> **Verdict — POSITIVE, NARROW. ⚑ WEAKENED 01:0x 07-29 by a hub
+> sanity check: above 3/4 was WRONG — it is above 2/4.**
+>
+> **What was wrong.** The table selected, as pooled's comparator, the
+> best point with `l0 ≤ TXC's l0`. k is swept on a **coarse grid**
+> (1,2,4,8,16,32), so no pooled point lands at TXC's budget and that
+> rule silently compares against a **cheaper** baseline. **At T=2 it
+> compared TXC @ 5.66 against pooled @ 3.51 — 38% less budget — and
+> called it a win.** The cheapest pooled point *above* TXC's budget is
+> only 5% over (5.97) and scores 0.4876 vs TXC's 0.4989: **inside the
+> seed spread.** The rule was biased in our favour and it moved a
+> verdict.
+>
+> **Corrected verdict, pooled interpolated to TXC's exact budget:**
+> **above 2/4 (T=8, T=16), INDISTINGUISHABLE 2/4 (T=2, T=4), never
+> below.**
+>
+> - **T=16 is the strong cell** and the only unambiguous one: pooled
+>   **cannot operate at TXC's budget at all** (cheapest point costs
+>   1.43× TXC) and TXC still beats it by **+0.0908** — **Pareto
+>   dominance**, better on both axes, which is *stronger* than a
+>   matched-budget win.
+> - **T=8 holds**, but the margin lives inside one grid step: pooled
+>   flips to indistinguishable if handed its next point up (1.58× TXC's
+>   budget).
+> - **T=2 and T=4 are INDISTINGUISHABLE at n=3.** Do not quote T=2 as a
+>   win; it was one only under the biased rule.
+>
+> **The durable part is the SHAPE, and it is untouched by the rule
+> change** because it ignores the budget cap entirely: **pooled
+> SATURATES, and its ceiling at ANY swept budget never reaches TXC**,
+> up to **4.06× TXC's budget**.
 >
 > **⚑ Stacked's 4/4 is REFUSED, not counted:** `T·d_sae = 32768` features
 > against `N_WINDOWS = 1024` is underdetermined, so its collapse is
@@ -466,6 +496,35 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   generated from the overlay/twin/summary jsons (ordered/shuffled
   mean±sd per T, gap, twin-gap control, anchor row, binding
   quote-form); regenerates with the final render.
+
+  > **⚑ THE TWO SYCGEN EXHIBITS DO NOT CROSS — do not quote them as
+  > one result** (Han, 07-29). The shuffle table above compares
+  > ordered vs shuffled against a **per-token anchor + untrained
+  > twin**; `tab_sycgen_budget_matched.md` compares TXC vs pooled and
+  > stacked at **matched budget with no shuffle dimension at all**
+  > (`frontier.json` carries no shuffle key — verified). Neither
+  > supports a "TXC beats a windowed SAE on order-sensitivity" claim.
+  > The sparsity-matched shuffle ablation that *would* is a separate
+  > run in flight (`briefings/sycgen-shuffle-sparsity-matched.md`).
+  >
+  > **⚑ And when it lands, do not compare a shuffle gap to pooled's:
+  > pooled's ordered−shuffled gap is EXACTLY ZERO by construction.**
+  > Mean-pooling per-token codes over a window is
+  > **permutation-invariant** (verified: max|diff| 5.96e-08, float
+  > noise; stacked 4.12). "TXC's shuffle gap beats pooled's" is a
+  > **mathematical identity dressed as a result.** In that run pooled
+  > is the **instrument check** (gap must be 0, a non-zero value voids
+  > the run) and **stacked is the baseline**, since concatenation
+  > supplies order free from the architecture with no temporal
+  > learning.
+  >
+  > **The live hypothesis is that the gap is architectural, not
+  > learned** — sycgen's shuffle claim already dissolved once under
+  > exactly this pressure: **untrained twins show LARGER gaps than
+  > trained models at every T** (see the twin column above). The
+  > binding quote-form already says the claim is the LEVEL story, not
+  > the order story. Keep it that way until the matched run says
+  > otherwise.
 
   *(Fig above is the FINAL render — the "LIVE-refreshing, 3/18
   trained partial" note that sat here described the 03:40 state and is

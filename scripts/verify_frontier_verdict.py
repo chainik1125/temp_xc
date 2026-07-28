@@ -98,6 +98,29 @@ def main(path: Path) -> int:
             k, c = max(elig, key=lambda kc: kc[1]["r"])
             d = txc["r"] - c["r"]
             spread = max(txc["sd"], c["sd"])
+            # ⚑ SELECTION-BIAS GUARD (added 01:0x 07-29). "Best point at
+            # l0 <= TXC's l0" sounds conservative but on a coarse k grid it
+            # picks a MUCH cheaper baseline: at T=2 it chose pooled @3.51
+            # against TXC @5.66 (38% less budget) and returned a win, while
+            # the point 5% ABOVE TXC's budget was indistinguishable. This
+            # does not re-implement the generator's bracket rule (that would
+            # destroy the independence this file exists for) — it flags the
+            # condition under which rule A cannot be trusted.
+            ratio = c["l0"] / txc["l0"] if txc["l0"] else float("nan")
+            over = [(kk, cc) for kk, cc in pts if cc["l0"] > txc["l0"] + 1e-9]
+            if ratio < 0.90:
+                nk, nc = min(over, key=lambda kc: kc[1]["l0"]) if over else (None, None)
+                near = ""
+                if nc is not None:
+                    nd = txc["r"] - nc["r"]
+                    ns = max(txc["sd"], nc["sd"])
+                    near = (f"; cheapest point ABOVE budget k={nk} @ "
+                            f"{nc['l0']:.2f} ({nc['l0']/txc['l0']:.2f}x) gives "
+                            f"delta={nd:+.4f} vs spread {ns:.4f} -> "
+                            f"{'INDISTINGUISHABLE' if abs(nd) <= ns else 'TXC above' if nd > 0 else 'TXC below'}")
+                print(f"   {'':8s}  ** SELECTION-BIAS WARNING: comparator "
+                      f"spends only {ratio:.2f}x TXC's budget — this is NOT a "
+                      f"matched comparison{near}")
             if abs(d) <= spread:
                 state, key = "INDISTINGUISHABLE (n=3)", "indistinguishable"
             elif d > 0:

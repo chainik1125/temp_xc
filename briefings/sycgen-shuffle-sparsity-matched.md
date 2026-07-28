@@ -82,6 +82,39 @@ State, before numbers exist:
   advantage disclosed and **never netted out** — and remember it is
   **uninformative at T≥8** (32768 features vs 1024 windows).
 
+## 2b. ⚑ AMENDMENT 01:0x — the budget table's comparator rule was
+## biased, and the same trap is waiting for you here
+
+A hub sanity check on the *delivered* budget table found the bug this
+run would have repeated. The generator compared TXC against **the best
+SAE point with `l0 ≤ TXC's l0`**. Sounds conservative. It is not: k is
+swept on a **coarse grid** (1,2,4,8,16,32), consecutive points differ
+by **40–75% in budget**, so no point lands at TXC's budget and the rule
+silently selects a **much cheaper** baseline. **At T=2 it compared TXC
+@ 5.66 against pooled @ 3.51 — 38% less budget — and returned a win.**
+The point 5% *above* TXC's budget was indistinguishable. **Headline
+went from above 3/4 to above 2/4.**
+
+**Binding for this run:**
+
+- **Bracket, never single-sided.** Report the best point **below** and
+  the cheapest point **above** TXC's measured budget, and interpolate
+  to TXC's exact `l0`. A verdict from one side of a coarse grid is not
+  a matched-budget verdict.
+- **Sweep k finely enough to bracket tightly.** Add intermediate k
+  where the grid straddles TXC's budget — cheap, and it is the
+  difference between a defensible number and an artifact. **A tight
+  bracket is worth more pod-minutes than another seed.**
+- **State the bracket width** in the card. If the two ends give
+  different verdicts, that IS the finding — report it, do not pick.
+- This applies to the **gap** as much as the level: a gap difference at
+  mismatched budget is not a matched-budget gap difference.
+
+**The general lesson, and it is why this brief exists twice over:
+a selection rule that is defensible in words can be biased in
+arithmetic, and it will bias toward whoever wrote it.** Check the rule
+against the grid it runs on, not against its own description.
+
 ## 3. Grid and scale
 
 `T {2,4,8,16}` × `seeds {1,2,42}` × arms `{txc, pooled, stacked}` ×

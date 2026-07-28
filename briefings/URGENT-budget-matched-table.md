@@ -27,6 +27,17 @@ SAE that gets to use the window.
 
 ---
 
+## ⚑ THE VERDICT BELOW IS SUPERSEDED (01:0x 07-29) — read the table, not this
+
+**"ABOVE pooled at 3/4 T" was biased and is now "above 2/4".** The
+comparator rule picked pooled's best point at `l0 ≤ TXC's l0`; on a
+coarse k grid that compared TXC @ 5.66 against pooled @ 3.51 at T=2 —
+**38% less budget**. Corrected: **above 2/4 (T=8, T=16),
+INDISTINGUISHABLE 2/4 (T=2, T=4), never below.** Authoritative source
+is `figs_writeup/tab_sycgen_budget_matched.md`, which now prints all
+three comparator rules. The paragraph below is kept as written for the
+record.
+
 ## ✅ mac-d PART DELIVERED (2026-07-29 00:11 BST) — verdict in LOG
 
 **Result: POSITIVE, qualified.** TXC's recovery-vs-budget frontier is

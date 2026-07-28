@@ -36040,3 +36040,102 @@ brief so the scale is usable: **read `cpu.max`/`memory.max` never
 this box" and `cache t=True` is a literal.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-29 00:41 BST — ⚑⚑ HUB: **the item-6 comparator rule was BIASED TOWARD US and it moved a verdict — "above 3/4" is wrong, it is above 2/4.** Found on a delivered, ratified, cross-checked exhibit
+
+Han asked to keep sanity-checking the deliverables while the shuffle
+ablation spins up. **The check landed on the table we had already
+shipped, ratified, and cross-checked with two independent
+implementations — and all three agreed on a biased number.**
+
+**The rule.** `gen_sycgen_budget_table.py` selected, as pooled's
+comparator, **the best point with `l0 ≤ TXC's l0`**. In words that is
+maximally conservative: never let the baseline outspend the model. **In
+arithmetic it is not**, because k is swept on a coarse grid
+(1,2,4,8,16,32) whose consecutive points differ by **40–75% in
+budget**. No pooled point lands at TXC's budget, so the rule silently
+selects a **materially cheaper** baseline and calls the result matched.
+
+**T=2 is where it bit.** TXC @ **5.66** was compared against pooled @
+**3.51** — the baseline handed **38% less budget** — and returned **TXC
+above**. The cheapest pooled point *above* TXC's budget is **5.97, a 5%
+overshoot**, and scores **0.4876 vs TXC's 0.4989**: a gap **inside the
+seed spread**. So the T=2 win existed only because the comparator was
+underfunded.
+
+**FIX — bracket, don't single-side.** The generator now reports the
+best point **below** and the cheapest point **above** TXC's budget and
+**interpolates to TXC's exact `l0`** (valid: pooled is monotone
+non-decreasing in budget within 2e-3, printed as a receipt). Three
+rules print side by side so the change is auditable: **A** strict (what
+we shipped, optimistic), **B** bracket must-beat-both (conservative),
+**C** interpolated (**primary** — it answers the actual question).
+
+**CORRECTED VERDICT vs pooled: above 2/4 (T=8, T=16),
+INDISTINGUISHABLE 2/4 (T=2, T=4), never below.** Was above 3/4.
+
+- **T=16 is the strong cell and the only unambiguous one** — pooled
+  **cannot operate at TXC's budget at all** (cheapest costs 1.43×) and
+  TXC still beats it by +0.0908: **Pareto dominance**, stronger than a
+  matched win.
+- **T=8 holds but the margin lives inside one grid step** — pooled
+  flips to indistinguishable if handed its next point up (1.58×).
+  Disclosed in the table.
+- **T=2 is not a win.** I had already flagged T=2 as *thin*
+  (Δ/spread 1.16) before the data landed — **but I diagnosed it as
+  threshold sensitivity when the real cause was comparator selection.**
+  A correct flag with the wrong mechanism is not a caught error: it
+  points the next reader at the wrong knob.
+
+**What makes this worth a long entry: every safeguard we had ran, and
+none of them could see it.** The pre-registration fixed the *threshold*
+and the *axis*, not the *comparator selection*. `report_frontier.py`
+and `verify_frontier_verdict.py` were built as independent
+implementations — but **independence of implementation is not
+independence of assumption**: both implemented the same rule from the
+same brief, so they cross-checked the arithmetic of a biased choice and
+agreed, twice, at n=2 implementations. **Two implementations of one
+premise is one check wearing two coats.**
+
+**GUARD, not a duplicate.** `verify_frontier_verdict.py` now flags when
+the selected comparator spends **<0.90×** TXC's budget and prints what
+the next point up would have said. I deliberately did **not** port the
+bracket rule into it — that would have made the two files agree by
+construction and destroyed the only independence left. It fires at T=2
+(0.62×) and T=2 stacked (0.70×) and is silent elsewhere, so the two
+routes now reach the same conclusion by **different** arguments.
+
+**SURFACES SWEPT** (the retraction-propagation lesson from 00:23,
+applied to my own correction within the hour): `REBUTTAL_HANDOFF.md`
+§6 verdict block **and** its executive-summary line ("a clean TXC win"
+— now explicitly not clean), `REBUTTAL_CODE_GUIDE.md:377`, and the
+**discharged** `URGENT-budget-matched-table.md`, which stated 3/4 as a
+delivered result where a worker would read it. Historical records
+(LOG entries, `MODAL_SPEND.md` ledger) left as written — they are
+correctly historical. Audit clean after.
+
+**AMENDED THE SHUFFLE BRIEFING BEFORE IT SPENDS** (`§2b`): the same
+trap is waiting there, and the shuffle run is the one with 20 H100s
+authorized. Binding: bracket both sides, **add intermediate k where the
+grid straddles TXC's budget** (*a tight bracket is worth more
+pod-minutes than another seed*), state the bracket width, and if the
+two ends disagree **that is the finding — report it, do not pick**.
+Applies to the **gap** exactly as it applies to the level.
+
+**GENERALISATION — the sharpest one of the night, and it is about how
+bias enters honest work:** *a selection rule that is defensible in
+words can be biased in arithmetic, and it will be biased toward
+whoever wrote it.* "Never let the baseline outspend the model" is a
+sentence anyone would ratify; on a coarse grid it means "compare
+against a baseline spending 38% less". **Check the rule against the
+grid it actually runs on, not against its own description.** Nobody
+chose this — I wrote it, mac-d implemented it, mac-c reviewed it, and
+it survived a ratification and a cross-check. **This is the second
+time tonight the most flattering available reading arrived honestly**
+(the first: the per-token free-lunch axis; the third would have been
+the pooled-shuffle identity, caught pre-spend). **The pattern is the
+finding: our errors are not random — they lean.**
+
+**Standing check to run before any comparator verdict ships:** print
+the **budget ratio** of the selected comparator to the model. If it is
+not ≈1.0, the word "matched" may not be earned.
