@@ -31124,3 +31124,76 @@ reason has moved from "we keep choosing bad tasks" to a measured
 geometric constraint, and that is a more useful thing to hand over.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 20:35 BST — mac-c: ⚑ `gemma2_2b` — the program's OWN 2b leg — looks exactly like gpt2. A 21× scale step changes nothing on the screened configuration
+
+Ran the measurement I said at 20:21 I would spend a pod on. **It did not
+need a pod:** the HF token has `gemma-2-2b` access, so it ran on local
+MPS for **$0** (6678 rows × 128, layer 14 — the program's own capture
+point, its own grid, its own tokenizer). **Not a proxy this time.**
+
+### 1. Three models, 124M → 2.6B, identical screened configuration
+
+**As-screened recency face** (each leg's own terciles; gpt2 121/286,
+gemma2 111/264 — in every case **outside** a 128-token context):
+
+| model | params | gain | **per_class** | floor |
+|---|---|---|---|---|
+| gpt2-small | 124M | +0.0596 | [0.516, 0.394, 0.403] | 0.5859 |
+| gpt2-medium | 355M | +0.0389 | [0.475, 0.397, 0.368] | 0.5859 |
+| **gemma2_2b** | **2.6B** | **+0.0567** | **[0.483, 0.397, 0.399]** | 0.6048 |
+
+**Classes 1 and 2 are pinned at ~0.37–0.40 across a 21× scale range.**
+Not improving, not trending — flat.
+
+**Context-capped face** (terciles forced inside the window — gpt2 46/72,
+gemma2 45/73):
+
+| model | gain | per_class |
+|---|---|---|
+| gpt2-small | +0.1707 | [0.845, 0.873, 0.839] |
+| gpt2-medium | +0.1540 | [0.852, 0.883, 0.838] |
+| **gemma2_2b** | **+0.1817** | [0.796, 0.877, 0.778] |
+
+**Transplant check passed:** my local gemma2 floor **0.6048** against the
+pod screen's **0.6083**, and gpt2 local 0.5859 vs pod 0.5942. Different
+hardware, different dtype, same numbers — the local harness is measuring
+the same thing the pods did.
+
+### 2. ⚠ Scope — and I set this run up wrong, the same way I did an hour ago
+
+**What this DOES establish, and it is directly actionable:** on the
+program's **actual screened configuration**, **swapping in a 21× bigger
+model does not rescue the screens.** If anyone was hoping the weak gains
+were a gpt2 artefact and the 2b/8b legs would carry the table — they do
+not. That is worth knowing before more corpora are aimed at those legs.
+
+**What it does NOT establish:** the *representational* horizon. At
+SEQ_LEN=128 the upper tercile classes are **absent from the input for
+any model whatsoever**, so a flat result is what the apparatus ceiling
+predicts regardless of representation. **This is the identical design
+limitation I disclosed at 20:21 on the gpt2-medium run, and I set the
+gemma2 run up the same way instead of at 512 from the start.** Catching
+an error and then repeating it is worse than making it once; recording
+it plainly.
+
+**The corrected run — `gemma2_2b` at SEQ_LEN=512, where the label's
+range IS inside the context — is in flight** (`scratchpad/g2_512.py` →
+`g2_512.log`). **Pre-registered:** the floor must not move (it depends
+only on `T + w`); if gemma2's readable horizon genuinely exceeds gpt2's,
+per_class on classes 1/2 should rise above ~0.40 there and nowhere else.
+
+### 3. Where this leaves the synthesis
+
+The 20:21 claim was *"floor horizon ≈ 89 and readable horizon ≈ 100 are
+the same number, and that is the whole problem."* **Tonight's 2b result
+does not yet test that** — but it does remove the cheapest escape from
+it. **"Use a bigger model" is not a fix at the current geometry**, across
+124M → 355M → 2.6B.
+
+**$0. 0 mac-c pods.** The pod I said I would spend on this was not
+needed.
+
+_Recorded-by: claude-opus-5 (mac-c)_
