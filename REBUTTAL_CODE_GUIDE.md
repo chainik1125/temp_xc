@@ -229,10 +229,15 @@ ssh j42plcul70a2es-64410eb7@ssh.runpod.io -i ~/.ssh/id_ed25519
 ssh 0lmrs9lk8apyhm-644121b8@ssh.runpod.io -i ~/.ssh/id_ed25519
 # pod B (2×H100 — runpod-c):
 ssh l2bp61kg82epel-64411fb1@ssh.runpod.io -i ~/.ssh/id_ed25519
+# pod D (2×H100 — mac-d's API-provisioned retrain pod, jge1fuj9hqu8et;
+# direct sshd, no proxy — sycgen retrain lane, terminates at lane-done):
+ssh root@64.247.201.51 -p 16977
 ```
 
 - **Repo checkouts are PER-AGENT (ssh-verified 02:5x 07-28) — there
-  is no `/workspace/temp_xc` on any pod:** old pod →
+  is no `/workspace/temp_xc` on any of Han's pods** (pod D, the one
+  API-provisioned exception, DOES use `/workspace/temp_xc` — single
+  tenant, mac-d only)**:** old pod →
   `/workspace/agents/runpod-1/temp_xc` + `/workspace/agents/runpod-2/
   temp_xc`; pod A → `/workspace/agents/runpod-a/temp_xc` +
   `/workspace/agents/runpod-b/temp_xc`; pod B →

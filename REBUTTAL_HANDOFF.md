@@ -158,16 +158,19 @@ carries the row-level label.
   (LOG 02:28, `task_hunt/sycgen/results/*.json`). The pre-authorized
   **matrix retrain is RUNNING** on mac-d's 2×H100: **36 cells,
   T {1,2,4,8,16} × seeds {42,1,2} × shuffle overlay, btk-only arm
-  (either-arm rule; card 74d260321 + §5 T-axis amendment, LOG
-  02:54).** T-axis disclosure: T{6,10} cannot tile this eval's
+  (either-arm rule; card 74d260321 + §5 T-axis amendment 90c89f294,
+  LOG 02:54).** T-axis disclosure: T{6,10} cannot tile this eval's
   frozen L=32 window (`eval_window_L % T == 0`; ValueError receipts
   kept for all 12 doomed cells, ≈$2 burn disclosed) — the axis is
   IDENTICAL to the delivered λ̂ exhibit's (item 4), not a coverage
-  retreat. Shard0 (untrained half) DONE; shard1 ETA ~03:35–03:55 →
+  retreat. Shard0 (untrained half) DONE 18/18-amended; per-token T1
+  anchors landed r=0.470/0.487/0.489; shard1 ETA ~03:35–03:55 →
   overlay → **fig+table in `figs_writeup/` plausibly by ~04:30,
-  comfortably before 11:00** (fallback: amendment window). Rows land
-  on the canonical leaderboard under
-  `datasource=sycgen_real_age_llama31_8b_l14`.
+  comfortably before 11:00** (fallback: amendment window; renderer
+  pre-written + fixture-tested, 1618b5a7a). Rows land on the
+  canonical leaderboard under
+  `datasource=sycgen_real_age_llama31_8b_l14`,
+  `eval_cfg.retrain_tag=sycgen_keep_r1`.
 - **Item 7 = evalage, CANDIDATE (screens pending):** corpus v1
   COMPLETE (400 docs / 2.04M tokens, claude-haiku, both card gates
   pass, HF-pushed w/ sha receipts) + **6/6 label-side bands PASSED**
@@ -186,7 +189,8 @@ carries the row-level label.
 - **For the 13:00 submission:** item 6 is quotable NOW as "first
   dedicated safety-relevant task passed all screens; full T-sweep
   running, exhibit expected before the deadline" — with the exhibit
-  itself landing by ~07:00–08:00 if the retrain drains on schedule.
+  itself landing by ~05:00 if the retrain drains on schedule
+  (renderer pre-written + fixture-tested, 1618b5a7a).
   Item 7 + further candidates: "results follow within the amendment
   window (Aug 3)."
 

@@ -18206,3 +18206,31 @@ lines carry the same discipline.
 The screen entry to follow will be stamped this way.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## [2026-07-28 03:07 London] mac-d: hub-doc sync — HANDOFF item 6 amended-state refresh + guide § 5a pod-D row (race with fab7c861f, 4 min)
+
+The hub's 02:58 post-compact bundle raced my 02:54 amendment push;
+two surgical corrections on my own lane's facts:
+
+- **HANDOFF item 6**: 48-cell/7-T/drain-05:30–06:30 → **36-cell,
+  T {1,2,4,8,16} (card § 5, pins 74d260321 + 90c89f294), drain ETA
+  ~04:00–04:15, exhibit ~05:00** (renderer pre-written +
+  fixture-tested 1618b5a7a). The quotable-NOW sentence itself is
+  UNCHANGED — still true under amendment. Shard0 receipts + T1
+  anchor values added.
+- **Guide § 5a**: pod-D row added (direct sshd `root@64.247.201.51
+  -p 16977`, no proxy; single-tenant mac-d; terminates at
+  lane-done) and the "no `/workspace/temp_xc` on any pod" claim
+  scoped to Han's pods — pod-D legitimately uses
+  `/workspace/temp_xc`; an agent ssh-ing there per § 5a would
+  otherwise look in a nonexistent per-agent path. LOOK-DON'T-TOUCH
+  applies to my pod like the others.
+- **Census note for the hub**: § 1b known-gaps lists "RLHF btk
+  T{6,10} (x6/x10)" as fillable — same eval-L divisibility check
+  flagged at 02:54 applies to that lane; if their L is 32 those
+  cells cannot exist and the census gap is permanent-by-design
+  (their card owner's call, not mine).
+
+Ratification of sycgen KEEP (fab7c861f § 4) acknowledged — the
+retrain premise is now hub-confirmed. PTR on these doc edits.
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_
