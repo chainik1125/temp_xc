@@ -29336,3 +29336,58 @@ regenerated.
   recommendation.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 16:00 London (date-verified 15:00 UTC) — mac-local (hub): ⚑ **MY ERROR — I pushed `REBUTTAL_HANDOFF.md` to origin WITH AN UNRESOLVED CONFLICT MARKER.** Fixed; mac-d's block kept over mine.
+
+### 1. What I broke, plainly
+
+My 15:5x push landed `REBUTTAL_HANDOFF.md` on origin containing a live
+three-way conflict — `<<<<<<< HEAD` at line 162, `=======` at 206,
+`>>>>>>>` at 249 — because mac-d and I wrote the final pf § 3 block at
+the same time.
+
+**Root cause is in my own push recipe.** The keep-both healer in my
+retry loop only ever touched `LOG.md`; when the rebase conflicted on
+the HANDOFF I ran `git add` + `rebase --continue` and **committed the
+markers**. **The deliverable surface Dmitry reads was broken on origin
+for ~4 minutes.** Nobody caught it but me, and only because I ran a
+marker count afterwards — which I do for the LOG and had not been doing
+for the HANDOFF.
+
+**Fixed:** markers 0, one pf figure embed, one GRID COMPLETE block.
+
+### 2. Resolution: I kept mac-d's block and dropped mine
+
+Not a merge — **theirs is simply better**, and the honest call is to
+say so rather than splice my sentences into it. Theirs carries
+everything mine had plus:
+
+- **ordered means alongside gaps and `l0` in one table**, so a reader
+  sees the level and the effect together;
+- the **11/15 negative** aggregate line;
+- a **scope caveat** mine lacked — *"15 cells at one k, one layer, one
+  substrate, 8000 steps — not 'shuffling has no effect' in general"*;
+- **both upstream deviations disclosed on the figure itself**;
+- and the sentence that should survive this whole day:
+  *"editing the paper's architecture to manufacture a cell the paper
+  never had is the trade this arm exists to refuse."*
+
+Their T10 third-seed phrasing is also sharper than mine: **−0.00003,
+"a sign with no magnitude behind it."** (Our sign strings differ only
+in seed ordering — same multisets, both correct.)
+
+### 3. Recipe fix, adopted now
+
+**The marker check applies to EVERY file a push touches, not just the
+LOG**, and the keep-both healer must not be trusted to cover files it
+was never written for. Concretely, before any push:
+`grep -c '^<<<<<<<' $(git diff --name-only origin/arxiv HEAD)` must be
+**0 across all of them**, and a conflict in a *deliverable* file is a
+**stop-and-resolve-by-hand**, never a `rebase --continue`.
+
+This is the third time today that a guard existed but did not cover the
+case that fired — thread budget vs the pod image, `chmod` vs FUSE, and
+now a conflict healer vs the file it was not written for. **A guard is
+only as good as the surface it is pointed at.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

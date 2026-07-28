@@ -159,7 +159,6 @@ panel — directly comparable to the btk figs above):**
 
   ![rlhf-pf](figs_writeup/fig_rlhf_shuffle_tsweep_pf.png)
 
-<<<<<<< HEAD
   **`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` — GRID COMPLETE
   (15/15), uniform 3 seeds at every T.** Paper-faithful RLHF figure,
   plus the three corrected T5 anchors as a separate marker (eval-only
@@ -203,50 +202,6 @@ panel — directly comparable to the btk figs above):**
     effect" in general. Two upstream deviations are disclosed on the
     figure itself: **no gradient clipping** (upstream clips at 1.0) and
     rows recording `precision: bf16` while **training is fp32**.
-=======
-  **`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` — GRID
-  COMPLETE, 15/15 cells, uniform 3 seeds at T{2,4,6,8,10}**, plus the
-  three corrected T5 anchors as a separate marker (eval-only upstream
-  weights, excluded from the sweep mean by `train_key` per ruling
-  d744f7c52 — never spliced into the curve).
-
-  **Shuffle gap (ordered − shuffled), `preference_auc_k20`:**
-
-  | T | n | mean | sd | seed signs |
-  |---|---|---|---|---|
-  | 2 | 3 | +0.00403 | 0.00924 | `+ − +` |
-  | 4 | 3 | −0.00366 | 0.00168 | `− − −` |
-  | 6 | 3 | +0.00037 | 0.00458 | `− − +` |
-  | 8 | 3 | −0.00438 | 0.01053 | `+ − −` |
-  | 10 | 3 | −0.01029 | 0.00992 | `− − −` |
-
-  **Whole grid: mean −0.00279, sd 0.00839, t = −1.29, df 14,
-  p = 0.219 — NOT significant. |mean| is 0.13× the anchors' own
-  seed-to-seed scatter (0.0209).**
-
-  **⚑ BINDING VERDICT — the paper-faithful arm shows NO order effect
-  at any T measured.** The largest per-T effect (T10) is 0.49× its own
-  noise and does not reach significance at n=3. **This matches the
-  BatchTopK arm** ("gaps ≈ 0 at every T ≤ 8") — **two independent
-  arms, same null.**
-
-  **No T-trend claim is licensed.** T8 is sign-mixed and sits *between*
-  T6 and T10, so monotonicity is broken mid-range; two all-negative T
-  values out of five is a **P = 0.12** coincidence (sign-consistency at
-  n=3 is a 1-in-4 shot per T, run five times). Verdict resolved against
-  a threshold pre-registered before the deciding cell landed
-  (hub 15:3x/15:5x).
-
-  **Independent port-fidelity check: `l0 = 100·T` exactly at every T**
-  (200/400/600/800/1000) — the paper's window budget is honoured
-  cell-for-cell.
-
-  **T1 and T16 are absent by design, not by shortfall:** upstream's
-  T-sweep archs are `t2,t3,t6,t7,t8,t10,t15,t20` — **neither `t1` nor
-  `t16` exists upstream** (T1 additionally hits an einsum degeneracy in
-  `agentic_txc02.encode`). Both T values are covered by the BatchTopK
-  arm at 3 seeds.
->>>>>>> ad841c4d3 (mac-local HUB: pf GRID COMPLETE 15/15 — recomputed mac-d's statistics from the leaderboard, exact (whole-grid mean -0.00279, sd 0.00839, t=-1.29 df=14 p=0.219 NOT significant, 0.13x seed scatter; uniform 3 seeds at T{2,4,6,8,10}). T8 landing SIGN-MIXED between T6 and T10 closes the trend question for good — monotonicity broken mid-range, not at an arguable endpoint. HANDOFF sec 3 updated to FINAL: complete table, whole-grid statistic, binding no-order-effect verdict with pre-registration provenance, l0=100*T port-fidelity check, T1/T16 absence framed as fidelity (upstream has neither arch); interim n=1/seed-mixed caveat retired. Item 3 complete on BOTH arms. Census regenerated)
 
   *(ii) Three things the 13:0x block got wrong, corrected here
   because each was load-bearing:*
