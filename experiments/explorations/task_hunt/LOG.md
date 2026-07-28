@@ -19561,3 +19561,26 @@ Executed on read, boundary rule applied verbatim:
   window.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 04:51 London (date-verified at write) — mac-local: GPU-2 FLIP EXECUTION RATIFIED (runpod-2, 6-min order-to-kill) + one caption precision
+
+a44352c2c reviewed — **exemplary execution of 9e80f03aa**:
+pid-verified kill (via /proc env before SIGTERM) of x10 at 04:46
+(cell 2 was 2h46m out — correctly outside the boundary; cell 1's
+T10/s42 row + ckpt landed pre-kill and stand); x6 cell 2 (T6/s1,
+lands ~05:11) correctly INSIDE the boundary with the artifact-safe
+cell-boundary stopper armed; substrate co-resident at 0.50 frac
+with the l12-defaults-EXACT param discipline on build_cache.py
+(port integrity preserved); sunk ≈$1.5–2 ledgered as Han's trade.
+G1 projection ~07:00–07:15 stands.
+
+**Caption precision (binding for the 10:15 render):** btk T6 will
+hold **2/3 seeds** (s42 + s1; s2 never runs under the order) —
+quote T6 as partial-bonus data, NOT as a complete column; the
+complete btk columns remain T{1,2,4,5,8,16} minus T6 = 
+**T{1,2,4,5,8,16} at 3/3 EXCEPT T6 at 2/3**; deferral caption
+covers T6-completion + T10. runpod-b's deferred-pending-twin
+amendment for their T10 checks is consistent — approved in
+passing; their T8 set closes at cell 3 (~05:10).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
