@@ -1,146 +1,102 @@
-# mac-local STATUS — PRE-COMPACT SNAPSHOT #2 (2026-07-28 ~02:40 London, date-checked)
+# mac-local STATUS — PRE-COMPACT SNAPSHOT #3 (13:13 London 07-28, date-checked)
 
-**I am mac-local: hub/orchestrator/reviewer.** Stamp from `date`
-(multiple drift corrigenda on record; commit order authoritative).
-**Post-compact: read THIS file, then the LOG tail from `1065b26cf`
-(deliverables matrix) forward.** The deliverable surfaces are
-`REBUTTAL_HANDOFF.md` + `REBUTTAL_CODE_GUIDE.md` (repo root — plots
-embedded, per-item pointers, fleet map, formulas).
+**I am mac-local: hub/orchestrator/reviewer (no compute).** Stamp
+from `date` at write (interpolate, never pre-write — many
+corrigenda). **Post-compact: read THIS, then the LOG tail from
+~12:30 forward** (the pace-anomaly → substrate-verdict arc).
+Deliverable surfaces: `REBUTTAL_HANDOFF.md` + `REBUTTAL_CODE_GUIDE.md`
++ `REBUTTAL_CELL_CENSUS.md` (regen: `scripts/cell_census.py --write`).
 
-## ⏰ DEADLINES
-Exhibits READY 11:00 BST TODAY; submission 13:00 BST; responses
-amendable to Aug 3. Dmitry drafts from the HANDOFF + CODE_GUIDE.
+## ⚑⚑⚑ HAN'S POST-COMPACT ORDER #1 (13:5x, binding)
+**"Orchestrate RLHF missing cells, MAX THROUGHPUT."** = (a) the
+pf grid: 21 cells `agentic_txc_02` port on **base-l12** (A/B
+SETTLED 13:5x: FVU 0.0036 vs 0.0367 — card §8's l13-IT premise
+FALSE; l12 caches present, registry tag `l12base_phase7`; the 9h
+pilot VOID; mismatched T5 anchors RETRACTED); (b) deferred btk
+T6/s2 + T10/{s1,s2}. Sequence: runpod-2 relaunches pilot on l12 →
+convergence vs upstream T5 log (upstream converged 5.8k; if ours
+tracks, adopt upstream stopping ⇒ ~4× fewer steps) → G1 → wave-1
+s42 (7 cells) → waves 2-3. **Map (31930ad8c): T16 = old-pod GPU 0
+SINGLE-TENANT (≥72 GiB); old-pod GPU 1 = 1 lane; pod B = 2×2
+lanes (runpod-c; 1.82× measured; needs l12 cache install —
+hardlink installer, minutes).** Launcher = `agents/runpod-a/
+run_pf_grid_lanes.sh` (fleet property: per-T GPU_FRACTION from
+measured peaks 3.6→39 GiB + T16≥72; packing guard; thread budget
+OMP=quota/lanes — the 2.3× oversubscription trap is an IMAGE
+property). Cost model MEASURED: feed-bound 818 MiB/s = 95% wall,
+T-independent, ~213 GPU-h pre-levers; fp32→fp16 feed = ~2× prize
+(post-G1, equivalence receipt). 12-lane ~1.0×/lane measured (no
+bandwidth ceiling; memory+cores bound only).
 
-## ⚑ HAN'S FINAL PRIORITY ORDER (02:38 LOG entry, binding)
-1. **PAPER-FAITHFUL {ReLU+TopK} probing + RLHF sweeps = TOP.** btk
-   work YIELDS on any GPU contention (incl. x6/x10 — runpod-2
-   sequences and states the call). btk renders CPU-side, fine.
-2. Hunted tasks (#4-7): EITHER arm suffices — no arm-doubling.
-3. Hunt continues (mac agents only); slots 6/7 = "the gold".
-4. Width-match: DONE. Pointer blocks: DONE.
-**Matrix arm mapping (Han-pinned): {BatchTopK} = btk-only (NO ReLU
-— the delivered sweeps); {ReLU+TopK} = paper-faithful (the sprint);
-relu-mix = certificate evidence ONLY, never a matrix column.**
+## DELIVERABLES SCOREBOARD (Han's 7 + extras; submission delayed past 13:00 — NeurIPS rule change, no hard deadline; amendable to Aug 3)
+1+2. Probing k5/k20: **COMPLETE BOTH ARMS** — btk FINAL figs
+  (+38task twin) + pf FINAL 7-pt figs (`_pf_k{5,20}`) embedded;
+  E1-E3 gates passed (E3 = archived anchors interpolate). Tables =
+  actmix RESULTS files (HANDOFF pointers fixed).
+3. RLHF: btk = 10:15 checkpoint render SHIPPED (T{1,2,4,5,8,16}×3s
+  + T6 2/3; deferral caption). pf = THE order-#1 lane above.
+  Both-arms = RM_CERTIFICATE v1.0 (rmx_b 6/6; T10/s42
+  tensor-grade). **T=5 SANITY: PASS** (published 0.899-0.902 =
+  38-task trapezoid; ours 0.9007; RLHF papermatch = 16-digit).
+4. λ̂ COMPLETE. 5. dq COMPLETE (toy-class).
+6. sycgen: DELIVERED (KEEP 3/3 → 15/18 FINAL, plot+table embedded,
+  twin-control quote-form v2 binding — level story, NOT order).
+7. OPEN: struqpos = sound KILL 3/3 (C1 proximity; salvage
+  amendment); evalage WEAK; retryesc_gen = mac-c SILENT ~9h (Han
+  may reassign; mac-e recommended, not yet spawned).
+Extras: T-SAE width DONE. **⚑ CAMERA-READY ERRATUM found: paper
+caption/prose say 36-task but plotted fig = 38-task (receipts:
+trapezoid 0.9007∈[0.899,0.902] on 38; 0.9334 on 36; appendix §c3
+admits 38). One-word amendment fix recommended — Dmitry's call.
+PANEL PIN: rebuttal figs = 36; never cross-quote (offset ~+0.03
+T-invariant ⇒ verdicts panel-invariant).**
 
-## THE PAPER-FAITHFUL SPRINT (live)
-- **Probing: CARD_PAPER_FAITHFUL FROZEN + RATIFIED (d9235755b,
-  02:39)** — `paper_txc_base_v1t` plugin = vendored 94119bc08
-  training stack VERBATIM + v2 wrapper, 8/8 contract tests, arm
-  'paper-faithful', **21 cells (7T×3 seeds; archived T5 anchors
-  separate)**, 5-GPU shard split T1/T2-last. **LAUNCH ORDERED** —
-  shards: runpod-1 GPU 0 (free), runpod-a GPU 0 (preflight PASS
-  zero-sync), runpod-c both GPUs (freeze-receipts PENDING — chase
-  if silent), runpod-b at rmx_b drain. ETA ~06:30-07:30. Per-cell
-  HF ckpt push.
-- **RLHF: agentic_txc_02 port (runpod-2)** — ETA ~04:00-04:30 for
-  plugin+tests+card; grid $90-110 APPROVED; pilot cell +
-  shardable lanes in-card; grid on GPU 2 (x6/x10 yields per Han).
-  Paper's RLHF arm = agentic_txc_02 = MatryoshkaTXCDRContrastive-
-  Multiscale (audit §6; VERIFY task #11 post-compact — load-
-  bearing on every RLHF caption; failure ⇒ pull disclosure).
-- Composition formulas + labeling rule (v2 columns never "paper
-  base"; archived T5 anchor row separate) — in CODE_GUIDE §1.
+## FLEET (burn $14.95/h)
+**OLD POD** ($8.97, Han's, 3×H100; runpod-1 + runpod-2 aboard):
+GPU 0 = reserved T16 single-tenant; GPU 1 = wave-1 lane; GPU 2 =
+pilot relaunch venue. **POD B** ($5.98, "t_scaling_hillclimb" =
+its account name; runpod-c aboard): 2×2 wave lanes at 1.82×;
+l13-IT substrate saga MOOT (l12 is the cache). **POD A TERMINATED**
+(204→404 receipts; runpod-a/b closed clean, no objection, 20/20
+durable; launcher preserved). mac-d = alive (renderer
+wave-1-verified; L40S + pod-D terminated). mac-c = SILENT.
+G2 INCIDENT re-review assigned runpod-1 (why did an
+ordering-gate pass on the wrong substrate) — amendment window.
 
-## DELIVERABLES STATE (items 1-7 + extras)
-1+2. Probing k5/k20: btk arm COMPLETE at 7 T-points (T10 s1/s2
-  landed overnight); paper-faithful arm = the sprint above;
-  7-point btk renders + tab_*.md tables = runpod-1 CPU-side.
-3. RLHF: btk T{1,2,5,8,16} done; T4 done (x4); x6/x10 mid-run
-  (yields on contention); relu-mix arm = DONE-BY-CERTIFICATE
-  (tensor-identical through T16, 829f05070) + rmx_b eq-extension
-  points (1/6 in: T8/s42 = 7/7 EQUAL; torch.equal relay amendment
-  approved); paper-faithful arm = the port.
-4. λ̂: COMPLETE (fills done; caption flags: T6-below-T4 dip,
-  T10 seed-fragility VENUE-LOCALIZED; R30 both-arms + T16
-  spot-check twin landed).
-5. dq: COMPLETE (fills on-plateau; toy-class, screen-shuffle
-  disclosed; idle-only forever).
-6+7. THE HUNT (mac agents): **sycgen** = screen GO issued (within-
-  domain frame binding, per-token baseline first) on mac-c's warm
-  L40S; **evalage** = 6/6 label-side bands PASSED (unigram 0.586
-  vs 0.60 — retryesc's killer beaten by design; harness thesis
-  measured) — NOT a KEEP until probed; 3-tokenizer gap closing via
-  mac-d's screen_grids.py transplant (verify 1,542 events/leg,
-  gap median ~862); **retryesc_gen** = design (mac-c);
-  **StruQ** = runpod-a $0 premeasures under OUR bars (Dmitry's
-  steering-screen GO ≠ our instrument; structural vocab-leak note;
-  task encouraged, steering METHOD parked). **First KEEP ⇒ mac-d's
-  warm 2×H100 retrain within the hour (either-arm now).**
-  mac-d pod = hunt-EXCLUSIVE (Han reversed my borrow).
-8. tsae width: COMPLETE both tasks + quote-form (LOG 00:18).
-9. Certificates: probing onset map (identity = sae+preT1;
-  divergence T2+ growing; T8 sign-flip; census-vs-trace lemma —
-  traces = bounds not counters; morning: 3-seed map + traces +
-  certificate); RLHF identity through T16 (boundary_min_pre ≥
-  2.21; refutation disclosed); A5b rmx_a cancelled-with-
-  certificate + auto-re-open.
+## HOUSE RULES ADDED TODAY (post-04:00)
+Liveness = /proc receipts, never GPU-samples+log-size (pilot
+misdiagnosis owned); venue-readiness = ARTIFACT receipts
+(bytes/manifest), never process state (my stage-B HF_TOKEN
+omission owned — launcher owns the completion check); explicit-
+path commits while canonical jsonl live; no blind add -A rebases;
+stamps interpolated at write; watcher = own run_in_background
+call, NEVER inline & (two strays tonight); single instance,
+liveness-check before arming; gold-visibility (KEEP → HANDOFF
+same-beat); artifact-vs-subject-line: artifacts win.
 
-## FLEET (see CODE_GUIDE §5 fleet map)
-old pod: r1 GPU0 free→shard, GPU1 night-tail→shard, GPU2 x6/x10→
-RLHF-pf grid. Pod A: r-a GPU0 shard (armed), r-b GPU1 rmx_b→shard.
-Pod B: runpod-c FREEZE-AND-JOIN ordered (clean-halt pattern,
-resume playbook, ckpts to HF) → both GPUs to shards; receipts
-pending. mac-c-screen-0728 (L40S) warm = screens. mac-d-retrain-
-0728 (2×H100) warm = hunt-KEEP only. Hill-climb FROZEN (program-
-best T16 k20 0.9251 r1-min; T1 collapse = open; C4 pre-registered;
-resume post-rebuttal).
+## OPS
+Watcher `scratchpad/watch_origin.sh` run_in_background, re-arm
+after each fire. Push recipe: explicit-path commit + retry loop w/
+LOG keep-both python + rebase-aware healing (dedupe check: entry
+appears once). Pods: old=j42plcul70a2es, B=l2bp61kg82epel, both
+@ssh.runpod.io -i ~/.ssh/id_ed25519 (piped-PTY + grep -av 2004;
+single-line cmds; base64-ship scripts; scp works direct-IP only).
+RunPod API = `dmitrys-runpod-api-key` (mac-only): DELETE
+/v1/pods/<id> = terminate. Ledger: scope ruling 13:0x (agent-spun
+vs Han-provisioned); $300 gen cap standing; tokens rotate
+post-weekend.
 
-## KEYS / BUDGET
-Generation backend = `dmitry-mats-claude-api-key` (VERIFIED LIVE;
-mac-only, env-inject, never pods). `dmitry-mats-openai-key` = 401
-staged (stored 128B never changed; -U re-add awaited). Han's
-`anthropic-api-key` = WITHDRAWN (personal; usage was 2 verify
-calls ~$0.001). $300 generation shared cap (~$50-70 committed);
-$500 aggregate (~$200 spent). RunPod balance was $1,267. All
-tokens rotate post-weekend.
-
-## HOUSE RULES ADDED TONIGHT
-Twin diffs join on train_key provenance + surface duplicates
-(never last-write-wins); only keyed twin diffs, never band
-summaries; alias exclusion list (RM_EQUIVALENCE.md) binding;
-positive-control rows filtered from aggregations; smoke-check
-runnables at review; .agent_id never tracked; checkpoint clause
-BLOCKING in generation cards; corpora + ckpts to HF at lane
-completion (ckpts/<train_key>/, LFS sha receipts); warm-holds
-carry stated purpose, hub sweeps; torch.equal where buffers
-differ; stamp from date BEFORE writing (many corrigenda).
-
-## WATCHER / OPS
-SESSION-scratchpad `watch_origin.sh`; run_in_background ONLY —
-NEVER inline `&` (three failures tonight); ONE instance at a time
-(pkill strays if echoes pile); exit 0 = arxiv push, empty
-HEAD..origin = echo. Conflict recipe: python keep-both + marker
-grep (anchored ^<<<<<<< = 0 baseline). Push-retry loop w/ resolve.
-Pods: old=j42plcul70a2es-64410eb7, A=0lmrs9lk8apyhm-644121b8,
-B=l2bp61kg82epel-64411fb1 (repo at /workspace/agents/runpod-c/
-temp_xc on B!), mac-d pod=jge1fuj9hqu8et; all @ssh.runpod.io
--i ~/.ssh/id_ed25519, PTY piped-stdin, grep -av 2004.
-
-## ⚑⚑⚑ OVERNIGHT WATCH (Han ASLEEP from ~04:40; charter cb3e34973 + gold-rule 0a2a203e8)
-**Han's four orders: (i) sycgen complete + handover updated;
-(ii) hunt CONTINUES; (iii) PAPER-FAITHFUL probing+RLHF finish =
-PRIORITY; (iv) code handover periodically updated. PLUS: any gold
-task → VISIBLE IN REBUTTAL_HANDOFF same-beat (partial embeds w/
-honest stamps — sycgen = the template).**
-Night state at 07:25: **PROBING PF GRID COMPLETE 21/21** (last 3
-cells hub-repatriated from dead runpod-c's pod-B clone via the
-HF channel — receipts LOG ~07:1x; renders GO at runpod-1). Han's
-04:4x re-prio executed: RLHF pf > btk ABSOLUTE (x-lane killed w/
-receipts; btk T{6,10} deferred, T6=2/3 partial-bonus). RLHF pf:
-pilot RUNNING on GPU2 (CPU-phase reads 0% GPU — /proc = liveness,
-my takeover misdiagnosis owned in LOG; pin-guard prevented
-collision), G1 next, pod-B = relief venue (hub rebuilt substrate
-stage A✓/B running; ckpts of repatriated cells pushed by hub).
-sycgen: FINAL-at-15/18 declared (tsae abandoned-disclosed; pod-D
-TERMINATED 07:01, ~$38). struqpos (item-7 #2): premeasure+
-expansion PASSED all bars (floor unmoved), screen protocol frozen
-w/ my 3 pins, RUNNING on mac-d's L40S ($0.99/h). evalage WEAK
-(closed). mac-c retryesc_gen = roll-call still unanswered.
-runpod-c session DOWN (their cells all finished first). 45-min
-heartbeat adopted fleet-wide. My remaining gates: probing renders
-review → HANDOFF; G1/grid watch; **10:15 RLHF checkpoint render**;
-**10:30 FULL final pass**; **11:00 readiness message**. Quote-forms
-binding: sycgen v2 (level story; twin control), k5 seed-spread
-flag, RLHF 21:10/22:28 forms, T6-partial/T10-deferred caption.
+## POST-COMPACT CHECKLIST
+1. **ORDER #1: RLHF missing cells, max throughput** (above; watch
+   runpod-2's l12 pilot relaunch + convergence verdict + wave-1
+   launches; fill every idle lane; levers on receipts).
+2. Review-on-push beats (watcher); ratify/bounce; census regen at
+   landings; HANDOFF/GUIDE re-stamps at milestones; gold-visibility.
+3. Item-3 HANDOFF: add pf-RLHF fig embed slot at first render
+   (mac-d flagged none exists); T5-anchor-inline = runpod-2 call.
+4. mac-c decision w/ Han (retryesc_gen reassignment / mac-e).
+5. G2 re-review (runpod-1) lands amendment-window.
+6. Final full-surface pass + readiness message when Han sets the
+   submission time.
 
 *Rewrite before any compact.*

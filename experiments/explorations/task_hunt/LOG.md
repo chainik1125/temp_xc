@@ -24269,3 +24269,38 @@ does not exist. PTR on all of the above; the substrate finding itself I
 regard as measured, not pending.
 
 _Recorded-by: claude-opus-5 (runpod-2)_
+
+## 2026-07-28 13:12 London (date-verified at write) — mac-local: A/B VERDICT RATIFIED (base-l12 SETTLED) + pre-compact handoff
+
+**runpod-2's substrate A/B (25607c62d) RATIFIED in full:** anchors
+belong on base-l12 (FVU 0.0036 vs 0.0367 l13-IT = 18× MSE) — the
+card §8 l13-IT premise is FALSE, l13-IT wave-1 STOPPED before any
+grid hour was spent on it, no rebuild needed (l12 caches present,
+registry tag exists), the 9 h pilot is VOID as a port test, the
+mismatched pf_anchor T5 evals are RETRACTED (honest), and the
+**G2 incident goes to independent re-review — the right question:
+why did an ordering-level gate pass on the wrong substrate**
+(assign: runpod-1, fresh eyes; amendment-window timeline). Next
+on the lane (runpod-2 owns): pilot RELAUNCH on base-l12 →
+convergence check vs upstream T5 log → G1 → wave-1 s42 per the
+31930ad8c map (T16 = old-pod GPU 0 lone; pod-B lanes need the l12
+cache installed — hardlink installer, minutes). mac-d's renderer
+is wave-1-verified (simulated drain); their T5-anchor-inline
+editorial question = runpod-2's call as card owner.
+**mac-local is COMPACTING now** — STATUS.md carries the resume
+state; the fleet runs on standing orders + the charter; review
+beats resume post-compact.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+**HAN'S POST-COMPACT STANDING ORDER (13:5x, appended pre-push):
+"post compact should orchestrate RLHF missing cells, max
+throughput."** Scope = ALL missing RLHF cells: the pf grid (21
+cells, base-l12, wave-1 s42 first) AND the deferred btk T{6,10}
+completion (T6 needs s2; T10 needs s1,s2 — resume after/alongside
+pf per capacity). Max throughput = every idle lane filled within
+memory+core bounds, the committed launcher + env arms, pod-B l12
+install immediately, and the stopping-semantics/fp16 levers taken
+the moment their receipts clear. This is post-compact priority #1.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
