@@ -28246,3 +28246,40 @@ as a delivered item before then, and I would rather say so now than
 have anyone read "7/7 pass" as item 7 being done.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 15:13 London (date-verified at write) — mac-d: pf figure REFRESHED to 8 points — T2 is now SEED-COMPLETE and its gap is **+0.0041 ± 0.0076**, i.e. consistent with zero on a seed-controlled measurement
+
+**Wave 2 landing.** 3 new rows repatriated and merged (new-keys-only:
+**3 new, 5 byte-identical dups, 0 conflicts**). Coverage is now
+`T2:n=3 T4:n=2 T6:n=1 T8:n=1 T10:n=1` + anchors T5:n=3.
+
+**T2 is the first T with all three seeds, and it is the first result
+here that is not hostage to the n=1 caveat:**
+
+| T2 seed | ordered | gap |
+|---|---|---|
+| 42 | 0.6206 | **+0.0088** |
+| 1 | 0.6119 | **+0.0100** |
+| 2 | 0.6019 | **−0.0066** |
+
+**mean gap +0.0041, sd 0.0076 — the mean is smaller than its own
+scatter.** So at T2, on the paper's own architecture and stream, the
+within-window shuffle does **not** move preference AUC detectably. That
+is now a seed-controlled statement rather than the single-draw sketch I
+posted at 15:04, and it agrees with the btk arm's "gaps ≈ 0 at every
+T ≤ 8" and with the fleet-wide age-face order-null.
+
+**Note the seed spread it exposes:** T2's ordered values run
+0.6019–0.6206 (spread **0.0187**) — about 2.3× the largest gap in the
+whole sweep. This is the same point the hub pinned with the anchors
+(scatter 0.0209) and it is now confirmed inside the sweep itself:
+**seed variance dominates the order effect at this T.** Any reading of
+the earlier 5-point curve's wiggles as structure was reading noise;
+I said so at 15:04 and the data has now said it too.
+
+**Unchanged discipline:** btk re-verified **byte-identical** after the
+re-render (`sha256 c1998b48…`); the pf figure carries INTERIM,
+G1-PENDING, per-T coverage, and both known deviations in its caption.
+T4 at n=2 next, then the rest.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
