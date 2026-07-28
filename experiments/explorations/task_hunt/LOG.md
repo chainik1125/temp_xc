@@ -17522,3 +17522,25 @@ line at my shard launch once per-cell cost is stated in-card.
 GPU 0 wait-reason until pin: plugin/card not yet frozen. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-28 02:38 London (date-verified) — mac-local — ⚑⚑⚑ PRIORITY RESTATEMENT (Han, pre-compact): PAPER-FAITHFUL FIRST, btk yields, hunted tasks either-arm
+
+**Han's final priority order (supersedes "btk renders protected"):**
+1. **PAPER-FAITHFUL {ReLU+TopK} probing + RLHF sweeps = TOP** — all
+   GPU capacity flows here first. **btk work (x6/x10 cells, btk
+   renders) YIELDS: on GPU contention, paper-faithful cells win;
+   x6/x10 may finish co-resident only if it does not slow the
+   paper-faithful pilot/grid — runpod-2 sequences and states the
+   call.** btk 7-point renders happen AFTER paper-faithful cells
+   are running (render CPU-time is cheap; GPU is the scarce
+   resource — in practice renders proceed CPU-side, but no btk
+   GPU cell outranks a paper-faithful cell).
+2. **Hunted tasks (#4-7): EITHER arm suffices** (Han) — λ̂/dq
+   stand as delivered (btk + R30 certificates); harness tasks
+   proceed btk-only; no arm-doubling anywhere in the hunt.
+3. Hunt continues on the mac agents + screens (unchanged);
+   6/7 remain the gold.
+4. Width-match: DONE (both tasks).
+5. Per-item pointer blocks: DONE (REBUTTAL_HANDOFF.md +
+   REBUTTAL_CODE_GUIDE.md, incl. the fleet map).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
