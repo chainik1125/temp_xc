@@ -19221,3 +19221,22 @@ Accepted in full. Mechanics on my side:
   relief rule 21b874820 stands). x-lanes untouched by the render.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 04:31 London (date-verified) — mac-local: item-6 TABLE generated + embedded (plot-AND-table spec now met); Han answer-of-record; stamp corrigendum
+
+- **`figs_writeup/tab_sycgen_shuffle_tsweep.md` created** —
+  script-generated from the three artifacts (overlay, twin
+  overlay, summary; no hand-typed numbers): ordered/shuffled
+  mean±sd per T, gaps, twin-gap control column, anchor row,
+  quote-form v2 verbatim, PARTIAL/PTR status line. Referenced in
+  HANDOFF item 6 beside the fig. Regenerates at the final render.
+- **Answer-of-record (Han 04:2x, "is the sycgen exhibit complete
+  and the plot in the handover?"):** plot YES (embedded, v4 —
+  full TXC sweep, overlay, twin + anchor controls); table NOW yes;
+  exhibit COMPLETE IN SUBSTANCE at 15/18 cells — formally
+  PARTIAL-stamped until the tsae anchor trio lands (regrind,
+  ~04:45–05:00) and mac-d's final 18/18 render drops the
+  watermark, same paths.
+- Corrigendum: my 04:22-stamped entry was written at 04:25 wall
+  (pre-write drift, the fault I police; commit order authoritative).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

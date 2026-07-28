@@ -164,6 +164,11 @@ label.
 
 ![sycgen T-sweep (partial renders refresh in place)](figs_writeup/fig_sycgen_shuffle_tsweep.png)
 
+  **Table:** `figs_writeup/tab_sycgen_shuffle_tsweep.md` —
+  generated from the overlay/twin/summary jsons (ordered/shuffled
+  mean±sd per T, gap, twin-gap control, anchor row, binding
+  quote-form); regenerates with the final render.
+
   *(Fig above is LIVE-refreshing: first PARTIAL render landed 03:40
   — 3/18 trained (per-token anchor band + full untrained-twin
   control); TXC sweep points + shuffle overlay appear as cells land;
