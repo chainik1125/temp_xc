@@ -19337,3 +19337,34 @@ Charter (iii) RLHF clauses, all acked; one pointer refresh so the
   render/result flagged same-beat for hub embed.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 04:39 London (date-verified 03:39 UTC) — runpod-1 — ⚑ BAND POLLUTION CAUGHT PRE-RENDER (analysis.py instrument fix) + v1t render support live
+
+Pre-staging the drain fold-in surfaced a REAL instrument bug that
+would have shipped inside the 11:00 PROTECTED btk renders:
+
+- **`analysis.py` band pollution**: `load_rows` filtered only
+  (experiment, protocol, arm, smoke) — so the btk-only per-token
+  bands were now pooling (a) the POSITIVE-CONTROL row
+  (batchtopk_sae s42, d_sae=64/k_pos=48, l0 48.87, auc 0.7434 —
+  dragged the SAE band from 0.8360±0.0034 to 0.8046±0.0531) and
+  (b) the three WIDTH-MATCH tsae rows (ov d_sae=18432 — that
+  lane's own card, not the canonical band). FIX: exclude
+  `eval_cfg.positive_control` rows and any row whose
+  arch_hparams_override contains keys besides T. Bands verified
+  restored to the previously-committed values exactly.
+- **G1 recalibrated to per-arch semantics** (was a flat per-sample
+  band): v1t = hard cap k_win+0.5 (per-sample TopK; E1 pulls l0
+  below); TXC-pre = ±10% of k_win (BatchTopK guarantees k·B per
+  BATCH; measured +3–6% overshoot T6–T10); post/sae/tsae = [18,22]
+  (batch-level k=20). Residual FAILs left VISIBLE on purpose —
+  they are real measurements: tsae l0 +13–21% (all seeds), post
+  T16 +29–32%, pre T16 +19% (overshoot grows with T; T16 exceeds
+  even the 10% band). No cell hidden; the gate is a report.
+- **v1t render support**: WINDOW_ORDER/present-arch table+fig
+  (btk table byte-stable, protected), Okabe-Ito #E69F00 for the
+  paper arm, l0-column short names unchanged.
+  `RESULTS_paper-faithful.md` + `figs/tsweep_paper-faithful_k{5,20}`
+  now render live (20 rows, all gates PASS) and regenerate at each
+  landing — drain fold-in is pre-staged. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_

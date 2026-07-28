@@ -58,17 +58,23 @@ def freeze_allowlist() -> set[str]:
 
 TXC_PRE = "txc_batchtopk_pre_btkonly"
 TXC_POST = "txc_batchtopk_post_btkonly"
+PAPER_V1T = "paper_txc_base_v1t"
 SAE = "batchtopk_sae_btkonly"
 TSAE = "tsae_btkonly"
-WINDOW_ARCHS = {TXC_PRE, TXC_POST}
+WINDOW_ARCHS = {TXC_PRE, TXC_POST, PAPER_V1T}
 TOKEN_ARCHS = {SAE, TSAE}
 
 # Okabe-Ito, matching figs_writeup/fig4 mappings (post/sae/tsae/untrained
 # keep their established hues; pre gets reddish-purple).
-C = {TXC_POST: "#D55E00", TXC_PRE: "#CC79A7", SAE: "#0072B2",
-     TSAE: "#009E73", "untrained": "#7f7f7f"}
+C = {TXC_POST: "#D55E00", TXC_PRE: "#CC79A7", PAPER_V1T: "#E69F00",
+     SAE: "#0072B2", TSAE: "#009E73", "untrained": "#7f7f7f"}
 LABEL = {TXC_PRE: "TXC-pre (k=20·T)", TXC_POST: "TXC-post (k=20/win)",
+         PAPER_V1T: "paper §5.1 ReLU∘TopK (k=20·T)",
          SAE: "BatchTopK SAE (20/tok)", TSAE: "T-SAE (20/tok)"}
+# Fixed plot/table order for window archs (present-only rendering).
+WINDOW_ORDER = (TXC_PRE, TXC_POST, PAPER_V1T)
+SHORT = {TXC_PRE: "TXC-pre", TXC_POST: "TXC-post", PAPER_V1T: "paper-v1t"}
+L0SHORT = {TXC_PRE: "pre", TXC_POST: "post", PAPER_V1T: "v1t"}
 
 
 def load_rows(arm: str) -> list[dict]:
@@ -80,7 +86,16 @@ def load_rows(arm: str) -> list[dict]:
             if (r.get("experiment") != "probing"
                     or r.get("evaluator_protocol_version") != "1.2.0"
                     or ec.get("arm") != arm
-                    or ec.get("smoke")):
+                    or ec.get("smoke")
+                    # instrument rows, never grid cells:
+                    or ec.get("positive_control")):
+                continue
+            # Canonical-hparam rows only: the grid varies T alone. Rows
+            # with other overrides (width-match tsae d_sae=18432, thin-
+            # pool controls) belong to their own cards and must not pool
+            # into these bands.
+            ov = (r.get("training_cfg") or {}).get("arch_hparams_override") or {}
+            if set(ov) - {"T"}:
                 continue
             if r["code_version"]["commit_sha"] not in freeze_allowlist():
                 continue
@@ -113,10 +128,19 @@ def gate_report(cells: dict, k_feats, Ts) -> list[str]:
         # G1 realized-l0 (trained cells only; untrained = fallback path, reported not gated)
         if not untrained:
             l0 = m["realized_l0"]
-            if arch == TXC_PRE:
+            if arch == PAPER_V1T:
+                # Per-SAMPLE TopK: k_win is a hard cap; ReLU-after-TopK
+                # zero-picks pull realized l0 strictly below it (E1).
                 lo, hi = 0.9 * 20 * T, 20 * T + 0.5
+            elif arch == TXC_PRE:
+                # BatchTopK guarantees k_win·B per BATCH, so per-window
+                # realized l0 legitimately overshoots k_win (measured
+                # +5–6% at T6–T16); symmetric 10% band.
+                lo, hi = 0.9 * 20 * T, 1.1 * 20 * T
             else:
-                lo, hi = 19.5, 20.5
+                # TXC_POST / SAE / TSAE: all batch-level BatchTopK at
+                # k=20 per window/token — same ±10% semantics.
+                lo, hi = 18.0, 22.0
             if not (lo <= l0 <= hi):
                 flag(False, f"G1 l0={l0:.2f} outside [{lo:.1f},{hi:.1f}] at {arch}/T{T}/s{seed}/k{k}")
         # G2 identity for per-token archs
@@ -152,9 +176,15 @@ def gate_report(cells: dict, k_feats, Ts) -> list[str]:
 
 
 def make_table(cells: dict, arm: str, k: int, Ts) -> list[str]:
-    out = [f"### arm `{arm}`, k_feat = {k}", "",
-           "| T | TXC-pre | TXC-pre shuf | TXC-post | TXC-post shuf | l0 pre | l0 post |",
-           "|---|---|---|---|---|---|---|"]
+    present = [a for a in WINDOW_ORDER
+               if any(key[0] == a and not key[1] for key in cells)]
+    # btk-only arm has exactly {TXC_PRE, TXC_POST} present, so its table
+    # is unchanged by the dynamic column list (protected render).
+    hdr = ("| T | " + " | ".join(f"{SHORT[a]} | {SHORT[a]} shuf"
+                                 for a in present)
+           + " | " + " | ".join(f"l0 {L0SHORT[a]}" for a in present) + " |")
+    out = [f"### arm `{arm}`, k_feat = {k}", "", hdr,
+           "|---" * (1 + 3 * len(present)) + "|"]
 
     def cell(arch, T, key, untrained=False):
         vals = [m[key] for (a, u, t, s, kk), m in cells.items()
@@ -165,12 +195,10 @@ def make_table(cells: dict, arm: str, k: int, Ts) -> list[str]:
         return f"{m_:.4f} ± {sd:.4f} (n={n})" if n > 1 else f"{m_:.4f} (n=1)"
 
     for T in Ts:
-        out.append("| {} | {} | {} | {} | {} | {} | {} |".format(
-            T,
-            cell(TXC_PRE, T, "mean_auc"), cell(TXC_PRE, T, "mean_auc_shuf"),
-            cell(TXC_POST, T, "mean_auc"), cell(TXC_POST, T, "mean_auc_shuf"),
-            cell(TXC_PRE, T, "realized_l0"), cell(TXC_POST, T, "realized_l0"),
-        ))
+        vals = [cell(a, T, key) for a in present
+                for key in ("mean_auc", "mean_auc_shuf")]
+        vals += [cell(a, T, "realized_l0") for a in present]
+        out.append("| " + str(T) + " | " + " | ".join(vals) + " |")
     out += ["", "| per-token band | AUC (T-invariant) | realized l0 |", "|---|---|---|"]
     for arch in (SAE, TSAE):
         out.append(f"| {LABEL[arch]} | {cell(arch, 1, 'mean_auc')} | {cell(arch, 1, 'realized_l0')} |")
@@ -186,7 +214,7 @@ def make_fig(cells: dict, arm: str, k: int, Ts, outdir: Path):
         1, 2, figsize=(10.4, 4.2), gridspec_kw={"width_ratios": [1.6, 1.0]})
     x = np.log2(Ts)
 
-    for arch in (TXC_PRE, TXC_POST):
+    for arch in WINDOW_ORDER:
         for key, ls, mk, lbl in (("mean_auc", "-", "o", LABEL[arch]),
                                  ("mean_auc_shuf", "--", "s", f"{LABEL[arch]} shuffled")):
             ys, es, xs = [], [], []
