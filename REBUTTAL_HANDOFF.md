@@ -159,35 +159,49 @@ panel — directly comparable to the btk figs above):**
 
   ![rlhf-pf](figs_writeup/fig_rlhf_shuffle_tsweep_pf.png)
 
-  **`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` — INTERIM,
-  G1-PENDING.** First paper-faithful RLHF figure; wave 1 (one seed per
-  T) plus the three corrected T5 anchors as a separate marker
-  (eval-only upstream weights, excluded from the sweep mean by
-  `train_key` per ruling d744f7c52 — never spliced into the curve).
-  Seeds 1 and 2 fill the error bars; re-render at drain.
+  **`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` — GRID COMPLETE
+  (15/15), uniform 3 seeds at every T.** Paper-faithful RLHF figure,
+  plus the three corrected T5 anchors as a separate marker (eval-only
+  upstream weights, excluded from the sweep mean by `train_key` per
+  ruling d744f7c52 — never spliced into the curve).
+  **T axis is T ∈ {2,4,6,8,10}: T1 and T16 are absent BY DESIGN** —
+  upstream's T-sweep archs are `t2,t3,t6,t7,t8,t10,t15,t20`, so both
+  were our own interpolations, not paper cells. (T16 exceeds 80 GB;
+  T1 hits an einsum degeneracy in `agentic_txc02.encode`. Neither was
+  patched — editing the paper's architecture to manufacture a cell the
+  paper never had is the trade this arm exists to refuse.)
 
-  | T | ordered | shuffled | gap | l0 |
-  |---|---|---|---|---|
-  | 2 | 0.6119 | 0.6019 | **+0.0100** | 200 |
-  | 4 | 0.6019 | 0.6041 | **−0.0022** | 400 |
-  | 6 | 0.6086 | 0.6031 | **+0.0055** | 600 |
-  | 8 | 0.6053 | 0.6107 | **−0.0054** | 800 |
-  | 10 | 0.5920 | 0.6030 | **−0.0110** | 1000 |
+  | T | n | ordered mean | gap mean | sd(gap) | signs | l0 |
+  |---|---|---|---|---|---|---|
+  | 2 | 3 | 0.6115 | **+0.00403** | 0.00924 | + − + | 200 |
+  | 4 | 3 | 0.6012 | **−0.00366** | 0.00168 | − − − | 400 |
+  | 6 | 3 | 0.6049 | **+0.00037** | 0.00458 | + − − | 600 |
+  | 8 | 3 | 0.6012 | **−0.00438** | 0.01053 | − + − | 800 |
+  | 10 | 3 | 0.5997 | **−0.01029** | 0.00992 | − − − | 1000 |
+  | **all** | **15** | | **−0.00279** | 0.00839 | 11/15 neg | |
 
-  **Two reads and the caveat that dominates them:**
-  - **`l0 = 100·T` exactly at every T** — the paper's window budget is
-    honoured cell-for-cell. An independent check that the port is
-    running the recipe we believe it is.
-  - **Shuffle gaps are ~0 and SIGN-MIXED (3 of 5 negative).** On this
-    evidence the paper-faithful arm shows **no order effect** — the
-    same story the btk arm tells ("gaps ≈ 0 at every T ≤ 8"). The port
-    reproducing the *negative* is itself a port-fidelity signal.
-  - **⚑ CAVEAT, and it outweighs both: n = 1 per T, seeds are MIXED
-    (T2 is seed 1, the rest seed 42), and the largest gap (0.0110) is
-    just 0.53× the anchors' own seed-to-seed scatter (0.0209).** No
-    order-effect claim survives that yet — the honest statement is
-    *no order effect detectable below the seed noise floor*. Wave 2/3
-    are what license anything stronger.
+  **The result is a NULL, and it is seed-controlled:**
+  - **Whole-grid gap −0.00279, sd 0.00839, n = 15 → t = −1.29, df = 14
+    — NOT significant at α = 0.05** (|t| < 2.14), and 0.13× the
+    anchors' own seed scatter (0.0209). On the paper's own
+    architecture, stream and recipe, **within-window shuffling does not
+    measurably change preference AUC.** Same story as the btk arm and
+    the fleet-wide age-face order-null.
+  - **`l0 = 100·T` exactly at every T** (200/400/600/800/1000) — the
+    paper's window budget honoured cell-for-cell; an independent check
+    that the port runs the recipe we believe it does.
+  - **No large-T trend is available.** T4 and T10 are sign-consistent
+    but T2, T6 and **T8 (− + −)** are not, so any "gaps go negative at
+    large T" reading has to explain T8 sitting between T6 and T10
+    pointing the other way. Two all-negative T of five is inside chance
+    (P = 0.121). T10's pre-registration resolved to the **null branch**:
+    its mean (−0.0103) misses the pre-registered −0.012 threshold, and
+    its third seed is **−0.00003** — a sign with no magnitude behind it.
+  - **Scope, so the null is not over-read:** this is 15 cells at one k,
+    one layer, one substrate, 8000 steps — not "shuffling has no
+    effect" in general. Two upstream deviations are disclosed on the
+    figure itself: **no gradient clipping** (upstream clips at 1.0) and
+    rows recording `precision: bf16` while **training is fp32**.
 
   *(ii) Three things the 13:0x block got wrong, corrected here
   because each was load-bearing:*
