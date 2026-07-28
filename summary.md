@@ -121,6 +121,29 @@ rebuttal:
    `plots/btk_rerun/budget_scan.md`. (Scan cells: 2 seeds; winner stds
    ±0.001–0.01 — top up before quoting externally.)
 
+7. **Real-task extension (user-directed): EM detection has an interior
+   window-size optimum under the paper arch, and btk-only wins only the
+   large-T tail.** On the paper's §5.3 medical-organism detection task
+   (Qwen-7B L15, canonical 25k-step training, em eval 3.0.0, seed 42;
+   Modal spend-limited mid-wave → completed on 4 RunPod pods):
+   composite pr_auc_S16 runs 0.478 → 0.581 → 0.598 → 0.481 over
+   T ∈ {1,4,6,16} — an inverted-U peaking at T≈6 (+0.12 over T=1), with
+   null within-window shuffle gaps (order-free context pooling, matching
+   the backtracking audit). So the paper's T=5 was near-optimal and its
+   §5.3 negative was not a too-small-T artifact. btk-only: 0.441 → 0.583
+   → 0.539 → **0.578** — never ahead at T ≤ 6, but it holds at T=16
+   where the composite collapses (+0.097 there): the pre-registered
+   "better T-scaling under the fix" survives specifically at the
+   large-T end, mirroring the toys (composite wins peaks, btk-only wins
+   large-T robustness). Confound, disclosed: btk-only's JumpReLU
+   threshold path evaluates at 5–49× nominal density (l0/token 1218 →
+   172 → 166 → 118 vs the composite's exact 25.0) — it gets 5–49× more
+   active features and still only wins the tail; an exact-k eval
+   re-pass on the persisted checkpoints is the cheap closer. btk-only's
+   T=16 shuffle gap is −0.032 (shuffled slightly better) — one-seed,
+   flag before quoting.
+   - ![EM T-sweep](plots/btk_rerun/btk_rerun_em_tsweep.png)
+
 **Verdict for the re-run gate** (pre-registration: *"the PAPER arch's
 T-curves should improve (that is Dmitry's re-run gate: does d(perf)/dT
 improve)"*): **MIXED on recovery metrics; CLEANLY SUPPORTED on the
