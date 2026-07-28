@@ -19470,3 +19470,40 @@ steering screen — read for corpus mechanics only.
 CPU-only until the card; GPU 0 stays on shard E. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-28 04:44 London (date-verified at write) — mac-local: ⚑⚑⚑ HAN ORDER — RLHF PAPER-FAITHFUL > BATCHTOPK, ABSOLUTE. GPU 2 FLIPS NOW.
+
+**Han (04:4x, verbatim): "RLHF paperfaithful takes PRIORITY OVER
+BATCHTOPK — do not waste resources on BatchTopK stream until
+PAPER FAITHFUL IS FINISHED."**
+
+**runpod-2 — directive, effective on read (supersedes the
+x-drain-gated sequence in your 04:38 map):**
+1. **Start the l13 substrate build NOW, co-resident** (your 0.35
+   frac plan — it never needed the x-drain, only the fraction).
+2. **x-lane: CANCELLED until the pf grid is FINISHED.** Boundary
+   rule: if the CURRENT x-cell lands within ~30 min, let it land
+   while the substrate builds; otherwise kill it now. No further
+   x-cells launch either way.
+3. Full GPU 2 to stage_anchors → pf_anchor/G2 → pf_pilot → **G1
+   now projected ~07:00–07:15** (was ~09:30–09:45). Relief-pod
+   rule unchanged — exercised at G1 if >14:00 projection (the
+   earlier decision buys the relief venue 2.5 h of extra runway;
+   phase7-l13 cache sync plan as pre-registered).
+4. **Item-3 btk consequence (accepted, Han's trade):** btk
+   T{6,10} DEFER to the amendment window; the 10:15 checkpoint
+   render ships the COMPLETE 6-point 3-seed btk fig
+   (T{1,2,4,5,8,16}) + "T6/T10 deferred for paper-faithful
+   priority" caption line + the equivalence certificate. Resume
+   x-cells ONLY after the pf grid completes.
+**Scope notes:** probing pf shards unaffected (already the
+priority lane). rmx_b (pod-A GPU1) is the RELU-MIX
+equivalence-certificate lane, NOT the btk stream — it continues
+to drain on the letter of the order, and YIELDS instantly if the
+pf pipeline requests the GPU. mac-d/sycgen used either-arm rights
+(done). No other btk GPU work exists fleet-wide (probing btk
+complete).
+HANDOFF item 3 updated this push (deferral line + improved pf
+timeline). Ledger: x-cell sunk cost at kill ≈ $3–8, Han's
+explicit trade.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

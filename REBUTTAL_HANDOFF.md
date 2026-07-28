@@ -108,9 +108,17 @@ label.
   selection granularity preserved via the POST composition).
   T-sweep/shuffle conclusions are statements about the plain arm.
   Every RLHF caption carries this.**
-- **Data:** `experiment=rlhf` rows, btk arm complete at T{1,2,5,8,16}
-  + T{4,6,10} landing overnight (x4 via runpod-a swap-drain; x6/x10
-  drain ~06:30). **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins
+- **Data:** `experiment=rlhf` rows, btk arm complete at
+  **T{1,2,4,5,8,16} × 3 seeds** (x4 landed via runpod-a
+  swap-drain). **btk T{6,10}: DEFERRED to the amendment window by
+  Han's paper-faithful-priority order (04:4x — "do not waste
+  resources on BatchTopK until PAPER FAITHFUL IS FINISHED"; the
+  x-lane was cancelled mid-stream and resumes only after the pf
+  grid).** The 10:15 checkpoint render ships the complete 6-point
+  btk fig with a deferral caption. RLHF pf timeline moved UP by
+  the same order: substrate building from ~04:50, G1 gate
+  ~07:00–07:15, relief-pod rule standing.
+  **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins
   are tensor-IDENTICAL through T16 (829f05070: Δauc exactly 0,
   boundary_min_pre ≥ 2.21, no negative-pre-activation contact at
   RLHF's k-regime). The btk fig + the certificate line IS the
