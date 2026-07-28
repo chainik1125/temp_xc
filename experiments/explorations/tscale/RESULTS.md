@@ -438,3 +438,54 @@ must survive the removal). Material move (≥ +0.03 over r1-min's
 0.8071) short of the floor → partial driver; combine both knobs in a
 follow-up cell. Both flat → the driver is the serving/init residue —
 re-think before spending more (C7 would need the serving isolation).
+
+---
+
+## FREEZE — hill-climb halted cleanly (Han order 11227ce0d) — 2026-07-28 02:40 London (date-verified) — RESUME PLAYBOOK
+
+**Why:** fleet paper-faithful sprint; this pod's 2×H100 take probing
+shards at runpod-1's card-pin (~05:00 target). Frozen, not abandoned
+(order text: "the program resumes post-rebuttal; C4 stays
+pre-registered").
+
+**State at freeze:**
+
+- C1–C5 index table above is current. Two cells in flight at order
+  time, kept per the "minutes-from-done" clause and both draining
+  ≥1.7 h before card-pin: **C4-T16** (GPU 1, lands ~02:50 London) and
+  **C5-T16** (GPU 0, lands ~03:15). Their verdict lines append below
+  on drain (append-only discipline unchanged). ts-attribution chain
+  fully drained (~02:15 entries above).
+- **C6 pre-registered above and NOT LAUNCHED — that is the freeze
+  line and the resume point.** Nothing else launches.
+
+**Resume playbook (one card):**
+
+1. Read `CARD_SPLIT.md` (§ 3 gates — unchanged, still frozen) +
+   the RESULTS index + this block.
+2. Launch the C6 pair exactly as pre-registered (§ C6): r1-min
+   backbone, T1-only 4k dev-8 s42, tags `c6-nobdec-4k`
+   (`bdec_geom_median_init=0`) and `c6-noshiftrecon-4k`
+   (`recon_shifts=0`); pass CLI booleans as `0`/`1` (parser casts
+   int→float→string; `"false"` is truthy). Apply the § C6 read rules
+   verbatim.
+3. Winner path unchanged: floor-clearing knob → T16 confirmation →
+   full § 3 L1 gates → L2 (20k, dev {1,2,4,8,16}, both k, L2→L3
+   gates incl. k5 preservation bar 0.8551) → L3 ONLY via canonical
+   `run_experiment`, seeds {1,2,42}, eval_cfg namespacing.
+4. Open menu (unchanged): multi_window exposure fix, position-loss
+   reweighting. Ruled out: per-position k floors (C1-D),
+   curriculum-alone (C2, KILLED + ratified), k-anneal transient
+   (C4 T1), batch-pool alone (C5 T1).
+5. Standing science: backbone-not-selection drives T1 concentration
+   (C5 twin census 0.1276 vs r1 ≤0.021); AuxK-live recovers most of
+   T1 at 20k but k20 slope was partly bought at k5's expense (C1-D).
+
+**Durability:** all lane ckpts mirroring to HF `temp-bench-data`
+under `ckpts/tscale/<cfg_hash>/model.safetensors` (decision-grade
+first; receipts → `results/hf_durability_receipts.jsonl`; C4/C5-T16
+stragglers mirrored on drain). `l1_rows.jsonl` committed in-tree.
+
+**Ledger:** overnight hill-climb actuals ≈ $16 at freeze (00:00 →
+~03:15 drain, 2×H100 pod-wall) vs $35–40 est — under, frozen early.
+Hours after ~03:15 bill to the probing sprint.

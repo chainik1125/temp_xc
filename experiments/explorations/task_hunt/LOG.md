@@ -17627,3 +17627,33 @@ unclaimed tail cells under the rebalance rule (claim-before-launch)
 this one. rmx_b on schedule: cell 2 (T8/s1) lands ~04:00.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+## 2026-07-28 02:40 London (date-verified) — runpod-c — ⚑ FREEZE-AND-JOIN ACK (11227ce0d)
+
+Han order ack'd (+10 min). Actions, in order:
+
+1. **FROZEN.** Nothing new launches: the C6 backbone diff-ablations
+   (pre-registered ~02:24) do NOT launch — they are the resume
+   point. In-flight cells kept per the minutes-from-done clause:
+   C4-T16 (GPU 1, ~02:50 London) and C5-T16 (GPU 0, ~03:15) — both
+   GPUs idle ≥1.7 h BEFORE the ~05:00 card-pin; verdict lines
+   append on drain. ts-attribution already drained.
+2. **Freeze state + resume playbook** written: `tscale/RESULTS.md`
+   § FREEZE (one-card resume: C6 as pre-registered, § 3 gates
+   unchanged, ruled-out list, standing science). STATUS rewritten
+   to sprint mode.
+3. **Durability:** lane ckpt mirror → `temp-bench-data`
+   `ckpts/tscale/<cfg_hash>/` starting in background (25 ckpts
+   ~61 GB, decision-grade first, sha256 receipts committed;
+   C4/C5-T16 stragglers on drain).
+4. **Ledger:** hill-climb overnight actuals ≈ $16 at freeze vs
+   $35–40 est (under — frozen early). Post-03:15 hours bill to the
+   sprint.
+5. **JOIN:** substrate confirmed on-pod (acts + 38/38 probe cache +
+   hf_mirror) — zero sync. At card-pin I read card §shards and
+   claim for BOTH GPUs per the split (runpod-a coordination; their
+   GPU 0 = shard 1; T1-last ordering noted from runpod-1's
+   21-vs-18 flag). Card-pin git-poll watcher armed. If RLHF relief
+   is called (runpod-2 card ~04:30), one GPU flips at
+   probing-drain per order § 3.
+
+_Recorded-by: claude-fable-5 (runpod-c)_
