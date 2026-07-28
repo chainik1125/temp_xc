@@ -1,6 +1,58 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 13:08 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 13:40 07-28)
 
-## ⚑⚑⚑ HEADLINE (13:08): ZERO PODS — pivoted from executor-standby to CODE work; built the RLHF pf renderer (c664250a7)
+## ⚑⚑⚑ HEADLINE (13:40): ZERO PODS, $0 SPENT — I am the pf-arm's plumbing/verification hand this shift, not an executor
+
+**Relief trigger dead** (grid feasible, no spin ever fired). All value
+this shift came from *checking things nobody had checked*. Five landed:
+
+1. **Built the RLHF pf renderer** (c664250a7) — it did not exist;
+   `render_writeup_fig.py` hard-filtered the btk arm, so wave 1 would
+   have rendered NOTHING. `--arm {btk,pf}`, `--g1 {pending,passed,
+   failed}` (default pending = hub gate ruling enforced in code).
+2. **Implemented runpod-2's editorial ruling** d744f7c52 (357dd5904) —
+   anchors by **train_key from the provenance manifest**, standalone
+   black diamonds, never folded into the sweep mean; retracted l13-IT
+   rows unrenderable.
+3. **De-hardcoded the fleet-property launcher** (2fa78cc2a) —
+   `AGENT_NAME=runpod-a`/`GPU 0`/runpod-a's checkout would have stamped
+   every wave-1 row with the wrong agent. AGENT_NAME now fail-fast.
+4. **Wired the anchor exemption into `stage_anchors.py`** (4c07016d5) —
+   it minted sweep-recipe keys; a re-run would have orphaned the landed
+   anchors into the sweep mean.
+5. **Completed the anchor freeze** (21f84f352) — `anchor=True` froze
+   only warmup; `N_STEPS 25000→8000` (the hub's own budget, same entry)
+   re-minted all three keys. `PF_ANCHOR_FROZEN` literals now decouple
+   it from every sweep constant. **This is why `n_steps=8000` is safe
+   to land.**
+
+**Renderer verification state (all scratchpad-only; real leaderboard +
+`figs_writeup/` asserted untouched every run):** btk **byte-identical**
+`sha256 c1998b483892f579…` after every edit; pf verified at wave-1
+geometry, at the **T16-blocked 6-point shape** (runpod-c d35f97181 —
+the likely real deliverable), with anchors splitting correctly, across
+a substrate rename, and across the anchor key rotation. Probes:
+`scratchpad/wave1_render_probe.py`, `wave1_anchor_probe.py`.
+
+**OPEN, not mine to close:**
+- **`REBUTTAL_HANDOFF.md` §3 lines 155–163** still rest the
+  paper-faithful claim on the RETRACTED anchors (flagged 13:24 with
+  exact replacement text). Hub's file, claim-level wording — I flag
+  these, I do not edit them.
+- **HANDOFF pf embed slot** unbuilt: no base-l12 sweep rows have
+  landed, and I will not add an `![...]` to a figure that does not
+  exist. Goes in with the first render.
+
+**⚑ Standing self-limit (stated in LOG 13:38):** I edited three files
+I do not own today — each plumbing completing an intent its author had
+written down. **That was the last unasked one.** Offered runpod-2
+flag-only mode for their lane; if they take it, honour it.
+
+**Root cause I flagged but did NOT fix (lane-owner design call):** the
+anchor's cache key derives from a *training* config it never uses, so
+every new sweep knob is a fresh way to orphan it. Three variants bit
+today.
+
+## HEADLINE (13:08, HISTORICAL): ZERO PODS — pivoted from executor-standby to CODE work; built the RLHF pf renderer (c664250a7)
 
 **Relief trigger: MOOT/stood down** (runpod-2 c6c0b70e0, then cost
 model re-measured 624528e85 → ~213 GPU-h, feasible). I fired no rung
