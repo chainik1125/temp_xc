@@ -92,10 +92,12 @@ Pre-registered target: **`floor_excess` ∈ [+0.15, +0.25]**, i.e.
 **15–25 % of eligible probe tokens sit within T = 64 of an escalation
 event** — 45–75 % of one tercile. Two-sided; **not** maximized.
 
-⚠ **CORRECTED after freeze — see § 2.2a. The gap numbers below are the
-corrected ones; the originals were too dense by ~2×.**
+⚠⚠ **THE WHOLE GAP TABLE IS SUPERSEDED — see § 2.2b.** Both the
+original and the § 2.2a "corrected" gap numbers rest on a model that
+turns out to be wrong in a third way. **`f` is measured directly now**;
+the gap is a descriptive receipt only.
 
-| target `f` | gap median `g` |
+| target `f` | gap median `g` (superseded) |
 |---|---|
 | 0.25 (upper) | 297 tok |
 | **0.20 (centre)** | **385 tok** |
@@ -156,30 +158,76 @@ GPU, via `claim_zone`. **Planning centre: `g ≈ 385` tokens (median),
 range 297–499** — i.e. **~2.2× denser than organic `retryesc`'s 886**,
 not the 3–5× the frozen draft said.
 
+### 2.2b ⚑ SECOND CORRIGENDUM — the gap→`f` map ignored WHERE eligible tokens sit
+
+**`f` is now measured, not modelled** (`dry_run.py`, real turn loop +
+real `build_stream` + real `claim_zone`, stub prose, $0).
+
+Both earlier gap estimates assumed **probe positions are uniform over
+the stream**. They are not. Eligible positions are **assistant tokens**,
+and each is offset from its preceding event by the **masked environment
+turn** — so a *long* assistant turn pushes its own tail past T = 64 even
+when the inter-event gap is short. `f` is therefore much lower at a
+given gap than the uniform model says.
+
+Measured, at `P_REPEAT` = 0.26:
+
+| assistant-turn band | realised gap median | **measured `f`** | |
+|---|---|---|---|
+| (60, 120) — the frozen card's | 267 | **0.1119** | ✗ below band |
+| (45, 90) | 213 | 0.1485 | ✗ (just) |
+| **(35, 70) — ADOPTED** | **180** | **0.1850** | ✅ mid-band |
+| (28, 56) | 153 | 0.2378 | ✅ but near the upper edge |
+
+**Turn length is the dominant knob, not `P_REPEAT`.** Across that range
+turn length moves `f` by ~0.13; `P_REPEAT` 0.26 → 0.32 moves it by
+~0.02. So the clock is bought with the **token clock**, which is what
+§ 2.3 argued *on principle* and this now supports *on evidence*.
+
+**Consequences, stated plainly:**
+- The gap target (385, range 297–499) is **retired as a bar**. The
+  adopted setting realises **180** — less than half of it — and is
+  correctly in band on the quantity that matters.
+- `LEN_LO, LEN_HI` = **35, 70** (was 60–120). This is a clock knob, and
+  § 2.2 named the clock as the one thing permitted to move; the target
+  `f` ∈ [+0.15, +0.25] **has not moved and will not.**
+- Corpus clock still passes with room: **3,350 tok/doc**, 21.5×
+  `dharm`'s fatal 155.6.
+
+**This is my third modelling slip on the same quantity**, and the
+pattern is identical each time: I reasoned forward from an assumption
+instead of measuring something the harness could already tell me. What
+kept all three cheap is the one thing the card got right at freeze —
+**the bar was written on the measured quantity, so a wrong model costs
+a re-tune, not a candidate.**
+
 ### 2.3 Corpus clock bar — and the realism cost the target imposes
 
 Documents must clear the standing corpus-clock bar by a wide margin
-(`dharm` died at 155.6 tok/doc). Plan: **~30–45 turn-pairs/doc**,
-assistant turns **~60–120 tok**, environment turns ~30–50 tok ⇒
-**~3,500–6,000 tok/doc**, ~25–35× the bar, with many position strata.
-Reported as measured, not assumed.
+(`dharm` died at 155.6 tok/doc). Adopted (§ 2.2b): **30–46
+turn-pairs/doc**, assistant turns **35–70 tok**, environment turns
+~22 tok ⇒ **measured 3,350 tok/doc** on the dry run — **21.5× the
+bar**, with many position strata. Measured, not assumed.
 
-**⚑ The tension, stated rather than left for a reader to find** (and
-**eased** by the § 2.2a correction, which is the honest report — the
-corrected clock is *less* demanding, not more). At the corrected
-`g ≈ 385` tok with ~120-tok turn-pairs, a repeat-failure event lands
-roughly **every three turn-pairs** — ~1 in 3 environment turns reports
-a repeat failure, rather than the ~1 in 2 the pre-correction `g ≈ 230`
-implied. Still a **more failure-prone agent than a typical real
-trace**, and still a direct consequence of the density target rather
-than an accident.
+**⚑ The tension, at the ADOPTED § 2.2b setting** — and it is **real,
+not eased.** I briefly wrote that the § 2.2a correction relaxed it;
+§ 2.2b removes that comfort and I am not keeping it.
+
+At `LEN_LO, LEN_HI` = 35–70 the realised turn-pair is **~78 tok** and an
+event lands every **~2.3 turn-pairs** — so roughly **4 in 10
+environment turns report a repeat failure**. That is a **substantially
+more failure-prone agent than a real trace**, it is a direct
+consequence of the density target, and it is the honest cost of
+clearing the floor-excess band at T = 64.
 
 Three things follow, all binding:
 
-1. **Turns are kept short deliberately** (60–120 tok, vs organic
+1. **Turns are kept short deliberately** (35–70 tok, vs organic
    `retryesc`'s 686 tok/turn) so the required event *rate per turn*
-   stays plausible instead of absurd. Most of the density is bought
-   with the token clock, not by making the agent fail more often.
+   stays as plausible as it can be. Most of the density is bought with
+   the token clock, not by making the agent fail more often — § 2.2b
+   measures turn length moving `f` by ~0.13 against `P_REPEAT`'s ~0.02,
+   so this is the efficient knob as well as the principled one.
 2. **The realism cost is disclosed on any exhibit this corpus reaches**
    — the same treatment `retryesc`'s single-agent/single-model
    substrate got. This is a claim about a constructed distribution.

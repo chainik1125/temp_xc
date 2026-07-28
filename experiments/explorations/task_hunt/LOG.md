@@ -27377,3 +27377,95 @@ Grid unaffected and still running — this was a read-only audit plus one
 caption.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+---
+
+## 2026-07-28 14:38 London (date-verified at write) — mac-c: **$0 DRY RUN of `retryesc_gen`** — caught a checkpoint crash and a **third** modelling slip on the same quantity; `f` is now MEASURED at **0.1850, in band**, and the scaffold is spend-ready
+
+Built the runner (`run_retryesc_gen`) and dry-ran it end to end against
+a **stub backend** — real turn loop, real `build_stream`, real
+`claim_zone`, **no API, no model, no spend.**
+
+### 1. Two defects the dry run caught before the pilot
+
+**(a) Checkpointing would have crashed at pair 5.** I stored `Pair`
+dataclasses in the doc plan; `save_ckpt` writes JSON. Since
+**checkpointing is BLOCKING for every generation card** (my own
+standing rule), the pilot would have died at the first checkpoint with
+generation already paid for. Fixed with `pairs_as_dicts()` /
+`is_event()` — plan stays plain JSON.
+
+**(b) `.gitignore` had no rule for generation checkpoints.** Added —
+they are pure resume state, large, superseded by the `.npz`, never a
+deliverable.
+
+**Structural invariants now asserted every run:** 2N+1 turns, strict
+user/assistant alternation, **no assistant turn may be an event**, and
+event positions must match the plan exactly.
+
+### 2. ⚑ Third modelling slip on the same quantity — and the fix
+
+The dry run's first measurement came back **f = 0.1089, OUT OF BAND**,
+at a realised gap median of **269 tok** — *denser* than my "corrected"
+385 target, yet `f` far *lower* than predicted.
+
+**Why: both gap→`f` models assumed probe positions are UNIFORM over the
+stream.** They are not. Eligible positions are **assistant tokens**,
+each offset from its preceding event by the **masked environment
+turn** — so a long assistant turn pushes its own tail past T = 64 even
+when the gap is short.
+
+Measured sweep at `P_REPEAT` = 0.26:
+
+| assistant-turn band | gap median | **measured `f`** | |
+|---|---|---|---|
+| (60,120) — the frozen card's | 267 | **0.1119** | ✗ |
+| (45,90) | 213 | 0.1485 | ✗ |
+| **(35,70) — ADOPTED** | **180** | **0.1850** | ✅ mid-band |
+| (28,56) | 153 | 0.2378 | near upper edge |
+
+**Turn length is the dominant knob, not `P_REPEAT`** — ~0.13 of `f`
+across that range versus ~0.02 for `P_REPEAT` 0.26→0.32. § 2.3 argued
+on principle that density should be bought with the **token clock**
+rather than by making the agent fail more; that is now supported on
+evidence, and it is the efficient knob too.
+
+**The gap target (385, range 297–499) is RETIRED as a bar.** The
+adopted setting realises **180** — less than half of it — and is
+correctly in band on the quantity that actually matters.
+
+### 3. What kept three wrong models cheap
+
+This is my third slip on this one quantity today (`capped near 1/3`,
+`K = 0.63`, and now the uniform-position assumption). The pattern is
+identical every time: **I reasoned forward from an assumption instead
+of measuring something the harness could already tell me.**
+
+What kept all three cheap is the single thing the card got right at
+freeze: **the bar was written on the MEASURED quantity, and the knob
+was named in advance.** So a wrong model costs a re-tune, not a
+candidate, and **the target `f` ∈ [+0.15, +0.25] has never moved.**
+
+### 4. A realism claim I am withdrawing
+
+In § 2.3 I wrote that the § 2.2a correction **eased** the realism
+tension. § 2.2b removes that comfort and I am not keeping it: at the
+adopted 35–70 band a turn-pair is ~78 tok and an event lands every
+**~2.3 pairs**, so **~4 in 10 environment turns report a repeat
+failure**. That is a substantially more failure-prone agent than a real
+trace. It is the honest cost of clearing the band at T = 64, it is
+disclosed on any exhibit, and it does **not** touch validity — § 3's
+construction rule (failure text drawn independently of repeat-status)
+holds at any event rate.
+
+### 5. State
+
+Dry run: **3,350 tok/doc** (21.5× `dharm`'s fatal 155.6), 593 events
+over 60 docs, invariants clean, **f = 0.1850 IN BAND**. Plan-time gates
+2–4 still pass (vocabulary cv 0.0567, exhaustion 0.0 %, corpus clock);
+gate 1 is superseded by this direct measurement.
+
+**The scaffold is spend-ready.** The pilot is the **first API spend** on
+this lane and its remaining job is the one thing a stub cannot test:
+**`unigram_auc` ≤ 0.60 on real prose** — still the risk I rate highest.
+
+_Recorded-by: claude-opus-5 (mac-c)_

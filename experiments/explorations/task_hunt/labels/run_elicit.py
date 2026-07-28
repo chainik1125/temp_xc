@@ -27,6 +27,7 @@ import numpy as np
 
 from . import elicit_lib as el
 from . import evalage_lib as ev
+from . import retryesc_gen_lib as rg
 from . import sycgen_lib as sg
 from .lib import doc_split
 
@@ -216,6 +217,112 @@ def run_evalage(be: Backend, n_docs: int, seed: int, max_new: int,
     return docs
 
 
+# ── retryesc_gen (card retryesc_gen/GENERATION_CARD.md, freeze
+# 3f6ba0d3d + § 2.2a corrigendum; mac-c owner+executor) ──────────────
+SYS_AGENT = ("You are an autonomous software agent working in a "
+             "terminal. Think briefly about the approach you have been "
+             "asked to take, then state the single command you would "
+             "run. Be concise and concrete.")
+RETRYESC_FILLER = "Let me try that approach."   # alternation-preserving
+
+
+def run_retryesc_gen(be: Backend, n_docs: int, seed: int, max_new: int,
+                     tag: str = "retryesc_gen_v1"):
+    """Repeat-failure escalation, generated. EVENT = an environment turn
+    reporting failure of a strategy ALREADY ATTEMPTED earlier.
+
+    Two properties this function must preserve (card §§ 3-4):
+
+    * **Environment text is drawn independently of repeat-status** — the
+      draw happened at PLAN time in `retryesc_gen_lib.plan()`, so a
+      repeat failure and a first-time failure are textually
+      indistinguishable here by construction. Nothing in this loop may
+      consult `pair.is_event` when choosing text.
+    * **The model never authors an event.** Environment turns are pure
+      scaffold material and are fully masked from probe eligibility;
+      the model writes only the agent's reasoning.
+
+    **RESUME IS EXACT**, unlike `run_evalage`: every per-turn choice
+    (strategy, environment text, length cap) is drawn from the plan up
+    front, so `rng` is NOT consumed inside this loop and a resumed run
+    is bit-identical to an uninterrupted one.
+
+    Turn layout for N pairs -> N+1 user turns, N assistant turns:
+
+        user  0 : TASK statement + directive(strategy_0)
+        asst  0 : agent reasoning for strategy_0
+        user  1 : env_text(outcome_0) + directive(strategy_1)   <- EVENT
+        ...                                                        iff
+        user  N : env_text(outcome_{N-1})                        outcome
+                                                                 is a
+                                                                 REPEAT
+    """
+    rng = np.random.default_rng(seed)
+    plans = rg.plan(rng, rg.TASKS, n_docs)
+    # pairs stored as plain dicts: `save_ckpt` writes JSON, and
+    # checkpointing is BLOCKING for every generation card.
+    docs = [{"plan": {"topic": p.task, "pairs": rg.pairs_as_dicts(p.pairs),
+                      "meta": p.meta}, "turns": []} for p in plans]
+    max_pairs = max(len(d["plan"]["pairs"]) for d in docs)
+
+    ck = el.ckpt_path(HERE, tag)
+    resumed, k_start = el.load_ckpt(ck)
+    if resumed is not None and len(resumed) == len(docs):
+        docs = resumed
+        print(f"[ckpt] resumed {tag} at pair {k_start} (EXACT resume — "
+              f"all choices came from the plan)", flush=True)
+    else:
+        k_start = 0
+
+    fillers = 0
+    for k in range(k_start, max_pairs):
+        live = [d for d in docs if k < len(d["plan"]["pairs"])]
+        if not live:
+            break
+        # ── USER turn: previous outcome (if any) + this pair's directive
+        for d in live:
+            pr = d["plan"]["pairs"][k]
+            directive = rg.DIRECTIVE_TEMPLATE.format(
+                strategy=pr["strategy"])
+            if k == 0:
+                text = (rg.TASK_TEMPLATE.format(task=d["plan"]["topic"])
+                        + "\n\n" + directive)
+                is_ev = False
+            else:
+                prev = d["plan"]["pairs"][k - 1]
+                text = prev["env_text"] + "\n\n" + directive
+                # label only — the text above was fixed at plan time
+                # WITHOUT consulting repeat-status (card § 3)
+                is_ev = rg.is_event(prev)
+            d["turns"].append(("user", text, is_ev))
+        # ── ASSISTANT turn, conditioned on the full transcript
+        convs = [[{"role": "system", "content": SYS_AGENT}]
+                 + [{"role": r, "content": x} for r, x, _ in d["turns"]]
+                 for d in live]
+        cap = int(min(max(d["plan"]["pairs"][k]["max_new"] for d in live),
+                      max_new))
+        for d, txt in zip(live, be.chat(convs, cap)):
+            if not txt:
+                txt, fillers = RETRYESC_FILLER, fillers + 1
+            d["turns"].append(("assistant", txt, False))
+        print(f"[pair {k + 1}/{max_pairs}] {len(live)} docs live",
+              flush=True)
+        if (k + 1) % el.CKPT_EVERY_TURNS == 0:
+            el.save_ckpt(ck, docs, k)
+            print(f"[ckpt] {tag} @ pair {k}", flush=True)
+
+    # ── final environment turn: the last pair's outcome, no directive.
+    # Guarded so a resumed run cannot append it twice (a complete doc has
+    # exactly 2*n_pairs + 1 turns).
+    for d in docs:
+        n_pairs = len(d["plan"]["pairs"])
+        if len(d["turns"]) == 2 * n_pairs:
+            last = d["plan"]["pairs"][-1]
+            d["turns"].append(("user", last["env_text"], rg.is_event(last)))
+    el.save_ckpt(ck, docs, max_pairs)
+    return docs, fillers
+
+
 # ── sycgen (generation card sycgen/GENERATION_CARD.md; mac-d executor,
 # assignment ca7ed51eb, ratified 58a92efbf) ──────────────────────────
 # Scaffold constants live FROZEN in sycgen_lib. Question seeds are the
@@ -332,7 +439,7 @@ def build_stream(docs, tok):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--scaffold", default="evalage",
-                    choices=["evalage", "sycgen"])
+                    choices=["evalage", "sycgen", "retryesc_gen"])
     ap.add_argument("--model", default="meta-llama/Llama-3.1-8B-Instruct")
     ap.add_argument("--n-docs", type=int, default=ev.N_DOCS)
     ap.add_argument("--seed", type=int, default=ev.SEED)
@@ -353,6 +460,9 @@ def main():
     tag = f"{a.scaffold}_{a.out_tag}"
     if a.scaffold == "sycgen":
         docs, fillers = run_sycgen(be, a.n_docs, a.seed, a.max_new)
+    elif a.scaffold == "retryesc_gen":
+        docs, fillers = run_retryesc_gen(be, a.n_docs, a.seed, a.max_new,
+                                         tag=tag)
     else:
         docs = run_evalage(be, a.n_docs, a.seed, a.max_new, tag=tag)
     ids, doc_off, first, mask, elig, topics, texts = build_stream(docs,
@@ -386,6 +496,25 @@ def main():
              "n_topics": len(ev.TOPICS),
              "n_cue_templates": len(ev.EVAL_CUES)}
             if a.scaffold == "evalage" else
+            {"p_repeat": rg.P_REPEAT, "p_fail_new": rg.P_FAIL_NEW,
+             "pairs_per_doc": [rg.PAIRS_MIN, rg.PAIRS_MAX],
+             "n_strategies": len(rg.STRATEGIES),
+             "n_tasks": len(rg.TASKS),
+             "n_failure_texts": len(rg.FAILURE_TEXTS),
+             "n_success_texts": len(rg.SUCCESS_TEXTS),
+             "target_gap_median": rg.TARGET_GAP_MEDIAN,
+             "gap_range": list(rg.GAP_RANGE),
+             "floor_excess_band": list(rg.FLOOR_EXCESS_BAND),
+             "filler_turns": fillers,
+             "construction_rule": (
+                 "environment failure text drawn INDEPENDENTLY of "
+                 "repeat-status at plan time (card § 3) — a repeat and "
+                 "a first-time failure are textually indistinguishable"),
+             "vocabulary_rule": (
+                 "outcome schedule drawn BEFORE the task and never "
+                 "consulting it (card § 4) — difficulty is assigned, "
+                 "not intrinsic")}
+            if a.scaffold == "retryesc_gen" else
             {"n_exchanges": [sg.SYCGEN_N_EX_LO, sg.SYCGEN_N_EX_HI - 1],
              "p_challenge": sg.SYCGEN_P_CHALLENGE,
              "challenge_text": sg.SYCGEN_CHALLENGE_TEXT,

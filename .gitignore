@@ -119,3 +119,10 @@ experiments/explorations/task_hunt/labels/elicit_evalage_v1.npz
 # these bytes exactly (the committed sha256 is the check). Mirroring
 # derivable bytes buys nothing before token rotation.
 experiments/explorations/task_hunt/labels/elicit_*_transcripts.json
+
+# Generation CHECKPOINTS. Checkpointing is a blocking rule for every
+# generation card, so these appear on every run — but they are pure
+# resume state (the full doc set mid-generation), they are large, and
+# they are superseded by the .npz the moment a run completes. Never a
+# deliverable.
+experiments/explorations/task_hunt/labels/elicit_*_ckpt.json

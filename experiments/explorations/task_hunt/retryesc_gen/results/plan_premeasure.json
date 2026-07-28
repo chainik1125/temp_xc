@@ -6,13 +6,10 @@
  "event_rate": 0.249,
  "pairs_per_event": 4.02,
  "gates": {
-  "1_clock": {
-   "projected_gap_median": 377.7,
-   "target": 385,
-   "range": [
-    297,
-    499
-   ],
+  "1_clock_SUPERSEDED": {
+   "projected_gap_median": 257.1,
+   "superseded_by": "dry_run.py -> claim_zone frac_in_window T64",
+   "why": "projection assumed uniform probe positions; eligible tokens sit in assistant turns offset from the event by the masked environment turn",
    "pass": true
   },
   "2_vocabulary": {
@@ -28,9 +25,9 @@
    "pass": true
   },
   "4_corpus_clock": {
-   "projected_tok_per_doc": 3527,
+   "projected_tok_per_doc": 2401,
    "dharm_fatal": 155.6,
-   "multiple_of_fatal": 22.7,
+   "multiple_of_fatal": 15.4,
    "pass": true
   }
  },

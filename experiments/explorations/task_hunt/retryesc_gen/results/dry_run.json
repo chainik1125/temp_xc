@@ -1,0 +1,36 @@
+{
+ "n_docs": 60,
+ "seed": 0,
+ "realised_frac_assumed": 0.8,
+ "p_repeat": 0.26,
+ "n_tokens": 201021,
+ "n_events": 593,
+ "gaps": {
+  "n_gaps": 533,
+  "mean": 291.31144465290805,
+  "median": 180.0,
+  "p10": 87.0,
+  "p90": 609.8,
+  "min": 82.0,
+  "max": 2130.0
+ },
+ "claim_zone": {
+  "n_rows": 126150,
+  "mean": 277.7714149821641,
+  "median": 199.0,
+  "frac_in_window": {
+   "T4": 0.0,
+   "T8": 0.0,
+   "T16": 0.0,
+   "T32": 0.036567578279825604,
+   "T64": 0.18496234641300038
+  }
+ },
+ "predicted_floor_excess_T64": 0.18496234641300038,
+ "band": [
+  0.15,
+  0.25
+ ],
+ "in_band": true,
+ "note": "STUB prose. Validates layout/masking/clock only; unigram cleanliness is a PILOT gate."
+}

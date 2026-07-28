@@ -49,10 +49,26 @@ OK = 0            # environment reports success
 FAIL_NEW = 1      # failure of a strategy not tried before
 FAIL_REPEAT = 2   # failure of a strategy already tried  <-- THE EVENT
 
-# ── clock targets (card s2.2a; g is the tunable knob) ───────────────
-TARGET_GAP_MEDIAN = 385      # tokens between events
-GAP_RANGE = (297, 499)
+# ── clock targets ───────────────────────────────────────────────────
+#
+# ⚑ THE BINDING TARGET IS `f`, AND ONLY `f`. The card said so from the
+# start ("the bar is written on the MEASURED quantity, not on g"), which
+# is what makes the following correction cheap instead of fatal.
 FLOOR_EXCESS_BAND = (0.15, 0.25)
+
+# ⚠ SUPERSEDED — the card's gap-median target of 385 tok (range
+# 297-499) was derived assuming probe positions are UNIFORM over the
+# stream. They are not: eligible positions are assistant tokens, offset
+# from the preceding event by the masked environment turn, and a long
+# assistant turn pushes its own tail past T=64. So `f` is far lower at
+# a given gap than the uniform model predicts.
+#
+# Measured (dry_run.py, stub prose): the in-band setting realises a gap
+# median of ~180 tok, less than HALF the "target", and lands f = 0.185.
+# The gap figure is retained only as a descriptive receipt.
+GAP_MEDIAN_SUPERSEDED = 385
+GAP_RANGE_SUPERSEDED = (297, 499)
+GAP_MEDIAN_MEASURED_IN_BAND = 180
 
 # Pair counts per episode -> ~3.5k-6k tokens/doc (card s2.3), ~25-35x
 # the corpus-clock bar that killed `dharm` at 155.6 tok/doc.
@@ -69,6 +85,28 @@ PAIRS_MIN, PAIRS_MAX = 30, 46
 # IS THE ARBITER and re-tunes this against measured `claim_zone`.
 P_REPEAT = 0.26
 P_FAIL_NEW = 0.34            # remainder is OK
+
+# ⚑ ASSISTANT TURN LENGTH IS THE DOMINANT CLOCK KNOB — measured, and
+# it is NOT what the frozen card first assumed.
+#
+# `f` is the fraction of ELIGIBLE (assistant) tokens within T=64 of an
+# event. Eligible tokens are not uniform over the stream: they sit in
+# assistant turns, offset from the preceding event by the masked
+# environment turn. So a LONG assistant turn pushes most of its own
+# tokens past T=64 even when the inter-event gap is short.
+#
+# Measured in `retryesc_gen/dry_run.py` (40 docs, stub prose, seed 0):
+#     len band     P_REPEAT 0.26      P_REPEAT 0.32
+#     (60,120)     f 0.1119           f 0.1230
+#     (45, 90)     f 0.1485           f 0.1629
+#     (35, 70)     f 0.1896   <--     f 0.2079
+#     (28, 56)     f 0.2378           f 0.2609
+#
+# Turn length moves `f` by ~0.13 across that range; P_REPEAT moves it by
+# ~0.02. So the clock is bought with the TOKEN CLOCK, not by making the
+# agent fail more often — which is what card § 2.3 argued on principle
+# and what this measurement now supports on evidence.
+LEN_LO, LEN_HI = 35, 70
 
 # ── the GLOBAL strategy pool (shared by every task, deliberately) ───
 # Generic remediation moves. Shared across tasks so strategy tokens
@@ -183,6 +221,24 @@ class EpisodePlan:
     meta: dict
 
 
+def pairs_as_dicts(pairs: list[Pair]) -> list[dict]:
+    """JSON-serializable form of a pair list.
+
+    ⚑ Required because checkpointing is BLOCKING for every generation
+    card and `save_ckpt` writes plain JSON — a dataclass in the doc plan
+    crashes the first checkpoint. Caught in `dry_run.py` at $0, which is
+    where it should be caught."""
+    return [{"outcome": p.outcome, "strategy": p.strategy,
+             "env_text": p.env_text, "max_new": p.max_new} for p in pairs]
+
+
+def is_event(pair: dict) -> bool:
+    """Event iff the environment reports failure of an ALREADY-TRIED
+    strategy. Reads the plan, never the text — the text is deliberately
+    uninformative about repeat-status (card § 3)."""
+    return pair["outcome"] == FAIL_REPEAT
+
+
 def plan_schedule(rng: np.random.Generator, n_pairs: int) -> list[dict]:
     """Draw the outcome schedule ALONE — no task, no vocabulary.
 
@@ -216,7 +272,7 @@ def plan_schedule(rng: np.random.Generator, n_pairs: int) -> list[dict]:
 
 
 def plan(rng: np.random.Generator, tasks: list[str], n_docs: int,
-         len_lo: int = 60, len_hi: int = 120) -> list[EpisodePlan]:
+         len_lo: int = LEN_LO, len_hi: int = LEN_HI) -> list[EpisodePlan]:
     """Full per-document plan. DRAW ORDER IS LOAD-BEARING:
     schedule FIRST (difficulty), task SECOND (vocabulary)."""
     plans = []

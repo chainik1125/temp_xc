@@ -56,10 +56,18 @@ def main() -> None:
     ex = rg.exhaustion_check(plans)
 
     gates = {
-        "1_clock": {
+        # ⚠ SUPERSEDED by dry_run.py, which measures `f` directly instead
+        # of projecting it from a gap. The projection assumed uniform
+        # probe positions; eligible tokens are assistant tokens offset
+        # from events by the masked environment turn, so f is much lower
+        # at a given gap. Kept as a descriptive receipt, NOT a gate.
+        "1_clock_SUPERSEDED": {
             "projected_gap_median": round(gap, 1),
-            "target": rg.TARGET_GAP_MEDIAN, "range": list(rg.GAP_RANGE),
-            "pass": bool(rg.GAP_RANGE[0] <= gap <= rg.GAP_RANGE[1])},
+            "superseded_by": "dry_run.py -> claim_zone frac_in_window T64",
+            "why": "projection assumed uniform probe positions; "
+                   "eligible tokens sit in assistant turns offset from "
+                   "the event by the masked environment turn",
+            "pass": True},
         "2_vocabulary": {
             "event_rate_cv_across_tasks": round(si["cv"], 4),
             "spread": round(si["spread_max_minus_min"], 4),
@@ -88,9 +96,9 @@ def main() -> None:
               + "  ".join(f"{k}={v}" for k, v in g.items() if k != "pass"))
     print(f"\n{'ALL PLAN-TIME GATES PASS' if all_pass else 'GATE FAILURE'}"
           f" — {'proceed to pilot' if all_pass else 'do NOT generate'}")
-    print("\nGate 1 rests on realised/cap ~= "
-          f"{REALISED_FRAC}; the PILOT measures claim_zone directly and "
-          "re-tunes P_REPEAT. This is a pre-filter, not the arbiter.")
+    print("\nGates 2-4 are genuinely plan-side. The CLOCK is no longer "
+          "gated here: dry_run.py measures `f` directly on a built "
+          "stream, and the PILOT re-measures it on real prose.")
 
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps({
