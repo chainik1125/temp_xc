@@ -50,6 +50,11 @@ retrained — see COMPOSITION_AUDIT).
 - **Fig:** `figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` (FINAL
   3-seed; 7-point re-render lands ~morning, same path).
 - **Table:** `figs_writeup/tab_rlhf_shuffle_tsweep.md` (with render).
+- **ARCH (explicit, anti-confusion): the RLHF TXC is
+  `txc_batchtopk_post_btkonly` — the plain windowed BatchTopK
+  crosscoder (POST composition; probing uses PRE). It is NOT
+  txc_pro — no matryoshka/contrastive/subseq anywhere in these
+  classes (refutation receipts: LOG ~01:55 entry).**
 - **Data:** `experiment=rlhf` rows, btk arm complete at T{1,2,5,8,16}
   + T{4,6,10} landing overnight (x4 via runpod-a swap-drain; x6/x10
   drain ~06:30). **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins

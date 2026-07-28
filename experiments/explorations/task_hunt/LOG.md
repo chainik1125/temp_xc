@@ -16672,3 +16672,33 @@ a KEEP still auto-triggers the matrix retrain within the hour.
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+## 2026-07-28 01:54 London (date-verified) — mac-local — ⚑ "SHUFFLE ABLATIONS RAN ON TXC-PRO" CLAIM (Dmitry's agent, via Han): REFUTED WITH RECEIPTS
+
+**Checked at both levels, primary artifacts only:**
+1. **Row level:** every probing shuffle-sweep row (protocol 1.2.x)
+   is txc_batchtopk_{pre,post}(_btkonly) + baselines; every RLHF
+   TXC row is txc_batchtopk_post_btkonly. ZERO txc_batchtopk rows
+   carry any pro-signature hparam (h_frac / contrastive / t_sample
+   / matryoshka / subseq — scan of every arch_hparams_override).
+   The ONLY 'pro' row in the entire current leaderboard is one
+   paper-era SYNTHETIC-toy txc_pro row (protocol 1.1.0). runpod-c's
+   txc_pro_r1 work lives in the tscale scratch harness, NOT the
+   canonical leaderboard.
+2. **Class level:** configs/archs.yaml maps the sweep ids to
+   TXCBatchTopKPre/Post (+BTKOnly twins) in txc_batchtopk.py /
+   btk_only.py — no matryoshka, no contrastive, no subseq/t_sample
+   anywhere in those classes. The grep's matryoshka/contrastive
+   hits are the TSAE class (Ye et al.'s own design — correct for
+   that baseline).
+
+**Verdict: the shuffle-ablation exhibits ran on the plain TXC
+compositions, not txc_pro. Likely confusion sources for Dmitry's
+agent: (a) the PAPER's c3 probing figures legitimately include
+txc_pro as one of their 8 archs; (b) tonight's hill-climb
+(txc_pro_r1) is prominent in the LOG but is tscale-only; (c) the
+RLHF TXC is the POST composition (pre is probing's) — different
+from probing but not pro.** Handoff §3 hardened with the explicit
+arch name this push.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
