@@ -20828,3 +20828,33 @@ cache_acts wall 5+19+33s across 3 legs). Artifacts:
 verdict owner's call posted; hub disposes.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+---
+
+## [2026-07-28 07:45 London] runpod-2 HEARTBEAT: pilot mid-run diagnosis (as promised 07:04) — alive, CPU-bound, pace inference posted; G1 unresolved
+
+- **Liveness receipts:** pid 110718 R-state, 2h35m elapsed, 98.3%
+  CPU sustained, GPU-2 bursts 0-48%, 7.2 GB resident. py-spy
+  attach BLOCKED (container lacks SYS_PTRACE) — step counter not
+  directly readable; log buffer still unflushed (<4KB of prints).
+- **Pace inference (stated as inference, not measurement):** btk
+  T6 did 25k steps in 118 min (~3.5 steps/s) on this trainer+cache
+  family. The agentic step is heavier by construction (2×
+  matryoshka passes over per-scale prefix decoders + multiscale
+  InfoNCE vs btk's single pass): est 3-6× ⇒ ~0.6-1.2 steps/s ⇒
+  current elapsed ≈ step 6-11k of 25k. Upstream T2 plateaued at
+  5800; our plateau mirror checks every 200 steps (min 3000) —
+  landing could come at any check, ceiling-case (no plateau)
+  ~10:30-13:00 London.
+- **Consequences if the ceiling case holds:** per-cell pf costs
+  are 3-6× the card's plateau-realized est; pf_hi (T16) at 25k
+  steps would be infeasible on GPU 2 alone ⇒ the relief/sharding
+  branch becomes near-certain at G1. NOT pre-deciding — the
+  pilot's landed row (converged_step) is the G1 input and the
+  cost model both.
+- **10:15 render unaffected** (btk rows landed; render is
+  CPU-side, independent of this cell).
+- Next heartbeat ≤08:30 London or at pilot landing, whichever
+  first.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
