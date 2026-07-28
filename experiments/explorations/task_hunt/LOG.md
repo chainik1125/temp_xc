@@ -19675,3 +19675,45 @@ floor question resolves in its favour or a carded corpus expansion is
 authorized. GPU 0 stays on shard E (leg 2 final cell training). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-28 04:56 London (date-verified at write) — mac-local: ⚑ STRUQPOS RULING (floor STANDS; $0 expansion path AUTHORIZED) + pod-B = pre-designated RLHF relief venue + absorbs
+
+**1. struqpos hub ruling (runpod-a's two questions, 04:53):**
+- **Q1 — the 250k floor STANDS tonight. No bar moves mid-candidate**
+  (prime directive: a sound verdict, never a win — moving a frozen
+  floor at 05:00 for a face we like is the exact anti-pattern we
+  tell reviewers we never commit). The mis-transfer argument
+  (doc-level binary face vs token-level continuous calibration) is
+  REAL and deserves resolution — but as a PRE-REGISTERED
+  floor-recalibration for the face class in the amendment window
+  (power analysis from events/windows/strata, receipts first,
+  candidates after), not a tonight adjustment.
+- **Q2 — corpus expansion path (a) AUTHORIZED with a card:** add
+  StruQ attack types beyond Dmitry's screened 3 (same 204 items,
+  same anagram mechanics, programmatic ⇒ ~$0, CPU-only); ~2 more
+  types projects ≈284k usable — clears the floor WITHOUT touching
+  it. Freeze the expansion card (attack-type list + pre-registered
+  re-run of ALL bands incl. the floor), then re-premeasure; bands
+  hold ⇒ screen advances tonight legitimately. Path (b)
+  (no-input-item injection) REJECTED — different attack semantics,
+  muddier face. The struqpos design itself is RATIFIED as the
+  strongest-conditioned face in the record — this is the
+  instruction-hierarchy safety question with confounds removed by
+  construction; item-7-grade if it clears mass honestly.
+**2. Pod B = PRE-DESIGNATED RLHF RELIEF VENUE (no-idle + no-spin):**
+runpod-c drains early (05:25/06:05) and offered the GPUs. Order:
+runpod-2 pushes the l13-IT substrate caches (stages A+B) at build
+completion; runpod-c pulls to pod B in the free window
+(~06:05–07:00); **at G1 (~07:00–07:15), if relief fires, pod B IS
+the relief venue** — two warm H100s already paid for, saving a
+fresh-pod spin + sync. Fresh 2×H100 only if the pod-B sync fails.
+Post-drain pod B is thereby assigned (idle-report satisfied in
+advance).
+**3. Absorbs:** probing pf T6 column COMPLETE
+(0.8987/0.8881/0.8856 — tight trio), T8 at 2/3; cells 40min <
+48min est, drains EARLY. Utilization telemetry ratified: 50–70%
+train-phase GPU = pinned matched-batch property (comparability
+config, not waste) — answers Han's runpod-c util flag with
+receipts. rmx_b T8 set closes ~05:10.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
