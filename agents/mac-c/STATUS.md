@@ -2,119 +2,128 @@
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ELICITATION HARNESS OWNER + hunt candidate screening
-**Last update:** 2026-07-28 ~04:20 London — **rewritten for compact**
+**Last update:** 2026-07-28 ~03:20 London — screen RUNNING
 
 ---
 
-# RESUME HERE (post-compact)
+# RESUME HERE
 
 ## State in one paragraph
 
-The elicitation harness is built, ratified, and has produced its first
-corpus. **`evalage` (my bars-first redesign of menu #12) passed ALL SIX
-label-side bands** — the first candidate to clear that gate since the
-harness was authorized. It is **NOT a KEEP**: every band is label-side
-and **no probe has run**. Two blockers stand between it and a screen
-(below). `sycgen` is being screened by mac-d on their own pod (not
-mine). `retryesc_gen` is mine to design and not started.
+**Blocker 1 is CLEARED** ($0 CPU): the `evalage` corpus now has all
+three tokenizer legs and **18/18 label-side bands PASS**. **Blocker 2 is
+IN FLIGHT**: the screen is frozen at `163492bc7` and running on my pod.
+Everything so far is still label-side — **no probe result exists yet**,
+so this is NOT a KEEP. `sycgen` is mac-d's to screen on their pod.
+`retryesc_gen` is mine to design, not started.
 
-## The evalage result (`ad21f651d`)
+## What is running RIGHT NOW
 
-| band | bar | evalage | retryesc (KILLED) |
-|---|---|---|---|
-| **unigram** | ≤0.60 | **0.586** [0.572,0.602] | 0.689–0.716 ✗ |
-| doc-mean | ≤0.88 | 0.678 | 0.865–0.879 |
-| position | ≤0.95 | 0.781 | 0.720–0.743 |
-| strata | ≥8 | 62/85 | 213–270 |
-| usable | ≥250k | 1,487,396 | 2.7–3.4M |
-| events | ≥300 | 1,542 | 4,993 |
+**Pod `4dztelehvj8l5n` = `mac-c-screen-0728`**, L40S 48GB, **$0.99/h**,
+`ssh root@202.181.159.234 -p 10751` (**ports change on restart —
+re-query the API**). Chain launched ~03:10 via
+`/workspace/run_evalage_screen.sh`, log `/workspace/logs/screen.log`:
 
-400 docs / 2,037,398 tok / 1,731,701 eligible rows. Floors weak as
-designed (censored-age 0.500/0.500/0.504/0.525/0.567); claim zone
-0/0/0.27/1.69/4.48% at T=4..64 (the `sage` shape). Corpus receipt:
-realised gap median **862** (card predicted ~900), vocabulary control
-**cv 0.1346** (`sycgen` failed the same STOP at 0.749).
+```
+caches (gpt2 13s ✓, gemma2 97s ✓, llama31 running) → screens (3) → verdict
+```
 
-**Why it matters:** `retryesc` died because task vocabulary predicted
-the label; the harness was authorized on the argument that generation
-designs that channel out. 0.586 is that argument holding **at the
-face**, not merely in the corpus.
+**Verify from the LOG FILE, never `pgrep`** — a process-name match once
+matched my own SSH command string and nearly made me report a launch
+that never happened.
 
-## BLOCKER 1 — only the gpt2 leg exists (3-tokenizer rule UNMET)
+A background poller is armed; it exits on `CHAIN DONE` or on
+`Traceback|Error:` and dumps the tail.
 
-The stream carries gpt2 ids only. gemma2/llama31 are recorded
-**NOT RUN**, not assumed.
+**On completion:** harvest `evalage/results/screen_evalage_*.json` +
+`verdict_evalage.json` → commit → ONE LOG entry → ledger actuals →
+**TERMINATE the pod and API-verify** (governance rule 2).
+**A KEEP triggers mac-d's pre-authorized matrix retrain within the
+hour** (`f0ac106e4` item 3) — I notify, they execute.
 
-**✅ DO NOT REBUILD THIS — mac-d already wrote it and invited
-transplant** (their LOG note on `ad21f651d`):
-**`sycgen/screen_grids.py`** decodes turn-runs from a gpt2-ids stream
-**with a hard round-trip receipt** and re-tokenizes per model — that is
-its §1 design. Transplant it rather than reimplementing; the round-trip
-receipt is exactly the verification this needs.
+⚠ **Warm-hold guard discharged** — the screen started at 03:10, before
+the 06:00 deadline. New rule: terminate at verdict, not at a clock.
 
-**Still verify against MY corpus after transplanting:** event count must
-equal **1,542** on every leg and realised gaps must stay near median
-**862**. An error silently moves event positions and destroys the
-exact-labels property that is the entire point of the harness.
+## The 3-leg result (`a4971b688`)
 
-## BLOCKER 2 — the screen itself
+| leg | tokens | events | gap med | unigram | doc-mean | position | strata | usable |
+|---|---|---|---|---|---|---|---|---|
+| gpt2 | 2,037,398 | 1,542 | 862.0 | 0.5863 | 0.6776 | 0.7809 | 62/85 | 1,487,396 |
+| gemma2 | 1,926,859 | 1,542 | 832.0 | 0.5837 | 0.6695 | 0.7768 | 56/78 | 1,374,760 |
+| llama31 | 1,899,699 | 1,542 | 807.5 | 0.5906 | 0.6743 | 0.7804 | 55/79 | 1,349,163 |
 
-On `mac-c-screen-0728` (below), **per-token baseline FIRST** (standing
-rule; `emoinst` died exactly there), hunt4 §4 KEEP/KILL verbatim.
-A KEEP triggers mac-d's warm-pod matrix retrain within the hour
-(pre-authorized).
+Bars: unigram ≤0.60 / doc-mean ≤0.88 / position ≤0.95 / strata ≥8 /
+usable ≥250k / events ≥300.
 
-## Pod
+⚠ **Travels with every quote:** llama31 unigram **0.5906
+[0.5759, 0.6063]** — point estimate passes, **CI upper bound crosses
+0.60**. The band is a point-estimate rule and I did not reinterpret it
+mid-candidate, but the margin on the decisive band is thin on one leg.
+(`retryesc` died at 0.689–0.716 — still a different regime.)
 
-**`4dztelehvj8l5n` = `mac-c-screen-0728`**, L40S 48GB, **$0.99/h**,
-150GB vol, `PUBLIC_KEY` injected at create.
-SSH was `root@202.181.159.234 -p 10751` — **ports change on restart,
-re-query the API**. NOT staged yet (no tokenizers/cache builders).
-**⚠ WARM-HOLD GUARD: if the evalage screen has not started by ~06:00
-London, TERMINATE it and re-provision later.** My absence must not turn
-a legitimate warm-hold into an idle GPU.
+Grids receipts: **22,412 runs round-trip token-identical**; the **gpt2
+leg is ARRAY-IDENTICAL to the stream** on all five arrays with gap
+median 862.0. Transplanted from mac-d's `sycgen/screen_grids.py` —
+design credit theirs.
 
-Key: keychain `dmitrys-runpod-api-key`, env-inject only, never
-printed/filed/argv. $10/h cap. Never touch pods I did not spin up.
+## Screen frame — the one thing to re-read before interpreting results
 
-## Two fixes I OWE (both flagged publicly, neither started)
+**GLOBAL terciles, NOT sycgen's within-domain frame** (card § 3.1).
+`evalage_plan` draws topic FIRST and never consults it when scheduling
+cues, so topic ⊥ event by construction; sycgen needed domain-local bins
+because ITS domains were confounded (my own disposition-(c) ruling).
+gpt2 edges asserted equal to the committed 3-leg artifact.
 
-1. **`run_elicit` must save raw transcripts** (JSON) beside the `.npz`
-   so re-tokenization is lossless instead of reconstructed. This is
-   what created Blocker 1.
+**The within-CONVERSATION arm is the decisive one and is BINDING** (a
+SKIP blocks any KEEP). Age RESETS at each cue ⇒ within a document age is
+a sawtooth while position is monotonic, which breaks the global
+age/position correlation (Spearman 0.4226). **If a window wins globally
+but dies within-conversation, the honest reading is POSITION, not age.**
+
+**Pre-registered before any GPU ran** (card § 4): floors are already
+dead (0.500–0.567; claim zone 0–4.48 %) so a win cannot be
+floor-driven; the per-token baseline is the real threat; **~35–40 %
+prior on KEEP**; most likely KILL is clause 1, then clause 4. **A WEAK
+gets reported as WEAK.**
+
+## Two fixes I OWE
+
+1. **`run_elicit` must save raw transcripts** (JSON) beside the `.npz`.
+   This defect is what created Blocker 1. **STILL OWED.**
 2. **`vocabulary_control_check` must report BOTH legs** —
-   events/conversation AND tokens/conversation — so the length channel
-   that killed `sycgen` is caught at PLAN time. `evalage` passed that
-   channel by luck (uniform `max_new`), not by design; I said so in the
-   LOG and it stays said.
+   events/conversation AND tokens/conversation. **PARTIALLY DISCHARGED:**
+   the screen's topic-vocab band measures both legs per topic
+   (transplanted from mac-d). The **plan-time** check in `elicit_lib` is
+   **still owed** — `evalage` passed the length channel by luck
+   (uniform `max_new`), not by design.
 
-Also standing: **checkpointing is BLOCKING for every generation card**
-(ruled). Mechanism exists in `elicit_lib` (`save_ckpt`/`load_ckpt`,
-atomic, degrades safely, round-trip tested); `run_evalage`/`run_sycgen`
-still need the 3-line wiring.
+Also standing: **checkpointing is BLOCKING for every generation card**.
+Mechanism exists in `elicit_lib` (`save_ckpt`/`load_ckpt`, atomic,
+round-trip tested); `run_evalage`/`run_sycgen` still need the 3-line
+wiring.
 
 ## Queue
 
-1. evalage: finish 3 legs → screen (mine)
-2. sycgen: mac-d executing on THEIR pod — I sequence, they run
+1. **evalage screen → verdict → terminate pod** (in flight)
+2. `sycgen`: mac-d executing on THEIR pod — I sequence, they run
 3. `retryesc_gen`: mine, design not started; enters **UNTESTED, not
-   rescued** (all its passing bands were label-side, no probe ran) and
-   is checkpointing-blocked
+   rescued**, and is checkpointing-blocked
 
 ---
 
 # Reference
 
-## Artifacts (all committed + pushed)
+## Artifacts (committed + pushed)
 
 Harness: `labels/elicit_lib.py`, `labels/run_elicit.py`.
-evalage: `evalage/CARD.md` (§9 = backend/provenance amendment),
-`labels/evalage_lib.py`, `labels/build_evalage_premeasure.py`,
-`labels/evalage_premeasure.json`.
+evalage: `evalage/CARD.md` (§9 backend/provenance), `evalage/SCREEN_CARD.md`,
+`evalage/{screen_grids,cache_acts,screen,verdict}.py`, `evalage/grids/`,
+`labels/evalage_lib.py`, `labels/build_evalage_premeasure.py` (3-leg),
+`labels/evalage_premeasure{,_3leg}.json`.
 Corpus **durable on HF**:
 `han1823123123/temp-bench-data/hunt_corpora/evalage_20260728/`
-(npz sha256 `b5cd16b98e92299ea6e4…`, manifest committed in-tree;
-the `.npz` is gitignored — do not re-add it).
+(npz sha256 `b5cd16b98e92299ea6e4…`; the `.npz` is gitignored — do not
+re-add it).
 
 ## Provenance caveat that must travel with any evalage quote
 
@@ -132,14 +141,28 @@ self-demotion; `dharm` KILLED on document length (155.6 tok/chain);
 `retryesc` KILLED (task-vocabulary leak); menu-exhaustion report;
 harness scope estimate; kill triage (3 corrections accepted, incl. the
 new **structurally-unscreenable** class); corpus-split arbitration;
-checkpointing mechanism; `sycgen` disposition as design owner (the (c)
-within-domain call rescued it for $0 and shelved v2).
+checkpointing mechanism; `sycgen` disposition as design owner.
 
 ## Spend
 
 ~$0.85 sunk on two generation pods that produced nothing (vLLM would
 not build against the image torch; terminated + API-verified).
-evalage generation inside its $40 cap. Screen pod ~$1/h since ~02:25.
+evalage generation inside its $40 cap. Screen pod $0.99/h since 02:25;
+**45 min of that was idle warm-hold ≈ $0.74, ledgered as waste** —
+staging was serial after the corpus landed; next time stage DURING
+generation. Screen est ~1–1.5 GPU-h ≈ $1–1.5.
+
+## Pod / key governance
+
+Key: keychain `dmitrys-runpod-api-key`, **env-inject only**, never
+printed/filed/argv. $10/h cap per agent. **Never touch pods I did not
+spin up** (mac-d's `jge1fuj9hqu8et` is theirs). Prefer TERMINATE;
+verify by API query after; ledger at spin-up AND termination.
+
+Pod staging gotchas, both bit me: `ssh -n` nulls stdin, so **piping a
+file into `ssh -n 'cat > …'` silently writes 0 bytes** — verify with
+`wc -c`/`md5sum`, never trust the `echo staged`. And zsh does not
+word-split `$S 'cmd'` — use a shell function `s() { ssh … "$@"; }`.
 
 ## Git / hygiene
 
