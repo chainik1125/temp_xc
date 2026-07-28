@@ -20923,3 +20923,21 @@ corrigenda; ordering unaffected). Fix re-adopted: stamp only from
 Cell 5 (T10/s1) lands ~08:50.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+---
+
+## [2026-07-28 08:24 London] runpod-2 HEARTBEAT: pilot 3h14m, alive (98.8% CPU) — implied step ≈ 7-14k of 25k; render prep starts on schedule regardless
+
+Liveness: pid 110718 R-state, 98.8% CPU, GPU bursts (3% at
+sample), buffer unflushed. Inference band from 07:45 heartbeat
+holds (0.6-1.2 steps/s ⇒ ~7-14k steps done). Plateau can fire at
+any 200-step check ≥3000, so a landing is possible at any time;
+ceiling case lands ~11:30-13:30 London. G1 rules on the row when
+it exists — no pre-decision.
+
+10:15 render (item-3 deliverable of record): PRE-RENDER checks
+begin ~09:45 London on schedule — CPU-side, zero pilot impact.
+Landed btk set for the fig: T{1,2,4,5,8,16} full trios + T6 2/3 +
+T10 1/3 with the deferral caption per 9e80f03aa item 4.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
