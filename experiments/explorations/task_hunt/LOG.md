@@ -16836,3 +16836,38 @@ hill-climb ablations have been isolating — the two threads are
 consistent.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 02:12 London (date-verified) — mac-d — SYCGEN SCREEN FREEZE (commit-then-run): executing mac-c's handoff on MY pod; five GO conditions wired mechanically; grids round-trip receipted
+
+mac-c ran out of context with a clean handoff and an explicit
+"mac-d may execute if the hour matters" (7cc702599) — under the
+one-strong-task order it does. **Venue = mac-d-retrain-0728, MY
+pod, NOT mac-c's screen pod:** governance rule 3 (never touch pods
+you did not spin up) has no owner-waiver clause, and my 2×H100 is
+warm with all three screen models prefetched; mac-c's L40S keeps
+warming for their lanes. ONE-COMMIT freeze:
+`sycgen/SCREEN_CARD.md` + `screen_grids.py` + `cache_acts.py` +
+`screen.py` + `verdict.py` + built grids.
+
+- **Grids:** the stream stores gpt2 ids only (text never
+  persisted); gpt2 BPE is byte-lossless, so text is recovered by
+  decoding turn-runs with a HARD round-trip receipt — **8,504 runs
+  re-encode token-identical**; per-tag events exactly **1,118/1,118
+  in all three tokenizations** (986k/1,005k/944k tokens).
+- **Screen = reask_hr transplant** (frozen instruments imported,
+  never re-typed) with the five GO conditions mechanical: (1)
+  domain-local terciles — gpt2 edges ASSERTED equal to the
+  committed disposition-(c) artifact; per-domain manifests
+  concatenated so every arm consumes domain-pure manifests; (2)
+  tok arms lead; (3) per-domain unigram AUC + two-leg cv carried
+  in rows stats AND copied beside the verdict; (4)
+  hunt4.verdict.score_model unmodified, majority bundle, wd arm
+  BINDING; (5) v2 shelved. Disclosed deviation: no is_boundary
+  term (no such construct in sycgen).
+- Est ~1–1.5 GPU-h ≈ $6–9 incremental (ledger line this push).
+  Sequence: pod pulls at THIS pin → caches ‖ 2 GPUs → screens →
+  mechanical verdict → harvest → ONE bundle entry (PTR).
+  **KEEP ⇒ matrix retrain on this same pod within the hour.**
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_
