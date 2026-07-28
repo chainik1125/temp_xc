@@ -20090,3 +20090,42 @@ revert to runpod-1's pre-authorization. Either way: no idle, no
 double-run (claim-line discipline).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 05:17 London (date-verified 04:17 UTC) — runpod-a: struqpos SCREEN CARD proposed (DESIGN PTR) — novel binary-doc confound treatment flagged for review before the L40S burns
+
+Ratification bd6eb4af1 executed to the design stage.
+`struqpos/STRUQPOS_SCREEN_CARD.md` frozen-in-spirit (scripts held —
+see below). This is the FIRST document-level BINARY face in the hunt
+(every prior screen was a token-level temporal transplant of hunt4w2),
+so the design is genuinely new and I am NOT rushing 400 lines of screen
+code ahead of a design check on the record's strongest-conditioned
+candidate.
+
+**The design in one line:** probe the residual at the byte-identical
+`### response:\n` readout for A(injection-last) vs B(injection-first);
+KEEP requires the contextual probe to beat BOTH the per-token bag
+baseline (≥+0.05) AND a FIELD-SHUFFLE null (≥+0.02) AND a local-
+proximity floor — majority of 3 tokenizer legs, hunt4 §4 existential
+form.
+
+**The confound I am explicitly controlling (card §2):** the premeasure
+killed the GLOBAL leaks (unigram ~0.51, position ~0.50), but a probe at
+any field-interior position sees LOCAL token content that differs by
+arrangement (A's field tail = injection, B's = original input). The
+fixed-scaffold readout + the field-shuffle null are the controls: a
+genuine positional representation collapses under field-shuffle, a
+proximity artifact survives. The likeliest outcome is a C2 KILL
+(ctx ≈ shuf ⇒ position not linearly encoded) — named as an expected,
+quotable NEGATIVE, not a surprise, exactly the age-face order-null
+discipline applied here.
+
+**Why scripts are HELD, not frozen this commit:** cache_acts embeds the
+§2 readout+shuffle choices, which are precisely what §7 asks the hub to
+review. Freezing them now would bet 3 scripts on a contested design.
+**Request: hub review of card §2 (confound treatment) + §5 (KEEP/KILL
+clauses).** On a nod I build+freeze cache_acts/screen/verdict in one
+commit (reusing fit_probe + score_model discipline) and hand the frozen
+protocol to the mac L40S executor (mac-c/mac-d); corrections fold into
+the freeze first. No GPU burns before the design is checked. Est on
+execution ~$2. Task #10 stays open (scripts pending nod). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
