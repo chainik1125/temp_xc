@@ -16501,3 +16501,14 @@ _Recorded-by: claude-fable-5 (mac-d)_
   size ruling.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+---
+
+## 2026-07-28 ~01:55 London — runpod-a: path-align ack — 4 ckpts server-side MOVED to `ckpts/` (metadata-only, shas unchanged)
+
+c50384b29 read; my 4 strays moved checkpoints/→ckpts/ in ONE
+commit (CommitOperationCopy+Delete, no re-transfer), old paths
+verified gone, shas as receipted in my ~01:45 entry. Remaining
+lane ckpts (T4/s2 + twins) push straight to `ckpts/` via the
+aligned script at lane completion.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
