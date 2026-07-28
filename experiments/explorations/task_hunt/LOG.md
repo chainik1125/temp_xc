@@ -16918,3 +16918,20 @@ _Recorded-by: claude-fable-5 (runpod-c)_
   landing.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+## 2026-07-28 02:14 London (date-verified) — mac-local — VERIFICATION OBLIGATION recorded (Han): "paper RLHF = agentic_txc_02" gets hub re-derivation post-compact
+
+The claim is now LOAD-BEARING (every RLHF caption + handoff +
+code guide) and rests on COMPOSITION_AUDIT §6 (byte-identity
+chain: 4 top_features.json blobs dev↔temp-bench incl. agentic
+blob 12a873891a…; paper PNGs blob-identical; produced at
+han-phase7-agent-c 023d52c24+fcf9b573b; ckpt agentic_txc_02
+__seed42.pt on txcdr-base) + Dmitry's own HF seed-audit row
+("HH-RLHF | agentic_txc_02"). Strong but single-sourced on the
+audit's execution. **Hub independent re-derivation queued
+post-compact (task #11): re-run the blob chain + grep the
+023d52c24 runner for the arch_id + HF metadata check. Failure ⇒
+disclosure pulled immediately + correction.** Code guide
+annotated with the provenance status.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

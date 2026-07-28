@@ -195,6 +195,12 @@ liveness-checked 20:25 07-27, both GPUs busy w/ L1 twins).
 
 ## IMMEDIATE NEXT ACTIONS (post-compact checklist)
 
+0. **VERIFY "paper RLHF TXC = agentic_txc_02" (task #11, Han
+   order)** — re-derive the audit §6 chain independently (runner
+   grep at han-phase7-agent-c 023d52c24, blob identity, HF
+   metadata). Load-bearing on every RLHF caption. Failure ⇒ pull
+   the disclosure + correct.
+
 1. Watch for: runpod-1 hardening tests (a)/(b) results → rule on
    the certificate; runpod-2 RLHF FINAL fig + equivalence-gate
    result; runpod-b λ̂ verdict + fig; runpod-c utilization report +

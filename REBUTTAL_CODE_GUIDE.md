@@ -41,6 +41,11 @@ append-only in `results/leaderboard.jsonl`, stamped with
   (k_win=100·T = 500 at the paper's T=5), per-window selection
   granularity preserved via the POST composition. Full pins:
   `experiments/explorations/task_hunt/COMPOSITION_AUDIT.md` §0/§3/§6.
+  (Provenance status: the agentic_txc_02 identification is
+  AUDIT-PINNED with byte-identity receipts + corroborated by
+  Dmitry's own HF seed-audit table; hub independent re-derivation
+  queued — task #11 / LOG ~02:1x. If it ever fails, the disclosure
+  is pulled immediately.)
   The RLHF renderer prints this disclosure below the axis on every
   fig.
 
