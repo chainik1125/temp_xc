@@ -88,3 +88,31 @@ Sections: §4 synthetic (Coupling + Denoising benches), §5.1 sparse probing (Ge
 - 23:00 probe: 1 cell ran (~6 min @10k steps), 14 refused — container tree went dirty after cell 1 appended the TRACKED results/leaderboard.jsonl; house rows carry dirty:true+diff hash, so container driver now passes --allow-dirty (code identity still pinned by _assert_pinned). Rescope from measured cost: T grid {1,2,4,5,8,10} (T=20 degenerate at every k: k·T≥d_sae), k_pos {1,2,5} (10/20 clipped almost everywhere), n_steps 6000, A10G. 216 cells, est ~$18. FAN-OUT launched detached at freeze 2ce33ac5.
 - 23:20 dataviz pass on analysis.py: Okabe-Ito palette validated (CVD ΔE 29+), k_pos as linestyle not alpha, slopes in legend, frozen tsae refs overlaid (gauc/eauc only — decoder-direction metrics; baselines had 10k steps vs our 6k = bias in baselines' favor, stated).
 - 23:45 **mac-a's CANONICAL btk-only convention landed (92db86c4)** — my implementation matched on substance except two eval-path items: EMA source set {>0}→{!=0} and threshold_set flag replacing the −1.0 sentinel. Conformed: renamed registry entry to `txc_base_btkonly` (canonical *_btkonly pattern), relu_mode hparam constructor-asserted, arch_version 1.1.0, new negative-threshold gating test. Full suite 351 green. Training path bit-identical to v1.0.0 → in-flight sweep rows stay valid for gauc/eauc; analysis folds both names into the btk-only arm. **mac-local APPROVED the convention (9e634bed) — pods GO.** Plan: after main sweep, redo the 12 btk shards under the canonical name (freeze v3 = 08711a37; composite shards Volume-skip), keep v1.0.0 rows as reproducibility cross-check.
+
+
+## Close-out (2026-07-28 ~02:30 UTC)
+
+Sprint ran far past the nominal 10h at the user's direction (EM extension,
+budget scan, RunPod fallback). Final state:
+
+- **Findings 1–7 in summary.md**, all figures in plots/btk_rerun/, 1,090+
+  canonical leaderboard rows in git.
+- **Artifacts**: HF public dataset `dmanningcoe/temp-xc-btk-sprint-artifacts`
+  (EM checkpoints, training cache, cohort cache minus judge_outputs; dataset
+  card up). Composite-T16 checkpoint pending upload on h200a's volume (its
+  machine occupied; pod STOPPED, data safe) — push /workspace/hf_push.sh
+  there when it restarts. Toy checkpoints not persisted (minutes to
+  retrain). Modal volume temp-xc-btk-rerun retains row JSONs + caches +
+  T1 checkpoints.
+- **Pods**: all four STOPPED (no GPU billing; volume storage only).
+  Incidents booked in the ledger: double-dispatch zombies, corrupt cohort
+  cache on h200a, self-stop watchers dead on pgrep self-match (~$20–30).
+- **Platform limits hit during the run**: Claude monthly limit (killed the
+  red-team subagent), Modal workspace spend limit (mid-EM-wave; RunPod
+  fallback per user), HF private-storage quota (resolved: public repo per
+  user).
+- **Open threads for the team**: exact-k eval re-pass to close the btk-only
+  density confound; seed top-ups on EM + scan winners; probe sweep past
+  T=20 (needs seq_len-128 datasource); mac-a-convention threshold-path
+  density artifact flagged for runpod-2's lane; backtracking eval-side
+  no-ReLU ablation still parked (Aniket's lane).
