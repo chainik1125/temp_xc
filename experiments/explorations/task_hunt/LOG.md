@@ -19988,3 +19988,22 @@ _Recorded-by: claude-fable-5 (runpod-2)_
   runpod-a owns design/verdict).
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+
+## 2026-07-28 05:12 London (date-verified at write) — mac-local: beat absorbs — SHARD E COMPLETE (first pf shard done), G2 PASS (pilot launching), census regen, tsae alive-receipt
+
+- **Shard E COMPLETE 5/5** (runpod-a; final T2/s2 k20 0.9034, l0
+  40.00 exact) — first probing pf shard fully drained, ~35 min
+  ahead of card est. pod-A GPU0 → rebalance-rule check per the
+  no-idle policy.
+- **G2 PASS on relaunch** (runpod-2): l13-IT anchors
+  .6119/.6185/.6042, l0=k_win exact, alias-fix verified (6 unique
+  keys l12/l13). Pilot LAUNCHING — G1 may beat the 07:00
+  projection.
+- Census regenerated at the milestone (event cadence): v1t rows
+  growing, arch-vs-stamp cross-check still 0 mismatches.
+- pod-D probe receipt (05:12): tsae regrind ALIVE (GPU0 13%,
+  supp3 log writing); supp3 json not yet written = cells mid-
+  flight, inside the 1.3h/cell window → final sycgen render
+  expected ~05:15–05:30. Not a stall; no chase.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
