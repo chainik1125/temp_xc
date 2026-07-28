@@ -113,5 +113,9 @@ experiments/explorations/task_hunt/labels/elicit_evalage_v1.npz
 # evalage v1 raw transcripts (10MB of generated text), recovered
 # retroactively by evalage/dump_transcripts.py under a per-run gpt2
 # round-trip receipt. The RECEIPT (sha256, counts) is committed as
-# evalage/transcripts_receipt.json; HF carries the durable copy.
+# evalage/transcripts_receipt.json.
+# NOT pushed to HF, deliberately: unlike the npz this file is DERIVABLE
+# — the npz is already durable on HF and dump_transcripts.py regenerates
+# these bytes exactly (the committed sha256 is the check). Mirroring
+# derivable bytes buys nothing before token rotation.
 experiments/explorations/task_hunt/labels/elicit_*_transcripts.json
