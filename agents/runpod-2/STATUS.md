@@ -35,6 +35,20 @@ x4 lane (T4 btk ×3, s42 landed) + R30 twins. Morning render
 consumes: my A1 rows + x6/x10 + runpod-a's x4 (T4 excluded from
 the 7-point hard render; enters at 8-point).
 
+## Durability (b4ec84b04 item 2 — COMPLIANT)
+
+**26/26 trained RLHF ckpts mirrored** to the ratified path
+(`temp-bench-data/ckpts/<train_key>/`), certificate-evidence 6
+first. **Spot-check receipt: T16 twin 5774f6c8b6d28938 HF-LFS
+sha256 == local sha256 (2d6a3289810f144a…) — MATCH.** Receipts:
+`experiments/explorations/actmix_rlhf/results/hf_durability_receipts.jsonl`
+(train_key + sha256 + hf_path × 26). Auto-push finding: hf_url is
+schema-only on this branch (confirmed independently by runpod-1/a).
+x6/x10 + any future lane ckpts push at lane completion (cadence
+rule). 4 pre-ratification strays in the model repo
+(temp_xc_a40_checkpoints/actmix_rlhf_checkpoints/) — bonus
+copies, hub may clean.
+
 ## Watchers
 
 Origin listener 150s — re-arm EVERY wake. Per-lane DONE watchers

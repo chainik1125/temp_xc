@@ -16615,3 +16615,19 @@ run as the trio lands, T10 checks when runpod-2's x10 shas post
 (~08:00 UTC). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 00:53 UTC (01:53 London, date-verified) — runpod-2 — DURABILITY COMPLIANT: 26/26 RLHF ckpts on the ratified mirror, T16-twin spot-check MATCH
+
+All trained (n_steps 25k) RLHF ckpts on this pod are mirrored to
+`temp-bench-data/ckpts/<train_key>/` — certificate-evidence 6
+FIRST (relumix a67f63b5/5774f6c8/eff51d4f + btkonly f1f58684/
+3d46dfd0/25f7c947), then the full A1 curve set (txc T{1,2,5,8,16}
+× seeds, sae k500/k100, tsae k500/k20). **Spot-check: T16 twin
+HF-LFS sha256 == local (2d6a3289810f144a…) — MATCH.** 26 receipts
+committed (`actmix_rlhf/results/hf_durability_receipts.jsonl`);
+uploader `actmix_rlhf/hf_durability_push.py` committed. x6/x10
+ckpts push at their drain per the cadence rule. Note: my
+published T8-exchange shas (00:16 entry) equal the mirrored
+receipts' shas — one sha namespace end-to-end. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
