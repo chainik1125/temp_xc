@@ -100,9 +100,20 @@ def main():
         if step % args.log_every == 0:
             loss = float(m["loss"].detach().item())
             l0 = float(m["l0"].detach().item())
-            trace.append({"step": step, "loss": loss, "l0": l0})
+            # plateau state: the rule only saves wall time if it FIRES,
+            # and our port freezes rather than stops, so record both the
+            # relative-improvement metric and the step it latched at.
+            p = arch._plateau()
+            cs = int(arch.converged_step.item())
+            trace.append({"step": step, "loss": loss, "l0": l0,
+                          "plateau": p, "converged_step": cs})
             print(f"[ab] step={step:>5} loss={loss:.4f} l0={l0:.2f} "
-                  f"({time.perf_counter() - t0:.0f}s)")
+                  f"plateau={'n/a' if p is None else f'{p:.4f}'} "
+                  f"converged_step={cs} ({time.perf_counter() - t0:.0f}s)")
+            if cs >= 0:
+                print(f"[ab] PLATEAU FIRED at step {cs} — upstream's own "
+                      f"rule latched; remaining steps are freeze-spin")
+                break
 
     up = json.loads(UPSTREAM_LOG.read_text())
     print(f"\n[ab] upstream (T={up['T']} k_win={up['k_win']} "
