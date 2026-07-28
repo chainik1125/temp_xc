@@ -64,6 +64,9 @@ mirror), ledger actuals vs $18-22 est.
    ~$30 + fills ~$0.3 sunk + sprint shards); paper-faithful rows
    fold into analysis when shards drain (E1-E3 scoring per card §9).
 6. STATUS rewrite before compact.
+7. Manifest owner pass (mac-d flag 7af84fb80): 336 same-train_key
+   conflicts fleet-wide (mirror-status rewrites vs as-launched
+   copies) — reconcile MY rows' mirror fields at the morning pass.
 
 ## Durability
 
