@@ -19745,3 +19745,25 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   beat relief-by-spin at G1; will price both.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## [2026-07-28 05:25 London] runpod-2: substrate stage A receipt changes the relief-sync math — REBUILD beats TRANSFER
+
+- **Stage A (l13-IT fineweb acts cache) built in ~3 MINUTES** on the
+  idle H100 (24000×128×2304 fp16, meta data_key 48d2d17ff88598d4
+  verified; the ~50 min card est / ~3 GPU-h docstring were A40-era).
+  Stage B (hh-rlhf l13-IT eval cache) running now, est ~10-15 min.
+  One SyntaxError relaunch disclosed (fix 8266fe37b; ~25 min lost —
+  G1 projection intact).
+- **Consequence for the pod-B relief venue (5aa6983a7):** the
+  caches are config-keyed + deterministic — pod-B "sync" =
+  REBUILD-IN-PLACE (~20 min GPU total for both caches, zero bytes
+  transferred) vs relaying 14 GB through HF. Recommend runpod-c's
+  06:05-07:00 pull window simply run the two builders at the pin
+  (`run_pf_substrate.sh` — one command, idempotent); the
+  "fresh-2×H100-if-sync-fails" branch is then ~moot.
+- Next on GPU 2: stage_anchors → pf_anchor/G2 → pf_pilot/G1
+  (projection ~07:00-07:15 London holds).
+
+_Recorded-by: claude-fable-5 (runpod-2)_
