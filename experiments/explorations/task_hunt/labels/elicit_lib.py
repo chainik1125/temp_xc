@@ -95,6 +95,14 @@ def claim_zone(raw_age: np.ndarray, elig: np.ndarray, Ts) -> dict:
             "frac_in_window": {f"T{T}": float((a <= T).mean()) for T in Ts}}
 
 
+# PROPOSED bar for the two-leg vocabulary control, not yet ratified.
+# Calibrated on the only two points the program has: sycgen FAILED the
+# length channel at cv 0.749, evalage passed at 0.1346. 0.35 sits
+# between them with margin on both sides. A `stop` means "take it to the
+# design owner", not "kill the candidate".
+VOCAB_CV_BAR = 0.35
+
+
 def vocabulary_control_check(token_ids: np.ndarray, event_first: np.ndarray,
                              doc_off: np.ndarray, topics: list[str],
                              window: int = 256) -> dict:
@@ -102,27 +110,84 @@ def vocabulary_control_check(token_ids: np.ndarray, event_first: np.ndarray,
 
     `retryesc` died because task vocabulary predicted the label. Here we
     can verify the control directly: the distribution of topics must not
-    differ between documents with many vs few events. Reported as the
-    per-topic event rate spread — a large spread means the control
-    FAILED and the scaffold must be fixed before generation is trusted.
+    differ between documents with many vs few events.
+
+    **TWO LEGS, reported separately — this is the fix to my own defect.**
+    The original version reported only events-per-TOKEN, which is a
+    ratio and therefore silently conflates two different leaks:
+
+      * `events_per_conv` — does topic predict the event SCHEDULE?
+      * `tokens_per_conv` — does topic predict conversation LENGTH?
+
+    A ratio can look clean while both legs are dirty in the same
+    direction, and the length leg is the one that actually fired on
+    `sycgen`. `evalage` passed it by luck (uniform `max_new`), not by
+    design, and I said so in the LOG before this fix existed. The legacy
+    `event_rate` keys are kept so old receipts stay comparable.
+
+    `stop` fires if EITHER leg exceeds `cv_bar`. The bar is PROPOSED,
+    not ratified: `sycgen` failed at cv 0.749 and `evalage` passed at
+    0.1346, so 0.35 sits between them with margin on both sides. Treat a
+    `stop` as "take this to the design owner", not as an automatic kill.
     """
     n_docs = len(doc_off) - 1
     per_doc_ev = np.array([int(event_first[doc_off[d]:doc_off[d + 1]].sum())
                            for d in range(n_docs)], dtype=float)
     per_doc_tok = np.diff(doc_off).astype(float)
     rate = per_doc_ev / np.maximum(per_doc_tok, 1)
-    by_topic = {}
-    for t in sorted(set(topics)):
-        m = np.array([x == t for x in topics])
-        if m.sum():
-            by_topic[t] = float(rate[m].mean())
+
+    def _by_topic(vals_per_doc):
+        out = {}
+        for t in sorted(set(topics)):
+            m = np.array([x == t for x in topics])
+            if m.sum():
+                out[t] = float(vals_per_doc[m].mean())
+        return out
+
+    def _spread(d):
+        v = np.array(list(d.values())) if d else np.array([0.0])
+        return {"per_topic": d,
+                "spread_max_minus_min": float(v.max() - v.min()),
+                "cv": float(v.std() / max(v.mean(), 1e-9))}
+
+    legs = {"events_per_conv": _spread(_by_topic(per_doc_ev)),
+            "tokens_per_conv": _spread(_by_topic(per_doc_tok))}
+    worst = max(legs, key=lambda k: legs[k]["cv"])
+    by_topic = _by_topic(rate)
     vals = np.array(list(by_topic.values())) if by_topic else np.array([0.0])
     return {"per_topic_event_rate": by_topic,
             "spread_max_minus_min": float(vals.max() - vals.min()),
             "cv": float(vals.std() / max(vals.mean(), 1e-9)),
-            "note": ("large spread => topic predicts event status => the "
-                     "retryesc vocabulary leak is being rebuilt; fix the "
-                     "scaffold, do not proceed")}
+            "legs": legs,
+            "worst_leg": worst,
+            "worst_leg_cv": legs[worst]["cv"],
+            "cv_bar_proposed": VOCAB_CV_BAR,
+            "stop": bool(legs[worst]["cv"] > VOCAB_CV_BAR),
+            "note": ("TWO LEGS: events/conv = topic predicts the event "
+                     "SCHEDULE; tokens/conv = topic predicts conversation "
+                     "LENGTH (the channel that fired on sycgen). Either "
+                     "one large => the retryesc vocabulary leak is being "
+                     "rebuilt; fix the scaffold, do not proceed. The "
+                     "events-per-TOKEN keys are the legacy ratio, kept "
+                     "for comparability — do not read them alone.")}
+
+
+def save_transcripts(path: Path, docs: list) -> None:
+    """Persist the raw generated text beside the `.npz`.
+
+    **My defect, now fixed.** `build_stream` wrote token ids and threw
+    the text away, so the corpus could only be re-tokenized by decoding
+    the gpt2 ids — which happens to be lossless, but that is a property
+    of gpt2's byte-level BPE, not something a scaffold may rely on. A
+    generation card that cannot produce its own text cannot be
+    re-tokenized for the 3-tokenizer rule without a recovery step, and
+    that is exactly the blocker `evalage` hit.
+    """
+    out = [{"topic": d["plan"].get("topic"),
+            "turns": [{"role": r, "text": x, "is_event": bool(e)}
+                      for r, x, e in d["turns"]]}
+           for d in docs]
+    path.write_text(json.dumps(out, ensure_ascii=False))
 
 
 def write_stream(out_path: Path, *, token_ids, doc_off, event_first,

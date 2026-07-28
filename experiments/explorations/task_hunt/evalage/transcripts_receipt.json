@@ -1,0 +1,11 @@
+{
+ "source_stream": "elicit_evalage_v1.npz",
+ "recovered_by": "gpt2 decode of the frozen run decomposition (screen_grids.doc_runs), re-asserted per run",
+ "n_docs": 400,
+ "n_turns": 22412,
+ "n_event_turns": 1542,
+ "roundtrip": "every run re-encodes token-identical",
+ "chars": 10095340,
+ "sha256": "8a87fc3154fb39132a59cc90b1a65df0ea39daa654759ad80373917c7aa9bde1",
+ "note": "retroactive fix \u2014 run_elicit now persists transcripts at generation time via elicit_lib.save_transcripts; this recovers the corpus that predates that fix"
+}

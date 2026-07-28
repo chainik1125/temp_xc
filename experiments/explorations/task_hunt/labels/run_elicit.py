@@ -340,6 +340,10 @@ def main():
     el.write_stream(HERE / f"elicit_{tag}.npz", token_ids=ids,
                     doc_off=doc_off, event_first=first, event_mask=mask,
                     probe_eligible=elig, doc_split=split)
+    # raw text beside the npz — the fix to my own defect. Without this,
+    # re-tokenizing for the 3-tokenizer rule needs a decode-recovery
+    # step, which is exactly the blocker evalage v1 hit.
+    el.save_transcripts(HERE / f"elicit_{tag}_transcripts.json", docs)
     gaps = el.realised_gaps(first, doc_off)
     vc = el.vocabulary_control_check(ids, first, doc_off, topics)
     rec = el.corpus_receipt(
