@@ -67,13 +67,15 @@ label.
   ∈ {5,20}, `eval_cfg.shuffle` ∈ {none, within_window}, seeds
   {1,2,42}. Datasource `gemma_2_2b_it_l13_fineweb_24k128` (paper
   probe cache; gemma-2-2b-it L13).
-- **PAPER-FAITHFUL ARMS (Han requirement, commissioned ~02:3x):**
-  the TRUE paper-composition T-sweeps (probing: trained
-  ReLU(TopK_{20T}(Σ)) via the upstream class; RLHF: agentic_txc_02
-  ported + trained) are COMMISSIONED and land in the amendment
-  window (target Aug 1-2). Until then the exhibits carry the v2
-  arms + the archived paper-composition T=5 anchors, labeled per
-  the rule below.
+- **PAPER-FAITHFUL ARMS (Han requirement — DELIVERED OVERNIGHT):**
+  probing: **ALL 21 `paper_txc_base_v1t` cells COMPLETE on the
+  leaderboard (7 T × 3 seeds, trained ReLU(TopK_{20T}(Σ)) via the
+  vendored upstream stack; E1–E3 fidelity gates incl. the
+  archived-anchor interpolation check PASSED)** — the pf+btk
+  7-point figs/tables render this morning, same paths. RLHF:
+  agentic_txc_02 trainable port frozen + substrate/anchors G2
+  PASSED; pilot → G1 in flight, grid today (relief pod
+  pre-staged), amendment-window fallback.
 - **LABELING RULE (binding, Codex-prompted):** the T-sweep arms are
   v2 compositions — label "TXC (v2, relu-mix/btk-only)", never
   "paper base"; the paper-exact composition appears only as the

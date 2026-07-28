@@ -95,11 +95,13 @@ the hunted-task cells that live outside the leaderboard. It is
 generated, not hand-written: refresh with
 `.venv/bin/python scripts/cell_census.py --write` — cells are landing
 all night (paper-faithful sprint, sycgen retrain), so regenerate
-before quoting coverage. Known in-flight gaps at 03:06: RLHF
-btk-only T{6,10} (old-pod GPU 2), ALL `paper_txc_base_v1t` cells
-(sprint, ETA ~06:30–07:30), sycgen retrain rows (~04:00). The
-probing btk-only arm is COMPLETE at 7 T × 3 seeds (T10/s2 landed
-03:00).
+before quoting coverage. State at 07:20: **probing paper-faithful
+COMPLETE 21/21** (last 3 cells hub-repatriated from pod B, LOG
+~07:1x); probing btk-only COMPLETE 7 T × 3 seeds; sycgen retrain
+rows on-board (15 trained + twins). Remaining gaps: RLHF
+paper-faithful grid (pilot→G1 in flight), RLHF btk T{6,10}
+(DEFERRED by Han's pf-priority order — T6 holds 2/3 seeds as
+partial-bonus).
 
 ## 2. Sparse probing — code, data, results
 
@@ -159,6 +161,13 @@ probing btk-only arm is COMPLETE at 7 T × 3 seeds (T10/s2 landed
   `metrics.shuffle_gap_auc_k20`); there is no `eval_cfg.k_feat` /
   `eval_cfg.shuffle` on RLHF rows (that is probing-1.2.x semantics).
   T=1 rows legitimately omit `shuffled_*` (shuffle ≡ identity).
+  **Substrate identity (added 05:05 07-28, G2 catch):** newer RLHF
+  rows carry `eval_cfg.hh_rlhf_cache` — a registry TAG
+  (`l12base_phase7` / `l13it_paper`) hashing into the eval_key,
+  with a `cache_expect` {subject, layer} hard-check before any
+  metric. Empty-`eval_cfg` rows are historical (l12base_phase7 by
+  default). Never compare rows across cache tags as
+  same-substrate.
 - **Fig/table:** `figs_writeup/fig_rlhf_shuffle_tsweep.*` +
   `tab_rlhf_shuffle_tsweep.md` (morning 7-point render). Licences:
   order-free inverted-U, T8 peak; shuffle gaps ≈ 0 at T ≤ 8, seed-
@@ -184,7 +193,7 @@ probing btk-only arm is COMPLETE at 7 T × 3 seeds (T10/s2 landed
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — what is running on every pod (snapshot 02:58 BST 07-28; sprint shards RUNNING)
+## 5. FLEET MAP — what is running on every pod (snapshot 07:20 BST 07-28; probing pf grid COMPLETE)
 
 This section dates fast. **Live sources: `agents/<id>/STATUS.md`
 (each agent self-maintains its own) + the LOG tail** — trust those
@@ -192,29 +201,30 @@ over this snapshot if they disagree.
 
 | pod | agents | GPU | running NOW | next |
 |---|---|---|---|---|
-| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0 | **paper-faithful probing shard A RUNNING since 01:39 UTC** (T16×3 → T1/s42; card d9235755b, arch `paper_txc_base_v1t`) | drain → 11:00 renders |
-| | | 1 | night-grid tail (btk s2/T10 — the last btk probing cell) | **shard B (T10×3 → T1/s1) armed at drain** |
-| | | 2 | x6 ‖ x10 (btk RLHF T{6,10}; **YIELDS to the RLHF paper-faithful grid on contention — Han priority**) | RLHF paper-faithful grid (agentic port card ~04:30) |
-| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | **paper-faithful probing shard E RUNNING since 02:41** (T4×3 → T2×{1,2}; est done ~06:20) | — |
-| | | 1 | rmx_b (eq-extension cells 2–6; cell 2 lands ~04:00) | overflow only post-drain (~11:30; boundary offer CLOSED) |
-| **pod B** (2×H100) | runpod-c alone | 0+1 | **paper-faithful probing shards C (T8×3→T1/s2) + D (T6×3→T2/s42) BOTH RUNNING** (launched 02:48 / 03:2x); hill-climb FULLY DRAINED + 27/27 ckpts HF-mirrored (freeze order discharged; resume playbook `tscale/RESULTS.md` §FREEZE) | drain → renders |
-| **mac-c-screen-0728** (L40S) | mac-c | — | **TERMINATED 03:14 (API-verified)** — evalage screen ran and returned WEAK 3/3 (no retrain); lane closed on-budget | mac-c continues CPU-side: retryesc_gen design/generation |
-| **mac-d-retrain-0728** (2×H100) | mac-d | 0+1 | **sycgen matrix retrain RUNNING — 36 cells, T{1,2,4,8,16} ≡ the λ̂ exhibit axis** (card 74d260321 + §5 amendment: T{6,10} can't tile eval L=32, receipts kept); shard0 DONE, shard1 ETA ~03:35–03:55 | shuffle overlay → repatriate rows → HF ckpts → T-sweep figure (~04:30) → TERMINATE pod |
+| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0+1 | drained (shards A+B + RM fills done) — CPU render pipeline: **E1–E3 fold-in + 7-point pf+btk figs/tables (GO issued ~07:1x)** | 10:15 RLHF checkpoint render |
+| | | 2 | **RLHF paper-faithful pf_pilot RUNNING** (CPU-heavy phases read as 0% GPU — /proc is the liveness source) | G1 → grid (pf_lo/mid/hi lanes; relief if >14:00 projection) |
+| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | scheduled-idle: struqpos-verdict standby + warm zero-bootstrap fallback for the L40S screen | struqpos verdict scoring |
+| | | 1 | rmx_b eq-extension cells 5–6 (T8 set CLOSED — relu-mix ≡ btk exact 3/3; T10 relay checks) | drain ~11:30 |
+| **pod B** (2×H100) | runpod-c (session DOWN since ~05:1x; hub-operated) | 0+1 | **shards C+D COMPLETED before the session died** (last 3 cells hub-repatriated via HF, LOG ~07:1x); NOW: hub-run l13-IT substrate rebuild (stage B) + ckpt push for the repatriated cells | **pre-designated RLHF relief venue at G1** |
+| **mac-d-struqscreen-0728** (L40S $0.99/h) | mac-d | — | struqpos screen chain v2 RUNNING (bootstrap death ~$1 disclosed, death-proofed monitor) | verdict → runpod-a scores; terminate at drain |
+| ~~mac-c-screen-0728~~ | — | — | TERMINATED (evalage WEAK, lane closed) | — |
+| ~~mac-d-retrain-0728 (pod D)~~ | — | — | **TERMINATED 07:01 API-verified** — sycgen lane closed (exhibit FINAL-at-15/18, tsae trio abandoned-disclosed); ledger ~$38 actuals | — |
 
 **Priority order (Han, 02:38): paper-faithful sweeps outrank ALL
 btk GPU work; hunted tasks need either arm only; relu-mix is
 certificate evidence, never a matrix column.**
 
-**CPU-side work in flight:** runpod-1 = 11:00 render
-pipeline (7-point per-k probing figs+tables + the onset-map
-certificate with traces); runpod-2 = `agentic_txc_02` port
-(vendor pattern) + RLHF 7-point render + rmx cross-pod sha
-checks; runpod-a = StruQ premeasures ($0, our bars); mac-c (local
-mac) = evalage corpus COMPLETE (2.04M tokens, both card gates pass,
-HF-pushed) → re-tokenization transplant + screens + retryesc_gen
-design; mac-d (local mac) = sycgen retrain owner (watchers armed) +
-overlay/figure at drain; mac-local = hub (review/ratify only, no
-compute).
+**CPU-side work in flight:** runpod-1 = E1–E3 formal fold-in +
+the 7-point pf+btk probing figs/tables (render GO issued);
+runpod-2 = G1 scoring at pilot landing + the 10:15 RLHF
+checkpoint render (deliverable of record; supersede branch if x10
+resumes post-grid); runpod-a = struqpos verdict owner; mac-c
+(local mac) = retryesc_gen generation (Claude API, $300 cap) —
+roll-call response pending; mac-d (local mac) = struqpos screen
+executor on the L40S; mac-local = hub (review/ratify + takeover
+executor where owners are down; RLHF eval-substrate semantics:
+`eval_cfg.hh_rlhf_cache` registry tag hashes into eval_key with a
+`cache_expect` hard-check — see §3 and the 05:05 G2 LOG entry).
 
 **Where outputs land:** canonical rows → `results/leaderboard.jsonl`;
 hill-climb scratch → `experiments/explorations/tscale/RESULTS.md`;
@@ -231,9 +241,9 @@ ssh j42plcul70a2es-64410eb7@ssh.runpod.io -i ~/.ssh/id_ed25519
 ssh 0lmrs9lk8apyhm-644121b8@ssh.runpod.io -i ~/.ssh/id_ed25519
 # pod B (2×H100 — runpod-c):
 ssh l2bp61kg82epel-64411fb1@ssh.runpod.io -i ~/.ssh/id_ed25519
-# pod D (2×H100 — mac-d's API-provisioned retrain pod, jge1fuj9hqu8et;
-# direct sshd, no proxy — sycgen retrain lane, terminates at lane-done):
-ssh root@64.247.201.51 -p 16977
+# pod D — TERMINATED 07:01 07-28 (sycgen lane closed); coordinates
+# retired. Current mac-d pod: mac-d-struqscreen-0728 (L40S, screen
+# lane only — see agents/mac-d/STATUS.md for its coordinates).
 ```
 
 - **Repo checkouts are PER-AGENT (ssh-verified 02:5x 07-28) — there

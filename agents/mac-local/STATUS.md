@@ -122,23 +122,25 @@ temp_xc on B!), mac-d pod=jge1fuj9hqu8et; all @ssh.runpod.io
 PRIORITY; (iv) code handover periodically updated. PLUS: any gold
 task → VISIBLE IN REBUTTAL_HANDOFF same-beat (partial embeds w/
 honest stamps — sycgen = the template).**
-Night state at 04:40: sycgen 15/18 (fig v4 + table embedded;
-tsae trio drains ~04:45-05:00 → mac-d final render drops PARTIAL
-→ I regen table same beat). Probing pf: 12+/21 cells, 5 shards
-draining ~05:45-06:30 → runpod-1 folds E1-E3 + renders 7-pt
-figs/tables (btk arm COMPLETE 7T×3s). RLHF: btk T{6,10} x-lanes
-drain ~10:45; **10:15 checkpoint render = item-3 deliverable of
-record (runpod-2 owns; data-driven landed set)**; pf port card
-DUE — CHASE runpod-2 if silent by 05:00; G1 relief rule
-pre-registered. Hunt: mac-c retryesc_gen (two-timescale face,
-NOT age; API gen under $300 cap); screen venue = claim pod-D at
-its drain or fresh L40S (pre-approved); StruQ premeasures
-runpod-a. My cadence: census regen at landings; guide fleet-map
-re-stamps ~06:00 + ~09:00; **10:30 FULL final pass (HANDOFF +
-GUIDE + CENSUS, items 1-9 pointers verified)**; **11:00 readiness
-message for Han's wake-up**. Ledger each beat. Quote-forms
+Night state at 07:25: **PROBING PF GRID COMPLETE 21/21** (last 3
+cells hub-repatriated from dead runpod-c's pod-B clone via the
+HF channel — receipts LOG ~07:1x; renders GO at runpod-1). Han's
+04:4x re-prio executed: RLHF pf > btk ABSOLUTE (x-lane killed w/
+receipts; btk T{6,10} deferred, T6=2/3 partial-bonus). RLHF pf:
+pilot RUNNING on GPU2 (CPU-phase reads 0% GPU — /proc = liveness,
+my takeover misdiagnosis owned in LOG; pin-guard prevented
+collision), G1 next, pod-B = relief venue (hub rebuilt substrate
+stage A✓/B running; ckpts of repatriated cells pushed by hub).
+sycgen: FINAL-at-15/18 declared (tsae abandoned-disclosed; pod-D
+TERMINATED 07:01, ~$38). struqpos (item-7 #2): premeasure+
+expansion PASSED all bars (floor unmoved), screen protocol frozen
+w/ my 3 pins, RUNNING on mac-d's L40S ($0.99/h). evalage WEAK
+(closed). mac-c retryesc_gen = roll-call still unanswered.
+runpod-c session DOWN (their cells all finished first). 45-min
+heartbeat adopted fleet-wide. My remaining gates: probing renders
+review → HANDOFF; G1/grid watch; **10:15 RLHF checkpoint render**;
+**10:30 FULL final pass**; **11:00 readiness message**. Quote-forms
 binding: sycgen v2 (level story; twin control), k5 seed-spread
-flag, RLHF 21:10/22:28 forms, "T10-in-flight" caption if x10
-late.
+flag, RLHF 21:10/22:28 forms, T6-partial/T10-deferred caption.
 
 *Rewrite before any compact.*

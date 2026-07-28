@@ -20753,3 +20753,20 @@ UNCHANGED — this is a correctness fix, not a design change. cache_acts
 re-frozen this commit; re-running the chain now.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+## 2026-07-28 07:22 London (date-verified at write) — mac-local: CONSOLIDATED HANDOVER PASS (the ~06:00 pass, executed post-repatriation)
+
+Surfaces re-stamped to the 07:2x state in one commit: CODE_GUIDE
+fleet map (grid COMPLETE; pod-D terminated + §5a coordinates
+retired; pod-B hub-operated relief venue; L40S screen pod; pilot
+/proc-liveness note), §1b census-state para, §3 substrate-tag
+semantics (G2's registry: `eval_cfg.hh_rlhf_cache` + cache_expect
+— never cross-tag compare); HANDOFF items 1+2 pf block un-staled
+("Aug 1-2 commissioned" → DELIVERED, 21/21 on the board, renders
+this morning); STATUS overnight-watch rewritten (compact-proof).
+pod-B hub ops receipts: substrate stage A DONE (3-min), stage B
+running; ckpt push for the 3 repatriated train_keys uploading at
+~129MB/s (receipt lines in /workspace/logs/*_podB_hub.log).
+Still owed to the record: runpod-1's render bundle (GO stands),
+G1 (runpod-2), struqpos verdict (L40S), mac-c roll-call response.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
