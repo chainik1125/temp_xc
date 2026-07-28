@@ -14,6 +14,34 @@ at budget <= TXC's. TXC "wins" at that T only if it beats BOTH at
 no greater budget. Pre-registered: if TXC does not sit above, item 6 is
 a NEGATIVE and is reported as one.
 
+⚑⚑ THE RULE IN THE PARAGRAPH ABOVE IS BIASED TOWARD TXC — hub, LOG
+`73f8ea388`, 00:41 07-29. "Best recovery at budget <= TXC's" is
+conservative in words only. k is swept on a COARSE grid
+(1,2,4,8,16,32) whose consecutive points differ by 40-75% in budget,
+so no SAE point lands at TXC's budget and this rule silently selects a
+MUCH CHEAPER baseline. At T=2 it compares TXC @5.66 against pooled
+@3.51 -- 38% LESS BUDGET -- and returns "TXC above"; the cheapest
+pooled point ABOVE TXC's budget (5.97, +5%) scores 0.4876 vs 0.4989,
+inside the seed spread.
+
+CORRECTED HEADLINE vs pooled: **above 2/4 (T=8, T=16),
+INDISTINGUISHABLE 2/4 (T=2, T=4), never below** -- was above 3/4. The
+authoritative surface is `figs_writeup/tab_sycgen_budget_matched.md`
+(via `scripts/gen_sycgen_budget_table.py`), which BRACKETS TXC's budget
+and interpolates to its exact l0, printing rules A/B/C side by side.
+
+THIS FILE IS DELIBERATELY LEFT IMPLEMENTING RULE A. It is not a bug to
+fix here: it is the rule-A reference, kept so the correction stays
+auditable and so the two verdict implementations do not converge into
+one premise wearing two coats -- which is exactly how this survived a
+ratification and a cross-check. `scripts/verify_frontier_verdict.py`
+carries a SELECTION-BIAS GUARD (fires when the chosen comparator spends
+<0.90x TXC's budget) rather than a copy of the bracket rule.
+
+Standing check before any comparator verdict ships: print the BUDGET
+RATIO of the selected comparator to the model. If it is not ~1.0, the
+word "matched" has not been earned.
+
 ⚑ Units. `realized_l0_per_window` is PER WINDOW here; `probing.py`'s
 `realized_l0` is PER TOKEN. Never cross-compare the two. Within this
 file, `l0_unit` differs BY ARM by construction and is printed per row:
