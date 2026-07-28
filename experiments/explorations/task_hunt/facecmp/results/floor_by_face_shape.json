@@ -1,0 +1,107 @@
+{
+  "T": 64,
+  "horizons": [
+    256,
+    512
+  ],
+  "chance": 0.3333333333333333,
+  "seed": 20260728,
+  "results": [
+    {
+      "corpus": "evalage",
+      "tokenizer": "gpt2",
+      "faces": [
+        {
+          "floor_acc": 0.3897777795791626,
+          "floor_excess": 0.05644444624582928,
+          "n_train": 12000,
+          "n_test": 4500,
+          "face": "RECENCY age (as screened)",
+          "edges": [
+            8.744833946228027,
+            9.982993125915527
+          ],
+          "n_elig": 1731701
+        },
+        {
+          "face": "CUMULATIVE rate_H256",
+          "skipped": "manifest too small",
+          "bin_counts": {
+            "0": 1441776,
+            "1": 0,
+            "2": 341917
+          }
+        },
+        {
+          "floor_acc": 0.4824444353580475,
+          "floor_excess": 0.14911110202471417,
+          "n_train": 12000,
+          "n_test": 4500,
+          "face": "CUMULATIVE rate_H512",
+          "edges": [
+            0.0,
+            1.0
+          ],
+          "n_elig": 1689127,
+          "bin_counts": {
+            "0": 1063224,
+            "1": 597098,
+            "2": 28805
+          }
+        }
+      ]
+    },
+    {
+      "corpus": "retryesc_gen",
+      "tokenizer": "gpt2",
+      "faces": [
+        {
+          "floor_acc": 0.5886666774749756,
+          "floor_excess": 0.25533334414164227,
+          "n_train": 12000,
+          "n_test": 4500,
+          "face": "RECENCY age (as screened)",
+          "edges": [
+            6.942514419555664,
+            8.194756507873535
+          ],
+          "n_elig": 567452
+        },
+        {
+          "floor_acc": 0.5528888702392578,
+          "floor_excess": 0.2195555369059245,
+          "n_train": 12000,
+          "n_test": 4500,
+          "face": "CUMULATIVE rate_H256",
+          "edges": [
+            0.0,
+            1.0
+          ],
+          "n_elig": 616426,
+          "bin_counts": {
+            "0": 266673,
+            "1": 255302,
+            "2": 94451
+          }
+        },
+        {
+          "floor_acc": 0.4664444327354431,
+          "floor_excess": 0.1331110994021098,
+          "n_train": 12000,
+          "n_test": 4500,
+          "face": "CUMULATIVE rate_H512",
+          "edges": [
+            1.0,
+            2.0
+          ],
+          "n_elig": 560680,
+          "bin_counts": {
+            "0": 296572,
+            "1": 163832,
+            "2": 100276
+          }
+        }
+      ]
+    }
+  ]
+}

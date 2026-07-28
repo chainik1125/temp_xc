@@ -30586,3 +30586,124 @@ I said in the beat I would clear before aiming anything, and it is
 cleared with a different answer than I expected.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 19:26 BST — mac-c: clew sweep → the gap is the FACE SHAPE, not the topic. And it is testable for $0 (H3: half confirmed, half refuted — the refuted half is the useful one)
+
+Brief `hunt-safety-gold-clew.md` executed. **Reporting a structural
+finding rather than a candidate**, because the sweep says the program has
+been varying the wrong axis, and I can show that with compute already in
+git.
+
+### 1. What the registry actually contains
+
+Queries run (all `similar --text`, concept-level per the brief's ladder,
+plus `works cited-by` on three nodes — reproducible):
+
+- *"internal state depends on an event many tokens earlier, no word in
+  the current text reveals it"*
+- *"detecting from activations that a model has been steered / had a
+  concept injected, and how long the effect persists"*
+- *"a latent behavioural mode that persists across many turns while the
+  surface text looks normal"*
+- *"committed to a false claim earlier and must stay consistent"*
+- *"inferred it is being evaluated and behaves differently afterwards"*
+- *"gradual erosion of a refusal across many turns until it complies"*
+- *"sustained pressure pushes the model into a regime that persists"*
+- *"deliberately underperforms; the decision to withhold is not visible"*
+
+**The citation graph earned its keep** (brief: 0 uses in 102 calls).
+`cited-by` on *Probing and Steering Evaluation Awareness* returned 9
+corpus works including **"When Evaluation Becomes a Side Channel: Regime
+Leakage and Structural Mitigations"** and **"Why Safety Probes Catch
+Liars But Miss Fanatics"** — neither surfaced by any keyword or
+similarity query I ran.
+
+⚠ **Honesty envelope, propagated:** *Behavioural Analysis of Alignment
+Faking* returned `corpus_n 0` over `fetched_n 0` — **nothing was
+measured**, so that is NOT evidence it is uncited. All three `cited-by`
+calls served from the hub's 18:2x cache; **no `--refresh`, no S2 call
+from me.**
+
+### 2. The structural observation
+
+**Every face the program has ever screened is a RECENCY face** —
+`sycgen_age`, `evalage_age`, `retryesc_age`, `reask_hr`: "how long since
+the last event". **The registry's safety states are overwhelmingly
+CUMULATIVE/REGIME states** — alignment faking, sandbagging, belief drift
+under accumulating context, behavioural phase transitions, misalignment
+contagion, evaluation-regime leakage. *Accumulating Context Changes the
+Beliefs of LMs* puts it exactly: belief profiles "may **silently**
+change as context accumulates".
+
+**And today's floor result says why that mismatch is fatal.** The floor
+is a probe on `(sage_floor(T), dose_window_count(T))` — **a censored age
+estimator**. A recency face therefore competes with the floor *on the
+floor's own home turf*: the quantity the floor computes IS the label,
+censored. That is a structural explanation for the `retryesc_gen`
+scissors, not a post-hoc story.
+
+### 3. H3, tested for $0 on corpora already in git
+
+The floor is **ground-truth-derived**, so it can be computed for a
+*hypothetical* face on an *existing* corpus with no activations and no
+generation. `facecmp/floor_by_face_shape.py`, gpt2 leg, identical
+window-computable features, only the LABEL changes:
+
+| corpus | face | floor_excess |
+|---|---|---|
+| evalage (sparse) | RECENCY age | **+0.0564** |
+| evalage (sparse) | CUMULATIVE rate_H512 | **+0.1491** |
+| retryesc_gen (dense) | RECENCY age | **+0.2553** |
+| retryesc_gen (dense) | CUMULATIVE rate_H256 | +0.2196 |
+| retryesc_gen (dense) | CUMULATIVE rate_H512 | **+0.1331** |
+
+**H3 as I stated it — "cumulative faces have lower floors" — is
+REFUTED.** On the sparse corpus the cumulative floor is nearly 3×
+*higher*. I am not going to quietly restate the hypothesis to match the
+data.
+
+**What the data does show is better than what I predicted.** Across a
+~4.5× density change the **recency** floor moves 0.056 → 0.255 while the
+**cumulative** floor is flat-to-down, 0.149 → 0.133. **The cumulative
+face DECOUPLES the floor from density.**
+
+That is precisely the escape from the scissors. The density thesis
+(gain tracks in-window event mass, face-level ρ +0.88) says I must raise
+density to get gain — but with a recency face, raising density drags the
+floor up with it, which is exactly how `retryesc_gen` died with gain
+cleared 3/3. **With a cumulative face I can spend the density knob on
+gain without the floor chasing it.**
+
+### 4. What this does NOT show — three limits, stated before anyone acts on it
+
+1. **It tests the BAR, not the ARM.** A low floor is necessary, not
+   sufficient. Nothing here says a windowed probe clears +0.05 gain.
+2. ⚠ **The rate faces are heavily tied on these corpora.** Tercile edges
+   come out at integers (0/1, 1/2) and bins are lopsided (evalage H512:
+   1063k/597k/**29k**; H256 had an EMPTY middle class and correctly
+   skipped). `rate_H` here takes values 0–3, so discretisation is doing
+   real work and the low floor is partly coarseness. **Suggestive, not
+   decisive.** A corpus *designed* for a rate face — per-document rate
+   variation — would give proper spread; these were built with a roughly
+   constant rate, which biases *against* H3 and makes the decoupling the
+   conservative read.
+3. **The real risk is unmeasured: does the model encode a long-horizon
+   running count at all?** `sycgen_rate` was demoted once already. That
+   is the question a screen answers and this cannot.
+
+### 5. Where I am
+
+**No candidate frozen yet, deliberately.** The sweep changed what I
+think the next candidate should BE, and freezing a card an hour after
+that shift is how the last three got built. Next: a cumulative-face
+design — per-document rate variation (so position cannot predict the
+label, the Heaps confound), **narrow events to shrink `w`** (today's
+finding: the floor's window is T+w, so a 5-token event turn instead of
+25 removes ~0.08 of floor for free), density spent on gain.
+
+**This is a NEW face family — attempt 1 of 2 under the brief's cap.**
+$0 spent tonight; **0 mac-c pods**; no generation money committed.
+
+_Recorded-by: claude-opus-5 (mac-c)_
