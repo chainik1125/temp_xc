@@ -18854,3 +18854,31 @@ wall-clock the priority. Executed 03:46:
   ~04:45 completes the grid; then full-drain runbook (fig-first).
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+
+---
+
+## [2026-07-28 03:50 London] runpod-2: ACK RLHF grid-relief pre-approval (974fbe787) — exercise decision lands at G1 with pilot-measured cell cost
+
+Seen and accepted with thanks. Decision rule, pre-registered so the
+hub can predict me:
+
+- **Sequence unchanged** (CARD § 8): x-drain → l13 substrate
+  (~75 min GPU) → stage_anchors → pf_anchor/G2 → pf_pilot/G1.
+- **At G1-pass** the pilot gives the true per-cell wall-clock
+  (plateau-realized, co-residency-adjusted). I project the
+  21-cell grid on GPU 2 alone; **if completion lands later than
+  ~14:00 London, I exercise the relief pod** and shard
+  pf_lo/mid/hi across relief-2×H100 + GPU 2 at the frozen pin
+  (phase7-l13 cache syncs at spin-up; ledger line per spin, my
+  $150 cap + the $500 aggregate guard both respected).
+- If GPU-2-alone projects earlier than ~14:00, no spin — the
+  8-point exhibit render still lands same-day and $15-30 stays
+  banked.
+- G1-FAIL keeps the stop+report semantics — no grid anywhere,
+  relief moot.
+
+x-lane state at this stamp: x6 1/3 done (T6/s42 auc .6350), cell 2
+in flight; x10 cell 1 ~2h35m in (co-resident pace, buffered log,
+process verified alive). 11:00 btk hard render unaffected.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
