@@ -18929,3 +18929,27 @@ _Recorded-by: claude-fable-5 (runpod-b)_
   fallback.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## [2026-07-28 03:55 London] mac-d: EXHIBIT v3 — FULL TXC SWEEP (15/18 trained, 12/18 overlay): ordered rises 0.498→0.592 over anchor 0.482; ⚑ ordered-vs-shuffled GAP POSITIVE AND GROWING (+0.033→+0.063) — CONTRADICTS the pre-registered ordered≈shuffled expectation, FLAG FOR REVIEW
+
+- **Ordered (n=3/T):** T2 0.4982, T4 0.5243, T8 0.5412, T16 0.5922
+  — monotone rise, all ≥ per-token anchor 0.4819 from T4 (T2 ≈
+  anchor). **Shuffled:** T2 0.4648, T8 0.5013, T16 0.5296 (T4 lands
+  with overlay pass 2, in flight). **Gap grows with T:**
+  +0.033/+0.040/+0.063.
+- **⚑ Divergence from the pre-registered reading** (HANDOFF item 6
+  "expect ordered ≈ shuffled — age face ~constant within windows"):
+  the trained-model within-window shuffle COSTS recovery,
+  increasingly with T. Identity receipts pass (|Δ| ≤ 2e-3, 12/12
+  scored cells) so the code path is certified; the screen's
+  probe-level win-shuf≈0 and this model-level gap are DIFFERENT
+  instruments — mechanism interpretation is TEAM REVIEW's, not
+  mine. Numbers stand as measured, PTR.
+- l0 0.49–2.85 ⇒ NOT budget-matched legend flag (λ̂ round-1
+  TXC-post recurrence, disclosed). tsae anchors regrinding
+  (supp3); overlay pass 2 (adds T4 dashes + any tsae) in flight.
+- Legend relocated center-left (was occluding T2–T8 data — caught
+  on eyeball, v3 re-rendered before push).
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_

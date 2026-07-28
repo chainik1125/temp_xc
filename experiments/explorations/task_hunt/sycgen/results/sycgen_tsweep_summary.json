@@ -3,11 +3,11 @@
  "status": "PENDING TEAM REVIEW",
  "partial": true,
  "coverage": {
-  "trained": 9,
-  "overlay": 0,
+  "trained": 15,
+  "overlay": 12,
   "untrained": 18,
   "of_each": 18,
-  "rendered_at": "03:47 28-07"
+  "rendered_at": "03:55 28-07"
  },
  "x_axis": [
   1,
@@ -17,10 +17,16 @@
   16
  ],
  "ordered": {
-  "T8": 0.5412857236706178,
-  "T16": 0.5922063581117277
+  "T2": 0.49821330988558626,
+  "T4": 0.5242710556853082,
+  "T8": 0.5412355946184296,
+  "T16": 0.5922043057720682
  },
- "shuffled": {},
+ "shuffled": {
+  "T2": 0.4648202247090803,
+  "T8": 0.5013486715990543,
+  "T16": 0.5295598338377352
+ },
  "untrained": {
   "batchtopk_sae_btkonly/T1": 0.226736703655724,
   "tsae_btkonly/T1": 0.226736703655724,
@@ -34,7 +40,7 @@
  },
  "l0_range_claiming_arm": {
   "min": 0.48870849609375,
-  "max": 0.8732808430989584
+  "max": 2.8498331705729165
  },
  "budget_matched": false,
  "match_rule": "min cell-mean realized l0 >= k_pos/2 = 4.0"

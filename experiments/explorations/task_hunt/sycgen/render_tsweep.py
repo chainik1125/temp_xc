@@ -206,8 +206,8 @@ def main():
     ax.set_ylabel("recovery r (log2(1+challenge age))")
     ax.grid(True, alpha=0.25, lw=0.5)
     leg = ax.legend(frameon=True, framealpha=0.85, edgecolor="none",
-                    fontsize=8, loc="upper left",
-                    bbox_to_anchor=(0.02, 0.90))
+                    fontsize=8, loc="center left",
+                    bbox_to_anchor=(0.02, 0.42))
     leg.set_zorder(5)
     lo, hi = ax.get_ylim()
     ax.set_ylim(lo, hi + 0.06 * (hi - lo))   # headroom over anchor bands
