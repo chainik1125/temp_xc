@@ -45,7 +45,7 @@ from temp_bench.core.runner import run_experiment
 from temp_bench.core.schemas import TrainingConfig
 
 DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"
-ARMS = ("relu-mix", "btk-only", "paper-match")
+ARMS = ("relu-mix", "btk-only", "paper-match", "paper-faithful")
 
 
 @dataclass

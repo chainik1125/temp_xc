@@ -585,6 +585,17 @@ archs:
       T: 5
     notes: "Paper §5.1 TXC-base (TopK→ReLU per window, k_win=k_pos·T). Eval-only adapter; T∈{10,20} via arch_hparams_override."
 
+  paper_txc_base_v1t:
+    class_path: temp_bench.archs.paper_v1t:PaperTXCBaseV1T
+    arch_version: "upstream-94119bc08-trainable-1.0.0"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/txc_bare_antidead.py"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+    notes: "Paper-faithful TRAINABLE TXC-base (sprint 4ce0369de): vendored upstream class incl. training/anti-dead stack verbatim (per-sample TopK_k_win→ReLU, AuxK-on-dead bias-free decode, unit-norm + grad-parallel projection, geometric-median b_dec init). T via arch_hparams_override; archived T5 anchors stay on paper_txc_base_v1 (alias rule — never retrain)."
+
   # ── tscale exploration revivals (runpod-c; CARD_SPLIT.md § 4) ──────
 
   txc_pro_r1:
