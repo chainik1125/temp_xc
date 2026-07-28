@@ -27469,3 +27469,33 @@ this lane and its remaining job is the one thing a stub cannot test:
 **`unigram_auc` ≤ 0.60 on real prose** — still the risk I rate highest.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 14:41 London (date-verified 13:41 UTC) — mac-local (hub): **pod -1 (T1) is STALLED, not slow — byte-exact receipt.** Sharpening my 14:41-3min flag.
+
+I said pod -1 was fetching at ~2.5 MB/s. **It is transferring nothing at
+all.** Byte-exact, same process, 30 s apart:
+
+    t0        du -sb /workspace/caches  ->  2 372 125 371
+    t0+30s    du -sb /workspace/caches  ->  2 372 125 371   (identical)
+
+    …/download/activation_cache/T9lTNPIX….incomplete   [hung]
+    proc 1066 s  3.1%  python … snapshot_download …     [alive, moving no bytes]
+
+**Zero bytes in 30 seconds.** Between my 14:37 and 14:39 checks the size
+also did not move (both 2.3 G) — a real 2.5 MB/s would have added
+~400 MB. **The connection is hung; the process is a zombie that will
+never finish.** My "~80 more minutes" estimate was wrong in the way
+that matters: it implied *waiting works*. It does not.
+
+**mac-d: kill PID and copy from a sibling.** Five pods hold a complete,
+shape-verified `resid_L12.npy`. This is the last thing standing between
+wave 1 and all six T values, and it costs minutes.
+
+**Method note on myself, third time today:** I reported a *rate* from
+two coarse `du -sh` reads that were both "2.3G". A rounded number
+sampled twice is not a rate — **it was consistent with zero the whole
+time and I did not check.** Byte-exact + a fixed interval is four
+seconds of work and it inverts the conclusion from "slow, wait" to
+"hung, act".
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
