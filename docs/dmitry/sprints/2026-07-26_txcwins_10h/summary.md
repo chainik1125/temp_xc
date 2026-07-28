@@ -736,38 +736,51 @@ input, so a substring metric systematically rewards whichever arm damages the mo
 **0.910**, held-out baseline z = 4.3. With the rate that high there is no room to *induce*, so
 the informative direction is **suppression** — steering that makes the model stop obeying.
 
-**Result (one dictionary seed; two more running).** Judged with `gpt-4o`; a cheap
-`comply_lead` proxy was validated against the judge on a stratified sample at **91.9%
-agreement** and carried the full n, with that decision recorded in the output.
+**Result: the architecture ranking is not stable across dictionary seeds.** Judged with
+`gpt-4o`; a cheap `comply_lead` proxy was validated against the judge on a stratified sample
+(91.9% and 97.3% agreement on the two seeds) and carried the full n, with that decision
+recorded in each output. Suppression below is baseline minus the arm's best rate over the dose
+grid; higher suppresses more.
 
-| arm | best rate | suppression | z |
+| arm | seed 0 | seed 1 | kind |
 | --- | --- | --- | --- |
-| `broadcast_optimal` — *supervised* | 0.495 | **−0.415** | −10.19 |
-| `tsae_broadcast` — attention tSAE | 0.690 | −0.220 | −5.72 |
-| `tsaep_broadcast` — published T-SAE | 0.715 | −0.195 | −5.16 |
-| **`random_broadcast` — NULL** | **0.765** | **−0.145** | **−4.01** |
-| `random_slab` — NULL | 0.840 | −0.070 | −2.13 |
-| **`txc_slab`** | **0.850** | **−0.060** | **−1.85** |
-| `txc_flat` / `sae_broadcast` | 0.870 | −0.040 | −1.28 |
+| `broadcast_optimal` | +0.415 | +0.420 | supervised |
+| `dom_slab` | +0.015 | +0.015 | supervised |
+| `random_broadcast` | +0.145 | +0.145 | **null** |
+| `random_slab` | +0.070 | +0.070 | **null** |
+| `txc_slab` | +0.060 | **+0.330** | learned |
+| `sae_broadcast` | +0.040 | **+0.310** | learned |
+| `tsae_broadcast` | +0.220 | +0.075 | learned |
+| `tsaep_broadcast` | +0.195 | +0.130 | learned |
+| `txc_flat` | +0.040 | +0.055 | learned |
 
-⚠ **A random constant write suppresses the injection more than the crosscoder's learned slab,
-and the crosscoder does not clear significance.** Both temporal SAEs beat the crosscoder and
-both nulls. The ranking is robust to the summary statistic — identical by min-over-doses and by
-mean-over-doses — and `txc_slab` never beats `random_broadcast` on any of the four statistics,
-so it is not an artefact of the optimistic min-selection, which would have flattered it.
+**The seed-invariant arms are bit-identical across seeds** — the two nulls and both supervised
+arms reproduce to three decimals, confirming the pipeline is deterministic apart from
+dictionary initialisation. **Every learned arm swings, and the ordering reshuffles completely:**
 
-**One arm is not budget-matched, and it is not the one that matters.** The attention tSAE
-carries **675.84 uncharged coefficients per segment** — its *predicted* codes are computed from
-context and only its 8.00 *novel* codes are billed — so its −0.220 is bought on an axis nobody
-else is spending on. The **published T-SAE has no uncharged component** (7.74 per segment,
-slightly *under* the 8.00 budget) and reaches −0.195 anyway. So the fair headline is:
+```text
+seed 0:  broadcast_optimal > tsae > tsaep > random_bcast > random_slab > txc  > sae
+seed 1:  broadcast_optimal > txc  > sae   > random_bcast > tsaep       > tsae > random_slab
+```
 
-> At matched sparsity, the published temporal SAE suppresses genuine instruction-switches
-> **3.3× more than the temporal crosscoder** (−0.195 against −0.060), and the crosscoder fails
-> to beat a random constant write.
+⚠ **From one seed you could report either "the published T-SAE suppresses 3.3× more than the
+crosscoder" (seed 0) or "the crosscoder suppresses 2.5× more than the published T-SAE" (seed 1).**
+The crosscoder moves 5.5× between seeds, the TopK SAE 7.8×, and both cross the null in opposite
+directions. **This is Reviewer 1's single-seed objection, demonstrated quantitatively on a real
+benchmark rather than argued.** It is the most transferable thing this cell produced, and it
+applies to every architecture comparison in this document that rests on one dictionary
+initialisation.
 
-This is also the arm that spent most of the sprint mislabelled: every `tsae_*` number elsewhere
-in this document is the attention architecture, not arXiv:2511.05541.
+**A budget caveat that survives the instability.** The attention tSAE carries **675.84
+uncharged coefficients per segment** — its *predicted* codes are computed from context and only
+its 8.00 *novel* codes are billed — so any number it posts is bought on an axis nobody else is
+spending on. The published T-SAE has no uncharged component (7.74 per segment, slightly *under*
+the 8.00 budget). This is also the arm that spent most of the sprint mislabelled: every other
+`tsae_*` number in this document is the attention architecture, not arXiv:2511.05541.
+
+**What is stable, across both seeds:** the supervised best-constant-write suppresses ~0.42,
+roughly 3× the best null and well beyond any learned arm's average; and `txc_flat` — the
+paper's v7 write — stays at +0.04–0.06, at or below the null both times.
 
 **Degeneracy is ruled out, so the suppression is genuine.** `repeat_frac` ≈ 0 everywhere,
 log-probabilities near baseline, replies *longer* than baseline, and the suppressing arms
