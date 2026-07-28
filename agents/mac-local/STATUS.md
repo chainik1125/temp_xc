@@ -13,17 +13,16 @@ LOG, ledger oversight, and the handover surfaces
 
 ## The one paragraph
 
-**Item 6 (sycgen) — our gold safety exhibit — was challenged by
-Dmitry's agent and the challenge LANDS.** They ran pooled- and
-stacked-SAE baselines we never ran; **TXC loses at every T** (.600 vs
-pooled .633 at T16). **Their TXC column IS our column** — a
-missing-baseline dispute, not a measurement one. **mac-c then found the
-gap is STRUCTURAL: `tsae_btkonly` cannot run at T>1 by construction, so
-in `probing`, `rlhf` and `em` every SAE baseline is per-token and TXC
-is the only arm with window access.** mac-d is building a
-**section-agnostic recovery-vs-budget FRONTIER** (hub ruling — not a
-single "matched point", which does not exist). Deadline pressure is
-off: the 13:00 BST window closed; **responses amendable to Aug 3**.
+**ITEM 6 CLOSED — challenge answered, claim RESTORED but NARROWED.**
+Dmitry's agent showed TXC losing to pooled/stacked SAE baselines we had
+never run; the proper comparison now exists as a **recovery-vs-budget
+frontier** (not a matched point, which does not exist). **vs pooled:
+TXC above 3/4 T, INDISTINGUISHABLE at T=4, never below** — and pooled
+**saturates**, never reaching TXC at up to **4.06× its budget**, so it
+is not a cutoff artifact. Stacked's 4/4 is **refused** as
+probe-capacity overfitting. Deliverable:
+`figs_writeup/tab_sycgen_budget_matched.md`. **Fleet idle, agent spend
+$0/h. All four mac-c hunt lanes un-parked behind lever 3.**
 
 ## Fleet
 
@@ -108,6 +107,17 @@ that is the property worth having.
 - **The anchor is the first number to read, not the headline curve** —
   a retrained anchor near its recorded value is what certifies the
   substrate underneath everything else.
+- **⚑ A RETRACTION DOES NOT PROPAGATE TO FILES, only to memory.** All
+  three agents found a claim they had already retracted still living on
+  another surface — mine was on `REBUTTAL_HANDOFF.md`, presented as a
+  "reusable result". **Sweep every surface after a retraction, WITH
+  POSITIVE CONTROLS** (a grep that finds nothing and a grep that is
+  broken produce identical output). mac-d's form: *when writing a
+  correction, re-read your own latest position on the claim FIRST.*
+- **The audit catches BROKEN, not WRONG.** It cannot know a pod list
+  was true three hours ago. Check 9 (`API-verified` lines fail past 6h
+  by git-blame age) narrows that, but only proves a claim was recently
+  *restamped*, not that it is *correct*.
 
 ## Quote-form guards now live in the handoff
 
