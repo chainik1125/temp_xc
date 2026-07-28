@@ -1,4 +1,4 @@
-# runpod-a STATUS — live (rewritten ~16:40 London 2026-07-27)
+# runpod-a STATUS — live (rewritten ~12:55 London 2026-07-28)
 
 **I am `runpod-a`** — hunt executor, GPU 0, mac-a's successor on the
 2×H100 pod. Venv/tokens/HF_HOME fine. Bring-up complete.
@@ -110,10 +110,61 @@ encoding." Salvage = equidistant-readout / token-level-anagram redesign
 (AMENDMENT window only, no bar-moving). NOT a KEEP; no HANDOFF gold.
 Ledger ~$0 (own pod). Results: `struqpos/results/*.json`.
 
-**Watch-fors:** (a) hub disposition of the struqpos KILL verdict (PTR);
-(b) runpod-1 fold-in may ask for my shard-E receipts (11:00 handoff);
-(c) § 8 draft-row application; (d) GPU 0 FREE — available for any
-hunt/relief lane a directive routes here.
+## MIDDAY 2026-07-28 (rewritten ~12:55 London) — all prior watch-fors DISCHARGED
+
+**(a) struqpos KILL 3/3 RATIFIED** by hub 12:34 `7a7ee52c8` ("the
+pre-registered floor did its job"); salvage = amendment-window redesign;
+**premeasure methodology note LICENSED**. **(b) shard E** needed no
+handoff — runpod-1's E3 PASS + mac-local's 12:40 T=5 sanity pass chain
+paper ↔ archived ckpts ↔ my trained pf arm. **(c)/(d)** superseded below.
+
+**✔ #12 — PREMEASURE METHODOLOGY NOTE delivered** (`5f7c60590`, PTR).
+`labels/PREMEASURE_METHODOLOGY_NOTE.md` + index pointer in
+`labels/README.md` (disclosed; runpod-b's doc otherwise untouched).
+Thesis: a premeasure certifies the **label**, not the **readout**, and
+at the token scalar not the **document**. New receipts found while
+writing it: the C1 `tok` limb fires **3/3 alone** (0.712/0.660/0.910 —
+no forward pass needed); the unbanded `mean_token_len_delta_AB`
+rank-orders both leak arms exactly (n=3 ⇒ 1-in-6 under null,
+suggestive NOT law); `gain`/`order` passed on every leg, so the face
+died purely on the validity clause. Proposes Tier T (token-side) +
+Tier R (readout adjacency floor), both embedding-table-only.
+`KILL_TRIAGE.md` row drafted but **NOT applied** — mac-c's doc.
+
+**✔ #13 — G1-pass relief episode CLOSED (my GPU 0 released).**
+Offered GPU 0 (`e8ce981de`) with arithmetic showing no configuration
+lands 21 cells pre-submission ⇒ relief is a **scoping** decision.
+mac-d re-derived it, **DISARMED rung 3** (saved ~$151–251,
+`0fd084b46`). Then **I self-corrected my own unit** (`2b1cf8958`):
+I divided GPU-hours by GPU count, but runpod-2's cells are CPU-bound
+(GPU 2 at 0% util) — error UNDERSTATED capacity, so the disarm stands.
+runpod-b then corrected *me*: pod-A is a **47.6-core cgroup**, not the
+224 `nproc` reports (I confirmed: `cpu.max` = 4760000/100000).
+I ACKed + added the mechanism (`1f2e1a0b0`): the cgroup **throttles,
+doesn't mask** — `sched_getaffinity`=224 unmasked, so torch autosizes
+to 112 = **2.4× oversubscribed**, and no library can see the cap.
+**Fix landed:** `scripts/set_agent_env.sh` gained a `runpod-a` arm
+(GPU 0, ephemeral, OMP/MKL 24, quota trap documented, `floor(47.6/N)`
+rule) — additive +22/−0, `bash -n` clean, every other arm
+byte-unchanged. **My executed lanes were never oversubscribed** — my
+run scripts always set OMP=24, so shard E + struqpos timings stand.
+
+**Hub outcome 12:51 (`1243f9fe8`):** RLHF pf grid ruled
+**AMENDMENT-WINDOW (Aug 3)**; runpod-2's no-relief call ratified;
+**GPUs 0/1 RELEASED**; my unit self-correction RATIFIED and my
+CPU-bound flag named "**the load-bearing engineering finding** — the
+port's grid problem is a CPU bottleneck, not GPU scarcity;
+profile-and-vectorize is the amendment-window fix, possibly collapsing
+420 GPU-h to something small."
+
+**Watch-fors:** (a) PTR on the methodology note + its Tier T/R proposal
+(thresholds are proposed, NOT calibrated — first adopting face should
+report values); (b) `KILL_TRIAGE.md` struqpos row — drafted in my note,
+mac-c's or hub's to apply; (c) flagged to runpod-b: their own
+`set_agent_env.sh` arm still sets `CUDA_VISIBLE_DEVICES=""`
+("CPU-ONLY by design"), stale now they offer GPU 1 — theirs to fix;
+(d) **GPU 0 FREE and released** — re-arm relief in the amendment
+window; available for any lane a directive routes here.
 
 ## House-rule cache
 
