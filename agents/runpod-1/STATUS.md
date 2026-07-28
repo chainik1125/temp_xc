@@ -1,9 +1,12 @@
 # Working state — agent `runpod-1`
 
-**2026-07-28 ~07:30 UTC (morning rewrite) — ALL DELIVERABLES
-SHIPPED. Night+sprint arc complete; nothing of mine in flight on
-either GPU. Awaiting only hub ratifications + any new directives.
-GPU 2 = runpod-2 (pf_pilot running there — never mine).**
+**2026-07-28 ~11:45 UTC — ALL DELIVERABLES SHIPPED + RATIFIED.
+Hub back after 5h gap (7a7ee52c8): deadline SOFTENED (Han, no
+longer hard 13:00), renders/certificate v1.0/manifest stance all
+RATIFIED. pf 7-point re-render order (12:34 London) delivered in
+5 min (b30ceaab9 + LOG 2525836d6). Nothing of mine in flight on
+either GPU. GPU 2 = runpod-2 (pf_pilot running there — never
+mine).**
 
 ## Delivered this arc (receipts = LOG shas)
 
@@ -35,14 +38,21 @@ GPU 2 = runpod-2 (pf_pilot running there — never mine).**
    sprint + 4 fills), LFS shas in /workspace/logs/ckpt_push.log.
 7. **Manifest owner pass (my share)**: 96/96 rows as-launched,
    receipts external by design, append-only stance posted.
+8. **pf 7-POINT RE-RENDER (hub order 12:34, closed 12:39)**:
+   writeup twins `figs_writeup/fig_probing_shuffle_tsweep_pf_
+   k{5,20}.*` FINAL 7T×3s (k20 T16−T1 −0.015; k5 −0.005) + full-Ts
+   tables (root cause: analysis.py default Ts was 5-point; btk
+   tables gained T6/T10 pre rows, row set unchanged 131). analysis
+   writeup renderer gained `arch` param (b30ceaab9).
 
 ## Open / watch
 
-- Hub ratification of §9 scoring + certificate v1.0 (posted).
-- rmx_b checks 5-6/6 → certificate §1 extension appends (mine to
-  fold when they land).
-- 11:00 London verify-only render slot: re-render ONLY if any btk
-  input changes (none can — rows frozen-complete).
+- ~~Hub ratifications~~ CLOSED 12:34 (7a7ee52c8): renders,
+  certificate v1.0, manifest stance, struqpos kill all RATIFIED.
+- rmx_b deferred T10 s1/s2 anchors → certificate §1 upgrade if
+  their btk twins ever land (GPU-2 flip deferred them).
+- runpod-2 pilot lands ≤15:30 London — no action of mine unless
+  hub orders.
 - Ledger night total (mine): night ~$30 + shards ~$14-15 + fills
   ~$3 ≈ $47-48. In MODAL_SPEND.md.
 - Monitors (this session): b6jr22n3d (origin), bbw1y8ufe (pf shard
