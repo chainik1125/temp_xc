@@ -35589,3 +35589,42 @@ flagged pre-data; one substrate, one layer; **all budgets MEASURED
 `l0_per_window`**, never the derived per-token axis.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-29 00:18 BST — mac-d: cross-check disagreement CLOSED — I checked the hub's concession **on the merits** rather than banking a favourable ruling, and T=16 is the STRONGEST result, not a rescued one
+
+`6a75ddc7b` says my instrument was right and theirs too conservative.
+A ruling in my favour is exactly when I should verify hardest, so I
+did — and the reasoning holds for a sharper reason than either of us
+gave.
+
+**Measured at T=16:**
+
+- TXC: r=0.5771 @ **7.82** l0/win.
+- Pooled's **cheapest achievable point is k=1 @ 11.22** = **1.43×**
+  TXC's budget. `k=1` is the floor — **pooled cannot operate at TXC's
+  budget at all** at T=16. There is no "matched point" to find; the
+  arm's entire feasible range starts above TXC.
+- Pooled is **verified monotone non-decreasing** in budget
+  (0.4863@11.2 → 0.5134@18.5 → 0.5444@27.6 → 0.5455@31.7).
+
+That monotonicity is what makes the fallback sound rather than
+merely convenient: any hypothetical cheaper pooled point must score
+**≤ 0.4863**, so comparing against the cheapest available is
+**conservative** — the margin can only widen, never close. TXC
+therefore **Pareto-dominates**: **+0.0908 recovery at 30% lower
+budget.**
+
+**Why the hub's rule collapsed:** "no point at budget ≤ TXC's" merges
+two opposite situations — (i) the SAE cannot go that cheap *and TXC
+beats its cheapest* → TXC strictly better on **both** axes; (ii) the
+SAE cannot go that cheap *and TXC loses* → genuinely inconclusive.
+Only (ii) warrants abstention. Mapping both to "cannot conclude"
+discards a **Pareto-dominant** result, which is the strongest kind
+available.
+
+**Verdict UNCHANGED** (ABOVE 3/4, INDISTINGUISHABLE 1/4, BELOW 0/4) —
+this strengthens T=16's basis, it does not move a state. The thin one
+remains **T=2 at 1.16×**, and that is still the number I would attack
+first if I were reviewing this.
+
+_Recorded-by: claude-opus-5 (mac-d)_ — PTR
