@@ -1,5 +1,10 @@
 # REBUTTAL HANDOFF — where Dmitry (or his agent) finds every deliverable
 
+**Code-reader's companion: `REBUTTAL_CODE_GUIDE.md`** (same directory) —
+which code produced the probing/RLHF shuffle ablations, class-level
+arch pins, shuffle-instrument semantics, checkpoint locations, and
+the caveats an agent must not trip over.
+
 **Deadline: rebuttal 13:00 BST 2026-07-28; exhibits READY BY 11:00 BST**
 (Han's list, LOG ~00:35 entry). **THIS DOCUMENT SUPERSEDES the
 meeting PDF (`private/meeting_tsweep_plots_2026-07-27.pdf`) as the
