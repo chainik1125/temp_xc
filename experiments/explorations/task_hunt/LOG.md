@@ -24638,3 +24638,59 @@ No-warmup schedule test still running (step 0 logged, ~10 min).
 Pilot 08:13, wrong-stream control only.
 
 _Recorded-by: claude-opus-5 (runpod-2)_
+
+## 2026-07-28 13:24 London (date-verified at write) — mac-d: ⚑⚑ THE SHIPPING DOC RESTS THE PAPER-FAITHFUL CLAIM ON THE RETRACTED ANCHORS — `REBUTTAL_HANDOFF.md` §3 lines 155–163 need the hub's hand
+
+**Not editing it — the hub is actively in this file** (12:34: "I am
+fixing the HANDOFF pointers"). Flagging with exact text so it is a
+ten-second fix. **This is a correctness defect in the document we
+ship**, so it should not wait on a quiet moment.
+
+**Line 162–163 currently reads:**
+> "Until then the paper-faithful RLHF claim is carried by the
+> **archived-agentic anchors (G2 rows)** + RM_CERTIFICATE v1.0,
+> labeled as such."
+
+**Those anchors are the ones runpod-2 retracted 25 minutes ago**
+(25607c62d, their words): *"my pf_anchor T5 evals RETRACTED as
+mismatched"* — they were evaluated on the l13-IT stream, and the
+substrate is settled base-l12 (FVU 0.0036 vs 0.0367; step-0 init
+fingerprint ×0.958 vs ×1.836). **As written, the rebuttal's stated
+fallback for the paper-faithful claim rests on withdrawn data.** I
+verified the coupling directly: the three retracted rows are exactly
+the `agentic_txc_02_v1t` / `gemma_2_2b_it_l13_fineweb_24k128` rows,
+and my renderer now refuses to plot them by design.
+
+**Line 155 has the same root:** "substrate-gate-VALIDATED (G2 passed
+on l13-IT with the alias fix)". G2 passed **on the wrong stream** and
+runpod-2 has flagged the G2 incident for independent re-review — so
+this should read as under-review, not as a validation the claim can
+lean on. (Stated as: G2's *status* is disputed; I am not asserting it
+is invalid, only that "VALIDATED" overstates today's position.)
+
+**Line 159–161 is separately stale:** "The pf grid + its T-sweep plot
+land in the amendment window (Aug 3), deferred WITH these receipts" —
+superseded by Han's ORDER #1 (grid re-armed TODAY at max throughput,
+8c28b60c1) and the A/B unblock (07fc11c62).
+
+**Proposed replacement for the fallback sentence, conservative:**
+> "The pf T5 anchor evals are **RETRACTED** (25607c62d — run on the
+> l13-IT stream; substrate settled base-l12). Until base-l12 pf rows
+> land, the paper-faithful RLHF claim is **not carried by anchor
+> numbers**; RM_CERTIFICATE v1.0 and the btk exhibit stand on their
+> own terms, and the pf arm is reported as in-flight with its G1/G2
+> status disclosed."
+
+**Why I am not fixing it myself:** three of my last four contributions
+were direct edits; this one is in a file its owner is editing right
+now, and a concurrent rewrite of a *claim* (not plumbing) is where
+that stops being helpful. If the hub would rather I apply it, say so
+and I will.
+
+**Unrelated status, same beat:** zero base-l12 pf rows have landed yet
+(checked the leaderboard just now), so my `--arm pf` renderer has
+nothing to draw and the HANDOFF pf **embed slot stays unbuilt** — I am
+not adding an `![...]` to a figure that does not exist. Both go in
+together at wave-1 drain.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
