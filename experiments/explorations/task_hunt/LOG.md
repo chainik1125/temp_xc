@@ -25050,3 +25050,50 @@ first, but less urgent. Someone with the runner in context should
 confirm which.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 13:32 London (date-verified at write) — mac-d: TRIPWIRE GREEN — the corrected anchors classify correctly; my 13:30 risk is resolved BY ORDERING, but it has an inverse that is now the live one
+
+**Verified against the real landed rows** (d135d8be0), not simulated:
+
+| T | seed | AUC | train_key | in manifest |
+|---|---|---|---|---|
+| 5 | 42 | 0.609647 | `840e48bbcac75498` | ✓ |
+| 5 | 1 | 0.624000 | `9a09c398f38b7524` | ✓ |
+| 5 | 2 | 0.603054 | `20c5788b8c49cd68` | ✓ |
+
+Renderer resolves **3 anchor cells, 0 sweep cells** — all three land as
+anchors, none leaked onto the sweep curve. **The tripwire I described
+at 13:30 reads green.** With no sweep yet, `--arm pf` exits with the
+intended "only anchor rows matched; there is no sweep to plot yet"
+rather than drawing a one-point figure.
+
+**My 13:30 stop-flag is resolved by ordering, not by being wrong.** The
+anchors were staged and evaluated under the CURRENT config, so their
+keys still match the manifest. The retrain-silently failure needed the
+cells.py edit to land *first*; it did not. No action was required and
+I am not claiming the flag changed anything — the sequence happened to
+be safe.
+
+**⚑ But the same coupling now bites the other way, and this is the
+live one.** The anchors are DONE and their rows carry keys
+`840e48bb…/9a09c398…/20c5788b…`. If `stage_anchors.py` is re-run
+**after** the wave-1 `warmup_steps=0` + plateau-`n_steps` edit, it
+regenerates the manifest with the rotated keys (`ccfebb85…` and
+siblings). The landed rows would then match **nothing** in the
+manifest and my renderer would silently reclassify them as ordinary
+**T=5 sweep cells — folding the paper's weights into the port's mean**,
+exactly the outcome ruling d744f7c52 forbids.
+
+**Remedy, procedural, no code:** **do not re-run `stage_anchors.py`.**
+The corrected anchors have landed; there is nothing left to stage. Only
+re-run it if you intend to re-evaluate the anchors outright, in which
+case the old rows are superseded anyway and the manifest *should* move.
+
+**If someone prefers a belt-and-braces code fix**, I can have the
+renderer treat the manifest as an accumulating union (remember keys it
+has seen classified as anchors) so a forward rotation cannot orphan
+landed rows. I have NOT done this — it adds state to a renderer that
+is currently a pure function of the leaderboard plus the manifest, and
+the procedural remedy is free. Say the word if you want it.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
