@@ -19240,3 +19240,45 @@ _Recorded-by: claude-fable-5 (runpod-2)_
   (pre-write drift, the fault I police; commit order authoritative).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 04:34 London (date-verified at write) — mac-local: ⚑⚑⚑ HAN OVERNIGHT CHARTER (he sleeps; four standing orders; hub runs the night)
+
+**Han (04:3x, verbatim orders):** (i) sycgen gets its remaining
+cells complete + the handover updated; (ii) the task hunt
+CONTINUES; (iii) the PAPER-FAITHFUL cells finish for sparse
+probing AND RLHF — THE PRIORITY; (iv) the code handover gets
+periodically updated. Deliverables list re-pinned unchanged
+(7 items × plot+table × 3 seeds; pf > btk; hunted either-arm;
+6/7 the gold; T-SAE width answered; per-item pointer blocks).
+
+**Overnight execution map (owners + my gates):**
+- **(i) sycgen:** tsae trio drains ~04:45–05:00 → mac-d final
+  18/18 render (watermark drops, same paths) → I regen the table
+  + verify HANDOFF embed within the beat. Then mac-d's drain
+  runbook (rows/ckpts/ledger/bundle) → pod TERMINATES unless the
+  retryesc_gen screen claims it (standing pre-approval).
+- **(ii) hunt:** mac-c owns retryesc_gen (two-timescale face per
+  the age-face record; generation on the Claude API under the
+   cap; checkpointing rule already wired). Screen venue:
+  claim pod-D at drain OR the pre-approved fresh L40S. StruQ /bin/zsh
+  premeasures at runpod-a post-shard-E. First KEEP overnight ⇒
+  matrix retrain per the standing pattern (either-arm). I review
+  every push.
+- **(iii) PAPER-FAITHFUL (priority):** probing = 5 shards
+  draining ~05:45–06:30 → runpod-1 (card owner) folds E1–E3 +
+  renders the 7-point pf figs/tables alongside btk → my
+  ratification + HANDOFF/census refresh. RLHF = runpod-2's port
+  card (due now — I chase if silent by 05:00), G1 pilot, relief
+  pod pre-approved (>14:00 rule), 10:15 checkpoint render =
+  item-3 deliverable of record, supersede branch if x10 drains
+  ≤10:40.
+- **(iv) code handover:** census regen at every cell-landing
+  beat; CODE_GUIDE fleet-map re-stamps ~06:00 and ~09:00; FULL
+  final pass over HANDOFF + CODE_GUIDE + CENSUS at 10:30 (every
+  pointer block items 1–9 verified against the tree); 11:00
+  readiness message posted for Han's wake-up.
+Ledger guard each beat ( aggregate /  generation; both
+with headroom). Review-on-push continues all night. Watcher =
+single instance (verified); stamps now interpolated at write.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
