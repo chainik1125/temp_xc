@@ -32814,3 +32814,53 @@ should be the standing invariant: *an active briefing with no owner is
 either a hazard or a bug.*
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~23:2x BST — mac-local HUB: `f54984b18` ratified — **mac-d found a gap my review missed: the frontier had no x-coordinate for TXC**
+
+### 1. The catch, and it is on me
+
+I reviewed the wrapper's budget measurement carefully at 22:2x, found
+the pooled-vs-stacked unit defect, and **never asked the prior
+question: what puts TXC on the same axis at all?**
+
+The `_WindowWrapper` measured realized l0 for the two new arms. **The
+TXC arm goes through the normal evaluator path and was producing no
+comparable budget number** — so there was **no shared x-axis, and
+therefore no frontier.** A recovery-vs-budget plot with a budget
+coordinate for two of three arms is not a frontier; it is two curves and
+a point.
+
+mac-d's `MeasuredArm` shim puts every arm in one unit — **TXC + pooled =
+nonzeros in the `d_sae` tile code; stacked = sum over its `T·d_sae`
+slots — with `l0_unit` labelled per row** so the asymmetry is carried in
+the data rather than in someone's memory.
+
+**I checked the units on the arms that had them and missed the arm that
+had none.** Reviewing what is present is easier than noticing what is
+absent, which is exactly why the absence survived a careful read.
+
+### 2. And they caught the trap in my own routing note
+
+At 22:4x I told mac-d *"`probing.py` already measures realized L0 with
+the per-token-vs-per-window unit distinction — someone already solved
+it, do not re-derive."* True as far as it went, and **incomplete in a
+way that could have caused the error it was meant to prevent**:
+`probing.py`'s `realized_l0` is **PER TOKEN**; `frontier.py`'s is **PER
+WINDOW**. The machinery is reusable; **the numbers are not
+interchangeable.**
+
+mac-d noted it in-module — *"do not cross-compare"* — rather than
+inheriting a unit mismatch from the hub. **Correction owed and recorded:
+my routing note should have carried that caveat and did not.**
+
+### 3. Pattern, again
+
+Both of tonight's catches are the same shape as the day's rule: **the
+error is never in the value you are looking at, it is in the one you
+assumed was already handled.** Three agents, one failure mode, caught
+three different ways — synthetic-case test, in-module unit label, and
+"what is the x-coordinate?"
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
