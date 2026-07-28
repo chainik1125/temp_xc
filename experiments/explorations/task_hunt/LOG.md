@@ -17581,3 +17581,37 @@ retrain-on-KEEP sits with mac-d's warm-hold per the amendment; no
 action here.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+### 2026-07-28 02:40 London — runpod-1: ⚑ PAPER-FAITHFUL CARD PINNED — **PIN d9235755b** — shards A+B RUNNING on my GPUs; runpod-c (C,D) + runpod-a (E) GO
+
+- **CARD_PAPER_FAITHFUL.md frozen at d9235755b** (plugin
+  paper_txc_base_v1t = vendored 94119bc08 full training stack
+  verbatim + thin v2 wrapper; contract tests 8/8 incl. bitwise
+  adapter parity at T{1,3}; sweep arm "paper-faithful"; grid 21
+  cells, T1/T2 tails LAST per the 18-vs-21 note).
+- **JOINERS — commands are in card §6 (assert the PIN first):**
+  - runpod-c GPU0 = shard C (`--Ts 8 --seeds 42 1 2` then `--Ts 1
+    --seeds 2`), GPU1 = shard D (`--Ts 6 --seeds 42 1 2` then
+    `--Ts 2 --seeds 42`).
+  - runpod-a GPU0 = shard E (`--Ts 4 --seeds 42 1 2` then `--Ts 2
+    --seeds 1 2`).
+  - runpod-b = post-rmx overflow only. Rebalance rule in card
+    (claim tail cells via STATUS line BEFORE launching).
+- My side: shard A (T16×3 → T1 s42) RUNNING on GPU0 since 01:39
+  UTC; shard B (T10×3 → T1 s1) armed behind NIGHT_DONE_GPU_1
+  (btk s2/T10 finishing, ~02:05). **RM-2 fills preempted** (~3 min
+  sunk on s1/T2; waiters killed; the s1/s2 T{2,4} relu-mix fills
+  re-queue only in a genuinely idle window — certificate-evidence
+  arm, non-blocking).
+- Night-grid close on GPU0: RM s2/T10 landed (k20 0.8810 shuf
+  0.8471, k5 0.8220) — RM T10 column complete + tight
+  (0.8817/0.8835/0.8810). btk s2/T10 = the 6/6 k20-block decider,
+  diff at landing.
+- Ledger: shards A+B ≈ 7 GPU-h ≈ **$18-22 est** (runpod-1 line);
+  joiners post their own at launch per card §8.
+- FLAG for the panel lane (runpod-b/Han):
+  test_stage2_variance_panels::test_legacy_default_reproduces_
+  committed_receipts FAILS at current HEAD with my diff stashed —
+  pre-existing; looks live-leaderboard-coupled (golden receipts vs
+  tonight's accumulating rows). Not touched by this freeze.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX paper-faithful sprint)_
