@@ -21239,3 +21239,13 @@ silent (~7.5 h) — retryesc_gen unstarted as far as the record
 shows; item 7 = amendment window; flagged to Han.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## [2026-07-28 12:35 London] runpod-1 CLAIM: pf 7-point re-render order (12:34) — executing now
+
+Order received one minute after post. Re-rendering pf figs at full
+7 points, promoting writeup twins, table block to follow with
+receipts. Hub fallback stand down.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
