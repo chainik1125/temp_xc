@@ -1,0 +1,212 @@
+{
+ "meta": {
+  "substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
+  "model": "gpt2",
+  "screen_hs": 7,
+  "face": "AGE_within_context_120",
+  "H": 64,
+  "status": "FEASIBILITY PROBE, not a hunt4 verdict",
+  "ax_ts": [
+   16,
+   32,
+   64
+  ],
+  "rows": {
+   "face": "AGE_within_context_120",
+   "H": 64,
+   "n_docs": 300,
+   "tercile_edges": [
+    5.554588851677638,
+    6.189824558880018
+   ],
+   "n_elig": 91470,
+   "bin_counts": {
+    "0": 30469,
+    "1": 30576,
+    "2": 30425
+   },
+   "AGE_within_context_120/train": {
+    "rows_per_class_total": {
+     "0": 3998,
+     "1": 3998,
+     "2": 3998
+    },
+    "ok": true
+   },
+   "AGE_within_context_120/test": {
+    "rows_per_class_total": {
+     "0": 1498,
+     "1": 1498,
+     "2": 1498
+    },
+    "ok": true
+   }
+  }
+ },
+ "cells": {
+  "AGE_within_context_120/tok_linear": {
+   "acc_test": 0.713840663433075,
+   "per_class": [
+    0.7883844971656799,
+    0.7643524408340454,
+    0.5887850522994995
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.2
+  },
+  "AGE_within_context_120/tok_mlp": {
+   "acc_test": 0.7000445127487183,
+   "per_class": [
+    0.7463284134864807,
+    0.7022696733474731,
+    0.6515353918075562
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 5.3
+  },
+  "AGE_within_context_120/position_floor": {
+   "acc_test": 0.3382287621498108,
+   "per_class": [
+    0.3384512662887573,
+    0.29105472564697266,
+    0.3851802349090576
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "AGE_within_context_120/T16/visible_evidence_floor": {
+   "acc_test": 0.5600801110267639,
+   "per_class": [
+    0.6802403330802917,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "AGE_within_context_120/T16/actxmean_linear": {
+   "acc_test": 0.7779261469841003,
+   "per_class": [
+    0.851802408695221,
+    0.8024032115936279,
+    0.6795727610588074
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.5
+  },
+  "AGE_within_context_120/T16/actxmean_mlp": {
+   "acc_test": 0.8093013167381287,
+   "per_class": [
+    0.8277703523635864,
+    0.8504672646522522,
+    0.7496662139892578
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 9.7
+  },
+  "AGE_within_context_120/T32/visible_evidence_floor": {
+   "acc_test": 0.7647975087165833,
+   "per_class": [
+    0.9546061158180237,
+    0.3397863805294037,
+    1.0
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "AGE_within_context_120/T32/actxmean_linear": {
+   "acc_test": 0.8380062580108643,
+   "per_class": [
+    0.8805073499679565,
+    0.8738317489624023,
+    0.7596795558929443
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.6
+  },
+  "AGE_within_context_120/T32/actxmean_mlp": {
+   "acc_test": 0.8638184070587158,
+   "per_class": [
+    0.9052069187164307,
+    0.8925233483314514,
+    0.7937249541282654
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 9.4
+  },
+  "AGE_within_context_120/T64/visible_evidence_floor": {
+   "acc_test": 0.9737427830696106,
+   "per_class": [
+    1.0,
+    0.9939919710159302,
+    0.9272363185882568
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "AGE_within_context_120/T64/actxmean_linear": {
+   "acc_test": 0.8524699807167053,
+   "per_class": [
+    0.8451268076896667,
+    0.8731642365455627,
+    0.8391188383102417
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.9
+  },
+  "AGE_within_context_120/T64/actxmean_mlp": {
+   "acc_test": 0.8845126628875732,
+   "per_class": [
+    0.9118825197219849,
+    0.9005340337753296,
+    0.84112149477005
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 10.2
+  },
+  "AGE_within_context_120/T64/actxmean_foreign_linear": {
+   "acc_test": 0.6806853413581848,
+   "per_class": [
+    0.742323100566864,
+    0.7116155028343201,
+    0.5881174802780151
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.7
+  },
+  "AGE_within_context_120/T32/label_null": {
+   "acc_test": 0.32955050468444824,
+   "per_class": [
+    0.3638184368610382,
+    0.3251001238822937,
+    0.2997329831123352
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.6
+  }
+ },
+ "summary": {
+  "tok": 0.713840663433075,
+  "best_window": 0.8845126628875732,
+  "best_T": 64,
+  "gain_vs_tok": 0.1706719994544983,
+  "floor_at_bestT": 0.9737427830696106,
+  "beats_floor": false,
+  "position_floor": 0.3382287621498108,
+  "gain_bar_0.05_cleared": true
+ }
+}

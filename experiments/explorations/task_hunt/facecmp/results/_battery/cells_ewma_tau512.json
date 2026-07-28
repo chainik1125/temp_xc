@@ -1,0 +1,232 @@
+{
+ "meta": {
+  "substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
+  "model": "gpt2",
+  "screen_hs": 7,
+  "face": "ewma_tau512",
+  "H": 512,
+  "status": "FEASIBILITY PROBE, not a hunt4 verdict",
+  "ax_ts": [
+   16,
+   32,
+   64
+  ],
+  "rows": {
+   "face": "ewma_tau512",
+   "H": 512,
+   "n_docs": 300,
+   "tercile_edges": [
+    1.0165290874111004,
+    1.7125882361479317
+   ],
+   "n_elig": 277361,
+   "bin_counts": {
+    "0": 95065,
+    "1": 93942,
+    "2": 88354
+   },
+   "ewma_tau512/train": {
+    "rows_per_class_total": {
+     "0": 3999,
+     "1": 3999,
+     "2": 3999
+    },
+    "ok": true
+   },
+   "ewma_tau512/test": {
+    "rows_per_class_total": {
+     "0": 1499,
+     "1": 1499,
+     "2": 1499
+    },
+    "ok": true
+   }
+  }
+ },
+ "cells": {
+  "ewma_tau512/tok_linear": {
+   "acc_test": 0.3740271329879761,
+   "per_class": [
+    0.3735823929309845,
+    0.34556370973587036,
+    0.40293529629707336
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 0.8
+  },
+  "ewma_tau512/tok_mlp": {
+   "acc_test": 0.35112297534942627,
+   "per_class": [
+    0.310206800699234,
+    0.3602401614189148,
+    0.3829219341278076
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 6.1
+  },
+  "ewma_tau512/position_floor": {
+   "acc_test": 0.34756505489349365,
+   "per_class": [
+    0.2928619086742401,
+    0.14409606158733368,
+    0.6057371497154236
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "ewma_tau512/T16/visible_evidence_floor": {
+   "acc_test": 0.39581942558288574,
+   "per_class": [
+    0.044029351323843,
+    0.964643120765686,
+    0.17878586053848267
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "ewma_tau512/T16/actxmean_linear": {
+   "acc_test": 0.37669557332992554,
+   "per_class": [
+    0.3602401614189148,
+    0.3755837082862854,
+    0.3942628502845764
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 1.8
+  },
+  "ewma_tau512/T16/actxmean_mlp": {
+   "acc_test": 0.3259951174259186,
+   "per_class": [
+    0.11007338017225266,
+    0.48565709590911865,
+    0.38225483894348145
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 9.8
+  },
+  "ewma_tau512/T32/visible_evidence_floor": {
+   "acc_test": 0.4331776797771454,
+   "per_class": [
+    0.9899933338165283,
+    0.006671113893389702,
+    0.3028685748577118
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "ewma_tau512/T32/actxmean_linear": {
+   "acc_test": 0.3700244724750519,
+   "per_class": [
+    0.352234810590744,
+    0.35356906056404114,
+    0.4042695164680481
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 1.9
+  },
+  "ewma_tau512/T32/actxmean_mlp": {
+   "acc_test": 0.3580164611339569,
+   "per_class": [
+    0.33622413873672485,
+    0.3488992750644684,
+    0.3889259397983551
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 9.5
+  },
+  "ewma_tau512/T32/actxmean_foreign_linear": {
+   "acc_test": 0.3529019355773926,
+   "per_class": [
+    0.3348899185657501,
+    0.33622413873672485,
+    0.38759171962738037
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "ewma_tau512/T64/visible_evidence_floor": {
+   "acc_test": 0.5001111626625061,
+   "per_class": [
+    0.9739826321601868,
+    0.020013341680169106,
+    0.506337583065033
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "ewma_tau512/T64/actxmean_linear": {
+   "acc_test": 0.3775850534439087,
+   "per_class": [
+    0.37424948811531067,
+    0.35957303643226624,
+    0.39893263578414917
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 2.0
+  },
+  "ewma_tau512/T64/actxmean_mlp": {
+   "acc_test": 0.35935068130493164,
+   "per_class": [
+    0.34222814440727234,
+    0.35490328073501587,
+    0.3809206187725067
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 115.7
+  },
+  "ewma_tau512/T64/actxmean_foreign_linear": {
+   "acc_test": 0.352234810590744,
+   "per_class": [
+    0.3509005904197693,
+    0.32888591289520264,
+    0.3769179582595825
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "ewma_tau512/T32/label_null": {
+   "acc_test": 0.337113618850708,
+   "per_class": [
+    0.3215476870536804,
+    0.3375583589076996,
+    0.352234810590744
+   ],
+   "n_train": 11997,
+   "n_test": 4497,
+   "wall_s": 1.7
+  }
+ },
+ "summary": {
+  "tok": 0.3740271329879761,
+  "best_window": 0.3775850534439087,
+  "best_T": 64,
+  "gain_vs_tok": 0.003557920455932617,
+  "floor_at_bestT": 0.5001111626625061,
+  "beats_floor": false,
+  "position_floor": 0.34756505489349365,
+  "gain_bar_0.05_cleared": false,
+  "face": "ewma_tau512",
+  "H": 512,
+  "edges": [
+   1.0165290874111004,
+   1.7125882361479317
+  ],
+  "foreign_null_T64": 0.352234810590744,
+  "label_null": 0.337113618850708,
+  "beats_own_null": true
+ }
+}

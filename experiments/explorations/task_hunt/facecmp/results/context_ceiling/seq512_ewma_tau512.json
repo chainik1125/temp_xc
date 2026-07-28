@@ -1,0 +1,212 @@
+{
+ "meta": {
+  "substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
+  "model": "gpt2",
+  "screen_hs": 7,
+  "face": "ewma_tau512",
+  "H": 512,
+  "status": "FEASIBILITY PROBE, not a hunt4 verdict",
+  "ax_ts": [
+   16,
+   32,
+   64
+  ],
+  "rows": {
+   "face": "ewma_tau512",
+   "H": 512,
+   "n_docs": 300,
+   "tercile_edges": [
+    1.0001505749813002,
+    1.6898768532015884
+   ],
+   "n_elig": 438703,
+   "bin_counts": {
+    "0": 149088,
+    "1": 149595,
+    "2": 140020
+   },
+   "ewma_tau512/train": {
+    "rows_per_class_total": {
+     "0": 3998,
+     "1": 3998,
+     "2": 3998
+    },
+    "ok": true
+   },
+   "ewma_tau512/test": {
+    "rows_per_class_total": {
+     "0": 1499,
+     "1": 1499,
+     "2": 1499
+    },
+    "ok": true
+   }
+  }
+ },
+ "cells": {
+  "ewma_tau512/tok_linear": {
+   "acc_test": 0.3560151159763336,
+   "per_class": [
+    0.33422282338142395,
+    0.32888591289520264,
+    0.40493661165237427
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.0
+  },
+  "ewma_tau512/tok_mlp": {
+   "acc_test": 0.3386702239513397,
+   "per_class": [
+    0.32288190722465515,
+    0.35156771540641785,
+    0.34156104922294617
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 5.8
+  },
+  "ewma_tau512/position_floor": {
+   "acc_test": 0.3604625165462494,
+   "per_class": [
+    0.44696465134620667,
+    0.07404936850070953,
+    0.5603736042976379
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.3
+  },
+  "ewma_tau512/T16/visible_evidence_floor": {
+   "acc_test": 0.3911496698856354,
+   "per_class": [
+    0.04269513115286827,
+    0.9613075256347656,
+    0.16944630444049835
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "ewma_tau512/T16/actxmean_linear": {
+   "acc_test": 0.3738047480583191,
+   "per_class": [
+    0.35490328073501587,
+    0.3562375009059906,
+    0.4102735221385956
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "ewma_tau512/T16/actxmean_mlp": {
+   "acc_test": 0.3529019355773926,
+   "per_class": [
+    0.32688459753990173,
+    0.34222814440727234,
+    0.38959306478500366
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 9.6
+  },
+  "ewma_tau512/T32/visible_evidence_floor": {
+   "acc_test": 0.43540138006210327,
+   "per_class": [
+    0.9899933338165283,
+    0.013342227786779404,
+    0.3028685748577118
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.3
+  },
+  "ewma_tau512/T32/actxmean_linear": {
+   "acc_test": 0.37825217843055725,
+   "per_class": [
+    0.36290860176086426,
+    0.33822548389434814,
+    0.43362241983413696
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "ewma_tau512/T32/actxmean_mlp": {
+   "acc_test": 0.3653546869754791,
+   "per_class": [
+    0.34556370973587036,
+    0.3448965847492218,
+    0.4056037366390228
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 9.5
+  },
+  "ewma_tau512/T64/visible_evidence_floor": {
+   "acc_test": 0.4947742819786072,
+   "per_class": [
+    0.9739826321601868,
+    0.014009339734911919,
+    0.4963308870792389
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.3
+  },
+  "ewma_tau512/T64/actxmean_linear": {
+   "acc_test": 0.37647321820259094,
+   "per_class": [
+    0.3909272849559784,
+    0.2875250279903412,
+    0.45096731185913086
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "ewma_tau512/T64/actxmean_mlp": {
+   "acc_test": 0.38025349378585815,
+   "per_class": [
+    0.4329552948474884,
+    0.3122081458568573,
+    0.39559707045555115
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 9.4
+  },
+  "ewma_tau512/T64/actxmean_foreign_linear": {
+   "acc_test": 0.3586835563182831,
+   "per_class": [
+    0.3122081458568573,
+    0.35890594124794006,
+    0.40493661165237427
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.7
+  },
+  "ewma_tau512/T32/label_null": {
+   "acc_test": 0.31687793135643005,
+   "per_class": [
+    0.3202134668827057,
+    0.325550377368927,
+    0.3048699200153351
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 1.8
+  }
+ },
+ "summary": {
+  "tok": 0.3560151159763336,
+  "best_window": 0.38025349378585815,
+  "best_T": 64,
+  "gain_vs_tok": 0.024238377809524536,
+  "floor_at_bestT": 0.4947742819786072,
+  "beats_floor": false,
+  "position_floor": 0.3604625165462494,
+  "gain_bar_0.05_cleared": false
+ }
+}

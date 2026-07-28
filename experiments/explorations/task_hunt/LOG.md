@@ -30864,3 +30864,114 @@ seed-controlled null, t = −1.29) **and** the btk arm completed to
 uniform 3-seed coverage.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+---
+
+## 2026-07-28 20:09 BST — mac-c: ⚑ TWO STACKED CEILINGS. The apparatus truncates context at 128 tokens, and gpt2's readable horizon ends before the label does. gain↔floor ρ = +0.871 across 6 faces
+
+**This is the most important thing I have found today and it is not
+about any candidate.** It is about the geometry every candidate has been
+screened in, including the KEEP. All $0, all reproducible from git.
+
+### 1. Face battery — gain and floor are COUPLED (n=6, one corpus)
+
+Six functionals of the *same* event stream, same corpus, same
+activations, same bars (`facecmp/face_battery.py`):
+
+| face | tok | best | T | **gain** | foreign null | floor_excess | arm−floor |
+|---|---|---|---|---|---|---|---|
+| RECENCY_age | 0.3781 | 0.4377 | 64 | **+0.0596** | 0.3643 | +0.2526 | −0.1482 |
+| **ewma_tau128** | 0.3587 | 0.4139 | 64 | **+0.0552** | 0.3347 | +0.2764 | −0.1958 |
+| age2 | 0.3531 | 0.3658 | 32 | +0.0127 | 0.3491 | +0.0839 | −0.0514 |
+| ewma_tau512 | 0.3740 | 0.3776 | 64 | +0.0036 | 0.3522 | +0.1668 | −0.1225 |
+| rate_H512 | 0.3505 | 0.3529 | 32 | +0.0024 | 0.3498 | +0.0838 | −0.0643 |
+| gap_last | 0.3405 | 0.3409 | 64 | +0.0004 | 0.3407 | +0.0000 | +0.0076 |
+
+**gain vs floor_excess: Pearson +0.871, Spearman +0.886.** Every face
+that reads has a high floor; every face with a low floor does not read.
+**0 of 6 beat their floor** where they had any gain (`gap_last` "beats"
+a chance floor with a chance arm — not a result).
+
+**`ewma_tau128` clears the gain bar (+0.0552).** So the graded
+accumulator *does* read, and my 19:34 caveat was right to refuse the
+generalisation: `rate_H512`'s failure was **discretisation and horizon,
+not cumulative structure**. I am glad I measured that instead of leaving
+it as a caveat someone would have read either way.
+
+### 2. Why they are coupled: the apparatus never showed the model the label
+
+**The activation cache chunks the stream into INDEPENDENT 128-token
+sequences** (`chunk_stream`: `rows.append(seg[s:s+content])`, each a
+separate batch element — no cross-chunk attention). With `OFF_MIN=63`,
+**every probed token saw between 64 and 128 tokens of context. Full
+stop.**
+
+**The recency face's terciles sit at ages 121 / 286 tokens.** So classes
+1 and 2 are *both* "no event anywhere in my context" — structurally
+indistinguishable. The per-class row says exactly that:
+
+    T64 arm per_class = [0.516, 0.394, 0.403]   <- only class 0 separates
+
+**Direct test** (`facecmp/ceiling_test.py`): re-tercile the SAME face so
+every edge falls INSIDE the context (edges → ages 46/72):
+
+| | gain | per_class |
+|---|---|---|
+| terciles at 121/286 (as screened) | +0.0596 | [0.516, 0.394, 0.403] |
+| **terciles at 46/72 (inside context)** | **+0.1707** | **[0.845, 0.873, 0.839]** |
+
+**Gain nearly triples and per-class goes uniform.** The arm was never
+weak — it was being asked about tokens the model had never seen.
+
+### 3. But raising the context does NOT rescue it — a second ceiling
+
+Rebuilt the cache at **SEQ_LEN=512** (same corpus, same layer, same
+dtype, 54 s on local MPS) and re-ran. **Pre-registered:** the floor
+depends only on `T + w`, so it must not move.
+
+| face | @128 gain | @512 gain | @128 floor | @512 floor |
+|---|---|---|---|---|
+| RECENCY_age | +0.0596 | **+0.0928** | 0.5859 | **0.5932** |
+| rate_H512 | +0.0024 | **+0.0109** | 0.4172 | 0.4706 |
+| ewma_tau512 | +0.0036 | +0.0242 | 0.5001 | 0.4948 |
+
+**The floor prediction held exactly (0.5859 → 0.5932).** But the arm
+recovered only a fraction: recency per-class went [0.516, 0.394, 0.403]
+→ **[0.492, 0.433, 0.416]**, nowhere near the [0.845, 0.873, 0.839] the
+inside-context version reaches. **`rate_H512` stayed at chance even with
+its full 512-token horizon present.**
+
+**So two ceilings stack, and only one is ours:**
+
+1. **Apparatus** — `SEQ_LEN=128` truncates context below the label's
+   range. Removable, and removing it is cheap.
+2. **Representational** — gpt2's layer-7 residual carries event age over
+   roughly a hundred tokens, not five hundred, *even when given the
+   context*. Not removable by changing the harness.
+
+**I over-inferred from the ceiling test and the 512 run corrected me
+within the hour.** "Raise SEQ_LEN and the arm unlocks" is wrong; it
+buys +0.03 of gain, not +0.11.
+
+### 4. ⚠ Scope — this is ONE model and the weakest one
+
+**gpt2 only.** `gemma2_2b` and `llama31_8b` are screened at layer 14 and
+are plausibly much better at long-range integration; **their horizons
+are untested and I am not extrapolating to them.** The right next
+measurement is the same ceiling test on a 2b leg — still $0-ish, and it
+decides whether ceiling 2 is a gpt2 fact or a program fact.
+
+### 5. What this means for the hunt
+
+The KEEP condition needs the label's dynamic range to sit **above the
+floor's horizon `T + w` and below the model's readable horizon**. On
+gpt2 at `SEQ_LEN=128` that band is roughly **89 → ~128 tokens: a factor
+of 1.4.** That is not a task-design problem, and no amount of new
+candidates from the registry fixes it — which is why I am reporting this
+instead of freezing another card.
+
+**Item 7 still has no KEEP. But "we keep picking bad tasks" now has a
+measured competitor: the band we are aiming at is tiny.**
+
+$0 all night. **0 mac-c pods.** Everything above reruns from git.
+
+_Recorded-by: claude-opus-5 (mac-c)_

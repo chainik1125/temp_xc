@@ -1,0 +1,232 @@
+{
+ "meta": {
+  "substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
+  "model": "gpt2",
+  "screen_hs": 7,
+  "face": "ewma_tau128",
+  "H": 512,
+  "status": "FEASIBILITY PROBE, not a hunt4 verdict",
+  "ax_ts": [
+   16,
+   32,
+   64
+  ],
+  "rows": {
+   "face": "ewma_tau128",
+   "H": 512,
+   "n_docs": 300,
+   "tercile_edges": [
+    0.10214595598066749,
+    0.4700029608923481
+   ],
+   "n_elig": 277361,
+   "bin_counts": {
+    "0": 94143,
+    "1": 93406,
+    "2": 89812
+   },
+   "ewma_tau128/train": {
+    "rows_per_class_total": {
+     "0": 3998,
+     "1": 3998,
+     "2": 3998
+    },
+    "ok": true
+   },
+   "ewma_tau128/test": {
+    "rows_per_class_total": {
+     "0": 1498,
+     "1": 1498,
+     "2": 1498
+    },
+    "ok": true
+   }
+  }
+ },
+ "cells": {
+  "ewma_tau128/tok_linear": {
+   "acc_test": 0.3587004840373993,
+   "per_class": [
+    0.3251001238822937,
+    0.33778372406959534,
+    0.4132176339626312
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.8
+  },
+  "ewma_tau128/tok_mlp": {
+   "acc_test": 0.3569203317165375,
+   "per_class": [
+    0.3257676959037781,
+    0.35847797989845276,
+    0.386515349149704
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 5.7
+  },
+  "ewma_tau128/position_floor": {
+   "acc_test": 0.33288830518722534,
+   "per_class": [
+    0.4072096049785614,
+    0.20293724536895752,
+    0.3885180354118347
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "ewma_tau128/T16/visible_evidence_floor": {
+   "acc_test": 0.4376946985721588,
+   "per_class": [
+    0.09212283045053482,
+    1.0,
+    0.2209612876176834
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "ewma_tau128/T16/actxmean_linear": {
+   "acc_test": 0.3874054253101349,
+   "per_class": [
+    0.34045395255088806,
+    0.3678237795829773,
+    0.4539385735988617
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.7
+  },
+  "ewma_tau128/T16/actxmean_mlp": {
+   "acc_test": 0.3729417026042938,
+   "per_class": [
+    0.34445926547050476,
+    0.36915886402130127,
+    0.40520694851875305
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 9.9
+  },
+  "ewma_tau128/T32/visible_evidence_floor": {
+   "acc_test": 0.5051179528236389,
+   "per_class": [
+    0.09212283045053482,
+    1.0,
+    0.42323097586631775
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.2
+  },
+  "ewma_tau128/T32/actxmean_linear": {
+   "acc_test": 0.39185580611228943,
+   "per_class": [
+    0.3397863805294037,
+    0.36248332262039185,
+    0.47329774498939514
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.9
+  },
+  "ewma_tau128/T32/actxmean_mlp": {
+   "acc_test": 0.3882955014705658,
+   "per_class": [
+    0.3357810378074646,
+    0.38117489218711853,
+    0.44793057441711426
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 9.7
+  },
+  "ewma_tau128/T32/actxmean_foreign_linear": {
+   "acc_test": 0.3520249128341675,
+   "per_class": [
+    0.3291054666042328,
+    0.32376500964164734,
+    0.4032042622566223
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.9
+  },
+  "ewma_tau128/T64/visible_evidence_floor": {
+   "acc_test": 0.6097018122673035,
+   "per_class": [
+    0.09212283045053482,
+    1.0,
+    0.7369826436042786
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.2
+  },
+  "ewma_tau128/T64/actxmean_linear": {
+   "acc_test": 0.41188251972198486,
+   "per_class": [
+    0.36915886402130127,
+    0.37049397826194763,
+    0.4959946572780609
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 2.0
+  },
+  "ewma_tau128/T64/actxmean_mlp": {
+   "acc_test": 0.4138851761817932,
+   "per_class": [
+    0.35180240869522095,
+    0.39185580611228943,
+    0.49799734354019165
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 679.9
+  },
+  "ewma_tau128/T64/actxmean_foreign_linear": {
+   "acc_test": 0.33466845750808716,
+   "per_class": [
+    0.30507344007492065,
+    0.3431241512298584,
+    0.35580775141716003
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 2.1
+  },
+  "ewma_tau128/T32/label_null": {
+   "acc_test": 0.33466845750808716,
+   "per_class": [
+    0.3464619517326355,
+    0.32309746742248535,
+    0.33444592356681824
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 1.8
+  }
+ },
+ "summary": {
+  "tok": 0.3587004840373993,
+  "best_window": 0.4138851761817932,
+  "best_T": 64,
+  "gain_vs_tok": 0.05518469214439392,
+  "floor_at_bestT": 0.6097018122673035,
+  "beats_floor": false,
+  "position_floor": 0.33288830518722534,
+  "gain_bar_0.05_cleared": true,
+  "face": "ewma_tau128",
+  "H": 512,
+  "edges": [
+   0.10214595598066749,
+   0.4700029608923481
+  ],
+  "foreign_null_T64": 0.33466845750808716,
+  "label_null": 0.33466845750808716,
+  "beats_own_null": true
+ }
+}
