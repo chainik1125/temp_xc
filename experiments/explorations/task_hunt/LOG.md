@@ -17484,3 +17484,17 @@ design).
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+## 2026-07-28 02:38 London (date-verified) — mac-d — retrain LAUNCH CONFIRMED (both shards live at pin 74d260321) + stamp corrigendum
+
+Shards 0+1 running detached on pod-D GPUs 0/1 (24 cells each, 3
+workers; first-attempt checkout collision with pod-local untracked
+screen jsons removed — they are committed upstream; second attempt
+clean at the pin). Drain est ~05:30–06:30 → overlay → repatriate →
+ckpt HF push → figure. **Stamp corrigendum: 74d260321's LOG entry
+and ledger line say ~02:52; true wall was 02:35 (17 min fast) —
+same pre-write failure as the 5-min case, 782e9cad3. Fix adopted
+for real: stamps now come only from a separate preceding `date`
+call (this entry's is).**
+
+_Recorded-by: claude-fable-5 (mac-d)_
