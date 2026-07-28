@@ -1,24 +1,38 @@
 #!/bin/bash
-# runpod-a — RLHF paper-faithful GRID lanes (Han-urgent directive 4e04ae0e3 item 2).
+# RLHF paper-faithful GRID lanes (Han-urgent directive 4e04ae0e3 item 2).
+# Authored by runpod-a on pod A; DE-HARDCODED by mac-d 13:14 07-28 when
+# the hub designated it fleet property (31930ad8c) and the wave-1 map
+# moved it to pod B + old-pod under other agents' hands.
 #
-#   ./run_pf_grid_lanes.sh <PIN> <lane> [lane ...]
+#   AGENT_NAME=<your-id> [GPU=<n>] [REPO=<path>] \
+#       ./run_pf_grid_lanes.sh <PIN> <lane> [lane ...]
 #
-# Launches one concurrent process per lane on GPU 0, each with explicit
-# thread + GPU-memory caps. Threads are divided across the lanes from the
-# REAL container quota (cgroup cpu.max, NOT nproc — see LOG 12:52/13:00).
+# Launches one concurrent process per lane on ONE GPU (default 0, set
+# GPU=n), each with explicit thread + GPU-memory caps. Threads are
+# divided across the lanes from the REAL container quota (cgroup
+# cpu.max, NOT nproc — see LOG 12:52/13:00).
 #
 # Guards the two traps runpod-b found in run_cells.py (LOG 0be31500b):
 #   trap 1  AGENT_NAME setdefault "runpod-2"  -> exported explicitly here
 #   trap 2  no thread bound, torch autosizes  -> OMP/MKL exported per lane
 # Both are set inline; runpod-2's driver is NOT edited.
+#
+# trap 3 (mac-d): AGENT_NAME, GPU and REPO were hardcoded to runpod-a /
+# GPU 0 / runpod-a's checkout. Used verbatim elsewhere that stamps every
+# row `runpod-a` and stacks every lane on GPU 0 — so AGENT_NAME is now
+# REQUIRED (fail-fast beats silent misattribution) and GPU/REPO are
+# overridable. REPO defaults to this pod's checkout for AGENT_NAME.
 set -euo pipefail
 
-REPO=/workspace/agents/runpod-a/temp_xc
+: "${AGENT_NAME:?refusing to launch: export AGENT_NAME=<your agent id>. It stamps every leaderboard row; a wrong value is silent provenance corruption.}"
+GPU="${GPU:-0}"
+REPO="${REPO:-/workspace/agents/${AGENT_NAME}/temp_xc}"
 PY="$REPO/.venv/bin/python"
 LOGDIR=/workspace/logs
 RESERVE_CORES=3          # left for the two agent processes + system
 
-[ $# -ge 2 ] || { echo "usage: $0 <PIN> <lane> [lane ...]"; exit 2; }
+[ -x "$PY" ] || { echo "FATAL: no venv python at $PY — set REPO=<your checkout>"; exit 2; }
+[ $# -ge 2 ] || { echo "usage: AGENT_NAME=<id> [GPU=n] $0 <PIN> <lane> [lane ...]"; exit 2; }
 PIN="$1"; shift
 LANES=("$@")
 N=${#LANES[@]}
@@ -95,8 +109,8 @@ m=json.loads(sys.argv[1])[sys.argv[2]]
 print(f'{min(0.95, m[\"peak_gib\"]*float(sys.argv[3])/float(sys.argv[4])):.3f}')
 " "$MEMJSON" "$lane" "$HEADROOM" "$GPU_TOTAL_GIB")
     echo "--- launching lane $lane (GPU_FRACTION=$FRAC) -> $out"
-    env CUDA_VISIBLE_DEVICES=0 \
-        AGENT_NAME=runpod-a \
+    env CUDA_VISIBLE_DEVICES="$GPU" \
+        AGENT_NAME="$AGENT_NAME" \
         HF_HOME=/workspace/hf_cache \
         OMP_NUM_THREADS="$THREADS" \
         MKL_NUM_THREADS="$THREADS" \
