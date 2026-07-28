@@ -1,98 +1,108 @@
-# runpod-c STATUS — FROZEN hill-climb → probing-sprint join (2026-07-28 02:40 London, date-verified)
+# runpod-c STATUS — ALIVE again; shards DONE; relief venue being repaired (2026-07-28 12:57 London, date-verified 11:57 UTC)
 
-**I am `runpod-c`**, alone on a dedicated 2×H100 pod, workspace
-`/workspace/agents/runpod-c/temp_xc`, venv `.venv` healthy, probing
-substrate ON-POD (acts + 38/38 probe cache; mirror at
-`/workspace/caches/probing/hf_mirror`).
+**I am `runpod-c`**, alone on a **dedicated** 2×H100 pod, workspace
+`/workspace/agents/runpod-c/temp_xc`, venv healthy, probing substrate
+resident (acts + 38/38 probe cache).
 
-## MODE: freeze-and-join (Han order 11227ce0d, ack'd 02:40)
+## READ FIRST — the 6h45m dead window
 
-The T-scaling hill-climb is **FROZEN, not abandoned** — full resume
-playbook in `experiments/explorations/tscale/RESULTS.md` § FREEZE
-(one card: launch the pre-registered C6 pair, § 3 gates unchanged).
-Both GPUs go to **probing paper-faithful shards at runpod-1's
-card-pin (~05:00 London target)**; possible RLHF relief later
-(runpod-2 coordinates, one GPU at probing-drain).
+Shards drained 05:59; **nothing ran 05:59 → 12:38** (both H100s 0%),
+through the 11:00 window. The fleet declared me down at 07:10 and
+carried my duties. No science lost — the shards had finished their
+whole assignment — but do not trust any fleet doc that describes pod B
+as "ready"; verify artifacts on disk. Disclosed in the 12:57 LOG beat.
 
-## IN FLIGHT RIGHT NOW (check FIRST on resume)
+## IN FLIGHT RIGHT NOW
 
-- **GPU 1, pid 25696** — **SHARD D RUNNING** (launched 02:48 at
-  PIN d9235755b): T6×{42,1,2} → T2×{42}, log
-  `/workspace/logs/pf_shard_D.log`, drains ~06:00. Sentinel line
-  `PF_SHARD_D_DONE`. Per-cell ckpt push via
-  `scripts/push_ckpts_hf.py <train_key>` (≤2h rule).
-- **GPU 0, pid 27050** — **SHARD C RUNNING** (launched 03:17 at
-  the C5-T16 drain): T8×{42,1,2} → T1×{2}, log
-  `/workspace/logs/pf_shard_C.log`, drains ~06:30. Sentinel
-  `PF_SHARD_C_DONE`. Same per-cell ckpt-push duty.
-- **tscale FULLY DRAINED 03:17** — freeze complete. C4 CLOSED
-  (T16 0.9253/0.8791 anneal-harmless; KILL as T1 fix). C5 KILLED
-  (T16 0.9016/0.8501 — pooled admission destroys the win, echoing
-  C2; census pair kills diversity-as-cause). Ledger FINAL: ≈$16
-  overnight, ≈$33 program. Resume = C6 per RESULTS § FREEZE.
-- **HF ckpt mirror COMPLETE 03:2x**: 27/27 tscale ckpts on
-  `temp-bench-data` `ckpts/tscale/<cfg_hash>/`, 27/27 LFS-sha
-  matches, receipts committed
-  (`tscale/results/hf_durability_receipts.jsonl`). Freeze order
-  item 1 fully discharged.
-- **Background: HF ckpt mirror** (~25 ckpts, 61 GB →
-  `temp-bench-data` `ckpts/tscale/<cfg_hash>/`), receipts →
-  `tscale/results/hf_durability_receipts.jsonl`; C4/C5-T16
-  stragglers re-run on drain. Log
-  `/workspace/logs/tscale_hf_mirror.log`.
-- **Card-pin watcher**: git poll for runpod-1's probing
-  paper-faithful card commit; on pin → read card §shards → claim
-  shards for both GPUs (coordinate with runpod-a: their GPU 0 =
-  shard 1; runpod-b GPU 1 joins at rmx_b drain; T1-last ordering
-  flagged by runpod-1). Launch per THEIR card/pins — venue rules,
-  their runner, nothing of mine.
+- **GPU 0 — RLHF l13-IT substrate stage B REBUILDING** (relaunched
+  12:55). Log `/workspace/logs/pf_substrate_stageB_runpodc.log`.
+  Target `/workspace/caches/rlhf/cached_hh_rlhf_l13it`. **Until this
+  lands, pod B is NOT G1-ready — say so if asked.**
+- **GPU 1 — idle, offered into rung-1 relief.**
 
-## Sprint join facts
+## ⚑ The two substrate bugs I found (fixed; see 12:57 beat)
 
-- 18 cells (21-vs-18 count being resolved by runpod-1), 4 GPUs at
-  pin (old-pod GPU 0 + pod-A GPU 0 + my two) → sweep plausibly
-  done 08:00–09:00, inside the 11:00 window.
-- My substrate is already local — zero sync cost. Probing quoted
-  numbers are NEVER touched by my tscale cells (namespaced); the
-  sprint shards run runpod-1's canonical pathway, which DOES write
-  paper-faithful rows — that is the point; follow their card
-  exactly.
-- 15-min ack discipline in effect fleet-wide.
+1. **Gated-repo 401**: the hub's 06:17 stage B ran with no `HF_TOKEN`;
+   `google/gemma-2-2b-it` is gated. Both `/workspace/.tokens/{hf_token,
+   hf_token_datasets}` DO have access (verified via `model_info`).
+   Fix = export `HF_TOKEN` before the launcher.
+2. **Stale-tree SyntaxError**: `build_cache.py:131` "name
+   'SUBJECT_MODEL' is used prior to global declaration" on my
+   102-commit-stale tree; **upstream compiles clean**. Sync before
+   running any lane.
 
-## Hill-climb standing (for anyone reading; details in RESULTS.md)
+The hub's 07:22 receipt said "stage B running" and was read as done —
+the cache dir sat EMPTY for ~6 h. **Cite artifacts, not process
+state.**
 
-C1–C5 complete: first monotone-rising TXC k20 curve at 20k (diag
-0.8974→0.9103→0.9171); r1-min = program-best T16 (k20 0.9251 / k5
-0.8763); T1 collapse mechanism = across-row latent concentration,
-driven by the BACKBONE not the selection rule (twin census 0.1276
-vs r1 ≤0.021 active-frac); k-anneal (C4-T1) and batch-pool (C5-T1)
-both FAIL the floor; A2 walk resolved NO; C6 (bdec-init /
-recon_shifts diff-ablations) pre-registered NOT LAUNCHED = resume
-point. Gate floors: T1 ≥ 0.8844, T16 ≥ 0.8810; k5 preservation bar
-0.8551 at L2.
+## COMPLETED — paper-faithful shards C + D (8/8 cells)
+
+PIN `d9235755b`, `paper_txc_base_v1t`, canonical runner, Protocol
+1.2.0. `PF_SHARD_D_DONE` 05:24, `PF_SHARD_C_DONE` 05:59.
+
+| T | k20 per seed | mean | realized l0 vs k_win |
+|---|---|---|---|
+| 1 (s2) | 0.8953 | — | 19.999 / 20 |
+| 2 (s42) | 0.9050 | — | 40.000 / 40 |
+| 6 (42/1/2) | 0.8987 / 0.8881 / 0.8856 | **0.8908** | 120.000 / 120 |
+| 8 (42/1/2) | 0.8821 / 0.8852 / 0.8893 | **0.8855** | 159.94–159.97 / 160 |
+
+- **Rows are upstream and exact** — mac-local repatriated the 3
+  stranded cells at 07:10; I verified 16/16 mine present, 0 missing, 0
+  dup eval_keys, 8/8 manifest train_keys. My local copies were
+  redundant and were dropped, not re-committed.
+- **E1 corroborated independently**: zero-picks 0.001/0.000/0.000/
+  0.036–0.057 at T1/T2/T6/T8 — onset exactly T6→T8, matching
+  runpod-1's `6e928e2bb` scoring from the other side.
+- **T=1 control is exact**: shuffle delta +0.0000 at both k5 and k20,
+  `shuffle_identity = 1.0`.
+- **8/8 ckpts durable** on `temp-bench-data` (verified by fresh
+  `list_repo_files`, not by the push script's log). Plus 27/27 tscale
+  ckpts under `ckpts/tscale/`.
+- **Actuals** 5.30 GPU-h, ~40 min/cell vs ~48 est.
+
+## ⚑ Venue capacity — measured, for rung-1 relief
+
+Replicated runpod-b's protocol on pod B (same GEMM shape, 6 iters):
+
+    nproc 208 ; cpu.max -> 44.2 core quota ; torch default 104 threads
+    OMP_NUM_THREADS unset  (the same trap they found on pod A)
+
+| config | pod B aggregate | pod B vs 1 lane | pod A vs 1 lane |
+|---|---|---|---|
+| 1 lane @default | 2210 | 1.00x | 1.00x |
+| 1 lane @quota | 3051 | 1.38x | 1.18x |
+| 2 lanes naive | 4029 | **1.82x** | **0.75x** |
+| 2 lanes partitioned | 4681 | 2.12x | 1.59x |
+
+**The cgroup trap generalises (platform property); the collapse does
+NOT** — naive 2-lane costs ~10% per lane here vs 260% on pod A.
+Candidate cause: pod B is single-agent dedicated, pod A is
+co-tenanted. Production corroboration: shards C+D ran naively
+co-tenanted 3.2 h at ~40 min/cell each, beating the ~48 min single-lane
+estimate — consistent with a lane that is NOT OpenMP-bound (bears on
+runpod-b's single-threaded question to runpod-2). Caveats: ~48 min is
+the card's estimate not a measured 1-lane baseline; my cells are
+probing, runpod-2's claim is about RLHF cells.
 
 ## Process state
 
-- Git: clean at last push; pull-rebase --autostash before every
-  push; LOG conflicts = keep BOTH + delete marker lines; **stamps
-  only AFTER reading `date`** (5 drifts on record — the rule is
-  real).
-- CLI bool trap: run_l1 extra-hparams casts int→float→string;
-  booleans must be `0`/`1`.
-- Ledger: day-1 ≈ $17; overnight hill-climb actuals ≈ $16 at
-  freeze (vs $35–40 est). Sprint hours post-03:15 bill to the
-  sprint. Cap $150/day fine.
-- Tokens at `/workspace/.tokens/` (gh, hf, hf_datasets) — paths
-  only, values never in git/logs/cards.
+- Git: synced to `0bed01849` via `reset --hard` **after** proving my
+  rows were already upstream (0 missing) — no data at risk.
+- Discipline: explicit-path commits; back up canonical files before
+  any rebase and union-verify after; LOG conflicts keep BOTH blocks;
+  never `--ours` on my own picks; **stamps only after reading `date`**
+  (6 drifts on record).
+- Tokens at `/workspace/.tokens/` — paths only, values never in
+  git/logs/cards.
+- Ledger: tscale ≈$16 overnight / ≈$33 program; shards 5.30 GPU-h.
 
-## Next actions queue (in order)
+## Next actions queue
 
-1. ~02:50 C4-T16 drains (watcher) → verdict line; GPU 1 idle.
-2. ~03:15 C5-T16 drains → C5 verdict line; GPU 0 idle; push both
-   verdicts + mirror stragglers; ledger finals.
-3. Card-pin (~05:00): claim shards per card §shards, launch on
-   both GPUs, run to sweep-done (~08:00–09:00). RLHF relief if
-   called.
-4. Post-rebuttal: resume via RESULTS § FREEZE playbook.
+1. **Watch stage B to completion**; post the receipt; only then may
+   pod B be called G1-ready.
+2. Hold both GPUs for rung-1 relief; runpod-2/mac-d scope the cells.
+3. Post-rebuttal: resume hill-climb via `tscale/RESULTS.md § FREEZE`
+   (pre-registered C6 pair, never launched = the resume point).
 
 *Rewrite before any compact. — runpod-c*
