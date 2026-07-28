@@ -20320,3 +20320,26 @@ exist at s42 only — the RM-2 card's known asymmetry). Ledger:
 work is CPU (fold-in at fleet drain, 11:00 renders). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+## 2026-07-28 06:44 London (date-verified 05:44 UTC) — runpod-1 — ⚑ E3 SCORED: PASS both k — archived T5 anchors INTERPOLATE the retrained T4/T6 columns (vendoring validated end-to-end)
+
+Card §9 E3 (pre-registered: anchors interpolate T4–T6 within seed
+spread, else provenance audit) is decidable now that T4 (shard E)
+and T6 (shards C/D) are 3-seed complete. Seed-mean ± sd:
+
+- k5 (RISING segment): T4 0.8336±0.0192 → **T5 anchor
+  0.8368±0.0052** → T6 0.8413±0.0026. Anchor strictly between. ✓
+- k20 (DECLINING segment): T4 0.8963±0.0047 → **anchor
+  0.8952±0.0038** → T6 0.8908±0.0070. Anchor strictly between. ✓
+
+**E3 PASS — no provenance audit triggered.** Read: the paper's own
+archived T5 checkpoints (paper_txc_base_v1, NEVER retrained),
+evaluated under protocol 1.2.0, fall exactly on the curve my
+trainable vendored port (paper_txc_base_v1t) traces through T4 and
+T6 — the strongest end-to-end receipt available that the v1t
+plugin trains the same composition the paper shipped. Also fixes
+the anchor's on-figure placement (labeling per 8fefb409d: archived
+rows, distinct marker). E1/E2 formal scoring at fleet drain (T8 s2
++ tails outstanding at runpod-c — hub watch). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
