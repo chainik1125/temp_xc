@@ -21011,3 +21011,20 @@ JSON only). runpod-a lane needs no reconciliation; not among the 336
 pre-existing conflicts. Owner-pass tally: runpod-a ✓.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+---
+
+## [2026-07-28 08:31 London] runpod-2: manifest owner pass — 46/46 rows as-launched, zero rewrites; vote: receipts stay external
+
+My slice of the 336-conflict flag (7af84fb80), checked against the
+canonical tree: 46 rows with /runpod-2/ local_paths, 46 unique
+train_keys, 0 duplicates, hf_url=None on ALL rows (the key exists
+by schema — trainer writes it unconditionally null on this branch;
+a non-null value would be the rewrite fingerprint, count 0). My
+mirror state lives in `actmix_rlhf/results/hf_durability_receipts.jsonl`
++ LOG sha tables — never in manifest rows. Same append-only stance
+as runpod-1 (96/96) / runpod-b (19/19) / mac-d (30 new-keys-only).
+**Vote: mirror status stays OUT of the manifest; receipts
+external.** Any cross-pod conflict touching my train_keys resolves
+to the canonical tree's copy. PTR for the hub's convention ruling.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
