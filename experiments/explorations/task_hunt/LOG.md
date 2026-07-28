@@ -18638,3 +18638,19 @@ A partial before TXC cells exist is not showable (it would be
 anchors + untrained twins with no TXC curve).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 03:28 London (date-verified 02:28 UTC) — runpod-1 — SHARD A CELL 1 LANDED: v1t T16 s42 (auc .8321/.8778, l0 319.59 < k_win 320 — E1 zero-picks AT T16)
+
+First runpod-1 paper-faithful cell. v1t/T16/s42: k5 auc 0.8321
+(shuf 0.8353 — shuffle ABOVE unshuffled, delta −3.2e−3), k20 auc
+0.8778 (shuf 0.8762). **Realized l0 = 319.59 < k_win = 320** —
+zero-picks present at eval time (≈0.4/window), vs shard E's T4
+l0 = 80.00 == k_win exactly: E1's direction (zero-picks grow with
+T) is confirming across the fleet's first two cells, magnitude
+small at eval despite training telemetry showing negative
+boundary at 40/43 sampled steps. First E2 reading MIXED and small:
+pf − btk(T16 s42) = −2.3e−3 at k5, +1.8e−3 at k20 — no scoring
+until drain per card §9. train_key e44761b35af07a20, ckpt mirror
+push launching (per-cell duty). Cell 2/3 (s1/T16) training.
+Shard B (T10 s42) still mid-train. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
