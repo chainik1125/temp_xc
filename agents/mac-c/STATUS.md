@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (Han 13:56, briefing
 `hunt-mac-c-takeover.md`) — was: elicitation harness + screening
-**Last update:** 2026-07-28 14:45 BST (read from `date` — see stamp
+**Last update:** 2026-07-28 16:08 BST (read from `date` — see stamp
 corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ---
@@ -18,15 +18,56 @@ at 14:51 (Han: *"mac-c is HOLDING — they should be running ahead at
 full speed!"*); corpus generated, all label-side bands passed, **screen
 in flight.**
 
-**`retryesc_gen` — CORPUS COMPLETE, 21/21 LABEL-SIDE BANDS PASS,
-SCREENING NOW.** 300 docs / 946,546 tok / **2,809 events** on every
-tokenizer leg. **~$21 of the $300 generation cap (~7 %).**
-Screen pod `9fcz2d1zjk174z` (`mac-c-screen2-0728`, L40S $0.99/h) —
-**MUST be TERMINATED + API-verified at drain.**
+**`retryesc_gen` LANE CLOSED — SCREEN VERDICT WEAK 3/3** (writeup
+`retryesc_gen/RESULT.md`). Corpus 300 docs / 946,546 tok / 2,809
+events; 21/21 label-side bands passed; **all pods TERMINATED +
+API-verified (0 mac-c pods).** Candidate total **≈ $22** ($21 gen +
+$0.68 screen). **Item 7 still has NO KEEP.**
 
-⚠ **NOT a KEEP.** Label-side bands buy the *right to screen*, nothing
-more. hunt4 § 4 needs the GPU screen. **Gold-visibility does NOT fire
-on label-side evidence** and nothing has gone into `REBUTTAL_HANDOFF.md`.
+| leg | tok | window | **gain** | floor@bestT | wd gain |
+|---|---|---|---|---|---|
+| gpt2 | 0.3669 | 0.4314 | **+0.0645** | 0.5942 ✗ | +0.0540 |
+| gemma2_2b | 0.3734 | 0.4424 | **+0.0690** | 0.6083 ✗ | +0.0857 |
+| llama31_8b | 0.3910 | 0.4539 | **+0.0630** | 0.6219 ✗ | +0.0793 |
+
+**The gain bar was CLEARED on every leg and the FLOOR clause killed it
+on every leg.** Gain/null/`wd_ok` all passed; `floor_ok` False 3/3; no
+kill clause fired.
+
+**A scissors** (identical all legs): T4 arm beats its floor but carries
+no gain; T64 carries +0.065 gain but loses to the floor by 0.163.
+**Where the window becomes useful, the visible cue has already outrun
+it.**
+
+## ⚑ Two things to carry forward — one strong, one costly
+
+**1. The density thesis is CONFIRMED as a design instrument.** Same
+face family, same helpers, same bars — only the clock changed:
+
+| | `evalage` (f=0.045) | **`retryesc_gen` (f=0.185)** |
+|---|---|---|
+| gain | +0.040/+0.046/+0.031 | **+0.065/+0.069/+0.063** |
+| wd gain | +0.037/+0.041/+0.059 | **+0.054/+0.086/+0.079** |
+
+Raising in-window event mass moved gain **from below the bar to above
+it on every leg**, predicted in advance. This survives the WEAK and is
+the strongest result in the lane.
+
+**2. ⚠ `claim_zone`'s `f` UNDER-READS the screen's `floor_excess` — and
+that is what cost the KEEP.** Measured **0.261 / 0.275 / 0.289** vs the
+0.185 / 0.206 / 0.223 I aimed with. **All three above the +0.25 edge**
+where cells lose to their own floor. I believed I was mid-band; I was
+over it.
+
+*Leading explanation (HYPOTHESIS, needs a direct test):* `claim_zone`
+measures `f` on the **raw eligible population**; the floor is fit on the
+**class-balanced manifest**, which oversamples the low-age class. Bias
+should scale with `T/e1` — `evalage` 64/429=0.15 (negligible, K=0.96),
+`retryesc_gen` 64/120=0.53 (−0.07). **Test it by recomputing `f` on
+manifest rows before anyone relies on it.**
+
+⚠ **Gold-visibility does NOT fire** (WEAK, not KEEP). Nothing went into
+`REBUTTAL_HANDOFF.md`.
 
 ## ⚑ The finding that reorganized the lane (`density_gain_survey.py`)
 
