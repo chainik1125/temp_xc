@@ -24429,3 +24429,90 @@ l12 eval cache. If wave-1 drains before that re-run, render the sweep
 with **no** anchor point rather than a wrong one.
 
 _Recorded-by: claude-opus-5 (runpod-2)_
+
+## 2026-07-28 13:17 London (date-verified 12:17 UTC) — runpod-2: ⚑⚑ **A/B VERDICT: base-l12 CONFIRMED — WAVE-1 IS UNBLOCKED, LAUNCH ON base-l12.** And a SECOND, separate fidelity gap found: our optimiser schedule is NOT upstream's
+
+**Both arms landed. Verdict on substrate: `gemma_2_2b_base_l12_phase7`.**
+Same port, same T=5/seed42/k_win500/batch1024 config as the upstream
+log, 400 steps each, loss on upstream's 200-step cadence:
+
+| step | arm B (base-l12) | arm A (l13-IT) | upstream |
+|---|---|---|---|
+| 0 | **88 064.68** (×0.958) | 168 712.56 (×1.836) | 91 888.16 |
+| 200 | 47 737.41 (×3.63) | 80 784.03 (×6.14) | 13 163.20 |
+| 400 | 22 903.56 (×2.06) | 35 549.79 (×3.19) | 11 136.78 |
+
+**Step 0 is the decisive number and it is a distribution fingerprint.**
+`b_dec` is geometric-median-initialised from the data, so the
+step-0 reconstruction loss is essentially a signature of the activation
+distribution before any learning happens. On base-l12 we init **within
+4% of upstream** (88 065 vs 91 888); on l13-IT we init **84% high**.
+Two independent instruments — the anchor forward-pass (FVU 0.0036 vs
+0.0367) and now the training init — agree. **Substrate: settled,
+twice, by measurement.**
+
+**⚑ ACTION: wave-1 may launch on `gemma_2_2b_base_l12_phase7` now.** I
+am pushing the `cells.py` correction with this entry (`PF_DATASOURCE`
+→ base-l12; `eval_cfg` → `l12base_phase7` + `cache_expect`
+gemma-2-2b/layer 12; `run.py validate` green; `cache_expect` verified
+field-by-field against the l12 cache's own `meta.json`). No substrate
+rebuild — both l12 caches are already on-pod. runpod-a's packing,
+GPU_FRACTION sizing and lane map are unaffected; only `datasource`
+changed.
+
+**⚑⚑ But the traces also expose a SECOND gap, and it is not the
+substrate.** Even on the CORRECT stream we descend far slower than
+upstream: by step 200 upstream has dropped **86%** (91 888 → 13 163)
+while we have dropped **46%** (88 065 → 47 737); at step 400 we are
+still **2.06×** upstream. Same arch, same data, same init — different
+trajectory.
+
+**Prime suspect: the training schedule is ours, not upstream's.** The
+port vendored the **architecture** verbatim; `lr` and `warmup` come
+from v2 `TrainingConfig` **defaults** (`learning_rate 3e-4`,
+`warmup_steps 1000`), and the card only ever mirrored the *batch*
+schedule. Our LambdaLR warmup means effective lr is **6e-5 at step 200
+(20% of nominal)** and **1.2e-4 at step 400 (40%)** — precisely the
+window where upstream does most of its descent. A 1000-step warmup
+against a run that upstream converged in 3 800 steps is not a small
+detail.
+
+**I cannot recover upstream's values from this pod:** the training log
+does not record `lr` or `warmup` (I checked every key), and
+`train_primary_archs.py` is not present — only caches and ckpts under
+`/workspace/caches/rlhf/`. **Ask to whoever has repo access:** the
+`lr` / warmup / optimiser settings at
+`han-phase7-unification@94119bc08:src/.../train_primary_archs.py`
+would close this immediately.
+
+**Test already running (launched 13:17, ~10 min):** arm B config with
+`--warmup 0`, everything else identical. If removing warmup pulls the
+trace onto upstream's, we have the fix and wave-1 should carry it; if
+not, the gap is elsewhere and wave-1's schedule stands as-is. I added
+`--lr` / `--warmup` knobs to `probe_stream_ab.py` for exactly this.
+
+**Launch recommendation, stated as a trade rather than a rule:** do
+**not** hold wave-1 for this. Wrong substrate was disqualifying —
+cells were unusable. The schedule gap is a *fidelity refinement*: cells
+trained under it are real results on the correct stream, just possibly
+not the paper's exact optimisation path. At ~10 h/cell, waiting costs
+more than it saves. **My advice: launch base-l12 now; if the no-warmup
+test lands within the hour and closes the gap, fold it into wave 2 and
+disclose the schedule in the caption.** If the hub prefers a fully
+faithful wave 1, the cost is a ~30 min hold — that is the hub's call,
+not mine, and I will support either.
+
+**Plausible unified story for the convergence anomaly** (hypothesis,
+now better supported): wrong stream **plus** a warmup suppressing lr
+through the first 1 000 steps ⇒ no plateau by 21 k, against upstream's
+plateau at 3 800. Neither alone obviously does it; together they do.
+
+**Timing receipt, free from this run:** 400 steps in **597 s** (arm B)
+and **590 s** (arm A) = **1.49 s/step each**, run concurrently with
+each other AND the pilot — three lanes, no measurable per-lane
+degradation, matching my solo 1.55 s. Independent corroboration of
+runpod-b's 12-lane no-saturation result (ade801886).
+
+Pilot: 08:08, unchanged, wrong-stream control only. PTR.
+
+_Recorded-by: claude-opus-5 (runpod-2)_

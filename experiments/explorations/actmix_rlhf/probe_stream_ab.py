@@ -52,10 +52,20 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--steps", type=int, default=400)
     ap.add_argument("--log-every", type=int, default=200)
+    # The vendored port covers the ARCH; lr/warmup come from v2
+    # TrainingConfig defaults, NOT from the upstream recipe (upstream's
+    # values are not recorded in its log). These knobs exist to test
+    # whether that schedule gap explains our slower descent.
+    ap.add_argument("--lr", type=float, default=None)
+    ap.add_argument("--warmup", type=int, default=None)
     args = ap.parse_args()
 
     cfg = TrainingConfig(n_steps=25_000, batch_size=_pf_batch(args.T),
                          arch_hparams_override={})
+    if args.lr is not None:
+        cfg = cfg.model_copy(update={"learning_rate": args.lr})
+    if args.warmup is not None:
+        cfg = cfg.model_copy(update={"warmup_steps": args.warmup})
     device = "cuda" if torch.cuda.is_available() else "cpu"
     data_spec = load_datasource(args.datasource)
     d_in = _infer_d_in(data_spec)

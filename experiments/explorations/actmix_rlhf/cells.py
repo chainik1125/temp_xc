@@ -196,7 +196,14 @@ LANES = {"r": lane_r, "rs": lane_rs, "s1": lane_s1,
 # ── CARD § 8: paper-faithful arm (agentic_txc_02_v1t) ──────────────────
 
 PF_ARCH = "agentic_txc_02_v1t"
-PF_DATASOURCE = "gemma_2_2b_it_l13_fineweb_24k128"  # the paper stream
+# SUBSTRATE CORRECTION (measured, 13:11 London): the card forced this arm
+# onto l13-IT on the premise that the T5 anchors were l13-IT-trained. They
+# are not. The staged anchor reconstructs base-l12 at FVU 0.0036 vs 0.0367
+# on l13-IT (probe_anchor_stream.py) — a 10x gap; the upstream training logs
+# record subject google/gemma-2-2b at layer 12; and l13-IT is the registry's
+# "§ 5.1 sparse-probing anchor". This is the anchors' native stream, and the
+# same one the btk arm trains on, so anchor and sweep are comparable.
+PF_DATASOURCE = "gemma_2_2b_base_l12_phase7"
 
 
 def _pf_batch(T):
@@ -224,9 +231,9 @@ def pf(T, seed=SEED):
         # l12-BASE rows as l13-IT cells); expect-check hard-fails on a
         # wrong-substrate cache before any metric is computed.
         "eval_cfg": {
-            "hh_rlhf_cache": "l13it_paper",
-            "cache_expect": {"subject_model": "google/gemma-2-2b-it",
-                             "anchor_layer": 13},
+            "hh_rlhf_cache": "l12base_phase7",
+            "cache_expect": {"subject_model": "google/gemma-2-2b",
+                             "anchor_layer": 12},
         },
     }
     return cell
