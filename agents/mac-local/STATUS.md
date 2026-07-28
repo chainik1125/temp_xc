@@ -63,6 +63,24 @@ touched** (house rule). **Han's call, still pending.** Also pending:
    four outcomes fixed before the numbers exist, incl. **underpowered as
    a distinct outcome from a loss.** Read it before reading results.
 
+## ⚑ BRANCH STATE (settled 23:2x 07-28 — read before any git op)
+
+**WORK ON `arxiv`. `main` is FROZEN at `7ceb45564` (its original March
+commit) by Han's instruction.** A brief unification was done and then
+reversed; both force-reverts used `--force-with-lease`, 0 commits ever
+existed only on `main`, and mac-d's stranded commit was re-appended to
+arxiv verbatim (`b99fe053c`). The pod never moved.
+
+**Standing branch check — BOTH lines, never either:**
+
+    git log --oneline <target>..<source> | wc -l   # MUST be 0
+    git rev-parse <target> <source>                # MUST match
+
+`arxiv..main` alone is **unfalsifiable** after a merge of main into
+arxiv: it returns 0 in the success case AND the disaster case (mac-c
+`851d73f85`). **The rev-parse line cannot be pointed the wrong way** —
+that is the property worth having.
+
 ## Standing rulings (do not relitigate)
 
 - **FRONTIER, not a matched point.** Constraining the SAE to TXC's
