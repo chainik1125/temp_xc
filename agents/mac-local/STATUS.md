@@ -116,28 +116,29 @@ B=l2bp61kg82epel-64411fb1 (repo at /workspace/agents/runpod-c/
 temp_xc on B!), mac-d pod=jge1fuj9hqu8et; all @ssh.runpod.io
 -i ~/.ssh/id_ed25519, PTY piped-stdin, grep -av 2004.
 
-## POST-COMPACT CHECKLIST
-1. ✅ DONE 03:01 — guide sanity-check PASS (fixes: scripts/ path,
-   RLHF k semantics k20/k50 empty-eval_cfg, fleet map 02:58) +
-   Han's SSH order (§5a, ssh-verified per-agent repo paths — NO
-   /workspace/temp_xc anywhere) + Han's CELL CENSUS order
-   (`REBUTTAL_CELL_CENSUS.md` + `scripts/cell_census.py`; 387
-   rows, 0 arm mismatches; regen before quoting coverage).
-   Ratified: sycgen KEEP 3/3 (ITEM 6 IN FLIGHT, mac-d retrain
-   drain ~05:30-06:30), shard E, r-c freeze. Flagged mac-c 03:55
-   impossible-future stamp.
-2. ✅ LOG tail read through runpod-a 02:41 (shard E launch).
-3. ✅ DONE 03:09 — Task #11 CLOSED: agentic_txc_02 INDEPENDENTLY
-   VERIFIED (5 legs: STAGE_1_ARCHS source pin, dev↔release blob
-   identity 12a873891a…, blob self-declared src_class, TopK→ReLU
-   encode, HF seed42 ckpt). Disclosure STANDS; guide §1 upgraded.
-4. Watch: shard launches + first paper-faithful cells; runpod-c
-   freeze receipts (CHASE if silent); runpod-2 port card (~04:30);
-   sycgen/evalage screen verdicts (first KEEP ⇒ mac-d retrain);
-   morning renders + tables + certificate; deck/handoff refresh
-   at 7-point landings; 11:00 readiness call to Han.
-5. Review-on-push everything; ratify/bounce; ledger sweeps
-   (hunt envelope, $500 aggregate, $300 generation).
-6. Stale 45-min cron still fires (treat as review-all beat).
+## ⚑⚑⚑ OVERNIGHT WATCH (Han ASLEEP from ~04:40; charter cb3e34973 + gold-rule 0a2a203e8)
+**Han's four orders: (i) sycgen complete + handover updated;
+(ii) hunt CONTINUES; (iii) PAPER-FAITHFUL probing+RLHF finish =
+PRIORITY; (iv) code handover periodically updated. PLUS: any gold
+task → VISIBLE IN REBUTTAL_HANDOFF same-beat (partial embeds w/
+honest stamps — sycgen = the template).**
+Night state at 04:40: sycgen 15/18 (fig v4 + table embedded;
+tsae trio drains ~04:45-05:00 → mac-d final render drops PARTIAL
+→ I regen table same beat). Probing pf: 12+/21 cells, 5 shards
+draining ~05:45-06:30 → runpod-1 folds E1-E3 + renders 7-pt
+figs/tables (btk arm COMPLETE 7T×3s). RLHF: btk T{6,10} x-lanes
+drain ~10:45; **10:15 checkpoint render = item-3 deliverable of
+record (runpod-2 owns; data-driven landed set)**; pf port card
+DUE — CHASE runpod-2 if silent by 05:00; G1 relief rule
+pre-registered. Hunt: mac-c retryesc_gen (two-timescale face,
+NOT age; API gen under $300 cap); screen venue = claim pod-D at
+its drain or fresh L40S (pre-approved); StruQ premeasures
+runpod-a. My cadence: census regen at landings; guide fleet-map
+re-stamps ~06:00 + ~09:00; **10:30 FULL final pass (HANDOFF +
+GUIDE + CENSUS, items 1-9 pointers verified)**; **11:00 readiness
+message for Han's wake-up**. Ledger each beat. Quote-forms
+binding: sycgen v2 (level story; twin control), k5 seed-spread
+flag, RLHF 21:10/22:28 forms, "T10-in-flight" caption if x10
+late.
 
 *Rewrite before any compact.*
