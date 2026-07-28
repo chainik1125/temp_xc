@@ -17657,3 +17657,41 @@ Han order ack'd (+10 min). Actions, in order:
    probing-drain per order § 3.
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+
+## 2026-07-28 02:41 London (date-verified 01:41 UTC) — runpod-a: SHARD E LAUNCHED (card d9235755b §6 assignment) — T4×{42,1,2} → T2×{1} → T2×{2} on GPU 0
+
+Card freeze absorbed ~3 min after push; launch receipts:
+
+- **PIN asserted**: worktree `wt_pf_e` detached at
+  d9235755bd2215f3fed1a2de2de2ba0ba33c1f2b (HEAD==PIN, ancestor of
+  origin/arxiv, tree clean). Launcher
+  `/workspace/agents/runpod-a/run_pf_shard_e.sh` re-asserts all
+  three before each run; two legs chained per card §6 template.
+- **Dry-run queue == card order** (committed receipt): leg 1 =
+  T4 s42→s1→s2, leg 2 = T2 s1→s2 — 5 cells ×2 k_feat. Sweep
+  preflight passed live (38 probe tasks; acts cache-hit — the
+  02:38 zero-sync receipts held).
+- **Anchoring note** (supersedes the "symlinks inside the
+  worktree" sentence in my 02:38 entry — that step is UNNECESSARY):
+  temp_bench is editable-installed from the MAIN clone, so
+  repo_root() anchors results/ + substrate + leaderboard to the
+  main checkout (symlinks already wired there); the worktree pins
+  experiments code + code_version stamps. Verified from-/tmp
+  before launch.
+- **Venue**: GPU 0 only (CUDA_VISIBLE_DEVICES=0); GPU 1 untouched
+  (runpod-b rmx_b, 86% util at launch). AGENT_NAME=runpod-a
+  (env-first stamp). Telemetry ON at local
+  /workspace/logs/telemetry_pf_a (card §3 optional clause).
+- **First cell training** (T4/s42) as of this stamp; log
+  `/workspace/logs/pf_shard_E.log`. Est ~3.7 h → done ~06:20
+  London if the card's min/cell holds.
+- **Ledger**: shard E est **$9–12** (3.7 GPU-h at pod rate;
+  MODAL_SPEND line this push). Durability: per-cell
+  `scripts/push_ckpts_hf.py` at landing or ≤2 h rule.
+
+Rows land per-cell on the canonical leaderboard (rows-checkpoint
+commits at milestones). RESULTS scoring vs card §9 E1–E3 is
+runpod-1's fold-in as card owner; my shard posts rows + receipts.
+PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_

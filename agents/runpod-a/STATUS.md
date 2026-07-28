@@ -82,33 +82,32 @@ patches: run_cells + grid.py env-first (mine), others swept by
 runpod-2. Listener re-armed each beat (150 s fetch-poll LOG +
 briefings/).
 
-**⚑ PAPER-FAITHFUL SPRINT SHARD (606e4587d item 3 — my next GPU
-lane; state re-read 02:38 London 07-28):** split now lands **IN
-runpod-1's card §shards** (their ack d39fc5075 — they own it; 21
-cells flagged vs commissioned 18, grid {1,2,4,6,8,10,16}×{42,1,2},
-T1 cells ordered LAST per shard so one hub line prunes 3). Card
-≤05:00 London on track. **4 GPUs at card-pin** (11227ce0d
-freeze-and-join): runpod-1 old-pod GPU 0 + my GPU 0 + runpod-c's
-2×H100 (substrate on-pod from bring-up); runpod-b GPU 1 joins at
-rmx_b drain (~11:30, or ~06:15 if their T8-boundary stop offer
-b5651d5f2 is taken). I coordinate shard ids with runpod-c here.
+**⚑ SHARD E RUNNING (task #9 — card d9235755b §6, my card-assigned
+lane; launched 02:41 London 07-28):** paper-faithful probing,
+`paper_txc_base_v1t` × T4{42,1,2} → T2{1} → T2{2} (5 cells ×2
+k_feat), GPU 0, est ~3.7 h ⇒ drain ~06:20 London. Mechanics:
+worktree `wt_pf_e` at PIN d9235755b (asserted clean+ancestor);
+launcher `/workspace/agents/runpod-a/run_pf_shard_e.sh`; log
+`/workspace/logs/pf_shard_E.log`; background task b8m5jcg9w.
+**Anchoring (verified, supersedes older note): temp_bench is
+editable-installed from the MAIN clone ⇒ rows/substrate/ckpts
+anchor there (symlinks already wired); worktree pins experiments
+code + stamps — NO in-worktree symlinks needed.** Substrate warm:
+`/workspace/caches/probing/hf_mirror` (33G), preflight receipts in
+my 02:38 LOG entry. On each cell landing: rows-checkpoint commit
+if pull needs it; ckpt push via `scripts/push_ckpts_hf.py` (≤2 h
+rule). At drain: actuals to ledger (est $9-12), worktree
+cmp-verify + remove, RESULTS scoring is runpod-1's fold-in (card
+owner) — my deliverable = rows + receipts, PTR.
 
-**Substrate: WARM — COLD caveat RETRACTED.** The paper's v1 anchor
-mirror sits at `/workspace/caches/probing/hf_mirror/` (33G;
-runpod-b wired it ~23:04 for width-match; my 17:29 symlinks in
-main checkout: `results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128`
-+ `results/data_cache/48d2d17ff88598d4/acts.npy`). Preflight PASS
-02:38: acts mmap (24000,128,2304) fp16; meta data_key
-48d2d17ff88598d4 (gemma-2-2b-it L13 resid_post, fineweb-edu); 38
-probe tasks. **At launch: recreate the two symlinks INSIDE the
-worktree** (repo_root anchors results/ to the worktree root),
-worktree-detach at card pin, AGENT_NAME=runpod-a, GPU 0.
-
-**Watch-fors:** (a) runpod-1's plugin card freeze ⇒ claim shard by
-LOG line + launch (shard ids w/ runpod-c); (b) mac-local's dq
-caption-fork ruling — if "measure the relu-mix column", that lane
-also lands here; (c) § 8 draft-row application; (d) 11:00 BST
-handoff support asks (my T4 rows + twin receipts feed items 3/4/5).
+**Watch-fors:** (a) hub prune line on the 21-vs-18 count — my T2
+tail cells are the shard's LAST, so a prune may cut them mid-lane
+(stop at cell boundary if so); (b) mac-local's dq caption-fork
+ruling — if "measure the relu-mix column", that lane queues behind
+shard E; (c) § 8 draft-row application; (d) 11:00 BST handoff
+support asks (T4 rows + twin receipts feed items 3/4/5);
+(e) REBALANCE offers on my tail per card §6 (T2 cells may be
+pulled by an idle joiner — LOG-line claim required first).
 
 ## House-rule cache
 
