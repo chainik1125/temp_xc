@@ -1,10 +1,9 @@
 # mac-c — STATUS
 
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
-**Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (Han 13:56, briefing
-`hunt-mac-c-takeover.md`) — was: elicitation harness + screening
-**Last update:** 2026-07-28 16:08 BST (read from `date` — see stamp
-corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
+**Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
+re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
+**Last update:** 2026-07-28 20:15 BST (stamped from `date` at write time)
 
 ---
 
@@ -12,441 +11,131 @@ corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ## State in one paragraph
 
-**I own the entire hunt end to end**, and **item 7 was the only
-deliverable with NO candidate.** Hub authorized spend at 14:51 (Han: *"mac-c is HOLDING — they
-should be running ahead at full speed!"*); I built, generated,
-premeasured and screened it in **~75 minutes for ~$22** — and it came
-back **WEAK**. Item 7 is still open.
-
-**`retryesc_gen` LANE CLOSED — SCREEN VERDICT WEAK 3/3** (writeup
-`retryesc_gen/RESULT.md`). Corpus 300 docs / 946,546 tok / 2,809
-events; 21/21 label-side bands passed; **all pods TERMINATED +
-API-verified (0 mac-c pods).** Candidate total **≈ $22** ($21 gen +
-$0.68 screen). **Item 7 still has NO KEEP.**
-
-| leg | tok | window | **gain** | floor@bestT | wd gain |
-|---|---|---|---|---|---|
-| gpt2 | 0.3669 | 0.4314 | **+0.0645** | 0.5942 ✗ | +0.0540 |
-| gemma2_2b | 0.3734 | 0.4424 | **+0.0690** | 0.6083 ✗ | +0.0857 |
-| llama31_8b | 0.3910 | 0.4539 | **+0.0630** | 0.6219 ✗ | +0.0793 |
-
-**The gain bar was CLEARED on every leg and the FLOOR clause killed it
-on every leg.** Gain/null/`wd_ok` all passed; `floor_ok` False 3/3; no
-kill clause fired.
-
-**A scissors** (identical all legs): T4 arm beats its floor but carries
-no gain; T64 carries +0.065 gain but loses to the floor by 0.163.
-**Where the window becomes useful, the visible cue has already outrun
-it.**
-
-## ⚑ Two things to carry forward — one strong, one costly
-
-**1. The density thesis is CONFIRMED as a design instrument.** Same
-face family, same helpers, same bars — only the clock changed:
-
-| | `evalage` (f=0.045) | **`retryesc_gen` (f=0.185)** |
-|---|---|---|
-| gain | +0.040/+0.046/+0.031 | **+0.065/+0.069/+0.063** |
-| wd gain | +0.037/+0.041/+0.059 | **+0.054/+0.086/+0.079** |
-
-Raising in-window event mass moved gain **from below the bar to above
-it on every leg**, predicted in advance. This survives the WEAK and is
-the strongest result in the lane.
-
-**2. ⚠ `claim_zone`'s `f` UNDER-READS the screen's `floor_excess` — and
-that is what cost the KEEP.** Measured **0.261 / 0.275 / 0.289** vs the
-0.185 / 0.206 / 0.223 I aimed with. **All three above the +0.25 edge**
-where cells lose to their own floor. I believed I was mid-band; I was
-over it.
-
-*Leading explanation (HYPOTHESIS, needs a direct test):* `claim_zone`
-measures `f` on the **raw eligible population**; the floor is fit on the
-**class-balanced manifest**, which oversamples the low-age class. Bias
-should scale with `T/e1` — `evalage` 64/429=0.15 (negligible, K=0.96),
-`retryesc_gen` 64/120=0.53 (−0.07). **Test it by recomputing `f` on
-manifest rows before anyone relies on it.**
-
-⚠ **Gold-visibility does NOT fire** (WEAK, not KEEP). Nothing went into
-`REBUTTAL_HANDOFF.md`.
-
-## ⚑ The finding that reorganized the lane (`density_gain_survey.py`)
-
-**Screen gain tracks IN-WINDOW EVENT MASS.** Recomputed $0 from 150
-face×model cells / 48 committed screen artifacts (49 cells, 15 faces
-carry a floor): Pearson **+0.699** cell-level, **+0.820 face-level**
-(Spearman +0.696 / **+0.882**).
-
-And it is **derivable, not just empirical**: `visible_evidence_floor`
-is fit on exactly `(censored_age, in_window_event_count)`, so for a
-balanced 3-class age face **`floor_excess` ≡ `f` ≡ P(event inside the
-T-window)** — verified exact (worst err **2e-6**) in
-`retryesc_gen/verify_floor_identity.py`. The x-axis is a **design
-parameter I can aim at before generating.**
-
-⚠ **The identity is exact for the QUANTITY; `claim_zone` estimates it on
-the WRONG POPULATION.** See the `claim_zone` section below — it
-under-reads by +0.076 at `T/e1` ≈ 0.5, which is what cost
-`retryesc_gen` its KEEP.
-
-| face | floor-excess | gain | verdict |
-|---|---|---|---|
-| `sycgen_age` | **+0.210** | **+0.117** | **KEEP** (gold) |
-| `evalage_age` | +0.045 | +0.039 | WEAK |
-| `reask_hr` | +0.034 | +0.018 | KILL |
-
-Band is **two-sided**: every face in +0.15…+0.25 cleared every cell
-(4/4); 1 of 11 outside did. Above +0.25, 3/5 cells **lose to their own
-floor** (`qd` margin −0.034). ⚠ Band edges are **POST HOC** — the
-correlation is the evidence, the bands are a design target.
-
-## ⚑ `claim_zone` — use it, but it is a LOWER BOUND, not the floor
-
-`elicit_lib.claim_zone(...)["frac_in_window"]["T64"]` is the **$0,
-label-side, no-GPU** estimate of `floor_excess`. Still the right tool
-for aiming — **but it UNDER-READS, and the size of the under-read
-depends on `T/e1`:**
-
-| corpus | `T/e1` | `f` (claim_zone) | measured `floor_excess` | error |
-|---|---|---|---|---|
-| `evalage` | 64/429 = 0.15 | 0.0470 | +0.0451 | **−0.002** ✅ |
-| `retryesc_gen` | 64/120 = **0.53** | 0.1853 | **0.2608** | **+0.076** ⚠ |
-
-**Do not aim at the top of the band with `claim_zone` alone.** At
-`T/e1` ≈ 0.5 it read 0.185 when the truth was 0.261 — over the +0.25
-edge — and that is what cost `retryesc_gen` its KEEP. Aim for a
-*measured* 0.15–0.20, i.e. `claim_zone f` ≈ 0.08–0.13 at this `T/e1`.
-
-## FIVE retractions of my own, all material
-
-1. **The age-face objection (withdrawn 14:07).** I said no age face
-   passes the order ladder (0/9, true) and inferred `retryesc_gen`
-   shouldn't be an age face (**false**). `sycgen_age` **is** an age
-   face, `order_pass_wd` **False**, and it is the **gold** at +0.115.
-   Order is **Q3 table-routing, NOT in the hunt4 § 4 KEEP rule.** The
-   hub had already folded my argument into the overnight map — the
-   retraction is what to act on. **Right lever: sparse vs dense, not
-   age vs rate.**
-2. **"Capped near 1/3" (wrong, caught by simulation pre-freeze).** I
-   wrote that the identity holds only while `T ≤ e1`. It survives to
-   `f = 2/3`. The false version said the floor "cannot run away" and
-   would have licensed a **much denser corpus as safe**. Truth is the
-   opposite: **the floor is computed from GROUND TRUTH and climbs
-   toward 1.0, while the arm only reads activations — density hands the
-   floor a bar the arm cannot reach.**
-3. **`K = 0.63` (wrong, corrected 15 min after freezing the card).**
-   I compared the measured `floor_excess` against an `f` **simulated
-   from exponential gaps** when `evalage`'s gaps are **log-uniform**,
-   then **gave the 1.6× artefact a mechanism** ("eligibility drops
-   positions nearest an event") and wrote it into a frozen card as
-   "structural, not a fudge". Real `K = 0.96`. **Material:** both my
-   planning routes were too dense — the one labelled "calibrated"
-   implied `f ≈ 0.36`, deep in the lose-to-your-own-floor zone.
-
-4. **The gap→`f` map (wrong a third time, caught by the dry run).**
-   Both gap models assumed **probe positions are uniform over the
-   stream**. They are not — eligible positions are **assistant tokens**,
-   offset from the preceding event by the **masked environment turn**,
-   so a long assistant turn pushes its own tail past T=64 even at a
-   short gap. First dry-run measurement: **f = 0.1089, out of band, at
-   a gap median of 269** — *denser* than my "corrected" 385 target yet
-   `f` far *lower*. Fixed by shortening turns to 35–70 ⇒ **f = 0.1850**.
-   **Turn length moves `f` ~0.13; `P_REPEAT` moves it ~0.02.**
-
-**⚑ STANDING LESSON — FOUR slips on ONE quantity in one day** (the fourth is retraction 5 below, and it is the one that cost a KEEP). Every
-time, I **reasoned forward from an assumption instead of measuring
-something the harness could already tell me** (`claim_zone` existed the
-whole time). **When a model and a measurement disagree, go find the
-measurement before inventing a mechanism for the gap.**
-
-**What kept the first three cheap:** the card wrote its bar on a
-**MEASURED** quantity and **named the knob in advance**, so a wrong
-model cost a re-tune, not a candidate. **The fourth was not cheap** —
-because the quantity I measured was the right *concept* read off the
-wrong *population*, and no amount of "measure, don't model" discipline
-catches that. **The next-level rule: check that your instrument and
-your bar are computed on the SAME ROWS.**
-
-5. **`claim_zone` under-reads `floor_excess` (cost the `retryesc_gen`
-   KEEP).** I aimed at 0.185 mid-band; the screen measured **0.261**,
-   over the +0.25 edge. Leading explanation (hypothesis, needs a direct
-   test): `claim_zone` uses the **raw eligible population**, the floor
-   is fit on the **class-balanced manifest** which oversamples the
-   low-age class. Predicted to scale with `T/e1`; consistent with
-   `evalage` (0.15 → −0.002) and `retryesc_gen` (0.53 → +0.076).
-
-## `evalage` — CLOSED (WEAK), and now explained
-
-Verdict `305fada43`, writeup `evalage/RESULT.md`: gains +0.040 /
-+0.046 / +0.031 against a +0.05 bar; null + floor clean on every leg.
-**The mechanism I could not give at the time is the corpus clock:**
-terciles at ages **429 / 1021** = 6.7× the T=64 ceiling ⇒ floor-excess
-+0.045 ⇒ dead band predicts +0.032, it scored **+0.039 — on the
-curve.** I had the gap median 862 in my own receipts and never
-connected it. Disposition unchanged: **no more GPU on `evalage`.**
-
-## The verdict (`305fada43`)
-
-| leg | tok | window best | gain | wd gain | verdict |
-|---|---|---|---|---|---|
-| gpt2 | 0.3907 | 0.4307 T64/actx_lin | **+0.0400** | +0.0370 | WEAK |
-| gemma2_2b | 0.3970 | 0.4430 T64/actx_mlp | **+0.0461** | +0.0410 | WEAK |
-| llama31_8b | 0.4025 | 0.4332 T32/actx_mlp | **+0.0307** | +0.0588 | WEAK |
-
-Bar is gain ≥ +0.05 (with null ≥ +0.02 and own-T floor). Null and floor
-cleared on every leg; **the +0.05 was not**, missing by 0.004–0.019.
-
-**Two things to carry forward, one good one bad:**
-* **The harness changed the FAILURE MODE.** Same face family on an
-  organic corpus (`reask_hr`, **KILLED 3/3**) had within-conversation
-  gains +0.017 / **−0.060** / **−0.006** — erased, then reversed, by the
-  wd frame, i.e. it was reading position. `evalage`'s wd gains are
-  positive on **all three** legs. It is not dying of that confound; it is
-  just a small effect.
-* **NO order information anywhere.** `actxmean` beats ordered-window on
-  all legs; win−shuf ≈0 or negative; `order_pass_wd` False 3/3.
-  ⚠ **Read with retraction 1 above** — this is a real negative about
-  *ordered* structure and about **table routing**, and I wrongly let it
-  imply the candidate family couldn't be gold.
-
-`position_floor` at chance 3/3 (0.330/0.322/0.336) despite label-side
-Spearman 0.4226 — the balanced manifest controls position by construction.
-
-**Disposition (mine, as design owner): no more GPU on `evalage` as
-specified.** The obvious knob (larger T) is barred by the apparatus
-(`gather_win` needs anchor ≥ T−1, `OFF_MIN`=63 in 128-tok chunks), not by
-a choice. Any follow-up is a NEW card with its own freeze.
-
-## ⚠ Two claims that sound alike — do NOT conflate them
-
-I killed a "windows too short to REACH terciles at 429/1021" excuse
-before publishing, and I was right to. The density finding is **not**
-that excuse coming back. Keep these apart:
-
-| | claim | status |
-|---|---|---|
-| **REACH** | separation ≫ T means the face is unreachable / uncomputable | ❌ **still wrong.** A T2 age face is well-defined at any distance; the window reads accumulated state, not the event. `sycgen_age`'s median low edge is **180 > 64** and it is the **gold** |
-| **DENSITY** | the fraction `f` of probe rows with an event *inside* the window predicts gain **magnitude** | ✅ the finding — ρ_face +0.88, and `floor_excess ≡ f` exactly |
-
-The lever is the **mean inter-event gap `g`**, not tercile separation
-(the edges are a *consequence* of `g`). Back-solved: `sycgen` **g ≈
-271**, `evalage` **g ≈ 862**, organic `retryesc` **g = 886**. So my
-old instinct that "the clock matters here" was right; I reached for
-*reach* when the right variable was *density*, and I should have
-pursued it then.
-
-## Owed fixes: BOTH DISCHARGED (`aa95c4eb1`)
-
-1. **Raw transcripts persisted** — `elicit_lib.save_transcripts` wired
-   into `run_elicit`, **and recovered retroactively** for the existing
-   corpus via `evalage/dump_transcripts.py` (400 docs / 22,412 turns /
-   1,542 event turns / sha256 `8a87fc3154fb3913…`, per-run round trip
-   re-asserted).
-2. **`vocabulary_control_check` reports BOTH legs** (events/conv,
-   tokens/conv) with a `stop` flag. ⚠ **The cv bar 0.35 is PROPOSED, NOT
-   RATIFIED** — calibrated only on sycgen 0.749 (fail) vs evalage 0.1346
-   (pass). Someone should confirm or move it.
-
-Checkpointing: wired into `run_evalage` (`720234442`).
-**`run_sycgen` still lacks the 3-line wiring** — the rule is standing
-and blocking for every generation card, so wire it before any
-`retryesc_gen` generation reuses that path.
-
-## Queue
-
-1. **`retryesc_gen` — CARD FROZEN `3f6ba0d3d`; scaffold BUILT + DRY-RUN
-   CLEAN; SPEND-READY. Next action = the ~20-doc PILOT, the FIRST API
-   SPEND on this lane.** Enters **UNTESTED, not rescued** (every passing
-   band was label-side; no probe ever ran).
-
-   **`f` is MEASURED, not projected** (`retryesc_gen/dry_run.py` — real
-   turn loop + real `build_stream` + real `claim_zone`, stub prose, $0):
-
-   | gate | measured | bar | |
-   |---|---|---|---|
-   | **clock (`f`)** | **0.1850** | **[0.15, 0.25]** | ✅ mid-band |
-   | vocabulary | task cv **0.0567** | ≤0.35 | ✅ |
-   | position | pool exhaustion **0.0 %** | <5 % | ✅ |
-   | corpus clock | **3,350 tok/doc** | 21.5× `dharm` fatal | ✅ |
-
-   Adopted knobs: **`LEN_LO,LEN_HI` = 35,70** and `P_REPEAT` = 0.26.
-   ⚠ **The gap-median target (385, range 297–499) is RETIRED as a bar**
-   — the adopted setting realises **180** and is in band on `f`, the
-   quantity that binds.
-
-   **Invariants asserted every dry run:** 2N+1 turns, strict
-   alternation, **no assistant turn may be an event**, event positions
-   match the plan exactly.
-
-   ⚠ **Three defects caught before any spend:**
-   * **POSITION CONFOUND** — a 10-strategy pool **exhausted
-     mid-episode**, after which every failure is *forced* to be a
-     repeat ⇒ event-status becomes a function of position, the
-     `reask_hr` killer. **Pool widened to 24** ⇒ exhaustion 0.0 %.
-     Residual rise (+0.0165) is structural (attempt 1 can't be a
-     repeat) and is left to the balanced manifest + band 3.
-   * **CHECKPOINT CRASH** — `Pair` dataclasses in the doc plan aren't
-     JSON-serializable, so the pilot would have **died at pair 5** with
-     generation already paid for. Fixed via `pairs_as_dicts()`.
-   * **`f` OUT OF BAND at first measurement** (0.1089) ⇒ re-tuned turn
-     length. See retraction 4.
-
-   ⚠ **What a stub CANNOT test:** the model's actual prose. **`unigram`
-   ≤ 0.60 is a PILOT gate and remains the risk I rate highest** — it is
-   what killed the organic `retryesc` at 0.69–0.72.
-
-   **PILOT RUNBOOK — two commands, the whole $0 chain is already built
-   and smoke-tested:**
-
-   ```bash
-   # 1. generate (~20 docs; FIRST spend; MATS key, $300 cap, ledger both ends)
-   .venv/bin/python -m experiments.explorations.task_hunt.labels.run_elicit \
-     --scaffold retryesc_gen --backend anthropic \
-     --model claude-haiku-4-5-20251001 \
-     --n-docs 20 --seed 0 --max-new 70 --out-tag pilot
-   # 2. score card § 5 (label-side, $0, seconds)
-   .venv/bin/python -m experiments.explorations.task_hunt.labels.\
-build_retryesc_gen_premeasure --tag retryesc_gen_pilot
-   ```
-
-   Pilot bands are **mass-scaled** (strata ≥4, usable ≥20k, events ≥60)
-   because 20 docs cannot carry 250k tokens — it would fail for being
-   *small*, not *wrong*. **`unigram` / `doc_mean` / `position` /
-   `floor_excess` are scale-free and NOT relaxed.**
-
-   Label-side receipt to carry in: censored-age floor AUC **0.774 at
-   T64** vs organic `retryesc`'s dead **0.500 at every T** — the density
-   target working, and exactly why band 4 is two-sided.
-
-   Design in `retryesc_gen/GENERATION_CARD.md`:
-   * face = **repeat-failure escalation**, § 1.2-shaped two-timescale
-     — indicator needs out-of-window memory (*is this a repeat?*),
-     kernel support inside T.
-   * **construction rule that makes density safe (binding):** failure
-     text is drawn from a fixed pool **independent of repeat-status**,
-     so a repeat and a first-time failure are textually
-     indistinguishable. If the generator ever makes repeats
-     distinctive, the candidate is dead.
-   * **vocabulary fix is structural:** failure schedule drawn FIRST,
-     independent of task ⇒ difficulty *assigned*, not intrinsic. This
-     is the bar `retryesc` actually died on (0.69–0.72 vs 0.60).
-   * target **`floor_excess` ∈ [+0.15,+0.25]**; **`P_REPEAT` (=`g`) is
-     the only knob permitted to move post-freeze**, corrected planning
-     centre **385 tok, range 297–499** (§ 2.2a — see corrigendum below).
-   * odds on record **before** the result: magnitude ~70–75 %, leak
-     gate ~65–75 % (**the dominant risk**), **joint ~50–55 %**.
-   * **A pilot outside the band is a NO-GO I report, not a band I
-     widen.**
-2. `sycgen` — **DELIVERED** (item 6, FINAL 15/18 at handover).
-   Maintenance only; do not reopen.
-3. `struqpos` — closed, KILLED SOUND 3/3. Salvage = amendment-window
-   only. Triage row applied to `KILL_TRIAGE.md` (runpod-a's wording).
-4. `evalage` — CLOSED (WEAK). Nothing further unless a new card is cut.
-
-## Standing rules that bind this lane (from the takeover briefing)
-
-* **Prime directive: a sound verdict, never a win.** A second honest
-  KILL is a fine outcome; a soft-pedalled KEEP is not.
-* **⚑ GOLD-VISIBILITY (Han, standing, asked twice):** if a gold task is
-  found it goes into `REBUTTAL_HANDOFF.md` **the same beat**, not at
-  the next tidy-up.
-* Generation on `dmitry-mats-claude-api-key`, **$300 cap**, ledger both
-  ends, **mac-only — never seeded to a pod**.
-* **Hardware:** mac-c and mac-d are both sessions on **one MacBook**
-  (M5 Pro, 18 cores, 48 GB unified). The RLHF grid moved to a pod so
-  the laptop is effectively mine — but it is still **one 48 GB
-  machine**, and GPU-hour budgets go through the hub.
-
-## Corrections I posted this stretch (both mine, both material)
-
-* **Stamp corrigendum** (`a49324ce0`): three LOG entries stamped up to
-  **99 min fast**; commit time is authoritative. Root cause — I wrote
-  stamps from an elapsed-time estimate instead of reading the clock.
-  **Fix adopted: stamp from `date` at write time.**
-* **Ledger correction** (`7e614f0b9`): my pre-screen idle burn was
-  **$2.24, not the $0.74 I claimed** — API uptime is authoritative. The
-  warm-hold cost **7× the screen it was warming for** ($0.30). A
-  warm-hold only pays if staging happens DURING the wait; mine ran
-  serially after the corpus landed, so it bought nothing.
-
----
-
-# Reference
-
-## Artifacts (committed + pushed)
-
-Harness: `labels/elicit_lib.py`, `labels/run_elicit.py`.
-evalage: `evalage/CARD.md` (§9 backend/provenance), `evalage/SCREEN_CARD.md`,
-**`evalage/RESULT.md` (the verdict writeup)**, `evalage/results/`
-(3 screen jsons + `verdict_evalage.json`),
-`evalage/{screen_grids,cache_acts,screen,verdict,dump_transcripts}.py`,
-`evalage/grids/`, `evalage/transcripts_receipt.json`,
-`labels/evalage_lib.py`, `labels/build_evalage_premeasure.py` (3-leg),
-`labels/evalage_premeasure{,_3leg}.json`.
-Transcripts (`labels/elicit_evalage_v1_transcripts.json`) are gitignored
-and **deliberately NOT on HF** — unlike the npz they are DERIVABLE, and
-`dump_transcripts.py` regenerates them exactly against the committed
-sha256.
-Corpus **durable on HF**:
-`han1823123123/temp-bench-data/hunt_corpora/evalage_20260728/`
-(npz sha256 `b5cd16b98e92299ea6e4…`; the `.npz` is gitignored — do not
-re-add it).
-
-## Provenance caveat that must travel with any evalage quote
-
-Generated by `claude-haiku-4-5-20251001` (seed 0, temp 0.8) via the
-MATS key. The pin is **model-id + API version, not a weight sha** ⇒
-**reproducible-in-expectation, not bit-exact**. Labels are unaffected
-(the scaffold knows every cue position). Regenerable on open weights
-from the same frozen scaffold if bit-exactness is ever required.
-
-## Closed this session (all ratified)
-
-`msdose_r1` KILLED; `sycgen` geometry-passed after my own clock-bar
-self-demotion; `dharm` KILLED on document length (155.6 tok/chain);
-`warddebt` no-screen (Ward sentence-kernels unreachable at our T);
-`retryesc` KILLED (task-vocabulary leak); menu-exhaustion report;
-harness scope estimate; kill triage (3 corrections accepted, incl. the
-new **structurally-unscreenable** class); corpus-split arbitration;
-checkpointing mechanism; `sycgen` disposition as design owner;
-**`evalage` SCREENED → WEAK 3/3 (lane closed)**.
-
-⚠ **Calibration reference, stated precisely because I once wrote it
-loosely:** `reask_hr` is the in-repo *band* calibration (position AUC
-0.925–0.946, doc-mean 0.818–0.828, unigram 0.560–0.575). **The `reask_hr`
-CANDIDATE was KILLED 3/3 at screen** — "surviving" in my older notes
-meant its label-side runs, never the candidate. Its wd gains
-(+0.017/−0.060/−0.006) are the contrast that makes `evalage`'s positive
-wd gains meaningful.
-
-## Spend (all pods TERMINATED + API-verified; 0 mac-c pods remaining)
-
-~$0.85 sunk on two generation pods that produced nothing (vLLM would
-not build against the image torch). evalage generation inside its $40
-cap. **Screen pod `4dztelehvj8l5n`: 00:39 → 03:13 BST = 2h34m ≈ $2.54**
-(est $3–6). Of that the actual work — caches + 3 screens + verdict — was
-≈18 min ≈ **$0.30**, and **≈$2.24 was idle warm-hold: the hold cost 7×
-the work it was holding for.** Ledgered as waste, not absorbed. The rule
-I'd give anyone: **a warm-hold only pays if staging runs DURING the
-wait.** Mine ran serially after the corpus landed, so it bought nothing.
-
-## Pod / key governance
-
-Key: keychain `dmitrys-runpod-api-key`, **env-inject only**, never
-printed/filed/argv. $10/h cap per agent. **Never touch pods I did not
-spin up** (mac-d's `jge1fuj9hqu8et` is theirs). Prefer TERMINATE;
-verify by API query after; ledger at spin-up AND termination.
-
-Pod staging gotchas, both bit me: `ssh -n` nulls stdin, so **piping a
-file into `ssh -n 'cat > …'` silently writes 0 bytes** — verify with
-`wc -c`/`md5sum`, never trust the `echo staged`. And zsh does not
-word-split `$S 'cmd'` — use a shell function `s() { ssh … "$@"; }`.
-
-## Git / hygiene
-
-Branch `arxiv`, identity `mac-c-agent`. LOG collisions are routine —
-union resolve (`sed -i '' -e '/^<<<<<<< HEAD$/d' -e '/^=======$/d' -e
-'/^>>>>>>> /d'`, `git add`, `GIT_EDITOR=true git rebase --continue`),
-verify with anchored `grep -n '^<<<<<<<'`.
-**Listener: re-arm after EVERY wake** —
-`zsh <scratchpad>/listener.sh` as a background task. On fire: read the
-output file, fetch+rebase, act only if addressed to mac-c, re-arm.
+**Item 7 still has no KEEP, and I no longer think the bottleneck is task
+choice.** Tonight closed two directions with receipts and then found
+something structural: **the benchmark's arm has almost no room to beat
+its own floor, for geometric reasons.** The floor sees `T + w` tokens
+(~89); every probed token only ever saw **64–128** tokens of context,
+because the activation cache chunks the stream into independent
+128-token sequences. So the arm's entire structural advantage is the
+band ~89→128 — **a factor of 1.4.** Everything else tonight follows from
+that. **$0 spent all night. 0 mac-c pods (API-verified 19:11).**
+
+## Prior lane, for context
+
+**`retryesc_gen` CLOSED — WEAK 3/3** (`retryesc_gen/RESULT.md`), ≈$22
+($21 gen + $0.68 screen), pod terminated + API-verified. Gain cleared on
+all three legs (+0.063…+0.069); **the floor clause killed all three.**
+The retryesc family is closed at **attempt 2 of 2**; the calibrated
+re-aim I floated at 16:05 is **dropped, not deferred**.
+
+## What is on record tonight (all pushed, all $0)
+
+1. **`floor_excess ≡ f` is NOT a law** — it is a low-density
+   approximation. The floor's second feature is
+   `dose_window_count(**event_mask**, T)`, so its effective window is
+   `T + w` (`w` = masked event-TURN width; evalage 13, retryesc_gen 25).
+   Replacing `f` with **`P(any masked token in window)`**: mean |resid|
+   0.0391 → **0.0056** (max 0.0075) across **6 legs / 2 corpora**,
+   densities 0.048–0.289. `retryesc_gen/floor_predictor_test.py`.
+   **My class-balancing hypothesis was REFUTED** (`manifest_f_test.py`:
+   the row walk moves `f` 0.1853 → 0.1875, 2.8% of the gap).
+2. **clew sweep** — 8 concept-level queries + `cited-by` on 3 nodes, all
+   listed in LOG for reproducibility. Citation graph surfaced *Regime
+   Leakage* and *Why Safety Probes Catch Liars But Miss Fanatics*,
+   unreachable by keyword. Registry's safety states are
+   **cumulative/regime**, not recency. *Alignment Faking* `cited-by`
+   returned `corpus_n 0` over `fetched_n 0` = **UNMEASURED**, not
+   evidence of absence.
+3. **Cumulative face: arm at CHANCE** (`facecmp/arm_test.py`).
+   `rate_H512` gain **+0.0024**; the foreign-context null *beat* the real
+   arm. **Positive control on the identical local pipeline reproduced the
+   pod** (+0.0596 vs pod's +0.0645), so the negative is about the LABEL,
+   not instrumentation. **Refuted my own bar-first reasoning**: both bars
+   were lower and it bought nothing, because the arm fell further than
+   the bar did.
+4. **Face battery, 6 faces** (`facecmp/face_battery.py`): **gain vs
+   floor_excess Pearson +0.871 / Spearman +0.886; 0/6 beat their floor.**
+   `ewma_tau128` **clears gain (+0.0552)** — the graded accumulator DOES
+   read, so `rate_H512` failed on discretisation+horizon, not on
+   cumulative structure.
+5. **⚑ TWO STACKED CEILINGS** (`facecmp/ceiling_test.py`,
+   `facecmp/run_seq512.py`):
+   - **Apparatus:** chunks are independent 128-token sequences. Recency
+     terciles sit at ages **121/286**, so 2 of 3 classes are "no event in
+     my context" — per_class `[0.516, 0.394, 0.403]`. Re-tercileing
+     INSIDE the context (ages 46/72) nearly triples gain
+     (+0.0596 → **+0.1707**) and makes per_class uniform
+     `[0.845, 0.873, 0.839]`.
+   - **Representational:** rebuilding the cache at **SEQ_LEN=512** moved
+     recency gain only +0.0596 → **+0.0928** (per_class
+     `[0.492, 0.433, 0.416]`), and `rate_H512` stayed at chance *with its
+     full horizon present*. **The floor held as pre-registered**
+     (0.5859 → 0.5932 — it depends only on `T + w`).
+   - **I over-inferred "raise SEQ_LEN and the arm unlocks"; the 512 run
+     corrected me within the hour.** It buys ~+0.03, not +0.11.
+
+## ⚠ The open caveat, and what is running
+
+**Everything in (5) is gpt2 ONLY — the weakest leg.** `gemma2_2b` /
+`llama31_8b` screen at layer 14 and are plausibly far better at
+long-range integration. **Not extrapolating.**
+
+**IN FLIGHT (background, local MPS, $0):** `scratchpad/scale_test.py` →
+`scratchpad/scale_test.log`, artifacts in `scratchpad/med/`.
+**gpt2-medium** (355M, 24 layers, capture 14 to preserve gpt2-small's
+7/12 relative depth) on the **byte-identical gpt2 grid** — same
+tokenizer, so corpus/terciles/manifest/floor are unchanged and only the
+model moves. Two faces: as-screened terciles (mostly OUTSIDE context) and
+context-capped (INSIDE). **Prediction: if the horizon is
+representational, medium closes some of the gap on the first while the
+second stays flat.** gemma-2-2b was tried first and **has no weights
+cached locally** (config/tokenizer only) — hence the proxy.
+
+## Next actions, in order
+
+1. **Read `scratchpad/scale_test.log`**, copy artifacts into
+   `facecmp/results/`, LOG the scaling result whichever way it falls.
+2. **The 2b/8b ceiling test decides whether ceiling 2 is a gpt2 fact or a
+   program fact.** Needs a weights download or a pod. **Highest-value
+   next experiment.**
+3. **Do NOT freeze another generation card until (2) resolves.** If the
+   readable horizon is short on every leg, the fix is apparatus/model
+   geometry, not another task from the registry — and a $21 corpus aimed
+   into a factor-1.4 band is wasted money.
+4. `briefings/hunt-safety-gold-clew.md` **stays active** — the sweep is
+   not exhausted. Untested leads: belief-drift under accumulating
+   context, deception-maintenance/commitment, steering-injection age.
+
+## Standing constraints (unchanged)
+
+- **RunPod (Dmitry's key, BINDING):** keychain `dmitrys-runpod-api-key`,
+  **mac agents only**, never seeded to a pod, env-inject only, never
+  echoed/filed/argv'd. **$10/hr max per agent**; **terminate the moment
+  it is unused, prefer TERMINATE, verify by API after**; **never modify
+  pods you did not spin up**; name `mac-c-<purpose>-<mmdd>`; ledger at
+  spin-up AND termination.
+- **Generation** = shared `dmitry-mats-claude-api-key` ($300 shared cap,
+  GENERATION ledger), mac-only, never on pods.
+- **clew READ-ONLY**: never `sync`/`register`/`seed add`/`clip`, **never
+  `--refresh`**. S2: env-only, **never argv**, 1 req/s CUMULATIVE.
+- **Never `set -x` in a script that touches a secret** (my own rule after
+  leaking a GitHub token into a pod log; contained + verified).
+- **Attempt caps are per face-family.** `retryesc` closed 2/2. The
+  cumulative family is at attempt 1 and I would call it spent given (3).
+- **Re-arm the listener after every wake** —
+  `zsh <scratchpad>/listener.sh` as a background task. It fires on my own
+  pushes; expected, just re-arm.
+- **Stamp from `date` at write time.** Three stamps corrected today.
+
+## Error tally (mine, today) — the pattern matters more than the count
+
+"capped near 1/3" → `K=0.63` → uniform-position gap map → the
+class-balancing hypothesis → "raise SEQ_LEN and the arm unlocks".
+**Every one was a model checked against itself rather than against the
+instrument that sets the bar.** Rules earned, in order: *measure, don't
+model* → *check instrument and bar use the same ROWS* → **check they use
+the same EVENTS** → **and check the model was actually SHOWN the thing
+you are asking it to encode.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
