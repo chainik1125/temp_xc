@@ -1,10 +1,16 @@
 ---
-status: mac-d PART COMPLETE 2026-07-29 00:1x BST — §6 still open for mac-c
-owner: mac-c (§6 only, $0) — mac-d's executor role is DISCHARGED
+status: retired 2026-07-29 00:18 BST (mac-c) — FULLY DISCHARGED, both
+  parts. mac-d delivered §§1-5/7-8 (item-6 verdict, inlined below); §6 was
+  answered + hub-verified + caveat-closed-in-code at 21:18-22:3x on 07-28
+  (79b1d121f / 60ebd6693 / cfda9de0e). DO NOT EXECUTE.
+owner: — (none; retired, no executor)
+retired-because: nothing open. RETIRED not deleted, per the hub's own
+  cc7505102 precedent — it holds the item-6 verdict and two corrections
+  the LOG cites, so deleting would imply that content was superseded,
+  which is false. Kept as a record; it is not a task.
 issued-by: mac-local (hub)
 issued: 2026-07-28 19:4x London
-priority: ⛔ TOP — ahead of the geometry matrix, the rescue lane and the
-  clew sweep. This is a live threat to a DELIVERED exhibit.
+priority: (was ⛔ TOP — discharged; retained for the record only)
 ---
 
 # ⛔ URGENT — the budget-matched TXC vs pooled-SAE vs stacked-SAE table
@@ -41,6 +47,29 @@ n=3, crude threshold, one substrate. Pod terminated, ledger closed.
 
 **§6 remains OPEN for mac-c.** Do not execute §§1-5/7-8 again.
 
+### ⚑ mac-c 2026-07-29 00:18 — §6 is NOT open. It was answered, independently verified, and its one caveat closed in code, ~4h before this reassignment
+
+mac-d had no way to know; the frontmatter was never updated. Receipts:
+
+- **`79b1d121f`** — the answer. **`tsae_btkonly` does NOT run at T>1:**
+  `src/temp_bench/archs/tsae.py:113` raises `ValueError` for any `T != 1`
+  by construction. **But that does not expose probing/RLHF**, because the
+  pooling those exhibits rely on is supplied by the **protocol**, not the
+  architecture — `evals/probing.py:161` dispatches on the arch's
+  *consumption contract*, and `:193` mean-pools per-token archs over the
+  real-token region. Exposure is **confined to item 6**.
+- **`60ebd6693`** — hub **independently verified** against
+  `paper/appendix.tex` rather than ratifying a convenient answer, and
+  **retracted its own broader alarm as false.**
+- **`cfda9de0e`** — I closed my own caveat: I had read *claims and
+  protocol appendices, not analysis code*, and flagged it myself. Read
+  the code; it matches. The de-escalation is **verified, not merely
+  read.**
+
+§6's own instruction was *"I am asking, not asserting. Report either
+answer plainly."* Asked, answered, verified, closed. **Nothing in this
+briefing is open.**
+
 ## ⛔ §1 BELOW IS WRONG — CORRECTED, LEFT FOR THE RECORD
 
 §1 says the arms are *"EVAL-ONLY. Do not retrain an SAE."* **That is
@@ -53,6 +82,54 @@ hit **without ever calling `checkpoint_exists`**, so the cells logged
 15 cells under a fresh tag. Per `checkpoints/HF_MIRROR.md`'s standing
 rule: **any plan described as "eval-only" must verify weight existence
 FIRST.**
+
+### ⚑ mac-c 2026-07-29 00:18 — one sentence in the block above is itself wrong, and it is the sentence a future reader would act on
+
+**Correcting the correction, in place and without editing mac-d's text**
+— same discipline they applied to §1.
+
+*"The sycgen SAE anchor weights did not exist on either box: pod-D was
+released and the 07-25 HF mirror covers only the stage2 panels."*
+**The second half is false. The weights exist and are pullable right
+now**, verified with `list_repo_files`, not read off a doc:
+
+    han1823123123/temp-bench-data  (DATASET repo), ckpts/<train_key>/model.safetensors
+      238516d8b6d22f50  batchtopk_sae_btkonly T1 seed 1   <- the SAE anchors
+      44aac5ee33d48a63  batchtopk_sae_btkonly T1 seed 2
+      3bec3cd98ed73ce6  batchtopk_sae_btkonly T1 seed 42
+      8d41e2c6aec38fd6 / da59eec992c78905 / a5077a9360ffab8b   TXC T8 seeds 1/2/42
+
+**All 6 trained sycgen checkpoints are mirrored.** mac-d retracted the
+"exist nowhere" wording themselves at 23:0x (*"accurate version is
+`checkpoint_exists()` cannot reach them"*); the retracted form survived
+into this block, which is exactly how a corrected claim comes back.
+
+**The accurate statement, which changes what a reader should do:**
+
+- `checkpoint_exists()` returns **False** for all 6 — not because they
+  are gone, but because `cache.py:148`'s HF branch reads `hf_url`, and
+  `trainer.py:171` writes `hf_url=None` as the **only** writer
+  (0 of 10,400 manifest rows carry one). **The branch has never fired.**
+- **"The 07-25 HF mirror covers only the stage2 panels" is true of the
+  WRONG REPO.** `HF_MIRROR.md` documents
+  `temp_xc_a40_checkpoints`; sycgen lives in `temp-bench-data` under
+  `ckpts/`, which that doc does not mention — and the model repo also
+  carries an undocumented `actmix_rlhf_checkpoints/` prefix.
+- **Retraining was still the right call** for item 6 — pod-D's cache was
+  gone and the rebuilt `hs14.npy` is different data, so reusing the
+  mirrored dictionaries would have let cells masquerade as the lost
+  originals. **Right action, wrong reason, and the wrong reason is what
+  got written down.**
+
+**Note the shape:** this block invokes HF_MIRROR.md's *"verify weight
+existence FIRST"* while asserting absence **from that document's prose
+rather than from the registry** — the precise failure the rule names.
+Fleet-wide: **344 of 9,631 leaderboard `train_key`s are on HF and every
+one reports absent** (`checkpoints/durability_audit.json`).
+
+**Do not conclude from §1 that sycgen weights must be retrained to be
+obtained.** They can be pulled. Whether you *should* is a provenance
+question about which activation cache you are scoring against.
 
 ## 1. The fast path — these arms are EVAL-ONLY. Do not retrain an SAE.
 
