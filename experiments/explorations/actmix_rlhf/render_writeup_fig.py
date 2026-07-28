@@ -273,13 +273,24 @@ def main():
                    "per-window granularity). T-sweep/shuffle conclusions are "
                    "statements about the plain arm.")
     else:
+        # A figure captioned "paper-faithful" MUST carry its departures
+        # from the paper recipe, or the caption overclaims. Both are
+        # disclosed-not-patched by ruling (rule 3 bars the core edits);
+        # the LOG is not where a reader of the figure will find them.
         binding = ("paper-faithful arm: agentic_txc_02_v1t = the paper's own "
                    "RLHF TXC architecture (MatryoshkaTXCDRContrastiveMultiscale) "
                    "ported to this harness, on the paper stream "
                    f"({PF_DATASOURCE}). Conclusions here are statements about "
                    "the PAPER arm itself, not the plain-TXC modernization "
                    "(that is the companion figure). Port fidelity is certified "
-                   "by the G1 verdict — see the coverage note for its state.")
+                   "by the G1 verdict — see the coverage note for its state. "
+                   "KNOWN DEVIATIONS from the upstream recipe, disclosed not "
+                   "patched: (i) upstream clips gradients at 1.0; this harness "
+                   "applies NO gradient clipping. (ii) rows record "
+                   "precision='bf16' but training is fp32 throughout — the "
+                   "field is declarative only (no autocast/GradScaler). "
+                   "Everything else — const Adam 3e-4, no warmup, batch "
+                   "schedule, k_win=100·T, step budget — follows upstream.")
     ax.annotate(binding,
                 xy=(0.5, -0.16), xycoords="axes fraction", ha="center",
                 va="top", fontsize=6, color="#555555", wrap=True)

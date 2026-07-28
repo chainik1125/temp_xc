@@ -27322,3 +27322,58 @@ lesson named: **absence of output is not evidence of progress.** ~$7
 burned for no cells is a cheap price for a fleet that now runs.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+## 2026-07-28 14:38 London (date-verified at write) — mac-d: POST-COMPACT PAPER-FAITHFUL CHECK adopted (Han) — first run caught the pf figure claiming paper fidelity while OMITTING both known deviations
+
+**Han's standing instruction:** *"we're going to need to sanity check
+every post compact — ensure we are still sticking to paper faithful."*
+Adopted as a ritual with a runbook, not a good intention:
+**`agents/mac-d/PAPER_FAITHFUL_CHECK.md`** — ~20 s, all reads, run
+before touching the pf arm in a fresh context.
+
+**Why a ritual rather than vigilance:** paper-fidelity is exactly the
+constraint that erodes across a context boundary. Every local decision
+looks reasonable, no test covers it, and nobody re-derives the upstream
+recipe after a compact. Today alone the recipe moved four times
+(l13-IT→base-l12, warmup 1000→0, N_STEPS→PF_N_STEPS, T16 dropped) —
+each correct, none of them individually alarming, and collectively the
+kind of drift that only a re-read catches.
+
+**Audit of what is running right now — the recipe HOLDS:**
+
+    arch        agentic_txc_02_v1t          (the paper's own arch)
+    substrate   gemma_2_2b_base_l12_phase7  (BASE l12 — not the retracted l13-IT)
+    lr / opt    3e-4 adam, CONSTANT         (no scheduler, per recovered source)
+    warmup      0 on sweep cells            (upstream has none)
+    n_steps     8000 via PF_N_STEPS         (btk's shared N_STEPS untouched)
+    k_pos       100*T                       (paper window budget)
+    batch       1024 / 512@T10 / 256@T16    (upstream's A40 schedule)
+    ANCHOR      frozen 25000/1024/1000      (paper weights, never retrained)
+
+**⚑ What the first run CAUGHT.** The two known deviations —
+(i) upstream clips gradients at **1.0** and this harness applies **no
+clipping at all** (verified: zero `clip_grad` hits in `core/trainer.py`
+*and* in `archs/`), and (ii) every row records `precision: bf16` while
+training is **fp32** (no autocast, no GradScaler, no `.half()`) — were
+recorded in the LOG and in `REBUTTAL_HANDOFF.md`, but **not in the pf
+figure's own caption.** The figure that says *"the paper's own RLHF TXC
+architecture"* was going to ship without saying where it departs from
+the paper. **Fixed:** both are now in the binding caption for
+`--arm pf`, alongside an explicit statement of what *does* follow
+upstream. btk caption re-verified **byte-identical** (`sha256
+c1998b48…`) — the change is pf-only.
+
+**The general form, worth keeping:** *a disclosure has to live where the
+reader of the claim will see it, not only where the author wrote it
+down.* A deviation logged at 04:00 and a figure captioned at 14:00 are
+not the same artifact, and reviewers read the second one.
+
+**Recorded as NOT a fidelity risk** (so it is not re-litigated): the
+resident buffer is **bitwise identical** to the host path (10/10
+`torch.equal` at batch 1024 on CUDA) — it removes a transfer, not a
+computation, and moves us *toward* upstream, which always kept its
+buffer on-device. The MPS branch cannot change any CUDA pathway.
+
+Grid unaffected and still running — this was a read-only audit plus one
+caption.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
