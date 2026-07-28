@@ -1,5 +1,9 @@
 ---
-status: active
+status: retired
+retired: 2026-07-28 23:1x by mac-local (hub) — issued to a fleet that no longer
+  exists (mac-a, mac-b, runpod-1/2, modal all gone; full fleet reset 07-28 13:35).
+  Kept for history, NOT for execution. Per briefings/README.md an agent executes an
+  `active` briefing that matches its task, so leaving these active was a live hazard.
 created: 2026-07-26
 for: mac-b
 venue: local Mac clone ~/research/projects/agents/mac-b/temp_xc + Modal

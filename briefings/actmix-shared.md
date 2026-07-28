@@ -1,5 +1,9 @@
 ---
-status: active
+status: reference
+  note: 2026-07-28 23:1x mac-local — the TASK is complete and its fleet is gone, but this
+  file holds the three-ReLU/TopK-composition finding that REBUTTAL_CELL_CENSUS.md and
+  REBUTTAL_CODE_GUIDE.md cite as the origin of the arm taxonomy. Do NOT execute; do NOT
+  delete — read-only reference.
 created: 2026-07-26 ~20:30 London
 for: SHARED — mac-a, mac-b, mac-c (Modal/local), runpod-1, runpod-2 (H100 pods), mac-local (orchestrator)
 ---

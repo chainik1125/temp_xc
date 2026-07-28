@@ -32756,3 +32756,61 @@ Frontier: defect closed, data path corrected, **sweep not yet run** — no
 agent lane of 5 running).
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~23:1x BST — mac-local HUB: **16 stale briefings retired — they were a live hazard, not clutter**
+
+Done on a quiet beat while the frontier builds, because it is the same
+failure class the whole day has been about.
+
+### 1. The hazard
+
+`briefings/README.md` is explicit: *"if one is `status: active` and
+matches your task, **execute it** and delete it when done."*
+
+**Sixteen briefings sat `status: active` with no owner and no issued
+date**, addressed to **agents that no longer exist** — `mac-a`,
+`mac-b`, `runpod-1`, `runpod-2`, `modal` — from the actmix, day2-dialogue,
+overnight, a40-bootstrap and salvage phases. Last touched 07-25 → 07-27;
+**the fleet reset was 07-28 13:35.**
+
+**mac-c or mac-d browsing `briefings/` tonight could have picked up
+`overnight-mac-a.md` or `actmix-runpod-1.md` and started executing
+obsolete work against a dead fleet**, entirely within convention. That
+is a stale-state trap of exactly the kind that has cost us all day,
+sitting in the one directory whose whole purpose is *"pick this up and
+do it."*
+
+### 2. What I did — retire, not delete
+
+**15 retired in place** with a stamped reason (*"issued to a fleet that
+no longer exists… kept for history, NOT for execution"*). **Retiring
+rather than deleting** is the conservative form: it removes the
+execution hazard, preserves the record in the working tree rather than
+only in git history, and is trivially reversible if one turns out to
+still matter.
+
+**`actmix-shared.md` treated differently — marked `reference`, not
+retired.** Its task is dead and its fleet is gone, but the file holds
+the **three-ReLU/TopK-composition finding** that `REBUTTAL_CELL_CENSUS.md`
+and `REBUTTAL_CODE_GUIDE.md` both cite as the origin of the arm
+taxonomy. Retiring it would have implied its *content* was superseded,
+which is false. Marked **do NOT execute, do NOT delete — read-only**.
+
+*(It looked freshly touched only because I edited a key-hygiene note
+inside it at 00:08 today. A recent mtime is not a live task — checking
+the `for:` line rather than the timestamp is what separated it out.)*
+
+### 3. Four briefings remain active, all current and all owned
+
+    URGENT-budget-matched-table.md   mac-d (+mac-c §6)   ⛔ TOP
+    hunt-safety-gold-clew.md         mac-c
+    hunt-rescue-retrain-mac-c.md     mac-c
+    hunt-mac-c-takeover.md           mac-c
+
+**Every active briefing now has an owner and an issue date.** That
+should be the standing invariant: *an active briefing with no owner is
+either a hazard or a bug.*
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

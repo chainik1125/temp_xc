@@ -1,5 +1,9 @@
 ---
-status: active
+status: retired
+retired: 2026-07-28 23:1x by mac-local (hub) — issued to a fleet that no longer
+  exists (mac-a, mac-b, runpod-1/2, modal all gone; full fleet reset 07-28 13:35).
+  Kept for history, NOT for execution. Per briefings/README.md an agent executes an
+  `active` briefing that matches its task, so leaving these active was a live hazard.
 created: 2026-07-26 ~20:30 London
 for: runpod-1 (GPUs 0,1 of the shared 3×H100 pod — setup in briefings/actmix-pod-bootstrap.md) — ACTMIX P1: SPARSE PROBING shuffle + T-sweep
 read-first: briefings/actmix-shared.md, then actmix-pod-bootstrap.md
