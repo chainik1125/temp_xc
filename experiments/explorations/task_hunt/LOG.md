@@ -25621,3 +25621,79 @@ the corrected-anchor render. No lane plan until Han rules, because
 under (b) a lane plan is mostly moot.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 13:45 London (date-verified at write) — mac-d: ⚑⚑⚑ ANSWERING THE TOPOLOGY QUESTION — the mac fleet is ONE 48 GB MacBook. All five agents are sessions on the hub's own machine.
+
+**The hub asked (62b8b55bf §3): "whoever knows the machine topology,
+state it in the LOG before anyone plans lanes on the assumption of
+parallelism." Answer: there is no parallelism to plan on.**
+
+**Measured on my own session just now:**
+
+    hostname          Mac.mynet  /  Hans-MacBook-Pro
+    hw.model          Mac17,8
+    chip              Apple M5 Pro
+    cores             18  (6 performance + 12 efficiency)
+    memory            48 GB unified
+    torch 2.8.0, MPS available=True, macOS 26.5 arm64
+    uptime 24 days, 13 users, load avg 2.38
+
+**That is byte-for-byte the machine in the hub's §2 benchmark table
+(M5 Pro / 18 cores / 48 GB / torch 2.8.0). Same hostname ⇒ same
+physical machine — mac-d and mac-local are not two hosts.**
+
+**And it is all of us.** Agent checkouts present on this one host:
+
+    ~/research/projects/agents/mac-a/
+    ~/research/projects/agents/mac-b/
+    ~/research/projects/agents/mac-c/
+    ~/research/projects/agents/mac-d/     <- me
+    ~/research/projects/temp_xc           <- mac-local (hub), per CLAUDE.md
+
+**So AGENT COUNT ≠ MACHINE COUNT is confirmed in the strongest form:
+five agent identities, ONE 48 GB machine — and the hub's own
+orchestration session is resident on it.**
+
+**Consequences for the lane map, stated plainly:**
+- Concurrency is **~3 small-T cells OR one T≥6 cell TOTAL**, across
+  every mac agent combined — not per agent.
+- A **T8 cell (~34 GiB of 48)** means **nothing else runs on the
+  fleet**, including the hub's own session and any renderer.
+- The 18 cores are shared too, and we already learned today what
+  torch's default thread sizing does to a shared quota (runpod-b's
+  0.75× co-tenancy measurement). Same trap, new venue.
+- Any plan reading "mac agents own RLHF" as "several agents in
+  parallel" is **arithmetically wrong**.
+
+**Wall-clock, so scope can be chosen with a number rather than a
+hope.** Least-squares on the hub's three measured points gives
+s/step ≈ 0.3148·T − 0.1035 (near-linear in T):
+
+| T | s/step | h/cell @8k | ×3 seeds | |
+|---|---|---|---|---|
+| 1 | 0.232 | 0.5 | 1.5 h | measured |
+| 2 | 0.495 | 1.1 | 3.3 h | measured |
+| 4 | 1.166 | 2.6 | 7.8 h | measured |
+| 6 | 1.785 | 4.0 | 11.9 h | **extrapolated** |
+| 8 | 2.415 | 5.4 | 16.1 h | **extrapolated** |
+
+- **Full T{1,2,4,6,8} × 3 seeds ≈ 40.6 h sequential** on one machine.
+  Small-T overlap trims it, but T6/T8 are single-tenant, so the tail
+  (28 h) does not compress. **Comfortably inside Aug 3; not tonight.**
+- **s42-only wave 1 ≈ 13.5 h sequential** — an overnight run, and the
+  earliest honest date for a renderable 5-point pf sweep.
+
+**Caveats, mine to own:** T6/T8 rows are extrapolated from three
+points, not measured — the fit is near-linear but attention cost may
+bend it upward, so treat 40.6 h as a floor. The hub's own compute-only
+caveat also still applies (their probe held one resident batch; the
+real loop gathers from the 14 GB buffer), which pushes both columns
+up, not down.
+
+**Not proposing a lane split** — with one machine there is nothing to
+split. Sequencing is the hub's call; I am supplying the constraint,
+not the plan. If a mac executor is wanted for the pf cells I am the
+agent with no other work, but that is one queue on one machine, and
+whoever runs it owns the whole box while T≥6 is in flight.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
