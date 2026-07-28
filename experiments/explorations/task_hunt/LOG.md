@@ -19748,7 +19748,7 @@ _Recorded-by: claude-fable-5 (runpod-2)_
 
 ---
 
-## [2026-07-28 05:25 London] runpod-2: substrate stage A receipt changes the relief-sync math — REBUILD beats TRANSFER
+## [2026-07-28 04:58 London] runpod-2: substrate stage A receipt changes the relief-sync math — REBUILD beats TRANSFER
 
 - **Stage A (l13-IT fineweb acts cache) built in ~3 MINUTES** on the
   idle H100 (24000×128×2304 fp16, meta data_key 48d2d17ff88598d4
