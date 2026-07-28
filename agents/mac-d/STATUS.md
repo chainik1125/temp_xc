@@ -1,68 +1,35 @@
 # mac-d STATUS — RunPod-API executor agent (LIVE session, updated 15:10 07-28)
 
-## ⚑⚑⚑ HEADLINE (16:06): pf GRID **COMPLETE & DELIVERED**; 1 pod left on btk gap cells
+## ⚑⚑⚑ HEADLINE (20:00): **DONE. BOTH ARMS COMPLETE. ZERO PODS. $0/h.**
 
-**FIRST after any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
-(Han's standing order). It has caught two real defects already.
+**After any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
+(Han's standing order — it caught two real defects today).
 
-**DELIVERED — RLHF paper-faithful arm, item 3:**
-`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` + HANDOFF §3.
-**15/15 cells, uniform 3 seeds at T{2,4,6,8,10}.**
-Whole-grid gap **−0.00279, sd 0.00839, t=−1.29, df=14, p=0.219 — NOT
-significant**, 0.13× the anchors' seed scatter (0.0209) ⇒ **clean
-seed-controlled NULL on the paper's own arm**, matching btk and the
-fleet-wide order-null. T8 landed sign-mixed *between* T6 and T10, which
-kills any large-T trend reading. `l0 = 100·T` exact at every T.
-**T1 and T16 absent BY DESIGN** — upstream has neither arch (T16 >80GB;
-T1 einsum degeneracy in `agentic_txc02.encode`). Not patched: editing
-the paper's arch to manufacture a cell it never had is the trade this
-arm exists to refuse.
-**HANDOFF §3 is RULED DONE by the hub (0404cd942) — do not edit it
-today without a data change.**
+**DELIVERED**
+- **pf arm (item 3's missing plot)** —
+  `figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}`, 15/15 cells,
+  uniform 3 seeds at T{2,4,6,8,10}. Whole-grid gap **−0.00279,
+  t = −1.29, p = 0.219 — NOT significant**; a clean seed-controlled
+  NULL on the paper's own architecture. `l0 = 100·T` exact at every T.
+  T1/T16 absent BY DESIGN (upstream has neither arch; not patched).
+- **btk arm completed** — `fig_rlhf_shuffle_tsweep.{png,pdf}`
+  superseded **ff242b78 → 8d75ff3a** (`--tag final`, hub ruling
+  f699c80a4), now uniform 3 seeds at all 8 T. Deferral caption retired
+  on evidence. "Only T10 moved" PROVEN by per-T series diff.
+  T>1 mean +0.00435, t=2.38 — **deliberately NOT claimed significant**
+  (seed-shared columns so df=20 overstates; 0.2× noise floor; opposite
+  sign to pf ⇒ no effect, not two effects).
 
-**⚑ btk `--tag final` IS GATED ON THE GAP CELLS.** Rendering it early
-produces a figure whose caption says "FINAL — seeds {42,1,2}" while its
-own coverage note still reads `T6:n=2 T10:n=1` — the tag asserts
-completeness the data lacks, and the two contradict each other in
-print. Baseline for the before/after sha is **`ff242b78`** (the
-committed deliverable), NOT `c1998b48` (my re-render). Preview verified
-in scratchpad; deliverable restored untouched.
+**SPEND CLOSED.** 0 pods, $0/h, API-verified. Grid-day ≈ $36 (incl.
+$2.55 disclosed bad-host loss). Peak $17.94/h → $0 in 5h45m.
 
-**IN FLIGHT — last pod** `tnp7vvew4t80wi` / `mac-d-rlhfpf-0728-5`,
-`ssh -p 12997 root@31.24.80.41`, $2.99/h. Running the 3 deferred **btk**
-gap cells (T6/s2, T10/s1, T10/s2) per hub 68e146e0f — same cache, so no
-re-bootstrap. Watcher armed on `BTK-GAP-DONE` in `/workspace/btk.log`.
-**btk uses n_steps=25000 + warmup=1000 — NEVER pf constants**, or the
-rows orphan from the 26 existing btk rows.
-
-**THEN (my remaining duties):** repatriate btk rows (new-keys-only
-merge) → `bash agents/mac-d/teardown_pod.sh tnp7vvew4t80wi btk 6 10`
-**ARM IS REQUIRED** (`pf`|`btk`) — v1 hardcoded pf and on this pod
-would have read pf T8 rows, said ALLOW, and destroyed the 3
-unrepatriated btk cells. Guard REFUSES until all 3 seeds of every
-listed T are local, for that arm — containers never push. → ledger
-actuals. Spend peaked $17.94/h (6 pods), now $2.99/h.
-
-**⚑ THE DAY'S ONE TRANSFERABLE LESSON (hub e4ace71d7): FIVE separate
-guards today REPORTED SUCCESS WHILE DOING NOTHING** — the thread budget
-vs the image, `chmod` vs the FUSE volume, the conflict healer vs
-HANDOFF, `--ours` inverted under rebase, and my byte-identity check vs
-the wrong baseline. **A green check is evidence only if you can say
-what it would have looked like had the thing been broken.** My
-byte-identity check compared a re-render to a re-render: it would have
-returned "identical" whether or not the shipped figure was damaged.
-Before trusting any guard, construct its failure case.
-
-**Traps hit today — all cost real time, do not repeat:**
-`nohup … &` over ssh dies on disconnect → `setsid … </dev/null & disown`.
-`pgrep -f <script>` matches probe shells + heredoc leftovers → deadlock;
-wait on ARTIFACTS. `huggingface-cli` deprecated → `snapshot_download`.
-`/usr/bin/time` absent on the image. A global `ax.margins` silently
-changed the ratified btk fig → re-check `sha256 c1998b48…` after ANY
-renderer edit. **`chmod` is a NO-OP on the `/workspace` MooseFS FUSE
-volume** (rc=0, mode unchanged) → never stage secrets there.
-**`--ours`/`--theirs` INVERT under rebase** — my `--ours` deleted the
-hub's block; verify conflict fixes BY CONTENT, never by marker count.
+**TOOLS LEFT BEHIND (all failure-tested, not just success-tested):**
+`btk_drain.sh` (repatriate → coverage gate → committed-baseline
+assert → render → PROVE only-expected-column-moved, DRIFT stops it)
+· `teardown_pod.sh <pod> <arm:pf|btk> <T...>` (refuses until 3/3 seeds
+are LOCAL; arm REQUIRED — v1 hardcoded pf and would have destroyed the
+btk cells) · `pod_drive.sh` / `pod_btk_gap.sh` (waits on ARTIFACTS,
+never pgrep) · `PAPER_FAITHFUL_CHECK.md`.
 
 ## HEADLINE (13:08, HISTORICAL): ZERO PODS — pivoted from executor-standby to CODE work; built the RLHF pf renderer (c664250a7)
 
