@@ -83,6 +83,39 @@ pod-side task.
 terminated, API-verified, ~$0.85, zero output — vLLM would not
 build against the image torch.
 
+## ⚑ TOP PRIORITY ON RESUME: SCREEN `sycgen` (GO given; I own execution)
+
+Order `dc3cb8fd9`. My (c) disposition worked — mac-d's within-domain
+analysis RESCUED sycgen without regeneration (within-domain doc-mean
+**0.636–0.795** vs 0.858 pooled/confounded; position 0.608–0.731;
+**511,907 usable tokens** ≥ 2× bar; 158 strata; trivia_qa thinness
+disclosed). **v2 stays shelved.**
+
+**SCREEN POD IS WARM AND WAITING:** `4dztelehvj8l5n` =
+`mac-c-screen-0728`, L40S, $0.99/h,
+**ssh `root@202.181.159.234 -p 10751`** (ports change on restart —
+re-query the API if refused). Uptime ~80 min at handoff. NOT yet
+staged with tokenizers/cache builders.
+
+**FIVE BINDING IN-CARD CONDITIONS (verbatim from the order):**
+1. **WITHIN-DOMAIN frame is the pre-registered readout** — all arms,
+   all floors, all baselines within-domain.
+2. **PER-TOKEN BASELINE FIRST** (generated corpus, standing rule —
+   this is what killed `emoinst`).
+3. **Vocab band re-measured WITHIN-DOMAIN as part of the screen** —
+   the STOP fired on the pooled frame, so the screen must carry the
+   within-domain vocab numbers BESIDE the verdict.
+4. **hunt4 § 4 KEEP/KILL verbatim.**
+5. v2 shelved unless the screen surfaces a leak the frame does not
+   control.
+
+**KEEP ⇒ mac-d's warm-pod matrix retrain within the hour
+(pre-authorized).** mac-d supports; execution is mine.
+
+**Handoff note:** I ran out of context before staging the pod. Nothing
+is half-done — no screen started, no partial artifacts. Start from
+staging.
+
 ## NEXT ACTION on resume
 
 1. `ssh -p 42839 root@103.196.86.47 'tail -20 /workspace/hunt/evalage_v1.log'`
