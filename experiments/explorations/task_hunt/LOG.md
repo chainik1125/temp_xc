@@ -35823,3 +35823,60 @@ and API-verified; ledger closed at $8.6; mac-d $0/h.
 
 _Recorded-by: claude-opus-5 (mac-d)_
 
+---
+
+## 2026-07-29 00:20 BST — HUB: `1a901cdb5` RATIFIED — **a retracted claim came back through a correction block**, and that is a new failure route
+
+mac-c and I retired the same briefing in the same minute; **theirs is
+the better version and I took it.** They found something inside it that
+I read past twice.
+
+### 1. The correction block itself contained a false claim
+
+§1's correction states *"the sycgen SAE anchor weights did not exist on
+either box… the 07-25 HF mirror covers only the stage2 panels."*
+**False** — all 6 trained sycgen checkpoints are on HF
+(`list_repo_files`, `temp-bench-data` under `ckpts/<train_key>/`,
+anchors `238516d8b6d22f50` / `44aac5ee33d48a63` / `3bec3cd98ed73ce6`).
+
+**⚑ mac-d had already retracted "exist nowhere" themselves at 23:0x —
+and the retracted form survived into the correction block.** As mac-c
+puts it: **"that is how a corrected claim comes back."**
+
+**A retraction does not propagate to every place the claim was written
+down.** Tonight produced ~30 LOG entries and several cards; a claim
+corrected in one is still sitting uncorrected in others. **That is a
+new route, distinct from every failure logged so far, and it is the one
+most likely to bite whoever reads this record cold.**
+
+### 2. The block violates the rule it invokes, in the same breath
+
+It cites `HF_MIRROR.md`'s *"verify weight existence FIRST"* — while
+asserting absence **from that document's prose rather than from the
+registry.** And the sentence is true **of the wrong repo**:
+`HF_MIRROR.md` documents `temp_xc_a40_checkpoints`; sycgen lives
+elsewhere. **The exact failure the rule names, committed by the text
+citing the rule.**
+
+**Retraining was still correct — for the provenance reason (rebuilt
+cache ≠ pod-D's originals), not the stated one.** mac-c's summary:
+**"right action, wrong reason, and the wrong reason is what got written
+down."**
+
+### 3. The generalisation, which lands on my own earlier sweep
+
+> **"A briefing with an owner and nothing open is as much a trap as one
+> with no owner — both make an agent do work that does not exist."**
+
+I retired **16 ownerless** briefings at `cc7505102` and called
+ownerless-and-active the hazard. **Owned-and-empty is the same hazard
+by a different route, and I did not see it.** **Frontmatter that is
+never updated manufactures phantom tasks.**
+
+### 4. Standing
+
+All four mac-c lanes unblocked; item 6 shipped; briefing **retired, not
+deleted** (it holds the verdict and two cited corrections), owner none,
+DO NOT EXECUTE.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
