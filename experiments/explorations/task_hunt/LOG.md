@@ -25697,3 +25697,78 @@ agent with no other work, but that is one queue on one machine, and
 whoever runs it owns the whole box while T≥6 is in flight.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 13:47 London (date-verified at write) — mac-d: ⚑⚑⚑ THE FRAMEWORK CANNOT SELECT MPS — every canonical run on this Mac trains on CPU, ~4.3× slower, SILENTLY. This blocks the whole mac plan.
+
+**`src/temp_bench/core/trainer.py:189`:**
+
+    def _select_device() -> str:
+        if torch.cuda.is_available():
+            return "cuda"
+        return "cpu"
+
+**MPS is never consulted.** On this machine `cuda.is_available()` is
+**False** and `mps.is_available()` is **True**, so every cell routed
+through the canonical runner selects **CPU**. Same pattern at
+`data/real_lm.py:105` (`"cuda" if available else "cpu"`) and
+`evals/rlhf.py:230` (`model.cuda()` under a cuda guard). **There is no
+`mps` string anywhere in `src/temp_bench/`** — I checked; every
+apparent hit is the substring inside `json.dumps`.
+
+**Why this is not visible until it has cost you the night:** nothing
+errors. The run starts, the loop turns, rows land. It is just slow, and
+"slow" is exactly what everyone already expects from a big grid.
+
+**Measured on this machine just now** (encoder-shape GEMM,
+4096×2304 @ 2304×18432 — the pf encoder's actual shape):
+
+| device | ms / GEMM | GFLOP/s |
+|---|---|---|
+| CPU (what the runner picks) | 208.2 | 1 671 |
+| MPS (what the hub benchmarked) | 48.2 | **7 214** |
+
+**≈ 4.3× on raw GEMM.** The hub's §2 table — 0.232 / 0.495 / 1.166
+s/step at T1/2/4 — was the vendored module driven **directly on MPS**,
+not through `run_experiment`. Through the canonical path those become
+roughly **1.0 / 2.1 / 5.0 s/step**, and my 13:45 arithmetic moves with
+it: **s42 wave-1 ≈ 13.5 h → ~58 h; the full 5-T × 3-seed grid ≈ 40.6 h
+→ ~175 h.** The Aug 3 window absorbs the first and **not** the second.
+
+**Hard rule #3 makes this someone's deliberate decision, not a patch I
+should sneak in:** `_select_device` lives in `temp_bench/core/`, which
+CLAUDE.md says never to edit ("Never edit `temp_bench/core/`"). So I
+am **flagging, not fixing** — this is the one place today where the
+one-line fix is explicitly forbidden to me by the project's own rules,
+and I am not going to quietly make an exception for it because it is
+convenient.
+
+**The fix, for whoever owns core:**
+
+    def _select_device() -> str:
+        if torch.cuda.is_available():
+            return "cuda"
+        if torch.backends.mps.is_available():
+            return "mps"
+        return "cpu"
+
+**Do not apply it blind.** Three things need checking first, and I have
+not checked them:
+1. **MPS op coverage** for `MatryoshkaTXCDRContrastiveMultiscale` —
+   the hub's probe ran the module on MPS, which is real evidence it
+   works, but their probe was forward+backward on one resident batch,
+   not the full loop with the buffer gather.
+2. **fp64 / unsupported ops** anywhere in the eval path — MPS has no
+   float64; a single `.double()` will hard-error rather than fall back
+   unless `PYTORCH_ENABLE_MPS_FALLBACK=1`.
+3. **Determinism / seed parity vs the CUDA rows already on the
+   leaderboard.** A device change mid-arm is a provenance question:
+   btk rows were trained on H100s. Mixing devices within one figure
+   needs a disclosure line at minimum, and someone should decide
+   whether it needs more.
+
+**Recommendation:** treat this as the gate before any mac cell is
+launched. If it is not fixed, launch nothing and say so — a CPU run
+that lands in 58 h looks identical to an MPS run that lands in 13 h
+until it is far too late to change course.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
