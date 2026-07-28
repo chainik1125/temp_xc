@@ -26909,3 +26909,80 @@ and can kill the card at pilot cost. No full generation until it lands
 in band **and** clears band 1.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 14:21 London (date-verified at write) — mac-c: ⚑ **CORRIGENDUM to the card I froze 15 minutes ago** — my `K = 0.63` was an artefact of the wrong gap model; the real factor is **0.96**, the identity is now validated on REAL data, and **both** of my planning routes were too dense
+
+Caught while building the pilot, **before any generation spend**. Card
+§ 2.2a, receipt `verify_floor_identity.py --real`.
+
+### 1. The harness already had the instrument I was simulating
+
+`elicit_lib.claim_zone(...)["frac_in_window"]["T64"]` **is** `f`,
+measured directly on a built stream. Against `evalage`'s **measured**
+`floor_excess`:
+
+| leg | `claim_zone` f | measured `floor_excess` | diff |
+|---|---|---|---|
+| gpt2 | 0.0448 | **+0.0480** | +0.0032 |
+| gemma2_2b | 0.0480 | **+0.0639** | +0.0159 |
+| llama31_8b | 0.0482 | **+0.0233** | −0.0248 |
+| **mean** | **0.0470** | **+0.0451** | **−0.0019** |
+
+**`K = 0.959`** — mean within 0.002, per-leg scatter ±0.025 (probe
+noise). **`floor_excess ≡ f` holds on real data with no eligibility
+correction at all.** That is a *stronger* result than the card claimed
+and it upgrades the pilot: **`f` is measurable at $0 on the label side,
+no GPU.**
+
+### 2. Where my 0.63 came from — a wrong model given a plausible story
+
+I compared the measured `floor_excess` against an `f` **simulated from
+exponential gaps**. `evalage`'s gaps are **log-uniform**. The 1.6×
+discrepancy was my gap model being wrong — and I did the thing worth
+flagging: **I gave the artefact a mechanism** ("probe eligibility
+excludes environment turns, so positions nearest an event drop out"),
+which sounded structural, was written into a frozen card as
+"structural, not a fudge", and was not tested against the real
+instrument sitting in the harness.
+
+### 3. It was material — both routes were too dense
+
+Re-solved from `evalage`'s **actual** age CDF (P(age≤16) = 0.0027,
+≤32 = 0.0169, ≤64 = 0.0448, median 683):
+
+| card's original route | implied `f` | |
+|---|---|---|
+| "calibrated" centre `g = 170` | **0.357** | ⚠ far past the +0.25 edge |
+| "naive" centre `g = 286` | **0.257** | ⚠ past the +0.25 edge |
+| **corrected centre `g = 385`** | **0.196** | ✅ in band |
+
+The route I labelled **"calibrated" was the worse of the two.** Had I
+started the pilot there it would have landed at `f ≈ 0.36` — the region
+where **3 of 5 record cells lose to their own floor**, i.e. precisely
+the failure the band exists to prevent. Corrected planning range
+**`g` ∈ [297, 499], centre 385** — ~2.2× denser than organic
+`retryesc`'s 886, not the 3–5× I wrote.
+
+### 4. Why this is not a breach of my own freeze
+
+§ 2.2 pre-registers the **target** (`floor_excess` ∈ [+0.15,+0.25]) and
+names **`g` as the one knob permitted to move**, precisely because the
+`g → f` mapping was the uncertain part. **The target has not moved and
+will not.** What moved is a planning estimate the card already flagged
+as the uncertain half — and it moved *because* the pilot-measures-it
+discipline forced me to go look at the real instrument.
+
+The § 2.3 realism tension **eases** accordingly (event every ~3
+turn-pairs, not ~2) — reported because it is the honest direction, not
+because it flatters the design.
+
+**Standing lesson I am taking from this, since it is my second modeling
+slip today:** when a simulation and a measurement disagree, **check
+whether the measurement already exists in the harness before inventing
+a mechanism for the gap.** Both of today's errors (the "capped near
+1/3" claim and this one) were caught by going to a ground-truth
+computation instead of reasoning forward from an assumption.
+
+_Recorded-by: claude-opus-5 (mac-c)_

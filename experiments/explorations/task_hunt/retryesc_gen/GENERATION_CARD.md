@@ -92,28 +92,69 @@ Pre-registered target: **`floor_excess` ∈ [+0.15, +0.25]**, i.e.
 **15–25 % of eligible probe tokens sit within T = 64 of an escalation
 event** — 45–75 % of one tercile. Two-sided; **not** maximized.
 
-Solving `f(g)` for exponential gaps at `T = 64`
-(`verify_floor_identity.py --solve`):
+⚠ **CORRECTED after freeze — see § 2.2a. The gap numbers below are the
+corrected ones; the originals were too dense by ~2×.**
 
-| target `f` | naive `g` | `evalage`-calibrated `g` |
+| target `f` | gap median `g` |
+|---|---|
+| 0.25 (upper) | 297 tok |
+| **0.20 (centre)** | **385 tok** |
+| 0.15 (lower) | 499 tok |
+
+### 2.2a ⚑ CORRIGENDUM (same day, before any spend) — `K = 0.96`, not 0.63
+
+**The identity is now validated on REAL DATA, and my calibration factor
+was an artefact of the wrong model.**
+
+`elicit_lib.claim_zone(...)["frac_in_window"]["T64"]` **is** `f`,
+measured directly on a built stream — the harness already had the
+instrument I was simulating. Against `evalage`'s *measured*
+`floor_excess`:
+
+| leg | `claim_zone` f | measured `floor_excess` | diff |
+|---|---|---|---|
+| gpt2 | 0.0448 | **+0.0480** | +0.0032 |
+| gemma2_2b | 0.0480 | **+0.0639** | +0.0159 |
+| llama31_8b | 0.0482 | **+0.0233** | −0.0248 |
+| **mean** | **0.0470** | **+0.0451** | **−0.0019** |
+
+**`K = 0.959`.** Per-leg scatter ±0.025 is probe noise; the mean is
+within 0.002. So `floor_excess ≡ f` holds on real data with **no
+eligibility correction at all**.
+
+**Where my 0.63 came from, stated plainly:** I compared the measured
+`floor_excess` against an `f` **simulated from exponential gaps**, and
+`evalage`'s gaps are **log-uniform**, not exponential. The 1.6×
+discrepancy was my gap model being wrong, and I misread it as a real
+eligibility effect and gave it a mechanism. **The simulation was an
+unnecessary intermediate — the real instrument supersedes it.**
+
+**This mattered, which is why it is a corrigendum and not a footnote.**
+Re-solving from `evalage`'s *actual* age CDF (anchors: P(age≤16) =
+0.0027, ≤32 = 0.0169, ≤64 = 0.0448, median 683):
+
+| card's original route | implied `f` | |
 |---|---|---|
-| 0.25 (upper) | 222 tok | 127 tok |
-| **0.20 (centre)** | **286 tok** | **169 tok** |
-| 0.15 (lower) | 393 tok | 237 tok |
+| "calibrated" centre `g = 170` | **0.357** | ⚠ far past the +0.25 edge |
+| "naive" centre `g = 286` | **0.257** | ⚠ past the +0.25 edge |
+| **corrected centre `g = 385`** | **0.196** | ✅ in band |
 
-**Calibration, disclosed.** `evalage` had `g = 862` ⇒ simulated
-`f = 0.0710`, but **measured +0.045** — a factor `K = 0.634`. The
-mechanism is known and expected: probe eligibility is restricted to
-assistant tokens while events sit in environment turns, so the
-positions nearest an event are disproportionately **ineligible** and
-are removed from `f`. Structural, not a fudge — but it is **one point
-of calibration**, so the two routes are quoted as a bracket rather than
-averaged into false precision.
+**Both original routes were too dense**, and the one I labelled
+"calibrated" was the worse of the two. Had I started the pilot there it
+would have landed in the region where 3 of 5 record cells lose to their
+own floor — the exact failure the band exists to prevent.
+
+**This correction is *within* the card's own rules, not a breach of
+them:** § 2.2 pre-registers the *target* (`floor_excess`) and names `g`
+as the one knob permitted to move, precisely because the mapping from
+`g` to `f` was the uncertain part. The target has not moved.
 
 **Therefore the bar is written on the MEASURED quantity, not on `g`.**
 `g` is the knob; `floor_excess` is the target; the § 6 pilot is the
-arbiter. **Planning centre: `g ≈ 170–290` tokens** (the two routes at
-`f = 0.20`), i.e. **3–5× denser than organic `retryesc`'s 886.**
+arbiter — and it now measures `f` at **$0 on the label side**, with no
+GPU, via `claim_zone`. **Planning centre: `g ≈ 385` tokens (median),
+range 297–499** — i.e. **~2.2× denser than organic `retryesc`'s 886**,
+not the 3–5× the frozen draft said.
 
 ### 2.3 Corpus clock bar — and the realism cost the target imposes
 
@@ -123,12 +164,15 @@ assistant turns **~60–120 tok**, environment turns ~30–50 tok ⇒
 **~3,500–6,000 tok/doc**, ~25–35× the bar, with many position strata.
 Reported as measured, not assumed.
 
-**⚑ The tension, stated rather than left for a reader to find.** At
-`g ≈ 230` tok and ~120-tok turn-pairs, a repeat-failure event must land
-roughly **every two turn-pairs** — meaning ~half of all environment
-turns report a repeat failure. That is a **more pathological agent than
-a typical real trace**, and it is a direct consequence of the density
-target, not an accident.
+**⚑ The tension, stated rather than left for a reader to find** (and
+**eased** by the § 2.2a correction, which is the honest report — the
+corrected clock is *less* demanding, not more). At the corrected
+`g ≈ 385` tok with ~120-tok turn-pairs, a repeat-failure event lands
+roughly **every three turn-pairs** — ~1 in 3 environment turns reports
+a repeat failure, rather than the ~1 in 2 the pre-correction `g ≈ 230`
+implied. Still a **more failure-prone agent than a typical real
+trace**, and still a direct consequence of the density target rather
+than an accident.
 
 Three things follow, all binding:
 
@@ -229,10 +273,13 @@ because a full corpus is the expensive object:
 
 1. **$0 — plan-time arithmetic** (§ 2) and the two-leg vocabulary
    control on the *plan*. Already done for this freeze.
-2. **PILOT — ~20 documents**, small fraction of the cap. Measure
-   `floor_excess` and Tier T/R (struqpos methodology note `5f7c60590`:
-   token-multiset delta, length delta, pooled bag-of-embeddings ≤ 0.55;
-   adjacency floor below the KEEP bar). Seconds of CPU.
+2. **PILOT — ~20 documents**, small fraction of the cap. Measure `f`
+   **directly** via `elicit_lib.claim_zone(...)["frac_in_window"]["T64"]`
+   — **$0, label-side, no GPU** (§ 2.2a: this equals `floor_excess`
+   with `K = 0.96` on real data). Plus Tier T/R (struqpos methodology
+   note `5f7c60590`: token-multiset delta, length delta, pooled
+   bag-of-embeddings ≤ 0.55; adjacency floor below the KEEP bar).
+   Seconds of CPU.
 3. **Tune `g` on the pilot** — the one quantity permitted to move after
    freeze, because § 2.2 pre-registers the *target* and names `g` as
    the knob. Tuning is logged with before/after values.
