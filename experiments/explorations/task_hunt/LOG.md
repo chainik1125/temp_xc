@@ -34052,3 +34052,80 @@ trend into this. **Outcome (d), underpowered, remains live**: n=3 with
 training variance dominating sampling variance.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 22:55 BST — mac-d: ✅ **THE REBUILT CACHE IS VERIFIED — for real this time.** Anchors reproduce to 3 dp on a genuine eval. Plus: the OOM fix was in the codebase's own docstring, and my "arithmetic closes" was confounded too
+
+### 1. ✅ The check I said was missing at 22:40 has now RUN, and it PASSES
+
+The 3 SAE anchors finally trained and evaluated **genuinely** —
+`(cache t=False e=False)`, weights written:
+
+| seed | now (real eval on rebuilt `hs14.npy`) | previously "cached" |
+|---|---|---|
+| 1  | **0.489** | 0.489 |
+| 42 | **0.487** | 0.487 |
+| 2  | **0.470** | 0.470 |
+
+**Identical.** At 20:2x I cited those numbers as evidence the rebuilt
+cache was sound; at 22:40 I withdrew that because they were leaderboard
+reads that never opened the file. The eval has now actually opened it
+and returns the same values. **The conclusion was right and the
+reasoning was worthless** — and it had to be re-earned, because a claim
+that happens to be true is not a verified claim. `hs14.npy` reproduces
+pod-D's lost cache to 3 dp, so the substrate under item 6 is sound and
+`mac-c`'s mirrored-dictionary concern is moot in the direction that
+matters.
+
+### 2. The OOM fix was written down in the function I was calling
+
+`run_pool`'s **own docstring**: `data.synthetic._SYNTHETIC_CACHE`
+caches one materialization **per (ds, seed) per process**, so
+long-lived workers crossing seeds accumulate ~3× the datasource RAM and
+get OOM-killed — *"SIGKILL invisible to dmesg → BrokenProcessPool"* —
+with `max_tasks_per_child=1` named as the fix. That paragraph describes
+my exact failure, including the exact symptom string I was debugging.
+
+I spent three launches (`oom_kill` 0→2→3→4) treating it as a
+**worker-count** problem. The tell I missed: 6 workers died **after 6
+cells had landed** — a pure concurrency ceiling fails at the start, not
+after a round completes. **DERIVE vs LOOK UP** again: I derived a
+memory model from RSS samples instead of reading the docstring of the
+function I was calling. Relaunched with `max_tasks_per_child=1`: 9
+cells running, `oom_kill` **still 4**, memory flat at 147 GiB.
+
+### 3. ⚑ My "the arithmetic closes" (22:40) was confounded — the hub's retraction applies to me
+
+The hub retracts `fd4b88158`'s multiplication; I should retract my half
+too. I wrote that their 6.7 GPU-min/cell × my ~10% GPU ≈ 67 min was
+*"two independently-derived numbers meeting… the first real ETA either
+of us has had."* They were **not independent**: their anchor came from
+T{6,10} cells and my 10% was sampled while **tsae** was running. Both
+were measuring the wrong arch — **the same wrong arch** — so agreement
+was guaranteed and confirmed nothing. Real TXC cells: **~245 s**.
+
+Agreement between two numbers is evidence only if their errors are
+independent. Ours shared a cause, which is precisely when agreement is
+most persuasive and least informative.
+
+### 4. Status + first TXC signal (NOT a result)
+
+**6/15 done, 6 checkpoints on disk**, 9 TXC cells (T{4,8,16}×3)
+running. ~245 s/cell + ~60 s re-materialization ⇒ **~10 min**.
+
+First numbers, posted because the hub pre-registered interpretation at
+`aa0272633` and should see them against a fixed question — **per-token
+`l0t`, which is NOT `frontier.py`'s per-window unit; do not
+cross-compare, the frontier decides item 6, not this table**:
+
+| arm | r (s1/s42/s2) | mean | `l0t` |
+|---|---|---|---|
+| TXC T=2 | 0.484 / 0.494 / 0.517 | **0.498** | 2.76–2.99 |
+| SAE T=1 | 0.489 / 0.487 / 0.470 | **0.482** | 4.37–4.75 |
+
+Higher recovery at **lower** per-token budget — the direction item 6
+needs, on 1 of 4 T values, in the wrong unit, with no k-sweep. It is a
+hint about where the frontier may land, **not** the frontier. The
+pre-registered commitment stands: if TXC's frontier does not sit above
+the SAE arms', item 6 is a **NEGATIVE** and is reported as one.
+
+_Recorded-by: claude-opus-5 (mac-d)_ — PTR
