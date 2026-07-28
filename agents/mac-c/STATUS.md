@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (Han 13:56, briefing
 `hunt-mac-c-takeover.md`) — was: elicitation harness + screening
-**Last update:** 2026-07-28 14:29 BST (read from `date` — see stamp
+**Last update:** 2026-07-28 14:41 BST (read from `date` — see stamp
 corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ---
@@ -18,7 +18,7 @@ honestly and took item 7's only other contender with it. **I am the
 only lane that can close it.** `retryesc_gen` is the candidate; its
 **GENERATION CARD IS FROZEN** (`3f6ba0d3d`) with a *derived* density
 target. Spend so far on this lane: **$0** — no pod, no generation, no
-API. **Next action: the ~20-doc pilot**, which measures `floor_excess`
+API. **Next action: the ~20-doc pilot** (FIRST spend), which measures `unigram`
 + Tier T/R and can kill the card at pilot cost.
 
 ## ⚑ The finding that reorganized the lane (`density_gain_survey.py`)
@@ -53,7 +53,7 @@ correlation is the evidence, the bands are a design target.
 +0.0451**, **K = 0.96**. So the pilot's density gate is **$0,
 label-side, no GPU**.
 
-## Three retractions of my own, all material
+## Four retractions of my own, all material
 
 1. **The age-face objection (withdrawn 14:07).** I said no age face
    passes the order ladder (0/9, true) and inferred `retryesc_gen`
@@ -79,11 +79,26 @@ label-side, no GPU**.
    planning routes were too dense — the one labelled "calibrated"
    implied `f ≈ 0.36`, deep in the lose-to-your-own-floor zone.
 
-**Standing lesson from 2 and 3, my two modeling slips today:** when a
-simulation and a measurement disagree, **check whether the measurement
-already exists in the harness before inventing a mechanism for the
-gap.** Both were caught by going to a ground-truth computation instead
-of reasoning forward from an assumption.
+4. **The gap→`f` map (wrong a third time, caught by the dry run).**
+   Both gap models assumed **probe positions are uniform over the
+   stream**. They are not — eligible positions are **assistant tokens**,
+   offset from the preceding event by the **masked environment turn**,
+   so a long assistant turn pushes its own tail past T=64 even at a
+   short gap. First dry-run measurement: **f = 0.1089, out of band, at
+   a gap median of 269** — *denser* than my "corrected" 385 target yet
+   `f` far *lower*. Fixed by shortening turns to 35–70 ⇒ **f = 0.1850**.
+   **Turn length moves `f` ~0.13; `P_REPEAT` moves it ~0.02.**
+
+**⚑ STANDING LESSON — three slips on ONE quantity in one day.** Every
+time, I **reasoned forward from an assumption instead of measuring
+something the harness could already tell me** (`claim_zone` existed the
+whole time). **When a model and a measurement disagree, go find the
+measurement before inventing a mechanism for the gap.**
+
+**What kept all three cheap:** the card wrote its bar on the
+**MEASURED** quantity and **named the knob in advance**. So a wrong
+model costs a re-tune, not a candidate — **the target `f` ∈
+[+0.15,+0.25] has never moved.** Do this on every future card.
 
 ## `evalage` — CLOSED (WEAK), and now explained
 
@@ -164,32 +179,46 @@ and blocking for every generation card, so wire it before any
 
 ## Queue
 
-1. **`retryesc_gen` — CARD FROZEN `3f6ba0d3d`; scaffold BUILT; ALL 4
-   PLAN-TIME GATES PASS at $0. Next action = the ~20-doc PILOT (first
-   API spend).** Enters **UNTESTED, not rescued** (every passing band
-   was label-side; no probe ever ran).
+1. **`retryesc_gen` — CARD FROZEN `3f6ba0d3d`; scaffold BUILT + DRY-RUN
+   CLEAN; SPEND-READY. Next action = the ~20-doc PILOT, the FIRST API
+   SPEND on this lane.** Enters **UNTESTED, not rescued** (every passing
+   band was label-side; no probe ever ran).
 
-   **Plan-time gates** (`retryesc_gen/plan_premeasure.py`,
-   `results/plan_premeasure.json`; 400 docs, seed 0, `P_REPEAT`=0.26):
+   **`f` is MEASURED, not projected** (`retryesc_gen/dry_run.py` — real
+   turn loop + real `build_stream` + real `claim_zone`, stub prose, $0):
 
    | gate | measured | bar | |
    |---|---|---|---|
-   | clock | gap median **378 tok** | 297–499 | ✅ |
+   | **clock (`f`)** | **0.1850** | **[0.15, 0.25]** | ✅ mid-band |
    | vocabulary | task cv **0.0567** | ≤0.35 | ✅ |
    | position | pool exhaustion **0.0 %** | <5 % | ✅ |
-   | corpus clock | **3,527 tok/doc** | 22.7× `dharm` fatal | ✅ |
+   | corpus clock | **3,350 tok/doc** | 21.5× `dharm` fatal | ✅ |
 
-   ⚠ **Caught at plan time: a POSITION CONFOUND.** A 10-strategy pool
-   **exhausted mid-episode**, after which every failure is *forced* to
-   be a repeat ⇒ event-status becomes a function of position — the
-   `reask_hr` killer. **Pool widened to 24** ⇒ exhaustion 0.0 %, rise
-   +0.0165. Residual rise is structural (attempt 1 can't be a repeat)
-   and is left to the balanced manifest + band 3.
+   Adopted knobs: **`LEN_LO,LEN_HI` = 35,70** and `P_REPEAT` = 0.26.
+   ⚠ **The gap-median target (385, range 297–499) is RETIRED as a bar**
+   — the adopted setting realises **180** and is in band on `f`, the
+   quantity that binds.
 
-   ⚠ **What the plan-time pass does NOT prove:** gate 1 assumes
-   realised length ≈0.8× cap (**pilot verifies via `claim_zone`**);
-   gate 2 checks the **schedule**, not the generated prose — `unigram`
-   ≤0.60 at pilot is still the risk I rate highest.
+   **Invariants asserted every dry run:** 2N+1 turns, strict
+   alternation, **no assistant turn may be an event**, event positions
+   match the plan exactly.
+
+   ⚠ **Three defects caught before any spend:**
+   * **POSITION CONFOUND** — a 10-strategy pool **exhausted
+     mid-episode**, after which every failure is *forced* to be a
+     repeat ⇒ event-status becomes a function of position, the
+     `reask_hr` killer. **Pool widened to 24** ⇒ exhaustion 0.0 %.
+     Residual rise (+0.0165) is structural (attempt 1 can't be a
+     repeat) and is left to the balanced manifest + band 3.
+   * **CHECKPOINT CRASH** — `Pair` dataclasses in the doc plan aren't
+     JSON-serializable, so the pilot would have **died at pair 5** with
+     generation already paid for. Fixed via `pairs_as_dicts()`.
+   * **`f` OUT OF BAND at first measurement** (0.1089) ⇒ re-tuned turn
+     length. See retraction 4.
+
+   ⚠ **What a stub CANNOT test:** the model's actual prose. **`unigram`
+   ≤ 0.60 is a PILOT gate and remains the risk I rate highest** — it is
+   what killed the organic `retryesc` at 0.69–0.72.
 
    Design in `retryesc_gen/GENERATION_CARD.md`:
    * face = **repeat-failure escalation**, § 1.2-shaped two-timescale
