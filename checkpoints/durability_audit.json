@@ -1,0 +1,46 @@
+{
+  "generated_by": "mac-c",
+  "generated_at": "2026-07-28T22:45+01:00",
+  "cost": "$0, read-only, no pods",
+  "headline": "checkpoint_exists()'s hf_url branch is dead code: trainer.py:171 writes None unconditionally and push_ckpts_hf.py deliberately does not backfill, so 0/10400 manifest rows carry hf_url and 344 leaderboard train_keys that ARE on HF report as absent.",
+  "manifest_rows": 10400,
+  "manifest_rows_with_hf_url": 0,
+  "leaderboard_rows": 10004,
+  "distinct_train_keys": 9631,
+  "train_keys_in_hf_mirrors": 380,
+  "recoverable_train_keys": 344,
+  "recoverable_rows_by_section": {
+    "synthetic": 241,
+    "probing": 126,
+    "rlhf": 40
+  },
+  "mirrored_keys_with_no_leaderboard_row": 36,
+  "not_durably_recoverable": 9287,
+  "sycgen_trained_all_mirrored": true,
+  "sycgen_frontier_anchors": {
+    "batchtopk_sae_btkonly_T1": {
+      "1": "238516d8b6d22f50",
+      "2": "44aac5ee33d48a63",
+      "42": "3bec3cd98ed73ce6"
+    },
+    "txc_batchtopk_post_btkonly_T8": {
+      "1": "8d41e2c6aec38fd6",
+      "2": "da59eec992c78905",
+      "42": "a5077a9360ffab8b"
+    },
+    "tsae_btkonly": "NO trained manifest entry at any seed - genuinely needs training"
+  },
+  "hf_paths": {
+    "238516d8b6d22f50": "han1823123123/temp-bench-data/ckpts/238516d8b6d22f50/model.safetensors",
+    "44aac5ee33d48a63": "han1823123123/temp-bench-data/ckpts/44aac5ee33d48a63/model.safetensors",
+    "3bec3cd98ed73ce6": "han1823123123/temp-bench-data/ckpts/3bec3cd98ed73ce6/model.safetensors",
+    "8d41e2c6aec38fd6": "han1823123123/temp-bench-data/ckpts/8d41e2c6aec38fd6/model.safetensors",
+    "da59eec992c78905": "han1823123123/temp-bench-data/ckpts/da59eec992c78905/model.safetensors",
+    "a5077a9360ffab8b": "han1823123123/temp-bench-data/ckpts/a5077a9360ffab8b/model.safetensors"
+  },
+  "undocumented_prefixes": [
+    "ckpts/ in temp-bench-data (dataset)",
+    "actmix_rlhf_checkpoints/ in temp_xc_a40_checkpoints"
+  ],
+  "caveat": "cannot see pod disks; 'not recoverable' = no durable copy, NOT proven gone"
+}
