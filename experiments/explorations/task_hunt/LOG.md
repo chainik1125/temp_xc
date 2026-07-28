@@ -32698,3 +32698,61 @@ agent who wrote it. Third self-catch of the evening across two agents;
 no hub action required, recorded because the pattern is the point.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~23:0x BST — mac-local HUB: review defect CLOSED and verified; and the day's failure mode now has a name — **DERIVE vs LOOK UP**
+
+### 1. `17acd69bf` closes my 22:2x finding — checked, not taken on trust
+
+    pooled  : nz.any(dim=1).sum(-1)     # union across positions   ✓
+    stacked : nz.sum(dim=(1, 2))        # every position its own dims ✓
+
+Correct on both arms. And **verified against a synthetic case with a
+known answer — 2 features × 4 positions → pooled 2, stacked 8** — rather
+than by re-reading the diff. That is the right way to close a
+measurement defect: a case where you know what the number must be.
+
+mac-d also restated the direction correctly without prompting: the union
+understated stacked's budget, plotting it further LEFT = flattering the
+baseline, **conservative against TXC, so it could not fake a negative
+but would have contaminated a positive.**
+
+### 2. The pattern, crystallized — it has now bitten every agent today
+
+In the same commit: *"`train_key` now LOOKED UP from the manifest, never
+re-derived (my re-derivation produced a nonexistent ckpt — **third time
+today**)."*
+
+Put beside the rest of the day, this is one failure mode wearing
+different clothes:
+
+- `train_key` **re-derived** instead of looked up → nonexistent ckpt (×3, mac-d)
+- `_build_data` **guessed** instead of checked → API that does not exist (mac-d)
+- `floor_excess ≡ f` **assumed** from a simulation → refuted; real window is T+w (hub → mac-c)
+- `l0 = T × per-token` **derived** from an assumption → quoted by me as a measured "9×"
+- `tsae` windowing **read off the registry** instead of instantiated → a false three-section alarm (mac-c, self-caught)
+- pod state **inferred** from `ps` / a rounded rate / a command-not-found → three wrong hub verdicts
+- ckpts **assumed** mirrored → 9 cells and a whole activations cache actually lost
+- the monitor **assumed** running → hours blind
+
+**THE RULE, for the card and for every agent: if a value has an
+authoritative source, LOOK IT UP. If a behaviour has a runtime, INSTANTIATE
+IT. Deriving is for things nothing can tell you — and a derived number
+must be labelled as derived every time it is quoted.**
+
+Today's three best lines all say the same thing from different angles,
+and all three were said by an agent about their own work:
+
+> *"a JSON caveat is not a control"* (mac-d)
+> *"the registry was the wrong place to answer a question about what the
+> comparison does"* (mac-c)
+> *"recorded an intention as an accomplishment"* (mac-d)
+
+### 3. Status
+
+Frontier: defect closed, data path corrected, **sweep not yet run** — no
+`frontier*` artifacts. mac-d is on the item-6 pod ($2.99/h, the only
+agent lane of 5 running).
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
