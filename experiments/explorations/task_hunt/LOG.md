@@ -29013,3 +29013,58 @@ first, `DELETE 204`, **API-verified GONE**. **mac-d fleet now 3× H100
 = $8.97/h.** Remaining: T6/T8/T10 s2 cells only.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 15:43 London (date-verified at write) — mac-d: ⚑⚑ **T10/s2 LANDED — and the pre-registration should NOT fire mechanically.** Sign says 3/3 negative; magnitude says the third seed is **−0.00003**, a coin on its edge.
+
+**The number the pre-registration was waiting for (full precision):**
+
+| T10 seed | ordered | shuffled | gap |
+|---|---|---|---|
+| 42 | 0.5919920 | 0.6029992 | **−0.01100722** |
+| 1 | 0.6008439 | 0.6206848 | **−0.01984093** |
+| **2** | 0.6063506 | 0.6063809 | **−0.00003036** |
+
+**mean −0.01029, 3/3 negative, 0.49× the anchor seed-scatter.**
+
+**By the letter of c33cf620a this is the "3/3 negative" branch. I do
+not think it should be reported that way, and here is why.** Seed 2's
+gap is **3×10⁻⁵** — **0.0015× the noise floor**, and **650× smaller
+than seed 1's**. Ordered and shuffled agree to four decimal places. As
+a *sign* it counts; as *evidence* it is nothing. The honest description
+of T10 is **"two seeds clearly negative (≈ −0.015), one exactly zero"**,
+not "three seeds negative".
+
+This matters because the sign test is the whole basis of the
+pre-registration, and a sign test cannot tell the difference between
+−0.02 and −0.00003. **Mechanically firing the negative-result branch
+here would let one bit of a floating-point comparison carry a claim its
+magnitude cannot support** — the same failure I flagged at T4, arriving
+from the opposite direction. Pre-registration protects against
+outcome-fitting; it does not license reporting a result the data does
+not have. I am flagging this for the hub rather than deciding it
+unilaterally, since the pre-registration is theirs.
+
+**Full grid, 14 of 15 cells** (T1 dropped — not an upstream arch):
+
+| T | n | mean gap | signs | ÷ scatter | smallest \|gap\| |
+|---|---|---|---|---|---|
+| 2 | 3 | +0.00403 | + − + | 0.19× | 0.00662 |
+| 4 | 3 | −0.00366 | − − − | 0.18× | 0.00220 |
+| 6 | 3 | +0.00037 | + − − | 0.02× | 0.00107 |
+| 8 | 2 | +0.00059 | − + | 0.03× | 0.00548 |
+| 10 | 3 | **−0.01029** | − − − | **0.49×** | **0.00003** |
+| **all** | **14** | **−0.00196** | | **0.09×** | |
+
+**Whole-grid mean −0.00196 = 0.09× the noise floor.** T6 came in
+seed-complete and sign-MIXED (+ − −), so the middle of the T axis still
+refuses the trend, and the hub's multiple-comparisons pricing stands:
+two all-negative T out of five is inside chance.
+
+**My reading, offered not imposed:** the defensible sentence remains
+*no order effect detectable below the seed noise floor*, with T10
+optionally noted as *the only T where two of three seeds move
+appreciably, both downward* — which is a description, not a finding.
+
+T6 and T10 lanes are now complete; only **T8/s2** is outstanding.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
