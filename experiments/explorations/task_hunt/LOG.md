@@ -20770,3 +20770,61 @@ Still owed to the record: runpod-1's render bundle (GO stands),
 G1 (runpod-2), struqpos verdict (L40S), mac-c roll-call response.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 07:24 London (date-verified 06:23 UTC) — runpod-a: ⚑ struqpos VERDICT = KILL 3/3 (C1, proximity-confound) — SOUND methodological kill; NOT "model lacks position encoding"; the floor caught what the premeasure missed
+
+Screen executed on runpod-a GPU 0 (fallback), frozen protocol PIN
+51e32c8f6 + 2 disclosed errata (gpt2 ctx-overflow, gemma OOM→AutoModel).
+Null-integrity gate PASSES 3/3 (shuf_labelperm 0.494/0.505/0.508 ≈0.50 —
+PIN-1 receipt clean). **Bundle = KILL 0/3 KEEP, every leg on clause C1.**
+
+| leg | tok | ctx | shuf | local_floor | kill |
+|---|---|---|---|---|---|
+| gpt2 | 0.712 | 0.999 | 0.537 | **1.000** | C1 |
+| gemma2_2b | 0.660 | 0.999 | 0.518 | **1.000** | C1 |
+| llama31_8b | 0.910 | 0.999 | 0.796 | **1.000** | C1 |
+
+**What killed it (honest mechanism, NOT the pre-named C2):** C1 =
+local/proximity leak. `local_floor` (the 4 field tokens adjacent to the
+`### response:` readout, input-embeddings only) = **1.000 on all 3
+legs** — the arrangement is TRIVIALLY recoverable from the tokens next
+to the readout, because in A the injection sits adjacent and in B it is
+distant. The readout residual (`ctx`≈1.0) separates the arms perfectly,
+but the per-attack breakdown proves that is **proximity, not integrated
+position**: for completion_real / escape_separation / completion_realcmb
+on gpt2+gemma the token-anagram HOLDS (tok≈0.50 balanced bag, shuf≈0.50
+clean null) yet ctx≈1.0 — and the ONLY thing separating those arms is
+the adjacent content, which `local_floor` reads at 1.0. The
+pre-registered floor did exactly its job: it refused to let a
+proximity artifact be scored as position-encoding. **The validity gate
+worked.**
+
+**Two honest sub-findings:**
+1. **The char-anagram premeasure was necessary but NOT sufficient.** It
+   passed on the per-type unigram scalar (~0.51), but a richer readout
+   recovers the arrangement: the bag-of-field-embeddings `tok` leaks
+   (0.66–0.91, worst on llama), and the adjacent tokens leak totally.
+   Char-level anagram ≠ token-multiset anagram — llama's BPE tokenizes
+   `input+sep+payload` vs `payload+sep+input` into materially different
+   multisets (its shuf never reaches chance: 0.796). A future premeasure
+   for position faces must add an embedding-probe + adjacent-token band,
+   not just the per-type unigram (amendment-window methodology note).
+2. **This does NOT license "the model does not encode injection
+   position."** The model's residual clearly separates trailing-vs-
+   leading injection (ctx≈1.0); the screen simply, correctly, refuses to
+   attribute that to position because proximity fully explains it. The
+   FACE is confounded, the model's representation is not adjudicated.
+
+**Salvage path (amendment window ONLY — no bar-moving tonight):** a
+readout EQUIDISTANT from the injection in both arms (so proximity is
+matched), or a token-level anagram assembled from shared token
+sequences (tok/shuf forced to exact chance). Either is a design change
+needing its own frozen card. Until then **struqpos is KILLED on its
+merits** — the strongest label-side-conditioned candidate in the record,
+killed by its own pre-registered proximity floor. NOT a KEEP; no
+HANDOFF gold embed. Ledger: ~$0 (ran on GPU 0, pod already up;
+cache_acts wall 5+19+33s across 3 legs). Artifacts:
+`struqpos/results/{verdict,screen_struqpos_*,acts_meta_*}.json`. PTR —
+verdict owner's call posted; hub disposes.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
