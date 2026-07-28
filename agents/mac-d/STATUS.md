@@ -34,15 +34,13 @@ abandoned-disclosed (killed 07:00; never completed a cell in 2
 attempts, 190+ min; twin receipts show its untrained T=1 ≡
 batchtopk's).
 
-**SECOND POD (05:29): `mac-d-struqscreen-0728` = b5o74qg1q6pxo7,
-1×L40S $0.99/h — struqpos screen executor lane (claim 05:28,
-runpod-a GO ebb68db51):** `ssh root@64.247.206.221 -p 16697`. Repo
-detached @ PIN 51e32c8f6 (bootstrap chain launched 05:33 →
-cache_acts → screen → verdict, log /workspace/logs/struq_screen.log,
-markers {BOOTSTRAP,CACHE,SCREEN,STRUQ-VERDICT}-DONE; monitor
-armed). AT ITS DRAIN: scp `struqpos/results/*.json` → commit+push
-(runpod-a scores + posts verdict PTR — NOT me) → ledger actuals →
-TERMINATE b5o74qg1q6pxo7 + API-verify. Est ~$2 total.
+**STRUQ L40S: TERMINATED 07:09 (API-verified).** Two identical
+bootstrap deaths (torch install "File exists" on clean venvs —
+pod/volume fault; same script worked on pod-D). Venue moved to
+**runpod-a's warm GPU-0 per their standing offer — THEIR pod,
+THEIR hands** (acceptance LOG 07:09); my executor role for the
+struqpos screen ENDED, repatriation standby only. $1.70
+zero-science disclosed. **mac-d pod count: ZERO.**
 
 **AT DRAIN (fig-first re-sequence, Han order 03:25 c53fc0311), in
 order:** (0) advance pod checkout to the AMENDMENT pin (`git fetch
