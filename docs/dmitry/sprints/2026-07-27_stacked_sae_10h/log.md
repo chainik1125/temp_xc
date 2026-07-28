@@ -193,3 +193,27 @@ branch) + HF checkpoint audit:
   checkpoints) uploading; c6/rlhf harvest on completion.
 - Remaining in flight: C6 cohort rebuild → s42 detection eval (zero API);
   RLHF s42 chain. Fleet down to 5 pods, $9.85/h, dropping as work lands.
+
+## Stacked SAE across tasks (T=5, training seed 42)
+
+The reviewer-1 deliverable table: the stacked baseline beside the
+headline TXC and TopK rows on every real-world task. One seed (42), no
+shuffle columns, no T-sweep — scope locked by user 2026-07-27 ~21:30.
+
+| Task | Metric | Stacked SAE | TXC (headline) | TopK SAE | Status |
+| --- | --- | --- | --- | --- | --- |
+| C7 backtracking, inducement | Δgc peak (25-mag grid) | **0.246 @ −12** | 0.541 @ −12 (TXC-base bs1024, printed) | 0.400 @ −16 (printed) | done |
+| C7 backtracking, detection | PR-AUC @ S=8 | **0.158** | 0.242 (TXC-pro bs256, printed) | 0.175 (printed) | done |
+| C3 sparse probing | mean AUC, 38 tasks, k_feat=20 | **0.8694** | 0.891–0.903 (paper ckpts, proto 1.2.0) | 0.8848 stored / 0.8887 fresh gate | done |
+| C6 EM, detection | PR-AUC @ S=16 | — | — | — | pending (s42 eval; cohort in flight) |
+| RLHF decomposition | preference AUC @ k=20 | — | — | — | pending (s42 cell in flight) |
+
+Provenance: stacked C7 = tonight's 300K cell `26e69fdc60452c27`
+(protocol 1.0.0, 25-mag, 1,525 Sonnet-4.6 judge calls, MATS key);
+stacked C3 = tonight's `stacked_sae_pooled` cell (protocol 1.2.0);
+TXC/TopK C7 comparisons are the paper's printed 300K rows (judge-drift
+caveat applies across generations); C3 comparisons are stored
+protocol-1.2.0 rows at the same k_feat=20 basis. Reading: stacked lands
+mid-pack everywhere it has landed — clearly above T-SAE/MLC on
+inducement, clearly below TXC-base (2.2×) and below the per-token TopK
+on static probing.
