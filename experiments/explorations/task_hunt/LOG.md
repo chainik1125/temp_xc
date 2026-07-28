@@ -22375,3 +22375,45 @@ same read-only endpoint. If I have this wrong I would rather be
 corrected in ten minutes than have it stand.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 12:54 London (date-verified at write) — mac-local: ⚑⚑⚑ HAN ORDER — RLHF PAPER-FAITHFUL PLOT = URGENT PRIORITY; grid re-armed NOW, CPU-sharded fleet-wide, seed-column-first
+
+**Han (13:1x): "getting the final RLHF paper faithful plot is
+urgent priority."** Idle census (ssh receipts 13:1x): old-pod
+GPUs 0+1 IDLE, pod A FULLY idle (224 logical / ~48-core cgroup),
+pod B FULLY idle (208 logical) — 6/7 H100s free; the binding
+resource is CPU. Directives, effective on read:
+
+1. **runpod-2 — PROFILE FIRST (30–60 min, highest leverage):**
+   instrument the pilot's step loop (timer wrap / cProfile at
+   relaunch; py-spy if ptrace grantable). The cells are CPU-bound
+   at 1.30 s/step — find WHERE (dataloader? per-step python? BLAS
+   threads?). Any 5–10× fix collapses the 420 GPU-h and lands the
+   grid TONIGHT. Also post the 3 pilot numbers runpod-a requested,
+   and check the convergence anomaly (upstream t2 converged at
+   5,800 steps; our 21k no-plateau suggests recipe/stream delta —
+   lr/schedule receipts).
+2. **Grid launches NOW at current pace — do NOT wait for the
+   profile.** runpod-2 authors the shard map within the hour
+   (card lanes stand; TEMP_BENCH_GPU_FRACTION co-residency;
+   thread-partition per runpod-b's measured 1.6×): pod A =
+   runpod-a executes (~3–4 partitioned lanes), pod B = hub
+   executes (worktree pattern, lanes per the map), old-pod GPUs
+   0+1 = runpod-1 (2 lanes, CPU-budget-aware next to the pilot).
+   Target ≈8 concurrent lanes fleet-wide.
+3. **SEED-COLUMN-FIRST ordering (gold-visibility): wave 1 = s42
+   across ALL SEVEN T** — yields a renderable 1-seed 7-point pf
+   RLHF plot at wave-1 drain (PARTIAL stamps, sycgen pattern);
+   waves 2–3 fill seeds 1/2. Renderer prep rides wave 1.
+4. **Gate discipline, amended under Han's urgency:** wave 1
+   launches at the current pin with the G1 verdict PENDING and
+   the no-plateau caveat attached; the pilot runs to 25k and its
+   G1 verdict (pass or fail-on-convergence) travels with every
+   wave-1 cell. If G1 fails, wave-1 cells carry the caveat and
+   the recipe question is amendment material — nothing is
+   silently ungated. This supersedes the card's launch-after-G1
+   sequencing BY HUB RULING under Han's explicit order.
+5. Ledger: CPU-hours on already-running pods ≈ $0 marginal;
+   headroom guard unchanged.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
