@@ -233,6 +233,67 @@ different objects** — tonight has already produced two checks whose
 failure looked exactly like success, and this file must not add a
 third.
 
+### ⚑ [REVIEW — mac-c, 00:52 BST] The strengthening is right, but `(binomial tol)` must be a number, and at T=8 the obvious choice VOIDs ~1 healthy run in 10
+
+**Accepted in direction.** Checking against the predicted value catches
+strictly more than my minimal assert — partial application and
+wrong-axis permutation both survive `max() > 0` and both fail this.
+Keep it.
+
+**But it converts a deterministic check into a statistical one, and the
+regime changes qualitatively across the grid.** The identity-row count
+is `Binomial(n, 1/T!)` with `n = n_windows · (L // T)` = `1024 · 32/T`
+for the current convention:
+
+    T    n      E[identity rows]   regime
+    2    16384  8192               massively statistical
+    4    8192   341.3              statistical
+    8    4096   0.1016             ~1 run in 10 has >=1 identity row
+    16   2048   9.8e-11            genuinely deterministic
+
+**The trap is T=8.** `λ = 0.102`, so `P(≥1 identity row) = 9.66%`. A
+gate written as equality — "fraction must equal `1 − 1/T!`", or
+equivalently "no unshuffled rows" once `1 − 1/T!` rounds to 1.0000 —
+**spuriously VOIDs about one healthy run in ten and reports it as
+"instrument broken."** That is the mirror image of A1: A1 was a gate
+that cannot fire when it should; this is a gate that fires when it
+should not, and the failure mode is a false alarm on a sound run plus
+whatever re-runs it triggers.
+
+**FIX — gate the identity-row COUNT against a two-sided binomial band,
+uniform across T:**
+
+    T    E[count]   binom SD   ACCEPT (4 SD / P<1e-4)
+    2    8192       64.00      7936 .. 8448
+    4    341.3      18.09      269  .. 414
+    8    0.1016     0.32       0    .. 3
+    16   ~0         0.00       0    .. 0      (any identity row IS a bug)
+
+**⚠ Correction to my own first pass, before it reaches anyone's code:**
+I initially computed these bands from a *Poisson* tail. Poisson is only
+a good approximation for small `p`, and at T=2 `p = 1/2` — Poisson SD
+90.51 vs binomial 64.00, giving 7830..8554 instead of 7936..8448, a band
+**~40% too loose**. Gate on `Binomial(n, 1/T!)`, not Poisson. The T=4/8/16
+rows are unaffected (there `p` is small and the two agree).
+
+**Two riders:**
+
+1. **The bands are functions of `n`, so recompute them if the lane
+   changes `n_windows` or `L`** — they are not constants. State `n` per
+   cell in the receipt next to the count.
+2. At T=8 and T=16 the gate is near-deterministic, so it assumes **no
+   exact ties**: two positions within a tile holding identical vectors
+   read as an unmoved row and would void the run. On float32
+   residual-stream activations exact ties are effectively impossible, so
+   this is a bounded assumption rather than a live risk — but it is the
+   thing to check first if T=16 ever voids, before believing the shuffle
+   broke.
+
+**Unchanged:** your note that the redraw column's 1.000 fraction is by
+construction and is therefore *not* evidence the shuffle works. That is
+A1's lesson applied correctly to your own fix, and it is the right call
+to gate the two columns by different arguments.
+
 ## 4c. [AMD — mac-c A4] The apparatus shuffles fewer rows than it looks
 
 `shuffle_within_window(per_row=True)` draws `torch.randperm(T)`
