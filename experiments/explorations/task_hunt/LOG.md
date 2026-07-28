@@ -29068,3 +29068,83 @@ appreciably, both downward* — which is a description, not a finding.
 T6 and T10 lanes are now complete; only **T8/s2** is outstanding.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 15:45 London (date-verified 14:45 UTC) — mac-local (hub): ⚑⚑ **THE T10 PRE-REGISTRATION RESOLVES — to the NULL branch, and I am applying it against the reading I would prefer.**
+
+### 1. The deciding cell landed. Full pf gap table, computed from the leaderboard:
+
+    T   n   gaps by seed                          mean      sd
+    2   3   s1:+0.0099 s2:-0.0066 s42:+0.0088   +0.0040  0.0092
+    4   3   s1:-0.0033 s2:-0.0055 s42:-0.0022   -0.0037  0.0017
+    6   3   s1:-0.0011 s2:-0.0033 s42:+0.0055   +0.0004  0.0046
+    8   2   s1:+0.0067 s42:-0.0055              +0.0006  0.0086
+    10  3   s1:-0.0198 s2:-0.0000 s42:-0.0110   -0.0103  0.0099
+
+    whole-grid mean -0.0020  =  0.09x the anchor seed-scatter (0.0209)
+
+### 2. ⚑ Applying my own 15:3x rule, strictly
+
+I pre-registered two branches. **The tempting reading is "T10 is 3/3
+negative".** My rule does not permit it:
+
+> *"If T10/s2 comes back negative (3/3, **mean ≲ −0.012**)"* → report a
+> consistent negative.
+> *"If T10/s2 comes back **positive or ~0**"* → sign-mixed noise, **no
+> trend claim survives.**
+
+**s2 = −0.0000.** That is *"~0"*, not a negative draw. And the mean is
+**−0.0103**, which does **not** clear the **−0.012** I wrote down
+before seeing it. **Both clauses point at the null branch. VERDICT:
+NULL.**
+
+The supporting arithmetic agrees, which is reassuring but is *not* why
+the verdict is what it is — the verdict is what it is because I wrote
+the threshold down first:
+
+- **t = −1.79, df = 2, two-sided p = 0.215.** Not significant.
+- **|mean| = 0.49× the anchor seed-scatter** — half the noise it sits on.
+- Two all-negative T's out of five: **P = 0.121 by chance** — roughly
+  a one-in-eight coincidence, i.e. unremarkable.
+- **Whole-grid mean −0.0020 = 0.09× scatter.** The aggregate is flat.
+
+**I would have preferred the other branch** — a real negative at large
+T is a far more interesting result than a null, and I said so at 15:3x
+when I called it "the first place the data might be saying something".
+It isn't. **The threshold I set beat the story I wanted, which is the
+only reason writing it down first was worth doing.**
+
+### 3. Binding scientific statement for item 3's caption
+
+> **The paper-faithful RLHF arm shows no order effect at any T
+> measured.** Per-T means range −0.0103 to +0.0040 against a
+> seed-to-seed scatter of 0.0209; the largest per-T effect is 0.49× its
+> own noise, the whole-grid mean is 0.09×, and no T reaches
+> significance at n = 3. **This matches the BatchTopK arm** ("gaps ≈ 0
+> at every T ≤ 8") — **two independent arms, same null.**
+
+**No T-trend claim. No "grows with T". No rescue of T10.**
+
+### 4. Grid status + the next allocation
+
+**pf is 14/15** — only **T8/s2** outstanding. T{2,4,6,10} are
+seed-complete.
+
+**T1 and T16 are DROPPED from the pf arm** and mac-d's reasoning is
+right: T1 hits an einsum degeneracy in `agentic_txc02.encode`, **and
+upstream has neither a `t1` nor a `t16` arch** — they are twins, and
+dropping both is *fidelity*, not shortfall.
+
+**Coverage against Han's spec {1,2,4,6,8,10,16}, audited from the
+leaderboard — every requested T is covered by at least one arm:**
+
+    T:      1    2    4    5    6    8    10   16
+    btk:   3s   3s   3s   3s   2s   3s   1s   3s
+    pf:     -   3s   3s    -   3s   2s   3s    -
+
+**⚑ Han's pf-priority order is now discharged, so the deferred btk
+cells should start:** `btk T6/s2` and `btk T10/{s1,s2}` are the only
+three cells standing between the btk arm and 3 seeds at every T.
+**mac-d: as pods free, run those three rather than terminating to
+zero.** Fleet is 3×H100 and falling.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
