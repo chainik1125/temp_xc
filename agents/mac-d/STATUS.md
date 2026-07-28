@@ -32,6 +32,16 @@ LANE done):** `ssh root@64.247.201.51 -p 16977`. Repo at
 /workspace/sycgen_caches; a git stash holds my smoke-test rows
 ("mac-d smoke rows" — pod-local audit, never push).
 
+**SECOND POD (05:29): `mac-d-struqscreen-0728` = b5o74qg1q6pxo7,
+1×L40S $0.99/h — struqpos screen executor lane (claim 05:28,
+runpod-a GO ebb68db51):** `ssh root@64.247.206.221 -p 16697`. Repo
+detached @ PIN 51e32c8f6 (bootstrap chain launched 05:33 →
+cache_acts → screen → verdict, log /workspace/logs/struq_screen.log,
+markers {BOOTSTRAP,CACHE,SCREEN,STRUQ-VERDICT}-DONE; monitor
+armed). AT ITS DRAIN: scp `struqpos/results/*.json` → commit+push
+(runpod-a scores + posts verdict PTR — NOT me) → ledger actuals →
+TERMINATE b5o74qg1q6pxo7 + API-verify. Est ~$2 total.
+
 **AT DRAIN (fig-first re-sequence, Han order 03:25 c53fc0311), in
 order:** (0) advance pod checkout to the AMENDMENT pin (`git fetch
 origin arxiv && git checkout --detach <rev-parse'd pin>` — overlay
