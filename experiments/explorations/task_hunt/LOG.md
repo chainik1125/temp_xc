@@ -28124,3 +28124,52 @@ not the slice). Then the screen — venue TBD, ~$1/h L40S under the
 standing waiver.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-28 15:04 London (date-verified at write) — mac-d: ⚑⚑ FIRST PAPER-FAITHFUL RLHF FIGURE IS ON DISK — 5 points repatriated + rendered. Early read: **shuffle gaps ~0 and SIGN-MIXED**, i.e. no order effect in the paper's own arm.
+
+**`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` exists.** The
+"one missing plot" now has a first version, INTERIM-stamped and
+G1-PENDING-stamped.
+
+**Rows repatriated from the pods** (containers never push; merged on
+the mac with a new-keys-only filter — 5 new, 0 byte-identical dups,
+**0 conflicts**, nothing existing touched):
+
+| T | seed | ordered | shuffled | gap | l0 |
+|---|---|---|---|---|---|
+| 2 | 1 | 0.6119 | 0.6019 | **+0.0100** | 200 |
+| 4 | 42 | 0.6019 | 0.6041 | **−0.0022** | 400 |
+| 6 | 42 | 0.6086 | 0.6031 | **+0.0055** | 600 |
+| 8 | 42 | 0.6053 | 0.6107 | **−0.0054** | 800 |
+| 10 | 42 | 0.5920 | 0.6030 | **−0.0110** | 1000 |
+
+**Two things worth stating now, and one caveat that outweighs both.**
+
+1. **`l0 = 100·T` exactly at every T** (200/400/600/800/1000) — the
+   paper's window budget is being honoured cell-for-cell. That is an
+   independent check that the port is running the recipe we think it
+   is, not just a number that looks plausible.
+2. **The shuffle gaps are ~0 and sign-mixed — three of five are
+   NEGATIVE** (shuffled beats ordered). On this evidence the
+   paper-faithful arm shows **no order effect**, which is the same
+   story the btk arm told ("gaps ≈ 0 at every T ≤ 8") and consistent
+   with the fleet-wide age-face order-null. The port reproducing the
+   *negative* is itself a meaningful port-fidelity signal.
+
+**The caveat that dominates: n = 1 per T, and the seeds are MIXED.**
+T2 is seed 1 (its s42 died in the eval-cache gap and re-runs shortly);
+T4/6/8/10 are seed 42. A five-point curve assembled from different
+seeds is **not** a seed-controlled sweep, and gaps of ±0.01 are exactly
+the size of seed-to-seed scatter in the T5 anchors (0.6031–0.6240,
+spread 0.021 — **twice** the largest gap here). **Nothing here
+separates signal from seed noise yet.** The figure is labelled
+INTERIM with per-T coverage printed on it; the remaining 13 cells are
+what make it a claim rather than a sketch.
+
+**Renderer fixes this render forced:** the pf caption (now carrying
+both known deviations) collided with the x-label, and the T10 ordered
+marker was clipped by autoscale. Both fixed **pf-only** — my first
+attempt used a global `ax.margins`, which changed the ratified btk
+figure; caught by the byte-identical check, scoped, re-verified
+`sha256 c1998b48…` unchanged. The btk deliverable has not moved.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_

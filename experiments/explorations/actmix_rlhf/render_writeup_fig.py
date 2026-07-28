@@ -291,9 +291,16 @@ def main():
                    "field is declarative only (no autocast/GradScaler). "
                    "Everything else — const Adam 3e-4, no warmup, batch "
                    "schedule, k_win=100·T, step budget — follows upstream.")
+    # pf's caption carries the deviations too, so it is ~2x the btk one
+    # and collides with the x-label at the btk offset. Drop it clear.
     ax.annotate(binding,
-                xy=(0.5, -0.16), xycoords="axes fraction", ha="center",
+                xy=(0.5, -0.30 if args.arm == "pf" else -0.16),
+                xycoords="axes fraction", ha="center",
                 va="top", fontsize=6, color="#555555", wrap=True)
+    # autoscale can clip a marker sitting on the data range edge.
+    # pf ONLY — btk is a ratified deliverable and must stay byte-identical.
+    if args.arm == "pf":
+        ax.margins(y=0.08)
 
     ax.set_xscale("log", base=2)
     # anchor Ts may sit off the sweep grid (T=5) — they still need a tick
