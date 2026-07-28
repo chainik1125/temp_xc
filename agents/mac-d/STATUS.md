@@ -1,5 +1,37 @@
 # mac-d STATUS — RunPod-API executor agent (LIVE session, updated 22:5x 07-28)
 
+> ## ⚑⚑ HUB CORRECTION 00:44 07-29 — appended by mac-local, your text below is UNCHANGED
+>
+> **Your headline verdict "ABOVE pooled at 3/4 T" is superseded: it is
+> above 2/4.** Not your arithmetic — **my comparator rule**, which you
+> implemented as briefed. It picked pooled's best point at `l0 ≤ TXC's
+> l0`; on a coarse k grid (40–75% budget steps) that compared **TXC @
+> 5.66 against pooled @ 3.51 at T=2 — 38% less budget** — and returned
+> a win. The cheapest pooled point *above* TXC's budget (5.97, +5%)
+> scores 0.4876 vs 0.4989: **inside the spread.**
+>
+> **Corrected: above 2/4 (T=8, T=16), INDISTINGUISHABLE 2/4 (T=2,
+> T=4), never below.** T=16 is the strong cell and unambiguous —
+> **Pareto dominance**, pooled cannot operate at TXC's budget at all.
+> Full reasoning: LOG `73f8ea388`. Table now brackets and interpolates;
+> `verify_frontier_verdict.py` has a selection-bias guard (it is a
+> guard, **not** a port of the bracket rule — the two must stay
+> independent).
+>
+> **Nothing you shipped needs redoing** — `frontier.json`'s 156 rows
+> are the input to the corrected reading. Only the verdict sentence
+> moves.
+>
+> **YOUR NEXT LANE IS CLAIMED AND WAITING:**
+> `briefings/sycgen-shuffle-sparsity-matched.md` (Han, TOP priority,
+> **up to 20 simultaneous H100s authorized**). Read **§1 first** —
+> pooled's ordered−shuffled gap is **exactly zero by construction**
+> (mean-pooling is permutation-invariant), so pooled is an **instrument
+> check** and **stacked** is the real baseline. Then **§2b**, added
+> after this correction: the same coarse-grid trap is waiting there —
+> **bracket both sides and add intermediate k where the grid straddles
+> TXC's budget.** Post the pre-spend estimate before launching.
+
 ## ⚑⚑⚑ HEADLINE (00:1x 07-29): **ITEM 6 DELIVERED. ZERO PODS. $0/h.** Everything below is FINISHED — do not re-do it.
 
 **ITEM 6 VERDICT (PTR):** TXC's recovery-vs-budget frontier is **ABOVE

@@ -36139,3 +36139,35 @@ finding: our errors are not random — they lean.**
 **Standing check to run before any comparator verdict ships:** print
 the **budget ratio** of the selected comparator to the model. If it is
 not ≈1.0, the word "matched" may not be earned.
+
+## 2026-07-29 00:44 BST — HUB: swept the STATUS files too, including **another agent's** — and the shuffle lane is still unclaimed
+
+The 00:41 correction swept the deliverables. **It missed the files
+agents actually read first.** Both my own STATUS and **mac-d's** led
+with "ABOVE pooled at 3/4 T" as a headline, and mac-d had just posted a
+pre-compact handoff — so their next context window would have resumed
+from a superseded verdict and propagated it before ever reaching the
+LOG. Fixed both.
+
+**I edited another agent's STATUS, which I normally will not do.**
+Rule I am setting rather than pretending this was routine: **append a
+clearly-marked HUB CORRECTION block at the top, never rewrite their
+text** — same append-both discipline the LOG uses for conflicts. Their
+content is untouched and labelled as untouched. A visible conflict is
+recoverable; a silently false headline in a resume-first file is not.
+
+**The correction is addressed to the right party: the rule was mine,
+not mac-d's.** They implemented exactly what the briefing specified.
+Nothing they shipped needs redoing — `frontier.json`'s 156 rows are the
+input to the corrected reading, and only the verdict sentence moves.
+**Saying "the rule was mine" is not politeness — it selects the right
+repair.** Blame the executor and you re-check arithmetic; blame the
+specification and you re-check every other rule written the same way.
+
+**LANE STATE: the shuffle ablation is issued but UNCLAIMED.** Both
+workers posted pre-compact handoffs (mac-c `e26573ea3` 00:33, mac-d
+`c63f3729f` 00:13) and neither has picked it up. Han's instruction is
+explicit that this is what we need, so the pointer now sits in mac-d's
+STATUS resume block as well as the briefing — **two surfaces, because
+one has already proven insufficient tonight.** Fleet is idle at $0/h,
+so nothing is burning while it waits.

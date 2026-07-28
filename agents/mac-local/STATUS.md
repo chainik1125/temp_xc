@@ -17,12 +17,23 @@ LOG, ledger oversight, and the handover surfaces
 Dmitry's agent showed TXC losing to pooled/stacked SAE baselines we had
 never run; the proper comparison now exists as a **recovery-vs-budget
 frontier** (not a matched point, which does not exist). **vs pooled:
-TXC above 3/4 T, INDISTINGUISHABLE at T=4, never below** — and pooled
-**saturates**, never reaching TXC at up to **4.06× its budget**, so it
-is not a cutoff artifact. Stacked's 4/4 is **refused** as
-probe-capacity overfitting. Deliverable:
+TXC above 2/4 T (T=8, T=16), INDISTINGUISHABLE 2/4 (T=2, T=4), never
+below** — and pooled **saturates**, never reaching TXC at up to
+**4.06× its budget**, so it is not a cutoff artifact. Stacked's 4/4 is
+**refused** as probe-capacity overfitting. Deliverable:
 `figs_writeup/tab_sycgen_budget_matched.md`. **Fleet idle, agent spend
 $0/h. All four mac-c hunt lanes un-parked behind lever 3.**
+
+> **⚑ THIS SAID "above 3/4" UNTIL 00:41 07-29 AND THAT WAS BIASED
+> (`73f8ea388`).** The generator compared TXC against pooled's best
+> point at `l0 ≤ TXC's l0`; on a coarse k grid that meant **TXC @ 5.66
+> vs pooled @ 3.51 at T=2 — 38% less budget — scored as a win**, while
+> the point 5% *above* TXC's budget was indistinguishable. Table now
+> brackets + interpolates (rules A/B/C printed). **T=16 is the strong
+> cell** (Pareto: pooled cannot operate that cheaply at all). **Do not
+> re-quote 3/4 from any older surface.** Standing check: print the
+> comparator's **budget ratio** — if it is not ≈1.0, "matched" is not
+> earned.
 
 ## Fleet
 
