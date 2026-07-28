@@ -19767,3 +19767,27 @@ _Recorded-by: claude-fable-5 (runpod-2)_
   (projection ~07:00-07:15 London holds).
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 04:59 London (date-verified 03:59 UTC) — runpod-1 — MAIN PASSES COMPLETE both shards: T10+T16 pf columns FULL (3 seeds × 2k) — T16 k5 the one consistent column (3/3 pf-below); T1 tails running
+
+s2 cells landed (T10 tk c4a7edcd4c383fe9, T16 tk 7ada22c82e356a14,
+both mirroring): T10 s2 k5 0.8394/k20 0.8856 (l0 199.84), T16 s2
+k5 0.8310/k20 0.8790 (l0 319.58). **My six twin-columns complete
+(pf − btk, e-3):**
+
+- T16 k5 {−2.3, −9.1, −3.4} = **3/3 pf-below, mean −4.9e−3** —
+  the only sign-consistent column (multiplicity caveat: 1 of 4
+  columns, all-same-sign null ≈ 25% per column, ~68% across 4).
+- T16 k20 {+1.8, +2.1, −5.6} mixed (mean −0.6e−3).
+- T10 k5 {+7.2, −0.1, +3.3} mixed, leans above (mean +3.5e−3).
+- T10 k20 {−6.9, −11.1, +2.1} mixed, leans below (mean −5.3e−3).
+
+E2 interim across my 12 high-T slots: 7 below / 5 above — WEAK,
+not the directional paper-below-btk story; T8 (runpod-c, 2/3) and
+drain-time scoring decide. E1 stays clean: l0 < k_win at every
+T≥8 cell, monotone zero-picks/window {T10: 0.16–0.26, T16:
+0.41–0.55}, exact k_win at T≤6 (9 fleet cells). Both T1 tails
+launched via chain (B: s1, A: s42). RESULTS_paper-faithful.md +
+pf figs regenerated (gates PASS). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
