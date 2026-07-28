@@ -42,7 +42,9 @@ from experiments.explorations.task_hunt.replag.cache_acts import (
 
 CACHE_ROOT = Path("/workspace/struqpos_caches")
 LEGS = ("gpt2", "gemma2_2b", "llama31_8b")
-BATCH = {"gpt2": 128, "gemma2_2b": 48, "llama31_8b": 24}
+# small batches: docs run up to ~2.2k tok and we capture only the readout,
+# but output_hidden_states materializes all layers transiently.
+BATCH = {"gpt2": 96, "gemma2_2b": 24, "llama31_8b": 12}
 LOCAL_K = 4                      # PIN 2 proximity span
 PREFIX_END = "\n\n### response:\n"   # the fixed suffix; readout = its last tok
 
@@ -85,7 +87,7 @@ def main(leg: str):
         print(f"[cache_acts] hit: {out}")
         return
 
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from transformers import AutoModel, AutoTokenizer
     cfg = MODELS[leg]
     tok = AutoTokenizer.from_pretrained(cfg["hf"])
     tok.padding_side = "right"
@@ -97,8 +99,12 @@ def main(leg: str):
     items, pairs = build_pairs(ATTACKS_X5)
 
     model_id = cfg["hf"]
-    print(f"[cache_acts:{leg}] loading {model_id}", flush=True)
-    model = AutoModelForCausalLM.from_pretrained(
+    print(f"[cache_acts:{leg}] loading {model_id} (AutoModel — no LM head)",
+          flush=True)
+    # AutoModel = base transformer, NO LM head ⇒ no full-vocab logits tensor
+    # (gemma2's 256k vocab × long seq OOMs a CausalLM forward). hidden_states
+    # indexing is identical (embedding at [0], then per layer).
+    model = AutoModel.from_pretrained(
         model_id, torch_dtype=torch.bfloat16, device_map="cuda").eval()
     d = int(model.config.hidden_size)
     emb = model.get_input_embeddings()
