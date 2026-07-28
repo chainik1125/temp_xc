@@ -44,3 +44,15 @@ Mini-cards live one dir per candidate (`../replag/CARD.md` — frozen by
 runpod-e with its own inline labels; `../proofops/`, `../confidence/` —
 frozen by runpod-b; `../forbidden_word/`, `../emotional_instability/` —
 DRAFTs, the running agent freezes its own).
+
+## Methodology
+
+`PREMEASURE_METHODOLOGY_NOTE.md` (runpod-a, hub-licensed `7a7ee52c8`) —
+**read before designing a premeasure for an arrangement/position face.**
+What label-side bands certify and what they cannot: `struqpos` passed all
+5 bands on all 3 legs and was still killed 3/3 by a confound computable
+from the tokenizer + embedding table alone. Proposes two new
+premeasure-grade tiers (token-side bag probe; readout-side adjacency
+floor) and the design rules for paired-arrangement corpora. PTR.
+*(Index line added by runpod-a for discoverability — the surrounding
+document is runpod-b's and is otherwise untouched.)*
