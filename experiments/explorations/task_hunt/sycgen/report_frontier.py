@@ -86,30 +86,64 @@ def main():
                 best[arm] = (k, c, "CHEAPEST AVAILABLE — still costlier than TXC")
         line = {"T": T, "txc": txc}
         for arm, (k, c, how) in best.items():
-            wins = txc["r"] > c["r"]
-            print(f"  -> {arm:8s} best@budget: k={k} r={c['r']:.4f} "
-                  f"l0/win={c['l0']:.2f} ({how})  TXC {'ABOVE' if wins else 'NOT above'}")
-            line[arm] = {"k": k, "r": c["r"], "l0": c["l0"], "txc_above": wins,
-                         "how": how}
+            # THREE states, not two (hub review 3291d7287). A bare
+            # `txc.r > c.r` makes 0.5001 vs 0.5000 an "ABOVE" that counts
+            # toward the headline — the forbidden move, executed
+            # mechanically. Outcome (d) "underpowered" is a DISTINCT
+            # pre-registered outcome and must never be folded into a win
+            # or a loss.
+            #
+            # ⚑ Deliberately NOT a significance test: n=3 does not
+            # support one, and mac-c (72cf1334f) forbade importing the
+            # 1.83-3.9x variance inflation onto these cells. This is a
+            # CRUDE guard — |delta| against the larger of the two seed
+            # SDs — and is labelled crude wherever it prints.
+            delta = txc["r"] - c["r"]
+            noise = max(txc["sd"], c["sd"])
+            if abs(delta) <= noise:
+                state = "INDISTINGUISHABLE"
+            else:
+                state = "ABOVE" if delta > 0 else "BELOW"
+            print(f"  -> {arm:8s} best@budget: k={k} r={c['r']:.4f}±{c['sd']:.4f} "
+                  f"l0/win={c['l0']:.2f} ({how})")
+            print(f"       TXC {state:17s} |delta|={abs(delta):.4f} "
+                  f"vs max(sd)={noise:.4f}  [crude, n=3]")
+            line[arm] = {"k": k, "r": c["r"], "l0": c["l0"], "state": state,
+                         "delta": delta, "noise": noise, "how": how}
         verdict_rows.append(line)
 
-    print("\n=== VERDICT (pre-registered) ===")
-    both = [v for v in verdict_rows
-            if v.get("pooled", {}).get("txc_above")
-            and v.get("stacked", {}).get("txc_above")]
-    pooled_only = [v for v in verdict_rows
-                   if v.get("pooled", {}).get("txc_above")
-                   and not v.get("stacked", {}).get("txc_above")]
+    print("\n=== VERDICT (pre-registered, THREE states) ===")
     for v in verdict_rows:
         p = v.get("pooled", {}); s = v.get("stacked", {})
-        print(f"  T={v['T']:<3} TXC r={v['txc']['r']:.4f}  "
-              f"vs pooled {'ABOVE' if p.get('txc_above') else 'below'}"
-              f"  vs stacked {'ABOVE' if s.get('txc_above') else 'below'}")
-    print(f"\n  TXC above BOTH arms at {len(both)}/{len(verdict_rows)} T values"
-          f"; above pooled only at {len(pooled_only)}.")
+        print(f"  T={v['T']:<3} TXC r={v['txc']['r']:.4f}±{v['txc']['sd']:.4f}"
+              f"   vs pooled {p.get('state','-'):17s}"
+              f" vs stacked {s.get('state','-')}")
+
+    def tally(arm):
+        c = {"ABOVE": 0, "BELOW": 0, "INDISTINGUISHABLE": 0}
+        for v in verdict_rows:
+            st = v.get(arm, {}).get("state")
+            if st:
+                c[st] += 1
+        return c
+
+    n = len(verdict_rows)
+    for arm in ("pooled", "stacked"):
+        c = tally(arm)
+        print(f"\n  vs {arm}: ABOVE {c['ABOVE']}/{n}, BELOW {c['BELOW']}/{n}, "
+              f"INDISTINGUISHABLE {c['INDISTINGUISHABLE']}/{n}")
+    both = sum(1 for v in verdict_rows
+               if v.get("pooled", {}).get("state") == "ABOVE"
+               and v.get("stacked", {}).get("state") == "ABOVE")
+    print(f"\n  TXC ABOVE BOTH arms at {both}/{n} T values.")
+    print("  INDISTINGUISHABLE is a THIRD outcome — it is NOT a win and")
+    print("  NOT a loss, and is never folded into either. The honest")
+    print("  headline may be 'we cannot tell at n=3'; that is a result.")
+    print("  The threshold is CRUDE (|delta| vs max seed sd), not a")
+    print("  significance test — n=3 does not support one.")
     print("  Reminder: stacked carries T x the probe input, so a stacked")
     print("  loss is partly a probe-capacity effect and must be said so.")
-    print("  If TXC is not above, item 6 is a NEGATIVE — report it as one.")
+    print("  If TXC is not ABOVE, item 6 is a NEGATIVE — report it as one.")
 
 
 if __name__ == "__main__":
