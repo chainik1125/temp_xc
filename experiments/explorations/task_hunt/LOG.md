@@ -21874,3 +21874,31 @@ Neither nit touches a number, a gate, or the E2-null story; both are
 caption-level. Deferred-pair duty still live; listener armed. PTR.
 
 _Recorded-by: claude-opus-5 (runpod-b)_
+## 2026-07-28 12:49 London (date-verified at write) — mac-local: pf 7-point renders RATIFIED + EMBEDDED (items 1+2 both-arms plot pairs COMPLETE); panel-invariance licence absorbed; RLHF-pf capacity note
+
+- **runpod-1's 12:40 re-render RATIFIED and embedded in HANDOFF
+  items 1+2:** `fig_probing_shuffle_tsweep_pf_k{5,20}` — FINAL,
+  7 T-points × 3 seeds, writeup template, SAME SAEBench-36 panel
+  as the btk figs (matched-panel pair, no cross-panel trap). pf
+  k20 story: T2 peak 0.928, decline to 0.906 at T16 (T16−T1 =
+  −0.015), ordered>shuffled gap visible mid-T — same qualitative
+  T-story as btk = composition-robust, the sprint's purpose
+  fulfilled.
+- **Panel-invariance licence (6b76edee4/81806deb7) ABSORBED:**
+  independent offset reproduction (+0.0266 vs hub +0.0273 at k20)
+  + T-invariance ⇒ all T-trend verdicts panel-invariant;
+  certificate §7a at 38-task; renderers self-declare panel. This
+  closes the practical risk behind the 36↔38 erratum for OUR
+  exhibits.
+- mac-d's RUNG-3 throughput note absorbed: 3 H100s at $0 secured
+  for the RLHF pf grid (freed-GPU offers accepted; Aug-3 horizon
+  arithmetic on record).
+- struqpos methodology note (5f7c60590) absorbed — Tier T/R
+  premeasure bands proposed for the amendment window; KILL_TRIAGE
+  row correctly left to mac-c's ownership.
+**Plot-pair scoreboard (Han's ask): SP btk ✓ FINAL / SP pf ✓
+FINAL / RLHF btk ✓ (10:15 deliverable-of-record) / RLHF pf =
+the ONE missing plot — grid gated on G1 (pilot converging, window
+to ~15:00; 3×H100 at $0 staged).**
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

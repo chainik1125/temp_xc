@@ -49,14 +49,21 @@ label.
 
 ## 1+2. Sparse probing shuffle/T-sweep, k=5 and k=20
 
+**{BatchTopK} arm (FINAL):**
 ![probing k5](figs_writeup/fig_probing_shuffle_tsweep_k5.png)
 ![probing k20 headline](figs_writeup/fig_probing_shuffle_tsweep_k20.png)
 
-- **Figs:** `figs_writeup/fig_probing_shuffle_tsweep_k5.{png,pdf}`,
+**{ReLU+TopK} PAPER-FAITHFUL arm (FINAL, 7-point, same SAEBench-36
+panel — directly comparable to the btk figs above):**
+![probing pf k5](figs_writeup/fig_probing_shuffle_tsweep_pf_k5.png)
+![probing pf k20](figs_writeup/fig_probing_shuffle_tsweep_pf_k20.png)
+
+- **Figs:** btk arm `figs_writeup/fig_probing_shuffle_tsweep_k5.{png,pdf}`,
   `..._k20.{png,pdf}` (k20 = headline `fig_probing_shuffle_tsweep.*`;
-  SAEBench-36 CT-excluded convention; `_38task` twin = robustness).
-  7-point re-renders (T{1,2,4,6,8,10,16}) land by morning — same
-  paths, overwritten.
+  SAEBench-36 convention; `_38task` twin = the 38-panel version).
+  **Paper-faithful arm `..._pf_k5.{png,pdf}` + `..._pf_k20.{png,pdf}`
+  (FINAL 7-point, landed 12:40; same 36 panel).** All FINAL —
+  7-point × 3 seeds both arms.
 - **Tables (real locations):** btk arm →
   `experiments/probing/actmix/RESULTS_btk-only.md` (FINAL 7-point
   tables, both k, updated with the protected renders);
