@@ -17945,3 +17945,52 @@ btk renders → PRELIMINARY certificate. Ack mac-d 90c89f294 (sycgen
 T-axis amendment — not this lane). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+## 2026-07-28 03:03 London (date-verified 02:03 UTC) — runpod-1 — TELEMETRY PARSE: v2 arms 0/1120 sampled-step contacts (floor declines with T, per-seed floors IDENTICAL across arms); paper-faithful arm in a DIFFERENT regime live (T16: 40/43 samples negative-boundary)
+
+Morning-queue item 2 delivered. Traces at
+/workspace/logs/telemetry_rm (sampled every 250 steps, 80
+samples/completed cell), census-first framing per 3b0a4df3d
+throughout — traces are RATE BOUNDS, the integer fired-census is
+the contact witness.
+
+**v2 arms (RM + btk), 14 completed traces = 1120 sampled steps:
+ZERO negative-boundary samples.** Per-cell bound 0/80 → rule-of-
+three 95% upper bound ≈ 3.75% of sampled steps; traces cover 0.4%
+of steps, and the census divergence (num_tokens_since_fired, 6/7
+tensors) proves ≥1 contact event lives in the unsampled 99.6% —
+the between-sample-contact regime, now quantified at every T.
+
+- **Selection-boundary floor declines monotonically with T** (min
+  over 80 samples, per cell): T6 {6.46, 6.62, 7.18} · T8 {5.21,
+  5.61, 5.65} · T10 {4.19, 4.26, 4.66} · T16 {3.29, 3.40}. The
+  boundary approaches zero from above as T grows but never
+  touches it in-sample — consistent with divergence magnitude
+  growing with T while remaining selection-level rare.
+- **Per-seed floors are IDENTICAL across arms at T10** (4.187 /
+  4.258 / 4.664 appear in both the RM and btk trace sets) while
+  the fired-census diverges — an extreme-statistic match that
+  again bounds the contact rate near zero without contradicting
+  the census witness.
+- Inventory disclosure: RM T16 has 2/3 traces (third cell predates
+  telemetry enablement on that lane), btk arm traced at T10 only
+  (fix landed mid-night, disclosed at 71a4de31f); endpoint census
+  via ckpt buffers covers the untraced cells.
+
+**Paper-faithful arm (live, INTERIM — cells still training): a
+different regime entirely.** T16 s42 trace at ~step 10.7k: 40/43
+sampled steps have NEGATIVE selection boundary (min −11.9) — E1's
+zero-pick mixing fingerprint is ACTIVE in-flight, per-sample TopK
+routinely selecting negatives that ReLU zeroes. Dead census 12948
+/18432 (~70%) at last sample with AuxK engaged. T10 s42 (shard B,
+early): 6/11 negative already. v2 arms never touch zero in 1120
+samples; the paper composition is negative at ~93% of samples at
+T16 — the cleanest one-figure contrast the certificate will carry.
+Final numbers at shard drain; no E2 scoring until then.
+
+Durability: twin-set mirror re-verified idempotently — 28/32
+receipts confirmed (certificate 30 previously receipted; night
+additions UPLOADED incl. btk s2/T10), final 4 uploads in flight,
+receipts land in ckpt_push.log. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
