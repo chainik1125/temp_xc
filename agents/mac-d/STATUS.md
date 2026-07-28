@@ -1,18 +1,29 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 02:56 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 03:44 07-28)
 
-## ⚑⚑⚑ HEADLINE (02:56): § 5 T-AXIS AMENDMENT POSTED (48→36 cells) — shard0 DONE 18/18-amended, shard1 on pace, drain ETA ~03:35–03:55
-Freeze 74d260321 launched the 48-cell grid; **T∈{6,10} cannot pass
-the canonical eval** (L=32 divisibility, power-of-two gate; λ̂
-template axis IS (2,4,8,16); zero T6/T10 rows fleet-wide) — my
-card-writing error, amended in RETRAIN_CARD **§ 5** + LOG 02:54.
-12 doomed cells = `ok:false` receipt rows in the as-run shard jsons
-(~$2 burn on the 6 trained ones, disclosed); the 36 survivors ARE
-the amended grid. Shard1 (all-trained half) left to complete —
-batchtopk T1 anchors landed r=0.470/0.487/0.489. **NOTE: pod clock
-= UTC, mac = BST — never read pod file mtimes as London times**
-(cost me a phantom-stall scare, retracted in LOG). Renderer
-`sycgen/render_tsweep.py` ALREADY WRITTEN (runbook step 4 is now
-just: run it). Est $15–21 ledgered at launch.
+## ⚑⚑⚑ HEADLINE (03:44): PARTIAL EXHIBIT LIVE (fig-first re-sequence, Han order 03:25) — re-render loop until drain; both GPUs working
+**Shipped 03:40 (7af84fb80):** `figs_writeup/fig_sycgen_shuffle_tsweep.*`
+v1 (PARTIAL watermark; anchor band r≈0.482 + 18/18 untrained sweep)
++ strict-JSON summary + 24 `sycgen_keep_r1` rows + HANDOFF item-6
+embed (live-refresh caption). Renderer is PARTIAL-TOLERANT (ordered
+layer from canonical rows; overlay optional→"PENDING"; ingests
+retrain_supp.json; cache-echo dedupe by (arch,T,seed,kind)).
+**Re-render + push at each landed trio — same paths supersede; run:**
+scp 3 result jsons from pod → `python -m …sycgen.render_tsweep` →
+commit fig+summary(+rows via repatriate.sh) → push.
+**Pod state:** GPU-0 = my supp pool (txc T{8,16}×3; T8 trio ROWED
+~03:38, T16 in flight; log retrain_supp.log, marker SUPP-DONE;
+launcher /workspace/run_supp.py — outside repo, pin-safe). GPU-1 =
+shard1 tsae trio CPU-grinding (NOT hung — CPU-time receipts in LOG
+03:31 ACK; **BOUND: no tsae completion by 04:05 → kill shard1**
+(bracketed lane-scoped pattern) **and relaunch remainder both-GPUs**
+— run_pool cache skips everything rowed). After tsae: shard1 trains
+T2,T4, burns doomed T6/T10 (§ 5 receipts), cache-skips T8/T16.
+**History:** § 5 amendment (48→36, T{6,10} eval-impossible) RATIFIED
+40013e558; my amended stall-response RATIFIED ae45c8fa6 (supersedes
+restart directive 486e14939). **Manifest merge DEFERRED: 336
+fleet-wide train_key conflicts pod↔local — owners' pass, not mine;
+sycgen ckpt manifest rides at HF-push step.** Pod clock = UTC (mac
+= BST) — never read pod mtimes as London. Est $15–21 ledgered.
 
 **POD-D COORDINATES (mine, jge1fuj9hqu8et, $5.98/h, warm-hold until
 LANE done):** `ssh root@64.247.201.51 -p 16977`. Repo at
@@ -21,27 +32,33 @@ LANE done):** `ssh root@64.247.201.51 -p 16977`. Repo at
 /workspace/sycgen_caches; a git stash holds my smoke-test rows
 ("mac-d smoke rows" — pod-local audit, never push).
 
-**AT DRAIN, in order:** (0) advance pod checkout to the AMENDMENT
-pin (`git fetch origin arxiv && git checkout --detach <pin>` —
-overlay imports the amended `WINDOW_TS`; NEVER before SHARD1-DONE,
-workers re-import from disk); (1) on-pod
+**AT DRAIN (fig-first re-sequence, Han order 03:25 c53fc0311), in
+order:** (0) advance pod checkout to the AMENDMENT pin (`git fetch
+origin arxiv && git checkout --detach <rev-parse'd pin>` — overlay
+imports the amended `WINDOW_TS`; NEVER before ALL training procs
+exited — shard1 AND supp — workers re-import from disk); (1) on-pod
 `.venv/bin/python -m experiments.explorations.task_hunt.sycgen.shuffle_overlay`
-(reads both shard jsons; identity 2e-3); (2)
-`bash agents/mac-d/repatriate.sh 64.247.201.51 16977` then push
-rows from the mac (pull-rebase; LOG conflicts keep-both);
-(3) on-pod ckpts → HF: `.venv/bin/python scripts/push_ckpts_hf.py
-<train_key>…` for the 18 TRAINED train_keys — extract from the POD
+(reads shard jsons; supp cells re-echo in shard1 via cache at its
+T8/T16 arrival — if shard1 was killed at the tsae bound, overlay's
+by_cell must ALSO ingest retrain_supp.json + relaunch json — check
+before running); (2) scp overlay+result jsons →
+`…sycgen.render_tsweep` on the mac → **commit+push fig+summary
+IMMEDIATELY** (full-drain render supersedes the partials, same
+paths; drop the PARTIAL caption line in HANDOFF item 6); (3)
+`bash agents/mac-d/repatriate.sh 64.247.201.51 16977` (NOTE:
+manifest merge conflicts 336× fleet-wide — if still unresolved, run
+the two merge_rows calls manually: leaderboard WILL apply, manifest
+stays deferred) then push rows (pull-rebase; LOG keep-both); (4)
+on-pod ckpts → HF: `.venv/bin/python scripts/push_ckpts_hf.py
+<train_key>…` for the 18 TRAINED train_keys — extract from POD
 LEADERBOARD (`eval_cfg.retrain_tag == "sycgen_keep_r1"` &&
-`training_cfg.n_steps > 0`; shard-json rows do NOT carry train_key
-— verified 02:5x), ratified `ckpts/<train_key>/`, sha receipts
-HERE; (4)
-harvest overlay json → commit; run
-`…sycgen.render_tsweep` on the mac (renderer already written →
-`figs_writeup/fig_sycgen_shuffle_tsweep.*` + summary json); (5)
-ledger ACTUALS; (6) ONE LOG bundle entry (PTR). THEN the lane is
-done → TERMINATE pod via
+`training_cfg.n_steps > 0`; shard-json rows carry NO train_key),
+ratified `ckpts/<train_key>/`, sha receipts HERE; (5) ledger
+ACTUALS (incl. supp-pool GPU-h); (6) ONE LOG bundle entry (PTR).
+THEN lane done → TERMINATE pod via
 `bash agents/mac-d/podctl.sh terminate jge1fuj9hqu8et` + ledger,
-UNLESS a new card claims it (check LOG first).
+UNLESS a retryesc_gen claim entry is in the LOG (claim-window
+cf59f25eb — hand over warm instead).
 
 **Session-local watchers armed pre-compact (they persist while the
 session lives; re-arm if genuinely fresh):** origin listener 150s
