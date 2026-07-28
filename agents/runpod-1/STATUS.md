@@ -1,103 +1,65 @@
 # Working state — agent `runpod-1`
 
-**2026-07-27 21:15 London (date-verified) — day report posted (LOG
-21:12). NIGHT GRID RUNNING at PIN db098b8c1: dead-latent RM
-T{6,8,10,16}×3s + btk T{6,10}×3s + telemetry, 2 GPUs, drain ~01:30
-pod. Morning queue below. GPU 2 = runpod-2, never mine.**
+**2026-07-28 02:41 London (date-verified) — PAPER-FAITHFUL SPRINT: card PINNED
+d9235755b, shard A RUNNING (GPU0, T16x3→T1s42 since 01:39 UTC),
+shard B armed behind NIGHT_DONE_GPU_1 (btk s2/T10 finishing ~02:05
+= the 6/6 k20-block decider; diff at landing). GPU 2 = runpod-2,
+never mine.**
 
-## The RM arc (context for any resume)
+## Sprint (task #12, commission 4ce0369de/606e4587d)
 
-Identity discovered (low-T bit-identical twins) → halt approved →
-Han override (dead-latent hypothesis needs high T) → divergence
-MEASURED: onset T≥2, deepening with T. CORRECTED mechanism
-arithmetic: per-window selection depth = k_pos·T/d_sae grows
-linearly (0.11%→1.74% T1→T16); sae stays shallow ⇒ sae identical
-×3 seeds (incl. cross-pod exact), pre identical ONLY at T1.
-T16 endpoint: ~57% dead latents BOTH arms, ~40% disjoint survivor
-sets, ~0.002 AUC cost (width-contingent per quote guards
-7093c21f8). Dead-frac vs T is U-shaped (0.44→0.37→0.57).
-Instrument gate closed (positive control DIVERGES at thin pool;
-ratified). Equivalence table: experiments/probing/actmix/
-RM_EQUIVALENCE.md (checker excludes positive_control rows).
+Plugin paper_txc_base_v1t = vendored 94119bc08 txc_bare_antidead
+FULL training stack verbatim + thin v2 wrapper (dict contract,
+first-batch b_dec init, post-accumulate grad hook, post_step renorm,
+wrapper-side telemetry). Tests 8/8 (bitwise adapter parity T{1,3},
+T1 formula, exact-k, mixing fingerprint, stack receipts, registry).
+CARD_PAPER_FAITHFUL.md §6 = the 5-GPU shard table (mine A+B;
+runpod-c C+D; runpod-a E; runpod-b overflow post-rmx). 21 cells,
+T1/T2 tails LAST (prune-free if hub rules 18). Logs
+/workspace/logs/pf_shard_{A,B}.log, monitor bwhegmrtw. At shard
+drain: per-cell HF ckpt push (scripts/push_ckpts_hf.py, ratified
+mirror), ledger actuals vs $18-22 est.
 
-## Live overnight
+## Night close (task #11 remainder)
 
-- Chains: /workspace/logs/actmix_night_gpu{0,1}.log (fresh persistent
-  monitor armed 23:1x; old bva90ega9 died silently). GPU0: control✓ →
-  btk T6×3s ✓ COMPLETE → RM sh1 T{10,16} (s42/T10 running ~60%).
-  GPU1: RM sh0 T{6,8} (s1/T8 running ~75%, then s2/T6, s2/T8) → btk
-  T10×3s LAST. Revised drain: GPU0 ~01:20, GPU1 ~02:00.
-- Landed tonight: btk T6 column complete (k20 0.8959±0.0037; s42+RM
-  s42/T8 deterministically re-ran, same train_keys). s1/T6 twin
-  DIVERGES 6/7 tensors (2nd seed; bidirectional per-k drift
-  replicates: k5 −1.02e-2 / k20 +2.4e-3) — LOG entry-of-record
-  b3fe4aa76 (measured pre-compact at 013441cfd).
-- TELEMETRY FIX 3a9744c7f: _TXCBatchTopKBTKBase.train_step was
-  missing maybe_log → tonight's 3 btk T6 cells have NO step-traces
-  (endpoint census via ckpt num_tokens_since_fired). btk T10 pass
-  starts post-fix ⇒ fully traced (fresh interpreter per pass). RM
-  traces complete. boundary_min_pre is only informative in the btk
-  arm (RM floor ≥0 by construction — ReLU precedes selection).
+- btk s2/T10 lands ~02:05 → rm_equivalence diff = SIXTH k20 point
+  at T≥10 (current block 5/5 btk-ahead, P≈3.1%; 6/6 ⇒ P≈1.6%) →
+  NIGHT_DONE_GPU_1 → shard B auto-launches.
+- RM-2 fills PREEMPTED (~3 min sunk disclosed); re-queue only in a
+  genuinely idle window. relu-mix = certificate evidence only per
+  arm mapping 692b — never a matrix column.
+- Delta map so far (RM−btk, all local 6/7 tensor diffs): T6 k5
+  {−1.63,−1.02,−1.38}e−2 3/3 btk · k20 mixed | T8 coin-flip both k
+  | T10 k20 {−6.8,−6.9}e−3 + T16 k20 {−1.67,−0.43,−6.10}e−3 = the
+  high-T k20 block. Multiplicity caveats posted with each flag.
 
-## Han deliverables matrix (1065b26cf) — my lane
+## Morning queue (revised for sprint)
 
-Probing = exhibits (1)+(2). RM fill T{2,4}×{s1,s2} CARDED (RM-2,
-3177ddc74) + QUEUED as waiter chains behind NIGHT_DONE_GPU_{0,1}
-(logs /workspace/logs/actmix_fill_gpu{0,1}.log, monitor bt2mwwky9;
-GPU0→s1 pair ~01:20, GPU1→s2 pair ~02:00, land ~03:30). T1 never
-retrained — certificate line on-figure (alias hazard, judgment
-call (a)). Renders are now BOTH ARMS at 7 T-points.
+1. btk s2/T10 diff + T10 column verdict (immediate at landing).
+2. Telemetry parse (btk arm now traced): boundary contact rate vs
+   T; census-first framing per 3b0a4df3d (traces = bounds).
+   Cross-venue lemma receipts: runpod-2 829f05070/fd3e4ff16
+   (identity ⟺ zero contact), runpod-a dq DIVERGES + λ̂ IDENTICAL.
+3. 11:00 PROTECTED: 7-point per-k btk renders (--writeup final) +
+   38task twin + archived-T5-anchor labeling per 8fefb409d rule +
+   agentic/caption disclosures where applicable.
+4. PRELIMINARY certificate: census leads; identity = {sae ×3, pre
+   T1}; divergence map T2-T16 per-T per-seed; controls; PTR.
+5. RESULTS_{btk-only,relu-mix}.md refresh; ledger actuals (night
+   ~$30 + fills ~$0.3 sunk + sprint shards); paper-faithful rows
+   fold into analysis when shards drain (E1-E3 scoring per card §9).
+6. STATUS rewrite before compact.
 
-## Morning queue (in order)
+## Durability
 
-1. Per-cell equivalence diffs as twins complete (rm_equivalence.py;
-   T10 column diffs when btk pass lands; fill diffs at ~03:30 close
-   the LOW-T end — T2 is the measured onset). Report immediately.
-   Done so far: s1/T6 ✓, s1/T8 ✓ (T8 sign FLIPS across seeds —
-   s42 RM-ahead, s1 btk-ahead, both k; e417488d5).
-2. Telemetry traces: parse telemetry_rm/*.jsonl → dead_frac +
-   boundary_min_pre vs step per (arm, T) — btk arm now traced
-   post-fix 3a9744c7f (min-selected NEGATIVE = boundary crossing);
-   btk T6 cells trace-less (endpoint census from ckpts).
-   MECHANISM FRAME (from live T10 trace + runpod-2's 829f05070
-   RLHF certificate): btk T10 shows ZERO negative samples in 60
-   (floor +4.19, median +6.8, dead_frac 0.429@14.75k) yet twins
-   diverge T≥2 — since no-contact ⇒ bit-identical passes ⇒ no
-   divergence possible, contact MUST occur between 250-step
-   samples (rare tail events; sampling gives a RATE BOUND, not
-   proof). Coherent cross-venue story: divergence probability
-   scales with selection depth vs positive-mass tail — probing
-   = rare-contact regime (tiny deltas, grows with T); runpod-2
-   RLHF = never-contact (floor ≥2.21) ⇒ 3/3 identity. Certificate
-   mechanism section writes THIS. Also: name the 1-of-7 EQUAL
-   tensor in diverged pairs (json tensor_mismatches).
-3. 7-point per-k fig re-renders BOTH ARMS (--writeup final; btk
-   family per eace1b077 — first-REAL-T10 announced 44fe0029f; RM
-   family new, T1-certificate caption line per matrix).
-4. Certificate entry (measured scope ONLY): identity = {sae all,
-   pre T1}; divergence map T2–T16 per-T per-seed deltas (incl. the
-   T8 sign-flip); positive-control receipts; PTR.
-5. RESULTS_relu-mix.md + RESULTS_btk-only.md refresh (analysis.py
-   both arms); RM ledger actuals (night ~\$30 + fill ~\$8).
-6. STATUS rewrite + push before compact.
-
-## Durability receipts (b4a directive, mechanism 0e644c65b)
-
-30/30 certificate-evidence ckpts on the ratified mirror
-(han1823123123/temp-bench-data ckpts/<train_key>/, every diffed
-twin pair + positive-control pair; 58.5 GB, ~200 MB/s). Per-key
-sha256 receipts: /workspace/logs/ckpt_push.log. LFS spot-check
-e91d887fac22fb33 (T8 acid-test RM ckpt): remote sha 48c4f2d4…
-== local, MATCH. Night-drain + fill ckpts append via the same
-shared tool (scripts/push_ckpts_hf.py, idempotent). Full-lane
-bulk (88/155 GB) stays local pending size ruling.
+30/30 certificate ckpts on ratified mirror, LFS spot-check MATCH
+(e91d887fac22fb33); receipts /workspace/logs/ckpt_push.log. Night
+T10/T16 + sprint ckpts append at drain (idempotent tool).
 
 ## Standing
 
-Timestamps: read `date` FIRST, then write the stamp (two drifts
-tonight disclosed in the report). Origin watcher bf369am3s; night
-monitor bva90ega9. LOG conflicts: union-resolve theirs-first +
-stray-marker check (grep '^<<<<<<<|^>>>>>>> [0-9a-f]|^=======$').
-Ledger: day-1 ≈ $98 + night ≈ $30 mostly day-2; caps intact.
-Tokens by path only; rotations post-weekend. Aniket's backtracking
-read-only.
+date FIRST then stamp. Monitors: bwhegmrtw (pf shards + gpu1 night),
+bt1e1yc98 (origin poll). Union-resolve LOG conflicts upstream-first
++ stray grep. Tokens by path only. Aniket read-only. GPU 2 never.
+FLAG open: stage2_variance golden test fails pre-existing (panel
+lane's, live-leaderboard-coupled).
