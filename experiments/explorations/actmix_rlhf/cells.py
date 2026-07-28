@@ -204,6 +204,7 @@ PF_ARCH = "agentic_txc_02_v1t"
 # "§ 5.1 sparse-probing anchor". This is the anchors' native stream, and the
 # same one the btk arm trains on, so anchor and sweep are comparable.
 PF_DATASOURCE = "gemma_2_2b_base_l12_phase7"
+PF_WARMUP_STEPS = 0  # sweep cells only — see pf(); anchors are exempt
 
 
 def _pf_batch(T):
@@ -217,15 +218,35 @@ def _pf_batch(T):
     return 1024
 
 
-def pf(T, seed=SEED):
+def pf(T, seed=SEED, *, anchor=False):
+    """`anchor=True` FREEZES the training_cfg at the staging-time recipe.
+
+    The T5 cells carry upstream's own weights and are eval-only, so their
+    train_key exists purely to locate a staged checkpoint. But train_key
+    hashes the whole training_cfg, so a sweep-recipe change (mac-d's catch
+    cb34e6f4b: warmup_steps=0 rotates 840e48bb -> ccfebb85) would leave the
+    staged weights unresolvable and the runner would SILENTLY RETRAIN them
+    — destroying the port-vs-paper comparison the arm exists to make.
+    Anchors therefore do not follow sweep-recipe edits; `lane_pf_anchor`
+    additionally hard-asserts the staged file is present.
+    """
+    tc = TrainingConfig(
+        n_steps=N_STEPS, batch_size=_pf_batch(T),
+        arch_hparams_override={"d_sae": D_SAE, "T": T, "k_pos": 100 * T})
+    if not anchor:
+        # Schedule fidelity (measured 13:28): the v2 default 1000-step
+        # warmup is a framework default, never part of the vendored
+        # recipe, and it holds lr at 20% through the window where
+        # upstream does its descent — trace ratio 3.63x vs 1.30x at
+        # step 200. Sweep cells run upstream-faithful; anchors are
+        # untouched by construction.
+        tc = tc.model_copy(update={"warmup_steps": PF_WARMUP_STEPS})
     cell = {
         "cell_id": f"rlhf_pf_agentic02_T{T}" + ("" if seed == SEED else f"_s{seed}"),
         "arch": PF_ARCH,
         "seed": seed,
         "datasource": PF_DATASOURCE,
-        "training_cfg": TrainingConfig(
-            n_steps=N_STEPS, batch_size=_pf_batch(T),
-            arch_hparams_override={"d_sae": D_SAE, "T": T, "k_pos": 100 * T}),
+        "training_cfg": tc,
         # § 8: eval substrate is CELL IDENTITY — the tag hashes into
         # eval_key (G2 incident: env-only cache resolution aliased
         # l12-BASE rows as l13-IT cells); expect-check hard-fails on a
@@ -264,8 +285,35 @@ def lane_pf_hi():
 def lane_pf_anchor():
     """CARD § 8: T5 anchor evals × 3 seeds — ckpts staged from
     txcdr-base (stage_anchors.py, phase_b provenance-manifest
-    precedent), NEVER trained here (alias rule)."""
-    return [pf(5, s) for s in (42, 1, 2)]
+    precedent), NEVER trained here (alias rule).
+
+    Hard-guarded: if a staged checkpoint is missing for a cell's
+    train_key, the runner would happily TRAIN one and the row would look
+    like a paper-weight eval while being our own 25k-step training. That
+    failure is silent and unrecoverable after the fact, so refuse to
+    build the lane instead.
+    """
+    from temp_bench.core.config import (  # local: keep module import cheap
+        checkpoint_dir, compute_data_key, compute_train_key, load_datasource)
+
+    cells, missing = [], []
+    for s in (42, 1, 2):
+        cell = pf(5, s, anchor=True)
+        tk = compute_train_key(
+            arch=cell["arch"], seed=s, training_cfg=cell["training_cfg"],
+            data_key=compute_data_key(load_datasource(cell["datasource"])))
+        if not (checkpoint_dir(tk) / "model.safetensors").exists():
+            missing.append(f"seed{s} train_key={tk}")
+        cells.append(cell)
+    if missing:
+        raise SystemExit(
+            "pf_anchor: staged paper weights not found for "
+            + "; ".join(missing)
+            + "\nThe runner would TRAIN these instead of loading upstream's "
+              "weights, silently turning the paper anchor into our own run. "
+              "Re-run stage_anchors.py (it derives keys from these same "
+              "cells), then relaunch.")
+    return cells
 
 
 # ── Seed-column lanes (Han order 2026-07-28 12:54, mac-local
