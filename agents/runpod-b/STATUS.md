@@ -30,6 +30,14 @@
   render I assist (tab_<stem>.md beside it).
 - Do NOT poach probing relu-mix T2/T4 (routed runpod-1 post-night-grid).
 
+## Durability receipts (b4ec84b04 item 2 — COMPLIANT 01:50)
+
+- 15/15 closed-lane ckpts on `han1823123123/temp-bench-data/ckpts/`
+  (ratified path, fleet script); per-file sha256 in
+  `agents/runpod-b/hf_ckpt_receipts.json`. Pre-ratification
+  `checkpoints/` prefix deleted (disclosed in LOG 01:50). rmx_b ckpts
+  push at lane drain (~11:30 — pace-corrected 100 min/cell).
+
 ## Standing
 
 - Dawn assist: 7-point fig re-renders (probing runpod-1 T6/T10 landing
