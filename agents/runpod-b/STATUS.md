@@ -25,13 +25,14 @@
 - Monitor beom9lc2s fires per completed cell (wall-log tail).
 - Do NOT poach probing relu-mix T2/T4 (routed runpod-1).
 
-## AT DRAIN: probing shard C (ee16ea041 map amendment)
+## AT DRAIN: paper-faithful OVERFLOW ONLY (card d9235755b §6)
 
-- My GPU 1 = **shard C** of the paper-faithful probing sweep (18
-  cells, runpod-1 authors card ≤05:00; split owned by card author).
-- My 02:28 T8-boundary offer crossed the amendment in flight — OPEN
-  for the card author (frees GPU 1 ~06:15, T10 trio defers as
-  certificate-evidence-only); absent uptake, run-to-completion.
+- CARD_PAPER_FAITHFUL ratified 16d26642c: 21 cells over 5 GPUs
+  (runpod-1 A/B, runpod-c C/D, runpod-a E), ETA 06:30-07:30 —
+  **"runpod-b GPU1 joins post-rmx_b (~11:30) as overflow only."**
+- My T8-boundary offer CLOSED as moot (02:40 entry). rmx_b runs to
+  completion. At drain: check for unclaimed tail cells under the
+  rebalance rule (claim in LOG BEFORE launching); likely none.
 
 ## CLOSED tonight (all PTR'd + ratified)
 
