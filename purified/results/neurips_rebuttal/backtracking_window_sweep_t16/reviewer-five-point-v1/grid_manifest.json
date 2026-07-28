@@ -1,0 +1,95 @@
+{
+  "artifact_sha256": "a816928d6e0520e027d0ef06925a43e2baec1e62e2dc1ff85b26cff5f1b6fc1a",
+  "cells": [
+    {
+      "result_sha256": "c9722119c0a94b5cffdcc0ed246a0233e7a15196d35174506850435dce1c1be2",
+      "seed": 1,
+      "window": 1
+    },
+    {
+      "result_sha256": "7a8eee2f6e1cc15de6b71037de6e2cb0a8fbe1acbc79f56e5219a79e598eb90d",
+      "seed": 2,
+      "window": 1
+    },
+    {
+      "result_sha256": "d90e44880b56993ba0666ea6cb912d06eed0c724ecffb382ed5a08f95b672455",
+      "seed": 42,
+      "window": 1
+    },
+    {
+      "result_sha256": "361a78405afa8c4c97de165b60d8a459fc4612b5468b70205e667d1604c894ad",
+      "seed": 1,
+      "window": 2
+    },
+    {
+      "result_sha256": "4b94fb7e1d640e4e8cce9030e62a0323a477b32f551e3542f073324d9822c5c4",
+      "seed": 2,
+      "window": 2
+    },
+    {
+      "result_sha256": "62e34aeda7bc1dc6cce57d800d641207962bc80f289797bc12d7b721ebf676f1",
+      "seed": 42,
+      "window": 2
+    },
+    {
+      "result_sha256": "b136d4b522c24ffce65a2e2413010a4a473c2056eaeac844017f1253cdcde191",
+      "seed": 1,
+      "window": 4
+    },
+    {
+      "result_sha256": "f2380c9e0b76876876d5832c1c1e7e7297226aad4d486ce728fb4ea959ca6314",
+      "seed": 2,
+      "window": 4
+    },
+    {
+      "result_sha256": "bad08644814d9538b8d13f054214caaaf7a3378cf98b22cc654e7ecbcec0d3d6",
+      "seed": 42,
+      "window": 4
+    },
+    {
+      "result_sha256": "5a5c895b03ab761fcc2525f93bc70d5abded6d6b263427145f603dc23c9e18fe",
+      "seed": 1,
+      "window": 6
+    },
+    {
+      "result_sha256": "a33b6dd0c2a0ba463aa5f50a6deecd8d61021dbdf6617453c9bc9deb648a8a00",
+      "seed": 2,
+      "window": 6
+    },
+    {
+      "result_sha256": "86892992eff26ee0fefdb9f8ffa6c13877034a57fd0a459801065a14dd303a88",
+      "seed": 42,
+      "window": 6
+    },
+    {
+      "result_sha256": "a08e0de385d36ee4e758c3ba93515456a602157a683b3ba5c1bf4de740120b0b",
+      "seed": 1,
+      "window": 10
+    },
+    {
+      "result_sha256": "f013723033cd6f2be517f82e73188c4420005f8d78ae66e79636fe66274d100f",
+      "seed": 2,
+      "window": 10
+    },
+    {
+      "result_sha256": "58a170546d2fd530921558211f1dab37ae6f3aecc84593a58de48cb37b5a9ed8",
+      "seed": 42,
+      "window": 10
+    }
+  ],
+  "cohort_sha256": "f397f4caf6212825bd98b1b82be932ae634f01a716fd7e3642fd3d7640b27c0b",
+  "protocol_version": "2026-07-26.t16.1",
+  "seeds": [
+    1,
+    2,
+    42
+  ],
+  "status": "complete",
+  "windows": [
+    1,
+    2,
+    4,
+    6,
+    10
+  ]
+}

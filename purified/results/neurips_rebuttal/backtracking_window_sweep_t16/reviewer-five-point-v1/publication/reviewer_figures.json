@@ -1,0 +1,18 @@
+{
+  "endpoint_windows": [
+    1,
+    10
+  ],
+  "n_cells": 15,
+  "paired_endpoint_gain": [
+    0.027882352380119962,
+    0.03671948159430183,
+    0.04657338655059204
+  ],
+  "paired_endpoint_gain_mean": 0.037058406841671276,
+  "paper_t1_s32_baselines": {
+    "SAE": 0.229,
+    "T-SAE": 0.245
+  },
+  "status": "complete"
+}
