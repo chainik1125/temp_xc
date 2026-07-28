@@ -261,8 +261,67 @@ def lane_pf_anchor():
     return [pf(5, s) for s in (42, 1, 2)]
 
 
+# ── Seed-column lanes (Han order 2026-07-28 12:54, mac-local
+#    4e04ae0e3 directive 3: "wave 1 = s42 across ALL SEVEN T", so
+#    wave-1 drain yields a renderable 1-seed 7-point pf RLHF plot).
+#
+#    ⚑ Why these are needed at all: pf_{lo,mid,hi} are T-blocked and
+#    seed-major WITHIN each T (T1/s42, T1/s1, T1/s2, T2/s42, …), so
+#    running them — even 3 concurrently — spends two cells on seeds
+#    1/2 before advancing T. The s42 column would drain LAST, not
+#    first. Seed-column-first is not expressible through the existing
+#    lane API; these lanes add the ordering, nothing else.
+#
+#    NO NEW CELLS AND NO NEW SCIENCE: every cell_id below is one the
+#    existing lanes already emit (`pf()` is the same factory, same
+#    seed, same batch schedule, same eval substrate). This is dispatch
+#    ORDER only — re-running a cell that a T-blocked lane already did
+#    is a cache-hit, not a duplicate row.
+#
+#    The _a/_b/_c thirds exist so the s42 column can be split across
+#    concurrent executors (directive 2's ~8 fleet-wide lanes). Slice
+#    boundaries are a guess at equal wall time and should be re-cut
+#    against runpod-2's measured per-cell figure: T16 runs at batch
+#    256 and T10 at 512 (upstream OOM schedule), so the _c third is
+#    the long pole.
+PF_T_ALL = (1, 2, 4, 6, 8, 10, 16)
+
+
+def lane_pf_s42():
+    """Wave 1 — s42 across all seven T (whole column, one venue)."""
+    return [pf(T) for T in PF_T_ALL]
+
+
+def lane_pf_s42_a():
+    """Wave-1 shard a: T{1,2,4}/s42."""
+    return [pf(T) for T in (1, 2, 4)]
+
+
+def lane_pf_s42_b():
+    """Wave-1 shard b: T{6,8}/s42."""
+    return [pf(T) for T in (6, 8)]
+
+
+def lane_pf_s42_c():
+    """Wave-1 shard c: T{10,16}/s42 — long pole (batch 512/256)."""
+    return [pf(T) for T in (10, 16)]
+
+
+def lane_pf_s1():
+    """Wave 2 — seed 1 across all seven T."""
+    return [pf(T, 1) for T in PF_T_ALL]
+
+
+def lane_pf_s2():
+    """Wave 3 — seed 2 across all seven T."""
+    return [pf(T, 2) for T in PF_T_ALL]
+
+
 LANES.update({
     "pf_pilot": lane_pf_pilot, "pf_lo": lane_pf_lo,
     "pf_mid": lane_pf_mid, "pf_hi": lane_pf_hi,
     "pf_anchor": lane_pf_anchor,
+    "pf_s42": lane_pf_s42, "pf_s42_a": lane_pf_s42_a,
+    "pf_s42_b": lane_pf_s42_b, "pf_s42_c": lane_pf_s42_c,
+    "pf_s1": lane_pf_s1, "pf_s2": lane_pf_s2,
 })
