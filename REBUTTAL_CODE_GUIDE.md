@@ -149,7 +149,41 @@ append-only in `results/leaderboard.jsonl`, stamped with
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. Standing caveats an agent must not trip over
+## 5. FLEET MAP — what is running on every pod (snapshot 02:35 BST 07-28)
+
+This section dates fast. **Live sources: `agents/<id>/STATUS.md`
+(each agent self-maintains its own) + the LOG tail** — trust those
+over this snapshot if they disagree.
+
+| pod | agents | GPU | running NOW | next |
+|---|---|---|---|---|
+| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0 | FREE — reserved | paper-faithful probing cells at plugin-freeze |
+| | | 1 | night-grid tail (last equivalence/btk cells) | probing shard at drain |
+| | | 2 | x6 ‖ x10 co-resident (RLHF btk T{6,10}×3; drains ~08:00-08:30) | RLHF paper-faithful grid (agentic port) |
+| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | FREE — armed | probing shard 1 at plugin-freeze |
+| | | 1 | rmx_b (relu-mix T{8,10} eq-extension cells, mid-run) | probing shard at drain; then dawn render assist |
+| **pod B** (2×H100) | runpod-c alone | 0+1 | T-scaling hill-climb (C4 k_train-anneal + t_sample attribution) — **NOT rebuttal work**; writes to `experiments/explorations/tscale/` scratch, never the canonical leaderboard | C4 chain per pyramid gates |
+| **mac-c-screen-0728** (L40S) | mac-c | — | warm-held (stated purpose) | sycgen within-domain screen (per-token baseline first), then evalage screen at generation drain |
+| **mac-d-retrain-0728** (2×H100) | mac-d | — | warm-held EXCLUSIVELY for the first hunt-KEEP matrix retrain (Han ruling: not a paper-faithful executor) | 7-T×3-seed×shuffle retrain the hour a KEEP posts |
+
+**CPU-side work in flight:** runpod-1 = paper-faithful trainable
+plugin + card (target ≤05:00) AND the protected 11:00 render
+pipeline (7-point per-k probing figs+tables + the onset-map
+certificate with traces); runpod-2 = `agentic_txc_02` port
+(vendor pattern) + RLHF 7-point render + rmx cross-pod sha
+checks; runpod-a = StruQ premeasures ($0, our bars); mac-c (local
+mac) = evalage generation via the Claude API + harness ownership +
+retryesc_gen design; mac-d (local mac) = sycgen screen support +
+next corpus card; mac-local = hub (review/ratify only, no
+compute).
+
+**Where outputs land:** canonical rows → `results/leaderboard.jsonl`;
+hill-climb scratch → `experiments/explorations/tscale/RESULTS.md`;
+hunt corpora → HF `temp-bench-data/hunt_corpora/`; checkpoints →
+HF `temp-bench-data/ckpts/<train_key>/`; figures/tables →
+`figs_writeup/`; verdicts/licences → the LOG.
+
+## 5b. Standing caveats an agent must not trip over
 
 - **A12:** the shipped c3 "T10/T20" cells are silent-T5 replicas —
   never quote the shipped c3 T-ordering; the real T-sweep is this
