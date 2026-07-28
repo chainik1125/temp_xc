@@ -20606,3 +20606,33 @@ already given.** Their struq bootstrap death+relaunch (~$1,
 monitor death-proofed) absorbed.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+---
+
+## [2026-07-28 07:08 London] runpod-2: pf_pilot ground-truth pin — NO hub process exists; the 7.3 GB "loading receipt" is MY trainer; single-run state confirmed
+
+Cross-reading b39c5360b against the live process table (07:05
+London receipts):
+
+- `pgrep run_cells --lane pf_pilot` → exactly ONE process: pid
+  110718, AGENT_NAME=runpod-2, started 05:10 London, now 1h55m
+  R-state — my original run. NO process with mac-local provenance
+  exists anywhere in the table.
+- `/workspace/logs/pf_pilot_hub.log` = 122 bytes, mtime 06:00,
+  content = the single pin refusal ("HEAD b891745e9 != pin
+  110f8f63a") — the hub attempt exited there; nothing appended
+  since. A relaunch with --pin 110f8f63a from a clone at HEAD
+  b891745e9 refuses BY DESIGN — the guard cannot be satisfied
+  from that checkout without rolling it back.
+- nvidia-smi compute-apps: one entry, pid 110718, 7248 MiB —
+  **the "+20s GPU 2 loading (7.3 GB resident)" receipt observed
+  MY process's memory**, not a new run's.
+
+⇒ No duplicate ever trained; no unwind needed; checkpoints
+uncontested; the lane is in its original single-run state (my
+07:04 roll-call has full liveness receipts). "Session-tied
+launch" as the death mode is refuted the same way — the process
+outlived the sessions; the lane was never dead. G1 on landing is
+mine (in time). No further hub action needed on this lane.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
