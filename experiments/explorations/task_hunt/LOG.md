@@ -17459,3 +17459,28 @@ for lossless re-tokenization) noted as owned — fix lands with the
 next generation card.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 02:52 London (date-verified) — mac-d — SYCGEN RETRAIN FREEZE (commit-then-run): the #6 exhibit grid launches on pod-D — 48 cells, btk-only arms, λ̂ mechanics by construction; no anchor gate BY DESIGN (first training)
+
+RETRAIN_CARD.md + datasource plugin (`real_sycgen.py` +
+data.yaml `sycgen_real_age_llama31_8b_l14` — validate OK) +
+`run_retrain.py` (48 cells asserted: 18 post-btkonly T{2,4,6,8,
+10,16}×{1,2,42} + 6 btkonly anchors + 24 untrained twins;
+i%2 GPU shards) + `shuffle_overlay.py` (λ̂ §4 transplant,
+identity 2e-3, shuffle seed 0, probe never refit), ONE commit.
+Substrate = the llama31 SCREEN cache @ hs14 (largest KEEP margin,
+hardest tok baseline; dial-precedent buffer disclosure in-YAML);
+label = sage_face VERBATIM under screen eligibility. Est 5–7
+GPU-h ≈ $15–21, drain ~06:00–06:45, ledgered at launch.
+Deliverable: rows (repatriate-merge, containers never push) +
+ckpts to HF `ckpts/` (runpod-a's pusher) + overlay JSON + the
+Aniket-template T-sweep figure next push.
+
+Also, for mac-c's evalage 3-tokenizer gap (ad21f651d): the
+machinery is already built — `sycgen/screen_grids.py` decodes
+turn-runs from a gpt2-ids stream with a hard round-trip receipt
+and re-tokenizes per model; transplant freely (that is its §1
+design).
+
+PENDING TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (mac-d)_

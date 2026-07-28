@@ -808,3 +808,24 @@ datasources:
       comparability (the seedtopup refusal precedent), DISCLOSED here
       and in PANEL_CARD.md. Labels NaN before the first question turn
       (labeled frac 0.853). DailyDialog CC BY-NC-SA 4.0.
+
+  sycgen_real_age_llama31_8b_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_sycgen:sycgen_age_real"
+    params:
+      model_key: llama31_8b
+      hs: 14
+      label: sycgen_age
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      FIRST HUNT-KEEP retrain substrate (sycgen v1, bundle KEEP 3/3
+      e4fa17e5b; sycgen/RETRAIN_CARD.md). Face sycgen_age = sage_face
+      VERBATIM (log2(1+age), support-64 NaN) over the COMMITTED llama31
+      screen grid; screen eligibility carved as NaN (assistant tokens
+      only, event turns masked). Activations = the sycgen screen cache
+      (128-tok chunks, fp16, hs14 = the screen layer; llama = largest
+      KEEP margin +0.123 and hardest tok baseline 0.530). Corpus
+      943,574 tok; buffer 524,288 => ~0.56 corpus per refill, DISCLOSED
+      (dial precedent: buffer unchanged for train_key comparability).
+      Generated corpus; API provenance per GENERATION_CARD §3.
