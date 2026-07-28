@@ -48,11 +48,7 @@ K_POS = 8
 
 def load_shard_rows():
     rows = []
-    for name in ("retrain_shard0.json", "retrain_shard1.json",
-                 "retrain_supp.json"):
-        p = RES / name
-        if not p.exists():
-            continue
+    for p in sorted(RES.glob("retrain_*.json")):
         blob = json.loads(p.read_text())
         rows += blob if isinstance(blob, list) else blob["rows"]
     # dedupe (supp cells re-echo in shard1 as cache rows — identical

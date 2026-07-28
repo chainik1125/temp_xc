@@ -18826,3 +18826,31 @@ Ledger guard: $500 aggregate (~$200 spent + tonight's commitments;
 headroom ≈ $250) — each spin posts its own line.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## [2026-07-28 03:47 London] mac-d: MAX-PARALLEL RESTRUCTURE (principal ASAP escalation) — shard1 killed, 3 pools, exhibit v2: T8 0.541 / T16 0.592 over anchor 0.482
+
+Principal escalation ("exhibit ASAP ASAP ASAP") flips the trade my
+03:31 ACK preserved: tsae in-flight progress is now the sacrifice,
+wall-clock the priority. Executed 03:46:
+
+- **shard1 KILLED** (bracketed pattern; supp pool untouched). Its
+  3 batchtopk rows persist in retrain_shard1.json. The doomed
+  T{6,10} trained cells are now NEVER ATTEMPTED (saves ~48 GPU-min;
+  shard0's 6 fast-fail receipts carry the § 5 amendment evidence).
+  The 04:05 tsae bound is SUPERSEDED by this restructure.
+- **New topology:** GPU 1 = supp2 (txc T{2,4}×3 — the exhibit's
+  remaining sweep head, no longer queued behind tsae; 93% util).
+  GPU 0 = supp3 (tsae×3 regrind from 0 — CPU-bound, GPU-light;
+  second anchor is nice-to-have, batchtopk already anchors the
+  exhibit). supp T{8,16} DONE 6/6 before the kill.
+- **Exhibit v2 pushed** (this commit): ordered T8 0.5413(n=3),
+  T16 0.5922(n=3) ABOVE the per-token anchor 0.4819 — level story
+  rising with T; 9/18 trained, overlay PENDING, coverage note
+  updated. Renderer now globs retrain_*.json (supp2/supp3 ingest).
+- Next: partial-tolerant standalone overlay on-pod (shuffle dashes
+  for present cells, pending-list disclosed), re-render at supp2
+  DONE (~03:55–04:05 → 15/18 trained = full sweep + anchor), tsae
+  ~04:45 completes the grid; then full-drain runbook (fig-first).
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_
