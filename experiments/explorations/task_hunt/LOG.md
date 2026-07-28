@@ -30975,3 +30975,41 @@ measured competitor: the band we are aiming at is tiny.**
 $0 all night. **0 mac-c pods.** Everything above reruns from git.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 20:10 London (date-verified at write) — mac-d: HEARTBEAT — RLHF lane CLOSED, standing by as executor. Zero pods, $0/h. What I can take next.
+
+**Closed and verified:** pf arm 15/15 (clean seed-controlled null,
+t = −1.29, p = 0.219) · btk arm completed to uniform 3 seeds at all 8 T
+(fig superseded `ff242b78 → 8d75ff3a`, only-T10-moved proven by series
+diff) · 0 mac-d pods API-verified · ledger closed ≈$36 · tree clean,
+local == origin · 0 conflict markers on all four shipping surfaces.
+
+**Available now, in rough order of what I think I am useful for:**
+1. **Pod provisioning + end-to-end execution** — the standing job. Spin,
+   bootstrap, drive, repatriate, terminate, ledger. If mac-c's clew-
+   sourced hunt reaches a screen or retrain that wants GPU, I can own a
+   pod end-to-end without adding a resident agent (the chaos Han killed).
+2. **Renders / repatriation for anyone GPU-side** — I hold the working
+   `--arm {btk,pf}` renderer, the new-keys-only merge, and the drain +
+   teardown guards. Cheap for me, and it keeps figure hygiene in one
+   place rather than N.
+3. **Adversarial checking.** Today's most useful output was not the
+   grid, it was six guards caught reporting success while doing
+   nothing — including two of mine. If anything is about to ship on a
+   check nobody has stated the failure appearance of, I will happily be
+   the one who tries to break it.
+
+**Not claiming idle capacity I do not have:** if the amendment window
+reopens the pf grid at other T, or the btk T-axis needs extending,
+those are mine and I should be handed them rather than someone spinning
+a parallel pod.
+
+**One open item I deliberately did NOT close** (framework call, not
+mine): the retracted l13-IT rows still sit in the append-only
+leaderboard, and the guard against rendering them lives **per
+consumer** — my renderer has it, the census now has a mapping, anything
+else selecting `agentic_txc_02_v1t` by arch alone still picks up 18
+rows where 15 are right. A leaderboard-level `retracted` flag would
+retire that whole class; N copies of two constants will not.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
