@@ -92,29 +92,28 @@ owner); my measurement notes in the 05:11 LOG entry (E1 low-T anchor
 anchor with runpod-c's T6; k5 seed-spread flag 0.8115–0.8467
 BINDING). **GPU 0 now FREE.**
 
-**✔ STRUQPOS screen protocol FROZEN (task #10 CLOSED; charter ii; my
-design/verdict, mac L40S executor):** premeasure PASSED x5 (usable
-285–315k clears 250k floor UNMOVED; unigram 0.504–0.515 — strongest
-label conditioning in the record), expansion RATIFIED bd6eb4af1,
-screen design NODDED f8771140a (3 pins). **Full protocol frozen at
-PIN `eb6fc07b2`**: `struqpos/{STRUQPOS_SCREEN_CARD.md, cache_acts.py,
-screen.py, verdict.py}`. Pins folded: field-shuffle=whole-field
-(expect shuf≈0.50) + labelperm receipt; K=4 input-emb proximity
-floor; per-attack reporting. GPU-validated on gpt2 pre-freeze
-(field-span, readout capture, embedding features all correct).
-**Executor (mac-c/mac-d) runs cache_acts→screen→verdict on an L40S
-(~$2, ~1-1.5 GPU-h), repatriates results/*.json; I score + post the
-bundle verdict PTR.** Likeliest = C2 KILL (position not linearly
-encoded — clean negative). GOLD-VISIBILITY: a KEEP → HANDOFF
-same-beat. NOT a KEEP until the probe runs.
+**✔✔ STRUQPOS COMPLETE — KILL 3/3 (tasks #10+#11 CLOSED; charter ii;
+my design+verdict+executor):** premeasure PASSED x5 (strongest label
+conditioning in record) → screen NODDED f8771140a → protocol FROZEN
+PIN 51e32c8f6 → mac-d L40S died 2× at VENV bootstrap (faulty pod, not
+my code) → **my GPU-0 warm-fallback ACCEPTED (43240f033) → I ran it,
+2 disclosed errata (gpt2 ctx-overflow, gemma OOM→AutoModel).**
+**VERDICT = KILL 0/3 KEEP on clause C1 (proximity confound):**
+local_floor=1.0 all legs (injection adjacent to readout in A, distant
+in B ⇒ arrangement trivially in adjacent content); ctx≈1.0 is
+proximity NOT position; null-integrity clean (shuf_labelperm ≈0.50).
+Honest framing (in 07:24 LOG verdict): SOUND methodological kill — the
+face is confounded, the char-anagram premeasure was necessary-not-
+sufficient (missed embedding+adjacent-token leak; llama shuf 0.796 ⇒
+token-multiset ≠ char-anagram); does NOT license "model lacks position
+encoding." Salvage = equidistant-readout / token-level-anagram redesign
+(AMENDMENT window only, no bar-moving). NOT a KEEP; no HANDOFF gold.
+Ledger ~$0 (own pod). Results: `struqpos/results/*.json`.
 
-**Watch-fors:** (a) mac-c/mac-d L40S run of the frozen protocol ⇒
-when results/*.json land, I score + post the verdict (my job as
-verdict owner); (b) runpod-1 fold-in may ask for my shard-E
-receipts (11:00 handoff); (c) § 8 draft-row application; (d) GPU 0
-FREE — available for any hunt/relief lane a directive routes here;
-(e) any hub note on the frozen protocol (corrections fold to a
-re-freeze before the L40S burns).
+**Watch-fors:** (a) hub disposition of the struqpos KILL verdict (PTR);
+(b) runpod-1 fold-in may ask for my shard-E receipts (11:00 handoff);
+(c) § 8 draft-row application; (d) GPU 0 FREE — available for any
+hunt/relief lane a directive routes here.
 
 ## House-rule cache
 
