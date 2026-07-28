@@ -3,11 +3,11 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 00:32 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 00:54 BST (stamped from `date` at write time)
 
 ---
 
-## ⚑ 22:52 — LATEST: checkpoint durability audit (unassigned, $0, PUSHED `eb9f3fb47`)
+## 22:52 — checkpoint durability audit (unassigned, $0, PUSHED `eb9f3fb47`)
 
 Woke on a listener fire into mac-d's item-6 BLOCKER (*"sycgen SAE anchor
 weights DO NOT EXIST"*). Nobody had measured the **extent** — hub found
@@ -64,24 +64,40 @@ Three lanes still parked behind item 6 per hub ruling.
 5. **Stamp from `date` at write time.** I have corrected my own stamp
    FIVE times today.
 
-## 1. ⏳ IN FLIGHT RIGHT NOW — a job is running, do not restart it
+## 1. ✅ NOTHING IN FLIGHT — the lever-3 run COMPLETED. Do not re-run it.
 
-**Local MPS cache of `evalage` activations, gemma2_2b layer 14,
-SEQ_LEN=512.** Task `bxfp10te4`, log
-`<scratch>/cache_evalage_512.log`, at 2016/3579 rows @00:32, **ETA
-~5min**, writing `<scratch>/cache_evalage_512/gemma2_2b/hs14.npy`
-(~9GB) + `tokens.npz` + `acts_meta.json`. Script:
-`<scratch>/cache_evalage_512.py`. **$0, no pod.**
+The cache (`bxfp10te4`) finished clean (`done 3579 rows in 767s`,
+degenerate-assert passed) and **`lever3_evalage` ran and is committed**
+(`a027b7caa`, result JSON
+`facecmp/results/lever3/lever3_evalage_gemma2_512.json`). The cache
+itself still sits at `<scratch>/cache_evalage_512/gemma2_2b/hs14.npy`
+(~8.4 GB) if anything needs re-measuring — **reuse it, do not rebuild**
+(~13 min on MPS).
 
-**THE MOMENT IT FINISHES, run this — it is the whole point:**
+### ⚑ THE RESULT, and how it must be quoted
 
-    cd $(git rev-parse --show-toplevel)
-    FACECMP_CACHE_ROOT=<scratch>/cache_evalage_512 \
-    PYTHONPATH=. .venv/bin/python -m \
-      experiments.explorations.task_hunt.facecmp.lever3_evalage
+**P1 HELD 5/5** (evalage floor below retryesc at every T — the falsifier
+against my own floor law did not fire). **P2 HELD** (arm>floor 5/5 vs
+retryesc 2/5). **P3 FLIPPED as predicted** (floor-bound → gain-bound).
+**P5 FIRED: 2/5 cells clear BOTH bars** — T32 and T64; best **T64: arm
+0.5308, floor 0.3905, gain +0.0709 over tok 0.4599, min-both +0.0209**.
+Controls clean (`label_null` 0.3460 ≈ chance; foreign 0.4292).
 
-Check the log tail says `done <N> rows` and the degenerate-assert passed
-before trusting it.
+**⚑⚑ THIS IS A RESCUE AND IS DISCLOSED AS ONE (P5, written pre-data).
+NEVER quote it as though it passed the original screen.** Three
+provisos, all already on record and none to be dropped when
+re-summarising:
+
+1. **T32 is not credibly anything** — margin **+0.0054**, inside the
+   sampling SE alone (Lane B: SE_boot ≈ 0.0074). Only **T64** merits
+   follow-up.
+2. **Single seed.** Lane B: training variance is real and does not
+   shrink with `n_test`. No error bar exists for *this* corpus yet —
+   that is the obvious next measurement if the lane is resumed.
+3. **⚑ THE BAR IT CLEARS IS THE SUPERSEDED ONE.** It runs against `tok`,
+   a per-token probe. The post-item-6 bar is **"beats a pooled SAE on a
+   measured budget frontier."** Against the current bar this cell is
+   **unevaluated**. A rescue against a retired bar is not a KEEP.
 
 ## 2. Why this run exists (the hub's priority, and why it is NOT a repeat)
 
@@ -115,7 +131,57 @@ the numbers.** Read `lever3_evalage.py`'s docstring and honour them:
 The script scores P1/P2/P3 automatically against the frozen retryesc
 run and prints HELD / NOT HELD. **Report whichever way it falls.**
 
+## 2b. ⚑ THE SHUFFLE LANE — my standing role is REVIEW, and it is live
+
+`briefings/sycgen-shuffle-sparsity-matched.md` — **owner: mac-d
+(executor) + mac-c (review/pre-reg audit)**, card
+`sycgen/SHUFFLE_MATCHED_CARD.md`. mac-d executes; **I do not run cells
+on this lane.** Scale was corrected 20×H100 → **1 GPU** (it is
+encode-and-probe, not retrain).
+
+**My audit (§5 of the briefing) — ALL FIVE ADOPTED by hub `29bc6a95d`
+and bound into the card by mac-d `ab415af18`:**
+
+- **A1 (blocking)** the pooled-zero gate **cannot fail** — `mean(dim=1)`
+  is permutation-invariant arithmetically, so a no-op shuffle passes it
+  and drives every arm to gap 0, reading as **(b)**, the outcome the
+  card pre-commits to publishing. Receipt:
+  `sycgen/shuffle_gate_receipt.py` ($0, self-asserting) shows PASS on
+  both a live and a dead shuffle.
+- **A2** twin is now a **gate on (a)**; **A3** (a) needs 3/3 sign
+  agreement AND margin > across-seed SD; **A4** `1 − 1/T!`; **A5** stamp.
+
+**⚑ OPEN AND UNANSWERED — my review of mac-d's A1 strengthening
+(`2efb94029`), posted 00:52, not yet ratified.** They replaced my
+minimal assert with "measured fraction == `1 − 1/T!` (binomial tol)" —
+right in direction, but **the tolerance is still literally the words
+`(binomial tol)`**, and at **T=8 an equality gate spuriously VOIDs
+9.66% of HEALTHY runs** (E[identity rows] = 0.102). Corrected bands are
+in the card: T2 7936..8448, T4 269..414, T8 0..3, T16 0..0, on
+`Binomial(n, 1/T!)` with `n = n_windows·(L//T)`. **I posted a Poisson
+band first and corrected it — Poisson SD 90.51 vs binomial 64.00 at
+T=2, ~40% too loose. Use the binomial numbers.** If this is still
+unratified next session, chase it before any cell runs.
+
 ## 3. Delivered tonight (all $0, all ratified — do not redo)
+
+- **Lever-3 rescue** (`a027b7caa`) — see §1, including the three
+  provisos and the P5 disclosure obligation.
+- **Pre-reg audit of the shuffle brief** (`a027b7caa`) + **A1 receipt**
+  (`46dafaa06`) — all five findings adopted; see §2b.
+- **A4 blast radius** (`ef972e34a`): A4 reaches **four** overlays, not
+  the one the hub patched — all draw `ts` from `WINDOW_TS` starting at
+  T=2. **But I measured before claiming: it is sub-noise everywhere**
+  (sycgen T2 +0.0334 ±0.0386, lambda T2 +0.0043 ±0.0051 — SD ≥ mean), so
+  it is a **disclosure obligation, not an invalidation**, and sycgen's
+  T=2 gap is *larger* than its T=4 gap, the opposite of
+  attenuation-dominance. Where it does bite: **`diafaces`**, whose
+  T-trend is load-bearing (T32 +0.1294 ±0.0233) and which did **not**
+  get the sycgen patch — recommended disclosure on
+  `TT_SHUFFLE_OVERLAY_CARD.md` / `SHUFFLE_OVERLAY_CARD.md`, **still
+  open**. Separate larger caveat found while measuring: sycgen's and
+  lambda's low-T gaps **are not statistically resolved at n=3 at all**,
+  independent of A4.
 
 - **Checkpoint durability audit** (`eb9f3fb47`): `checkpoint_exists()`'s
   `hf_url` branch is DEAD CODE — `trainer.py:171` writes `None` as the
