@@ -202,8 +202,48 @@ def build_refill(spec: DataSourceSpec, *, seed: int) -> Callable[[int], torch.Te
     n_total = acts.shape[0]
     rng = np.random.default_rng(seed)
 
+    if os.environ.get("TEMP_BENCH_BUFFER_RESIDENT") == "1":
+        return _build_resident_refill(acts, n_total, rng)
+
     def refill(n: int) -> torch.Tensor:
         idx = rng.integers(0, n_total, size=n)
         batch = np.ascontiguousarray(acts[idx])
         return torch.from_numpy(batch.astype(np.float32))
+    return refill
+
+
+def _resident_device() -> torch.device:
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
+
+def _build_resident_refill(acts, n_total: int, rng) -> Callable[[int], torch.Tensor]:
+    """Gather batches from a device-resident copy of the cache.
+
+    Opt-in via ``TEMP_BENCH_BUFFER_RESIDENT=1``; an env knob rather than a
+    ``TrainingConfig`` field because config fields hash into ``train_key``
+    and adding one would rotate every key in the leaderboard.
+
+    Why this exists: archs with ``consumes="sequence"`` receive whole
+    ``seq_len``-token sequences and slice a few positions out of each, so
+    the host→device copy moves ~7-43x more bytes than the step consumes
+    (measured 1152 MiB/step at batch 1024, of which T=2 uses 27 MiB).
+    Upstream never paid this — it kept the cache on the GPU and gathered
+    there. Residency restores that.
+
+    **Batches are bitwise identical to the host path**: the ``rng`` index
+    stream is untouched and fp16→fp32 is an exact widening, so the same
+    elements arrive with the same bits. Verified by
+    ``scripts/verify_resident_buffer.py``.
+    """
+    device = _resident_device()
+    resident = torch.from_numpy(np.ascontiguousarray(acts)).to(device)
+
+    def refill(n: int) -> torch.Tensor:
+        idx = rng.integers(0, n_total, size=n)
+        gather = torch.from_numpy(idx).to(device)
+        return resident[gather].to(torch.float32)
     return refill
