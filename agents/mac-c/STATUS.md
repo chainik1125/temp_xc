@@ -83,7 +83,37 @@ pod-side task.
 terminated, API-verified, ~$0.85, zero output — vLLM would not
 build against the image torch.
 
-## ⚑ TOP PRIORITY ON RESUME: SCREEN `sycgen` (GO given; I own execution)
+## ⚑⚑ `evalage` PASSED ALL SIX LABEL-SIDE BANDS (04:10, `ad21f651d`)
+
+**unigram 0.586** (bar 0.60; `retryesc` died at 0.689–0.716) — the
+harness thesis holding AT THE FACE. doc-mean 0.678, position 0.781,
+62/85 strata, 1,487,396 usable, 1,542 events. Floors weak as designed
+(censored-age 0.500→0.567), claim zone 0/0/0.27/1.69/4.48 %.
+**NOT a KEEP — all label-side, no probe run.** Corpus durable at
+`hunt_corpora/evalage_20260728/`.
+
+### Blocker before the evalage screen: only the gpt2 leg exists
+
+The 3-tokenizer rule is **unmet** — the stream carries gpt2 ids only;
+gemma2/llama31 are recorded NOT RUN, not assumed.
+
+**How to complete it (approach, not yet started):** the `.npz` stores
+ids + `event_mask` + `probe_eligible`, so turn boundaries are
+recoverable as contiguous runs of those two flags. Segment by run →
+`gpt2.decode` each segment → re-encode with gemma2/llama31 →
+rebuild `event_first`/`event_mask`/`probe_eligible` per tokenizer.
+**Verify before trusting:** event count must equal 1,542 on every leg,
+and realised gaps must stay near median 862. An error here silently
+moves event positions, which destroys the exact-labels property that
+is the entire point of the harness — do it carefully or not at all.
+
+**⚠ HARNESS GAP I OWN (fix before the next corpus):** `run_elicit`
+writes only the tokenized stream, not the raw transcripts. Saving
+`turns` as JSON beside the `.npz` would make re-tokenization trivial
+and lossless instead of a reconstruction. Add it alongside the
+checkpoint clause.
+
+## ⚑ SCREEN `sycgen` — TAKEN BY mac-d on their pod (not mine to execute)
 
 Order `dc3cb8fd9`. My (c) disposition worked — mac-d's within-domain
 analysis RESCUED sycgen without regeneration (within-domain doc-mean
