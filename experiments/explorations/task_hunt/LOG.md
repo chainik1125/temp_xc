@@ -35975,3 +35975,68 @@ it.
 
 _Recorded-by: claude-opus-5 (mac-d)_
 
+
+---
+
+## 2026-07-29 00:34 BST — ⚑⚑ HUB: sycgen SHUFFLE ablation, sparsity-matched — ISSUED, and it contains a trap that would have produced a TAUTOLOGY
+
+**Han found a real gap:** the two sycgen exhibits rest on **different
+comparisons and nothing crosses them.** The shuffle figure compares
+against a per-token anchor (the framing Dmitry's challenge undermined);
+the budget table has **no shuffle dimension at all** (`frontier.json`
+carries no shuffle key — verified). **Nobody has asked whether the
+ordered−shuffled gap survives against a sparsity-matched SAE.**
+
+Brief: `briefings/sycgen-shuffle-sparsity-matched.md`. **Han authorized
+up to 20 simultaneous H100s.**
+
+### 1. ⚑ The trap, verified before the brief was written
+
+    pooled  ordered vs shuffled : IDENTICAL  max|diff| 5.96e-08 (float noise)
+    stacked ordered vs shuffled : DIFFERENT  max|diff| 4.12
+
+**Mean-pooling per-token codes is PERMUTATION-INVARIANT.** Pooled's
+ordered−shuffled gap is **exactly zero, always, on any data, for any
+model.**
+
+**Had this run naively, TXC would have "beaten pooled" on the shuffle
+gap BY CONSTRUCTION, and we would have published a mathematical
+identity as a result** — the most flattering possible framing, arrived
+at honestly, and completely empty. **That is the same shape as the
+per-token free-lunch artifact from four hours ago**, which also looked
+like a strong finding until someone asked what the axis actually was.
+
+### 2. What the design becomes
+
+- **pooled = INSTRUMENT CHECK, not comparator.** Its gap MUST be 0.
+  **A non-zero pooled gap voids the entire run.** Check it first.
+- **stacked = the real baseline.** Concatenation is position-dependent,
+  so stacked gets order **free from architecture, with no temporal
+  learning.** That is the null the claim must beat.
+- **⇒ THE CLAIM UNDER TEST: TXC's gap > STACKED's gap at matched
+  measured budget.** Reporting against pooled measures an identity.
+
+### 3. Pre-registered outcomes
+
+**(a)** TXC > stacked ⇒ order used beyond what concatenation supplies.
+**(b)** TXC ≈ stacked ⇒ **architectural position-sensitivity, not
+learned temporal structure** — and this is the **live** hypothesis,
+because sycgen's original shuffle claim **already dissolved once under
+exactly this pressure** (untrained twins showed *larger* gaps than
+trained). **(c)** TXC < stacked ⇒ negative. **(d)** indistinguishable at
+n=3 ⇒ neither win nor loss.
+
+**Untrained twins are MANDATORY** — they are what killed the original
+claim; a trained-only gap is not evidence.
+
+### 4. Scale, with tonight's hard-won operational notes attached
+
+20×H100 ≈ **/h — authorized is not free**; pre-spend estimate before
+launch, ledger both ends, terminate + API-verify. Carried into the
+brief so the scale is usable: **read `cpu.max`/`memory.max` never
+`nproc`/`free`**; **`max_tasks_per_child=1`** (per-process
+`_SYNTHETIC_CACHE`); **24.5 GiB/worker peak** on concurrent load;
+**verify weight existence FIRST** — `checkpoint_exists()` means "on
+this box" and `cache t=True` is a literal.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
