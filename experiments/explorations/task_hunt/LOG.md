@@ -36271,3 +36271,84 @@ next reader than a silent one.
 Cost tonight: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 00:5x BST — ⚑⚑ HUB RULING: mac-c's pre-registration audit of the shuffle brief — **ALL FIVE ADOPTED, A1 BLOCKING, and A1 is the same trap one level up from the one I caught**
+
+mac-c audited the brief I issued 20 minutes earlier and found four
+defects plus a stamp error. **All adopted. Details in the briefing §6;
+this entry records what it means.**
+
+**A1 — I pre-registered a conclusion that a dead instrument would
+manufacture through a passing gate.** §1 of my brief caught a tautology
+in the *comparator* (pooled's shuffle gap is zero by construction) and
+made pooled-zero the instrument gate. **mac-c saw that the gate is
+itself tautological.** `frontier.py:119` is `z.mean(dim=1)`;
+permutation-invariance of a mean is **arithmetic**, so pooled's zero
+survives *any* bug in the shuffle. The gate tests **pooled**. It never
+tested the **shuffle**. And the failure it misses — a silently no-op
+shuffle — sends every arm to gap≈0, **passes the gate**, and reads as
+**(b) architectural-not-learned**, which my own §2 names the live
+hypothesis and §4 pre-commits to publishing.
+
+**They verified absence at source rather than asserting it**: no assert
+that `tiles_sh` differs from `tiles_ev` exists anywhere in the repo;
+the existing `IDENTITY_TOL` assert is a *replication* guard on
+`|canonical_r − recomputed_r|` and says nothing about the shuffle;
+`shuffle_within_window` never checks the permutation is non-identity.
+Fix is one line on the **input** side, arm-independent, upstream of
+every encoder.
+
+**STANDING RULE, new: a gate and a positive control are different
+objects.** A gate says the comparator is honest; a positive control
+says the instrument is alive. Tonight has now produced *three* cases
+where a check's failure was indistinguishable from its success — the
+zsh word-split sweep, the per-token free-lunch axis, and this.
+
+**A4 REACHES BACK INTO A DELIVERED EXHIBIT, and I measured it rather
+than accepting `1/T!`** (20k rows per T): rows identical to ordered =
+**0.501 / 0.042 / 0.000 / 0.000** at T = 2/4/8/16. `per_row=True` draws
+an independent `randperm(T)`, which is the identity with probability
+`1/T!`. **At T=2 half the "shuffled" condition IS the ordered
+condition.** Common-mode at fixed T, so the **level** story is safe —
+but the T-sweep carries a `1 − 1/T!` term that rises with T
+**regardless of the phenomenon**. A first-order correction (≈0.067 /
+0.024 / 0.040 / 0.063) **removes the apparent trend entirely and makes
+T=2 the largest cell.** Disclosure added to
+`figs_writeup/tab_sycgen_shuffle_tsweep.md`, with the correction
+labelled **an order-of-magnitude check that must NOT be quoted** —
+the probe is fit jointly across rows, so the gap is not a linear
+mixture and the correction is only approximate. **It is enough to
+forbid a trend reading; it is not enough to publish numbers.**
+
+**The binding quote-form already said "the claim is the LEVEL story,
+not the order story."** That was written for a different reason and it
+is what keeps the exhibit safe. **A conservative framing adopted early
+paid for a defect discovered nine hours later.**
+
+**A2/A3 were left to me and are now fixed numbers, before data:** the
+untrained twin becomes a **gate on (a)** rather than a column (as
+written, (a) and "not learned" could both fire, pointing opposite ways,
+with nothing to arbitrate — and that combination is historically what
+happened here); and **(a) requires the trained-TXC gap to exceed
+stacked in ALL THREE seeds** (sign test, one-sided p=1/8) **AND the
+mean margin to exceed the across-seed SD of the per-seed margin.**
+Everything else is (d). Same form governs the twin gate.
+
+**A5: my frontmatter stamp was ~40 minutes in the FUTURE** — written
+from elapsed-feel, not `date`. Same class as the ~2h LOG misdating
+earlier tonight. Fixed.
+
+**COST/BENEFIT, stated because it should drive the next decision: ~40
+minutes of $0 review against a run with 20×H100 authorized.** Four real
+defects, one of which would have produced a publishable-looking result
+from a dead instrument.
+
+**THE GENERALISATION, and it is uncomfortable: the gate I was most
+confident in was the hollow one — and I was confident BECAUSE §1's
+tautology-catch had just succeeded.** Catching a subtle error primes
+you to trust the fix, and the fix inherited the flaw. **A check that
+just caught something is not thereby a good check.** Pair it with the
+00:41 lesson and the shape of tonight's errors is clear: **they lean.**
+Three times now the most flattering available reading arrived honestly
+— the free-lunch axis, the biased comparator, and a gate that would
+have certified a dead instrument as the pre-registered result.
