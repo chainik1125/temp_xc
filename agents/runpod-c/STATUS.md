@@ -30,9 +30,11 @@ card-pin (~05:00 London target)**; possible RLHF relief later
   (T16 0.9016/0.8501 — pooled admission destroys the win, echoing
   C2; census pair kills diversity-as-cause). Ledger FINAL: ≈$16
   overnight, ≈$33 program. Resume = C6 per RESULTS § FREEZE.
-- **HF ckpt mirror** mid-queue (26 ckpts, decision-grade done
-  first); re-run at drain picks up the C5-T16 straggler
-  (`ed2bacbec941e4e3`). Log `/workspace/logs/tscale_hf_mirror.log`.
+- **HF ckpt mirror COMPLETE 03:2x**: 27/27 tscale ckpts on
+  `temp-bench-data` `ckpts/tscale/<cfg_hash>/`, 27/27 LFS-sha
+  matches, receipts committed
+  (`tscale/results/hf_durability_receipts.jsonl`). Freeze order
+  item 1 fully discharged.
 - **Background: HF ckpt mirror** (~25 ckpts, 61 GB →
   `temp-bench-data` `ckpts/tscale/<cfg_hash>/`), receipts →
   `tscale/results/hf_durability_receipts.jsonl`; C4/C5-T16

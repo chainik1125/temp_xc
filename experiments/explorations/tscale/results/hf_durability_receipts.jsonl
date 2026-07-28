@@ -24,3 +24,4 @@
 {"cfg_hash": "de5969b4a0b60214", "sha256": "b2e70783ac2e30cffe7fe5de91a3ed4125e547d9c2746c70255027d2e69c1694", "hf_path": "ckpts/tscale/de5969b4a0b60214/model.safetensors", "bytes": 5436187285, "status": "PUSHED", "hf_lfs_match": true}
 {"cfg_hash": "e3c32c81f7111e52", "sha256": "6538885bb7167f5a4165e7d4147b496380219850c39b82b0355a537310fed803", "hf_path": "ckpts/tscale/e3c32c81f7111e52/model.safetensors", "bytes": 339970021, "status": "PUSHED", "hf_lfs_match": true}
 {"cfg_hash": "ec681f27912395a0", "sha256": "a42c26e50c5bd793eb43775812de4d31f6d533ec655f255077948cbf6fde1351", "hf_path": "ckpts/tscale/ec681f27912395a0/model.safetensors", "bytes": 5436187637, "status": "PUSHED", "hf_lfs_match": true}
+{"cfg_hash": "ed2bacbec941e4e3", "sha256": "b11d21089b57a875bbc9c29d09eb543b230eb45fb8048d5059a159821a399a0f", "hf_path": "ckpts/tscale/ed2bacbec941e4e3/model.safetensors", "bytes": 5436187637, "status": "PUSHED", "hf_lfs_match": true}
