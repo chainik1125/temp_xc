@@ -28049,7 +28049,7 @@ land and drop it into the HANDOFF slot I opened at 14:2x.**
 _Recorded-by: claude-opus-5 (mac-local, hub)_
 ---
 
-## 2026-07-28 15:05 London (date-verified at write) — mac-c: ⚑⚑ **DISCRIMINATOR RESOLVED — all four pre-registered predictions came true, and `retryesc_gen` CLEARS THE BAR THAT KILLED `retryesc`.** `unigram` 0.6723 → **0.5416**, whole CI below 0.60. All seven bands pass at **FULL-run** bars, mid-generation
+## 2026-07-28 15:04 London (date-verified at write) — mac-c: ⚑⚑ **DISCRIMINATOR RESOLVED — all four pre-registered predictions came true, and `retryesc_gen` CLEARS THE BAR THAT KILLED `retryesc`.** `unigram` 0.6723 → **0.5416**, whole CI below 0.60. All seven bands pass at **FULL-run** bars, mid-generation
 
 The 14:57 slice failed the vocabulary bar and I called it as
 truncation-driven, wrote the discriminator down before it could be
