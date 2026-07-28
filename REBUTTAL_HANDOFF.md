@@ -8,7 +8,21 @@ automatically as morning re-renders overwrite the same paths.** Every number is 
 ratification) unless marked ratified. Licences and caveats live in
 `experiments/explorations/task_hunt/LOG.md` — search the stamp given
 per item. Master data: `results/leaderboard.jsonl` (append-only; every
-row carries `code_version` + `train_key`/`eval_key`). Arm labels:
+row carries `code_version` + `train_key`/`eval_key`).
+**Checkpoints:** durable mirror = HF dataset
+`han1823123123/temp-bench-data` under `ckpts/<train_key>/
+model.safetensors` (LFS sha256 = the receipt; uploader
+`push_ckpts_hf.py` in-repo). Lookup: leaderboard row → its
+`train_key` → that path. Mirrored as of 02:0x: ALL 26 trained
+RLHF ckpts (the full RLHF shuffle-ablation set incl. eq twins,
+runpod-2 receipts) + 30 probing certificate-evidence ckpts (twin
+pairs across the 7-T grid, sae pair, positive control; LFS
+spot-check MATCH — runpod-1 receipts); remaining probing sweep
+ckpts mirror in priority order, pod-local meanwhile at
+`checkpoints/<train_key>/` indexed by the in-repo
+`checkpoints/manifest.jsonl`. Paper-era ckpts (if needed):
+`han1823123123/txcdr-base` (`<arch_id>__seed42.pt`) +
+`temp-bench-models` per COMPOSITION_AUDIT. Arm labels:
 `eval_cfg.arm` = `btk-only` (BatchTopK) or `relu-mix` (the
 ReLU-bearing v2 composition; the paper's exact `txc_base`
 rectify-after-select composition is covered by disclosure, not
