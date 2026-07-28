@@ -33220,3 +33220,57 @@ The under-parallelisation was **mine** to catch — I sized the pod, I
 picked `3`, and I am the one who had the cgroup lesson this morning.
 
 _Recorded-by: claude-opus-5 (mac-d)_ — PTR
+
+---
+
+## 2026-07-28 ~23:1x BST — HUB CORRECTION + a real anchor: my "~8 min/cell" was DERIVED. The measured figure is **~6.7 min/trained cell**, which makes the stall **~9× over**, not ~7×
+
+### 1. Correcting myself before Han acts on it
+
+I told Han we were *"~7× past budget for a single cell"* against **~8
+min/cell**. **That 8 minutes was DERIVED from mac-d's `$3–4 for 9
+retrains` cost estimate — it was never measured.** I checked for an
+empirical anchor and found **`wall_s` is recorded on 0 of 39 sycgen
+retrain rows**, so the successful run left no per-cell timing at all.
+
+**Quoting a derived number as a budget, in the middle of arguing that
+derived numbers are the day's failure mode.** Fourth time on this issue.
+
+### 2. The real anchor, from a receipt in this LOG (02:54 entry)
+
+> *"6 untrained failed-fast ≈$0; **6 trained ≈40 GPU-min ≈$2 burn**"*
+
+Those were the doomed T{6,10} cells — they **trained fully** and only
+died at eval on `eval_window_L % T`. So **~40 GPU-min / 6 = ~6.7 minutes
+to train one TXC cell** on the original run. **That is a measurement,
+not an estimate.**
+
+### 3. What it does to the picture
+
+**Cell 4 has now been running ~65 minutes against a measured ~6.7 min.
+That is ~9–10× over, not ~7×.**
+
+**Caveat, stated so the anchor is not over-read:** the original ran on
+pod-D, possibly different worker count and hardware, and the cache here
+was freshly rebuilt. It is an anchor, **not an identity**. But 9–10× is
+far outside any plausible variation in those factors, and the `/proc`
+evidence (RSS churning ±3 GB, `read_bytes` 0, GPU ~10%, three 15 GB fp32
+duplicates) independently explains *why*.
+
+### 4. Two independent lines now agree
+
+- **Timing:** ~65 min vs a measured ~6.7 min ⇒ ~9–10× over.
+- **Mechanism:** 3 × 15.2 GB fp32 CPU duplicates, multi-GB gathers per
+  refill, GPU held but ~10% used.
+
+They were arrived at separately and they point at the same thing. **My
+recommendation to Han is unchanged and now better evidenced.**
+
+### 5. A gap worth fixing regardless of tonight
+
+**`wall_s` is not recorded on retrain rows.** That is why nobody could
+answer "is this cell slow?" from artifacts, and why I reached for a
+derived number. **Record per-cell wall time on every retrain row** — it
+costs nothing and it is precisely the receipt this hour needed.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
