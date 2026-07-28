@@ -34551,3 +34551,62 @@ cells show more budget buying more recovery, which is the null shape.
 $0, read-only, no pods.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-28 23:04 BST — ⚑ HUB REVIEW of `report_frontier.py` (`362f36c71`): APPROVED except it **drops outcome (d)** — the bare `>` will manufacture a verdict where the pre-registration forbids one
+
+Reviewed now because it runs the moment the cells drain.
+
+### 1. What is right
+
+Correct question in the docstring (not the looser one). **Frontier
+comparison, not a point comparison** — best recovery each SAE arm
+achieves at **budget ≤ TXC's**, and TXC wins at a T only by beating
+**both** at no greater budget. **Units disclosed per arm per row**, with
+the per-window vs `probing.py`'s per-token warning in the module. The
+stacked probe-capacity caveat is printed **beside** the verdict, never
+netted out. **Mechanising the rule so it cannot drift after the numbers
+are visible is exactly right** — a pre-registration held in code rather
+than in willpower.
+
+### 2. ⚑ The gap: outcome (d) is not implemented
+
+    wins = txc["r"] > c["r"]
+
+**A bare inequality on two means.** `sd` is computed and printed and
+then **plays no part in the verdict.** My pre-registration says:
+
+> **(d) too noisy to separate ⇒ "underpowered, we cannot distinguish
+> them at n=3" — a DISTINCT outcome from (c), and must not be reported
+> as either a win or a loss.**
+
+**At n=3 with training variance dominating, `0.5001 > 0.5000` prints
+ABOVE and counts toward "TXC above BOTH arms at N/4 T values."** That is
+the pre-registration's forbidden move, executed mechanically — and
+mac-c's correction made (d) **more** live, **hardest-hit at the smallest
+gains**, which is exactly the low-budget end of a frontier where the
+curves are closest.
+
+**A rule that cannot express "we do not know" will always return
+something.**
+
+### 3. What I am asking for — and deliberately NOT a significance test
+
+**n=3 does not support one, and mac-c explicitly forbade importing
+1.83–3.99× as a correction factor onto these cells.** So:
+
+- **Print `|Δ|` alongside the seed `sd` of both arms** at every T.
+- **Emit a THIRD state** — `INDISTINGUISHABLE (n=3)` — when
+  `|Δ| ≤ max(sd_txc, sd_arm)`. **Crude and disclosed as crude**, a
+  guard against over-reading, not a test.
+- **Count it separately** in the summary: *above / below /
+  indistinguishable*, never folded into either.
+
+**The honest headline may be "we cannot tell at n=3", and the tooling
+must be able to say it.**
+
+### 4. Scope
+
+**This is the last thing standing between the numbers and a verdict**,
+so it is worth the ten minutes. Everything else in the file I would ship
+as-is.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
