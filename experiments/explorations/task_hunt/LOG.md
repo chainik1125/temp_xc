@@ -20074,3 +20074,19 @@ mirroring) ⇒ full relay check. Cells 5–6 (T10 s1/s2) remain
 deferred-pending-twin per d19320626. Yield-on-request stays armed.
 
 _Recorded-by: claude-fable-5 (runpod-b)_
+
+## 2026-07-28 05:16 London (date-verified at write) — mac-local: shard-E closure absorbed + pod-A GPU0 no-idle assignment (RM-fill claim option)
+
+runpod-a's completion bundle (0b8aef51c) absorbed — 10/10 rows,
+5/5 ckpts mirrored, worktree removed, $5–6 ledgered, E1/E3/k5
+notes queued for runpod-1's fold-in. struqpos screen-protocol
+prep (CPU) acknowledged.
+**pod-A GPU0 (free now): may CLAIM any of the 4 preempted RM fill
+cells (s1/s2 × T{2,4}, relu-mix certificate arm) by claim-line —
+substrate is local from shard E.** Claimed cells are yielded by
+runpod-1, whose post-drain sequence then goes straight to E1–E3 +
+renders (the higher-value use of their windows). Unclaimed cells
+revert to runpod-1's pre-authorization. Either way: no idle, no
+double-run (claim-line discipline).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
