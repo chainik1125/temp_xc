@@ -27986,3 +27986,64 @@ vocabulary leak. But it is Han's call how to present it, and he should
 have the option now rather than at drain. **Items 1–6 are unaffected.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 15:04 London (date-verified 14:04 UTC) — mac-local (hub): ⚑ **WAVE 1 COMPLETE — all five T at seed 42.** And I must correct my own load-imbalance number: it was **1.4×, not 2.5–3×.**
+
+### 1. Measured cell walls — extrapolation replaced by receipts
+
+    T=2   CELL-OK  wall =  592 s   ( 9.9 min)
+    T=4   CELL-OK  wall = 1208 s   (20.1 min)
+    T=6   CELL-OK  wall = 1196 s   (19.9 min)
+    T=8   CELL-OK  wall = 1691 s   (28.2 min)   <- the real long pole
+    T=10  CELL-OK  wall = 1251 s   (20.9 min)
+
+**All five pods are on seed 1. Wave 1 (s42) is DONE across
+T{2,4,6,8,10}.**
+
+### 2. ⚑ Correcting myself: my 40/60/90 min extrapolation was wrong, and so was the 2.5–3× that rode on it
+
+At 14:5x I extrapolated T6/T8/T10 ≈ **40/60/90 min** from parameter
+count. Measured: **20/28/21**. I labelled it extrapolated — which was
+right — but I then attached a **"2.5–3× faster"** headline to a
+recommendation built on it, and **that number is wrong.**
+
+**Why T10 is FASTER than T8**, which no parameter-count model predicts:
+`_pf_batch(T)` drops the batch to **512 at T ≥ 10** (upstream's own A40
+accommodation), so T10 does **half the per-step work** of T8. The
+schedule I recovered from upstream source at 13:26 is the reason, and I
+did not carry it into my own estimate.
+
+**The honest arithmetic:** total work = 3 × (10+20+20+28+21) = **297
+pod-minutes over 5 pods**. Perfectly balanced ⇒ **~59 min**. As
+scheduled, the wall is 3 × T8 = **~85 min**. **The imbalance costs ~26
+minutes — a factor of 1.4, not 2.5–3.**
+
+**Consequence for the ruling: mac-d's fix is already proportionate.**
+Moving the T1 cells onto the fast T2 pod (`774ce1d13`) is the right
+size of response; **a full longest-first rescheduler would buy ~26
+minutes and is not worth the churn now.** I withdraw the stronger
+version of my 14:5x recommendation.
+
+**Wall estimate, from measurement:** T8's pod finishes 3 seeds ≈
+14:59Z ⇒ **~16:00 London for the full 18-cell grid.**
+
+### 3. Cosmetic, but flag it before someone misreads it
+
+Every `CELL-OK` line reads `auc=None`. **The cells are fine** — I read
+T2/s1's row directly and it carries `preference_auc_k20 = 0.6119` and
+the full metric set. The driver is looking for a key called `auc` that
+the RLHF evaluator does not emit (it emits `preference_auc_k20` /
+`_k50`). **mac-d: a one-line fix, but worth doing — "auc=None" on a
+successful cell is exactly the kind of line someone reads at 02:00 as a
+broken eval.**
+
+### 4. ⚑ The deliverable consequence Han cares about
+
+**Wave 1 done means item 3's paper-faithful figure is renderable
+today** — a full-shape 1-seed curve over T{2,4,6,8,10}, plus T1 when
+the T2 pod picks it up, plus the three corrected T5 anchors as their
+own marker. Seeds 1 and 2 fill the error bars by ~16:00. **mac-d: the
+renderer is wave-1-verified; render the s42 curve as soon as the rows
+land and drop it into the HANDOFF slot I opened at 14:2x.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
