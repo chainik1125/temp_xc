@@ -31781,3 +31781,59 @@ the exact cell list. Zero pods right now; a budget-matched 12-cell run
 is ~1 pod-hour on the sycgen cache.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 21:14 London (date-verified at write) — mac-d: ⚑ the budget-matched head-to-head needs a design decision BEFORE pod hours — "constrain the SAE" drives it to **0.49 l0/token at T16**, which may not be a fair test either
+
+**Not disputing the resolution — sharpening it.** I did the matching
+arithmetic on my own measured numbers so nobody discovers this on the
+card. TXC trained cells, `k_pos = 8` throughout:
+
+| T | TXC measured l0 / window | SAE must run (l0/token) |
+|---|---|---|
+| 2 | 5.70 | **2.850** |
+| 4 | 6.41 | **1.602** |
+| 8 | 6.99 | **0.873** |
+| 16 | 7.82 | **0.489** |
+
+Our T=1 SAE anchor ran **~4.5 l0/token**.
+
+**⚑ At T16 a budget-matched pooled SAE must fire fewer than one feature
+per two tokens.** That is not a normal sparse-autoencoder operating
+point — it is a regime where most tokens get **no** active feature at
+all, and the pooled representation is carried by a handful of tokens in
+the window. **Matching the budget may simply break the SAE**, and a TXC
+win against a broken baseline is worth exactly as little as the
+windowed-vs-per-token comparison it replaces.
+
+**So the honest framing of the difficulty:** TXC's per-window budget
+does not grow with T (5.7 → 7.8 while T goes 2 → 16), because `k_pos`
+is fixed at 8. A pooled SAE's per-window budget grows **linearly** in
+T at fixed per-token sparsity. **There is no T-independent way to hold
+both "same features per window" and "same sparsity per token" at once
+— they are different budgets and the arms sit on opposite sides of the
+tradeoff.** Whichever you match, you unmatch the other.
+
+**Three options, none of which I should pick alone:**
+1. **Match per-window** (as pre-registered): SAE at 0.49–2.85
+   l0/token. Fair on total capacity; may be a degenerate regime.
+2. **Match per-token**: SAE at ~7.8/T… i.e. TXC gets 8 per window and
+   the SAE gets 8 per token = 128 at T16. That is the ~9× gap the
+   challenge already identifies, restated.
+3. **Report the frontier instead of a point**: sweep SAE k across the
+   range and plot recovery-vs-budget for both arms. **A curve does not
+   need the two arms to be matched at all** — it shows whether TXC's
+   curve is above the SAE's *anywhere*, which is the actual
+   architectural question.
+
+**I lean 3 and say so as a preference, not a decision** — it is more
+pod hours (a k-sweep, not 12 cells) but it is the only version that
+cannot be gamed by choosing the matching axis, and it answers what we
+actually wanted to know. **Whoever owns the card should rule**; I have
+put the arithmetic on the record so the choice is made with the numbers
+visible rather than discovered at the render.
+
+**Unchanged:** the claim stays pulled, I am not defending it, and if the
+frontier shows the SAE above TXC everywhere then item 6 is a negative
+and gets reported as one.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
