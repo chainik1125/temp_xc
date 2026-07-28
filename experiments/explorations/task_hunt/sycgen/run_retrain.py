@@ -1,8 +1,9 @@
-"""sycgen FIRST-KEEP matrix retrain grid (RETRAIN_CARD.md § 2).
+"""sycgen FIRST-KEEP matrix retrain grid (RETRAIN_CARD.md § 2, as
+AMENDED by § 5).
 
 The λ̂ Stage-2 design on the sycgen substrate, btk-only arms per the
 pinned matrix mapping (692cb): claiming arm
-`txc_batchtopk_post_btkonly` × T ∈ {2,4,6,8,10,16} + per-token anchors
+`txc_batchtopk_post_btkonly` × T ∈ {2,4,8,16} + per-token anchors
 (`batchtopk_sae_btkonly`, `tsae_btkonly` @ T=1), seeds {1,2,42},
 untrained twins INCLUDED (first training on this substrate — matrix
 standard). Hyperparameters inherited BY CONSTRUCTION from
@@ -10,6 +11,15 @@ standard). Hyperparameters inherited BY CONSTRUCTION from
 eval L 32, corpus-sized buffer). `eval_extra.retrain_tag` namespaces
 eval keys; checkpoints persist locally for the shuffle overlay and the
 HF ckpt push.
+
+AMENDMENT (card § 5): the launched grid listed T ∈ {2,4,6,8,10,16}
+(48 cells) — T ∈ {6,10} cannot pass the canonical eval
+(`synthetic_recovery` requires eval_window_L % T == 0, power-of-two;
+L=32, and no L ≤ seq_len 128 divides {6,10,16}, LCM 240). The λ̂
+Stage-2 template axis is (2,4,8,16); the leaderboard holds zero
+T6/T10 rows fleet-wide. The as-run shard jsons keep the 12 failed
+T{6,10} cells (ok:false, the exact ValueError) as the receipt; the
+surviving 36 cells ARE this amended grid. Not relaunched.
 
 Two-shard split for the pod's two GPUs (deterministic i%2 over the
 sorted cell list — balanced mix of arms/Ts per shard):
@@ -29,7 +39,7 @@ HERE = Path(__file__).resolve().parent
 DS = "sycgen_real_age_llama31_8b_l14"
 D_SAE = 2048
 K_POS = (8,)
-WINDOW_TS = (2, 4, 6, 8, 10, 16)
+WINDOW_TS = (2, 4, 8, 16)  # § 5 amendment: λ̂ template axis; L=32 tiles exactly
 EVAL_L = 32
 N_STEPS = 8_000
 BUFFER_TOKENS = 524_288
@@ -50,9 +60,9 @@ def cells():
     for c in cs:
         c["buffer_tokens"] = BUFFER_TOKENS
         c["eval_extra"] = {"retrain_tag": RETRAIN_TAG}
-    # 24 trained (18 post + 6 anchors) + 24 untrained twins (one per
-    # (arch, T) per seed) = 48; assert the card count.
-    assert len(cs) == 48, f"card § 2 grid is 48 cells, built {len(cs)}"
+    # 18 trained (12 post + 6 anchors) + 18 untrained twins (one per
+    # (arch, T) per seed) = 36; assert the amended card count (§ 5).
+    assert len(cs) == 36, f"amended grid is 36 cells, built {len(cs)}"
     return sorted(cs, key=lambda c: (c["arch"], c["T"], c["seed"],
                                      c["n_steps"]))
 

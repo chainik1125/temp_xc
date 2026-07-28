@@ -1,11 +1,18 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 02:3x 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 02:56 07-28)
 
-## ⚑⚑⚑ HEADLINE (02:40, pre-compact rewrite): RETRAIN GRID RUNNING — drain ~05:30–06:30
-Freeze 74d260321 (RETRAIN_CARD + datasource plugin
-`sycgen_real_age_llama31_8b_l14` + 48-cell grid + overlay
-transplant). Both shards live DETACHED on pod-D at that pin
-(i%2 split, 3 workers each; logs `/workspace/logs/retrain_s{0,1}.log`,
-watch for SHARD{0,1}-DONE). Est $15–21 ledgered at launch.
+## ⚑⚑⚑ HEADLINE (02:56): § 5 T-AXIS AMENDMENT POSTED (48→36 cells) — shard0 DONE 18/18-amended, shard1 on pace, drain ETA ~03:35–03:55
+Freeze 74d260321 launched the 48-cell grid; **T∈{6,10} cannot pass
+the canonical eval** (L=32 divisibility, power-of-two gate; λ̂
+template axis IS (2,4,8,16); zero T6/T10 rows fleet-wide) — my
+card-writing error, amended in RETRAIN_CARD **§ 5** + LOG 02:54.
+12 doomed cells = `ok:false` receipt rows in the as-run shard jsons
+(~$2 burn on the 6 trained ones, disclosed); the 36 survivors ARE
+the amended grid. Shard1 (all-trained half) left to complete —
+batchtopk T1 anchors landed r=0.470/0.487/0.489. **NOTE: pod clock
+= UTC, mac = BST — never read pod file mtimes as London times**
+(cost me a phantom-stall scare, retracted in LOG). Renderer
+`sycgen/render_tsweep.py` ALREADY WRITTEN (runbook step 4 is now
+just: run it). Est $15–21 ledgered at launch.
 
 **POD-D COORDINATES (mine, jge1fuj9hqu8et, $5.98/h, warm-hold until
 LANE done):** `ssh root@64.247.201.51 -p 16977`. Repo at
@@ -14,18 +21,22 @@ LANE done):** `ssh root@64.247.201.51 -p 16977`. Repo at
 /workspace/sycgen_caches; a git stash holds my smoke-test rows
 ("mac-d smoke rows" — pod-local audit, never push).
 
-**AT DRAIN, in order:** (1) on-pod
+**AT DRAIN, in order:** (0) advance pod checkout to the AMENDMENT
+pin (`git fetch origin arxiv && git checkout --detach <pin>` —
+overlay imports the amended `WINDOW_TS`; NEVER before SHARD1-DONE,
+workers re-import from disk); (1) on-pod
 `.venv/bin/python -m experiments.explorations.task_hunt.sycgen.shuffle_overlay`
 (reads both shard jsons; identity 2e-3); (2)
 `bash agents/mac-d/repatriate.sh 64.247.201.51 16977` then push
 rows from the mac (pull-rebase; LOG conflicts keep-both);
-(3) ckpts → HF via runpod-a's `push_ckpts_hf.py` (ratified
-`ckpts/<train_key>/`), sha receipts HERE; (4) harvest overlay json
-→ commit; WRITE the Aniket-template T-sweep figure renderer
-(ordered-solid/shuffled-dashed, per-seed faints, T=1 anchor bands,
-y = recovery r; template = the frozen probing/RLHF pair,
-`figs_writeup/`); (5) ledger ACTUALS; (6) ONE LOG bundle entry
-(PTR). THEN the lane is done → TERMINATE pod via
+(3) on-pod ckpts → HF: `.venv/bin/python scripts/push_ckpts_hf.py
+<train_key>…` for the 18 TRAINED rows' train_keys (from shard
+jsons; ratified `ckpts/<train_key>/`), sha receipts HERE; (4)
+harvest overlay json → commit; run
+`…sycgen.render_tsweep` on the mac (renderer already written →
+`figs_writeup/fig_sycgen_shuffle_tsweep.*` + summary json); (5)
+ledger ACTUALS; (6) ONE LOG bundle entry (PTR). THEN the lane is
+done → TERMINATE pod via
 `bash agents/mac-d/podctl.sh terminate jge1fuj9hqu8et` + ledger,
 UNLESS a new card claims it (check LOG first).
 

@@ -71,4 +71,34 @@ T=1 anchors are shuffle-identity by construction.
   ~06:00–06:45 London. Ledger at launch (this push), actuals at
   drain. Hunt envelope / Han $500 aggregate.
 
+## § 5 AMENDMENT — T-axis (post-launch, 02:49 2026-07-28, mac-d)
+
+**§ 2's T ∈ {2,4,6,8,10,16} was my card-writing error and is amended
+to T ∈ {2,4,8,16} (grid 48 → 36 cells).** The frozen § 2 text above
+is left untouched per governance; this section supersedes it.
+
+- **Why**: the canonical eval (`temp_bench/evals/synthetic_recovery.py`)
+  requires `eval_window_L % T == 0` with power-of-two L and T
+  (synthetic README § 4). L=32 (frozen § 2) rejects T∈{6,10}; no
+  single L ≤ seq_len 128 divides {6,10,16} (LCM 240). I conflated the
+  7-point *synthetic-lane rendering* axis with the real-cache
+  trainable axis. The actual λ̂ Stage-2 template constant is
+  `WINDOW_TS = (2, 4, 8, 16)` ("eval_window_L = 32 so every T in the
+  ladder tiles it exactly" — run_stage2.py); the leaderboard holds
+  **zero** T=6/T=10 rows fleet-wide. The amended exhibit x-axis
+  {1,2,4,8,16} is exactly the λ̂ exhibit's.
+- **Receipt**: the as-run shard jsons retain all 12 doomed cells as
+  `ok:false` rows carrying the exact ValueError (6 untrained
+  failed-fast ≈ $0; 6 trained ≈ 40 GPU-min ≈ $2 burn, disclosed).
+  The 36 surviving cells are BY CONSTRUCTION the amended grid — no
+  cell of the amended grid was affected; nothing relaunched.
+- **Decision**: shard 1 was left to complete (killing would have
+  destroyed 3 in-flight legitimate cells to save ~$2). Shard 0
+  finished 18/18 amended cells ok; shard 1 verdict at drain.
+- **Ripple**: `run_retrain.WINDOW_TS → (2,4,8,16)` + assert 36
+  (single source; `shuffle_overlay` imports it). Pod checkout
+  advances to the amendment pin AFTER `SHARD1-DONE`, before the
+  overlay runs (running workers re-import from disk — no mid-run
+  edits on the pod).
+
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)._

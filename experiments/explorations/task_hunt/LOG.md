@@ -17754,3 +17754,52 @@ Sequencing at x-drain (~08:00): substrate (~1.5 h GPU) → G2/G1
 gates → grid. 11:00 btk renders unaffected. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+---
+
+## [2026-07-28 02:54 London] mac-d: sycgen RETRAIN — § 5 T-AXIS AMENDMENT (48→36 cells) + shard0 DONE 18/18-amended, shard1 on pace
+
+**Amendment (RETRAIN_CARD § 5, stamped):** the launched grid's
+T ∈ {2,4,6,8,10,16} was my card-writing error — the canonical eval
+(`synthetic_recovery`) requires `eval_window_L % T == 0`, power-of-two
+(L=32 frozen; no L ≤ seq_len 128 divides {6,10,16}, LCM 240). I
+conflated the 7-point synthetic-lane rendering axis with the
+real-cache trainable axis. The λ̂ Stage-2 template constant is
+`WINDOW_TS = (2,4,8,16)`; the leaderboard holds **zero** T6/T10 rows
+fleet-wide. Amended axis {1,2,4,8,16} ≡ the λ̂ exhibit's.
+
+- **Receipt:** as-run shard jsons keep all 12 doomed T{6,10} cells as
+  `ok:false` rows w/ the exact ValueError (6 untrained failed-fast
+  ≈$0; 6 trained ≈40 GPU-min ≈$2 burn, disclosed). The 36 survivors
+  ARE the amended grid by construction — nothing relaunched, no
+  amended cell affected. Shard1 left to complete (killing would cost
+  3 in-flight legit cells to save ~$2).
+- **State:** shard0 (all-untrained half) DONE 18/18 amended ok in
+  205s; shard1 (all-trained) on pace — batchtopk_sae T1 anchors
+  landed r = 0.470/0.487/0.489 (screen tok_best was 0.530 —
+  coherent), ~4 min/cell, ETA ~03:35–03:55 London. NOTE pod clock =
+  UTC (mac = BST): early-session "stall" reading was my clock-mixing
+  error, retracted here.
+- **Code (this push):** `run_retrain.WINDOW_TS → (2,4,8,16)` +
+  assert 36 (single source; overlay imports it); pod checkout
+  advances to this pin only AFTER `SHARD1-DONE` (workers re-import
+  from disk — no mid-run edits). `sycgen/render_tsweep.py` written
+  ahead of drain: knob-for-knob with `render_overlay_figs.py`
+  (ordered-solid/shuffled-dashed, per-seed faints, T=1 anchor bands,
+  seed-mean ± sd), sycgen knobs card-documented: untrained-twin layer
+  in the quoted-ticks slot (no quoted panel exists — first training),
+  `_btkonly` arms, PENDING-TEAM-REVIEW corner stamp, λ̂ round-1
+  budget-match disclosure inherited (legend l0 range + NOT-matched
+  flag at min cell-mean l0 < k/2).
+- **Heads-up runpod-2/runpod-b (relu-mix x6/x10 lanes):** IF your
+  eval_window_L is 32, T{6,10} raises at eval
+  (`synthetic_recovery.py:83`) — verify your L before launch.
+  Synthetic lanes with longer seq_len can tile legitimately (L=240
+  divides all of {1,2,4,6,8,10,16}); zero non-power-of-two-T rows
+  exist on the leaderboard today, so nobody has crossed this yet.
+
+Drain runbook unchanged otherwise (STATUS): overlay → repatriate →
+ckpts→HF → figure+summary → ledger actuals → bundle entry →
+terminate. PTR.
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_
