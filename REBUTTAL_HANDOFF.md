@@ -7,14 +7,19 @@ SSH access, and the caveats an agent must not trip over.
 **Cell inventory: `REBUTTAL_CELL_CENSUS.md`** (same directory) — every
 cell we have results for, labeled {ReLU+TopK} paper-faithful vs
 {BatchTopK} btk-only vs relu-mix (the misinterpreted arm); regenerate
-with `.venv/bin/python scripts/cell_census.py --write` (cells are
-landing all night).
+with `.venv/bin/python scripts/cell_census.py --write` — **regenerate
+before quoting coverage**, and read its two check sections
+(arch-vs-stamp, substrate-pin) rather than the table alone.
 
-**Deadline: rebuttal 13:00 BST 2026-07-28; exhibits READY BY 11:00 BST**
-(Han's list, LOG ~00:35 entry). **THIS DOCUMENT SUPERSEDES the
-meeting PDF (`private/meeting_tsweep_plots_2026-07-27.pdf`) as the
-deliverable surface — plots are embedded below and refresh
-automatically as morning re-renders overwrite the same paths.** Every number is PTR (pending team
+**⚑ TIMELINE (restamped 18:0x 07-28 — the previous line said "deadline
+13:00 BST today; exhibits ready by 11:00" and that had already
+PASSED):** the 13:00 BST 2026-07-28 rebuttal window has closed;
+**responses remain amendable to Aug 3**, so every item below is in the
+amendment window, not in a same-day scramble. **THIS DOCUMENT
+SUPERSEDES the meeting PDF
+(`private/meeting_tsweep_plots_2026-07-27.pdf`) as the deliverable
+surface — plots are embedded below and refresh in place when a
+renderer overwrites the same path.** Every number is PTR (pending team
 ratification) unless marked ratified. Licences and caveats live in
 `experiments/explorations/task_hunt/LOG.md` — search the stamp given
 per item. Master data: `results/leaderboard.jsonl` (append-only; every
@@ -23,7 +28,10 @@ row carries `code_version` + `train_key`/`eval_key`).
 `han1823123123/temp-bench-data` under `ckpts/<train_key>/
 model.safetensors` (LFS sha256 = the receipt; uploader
 `push_ckpts_hf.py` in-repo). Lookup: leaderboard row → its
-`train_key` → that path. Mirrored as of 02:0x: ALL 26 trained
+`train_key` → that path. **⚑ The mirror stamp below is 02:0x and has
+NOT been re-verified since; the 21 probing pf + 15 RLHF pf ckpts
+landed after it, so their mirror status is UNCONFIRMED — check before
+relying on it.** Mirrored as of 02:0x: ALL 26 trained
 RLHF ckpts (the full RLHF shuffle-ablation set incl. eq twins,
 runpod-2 receipts) + 30 probing certificate-evidence ckpts (twin
 pairs across the 7-T grid, sae pair, positive control; LFS
@@ -35,12 +43,12 @@ ckpts mirror in priority order, pod-local meanwhile at
 `temp-bench-models` per COMPOSITION_AUDIT. **MATRIX ARM MAPPING (Han-pinned ~02:3x):** {BatchTopK} =
 `btk-only` (NO ReLU, signed selection — the delivered sweep arm);
 {ReLU+TopK} = the PAPER-FAITHFUL composition
-ReLU(TopK_{k_pos·T}(Σ)) — **probing arm LANDING THIS MORNING**
-(`paper_txc_base_v1t` sprint: 21 cells across 5 GPUs, first cells
-on the board 03:1x, ETA ~06:30–07:30); RLHF arm = the agentic_txc_02
-trainable port (runpod-2 card ~04:30; same-day target with a
-pre-approved relief pod, amendment-window fallback). Until those
-landings the archived T=5 anchors carry the paper composition.
+ReLU(TopK_{k_pos·T}(Σ)) — **probing arm COMPLETE** (`paper_txc_base_v1t`,
+21/21 cells, 7 T × 3 seeds); **RLHF arm COMPLETE** (`agentic_txc_02_v1t`,
+the agentic_txc_02 trainable port, 15/15 cells, T{2,4,6,8,10} × 3 seeds
+— see §3 for why T1/T16 are absent by design). Both landed 07-28; the
+archived T=5 anchors are now a comparison row, no longer the only
+carrier of the paper composition.
 `relu-mix` (ReLU-before-BatchTopK) is NEITHER matrix arm —
 certificate evidence only. `eval_cfg.arm` carries the row-level
 label.
@@ -96,15 +104,16 @@ panel — directly comparable to the btk figs above):**
   ∈ {5,20}, `eval_cfg.shuffle` ∈ {none, within_window}, seeds
   {1,2,42}. Datasource `gemma_2_2b_it_l13_fineweb_24k128` (paper
   probe cache; gemma-2-2b-it L13).
-- **PAPER-FAITHFUL ARMS (Han requirement — DELIVERED OVERNIGHT):**
+- **PAPER-FAITHFUL ARMS (Han requirement — BOTH DELIVERED):**
   probing: **ALL 21 `paper_txc_base_v1t` cells COMPLETE on the
   leaderboard (7 T × 3 seeds, trained ReLU(TopK_{20T}(Σ)) via the
   vendored upstream stack; E1–E3 fidelity gates incl. the
-  archived-anchor interpolation check PASSED)** — the pf+btk
-  7-point figs/tables render this morning, same paths. RLHF:
-  agentic_txc_02 trainable port frozen + substrate/anchors G2
-  PASSED; pilot → G1 in flight, grid today (relief pod
-  pre-staged), amendment-window fallback.
+  archived-anchor interpolation check PASSED)** — pf+btk 7-point
+  figs/tables rendered, same paths. RLHF: **grid COMPLETE 15/15**
+  (§3). **⚑ Correction to the superseded text here, which claimed
+  "substrate/anchors G2 PASSED": that G2 pass was on the WRONG
+  substrate (l13-IT) and was RETRACTED — see §3(ii). The re-run on
+  base-l12 is what stands.**
 - **LABELING RULE (binding, Codex-prompted):** the T-sweep arms are
   v2 compositions — label "TXC (v2, relu-mix/btk-only)", never
   "paper base"; the paper-exact composition appears only as the
@@ -121,12 +130,17 @@ panel — directly comparable to the btk figs above):**
 
 ![rlhf](figs_writeup/fig_rlhf_shuffle_tsweep.png)
 
-- **Fig:** `figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` (FINAL
-  3-seed; 7-point re-render lands ~morning, same path).
+- **Fig:** `figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` (btk arm,
+  3-seed; current artifact `ff242b78`). **⚑ Its caption still reads
+  "T6/T10 deferred" and that has gone FALSE — T6 is complete and T10
+  is draining. mac-d owns the renderer and re-renders once at drain
+  (`--tag final`, hub ruling f699c80a4); the new hash supersedes
+  `ff242b78` in the LOG.** Prose below is already corrected; the
+  figure is the lagging surface.
 - **Table (real location):**
   `experiments/explorations/actmix_rlhf/results/rlhf_table.md`
-  (regenerated by the 10:15 checkpoint render; deferral caption
-  semantics included).
+  (regenerates with the same re-render; deferral caption semantics
+  included).
 - **ARCH (explicit, anti-confusion): the RLHF TXC exhibit arch is
   `txc_batchtopk_post_btkonly` — the plain windowed BatchTopK
   crosscoder (POST composition; probing uses PRE). It is NOT
@@ -142,20 +156,24 @@ panel — directly comparable to the btk figs above):**
   selection granularity preserved via the POST composition).
   T-sweep/shuffle conclusions are statements about the plain arm.
   Every RLHF caption carries this.**
-- **Data:** `experiment=rlhf` rows, btk arm complete at
-  **T{1,2,4,5,8,16} × 3 seeds** (x4 landed via runpod-a
-  swap-drain). **btk T{6,10}: DEFERRED to the amendment window by
-  Han's paper-faithful-priority order (04:4x — "do not waste
-  resources on BatchTopK until PAPER FAITHFUL IS FINISHED"; the
-  x-lane was cancelled mid-stream and resumes only after the pf
-  grid).** The 10:15 checkpoint render ships the complete 6-point
-  btk fig with a deferral caption.
-  **RLHF PAPER-FAITHFUL ARM — STATUS 14:1x (SUPERSEDES the 13:0x
-  "deferred to Aug 3" block; that block's premises were all
-  subsequently falsified by measurement — see below).** The grid is
-  **RUNNING NOW on 6×H100**, not deferred.
+- **Data:** `experiment=rlhf` rows, btk arm at **T{1,2,4,5,8,16} × 3
+  seeds** (x4 landed via runpod-a swap-drain). **btk T{6,10} —
+  RESTAMPED 18:0x, the "DEFERRED to the amendment window" text here
+  is SUPERSEDED:** the pf grid finished, the deferral lapsed with it,
+  and the gap lane resumed. **T6 is COMPLETE (3/3 seeds); T10 holds
+  seed 42 with two cells draining on `mac-d-rlhfpf-0728-5`.** The
+  original deferral (Han 04:4x — *"do not waste resources on
+  BatchTopK until PAPER FAITHFUL IS FINISHED"*) was honoured; it is
+  simply no longer in force.
+  **RLHF PAPER-FAITHFUL ARM — GRID COMPLETE 15/15** (this supersedes
+  both the 13:0x "deferred to Aug 3" block, whose premises were
+  falsified by measurement, and the 14:1x "RUNNING NOW on 6×H100"
+  status — the six pf pods are gone, one pod remains for the btk gap
+  cells).
 
-  *(i) The pf figure slot — deliberately empty, not forgotten:*
+  *(i) The pf figure — RENDERED (`fig_rlhf_shuffle_tsweep_pf.png`,
+  15:58); the "deliberately empty slot" note it used to carry is
+  retired:*
 
   ![rlhf-pf](figs_writeup/fig_rlhf_shuffle_tsweep_pf.png)
 
@@ -237,16 +255,28 @@ panel — directly comparable to the btk figs above):**
   `.half()`, `SequenceBuffer` casts to fp32 — so every row we hold
   records `precision: bf16` while having trained **fp32**.
 
-  *(iv) Scope:* **T{1,2,4,6,8,10} × 3 seeds = 18 cells.** **T16 is
-  excluded and that is a finding, not a shortfall:** upstream's
+  *(iv) Scope:* **T{2,4,6,8,10} × 3 seeds = 15 cells** — the delivered
+  grid. (This line previously read "T{1,2,4,6,8,10} × 3 seeds = 18
+  cells", which contradicted the table above it and the T-axis note;
+  T1 is absent for the same by-design reason as T16, so 15 is the
+  correct count.) **T16 is excluded and that is a finding, not a
+  shortfall:** upstream's
   T-sweep archs are `t2,t3,t6,t7,t8,t10,t15,t20` — **there is no
   `t16`** — and our port needs 69.3 GiB for params+Adam alone, which
   contradicts upstream's documented **48 GB A40** accommodation. Our
   large-T cells may not be the paper's cells.
 
-  Until the grid drains, the paper-faithful RLHF claim is carried by
-  the corrected base-l12 anchors + RM_CERTIFICATE v1.0, labeled as
-  such.
+  **The grid has drained**, so the paper-faithful RLHF claim now rests
+  on the 15 cells above; the corrected base-l12 anchors + RM_CERTIFICATE
+  v1.0 remain as the comparison row, never spliced into the sweep mean.
+  **Row-selection warning:** `agentic_txc_02_v1t` also has **3 rows on
+  the WRONG substrate** (`gemma_2_2b_it_l13_fineweb_24k128`, T5, from
+  before the substrate retraction). The pf renderer already excludes
+  them (mac-d, a8923d849: sweep=15 / anchors=3, all base-l12), but that
+  guard is per-consumer — **any selector keyed on arch+T alone picks up
+  18 rows where 15 are right.** Always pin
+  `datasource=gemma_2_2b_base_l12_phase7`; the census flags these rows
+  `⚠ OFF-SUBSTRATE — DO NOT QUOTE`.
   **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins
   are tensor-IDENTICAL through T16 (829f05070: Δauc exactly 0,
   boundary_min_pre ≥ 2.21, no negative-pre-activation contact at
@@ -271,8 +301,9 @@ panel — directly comparable to the btk figs above):**
   0.0000 exactly — at T=1 a within-window shuffle IS the identity, so
   that zero is the instrument's own null, not a result.** The overlay
   JSON still carries `status: PENDING TEAM REVIEW`; the table
-  reproduces that rather than upgrading it. Interim numbers: (with
-  render).
+  reproduces that rather than upgrading it. (The dangling "Interim
+  numbers: (with render)" placeholder that sat here is removed — the
+  numbers are in the table.)
 - **Data:** hunt-width cells (d_sae 2048) — overlay card
   `SHUFFLE_OVERLAY_CARD.md` + T_FILL card (c09485d1c) under
   `experiments/explorations/task_hunt/`; substrate
@@ -291,16 +322,29 @@ panel — directly comparable to the btk figs above):**
 - **Fig:** `experiments/explorations/task_hunt/figs_writeup/
   fig2_question_gap_tscaling.{png,pdf}` + fills (T6/T10 on-plateau,
   88cb4f867).
-- **Table:** script-generated `figs_writeup/tab_dq_tsweep.md`
-  lands at the pre-submission final pass (data: dq fill results +
-  DQ_T_FILL card; toy-class caveat travels).
+- **Table:** `figs_writeup/tab_dq_tsweep.md` — **GENERATED** (script
+  `scripts/gen_handoff_tables.py`, regenerate rather than hand-edit;
+  8 T values, trained vs untrained twin, gap grows +0.1032 → +0.2754).
+  Data: dq fill results + DQ_T_FILL card; the TOY-class caveat is
+  in-table. (This line previously said the table "lands at the
+  pre-submission final pass" — it has landed.)
 - **Caveats:** TOY-class per Dmitry's bar (meeting 07-27) —
   within-SAE use only; shuffle columns are SCREEN-class (overlay
   ruled out, LOG 00:05); passed-then-demoted framing.
 
-## 6+7. Safety-relevant hunted tasks (THE GOLD — status, not yet exhibits)
+## 6+7. Safety-relevant hunted tasks (THE GOLD)
 
-- **⚑ ITEM 6 = SYCGEN, IN FLIGHT (state 03:3x 07-28): the hunt
+**⚑ SECTION STATUS, restamped 18:0x 07-28 — read this before the
+overnight prose below, which is written in the future tense and has
+been overtaken:** **item 6 (sycgen) is a DELIVERED EXHIBIT** — fig and
+table both exist, final render, no longer "in flight" and no longer a
+partial. **Item 7 is CLOSED as a measured negative** (`retryesc_gen`,
+WEAK 3/3) — the "item 7 = OPEN" block further down is superseded by
+the ⚑⚑ block at the end of this section. The section heading used to
+say *"status, not yet exhibits"*; that is no longer true of item 6.
+
+- **⚑ ITEM 6 = SYCGEN — DELIVERED (screen state below is from 03:3x
+  07-28; the exhibit landed later the same night): the hunt
   found its first KEEP.** `sycgen` (sycophancy-under-challenge,
   generated corpus under the elicitation harness) passed the screen
   bundle **KEEP 3/3** — gpt2/gemma2_2b/llama31_8b, zero kill
@@ -315,10 +359,10 @@ panel — directly comparable to the btk figs above):**
   mean±sd per T, gap, twin-gap control, anchor row, binding
   quote-form); regenerates with the final render.
 
-  *(Fig above is LIVE-refreshing: first PARTIAL render landed 03:40
-  — 3/18 trained (per-token anchor band + full untrained-twin
-  control); TXC sweep points + shuffle overlay appear as cells land;
-  the in-figure coverage note is authoritative.)*
+  *(Fig above is the FINAL render — the "LIVE-refreshing, 3/18
+  trained partial" note that sat here described the 03:40 state and is
+  retired. The in-figure coverage note remains authoritative if it
+  ever disagrees with this prose.)*
 
   **What sycgen is, intuitively (for Dmitry — read this first).**
   Multi-turn Q&A conversations built on the *"are you sure?"*
@@ -372,7 +416,7 @@ panel — directly comparable to the btk figs above):**
   anchor's ~4.5 — sparser and above it; flag travels on the
   legend).
 
-  **How to check progress (self-serve, ~2 h from now):**
+  **How to check the delivered artifacts (self-serve):**
   ```
   git pull                      # branch arxiv
   # 1) the figure (exists once rendered; refreshes in place):
@@ -385,10 +429,11 @@ panel — directly comparable to the btk figs above):**
   # 4) narrative state: this section + the binding record:
   grep -n "sycgen" experiments/explorations/task_hunt/LOG.md | tail -5
   ```
-  A partial render carries a "PENDING TEAM REVIEW" corner stamp and
-  a coverage note ("N/36 cells"); the full-drain render supersedes
-  at the same paths. The pre-authorized
-  **matrix retrain is RUNNING** on mac-d's 2×H100: **36 cells,
+  (A partial render carries a "PENDING TEAM REVIEW" corner stamp and
+  a coverage note ("N/36 cells"); the full-drain render supersedes at
+  the same paths. **That supersession has happened** — what is on
+  disk is the full render.) The pre-authorized
+  **matrix retrain — COMPLETE** (ran on mac-d's 2×H100): **36 cells,
   T {1,2,4,8,16} × seeds {42,1,2} × shuffle overlay, btk-only arm
   (either-arm rule; card 74d260321 + §5 T-axis amendment 90c89f294,
   LOG 02:54).** T-axis disclosure: T{6,10} cannot tile this eval's
@@ -396,14 +441,18 @@ panel — directly comparable to the btk figs above):**
   kept for all 12 doomed cells, ≈$2 burn disclosed) — the axis is
   IDENTICAL to the delivered λ̂ exhibit's (item 4), not a coverage
   retreat. Shard0 (untrained half) DONE 18/18-amended; per-token T1
-  anchors landed r=0.470/0.487/0.489; shard1 ETA ~03:35–03:55 →
-  overlay → **fig+table in `figs_writeup/` plausibly by ~04:30,
-  comfortably before 11:00** (fallback: amendment window; renderer
-  pre-written + fixture-tested, 1618b5a7a). Rows land on the
+  anchors landed r=0.470/0.487/0.489; **both shards drained and the
+  fig+table are in `figs_writeup/`** (the "shard1 ETA ~03:35–03:55 …
+  plausibly by ~04:30, comfortably before 11:00" schedule text here
+  is spent). Rows land on the
   canonical leaderboard under
   `datasource=sycgen_real_age_llama31_8b_l14`,
   `eval_cfg.retrain_tag=sycgen_keep_r1`.
-- **Item 7 = OPEN — evalage resolved WEAK (03:14; screen verdict,
+- **Item 7 — ⚑ THIS BLOCK IS SUPERSEDED (kept for the evalage
+  science, which still stands; for the item-7 verdict read the ⚑⚑
+  block below — `retryesc_gen`, CLOSED WEAK 3/3). It reads "OPEN" and
+  names a pathway that has since been run to completion.**
+  **evalage resolved WEAK (03:14; screen verdict,
   LOG + `task_hunt/evalage/RESULT.md`):** 3/3 legs WEAK, 0 KEEP /
   0 KILL — no kill clause fired, but gains +0.031/+0.046/+0.041
   fell short of the +0.05 KEEP bar, and there is NO order signal
@@ -425,11 +474,11 @@ panel — directly comparable to the btk figs above):**
   evalage (WEAK, cleanly diagnosed).
 - **Where verdicts appear:** LOG (stamped entries) +
   `experiments/explorations/task_hunt/<candidate>/` cards/results.
-- **For the 13:00 submission:** item 6 is quotable NOW as "first
-  dedicated safety-relevant task passed all screens; full T-sweep
-  running, exhibit expected before the deadline" — with the exhibit
-  itself landing by ~05:00 if the retrain drains on schedule
-  (renderer pre-written + fixture-tested, 1618b5a7a).
+- **What to quote now (restamped; the "for the 13:00 submission"
+  wording here is spent):** item 6 is quotable as *"a dedicated
+  safety-relevant task, generated under the elicitation harness,
+  passed every screen and is delivered as a full T-sweep exhibit"* —
+  the fig and table exist, not "expected".
   Item 7: **RESOLVED 16:0x 07-28 — see the block below. It is a
   measured negative, not an open question.**
 
@@ -492,9 +541,18 @@ panel — directly comparable to the btk figs above):**
   survivor sets, ≈0.002 AUC at d_sae 18432. Table + per-cell
   receipts: `experiments/probing/actmix/RM_EQUIVALENCE.md` (incl.
   ALIAS EXCLUSION LIST — any future arm-diff must exclude those
-  train_keys). Morning: 3-seed onset map + boundary_min_pre traces +
-  certificate (PRELIMINARY until then). Pack §3 carries the
-  redrafted both-arms licence.
+  train_keys). Pack §3 carries the redrafted both-arms licence.
+  **Restamp (verified 18:0x):** the line here used to promise a
+  3-seed onset map "this morning" and mark the certificate
+  PRELIMINARY until then. **The 3-seed map is there** —
+  `RM_EQUIVALENCE.md` (last written 03:02 07-28) carries seeds
+  {1,2,42} across T{1,2,4,6,8,10,16}, **3/18 pairs IDENTICAL**, the
+  rest DIVERGES with per-cell Δauc (largest |Δ| = T6's −1.63e-2).
+  **Two caveats to quote with it:** two rows are resolved
+  **metric-only** ("weights remote" — `batchtopk_sae` seed 2,
+  `txc_batchtopk_pre` seed 42/T2), so they are not tensor-level
+  receipts; and I did **not** verify the promised `boundary_min_pre`
+  traces are attached — check before citing those specifically.
 - **RLHF regime differs — now FULLY CERTIFIED:** twins
   tensor-identical through T16 (829f05070; pre-registered
   divergence refuted and disclosed). Unified mechanism frame:

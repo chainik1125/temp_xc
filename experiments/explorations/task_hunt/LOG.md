@@ -30254,3 +30254,83 @@ shape of it.
 figure unaffected (different arch entirely).
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+---
+
+## 2026-07-28 ~18:1x BST — mac-local HUB: **STALENESS RESTAMP of both handover surfaces** — the handoff was announcing a deadline that had already PASSED, and the guide was advertising 6 pods at $17.94/h when 4 are running at $6.86/h
+
+**Han asked whether the two handover documents are up to date and not
+misleading. They were not.** Both were written as live overnight
+documents and never restamped as the work landed, so they read in the
+future tense about things that are finished — the failure mode where
+every individual sentence was true when written.
+
+### 1. The worst three
+
+- **`REBUTTAL_HANDOFF.md` line 1 of orientation:** *"Deadline:
+  rebuttal 13:00 BST 2026-07-28; exhibits READY BY 11:00 BST."*
+  **That deadline had passed five hours before I read it**, and the
+  window is now the Aug 3 amendment. The first thing a reader saw was
+  a false urgency.
+- **`REBUTTAL_CODE_GUIDE.md` §5 fleet map:** six `mac-d-rlhfpf-0728*`
+  pods, *"$2.99/h each = $17.94/h"*, *"Running: the RLHF
+  paper-faithful grid — 18 cells"*. **API truth: 4 pods, $6.86/h**;
+  five of the six are gone with the grid that finished on them, and
+  the grid was **15 cells, not 18**.
+- **Item 7 was described BOTH ways in the same section** — an "OPEN,
+  pathway now retryesc_gen + StruQ" block and, 30 lines later, the
+  ⚑⚑ "CLOSED, WEAK 3/3" block. The first is now marked SUPERSEDED
+  in place rather than deleted, because its evalage science stands.
+
+### 2. Internal contradictions, now resolved
+
+- **18 cells vs 15.** §3(iv) said *"T{1,2,4,6,8,10} × 3 seeds = 18
+  cells"* directly under a table of 15 rows and a note saying T1 is
+  absent by design. Corrected to 15.
+- **"G2 PASSED" vs the G2 retraction.** §1+2 asserted RLHF
+  *"substrate/anchors G2 PASSED"*; §3(ii) says that pass was on the
+  **wrong substrate (l13-IT)** and was retracted. The §1+2 line now
+  carries the correction and points at §3(ii).
+- **"The pf figure slot — deliberately empty"** sat immediately above
+  **"GRID COMPLETE (15/15)"**. The figure rendered at 15:58.
+
+### 3. A correction to my own fleet number, twice over
+
+I reported *"3 pods, $6.42/h, $3.43/h unattributed"* earlier today.
+**API truth: 4 running, $6.86/h, $3.87/h unattributed** — I missed
+`tsae-paper-widthmatch-em` ($0.44/h). And my first API script printed
+**"LIVE PODS: 128, TOTAL $109.03/h"** because it summed `costPerHr`
+over every pod record including 124 **EXITED** ones. Both numbers
+were wrong in the same pass; the corrected figures are in the guide.
+
+### 4. What I did NOT change
+
+The **btk figure's** false "T6/T10 deferred" caption. The prose around
+it is corrected; the figure is mac-d's renderer and re-renders once at
+drain per the standing ruling. Editing a file concurrently with its
+owner is what produced this morning's conflict-marker push. The
+handoff now says explicitly that the figure is the lagging surface.
+
+Also left as an **explicit unknown rather than a guess**: the ckpt
+mirror stamp is 02:0x and **two grids landed after it** (21 probing pf
++ 15 RLHF pf). I did not verify HF, so both documents now say the
+mirror status of those is UNCONFIRMED. Pods are ephemeral — an
+unmirrored ckpt on `-0728-5` is one termination from gone.
+
+### 5. Staleness is now swept mechanically
+
+`handoff_audit.py` check 8 greps both surfaces for time-bound phrasing
+(*"this morning"*, *"ETA ~"*, *"RUNNING NOW"*, *"in flight"*,
+*"before the deadline"*, …) and **reports** hits with line numbers.
+**Deliberately not a gate:** a checker cannot know whether prose is
+still true, so it prints and a human judges. All 8 current hits are
+restamp text quoting the old wording.
+
+**Check 6 caught a false positive of its own making** — it failed on
+the handoff citing `agentic_txc_02_v1t`, which the handoff cites *in
+order to warn about* the off-substrate rows. The census flags at
+(arch, datasource) granularity and my check collapsed it to arch. Now:
+citing a flagged arch is fine **iff** the pinned substrate is named
+too. The guard failing on its own warning text is how the granularity
+bug surfaced — which is an argument for guards that can fail.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

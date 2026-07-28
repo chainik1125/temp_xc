@@ -24,8 +24,8 @@ append-only in `results/leaderboard.jsonl`, stamped with
 |---|---|---|
 | probing TXC | `txc_batchtopk_pre` / `txc_batchtopk_pre_btkonly` | `TXCBatchTopKPre` (`src/temp_bench/archs/txc_batchtopk.py:296`) / `TXCBatchTopKPreBTKOnly` (`src/temp_bench/archs/btk_only.py:194`) |
 | RLHF TXC | `txc_batchtopk_post_btkonly` | `TXCBatchTopKPostBTKOnly` (`btk_only.py:208`) |
-| **probing paper-faithful (the sprint)** | `paper_txc_base_v1t` | `PaperTXCBaseV1T` (`src/temp_bench/archs/paper_v1t.py:181`) — vendored 94119bc08 training stack VERBATIM + thin v2 wrapper; arm `paper-faithful`; card `experiments/probing/actmix/CARD_PAPER_FAITHFUL.md` (21 cells RUNNING across 4-5 GPUs, ETA ~06:30–07:30) |
-| RLHF paper-faithful | agentic_txc_02 trainable port | runpod-2 building; card ETA ~04:30 (vendor pattern, `experiments/explorations/actmix_rlhf/vendor/`) — cells land after |
+| **probing paper-faithful (the sprint)** | `paper_txc_base_v1t` | `PaperTXCBaseV1T` (`src/temp_bench/archs/paper_v1t.py:181`) — vendored 94119bc08 training stack VERBATIM + thin v2 wrapper; arm `paper-faithful`; card `experiments/probing/actmix/CARD_PAPER_FAITHFUL.md`. **COMPLETE 21/21** (7 T × 3 seeds) |
+| **RLHF paper-faithful** | `agentic_txc_02_v1t` | `AgenticTXC02` (`src/temp_bench/archs/agentic_txc02.py:68`) — the paper's RLHF arch, trainable port, vendored 94119bc08 (`experiments/explorations/actmix_rlhf/vendor/`). **COMPLETE 15/15** (T{2,4,6,8,10} × 3 seeds). ⚑ Its rows carry **no `eval_cfg.arm` stamp**; the census maps the arm from the source composition (`encode` = `topk` → `scatter(relu)` = TopK→ReLU) and says so |
 | baselines | `batchtopk_sae(_btkonly)`, `tsae_btkonly` | same two files; the T-SAE class legitimately carries matryoshka+contrastive (Ye et al.'s design) |
 
 - **Arm labels** (`eval_cfg.arm`): `btk-only` = BatchTopK with NO ReLU
@@ -93,15 +93,18 @@ each labeled **{ReLU+TopK} PAPER-FAITHFUL** vs **{BatchTopK}
 "{ReLU+TopK} paper-faithful" arm — certificate evidence only)**, plus
 the hunted-task cells that live outside the leaderboard. It is
 generated, not hand-written: refresh with
-`.venv/bin/python scripts/cell_census.py --write` — cells are landing
-all night (paper-faithful sprint, sycgen retrain), so regenerate
-before quoting coverage. State at 07:20: **probing paper-faithful
-COMPLETE 21/21** (last 3 cells hub-repatriated from pod B, LOG
-~07:1x); probing btk-only COMPLETE 7 T × 3 seeds; sycgen retrain
-rows on-board (15 trained + twins). Remaining gaps: RLHF
-paper-faithful grid (pilot→G1 in flight), RLHF btk T{6,10}
-(DEFERRED by Han's pf-priority order — T6 holds 2/3 seeds as
-partial-bonus).
+`.venv/bin/python scripts/cell_census.py --write`, and **read its two
+check sections, not just the table**: *Arch-vs-stamp cross-check* and
+*Substrate-pin check* (the latter names cells that sit on the wrong
+substrate and must not be quoted).
+
+**State at 18:0x** (supersedes the 07:20 stamp this section carried):
+probing paper-faithful **COMPLETE 21/21**; probing btk-only
+**COMPLETE** 7 T × 3 seeds; sycgen retrain rows on-board; RLHF
+paper-faithful **COMPLETE 15/15**. **The one remaining gap is RLHF
+btk T10** (seed 42 only, two cells draining) — T6 closed at 3/3, and
+the pf-priority deferral that held T{6,10} back has lapsed with the
+pf grid.
 
 ## 2. Sparse probing — code, data, results
 
@@ -133,7 +136,11 @@ partial-bonus).
   `eval_cfg.k_feat` ∈ {5,20}, seeds {1,2,42}. k_win = 20·T
   (constant per-token budget — the program-wide sparsity convention).
 - **Figs/tables:** `figs_writeup/fig_probing_shuffle_tsweep{,_k5,_k20,_38task}.*`
-  + `tab_*` twins (morning 7-point render). Licences: k-inversion
+  and the paper-faithful twins `..._pf_k5`/`..._pf_k20` — **all FINAL
+  7-point renders, both arms**. Tables are
+  `experiments/probing/actmix/RESULTS_btk-only.md` (btk) and
+  `RESULTS.md` (pf); the `figs_writeup/tab_*` probing paths this
+  section used to promise were never created. Licences: k-inversion
   (probe-budget-dependent, no monotone window win at any k); level
   story leads.
 - **Equivalence/arm evidence:** `experiments/probing/actmix/
@@ -160,8 +167,16 @@ partial-bonus).
   k_win = 100·T.
 - **Row filter:** `experiment=rlhf`, `datasource=
   gemma_2_2b_base_l12_phase7`, arch `txc_batchtopk_post_btkonly`
+  (btk arm) / **`agentic_txc_02_v1t` (paper-faithful arm)**
   (+ baselines), T ∈ {1,2,4,5,6,8,10,16} (T5 = the paper's operating
-  point, kept as bonus), seeds {1,2,42}. NOTE the evaluator is
+  point, kept as bonus), seeds {1,2,42}.
+  **⚑ PIN THE DATASOURCE.** `agentic_txc_02_v1t` has **3 rows on
+  `gemma_2_2b_it_l13_fineweb_24k128`** — the wrong substrate, left
+  over from before the substrate retraction. A selector keyed on
+  arch+T alone returns **18 rows where 15 are correct**. The pf
+  renderer already excludes them (mac-d, a8923d849), but that guard
+  is per-consumer; the census flags them
+  `⚠ OFF-SUBSTRATE — DO NOT QUOTE`. NOTE the evaluator is
   `rlhf 2.0.0` and its rows carry an EMPTY `eval_cfg` — probe budgets
   are metric-name-encoded (`metrics.preference_auc_k20` / `_k50`) and
   the shuffle twins are in-row (`metrics.shuffled_*`,
@@ -175,8 +190,12 @@ partial-bonus).
   metric. Empty-`eval_cfg` rows are historical (l12base_phase7 by
   default). Never compare rows across cache tags as
   same-substrate.
-- **Fig/table:** `figs_writeup/fig_rlhf_shuffle_tsweep.*` +
-  `tab_rlhf_shuffle_tsweep.md` (morning 7-point render). Licences:
+- **Fig/table:** btk arm `figs_writeup/fig_rlhf_shuffle_tsweep.*` +
+  `experiments/explorations/actmix_rlhf/results/rlhf_table.md`;
+  paper-faithful arm `figs_writeup/fig_rlhf_shuffle_tsweep_pf.*`.
+  **The btk fig's "T6/T10 deferred" caption has gone false** and
+  mac-d re-renders it once at drain (`--tag final`; baseline
+  `ff242b78`). Licences:
   order-free inverted-U, T8 peak; shuffle gaps ≈ 0 at T ≤ 8, seed-
   mixed at T16 (quote form in LOG 21:10 + ratification 22:28).
 - **Both-arms:** `RLHF_EQUIVALENCE.md` — twins tensor-IDENTICAL
@@ -191,16 +210,21 @@ partial-bonus).
   path `ckpts/<train_key>/model.safetensors` (LFS sha256 = receipt).
   Lookup: leaderboard row → `train_key` → that path. Uploader:
   `scripts/push_ckpts_hf.py` / `hf_durability_push.py` (RLHF).
-- **Mirrored now:** all 26 trained RLHF ckpts; 30 probing
-  certificate-evidence ckpts (twin pairs across the 7-T grid, sae
-  pair, positive control; spot-check MATCH). Remainder mirrors in
-  priority order; pod-local at `checkpoints/<train_key>/`, indexed
-  by `checkpoints/manifest.jsonl` (tracked).
+- **Mirrored as of the 02:0x stamp:** 26 trained RLHF ckpts; 30
+  probing certificate-evidence ckpts (twin pairs across the 7-T grid,
+  sae pair, positive control; spot-check MATCH). Pod-local at
+  `checkpoints/<train_key>/`, indexed by `checkpoints/manifest.jsonl`
+  (tracked). **⚑ NOT re-verified since that stamp, and two grids have
+  landed after it** — the 21 probing paper-faithful and 15 RLHF
+  paper-faithful ckpts. **Treat their mirror status as unconfirmed**;
+  re-run the uploader or check HF before relying on durability for
+  anything trained after 02:0x. Pods are ephemeral, so an unmirrored
+  ckpt on `-0728-5` is one termination from gone.
 - **Paper-era ckpts:** `han1823123123/txcdr-base`
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — snapshot 14:19 BST 07-28 (**FULL FLEET RESET at ~13:35**)
+## 5. FLEET MAP — snapshot **18:0x BST 07-28, API-verified**
 
 This section dates fast. **Live sources: `agents/<id>/STATUS.md` + the
 LOG tail** — trust those over this snapshot if they disagree.
@@ -223,22 +247,32 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 14:19)
+### Pods now (API-verified 18:0x — **replaces the 14:19 six-pod list**)
 
-All **1×H100 80 GB SECURE, $2.99/h each = $17.94/h**, owner mac-d,
-terminate-at-lane-end:
+**4 RUNNING, $6.86/h total.** The previous snapshot listed six
+`mac-d-rlhfpf-0728*` pods at **$17.94/h**; five of those are gone with
+the pf grid that finished on them.
 
-    mac-d-rlhfpf-0728    aqil2dkyikg3ze
-    mac-d-rlhfpf-0728-2  p478c8uyllvkzz
-    mac-d-rlhfpf-0728-3  5sbd2s9mh0njzo
-    mac-d-rlhfpf-0728-4  mi7cnfpnuikybi
-    mac-d-rlhfpf-0728-5  tnp7vvew4t80wi
-    mac-d-rlhfpf-0728-6  c48kuf2z2dipmv
+    mac-d-rlhfpf-0728-5            tnp7vvew4t80wi  $2.99/h  agent lane
+    mats-gap-code-h100             ezy8rifpgj6cqa  $2.99/h  ⚑ unattributed
+    tsae-paper-widthmatch-probing  oo41iwp6zrxatc  $0.44/h  ⚑ unattributed
+    tsae-paper-widthmatch-em       821raf0lsqp3aj  $0.44/h  ⚑ unattributed
 
-**Running:** the RLHF **paper-faithful** grid — 18 cells,
-T{1,2,4,6,8,10} × 3 seeds, one cell per GPU, no co-tenancy.
-T16 excluded (83 GiB > 80 with the resident buffer, and upstream has
-no `t16` arch). Deferred btk T{6,10} resume after the pf grid.
+**Only one pod belongs to a live agent lane.** The other three are
+non-convention names totalling **$3.87/h**, attributable to no agent
+here; two of them name deliverables that are already complete. They
+are **untouched** per the house rule (never modify a pod you did not
+spin up) and are flagged for Han's call. *(An earlier hub report said
+"3 pods, $6.42/h, $3.43/h unattributed" — that missed
+`tsae-paper-widthmatch-em`. The API numbers above supersede it.)*
+
+**Running now:** the RLHF **btk gap cells** (T10, two cells) on
+`-0728-5`. The pf grid that occupied the six pods is **COMPLETE —
+15 cells, T{2,4,6,8,10} × 3 seeds**, not the 18 cells this section
+previously advertised: T1 and T16 are both absent by design (T16
+exceeds 80 GB and upstream has no `t16` arch; T1 hits an einsum
+degeneracy). The btk T{6,10} deferral has **lapsed** — it was
+conditional on the pf grid, which has finished.
 
 **Priority order (Han, unchanged): paper-faithful outranks ALL btk GPU
 work; hunted tasks need either arm only; relu-mix is certificate
@@ -284,7 +318,7 @@ only — **never echoed, written to a file, or passed as an argument.**
 
 - **A12:** the shipped c3 "T10/T20" cells are silent-T5 replicas —
   never quote the shipped c3 T-ordering; the real T-sweep is this
-  exhibit (first REAL T10 cells landed tonight).
+  exhibit (first REAL T10 cells landed overnight 07-27→28).
 - The mechanism story is per-task: probing = rare-boundary-contact
   regime (divergence from T2); RLHF = never-contact (identity
   through T16). One mechanism, two measured regimes — never quote
@@ -304,19 +338,31 @@ Per-item exhibit blocks live in `REBUTTAL_HANDOFF.md` §4–§7; code:
 - **item 5, dq question-marks (COMPLETE, TOY-class disclosed):**
   `experiments/explorations/task_hunt/diafaces/` (DQ_T_FILL_CARD.md,
   results/); exhibit set per HANDOFF §5.
-- **item 6, sycgen sycophancy-adjacent (IN FLIGHT — first hunt KEEP
-  3/3, LOG 02:28):** `experiments/explorations/task_hunt/sycgen/`
+- **item 6, sycgen sycophancy-adjacent (DELIVERED — first hunt KEEP
+  3/3, LOG 02:28; retrain COMPLETE, fig + table final):**
+  `experiments/explorations/task_hunt/sycgen/`
   (GENERATION_CARD.md, SCREEN_CARD.md, RETRAIN_CARD.md,
   screen.py/screen_grids.py, run_retrain.py, shuffle_overlay.py,
   results/); datasource plugin `sycgen_real_age_llama31_8b_l14`;
-  retrain rows land on the canonical leaderboard ~05:30–06:30
-  (regenerate the census).
-- **item 7 — OPEN. evalage resolved WEAK** (0 KEEP / 0 KILL, gains
-  below the +0.05 bar, no order signal; LOG 03:14):
-  `experiments/explorations/task_hunt/evalage/` (RESULT.md is the
-  full verdict); corpus on HF `temp-bench-data/hunt_corpora/` with
-  sha receipts. Pathway now: `task_hunt/retryesc/` (retryesc_gen
-  regeneration) + StruQ premeasures (runpod-a).
+  rows are on the canonical leaderboard (regenerate the census).
+- **item 7 — CLOSED, WEAK 3/3 (`retryesc_gen`, 16:0x 07-28).** The
+  final candidate was generated, validated and screened end to end:
+  **21/21 label-side bands PASS**, the **gain bar cleared on every
+  leg (+0.063…+0.069)**, and the **floor clause killed it on every
+  leg** — a trivial visible-evidence baseline matched the windowed
+  gain, so the task does not discriminate. Diagnosed cause: corpus
+  density overshoot (`floor_excess` 0.261 measured vs 0.185 targeted)
+  from an aiming estimator that is a **lower bound**, corrected
+  in-repo. Verdict + band table:
+  `experiments/explorations/task_hunt/retryesc_gen/RESULT.md`.
+  (This section previously read *"item 7 — OPEN … pathway now:
+  `task_hunt/retryesc/` + StruQ premeasures (runpod-a)"* — that
+  pathway was run to completion, and `runpod-a` no longer exists.
+  Note `retryesc/` and `retryesc_gen/` are **different directories**:
+  the verdict lives in the latter.) Earlier candidate `evalage`
+  resolved WEAK (0 KEEP / 0 KILL; LOG 03:14),
+  `experiments/explorations/task_hunt/evalage/RESULT.md`; corpora on
+  HF `temp-bench-data/hunt_corpora/` with sha receipts.
 - The hunted-task shuffle-overlay results are eval_extra-namespaced
   JSONs in each dir's `results/` (NOT leaderboard rows) — see the
   census §"Hunted-task cells outside the leaderboard".

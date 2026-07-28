@@ -112,19 +112,34 @@ def main(self_test: bool = False) -> int:
             cols = [c.strip() for c in ln.split("|")]
             if len(cols) > 4 and "⚠" in cols[3]:
                 flagged.add(cols[1].strip("` "))
+    # The census flags at (arch, datasource) granularity, so "arch is
+    # cited" is the WRONG test — the handoff cites the flagged arch
+    # precisely to warn about it. The real requirement: if you cite an
+    # arch that has off-substrate rows, you must also pin the substrate
+    # those rows are NOT on. First cut of this check failed on its own
+    # warning text, which is how the granularity bug surfaced.
+    pins = dict(re.findall(r"`([a-z0-9_]+)`/T=\S+: \d+ row\(s\) on `[^`]+`, "
+                           r"pinned to `([^`]+)`",
+                           census_p.read_text() if census_p.exists() else ""))
     for arch in sorted(flagged):
-        if arch in text:
+        if arch not in text:
+            continue
+        pin = pins.get(arch)
+        if pin is None:
             fails.append(f"handoff cites `{arch}`, which the census FLAGS "
-                         f"(unmapped or off-substrate) — classify before quoting")
+                         f"as UNMAPPED — classify before quoting")
+        elif pin not in text:
+            fails.append(f"handoff cites `{arch}`, which has OFF-SUBSTRATE "
+                         f"rows, without pinning `{pin}` anywhere")
     # NOTE the matching is on EXACT arch ids: the handoff cites the RLHF arm
     # as `agentic_txc_02` while the census keys `agentic_txc_02_v1t`, so a
     # shortened citation is not caught here. Loosening it would fire on the
     # correct-substrate cells too, which is why the substrate is ALSO pinned
     # in the census itself rather than relying on this check alone.
-    notes.append(f"census-flagged archs: {len(flagged)}, cited in handoff 0 "
-                 f"(exact-id match)"
-                 if not any("FLAGS" in f for f in fails)
-                 else f"census-flagged archs: {len(flagged)}")
+    cited = sum(1 for a in flagged if a in text)
+    notes.append(f"census-flagged archs: {len(flagged)}, cited in handoff "
+                 f"{cited} (exact-id match; a citation is OK only if the "
+                 f"pinned substrate is named too)")
 
     # 7. runnable script paths cited in either guide
     guide_pat = re.compile(
@@ -140,6 +155,29 @@ def main(self_test: bool = False) -> int:
             if not (ROOT / s).exists():
                 fails.append(f"{g} cites a script that does not exist: {s}")
     notes.append(f"script paths cited in guides: {n_scripts}")
+
+    # 8. staleness sweep — REPORT, not a gate. These phrases were all
+    # true when written and went false as the work landed; on 07-28 the
+    # handoff still announced a deadline that had passed. A checker
+    # cannot judge whether prose is current, so this prints hits and
+    # leaves the call to a human. Silence here means nothing; a hit
+    # means "re-read that line".
+    stale_pat = re.compile(
+        r"(?i)\b(this morning|tonight|overnight|~?\d{1,2}:\d{2}\s*(?:BST)?\s*"
+        r"(?:today|render)|ETA ~|lands? ~|landing this|RUNNING NOW|in flight|"
+        r"h from now|before the deadline|by the deadline|all night|"
+        r"expected before)\b")
+    stale_hits: list[str] = []
+    for g in ("REBUTTAL_HANDOFF.md", "REBUTTAL_CODE_GUIDE.md"):
+        gp = ROOT / g
+        if not gp.exists():
+            continue
+        for i, ln in enumerate(gp.read_text().splitlines(), 1):
+            m = stale_pat.search(ln)
+            if m and "SUPERSEDED" not in ln and "previously" not in ln:
+                stale_hits.append(f"{g}:{i}: …{m.group(0)}…")
+    notes.append(f"staleness sweep: {len(stale_hits)} future/time-bound "
+                 f"phrase(s) — REPORT ONLY, judge each by hand")
 
     # 5. census freshness
     census, lb = ROOT / "REBUTTAL_CELL_CENSUS.md", ROOT / "results/leaderboard.jsonl"
@@ -179,6 +217,10 @@ def main(self_test: bool = False) -> int:
 
     for n in notes:
         print(f"  · {n}")
+    if stale_hits:
+        print("\n  time-bound phrasing to re-read (report only, not failures):")
+        for h in stale_hits:
+            print(f"    ~ {h}")
     if fails:
         print(f"\nAUDIT FAILED — {len(fails)} problem(s):")
         for f in fails:
