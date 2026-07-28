@@ -64,13 +64,45 @@ def resolve(ref: str) -> Path | None:
     return hits[0] if hits else None
 
 
+# ── predicates, extracted so --self-test can exercise the REAL decision ──
+# A probe that re-implements a check tests the probe, not the check. These
+# exist so every guard's failure path runs the same code the audit runs.
+# (Added 01:3x 07-29: only 3 of 9 checks had positive controls, so "AUDIT
+# CLEAN" was partly an unfalsifiable claim — the exact defect the fleet
+# spent tonight finding in gates elsewhere. See LOG `33a5c72d8`.)
+
+def missing_on_disk(rel: str) -> bool:
+    """#1/#7: a cited path that is not on disk."""
+    return not (ROOT / rel).exists()
+
+
+def count_conflict_markers(body: str) -> int:
+    """#3: unresolved merge markers left in a deliverable."""
+    return sum(1 for ln in body.splitlines() if ln.startswith("<<<<<<<"))
+
+
+def ref_absent(body: str, ref: str) -> bool:
+    """#4: an item's plot/table not referenced in the handoff."""
+    return ref not in body
+
+
+def census_is_stale(census_mtime: float, lb_mtime: float) -> bool:
+    """#5: census older than the leaderboard it summarises."""
+    return census_mtime < lb_mtime
+
+
+def live_fact_expired(age_h: float, limit_h: float) -> bool:
+    """#9: an 'API-verified' claim older than the freshness limit."""
+    return age_h > limit_h
+
+
 def main(self_test: bool = False) -> int:
     text = HANDOFF.read_text()
 
     # 1. embedded figures
     figs = sorted(set(re.findall(r"]\(([^)]*\.png)\)", text)))
     for f in figs:
-        if not (ROOT / f).exists():
+        if missing_on_disk(f):
             fails.append(f"figure embedded but MISSING on disk: {f}")
     notes.append(f"figures embedded: {len(figs)}, all present"
                  if not fails else f"figures embedded: {len(figs)}")
@@ -88,16 +120,16 @@ def main(self_test: bool = False) -> int:
         if not p.exists():
             fails.append(f"deliverable surface missing: {s}")
             continue
-        n = sum(1 for ln in p.read_text().splitlines() if ln.startswith("<<<<<<<"))
+        n = count_conflict_markers(p.read_text())
         if n:
             fails.append(f"{n} conflict marker(s) in {s}")
     notes.append(f"surfaces scanned for markers: {len(SURFACES)}")
 
     # 4. every item has a plot AND a table
     for item, (plot, table) in ITEMS.items():
-        if plot not in text:
+        if ref_absent(text, plot):
             fails.append(f"item {item}: plot not referenced in handoff ({plot})")
-        if table not in text:
+        if ref_absent(text, table):
             fails.append(f"item {item}: table not referenced in handoff ({table})")
         elif resolve(table) is None:
             fails.append(f"item {item}: table referenced but MISSING ({table})")
@@ -153,7 +185,7 @@ def main(self_test: bool = False) -> int:
             continue
         for s in sorted(set(guide_pat.findall(gp.read_text()))):
             n_scripts += 1
-            if not (ROOT / s).exists():
+            if missing_on_disk(s):
                 fails.append(f"{g} cites a script that does not exist: {s}")
     notes.append(f"script paths cited in guides: {n_scripts}")
 
@@ -204,7 +236,7 @@ def main(self_test: bool = False) -> int:
                 continue
             import time
             age_h = (time.time() - ts) / 3600
-            if age_h > STALE_H:
+            if live_fact_expired(age_h, STALE_H):
                 fails.append(f"{g}:{i}: an 'API-verified' claim is "
                              f"{age_h:.1f}h old (> {STALE_H}h) — re-query the "
                              f"API; a live-fact snapshot silently goes false")
@@ -213,7 +245,8 @@ def main(self_test: bool = False) -> int:
 
     # 5. census freshness
     census, lb = ROOT / "REBUTTAL_CELL_CENSUS.md", ROOT / "results/leaderboard.jsonl"
-    if census.exists() and lb.exists() and census.stat().st_mtime < lb.stat().st_mtime:
+    if (census.exists() and lb.exists()
+            and census_is_stale(census.stat().st_mtime, lb.stat().st_mtime)):
         fails.append("census is OLDER than the leaderboard — "
                      "run scripts/cell_census.py --write")
     notes.append("census freshness checked")
@@ -237,7 +270,39 @@ def main(self_test: bool = False) -> int:
         found = guide_pat.findall("run `scripts/definitely_missing_xyz.py` now")
         probes.append(("missing-script detect",
                        found == ["scripts/definitely_missing_xyz.py"]
-                       and not (ROOT / found[0]).exists() if found else False))
+                       and missing_on_disk(found[0]) if found else False))
+
+        # ── added 01:3x 07-29: the six checks that had NO positive control.
+        # Each calls the SAME predicate main() calls, on a failure input,
+        # and must ALSO stay quiet on a passing input — a guard that fires
+        # on everything is as useless as one that fires on nothing.
+        probes.append(("figure-missing detect",
+                       missing_on_disk("figs_writeup/no_such_figure_xyz.png")
+                       and not missing_on_disk("REBUTTAL_HANDOFF.md")))
+
+        probes.append(("conflict-marker detect",
+                       count_conflict_markers("a\n<<<<<<< HEAD\nb\n") == 1
+                       and count_conflict_markers("a\nb\n") == 0))
+
+        probes.append(("item-ref-absent detect",
+                       ref_absent("handoff body", "fig_not_referenced_xyz")
+                       and not ref_absent("has fig_x here", "fig_x")))
+
+        probes.append(("census-staleness detect",
+                       census_is_stale(100.0, 200.0)
+                       and not census_is_stale(200.0, 100.0)))
+
+        probes.append(("live-fact-age detect",
+                       live_fact_expired(STALE_H + 0.1, STALE_H)
+                       and not live_fact_expired(STALE_H - 0.1, STALE_H)))
+
+        # #8 (staleness sweep) is REPORT-ONLY by design, so it has no
+        # pass/fail path to probe — but its REGEX can silently stop
+        # matching, which would look exactly like clean prose. Probe the
+        # pattern, and state plainly that this is not a gate.
+        probes.append(("staleness-regex alive (report-only check)",
+                       bool(stale_pat.search("figure lands ~14:00 BST today"))
+                       and not stale_pat.search("a plain sentence")))
 
         bad = [n for n, ok in probes if not ok]
         if bad:

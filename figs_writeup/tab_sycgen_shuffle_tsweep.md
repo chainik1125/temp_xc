@@ -31,6 +31,12 @@ _Generated from `sycgen/results/{sycgen_shuffle_overlay,sycgen_twin_overlay,sycg
 > seed, so the attenuation is **common-mode** and the level story is
 > safe.
 >
+> **Scope, precisely (mac-c `b275ae27d`): the shuffle touches only the
+> eval tiles of the SHUFFLED column.** The **ordered** T-sweep never
+> sees it and is **untouched**; A4 can move only the shuffled curve,
+> and therefore the gap. Fixed-T comparisons stand as recorded,
+> including the anchor gates.
+>
 > **What it DOES threaten: any reading of the T-sweep as a trend.**
 > The apparatus carries a `1 − 1/T!` multiplicative term that rises
 > with T **regardless of the phenomenon**, so "the gap grows with T"
