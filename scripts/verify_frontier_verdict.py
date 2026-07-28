@@ -76,8 +76,24 @@ def main(path: Path) -> int:
             pts = [(k, c) for k, c in pts if c]
             elig = [(k, c) for k, c in pts if c["l0"] <= txc["l0"] + 1e-9]
             if not elig:
-                print(f"   {arm:8s}: no point at budget <= TXC's — "
-                      f"NOT COMPARABLE at matched cost")
+                # "No eligible point" splits into TWO very different cases and
+                # collapsing them loses real information (found when this
+                # disagreed with mac-d at T=16, and mac-d was right):
+                #   - every SAE point COSTLIER and TXC still wins  -> STRONGER
+                #     than matched budget: TXC is better AND cheaper.
+                #   - every SAE point cheaper                      -> genuinely
+                #     not comparable at TXC's cost.
+                ch_k, ch = min(pts, key=lambda kc: kc[1]["l0"])
+                if ch["l0"] > txc["l0"] and txc["r"] > ch["r"]:
+                    tally["above"] += 1
+                    print(f"   {arm:8s}: cheapest k={ch_k} r={ch['r']:.4f} "
+                          f"l0/win={ch['l0']:.2f} costs {ch['l0']/txc['l0']:.2f}x "
+                          f"TXC | TXC beats it by {txc['r']-ch['r']:+.4f} "
+                          f"-> TXC above AND CHEAPER (stronger than matched)")
+                else:
+                    print(f"   {arm:8s}: no point at budget <= TXC's and the "
+                          f"cheapest ({ch['l0']:.2f}) does not resolve it — "
+                          f"NOT COMPARABLE")
                 continue
             k, c = max(elig, key=lambda kc: kc[1]["r"])
             d = txc["r"] - c["r"]

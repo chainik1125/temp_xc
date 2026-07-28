@@ -35519,3 +35519,73 @@ committed; cross-check against the hub's independent
 `scripts/verify_frontier_verdict.py` invited before anything ships.
 
 _Recorded-by: claude-opus-5 (mac-d)_ — PTR
+
+---
+
+## 2026-07-29 00:14 BST — HUB CROSS-CHECK of `dbbcfc6ee`: **the two implementations DISAGREED at T=16, mac-d was RIGHT, and my instrument was too conservative**
+
+I pre-registered that a disagreement between the two verdict
+implementations is itself a finding reported **before** any verdict.
+There was one. Here it is.
+
+### 1. The disagreement, and its resolution
+
+My checker returned **NOT COMPARABLE** for pooled at T=16; mac-d counted
+it **ABOVE**. From the data:
+
+    T=16  TXC r=0.5771 @ 7.82 l0/win
+      pooled k=1  r=0.4863 @ 11.22   <- CHEAPEST, and still 1.43x TXC's budget
+      pooled k=2  r=0.5134 @ 18.50
+      pooled k=4..32  r~0.5455 @ 27.6-31.7   <- SATURATED
+
+**Every pooled point at T=16 costs MORE than TXC, and TXC beats the
+cheapest by +0.0908.** So TXC is **better AND ~30% cheaper**.
+
+**mac-d is right and my rule was wrong.** "No point at budget ≤ TXC's"
+collapses two opposite situations: every SAE point *cheaper* (genuinely
+not comparable) versus every SAE point *costlier and still losing*
+(**stronger** than matched budget). **My checker discarded favourable
+evidence as missing evidence.** Fixed; it now distinguishes them and
+reports `TXC above AND CHEAPER`.
+
+**Corrected tally: above 7, below 0, indistinguishable 1** — and on the
+three T values where both implementations were in scope, **they agreed
+exactly** (T2 above, T4 indistinguishable, T8 above).
+
+### 2. One wording precision on the headline
+
+*"vs pooled at matched per-window budget: ABOVE 3/4 T"* — **at T=16 it is
+not matched.** TXC wins at **lower** cost. That is stronger, but the
+phrase claims a precision the cell does not have. **Accurate form:
+"ABOVE at matched-or-better budget; at T=16 TXC beats the cheapest
+pooled point while spending 30% less."**
+
+### 3. What makes this a real result rather than a threshold artifact
+
+**mac-d's bracketing check is the load-bearing part, and they ran it to
+try to break their own finding:** **pooled SATURATES** (flat k=8..32),
+and **its ceiling at ANY swept budget fails to reach TXC at T=2/4/16
+despite +26%/+88%/+306% budget**, tying only at T=8 by spending 2.9×.
+**That is not a hard-cutoff artifact — more budget simply stops buying
+the pooled arm anything.**
+
+### 4. And they refused their own best number
+
+**Stacked scores 4/4 for TXC and mac-d REFUSES to count it**:
+`T·d_sae = 32768` features against `N_WINDOWS = 1024` is
+underdetermined, so stacked's collapse is **probe-capacity overfitting**,
+not architecture. **They pre-registered that caveat when it would have
+flattered stacked, and applied it with equal force once it cut the other
+way.** The honest comparison is **TXC vs pooled, 3/4** — and my
+independent run agrees the stacked cells are the ones to discount.
+
+### 5. Verdict as it should be quoted
+
+**POSITIVE, QUALIFIED.** TXC above pooled at matched-or-better budget on
+**3 of 4 T**, indistinguishable at T=4, **never below**. Limits travelling
+with it: **n=3**; threshold crude and **not a significance test**;
+mac-c's 1.83–3.99× **not imported**; **T=2 thin at 1.16×** exactly as
+flagged pre-data; one substrate, one layer; **all budgets MEASURED
+`l0_per_window`**, never the derived per-token axis.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
