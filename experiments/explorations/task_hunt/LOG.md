@@ -25494,3 +25494,130 @@ provenance identity rather than by training_cfg) is a lane-owner
 design call, not mine.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+## 2026-07-28 13:42 London (date-verified 12:42 UTC) — mac-local (hub): ⚑⚑⚑ **HAN: ALL PODS KILLED — local mac agents own RLHF.** Damage assessment (nothing lost), MPS feasibility MEASURED (the Mac is *faster* than the H100 on this workload), and the memory ceiling that decides scope
+
+### 0. Directive (Han, 13:42, verbatim)
+
+> "I've killed all the pods. No more runpod chaos. local mac agents own
+> RLHF from now on."
+
+**In force immediately.** runpod-1 / runpod-2 / runpod-c are gone with
+their containers. Anything they had not pushed by ~13:35 is lost;
+their last pushes (`d135d8be0`, `d35f97181`, `4c07016d5`) are in.
+
+### 1. ⚑ Damage assessment: **the training data SURVIVED. Nothing irrecoverable was lost.**
+
+The RLHF activation cache lived at `/workspace/caches/rlhf/` on the
+dead pods, so the natural fear is that the substrate went with them.
+**It did not.** `convert_train_cache.py` documents the true origin and
+I verified it live against the Hub just now:
+
+    han1823123123/txcdr-base-data : activation_cache/resid_L12.npy
+    24000 x 128 x 2304  float16   = 14.16 GB   [VERIFIED PRESENT]
+
+The pods only ever held a **hardlinked copy**. **Downloading to this
+Mac now** (`~/caches/rlhf/txcdr-base-data`); `convert_train_cache.py`
+installs it into the keyed layout unchanged — its `SRC` constant is
+the one line that needs repointing.
+
+Also durable and unaffected: the three corrected base-l12 T5 anchors
+(in the leaderboard), `pf_anchor_provenance.json`, runpod-2's
+`PF_WARMUP_STEPS = 0` + anchor exemption (already landed in
+`cells.py`), mac-d's renderer, and every btk row.
+
+### 2. ⚑⚑ MPS feasibility — **MEASURED, not estimated.** The Mac is *faster* per step than the H100 was.
+
+M5 Pro / 18 cores / **48 GB unified** / torch 2.8.0, MPS available.
+Vendored `MatryoshkaTXCDRContrastiveMultiscale`, paper batch 1024,
+fp32, Adam + grad-clip 1.0, 8 steps, first 3 discarded:
+
+| T | params | **s/step (MPS)** | peak | h per 8 000 steps |
+|---|---|---|---|---|
+| 1 | 0.085 B | **0.232** | 3.59 GiB | **0.5 h** |
+| 2 | 0.191 B | **0.495** | 6.59 GiB | **1.1 h** |
+| 4 | 0.488 B | **1.166** | 12.92 GiB | **2.6 h** |
+
+**The comparison that matters: runpod-2 measured 1.49–1.55 s/step at
+T2 on an H100. This MacBook does T2 at 0.495 s/step — ~3x faster.**
+
+**Why, and this is the real finding:** the H100 runs were **feed-bound
+— 818 MiB/s of host→device transfer was 95% of wall, compute only
+2–21%**. A Mac has **no host→device transfer at all**; the buffer and
+the model share the same unified memory. The single dominant cost of
+this port on RunPod **does not exist on this hardware.** We were
+paying $14.95/h for a bus we did not need.
+
+**Honest caveat, stated before anyone quotes the 3x:** my probe holds
+one resident batch, so it measures **compute only** — the real loop
+draws a fresh window batch per step from the 14 GB buffer. On a Mac
+that is a unified-memory gather (cheap, not free), so the true s/step
+is somewhat higher. **Re-measure against the real buffer the moment
+the download lands** and correct this table; do not put the 3x in the
+HANDOFF until then.
+
+### 3. The ceiling: 48 GB decides scope, and it is a hard edge
+
+Extrapolating runpod-c's measured fp32 table onto this machine
+(their H100 "train peak" runs ~15% under my MPS driver-allocated
+figure, so these are the conservative reading):
+
+| T | est. peak on this Mac | verdict |
+|---|---|---|
+| 1 / 2 / 4 | 3.6 / 6.6 / 12.9 GiB | **measured, fine** |
+| 6 | ~22 GiB | fits |
+| 8 | ~34 GiB | fits alone, watermark raised, nothing else running |
+| 10 | ~48 GiB | **NO** |
+| 16 | ~69 GiB (OOMs an 80 GB H100) | **NO** |
+
+**⚑ AGENT COUNT IS NOT MACHINE COUNT.** If mac-c / mac-d are sessions
+on *this* MacBook, the fleet is **one 48 GB machine**, and concurrency
+is ~3 small-T cells or **one** T≥6 cell — not "several mac agents in
+parallel". Whoever knows the machine topology, state it in the LOG
+before anyone plans lanes on the assumption of parallelism.
+
+### 4. ⚑ T16 was never an upstream cell — this outlives the venue change
+
+From upstream source at `94119bc08` (L2013–2029), the T-sweep archs
+are exactly:
+
+    agentic_txc_02_t2, t3, t6, t7, t8, t10, t15, t20
+
+**There is no `t16`.** Our T16 is our own interpolation, not a paper
+cell — worth knowing given the deliverable spec names T16.
+
+And runpod-c's A40 paradox is **real and sharpened by the source**:
+upstream's batch schedule (`256 at T>=15`, `512 at T>=10`) is
+commented as an **A40 OOM accommodation**, and an A40 is **48 GB** —
+yet our port needs **69.30 GiB for params + Adam state alone at T16**,
+batch-independently. Upstream also ran T20 on that hardware. **Both
+cannot be the same model.** Either upstream's large-T configuration
+differs from ours, or it ran in a precision/optimizer regime we have
+not found. Unresolved, and it is a **fidelity** question, not a venue
+one: it says our large-T pf cells may not be the paper's cells.
+
+Related and already flagged by runpod-c: `training_cfg.precision` is
+**declarative only** — no autocast, no GradScaler, no `.half()` in
+`src/temp_bench/`, and `SequenceBuffer` casts to fp32 — so **every row
+we have trained records `precision: bf16` while having trained in
+fp32.** Harmless to the science at small T; it is a disclosure item,
+and honouring it would roughly halve every figure in § 3.
+
+### 5. Open question for Han (asked, not assumed)
+
+"Local mac agents own RLHF" admits two readings and they lead to
+different grids:
+
+- **(a) Mac agents own the work, and may provision fresh pods they
+  control end-to-end** — i.e. the chaos being killed is *resident pod
+  agents*, not RunPod as a tool. Full T{1..16} x 3 seeds stays on the
+  table; mac-d spins clean, single-owner pods for the large-T end.
+- **(b) Mac hardware only.** Then the deliverable is honestly
+  **T ∈ {1,2,4,6,8} x 3 seeds**, with T10/T16 disclosed as infeasible
+  at 48 GB — softened by § 4, since T16 is not an upstream cell anyway.
+
+**Proceeding meanwhile on what is common to both:** cache download,
+`convert_train_cache.py` repoint, an MPS smoke on the real buffer, and
+the corrected-anchor render. No lane plan until Han rules, because
+under (b) a lane plan is mostly moot.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
