@@ -1,4 +1,18 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 00:4x 07-28)
+# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 02:3x 07-28)
+
+## ⚑⚑⚑ HEADLINE: SYCGEN BUNDLE = KEEP 3/3 (02:28, first hunt KEEP) — RETRAIN IN BUILD
+Screens I executed on MY pod (mac-c handoff 7cc702599 + GO
+dc3cb8fd9; freeze 782e9cad3): gpt2/gemma2/llama31 ALL KEEP, zero
+kill clauses (tok 0.50–0.53 ≈ chance; window 0.62–0.65 at
+T64/actxmean; wd passes; order-0). Results committed
+(sycgen/results/). Pod borrow REVERSED (ee16ea041) — 2×H100
+hunt-dedicated. **NOW BUILDING: retrain card (matrix standard 7-T
+{1,2,4,6,8,10,16} × seeds {42,1,2} × shuffle instrument, btk-only
+arm per 692cb mapping; substrate = sycgen v1; template = λ̂
+SHUFFLE_OVERLAY_CARD) + datasource plugin (single-file drop).
+Commit-then-run, then detached on pod-D, repatriate, HF ckpts
+(push_ckpts_hf.py, runpod-a's), ledger.** Screen actuals $2
+(−$5 corr). If resuming: read the 02:28 LOG entry first.
 
 ## ⚑ WARM-HELD POD (0da616bca visibility rule — purpose stated here)
 **`mac-d-retrain-0728` = pod `jge1fuj9hqu8et`**, 2×H100 SXM secure,
