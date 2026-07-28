@@ -13,10 +13,10 @@ corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 ## State in one paragraph
 
 **I own the entire hunt end to end**, and **item 7 was the only
-deliverable with NO candidate.** It now has one. Hub authorized spend
-at 14:51 (Han: *"mac-c is HOLDING — they should be running ahead at
-full speed!"*); corpus generated, all label-side bands passed, **screen
-in flight.**
+deliverable with NO candidate.** Hub authorized spend at 14:51 (Han: *"mac-c is HOLDING — they
+should be running ahead at full speed!"*); I built, generated,
+premeasured and screened it in **~75 minutes for ~$22** — and it came
+back **WEAK**. Item 7 is still open.
 
 **`retryesc_gen` LANE CLOSED — SCREEN VERDICT WEAK 3/3** (writeup
 `retryesc_gen/RESULT.md`). Corpus 300 docs / 946,546 tok / 2,809
@@ -83,6 +83,11 @@ T-window)** — verified exact (worst err **2e-6**) in
 `retryesc_gen/verify_floor_identity.py`. The x-axis is a **design
 parameter I can aim at before generating.**
 
+⚠ **The identity is exact for the QUANTITY; `claim_zone` estimates it on
+the WRONG POPULATION.** See the `claim_zone` section below — it
+under-reads by +0.076 at `T/e1` ≈ 0.5, which is what cost
+`retryesc_gen` its KEEP.
+
 | face | floor-excess | gain | verdict |
 |---|---|---|---|
 | `sycgen_age` | **+0.210** | **+0.117** | **KEEP** (gold) |
@@ -94,14 +99,24 @@ Band is **two-sided**: every face in +0.15…+0.25 cleared every cell
 floor** (`qd` margin −0.034). ⚠ Band edges are **POST HOC** — the
 correlation is the evidence, the bands are a design target.
 
-## ⚑ `claim_zone` MEASURES `f` DIRECTLY — use it, do not simulate
+## ⚑ `claim_zone` — use it, but it is a LOWER BOUND, not the floor
 
-`elicit_lib.claim_zone(...)["frac_in_window"]["T64"]` **is**
-`floor_excess`. Validated on `evalage`: predicted 0.0470 vs **measured
-+0.0451**, **K = 0.96**. So the pilot's density gate is **$0,
-label-side, no GPU**.
+`elicit_lib.claim_zone(...)["frac_in_window"]["T64"]` is the **$0,
+label-side, no-GPU** estimate of `floor_excess`. Still the right tool
+for aiming — **but it UNDER-READS, and the size of the under-read
+depends on `T/e1`:**
 
-## Four retractions of my own, all material
+| corpus | `T/e1` | `f` (claim_zone) | measured `floor_excess` | error |
+|---|---|---|---|---|
+| `evalage` | 64/429 = 0.15 | 0.0470 | +0.0451 | **−0.002** ✅ |
+| `retryesc_gen` | 64/120 = **0.53** | 0.1853 | **0.2608** | **+0.076** ⚠ |
+
+**Do not aim at the top of the band with `claim_zone` alone.** At
+`T/e1` ≈ 0.5 it read 0.185 when the truth was 0.261 — over the +0.25
+edge — and that is what cost `retryesc_gen` its KEEP. Aim for a
+*measured* 0.15–0.20, i.e. `claim_zone f` ≈ 0.08–0.13 at this `T/e1`.
+
+## FIVE retractions of my own, all material
 
 1. **The age-face objection (withdrawn 14:07).** I said no age face
    passes the order ladder (0/9, true) and inferred `retryesc_gen`
@@ -137,16 +152,27 @@ label-side, no GPU**.
    `f` far *lower*. Fixed by shortening turns to 35–70 ⇒ **f = 0.1850**.
    **Turn length moves `f` ~0.13; `P_REPEAT` moves it ~0.02.**
 
-**⚑ STANDING LESSON — three slips on ONE quantity in one day.** Every
+**⚑ STANDING LESSON — FOUR slips on ONE quantity in one day** (the fourth is retraction 5 below, and it is the one that cost a KEEP). Every
 time, I **reasoned forward from an assumption instead of measuring
 something the harness could already tell me** (`claim_zone` existed the
 whole time). **When a model and a measurement disagree, go find the
 measurement before inventing a mechanism for the gap.**
 
-**What kept all three cheap:** the card wrote its bar on the
-**MEASURED** quantity and **named the knob in advance**. So a wrong
-model costs a re-tune, not a candidate — **the target `f` ∈
-[+0.15,+0.25] has never moved.** Do this on every future card.
+**What kept the first three cheap:** the card wrote its bar on a
+**MEASURED** quantity and **named the knob in advance**, so a wrong
+model cost a re-tune, not a candidate. **The fourth was not cheap** —
+because the quantity I measured was the right *concept* read off the
+wrong *population*, and no amount of "measure, don't model" discipline
+catches that. **The next-level rule: check that your instrument and
+your bar are computed on the SAME ROWS.**
+
+5. **`claim_zone` under-reads `floor_excess` (cost the `retryesc_gen`
+   KEEP).** I aimed at 0.185 mid-band; the screen measured **0.261**,
+   over the +0.25 edge. Leading explanation (hypothesis, needs a direct
+   test): `claim_zone` uses the **raw eligible population**, the floor
+   is fit on the **class-balanced manifest** which oversamples the
+   low-age class. Predicted to scale with `T/e1`; consistent with
+   `evalage` (0.15 → −0.002) and `retryesc_gen` (0.53 → +0.076).
 
 ## `evalage` — CLOSED (WEAK), and now explained
 
