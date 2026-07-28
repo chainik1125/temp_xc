@@ -55,6 +55,13 @@ retrained — see COMPOSITION_AUDIT).
   ∈ {5,20}, `eval_cfg.shuffle` ∈ {none, within_window}, seeds
   {1,2,42}. Datasource `gemma_2_2b_it_l13_fineweb_24k128` (paper
   probe cache; gemma-2-2b-it L13).
+- **PAPER-FAITHFUL ARMS (Han requirement, commissioned ~02:3x):**
+  the TRUE paper-composition T-sweeps (probing: trained
+  ReLU(TopK_{20T}(Σ)) via the upstream class; RLHF: agentic_txc_02
+  ported + trained) are COMMISSIONED and land in the amendment
+  window (target Aug 1-2). Until then the exhibits carry the v2
+  arms + the archived paper-composition T=5 anchors, labeled per
+  the rule below.
 - **LABELING RULE (binding, Codex-prompted):** the T-sweep arms are
   v2 compositions — label "TXC (v2, relu-mix/btk-only)", never
   "paper base"; the paper-exact composition appears only as the

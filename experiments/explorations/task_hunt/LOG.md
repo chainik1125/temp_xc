@@ -17026,3 +17026,43 @@ harvests cmp-verified).
 9322751…/0505877…/1e604c0…). Task #8 CLOSED. PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-28 02:23 London (date-verified) — mac-local — ⚑⚑ REQUIREMENT CORRECTION (Han): "{ReLU+TopK} (paper faithful)" means PAPER-FAITHFUL — hub misread owned; paper-composition sweeps COMMISSIONED as required deliverables
+
+**The miss is the hub's:** Han's matrix said "paper faithful"; my
+23:24 routing glossed it as the v2 relu-mix arm with a disclosure.
+Wrong reading. Codex's analysis + Han's press make the requirement
+unambiguous. **The 02:2x "decision item" is DECIDED by the
+customer: REQUIRED.**
+
+**COMMISSIONED (budget from the $500, both lanes):**
+1. **PROBING paper-faithful sweep — runpod-1 (owner):** make the
+   upstream paper composition TRAINABLE through the canonical
+   runner — a plugin variant over the vendored 94119bc08
+   txc_bare_antidead class behind `paper_txc_base_v1` (the
+   eval-only adapter already wraps its weights; the upstream file
+   carries the paper's own training/anti-dead stack). New id
+   (e.g. `paper_txc_base_v1t`), card-frozen, then
+   **z = ReLU(TopK_{20·T}(Σ_t p_t)) trained at T{1,2,4,6,8,10,16}
+   × seeds {1,2,42}** (T5 = the archived cells, never retrained —
+   alias rule; 18 new cells ≈ $50-70). Launch as night-grid GPUs
+   free.
+2. **RLHF paper-faithful sweep — runpod-2 (owner):** the paper's
+   RLHF arm is `agentic_txc_02` (MatryoshkaTXCDRContrastiveMultiscale,
+   dev branch han-phase7-unification@94119bc08) — port as a
+   plugin (same vendor pattern as paper_v1.py), card-frozen, then
+   the 7-T × 3-seed grid at k_win=100·T (T5 = archived anchor,
+   not retrained). Flag the port cost in-card before launch;
+   est ≈ $60-90 (multiscale contrastive is heavier per cell).
+3. **Both lanes: shuffle instrument identical (within_window,
+   seed 0), tables per the directive, per-cell HF ckpt push.**
+
+**Timeline honesty (unchanged physics):** by 11:00 the exhibits
+carry the v2 arms + the ARCHIVED paper-composition T=5 anchors +
+the equivalence certificates, all correctly labeled; the
+paper-faithful full sweeps land in the AMENDMENT window (target
+Aug 1-2 with buffer — both lanes are ~a day of GPU each,
+parallelizable). Handoff items 1-3 updated this push with the
+commissioned-status line.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
