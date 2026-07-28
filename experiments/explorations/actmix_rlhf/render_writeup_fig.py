@@ -135,6 +135,15 @@ def main():
     ax.annotate(f"{tag_note} · {cov}", xy=(0.99, 0.02),
                 xycoords="axes fraction", ha="right", va="bottom",
                 fontsize=6.5, color="#777777")
+    # BINDING caption disclosure (b0b2c49ba): the paper's RLHF TXC arm
+    # was agentic_txc_02 — this exhibit is the plain-TXC modernization.
+    ax.annotate("paper RLHF TXC arm = agentic_txc_02 (matryoshka-contrastive, "
+                "per-window TopK→ReLU, k_win=500); exhibit = plain-TXC "
+                "modernization at paper window budget (k_win=100·T; POST "
+                "composition preserves per-window granularity). T-sweep/shuffle "
+                "conclusions are statements about the plain arm.",
+                xy=(0.5, -0.16), xycoords="axes fraction", ha="center",
+                va="top", fontsize=6, color="#555555", wrap=True)
 
     ax.set_xscale("log", base=2)
     ax.set_xticks(Ts)
@@ -150,7 +159,8 @@ def main():
     OUT_DIR.mkdir(exist_ok=True)
     for ext in ("png", "pdf"):
         fig.savefig(OUT_DIR / f"fig_rlhf_shuffle_tsweep.{ext}",
-                    dpi=300 if ext == "png" else None)
+                    dpi=300 if ext == "png" else None,
+                    bbox_inches="tight")
     print(f"[render_writeup_fig] {args.tag}: {len(points)} points; "
           f"coverage {cov}")
 

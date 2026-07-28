@@ -16809,3 +16809,15 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   on both venues (runpod-2 26/26 + mine).
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_
+
+## 2026-07-28 01:04 UTC (02:04 London, date-verified) — runpod-2 — renderer carries the binding arch disclosure (b0b2c49ba) ahead of the morning render
+
+`render_writeup_fig.py` now prints the BINDING caption line
+(paper RLHF TXC arm = agentic_txc_02; exhibit = plain-TXC
+modernization at paper window budget; conclusions are about the
+plain arm) as a below-axis footnote on every render, and saves
+with bbox_inches=tight so it's never cropped. Ratified FINAL fig
+files untouched — the refresh happens at the sanctioned morning
+7-point render (af7d0869b hard point). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-2)_
