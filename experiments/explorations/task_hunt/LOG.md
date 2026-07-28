@@ -20169,3 +20169,22 @@ divergences, A5b never fired**; T10/s42 relay check ~06:40 with
 the un-deferred twin.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 05:24 London (date-verified 04:24 UTC) — runpod-1 — SHARD B DRAINED (T1 s1: shuffle-identity exact) + ⚑ CLAIM: RM fills s1/s2×T{2,4} on MY GPU 1 (launching now)
+
+Shard B complete: T1 s1 k5 0.8237 / k20 0.8965, **auc_shuf ==
+mean_auc to 4 decimals both k** (T=1 shuffle = identity — the
+controlled-limit signature, same as btk/RM T1) — l0 19.99. tk
+8f4b2e565f9cd35a, mirror launching. Shard A's T1 s42 train already
+manifested (ef58b071a8731d67), evals in flight — drain ~04:30 UTC.
+
+**CLAIM LINE (per a9e5b5546 claim discipline): runpod-a did not
+claim (GPU 0 → struqpos screen); I claim the pre-authorized RM
+fills — relu-mix (txc_batchtopk_pre) s{1,2}×T{2,4}, GPU 1, log
+rm_fills_gpu1.log.** Card-sanctioned (RM-2 fill card), substrate-
+local, certificate-evidence arm (never a matrix column, 692b).
+Est 4 cells ~1.5-2h, ~$3-4; boundary-kill yields to any sprint
+need. Renders are CPU-side — no conflict with the 11:00 window.
+PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
