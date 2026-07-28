@@ -29282,3 +29282,57 @@ corrected port-fidelity stamp, per-T coverage, and both deviations.
 pf lane drained, on the cache it already holds.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 15:59 London (date-verified 14:59 UTC) — mac-local (hub): ⚑⚑⚑ **pf GRID COMPLETE 15/15 — VERIFIED INDEPENDENTLY, HANDOFF UPDATED TO FINAL.** Item 3 now has both plots.
+
+### 1. I recomputed mac-d's statistics from the leaderboard. They are exact.
+
+    T   n   mean       sd        seed signs
+    2   3   +0.00403   0.00924   + - +
+    4   3   -0.00366   0.00168   - - -
+    6   3   +0.00037   0.00458   - - +
+    8   3   -0.00438   0.01053   + - -
+    10  3   -0.01029   0.00992   - - -
+
+    15 cells | whole-grid mean -0.00279  sd 0.00839
+              t = -1.29, df 14, two-sided p = 0.219  NOT SIGNIFICANT
+              |mean| = 0.13x the anchor seed-scatter (0.0209)
+
+**Uniform 3 seeds at every T. The grid is done.**
+
+### 2. ⚑ T8 landing sign-MIXED is what closes the trend question for good
+
+T8 sits **between** T6 and T10. Its seeds are `+ − −` — **mixed** — so
+any monotone-in-T story is broken **in the middle of the range**, not
+at an endpoint where one could argue about edge effects. Combined with
+the pre-registered T10 null (15:5x) and two-all-negative-of-five being
+a **P = 0.12** coincidence, **there is no trend to report and no
+version of the data that supports one.**
+
+**Binding verdict, unchanged from 15:5x and now on the full grid: the
+paper-faithful arm shows NO order effect at any T measured. The
+BatchTopK arm says the same. Two independent arms, one null.**
+
+### 3. HANDOFF updated to final
+
+`REBUTTAL_HANDOFF.md` § 3 now carries the complete table, the
+whole-grid statistic, the binding verdict, the pre-registration
+provenance, the `l0 = 100·T` port-fidelity check, and the T1/T16
+absence framed as **fidelity** (upstream has neither arch) rather than
+shortfall. **The interim n=1 / seed-mixed caveat is retired** — it was
+true at 15:1x and is superseded. Figure re-rendered at 15:58; census
+regenerated.
+
+**Han's item 3 is complete on both arms: (i) paper-faithful plot and
+(ii) BatchTopK plot, each with its own table.**
+
+### 4. Still open, and small
+
+- **btk gap cells** (T6/s2, T10/s1, T10/s2) running on the surviving
+  pod per the 15:5x hold — keys pre-verified. They bring the btk arm
+  to uniform 3 seeds; the exhibit ships either way.
+- **mac-c's screen** — the only thing between item 7 and a verdict.
+- **Token rotation** — three pod-staged tokens, Han's call, still my
+  recommendation.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
