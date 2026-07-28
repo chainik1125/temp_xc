@@ -18127,3 +18127,49 @@ x6/x10 drain unchanged (~08:00-08:30 UTC), then the frozen
 THEN-order (T10 trio shas → HF push → pf substrate → gates → grid).
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+## 2026-07-28 03:06 London (date-verified) — mac-local: sycgen T-AXIS AMENDMENT RATIFIED (36 cells) + corrections to my 03:01 bundle + beat absorbs
+
+**RATIFIED — mac-d's RETRAIN_CARD §5 amendment (02:54): T-axis
+{1,2,4,8,16}, 36 cells.** Forced by the eval contract
+(`synthetic_recovery` requires `eval_window_L % T == 0`, L=32
+frozen; no admissible L covers {6,10,16}); my census run
+independently corroborates ZERO T6/T10 rows fleet-wide on any
+synthetic-eval lane. Receipts accepted: 12 doomed cells kept as
+`ok:false` rows with the exact ValueError, ≈$2 burn disclosed,
+nothing relaunched. **The axis is identical to the delivered λ̂
+exhibit (item 4) — precedent, not retreat; hunted tasks were
+already relaxed to either-arm (Han 02:38), and this T-axis
+constraint is now DISCLOSED in HANDOFF item 6 for Han's eyes** (the
+literal deliverable directive says the sweep "must include
+{1,2,4,6,8,10,16}" — for THIS eval family that is mathematically
+unsatisfiable at L=32; flagging rather than silently narrowing).
+mac-d's renderer-ahead-of-drain + heads-up to the x6/x10 lanes
+(rlhf evaluator ≠ synthetic_recovery; no L%T constraint there —
+confirmed by the 24 existing RLHF btk rows incl. T5) both noted.
+
+**CORRECTIONS to my 03:01 entry (numbers superseded):** "48-cell"
+→ **36-cell**; drain "~05:30–06:30" → **shard1 ETA ~03:35–03:55,
+fig plausibly ~04:30**. HANDOFF item 6, CODE_GUIDE fleet map, and
+the census generator all reconciled this push.
+
+**Beat absorbs (review-on-push):**
+- **runpod-1 6/6 DECIDER (03:00) absorbed:** high-T k20 block
+  complete, 6/6 btk-ahead (P≈1.6% nominal, post-hoc caveat stays
+  attached in any quote); T10/s2 landed ⇒ **probing {BatchTopK}
+  arm now COMPLETE at 7 T × 3 seeds** — census regenerated,
+  {1,2,42} at every T; guide §1b gaps updated. Shard B
+  auto-launch at PIN confirmed.
+- **runpod-c shard D launch (02:48) RATIFIED** — pin-ancestor +
+  empty-diff + 8/8 on-pod tests + substrate receipts all present;
+  shard C at C5-T16 drain ~03:15-03:20 as ordered.
+- **mac-c evalage (03:15-stamped): 3-TOKENIZER RULE MET (18/18
+  bands, gpt2 leg array-identical to the stream) + screen FROZEN
+  (163492bc7) and RUNNING + both owed harness fixes discharged**
+  — absorbed; the llama31 unigram CI-upper-crossing disclosure is
+  the right honesty (point-estimate rule stands, margin travels
+  with any KEEP). Item 7 could reach screen verdict TONIGHT.
+  Stamp note: this entry is future-stamped again vs its commit
+  clock (03:15 vs 03:00:12) — folded into the standing corrigendum
+  request, content unaffected.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

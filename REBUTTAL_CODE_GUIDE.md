@@ -93,10 +93,11 @@ the hunted-task cells that live outside the leaderboard. It is
 generated, not hand-written: refresh with
 `.venv/bin/python scripts/cell_census.py --write` — cells are landing
 all night (paper-faithful sprint, sycgen retrain), so regenerate
-before quoting coverage. Known in-flight gaps at 02:58: probing
-btk-only T10/seed2 (old-pod GPU 1), RLHF btk-only T{6,10} (old-pod
-GPU 2), ALL `paper_txc_base_v1t` cells (sprint, ETA ~06:30–07:30),
-sycgen retrain rows (~05:30–06:30).
+before quoting coverage. Known in-flight gaps at 03:06: RLHF
+btk-only T{6,10} (old-pod GPU 2), ALL `paper_txc_base_v1t` cells
+(sprint, ETA ~06:30–07:30), sycgen retrain rows (~04:00). The
+probing btk-only arm is COMPLETE at 7 T × 3 seeds (T10/s2 landed
+03:00).
 
 ## 2. Sparse probing — code, data, results
 
@@ -196,7 +197,7 @@ over this snapshot if they disagree.
 | | | 1 | rmx_b (eq-extension cells 2–6; cell 2 lands ~04:00) | overflow only post-drain (~11:30; boundary offer CLOSED) |
 | **pod B** (2×H100) | runpod-c alone | 0+1 | **FROZEN hill-climb draining in-flight C4/C5-T16 (~02:50 / ~03:15)**; resume playbook in `tscale/RESULTS.md` §FREEZE; ckpt mirror to HF in background | **shards C (T8×3→T1/s2) + D (T6×3→T2/s42) at drain** — substrate on-pod, zero sync |
 | **mac-c-screen-0728** (L40S) | mac-c | — | warm-held (stated purpose) | evalage screen once the 3-tokenizer re-tokenization transplant (mac-d's `screen_grids.py`) verifies |
-| **mac-d-retrain-0728** (2×H100) | mac-d | 0+1 | **sycgen 48-cell matrix retrain RUNNING** (first hunt KEEP 3/3 at 02:28 → retrain within the hour, as pre-authorized; card 74d260321, drain ~05:30–06:30) | shuffle overlay → repatriate rows → HF ckpts → T-sweep figure → TERMINATE pod |
+| **mac-d-retrain-0728** (2×H100) | mac-d | 0+1 | **sycgen matrix retrain RUNNING — 36 cells, T{1,2,4,8,16} ≡ the λ̂ exhibit axis** (card 74d260321 + §5 amendment: T{6,10} can't tile eval L=32, receipts kept); shard0 DONE, shard1 ETA ~03:35–03:55 | shuffle overlay → repatriate rows → HF ckpts → T-sweep figure (~04:30) → TERMINATE pod |
 
 **Priority order (Han, 02:38): paper-faithful sweeps outrank ALL
 btk GPU work; hunted tasks need either arm only; relu-mix is

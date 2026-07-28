@@ -156,12 +156,18 @@ carries the row-level label.
   kill clauses, per-token best 0.501/0.529/0.530 ≈ chance vs window
   best 0.616/0.641/0.652 (T64/actxmean_mlp), order-0, wd passes
   (LOG 02:28, `task_hunt/sycgen/results/*.json`). The pre-authorized
-  **48-cell matrix retrain is RUNNING** on mac-d's 2×H100 (7-T
-  {1,2,4,6,8,10,16} × seeds {42,1,2} × shuffle overlay, btk-only arm
-  — either-arm rule; card 74d260321), **drain ~05:30–06:30 → overlay
-  → fig+table in `figs_writeup/` before 11:00 if the schedule
-  holds** (fallback: amendment window). Rows land on the canonical
-  leaderboard under `datasource=sycgen_real_age_llama31_8b_l14`.
+  **matrix retrain is RUNNING** on mac-d's 2×H100: **36 cells,
+  T {1,2,4,8,16} × seeds {42,1,2} × shuffle overlay, btk-only arm
+  (either-arm rule; card 74d260321 + §5 T-axis amendment, LOG
+  02:54).** T-axis disclosure: T{6,10} cannot tile this eval's
+  frozen L=32 window (`eval_window_L % T == 0`; ValueError receipts
+  kept for all 12 doomed cells, ≈$2 burn disclosed) — the axis is
+  IDENTICAL to the delivered λ̂ exhibit's (item 4), not a coverage
+  retreat. Shard0 (untrained half) DONE; shard1 ETA ~03:35–03:55 →
+  overlay → **fig+table in `figs_writeup/` plausibly by ~04:30,
+  comfortably before 11:00** (fallback: amendment window). Rows land
+  on the canonical leaderboard under
+  `datasource=sycgen_real_age_llama31_8b_l14`.
 - **Item 7 = evalage, CANDIDATE (screens pending):** corpus v1
   COMPLETE (400 docs / 2.04M tokens, claude-haiku, both card gates
   pass, HF-pushed w/ sha receipts) + **6/6 label-side bands PASSED**
