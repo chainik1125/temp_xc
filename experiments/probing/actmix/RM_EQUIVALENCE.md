@@ -1,6 +1,6 @@
 # P1-RM ↔ btk-only weight-equivalence table (auto: rm_equivalence.py, protocol (a))
 
-3/17 pairs IDENTICAL (torch.equal on every shared tensor).
+3/18 pairs IDENTICAL (torch.equal on every shared tensor).
 
 ## ALIAS EXCLUSION LIST (184ebd47a assignment — any future arm-diff must exclude these train_keys)
 
@@ -22,6 +22,7 @@ House rule enforced by this checker: joins filter n_steps>0 AND this list, and D
 | txc_batchtopk_pre | 1 | 16 | 7 | **DIVERGES** | -7.53e-03 | threshold_set |
 | txc_batchtopk_pre | 2 | 6 | 7 | **DIVERGES** | -1.38e-02 | threshold_set |
 | txc_batchtopk_pre | 2 | 8 | 7 | **DIVERGES** | +5.63e-03 | threshold_set |
+| txc_batchtopk_pre | 2 | 10 | 7 | **DIVERGES** | -1.41e-02 | threshold_set |
 | txc_batchtopk_pre | 2 | 16 | 7 | **DIVERGES** | +7.94e-04 | threshold_set |
 | txc_batchtopk_pre | 42 | 1 | 7 | **IDENTICAL** | +0.00e+00 | threshold_set |
 | txc_batchtopk_pre | 42 | 2 | 0 | **METRIC-DIVERGES (weights remote)** | +4.56e-03 | — |

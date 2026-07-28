@@ -17910,3 +17910,38 @@ receipt), `labels/evalage_premeasure_3leg.json`,
 Commits `a4971b688` (grids + bands), `163492bc7` (screen freeze).
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-28 03:00 London (date-verified 02:00 UTC) — runpod-1 — ⚑ THE 6/6 DECIDER LANDED: high-T k20 block COMPLETE, 6/6 btk-ahead (P≈1.6% nominal) + night chain DRAINED + shard B auto-launched
+
+**Night chain closed.** btk s2/T10 landed (k5 0.8361 / k20 0.8835,
+l0 211.72, eval_keys 5dd19a3e101c950c / 4248e42238216c3c) →
+`[sweep] PASS COMPLETE (all cells ok)` → NIGHT_DONE_GPU_1 →
+**shard B auto-launched 01:57 UTC at PIN d9235755b** (waiter worked
+as designed; T10×{42,1,2}→T1×{1}, log pf_shard_B.log). Both my
+GPUs now on paper-faithful cells (A: T16 s42 since 01:39).
+
+**The pre-framed decider (a264241ac): resolved btk-ahead.**
+rm_equivalence refreshed (18 pairs, 3 IDENTICAL unchanged; s2/T10
+DIVERGES on the shared tensors, table + JSON in-tree). Per-k deltas
+from the landed rows, Δ = RM − btk:
+
+- **High-T k20 block, now complete — 6/6 btk-ahead:**
+  T10 k20 {−6.84, −6.87, −2.49}e−3 · T16 k20 {−1.67, −0.43,
+  −6.10}e−3. One-sided sign-test P ≈ 0.5^6 ≈ **1.6%** — nominal
+  only: this block was flagged at 5/5, so the standing post-hoc
+  multiplicity caveat applies. Magnitudes stay small (0.4–6.9e−3).
+- **Secondary (new tonight): the T10 COLUMN is 6/6 negative across
+  BOTH k** — k5 {−0.61, −2.29, −14.1}e−3. s2/T10 k5 −1.41e−2 is
+  the largest T10 delta and 2nd-largest in the whole map (after
+  T6 s42 k5 −1.63e−2). Caveat: k5/k20 evals share weights per
+  seed, so the column's 6 slots ≈ 3 independent draws, not 6.
+- Delta-map regimes stand: T6 k5-consistent btk-ahead ~1.3e−2 ·
+  T8 coin-flip · high-T k20 block btk-ahead. Certificate framing
+  per 3b0a4df3d: census leads, traces = rate bounds.
+
+Rows/manifest/equivalence outputs committed this batch. Night btk
+T10/T16 ckpt mirror push queued next (ratified mechanism, per-cell
+duty). Morning queue unchanged: telemetry parse → 11:00 PROTECTED
+btk renders → PRELIMINARY certificate. Ack mac-d 90c89f294 (sycgen
+T-axis amendment — not this lane). PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
