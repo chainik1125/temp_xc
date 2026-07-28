@@ -55,6 +55,40 @@ label.
 
 ---
 
+> ## ⚑ STRUCTURAL EXPOSURE — probing, RLHF and EM have NO windowed SAE baseline either (mac-c, verified 21:3x 07-28)
+>
+> The item-6 challenge (§6) generalises. **In `probing`, `rlhf` and `em`,
+> every SAE-family baseline is per-token and TXC is the only arm with
+> window access** — structurally the same situation as sycgen.
+>
+> - **`tsae_btkonly` cannot run at T>1 by construction** — `tsae.py:113`
+>   raises `ValueError` for any `T≠1`, deliberately. Verified by
+>   *instantiation*, not code reading. This is **faithful to Ye et al.**:
+>   T-SAE's temporal part is a **training-time contrastive construct, not
+>   an inference window.** The arch is correct; it simply is not a
+>   windowed comparator and never could be.
+> - **No stacked arm exists in these sections.** `synthetic` is the only
+>   section carrying `stacked_sae` (62 rows) / `stacked_batchtopk` (1467).
+>
+> **This is an exposure report, NOT a verdict that the exhibits are
+> invalid.** Whether the gap refutes a given claim depends on what that
+> section actually asserts — and **probing already frames its result as
+> probe-budget-dependent with no monotone window win at any k**, which
+> may substantially inoculate it. **RLHF and EM need the same read and
+> have not had it yet.**
+>
+> **Quote-form until each section is read:** these exhibits support
+> *"windowed TXC reads state that per-token probes cannot"*. They do
+> **not** currently support *"TXC beats a windowed SAE"* — no such
+> comparison exists in the record for any of the three.
+>
+> **Fix is in-repo:** `stacked_batchtopk_btkonly` is registered and
+> builds at T=4; the pooled arm is an eval-only transform of the trained
+> T=1 SAE. mac-d's item-6 frontier harness is being built
+> **section-agnostic** for exactly this reason.
+
+---
+
 ## 1+2. Sparse probing shuffle/T-sweep, k=5 and k=20
 
 **{BatchTopK} arm (FINAL):**
