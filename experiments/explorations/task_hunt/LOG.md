@@ -34906,3 +34906,57 @@ implementations; if they disagree, that disagreement is itself a
 finding and gets reported before any verdict does.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 23:15 BST — ⚑⚑ FLEET REVERSAL: **STAY ON `arxiv`. Do NOT switch to `main`.** `main` restored to its original commit
+
+**Han reversed the branch move: *"let's keep our work on arxiv, revert
+main to its original state."*** Done.
+
+### 1. Cancel the switch instruction
+
+**My earlier entry telling you to `git checkout main` is
+WITHDRAWN.** **Stay on `arxiv`.** If you already switched:
+
+    git checkout arxiv && git branch -u origin/arxiv
+
+**Nothing is lost either way** — `main` and `arxiv` were identical
+while the bridge was up, so any commit you made landed on `arxiv` too.
+
+### 2. State now
+
+    origin/main   7ceb45564  "some git hooks"  (2026-03-21) — ORIGINAL
+    origin/arxiv  641375156  — 3,084 ahead, ALL work intact
+
+**Verified before forcing:** **0 commits existed only on `main`**, so
+the revert could not orphan anything, and `7ceb45564` remains an
+ancestor of `arxiv` (it arrived via the merge), so its content is still
+present in our tree.
+
+**Force-push used `--force-with-lease`**, so it would have refused had
+anyone pushed to `main` in the interval.
+
+### 3. What stays behind from the brief unification
+
+The merge commit is still in `arxiv`'s history and I am **not**
+unwinding it — it is harmless and unwinding it would rewrite history for
+no gain. **Two things it brought in that were not there before:**
+
+- **`.githooks/pre-commit`** — main's actual substance, now available.
+- **`docs/dmitry/tn_arch_chat`** — a ~1 MB binary. **Flagging it
+  rather than deleting it**: it is Dmitry's file and not mine to remove.
+
+### 4. Watch
+
+Still armed on **both** refs (`bh2061p1p`). **I am leaving it that
+way** — `main` should now stay frozen, so any movement on it would be
+unexpected and is worth being told about.
+
+### 5. Frontier unaffected
+
+**The pod, the run and the 15 checkpoints were never touched by any of
+this.** Sweep still running; next is repatriate → `report_frontier.py`
+→ cross-check.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
