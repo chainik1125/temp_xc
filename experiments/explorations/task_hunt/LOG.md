@@ -30491,3 +30491,98 @@ it is; **0 mac-c pods, API-verified this minute** (two RUNNING pods on
 the account are mac-d's and the probing lane's — not mine, not touched).
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 19:19 BST — mac-c: ⚑ `floor_excess ≡ f` IS NOT A LAW. It is a low-density approximation, and the brief is propagating it as a law
+
+**Read this before aiming any generated corpus.** My own 16:05
+hypothesis is refuted, my own 19:11 correction is superseded, and the
+design law in `hunt-safety-gold-clew.md` § 2 needs one word changed.
+All three were wrong in the same direction, and $0 of local compute
+settles it.
+
+### 1. H1 (mine) — "`claim_zone` reads the wrong row population" — REFUTED
+
+`retryesc_gen/manifest_f_test.py` walks the rows from `claim_zone`'s
+population to the screen's class-balanced, position-stratified manifest
+**one filter at a time** (probe_eligible→is_assistant, drop doc tails,
+`pos≥64`, intra-chunk offset `≥63`, tercile-assigned, then the balanced
+manifest with the screen's own seed):
+
+| step | gpt2 `f` |
+|---|---|
+| `claim_zone`'s own rows | 0.1853 |
+| … five filters later, == screen `elig` | 0.1859 |
+| balanced+stratified manifest (train) | **0.1875** |
+
+**2.8% of a 0.0755 gap. Every rung flat.** The instrument and the bar
+really are computed on different rows — but that difference is not what
+moved the number. I proposed class-balancing as the mechanism and it is
+not the mechanism.
+
+### 2. H2 — the floor sees a WIDER WINDOW than `f` assumes — CONFIRMED
+
+`_FloorBank.feats` is `(sage_floor, dose_window_count)`, and
+`dose_window_count` is fed **`event_mask`, not `event_first`**. The mask
+spans the **whole event turn**, so a row whose event *first token* has
+already left the T-window still has masked event tokens inside it. **The
+floor's effective window is `T + w`**, `w` = masked-turn width.
+Verified: exactly one masked run per event, mean width **14.0**
+(`evalage`) and **24.8** (`retryesc_gen`), matching medians 13 and 25.
+
+`retryesc_gen/floor_predictor_test.py`, one row population, both corpora:
+
+| corpus | leg | w | `f` (old) | **P(masked in win)** | measured `fe` | resid old | **resid new** |
+|---|---|---|---|---|---|---|---|
+| evalage | gpt2 | 13 | 0.0448 | 0.0551 | 0.0481 | −0.0032 | **+0.0070** |
+| evalage | gemma2 | 13 | 0.0480 | 0.0585 | 0.0639 | −0.0159 | **−0.0053** |
+| evalage | llama31 | 13 | 0.0482 | 0.0591 | 0.0538 | −0.0056 | **+0.0053** |
+| retryesc_gen | gpt2 | 25 | 0.1853 | 0.2662 | 0.2608 | −0.0756 | **+0.0053** |
+| retryesc_gen | gemma2 | 24 | 0.2064 | 0.2825 | 0.2750 | −0.0686 | **+0.0075** |
+| retryesc_gen | llama31 | 23 | 0.2230 | 0.2919 | 0.2885 | −0.0655 | **+0.0034** |
+
+**mean |resid| 0.0391 → 0.0056; max 0.0756 → 0.0075. 86% error
+reduction over 6 legs, 2 corpora, densities 0.048 → 0.289.** And it errs
+**high on 5 of 6** — the conservative direction, because the *upper*
+band edge is what kills candidates. An oracle indicator is an upper
+bound on what a fitted 2-feature probe extracts, so this is expected
+rather than lucky.
+
+**The identity held on `evalage` and broke on `retryesc_gen` because
+w went 13 → 25.** Nothing subtler than that. `w` is the variable nobody
+was tracking — and it is one I moved *myself*, deliberately, when I
+shortened turns to 35–70 tokens to raise density. **I changed the
+instrument's error at the same time as the quantity it measures, and
+did not notice.**
+
+### 3. Three corrections I owe
+
+- **To the brief (§ 2):** `floor_excess ≡ P(event inside the T-window)
+  — exactly (2e-6)` should read **`P(any masked EVENT-TURN token inside
+  the window)`**. The 2e-6 is real but it was measured against a
+  **simulation with point events**, never against the screen's actual
+  floor features. Please don't hand the point-event version to another
+  agent — with wide turns it under-reads badly and it under-reads
+  *worst* exactly where the band's upper edge bites.
+- **To my own 19:11 beat:** "aim at `claim_zone f` ≈ 0.13–0.15" is
+  **withdrawn**. That was an additive constant fit to a residual whose
+  mechanism I had wrong. Correct instruction: **compute
+  `P(masked token in window)` directly on the planned corpus and put
+  THAT in [0.15, 0.25].** No correction factor, no `T/e1` term.
+- **To the error tally:** this is the fifth, and it is the same shape as
+  the uniform-position gap map — **a model verified against itself
+  rather than against the instrument that sets the bar.** My 16:05 rule
+  ("check instrument and bar are computed on the same ROWS") was the
+  right instinct pointed at the wrong noun. **The rule that actually
+  catches this one: check they are computed on the same EVENTS.**
+
+### 4. Cost and status
+
+**$0, no GPU, no pod, ~25 min.** Both scripts committed and
+deterministic from grids already in git; anyone can rerun them. **0
+mac-c pods.** Now moving to the clew sweep — this was the prerequisite
+I said in the beat I would clear before aiming anything, and it is
+cleared with a different answer than I expected.
+
+_Recorded-by: claude-opus-5 (mac-c)_

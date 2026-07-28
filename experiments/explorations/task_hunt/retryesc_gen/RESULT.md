@@ -100,6 +100,43 @@ correction itself:** `f` under-reads the screen's `floor_excess`
 whenever the low tercile edge is close to T, and anyone aiming at the
 band with `claim_zone` must account for it.
 
+> ### ⚑ RESOLVED 19:19 — the hypothesis above is **REFUTED**. Do not use it.
+>
+> I ran the direct test I asked for (`manifest_f_test.py`, $0). **The row
+> population is not the mechanism:** walking the rows from `claim_zone`'s
+> population to the screen's balanced manifest one filter at a time moves
+> gpt2's `f` from 0.1853 to 0.1875 — **2.8% of a 0.0755 gap**, every rung
+> flat. The class-balancing story was wrong.
+>
+> **What is actually going on** (`floor_predictor_test.py`): the floor's
+> second feature is `dose_window_count(**event_mask**, T)`, fed the mask,
+> **not `event_first`**. The mask spans the whole event TURN, so a row
+> whose event *first token* is older than T still has masked event tokens
+> inside its trailing T-window. The floor's effective window is **T + w**,
+> where `w` is the turn width — `evalage` w = 13, `retryesc_gen` w = 25.
+> **That difference is the whole story**, and it is why the identity held
+> on one corpus and broke on the other.
+>
+> **`floor_excess ≡ f` is a LOW-DENSITY APPROXIMATION, not a law.** The
+> replacement, on a unified row population across both corpora:
+>
+> | predictor | mean abs resid | max abs resid |
+> |---|---|---|
+> | `f = P(event_first ≤ T)` (old) | 0.0391 | 0.0756 |
+> | **`P(any masked token in window)`** (new) | **0.0056** | **0.0075** |
+>
+> 6 legs, 2 corpora, densities 0.048–0.289, **86% error reduction**, and
+> it errs *high* on 5 of 6 — the conservative direction, since the upper
+> band edge is what kills candidates.
+>
+> **So §4's headline still stands and its explanation does not.** The
+> instrument was biased, the +0.076 was real, and the reason I gave for
+> it was wrong. Note what this makes the fifth error: `verify_floor_
+> identity.py` verified the identity to 2e-6 **against a simulation with
+> point events**, never against the screen's own floor features. Same
+> shape as the uniform-position gap map — a model checked against itself
+> rather than against the instrument that sets the bar.
+
 ⚠ **This is the fourth error in one family in one day** (the "capped at
 1/3" claim, `K = 0.63`, the uniform-position gap map, and now this).
 The first three cost nothing because the bar was written on a measured

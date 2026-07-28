@@ -1,0 +1,222 @@
+{
+  "T": 64,
+  "chance": 0.3333333333333333,
+  "legs": [
+    {
+      "leg": "gpt2",
+      "tokenizer": "gpt2",
+      "masked_turn_width_median": 25.0,
+      "effective_window_T_plus_w": 89.0,
+      "tercile_edges": [
+        6.918863296508789,
+        8.16490650177002
+      ],
+      "aimed_f_claim_zone": 0.1853,
+      "measured_floor_acc_T64": 0.5941739082336426,
+      "measured_floor_excess_T64": 0.26084057490030926,
+      "ladder": [
+        {
+          "step": "0_premeasure_elig (claim_zone's own rows)",
+          "f_T64": 0.185280869571347,
+          "n_rows": 567452
+        },
+        {
+          "step": "1_swap probe_eligible -> is_assistant",
+          "f_T64": 0.185280869571347,
+          "n_rows": 567452
+        },
+        {
+          "step": "2_+ drop document tails",
+          "f_T64": 0.18629868533329477,
+          "n_rows": 553144
+        },
+        {
+          "step": "3_+ pos >= POS_MIN (64)",
+          "f_T64": 0.18629868533329477,
+          "n_rows": 553144
+        },
+        {
+          "step": "4_+ intra-chunk offset >= 63",
+          "f_T64": 0.18591091805207663,
+          "n_rows": 283851
+        },
+        {
+          "step": "5_+ tercile-assigned (bins>=0)  == screen elig",
+          "f_T64": 0.18591091805207663,
+          "n_rows": 283851
+        }
+      ],
+      "manifest": {
+        "train": {
+          "f_T64": 0.1884746893503461,
+          "n_rows": 11991,
+          "rows_per_class": {
+            "0": 3997,
+            "1": 3997,
+            "2": 3997
+          },
+          "frac_masked_token_in_window": 0.2682011508631474,
+          "floor_excess_predicted": 0.2682011508631474
+        },
+        "test": {
+          "f_T64": 0.1874583055370247,
+          "n_rows": 4497,
+          "rows_per_class": {
+            "0": 1499,
+            "1": 1499,
+            "2": 1499
+          },
+          "frac_masked_token_in_window": 0.276184122748499,
+          "floor_excess_predicted": 0.276184122748499
+        }
+      },
+      "manifest_test_f_T64": 0.1874583055370247,
+      "residual_manifest_vs_measured": -0.07338226936328457,
+      "residual_claimzone_vs_measured": -0.07554057490030927
+    },
+    {
+      "leg": "gemma2_2b",
+      "tokenizer": "gemma2",
+      "masked_turn_width_median": 24.0,
+      "effective_window_T_plus_w": 88.0,
+      "tercile_edges": [
+        6.7944159507751465,
+        8.044394493103027
+      ],
+      "aimed_f_claim_zone": 0.2064,
+      "measured_floor_acc_T64": 0.6083424687385559,
+      "measured_floor_excess_T64": 0.2750091354052226,
+      "ladder": [
+        {
+          "step": "0_premeasure_elig (claim_zone's own rows)",
+          "f_T64": 0.2063894126575544,
+          "n_rows": 511252
+        },
+        {
+          "step": "1_swap probe_eligible -> is_assistant",
+          "f_T64": 0.2063894126575544,
+          "n_rows": 511252
+        },
+        {
+          "step": "2_+ drop document tails",
+          "f_T64": 0.20695912908392636,
+          "n_rows": 497591
+        },
+        {
+          "step": "3_+ pos >= POS_MIN (64)",
+          "f_T64": 0.20695912908392636,
+          "n_rows": 497591
+        },
+        {
+          "step": "4_+ intra-chunk offset >= 63",
+          "f_T64": 0.20553596170802368,
+          "n_rows": 254048
+        },
+        {
+          "step": "5_+ tercile-assigned (bins>=0)  == screen elig",
+          "f_T64": 0.20553596170802368,
+          "n_rows": 254048
+        }
+      ],
+      "manifest": {
+        "train": {
+          "f_T64": 0.20443555110888778,
+          "n_rows": 11994,
+          "rows_per_class": {
+            "0": 3998,
+            "1": 3998,
+            "2": 3998
+          },
+          "frac_masked_token_in_window": 0.28214107053526766,
+          "floor_excess_predicted": 0.28214107053526766
+        },
+        "test": {
+          "f_T64": 0.21509686038744155,
+          "n_rows": 4491,
+          "rows_per_class": {
+            "0": 1497,
+            "1": 1497,
+            "2": 1497
+          },
+          "frac_masked_token_in_window": 0.29236250278334447,
+          "floor_excess_predicted": 0.29236250278334447
+        }
+      },
+      "manifest_test_f_T64": 0.21509686038744155,
+      "residual_manifest_vs_measured": -0.05991227501778104,
+      "residual_claimzone_vs_measured": -0.0686091354052226
+    },
+    {
+      "leg": "llama31_8b",
+      "tokenizer": "llama31",
+      "masked_turn_width_median": 23.0,
+      "effective_window_T_plus_w": 87.0,
+      "tercile_edges": [
+        6.700439929962158,
+        7.948367118835449
+      ],
+      "aimed_f_claim_zone": 0.223,
+      "measured_floor_acc_T64": 0.6218662858009338,
+      "measured_floor_excess_T64": 0.2885329524676005,
+      "ladder": [
+        {
+          "step": "0_premeasure_elig (claim_zone's own rows)",
+          "f_T64": 0.22304605372759154,
+          "n_rows": 474207
+        },
+        {
+          "step": "1_swap probe_eligible -> is_assistant",
+          "f_T64": 0.22304605372759154,
+          "n_rows": 474207
+        },
+        {
+          "step": "2_+ drop document tails",
+          "f_T64": 0.223841467781595,
+          "n_rows": 460777
+        },
+        {
+          "step": "3_+ pos >= POS_MIN (64)",
+          "f_T64": 0.223841467781595,
+          "n_rows": 460777
+        },
+        {
+          "step": "4_+ intra-chunk offset >= 63",
+          "f_T64": 0.22589353934969011,
+          "n_rows": 235580
+        },
+        {
+          "step": "5_+ tercile-assigned (bins>=0)  == screen elig",
+          "f_T64": 0.22589353934969011,
+          "n_rows": 235580
+        }
+      ],
+      "manifest": {
+        "train": {
+          "f_T64": 0.23161580790395198,
+          "n_rows": 11994,
+          "rows_per_class": {
+            "0": 3998,
+            "1": 3998,
+            "2": 3998
+          },
+          "frac_masked_token_in_window": 0.2989828247457062,
+          "floor_excess_predicted": 0.2989828247457062
+        },
+        "test": {
+          "f_T64": 0.21918113039608367,
+          "n_rows": 4494,
+          "rows_per_class": {
+            "0": 1498,
+            "1": 1498,
+            "2": 1498
+          },
+          "frac_masked_token_in_window": 0.30240320427236317,
+          "floor_excess_predicted": 0.30240320427236317
+        }
+      },
+      "manifest_test_f_T64": 0.21918113039608367,
+      "residual_manifest_vs_measured": -0.06935182207151686,
+      "residual_claimzone_vs_measured": -0.06553295246760052
+    }
+  ]
+}
