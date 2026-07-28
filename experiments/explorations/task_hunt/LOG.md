@@ -30796,3 +30796,71 @@ and it cost ~$21 less than finding out after generating.
 receipts rather than one with a story.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 19:59 London (date-verified at write) — mac-d: ⚑⚑⚑ **BOTH ARMS COMPLETE. LAST POD DOWN, $0/h.** btk figure superseded on evidence; and a bug in my own first read of the finished grid, caught before it was posted.
+
+**Gap cells landed:** T6/s2 (3243 s), T10/s1 (5366 s), T10/s2 (5349 s).
+**btk arm is now uniform 3 seeds at ALL EIGHT T** — was T6:n=2, T10:n=1.
+
+**Figure superseded per hub ruling f699c80a4:**
+`ff242b78 → 8d75ff3a`. The deferral caption ("T6/T10 deferred for
+paper-faithful priority; final sweep supersedes in the amendment
+window") became **false** the moment those cells landed, and was
+retired on evidence. **The hub's condition was PROVEN, not asserted:**
+
+    expected change  ordered  T10: mu 0.621772 -> 0.614065  n 1 -> 3
+    expected change  shuffled T10: mu 0.620673 -> 0.615182  n 1 -> 3
+    VERIFIED: only T10 changed; every other column bit-equal
+
+That check is a per-T series diff run by `agents/mac-d/btk_drain.sh`,
+which prints DRIFT and **stops before committing** if any other column
+moves. It also asserted the baseline was the COMMITTED sha, not one of
+my re-renders — the trap I fell into at 16:16.
+
+**⚑ A bug in my own first read, caught before posting.** My quick
+summary printed **T1 mean gap +0.59201**. That is impossible: at T=1 a
+within-window shuffle **is the identity**, so the gap is 0 by
+construction and the row legitimately carries no `shuffled_*` metric.
+My `.get('shuffled_preference_auc_k20', 0)` default turned "absent"
+into "zero" and reported the raw AUC as a gap — which also poisoned
+the aggregate (t = 1.92 across 24 cells). **A number that large in a
+shuffle-gap column is not a finding, it is a decoding error**, and the
+tell was that it equalled the AUC itself. Corrected below.
+
+**btk FINAL, T = 1 handled by construction:**
+
+| T | n | mean gap | sd | signs |
+|---|---|---|---|---|
+| 1 | 3 | 0.00000 | 0.00000 | identity by construction |
+| 2 | 3 | +0.00256 | 0.00567 | + − + |
+| 4 | 3 | +0.00183 | 0.00338 | − + + |
+| 5 | 3 | +0.00918 | 0.00556 | + + + |
+| 6 | 3 | +0.00367 | 0.00355 | + + + |
+| 8 | 3 | +0.00074 | 0.00884 | + − + |
+| 10 | 3 | −0.00112 | 0.01013 | + − + |
+| 16 | 3 | +0.01357 | 0.01376 | − + + |
+| **T>1** | **21** | **+0.00435** | 0.00836 | **t = 2.38** |
+
+**On that t = 2.38 I am deliberately NOT claiming significance.** It
+exceeds the 2.08 two-tailed threshold at df=20, but (i) the 21 cells
+are **three seeds × seven T**, not 21 independent draws — the seed is
+shared down each column, so df=20 overstates the information; (ii) the
+effect is **+0.0044**, one-fifth of the anchors' own seed scatter
+(0.0209); and (iii) it is the *opposite sign* to the pf arm's
+−0.00279. **Two arms, opposite signs, both within noise, is the
+signature of no effect** — not of two effects. The btk arm's standing
+quote form ("gaps ≈ 0 at every T ≤ 8") survives; anyone wanting to
+upgrade it to a positive claim needs a proper repeated-measures test,
+which is a scoring decision and not mine to make unilaterally.
+
+**Pod: GONE.** Guard confirmed btk T6 and T10 both 3/3 local BEFORE the
+kill; `DELETE 204`; **API-verified GONE; 0 mac-d pods; $0/h.** Peak was
+$17.94/h at 14:15 — to zero in 5 h 45 m by per-lane teardown.
+**RLHF grid-day actuals ≈ $36**, including **$2.55 of bad-host loss I
+disclosed at the time**.
+
+**Delivered today:** the pf arm 15/15 (item 3's missing plot, a clean
+seed-controlled null, t = −1.29) **and** the btk arm completed to
+uniform 3-seed coverage.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
