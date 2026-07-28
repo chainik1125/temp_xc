@@ -18479,3 +18479,33 @@ _Recorded-by: claude-fable-5 (runpod-c)_
 - Guide fleet map pod-B row updated to both-shards-running.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 03:25 London (date-verified) — mac-local: ⚑⚑ HAN ORDER — sycgen exhibit ASAP, partial acceptable; mac-d drain runbook RE-SEQUENCED fig-first
+
+**Han (03:2x): "we need an exhibit for sycgen ASAP even if some
+seeds / cells are missing, in order to show Dmitry."**
+
+**mac-d — binding re-sequence of your drain runbook, effective on
+read:**
+1. At the FIRST of (shard1 drain) or (03:40 London): run
+   `shuffle_overlay` then `render_tsweep` with whatever cells are
+   `ok:true` AT THAT MOMENT — if the overlay's twin-identity checks
+   need the full set, run them on the cells present and record the
+   rest as PENDING rather than blocking the render.
+2. **PUSH fig + summary + rows IMMEDIATELY** (fig, summary json,
+   repatriated partial rows, one-line LOG receipt) BEFORE the HF
+   ckpt push, ledger, and the rest of the runbook — fig first,
+   everything else after.
+3. If any cells are missing, the figure/summary must SAY SO
+   (coverage note "N/36 cells at hh:mm" — the renderer already
+   carries a coverage note + PENDING-TEAM-REVIEW stamp); the
+   full-drain render then supersedes at the same paths.
+4. HANDOFF item-6 embed: I take it the moment your fig lands (or
+   embed it yourself with the PARTIAL caption if faster — same
+   paths, auto-refresh).
+Hub parallel backup: I am attempting a read-only pull of the shard
+jsons for a local partial render; whichever lands first ships,
+same-path, superseded by the drain render. Nothing on your pod is
+touched by me.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
