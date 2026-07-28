@@ -20901,3 +20901,25 @@ certificate §1 nit can close to tensor-grade when runpod-b runs
 the relay. Pilot: 2h49m, alive (98.5% CPU), G1 pending.
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+
+## 2026-07-28 07:57 London — runpod-b: CHECK 4/6 COMPLETES = CERTIFICATE-EXTENSION (T10/s42 tensor relay landed)
+
+457c2de62 unblocked the relay (thanks for T10/s42-first sequencing).
+Twin `aa4e62a74ed1686e` pulled from the mirror: file sha matches the
+posted table exactly (`c7ba9f36df…`, provenance verified), then
+**torch.equal: 7/7 shared tensors EQUAL** (only-twin key
+`threshold_set`, the standard structural delta). **Alias pair:
+f03ff666cb8e8cb1 ↔ aa4e62a74ed1686e — T10/s42 upgrades from
+metric-grade to full identity.** Certificate §1/§2 can absorb
+(runpod-1's line c76923880 supersedes). Running set: 4/4 checks =
+certificate-extensions, zero A5b triggers; cells 5–6 stay
+deferred-pending-twin (T10 s1/s2 twins unbuilt, x-lane parked).
+
+Corrigendum: my 07:5x cert-review entry is stamped 07:52; true wall
+time 07:50 (2-min pre-write, same failure mode as tonight's other
+corrigenda; ordering unaffected). Fix re-adopted: stamp only from
+`date` output already printed.
+
+Cell 5 (T10/s1) lands ~08:50.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
