@@ -3,7 +3,7 @@
   "substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
   "model": "gemma2_2b",
   "screen_hs": 14,
-  "face": "L3_gemma2_512",
+  "face": "L3EV_evalage_gemma2_512",
   "H": 64,
   "status": "FEASIBILITY PROBE, not a hunt4 verdict",
   "ax_ts": [
@@ -14,20 +14,20 @@
    64
   ],
   "rows": {
-   "face": "L3_gemma2_512",
+   "face": "L3EV_evalage_gemma2_512",
    "H": 64,
-   "n_docs": 300,
+   "n_docs": 400,
    "tercile_edges": [
-    6.781359672546387,
-    8.038919448852539
+    8.584962844848633,
+    9.831307411193848
    ],
-   "n_elig": 409015,
+   "n_elig": 1359826,
    "bin_counts": {
-    "0": 133785,
-    "1": 136641,
-    "2": 138589
+    "0": 454761,
+    "1": 459020,
+    "2": 446045
    },
-   "L3_gemma2_512/train": {
+   "L3EV_evalage_gemma2_512/train": {
     "rows_per_class_total": {
      "0": 3998,
      "1": 3998,
@@ -35,11 +35,11 @@
     },
     "ok": true
    },
-   "L3_gemma2_512/test": {
+   "L3EV_evalage_gemma2_512/test": {
     "rows_per_class_total": {
-     "0": 1498,
-     "1": 1498,
-     "2": 1498
+     "0": 1499,
+     "1": 1499,
+     "2": 1499
     },
     "ok": true
    }
@@ -276,16 +276,247 @@
    "n_train": 11994,
    "n_test": 4494,
    "wall_s": 4.8
+  },
+  "L3EV_evalage_gemma2_512/tok_linear": {
+   "acc_test": 0.4442962110042572,
+   "per_class": [
+    0.5443629026412964,
+    0.3929286301136017,
+    0.39559707045555115
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 2.6
+  },
+  "L3EV_evalage_gemma2_512/tok_mlp": {
+   "acc_test": 0.4598621428012848,
+   "per_class": [
+    0.5630420446395874,
+    0.4022681713104248,
+    0.4142761826515198
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 13.1
+  },
+  "L3EV_evalage_gemma2_512/position_floor": {
+   "acc_test": 0.33222147822380066,
+   "per_class": [
+    0.2888592481613159,
+    0.3355570435523987,
+    0.37224817276000977
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.1
+  },
+  "L3EV_evalage_gemma2_512/T4/visible_evidence_floor": {
+   "acc_test": 0.33644652366638184,
+   "per_class": [
+    0.009339559823274612,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.1
+  },
+  "L3EV_evalage_gemma2_512/T4/actxmean_linear": {
+   "acc_test": 0.4440738260746002,
+   "per_class": [
+    0.5523682236671448,
+    0.3942628502845764,
+    0.38559040427207947
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.5
+  },
+  "L3EV_evalage_gemma2_512/T4/actxmean_mlp": {
+   "acc_test": 0.47987547516822815,
+   "per_class": [
+    0.6124082803726196,
+    0.409606397151947,
+    0.4176117479801178
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 25.4
+  },
+  "L3EV_evalage_gemma2_512/T8/visible_evidence_floor": {
+   "acc_test": 0.33978208899497986,
+   "per_class": [
+    0.01934623159468174,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "L3EV_evalage_gemma2_512/T8/actxmean_linear": {
+   "acc_test": 0.4560818374156952,
+   "per_class": [
+    0.566377580165863,
+    0.40493661165237427,
+    0.3969312906265259
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.6
+  },
+  "L3EV_evalage_gemma2_512/T8/actxmean_mlp": {
+   "acc_test": 0.4865465760231018,
+   "per_class": [
+    0.6117411851882935,
+    0.42628419399261475,
+    0.421614408493042
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 25.4
+  },
+  "L3EV_evalage_gemma2_512/T16/visible_evidence_floor": {
+   "acc_test": 0.3468979299068451,
+   "per_class": [
+    0.040693797171115875,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.1
+  },
+  "L3EV_evalage_gemma2_512/T16/actxmean_linear": {
+   "acc_test": 0.4696464240550995,
+   "per_class": [
+    0.6004002690315247,
+    0.4056037366390228,
+    0.40293529629707336
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.5
+  },
+  "L3EV_evalage_gemma2_512/T16/actxmean_mlp": {
+   "acc_test": 0.506115198135376,
+   "per_class": [
+    0.6264176368713379,
+    0.43562373518943787,
+    0.4563041925430298
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 25.5
+  },
+  "L3EV_evalage_gemma2_512/T16/actxmean_foreign_linear": {
+   "acc_test": 0.4191683232784271,
+   "per_class": [
+    0.505670428276062,
+    0.3789192736148834,
+    0.37291526794433594
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.7
+  },
+  "L3EV_evalage_gemma2_512/T32/visible_evidence_floor": {
+   "acc_test": 0.36290860176086426,
+   "per_class": [
+    0.08872582018375397,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "L3EV_evalage_gemma2_512/T32/actxmean_linear": {
+   "acc_test": 0.48587948083877563,
+   "per_class": [
+    0.609072744846344,
+    0.409606397151947,
+    0.4389593005180359
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.6
+  },
+  "L3EV_evalage_gemma2_512/T32/actxmean_mlp": {
+   "acc_test": 0.5152323842048645,
+   "per_class": [
+    0.6564376354217529,
+    0.43028685450553894,
+    0.45897266268730164
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 25.4
+  },
+  "L3EV_evalage_gemma2_512/T64/visible_evidence_floor": {
+   "acc_test": 0.3904825448989868,
+   "per_class": [
+    0.17144763469696045,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 0.2
+  },
+  "L3EV_evalage_gemma2_512/T64/actxmean_linear": {
+   "acc_test": 0.5018901228904724,
+   "per_class": [
+    0.6517678499221802,
+    0.42094728350639343,
+    0.4329552948474884
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.5
+  },
+  "L3EV_evalage_gemma2_512/T64/actxmean_mlp": {
+   "acc_test": 0.5307983160018921,
+   "per_class": [
+    0.6777852177619934,
+    0.4349566400051117,
+    0.47965309023857117
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 25.4
+  },
+  "L3EV_evalage_gemma2_512/T64/actxmean_foreign_linear": {
+   "acc_test": 0.4291750192642212,
+   "per_class": [
+    0.5223482251167297,
+    0.3962641656398773,
+    0.36891260743141174
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.6
+  },
+  "L3EV_evalage_gemma2_512/T32/label_null": {
+   "acc_test": 0.34600844979286194,
+   "per_class": [
+    0.3562375009059906,
+    0.32288190722465515,
+    0.35890594124794006
+   ],
+   "n_train": 11994,
+   "n_test": 4497,
+   "wall_s": 4.8
   }
  },
  "summary": {
-  "tok": 0.3818424642086029,
-  "best_window": 0.49065420031547546,
+  "tok": 0.4598621428012848,
+  "best_window": 0.5307983160018921,
   "best_T": 64,
-  "gain_vs_tok": 0.10881173610687256,
-  "floor_at_bestT": 0.6081441640853882,
-  "beats_floor": false,
-  "position_floor": 0.351579874753952,
+  "gain_vs_tok": 0.0709361732006073,
+  "floor_at_bestT": 0.3904825448989868,
+  "beats_floor": true,
+  "position_floor": 0.33222147822380066,
   "gain_bar_0.05_cleared": true
  }
 }

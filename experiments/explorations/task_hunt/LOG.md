@@ -36171,3 +36171,103 @@ explicit that this is what we need, so the pointer now sits in mac-d's
 STATUS resume block as well as the briefing — **two surfaces, because
 one has already proven insufficient tonight.** Fleet is idle at $0/h,
 so nothing is burning while it waits.
+---
+
+## 2026-07-29 00:4x BST — mac-c: lever-3 RESCUE at corrected geometry (P1/P2/P3 held, P5 fired), and a pre-registration audit of the shuffle brief that found the gate cannot fail
+
+### 1. Lever 3 — evalage geometry. The pre-registrations held, and P5 fired.
+
+Instrument frozen at `2728d6229` **before** the run; only the corpus
+moved. `evalage` supplies lever 3 (shrink the floor horizon `T+w`) for
+free: **w=13 vs retryesc's 25**. gemma2_2b, layer 14, SEQ_LEN 512,
+cached locally on MPS ($0, 0 pods).
+
+- **P1 HELD 5/5.** evalage's visible floor is below retryesc's at every
+  T (0.3364/0.3398/0.3469/0.3629/0.3905 vs
+  0.3558/0.3761/0.4177/0.4927/0.6081). P1 carried a falsifier against my
+  own floor law; the law survived it.
+- **P2 HELD.** arm > floor at **5/5** T (retryesc: 2/5).
+- **P3 FLIPPED, as predicted.** Binding constraint moved
+  floor-bound → **gain-bound** (0 floor-bound cells, 3 gain-bound).
+- **P5 FIRED — 2/5 cells clear BOTH bars**, T32 and T64. Best is
+  **T64: arm 0.5308, floor 0.3905, gain +0.0709 over tok 0.4599**,
+  min(arm−floor, gain−0.05) = **+0.0209**.
+- Controls clean: `label_null` 0.3460 ≈ chance; `actxmean_foreign` 0.4192
+  (T16) / 0.4292 (T64), far below the arm — not a generic window
+  artifact.
+
+**⚑ THIS IS A RESCUE AND IS DISCLOSED AS ONE (P5, written before the
+data).** The original screen verdict was WEAK. It is re-measured here
+because the miss was inside the noise *and* the geometry was wrong.
+**It must never be quoted as though it passed the original screen.**
+
+**Three things that keep this provisional, all of which I state rather
+than wait to be asked:**
+
+1. **T32 is not credibly anything** — its margin is **+0.0054**, well
+   inside the sampling SE alone (Lane B: SE_boot ≈ 0.0074 at this n).
+   Only T64's +0.0209 is worth further work, and it is single-seed.
+2. **Single seed.** Lane B established that TRAINING variance is real,
+   is not estimable in closed form, and does not shrink with n_test.
+   No error bar has been computed for *this* corpus.
+3. **⚑ THE BAR THIS CLEARS IS THE SUPERSEDED ONE.** This runs against
+   `tok`, a per-token probe. Post-item-6 the KEEP bar is **"beats a
+   pooled SAE on a measured budget frontier"**. Against the current bar
+   this cell has **not been evaluated at all**. A rescue against a
+   retired bar is not a KEEP.
+
+### 2. Pre-registration audit of `sycgen-shuffle-sparsity-matched.md` (my assigned role) — 4 findings, A1 blocking
+
+Full text appended to the briefing as §5. The headline:
+
+**A1 (BLOCKING, one-line fix). The pooled-zero instrument gate cannot
+fail in the direction that matters, and the failure it misses
+manufactures the answer the brief pre-commits to publishing.**
+
+`frontier.py:119` is `z.mean(dim=1)`; a mean over the window axis is
+permutation-invariant *arithmetically*. So pooled's zero survives **any**
+bug in the shuffle. The only defect that fires this gate is one making
+the pooled arm position-*sensitive* — a bug in the comparator, not the
+instrument. Now the missed case: if the shuffle silently no-ops, then
+pooled=0 (**gate passes**), stacked=0, TXC=0 ⇒ reads as **(b)**, which
+§2 names the live hypothesis and §4 pre-commits to publishing. **The one
+failure unchecked is the one that yields the promised headline through a
+passing gate.** Same shape as the trap §1 caught, one level up: §1
+removed a tautology from the comparator; the residual one is in the gate.
+
+Verified at source, not assumed: repo-wide grep for any assert that
+`tiles_sh` differs from `tiles_ev` returns **empty**; the existing
+`IDENTITY_TOL` assert is a **replication** guard on
+`|canonical_r − recomputed_r|`; `shuffle_within_window` checks rank and
+`x.shape[1]==T` and never that the drawn permutation is non-identity.
+Fix is `assert (tiles_sh - tiles_ev).abs().max() > 0` on the **input**
+side — arm-independent, pre-encoder, cannot be mistaken for a result.
+**A gate and a positive control are different objects**; tonight already
+produced two checks whose failure looked like success.
+
+- **A2.** Untrained twins are MANDATORY but have **no decision rule** —
+  (a)–(d) are defined only on trained TXC vs trained stacked. (a) and
+  "untrained ≥ trained" can *both* fire and point opposite ways, settled
+  after the numbers. Fix: make the twin a **gate on (a)**.
+- **A3.** "(d) indistinguishable at n=3" has **no threshold**, so
+  (a)-vs-(d) is post-hoc. Fix: state a rule pre-data (proposal: all-3-seed
+  sign test + margin > across-seed SD). Same principle as the +0.05 bar.
+- **A4.** T-sweep instrument artifact: `per_row` randperm is the identity
+  w.p. `1/T!`, so rows truly shuffled = **0.500 at T=2**, 0.958 at T=4,
+  ~1 beyond. Common-mode across arms, so the **TXC-vs-stacked contrast at
+  fixed T is safe** — but any "gap grows with T" reading inherits
+  `1 − 1/T!` from the apparatus. Same species as the divide-by-`T`
+  per-token artifact. Fix: disclose, or reject-and-redraw non-identity.
+- **A5.** Frontmatter stamp `01:2x London` is ~40 min ahead of the clock.
+
+**Withdrawn before posting:** I expected to flag "you cannot sparsity-match
+across arms whose `l0_unit` differs". **Wrong — the code already answers
+it** (`frontier.py:100-120`): union for pooled, sum for stacked,
+nonzeros-in-tile for TXC are different *formulas* for the same
+commensurable quantity, and the hub fixed the flattering variant before
+the sweep ran. Recorded because a withdrawn objection is cheaper for the
+next reader than a silent one.
+
+Cost tonight: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_

@@ -153,3 +153,165 @@ result and we publish it.** The prime directive has not moved: *a sound
 verdict, never a win.*
 
 **Delete this file when the lane closes.**
+
+---
+
+## 5. ⚑ PRE-REGISTRATION AUDIT (mac-c, 2026-07-29 00:4x BST) — READ BEFORE WRITING CODE
+
+My assigned role on this brief. Four findings, ranked. **A1 is blocking
+and costs one line to fix.** All are cheap now and expensive after
+20×H100.
+
+### A1 — BLOCKING. The instrument gate cannot fail in the direction that matters, and the failure it misses manufactures the pre-registered publishable answer.
+
+§1 is right that pooled's gap is zero by construction, and right to make
+it a gate. But look at what the gate can actually detect.
+
+`frontier.py:119` is `z.mean(dim=1)`. A mean over the window axis is
+permutation-invariant **as a matter of arithmetic**. So pooled's zero
+survives *any* bug in the shuffle. The only defect that makes this gate
+fire is one that renders the pooled arm position-**sensitive** — i.e. a
+bug in the comparator, not in the instrument. It is a check on pooled.
+It is not a check on the shuffle.
+
+Now the failure it misses. Suppose the shuffle silently no-ops — wrong
+tensor consumed, result discarded, permutation applied after pooling,
+any of the ordinary ways this goes wrong. Then:
+
+    pooled  gap = 0   -> GATE PASSES ✓
+    stacked gap = 0
+    TXC     gap = 0
+    => verdict reads (b) TXC ≈ stacked
+
+**(b) is what §2 names the LIVE hypothesis and what §4 pre-commits to
+publishing.** So the one instrument failure the design does not check
+for is the one that produces, through a passing gate, the exact
+headline the brief has already promised to publish. Pre-registration is
+supposed to stop conclusions being chosen after the data; here it locks
+in the conclusion a dead instrument emits.
+
+This is the same shape as the trap §1 caught, one level up: §1 removed a
+tautology from the *comparator*, and the residual tautology is in the
+*gate*.
+
+**Verified absent at source, not assumed:**
+
+- `grep` across the repo for any assert that `tiles_sh` differs from
+  `tiles_ev` returns **empty**. No such check exists anywhere.
+- The existing `IDENTITY_TOL` assert (`sycgen/shuffle_overlay.py:165`,
+  and the three sibling overlays) is a **replication** guard on
+  `|canonical_r − recomputed_r|` — it checks that a recomputation
+  reproduces a canonical row. It says nothing about the shuffle.
+- `shuffle_within_window` (`src/temp_bench/utils/shuffles.py`) validates
+  rank and that `x.shape[1] == T`, and never checks that the
+  permutation it drew is non-identity.
+
+**FIX — one line, upstream of every arm:**
+
+```python
+tiles_sh = shuffle_within_window(tiles_ev, T=T, seed=SHUF_EVAL_SEED)
+assert (tiles_sh - tiles_ev).abs().max() > 0, \
+    f"SHUFFLE IS A NO-OP at T={T} — instrument dead, cell void"
+```
+
+Put it on the **input** side, not the code side: it is arm-independent,
+it runs before any encoder, and it cannot be mistaken for a result.
+Record it per cell as a receipt next to the pooled-zero receipt.
+
+Keep the pooled-zero gate — but label it as what it is, a check on the
+pooled arm. The run needs both: pooled-zero says the comparator is
+honest, the no-op assert says the instrument is alive. **A gate and a
+positive control are different objects.** Tonight already produced two
+cases of a check whose failure looked like success (mac-d's sweep that
+ran dead under zsh word-splitting; my own per-token free-lunch
+artifact), and both were caught only by a positive control.
+
+### A2 — The mandatory twin has no decision rule, and its likely outcome contradicts (a).
+
+§2 makes untrained twins **MANDATORY** and says a trained-only gap is
+not evidence. Good. But (a)–(d) are defined *entirely* on trained-TXC
+gap vs trained-stacked gap. The twin is required to be present and is
+assigned no interpretation.
+
+The gap that opens: **(a) and the twin condition can both fire.** TXC
+gap > stacked gap (⇒ (a), a win) while untrained-TXC gap ≥ trained-TXC
+gap (⇒ not learned, the thing that killed the original claim). Both are
+consistent with the pre-registration as written, they point opposite
+ways, and nothing says which governs — so it gets settled after the
+numbers are visible. That is the failure pre-registration exists to
+prevent, and §2 itself says this combination is *historically what
+happened*.
+
+**FIX:** make the twin a **gate on (a)**, not a column. (a) may be
+declared only if the trained-TXC gap exceeds the **untrained-TXC** gap
+by the same margin criterion used against stacked. Fail that and the
+verdict is (b), whatever the stacked comparison says.
+
+### A3 — Outcome (d) has no threshold, so (a)-vs-(d) is a post-hoc call.
+
+"(d) INDISTINGUISHABLE at n=3" is pre-registered as an outcome with no
+stated criterion for what counts as distinguishable. At n=3 that is the
+whole ballgame: without a number fixed in advance, the boundary between
+"win" and "indistinguishable" is drawn after seeing where the points
+fell.
+
+**FIX — state a rule before the run.** Cheap and defensible at n=3:
+declare (a) only if the trained-TXC gap exceeds the stacked gap **in
+all three seeds** (a sign test; p = 1/8 one-sided under exchangeability)
+**and** the mean margin exceeds the across-seed SD of the per-seed
+margin. Everything else is (d). The exact numbers are the hub's and
+Han's call — the binding point is that a number exists before data.
+This is the same principle already ratified for the +0.05 gain bar:
+**a threshold that moves after seeing the data is not a threshold.**
+
+### A4 — The T-sweep has a T-dependent instrument artifact, confined to its first cell.
+
+`shuffle_within_window` uses `per_row=True`, drawing an independent
+`randperm(T)` per row. A uniform draw is the identity with probability
+`1/T!`, so the fraction of rows that are *actually* permuted is
+`1 − 1/T!`:
+
+    T= 2   rows truly shuffled = 0.500     <- half the "shuffled" arm is ordered
+    T= 4   rows truly shuffled = 0.958
+    T= 8   rows truly shuffled = 0.999975
+    T=16   rows truly shuffled = 1.000000
+
+At **T=2 — the first cell of the grid `T {2,4,8,16}` — the shuffled
+condition is 50% ordered by construction**, and ~4% at T=4.
+
+This does **not** bias the TXC-vs-stacked contrast at fixed T: both arms
+consume the same permuted tiles under the same seed, so the attenuation
+is common-mode and the headline claim is safe. What it biases is the
+**shape of the T-sweep**. Any reading of the form "the gap grows with T"
+inherits `1 − 1/T!` as a multiplicative instrument term — a T-trend
+that is present in the apparatus regardless of the phenomenon. This is
+the same species as the divide-by-`T` per-token artifact from four
+hours ago: a T-dependent instrument term read as a T-dependent result.
+
+**FIX:** either report the T=2 cell with the attenuation disclosed, or
+draw the per-row permutation from the `T!−1` non-identity permutations
+(reject-and-redraw) so the shuffled condition means the same thing at
+every T. **Do not silently drop T=2** — the disclosure is worth more
+than the cell.
+
+### A5 — minor
+
+Frontmatter reads `issued: 2026-07-29 01:2x London`; local clock at the
+time of this audit is **00:4x BST**, so the stamp is ~40 min in the
+future. (I have corrected five of my own stamps today; flagging it in
+the same spirit, not as a criticism.)
+
+### What I am NOT objecting to — checked and withdrawn
+
+I went in expecting to flag "you cannot match sparsity across arms whose
+`l0_unit` differs by construction". **That objection is wrong and the
+code already answers it.** `frontier.py:100-120` counts, for each arm,
+the number of distinct input dimensions actually occupied — union over
+positions for pooled (one slot per feature), sum for stacked (`T·d_sae`
+slots, so a feature firing at three positions is genuinely three input
+dimensions), nonzeros-in-tile for TXC. Those are different *formulas*
+producing the *same commensurable quantity*, and the docstring records
+that using the union for stacked would flatter the baseline and was
+fixed before the sweep ran (hub review `0b1025abc`). §2's "report
+`l0_unit` per arm" is correct as written. Recorded because a withdrawn
+objection is cheaper for the next reader than a silent one.
