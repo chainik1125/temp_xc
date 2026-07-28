@@ -1,19 +1,44 @@
 # mac-d STATUS — RunPod-API executor agent (LIVE session, updated 02:3x 07-28)
 
-## ⚑⚑⚑ HEADLINE (02:38): RETRAIN GRID RUNNING — drain ~05:30–06:30
-Freeze 74d260321 (card + datasource plugin sycgen_real_age_llama31_
-8b_l14 + 48-cell grid + overlay transplant). Both shards live on
-pod-D (i%2 split, 3 workers each; logs /workspace/logs/
-retrain_s{0,1}.log; monitor armed). AT DRAIN, in order: (1)
-`sycgen/shuffle_overlay.py` on-pod (identity 2e-3); (2)
-`agents/mac-d/repatriate.sh 64.247.201.51 16977` (dup-key merge,
-push rows from mac); (3) ckpts via runpod-a's push_ckpts_hf.py
-(`ckpts/<train_key>/`, sha receipts here); (4) overlay json +
-Aniket-template T-sweep figure; (5) ledger actuals; (6) ONE LOG
-bundle (PTR). Screen results HF-durable
-(hunt_corpora/sycgen_20260728/screen/). Stamp discipline: date
-from a separate preceding call, ALWAYS (corrigendum 02:38 entry).
-Pod stays up (lane not done). 08:55 Mission-2 checkpoint stands.
+## ⚑⚑⚑ HEADLINE (02:40, pre-compact rewrite): RETRAIN GRID RUNNING — drain ~05:30–06:30
+Freeze 74d260321 (RETRAIN_CARD + datasource plugin
+`sycgen_real_age_llama31_8b_l14` + 48-cell grid + overlay
+transplant). Both shards live DETACHED on pod-D at that pin
+(i%2 split, 3 workers each; logs `/workspace/logs/retrain_s{0,1}.log`,
+watch for SHARD{0,1}-DONE). Est $15–21 ledgered at launch.
+
+**POD-D COORDINATES (mine, jge1fuj9hqu8et, $5.98/h, warm-hold until
+LANE done):** `ssh root@64.247.201.51 -p 16977`. Repo at
+/workspace/temp_xc (detached @ 74d260321); tokens at
+/workspace/.tokens (gh+hf×2); sycgen caches at
+/workspace/sycgen_caches; a git stash holds my smoke-test rows
+("mac-d smoke rows" — pod-local audit, never push).
+
+**AT DRAIN, in order:** (1) on-pod
+`.venv/bin/python -m experiments.explorations.task_hunt.sycgen.shuffle_overlay`
+(reads both shard jsons; identity 2e-3); (2)
+`bash agents/mac-d/repatriate.sh 64.247.201.51 16977` then push
+rows from the mac (pull-rebase; LOG conflicts keep-both);
+(3) ckpts → HF via runpod-a's `push_ckpts_hf.py` (ratified
+`ckpts/<train_key>/`), sha receipts HERE; (4) harvest overlay json
+→ commit; WRITE the Aniket-template T-sweep figure renderer
+(ordered-solid/shuffled-dashed, per-seed faints, T=1 anchor bands,
+y = recovery r; template = the frozen probing/RLHF pair,
+`figs_writeup/`); (5) ledger ACTUALS; (6) ONE LOG bundle entry
+(PTR). THEN the lane is done → TERMINATE pod via
+`bash agents/mac-d/podctl.sh terminate jge1fuj9hqu8et` + ledger,
+UNLESS a new card claims it (check LOG first).
+
+**Session-local watchers armed pre-compact (they persist while the
+session lives; re-arm if genuinely fresh):** origin listener 150s
+(task_hunt/ + agents/mac-d/ + briefings/); retrain-shard monitor
+(ssh poll 240s, DONE+failure signatures); 08:55 London alarm →
+Mission-2 checkpoint (A5 relu-mix slip decision — likely moot,
+rmx_b is certificate-extension; check LOG first, coordinate with
+runpod-2 before ANY relief spin-up). Stamp discipline: stamps ONLY
+from a separate preceding `date` call (corrigenda 02:38, twice
+before). Screen results HF-durable
+(`hunt_corpora/sycgen_20260728/screen/`), corpus + gates likewise.
 
 ## PREVIOUS HEADLINE: SYCGEN BUNDLE = KEEP 3/3 (02:28, first hunt KEEP)
 Screens I executed on MY pod (mac-c handoff 7cc702599 + GO
