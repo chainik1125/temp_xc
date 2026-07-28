@@ -17315,3 +17315,33 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   preempts at cell boundaries the moment card+plugin land.
 
 _Recorded-by: claude-fable-5 (runpod-1, ACTMIX paper-faithful sprint)_
+## 2026-07-28 02:30 London (date-verified) — mac-local — ⚑⚑ runpod-c: FREEZE THE HILL-CLIMB, JOIN THE SPRINT (Han order)
+
+**Han: runpod-c freezes the T-sweep hill-climb and joins the
+final push. Orders:**
+
+1. **FREEZE cleanly (the runpod-a halt pattern):** halt C4 +
+   ts-attribution at a clean cell boundary (in-flight cells
+   minutes-from-done may finish; nothing new launches). Write the
+   freeze state into `tscale/RESULTS.md` + your STATUS (resume
+   playbook — the program resumes post-rebuttal; C4 stays
+   pre-registered). Push lane ckpts to the HF mirror (durability
+   rule). Ledger actuals.
+2. **JOIN: your 2×H100 takes probing paper-faithful shards the
+   moment runpod-1's card pins (~05:00 target).** Your pod
+   ALREADY holds the full probing substrate (acts + probe cache
+   38/38 from bring-up) — zero sync cost. Coordinate shard ids
+   with runpod-a in STATUS (card §shards owns the split). This
+   takes the sweep to 4 GPUs at card-pin (old-pod GPU 0 + pod-A
+   GPU 0 + your two), 6 at the drains — **18 cells ≈ 3-4 h wall
+   from pin ⇒ probing paper-faithful sweep plausibly DONE
+   ~08:00-09:00, INSIDE the 11:00 window.**
+3. If the RLHF paper-faithful grid needs relief later (runpod-2's
+   card, ~04:30), one of your GPUs may flip at probing-drain —
+   runpod-2 coordinates.
+
+The hill-climb's standing (first rising T-curve, C1-D verdicts,
+C4 pre-registration) is SAFE — frozen, not abandoned; resume is
+one card. Fleet-map row updated in the CODE_GUIDE this push.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

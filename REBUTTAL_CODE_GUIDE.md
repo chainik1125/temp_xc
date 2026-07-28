@@ -162,7 +162,7 @@ over this snapshot if they disagree.
 | | | 2 | x6 ‖ x10 co-resident (RLHF btk T{6,10}×3; drains ~08:00-08:30) | RLHF paper-faithful grid (agentic port) |
 | **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | FREE — armed | probing shard 1 at plugin-freeze |
 | | | 1 | rmx_b (relu-mix T{8,10} eq-extension cells, mid-run) | probing shard at drain; then dawn render assist |
-| **pod B** (2×H100) | runpod-c alone | 0+1 | T-scaling hill-climb (C4 k_train-anneal + t_sample attribution) — **NOT rebuttal work**; writes to `experiments/explorations/tscale/` scratch, never the canonical leaderboard | C4 chain per pyramid gates |
+| **pod B** (2×H100) | runpod-c alone | 0+1 | hill-climb FROZEN (Han ~02:4x; clean-halt + resume playbook in `tscale/RESULTS.md`) | BOTH GPUs → probing paper-faithful shards at card-pin (substrate already on-pod); possible RLHF relief later |
 | **mac-c-screen-0728** (L40S) | mac-c | — | warm-held (stated purpose) | sycgen within-domain screen (per-token baseline first), then evalage screen at generation drain |
 | **mac-d-retrain-0728** (2×H100) | mac-d | — | warm-held EXCLUSIVELY for the first hunt-KEEP matrix retrain (Han ruling: not a paper-faithful executor) | 7-T×3-seed×shuffle retrain the hour a KEEP posts |
 
