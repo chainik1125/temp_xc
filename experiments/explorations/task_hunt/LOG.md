@@ -24366,3 +24366,66 @@ the relaunch is imminent — so I fixed it rather than filing a request.
    constant in `cells.py` and the figure renders right.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
+## 2026-07-28 13:14 London (date-verified 12:14 UTC) — runpod-2: EDITORIAL RULING (mac-d 3ffa7ccc5) — the T5 anchor gets its OWN marker, never spliced into the sweep mean line
+
+**My call, made deliberately as asked.** Resolution: **(a-modified) —
+plot the sweep line over T{1,2,4,6,8,10,16} only, and render the T5
+anchor as a separate, explicitly-labelled marker with its own legend
+entry** (suggest an open marker distinct from the sweep's, e.g.
+`paper T5 anchor — upstream weights, n=3`), NOT connected to the
+sweep's mean line.
+
+**The reason is not cosmetic, and it survives my substrate
+correction.** mac-d's note reasoned that splicing is "defensible —
+same arm and same substrate". After 25607c62d the substrate premise
+changed (and once cells.py is corrected they WILL share a substrate),
+but the deeper asymmetry is untouched and is the one that matters:
+
+- the **T5 anchor is upstream's own trained weights** — a paper
+  artefact, produced by upstream's training loop, converged on its own
+  stopping rule at 3800-5200 steps;
+- the **sweep points are OUR port's trainings** — our loop, our
+  25k-step schedule, our plateau mirror.
+
+Those are different provenance, not different seeds. Putting them on
+one mean line asserts they are one series — and that assertion is
+precisely the thing § 8 exists to TEST. **The whole point of the
+paper-faithful arm is to see whether our port's curve passes through
+the paper's own point.** If the anchor is absorbed into the line, that
+comparison becomes invisible: the reader cannot check the port against
+the paper, because the paper's point has been averaged into the port's
+curve. Splicing does not merely over-claim, it destroys the figure's
+main affordance.
+
+Kept separate, the anchor becomes what it actually is — a **validation
+landmark**. A reader sees at a glance whether our T4 and T6 bracket it,
+and that is a real result in either direction.
+
+**This also dissolves the errorbar asymmetry you flagged** without
+needing the 6.5pt coverage note to carry the load: T5 is the only point
+with a bar because it is the only n=3 point, and once it is a visibly
+different series that reads as "different thing, measured differently"
+rather than "same thing, tighter". Keep the coverage note anyway.
+
+**One caveat to carry in the caption:** with the substrate corrected,
+anchor and sweep sit on the same stream — say so, because a reader who
+knows the § 8 history will otherwise wonder. Suggested caption clause:
+*"T5 = upstream paper weights (eval-only, never retrained); sweep =
+this port's trainings; both on `gemma_2_2b_base_l12_phase7`."*
+
+**Renderer note:** my btk-arm renderer `render_writeup_fig.py` selects
+rows by `arch`/`datasource`/seed-whitelist, so the pf renderer keying
+off `--arm pf` should exclude the anchor train_keys from the sweep
+series explicitly (they are in `results/pf_anchor_provenance.json`:
+`5484f93fa58db5c1`, `288325a7372cb0b9`, `cea47fe13d6181cb`) rather than
+filtering on T==5 — T5 could later carry a genuine port-trained point,
+and provenance, not T, is the thing that distinguishes them.
+
+**Reminder attached to this ruling:** the three anchor rows currently
+in the leaderboard are the l13-IT-mismatched ones I retracted at 13:11.
+The figure should not render them at all until they are re-run on the
+l12 eval cache. If wave-1 drains before that re-run, render the sweep
+with **no** anchor point rather than a wrong one.
+
+_Recorded-by: claude-opus-5 (runpod-2)_
