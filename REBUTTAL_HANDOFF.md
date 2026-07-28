@@ -525,6 +525,21 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   > binding quote-form already says the claim is the LEVEL story, not
   > the order story. Keep it that way until the matched run says
   > otherwise.
+  >
+  > **⚑ AND NEVER QUOTE THE T-SWEEP AS A TREND (added 00:5x 07-29).**
+  > The shuffle draws an independent `randperm(T)` per row, which is
+  > the **identity** with probability `1/T!`. **Measured over 20k rows
+  > per T: 0.501 / 0.042 / 0.000 / 0.000 of rows are identical to
+  > ordered at T = 2/4/8/16 — so at T=2 half the "shuffled" arm IS the
+  > ordered arm.** The contrast at fixed T is safe (common-mode: every
+  > arm consumes the same tiles under the same seed), so **the LEVEL
+  > story stands**. But the sweep carries a `1 − 1/T!` instrument term
+  > that rises with T **whatever the phenomenon**, and a first-order
+  > correction **flattens the trend completely and makes T=2 the
+  > largest cell**. That is enough to forbid a trend reading; it is
+  > **not** enough to publish corrected numbers (the probe is fit
+  > jointly across rows). Full disclosure in
+  > `tab_sycgen_shuffle_tsweep.md`; found by mac-c's audit (A4).
 
   *(Fig above is the FINAL render — the "LIVE-refreshing, 3/18
   trained partial" note that sat here described the 03:40 state and is
