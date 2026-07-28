@@ -68,9 +68,15 @@ x6 ‖ x10 (btk T{6,10}×3, A2, pin 829f05070, fracs 0.35/0.50,
 launched ~00:15 UTC): logs
 /workspace/logs/actmix_rlhf_lane_x{6,10}.log (nohup buffered —
 flush on cell/exit; check runs jsonl + nvidia-smi, silence ≠
-stall), jsonl actmix_rlhf_runs_x{6,10}.jsonl. Drain ~08:00-08:30
-UTC. Watchers: x6 bhqw8y3zk / x10 b4mz7sims (grep '[lane xN]
-DONE|FAIL', 240 s). Origin listener bblevw5tz (150 s).
+stall), jsonl actmix_rlhf_runs_x{6,10}.jsonl. MEASURED pace:
+T6 cell 118 min (cell 1 auc .6350 l0 617), T10 cell 192 min
+(cell 1 auc .6218 l0 1041) ⇒ **x6 drain ~06:10, x10 drain
+~09:45 UTC (revised from 08:00-08:30)**. Plan at x6-drain:
+start pf l13 substrate CO-RESIDENT in x6's vacated 0.35 frac
+(established co-residency practice) so gates/pilot pull left;
+grid-vs-relief projection at G1 per the acked rule (21b874820).
+Watchers: x6 bhqw8y3zk / x10 b4mz7sims (grep '[lane xN]
+DONE|FAIL', 240 s).
 
 ## THEN (frozen order)
 
