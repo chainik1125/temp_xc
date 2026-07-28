@@ -28460,3 +28460,54 @@ btk re-verified byte-identical. pf figure keeps INTERIM + G1-PENDING +
 per-T coverage + both deviations in caption.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+---
+
+## 2026-07-28 15:18 London (date-verified at write) — mac-c: **3-TOKENIZER RULE DISCHARGED — 21/21 bands pass (7 bands × 3 legs).** `retryesc_gen` has earned its screen; the earlier transcripts fix is what made this cheap
+
+### 1. All three legs, all seven bands
+
+| band | gpt2 | gemma2 | llama31 | bar | |
+|---|---|---|---|---|---|
+| **`unigram_auc`** | **0.5431** | **0.5406** | **0.5434** | ≤ 0.60 | ✅ |
+| `doc_mean_only_auc` | 0.6696 | 0.6720 | 0.6719 | ≤ 0.88 | ✅ |
+| `position_auc` | 0.6135 | 0.6137 | 0.6114 | ≤ 0.95 | ✅ |
+| **`floor_excess`** | **0.1853** | **0.2064** | **0.2230** | [0.15, 0.25] | ✅ |
+| strata | 31/34 | 29/32 | 26/30 | ≥ 8 | ✅ |
+| usable | 556,858 | 498,439 | 460,159 | ≥ 250k | ✅ |
+| events | 2,809 | 2,809 | 2,809 | ≥ 300 | ✅ |
+
+**`unigram` spans 0.5406–0.5434 across three tokenizers** — a 0.003
+spread. This is not a gpt2 artefact.
+
+⚠ **`floor_excess` rises across legs (0.185 → 0.206 → 0.223)** because
+the coarser tokenizers emit fewer tokens for the same text, so T = 64
+covers more *content*. **llama31 at 0.223 is the closest to the +0.25
+upper edge** — the side where cells lose to their own floor. It is
+inside the band, but it is the leg to watch at screen, and I would
+rather flag it now than explain it after.
+
+### 2. The transcripts fix paying for itself
+
+`evalage` could only re-tokenize by **decoding its gpt2 id stream** —
+lossless for byte-level BPE, but a property of that tokenizer, not a
+guarantee, and it was the blocker that stalled its 3-leg rule. I wired
+`save_transcripts` into `run_elicit` afterwards as an owed fix.
+
+So this builder re-tokenizes **from persisted raw text**: no
+decode-recovery, no round-trip assumption anywhere. It is shorter and
+strictly stronger than the `evalage` version, and the receipt is
+harder — **the gpt2 leg reproduces the generation stream
+ARRAY-FOR-ARRAY (5/5 arrays identical)**, plus **2,809 events on every
+leg** and 22,814 turns re-tokenized.
+
+### 3. State
+
+`retryesc_gen` is **label-side complete and qualified for screen**.
+Still **NOT a KEEP** — hunt4 § 4 needs the GPU screen, and
+**gold-visibility does not fire on label-side evidence.**
+
+**Next:** HF durability for the corpus before token rotation, then the
+screen (fresh L40S ~$1/h under the standing waiver, ledgered both ends,
+hunt4 § 4 verbatim).
+
+_Recorded-by: claude-opus-5 (mac-c)_

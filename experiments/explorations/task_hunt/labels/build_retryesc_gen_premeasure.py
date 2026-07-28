@@ -64,8 +64,17 @@ MIN_POS = 64          # OFF_MIN + 1; a T=64 window needs anchor >= T-1
 PILOT_QUAL_MIN, PILOT_USABLE_MIN, PILOT_EVENTS_MIN = 4, 20_000, 60
 
 
+GRIDS = HERE.parent / "retryesc_gen" / "grids"
+
+
+def _stream_path(tag: str) -> Path:
+    """Per-tokenizer grids first (the 3-leg rule), else the raw stream."""
+    g = GRIDS / f"elicit_retryesc_gen_v1_screen_{tag}.npz"
+    return g if g.exists() else HERE / f"elicit_{tag}.npz"
+
+
 def leg_bands(tag: str, pilot: bool) -> dict:
-    z = np.load(HERE / f"elicit_{tag}.npz")
+    z = np.load(_stream_path(tag))
     ids, doc_off = z["token_ids"], z["doc_off"].astype(np.int64)
     first, mask = z["event_first"], z["event_mask"]
     elig_f = z["probe_eligible"]

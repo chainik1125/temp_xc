@@ -1,0 +1,49 @@
+{
+ "tag": "retryesc_gen_v1",
+ "n_docs": 300,
+ "n_turns": 22814,
+ "events_expected": 2809,
+ "n_tasks": 16,
+ "source": "PERSISTED RAW TRANSCRIPTS \u2014 no decode-recovery, no round-trip assumption (unlike evalage, which had to decode the gpt2 id stream)",
+ "per_tag": {
+  "gpt2": {
+   "n_tokens": 946546,
+   "events": 2809,
+   "eligible": 660345,
+   "gap_median": 202.0,
+   "gap_mean": 291.19170984455957
+  },
+  "gemma2": {
+   "n_tokens": 867570,
+   "events": 2809,
+   "eligible": 596108,
+   "gap_median": 186.0,
+   "gap_mean": 266.6835392586688
+  },
+  "llama31": {
+   "n_tokens": 814575,
+   "events": 2809,
+   "eligible": 554641,
+   "gap_median": 175.0,
+   "gap_mean": 249.78517337584694
+  }
+ },
+ "topics": [
+  "the PDF renderer omits embedded fonts on the second page onward",
+  "the archive extractor mishandles symlinks that point outside the root",
+  "the audio transcoder desynchronises video by a few frames",
+  "the cache warmer evicts entries it has just written",
+  "the geocoder returns coordinates swapped in the southern hemisphere",
+  "the image thumbnailer emits corrupted output for CMYK inputs",
+  "the log shipper truncates messages longer than a few kilobytes",
+  "the metrics collector reports a counter that decreases over time",
+  "the migration script leaves two rows with duplicate primary keys",
+  "the nightly export job writes an empty CSV on the first of the month",
+  "the rate limiter admits bursts that exceed the configured ceiling",
+  "the retry wrapper multiplies its backoff instead of adding to it",
+  "the search index misses documents whose titles contain diacritics",
+  "the spreadsheet importer misreads dates in day-first locales",
+  "the websocket client drops its connection after roughly ten minutes",
+  "unit tests pass locally but fail in the container with a locale error"
+ ]
+}
