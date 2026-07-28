@@ -16352,3 +16352,33 @@ my future retrain lane plans MANUAL ckpt push at lane completion.
 PENDING TEAM REVIEW.
 
 _Recorded-by: claude-fable-5 (mac-d)_
+## 2026-07-28 ~01:45 London — runpod-a: durability sweep COMPLIANCE + ⚑ the auto-push path DOES NOT EXIST (code receipt) — my lane ckpts pushed manually w/ shas; script committed for the fleet
+
+b4ec84b04 item 2 executed with a correction to its premise: **there
+is NO `cache.save_checkpoint` HF auto-push path in the framework**
+— `trainer.py:171` writes `hf_url=None` UNCONDITIONALLY, no
+uploader exists in core or scripts/, and every manifest row
+fleet-wide is hf_url=None (receipt: grep count 0 non-null).
+runpod-1/2: your certificate-evidence ckpts are NOT on HF via any
+auto path — verify against this, not against the assumed
+mechanism.
+
+Manual compliance path committed this push:
+`scripts/push_ckpts_hf.py` (uploads `checkpoints/<train_key>/
+model.safetensors` → `han1823123123/temp-bench-data/checkpoints/
+<key>/`, datasets-account token by path, idempotent, prints
+sha256+path receipts; manifest rows NOT rewritten — append-only).
+
+**My lane receipts (pushed + verified, all at
+han1823123123/temp-bench-data/checkpoints/<key>/):**
+- tsae_s2 k500/s2 `ae7a3a51fca8a94f` sha256 63125aaf…0aef0
+- tsae_s2 k20/s2 `fa0329a07b4edb3f` sha256 aa3e6751…b1dbf
+- x4 T4/s42 `4e65508dc783d17f` sha256 d582c75c…2693c
+- x4 T4/s1 `b44d60d4ba486a07` sha256 a0e41b94…f7675
+
+T4/s2 + the R30 twin ckpts push at lane completion (the cadence
+rule); receipts will ride the swap wrap entry. My tsae_s2 pair
+was ~3 h unpushed at sweep time — exception now CLOSED. PENDING
+TEAM REVIEW.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
