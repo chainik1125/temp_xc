@@ -1,91 +1,62 @@
 # Working state — agent `runpod-1`
 
-**2026-07-28 ~03:10 London (post-compact, all first moves DONE) —
-PAPER-FAITHFUL SPRINT at PIN d9235755b, ratified 16d26642c. Night
-chain DRAINED (PASS COMPLETE); btk s2/T10 landed → 6/6 DECIDER
-RESOLVED btk-ahead (LOG 983baf1a9): high-T k20 block 6/6, P≈1.6%
-nominal w/ post-hoc caveat; T10 column 6/6-slot negative. Shard A
-RUNNING (GPU0, T16 s42 cell 1/3 since 01:39 UTC, pf_shard_A.log);
-shard B AUTO-LAUNCHED 01:57 UTC (GPU1, T10x3→T1s1, pf_shard_B.log).
-TELEMETRY PARSED (LOG da853dd01): v2 arms 0/1120 sampled contacts,
-floor declines with T, per-seed floors identical across arms;
-paper-faithful T16 live at 40/43 NEGATIVE-boundary samples (E1
-active in-flight). RM_CERTIFICATE.md PRELIMINARY drafted (census-
-first). Durability: 32/32 twin ckpts receipted on ratified mirror
-(incl. night T10/T16 additions; ckpt_push.log). Fleet: C/D at
-runpod-c, E at runpod-a, runpod-b overflow-only. Hub ETA
-06:30-07:30. GPU 2 = runpod-2, never mine.
-MILESTONE 06:11 UTC: SPRINT DELIVERED — shards A+B drained (8/8,
-$14-15), RM fills drained (4/4, $3), 12/12 ckpts receipted, grid
-21/21 (pod-B rows repatriated by hub), **card §9 SCORED: E1
-CONFIRMED (monotone onset T6-T8) · E2 NOT CONFIRMED (null — pf ≡
-btk at matched budget) · E3 PASS (anchors interpolate)** —
-5075d098e awaiting ratification. pf renders live in-tree.
-REMAINING: (a) 11:00 London PROTECTED btk 7-point renders
-(--writeup final; analysis.py pollution-fixed 5a699a5d4 — bands
-verified canonical); (b) certificate PRELIMINARY→final (fold: E-
-scores, telemetry bounds, fills, runpod-b RLHF T8-trio identity);
-(c) manifest owner pass (morning, 7af84fb80); (d) STATUS rewrite.
-Monitors (this session): bbw1y8ufe (pf shards A/B logs),
-b6jr22n3d (origin poller).**
+**2026-07-28 ~07:30 UTC (morning rewrite) — ALL DELIVERABLES
+SHIPPED. Night+sprint arc complete; nothing of mine in flight on
+either GPU. Awaiting only hub ratifications + any new directives.
+GPU 2 = runpod-2 (pf_pilot running there — never mine).**
 
-## Sprint (task #12, commission 4ce0369de/606e4587d)
+## Delivered this arc (receipts = LOG shas)
 
-Plugin paper_txc_base_v1t = vendored 94119bc08 txc_bare_antidead
-FULL training stack verbatim + thin v2 wrapper (dict contract,
-first-batch b_dec init, post-accumulate grad hook, post_step renorm,
-wrapper-side telemetry). Tests 8/8 (bitwise adapter parity T{1,3},
-T1 formula, exact-k, mixing fingerprint, stack receipts, registry).
-CARD_PAPER_FAITHFUL.md §6 = the 5-GPU shard table (mine A+B;
-runpod-c C+D; runpod-a E; runpod-b overflow post-rmx). 21 cells,
-T1/T2 tails LAST (prune-free if hub rules 18). Logs
-/workspace/logs/pf_shard_{A,B}.log, monitor bwhegmrtw. At shard
-drain: per-cell HF ckpt push (scripts/push_ckpts_hf.py, ratified
-mirror), ledger actuals vs $18-22 est.
+1. **Paper-faithful sprint (task #12)**: plugin `paper_txc_base_v1t`
+   (vendored 94119bc08, 8/8 contract tests, bitwise adapter parity)
+   + CARD_PAPER_FAITHFUL.md (PIN d9235755b, ratified 16d26642c) +
+   my shards A+B 8/8 cells ($14-15, under est) + grid COMPLETE
+   21/21 fleet-wide (pod-B strays repatriated by hub 6e928e2bb).
+   **Card §9 SCORED (5075d098e): E1 CONFIRMED (zero-picks monotone,
+   onset T6-T8, ≤0.14% of budget) · E2 NOT CONFIRMED (null — pf ≡
+   btk at matched budgets; T8 k5 3/3 ABOVE) · E3 PASS (archived T5
+   anchors interpolate retrained T4-T6 both k = vendoring validated
+   end-to-end).** pf renders live (RESULTS_paper-faithful.md +
+   figs), regenerate via `analysis.py --arm paper-faithful`.
+2. **RM_CERTIFICATE v1.0** (aa6067152 + review fixes fcd744e1f):
+   census-first lemma pair; identity set; T2-T16 divergence map w/
+   caveats; §3a METRIC-NULL; trace bounds (v2 arms 0/1120 sampled
+   contacts; floors decline with T); controls; §7 paper-faithful
+   corroboration; RLHF cross-venue identity now tensor-grade
+   through T10/s42 (rmx_b checks 1-4; 5-6 append as extensions).
+3. **11:00 PROTECTED btk renders SHIPPED EARLY** (6391ced2c,
+   deliverable-of-record; slot is verify-only): 4 writeup figs
+   FINAL 7T×3s + RESULTS refreshes, post pollution-fix.
+4. **⚑ analysis.py band-pollution fix** (5a699a5d4, RATIFIED
+   72cca1bdf): positive-control + width-match rows excluded from
+   canonical bands; per-arch G1 semantics; v1t render support.
+5. **RM fills** (ba8a4ff3e): relu-mix T2/T4 now 3-seed, ~$3.
+6. **Durability**: 44 ckpts receipted this venue (32 twins + 8
+   sprint + 4 fills), LFS shas in /workspace/logs/ckpt_push.log.
+7. **Manifest owner pass (my share)**: 96/96 rows as-launched,
+   receipts external by design, append-only stance posted.
 
-## Night close (task #11 remainder)
+## Open / watch
 
-- btk s2/T10 lands ~02:05 → rm_equivalence diff = SIXTH k20 point
-  at T≥10 (current block 5/5 btk-ahead, P≈3.1%; 6/6 ⇒ P≈1.6%) →
-  NIGHT_DONE_GPU_1 → shard B auto-launches.
-- RM-2 fills PREEMPTED (~3 min sunk disclosed); re-queue only in a
-  genuinely idle window. relu-mix = certificate evidence only per
-  arm mapping 692b — never a matrix column.
-- Delta map so far (RM−btk, all local 6/7 tensor diffs): T6 k5
-  {−1.63,−1.02,−1.38}e−2 3/3 btk · k20 mixed | T8 coin-flip both k
-  | T10 k20 {−6.8,−6.9}e−3 + T16 k20 {−1.67,−0.43,−6.10}e−3 = the
-  high-T k20 block. Multiplicity caveats posted with each flag.
-
-## Morning queue (revised for sprint)
-
-1. btk s2/T10 diff + T10 column verdict (immediate at landing).
-2. Telemetry parse (btk arm now traced): boundary contact rate vs
-   T; census-first framing per 3b0a4df3d (traces = bounds).
-   Cross-venue lemma receipts: runpod-2 829f05070/fd3e4ff16
-   (identity ⟺ zero contact), runpod-a dq DIVERGES + λ̂ IDENTICAL.
-3. 11:00 PROTECTED: 7-point per-k btk renders (--writeup final) +
-   38task twin + archived-T5-anchor labeling per 8fefb409d rule +
-   agentic/caption disclosures where applicable.
-4. PRELIMINARY certificate: census leads; identity = {sae ×3, pre
-   T1}; divergence map T2-T16 per-T per-seed; controls; PTR.
-5. RESULTS_{btk-only,relu-mix}.md refresh; ledger actuals (night
-   ~$30 + fills ~$0.3 sunk + sprint shards); paper-faithful rows
-   fold into analysis when shards drain (E1-E3 scoring per card §9).
-6. STATUS rewrite before compact.
-7. Manifest owner pass (mac-d flag 7af84fb80): 336 same-train_key
-   conflicts fleet-wide (mirror-status rewrites vs as-launched
-   copies) — reconcile MY rows' mirror fields at the morning pass.
-
-## Durability
-
-30/30 certificate ckpts on ratified mirror, LFS spot-check MATCH
-(e91d887fac22fb33); receipts /workspace/logs/ckpt_push.log. Night
-T10/T16 + sprint ckpts append at drain (idempotent tool).
+- Hub ratification of §9 scoring + certificate v1.0 (posted).
+- rmx_b checks 5-6/6 → certificate §1 extension appends (mine to
+  fold when they land).
+- 11:00 London verify-only render slot: re-render ONLY if any btk
+  input changes (none can — rows frozen-complete).
+- Ledger night total (mine): night ~$30 + shards ~$14-15 + fills
+  ~$3 ≈ $47-48. In MODAL_SPEND.md.
+- Monitors (this session): b6jr22n3d (origin), bbw1y8ufe (pf shard
+  logs, drained), b56vdn9e9 (fill logs, drained) — the two
+  drained-log monitors can be stopped or left to session end.
 
 ## Standing
 
-date FIRST then stamp. Monitors: bwhegmrtw (pf shards + gpu1 night),
-bt1e1yc98 (origin poll). Union-resolve LOG conflicts upstream-first
-+ stray grep. Tokens by path only. Aniket read-only. GPU 2 never.
+date FIRST then stamp (two pre-write slips tonight, both corrected
+at write — keep reading the clock). Union-resolve LOG conflicts
+upstream-first + stray grep; "commit or stash" branch in pull
+loops. --ours=upstream in rebase. Explicit-path git add (house
+rule 660c50488). Tokens by path only. Aniket read-only. GPU 2
+never. Liveness = /proc receipts, never GPU samples + log size
+(house lesson 6e928e2bb). Claim-line before any pulled cell.
 FLAG open: stage2_variance golden test fails pre-existing (panel
 lane's, live-leaderboard-coupled).
