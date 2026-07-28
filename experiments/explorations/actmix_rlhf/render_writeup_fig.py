@@ -46,15 +46,40 @@ TXC = "#D55E00"  # house Okabe-Ito; hue follows the entity, linestyle
                  # carries the order condition (CVD-safe split)
 
 
+ANCHOR_PROV = Path(__file__).resolve().parent / "results" / \
+    "pf_anchor_provenance.json"
+
+# runpod-2 ruling d744f7c52: the T=5 anchors are UPSTREAM PAPER WEIGHTS,
+# not this port's trainings. Splicing them into the sweep mean destroys
+# the port-vs-paper comparison section 8 exists to make. They are
+# identified by TRAIN_KEY via the provenance manifest — never by T == 5,
+# which would also swallow a legitimate T=5 sweep cell.
+def anchor_train_keys():
+    if not ANCHOR_PROV.exists():
+        return set()
+    return set(json.loads(ANCHOR_PROV.read_text()))
+
+
+# Same ruling: the l13-IT anchor evals are RETRACTED — substrate settled
+# as base-l12 (25607c62d, FVU 0.0036 vs 0.0367) — and must not render.
+RETRACTED_CACHES = {"l13it_paper"}
+RETRACTED_ANCHOR_LAYER = 13
+
+
 def load_points(arch=TXC_ARCH, datasource=DATASOURCE):
-    """(T, seed) -> {ordered, shuffled} from the latest matching row.
+    """-> (sweep, anchors), each (T, seed) -> {ordered, shuffled}.
 
     `arch`/`datasource` select the arm. They are a REQUIRED pair: the
     two arms share metric names (`preference_auc_k20`), so filtering on
     only one of them would silently mix the plain-TXC and
     paper-faithful arms into one figure.
+
+    Sweep and anchor rows are kept in SEPARATE dicts rather than one
+    keyed by anchor-ness, so a T=5 sweep cell and a T=5 anchor cannot
+    overwrite each other in the dedupe.
     """
-    best = {}
+    anchors_tk = anchor_train_keys()
+    sweep, anchors = {}, {}
     for line in LEADERBOARD.read_text().splitlines():
         if not line.strip():
             continue
@@ -64,6 +89,12 @@ def load_points(arch=TXC_ARCH, datasource=DATASOURCE):
                 or r.get("datasource") != datasource
                 or int(r.get("seed", -1)) not in SEEDS):
             continue
+        ec = r.get("eval_cfg") or {}
+        if (ec.get("hh_rlhf_cache") in RETRACTED_CACHES
+                or (ec.get("cache_expect") or {}).get("anchor_layer")
+                == RETRACTED_ANCHOR_LAYER):
+            continue  # retracted l13-IT substrate
+        best = anchors if r.get("train_key") in anchors_tk else sweep
         if not (r.get("training_cfg") or {}).get("n_steps"):
             continue  # untrained twins are not in this figure
         m = r["metrics"]
@@ -75,7 +106,7 @@ def load_points(arch=TXC_ARCH, datasource=DATASOURCE):
         shuffled = (ordered if T == 1  # identity by construction
                     else m.get("shuffled_preference_auc_k20"))
         best[key] = {"ts": r["ts"], "ordered": ordered, "shuffled": shuffled}
-    return best
+    return sweep, anchors
 
 
 def series(points, seed, field):
@@ -124,11 +155,16 @@ def main():
     colors = {"ordered": TXC, "shuffled": shuf_c}
 
     arm = ARMS[args.arm]
-    points = load_points(arm["arch"], arm["datasource"])
-    if not points:
+    points, anchors = load_points(arm["arch"], arm["datasource"])
+    if not points and not anchors:
         raise SystemExit(
             f"no matching leaderboard rows for arm={args.arm} "
-            f"(arch={arm['arch']}, datasource={arm['datasource']})")
+            f"(arch={arm['arch']}, datasource={arm['datasource']}) — "
+            "note retracted l13-IT rows are excluded by design")
+    if not points:
+        raise SystemExit(
+            f"arm={args.arm}: only anchor rows matched ({len(anchors)}); "
+            "there is no sweep to plot yet")
 
     fig, ax = plt.subplots(figsize=(5.4, 3.7))
 
@@ -151,6 +187,25 @@ def main():
                 ax.errorbar(T, m, yerr=s, color=c, capsize=3,
                             lw=1.2, zorder=2)
 
+    # Ruling d744f7c52: anchors are UPSTREAM PAPER WEIGHTS — plotted as
+    # standalone markers in a neutral hue (provenance differs from the
+    # port's trainings), never joined to the sweep and never folded into
+    # its mean. The port-vs-paper gap at the anchor T is the comparison
+    # section 8 exists to make, and it is only readable if the two are
+    # visually distinct.
+    if anchors:
+        for field, mfc, alabel in (
+                ("ordered", "black", "paper anchor (upstream wts)"),
+                ("shuffled", "white", "paper anchor, shuffled")):
+            aTs, amu, asd, _ = mean_sd(anchors, field)
+            ax.plot(aTs, amu, linestyle="none", marker="D", ms=6,
+                    color="black", mfc=mfc, mec="black", label=alabel,
+                    zorder=4)
+            for T, m, s in zip(aTs, amu, asd):
+                if s is not None:
+                    ax.errorbar(T, m, yerr=s, color="black", capsize=3,
+                                lw=1.2, zorder=4)
+
     Ts, mu, _, n = mean_sd(points, "ordered")
     if 16 in Ts and 1 in Ts:
         delta = mu[Ts.index(16)] - mu[Ts.index(1)]
@@ -163,6 +218,10 @@ def main():
                     ha="left", va="top", fontsize=8, color="#555555")
 
     cov = " ".join(f"T{T}:n={k}" for T, k in zip(Ts, n))
+    if anchors:
+        aTs, _, _, an = mean_sd(anchors, "ordered")
+        cov += ("  |  anchors " +
+                " ".join(f"T{T}:n={k}" for T, k in zip(aTs, an)))
     tag_note = {
         "interim": "INTERIM — remaining seeds in flight",
         "final": "FINAL — seeds {42, 1, 2}",
@@ -219,8 +278,10 @@ def main():
                 va="top", fontsize=6, color="#555555", wrap=True)
 
     ax.set_xscale("log", base=2)
-    ax.set_xticks(Ts)
-    ax.set_xticklabels([str(T) for T in Ts])
+    # anchor Ts may sit off the sweep grid (T=5) — they still need a tick
+    tick_Ts = sorted(set(Ts) | {T for (T, _) in anchors})
+    ax.set_xticks(tick_Ts)
+    ax.set_xticklabels([str(T) for T in tick_Ts])
     ax.minorticks_off()
     ax.set_xlabel("T (window length)")
     ax.set_ylabel("preference AUC (k = 20)")
