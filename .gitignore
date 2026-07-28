@@ -131,3 +131,10 @@ experiments/explorations/task_hunt/labels/elicit_retryesc_gen_dryrun.npz
 # they are superseded by the .npz the moment a run completes. Never a
 # deliverable.
 experiments/explorations/task_hunt/labels/elicit_*_ckpt.json
+
+# Mid-flight SLICE stream. Rebuilt in seconds by
+# `retryesc_gen/slice_from_ckpt.py`, overwritten on every run, and it is
+# a TRUNCATED corpus — committing it invites mistaking a 5-pair slice
+# for the real 300-doc stream, which is exactly the confusion that made
+# the 14:57 vocabulary band read as a failure.
+experiments/explorations/task_hunt/labels/elicit_retryesc_gen_slice.npz
