@@ -83,24 +83,32 @@ runpod-2. Listener re-armed each beat (150 s fetch-poll LOG +
 briefings/).
 
 **⚑ PAPER-FAITHFUL SPRINT SHARD (606e4587d item 3 — my next GPU
-lane):** runpod-a + runpod-b run the paper-faithful PROBING shards
-on pod-A GPUs at drain. **Shard-split proposal (coordinate here per
-the directive): my GPU 0 is FREE NOW and takes the FIRST shard the
-moment runpod-1's plugin card freezes (their CPU-build, sweep
-"plausibly late-morning"); runpod-b's GPU 1 joins at rmx_b drain
-(~11:30) and we split the remaining cells ~evenly at that point
-(18 cells total; exact split at card-freeze when per-cell cost is
-stated).** GPU 0 idles until the plugin card lands — WAIT-REASON
-stated (nothing runnable: plugin does not exist yet; renders
-protected; RM-2 fill demoted). Arm mapping pinned 692bc5d1b:
-{ReLU+TopK} = paper-faithful (this sweep), relu-mix = certificate
-evidence only.
+lane; state re-read 02:38 London 07-28):** split now lands **IN
+runpod-1's card §shards** (their ack d39fc5075 — they own it; 21
+cells flagged vs commissioned 18, grid {1,2,4,6,8,10,16}×{42,1,2},
+T1 cells ordered LAST per shard so one hub line prunes 3). Card
+≤05:00 London on track. **4 GPUs at card-pin** (11227ce0d
+freeze-and-join): runpod-1 old-pod GPU 0 + my GPU 0 + runpod-c's
+2×H100 (substrate on-pod from bring-up); runpod-b GPU 1 joins at
+rmx_b drain (~11:30, or ~06:15 if their T8-boundary stop offer
+b5651d5f2 is taken). I coordinate shard ids with runpod-c here.
 
-**Watch-fors:** (a) runpod-1's plugin card freeze ⇒ claim shard 1
-by LOG line + launch; (b) mac-local's dq caption-fork ruling — if
-"measure the relu-mix column", that lane also lands here; (c) § 8
-draft-row application; (d) 11:00 BST handoff support asks (my T4
-rows + twin receipts feed items 3/4/5).
+**Substrate: WARM — COLD caveat RETRACTED.** The paper's v1 anchor
+mirror sits at `/workspace/caches/probing/hf_mirror/` (33G;
+runpod-b wired it ~23:04 for width-match; my 17:29 symlinks in
+main checkout: `results/probe_cache/gemma_2_2b_it_l13_fineweb_24k128`
++ `results/data_cache/48d2d17ff88598d4/acts.npy`). Preflight PASS
+02:38: acts mmap (24000,128,2304) fp16; meta data_key
+48d2d17ff88598d4 (gemma-2-2b-it L13 resid_post, fineweb-edu); 38
+probe tasks. **At launch: recreate the two symlinks INSIDE the
+worktree** (repo_root anchors results/ to the worktree root),
+worktree-detach at card pin, AGENT_NAME=runpod-a, GPU 0.
+
+**Watch-fors:** (a) runpod-1's plugin card freeze ⇒ claim shard by
+LOG line + launch (shard ids w/ runpod-c); (b) mac-local's dq
+caption-fork ruling — if "measure the relu-mix column", that lane
+also lands here; (c) § 8 draft-row application; (d) 11:00 BST
+handoff support asks (my T4 rows + twin receipts feed items 3/4/5).
 
 ## House-rule cache
 

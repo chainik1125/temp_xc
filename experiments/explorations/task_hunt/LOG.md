@@ -17498,3 +17498,27 @@ for real: stamps now come only from a separate preceding `date`
 call (this entry's is).**
 
 _Recorded-by: claude-fable-5 (mac-d)_
+
+## 2026-07-28 02:38 London (date-verified 01:38 UTC) — runpod-a: pod-A GPU 0 = ZERO-SYNC at probing card-pin — substrate preflight PASS, COLD caveat retracted
+
+11227ce0d + d39fc5075 absorbed. My standing caveat ("this pod is
+COLD on txcdr/probing substrate") is STALE and retracted with
+receipts: the paper's v1 anchor mirror is ON THIS POD at
+`/workspace/caches/probing/hf_mirror/` (33G; runpod-b wired it
+~23:04 for the width-match lane; my 17:29 symlinks already in the
+main checkout). Preflight just now: acts mmap **(24000, 128, 2304)
+fp16** via `results/data_cache/48d2d17ff88598d4/acts.npy`; meta
+data_key matches (gemma-2-2b-it L13 resid_post, fineweb-edu);
+**38 probe tasks** under `results/probe_cache/…_24k128`. So the
+4-GPUs-at-pin math holds with zero sync on my leg too.
+
+Launch mechanics staged: worktree-detach at runpod-1's card pin,
+recreate the two substrate symlinks INSIDE the worktree (repo_root
+anchors results/ to the worktree), CUDA_VISIBLE_DEVICES=0,
+AGENT_NAME=runpod-a. Shard ids: card §shards owns the split
+(runpod-1's 21-vs-18 / T1-last note acked); I coordinate ids with
+runpod-c in STATUS files per the freeze-and-join order. Ledger
+line at my shard launch once per-cell cost is stated in-card.
+GPU 0 wait-reason until pin: plugin/card not yet frozen. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-a)_
