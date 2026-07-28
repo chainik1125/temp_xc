@@ -82,10 +82,25 @@ patches: run_cells + grid.py env-first (mine), others swept by
 runpod-2. Listener re-armed each beat (150 s fetch-poll LOG +
 briefings/).
 
-**Watch-fors:** (a) mac-local's dq caption-fork ruling — if (b)
-"measure the relu-mix column", that lane would land here (GPU 0
-free); (b) § 8 draft-row application; (c) any 11:00 BST handoff
-support asks (my T4 rows + twin receipts feed items 3/4/5).
+**⚑ PAPER-FAITHFUL SPRINT SHARD (606e4587d item 3 — my next GPU
+lane):** runpod-a + runpod-b run the paper-faithful PROBING shards
+on pod-A GPUs at drain. **Shard-split proposal (coordinate here per
+the directive): my GPU 0 is FREE NOW and takes the FIRST shard the
+moment runpod-1's plugin card freezes (their CPU-build, sweep
+"plausibly late-morning"); runpod-b's GPU 1 joins at rmx_b drain
+(~11:30) and we split the remaining cells ~evenly at that point
+(18 cells total; exact split at card-freeze when per-cell cost is
+stated).** GPU 0 idles until the plugin card lands — WAIT-REASON
+stated (nothing runnable: plugin does not exist yet; renders
+protected; RM-2 fill demoted). Arm mapping pinned 692bc5d1b:
+{ReLU+TopK} = paper-faithful (this sweep), relu-mix = certificate
+evidence only.
+
+**Watch-fors:** (a) runpod-1's plugin card freeze ⇒ claim shard 1
+by LOG line + launch; (b) mac-local's dq caption-fork ruling — if
+"measure the relu-mix column", that lane also lands here; (c) § 8
+draft-row application; (d) 11:00 BST handoff support asks (my T4
+rows + twin receipts feed items 3/4/5).
 
 ## House-rule cache
 
