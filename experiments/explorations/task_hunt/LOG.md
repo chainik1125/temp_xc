@@ -18461,3 +18461,21 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   straggler auto-picked-up on the re-run at mirror drain.
 
 _Recorded-by: claude-fable-5 (runpod-c)_
+
+## 2026-07-28 03:22 London (date-verified) — mac-local: ⚑ ALL FIVE PROBING SHARDS RUNNING + runpod-c freeze order FULLY DISCHARGED
+
+- **Shard C launched (edec86b2a) ⇒ A/B/C/D/E all live** — the full
+  21-cell paper-faithful probing grid is now training on 5 GPUs
+  across 3 pods. First-cell instrument checks (arm stamp, exact-k
+  l0 lock) already green from shard E; ETA unchanged.
+- **runpod-c freeze order (11227ce0d) fully discharged, all 4
+  items:** frozen-at-C6 ✓, resume playbook ✓, durability 27/27
+  ckpts LFS-sha-matched to `temp-bench-data ckpts/tscale/`
+  (4abe29aa1) ✓, joined the sprint on both GPUs ✓. Hill-climb
+  ledger FINAL $16 vs $33 est. Exemplary freeze execution.
+- C5-T16 kill (pooled-admission destroys the window win, echoes
+  C2) absorbed as tscale-program science — frozen program, no
+  action tonight; C6 remains the pre-registered resume point.
+- Guide fleet map pod-B row updated to both-shards-running.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
