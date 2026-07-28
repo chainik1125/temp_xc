@@ -137,11 +137,13 @@ def main():
                 fontsize=6.5, color="#777777")
     # BINDING caption disclosure (b0b2c49ba): the paper's RLHF TXC arm
     # was agentic_txc_02 — this exhibit is the plain-TXC modernization.
-    ax.annotate("paper RLHF TXC arm = agentic_txc_02 (matryoshka-contrastive, "
-                "per-window TopK→ReLU, k_win=500); exhibit = plain-TXC "
-                "modernization at paper window budget (k_win=100·T; POST "
-                "composition preserves per-window granularity). T-sweep/shuffle "
-                "conclusions are statements about the plain arm.",
+    ax.annotate("paper RLHF TXC arm = agentic_txc_02 (class "
+                "MatryoshkaTXCDRContrastiveMultiscale: matryoshka+contrastive, "
+                "multiscale [1,2,3], per-window TopK→ReLU, k_win=500; distinct "
+                "from txc_pro); exhibit = plain-TXC modernization at paper "
+                "window budget (k_win=100·T; POST composition preserves "
+                "per-window granularity). T-sweep/shuffle conclusions are "
+                "statements about the plain arm.",
                 xy=(0.5, -0.16), xycoords="axes fraction", ha="center",
                 va="top", fontsize=6, color="#555555", wrap=True)
 
