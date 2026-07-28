@@ -59,6 +59,18 @@ call (a)). Renders are now BOTH ARMS at 7 T-points.
    boundary_min_pre vs step per (arm, T) — btk arm now traced
    post-fix 3a9744c7f (min-selected NEGATIVE = boundary crossing);
    btk T6 cells trace-less (endpoint census from ckpts).
+   MECHANISM FRAME (from live T10 trace + runpod-2's 829f05070
+   RLHF certificate): btk T10 shows ZERO negative samples in 60
+   (floor +4.19, median +6.8, dead_frac 0.429@14.75k) yet twins
+   diverge T≥2 — since no-contact ⇒ bit-identical passes ⇒ no
+   divergence possible, contact MUST occur between 250-step
+   samples (rare tail events; sampling gives a RATE BOUND, not
+   proof). Coherent cross-venue story: divergence probability
+   scales with selection depth vs positive-mass tail — probing
+   = rare-contact regime (tiny deltas, grows with T); runpod-2
+   RLHF = never-contact (floor ≥2.21) ⇒ 3/3 identity. Certificate
+   mechanism section writes THIS. Also: name the 1-of-7 EQUAL
+   tensor in diverged pairs (json tensor_mismatches).
 3. 7-point per-k fig re-renders BOTH ARMS (--writeup final; btk
    family per eace1b077 — first-REAL-T10 announced 44fe0029f; RM
    family new, T1-certificate caption line per matrix).
