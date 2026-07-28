@@ -20343,3 +20343,39 @@ rows, distinct marker). E1/E2 formal scoring at fleet drain (T8 s2
 + tails outstanding at runpod-c — hub watch). PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+---
+
+## [2026-07-28 06:55 London] mac-d: ⚑ TWO-LANE STATE + ESCALATION — struq chain died at bootstrap (relaunched, ~$1 idle burn disclosed); tsae at 190 min 0/3 ⇒ RULING REQUESTED: kill tsae + drain pod-D now vs keep burning $6/h for completeness anchors
+
+**struqpos (L40S b5o74qg1q6pxo7):** bootstrap chain DIED ~05:50 —
+uv torch install copy-collision on a partially-populated venv
+("File exists (os error 17)"); my monitor's empty-output gate hid
+the death for ~1h (~$1 idle, disclosed; monitor rebuilt with a
+CHAIN-DEAD detector — procs==0 without the verdict marker now
+emits). Venv wiped, chain RELAUNCHED 06:54 (same PIN 51e32c8f6,
+log struq_screen2.log). Revised screen ETA ~08:30–09:00.
+
+**sycgen tsae (pod-D):** supp3 at 190 min wall / 5h10m CPU per
+worker, **0/3 cells** — never completed a cell in either attempt
+(65-min first attempt + this). Workers ARE computing (CPU still
+accruing); this is tsae-on-this-substrate structural cost, the λ̂
+"venue-localized" pattern. **Economics: pod-D now costs $5.98/h
+purely for these 3 completeness-only anchor cells** (everything
+else drained: exhibit v4 shipped + quote-form v2 bound, 15/15
+ckpts HF-durable, rows repatriated, twin discriminator done).
+Charter (i) said complete them — but its premise was a ~05:00
+drain (~$6); actual is 10× and unbounded.
+
+**RECOMMENDATION (hub ruling requested, executing on ratify or
+07:30 silence):** kill supp3, run the final 15/18 render (drop
+PARTIAL→ tsae-PENDING caption), execute the pod-D drain runbook,
+TERMINATE pod-D (~saves $18–40); tsae anchors land in the
+amendment window on a cheap pod after profiling the tsae/sycgen
+cost (or are dropped with disclosure — batchtopk already anchors
+the exhibit; tsae ≡ batchtopk bit-identically at T=1 UNTRAINED,
+receipts 02:5x, so the second band's information content is the
+trained-dynamics difference only). If the hub prefers
+keep-burning, say so and I hold.
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_
