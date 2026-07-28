@@ -19368,3 +19368,55 @@ would have shipped inside the 11:00 PROTECTED btk renders:
   landing — drain fold-in is pre-staged. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-1)_
+
+## 2026-07-28 04:42 London (date-verified at write) — mac-local: ⚑ NO-IDLE SWEEP (Han order) — fleet census 04:41, one idle GPU, fill policy; handover cadence tightened; band-pollution fix ratified; corrigenda
+
+**Han (04:4x): "ensure no GPU idle; ensure code guide and handoff
+updated throughout the night."**
+
+**1. GPU census (ssh receipts, 04:41):** old pod 96/97/100%
+(shards A+B tails + x-lane) — pod A 64/78% (shard E T2 leg +
+rmx_b) — pod B 92/85% (shards C+D, logs written 1 min before
+sample; an earlier 0% read was the CPU probe-eval phase, not a
+stall) — pod D: GPU0 = tsae regrind (CPU-bound by design), **GPU1
+= the fleet's ONLY idle GPU** (supp2 drained on schedule).
+
+**2. Fill policy (binding):**
+- **pod-D GPU1: no fill — TERMINATE at tsae drain per runbook.**
+  No-idle ≠ make-work: no card-sanctioned work exists whose
+  substrate lives on pod-D (sycgen caches only), and un-carded
+  extra cells violate freeze discipline. Stopping a $5.98/h meter
+  ~20 min early IS the no-idle-compliant move. retryesc_gen
+  screens get the pre-approved fresh L40S when the corpus gates
+  pass (minutes to warm, ~$1/h).
+- **old pod, post-shard idle windows ≥10 min (from ~05:00):
+  runpod-1 pre-authorized** to run the preempted relu-mix fills
+  (s1/s2 T{2,4} — already card-sanctioned, substrate-local,
+  certificate-evidence arm) between shard drain and render work.
+- **pod A GPU0 at shard-E drain (~05:45):** rebalance-rule check
+  for unclaimed pf tail cells FIRST, else RM-fill assist
+  (substrate local); GPU1 continues rmx_b to drain.
+- **pod B at C/D drains (~06:00/06:30):** runpod-c holds for the
+  morning render assists + posts an idle-report; hub assigns or
+  blesses idle-brief there (Han-era pod — no termination call
+  from me).
+
+**3. Handover cadence (Han re-order) TIGHTENED:** updates are now
+EVENT-TRIGGERED at every drain milestone (sycgen final render;
+each probing shard drain; RLHF 10:15/supersede renders; any KEEP
+— gold-visibility) in addition to the 06:00/09:00 restamps and
+the 10:30 full pass. Census regen rides every milestone.
+
+**4. runpod-1's analysis.py band-pollution fix (5a699a5d4)
+RATIFIED** — positive-control + width-match rows excluded from
+canonical bands IN-RENDERER, caught before the 11:00 protected
+renders; §5b caveat now enforced by construction. v1t render
+support live with gates PASS — exactly what item (iii) needs.
+
+**5. Corrigenda (mine):** the 04:33 charter entry's ledger line
+lost its amounts to shell interpolation — read "$500 aggregate /
+$300 generation". A watcher stray from an inline-& arm (my own
+banned pattern) was caught and killed within the beat;
+single-instance verified since.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
