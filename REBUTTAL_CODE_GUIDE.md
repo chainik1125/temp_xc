@@ -200,82 +200,85 @@ partial-bonus).
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — what is running on every pod (snapshot 07:20 BST 07-28; probing pf grid COMPLETE)
+## 5. FLEET MAP — snapshot 14:19 BST 07-28 (**FULL FLEET RESET at ~13:35**)
 
-This section dates fast. **Live sources: `agents/<id>/STATUS.md`
-(each agent self-maintains its own) + the LOG tail** — trust those
-over this snapshot if they disagree.
+This section dates fast. **Live sources: `agents/<id>/STATUS.md` + the
+LOG tail** — trust those over this snapshot if they disagree.
 
-| pod | agents | GPU | running NOW | next |
-|---|---|---|---|---|
-| **old pod** (3×H100) | runpod-1 (GPU 0/1), runpod-2 (GPU 2) | 0+1 | drained (shards A+B + RM fills done) — CPU render pipeline: **E1–E3 fold-in + 7-point pf+btk figs/tables (GO issued ~07:1x)** | 10:15 RLHF checkpoint render |
-| | | 2 | **RLHF paper-faithful pf_pilot RUNNING** (CPU-heavy phases read as 0% GPU — /proc is the liveness source) | G1 → grid (pf_lo/mid/hi lanes; relief if >14:00 projection) |
-| **pod A** (2×H100) | runpod-a (GPU 0), runpod-b (GPU 1) | 0 | scheduled-idle: struqpos-verdict standby + warm zero-bootstrap fallback for the L40S screen | struqpos verdict scoring |
-| | | 1 | rmx_b eq-extension cells 5–6 (T8 set CLOSED — relu-mix ≡ btk exact 3/3; T10 relay checks) | drain ~11:30 |
-| **pod B** (2×H100) | runpod-c (session DOWN since ~05:1x; hub-operated) | 0+1 | **shards C+D COMPLETED before the session died** (last 3 cells hub-repatriated via HF, LOG ~07:1x); NOW: hub-run l13-IT substrate rebuild (stage B) + ckpt push for the repatriated cells | **pre-designated RLHF relief venue at G1** |
-| **mac-d-struqscreen-0728** (L40S $0.99/h) | mac-d | — | struqpos screen chain v2 RUNNING (bootstrap death ~$1 disclosed, death-proofed monitor) | verdict → runpod-a scores; terminate at drain |
-| ~~mac-c-screen-0728~~ | — | — | TERMINATED (evalage WEAK, lane closed) | — |
-| ~~mac-d-retrain-0728 (pod D)~~ | — | — | **TERMINATED 07:01 API-verified** — sycgen lane closed (exhibit FINAL-at-15/18, tsae trio abandoned-disclosed); ledger ~$38 actuals | — |
+**⚑ Everything in the previous snapshot is gone.** Han terminated every
+pod at ~13:35 ("I've killed all the pods. No more runpod chaos"). The
+old pod, pod A and pod B are **EXITED**, and with them the agents
+`runpod-1`, `runpod-2`, `runpod-a`, `runpod-b`, `runpod-c`. Their work
+is durable on origin + HF; their containers are not.
 
-**Priority order (Han, 02:38): paper-faithful sweeps outrank ALL
-btk GPU work; hunted tasks need either arm only; relu-mix is
-certificate evidence, never a matrix column.**
+### Agents now
 
-**CPU-side work in flight:** runpod-1 = E1–E3 formal fold-in +
-the 7-point pf+btk probing figs/tables (render GO issued);
-runpod-2 = G1 scoring at pilot landing + the 10:15 RLHF
-checkpoint render (deliverable of record; supersede branch if x10
-resumes post-grid); runpod-a = struqpos verdict owner; mac-c
-(local mac) = retryesc_gen generation (Claude API, $300 cap) —
-roll-call response pending; mac-d (local mac) = struqpos screen
-executor on the L40S; mac-local = hub (review/ratify + takeover
-executor where owners are down; RLHF eval-substrate semantics:
-`eval_cfg.hh_rlhf_cache` registry tag hashes into eval_key with a
-`cache_expect` hard-check — see §3 and the 05:05 G2 LOG entry).
+| agent | where | owns |
+|---|---|---|
+| **mac-local** | Han's MacBook | hub: review, ratify, LOG, ledger oversight, this guide + `REBUTTAL_HANDOFF.md` |
+| **mac-d** | Han's MacBook (drives pods via API) | **the RLHF pf grid and all six pods** |
+| **mac-c** | Han's MacBook | **the task hunt, end to end** (`briefings/hunt-mac-c-takeover.md`) — item 7 is the open deliverable |
+
+**⚑ All agent identities are sessions on ONE machine** — `Hans-MacBook-Pro`,
+M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
+is **not** machine count; plan concurrency accordingly.
+
+### Pods now (API-verified 14:19)
+
+All **1×H100 80 GB SECURE, $2.99/h each = $17.94/h**, owner mac-d,
+terminate-at-lane-end:
+
+    mac-d-rlhfpf-0728    aqil2dkyikg3ze
+    mac-d-rlhfpf-0728-2  p478c8uyllvkzz
+    mac-d-rlhfpf-0728-3  5sbd2s9mh0njzo
+    mac-d-rlhfpf-0728-4  mi7cnfpnuikybi
+    mac-d-rlhfpf-0728-5  tnp7vvew4t80wi
+    mac-d-rlhfpf-0728-6  c48kuf2z2dipmv
+
+**Running:** the RLHF **paper-faithful** grid — 18 cells,
+T{1,2,4,6,8,10} × 3 seeds, one cell per GPU, no co-tenancy.
+T16 excluded (83 GiB > 80 with the resident buffer, and upstream has
+no `t16` arch). Deferred btk T{6,10} resume after the pf grid.
+
+**Priority order (Han, unchanged): paper-faithful outranks ALL btk GPU
+work; hunted tasks need either arm only; relu-mix is certificate
+evidence, never a matrix column.**
 
 **Where outputs land:** canonical rows → `results/leaderboard.jsonl`;
-hill-climb scratch → `experiments/explorations/tscale/RESULTS.md`;
-hunt corpora → HF `temp-bench-data/hunt_corpora/`; checkpoints →
-HF `temp-bench-data/ckpts/<train_key>/`; figures/tables →
-`figs_writeup/`; verdicts/licences → the LOG.
+hunt corpora → HF `temp-bench-data/hunt_corpora/`; checkpoints → HF
+`temp-bench-data/ckpts/<train_key>/`; figures/tables → `figs_writeup/`;
+verdicts/licences → the LOG.
 
-## 5a. SSH access to the pods
+## 5a. Pod access
 
-```
-# old pod (3×H100 — runpod-1, runpod-2):
-ssh j42plcul70a2es-64410eb7@ssh.runpod.io -i ~/.ssh/id_ed25519
-# pod A (2×H100 — runpod-a, runpod-b):
-ssh 0lmrs9lk8apyhm-644121b8@ssh.runpod.io -i ~/.ssh/id_ed25519
-# pod B (2×H100 — runpod-c):
-ssh l2bp61kg82epel-64411fb1@ssh.runpod.io -i ~/.ssh/id_ed25519
-# pod D — TERMINATED 07:01 07-28 (sycgen lane closed); coordinates
-# retired. mac-d-struqscreen-0728 (L40S) — TERMINATED 07:09 07-28
-# (venue moved to runpod-a GPU 0). mac-d holds ZERO pods
-# (account-API-verified 12:49 07-28); no mac-d coordinates are live.
+**The old ssh coordinates in this section are RETIRED — those pods no
+longer exist.** Current pods are API-provisioned and mac-d-owned:
+
+```bash
+agents/mac-d/podctl.sh mine              # list mac-d-* pods
+agents/mac-d/podctl.sh ssh <podId>       # print ssh coordinates
+agents/mac-d/podctl.sh status <podId>
+agents/mac-d/podctl.sh terminate <podId> # refuses non-mac-d pods; verifies after
 ```
 
-- **Repo checkouts are PER-AGENT (ssh-verified 02:5x 07-28) — there
-  is no `/workspace/temp_xc` on any of Han's pods** (pod D, the one
-  API-provisioned exception, DOES use `/workspace/temp_xc` — single
-  tenant, mac-d only)**:** old pod →
-  `/workspace/agents/runpod-1/temp_xc` + `/workspace/agents/runpod-2/
-  temp_xc`; pod A → `/workspace/agents/runpod-a/temp_xc` +
-  `/workspace/agents/runpod-b/temp_xc`; pod B →
-  `/workspace/agents/runpod-c/temp_xc`. The leaderboard/results in
-  each checkout are the same append-only stream (agents push/pull
-  through origin); the branch-of-record is `arxiv` on origin — read
-  results there first, ssh only when you need live logs.
-- **Scripted (non-interactive) use:** the RunPod ssh proxy forces a
-  PTY — pipe your command list over stdin
+The key is env-injected from the macOS keychain inside that script
+only — **never echoed, written to a file, or passed as an argument.**
+
+- **Repo checkout on the new pods:** single-tenant, so `/workspace/temp_xc`
+  (unlike the retired shared pods, which were per-agent
+  `/workspace/agents/<id>/temp_xc`). The branch-of-record is `arxiv` on
+  origin — **read results there first, ssh only for live logs.**
+- **Scripted (non-interactive) use:** the RunPod ssh proxy forces a PTY
+  — pipe your command list over stdin
   (`printf 'cmd; exit\n' | ssh -tt <host> -i ~/.ssh/id_ed25519`) and
-  strip bracketed-paste noise from the output (`| grep -av 2004`).
-- **LOOK, DON'T TOUCH (house rule: never modify a pod you did not
-  spin up):** every GPU is running deadline lanes — `nvidia-smi`,
-  `tail -f /workspace/logs/*.log`, and reading result files are
-  fine; do NOT kill/launch/modify anything. Coordinate through the
-  LOG instead.
-- Pod-local HF/GH tokens live at `/workspace/.tokens/` (never in
-  git); training logs at `/workspace/logs/`.
+  strip bracketed-paste noise (`| grep -av 2004`).
+- **LOOK, DON'T TOUCH** (house rule: never modify a pod you did not spin
+  up): `nvidia-smi`, log tails and result reads are fine; do not
+  kill/launch/modify. Coordinate through the LOG.
+- **Liveness = `/proc` receipts, never GPU point-samples + log size.**
+  Three separate CPU-bound phases were misread as dead processes on
+  07-28; do not make it four.
+- Pod-local HF/GH tokens live at `/workspace/.tokens/` (never in git).
 
 ## 5b. Standing caveats an agent must not trip over
 

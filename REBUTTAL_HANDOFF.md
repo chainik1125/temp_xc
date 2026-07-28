@@ -150,17 +150,69 @@ panel — directly comparable to the btk figs above):**
   x-lane was cancelled mid-stream and resumes only after the pf
   grid).** The 10:15 checkpoint render ships the complete 6-point
   btk fig with a deferral caption.
-  **RLHF PAPER-FAITHFUL ARM — DEFINITIVE STATUS (13:0x, measured
-  receipts):** the trainable \`agentic_txc_02\` port is BUILT (11
-  contract tests), substrate-gate-VALIDATED (G2 passed on l13-IT
-  with the alias fix), and pace-MEASURED (pilot 9.0 h at 1.30
-  s/step, no plateau at 21k — G1's own convergence criterion under
-  test); the full grid projects ~420 GPU-h as-is, and the cells
-  are CPU-BOUND (0% GPU util — the identified optimization
-  target). **The pf grid + its T-sweep plot land in the amendment
-  window (Aug 3), deferred WITH these receipts.** Until then the
-  paper-faithful RLHF claim is carried by the archived-agentic
-  anchors (G2 rows) + RM_CERTIFICATE v1.0, labeled as such.
+  **RLHF PAPER-FAITHFUL ARM — STATUS 14:1x (SUPERSEDES the 13:0x
+  "deferred to Aug 3" block; that block's premises were all
+  subsequently falsified by measurement — see below).** The grid is
+  **RUNNING NOW on 6×H100**, not deferred.
+
+  *(i) The pf figure slot — deliberately empty, not forgotten:*
+
+  <!-- PF-RLHF FIGURE SLOT: fig_rlhf_shuffle_tsweep_pf.{png,pdf}
+       drops here at first render. Renderer exists and is
+       wave-1-verified: render_writeup_fig.py --arm pf.
+       Per Han: item 3 needs BOTH (i) a paper-faithful plot and
+       (ii) the BatchTopK plot above. -->
+
+  **Renderable today, anchors-only:** the three corrected T5 anchors
+  are on the board (`preference_auc_k20` **0.6096 / 0.6240 / 0.6031**,
+  seeds 42/1/2). They are **eval-only upstream paper weights**, plot
+  as their **own marker** and are excluded from the sweep mean by
+  `train_key` (ruling d744f7c52) — never spliced into the curve.
+
+  *(ii) Three things the 13:0x block got wrong, corrected here
+  because each was load-bearing:*
+  - **Substrate.** "G2 passed on l13-IT" — l13-IT was the **wrong
+    stream**, a carryover from the probing section. The paper's
+    `agentic_txc_02` trained on **gemma-2-2b BASE layer 12**
+    (anchor FVU 0.0036 vs 0.0367; step-0 init within 4% of upstream
+    vs 84% high). Settled twice by measurement. The l13-IT anchors
+    were retracted and re-run on base-l12.
+  - **Pace / "CPU-BOUND, 0% GPU util".** Also wrong as a diagnosis.
+    The port declares `consumes="sequence"`, so it copies **whole
+    128-token sequences** host→device every step — **1152 MiB** — to
+    use the **27 MiB** a T=2 step actually consumes: a **42.7×
+    over-transfer**. That *is* the "818 MiB/s feed" (computed 814,
+    0.5% match) and it explains its otherwise-strange
+    T-independence. Upstream never paid it — it kept the fp16 cache
+    **on the GPU** and gathered there. Fixed by
+    `TEMP_BENCH_BUFFER_RESIDENT=1` (opt-in, default off), receipted
+    **bitwise-identical** batches (`scripts/verify_resident_buffer.py`,
+    `torch.equal`), ~16× on the refill at steady state.
+  - **Schedule.** `lr`/`warmup`/stopping were never vendored — they
+    fell through to framework defaults (warmup 1000, fixed 25 000
+    steps). Upstream source (`94119bc08`) has **no scheduler and no
+    warmup**, constant Adam 3e-4, grad_clip 1.0, and a **plateau
+    stop** (<2% over a 5-point window, min 3 000) — which is why its
+    own runs ended at **4 200 / 4 600 / 5 200** steps. Sweep cells now
+    run `warmup_steps=0` + `PF_N_STEPS=8_000`; anchors are frozen at
+    the staging recipe so their keys cannot rotate.
+
+  *(iii) Known deviations, disclosed not patched:* **grad_clip 1.0**
+  is upstream and absent from our core trainer (rule 3); and
+  `training_cfg.precision` is **declarative only** — no autocast, no
+  `.half()`, `SequenceBuffer` casts to fp32 — so every row we hold
+  records `precision: bf16` while having trained **fp32**.
+
+  *(iv) Scope:* **T{1,2,4,6,8,10} × 3 seeds = 18 cells.** **T16 is
+  excluded and that is a finding, not a shortfall:** upstream's
+  T-sweep archs are `t2,t3,t6,t7,t8,t10,t15,t20` — **there is no
+  `t16`** — and our port needs 69.3 GiB for params+Adam alone, which
+  contradicts upstream's documented **48 GB A40** accommodation. Our
+  large-T cells may not be the paper's cells.
+
+  Until the grid drains, the paper-faithful RLHF claim is carried by
+  the corrected base-l12 anchors + RM_CERTIFICATE v1.0, labeled as
+  such.
   **Relu-mix arm: DONE-BY-CERTIFICATE — RLHF twins
   are tensor-IDENTICAL through T16 (829f05070: Δauc exactly 0,
   boundary_min_pre ≥ 2.21, no negative-pre-activation contact at
