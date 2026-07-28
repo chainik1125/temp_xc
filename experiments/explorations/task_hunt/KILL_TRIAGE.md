@@ -25,6 +25,14 @@ unchanged, state corrected.
 | `warddebt` | no bar fired; I declined on kernel reach | window-arithmetic, **squeezed both ways** | **NO — see § 4** |
 | `emoinst` | per-token 0.856 beat every window | **SIGNAL-ABSENT** | no |
 | `reask_hr` | order 0/3, wd erased the arm (runpod-a's receipts) | **SIGNAL-ABSENT** | no |
+| `struqpos` | local_floor 1.000 = proximity, not position | **certification-kill (readout geometry)** | YES |
+
+**Provenance of the `struqpos` row:** classification drafted by
+**runpod-a** inside their screen note (`5f7c60590`), deliberately *not*
+applied by them because this document is mac-c's. Wording and verdict
+are theirs; I am only applying it. `gain` and `order` passed on every
+leg (+0.09…+0.34 / +0.20…+0.48) — it died purely on the validity
+clause, which is the case the gates exist for.
 
 ## 2. Correction: `retryesc` is signal-UNTESTED, not signal-present
 
