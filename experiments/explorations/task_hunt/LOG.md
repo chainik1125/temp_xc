@@ -32520,3 +32520,77 @@ tested.** Worth 10 minutes of mac-d's time before writing it again.
 **$0. 0 mac-c pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-28 ~22:3x BST — mac-local HUB: **claim-read RATIFIED and INDEPENDENTLY VERIFIED — exposure is CONFINED TO ITEM 6.** My own handoff block retracted; appendix-vs-code authorized as the next $0 step
+
+**mac-c (`79b1d121f`) de-escalated from three exposed sections to one.
+Because that is the answer we would *want*, I verified the load-bearing
+facts myself in `paper/appendix.tex` rather than ratify a comfortable
+result. They hold.**
+
+### 1. The correction, and why the first answer was wrong
+
+mac-c's 21:18 answer said *"every SAE baseline is per-token and TXC is
+the only arm with window access."* **True of the ARCHITECTURE, false of
+the COMPARISON — the pooling is supplied by the PROTOCOL.** Their own
+diagnosis, and it is the right one: *"I checked the arch registry and
+stopped there; the registry was the wrong place to answer a question
+about what the comparison does."*
+
+### 2. Hub verification — I read the appendix myself
+
+- **Probing** (`appendix.tex`, probing protocol): *"Per-token
+  architectures encode the full (N,S,d_in) tensor and **mean-pool over
+  the token axis**… The output is a single (d_SAE) feature vector per
+  prompt **for every architecture**."* **That is Dmitry's pooled-SAE
+  construction, in the protocol.** And it pools over **S = 32 tokens —
+  WIDER than any window arm** (T=5 → 28 windows of width 5). Sparsity is
+  matched too: **matched-sparsity invariant fixes expected per-token
+  L0 = 20 across architectures** (TopK SAE k_win=20; TXC-base(T)
+  k_win=20T). **NOT exposed.**
+- **Backtracking**: *"we encode each (sentence, T×d_in) tensor and
+  **max-pool** absolute feature activations over positions"*, all archs.
+  **NOT exposed.**
+- **`grep concat` over the paper sources: NO HITS** — confirming
+  concatenation/stacked is absent outside `synthetic`.
+
+### 3. The EM/RLHF argument is airtight and worth stating plainly
+
+Both sections already report **TXC negatives**. **A stronger baseline
+can only make TXC look worse, so it cannot overturn a negative in TXC's
+favour.** One-directional, decisive, and it needs no experiment.
+
+### 4. My own handoff block was FALSE and is retracted
+
+The ⚑ STRUCTURAL EXPOSURE block I wrote above §1+2 at ~21:5x asserted
+that probing/RLHF/EM had no windowed SAE baseline. **That is wrong.** It
+is replaced with a ✅ RESOLVED block carrying the appendix quotes, the
+per-section verdicts, and the residual gap.
+
+By my own ruling to mac-d — *a caption that has become FALSE is worse
+than a byte-hash that has changed* — a false alarm on a deliverable
+surface is worse than no alarm, because it would have sent Dmitry
+re-planning three sections that are fine. **Fixed within the beat.**
+
+### 5. Residual gap, precisely, and the sizing
+
+**pooled ≠ stacked.** Concatenation is absent outside `synthetic`; in
+Dmitry's table stacked ran level with pooled. So this is a
+**completeness gap — one arm on one axis**, not three exposed sections.
+**Do NOT re-plan three sections.** The item-6 table stays urgent; the
+section-agnostic harness stays correct **as cheap insurance for the
+stacked arm**, not because the paper is at risk.
+
+### 6. ⚑ What keeps this open — authorized next
+
+mac-c read **claims + protocol appendices, NOT each section's analysis
+code**, and flagged it themselves. **If any section's code deviates from
+its appendix, that section flips back into exposure.** The
+appendix-vs-code check is **AUTHORIZED as mac-c's next $0 step** — it is
+the difference between "the paper says it pools" and "the code pools."
+Today has produced six instances of a stated intention that was not the
+executed behaviour; this is exactly that shape.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_

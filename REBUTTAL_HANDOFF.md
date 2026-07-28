@@ -55,37 +55,49 @@ label.
 
 ---
 
-> ## ⚑ STRUCTURAL EXPOSURE — probing, RLHF and EM have NO windowed SAE baseline either (mac-c, verified 21:3x 07-28)
+> ## ✅ RESOLVED — the missing-baseline exposure is CONFINED TO ITEM 6 (claim-read 22:2x, hub-verified against the appendix)
 >
-> The item-6 challenge (§6) generalises. **In `probing`, `rlhf` and `em`,
-> every SAE-family baseline is per-token and TXC is the only arm with
-> window access** — structurally the same situation as sycgen.
+> **An earlier version of this block said probing, RLHF and EM had no
+> windowed SAE baseline and were structurally exposed. That was wrong
+> and is retracted.** It came from reading the *arch registry* — which
+> is the wrong place to answer a question about what the *comparison*
+> does, because **the pooling is supplied by the PROTOCOL, not the
+> architecture.**
 >
-> - **`tsae_btkonly` cannot run at T>1 by construction** — `tsae.py:113`
->   raises `ValueError` for any `T≠1`, deliberately. Verified by
->   *instantiation*, not code reading. This is **faithful to Ye et al.**:
->   T-SAE's temporal part is a **training-time contrastive construct, not
->   an inference window.** The arch is correct; it simply is not a
->   windowed comparator and never could be.
-> - **No stacked arm exists in these sections.** `synthetic` is the only
->   section carrying `stacked_sae` (62 rows) / `stacked_batchtopk` (1467).
+> **Verified directly in `paper/appendix.tex`:**
 >
-> **This is an exposure report, NOT a verdict that the exhibits are
-> invalid.** Whether the gap refutes a given claim depends on what that
-> section actually asserts — and **probing already frames its result as
-> probe-budget-dependent with no monotone window win at any k**, which
-> may substantially inoculate it. **RLHF and EM need the same read and
-> have not had it yet.**
+> - **Probing** — *"Per-token architectures encode the full
+>   $(N,S,d_{in})$ tensor and **mean-pool over the token axis**… The
+>   output is a single $(d_{SAE})$ feature vector per prompt **for every
+>   architecture**."* **That is exactly Dmitry's pooled-SAE
+>   construction**, and it pools over **S = 32 tokens — a WIDER span
+>   than any window arm gets** (T=5 → 28 windows of width 5). Sparsity is
+>   matched by design too: the **matched-sparsity invariant fixes
+>   expected per-token $L_0 = 20$ across architectures** (TopK SAE
+>   $k_{win}=20$; TXC-base(T) $k_{win}=20T$). **NOT exposed.**
+> - **Backtracking** — *"we encode each (sentence, $T\times d_{in}$)
+>   tensor and **max-pool** absolute feature activations over positions"*,
+>   all architectures. **NOT exposed.**
+> - **EM and RLHF** — both already report **TXC negatives** ("T-SAE
+>   performs best… TXC variants underperform"; "the result is a negative
+>   case for TXC"). **The logic here is one-directional and decisive: a
+>   stronger baseline can only make TXC look worse, so it cannot
+>   overturn a negative in TXC's favour.** Not exposed in any direction
+>   that matters.
+> - **Item 6 (§6)** — a clean TXC win against per-token-only
+>   comparators. **The only exposed exhibit.**
 >
-> **Quote-form until each section is read:** these exhibits support
-> *"windowed TXC reads state that per-token probes cannot"*. They do
-> **not** currently support *"TXC beats a windowed SAE"* — no such
-> comparison exists in the record for any of the three.
+> **Residual gap, stated precisely: pooled ≠ stacked.** Concatenation is
+> absent outside `synthetic` (`grep concat` over the paper sources: **no
+> hits**). In Dmitry's table stacked ran level with pooled, so this is a
+> **completeness gap — one arm on one axis**, not three exposed sections.
+> mac-d's frontier harness stays section-agnostic as cheap insurance for
+> that arm, not because the paper sections are at risk.
 >
-> **Fix is in-repo:** `stacked_batchtopk_btkonly` is registered and
-> builds at T=4; the pooled arm is an eval-only transform of the trained
-> T=1 SAE. mac-d's item-6 frontier harness is being built
-> **section-agnostic** for exactly this reason.
+> **⚑ Caveat that keeps this open:** the read covers **claims + protocol
+> appendices, NOT each section's analysis code.** If any section's code
+> deviates from its appendix, that section flips back into exposure.
+> Verifying appendix-vs-code is authorized as the next $0 step.
 
 ---
 
