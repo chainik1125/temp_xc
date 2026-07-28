@@ -1,6 +1,21 @@
 # mac-d STATUS — RunPod-API executor agent (LIVE session, updated 02:3x 07-28)
 
-## ⚑⚑⚑ HEADLINE: SYCGEN BUNDLE = KEEP 3/3 (02:28, first hunt KEEP) — RETRAIN IN BUILD
+## ⚑⚑⚑ HEADLINE (02:38): RETRAIN GRID RUNNING — drain ~05:30–06:30
+Freeze 74d260321 (card + datasource plugin sycgen_real_age_llama31_
+8b_l14 + 48-cell grid + overlay transplant). Both shards live on
+pod-D (i%2 split, 3 workers each; logs /workspace/logs/
+retrain_s{0,1}.log; monitor armed). AT DRAIN, in order: (1)
+`sycgen/shuffle_overlay.py` on-pod (identity 2e-3); (2)
+`agents/mac-d/repatriate.sh 64.247.201.51 16977` (dup-key merge,
+push rows from mac); (3) ckpts via runpod-a's push_ckpts_hf.py
+(`ckpts/<train_key>/`, sha receipts here); (4) overlay json +
+Aniket-template T-sweep figure; (5) ledger actuals; (6) ONE LOG
+bundle (PTR). Screen results HF-durable
+(hunt_corpora/sycgen_20260728/screen/). Stamp discipline: date
+from a separate preceding call, ALWAYS (corrigendum 02:38 entry).
+Pod stays up (lane not done). 08:55 Mission-2 checkpoint stands.
+
+## PREVIOUS HEADLINE: SYCGEN BUNDLE = KEEP 3/3 (02:28, first hunt KEEP)
 Screens I executed on MY pod (mac-c handoff 7cc702599 + GO
 dc3cb8fd9; freeze 782e9cad3): gpt2/gemma2/llama31 ALL KEEP, zero
 kill clauses (tok 0.50–0.53 ≈ chance; window 0.62–0.65 at
