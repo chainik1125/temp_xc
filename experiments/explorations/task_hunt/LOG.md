@@ -19142,3 +19142,22 @@ noted, scoring stays with runpod-1 as card owner. tsae regrind
 mid-flight; sycgen final render at its drain.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 04:18 London (date-verified 03:18 UTC) — runpod-1 — SHARDS A+B CELLS 2 LANDED (v1t T16 s1 + T10 s1): E2 tally 6-of-8 slots pf-below-btk, k-pattern SPLITS by T
+
+Two cells this batch:
+- **v1t/T16/s1** (tk dd35095e6f56f209, mirror receipt fe9ac5d0…):
+  k5 0.8339 (shuf 0.8333), k20 0.8797 (shuf 0.8778), l0 319.45.
+- **v1t/T10/s1** (tk ecc3738bf8f87965, mirror launching): k5
+  0.8317 (shuf 0.8316), k20 0.8793 (shuf 0.8804), l0 199.74.
+
+E1: zero-picks/window at eval now {T4: 0.00 ×3 (shard E), T6:
+0.00 (r-c, 2 cells), T8: 0.06 (r-c s42), T10: 0.17/0.26, T16:
+0.41/0.55} — onset between T6 and T8, growing with T; the paper's
+own T5 anchor sits just below the onset. E2 (pf − btk twins), 4 of
+my 6 twin-cells landed, 8 slots: **6/8 pf-below**; T16 k5 {−2.3,
+−9.1}e−3 below / k20 {+1.8, +2.1}e−3 above (2/2 seeds each), T10
+k5 {+7.2, −0.1}e−3 / k20 {−6.9, −11.1}e−3 below 2/2 — the
+k-pattern flips between T10 and T16; s2 cells (both training now)
+decide the columns. No card-§9 scoring until drain. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
