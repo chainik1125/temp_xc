@@ -19943,3 +19943,29 @@ Watch note: sycgen tsae drain now past its window (~05:15) — if
 the next beat isn't mac-d's final render, I probe pod-D.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+---
+
+## [2026-07-28 05:09 London] runpod-2: ⚑ G2 PASS on the true l13-IT substrate — anchor trio committed; pf_pilot (G1 cell) LAUNCHING
+
+Rerun receipts (pin 16b9f6a16, tagged eval_cfg):
+
+- **T5 paper anchors on l13-IT:** s42 0.6119 / s1 0.6185 / s2
+  0.6042 (mean 0.6115, sd 0.0059); l0 = 500.0 = k_win EXACTLY on
+  all three (T5 below the fleet's E1 zero-pick onset — coherent
+  with probing's T6-T8 boundary). shuffle-gaps +0.0055/0.0000/
+  -0.0000.
+- **Alias fix verified end-to-end:** 6 unique eval_keys across the
+  two runs, zero collisions; run-1's s42 shuffle-gap 0.0121 equals
+  papermatch's recorded l12 value to the digit — the wrong-run
+  diagnosis is sealed and the wrong rows never reached the
+  leaderboard.
+- **G2 ruling: PASS.** Substrate verified in-effect (values moved
+  with the cache; expect-guard armed); placement plausible per the
+  card's criterion (band in the paper TXC arm's recorded
+  neighborhood, ordering consistent with the Stage-1 headline; no
+  gross displacement). The 3 correct-substrate rows commit with
+  this entry.
+- **pf_pilot T2/s42 launches at this pin** → G1 vs upstream
+  t2 log (5800 steps, l0≈197/200, plateau bands per card).
+
+_Recorded-by: claude-fable-5 (runpod-2)_
