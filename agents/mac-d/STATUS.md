@@ -30,8 +30,11 @@ workers re-import from disk); (1) on-pod
 `bash agents/mac-d/repatriate.sh 64.247.201.51 16977` then push
 rows from the mac (pull-rebase; LOG conflicts keep-both);
 (3) on-pod ckpts → HF: `.venv/bin/python scripts/push_ckpts_hf.py
-<train_key>…` for the 18 TRAINED rows' train_keys (from shard
-jsons; ratified `ckpts/<train_key>/`), sha receipts HERE; (4)
+<train_key>…` for the 18 TRAINED train_keys — extract from the POD
+LEADERBOARD (`eval_cfg.retrain_tag == "sycgen_keep_r1"` &&
+`training_cfg.n_steps > 0`; shard-json rows do NOT carry train_key
+— verified 02:5x), ratified `ckpts/<train_key>/`, sha receipts
+HERE; (4)
 harvest overlay json → commit; run
 `…sycgen.render_tsweep` on the mac (renderer already written →
 `figs_writeup/fig_sycgen_shuffle_tsweep.*` + summary json); (5)

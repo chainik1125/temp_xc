@@ -124,13 +124,15 @@ def main():
                 va="top", fontsize=8, color="#555555")
     cov = " ".join(
         f"T{T}:n={len([1 for s in seeds if (T, s) in at])}" for T in Ts)
-    ax.annotate("no anchor gate BY DESIGN (first training; card § 1) · "
+    ax.annotate("no anchor gate BY DESIGN (first training; card § 1)\n"
                 f"{cov} · shuffle seed {payload['shuf_eval_seed']}",
                 xy=(0.99, 0.02), xycoords="axes fraction", ha="right",
-                va="bottom", fontsize=6.5, color="#777777")
+                va="bottom", fontsize=6.5, color="#777777", zorder=5,
+                bbox=dict(boxstyle="round,pad=0.25", fc="white",
+                          ec="none", alpha=0.75))
     if payload.get("status") == "PENDING TEAM REVIEW":
-        ax.annotate("PENDING TEAM REVIEW", xy=(0.99, 0.95),
-                    xycoords="axes fraction", ha="right", va="top",
+        ax.annotate("PENDING TEAM REVIEW", xy=(0.5, 0.97),
+                    xycoords="axes fraction", ha="center", va="top",
                     fontsize=7, color="#bb4444", alpha=0.8)
 
     ax.set_xscale("log", base=2)
@@ -138,10 +140,12 @@ def main():
     ax.set_xticklabels([str(T) for T in Ts])
     ax.minorticks_off()
     ax.set_xlabel("T (window length)")
-    ax.set_ylabel("recovery r (sycgen_age: log2(1+challenge age))")
+    ax.set_ylabel("recovery r (log2(1+challenge age))")
     ax.grid(True, alpha=0.25, lw=0.5)
-    ax.legend(frameon=False, fontsize=8, loc="upper left",
-              bbox_to_anchor=(0.02, 0.90))
+    leg = ax.legend(frameon=True, framealpha=0.85, edgecolor="none",
+                    fontsize=8, loc="upper left",
+                    bbox_to_anchor=(0.02, 0.90))
+    leg.set_zorder(5)
     fig.tight_layout()
 
     OUT_DIR.mkdir(exist_ok=True)
