@@ -27632,3 +27632,65 @@ binds: the moment `retryesc_gen` clears its KEEP rule, it goes into
 `REBUTTAL_HANDOFF.md` the same beat.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+## 2026-07-28 14:54 London (date-verified 13:54 UTC) — mac-local (hub): **eval cache landed fleet-wide (good)** + ⚑ **the lane map is load-imbalanced ~3×: one T per pod should be one CELL per pod.**
+
+### 1. Eval gap closed prospectively — verified on every running pod
+
+    p478c8uyllvkzz  hh=2.3G  ok=0 fail=1   (the pre-cache T2 s42)
+    5sbd2s9mh0njzo  hh=2.3G  ok=0 fail=0
+    mi7cnfpnuikybi  hh=2.3G  ok=0 fail=0
+    tnp7vvew4t80wi  hh=2.3G  ok=0 fail=0
+    c48kuf2z2dipmv  hh=2.3G  ok=0 fail=0
+
+mac-d built `cached_hh_rlhf` on **all five**, not just the one that
+failed. **Only T2/s42 needs redoing, and it will cache-hit on
+`train_key` — eval only.** Clean recovery.
+
+### 2. ⚑ The remaining inefficiency: cells are pinned one-T-per-pod, and T is what makes a cell long
+
+Measured and observed, kept separate:
+
+- **T2 = 0.066 s/step (measured)** ⇒ cell ≈ **9 min**.
+- **T4 has been running ≥19.5 min** (started 13:33:56Z, still alive at
+  13:53:29Z) — an **observed lower bound**, not a finished time.
+- T6/T8/T10 **extrapolated by parameter count** (0.9/1.4/2.1 B vs
+  T2's 0.19 B): roughly **40 / 60 / 90 min**. *Extrapolated. Do not
+  quote as measurement* — today has punished me three times for
+  exactly that.
+
+**The point does not depend on the exact numbers, only on T10 ≫ T2.**
+With one T per pod and seeds run sequentially **within** a pod:
+
+    T2 pod:  3 seeds x ~9 min   = ~27 min, then IDLE for hours
+    T10 pod: 3 seeds x ~90 min  = ~4.5 h    <- sets the wall
+
+**Wall = 3 × the slowest cell.** But **seeds within a T are completely
+independent** — nothing couples T10/s42, T10/s1 and T10/s2. Pinning
+them to one pod is a choice, not a constraint.
+
+### 3. The fix: schedule CELLS, longest-first, not T-blocks
+
+18 independent cells, 6 pods, greedy longest-first. Wall becomes
+**max(longest single cell, total work / 6)** ≈ **~90–110 min** instead
+of ~4.5 h — call it **2.5–3× faster**, and the T2 pod stops idling.
+
+**mac-d: when a pod finishes its cell, give it the longest unstarted
+cell rather than the next seed of its own T.** If the driver is
+per-pod-per-T, the change is a shared work queue; if that is a bigger
+edit than it sounds, the cheap 80% is simply **starting T10/s1 and
+T10/s2 on the pods that will free up first** (T2's, then T4's).
+
+**This is the same anti-pattern for the fourth time today** —
+independent work serialized behind a structure that did not require it
+(provisioning behind sizing, bootstrap behind cache, generation behind
+pilot, now seeds behind their T). Worth fixing as a habit, not just
+here.
+
+### 4. Standing
+
+Still **zero cells with real metrics** on the board. The eval path is
+now *unblocked* but remains *unproven*; the first CELL-OK gets its
+numbers eyeballed before the other 17 are trusted.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
