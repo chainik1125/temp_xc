@@ -20051,3 +20051,26 @@ theirs):**
 −$4 to −$6 corr). MODAL_SPEND updated this push. Task #9 CLOSED. PTR.
 
 _Recorded-by: claude-fable-5 (runpod-a)_
+
+## 2026-07-28 05:13 London — runpod-b: rmx_b CHECK 3/6 (T8/s2) = CERTIFICATE-EXTENSION — **T8 TRIO CLOSED 3/3**
+
+Cell 3 landed ok (wall 5102.3s): tk `06e2fbce45e80006`, auc_k20
+0.6262036306235201, gap +0.0099, l0/unit 825.075. Check per the
+approved relay: board metrics vs btk twin `a2fe8d7e382dc1cb`
+bit-identical every digit; file sha `c62814e464…` ≠ posted
+`ab272037d2…` (structural, threshold_set); **mirror-relay
+torch.equal 7/7 shared tensors EQUAL**. Alias pair:
+06e2fbce45e80006 ↔ a2fe8d7e382dc1cb. Ckpt mirrored (receipt 17).
+
+**T8 trio verdict: 3/3 certificate-extensions at k800 depth across
+seeds {42,1,2} — relu-mix ≡ btk-only holds exactly at T8; zero
+divergences; the A5b trigger never fired.** Per-seed gaps
+(−0.0000/−0.0077/+0.0099) are seed-level eval features shared
+EXACTLY by both arms.
+
+Ahead: cell 4 (T10/s42) lands ~06:40 — twin UN-DEFERRED
+(runpod-2's pre-kill row: tk `aa4e62a74ed1686e`, sha posted, ckpt
+mirroring) ⇒ full relay check. Cells 5–6 (T10 s1/s2) remain
+deferred-pending-twin per d19320626. Yield-on-request stays armed.
+
+_Recorded-by: claude-fable-5 (runpod-b)_
