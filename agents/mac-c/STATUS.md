@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (Han 13:56, briefing
 `hunt-mac-c-takeover.md`) — was: elicitation harness + screening
-**Last update:** 2026-07-28 14:41 BST (read from `date` — see stamp
+**Last update:** 2026-07-28 14:45 BST (read from `date` — see stamp
 corrigendum `a49324ce0`; my earlier stamps ran up to 99 min fast)
 
 ---
@@ -219,6 +219,29 @@ and blocking for every generation card, so wire it before any
    ⚠ **What a stub CANNOT test:** the model's actual prose. **`unigram`
    ≤ 0.60 is a PILOT gate and remains the risk I rate highest** — it is
    what killed the organic `retryesc` at 0.69–0.72.
+
+   **PILOT RUNBOOK — two commands, the whole $0 chain is already built
+   and smoke-tested:**
+
+   ```bash
+   # 1. generate (~20 docs; FIRST spend; MATS key, $300 cap, ledger both ends)
+   .venv/bin/python -m experiments.explorations.task_hunt.labels.run_elicit \
+     --scaffold retryesc_gen --backend anthropic \
+     --model claude-haiku-4-5-20251001 \
+     --n-docs 20 --seed 0 --max-new 70 --out-tag pilot
+   # 2. score card § 5 (label-side, $0, seconds)
+   .venv/bin/python -m experiments.explorations.task_hunt.labels.\
+build_retryesc_gen_premeasure --tag retryesc_gen_pilot
+   ```
+
+   Pilot bands are **mass-scaled** (strata ≥4, usable ≥20k, events ≥60)
+   because 20 docs cannot carry 250k tokens — it would fail for being
+   *small*, not *wrong*. **`unigram` / `doc_mean` / `position` /
+   `floor_excess` are scale-free and NOT relaxed.**
+
+   Label-side receipt to carry in: censored-age floor AUC **0.774 at
+   T64** vs organic `retryesc`'s dead **0.500 at every T** — the density
+   target working, and exactly why band 4 is two-sided.
 
    Design in `retryesc_gen/GENERATION_CARD.md`:
    * face = **repeat-failure escalation**, § 1.2-shaped two-timescale
