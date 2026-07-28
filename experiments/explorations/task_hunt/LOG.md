@@ -31837,3 +31837,72 @@ frontier shows the SAE above TXC everywhere then item 6 is a negative
 and gets reported as one.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+## 2026-07-28 ~19:4x BST — mac-local HUB: ⛔ **BUDGET-MATCHED TABLE ASSIGNED TO LOCAL WORKERS — TOP PRIORITY, ahead of every other lane**
+
+**Han: *"we need to get the budget matched comparison TABLE DONE ASAP"*
+and *"ASSIGN TO LOCAL WORKERS."*** Brief:
+`briefings/URGENT-budget-matched-table.md`.
+
+**Assignment:** **mac-d primary** — idle, 0 pods, explicitly standing by
+as executor (`7e1b21746`), and owns the sycgen retrain/eval/render
+pathway. **mac-c keeps the geometry lane** plus one $0 check (§ 6
+below). This outranks the geometry matrix, the rescue lane and the clew
+sweep: it is a live threat to a **delivered** exhibit, and those are not.
+
+### 1. The fast path — the new arms need NO training
+
+**Pooled and stacked SAE are post-hoc transforms of the already-trained
+T=1 SAE.** Encode per token, then per T-window mean-pool (→ `d_sae`) or
+concatenate (→ `T·d_sae`). That is why Dmitry's agent produced the table
+quickly, and why ours can exist today: it is an **encode-and-probe job
+over cached activations, not a training run.**
+
+### 2. The match: constrain the SAE arms, never inflate TXC
+
+Per `(T, seed)`, take the TXC's realized `l0_per_window` for that exact
+cell and **top-k truncate** the pooled/stacked vector to that k
+(largest-magnitude kept — the SAE chooses which features it keeps).
+**Every cell reports realized `l0_per_window`. A budget-matched table
+with no realized-l0 column is not evidence.**
+
+### 3. ⚑ Correction to my own 19:2x framing
+
+I wrote that a pooled SAE spends *"≈72 per window at T16, ~9× the TXC's
+7.8"*. **That 9× is an UPPER BOUND, not a measurement** — pooling
+collapses features firing at several positions, so the realized union
+may be well under 4.5·T. **Measure it; do not quote my bound.** I
+derived a number from an assumption and stated it like a receipt, which
+is the same error I logged against the fleet twice today.
+
+### 4. The as-run columns STAY IN THE TABLE
+
+Both budget conditions side by side: **as-run (Dmitry's) and matched.**
+Dropping the as-run columns and showing only the matched version would
+look exactly like hiding the inconvenient number, and would deserve to.
+
+### 5. Pre-registration, written before any number exists
+
+**If TXC still loses at matched budget, item 6 is a NEGATIVE and we
+report it as one.** No re-cutting, no "but at T8", no post-hoc arm
+selection.
+
+### 6. ⚑ FIRST BLOCKER — do this before anything else
+
+**The pods are gone and the ckpt mirror stamp is 02:0x while the sycgen
+retrain ran ~03:40–04:30**, so the sycgen weights may never have been
+mirrored to HF. The retrain rows are `eval_extra`-namespaced and
+**carry no `train_key`**, so the usual lookup does not apply.
+**Step 0 is: prove the trained TXC and SAE weights still exist.** If
+they do, this is hours. If they do not, say so loudly and immediately —
+the cost changes completely and Han is planning around this table.
+
+### 7. mac-c's $0 question, which may be bigger than item 6
+
+**Does the probing / RLHF `tsae_btkonly` baseline actually run at T>1,
+budget-matched?** If yes, the paper sections are defended and only the
+hunted task is exposed. **If no — if T-SAE is also effectively a
+per-token comparator — the same missing-baseline objection lands on the
+headline probing and RLHF exhibits**, which is a far larger problem
+than item 6. Asking, not asserting.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
