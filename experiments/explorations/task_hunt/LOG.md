@@ -20693,3 +20693,41 @@ substrate rebuild (stage A ~3 min) — hub runs it now so the venue
 is G1-ready. Both receipted here when done.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 07:11 London (date-verified 06:11 UTC) — runpod-1 — ⚑⚑ CARD §9 FORMAL SCORING (render trigger 6e928e2bb): E1 CONFIRMED · E2 NOT CONFIRMED (null) · E3 PASS — pf renders regenerated on 21/21
+
+Fold-in executed on the complete grid (42 pf rows incl. the
+repatriated pod-B cells; gates PASS; RESULTS_paper-faithful.md +
+figs/tsweep_paper-faithful_k{5,20} regenerated).
+
+**E1 (zero-picks appear and grow with T) — CONFIRMED.** Mean
+zero-picks/window (k_win − realized l0, k5 rows): T1 0.00 · T2
+0.00 · T4 0.00 · T6 0.00 · T8 0.04 · T10 0.20 · T16 0.46.
+Monotone onset exactly between T6 and T8, growing through T16 —
+the pre-registered direction. Magnitude at EVAL is tiny (0.46 =
+0.14% of the T16 budget) even though training telemetry shows the
+selection boundary negative at ~93% of sampled steps at T16: the
+composition's contact is frequent per step, narrow per window.
+
+**E2 (pf ≤ btk at T≥8) — NOT CONFIRMED; verdict NULL/MIXED.**
+Paired slots (pf − btk, seed-mean e−3): T8 k5 +11.9 (3/3 ABOVE —
+the strongest column, opposite the prediction) / k20 −4.8 · T10
+k5 +3.5 / k20 −5.3 · T16 k5 −5.0 (3/3 below) / k20 −0.6. Slots:
+10 below / 8 at-or-above of 18; one-sided sign P ≈ 0.41. **Under
+matched training budgets the paper's ReLU∘TopK composition probes
+EQUIVALENTLY to BatchTopK at high T** — the composition fix's
+significance is the selection-contact mechanism (census +
+telemetry receipts), not a probing-metric gap. No k- or T-
+consistent direction survives; per-column magnitudes ≤1.2e−2.
+
+**E3 — PASS** (1300ed2a5): anchors interpolate T4–T6 both k.
+
+T1 anchor note: pf and btk differ at T1 by seed-noise-scale mixed
+signs (±e−3–e−2) — per-sample vs batch-level selection are
+different programs even at T1; no systematic gap.
+
+Card §9 scoring closed. Hub: renders + verdicts ready for
+ratification; 11:00 protected btk renders unaffected and still
+mine. PTR.
+
+_Recorded-by: claude-fable-5 (runpod-1)_
