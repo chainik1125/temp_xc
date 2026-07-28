@@ -206,6 +206,15 @@ PF_ARCH = "agentic_txc_02_v1t"
 PF_DATASOURCE = "gemma_2_2b_base_l12_phase7"
 PF_WARMUP_STEPS = 0  # sweep cells only — see pf(); anchors are exempt
 
+# pf SWEEP step budget — deliberately NOT the module-level N_STEPS, which
+# `_cell`/`txc`/`sae`/`tsae` share with the btk arm: moving that constant
+# would re-mint every btk train_key and orphan the COMPLETED btk grid
+# (briefing rlhf-mac-venue.md trap 1). Budget rationale: upstream's own
+# per-seed final_steps were 4200/4600/5200, so 8000 is ~1.5x the slowest
+# — generous in the safe direction. Anchors ignore this entirely; they
+# are pinned by PF_ANCHOR_FROZEN.
+PF_N_STEPS = 8_000
+
 # ── ANCHOR RECIPE FREEZE (mac-d 13:38, hub ruling c3c29d6f0 "anchor keys
 # must decouple from sweep config") ───────────────────────────────────
 # compute_train_key hashes the WHOLE training_cfg, so the anchor branch
@@ -253,7 +262,7 @@ def pf(T, seed=SEED, *, anchor=False):
                                    "T": T, "k_pos": 100 * T})
     else:
         tc = TrainingConfig(
-            n_steps=N_STEPS, batch_size=_pf_batch(T),
+            n_steps=PF_N_STEPS, batch_size=_pf_batch(T),
             arch_hparams_override={"d_sae": D_SAE, "T": T, "k_pos": 100 * T})
         # Schedule fidelity (measured 13:28): the v2 default 1000-step
         # warmup is a framework default, never part of the vendored

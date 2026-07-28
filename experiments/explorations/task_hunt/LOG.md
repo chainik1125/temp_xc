@@ -26015,3 +26015,72 @@ host-fed batches must be **bitwise identical** — that is the receipt,
 and I will post it or abandon the change.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+## 2026-07-28 13:55 London (date-verified at write) — mac-d: ACK the pod plan + briefing first-beat discharged — MPS smoke PASSED but PROVES LESS THAN IT LOOKS; `PF_N_STEPS` split landed; ⚑ the btk grid is ALREADY orphaned by a data_key change
+
+**ACK 352b30171. The port-bug finding is the right call and my mac
+work is correctly demoted.** I will not run grid cells on the laptop.
+`briefings/rlhf-mac-venue.md` treated as RETIRED — I own it, so I will
+delete it once its still-live items (below) are folded here.
+
+**§ 6.1 topology — already answered before the briefing landed**
+(96e34816a, 13:45): all five agent identities are sessions on ONE
+M5 Pro / 48 GB (`Hans-MacBook-Pro`); mac-a/b/c/d checkouts plus
+mac-local's tree all on this host. That is the finding Han's 13:52
+question turned on.
+
+**§ 6.2 smoke — RAN, PASSED, and I am correcting my own script's claim
+about it.** `experiments/explorations/actmix_rlhf/smoke_mps.py`, T1,
+20 steps, through the canonical `run_experiment`:
+- `_select_device() -> mps` (asserted, not assumed);
+- cache resolved, `data_key 44b72320bc3a56e2`, `cache_expect` present;
+- 20 real training steps on MPS, losses moving;
+- **row written** to the canonical leaderboard, `agent: mac-d`.
+
+**But it does NOT prove the eval path, and my first read of it was
+wrong.** `eval_cfg.smoke: true` **short-circuits the rlhf evaluator** —
+the row's metrics are literally `{"smoke_ok": 1.0}` and
+`preference_auc_k20` is absent because scoring **never ran**, not
+because 20 steps is noisy. My script printed the latter gloss; fixed.
+**The eval path on a non-CUDA device remains unproven** — it is where
+fp64/unsupported-op failures would surface, so the first real cell is
+what tests it. Flagging rather than papering over, since a bad eval
+would land after the training hours are already spent.
+
+**§ 4 trap 1 — done.** Added **`PF_N_STEPS = 8_000`** as a separate
+constant used only in the `pf()` **sweep** branch. Verified: module
+`N_STEPS` still 25 000 (btk `_cell`/`txc`/`sae`/`tsae` untouched),
+anchors still reproduce the manifest exactly, pf sweep now 8 000, pf
+anchor still 25 000.
+
+**⚑ Finding, PRE-EXISTING and not mine: the btk grid is already
+orphaned.** Checking trap 1 properly, **0 of 21 btk rows' train_keys
+reproduce from the current tree** — and that is true on **unmodified
+HEAD**, before my edit (verified by stashing). Cause is upstream of
+`N_STEPS`: the rows carry **`data_key 367950a501ec42d0`** while the
+current `gemma_2_2b_base_l12_phase7` spec computes
+**`44b72320bc3a56e2`**. The datasource spec changed after those rows
+were trained. Consequences: btk checkpoints will not resolve, and the
+**deferred btk T6/T10 amendment-window cells would silently retrain
+rather than resume**. The pf arm is unaffected — anchors reproduce, so
+pf is internally consistent under the current spec. I have not
+isolated which field moved and am not guessing; flagging for the btk
+owner.
+
+**Bonus defect, in my own renderer, found by writing the smoke row:**
+`render_writeup_fig` had **no smoke filter** — the seed whitelist only
+catches stray seed-0. A 20-step bring-up row at seed 42 would have
+plotted as a genuine sweep point. Fixed, and it needed the
+`eval_cfg.smoke` fallback: the runner did **not** promote it to a
+top-level field on this row, so a top-level-only check would have
+missed it. btk re-verified byte-identical; pf still 3 anchors / 0 sweep.
+
+**Next, and deliberately in this order to spend nothing until the code
+is proven:**
+1. Implement `TEMP_BENCH_BUFFER_RESIDENT=1` (env opt-in, `data/`, default OFF).
+2. **Produce the bitwise equivalence receipt LOCALLY on this Mac** —
+   `torch.equal` over N batches, resident vs host-fed. It needs a GPU,
+   not an 80 GB GPU. Proving it here costs $0.
+3. **Only then spin the pod**, with code that already carries its receipt.
+Claim line + ledger before any spend, per house rules.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_

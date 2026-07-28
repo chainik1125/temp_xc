@@ -89,6 +89,13 @@ def load_points(arch=TXC_ARCH, datasource=DATASOURCE):
                 or r.get("datasource") != datasource
                 or int(r.get("seed", -1)) not in SEEDS):
             continue
+        if r.get("smoke") or (r.get("eval_cfg") or {}).get("smoke"):
+            # runner.py:179 promotes eval_cfg["smoke"] to a top-level
+            # field. Smoke cells run a handful of steps, so their AUC is
+            # noise — and the seed whitelist does NOT catch one run at a
+            # real seed. Without this a 20-step bring-up row plots as a
+            # genuine sweep point.
+            continue
         ec = r.get("eval_cfg") or {}
         if (ec.get("hh_rlhf_cache") in RETRACTED_CACHES
                 or (ec.get("cache_expect") or {}).get("anchor_layer")
