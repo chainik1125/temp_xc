@@ -103,6 +103,13 @@ from experiments.explorations.task_hunt.retryesc_gen.cache_acts import (
 
 HERE = Path(__file__).resolve().parent
 GRIDS = HERE.parent / "retryesc_gen" / "grids"
+# The grid FILENAME was hardcoded inside build_rows, which silently pinned
+# every downstream script to one corpus. `evalage` has the same schema
+# (minus an unused `probe_eligible`) and a narrower masked-turn width
+# (w=13 vs 25), so it is the corpus lever 3's floor horizon T+w actually
+# wants — overridable like CACHE_ROOT, default unchanged so the frozen
+# retryesc results stay byte-identical.
+GRID_PAT = "elicit_retryesc_gen_v1_screen_{tag}.npz"
 RES = HERE / "results"
 
 FACE = "cum_rate_H512"
@@ -144,7 +151,7 @@ class _FloorBank:
 
 def build_rows(key: str):
     tag = TOK_TAG[key]
-    z = np.load(GRIDS / f"elicit_retryesc_gen_v1_screen_{tag}.npz")
+    z = np.load(GRIDS / GRID_PAT.format(tag=tag))
     c = np.load(CACHE_ROOT / key / "tokens.npz")
     ids, doc_idx, n_prefix = c["ids"], c["doc_idx"], int(c["n_prefix"])
     content = ids.shape[1] - n_prefix
