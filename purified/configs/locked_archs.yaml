@@ -157,6 +157,28 @@ archs:
       k_pos: 128
     notes: "SAE arditi as used by Dmitry. C6 baseline only."
 
+  stacked_btkonly_pooled:
+    class_path: temp_bench.architectures.stacked_btk_pooled:StackedBTKOnlyPooled
+    arch_version: "1.2.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_component_hparams:
+      c6:
+        d_sae: 32768
+        k_pos: 25
+    notes: >-
+      Reviewer-1 stacked baseline (2026-07-28): T independent per-position
+      BatchTopK dicts, pooled window code. State-dict compatible with the
+      dmitry-stacked-arxiv checkpoint (HF stacked-sae-rebuttal-2026-07,
+      c6_em/checkpoints/8b8231508a1ce6e3) so the Wang steering eval runs
+      on the same weights as the detection row. Decoder rows unit-norm;
+      NO sqrt(T) magnitude rescale.
+
   txc_base:
     class_path: temp_bench.architectures.txc_base:TXCBase
     arch_version: "1.0.0"

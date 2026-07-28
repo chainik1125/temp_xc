@@ -144,6 +144,20 @@ def decoder_row(arch_module, feature_id: int) -> torch.Tensor:
     - SAE-arditi: ``(d_sae, d_in)`` — return ``W_dec[fid]`` directly.
     """
     W = arch_module.W_dec.data
+    if hasattr(arch_module, "encode_per_position"):
+        # Stacked per-position layout: W_dec is (T, d_sae, d_in) — the
+        # generic 3-D branch below would index the T axis by feature_id.
+        # Take the last position's dictionary row (matches the TXC
+        # last-temporal-slot convention). Rows are unit-norm; no sqrt(T)
+        # rescale applies.
+        row = W[-1, feature_id, :].detach().clone()
+        n = float(row.norm())
+        if not (0.5 <= n <= 2.0):
+            raise RuntimeError(
+                f"stacked decoder row norm {n:.3f} outside sanity band; "
+                "refusing to steer with a miscalibrated direction."
+            )
+        return row
     if W.dim() == 2:
         return W[feature_id].detach().clone()
     if W.dim() == 3:

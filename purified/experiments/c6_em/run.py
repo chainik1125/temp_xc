@@ -94,6 +94,10 @@ def make_training_cfg(arch_name: str) -> TrainingConfig:
     """
     if arch_name == "sae_arditi":
         return TrainingConfig()
+    if arch_name == "stacked_btkonly_pooled":
+        # Matches the dmitry-stacked-arxiv training of the injected
+        # checkpoint: schema defaults (1024 / 25_000), no Bricken.
+        return TrainingConfig()
     if arch_name == "txc_base":
         return TrainingConfig(
             bricken_enabled=True,
@@ -121,7 +125,7 @@ def make_eval_fn(datasource_name: str):
         arch_name = eval_cfg["_arch_name"]
         state_dict = eval_cfg["_state_dict"]
         train_key = eval_cfg.get("_train_key", "unknown")
-        arch_T = int(eval_cfg.get("arch_T", 5 if arch_name == "txc_base" else 1))
+        arch_T = int(eval_cfg.get("arch_T", 5 if arch_name in ("txc_base", "stacked_btkonly_pooled") else 1))
 
         ds = load_datasource(datasource_name)
         ds_d = ds.model_dump()
@@ -216,7 +220,7 @@ def run_one_cell(arch_name: str, *, seed: int,
         "n_final": 3,
         "n_alpha_grid": 27,
         "max_new_tokens": 200,
-        "arch_T": 5 if arch_name == "txc_base" else 1,
+        "arch_T": 5 if arch_name in ("txc_base", "stacked_btkonly_pooled") else 1,
     }
 
     log.info("[c6.run] CELL: arch=%s seed=%d ds=%s",
