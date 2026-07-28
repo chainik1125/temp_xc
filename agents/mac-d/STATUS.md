@@ -25,12 +25,14 @@ fleet-wide train_key conflicts pod↔local — owners' pass, not mine;
 sycgen ckpt manifest rides at HF-push step.** Pod clock = UTC (mac
 = BST) — never read pod mtimes as London. Est $15–21 ledgered.
 
-**POD-D COORDINATES (mine, jge1fuj9hqu8et, $5.98/h, warm-hold until
-LANE done):** `ssh root@64.247.201.51 -p 16977`. Repo at
-/workspace/temp_xc (detached @ 74d260321); tokens at
-/workspace/.tokens (gh+hf×2); sycgen caches at
-/workspace/sycgen_caches; a git stash holds my smoke-test rows
-("mac-d smoke rows" — pod-local audit, never push).
+**POD-D: TERMINATED 07:01 07-28 (API-verified; order ae58a9336
+item 3; actuals ~$38 ledgered).** sycgen lane CLOSED my side:
+exhibit FINAL-at-15/18 (hub declaration; final render rides their
+morning pass — all inputs in-repo), 15/15 ckpts HF-durable (sha
+receipts below), all 10 result jsons committed, tsae trio
+abandoned-disclosed (killed 07:00; never completed a cell in 2
+attempts, 190+ min; twin receipts show its untrained T=1 ≡
+batchtopk's).
 
 **SECOND POD (05:29): `mac-d-struqscreen-0728` = b5o74qg1q6pxo7,
 1×L40S $0.99/h — struqpos screen executor lane (claim 05:28,
