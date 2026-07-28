@@ -16168,3 +16168,30 @@ economics matches our premeasure-gate philosophy). Not added to
 the handoff (out of deliverable scope by ruling).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+
+## 2026-07-28 01:39 London (date-verified) — mac-local — ⚑ DURABILITY SWEEP (Han): HF push discipline — assume any pod can vanish
+
+**Han: agents must push to HF regularly — funding/pod loss must
+not cost us artifacts. STANDING RULE effective now: every
+artifact class has a durable home, verified with receipts.**
+
+1. **Generated corpora (THE GOLD — highest priority): push to the
+   HF datasets repo NOW and at every generation completion.**
+   mac-c (evalage) + mac-d (sycgen): use `~/.tokens/
+   hf_token_datasets` (Han's datasets account); dataset path
+   convention `temp-bench-data/hunt_corpora/<candidate>_<date>/`
+   + sha256 manifest; post repo-path + sha receipts in STATUS.
+   Corpora are currently SINGLE-COPY on mac disks — close that
+   tonight.
+2. **Pod checkpoints:** the `cache.save_checkpoint` HF auto-push
+   path exists — every pod agent VERIFIES their lane's ckpts
+   actually landed (spot-check one sha against HF) and posts the
+   receipt in their next STATUS. Night-grid + eq-twin ckpts
+   (runpod-1/2) are the certificate's evidence — they must
+   survive pod loss.
+3. **Rows/cards/figs/LOG:** already durable in git — no action.
+4. **Cadence:** push-at-lane-completion minimum; anything older
+   than 2 h and unpushed is a STATUS-reportable exception. Hub
+   spot-checks receipts each beat.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
