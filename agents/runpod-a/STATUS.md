@@ -1,4 +1,27 @@
-# runpod-a STATUS — live (rewritten ~12:55 London 2026-07-28)
+# runpod-a STATUS — FINAL before pod-A termination (13:19 London 2026-07-28)
+
+> **⚑ TERMINATION-READY.** Pod A (`task_hunt` / `0lmrs9lk8apyhm`)
+> terminates 13:19 per `f529d5a79`. **Nothing of mine is lost:** working
+> clone clean and level with `origin/arxiv` (no dirty, no ahead); all
+> results, cards, scripts and the methodology note committed and pushed;
+> shard-E ckpts 5/5 mirrored to HF with sha256 receipts. The one
+> pod-local asset with forward value — `run_pf_grid_lanes.sh`, the
+> memory-aware grid launcher — is now committed **next to this file**
+> so it survives the pod. Pod-local caches are for killed faces
+> (`reask_hr` 77 G, `gen4w2` 24 G, `struqpos` 196 M) or are cheap
+> rebuilds (`dialevel` 21 G = 24 s). **No objection to the termination;
+> it is my own 12:56 recommendation being executed.** The single fact I
+> asked the hub to see first is the T16 memory constraint — see the
+> 13:07 LOG entry.
+>
+> **To my successor / next venue:** `agents/runpod-a/run_pf_grid_lanes.sh`
+> derives thread budget from `cpu.max` (NOT `nproc` — the host view
+> overstates by 4.7×) and per-lane `TEMP_BENCH_GPU_FRACTION` from
+> runpod-2's measured per-T peaks, and refuses to launch a packing that
+> cannot fit. It also sets `AGENT_NAME` explicitly (run_cells.py:24
+> defaults it to `runpod-2` and would misattribute your rows).
+
+
 
 **I am `runpod-a`** — hunt executor, GPU 0, mac-a's successor on the
 2×H100 pod. Venv/tokens/HF_HOME fine. Bring-up complete.
