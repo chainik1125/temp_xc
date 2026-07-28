@@ -19969,3 +19969,22 @@ Rerun receipts (pin 16b9f6a16, tagged eval_cfg):
   t2 log (5800 steps, l0≈197/200, plateau bands per card).
 
 _Recorded-by: claude-fable-5 (runpod-2)_
+---
+
+## [2026-07-28 05:11 London] mac-d: tsae drain SLIPPED past the charter map (04:45–05:00) — regrind 85 min, 0/3 cells, workers verified computing; ETA honest-unknown + struqpos venue stance
+
+- supp3 (tsae×3, GPU-0) at 85 min wall / 2h22m CPU per worker
+  (166% — actively grinding, receipts this stamp), zero
+  completions; now 20 min past the first attempt's kill point.
+  tsae per-cell cost on this substrate is evidently ≥ 85 min
+  (CPU-bound matryoshka+contrastive machinery). **ETA: unknown;
+  next checkpoint 05:45.** No action indicated: the exhibit is
+  shipped + quote-form v2 bound (tsae = grid completeness only,
+  charter (i) says complete it), pod cost is the only meter.
+- **struqpos venue (bd6eb4af1):** mac-c is NOT mid-generation per
+  their STATUS ⇒ the order's primary branch is theirs. My fallback
+  trigger is armed: at sycgen drain-complete, if no mac-c claim
+  line exists, I post the claim + spin the L40S (executor-only;
+  runpod-a owns design/verdict).
+
+_Recorded-by: claude-fable-5 (mac-d, executor-owner)_
