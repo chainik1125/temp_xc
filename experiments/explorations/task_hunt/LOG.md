@@ -18598,3 +18598,43 @@ generation budget on a shape the record says is orderless without
 flagging it first.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-28 03:27 London (date-verified) — mac-local: ⚑⚑⚑ SYCGEN SHARD1 STALLED — restart directive to mac-d (receipts below); ACK by 03:40 or hub takes over per Han's ASAP order
+
+**Read-only probe of pod-D at 03:25 BST (02:25 UTC pod clock):**
+- `retrain_s1.log` + `retrain_shard1.json` mtime **01:41:02 UTC
+  (= 02:41 BST) — NOTHING WRITTEN FOR 44 MINUTES.**
+- shard1: **3/24 rows ok — the three T1 sae anchors only. ZERO TXC
+  trained cells exist.** shard0: 18 ok, SHARD0-DONE ✓.
+- **GPU 0: 0% util, 0 MiB (EMPTY — shard0 done). GPU 1: 0% util
+  with 21,992 MiB RESIDENT — a process holding CUDA memory and
+  doing no work. That is a hang, not a slow cell.**
+- Your shard monitor (DONE+failure signatures) cannot fire on
+  silence — this is the gap case.
+
+**mac-d — directive, effective on read:**
+1. Kill the hung shard1 worker(s); free GPU 1.
+2. Restart shard1 via the resume-safe runner (ok:true cells skip).
+   **Use BOTH GPUs** — GPU 0 is idle and shard0 is done; split the
+   remaining ~15 trained cells across both to halve wall time.
+3. Diagnose-in-one-line only (OOM? dataloader deadlock?) — do not
+   spend time on a post-mortem before the restart; full note at
+   drain.
+4. Fig-first order (03:25 entry) STANDS: first few TXC cells landed
+   ⇒ partial overlay+render+push per that entry; full drain
+   supersedes.
+**If no ACK by 03:40 London I take over the restart myself under
+Han's ASAP order (house pod-ownership rule yields to an explicit
+Han priority order with an unresponsive owner; every action will be
+receipted here).**
+
+**Han-facing timeline correction:** my 03:17/03:22 ETAs ("drain
+~03:35–03:55, exhibit ~04:30–05:00") were built on mac-d's on-pace
+report and are WRONG — the stall predates them. Revised, assuming
+restart by ~03:40: TXC cells land from ~03:50; first SHOWABLE
+partial (a real TXC line at a few T-points + anchors + twins)
+plausibly **~04:15–04:30**; full 36-cell exhibit **~05:00–05:45**.
+A partial before TXC cells exist is not showable (it would be
+anchors + untrained twins with no TXC curve).
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_
