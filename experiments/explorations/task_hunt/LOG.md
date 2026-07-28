@@ -36519,3 +36519,57 @@ l0 reported beside it.
 Card next, committed before any cell runs. No pods up; $0/h.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+## 2026-07-29 00:49 BST — mac-c: A4's blast radius is FOUR overlays, not one — but I measured it before claiming it, and it is sub-noise everywhere. Disclosure issue, not an invalidation.
+
+The hub's ruling (`29bc6a95d`) adopted A4 and patched the **sycgen**
+exhibit. A4 is a property of `shuffle_within_window` itself, so I swept
+for every surface that inherits it rather than assume sycgen was the
+only one.
+
+**Structural reach — confirmed.** All four shuffle overlays
+(`sycgen/`, `lambda_intensity/` ×2, `diafaces/`) take `ts` from
+`WINDOW_TS`, which starts at **T=2** in every case, and all call the
+same helper at its `per_row=True` default. Five delivered result files
+contain T=2 cells. So the mechanism reaches all of them.
+
+**Magnitude — and this is where I stop short of the claim.** Measured
+mean ordered−shuffled gap by T, n=3 seeds:
+
+    sycgen    T2 +0.0334 ±0.0386   T4 +0.0227   T8 +0.0399   T16 +0.0626
+    lambda    T2 +0.0043 ±0.0051   T4 +0.0069   T8 +0.0139   T16 +0.0114
+    diafaces  T2 +0.0197 ±0.0136   T4 +0.0240   T8 +0.0128   T16 +0.0535  T32 +0.1294 ±0.0233
+
+**In sycgen and lambda the T=2 seed SD equals or exceeds the T=2 mean.**
+A4's attenuation is real and its sign is known (it can only shrink the
+T=2 gap), but it is **smaller than the seed noise in every exhibit**.
+And sycgen's T=2 gap is *larger* than its T=4 gap — the opposite of what
+attenuation-dominance would produce. **So for the three non-sycgen
+exhibits this is a disclosure obligation, not an invalidation, and I am
+not going to dress it up as one.** Inflating it would be the same error
+in the opposite direction from the ones I have been catching tonight.
+
+**Where it does bite, and it is the exhibit that did NOT get patched:**
+`diafaces` is the one whose T-trend is load-bearing — T=32 at
+**+0.1294 ±0.0233** is 6.6× its T=2 cell and comfortably above its own
+noise, so that exhibit genuinely reads a T-trend. It is exactly the one
+the sycgen patch did not cover. **Recommend the same disclosure be
+carried to `TT_SHUFFLE_OVERLAY_CARD.md` and
+`SHUFFLE_OVERLAY_CARD.md`.**
+
+**⚑ A separate and larger caveat, found while measuring the first one.**
+In sycgen and lambda the **low-T gaps are not statistically resolved at
+n=3 at all**, before the shuffle artifact is even considered — SD ≥ mean
+at T=2 in both. Any T-trend reading in those two exhibits is unresolved
+on its own terms. That is a bigger caveat than A4 and it is independent
+of it; better disclosed by us now than found by a reviewer.
+
+**Checked, not assumed:** `*_retrain.json` in `lambda_intensity/` and
+`diafaces/` are canonical **run manifests** (train rows; metrics carry
+`eauc`/`nmse`/`lambda_recovery`, no shuffle key), not overlay results —
+so the gap analysis above covers the right five files. T=1 rows are
++0.0000 exactly in all overlays, consistent with the already-annotated
+"shuffle ≡ identity at T=1".
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
