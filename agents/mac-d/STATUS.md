@@ -1,96 +1,47 @@
 # mac-d STATUS — RunPod-API executor agent (LIVE session, updated 15:10 07-28)
 
-## ⚑⚑⚑ HEADLINE (15:10): RLHF pf GRID RUNNING ON 5× H100 — I own it end-to-end
+## ⚑⚑⚑ HEADLINE (16:06): pf GRID **COMPLETE & DELIVERED**; 1 pod left on btk gap cells
 
-**FIRST: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`** (Han's standing
-order: sanity-check paper fidelity after every compact).
+**FIRST after any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
+(Han's standing order). It has caught two real defects already.
 
-**Fleet:** 5× H100 80GB SECURE, **$14.95/h**, one T per pod —
-T2 `64.247.201.58:16362` · T4 `87.120.211.210:10942` ·
-T6 `216.243.220.230:13364` · T8 `31.24.80.41:12997` ·
-T10 `216.243.220.223:17648`. The T2 pod also owns **T1×3** (adopted
-after two bad-host pods were killed). 18 cells; seeds 42→1→2.
-`agents/mac-d/pod_drive.sh` is the per-pod driver (`PF_T=<T>`).
+**DELIVERED — RLHF paper-faithful arm, item 3:**
+`figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` + HANDOFF §3.
+**15/15 cells, uniform 3 seeds at T{2,4,6,8,10}.**
+Whole-grid gap **−0.00279, sd 0.00839, t=−1.29, df=14, p=0.219 — NOT
+significant**, 0.13× the anchors' seed scatter (0.0209) ⇒ **clean
+seed-controlled NULL on the paper's own arm**, matching btk and the
+fleet-wide order-null. T8 landed sign-mixed *between* T6 and T10, which
+kills any large-T trend reading. `l0 = 100·T` exact at every T.
+**T1 and T16 absent BY DESIGN** — upstream has neither arch (T16 >80GB;
+T1 einsum degeneracy in `agentic_txc02.encode`). Not patched: editing
+the paper's arch to manufacture a cell it never had is the trade this
+arm exists to refuse.
+**HANDOFF §3 is RULED DONE by the hub (0404cd942) — do not edit it
+today without a data change.**
 
-**Delivered:** `figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}` —
-first paper-faithful RLHF figure, ratified + embedded in HANDOFF §3.
-5 rows in: T2/s1 0.6119, T4 0.6019, T6 0.6086, T8 0.6053, T10 0.5920.
-**l0 = 100·T exact at every T** (port-fidelity confirmation).
-**Shuffle gaps ~0, sign-mixed (3/5 negative)** — binding form per hub:
-*"no order effect DETECTABLE below the seed noise floor at n=1"*
-(largest gap 0.0110 = 0.53× the anchors' seed scatter 0.0209).
+**IN FLIGHT — last pod** `tnp7vvew4t80wi` / `mac-d-rlhfpf-0728-5`,
+`ssh -p 12997 root@31.24.80.41`, $2.99/h. Running the 3 deferred **btk**
+gap cells (T6/s2, T10/s1, T10/s2) per hub 68e146e0f — same cache, so no
+re-bootstrap. Watcher armed on `BTK-GAP-DONE` in `/workspace/btk.log`.
+**btk uses n_steps=25000 + warmup=1000 — NEVER pf constants**, or the
+rows orphan from the 26 existing btk rows.
 
-**Key numbers:** resident buffer on CUDA = **219.7× faster refill**,
-bitwise identical; T2 **0.074 s/step** vs the H100's pre-fix 1.49
-(~20×), beating the hub's 0.1–0.35 prediction.
+**THEN (my remaining duties):** repatriate btk rows (new-keys-only
+merge) → `bash agents/mac-d/teardown_pod.sh tnp7vvew4t80wi <T>`
+(REFUSES until all 3 seeds are local — containers never push) → ledger
+actuals. Spend peaked $17.94/h (6 pods), now $2.99/h.
 
-**Loop:** repatriate rows from pods (containers never push) → merge
-new-keys-only into `results/leaderboard.jsonl` → re-render
-`--arm pf --g1 pending` → commit. Terminate each pod at its lane end,
-API-verified, ledger actuals.
-
-**Traps hit today, do not repeat:** `nohup … &` over ssh is killed on
-disconnect (use `setsid … </dev/null & disown`); `pgrep -f <script>`
-matches your own probe shells AND leftover heredoc shells → watcher
-deadlock (avoid pgrep-based waiting entirely); `huggingface-cli` is
-deprecated (use `snapshot_download`); `/usr/bin/time` absent on the
-image; **a global `ax.margins` silently changed the ratified btk
-figure** — always re-check `sha256 c1998b48…` after touching the
-renderer.
-
-
-
-## ⚑⚑⚑ HEADLINE (13:40): ZERO PODS, $0 SPENT — I am the pf-arm's plumbing/verification hand this shift, not an executor
-
-**Relief trigger dead** (grid feasible, no spin ever fired). All value
-this shift came from *checking things nobody had checked*. Five landed:
-
-1. **Built the RLHF pf renderer** (c664250a7) — it did not exist;
-   `render_writeup_fig.py` hard-filtered the btk arm, so wave 1 would
-   have rendered NOTHING. `--arm {btk,pf}`, `--g1 {pending,passed,
-   failed}` (default pending = hub gate ruling enforced in code).
-2. **Implemented runpod-2's editorial ruling** d744f7c52 (357dd5904) —
-   anchors by **train_key from the provenance manifest**, standalone
-   black diamonds, never folded into the sweep mean; retracted l13-IT
-   rows unrenderable.
-3. **De-hardcoded the fleet-property launcher** (2fa78cc2a) —
-   `AGENT_NAME=runpod-a`/`GPU 0`/runpod-a's checkout would have stamped
-   every wave-1 row with the wrong agent. AGENT_NAME now fail-fast.
-4. **Wired the anchor exemption into `stage_anchors.py`** (4c07016d5) —
-   it minted sweep-recipe keys; a re-run would have orphaned the landed
-   anchors into the sweep mean.
-5. **Completed the anchor freeze** (21f84f352) — `anchor=True` froze
-   only warmup; `N_STEPS 25000→8000` (the hub's own budget, same entry)
-   re-minted all three keys. `PF_ANCHOR_FROZEN` literals now decouple
-   it from every sweep constant. **This is why `n_steps=8000` is safe
-   to land.**
-
-**Renderer verification state (all scratchpad-only; real leaderboard +
-`figs_writeup/` asserted untouched every run):** btk **byte-identical**
-`sha256 c1998b483892f579…` after every edit; pf verified at wave-1
-geometry, at the **T16-blocked 6-point shape** (runpod-c d35f97181 —
-the likely real deliverable), with anchors splitting correctly, across
-a substrate rename, and across the anchor key rotation. Probes:
-`scratchpad/wave1_render_probe.py`, `wave1_anchor_probe.py`.
-
-**OPEN, not mine to close:**
-- **`REBUTTAL_HANDOFF.md` §3 lines 155–163** still rest the
-  paper-faithful claim on the RETRACTED anchors (flagged 13:24 with
-  exact replacement text). Hub's file, claim-level wording — I flag
-  these, I do not edit them.
-- **HANDOFF pf embed slot** unbuilt: no base-l12 sweep rows have
-  landed, and I will not add an `![...]` to a figure that does not
-  exist. Goes in with the first render.
-
-**⚑ Standing self-limit (stated in LOG 13:38):** I edited three files
-I do not own today — each plumbing completing an intent its author had
-written down. **That was the last unasked one.** Offered runpod-2
-flag-only mode for their lane; if they take it, honour it.
-
-**Root cause I flagged but did NOT fix (lane-owner design call):** the
-anchor's cache key derives from a *training* config it never uses, so
-every new sweep knob is a fresh way to orphan it. Three variants bit
-today.
+**Traps hit today — all cost real time, do not repeat:**
+`nohup … &` over ssh dies on disconnect → `setsid … </dev/null & disown`.
+`pgrep -f <script>` matches probe shells + heredoc leftovers → deadlock;
+wait on ARTIFACTS. `huggingface-cli` deprecated → `snapshot_download`.
+`/usr/bin/time` absent on the image. A global `ax.margins` silently
+changed the ratified btk fig → re-check `sha256 c1998b48…` after ANY
+renderer edit. **`chmod` is a NO-OP on the `/workspace` MooseFS FUSE
+volume** (rc=0, mode unchanged) → never stage secrets there.
+**`--ours`/`--theirs` INVERT under rebase** — my `--ours` deleted the
+hub's block; verify conflict fixes BY CONTENT, never by marker count.
 
 ## HEADLINE (13:08, HISTORICAL): ZERO PODS — pivoted from executor-standby to CODE work; built the RLHF pf renderer (c664250a7)
 
