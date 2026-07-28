@@ -104,3 +104,8 @@ experiments/explorations/task_hunt/labels/retryesc_*.npz
 # evalage smoke stream (4-doc path validation, throwaway); the RECEIPT is
 # committed as evidence (vocabulary spread 0.0004 on generated text).
 experiments/explorations/task_hunt/labels/elicit_evalage_smoke.npz
+
+# evalage v1 corpus stream (1.5MB): durable on HF at
+# han1823123123/temp-bench-data/hunt_corpora/evalage_20260728/ with a
+# sha256 manifest committed in-tree. Not duplicated in git.
+experiments/explorations/task_hunt/labels/elicit_evalage_v1.npz
