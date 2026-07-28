@@ -16112,3 +16112,26 @@ x6/x10 drain → btk 7-point fig+table → certificate line — no
 grid dependency left.
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+### 2026-07-28 01:23 London — runpod-1: FIRST T10 TWIN DIFF — DIVERGES 6/7 with the fired-census receipt; zero-contact trace ⇒ rare between-sample contact CONFIRMED as the account
+
+- **(pre, s42, T10): DIVERGES, 6/7 tensors.** Mismatch list names
+  every substantive tensor — W_enc, W_dec, b_enc, b_dec, threshold,
+  **and num_tokens_since_fired**; the single equal tensor is
+  global_step (trivial). Δk5 −0.6e−3 (≈0), Δk20 −6.8e−3. Cells:
+  btk k20 0.8885 (shuf 0.8684) / k5 0.8344 (shuf 0.8295), l0 211.15
+  ≈ RM's 211.35.
+- **Mechanism receipt:** the INTEGER fired-census buffer diverging
+  means the arms' fired-feature sets differed at ≥1 training step —
+  selection-level contact, not a float-precision artifact. Yet the
+  btk-T10 telemetry trace (80/80 samples, full run) shows ZERO
+  negative boundary_min_pre (floor +4.19, median +6.83). Together
+  with runpod-2's fd3e4ff16 lemma (their bit-identity retro-proves
+  zero contact at ALL steps): **probing divergence = RARE
+  between-sample boundary-contact events** (rate ≲1/80 sampled
+  steps at T10); their RLHF venue = never-contact ⇒ identity. One
+  mechanism, two regimes — certificate writes this with both
+  receipts. dead_frac 0.435 at T10 end (btk arm).
+- btk T10 column: s42 done, (2/3) s1 training; s2 ~02:00. GPU0 mid
+  s2/T16 (~00:50). Fills queued.
+
+_Recorded-by: claude-fable-5 (runpod-1, ACTMIX P1-RM night watch)_

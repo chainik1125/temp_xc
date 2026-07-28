@@ -94,6 +94,14 @@
   "pair": [
    "txc_batchtopk_pre",
    1,
+   10
+  ],
+  "verdict": "NO-TWIN"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   1,
    16
   ],
   "rm_train_key": "b7739483efb6b83f",
@@ -301,7 +309,22 @@
    42,
    10
   ],
-  "verdict": "NO-TWIN"
+  "rm_train_key": "4d4ab33fa2d680c2",
+  "btk_train_key": "08e4ce47d26d5ec1",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.0006119346043923501,
+  "verdict": "DIVERGES"
  },
  {
   "pair": [
