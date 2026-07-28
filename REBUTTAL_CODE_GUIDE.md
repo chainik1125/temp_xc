@@ -247,16 +247,24 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 18:0x — **replaces the 14:19 six-pod list**)
+### Pods now (API-verified 22:5x — **the set turns over fast; re-query, do not trust this list**)
 
-**4 RUNNING, $6.86/h total.** The previous snapshot listed six
-`mac-d-rlhfpf-0728*` pods at **$17.94/h**; five of those are gone with
-the pf grid that finished on them.
+**5 RUNNING, $9.58/h total — only ONE is an agent lane.**
 
-    mac-d-rlhfpf-0728-5            tnp7vvew4t80wi  $2.99/h  agent lane
-    mats-gap-code-h100             ezy8rifpgj6cqa  $2.99/h  ⚑ unattributed
-    tsae-paper-widthmatch-probing  oo41iwp6zrxatc  $0.44/h  ⚑ unattributed
-    tsae-paper-widthmatch-em       821raf0lsqp3aj  $0.44/h  ⚑ unattributed
+    mac-d-item6-0728               $2.99/h  agent lane (item-6 frontier)
+    reviewer-btk-tsae-300k         $2.99/h  ⚑ not an agent lane
+    reviewer-headline-multiseed    $2.99/h  ⚑ not an agent lane
+    tsae-paper-widthmatch-probing  $0.44/h  ⚑ not an agent lane
+    aah-cluster-dmrg               $0.17/h  ⚑ unrelated to this project
+
+**$6.59/h is outside the agent fleet.** The composition **changed
+between 18:0x and 22:5x**: `mats-gap-code-h100` and
+`tsae-paper-widthmatch-em` went away, `reviewer-btk-tsae-300k` and
+`aah-cluster-dmrg` appeared, and **`reviewer-headline-multiseed` was
+EXITED at 18:0x and is RUNNING again** — so these are being
+hand-provisioned by a human, not leaked by an agent. Per Han's scope
+ruling, hand-provisioned pods bill **outside** the agent $500 cap. They
+are **untouched** either way (never modify a pod you did not spin up).
 
 **Only one pod belongs to a live agent lane.** The other three are
 non-convention names totalling **$3.87/h**, attributable to no agent

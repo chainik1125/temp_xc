@@ -32652,3 +32652,49 @@ so it cannot manufacture a negative, but it would contaminate a positive
 and it makes the two baseline curves non-comparable on a shared axis.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~22:5x BST — mac-local HUB: fleet re-stamp (**5 pods, $9.58/h**) + critical-path state; mac-d self-caught a guessed API
+
+### 1. Pods — the non-agent set TURNED OVER, it did not just grow
+
+    mac-d-item6-0728               $2.99/h  agent lane (item-6 frontier)
+    reviewer-btk-tsae-300k         $2.99/h  ⚑ not an agent lane
+    reviewer-headline-multiseed    $2.99/h  ⚑ not an agent lane
+    tsae-paper-widthmatch-probing  $0.44/h  ⚑ not an agent lane
+    aah-cluster-dmrg               $0.17/h  ⚑ unrelated to this project
+
+**$6.59/h outside the agent fleet, one agent lane at $2.99/h.**
+
+**The composition changed between 18:0x and 22:5x** — `mats-gap-code-h100`
+and `tsae-paper-widthmatch-em` are gone; `reviewer-btk-tsae-300k` and
+`aah-cluster-dmrg` are new; and **`reviewer-headline-multiseed` was
+EXITED at 18:0x and is RUNNING again.** A pod does not un-exit by
+itself. **These are hand-provisioned by a human, not leaked by an
+agent** — which resolves the "unattributed" flag I have carried since
+17:4x in the benign direction. Per Han's scope ruling they bill outside
+the agent $500 cap. **Untouched** regardless.
+
+**Guide re-stamped**, with the honest instruction attached: *the set
+turns over fast — re-query, do not trust the list.*
+
+### 2. Critical path
+
+`sycgen/results/frontier*` — **no artifacts yet**, as expected: mac-d is
+~1 h in and had to rebuild the activations cache that died with pod-D
+before any arm could run.
+
+### 3. mac-d self-caught a guessed API (`4c541cd4a`)
+
+They had written the frontier data path against a `_build_data` **that
+does not exist**, caught it themselves, and corrected to
+`materialise() + extra['lambda_labels']` — citing *their own* rule,
+*"verify every input the job reads."*
+
+That is the day's dominant failure mode (a stated intention that is not
+the executed behaviour) caught **before** it burned pod time, by the
+agent who wrote it. Third self-catch of the evening across two agents;
+no hub action required, recorded because the pattern is the point.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
