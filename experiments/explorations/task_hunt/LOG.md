@@ -18953,3 +18953,49 @@ _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
   on eyeball, v3 re-rendered before push).
 
 _Recorded-by: claude-fable-5 (mac-d, executor-owner)_
+
+## 2026-07-28 03:59 London (date-verified) — mac-local: ⚑⚑ SYCGEN FULL-SWEEP EXHIBIT RATIFIED with quote-form; the positive shuffle gap is REAL-BY-RECEIPTS and stays PTR-mechanism; two precision corrections
+
+**Exhibit v3/v4 reviewed against the artifacts (overlay json,
+summary json, fig):**
+- **Instrument: CLEAN.** 15/15 present cells carry recompute
+  receipts (|canonical−recomputed| ≤ 2e-4, tol 2e-3);
+  shuffle-identity violations 0; pending list = the 3 tsae cells,
+  disclosed on-fig.
+- **The result: ordered − shuffled is POSITIVE IN 12/12 TXC
+  trained cells** (no sign flip at any seed × T). Seed-means:
+  +0.033 (T2), +0.023 (T4), +0.040 (T8), +0.063 (T16). Per-seed
+  T16 range +0.028/+0.079/+0.080. Ordered level 0.498→0.592 over
+  the per-token anchor 0.482; untrained twins 0.08–0.22.
+- **QUOTE-FORM (binding until amended):** "ordered−shuffled gap
+  positive in 12/12 trained cells, seed-mean +0.02–+0.06, largest
+  at T16; seed spread large (T16 +0.03–+0.08); seed-mean NOT
+  monotone (T4 dip)." Never quote "monotone in T" — that holds
+  only loosely per-seed.
+- **Two precision corrections:** (1) v4's subject line says gaps
+  "+0.033/+0.036/+0.040/+0.063 monotone in T" — the artifact says
+  T4 = +0.0227 and the seed-mean is non-monotone; artifact wins,
+  corrected here (mac-d: no action needed, the fig/summary are
+  right — the subject line was the slip). (2) My OWN 03:34/03:4x
+  expectation-setting ("expect ordered ≈ shuffled, state-not-order,
+  age-face precedent") is CONTRADICTED by the data — the
+  pre-registered expectation failed in the interesting direction,
+  and I repeated it to Han twice tonight. Corrected in the HANDOFF
+  this push.
+- **Mechanism status: PTR.** The screens' order-ladder found no
+  order signal in POOLED RAW activations (mac-c's age-face record
+  stands — different measurement); the trained TXC's positive gap
+  says the DICTIONARY's label-recovery uses within-window order
+  (position-anisotropic encoders can read event-position-in-window
+  — the recency structure an age face puts exactly there). These
+  are compatible, but tonight we claim only the measurement, not
+  the mechanism. **One cheap discriminator ASSIGNED to mac-d
+  (non-blocking, after tsae):** run the overlay on the UNTRAINED
+  twins — twin gaps ≈ 0 ⇒ the order use is LEARNED (strongest
+  form); twin gaps > 0 ⇒ init-anisotropy contribution, quote
+  softens accordingly.
+- HANDOFF item 6 updated: full-sweep numbers, the quote-form, the
+  pre-registration-contradicted disclosure replacing my
+  expect-coinciding-curves paragraph.
+
+_Recorded-by: claude-fable-5 (mac-local, orchestrator)_

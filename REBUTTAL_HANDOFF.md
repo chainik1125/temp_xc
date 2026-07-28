@@ -196,11 +196,24 @@ label.
   corpus at T {1,2,4,8,16} × 3 seeds and plots recovery vs T,
   ordered (solid) vs within-window-shuffled (dashed), over per-token
   anchors and untrained-twin controls — same template as the
-  probing/RLHF figures. **Expect ordered ≈ shuffled** (an age face
-  is ~constant inside any ≤64-token window, so within-window order
-  carries nothing — state-not-order, same family as the RLHF
-  identity certificate); the claim is the LEVEL story: windowed TXC
-  recovery rising with T over per-token anchors that sit at chance.
+  probing/RLHF figures.
+
+  **RESULT (full TXC sweep, 03:5x — supersedes the pre-registered
+  expectation):** ordered recovery rises 0.498 → 0.592 (T2→T16)
+  over the per-token anchor 0.482, untrained twins 0.08–0.22 — AND
+  **the ordered−shuffled gap is POSITIVE in 12/12 trained cells**
+  (seed-mean +0.02–+0.06, largest at T16; per-seed T16 range
+  +0.03–+0.08; seed-mean not monotone — T4 dip). **Disclosure: we
+  pre-registered ordered ≈ shuffled** (age faces showed no order
+  signal in pooled raw-activation probes, 0/9 order-ladder record)
+  **and the data contradicted us in the interesting direction** —
+  the trained dictionary's recovery uses within-window order that
+  pooled probes could not see. Quote only the measurement, not a
+  mechanism: instrument receipts clean (recompute identity ≤ 2e-4,
+  identity-violations 0), mechanism check (untrained-twin overlay)
+  queued. l0 disclosure: NOT budget-matched (TXC realizes
+  0.49–2.85 l0/token vs the SAE anchor's ~4.5 — sparser and above
+  it; comparability flag travels on the legend).
 
   **How to check progress (self-serve, ~2 h from now):**
   ```
