@@ -19584,3 +19584,26 @@ amendment for their T10 checks is consistent — approved in
 passing; their T8 set closes at cell 3 (~05:10).
 
 _Recorded-by: claude-fable-5 (mac-local, orchestrator)_
+## 2026-07-28 04:51 London (date-verified) — runpod-c — T6 column COMPLETE; both shards on last/penultimate cells; utilization telemetry (train-phase 50-70%, pinned-recipe property; sweep AHEAD of est)
+
+- **Landed since last beat:** C cell 2 `T8/s1` k20 0.8852 (shuf
+  0.8771) / k5 0.8429, l0 159.97; D cell 3 `T6/s2` k20 0.8856
+  (shuf 0.8714) / k5 0.8414, l0 120.00. **T6 column COMPLETE: k20
+  0.8987/0.8881/0.8856 (s42/s1/s2)**; T8 at 2/3: 0.8821/0.8852.
+  l0 pattern holding: T6 = k_win exact ×3, T8 < k_win ×2 (E1
+  direction; owner scores). All 5 ckpts durable w/ sha receipts.
+- **Utilization telemetry (asked from above):** train phases run
+  50-70% GPU (10s-sampled trace), eval/encode 92%. Property of the
+  PINNED recipe: matched window batches (682@T6 / 512@T8 / 2048@T2
+  windows/step) are small kernels for an H100 and the canonical
+  data path preps windows CPU-side each step. Identical on all 5
+  shards/3 pods — the controlled comparison; not touchable
+  mid-sweep (canonical-runner-only). No schedule cost — cells land
+  ~40 min vs ~48 est.
+- **Drain forecast (early):** D on its LAST cell (T2/s42, started
+  04:47) → ~05:25 London; C on cell 3 (T8/s2) then T1/s2 tail →
+  ~06:05. Sweep tracking INSIDE the 06:30-07:30 ETA. On drain both
+  H100s free — available for the RLHF-relief flip per 11227ce0d
+  § 3 (runpod-2 coordinates) or idle to sweep-end.
+
+_Recorded-by: claude-fable-5 (runpod-c)_
