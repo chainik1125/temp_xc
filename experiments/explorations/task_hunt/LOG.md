@@ -33054,3 +33054,67 @@ long, or is it stuck?** You are the only one who knows what that cell
 should cost.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-28 ~23:0x BST — HUB: the stall is **DIAGNOSED from `/proc` alone** — 3 workers × ~15 GB fp32 duplicate of a 7.6 GB cache, multi-GB CPU gathers per refill. No install, no attach, nothing touched.
+
+Han has not yet ruled on the takeover. Rather than wait idle, I narrowed
+it with **pure `/proc` reads** — permitted under LOOK-DON'T-TOUCH, and
+the answer is ready whichever way he decides.
+
+### 1. Measured
+
+    worker RSS:  19.9 / 17.8 / 17.7 GB   -> 25s later ->  17.0 / 20.3 / 16.6 GB
+    read_bytes:  0 , 0 , 0               (no disk I/O at all)
+    cache file:  /workspace/sycgen_caches/llama31_8b/hs14.npy = 7.59 GB
+    GPU:         16.2 / 81.5 GiB held, ~10% util
+    CPU:         ~168% x 3, ticks accumulating
+    log:         no line in ~60 min
+
+### 2. The arithmetic closes exactly
+
+`real_sycgen.py:98` does
+`torch.from_numpy(np.ascontiguousarray(arr[:N])).float()` — the **7.59 GB
+fp16 cache becomes a ~15.2 GB fp32 tensor**. Measured RSS of **17–20 GB
+per worker** is that tensor plus overhead. **× 3 worker processes ≈ 46+ GB
+of the same data, duplicated**, because `_SYNTHETIC_CACHE` is
+module-level and therefore per process.
+
+**The duplication I flagged at 22:4x is CONFIRMED by size match.**
+
+### 3. And it corrects the rest of my own hypothesis
+
+At 22:5x I guessed cell 4 was **still materialising** a fresh datasource.
+**Wrong.** RSS is **oscillating, not growing** (±3 GB), and `read_bytes`
+is **0** — nothing is being loaded. They are computing on resident data
+with **multi-gigabyte allocation churn**, which is the signature of
+`data.x[idx].clone()` cutting a multi-GB temporary out of a 15 GB CPU
+tensor, **three times over, per refill**.
+
+So: **right about the duplication, wrong about the phase.** Third
+correction to my own reasoning on this one issue in ninety minutes —
+each one from going and measuring instead of arguing.
+
+### 4. What this means for the fix
+
+The `_build_resident_refill` pattern is **more valuable here than it was
+on `real_lm.py`**, not less: putting the tensor on the GPU removes the
+multi-GB CPU gather **and** the fp32 doubling matters less at 15 GB on an
+80 GB card **and** a single process stops triplicating it. **The `.float()`
+cast at `real_sycgen.py:98` is itself worth questioning** — fp16 in, fp32
+held, 2× RAM for a cache that is only ever gathered from.
+
+**mac-d — this is a sizing input, not an instruction.** Three workers on
+this cache is the design mistake; one process with a GPU-resident tensor
+is the fix. Your call on whether that is worth a restart, and the ETA is
+still the number nobody but you has.
+
+### 5. Han's decision still stands open
+
+**~$4.20 burned now.** My takeover recommendation is unchanged, and the
+py-spy dump I offered is **no longer needed to diagnose** — `/proc` did
+it for free. A takeover would now be purely to *stop the burn and
+restart correctly*, not to learn anything.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
