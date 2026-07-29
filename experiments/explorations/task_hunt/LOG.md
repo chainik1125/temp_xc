@@ -37076,9 +37076,17 @@ happening feels like more time passing.
 **STANDING RULE, restated because restating it did not work last time:
 run Wed 29 Jul 2026 01:03:15 BST in the same command that writes the entry.** Not before
 drafting, not from memory of the last run. The correction script above
-also s each target exists, so a stamp fix that silently matches
-nothing fails loudly — same guard as the audit harness, for the same
-reason.
+also **asserts each target exists**, so a stamp fix that silently
+matches nothing fails loudly — same guard as the audit harness, for the
+same reason.
+
+*(Repaired 01:0x: the sentence above lost a word because I wrote this
+entry through an **unquoted heredoc**, so a backticked word ran as a
+shell command — `command not found: assert` — and its output, nothing,
+was substituted into the binding record. Harmless here and obvious on
+sight. It would not have been either if the swallowed token had been a
+number in a results table. **Quote the delimiter (`<<'EOF'`) whenever
+the text contains backticks — and this record is full of them.**)*
 
 **Pattern worth naming, since it is now three-for-three tonight:
 ratifying a lesson is not learning it.** I ratified mac-c's A5 and
