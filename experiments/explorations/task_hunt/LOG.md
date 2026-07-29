@@ -37950,3 +37950,66 @@ insertions, 1 deletion** (the intended *four → five*), one file. The
 in-file markers claiming *"source branch is NOT modified"* were **false
 the moment I pushed** and were corrected at all 4 sites first. Now
 `cc9274b6c`; both branches carry the identical block.
+
+## 2026-07-29 01:37 BST — HUB ratifies `32b53964a` (**the TXC arm was being silently skipped**) + one RLHF data anomaly, reported not diagnosed
+
+### 1. mac-d's BLOCKING fix — ratified, and it is the best catch of the lane
+
+**The entire claim arm was being skipped at every cell.**
+`txc trained ... SKIP FileNotFoundError: no manifest train_key for
+txc_batchtopk_post_btkonly T=2 seed=1` — while pooled and stacked ran
+fine. **The sweep would have completed, written rows, and reported, with
+no TXC in it.** A run that produces a full-looking table with the
+treatment arm missing is the worst failure available in this lane, and
+it was caught **on the first timed run against real data, before any
+scientific output.**
+
+**Cause is the third instance tonight of the same species:** the fact
+was recorded somewhere real and the lookup pointed at an unsynchronised
+surface. `_key_from_manifest` resolves **6 of 15** cells on a fresh
+box because **manifest entries are appended by the training process on
+the pod and containers never push** — the committed manifest still holds
+pod-D's originals and nothing from the rebuild. **Item 6 only worked
+because it ran ON the pod that wrote them.** The 9 it misses are exactly
+the TXC cells. Compare `checkpoint_exists()` answering "on this box"
+and `cache t=True` meaning "a row exists": **three different lookups,
+one shared defect — asking a local artefact a question only the fleet
+can answer.**
+
+**Fix ratified:** resolve `train_key` from the **leaderboard**, which
+is repatriated and in git, asserting 15 or refusing; manifest demoted to
+fallback. Plus HF_MIRROR.md's rule enforced *at the point of use* — **a
+resolved key is not a present checkpoint**, so the weight file is
+checked too.
+
+### 2. RLHF: one metric collision — stated as a fact, not a diagnosis
+
+While checking the provenance hole (56/213 unresolvable shas, 5,175
+rows: **synthetic 5,146, em 21, rlhf 8, probing 0, backtracking 0**) I
+found `batchtopk_sae_btkonly` and `tsae_btkonly` sharing
+`preference_auc_k20 = 0.6587578167688666` **to 16 digits**, with
+different `train_key`, different `eval_key`, 73 s apart, and
+**identical values on all 12 metrics**.
+
+**I checked the two benign explanations and both fail:**
+
+- *"Most cross-arch collisions are aliasing"* — true, and it disposes of
+  the rest: they are `X` vs `X_btkonly` (same arm, two labels) or
+  quantised ceilings (synthetic `gauc` 0.99 across 11 archs and **524**
+  train_keys). **This pair is two genuinely different architectures.**
+- *"At T=1 a temporal SAE just is a per-token SAE"* — both rows are
+  T=1, so this was my favoured explanation. **It predicts broad
+  coincidence and the data shows the opposite:** at T=1 the two families
+  hold **6 and 8 distinct values with exactly ONE shared.**
+
+**I am not naming a mechanism.** I have been wrong on mechanism three
+times tonight (threshold-vs-selection at T=2; shuffle-artifact-vs-n=3;
+`sage_floor` vs the mask feature), and the pattern is that I reach for
+a cause before measuring it. **Fact reported, cause left open, owner
+flagged.**
+
+**⚑ NOT AN EMERGENCY, and saying so is part of the report:** 0.6588 is
+**not quoted anywhere** — the response cites TSAE at **.600/.599** — so
+**no delivered number depends on it** and the Reviewer-1 text is
+unaffected. It is worth resolving before the RLHF baselines are leaned
+on harder, and no sooner.
