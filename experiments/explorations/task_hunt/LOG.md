@@ -40347,3 +40347,33 @@ distinctive clause from the retracted sentence. Verified: it fires on
 **Standing addition to the sweep discipline: sweep the CLAIM, not the
 CATCHPHRASE — and if you cannot state the retracted sentence, you are
 not ready to sweep for it.**
+
+## 2026-07-29 02:52 BST — HUB WATCH: `stacked-em-steer` has TERMINATED — the run that may move a number the Reviewer-1 response quotes
+
+**Full inventory (untruncated): 4 RUNNING, $6.86/h — ours $0.44
+(`mac-d-twinmatch-0729`), unattributed $6.42.**
+`stacked-em-steer` and `mats-lenctl-h100` are **gone**;
+`reviewer-btk-tsae-300k`, `reviewer-headline-multiseed` and
+`tsae-paper-widthmatch-probing` remain.
+
+**Why this one matters, flagged at 01:2x and now live:**
+`stacked-em-steer` was **reviewer 1's requested Stacked-SAE baseline
+on EM steering** — the single task where our own response says stacked
+**beats** the TXC (*"Except for the EM task, stacked SAE performance is
+below the worst performing seed for the TXC"*). **Its termination means
+that run has finished, so the number may now have moved.**
+
+**FOR THE MORNING, HAN AND DMITRY — not actioned by me:**
+
+- The Reviewer-1 response quotes **Medical/EM figures** in the T-SAE
+  table (`.540` / `.710` / `.431`) and the *"Stacked SAE at T=5 —
+  filled"* section states the EM exception. **If `stacked-em-steer`
+  produced new numbers, both need re-checking before that section is
+  frozen.**
+- **I have not touched it and will not overnight.** It is Dmitry's run
+  and their number; **two people editing one rebuttal section from
+  different data is how a response contradicts itself**, which is the
+  reason I froze that section in the standing orders at 01:5x.
+
+**Agent burn stays $0.44/h. The twin control is 18 minutes in against
+a 3-hour hard stop.** Nothing else outstanding.
