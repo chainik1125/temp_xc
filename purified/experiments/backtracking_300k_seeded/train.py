@@ -183,11 +183,15 @@ def main() -> int:
     def batch_iter(n: int) -> torch.Tensor:
         sequence_indices = sampler.integers(0, n_sequences, size=n)
         position_indices = sampler.integers(0, sequence_length - window_size + 1, size=n)
-        batch = torch.empty((n, window_size, d_in), dtype=torch.float32)
-        for row in range(n):
-            start = int(position_indices[row])
-            batch[row] = acts[int(sequence_indices[row]), start : start + window_size].float()
-        return batch
+        sequence_index = torch.from_numpy(sequence_indices.astype(np.int64, copy=False))
+        position_index = torch.from_numpy(position_indices.astype(np.int64, copy=False))
+        offsets = torch.arange(window_size, dtype=torch.int64)
+        # This is bit-for-bit equal to the historical per-row copy loop, but
+        # avoids 1,024 Python-level tensor assignments on every training step.
+        return acts[
+            sequence_index[:, None],
+            position_index[:, None] + offsets[None, :],
+        ].float()
 
     started = time.time()
     metadata = {
