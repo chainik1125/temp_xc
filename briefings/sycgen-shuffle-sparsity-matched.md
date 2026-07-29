@@ -491,3 +491,67 @@ well-reasoned trade-off stated **without measuring either side of it**
 be biased in arithmetic. **I did it again, in the correction to the
 first instance.** The check is the same one: run the numbers on the
 grid you actually have before prescribing spend against it.
+
+---
+
+## 8. ⚑⚑ HAN DIRECTIVE — **PARALLELIZE CELLS ACROSS GPUs. MAX THROUGHPUT.** A single A40 is not the shape.
+
+Han: *"we need to use more than just a single A40... parallelize cells
+ACROSS GPUs, max throughput!"* **This is a decision, not a preference.
+Execute it.**
+
+**But adding GPUs to the current script buys EXACTLY ZERO, and that is
+the first thing to fix.** `run_shuffle_matched.py:293-327` is
+**single-process, single-device**: one `device = "cuda"`, then a serial
+`for T in ts:` over the whole grid. **There is no sharding, so a
+16×H100 pod would run 15 idle GPUs.** Hardware first, code first — in
+that order it is wasted money.
+
+### Do it in this order
+
+**1. Keep phase 1 (the llama-3.1-8B forward) on ONE GPU.** mac-d's
+reasoning is right and survives the directive: it produces a **shared
+7.59 GB artifact** from 926,592 tokens, and sharding it means N pods
+each pulling ~16 GB of model weights to rebuild *the same file*.
+**Parallelism belongs in phase 2, not phase 1.**
+
+**2. Add cell-level sharding to `run_shuffle_matched.py`** — this is
+the actual unlock. The grid is `T{2,4,8,16} × seeds{1,2,42} ×
+{txc,pooled,stacked} × {ordered,shuffled} × {plain,redraw} ×
+{trained,untrained}` ≈ **288 cells, all independent** once the cache
+exists. Add `--shard i/n`, deterministic assignment (sort the cell
+list, stride by `i::n`), one process per GPU pinned with
+`CUDA_VISIBLE_DEVICES`, each writing `shuffle_matched.shard{i}.json`,
+then a merge step. **Cells are independent; the gate receipts are
+per-cell and merge cleanly.**
+
+**3. THEN size the fleet — from a measurement, not a guess.** Time the
+first 3–5 cells after the cache lands and report **seconds/cell**.
+`288 × t_cell / n_gpu` sizes the pod. **Do not skip this**: I
+prescribed a k-grid spend tonight without measuring either side of the
+trade-off and had to withdraw it within the hour.
+
+**4. Scale up.** A multi-GPU **single pod** is strongly preferred over
+many pods — the cache is built once on local disk and every GPU reads
+the same file, with no re-download. **8×H100 ≈ $23.92/h is well inside
+Han's standing $60/h authorization**, and if seconds/cell justifies
+more, take more.
+
+### The constraints that bind before GPU count does
+
+- **Read `cpu.max` and `memory.max`, NEVER `nproc`/`free`** — a
+  container reports host resources. This cost us cores once and an OOM
+  once, tonight.
+- **Peak was 24.5 GiB per worker** (fp16 source + fp32 copy held
+  together). At 233.8 GiB that is **~9 workers**, so **RAM may bind
+  before GPUs do** — size workers against `memory.max`, not against
+  GPU count, and say which one bound.
+- **`max_tasks_per_child=1`** — `_SYNTHETIC_CACHE` is per-process and
+  long-lived workers crossing seeds accumulate ~3× datasource RAM.
+- **Gate first, still.** The A1 bands and the pooled-zero receipt run
+  **before** the sweep fans out — a fast wrong answer is the worst
+  outcome available here, and 288 cells of it is worse than 288 slow
+  ones.
+
+**Ledger both ends, terminate at lane end, API-verify.** Post the
+**pre-spend estimate with the measured seconds/cell** before scaling.

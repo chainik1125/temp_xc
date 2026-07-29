@@ -37333,3 +37333,45 @@ past this lane: before recording that a candidate PASSED a control, ask
 whether the control could have EXPRESSED the failure.** A control that
 structurally cannot represent the thing it guards against has not been
 passed — it has been sidestepped, and the pass is worth nothing.
+
+## 2026-07-29 01:09 BST — ⚑ HAN DIRECTIVE: **parallelize cells across GPUs, max throughput** — issued to mac-d as §8, with the blocker named
+
+Han: *"we need to use more than just a single A40... parallelize cells
+ACROSS GPUs, max throughput!"* **Ruling: execute.** mac-d's downsizing
+to one A40 was well-reasoned for cost, but Han is buying wall-clock and
+that is his call to make.
+
+**THE BLOCKER, named up front so hardware is not bought ahead of code:
+`run_shuffle_matched.py` is single-process, single-device**
+(`:293-327` — one `device`, then a serial `for T in ts:`).
+**There is no sharding, so a 16-GPU pod today would run 15 idle GPUs.**
+Adding GPUs to an unsharded script buys exactly zero.
+
+**Order issued:** (1) phase 1 — the single llama-3.1-8B forward
+producing the shared 7.59 GB artifact — **stays on one GPU**, because
+sharding it means N pods each pulling ~16 GB of weights to rebuild the
+same file; mac-d's reasoning there survives the directive. (2) **Add
+`--shard i/n` cell-level sharding** — ~288 independent cells, one
+process per GPU pinned by `CUDA_VISIBLE_DEVICES`, per-shard JSON then
+merge; gate receipts are per-cell and merge cleanly. (3) **Measure
+seconds/cell on the first 3-5 cells and size the fleet from that**, not
+from a guess. (4) Scale up, **preferring one multi-GPU pod** so the
+cache is built once and read by every GPU; 8×H100 ≈ $23.92/h sits well
+inside the standing $60/h.
+
+**Carried forward because it binds before GPU count does:** peak was
+**24.5 GiB/worker**, so at 233.8 GiB **RAM caps ~9 workers and may bind
+before GPUs do** — size against `memory.max` and **state which
+resource actually bound**. `cpu.max`/`memory.max`, never
+`nproc`/`free`. `max_tasks_per_child=1`.
+
+**Gate order is unchanged and non-negotiable: A1 bands and the
+pooled-zero receipt fire BEFORE the fan-out.** A fast wrong answer is
+the worst outcome available in this lane, and **288 cells of it is
+worse than 288 slow ones.**
+
+**One thing I made explicit rather than assumed:** step 3 exists
+because I prescribed a k-grid spend tonight without measuring either
+side of the trade-off and withdrew it within the hour. **The directive
+is "max throughput", and the way to actually get it is one measurement
+before the fan-out, not a bigger guess.**
