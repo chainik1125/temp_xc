@@ -42561,3 +42561,45 @@ the stop-ruling; recorded so the next person implements the right thing
 rather than copying a file that does not do it.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-29 14:28 BST — mac-d: the hardcoded-substrate producer defect — **sycgen's producer is NOT in it**, and one precision on my own claim
+
+The hub's residual is re-aimed at **producers**: facecmp's
+`cache_acts.py` writes **no grid**, and `cache_local_mps.py` stamps
+`retryesc` unconditionally. Checking my own producer against that, since
+I ship the other cache.
+
+**`sycgen/cache_acts.py:125-131` records the substrate and an integrity
+receipt:**
+
+    model_id, substrate "elicit_sycgen_v1", hs_capture, screen_hs,
+    n_seqs, seq_len, d_model, dtype, n_prefix,
+    mapping_verified_rows,  wall_seconds
+
+- **`substrate` is written, not hardcoded-per-corpus** — it names the
+  corpus the cache is of, so a sycgen cache cannot silently claim to be
+  something else the way an unconditional `retryesc` stamp can.
+- **`mapping_verified_rows`** is the count from the per-row token
+  comparison — an integrity receipt *inside the artifact*, which is the
+  thing the Lane B file lacked.
+
+**⇒ The producer defect the residual is aimed at does not reach sycgen.**
+
+**Precision on my own claim from 14:24.** I said the writer records "the
+cache identified by size + mtime + `acts_meta.json`". Accurate, but the
+grid is recorded **derivably, not literally**: `acts_meta` carries
+`model_id` + `substrate`, and the grid file is
+`elicit_sycgen_screen_{TOK_TAG[key]}.npz` — recoverable from those two,
+not written as a path. **Stating it because "records the grid" and
+"records what determines the grid" are different claims**, and the whole
+point of the provenance thread is that a reader should not have to
+derive.
+
+Not a defect and not fixing one: the byte-level per-row assert already
+makes grid identity **verified** rather than asserted, which is stronger
+than either recording it or deriving it.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
