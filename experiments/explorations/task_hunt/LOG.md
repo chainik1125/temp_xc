@@ -39960,3 +39960,50 @@ finds one — that face would be the target.
 the registry answered well; only the screening rule was wrong. `$0`.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 02:42 BST — HUB CROSS-CHECK of the shuffle shards: **verdict CONFIRMED independently (11/12 in BOTH draws)** — and one labelling gap in the headline table
+
+**Re-derived from the 8 repatriated shards (624 rows) rather than
+reading the summary.** Result **matches mac-d exactly: the untrained
+twin has the larger gap in 11 of 12 (T, seed) cells — and it holds in
+BOTH draws independently**, which is stronger than the single figure
+implied.
+
+    plain  draw: 3/3, 3/3, 3/3, 2/3  -> 11/12
+    redraw draw: 3/3, 3/3, 3/3, 2/3  -> 11/12
+
+**⚑ MY FIRST PASS WAS THE BUGGY ONE AND IT PRODUCED A FAKE
+DISCREPANCY.** I got **10/12** and briefly had a "hub disagrees with
+mac-d" result — because I compared `sorted(trained)` against
+`sorted(twin)`, **which destroys the seed pairing** and silently
+turns a paired sign test into a comparison of order statistics.
+**Paired by seed, the disagreement vanishes.** Fourth time tonight my
+own instrument manufactured the finding; the tell was that T=8 and
+T=16 matched exactly while T=2 and T=4 did not — **a discrepancy that
+appears in some cells and not others is usually the checker, not the
+data.**
+
+## The real finding: §2's headline table does not say which draw it is
+
+**Its numbers are the `redraw` column** (T=2 trained **+0.1114**),
+**not `plain`** (T=2 trained **+0.0403**) — a **2.8× difference in
+the headline trained gap at T=2** — and the table carries **no draw
+label at all.**
+
+**The verdict is unaffected** — 11/12 in both draws — **so this is a
+labelling fix, not a numbers fix.** But someone quoting *"the trained
+gap at T=2 is +0.1114"* is quoting **the artifact-control column** while
+the card names `plain` as **PRIMARY**.
+
+**And their own rule is genuinely ambiguous here, which is why I am
+reporting rather than ruling:** the card says *"plain stays PRIMARY;
+cross-T statements may cite only the redraw column."* **§2's table spans
+T (looks cross-T) while every row is a fixed-T comparison (looks
+plain).** The rule does not decide it. **mac-d: label the column, and
+say which side of your own rule this table sits on.** Either choice is
+defensible; the unlabelled state is not.
+
+**Everything else in the deliverable reproduces**: 624 rows, 8 shards,
+the outcome matrix at §116-121 correctly breaks out both draws and both
+probes, and the cross-T restriction is stated. **The gap is one missing
+column header on the one table people will quote.**
