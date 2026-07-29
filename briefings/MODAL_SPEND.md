@@ -183,3 +183,52 @@ buy that same loss a third time.
 
 **Termination:** ledger closes at lane end, terminate (not stop),
 API-verified.
+
+## 2026-07-29 01:3x BST — mac-d — SECOND POD: `mac-d-sycshuffle8-0729` (`s34aj6ap3gliuk`)
+
+Han's §8 directive (*parallelize cells across GPUs, max throughput*),
+executed under the overnight standing order (**≤8 GPUs needs no
+approval**).
+
+| field | value |
+|---|---|
+| shape | **4× NVIDIA A40** (8× and 8×A6000 both unavailable SECURE) |
+| rate | **$1.76/h** |
+| concurrent with | `qa4ucag1sezl56` A40 $0.44/h (serial hedge) |
+| **combined** | **$2.20/h** |
+| hard stop | 3 h after pod-up |
+
+### ⚑ The measurement that chose this shape — GPUs are NOT what makes it faster
+
+Before buying, I measured which resource binds (§8 step 3 is explicit
+that fleet size comes from a measurement, and the hub withdrew a
+prescription tonight for skipping exactly this).
+
+- **GPU utilisation during a real cell: mean 1.4%, median 0%, idle in
+  94% of samples, never above 43%.** The sweep is **not GPU-bound.**
+  The cost is `sklearn.LinearRegression`, on CPU.
+- **3 concurrent shards on the 1×A40: one was OOM-KILLED and the
+  survivors slowed 207 s → 381 s. Zero throughput gain.** Each process
+  materialises its own copy of the activations
+  (7239×128×4096 fp32 ≈ **15.2 GB**), so 46.6 GiB fits ~2.
+
+⇒ **RAM BINDS. Not GPU, not CPU.** The hub anticipated this ("RAM may
+bind before GPUs do — say which one bound"). It bound.
+
+**So the 4×A40 was chosen for its 186.3 GiB and 32.3 CPUs**, not its
+GPUs — RunPod scales CPU/RAM with GPU count, so GPU count is the
+*meter* by which cores and memory are sold here, not the thing doing
+the work. **This is why I did NOT take H100s: 8×H100 is $23.92/h for
+GPUs that would sit 94% idle.** 4×A40 buys the same binding resource at
+**$1.76/h**, ~1/14th the cost of the authorised ceiling.
+
+    1×A40   7.7 CPUs   46.6 GiB   -> ~2 concurrent
+    4×A40  32.3 CPUs  186.3 GiB   -> ~9 concurrent (running 8)
+
+**Cache is rebuilt per pod** (answering the hub's question): `/workspace`
+is pod-local, so the 4×A40 rebuilds its own 7.59 GB `hs14.npy` — 206 s
+measured, cheaper than moving the file between pods.
+
+**Serial hedge kept running** on the already-paid 1×A40 rather than
+killed: it was idle otherwise, it is $0.44/h, and it is a complete
+independent copy of the grid if the sharded run trips.
