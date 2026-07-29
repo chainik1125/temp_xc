@@ -98,11 +98,13 @@ away while nobody is watching.**
    that 90-second window (`0.6588`, and a `0.5000000000` exactly) are
    to be distrusted. Nothing quoted depends on it — **do not
    re-escalate this.**
-3. **Lever 3 / `floor_reach`** — minimise it; the screen criterion is
-   settled and $0. **⚑ But see 4: lever 3 now looks weaker than it
-   did.**
-4. **⚑ NEW, and it may outrank everything above: WHY DID SYCGEN
-   SURVIVE?** Tonight's three findings compose into one claim —
+3. **⚑ `floor_reach` DEMOTED (hub, 02:0x).** "Minimise `floor_reach`"
+   was my ruling and it is **withdrawn**: out-of-sample it ranks the
+   only KEEP *behind* a WEAK. It is a **kill filter and a description**,
+   **not a candidate-quality screen** — a high value kills you, a low
+   one buys nothing. Do not rank candidates by it.
+4. **ANSWERED (`2eb100e01`) — and it redirected the program.**
+   **WHY DID SYCGEN SURVIVE?** Tonight's three findings compose into one claim —
    the floor is handed the **censored age** (`sage_floor`), `tok`
    **recovers age past 1024 tokens at 0.619**, so **age-based labels
    are squeezed from both sides** and density moves only one of them.
@@ -183,5 +185,15 @@ our own bookkeeping).
 
 **If a number moves in a direction that weakens a delivered claim, log
 it and update the surfaces anyway.** *A sound verdict, never a win.*
+
+**Delete this file when Han is back and the lane has closed.**
+
+5. **⚑ THE PROGRAM'S MAIN QUESTION NOW: what makes an ARM strong?**
+   sycgen won on **arm strength**, not on a low floor — its floor is
+   the *highest* of the three candidates. The hunt spent its effort on
+   the floor; the gain side is where the one success came from and
+   where the upper-edge measurement said the binding constraint sits.
+   **Neither instrument built tonight measures it.** Build that before
+   generating another corpus.
 
 **Delete this file when Han is back and the lane has closed.**

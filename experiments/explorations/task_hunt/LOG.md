@@ -38681,3 +38681,80 @@ question in one query and disagreed with it completely.
 **Item closed as bounded, not as resolved:** the unresolvable shas are
 real, they are concentrated in exploratory work, and **no delivered
 exhibit in probing or backtracking rests on one.**
+
+## 2026-07-29 02:01 BST — ⚑⚑ HUB: **the sycgen question paid, and it overturns my own ratified screen rule.** The hunt has been optimising the wrong side
+
+**`2eb100e01` ratified in full.** I queued *"why did sycgen survive
+the theory that explains every failure?"* at 01:5x on the argument that
+**a theory which cannot explain its one success is not finished.**
+mac-c answered it from artifacts on disk, $0 — and the answer breaks
+the criterion **I ratified as the screen rule** at 01:1x.
+
+### 1. `floor_reach` is REFUTED as a predictor — and the demotion is mine to make
+
+Out-of-sample against the actual verdicts:
+
+| corpus | floor_reach | outcome |
+|---|---|---|
+| evalage | **0.0138** (lowest) | WEAK |
+| sycgen | 0.0242 | **KEEP 3/3** |
+| retryesc | 0.0732 (highest) | KILL 3/3 |
+
+**It gets the KILL right and ranks the only KEEP behind a WEAK.**
+mac-c's own statement is the correct one: **necessary, not sufficient —
+a high value kills you, a low one buys nothing.**
+
+**⚑ HUB RULING AMENDED.** At 01:1x I adopted *"SCREEN RULE: MINIMISE
+`floor_reach`."* **That is wrong as written and I am withdrawing it.**
+`floor_reach` stays as (a) a **kill filter** and (b) a **description**
+of what the floor can resolve — where it is well validated (0.82–1.13×
+against observed `floor_excess` on two corpora). **It is not a
+candidate-quality screen and must not be used to rank candidates.**
+
+### 2. Their own floor law fails on sycgen by 2.3×, and they found why
+
+`floor_reach`@T64 **0.0892** vs observed `floor_excess` **0.2097**
+(ratio 0.43, against 0.95 and 0.88 on the two corpora it was validated
+on — **which shared one regime**). Two mechanisms tested and **refuted
+first** (tercile-censoring; a suspected divergence from
+`section_age` — it matches). **What survives:** floor per-class recall
+is **[0.505, 0.149, 0.976]**, not uniform, and
+**P(uncensored | class) = 0.2822 / 0 / 0** — *every* uncensored row is
+class 0 — so on the screen's **balanced** test set, predicting one class
+for the censored mass **banks a large share for free**. **The law
+assumed out-of-window ⇒ chance; under class balancing with a skewed age
+distribution that is false.**
+
+### 3. THE ANSWER, and it redirects the program
+
+**sycgen did not win by having a low floor. Its floor is the HIGHEST of
+the three** (0.5430 vs evalage 0.3905, chance 1/3 for both). **It won on
+ARM STRENGTH.** Excess over chance, gemma2_2b:
+
+    sycgen   tok +0.196   floor +0.210   arm +0.308
+    evalage  tok +0.127   floor +0.057   arm +0.197
+
+**The hunt has spent its entire effort lowering the floor. The one
+success came from a task whose windowed signal is simply better.**
+`floor_reach` tells you what will **kill** a candidate, never what
+will **carry** one — and we have been steering by the kill term.
+
+**This composes with the upper-edge result rather than competing with
+it:** that measurement said the binding constraint sits on the **gain**
+side; this says the one thing that ever worked won **there**. Two
+independent routes to the same redirection in one night.
+
+### 4. They caught their own error before publishing, and it protected my premise
+
+They first computed sycgen clearing gain on only **2/3** models —
+wrong, from taking the best arm cell across **both faces**, including
+`sycgen_age_wd`, the **within-conversation control** face. On the
+headline `sycgen_age` face all three clear: **+0.1118 / +0.1151 /
++0.1225**. **Had that stood, my premise ("cleared floor and gain on
+three models") would have looked false and the question would have
+dissolved into a bookkeeping error instead of producing this.**
+
+**OPEN, AND IT IS NOW THE PROGRAM'S MAIN QUESTION: what makes an ARM
+strong?** Exactly where the upper-edge measurement predicted the
+binding constraint would sit. **Neither of tonight's two instruments
+measures it.**
