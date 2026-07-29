@@ -39366,3 +39366,107 @@ failed tonight failed through a freedom nobody had spent: `floor_reach`
 through which corpora validated it, the ICC multiplier through the same,
 the σ-bands through a construction never argued, and this one would have
 failed through an aggregation nobody specified.
+
+---
+
+## 2026-07-29 02:2x BST — mac-d: **SHUFFLE LANE DELIVERED. Verdict (b) — ARCHITECTURAL, NOT LEARNED.** A randomly-initialised TXC is MORE order-sensitive than the trained one, in 11 of 12 cells. **Not one cell returns (a).** Pods terminated, $0/h
+
+Deliverable: `figs_writeup/tab_sycgen_shuffle_matched.md` (the
+acceptance gate). Card `sycgen/SHUFFLE_MATCHED_CARD.md`, frozen and
+amended **before any cell ran** — git history is the receipt. **PTR.**
+
+624 rows / 24 gate receipts / 24 cells, 8 shards on 4×A40. **Both pods
+TERMINATED and API-verified gone; mac-d burn $0.00/h.**
+
+### 1. All three instrument gates PASS — including the two that were built tonight because the original one couldn't fail
+
+    shuffle-live (identity count vs binomial band)   24/24 PASS
+      T=2  8092/16384   T=4  337/8192   T=8  0/4096   T=16  0/2048
+      theory 1-1/T!     tracked at every T
+    pooled gap identically 0                          max 6.53e-09 / 288 rows
+    SAE l0 permutation-invariant (PREDICTED, then MEASURED)   0 violations
+
+The l0 line is card §6: I predicted both SAE budget units are symmetric
+over positions, so the budget must be permutation-invariant, and said it
+would be **measured rather than asserted**. It was, and it holds.
+
+### 2. THE RESULT
+
+Trained vs random-init TXC — **same architecture, same T, same seed, one
+arm against itself, so no budget matching is involved**:
+
+    T=2   trained +0.1114   twin +0.1671   trained>twin 0/3 seeds
+    T=4   trained +0.0231   twin +0.1375                 0/3
+    T=8   trained +0.0504   twin +0.0820                 0/3
+    T=16  trained +0.0618   twin +0.0267                 1/3
+
+**11 of 12 (T, seed) cells put the UNTRAINED twin at the LARGER gap**,
+at every T, in both draws, often 3–7×. That is the pre-registered **(b)**,
+and it reproduces the exact mechanism that dissolved sycgen's original
+shuffle claim. Across (T × draw × probe), **15 of 16 return (b) or (c);
+none returns (a).**
+
+### 3. The qualifier I found, reported rather than buried — and it does not rescue the claim
+
+The twin **barely does the task**: ordered recovery **0.058** at T=16
+against the trained model's **0.578**. So its raw gap is a difference
+between two near-chance numbers, and raw gaps are not obviously
+commensurable across a 10× difference in base recovery. **That is a
+limitation of the rule I PRE-REGISTERED, found by the data.**
+
+I am not using it to overturn the verdict. The obvious alternative — a
+**relative** gap — is **post-hoc, was not pre-registered**, and I checked
+it precisely because it was the reading that might have favoured us.
+**It makes the negative stronger:** the twin loses **76–79%** of its
+recovery to shuffling at T=2/4/8; the trained model loses **4.5–22%**.
+
+**Budget confound, disclosed:** the twin runs at `l0`=8.00 (every
+`k_pos` slot live) vs the trained model's 5.44–7.86 — up to **1.47×**,
+which plausibly inflates the twin's gap. It is smallest at **T=16
+(1.02×)**, and T=16 is exactly where the twin gate is *least* decisive
+(mean favours trained, but only **1/3 seeds**, so the pre-registered 3/3
+sign test fails). The cleanest cell is the least conclusive one.
+
+### 4. Stacked cannot be budget-matched at T=8/16, and it is STRUCTURAL
+
+Stacked's `l0` is a **sum over positions**, so its cheapest possible
+setting is `T·1`:
+
+    T=8   stacked floor  8.00  vs TXC 7.22   (1.11x)
+    T=16  stacked floor 16.00  vs TXC 7.86   (2.04x)
+
+**No finer `k` closes that** — same shape as item 6's pooled floor at
+T=16. The standing budget-ratio check fires (0.64–2.05) and **I do not
+claim "matched" at T=8/16.** Where they *can* be compared, TXC's gap is
+larger at T=2 but **smaller at T=8/16** — beyond T=4 the windowed model
+is **less** order-sensitive than plain concatenation.
+
+### 5. What this does NOT say
+
+**TXC recovers λ perfectly well** — ordered recovery **0.499 → 0.578**
+across T against the twin's 0.222 → 0.058. **Training works.** The
+finding is narrower and sharper: **the ordered−shuffled gap is the wrong
+evidence for it.** A random model shows that gap too, usually bigger.
+
+### 6. Execution notes worth keeping
+
+- **The TXC arm — the entire claim arm — was silently SKIPPED** on the
+  first real run. `_key_from_manifest` resolves only 6 of 15 cells on a
+  fresh box, because **manifest entries are written on the pod and
+  containers never push**; the 9 it misses are exactly the TXC cells.
+  Item 6 only worked because it *ran on* the pod that wrote them. Fixed
+  by looking the key up in the **leaderboard**, which is in git. The run
+  still exited 0 — a sweep that drops its claim arm and reports success.
+- **Fleet sized from measurement, not authorization.** GPU utilisation
+  during a real cell: **mean 1.4%, idle in 94% of samples**. Three
+  concurrent shards on 1×A40: **one OOM-killed, survivors 207 s → 381 s,
+  zero gain**. Each process materialises its own **15.2 GB** copy of the
+  activations. **RAM binds — not GPU, not CPU.** So 4×A40 was bought for
+  its **186.3 GiB and 32.3 CPUs**, not its GPUs, and 8×H100 was declined
+  as $23.92/h of silicon that would sit 94% idle. **Total lane cost
+  ≈ $2.12 against a $60/h authorization.**
+- **24 cells is a hard parallelism ceiling** — beyond 24 shards, shards
+  go empty. Verified by partition test, not assumed.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
