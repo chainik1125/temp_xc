@@ -259,6 +259,7 @@ def _paired_values(
     model: str,
     baseline: str,
     metric: str,
+    fresh_only: bool = False,
 ) -> list[float]:
     seeds = sorted(
         seed
@@ -270,6 +271,11 @@ def _paired_values(
         model_row = by_key.get((task, model, seed))
         baseline_row = by_key.get((task, baseline, seed))
         if model_row is None or baseline_row is None:
+            continue
+        if fresh_only and (
+            int(model_row["training"]["start_step"]) != 0
+            or int(baseline_row["training"]["start_step"]) != 0
+        ):
             continue
         deltas.append(
             float(model_row["metrics"][metric])
@@ -308,6 +314,11 @@ def aggregate(
                 for row in selected
                 if int(row["training"]["start_step"]) == 0
             ]
+            resumed = [
+                float(row["metrics"][metric])
+                for row in selected
+                if int(row["training"]["start_step"]) > 0
+            ]
             entry: dict[str, Any] = {
                 "task": task,
                 "metric": metric,
@@ -321,6 +332,9 @@ def aggregate(
                 },
                 "fresh_n": len(fresh),
                 "fresh_mean": _mean(fresh) if fresh else None,
+                "fresh_std": _std(fresh) if fresh else None,
+                "resumed_n": len(resumed),
+                "resumed_mean": _mean(resumed) if resumed else None,
                 "mean_l0_per_window": _mean(
                     [float(row["metrics"]["l0_per_window"]) for row in selected]
                 ),
@@ -348,6 +362,24 @@ def aggregate(
                 entry[f"wins_vs_{baseline}"] = sum(delta > 0 for delta in deltas)
                 entry[f"ties_vs_{baseline}"] = sum(delta == 0 for delta in deltas)
                 entry[f"paired_n_vs_{baseline}"] = len(deltas)
+                fresh_deltas = _paired_values(
+                    by_key,
+                    task=task,
+                    model=model,
+                    baseline=baseline,
+                    metric=metric,
+                    fresh_only=True,
+                )
+                entry[f"fresh_delta_vs_{baseline}"] = (
+                    _mean(fresh_deltas) if fresh_deltas else None
+                )
+                entry[f"fresh_delta_vs_{baseline}_std"] = (
+                    _std(fresh_deltas) if fresh_deltas else None
+                )
+                entry[f"fresh_wins_vs_{baseline}"] = sum(
+                    delta > 0 for delta in fresh_deltas
+                )
+                entry[f"fresh_paired_n_vs_{baseline}"] = len(fresh_deltas)
             entries.append(entry)
     return entries
 

@@ -96,7 +96,11 @@ def test_analysis_checks_panel_and_computes_paired_deltas(tmp_path: Path) -> Non
     )
     assert candidate["mean"] == pytest.approx(0.85)
     assert candidate["fresh_mean"] == pytest.approx(0.8)
+    assert candidate["fresh_std"] == 0.0
+    assert candidate["resumed_mean"] == pytest.approx(0.9)
     assert candidate["delta_vs_txc_pre"] == pytest.approx(0.6)
+    assert candidate["fresh_delta_vs_txc_pre"] == pytest.approx(0.6)
+    assert candidate["fresh_paired_n_vs_txc_pre"] == 1
     assert candidate["delta_vs_spectral_v1"] == pytest.approx(0.2)
     assert candidate["wins_vs_spectral_v1"] == 2
     assert (tmp_path / "out" / "benchmark_seed_rows.csv").is_file()
