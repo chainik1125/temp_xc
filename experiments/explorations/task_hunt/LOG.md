@@ -37517,3 +37517,60 @@ unmeasured** and needs activations — that is the next $0 run on the cached
 Cost: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-29 01:13 BST — HUB: **sycgen added to the Reviewer-1 response** (Han) — copied onto `arxiv`, Dmitry's branch untouched
+
+Han: *"update the current draft of our response to reviewer 1 (the one
+that gave a 4) by adding the sycgen task... if we make them go 4→5 that
+gives the AC a good case to ignore the 1."*
+
+**WHY SYCGEN IS THE RIGHT EXHIBIT FOR THIS REVIEWER — it answers their
+stated *biggest* weakness almost verbatim.** Reviewer 1: *"the paper
+even describes the right baseline, **Stacked SAE**, which isolates
+temporal aggregation from cross-position weight sharing... but this
+comparison is missing from Fig. 4 and Table 2."* Item 6 is exactly that
+comparison — **TXC vs pooled AND stacked, on a real model, at matched
+measured sparsity, over three seeds** — and the three seeds also touch
+their *first* weakness (single-seed results).
+
+**Delivered:** `docs/dmitry/reviewer_responses/reviewer_responses_1.md`
+on `arxiv`, copied from `origin/dmitry-txcwins-10h`. **Diff vs the
+source branch: 66 insertions, 1 deletion** — the deletion is *"four
+additional lines of evidence"* → *"five"*. **Dmitry's branch is not
+modified** (verified: still `b1027b608`).
+
+**Constraints met:** copy-paste block **6,951 chars against the 10,000
+limit**; **0 links, 0 images, 0 URLs** (checked mechanically, not by
+eye). Additions are wrapped in HTML comment markers so they are obvious
+in the raw file and **invisible when pasted**, and the same block was
+added to the working section as bullet `e` so the two halves of the
+document do not disagree — **divergent surfaces have bitten us four
+times tonight.**
+
+**HONESTY POSTURE, which for this reviewer is a feature rather than a
+cost — they explicitly praised the paper's candour about negatives:**
+the claim is stated as a **narrow positive**, above pooled at T=8/16
+and **indistinguishable at T=2/4**, never below. The stacked arm is
+**refused at T≥8 in our own text** (32,768 input dims against 1,024
+windows = probe-capacity artifact, not architecture) rather than
+banked as a 4/4 win. The `*` footnote discloses that at those cells
+the baseline **cannot operate as sparsely as the TXC at all**, so the
+figure shown is its score at a **higher** budget and the comparison is
+conservative in the baseline's favour.
+
+**ONE OVERCLAIM CAUGHT BEFORE IT SHIPPED:** I first wrote *"statistically
+indistinguishable at T=2 and T=4"*. **We have no significance test** —
+the rule is `|Δ| ≤ max(sd)` at n=3, crude and disclosed as crude, and
+this is the reviewer who complained that *"the confidence intervals are
+large and overlap"*. Claiming a statistical procedure we do not have,
+**in front of the reviewer most alert to exactly that**, would have been
+the single worst sentence to get wrong. Rewritten as *"the gap is
+smaller than the across-seed spread, which at n=3 we report as
+indistinguishable rather than as a win (we do not claim a significance
+test at this n)"*.
+
+**Numbers were extracted programmatically from `frontier.json`, not
+transcribed** — a table in this document rendered a 1.27× ratio as
+"+127%" earlier tonight, and hand-copying is how that happens.
+
+**NOT CITED: the shuffle-matched run, which is still in flight.** The
+response uses only what is on disk, per Han.
