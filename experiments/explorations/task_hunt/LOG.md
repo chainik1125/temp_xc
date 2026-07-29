@@ -39714,3 +39714,85 @@ pod, standing orders §1 apply unchanged** — ≤8 GPUs without approval,
 pre-spend posted above that, hard stop 3 h after pod-up, terminate and
 API-verify. **The lane's own precedent is $2.12 for 624 rows, so this
 should be small.**
+---
+
+## 2026-07-29 02:3x BST — mac-c: amplifier test COMPLETE, both corpora. **A1 survives out-of-sample; A2 is DEAD; A3 found no target in 12 faces — and the dead clause is the constructive finding**
+
+Pre-registration `dafd000ca` (with my stated preference to be refuted),
+no-pooling addendum `70d85ff59` (fixed while retryesc was in flight and
+unseen). Six faces × two corpora × one identical pipeline, gemma2_2b L14
+@512. **12/12 faces built and passed the A4 validity gate — none
+excluded. $0, 0 pods.**
+
+### evalage (in-sample)
+
+| face | tok_exc | arm_exc | gain | ratio | T |
+|---|---|---|---|---|---|
+| RECENCY_age | +0.1265 | +0.1975 | +0.0709 | 1.56 | 64 |
+| rate_H512 | +0.1736 | +0.2241 | +0.0505 | 1.29 | 64 |
+| ewma_tau128 | +0.1078 | +0.1806 | +0.0727 | 1.68 | 64 |
+| ewma_tau512 | +0.1106 | +0.1911 | +0.0806 | 1.73 | 64 |
+| age2 | +0.0318 | +0.0511 | +0.0193 | 1.61 | 64 |
+| gap_last | +0.0038 | +0.0051 | +0.0013 | — | 64 |
+
+### retryesc_gen (OUT-OF-SAMPLE)
+
+| face | tok_exc | arm_exc | gain | ratio | T |
+|---|---|---|---|---|---|
+| RECENCY_age | +0.0485 | +0.1573 | +0.1088 | 3.24 | 64 |
+| rate_H512 | +0.0262 | +0.0614 | +0.0351 | 2.34 | 64 |
+| ewma_tau128 | +0.0440 | +0.1314 | +0.0874 | 2.99 | 64 |
+| ewma_tau512 | +0.0256 | +0.0645 | +0.0389 | 2.52 | 64 |
+| age2 | +0.0178 | +0.0352 | +0.0174 | 1.98 | 32 |
+| gap_last | −0.0018 | +0.0125 | +0.0142 | — | 16 |
+
+### Verdicts, exactly as pre-registered
+
+| clause | evalage | retryesc_gen | outcome |
+|---|---|---|---|
+| **A1** Spearman(tok_exc, arm_exc) | **+1.000** | **+0.943** | **HOLDS on both, separately** |
+| **A2** ratio range | [1.29, 1.73] | [1.98, 3.24] | **DEAD — no overlap** |
+| **A3** kill condition | 0/6 | 0/6 | **no target found** |
+| **A4** faces valid | 6/6 | 6/6 | none excluded |
+
+**A1 survived the out-of-sample test** across 12 faces spanning
+`tok_excess` from −0.0018 to +0.1736, **reported per-corpus and never
+pooled** — the addendum's simulation showed pooling manufactures
+ρ = +0.76 from pure noise plus the between-corpus offset.
+
+**⚑ A2 IS DEAD, and my own frozen rule is what kills it:** *"if the two
+ranges do not overlap, the constant-multiplier reading is DEAD even if
+both correlations are +1."* They do not overlap — evalage tops out at
+**1.73**, retryesc bottoms at **1.98**. Two `gap_last` ratios excluded as
+degenerate (|tok_excess| < 0.005, denominator ≈ 0), disclosed rather than
+dropped.
+
+**⚑ AND THE DEAD CLAUSE IS THE USEFUL RESULT.** The amplification factor
+is **not** a constant — it is a **corpus property that varies ~2×**
+(evalage ~1.5, retryesc ~2.7). That is a **new screening axis on the
+gain side**, which is where the binding constraint sits, and it is
+independent of the per-token signal strength.
+
+**But it does not rescue a weak corpus, and the arithmetic says why:**
+
+    evalage  best   tok +0.1265 x 1.56 = arm +0.1975
+    retryesc best   tok +0.0485 x 3.24 = arm +0.1573
+
+**retryesc amplifies ~2× harder and still loses**, because it multiplies
+a signal ~2.6× smaller. **Ratio does not compensate for absent signal** —
+so the target is a corpus with **both** a real per-token signal **and** a
+high amplification factor, not either alone.
+
+**A3 found nothing in 12 faces.** The closest was retryesc `gap_last`
+(tok −0.0018, arm +0.0125) — per-token silent, and its arm is +0.0125,
+far under the +0.05 bar. **No weak-tok/strong-arm face exists in this
+battery.** Per the pre-registration this is *"NOT proven; absence over 6
+faces is weak evidence"* — now 12, still absence-evidence, not proof.
+
+**Standing limits, unchanged:** one model, one layer, and all faces are
+functionals of the SAME event stream within a corpus, so they are
+readouts of one signal rather than independent tasks. **The tension with
+`hunt-safety-gold-clew.md` stands and is now measured on two corpora:
+screening FOR per-token silence selects against the arm, not for it.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
