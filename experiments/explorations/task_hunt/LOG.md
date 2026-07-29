@@ -39514,3 +39514,78 @@ exists. **The question is only whether it ran this time.**
 y/n, verdict (a)–(d), and the ledger for both pods. **No escalation and
 no action taken; the standing hard stop was ~04:1x and we are well
 inside it.** Watch continues.
+
+## 2026-07-29 02:30 BST — ⚑⚑ HUB ratifies the SHUFFLE LANE — verdict **(b) ARCHITECTURAL, NOT LEARNED** — and adds one cross-check on mac-d's own disclosed confound
+
+**RATIFIED. 624 rows, 24 cells, 8 shards on 4×A40, pods terminated and
+API-verified, total $2.12 — 3.5% of one hour of the authorisation.**
+Deliverable landed at `figs_writeup/tab_sycgen_shuffle_matched.md`,
+in the markdown pipe-table format decided tonight, **and it exists
+because the gap was flagged pre-emptively 20 minutes before the run
+finished.**
+
+**ALL THREE INSTRUMENT GATES PASS**, including the two that were built
+tonight out of a hollow one:
+
+    shuffle live (identity rows vs binomial band)   24/24 PASS
+    pooled gap identically 0 (288 rows)             max 6.53e-09
+    SAE l0 permutation-invariant (predicted first)   0 violations
+
+**The A1 chain closes exactly as designed:** the pooled-zero gate
+returns PASS on a dead shuffle, so it certifies nothing; the input-side
+identity-row count against `1 − 1/T!` is what certifies the
+instrument, and it tracked theory at every T. **A gate that could not
+fire became a gate that did.**
+
+**THE RESULT: a randomly-initialised TXC is MORE order-sensitive than
+the trained one — 11 of 12 (T, seed) cells.** 15 of 16 combinations
+return (b) or (c); **not one returns (a).** That is the pre-registered
+live hypothesis, and **we pre-committed to publishing it.**
+
+**mac-d reported the qualifier rather than burying it**, then went
+further: the twin **barely does the task** (0.058 ordered at T=16 vs
+0.578 trained), so raw gaps are not obviously commensurable across a
+10× base-recovery difference — **a limitation of the rule they
+pre-registered, found by their own data.** They then checked the
+post-hoc *relative*-gap alternative, **labelled it post-hoc, refused to
+use it**, and noted it makes the negative **stronger** (twin loses
+76–79% of recovery to shuffling; trained loses 4.5–22%).
+
+## ⚑ HUB CROSS-CHECK: their disclosed budget confound TRACKS the effect
+
+mac-d disclosed that the twin runs at `l0`=8.00 against the trained
+model's 5.44–7.86 — **up to 1.47× the budget** — and that the confound
+is smallest at T=16. **I tested whether it explains the result:**
+
+| T | twin budget × | twin gap − trained gap |
+|---|---|---|
+| 2 | 1.41 | +0.0557 |
+| 4 | 1.26 | +0.1144 |
+| 8 | 1.15 | +0.0316 |
+| 16 | **1.02** | **−0.0351** |
+
+**Spearman(budget advantage, twin excess) = +0.80 (n=4).** The twin's
+extra order-sensitivity **shrinks as its budget advantage shrinks and
+REVERSES at T=16, where the budgets nearly match.** **That is the
+signature a budget artifact leaves.**
+
+**This does not overturn (b) — it bounds it, and mac-d's own text
+already points at the same place** ("the confound is smallest at T=16,
+and that is exactly where the twin gate is least decisive"). **The
+honest statement: (b) is carried by T=2/4/8, where the twin is handed
+up to 1.41× the budget; at the one T with a near-matched comparison the
+direction flips toward (a) and fails its own 3/3 sign test.** n=4 on
+the correlation, so this is a flag, not a finding.
+
+**⇒ RULING: publish (b) with the budget confound stated at equal
+prominence, and name the T=16 reversal.** The claim we can defend is
+**"the ordered−shuffled gap is not evidence of learned temporal
+structure"** — which is what the binding quote-form has said since
+04:16 yesterday. **What we cannot yet say is that training REDUCES
+order-sensitivity**, because the comparison that would show it is the
+one the budget confounds.
+
+**Next $0 step, and it is the obvious one: re-run the twin at the
+trained model's realized `l0` instead of `k_pos`-full.** That
+removes the confound entirely and is the only way T=16's flip gets
+resolved. **Not tonight — the pods are down and the ledger is closed.**
