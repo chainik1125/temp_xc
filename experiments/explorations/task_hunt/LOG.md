@@ -37896,3 +37896,57 @@ for the same sentence.**
 **Verified:** 84 math blocks (57 working as-is + 27 paste after
 unescape), **0 failures**. Paste block **6,534 / 10,000**. Dmitry's
 branch untouched.
+
+## 2026-07-29 01:36 BST — HUB: **the real render bug was inline math wrapping a line** — and Dmitry's branch now carries sycgen too (Han reversed the earlier instruction)
+
+**Han: *"IT STILL SAYS Extra close brace on the github viewer."* The
+GitHub detail is what cracked it.** Not the escaping at all:
+
+    Stacked's collapse at $T\ge8$ reflects its $T\cdot
+    d_{\text{SAE}}$ input dimension ...
+
+**Inline `$...$` cannot cross a line break.** The opening `$`
+never closes, the next `$` opens a fresh span, and the braces cascade
+— reported against a table that is itself valid. **Present in both
+copies.** Fixed in the working copy; the paste copy is regenerated from
+it with the round-trip asserted.
+
+**⚑ MY CHECKER COULD NOT HAVE FOUND THIS.** Its inline regex was
+`[^$\n]+` — **newlines excluded by construction**, so the one live
+bug was outside its search space while it reported "32 blocks, 0
+failures". **A green test whose pattern cannot match the failure is
+worse than no test: it bought me confidence and cost Han two more
+rounds.** Third time tonight a check failed to model the delivery path
+(the scratchpad `ROOT`; the un-unescaped KaTeX run; this).
+
+**AND I BUNDLED FIXES AGAIN.** Round 1 I changed `\text{-}`,
+`$^{*}$` **and** the escaping in one commit, so when it stayed
+broken I could not attribute it — and I then "fixed" the escaping in the
+wrong direction, since single-backslash is what GitHub renders. **Two
+changes, one commit, no attribution; then a confident wrong diagnosis on
+top.**
+
+**DURABLE FIX: `scripts/check_response_math.py`** — six structural
+checks, `--self-test` proving each **fires on a failure case AND stays
+quiet on a passing one**. The baseless-superscript check is a
+**warning, not a failure**: KaTeX and MathJax both render `$^{\dagger}$`
+and it appears in Dmitry's pre-existing text, which demonstrably works.
+**A check that fires on valid-in-practice input is as useless as one
+that never fires** — and it would have blocked on someone else's
+working line.
+
+**PROSE, per Han (*"too LLM soundy and bloated"*):** rewritten
+declarative, in the register of the rest of the document. **The tight
+version is the stronger one** — the buried claim now leads: **0.499 →
+0.523 → 0.537 → 0.577, the TXC scaling with the window.** Caveats
+survive as clauses, not paragraphs.
+
+**DMITRY'S BRANCH UPDATED — Han reversed the earlier "do NOT update"
+instruction, so I executed.** Checked first that it had **moved**
+(`b1027b608` → `87d766fb2`) and that `reviewer_responses_1.md` was
+**untouched** by that commit (Dmitry edited reviewer 2 only), so the
+apply was safe rather than a blind overwrite of live work. Diff: **110
+insertions, 1 deletion** (the intended *four → five*), one file. The
+in-file markers claiming *"source branch is NOT modified"* were **false
+the moment I pushed** and were corrected at all 4 sites first. Now
+`cc9274b6c`; both branches carry the identical block.
