@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 00:54 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 01:16 BST (stamped from `date` at write time)
 
 ---
 
@@ -130,6 +130,70 @@ the numbers.** Read `lever3_evalage.py`'s docstring and honour them:
 
 The script scores P1/P2/P3 automatically against the frozen retryesc
 run and prints HELD / NOT HELD. **Report whichever way it falls.**
+
+## 1b. ⚑⚑ THE HUNT'S AIM WAS CORRECTED TWICE TONIGHT — READ THIS BEFORE TOUCHING THE HUNT
+
+`experiments/explorations/task_hunt/FLOOR_AIM_CORRECTION.md` +
+`beyond_t_mass.py`. Net position after two of my own retractions:
+
+**STANDS — the instrument fact.** `visible_evidence_floor` is fit on
+`sage_floor(event_first,T)` + `dose_window_count(event_mask,T)`, both
+handed **ground-truth event arrays** (`screen.py:113` → `:301`).
+**Neither reads a token.** So "per-token silent" aims at the **gain**
+bar — and `retryesc_gen` cleared gain 3/3 and died on the **floor**.
+Two of the brief's three gold criteria select for a non-binding bar.
+
+**⛔ RETRACTED (mine).** *"Censored-age labels cannot beat this floor at
+any density."* **False — `sycgen`, our only KEEP, is exactly that and
+beats the SAME `_FloorBank` by +0.121/+0.137/+0.140 on 3/3 models.**
+`sage_floor` censors at **T+1** but the label is the **uncensored** age,
+so winnable mass is `P(age > T)`. **My own `d2320d274` already said
+this** and I wrote a universal denying it.
+
+**⛔ RETRACTED (mine).** *"Type-injection is the only non-vacuous
+family."* **Backwards under my own criterion.** A type label the floor
+cannot express is **ESCAPED, not beaten** — and *an escaped control is
+not a passed control*. Timing labels face an **expressive** floor and
+sycgen genuinely beat it. Type labels need a **type-aware floor built
+first** before any KEEP means anything.
+
+**⛔ FALSIFIED (the hub's, by my run).** *"Sort candidates by beyond-T
+mass."* `P(age>T)` **saturates at 1.0000 for both corpora at T=4,8,16**
+and orders them backwards at T=16. I scored `event_first`; the floor's
+discriminating feature is `dose_window_count(event_MASK,T)` — mask
+**width** `w`, which is why `w` is lever 3.
+
+**✅ THE WORKING SCREEN CRITERION — use this:**
+`floor_reach = P(any masked token in the trailing T window)` (my
+corrected floor law). Tracks observed `floor_excess` within
+**0.82–1.13×**; separates evalage (w=13) from retryesc_gen (w=25) by
+**~5.3× at every T**, 3 legs each, ±8%. **MINIMISE IT.** Run:
+`PYTHONPATH=. .venv/bin/python -m experiments.explorations.task_hunt.beyond_t_mass`
+(both criteria kept in the file — the falsified one is the record).
+
+### ⏭ THE NAMED NEXT STEP — the band's UPPER edge, unmeasured, $0
+
+`floor_reach` is the **lower** edge only (what the floor can resolve).
+The upper edge — **how far back the residual stream still carries a
+sparse event** — is unmeasured and is what decides whether "push events
+older than T+w" actually works. A corpus can score perfectly on
+`floor_reach` and still lose because its events are too old to be
+represented at all.
+
+**Everything needed is already on disk** — reuse, do not rebuild
+(~13 min MPS): `<scratch>/cache_evalage_512/gemma2_2b/hs14.npy` (8.4 GB)
++ `evalage/grids/elicit_evalage_screen_gemma2.npz`.
+
+**Design sketch (PRE-REGISTER BEFORE RUNNING).** `arm_test.build_rows`
+computes `val = rate_face(...)` as the **raw** quantity and only then
+tercile-bins it (`arm_test.py:166,181-186`). A variant must keep raw age
+and bucket by it: fit a multiclass probe over log2 age buckets on
+eligible positions, report **per-bucket accuracy vs chance**, and read
+the retention horizon as the largest age still above chance. Controls:
+`label_null` permutation and the `foreign` window, exactly as the screen
+does. **State a falsifier first** — e.g. if accuracy is flat across all
+buckets, the probe is reading position rather than age and the run is
+void.
 
 ## 2b. ⚑ THE SHUFFLE LANE — my standing role is REVIEW, and it is live
 
