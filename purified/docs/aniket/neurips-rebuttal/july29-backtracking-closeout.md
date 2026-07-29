@@ -22,6 +22,43 @@ the submitted seed-42 C7 cell with seed as the only intended change:
 Use the historical locked configuration rather than a current default, because
 the current code has accumulated incompatible TopK/BatchTopK variants.
 
+## July 29 execution protocol
+
+An audit found that the historical C7 runner passed the nominal seed into its
+NumPy window sampler but never seeded Python or PyTorch before model
+initialization and `torch.randint`. Its evaluation adapter also silently
+defaulted to seed 42 because `run_cell` did not thread the owning cell seed
+into `eval_cfg`. The submitted aggregate seed-42 row remains the paper
+reference, but it is not a sufficient deterministic member of a new
+three-seed replication.
+
+The clean replication therefore trains corrected seeds 1, 2, and 42 under
+protocol `c7-300k-seeded-v1`, with all Python, NumPy, CPU-Torch, and CUDA RNGs
+seeded before initialization. The runner:
+
+- archives historical source commit
+  `284a8bf5e3e5a7cc094dd68c6fa5a92a9fd4eec3` without switching branches;
+- verifies activation-cache key `fb2a74be884e512a`, SHA-256
+  `dc34dfb117f77abddef4b4396d0d00afc707c39876d0ee36015de1e7b8406914`,
+  shape `(4044, 128, 4096)`, and `float16` dtype;
+- asserts the exact historical training keys
+  `a300c63374c3597e`, `27078b0d7700ae05`, and `8787f8fe527218ad`;
+- keeps the cache on the pinned worker GPU and uses a vectorized gather that
+  was checked bit-for-bit against the historical row-copy loop;
+- writes only one final checkpoint per cell plus compact progress and
+  provenance JSON, so storage is bounded.
+
+The reproducible launcher is in
+`purified/experiments/backtracking_300k_seeded/`. The three TXC cells run on
+three H100s; the new T-SAE-16K seed-42 sensitivity control runs on one A40.
+The submitted T-SAE-32K cell is not duplicated.
+
+The historical trainer has no exact optimizer/RNG resume format. These tmux
+jobs survive a disconnected laptop, but terminating a pod before its final
+checkpoint would restart that cell from step zero; adding an unverified
+partial-resume format during the closeout would create a larger reproducibility
+risk than the bounded preemption risk.
+
 ## Evaluations required for each TXC seed
 
 1. **Detection:** run the paper's grouped Backtracking detector at
