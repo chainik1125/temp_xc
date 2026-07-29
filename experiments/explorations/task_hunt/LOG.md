@@ -38049,3 +38049,71 @@ both lose.
 **Both branches updated and verified in step** (`check_response_sync.py`:
 identical, 541 lines). Checked before applying that Dmitry had not
 touched the file since `cc9274b6c`. Math checker: 0 problems.
+---
+
+## 2026-07-29 01:4x BST — mac-c CLOSES overnight open item §5.2 (RLHF metric collision): the flag both UNDERSTATED and OVERSTATED it — 9 of 10 are benign renames, exactly ONE is a real defect, and the discriminator is `batch_size`
+
+Standing orders §5.2: *"`batchtopk_sae_btkonly` and `tsae_btkonly` share
+`preference_auc_k20` to 16 digits with different train/eval keys… should
+not still be open when RLHF baselines are leaned on."* Taken because it is
+**$0, unclaimed, and forensic**. 73 RLHF rows in `results/leaderboard.jsonl`.
+
+**The flag UNDERSTATED it:** the two rows share **all four** metrics
+(`auc_k20`, `auc_k50`, `fold_min`, `fold_max`), plus `n_pairs`, `n_valid`,
+`eval_cfg`, `data_key`, `datasource`, `evaluator_*`, `seed` — not one
+number.
+
+**The flag OVERSTATED it:** **10 row-pairs share all four metrics, and 9
+are benign.** Those 9 are the same base architecture under the
+`_btkonly` rename — `batchtopk_sae` ↔ `batchtopk_sae_btkonly`,
+`txc_batchtopk_post` ↔ `txc_batchtopk_post_btkonly` (8×) — `arch_version`
+1.0.0 vs 1.1.0, **`batch_size` 1024 on both sides.** Same model evaluated
+twice under two arch labels; the `train_key` differs because it hashes the
+arch name. Expected, not a defect.
+
+**⚑ THE DISCRIMINATOR — same base arch AND matching `batch_size`:**
+
+    auc20=0.6250440168  bases=[batchtopk_sae]         bs=[1024]        BENIGN
+    auc20=0.6228765709  bases=[txc_batchtopk_post]    bs=[1024]        BENIGN
+    auc20=0.6587578168  bases=[batchtopk_sae, tsae]   bs=[32, 1024]  ** ANOMALY **
+    ... 7 more                                         bs=[1024]        BENIGN
+
+**Exactly one anomaly, and it is a real defect.** `tsae_btkonly`
+`train_key=9147e04c9555b952` (arch_version **2.1.0-port**, **bs=32**)
+carries metrics byte-identical to `batchtopk_sae_btkonly`
+`4f20f7d8dbc3b855` (arch_version **1.1.0**, **bs=1024**), timestamps **73
+seconds apart**. A model trained at bs=32 cannot produce four
+byte-identical statistics to one trained at bs=1024, so the benign
+"same-model-two-names" explanation **does not apply here**. P(all four
+match by chance) ≈ **7.2e-08**.
+
+**Adjacent smell in the same 90-second window** — all `tsae_btkonly`,
+seed 42: `00:30:02` 0.5997, `00:31:22` **0.6588 (the duplicate — and the
+highest value any tsae row ever produced)**, `00:31:29`
+**0.5000000000 exactly** (`037faff74c387997`). An exact-chance AUC is a
+degenerate-predictor signature. **Both rows from that window should be
+distrusted, not just the duplicate.**
+
+**Hypothesis I tested and REFUTED, reported because it was the obvious
+one:** *"`preference_auc_k20` doesn't depend on the trained dictionary at
+all."* It does — grouping by `(data_key, seed, eval_cfg)`, one group of
+**26 rows yields 20 distinct values** across archs. The metric
+discriminates architectures; the collision is not arch-blindness.
+
+**The other two `auc_k20` collisions ARE coincidences, and the "16
+digits" framing is what made them look otherwise.** AUC is a **rank
+statistic — an exact rational** (`54252/82355`, `49297/82355`,
+`14553/23530`, all exact to float precision), so 16-digit agreement is
+*cheap*, not miraculous: observed support is **61 distinct values in 73
+rows**. The two collisions involving `agentic_txc_02_v1t` match on
+`auc_k20` only — siblings differ — exactly as a discrete statistic
+should. **The sibling metrics, not the digit count, are the test.**
+
+**Status:** item §5.2 closed as *diagnosed*. Nothing quoted depends on it
+(confirmed by the hub). Remediation is one row to re-run, not a
+systematic problem — and the `batch_size` discriminator is reusable for
+the next such flag.
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
