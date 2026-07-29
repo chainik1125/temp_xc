@@ -1,0 +1,160 @@
+"""Render the matched synthetic benchmark summary."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+from matplotlib.colors import TwoSlopeNorm
+import numpy as np
+import pandas as pd
+
+
+POWER_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_INPUT = POWER_ROOT / "results" / "overnight_remote" / "summary.json"
+DEFAULT_FIGURES = POWER_ROOT / "figures"
+DEFAULT_RESULTS = POWER_ROOT / "results" / "overnight_remote"
+
+MODELS = (
+    "txc_pre",
+    "txc_post",
+    "spectral_v1",
+    "v2_remove_dc",
+    "v2_dominance",
+    "v2_freq_matryoshka",
+    "v2_combined",
+    "v2_global",
+)
+MODEL_LABELS = {
+    "txc_pre": "TXC-pre",
+    "txc_post": "TXC-post",
+    "spectral_v1": "Spectral v1",
+    "v2_remove_dc": "−DC",
+    "v2_dominance": "Dominance",
+    "v2_freq_matryoshka": "Freq-Mat.",
+    "v2_combined": "Combined",
+    "v2_global": "Global top-k",
+}
+MODEL_COLORS = {
+    "txc_pre": "#777777",
+    "txc_post": "#BBBBBB",
+    "spectral_v1": "#0072B2",
+    "v2_remove_dc": "#56B4E9",
+    "v2_dominance": "#009E73",
+    "v2_freq_matryoshka": "#E69F00",
+    "v2_combined": "#D55E00",
+    "v2_global": "#CC79A7",
+}
+TASKS = ("frequency", "multilane", "phasepair", "permuted", "colored")
+TASK_LABELS = {
+    "frequency": "Periodic velocity",
+    "multilane": "Multilane periodic",
+    "phasepair": "Phase-only sign",
+    "permuted": "Permuted schedule",
+    "colored": "Colored sources",
+}
+
+
+def _ordered(frame: pd.DataFrame) -> pd.DataFrame:
+    out = frame.copy()
+    out["model"] = pd.Categorical(out["model"], categories=MODELS, ordered=True)
+    out["task"] = pd.Categorical(out["task"], categories=TASKS, ordered=True)
+    return out.sort_values(["task", "model"])
+
+
+def plot_primary(frame: pd.DataFrame, output: Path) -> None:
+    fig, axes = plt.subplots(1, len(TASKS), figsize=(15, 4.2), sharey=True)
+    for axis, task in zip(axes, TASKS, strict=True):
+        part = frame[frame["task"] == task].set_index("model").reindex(MODELS)
+        means = part["mean"].to_numpy(dtype=float)
+        errors = part["std"].to_numpy(dtype=float)
+        x = np.arange(len(MODELS))
+        axis.bar(
+            x,
+            means,
+            yerr=errors,
+            color=[MODEL_COLORS[model] for model in MODELS],
+            edgecolor="white",
+            linewidth=0.6,
+            capsize=2,
+        )
+        axis.axhline(0.0, color="0.45", linewidth=0.8)
+        axis.set_title(TASK_LABELS[task])
+        axis.set_xticks(x, [MODEL_LABELS[model] for model in MODELS], rotation=68, ha="right")
+        axis.grid(axis="y", alpha=0.2)
+    axes[0].set_ylabel("Primary recovery metric (mean ± seed SD)")
+    fig.suptitle("Matched synthetic benchmark", y=0.995)
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_deltas(frame: pd.DataFrame, output: Path) -> None:
+    variants = [model for model in MODELS if model != "txc_pre"]
+    table = (
+        frame.pivot(index="model", columns="task", values="delta_vs_txc_pre")
+        .reindex(index=variants, columns=TASKS)
+        .astype(float)
+    )
+    values = table.to_numpy()
+    finite = np.abs(values[np.isfinite(values)])
+    limit = max(float(finite.max(initial=0.0)), 0.05)
+    fig, axis = plt.subplots(figsize=(8.8, 5.1))
+    image = axis.imshow(
+        values,
+        cmap="RdBu",
+        norm=TwoSlopeNorm(vmin=-limit, vcenter=0.0, vmax=limit),
+        aspect="auto",
+    )
+    for i in range(values.shape[0]):
+        for j in range(values.shape[1]):
+            value = values[i, j]
+            if np.isfinite(value):
+                axis.text(j, i, f"{value:+.3f}", ha="center", va="center", fontsize=8)
+    axis.set_xticks(np.arange(len(TASKS)), [TASK_LABELS[task] for task in TASKS])
+    axis.set_yticks(
+        np.arange(len(variants)), [MODEL_LABELS[model] for model in variants]
+    )
+    axis.tick_params(axis="x", rotation=25)
+    axis.set_title("Paired primary-metric delta versus equal-support TXC-pre")
+    colorbar = fig.colorbar(image, ax=axis, pad=0.02)
+    colorbar.set_label("Recovery delta")
+    fig.tight_layout()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
+    parser.add_argument("--figures-dir", type=Path, default=DEFAULT_FIGURES)
+    parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS)
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    payload = json.loads(args.input.read_text())
+    frame = _ordered(pd.DataFrame(payload["aggregates"]))
+    expected = {(task, model) for task in TASKS for model in MODELS}
+    observed = {(str(row.task), str(row.model)) for row in frame.itertuples()}
+    missing = sorted(expected - observed)
+    if missing:
+        raise RuntimeError(f"incomplete summary, missing {missing}")
+    args.results_dir.mkdir(parents=True, exist_ok=True)
+    frame.to_csv(args.results_dir / "benchmark_aggregate.csv", index=False)
+    plot_primary(frame, args.figures_dir / "benchmark_primary_metrics.png")
+    plot_deltas(frame, args.figures_dir / "benchmark_delta_vs_txc_pre.png")
+    print(
+        frame.pivot(index="model", columns="task", values="mean")
+        .reindex(index=MODELS, columns=TASKS)
+        .to_string(float_format=lambda value: f"{value:.3f}")
+    )
+
+
+if __name__ == "__main__":
+    main()
