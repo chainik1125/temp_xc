@@ -30,6 +30,12 @@ _req() { # method path [body]
 }
 
 _body() { # create-body JSON on stdout; pubkey embedded via python for safe quoting
+  # Shape is OVERRIDABLE per lane, defaults unchanged (2xH100, ~$5.98/h).
+  # Added 07-29 for the shuffle lane, which does ONE llama-3.1-8B forward
+  # pass and then encode-and-probe: it needs ~16 GB of VRAM and no
+  # training at all, so 2xH100 would be ~13x the required spend. Set
+  #   POD_GPU_TYPE="NVIDIA A40" POD_GPU_COUNT=1 POD_VOLUME_GB=150
+  # to size a lane down. Defaults preserved so no other lane changes.
   local name="$1"
   PODNAME="$name" /usr/bin/python3 - <<'PY'
 import json, os, pathlib
@@ -38,10 +44,10 @@ print(json.dumps({
     "name": os.environ["PODNAME"],
     "imageName": "runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404",
     "cloudType": "SECURE",
-    "gpuTypeIds": ["NVIDIA H100 80GB HBM3"],
-    "gpuCount": 2,
-    "containerDiskInGb": 30,
-    "volumeInGb": 300,
+    "gpuTypeIds": [os.environ.get("POD_GPU_TYPE", "NVIDIA H100 80GB HBM3")],
+    "gpuCount": int(os.environ.get("POD_GPU_COUNT", "2")),
+    "containerDiskInGb": int(os.environ.get("POD_CONTAINER_GB", "30")),
+    "volumeInGb": int(os.environ.get("POD_VOLUME_GB", "300")),
     "volumeMountPath": "/workspace",
     "ports": ["22/tcp", "8888/http"],
     "env": {"PUBLIC_KEY": pub},
@@ -72,7 +78,12 @@ case "$cmd" in
     if [ "$dry" = 1 ]; then
       echo "$body" | /usr/bin/python3 -m json.tool; exit 0
     fi
-    echo "creating $name (2xH100 SXM secure, ~\$5.98/h) ..."
+    # Report the shape actually being requested. This line used to be a
+    # hardcoded "2xH100 ... ~$5.98/h" and printed that even when the env
+    # overrides asked for a single A40 at $0.44/h — a banner that
+    # describes the default rather than the request is exactly the kind
+    # of message a later reader takes as a receipt of what was spun.
+    echo "creating $name (${POD_GPU_COUNT:-2}x ${POD_GPU_TYPE:-NVIDIA H100 80GB HBM3}, SECURE, vol ${POD_VOLUME_GB:-300}GB) ..."
     resp="$(_req POST /pods "$body")"
     echo "$resp" | _show || { echo "create response:"; echo "$resp"; exit 1; }
     id="$(echo "$resp" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin).get("id",""))')"

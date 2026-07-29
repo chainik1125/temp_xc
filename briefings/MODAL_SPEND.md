@@ -149,3 +149,37 @@ actuals, same discipline as the Modal table.
 - 2026-07-28 19:58 BST mac-d **LAST POD TERMINATED — mac-d GPU spend CLOSED at $0/h.** `tnp7vvew4t80wi` (`mac-d-rlhfpf-0728-5`) killed via the arm-aware guard (btk T6 + T10 both verified 3/3 in the LOCAL leaderboard first), `DELETE 204`, **API-verified GONE**; 0 mac-d pods remain. **RLHF grid-day ACTUALS ≈ $36**: -5 (T8 pf + 3 btk gap cells) 6.8h ≈ $20; -2 (T2) ≈ $4.5; -3 (T4) ≈ $4.2; -4 (T6) ≈ $4.8; -6 (T10) ≈ $4.8; plus **$2.55 of disclosed bad-host loss** (`aqil2dkyikg3ze` stalled 34 min ≈ $1.70 + its same-host replacement `8y6mv20l72ghqk` 17 min ≈ $0.85, both zero science, killed per Han's "if a pod is faulty can always close it and open new one"). Peak burn was $17.94/h at 14:15 (6 pods); per-lane teardown took it to $0 in 5h45m. **Delivered for it: the pf grid 15/15 (item 3's missing plot) AND the btk arm completed to uniform 3-seed coverage.** Separately ledgered earlier today: pod-D sycgen $38, struq L40S $1.70.
 - 2026-07-28 21:22 BST mac-d **SPIN-UP (item-6 budget-matched frontier, URGENT assignment 0a4dd1171 / brief `URGENT-budget-matched-table.md`).** 1× H100 80GB SECURE ~$2.99/h. Purpose, one session: (1) rebuild the sycgen llama31-l14 activation cache lost with pod-D (943,574 tokens from the in-repo frozen grid, ~7.2 GB fp16), (2) 9 TXC retrains for T{2,4,16} (T=8 weights survived), (3) encode+probe the pooled/stacked SAE arms as post-hoc transforms of the surviving T=1 SAE, (4) k-sweep FRONTIER per hub ruling 14de8b5a0 (not a matched point). EST **~2 pod-h ≈ $6**, self-cap $25. Proceeding without a separate cost approval: the assignment is explicit, Han said "ASAP", and this is the means. ACTUALS + API-verified termination at drain.
 - 2026-07-29 00:11 BST mac-d **ITEM-6 POD ACTUALS + TERMINATION — mac-d GPU spend CLOSED at $0/h.** `davlc92a80erp3` (`mac-d-item6-0728`, 1× H100 $2.99/h) ran 21:22 → 00:11 ≈ **2.9 h ≈ $8.6** vs est ~$6 (self-cap $25; **+$2.6 over est, cause stated**). `DELETE 204`, **API-verified GONE**, 0 mac-d pods remain. Kill was gated on **15/15 leaderboard rows AND 156/156 frontier rows verified LOCAL first** (containers never push); the standing `teardown_pod.sh` guard knows only the pf/btk arms, so I ran the equivalent assertion explicitly rather than let a wrong-arm guard manufacture confidence — the exact failure that guard was rewritten for this morning. **Overrun is fully attributable and disclosed:** ~70 min training `tsae_btkonly` cells that `frontier.py` never loads (≈$3.5, my sharding error, caught only when I checked which cells were actually in flight) + **three OOM-killed launches** at 12/9/6 workers (≈$1, cgroup `memory.max` 233.8 GiB read as `free`'s 2015 GB, then per-worker accumulation that `run_pool`'s own docstring documents). **Delivered:** item-6 verdict — TXC's recovery-vs-budget frontier ABOVE pooled at 3/4 T, indistinguishable at 1/4, below at none; plus the rebuilt sycgen activation cache **verified** reproducing pod-D's lost originals to 3 dp, 15 retrained checkpoints, and 156 swept frontier rows. Checkpoints deliberately NOT HF-mirrored: cache rebuilds in 37 s and the 15 cells in ~20 min ≈ $1, so regeneration beats an upload. **mac-d day total ≈ $84** (RLHF grid-day $36 + pod-D $38 + struq $1.70 + item-6 $8.6).
+
+## 2026-07-29 01:0x BST — mac-d — POD UP: `mac-d-sycshuffle-0729` (`qa4ucag1sezl56`)
+
+**Lane:** sycgen shuffle ablation, sparsity-matched
+(`briefings/sycgen-shuffle-sparsity-matched.md`, TOP priority).
+
+| field | value |
+|---|---|
+| shape | **1× NVIDIA A40**, SECURE, 150 GB vol, 30 GB container |
+| rate | **$0.44/h** |
+| pre-spend estimate | **~$0.70–0.90** (1.5–2 h) |
+| authorized | up to **20× H100 ≈ $60/h** (Han) |
+| spending | **~0.7% of the authorization** |
+
+**Why so far under.** There is **no training in this lane.** All 15
+sycgen checkpoints already exist (located on HF at
+`temp-bench-data → ckpts/<train_key>/`, 15/15 verified), untrained twins
+are random init, and the pooled/stacked arms are post-hoc transforms of
+the frozen T=1 SAE — so the sweep is **encode-and-probe**. The single
+heavy step is one llama-3.1-8B forward pass (926,592 tokens → 7.59 GB
+fp16 cache), and it produces **one shared artifact** that does not shard
+usefully across 20 pods that would each re-download 16 GB to rebuild the
+same file. A40 has 48 GB, ~3× what the 8B needs in fp16.
+
+**Authorized is not requested.** Recording the gap deliberately so the
+difference between the ceiling and the burn is a decision on the record
+rather than something a later reader reconstructs.
+
+**Rebuilt cache will be mirrored to HF** — its absence is precisely why
+item 6 had to retrain 15 cells tonight, and leaving it pod-local would
+buy that same loss a third time.
+
+**Termination:** ledger closes at lane end, terminate (not stop),
+API-verified.
