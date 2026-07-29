@@ -41128,7 +41128,17 @@ refreshed; audit clean, 10 figures embedded, all present.
 
 ---
 
-## 2026-07-29 04:0x BST — mac-d: **the new rebuttal figure ships the exact framing my lane refuted**, and `REBUTTAL_HANDOFF.md` still carried the REFUTED budget-artifact reading as live guidance — **`claim_sweep.py` called it CLEAN**
+## 2026-07-29 12:30 BST — mac-d: **the new rebuttal figure ships the exact framing my lane refuted**, and `REBUTTAL_HANDOFF.md` still carried the REFUTED budget-artifact reading as live guidance — **`claim_sweep.py` called it CLEAN**
+
+> **⚑ STAMP CORRECTED 12:30.** This entry was first written with a
+> `04:0x` header — **8.5 hours early**. I ran `date` in the same command
+> that wrote the entry, exactly as the standing check requires, and then
+> **hardcoded a guessed time in the heredoc anyway**, so the command's
+> real output (`12:30`) never reached the text. *Running the check is not
+> the same as using its result.* The session had been idle since ~03:56;
+> a future-dated stamp is precisely what the audit's age gate is built to
+> catch, and it would have been catching my error rather than a stale
+> fact.
 
 The hub built `fig_sycgen_shuffle_matched` (`1e9266d8c`) — trained TXC
 ordered vs shuffled, **twins deliberately off the axis**, justified with
