@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 01:16 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 02:01 BST (stamped from `date` at write time)
 
 ---
 
@@ -163,15 +163,66 @@ and orders them backwards at T=16. I scored `event_first`; the floor's
 discriminating feature is `dose_window_count(event_MASK,T)` — mask
 **width** `w`, which is why `w` is lever 3.
 
-**✅ THE WORKING SCREEN CRITERION — use this:**
-`floor_reach = P(any masked token in the trailing T window)` (my
-corrected floor law). Tracks observed `floor_excess` within
-**0.82–1.13×**; separates evalage (w=13) from retryesc_gen (w=25) by
-**~5.3× at every T**, 3 legs each, ±8%. **MINIMISE IT.** Run:
-`PYTHONPATH=. .venv/bin/python -m experiments.explorations.task_hunt.beyond_t_mass`
-(both criteria kept in the file — the falsified one is the record).
+**⚠ DEMOTED — `floor_reach` is NOT a screen. Do not use it as one.**
+`floor_reach = P(any masked token in the trailing T window)`. It tracks
+observed `floor_excess` within 0.82–1.13× **on evalage and retryesc**,
+and separates those two by ~5.3× — but the out-of-sample test on our one
+KEEP **refuted it as a predictor** (`2eb100e01`):
 
-### ⏭ THE NAMED NEXT STEP — the band's UPPER edge, unmeasured, $0
+    evalage  0.0138@T16  -> WEAK      <- ranked BEST by the criterion
+    sycgen   0.0242@T16  -> KEEP 3/3  <- the actual winner, ranked 2nd
+    retryesc 0.0732@T16  -> KILL 3/3
+
+**It is NECESSARY, NOT SUFFICIENT: a high value kills you, a low one
+buys nothing.** And **the underlying law fails on sycgen by 2.3×**
+(0.0892 predicted vs 0.2097 observed) because it assumes out-of-window ⇒
+chance, which is **false on a class-BALANCED test set** — every
+uncensored sycgen row is class 0 (`P(uncensored|class)` =
+0.2822/0/0), so predicting one class for the censored mass banks a large
+share free. Still fine as a *description* of what the floor can resolve;
+**never quote it as a candidate-quality screen.** Run:
+`PYTHONPATH=. .venv/bin/python -m experiments.explorations.task_hunt.beyond_t_mass`
+
+**✅ WHAT ACTUALLY SEPARATED THE ONE SUCCESS — ARM STRENGTH, not floor.**
+sycgen's floor is the **highest** of the three (0.5430 vs evalage 0.3905,
+chance 1/3 both) and it won anyway. Excess over chance, gemma2_2b:
+
+              tok      floor      arm    arm-floor    gain
+    sycgen  +0.196    +0.210    +0.308     +0.098   +0.1118
+    evalage +0.127    +0.057    +0.197     +0.140   +0.0709
+
+**The hunt has been lowering the floor; the one KEEP came from a better
+windowed signal.** The open question is *what makes an arm strong* — the
+**gain** side.
+
+**✅ UPPER EDGE MEASURED** (`a88132d8d`, pre-reg frozen at `d6b11068d`
+before the run). evalage gemma2_2b L14: act 0.6190, position control
+0.2171 (U2 held 7×), label_null 0.2110; recall 0.9976 → 0.8167 → 0.4952
+→ 0.4143 → **0.3714 at 1024+**, every bucket above chance ⇒ per U4
+**"horizon exceeds the measurable range"**, not a number. ⚑ **The probe
+IS the `tok` arm**, so the same retention that removes the cliff is what
+makes gain hard — **the band is ONE-SIDED**. Disclosure on record
+(`ebc752e90`): I changed pre-registered `CHANCE` 1/6→1/5 after run 1
+(the `1-3` bucket is empty by construction, w=13); under the frozen 1/6
+U3 would have squeaked at 89% of budget vs 22%. **Pre-register the RULE,
+not the literal.**
+
+### ✅ ALSO CLOSED: overnight item §5.2, the RLHF metric collision (`d18c556db`)
+
+The flag both understated and overstated it. **10 row-pairs share all
+four metrics and NINE ARE BENIGN** — same base arch under the `_btkonly`
+rename, `batch_size` 1024 on both sides. **Discriminator = `batch_size`.**
+Exactly one anomaly: `tsae_btkonly` `9147e04c9555b952` (bs=**32**) carries
+metrics byte-identical to `batchtopk_sae_btkonly` `4f20f7d8dbc3b855`
+(bs=**1024**), 73s apart; P(all four match by chance) ≈ 7.2e-08. **Also
+distrust `037faff74c387997`** — same 90s window, AUC exactly
+**0.5000000000**, a degenerate-predictor signature. Tested and refuted
+the obvious hypothesis (metric is arch-blind): 26 rows → 20 values.
+**"16 digits" is a red herring** — AUC is an exact rational
+(`54252/82355`), support 61 values in 73 rows. **Sibling metrics, not
+digit count, are the test.**
+
+### ⏭ THE OLD NEXT STEP — DONE, see UPPER EDGE above. Kept for the design note.
 
 `floor_reach` is the **lower** edge only (what the floor can resolve).
 The upper edge — **how far back the residual stream still carries a
