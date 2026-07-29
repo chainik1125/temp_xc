@@ -38158,3 +38158,59 @@ transcribed"* — and then transcribed them from my own terminal output.
 
 **Added to the standing orders' results-landing procedure**, so it runs
 when the shuffle numbers land rather than after someone notices.
+
+## 2026-07-29 01:46 BST — HUB ratifies `d18c556db`: the RLHF collision is **one real anomaly, not eight** — and **my reasoning was wrong in both directions**
+
+**Ratified in full, including both corrections to me.** I flagged this
+at 01:5x, deliberately declined to name a mechanism, and handed it over.
+mac-c took it as a $0 forensic job and closed it.
+
+**They found my flag UNDERSTATED the evidence:** the pair shares not one
+number but **all four metrics** (`auc_k20`, `auc_k50`,
+`fold_min`, `fold_max`) plus `n_pairs`, `n_valid`,
+`eval_cfg`, `data_key`, `datasource`, `evaluator_*` and seed.
+
+**And OVERSTATED the count: 10 row-pairs share all four metrics and
+NINE ARE BENIGN.** Same base architecture under the `_btkonly` rename
+(`batchtopk_sae`, and `txc_batchtopk_post` ×8), `arch_version`
+1.0.0 vs 1.1.0, **`batch_size` 1024 on both sides** — the same model
+evaluated twice under two labels. **`train_key` differs because it
+hashes the arch name**, which is exactly why "different train_key" felt
+like strong evidence to me and is not.
+
+**DISCRIMINATOR, and it is the reusable part: same base arch AND
+matching `batch_size` ⇒ benign.** Exactly **one** pair survives it —
+`tsae_btkonly` (2.1.0-port, **bs=32**) carrying metrics byte-identical
+to `batchtopk_sae_btkonly` (1.1.0, **bs=1024**), 73 s apart. **A model
+trained at bs=32 cannot produce four byte-identical statistics to one
+trained at bs=1024**, so the same-model-two-names explanation cannot
+cover it. P(all four match by chance) ≈ **7.2e-08**.
+
+**⚑ MY "16 DIGITS" FRAMING WAS THE MISLEADING PART, and they are right
+to name it.** **AUC is a rank statistic — an exact rational**
+(54252/82355, 49297/82355, 14553/23530) over 61 distinct observed values
+in 73 rows. **Exact 16-digit agreement is therefore CHEAP**, not
+"essentially impossible": my intuition was calibrated on continuous
+metrics and the metric is discrete. **The test is whether the SIBLING
+metrics agree, not how many digits match** — and the two other
+collisions match on `auc_k20` only, with siblings differing, so they
+are genuine coincidences. **I reached the right conclusion through
+reasoning that would have failed on the next case.**
+
+**They also refuted the obvious hypothesis before it could stand** —
+*"the metric does not depend on the trained dictionary"*. It does:
+grouping by (`data_key`, seed, `eval_cfg`), one group of 26 rows
+yields **20 distinct values** across archs.
+
+**ADJACENT FINDING, and it is the one to act on:** in the same 90-second
+window, all `tsae_btkonly` seed 42 — `00:30:02 → 0.5997`,
+`00:31:22 → 0.6588` (the duplicate, and **the highest value any tsae
+row produced**), `00:31:29 → 0.5000000000` **exactly**, a
+degenerate-predictor signature. **Distrust both rows from that window.**
+That the anomalous value is also the best tsae number on record is the
+detail that would have embarrassed us if a baseline had been quoted
+from it.
+
+**Closed as diagnosed. Nothing quoted depends on it; remediation is one
+row to re-run.** Left in the standing orders' open list with that
+scope so it is not re-escalated.
