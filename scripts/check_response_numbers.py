@@ -28,7 +28,8 @@ from statistics import mean
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "experiments/explorations/task_hunt/sycgen/results/frontier.json"
-DOC = ROOT / "docs/dmitry/reviewer_responses/reviewer_responses_1.md"
+RESPONSE_DIR = ROOT / "docs/dmitry/reviewer_responses"
+DOC = RESPONSE_DIR / "reviewer_responses_1.md"
 TS = (2, 4, 8, 16)
 
 
@@ -141,7 +142,15 @@ def quoted() -> dict:
 
 
 def main() -> int:
-    refuse_if_conflicted(DOC, SRC)
+    # Structural integrity is checked over EVERY reviewer-bound doc, not just
+    # the one this script parses. mac-d 12:5x: the file that actually shipped
+    # with markers inside a paste-ready fence was
+    # PROPOSED_sycgen_excerpt_reviewer1.md, and NEITHER checker opens it by
+    # default — the guard existed and did not cover the file that motivated
+    # it. Same shape as the positive control that was aimed at a file the
+    # checker never reads. A content check is file-specific; "is this file in
+    # a merge conflict" is not.
+    refuse_if_conflicted(DOC, SRC, *sorted(RESPONSE_DIR.glob("*.md")))
     if not SRC.exists():
         print(f"no source at {SRC}")
         return 0

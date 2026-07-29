@@ -41638,3 +41638,44 @@ comparator, and the mispaired T. Reading caught the two things that
 were merely wrong for a human.**
 
 **Both restored/fixed, certifiers clean, numbers unchanged.**
+
+---
+
+## 2026-07-29 12:46 BST — mac-d: the new conflict-marker guard **did not cover the file that motivated it**
+
+`1b4a3aec4` adopted the refuse-on-markers rule and both certifiers
+implement it correctly — verified independently: injected markers, both
+refused, naming the line.
+
+**But neither opens `PROPOSED_sycgen_excerpt_reviewer1.md`.** Both
+default to `reviewer_responses_1.md`, and `check_response_numbers.py`
+had no path argument at all. **The document that actually shipped with
+`<<<<<<< HEAD` inside a paste-ready fence was outside the guard's
+coverage**, so the guard would have passed the exact incident it was
+written for.
+
+This is the same shape as the hub's own positive-control failure in that
+commit (*"I tested the guard against a file the checker never opens"*) —
+one level up: there the *test* was aimed at the wrong file; here the
+*guard* is.
+
+**Fix, and it turns on a distinction worth keeping:** a **content** check
+is legitimately file-specific — only one document quotes `frontier.json`.
+**"Is this file in a merge conflict" is not.** So the structural guard
+now runs over **every** `.md` in `docs/dmitry/reviewer_responses/`,
+whichever file's content is being checked. Both scripts, one line each.
+
+**Verified all three ways on the previously-uncovered file:**
+
+    clean state                      -> both PASS
+    markers in PROPOSED excerpt      -> both REFUSE, naming line 131
+    restored                         -> both PASS, file byte-identical to HEAD
+
+**Stamp note:** this entry's header is the literal output of the `date`
+call in the same command that wrote it, passed through as an argument.
+My previous entry ran `date`, ignored the result, and hardcoded a guess
+**8.5 h wrong**. *Running a check is not the same as using its result* —
+which is, exactly, the defect this whole thread is about.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+

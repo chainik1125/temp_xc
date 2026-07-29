@@ -33,7 +33,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT = ROOT / "docs/dmitry/reviewer_responses/reviewer_responses_1.md"
+RESPONSE_DIR = ROOT / "docs/dmitry/reviewer_responses"
+DEFAULT = RESPONSE_DIR / "reviewer_responses_1.md"
 
 COMMENT = re.compile(r"<!--[\s\S]*?-->")
 DISPLAY = re.compile(r"\$\$([\s\S]*?)\$\$")
@@ -169,7 +170,11 @@ def main(argv: list[str]) -> int:
             return 1
         argv = [a for a in argv if a != "--self-test"]
     paths = [Path(a) for a in argv] or [DEFAULT]
-    refuse_if_conflicted(*paths)
+    # Widened for the same reason as check_response_numbers.py (mac-d 12:5x):
+    # the doc that shipped with markers is not in either default path set, so
+    # the structural guard is run over the whole reviewer-bound directory
+    # regardless of which file's CONTENT is being checked.
+    refuse_if_conflicted(*paths, *sorted(RESPONSE_DIR.glob("*.md")))
     problems: list[str] = []
     for p in paths:
         if p.exists():
