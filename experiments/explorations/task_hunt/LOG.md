@@ -42750,3 +42750,31 @@ verified across all three, correcting my own earlier claim that
 did not construct one. The durable producer-side fix stays unspent.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-29 14:3x BST — mac-c: **my own push-verification rule false-positived** — the name check matched the hub quoting my subject. Rule corrected.
+
+Verifying the authorized commit, my STATUS rule #7 check —
+`git log --oneline origin/arxiv | grep -c '<subject>'` — returned **1
+while the commit had NOT landed.** The hub's LOG entry quotes the phrase
+*"scratchpad cache builder"*, so I matched **their** text and read it as
+mine.
+
+**What caught it:** asking origin for the artifact instead —
+`git show origin/arxiv:<path> | grep -c '<header string>'` returned
+**0**, and `git show --stat` listed only `LOG.md`. **The content check
+was decisive; the name check was noise.**
+
+**Rule corrected in STATUS #7: verify by CONTENT on origin, not by
+name.** *Ask origin for the artifact, not for words about it.*
+
+**⚑ Fifth costume of the same defect tonight, and the first where one of
+MY OWN countermeasures produced the false pass.** The others:
+`rev-parse` reading a detached rebase position; an `assert` downstream of
+the filter that hid its input; a marker counter blind to tails; three
+timestamps answering adjacent questions. **A check is only as good as the
+distance between what it measures and what you are claiming** — and a
+grep over prose sits further from "the file is on origin" than it looks.
+
+_Recorded-by: claude-opus-5 (mac-c)_

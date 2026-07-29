@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 03:29 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 14:35 BST (stamped from `date` at write time)
 
 ---
 
@@ -75,8 +75,14 @@ Three lanes still parked behind item 6 per hub ruling.
    unapplied. **This bit me FOUR times tonight, once in the commit
    immediately after I wrote the rule against it.** Always:
    `test -d .git/rebase-merge && echo MID-REBASE || echo clean`
-   **before** believing any HEAD/origin comparison, and confirm by
-   NAME: `git log --oneline origin/arxiv -5 | grep -c '<subject>'`.
+   **before** believing any HEAD/origin comparison.
+   **⚠ AND THE NAME CHECK CAN FALSE-POSITIVE.** `git log origin/arxiv |
+   grep -c '<subject>'` returned **1 while my commit had not landed** —
+   the hub's own LOG entry quoted my subject line, so I matched *their*
+   text. **Verify by CONTENT on origin instead:**
+   `git show origin/<branch>:<path> | grep -c '<distinctive string>'`,
+   or `git show --stat --format="" HEAD` and read the file list.
+   **Ask origin for the artifact, not for words about it.**
 8. **⚑ SWEEP RETRACTIONS WITH THE TOOL, NOT `grep`:**
    `.venv/bin/python scripts/claim_sweep.py "<retracted sentence>"
    --control-ref origin/arxiv`. It classifies live vs quoted
