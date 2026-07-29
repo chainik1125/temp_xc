@@ -78,13 +78,19 @@ makes the negative stronger:
 The twin loses **76–79%** of its recovery to shuffling at T=2/4/8;
 the trained model loses **4.5–22%**.
 
-**Budget confound, disclosed:** the twin runs at `l0`=8.00 (every
-`k_pos` slot live) against the trained model's 5.44–7.86, i.e. up
-to **1.47×** the budget, which plausibly inflates the twin's gap.
-The confound is smallest at **T=16 (1.02–1.03×)** — and that is
-exactly where the twin gate is least decisive (mean favours the
-trained model, but only **1/3 seeds** agree, so the pre-registered
-3/3 sign test fails).
+**Budget confound — raised here, RESOLVED in §2c. Do not read this
+paragraph alone.** The twin runs at `l0`=8.00 (every `k_pos` slot
+live) against the trained model's 5.44–7.86, i.e. up to **1.47×**
+the budget, which *could* inflate the twin's gap. The confound is
+smallest at **T=16 (1.02–1.03×)** — exactly where the twin gate is
+least decisive (mean favours the trained model, but only **1/3
+seeds** agree, so the pre-registered 3/3 sign test fails).
+
+**§2c re-ran the twin at matched budget and this is NOT the**
+**mechanism.** The paragraph above states a hypothesis that was
+then tested and refuted; it is kept because the reasoning that
+motivated the control belongs in the record, not because the
+worry survives.
 
 ### 2c. CONTROL: the twin re-run at the trained model's budget
 

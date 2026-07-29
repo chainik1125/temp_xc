@@ -117,11 +117,20 @@ exactly as it applies to the level:**
   cheapest point **above** TXC's measured budget, and **interpolate to
   TXC's exact `l0`** (primary). Monotonicity of the arm in budget is a
   **precondition, printed as a receipt** — not assumed.
-- **Sweep k finely enough to bracket tightly.** **[AMD]** `K_SWEEP` is
+- ~~**Sweep k finely enough to bracket tightly.** **[AMD]** `K_SWEEP` is
   therefore widened from item 6's `(1,2,4,8,16,32)` to include
   intermediate points — *a tight bracket is worth more pod-minutes than
   another seed*, and here it is nearly free (encode-and-probe, no
-  training).
+  training).~~
+  **⚑ SUPERSEDED — see §5 [AMD2]. THE CODE THAT RAN USED THE 6-POINT
+  GRID `(1,2,4,8,16,32)`.** The hub measured the grid and **withdrew**
+  this guidance (the nearest existing point is already within 1.4–7.7%
+  of TXC's budget at T=2/4/8; at T=16 refinement is impossible because
+  the arm's floor is above TXC). Struck rather than deleted, because a
+  frozen card whose text contradicts the code that ran is worse than a
+  visible correction — the rest of §2b (bracket both sides, state the
+  width, report a disagreement, print the ratio) **remains fully in
+  force and was applied.**
 - **State the bracket width** in the results table.
 - **If the two ends disagree, that IS the finding — report it, do not
   pick.**
@@ -396,6 +405,25 @@ which n is kinder to the claim:**
 - Extra seeds are trained under a **distinct tag** and disclosed as
   **later-trained than the original three** — same rebuilt-cache
   provenance (§7), one more generation removed from pod-D's originals.
+
+> **⚑ OUTCOME, stated because this section required it: THE n=5
+> EXTENSION WAS NOT RUN. The delivered verdict is n=3.**
+>
+> Seeds 3 and 4 were never trained. The clause above says *"If they do
+> not, n=3 stands and the shortfall is stated"* — this is that
+> statement, and it is recorded here rather than left as a silently
+> unmet intention.
+>
+> **What the shortfall costs:** outcome **(d)** remains **unsized** —
+> the very gap the hub named when it redirected spend from a sixth `k`
+> to seeds. At n=3 the noise band is a heuristic and the sign test is
+> 3/3-or-nothing, which is exactly why **T=8 and T=16 come back
+> INDETERMINATE** in the twin-matched control (2/3 seeds). **A 5-seed
+> run is the single highest-value follow-up for this lane**, and the
+> cells it needs are 10 trainings (8 TXC + 2 SAE) on the rebuilt cache.
+>
+> The T=2/T=4 results, which carry verdict (b), are **3/3** and do not
+> depend on the extension.
 
 Trained arms load the 15 existing checkpoints. **No training in this
 lane.**

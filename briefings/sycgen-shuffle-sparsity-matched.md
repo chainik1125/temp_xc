@@ -101,10 +101,21 @@ went from above 3/4 to above 2/4.**
   the cheapest point **above** TXC's measured budget, and interpolate
   to TXC's exact `l0`. A verdict from one side of a coarse grid is not
   a matched-budget verdict.
-- **Sweep k finely enough to bracket tightly.** Add intermediate k
+- ~~**Sweep k finely enough to bracket tightly.** Add intermediate k
   where the grid straddles TXC's budget — cheap, and it is the
   difference between a defensible number and an artifact. **A tight
-  bracket is worth more pod-minutes than another seed.**
+  bracket is worth more pod-minutes than another seed.**~~
+  **⚑ WITHDRAWN by the hub (`5c2be589a`) — struck by mac-d, hub text
+  otherwise untouched.** The hub measured the grid
+  (`scripts/plan_bracket_grid.py`, $0) and found it **already tight**:
+  the nearest existing point is within **1.4–7.7%** of TXC's budget at
+  T=2/4/8, and at T=16 refinement is *impossible* because the arm's
+  floor sits above TXC. Item 6's bias was **selection, not coverage**.
+  **The run used the unchanged 6-point grid `(1,2,4,8,16,32)`.** Struck
+  because this bullet was still the only live copy of the withdrawn
+  guidance and would have sent the next reader to spend on a sixth `k`
+  — the hub's own redirect was *spend on seeds instead*. **The rest of
+  §2b stands and was applied in full.**
 - **State the bracket width** in the card. If the two ends give
   different verdicts, that IS the finding — report it, do not pick.
 - This applies to the **gap** as much as the level: a gap difference at
