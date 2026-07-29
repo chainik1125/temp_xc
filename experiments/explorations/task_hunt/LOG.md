@@ -37256,3 +37256,80 @@ reusing `count_conflict_markers`, the production predicate with
 `startswith` that I had extracted an hour earlier **for exactly this
 purpose**. Too-loose and too-hollow are the same defect: **a check
 whose output does not depend on the thing it claims to measure.**
+
+## 2026-07-29 01:07 BST — ⚑⚑ HUB: mac-c's ESCAPE-vs-BEAT distinction is the right tool — **and applied to my counterexample it REVERSES their ranking. The timing family is the non-vacuous one.**
+
+**`2785af115` ratified, including the self-catch.** mac-c proposed a
+$0 test — assign K=2 synthetic types, check the floor sits at chance
+on the type label — then found **it cannot fail**: the floor's two
+features do not take type as input, so with type independent of timing
+no probe on them can exceed base rate. **They measured it anyway
+because "a *cannot* deserves a number"** (oracle majority per distinct
+feature-cell = upper bound over ALL probes; 61 cells, oracle 0.5105 vs
+base rate 0.5079 — chance). **They had pre-registered a falsifier for a
+test whose outcome was fixed by the shape of its inputs**, which would
+have dressed a content-free confirmation in the apparatus of a sound
+result. Same species as the pooled-shuffle identity, caught in the
+document explaining why the hunt mis-aims.
+
+**THEIR BINDING CORRECTION IS THE SHARPEST CONCEPT OF THE NIGHT:**
+
+> **A type-based label does not BEAT the floor, it ESCAPES it — and an
+> escaped control is not a passed control.**
+
+If the floor structurally cannot express the label, clearing it is
+free. So a type-based candidate needs a **TYPE-AWARE floor built before
+any KEEP means anything**, else the screen silently loses the clause
+doing all the killing.
+
+## ⚑ NOW CROSS THAT WITH `41281e0eb`, AND THE RANKING INVERTS
+
+mac-c sharpened §6 from "promising" to **"the only non-vacuous
+family"**. **Their own distinction says the opposite.** Sort both
+families by it:
+
+| family | is the floor EXPRESSIVE for this label? | what a pass means |
+|---|---|---|
+| **timing** (sycgen) | **YES** — `sage_floor` is the censored age, the label's own statistic | **sycgen BEAT it** 3/3 (+0.073/+0.098/+0.107) — **a PASSED control, the strongest kind** |
+| **type** (proposed) | **NO** — type is not an input | a pass is an **ESCAPE**; means nothing until a type-aware floor exists |
+
+**The timing family is the one with a passed control. The type family
+is the one that cannot produce a sound verdict until new apparatus is
+built.** Under mac-c's own criterion, **sycgen is the non-vacuous
+result and the type family is the one currently unable to generate
+one.**
+
+**This does not sink the type family** — it is genuinely promising, and
+mac-c's honest framing of the no-textual-trace case is right: where the
+type has no textual trace, a *visible-evidence* floor at chance **is**
+the correct answer to "what could a text-only observer get", namely
+nothing. **But that is a statement about a different control**, and it
+should be built and named as one rather than inherited from the floor
+it escaped.
+
+**AND THE TIMING FAMILY IS NOT EXHAUSTED, which was the original
+claim.** `sage_floor` censors at **T+1** (verified,
+`gen4c_lib.py:115`), so the winnable mass is exactly the windows whose
+event is **older than T**. That is measurable on existing corpora, it
+is **not** tautological — it can come out either way — and it is the
+screen criterion the hunt has lacked. **Sort candidates by beyond-T
+mass before generating anything.**
+
+## THE REAL OPEN QUESTION IS THE ONE THEY NAMED, AND IT IS ON THE GAIN SIDE
+
+*Does a WINDOWED arm beat a PER-TOKEN arm on "type of most recent
+event"?* **A per-token probe reads an activation that has already
+attended over the whole prefix**, so it may carry the last event's type
+with no windowing at all — which is how `tok` has beaten expectations
+before. **Unmeasured, needs real activations, carries its own
+falsifier.** This is the ambience question in its sharpest form, and it
+applies to the type family **exactly as hard as the floor question
+applies to the timing family**: each family has one bar that is easy
+for it and one that is not, and **we have been checking the easy one in
+both cases.**
+
+**STANDING RULE, promoted from mac-c's sentence because it generalises
+past this lane: before recording that a candidate PASSED a control, ask
+whether the control could have EXPRESSED the failure.** A control that
+structurally cannot represent the thing it guards against has not been
+passed — it has been sidestepped, and the pass is worth nothing.
