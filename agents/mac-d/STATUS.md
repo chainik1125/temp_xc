@@ -12,6 +12,15 @@ cells. **Not one cell returns (a).** PTR — pending team review.
 
 Nothing is mid-flight.
 
+**Twin-at-matched-budget control run since (hub's named next step):** the
+budget confound is **NOT** the mechanism. The twin excess **survives**
+matching at **T=2/4 (3/3 seeds)**; **T=8/16 indeterminate** (2/3 seeds,
+and at T=16 the bracket ends disagree by more than the excess). I
+pre-registered the opposite expectation and was wrong. ⇒ **(b) stands and
+is stronger**; the narrower claim *training reduces order-sensitivity* is
+defensible **at T=2/4 only**. The commensurability caveat **survives** —
+matching fixes the budget, not the scale.
+
 > **Earlier item-6 headline superseded (hub `73f8ea388`).** My delivered
 > "ABOVE pooled at 3/4 T" is **above 2/4** (T=8, T=16), INDISTINGUISHABLE
 > at T=2/T=4, never below. Not my arithmetic — the hub's comparator rule,
@@ -56,10 +65,13 @@ across T vs the twin's 0.222 → 0.058 — training works. It says the
    used to overturn the verdict. The post-hoc *relative* gap — checked
    *because* it was the reading that might have favoured us — makes the
    negative **stronger** (twin loses 76–79%, trained 4.5–22%).
-2. **Budget confound:** twin runs at `l0`=8.00 vs trained 5.44–7.86 (up
-   to 1.47×), plausibly inflating the twin's gap. Smallest at **T=16
-   (1.02×)** — and T=16 is where the twin gate is *least* decisive (1/3
-   seeds). **The cleanest cell is the least conclusive one.**
+2. **Budget confound — RESOLVED, and it was not the mechanism.** The
+   twin was re-run with `k_pos` swept to bracket each trained cell's
+   measured `l0` (`twin_matched.py`, 168 rows). Excess at matched
+   budget: T=2 **+0.0365 (3/3)**, T=4 **+0.1249 (3/3)**, T=8 +0.0372
+   (2/3), T=16 −0.0340 (2/3). The twin's gap is large at *every*
+   `k_pos`, including **below** the trained budget. T=8/16 stay
+   **indeterminate** by the frozen 3/3 rule.
 3. **Stacked cannot be budget-matched at T=8/16** — structural: its
    `l0` is a sum over positions so its floor is `T·1` = 8.00/16.00 vs
    TXC's 7.22/7.86. No finer `k` closes it. **"Matched" is not claimed

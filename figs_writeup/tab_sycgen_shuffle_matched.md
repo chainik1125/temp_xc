@@ -86,6 +86,43 @@ exactly where the twin gate is least decisive (mean favours the
 trained model, but only **1/3 seeds** agree, so the pre-registered
 3/3 sign test fails).
 
+### 2c. CONTROL: the twin re-run at the trained model's budget
+
+The confound above is not merely disclosed — it was **removed**.
+The hub cross-checked it against the effect and found it *tracked*
+(Spearman +0.80; excess reversing at T=16), so the twin was re-run
+with its `k_pos` swept to **bracket each trained cell's measured**
+**`l0`** and interpolated to ratio **1.000** (`twin_matched.py`,
+frozen before running, 168 rows).
+
+| T | twin excess @ matched budget | twin > trained | bracket-end disagreement |
+|---|---|---|---|
+| 2 | +0.0365 | **3/3** | 0.036 |
+| 4 | +0.1249 | **3/3** | 0.014 |
+| 8 | +0.0372 | **2/3** | 0.022 |
+| 16 | -0.0340 | **2/3** | 0.052 |
+
+**The excess SURVIVES budget matching at T=2 and T=4 (3/3 seeds).**
+The twin's gap is large at *every* `k_pos` swept, including
+settings **below** the trained model's budget — at T=2 seed 2 the
+twin at `l0`=3.00 gives **+0.1318** against the trained model's
+**+0.0550** at `l0`=5.89. **A budget artifact cannot look like**
+**that**, so the confound is not the mechanism.
+
+**T=8 and T=16 are INDETERMINATE, not supporting:** only 2/3 seeds,
+failing the pre-registered 3/3 sign test, and at T=16 the
+**bracket ends disagree by more than the excess itself**. The
+twin's T=16 gap bounces between −0.056 and +0.094 with no trend —
+noise around zero, which is what a model with 0.058 ordered
+recovery should produce.
+
+⇒ **(b) stands and is stronger.** The narrower claim that
+**training reduces order-sensitivity** is defensible **at T=2 and
+T=4 only**, and is not generalised across T.
+
+**The commensurability caveat (§2b) SURVIVES this control.**
+Matching fixes the *budget*, not the *scale*.
+
 ## 3. TXC vs STACKED — the pre-registered comparator
 
 | T | TXC `l0` | TXC gap | stacked floor (k=1) | ratio | matched? |

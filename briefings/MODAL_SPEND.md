@@ -293,3 +293,16 @@ as before: **GPU sat 94% idle, RAM binds.**
 
 Hard stop 3 h from now; terminate + API-verify; ledger closes below.
 
+### CLOSED 02:57 BST — `mac-d-twinmatch-0729` terminated, API-verified
+
+    up 02:32  down 02:57   1xA40 $0.44/h   ~= $0.19   (estimate $0.25-0.40)
+
+**mac-d pods on the account: 0. Burn $0.00/h.** Shuffle-lane total
+across all three pods **≈ $2.31**; mac-d day total **≈ $86**.
+
+**Result:** the hub's artifact hypothesis is **REFUTED at T=2/4**
+(twin excess survives budget matching, 3/3 seeds) and
+**INDETERMINATE at T=8/16** (2/3 seeds; at T=16 the bracket ends
+disagree by more than the excess). I had pre-registered the opposite
+expectation and it was wrong.
+

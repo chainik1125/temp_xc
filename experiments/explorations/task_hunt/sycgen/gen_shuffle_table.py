@@ -152,6 +152,69 @@ def main() -> int:
     A("3/3 sign test fails).")
     A("")
 
+    A("### 2c. CONTROL: the twin re-run at the trained model's budget")
+    A("")
+    A("The confound above is not merely disclosed — it was **removed**.")
+    A("The hub cross-checked it against the effect and found it *tracked*")
+    A("(Spearman +0.80; excess reversing at T=16), so the twin was re-run")
+    A("with its `k_pos` swept to **bracket each trained cell's measured**")
+    A("**`l0`** and interpolated to ratio **1.000** (`twin_matched.py`,")
+    A("frozen before running, 168 rows).")
+    A("")
+    tw = HERE / "results" / "twin_matched.json"
+    if tw.exists():
+        trows = json.loads(tw.read_text())["rows"]
+
+        def brk(c, t):
+            b = [x for x in c if x["l0"] <= t]
+            a = [x for x in c if x["l0"] > t]
+            lo = max(b, key=lambda z: z["l0"]) if b else None
+            hi = min(a, key=lambda z: z["l0"]) if a else None
+            if lo and hi and hi["l0"] > lo["l0"]:
+                w = (t - lo["l0"]) / (hi["l0"] - lo["l0"])
+                return lo["gap"] + w * (hi["gap"] - lo["gap"]), abs(hi["gap"] - lo["gap"])
+            c2 = lo or hi
+            return c2["gap"], 0.0
+
+        A("| T | twin excess @ matched budget | twin > trained | bracket-end disagreement |")
+        A("|---|---|---|---|")
+        for T in TS:
+            es, ds = [], []
+            for s in SEEDS:
+                tr = [r for r in trows if r["arm"] == "txc_trained" and r["T"] == T
+                      and r["seed"] == s and r["draw"] == "redraw"][0]
+                cs = [{"l0": r["realized_l0_per_window_ordered"],
+                       "gap": r["gap_fixedprobe"]}
+                      for r in trows if r["arm"] == "txc_twin" and r["T"] == T
+                      and r["seed"] == s and r["draw"] == "redraw"]
+                g, d = brk(cs, tr["realized_l0_per_window_ordered"])
+                es.append(g - tr["gap_fixedprobe"])
+                ds.append(d)
+            n = sum(1 for e in es if e > 0)
+            A(f"| {T} | {st.mean(es):+.4f} | **{n}/3** | {st.mean(ds):.3f} |")
+        A("")
+    A("**The excess SURVIVES budget matching at T=2 and T=4 (3/3 seeds).**")
+    A("The twin's gap is large at *every* `k_pos` swept, including")
+    A("settings **below** the trained model's budget — at T=2 seed 2 the")
+    A("twin at `l0`=3.00 gives **+0.1318** against the trained model's")
+    A("**+0.0550** at `l0`=5.89. **A budget artifact cannot look like**")
+    A("**that**, so the confound is not the mechanism.")
+    A("")
+    A("**T=8 and T=16 are INDETERMINATE, not supporting:** only 2/3 seeds,")
+    A("failing the pre-registered 3/3 sign test, and at T=16 the")
+    A("**bracket ends disagree by more than the excess itself**. The")
+    A("twin's T=16 gap bounces between −0.056 and +0.094 with no trend —")
+    A("noise around zero, which is what a model with 0.058 ordered")
+    A("recovery should produce.")
+    A("")
+    A("⇒ **(b) stands and is stronger.** The narrower claim that")
+    A("**training reduces order-sensitivity** is defensible **at T=2 and")
+    A("T=4 only**, and is not generalised across T.")
+    A("")
+    A("**The commensurability caveat (§2b) SURVIVES this control.**")
+    A("Matching fixes the *budget*, not the *scale*.")
+    A("")
+
     A("## 3. TXC vs STACKED — the pre-registered comparator")
     A("")
     A("| T | TXC `l0` | TXC gap | stacked floor (k=1) | ratio | matched? |")
