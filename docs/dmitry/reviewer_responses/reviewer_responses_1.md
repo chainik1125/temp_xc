@@ -245,33 +245,30 @@ and the label at each position is the number of tokens since the user last
 challenged it. A probe on one token's activation still recovers part of it, as
 the residual stream has attended over the prefix, so the baselines here are not
 blind: they read the same activations, and the question is whether the window
-adds anything at matched sparsity. We compare the TXC against a pooled
-SAE (the mean of the per-token codes across the window) and a stacked SAE (the
-same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
-and read each one off at the sparsity the TXC actually uses. Three seeds;
-Llama-3.1-8B, layer 14, $d_{\text{SAE}}=2048$. A per-token SAE reaches $0.482$.
+adds anything at matched sparsity.
 
-$$
-\begin{array}{l|cccc}
-\hline
-\text{Architecture} & T{=}2 & T{=}4 & T{=}8 & T{=}16 \\
-\hline
-\text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\
-\text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\
-\hline
-\text{TXC} & \mathbf{0.499} & \mathbf{0.523} & \mathbf{0.536} & \mathbf{0.577} \\
-\hline
-\text{TXC } L_0/\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\
-\hline
-\end{array}
-$$
+We compare the TXC against a pooled SAE (the mean of the per-token codes across
+the window) and a stacked SAE (the same codes concatenated). We sweep k for both
+baselines and read each one off at the sparsity the TXC actually uses. Three
+seeds; Llama-3.1-8B, layer 14, dictionary size 2048. A per-token SAE reaches
+0.482.
 
-The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
-$T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
-$T{=}4$ the margin over the pooled SAE is smaller than the variation across
-seeds. Starred entries are baselines that cannot run as sparsely as the TXC,
-so they are read off at a higher sparsity and the comparison favours them. The
-stacked SAE's drop at $T\ge8$ comes from its input growing to $T\cdot d_\text{SAE}$, not from the architecture.
+**Recovery at matched sparsity** (asterisks explained below):
+
+| Architecture | T = 2 | T = 4 | T = 8 | T = 16 |
+| :--- | ---: | ---: | ---: | ---: |
+| Pooled SAE | 0.485 | 0.488 | 0.467 | 0.486* |
+| Stacked SAE | 0.468 | 0.412 | 0.149* | 0.314* |
+| **TXC** | **0.499** | **0.523** | **0.536** | **0.577** |
+| TXC L0 per window | 5.66 | 6.35 | 6.94 | 7.82 |
+
+The TXC improves with window size, from 0.499 at T = 2 to 0.577 at T = 16, and
+is above both baselines at every window size; at T = 2 and T = 4 the margin over
+the pooled SAE is smaller than the variation across seeds. Starred entries are
+baselines that cannot run as sparsely as the TXC, so they are read off at a
+higher sparsity and the comparison favours them. The stacked SAE's drop from
+T = 8 comes from its input growing to T times the dictionary size, not from the
+architecture.
 
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
@@ -359,33 +356,30 @@ and the label at each position is the number of tokens since the user last
 challenged it. A probe on one token's activation still recovers part of it, as
 the residual stream has attended over the prefix, so the baselines here are not
 blind: they read the same activations, and the question is whether the window
-adds anything at matched sparsity. We compare the TXC against a pooled
-SAE (the mean of the per-token codes across the window) and a stacked SAE (the
-same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
-and read each one off at the sparsity the TXC actually uses. Three seeds;
-Llama-3.1-8B, layer 14, $d_{\\text{SAE}}=2048$. A per-token SAE reaches $0.482$.
+adds anything at matched sparsity.
 
-$$
-\\begin{array}{l|cccc}
-\\hline
-\\text{Architecture} & T{=}2 & T{=}4 & T{=}8 & T{=}16 \\\\
-\\hline
-\\text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\\\
-\\text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\\\
-\\hline
-\\text{TXC} & \\mathbf{0.499} & \\mathbf{0.523} & \\mathbf{0.536} & \\mathbf{0.577} \\\\
-\\hline
-\\text{TXC } L_0/\\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\\\
-\\hline
-\\end{array}
-$$
+We compare the TXC against a pooled SAE (the mean of the per-token codes across
+the window) and a stacked SAE (the same codes concatenated). We sweep k for both
+baselines and read each one off at the sparsity the TXC actually uses. Three
+seeds; Llama-3.1-8B, layer 14, dictionary size 2048. A per-token SAE reaches
+0.482.
 
-The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
-$T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
-$T{=}4$ the margin over the pooled SAE is smaller than the variation across
-seeds. Starred entries are baselines that cannot run as sparsely as the TXC,
-so they are read off at a higher sparsity and the comparison favours them. The
-stacked SAE's drop at $T\\ge8$ comes from its input growing to $T\\cdot d_\\text{SAE}$, not from the architecture.
+**Recovery at matched sparsity** (asterisks explained below):
+
+| Architecture | T = 2 | T = 4 | T = 8 | T = 16 |
+| :--- | ---: | ---: | ---: | ---: |
+| Pooled SAE | 0.485 | 0.488 | 0.467 | 0.486* |
+| Stacked SAE | 0.468 | 0.412 | 0.149* | 0.314* |
+| **TXC** | **0.499** | **0.523** | **0.536** | **0.577** |
+| TXC L0 per window | 5.66 | 6.35 | 6.94 | 7.82 |
+
+The TXC improves with window size, from 0.499 at T = 2 to 0.577 at T = 16, and
+is above both baselines at every window size; at T = 2 and T = 4 the margin over
+the pooled SAE is smaller than the variation across seeds. Starred entries are
+baselines that cannot run as sparsely as the TXC, so they are read off at a
+higher sparsity and the comparison favours them. The stacked SAE's drop from
+T = 8 comes from its input growing to T times the dictionary size, not from the
+architecture.
 
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
