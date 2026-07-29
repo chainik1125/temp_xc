@@ -39668,3 +39668,49 @@ the pattern is live and the 0 means clean.**
 (`floor_excess`, "at chance", now this), **and the first where the
 control itself was invalidated by my own fix.** Git history is the
 natural control surface: it always holds the pre-fix state.
+
+## 2026-07-29 02:33 BST — HUB ratifies `1a2aa4905`: the twin-at-matched-budget control, frozen before running — **and mac-d pre-commits to the outcome that weakens their own verdict**
+
+**Ratified.** They took the cross-check on their own disclosed confound
+and drew the right conclusion: *"the confound has to be REMOVED, not
+disclosed."* **That is the correct escalation** — I had ruled only that
+it be carried at equal prominence, which leaves the reader to
+adjudicate; removing it answers the question instead.
+
+**⚑ THEY STATE THE EXPECTED OUTCOME AGAINST THEMSELVES:** *"given +0.80
+and the T=16 reversal I expect (ii)"* — where **(ii) is the outcome in
+which their own verdict survives only in its weak form** and *"the
+claim that training REDUCES order-sensitivity is WITHDRAWN not
+softened."* **Third time tonight an agent has pre-committed to the
+result that costs them**, and the phrasing matters: **"withdrawn, not
+softened"** closes the escape hatch where a refuted claim survives as a
+hedge.
+
+**AND THEY FENCE OFF WHAT THE RE-RUN CANNOT RESCUE**, stated in advance
+*"so the run cannot be read as a do-over"*: **the gap is not evidence
+of LEARNED temporal structure — a random model produces a gap of the
+same order — and that half of (b) stands regardless of what this
+returns.** **Naming which part of a conclusion is immune to a new
+measurement, before taking it, is what stops a control becoming a
+second attempt at a better answer.**
+
+**(iii) mixed ⇒ reported per T, never aggregated into a headline** —
+the same no-pooling discipline mac-c fixed for the amplifier test an
+hour ago, arrived at independently.
+
+**⚑ ONE DESIGN NOTE, and it is tonight's own standing check:
+``matched'' must be MEASURED, not assumed.** The twin sits at
+`l0`=8.00 because every `k_pos` slot is live; matching it to the
+trained model's **5.44–7.86** means constraining its `k` at eval.
+**Report the twin's realized `l0` per cell beside the trained
+model's, and print the ratio.** If it is not ≈1.0, "matched" has not
+been earned — **that check is exactly what turned item 6's "above 3/4"
+into "above 2/4", and this run exists because a budget ratio of 1.47×
+went unexamined.** A control introduced to remove a budget confound
+must not inherit one.
+
+**Cost/venue:** pods are down and agent burn is $0/h. **If this needs a
+pod, standing orders §1 apply unchanged** — ≤8 GPUs without approval,
+pre-spend posted above that, hard stop 3 h after pod-up, terminate and
+API-verify. **The lane's own precedent is $2.12 for 624 rows, so this
+should be small.**
