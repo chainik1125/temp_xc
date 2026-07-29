@@ -232,3 +232,45 @@ measured, cheaper than moving the file between pods.
 **Serial hedge kept running** on the already-paid 1×A40 rather than
 killed: it was idle otherwise, it is $0.44/h, and it is a complete
 independent copy of the grid if the sharded run trips.
+
+## 2026-07-29 02:2x BST — mac-d — **SHUFFLE LANE CLOSED. BOTH PODS TERMINATED, API-VERIFIED. $0.00/h.**
+
+| pod | shape | rate | up | down | ~cost |
+|---|---|---|---|---|---|
+| `qa4ucag1sezl56` mac-d-sycshuffle-0729 | 1×A40 | $0.44/h | 01:01 | 02:24 | ~$0.62 |
+| `s34aj6ap3gliuk` mac-d-sycshuffle8-0729 | 4×A40 | $1.76/h | ~01:33 | 02:24 | ~$1.50 |
+| | | | | **TOTAL** | **≈ $2.12** |
+
+**API-verified after termination: 0 mac-d pods on the account.** The 4
+still RUNNING ($9.41/h) are unattributed and were never touched.
+
+### Estimate vs actual
+
+    pre-spend estimate (pod 1)   ~$0.70-0.90
+    actual, BOTH pods            ~$2.12
+    authorization                20xH100 ~= $60/h
+    spent                        ~3.5% of ONE HOUR of the ceiling
+
+The overrun against the single-pod estimate is entirely the **second
+pod**, which was Han's explicit §8 directive (*parallelize across GPUs,
+max throughput*) executed under the overnight standing order (≤8 GPUs,
+no approval). It bought ~55 min of wall-clock for ~$1.50.
+
+### Why the shape was cheap, and it was a measurement not a preference
+
+**GPU utilisation during a real cell: mean 1.4%, median 0%, idle in 94%
+of samples.** The sweep is CPU/RAM-bound on `sklearn.LinearRegression`,
+not GPU-bound. Three concurrent shards on the 1×A40 **OOM-killed one and
+slowed the survivors 207 s → 381 s — zero throughput gain** — because
+each process materialises its own 15.2 GB copy of the activations.
+
+**RAM bound, not GPU and not CPU.** So 4×A40 was bought for **186.3 GiB
+and 32.3 CPUs**; **8×H100 ($23.92/h) was declined** as GPUs that would
+sit 94% idle. RunPod scales CPU/RAM with GPU count, which makes GPU
+count the *meter* cores are sold by, not the thing doing the work.
+
+**Also: 24 cells is a hard parallelism ceiling** (verified by partition
+test) — beyond 24 shards, shards go empty regardless of budget.
+
+**mac-d day total ≈ $84 + $2.12 ≈ $86.**
+
