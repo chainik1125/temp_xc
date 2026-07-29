@@ -256,6 +256,13 @@ is **not** machine count; plan concurrency accordingly.
 **NO PODS RUNNING. $0.00/h — agent and unattributed alike.** Every pod
 from the overnight, ours and Dmitry's, has been terminated.
 
+    total $0.00/h   ours $0.00/h   unattributed $0.00/h
+
+(mac-d re-queried independently at 14:08 and agrees. The stamp this
+replaced read *"1 RUNNING, $0.00/h"* — **internally contradictory**; a
+running pod cannot cost $0.00/h. The age gate caught the staleness, not
+the contradiction. Reasoning in the LOG.)
+
 **⚑ `stacked-em-steer` ran reviewer 1's Stacked-SAE-on-EM baseline and
 has finished — the quoted EM figures may have moved; check before
 freezing that section** (hub watch, LOG 02:5x).

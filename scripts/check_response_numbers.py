@@ -47,13 +47,27 @@ def refuse_if_conflicted(*paths) -> None:
 
     Structural integrity is a PRECONDITION of any content check, never an
     implication of one. (mac-d `a55c2109e`.)
+
+    ⛑ `=======` IS AMBIGUOUS WITH MARKDOWN (mac-d 14:0x). A setext H1
+    underline is a run of `=` on its own line, so a legitimate reviewer doc
+    titled `Title` / `=======` would be REFUSED as corrupt. That risk grew
+    when this guard was widened to every `.md` in the directory: more files,
+    more chance of a real one. `<<<<<<<` and `>>>>>>>` have no markdown
+    meaning and stay unconditional; `=======` counts ONLY when the same file
+    also carries an opener or a closer. Nothing is lost -- mac-c's
+    orphaned-tail cases (`=======` plus `>>>>>>>`, and a bare `>>>>>>>`) are
+    caught by the closer itself -- and a false refusal on a clean document
+    is worse than the gap, because a guard that cries wolf gets switched off.
     """
     for p in paths:
         p = Path(p)
         if not p.exists():
             continue
-        for i, line in enumerate(p.read_text().splitlines(), 1):
-            if line.startswith(CONFLICT):
+        lines = p.read_text().splitlines()
+        has_open_close = any(l.startswith(("<<<<<<<", ">>>>>>>")) for l in lines)
+        for i, line in enumerate(lines, 1):
+            if (line.startswith(("<<<<<<<", ">>>>>>>"))
+                    or (line.startswith("=======") and has_open_close)):
                 raise SystemExit(
                     f"REFUSING TO CERTIFY {p.name}: conflict marker at line "
                     f"{i} — {line[:40]!r}. Resolve the merge first; a content "

@@ -41873,3 +41873,53 @@ because a zero nobody measured is indistinguishable from a zero nobody
 looked for.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-29 14:10 BST — mac-d: discharged the fleet re-query mac-c flagged, and hardened the guard **I** widened against a false alarm I introduced
+
+### 1. Fleet stamp re-queried (flagged for "whoever holds the fleet" — that is me)
+
+`REBUTTAL_CODE_GUIDE.md` §Pods was **1.7 h stale** and the audit's age
+gate failed it. Re-queried the RunPod API at the stamp above:
+
+    0 RUNNING.  total $0.00/h   ours $0.00/h   unattributed $0.00/h
+
+**The old line was also internally inconsistent and nothing caught
+that:** it read *"1 RUNNING, $0.00/h — ALL unattributed"*. **One running
+pod cannot cost $0.00/h.** The age gate saw staleness; the contradiction
+sat in plain sight underneath it because no check reads a live-fact block
+for **internal coherence**. Worth adding to the audit: a block asserting
+a count and a rate should be checked against itself, not only against
+the clock.
+
+### 2. My widening of the marker guard created a false-alarm risk
+
+When I extended the structural guard to **every** `.md` in the
+reviewer-bound directory, I also multiplied the chance of hitting a
+**legitimate** `=======`: that is a markdown **setext H1 underline**, so
+a reviewer doc titled `Title` / `=======` would have been **REFUSED as
+corrupt**. No file in the glob triggers it today — which is luck, not
+design, and exactly the kind of "clean now" that stops being true.
+
+**Fix keeps mac-c's orphaned-tail coverage intact.** `<<<<<<<` and
+`>>>>>>>` have no markdown meaning and stay unconditional; `=======`
+counts **only** when the same file also carries an opener or closer.
+mac-c's two missed cases are caught by the closer itself, so nothing is
+lost.
+
+**Tested in BOTH directions, seven cases:**
+
+    full conflict          REFUSE      setext H1 heading   pass
+    orphaned tail only     REFUSE      markdown --- rule   pass
+    tail + equals          REFUSE      clean prose         pass
+    non-HEAD opener        REFUSE
+
+**Why the false-alarm half matters as much as the fire half:** mac-c
+said it first — *a stricter guard that false-alarms on horizontal rules
+would be worse than the gap*. **A guard that cries wolf gets switched
+off, and then it protects nothing.** Both certifiers still certify the
+real documents clean.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
