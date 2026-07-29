@@ -387,8 +387,8 @@ The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
 $T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
 $T{=}4$ its margin over pooled is within the seed spread. Starred entries mark
 baselines that cannot reach the TXC's sparsity, so they are scored at a higher
-budget than the TXC. Stacked's collapse at $T\ge8$ reflects its $T\cdot
-d_{\text{SAE}}$ input dimension rather than the architecture.
+budget than the TXC. Stacked's collapse at $T\ge8$ reflects its input
+dimension of $T\cdot d_{\text{SAE}}$ rather than the architecture.
 
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
@@ -486,8 +486,8 @@ The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
 $T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
 $T{=}4$ its margin over pooled is within the seed spread. Starred entries mark
 baselines that cannot reach the TXC's sparsity, so they are scored at a higher
-budget than the TXC. Stacked's collapse at $T\\ge8$ reflects its $T\\cdot
-d_{\\text{SAE}}$ input dimension rather than the architecture.
+budget than the TXC. Stacked's collapse at $T\\ge8$ reflects its input
+dimension of $T\\cdot d_{\\text{SAE}}$ rather than the architecture.
 
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
