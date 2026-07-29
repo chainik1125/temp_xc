@@ -41,7 +41,9 @@ class TargetSpec:
     label_key: str
     kind: Literal["classification", "regression"]
     label_mode: Literal["sequence", "token"] = "token"
-    transform: Literal["none", "phasepair_pair", "phasepair_sign"] = "none"
+    transform: Literal[
+        "none", "phasepair_pair", "phasepair_sign", "multilane_lane0"
+    ] = "none"
     negative_is_invalid: bool = False
 
 
@@ -62,6 +64,12 @@ TARGETS: dict[str, TargetSpec] = {
     ),
     "signed_motion_sign": TargetSpec(
         "toy_signed_motion_M19_d40", "sign_labels", "classification", "sequence"
+    ),
+    "multilane_lane0": TargetSpec(
+        "toy_multilane_circle_M101_d24",
+        "lane_velocity_labels",
+        "classification",
+        transform="multilane_lane0",
     ),
     "backtracking_lambda": TargetSpec(
         "toy_backtracking_selfexcite_d64", "lambda_labels", "regression"
@@ -102,7 +110,9 @@ def _labels(data, spec: TargetSpec) -> np.ndarray:
     labels = data.extra[spec.label_key].detach().cpu().numpy()
     if spec.label_mode == "sequence" and labels.ndim == 2:
         labels = labels[:, 0]
-    if spec.transform != "none":
+    if spec.transform == "multilane_lane0":
+        labels = labels[..., 0]
+    elif spec.transform != "none":
         omega = np.asarray(data.extra["omega"], dtype=np.int64)
         M = int(data.extra["M"])
         velocity = omega[labels.astype(np.int64)]
@@ -280,6 +290,7 @@ def _write_outputs(result: dict, output: Path) -> None:
     with csv_path.open("w", newline="") as f:
         writer = csv.DictWriter(
             f,
+            lineterminator="\n",
             fieldnames=[
                 "target", "datasource", "target_kind", "seed", "tile_size",
                 "power_full_score", "dc_vector_score", "power_ac_score", "power_ac_std",

@@ -1,3 +1,11 @@
+---
+author: Dmitry
+date: 2026-07-29
+tags:
+  - results
+  - complete
+---
+
 ## Synthetic task-spectrum screen
 
 ## Answer
@@ -12,12 +20,13 @@ The useful object is a *routing vector* with at least four components:
 - complex cross-spectral terms for phase and direction;
 - sensitivity to window length for localization and nonstationarity.
 
-Across the synthetic panel, ordinary AC power is nearly perfect for periodic
-magnitude tasks, while it is exactly chance for two direction/sign tasks whose
-information lives in cross-channel phase. Global spectral summaries overlap
-substantially across otherwise different tasks. This argues for using spectra
-to choose an architecture or loss, not to assign a single scalar
-"temporality" score.
+Across the synthetic panel, ordinary AC power is nearly perfect for clean
+periodic magnitude tasks and progressively recovers one tone inside a
+three-tone superposition. It remains exactly at chance for two direction/sign
+tasks whose information lives in cross-channel phase. Global spectral
+summaries overlap substantially across otherwise different tasks. This argues
+for using a spectral routing vector to choose an architecture or loss, not for
+assigning a universal scalar "temporality" score.
 
 ## Protocol
 
@@ -55,6 +64,10 @@ Selected three-seed means are:
 | periodic velocity | 4 | 0.100 | 0.625 | 0.494 | 0.127 |
 | periodic velocity | 32 | 0.100 | 0.991 | 0.864 | 0.156 |
 | periodic magnitude | 4 | 0.333 | 0.990 | 0.951 | 0.356 |
+| multilane lane-0 velocity | 4 | 0.100 | 0.242 | 0.286 | 0.105 |
+| multilane lane-0 velocity | 8 | 0.100 | 0.485 | 0.546 | 0.122 |
+| multilane lane-0 velocity | 16 | 0.100 | 0.708 | 0.725 | 0.141 |
+| multilane lane-0 velocity | 32 | 0.100 | 0.790 | 0.827 | 0.134 |
 | phase-only sign | 4 | 0.500 | 0.483 | 0.826 | 0.507 |
 | phase-only sign | 32 | 0.500 | 0.517 | 0.984 | 0.496 |
 | motion direction | 4 | 0.500 | 0.493 | 0.933 | 0.496 |
@@ -64,7 +77,7 @@ Selected three-seed means are:
 | recipe equality | 4 | 0.500 | 0.686 | 0.655 | 0.597 |
 | recipe equality | 32 | 0.500 | 0.480 | 0.486 | 0.562 |
 
-These results give four clean conclusions.
+These results give five clean conclusions.
 
 ### Power detects periodic magnitude
 
@@ -72,6 +85,31 @@ For FrequencyBench velocity, AC-power accuracy rises from 0.625 at four tokens
 to 0.991 at 32 tokens. The phase-pair magnitude class is already 0.990 at four
 tokens. These are the tasks for which a band-partitioned spectral crosscoder
 has a strong mechanistic prior.
+
+### Multilane power gives a benchmark prediction
+
+The multilane target selects lane 0 from three simultaneous circle tones and
+predicts its ten-way velocity class. AC-power accuracy rises monotonically
+from 0.242 at four tokens to 0.485, 0.708, and 0.790 at 8, 16, and 32 tokens.
+The corresponding shuffled-label means stay near 0.100. Cross-spectral
+accuracy is 0.286, 0.546, 0.725, and 0.827, while signed DC remains weak at
+0.105--0.141.
+
+This gives a specific screen-to-benchmark prediction. Lane velocity is
+primarily a power-aligned target embedded in spectral superposition, not a
+stable-mean target. A band-partitioned or band-balanced crosscoder should
+therefore have a relevant inductive bias for multilane recovery. The four-token
+cell has both detectable spectral signal and substantial headroom, so it is a
+better architecture discriminator than the longer windows, where even the
+fixed screen approaches high accuracy. The small cross-minus-power increment
+of 0.017--0.061 leaves room for phase-aware structure but does not make phase
+the primary prediction.
+
+This is a directional prediction, not a promised ranking or effect size. The
+screen uses fixed spectral summaries rather than learned sparse codes, and it
+targets one lane while the benchmark averages recovery over all lanes. Its
+role is to identify the mechanism and informative window regime; matched
+training results must decide whether any spectral variant actually beats TXC.
 
 ### Power erases direction
 
@@ -126,6 +164,11 @@ cluster together. Filler channels and task-independent variance can dominate a
 trace spectrum. A task-conditioned probe is much more informative than ranking
 tasks by low-frequency mass alone.
 
+These are global, time-averaged summaries. They cannot prove stationarity:
+a localized or drifting process can share the same global power with a
+stationary process. Stationarity requires blockwise or position-conditioned
+spectra and uncertainty over independent sequences or documents.
+
 ## Proposed routing screen
 
 For a candidate temporal task:
@@ -164,10 +207,15 @@ The overnight benchmark therefore compares:
 - global top-k selection, which removes forced per-band occupancy.
 
 The screen predicts that no single spectral variant should win every task.
-Multiband models should be strongest on periodic magnitude tasks; phase-only
-and permuted controls test whether gains are merely DCT alignment; colored and
-stable-state tasks test the costs of over-penalizing low frequency or deleting
-DC.
+Multiband models should be strongest on periodic magnitude tasks. The
+multilane result sharpens that prediction: at the four-token benchmark window,
+lane power is above chance but far from saturated, so band partitioning has a
+plausible superposition advantage with measurable headroom. Phase-only and
+permuted controls test whether gains are merely DCT alignment, and the colored
+task tests recovery from temporal covariance. The benchmark has no
+DC-positive stable-state task, so it cannot establish that deleting DC is
+generally safe. The signed-DC and cross-spectral screening arms remain
+essential because power alone cannot recover stable state, direction, or sign.
 
 ## Artifacts
 

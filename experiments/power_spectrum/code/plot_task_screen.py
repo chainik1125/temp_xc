@@ -25,6 +25,7 @@ TARGETS = (
     ("phasepair_pair", "Periodic magnitude"),
     ("phasepair_sign", "Phase-only sign"),
     ("signed_motion_sign", "Motion direction"),
+    ("multilane_lane0", "Multilane velocity"),
     ("permuted_schedule", "Permuted schedule"),
     ("recipe_equality", "Higher-order equality"),
 )
@@ -34,6 +35,7 @@ SUMMARY_LABELS = {
     "toy_hedging_drift_d64": "hedging drift",
     "toy_cyclic_circle_M101_d128": "cyclic circle",
     "toy_phasepair_M101_d24": "phase pair",
+    "toy_multilane_circle_M101_d24": "multilane",
     "toy_permuted_circle_M101_d128": "permuted circle",
     "toy_signed_motion_M19_d40": "signed motion",
     "toy_recipe_instruction_d64": "recipe",
@@ -46,6 +48,7 @@ SUMMARY_OFFSETS = {
     "toy_hedging_drift_d64": (5, 5),
     "toy_cyclic_circle_M101_d128": (5, 5),
     "toy_phasepair_M101_d24": (-62, 5),
+    "toy_multilane_circle_M101_d24": (5, -13),
     "toy_recipe_instruction_d64": (5, -13),
     "toy_assumption_consequence_d64": (5, 12),
 }
@@ -86,8 +89,8 @@ def aggregate_probes(frame: pd.DataFrame) -> pd.DataFrame:
 
 
 def plot_separability(frame: pd.DataFrame, output: Path) -> None:
-    fig, axes = plt.subplots(2, 3, figsize=(11.5, 6.7), sharex=True)
-    for axis, (target, title) in zip(axes.flat, TARGETS, strict=True):
+    fig, axes = plt.subplots(2, 4, figsize=(14, 6.7), sharex=True)
+    for axis, (target, title) in zip(axes.flat, TARGETS):
         part = frame[frame["target"] == target]
         for key, (label, color, marker) in METHODS.items():
             summary = (
@@ -113,6 +116,8 @@ def plot_separability(frame: pd.DataFrame, output: Path) -> None:
         axis.set_xticks((4, 8, 16, 32), labels=("4", "8", "16", "32"))
         axis.set_ylim(-0.03, 1.04)
         axis.grid(axis="y", alpha=0.2)
+    for axis in axes.flat[len(TARGETS) :]:
+        axis.set_visible(False)
     axes[0, 0].set_ylabel("Cross-validated accuracy")
     axes[1, 0].set_ylabel("Cross-validated accuracy")
     for axis in axes[1]:
@@ -196,7 +201,11 @@ def main() -> None:
     probes = _probe_frame(payload)
     aggregate = aggregate_probes(probes)
     args.results_dir.mkdir(parents=True, exist_ok=True)
-    aggregate.to_csv(args.results_dir / "task_screen_aggregate.csv", index=False)
+    aggregate.to_csv(
+        args.results_dir / "task_screen_aggregate.csv",
+        index=False,
+        lineterminator="\n",
+    )
     plot_separability(probes, args.figures_dir / "task_screen_separability.png")
     plot_global_summaries(payload, args.figures_dir / "task_spectrum_summary.png")
 

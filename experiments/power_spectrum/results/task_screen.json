@@ -22,6 +22,7 @@
       "toy_hedging_drift_d64",
       "toy_cyclic_circle_M101_d128",
       "toy_phasepair_M101_d24",
+      "toy_multilane_circle_M101_d24",
       "toy_permuted_circle_M101_d128",
       "toy_signed_motion_M19_d40",
       "toy_recipe_instruction_d64",
@@ -34,6 +35,7 @@
       "phasepair_sign",
       "permuted_schedule",
       "signed_motion_sign",
+      "multilane_lane0",
       "backtracking_lambda",
       "changepoint_mode",
       "changepoint_tss",
@@ -108,6 +110,19 @@
       "operator_dc_fraction": 0.0004823261283954138,
       "operator_peak_frequency": 0.03125,
       "max_directionality": 1.8831481590445027
+    },
+    {
+      "datasource": "toy_multilane_circle_M101_d24",
+      "seed": 1,
+      "dc_fraction": 0.07678371729956252,
+      "ac_low_fraction": 0.35052788920868216,
+      "ac_centroid": 0.22740990450381582,
+      "ac_entropy": 0.932392558802829,
+      "ac_peak_frequency": 0.015625,
+      "ac_peak_prominence": 2.9408509990641476,
+      "operator_dc_fraction": 0.0578105218592509,
+      "operator_peak_frequency": 0.015625,
+      "max_directionality": 1.9883059953660434
     },
     {
       "datasource": "toy_permuted_circle_M101_d128",
@@ -240,6 +255,19 @@
       "max_directionality": 0.7559329720306291
     },
     {
+      "datasource": "toy_multilane_circle_M101_d24",
+      "seed": 2,
+      "dc_fraction": 0.08320240477383409,
+      "ac_low_fraction": 0.35320502666837095,
+      "ac_centroid": 0.2250780922317187,
+      "ac_entropy": 0.9331952912509822,
+      "ac_peak_frequency": 0.015625,
+      "ac_peak_prominence": 3.0569915443720967,
+      "operator_dc_fraction": 0.06500776302465287,
+      "operator_peak_frequency": 0.015625,
+      "max_directionality": 1.9884198751928932
+    },
+    {
       "datasource": "toy_permuted_circle_M101_d128",
       "seed": 2,
       "dc_fraction": 0.010751500235592655,
@@ -368,6 +396,19 @@
       "operator_dc_fraction": 0.0005189069531195975,
       "operator_peak_frequency": 0.03125,
       "max_directionality": 0.7407950046886005
+    },
+    {
+      "datasource": "toy_multilane_circle_M101_d24",
+      "seed": 42,
+      "dc_fraction": 0.0870457810834204,
+      "ac_low_fraction": 0.34520342455073627,
+      "ac_centroid": 0.22631000817013042,
+      "ac_entropy": 0.9356847996405718,
+      "ac_peak_frequency": 0.015625,
+      "ac_peak_prominence": 2.752873510914514,
+      "operator_dc_fraction": 0.059389500411356044,
+      "operator_peak_frequency": 0.015625,
+      "max_directionality": 1.9903611054000971
     },
     {
       "datasource": "toy_permuted_circle_M101_d128",
@@ -1735,6 +1776,266 @@
       },
       "dc_gain": 0.043834053537557705,
       "phase_gain": 0.572433291975071
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 1,
+      "tile_size": 4,
+      "power_full": {
+        "score_mean": 0.1794073149073149,
+        "score_std": 0.013369804584490596,
+        "chance": 0.1,
+        "shuffled_mean": 0.09415506715506715,
+        "n_examples": 512,
+        "n_features": 25
+      },
+      "power_ac": {
+        "score_mean": 0.2286496836496837,
+        "score_std": 0.024574188019090316,
+        "chance": 0.1,
+        "shuffled_mean": 0.11368978243978245,
+        "n_examples": 512,
+        "n_features": 17
+      },
+      "cross_full": {
+        "score_mean": 0.2433396603396603,
+        "score_std": 0.02986685075418334,
+        "chance": 0.1,
+        "shuffled_mean": 0.1271933066933067,
+        "n_examples": 512,
+        "n_features": 193
+      },
+      "cross_ac": {
+        "score_mean": 0.2608114108114108,
+        "score_std": 0.027137343902692183,
+        "chance": 0.1,
+        "shuffled_mean": 0.09753529803529803,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "dc_vector": {
+        "score_mean": 0.11824136974136971,
+        "score_std": 0.03196764077973625,
+        "chance": 0.1,
+        "shuffled_mean": 0.08980846930846931,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.2286496836496837,
+        "score_std": 0.024574188019090316,
+        "chance": 0.1,
+        "shuffled_mean": 0.11368978243978245,
+        "n_examples": 512,
+        "n_features": 17
+      },
+      "cross": {
+        "score_mean": 0.2608114108114108,
+        "score_std": 0.027137343902692183,
+        "chance": 0.1,
+        "shuffled_mean": 0.09753529803529803,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "dc_gain": -0.11040831390831397,
+      "phase_gain": 0.032161727161727105
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 1,
+      "tile_size": 8,
+      "power_full": {
+        "score_mean": 0.3880222555222555,
+        "score_std": 0.05121978434836038,
+        "chance": 0.1,
+        "shuffled_mean": 0.13833580308580307,
+        "n_examples": 512,
+        "n_features": 41
+      },
+      "power_ac": {
+        "score_mean": 0.4367766677766678,
+        "score_std": 0.03529531703866516,
+        "chance": 0.1,
+        "shuffled_mean": 0.09802555777555777,
+        "n_examples": 512,
+        "n_features": 33
+      },
+      "cross_full": {
+        "score_mean": 0.4812651792651793,
+        "score_std": 0.03787503772486197,
+        "chance": 0.1,
+        "shuffled_mean": 0.09609065934065933,
+        "n_examples": 512,
+        "n_features": 321
+      },
+      "cross_ac": {
+        "score_mean": 0.536927183927184,
+        "score_std": 0.02398982799081028,
+        "chance": 0.1,
+        "shuffled_mean": 0.1320319957819958,
+        "n_examples": 512,
+        "n_features": 257
+      },
+      "dc_vector": {
+        "score_mean": 0.12132439782439781,
+        "score_std": 0.026036145292497703,
+        "chance": 0.1,
+        "shuffled_mean": 0.09418081918081918,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.4367766677766678,
+        "score_std": 0.03529531703866516,
+        "chance": 0.1,
+        "shuffled_mean": 0.09802555777555777,
+        "n_examples": 512,
+        "n_features": 33
+      },
+      "cross": {
+        "score_mean": 0.536927183927184,
+        "score_std": 0.02398982799081028,
+        "chance": 0.1,
+        "shuffled_mean": 0.1320319957819958,
+        "n_examples": 512,
+        "n_features": 257
+      },
+      "dc_gain": -0.31545226995227,
+      "phase_gain": 0.10015051615051618
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 1,
+      "tile_size": 16,
+      "power_full": {
+        "score_mean": 0.6787533022533023,
+        "score_std": 0.04975007091587437,
+        "chance": 0.1,
+        "shuffled_mean": 0.10967044067044066,
+        "n_examples": 512,
+        "n_features": 73
+      },
+      "power_ac": {
+        "score_mean": 0.667332167832168,
+        "score_std": 0.029521450061224155,
+        "chance": 0.1,
+        "shuffled_mean": 0.08771414696414695,
+        "n_examples": 512,
+        "n_features": 65
+      },
+      "cross_full": {
+        "score_mean": 0.7015,
+        "score_std": 0.02502282908283236,
+        "chance": 0.1,
+        "shuffled_mean": 0.11555161505161504,
+        "n_examples": 512,
+        "n_features": 577
+      },
+      "cross_ac": {
+        "score_mean": 0.7101111111111111,
+        "score_std": 0.04583779439569196,
+        "chance": 0.1,
+        "shuffled_mean": 0.08635744810744812,
+        "n_examples": 512,
+        "n_features": 513
+      },
+      "dc_vector": {
+        "score_mean": 0.15891930291930292,
+        "score_std": 0.03177676339109037,
+        "chance": 0.1,
+        "shuffled_mean": 0.0919464701964702,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.667332167832168,
+        "score_std": 0.029521450061224155,
+        "chance": 0.1,
+        "shuffled_mean": 0.08771414696414695,
+        "n_examples": 512,
+        "n_features": 65
+      },
+      "cross": {
+        "score_mean": 0.7101111111111111,
+        "score_std": 0.04583779439569196,
+        "chance": 0.1,
+        "shuffled_mean": 0.08635744810744812,
+        "n_examples": 512,
+        "n_features": 513
+      },
+      "dc_gain": -0.5084128649128651,
+      "phase_gain": 0.04277894327894316
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 1,
+      "tile_size": 32,
+      "power_full": {
+        "score_mean": 0.7595229215229216,
+        "score_std": 0.048460838722095875,
+        "chance": 0.1,
+        "shuffled_mean": 0.09656826506826507,
+        "n_examples": 512,
+        "n_features": 137
+      },
+      "power_ac": {
+        "score_mean": 0.7706837606837607,
+        "score_std": 0.020993142666817313,
+        "chance": 0.1,
+        "shuffled_mean": 0.09975874125874125,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "cross_full": {
+        "score_mean": 0.8387777777777778,
+        "score_std": 0.01906939892363264,
+        "chance": 0.1,
+        "shuffled_mean": 0.08609337884337884,
+        "n_examples": 512,
+        "n_features": 1089
+      },
+      "cross_ac": {
+        "score_mean": 0.8234444444444444,
+        "score_std": 0.02030021589619427,
+        "chance": 0.1,
+        "shuffled_mean": 0.09881154956154956,
+        "n_examples": 512,
+        "n_features": 1025
+      },
+      "dc_vector": {
+        "score_mean": 0.11187778887778888,
+        "score_std": 0.04742071555064816,
+        "chance": 0.1,
+        "shuffled_mean": 0.06889929514929514,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.7706837606837607,
+        "score_std": 0.020993142666817313,
+        "chance": 0.1,
+        "shuffled_mean": 0.09975874125874125,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "cross": {
+        "score_mean": 0.8234444444444444,
+        "score_std": 0.02030021589619427,
+        "chance": 0.1,
+        "shuffled_mean": 0.09881154956154956,
+        "n_examples": 512,
+        "n_features": 1025
+      },
+      "dc_gain": -0.6588059718059718,
+      "phase_gain": 0.05276068376068377
     },
     {
       "target": "backtracking_lambda",
@@ -4597,6 +4898,266 @@
       "phase_gain": 0.48838612368024137
     },
     {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 2,
+      "tile_size": 4,
+      "power_full": {
+        "score_mean": 0.2230091575091575,
+        "score_std": 0.03820706778277963,
+        "chance": 0.1,
+        "shuffled_mean": 0.10490962632139103,
+        "n_examples": 512,
+        "n_features": 25
+      },
+      "power_ac": {
+        "score_mean": 0.266947385947386,
+        "score_std": 0.050010208767410684,
+        "chance": 0.1,
+        "shuffled_mean": 0.10284792984792983,
+        "n_examples": 512,
+        "n_features": 17
+      },
+      "cross_full": {
+        "score_mean": 0.19391969141969143,
+        "score_std": 0.04099133885693255,
+        "chance": 0.1,
+        "shuffled_mean": 0.10225183150183151,
+        "n_examples": 512,
+        "n_features": 193
+      },
+      "cross_ac": {
+        "score_mean": 0.3100908535908536,
+        "score_std": 0.06132252788770723,
+        "chance": 0.1,
+        "shuffled_mean": 0.10531877273053743,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "dc_vector": {
+        "score_mean": 0.10829098679098678,
+        "score_std": 0.03251577298960829,
+        "chance": 0.1,
+        "shuffled_mean": 0.0678125093860388,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.266947385947386,
+        "score_std": 0.050010208767410684,
+        "chance": 0.1,
+        "shuffled_mean": 0.10284792984792983,
+        "n_examples": 512,
+        "n_features": 17
+      },
+      "cross": {
+        "score_mean": 0.3100908535908536,
+        "score_std": 0.06132252788770723,
+        "chance": 0.1,
+        "shuffled_mean": 0.10531877273053743,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "dc_gain": -0.1586563991563992,
+      "phase_gain": 0.0431434676434676
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 2,
+      "tile_size": 8,
+      "power_full": {
+        "score_mean": 0.48459651459651465,
+        "score_std": 0.03994107629107892,
+        "chance": 0.1,
+        "shuffled_mean": 0.08122353463529933,
+        "n_examples": 512,
+        "n_features": 41
+      },
+      "power_ac": {
+        "score_mean": 0.5165547230547232,
+        "score_std": 0.03977972556185823,
+        "chance": 0.1,
+        "shuffled_mean": 0.09361668886668888,
+        "n_examples": 512,
+        "n_features": 33
+      },
+      "cross_full": {
+        "score_mean": 0.4915115995115995,
+        "score_std": 0.05218806950153235,
+        "chance": 0.1,
+        "shuffled_mean": 0.0646326892062186,
+        "n_examples": 512,
+        "n_features": 321
+      },
+      "cross_ac": {
+        "score_mean": 0.5529231324231325,
+        "score_std": 0.05753535802329938,
+        "chance": 0.1,
+        "shuffled_mean": 0.060404314639608755,
+        "n_examples": 512,
+        "n_features": 257
+      },
+      "dc_vector": {
+        "score_mean": 0.11576301476301476,
+        "score_std": 0.027468216484639676,
+        "chance": 0.1,
+        "shuffled_mean": 0.08774865657218597,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.5165547230547232,
+        "score_std": 0.03977972556185823,
+        "chance": 0.1,
+        "shuffled_mean": 0.09361668886668888,
+        "n_examples": 512,
+        "n_features": 33
+      },
+      "cross": {
+        "score_mean": 0.5529231324231325,
+        "score_std": 0.05753535802329938,
+        "chance": 0.1,
+        "shuffled_mean": 0.060404314639608755,
+        "n_examples": 512,
+        "n_features": 257
+      },
+      "dc_gain": -0.4007917082917084,
+      "phase_gain": 0.03636840936840935
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 2,
+      "tile_size": 16,
+      "power_full": {
+        "score_mean": 0.763468142968143,
+        "score_std": 0.022087912825625732,
+        "chance": 0.1,
+        "shuffled_mean": 0.09438837796190737,
+        "n_examples": 512,
+        "n_features": 73
+      },
+      "power_ac": {
+        "score_mean": 0.7278869463869464,
+        "score_std": 0.028320399159259112,
+        "chance": 0.1,
+        "shuffled_mean": 0.10731485671191554,
+        "n_examples": 512,
+        "n_features": 65
+      },
+      "cross_full": {
+        "score_mean": 0.728885003885004,
+        "score_std": 0.02794663144985747,
+        "chance": 0.1,
+        "shuffled_mean": 0.11435443151619624,
+        "n_examples": 512,
+        "n_features": 577
+      },
+      "cross_ac": {
+        "score_mean": 0.7366642246642247,
+        "score_std": 0.03523261347450185,
+        "chance": 0.1,
+        "shuffled_mean": 0.11791552565081978,
+        "n_examples": 512,
+        "n_features": 513
+      },
+      "dc_vector": {
+        "score_mean": 0.11332023532023532,
+        "score_std": 0.031379690059819616,
+        "chance": 0.1,
+        "shuffled_mean": 0.07834280425456897,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.7278869463869464,
+        "score_std": 0.028320399159259112,
+        "chance": 0.1,
+        "shuffled_mean": 0.10731485671191554,
+        "n_examples": 512,
+        "n_features": 65
+      },
+      "cross": {
+        "score_mean": 0.7366642246642247,
+        "score_std": 0.03523261347450185,
+        "chance": 0.1,
+        "shuffled_mean": 0.11791552565081978,
+        "n_examples": 512,
+        "n_features": 513
+      },
+      "dc_gain": -0.6145667110667111,
+      "phase_gain": 0.008777278277278255
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 2,
+      "tile_size": 32,
+      "power_full": {
+        "score_mean": 0.7891289821289822,
+        "score_std": 0.03388598596786174,
+        "chance": 0.1,
+        "shuffled_mean": 0.08791868915398328,
+        "n_examples": 512,
+        "n_features": 137
+      },
+      "power_ac": {
+        "score_mean": 0.8050372960372961,
+        "score_std": 0.041379473708022446,
+        "chance": 0.1,
+        "shuffled_mean": 0.0892153647006588,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "cross_full": {
+        "score_mean": 0.8397202797202796,
+        "score_std": 0.03410091455145054,
+        "chance": 0.1,
+        "shuffled_mean": 0.10257459697165579,
+        "n_examples": 512,
+        "n_features": 1089
+      },
+      "cross_ac": {
+        "score_mean": 0.838034188034188,
+        "score_std": 0.035043712202344326,
+        "chance": 0.1,
+        "shuffled_mean": 0.09259619791972731,
+        "n_examples": 512,
+        "n_features": 1025
+      },
+      "dc_vector": {
+        "score_mean": 0.1597074592074592,
+        "score_std": 0.021670288814804366,
+        "chance": 0.1,
+        "shuffled_mean": 0.08779662820839292,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.8050372960372961,
+        "score_std": 0.041379473708022446,
+        "chance": 0.1,
+        "shuffled_mean": 0.0892153647006588,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "cross": {
+        "score_mean": 0.838034188034188,
+        "score_std": 0.035043712202344326,
+        "chance": 0.1,
+        "shuffled_mean": 0.09259619791972731,
+        "n_examples": 512,
+        "n_features": 1025
+      },
+      "dc_gain": -0.6453298368298369,
+      "phase_gain": 0.03299689199689193
+    },
+    {
       "target": "backtracking_lambda",
       "datasource": "toy_backtracking_selfexcite_d64",
       "target_kind": "regression",
@@ -7455,6 +8016,266 @@
       },
       "dc_gain": -0.0158748114630467,
       "phase_gain": 0.4354449472096531
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 42,
+      "tile_size": 4,
+      "power_full": {
+        "score_mean": 0.12415151515151515,
+        "score_std": 0.019876461379422044,
+        "chance": 0.1,
+        "shuffled_mean": 0.10911108336108337,
+        "n_examples": 512,
+        "n_features": 25
+      },
+      "power_ac": {
+        "score_mean": 0.23124242424242425,
+        "score_std": 0.022165521096445994,
+        "chance": 0.1,
+        "shuffled_mean": 0.12110786435786436,
+        "n_examples": 512,
+        "n_features": 17
+      },
+      "cross_full": {
+        "score_mean": 0.20976767676767677,
+        "score_std": 0.044812078566730994,
+        "chance": 0.1,
+        "shuffled_mean": 0.09725199800199799,
+        "n_examples": 512,
+        "n_features": 193
+      },
+      "cross_ac": {
+        "score_mean": 0.2862626262626263,
+        "score_std": 0.02062199200933849,
+        "chance": 0.1,
+        "shuffled_mean": 0.07207262182262182,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "dc_vector": {
+        "score_mean": 0.08826262626262626,
+        "score_std": 0.009844378838445059,
+        "chance": 0.1,
+        "shuffled_mean": 0.09829281829281829,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.23124242424242425,
+        "score_std": 0.022165521096445994,
+        "chance": 0.1,
+        "shuffled_mean": 0.12110786435786436,
+        "n_examples": 512,
+        "n_features": 17
+      },
+      "cross": {
+        "score_mean": 0.2862626262626263,
+        "score_std": 0.02062199200933849,
+        "chance": 0.1,
+        "shuffled_mean": 0.07207262182262182,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "dc_gain": -0.14297979797979798,
+      "phase_gain": 0.055020202020202025
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 42,
+      "tile_size": 8,
+      "power_full": {
+        "score_mean": 0.44293939393939397,
+        "score_std": 0.0446272554544301,
+        "chance": 0.1,
+        "shuffled_mean": 0.10424153624153625,
+        "n_examples": 512,
+        "n_features": 41
+      },
+      "power_ac": {
+        "score_mean": 0.5015050505050506,
+        "score_std": 0.05722014269581631,
+        "chance": 0.1,
+        "shuffled_mean": 0.10631296481296482,
+        "n_examples": 512,
+        "n_features": 33
+      },
+      "cross_full": {
+        "score_mean": 0.5037272727272727,
+        "score_std": 0.01674603842947093,
+        "chance": 0.1,
+        "shuffled_mean": 0.11585414585414586,
+        "n_examples": 512,
+        "n_features": 321
+      },
+      "cross_ac": {
+        "score_mean": 0.5478787878787879,
+        "score_std": 0.025149841735739014,
+        "chance": 0.1,
+        "shuffled_mean": 0.1035804750804751,
+        "n_examples": 512,
+        "n_features": 257
+      },
+      "dc_vector": {
+        "score_mean": 0.12924242424242424,
+        "score_std": 0.03428204927003114,
+        "chance": 0.1,
+        "shuffled_mean": 0.08953213453213453,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.5015050505050506,
+        "score_std": 0.05722014269581631,
+        "chance": 0.1,
+        "shuffled_mean": 0.10631296481296482,
+        "n_examples": 512,
+        "n_features": 33
+      },
+      "cross": {
+        "score_mean": 0.5478787878787879,
+        "score_std": 0.025149841735739014,
+        "chance": 0.1,
+        "shuffled_mean": 0.1035804750804751,
+        "n_examples": 512,
+        "n_features": 257
+      },
+      "dc_gain": -0.3722626262626263,
+      "phase_gain": 0.04637373737373729
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 42,
+      "tile_size": 16,
+      "power_full": {
+        "score_mean": 0.744929292929293,
+        "score_std": 0.03745509844535281,
+        "chance": 0.1,
+        "shuffled_mean": 0.08951287601287602,
+        "n_examples": 512,
+        "n_features": 73
+      },
+      "power_ac": {
+        "score_mean": 0.7286565656565657,
+        "score_std": 0.036675024091373805,
+        "chance": 0.1,
+        "shuffled_mean": 0.11923287823287824,
+        "n_examples": 512,
+        "n_features": 65
+      },
+      "cross_full": {
+        "score_mean": 0.7435858585858586,
+        "score_std": 0.04020156019735807,
+        "chance": 0.1,
+        "shuffled_mean": 0.08980436230436231,
+        "n_examples": 512,
+        "n_features": 577
+      },
+      "cross_ac": {
+        "score_mean": 0.7272323232323232,
+        "score_std": 0.011351250264310213,
+        "chance": 0.1,
+        "shuffled_mean": 0.10602866577866579,
+        "n_examples": 512,
+        "n_features": 513
+      },
+      "dc_vector": {
+        "score_mean": 0.15133333333333335,
+        "score_std": 0.029372314930892866,
+        "chance": 0.1,
+        "shuffled_mean": 0.11260503385503384,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.7286565656565657,
+        "score_std": 0.036675024091373805,
+        "chance": 0.1,
+        "shuffled_mean": 0.11923287823287824,
+        "n_examples": 512,
+        "n_features": 65
+      },
+      "cross": {
+        "score_mean": 0.7272323232323232,
+        "score_std": 0.011351250264310213,
+        "chance": 0.1,
+        "shuffled_mean": 0.10602866577866579,
+        "n_examples": 512,
+        "n_features": 513
+      },
+      "dc_gain": -0.5773232323232323,
+      "phase_gain": -0.001424242424242439
+    },
+    {
+      "target": "multilane_lane0",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "target_kind": "classification",
+      "seed": 42,
+      "tile_size": 32,
+      "power_full": {
+        "score_mean": 0.7920404040404041,
+        "score_std": 0.04466011149355159,
+        "chance": 0.1,
+        "shuffled_mean": 0.12824428349428346,
+        "n_examples": 512,
+        "n_features": 137
+      },
+      "power_ac": {
+        "score_mean": 0.7944444444444445,
+        "score_std": 0.04508003686220318,
+        "chance": 0.1,
+        "shuffled_mean": 0.11150385725385725,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "cross_full": {
+        "score_mean": 0.8458181818181817,
+        "score_std": 0.011668437488591227,
+        "chance": 0.1,
+        "shuffled_mean": 0.12638214563214564,
+        "n_examples": 512,
+        "n_features": 1089
+      },
+      "cross_ac": {
+        "score_mean": 0.8194646464646465,
+        "score_std": 0.018014012389898856,
+        "chance": 0.1,
+        "shuffled_mean": 0.11919369519369519,
+        "n_examples": 512,
+        "n_features": 1025
+      },
+      "dc_vector": {
+        "score_mean": 0.1317777777777778,
+        "score_std": 0.026491413135222346,
+        "chance": 0.1,
+        "shuffled_mean": 0.09376420801420801,
+        "n_examples": 512,
+        "n_features": 8
+      },
+      "power": {
+        "score_mean": 0.7944444444444445,
+        "score_std": 0.04508003686220318,
+        "chance": 0.1,
+        "shuffled_mean": 0.11150385725385725,
+        "n_examples": 512,
+        "n_features": 129
+      },
+      "cross": {
+        "score_mean": 0.8194646464646465,
+        "score_std": 0.018014012389898856,
+        "chance": 0.1,
+        "shuffled_mean": 0.11919369519369519,
+        "n_examples": 512,
+        "n_features": 1025
+      },
+      "dc_gain": -0.6626666666666667,
+      "phase_gain": 0.025020202020201943
     },
     {
       "target": "backtracking_lambda",
