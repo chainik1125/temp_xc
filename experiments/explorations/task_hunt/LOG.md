@@ -39122,3 +39122,36 @@ claim.** The other two are why it was caught.
 **Standing check earned: when a metric is quoted as "chance", quote the
 MEASURED null beside it.** `null_win` was in the verdict file the
 whole time, one field away from `tok_best`.
+
+## 2026-07-29 02:16 BST — HUB: swept the "at chance" claim and **found a THIRD live site in the file I had just corrected twice**
+
+**I fixed two sites at 02:1x and declared the handoff corrected. There
+were three.** `REBUTTAL_HANDOFF.md:607` still asserted *"a task whose
+per-token probes sit at chance"* inside the **binding quote-form for the
+shuffle exhibit** — a different section, so it survived a fix aimed at
+the two sites I remembered.
+
+**This is the fourth time tonight the same failure has run: I correct
+the places I remember writing, not the places the claim reached.** The
+rule was written at 00:23 after the `floor_excess` sweep found one on
+this same file, ratified again at 00:2x when mac-d re-asserted a
+retracted claim inside a correction block, and applied by both workers
+to their own surfaces. **I logged the generalisation three times and
+then reproduced it.**
+
+**What actually worked was mechanical, not memory:** a grep with a
+**positive control** — I first confirmed the pattern fires on the
+pre-fix version in git (2 hits) so that a clean result meant "clean"
+rather than "broken regex". **The control is what made the empty
+result trustworthy, and the same run is what surfaced the third site.**
+
+**Now: 0 live assertions**, positive control still firing, audit clean.
+
+**Standing rule, tightened from "sweep every surface" to something that
+actually survives being tired:**
+
+> **A retraction is not done when the correction is written. It is done
+> when a controlled grep over every surface returns zero — and the
+> control must be shown to fire, or the zero means nothing.**
+
+**"I fixed it" is not a check. `grep -c` on a known-positive is.**

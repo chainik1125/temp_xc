@@ -604,7 +604,9 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   every T** while lifting recovery from ≤0.22 to 0.50–0.59 — NOT
   learned order-use. **The claim is the level story** (windowed TXC
   recovery rising with T over per-token anchors, on a task whose
-  per-token probes sit at chance); the shuffle columns are the
+  per-token probes read the state only PARTIALLY — 0.50–0.53 against a
+  ~0.33 three-class null, **not** at chance; corrected 02:2x, see the
+  block above); the shuffle columns are the
   honest architectural control, consistent with the record-wide
   age-face order-null once that control is applied. Full
   validity-gate loop ran same-night: pre-registered ordered≈shuffled
