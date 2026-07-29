@@ -6,8 +6,6 @@ tags:
   - results
 ---
 
-<!-- Thank the reviewer for appreciating the benchmarking. -->
-
 ## 🟦 Reviewer 2 response
 
 ## OpenReview copy-and-paste version
@@ -16,8 +14,7 @@ We thank the reviewer for recognizing the novelty of applying crosscoders along 
 
 > 🟦 Since the non-temporal MLC ties TXC on probing, can you isolate the temporal contribution from generic crosscoder capacity?
 
-We provide a number of lines of evidence. First, we provide the explicit parameter counts for all architectures, since this was explicitly asked for by 🟩 Reviewer bbby.
-
+We provide several lines of evidence. First, the Stacked SAE matches the TXC's trainable parameter count and dense inference cost but cannot share information across sequence positions. We report both quantities for all architectures below, as requested by 🟩 Reviewer bbby.
 
 **Trainable parameters (billions):**
 
@@ -81,7 +78,14 @@ $$
 \\end{array}
 $$
 
-We note in particular, that the stacked-SAE has the same number of trainable parameters as the TXC, but does not allow sharing cross-position information. We provide the comparison between the TXC and the stacked SAE baseline below. We see that the stacked SAE underperforms the TXC in all but the EM task.
+$^{*}$ Medical T-SAE entries report paper-width / matched-width values. Costs
+are per architecture's native forward. For an equal five-token segment, the
+single-token SAE and T-SAE costs should therefore be multiplied by five.
+
+We next compare the TXC with the Stacked SAE baseline directly. The TXC scores
+higher on Sparse probing, both Backtracking metrics, and HH-RLHF; the Stacked
+SAE scores higher on Medical EM detection, while its Medical EM steering
+evaluation was not run.
 
 **Stacked SAE control at T=5:**
 
@@ -96,7 +100,19 @@ $$
 \\mathrm{HH\!-\!RLHF}&.60&.61&.99&\\mathbf{.62}
 \\end{array}
 $$
-**Window-size sweep** (entries are percentages of T=5):
+
+$^{\dagger}$ The Medical EM detection comparison is not
+sparsity-calibrated: realized evaluation $L_0$ exceeded its nominal target for
+every architecture under train-to-rollout distribution shift. We therefore
+treat this comparison as directional pending re-thresholding.
+
+The matched-capacity Backtracking result isolates cross-position sharing from
+generic parameter count: the Stacked SAE reaches only $0.45\times$ the TXC's
+steering effect and $0.65\times$ its detection PR-AUC. This is the clearest
+real-world evidence that the gain is not explained by capacity alone. We also
+report the explicit dependence on window size:
+
+**Window-size sweep** (entries after Headline are percentages of $T=5$):
 
 $$
 \\begin{array}{lrrrrrr}
@@ -108,14 +124,21 @@ $$
 \\end{array}
 $$
 
-Longer context does not help static probing, but it materially helps Backtracking and Medical EM. We do not in general expect temporal structure to be helpful on all tasks, but we do claim both that temporal structure is relevant for some important applications of SAEs _and_ that TXCs can exploit them.
+Longer context does not help static probing, but it materially helps
+Backtracking and Medical EM. We do not expect temporal structure to help on
+every task; rather, these results show both that temporal structure matters for
+some important SAE applications *and* that TXCs can exploit it.
 
-As an additional comparison,
-
+We also take the opportunity to answer 🟩 Reviewer bbby's request for an explicit accounting of capacity for the T-SAE:
 
 ### T-SAE dictionary-width control
 
-Our description of dictionary sizes was ambiguous. We ran T-SAE variants whose widths were matched to the other architectures, as well as variants using the original paper width ($d_{\\mathrm{SAE}}=16{,}384$). Where these disagreed, we selected the better-performing variant to ensure that we compared against the strongest baseline. We have clarified this and added results for both settings to the paper appendix:
+Our description of dictionary sizes was ambiguous. For each task, we ran the
+T-SAE at the width used for the paper result and, where different, at the width
+matched to the other architectures. Where these disagreed, we selected the
+better-performing variant to ensure that we compared against the strongest
+baseline. We have clarified this and added both settings to the paper
+appendix:
 
 $$
 \\begin{array}{l|l|c|c|c}
@@ -128,7 +151,7 @@ $$
 \\hline
 \\text{Backtracking} &
 \\text{detection PR-AUC}@S{=}32 &
-0.26^{\\dagger} &
+0.26^{\\ddagger} &
 0.25\\ (d{=}32{,}768) &
 0.25\\ (d{=}32{,}768) \\\\
 \\hline
@@ -147,21 +170,5 @@ $$
 \\end{array}
 $$
 
-### Parameter count and inference cost
-
-We also report the capacity and dense inference cost of every architecture in
-the headline configurations. Parameter counts are in billions. Inference cost
-is in GFLOPs per architecture's native forward: one token for TopK SAE and
-T-SAE, five positions for TFA, Stacked SAE, and TXC-base, five layers for MLC,
-and ten positions for TXC-pro. We count one multiply-add as two FLOPs and
-exclude selection, bias additions, nonlinearities, and training-only losses.
-
-
-
-
-This also sharpens the Stacked SAE control: Stacked SAE and $T=5$ TXC are
-effectively capacity- and inference-matched (1.3B parameters and 2.7 GFLOPs
-each on Backtracking), but Stacked SAE reaches only
-$0.45\\times$ TXC's causal steering effect. The Backtracking gain therefore
-cannot be explained by generic parameter count or dense inference compute
-alone.
+$^{\ddagger}$ The Backtracking TXC value is the $T=5$ cell from the new
+window-size sweep.
