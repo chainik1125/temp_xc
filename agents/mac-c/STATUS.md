@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 14:35 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 15:59 BST (stamped from `date` at write time)
 
 ---
 
@@ -83,6 +83,16 @@ Three lanes still parked behind item 6 per hub ruling.
    `git show origin/<branch>:<path> | grep -c '<distinctive string>'`,
    or `git show --stat --format="" HEAD` and read the file list.
    **Ask origin for the artifact, not for words about it.**
+   **⚑ AND FIX THE PUSH LINE ITSELF.** Mine used
+   `git push -q … ; <compare>` — **`;` not `&&`**, so the comparison ran
+   even when the push was **rejected**, and `-q | tail` swallowed the
+   error. A non-FF `git push -q` **returns exit 1** — that signal was
+   available all session and discarded. **Use:**
+   `git push origin arxiv && git fetch -q origin arxiv && test "$(git rev-parse HEAD)" = "$(git rev-parse origin/arxiv)" && echo OK`
+   Dropping `-q` also prints the real ref transition
+   (`6f6050793..f6ae0a1c7`), which is *direct* evidence instead of an
+   inference. ⚠ **These compose with #7:** a rejection *during* a rebase
+   prints `unpushed 0` and gets believed — happened twice tonight.
 8. **⚑ SWEEP RETRACTIONS WITH THE TOOL, NOT `grep`:**
    `.venv/bin/python scripts/claim_sweep.py "<retracted sentence>"
    --control-ref origin/arxiv`. It classifies live vs quoted
