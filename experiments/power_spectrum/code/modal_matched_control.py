@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -11,7 +10,6 @@ from pathlib import Path
 import modal
 
 from experiments.power_spectrum.code.modal_benchmark import (
-    ENV,
     LOCAL_ROOT,
     REMOTE_PYTHON,
     REMOTE_ROOT,
@@ -83,7 +81,6 @@ def main(stage: str = "plan", out: str = "") -> None:
                 "--dry-run",
             ],
             cwd=LOCAL_ROOT,
-            env={**os.environ, **ENV},
             check=True,
         )
         return

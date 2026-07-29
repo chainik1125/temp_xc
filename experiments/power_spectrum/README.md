@@ -56,8 +56,10 @@ uv run python -m ruff check experiments/power_spectrum
 Inspect the exact paid-compute plan without allocating a GPU:
 
 ```bash
-uv run modal run experiments/power_spectrum/code/modal_benchmark.py --stage plan
-uv run modal run experiments/power_spectrum/code/modal_matched_control.py \
+uv run --with modal modal run \
+  experiments/power_spectrum/code/modal_benchmark.py --stage plan
+uv run --with modal modal run \
+  experiments/power_spectrum/code/modal_matched_control.py \
   --stage plan
 ```
 
@@ -70,9 +72,10 @@ atomically, and resumes completed cells.
 Launch the durable overnight call only after the paid smoke stage succeeds:
 
 ```bash
-uv run modal run experiments/power_spectrum/code/modal_benchmark.py \
+uv run --with modal modal run \
+  experiments/power_spectrum/code/modal_benchmark.py \
   --stage smoke
-uv run modal run --detach \
+uv run --with modal modal run --detach \
   experiments/power_spectrum/code/modal_benchmark.py --stage overnight
 ```
 
