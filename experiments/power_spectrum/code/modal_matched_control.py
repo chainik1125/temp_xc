@@ -13,7 +13,7 @@ REMOTE_IMPORT_ROOT = Path("/repo")
 if REMOTE_IMPORT_ROOT.is_dir():
     sys.path.insert(0, str(REMOTE_IMPORT_ROOT))
 
-from experiments.power_spectrum.code.modal_benchmark import (
+from experiments.power_spectrum.code.modal_benchmark import (  # noqa: E402
     LOCAL_ROOT,
     REMOTE_PYTHON,
     REMOTE_ROOT,
