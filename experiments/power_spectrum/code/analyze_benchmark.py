@@ -427,7 +427,11 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     ]
     fieldnames = list(scalar_rows[0])
     with path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(scalar_rows)
 

@@ -178,3 +178,10 @@ def test_colored_chance_correction_excludes_zeroed_dc_candidates() -> None:
     assert receipts[0]["effective_nonzero_candidates"] == 192
     assert row["metrics"]["colored_rec_adj_reported"] == 0.25
     assert row["metrics"]["colored_rec_adj"] != 0.25
+
+
+def test_csv_outputs_use_repository_lf_line_endings(tmp_path: Path) -> None:
+    path = tmp_path / "rows.csv"
+    analyze_benchmark._write_csv(path, [{"name": "candidate", "score": 0.5}])
+
+    assert b"\r\n" not in path.read_bytes()

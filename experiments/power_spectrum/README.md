@@ -29,8 +29,8 @@ results, figures, and conclusions for this run belong in this directory.
 
 The original checkout is not modified by this experiment. Development occurs
 on the isolated branch `codex/spectral-screen-overnight-20260729`; the
-checkout's host-side location is operational metadata rather than part of the
-experiment.
+checkout is at the neutral ignored path `.worktrees/power-spectrum`. That
+host-side location is operational metadata rather than part of the experiment.
 
 ## Reading order
 
@@ -63,11 +63,14 @@ uv run --with modal modal run \
   --stage plan
 ```
 
-The frozen worst-case plan is 2,448,000 optimizer steps, 7.15 estimated A10G
-hours, and $35.75 under a deliberately conservative effective rate of $5/hour.
-The runner has a 7.5-hour inner deadline, a 7h45 remote hard timeout, and a
-$45 usable ledger plus a $5 reserve. It uses one GPU sequentially, checkpoints
-atomically, and resumes completed cells.
+The main frozen plan is 2,448,000 optimizer steps, 7.15 estimated A10G hours,
+and $35.75 under a deliberately conservative effective rate of $5/hour. The
+matched full-band control adds 312,000 steps, 0.95 estimated hours, and $4.74,
+for a combined planned estimate of $40.49. The independent jobs' 7.5-hour and
+1.1-hour inner deadlines bound new GPU time to $43.00 at the same inflated
+rate; combined spend must still be checked explicitly because their ledgers
+are separate. Each job uses one GPU sequentially, checkpoints atomically, and
+resumes completed cells.
 
 Launch the durable overnight call only after the paid smoke stage succeeds:
 
