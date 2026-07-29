@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 02:01 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 02:37 BST (stamped from `date` at write time)
 
 ---
 
@@ -206,6 +206,38 @@ makes gain hard — **the band is ONE-SIDED**. Disclosure on record
 (the `1-3` bucket is empty by construction, w=13); under the frozen 1/6
 U3 would have squeaked at 89% of budget vs 22%. **Pre-register the RULE,
 not the literal.**
+
+### ✅ THE PROGRAM'S MAIN QUESTION, ANSWERED ON TWO CORPORA (`21217087e`)
+
+*"What makes an ARM strong?"* (standing orders §7). **The window
+AMPLIFIES an existing per-token signal; it does not GENERATE one.**
+6 faces × 2 corpora × one identical pipeline, gemma2_2b L14 @512, 12/12
+valid, none excluded. Pre-reg `dafd000ca` + no-pooling addendum
+`70d85ff59` (fixed while the 2nd corpus was in flight, unseen).
+
+| clause | evalage | retryesc_gen | outcome |
+|---|---|---|---|
+| A1 Spearman(tok_exc, arm_exc) | +1.000 | +0.943 | **HOLDS, per-corpus, never pooled** |
+| A2 ratio range | [1.29, 1.73] | [1.98, 3.24] | **DEAD — no overlap** |
+| A3 kill condition | 0/6 | 0/6 | no weak-tok/strong-arm face |
+
+**⚑ THE CONSTRUCTIVE PART IS THE DEAD CLAUSE.** The amplification factor
+is **a corpus property varying ~2×** (evalage ~1.5, retryesc ~2.7) —
+**a new screening axis on the GAIN side**, where the binding constraint
+sits. **But it does not rescue weak signal:** evalage `+0.1265 × 1.56 =
++0.1975` beats retryesc `+0.0485 × 3.24 = +0.1573`. Amplifying 2× harder
+loses to a 2.6× stronger signal. **Target = real per-token signal AND
+high amplification, not either alone.**
+
+**⚑⚑ CONSEQUENCE FOR THE HUNT'S BRIEF, now measured on two corpora:**
+`hunt-safety-gold-clew.md` screens FOR **per-token silence**. That
+**selects against the arm**, because the arm is downstream of the same
+signal. The one KEEP (sycgen) has the **strongest** tok of the three
+candidates. **Do not screen for per-token silence as a positive
+criterion.** (Hub reached this independently from a rebuttal overclaim.)
+
+**Never pool corpora for this** — simulated, pooling manufactures
+ρ=+0.76 from pure noise plus the between-corpus offset.
 
 ### ✅ ALSO CLOSED: overnight item §5.2, the RLHF metric collision (`d18c556db`)
 
