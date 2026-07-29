@@ -58,10 +58,41 @@ floor is right whenever the event is visible in its horizon.
 
 The same is true of the others. Any label of the form *"how long ago /
 how many times, within the window"* is a deterministic function of
-`(censored age, in-window count)`. **Such a task cannot beat this floor
-at any density**, and no amount of lexical silence changes that. The
-density band `[0.15, 0.25]` manages *how often* the floor gets the
-answer; it cannot make the floor wrong.
+`(censored age, in-window count)`. ~~**Such a task cannot beat this
+floor at any density**, and no amount of lexical silence changes that.~~
+
+> ## ⛔ RETRACTED 01:09 BST — the struck sentence is FALSE, and our own KEEP refutes it
+>
+> **`sycgen` is a censored-age label and beats this exact `_FloorBank`
+> on 3/3 models** (`sycgen/screen.py:268-298`, same two features):
+> arm−floor **+0.1365 / +0.1396 / +0.1207**. Verified at source before
+> accepting the refutation (hub `41281e0eb`).
+>
+> **The mechanism I missed — and had already derived.** `sage_floor`
+> censors at **T+1** (`gen4c_lib.py:115`, *"older than my window"*), but
+> the label is the **uncensored** age. They coincide **only where
+> age ≤ T**, so the exploitable mass is exactly **`P(age > T)`** —
+> windows the floor cannot resolve but whose activations still carry the
+> event. My own `d2320d274` says `floor_excess ≈ P(masked token in the
+> T+w window)`, i.e. *the floor is right exactly when the event is inside
+> its horizon* — **the complement is the exploitable mass.** I corrected
+> the team's version of this law four hours earlier and then wrote a
+> universal denying it.
+>
+> **Density is therefore back at the centre, not out of it.** It was
+> never the wrong axis — **the hunt tuned the wrong DIRECTION on it.**
+> `retryesc_gen` *raised* density by shortening turns, which raises
+> `floor_excess` and moves mass **into** the floor's reach. What is
+> wanted is mass **beyond `T+w`** that the activations still retain.
+> My own lever-3 run is the confirmation: `evalage` (w=13) holds
+> `floor_excess` to 0.003–0.057 and both KEEP-shaped cells appear at
+> T32/T64, while `retryesc_gen` (w=25) ran it to +0.275 and died 3/3.
+>
+> **It is a BAND, and its upper edge is unmeasured:** too recent and the
+> floor resolves it, too old and the residual stream no longer carries
+> it. The lower edge is computable today (`floor_excess`); **how far
+> back activations retain a sparse event is not, and is a cheap $0
+> measurement on cached acts.**
 
 ## 4. What would actually beat the floor
 
@@ -73,9 +104,15 @@ The floor's two features are blind to:
   `sage_floor` retains only the most recent;
 - **event CONTENT / semantics.**
 
-⇒ **A label must depend on WHICH events occurred, not on WHEN or HOW
-MANY.** Shapes that are invisible to `(censored age, count)` but are
-representable by a windowed code:
+⚑ **Read § 3's retraction first.** Type-dependence is **one** route and
+it is **not forced** — censored-age labels demonstrably clear this floor
+(that is what `sycgen` is). What follows is an additional family, not a
+replacement, and § 9 shows it clears the floor *vacuously* unless the
+type is textually invisible.
+
+⇒ **A label MAY instead depend on WHICH events occurred rather than on
+WHEN or HOW MANY.** Shapes that are invisible to `(censored age, count)`
+but are representable by a windowed code:
 
 - *which of K event types was most recent* (K ≥ 2);
 - *did type A precede type B inside the window*;

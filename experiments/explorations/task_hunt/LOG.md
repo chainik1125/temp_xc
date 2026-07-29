@@ -37375,3 +37375,79 @@ because I prescribed a k-grid spend tonight without measuring either
 side of the trade-off and withdrew it within the hour. **The directive
 is "max throughput", and the way to actually get it is one measurement
 before the fan-out, not a bigger guess.**
+---
+
+## 2026-07-29 01:09 BST — mac-c RETRACTS the universal in `1f62c8461`. The hub is right, our own KEEP refutes it, and I had already derived the mechanism that refutes it four hours earlier
+
+**RETRACTED, unconditionally:** *"Any label of the form 'how long ago /
+how many times, within the window' is a deterministic function of
+`(censored age, in-window count)` and cannot beat this floor at any
+density."* That is false.
+
+**Verified independently at source before accepting the refutation.**
+`sycgen/screen.py:268-298` defines the **same `_FloorBank`** on the same
+two features (`sage_floor(first,T)`, `dose_window_count(mask,T)`), and
+sycgen — a censored-age-family label, our one KEEP — **beats it on 3/3
+models**:
+
+    gemma2_2b   arm 0.6795  floor 0.5430  arm-floor +0.1365
+    gpt2        arm 0.6825  floor 0.5429  arm-floor +0.1396
+    llama31_8b  arm 0.6658  floor 0.5451  arm-floor +0.1207
+
+**The mechanism, and why my error is worse than a slip.** `sage_floor`
+censors at **T+1** (`gen4c_lib.py:115`: `min(age, T+1)`, *"older than my
+window"*). The label is the **uncensored** age. They coincide **only
+where age ≤ T**, so the exploitable mass is exactly **P(age > T)** —
+windows whose event the floor cannot resolve but whose activations still
+carry it.
+
+**I established that four hours ago.** My own correction at `d2320d274`
+is `floor_excess ≈ P(any masked token in the T+w window)` — which says
+in as many words that *the floor is right exactly when the event is
+inside its horizon*. **The complement is the exploitable mass.** I
+derived the mechanism, corrected the team's version of it, and then
+wrote a universal that denies it. The instrument fact was new; the
+universal was a contradiction of my own prior result.
+
+**My lever-3 run is independent confirmation of the hub's mechanism**
+(and I missed that too, having run it 30 minutes earlier):
+
+       T   floor  floor_excess     arm  arm-floor   KEEP-shaped
+       4  0.3364        0.0031  0.4799    +0.1435             -
+      16  0.3469        0.0136  0.5061    +0.1592             -
+      32  0.3629        0.0296  0.5152    +0.1523           YES
+      64  0.3905        0.0572  0.5308    +0.1403           YES
+
+`evalage` (w=13) leaves floor_excess at **0.003–0.057** — the floor
+resolves almost nothing and the exploitable mass is large at every T.
+`retryesc_gen` (w=25) ran floors 0.3558→0.6081, **floor_excess up to
++0.275**, mass consumed. **Lever 3 — shrink the floor's horizon `T+w` —
+IS the density/geometry lever**, and the arm−floor column above is what
+it buys.
+
+**So the corrected aim, in one line:** density was never the wrong axis;
+**the hunt tuned the wrong DIRECTION on it.** `retryesc_gen` *raised*
+density by shortening turns, which raises `floor_excess` and moves mass
+**into** the floor's reach — precisely backwards. What is wanted is mass
+**beyond `T+w`** that the activations still carry.
+
+**That makes it a BAND, not a monotone, and the upper edge is empirical:**
+too recent and the floor resolves it; too old and the model's activations
+no longer retain it. The lower edge I can compute (`floor_excess`); **the
+upper edge is unmeasured** — how far back the residual stream still
+carries a sparse event — and is a genuine, cheap, $0 measurement on
+cached activations.
+
+**On type-labels:** they stand as *promising but NOT forced*. The hub is
+right that my universal would have discarded the family containing our
+only KEEP — and my own §9 already showed the type route clears the floor
+**vacuously** unless the type is textually invisible. Both corrections
+point the same way: **§6's activation-injection family is worth keeping
+on the list; it is not the mandated answer, and censored-age is very much
+alive.**
+
+`FLOOR_AIM_CORRECTION.md` §3/§4 are amended in place to carry this.
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
