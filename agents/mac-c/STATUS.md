@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 02:37 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 02:51 BST (stamped from `date` at write time)
 
 ---
 
@@ -63,6 +63,30 @@ Three lanes still parked behind item 6 per hub ruling.
    `git add`, `GIT_EDITOR=true git rebase --continue`, verify markers=0.
 5. **Stamp from `date` at write time.** I have corrected my own stamp
    FIVE times today.
+6. **⚑ VERIFY A COMMIT BY ITS DIFF, NOT ITS MESSAGE.**
+   `git rebase --continue` **reuses the original commit message** even
+   when conflict resolution changed what the commit does. `6a8a1b98f`
+   says *"AMENDMENT IN PLACE"* for a brief and its diff touches
+   `LOG.md` only. **After every rebase: `git show --stat --format=""
+   HEAD` and read it.** If the conflict changed the commit's effect,
+   **rewrite the message too.**
+7. **⚑ `git rev-parse HEAD` LIES MID-REBASE** — it reports the detached
+   rebase position, so `HEAD == origin` can print while your commit is
+   unapplied. **This bit me FOUR times tonight, once in the commit
+   immediately after I wrote the rule against it.** Always:
+   `test -d .git/rebase-merge && echo MID-REBASE || echo clean`
+   **before** believing any HEAD/origin comparison, and confirm by
+   NAME: `git log --oneline origin/arxiv -5 | grep -c '<subject>'`.
+8. **⚑ SWEEP RETRACTIONS WITH THE TOOL, NOT `grep`:**
+   `.venv/bin/python scripts/claim_sweep.py "<retracted sentence>"
+   --control-ref origin/arxiv`. It classifies live vs quoted
+   (struck/blockquote/correction-line) and **refuses to report clean if
+   the control does not fire**. It found a retracted claim of mine that
+   **three manual sweeps missed** (`FLOOR_AIM_CORRECTION.md:293`).
+   **Choose the key from the RETRACTED SENTENCE, not a memorable
+   phrase** — "load-bearing" returned 15 false alarms; *"cannot beat
+   this floor at any density"* returned a clean 0. And **a live hit
+   means ASSERTED, not WRONG** — read each one.
 
 ## 1. ✅ NOTHING IN FLIGHT — the lever-3 run COMPLETED. Do not re-run it.
 
