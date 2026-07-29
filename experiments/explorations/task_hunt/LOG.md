@@ -41204,3 +41204,59 @@ evidence *of* is the part that had to travel with them.**
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+## 2026-07-29 12:33 BST — HAN: **sycgen was left OUT of the submitted Reviewer-1 response** — proposal excerpt written for Dmitry
+
+**Han: Dmitry did not include sycgen, "because he didn't see the shuffle
+ablation result properly (got confused with the untrained twins
+stuff)."** The submitted response
+(`~/Desktop/actual_responses/bbby_response`) gives **three** lines of
+evidence for the temporal contribution — Shamir, window sweeps, Stacked
+SAE — and no sycgen.
+
+**⚑ THE CONFUSION IS OURS, NOT HIS.** Our write-up led with the
+**untrained-twin control**, which is a legitimate result and the
+**wrong thing to lead with**: the twin reaches **0.058** ordered
+recovery against the trained model's **0.578**, so its gap is a
+difference between two near-chance numbers. **A reader meeting that
+first cannot tell what is being claimed.** Han said this plainly at
+12:2x — *"untrained twins are NOT of the same level"* — and he was
+right both times: **it cost us the exhibit.**
+
+**WRITTEN:
+`docs/dmitry/reviewer_responses/PROPOSED_sycgen_excerpt_reviewer1.md`**
+— paste-ready, matching the submitted response's **plain-text style**
+(tab-aligned tables, no LaTeX, no markdown), ~1,900 chars against
+~5,500 of headroom.
+
+**What it leads with is the shuffle ablation**, because it is the
+**direct** answer to the reviewer's sharpest question (*"what evidence
+shows the improvement is specifically due to temporal aggregation?"*):
+**same trained model, same weights, same sparsity — only the token
+order inside the window changes.**
+
+    TXC recovery      T=2     T=4     T=8     T=16
+    Order preserved   0.499   0.522   0.536   0.578
+    Order shuffled    0.388   0.499   0.486   0.516
+    Gap               0.111   0.023   0.050   0.062
+
+**The twin control is NOT in the excerpt** — it is discussed after it,
+as a decision for Dmitry, with a recommended **one-sentence** pre-empt
+(*"a randomly-initialised TXC also loses accuracy under shuffling, so
+this order-sensitivity is architectural; what training adds is the
+accuracy itself, 0.22 → 0.58"*). **Recommending disclosure, in one
+sentence, in the position where it clarifies rather than confuses.**
+
+**EVERY NUMBER RE-DERIVED FROM SOURCE BEFORE THE FILE WAS FINISHED** —
+level from `frontier.json` through the same interpolation the table
+generator uses, shuffle from the 8 shards. **6/6 rows match, 0
+mismatches.** The check caught one: I had written the T=4
+order-preserved value as **0.523**, taken from the *level* table, when
+the shuffle run's own value is **0.522**. Same quantity, two
+evaluations (0.5227 vs 0.5225), landing on opposite sides of a
+3-dp round.
+
+**Rather than hide the 0.001 I stated it** — one clause: *"the
+order-preserved row is those same models re-evaluated in this run; it
+agrees with the table above to within 0.001."* **A reviewer comparing
+two tables in the same response would have found it, and an unexplained
+0.001 reads worse than an explained one.**
