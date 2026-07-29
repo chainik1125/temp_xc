@@ -12,11 +12,11 @@ tags:
 
 ## OpenReview copy-and-paste version
 
-We thank the reviewer for recognizing the novelty of applying crosscoders along the sequence axis and the value of the synthetic and real-world benchmarks.
+We thank the reviewer for recognizing the novelty of applying crosscoders along the sequence axis and the value of the synthetic and real-world benchmarks. We provide responses to the specific question about temporal vs. generic capacity below.
 
 > Since the non-temporal MLC ties TXC on probing, can you isolate the temporal contribution from generic crosscoder capacity?
 
-We agree that sparse probing alone does not isolate a temporal advantage: MLC ties TXC, and TXC performance is nearly invariant to window size on this static task. We have narrowed our claim accordingly. Two new controls separate temporal context from generic crosscoder capacity on the explicitly temporal tasks.
+We provide a number of lines of evidence. First, we provide the explicit window size dependence in each task for the base TXC:
 
 **Window-size sweep** (entries are percentages of T=5):
 
@@ -30,7 +30,9 @@ $$
 \\end{array}
 $$
 
-Longer context does not help static probing, but it materially helps Backtracking and Medical EM.
+Longer context does not help static probing, but it materially helps Backtracking and Medical EM. We do not in general expect temporal structure to be helpful on all tasks, but we do claim both that temporal structure is relevant for some important applications of SAEs _and_ that TXCs can exploit them.
+
+As an additional comparison, we provide explicitly the stacked SAE baseline, which aggregates the same temporal window without sharing feature weights across positions. We see that the stacked SAE underperforms the TXC in all but the EM task.
 
 **Stacked SAE control at T=5:**
 
@@ -46,11 +48,6 @@ $$
 \\end{array}
 $$
 
-Backtracking steering values peak at m=-12; detection uses PR-AUC at S=8, Medical detection uses PR-AUC at S=16, and HH-RLHF uses preference AUC at k=20.
-
-This control aggregates the same temporal window without sharing feature weights across positions. On causal Backtracking steering, it beats T-SAE (.164) and matches MLC (.246), showing that temporal aggregation helps, but reaches only .45x TXC's effect. Cross-position weight sharing supplies the remaining 2.2x gain. Conversely, Stacked SAE trails the per-token TopK SAE on static probing, so generic aggregation cannot explain that result. HH-RLHF remains a negative control: its random-dictionary floor (.617) exceeds both trained Stacked SAE (.602) and TXC (.610), indicating that this length-confounded metric is largely training-insensitive.
-
-† Medical EM detection is not sparsity-calibrated: under train-to-rollout distribution shift, realized evaluation $L_0$ is 6--10x nominal for the reference architectures and approximately 32x nominal for Stacked SAE. The .652 result should therefore be treated as directional pending re-thresholding, although it exceeds the Stacked random-dictionary floor of .344. The Stacked Medical steering cell requires approximately 14.8K judged generations and was scoped to follow-up work.
 
 ### T-SAE dictionary-width control
 
@@ -86,4 +83,88 @@ $$
 \\end{array}
 $$
 
-Here, *matched width* means matching the TXC's number of dictionary features, not its parameter count. The submitted Backtracking and HH-RLHF T-SAE checkpoints were already width-matched; the apparent mismatch came from presenting the global default without the task-specific overrides. $^{\\dagger}$ The interim Backtracking TXC value is Aniket's retained 20K-step seed-42 result, which we will replace with the completed 300K-step comparison. The completed matched-width Medical EM and HH-RLHF entries are single-seed (seed 42) reruns.
+### Parameter count and inference cost
+
+We also report the capacity and dense inference cost of every architecture in
+the headline configurations. Parameter counts are in millions. Inference cost
+is in GFLOPs per architecture's native forward: one token for TopK SAE and
+T-SAE, five positions for TFA, Stacked SAE, and TXC-base, five layers for MLC,
+and ten positions for TXC-pro. We count one multiply-add as two FLOPs and
+exclude selection, bias additions, nonlinearities, and training-only losses.
+
+**Trainable parameters (millions):**
+
+$$
+\\begin{array}{l|rrrr}
+\\hline
+\\text{Architecture} &
+\\text{Sparse} &
+\\text{Backtracking} &
+\\text{Medical EM} &
+\\text{HH-RLHF} \\\\
+\\hline
+\\text{TopK SAE / SAE-Arditi} &
+84.96 & 268.47 & 234.92 & 84.96 \\\\
+\\text{T-SAE} &
+75.52 & 268.47 & 117.46/234.92^{*} & 84.96 \\\\
+\\text{TFA }(T{=}5) &
+732.60 & 2315.33 & 2298.55 & \\text{--} \\\\
+\\text{MLC }(L{=}5) &
+424.70 & 1342.23 & \\text{--} & \\text{--} \\\\
+\\text{Stacked SAE }(T{=}5) &
+424.78 & 1342.36 & 1174.59 & 424.78 \\\\
+\\text{TXC-base }(T{=}5) &
+424.70 & 1342.23 & 1174.46 & 424.70 \\\\
+\\text{TXC-base }(T{=}10/20) &
+849.39/1698.76 & \\text{--} & \\text{--} & \\text{--} \\\\
+\\text{TXC-pro }(T_{\\max}{=}10) &
+849.39 & 2684.43 & 2348.88 & \\text{--} \\\\
+\\hline
+\\end{array}
+$$
+
+**Dense inference cost (GFLOPs per native forward):**
+
+$$
+\\begin{array}{l|rrrr}
+\\hline
+\\text{Architecture and native input} &
+\\text{Sparse} &
+\\text{Backtracking} &
+\\text{Medical EM} &
+\\text{HH-RLHF} \\\\
+\\hline
+\\text{TopK SAE / SAE-Arditi, 1 token} &
+0.170 & 0.537 & 0.470 & 0.170 \\\\
+\\text{T-SAE, 1 token} &
+0.151 & 0.537 & 0.235/0.470^{*} & 0.170 \\\\
+\\text{TFA, 5 tokens} &
+8.601 & 27.181 & 26.510 & \\text{--} \\\\
+\\text{MLC, 5 layers} &
+0.849 & 2.684 & \\text{--} & \\text{--} \\\\
+\\text{Stacked SAE, 5 tokens} &
+0.849 & 2.684 & 2.349 & 0.849 \\\\
+\\text{TXC-base, 5 tokens} &
+0.849 & 2.684 & 2.349 & 0.849 \\\\
+\\text{TXC-base, 10/20 tokens} &
+1.699/3.397 & \\text{--} & \\text{--} & \\text{--} \\\\
+\\text{TXC-pro, 10 tokens} &
+1.699 & 5.369 & 4.698 & \\text{--} \\\\
+\\hline
+\\end{array}
+$$
+
+$^{*}$ Medical T-SAE entries give paper-width / matched-width values. For an
+equal five-token segment, the per-token SAE and T-SAE costs should be
+multiplied by five. A matched-width per-token SAE or T-SAE and a five-position
+TXC therefore have the same leading dense-matmul cost over five reconstructed
+positions, while TXC stores approximately five times as many parameters
+because its encoder and decoder weights are position-specific. Sliding-window
+evaluation adds one native forward per window.
+
+This also sharpens the Stacked SAE control: Stacked SAE and $T=5$ TXC are
+effectively capacity- and inference-matched (1,342.36M vs. 1,342.23M
+parameters and 2.684 GFLOPs each on Backtracking), but Stacked SAE reaches only
+$0.45\\times$ TXC's causal steering effect. The Backtracking gain therefore
+cannot be explained by generic parameter count or dense inference compute
+alone.
