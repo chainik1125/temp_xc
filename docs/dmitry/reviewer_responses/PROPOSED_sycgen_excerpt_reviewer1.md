@@ -20,16 +20,10 @@ limit, so there is room.
 "four" and add:**
 
 ```
-<<<<<<< HEAD
 d. We add a real-world task on model activations, where the TXC matches or
 beats both SAE baselines at matched sparsity -- clearly so at the larger
 window sizes -- and loses accuracy when the token order inside its window is
 destroyed.
-=======
-d. We add a real-world task whose label no single token reveals. The TXC beats
-the per-token, pooled and stacked SAE baselines at matched sparsity, and loses
-accuracy when the token order inside its own window is destroyed.
->>>>>>> 69d6877f2 (Remove the untrained control from the proposal (Han); fix a false claim the check caught)
 ```
 
 > **⚑ SUMMARY LINE CORRECTED (mac-d, 12:3x) — two overclaims, both
@@ -109,69 +103,15 @@ Scope: one task, one model, one layer, three seeds.
 
 ## One line for Dmitry, not for the response
 
-<<<<<<< HEAD
-**We also ran an untrained control, and it qualifies the claim
-substantially.** A randomly-initialised TXC also loses accuracy under
-shuffling — and its gap is **LARGER than the trained model's at 3 of the 4
-window sizes** (and in **11 of 12** individual (T, seed) cells) (T=2 0.167 vs 0.111; T=4 0.138 vs 0.023; T=8 0.082 vs 0.050;
-only T=16 is smaller, 0.027 vs 0.062). **This still holds when the twin is
-re-run at the trained model's exact sparsity**, so it is not a budget
-artifact — we tested that and it was refuted.
-
-**So the order-sensitivity is a property of the ARCHITECTURE, not something
-training creates.** The gap on its own is **not** evidence of *learned*
-temporal structure. Note the twin is off the figure's axis for a **scale**
-reason (0.058 vs 0.578 ordered recovery), **not** because its gap is small —
-it is not.
-
-**What training adds is the accuracy itself**: at T=16, ordered recovery goes
-from **0.058 (untrained) to 0.578 (trained)** — the untrained model is near
-chance.
-
-> **⚑ NUMBER CORRECTED (mac-d, 12:3x, before this was pasted anywhere).** This
-> read *"from 0.22 (untrained) to 0.58 (trained) at T=16"*. **0.22 is the T=2
-> untrained value; at T=16 it is 0.058** — the sentence paired T=2's untrained
-> figure with T=16's trained one. Untrained ordered recovery by T is
-> **0.222 / 0.179 / 0.103 / 0.058** (T=2/4/8/16); trained is
-> **0.499 / 0.523 / 0.536 / 0.578**. The error **understated our own result**
-> (the real lift at T=16 is ~10x, not ~2.6x) but would not have survived a
-> reviewer checking it. *"By a comparable amount"* also softened: the twin's
-> gap is **larger** in 11/12 cells and **6x larger at T=4**, so "comparable"
-> understated it in the direction that flatters us. Shuffle table above
-> re-verified against the 8 source shards: **16/16 values exact.**
-
-**Two ways to handle it, your call:**
-
-1. **As written above** — claim only that the trained model's accuracy
-   depends on token order. That is true and it is what the reviewer asked
-   about. **But be clear-eyed: if a reviewer asks whether an untrained model
-   shows the same gap, the answer is "yes, and usually larger."** That is a
-   worse conversation to have after the fact than before.
-2. **Pre-empt it** by adding one sentence:
-
-```
-A randomly-initialised TXC also loses accuracy under shuffling, by a similar or
-larger amount, so this order-sensitivity is a property of the architecture
-rather than something training creates. What training adds is the accuracy
-itself: at T=16, ordered recovery rises from 0.058 to 0.578.
-```
-
-**Our recommendation is (2).** It costs one sentence, it is the kind of
-disclosure this reviewer explicitly praised ("the honesty about negative
-results is appreciated"), and it removes the only follow-up that could
-embarrass the claim.
-=======
 We also ran a random-init control on the shuffle. **It is deliberately not in
-the excerpt** — it answers a different question and it is what made the
+the excerpt** (Han) — it answers a different question and it is what made the
 earlier write-up unreadable.
 
-**Worth knowing before a reviewer asks:** a random-init TXC also loses
-accuracy under shuffling, so the *order-sensitivity itself* is architectural;
-what training supplies is the accuracy (ordered recovery 0.22 → 0.58 at T=16).
-**Nothing in the excerpt claims otherwise** — it claims only that the trained
-model's accuracy depends on token order, which is what the reviewer asked
-about. Detail: `REBUTTAL_HANDOFF.md` §6.
->>>>>>> 69d6877f2 (Remove the untrained control from the proposal (Han); fix a false claim the check caught)
+**Worth knowing before a reviewer asks:** a random-init TXC also loses accuracy
+under shuffling, by a similar or larger amount, so the *order-sensitivity
+itself* is architectural rather than learned. What training supplies is the
+accuracy: at T=16, ordered recovery rises from **0.058 to 0.578**.
+**Nothing in the excerpt claims otherwise.** Detail: `REBUTTAL_HANDOFF.md` §6.
 
 ---
 

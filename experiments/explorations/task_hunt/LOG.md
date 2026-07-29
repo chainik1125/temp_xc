@@ -41407,3 +41407,55 @@ the numbers.
 
 **All six data rows re-verified against `frontier.json` and the shards:
 0 mismatches.** The per-token anchor is 0.4819 → 0.482 as printed.
+
+## 2026-07-29 12:40 BST — ⚑ HUB: **I pushed a file with live conflict markers.** My retry loop only ever resolved LOG.md
+
+**The defect, stated first:** `aea7924fd` pushed
+`PROPOSED_sycgen_excerpt_reviewer1.md` with **4 conflict markers on
+`origin/arxiv`**. **My push loop resolves conflicts in
+`experiments/explorations/task_hunt/LOG.md` and nothing else** — it
+has run ~40 times tonight and every prior conflict happened to be in
+the LOG, so **a loop that could only ever half-work looked like it
+worked.** The first time another file conflicted, it pushed the
+markers.
+
+**Same shape as the night's whole theme, in my own infrastructure: it
+did not fail, it produced output.** `git rebase --continue` succeeded,
+the push succeeded, and the result was a corrupt deliverable on a
+shared branch. **`handoff_audit.py` would have caught it — it scans
+SURFACES for markers — but that file is not in `SURFACES`.**
+
+**Resolved by hand, keeping mac-d's edits over mine where they were
+right** (they were, on both counts — see below), and **the untrained
+section dropped per Han**, which is what the conflict was about.
+**0 markers, verified.**
+
+## mac-d caught three prose errors in my excerpt, all in our favour
+
+**`755a22b42`, and all three are mine:**
+
+1. *"the TXC **beats** both SAE baselines"* — **false of pooled at
+   T=2/4**, where the table returns **INDISTINGUISHABLE**. That table's
+   own headline was corrected from "above 3/4" to "above 2/4" for
+   exactly this; **my summary line reintroduced the claim the
+   correction removed.** Now *"matches or beats … clearly so at the
+   larger window sizes."*
+2. *"whose label **no single token reveals**"* — **the overclaim
+   already fixed twice on this response.** The body of my own excerpt
+   contradicts it (*"a probe on one token's activation still recovers
+   part of it"*). **A summary that disagrees with its own section.**
+3. *"from **0.22** (untrained) to 0.58 at T=16"* — **0.22 is the T=2
+   value; at T=16 it is 0.058.** I paired T=2's untrained figure with
+   T=16's trained one. **This one understated our own result** (~10×
+   lift, not ~2.6×) and still had to go.
+
+**Every reviewer-bound number re-verified after the merge: 6/6 rows
+exact against `frontier.json` and the shards, untrained T=16 = 0.058
+confirmed.** The tables were never wrong. **All five errors tonight in
+this document were in the PROSE around them** — the summary line, the
+"comparable" softening, the two-cell claim from a one-cell fact, the
+mispaired T. **Generated numbers survived; sentences about them did
+not.**
+
+**Fixing the loop is the next action** — resolve conflicts in every
+path, not just the LOG.
