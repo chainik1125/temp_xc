@@ -91,6 +91,9 @@ of papers covering:
 - task-conditioned or sequence-conditioned temporal statistics;
 - controls that distinguish order, frequency content, and simple averaging.
 
+The working synthesis is
+[Temporal Screen: annotated reading list and research synthesis](reading-list.md).
+
 The "Surya paper" is
 [Cagnetta, Raventós, Ganguli, and Wyart, *Deriving Neural Scaling Laws from
 the statistics of natural language*](https://arxiv.org/abs/2602.07488).
