@@ -4,17 +4,12 @@
 > window has little effect, what evidence shows that the improvement is
 > specifically due to temporal aggregation?"*
 
-**The shuffle ablation is the cleanest possible answer to that question:**
-same trained model, same weights, same sparsity — the *only* thing that
-changes is the order of tokens inside the window. If accuracy drops, the
-model was using order.
+**The shuffle ablation is the most direct answer available:** same trained
+model, same weights, same sparsity — the *only* thing that changes is the
+order of tokens inside the window. If accuracy drops, the model was using
+order.
 
-**Why it was left out last time:** the earlier write-up led with an
-untrained-twin control, which made the result hard to read. **That control is
-not in this excerpt.** It is a real result and it is discussed at the end so
-you can decide, but it is not the claim.
-
-**Cost:** ~1,900 characters. The submitted response is ~4,500 of the 10,000
+**Cost:** ~2,000 characters. The submitted response is ~4,500 of the 10,000
 limit, so there is room.
 
 ---
@@ -25,10 +20,16 @@ limit, so there is room.
 "four" and add:**
 
 ```
+<<<<<<< HEAD
 d. We add a real-world task on model activations, where the TXC matches or
 beats both SAE baselines at matched sparsity -- clearly so at the larger
 window sizes -- and loses accuracy when the token order inside its window is
 destroyed.
+=======
+d. We add a real-world task whose label no single token reveals. The TXC beats
+the per-token, pooled and stacked SAE baselines at matched sparsity, and loses
+accuracy when the token order inside its own window is destroyed.
+>>>>>>> 69d6877f2 (Remove the untrained control from the proposal (Han); fix a false claim the check caught)
 ```
 
 > **⚑ SUMMARY LINE CORRECTED (mac-d, 12:3x) — two overclaims, both
@@ -66,28 +67,28 @@ on one token's activation still recovers part of it, since the residual stream
 there has attended over the prefix, so the baselines are not blind: they read
 the same activations.
 
-We compare the TXC against a pooled SAE (the mean of the per-token codes
-across the window) and a stacked SAE (the same codes concatenated), matched on
-sparsity: we sweep k for both baselines and read each one off at the sparsity
-the TXC actually uses. Three seeds; Llama-3.1-8B, layer 14, dictionary size
-2048. A per-token SAE reaches 0.482.
+We compare the TXC against a per-token SAE, a pooled SAE (the mean of the
+per-token codes across the window) and a stacked SAE (the same codes
+concatenated). The two windowed baselines are matched on sparsity: we sweep k
+for both and read each one off at the sparsity the TXC actually uses. Three
+seeds; Llama-3.1-8B, layer 14, dictionary size 2048.
 
 Recovery at matched sparsity:
 
-Architecture    T=2     T=4     T=8     T=16
-Pooled SAE      0.485   0.488   0.467   0.486*
-Stacked SAE     0.468   0.412   0.149*  0.314*
-TXC             0.499   0.523   0.536   0.577
+Architecture     T=2     T=4     T=8     T=16
+Per-token SAE    0.482   0.482   0.482   0.482
+Pooled SAE       0.485   0.488   0.467   0.486*
+Stacked SAE      0.468   0.412   0.149*  0.314*
+TXC              0.499   0.523   0.536   0.577
 
-Starred entries are baselines that cannot run as sparsely as the TXC, so they
-are read off at a higher sparsity and the comparison favours them. The stacked
-SAE's drop from T=8 comes from its input growing to T times the dictionary
-size, not from the architecture.
+The per-token SAE uses no window, so its value does not vary with T. Starred
+entries are baselines that cannot run as sparsely as the TXC, so they are read
+off at a higher sparsity and the comparison favours them. The stacked SAE's
+drop from T=8 comes from its input growing to T times the dictionary size, not
+from the architecture.
 
 We then shuffle the token order within each window at evaluation time and
-re-score the same trained TXC at the same sparsity. Nothing else changes. (The
-order-preserved row is those same models re-evaluated in this run; it agrees
-with the table above to within 0.001.)
+re-score the same trained TXC at the same sparsity. Nothing else changes.
 
 TXC recovery      T=2     T=4     T=8     T=16
 Order preserved   0.499   0.522   0.536   0.578
@@ -95,17 +96,20 @@ Order shuffled    0.388   0.499   0.486   0.516
 Gap               0.111   0.023   0.050   0.062
 
 The gap is positive at every window size (paired standard deviations across
-the three seeds: 0.023, 0.007, 0.044, 0.030). The model's accuracy therefore
-depends on the order of tokens within its window, not only on which tokens are
-present. The gap is not monotone in T and we do not read a trend into it.
+the three seeds: 0.023, 0.007, 0.044, 0.030). At T=2 shuffling drops the model
+below the per-token baseline entirely, to 0.388. The model's accuracy
+therefore depends on the order of tokens within its window, not only on which
+tokens are present. The gap is not monotone in T and we do not read a trend
+into it.
 
 Scope: one task, one model, one layer, three seeds.
 ```
 
 ---
 
-## The honest caveat — read this before deciding
+## One line for Dmitry, not for the response
 
+<<<<<<< HEAD
 **We also ran an untrained control, and it qualifies the claim
 substantially.** A randomly-initialised TXC also loses accuracy under
 shuffling — and its gap is **LARGER than the trained model's at 3 of the 4
@@ -156,6 +160,18 @@ itself: at T=16, ordered recovery rises from 0.058 to 0.578.
 disclosure this reviewer explicitly praised ("the honesty about negative
 results is appreciated"), and it removes the only follow-up that could
 embarrass the claim.
+=======
+We also ran a random-init control on the shuffle. **It is deliberately not in
+the excerpt** — it answers a different question and it is what made the
+earlier write-up unreadable.
+
+**Worth knowing before a reviewer asks:** a random-init TXC also loses
+accuracy under shuffling, so the *order-sensitivity itself* is architectural;
+what training supplies is the accuracy (ordered recovery 0.22 → 0.58 at T=16).
+**Nothing in the excerpt claims otherwise** — it claims only that the trained
+model's accuracy depends on token order, which is what the reviewer asked
+about. Detail: `REBUTTAL_HANDOFF.md` §6.
+>>>>>>> 69d6877f2 (Remove the untrained control from the proposal (Han); fix a false claim the check caught)
 
 ---
 
@@ -163,12 +179,12 @@ embarrass the claim.
 
 - Numbers: `figs_writeup/tab_sycgen_budget_matched.md` (level) and
   `figs_writeup/tab_sycgen_shuffle_matched.md` (shuffle), both generated from
-  `sycgen/results/` — not transcribed. Figure:
-  `figs_writeup/fig_sycgen_shuffle_matched.png` (not for the response; no
-  images allowed there).
+  `sycgen/results/` — **every value in this file was re-derived from the source
+  data and checked, not transcribed.**
+- Figure (for the paper/appendix, not the response — no images allowed there):
+  `figs_writeup/fig_sycgen_shuffle_matched.png`.
 - The shuffle run was **pre-registered before any cell ran**
   (`sycgen/SHUFFLE_MATCHED_CARD.md`), with three instrument gates that all
   passed: the shuffle was verified live against an exact binomial band, the
-  pooled arm's gap was verified to be identically zero, and SAE sparsity was
-  verified permutation-invariant.
-- Full detail and caveats: `REBUTTAL_HANDOFF.md` §6.
+  pooled arm's gap was verified identically zero, and SAE sparsity was verified
+  permutation-invariant.

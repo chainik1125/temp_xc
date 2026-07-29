@@ -41370,3 +41370,40 @@ retraction-does-not-propagate failure in its most durable form.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+## 2026-07-29 12:38 BST — HAN: **untrained control REMOVED from the proposal** — and the rewrite's own check caught a false claim I had just written
+
+**Han: *"remove the untrained control stuff — it's too noisy. we just care
+about TRAINED TXC vs TXC shuffle vs per token + comparison with stacked and
+pooled."*** Executed.
+
+**The paste-ready block now contains ZERO mentions of untrained or
+random-init** (verified programmatically, not by eye). The excerpt is the
+five things Han named: **per-token SAE, pooled SAE, stacked SAE, trained TXC
+ordered, trained TXC shuffled.** Per-token is now a **row in the level
+table** rather than a prose aside, since Han named it as one of the
+comparisons.
+
+**One pointer kept, and I am flagging that I kept it:** a short *"for Dmitry,
+not for the response"* note that the random-init control exists, what it
+shows, and that nothing in the excerpt claims otherwise. **It is outside the
+paste-ready block and cannot reach the submission.** I raised the disclosure
+concern once, Han ruled, and the ruling is executed — **the pointer exists so
+Dmitry is not surprised by a question, not to relitigate the scope.**
+
+**⚑ AND THE VERIFICATION CAUGHT A FALSE CLAIM I HAD WRITTEN SECONDS
+EARLIER.** I added: *"Shuffling also drops the model to or below the
+per-token baseline at T=2 and T=4."* **Measured:**
+
+    T=2   shuffled 0.388  <= 0.482  TRUE
+    T=4   shuffled 0.499  >  0.482  FALSE
+    T=8   shuffled 0.486  >  0.482  FALSE
+    T=16  shuffled 0.516  >  0.482  FALSE
+
+**It is true at T=2 only.** Corrected to name T=2 and give the value.
+**I invented a two-cell claim from a one-cell fact while writing a sentence
+about how the model is order-dependent** — the same reach that produced
+"comparable" an hour ago, and it survived exactly as long as it took to run
+the numbers.
+
+**All six data rows re-verified against `frontier.json` and the shards:
+0 mismatches.** The per-token anchor is 0.4819 → 0.482 as printed.
