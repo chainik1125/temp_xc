@@ -37841,3 +37841,58 @@ inconsistent — and this reviewer is the 4 we are trying to move to a 5.
 
 **No action taken on any pod.** House rule holds regardless of what they
 cost or what they are computing.
+
+## 2026-07-29 01:31 BST — HUB: the sycgen table still did not render — **my first diagnosis was wrong, and I had bundled two changes so I could not tell which**
+
+Han: *"STILL not being rendered properly — Dmitry's other tables are
+FINE."*
+
+**I got the cause backwards the first time.** I marked comment spans and
+checked every `begin{array}` in the file:
+
+| lines | escaping | in comment | renders |
+|---|---|---|---|
+| 81, 138, 168, 274, 328 | **single** | no | **FINE** (Dmitry's, what Han reads) |
+| 395, 471, 495 | double | no | paste-only |
+| **439** | **double** | no | **mine — broken** |
+
+**Single-backslash is what renders. My conversion to double is what
+broke it.** The genuine faults in the first version were the
+`\text{-}` nested in `\mathrm{}` and the baseless `$^{*}$` —
+**and I fixed those in the same commit as the escaping change**, so when
+the table came back broken I had no way to attribute it. **Two changes,
+one commit, one symptom: the attribution was destroyed before the test
+ran.** Change one thing when you are diagnosing.
+
+**FIX — follow the file's actual pattern instead of inventing one.** The
+document already keeps each table twice: a **readable single-backslash
+copy in the working section** and a **double-backslash copy in the paste
+section** for OpenReview. sycgen now does the same. The paste copy is
+**generated from the working copy by doubling every backslash**, and the
+round-trip is asserted (`doubled.replace('\\\\','\\') == single`),
+so the two cannot drift.
+
+**⚑ AND THE DOUBLING BUG BIT ME TWICE IN ONE HOUR.** I used a regex for
+"double every *single* backslash" — `(?<!\\)\\(?!\\)` — which
+**skips the `\\` row separators that are already doubled**, so array
+rows never terminated and KaTeX reported *"\hline valid only within
+array environment"*. The rule is not "double the single ones", it is
+**"double them all"**. A plain `.replace('\\','\\\\')` is correct
+and the clever regex was wrong both times I reached for it.
+
+**PROSE REWRITTEN — Han: *"too LLM soundy and bloated... like the rest
+of Dmitry's writing."* Correct, and the tight version is the stronger
+one.** I had three hedging sentences and a parenthetical disclaiming a
+significance test. Dmitry's style is declarative: *"beyond the
+threshold, the TXC improves from 0.154 at W=3 to near perfect recovery,
+0.956 at W=10."* **The claim that was buried is the best one we have:
+0.499 → 0.523 → 0.537 → 0.577 is the TXC scaling with the window**, and
+it now leads. Honesty kept as clauses, not paragraphs: the T=2/4 margin
+"within the seed spread", starred baselines "scored at a higher budget",
+stacked's collapse "reflects its $T\cdot d$ input dimension". **The
+caveats got shorter and the claim got stronger — they were competing
+for the same sentence.**
+
+**Verified:** 84 math blocks (57 working as-is + 27 paste after
+unescape), **0 failures**. Paste block **6,534 / 10,000**. Dmitry's
+branch untouched.
