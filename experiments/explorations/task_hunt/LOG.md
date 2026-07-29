@@ -37809,3 +37809,35 @@ unwraps it.**
 guard is correct and sufficient for the reporter; the row stamp is what
 survives extraction. Cheap now, and it is the same lesson as the file
 path one level down.
+
+## 2026-07-29 01:24 BST — HUB: unattributed pod burn has **more than doubled**, and one of the new pods is running the baseline our Reviewer-1 response quotes
+
+**Re-queried read-only** (`LOOK-DON'T-TOUCH`; these are not ours and
+none were modified). **4 non-convention pods, $9.41/h** — up from the
+3 at $3.87/h my STATUS recorded. Fleet incl. mac-d's A40: **$9.85/h ≈
+$226/day.**
+
+**Composition changed, not just the total:** `mats-gap-code-h100` and
+`tsae-paper-widthmatch-em` are **gone**; three H100s appeared —
+`reviewer-btk-tsae-300k`, `reviewer-headline-multiseed`,
+`stacked-em-steer`. **A stale total would have hidden that**: had I
+only compared the number I would have seen "$3.87 → $9.41, someone
+added GPUs" and missed that two of the old ones went away and three
+*new* ones arrived, which is the part that matters.
+
+**⚑ THE COORDINATION FINDING OUTRANKS THE COST.** Those names are
+**rebuttal work from outside this fleet**, and `stacked-em-steer` is
+specifically **reviewer 1's requested Stacked-SAE baseline on EM
+steering** — which is the single task where our own Reviewer-1 response
+states stacked *beats* the TXC (*"Except for the EM task, stacked SAE
+performance is below the worst performing seed for the TXC"*). **Someone
+is right now recomputing a number that response quotes**, and I edited
+that document ninety minutes ago without knowing it.
+
+**Recommend to Han: a word with Dmitry before the Reviewer-1 section is
+frozen.** Not because the number is wrong, but because two people
+producing it independently is how a rebuttal ends up internally
+inconsistent — and this reviewer is the 4 we are trying to move to a 5.
+
+**No action taken on any pod.** House rule holds regardless of what they
+cost or what they are computing.

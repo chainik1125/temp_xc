@@ -81,10 +81,30 @@ before it guards a run.**
 structurally unreachable). Add no k cells; spend on SEEDS (n=3→5),
 since outcome (d) is still unsized.**
 
-**⚑ 3 unattributed non-convention pods ($3.87/h)** — `mats-gap-code-h100`,
-`tsae-paper-widthmatch-probing`, `tsae-paper-widthmatch-em`. **Never
-touched** (house rule). **Han's call, still pending.** Also pending:
-3-token rotation (`gh`, `hf_token`, `hf_token_datasets`).
+**⚑ UNATTRIBUTED PODS — RE-QUERIED 01:2x 07-29, THE PICTURE CHANGED.**
+Now **4 non-convention pods at $9.41/h** (was 3 at $3.87/h):
+
+| pod | $/h | note |
+|---|---|---|
+| `reviewer-btk-tsae-300k` | 2.99 (H100) | **NEW** |
+| `reviewer-headline-multiseed` | 2.99 (H100) | **NEW** |
+| `stacked-em-steer` | 2.99 (H100) | **NEW** |
+| `tsae-paper-widthmatch-probing` | 0.44 (A40) | was already up |
+
+`mats-gap-code-h100` and `tsae-paper-widthmatch-em` are **gone**. Total
+fleet incl. mac-d's A40 = **$9.85/h**. **Never touched** (house rule:
+agents do not modify pods they did not spin up). **Han's call, still
+pending** — and it is now ~**$226/day**, not ~$93.
+
+**⚑ COORDINATION SIGNAL, bigger than the cost:** those three names are
+**rebuttal work by someone outside this fleet**. `stacked-em-steer` in
+particular is **reviewer 1's requested Stacked-SAE baseline on EM
+steering** — the one task where our own response says stacked beats the
+TXC. Whoever is running it may be about to change a number the
+Reviewer-1 response quotes. **Worth a word with Dmitry before we freeze
+that section.**
+
+Also pending: 3-token rotation (`gh`, `hf_token`, `hf_token_datasets`).
 
 ## In flight (updated ~00:4x — the 20:00–00:30 chain is below)
 
