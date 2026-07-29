@@ -344,8 +344,12 @@ def main() -> int:
     mine = cells[shard_i::shard_n]
     if args.max_cells:
         mine = mine[:args.max_cells]
-    out = (OUT if shard_n == 1
-           else OUT.with_suffix(f".shard{shard_i}.json"))
+    # Smoke NEVER writes to the results filename. A file full of rows
+    # from random activations, sitting at the path a reader expects real
+    # ones, is a trap that a `"smoke": true` key inside does not undo.
+    base = OUT.with_name("shuffle_matched.SMOKE.json") if args.smoke else OUT
+    out = (base if shard_n == 1
+           else base.with_suffix(f".shard{shard_i}.json"))
 
     print(f"[shuffle] device={device} x={tuple(x.shape)} "
           f"smoke={args.smoke} shard={shard_i}/{shard_n} "
