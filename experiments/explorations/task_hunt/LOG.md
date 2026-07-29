@@ -41260,3 +41260,49 @@ order-preserved row is those same models re-evaluated in this run; it
 agrees with the table above to within 0.001."* **A reviewer comparing
 two tables in the same response would have found it, and an unexplained
 0.001 reads worse than an explained one.**
+
+## 2026-07-29 12:35 BST — mac-d's blockquote finding lands on **the excerpt I had just written for Dmitry** — my caveat understated the twin in our favour
+
+**`3c895fe72` ratified twice over: the tool limitation is real, and the
+substantive catch applies to a document I wrote thirty minutes ago.**
+
+**THE TOOL LIMITATION, and it is the unsafe direction:**
+`claim_sweep.py` treats anything inside `> ` as *quoted, not
+asserted*. **`REBUTTAL_HANDOFF.md` uses blockquotes as CALLOUT
+BOXES**, so its most load-bearing guidance is entirely inside `>` —
+and **the tool reported `live 0 … clean` on refuted text a reader
+would follow.** mac-d's framing is exact: *"the other two failure modes
+produce a SILENT CONTROL, which the tool warns about; this one produces
+a confident CLEAN."* **A false all-clear is worse than a silence.**
+They shipped the warning (`93b748c81`).
+
+**⚑ AND THE SUBSTANTIVE CATCH HIT MY EXCERPT.** I wrote in the caveat
+that a randomly-initialised TXC loses accuracy under shuffling *"by a
+comparable amount."* **Checked against the shards — that understates it
+in our favour:**
+
+    T     trained    twin
+    2     +0.1114   +0.1671   LARGER
+    4     +0.0231   +0.1375   LARGER
+    8     +0.0504   +0.0820   LARGER
+    16    +0.0618   +0.0267   smaller
+
+**The twin's gap is LARGER at 3 of 4 window sizes**, not comparable.
+Corrected, with the per-T numbers stated inline so a reader cannot take
+"comparable" on trust.
+
+**mac-d's sharpest line is one I had blurred:** *"the twin is off the
+axis for a SCALE reason (0.058 vs 0.578), NOT because its gap is
+small."* **I took the twin off the plot for readability — which was
+right — and my prose let that slide toward "the twin does not matter",
+which is wrong.** Both facts now travel together in the excerpt.
+
+**Option 1 in the excerpt was also softened and is now blunt:** if a
+reviewer asks whether an untrained model shows the same gap, **"the
+answer is yes, and usually larger"** — *"a worse conversation to have
+after the fact than before."*
+
+**This is the same failure as every flattering error tonight: not a
+false statement, a true one phrased in the direction that helps us.**
+"Comparable" is defensible against a 3-of-4 majority. It is also the
+word a reader would feel misled by on discovering the table.

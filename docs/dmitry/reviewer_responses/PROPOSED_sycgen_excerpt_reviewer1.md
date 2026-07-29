@@ -85,10 +85,19 @@ Scope: one task, one model, one layer, three seeds.
 
 ## The honest caveat — read this before deciding
 
-**We also ran an untrained control, and it qualifies the claim.** A
-randomly-initialised TXC *also* loses accuracy under shuffling, by a
-comparable amount. So the order-sensitivity is **a property of the
-architecture**, not something training creates.
+**We also ran an untrained control, and it qualifies the claim
+substantially.** A randomly-initialised TXC also loses accuracy under
+shuffling — and its gap is **LARGER than the trained model's at 3 of the 4
+window sizes** (T=2 0.167 vs 0.111; T=4 0.138 vs 0.023; T=8 0.082 vs 0.050;
+only T=16 is smaller, 0.027 vs 0.062). **This still holds when the twin is
+re-run at the trained model's exact sparsity**, so it is not a budget
+artifact — we tested that and it was refuted.
+
+**So the order-sensitivity is a property of the ARCHITECTURE, not something
+training creates.** The gap on its own is **not** evidence of *learned*
+temporal structure. Note the twin is off the figure's axis for a **scale**
+reason (0.058 vs 0.578 ordered recovery), **not** because its gap is small —
+it is not.
 
 **What training adds is the accuracy itself**: ordered recovery goes from
 **0.22 (untrained) to 0.58 (trained)** at T=16, while the untrained model
@@ -96,17 +105,18 @@ sits near chance.
 
 **Two ways to handle it, your call:**
 
-1. **As written above** — claim only that the trained model's accuracy depends
-   on token order. That is true, it is what the reviewer asked about, and it
-   does not overreach. If a reviewer asks whether an untrained model shows the
-   same, the answer is yes and it is not damaging, because an untrained model
-   recovers almost nothing to begin with.
+1. **As written above** — claim only that the trained model's accuracy
+   depends on token order. That is true and it is what the reviewer asked
+   about. **But be clear-eyed: if a reviewer asks whether an untrained model
+   shows the same gap, the answer is "yes, and usually larger."** That is a
+   worse conversation to have after the fact than before.
 2. **Pre-empt it** by adding one sentence:
 
 ```
-A randomly-initialised TXC also loses accuracy under shuffling, so this
-order-sensitivity is architectural; what training adds is the accuracy itself,
-lifting ordered recovery from 0.22 to 0.58.
+A randomly-initialised TXC also loses accuracy under shuffling, by a similar or
+larger amount, so this order-sensitivity is a property of the architecture
+rather than something training creates. What training adds is the accuracy
+itself: ordered recovery rises from 0.22 to 0.58 at T=16.
 ```
 
 **Our recommendation is (2).** It costs one sentence, it is the kind of
