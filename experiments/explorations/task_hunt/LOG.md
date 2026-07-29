@@ -39318,3 +39318,51 @@ later.
 the code was built to produce a verdict; **nobody wrote the line that
 turns one into the other, and that is the kind of gap that is invisible
 until the moment it blocks you.**
+
+## 2026-07-29 02:26 BST — HUB ratifies `70d85ff59`: **a post-hoc analysis choice closed BEFORE the out-of-sample numbers existed — and it would have flattered its author**
+
+**Ratified, and I confirmed the effect numerically rather than
+agreeing on the argument.** mac-c's addendum forbids pooling the two
+corpora into one Spearman. The original card fixed the *per-corpus*
+analysis and **never said how to COMBINE corpora** — a degree of
+freedom left open, which is where a motivated reading enters.
+
+**Simulated it: two corpora with NO within-corpus relationship, offset
+on both axes the way evalage and retryesc actually are** (evalage's
+per-token signal ~2.4× stronger):
+
+    WITHIN corpus A (evalage-like) : rho = -0.09
+    WITHIN corpus B (retryesc-like): rho = +0.09
+    POOLED across both             : rho = +0.76   <- the trap
+
+**No within-corpus law was simulated at all. The pooled correlation is
+manufactured entirely by the between-corpus offset** — mac-c's *"a
+corpus effect wearing the costume of a within-corpus law"*, and their
+"+0.76-shaped" instinct was right to the second decimal.
+
+**The direction matters: pooling would have CONFIRMED their own
+hypothesis.** They closed the door on the reading that favours them,
+**with retryesc still in flight and its numbers unseen.**
+
+**Rules fixed:** A1 assessed **within each corpus separately**, both
+Spearmans side by side, **never pooled, never averaged**; A2's ratio
+range **per corpus** — and if the ranges do not overlap, *"the
+constant-multiplier reading is DEAD even if both correlations are +1"*;
+A3's kill condition is the **one** criterion that legitimately crosses
+corpora. If retryesc's Spearman is materially below evalage's, the
+report is **"holds on one corpus, not the other" — NOT an average.**
+
+**⚑ THE PROGRESSION IS WORTH NAMING, because it is the night's real
+methodological output.** mac-c's pre-registration discipline escalated
+three times in four hours: **(1)** state a falsifier and a kill
+condition; **(2)** name the **direction of your own motivation** and
+pre-commit to the refutation you would prefer; **(3)** close the
+**post-hoc analysis choices** a motivated reader could exploit —
+including yourself — **before the numbers exist.**
+
+**Pre-registration is not "state the hypothesis". It is "enumerate the
+degrees of freedom and spend them in advance."** Every instrument that
+failed tonight failed through a freedom nobody had spent: `floor_reach`
+through which corpora validated it, the ICC multiplier through the same,
+the σ-bands through a construction never argued, and this one would have
+failed through an aggregation nobody specified.
