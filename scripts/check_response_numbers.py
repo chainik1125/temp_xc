@@ -69,9 +69,33 @@ def expected() -> dict:
 
 
 def quoted() -> dict:
-    """Parse the single-backslash (working) copy of the table."""
+    """Parse the sycgen table.
+
+    Handles BOTH shapes: the markdown pipe table (house style since Dmitry's
+    2026-07-29 conversion — pipe tables render everywhere, which is what the
+    LaTeX arrays kept failing to do) and the older LaTeX array, so this keeps
+    working on either branch mid-migration.
+    """
     body = DOC.read_text()
     got: dict = {}
+    rows = {"Pooled SAE": "pooled", "Stacked SAE": "stacked", "TXC": "txc",
+            "TXC L0 per window": "l0"}
+
+    # --- markdown pipe table ------------------------------------------
+    for label, key in rows.items():
+        pat = re.compile(r"^\|\s*\*{0,2}" + re.escape(label) +
+                         r"\*{0,2}\s*\|(.+)$", re.M)
+        m = pat.search(body)
+        if not m:
+            continue
+        vals = re.findall(r"(\d+\.\d+)", m.group(1))
+        for T, v in zip(TS, vals):
+            got.setdefault(T, {})[key] = float(v)
+
+    if got:
+        return got
+
+    # --- legacy LaTeX array -------------------------------------------
     for name, key in (("Pooled SAE", "pooled"), ("Stacked SAE", "stacked"),
                       ("TXC", "txc")):
         pat = re.compile(r"\\text\{" + name + r"\}((?:\s*&\s*(?:\\mathbf\{)?"
@@ -79,8 +103,7 @@ def quoted() -> dict:
         m = pat.search(body)
         if not m:
             continue
-        vals = re.findall(r"(\d\.\d+)", m.group(1))
-        for T, v in zip(TS, vals):
+        for T, v in zip(TS, re.findall(r"(\d\.\d+)", m.group(1))):
             got.setdefault(T, {})[key] = float(v)
     m = re.search(r"\\text\{TXC \}\s*L_0/\\text\{window\}((?:\s*&\s*[\d.]+){4})",
                   body)

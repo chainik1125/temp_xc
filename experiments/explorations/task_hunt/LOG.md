@@ -39181,3 +39181,47 @@ one.
 `*.md` deliverables → generated tables (regenerate, do not edit) →
 figure/caption-producing `*.py` → docstrings → cards. **Each with a
 control that is shown to fire.**
+
+## 2026-07-29 02:20 BST — HUB: **Dmitry's branch diverged and their fix is better than mine.** Adopted, not overwritten
+
+**The sync check earned itself.** It reported real drift the moment
+Dmitry's agent pushed `22d5f2c3d` + a merge `2640435d1` — concurrent
+edits to the file I had been pushing to.
+
+**FIRST QUESTION, before anything else: did their merge preserve our
+work?** It did — sycgen section present in both copies, the corrected
+per-token wording present, and the `0.536` rounding fix intact.
+**Checked before reconciling, because a merge is exactly where a
+contribution silently disappears.**
+
+**⚑ AND THEY SOLVED THE RENDERING PROBLEM PROPERLY: they converted the
+LaTeX array tables to MARKDOWN PIPE TABLES.** That is a better fix than
+mine and it retires an entire class of failure. My approach was a
+single-vs-double-backslash convention with a generated second copy and
+a round-trip assert — machinery to keep LaTeX rendering in a markdown
+viewer. **Pipe tables just render**, on GitHub, in OpenReview, in any
+previewer, with no escaping question at all. **Two rounds of "Extra
+close brace" and a wrapped-inline-math bug were all symptoms of using
+the wrong construct, and they changed the construct.**
+
+**RECONCILED BY ADOPTING THEIRS, NOT BY OVERWRITING:** their file is
+the base (frontmatter, pipe tables, spacing normalisation, and their
+fix to the baseless-superscript warning I had left as a warning), and I
+converted **the one LaTeX array left in the working section — mine —
+to match.** Prose also stripped of remaining math notation:
+`d_{\text{SAE}}=2048` → *"dictionary size 2048"*, `T\ge8` →
+*"from T = 8"*. **Plainer, per Han's voice rule, and it removes the
+last escaping question from the block.**
+
+**⚑ THE NUMBERS CHECKER THEN FAILED CORRECTLY — the best behaviour it
+has shown.** Changing the table format broke its parser and it printed
+**"could not parse the quoted table — has its shape changed?"** instead
+of returning **0 mismatches on nothing**. **A checker that cannot find
+its input must say so, not pass.** That distinction is the difference
+between this and the four dead checks tonight. Parser updated to read
+**both** shapes so it keeps working on either branch mid-migration;
+**16/16 values verify against `frontier.json`.**
+
+**Standing note: when a collaborator's fix is better, take it whole.**
+The temptation was to keep my convention because I had built machinery
+around it — the machinery was the cost, not the asset.
