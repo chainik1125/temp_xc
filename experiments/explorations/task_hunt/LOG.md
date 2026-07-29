@@ -38548,3 +38548,88 @@ quantity, and it retires my narrower note by absorbing it.
 **Standing rule added: pre-register the FORMULA. If a frozen card
 contains a literal that could have been computed, that literal is a
 latent post-hoc edit waiting to happen.**
+---
+
+## 2026-07-29 01:5x BST — mac-c answers the queued sycgen question: **my own screen criterion FAILS on the one success, and sycgen did not win by having a low floor — it won by having a stronger ARM**
+
+Standing orders §5.4: *"WHY DID SYCGEN SURVIVE? … A theory that explains
+every failure and cannot explain the one success is not finished."*
+Answered from artifacts on disk. **$0, 0 pods.**
+
+### 1. ⛔ `floor_reach` is REFUTED as a predictor — it ranks the KEEP second
+
+Out-of-sample test on the one success. `floor_reach` (mean of 3 legs):
+
+    corpus          T4      T8     T16     T32     T64     outcome
+    evalage       0.0034  0.0069  0.0138  0.0275  0.0532   WEAK (2/5 on my rescue)
+    sycgen        0.0060  0.0121  0.0242  0.0481  0.0910   ** KEEP 3/3 **
+    retryesc_gen  0.0183  0.0366  0.0732  0.1424  0.2409   KILL 3/3
+
+**My criterion says minimise it. Ranked best→worst it gives evalage <
+sycgen < retryesc — but the outcomes are sycgen > evalage > retryesc.**
+It gets the KILL right and **puts the only KEEP behind a WEAK.**
+`floor_reach` is at best **necessary, not sufficient**: a high value
+kills you, a low one buys nothing. It stays valid as a *description of
+what the floor can resolve* — that part is arithmetic, validated against
+observed `floor_excess` at 0.82–1.13× on two corpora — but **it is not a
+candidate-quality screen and I should not have implied it was.**
+
+### 2. ⛔ And my FLOOR LAW itself fails on sycgen — by 2.3×
+
+    corpus         floor_reach@T64   observed floor_excess   ratio
+    evalage                 0.0541                  0.0572    0.95
+    retryesc_gen            0.2431                  0.2748    0.88
+    sycgen                  0.0892                  0.2097  ** 0.43 **
+
+**The law was validated on two corpora that share a regime.** sycgen is
+outside it.
+
+**Mechanism — two hypotheses tested and REFUTED before the one that
+survived.** (a) *Censoring itself separates terciles*: no — T=64 sits
+**below** e1=293, so 90.6% of rows land in one censored bucket and
+censoring cannot discriminate. (b) *My per-doc age reimplementation
+diverges from `section_age`*: no — it matches.
+
+**What survives:** the floor's per-class recall is **[0.505, 0.149,
+0.976]** — it is not guessing uniformly. Measured on sycgen at T=64,
+`P(uncensored | class)` = **0.2822 / 0.0000 / 0.0000**: every uncensored
+row is in class 0. So on the screen's **BALANCED** test set, predicting
+one class for the whole censored mass banks a large share for free.
+**My law assumed out-of-window ⇒ chance. Under class balancing with a
+skewed age distribution that is FALSE**, and sycgen is where it shows.
+
+### 3. ⚑ The answer to the question: sycgen did NOT win by having a low floor
+
+Its floor is **the highest of the three** — 0.5430 vs evalage's 0.3905
+(chance 1/3 both). It won because its **arm** is much stronger. As excess
+over chance on gemma2_2b:
+
+                  tok      floor      arm     arm-floor    gain
+    sycgen      +0.196    +0.210    +0.308      +0.098    +0.1118
+    evalage     +0.127    +0.057    +0.197      +0.140    +0.0709
+
+**sycgen's arm reaches +0.308 over chance; evalage's only +0.197.** The
+hunt has spent its effort **lowering the floor**; the one success came
+from **a task whose windowed signal is simply better**. That inverts the
+strategy: `floor_reach` tells you what will *kill* a candidate, not what
+will *carry* one.
+
+### 4. Correction to my own premise check, caught before publishing
+
+I first computed sycgen as clearing gain on only **2/3** models. **That
+was wrong** — it came from taking the best arm cell across **both**
+faces, including `sycgen_age_wd`, the within-conversation *control* face
+(whose gain on gemma2 is +0.0485). On the headline `sycgen_age` face all
+three clear comfortably: **+0.1118 / +0.1151 / +0.1225**. The hub's
+premise stands as written; my near-miss was a cell-selection error, not a
+finding.
+
+**Net:** two of my own results retracted or bounded tonight's third and
+fourth time. The instrument fact stands, `floor_reach` is demoted from
+screen to necessary-condition, and the open question is now **what makes
+an arm strong**, which is the gain side — exactly where the upper-edge
+measurement said the binding constraint would sit.
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
