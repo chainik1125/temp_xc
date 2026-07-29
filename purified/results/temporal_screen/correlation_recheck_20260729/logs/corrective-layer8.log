@@ -1,0 +1,11 @@
+layer=8 centering=global: reconstructing articles
+layer=8 centering=position: reconstructing articles
+layer=8 centering=sequence: reconstructing articles
+{
+  "status": "ok",
+  "layers": [
+    8
+  ],
+  "output_dir": "/workspace/correlation-rerun-20260729/corrective",
+  "limitation": "cached article-prefix reconstruction: source tokens are contiguous across joined 255-token blocks, but activations were produced with a fresh BOS, context, and positional reset per block; discarded article remainders cannot be recovered"
+}

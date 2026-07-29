@@ -1,0 +1,18 @@
+{
+  "json": "/workspace/correlation-rerun-20260729/robustness/layer_8.json",
+  "figure": "/workspace/correlation-rerun-20260729/robustness/layer_8.png",
+  "table": "/workspace/correlation-rerun-20260729/robustness/layer_8_fits.csv",
+  "spectral_table": "/workspace/correlation-rerun-20260729/robustness/layer_8_spectral.csv",
+  "summary": {
+    "legacy_aicc_winner": "power_cutoff_floor",
+    "crossfit_aicc_winner": "stretched_floor",
+    "signed_direction_aicc_winners": {
+      "power_cutoff_floor": 1,
+      "stretched_floor": 3,
+      "power": 1,
+      "power_floor": 3
+    },
+    "signed_directions_fit": 8,
+    "signed_directions_total": 8
+  }
+}

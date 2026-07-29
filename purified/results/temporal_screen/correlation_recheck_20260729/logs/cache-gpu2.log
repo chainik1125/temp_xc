@@ -1,0 +1,7 @@
+2026-07-29 22:30:44,437 | INFO    | cache | caching sequences [4000:8000] of 8000 on cuda:0
+2026-07-29 22:32:22,229 | INFO    | cache |   wrote shard_0004.pt  seqs[4000:5000]  layers=[6, 8, 12]
+2026-07-29 22:32:32,029 | INFO    | cache |   wrote shard_0005.pt  seqs[5000:6000]  layers=[6, 8, 12]
+2026-07-29 22:32:41,999 | INFO    | cache |   wrote shard_0006.pt  seqs[6000:7000]  layers=[6, 8, 12]
+2026-07-29 22:32:52,136 | INFO    | cache |   wrote shard_0007.pt  seqs[7000:8000]  layers=[6, 8, 12]
+Loaded pretrained model gpt2 into HookedTransformer
+Moving model to device:  cuda:0

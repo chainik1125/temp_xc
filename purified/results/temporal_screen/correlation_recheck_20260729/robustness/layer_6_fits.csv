@@ -1,0 +1,4 @@
+layer,estimator,aicc_winner,tail_rmse_winner,winner_aicc,pure_power_alpha,pure_power_aicc,pure_power_tail_log_rmse
+6,no_removal,power_floor,power_cutoff_floor,-479.8835361799296,0.1746448756687701,-290.8071881962623,0.0695983417060665
+6,legacy_same_data,power_cutoff_floor,power_cutoff_floor,-376.4181008535565,0.7561448154580418,-223.90244386991824,0.2265818083913718
+6,crossfit_removal,power_cutoff_floor,power_cutoff_floor,-379.0007800307453,0.7364950157724229,-221.27028422126597,0.23315027265417895

@@ -1,0 +1,8 @@
+2026-07-29 22:30:43,641 | INFO    | cache | caching sequences [0:4000] of 8000 on cuda:0
+2026-07-29 22:32:12,370 | INFO    | cache | logit-lens sanity: max|manual-model logits| = 0.00e+00 (OK)
+2026-07-29 22:32:22,349 | INFO    | cache |   wrote shard_0000.pt  seqs[0:1000]  layers=[6, 8, 12]
+2026-07-29 22:32:31,895 | INFO    | cache |   wrote shard_0001.pt  seqs[1000:2000]  layers=[6, 8, 12]
+2026-07-29 22:32:42,025 | INFO    | cache |   wrote shard_0002.pt  seqs[2000:3000]  layers=[6, 8, 12]
+2026-07-29 22:32:52,025 | INFO    | cache |   wrote shard_0003.pt  seqs[3000:4000]  layers=[6, 8, 12]
+Loaded pretrained model gpt2 into HookedTransformer
+Moving model to device:  cuda:0

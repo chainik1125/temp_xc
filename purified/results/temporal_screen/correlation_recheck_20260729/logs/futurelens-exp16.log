@@ -1,0 +1,9 @@
+2026-07-29 22:33:29,573 | INFO    | exp16d | L6 b=1: exp R2=0.7647 xi=26.21 | pow R2=0.9778 alpha=0.756 | AIC winner: pow
+2026-07-29 22:33:36,965 | INFO    | exp16d | L6 b=2: exp R2=0.7817 xi=16.18 | pow R2=0.9691 alpha=0.678 | AIC winner: pow
+2026-07-29 22:33:44,425 | INFO    | exp16d | L6 b=4: exp R2=0.8151 xi=11.1 | pow R2=0.9603 alpha=0.568 | AIC winner: pow
+2026-07-29 22:33:52,254 | INFO    | exp16d | L6 b=8: exp R2=0.7888 xi=15.06 | pow R2=0.9231 alpha=0.367 | AIC winner: pow
+2026-07-29 22:34:10,129 | INFO    | exp16d | L8 b=1: exp R2=0.776 xi=35.23 | pow R2=0.9846 alpha=0.56 | AIC winner: pow
+2026-07-29 22:34:17,665 | INFO    | exp16d | L8 b=2: exp R2=0.8152 xi=20.85 | pow R2=0.9826 alpha=0.519 | AIC winner: pow
+2026-07-29 22:34:24,310 | INFO    | exp16d | L8 b=4: exp R2=0.8691 xi=13.3 | pow R2=0.9837 alpha=0.465 | AIC winner: pow
+2026-07-29 22:34:30,991 | INFO    | exp16d | L8 b=8: exp R2=0.8245 xi=14.42 | pow R2=0.9484 alpha=0.38 | AIC winner: pow
+2026-07-29 22:34:30,999 | INFO    | exp16d | wrote /workspace/tensor-network-futurelens-rerun/results/runs/gpt2_exp16_powerlaw/powerlaw_vs_exp.json
