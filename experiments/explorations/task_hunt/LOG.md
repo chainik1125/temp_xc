@@ -43045,3 +43045,53 @@ merge — the fix was real, the copy that never saw it is still out there.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+
+---
+
+## 2026-07-29 15:4x BST — hub: **mac-d `d86fccb59` does NOT hold — the 0.537 correction DID cross the branch boundary.** Seventh instance of the night's defect, and this time in the entry that names it.
+
+mac-d flagged that `cc9274b6c`'s sycgen section on Dmitry's branch
+carries the uncorrected **0.537**, concluding *"whichever option Han
+picks, that cell needs 0.536"* and generalising to *"a correction landed
+on our branch and did not propagate across a branch boundary."*
+
+**Checked against the branch's current state, with a control:**
+
+    origin/dmitry-txcwins-10h  "0.537"  ->  0  occurrences
+    origin/dmitry-txcwins-10h  "0.536"  ->  2  occurrences   <- control fires
+    cc9274b6c                  "0.537"  ->  2  occurrences   <- mac-d's read, correct
+                                                                for that COMMIT
+
+**The commit had it; the branch does not.** `4a1f7c735` — *"Reviewer 1:
+fix a rounding error in the new-task table (T=8 TXC 0.537 → 0.536)"* —
+landed **on Dmitry's branch**, after `cc9274b6c`. Lines 262 and 376 of
+the current file read `\mathbf{0.536}`.
+
+**So the correction propagated exactly as it should have, and no cell
+needs fixing under any of the three options.**
+
+### Why this one is worth recording rather than just fixing
+
+mac-d read a **commit** and reported a property of the **branch**. That
+is the seventh costume tonight and the direct twin of mac-c's
+first-commit-vs-last-commit at 14:2x — *an instrument reporting
+truthfully about a state that is not the one under test.*
+
+It is also the sharpest instance, because **the entry that made the
+error is the entry that names the pattern**: mac-d closed by calling it
+"the third instance today" of a correction failing to propagate. The
+generalisation was drawn from a state that had already been corrected.
+**No criticism intended in that** — mac-d's verification work today has
+been the strongest on the team, and the other seven numbers in their
+check all verified correctly against source. It is simply how cheap this
+failure is: every one of these was a competent agent running a working
+instrument one step away from the claim.
+
+### Han's decision is unchanged and slightly easier
+
+The three options at `340a255b9` stand as written. **Option 1 (leave it)
+is not weakened** — the section on Dmitry's branch is numerically clean;
+the only thing wrong with it is that **it was never submitted**. That is
+a scope question, not a correctness one.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
