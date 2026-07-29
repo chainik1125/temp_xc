@@ -1,0 +1,33 @@
+{
+  "seeds": [1, 2, 42],
+  "n_sequences": 512,
+  "tile_sizes": [4, 8, 16, 32],
+  "n_components": 8,
+  "n_splits": 5,
+  "low_cutoff": 0.125,
+  "summary_datasources": [
+    "toy_backtracking_selfexcite_d64",
+    "toy_changepoint_modes_d64",
+    "toy_hedging_drift_d64",
+    "toy_cyclic_circle_M101_d128",
+    "toy_phasepair_M101_d24",
+    "toy_permuted_circle_M101_d128",
+    "toy_signed_motion_M19_d40",
+    "toy_recipe_instruction_d64",
+    "toy_assumption_consequence_d64",
+    "toy_colored_sources_N32_D2_d32"
+  ],
+  "targets": [
+    "frequency_velocity",
+    "phasepair_pair",
+    "phasepair_sign",
+    "permuted_schedule",
+    "signed_motion_sign",
+    "backtracking_lambda",
+    "changepoint_mode",
+    "changepoint_tss",
+    "hedging_confidence",
+    "recipe_equality",
+    "assumption_next_state"
+  ]
+}

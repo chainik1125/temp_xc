@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "run_name": "power-spectrum-synthetic-overnight-20260729",
+  "budget": {
+    "max_total_usd": 50.0,
+    "reserve_usd": 5.0,
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 7.5
+  },
+  "planning": {
+    "estimated_steps_per_second": 120.0,
+    "estimated_eval_seconds_per_cell": 30.0,
+    "setup_seconds": 300.0
+  },
+  "training": {
+    "batch_tokens": 1024,
+    "buffer_tokens": 524288,
+    "refill_threshold": 0.5,
+    "learning_rate": 0.0003,
+    "warmup_steps": 1000,
+    "checkpoint_every_steps": 1000,
+    "budget_check_every_steps": 100
+  },
+  "fairness": {
+    "compute": "Every arm gets the same datasource, seed, optimizer steps, learning rate, d_sae, and approximately 1024 reconstructed token positions per step (batch_size*T).",
+    "txc_pre": "Primary equal-code-support baseline: nominal shared-window support is at most k_pos*T, matching spectral's total per-band support.",
+    "txc_post": "Position-mixing/nonlinearity comparator: nominal shared-window support is k_pos; it reuses each active atom across T decoded positions and is reported separately rather than called equal-support.",
+    "reporting": "Parameter count, realized l0_per_window, realized l0_per_token, NMSE, and paired seed deltas versus both TXC baselines are all reported."
+  },
+  "models": [
+    {
+      "name": "txc_pre",
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPre",
+      "implementation_version": "1.0.0",
+      "fairness_role": "equal_window_support",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "txc_post",
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+      "implementation_version": "1.0.0",
+      "fairness_role": "position_mixing_lower_code_support",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "spectral_v1",
+      "class_path": "temp_bench.archs.spectral_txc:SpectralTXCBatchTopK",
+      "implementation_version": "1.0.0",
+      "fairness_role": "equal_window_support",
+      "hparams": {
+        "bands": "multiband",
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "v2_remove_dc",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.0.0-experimental",
+      "class_candidates": [
+        "SpectralTXCBatchTopKV2",
+        "SpectralTXCV2"
+      ],
+      "fairness_role": "equal_window_support",
+      "hparams": {
+        "bands": "multiband",
+        "dc_mode": "remove",
+        "selection_mode": "per_band",
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "v2_dominance",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.0.0-experimental",
+      "class_candidates": [
+        "SpectralTXCBatchTopKV2",
+        "SpectralTXCV2"
+      ],
+      "fairness_role": "equal_window_support",
+      "hparams": {
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "selection_mode": "per_band",
+        "dominance_alpha": 0.1,
+        "dominance_cap": 1.5,
+        "dominance_target": "bandwidth",
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "v2_freq_matryoshka",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.0.0-experimental",
+      "class_candidates": [
+        "SpectralTXCBatchTopKV2",
+        "SpectralTXCV2"
+      ],
+      "fairness_role": "equal_window_support",
+      "hparams": {
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "selection_mode": "per_band",
+        "frequency_matryoshka_alpha": 0.1,
+        "frequency_matryoshka_decay": 1.0,
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "v2_combined",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.0.0-experimental",
+      "class_candidates": [
+        "SpectralTXCBatchTopKV2",
+        "SpectralTXCV2"
+      ],
+      "fairness_role": "equal_window_support",
+      "hparams": {
+        "bands": "multiband",
+        "dc_mode": "remove",
+        "selection_mode": "per_band",
+        "dominance_alpha": 0.1,
+        "dominance_cap": 1.5,
+        "dominance_target": "bandwidth",
+        "frequency_matryoshka_alpha": 0.1,
+        "frequency_matryoshka_decay": 1.0,
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "v2_global",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.0.0-experimental",
+      "class_candidates": [
+        "SpectralTXCBatchTopKV2",
+        "SpectralTXCV2"
+      ],
+      "fairness_role": "equal_window_support_global_selection",
+      "hparams": {
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "selection_mode": "global",
+        "auxk_alpha": 0.03125
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "name": "frequency",
+      "datasource": "toy_cyclic_circle_M101_d128",
+      "primary_metric": "velocity_recovery",
+      "T": 8,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 6000,
+      "max_cell_minutes": 30,
+      "rationale": "Single-tone power task with headroom; T=16 is deliberately avoided because existing spectral v1 saturates there."
+    },
+    {
+      "name": "multilane",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "primary_metric": "multilane_recovery",
+      "T": 4,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 30000,
+      "max_cell_minutes": 45,
+      "rationale": "Memorization-immune superposition task; T=4 is where the existing multiband versus full-band margin is largest."
+    },
+    {
+      "name": "phasepair",
+      "datasource": "toy_phasepair_M101_d24",
+      "primary_metric": "sign_recovery",
+      "T": 4,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 30000,
+      "max_cell_minutes": 45,
+      "rationale": "Phase-only negative control for a power prior; singleton v1 bands are sign-blind at T=4 while TXC-post is strong."
+    },
+    {
+      "name": "permuted",
+      "datasource": "toy_permuted_circle_M101_d128",
+      "primary_metric": "schedule_recovery",
+      "T": 8,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 6000,
+      "max_cell_minutes": 30,
+      "rationale": "Broadband schedule task tests whether a spectral gain is DCT-alignment-specific."
+    },
+    {
+      "name": "colored",
+      "datasource": "toy_colored_sources_N32_D2_d32",
+      "primary_metric": "colored_rec_adj",
+      "T": 8,
+      "d_sae": 32,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 30000,
+      "max_cell_minutes": 45,
+      "rationale": "Low-frequency covariance/eigendirection task, complementary to tone-latent recovery."
+    }
+  ],
+  "phases": {
+    "smoke": {
+      "models": "all",
+      "tasks": [
+        "frequency"
+      ],
+      "seeds": [
+        42
+      ],
+      "n_steps": 2,
+      "max_cell_minutes": 10
+    },
+    "gate": {
+      "models": "all",
+      "tasks": "all",
+      "seeds": [
+        42
+      ],
+      "n_steps": 1200,
+      "max_cell_minutes": 20
+    },
+    "full": {
+      "models": "all",
+      "tasks": "all",
+      "seeds": [
+        1,
+        2,
+        42
+      ]
+    }
+  },
+  "gates": {
+    "required_models": [
+      "txc_pre",
+      "txc_post",
+      "spectral_v1"
+    ],
+    "max_nmse": 100.0
+  }
+}
