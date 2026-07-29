@@ -38844,3 +38844,83 @@ with the `tail` failure named. Audit clean, self-test 9/9.
 
 **The reusable line: a "live fact" needs an expiry set by the fact, and
 a gate needs to know the difference between stale and retired.**
+---
+
+## 2026-07-29 02:0x BST — mac-c on "what makes an ARM strong": my first instrument FAILS out-of-sample (predicts backwards), and the diagnosis suggests the hunt's core criterion is SELF-DEFEATING
+
+Standing orders §5.5: *"what makes an ARM strong? Neither instrument
+built tonight measures it. Build that before generating another corpus."*
+First attempt built and **reported as a negative**. $0, 0 pods, both
+corpora already cached locally (evalage + retryesc_gen, gemma2_2b L14
+@512). **Exploratory — not pre-registered, and labelled as such in the
+run.**
+
+### The idea, and why it was plausible
+
+`actxmean` averages `T` per-token activations. Averaging denoises only if
+the per-position label signal is **non-redundant**. Measure the
+intraclass correlation `ICC` of the label direction inside a window: high
+ICC ⇒ positions agree ⇒ averaging buys nothing; low ICC ⇒ independent
+looks ⇒ SNR gain `sqrt(T/(1+(T-1)·ICC))`.
+
+### ⛔ It works within a corpus and INVERTS across corpora
+
+    corpus         T    ICC    SNR mult     observed gain
+    evalage        4   0.634      1.174          +0.0200
+    evalage       64   0.331      1.710          +0.0709   <- tracks, 5/5
+    retryesc_gen   4   0.463      1.294
+    retryesc_gen  64   0.103      2.923      ** negative **
+
+**Within evalage it tracks perfectly** — ICC falls, multiplier rises,
+gain rises, monotone across all five T. **Across corpora it predicts the
+exact opposite of what happened:** retryesc has *lower* ICC and a *higher*
+predicted multiplier (2.92 vs 1.71 at T64), and its arm does not beat tok
+at all. **The instrument is refuted as a cross-corpus screen.** Same
+shape as `floor_reach` three hours earlier: fits the cases it was built
+from, inverts on the one it wasn't.
+
+### Diagnosis — low ICC is AMBIGUOUS, and I built the formula on one reading
+
+    corpus        tok-chance    T    ICC   BETWEEN var   signal x mult
+    evalage          +0.1121    4  0.634        1.9540          2.2943
+    evalage          +0.1121   64  0.331        1.0678          1.8262
+    retryesc_gen     +0.0472    4  0.463        0.6485          0.8392
+    retryesc_gen     +0.0472   64  0.103        0.1823          0.5328
+
+Low ICC can mean **"independent looks at a real signal"** (averaging
+helps) **or "there is barely a signal"** (averaging helps nothing). My
+multiplier assumed the first. retryesc is the second: its between-window
+signal variance is **3.0× smaller at T4 and 5.9× smaller at T64**, and
+its per-token probe is **+0.047 over chance versus evalage's +0.112**.
+**Signal magnitude dominates; redundancy is second-order** — `signal ×
+mult` orders the corpora correctly (2.29/1.83 vs 0.84/0.53) where ICC
+alone does not.
+
+### ⚑ THE IMPLICATION, and it is a HYPOTHESIS, not a result
+
+**The window appears to AMPLIFY an existing per-token signal rather than
+GENERATE one.** Excess over chance, same pipeline:
+
+    sycgen   tok +0.196   arm +0.308      (KEEP 3/3)
+    evalage  tok +0.127   arm +0.197      (WEAK)
+    retryesc tok +0.047   arm weak        (KILL 3/3)
+
+**Arm strength tracks tok strength.** If that holds, the hunt's own
+sourcing criterion is **self-defeating**: `hunt-safety-gold-clew.md`
+demands **per-token-silent** tasks precisely to suppress `tok` and widen
+the gain — but suppressing the per-token signal would suppress the arm
+along with it, because the arm is downstream of the same signal. **That
+would explain the entire kill record with one mechanism**, and it is
+consistent with the upper-edge finding (a single token already carries
+age past 1024, so `tok` is strong wherever the signal exists at all).
+
+**I am not claiming it.** Three corpora, one model, one layer, and two of
+the three arm numbers come from different screen configurations. **The
+test is cheap and specified:** compute tok-excess and arm-excess through
+one identical pipeline for every screened corpus and check whether
+arm-excess is monotone in tok-excess. If it is not, this hypothesis dies
+and the "amplifier" framing goes with it.
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
