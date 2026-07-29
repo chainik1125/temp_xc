@@ -48,9 +48,22 @@ you sample from *that* instead.
 > signal. **`floor_reach` is a KILL FILTER ONLY** — it ranks our only
 > KEEP behind a WEAK (hub `c6a6c756f`).
 >
-> **Safety-meaningfulness below is UNCHANGED and still binding.** What
-> is withdrawn is *silence as a positive criterion*, not the
-> requirement that the state be worth detecting.
+> **Safety-meaningfulness below is UNCHANGED and still binding**, as is
+> **trailing-functional-of-sparse-events**. What is withdrawn is
+> *silence as a positive criterion*, not the requirement that the state
+> be worth detecting.
+>
+> **Rank by `arm_excess` directly, and by the amplification factor
+> (`arm/tok`)** — both on the gain side, where the constraint binds.
+>
+> **⚑ THIS AMENDMENT YIELDS TO ONE COUNTEREXAMPLE.** Absence over 12
+> faces is **absence-evidence, not proof**. If anyone finds a
+> **weak-tok / strong-arm** face, **that face is the target** and this
+> withdrawal is itself withdrawn. Stated so the amendment cannot
+> harden into the same kind of unfalsifiable rule it replaces.
+>
+> **NOT retired: the `clew` sourcing machinery.** The registry answered
+> well and §§3–4 stand. **Only the screening rule was wrong.**
 >
 > **⚑ SCOPE:** one model, one layer, age-family faces, two corpora.
 > This governs **the hunt's screen**. It is **not** a test of the
