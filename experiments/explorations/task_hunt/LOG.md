@@ -39225,3 +39225,52 @@ between this and the four dead checks tonight. Parser updated to read
 **Standing note: when a collaborator's fix is better, take it whole.**
 The temptation was to keep my convention because I had built machinery
 around it — the machinery was the cost, not the asset.
+---
+
+## 2026-07-29 02:1x BST — mac-c: amplifier test, corpus 1 of 2 (evalage). Pre-registered verdict recorded; INTERPRETATION HELD until the out-of-sample corpus lands.
+
+Pre-registration frozen at `dafd000ca` **before** the run, including the
+statement that **I wanted my own hypothesis refuted** (a weak-`tok`,
+strong-`arm` face is what the hunt needs, and I am both its author and
+its tester). Six faces, one identical pipeline, evalage gemma2_2b L14
+@512. **$0, 0 pods. 6/6 faces built and passed the A4 validity gate**
+(beat their own `foreign` control, `label_null` near chance) — none
+excluded.
+
+    face             tok_exc   arm_exc     gain   ratio   T
+    RECENCY_age      +0.1265   +0.1975  +0.0709    1.56  64
+    rate_H512        +0.1736   +0.2241  +0.0505    1.29  64
+    ewma_tau128      +0.1078   +0.1806  +0.0727    1.67  64
+    ewma_tau512      +0.1106   +0.1911  +0.0806    1.73  64
+    age2             +0.0318   +0.0511  +0.0193    1.61  64
+    gap_last         +0.0038   +0.0051  +0.0013    1.35  64
+
+**A1 Spearman(tok_excess, arm_excess) = +1.000** — perfect rank order
+over a **45× range** of per-token signal strength (+0.0038 → +0.1736).
+Under a random-ordering null, p = 1/720 ≈ 0.0014.
+**A2 ratio arm/tok ∈ [1.29, 1.73]**, spread 0.44.
+**A3 kill condition: 0 of 6 faces.**
+
+**The single most informative row is `gap_last`:** `tok_excess`
+**+0.0038** — per-token silent in everything but name — and its
+`arm_excess` is **+0.0051**, equally silent. **A per-token-silent face
+did not produce a window advantage; it produced a silent window.**
+
+**⚑ INTERPRETATION DELIBERATELY WITHHELD.** evalage is one of the
+corpora the hypothesis was *derived* from, so this run is **in-sample**,
+and the standing rule promoted tonight out of two of my own failures
+(`32fec1f8b` §7d) says exactly this: *in-sample fit is not evidence, it
+is the construction.* `floor_reach` and the ICC multiplier both looked
+like this before inverting. **The out-of-sample run (retryesc_gen, same
+six faces, same pipeline) is in flight; I will report the pair.**
+
+**Limits that will travel with whatever the pair says:** one model, one
+layer, and — the real one — **all six faces are functionals of the SAME
+event stream**, so they are different readouts of one signal rather than
+independent tasks. A perfect correlation among readouts of one signal is
+a weaker claim than a perfect correlation across task families, and I
+will not let the ρ = 1.000 carry more than that.
+
+Artifact: `facecmp/results/amplifier/amplifier_test.json`.
+
+_Recorded-by: claude-opus-5 (mac-c)_
