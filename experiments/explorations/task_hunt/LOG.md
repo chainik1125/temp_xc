@@ -40613,3 +40613,48 @@ T=4, we can — the untrained twin is more order-sensitive than the
 trained model with the budget advantage removed.** The qualification I
 added to the binding quote-form now needs its own correction, and I
 will make it on the next beat rather than leave it half-done.
+
+## 2026-07-29 03:12 BST — HUB: corrected the qualification MY refuted hypothesis planted, and the volatile age gate caught a stale fleet list on the same pass
+
+**A refuted hypothesis propagates exactly like a retracted claim, and
+mine had reached three surfaces.** Corrected all three:
+
+- `REBUTTAL_HANDOFF.md` shuffle block — *"BUDGET CONFOUND, carry at
+  equal prominence… (b) is carried by T=2/4/8"* → **"REMOVED, NOT
+  DISCLOSED… the artifact hypothesis, MINE, is REFUTED"**, with the
+  matched-budget numbers and the detail that kills it (**the twin's gap
+  is large at budgets BELOW the trained model's**).
+- `REBUTTAL_HANDOFF.md` quote-form and
+  `tab_sycgen_shuffle_tsweep.md` quote-form — both carried my
+  *"training reduces it is NOT established"* qualification, **which
+  rested entirely on the refuted hypothesis.**
+
+**⚑ AND MY EARLIER EDIT HAD MANGLED THE HANDOFF BLOCK.** Inserting a
+parenthetical at 02:2x split a bold span, leaving a **stray `**` five
+lines below** and a sentence that ran into its own correction. **The
+audit does not check markup balance and I did not re-read the rendered
+block** — I verified the *claim* and not the *text around it*.
+Rebuilt clean. **An in-place correction is an edit to prose, and prose
+can be broken by a correct correction.**
+
+**`tab_sycgen_shuffle_matched.md` left alone — mac-d had already
+folded the control in correctly**, presenting my +0.80 as the
+*motivation* for the re-run rather than a live claim. **Historically
+accurate and the right framing; nothing for me to fix.**
+
+## The volatile age gate fired on the same pass, and it was right
+
+**`AUDIT FAILED — an 'API-verified' claim is 1.1h old (> 1.0h)`.** The
+1-hour budget I set for fleet claims two hours ago **caught a genuinely
+stale list**: re-queried and **3 RUNNING, $6.42/h, ours $0.00/h** —
+**all three mac-d pods are down and the ledgers closed.**
+`stacked-em-steer` and `mats-lenctl-h100` have also terminated since
+the last stamp.
+
+**This is the first time tonight a gate I built failed on real
+staleness rather than on its own miscalibration**, and the fix was to
+re-query rather than to widen the threshold. **A gate that makes you do
+the work is behaving; a gate you keep loosening is not.**
+
+**Agent GPU spend is $0.00/h. Everything in flight tonight has
+landed.**

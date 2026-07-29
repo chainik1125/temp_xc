@@ -94,7 +94,7 @@ _Generated from `sycgen/results/{sycgen_shuffle_overlay,sycgen_twin_overlay,sycg
 **Quote-form (binding, LOG 04:16):** shuffle costs 0.02–0.06 recovery
 (positive 12/12 trained cells), but untrained twins show LARGER gaps at
 every T — the gap is architectural position-sensitivity; not learned
-order-use. — **⚑ but the matched run shows the twin's excess gap TRACKS its budget advantage (Spearman +0.80) and REVERSES at T=16 where budgets nearly match, so "training reduces it" is NOT established; see `tab_sycgen_shuffle_matched.md`** Training still lifts recovery ≤0.22 → 0.50–0.59.
+order-use. — **⚑ and the budget confound was REMOVED, not merely disclosed: at matched budget the twin still shows the larger gap at T=2 (+0.0365) and T=4 (+0.1249), 3/3 seeds each; T=8/16 indeterminate. An earlier hub note called "training reduces it" unestablished on a budget-artifact hypothesis the control REFUTED. See `tab_sycgen_shuffle_matched.md` §2c** Training still lifts recovery ≤0.22 → 0.50–0.59.
 The claim is the LEVEL story. l0 NOT budget-matched (TXC 0.49–2.85
 l0/token vs SAE ~4.5 — sparser and above the anchor; flag travels).
 Untrained twin levels: 0.075–0.218 (see fig).

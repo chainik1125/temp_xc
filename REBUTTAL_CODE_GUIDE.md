@@ -251,9 +251,24 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 02:05 07-29 — **the set turns over in MINUTES; re-query with `scripts/pod_inventory.py`, do not trust this list**)
+### Pods now (API-verified 03:12 07-29 — **the set turns over in MINUTES; re-query with `scripts/pod_inventory.py`, do not trust this list**)
 
-**7 RUNNING, $14.60/h — ours $2.20/h, unattributed $12.40/h (≈$298/day).**
+**3 RUNNING, $6.42/h — ALL unattributed. Agent GPU spend is $0.00/h:
+mac-d's three pods are down, ledgers closed.**
+
+    reviewer-btk-tsae-300k         $2.99/h  ⚑ not an agent lane
+    reviewer-headline-multiseed    $2.99/h  ⚑ not an agent lane
+    tsae-paper-widthmatch-probing  $0.44/h  ⚑ not an agent lane
+
+**`stacked-em-steer` and `mats-lenctl-h100` have TERMINATED since the
+last stamp.** ⚑ `stacked-em-steer` was reviewer 1's requested
+Stacked-SAE-on-EM baseline — **the quoted EM figures may have moved;
+check before freezing that section** (hub watch, LOG 02:5x).
+
+**⚑ Read this list with `scripts/pod_inventory.py`, never through
+`tail`.** A truncated read at 01:47 dropped a row and reported a
+running pod as gone. **A printed total that disagrees with the rows
+above it is a truncated list.**
 
     mac-d-sycshuffle-0729          $0.44/h  OURS (shuffle lane)
     mac-d-sycshuffle8-0729         $1.76/h  OURS (4xA40, bought for RAM)
