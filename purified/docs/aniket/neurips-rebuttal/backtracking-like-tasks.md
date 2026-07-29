@@ -1,6 +1,7 @@
 # Backtracking-like task candidates for the NeurIPS reviewer stage
 
-_Literature screen begun 2026-07-22; continuously updated through 2026-07-24. These are ex ante task proposals, not TXC results._
+_Literature screen begun 2026-07-22; continuously updated through 2026-07-28.
+Candidates were proposed ex ante; status sections now record completed gates._
 
 ## Bottom line
 
@@ -11,8 +12,9 @@ how many subject-model tokens the writer will erase. The exact-token cohort has
 history improves from 1.423 log loss at \(T=1\) to 1.239 at \(T=6\), versus
 1.423 for the endpoint, 1.492 for an order-invariant summary, and 1.632 for a
 probe retrained on shuffled histories. All equal-writer intervals exclude zero.
-This is a passed raw-representation gate; frozen TXC-versus-SAE evaluation is
-still pending.
+The frozen submitted \(T=5\) TXC also beats the strongest matched SAE at the
+pre-specified 32-feature budget: 1.2356 versus 1.2613 equal-writer log loss,
+with paired improvement 0.0257 [0.0100, 0.0413].
 
 The cleanest literal temporal-offset backup remains **speech-repair
 destination distance**: immediately before the first repair word, predict
@@ -21,7 +23,7 @@ failed onset formulation, whose label is already readable from the current
 repair word. On 9,030 simple Switchboard repairs, ordered five-word history
 beats the endpoint and order-invariant controls, loses its advantage under
 reversal, and improves monotonically from \(T=1\) through \(T=5\). It is the
-next activation experiment if the deletion dictionary gate fails.
+next activation experiment if an independent second destination task is needed.
 
 The strongest immediate exact-model reasoning experiment remains **strict pre-onset prediction of self-checking**. The strongest independent comprehension task is **human reading-time spillover** in Natural Stories. Its local opportunity gate passes before any activation or dictionary result is examined: ordered current-plus-history lexical and surprisal covariates beat an endpoint, an explicit first difference, and parameter-matched order-invariant histories in held-out stories, and reversing the historical positions removes the gain. The lag-identity result independently replicates on A-Maze responses to the same ten stories.
 
@@ -37,7 +39,7 @@ The most elegant spectral candidate is **reasoning-loop onset**, but public-corp
 
 | Rank | Candidate | Observable boundary | Strongest reason to try it | Main threat | Operational status |
 |---|---|---|---|---|---|
-| Lead | Human writing-revision destination | Strictly before a leading-edge deletion burst, identify how many subject-model tokens will be erased | 6,224 exact-token events; ordered layer-10 activation history wins at \(T=6\) against endpoint, invariant, difference, and retrained-shuffle controls | A frozen TXC may still fail to recover the raw ordered signal | Exact-token and raw-activation gates complete; frozen TXC-versus-SAE next |
+| Lead | Human writing-revision destination | Strictly before a leading-edge deletion burst, identify how many subject-model tokens will be erased | 6,224 exact-token events; frozen \(T=5\) TXC beats the strongest matched SAE at the pre-specified \(S=32\) budget and degrades under shuffle/reversal | One dictionary seed; human revision can depend on unobserved cognitive state | Exact-token, raw-activation, and frozen-dictionary gates complete |
 | 1 | Speech-repair destination distance | Strictly before the first repair word, identify which prior model-token position began the reparandum | 7,071 exact-token events after global window deduplication; ordered history beats endpoint/invariant controls with a monotone \(T=1\ldots5\) curve | Raw activation and frozen-dictionary gates remain | Best literal temporal-offset backup |
 | 2 | Self-checking or plan-generation onset | First sentence entering a tagged reasoning mode | 435K public sentence labels on the exact subject model; cheap strict-pre-onset construction | Close to the existing MATH/backtracking domain; labels are GPT-derived | Cheapest immediate reasoning pilot |
 | 3 | Human reading-time spillover | Word-level latency after a short stimulus history | 10,198 self-paced targets plus 9,777 A-Maze replication targets; ordered lexical gate beats invariant and reversal controls in both paradigms; exact Gemma dictionary match | Gates use word lags rather than model-token activations; participant-level nuisance control is required | Best independent comprehension task; activation gate next |
@@ -594,12 +596,20 @@ ordered result occurs at \(T=4\), 1.175 versus 1.229 for the endpoint and
 single offset has an interval crossing zero. The exact-token target is
 therefore the defensible benchmark.
 
+### Frozen submitted-dictionary result
+
+The pre-specified \(S=32\) gate now passes on the same exact cohort. The frozen
+submitted \(T=5\) TXC obtains 1.2356 equal-writer log loss, versus 1.2613 for
+the strongest matched SAE; the paired improvement is 0.0257 with 95% interval
+[0.0100, 0.0413]. Fixed shuffling and reversal raise TXC loss to 1.6461 and
+1.6569. The SAE family includes positional/stacked, max-pooled invariant, and
+last-token codes under identical writer folds and feature budgets.
+
 **Recommendation:** promote this to the leading independent semi-synthetic
-task. It is mechanically labeled, writer-grouped, and shows a finite useful
-history scale plus decisive order-destruction controls in real model
-activations. This is still a raw-representation gate rather than a TXC result;
-the next experiment is the preregistered frozen TXC-versus-SAE comparison on
-the same cohort.
+task. It is mechanically labeled, writer-grouped, and shows both a finite
+useful history scale in raw activations and an advantage for the frozen TXC at
+the locked feature budget. The dictionary comparison uses one seed, so its
+writer bootstrap must not be described as dictionary-seed uncertainty.
 
 ## 0H. First reasoning-error localization
 

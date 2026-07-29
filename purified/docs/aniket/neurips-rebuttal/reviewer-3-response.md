@@ -1,96 +1,99 @@
 # Draft response to Reviewer EAxU
 
-This is a paste-ready draft for Reviewer 3. It is intentionally narrower than
-the paper's submitted headline: the new backtracking sweep supports a robust
-longer-context effect and a smaller order-sensitivity effect, not universal
-TXC dominance.
+This is a paste-ready response. It deliberately makes the narrower claim
+supported by the new controls: TXC benefits from longer local context on
+backtracking, and part of that benefit is sensitive to token order.
 
 ## Response
 
-Thank you for the detailed feedback and for recognizing that temporal
-crosscoders are a well-motivated direction. We agree that the submitted
-manuscript placed too much architectural detail in the appendix and contained
-several missing or ambiguous citations. We will make the main text
-self-contained and correct each presentation issue you identified.
+Thank you for the detailed feedback. We agree that the submission left key
+architecture definitions in the appendix, overstated the generality of the
+empirical result, and omitted several relevant citations. We will make the
+method self-contained in the main text and correct the attribution and
+presentation issues below.
 
-**Empirical scope.** We do not intend to claim that TXCs dominate every
-dictionary architecture: MLC and T-SAE are stronger on some tasks, while the
-clearest TXC result is backtracking. To test the robustness and temporal basis
-of that result, we added a separate matched 20K-step, three-seed backtracking
-window sweep and a fixed-probe order perturbation. Ordered TXC detection AP
-increases from \(0.216\pm0.005\) at \(T=1\) to \(0.256\pm0.012\) at \(T=6\);
-every seed improves with longer context. At \(T=6\), applying the same trained
-probe after within-window shuffling reduces AP to \(0.241\pm0.013\), an
-ordered-minus-shuffled gap of \(0.015\pm0.005\). We interpret the first result
-as evidence that the representation benefits from local context and the second
-as a more limited sensitivity test showing that some of this signal depends on
-token order. We will temper broad performance language and state explicitly
-where TXC, T-SAE, and MLC each perform best.
+**Empirical scope.** We do not claim that TXCs dominate every dictionary
+architecture: MLC and T-SAE are stronger on some tasks, while backtracking is
+the clearest submitted TXC result. We added a matched 20K-step, three-seed
+TXC-base detection sweep over \(T\in\{1,2,4,6,10\}\) and a fixed-probe order
+perturbation. Ordered AP rises from \(0.218\pm0.005\) at \(T=1\) to
+\(0.255\pm0.008\) at \(T=10\); every seed's \(T=10\) endpoint exceeds its
+\(T=1\) endpoint, with a paired gain of \(0.037\pm0.009\). At \(T=10\),
+shuffling each window under the same ordered-trained dictionary and probe
+gives \(0.231\pm0.009\), an ordered-minus-shuffled gap of
+\(0.023\pm0.007\). The first result supports useful local history; the smaller
+perturbation gap shows that part, but not all, of the gain depends on order.
+Because this is a fixed-probe covariate-shift control rather than a retrained
+order-invariant model, we treat it as representation sensitivity, not a
+causal estimate of unique temporal information.
 
-**TXC and TXC-Pro definitions.** We will define both methods at first use in
-the main text and point directly to a consolidated architecture table. Given a
-window \(X_t=(x_t,\ldots,x_{t+T-1})\), a TXC forms one shared sparse code
+We also added a real-language temporal task using the public
+[KLiCKe](https://doi.org/10.17239/jowr-2025.17.01.02) corpus of human
+keystroke logs. From the final five layer-10 activations before a deletion
+burst, a cross-fitted sparse probe predicts whether the writer will delete
+\(2,3,4,5,\) or \(6+\) model tokens. On 6,224 events from 2,510 held-out
+writers, the frozen submitted \(T=5\) TXC obtains 1.236 equal-writer log loss
+at the pre-specified \(S=32\) feature budget, versus 1.261 for the strongest
+matched SAE (paired improvement 0.0257, 95% CI [0.0100, 0.0413]). Holding the
+probe fixed while shuffling or reversing TXC inputs raises loss to 1.646 and
+1.657. This uses one frozen dictionary pair, so we present it as a controlled
+additional example rather than a multi-seed architecture comparison.
+
+**TXC and TXC-Pro.** We will define both at first use and consolidate their
+settings into one architecture table. For a window
+\(X_t=(x_t,\ldots,x_{t+T-1})\), TXC forms one shared sparse code
 \[
 z_t=\sigma\!\left(\sum_{\tau=0}^{T-1}
-W_{\mathrm{enc}}^{(\tau)}x_{t+\tau}+b_{\mathrm{enc}}\right)
-\]
-and reconstructs each position with
-\[
+W_{\mathrm{enc}}^{(\tau)}x_{t+\tau}+b_{\mathrm{enc}}\right),
+\qquad
 \hat{x}_{t+\tau}=W_{\mathrm{dec}}^{(\tau)}z_t+b_{\mathrm{dec}}^{(\tau)}.
 \]
-TXC-base uses a fixed \(T=5\) window and this full-window sparse
-reconstruction objective. TXC-Pro adds three fixed choices: a ten-position
-encoder that samples five positions per training step and uses all ten at
-evaluation, eight nested Matryoshka reconstruction groups, and
-inverse-distance-weighted contrastive losses at shifts
-\(\Delta\in\{1,2\}\). We agree that requiring readers to recover these
-definitions from Appendix A made the paper unnecessarily difficult to follow.
+TXC-base uses a fixed \(T=5\) window and full-window reconstruction. TXC-Pro
+adds a ten-position encoder that samples five positions during training and
+uses all ten at evaluation, eight nested Matryoshka reconstruction groups,
+and inverse-distance-weighted contrastive losses at shifts
+\(\Delta\in\{1,2\}\).
 
-**Missing citations and title collision.** We will add the archival citation
-for the Matryoshka objective used in TXC-Pro: Bussmann, Nabeshima, Karvonen,
-and Nanda, *Learning Multi-Level Features with Matryoshka Sparse
-Autoencoders* (ICML 2025). We will cite Turner et al., *Model Organisms for
-Emergent Misalignment*, for the bad-medical-advice model organism, and correct
-the venue metadata for Temporal SAEs, Cunningham et al., Gao et al., and
-Kantamneni et al.
+**Missing citations and title collision.** We will cite Bussmann, Nabeshima,
+Karvonen, and Nanda, *Learning Multi-Level Features with Matryoshka Sparse
+Autoencoders* (ICML 2025), for the Matryoshka objective; Bhalla et al.,
+*Temporal Sparse Autoencoders* (ICLR 2026), for T-SAE; and Turner, Soligo,
+Taylor, Rajamanoharan, and Nanda, *Model Organisms for Emergent Misalignment*
+(2025), for the bad-medical-advice organism. We will also correct the venue
+metadata for Cunningham et al. (ICLR 2024), Gao et al. (ICLR 2025), and
+Kantamneni et al. (ICML 2025).
 
-We will also cite Bayazit, Mueller, and Bosselut. Their work crosscodes
-representations across model checkpoints to study emergence and consolidation
-over **pretraining time**; ours crosscodes activations across token positions
-within a fixed model to study **sequence time**. The methods and scientific
-questions are distinct, but the shared title is confusing. We will explain
-this distinction in Related Work and rename our paper **“Temporal
-Crosscoders: Sparse Feature Discovery Across Sequence Positions.”**
+We will cite Bayazit, Mueller, and Bosselut, *Crosscoding Through Time*
+(ACL 2026). Their crosscoders span training checkpoints to study pretraining
+time; ours span token positions within one fixed model to study sequence time.
+The questions are distinct, but the shared title is confusing. We will explain
+the distinction in Related Work and rename our paper **“Temporal Crosscoders:
+Sparse Feature Discovery Across Sequence Positions.”**
 
-**Remaining presentation fixes.** “SAE-arditi” is not a new architecture. It
-is a per-token TopK SAE using the Arditi--Chen implementation/checkpoint
-convention for the Qwen bad-medical setup
+**Remaining presentation fixes.** “SAE-arditi” is a per-token TopK(ReLU) SAE
+in the Arditi--Chen setup, not a new architecture
 (\(d_{\mathrm{SAE}}=32{,}768,\ k=128\)). We will rename it “TopK SAE
-(Arditi--Chen setup),” define and cite it at first use, and use the same name
-in the C6 results. We will merge the duplicated F.1/F.13 configuration
-material into one table and repair the main-text-to-appendix cross-references.
-Finally, we will remove the live Google Colab URL and replace it with an
-archival citation while keeping the synthetic construction self-contained in
-the manuscript.
-
-We appreciate these comments: they identify real exposition and attribution
-problems, and the revised structure will make both the contribution and its
-limits substantially easier to assess.
+(Arditi--Chen setup),” define and cite it at first use, and use that name
+throughout C6. We will merge F.1/F.13 into one configuration table and repair
+the appendix cross-references. Finally, we will replace the live Colab citation
+with Chanin and Garriga-Alonso, *SynthSAEBench: Evaluating Sparse Autoencoders
+on Scalable Realistic Synthetic Data* (arXiv:2602.14687), while keeping our
+construction self-contained.
 
 ## Internal verification notes
 
-- The backtracking numbers above come from the committed three-seed
-  \(T=1,\ldots,6\) package in commit `32108679`. They are mean \(\pm\) sample
-  SD across dictionary seeds and use a 32-feature, question-grouped sparse
-  probe.
+- The backtracking values come from the committed 15-cell
+  \(T\in\{1,2,4,6,10\}\), three-seed package in commit `d9c7fc7b`. Values are
+  mean \(\pm\) sample SD across dictionary seeds and use a 32-feature,
+  question-grouped sparse probe.
 - The shuffle is a deterministic test-time perturbation under the fixed
-  ordered-trained probe. It is a representation-sensitivity control, not a
-  retrained shuffled model and not a causal estimate of all temporal
-  information.
+  ordered-trained probe. Do not call it a retrained shuffled model or a causal
+  estimate of all temporal information.
+- The deletion result uses one frozen seed-42 dictionary pair, five
+  writer-grouped folds, and a 2,000-draw equal-writer bootstrap. Do not call
+  the folds or bootstrap draws dictionary seeds.
 - The paper's backtracking T-SAE point already uses
   \(d_{\mathrm{SAE}}=32{,}768\); see `tsae-capacity-audit.md`. Do not describe
   the existing T-SAE as width-underpowered.
-- The Matryoshka citation is Bussmann et al. (ICML 2025), despite the reviewer
-  attributing the title to Bhalla et al.
-- Before posting, confirm the team approves the proposed new title and that
-  Han's locked TXC-Pro definition matches the paragraph above verbatim.
+- Confirm team approval of the proposed title and Han's locked TXC-Pro
+  definition before posting.

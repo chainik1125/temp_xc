@@ -1,8 +1,9 @@
 # Aniket's semi-synthetic task candidates
 
-_Reviewer-stage mini-writeup, July 26. These are controlled tasks constructed
-from real human language behavior. Deletion destination has passed its
-exact-token and raw-activation gates; the other results remain task-side gates._
+_Reviewer-stage mini-writeup, updated July 28. These are controlled tasks
+constructed from real human language behavior. Deletion destination has passed
+its exact-token, raw-activation, and frozen-dictionary gates; the other results
+remain task-side gates._
 
 ## Recommendation
 
@@ -12,11 +13,9 @@ location inside a strict pre-event history, so a temporal representation has a
 specific job that an endpoint or order-invariant bag cannot perform. They also
 support the reviewer's requested window sweep and shuffle/reversal controls.
 
-Neither current result is evidence that a TXC has already succeeded on the
-task. Deletion destination establishes ordered signal in raw subject-model
-activations, while the frozen TXC-versus-SAE comparison remains a separate
-gate. Speech repair currently establishes only that its exact-token task
-contains ordered information.
+Deletion destination now provides a frozen TXC-versus-SAE result. Speech
+repair currently establishes only that its exact-token task contains ordered
+information.
 
 ## 1. Human deletion destination
 
@@ -55,16 +54,22 @@ retrained-shuffle-minus-ordered is .416 [.386, .447]. Balanced accuracy is
 
 The original lexical 2/3/4/5+ target is weaker: it reaches 1.175 at \(T=4\)
 but does not significantly beat the train-selected best single offset. The
-capped token-distance label is therefore the primary benchmark. The next gate
-is a frozen TXC-versus-identically-exposed-SAE comparison on this exact cohort.
+capped token-distance label is therefore the primary benchmark.
+
+The frozen submitted \(T=5\) dictionaries pass the pre-specified \(S=32\)
+gate. Ordered TXC reaches 1.2356 equal-writer log loss versus 1.2613 for the
+strongest matched SAE, a paired improvement of 0.0257 with 95% interval
+[0.0100, 0.0413]. Fixed shuffling and reversal worsen TXC loss to 1.6461 and
+1.6569. The SAE comparison includes positional/stacked, max-pooled invariant,
+and last-token codes under identical writer folds and feature budgets.
 
 **Why it is useful:** the event boundary and destination are mechanical,
 independent of model-generated reasoning, and available at scale.
 
 **Main risk:** the human deletion decision may depend on unobserved cognitive
-state, and a frozen TXC may fail to preserve the ordered signal visible to a
-dense raw probe. Any such null should stop the task from being presented as a
-TXC result.
+state. The frozen result also uses one dictionary seed; its five writer-grouped
+folds and writer bootstrap quantify cohort uncertainty, not dictionary
+initialization variance.
 
 ## 2. Speech-repair destination
 
