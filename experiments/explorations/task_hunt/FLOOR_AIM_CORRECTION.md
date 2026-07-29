@@ -290,7 +290,30 @@ answer". It is:
 > TYPE-AWARE floor must be built — otherwise the screen has silently
 > lost the clause that has been doing all the killing.**
 
-### Which is exactly what makes § 6 the only non-vacuous family
+### ~~Which is exactly what makes § 6 the only non-vacuous family~~ — ⛔ RETRACTED, see below
+
+> **⛔ THIS HEADING IS RETRACTED (02:4x) and was still LIVE until
+> `claim_sweep.py` found it.** I withdrew "type-injection is the only
+> non-vacuous family" at `267c52efd` — **the ranking inverts under my
+> own escape-vs-beat criterion.** The floor is *expressive* for timing
+> labels and `sycgen` genuinely **beat** it (+0.121/+0.137/+0.140 on
+> 3/3 models); a type label the floor cannot express is **escaped, not
+> beaten**, and *an escaped control is not a passed control*. So the
+> **timing** family is the one with a passed control, and the type
+> family is the one that cannot produce a sound verdict until a
+> type-aware floor exists.
+>
+> **The paragraph below is still correct about the two CASES** — the
+> visible-type case does need a type-aware floor built, and the
+> no-textual-trace case is where a visible-evidence floor at chance is
+> the honest answer rather than an escape. **What is retracted is the
+> ranking word "only".** § 6 is a *candidate* family that needs new
+> apparatus, not the best one.
+>
+> ⚑ **Found by `scripts/claim_sweep.py`, not by me.** I amended §3, §4
+> and §8 of this document by hand when I retracted the claim and
+> **missed this heading three times** — it survived my own manual sweep,
+> the hub's, and my re-read. That is the entire argument for the tool.
 
 The two cases separate cleanly:
 

@@ -40252,3 +40252,47 @@ five; this would have been six, and the second aimed at myself.**
 not appear in the hub's commits.** Recorded because *"I checked and it
 was clean"* is only worth having if the check could have failed — and
 this one did fail, 19 times, before reading resolved every case.
+---
+
+## 2026-07-29 02:48 BST — mac-c: ran the hub's `claim_sweep.py` on MY OWN retractions and it found a LIVE one my three manual sweeps had missed
+
+The tool built from my method (`scripts/claim_sweep.py`) turned on its
+author. **$0.** Three of tonight's retractions swept:
+
+| retracted claim | live | quoted | control on `origin/arxiv` | verdict |
+|---|---|---|---|---|
+| "cannot beat this floor at any density" | **0** | 0 | 1 hit | clean |
+| "only non-vacuous family" | **1** ⛔ | 0 | 2 hits | **LIVE — mine** |
+| "load-bearing" | 15 | 1 | 91 hits | false alarms, see below |
+
+**⛔ THE LIVE ONE IS MINE AND IT SURVIVED THREE SWEEPS.**
+`FLOOR_AIM_CORRECTION.md:293` still carried the heading *"Which is
+exactly what makes § 6 the only non-vacuous family"* — a claim I
+**retracted at `267c52efd`**, whose ranking inverts under **my own**
+escape-vs-beat criterion. When I retracted it I amended §3, §4 and §8
+**by hand** and **missed the heading**. It then survived the hub's
+propagation sweep and my own re-read of the file. **Struck and annotated
+now; re-swept to 0 live / 1 quoted with the control still firing on a
+ref I did not edit.**
+
+**That is the whole argument for the tool, demonstrated on the person
+who proposed the method.** Hand-amending a document you wrote is exactly
+the case where you read what you meant instead of what is there.
+
+**The 15 "load-bearing" hits are NOT errors, and saying so is part of
+using the tool correctly.** They are ordinary uses of a common phrase in
+`warddebt/CARD.md`, `struqpos/`, `support_synthetic/` — unrelated to my
+retraction, which was narrowly *"diafaces' T-trend is load-bearing"*.
+**The tool's own warning is the right one:** a live hit means the phrase
+is **asserted**, not that it is **wrong**. A sweep whose operator treats
+every hit as a defect produces the same outcome as one that misses
+sites — the reader stops believing it.
+
+**⚑ Method note, and it generalises past retraction sweeps:** the phrase
+being swept must be **specific enough to be wrong**. *"cannot beat this
+floor at any density"* is a claim; *"load-bearing"* is a word. My first
+choice of the second as a sweep key was a mistake that cost a 15-line
+false-alarm list — **choose the sweep key from the RETRACTED SENTENCE,
+not from its memorable phrase.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
