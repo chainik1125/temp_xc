@@ -39866,3 +39866,39 @@ HUNT's screen** — one model, one layer, age-family faces, two corpora —
 other way, and **item 6's own numbers agree** (our one KEEP has the
 strongest `tok` of the three candidates). **Worth a deliberate look
 before the ambience framing is leaned on again.**
+
+## 2026-07-29 02:40 BST — HUB: the withdrawn criterion PROPAGATED to the governing brief — and two remaining sites assigned, not edited
+
+**A ruling that lives only in the LOG is a ruling nobody follows.**
+`briefings/hunt-safety-gold-clew.md` §1 still defined gold as *"a
+safety-meaningful latent state **that is per-token silent**"* — the
+sentence the measurement just retired.
+
+**Withdrawn in place**, with the evidence, the corroboration from two
+other directions, the replacement screen (**rank by `tok_excess ×
+amplification`, require BOTH; `floor_reach` is a kill filter only**),
+and an explicit note that **safety-meaningfulness is UNCHANGED and
+still binding** — what is withdrawn is *silence as a positive
+criterion*, not the requirement that the state be worth detecting.
+**Scope stated: this governs the HUNT's screen, not the paper's
+ambience claim.**
+
+**Controlled sweep, against git rather than post-fix:** the pre-fix
+state on `origin/arxiv` still shows the bare criterion (**1 hit**), so
+the pattern is live; **live bare assertions now 0.**
+
+**TWO REMAINING SITES, ASSIGNED TO mac-c RATHER THAN EDITED BY ME:**
+`FLOOR_AIM_CORRECTION.md:42` and `:212` — *"hunting for
+per-token-silent tasks selects for the gain bar"* — **their document,
+their analysis, and they are awake and hold the context.** Their line
+is now **half-superseded by their own measurement**: it correctly said
+silence aims at the gain bar, and the new result adds that **it aims
+there in the WRONG DIRECTION.** That is a nuance the author should
+write, not me.
+
+**`synthetic/STATUS.md:540` checked and left alone** — *"frequency
+per-token-silent/TXC-pre-flat confirmed"* is a **description of a
+measured result** on a different benchmark, not a screening criterion.
+**Precision about where a correction does NOT apply is part of the
+correction** — the same call as leaving `tab_dq_tsweep.md`
+un-annotated for A4.

@@ -25,8 +25,39 @@ you sample from *that* instead.
 
 ## 1. What "gold" means here, operationally
 
+> ## ⚑⚑ THE PER-TOKEN-SILENCE CRITERION BELOW IS WITHDRAWN (02:39 07-29, hub `7d8a8a18d`)
+>
+> **It is measured to be counterproductive**, on two corpora through one
+> identical pipeline (mac-c `21217087e`): **`arm_excess` tracks
+> `tok_excess`** (Spearman **+1.000** and **+0.943**), so **screening
+> FOR per-token silence selects AGAINST the windowed arm, not for it.**
+> The window appears to **amplify** an existing per-token signal rather
+> than generate one. Corroborated from two other directions tonight:
+> a single token's activation **carries age past 1024 tokens**, and
+> **our one KEEP has the STRONGEST `tok` of the three candidates**
+> (sycgen `tok_best` 0.50–0.53 against a ~0.33 null).
+>
+> **A face that WAS per-token silent was found and its arm was weak** —
+> retryesc `gap_last`, `tok` −0.0018, `arm` +0.0125. The criterion was
+> tested, not merely unfired.
+>
+> **REPLACEMENT SCREEN — rank by `tok_excess × amplification`, and
+> require BOTH.** Amplification is a **corpus property** (~1.5 evalage,
+> ~2.7 retryesc) and **does not compensate for absent signal**:
+> retryesc amplifies 2× harder and still loses on a 2.6× smaller
+> signal. **`floor_reach` is a KILL FILTER ONLY** — it ranks our only
+> KEEP behind a WEAK (hub `c6a6c756f`).
+>
+> **Safety-meaningfulness below is UNCHANGED and still binding.** What
+> is withdrawn is *silence as a positive criterion*, not the
+> requirement that the state be worth detecting.
+>
+> **⚑ SCOPE:** one model, one layer, age-family faces, two corpora.
+> This governs **the hunt's screen**. It is **not** a test of the
+> paper's ambience claim — flagged for Han, not concluded.
+
 Not "a task about a safety topic". The bar is a **task whose label is a
-safety-meaningful latent state that is per-token silent**:
+safety-meaningful latent state** ~~that is per-token silent~~:
 
 - **Safety-meaningful** — the state is something a monitor would
   actually want to detect: the model is in a capitulation regime, is
