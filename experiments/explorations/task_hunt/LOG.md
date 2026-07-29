@@ -43035,8 +43035,15 @@ fix and still carries it.**
 correctly. **T=8 is the single defect.** The section is level-table only,
 so it does **not** carry any of the excerpt's shuffle-side errors.
 
-**⇒ Whichever option Han picks, that cell needs 0.536.** Flagging, not
-editing — the section is Dmitry's branch and the decision is Han's.
+~~**⇒ Whichever option Han picks, that cell needs 0.536.** Flagging, not
+editing — the section is Dmitry's branch and the decision is Han's.~~
+
+**⚑ RETRACTED — THIS FLAG WAS WRONG (hub `a713249b4`, verified by me).**
+`origin/dmitry-txcwins-10h` contains **`0.537` zero times** and
+**`0.536` twice**. `4a1f7c735` (*"fix a rounding error in the new-task
+table (T=8 TXC 0.537 -> 0.536)"*) landed on Dmitry's branch **after**
+`cc9274b6c`. **The correction DID propagate. No cell needs fixing and
+Han's option 1 is not weakened.**
 
 **The pattern, since it is the third instance today:** a correction
 landed on our branch and **did not propagate across a branch boundary**.
@@ -43095,3 +43102,52 @@ the only thing wrong with it is that **it was never submitted**. That is
 a scope question, not a correctness one.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-29 15:41 BST — mac-d: **I RETRACT the 0.537 flag. I read a COMMIT and reported a property of the BRANCH** — and did it in the entry naming that exact pattern
+
+`a713249b4` refutes my `d86fccb59`. **Verified independently before
+accepting**, not deferred to:
+
+    '0.537' on origin/dmitry-txcwins-10h : 0
+    '0.536' on origin/dmitry-txcwins-10h : 2   (control fires)
+    4a1f7c735 "fix a rounding error ... 0.537 -> 0.536"
+      -> cc9274b6c precedes it, and the fix IS on the branch
+
+**The correction propagated. Nothing needs fixing. Han's option 1 is not
+weakened, and my flag would have sent him to re-check a number that was
+already right.**
+
+### What I actually did wrong
+
+I ran `git show cc9274b6c` — a **diff at one point in time** — and
+reported it as *"the section on Dmitry's branch carries 0.537."* Those
+are different objects. The commit genuinely contains `0.537`; the
+**branch** does not, because a later commit fixed it. **`git show
+<commit>` is adjacent to `git show <branch>:<file>`, and I substituted
+one for the other without noticing.**
+
+That is the night's named defect class — **an instrument observing a
+state adjacent to the one under test** — and I committed it **inside the
+entry that named the pattern**, in a paragraph declaring it the "third
+instance of a correction failing to propagate." **The correction had
+propagated; my reading had not.**
+
+### Why my own controls did not catch it
+
+I verified **six numbers** in that section against source and got six
+matches, which felt like thoroughness. Every one was read from the same
+wrong object. **Checking more things in the wrong place is not
+triangulation** — it is one error, repeated, wearing the appearance of
+corroboration. What would have caught it is one question about the
+*instrument* rather than the *content*: **does this command read the
+state I am making a claim about?**
+
+The fix is a habit, not a tool: **claims about a branch get read from
+`<branch>:<path>`; claims about a commit get read from the commit.** And
+when reporting *"X still carries Y"*, the control is **grepping X for Y
+and for its corrected form** — which the hub ran and I did not.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
