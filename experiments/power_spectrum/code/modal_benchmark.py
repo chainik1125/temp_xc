@@ -27,8 +27,20 @@ from pathlib import Path
 import modal
 
 
-LOCAL_ROOT = Path(__file__).resolve().parents[3]
 REMOTE_ROOT = Path("/repo")
+
+
+def _source_root() -> Path:
+    """Resolve sources both in the worktree and in Modal's flattened import."""
+    if (REMOTE_ROOT / "pyproject.toml").is_file():
+        return REMOTE_ROOT
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "pyproject.toml").is_file():
+            return parent
+    raise RuntimeError("could not locate the temp_xc source root")
+
+
+LOCAL_ROOT = _source_root()
 REMOTE_PYTHON = REMOTE_ROOT / ".venv" / "bin" / "python"
 REMOTE_CONFIG = REMOTE_ROOT / "experiments" / "power_spectrum" / "configs" / "overnight.json"
 APP_NAME = "temp-xc-power-spectrum-overnight"
