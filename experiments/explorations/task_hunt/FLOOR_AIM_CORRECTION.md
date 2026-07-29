@@ -1,0 +1,185 @@
+# The hunt has been aiming at the wrong bar — the floor never looks at the text
+
+**mac-c, 2026-07-29 01:02 BST.** $0, 0 pods. Produced while executing
+`briefings/hunt-safety-gold-clew.md` (the clew literature sweep). It is
+neither of that brief's two acceptance-gate items — see § 8 — but it
+changes what a candidate has to look like, so it is posted before any
+further sourcing.
+
+---
+
+## 1. The instrument fact, verified at source
+
+`visible_evidence_floor` is fit on exactly two features
+(`evalage/screen.py:357`, `_FloorBank.feats`, `screen.py:289-293`):
+
+    sage_floor(event_first, T)        # gen4c_lib.py:115
+    dose_window_count(event_mask, T)  # wave3_lib.py:170
+
+and both are handed the **ground-truth event arrays** — `first, mask =
+z["event_first"], z["event_mask"]` straight off the stream npz
+(`screen.py:113`), passed into `_FloorBank(**fl)` at `screen.py:301`.
+
+    sage_floor        = log2(1 + min(age_of_last_event, T+1))
+    dose_window_count = # masked event-turn tokens in the trailing T view
+
+**Neither feature reads a single token.** The floor is not a
+*text*-visible-evidence baseline. It is a **window-computable function of
+where the events are**.
+
+## 2. What follows immediately
+
+**"Per-token silent" does nothing against the floor.** It is a property
+of the *text*, and the floor does not look at the text. Per-token
+silence defeats the `tok` arm — that is, it helps clear the **gain**
+bar.
+
+But `hunt-safety-gold-clew.md` § 2 states the situation plainly:
+`retryesc_gen` **cleared the gain bar on every leg** (+0.063…+0.069) and
+**died on the floor, 3/3**. So:
+
+> **The brief's operational definition of gold — safety-meaningful,
+> per-token silent, trailing functional of sparse events — selects for
+> the bar that was never binding.**
+
+Two of its three criteria (silence, trailing-functional-of-events) aim
+at gain. The floor is untouched by both, and the floor is what kills.
+
+## 3. The three failures have ONE mechanism, not three diagnoses
+
+`evalage`'s face is a balanced 3-class binning of **the age of the last
+event**. `sage_floor` is **the censored age of the last event**.
+
+**The floor is handed the label's own sufficient statistic.** That is
+not a near-miss; inside the window it is the label exactly, and outside
+it is censored. It is also precisely why `floor_excess ≈ P(event in
+window)` — the identity I corrected at `d2320d274` — holds at all: the
+floor is right whenever the event is visible in its horizon.
+
+The same is true of the others. Any label of the form *"how long ago /
+how many times, within the window"* is a deterministic function of
+`(censored age, in-window count)`. **Such a task cannot beat this floor
+at any density**, and no amount of lexical silence changes that. The
+density band `[0.15, 0.25]` manages *how often* the floor gets the
+answer; it cannot make the floor wrong.
+
+## 4. What would actually beat the floor
+
+The floor's two features are blind to:
+
+- **event TYPE** — `event_first`/`event_mask` are single indicator
+  arrays; every event is interchangeable;
+- **ORDER among distinguishable events** — the count is order-blind and
+  `sage_floor` retains only the most recent;
+- **event CONTENT / semantics.**
+
+⇒ **A label must depend on WHICH events occurred, not on WHEN or HOW
+MANY.** Shapes that are invisible to `(censored age, count)` but are
+representable by a windowed code:
+
+- *which of K event types was most recent* (K ≥ 2);
+- *did type A precede type B inside the window*;
+- *is the in-window type multiset {A,B} rather than {A,A}* at matched
+  count and matched recency.
+
+Note all three hold **event positions fixed** — so they are orthogonal
+to density, which is the axis the hunt has been tuning.
+
+## 5. ⚑ The fairness objection, which is real
+
+A critic says: *"your task beats the floor only because the floor is
+under-specified for it — a type-aware floor would eat it."* **Correct,
+and it must be answered, not dodged.**
+
+If the event types are **visible in the text**, the honest floor is a
+type-aware one — a human reading the transcript sees which event
+happened — and building the task that way is gaming the instrument
+rather than beating it.
+
+**The objection binds only when the type is textually visible.** So the
+candidate family that survives it is one where the event's *type* leaves
+no textual trace — and there the type-aware floor cannot be constructed
+from visible evidence, because there is no visible evidence of type.
+
+## 6. The shape that survives § 5 — and where the literature points
+
+**Activation-space injection with K distinguishable concepts.** The
+event is a hook-applied injection during the forward pass; the label is
+*which concept was injected most recently* (or *how long since concept
+A specifically*). Then:
+
+- the event has **no textual trace at all**, so type-visibility is zero
+  by construction and § 5's objection cannot be raised;
+- giving the floor the injection **positions** (which it takes anyway)
+  is *conservative* — a real monitor would not even have those;
+- the label is not a function of `(censored age, count)`, so the floor
+  sits at chance on type while the windowed arm has a real target;
+- it is safety-meaningful in the sense the brief demands: *has this
+  model been steered, and with what* is exactly what a monitor wants.
+
+**This is not my invention — it is an existing literature protocol**,
+which is the point of sourcing from the registry rather than from my own
+head. Registry nodes (ranks, not scores):
+
+| work | key | why |
+|---|---|---|
+| Latent Introspection: Models Can Detect Prior Concept Injections | `WQX34P7C` | the protocol itself: injection is a **prior** event detected later |
+| Emergent Introspective Awareness in LLMs (tc-thread) | `RSHUFZ38` | **45 citers** via `works cited-by` — S2 cannot see this venue |
+| Steering Awareness: Models Can Be Trained to Detect Activation Steering | `89XMKFMX` | detection-from-within, trainable |
+| Steering Awareness: Detecting Activation Steering from Within | `KNW22PG7` | ditto, separate node |
+| Activation Oracles: LLMs as General-Purpose Activation Interpreters | `MZR4QUQ6` | reading injected state as a task |
+| RepIt: Representing Isolated Targets to Steer Language Models | `R88EFKJB` | **isolated** targets ⇒ K distinguishable concepts |
+| Stateless Yet Not Forgetful: Implicit Memory as a Hidden Channel | `K4CXV49A` | trailing state with no visible carrier |
+| Accumulating Context Changes the Beliefs of LMs | `9SMGIFBX` | accumulation over context |
+
+## 7. Reproducing the sweep
+
+    export CLEW_AGENT=mac-c CLEW_READONLY=1
+    CLEW=~/research/tools/clew/.venv/bin/clew
+    $CLEW stats
+    $CLEW search "introspection" --json          # positive control, 20 hits
+    $CLEW search "concept injection" --json      # 20
+    $CLEW search "activation steering" --json    # 20
+    $CLEW search "implicit memory" --json        # 11
+    $CLEW search "steering detection" --json     # 20
+    $CLEW similar WQX34P7C -n 12 --json          # specter2-cosine
+    $CLEW works cited-by RSHUFZ38 --json         # s2-citation-graph, 45, cached 2026-07-10
+    $CLEW similar --text "identifying which of several different concepts was
+      injected into a model's activations earlier in the sequence …" --json
+                                                 # local-specter2-text
+
+**Envelopes propagated:** `cited-by RSHUFZ38` ran on `s2-citation-graph`
+**cached 2026-07-10 16:30:59** — not live. `similar` hits carry no
+per-hit `vec` tier in this build, so treat the ranking as approximate
+and use **ranks, never cosine values**. No `--refresh`, no writes.
+
+⚑ **My first pass at this sweep reported ZERO hits for every query,
+including `introspection`.** That was a **parser bug in my own reader**
+(I read `results`/`works`; clew returns `hits`), not an absence — and it
+looked exactly like a clean negative. Under this brief's gate a swept
+registry that returns nothing is a *deliverable* ("a reasoned negative on
+the source itself"), so I was one step from publishing a false negative
+with the queries attached to make it reproducible. Caught by disbelieving
+a zero for `introspection` in a 1083-work interp registry and reading the
+raw output. The reader now **refuses to report any zero unless a positive
+control fires first** (`<scratch>/cq.py`).
+
+## 8. What this is and is not
+
+**It is not a screened candidate** — nothing has been generated or
+measured, and no verdict is claimed. **It is not a reasoned negative on
+the registry** — the registry answered well; § 6 is sourced from it.
+
+It is a **correction to the aiming criterion**, and it is worth posting
+before more sourcing because it invalidates the search key: hunting for
+per-token-silent tasks selects for the gain bar, and the gain bar has not
+been the binding constraint since `retryesc_gen`.
+
+**The next concrete step is cheap and is a measurement, not a
+generation:** take any existing corpus, hold event positions fixed,
+assign K=2 synthetic event *types*, and check that
+`visible_evidence_floor` sits at chance on the type label while the
+windowed arm does not. That is a $0 local run on cached activations and
+it tests § 4 directly before anything is generated. **It should be
+pre-registered with a falsifier — if the floor is NOT at chance on a
+type label, § 4 is wrong and I report that.**

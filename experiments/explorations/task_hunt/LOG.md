@@ -36970,3 +36970,70 @@ data exists.
 **Lane state: written, smoke-clean, $0 spent, 0 pods, nothing
 scientific run.** Next action is mac-d's, and the pre-spend estimate
 comes before the pod.
+---
+
+## 2026-07-29 01:02 BST — mac-c: ⚑ THE HUNT HAS BEEN AIMING AT THE WRONG BAR — `visible_evidence_floor` never looks at the text, so "per-token silent" cannot help against it
+
+Full writeup: `experiments/explorations/task_hunt/FLOOR_AIM_CORRECTION.md`.
+Produced while executing `hunt-safety-gold-clew.md`. **$0, 0 pods.**
+
+**The instrument fact, verified at source.** The floor is fit on exactly
+two features — `sage_floor(event_first, T)` and
+`dose_window_count(event_mask, T)` — and both are handed the
+**ground-truth event arrays** (`screen.py:113` → `_FloorBank(**fl)` at
+`:301`). **Neither reads a token.** The floor is not a *text*-visible
+baseline; it is a **window-computable function of where the events are**.
+
+**Therefore "per-token silent" aims at the gain bar, not the floor.** And
+the brief itself records that `retryesc_gen` **cleared gain on every leg
+(+0.063…+0.069) and died on the floor 3/3**. So two of the three criteria
+in the brief's definition of gold select for the bar that was never
+binding.
+
+**The three failures collapse to ONE mechanism.** `evalage`'s face is a
+3-class binning of *the age of the last event*; `sage_floor` is *the
+censored age of the last event*. **The floor is handed the label's own
+sufficient statistic.** Any label of the form "how long ago / how many
+times, within the window" is a deterministic function of `(censored age,
+in-window count)` and **cannot beat this floor at any density**. Density
+controls how often the floor is right; it cannot make the floor wrong.
+
+**What could beat it:** the floor is blind to event **TYPE**, to **ORDER**
+among distinguishable events, and to **content**. So the label must depend
+on *which* events occurred, not *when* or *how many* — e.g. which of K
+types was most recent, or whether A preceded B in-window. All hold event
+positions fixed, so they are **orthogonal to density**, the axis the hunt
+has been tuning.
+
+**⚑ The fairness objection, stated because it is real:** a type-aware
+floor would eat such a task *if the types are textually visible*. So the
+surviving family is one where the event's TYPE has no textual trace —
+**activation-space injection with K distinguishable concepts**, an
+existing literature protocol (`WQX34P7C` Latent Introspection; `RSHUFZ38`
+tc-thread with **45 citers found via `works cited-by`**, a venue S2 cannot
+see; `89XMKFMX`/`KNW22PG7` Steering Awareness; `MZR4QUQ6` Activation
+Oracles; `R88EFKJB` RepIt). Sourced from the registry, not from my head —
+which was the entire point of the brief.
+
+**⚑ My first pass at the sweep reported ZERO hits for every query,
+including `introspection` in a 1083-work interp registry.** That was a
+**parser bug in my own reader** (`results`/`works` vs clew's `hits`), not
+an absence — and under this brief a swept-registry-returns-nothing result
+is itself a deliverable, so I was one step from publishing a **false
+negative with reproducible queries attached**. Caught by disbelieving the
+zero and reading raw output. The reader now **refuses to report any zero
+unless a positive control fires first**. Third instance tonight of a check
+whose failure looks like success — and the first one that was mine.
+
+**NOT claimed:** no candidate screened, no verdict, no generation. This is
+a correction to the aiming criterion, posted before more sourcing because
+it invalidates the search key.
+
+**Next step is a MEASUREMENT, not a generation, and it is $0:** take an
+existing corpus, hold event positions fixed, assign K=2 synthetic event
+*types*, and check `visible_evidence_floor` sits at chance on the type
+label while the windowed arm does not. **Pre-register with a falsifier —
+if the floor is NOT at chance on a type label, my § 4 is wrong and I
+report that.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
