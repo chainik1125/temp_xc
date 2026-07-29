@@ -13,6 +13,51 @@ LOG, ledger oversight, and the handover surfaces
 
 ## ⚑⚑ OVERNIGHT MODE (Han asleep from ~01:5x 07-29) — read this first
 
+### WHERE ITEM 6 STANDS, as of 02:53 — it narrowed THREE times tonight
+
+1. **"a clean TXC win"** → **above 2/4 T at matched budget**
+   (`73f8ea388`; the comparator rule was biased toward us).
+2. → **the shuffle gap is (b) ARCHITECTURAL, NOT LEARNED**
+   (`90e0a4e2a`; a random-init TXC is *more* order-sensitive, 11/12
+   cells, pre-registered and pre-committed to publishing).
+3. → **"per-token probes sit at chance" was FALSE** (`2b2fc4266`;
+   `tok_best` 0.50–0.53 against a ~0.33 **3-class** null — someone read
+   0.50 as chance). **sycgen is NOT per-token-silent.**
+
+**Each narrowing came from running a comparison we had not run. None
+came from a reviewer.** **T=16 is the one unambiguous cell** (Pareto:
+pooled cannot operate at TXC's budget at all).
+
+**What item 6 supports:** per-token 0.50–0.53, windowed 0.62–0.65, a
+gain of **+0.11–0.12** at matched sparsity **against baselines reading
+the same activations.** Not per-token blindness. **The reviewer
+response reflects only what survives** — a level claim, no order claim.
+
+### PROGRAM-LEVEL: the hunt's aim was WITHDRAWN twice tonight
+
+- **`floor_reach` demoted** to a kill filter (`c6a6c756f`) — my own
+  ratified screen rule; it ranks our only KEEP behind a WEAK.
+- **Per-token silence WITHDRAWN as a positive criterion**
+  (`7d8a8a18d`, propagated into `hunt-safety-gold-clew.md`) — measured
+  on two corpora: `arm_excess` tracks `tok_excess` (+1.000 / +0.943),
+  so **screening for silence selects AGAINST the arm.**
+- **Replacement:** rank by `tok_excess × amplification` **and by
+  `arm_excess`**; the amendment **yields to one weak-tok/strong-arm
+  counterexample.**
+- **⚑ Flagged for Han, NOT concluded:** this governs the HUNT's screen,
+  not the paper's ambience claim — but it points the other way.
+
+### TOOLS BUILT TONIGHT (use them; the rules alone did not hold)
+
+    scripts/pod_inventory.py       full fleet, never tail
+    scripts/claim_sweep.py         live-vs-quoted retraction sweep + control
+    scripts/check_response_math.py 6 LaTeX/render checks, self-tested
+    scripts/check_response_sync.py arxiv vs dmitry branch drift
+    scripts/check_response_numbers.py quoted table vs frontier.json
+
+**Every one exists because a written rule failed and a script did not.**
+
+
 **⚑ FORMAT + CO-EDITING CHANGE (02:23):** the reviewer-response
 tables are now **markdown pipe tables** (Dmitry's agent converted them;
 it retires the LaTeX/backslash-escaping problem entirely). **And
