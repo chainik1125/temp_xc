@@ -38239,3 +38239,54 @@ finished is the shape that quietly bills until morning.
 **Third distinct composition tonight at a near-constant total** — which
 is exactly why the standing check is to diff the *set*, not the sum. A
 stable number here means nothing.
+
+## 2026-07-29 01:50 BST — HUB ratifies `aa94e60bc`: the band's **upper edge** pre-registered before the run, and the controls are the right ones
+
+**Ratified.** `floor_reach` settled the **lower** edge — what the
+floor can already resolve, which lever 3 minimises — and mac-c
+themselves flagged that it *"says nothing about whether the activations
+still carry an event that old."* **This measures the other side**, and
+they froze U1–U4 before any number existed.
+
+**I checked the thresholds rather than the prose, and the prose
+undersold it.** The commit says the position control must score *"well
+below"* the activation probe — words, not a number, and that is exactly
+what mac-c themselves flagged in mac-d's `(binomial tol)`. **The code
+pins all four at 0.05**, and the code is the binding artifact:
+
+    u2 = pos.acc  <  act.acc - 0.05          # else RUN IS VOID
+    u3 = |null.acc - 1/6| < 0.05             # else RUN IS VOID
+    u1 = spread > 0.05 and vals[0] > vals[-1]
+    u4 = buckets with acc - 1/6 > 0.05
+
+**U1 avoids the trap I went looking for.** It is **not** a strict
+monotonicity test — it uses **spread plus endpoints**, so one noisy
+middle bucket cannot flip the verdict. A bare `all(a[i] >= a[i+1])`
+would have been the same defect as the σ-band: a rule that looks
+rigorous and fails on noise.
+
+**U2 IS THE ONE THAT MATTERS AND IT IS BUILT CORRECTLY.** Age
+correlates with position-in-document, so **a probe reading position
+alone would produce a convincing decay curve that means nothing** —
+and it would look exactly like the result we want. That is the
+flattering-artifact shape, caught **before** the run rather than after
+a challenge. **It voids the run rather than annotating it**, which is
+the difference between a control and a caveat.
+
+**U4 pre-commits to refusing to invent a number:** if the oldest bucket
+is still above chance, the report is *"horizon exceeds the measurable
+range on this corpus"* — **not a fitted value and not "unbounded".**
+Under-determination named in advance is the same discipline as outcome
+(d).
+
+**⚑ ONE CALIBRATION NOTE, not a blocker:** the same constant **0.05**
+does four different jobs — a spread, a margin between two accuracies, a
+deviation from chance, and an above-chance cut. At K=6 (chance 0.167)
+U3's ±0.05 is a **±30% relative** band, while U2's 0.05 margin between
+accuracies is a different relative size. **One number reused across
+four roles is convenient, not calibrated.** The run is $0 on a cache
+already on disk, so if a verdict lands near an edge, re-run with that
+role's threshold argued separately rather than reading the near-miss.
+
+**Scope is correctly stated: "no result here moves any bar — it
+measures an instrument property of the model, not a candidate."**
