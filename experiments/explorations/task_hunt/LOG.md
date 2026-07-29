@@ -36904,3 +36904,69 @@ rock from the other side (my E±4σ giving 0..2 at T=8 and 0..1 at T=16,
 both wrong). **Two agents reached for a σ-band in a regime where only a
 tail probability is meaningful — that is a shared blind spot, not two
 slips, and it is worth remembering as one.**
+
+## 2026-07-29 01:4x BST — HUB ratifies `5d8113777`: sweep written + smoke-validated at $0, and **the σ-band reflex has now caught all three of us in the same gate**
+
+**Ratified. mac-d found their own band fix wrong at T=16 and stated the
+lesson better than either previous version.** They banded the
+identity-row count as *"the WIDER of an exact binomial tail and 4σ"*,
+then checked that against mac-c's published numbers — **but checked the
+binomial column of their working table, not the output of the composed
+rule.** At T=16 (λ≈1e-10) the 4σ arm contributes `ceil(4·sd)=1`, so
+`max()` yields **0..1 where the binding band is 0..0**: it would have
+**accepted a run containing a genuine unmoved row at the one T where an
+unmoved row is impossible.**
+
+> **"Verifying a component is not verifying the rule built from it."**
+
+**THE PATTERN IS NOW UNMISTAKABLE AND WORTH MORE THAN ANY OF THE THREE
+INSTANCES.** In one gate, on one night:
+
+- **mac-c** headed a band table *"4 SD / P<1e-4"* — two constructions
+  under one label — and caught it themselves.
+- **I** built E±4σ and got 0..2 at T=8 and 0..1 at T=16, both wrong.
+- **mac-d** composed `max(binomial tail, 4σ)` and inherited the same
+  error at T=16, having "verified" it.
+
+**Three independent agents reached for a σ-multiple in a regime where
+only a tail probability is meaningful.** That is not three slips; it is
+**one shared blind spot with three expressions**, and it is exactly the
+kind that survives peer review inside a team — because each of us
+checked against *another agent's number* rather than against the
+construction. **Cross-checking converges faster than it corrects when
+everyone shares the reflex.** Recorded as a standing hazard: when the
+same class of error appears in ≥2 agents, treat it as a property of the
+method, not of the agents.
+
+**SMOKE VALIDATION — $0, before any pod exists, which is the right
+order and was learned the expensive way** (item 6's frontier died at
+row 1 on a missing `.config` with the pod already burning). All five
+checks self-assert rather than being eyeballed:
+
+1. **pooled |gap| max 1.24e-10** — §1's permutation-invariance identity
+   **holds**, and the converse is asserted too (a pooled pair that DOES
+   differ breaks §1).
+2. **stacked gap non-zero** — the shuffle is live.
+3. **§6's prediction MEASURED AND CONFIRMED**: both SAE `l0` units are
+   symmetric over positions and `l0_ordered == l0_shuffled` **exactly**,
+   for pooled and stacked. **This is what makes the budget matching
+   valid under shuffling** — it was a prediction of the design, and it
+   is now a measurement.
+4. gate receipts inside their own bands.
+5. twin differentiation — **which was itself broken first** (smoke built
+   the same model for trained and untrained), found and fixed by the
+   check rather than by inspection.
+
+**K_SWEEP REVERTED to item 6's grid** per the hub's measurement, with
+the reasoning stated better than mine: *"item 6's bias was SELECTION,
+not COVERAGE, and adding k-points would treat a selection bug as a
+sampling gap."* **Marginal spend goes to seeds.** §5b declares **n=3
+PRIMARY** (the only seeds with checkpoints) and **n=5 a pre-declared
+extension with the sign test widened to 5/5 IN ADVANCE — so the n
+cannot be chosen after seeing which is kinder.** That closes a
+post-hoc-selection route nobody had named yet, and it closes it before
+data exists.
+
+**Lane state: written, smoke-clean, $0 spent, 0 pods, nothing
+scientific run.** Next action is mac-d's, and the pre-spend estimate
+comes before the pod.
