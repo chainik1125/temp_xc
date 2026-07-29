@@ -38969,3 +38969,57 @@ make it visible.
 quoted numbers **0 mismatches** against `frontier.json`,
 `tab_sycgen_budget_matched.md` **regenerates byte-identical** (already
 current, verdict unchanged: above 2/4, indistinguishable 2/4).
+
+## 2026-07-29 02:11 BST — HUB ratifies `7df9f25d8` (arm instrument REFUTED) and issues the hunt continuation: **$0 test before any corpus**
+
+**Ratified, and reported as a negative by its author — correctly.**
+mac-c built an arm-strength instrument (ICC of the label direction in a
+window; predicted SNR gain `sqrt(T/(1+(T-1)ICC))`). **It works WITHIN
+a corpus and INVERTS across them:** evalage monotone 5/5, but
+retryesc has **lower** ICC, **higher** predicted multiplier, and an arm
+that does not beat `tok` at all.
+
+**Their diagnosis is the useful part: low ICC is AMBIGUOUS** —
+"independent looks at a real signal" (averaging helps) versus "there is
+barely a signal" (averaging helps nothing). The multiplier assumed the
+first; retryesc is the second. **Signal magnitude dominates and
+redundancy is second-order** — `signal × mult` orders the corpora
+correctly where ICC alone does not.
+
+**⚑ TWO INSTRUMENTS, TWO INVERSIONS, HOURS APART.** `floor_reach` was
+validated on two corpora and ranked our only KEEP behind a WEAK. The
+ICC multiplier was validated on one corpus and inverted on the next.
+**Both fit the cases they were built from; both failed the first case
+they were not.** That is not bad luck, it is what in-sample validation
+*is* — **the fit is the construction, not evidence about it.** Standing
+rule issued: **validate an instrument on a case it was NOT derived from
+before letting it direct spend.**
+
+**THE HYPOTHESIS THEY RAISE IS THE PROGRAM'S CENTRAL QUESTION:** the
+window may **amplify** an existing per-token signal rather than
+**generate** one. If arm-excess tracks tok-excess, then
+`hunt-safety-gold-clew.md`'s demand for **per-token-silent** tasks is
+**self-defeating** — suppressing `tok` suppresses the arm, because the
+arm is downstream of the same signal. **One mechanism, the whole kill
+record.**
+
+**It is already half-confirmed from the other side, and I found that
+independently within the hour:** sycgen's `tok_best` is
+**0.50–0.53 against a ~0.34 null** — **our only KEEP has the strongest
+per-token signal of the three candidates**, and that same fact forced
+tonight's correction to the rebuttal's "not visible in any single
+token".
+
+**HUNT CONTINUATION ISSUED (§7).** Han authorised more pods; **the
+first action is $0 and nothing is generated before it**: run
+tok-excess and arm-excess through **one identical pipeline** across
+every screened corpus and check monotonicity. **Generating another
+corpus under a criterion that may be inverted is the most expensive
+mistake available.** If it holds, re-aim onto **arm-excess and
+arm/tok ratio** with `floor_reach` kept only as a kill filter. If it
+is refuted, say so and the old aim survives — n=3 corpora, one model,
+one layer, **cheap to kill and it deserves the chance.**
+
+**Fleet guidance carried:** prefer A40s and measure first — the shuffle
+lane found **GPU idle 94% with RAM binding**, so generation and probing
+are plausibly CPU/RAM-bound too. **Say which resource bound.**

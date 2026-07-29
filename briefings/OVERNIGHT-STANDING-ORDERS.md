@@ -197,3 +197,70 @@ it and update the surfaces anyway.** *A sound verdict, never a win.*
    generating another corpus.
 
 **Delete this file when Han is back and the lane has closed.**
+
+---
+
+## 7. ⚑ HUNT CONTINUATION (Han, 02:1x: *"orchestrate continuation of task hunting and sanity checking overnight, fine to spin up more runpods"*)
+
+**Pods authorised for the hunt.** But tonight changed what to spend
+them on, and the order matters more than the budget.
+
+### 7a. FIRST, AND IT IS $0: the monotonicity test. Nothing gets generated before it.
+
+mac-c specified it in `7df9f25d8` and it is the cheapest decisive
+measurement available: **compute `tok`-excess and `arm`-excess through
+ONE identical pipeline for every screened corpus, and check whether
+they move together.**
+
+Why it outranks everything: the hypothesis is that **the window
+AMPLIFIES an existing per-token signal rather than generating one.**
+
+    sycgen     tok +0.196   arm +0.308   KEEP
+    evalage    tok +0.127   arm +0.197   WEAK
+    retryesc   tok +0.047   arm weak     KILL
+
+**If that holds, `hunt-safety-gold-clew.md`'s sourcing criterion is
+SELF-DEFEATING**: it demands per-token-SILENT tasks to suppress `tok`
+and widen the gain — but suppressing the per-token signal would
+suppress the arm too, because the arm is downstream of the same signal.
+**That single mechanism would explain the entire kill record.**
+
+**It is already half-confirmed from the other side:** our one KEEP has
+the **strongest** `tok` of the three (`tok_best` 0.50–0.53 against a
+~0.34 null), so **sycgen is not per-token-silent by measurement** —
+which also forced a correction to the rebuttal tonight.
+
+**Generating another corpus under a criterion that may be inverted is
+the most expensive mistake available. Measure first.**
+
+### 7b. THEN, if the test says the criterion is inverted — re-aim, and pods are for this
+
+Screen for **tasks whose window AMPLIFIES most**, not tasks whose
+`tok` is weakest. Concretely: rank candidates by **arm-excess** and by
+**arm/tok ratio**, keep `floor_reach` only as a **kill filter**, and
+stop treating per-token silence as a positive criterion.
+
+### 7c. If the test refutes it, say so and the old aim survives
+
+n=3 corpora, one model, one layer, and two of three arm numbers came
+from different screen configurations. **The hypothesis is cheap to
+kill and should be given the chance.**
+
+### 7d. ⚑ STANDING RULE EARNED TWICE TONIGHT — before an instrument is used to spend money
+
+**`floor_reach` and the ICC arm-multiplier were both built, both
+validated in-sample, and both INVERTED on the first case they were not
+built from.** Two for two, hours apart, by careful people.
+
+> **Validate an instrument on a case it was NOT derived from before
+> letting it direct spend.** In-sample fit is not evidence; it is the
+> construction.
+
+### 7e. Spend rules for the hunt
+
+- Same ceilings as §1: **≤8 GPUs no approval**, pre-spend posted above
+  that, **hard stop 3h after pod-up**, terminate + API-verify + ledger.
+- **Prefer A40s.** The shuffle lane measured GPU idle 94% with RAM
+  binding — **corpus generation and probing are likely CPU/RAM-bound
+  too. Measure before buying H100s**, and say which resource bound.
+- **Use `scripts/pod_inventory.py`** to read the fleet. Never `tail`.
