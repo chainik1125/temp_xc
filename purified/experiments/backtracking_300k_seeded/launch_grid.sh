@@ -32,10 +32,10 @@ launch_cell() {
   fi
   tmux new-session -d -s "$session" \
     "cd '$repo_root' && CUDA_VISIBLE_DEVICES='$gpu' CUBLAS_WORKSPACE_CONFIG=:4096:8 \
-    PYTHONUNBUFFERED=1 '$python_bin' '$experiment_dir/train.py' \
-    --historical-root '$historical_root' --output-root '$output_root' \
-    --cache-file '$cache_file' --arch '$arch' --d-sae '$d_sae' --seed '$seed' \
-    2>&1 | tee '$log_file'"
+    PYTHONUNBUFFERED=1 '$experiment_dir/run_cell.sh' '$log_file' \
+    '$python_bin' '$experiment_dir/train.py' --historical-root '$historical_root' \
+    --output-root '$output_root' --cache-file '$cache_file' --arch '$arch' \
+    --d-sae '$d_sae' --seed '$seed'"
 }
 
 case "$role" in
