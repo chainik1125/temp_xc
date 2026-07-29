@@ -40760,3 +40760,62 @@ cache and grid set together, so **that** lane is clean. **The open
 question stands: how many OTHER delivered results ran through
 `build_rows` on a cache with no `grid` field?** Unverifiable by the
 new guard, and still unanswered.
+
+---
+
+## 2026-07-29 03:51 BST — mac-d: deliverable **independently re-verified against raw data**, and I am declining to spend on the n=5 extension — **my own frozen 5/5 rule makes it nearly incapable of changing a verdict**
+
+Lane stays closed. **0 pods, $0.00/h.** Nothing unpushed.
+
+### 1. Verified by recomputation, not by re-running the generator
+
+I edited `gen_shuffle_table.py` twice after the data landed (§2c, and
+the §2b forward-pointer), so the shipping table was re-checked **from
+the raw shard JSON by an independent path** rather than by regenerating
+and comparing a file to itself — which is the byte-identity mistake I
+made earlier tonight, where my re-render was compared to my re-render.
+
+    T=2  recomputed +0.1114/+0.1671   table +0.1114/+0.1671   MATCH
+    T=4  recomputed +0.0231/+0.1375   table +0.0231/+0.1375   MATCH
+    T=8  recomputed +0.0504/+0.0820   table +0.0504/+0.0820   MATCH
+    T=16 recomputed +0.0618/+0.0267   table +0.0618/+0.0267   MATCH
+    pooled max|gap| 6.53e-09 recomputed = 6.53e-09 as printed
+
+### 2. The n=5 extension: NOT run, and I am not funding it unasked
+
+Card §5b pre-declared it and I have already discharged the clause
+requiring the shortfall be stated. On whether to run it now:
+
+**The premise it was scoped under is gone.** §5b costed it as a **free
+rider on a pod that was "already up and otherwise idle during the probe
+sweep."** That pod is terminated. Standalone it is 10 trainings (8 TXC
++ 2 SAE) plus a 7.59 GB cache rebuild — **~$6–8 and ~1.5 h**, a new
+spend decision rather than "completing the card."
+
+**And my own frozen rule caps its value.** §5b fixed the n=5 test as
+**5/5 sign agreement — stricter than 3/3.** So:
+
+- **T=2 and T=4 are already 3/3** and carry verdict (b). More seeds
+  cannot strengthen them.
+- **T=8 and T=16 are 2/3.** Under a 5/5 rule they would need *every*
+  added seed to agree to become determinate — unlikely from 2/3, so
+  the expected return is "still indeterminate, better sized."
+
+Spending on a run that is **pre-committed to be inconclusive** is poor
+value, and there is a worse failure attached: a **4/5** result would
+create exactly the pressure to relabel it "essentially unanimous" that
+§5b wrote its rule to forbid. I would rather leave the gap stated than
+buy a number I have already promised not to round up.
+
+**What it WOULD buy, honestly:** it sizes outcome **(d)**, which is the
+gap the hub named when redirecting spend from a sixth `k` to seeds.
+That redirect was made when the marginal cost was ~zero; it is not now.
+
+**⇒ Recommendation, hub's call, not mine to take unilaterally at 03:51
+with Han asleep:** if (d) is worth sizing, fund the 5-seed run
+deliberately as its own lane with its own pre-registration — **do not**
+let it ride in as a leftover clause of a delivered card. The delivered
+verdict does not depend on it: **T=2/4 are 3/3 and carry (b).**
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
