@@ -26,26 +26,6 @@ window sizes -- and loses accuracy when the token order inside its window is
 destroyed.
 ```
 
-> **⚑ SUMMARY LINE CORRECTED (mac-d, 12:3x) — two overclaims, both
-> contradicted by our own ratified verdicts.**
->
-> 1. *"the TXC **beats** both SAE baselines"* — **not true of pooled at
->    T=2/4.** `tab_sycgen_budget_matched.md` returns **INDISTINGUISHABLE**
->    there and **TXC above** only at T=8/16. That table's headline was itself
->    corrected from "above 3/4" to **"above 2/4"** when the comparator rule
->    was found biased; restating "beats" in the summary would reintroduce
->    exactly the claim that correction removed. Changed to **"matches or
->    beats … clearly so at the larger window sizes"**, which is what the
->    numbers in the body actually show.
-> 2. *"whose label **no single token reveals**"* — this is the overclaim
->    already fixed twice on this response (`7bebeccbe`, `0a1e48cfd`:
->    *"not visible in any single token" is false by our own screen*). The
->    body of the excerpt is careful and says so explicitly — *"a probe on one
->    token's activation still recovers part of it … the baselines are not
->    blind"* — so the summary contradicted its own section. Dropped.
->
-> A reviewer reading the body table would have caught both.
-
 **Then add this section after "1c. Stacked SAE baseline":**
 
 ```
@@ -82,7 +62,9 @@ drop from T=8 comes from its input growing to T times the dictionary size, not
 from the architecture.
 
 We then shuffle the token order within each window at evaluation time and
-re-score the same trained TXC at the same sparsity. Nothing else changes.
+re-score the same trained TXC at the same sparsity. Nothing else changes. (The
+order-preserved row is those same models re-evaluated in this run, and agrees
+with the table above to within 0.001.)
 
 TXC recovery      T=2     T=4     T=8     T=16
 Order preserved   0.499   0.522   0.536   0.578
@@ -128,3 +110,28 @@ accuracy: at T=16, ordered recovery rises from **0.058 to 0.578**.
   passed: the shuffle was verified live against an exact binomial band, the
   pooled arm's gap was verified identically zero, and SAE sparsity was verified
   permutation-invariant.
+
+---
+
+## What changed in this proposal, and why
+
+> **⚑ SUMMARY LINE CORRECTED (mac-d, 12:3x) — two overclaims, both
+> contradicted by our own ratified verdicts.**
+>
+> 1. *"the TXC **beats** both SAE baselines"* — **not true of pooled at
+>    T=2/4.** `tab_sycgen_budget_matched.md` returns **INDISTINGUISHABLE**
+>    there and **TXC above** only at T=8/16. That table's headline was itself
+>    corrected from "above 3/4" to **"above 2/4"** when the comparator rule
+>    was found biased; restating "beats" in the summary would reintroduce
+>    exactly the claim that correction removed. Changed to **"matches or
+>    beats … clearly so at the larger window sizes"**, which is what the
+>    numbers in the body actually show.
+> 2. *"whose label **no single token reveals**"* — this is the overclaim
+>    already fixed twice on this response (`7bebeccbe`, `0a1e48cfd`:
+>    *"not visible in any single token" is false by our own screen*). The
+>    body of the excerpt is careful and says so explicitly — *"a probe on one
+>    token's activation still recovers part of it … the baselines are not
+>    blind"* — so the summary contradicted its own section. Dropped.
+>
+> A reviewer reading the body table would have caught both.
+

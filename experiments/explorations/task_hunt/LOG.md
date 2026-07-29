@@ -41599,3 +41599,42 @@ corrections** — both variants survived, so the superseded text came
 back. **Already re-applied at `3a445fc13`; the file on `origin` is
 clean and verified (0 markers, 0 untrained mentions in paste blocks,
 6/6 rows exact).**
+
+## 2026-07-29 12:45 BST — HUB: **READING the deliverable found what six scripted checks did not** — a lost clause and a document you could not use
+
+**Every check on this file passed** — 0 conflict markers, 0 jargon in
+paste blocks, 6/6 rows exact, math clean, certifiers refusing on
+corruption. **So I read it end to end, as Dmitry would, and found two
+things no assertion I wrote could express.**
+
+**1. A clause I wrote was never committed, and I destroyed it myself.**
+The excerpt shows TXC **0.577** in the level table and **0.578** in the
+shuffle table — the same quantity from two evaluations (0.5227 /
+0.5225-class rounding). **I had written the explaining clause hours
+ago** — *"agrees with the table above to within 0.001"* — and it
+appears in **zero commits.** I added it to the working tree, then Han's
+"remove the untrained control" instruction had me do a **full-file
+`Write`**, which **silently discarded the uncommitted edit.**
+
+**I blamed the merge before checking, and the merge was innocent.** Git
+history took four seconds to settle it. **A full-file rewrite is a
+destructive operation on anything not yet committed, and I performed
+three of them on this file tonight.**
+
+**2. The document was hard to USE, which no check measures.** mac-d's
+19-line correction block sat **between the two blocks Dmitry is meant
+to paste** — honest, valuable, and directly in the way of the file's
+one job. **Moved to the end under "What changed in this proposal, and
+why"; nothing removed.** The paste-ready section is now two fenced
+blocks in a row.
+
+**⚑ THE POINT, and it is the counterweight to everything else tonight:
+I built five instruments and every one of them checks a PROPERTY. None
+of them can ask "would a person be able to use this?" or "does this
+sentence still say what I meant three rewrites ago?"** Tonight's
+lesson has been *tools over rules* — this is its limit. **The tools
+caught the corrupt file, the false claim, the stale stamp, the biased
+comparator, and the mispaired T. Reading caught the two things that
+were merely wrong for a human.**
+
+**Both restored/fixed, certifiers clean, numbers unchanged.**
