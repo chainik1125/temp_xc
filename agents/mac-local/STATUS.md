@@ -11,7 +11,38 @@ LOG, ledger oversight, and the handover surfaces
 
 # RESUME HERE
 
-## ⚑⚑ OVERNIGHT MODE (Han asleep from ~01:5x 07-29) — read this first
+## ⚑⚑ OVERNIGHT COMPLETE (03:56 07-29) — everything in flight has LANDED
+
+**Agent GPU spend $0.00/h. All three mac-d pods terminated and
+API-verified, ledgers closed. Total agent spend for the night: ~$2.56.**
+Fleet is 3 unattributed pods at $6.42/h (Han's call, untouched).
+
+**All four checks green:** `handoff_audit` clean · quoted numbers 0
+mismatches vs `frontier.json` · responses 0 drift across both branches ·
+math 0 problems. `main` frozen at `7ceb45564`.
+
+### What landed
+
+| lane | outcome |
+|---|---|
+| sycgen shuffle, sparsity-matched | **(b) architectural, not learned** — 11/12 cells, all 3 gates pass |
+| twin at matched budget | **the hub's budget-artifact hypothesis REFUTED** — (b) confirmed at T=2/4 |
+| amplifier test | A1 holds out-of-sample; **A2 dead by its own frozen rule** |
+| Lane B error bars | **T64 rescue survives** (P=0.001); **T32 demoted** 2/5 → 1/5 |
+| hunt sourcing criterion | **per-token silence WITHDRAWN** — it selects *against* the arm |
+
+### Left for Han and Dmitry, deliberately not actioned
+
+1. **`stacked-em-steer` finished** — the EM figures the Reviewer-1
+   response quotes may have moved. **That section stays frozen** until
+   you two reconcile it.
+2. **Blast radius, mac-c's guard:** how many delivered results ran
+   through `build_rows` on a cache with **no `grid` field**? Protected
+   forward, unchecked backward. **Outranks new measurement.**
+3. Token rotation (`gh`, `hf_token`, `hf_token_datasets`).
+4. The 3 unattributed pods, **$6.42/h ≈ $154/day**.
+
+## ⚑⚑ OVERNIGHT MODE — operating rules (still in force)
 
 ### WHERE ITEM 6 STANDS, as of 02:53 — it narrowed THREE times tonight
 
