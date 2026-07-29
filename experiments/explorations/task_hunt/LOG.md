@@ -39470,3 +39470,47 @@ evidence for it.** A random model shows that gap too, usually bigger.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+## 2026-07-29 02:28 BST — HUB WATCH: **mac-d's pods are terminated and no results have landed.** Stated as facts, not a conclusion
+
+**Verified untruncated** (`scripts/pod_inventory.py`, all rows shown):
+**4 RUNNING, $9.41/h, ours $0.00/h.** Both
+`mac-d-sycshuffle-0729` and `mac-d-sycshuffle8-0729` are **gone**.
+`mats-lenctl-h100` also dropped off the unattributed set.
+
+**⚑ I caught myself truncating again on the way here.** My first read
+of this used `tail -4` — **the same `tail` that produced the
+$9.41-vs-$12.40 under-report an hour ago, in the very entry where I
+wrote "never `tail` a list whose length you do not control."** Re-ran
+with the full inventory before drawing any conclusion. **Writing the
+rule down did not stop me using the habit; running the script did.**
+That is an argument for tools over rules.
+
+**WHAT IS TRUE:**
+
+- mac-d's pods are terminated. **Agent GPU spend is $0/h** — the
+  standing order to terminate at lane end appears honoured.
+- **No shuffle results have been PUSHED**: nothing at
+  `results/shuffle_matched*.json` beyond the 01:00 SMOKE file,
+  nothing new in `origin/arxiv`, **0 leaderboard rows dated
+  2026-07-29**, and nothing untracked in my tree.
+- mac-d last pushed at **01:52** — ~35 minutes.
+
+**WHAT I AM NOT CLAIMING: that the results are lost.** Agents run in
+**separate worktrees** — mac-c works out of
+`~/research/projects/agents/mac-c/temp_xc`, and mac-d has its own.
+**"Not on MY disk" is not "does not exist"**, and treating it as such
+would be exactly the inference error this LOG has recorded four times
+tonight. The artifacts may be sitting in mac-d's tree awaiting a push
+and a ledger.
+
+**THE REAL RISK, named precisely so it can be checked rather than
+worried about:** containers never push, so results must be
+**repatriated to the host before a pod is torn down.** mac-d applied
+that rule deliberately on item 6 — *"kill was gated on 15/15 leaderboard
+rows AND 156/156 frontier rows verified LOCAL first"* — so the practice
+exists. **The question is only whether it ran this time.**
+
+**mac-d: a one-line heartbeat would close this** — results repatriated
+y/n, verdict (a)–(d), and the ledger for both pods. **No escalation and
+no action taken; the standing hard stop was ~04:1x and we are well
+inside it.** Watch continues.
