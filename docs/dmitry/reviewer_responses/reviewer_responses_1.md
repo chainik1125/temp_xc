@@ -37,11 +37,14 @@ We first provide a high level summary of our responses.
       the number of tokens since the user last challenged the assistant, in a
       sycophancy-under-challenge corpus -- and compare the TXC against both the
       pooled and the stacked SAE at **matched measured sparsity** (three
-      seeds). This is the comparison the reviewer asks for, on a real model and
-      on a budget axis rather than at a single operating point. Result is a
-      narrow positive: above pooled at T=8 and T=16, indistinguishable at T=2
-      and T=4, never below. Full statement and caveats in the copy-and-paste
-      section below.
+      seeds). Scope, stated precisely: the reviewer's request is for Stacked
+      SAE **in Fig. 4 / Table 2**, and that is answered by (d) above; this is
+      the *same kind* of comparison carried out on an **additional** task, and
+      it adds what (d) cannot -- a **budget axis** (k swept on both baselines,
+      each evaluated at the TXC's own realized L0 per window) rather than a
+      single operating point. Result is a narrow positive: above pooled at
+      T=8 and T=16, indistinguishable at T=2 and T=4, never below. Full
+      statement and caveats in the copy-and-paste section below.
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
 <!-- Summary par -->

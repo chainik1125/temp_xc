@@ -37742,3 +37742,30 @@ neighbours instead of writing correct LaTeX that renders as garbage.
 **0 links, 0 images, 0 URLs**; numbers identical
 (.499/.485/.468, .523/.488/.412, .537/.467/.149, .577/.486/.314);
 **Dmitry's branch still `b1027b608`.**
+
+## 2026-07-29 01:21 BST — HUB: tightened an overclaim in the Reviewer-1 addition (mine, caught on re-read)
+
+The working-section bullet said the sycgen comparison *"is the
+comparison the reviewer asks for."* **It is not, quite.** Reviewer 1
+asks for **Stacked SAE in Fig. 4 / Table 2** — the backtracking
+headline — and that request is answered by the existing *"Stacked SAE
+at T=5 — filled"* section. **sycgen is the same KIND of comparison on
+an ADDITIONAL task.**
+
+Rewritten to say exactly that, and to name what sycgen adds that the
+Fig-4 answer cannot: **a budget axis** — k swept on both baselines,
+each evaluated at the TXC's own realized L0 per window — **rather than
+a single operating point.** That is a real and defensible increment;
+"this is what you asked for" was not.
+
+**Why bother when it sits in the working section and is never pasted:**
+it is the line Han or Dmitry would read when deciding **how hard to
+lean on sycgen** in the final response. **An overclaim in the notes
+becomes an overclaim in the submission one edit later** — and this is
+the reviewer whose stated objection is that the paper claims more than
+its evidence supports. Getting caught overstating *scope* to the
+reviewer who complained about *overstatement* would cost more than the
+exhibit gains.
+
+Paste block re-verified: **32 math blocks render, 0 failures**;
+**6,979 → within limit**; Dmitry's branch untouched.
