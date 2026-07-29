@@ -38409,3 +38409,87 @@ note and it is mine to have gotten wrong.
 Cost: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-29 01:53 BST — HUB ratifies `64b5a2989` + `a88132d8d`: **we bought RAM billed as GPUs**, and **the hunt's aiming band is ONE-SIDED**
+
+### 1. mac-d sized the fleet from a measurement, and the measurement inverted the directive
+
+Han asked to parallelise **across GPUs**. mac-d measured first (§8 step
+3) and found **the GPUs were never the constraint**:
+
+- GPU utilisation on a real cell: **mean 1.4%, median 0%, idle in 94%
+  of samples.** The cost is **sklearn `LinearRegression` on CPU.**
+- 3 concurrent shards on 1×A40: **one OOM-killed**, survivors slowed
+  **207s → 381s**. **Zero throughput gain.** Each process materialises
+  its own **15.2 GB** copy, so 46.6 GiB fits ~2.
+- **RAM BINDS.** §8 asked which resource bound and required it stated;
+  they stated it.
+
+**⇒ 4×A40 was bought for 186.3 GiB and 32.3 CPUs, not for its GPUs.**
+Their framing is the sharp part and it generalises past this lane:
+**RunPod scales CPU/RAM with GPU count, so GPU count is the METER the
+cores are sold by, not the thing doing the work.** "Parallelise across
+GPUs" executed honestly meant **buy RAM, billed as GPUs** — and H100s
+would have cost more for the same idle silicon. **This is what step 3
+was for**, and it is the third time tonight that measuring before
+spending changed the answer rather than confirming it.
+
+### 2. mac-c measured the upper edge — and the result reframes the hunt
+
+**All four pre-registrations resolved, none violated.** chance **1/5 =
+0.2000**; activation probe **0.6190**; position control **0.2171** (U2
+held decisively — the artifact that would have faked the whole curve
+did not fire); `label_null` **0.2110** (U3 held). Per-bucket recall
+**0.9976 / 0.8167 / 0.4952 / 0.4143 / 0.3714**, U1 held, spread 0.6262.
+**U4: every bucket including 1024+ is clearly above chance**, so the
+report is the pre-registered *"horizon exceeds the measurable range on
+this corpus"* — **not a number and not "unbounded".**
+
+**They found an empty-by-construction bucket on the first run and
+re-indexed AGAINST themselves:** the 1-3 bucket has **zero** rows
+because eligibility requires `mask==0` while the mask spans the whole
+event turn (w=13), so **minimum observable age is exactly 13**. Chance
+is therefore **1/5, not 1/6** — and 1/6 is the *flattering* denominator.
+**Finding a bug that makes your own probe look better and fixing it is
+the tell that a measurement is honest.**
+
+**⚑ THE FINDING, and it is program-level: THE AIMING BAND IS
+ONE-SIDED.** The upper edge is **not binding** — pushing events beyond
+T+w does not walk off a cliff. **But the probe that proves it is the
+`tok` arm**, a single-token activation scoring **0.6190 on 5-way
+age**. *The same fact that removes the cliff is what makes the gain bar
+hard.* So pushing events older **lowers `floor_reach` (good) and
+barely weakens `tok` (bad)** — the two edges do not move together, and
+lever 3 buys less than it appeared to. Consistent with tonight's
+lever-3 run, where P3 flipped **floor-bound → gain-bound** exactly as
+predicted.
+
+### 3. HUB SYNTHESIS — why every candidate died, and the question it raises
+
+Put the night's three findings together and they are one statement:
+
+1. The floor is handed **the censored age** — the label's own
+   sufficient statistic (`sage_floor`).
+2. `tok` **recovers age out past 1024 tokens** at 0.619 — so
+   per-token silence, which aims at the gain bar, is **not achieved by
+   age labels**.
+3. Therefore **age-based labels are squeezed from BOTH sides**, and
+   density moves only one of them.
+
+**The hunt has been generating age labels.** That is a better
+explanation of the kill record than any individual candidate's flaws.
+
+**⇒ THE $0 QUESTION I AM PUTTING TO BOTH AGENTS: why did sycgen
+survive this?** Its label **is** an age, and it cleared floor **and**
+gain on three models. Either sycgen sits in a corner of the geometry
+the others missed — different model, layer, corpus, or beyond-T mass —
+**or one of the three findings above does not generalise as stated.**
+**Our one KEEP is the sharpest test available of the theory that
+explains our failures**, it costs nothing to ask, and it should be
+asked before the next corpus is generated. **A theory that explains
+every failure and cannot explain the one success is not finished.**
+
+**LIMITS carried as stated:** one model, one layer, one corpus;
+retention is a property of model+layer+corpus. The 4-15 bucket's 0.9976
+is the easiest possible case. And this shows **a probe can RECOVER age
+from the activation — not that the stream REMEMBERS the event.** $0,
+0 pods.
