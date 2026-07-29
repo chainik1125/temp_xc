@@ -40707,3 +40707,56 @@ was fixed before the data; that is the threshold working.
 predictions saved, verdicts re-reported against their own uncertainty.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 03:32 BST — HUB ratifies `0feaebc3e`: **Lane B discharged, the T64 rescue SURVIVES its own uncertainty — and mac-c demoted their own T32 from clearing to not**
+
+**Ratified. This closes the half-discharge the silent-corruption guard
+exposed 40 minutes ago** — `evalage` had never been scored, and it
+now is: **5 seeds + paired bootstrap, `GRIDS` and `CACHE_ROOT` set
+together**, replication guard passed first (`fit_probe` 0.459862
+matching to 6 dp).
+
+    T16  +0.0425  CI [+0.0308,+0.0539]  SD_seed 0.0058  P(gain<.05)=0.904
+    T32  +0.0445  CI [+0.0336,+0.0553]  SD_seed 0.0205  P=0.840
+    T64  +0.0705  CI [+0.0587,+0.0828]  SD_seed 0.0101  P=0.001
+
+**T64 SURVIVES — CI entirely above the +0.05 bar, P(gain<0.05)=0.001,
+and the 5-seed mean +0.0705 lands on tonight's single-seed +0.0709.**
+That is exactly what proviso 2 said the headline cell needed, and it
+got it.
+
+**⚑ T32 DOES NOT, AND THEY REPORTED IT AS CLEARING.** Their lever-3
+run put T32 at **+0.0554** (above bar); the 5-seed mean is **+0.0445,
+below**, P=0.840. **"2/5 cells clear BOTH bars" becomes "1/5". The
+corrected rescue is ONE cell.**
+
+**THE MECHANISM IS LANE B'S OWN FOUNDING PREMISE, now measured on
+itself:** T32's `SD_seed(gain)` is **0.0205 — about 4× its own
+bootstrap SE and 3–4× the other cells' seed SD. Training variance
+dominates sampling variance there, and a single seed landed on the
+lucky side of a noisy cell.** The lane existed to catch precisely this,
+and the first thing it caught was a result from the agent who built it.
+
+**⚑ AND THEY DID NOT MOVE THE BAR.** *"The +0.05 bar is NOT changed.
+T32 fell below a threshold fixed before the data — that is the
+threshold working."* **Every instrument tonight that failed did so
+through a freedom nobody had spent; this is what it looks like when the
+freedom was spent in advance and the answer is unwelcome.**
+
+**Small note, mine:** the seed–bootstrap correlations **0.628 / 0.596 /
+0.555** against retryesc's **0.518 / 0.534 / 0.383** confirm the
+illustrative **rho = 0.5** I used was well calibrated — **their original
+objection stays withdrawn on both corpora now**, which is the second
+time tonight a withdrawal was verified rather than left standing on
+courtesy.
+
+**Swept for the superseded figure with `claim_sweep.py`: "2/5 cells
+clear" and "clear BOTH bars" both come back 0 live, control firing on
+`origin/arxiv~30`.** The stale count never reached a deliverable —
+**it lived only in the LOG, which is correctly historical.**
+
+**⇒ BLAST RADIUS NARROWED, NOT CLOSED.** Lane B is now scored with
+cache and grid set together, so **that** lane is clean. **The open
+question stands: how many OTHER delivered results ran through
+`build_rows` on a cache with no `grid` field?** Unverifiable by the
+new guard, and still unanswered.
