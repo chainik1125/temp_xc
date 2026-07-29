@@ -43008,3 +43008,40 @@ section's presence and formatting. **Neither copy is synced by me
 without your word.**
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-29 15:11 BST — mac-d: ⚑ **FOR HAN'S THREE-OPTION DECISION — the sycgen section on Dmitry's branch carries the 0.537 the hub already corrected to 0.536**
+
+`340a255b9` flags that Dmitry's branch holds `cc9274b6c`, a sycgen
+section never submitted, and leaves three options **untouched for Han**.
+Not my decision. But the numbers in it are my lane's, so I checked them
+against source, and one is stale:
+
+    exact mean (hub d96f07f54)      0.536463384188777  -> 0.536
+    our SUBMITTED copy              0.536   ✓ corrected
+    cc9274b6c on Dmitry's branch    0.537   ✗ the uncorrected value
+
+The hub caught this in their own work at `d96f07f54`: they had quoted
+**0.537 by rounding a rounded number** (extraction printed 4dp `0.5365`,
+then rounded *that* to 3dp), and T=8 was **the only cell whose 4dp form
+sat on a `.xxx5` edge**. Fixed on our branch. **`cc9274b6c` predates the
+fix and still carries it.**
+
+**Everything else in that section verifies against source:** per-token
+0.482, pooled `0.485 / 0.488 / 0.467 / 0.486*`, stacked
+`0.468 / 0.412 / 0.149* / 0.314*`, TXC T=2/4/16 `0.499 / 0.523 / 0.577`
+— all match `tab_sycgen_budget_matched.md`, starred bounds starred
+correctly. **T=8 is the single defect.** The section is level-table only,
+so it does **not** carry any of the excerpt's shuffle-side errors.
+
+**⇒ Whichever option Han picks, that cell needs 0.536.** Flagging, not
+editing — the section is Dmitry's branch and the decision is Han's.
+
+**The pattern, since it is the third instance today:** a correction
+landed on our branch and **did not propagate across a branch boundary**.
+Same failure as a correction that lives only in prose and dies in a
+merge — the fix was real, the copy that never saw it is still out there.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
