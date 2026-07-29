@@ -33,8 +33,8 @@ We first provide a high level summary of our responses.
      ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
      Source branch `dmitry-txcwins-10h` is NOT modified.
      ============================================================ -->
-    - e. Fifth, we add a real world task whose state is not visible in any
-      single token, and compare against pooled and stacked SAEs at matched
+    - e. Fifth, we add a real world task whose label no single token of text
+      displays, and compare against pooled and stacked SAEs at matched
       sparsity over three seeds. The TXC improves with window size and is
       above both baselines at every window size.
 <!-- ===================== END ADDED (sycgen) ===================== -->
@@ -361,10 +361,13 @@ $$
 
 ## A new real world task: how long since the user last challenged the model
 
-We add a real world task in which the quantity being probed is not visible in
-any single token. The data is multi-turn dialogue where the user repeatedly
-questions the model's answers, and the label at each position is the number of
-tokens since the user last challenged it. We compare the TXC against a pooled
+We add a real world task whose label no single token of text displays. The data
+is multi-turn dialogue where the user repeatedly questions the model's answers,
+and the label at each position is the number of tokens since the user last
+challenged it. A probe on one token's activation still recovers part of it, as
+the residual stream has attended over the prefix, so the baselines here are not
+blind: they read the same activations, and the question is whether the window
+adds anything at matched sparsity. We compare the TXC against a pooled
 SAE (the mean of the per-token codes across the window) and a stacked SAE (the
 same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
 and read each one off at the sparsity the TXC actually uses. Three seeds;
@@ -413,7 +416,7 @@ We thank the reviewer for recognizing the novelty of our proposal and for noting
      Source branch `dmitry-txcwins-10h` is NOT modified.
      Everything between these markers is new.
      ============================================================ -->
-   **d.** Fourth, we add a real world task whose state is not visible in any single token, and compare against pooled and stacked SAEs at matched sparsity. The TXC improves with window size and is above both baselines.
+   **d.** Fourth, we add a real world task whose label no single token of text displays, and compare against pooled and stacked SAEs at matched sparsity. The TXC improves with window size and is above both baselines.
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
 2. We address the reviewer's concerns about seeds by running three seeds for the base TXC. We confirm that the relative rankings do not change.
@@ -462,10 +465,13 @@ For every non-TXC baseline, subscripts give the selected k independently at each
 
 ### A new real world task: how long since the user last challenged the model
 
-We add a real world task in which the quantity being probed is not visible in
-any single token. The data is multi-turn dialogue where the user repeatedly
-questions the model's answers, and the label at each position is the number of
-tokens since the user last challenged it. We compare the TXC against a pooled
+We add a real world task whose label no single token of text displays. The data
+is multi-turn dialogue where the user repeatedly questions the model's answers,
+and the label at each position is the number of tokens since the user last
+challenged it. A probe on one token's activation still recovers part of it, as
+the residual stream has attended over the prefix, so the baselines here are not
+blind: they read the same activations, and the question is whether the window
+adds anything at matched sparsity. We compare the TXC against a pooled
 SAE (the mean of the per-token codes across the window) and a stacked SAE (the
 same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
 and read each one off at the sparsity the TXC actually uses. Three seeds;
