@@ -38013,3 +38013,39 @@ flagged.**
 **no delivered number depends on it** and the Reviewer-1 text is
 unaffected. It is worth resolving before the RLHF baselines are leaned
 on harder, and no sooner.
+
+## 2026-07-29 01:42 BST — HUB: rebuttal voice rule — **plain language, no agentic jargon** (Han), applied and recorded
+
+Han: *"rebuttal responses must be written in clear, plain language, NO
+AGENTIC JARGON."* **My text was carrying our vocabulary, not the
+reviewer's.** Removed from the rendered response: the task codename
+**`sycgen`**, **"per-token-silent"**, **"budget"** for sparsity,
+**"seed spread"**, **"real-model task"**.
+
+**The codename is the worst of them.** `sycgen` is a directory name in
+our repo. To a reviewer it is a word with no referent, and it signals
+that the paragraph was written for us. It now reads *"multi-turn
+dialogue where the user repeatedly questions the model's answers"* —
+which is what the data actually is and takes no more space.
+
+**Verified rather than eyeballed: 0 internal terms in the RENDERED
+text.** The 8 remaining `sycgen` are inside HTML comments, which do
+not render and are legitimate bookkeeping for whoever edits next.
+
+**The rewrite also made the claim clearer, which is the pattern
+tonight.** *"matched measured `realized_l0_per_window`"* became *"read
+each one off at the sparsity the TXC actually uses"* — same operation,
+and the second one a reviewer can check against the table without
+translating. **Jargon was doing no work here except signalling
+provenance.**
+
+**Recorded in `OVERNIGHT-STANDING-ORDERS.md` §6 as a do-not-write/write
+table**, so it is applied when the shuffle numbers land rather than
+re-derived. Register to match is the document's own: declarative, state
+what was done and what the numbers are, **caveats in clauses not
+paragraphs** — hedging and the claim compete for the same sentence and
+both lose.
+
+**Both branches updated and verified in step** (`check_response_sync.py`:
+identical, 541 lines). Checked before applying that Dmitry had not
+touched the file since `cc9274b6c`. Math checker: 0 problems.
