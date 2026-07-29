@@ -22,3 +22,11 @@ The already-submitted T-SAE width-32,768 seed-42 cell
 Run `setup_runtime.sh` once per pod, then `launch_grid.sh h100` or
 `launch_grid.sh a40`. Both scripts fail closed unless the checkout is on
 `neurips-aniket`.
+
+After a checkpoint is complete, `detect.py` reproduces the paper's grouped
+five-fold sparse-probe evaluation at
+\(S\in\{1,2,4,8,16,32\}\). It refuses partial or mismatched checkpoints and
+writes one compact, provenance-stamped JSON result. Steering is intentionally
+kept separate: the historical full evaluator loses generated panels if the
+Anthropic judge is unavailable, so it must not be launched until generation
+persistence and the judge credential have both been verified.
