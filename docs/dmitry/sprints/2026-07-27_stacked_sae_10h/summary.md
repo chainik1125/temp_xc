@@ -34,6 +34,14 @@ paper's own protocols, one training seed (42), window T=5.
    distribution shift; references 6–10× nominal, stacked ~32×), so the
    EM comparison is directional until the panel is re-thresholded.
    Notably the same cell at T=4 scored 0.512 — the win is T-sensitive.
+   Follow-up (2026-07-29): the EM *steering* cell also ran, through the
+   paper's own Wang stage-4 pipeline on the same weights. Same-grid
+   comparison: stacked Δalign|coh≥70 = 13.6 vs TXC 17.1 (TXC 1.26×),
+   but on the pipeline's peak-align criterion the ordering reverses
+   (stacked 69.3 vs TXC 74.6, lower = stronger; SAE-arditi 68.5 wins) —
+   EM steering differences sit within summary-convention sensitivity,
+   consistent with EM being the task where per-position approaches
+   compete with or beat the crosscoder.
 
 4. **A forensic result that matters beyond this sprint: the paper's C7
    numbers are a two-generation story.** The printed Fig 4/Table 2
@@ -54,6 +62,7 @@ paper's own protocols, one training seed (42), window T=5.
 | C3 probing | mean AUC, 38 tasks | 0.8694 | 0.89 (TXC) | 0.8026 |
 | C6 EM detection | PR-AUC @ S=16 | 0.6516† | 0.54 (TXC) | 0.3442 |
 | RLHF decomposition | pref AUC @ k=20 | 0.602 | 0.61 | **0.6174** |
+| C6 EM steering | Δalign\|coh≥70 (same grid) | 13.6 | 17.1 (TXC) | n/a |
 
 † see finding 3. Floor note: the untrained RLHF floor (0.6174)
 *exceeds* both the trained stacked cell (0.602) and the 0.61 headline —
@@ -98,5 +107,7 @@ registry entry (C6 first trained off-target; caught by the L0
 window/token ratio), and direct-CLI cells bypass cell-table overrides
 (RLHF first trained at k_win=80 instead of 500). Every result above
 postdates the fixes; the mislabeled artifacts are kept on HF for
-provenance. Total spend: ≈$95 in pods, ≈$8 in judge calls (of a $200
-cap).
+provenance. Total spend: ≈$105 in pods, ≈$23 in judge calls (of a $200 cap),
+including the follow-up EM steering cell (~21K Haiku calls; checkpoint
+injection into the purified pipeline required a config.json beside the
+safetensors — its absence silently triggers retraining).
