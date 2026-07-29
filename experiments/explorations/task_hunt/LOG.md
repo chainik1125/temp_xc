@@ -39630,3 +39630,41 @@ theirs, **and they caught it themselves and marked it "not yet
 fixed."** For the shuffle table the bracket is a **range**, not an
 interpolated point — recorded so the next reader does not treat the
 budget table's rule as general.
+
+## 2026-07-29 02:32 BST — HUB: **my own ruling invalidated a claim in the binding quote-form, and I swept for what the ruling broke**
+
+**A ruling is an edit to the claim set, and it can falsify text
+elsewhere the same way a retraction does.** Mine at 02:3x said *"what
+we CANNOT say: that training reduces order-sensitivity."* Twenty
+minutes later the binding quote-form still read:
+
+> *"the gap is architectural position-sensitivity, **which training
+> REDUCES at every T**"*
+
+**That is precisely the claim I had just ruled unsupported**, sitting
+in the most load-bearing sentence of the exhibit, on two surfaces.
+
+**Both qualified in place** with the reason and a pointer to the
+matched result. The handoff keeps the original wording visible in a
+parenthetical rather than silently rewriting it, per the retired-not-
+deleted precedent.
+
+**⚑ AND THE SWEEP'S CONTROL WENT DEAD THE MOMENT MY FIX LANDED.** I
+grepped the pattern after fixing and got **0 hits — from a control that
+returned 0 because I had removed the pattern**, not because the
+surfaces were clean. **A post-fix control tests nothing: the fix and
+the control were the same edit.** Re-ran the control against
+`origin/arxiv` (the pre-fix state in git): **1 hit on each surface, so
+the pattern is live and the 0 means clean.**
+
+**The rule from 02:2x needed one more clause, and this is it:**
+
+> A retraction is done when a controlled grep over every surface
+> returns zero — and **the control must be evaluated against a state
+> where the claim still exists**, not against the state you just
+> fixed.
+
+**Third sweep tonight where the control was the load-bearing part**
+(`floor_excess`, "at chance", now this), **and the first where the
+control itself was invalidated by my own fix.** Git history is the
+natural control surface: it always holds the pre-fix state.

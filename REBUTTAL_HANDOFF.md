@@ -647,8 +647,12 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   (seed-mean +0.02–+0.06), **but the untrained-twin control shows
   LARGER gaps at every T** (+0.10–+0.17; normalized ~0.5–0.9 vs
   trained ~0.04–0.11): the gap reflects the windowed encoder's
-  architectural position-sensitivity, **which training REDUCES at
-  every T** while lifting recovery from ≤0.22 to 0.50–0.59 — NOT
+  architectural position-sensitivity** — **⚑ but the matched run shows the twin's excess gap TRACKS its budget advantage (Spearman +0.80) and REVERSES at T=16 where budgets nearly match, so "training reduces it" is NOT established; see `tab_sycgen_shuffle_matched.md`**
+
+  *(This block previously read "which training REDUCES at every T".
+  That is exactly the claim the matched run cannot support.)*
+
+  ** while lifting recovery from ≤0.22 to 0.50–0.59 — NOT
   learned order-use. **The claim is the level story** (windowed TXC
   recovery rising with T over per-token anchors, on a task whose
   per-token probes read the state only PARTIALLY — 0.50–0.53 against a
