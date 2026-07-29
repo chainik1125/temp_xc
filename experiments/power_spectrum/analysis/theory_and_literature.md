@@ -10,11 +10,12 @@ localization, or higher-order dependencies. In particular, time reversal and
 the sign of a real sinusoid are invisible to an ordinary power spectrum.
 
 The result in Cagnetta et al. justifies Fourier analysis more narrowly than the
-strongest reading suggests. Translation invariance of the population two-point
-function makes temporal Fourier modes the natural diagonal coordinates of the
-second-order covariance operator. Their reported power-law decay of a
-*lagwise matrix norm* does **not** prove that language activations have a
-low-frequency-dominated power spectrum.
+strongest reading suggests. They use a corpus-averaged two-point function that
+depends only on lag. Conditional on that lag-stationary description,
+translation invariance makes temporal Fourier modes the natural diagonal
+coordinates of the second-order covariance operator. Their reported power-law
+decay of a *lagwise matrix norm* does **not** prove that language activations
+have a low-frequency-dominated power spectrum.
 
 The first experiment should therefore use a statistically controlled,
 multivariate screen with DC reported separately, multitaper AC spectra,
@@ -49,16 +50,18 @@ spectral estimation. See [Cagnetta, Raventós, Ganguli, and Wyart,
 2026](https://arxiv.org/abs/2602.07488), especially the token-correlation and
 sampling-noise sections.
 
-The definition suppresses the absolute position $i$. This is wide-sense
-stationarity, or translation invariance at second order. For the full
-two-sided matrix covariance sequence,
+The definition suppresses the absolute position $i$, thereby using a
+wide-sense-stationary, or second-order translation-invariant, summary. This is
+not itself an empirical stationarity test: corpus averaging can conceal
+document-position and domain changes. Conditional on this summary, define the
+full two-sided matrix covariance sequence by
 
 $$
 C(-n)=C(n)^\top,\qquad
 S(\omega)=\sum_{n=-\infty}^{\infty}C(n)e^{-i\omega n},
 $$
 
-$S(\omega)$ is a Hermitian positive-semidefinite cross-spectral density
+where $S(\omega)$ is a Hermitian positive-semidefinite cross-spectral density
 matrix. Equivalently, the covariance over a long finite window is block
 Toeplitz and is approximately block-diagonalized in temporal Fourier
 coordinates. This is the precise motivation for a frequency-domain
