@@ -247,6 +247,46 @@ def _gate_shuffle_live(tiles: torch.Tensor, tiles_sh: torch.Tensor,
 
 # ── arms ───────────────────────────────────────────────────────────────
 
+RETRAIN_TAG = "sycgen_keep_r1_rebuilt"
+_KEYS: dict = {}
+
+
+def _key_from_leaderboard(arch_name: str, T: int, seed: int) -> str | None:
+    """LOOK the train_key UP in the leaderboard; never re-derive it.
+
+    ⚑ `_key_from_manifest` (frontier.py) resolves only 6 of the 15 cells
+    on a fresh box, and the TXC arm — the entire claim arm — is among the
+    9 it misses. It is not wrong, it is reading an incomplete file:
+    **manifest entries are appended by the training process ON THE POD,
+    and containers never push**, so the committed
+    `checkpoints/manifest.jsonl` still holds pod-D's originals
+    (`ts 2026-07-28T01:40`) and nothing from tonight's rebuild. Item 6
+    only worked because it ran on the pod that wrote them.
+
+    The leaderboard IS repatriated — it is in git, one row per cell, and
+    the 15 rows tagged `sycgen_keep_r1_rebuilt` are exactly the cells
+    this lane loads. So it is the authoritative source here, and the
+    `(arch, T, seed) -> train_key` map is read off it.
+
+    Same species as "the weights are unreachable, not absent": the fact
+    is recorded somewhere real, and the lookup was pointed at a surface
+    that had not been synchronised.
+    """
+    if not _KEYS:
+        lb = Path(__file__).resolve().parents[4] / "results" / "leaderboard.jsonl"
+        for line in lb.read_text().splitlines():
+            if RETRAIN_TAG not in line:
+                continue
+            r = json.loads(line)
+            ov = (r.get("training_cfg") or {}).get("arch_hparams_override") or {}
+            _KEYS[(r["arch"], ov.get("T"), r["seed"])] = r["train_key"]
+        if len(_KEYS) != 15:
+            raise RuntimeError(
+                f"expected 15 cells under {RETRAIN_TAG}, found {len(_KEYS)} — "
+                "the leaderboard is not the grid this card describes")
+    return _KEYS.get((arch_name, T, seed))
+
+
 def _build(arch_name: str, T: int, seed: int, ds_spec, *, trained: bool):
     """Trained arm loads the mirrored checkpoint; twin is random init.
 
@@ -263,10 +303,22 @@ def _build(arch_name: str, T: int, seed: int, ds_spec, *, trained: bool):
     spec = spec.model_copy(update={
         "hparams": {**spec.hparams, "d_sae": 2048, "T": T, "k_pos": 8}})
     if trained:
-        tk = _key_from_manifest(arch_name, T, seed)
+        tk = _key_from_leaderboard(arch_name, T, seed)
+        if tk is None:                       # manifest only as a fallback
+            tk = _key_from_manifest(arch_name, T, seed)
         if tk is None:
             raise FileNotFoundError(
-                f"no manifest train_key for {arch_name} T={T} seed={seed}")
+                f"no train_key for {arch_name} T={T} seed={seed} in the "
+                f"leaderboard ({RETRAIN_TAG}) or the manifest")
+        # HF_MIRROR.md's standing rule, enforced rather than remembered:
+        # a resolved key is not a present checkpoint.
+        from temp_bench.core.config import checkpoint_dir
+        w = checkpoint_dir(tk) / "model.safetensors"
+        if not w.exists():
+            raise FileNotFoundError(
+                f"{arch_name} T={T} seed={seed}: train_key {tk} resolves but "
+                f"{w} is absent. Fetch it from the HF mirror "
+                f"(temp-bench-data, ckpts/{tk}/) — do NOT 'eval-only' it.")
         return _load_checkpoint(spec, tk, ds_spec), tk
     torch.manual_seed(int(seed))
     cls = import_by_path(spec.class_path)
