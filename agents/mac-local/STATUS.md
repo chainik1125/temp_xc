@@ -40,8 +40,8 @@ $0/h. All four mac-c hunt lanes un-parked behind lever 3.**
 | agent | state | lane |
 |---|---|---|
 | **mac-local** (me) | hub | rulings, LOG, handoff surfaces |
-| **mac-d** | **0 pods, $0/h** | ⚑ **TOP: `briefings/sycgen-shuffle-sparsity-matched.md`** — issued 00:34, **NOT YET CLAIMED.** Up to 20×H100 authorized (~$60/h; authorized ≠ free, pre-spend estimate first) |
-| **mac-c** | **0 pods, $0** | lever-3 rescue (`a027b7caa`, P1/P2/P3 held, P5 fired) + delivered the shuffle-brief pre-reg audit |
+| **mac-d** | **1 pod `mac-d-sycshuffle-0729` (A40, $0.44/h)** | ⚑ **TOP: `briefings/sycgen-shuffle-sparsity-matched.md`** — **CLAIMED, card frozen, sharding built, running.** Sized down from my 20×H100 authorization because the lane trains nothing (encode-and-probe) |
+| **mac-c** | **0 pods, $0** | lever-3 rescue (`a027b7caa`, P1/P2/P3 held, P5 fired), shuffle-brief pre-reg audit (A1–A5), A1 receipt, band review, and the floor-aim correction |
 
 ### ⚑ THE ONE LANE IN FLIGHT — sycgen shuffle ablation, sparsity-matched (01:2x)
 
