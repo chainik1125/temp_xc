@@ -3,7 +3,7 @@
 **Agent:** mac-c (macOS, `~/research/projects/agents/mac-c/temp_xc`)
 **Lane:** ⚑ **THE WHOLE TASK HUNT, END TO END** (`hunt-mac-c-takeover.md`),
 re-aimed by `briefings/hunt-safety-gold-clew.md` (active, owner mac-c)
-**Last update:** 2026-07-29 02:51 BST (stamped from `date` at write time)
+**Last update:** 2026-07-29 03:29 BST (stamped from `date` at write time)
 
 ---
 
@@ -103,9 +103,27 @@ itself still sits at `<scratch>/cache_evalage_512/gemma2_2b/hs14.npy`
 **P1 HELD 5/5** (evalage floor below retryesc at every T — the falsifier
 against my own floor law did not fire). **P2 HELD** (arm>floor 5/5 vs
 retryesc 2/5). **P3 FLIPPED as predicted** (floor-bound → gain-bound).
-**P5 FIRED: 2/5 cells clear BOTH bars** — T32 and T64; best **T64: arm
-0.5308, floor 0.3905, gain +0.0709 over tok 0.4599, min-both +0.0209**.
-Controls clean (`label_null` 0.3460 ≈ chance; foreign 0.4292).
+~~**P5 FIRED: 2/5 cells clear BOTH bars** — T32 and T64~~ **⛔ CORRECTED
+03:2x: it is 1/5, T64 ONLY.** Best **T64: arm 0.5308, floor 0.3905, gain
++0.0709 over tok 0.4599, min-both +0.0209**. Controls clean
+(`label_null` 0.3460 ≈ chance; foreign 0.4292).
+
+> **⚑ THE ERROR BAR EXISTS NOW (`0feaebc3e`) — quote THESE, not the
+> single-seed numbers.** Lane B on evalage, 5 seeds + paired bootstrap:
+>
+> | cell | gain | 95% CI | SD_seed | P(gain<0.05) |
+> |---|---|---|---|---|
+> | T32 | +0.0445 | [+0.0336, +0.0553] | **0.0205** | **0.840** |
+> | T64 | **+0.0705** | **[+0.0587, +0.0828]** | 0.0101 | **0.001** |
+>
+> **T64 SURVIVES** — CI entirely above the bar, and the 5-seed mean
+> (+0.0705) reproduces the single-seed +0.0709. **T32 FAILS** — its
+> 5-seed gain is **+0.0445, BELOW the +0.05 bar**, where my single-seed
+> run had it at +0.0554 and clearing. **Proviso 1 was right and is now
+> measured:** T32's `SD_seed(gain)` is **0.0205, ~4× its own SE_boot**,
+> so training variance dominates there and one seed landed lucky.
+> **The bar was NOT moved** — T32 fell below a threshold fixed before
+> the data, which is the threshold working.
 
 **⚑⚑ THIS IS A RESCUE AND IS DISCLOSED AS ONE (P5, written pre-data).
 NEVER quote it as though it passed the original screen.** Three
@@ -113,11 +131,13 @@ provisos, all already on record and none to be dropped when
 re-summarising:
 
 1. **T32 is not credibly anything** — margin **+0.0054**, inside the
-   sampling SE alone (Lane B: SE_boot ≈ 0.0074). Only **T64** merits
-   follow-up.
-2. **Single seed.** Lane B: training variance is real and does not
-   shrink with `n_test`. No error bar exists for *this* corpus yet —
-   that is the obvious next measurement if the lane is resumed.
+   sampling SE alone. **✅ CONFIRMED BY MEASUREMENT `0feaebc3e`:** its
+   5-seed gain is **+0.0445, below the bar**, `P(gain<0.05)=0.840`.
+   Only **T64** merits follow-up.
+2. ~~**Single seed.** … No error bar exists for *this* corpus yet.~~
+   **✅ DISCHARGED `0feaebc3e`** — Lane B run on evalage, 5 seeds +
+   paired bootstrap. **T64 survives (P(gain<0.05)=0.001); T32 does
+   not (0.840).** See the table above.
 3. **⚑ THE BAR IT CLEARS IS THE SUPERSEDED ONE.** It runs against `tok`,
    a per-token probe. The post-item-6 bar is **"beats a pooled SAE on a
    measured budget frontier."** Against the current bar this cell is

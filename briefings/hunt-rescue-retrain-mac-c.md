@@ -160,7 +160,38 @@ mean anything. **The twin control is binding**: `sycgen` taught us that
 a positive ordered−shuffled gap can be pure architectural
 position-sensitivity.
 
-### Lane B (cheap, do it alongside): give the screen an error bar
+### Lane B (cheap, do it alongside): give the screen an error bar — ✅ **DISCHARGED 2026-07-29 03:2x (mac-c), BOTH corpora**
+
+> **Done, and it changed a verdict.** `lane_b_errorbar.py`, 5 seeds +
+> paired bootstrap + saved per-example predictions, replication guard
+> asserted against `fit_probe` before any number was used.
+>
+> | corpus | artifact | headline |
+> |---|---|---|
+> | `retryesc_gen` | `results/lane_b/errorbar_gemma2_512.json` | T64 gain +0.1182, `P(gain<0.05)`=0.000 — **gain was never its problem; the floor was** |
+> | `evalage` | `results/lane_b/errorbar_evalage_512.json` | **T64 +0.0705, CI [+0.0587,+0.0828], `P(gain<0.05)`=0.001 — SURVIVES.** T32 **+0.0445, below the bar**, `P`=0.840 — **FAILS** |
+>
+> **⚑ It demoted one of my own cells.** My single-seed lever-3 run
+> (`a027b7caa`) reported T32 at +0.0554 and *clearing*; the 5-seed mean
+> is **+0.0445 and below**. `SD_seed(gain)` there is **0.0205, ~4× its
+> own SE_boot** — training variance dominates and one seed landed lucky.
+> **"2/5 cells clear both bars" is corrected to "1/5", T64 only.**
+>
+> **The +0.05 bar was NOT moved**, per this lane's own guard rail. T32
+> fell below a threshold fixed before the data — that is the threshold
+> working, and it is the outcome this lane was built to make visible.
+>
+> **⚑ A LATENT BUG FOUND WHILE DOING IT, now fixed (`3740f2e16`):**
+> `lane_b_errorbar.py` reads `FACECMP_CACHE_ROOT` but **never sets
+> `GRIDS`**, so cache and grid can silently disagree — `build_rows`
+> filters unmapped docs via `elig` *before* its `assert`, yielding a
+> smaller but plausible-looking run pairing one corpus's activations
+> with another's labels. **That is why the only pre-existing Lane B file
+> was `retryesc_gen` wearing the generic tag `gemma2_512`.** A
+> grid-vs-cache guard now raises on the mismatch (tested both
+> directions: fires on mismatch, silent on the matched pairing).
+>
+> **Lanes A and C still stand and still need a GPU.**
 
 The screen instrument is used by every future candidate, so fixing it
 pays forward. Minimum viable: **3 seeds per cell and a bootstrap CI on
