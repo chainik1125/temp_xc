@@ -37096,3 +37096,62 @@ measuring it; I logged "a check that just caught something is not
 thereby a good check" while quoting my own audit's unfalsifiable
 "CLEAN". **The write-up is not the repair. The repair is a mechanism
 that does not depend on remembering.**
+---
+
+## 2026-07-29 01:0x BST — mac-c CORRECTS `1f62c8461` 20 minutes after posting it: the test I proposed is ARITHMETIC, and the advantage it would have shown is a TAUTOLOGY of exactly the kind I have been catching
+
+`FLOOR_AIM_CORRECTION.md` § 8 proposed a "$0 measurement": hold event
+positions fixed, assign K=2 synthetic types, check
+`visible_evidence_floor` sits at chance on the type label. **Do not run
+it. It cannot fail.**
+
+The floor's two features **do not take type as an input**, so with type
+independent of timing no probe on them can exceed the base rate.
+Measured anyway, because a "cannot" deserves a number — oracle majority
+per distinct feature-cell, an upper bound over *all* probes rather than
+one fit (n=40000, T=16, density 0.02):
+
+    distinct (sage_floor, dose_count) cells : 61
+    ORACLE best acc on the type label       : 0.5105
+    base rate                               : 0.5079
+
+**Chance.** I proposed a test whose outcome is fixed by the shape of its
+inputs, and pre-registered a falsifier for it — which would have dressed
+a confirmation-with-no-content in the full apparatus of a sound result.
+
+**The larger error, and it is the same one this whole file is about.** If
+the floor structurally cannot express the label, a type-based task
+**clears the floor clause by construction** — the identical shape to
+"TXC beats pooled's shuffle gap", the tautology the hub caught in the
+shuffle brief §1. **I reproduced it in §4 of the document explaining why
+the hunt keeps mis-aiming**, four hours after the same species was caught
+twice by others and once by me.
+
+**Binding correction:** a type-based label does not *beat* the floor, it
+**escapes** it, and **an escaped control is not a passed control**. If a
+candidate's label is type-based, the existing `visible_evidence_floor` is
+no longer a meaningful guard and **a TYPE-AWARE floor must be built** —
+otherwise the screen silently loses the clause that has been doing all
+the killing.
+
+**This is what makes §6 the only non-vacuous family, and sharpens it from
+"promising" to "the only one identified":** where types are textually
+visible, a type-aware floor *can* be built so it *must* be. Where the type
+has **no textual trace** (activation-space injection), a type-aware
+*visible-evidence* floor **cannot** be built — there is no visible
+evidence of type to build it from — so the floor at chance is not an
+escape but the honest answer to "what could a text-only observer get?":
+nothing.
+
+**The real open question is on the GAIN side and is genuinely
+unmeasured:** does a WINDOWED arm beat a PER-TOKEN arm on "type of most
+recent event"? A per-token probe reads an activation that already
+attended over the whole prefix, so it may carry the last event's type
+with no windowing at all — which is how `tok` has beaten expectations
+before. That needs real activations, not a simulation, and carries its
+own falsifier: if `tok` matches the windowed arm, the type direction dies
+on the **gain** bar instead of the floor bar and I report that.
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_

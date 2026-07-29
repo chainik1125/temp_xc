@@ -175,11 +175,77 @@ before more sourcing because it invalidates the search key: hunting for
 per-token-silent tasks selects for the gain bar, and the gain bar has not
 been the binding constraint since `retryesc_gen`.
 
-**The next concrete step is cheap and is a measurement, not a
-generation:** take any existing corpus, hold event positions fixed,
-assign K=2 synthetic event *types*, and check that
-`visible_evidence_floor` sits at chance on the type label while the
-windowed arm does not. That is a $0 local run on cached activations and
-it tests § 4 directly before anything is generated. **It should be
-pre-registered with a falsifier — if the floor is NOT at chance on a
-type label, § 4 is wrong and I report that.**
+## 9. ⚑⚑ CORRECTION TO § 8, 20 MINUTES LATER — the test I proposed is ARITHMETIC, and the "advantage" it would have shown is a TAUTOLOGY
+
+§ 8 originally proposed: *hold event positions fixed, assign K=2
+synthetic types, check the floor sits at chance on the type label.*
+**Do not run that. It cannot fail, and I should have seen it before
+posting.**
+
+The floor's two features **do not take type as an input**. Given a type
+independent of timing, no probe on them can exceed the base rate — this
+is arithmetic, not a result. Measured anyway, because a claim of
+"cannot" deserves a number (`n=40000`, `T=16`, density 0.02, oracle
+majority per distinct feature-cell — an upper bound over *all* probes,
+not one fit):
+
+    distinct (sage_floor, dose_count) cells : 61
+    ORACLE best accuracy on the type label  : 0.5105
+    base rate                               : 0.5079
+
+**0.5105 vs 0.5079 — chance.** A test whose outcome is fixed by the
+shape of the inputs is not evidence, and running it would have produced
+a confirmation with no content.
+
+### And the part that matters more: clearing the floor this way is VACUOUS
+
+If the floor structurally cannot express the label, then a type-based
+task **clears the floor clause by construction**. That is the same shape
+as "TXC beats pooled's shuffle gap" — the tautology the hub caught in
+`briefings/sycgen-shuffle-sparsity-matched.md` § 1 — and I reproduced it
+in § 4 of this very document while writing up why the hunt keeps
+mis-aiming.
+
+**So § 4 must be read with this attached:** a type-based label does not
+*beat* the floor, it **escapes** it, and an escaped control is not a
+passed control. The correct response is not "type labels are the
+answer". It is:
+
+> **If a candidate's label is type-based, the existing
+> `visible_evidence_floor` is no longer a meaningful guard for it, and a
+> TYPE-AWARE floor must be built — otherwise the screen has silently
+> lost the clause that has been doing all the killing.**
+
+### Which is exactly what makes § 6 the only non-vacuous family
+
+The two cases separate cleanly:
+
+- **Types visible in the text** — a type-aware floor *can* be built from
+  visible evidence, so it *must* be, and the candidate has to beat it.
+  Clearing the current floor proves nothing.
+- **Types with no textual trace** (activation-space injection, § 6) — a
+  type-aware **visible-evidence** floor **cannot** be built, because
+  there is no visible evidence of type to build it from. Here the floor
+  sitting at chance is not an escape; it is the honest answer to "what
+  could a text-only observer get?", which is: nothing.
+
+**§ 6 is therefore not merely a promising family — it is the only one
+identified so far where a type-based label clears the floor clause
+legitimately rather than vacuously.**
+
+### The real open question, restated
+
+The floor is settled by arithmetic. What is genuinely unmeasured is the
+**gain** side, and it is not obvious:
+
+> **Does a WINDOWED arm beat a PER-TOKEN arm on a "type of most recent
+> event" label?**
+
+A per-token probe at position *t* reads an activation that has already
+attended over the whole prefix, so it may well carry "the last event was
+type A" without any windowing. That is precisely how `tok` has
+outperformed expectations before. **That** is the measurement worth
+running, it needs real activations rather than a simulation, and it
+should carry a falsifier: if `tok` matches the windowed arm on a type
+label, the type direction dies on the gain bar instead of the floor bar
+and I report that.
