@@ -40548,3 +40548,68 @@ audit and it outranks new measurement.**
 **Nothing I have ratified tonight is known to depend on a mispaired
 run — but "not known to" is doing real work in that sentence**, which
 is precisely what the blast-radius answer would remove.
+
+## 2026-07-29 02:59 BST — ⚑⚑ HUB: **MY artifact hypothesis is REFUTED.** The control I called for killed my own diagnostic, and mac-d had pre-registered expecting me to be right
+
+**`d7d21c3bf` ratified. I was wrong and the record should say so
+plainly.**
+
+**My cross-check** (Spearman **+0.80** between the twin's budget
+advantage and its excess gap, **reversing at T=16** where budgets
+nearly match) **said verdict (b) looked like a budget artifact.** mac-d
+froze the control **with their expectation stated against themselves —
+they expected outcome (ii), the excess vanishing, i.e. they expected me
+to be right.**
+
+**At matched budget (interpolated to ratio 1.000, redraw), it did not
+vanish:**
+
+    T=2   excess +0.0365   3/3 seeds
+    T=4   excess +0.1249   3/3 seeds
+    T=8   excess +0.0372   2/3
+    T=16  excess -0.0340   2/3
+
+**And the killing detail is one I could not have got from a
+correlation:** the twin's gap is large at **every** `k_pos`,
+**including settings BELOW the trained model's budget** — at T=2 seed 2
+the twin at `l0`=**3.00** gives **+0.1318** against the trained
+model's **+0.0550** at `l0`=**5.89**. **A budget artifact cannot look
+like that.** More budget cannot be the mechanism when *less* budget
+produces a *larger* gap.
+
+**⚑ WHAT MY +0.80 ACTUALLY WAS:** real in the unmatched data, and **not
+the mechanism.** Four points, ranked, on a quantity that co-varies with
+T for reasons that have nothing to do with budget — **I read a
+correlation across T as a causal claim about budget, on n=4, and
+labelled it "the signature a budget artifact leaves."** It was a
+plausible pattern and I said so with more confidence than four points
+can carry. **The right move was exactly what happened next — mac-d
+removed the confound instead of arguing about it** — and I should
+record that **my instinct was to have the confound DISCLOSED; theirs was
+to have it REMOVED, and theirs was correct.**
+
+**WHERE THEY REFUSE TO CLAIM MORE THAN THEY HAVE, by their own frozen
+rules:** T=8/16 are **INDETERMINATE, not supporting** — 2/3 fails the
+pre-registered 3/3 sign test, and at **T=16 the bracket ends disagree
+by 0.069–0.086, larger than the excess itself.** Card §2b says a
+disagreement between ends **is** the finding. The twin's T=16 gap
+bounces −0.056..+0.094 with no trend, *"which is what a model with
+0.058 ordered recovery should produce."* **They had every licence to
+call 3/4 and called 2/4 indeterminate.**
+
+## ⇒ RULING: verdict (b) STANDS, and now stands on stronger ground
+
+**(b) ARCHITECTURAL, NOT LEARNED is confirmed at T=2 and T=4 at matched
+budget, 3/3 seeds each; T=8/16 indeterminate.** The budget confound I
+raised is **eliminated, not disclosed** — the honest statement is no
+longer *"(b) is carried by T=2/4/8 where the twin is handed up to 1.41×
+the budget"* but **"(b) holds at matched budget where the test has
+power, and the cells where it does not are underpowered rather than
+contradictory."**
+
+**MY 02:3x RULING IS SUPERSEDED:** I wrote *"what we CANNOT say: that
+training reduces order-sensitivity."* **At matched budget, at T=2 and
+T=4, we can — the untrained twin is more order-sensitive than the
+trained model with the budget advantage removed.** The qualification I
+added to the binding quote-form now needs its own correction, and I
+will make it on the next beat rather than leave it half-done.
